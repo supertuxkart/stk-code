@@ -20,6 +20,8 @@
 #include "utils/extract_mobile_assets.hpp"
 #include "addons/zip.hpp"
 #include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
@@ -64,10 +66,27 @@ bool ExtractMobileAssets::extract(const std::string& zip_file,
             succeed = true;
         }
     }
-    if (succeed)
-        file_manager->reinitAfterDownloadAssets();
     file_manager->removeFile(zip_file);
     return succeed;
 }   // extract
+
+// ----------------------------------------------------------------------------
+void ExtractMobileAssets::reinit()
+{
+    file_manager->reinitAfterDownloadAssets();
+    irr_driver->sameRestart();
+    track_manager->loadTrackList();
+}   // reinit
+
+// ----------------------------------------------------------------------------
+void ExtractMobileAssets::uninstall()
+{
+    // Remove the version file in stk-assets folder first, so if it crashes /
+    // restarted by mobile it will auto discard downloaded assets
+    file_manager->removeFile(file_manager->getSTKAssetsDownloadDir() +
+        "stk-assets." + STK_VERSION);
+    file_manager->removeDirectory(file_manager->getSTKAssetsDownloadDir());
+    reinit();
+}   // uninstall
 
 #endif

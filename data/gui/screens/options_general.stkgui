@@ -86,6 +86,11 @@
                    </div>
 
                    <spacer width="5" height="4%"/>
+                   <div width="100%" height="fit" layout="horizontal-row" >
+                       <spacer width="1%" height="100%"/>
+                       <button id="assets_settings" raw_text="Android specific options"/>
+                   </div>
+                   <spacer width="5" height="4%"/>
                </box>
             </div>
         </div>

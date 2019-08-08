@@ -20,19 +20,10 @@
 #define HEADER_DOWNLOAD_ASSETS_SIZE_HPP
 /* Return .zip file size in bytes (as in ls -l)
  */
-inline unsigned getDownloadAssetsSize(bool is_full, bool is_hd)
+inline unsigned getDownloadAssetsSize()
 {
     // Todo: generated from some sed script
-    unsigned full_hd = 188442091;
-    unsigned full_nonhd = 83487825;
-    unsigned nonfull_hd = 166310030;
-    unsigned nonfull_nonhd = 69282428;
-    if (is_full && is_hd)
-        return full_hd;
-    if (is_full && !is_hd)
-        return full_nonhd;
-    if (!is_full && is_hd)
-        return nonfull_hd;
-    return nonfull_nonhd;
+    unsigned stk_assets_size = 188442091;
+    return stk_assets_size;
 }
 #endif

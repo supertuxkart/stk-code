@@ -178,7 +178,7 @@
 
   <urls donate="https://supertuxkart.net/Donate"
         password-reset="https://online.supertuxkart.net/password-reset.php"
-        assets-download="https://downloads.sourceforge.net/project/supertuxkart/stk-assets-mobile/"/>
+        assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
 
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over

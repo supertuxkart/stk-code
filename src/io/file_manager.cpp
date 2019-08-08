@@ -215,9 +215,9 @@ FileManager::FileManager()
 #ifdef MOBILE_STK
     m_stk_assets_download_dir = getenv("HOME");
 #ifdef IOS_STK
-    m_stk_assets_download_dir += "/Library/Application Support/SuperTuxKart/stk-assets-full/";
+    m_stk_assets_download_dir += "/Library/Application Support/SuperTuxKart/stk-assets/";
 #elif defined (ANDROID)
-    m_stk_assets_download_dir += "/stk-assets-full/";
+    m_stk_assets_download_dir += "/stk-assets/";
 #endif
 
 #else

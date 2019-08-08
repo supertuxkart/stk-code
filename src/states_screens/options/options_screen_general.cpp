@@ -38,6 +38,8 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens/dialogs/download_assets.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
 #include "states_screens/options/options_screen_input.hpp"
@@ -46,6 +48,7 @@
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
+#include "utils/extract_mobile_assets.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -113,6 +116,24 @@ void OptionsScreenGeneral::init()
     assert( show_login!= NULL );
     show_login->setState( UserConfigParams::m_always_show_login_screen);
 
+#ifdef MOBILE_STK
+    if (ExtractMobileAssets::hasFullAssets())
+    {
+        // I18N: For mobile version for STK, uninstall the downloaded assets
+        getWidget("assets_settings")->setText(_("Uninstall full game assets"));
+    }
+    else
+    {
+        // I18N: For mobile version for STK, install the full game assets which
+        // will download from stk server
+        getWidget("assets_settings")->setText(_("Install full game assets"));
+    }
+    if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED ||
+        StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+        getWidget("assets_settings")->setActive(false);
+#else
+    getWidget("assets_settings")->setVisible(false);
+#endif
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -217,6 +238,29 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         assert( difficulty != NULL );
         UserConfigParams::m_per_player_difficulty = difficulty->getState();
     }
+#ifdef MOBILE_STK
+    else if (name=="assets_settings")
+    {
+        if (ExtractMobileAssets::hasFullAssets())
+        {
+            class AssetsDialogListener : public MessageDialog::IConfirmDialogListener
+            {
+            public:
+                virtual void onConfirm() OVERRIDE
+                {
+                    ModalDialog::dismiss();
+                    ExtractMobileAssets::uninstall();
+                }
+            };   // class AssetsDialogListener
+            new MessageDialog(
+                _("Are you sure to uninstall full game assets?"),
+                MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
+                new AssetsDialogListener(), true);
+        }
+        else
+            new DownloadAssets();
+    }
+#endif
 #endif
 }   // eventCallback
 
