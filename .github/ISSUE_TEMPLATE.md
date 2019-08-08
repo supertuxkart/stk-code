@@ -14,7 +14,7 @@ For any suggestions, please address them on the forum: https://forum.freegamedev
 
 ## Configuration
 
-<!-- PLease specify the version of STK you are using.  The version can be found in the "About" screen. -->
+<!-- Please specify the version of STK you are using.  The version can be found in the "About" screen. -->
 STK release version: 
 
 <!-- Please specify where you downloaded STK -->
