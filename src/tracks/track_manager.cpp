@@ -150,6 +150,10 @@ void TrackManager::loadTrackList()
     m_arena_groups.clear();
     m_soccer_arena_groups.clear();
     m_track_avail.clear();
+    // This function is called when install a new addons, delete previous
+    // tracks
+    for (Track* track : m_tracks)
+        delete track;
     m_tracks.clear();
 
     for(unsigned int i=0; i<m_track_search_path.size(); i++)
