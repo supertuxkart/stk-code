@@ -72,7 +72,7 @@ private:
 public:
                 TrackManager();
                ~TrackManager();
-
+    static void removeTrackSearchDirs();
     static void addTrackSearchDir(const std::string &dir);
     /** Returns a list of all track identifiers. */
     std::vector<std::string> getAllTrackIdentifiers();

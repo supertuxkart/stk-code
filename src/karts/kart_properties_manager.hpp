@@ -78,6 +78,7 @@ protected:
 public:
                              KartPropertiesManager();
                             ~KartPropertiesManager();
+    static void              removeKartSearchDirs();
     static void              addKartSearchDir       (const std::string &s);
     const KartProperties*    getKartById            (int i) const;
     const KartProperties*    getKart(const std::string &ident) const;

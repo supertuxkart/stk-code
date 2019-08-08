@@ -47,6 +47,12 @@ TrackManager::~TrackManager()
 }   // ~TrackManager
 
 //-----------------------------------------------------------------------------
+void TrackManager::removeTrackSearchDirs()
+{
+    m_track_search_path.clear();
+}   // removeTrackSearchDirs
+
+//-----------------------------------------------------------------------------
 /** Adds a directory from which tracks are loaded. The track manager checks if
  *  either this directory itself contains a track, and if any subdirectory
  *  contains a track.

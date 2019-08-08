@@ -234,7 +234,6 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
-#include "states_screens/download_assets.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/register_screen.hpp"
@@ -1713,31 +1712,6 @@ void initRest()
     input_manager = new InputManager();
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
-#ifdef MOBILE_STK
-    if (DownloadAssets::getInstance()->needDownloadAssets())
-    {
-        // The screen tell user it will use wifi / cellular data to download already
-        int prev_state = UserConfigParams::m_internet_status;
-        UserConfigParams::m_internet_status = Online::RequestManager::IPERM_ALLOWED;
-        DownloadAssets::getInstance()->push();
-        main_loop = new MainLoop(0, true/*download_assets*/);
-        main_loop->run();
-        delete main_loop;
-        main_loop = NULL;
-        // Reset after finish download
-        UserConfigParams::m_internet_status = prev_state;
-        if (DownloadAssets::getInstance()->needDownloadAssets())
-            throw std::runtime_error("User doesn't want to download assets");
-        else
-        {
-            // Clean the download assets screen after downloading
-            GUIEngine::clear();
-            GUIEngine::cleanUp();
-            GUIEngine::clearScreenCache();
-            GUIEngine::init(device, driver, StateManager::get());
-        }
-    }
-#endif
 
     stk_config->initMusicFiles();
     // This only initialises the non-network part of the add-ons manager. The
