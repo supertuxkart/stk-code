@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/transport_address.hpp"
@@ -94,7 +95,7 @@ Network::~Network()
 ENetPeer *Network::connectTo(const TransportAddress &address)
 {
     const ENetAddress enet_address = address.toEnetAddress();
-    return enet_host_connect(m_host, &enet_address, 2, 0);
+    return enet_host_connect(m_host, &enet_address, EVENT_CHANNEL_COUNT, 0);
 }   // connectTo
 
 // ----------------------------------------------------------------------------
