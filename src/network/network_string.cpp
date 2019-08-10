@@ -18,6 +18,7 @@
 #include "network/network_string.hpp"
 
 #include "utils/string_utils.hpp"
+#include "utils/utf8/core.h"
 
 #include <algorithm>   // for std::min
 #include <iomanip>
@@ -148,17 +149,30 @@ BareNetworkString& BareNetworkString::encodeString16(
 int BareNetworkString::decodeString16(irr::core::stringw* out) const
 {
     uint16_t str_len = getUInt16();
-    std::u32string convert;
+    // Irrlicht string has bad append speed for large string
+    if (sizeof(wchar_t) == 4)
+        out->reserve(str_len + 1);
+    else
+        out->reserve((str_len * 2) + 1);
     for (unsigned i = 0; i < str_len; i++)
     {
         uint32_t c = getUInt32();
         if (sizeof(wchar_t) == 2)
-            convert += (char32_t)c;
+        {
+            if (c > 0xffff)
+            {
+                c -= 0x10000;
+                // Make a surrogate pair
+                using namespace utf8::internal;
+                out->append(wchar_t((c >> 10) + LEAD_SURROGATE_MIN));
+                out->append(wchar_t((c & 0x3ff) + TRAIL_SURROGATE_MIN));
+            }
+            else
+                out->append((wchar_t)c);
+        }
         else
             out->append((wchar_t)c);
     }
-    if (str_len > 0 && !convert.empty())
-        *out = StringUtils::utf32ToWide(convert);
     return str_len * 4 + 2;
 }   // decodeString16
 
