@@ -146,9 +146,11 @@ public:
     /** Allows one to read a buffer from the beginning again. */
     void reset() { m_current_offset = 0; }
     // ------------------------------------------------------------------------
-    BareNetworkString& encodeString16(const irr::core::stringw& value);
+    BareNetworkString& encodeString16(const irr::core::stringw& value,
+                                      uint16_t max_len = 65535);
     // ------------------------------------------------------------------------
-    int decodeString16(irr::core::stringw* out) const;
+    int decodeString16(irr::core::stringw* out,
+                       uint16_t max_len = 65535);
     // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);
     BareNetworkString& encodeString(const irr::core::stringw &value);

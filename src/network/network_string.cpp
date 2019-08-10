@@ -51,6 +51,17 @@ void NetworkString::unitTesting()
     max = smax.getInt24();
     assert(max == 0x7fffff);
 
+    // Check max len handling in decodeString16
+    BareNetworkString string16;
+    string16.addUInt32(0).encodeString16(L"abcdefg").encodeString(std::string("hijklmnop"));
+    max = string16.getUInt32();
+    core::stringw out_1;
+    std::string out_2;
+    string16.decodeString16(&out_1, 4);
+    assert(out_1 == L"abcd");
+    string16.decodeString(&out_2);
+    assert(out_2 == "hijklmnop");
+
     // Check log message format
     BareNetworkString slog(28);
     for(unsigned int i=0; i<28; i++)
@@ -118,7 +129,8 @@ int BareNetworkString::decodeStringW(irr::core::stringw *out) const
 /** Encode string with max length of 16bit and utf32, used in motd or
  *  chat. */
 BareNetworkString& BareNetworkString::encodeString16(
-                                               const irr::core::stringw& value)
+                                               const irr::core::stringw& value,
+                                               uint16_t max_len)
 {
     size_t utf32_len = 0;
     const uint32_t* utf32 = NULL;
@@ -137,8 +149,8 @@ BareNetworkString& BareNetworkString::encodeString16(
     }
 
     uint16_t str_len = (uint16_t)utf32_len;
-    if (utf32_len > 65535)
-        str_len = 65535;
+    if (utf32_len > max_len)
+        str_len = max_len;
     addUInt16(str_len);
     for (unsigned i = 0; i < str_len; i++)
         addUInt32(utf32[i]);
@@ -146,7 +158,8 @@ BareNetworkString& BareNetworkString::encodeString16(
 }   // encodeString16
 
 // ----------------------------------------------------------------------------
-int BareNetworkString::decodeString16(irr::core::stringw* out) const
+int BareNetworkString::decodeString16(irr::core::stringw* out,
+                                      uint16_t max_len)
 {
     uint16_t str_len = getUInt16();
     // Irrlicht string has bad append speed for large string
@@ -156,6 +169,11 @@ int BareNetworkString::decodeString16(irr::core::stringw* out) const
         out->reserve((str_len * 2) + 1);
     for (unsigned i = 0; i < str_len; i++)
     {
+        if (i >= max_len)
+        {
+            skip((str_len - i) * 4);
+            break;
+        }
         uint32_t c = getUInt32();
         if (sizeof(wchar_t) == 2)
         {
