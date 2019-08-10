@@ -43,10 +43,6 @@ private:
     /* True if the border to draw should be thin */
     bool m_thin_border;
 
-    /** If true, characters will have right alignment when rendering, for RTL
-     *  language. */
-    bool m_rtl;
-
     /** Scaling when rendering. */
     float m_scale;
 
@@ -65,15 +61,14 @@ public:
     /** Constructor. It will initialize all members with default values if no
      *  parameter is given. */
     FontSettings(bool black_border = false, bool colored_border = false,
-                 bool thin_border = false,
-                 bool rtl = false, float scale = 1.0f, bool shadow = false,
+                 bool thin_border = false, float scale = 1.0f,
+                 bool shadow = false,
                  const video::SColor& shadow_color = video::SColor(0, 0, 0, 0),
                  const video::SColor& border_color = video::SColor(0, 0, 0, 0))
     {
         m_black_border = black_border;
         m_colored_border = colored_border;
         m_thin_border = thin_border;
-        m_rtl = rtl;
         m_scale = scale;
         m_shadow = shadow;
         m_shadow_color = shadow_color;
@@ -127,13 +122,6 @@ public:
     // ------------------------------------------------------------------------
     /** Return if the border should be thin or not. */
     bool useThinBorder() const                        { return m_thin_border; }
-    // ------------------------------------------------------------------------
-    /** Set right text alignment for RTL language.
-     *  \param rtl If it's enabled. */
-    void setRTL(bool rtl)                                      { m_rtl = rtl; }
-    // ------------------------------------------------------------------------
-    /** Return if right text alignment for RTL language is enabled. */
-    bool isRTL() const                                        { return m_rtl; }
 
 };   // FontSettings
 

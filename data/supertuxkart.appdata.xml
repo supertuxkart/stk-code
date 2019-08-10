@@ -5,24 +5,28 @@
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0+</project_license>
   <name>SuperTuxKart</name>
-  <summary>A racing game</summary>
+  <summary>A 3D arcade racer with a variety of characters, tracks, and modes to play.</summary>
   <description>
     <p>
-      Supertuxkart is a free 3D kart racing game, with a focus on having fun over
-      realism. You can play with up to 4 friends on one PC, racing against each
-      other, or try to beat the computer in single-player mode.
+      Karts. Nitro. Action! SuperTuxKart is a 3D open-source arcade racer with a 
+      variety of characters, tracks, and modes to play. Our aim is to create a 
+      game that is more fun than realistic, and provide an enjoyable experience 
+      for all ages.
     </p>
     <p>
-      See the great lighthouse or drive through the sand and visit the pyramids.
-      Race underground or in space, watching the stars pass by. Or rest under the
-      palm trees on the beach, watching the other karts overtake you. But don't eat
-      the bananas! Watch for bowling balls, plungers, bubble gum and cakes thrown by
-      your opponents.
+      Discover the mystery of an underwater world, or drive through the jungles 
+      of Val Verde and visit the famous Cocoa Temple. Race underground or in a
+      spaceship, through a rural farmland or a strange alien planet.
+      Or rest under the palm trees on the beach, watching the other karts
+      overtake you. But don't eat the bananas! Watch for bowling balls,
+      plungers, bubble gum, and cakes thrown by your opponents.
     </p>
     <p>
-      You can do a single race against other karts, compete in one of several Grand
-      Prix, try to beat the high score in time trials on your own, play battle mode
-      against the computer or your friends, and more!
+      You can do a single race against other karts, compete in one of several 
+      Grand Prix, try to beat the high score in time trials on your own, play 
+      battle mode against the computer or your friends, and more! For a greater 
+      challenge, race online against players from all over the world and prove 
+      your racing prowess!
     </p>
   </description>
   <screenshots>

@@ -280,4 +280,3 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 
     node->updateAbsolutePosition();
 }
-

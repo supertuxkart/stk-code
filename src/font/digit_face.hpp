@@ -40,12 +40,13 @@ private:
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
-    DigitFace(FaceTTF* ttf);
+    DigitFace();
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
-
+    // ------------------------------------------------------------------------
+    virtual bool disableTextShaping() const OVERRIDE           { return true; }
 };   // DigitFace
 
 #endif

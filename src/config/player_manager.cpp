@@ -81,19 +81,6 @@ PlayerProfile::OnlineState PlayerManager::getCurrentOnlineState()
 }   // getCurrentOnlineState
 
 // ----------------------------------------------------------------------------
-/** Returns the online name of this player.
- */
-const irr::core::stringw& PlayerManager::getCurrentOnlineUserName()
-{
-    if (getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN ||
-        getCurrentOnlineState() == PlayerProfile::OS_GUEST         )
-        return getCurrentOnlineProfile()->getUserName();
-
-    static core::stringw not_signed_in = _("Currently not signed in");
-    return not_signed_in;
-}   // getCurrentOnlineUserName
-
-// ----------------------------------------------------------------------------
 /** Sends a request to the server to see if any new information is
  *  available. (online friends, notifications, etc.).
  */
@@ -270,7 +257,7 @@ void PlayerManager::save()
         if(m_current_player)
         {
             players_file << "    <current player=\""
-                         << StringUtils::xmlEncode(m_current_player->getName(true/*ignoreRTL*/)) << L"\"/>\n";
+                         << StringUtils::xmlEncode(m_current_player->getName()) << L"\"/>\n";
         }
 
         // Save all non-guest players
@@ -328,8 +315,7 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enforcing current player '%s'.",
-                StringUtils::wideToUtf8(player->getName(true/*ignoreRTL*/))
-                .c_str());
+                StringUtils::wideToUtf8(player->getName()).c_str());
             m_current_player = player;
             return;
         }
@@ -343,8 +329,7 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enforcing current player '%s'.",
-                StringUtils::wideToUtf8(player->getName(true/*ignoreRTL*/))
-                .c_str());
+                StringUtils::wideToUtf8(player->getName()).c_str());
             m_current_player = player;
             return;
         }
@@ -361,19 +346,26 @@ void PlayerManager::enforceCurrentPlayer()
  */
 void PlayerManager::addDefaultPlayer()
 {
-    std::string username = "unnamed player";
+    core::stringw username = "Player";
 
-    if(getenv("USERNAME")!=NULL)        // for windows
-        username = getenv("USERNAME");
-    else if(getenv("USER")!=NULL)       // Linux, Macs
+#if defined(WIN32)
+    std::vector<wchar_t> env;
+    // An environment variable has a maximum size limit of 32,767 characters
+    env.resize(32767, 0);
+    DWORD length = GetEnvironmentVariable(L"USERNAME", env.data(), 32767);
+    if (length != 0)
+        username = env.data();
+#else
+    if (getenv("USER") != NULL)          // Linux, Macs
         username = getenv("USER");
-    else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
+    else if (getenv("LOGNAME") != NULL)  // Linux, Macs
         username = getenv("LOGNAME");
+#endif
 
     // Set the name as the default name, but don't mark it as 'default'
     // yet, since not having a default player forces the player selection
     // screen to be shown.
-    m_all_players.push_back(new Online::OnlinePlayerProfile(username.c_str()) );
+    m_all_players.push_back(new Online::OnlinePlayerProfile(username));
 
 }   // addDefaultPlayer
 
@@ -392,12 +384,12 @@ void PlayerManager::createGuestPlayers(int n)
         if(i==0)
         {
             // I18N: Name of first guest player (without number)
-            guest_name = _LTR("Guest");
+            guest_name = _("Guest");
         }
         else
         {
             // I18N: Name of further guest players, with a 1, 2, ... attached
-            guest_name = _LTR("Guest %d", i);
+            guest_name = _("Guest %d", i);
         }
         PlayerProfile *guest = new Online::OnlinePlayerProfile(guest_name,
                                                                /*guest*/ true);
@@ -457,7 +449,7 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 {
     for (PlayerProfile* player : m_all_players)
     {
-        if(player->getName(true/*ignoreRTL*/)==name)
+        if(player->getName()==name)
             return player;
     }
     return NULL;

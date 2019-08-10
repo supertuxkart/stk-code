@@ -19,6 +19,7 @@
 #include "physics/triangle_mesh.hpp"
 
 #include "config/stk_config.hpp"
+#include "main_loop.hpp"
 #include "physics/physics.hpp"
 #include "utils/constants.hpp"
 #include "utils/time.hpp"
@@ -187,6 +188,8 @@ void TriangleMesh::createPhysicalBody(float friction,
     // We need the collision shape, but not the collision object (since
     // this will be created when the dynamics body is anyway).
     createCollisionShape(/*create_collision_object*/false, serializedBhv);
+    main_loop->renderGUI(5583);
+
     btTransform startTransform;
     startTransform.setIdentity();
     m_motion_state = new btDefaultMotionState(startTransform);

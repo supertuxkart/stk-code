@@ -86,13 +86,7 @@ namespace GUIEngine
           *                       too small to contain \c text. Note that this option may
           *                       only be passed after the widget has been add()ed.
           */
-        virtual void setText(const wchar_t *text, bool expandAsNeeded);
-        
-        /** Overloaded function which takes a stringw. */
-        virtual void setText(const irr::core::stringw &s, bool expandAsNeeded)
-        {
-            setText(s.c_str(), expandAsNeeded);
-        }
+        virtual void setText(const irr::core::stringw& text, bool expandAsNeeded);
 
         // --------------------------------------------------------------------
         

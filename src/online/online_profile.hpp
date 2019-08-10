@@ -19,15 +19,16 @@
 #ifndef HEADER_ONLINE_PROFILE_HPP
 #define HEADER_ONLINE_PROFILE_HPP
 
-#include "online/request_manager.hpp"
-#include "online/xml_request.hpp"
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
 
+#include "irrString.h"
+
 #include <atomic>
-#include <irrString.h>
 #include <map>
 #include <string>
+
+class XMLNode;
 
 namespace Online
 {
@@ -102,7 +103,7 @@ private:
 
     bool                            m_has_fetched_achievements;
     std::vector<uint32_t>           m_achievements;
-    std::map<uint32_t, core::stringw> m_friend_server_map;
+    std::map<uint32_t, irr::core::stringw> m_friend_server_map;
     bool                            m_cache_bit;
 
     void storeFriends(const XMLNode * input);
@@ -123,7 +124,7 @@ public:
     const IDList&   getAchievements();
     void merge(OnlineProfile * profile);
     // ------------------------------------------------------------------------
-    std::map<uint32_t, core::stringw>& getFriendServerMap()
+    std::map<uint32_t, irr::core::stringw>& getFriendServerMap()
                                                 { return m_friend_server_map; }
     // ------------------------------------------------------------------------
     /** Returns true if the achievements for this profile have been fetched. */

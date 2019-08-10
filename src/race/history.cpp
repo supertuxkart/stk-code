@@ -30,6 +30,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
 
 History* history = 0;
 bool History::m_online_history_replay = false;
@@ -137,7 +138,7 @@ void History::Save()
     else
     {
         std::string fn = file_manager->getUserConfigFile("history.dat");
-        fd = fopen(fn.c_str(), "w");
+        fd = FileUtils::fopenU8Path(fn, "w");
         if(fd)
             Log::info("History", "Saved in '%s'.", fn.c_str());
     }
@@ -196,7 +197,7 @@ void History::Load()
     else
     {
         std::string fn = file_manager->getUserConfigFile("history.dat");
-        fd = fopen(fn.c_str(), "r");
+        fd = FileUtils::fopenU8Path(fn, "r");
         if(fd)
             Log::info("History", "Reading '%s'.", fn.c_str());
     }

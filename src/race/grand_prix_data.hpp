@@ -24,8 +24,6 @@
 #include <string>
 #include <vector>
 
-#include "utils/translation.hpp"
-
 using irr::core::stringw;
 
 class Track;
@@ -149,9 +147,7 @@ public:
     void                     remove(const unsigned int track);
 
     // -------------------------------------------------------------------------
-    /** @return the (potentially translated) user-visible name of the Grand
-     *  Prix (apply fribidi as needed) */
-    irr::core::stringw getName()      const { return m_editable ? m_name.c_str() : _LTR(m_name.c_str());   }
+    irr::core::stringw getName() const;
 
     // -------------------------------------------------------------------------
     /** @return the internal indentifier of the Grand Prix (not translated) */
@@ -171,7 +167,7 @@ public:
     enum GPReverseType getReverseType()
                                       const { return m_reverse_type;           }
     static const char*        getRandomGPID()   { return "random";             }
-    static irr::core::stringw getRandomGPName() { return _LTR("Random Grand Prix"); }
+    static irr::core::stringw getRandomGPName();
 };   // GrandPrixData
 
 #endif

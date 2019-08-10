@@ -74,6 +74,10 @@ private:
     irr::core::stringw m_msg;
     void doInit(bool from_queue);
 
+    /** If set this will set the focus on 'cancel'/'no' 
+     *  instead of "yes"/"ok". */
+    bool m_focus_on_cancel;
+
 public:
 
     /**
@@ -101,6 +105,10 @@ public:
     GUIEngine::EventPropagation processEvent(const std::string& eventSource) OVERRIDE;
 
     virtual void loadedFromFile() OVERRIDE;
+
+    /** Calling this will make sure that the focus is set on the 'cancel' or
+     * 'no'. */
+    void setFocusCancel() {m_focus_on_cancel = true; }
 };
 
 

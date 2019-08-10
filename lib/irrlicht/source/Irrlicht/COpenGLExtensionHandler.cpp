@@ -210,7 +210,7 @@ void COpenGLExtensionHandler::dumpFramebufferFormats() const
 #endif
 				,0,0,0,0
 			};
-			size_t nums = sizeof(atts)/sizeof(int);
+			u32 nums = sizeof(atts)/sizeof(int);
 			const bool depth_float_supported= (wglExtensions.find("WGL_EXT_depth_float") != -1);
 			if (!depth_float_supported)
 			{

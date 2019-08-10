@@ -20,16 +20,18 @@
 
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "karts/abstract_kart.hpp"
-#include "modes/capture_the_flag.hpp"
+#ifdef DEBUG
 #include "network/network_config.hpp"
+#endif
 #include "network/network_player_profile.hpp"
-#include "network/protocols/game_events_protocol.hpp"
+#include "network/peer_vote.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -43,7 +45,7 @@ GameSetup::GameSetup()
     {
         const std::string& path = ServerConfig::getConfigDirectory() + "/" +
             motd;
-        std::ifstream message(path);
+        std::ifstream message(FileUtils::getPortableReadingPath(path));
         if (message.is_open())
         {
             for (std::string line; std::getline(message, line); )
@@ -61,82 +63,10 @@ GameSetup::GameSetup()
     const std::string& server_name = ServerConfig::m_server_name;
     m_server_name_utf8 = StringUtils::wideToUtf8
         (StringUtils::xmlDecode(server_name));
-    m_connected_players_count.store(0);
     m_extra_server_info = -1;
     m_is_grand_prix.store(false);
     reset();
 }   // GameSetup
-
-//-----------------------------------------------------------------------------
-/** Update and see if any player disconnects.
- *  \param remove_disconnected_players remove the disconnected players,
- *  otherwise eliminate the kart in world, so this function must be called
- *  in main thread.
- */
-void GameSetup::update(bool remove_disconnected_players)
-{
-    std::unique_lock<std::mutex> lock(m_players_mutex);
-    if (remove_disconnected_players)
-    {
-        m_players.erase(std::remove_if(m_players.begin(), m_players.end(), []
-            (const std::weak_ptr<NetworkPlayerProfile> npp)->bool
-            {
-                return npp.expired();
-            }), m_players.end());
-        m_connected_players_count.store((uint32_t)m_players.size());
-        return;
-    }
-    if (!World::getWorld() ||
-        World::getWorld()->getPhase() < WorldStatus::MUSIC_PHASE)
-    {
-        m_connected_players_count.store((uint32_t)m_players.size());
-        return;
-    }
-    lock.unlock();
-
-    int red_count = 0;
-    int blue_count = 0;
-    unsigned total = 0;
-    for (uint8_t i = 0; i < (uint8_t)m_players.size(); i++)
-    {
-        bool disconnected = m_players[i].expired();
-        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
-            !disconnected)
-            red_count++;
-        else if (race_manager->getKartInfo(i).getKartTeam() ==
-            KART_TEAM_BLUE && !disconnected)
-            blue_count++;
-
-        if (!disconnected)
-        {
-            total++;
-            continue;
-        }
-        AbstractKart* k = World::getWorld()->getKart(i);
-        if (!k->isEliminated() && !k->hasFinishedRace())
-        {
-            CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>
-                (World::getWorld());
-            if (ctf)
-                ctf->loseFlagForKart(k->getWorldKartId());
-
-            World::getWorld()->eliminateKart(i,
-                false/*notify_of_elimination*/);
-            k->setPosition(
-                World::getWorld()->getCurrentNumKarts() + 1);
-            k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
-            NetworkString p(PROTOCOL_GAME_EVENTS);
-            p.setSynchronous(true);
-            p.addUInt8(GameEventsProtocol::GE_PLAYER_DISCONNECT).addUInt8(i);
-            STKHost::get()->sendPacketToAllPeers(&p, true);
-        }
-    }
-    m_connected_players_count.store(total);
-
-    if (m_players.size() != 1 && World::getWorld()->hasTeam() &&
-        (red_count == 0 || blue_count == 0))
-        World::getWorld()->setUnfairTeam(true);
-}   // removePlayer
 
 //-----------------------------------------------------------------------------
 void GameSetup::loadWorld()
@@ -180,19 +110,23 @@ void GameSetup::loadWorld()
     {
         race_manager->setReverseTrack(m_reverse);
         race_manager->startSingleRace(m_tracks.back(), m_laps,
-            false/*from_overworld*/);
+                                      false/*from_overworld*/);
     }
 }   // loadWorld
 
 //-----------------------------------------------------------------------------
 void GameSetup::addServerInfo(NetworkString* ns)
 {
+#ifdef DEBUG
     assert(NetworkConfig::get()->isServer());
+#endif
     ns->encodeString(m_server_name_utf8);
     auto sl = LobbyProtocol::get<ServerLobby>();
     assert(sl);
     ns->addUInt8((uint8_t)sl->getDifficulty())
         .addUInt8((uint8_t)ServerConfig::m_server_max_players)
+        // Reserve for extra spectators
+        .addUInt8(0)
         .addUInt8((uint8_t)sl->getGameMode());
     if (hasExtraSeverInfo())
     {
@@ -225,78 +159,61 @@ void GameSetup::addServerInfo(NetworkString* ns)
 
     ns->encodeString16(m_message_of_today);
     ns->addUInt8((uint8_t)ServerConfig::m_server_configurable);
+    ns->addUInt8(ServerConfig::m_live_players? 1 : 0);
 }   // addServerInfo
 
 //-----------------------------------------------------------------------------
-void GameSetup::sortPlayersForGrandPrix()
+void GameSetup::sortPlayersForGrandPrix(
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
     if (!isGrandPrix())
         return;
-    std::lock_guard<std::mutex> lock(m_players_mutex);
 
     if (m_tracks.size() == 1)
     {
         std::random_device rd;
         std::mt19937 g(rd());
-        std::shuffle(m_players.begin(), m_players.end(), g);
+        std::shuffle(players.begin(), players.end(), g);
         return;
     }
 
-    std::sort(m_players.begin(), m_players.end(),
-        [](const std::weak_ptr<NetworkPlayerProfile>& a,
-        const std::weak_ptr<NetworkPlayerProfile>& b)
+    std::sort(players.begin(), players.end(),
+        [](const std::shared_ptr<NetworkPlayerProfile>& a,
+        const std::shared_ptr<NetworkPlayerProfile>& b)
         {
-            // They should be never expired
-            auto c = a.lock();
-            assert(c);
-            auto d = b.lock();
-            assert(d);
-            return (c->getScore() < d->getScore()) ||
-                (c->getScore() == d->getScore() &&
-                c->getOverallTime() > d->getOverallTime());
+            return (a->getScore() < b->getScore()) ||
+                (a->getScore() == b->getScore() &&
+                a->getOverallTime() > b->getOverallTime());
         });
     if (UserConfigParams::m_gp_most_points_first)
     {
-        std::reverse(m_players.begin(), m_players.end());
+        std::reverse(players.begin(), players.end());
     }
 }   // sortPlayersForGrandPrix
 
 //-----------------------------------------------------------------------------
-void GameSetup::sortPlayersForGame()
+void GameSetup::sortPlayersForGame(
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
-    std::lock_guard<std::mutex> lock(m_players_mutex);
     if (!isGrandPrix())
     {
         std::random_device rd;
         std::mt19937 g(rd());
-        std::shuffle(m_players.begin(), m_players.end(), g);
+        std::shuffle(players.begin(), players.end(), g);
     }
     if (!race_manager->teamEnabled() ||
         ServerConfig::m_team_choosing)
         return;
-    for (unsigned i = 0; i < m_players.size(); i++)
+    for (unsigned i = 0; i < players.size(); i++)
     {
-        auto player = m_players[i].lock();
-        assert(player);
-        player->setTeam((KartTeam)(i % 2));
+        players[i]->setTeam((KartTeam)(i % 2));
     }
 }   // sortPlayersForGame
 
 // ----------------------------------------------------------------------------
-std::pair<int, int> GameSetup::getPlayerTeamInfo() const
+void GameSetup::setRace(const PeerVote &vote)
 {
-    std::lock_guard<std::mutex> lock(m_players_mutex);
-    int red_count = 0;
-    int blue_count = 0;
-    for (auto& p : m_players)
-    {
-        auto player = p.lock();
-        if (!player)
-            continue;
-        if (player->getTeam() == KART_TEAM_RED)
-            red_count++;
-        else if (player->getTeam() == KART_TEAM_BLUE)
-            blue_count++;
-    }
-    return std::make_pair(red_count, blue_count);
-}   // getPlayerTeamInfo
+    m_tracks.push_back(vote.m_track_name);
+    m_laps = vote.m_num_laps;
+    m_reverse = vote.m_reverse;
+}   // setRace

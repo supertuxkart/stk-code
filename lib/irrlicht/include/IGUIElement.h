@@ -477,7 +477,7 @@ public:
 
 
 	//! Sets the new caption of this element.
-	virtual void setText(const wchar_t* text)
+	virtual void setText(const irr::core::stringw& text)
 	{
 		Text = text;
 	}

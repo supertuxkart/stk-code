@@ -55,9 +55,9 @@ void ConnectToPeer::asynchronousUpdate()
                 break;
             }
             // Each 2 second for a ping or broadcast
-            if (StkTime::getRealTimeMs() > m_timer + 2000)
+            if (StkTime::getMonoTimeMs() > m_timer + 2000)
             {
-                m_timer = StkTime::getRealTimeMs();
+                m_timer = StkTime::getMonoTimeMs();
                 // Send a broadcast packet with the string aloha_stk inside,
                 // the client will use enet intercept to discover if server
                 // address or port is different from stk addons database.

@@ -38,11 +38,13 @@ private:
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
-    RegularFace(FaceTTF* ttf);
+    RegularFace();
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void reset() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool useColorGlyphPage() const  OVERRIDE           { return true; }
 
 };   // RegularFace
 

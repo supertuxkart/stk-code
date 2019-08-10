@@ -34,10 +34,13 @@ namespace irr
     namespace video { class IVideoDriver; class ITexture;        }
 }
 
+#include <functional>
 #include <string>
 
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include "irrString.h"
 
 /**
  * \ingroup guiengine
@@ -54,21 +57,21 @@ namespace GUIEngine
 
     /** \brief Returns the widget currently focused by given player, or NULL if none.
       * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-      *       needs, so we use ours. (i.e. always call these functions are never those
+      *       needs, so we use ours. (i.e. always call these functions, never those
       *       in IGUIEnvironment)
       */
     Widget* getFocusForPlayer(const unsigned int playerID);
 
     /** \brief Focuses nothing for given player (removes any selection for this player).
       * \note Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-      *       needs, so we use ours. (i.e. always call these functions are never those
+      *       needs, so we use ours. (i.e. always call these functions, never those
       *       in IGUIEnvironment)
       */
     void focusNothingForPlayer(const unsigned int playerID);
 
     /** \brief Returns whether given the widget is currently focused by given player.
       * \note  Do NOT use irrLicht's GUI focus facilities; it's too limited for our
-      *        needs, so we use ours. (i.e. always call these functions are never those
+      *        needs, so we use ours. (i.e. always call these functions, never those
       *        in IGUIEnvironment)
       */
     bool isFocusedForPlayer(const Widget*w, const unsigned int playerID);
@@ -194,7 +197,7 @@ namespace GUIEngine
       * \param message  the message to display
       * \param time     the time to display the message, in seconds
       */
-    void showMessage(const wchar_t* message, const float time=5.0f);
+    void showMessage(const irr::core::stringw& message, const float time=5.0f);
 
     /** \brief Add a screen to the list of screens known by the gui engine */
     void  addScreenToList(Screen* screen);
@@ -222,7 +225,7 @@ namespace GUIEngine
     /**
       * \brief called on every frame to trigger the rendering of the GUI
       */
-    void render(float dt);
+    void render(float dt, bool is_loading = false);
 
     /** \brief renders a "loading" screen */
     void renderLoading(bool clearIcons = true);
@@ -248,6 +251,10 @@ namespace GUIEngine
       */
     void reloadSkin();
 
+    /**
+      * \brief Add gui-related function before rendering GUI (from other thread)
+      */
+    void addGUIFunctionBeforeRendering(std::function<void()> func);
 }
 
 #endif

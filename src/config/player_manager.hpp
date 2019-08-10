@@ -82,7 +82,6 @@ public:
     // ------------------------------------------------------------------------
     static void destroy()
     {
-        assert(m_player_manager);
         delete m_player_manager;
         m_player_manager = NULL;
     }   // destroy
@@ -106,7 +105,6 @@ public:
     static Online::OnlineProfile* getCurrentOnlineProfile();
 
     static PlayerProfile::OnlineState getCurrentOnlineState();
-    static const irr::core::stringw& getCurrentOnlineUserName();
     static void requestOnlinePoll();
     static void resumeSavedSession();
     static void onSTKQuit();

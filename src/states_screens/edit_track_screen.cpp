@@ -26,7 +26,8 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -189,7 +190,7 @@ void EditTrackScreen::loadTrackList()
         if (!t->isArena()    && !t->isSoccer() &&
             !t->isInternal() && belongs_to_group       )
         {
-            tracks_widget->addItem(translations->fribidize(t->getName()),
+            tracks_widget->addItem(t->getName(),
                                    t->getIdent(),
                                    t->getScreenshotFile(), 0,
                                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
@@ -220,7 +221,7 @@ void EditTrackScreen::selectTrack(const std::string& id)
     if (m_track)
     {
         tracks->setSelection(m_track->getIdent(), PLAYER_ID_GAME_MASTER, true);
-        selected_track->setText(translations->fribidize(m_track->getName()), true);
+        selected_track->setText(m_track->getName(), true);
 
         laps->setValue(m_laps);
 

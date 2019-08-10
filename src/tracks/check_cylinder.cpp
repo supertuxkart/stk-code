@@ -25,13 +25,14 @@
 #include "items/item.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/check_manager.hpp"
 
-CheckCylinder::CheckCylinder(const XMLNode &node, unsigned int index, TriggerItemListener* listener)
-           : CheckStructure(node, index)
+CheckCylinder::CheckCylinder(const XMLNode &node,
+                             std::function<void()> triggering_function)
+           : CheckStructure(CheckManager::get()->getCheckStructureCount())
 {
     m_radius2 = 1;
     m_height = 0;
-    m_listener = listener;
     node.get("height", &m_height);
     node.get("radius", &m_radius2);
     m_radius2 *= m_radius2;
@@ -43,6 +44,7 @@ CheckCylinder::CheckCylinder(const XMLNode &node, unsigned int index, TriggerIte
     {
         m_is_inside[i] = false;
     }
+    m_triggering_function = triggering_function;
 }   // CheckCylinder
 
 // ----------------------------------------------------------------------------
@@ -57,6 +59,9 @@ CheckCylinder::CheckCylinder(const XMLNode &node, unsigned int index, TriggerIte
 bool CheckCylinder::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                                 int kart_id)
 {
+    // kart_id will be -1 if called by CheckManager::getChecklineTriggering
+    if (kart_id < 0 || kart_id >= (int)m_is_inside.size())
+        return false;
     // TODO: this is the code for a sphere, rewrite for cylinder
     Vec3 old_pos_xz(old_pos.x(), 0.0f, old_pos.z());
     Vec3 new_pos_xz(new_pos.x(), 0.0f, new_pos.z());
@@ -70,8 +75,8 @@ bool CheckCylinder::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
     bool triggered = (old_dist2>=m_radius2 && new_dist2 < m_radius2) ||
            (old_dist2< m_radius2 && new_dist2 >=m_radius2);
 
-    if (triggered && m_listener != NULL)
-        m_listener->onTriggerItemApproached();
+    if (triggered && m_triggering_function)
+        m_triggering_function();
 
     return triggered;
 }   // isTriggered

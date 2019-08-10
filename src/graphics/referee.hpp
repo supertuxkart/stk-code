@@ -108,6 +108,8 @@ public:
     /** Returns true if this referee is attached to the scene graph. */
     bool        isAttached() const {return m_scene_node->getParent()!=NULL;}
     // ------------------------------------------------------------------------
+    void        setAnimationFrameWithCreatedTicks(int created_ticks);
+    // ------------------------------------------------------------------------
     /** Returns the graphical offset the referee should be drawn at at the
      *  start of a race. */
     static const Vec3& getStartOffset() {return m_st_start_offset; }

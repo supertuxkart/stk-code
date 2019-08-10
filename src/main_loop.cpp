@@ -33,6 +33,7 @@
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/network_timer_synchronizer.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
@@ -43,7 +44,9 @@
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -65,7 +68,7 @@ LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg,
 #endif
 
 // ----------------------------------------------------------------------------
-MainLoop::MainLoop(unsigned parent_pid)
+MainLoop::MainLoop(unsigned parent_pid, bool download_assets)
         : m_abort(false), m_request_abort(false), m_ticks_adjustment(0), 
           m_parent_pid(parent_pid)
 {
@@ -74,19 +77,20 @@ MainLoop::MainLoop(unsigned parent_pid)
     m_throttle_fps    = true;
     m_allow_large_dt  = false;
     m_frame_before_loading_world = false;
+    m_download_assets = download_assets;
 #ifdef WIN32
     if (parent_pid != 0)
     {
-        std::string class_name = "separate_process";
-        class_name += StringUtils::toString(GetCurrentProcessId());
+        core::stringw class_name = L"separate_process";
+        class_name += StringUtils::toWString(GetCurrentProcessId());
         WNDCLASSEX wx = {};
         wx.cbSize = sizeof(WNDCLASSEX);
         wx.lpfnWndProc = separateProcessProc;
         wx.hInstance = GetModuleHandle(0);
-        wx.lpszClassName = &class_name[0];
+        wx.lpszClassName = class_name.c_str();
         if (RegisterClassEx(&wx))
         {
-            CreateWindowEx(0, &class_name[0], "stk_server_only",
+            CreateWindowEx(0, class_name.c_str(), L"stk_server_only",
                 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, NULL, NULL);
         }
     }
@@ -101,7 +105,7 @@ MainLoop::~MainLoop()
 //-----------------------------------------------------------------------------
 /** Returns the current dt, which guarantees a limited frame rate. If dt is
  *  too low (the frame rate too high), the process will sleep to reach the
- *  maxium frame rate.
+ *  maximum frame rate.
  */
 float MainLoop::getLimitedDt()
 {
@@ -117,7 +121,32 @@ float MainLoop::getLimitedDt()
 
     while( 1 )
     {
-        m_curr_time = StkTime::getRealTimeMs();
+        m_curr_time = StkTime::getMonoTimeMs();
+        if (m_prev_time > m_curr_time)
+        {
+            m_prev_time = m_curr_time;
+            // If system time adjusted backwards, return fixed dt and
+            // resynchronize network timer if exists in client
+            if (STKHost::existHost())
+            {
+#ifndef SERVER_ONLY
+                if (UserConfigParams::m_artist_debug_mode &&
+                    !ProfileWorld::isNoGraphics())
+                {
+                    core::stringw err = L"System clock running backwards in"
+                        " networking game.";
+                    MessageQueue::add(MessageQueue::MT_ERROR, err);
+                }
+#endif
+                Log::error("MainLoop", "System clock running backwards in"
+                    " networking game.");
+                if (STKHost::get()->getNetworkTimerSynchronizer())
+                {
+                    STKHost::get()->getNetworkTimerSynchronizer()
+                        ->resynchroniseTimer();
+                }
+            }
+        }
         dt = (float)(m_curr_time - m_prev_time);
         // On a server (i.e. without graphics) the frame rate can be under
         // 1 ms, i.e. dt = 0. Additionally, the resolution of a sleep
@@ -128,12 +157,15 @@ float MainLoop::getLimitedDt()
         // with clients (server time is supposed to be behind client time).
         // So we play it safe by adding a loop to make sure at least 1ms
         // (minimum time that can be handled by the integer timer) delay here.
-        // Only exception is profile mode (typically running without graphics),
-        // which we want to run as fast as possible.
-        while (dt <= 0 && !ProfileWorld::isProfileMode())
+        while (dt == 0)
         {
             StkTime::sleep(1);
-            m_curr_time = StkTime::getRealTimeMs();
+            m_curr_time = StkTime::getMonoTimeMs();
+            if (m_prev_time > m_curr_time)
+            {
+                Log::error("MainLopp", "System clock keeps backwards!");
+                m_prev_time = m_curr_time;
+            }
             dt = (float)(m_curr_time - m_prev_time);
         }
 
@@ -198,15 +230,17 @@ float MainLoop::getLimitedDt()
 //-----------------------------------------------------------------------------
 /** Updates all race related objects.
  *  \param ticks Number of ticks (physics steps) to simulate - should be 1.
+ *  \param fast_forward If true, then only rewinders in network will be
+ *  updated, but not the physics.
  */
-void MainLoop::updateRace(int ticks)
+void MainLoop::updateRace(int ticks, bool fast_forward)
 {
     if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
 
     // The race event manager will update world in case of an online race
     if ( RaceEventManager::getInstance() && 
          RaceEventManager::getInstance()->isRunning() )
-        RaceEventManager::getInstance()->update(ticks);
+        RaceEventManager::getInstance()->update(ticks, fast_forward);
     else
         World::getWorld()->updateWorld(ticks);
 }   // updateRace
@@ -282,7 +316,7 @@ void MainLoop::updateRace(int ticks)
  */
 void MainLoop::run()
 {
-    m_curr_time = StkTime::getRealTimeMs();
+    m_curr_time = StkTime::getMonoTimeMs();
     // DT keeps track of the leftover time, since the race update
     // happens in fixed timesteps
     float left_over_time = 0;
@@ -362,7 +396,7 @@ void MainLoop::run()
             }
 
 #ifndef SERVER_ONLY
-            if (CVS->isGLSL())
+            if (CVS->isGLSL() && !m_download_assets)
             {
                 // Flush all command before delete world, avoid later access
                 SP::SPTextureManager::get()
@@ -420,14 +454,20 @@ void MainLoop::run()
                 input_manager->update(frame_duration);
                 GUIEngine::update(frame_duration);
                 PROFILER_POP_CPU_MARKER();
-                PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
-                SFXManager::get()->update();
-                PROFILER_POP_CPU_MARKER();
+                if (!m_download_assets)
+                {
+                    PROFILER_PUSH_CPU_MARKER("Music", 0x7F, 0x00, 0x00);
+                    SFXManager::get()->update();
+                    PROFILER_POP_CPU_MARKER();
+                }
             }
             // Some protocols in network will use RequestManager
-            PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
-            Online::RequestManager::get()->update(frame_duration);
-            PROFILER_POP_CPU_MARKER();
+            if (!m_download_assets)
+            {
+                PROFILER_PUSH_CPU_MARKER("Database polling update", 0x00, 0x7F, 0x7F);
+                Online::RequestManager::get()->update(frame_duration);
+                PROFILER_POP_CPU_MARKER();
+            }
 
             m_ticks_adjustment.lock();
             if (m_ticks_adjustment.getData() != 0)
@@ -453,7 +493,12 @@ void MainLoop::run()
                 }
             }
             m_ticks_adjustment.unlock();
-    
+
+            // Avoid hang when some function in world takes too long time or
+            // when leave / come back from android home button
+            bool fast_forward = NetworkConfig::get()->isNetworking() &&
+                NetworkConfig::get()->isClient() &&
+                num_steps > stk_config->time2Ticks(1.0f);
             for (int i = 0; i < num_steps; i++)
             {
                 if (World::getWorld() && history->replayHistory())
@@ -461,7 +506,7 @@ void MainLoop::run()
                     history->updateReplay(
                                        World::getWorld()->getTicksSinceStart());
                 }
-    
+
                 PROFILER_PUSH_CPU_MARKER("Protocol manager update",
                                          0x7F, 0x00, 0x7F);
                 if (auto pm = ProtocolManager::lock())
@@ -469,26 +514,31 @@ void MainLoop::run()
                     pm->update(1);
                 }
                 PROFILER_POP_CPU_MARKER();
-    
+
                 PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
                 if (World::getWorld())
                 {
-                    updateRace(1);
+                    updateRace(1, fast_forward);
                 }
                 PROFILER_POP_CPU_MARKER();
-    
+
                 // We need to check again because update_race may have requested
                 // the main loop to abort; and it's not a good idea to continue
                 // since the GUI engine is no more to be called then.
                 if (m_abort || m_request_abort) 
                     break;
-    
+
                 if (m_frame_before_loading_world)
                 {
+                    // This will be called when changing introcutscene 1 and 2
+                    // in CutsceneWorld::enterRaceOverState
+                    // Reset the timer for correct time for cutscene
                     m_frame_before_loading_world = false;
+                    m_curr_time = StkTime::getMonoTimeMs();
+                    left_over_time = 0.0f;
                     break;
                 }
-                
+
                 if (World::getWorld())
                 {
                     if (World::getWorld()->getPhase()==WorldStatus::SETUP_PHASE)
@@ -507,13 +557,21 @@ void MainLoop::run()
             {
                 // User aborted (e.g. closed window)
                 bool abort = !irr_driver->getDevice()->run();
-                
+
+                if (m_frame_before_loading_world)
+                {
+                    // irr_driver->getDevice()->run() loads the world
+                    m_frame_before_loading_world = false;
+                    m_curr_time = StkTime::getMonoTimeMs();
+                    left_over_time = 0.0f;
+                }
+
                 if (abort)
                 {
                     m_request_abort = true;
                 }
             }
-            
+
             if (auto gp = GameProtocol::lock())
             {
                 gp->sendActions();
@@ -530,4 +588,53 @@ void MainLoop::run()
 
 }   // run
 
+// ----------------------------------------------------------------------------
+/** Renders the GUI. This function is used during loading a track to get a
+ *  responsive GUI, and allow GUI animations (like a progress bar) to be
+ *  shown.
+ *  \param phase An integer indicated a phase. The maximum number of phases
+ *         is used to show a progress bar. The values are between 0 and 8200.
+ *  \param loop_index If the call is from a loop, the current loop index.
+ *  \param loop_size The number of loop iterations. Used to smooth update
+ *         e.g. a progress bar.
+ */
+void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
+{
+    return;
+#ifdef SERVER_ONLY
+    return;
+#else
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer()         )
+    {
+        return;
+    }
+    // Rendering past phase 7000 causes the minimap to not work
+    // on higher graphical settings
+    if (phase > 7000)
+    {
+        m_request_abort = !irr_driver->getDevice()->run();
+        return;
+    }
+
+    uint64_t now = StkTime::getMonoTimeMs();
+    float dt = (now - m_curr_time)/1000.0f;
+    
+    if (dt < 1.0 / 30.0f) return;
+
+    m_curr_time = now;
+    
+    // TODO: remove debug output
+    //Log::verbose("mainloop", "Rendergui t %llu dt %f phase %d  index %d / %d",
+    //             now, dt, phase, loop_index, loop_size);
+
+    irr_driver->update(dt, /*is_loading*/true);
+    GUIEngine::update(dt);
+    m_request_abort = !irr_driver->getDevice()->run();
+    
+    //TODO: remove debug output
+    // uint64_t now2 = StkTime::getMonoTimeMs();
+    // Log::verbose("mainloop", "  duration t %llu dt %llu", now, now2-now);
+#endif
+}   // renderGUI
 /* EOF */

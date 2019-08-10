@@ -119,6 +119,7 @@ public:
     virtual      ~TrackObject();
     virtual void update(float dt);
     virtual void updateGraphics(float dt);
+    virtual void resetAfterRewind();
     void move(const core::vector3df& xyz, const core::vector3df& hpr,
               const core::vector3df& scale, bool updateRigidBody,
               bool isAbsoluteCoord);
@@ -249,6 +250,8 @@ public:
     std::vector<TrackObject*>& getChildren() { return m_children; }
     // ------------------------------------------------------------------------
     void movePhysicalBodyToGraphicalNode(const core::vector3df& xyz, const core::vector3df& hpr);
+    // ------------------------------------------------------------------------
+    bool joinToMainTrack();
     LEAK_CHECK()
 };   // TrackObject
 

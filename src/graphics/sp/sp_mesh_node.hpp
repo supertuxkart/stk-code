@@ -138,6 +138,14 @@ public:
         return NULL;
     }
     // ------------------------------------------------------------------------
+    void resetFirstRenderInfo(std::shared_ptr<RenderInfo> ri)
+    {
+        m_render_info.clear();
+        m_first_render_info = ri;
+        m_render_info.resize(getMesh()->getMeshBufferCount(),
+            m_first_render_info);
+    }
+    // ------------------------------------------------------------------------
     void setGlowColor(const video::SColorf& color)    { m_glow_color = color; }
     // ------------------------------------------------------------------------
     const video::SColorf& getGlowColor() const         { return m_glow_color; }

@@ -321,7 +321,7 @@ void ShadowMatrices::renderWireFrameFrustrum(float *tmp, unsigned i)
 void ShadowMatrices::renderShadowsDebug(const FrameBuffer* shadow_framebuffer,
                                         const PostProcessing *post_processing)
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
     glViewport(0, UserConfigParams::m_height / 2,
                UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
     post_processing->renderTextureLayer(shadow_framebuffer->getDepthTexture(), 0);

@@ -53,7 +53,8 @@ enum EVENT_CHANNEL : uint8_t
 {
     EVENT_CHANNEL_NORMAL = 0,   //!< Normal channel (encrypted if supported)
     EVENT_CHANNEL_UNENCRYPTED = 1,//!< Unencrypted channel
-    EVENT_CHANNEL_COUNT = 2
+    EVENT_CHANNEL_DATA_TRANSFER = 2,//!< Data transfer channel (like game replay)
+    EVENT_CHANNEL_COUNT = 3
 };
 
 enum PeerDisconnectInfo : unsigned int;
@@ -83,7 +84,7 @@ private:
     std::shared_ptr<STKPeer> m_peer;
 
     /** Arrivial time of the event, for timeouts. */
-    double m_arrival_time;
+    uint64_t m_arrival_time;
 
     /** For disconnection event, a bit more info is provided. */
     PeerDisconnectInfo m_pdi;
@@ -118,7 +119,7 @@ public:
                                         m_data->isSynchronous();     }
     // ------------------------------------------------------------------------
     /** Returns the arrival time of this event. */
-    double getArrivalTime() const { return m_arrival_time; }
+    uint64_t getArrivalTime() const { return m_arrival_time; }
     // ------------------------------------------------------------------------
     PeerDisconnectInfo getPeerDisconnectInfo() const { return m_pdi; }
     // ------------------------------------------------------------------------

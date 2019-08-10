@@ -168,7 +168,7 @@ public:
 };
 
 // ============================================================================
-class IBLShader : public TextureShader<IBLShader, 3>
+class IBLShader : public TextureShader<IBLShader, 4>
 {
 public:
     IBLShader()
@@ -178,7 +178,8 @@ public:
         assignUniforms();
         assignSamplerNames(0, "ntex",  ST_NEAREST_FILTERED,
                            1, "dtex",  ST_NEAREST_FILTERED,
-                           2, "probe", ST_TRILINEAR_CUBEMAP);
+                           2, "probe", ST_TRILINEAR_CUBEMAP,
+                           3, "albedo",ST_NEAREST_FILTERED);
     }   // IBLShader
 };   // IBLShader
 
@@ -293,7 +294,8 @@ static void renderPointLights(unsigned count,
 // ----------------------------------------------------------------------------
 void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
                                   GLuint depth_stencil_texture,
-                                  GLuint specular_probe)
+                                  GLuint specular_probe,
+                                  GLuint albedo_buffer)
 {
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -317,7 +319,8 @@ void LightingPasses::renderEnvMap(GLuint normal_depth_texture,
         IBLShader::getInstance()->setTextureUnits(
             normal_depth_texture,
             depth_stencil_texture,
-            specular_probe);
+            specular_probe,
+            albedo_buffer);
         IBLShader::getInstance()->setUniforms();
     }
 
@@ -426,6 +429,7 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
 void LightingPasses::renderLights(  bool has_shadow,
                                     GLuint normal_depth_texture,
                                     GLuint depth_stencil_texture,
+                                    GLuint albedo_texture,
                                     const FrameBuffer* shadow_framebuffer,
                                     GLuint specular_probe)
 {
@@ -433,7 +437,8 @@ void LightingPasses::renderLights(  bool has_shadow,
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
         renderEnvMap(normal_depth_texture,
                      depth_stencil_texture,
-                     specular_probe);
+                     specular_probe,
+                     albedo_texture);
     }
 
     // Render sunlight if and only if track supports shadow

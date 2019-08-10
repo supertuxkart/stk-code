@@ -19,6 +19,8 @@
 #ifndef HEADER_KART_CONTROL_HPP
 #define HEADER_KART_CONTROL_HPP
 
+#include "utils/types.hpp"
+
 class BareNetworkString;
 
 /**
@@ -33,10 +35,10 @@ public:
     enum  SkidControl {SC_NONE, SC_NO_DIRECTION, SC_LEFT, SC_RIGHT};
 
 private:
-    /** The current steering value in [-1, 1]. */
-    float m_steer;
-    /** Acceleration, in [0, 1]. */
-    float m_accel;
+    /** The current steering value in [-32767, 32767]. */
+    int16_t m_steer;
+    /** Acceleration, in [0, 65535]. */
+    uint16_t m_accel;
     /** True if the kart brakes. */
     bool  m_brake;
     /** True if the kart activates nitro. */
@@ -68,8 +70,8 @@ public:
     /** Resets all controls. */
     void reset()
     {
-        m_steer     = 0.0f;
-        m_accel     = 0.0f;
+        m_steer     = 0;
+        m_accel     = 0;
         m_brake     = false;
         m_nitro     = false;
         m_skid      = SC_NONE;
@@ -91,10 +93,6 @@ public:
                m_fire      == other.m_fire    &&
                m_look_back == other.m_look_back;
     }    // operator==
-
-    // ------------------------------------------------------------------------
-    /** Return the serialised size in bytes.                                 */
-    static int getLength() { return 9; }
     // ------------------------------------------------------------------------
     /** Copies the important data from this objects into a memory buffer. */
     void saveState(BareNetworkString *buffer) const;
@@ -126,11 +124,11 @@ public:
         m_skid      = (SkidControl)((c & 96) >> 5);
     }   // setButtonsCompressed
     // ------------------------------------------------------------------------
-    /** Returns the current steering value. */
-    float getSteer() const { return m_steer; }
+    /** Returns the current steering value in [-1, 1]. */
+    float getSteer() const { return (float)m_steer / 32767.0f; }
     // ------------------------------------------------------------------------
-    /** Returns current acceleration. */
-    float getAccel() const { return m_accel; }
+    /** Returns current acceleration in [0, 1]. */
+    float getAccel() const { return (float)m_accel / 65535.0f; }
     // ------------------------------------------------------------------------
     /** Returns if the kart is braking. */
     bool getBrake() const { return m_brake; }

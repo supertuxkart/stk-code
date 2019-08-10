@@ -31,7 +31,7 @@ after some tweaks, but atm. only linux is supported.
 
 Dependencies list (may be incomplete):
 
-    autoconf, automake, make, python, gradle, ant, imagemagick, cmake, 
+    autoconf, automake, make, python, gradle, imagemagick, cmake, 
     vorbis-tools, pngquant
 
 Additionally some dependencies for optimize_data script:
@@ -80,20 +80,14 @@ to just run:
  ENVIRONMENT VARIABLES
 --------------------------------------------------------------------------------
 
-COMPILE_ARCH    - Allows to choose CPU architecture for which the package will
+COMPILE_ARCH    - Allows one to choose CPU architecture for which the package will
                   be compiled. 
                   Possible values: armv7, aarch64, x86, x86_64.
                   Default is: armv7.
 
-BUILD_TYPE      - Allows to set build type.
+BUILD_TYPE      - Allows one to set build type.
                   Possible values: debug, release, beta.
                   Default is: debug.
-
-BUILD_TOOL      - Allows to choose a tool that is used for creating package. 
-                  Note that ant has been already removed from Android SDK, so 
-                  you have to use SDK <= 25.2.5 for building with ant.
-                  Possible values: ant, gradle.
-                  Default is: gradle.
 
 BUILD_TOOLS_VER - Allows to override the SDK build-tools version.
 

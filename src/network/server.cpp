@@ -17,11 +17,12 @@
 
 #include "network/server.hpp"
 #include "config/player_manager.hpp"
+#include "io/xml_node.hpp"
 #include "online/online_player_profile.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
 #include "network/network_config.hpp"
-#include "io/xml_node.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
@@ -55,6 +56,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("host_id", &m_server_owner);
     xml.get("max_players", &m_max_players);
     xml.get("current_players", &m_current_players);
+    xml.get("current_track", &m_current_track);
     uint32_t ip;
     xml.get("ip", &ip);
     m_address.setIP(ip);
@@ -65,6 +67,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("password", &m_password_protected);
     xml.get("game_started", &m_game_started);
     xml.get("distance", &m_distance);
+    xml.get("country_code", &m_country_code);
     m_server_owner_name = L"-";
     m_server_owner_lower_case_name = "-";
 
@@ -82,6 +85,14 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
         player_info->get("rank", &std::get<0>(t));
         player_info->get("username", &username);
         std::get<1>(t) = StringUtils::utf8ToWide(username);
+        std::string country;
+        player_info->get("country-code", &country);
+        const core::stringw& flag = StringUtils::getCountryFlag(country);
+        if (!flag.empty())
+        {
+            std::get<1>(t) += L" ";
+            std::get<1>(t) += flag;
+        }
         m_lower_case_player_names += StringUtils::toLowerCase(username);
         player_info->get("scores", &std::get<2>(t));
         float time_played = 0.0f;
@@ -102,9 +113,8 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("official", &m_official);
     if (m_official)
     {
-        // I18N: Official means this server is hosted by STK team
-        m_server_owner_name = _("Official");
-        m_server_owner_lower_case_name = "Official";
+        m_server_owner_name = L"\u2606\u2605STK\u2605\u2606";
+        m_server_owner_lower_case_name = "stk";
         return;
     }
 
@@ -152,11 +162,12 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
  *  \param address IP and port of the server.
  *  \param password_protected True if can only be joined with a password.
  *  \param game_started True if there is already game begun in server.
+ *  \param current_track If server is in game, store the track ident
  */
 Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                int current_players, unsigned difficulty, unsigned server_mode,
                const TransportAddress &address, bool password_protected,
-               bool game_started)
+               bool game_started, const std::string& current_track)
       : m_supports_encrytion(false)
 {
     m_name               = name;
@@ -174,4 +185,28 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_distance = 0.0f;
     m_official = false;
     m_game_started = game_started;
+    m_current_track = current_track;
 }   // server(server_id, ...)
+
+// ----------------------------------------------------------------------------
+Track* Server::getCurrentTrack() const
+{
+    if (!m_current_track.empty())
+        return track_manager->getTrack(m_current_track);
+    return NULL;
+}   // getCurrentTrack
+
+// ----------------------------------------------------------------------------
+bool Server::searchByName(const std::string& lower_case_word)
+{
+    auto list = StringUtils::split(lower_case_word, ' ', false);
+    bool server_name_found = true;
+    for (auto& word : list)
+    {
+        const std::string& for_search = m_lower_case_name +
+            m_lower_case_player_names;
+        server_name_found = server_name_found &&
+            for_search.find(word) != std::string::npos;
+    }
+    return server_name_found;
+}   // searchByName

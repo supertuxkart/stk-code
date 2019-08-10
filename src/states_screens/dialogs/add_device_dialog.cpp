@@ -23,13 +23,13 @@
 #include "guiengine/widgets/button_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
+#include "input/wiimote_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-#include "input/wiimote_manager.hpp"
 
 #include <IGUIStaticText.h>
 #include <IGUIEnvironment.h>
@@ -70,16 +70,13 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
           "computer. Remember that everyone still needs different keybindings "
           "in this case.)");
     IGUIStaticText* b =
-        GUIEngine::getGUIEnv()->addStaticText(msg.c_str(),
+        GUIEngine::getGUIEnv()->addStaticText(msg,
                                               text_area,
                                               /*border*/false ,
                                               /*word wrap*/true,
                                               m_irrlicht_window);
     b->setTabStop(false);
-    b->setRightToLeft(translations->isRTLText(msg));
-    // because it looks like 'setRightToLeft' applies next time
-    // setText is called only
-    b->setText(msg.c_str());
+    b->setText(msg);
 
 #ifdef ENABLE_WIIUSE
     {

@@ -21,6 +21,7 @@
 #include "config/stk_config.hpp"
 #include "modes/world.hpp"
 #include "network/dummy_rewinder.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
@@ -246,8 +247,12 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         // player might have a network hickup).
         if (NetworkConfig::get()->isServer() && (*i)->getTicks() < world_ticks)
         {
-            Log::warn("RewindQueue", "Server received at %d message from %d",
-                      world_ticks, (*i)->getTicks());
+            if (Network::m_connection_debug)
+            {
+                Log::warn("RewindQueue",
+                    "Server received at %d message from %d",
+                    world_ticks, (*i)->getTicks());
+            }
             // Server received an event in the past. Adjust this event
             // to be executed 'now' - at least we get a bit closer to the
             // client state.
@@ -295,6 +300,9 @@ void RewindQueue::mergeNetworkData(int world_ticks, bool *needs_rewind,
         m_latest_confirmed_state_time = latest_confirmed_state;
     }
 
+    if (NetworkConfig::get()->isServer())
+        cleanupOldRewindInfo(world_ticks);
+
     // If the computed rewind time is before the last confirmed
     // state, instead rewind from the latest confirmed state.
     // This should not be necessary anymore, but I'll leave it
@@ -321,12 +329,16 @@ void RewindQueue::cleanupOldRewindInfo(int ticks)
 {
     auto i = m_all_rewind_info.begin();
 
-    while ( (*i)->getTicks() < ticks)
+    while (!m_all_rewind_info.empty() &&
+        (*i)->getTicks() < ticks)
     {
         if (m_current == i) next();
         delete *i;
         i = m_all_rewind_info.erase(i);
     }
+
+    if (m_all_rewind_info.empty())
+        m_current = m_all_rewind_info.end();
 
 }   // cleanupOldRewindInfo
 

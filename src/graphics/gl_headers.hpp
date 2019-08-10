@@ -32,7 +32,19 @@ extern "C" {
 }
 #include <cinttypes>
 
+#if defined(USE_GLES2)
+#    define __gl2_h_
 #if defined(__APPLE__)
+#    include <OpenGLES/ES3/gl.h>
+#    include <OpenGLES/ES3/glext.h>
+#    include <OpenGLES/ES2/glext.h>
+#else
+#    include <GLES3/gl3.h>
+#    include <GLES3/gl3ext.h>
+#    include <GLES2/gl2ext.h>
+#endif
+#    define glVertexAttribDivisorARB glVertexAttribDivisor
+#elif defined(__APPLE__)
 #    include <OpenGL/gl.h>
 #    include <OpenGL/gl3.h>
 #    define OGL32CTX
@@ -45,12 +57,6 @@ extern "C" {
 #    ifndef GL_TEXTURE_SWIZZLE_RGBA
 #        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
 #    endif
-#elif defined(USE_GLES2)
-#    define __gl2_h_
-#    include <GLES3/gl3.h>
-#    include <GLES3/gl3ext.h>
-#    include <GLES2/gl2ext.h>
-#    define glVertexAttribDivisorARB glVertexAttribDivisor
 #elif defined(WIN32)
 #    define WIN32_LEAN_AND_MEAN
 #    include <windows.h>

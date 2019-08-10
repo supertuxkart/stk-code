@@ -97,7 +97,7 @@ namespace gui
 		virtual void draw();
 
 		//! Sets the new caption of this element.
-		virtual void setText(const wchar_t* text);
+		virtual void setText(const core::stringw& text);
 
 		//! Sets the maximum amount of characters which may be entered in the box.
 		//! \param max: Maximum amount of characters. If 0, the character amount is
@@ -124,7 +124,13 @@ namespace gui
 
 		//! Reads attributes of the element
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
-
+		virtual void setComposingText(const std::u32string& ct) {}
+		virtual void clearComposingText() {}
+		virtual const core::position2di& getICPos() const
+		{
+			static core::position2di unused;
+			return unused;
+		}
 	protected:
 		//! Breaks the single text line.
 		void breakText();

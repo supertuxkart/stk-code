@@ -25,6 +25,8 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 

@@ -22,6 +22,8 @@
 #ifndef HEADER_REMOTE_KART_INFO_HPP
 #define HEADER_REMOTE_KART_INFO_HPP
 
+#include <limits>
+#include <memory>
 #include <string>
 #include <vector>
 #include <irrString.h>
@@ -41,21 +43,25 @@ enum PerPlayerDifficulty : uint8_t
     PLAYER_DIFFICULTY_COUNT
 };
 
+class NetworkPlayerProfile;
+
 class RemoteKartInfo
 {
         std::string         m_kart_name;
         irr::core::stringw  m_user_name;
         int                 m_local_player_id;
         int                 m_global_player_id;
-        int                 m_host_id;
-        KartTeam          m_kart_team;
+        uint32_t            m_host_id;
+        KartTeam            m_kart_team;
         bool                m_network_player;
         PerPlayerDifficulty m_difficulty;
         float               m_default_kart_color;
         uint32_t            m_online_id;
+        std::string         m_country_code;
+        std::weak_ptr<NetworkPlayerProfile> m_profile;
 public:
      RemoteKartInfo(int player_id, const std::string& kart_name,
-                    const irr::core::stringw& user_name, int host_id,
+                    const irr::core::stringw& user_name, uint32_t host_id,
                     bool network)
                   : m_kart_name(kart_name), m_user_name(user_name),
                     m_local_player_id(player_id), m_global_player_id(-1),
@@ -66,21 +72,22 @@ public:
      {}
      RemoteKartInfo(const std::string& kart_name) : m_kart_name(kart_name),
                     m_user_name(""), m_local_player_id(-1),
-                    m_global_player_id(-1), m_host_id(-1),
+                    m_global_player_id(-1),
+                    m_host_id(std::numeric_limits<uint32_t>::max()),
                     m_kart_team(KART_TEAM_NONE), m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
                     m_default_kart_color(0.0f), m_online_id(0)
      {}
      RemoteKartInfo() : m_kart_name(""), m_user_name(""),
                     m_local_player_id(-1), m_global_player_id(-1),
-                    m_host_id(-1), m_kart_team(KART_TEAM_NONE),
-                    m_network_player(false),
+                    m_host_id(std::numeric_limits<uint32_t>::max()),
+                    m_kart_team(KART_TEAM_NONE), m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
                     m_default_kart_color(0.0f), m_online_id(0)
      {}
     void setKartName(const std::string& n)   { m_kart_name = n;           }
     void setPlayerName(const irr::core::stringw& u) { m_user_name = u;    }
-    void setHostId(int id)                   { m_host_id = id;            }
+    void setHostId(uint32_t id)              { m_host_id = id;            }
     void setLocalPlayerId(int id)            { m_local_player_id = id;    }
     void setGlobalPlayerId(int id)           { m_global_player_id = id;   }
     void setKartTeam(KartTeam team)      { m_kart_team = team;      }
@@ -89,17 +96,32 @@ public:
     void setPerPlayerDifficulty(PerPlayerDifficulty value) 
                                              { m_difficulty = value;      }
     void setOnlineId(uint32_t id)            { m_online_id = id;          }
-    int  getHostId() const                   { return m_host_id;          }
+    uint32_t getHostId() const               { return m_host_id;          }
     int  getLocalPlayerId() const            { return m_local_player_id;  }
     int  getGlobalPlayerId() const           { return m_global_player_id; }
     bool  isNetworkPlayer() const            { return m_network_player;   }
     const std::string& getKartName() const   { return m_kart_name;        }
     const irr::core::stringw& getPlayerName() const { return m_user_name; }
-    KartTeam getKartTeam() const         { return m_kart_team;      }
+    KartTeam getKartTeam() const               { return m_kart_team;      }
     PerPlayerDifficulty getDifficulty() const { return m_difficulty;      }
     float getDefaultKartColor() const      { return m_default_kart_color; }
     uint32_t getOnlineId() const           { return m_online_id;          }
-
+    void setCountryCode(const std::string& id) { m_country_code = id;     }
+    const std::string& getCountryCode() const { return m_country_code;    }
+    void setNetworkPlayerProfile(
+        std::weak_ptr<NetworkPlayerProfile> npp)       { m_profile = npp; }
+    std::weak_ptr<NetworkPlayerProfile> getNetworkPlayerProfile() const
+                                                      { return m_profile; }
+    bool disconnected() const               { return m_profile.expired(); }
+    bool isReserved() const
+              { return m_host_id == std::numeric_limits<uint32_t>::max(); }
+    void makeReserved()
+    {
+        m_host_id = std::numeric_limits<uint32_t>::max();
+        m_profile.reset();
+    }
+    void copyFrom(std::shared_ptr<NetworkPlayerProfile> p,
+                  unsigned local_id);
     bool operator<(const RemoteKartInfo& other) const
     {
         return ((m_host_id<other.m_host_id) ||

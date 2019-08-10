@@ -20,7 +20,7 @@
 
 #include "irrString.h"
 
-#if !defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#if !defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <EGL/egl.h>
@@ -248,7 +248,7 @@ void COGLES2Texture::uploadTexture(bool newTexture, void* mipmapData, u32 level)
 			break;
 	}
 	// Hack for iPhone SDK, which requires a different InternalFormat
-#ifdef _IRR_IPHONE_PLATFORM_
+#ifdef _IRR_IOS_PLATFORM_
 	if (InternalFormat==GL_BGRA)
 		InternalFormat=GL_RGBA;
 #endif
@@ -634,7 +634,7 @@ void COGLES2FBOTexture::bindRTT()
 void COGLES2FBOTexture::unbindRTT()
 {
 	if (ColorFrameBuffer != 0)
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, Driver->getDefaultFramebuffer());
 }
 
 

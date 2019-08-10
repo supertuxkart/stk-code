@@ -24,6 +24,7 @@
 #include "karts/controller/arena_ai.hpp"
 
 class ThreeStrikesBattle;
+class WorldWithRank;
 
 /** The actual battle AI.
  * \ingroup controller
@@ -32,7 +33,8 @@ class BattleAI : public ArenaAI
 {
 protected:
     /** Keep a pointer to world. */
-    ThreeStrikesBattle *m_world;
+    WorldWithRank *m_world;
+    ThreeStrikesBattle* m_tsb_world;
 
     // ------------------------------------------------------------------------
     virtual void  findClosestKart(bool consider_difficulty,

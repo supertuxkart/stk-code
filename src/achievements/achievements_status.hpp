@@ -20,14 +20,14 @@
 #ifndef HEADER_ACHIEVEMENTS_SLOT_HPP
 #define HEADER_ACHIEVEMENTS_SLOT_HPP
 
-#include "achievements/achievement.hpp"
-#include "online/request_manager.hpp"
-#include "online/xml_request.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
+#include <map>
 #include <string>
+#include <vector>
 
+class Achievement;
 class UTFWriter;
 class XMLNode;
 
@@ -204,12 +204,6 @@ private:
 
     bool                m_online;
     bool                m_valid;
-
-    class SyncAchievementsRequest : public Online::XMLRequest {
-        virtual void callback ();
-    public:
-        SyncAchievementsRequest() : Online::XMLRequest(true) {}
-    };
 
     void setEnumToString();
     void updateAchievementsProgress(UpdateType type, unsigned int enum_id);

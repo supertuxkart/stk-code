@@ -48,7 +48,7 @@ private:
 
     /** A sound effect for rolling ball. */
     SFXBase     *m_roll_sfx;
-    virtual void hideNodeWhenUndoDestruction() OVERRIDE;
+    void removeRollSfx();
 
 public:
              Bowling(AbstractKart* kart);
@@ -57,7 +57,8 @@ public:
     virtual bool updateAndDelete(int ticks) OVERRIDE;
     virtual bool hit(AbstractKart* kart, PhysicalObject* obj=NULL) OVERRIDE;
     virtual HitEffect *getHitEffect() const OVERRIDE;
-
+    // ------------------------------------------------------------------------
+    virtual void onFireFlyable() OVERRIDE;
 
 };   // Bowling
 

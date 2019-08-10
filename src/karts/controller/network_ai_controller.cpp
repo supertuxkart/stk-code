@@ -31,7 +31,7 @@ const int UPDATE_FREQUENCY = 30;
 // ----------------------------------------------------------------------------
 NetworkAIController::NetworkAIController(AbstractKart *kart,
                                          int local_player_id,
-                                         SkiddingAI* ai)
+                                         AIBaseController* ai)
                    : PlayerController(kart)
 {
     m_ai_controller = ai;

@@ -17,6 +17,7 @@
 
 #include "utils/separate_process.hpp"
 #include "io/file_manager.hpp"
+#include "utils/command_line.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -34,6 +35,11 @@
 #  include <errno.h>
 #endif
 
+#ifdef __FreeBSD__
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#endif
+
 #ifdef ANDROID
 #include <dlfcn.h>
 #include <fstream>
@@ -45,15 +51,21 @@
 std::string SeparateProcess::getCurrentExecutableLocation()
 {
 #ifdef WIN32
-    HMODULE moudle = GetModuleHandle(NULL);
-    char path[1024];
-    if (GetModuleFileNameA(moudle, path, 1024) < 1024)
-        return file_manager->getFileSystem()->getAbsolutePath(path).c_str();
-    return "";
+    // We already set the full path of exe name in windows
+    return CommandLine::getExecName();
 #elif defined (__APPLE__)
     char path[1024];
     unsigned buf_size = 1024;
     if (_NSGetExecutablePath(path, &buf_size) == 0)
+    {
+        return file_manager->getFileSystem()->getAbsolutePath(path).c_str();
+    }
+    return "";
+#elif defined (__FreeBSD__)
+    char path[PATH_MAX];
+    size_t len = PATH_MAX;
+    const int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
+    if (sysctl(&mib[0], 4, &path, &len, NULL, 0) == 0)
     {
         return file_manager->getFileSystem()->getAbsolutePath(path).c_str();
     }
@@ -87,12 +99,12 @@ SeparateProcess::~SeparateProcess()
 {
     bool dead = false;
 #if defined(WIN32)
-    std::string class_name = "separate_process";
-    class_name += StringUtils::toString(m_child_pid);
-    HWND hwnd = FindWindowEx(HWND_MESSAGE, NULL, &class_name[0], NULL);
+    core::stringw class_name = "separate_process";
+    class_name += StringUtils::toWString(m_child_pid);
+    HWND hwnd = FindWindowEx(HWND_MESSAGE, NULL, class_name.c_str(), NULL);
     if (hwnd != NULL)
     {
-        PostMessage(hwnd, WM_DESTROY, NULL, NULL);
+        PostMessage(hwnd, WM_DESTROY, 0, 0);
         if (WaitForSingleObject(m_child_handle, 5000) != WAIT_TIMEOUT)
         {
             dead = true;
@@ -235,8 +247,9 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     // Create the child process.
     std::string cmd = exe + argument + " --parent-process=" +
         StringUtils::toString(GetCurrentProcessId());
+    core::stringw cmd_w = StringUtils::utf8ToWide(cmd);
     bool success = CreateProcess(NULL,
-        &cmd[0],               // command line
+        cmd_w.data(),          // command line
         NULL,                  // process security attributes
         NULL,                  // primary thread security attributes
         TRUE,                  // handles are inherited

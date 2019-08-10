@@ -233,22 +233,6 @@ void DrawCalls::prepareDrawCalls(scene::ICameraSceneNode *camnode)
         PROFILER_POP_CPU_MARKER();
     }
 
-    /*    switch (reason)
-    {
-    case GL_ALREADY_SIGNALED:
-    printf("Already Signaled\n");
-    break;
-    case GL_TIMEOUT_EXPIRED:
-    printf("Timeout Expired\n");
-    break;
-    case GL_CONDITION_SATISFIED:
-    printf("Condition Satisfied\n");
-    break;
-    case GL_WAIT_FAILED:
-    printf("Wait Failed\n");
-    break;
-    }*/
-
     PROFILER_PUSH_CPU_MARKER("- particle and text billboard upload", 0x3F,
         0x03, 0x61);
     CPUParticleManager::getInstance()->uploadAll();

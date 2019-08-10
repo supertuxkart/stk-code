@@ -86,9 +86,6 @@ public:
 
         // Undefined, used in asserts to catch incorrect states.
         UNDEFINED_PHASE,
-
-        //Goal scored phase
-        GOAL_PHASE
     };
 
 protected:
@@ -130,11 +127,19 @@ private:
      */
     int             m_auxiliary_ticks;
 
+    int             m_start_music_ticks;
+
+    int             m_race_ticks;
+
+    int             m_live_join_ticks;
+
     /** Special counter to count ticks since start (in terms of physics
      *  timestep size). */
     int             m_count_up_ticks;
 
     bool            m_engines_started;
+
+    bool            m_live_join_world;
 
     void startEngines();
 
@@ -157,13 +162,11 @@ public:
     // Note: GO_PHASE is both: start phase and race phase
     bool     isStartPhase() const  { return m_phase<GO_PHASE;               }
     // ------------------------------------------------------------------------
-    bool     isRacePhase()  const  { return (m_phase>=GO_PHASE &&
-                                            m_phase<FINISH_PHASE) ||
-                                            m_phase == GOAL_PHASE;          }
+    bool     isRacePhase()  const  { return m_phase>=GO_PHASE &&
+                                            m_phase<FINISH_PHASE;           }
     // ------------------------------------------------------------------------
-    bool     isActiveRacePhase() const { return (m_phase>=GO_PHASE &&
-                                                m_phase<DELAY_FINISH_PHASE) ||
-                                                m_phase == GOAL_PHASE; }
+    bool     isActiveRacePhase() const { return m_phase>=GO_PHASE &&
+                                                m_phase<DELAY_FINISH_PHASE; }
     // ------------------------------------------------------------------------
     /** While the race menu is being displayed, m_phase is limbo, and
      *  m_previous_phase is finish. So we have to test this case, too.  */
@@ -212,7 +215,18 @@ public:
     int getTicksSinceStart() const { return m_count_up_ticks; }
     // ------------------------------------------------------------------------
     int getAuxiliaryTicks() const { return m_auxiliary_ticks; }
-
+    // ------------------------------------------------------------------------
+    bool isLiveJoinWorld() const { return m_live_join_world; }
+    // ------------------------------------------------------------------------
+    void setLiveJoinWorld(bool val) { m_live_join_world = val; }
+    // ------------------------------------------------------------------------
+    int getMusicDescriptionTicks() const
+    {
+        return m_live_join_ticks == -1 ?
+            m_count_up_ticks : m_count_up_ticks - m_live_join_ticks;
+    }
+    // ------------------------------------------------------------------------
+    void endLiveJoinWorld(int ticks_now);
 };   // WorldStatus
 
 

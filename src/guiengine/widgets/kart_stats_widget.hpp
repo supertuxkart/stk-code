@@ -101,10 +101,10 @@ namespace GUIEngine
         void hideAll();
 
         /** Change the value of the widget, it must be a percent. */
-        void setValue(Stats type, int value);
+        void setValue(Stats type, float value);
 
         /** Get the current values of the widget. */
-        int getValue(Stats type);
+        float getValue(Stats type);
 
         /** If the icons should be displayed. */
         void setDisplayIcons(bool display_icons);

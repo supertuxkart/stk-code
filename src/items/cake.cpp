@@ -34,92 +34,6 @@ float Cake::m_gravity;
 Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 {
     m_target = NULL;
-
-    setDoTerrainInfo(false);
-
-    btVector3 gravity_vector;
-    btQuaternion q = kart->getTrans().getRotation();
-    gravity_vector = Vec3(0, -1, 0).rotate(q.getAxis(), q.getAngle());
-    gravity_vector = gravity_vector.normalize() * m_gravity;
-    // A bit of a hack: the mass of this kinematic object is still 1.0
-    // (see flyable), which enables collisions. I tried setting
-    // collisionFilterGroup/mask, but still couldn't get this object to
-    // collide with the track. By setting the mass to 1, collisions happen.
-    // (if bullet is compiled with _DEBUG, a warning will be printed the first
-    // time a homing-track collision happens).
-    float forward_offset=kart->getKartLength()/2.0f + m_extend.getZ()/2.0f;
-
-    float up_velocity = m_speed/7.0f;
-
-    // give a speed proportional to kart speed. m_speed is defined in flyable
-    m_speed *= kart->getSpeed() / 23.0f;
-
-    //when going backwards, decrease speed of cake by less
-    if (kart->getSpeed() < 0) m_speed /= 3.6f;
-
-    m_speed += 16.0f;
-
-    if (m_speed < 1.0f) m_speed = 1.0f;
-
-    btTransform trans = kart->getTrans();
-
-    float heading=kart->getHeading();
-    float pitch = kart->getTerrainPitch(heading);
-
-    // Find closest kart in front of the current one
-    const bool  backwards = kart->getControls().getLookBack();
-    const AbstractKart *closest_kart=NULL;
-    Vec3        direction;
-    float       kart_dist_squared;
-    getClosestKart(&closest_kart, &kart_dist_squared, &direction,
-                   kart /* search in front of this kart */, backwards);
-
-    // aim at this kart if 1) it's not too far, 2) if the aimed kart's speed
-    // allows the projectile to catch up with it
-    //
-    // this code finds the correct angle and upwards velocity to hit an opponents'
-    // vehicle if they were to continue travelling in the same direction and same speed
-    // (barring any obstacles in the way of course)
-    if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared &&
-        m_speed>closest_kart->getSpeed())
-    {
-        m_target = (AbstractKart*)closest_kart;
-
-        float fire_angle     = 0.0f;
-        getLinearKartItemIntersection (kart->getXYZ(), closest_kart,
-                                       m_speed, m_gravity, forward_offset,
-                                       &fire_angle, &up_velocity);
-
-        // apply transformation to the bullet object (without pitch)
-        btQuaternion q;
-        q = trans.getRotation() * btQuaternion(btVector3(0, 1, 0), fire_angle);
-        trans.setRotation(q);
-        m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
-
-        createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, gravity_vector,
-                      true /* rotation */, false /* backwards */, &trans);
-    }
-    else
-    {
-        m_target = NULL;
-        // kart is too far to be hit. so throw the projectile in a generic way,
-        // straight ahead, without trying to hit anything in particular
-        trans = kart->getAlignedTransform(pitch);
-
-        m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
-
-        createPhysics(forward_offset, m_initial_velocity,
-                      new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, gravity_vector,
-                      true /* rotation */, backwards, &trans);
-    }
-
-
-    //do not adjust height according to terrain
-    setAdjustUpVelocity(false);
-    additionalPhysicsProperties();
 }   // Cake
 
 // -----------------------------------------------------------------------------
@@ -162,3 +76,95 @@ bool Cake::hit(AbstractKart* kart, PhysicalObject* obj)
 
     return was_real_hit;
 }   // hit
+
+// ----------------------------------------------------------------------------
+void Cake::onFireFlyable()
+{
+    Flyable::onFireFlyable();
+    setDoTerrainInfo(false);
+
+    btVector3 gravity_vector;
+    btQuaternion q = m_owner->getTrans().getRotation();
+    gravity_vector = Vec3(0, -1, 0).rotate(q.getAxis(), q.getAngle());
+    gravity_vector = gravity_vector.normalize() * m_gravity;
+    // A bit of a hack: the mass of this kinematic object is still 1.0
+    // (see flyable), which enables collisions. I tried setting
+    // collisionFilterGroup/mask, but still couldn't get this object to
+    // collide with the track. By setting the mass to 1, collisions happen.
+    // (if bullet is compiled with _DEBUG, a warning will be printed the first
+    // time a homing-track collision happens).
+    float forward_offset=m_owner->getKartLength()/2.0f + m_extend.getZ()/2.0f;
+
+    float up_velocity = m_speed/7.0f;
+
+    // give a speed proportional to kart speed. m_speed is defined in flyable
+    m_speed *= m_owner->getSpeed() / 23.0f;
+
+    //when going backwards, decrease speed of cake by less
+    if (m_owner->getSpeed() < 0) m_speed /= 3.6f;
+
+    m_speed += 16.0f;
+
+    if (m_speed < 1.0f) m_speed = 1.0f;
+
+    btTransform trans = m_owner->getTrans();
+
+    float heading=m_owner->getHeading();
+    float pitch = m_owner->getTerrainPitch(heading);
+
+    // Find closest kart in front of the current one
+    const bool  backwards = m_owner->getControls().getLookBack();
+    const AbstractKart *closest_kart=NULL;
+    Vec3        direction;
+    float       kart_dist_squared;
+    getClosestKart(&closest_kart, &kart_dist_squared, &direction,
+                   m_owner /* search in front of this kart */, backwards);
+
+    // aim at this kart if 1) it's not too far, 2) if the aimed kart's speed
+    // allows the projectile to catch up with it
+    //
+    // this code finds the correct angle and upwards velocity to hit an opponents'
+    // vehicle if they were to continue travelling in the same direction and same speed
+    // (barring any obstacles in the way of course)
+    if(closest_kart != NULL && kart_dist_squared < m_st_max_distance_squared &&
+        m_speed>closest_kart->getSpeed())
+    {
+        m_target = (AbstractKart*)closest_kart;
+
+        float fire_angle     = 0.0f;
+        getLinearKartItemIntersection (m_owner->getXYZ(), closest_kart,
+                                       m_speed, m_gravity, forward_offset,
+                                       &fire_angle, &up_velocity);
+
+        // apply transformation to the bullet object (without pitch)
+        btQuaternion q;
+        q = trans.getRotation() * btQuaternion(btVector3(0, 1, 0), fire_angle);
+        trans.setRotation(q);
+        m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
+
+        createPhysics(forward_offset, m_initial_velocity,
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */, gravity_vector,
+                      true /* rotation */, false /* backwards */, &trans);
+    }
+    else
+    {
+        m_target = NULL;
+        // kart is too far to be hit. so throw the projectile in a generic way,
+        // straight ahead, without trying to hit anything in particular
+        trans = m_owner->getAlignedTransform(pitch);
+
+        m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
+
+        createPhysics(forward_offset, m_initial_velocity,
+                      new btCylinderShape(0.5f*m_extend),
+                      0.5f /* restitution */, gravity_vector,
+                      true /* rotation */, backwards, &trans);
+    }
+
+    //do not adjust height according to terrain
+    setAdjustUpVelocity(false);
+    m_body->setActivationState(DISABLE_DEACTIVATION);
+    m_body->clearForces();
+    m_body->applyTorque(btVector3(5.0f, -3.0f, 7.0f));
+}   // onFireFlyable

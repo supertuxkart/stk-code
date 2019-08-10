@@ -34,8 +34,9 @@
 #include "states_screens/kart_selection.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
-
+#include "utils/translation.hpp"
 
 #include <fstream>
 #include <iostream>
@@ -121,7 +122,7 @@ void AddonsManager::init(const XMLNode *xml,
           !file_manager->fileExists(filename)                          )
        && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED
        && !file_manager->fileExists(filename_part);
-    
+
     if (download)
     {
         Log::info("addons", "Downloading updated addons.xml.");
@@ -140,8 +141,18 @@ void AddonsManager::init(const XMLNode *xml,
     }
     else
         Log::info("addons", "Using cached addons.xml.");
-        
-    const XMLNode *xml_addons = new XMLNode(filename);
+
+    const XMLNode* xml_addons = NULL;
+    try
+    {
+        xml_addons = new XMLNode(filename);
+    }
+    catch (std::exception& e)
+    {
+        Log::error("addons", "Error %s", e.what());
+    }
+    if (!xml_addons)
+        return;
     addons_manager->initAddons(xml_addons);   // will free xml_addons
     if(UserConfigParams::logAddons())
         Log::info("addons", "Addons manager list downloaded.");
@@ -595,13 +606,15 @@ void AddonsManager::saveInstalled()
 {
     // Put the addons in the xml file
     // Manually because the irrlicht xml writer doesn't seem finished, FIXME ?
-    std::ofstream xml_installed(m_file_installed.c_str());
+    std::ofstream xml_installed(
+        FileUtils::getPortableWritingPath(m_file_installed));
 
     // Write the header of the xml file
     xml_installed << "<?xml version=\"1.0\"?>" << std::endl;
 
     // Get server address from config
-    std::string server = UserConfigParams::m_server_addons;
+    const std::string server = stk_config->m_server_addons;
+
     // Find the third slash (end of the domain)
     std::string::size_type index = server.find('/');
     index = server.find('/', index + 2) + 1; // Omit one slash

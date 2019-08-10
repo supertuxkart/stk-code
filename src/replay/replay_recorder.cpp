@@ -34,6 +34,8 @@
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <algorithm>
 #include <stdio.h>
@@ -392,7 +394,7 @@ void ReplayRecorder::save()
     }
 
     core::stringw msg = _("Replay saved in \"%s\".",
-        (file_manager->getReplayDir() + getReplayFilename()).c_str());
+        StringUtils::utf8ToWide(file_manager->getReplayDir() + getReplayFilename()));
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 
     fprintf(fd, "version: %d\n", getCurrentReplayVersion());

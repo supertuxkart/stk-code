@@ -26,6 +26,7 @@
 #include "io/utf_writer.hpp"
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 

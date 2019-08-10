@@ -58,9 +58,19 @@ typedef int socklen_t;
 
 static enet_uint32 timeBase = 0;
 
+#ifdef IOS_STK
+extern void iOSInitialize(void);
+extern int isIPV6Only(void);
+extern void getSynthesizedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
+extern void getIPV4FromSynthesized(const struct sockaddr_in6* in6, ENetAddress* ea);
+#endif
+
 int
 enet_initialize (void)
 {
+#ifdef IOS_STK
+    iOSInitialize();
+#endif
     return 0;
 }
 
@@ -189,26 +199,42 @@ enet_address_get_host (const ENetAddress * address, char * name, size_t nameLeng
 int
 enet_socket_bind (ENetSocket socket, const ENetAddress * address)
 {
-    struct sockaddr_in sin;
-
-    memset (& sin, 0, sizeof (struct sockaddr_in));
-
-    sin.sin_family = AF_INET;
-
-    if (address != NULL)
+#ifdef IOS_STK
+    // In STK we only bind port and listen to any address
+    if (isIPV6Only())
     {
-       sin.sin_port = ENET_HOST_TO_NET_16 (address -> port);
-       sin.sin_addr.s_addr = address -> host;
+        struct sockaddr_in6 sin;
+        memset (&sin, 0, sizeof (struct sockaddr_in6));
+        sin.sin6_family = AF_INET6;
+        sin.sin6_addr = in6addr_any;
+        sin.sin6_port = ENET_HOST_TO_NET_16 (address -> port);
+        return bind (socket, (struct sockaddr *) & sin,
+                     sizeof (struct sockaddr_in6));
     }
     else
+#endif
     {
-       sin.sin_port = 0;
-       sin.sin_addr.s_addr = INADDR_ANY;
-    }
+        struct sockaddr_in sin;
 
-    return bind (socket,
-                 (struct sockaddr *) & sin,
-                 sizeof (struct sockaddr_in)); 
+        memset (& sin, 0, sizeof (struct sockaddr_in));
+
+        sin.sin_family = AF_INET;
+
+        if (address != NULL)
+        {
+           sin.sin_port = ENET_HOST_TO_NET_16 (address -> port);
+           sin.sin_addr.s_addr = address -> host;
+        }
+        else
+        {
+           sin.sin_port = 0;
+           sin.sin_addr.s_addr = INADDR_ANY;
+        }
+
+        return bind (socket,
+                     (struct sockaddr *) & sin,
+                     sizeof (struct sockaddr_in));
+    }
 }
 
 int
@@ -235,7 +261,12 @@ enet_socket_listen (ENetSocket socket, int backlog)
 ENetSocket
 enet_socket_create (ENetSocketType type)
 {
-    return socket (PF_INET, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
+#ifdef IOS_STK
+    int af_family = isIPV6Only() == 1 ? PF_INET6 : PF_INET;
+#else
+    int af_family = PF_INET;
+#endif
+    return socket (af_family, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
 }
 
 int
@@ -377,20 +408,34 @@ enet_socket_send (ENetSocket socket,
 {
     struct msghdr msgHdr;
     struct sockaddr_in sin;
+#ifdef IOS_STK
+    struct sockaddr_in6 sin6;
+#endif
     int sentLength;
 
     memset (& msgHdr, 0, sizeof (struct msghdr));
 
     if (address != NULL)
     {
-        memset (& sin, 0, sizeof (struct sockaddr_in));
+#ifdef IOS_STK
+        if (isIPV6Only())
+        {
+            getSynthesizedAddress(address, &sin6);
+            msgHdr.msg_name = & sin6;
+            msgHdr.msg_namelen = sizeof (struct sockaddr_in6);
+        }
+        else
+#endif
+        {
+            memset (& sin, 0, sizeof (struct sockaddr_in));
 
-        sin.sin_family = AF_INET;
-        sin.sin_port = ENET_HOST_TO_NET_16 (address -> port);
-        sin.sin_addr.s_addr = address -> host;
+            sin.sin_family = AF_INET;
+            sin.sin_port = ENET_HOST_TO_NET_16 (address -> port);
+            sin.sin_addr.s_addr = address -> host;
 
-        msgHdr.msg_name = & sin;
-        msgHdr.msg_namelen = sizeof (struct sockaddr_in);
+            msgHdr.msg_name = & sin;
+            msgHdr.msg_namelen = sizeof (struct sockaddr_in);
+        }
     }
 
     msgHdr.msg_iov = (struct iovec *) buffers;
@@ -417,14 +462,27 @@ enet_socket_receive (ENetSocket socket,
 {
     struct msghdr msgHdr;
     struct sockaddr_in sin;
+#ifdef IOS_STK
+    struct sockaddr_in6 sin6;
+#endif
     int recvLength;
 
     memset (& msgHdr, 0, sizeof (struct msghdr));
 
     if (address != NULL)
     {
-        msgHdr.msg_name = & sin;
-        msgHdr.msg_namelen = sizeof (struct sockaddr_in);
+#ifdef IOS_STK
+        if (isIPV6Only())
+        {
+            msgHdr.msg_name = & sin6;
+            msgHdr.msg_namelen = sizeof (struct sockaddr_in6);
+        }
+        else
+#endif
+        {
+            msgHdr.msg_name = & sin;
+            msgHdr.msg_namelen = sizeof (struct sockaddr_in);
+        }
     }
 
     msgHdr.msg_iov = (struct iovec *) buffers;
@@ -447,8 +505,17 @@ enet_socket_receive (ENetSocket socket,
 
     if (address != NULL)
     {
-        address -> host = (enet_uint32) sin.sin_addr.s_addr;
-        address -> port = ENET_NET_TO_HOST_16 (sin.sin_port);
+#ifdef IOS_STK
+        if (isIPV6Only())
+        {
+            getIPV4FromSynthesized(&sin6, address);
+        }
+        else
+#endif
+        {
+            address -> host = (enet_uint32) sin.sin_addr.s_addr;
+            address -> port = ENET_NET_TO_HOST_16 (sin.sin_port);
+        }
     }
 
     return recvLength;

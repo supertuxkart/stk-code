@@ -41,6 +41,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>

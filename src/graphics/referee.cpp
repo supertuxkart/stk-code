@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/referee.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
@@ -27,6 +28,7 @@
 #include "karts/abstract_kart.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "modes/world.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
@@ -194,8 +196,6 @@ Referee::Referee(const AbstractKart &kart)
     m_scene_node->grab();
     m_scene_node->setScale(m_st_scale.toIrrVector());
     m_scene_node->setPosition(core::vector3df(0, kart.getKartHeight() + 0.4f, 0));
-    m_scene_node->setFrameLoop(m_st_first_rescue_frame,
-                               m_st_last_rescue_frame);
 
 }   // Referee
 
@@ -280,3 +280,17 @@ void Referee::selectReadySetGo(int rsg)
     }
 }   // selectReadySetGo
 
+// ----------------------------------------------------------------------------
+/** Set the referee animation frame with created ticks of \ref RescueAnimation,
+ *  so that it's synchronized with world ticks, and can be rewound easily.
+ */
+void Referee::setAnimationFrameWithCreatedTicks(int created_ticks)
+{
+    float dur = stk_config->ticks2Time(
+        World::getWorld()->getTicksSinceStart() - created_ticks);
+    dur *= 25.0f;
+    float ref_dur = (float)(m_st_last_rescue_frame - m_st_first_rescue_frame);
+    float frame = std::fmod(dur, ref_dur);
+    frame += (float)m_st_first_rescue_frame;
+    m_scene_node->setCurrentFrame(frame);
+}   // setAnimationFrameWithCreatedTicks

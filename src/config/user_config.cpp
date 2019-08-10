@@ -38,6 +38,8 @@ static std::vector<UserConfigParam*> all_params;
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
+#include "utils/file_utils.hpp"
+#include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -743,7 +745,8 @@ void UserConfig::saveConfig()
     try
     {
         std::string s = ss.str();
-        std::ofstream configfile(filename.c_str(), std::ofstream::out);
+        std::ofstream configfile(FileUtils::getPortableWritingPath(filename),
+            std::ofstream::out);
         configfile << ss.rdbuf();
         configfile.close();
     }

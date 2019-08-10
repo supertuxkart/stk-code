@@ -26,12 +26,14 @@
 #include "items/item_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+#include "utils/string_utils.hpp"
 
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
@@ -55,6 +57,25 @@ ItemState::ItemState(ItemType type, const AbstractKart *owner, int id)
     else
         setDeactivatedTicks(0);
 }   // ItemState(ItemType)
+
+//-----------------------------------------------------------------------------
+/** Constructor to restore item state at current ticks in client for live join
+ */
+ItemState::ItemState(const BareNetworkString& buffer)
+{
+    m_type = (ItemType)buffer.getUInt8();
+    m_original_type = (ItemType)buffer.getUInt8();
+    m_ticks_till_return = buffer.getUInt32();
+    m_item_id = buffer.getUInt32();
+    m_deactive_ticks = buffer.getUInt32();
+    m_used_up_counter = buffer.getUInt32();
+    m_xyz = buffer.getVec3();
+    m_original_rotation = buffer.getQuat();
+    m_previous_owner = NULL;
+    int8_t kart_id = buffer.getUInt8();
+    if (kart_id != -1)
+        m_previous_owner = World::getWorld()->getKart(kart_id);
+}   // ItemState(const BareNetworkString& buffer)
 
 // ------------------------------------------------------------------------
 /** Sets the disappear counter depending on type.  */
@@ -108,7 +129,6 @@ void ItemState::update(int ticks)
  */
 void ItemState::collected(const AbstractKart *kart)
 {
-    m_previous_owner = kart;
     if (m_type == ITEM_EASTER_EGG)
     {
         // They will disappear 'forever'
@@ -146,6 +166,19 @@ Item::ItemType ItemState::getGrahpicalType() const
         ITEM_BUBBLEGUM_NOLOK : getType();
 }   // getGrahpicalType
 
+//-----------------------------------------------------------------------------
+/** Save item state at current ticks in server for live join
+ */
+void ItemState::saveCompleteState(BareNetworkString* buffer) const
+{
+    buffer->addUInt8((uint8_t)m_type).addUInt8((uint8_t)m_original_type)
+        .addUInt32(m_ticks_till_return).addUInt32(m_item_id)
+        .addUInt32(m_deactive_ticks).addUInt32(m_used_up_counter)
+        .add(m_xyz).add(m_original_rotation)
+        .addUInt8(m_previous_owner ?
+            (int8_t)m_previous_owner->getWorldKartId() : (int8_t)-1);
+}   // saveCompleteState
+
 // ============================================================================
 /** Constructor for an item.
  *  \param type Type of the item.
@@ -157,21 +190,16 @@ Item::ItemType ItemState::getGrahpicalType() const
  *         used to deactivate this item for the owner, i.e. avoid that a kart
  *         'collects' its own bubble gum. NULL means no owner, and the item
  *         can be collected immediatley by any kart.
- *  \param is_predicted True if the creation of the item is predicted by
- *         a client. Only used in networking.
  */
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-           const AbstractKart *owner, bool is_predicted)
+           const AbstractKart *owner)
     : ItemState(type, owner)
 {
-    assert(type != ITEM_TRIGGER); // use other constructor for that
-
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
-    m_graphical_type    = type;
-    m_listener          = NULL;
+    m_graphical_type    = getGrahpicalType();
 
     LODNode* lodnode =
         new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
@@ -207,23 +235,6 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
-
-//-----------------------------------------------------------------------------
-
-/** \brief Constructor to create a trigger item.
-  * Trigger items are invisible and can be used to trigger a behavior when
-  * approaching a point.
-  */
-Item::Item(const Vec3& xyz, float distance, TriggerItemListener* trigger)
-    : ItemState(ITEM_TRIGGER)
-{
-    m_distance_2        = distance*distance;
-    initItem(ITEM_TRIGGER, xyz, /*normal not required*/Vec3(0,1,0));
-    m_graphical_type    = ITEM_TRIGGER;
-    m_node              = NULL;
-    m_listener          = trigger;
-    m_was_available_previously = true;
-}   // Item(xyz, distance, trigger)
 
 //-----------------------------------------------------------------------------
 /** Initialises the item. Note that m_distance_2 must be defined before calling
@@ -356,10 +367,10 @@ void Item::updateGraphics(float dt)
     if (m_node == NULL)
         return;
 
-    if (m_graphical_type != getType())
+    if (m_graphical_type != getGrahpicalType())
     {
         handleNewMesh(getGrahpicalType());
-        m_graphical_type = getType();
+        m_graphical_type = getGrahpicalType();
     }
 
     float time_till_return = stk_config->ticks2Time(getTicksTillReturn());

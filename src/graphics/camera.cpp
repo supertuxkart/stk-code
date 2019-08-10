@@ -273,7 +273,7 @@ void Camera::update(float dt)
 
     if (race_manager->getNumLocalPlayers() < 2)
     {
-        Vec3 heading(sin(m_kart->getHeading()), 0.0f, cos(m_kart->getHeading()));
+        Vec3 heading(sinf(m_kart->getHeading()), 0.0f, cosf(m_kart->getHeading()));
         SFXManager::get()->positionListener(m_kart->getSmoothedXYZ(),
                                             heading,
                                             Vec3(0, 1, 0));

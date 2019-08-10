@@ -72,7 +72,7 @@ private:
 public:
                 TrackManager();
                ~TrackManager();
-
+    static void removeTrackSearchDirs();
     static void addTrackSearchDir(const std::string &dir);
     /** Returns a list of all track identifiers. */
     std::vector<std::string> getAllTrackIdentifiers();
@@ -115,6 +115,8 @@ public:
     /** Returns the track with a given index number.
      *  \param index The index number of the track. */
     Track* getTrack(unsigned int index) const { return m_tracks[index];}
+    // ------------------------------------------------------------------------
+    int getTrackIndexByIdent(const std::string& ident) const;
     // ------------------------------------------------------------------------
     /** Checks if a certain track is available.
      *  \param n Index of the track to check. */

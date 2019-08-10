@@ -28,6 +28,7 @@
 
 namespace irr
 {
+class IrrlichtDevice;
 namespace io
 {
 	class IWriteFile;
@@ -384,6 +385,7 @@ namespace video
 		virtual void drawMeshBufferNormals(const scene::IMeshBuffer* mb, f32 length=10.f, SColor color=0xffffffff);
 
 	protected:
+		IrrlichtDevice* m_device;
 		struct SHWBufferLink
 		{
 			SHWBufferLink(const scene::IMeshBuffer *_MeshBuffer)
@@ -669,6 +671,7 @@ namespace video
 				const c8* name=0);
 
 		virtual bool checkDriverReset() {return false;}
+		virtual u32 getDefaultFramebuffer() const { return 0; }
 	protected:
 
 		//! deletes all textures

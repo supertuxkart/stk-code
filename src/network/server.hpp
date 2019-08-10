@@ -34,6 +34,7 @@
 #include <string>
 #include <tuple>
 
+class Track;
 class XMLNode;
 
 /**
@@ -95,6 +96,9 @@ protected:
         /*rank*/int, core::stringw, /*scores*/double, /*playing time*/float
         > > m_players;
 
+    std::string m_current_track;
+
+    std::string m_country_code;
 public:
 
          /** Initialises the object from an XML node. */
@@ -102,7 +106,8 @@ public:
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
                 unsigned server_mode, const TransportAddress &address,
-                bool password_protected, bool game_started);
+                bool password_protected, bool game_started,
+                const std::string& current_track = "");
     // ------------------------------------------------------------------------
     /** Returns ip address and port of this server. */
     const TransportAddress& getAddress() const { return m_address; }
@@ -156,18 +161,10 @@ public:
     // ------------------------------------------------------------------------
     void setSupportsEncryption(bool val)        { m_supports_encrytion = val; }
     // ------------------------------------------------------------------------
-    bool searchByName(const std::string& lower_case_word)
-    {
-        auto list = StringUtils::split(lower_case_word, ' ', false);
-        bool server_name_found = true;
-        for (auto& word : list)
-        {
-            const std::string& for_search = m_lower_case_name +
-                m_lower_case_player_names;
-            server_name_found = server_name_found &&
-                for_search.find(word) != std::string::npos;
-        }
-        return server_name_found;
-    }
+    bool searchByName(const std::string& lower_case_word);
+    // ------------------------------------------------------------------------
+    Track* getCurrentTrack() const;
+    // ------------------------------------------------------------------------
+    const std::string& getCountryCode() const        { return m_country_code; }
 };   // Server
 #endif // HEADER_SERVER_HPP

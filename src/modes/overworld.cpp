@@ -255,8 +255,8 @@ void OverWorld::onFirePressed(Controller* who)
                 }
 
                 const unsigned int val = challenge->getNumTrophies();
-// Android may have less challenges available than the main version
-#ifdef ANDROID
+// Mobile STK may have less challenges available than the main version
+#ifdef MOBILE_STK
                 bool enough_challenges = true;
 #else
                 const unsigned int val2 = challenge->getNumChallenges();

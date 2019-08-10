@@ -28,7 +28,9 @@
 #include "network/stk_host.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -45,11 +47,12 @@ using namespace Online;
  *         server (i.e. while it is being created).
  */
 ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
-                : ModalDialog(0.8f,0.8f), m_server(server), m_password(NULL)
+                : ModalDialog(0.85f,0.85f), m_server(server), m_password(NULL)
 {
     Log::info("ServerInfoDialog", "Server id is %d, owner is %d",
        server->getServerId(), server->getServerOwner());
     m_self_destroy = false;
+    m_join_server = false;
 
     loadFromFile("online/server_info_dialog.stkgui");
     getWidget<LabelWidget>("title")->setText(server->getName(), true);
@@ -70,26 +73,39 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     }
     else
     {
-        getWidget("label_password")->setVisible(false);
-        getWidget("password")->setVisible(false);
+        Widget* password_box = getWidget("password-box");
+        password_box->setCollapsed(true); // FIXME Doesn't reuse free space for other widgets
+    }
+
+    core::stringw difficulty = race_manager->getDifficultyName(
+        server->getDifficulty());
+    //I18N: In server info dialog
+    getWidget<LabelWidget>("server-info-1")->setText(_("Difficulty: %s", difficulty), false);
+
+    core::stringw mode = ServerConfig::getModeName(server->getServerMode());
+    //I18N: In server info dialog
+    getWidget<LabelWidget>("server-info-2")->setText(_("Game mode: %s", mode), false);
+
+#ifndef SERVER_ONLY
+    if (!server->getCountryCode().empty())
+    {
+        core::stringw country_name =
+            translations->getLocalizedCountryName(server->getCountryCode());
+        //I18N: In the server info dialog, show the server location with
+        //country name (based on IP geolocation)
+        getWidget<LabelWidget>("server-info-3")->setText(_("Server location: %s", country_name), false);
+    }
+#endif
+
+    Track* t = server->getCurrentTrack();
+    if (t)
+    {
+        core::stringw track_name = t->getName();
+        //I18N: In server info dialog, showing the current track playing in server
+        getWidget<LabelWidget>("server-info-4")->setText(_("Current track: %s", track_name), false);
     }
 
     auto& players = m_server->getPlayers();
-    core::stringw server_info;
-    core::stringw difficulty = race_manager->getDifficultyName(
-        server->getDifficulty());
-
-    //I18N: In server info dialog
-    core::stringw each_line = _("Difficulty: %s", difficulty);
-    server_info += each_line;
-    server_info += L"\n";
-
-    //I18N: In server info dialog
-    core::stringw mode = ServerConfig::getModeName(server->getServerMode());
-    each_line = _("Game mode: %s", mode);
-    server_info += each_line;
-    server_info += L"\n";
-
     if (!players.empty())
     {
         // I18N: Show above the player list in server info dialog to
@@ -128,9 +144,6 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     {
         getWidget("player-list")->setVisible(false);
     }
-    getWidget("server-info")->setVisible(true);
-    getWidget<LabelWidget>("server-info")->setText(server_info, true);
-
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
@@ -174,7 +187,7 @@ GUIEngine::EventPropagation
         }
         else if(selection == m_join_widget->m_properties[PROP_ID])
         {
-            requestJoin();
+            m_join_server = true;
             return GUIEngine::EVENT_BLOCK;
         }
     }
@@ -191,7 +204,7 @@ void ServerInfoDialog::onEnterPressedInternal()
     const int playerID = PLAYER_ID_GAME_MASTER;
     if (GUIEngine::isFocusedForPlayer(m_options_widget, playerID))
         return;
-    requestJoin();
+    m_join_server = true;
 }   // onEnterPressedInternal
 
 // -----------------------------------------------------------------------------
@@ -217,4 +230,6 @@ void ServerInfoDialog::onUpdate(float dt)
         ModalDialog::dismiss();
         return;
     }
+    if (m_join_server)
+        requestJoin();
 }   // onUpdate

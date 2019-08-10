@@ -8,11 +8,14 @@
 #include "IGUIElement.h"
 #include "SColor.h"
 
+#include <vector>
+
 namespace irr
 {
 namespace gui
 {
 	class IGUIFont;
+	struct GlyphLayout;
 
 	//! Multi or single line text label.
 	class IGUIStaticText : public IGUIElement
@@ -115,16 +118,11 @@ namespace gui
 		//! Checks if the text in this label should be clipped if it goes outside bounds
 		virtual bool isTextRestrainedInside() const = 0;
 
-		//! Set whether the string should be interpreted as right-to-left (RTL) text
-		/** \note This component does not implement the Unicode bidi standard, the
-		text of the component should be already RTL if you call this. The
-		main difference when RTL is enabled is that the linebreaks for multiline
-		elements are performed starting from the end.
-		*/
-		virtual void setRightToLeft(bool rtl) = 0;
-
-		//! Checks whether the text in this element should be interpreted as right-to-left
-		virtual bool isRightToLeft() const = 0;
+		virtual const std::vector<GlyphLayout>& getGlyphLayouts() const = 0;
+		virtual void setGlyphLayouts(std::vector<GlyphLayout>& gls) = 0;
+		virtual void clearGlyphLayouts() = 0;
+		virtual void setUseGlyphLayoutsOnly(bool gls_only) = 0;
+		virtual bool useGlyphLayoutsOnly() const = 0;
 	};
 
 

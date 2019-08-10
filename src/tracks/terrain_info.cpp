@@ -129,8 +129,8 @@ bool TerrainInfo::getSurfaceInfo(const Vec3 &from, Vec3 *position,
 float TerrainInfo::getTerrainPitch(float heading) const {
     if(!m_material) return 0.0f;
 
-    const float X = sin(heading);
-    const float Z = cos(heading);
+    const float X = sinf(heading);
+    const float Z = cosf(heading);
     // Compute the angle between the normal of the plane and the line to
     // (x,0,z).  (x,0,z) is normalised, so are the coordinates of the plane,
     // simplifying the computation of the scalar product.

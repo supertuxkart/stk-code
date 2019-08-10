@@ -66,7 +66,7 @@ namespace gui
 		virtual void draw();
 
 		//! Sets the new caption of the element
-		virtual void setText(const wchar_t* text);
+		virtual void setText(const core::stringw& text);
 
 		//! Returns caption of this element.
 		virtual const wchar_t* getText() const;

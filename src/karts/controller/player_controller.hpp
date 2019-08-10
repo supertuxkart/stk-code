@@ -49,7 +49,7 @@ public:
     virtual void reset             () OVERRIDE;
     virtual void handleZipper(bool play_sound) OVERRIDE;
     virtual void resetInputState();
-    virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
+    virtual bool saveState(BareNetworkString *buffer) const OVERRIDE;
     virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void  collectedItem(const ItemState &item,

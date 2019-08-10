@@ -40,7 +40,7 @@ using namespace irr;
 
 SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
                                    bool multiplayer, bool display_icon,
-                                   const int value)
+                                   const float value)
                                   : Widget(WTYPE_DIV)
 {
     m_player_id = player_id;
@@ -120,34 +120,26 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_w = w;
     m_h = h;
     
-    int iconbox_h = h; //within icon box, icon is drawn at 75% size
-    int iconbox_w = h; //assuming square icon
+    int iconbox_h = h * 4 / 3; 
+    int iconbox_w = h * 4 / 3; //assuming square icon
     
-    m_iconbutton_h = iconbox_h * 3 / 4; 
-    m_iconbutton_w = iconbox_w * 3 / 4; 
+    m_iconbutton_h = iconbox_h; 
+    m_iconbutton_w = iconbox_w; 
 
     // -- sizes
     m_bar_w = m_w - iconbox_w - 25;  //leaving just enough space for icon + its margin  
     m_bar_h = h;
-
-    // for shrinking effect
-    if (h < 175)
-    {
-        const float factor = h / 175.0f;
-        m_bar_h   = (int)(m_bar_h*factor);
-        // no scale effect for icon (becomes too small otherwise)
-    }
     
-    m_bar_x = x + iconbox_w;    
+    m_bar_x = x + iconbox_w + m_w / 32;    
     m_bar_y = y + h/2 - m_bar_h/2; //align to midpoint in y direction
 
-    m_iconbutton_x = x;
+    m_iconbutton_x = x; //make sure icon has enough space on the right
     m_iconbutton_y = y + h/2 - m_iconbutton_h/2; //align to midpoint in y direction
 }   // setSize
 
 // -----------------------------------------------------------------------------
 
-void SkillLevelWidget::setValue(const int value)
+void SkillLevelWidget::setValue(const float value)
 {
     m_bar->moveValue(value);
 }

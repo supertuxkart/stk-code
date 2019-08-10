@@ -155,7 +155,7 @@ public:
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const
                   { return core::dimension2du(m_map_width, m_map_height); }
-
+    virtual void calculateMinimapSize();
 };   // RaceGUI
 
 #endif

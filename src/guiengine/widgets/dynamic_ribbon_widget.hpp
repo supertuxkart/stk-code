@@ -64,6 +64,12 @@ namespace GUIEngine
         unsigned int m_badges;
     };
 
+    struct DynamicRibbonScrollCallback
+    {
+        void* data;
+        void (*callback)(void* data);
+    };
+
     /**
       * \brief An extended version of RibbonWidget, with more capabilities.
       * A dynamic ribbon builds upon RibbonWidget, adding dynamic contents creation and sizing,
@@ -191,6 +197,7 @@ namespace GUIEngine
         /** Max length of a label, in characters */
         unsigned int m_max_label_length;
 
+        DynamicRibbonScrollCallback m_scroll_callback;
     public:
 
         LEAK_CHECK()
@@ -202,7 +209,7 @@ namespace GUIEngine
           */
         DynamicRibbonWidget(const bool combo, const bool multi_row);
 
-        /** Reference pointers only, the actual instances are owned by m_children. Used to create mtultiple-row
+        /** Reference pointers only, the actual instances are owned by m_children. Used to create multiple-row
          ribbons (what appears to be a grid of icons is actually a vector of stacked basic ribbons) */
         PtrVector<RibbonWidget, REF> m_rows;
 
@@ -238,6 +245,7 @@ namespace GUIEngine
         /** Clears all items added through 'addItem'. You can then add new items with 'addItem' and call
             'updateItemDisplay' to update the display. */
         void clearItems();
+        void setBadge(const std::string &name, BadgeType badge);
 
         /** Sort the list of items with a given comparator. */
         template<typename Compare>
@@ -302,7 +310,7 @@ namespace GUIEngine
         /** \brief callback from IRibbonListener */
         virtual void onSelectionChange(){}
 
-        virtual void setText(const wchar_t *text);
+        virtual void setText(const irr::core::stringw& text);
 
         virtual void update(float delta);
 
@@ -312,6 +320,12 @@ namespace GUIEngine
 
         /** Set max length of displayed text. */
         void setMaxLabelLength(int length) { m_max_label_length = length; }
+
+        void registerScrollCallback(void (*callback)(void* data), void* data)
+        { 
+            m_scroll_callback.callback = callback; 
+            m_scroll_callback.data = data;
+        }
     };
 
 }

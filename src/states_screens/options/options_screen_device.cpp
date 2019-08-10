@@ -39,6 +39,7 @@
 #include "states_screens/options/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>
@@ -398,16 +399,16 @@ void OptionsScreenDevice::updateInputButtons()
     GUIEngine::Widget* conflict_label =
         getWidget<GUIEngine::LabelWidget>("conflict");
 
-    std::wostringstream oss;
+    core::stringw warning;
     if (conflicts_between)
     {
-        oss << _("* A blue item means a conflict with another configuration");
+        warning = _("* A blue item means a conflict with another configuration");
         if (conflicts_inside)
-            oss << "\n";
+            warning += "\n";
     }
     if (conflicts_inside)
-        oss << _("* A red item means a conflict in the current configuration");
-    conflict_label->setText(oss.str().c_str());
+        warning += _("* A red item means a conflict in the current configuration");
+    conflict_label->setText(warning);
 
 }   // updateInputButtons
 

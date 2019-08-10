@@ -307,7 +307,7 @@ namespace irr
             //! Return a system-specific size which is supported for cursors. Larger icons will fail, smaller icons might work.
 			virtual core::dimension2di getSupportedIconSize() const;
 
-            void update();
+			void update();
 
 		private:
 
@@ -386,6 +386,12 @@ namespace irr
 		//! returns the win32 cursor control
 		CCursorControl* getWin32CursorControl();
 
+		HWND getHandle() const { return HWnd; }
+
+		bool isIMEComposingStarted() const { return m_ime_composing_started; }
+
+		void setIMEComposingStarted(bool started) { m_ime_composing_started = started; }
+
 	private:
 
 		//! create the driver
@@ -398,6 +404,7 @@ namespace irr
 
 		void resizeIfNecessary();
 
+		bool m_ime_composing_started;
 		HWND HWnd;
 
 		bool ChangedToFullScreen;

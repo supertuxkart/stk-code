@@ -44,48 +44,36 @@ void ChallengeStatus::load(const XMLNode* challenges_node)
         return;
     }
 
-    m_state[0] = CH_INACTIVE;
-    m_state[1] = CH_INACTIVE;
-    m_state[2] = CH_INACTIVE;
-    m_state[3] = CH_INACTIVE;
+    m_active = 0;
+    m_solved = 0;
 
     std::string solved;
     if (node->get("solved", &solved))
     {
+        // Solving at a difficulty also marks lower difficulties as solved
         if (solved == "easy")
-            m_state[0] = CH_SOLVED;
+            m_solved = 0x01;
         else if (solved == "medium")
-        {
-            m_state[0] = CH_SOLVED;
-            m_state[1] = CH_SOLVED;
-        }
+            m_solved = 0x03;
         else if (solved == "hard")
-        {
-            m_state[0] = CH_SOLVED;
-            m_state[1] = CH_SOLVED;
-            m_state[2] = CH_SOLVED;
-        }
+            m_solved = 0x07;
         else if (solved == "best")
-        {
-            m_state[0] = CH_SOLVED;
-            m_state[1] = CH_SOLVED;
-            m_state[2] = CH_SOLVED;
-            m_state[3] = CH_SOLVED;
-        }
+            m_solved = 0x0F;
     }   // if has 'solved' attribute
     if (!node->get("best_while_slower", &m_max_req_in_lower_diff))
         m_max_req_in_lower_diff = false;
 }   // load
 
 //-----------------------------------------------------------------------------
-
+// Solve not only the current difficulty but all those before
+// e.g. if you solved hard then you also get easy.
+// Also resets active flag.
 void ChallengeStatus::setSolved(RaceManager::Difficulty d)
 {
-    // solve not only the current difficulty but all those before
-    // e.g. if you solved hard then you also get easy
-    for (int curr = 0; curr <= d; curr++)
+    if ((int) d <= 3)
     {
-        m_state[curr] = CH_SOLVED;
+        m_solved |= (0x0F >> (3 - (int) d)); // Sets the last d+1 bits to 1
+        m_active &= ~m_solved; // Sets to 0 all bits which are at 1 in m_solved
     }
 } // setSolved
 

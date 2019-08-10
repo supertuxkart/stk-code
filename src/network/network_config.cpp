@@ -19,6 +19,9 @@
 #include "network/network_config.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
+#include "input/device_manager.hpp"
+#include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "network/server_config.hpp"
 #include "network/transport_address.hpp"
 #include "online/xml_request.hpp"
@@ -27,6 +30,7 @@
 #include "states_screens/online/online_lan.hpp"
 #include "states_screens/online/online_profile_servers.hpp"
 #include "states_screens/online/online_screen.hpp"
+#include "states_screens/state_manager.hpp"
 
 NetworkConfig *NetworkConfig::m_network_config = NULL;
 
@@ -55,6 +59,7 @@ NetworkConfig::NetworkConfig()
         0 : stk_config->m_client_port;
     m_joined_server_version = 0;
     m_network_ai_tester = false;
+    m_state_frequency = 10;
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------
@@ -62,6 +67,7 @@ NetworkConfig::NetworkConfig()
  */
 void NetworkConfig::unsetNetworking()
 {
+    clearServerCapabilities();
     m_network_type = NETWORK_NONE;
     ServerConfig::m_private_server_password = "";
 }   // unsetNetworking
@@ -139,3 +145,29 @@ std::vector<GUIEngine::Screen*>
         }
     }
 }   // getResetScreens
+
+// ----------------------------------------------------------------------------
+/** Called before (re)starting network race, must be used before adding
+ *  split screen players. */
+void NetworkConfig::clearActivePlayersForClient() const
+{
+    if (!isClient())
+        return;
+    StateManager::get()->resetActivePlayers();
+    if (input_manager)
+    {
+        input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
+        input_manager->getDeviceManager()->setSinglePlayer(NULL);
+        input_manager->setMasterPlayerOnly(false);
+        input_manager->getDeviceManager()->clearLatestUsedDevice();
+    }
+}   // clearActivePlayersForClient
+
+// ----------------------------------------------------------------------------
+/** True when client needs to round the bodies phyiscal info for current
+ *  ticks, server doesn't as it will be done implictly in save state. */
+bool NetworkConfig::roundValuesNow() const
+{
+    return isNetworking() && !isServer() && RewindManager::get()
+        ->shouldSaveState(World::getWorld()->getTicksSinceStart());
+}   // roundValuesNow

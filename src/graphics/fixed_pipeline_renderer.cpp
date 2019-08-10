@@ -37,7 +37,7 @@ void FixedPipelineRenderer::onUnloadWorld()
     
 }
 
-void FixedPipelineRenderer::render(float dt)
+void FixedPipelineRenderer::render(float dt, bool is_loading)
 {    
     World *world = World::getWorld(); // Never NULL.
 
@@ -92,7 +92,15 @@ void FixedPipelineRenderer::render(float dt)
     }  // for i<getNumKarts
 
     // Either render the gui, or the global elements of the race gui.
-    GUIEngine::render(dt);
+    glViewport(0, irr_driver->getDevice()->getMovedHeight(),
+        irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height);
+    GUIEngine::render(dt, is_loading);
+
+    if (irr_driver->getRenderNetworkDebug() && !is_loading)
+        irr_driver->renderNetworkDebug();
+    glViewport(0, 0, irr_driver->getActualScreenSize().Width,
+        irr_driver->getActualScreenSize().Height);
 
     // Render the profiler
     if(UserConfigParams::m_profiler_enabled)

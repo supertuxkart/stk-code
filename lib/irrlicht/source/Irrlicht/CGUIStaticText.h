@@ -10,6 +10,7 @@
 
 #include "IGUIStaticText.h"
 #include "irrArray.h"
+#include "GlyphLayout.h"
 
 namespace irr
 {
@@ -20,7 +21,7 @@ namespace gui
 	public:
 
 		//! constructor
-		CGUIStaticText(const wchar_t* text, bool border, IGUIEnvironment* environment,
+		CGUIStaticText(const core::stringw& text, bool border, IGUIEnvironment* environment,
 			IGUIElement* parent, s32 id, const core::rect<s32>& rectangle,
 			bool background = false);
 
@@ -87,7 +88,7 @@ namespace gui
 		virtual bool isWordWrapEnabled() const;
 
 		//! Sets the new caption of this element.
-		virtual void setText(const wchar_t* text);
+		virtual void setText(const core::stringw& text);
 
 		//! Returns the height of the text in pixels when it is drawn.
 		virtual s32 getTextHeight() const;
@@ -98,22 +99,17 @@ namespace gui
 		//! Updates the absolute position, splits text if word wrap is enabled
 		virtual void updateAbsolutePosition();
 
-		//! Set whether the string should be interpreted as right-to-left (RTL) text
-		/** \note This component does not implement the Unicode bidi standard, the
-		text of the component should be already RTL if you call this. The
-		main difference when RTL is enabled is that the linebreaks for multiline
-		elements are performed starting from the end.
-		*/
-		virtual void setRightToLeft(bool rtl);
-
-		//! Checks if the text should be interpreted as right-to-left text
-		virtual bool isRightToLeft() const;
-
 		//! Writes attributes of the element.
 		virtual void serializeAttributes(io::IAttributes* out, io::SAttributeReadWriteOptions* options) const;
 
 		//! Reads attributes of the element
 		virtual void deserializeAttributes(io::IAttributes* in, io::SAttributeReadWriteOptions* options);
+
+		virtual const std::vector<GlyphLayout>& getGlyphLayouts() const { return m_glyph_layouts; }
+		virtual void setGlyphLayouts(std::vector<GlyphLayout>& gls) { m_glyph_layouts = gls; }
+		virtual void clearGlyphLayouts() { m_glyph_layouts.clear(); }
+		virtual void setUseGlyphLayoutsOnly(bool gls_only) { m_use_glyph_layouts_only = gls_only; }
+		virtual bool useGlyphLayoutsOnly() const { return m_use_glyph_layouts_only; }
 
 	private:
 
@@ -127,13 +123,14 @@ namespace gui
 		bool WordWrap;
 		bool Background;
 		bool RestrainTextInside;
-		bool RightToLeft;
 
 		video::SColor OverrideColor, BGColor;
 		gui::IGUIFont* OverrideFont;
 		gui::IGUIFont* LastBreakFont; // stored because: if skin changes, line break must be recalculated.
 
-		core::array< core::stringw > BrokenText;
+		//! If true, setText / updating this element will not reshape with Text object
+		bool m_use_glyph_layouts_only;
+		std::vector<GlyphLayout> m_glyph_layouts;
 	};
 
 } // end namespace gui

@@ -16,7 +16,6 @@
 #include "CIrrDeviceStub.h"
 #include "IrrlichtDevice.h"
 #include "IImagePresenter.h"
-#include "ICursorControl.h"
 
 #include <map>
 
@@ -73,52 +72,28 @@ namespace irr
         virtual bool deactivateGyroscope();
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
-        virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
-        virtual void showKeyboard(bool show);
-        
-        class CCursorControl : public gui::ICursorControl
+        void fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end, int type);
+        virtual void toggleOnScreenKeyboard(bool show, s32 type = 0);
+        virtual bool supportsTouchDevice() const { return HasTouchDevice; }
+        virtual bool hasHardwareKeyboard() const;
+        // ATM if there is touch device we assume native screen keyboard is
+        // available which for example android tv doesn't
+        virtual bool hasOnScreenKeyboard() const { return HasTouchDevice; }
+        virtual u32 getScreenHeight() const { return m_screen_height; }
+        virtual u32 getOnScreenKeyboardHeight() const;
+        virtual s32 getMovedHeight() const { return m_moved_height; }
+        virtual void registerGetMovedHeightFunction(HeightFunc height_function)
         {
-        public:
-
-            CCursorControl() : CursorPos(core::position2d<s32>(0, 0)) {}
-            virtual void setVisible(bool visible) {}
-            virtual bool isVisible() const {return false;}
-            virtual void setPosition(const core::position2d<f32> &pos)
-            {
-                setPosition(pos.X, pos.Y);
-            }
-            virtual void setPosition(f32 x, f32 y) 
-            {
-                CursorPos.X = x;
-                CursorPos.Y = y;
-            }
-            virtual void setPosition(const core::position2d<s32> &pos)
-            {
-                setPosition(pos.X, pos.Y);
-            }
-            virtual void setPosition(s32 x, s32 y)
-            {
-                CursorPos.X = x;
-                CursorPos.Y = y;
-            }
-            virtual const core::position2d<s32>& getPosition() 
-            {
-                return CursorPos;
-            }
-            virtual core::position2d<f32> getRelativePosition()
-            {
-                return core::position2d<f32>(0, 0);
-            }
-            virtual void setReferenceRect(core::rect<s32>* rect=0) {}
-        private:
-            core::position2d<s32> CursorPos;
-        };
-        
+            m_moved_height_func = height_function;
+        }
         static void onCreate();
         static const AndroidApplicationInfo& getApplicationInfo(
                                                     ANativeActivity* activity);
 
     private:
+        s32 m_moved_height;
+        u32 m_screen_height;
+        HeightFunc m_moved_height_func;
         android_app* Android;
         ASensorManager* SensorManager;
         ASensorEventQueue* SensorEventQueue;
@@ -126,7 +101,6 @@ namespace irr
         const ASensor* Gyroscope;
         bool AccelerometerActive;
         bool GyroscopeActive;
-        bool TextInputEnabled;
         static AndroidApplicationInfo ApplicationInfo;
 
         static bool IsPaused;
@@ -143,7 +117,7 @@ namespace irr
         };
         
         TouchEventData TouchEventsData[32];
-        bool IsMousePressed;
+        bool HasTouchDevice;
         float GamepadAxisX;
         float GamepadAxisY;
         DeviceOrientation DefaultOrientation;
@@ -157,15 +131,11 @@ namespace irr
         void createKeyMap();
         void createVideoModeList();
         wchar_t getKeyChar(SEvent& event);
-        wchar_t getUnicodeChar(AInputEvent* event);
-        static void hideNavBar(ANativeActivity* activity);
         static void readApplicationInfo(ANativeActivity* activity);
         int getRotation();
         DeviceOrientation getDefaultOrientation();
         video::SExposedVideoData& getExposedVideoData();
         
-        static void handleAndroidCommandDirect(ANativeActivity* activity, 
-                                               int32_t cmd);
         static void handleAndroidCommand(android_app* app, int32_t cmd);
         static s32 handleInput(android_app* app, AInputEvent* event);
 

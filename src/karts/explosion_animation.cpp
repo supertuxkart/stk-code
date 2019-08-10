@@ -18,16 +18,19 @@
 
 #include "karts/explosion_animation.hpp"
 
-#include "audio/sfx_manager.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/stars.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/follow_the_leader.hpp"
-#include "modes/world.hpp"
-#include "network/network_config.hpp"
+#include "network/network_string.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/mini_glm.hpp"
+
+#include <cstring>
 
 /** A static create function that does only create an explosion if
  *  the explosion happens to be close enough to affect the kart.
@@ -40,7 +43,10 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                const Vec3 &pos,
                                                bool direct_hit)
 {
-    if(kart->isInvulnerable()) return NULL;
+    // When goal phase is happening karts is made stationary, so no animation
+    // will be created
+    if (kart->isInvulnerable() || World::getWorld()->isGoalPhase())
+        return NULL;
 
     float r = kart->getKartProperties()->getExplosionRadius();
 
@@ -61,7 +67,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
             ftl_world->leaderHit();
     }
 
-    return new ExplosionAnimation(kart, pos, direct_hit);
+    return new ExplosionAnimation(kart, direct_hit);
 }   // create
 
 // ----------------------------------------------------------------------------
@@ -70,66 +76,134 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
  *  Otherwise, NULL is returned. */
 ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart)
 {
-    if(kart->isInvulnerable()) return NULL;
-    else if(kart->isShielded())
+    if (kart->isInvulnerable() || World::getWorld()->isGoalPhase())
+        return NULL;
+    else if (kart->isShielded())
     {
         kart->decreaseShieldTime();
         return NULL;
     }
-    return new ExplosionAnimation(kart, kart->getXYZ(), /*direct hit*/true);
+    return new ExplosionAnimation(kart, /*direct hit*/true);
 }   // create
 
 // ----------------------------------------------------------------------------
-ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
-                                       const Vec3 &explosion_position,
-                                       bool direct_hit, bool from_state)
+ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, bool direct_hit)
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
+{
+    memset(m_reset_trans_compressed, 0, 16);
+    Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
+    // Put the kart back to its own flag base like rescue if direct hit in CTF
+    bool reset = race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit;
+    if (reset)
+    {
+        btTransform prev_trans = m_kart->getTrans();
+        World::getWorld()->moveKartAfterRescue(m_kart);
+        btTransform reset_trans = m_kart->getTrans();
+        m_kart->getBody()->setCenterOfMassTransform(prev_trans);
+        m_kart->setTrans(prev_trans);
+        MiniGLM::compressbtTransform(reset_trans,
+            m_reset_trans_compressed);
+        init(direct_hit, normal, reset_trans);
+    }
+    else
+    {
+        init(direct_hit, normal,
+             btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f)));
+    }
+
+    float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
+    m_kart->setInvulnerableTicks(stk_config->time2Ticks(t));
+    m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
+    m_kart->getAttachment()->clear();
+    // Clear powerups when direct hit in CTF
+    if (reset)
+        resetPowerUp();
+}   // ExplosionAnimation
+
+//-----------------------------------------------------------------------------
+ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, BareNetworkString* b)
+                  : AbstractKartAnimation(kart, "ExplosionAnimation")
+{
+    restoreBasicState(b);
+    restoreData(b);
+}   // RescueAnimation
+
+//-----------------------------------------------------------------------------
+void ExplosionAnimation::restoreData(BareNetworkString* b)
+{
+    bool direct_hit = b->getUInt8() == 1;
+    Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
+    btTransform reset_transform =
+        btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+
+    if (race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit)
+    {
+        m_reset_trans_compressed[0] = b->getInt24();
+        m_reset_trans_compressed[1] = b->getInt24();
+        m_reset_trans_compressed[2] = b->getInt24();
+        m_reset_trans_compressed[3] = b->getUInt32();
+        reset_transform =
+            MiniGLM::decompressbtTransform(m_reset_trans_compressed);
+    }
+    init(direct_hit, normal, reset_transform);
+}   // restoreData
+
+//-----------------------------------------------------------------------------
+ExplosionAnimation::~ExplosionAnimation()
+{
+    // Only play with physics and camera if the object is getting destroyed
+    // because its time is up. If there is still time left when this gets
+    // called, it means that the world is getting destroyed so we don't touch
+    // these settings.
+    if (m_end_ticks != std::numeric_limits<int>::max())
+    {
+        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
+        // Don't reset spectate camera
+        auto cl = LobbyProtocol::get<ClientLobby>();
+        if (!cl || !cl->isSpectator())
+        {
+            for (unsigned i = 0; i < Camera::getNumCameras(); i++)
+            {
+                Camera *camera = Camera::getCamera(i);
+                if (camera->getType() != Camera::CM_TYPE_END)
+                    camera->setMode(Camera::CM_NORMAL);
+            }
+        }
+    }
+}   // ~ExplosionAnimation
+
+// ----------------------------------------------------------------------------
+void ExplosionAnimation::init(bool direct_hit, const Vec3& normal,
+                              const btTransform& reset_trans)
 {
     m_direct_hit = direct_hit;
     m_reset_ticks = -1;
     float timer = m_kart->getKartProperties()->getExplosionDuration();
-    m_timer = stk_config->time2Ticks(timer);
-    m_normal = m_kart->getNormal();
+    m_normal = normal;
 
     // Non-direct hits will be only affected half as much.
-    if (!m_direct_hit)
+    if (!direct_hit)
     {
         timer *= 0.5f;
-        m_timer /= 2;
     }
 
     // Put the kart back to its own flag base like rescue if direct hit in CTF
     if (race_manager->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit)
     {
-        m_reset_ticks = stk_config->time2Ticks(timer * 0.2f);
+        m_reset_ticks = m_created_ticks +
+            stk_config->time2Ticks(timer * 0.8f);
     }
+    m_end_ticks = m_created_ticks + stk_config->time2Ticks(timer);
 
     if (m_reset_ticks != -1)
-    {
-        m_xyz = m_kart->getXYZ();
-        m_orig_xyz = m_xyz;
-        btTransform prev_trans = kart->getTrans();
-        World::getWorld()->moveKartAfterRescue(kart);
-        m_end_transform = kart->getTrans();
-        m_reset_xyz = m_end_transform.getOrigin();
-        m_reset_normal = m_end_transform.getBasis().getColumn(1);
-        kart->getBody()->setCenterOfMassTransform(prev_trans);
-        kart->setTrans(prev_trans);
-    }
+        m_reset_trans = reset_trans;
     else
-    {
-        m_end_transform = m_kart->getTrans();
-        m_xyz = m_kart->getXYZ();
-        m_orig_xyz = m_xyz;
-    }
-    m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
+        m_reset_trans = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
 
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isServer())
-    {
-        m_end_ticks = m_timer + World::getWorld()->getTicksSinceStart() + 1;
-    }
     // Half of the overall time is spent in raising, so only use
     // half of the explosion time here.
     // Velocity after t seconds is:
@@ -139,48 +213,29 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
     // the specified time.
     m_velocity = 0.5f * timer * Track::getCurrentTrack()->getGravity();
 
-    m_curr_rotation.setHeading(m_kart->getHeading());
-    m_curr_rotation.setPitch(m_kart->getPitch());
-    m_curr_rotation.setRoll(m_kart->getRoll());
+    // From moveable::updatePosition
+    Vec3 forw_vec = m_created_transform.getBasis().getColumn(2);
+    float heading = atan2f(forw_vec.getX(), forw_vec.getZ());
+    Vec3 up = m_created_transform.getBasis().getColumn(1);
+    float pitch = atan2(up.getZ(), fabsf(up.getY()));
+    float roll = atan2(up.getX(), up.getY());
 
-    const int max_rotation = m_direct_hit ? 2 : 1;
-    // To get rotations in both directions for each axis we determine a random
-    // number between -(max_rotation-1) and +(max_rotation-1)
+    m_curr_rotation.setHeading(heading);
+    m_curr_rotation.setPitch(pitch);
+    m_curr_rotation.setRoll(roll);
+
+    const int max_rotation = direct_hit ? 2 : 1;
+    // To get rotations in both directions for each axis we determine a
+    // number calculated by world created ticks between
+    // -(max_rotation-1) and +(max_rotation-1)
     float f = 2.0f * M_PI / timer;
-    m_add_rotation.setHeading( (rand()%(2*max_rotation+1)-max_rotation)*f );
-    m_add_rotation.setPitch(   (rand()%(2*max_rotation+1)-max_rotation)*f );
-    m_add_rotation.setRoll(    (rand()%(2*max_rotation+1)-max_rotation)*f );
-
-    // Set invulnerable time, and graphical effects
-    float t = m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
-    m_kart->setInvulnerableTicks(stk_config->time2Ticks(t));
-    m_kart->showStarEffect(t);
-
-    m_kart->getAttachment()->clear();
-    // Clear powerups when direct hit in CTF
-    if (!from_state)
-        addNetworkAnimationChecker(m_reset_ticks != -1);
-}   // ExplosionAnimation
-
-//-----------------------------------------------------------------------------
-ExplosionAnimation::~ExplosionAnimation()
-{
-    // Only play with physics and camera if the object is getting destroyed
-    // because its time is up. If there is still time left when this gets
-    // called, it means that the world is getting destroyed so we don't touch
-    // these settings.
-    if (m_timer < 0)
-    {
-        m_kart->getBody()->setLinearVelocity(btVector3(0,0,0));
-        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
-        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
-        {
-            Camera *camera = Camera::getCamera(i);
-            if(camera->getType() != Camera::CM_TYPE_END)
-                camera->setMode(Camera::CM_NORMAL);
-        }
-    }
-}   // ~KartAnimation
+    m_add_rotation.setHeading(
+        ((m_created_ticks / 9) % (2 * max_rotation + 1) - max_rotation) * f);
+    m_add_rotation.setPitch(
+        ((m_created_ticks / 10) % (2 * max_rotation + 1) - max_rotation) * f);
+    m_add_rotation.setRoll(
+        ((m_created_ticks / 11) % (2 * max_rotation + 1) - max_rotation) * f);
+}   // init
 
 // ----------------------------------------------------------------------------
 /** Updates the kart animation.
@@ -188,40 +243,86 @@ ExplosionAnimation::~ExplosionAnimation()
  */
 void ExplosionAnimation::update(int ticks)
 {
-    float dt = stk_config->ticks2Time(ticks);
-    m_velocity -= dt * Track::getCurrentTrack()->getGravity();
-    m_xyz = m_xyz + dt * m_velocity * m_normal;
+    float dur = stk_config->ticks2Time(
+        World::getWorld()->getTicksSinceStart() - m_created_ticks);
+
+    float velocity = m_velocity -
+        dur * 0.5f * Track::getCurrentTrack()->getGravity();
+    Vec3 xyz = m_created_transform.getOrigin() + dur * velocity * m_normal;
+    btQuaternion q = m_created_transform.getRotation();
 
     // Make sure the kart does not end up under the track
-    if ((m_xyz - m_orig_xyz).dot(m_normal)<0)
+    if ((xyz - m_created_transform.getOrigin()).dot(m_normal) < 0.0f)
     {
-        m_xyz = m_orig_xyz;
-        // Don't end the animation if networking for predefined end transform
-        if (!NetworkConfig::get()->isNetworking())
-            m_timer = -1;
+        xyz = m_created_transform.getOrigin();
+        m_end_ticks = World::getWorld()->getTicksSinceStart();
     }
-    m_curr_rotation += dt * m_add_rotation;
-    btQuaternion q(m_curr_rotation.getHeading(), m_curr_rotation.getPitch(),
-                   m_curr_rotation.getRoll());
+    else if (getAnimationTimer() != 0.0f)
+    {
+        Vec3 curr_rotation = m_curr_rotation + dur * m_add_rotation;
+        q = btQuaternion(curr_rotation.getHeading(), curr_rotation.getPitch(),
+            curr_rotation.getRoll());
+    }
 
-    if (m_reset_ticks != -1)
+    if (m_reset_ticks != -1 &&
+        World::getWorld()->getTicksSinceStart() > m_reset_ticks)
     {
-        m_reset_xyz = m_reset_xyz + dt * m_velocity * m_reset_normal;
-        if ((m_reset_xyz - m_end_transform.getOrigin()).dot(m_reset_normal) <
-            0.0f)
-            m_reset_xyz = m_end_transform.getOrigin();
-    }
-    if (m_reset_ticks != -1 && m_timer < m_reset_ticks)
-    {
-        m_kart->setXYZ(m_reset_xyz);
-        m_kart->setRotation(m_end_transform.getRotation());
-        m_kart->getBody()->setCenterOfMassTransform(m_kart->getTrans());
+        Vec3 reset_xyz;
+        const Vec3 reset_up = m_reset_trans.getBasis().getColumn(1);
+        reset_xyz = m_reset_trans.getOrigin() + dur * velocity * reset_up;
+        if ((reset_xyz - m_reset_trans.getOrigin()).dot(reset_up) < 0.0f)
+            reset_xyz = m_reset_trans.getOrigin();
+        m_kart->setXYZ(reset_xyz);
+        m_kart->setRotation(m_reset_trans.getRotation());
     }
     else
     {
-        m_kart->setXYZ(m_xyz);
+        m_kart->setXYZ(xyz);
         m_kart->setRotation(q);
     }
 
     AbstractKartAnimation::update(ticks);
 }   // update
+
+// ----------------------------------------------------------------------------
+void ExplosionAnimation::updateGraphics(float dt)
+{
+    if (!m_kart->getStarsEffect()->isEnabled())
+    {
+        // Set graphical effects for invulnerable time in updateGraphics
+        // to avoid issue with rewind
+        float t =
+            m_kart->getKartProperties()->getExplosionInvulnerabilityTime();
+        m_kart->showStarEffect(t);
+    }
+    AbstractKartAnimation::updateGraphics(dt);
+}   // updateGraphics
+
+// ----------------------------------------------------------------------------
+bool ExplosionAnimation::hasResetAlready() const
+{
+    return m_reset_ticks != -1 &&
+        World::getWorld()->getTicksSinceStart() > m_reset_ticks;
+}   // update
+
+// ----------------------------------------------------------------------------
+void ExplosionAnimation::saveState(BareNetworkString* buffer)
+{
+    AbstractKartAnimation::saveState(buffer);
+    buffer->addUInt8(m_direct_hit ? 1 : 0);
+    if (race_manager->getMinorMode() ==
+        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
+    {
+        buffer->addInt24(m_reset_trans_compressed[0])
+            .addInt24(m_reset_trans_compressed[1])
+            .addInt24(m_reset_trans_compressed[2])
+            .addUInt32(m_reset_trans_compressed[3]);
+    }
+}   // saveState
+
+// ----------------------------------------------------------------------------
+void ExplosionAnimation::restoreState(BareNetworkString* buffer)
+{
+    AbstractKartAnimation::restoreState(buffer);
+    restoreData(buffer);
+}   // restoreState

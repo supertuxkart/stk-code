@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "io/utf_writer.hpp"
+#include "utils/file_utils.hpp"
 
 #include <wchar.h>
 #include <string>
@@ -26,7 +27,8 @@ using namespace irr;
 // ----------------------------------------------------------------------------
 
 UTFWriter::UTFWriter(const char* dest, bool wide)
-         : m_base(dest, std::ios::out | std::ios::binary)
+         : m_base(FileUtils::getPortableWritingPath(dest),
+                  std::ios::out | std::ios::binary)
 {
     m_wide = wide;
 

@@ -69,9 +69,8 @@ void OptionsScreenInput::loadedFromFile()
     m_icon_bank->addTextureAsSprite(icon3);
     m_icon_bank->addTextureAsSprite(icon4);
 
-    // scale icons depending on screen resolution. the numbers below are a bit arbitrary
-    const int screen_width = irr_driver->getFrameSize().Width;
-    const float scale = 0.3f + 0.2f*std::max(0, screen_width - 640)/564.0f;
+    // scale icons depending on font height
+    const float scale = GUIEngine::getFontHeight() / 72.0f;
     m_icon_bank->setScale(scale);
 }   // loadFromFile
 
@@ -279,12 +278,7 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         }
         else if (selection.find("touch_device") != std::string::npos)
         {
-            // Don't edit multitouch settings during a race, because it needs
-            // to re-create all buttons to take an effect
-            if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
-            {
-                new MultitouchSettingsDialog(0.8f, 0.9f);
-            }
+            new MultitouchSettingsDialog(0.8f, 0.9f);
         }
         else
         {

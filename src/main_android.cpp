@@ -15,19 +15,21 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef ANDROID
+#ifdef MOBILE_STK
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 
+#ifdef ANDROID
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
 
 extern int main(int argc, char *argv[]);
 
 struct android_app* global_android_app;
 
-void override_default_params()
+void override_default_params_for_mobile()
 {
     // It has an effect only on the first run, when config file is created.
     // So that we can still modify these params in STK options and user's
@@ -40,14 +42,10 @@ void override_default_params()
     // Disable advanced lighting by default to make the game playable
     UserConfigParams::m_dynamic_lights = false;
 
-    // Enable multitouch device when touchscreen is available
-    int32_t touch = AConfiguration_getTouchscreen(global_android_app->config);
-    
-    if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
-    {
-        UserConfigParams::m_multitouch_enabled = true;
-    }
-    
+    // Enable multitouch race GUI
+    UserConfigParams::m_multitouch_draw_gui = true;
+
+#ifdef ANDROID
     // Set multitouch device scale depending on actual screen size
     int32_t screen_size = AConfiguration_getScreenSize(global_android_app->config);
     
@@ -56,22 +54,26 @@ void override_default_params()
     case ACONFIGURATION_SCREENSIZE_SMALL:
     case ACONFIGURATION_SCREENSIZE_NORMAL:
         UserConfigParams::m_multitouch_scale = 1.3f;
+        UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
+        UserConfigParams::m_font_size = 5.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_LARGE:
         UserConfigParams::m_multitouch_scale = 1.2f;
+        UserConfigParams::m_multitouch_sensitivity_x = 0.15f;
+        UserConfigParams::m_font_size = 5.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_XLARGE:
         UserConfigParams::m_multitouch_scale = 1.1f;
+        UserConfigParams::m_multitouch_sensitivity_x = 0.2f;
+        UserConfigParams::m_font_size = 4.0f;
         break;
     default:
         break;
     }
-    
+#endif
+
     // Enable screen keyboard
     UserConfigParams::m_screen_keyboard = 1;
-    
-    // Set bigger fonts and buttons
-    UserConfigParams::m_hidpi_enabled = true;
     
     // It shouldn't matter, but STK is always run in fullscreen on android
     UserConfigParams::m_fullscreen = true;
@@ -84,6 +86,7 @@ void override_default_params()
     UserConfigParams::m_enforce_current_player = true;
 }
 
+#ifdef ANDROID
 void android_main(struct android_app* app) 
 {
     Log::info("AndroidMain", "Loading application...");
@@ -94,7 +97,7 @@ void android_main(struct android_app* app)
     CIrrDeviceAndroid::onCreate();
     
     app_dummy();
-    override_default_params();
+    override_default_params_for_mobile();
 
     main(0, {});
 
@@ -108,5 +111,6 @@ void android_main(struct android_app* app)
     fflush(NULL);
     _exit(0);
 }
+#endif
 
 #endif

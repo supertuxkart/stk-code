@@ -44,7 +44,7 @@ namespace GraphicsRestrictions
         /** The list of names used in the XML file for the graphics
          *  restriction types. They must be in the same order as the types. */
 
-        std::array<std::string, 31> m_names_of_restrictions =
+        std::array<std::string, 32> m_names_of_restrictions =
         {
             {
                 "UniformBufferObject",
@@ -77,7 +77,8 @@ namespace GraphicsRestrictions
                 "VertexIdWorking",
                 "HardwareSkinning",
                 "NpotTextures",
-                "TextureBufferObject"
+                "TextureBufferObject",
+                "SystemScreenKeyboard"
             }
         };
     }   // namespace Private
@@ -430,7 +431,7 @@ public:
         else
         {
             m_version_tests.push_back(VERSION_IGNORE);
-            Log::warn("Graphics", "Invalid verison '%s' found - ignored.",
+            Log::warn("Graphics", "Invalid version '%s' found - ignored.",
                       version.c_str());
         }
         
@@ -450,6 +451,8 @@ public:
         {
 #if defined(__linux__) && !defined(ANDROID)
             if(m_os!="linux") return false;
+#elif defined(IOS_STK)
+            if(m_os!="ios") return false;
 #elif defined(WIN32)
             if(m_os!="windows") return false;
 #elif defined(__APPLE__)

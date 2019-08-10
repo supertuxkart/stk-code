@@ -32,6 +32,7 @@ using irr::core::stringc;
 #include "online/link_helper.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -122,7 +123,8 @@ void CreditsScreen::loadedFromFile()
 
     std::string creditsfile = file_manager->getAsset("CREDITS");
 
-    std::ifstream file( creditsfile.c_str(), std::ios::binary ) ;
+    std::ifstream file(
+        FileUtils::getPortableReadingPath(creditsfile), std::ios::binary);
 
     if (file.fail() || !file.is_open() || file.eof())
     {
@@ -224,7 +226,11 @@ void CreditsScreen::init()
     assert(w != NULL);
 
     reset();
-    setArea(w->m_x + 15, w->m_y + 8, w->m_w - 30, w->m_h - 16);
+    
+    setArea(w->m_x + GUIEngine::getFontHeight(),
+             w->m_y + GUIEngine::getFontHeight() / 2,
+             w->m_w - GUIEngine::getFontHeight() * 2,
+             w->m_h - GUIEngine::getFontHeight());
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -251,7 +257,7 @@ void CreditsScreen::reset()
 
 // ----------------------------------------------------------------------------
 
-void CreditsScreen::onUpdate(float elapsed_time)
+void CreditsScreen::onDraw(float elapsed_time)
 {
     // multiply by 0.8 to slow it down a bit as a whole
     time_before_next_step -= elapsed_time*0.8f;
@@ -306,7 +312,7 @@ void CreditsScreen::onUpdate(float elapsed_time)
 
             color.setAlpha( alpha );
 
-            text_offset = (int)((1.0f - fade_in) * 100);
+            text_offset = (int)((1.0f - fade_in) * GUIEngine::getFontHeight());
         }
         // fade out
         else if (time_before_next_step >= m_time_element - ENTRIES_FADE_TIME)
@@ -320,7 +326,7 @@ void CreditsScreen::onUpdate(float elapsed_time)
             else if(alpha > 255) alpha = 255;
             color.setAlpha( alpha );
 
-            text_offset = -(int)(fade_out * 100);
+            text_offset = -(int)(fade_out * GUIEngine::getFontHeight());
         }
 
 
@@ -343,9 +349,9 @@ void CreditsScreen::onUpdate(float elapsed_time)
             GUIEngine::getFont()->draw(m_sections[m_curr_section]
                                        .m_entries[m_curr_element]
                                        .m_subentries[i].c_str(),
-                                       core::recti( m_x + 32,
+                                       core::recti( m_x + GUIEngine::getFontHeight()/2,
                                                     suby + text_offset/(1+1),
-                                                    m_x + m_w + 32,
+                                                    m_x + m_w + GUIEngine::getFontHeight()/2,
                                                     suby + m_h/8
                                                          + text_offset/(1+1) ),
                                        color, false/* center h */,

@@ -22,7 +22,7 @@
 /** Constructor of RegularFace.
  *  \param ttf \ref FaceTTF for RegularFace to use.
  */
-RegularFace::RegularFace(FaceTTF* ttf) : FontWithFace("RegularFace", ttf)
+RegularFace::RegularFace() : FontWithFace("RegularFace")
 {
 }   // RegularFace
 
@@ -30,9 +30,8 @@ RegularFace::RegularFace(FaceTTF* ttf) : FontWithFace("RegularFace", ttf)
 void RegularFace::init()
 {
     FontWithFace::init();
-    // Reserve some space for characters added later
-    m_font_max_height = m_glyph_max_height + 10;
-
+    // Reserve some space for characters added later in the next line
+    m_font_max_height = m_glyph_max_height * 7 / 5;
 }   // init
 
 // ----------------------------------------------------------------------------

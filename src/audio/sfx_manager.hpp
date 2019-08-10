@@ -247,7 +247,6 @@ public:
     /** Static function to get the singleton sfx manager. */
     static SFXManager *get()
     {
-        assert(m_sfx_manager);
         return m_sfx_manager;
     }   // get
 
@@ -261,7 +260,7 @@ public:
                                           const std::string &filename,
                                           bool               positional,
                                           float              rolloff,
-                                          float              max_width,
+                                          float              max_dist,
                                           float              gain,
                                           const bool         load = true);
 

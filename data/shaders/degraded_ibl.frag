@@ -19,5 +19,5 @@ void main(void)
     vec3 normal = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
 
     Diff = vec4(0.25 * DiffuseIBL(normal), 1.);
-    Spec = vec4(0., 0., 0., 1.);
+    Spec = vec4(0.031, 0.106, 0.173, 1.);
 }

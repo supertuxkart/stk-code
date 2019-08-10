@@ -22,8 +22,9 @@
 #include "guiengine/screen.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
 
-#include <vector>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 class KartModel;
@@ -61,7 +62,7 @@ public:
     void onCutsceneEnd() OVERRIDE;
     void onUpdate(float dt) OVERRIDE;
     /** \brief set which karts lost this GP */
-    void setKarts(std::vector<std::string> ident);
+    void setKarts(std::vector<std::pair<std::string, float> > ident);
     MusicInformation* getInGameMenuMusic() const OVERRIDE;
 };
 

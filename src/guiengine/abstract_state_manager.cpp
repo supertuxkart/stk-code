@@ -24,10 +24,11 @@
 #include "guiengine/screen_keyboard.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
+#include "utils/debug.hpp"
 
 #include <vector>
 #include <iostream>
-
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 
@@ -55,6 +56,8 @@ void AbstractStateManager::enterGameState()
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     m_menu_stack.emplace_back(RACE_STATE_NAME, (Screen*)NULL);
+
+    Debug::closeDebugMenu();
     setGameState(GAME);
     GUIEngine::cleanForGame();
 }   // enterGameState
@@ -209,12 +212,17 @@ void AbstractStateManager::popMenu()
 {
     assert(m_game_mode != GAME);
 
+    if (m_menu_stack.empty())
+        return;
+
     // Send tear-down event to menu
     getCurrentScreen()->tearDown();
     m_menu_stack.pop_back();
 
-    if (m_menu_stack.size() == 0)
+    if (m_menu_stack.empty())
     {
+        getGUIEnv()->clear();
+        getCurrentScreen()->elementsWereDeleted();
         onStackEmptied();
         return;
     }

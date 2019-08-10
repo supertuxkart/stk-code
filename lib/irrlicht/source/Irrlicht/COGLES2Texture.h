@@ -12,7 +12,7 @@
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
 
-#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
 #include <OpenGLES/ES2/gl.h>
 #else
 #include <GLES2/gl2.h>

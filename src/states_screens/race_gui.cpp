@@ -49,6 +49,7 @@ using namespace irr;
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
 #include "modes/soccer_world.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
 #include "tracks/track.hpp"
@@ -91,91 +92,17 @@ RaceGUI::RaceGUI()
     else
         m_lap_width = font->getDimension(L"9/9").Width;
 
-    float map_size_splitscreen = 1.0f;
-
-    // If there are four players or more in splitscreen
-    // and the map is in a player view, scale down the map
-    if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
-    {
-        // If the resolution is wider than 4:3, we don't have to scaledown the minimap as much
-        // Uses some margin, in case the game's screen is not exactly 4:3
-        if ( ((float) irr_driver->getFrameSize().Width / (float) irr_driver->getFrameSize().Height) >
-             (4.1f/3.0f))
-        {
-            if (race_manager->getNumLocalPlayers() == 4)
-                map_size_splitscreen = 0.75f;
-            else
-                map_size_splitscreen = 0.5f;
-        }
-        else
-            map_size_splitscreen = 0.5f;
-    }
-
-    // Originally m_map_height was 100, and we take 480 as minimum res
-    float scaling = irr_driver->getFrameSize().Height / 480.0f;
-    const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
-    const float top_margin = 3.5f * m_font_height;
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+                               irr_driver->getDevice()->supportsTouchDevice()) ||
+                               UserConfigParams::m_multitouch_active > 1;
     
-    if (UserConfigParams::m_multitouch_enabled && 
-        UserConfigParams::m_multitouch_mode != 0 &&
+    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         race_manager->getNumLocalPlayers() == 1)
     {
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }
     
-    // Check if we have enough space for minimap when touch steering is enabled
-    if (m_multitouch_gui != NULL)
-    {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
-                                         m_multitouch_gui->getHeight());
-        
-        if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
-        {
-            scaling = (map_bottom - top_margin) / (map_size + 20.0f);
-        }
-    }
-    
-    // Marker texture has to be power-of-two for (old) OpenGL compliance
-    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_minimap_ai_size       = (int)( stk_config->m_minimap_ai_icon     * scaling);
-    m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
-    m_map_width             = (int)(map_size * scaling);
-    m_map_height            = (int)(map_size * scaling);
-
-    if(UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
-       race_manager->getNumLocalPlayers() == 1)
-    {
-        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
-                                                        m_map_width - 10.0f*scaling);
-        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
-                                                        m_map_height);
-    }
-    else // default, map in the bottom-left corner
-    {
-        m_map_left          = (int)( 10.0f * scaling);
-        m_map_bottom        = (int)( 10.0f * scaling);
-    }
-
-    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
-    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
-    m_map_rendered_width    = map_texture;
-    m_map_rendered_height   = map_texture;
-
-
-    // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getIfEmptyScreenSpaceExists())
-    {
-        m_map_left = irr_driver->getActualScreenSize().Width -
-                     m_map_width - (int)( 10.0f * scaling);
-        m_map_bottom        = (int)( 10.0f * scaling);
-    }
-    else if (m_multitouch_gui != NULL)
-    {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
-                                                        m_map_width) * 0.95f);
-        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height - 
-                                                    top_margin - m_map_height);
-    }
+    calculateMinimapSize();
 
     m_is_tutorial = (race_manager->getTrackName() == "tutorial");
 
@@ -231,6 +158,96 @@ void RaceGUI::reset()
 }  // reset
 
 //-----------------------------------------------------------------------------
+void RaceGUI::calculateMinimapSize()
+{
+    float map_size_splitscreen = 1.0f;
+
+    // If there are four players or more in splitscreen
+    // and the map is in a player view, scale down the map
+    if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
+    {
+        // If the resolution is wider than 4:3, we don't have to scaledown the minimap as much
+        // Uses some margin, in case the game's screen is not exactly 4:3
+        if ( ((float) irr_driver->getFrameSize().Width / (float) irr_driver->getFrameSize().Height) >
+             (4.1f/3.0f))
+        {
+            if (race_manager->getNumLocalPlayers() == 4)
+                map_size_splitscreen = 0.75f;
+            else
+                map_size_splitscreen = 0.5f;
+        }
+        else
+            map_size_splitscreen = 0.5f;
+    }
+
+    // Originally m_map_height was 100, and we take 480 as minimum res
+    float scaling = std::min(irr_driver->getFrameSize().Height,  
+                             irr_driver->getFrameSize().Width) / 480.0f;
+    const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
+    const float top_margin = 3.5f * m_font_height;
+    
+    // Check if we have enough space for minimap when touch steering is enabled
+    if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
+    {
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+                                         m_multitouch_gui->getHeight());
+        
+        if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
+        {
+            scaling = (map_bottom - top_margin) / (map_size + 20.0f);
+        }
+        
+        // Use some reasonable minimum scale, because minimap size can be 
+        // changed during the race
+        scaling = std::max(scaling,
+                           irr_driver->getActualScreenSize().Height * 0.15f / 
+                           (map_size + 20.0f));
+    }
+    
+    // Marker texture has to be power-of-two for (old) OpenGL compliance
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_ai_size       = (int)( stk_config->m_minimap_ai_icon     * scaling);
+    m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
+    m_map_width             = (int)(map_size * scaling);
+    m_map_height            = (int)(map_size * scaling);
+
+    if(UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
+       race_manager->getNumLocalPlayers() == 1)
+    {
+        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width - 10.0f*scaling);
+        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
+                                                        m_map_height);
+    }
+    else // default, map in the bottom-left corner
+    {
+        m_map_left          = (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
+    }
+
+    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
+    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
+    m_map_rendered_width    = map_texture;
+    m_map_rendered_height   = map_texture;
+
+
+    // special case : when 3 players play, use available 4th space for such things
+    if (race_manager->getIfEmptyScreenSpaceExists())
+    {
+        m_map_left = irr_driver->getActualScreenSize().Width -
+                     m_map_width - (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
+    }
+    else if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
+    {
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width) * 0.95f);
+        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height - 
+                                                    top_margin - m_map_height);
+    }
+}  // calculateMinimapSize
+
+//-----------------------------------------------------------------------------
 /** Render all global parts of the race gui, i.e. things that are only
  *  displayed once even in splitscreen.
  *  \param dt Timestep sized.
@@ -259,7 +276,7 @@ void RaceGUI::renderGlobal(float dt)
     {
         drawGlobalReadySetGo();
     }
-    if(world->getPhase() == World::GOAL_PHASE)
+    else if (world->isGoalPhase())
         drawGlobalGoal();
 
     if (!m_enabled) return;
@@ -339,7 +356,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    if (m_multitouch_gui == NULL)
+    if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
     {
         drawPowerupIcons(kart, viewport, scaling);
         drawSpeedEnergyRank(kart, viewport, scaling, dt);
@@ -388,7 +405,7 @@ void RaceGUI::drawGlobalTimer()
         {
             sw = _("Challenge Failed");
             int string_width =
-                GUIEngine::getFont()->getDimension(_("Challenge Failed")).Width;
+                GUIEngine::getFont()->getDimension(sw.c_str()).Width;
             dist_from_right = 10 + string_width;
             time_color = video::SColor(255,255,0,0);
             use_digit_font = false;
@@ -412,7 +429,7 @@ void RaceGUI::drawGlobalTimer()
         font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
     font->setBlackBorder(true);
-    font->draw(sw.c_str(), pos, time_color, false, false, NULL,
+    font->draw(sw, pos, time_color, false, false, NULL,
                true /* ignore RTL */);
     font->setBlackBorder(false);
 
@@ -493,7 +510,7 @@ void RaceGUI::drawGlobalMiniMap()
     if (UserConfigParams::m_minimap_display == 2) /*map hidden*/
         return;
     
-    if (m_multitouch_gui != NULL)
+    if (m_multitouch_gui != NULL && !m_multitouch_gui->isSpectatorMode())
     {
         float max_scale = 1.3f;
                                                       
@@ -532,8 +549,10 @@ void RaceGUI::drawGlobalMiniMap()
                 lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
             draw2DImage(m_red_flag, rp, rs, NULL, NULL, true, true);
         }
+        Vec3 pos = ctf_world->getRedHolder() == -1 ? ctf_world->getRedFlag() :
+            ctf_world->getKart(ctf_world->getRedHolder())->getSmoothedTrans().getOrigin();
 
-        track->mapPoint2MiniMap(ctf_world->getRedFlag(), &draw_at);
+        track->mapPoint2MiniMap(pos, &draw_at);
         core::rect<s32> rs(core::position2di(0, 0), m_red_flag->getSize());
         core::rect<s32> rp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
@@ -553,7 +572,10 @@ void RaceGUI::drawGlobalMiniMap()
             draw2DImage(m_blue_flag, rp, rs, NULL, NULL, true, true);
         }
 
-        track->mapPoint2MiniMap(ctf_world->getBlueFlag(), &draw_at);
+        pos = ctf_world->getBlueHolder() == -1 ? ctf_world->getBlueFlag() :
+            ctf_world->getKart(ctf_world->getBlueHolder())->getSmoothedTrans().getOrigin();
+
+        track->mapPoint2MiniMap(pos, &draw_at);
         core::rect<s32> bs(core::position2di(0, 0), m_blue_flag->getSize());
         core::rect<s32> bp(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/1.4f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.2f)),
@@ -561,19 +583,25 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.2f)));
         draw2DImage(m_blue_flag, bp, bs, NULL, NULL, true);
     }
-    
+
+    AbstractKart* target_kart = NULL;
+    Camera* cam = Camera::getActiveCamera();
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    bool is_nw_spectate = cl && cl->isSpectator();
+    // For network spectator highlight
+    if (race_manager->getNumLocalPlayers() == 1 && cam && is_nw_spectate)
+        target_kart = cam->getKart();
+
     // Move AI/remote players to the beginning, so that local players icons
     // are drawn above them
     World::KartList karts = world->getKarts();
-    std::sort(karts.begin(), karts.end(), []
-        (const std::shared_ptr<AbstractKart>& a,
-         const std::shared_ptr<AbstractKart>& b)->bool
+    std::partition(karts.begin(), karts.end(), [target_kart, is_nw_spectate]
+        (const std::shared_ptr<AbstractKart>& k)->bool
     {
-        bool aIsLocalPlayer = a->getController()->isLocalPlayerController();
-        bool bIsLocalPlayer = b->getController()->isLocalPlayerController();
-
-        // strictly greater than, so return false if equal
-        return !aIsLocalPlayer && aIsLocalPlayer != bIsLocalPlayer;
+        if (is_nw_spectate)
+            return k.get() != target_kart;
+        else
+            return !k->getController()->isLocalPlayerController();
     });
 
     for (unsigned int i = 0; i < karts.size(); i++)
@@ -581,11 +609,12 @@ void RaceGUI::drawGlobalMiniMap()
         const AbstractKart *kart = karts[i].get();
         const SpareTireAI* sta =
             dynamic_cast<const SpareTireAI*>(kart->getController());
-            
+
         // don't draw eliminated kart
         if (kart->isEliminated() && !(sta && sta->isMoving())) 
             continue;
-            
+        if (!kart->isVisible())
+            continue;
         const Vec3& xyz = kart->getSmoothedTrans().getOrigin();
         Vec3 draw_at;
         track->mapPoint2MiniMap(xyz, &draw_at);
@@ -596,9 +625,11 @@ void RaceGUI::drawGlobalMiniMap()
         {
             continue;
         }
+        bool is_local = is_nw_spectate ? kart == target_kart :
+            kart->getController()->isLocalPlayerController();
         // int marker_height = m_marker->getSize().Height;
         core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-        int marker_half_size = (kart->getController()->isLocalPlayerController()
+        int marker_half_size = (is_local
                                 ? m_minimap_player_size
                                 : m_minimap_ai_size                        )>>1;
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
@@ -609,8 +640,7 @@ void RaceGUI::drawGlobalMiniMap()
         bool has_teams = (ctf_world || soccer_world);
         
         // Highlight the player icons with some backgorund image.
-        if ((has_teams || kart->getController()->isLocalPlayerController()) &&
-            m_icons_frame != NULL)
+        if ((has_teams || is_local) && m_icons_frame != NULL)
         {
             video::SColor color = kart->getKartProperties()->getColor();
             
@@ -844,7 +874,9 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    font->setScale(min_ratio * scale);
+    
+    int font_height = font->getDimension(L"X").Height;
+    font->setScale((float)meter_height / font_height * 0.4f * scale);
     font->setShadow(video::SColor(255, 128, 0, 0));
     std::ostringstream oss;
     oss << rank; // the current font has no . :(   << ".";
@@ -1155,7 +1187,8 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     int hit_capture_limit =
-        race_manager->getHitCaptureLimit() != std::numeric_limits<int>::max()
+        (race_manager->getHitCaptureLimit() != std::numeric_limits<int>::max()
+         && race_manager->getHitCaptureLimit() != 0)
         ? race_manager->getHitCaptureLimit() : -1;
     int score_limit = sw && !race_manager->hasTimeTarget() ?
         race_manager->getMaxGoal() : ctf ? hit_capture_limit : -1;
@@ -1228,8 +1261,11 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     }
 
     if (!world->raceHasLaps()) return;
-    const int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
-
+    int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
+    // Network race has larger lap than getNumLaps near finish line
+    // due to waiting for final race result from server
+    if (lap + 1> race_manager->getNumLaps())
+        lap--;
     // don't display 'lap 0/..' at the start of a race
     if (lap < 0 ) return;
 

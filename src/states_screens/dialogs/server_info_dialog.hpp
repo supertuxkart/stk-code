@@ -42,7 +42,7 @@ class ServerInfoDialog : public GUIEngine::ModalDialog
 {
 
 private:
-    bool m_self_destroy;
+    bool m_self_destroy, m_join_server;
 
     const std::shared_ptr<Server> m_server;
 

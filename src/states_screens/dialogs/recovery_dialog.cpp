@@ -20,6 +20,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "online/xml_request.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"

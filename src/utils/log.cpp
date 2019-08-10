@@ -19,8 +19,11 @@
 #include "utils/log.hpp"
 
 #include "config/user_config.hpp"
+#include "network/network_config.hpp"
+#include "utils/file_utils.hpp"
 
 #include <cstdio>
+#include <ctime>
 #include <stdio.h>
 
 #ifdef ANDROID
@@ -154,7 +157,21 @@ void Log::printMessage(int level, const char *component, const char *format,
         remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     }
 
-    index += snprintf (line + index, remaining, "[%s] %s: ", names[level], component);
+#ifndef ANDROID
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer())
+    {
+        std::time_t result = std::time(nullptr);
+        index += snprintf (line + index, remaining,
+            "%.24s [%s] %s: ", std::asctime(std::localtime(&result)),
+            names[level], component);
+    }
+    else
+#endif
+    {
+        index += snprintf (line + index, remaining,
+            "[%s] %s: ", names[level], component);
+    }
     remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     index += vsnprintf(line + index, remaining, format, args);
     remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
@@ -234,7 +251,9 @@ void Log::writeLine(const char *line, int level)
     }
 
 #if defined(_MSC_FULL_VER) && defined(_DEBUG)
-    if (m_buffer_size <= 1) OutputDebugString(line);
+    // We don't use utf8ToWide for performance, and debug message
+    // is mostly english anyway
+    if (m_buffer_size <= 1) OutputDebugStringA(line);
 #endif
 
     if (m_file_stdout) fprintf(m_file_stdout, "%s", line);
@@ -275,7 +294,7 @@ void Log::flushBuffers()
  */
 void Log::openOutputFiles(const std::string &logout)
 {
-    m_file_stdout = fopen(logout.c_str(), "w");
+    m_file_stdout = FileUtils::fopenU8Path(logout, "w");
     if (!m_file_stdout)
     {
         Log::error("main", "Can not open log file '%s'. Writing to "

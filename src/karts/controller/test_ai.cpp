@@ -299,7 +299,7 @@ void SkiddingAI::update(int ticks)
     // If the kart needs to be rescued, do it now (and nothing else)
     if(isStuck() && !m_kart->getKartAnimation())
     {
-        new RescueAnimation(m_kart);
+        RescueAnimation::create(m_kart);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -1074,8 +1074,6 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
             break;
         case Item::ITEM_BONUS_BOX:
             break;
-        case Item::ITEM_TRIGGER: return; break;
-
         default: assert(false); break;
     }    // switch
 
@@ -1584,7 +1582,7 @@ void SkiddingAI::handleRescue(const float dt)
         m_time_since_stuck += dt;
         if(m_time_since_stuck > 2.0f)
         {
-            new RescueAnimation(m_kart);
+            RescueAnimation::create(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }

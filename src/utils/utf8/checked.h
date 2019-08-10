@@ -209,17 +209,22 @@ namespace utf8
         while (start != end) {
             uint32_t cp = internal::mask16(*start++);
             // Take care of surrogate pairs first
-            if (internal::is_lead_surrogate(cp)) {
-                if (start != end) {
+            if (internal::is_lead_surrogate(cp))
+            {
+                uint32_t lead_surrogate = cp;
+                if (start != end)
+                {
                     uint32_t trail_surrogate = internal::mask16(*start++);
                     if (internal::is_trail_surrogate(trail_surrogate))
-                        cp = (cp << 10) + trail_surrogate + internal::SURROGATE_OFFSET;
+                    {
+                        cp = ((lead_surrogate - internal::LEAD_SURROGATE_MIN) << 10) +
+                            (trail_surrogate - internal::TRAIL_SURROGATE_MIN) + 0x10000;
+                    }
                     else
                         throw invalid_utf16(static_cast<uint16_t>(trail_surrogate));
                 }
                 else
                     throw invalid_utf16(static_cast<uint16_t>(cp));
-
             }
             // Lone trail surrogate
             else if (internal::is_trail_surrogate(cp))
@@ -230,13 +235,50 @@ namespace utf8
         return result;
     }
 
+    template <typename u16bit_iterator, typename u32bit_iterator>
+    u32bit_iterator utf16to32 (u16bit_iterator start, u16bit_iterator end, u32bit_iterator result)
+    {
+        while (start != end)
+        {
+            uint32_t cp = internal::mask16(*start++);
+            // Take care of surrogate pairs first
+            if (internal::is_lead_surrogate(cp))
+            {
+                uint32_t lead_surrogate = cp;
+                if (start != end)
+                {
+                    uint32_t trail_surrogate = internal::mask16(*start++);
+                    if (internal::is_trail_surrogate(trail_surrogate))
+                    {
+                        cp = ((lead_surrogate - internal::LEAD_SURROGATE_MIN) << 10 ) +
+                            (trail_surrogate - internal::TRAIL_SURROGATE_MIN) + 0x10000;
+                    }
+                    else
+                        throw invalid_utf16(static_cast<uint16_t>(trail_surrogate));
+                }
+                else
+                    throw invalid_utf16(static_cast<uint16_t>(cp));
+            }
+            // Lone trail surrogate
+            else if (internal::is_trail_surrogate(cp))
+                throw invalid_utf16(static_cast<uint16_t>(cp));
+
+            (*result++) = cp;
+        }
+        return result;
+    }
+
     template <typename u16bit_iterator, typename octet_iterator>
     u16bit_iterator utf8to16 (octet_iterator start, octet_iterator end, u16bit_iterator result)
     {
-        while (start != end) {
+        while (start != end)
+        {
             uint32_t cp = next(start, end);
-            if (cp > 0xffff) { //make a surrogate pair
-                *result++ = static_cast<uint16_t>((cp >> 10)   + internal::LEAD_OFFSET);
+            if (cp > 0xffff)
+            {
+                cp -= 0x10000;
+                //make a surrogate pair
+                *result++ = static_cast<uint16_t>((cp >> 10)   + internal::LEAD_SURROGATE_MIN);
                 *result++ = static_cast<uint16_t>((cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
             }
             else
@@ -251,6 +293,25 @@ namespace utf8
         while (start != end)
             result = append(*(start++), result);
 
+        return result;
+    }
+
+    template <typename u16bit_iterator, typename u32bit_iterator>
+    u16bit_iterator utf32to16 (u32bit_iterator start, u32bit_iterator end, u16bit_iterator result)
+    {
+        while (start != end)
+        {
+            uint32_t cp = *start++;
+            if (cp > 0xffff)
+            {
+                cp -= 0x10000;
+                //make a surrogate pair
+                *result++ = static_cast<uint16_t>((cp >> 10)   + internal::LEAD_SURROGATE_MIN);
+                *result++ = static_cast<uint16_t>((cp & 0x3ff) + internal::TRAIL_SURROGATE_MIN);
+            }
+            else
+                *result++ = static_cast<uint16_t>(cp);
+        }
         return result;
     }
 

@@ -26,6 +26,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "online/link_helper.hpp"
+#include "online/request_manager.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -84,16 +85,23 @@ void RegisterScreen::init()
     stringw username = "";
     if(m_existing_player)
     {
-        username = m_existing_player->getName(true/*ignoreRTL*/);
+        username = m_existing_player->getName();
     }
     else if (PlayerManager::get()->getNumPlayers() == 0)
     {
-        if (getenv("USERNAME") != NULL)        // for windows
-            username = getenv("USERNAME");
-        else if (getenv("USER") != NULL)       // Linux, Macs
+#if defined(WIN32)
+        std::vector<wchar_t> env;
+        // An environment variable has a maximum size limit of 32,767 characters
+        env.resize(32767, 0);
+        DWORD length = GetEnvironmentVariable(L"USERNAME", env.data(), 32767);
+        if (length != 0)
+            username = env.data();
+#else
+        if (getenv("USER") != NULL)          // Linux, Macs
             username = getenv("USER");
-        else if (getenv("LOGNAME") != NULL)    // Linux, Macs
+        else if (getenv("LOGNAME") != NULL)  // Linux, Macs
             username = getenv("LOGNAME");
+#endif
     }
 
     TextBoxWidget* local_username = getWidget<TextBoxWidget>("local_username");
@@ -188,6 +196,7 @@ void RegisterScreen::makeEntryFieldsVisible()
     getWidget<TextBoxWidget>("password_confirm")->setVisible(new_account);
     getWidget<LabelWidget  >("label_password_confirm")->setVisible(new_account);
     getWidget<TextBoxWidget>("email")->setVisible(new_account);
+    getWidget<TextBoxWidget>("email")->setTextBoxType(TBT_EMAIL);
     getWidget<LabelWidget  >("label_email")->setVisible(new_account);
     if(getWidget<TextBoxWidget>("email_confirm"))
     {

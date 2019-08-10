@@ -20,14 +20,15 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "GlyphLayout.h"
 #include <map>
 #include <memory>
-#include <tuple>
 #include <utility>
 
 class InputDevice;
 class Server;
 enum KartTeam : int8_t;
+struct LobbyPlayer;
 
 namespace GUIEngine
 { 
@@ -65,19 +66,26 @@ private:
 
     NetworkingLobby();
 
-    float m_ping_update_timer;
-    std::map<std::string, std::tuple<core::stringw, /*icon*/int, KartTeam> >
-        m_player_names;
+    uint64_t m_ping_update_timer;
+    std::map<std::string, LobbyPlayer> m_player_names;
     std::shared_ptr<Server> m_joined_server;
-    std::vector<core::stringw> m_server_info;
+
+    std::vector<gui::GlyphLayout> m_server_info;
     int m_server_info_height;
+
+    core::stringw m_start_text, m_ready_text, m_live_join_text,
+        m_configuration_text, m_spectate_text;
 
     float m_start_timeout;
     int64_t m_cur_starting_timer;
     unsigned m_min_start_game_players;
 
     bool m_allow_change_team, m_has_auto_start_in_server,
-        m_server_configurable;
+        m_server_configurable, m_client_live_joinable,
+        m_reload_server_info;
+
+    video::ITexture* m_config_texture;
+    video::ITexture* m_spectate_texture;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;
@@ -88,6 +96,7 @@ private:
     GUIEngine::ListWidget* m_player_list;
     GUIEngine::TextBoxWidget* m_chat_box;
     GUIEngine::ButtonWidget* m_send_button;
+    GUIEngine::ButtonWidget* m_emoji_button;
 
     irr::gui::STKModifiedSpriteBank* m_icon_bank;
 
@@ -95,13 +104,7 @@ private:
     virtual void unloaded() OVERRIDE;
 
     virtual void onTextUpdated() OVERRIDE {}
-    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
-    {
-        sendChat(text);
-        return true;
-    }
-
-    void sendChat(irr::core::stringw text);
+    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE;
     void updatePlayerPings();
 
 public:
@@ -134,10 +137,8 @@ public:
         m_joined_server = server;
         m_server_info.clear();
     }
-    void updatePlayers(const std::vector<std::tuple<uint32_t/*host id*/,
-                       uint32_t/*online id*/, uint32_t/*local player id*/,
-                       core::stringw/*player name*/, int/*icon id*/,
-                       KartTeam> >& p);
+    void updateServerInfos();
+    void updatePlayers();
     void openSplitscreenDialog(InputDevice* device);
     void addSplitscreenPlayer(irr::core::stringw name);
     void cleanAddedPlayers();
@@ -145,6 +146,7 @@ public:
                             float start_timeout, unsigned server_max_player);
     void setStartingTimerTo(float t);
     void toggleServerConfigButton(bool val)    { m_server_configurable = val; }
+    void reloadServerInfos()                   { m_reload_server_info = true; }
 };   // class NetworkingLobby
 
 #endif

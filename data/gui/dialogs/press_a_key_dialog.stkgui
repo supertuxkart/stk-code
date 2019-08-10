@@ -4,12 +4,12 @@
 
         <label id="title" width="100%" text_align="center" text="Press fully and release..." proportion="1" I18N="When changing input configurations" word_wrap="true"/>
 
-        <spacer height="25" width="10" />
+        <spacer height="4%" width="10" />
 
         <button id="assignEsc" I18N="When configuring input" text="Assign to ESC key" align="center"/>
-        <spacer height="10" width="10" />
+        <spacer height="2%" width="10" />
         <button id="assignNone"    I18N="When configuring input" text="Assign nothing" align="center"/>
-        <spacer height="10" width="10" />
+        <spacer height="2%" width="10" />
         <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
 
     </div>

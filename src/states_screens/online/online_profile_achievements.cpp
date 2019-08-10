@@ -224,7 +224,7 @@ void BaseOnlineProfileAchievements::displayResults()
             Achievement *a = *vit;
             if (a->getInfo()->isSecret() && !a->isAchieved())
                 continue;
-            ListWidget::ListCell title(translations->fribidize(a->getInfo()->getName()), -1, 2);
+            ListWidget::ListCell title(a->getInfo()->getName(), -1, 2);
             ListWidget::ListCell goals(a->getGoalProgressAsString(), -1, 1);
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);

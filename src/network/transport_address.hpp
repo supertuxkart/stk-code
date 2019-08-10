@@ -22,7 +22,6 @@
 #ifndef HEADER_TRANSPORT_ADDRESS_HPP
 #define HEADER_TRANSPORT_ADDRESS_HPP
 
-#include "utils/string_utils.hpp"
 #include "utils/types.hpp"
 
 #include "enet/enet.h"
@@ -65,36 +64,9 @@ public:
     }   // TransportAddress(EnetAddress)
 
     // ------------------------------------------------------------------------
-    /** Construct an IO address from a string in the format x.x.x.x with a
-     *  port number. */
-    TransportAddress(const std::string& str, uint16_t port_number)
-    {
-        std::vector<uint32_t> ip = StringUtils::splitToUInt(str, '.');
-        m_ip   = 0;
-        m_port = 0;
-        if (ip.size() >= 4)
-            m_ip = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
-
-        m_port = port_number;
-    }   // TransportAddress(string of ip, port number)
-
+    TransportAddress(const std::string& str, uint16_t port_number);
     // ------------------------------------------------------------------------
-    /** Construct an IO address from a string in the format x.x.x.x:x. */
-    TransportAddress(const std::string& str)
-    {
-        std::string combined = StringUtils::replace(str, ":", ".");
-        std::vector<uint32_t> ip = StringUtils::splitToUInt(combined, '.');
-        m_ip   = 0;
-        m_port = 0;
-        if (ip.size() >= 4)
-            m_ip = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
-
-        if(ip.size()==5)
-            m_port = (uint16_t)(ip[4] < 65536 ? ip[4] : 0);
-        else
-            m_port = 0;
-    }   // TransportAddress(string of ip)
-
+    TransportAddress(const std::string& str);
     // ------------------------------------------------------------------------
     ~TransportAddress() {}
     // ------------------------------------------------------------------------
@@ -163,21 +135,7 @@ public:
         return other.m_ip != m_ip || other.m_port != m_port;
     }   // operator!=
     // ------------------------------------------------------------------------
-    /** Returns a std::string representing the ip address and port in human
-     *  readable format.
-     *  \param show_port True if the port should be shown as well, otherwise
-     *         only the ip address will be returned.
-     */
-    std::string toString(bool show_port = true) const
-    {
-        std::string s = 
-            StringUtils::insertValues("%d.%d.%d.%d",
-                                 ((m_ip >> 24) & 0xff), ((m_ip >> 16) & 0xff),
-                                 ((m_ip >>  8) & 0xff), ((m_ip >>  0) & 0xff));
-        if (show_port)
-            s += StringUtils::insertValues(":%d", m_port);
-        return s;
-    }   // toString
+    std::string toString(bool show_port = true) const;
 };   // TransportAddress
 
 #endif // TYPES_HPP

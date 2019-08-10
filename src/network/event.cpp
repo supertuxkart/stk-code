@@ -41,7 +41,7 @@ constexpr bool isConnectionRequestPacket(unsigned char* data, size_t length)
 // ============================================================================
 Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
 {
-    m_arrival_time = (double)StkTime::getTimeSinceEpoch();
+    m_arrival_time = StkTime::getMonoTimeMs();
     m_pdi = PDI_TIMEOUT;
     m_peer = peer;
 
@@ -75,7 +75,8 @@ Event::Event(ENetEvent* event, std::shared_ptr<STKPeer> peer)
         {
             throw std::runtime_error("Unencrypted content at wrong state.");
         }
-        if (m_peer->getCrypto() && event->channelID == EVENT_CHANNEL_NORMAL)
+        if (m_peer->getCrypto() && (event->channelID == EVENT_CHANNEL_NORMAL ||
+            event->channelID == EVENT_CHANNEL_DATA_TRANSFER))
         {
             m_data = m_peer->getCrypto()->decryptRecieve(event->packet);
         }

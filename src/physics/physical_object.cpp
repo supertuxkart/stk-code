@@ -20,6 +20,7 @@
 
 #include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -29,7 +30,8 @@
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "network/compress_network_body.hpp"
-#include "network/rewind_manager.hpp"
+#include "network/network_config.hpp"
+#include "network/protocols/lobby_protocol.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/constants.hpp"
@@ -41,6 +43,7 @@
 #include <ITexture.h>
 using namespace irr;
 
+#include <algorithm>
 #include <memory>
 #include <string>
 #include <vector>
@@ -630,8 +633,11 @@ void PhysicalObject::update(float dt)
 {
     if (!m_is_dynamic) return;
 
-    m_current_transform = m_body->getWorldTransform();
+    // Round values in network for better synchronization
+    if (NetworkConfig::get()->roundValuesNow())
+        CompressNetworkBody::compress(m_body, m_motion_state);
 
+    m_current_transform = m_body->getWorldTransform();
     const Vec3 &xyz = m_current_transform.getOrigin();
     if(m_reset_when_too_low && xyz.getY()<m_reset_height)
     {
@@ -780,8 +786,13 @@ void PhysicalObject::addForRewind()
     SmoothNetworkBody::setEnable(true);
     SmoothNetworkBody::setSmoothRotation(false);
     SmoothNetworkBody::setAdjustVerticalOffset(false);
-    Rewinder::setUniqueIdentity(std::string("P") + StringUtils::toString
-        (Track::getCurrentTrack()->getPhysicalObjectUID()));
+    Rewinder::setUniqueIdentity(
+        {
+            RN_PHYSICAL_OBJ,
+            // We have max moveable physical object defined in stk_config,
+            // which is 15 at the moment
+            static_cast<char>(Track::getCurrentTrack()->getPhysicalObjectUID())
+        });
     Rewinder::rewinderAdd();
 }   // addForRewind
 
@@ -803,20 +814,33 @@ void PhysicalObject::computeError()
 // ----------------------------------------------------------------------------
 BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
 {
+    bool has_live_join = false;
+
+    if (auto sl = LobbyProtocol::get<LobbyProtocol>())
+        has_live_join = sl->hasLiveJoiningRecently();
+
+    BareNetworkString* buffer = new BareNetworkString();
+    // This will compress and round down values of body, use the rounded
+    // down value to test if sending state is needed
+    // If any client live-joined always send new state for this object
+    CompressNetworkBody::compress(m_body, m_motion_state, buffer);
     btTransform cur_transform = m_body->getWorldTransform();
+    Vec3 current_lv = m_body->getLinearVelocity();
+    Vec3 current_av = m_body->getAngularVelocity();
+
     if ((cur_transform.getOrigin() - m_last_transform.getOrigin())
         .length() < 0.01f &&
-        (m_body->getLinearVelocity() - m_last_lv).length() < 0.01f &&
-        (m_body->getLinearVelocity() - m_last_av).length() < 0.01f)
+        (current_lv - m_last_lv).length() < 0.01f &&
+        (current_av - m_last_av).length() < 0.01f && !has_live_join)
+    {
+        delete buffer;
         return nullptr;
+    }
 
     ru->push_back(getUniqueIdentity());
-    BareNetworkString *buffer = new BareNetworkString();
     m_last_transform = cur_transform;
-    m_last_lv = m_body->getLinearVelocity();
-    m_last_av = m_body->getAngularVelocity();
-    CompressNetworkBody::compress(m_last_transform, m_last_lv, m_last_av,
-        buffer, m_body, m_motion_state);
+    m_last_lv = current_lv;
+    m_last_av = current_av;
     return buffer;
 }   // saveState
 
@@ -824,16 +848,11 @@ BareNetworkString* PhysicalObject::saveState(std::vector<std::string>* ru)
 void PhysicalObject::restoreState(BareNetworkString *buffer, int count)
 {
     m_no_server_state = false;
-    CompressNetworkBody::decompress(buffer, &m_last_transform, &m_last_lv,
-        &m_last_av);
-
-    m_body->setWorldTransform(m_last_transform);
-    m_motion_state->setWorldTransform(m_last_transform);
-    m_body->setInterpolationWorldTransform(m_last_transform);
-    m_body->setLinearVelocity(m_last_lv);
-    m_body->setAngularVelocity(m_last_av);
-    m_body->setInterpolationLinearVelocity(m_last_lv);
-    m_body->setInterpolationAngularVelocity(m_last_av);
+    CompressNetworkBody::decompress(buffer, m_body, m_motion_state);
+    // Save the newly decompressed value for local state restore
+    m_last_transform = m_body->getWorldTransform();
+    m_last_lv = m_body->getLinearVelocity();
+    m_last_av = m_body->getAngularVelocity();
 }   // restoreState
 
 // ----------------------------------------------------------------------------
@@ -866,3 +885,136 @@ std::function<void()> PhysicalObject::getLocalStateRestoreFunction()
         }
     };
 }   // getLocalStateRestoreFunction
+
+// ----------------------------------------------------------------------------
+void PhysicalObject::joinToMainTrack()
+{
+    auto sm = irr_driver->getSceneManager();
+    auto gc = sm->getGeometryCreator();
+    scene::IMeshManipulator* mani =
+        irr_driver->getVideoDriver()->getMeshManipulator();
+
+    if (m_body_type == MP_EXACT)
+    {
+        TrackObjectPresentationSceneNode* presentation =
+            m_object->getPresentation<TrackObjectPresentationSceneNode>();
+        assert(presentation);
+        Track::getCurrentTrack()->convertTrackToBullet(presentation->getNode());
+    }
+    else if (m_body_type == MP_CYLINDER_X || m_body_type == MP_CYLINDER_Y ||
+        m_body_type == MP_CYLINDER_Z)
+    {
+        btCylinderShape* cylinder = dynamic_cast<btCylinderShape*>(m_shape);
+        assert(cylinder);
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+
+        int up_axis = cylinder->getUpAxis();
+        scene::IMesh* mesh =
+            gc->createCylinderMesh(cylinder->getRadius(),
+            cylinder->getHalfExtentsWithMargin()[up_axis] * 2.0f,
+            std::max((int)(cylinder->getRadius() * M_PI), 4));
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
+        Vec3 offset;
+        offset.setY(-cylinder->getHalfExtentsWithMargin()[up_axis]);
+        translate.setTranslation(offset.toIrrVector());
+        mani->transform(mesh, translate);
+
+        core::matrix4 adjust_axis(core::matrix4::EM4CONST_IDENTITY);
+        if (m_body_type == MP_CYLINDER_X)
+            adjust_axis.setRotationDegrees(core::vector3df(0, 0, -90));
+        else if (m_body_type == MP_CYLINDER_Z)
+            adjust_axis.setRotationDegrees(core::vector3df(90, 0, 0));
+        mani->transform(mesh, adjust_axis);
+
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+    else if (m_body_type == MP_CONE_X || m_body_type == MP_CONE_Y ||
+        m_body_type == MP_CONE_Z)
+    {
+        btConeShape* cone = dynamic_cast<btConeShape*>(m_shape);
+        assert(cone);
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+
+        scene::IMesh* mesh =
+            gc->createConeMesh(cone->getRadius(),
+            cone->getHeight(),
+            std::max((int)(cone->getRadius() * M_PI), 4));
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
+        Vec3 offset;
+        offset.setY(cone->getHeight() * -0.5f);
+        translate.setTranslation(offset.toIrrVector());
+        mani->transform(mesh, translate);
+
+        core::matrix4 adjust_axis(core::matrix4::EM4CONST_IDENTITY);
+        if (m_body_type == MP_CONE_X)
+            adjust_axis.setRotationDegrees(core::vector3df(0, 0, -90));
+        else if (m_body_type == MP_CONE_Z)
+            adjust_axis.setRotationDegrees(core::vector3df(90, 0, 0));
+        mani->transform(mesh, adjust_axis);
+
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+    else if (m_body_type == MP_SPHERE)
+    {
+        btSphereShape* sphere = dynamic_cast<btSphereShape*>(m_shape);
+        assert(sphere);
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+
+        scene::IMesh* mesh =
+            gc->createSphereMesh(sphere->getRadius(),
+            std::max((int)(sphere->getRadius() / 2.0f), 4),
+            std::max((int)(sphere->getRadius() / 2.0f), 4));
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+    else if (m_body_type == MP_BOX)
+    {
+        btBoxShape* box = dynamic_cast<btBoxShape*>(m_shape);
+        assert(box);
+        scene::IMesh* mesh =
+            gc->createCubeMesh(
+            Vec3(box->getHalfExtentsWithMargin() * 2.0f).toIrrVector());
+        scene::ISceneNode* node = sm->addMeshSceneNode(mesh);
+        mesh->drop();
+
+        btTransform t;
+        m_motion_state->getWorldTransform(t);
+        node->setPosition(Vec3(t.getOrigin()).toIrrVector());
+        Vec3 hpr;
+        hpr.setHPR(t.getRotation());
+        node->setRotation(hpr.toIrrHPR());
+
+        Track::getCurrentTrack()->convertTrackToBullet(node);
+        node->remove();
+    }
+
+}   // joinToMainTrack

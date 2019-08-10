@@ -1,24 +1,24 @@
 <?xml version="1.0"?>
 <challenge version="3">
     <unlock_list list="false"/>
-    <track id="greenvalley" laps="3" reverse="false"/>
+    <track id="black_forest" laps="2" reverse="false"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="90"/>
+    <requirements trophies="130"/>
     
     <best>
-        <karts number="9"/>
-        <requirements position="1"/>
+        <karts number="10"/>
+        <requirements position="1" time="170"/>
     </best>
     <hard>
-        <karts number="8"/>
+        <karts number="9"/>
         <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="7"/>
+        <karts number="8"/>
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="6"/>
+        <karts number="7"/>
         <requirements position="1"/>
     </easy>
 </challenge>

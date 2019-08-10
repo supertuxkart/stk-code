@@ -31,6 +31,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -109,7 +110,7 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
 
             std::string filename = *dir + "/" + *file;
 
-            FILE* f = fopen(filename.c_str(), "r");
+            FILE* f = FileUtils::fopenU8Path(filename, "r");
             if (f)
             {
                 fclose(f);
@@ -278,8 +279,16 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
         }
     }
 
+
+
     for (unsigned int n = 0; n < unlocked.size(); n++)
     {
+        //FIXME : this is a quick hack to avoid an unlocked kart being shown
+        //        several times when completing different difficulties of
+        //        a single-race challenge unlocking a kart.
+        if ((points_now - points_before) <= 5)
+            break;
+
         std::vector<ChallengeData::UnlockableFeature> features = unlocked[n]->getFeatures();
 
         for (unsigned int i = 0; i < features.size(); i++)

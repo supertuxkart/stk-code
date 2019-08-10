@@ -26,6 +26,8 @@
 #include "network/network_config.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
+#include "online/request_manager.hpp"
+#include "online/xml_request.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/online_profile_friends.hpp"
 #include "states_screens/options/user_screen.hpp"
@@ -44,6 +46,25 @@ using namespace Online;
 
 namespace Online
 {
+    namespace PrivateRequest
+    {
+        // ----------------------------------------------------------------
+        class SignInRequest : public XMLRequest
+        {
+            virtual void callback();
+        public:
+            SignInRequest(bool manage_memory)
+                : XMLRequest(manage_memory, /*priority*/10) {}
+        };   // SignInRequest
+
+        // ----------------------------------------------------------------
+        class PollRequest : public XMLRequest
+        {
+            virtual void callback();
+        public:
+            PollRequest();
+        };   // PollRequest
+    }
     // ------------------------------------------------------------------------
     /** Adds the login credential to a http request. It sets the name of
      *  the script to invokce, token, and user id.
@@ -94,7 +115,8 @@ namespace Online
     {
         if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
-            SignInRequest *request = new SignInRequest(true);
+            PrivateRequest::SignInRequest *request =
+                new PrivateRequest::SignInRequest(true);
             setUserDetails(request, "saved-session");
 
             // The userid must be taken from the saved data,
@@ -118,7 +140,8 @@ namespace Online
         // logout stil happening.
         assert(m_online_state == OS_SIGNED_OUT ||
                m_online_state == OS_SIGNING_OUT);
-        SignInRequest * request = new SignInRequest(true);
+        PrivateRequest::SignInRequest * request =
+            new PrivateRequest::SignInRequest(true);
 
         // We can't use setUserDetail here, since there is no token yet
         request->setApiURL(API::USER_PATH, "connect");
@@ -134,7 +157,7 @@ namespace Online
     // ------------------------------------------------------------------------
     /** Called when the signin request is finished.
      */
-    void OnlinePlayerProfile::SignInRequest::callback()
+    void PrivateRequest::SignInRequest::callback()
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
@@ -149,8 +172,7 @@ namespace Online
                 PlayerProfile *player = PlayerManager::get()->getPlayer(i);
                 if(player != current &&
                     player->hasSavedSession() &&
-                    player->getLastOnlineName(true/*ignoreRTL*/) ==
-                    current->getLastOnlineName(true/*ignoreRTL*/))
+                    player->getLastOnlineName() == current->getLastOnlineName())
                 {
                     player->clearSession();
                 }
@@ -339,13 +361,14 @@ namespace Online
     {
         assert(m_online_state == OS_SIGNED_IN);
 
-        OnlinePlayerProfile::PollRequest *request = new OnlinePlayerProfile::PollRequest();
+        PrivateRequest::PollRequest *request =
+            new PrivateRequest::PollRequest();
         setUserDetails(request, "poll");
         request->queue();
     }   // requestPoll()
 
     // ------------------------------------------------------------------------
-    OnlinePlayerProfile::PollRequest::PollRequest()
+    PrivateRequest::PollRequest::PollRequest()
                        : XMLRequest(true)
     {
     }   // PollRequest
@@ -354,7 +377,7 @@ namespace Online
     /** Callback for the poll request. Parses the information and spawns
      *  notifications accordingly.
      */
-    void OnlinePlayerProfile::PollRequest::callback()
+    void PrivateRequest::PollRequest::callback()
     {
         // connection error
         if (!isSuccess())
