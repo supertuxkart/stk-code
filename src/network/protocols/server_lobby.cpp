@@ -595,7 +595,7 @@ void ServerLobby::handleChat(Event* event)
     event->getPeer()->updateLastActivity();
     const bool sender_in_game = event->getPeer()->isWaitingForGame();
     core::stringw message;
-    event->data().decodeString16(&message);
+    event->data().decodeString16(&message, 1000/*max_len*/);
     if (message.size() > 0)
     {
         NetworkString* chat = getNetworkString();

@@ -1341,7 +1341,7 @@ void ClientLobby::sendChat(irr::core::stringw text)
             name = PlayerManager::getCurrentOnlineProfile()->getUserName();
         else
             name = player->getName();
-        chat->encodeString16(name + L": " + text);
+        chat->encodeString16(name + L": " + text, 1000/*max_len*/);
 
         STKHost::get()->sendToServer(chat, true);
         delete chat;
