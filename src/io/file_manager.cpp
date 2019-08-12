@@ -436,6 +436,11 @@ void FileManager::reinitAfterDownloadAssets()
     m_music_search_path.clear();
     discoverPaths();
     addAssetsSearchPath();
+    // Add back addons search path
+    KartPropertiesManager::addKartSearchDir(
+                 file_manager->getAddonsFile("karts/"));
+    track_manager->addTrackSearchDir(
+                 file_manager->getAddonsFile("tracks/"));
 }   // reinitAfterDownloadAssets
 
 //-----------------------------------------------------------------------------
