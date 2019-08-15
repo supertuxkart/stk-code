@@ -7,7 +7,7 @@
   <key>CFBundleExecutable</key>
   <string>supertuxkart</string>
   <key>CFBundleIdentifier</key>
-  <string>org.supertuxkart.stk</string>
+  <string>net.supertuxkart.stkios</string>
   <key>CFBundleInfoDictionaryVersion</key>
   <string>6.0</string>
   <key>CFBundleName</key>
