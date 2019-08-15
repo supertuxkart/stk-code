@@ -174,6 +174,7 @@ void MultitouchDevice::reset()
 
     m_orientation = 0.0f;
     m_gyro_time = 0;
+    m_affected_linked_buttons.clear();
 } // reset
 
 // ----------------------------------------------------------------------------
@@ -249,11 +250,88 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
 {
     assert(event_id < m_events.size());
 
+    auto inside_button = [](MultitouchButton* button,
+        const MultitouchEvent& event)->bool
+        {
+            if (button == NULL)
+                return false;
+            return event.x >= button->x &&
+                event.x <= button->x + button->width &&
+                event.y >= button->y && event.y <= button->y + button->height;
+        };
+    auto is_linked_button = [](MultitouchButton* button)->bool
+        {
+            if (button == NULL)
+                return false;
+            return button->type >= BUTTON_FIRE &&
+                button->type <= BUTTON_RESCUE;
+        };
+
+    const MultitouchEvent& event = m_events[event_id];
+    std::vector<MultitouchButton*> linked_buttons;
+    for (MultitouchButton* button : m_buttons)
+    {
+        if (button == NULL || !is_linked_button(button))
+            continue;
+        linked_buttons.push_back(button);
+    }
+
+    if (!event.touched)
+    {
+        m_affected_linked_buttons.erase(event.id);
+    }
+    else
+    {
+        for (MultitouchButton* button : linked_buttons)
+        {
+            if (inside_button(button, event))
+            {
+                auto& ret = m_affected_linked_buttons[event.id];
+                if (!ret.empty() && ret.back() == button)
+                    continue;
+                if (ret.size() >= 2)
+                {
+                    if (ret[0] == button)
+                        ret.resize(1);
+                    else if (ret[ret.size() - 2] == button)
+                        ret.resize(ret.size() - 1);
+                    else
+                        ret.push_back(button);
+                }
+                else
+                    ret.push_back(button);
+                break;
+            }
+        }
+    }
+    for (MultitouchButton* button : linked_buttons)
+    {
+        bool found = false;
+        for (auto& p : m_affected_linked_buttons)
+        {
+            auto it = std::find(p.second.begin(), p.second.end(), button);
+            if (it != p.second.end())
+            {
+                button->pressed = true;
+                handleControls(button);
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            button->pressed = false;
+            handleControls(button);
+        }
+    }
+
     MultitouchButton* pressed_button = NULL;
     
     for (MultitouchButton* button : m_buttons)
     {
-        if (button->pressed && button->event_id == event_id) 
+        if (is_linked_button(button))
+            continue;
+        if (button->pressed && button->event_id == event_id)
         {
             pressed_button = button;
             break;
@@ -262,16 +340,15 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
 
     for (MultitouchButton* button : m_buttons)
     {
+        if (is_linked_button(button))
+            continue;
         if (pressed_button != NULL && button != pressed_button)
             continue;
-            
+
         bool update_controls = false;
         bool prev_button_state = button->pressed;
-        MultitouchEvent event = m_events[event_id];
 
-        if (pressed_button != NULL ||
-            (event.x >= button->x && event.x <= button->x + button->width &&
-            event.y >= button->y && event.y <= button->y + button->height))
+        if (pressed_button != NULL || inside_button(button, event))
         {
             button->pressed = event.touched;
             button->event_id = event_id;
@@ -295,7 +372,7 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
                     update_controls = true;
                 }
             }
-            
+
             if (button->type == MultitouchButtonType::BUTTON_STEERING ||
                 button->type == MultitouchButtonType::BUTTON_UP_DOWN)
             {

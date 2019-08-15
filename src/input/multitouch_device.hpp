@@ -20,6 +20,7 @@
 #define HEADER_MULTITOUCH_DEVICE_HPP
 
 #include <array>
+#include <map>
 #include <vector>
 
 #include "input/input_device.hpp"
@@ -98,6 +99,8 @@ private:
     float getSteeringFactor(float value, float sensitivity);
     void handleControls(MultitouchButton* button);
     bool isGameRunning();
+
+    std::map<unsigned, std::vector<MultitouchButton*> > m_affected_linked_buttons;
 
 public:
     /** The array that contains data for all multitouch input events */
