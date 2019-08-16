@@ -60,14 +60,15 @@ public:
 // ============================================================================
 class TextureRectShader : public TextureShader<TextureRectShader, 1, 
                                              core::vector2df, core::vector2df,
-                                             core::vector2df, core::vector2df>
+                                             core::vector2df, core::vector2df,
+                                             float>
 {
 public:
     TextureRectShader()
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
                             GL_FRAGMENT_SHADER, "texturedquad.frag");
-        assignUniforms("center", "size", "texcenter", "texsize");
+        assignUniforms("center", "size", "texcenter", "texsize", "rotation");
 
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // TextureRectShader
@@ -161,7 +162,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
 static void drawTexQuad(GLuint texture, float width, float height,
                         float center_pos_x, float center_pos_y, 
                         float tex_center_pos_x, float tex_center_pos_y,
-                        float tex_width, float tex_height)
+                        float tex_width, float tex_height, float rotation)
 {
     TextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
@@ -171,7 +172,7 @@ static void drawTexQuad(GLuint texture, float width, float height,
                     core::vector2df(center_pos_x, center_pos_y), 
                     core::vector2df(width, height),
                     core::vector2df(tex_center_pos_x, tex_center_pos_y),
-                    core::vector2df(tex_width, tex_height)                );
+                    core::vector2df(tex_width, tex_height), rotation);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
@@ -456,7 +457,7 @@ void draw2DImage(const video::ITexture* texture,
                  const core::rect<s32>* clip_rect,
                  const video::SColor* const colors,
                  bool use_alpha_channel_of_texture,
-                 bool draw_translucently)
+                 bool draw_translucently, float rotation)
 {
     if (!CVS->isGLSL())
     {
@@ -511,7 +512,7 @@ void draw2DImage(const video::ITexture* texture,
     {
         drawTexQuad(texture->getOpenGLTextureName(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
-                    tex_center_pos_y, tex_width, tex_height);
+                    tex_center_pos_y, tex_width, tex_height, rotation);
     }
     if (clip_rect)
         glDisable(GL_SCISSOR_TEST);
@@ -588,7 +589,7 @@ void draw2DImage(const video::ITexture* texture,
     {
         drawTexQuad(texture->getOpenGLTextureName(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
-                    tex_center_pos_y, tex_width, tex_height);
+                    tex_center_pos_y, tex_width, tex_height, 0.0f/*rotation*/);
     }
     if (clip_rect)
         glDisable(GL_SCISSOR_TEST);
