@@ -58,7 +58,7 @@ public:
 };   // UniformColoredTextureRectShader
 
 // ============================================================================
-class TextureRectShader : public TextureShader<TextureRectShader, 1, 
+class TextureRectShader : public TextureShader<TextureRectShader, 1,
                                              core::vector2df, core::vector2df,
                                              core::vector2df, core::vector2df,
                                              float>
@@ -73,6 +73,24 @@ public:
         assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
     }   // TextureRectShader
 };   // TextureRectShader
+
+// ============================================================================
+class TextureRectCustomAlphaShader : public TextureShader<TextureRectCustomAlphaShader, 1,
+                                             core::vector2df, core::vector2df,
+                                             core::vector2df, core::vector2df,
+                                             float, float>
+{
+public:
+    TextureRectCustomAlphaShader()
+    {
+        loadProgram(OBJECT, GL_VERTEX_SHADER, "texturedquad.vert",
+                            GL_FRAGMENT_SHADER, "texturedquad_custom_alpha.frag");
+        assignUniforms("center", "size", "texcenter", "texsize", "rotation",
+            "custom_alpha");
+
+        assignSamplerNames(0, "tex", ST_BILINEAR_CLAMPED_FILTERED);
+    }   // TextureRectCustomAlphaShader
+};   // TextureRectCustomAlphaShader
 
 // ============================================================================
 class ColoredRectShader : public Shader<ColoredRectShader, core::vector2df,
@@ -515,6 +533,61 @@ void draw2DImage(const video::ITexture* texture,
                     tex_center_pos_y, tex_width, tex_height, rotation);
     }
     if (clip_rect)
+        glDisable(GL_SCISSOR_TEST);
+    glUseProgram(0);
+
+    glGetError();
+}   // draw2DImage
+
+// ----------------------------------------------------------------------------
+void draw2DImageCustomAlpha(const irr::video::ITexture* texture,
+                            const irr::core::rect<irr::s32>& destRect,
+                            const irr::core::rect<irr::s32>& sourceRect,
+                            const irr::core::rect<irr::s32>* clipRect,
+                            float rotation, float custom_alpha)
+{
+    if (!CVS->isGLSL())
+        return;
+
+    float width, height, center_pos_x, center_pos_y, tex_width, tex_height;
+    float tex_center_pos_x, tex_center_pos_y;
+
+    getSize(texture->getSize().Width, texture->getSize().Height,
+            texture->isRenderTarget(), destRect, sourceRect, width, height,
+            center_pos_x, center_pos_y, tex_width, tex_height,
+            tex_center_pos_x, tex_center_pos_y);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if (clipRect)
+    {
+        if (!clipRect->isValid())
+            return;
+
+        glEnable(GL_SCISSOR_TEST);
+        const core::dimension2d<u32>& render_target_size =
+                            irr_driver->getActualScreenSize();
+        glScissor(clipRect->UpperLeftCorner.X,
+                  (s32)render_target_size.Height - clipRect->LowerRightCorner.Y +
+                  irr_driver->getDevice()->getMovedHeight(),
+                  clipRect->getWidth(), clipRect->getHeight());
+    }
+
+    TextureRectCustomAlphaShader::getInstance()->use();
+    glBindVertexArray(SharedGPUObjects::getUI_VAO());
+
+    TextureRectCustomAlphaShader::getInstance()->setTextureUnits(texture->getOpenGLTextureName());
+    TextureRectCustomAlphaShader::getInstance()->setUniforms(
+                    core::vector2df(center_pos_x, center_pos_y),
+                    core::vector2df(width, height),
+                    core::vector2df(tex_center_pos_x, tex_center_pos_y),
+                    core::vector2df(tex_width, tex_height), rotation, custom_alpha);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    if (clipRect)
         glDisable(GL_SCISSOR_TEST);
     glUseProgram(0);
 
