@@ -51,7 +51,8 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_steering_wheel_tex = NULL;
     m_steering_wheel_tex_mask_up = NULL;
     m_steering_wheel_tex_mask_down = NULL;
-    m_up_down_tex = NULL;
+    m_accelerator_tex = NULL;
+    m_accelerator_handle_tex = NULL;
     m_pause_tex = NULL;
     m_nitro_tex = NULL;
     m_nitro_empty_tex = NULL;
@@ -136,8 +137,10 @@ void RaceGUIMultitouch::init()
     
     m_steering_wheel_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
                                                   "android/steering_wheel.png");
-    m_up_down_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
-                                                         "android/up_down.png");
+    m_accelerator_tex = irr_driver->getTexture(FileManager::GUI_ICON,
+                                               "android/accelerator.png");
+    m_accelerator_handle_tex = irr_driver->getTexture(FileManager::GUI_ICON,
+                                               "android/accelerator_handle.png");
     m_pause_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/pause.png");
     m_nitro_tex = irr_driver->getTexture(FileManager::GUI_ICON, "android/nitro.png");
     m_nitro_empty_tex = irr_driver->getTexture(FileManager::GUI_ICON, 
@@ -395,9 +398,30 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
         }
         if (button->type == MultitouchButtonType::BUTTON_UP_DOWN)
         {
-            video::ITexture* btn_texture = m_up_down_tex;
+            video::ITexture* btn_texture = m_accelerator_tex;
             core::rect<s32> coords(pos_zero, btn_texture->getSize());
             draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
+            AbstractKart* k = NULL;
+            Camera* c = Camera::getActiveCamera();
+            if (c)
+                k = c->getKart();
+            if (k)
+            {
+                float upper_corner;
+                if (k->getControls().getBrake())
+                {
+                    upper_corner = button->y + button->height - button->width / 2;
+                }
+                else
+                {
+                    upper_corner = button->y + button->height / 2 - button->width / 4;
+                    upper_corner -= (int)((float)(button->height / 2 - button->width / 4) * (k->getControls().getAccel()));
+                }
+                core::rect<s32> handle_pos(button->x, upper_corner, button->x + button->width / 2,
+                                           upper_corner + button->width / 2);
+                core::rect<s32> handle_coords(pos_zero, m_accelerator_handle_tex->getSize());
+                draw2DImage(m_accelerator_handle_tex, handle_pos, handle_coords, NULL, NULL, true);
+            }
         }
         else
         {
