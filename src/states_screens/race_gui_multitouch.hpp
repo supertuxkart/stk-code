@@ -40,6 +40,8 @@ private:
     unsigned int m_height;
     
     video::ITexture* m_steering_wheel_tex;
+    video::ITexture* m_steering_wheel_tex_mask_up;
+    video::ITexture* m_steering_wheel_tex_mask_down;
     video::ITexture* m_up_down_tex;
     video::ITexture* m_pause_tex;
     video::ITexture* m_nitro_tex;

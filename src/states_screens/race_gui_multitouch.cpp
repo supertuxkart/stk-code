@@ -24,6 +24,7 @@ using namespace irr;
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/camera_debug.hpp"
+#include "graphics/central_settings.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -32,6 +33,7 @@ using namespace irr;
 #include "input/multitouch_device.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/controller/kart_control.hpp"
 #include "modes/world.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -47,6 +49,8 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_is_spectator_mode = false;
     m_height = 0;
     m_steering_wheel_tex = NULL;
+    m_steering_wheel_tex_mask_up = NULL;
+    m_steering_wheel_tex_mask_down = NULL;
     m_up_down_tex = NULL;
     m_pause_tex = NULL;
     m_nitro_tex = NULL;
@@ -150,7 +154,15 @@ void RaceGUIMultitouch::init()
     m_gui_action_tex = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
     m_up_tex = irr_driver->getTexture(FileManager::GUI_ICON, "up.png");
     m_down_tex = irr_driver->getTexture(FileManager::GUI_ICON, "down.png");
-    
+#ifndef SERVER_ONLY
+    if (CVS->isGLSL())
+    {
+        m_steering_wheel_tex_mask_up = irr_driver->getTexture(FileManager::GUI_ICON,
+                                            "android/steering_wheel_mask_up.png");
+        m_steering_wheel_tex_mask_down = irr_driver->getTexture(FileManager::GUI_ICON,
+                                            "android/steering_wheel_mask_down.png");
+    }
+#endif
     auto cl = LobbyProtocol::get<ClientLobby>();
     
     if (cl && cl->isSpectator())
@@ -352,8 +364,23 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
         {
             video::ITexture* btn_texture = m_steering_wheel_tex;
             core::rect<s32> coords(pos_zero, btn_texture->getSize());
-            draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true);
-
+            draw2DImage(btn_texture, btn_pos, coords, NULL, NULL, true, false/*draw_translucently*/,
+                (button->axis_y >= 0 ? -1 : 1) * button->axis_x);
+#ifndef SERVER_ONLY
+            AbstractKart* k = NULL;
+            Camera* c = Camera::getActiveCamera();
+            if (c)
+                k = c->getKart();
+            if (CVS->isGLSL() && k)
+            {
+                float accel = k->getControls().getAccel();
+                core::rect<s32> mask_coords(pos_zero, m_steering_wheel_tex_mask_up->getSize());
+                draw2DImageCustomAlpha(m_steering_wheel_tex_mask_up, btn_pos, mask_coords, NULL,
+                    (button->axis_y >= 0 ? -1 : 1) * button->axis_x, accel >= 0.0f ? accel * 0.5f : 0.0f);
+                draw2DImageCustomAlpha(m_steering_wheel_tex_mask_down, btn_pos, mask_coords, NULL,
+                    (button->axis_y >= 0 ? -1 : 1) * button->axis_x, k->getControls().getBrake() ? 0.5f : 0.0f);
+            }
+#endif
             // float x = (float)(button->x) + (float)(button->width) / 2.0f *
             //                                          (button->axis_x + 1.0f);
             // float y = (float)(button->y) + (float)(button->height) / 2.0f *
