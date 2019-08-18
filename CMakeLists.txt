@@ -22,6 +22,7 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SYSTEM_ENET "Use system ENet instead of the built-in version, when available." ON)
+option(USE_IPV6 "Allow create or connect to game server with ipv6 address, system enet will not be used." OFF)
 option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
@@ -160,11 +161,15 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
 # Find system ENet library or build it if missing
-if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET)
+if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET AND NOT USE_IPV6)
     pkg_check_modules(ENET libenet>=1.3.4)
 endif()
 
-if(ENET_FOUND)
+if (USE_IPV6)
+   add_definitions(-DENABLE_IPV6)
+endif()
+
+if(ENET_FOUND AND NOT USE_IPV6)
     include_directories(${ENET_INCLUDE_DIRS})
 else()
     # Fallback to built-in version

@@ -23,7 +23,7 @@
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
-#include "network/ios_ipv6.hpp"
+#include "network/unix_ipv6.hpp"
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
 #include "network/network_player_profile.hpp"
@@ -370,8 +370,7 @@ void STKHost::shutdown()
  */
 void STKHost::setPublicAddress()
 {
-#ifdef IOS_STK
-    if (isIPV6Only())
+    if (isIPV6())
     {
         // IPV6 only in iOS doesn't support connection to firewalled server,
         // so no need to test STUN
@@ -379,7 +378,7 @@ void STKHost::setPublicAddress()
         m_public_address = TransportAddress("169.254.0.0:65535");
         return;
     }
-#endif
+
     std::vector<std::pair<std::string, uint32_t> > untried_server;
     for (auto& p : UserConfigParams::m_stun_servers)
         untried_server.push_back(p);
@@ -714,8 +713,8 @@ void STKHost::mainLoop()
 
     // A separate network connection (socket) to handle LAN requests.
     Network* direct_socket = NULL;
-    if ((NetworkConfig::get()->isLAN() && is_server) ||
-        NetworkConfig::get()->isPublicServer())
+    if (!isIPV6() && ((NetworkConfig::get()->isLAN() && is_server) ||
+        NetworkConfig::get()->isPublicServer()))
     {
         TransportAddress address(0, stk_config->m_server_discovery_port);
         ENetAddress eaddr = address.toEnetAddress();
@@ -811,7 +810,7 @@ void STKHost::mainLoop()
                         {
                             Log::info("STKHost", "%s %s with ping %d is higher"
                                 " than %d ms when not in game, kick.",
-                                p.second->getAddress().toString().c_str(),
+                                p.second->getRealAddress().c_str(),
                                 player_name.c_str(), ap, max_ping);
                             p.second->setWarnedForHighPing(true);
                             p.second->setDisconnected(true);
@@ -824,7 +823,7 @@ void STKHost::mainLoop()
                         {
                             Log::info("STKHost", "%s %s with ping %d is higher"
                                 " than %d ms.",
-                                p.second->getAddress().toString().c_str(),
+                                p.second->getRealAddress().c_str(),
                                 player_name.c_str(), ap, max_ping);
                             p.second->setWarnedForHighPing(true);
                             NetworkString msg(PROTOCOL_LOBBY_ROOM);
@@ -889,7 +888,7 @@ void STKHost::mainLoop()
                 {
                     Log::info("STKHost", "%s has not been validated for more"
                         " than %f seconds, disconnect it by force.",
-                        it->second->getAddress().toString().c_str(),
+                        it->second->getRealAddress().c_str(),
                         timeout);
                     enet_host_flush(host);
                     enet_peer_reset(it->first);
@@ -976,7 +975,8 @@ void STKHost::mainLoop()
                 stk_event = new Event(&event, stk_peer);
                 TransportAddress addr(event.peer->address);
                 Log::info("STKHost", "%s has just connected. There are "
-                    "now %u peers.", addr.toString().c_str(), getPeerCount());
+                    "now %u peers.", stk_peer->getRealAddress().c_str(),
+                    getPeerCount());
                 // Client always trust the server
                 if (!is_server)
                     stk_peer->setValidated();
@@ -994,15 +994,17 @@ void STKHost::mainLoop()
                 }
                 // Use the previous stk peer so protocol can see the network
                 // profile and handle it for disconnection
+                std::string addr;
                 if (m_peers.find(event.peer) != m_peers.end())
                 {
-                    stk_event = new Event(&event, m_peers.at(event.peer));
+                    std::shared_ptr<STKPeer>& peer = m_peers.at(event.peer);
+                    addr = peer->getRealAddress();
+                    stk_event = new Event(&event, peer);
                     std::lock_guard<std::mutex> lock(m_peers_mutex);
                     m_peers.erase(event.peer);
                 }
-                TransportAddress addr(event.peer->address);
                 Log::info("STKHost", "%s has just disconnected. There are "
-                    "now %u peers.", addr.toString().c_str(), getPeerCount());
+                    "now %u peers.", addr.c_str(), getPeerCount());
             }   // ENET_EVENT_TYPE_DISCONNECT
 
             if (!stk_event && m_peers.find(event.peer) != m_peers.end())

@@ -58,18 +58,18 @@ typedef int socklen_t;
 
 static enet_uint32 timeBase = 0;
 
-#ifdef IOS_STK
-extern void iOSInitialize(void);
-extern int isIPV6Only(void);
-extern void getSynthesizedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
-extern void getIPV4FromSynthesized(const struct sockaddr_in6* in6, ENetAddress* ea);
+#ifdef ENABLE_IPV6
+extern void unixInitialize(void);
+extern int isIPV6(void);
+extern void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
+extern void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
 #endif
 
 int
 enet_initialize (void)
 {
-#ifdef IOS_STK
-    iOSInitialize();
+#ifdef ENABLE_IPV6
+    unixInitialize();
 #endif
     return 0;
 }
@@ -199,9 +199,9 @@ enet_address_get_host (const ENetAddress * address, char * name, size_t nameLeng
 int
 enet_socket_bind (ENetSocket socket, const ENetAddress * address)
 {
-#ifdef IOS_STK
+#ifdef ENABLE_IPV6
     // In STK we only bind port and listen to any address
-    if (isIPV6Only())
+    if (isIPV6())
     {
         struct sockaddr_in6 sin;
         memset (&sin, 0, sizeof (struct sockaddr_in6));
@@ -261,12 +261,26 @@ enet_socket_listen (ENetSocket socket, int backlog)
 ENetSocket
 enet_socket_create (ENetSocketType type)
 {
-#ifdef IOS_STK
-    int af_family = isIPV6Only() == 1 ? PF_INET6 : PF_INET;
+#ifdef ENABLE_IPV6
+    int af_family = isIPV6() == 1 ? PF_INET6 : PF_INET;
 #else
     int af_family = PF_INET;
 #endif
-    return socket (af_family, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
+    int socket_fd = socket (af_family, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
+#ifdef ENABLE_IPV6
+    if (isIPV6())
+    {
+        int no = 0;
+        // Allow ipv6 socket listen to ipv4 connection (as long as the host has ipv4 address)
+        int ret = setsockopt(socket_fd, IPPROTO_IPV6, IPV6_V6ONLY, (void*)&no, sizeof(no));
+        if (ret != 0)
+        {
+            close(socket_fd);
+            return -1;
+        }
+    }
+#endif
+    return socket_fd;
 }
 
 int
@@ -408,7 +422,7 @@ enet_socket_send (ENetSocket socket,
 {
     struct msghdr msgHdr;
     struct sockaddr_in sin;
-#ifdef IOS_STK
+#ifdef ENABLE_IPV6
     struct sockaddr_in6 sin6;
 #endif
     int sentLength;
@@ -417,10 +431,10 @@ enet_socket_send (ENetSocket socket,
 
     if (address != NULL)
     {
-#ifdef IOS_STK
-        if (isIPV6Only())
+#ifdef ENABLE_IPV6
+        if (isIPV6())
         {
-            getSynthesizedAddress(address, &sin6);
+            getIPV6FromMappedAddress(address, &sin6);
             msgHdr.msg_name = & sin6;
             msgHdr.msg_namelen = sizeof (struct sockaddr_in6);
         }
@@ -462,7 +476,7 @@ enet_socket_receive (ENetSocket socket,
 {
     struct msghdr msgHdr;
     struct sockaddr_in sin;
-#ifdef IOS_STK
+#ifdef ENABLE_IPV6
     struct sockaddr_in6 sin6;
 #endif
     int recvLength;
@@ -471,8 +485,8 @@ enet_socket_receive (ENetSocket socket,
 
     if (address != NULL)
     {
-#ifdef IOS_STK
-        if (isIPV6Only())
+#ifdef ENABLE_IPV6
+        if (isIPV6())
         {
             msgHdr.msg_name = & sin6;
             msgHdr.msg_namelen = sizeof (struct sockaddr_in6);
@@ -505,10 +519,10 @@ enet_socket_receive (ENetSocket socket,
 
     if (address != NULL)
     {
-#ifdef IOS_STK
-        if (isIPV6Only())
+#ifdef ENABLE_IPV6
+        if (isIPV6())
         {
-            getIPV4FromSynthesized(&sin6, address);
+            getMappedFromIPV6(&sin6, address);
         }
         else
 #endif
