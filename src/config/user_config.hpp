@@ -748,13 +748,6 @@ namespace UserConfigParams
         "The stun servers that will be used to know the public address with"
         " port", {{ "stun-server", "address", "ping" }},
             {
-                { "stun.12connect.com:3478", 0u },
-                { "stun.callwithus.com:3478", 0u },
-                { "stun.cope.es:3478", 0u },
-                { "stun.counterpath.net:3478", 0u },
-                { "stun.ekiga.net:3478", 0u },
-                { "stun.ivao.aero:3478", 0u },
-                { "stun.schlund.de:3478", 0u },
                 { "stun.stunprotocol.org:3478", 0u },
                 { "stun.l.google.com:19302", 0u },
                 { "stun1.l.google.com:19302", 0u },
