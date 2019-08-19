@@ -15,6 +15,72 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifdef WIN32
+#include "ws2tcpip.h"
+#else
+#include <arpa/inet.h>
+#include <err.h>
+#include <netdb.h>
+#include <sys/socket.h>
+#include <sys/sysctl.h>
+#include <stdlib.h>
+#endif
+
+// ----------------------------------------------------------------------------
+/** Workaround of a bug in iOS 9 where port number is not written. */
+extern "C" int getaddrinfo_compat(const char* hostname,
+                                  const char* servname,
+                                  const struct addrinfo* hints,
+                                  struct addrinfo** res)
+{
+#ifdef IOS_STK
+    int err;
+    int numericPort;
+
+    // If we're given a service name and it's a numeric string,
+    // set `numericPort` to that, otherwise it ends up as 0.
+    numericPort = servname != NULL ? atoi(servname) : 0;
+
+    // Call `getaddrinfo` with our input parameters.
+    err = getaddrinfo(hostname, servname, hints, res);
+
+    // Post-process the results of `getaddrinfo` to work around
+    if ((err == 0) && (numericPort != 0))
+    {
+        for (const struct addrinfo* addr = *res; addr != NULL;
+             addr = addr->ai_next)
+        {
+            in_port_t* portPtr;
+            switch (addr->ai_family)
+            {
+                case AF_INET:
+                {
+                    portPtr = &((struct sockaddr_in*)addr->ai_addr)->sin_port;
+                }
+                break;
+                case AF_INET6:
+                {
+                    portPtr = &((struct sockaddr_in6*)addr->ai_addr)->sin6_port;
+                }
+                break;
+                default:
+                {
+                    portPtr = NULL;
+                }
+                break;
+            }
+            if ((portPtr != NULL) && (*portPtr == 0))
+            {
+                *portPtr = htons(numericPort);
+            }
+        }
+    }
+    return err;
+#else
+    return getaddrinfo(hostname, servname, hints, res);
+#endif
+}
+
 #ifndef ENABLE_IPV6
 #include "network/unix_ipv6.hpp"
 // ----------------------------------------------------------------------------
@@ -36,13 +102,6 @@ std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/types.hpp"
-
-#include <arpa/inet.h>
-#include <err.h>
-#include <netdb.h>
-#include <stdlib.h>
-#include <sys/socket.h>
-#include <sys/sysctl.h>
 
 #include <algorithm>
 #include <utility>

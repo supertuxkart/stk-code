@@ -27,7 +27,11 @@ void unixInitialize();
 void removeMappedAddress(const ENetAddress* ea);
 void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
 void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
+void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6);
+int getaddrinfo_compat(const char* hostname, const char* servname,
+                       const struct addrinfo* hints, struct addrinfo** res);
 #ifdef __cplusplus
 }
 #endif
 std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea);
+std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in);
