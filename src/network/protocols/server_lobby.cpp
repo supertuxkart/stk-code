@@ -1867,7 +1867,13 @@ bool ServerLobby::registerServer(bool now)
 
     Log::info("ServerLobby", "Public server address %s",
         m_server_address.toString().c_str());
-
+    if (!STKHost::get()->getPublicIPV6Address().empty())
+    {
+        request->addParameter("address_ipv6",
+            STKHost::get()->getPublicIPV6Address());
+        Log::info("ServerLobby", "Public IPV6 server address %s",
+            STKHost::get()->getPublicIPV6Address().c_str());
+    }
     if (now)
     {
         request->executeNow();

@@ -16,8 +16,26 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef WIN32
-#include "ws2tcpip.h"
+#ifdef __GNUC__
+#    include <ws2tcpip.h>    // Mingw / gcc on windows
+#    undef _WIN32_WINNT
+#    define _WIN32_WINNT 0x501
+#    include <winsock2.h>
+#    include <ws2tcpip.h>
+
+extern "C"
+{
+   WINSOCK_API_LINKAGE  PCSTR WSAAPI inet_ntop(INT Family, PVOID pAddr, PSTR pStringBuf, size_t StringBufSize);
+}
+
 #else
+#    include <winsock2.h>
+#    include <in6addr.h>
+#    include <ws2tcpip.h>
+#endif
+
+#else
+
 #include <arpa/inet.h>
 #include <err.h>
 #include <netdb.h>
@@ -25,6 +43,40 @@
 #include <sys/sysctl.h>
 #include <stdlib.h>
 #endif
+
+#include <string>
+
+// ----------------------------------------------------------------------------
+std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in)
+{
+    std::string result;
+    char ipv6[INET6_ADDRSTRLEN] = {};
+#ifdef WIN32
+    struct sockaddr_in6 copied = *in;
+    inet_ntop(AF_INET6, &copied, ipv6, INET6_ADDRSTRLEN);
+#else
+    inet_ntop(AF_INET6, &(in->sin6_addr), ipv6, INET6_ADDRSTRLEN);
+#endif
+    result = ipv6;
+    return result;
+}   // getIPV6ReadableFromIn6
+
+// ----------------------------------------------------------------------------
+bool sameIPV6(const struct sockaddr_in6* in_1, const struct sockaddr_in6* in_2)
+{
+    // Check port first, then address
+    if (in_1->sin6_port != in_2->sin6_port)
+        return false;
+
+    const struct in6_addr* a = &(in_1->sin6_addr);
+    const struct in6_addr* b = &(in_2->sin6_addr);
+    for (unsigned i = 0; i < sizeof(struct in6_addr); i++)
+    {
+        if (a->s6_addr[i] != b->s6_addr[i])
+            return false;
+    }
+    return true;
+}   // sameIPV6
 
 // ----------------------------------------------------------------------------
 /** Workaround of a bug in iOS 9 where port number is not written. */
@@ -133,16 +185,6 @@ void unixInitialize()
 }   // unixInitialize
 
 // ----------------------------------------------------------------------------
-std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in)
-{
-    std::string result;
-    char ipv6[INET6_ADDRSTRLEN] = {};
-    inet_ntop(AF_INET6, &(in->sin6_addr), ipv6, INET6_ADDRSTRLEN);
-    result = ipv6;
-    return result;
-}   // getIPV6ReadableFromIn6
-
-// ----------------------------------------------------------------------------
 /* Called when a peer is disconnected and we remove its reference to the ipv6.
  */
 void removeMappedAddress(const ENetAddress* ea)
@@ -205,23 +247,6 @@ void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6)
     else
         memset(in6, 0, sizeof(struct sockaddr_in6));
 }   // getIPV6FromMappedAddress
-
-// ----------------------------------------------------------------------------
-bool sameIPV6(const struct sockaddr_in6* in_1, const struct sockaddr_in6* in_2)
-{
-    // Check port first, then address
-    if (in_1->sin6_port != in_2->sin6_port)
-        return false;
-
-    const struct in6_addr* a = &(in_1->sin6_addr);
-    const struct in6_addr* b = &(in_2->sin6_addr);
-    for (unsigned i = 0; i < sizeof(struct in6_addr); i++)
-    {
-        if (a->s6_addr[i] != b->s6_addr[i])
-            return false;
-    }
-    return true;
-}   // sameIPV6
 
 // ----------------------------------------------------------------------------
 /* This is called when enet recieved a packet from its socket, we create an

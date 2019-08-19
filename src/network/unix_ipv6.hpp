@@ -35,3 +35,5 @@ int getaddrinfo_compat(const char* hostname, const char* servname,
 #endif
 std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea);
 std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in);
+bool sameIPV6(const struct sockaddr_in6* in_1,
+              const struct sockaddr_in6* in_2);

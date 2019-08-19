@@ -134,6 +134,9 @@ private:
     /** The public address found by stun (if WAN is used). */
     TransportAddress m_public_address;
 
+    /** The public ipv6 address found by stun (if WAN is used). */
+    std::string m_public_ipv6_address;
+
     /** The public address stun server used. */
     TransportAddress m_stun_address;
 
@@ -167,7 +170,9 @@ private:
                                    std::map<std::string, uint64_t>& ctp);
     // ------------------------------------------------------------------------
     void mainLoop();
-
+    // ------------------------------------------------------------------------
+    std::string getIPFromStun(int socket, const std::string& stun_address,
+                              bool ipv4);
 public:
     /** If a network console should be started. */
     static bool m_enable_console;
@@ -196,6 +201,9 @@ public:
     // ------------------------------------------------------------------------
     const TransportAddress& getPublicAddress() const
                                                    { return m_public_address; }
+    // ------------------------------------------------------------------------
+    const std::string& getPublicIPV6Address() const
+                                              { return m_public_ipv6_address; }
     // ------------------------------------------------------------------------
     const TransportAddress& getStunAddress() const   { return m_stun_address; }
     // ------------------------------------------------------------------------
