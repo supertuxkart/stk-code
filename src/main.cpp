@@ -612,6 +612,9 @@ void cmdLineHelp()
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
     "                          public port.\n"
+    "       --connect-now6=ip   Connect to a server with IPV6 known now\n"
+    "                          (in format [x:x:x:x:x:x:x:x]:xxx(port)), the port should be its\n"
+    "                          public port.\n"
     "       --server-id=n      Server id in stk addons for --connect-now.\n"
     "       --network-ai=n     Numbers of AI for connecting to linear race server, used\n"
     "                          together with --connect-now.\n"
@@ -1323,7 +1326,11 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         }
     }
 
-    if (CommandLine::has("--connect-now", &s))
+    std::string ipv4;
+    std::string ipv6;
+    bool has_ipv4 = CommandLine::has("--connect-now", &ipv4);
+    bool has_ipv6 = CommandLine::has("--connect-now6", &ipv6);
+    if (has_ipv4 || has_ipv6)
     {
         NetworkConfig::get()->setIsServer(false);
         if (CommandLine::has("--network-ai", &n))
@@ -1343,10 +1350,26 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
                 input_manager->getDeviceManager()->getLatestUsedDevice(),
                 PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         }
-        TransportAddress server_addr(s);
+        std::string fixed_ipv6 = StringUtils::findAndReplace(ipv6, "[", " ");
+        fixed_ipv6 = StringUtils::findAndReplace(fixed_ipv6, "]", " ");
+        auto split_ipv6 = StringUtils::split(fixed_ipv6, ' ');
+        std::string ipv6_port;
+        if (split_ipv6.size() == 3)
+        {
+            ipv4 = "0.0.0.1" + split_ipv6[2];
+            fixed_ipv6 = split_ipv6[1];
+        }
+        else
+            fixed_ipv6.clear();
+        TransportAddress server_addr(ipv4);
         auto server = std::make_shared<Server>(0,
             StringUtils::utf8ToWide(server_addr.toString()), 0, 0, 0, 0,
             server_addr, !server_password.empty(), false);
+        if (!fixed_ipv6.empty())
+        {
+            server->setIPV6Address(fixed_ipv6);
+            server->setIPV6Connection(true);
+        }
         NetworkConfig::get()->doneAddingNetworkPlayers();
         if (server_id != 0)
         {
