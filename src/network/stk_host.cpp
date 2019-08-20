@@ -261,6 +261,7 @@ STKHost::STKHost(bool server)
 
     if (server)
     {
+        setIPV6(ServerConfig::m_ipv6_server ? 1 : 0);
         addr.port = ServerConfig::m_server_port;
         if (addr.port == 0 && !UserConfigParams::m_random_server_port)
             addr.port = stk_config->m_server_port;
@@ -856,12 +857,18 @@ void STKHost::mainLoop()
 
     // A separate network connection (socket) to handle LAN requests.
     Network* direct_socket = NULL;
-    if (!isIPV6() && ((NetworkConfig::get()->isLAN() && is_server) ||
-        NetworkConfig::get()->isPublicServer()))
+    if ((NetworkConfig::get()->isLAN() && is_server) ||
+        NetworkConfig::get()->isPublicServer())
     {
         TransportAddress address(0, stk_config->m_server_discovery_port);
         ENetAddress eaddr = address.toEnetAddress();
+        bool socket_ipv6 = isIPV6() == 1 ? true : false;
+        if (socket_ipv6)
+            setIPV6(0);
+        // direct_socket use IPV4 only atm
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
+        if (socket_ipv6)
+            setIPV6(1);
         if (direct_socket->getENetHost() == NULL)
         {
             Log::warn("STKHost", "No direct socket available, this "

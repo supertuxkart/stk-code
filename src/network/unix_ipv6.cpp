@@ -142,6 +142,11 @@ int isIPV6()
 }   // isIPV6
 
 // ----------------------------------------------------------------------------
+void setIPV6(int val)
+{
+}   // setIPV6
+
+// ----------------------------------------------------------------------------
 std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
 {
     return "";
@@ -180,7 +185,7 @@ void unixInitialize()
 {
     // Clear previous setting, in case user changed wifi or mobile data
     g_mapped_ipv6_used = 0;
-    g_ipv6 = 1;
+    g_ipv6 = 0;
     g_mapped_ips.clear();
 }   // unixInitialize
 

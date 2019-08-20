@@ -176,6 +176,14 @@ namespace ServerConfig
         "it allows saving server resource if your server is not "
         "behind a firewall."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_ipv6_server
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ipv6-server",
+        "Enable to allow ipv6 connection if you have a public ipv6 address. "
+        "STK currently use dual-stack mode which requires server to have both "
+        "ipv4 and ipv6 and listen to same port, firewalled-server will be "
+        "disabled so you need to make sure this server has port forward "
+        "configured properly if needed."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_owner_less
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "owner-less",
         "No server owner in lobby which can control the starting of game or "
