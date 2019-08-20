@@ -152,22 +152,39 @@ std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
     return "";
 }   // getIPV6ReadableFromMappedAddress
 
+// ----------------------------------------------------------------------------
+void removeDisconnectedMappedAddress()
+{
+}   // removeDisconnectedMappedAddress
+
 #else
 
 #include "network/unix_ipv6.hpp"
 #include "network/transport_address.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 #include "utils/types.hpp"
 
 #include <algorithm>
-#include <utility>
 #include <vector>
 
 // ============================================================================
 uint32_t g_mapped_ipv6_used;
 int g_ipv6;
-std::vector<std::pair<ENetAddress, struct sockaddr_in6> > g_mapped_ips;
+struct MappedAddress
+{
+    ENetAddress m_addr;
+    struct sockaddr_in6 m_in6;
+    uint64_t m_last_activity;
+    MappedAddress(const ENetAddress& addr, const struct sockaddr_in6& in6)
+    {
+        m_addr = addr;
+        m_in6 = in6;
+        m_last_activity = StkTime::getMonoTimeMs();
+    }
+};
+std::vector<MappedAddress> g_mapped_ips;
 // ============================================================================
 int isIPV6()
 {
@@ -190,38 +207,17 @@ void unixInitialize()
 }   // unixInitialize
 
 // ----------------------------------------------------------------------------
-/* Called when a peer is disconnected and we remove its reference to the ipv6.
- */
-void removeMappedAddress(const ENetAddress* ea)
-{
-    auto it = std::find_if(g_mapped_ips.begin(), g_mapped_ips.end(),
-        [ea](const std::pair<ENetAddress, struct sockaddr_in6>& addr)
-        {
-            return ea->host == addr.first.host && ea->port == addr.first.port;
-        });
-    if (it != g_mapped_ips.end())
-    {
-        TransportAddress addr(it->first);
-        Log::debug("IPV6", "Removing %s, ipv4 address %s.",
-            getIPV6ReadableFromIn6(&it->second).c_str(),
-            addr.toString().c_str());
-        g_mapped_ips.erase(it);
-        Log::debug("IPV6", "Mapped address size now: %d.",
-            g_mapped_ips.size());
-    }
-}   // removeMappedAddress
-
-// ----------------------------------------------------------------------------
 std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
 {
     std::string result;
     auto it = std::find_if(g_mapped_ips.begin(), g_mapped_ips.end(),
-        [ea](const std::pair<ENetAddress, struct sockaddr_in6>& addr)
+        [ea](const MappedAddress& addr)
         {
-            return ea->host == addr.first.host && ea->port == addr.first.port;
+            return ea->host == addr.m_addr.host &&
+                ea->port == addr.m_addr.port;
         });
     if (it != g_mapped_ips.end())
-        result = getIPV6ReadableFromIn6(&it->second);
+        result = getIPV6ReadableFromIn6(&it->m_in6);
     return result;
 }   // getIPV6ReadableFromMappedAddress
 
@@ -243,12 +239,16 @@ void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
 void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6)
 {
     auto it = std::find_if(g_mapped_ips.begin(), g_mapped_ips.end(),
-        [ea](const std::pair<ENetAddress, struct sockaddr_in6>& addr)
+        [ea](const MappedAddress& addr)
         {
-            return ea->host == addr.first.host && ea->port == addr.first.port;
+            return ea->host == addr.m_addr.host &&
+                ea->port == addr.m_addr.port;
         });
     if (it != g_mapped_ips.end())
-        memcpy(in6, &it->second, sizeof(struct sockaddr_in6));
+    {
+        it->m_last_activity = StkTime::getMonoTimeMs();
+        memcpy(in6, &it->m_in6, sizeof(struct sockaddr_in6));
+    }
     else
         memset(in6, 0, sizeof(struct sockaddr_in6));
 }   // getIPV6FromMappedAddress
@@ -260,13 +260,14 @@ void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6)
 void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
 {
     auto it = std::find_if(g_mapped_ips.begin(), g_mapped_ips.end(),
-        [in6](const std::pair<ENetAddress, struct sockaddr_in6>& addr)
+        [in6](const MappedAddress& addr)
         {
-            return sameIPV6(in6, &addr.second);
+            return sameIPV6(in6, &addr.m_in6);
         });
     if (it != g_mapped_ips.end())
     {
-        *ea = it->first;
+        it->m_last_activity = StkTime::getMonoTimeMs();
+        *ea = it->m_addr;
         return;
     }
 
@@ -295,5 +296,28 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
         addMappedAddress(ea, in6);
     }
 }   // getMappedFromIPV6
+
+// ----------------------------------------------------------------------------
+/* Called when a peer is expired (no activity for 20 seconds) and we remove its
+ * reference to the ipv6.
+ */
+void removeDisconnectedMappedAddress()
+{
+    for (auto it = g_mapped_ips.begin(); it != g_mapped_ips.end();)
+    {
+        if (it->m_last_activity + 20000 < StkTime::getMonoTimeMs())
+        {
+            TransportAddress addr(it->m_addr);
+            Log::debug("IPV6", "Removing expired %s, ipv4 address %s.",
+                getIPV6ReadableFromIn6(&it->m_in6).c_str(),
+                addr.toString().c_str());
+            it = g_mapped_ips.erase(it);
+            Log::debug("IPV6", "Mapped address size now: %d.",
+                g_mapped_ips.size());
+        }
+        else
+            it++;
+    }
+}   // removeDisconnectedMappedAddress
 
 #endif

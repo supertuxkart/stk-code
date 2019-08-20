@@ -881,6 +881,7 @@ void STKHost::mainLoop()
     uint64_t last_ping_time = StkTime::getMonoTimeMs();
     uint64_t last_update_speed_time = StkTime::getMonoTimeMs();
     uint64_t last_ping_time_update_for_client = StkTime::getMonoTimeMs();
+    uint64_t last_disconnect_time_update = StkTime::getMonoTimeMs();
     std::map<std::string, uint64_t> ctp;
     while (m_exit_timeout.load() > StkTime::getMonoTimeMs())
     {
@@ -920,6 +921,15 @@ void STKHost::mainLoop()
 
         if (is_server)
         {
+            if (isIPV6() &&
+                last_disconnect_time_update < StkTime::getMonoTimeMs())
+            {
+                // Check per 20 second, don't need to check client because it
+                // only has 1 peer
+                last_disconnect_time_update = StkTime::getMonoTimeMs() + 20000;
+                removeDisconnectedMappedAddress();
+            }
+
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
             const float timeout = ServerConfig::m_validation_timeout;
             bool need_ping = false;

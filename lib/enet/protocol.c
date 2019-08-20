@@ -9,10 +9,6 @@
 #include "enet/time.h"
 #include "enet/enet.h"
 
-#ifdef ENABLE_IPV6
-extern void removeMappedAddress(const ENetAddress* ea);
-#endif
-
 static size_t commandSizes [ENET_PROTOCOL_COMMAND_COUNT] =
 {
     0,
@@ -88,10 +84,6 @@ enet_protocol_dispatch_incoming_commands (ENetHost * host, ENetEvent * event)
            event -> peer = peer;
            event -> data = peer -> eventData;
 
-#ifdef ENABLE_IPV6
-           removeMappedAddress(&peer->address);
-#endif
-
            enet_peer_reset (peer);
 
            return 1;
@@ -155,10 +147,6 @@ enet_protocol_notify_disconnect (ENetHost * host, ENetPeer * peer, ENetEvent * e
         event -> type = ENET_EVENT_TYPE_DISCONNECT;
         event -> peer = peer;
         event -> data = 0;
-
-#ifdef ENABLE_IPV6
-        removeMappedAddress(&peer->address);
-#endif
 
         enet_peer_reset (peer);
     }
