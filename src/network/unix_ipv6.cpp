@@ -157,6 +157,11 @@ void removeDisconnectedMappedAddress()
 {
 }   // removeDisconnectedMappedAddress
 
+// ----------------------------------------------------------------------------
+void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
+{
+}   // addMappedAddress
+
 #else
 
 #include "network/unix_ipv6.hpp"

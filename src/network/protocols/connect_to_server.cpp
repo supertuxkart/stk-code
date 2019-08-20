@@ -31,12 +31,19 @@
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "network/unix_ipv6.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#ifdef WIN32
+#  include <ws2tcpip.h>
+#else
+#  include <netdb.h>
+#endif
 
 #include <algorithm>
 // ============================================================================
@@ -84,8 +91,14 @@ void ConnectToServer::setup()
     Log::info("ConnectToServer", "SETUP");
     // In case of LAN or client-server we already have the server's
     // and our ip address, so we can immediately start requesting a connection.
-    m_state = NetworkConfig::get()->isLAN() ?
-        GOT_SERVER_ADDRESS : SET_PUBLIC_ADDRESS;
+    if (NetworkConfig::get()->isLAN())
+    {
+        m_state = GOT_SERVER_ADDRESS;
+        if (m_server->useIPV6Connection())
+            setIPV6(1);
+    }
+    else
+        m_state = SET_PUBLIC_ADDRESS;
 }   // setup
 
 // ----------------------------------------------------------------------------
@@ -211,6 +224,11 @@ void ConnectToServer::asynchronousUpdate()
                 }
                 servers.clear();
             }
+            if (m_server->useIPV6Connection())
+            {
+                // Disable STUN if using ipv6 (check in setPublicAddress)
+                setIPV6(1);
+            }
             if (m_server->supportsEncryption())
             {
                 STKHost::get()->setPublicAddress();
@@ -247,11 +265,19 @@ void ConnectToServer::asynchronousUpdate()
             // direct connection to server first, if failed than use the one
             // that has stun mapped, the first 8 seconds allow the server to
             // start the connect to peer protocol first before the port is
-            // remapped
-            if (tryConnect(2000, 4, true/*another_port*/))
-                break;
-            if (!tryConnect(2000, 11))
-                m_state = DONE;
+            // remapped. IPV6 has no stun so try once with any port
+            if (isIPV6())
+            {
+                if (!tryConnect(2000, 15, true/*another_port*/, true/*ipv6*/))
+                    m_state = DONE;
+            }
+            else
+            {
+                if (tryConnect(2000, 4, true/*another_port*/))
+                    break;
+                if (!tryConnect(2000, 11))
+                    m_state = DONE;
+            }
             break;
         }
         case DONE:
@@ -337,7 +363,8 @@ int ConnectToServer::interceptCallback(ENetHost* host, ENetEvent* event)
 }   // interceptCallback
 
 // ----------------------------------------------------------------------------
-bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port)
+bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
+                                 bool ipv6)
 {
     m_retry_count = retry;
     ENetEvent event;
@@ -352,20 +379,51 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port)
 
     m_done_intecept = false;
     nw->getENetHost()->intercept = ConnectToServer::interceptCallback;
+
+    std::string connecting_address = m_server_address.toString();
+    if (ipv6)
+    {
+        struct addrinfo hints;
+        struct addrinfo* res = NULL;
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET6;
+        hints.ai_socktype = SOCK_STREAM;
+        if (getaddrinfo(m_server->getIPV6Address().c_str(),
+            StringUtils::toString(m_server->getAddress().getPort()).c_str(),
+            &hints, &res) != 0 || res == NULL)
+            return false;
+        for (const struct addrinfo* addr = res; addr != NULL;
+             addr = addr->ai_next)
+        {
+            if (addr->ai_family == AF_INET6)
+            {
+                struct sockaddr_in6* ipv6 =
+                    (struct sockaddr_in6*)addr->ai_addr;
+                ENetAddress addr = m_server_address.toEnetAddress();
+                connecting_address = std::string("[") +
+                    m_server->getIPV6Address() + "]:" +
+                    StringUtils::toString(addr.port);
+                addMappedAddress(&addr, ipv6);
+                break;
+            }
+        }
+        freeaddrinfo(res);
+    }
+
     while (--m_retry_count >= 0 && !ProtocolManager::lock()->isExiting())
     {
         ENetPeer* p = nw->connectTo(m_server_address);
         if (!p)
             break;
         Log::info("ConnectToServer", "Trying connecting to %s from port %d, "
-            "retry remain: %d", m_server_address.toString().c_str(),
+            "retry remain: %d", connecting_address.c_str(),
             nw->getENetHost()->address.port, m_retry_count);
         while (enet_host_service(nw->getENetHost(), &event, timeout) != 0)
         {
             if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
                 Log::info("ConnectToServer", "Connected to %s",
-                    m_server_address.toString().c_str());
+                    connecting_address.c_str());
                 nw->getENetHost()->intercept = NULL;
                 STKHost::get()->initClientNetwork(event, nw);
                 m_state = DONE;

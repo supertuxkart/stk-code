@@ -49,7 +49,8 @@ private:
 
     void getClientServerInfo();
     void registerWithSTKServer();
-    bool tryConnect(int timeout, int retry, bool another_port = false);
+    bool tryConnect(int timeout, int retry, bool another_port = false,
+                    bool ipv6 = false);
     static TransportAddress m_server_address;
     static int interceptCallback(ENetHost* host, ENetEvent* event);
     static int m_retry_count;
