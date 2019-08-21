@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 16:41+0800\n"
-"PO-Revision-Date: 2019-08-12 07:32+0000\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Breton (http://www.transifex.com/supertuxkart/supertuxkart/language/br/)\n"
 "MIME-Version: 1.0\n"
@@ -418,7 +418,6 @@ msgstr "* Adloc'hañ STK evit arloañ an arventennoù nevez"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -974,28 +973,6 @@ msgstr "Kreditoù"
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "Roit arc'hant evit sikour SuperTuxKart da vont war-raok!"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr ""
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1838,8 +1815,8 @@ msgstr "Diskouez (ar) servij(où) prevez"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "Kuzhat ar servijerioù gant ur c'hoariadenn war ober"
+msgid "Use IPV6 connection if server supports"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -3257,7 +3234,7 @@ msgstr "Echuet ho peus ar redadeg!"
 msgid "%s left the game."
 msgstr ""
 
-#: src/main.cpp:1840
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3268,16 +3245,16 @@ msgid ""
 "statistics\")."
 msgstr ""
 
-#: src/main.cpp:2108
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr "Ho diarunusted a zo re izel evit gallout loc'hañ STK."
 
-#: src/main.cpp:2140
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Re gozh eo handelv ho stur. Stailhit ar sturioù video nevesañ, mar plij."
 
-#: src/main.cpp:2158
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3545,11 +3522,11 @@ msgstr ""
 msgid "Successfully reported %s."
 msgstr ""
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr "Servijer lenn fonnus ebet hegerz."
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Dibosupl kevreañ ouzh ar servijer %s."
@@ -5095,15 +5072,15 @@ msgid "Distance (km)"
 msgstr ""
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "Dizanv"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr "N'eus servijer ebet hegerz."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr "Oc'h adtapout servijoù"
 
@@ -5298,7 +5275,7 @@ msgstr ""
 msgid "Install full game assets"
 msgstr ""
 
-#: src/states_screens/options/options_screen_general.cpp:256
+#: src/states_screens/options/options_screen_general.cpp:264
 msgid "Are you sure to uninstall full game assets?"
 msgstr ""
 

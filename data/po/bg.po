@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 16:41+0800\n"
-"PO-Revision-Date: 2019-08-12 07:32+0000\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
 "Last-Translator: Любомир Василев\n"
 "Language-Team: Bulgarian (http://www.transifex.com/supertuxkart/supertuxkart/language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -416,7 +416,6 @@ msgstr "* Рестартирай, за да се приложат новите �
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -972,28 +971,6 @@ msgstr "Заслуги"
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "Дари, за да подкрепите Супер Тъкс Карт!"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr "Сваляне на файловете за играта"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr "Супер Тъкс Карт трябва да свали файлове за играта, за да можеш да играеш сега. Ако нямаш безжична връзка с Интернет, ще се използват мобилните данни."
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr "Да бъдат включени всички карти"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr "Да се ползват текстури и музика с високо качество"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1836,8 +1813,8 @@ msgstr "Показване на частните сървъри"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "Скриване на сървърите, на които играта вече е започнала"
+msgid "Use IPV6 connection if server supports"
+msgstr "Използване на връзка чрез IPV6, ако сървърът го поддържа"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -3252,7 +3229,7 @@ msgstr "Ти завърши състезанието!"
 msgid "%s left the game."
 msgstr "%s напусна играта."
 
-#: src/main.cpp:1840
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3263,16 +3240,16 @@ msgid ""
 "statistics\")."
 msgstr "Супер Тъкс Карт може да се свързва със сървър, за да сваля добавки и да те известява за обновления. Освен това, ние събираме анонимни хардуерни данни, които да ни помогнат в разработката на СТК. Моля, прочети нашата декларация за поверителност тук: http://privacy.supertuxkart.net. Би ли искал тази функционалност да бъде включена? (За да промениш тази настройка по-късно, отиди в настройките, избери раздела „Общи“ и промени „Свързване с Интернет“ и „Изпращане на анонимни данни за хардуера“)."
 
-#: src/main.cpp:2108
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr "Разделителната способност на екрана е твърде малка."
 
-#: src/main.cpp:2140
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Версията на драйвера е твърде стара. Моля, инсталирай най-новия драйвер за видео картата."
 
-#: src/main.cpp:2158
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3537,11 +3514,11 @@ msgstr "Натисни <%s> или <%s>, за да промениш това к�
 msgid "Successfully reported %s."
 msgstr "%s беше докладван успешно."
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr "Няма налични сървъри за бърза игра."
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Връзката със сървъра е невъзможна: %s."
@@ -5069,15 +5046,15 @@ msgid "Distance (km)"
 msgstr "Разстояние (км)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "Неизвестно"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr "Няма налични сървъри."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr "Получаване на сървърите"
 
@@ -5272,7 +5249,7 @@ msgstr "Деинсталиране на големите файлове на и�
 msgid "Install full game assets"
 msgstr "Инсталиране на големите файлове на играта"
 
-#: src/states_screens/options/options_screen_general.cpp:256
+#: src/states_screens/options/options_screen_general.cpp:264
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Настина ли искаш да се деинсталират големите файлове на играта?"
 

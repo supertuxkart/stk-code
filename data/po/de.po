@@ -26,9 +26,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 16:41+0800\n"
-"PO-Revision-Date: 2019-08-12 07:32+0000\n"
-"Last-Translator: Wuzzy <almikes@aol.com>\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
+"Last-Translator: Ettore Atalan <atalanttore@googlemail.com>\n"
 "Language-Team: German (http://www.transifex.com/supertuxkart/supertuxkart/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -431,7 +431,6 @@ msgstr "* Starte SuperTuxKart neu, um die neuen Einstellungen anzuwenden"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -987,28 +986,6 @@ msgstr "Mitwirkende"
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "Spende, um SuperTuxKart zu unterstützen!"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr "Spieldaten herunterladen"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr "SuperTuxKart muss Spieldaten herunterladen, um das Spiel jetzt spielen zu können; dies wird deine mobile Datenverbindung in Anspruch nehmen, falls du keinen drahtlosen Internetzugang hast."
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr "Alle Strecken einbeziehen"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr "Hochqualitative Texturen und Musik benutzen"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1851,8 +1828,8 @@ msgstr "Nur private Server anzeigen"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "Server mit laufendem Spiel verstecken"
+msgid "Use IPV6 connection if server supports"
+msgstr "IPV6-Verbindung verwenden, wenn der Server dies unterstützt"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -3267,7 +3244,7 @@ msgstr "Du hast das Rennen beendet!"
 msgid "%s left the game."
 msgstr "%s verließ das Spiel."
 
-#: src/main.cpp:1840
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3278,16 +3255,16 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart kann sich mit einem Server verbinden, um Add-Ons herunterzuladen und dich über Aktualisierungen zu informieren. Wir sammeln auch anonyme Hardware-Statistiken, die bei der Entwicklung von STK hilfreich sind. Bitte lies unsere Datenschutzerklärung unter http://privacy.supertuxkart.net. Möchtest du diese Funktion aktivieren? (Um diese Einstellung später zu ändern, wähle die Registerkarte „Allgemein“ in den Einstellungen und ändere „Mit dem Internet verbinden“ und „Anonyme HW-Statistiken senden“.)"
 
-#: src/main.cpp:2108
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr "Deine Bildschirmauflösung ist zu klein für STK."
 
-#: src/main.cpp:2140
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Dein Treiber ist zu alt. Bitte installiere die neuste Version des Grafiktreibers."
 
-#: src/main.cpp:2158
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3552,11 +3529,11 @@ msgstr "Drücke <%s> oder <%s> zum Ändern des Zielspielers oder <%s> für die K
 msgid "Successfully reported %s."
 msgstr "%s erfolgreich gemeldet."
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr "Kein Schnellspielserver verfügbar."
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Verbindung zum Server %s konnte nicht hergestellt werden."
@@ -5084,15 +5061,15 @@ msgid "Distance (km)"
 msgstr "Distanz (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr "Kein Server ist verfügbar."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr "Server abholen"
 
@@ -5287,7 +5264,7 @@ msgstr "Vollständige Spieldaten deinstallieren"
 msgid "Install full game assets"
 msgstr "Vollständige Spieldaten installieren"
 
-#: src/states_screens/options/options_screen_general.cpp:256
+#: src/states_screens/options/options_screen_general.cpp:264
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Möchtest du die vollständigen Spieldaten wirklich deinstallieren?"
 

@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 16:41+0800\n"
-"PO-Revision-Date: 2019-08-12 07:32+0000\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/supertuxkart/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -415,7 +415,6 @@ msgstr "* Käynnistä STK uudelleen, jotta muutokset tulevat voimaan"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -971,28 +970,6 @@ msgstr "Tekijät"
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "Lahjoita pitääksesi SuperTuxKartin vauhdissa!"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr "Lataa pelin resurssit"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr "SuperTuxKartin tulee ladata pelin pelaamiseksi vaadittavia tiedostoja. Lataus käyttää mobiilidatayhteyttä, jos käytössäsi ei ole wifi-yhteyttä."
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr "Sisällytä kaikki radat"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr "Käytä korkealaatuisia tekstuureita ja musiikkia"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1835,8 +1812,8 @@ msgstr "Näytä yksityispalvelin (tai palvelimet)"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "Piilota palvelimet, joissa on peli meneillään"
+msgid "Use IPV6 connection if server supports"
+msgstr "Käytä IPv6-yhteyttä jos palvelin tukee sitä"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -3251,7 +3228,7 @@ msgstr "Saavuit maaliin!"
 msgid "%s left the game."
 msgstr "%s poistui pelistä."
 
-#: src/main.cpp:1840
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3260,18 +3237,18 @@ msgid ""
 "(To change this setting at a later time, go to options, select tab "
 "'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr ""
+msgstr "SuperTuxKart voi ottaa yhteyden internetiin lisäosien lataamiseksi ja päivitysten tarkistamiseksi. Keräämme myös laitteistosta anonyymeja tietoja STK:n kehittämiseksi. Lue yksityisyyskäytäntö osoitteessa http://privacy.supertuxkart.net. Sallitko yhteyden muodostamisen internetiin? (Nämä asetukset on mahdollista muuttaa kohdasta asetuksien Yleiset-kohdasta poistamalla käytöstä \"Yhdistä internetiin\" sekä \"Lähetä anonyymeja tietoja laitteistosta\")."
 
-#: src/main.cpp:2108
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr "Näyttösi resoluutio on liian matala STK:n pelaamista varten."
 
-#: src/main.cpp:2140
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Ajuriversiosi on liian vanha. Asenna näytönohjaimen uusin ajuri."
 
-#: src/main.cpp:2158
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3536,11 +3513,11 @@ msgstr "Paina <%s> tai <%s> vaihtaaksesi kohdistettua pelaajaa ja <%s> vaihtaaks
 msgid "Successfully reported %s."
 msgstr "Pelaajasta %s ilmoitettiin onnistuneesti."
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr "Ei pikapelipalvelinta saatavilla."
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Ei voida yhdistää palvelimeen %s."
@@ -5068,15 +5045,15 @@ msgid "Distance (km)"
 msgstr "Etäisyys (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "Tuntematon"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr "Ei palvelinta käytettävissä."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr "Noudetaan palvelimia"
 
@@ -5271,7 +5248,7 @@ msgstr "Poista koko pelin resurssit"
 msgid "Install full game assets"
 msgstr "Asenna koko pelin resurssit"
 
-#: src/states_screens/options/options_screen_general.cpp:256
+#: src/states_screens/options/options_screen_general.cpp:264
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Haluatko varmasti poistaa koko pelin resurssit?"
 

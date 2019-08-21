@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 16:41+0800\n"
-"PO-Revision-Date: 2019-08-12 07:32+0000\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Greek (http://www.transifex.com/supertuxkart/supertuxkart/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -421,7 +421,6 @@ msgstr "* Επανεκκίνηση του STK για εφαρμογή νέων �
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -977,28 +976,6 @@ msgstr "Συντελεστές"
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "Δωρίστε για να βοηθήσετε το SuperTuxKart!"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr "Περιλαμβάνει όλες τις Πίστες"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr "Χρησιμοποίησε υψηλή ποιότητα στα textures και στην μουσική"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1841,8 +1818,8 @@ msgstr "Εμφάνιση ιδιωτικού(ών) server"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "Κρύψε τους servers με ένα παιχνίδι σε εξέλιξη"
+msgid "Use IPV6 connection if server supports"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -3257,7 +3234,7 @@ msgstr "Ολοκλήρωσες τον αγώνα!"
 msgid "%s left the game."
 msgstr "%s έφυγε απο το παινχίδι."
 
-#: src/main.cpp:1840
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3268,16 +3245,16 @@ msgid ""
 "statistics\")."
 msgstr "Το SuperTuxKart μπορεί να συνδεθεί σε έναν server για να κατεβάζετε πρόσθετα και σας ειδοποιεί για ενημερώσεις. Επίσης συλλέγουμε ανώνυμα στατιστικά υλικού για να βοηθηθεί η ανάπτυξη του STK. Παρακαλούμε διαβάστε την πολιτική απορρήτου στην σελίδα http://privacy.supertuxkart.net. Θέλετε αυτό το χαρακτηριστικό να ενεργοποιηθεί; (Για να αλλάξετε αυτή τη ρύθμιση σε μεταγενέστερο χρόνο, πηγαίνετε στις επιλογές, επιλέξτε την καρτέλα «Εμφάνιση» και επεξεργαστείτε τα \"Σύνδεση στο Internet\" και \"Αποστολή στατιστικών υλικού ανώνυμα\")."
 
-#: src/main.cpp:2108
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr "Η ανάλυση της οθόνης σας είναι πολύ χαμηλή για να τρέξει το STK."
 
-#: src/main.cpp:2140
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Η έκδοση του οδηγού γραφικών είναι πολύ παλιά. Παρακαλώ εγκαταστήστε τον πιο πρόσφατο οδηγό γραφικών."
 
-#: src/main.cpp:2158
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3542,11 +3519,11 @@ msgstr "Πάτηστε <%s> ή <%s> για να αλλάξετε τον παίκ
 msgid "Successfully reported %s."
 msgstr "Πετύχε το παράπονο %s."
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr "Δεν υπάρχει server διαθέσιμος για γρήγορο παιχνίδι."
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Δεν είναι δυνατή η σύνδεση στον server  %s."
@@ -5074,15 +5051,15 @@ msgid "Distance (km)"
 msgstr "Απόσταση (χλμ.)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "Άγνωστο"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr "Δεν υπάρχει διαθέσιμος server."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr "Λήψη των server"
 
@@ -5277,7 +5254,7 @@ msgstr ""
 msgid "Install full game assets"
 msgstr ""
 
-#: src/states_screens/options/options_screen_general.cpp:256
+#: src/states_screens/options/options_screen_general.cpp:264
 msgid "Are you sure to uninstall full game assets?"
 msgstr ""
 
