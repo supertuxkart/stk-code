@@ -23,7 +23,6 @@
 #include "io/file_manager.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
-#include "network/unix_ipv6.hpp"
 #include "network/network_config.hpp"
 #include "network/network_console.hpp"
 #include "network/network_player_profile.hpp"
@@ -33,6 +32,7 @@
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/server_config.hpp"
+#include "network/stk_ipv6.hpp"
 #include "network/stk_peer.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -726,7 +726,7 @@ void STKHost::setPublicAddress()
         Log::debug("STKHost", "Using STUN server %s", server_name.c_str());
         uint64_t ping = StkTime::getMonoTimeMs();
         std::string ipv4_string = getIPFromStun(
-            m_network->getENetHost()->socket, server_name, true/*ipv4*/);
+            (int)m_network->getENetHost()->socket, server_name, true/*ipv4*/);
         TransportAddress addr(ipv4_string);
         if (!addr.isUnset())
         {
@@ -737,7 +737,7 @@ void STKHost::setPublicAddress()
             if (isIPV6())
             {
                 m_public_ipv6_address = getIPFromStun(
-                    m_network->getENetHost()->socket, server_name,
+                    (int)m_network->getENetHost()->socket, server_name,
                     false/*ipv4*/);
                 if (m_public_ipv6_address.empty())
                 {
@@ -755,16 +755,32 @@ void STKHost::setPublicAddress()
 //-----------------------------------------------------------------------------
 void STKHost::setPrivatePort()
 {
-    struct sockaddr_in sin;
-    socklen_t len = sizeof(sin);
-    ENetHost *host = m_network->getENetHost();
-    if (getsockname(host->socket, (struct sockaddr *)&sin, &len) == -1)
+    if (isIPV6())
     {
-        Log::error("STKHost", "Error while using getsockname().");
-        m_private_port = 0;
+        struct sockaddr_in6 sin6;
+        socklen_t len = sizeof(sin6);
+        ENetHost *host = m_network->getENetHost();
+        if (getsockname(host->socket, (struct sockaddr *)&sin6, &len) == -1)
+        {
+            Log::error("STKHost", "Error while using getsockname().");
+            m_private_port = 0;
+        }
+        else
+            m_private_port = ntohs(sin6.sin6_port);
     }
     else
-        m_private_port = ntohs(sin.sin_port);
+    {
+        struct sockaddr_in sin;
+        socklen_t len = sizeof(sin);
+        ENetHost *host = m_network->getENetHost();
+        if (getsockname(host->socket, (struct sockaddr *)&sin, &len) == -1)
+        {
+            Log::error("STKHost", "Error while using getsockname().");
+            m_private_port = 0;
+        }
+        else
+            m_private_port = ntohs(sin.sin_port);
+    }
 }   // setPrivatePort
 
 //-----------------------------------------------------------------------------

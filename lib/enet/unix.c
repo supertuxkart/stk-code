@@ -59,7 +59,7 @@ typedef int socklen_t;
 static enet_uint32 timeBase = 0;
 
 #ifdef ENABLE_IPV6
-extern void unixInitialize(void);
+extern void stkInitialize(void);
 extern int isIPV6(void);
 extern void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
 extern void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
@@ -69,7 +69,7 @@ int
 enet_initialize (void)
 {
 #ifdef ENABLE_IPV6
-    unixInitialize();
+    stkInitialize();
 #endif
     return 0;
 }
@@ -268,7 +268,7 @@ enet_socket_create (ENetSocketType type)
 #endif
     int socket_fd = socket (af_family, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
 #ifdef ENABLE_IPV6
-    if (isIPV6())
+    if (isIPV6() && socket_fd != -1)
     {
         int no = 0;
         // Allow ipv6 socket listen to ipv4 connection (as long as the host has ipv4 address)

@@ -51,12 +51,8 @@ std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in)
 {
     std::string result;
     char ipv6[INET6_ADDRSTRLEN] = {};
-#ifdef WIN32
-    struct sockaddr_in6 copied = *in;
-    inet_ntop(AF_INET6, &copied, ipv6, INET6_ADDRSTRLEN);
-#else
-    inet_ntop(AF_INET6, &(in->sin6_addr), ipv6, INET6_ADDRSTRLEN);
-#endif
+    struct in6_addr ipv6_addr = in->sin6_addr;
+    inet_ntop(AF_INET6, &ipv6_addr, ipv6, INET6_ADDRSTRLEN);
     result = ipv6;
     return result;
 }   // getIPV6ReadableFromIn6
@@ -134,7 +130,7 @@ extern "C" int getaddrinfo_compat(const char* hostname,
 }
 
 #ifndef ENABLE_IPV6
-#include "network/unix_ipv6.hpp"
+#include "network/stk_ipv6.hpp"
 // ----------------------------------------------------------------------------
 int isIPV6()
 {
@@ -164,7 +160,7 @@ void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
 
 #else
 
-#include "network/unix_ipv6.hpp"
+#include "network/stk_ipv6.hpp"
 #include "network/transport_address.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
@@ -203,13 +199,13 @@ void setIPV6(int val)
 }   // setIPV6
 
 // ----------------------------------------------------------------------------
-void unixInitialize()
+void stkInitialize()
 {
     // Clear previous setting, in case user changed wifi or mobile data
     g_mapped_ipv6_used = 0;
     g_ipv6 = 0;
     g_mapped_ips.clear();
-}   // unixInitialize
+}   // stkInitialize
 
 // ----------------------------------------------------------------------------
 std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
@@ -276,13 +272,21 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
         return;
     }
 
-    uint16_t w0 = in6->sin6_addr.s6_addr16[0];
-    uint16_t w1 = in6->sin6_addr.s6_addr16[1];
-    uint16_t w2 = in6->sin6_addr.s6_addr16[2];
-    uint16_t w3 = in6->sin6_addr.s6_addr16[3];
-    uint16_t w4 = in6->sin6_addr.s6_addr16[4];
-    uint16_t w5 = in6->sin6_addr.s6_addr16[5];
-    if (w0 == 0 && w1 == 0 && w2 == 0 && w3 == 0 && w4 == 0 && w5 == 0xFFFF)
+    uint8_t w0 = in6->sin6_addr.s6_addr[0];
+    uint8_t w1 = in6->sin6_addr.s6_addr[1];
+    uint8_t w2 = in6->sin6_addr.s6_addr[2];
+    uint8_t w3 = in6->sin6_addr.s6_addr[3];
+    uint8_t w4 = in6->sin6_addr.s6_addr[4];
+    uint8_t w5 = in6->sin6_addr.s6_addr[5];
+    uint8_t w6 = in6->sin6_addr.s6_addr[6];
+    uint8_t w7 = in6->sin6_addr.s6_addr[7];
+    uint8_t w8 = in6->sin6_addr.s6_addr[8];
+    uint8_t w9 = in6->sin6_addr.s6_addr[9];
+    uint8_t w10 = in6->sin6_addr.s6_addr[10];
+    uint8_t w11 = in6->sin6_addr.s6_addr[11];
+    if (w0 == 0 && w1 == 0 && w2 == 0 && w3 == 0 && w4 == 0 &&
+        w5 == 0 && w6 == 0 && w7 == 0 && w8 == 0 && w9 == 0 &&
+        w10 == 0xff && w11 == 0xff)
     {
         ea->host = ((in_addr*)(in6->sin6_addr.s6_addr + 12))->s_addr;
         ea->port = ntohs(in6->sin6_port);

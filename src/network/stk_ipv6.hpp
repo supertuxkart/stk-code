@@ -23,7 +23,7 @@ extern "C" {
 #endif
 int isIPV6();
 void setIPV6(int val);
-void unixInitialize();
+void stkInitialize();
 void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
 void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
 void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6);
