@@ -37,7 +37,9 @@
 STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
        : m_peer_address(enet_peer->address), m_host(host)
 {
-    m_ipv6_address = getIPV6ReadableFromMappedAddress(&enet_peer->address);
+    // We use 0.x.x.x ip to map to ipv6 address internally
+    if (m_peer_address.getIP() < 16777216)
+        m_ipv6_address = getIPV6ReadableFromMappedAddress(&enet_peer->address);
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
     m_connected_time      = StkTime::getMonoTimeMs();

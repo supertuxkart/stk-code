@@ -382,7 +382,7 @@ void ProtocolManager::update(int ticks)
         }
         catch (std::exception& e)
         {
-            const std::string& name = (*i)->getPeer()->getAddress().toString();
+            const std::string& name = (*i)->getPeer()->getRealAddress();
             Log::error("ProtocolManager",
                 "Synchronous event error from %s: %s", name.c_str(), e.what());
             Log::error("ProtocolManager", (*i)->data().getLogMessage().c_str());
@@ -441,7 +441,7 @@ void ProtocolManager::asynchronousUpdate()
         }
         catch (std::exception& e)
         {
-            const std::string& name = (*i)->getPeer()->getAddress().toString();
+            const std::string& name = (*i)->getPeer()->getRealAddress();
             Log::error("ProtocolManager", "Asynchronous event "
                 "error from %s: %s", name.c_str(), e.what());
             Log::error("ProtocolManager",

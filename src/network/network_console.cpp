@@ -91,7 +91,8 @@ void mainLoop(STKHost* host)
                 peer->kick();
                 // ATM use permanently ban
                 auto sl = LobbyProtocol::get<ServerLobby>();
-                if (sl)
+                // We don't support banning ipv6 address atm
+                if (sl && peer->getIPV6Address().empty())
                     sl->saveIPBanTable(peer->getAddress());
             }
             else
@@ -105,7 +106,7 @@ void mainLoop(STKHost* host)
             for (unsigned int i = 0; i < peers.size(); i++)
             {
                 std::cout << peers[i]->getHostId() << ": " <<
-                    peers[i]->getAddress().toString() <<  " " <<
+                    peers[i]->getRealAddress() <<  " " <<
                     peers[i]->getUserVersion() << std::endl;
             }
         }

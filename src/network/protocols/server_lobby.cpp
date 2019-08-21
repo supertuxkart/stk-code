@@ -1387,14 +1387,14 @@ void ServerLobby::liveJoinRequest(Event* event)
         for (int id : used_id)
         {
             Log::info("ServerLobby", "%s live joining with reserved kart id %d.",
-                peer->getAddress().toString().c_str(), id);
+                peer->getRealAddress().c_str(), id);
             peer->addAvailableKartID(id);
         }
     }
     else
     {
         Log::info("ServerLobby", "%s spectating now.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
     }
 
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players =
@@ -1532,7 +1532,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     if (!live_joined_in_time)
     {
         Log::warn("ServerLobby", "%s can't live-join in time.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         rejectLiveJoin(peer.get(), BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
@@ -1553,12 +1553,12 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
         const RemoteKartInfo& rki = race_manager->getKartInfo(id);
         addLiveJoiningKart(id, rki, m_last_live_join_util_ticks);
         Log::info("ServerLobby", "%s succeeded live-joining with kart id %d.",
-            peer->getAddress().toString().c_str(), id);
+            peer->getRealAddress().c_str(), id);
     }
     if (peer->getAvailableKartIDs().empty())
     {
         Log::info("ServerLobby", "%s spectating succeeded.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         spectator = true;
     }
 
@@ -1631,7 +1631,7 @@ void ServerLobby::update(int ticks)
                 // Remove loading world too long (60 seconds) live join peer
                 Log::info("ServerLobby", "%s hasn't live-joined within"
                     " 60 seconds, remove it.",
-                    peer->getAddress().toString().c_str());
+                    peer->getRealAddress().c_str());
                 rki.makeReserved();
                 continue;
             }
@@ -1642,7 +1642,7 @@ void ServerLobby::update(int ticks)
                     continue;
                 Log::info("ServerLobby", "%s %s has been idle for more than"
                     " %d seconds, kick.",
-                    peer->getAddress().toString().c_str(),
+                    peer->getRealAddress().c_str(),
                     StringUtils::wideToUtf8(rki.getPlayerName()).c_str(), sec);
                 peer->kick();
             }
@@ -3010,7 +3010,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
                 Log::info("ServerLobby",
                     "New player %s with online id %u from %s with %s.",
                     StringUtils::wideToUtf8(npp->getName()).c_str(),
-                    npp->getOnlineId(), peer->getAddress().toString().c_str(),
+                    npp->getOnlineId(), peer->getRealAddress().c_str(),
                     peer->getUserVersion().c_str());
             }
         }
@@ -3727,7 +3727,7 @@ void ServerLobby::configPeersStartTime()
         {
             Log::warn("ServerLobby",
                 "Peer %s cannot catch up with max ping %d.",
-                peer->getAddress().toString().c_str(), max_ping);
+                peer->getRealAddress().c_str(), max_ping);
             continue;
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
@@ -3802,7 +3802,7 @@ void ServerLobby::addWaitingPlayersToGame()
                     "New player %s with online id %u from %s with %s.",
                     StringUtils::wideToUtf8(profile->getName()).c_str(),
                     profile->getOnlineId(),
-                    peer->getAddress().toString().c_str(),
+                    peer->getRealAddress().c_str(),
                     peer->getUserVersion().c_str());
             }
         }
@@ -3868,7 +3868,7 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
             const char* desc = (char*)sqlite3_column_text(stmt, 4);
             Log::info("ServerLobby", "%s banned by IP: %s "
                 "(rowid: %d, description: %s).",
-                peer->getAddress().toString().c_str(), reason, row_id, desc);
+                peer->getRealAddress().c_str(), reason, row_id, desc);
             kickPlayerWithReason(peer, reason);
         }
         ret = sqlite3_finalize(stmt);
@@ -3927,7 +3927,7 @@ void ServerLobby::testBannedForOnlineId(STKPeer* peer,
             const char* desc = (char*)sqlite3_column_text(stmt, 2);
             Log::info("ServerLobby", "%s banned by online id: %s "
                 "(online id: %u rowid: %d, description: %s).",
-                peer->getAddress().toString().c_str(), reason, online_id,
+                peer->getRealAddress().c_str(), reason, online_id,
                 row_id, desc);
             kickPlayerWithReason(peer, reason);
         }
@@ -4329,7 +4329,7 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
     if (!w || !worldIsActive() || peer->isWaitingForGame())
     {
         Log::warn("ServerLobby", "%s try to leave the game at wrong time.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         return;
     }
 
@@ -4339,14 +4339,14 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
         if (rki.getHostId() == peer->getHostId())
         {
             Log::info("ServerLobby", "%s left the game with kart id %d.",
-                peer->getAddress().toString().c_str(), id);
+                peer->getRealAddress().c_str(), id);
             rki.setNetworkPlayerProfile(
                 std::shared_ptr<NetworkPlayerProfile>());
         }
         else
         {
             Log::error("ServerLobby", "%s doesn't exist anymore in server.",
-                peer->getAddress().toString().c_str());
+                peer->getRealAddress().c_str());
         }
     }
     NetworkItemManager* nim =
@@ -4382,7 +4382,7 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
     {
         Log::warn("ServerLobby",
             "%s try to leave selecting assets at wrong time.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         return;
     }
 
