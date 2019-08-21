@@ -19,10 +19,10 @@
                 <spacer width="10"/>
                 <label proportion="1" height="100%" text_align="left"
                        I18N="In the server selection screen" text="Show private server(s)"/>
-                <checkbox width="fit" id="game_started" text_align="left"/>
+                <checkbox width="fit" id="ipv6" text_align="left"/>
                 <spacer width="10"/>
                 <label proportion="1" height="100%" text_align="left"
-                       I18N="In the server selection screen" text="Hide servers with an ongoing game"/>
+                       I18N="In the server selection screen" text="Use IPV6 connection if server supports"/>
             </div>
         </div>
     </div>
