@@ -40,7 +40,6 @@ extern "C"
 #include <err.h>
 #include <netdb.h>
 #include <sys/socket.h>
-#include <sys/sysctl.h>
 #include <stdlib.h>
 #endif
 

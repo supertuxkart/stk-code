@@ -135,7 +135,7 @@ LOCAL_MODULE       := enet
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/enet/*.c)
-LOCAL_CFLAGS       := -I../lib/enet/include/ -DHAS_SOCKLEN_T
+LOCAL_CFLAGS       := -I../lib/enet/include/ -DHAS_SOCKLEN_T -DENABLE_IPV6
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -209,6 +209,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -DUSE_GLES2      \
                       -DMOBILE_STK     \
                       -DENABLE_SOUND   \
+                      -DENABLE_IPV6    \
                       -DENABLE_CRYPTO_OPENSSL           \
                       -DNDEBUG         \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
