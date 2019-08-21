@@ -15,15 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <enet/enet.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 int isIPV6Only();
-void iOSInitialize();
-void getSynthesizedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
-void getIPV4FromSynthesized(const struct sockaddr_in6* in6, ENetAddress* ea);
 #ifdef __cplusplus
 }
 #endif

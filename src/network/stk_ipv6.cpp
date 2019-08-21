@@ -160,6 +160,7 @@ void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
 #else
 
 #include "network/stk_ipv6.hpp"
+#include "network/ios_ipv6.hpp"
 #include "network/transport_address.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
@@ -204,6 +205,10 @@ void stkInitialize()
     g_mapped_ipv6_used = 0;
     g_ipv6 = 0;
     g_mapped_ips.clear();
+#ifdef IOS_STK
+    if (isIPV6Only())
+        g_ipv6 = 1;
+#endif
 }   // stkInitialize
 
 // ----------------------------------------------------------------------------

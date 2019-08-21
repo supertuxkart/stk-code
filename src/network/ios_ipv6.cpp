@@ -20,16 +20,15 @@
 #ifdef IOS_STK
 
 #include "network/ios_ipv6.hpp"
-#include "network/transport_address.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/log.hpp"
 
 #include <arpa/inet.h>
 #include <err.h>
+#include <errno.h>
 #include <netdb.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/sysctl.h>
+#include <unistd.h>
 
 #if TARGET_IPHONE_SIMULATOR
 #include <net/route.h>
@@ -43,11 +42,6 @@
 
 #define NAME_SVR ("nameserver")
 #define NAME_SVR_LEN (10)
-
-
-int g_ipv6_only;
-struct sockaddr_in6 g_connected_ipv6;
-ENetAddress g_connected_ipv4;
 
 namespace Mars
 {
@@ -271,94 +265,18 @@ namespace Mars
     }
 }
 
+// ============================================================================
+/** Return 1 if this iOS device has only IPV6 address, in this case we always
+ *  create inet6 socket in enet and try to use the NAT64 (provided by iOS)
+ *  to connect to ipv4 server. */
 int isIPV6Only()
 {
-    return g_ipv6_only;
-}
-
-void iOSInitialize()
-{
-    // Clear previous setting, in case user changed wifi or mobile data
-    g_ipv6_only = 0;
-    g_connected_ipv4.host = 0;
-    g_connected_ipv4.port = 0;
-    memset(&g_connected_ipv6, 0, sizeof(struct sockaddr_in6));
-
     using namespace Mars;
     int ipstack = local_ipstack_detect();
     if (ipstack == ELocalIPStack_IPv6)
-        g_ipv6_only = 1;
-}   // iOSInitialize
-
-void getSynthesizedAddress(const ENetAddress* ea, struct sockaddr_in6* in6)
-{
-    if (ea->host != g_connected_ipv4.host &&
-        ea->port != g_connected_ipv4.port)
-    {
-        g_connected_ipv4.host = ea->host;
-        g_connected_ipv4.port = ea->port;
-        memset(&g_connected_ipv6, 0, sizeof(struct sockaddr_in6));
-        g_connected_ipv6.sin6_family = AF_INET6;
-        TransportAddress addr(*ea);
-        // The ability to synthesize IPv6 addresses was added to getaddrinfo in iOS 9.2
-        struct addrinfo hints, *res;
-
-        memset(&hints, 0, sizeof hints);
-        hints.ai_family = AF_UNSPEC;
-        hints.ai_socktype = SOCK_STREAM;
-
-        // Resolve the stun server name so we can send it a STUN request
-        const std::string& ipv4 = addr.toString(false/*show_port*/);
-        int status = getaddrinfo(ipv4.c_str(), StringUtils::toString(ea->port).c_str(),
-            &hints, &res);
-        if (status != 0)
-        {
-            Log::error("STKHost", "Error in getaddrinfo for synthesizing ipv6"
-                       " %s: %s", ipv4.c_str(), gai_strerror(status));
-            return;
-        }
-        assert(res != NULL);
-        for (const struct addrinfo* addr = res; addr != NULL; addr = addr->ai_next)
-        {
-            if (addr->ai_family == AF_INET6)
-            {
-                struct sockaddr_in6* ipv6 = (struct sockaddr_in6*)addr->ai_addr;
-                g_connected_ipv6.sin6_addr = ipv6->sin6_addr;
-                // Workaround in iOS 9 where port is not written (fixed in iOS 10)
-                if (ipv6->sin6_port == 0)
-                    ipv6->sin6_port = htons(ea->port);
-                g_connected_ipv6.sin6_port = ipv6->sin6_port;
-                break;
-            }
-        }
-        freeaddrinfo(res);
-    }
-    memcpy(in6, &g_connected_ipv6, sizeof(struct sockaddr_in6));
-}
-
-bool sameIPV6(const struct in6_addr* a, const struct in6_addr* b)
-{
-    for (unsigned i = 0; i < sizeof(struct in6_addr); i++)
-    {
-        if (a->s6_addr[i] != b->s6_addr[i])
-            return false;
-    }
-    return true;
-}
-
-void getIPV4FromSynthesized(const struct sockaddr_in6* in6, ENetAddress* ea)
-{
-    if (sameIPV6(&(in6->sin6_addr), &(g_connected_ipv6.sin6_addr)) &&
-        in6->sin6_port == g_connected_ipv6.sin6_port)
-    {
-        ea->host = g_connected_ipv4.host;
-        ea->port = g_connected_ipv4.port;
-    }
+        return 1;
     else
-    {
-        ea->host = 0;
-        ea->port = 0;
-    }
-}
+        return 0;
+}   // isIPV6Only
 
 #endif

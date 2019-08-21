@@ -386,10 +386,21 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
         struct addrinfo hints;
         struct addrinfo* res = NULL;
         memset(&hints, 0, sizeof(hints));
-        hints.ai_family = AF_INET6;
+        hints.ai_family = AF_UNSPEC;
         hints.ai_socktype = SOCK_STREAM;
-        if (getaddrinfo(m_server->getIPV6Address().c_str(),
-            StringUtils::toString(m_server->getAddress().getPort()).c_str(),
+        std::string addr_string = m_server->getIPV6Address();
+        std::string port =
+            StringUtils::toString(m_server->getAddress().getPort());
+#ifdef IOS_STK
+        // The ability to synthesize IPv6 addresses was added to getaddrinfo
+        // in iOS 9.2
+        if (!m_server->useIPV6Connection())
+        {
+            // From IPV4
+            addr_string = m_server->getAddress().toString(false/*show_port*/);
+        }
+#endif
+        if (getaddrinfo_compat(addr_string.c_str(), port.c_str(),
             &hints, &res) != 0 || res == NULL)
             return false;
         for (const struct addrinfo* addr = res; addr != NULL;
@@ -397,13 +408,12 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
         {
             if (addr->ai_family == AF_INET6)
             {
-                struct sockaddr_in6* ipv6 =
+                struct sockaddr_in6* ipv6_sock =
                     (struct sockaddr_in6*)addr->ai_addr;
                 ENetAddress addr = m_server_address.toEnetAddress();
-                connecting_address = std::string("[") +
-                    m_server->getIPV6Address() + "]:" +
+                connecting_address = std::string("[") + addr_string + "]:" +
                     StringUtils::toString(addr.port);
-                addMappedAddress(&addr, ipv6);
+                addMappedAddress(&addr, ipv6_sock);
                 break;
             }
         }
