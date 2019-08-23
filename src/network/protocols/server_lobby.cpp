@@ -222,11 +222,13 @@ void ServerLobby::initServerStatsTable()
         StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
         ServerConfig::m_server_uid + "_stats";
 
-    std::string query = StringUtils::insertValues(
-        "CREATE TABLE IF NOT EXISTS %s (\n"
+    std::ostringstream oss;
+    oss << "CREATE TABLE IF NOT EXISTS " << table_name << " (\n"
         "    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer\n"
-        "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n"
-        "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
+        "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n";
+    if (ServerConfig::m_ipv6_server)
+        oss << "    ipv6 TEXT NOT NULL DEFAULT '', -- IPV6 (if exists) in string of host\n";
+    oss << "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
         "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
         "    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)\n"
         "    player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player\n"
@@ -235,7 +237,8 @@ void ServerLobby::initServerStatsTable()
         "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
         "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
         "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host\n"
-        ") WITHOUT ROWID;", table_name.c_str());
+        ") WITHOUT ROWID;";
+    std::string query = oss.str();
     sqlite3_stmt* stmt = NULL;
     int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
     if (ret == SQLITE_OK)
@@ -278,11 +281,13 @@ void ServerLobby::initServerStatsTable()
     std::string full_stats_view_name = std::string("v") +
         StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
         ServerConfig::m_server_uid + "_full_stats";
-    std::ostringstream oss;
+    oss.str("");
     oss << "CREATE VIEW IF NOT EXISTS " << full_stats_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
-        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num,\n"
+        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
+    if (ServerConfig::m_ipv6_server)
+        oss << "    ipv6,";
+    oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, disconnected_time, ping FROM " << m_server_stats_table << "\n"
@@ -302,8 +307,10 @@ void ServerLobby::initServerStatsTable()
     oss.clear();
     oss << "CREATE VIEW IF NOT EXISTS " << current_players_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
-        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num,\n"
+        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
+    if (ServerConfig::m_ipv6_server)
+        oss << "    ipv6,";
+    oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", 'now') - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, ping FROM " << m_server_stats_table << "\n"
@@ -338,7 +345,10 @@ void ServerLobby::initServerStatsTable()
     else
     {
         oss << "CREATE VIEW IF NOT EXISTS " << player_stats_view_name << " AS\n"
-            << "    SELECT a.online_id, a.username, a.ip, a.ip_readable, a.port, a.player_num,\n"
+            << "    SELECT a.online_id, a.username, a.ip, a.ip_readable,\n";
+        if (ServerConfig::m_ipv6_server)
+            oss << "    a.ipv6,";
+        oss << "    a.port, a.player_num,\n"
             << "    a.country_code, a.country_flag, a.country_name, a.version, a.ping,\n"
             << "    b.num_connections, b.first_connected_time, b.first_disconnected_time,\n"
             << "    a.connected_time AS last_connected_time, a.disconnected_time AS last_disconnected_time,\n"
@@ -923,14 +933,32 @@ void ServerLobby::writePlayerReport(Event* event)
         return;
     auto reporting_npp = reporting_peer->getPlayerProfiles()[0];
 
-    std::string query = StringUtils::insertValues(
-        "INSERT INTO %s "
-        "(server_uid, reporter_ip, reporter_online_id, reporter_username, "
-        "info, reporting_ip, reporting_online_id, reporting_username) "
-        "VALUES (?, %u, %u, ?, ?, %u, %u, ?);",
-        ServerConfig::m_player_reports_table.c_str(),
-        reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
-        reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId());
+    std::string query;
+    if (ServerConfig::m_ipv6_server)
+    {
+        // We don't save the internally mapped ipv4 (0.x.x.x)
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(server_uid, reporter_ip, reporter_ipv6, reporter_online_id, reporter_username, "
+            "info, reporting_ip, reporting_ipv6, reporting_online_id, reporting_username) "
+            "VALUES (?, %u, \"%s\", %u, ?, ?, %u, \"%s\", %u, ?);",
+            ServerConfig::m_player_reports_table.c_str(),
+            reporter->getIPV6Address().empty() ? reporter->getAddress().getIP() : 0,
+            reporter->getIPV6Address(), reporter_npp->getOnlineId(),
+            reporting_peer->getIPV6Address().empty() ? reporting_peer->getAddress().getIP() : 0,
+            reporting_peer->getIPV6Address(), reporting_npp->getOnlineId());
+    }
+    else
+    {
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(server_uid, reporter_ip, reporter_online_id, reporter_username, "
+            "info, reporting_ip, reporting_online_id, reporting_username) "
+            "VALUES (?, %u, %u, ?, ?, %u, %u, ?);",
+            ServerConfig::m_player_reports_table.c_str(),
+            reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
+            reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId());
+    }
     bool written = easySQLQuery(query,
         [reporter_npp, reporting_npp, info](sqlite3_stmt* stmt)
         {
@@ -3026,14 +3054,30 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
 #ifdef ENABLE_SQLITE3
     if (m_server_stats_table.empty())
         return;
-    std::string query = StringUtils::insertValues(
-        "INSERT INTO %s "
-        "(host_id, ip, port, online_id, username, player_num, "
-        "country_code, version, ping) "
-        "VALUES (%u, %u, %u, %u, ?, %u, ?, ?, %u);",
-        m_server_stats_table.c_str(), peer->getHostId(),
-        peer->getAddress().getIP(), peer->getAddress().getPort(), online_id,
-        player_count, peer->getAveragePing());
+    std::string query;
+    if (ServerConfig::m_ipv6_server && !peer->getIPV6Address().empty())
+    {
+        // We don't save the internally mapped ipv4 (0.x.x.x)
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(host_id, ip, ipv6 ,port, online_id, username, player_num, "
+            "country_code, version, ping) "
+            "VALUES (%u, 0, \"%s\" ,%u, %u, ?, %u, ?, ?, %u);",
+            m_server_stats_table.c_str(), peer->getHostId(),
+            peer->getIPV6Address(), peer->getAddress().getPort(), online_id,
+            player_count, peer->getAveragePing());
+    }
+    else
+    {
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(host_id, ip, port, online_id, username, player_num, "
+            "country_code, version, ping) "
+            "VALUES (%u, %u, %u, %u, ?, %u, ?, ?, %u);",
+            m_server_stats_table.c_str(), peer->getHostId(),
+            peer->getAddress().getIP(), peer->getAddress().getPort(),
+            online_id, player_count, peer->getAveragePing());
+    }
     easySQLQuery(query, [peer, country_code](sqlite3_stmt* stmt)
         {
             if (sqlite3_bind_text(stmt, 1, StringUtils::wideToUtf8(
@@ -3839,6 +3883,10 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
 {
 #ifdef ENABLE_SQLITE3
     if (!m_db || !m_ip_ban_table_exists)
+        return;
+
+    // We only test for ipv4 atm
+    if (!peer->getIPV6Address().empty())
         return;
 
     int row_id = -1;
