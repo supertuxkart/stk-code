@@ -82,9 +82,9 @@ void CameraNormal::moveCamera(float dt, bool smooth)
     Kart *kart = dynamic_cast<Kart*>(m_kart);
     if (kart->isFlying())
     {
-        Vec3 vec3 = m_kart->getSmoothedXYZ() + Vec3(sinf(m_kart->getHeading()) * -4.0f,
+        Vec3 vec3 = m_kart->getSmoothedXYZ() + Vec3(sin(m_kart->getHeading()) * -4.0f,
             0.5f,
-            cosf(m_kart->getHeading()) * -4.0f);
+            cos(m_kart->getHeading()) * -4.0f);
         m_camera->setTarget(m_kart->getSmoothedXYZ().toIrrVector());
         m_camera->setPosition(vec3.toIrrVector());
         return;
@@ -99,7 +99,7 @@ void CameraNormal::moveCamera(float dt, bool smooth)
     const Skidding *ks = m_kart->getSkidding();
     float skid_factor = ks->getVisualSkidRotation();
 
-    float skid_angle = asinf(skid_factor);
+    float skid_angle = asin(skid_factor);
     float ratio = current_speed / max_speed_without_zipper;
 
     ratio = ratio > -0.12f ? ratio : -0.12f;
@@ -109,9 +109,9 @@ void CameraNormal::moveCamera(float dt, bool smooth)
     if (camera_distance > -2.0f) camera_distance = -2.0f; // don't get too close to the kart
 
     // Defines how far camera should be from player kart.
-    Vec3 wanted_camera_offset(camera_distance * sinf(skid_angle / 2),
+    Vec3 wanted_camera_offset(camera_distance * sin(skid_angle / 2),
         (0.85f + ratio / 2.5f),
-        camera_distance * cosf(skid_angle / 2));
+        camera_distance * cos(skid_angle / 2));
 
     float delta = 1;
     float delta2 = 1;
@@ -325,7 +325,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
     Vec3 wanted_position;
     Vec3 wanted_target = m_kart->getSmoothedTrans()(Vec3(0, above_kart, 0));
 
-    float tan_up = tanf(cam_angle);
+    float tan_up = tan(cam_angle);
     Vec3 relative_position(side_way,
                            fabsf(distance)*tan_up+above_kart,
                            distance);

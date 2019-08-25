@@ -28,8 +28,6 @@
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "online/request_manager.hpp"
-#include "online/xml_request.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/vote_dialog.hpp"
@@ -171,18 +169,18 @@ void AddonsLoading::beforeAddingWidgets()
         float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
         char s[32];
         sprintf(s, "%.1f", f);
-        unit = _("%s MB", s);
+        unit = _LTR("%s MB", s);
     }
     else if(n>1024)
     {
         float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
         char s[32];
         sprintf(s, "%.1f", f);
-        unit = _("%s KB", s);
+        unit = _LTR("%s KB", s);
     }
     else
         // Anything smaller just let it be 1 KB
-        unit = _("%s KB", 1);
+        unit = _LTR("%s KB", 1);
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
 #endif
@@ -285,7 +283,7 @@ void AddonsLoading::onUpdate(float delta)
     if(m_progress->isVisible())
     {
         float progress = m_download_request->getProgress();
-        m_progress->setValue(progress*100.0f);
+        m_progress->setValue((int)(progress*100.0f));
         if(progress<0)
         {
             // Avoid displaying '-100%' in case of an error.

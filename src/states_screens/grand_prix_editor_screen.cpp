@@ -31,7 +31,6 @@
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -171,7 +170,7 @@ void GrandPrixEditorScreen::setSelection (const GrandPrixData* gpdata)
     else
     {
         m_selection = grand_prix_manager->editGrandPrix(gpdata->getId());
-        gpname_widget->setText(gpdata->getName(), true);
+        gpname_widget->setText(translations->fribidize(gpdata->getName()), true);
         gplist_widget->setSelection(m_selection->getId(), PLAYER_ID_GAME_MASTER, true);
         loadTrackList (gpdata->getId());
     }
@@ -205,7 +204,7 @@ void GrandPrixEditorScreen::loadTrackList (const std::string& gpname)
         else
         {
             tracks_widget->addItem(
-                StringUtils::toWString(t + 1) + ". " + curr->getName(),
+                StringUtils::toWString(t + 1) + ". " + translations->fribidize(curr->getName()),
                 curr->getIdent(), curr->getScreenshotFile(), 0,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }
@@ -243,7 +242,8 @@ void GrandPrixEditorScreen::loadGPList()
 
         if (m_gpgroup == GrandPrixData::GP_NONE || m_gpgroup == gp->getGroup())
         {
-            gplist_widget->addAnimatedItem(gp->getName(),
+            gplist_widget->addAnimatedItem(
+                translations->fribidize(gp->getName()),
                 gp->getId(), sshot_files, 2.0f, 0,
                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
         }

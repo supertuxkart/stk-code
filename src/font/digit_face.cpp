@@ -22,7 +22,7 @@
 /** Constructor of DigitFace.
  *  \param ttf \ref FaceTTF for DigitFace to use.
  */
-DigitFace::DigitFace() : FontWithFace("DigitFace")
+DigitFace::DigitFace(FaceTTF* ttf) : FontWithFace("DigitFace", ttf)
 {
 }   // DigitFace
 
@@ -30,8 +30,9 @@ DigitFace::DigitFace() : FontWithFace("DigitFace")
 void DigitFace::init()
 {
     FontWithFace::init();
-    // Reserve some space for characters added later in the next line
-    m_font_max_height = m_glyph_max_height * 7 / 5;
+
+    m_font_max_height = m_glyph_max_height + 10;
+
 }   // init
 
 // ----------------------------------------------------------------------------

@@ -23,8 +23,6 @@
 #include "tracks/check_line.hpp"
 #include "utils/cpp2011.hpp"
 
-#include <set>
-
 class CheckManager;
 class Flyable;
 class Ipo;
@@ -37,8 +35,8 @@ namespace SP
 }
 
 /**
- *  \brief Implements a simple checkline that will cause a kart or flyable to
- *         be shot to a specified point.
+ *  \brief Implements a simple checkline that will cause a kart to be
+ *         shot to a specified point.
  *
  * \ingroup tracks
  */
@@ -60,37 +58,19 @@ private:
     /** Used to display debug information about checklines. */
     std::shared_ptr<SP::SPDynamicDrawCall> m_debug_target_dy_dc;
 #endif
+    std::vector<Flyable*> m_all_flyables;
+    std::vector<Vec3>     m_flyable_previous_position;
 
-    std::set<Flyable*> m_all_flyables;
 public:
              CheckCannon(const XMLNode &node, unsigned int index);
-    // ------------------------------------------------------------------------
     virtual ~CheckCannon();
-    // ------------------------------------------------------------------------
-    virtual void trigger(unsigned int kart_index) OVERRIDE {}
-    // ------------------------------------------------------------------------
+    virtual void trigger(unsigned int kart_index) OVERRIDE;
     virtual void changeDebugColor(bool is_active) OVERRIDE;
-    // ------------------------------------------------------------------------
     virtual void update(float dt) OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual bool triggeringCheckline() const OVERRIDE         { return false; }
-    // ------------------------------------------------------------------------
-    /** Adds a flyable to be tested for crossing a cannon checkline.
-    *  \param flyable The flyable to be tested.
-    */
-    void addFlyable(Flyable* flyable)       { m_all_flyables.insert(flyable); }
-    // ------------------------------------------------------------------------
-    /** Removes a flyable from the tests if it crosses a checkline. Used when
-    *  the flyable is removed (e.g. explodes).
-    */
-    void removeFlyable(Flyable* flyable)     { m_all_flyables.erase(flyable); }
-    // ------------------------------------------------------------------------
-    const Vec3& getTargetLeft() const                 { return m_target_left; }
-    // ------------------------------------------------------------------------
-    const Vec3& getTargetRight() const               { return m_target_right; }
-    // ------------------------------------------------------------------------
-    Ipo* getIpo() const                                     { return m_curve; }
-};   // CheckCannon
+    virtual bool triggeringCheckline() const OVERRIDE { return false; }
+    void addFlyable(Flyable *flyable);
+    void removeFlyable(Flyable *flyable);
+};   // CheckLine
 
 #endif
 

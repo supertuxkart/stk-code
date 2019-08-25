@@ -94,13 +94,19 @@ protected:
     /** The type of the protocol. */
     ProtocolType m_type;
 
+    /** The callback object, if needed. */
+    CallbackObject* m_callback_object;
+
+    /** The state this protocol is in (e.g. running, paused, ...). */
+    ProtocolState m_state;
+
     /** True if this protocol should receive connection events. */
     bool m_handle_connections;
 
     /** TRue if this protocol should recceiver disconnection events. */
     bool m_handle_disconnections;
 public:
-             Protocol(ProtocolType type);
+             Protocol(ProtocolType type, CallbackObject* callback_object=NULL);
     virtual ~Protocol();
 
     /** \brief Called when the protocol is going to start. Must be re-defined
@@ -117,14 +123,39 @@ public:
     virtual void asynchronousUpdate() = 0;
 
     /// functions to check incoming data easily
-    NetworkString* getNetworkString(size_t capacity = 16) const;
+    NetworkString* getNetworkString(size_t capacity = 16);
     bool checkDataSize(Event* event, unsigned int minimum_size);
     void sendMessageToPeers(NetworkString *message, bool reliable = true);
     void sendMessageToPeersInServer(NetworkString *message,
                                     bool reliable = true);
     void sendToServer(NetworkString *message, bool reliable = true);
-    virtual void requestStart();
-    virtual void requestTerminate();
+    void requestStart();
+    void requestPause();
+    void requestUnpause();
+    void requestTerminate();
+
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol is paused (by an other entity or by
+    *  itself). */
+    virtual void paused() { }
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol is used.
+    */
+    virtual void unpaused() { }
+    // ------------------------------------------------------------------------
+    /** \brief Called when the protocol was just killed. It triggers the 
+     *  callback if defined. */
+    virtual void terminated()
+    {
+        if (m_callback_object)
+            m_callback_object->callback(this);
+    }   // terminated
+    // ------------------------------------------------------------------------
+    /** Returns the current protocol state. */
+    ProtocolState getState() const { return m_state;  }
+    // ------------------------------------------------------------------------
+    /** Sets the current protocol state. */
+    void setState(ProtocolState s) { m_state = s; }
     // ------------------------------------------------------------------------
     /** \brief Notify a protocol matching the Event type of that event.
      *  \param event : Pointer to the event.

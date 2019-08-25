@@ -22,7 +22,6 @@
 #define HEADER_LOCAL_PLAYER_CONTROLLER_HPP
 
 #include "karts/controller/player_controller.hpp"
-#include <memory>
 
 class AbstractKart;
 class ParticleEmitter;
@@ -45,7 +44,7 @@ private:
     bool           m_has_started;
     bool           m_is_above_nitro_target;
 
-    std::unique_ptr<ParticleEmitter> m_sky_particles_emitter;
+    ParticleEmitter* m_sky_particles_emitter;
 
     /** The index of the camera attached to the kart for this controller. The
      *  camera object is managed in the Camera class, so no need to free it. */
@@ -73,7 +72,6 @@ public:
     void         update            (int ticks) OVERRIDE;
     bool         action            (PlayerAction action, int value,
                                     bool dry_run=false) OVERRIDE;
-            void initParticleEmitter();
     virtual void handleZipper      (bool play_sound) OVERRIDE;
     void         collectedItem     (const ItemState &item,
                                     float previous_energy=0) OVERRIDE;

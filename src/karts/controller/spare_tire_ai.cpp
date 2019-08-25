@@ -27,8 +27,6 @@
 #include "tracks/arena_node.hpp"
 #include "physics/physics.hpp"
 #include "utils/random_generator.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <algorithm>
 
@@ -143,7 +141,7 @@ void SpareTireAI::crashed(const AbstractKart *k)
     if (dynamic_cast<const SpareTireAI*>(k->getController()) != NULL) return;
 
     // Tell players that they can have at most 3 lives
-    if (m_tsb_world->getKartLife(k->getWorldKartId()) == 3)
+    if (m_world->getKartLife(k->getWorldKartId()) == 3)
     {
         World::getWorld()->getRaceGUI()->addMessage
             (_("You can have at most 3 lives!"), k, 2.0f);
@@ -151,7 +149,7 @@ void SpareTireAI::crashed(const AbstractKart *k)
     // Otherwise add one life for that kart 
     else
     {
-        m_tsb_world->addKartLife(k->getWorldKartId());
+        m_world->addKartLife(k->getWorldKartId());
         World::getWorld()->getRaceGUI()->addMessage(_("+1 life."), k, 2.0f);
     }
     unspawn();

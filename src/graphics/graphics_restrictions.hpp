@@ -65,7 +65,6 @@ namespace GraphicsRestrictions
         GR_HARDWARE_SKINNING,
         GR_NPOT_TEXTURES,
         GR_TEXTURE_BUFFER_OBJECT,
-        GR_SYSTEM_SCREEN_KEYBOARD,
         GR_COUNT  /** MUST be last entry. */
     } ;
 

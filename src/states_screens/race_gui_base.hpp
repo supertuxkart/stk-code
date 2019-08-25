@@ -134,7 +134,7 @@ private:
     
     /** Translated strings 'ready', 'set', 'go'. */
     core::stringw    m_string_ready, m_string_set, m_string_go, m_string_goal,
-        m_string_waiting_for_others, m_string_waiting_for_the_server;
+        m_string_waiting_for_others;
 
     /** The position of the referee for all karts. */
     std::vector<Vec3> m_referee_pos;
@@ -245,13 +245,11 @@ public:
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du
                   getMiniMapSize() const = 0;
-    virtual void calculateMinimapSize() {};
     // ------------------------------------------------------------------------
     virtual void clearAllMessages() { m_messages.clear(); }
 
     void drawGlobalPlayerIcons(int bottom_margin);
-    void drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
-                        bool is_local);
+    void drawPlayerIcon(AbstractKart *kart, int x, int y, int w);
     
     virtual void drawEnergyMeter(int x, int y, const AbstractKart *kart,
                                  const core::recti &viewport,
@@ -259,9 +257,6 @@ public:
 
     void cleanupMessages(const float dt);
     void removeReferee();
-    
-    RaceGUIMultitouch* getMultitouchGUI() {return m_multitouch_gui;}
-    void recreateMultitouchGUI();
 
 };   // RaceGUIBase
 

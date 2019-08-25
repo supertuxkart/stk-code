@@ -28,7 +28,6 @@
 #include "utils/no_copy.hpp"
 
 #include <string>
-#include <map>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
@@ -36,11 +35,9 @@
 #ifndef SERVER_ONLY
 #include <ft2build.h>
 #include FT_FREETYPE_H
-
-#include "irrString.h"
-#include "GlyphLayout.h"
 #endif
 
+class FaceTTF;
 class FontWithFace;
 
 /** This class stores all font files required in STK.
@@ -55,31 +52,18 @@ private:
 #ifndef SERVER_ONLY
     /** A FreeType library, it holds the FT_Face internally inside freetype. */
     FT_Library                               m_ft_library;
-
-    /** List of TTF files for complex text shaping. */
-    std::vector<FT_Face>                     m_faces;
-
-    /** TTF file for digit font in STK. */
-    FT_Face                                  m_digit_face;
-
-    /** DPI used when shaping, each face will apply an inverse of this and the
-     *  dpi of itself when rendering, so all faces can share the same glyph
-     *  layout cache. */
-    unsigned m_shaping_dpi;
-
-    /** Map FT_Face to index for quicker layout. */
-    std::map<FT_Face, uint16_t> m_ft_faces_to_index;
-
-    /** Text drawn to glyph layouts cache. */
-    std::map<irr::core::stringw,
-        std::vector<irr::gui::GlyphLayout> > m_cached_gls;
-
-    bool m_has_color_emoji;
 #endif
+
+    /** TTF files used in \ref BoldFace and \ref RegularFace. */
+    FaceTTF*                                 m_normal_ttf;
+
+    /** TTF files used in \ref DigitFace. */
+    FaceTTF*                                 m_digit_ttf;
 
     /** Map type for each \ref FontWithFace with a index, save getting time in
      *  \ref getFont. */
     std::unordered_map<std::type_index, int> m_font_type_map;
+
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
@@ -115,34 +99,14 @@ public:
         }
     }
     // ------------------------------------------------------------------------
-    bool hasColorEmoji() const                    { return m_has_color_emoji; }
-    // ------------------------------------------------------------------------
     /** Return the \ref m_ft_library. */
     FT_Library getFTLibrary() const                    { return m_ft_library; }
-    // ------------------------------------------------------------------------
-    std::vector<FT_Face> loadTTF(const std::vector<std::string>& ttf_list);
-    // ------------------------------------------------------------------------
-    FT_Face loadColorEmoji();
-    // ------------------------------------------------------------------------
-    unsigned getShapingDPI() const                    { return m_shaping_dpi; }
-    // ------------------------------------------------------------------------
-    void shape(const std::u32string& text,
-               std::vector<irr::gui::GlyphLayout>& gls,
-               std::vector<std::u32string>* line_data = NULL);
-    // ------------------------------------------------------------------------
-    std::vector<irr::gui::GlyphLayout>& getCachedLayouts
-                  (const irr::core::stringw& str);
-    // ------------------------------------------------------------------------
-    void clearCachedLayouts()                         { m_cached_gls.clear(); }
-    // ------------------------------------------------------------------------
-    void initGlyphLayouts(const irr::core::stringw& text,
-                          std::vector<irr::gui::GlyphLayout>& gls,
-                          std::vector<std::u32string>* line_data = NULL);
 #endif
     // ------------------------------------------------------------------------
     void loadFonts();
     // ------------------------------------------------------------------------
     void unitTesting();
+
 
 };   // FontManager
 

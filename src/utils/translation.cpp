@@ -35,23 +35,21 @@
 #include <cwchar>
 #include <fstream>
 #include <iostream>
-#include <unordered_map>
-#include <unordered_set>
+#include <thread>
+
+#if ENABLE_BIDI
+#  include <fribidi/fribidi.h>
+#endif
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
-#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
 
 #ifdef ANDROID
 #include "main_android.hpp"
 #endif
 
-#ifdef IOS_STK
-#include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceiOS.h"
-#endif
 
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
@@ -65,20 +63,6 @@ Translations* translations = NULL;
 #endif
 
 #ifndef SERVER_ONLY
-std::map<std::string, std::string> Translations::m_localized_name;
-std::map<std::string, std::map<std::string, irr::core::stringw> >
-    Translations::m_localized_country_codes;
-// ============================================================================
-std::unordered_map<char32_t,
-    std::pair<std::unordered_set<std::u32string>, size_t> > g_thai_dict;
-// ============================================================================
-constexpr bool isThaiCP(char32_t c)
-{
-    return c >= 0x0e00 && c <= 0x0e7f;
-}   // isThaiCP
-
-// ============================================================================
-
 const bool REMOVE_BOM = false;
 using namespace tinygettext;
 /** The list of available languages; this is global so that it is cached (and remains
@@ -86,12 +70,110 @@ using namespace tinygettext;
 typedef std::vector<std::string> LanguageList;
 static LanguageList g_language_list;
 
-// ============================================================================
 // Note : this method is not static because 'g_language_list' is initialized
 //        the first time Translations is constructed (despite being a global)
 const LanguageList* Translations::getLanguageList() const
 {
     return &g_language_list;
+}
+#endif
+
+// ----------------------------------------------------------------------------
+/** Frees the memory allocated for the result of toFribidiChar(). */
+#ifdef ENABLE_BIDI
+void freeFribidiChar(FriBidiChar *str)
+{
+#ifdef TEST_BIDI
+    delete[] str;
+#else
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] str;
+#endif
+}
+#endif
+
+/** Frees the memory allocated for the result of fromFribidiChar(). */
+#ifdef ENABLE_BIDI
+void freeFribidiChar(wchar_t *str)
+{
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] str;
+}
+#endif
+
+// ----------------------------------------------------------------------------
+/** Converts a wstring to a FriBidi-string.
+    The caller must take care to free (or not to free) the result after use.
+    Freeing should be done with freeFribidiChar().
+
+    On linux, the string doesn't need to be converted because wchar_t is
+    already UTF-32. On windows the string is converted from UTF-16 by this
+    function. */
+#ifdef ENABLE_BIDI
+FriBidiChar* toFribidiChar(const wchar_t* str)
+{
+    std::size_t length = wcslen(str);
+    FriBidiChar *result;
+    if (sizeof(wchar_t) == sizeof(FriBidiChar))
+        result = (FriBidiChar*) str;
+    else
+    {
+        // On windows FriBidiChar is 4 bytes, but wchar_t is 2 bytes.
+        // So we simply copy the characters over here (note that this
+        // is technically incorrect, all characters we use/support fit
+        // in 16 bits, which is what irrlicht supports atm).
+        result = new FriBidiChar[length + 1];
+        for (std::size_t i = 0; i <= length; i++)
+            result[i] = str[i];
+    }
+
+#ifdef TEST_BIDI
+    // Prepend a character in each line that forces RTL style
+    int lines = 1;
+    for (std::size_t i = 0; i <= length; i++)
+    {
+        if (str[i] == L'\n')
+            lines++;
+    }
+    FriBidiChar *tmp = result;
+    length += lines;
+    result = new FriBidiChar[length + 1];
+    lines = 1;
+    result[0] = L'\u202E';
+    for (std::size_t i = 1; i <= length; i++)
+    {
+        result[i] = tmp[i - lines];
+        if (str[i - lines] == L'\n')
+        {
+            lines++;
+            i++;
+            result[i] = L'\u202E';
+        }
+    }
+    if (sizeof(wchar_t) != sizeof(FriBidiChar))
+        delete[] tmp;
+#endif
+
+    return result;
+}
+
+wchar_t* fromFribidiChar(const FriBidiChar* str)
+{
+    wchar_t *result;
+    if (sizeof(wchar_t) == sizeof(FriBidiChar))
+        result = (wchar_t*) str;
+    else
+    {
+        std::size_t length = 0;
+        while (str[length])
+            length++;
+
+        // Copy back to wchar_t array
+        result = new wchar_t[length + 1];
+        for (std::size_t i = 0; i <= length; i++)
+            result[i] = str[i];
+    }
+    return result;
 }
 #endif
 
@@ -118,150 +200,50 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
     }
 
-    if (m_localized_name.empty())
+    const std::string file_name = file_manager->getAsset("localized_name.txt");
+    try
     {
-        const std::string file_name = file_manager->getAsset("localized_name.txt");
-        try
+        std::unique_ptr<std::istream> in(new std::ifstream(file_name.c_str()));
+        if (!in.get())
         {
-            std::ifstream in(FileUtils::getPortableReadingPath(file_name));
-            if (!in.is_open())
-            {
-                Log::error("translation", "error: failure opening: '%s'.",
-                    file_name.c_str());
-            }
-            else
-            {
-                for (std::string line; std::getline(in, line, ';'); )
-                {
-                    line = StringUtils::removeWhitespaces(line);
-
-                    if (line.empty())
-                        continue;
-
-                    std::size_t pos = line.find("=");
-
-                    if (pos == std::string::npos)
-                        continue;
-
-                    std::string name = line.substr(0, pos);
-                    std::string localized_name = line.substr(pos + 1);
-
-                    if (name.empty() || localized_name.empty())
-                        continue;
-
-                    if (localized_name == "0")
-                    {
-                        localized_name =
-                            tinygettext::Language::from_name(name).get_name();
-                    }
-                    m_localized_name[name] = localized_name;
-                }
-            }
+            Log::error("translation", "error: failure opening: '%s'.",
+                file_name.c_str());
         }
-        catch(std::exception& e)
+        else
         {
-            Log::error("translation", "error: failure extract localized name.");
-            Log::error("translation", "%s", e.what());
+            for (std::string line; std::getline(*in, line, ';'); )
+            {
+                line = StringUtils::removeWhitespaces(line);
+                
+                if (line.empty())
+                    continue;
+                    
+                std::size_t pos = line.find("=");
+                
+                if (pos == std::string::npos)
+                    continue;
+                    
+                std::string name = line.substr(0, pos);
+                std::string localized_name = line.substr(pos + 1);
+                
+                if (name.empty() || localized_name.empty())
+                    continue;
+                    
+                if (localized_name == "0")
+                {
+                    localized_name =
+                        tinygettext::Language::from_name(name).get_name();
+                }
+                m_localized_name[name] = localized_name;
+            }
         }
     }
-
-    if (m_localized_country_codes.empty())
+    catch(std::exception& e)
     {
-        const std::string file_name = file_manager->getAsset("country_names.csv");
-        try
-        {
-            std::ifstream in(FileUtils::getPortableReadingPath(file_name));
-            if (!in.is_open())
-            {
-                Log::error("translation", "error: failure opening: '%s'.",
-                    file_name.c_str());
-            }
-            else
-            {
-                std::vector<std::string> header;
-                std::string line;
-                while (!StringUtils::safeGetline(in, line).eof())
-                {
-                    std::vector<std::string> lists = StringUtils::split(line, ';');
-                    if (lists.size() < 2)
-                    {
-                        Log::error("translation", "Invaild list.");
-                        break;
-                    }
-                    if (lists[0] == "country_code")
-                    {
-                        header = lists;
-                        continue;
-                    }
-                    if (lists.size() != header.size())
-                    {
-                        Log::error("translation", "Different column size.");
-                        break;
-                    }
-                    if (m_localized_country_codes.find(lists[0]) ==
-                        m_localized_country_codes.end())
-                    {
-                        m_localized_country_codes[lists[0]] =
-                        std::map<std::string, irr::core::stringw>();
-                    }
-                    for (unsigned i = 1; i < lists.size(); i++)
-                    {
-                        auto& ret = m_localized_country_codes.at(lists[0]);
-                        ret[header[i]] = StringUtils::utf8ToWide(lists[i]);
-                    }
-                }
-            }
-        }
-        catch (std::exception& e)
-        {
-            Log::error("translation", "error: failure extract localized country name.");
-            Log::error("translation", "%s", e.what());
-        }
+        Log::error("translation", "error: failure extract localized name.");
+        Log::error("translation", "%s", e.what());
     }
 
-    if (g_thai_dict.empty())
-    {
-        const std::string file_name = file_manager->getAsset("thaidict.txt");
-        try
-        {
-            std::ifstream in(FileUtils::getPortableReadingPath(file_name));
-            if (!in.is_open())
-            {
-                Log::error("translation", "error: failure opening: '%s'.",
-                    file_name.c_str());
-            }
-            else
-            {
-                std::string line;
-                while (!StringUtils::safeGetline(in, line).eof())
-                {
-                    const std::u32string& u32line = StringUtils::utf8ToUtf32(line);
-                    char32_t thai = u32line[0];
-                    if (u32line.empty() || !isThaiCP(thai))
-                        continue;
-                    if (g_thai_dict.find(thai) == g_thai_dict.end())
-                    {
-                        g_thai_dict[thai] =
-                            {
-                                std::make_pair(
-                                    std::unordered_set<std::u32string>{u32line},
-                                    u32line.size())
-                            };
-                        continue;
-                    }
-                    auto& ret = g_thai_dict.at(thai);
-                    ret.first.insert(u32line);
-                    if (ret.second < u32line.size())
-                        ret.second = u32line.size();
-                }
-            }
-        }
-        catch (std::exception& e)
-        {
-            Log::error("translation", "error: failure extract Thai dictionary.");
-            Log::error("translation", "%s", e.what());
-        }
-    }
     // LC_ALL does not work, sscanf will then not always be able
     // to scan for example: s=-1.1,-2.3,-3.3 correctly, which is
     // used in driveline files.
@@ -325,14 +307,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             language = p_lang;
         else
         {
-#ifdef IOS_STK
-            language = irr::CIrrDeviceiOS::getSystemLanguageCode();
-            if (language.find("zh-Hans") != std::string::npos)
-                language = "zh_CN";
-            else if (language.find("zh-Hant") != std::string::npos)
-                language = "zh_TW";
-            language = StringUtils::findAndReplace(language, "-", "_");
-#elif defined(WIN32)
+#ifdef WIN32
             // Thanks to the frogatto developer for this code snippet:
             char c[1024];
             GetLocaleInfoA(LOCALE_USER_DEFAULT, LOCALE_SISO639LANGNAME,
@@ -355,19 +330,19 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 char p_language[3] = {};
                 AConfiguration_getLanguage(global_android_app->config, 
                                            p_language);
-                std::string s_language(p_language);
-                if (!s_language.empty())
+                
+                if (p_language != NULL)
                 {
-                    language += s_language;
-
+                    language += p_language;
+                    
                     char p_country[3] = {};
                     AConfiguration_getCountry(global_android_app->config, 
                                               p_country);
-                    std::string s_country(p_country);
-                    if (!s_country.empty())
+                    
+                    if (p_country)
                     {
                         language += "_";
-                        language += s_country;
+                        language += p_country;
                     }
                 }
             }
@@ -380,9 +355,6 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     {
         Log::verbose("translation", "Env var LANGUAGE = '%s'.",
                      language.c_str());
-
-        // Hong Kong use tranditional chinese, not zh_CN which C > T
-        language = StringUtils::findAndReplace(language, "zh_HK", "zh_TW");
 
         if (language.find(":") != std::string::npos)
         {
@@ -403,12 +375,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
             m_current_language_name = l.get_name();
             m_current_language_name_code = l.get_language();
-            m_current_language_tag = m_current_language_name_code;
-            if (!l.get_country().empty())
-            {
-                m_current_language_tag += "-";
-                m_current_language_tag += l.get_country();
-            }
+
             if (!l)
             {
                 m_dictionary = m_dictionary_manager.get_dictionary();
@@ -419,23 +386,16 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             const Language& tgtLang = Language::from_env(language);
             if (!tgtLang)
             {
-                Log::warn("Translation", "Unsupported language '%s'", language.c_str());
+                Log::warn("Translation", "Unsupported langage '%s'", language.c_str());
                 UserConfigParams::m_language = "system";
                 m_current_language_name = "Default language";
                 m_current_language_name_code = "en";
-                m_current_language_tag = "en";
                 m_dictionary = m_dictionary_manager.get_dictionary();
             }
             else
             {
                 m_current_language_name = tgtLang.get_name();
                 m_current_language_name_code = tgtLang.get_language();
-                m_current_language_tag = m_current_language_name_code;
-                if (!tgtLang.get_country().empty())
-                {
-                    m_current_language_tag += "-";
-                    m_current_language_tag += tgtLang.get_country();
-                }
                 Log::verbose("translation", "Language '%s'.", m_current_language_name.c_str());
                 m_dictionary = m_dictionary_manager.get_dictionary(tgtLang);
             }
@@ -445,41 +405,146 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
     {
         m_current_language_name = "Default language";
         m_current_language_name_code = "en";
-        m_current_language_tag = m_current_language_name_code;
         m_dictionary = m_dictionary_manager.get_dictionary();
     }
+
+    // This is a silly but working hack I added to determine whether the
+    // current language is RTL or not, since gettext doesn't seem to provide
+    // this information
+
+    // This one is just for the xgettext parser to pick up
+#define ignore(X)
+
+    //I18N: Do NOT literally translate this string!! Please enter Y as the
+    //      translation if your language is a RTL (right-to-left) language,
+    //      N (or nothing) otherwise
+    ignore(_("   Is this a RTL language?"));
+
+    const std::string isRtl =
+        m_dictionary.translate("   Is this a RTL language?");
+
+    m_rtl = false;
+
+    for (unsigned int n=0; n < isRtl.size(); n++)
+    {
+        if (isRtl[n] == 'Y')
+        {
+            m_rtl = true;
+            break;
+        }
+    }
+#ifdef TEST_BIDI
+    m_rtl = true;
+#endif
 
 #endif
 }   // Translations
 
 // ----------------------------------------------------------------------------
+
 Translations::~Translations()
 {
 }   // ~Translations
 
 // ----------------------------------------------------------------------------
+
+const wchar_t* Translations::fribidize(const wchar_t* in_ptr)
+{
+#ifdef SERVER_ONLY
+    return in_ptr;
+#else
+    if (isRTLText(in_ptr))
+    {
+        std::lock_guard<std::mutex> lock(m_fribidized_mutex);
+        // Test if this string was already fribidized
+        std::map<const irr::core::stringw, const irr::core::stringw>::const_iterator
+            found = m_fribidized_strings.find(in_ptr);
+        if (found != m_fribidized_strings.cend())
+            return found->second.c_str();
+
+        // Use fribidi to fribidize the string
+        // Split text into lines
+        std::vector<core::stringw> input_lines = StringUtils::split(in_ptr, '\n');
+        // Reverse lines for RTL strings, irrlicht will reverse them back
+        // This is needed because irrlicht inserts line breaks itself if a text
+        // is too long for one line and then reverses the lines again.
+        std::reverse(input_lines.begin(), input_lines.end());
+
+        // Fribidize and concat lines
+        core::stringw converted_string;
+        for (std::vector<core::stringw>::iterator it = input_lines.begin();
+             it != input_lines.end(); it++)
+        {
+            if (it == input_lines.begin())
+                converted_string = fribidizeLine(*it);
+            else
+            {
+                converted_string += "\n";
+                converted_string += fribidizeLine(*it);
+            }
+        }
+
+        // Save it in the map
+        m_fribidized_strings.insert(std::pair<const irr::core::stringw, const irr::core::stringw>(
+            in_ptr, converted_string));
+        found = m_fribidized_strings.find(in_ptr);
+
+        return found->second.c_str();
+    }
+    else
+        return in_ptr;
+#endif
+}
+
+bool Translations::isRTLText(const wchar_t *in_ptr)
+{
+#if ENABLE_BIDI
+    std::size_t length = wcslen(in_ptr);
+    FriBidiChar *fribidiInput = toFribidiChar(in_ptr);
+
+    FriBidiCharType *types = new FriBidiCharType[length];
+    fribidi_get_bidi_types(fribidiInput, (FriBidiStrIndex)length, types);
+    freeFribidiChar(fribidiInput);
+
+    // Declare as RTL if one character is RTL
+    for (std::size_t i = 0; i < length; i++)
+    {
+        if (types[i] & FRIBIDI_MASK_RTL)
+        {
+            delete[] types;
+            return true;
+        }
+    }
+    delete[] types;
+    return false;
+#else
+    return false;
+#endif
+}
+
 /**
  * \param original Message to translate
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-irr::core::stringw Translations::w_gettext(const wchar_t* original, const char* context)
+const wchar_t* Translations::w_gettext(const wchar_t* original, const char* context)
 {
     std::string in = StringUtils::wideToUtf8(original);
     return w_gettext(in.c_str(), context);
-}   // w_gettext
+}
 
-// ----------------------------------------------------------------------------
 /**
  * \param original Message to translate
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-irr::core::stringw Translations::w_gettext(const char* original, const char* context)
+const wchar_t* Translations::w_gettext(const char* original, const char* context)
 {
 
 #ifdef SERVER_ONLY
-    return L"";
+    static irr::core::stringw dummy_for_server;
+    dummy_for_server = StringUtils::utf8ToWide(original);
+    return dummy_for_server.c_str();
 #else
 
     if (original[0] == '\0') return L"";
@@ -493,20 +558,22 @@ irr::core::stringw Translations::w_gettext(const char* original, const char* con
                                      m_dictionary.translate_ctxt(context, original));
     // print
     //for (int n=0;; n+=4)
-    const irr::core::stringw wide = StringUtils::utf8ToWide(original_t);
-    const wchar_t* out_ptr = wide.c_str();
+    std::lock_guard<std::mutex> lock(m_gettext_mutex);
+
+    static std::map<std::thread::id, core::stringw> original_tw;
+    original_tw[std::this_thread::get_id()] = StringUtils::utf8ToWide(original_t);
+
+    const wchar_t* out_ptr = original_tw.at(std::this_thread::get_id()).c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
 
-    return wide;
+    return out_ptr;
 #endif
+}
 
-}   // w_gettext
-
-// ----------------------------------------------------------------------------
 /**
  * \param singular Message to translate in singular form
  * \param plural   Message to translate in plural form (can be the same as the singular form)
@@ -514,14 +581,13 @@ irr::core::stringw Translations::w_gettext(const char* original, const char* con
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-irr::core::stringw Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
+const wchar_t* Translations::w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context)
 {
     std::string in = StringUtils::wideToUtf8(singular);
     std::string in2 = StringUtils::wideToUtf8(plural);
     return w_ngettext(in.c_str(), in2.c_str(), num, context);
-}   // w_ngettext
+}
 
-// ----------------------------------------------------------------------------
 /**
  * \param singular Message to translate in singular form
  * \param plural   Message to translate in plural form (can be the same as the singular form)
@@ -529,10 +595,12 @@ irr::core::stringw Translations::w_ngettext(const wchar_t* singular, const wchar
  * \param context  Optional, can be set to differentiate 2 strings that are identical
  *                 in English but could be different in other languages
  */
-irr::core::stringw Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
+const wchar_t* Translations::w_ngettext(const char* singular, const char* plural, int num, const char* context)
 {
 #ifdef SERVER_ONLY
-    return L"";
+    static core::stringw str_buffer;
+    str_buffer = StringUtils::utf8ToWide(singular);
+    return str_buffer.c_str();
 
 #else
 
@@ -540,107 +608,96 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
                               m_dictionary.translate_plural(singular, plural, num) :
                               m_dictionary.translate_ctxt_plural(context, singular, plural, num));
 
-    const irr::core::stringw wide = StringUtils::utf8ToWide(res);
-    const wchar_t* out_ptr = wide.c_str();
+    std::lock_guard<std::mutex> lock(m_ngettext_mutex);
+
+    static std::map<std::thread::id, core::stringw> str_buffer;
+    str_buffer[std::this_thread::get_id()] = StringUtils::utf8ToWide(res);
+
+    const wchar_t* out_ptr = str_buffer.at(std::this_thread::get_id()).c_str();
     if (REMOVE_BOM) out_ptr++;
 
 #if TRANSLATE_VERBOSE
     std::wcout << L"  translation : " << out_ptr << std::endl;
 #endif
 
-    return wide;
+    return out_ptr;
 #endif
 
-}   // w_ngettext
+}
 
-// ----------------------------------------------------------------------------
+core::stringw Translations::fribidizeLine(const core::stringw &str)
+{
+#if ENABLE_BIDI
+    FriBidiChar *fribidiInput = toFribidiChar(str.c_str());
+    std::size_t length = 0;
+    while (fribidiInput[length])
+        length++;
+
+    // Assume right to left as start direction.
+#if FRIBIDI_MINOR_VERSION==10
+    // While the doc for older fribidi versions is somewhat sparse,
+    // using the RIGHT-TO-LEFT EMBEDDING character here appears to
+    // work correct.
+    FriBidiCharType pbase_dir = L'\u202B';
+#else
+    FriBidiCharType pbase_dir = FRIBIDI_PAR_ON;
+#endif
+
+    // Reverse text line by line
+    FriBidiChar *fribidiOutput = new FriBidiChar[length + 1];
+    memset(fribidiOutput, 0, (length + 1) * sizeof(FriBidiChar));
+    fribidi_boolean result = fribidi_log2vis(fribidiInput,
+                                                (FriBidiStrIndex)length,
+                                                &pbase_dir,
+                                                fribidiOutput,
+            /* gint   *position_L_to_V_list */ NULL,
+            /* gint   *position_V_to_L_list */ NULL,
+            /* gint8  *embedding_level_list */ NULL
+                                                            );
+
+    freeFribidiChar(fribidiInput);
+
+    if (!result)
+    {
+        delete[] fribidiOutput;
+        Log::error("Translations::fribidize", "Fribidi failed in 'fribidi_log2vis' =(");
+        return core::stringw(str);
+    }
+
+    wchar_t *convertedString = fromFribidiChar(fribidiOutput);
+    core::stringw converted_string(convertedString);
+    freeFribidiChar(convertedString);
+    delete[] fribidiOutput;
+    return converted_string;
+
+#else
+    return core::stringw(str);
+#endif // ENABLE_BIDI
+
+}
+
 #ifndef SERVER_ONLY
 std::set<wchar_t> Translations::getCurrentAllChar()
 {
     return m_dictionary.get_all_used_chars();
-}   // getCurrentAllChar
+}
 
-// ----------------------------------------------------------------------------
 std::string Translations::getCurrentLanguageName()
 {
     return m_current_language_name;
     //return m_dictionary_manager.get_language().get_name();
-}   // getCurrentLanguageName
+}
 
-// ----------------------------------------------------------------------------
 std::string Translations::getCurrentLanguageNameCode()
 {
     return m_current_language_name_code;
-}   // getCurrentLanguageNameCode
+}
 
-// ----------------------------------------------------------------------------
 const std::string& Translations::getLocalizedName(const std::string& str) const
 {
     std::map<std::string, std::string>::const_iterator n = m_localized_name.find(str);
     assert (n != m_localized_name.end());
     return n->second;
-}   // getLocalizedName
-
-// ----------------------------------------------------------------------------
-/* Convert 2-letter country code to localized readable name.
- */
-irr::core::stringw Translations::getLocalizedCountryName(const std::string& country_code) const
-{
-    auto it = m_localized_country_codes.find(country_code);
-    // If unknown 2 letter country just return the same
-    if (it == m_localized_country_codes.end())
-        return StringUtils::utf8ToWide(country_code);
-    auto name_itr = it->second.find(m_current_language_tag);
-    if (name_itr != it->second.end())
-        return name_itr->second;
-    // If there should be invalid language tag, use en (which always exists)
-    name_itr = it->second.find("en");
-    if (name_itr != it->second.end())
-        return name_itr->second;
-    // Fallback
-    return StringUtils::utf8ToWide(country_code);
-}   // getLocalizedCountryName
-
-// ----------------------------------------------------------------------------
-/* Insert breakmark to thai sentence according to thai word dictionary, which
- * adds a mark in the begining of a thai vocabulary
- */
-void Translations::insertThaiBreakMark(const std::u32string& thai,
-                                       std::vector<bool>& breakable)
-{
-    if (thai.size() < 3)
-        return;
-    for (size_t i = 0; i < thai.size();)
-    {
-        char32_t t = thai[i];
-        if (i >= thai.size() - 2 || !isThaiCP(t))
-        {
-            i++;
-            continue;
-        }
-        auto ret = g_thai_dict.find(t);
-        if (ret == g_thai_dict.end())
-        {
-            i++;
-            continue;
-        }
-        size_t checked_word = 1;
-        const size_t max_checking_word = ret->second.second;
-        for (size_t j = i + 1;; j++)
-        {
-            if (j - i > max_checking_word || j > thai.size())
-                break;
-            const std::u32string& ss = thai.substr(i, j - i);
-            if (ret->second.first.find(ss) != ret->second.first.end())
-            {
-                if (ss.size() > checked_word)
-                    checked_word = ss.size();
-                if (i != 0)
-                    breakable[i - 1] = true;
-            }
-        }
-        i += checked_word;
-    }
-}   // insertThaiBreakMark
+}
 
 #endif

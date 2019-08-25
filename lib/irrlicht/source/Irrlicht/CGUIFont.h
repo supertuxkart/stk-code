@@ -53,20 +53,6 @@ public:
 			video::SColor color, bool hcenter=false,
 			bool vcenter=false, const core::rect<s32>* clip=0);
 
-	virtual void drawQuick(const core::stringw& text, const core::rect<s32>& position,
-			video::SColor color, bool hcenter=false,
-			bool vcenter=false, const core::rect<s32>* clip=0)
-	{
-		draw(text, position, color, hcenter, vcenter, clip);
-	}
-
-	virtual void draw(const std::vector<GlyphLayout>& gls, const core::rect<s32>& position,
-			video::SColor color, bool hcenter=false,
-			bool vcenter=false, const core::rect<s32>* clip=0) {}
-
-	virtual void initGlyphLayouts(const core::stringw& text,
-		std::vector<GlyphLayout>& gls, std::vector<std::u32string>* line_data = NULL) {}
-
 	//! returns the dimension of a text
 	virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
 
@@ -80,8 +66,6 @@ public:
 	virtual void setKerningWidth (s32 kerning);
 	virtual void setKerningHeight (s32 kerning);
 
-	virtual s32 getHeightPerLine() const { return (s32)getDimension(L"A").Height + getKerningHeight(); }
-
 	//! set an Pixel Offset on Drawing ( scale position on width )
 	virtual s32 getKerningWidth(const wchar_t* thisLetter=0, const wchar_t* previousLetter=0) const;
 	virtual s32 getKerningHeight() const;
@@ -93,9 +77,6 @@ public:
 	virtual u32 getSpriteNoFromChar(const wchar_t *c) const;
 
 	virtual void setInvisibleCharacters( const wchar_t *s );
-	virtual void setScale(f32 scale) {}
-	virtual f32 getInverseShaping() const { return 1.0f; }
-	virtual f32 getScale() const { return 1.0f; }
 
 private:
 

@@ -26,7 +26,6 @@
 #include "karts/controller/controller.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <ISceneManager.h>

@@ -143,12 +143,30 @@ public:
     }   // BareNetworkString
 
     // ------------------------------------------------------------------------
-    /** Allows one to read a buffer from the beginning again. */
+    /** Allows to read a buffer from the beginning again. */
     void reset() { m_current_offset = 0; }
     // ------------------------------------------------------------------------
-    BareNetworkString& encodeString16(const irr::core::stringw& value);
+    BareNetworkString& encodeString16(const irr::core::stringw& value)
+    {
+        uint16_t str_len = (uint16_t)value.size();
+        if (value.size() > 65535)
+            str_len = 65535;
+        addUInt16(str_len);
+        for (unsigned i = 0; i < str_len; i++)
+            addUInt16((uint16_t)value[i]);
+        return *this;
+    }
     // ------------------------------------------------------------------------
-    int decodeString16(irr::core::stringw* out) const;
+    int decodeString16(irr::core::stringw* out) const
+    {
+        uint16_t str_len = getUInt16();
+        for (unsigned i = 0; i < str_len; i++)
+        {
+            uint16_t c = getUInt16();
+            out->append((wchar_t)c);
+        }
+        return str_len + 2;
+    }
     // ------------------------------------------------------------------------
     BareNetworkString& encodeString(const std::string &value);
     BareNetworkString& encodeString(const irr::core::stringw &value);
@@ -226,17 +244,6 @@ public:
         m_buffer.push_back(value & 0xff);
         return *this;
     }   // addUInt16
-
-    // ------------------------------------------------------------------------
-    /** Adds signed 24 bit integer. */
-    BareNetworkString& addInt24(const int value)
-    {
-        uint32_t combined = (uint32_t)value & 0xffffff;
-        m_buffer.push_back((combined >> 16) & 0xff);
-        m_buffer.push_back((combined >> 8) & 0xff);
-        m_buffer.push_back(combined & 0xff);
-        return *this;
-    }   // addInt24
 
     // ------------------------------------------------------------------------
     /** Adds unsigned 32 bit integer. */
@@ -320,16 +327,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getUInt32() const { return get<uint32_t, 4>(); }
-    // ------------------------------------------------------------------------
-    /** Returns a signed 24 bit integer. */
-    inline int getInt24() const
-    {
-        uint32_t combined = get<uint32_t, 3>();
-        if (combined & 0x800000)
-            return (0x1000000 - (int)combined) * -1;
-        else
-            return (int)combined;
-    }
     // ------------------------------------------------------------------------
     /** Returns a unsigned 32 bit integer. */
     inline uint32_t getTime() const { return get<uint32_t, 4>(); }

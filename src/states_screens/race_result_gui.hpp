@@ -127,9 +127,6 @@ private:
     /** Distance between each row of the race results */
     unsigned int               m_distance_between_rows;
 
-    /** Distance between each row of the highscore, race data, etc.*/
-    unsigned int               m_distance_between_meta_rows;
-
     /** The size of the kart icons. */
     unsigned int               m_width_icon;
 
@@ -230,7 +227,6 @@ public:
     virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}
 
     virtual void onUpdate(float dt) OVERRIDE;
-    virtual void onDraw(float dt) OVERRIDE;
 
     /** No more messages need to be displayed, but the function might still be
      *  called (e.g. 'new lap' message if the end controller is used for more

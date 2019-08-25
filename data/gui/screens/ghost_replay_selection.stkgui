@@ -10,10 +10,10 @@
 
         <!-- This is filled in programmatically -->
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
-            <list id="replay_list" x="0" y="0" width="100%" height="100%" alternate_bg="true"/>
+            <list id="replay_list" x="0" y="0" width="100%" height="100%"/>
         </box>
 
-        <tabs id="race_mode" height="6%" width="98%" align="center">
+        <tabs id="race_mode" height="6%" max_height="110" x="1%" width="98%" align="center">
             <icon-button id="tab_time_trial" width="128" height="128" icon="gui/icons/mode_tt.png"
                          I18N="In the ghost replay selection screen" text="Time trial"/>
             <icon-button id="tab_egg_hunt" width="128" height="128" icon="gui/icons/mode_easter.png"

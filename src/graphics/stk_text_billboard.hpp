@@ -83,15 +83,13 @@ private:
 
     core::aabbox3df m_bbox;
 
-    // ------------------------------------------------------------------------
-    float getDefaultScale(FontWithFace* face);
 public:
     // ------------------------------------------------------------------------
     STKTextBillboard(const video::SColor& color_top,
                      const video::SColor& color_bottom, ISceneNode* parent,
                      ISceneManager* mgr, s32 id,
                      const core::vector3df& position,
-                     const core::vector3df& scale = core::vector3df(1, 1, 1));
+                     const core::vector3df& size);
     // ------------------------------------------------------------------------
     ~STKTextBillboard()
     {
@@ -127,9 +125,9 @@ public:
     // ------------------------------------------------------------------------
     virtual const core::aabbox3df& getBoundingBox() const    { return m_bbox; }
     // ------------------------------------------------------------------------
-    void init(const core::stringw& text, FontWithFace* face);
+    void init(core::stringw text, FontWithFace* face);
     // ------------------------------------------------------------------------
-    void initLegacy(const core::stringw& text, FontWithFace* face);
+    void initLegacy(core::stringw text, FontWithFace* face);
     // ------------------------------------------------------------------------
     void draw(video::ITexture* tex) const
     {

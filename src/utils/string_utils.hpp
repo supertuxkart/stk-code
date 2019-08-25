@@ -27,12 +27,13 @@
 #include <sstream>
 #include <irrString.h>
 #include <IGUIFont.h>
-#include <irrTypes.h>
+#include "utils/constants.hpp"
+#include "utils/types.hpp"
+#include "utils/log.hpp"
 
 namespace StringUtils
 {
-    void unitTesting();
-    int versionToInt(const std::string &s);
+    int           versionToInt(const std::string &s);
 
     bool hasSuffix(const std::string& lhs, const std::string &rhs);
     bool startsWith(const std::string& str, const std::string& prefix);
@@ -51,12 +52,10 @@ namespace StringUtils
     std::string timeToString(float time, unsigned int precision=2,
                              bool display_minutes_if_zero = true, bool display_hours = false);
     irr::core::stringw loadingDots(float interval = 0.5f, int max_dots = 3);
-    irr::core::stringw loadingDots(const irr::core::stringw& s);
+    irr::core::stringw loadingDots(const wchar_t *s);
     std::string                     toUpperCase(const std::string&);
     std::string                     toLowerCase(const std::string&);
     std::vector<std::string>        split(const std::string& s, char c,
-                                          bool keepSplitChar=false);
-    std::vector<std::u32string>     split(const std::u32string& s, char32_t c,
                                           bool keepSplitChar=false);
     std::vector<irr::core::stringw> split(const irr::core::stringw& s,
                                           char c, bool keepSplitChar=false);
@@ -241,100 +240,36 @@ namespace StringUtils
     }   // parseString
 
     // ------------------------------------------------------------------------
-    /** Return country flag (in regional indicators) from 2-letter country
-     *  code. */
-    inline irr::core::stringw getCountryFlag(const std::string& country_code)
-    {
-        if (country_code.empty() || country_code.size() != 2)
-            return L"";
-        uint32_t flag[3] =
-        {
-            (uint32_t)(country_code[0]) + 127397,
-            (uint32_t)(country_code[1]) + 127397,
-            0
-        };
-        if (sizeof(wchar_t) == 4)
-        {
-            return (wchar_t*)flag;
-        }
-        else if (sizeof(wchar_t) == 2)
-        {
-            flag[0] -= 0x10000;
-            flag[1] -= 0x10000;
-            wchar_t u16[5] =
-            {
-                //make a surrogate pair
-                static_cast<wchar_t>((flag[0] >> 10) + 0xd800),
-                static_cast<wchar_t>((flag[0] & 0x3ff) + 0xdc00),
-                static_cast<wchar_t>((flag[1] >> 10) + 0xd800),
-                static_cast<wchar_t>((flag[1] & 0x3ff) + 0xdc00),
-                0
-            };
-            return u16;
-        }
-        return L"";
-    }   // getCountryFlag
-
-    // ------------------------------------------------------------------------
+    
     irr::core::stringw utf8ToWide(const char* input);
     irr::core::stringw utf8ToWide(const std::string &input);
-    std::u32string utf8ToUtf32(const std::string &input);
     std::string wideToUtf8(const wchar_t* input);
     std::string wideToUtf8(const irr::core::stringw& input);
-    std::string utf32ToUtf8(const std::u32string& input);
     std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
     std::string removeWhitespaces(const std::string& input);
     void breakText(const std::wstring& input, std::vector<std::wstring> &output,
                    unsigned int max_width, irr::gui::IGUIFont* font, bool right_to_left=false);
     bool breakable (wchar_t c);
     bool partOfLongUnicodeChar (wchar_t c);
-    irr::core::stringw utf32ToWide(const std::u32string& input);
-    std::u32string wideToUtf32(const irr::core::stringw& input);
 
-    std::string getUserAgentString();
-    /**
-     * Returns the hostname part of an url (if any)
-     *
-     * Example https://online.supertuxkart.net/
-     *
-     */
-    std::string getHostNameFromURL(const std::string& url);
-    // ------------------------------------------------------------------------
-    /* Get line from istream with taking into account for its line ending. */
-    inline std::istream& safeGetline(std::istream& is, std::string& t)
+    inline std::string getUserAgentString()
     {
-        t.clear();
-
-        // The characters in the stream are read one-by-one using a std::streambuf.
-        // That is faster than reading them one-by-one using the std::istream.
-        // Code that uses streambuf this way must be guarded by a sentry object.
-        // The sentry object performs various tasks,
-        // such as thread synchronization and updating the stream state.
-        std::istream::sentry se(is, true);
-        std::streambuf* sb = is.rdbuf();
-
-        for(;;)
-        {
-            int c = sb->sbumpc();
-            switch (c)
-            {
-            case '\n':
-                return is;
-            case '\r':
-                if(sb->sgetc() == '\n')
-                    sb->sbumpc();
-                return is;
-            case std::streambuf::traits_type::eof():
-                // Also handle the case when the last line has no line ending
-                if (t.empty())
-                    is.setstate(std::ios::eofbit);
-                return is;
-            default:
-                t += (char)c;
-            }
-        }
+        std::string uagent(std::string("SuperTuxKart/") + STK_VERSION);
+#ifdef WIN32
+        uagent += (std::string)" (Windows)";
+#elif defined(__APPLE__)
+        uagent += (std::string)" (Macintosh)";
+#elif defined(__FreeBSD__)
+        uagent += (std::string)" (FreeBSD)";
+#elif defined(ANDROID)
+        uagent += (std::string)" (Android)";
+#elif defined(linux)
+        uagent += (std::string)" (Linux)";
+#else
+        // Unknown system type
+#endif
+        return uagent;
     }
-
 } // namespace StringUtils
 
 #endif

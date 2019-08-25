@@ -32,8 +32,6 @@
 #include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 ChallengeData::ChallengeData(const std::string& filename)
 {
@@ -293,35 +291,23 @@ ChallengeData::ChallengeData(const std::string& filename)
 const irr::core::stringw ChallengeData::getChallengeDescription() const
 {
     core::stringw description;
-
-    if (m_is_unlock_list)
-        return description;
-
-    if (m_mode == CM_GRAND_PRIX)
+    if (!m_track_id.empty())
     {
-        if (m_minor == RaceManager::MINOR_MODE_NORMAL_RACE)
-            description = _("Normal Race (Grand Prix)");
-        else if (m_minor == RaceManager::MINOR_MODE_TIME_TRIAL)
-            description = _("Time-Trial (Grand Prix)");
-    }
-    else if (!m_track_id.empty())
-    {
-        if (m_is_ghost_replay)
-            description = _("Time-Trial - beat the replay");
-        else if (m_energy[0] > 0)
-            description = _("Time-Trial - nitro challenge");
-        else if (m_minor == RaceManager::MINOR_MODE_NORMAL_RACE)
-            description = _("Normal Race (single race)");
-        else if (m_minor == RaceManager::MINOR_MODE_TIME_TRIAL)
-            description = _("Time-Trial (single race)");
-        else if (m_minor == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-            description = _("Follow the Leader (single race)");
-    }
-
-    if (m_reverse == true)
-    {
-        description += core::stringw(L"\n");
-        description += _("Mode: Reverse");
+        if (m_minor != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            //I18N: number of laps to race in a challenge
+            description += _("Laps: %i", m_num_laps);
+            description += core::stringw(L"\n");
+        }
+        else
+        {
+            // Follow the leader mode:
+            description = _("Follow the leader");
+        }
+        if (m_reverse == true)
+        {
+            description += _("Reverse");
+        }
     }
     return description;
 }   // getChallengeDescription

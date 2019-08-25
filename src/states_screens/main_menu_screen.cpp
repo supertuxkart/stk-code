@@ -59,7 +59,8 @@
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
+
+
 
 #include <string>
 
@@ -78,7 +79,7 @@ MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 void MainMenuScreen::loadedFromFile()
 {
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    w->setScrollSpeed(GUIEngine::getFontHeight() / 2);
+    w->setScrollSpeed(15);
     
     RibbonWidget* rw_top = getWidget<RibbonWidget>("menu_toprow");
     assert(rw_top != NULL);
@@ -105,12 +106,7 @@ void MainMenuScreen::loadedFromFile()
 
 void MainMenuScreen::beforeAddingWidget()
 {
-#ifdef IOS_STK
-    // iOS app doesn't like quit button in UI
-    Widget* w = getWidget("quit");
-    if (w)
-        w->setVisible(false);
-#endif
+
 }
 
 // ----------------------------------------------------------------------------
@@ -172,12 +168,6 @@ void MainMenuScreen::init()
         IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 #endif
 
-#ifdef IOS_STK
-    // iOS app doesn't like quit button in UI
-    Widget* quit = getWidget("quit");
-    if (quit)
-        quit->setVisible(false);
-#endif
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -291,12 +281,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
         scene->push();
-        const std::pair<std::string, float> winners[] =
-            {
-                { "kiki", 0.6f },
-                { "nolok", 1.0f },
-                { "pidgin", 0.0f },
-            };
+        const std::string winners[] = { "kiki", "nolok", "pidgin" };
         scene->setKarts(winners);
     }
     else if (selection == "test_gplose")
@@ -309,9 +294,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->startSingleRace("gplose", 999, false);
         GrandPrixLose* scene = GrandPrixLose::getInstance();
         scene->push();
-        std::vector<std::pair<std::string, float> > losers;
-        losers.emplace_back("nolok", 1.0f);
-        losers.emplace_back("kiki", 0.6f);
+        std::vector<std::string> losers;
+        losers.push_back("nolok");
+        losers.push_back("kiki");
         //losers.push_back("wilber");
         //losers.push_back("tux");
         scene->setKarts(losers);
@@ -420,12 +405,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "quit")
     {
-#ifdef ANDROID
-        GUIEngine::EventHandler::get()->setAcceptEvents(false);
-        ANativeActivity_finish(global_android_app->activity);
-#else
         StateManager::get()->popMenu();
-#endif
         return;
     }
     else if (selection == "about")
@@ -499,7 +479,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
                 next->setGoToOverworldNext();
                 next->setMultiplayer(false);
-                next->push();
+                StateManager::get()->resetAndGoToScreen(next);
                 return;
             }
             OverWorld::enterOverWorld();
@@ -584,16 +564,3 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
     }
 #endif
 }   // onDisabledItemClicked
-
-// ----------------------------------------------------------------------------
-
-bool MainMenuScreen::onEscapePressed()
-{
-#ifdef ANDROID
-    GUIEngine::EventHandler::get()->setAcceptEvents(false);
-    ANativeActivity_finish(global_android_app->activity);
-    return false;
-#endif
-
-    return true;
-}   // onEscapePressed

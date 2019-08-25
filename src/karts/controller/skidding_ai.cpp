@@ -175,7 +175,6 @@ void SkiddingAI::reset()
     m_avoid_item_close           = false;
     m_skid_probability_state     = SKID_PROBAB_NOT_YET;
     m_last_item_random           = NULL;
-    m_burster                    = false;
 
     AIBaseLapController::reset();
     m_track_node               = Graph::UNKNOWN_SECTOR;
@@ -300,7 +299,7 @@ void SkiddingAI::update(int ticks)
         if (m_enabled_network_ai)
             m_controls->setRescue(true);
         else
-            RescueAnimation::create(m_kart);
+            new RescueAnimation(m_kart);
         AIBaseLapController::update(ticks);
         return;
     }
@@ -1000,6 +999,8 @@ void SkiddingAI::evaluateItems(const ItemState *item, Vec3 kart_aim_direction,
             break;
         case Item::ITEM_BONUS_BOX:
             break;
+        case Item::ITEM_TRIGGER: return; break;
+
         default: assert(false); break;
     }    // switch
 
@@ -2159,7 +2160,7 @@ void SkiddingAI::handleRescue(const float dt)
             if (m_enabled_network_ai)
                 m_controls->setRescue(true);
             else
-                RescueAnimation::create(m_kart);
+                new RescueAnimation(m_kart);
             m_time_since_stuck=0.0f;
         }   // m_time_since_stuck > 2.0f
     }
@@ -2177,27 +2178,23 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     int nitro_skill = computeSkill(NITRO_SKILL);
     int item_skill = computeSkill(ITEM_SKILL);
    
-    //Nitro continue to be advantageous during the fadeout (nitro ticks continue to tick in the negatives)
+    //Nitro continue to be advantageous during the fadeout
     int nitro_ticks = m_kart->getSpeedIncreaseTicksLeft(MaxSpeed::MS_INCREASE_NITRO);
-    float time_until_fadeout = ( stk_config->ticks2Time(nitro_ticks)
+    float nitro_time = ( stk_config->ticks2Time(nitro_ticks)
                        + m_kart->getKartProperties()->getNitroFadeOutTime() );
-
-    // Because it takes some time after nitro activation to accelerate to the increased max speed,
-    // the best moment for the next burst of nitro is not when the fade-out has
-    // finished, but it is not either before the fade-out starts.
-    float nitro_max_active = m_kart->getKartProperties()->getNitroDuration();
-    float nitro_max_fadeout = m_kart->getKartProperties()->getNitroFadeOutTime();
+    float nitro_max_time = m_kart->getKartProperties()->getNitroDuration()
+                         + m_kart->getKartProperties()->getNitroFadeOutTime();
 
     //Nitro skill 0 : don't use
-    //Nitro skill 1 : don't use if the kart is braking, is not on the ground, has finished the race, has no nitro,
+    //Nitro skill 1 : don't use if the kart is braking, on the ground, has finished the race, has no nitro,
     //                has a parachute or an anvil attached, or has a plunger in the face.
     //                Otherwise, use it immediately
-    //Nitro skill 2 : Don't use nitro if there is more than 35% of main effect left..
-    //                Use it when at max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
+    //Nitro skill 2 : Don't use nitro if there is more than 1,2 seconds of effect/fadeout left. Use it when at
+    //                max speed or under 5 of speed (after rescue, etc.). Use it to pass bombs.
     //                Tries to builds a reserve of 4 energy to use towards the end
-    //Nitro skill 3 : Same as level 2, but don't use until 10% of main effect left, and don't use close
+    //Nitro skill 3 : Same as level 2, but don't use until 0.5 seconds of effect/fadeout left, and don't use close
     //                to bad items, and has a target reserve of 8 energy
-    //Nitro skill 4 : Same as level 3, but don't use until 50% of fadeout left and ignore the plunger
+    //Nitro skill 4 : Same as level 3, but don't use until 0.05 seconds of effect/fadeout left and ignore the plunger
     //                and has a target reserve of 12 energy
    
     m_controls->setNitro(false);
@@ -2205,11 +2202,17 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     float energy_reserve = 0;
 
     if (nitro_skill == 2)
+    {
         energy_reserve = 4;  
-    else if (nitro_skill == 3)
+    }
+    if (nitro_skill == 3)
+    {
         energy_reserve = 8;  
-    else if (nitro_skill == 4)
+    }
+    if (nitro_skill == 4)
+    {
         energy_reserve = 12;  
+    }
 
     // No point in building a big nitro reserve in nitro for FTL AIs,
     // just keep enough to help accelerating after an accident
@@ -2228,12 +2231,17 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     if(m_kart->getBlockedByPlungerTicks()>0)
     {
         if ((nitro_skill < 4) && (item_skill < 5))
+        {
             return;
-        // No else-if because the nitro_skill and item_skill conditions can happen together
-        if (nitro_skill < 4)
-            nitro_skill = 0;
-        if (item_skill < 5)
-            item_skill = 0;
+        }
+        else if (nitro_skill < 4)
+        {
+            nitro_skill = 0;  
+        }
+        else if (item_skill < 5)
+        {
+            item_skill = 0;  
+        }
     }
 
     // Don't use nitro or zipper if it would make the kart go too fast
@@ -2257,19 +2265,38 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     {
        nitro_skill = 0;
     }
-
-    // If the AI has a lot of nitro, it should consume it without waiting for some fadeout
-    bool big_reserve = false;
-
-
-    // If this kart is the last kart, set nitro reserve to be at most 2
-    const unsigned int num_karts = m_world->getCurrentNumKarts();
-    if(nitro_skill >= 2 && m_kart->getPosition()== (int)num_karts &&
-        num_karts > 1 )
+   
+    // Don't use nitro if there is already a nitro boost active
+    // Nitro effect and fadeout varies between karts type from 2 to 4 seconds
+    // So vary time according to kart properties
+    if ((nitro_skill == 4) && nitro_time >= (nitro_max_time*0.01f) )
     {
-        energy_reserve = 2;
+       nitro_skill = 0;
     }
-
+    else if ((nitro_skill == 3) && nitro_time >= (nitro_max_time*0.35f) )
+    {
+       nitro_skill = 0;
+    }
+    else if ((nitro_skill == 2) && nitro_time >= (nitro_max_time*0.5f) )
+    {
+       nitro_skill = 0;
+    }
+   
+    // If there are items to avoid close
+    // Don't use zippers
+    // Dont use nitro if nitro_skill is 3 or 4
+    // (since going faster makes it harder to avoid items).
+    if(m_avoid_item_close && (m_kart->getEnergy()==0 || nitro_skill == 0 || nitro_skill >= 3) )
+        return;
+   
+    // If basic AI, use nitro immediately
+   
+    if (nitro_skill == 1)
+    {
+        m_controls->setNitro(true);
+        return;
+    }
+   
     // Estimate time towards the end of the race.
     // Decreases the reserve size when there is an estimate of time remaining
     // to the end of less than 2,5 times the maximum nitro effect duration.
@@ -2280,50 +2307,42 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
     if(nitro_skill >= 2 && energy_reserve > 0.0f)
     {
         float finish = m_world->getEstimatedFinishTime(m_kart->getWorldKartId()) - m_world->getTime();
-        float max_time_effect = (nitro_max_active + nitro_max_fadeout) / m_kart->getKartProperties()->getNitroConsumption()
+        float max_time_effect = nitro_max_time / m_kart->getKartProperties()->getNitroConsumption()
                                 * m_kart->getEnergy()*2; //the minimum burst consumes around 0.5 energy
-
+       
         // The burster forces the AI to consume its reserve by series of 2 bursts
         // Otherwise the bursting differences of the various nitro skill wouldn't matter here
         // In short races, most AI nitro usage may be at the end with the reserve
+        // FIXME : if there is a lot more nitro than can be used, use it by longer/more frequent bursts
+        // FIXME : waiting for the end of the fade-out for the next burst is not optimal
+        //         as the kart loses nitro top speed time reaccelerating
+        // FIXME : if the nitro reserve goes over 18, use as soon as practical
+        float burster;
         
-        if(m_burster && time_until_fadeout >= 0)
-            energy_reserve = 0;
-        else if (m_burster)
-            m_burster = false;
-
-        if( (2.5f*max_time_effect) >= finish )
+        if ( nitro_time > 0)
+        {
+           burster = 2*nitro_max_time;
+        }
+        else
+        {
+             burster = 0;  
+        }
+        if( (2.5f*max_time_effect) >= (finish - burster) )
         {
             // Absolute reduction to avoid small amount of unburned nitro at the end
-            energy_reserve = std::min(energy_reserve, finish/(2.5f*max_time_effect/m_kart->getEnergy()) - 0.5f);
+            energy_reserve = (finish - burster)/(2.5f*max_time_effect/m_kart->getEnergy()) - 0.5f ;
         }
-        if( (1.8f*max_time_effect) >= finish || m_kart->getEnergy() >= 16)
-            big_reserve = true;
     }
    
-    // Don't use nitro if there is already a nitro boost active
-    // Nitro effect and fadeout may vary between karts type
-    // So vary time according to kart properties
-    if (   ((nitro_skill == 4) && time_until_fadeout >= (nitro_max_fadeout*0.50f) && !big_reserve)
-        || ((nitro_skill == 4) && time_until_fadeout >= (nitro_max_fadeout))
-        || ((nitro_skill == 3) && time_until_fadeout >= (nitro_max_fadeout + nitro_max_active*0.10f))
-        || ((nitro_skill == 2) && time_until_fadeout >= (nitro_max_fadeout + nitro_max_active*0.35f)))
-    {
-       nitro_skill = 0;
-    }
-
     // If trying to pass a bomb to a kart faster or far ahead, use nitro reserve
     if(m_kart->getAttachment()->getType() == Attachment::ATTACH_BOMB
        && nitro_skill >= 2 && energy_reserve > 0.0f)
     {
         if (m_distance_ahead>10.0f || m_kart_ahead->getSpeed() > m_kart->getSpeed() )
         {
-            energy_reserve = 0;
+            energy_reserve = 0 ;
         }
     }
-
-    // TODO : if a kart behind and reasonably close goes faster
-    //        and it has a swatter, use nitro to try and dodge the swatter.
    
     // Don't use nitro if building an energy reserve
     if (m_kart->getEnergy() <= energy_reserve)
@@ -2331,25 +2350,31 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
         nitro_skill = 0;  
     }
 
-    // If basic AI, or if the kart is very slow (e.g. after rescue) but not too much (accident)
-    // or if kart is near the base max speed, use nitro.
-    // This last condition is to profit from the max speed increase
-    // And because it means there should be no slowing down from, e.g. plungers
-    // If the kart has a huge reserve and may not have enough time until the end to ue it,
-    // relax the speed condition.
-    if (    nitro_skill == 1
-        || (nitro_skill > 1 && (   (m_kart->getSpeed()<5 && m_kart->getSpeed()>2)
-                                || (m_kart->getSpeed()> 0.96f*m_kart->getCurrentMaxSpeed())
-                                || (m_kart->getSpeed()> 0.3f *m_kart->getCurrentMaxSpeed() && big_reserve))) )
+    // If the kart is very slow (e.g. after rescue), use nitro
+    if(nitro_skill > 0 && m_kart->getSpeed()<5 && m_kart->getSpeed()>2)
     {
         m_controls->setNitro(true);
-        m_burster = !m_burster;
+        return;
+    }
+   
+   // If kart is at max speed, use nitro
+   // This is to profit from the max speed increase
+   // And because it means there should be no slowing down from, e.g. plungers
+   if (nitro_skill > 0 && m_kart->getSpeed() > 0.99f*m_kart->getCurrentMaxSpeed() )
+    {
+        m_controls->setNitro(true);
+        return;
     }
 
-    //TODO : for now we don't disable nitro use when close to bananas and gums,
-    //       because it hurts more often than not (when the bad item is avoided)
-    if(m_avoid_item_close)
+    // If this kart is the last kart, and we have nitro, use it.
+    // -------------------------------------------------
+    const unsigned int num_karts = m_world->getCurrentNumKarts();
+    if(nitro_skill > 0 && m_kart->getPosition()== (int)num_karts &&
+        num_karts > 1 )
+    {
+        m_controls->setNitro(true);
         return;
+    }
    
     // Use zipper
     if(m_kart->getPowerup()->getType() == PowerupManager::POWERUP_ZIPPER 

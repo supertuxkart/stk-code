@@ -23,8 +23,6 @@
 #include "karts/ghost_kart.hpp"
 #include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
@@ -89,25 +87,39 @@ void EasterEggHunt::readData(const std::string &filename)
         return;
     }
 
-    // Search for the most relevant set of egg
+    // Search for the closest difficulty set of egg.
     const XMLNode *data = NULL;
     RaceManager::Difficulty difficulty     = race_manager->getDifficulty();
     RaceManager::Difficulty act_difficulty = RaceManager::DIFFICULTY_COUNT;
-
-    for(int i=RaceManager::DIFFICULTY_FIRST; i<=RaceManager::DIFFICULTY_LAST; i++)
+    for(int i=difficulty; i<=RaceManager::DIFFICULTY_LAST; i++)
     {
-        std::string diff_name = race_manager->getDifficultyAsString((RaceManager::Difficulty)i);
+        std::string diff_name=
+            race_manager->getDifficultyAsString((RaceManager::Difficulty)i);
         const XMLNode * cur_data = easter->getNode(diff_name);
         if (cur_data)
         {
             data = cur_data;
             act_difficulty = (RaceManager::Difficulty)i;
-            // Stop at the easiest difficulty which is equal or harder than the desired one.
-            // If none is equal or harder, this will default to the hardest defined set.
-            if (act_difficulty >= difficulty)
-                break;
+            break;
         }
     }
+    // If there is no data for an equal or harder placement,
+    // check for the most difficult placement that is easier:
+    if(!data)
+    {
+        for(int i=difficulty-1; i>=RaceManager::DIFFICULTY_FIRST; i--)
+        {
+            std::string diff_name=
+               race_manager->getDifficultyAsString((RaceManager::Difficulty)i);
+            const XMLNode * cur_data = easter->getNode(diff_name);
+            if (cur_data)
+            {
+                data = cur_data;
+                act_difficulty = (RaceManager::Difficulty)i;
+                break;
+            }
+        }   // for i
+    }   // if !data
 
     if(!data)
     {

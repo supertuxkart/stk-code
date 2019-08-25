@@ -62,9 +62,6 @@ DynamicRibbonWidget::DynamicRibbonWidget(const bool combo, const bool multi_row)
     m_item_count_hint = 0;
 
     m_max_label_width = 0;
-
-    m_scroll_callback.callback = NULL;
-    m_scroll_callback.data = NULL;
 }
 // -----------------------------------------------------------------------------
 DynamicRibbonWidget::~DynamicRibbonWidget()
@@ -152,8 +149,14 @@ void DynamicRibbonWidget::add()
 
     const int average_y = m_y + (m_h - m_label_height)/2;
 
-    m_arrows_w = GUIEngine::getFontHeight() * 2;
+    unsigned int screen_height = irr_driver->getActualScreenSize().Height;
+    m_arrows_w = (int)(screen_height / 15);
     m_arrows_w = std::max(m_arrows_w, 40);
+    
+    if (UserConfigParams::m_hidpi_enabled)
+    {
+        m_arrows_w = int(m_arrows_w*1.5f);
+    }
 
     const int button_h = m_arrows_w;
 
@@ -527,33 +530,6 @@ void DynamicRibbonWidget::clearItems()
 }
 
 // -----------------------------------------------------------------------------
-void DynamicRibbonWidget::setBadge(const std::string &name, BadgeType badge)
-{
-    for (unsigned int r = 0; r < m_rows.size(); r++)
-    {
-        for (unsigned int c = 0; c < m_rows[r].m_children.size(); c++)
-        {
-            if(m_rows[r].m_children[c].m_properties[PROP_ID]==name)
-                m_rows[r].m_children[c].setBadge(badge);
-            else
-                m_rows[r].m_children[c].unsetBadge(badge);
-        }
-    }
-    
-    for (unsigned int i = 0; i < m_items.size(); i++)
-    {
-        if (m_items[i].m_code_name == name)
-        {
-            m_items[i].m_badges |= int(badge);
-        }
-        else
-        {
-            m_items[i].m_badges &= (~int(badge));
-        }
-    }
-}   // setBadge
-
-// -----------------------------------------------------------------------------
 void DynamicRibbonWidget::elementRemoved()
 {
     Widget::elementRemoved();
@@ -763,7 +739,7 @@ void DynamicRibbonWidget::onRibbonWidgetScroll(const int delta_x)
 
 // -----------------------------------------------------------------------------
 
-void DynamicRibbonWidget::setText(const irr::core::stringw& text)
+void DynamicRibbonWidget::setText(const wchar_t *text)
 {
     Widget::setText(text);
 
@@ -817,11 +793,6 @@ void DynamicRibbonWidget::scroll(int x_delta, bool evenIfDeactivated)
     else if (m_scroll_offset > max_scroll) m_scroll_offset = 0;
 
     updateItemDisplay();
-
-    if (m_scroll_callback.callback != NULL)
-    {
-        m_scroll_callback.callback(m_scroll_callback.data);
-    }
 
     // update selection markers in child ribbon
     if (m_combo)

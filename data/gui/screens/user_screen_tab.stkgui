@@ -77,19 +77,19 @@
                 
                 <spacer width="20" height="2%"/>
 
-                <div width="100%" align="center" layout="vertical-row" height="13%">
+                <div width="100%" align="center" layout="vertical-row" height="18%">
                     <buttonbar id="options" width="100%" height="100%" align="center">
-                        <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
+                        <icon-button id="ok" width="fit" height="fit" icon="gui/icons/green_check.png"
                                      I18N="In the user screen" text="OK" label_location="bottom"/>
-                        <icon-button id="new_user" width="128" height="128" icon="gui/icons/blue_plus.png"
+                        <icon-button id="new_user" width="fit" height="fit" icon="gui/icons/blue_plus.png"
                                      I18N="In the user screen" text="Add" label_location="bottom"/>
-                        <icon-button id="delete" width="128" height="128" icon="gui/icons/remove.png"
+                        <icon-button id="delete" width="fit" height="fit" icon="gui/icons/remove.png"
                                      I18N="In the user screen" text="Delete" label_location="bottom"/>
-                        <icon-button id="rename" width="128" height="128" icon="gui/icons/rename.png"
+                        <icon-button id="rename" width="fit" height="fit" icon="gui/icons/rename.png"
                                      I18N="In the user screen" text="Rename" label_location="bottom"/>
-                        <icon-button id="default_kart_color" width="128" height="128" icon="gui/icons/edit.png"
+                        <icon-button id="default_kart_color" width="fit" height="fit" icon="gui/icons/edit.png"
                                      I18N="In the user screen" text="Kart color" label_location="bottom"/>
-                        <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
+                        <icon-button id="cancel" width="fit" height="fit" icon="gui/icons/main_quit.png"
                                      I18N="In the user screen" text="Cancel" label_location="bottom"/>
                     </buttonbar>
                 </div>

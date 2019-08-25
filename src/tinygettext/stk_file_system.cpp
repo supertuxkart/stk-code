@@ -25,7 +25,6 @@
 #include <string.h>
 
 #include "io/file_manager.hpp"
-#include "utils/file_utils.hpp"
 
 namespace tinygettext {
 
@@ -50,8 +49,7 @@ StkFileSystem::open_directory(const std::string& pathname)
 std::unique_ptr<std::istream>
 StkFileSystem::open_file(const std::string& filename)
 {
-  return std::unique_ptr<std::istream>(new std::ifstream(
-    FileUtils::getPortableReadingPath(filename)));
+  return std::unique_ptr<std::istream>(new std::ifstream(filename.c_str()));
 }
 
 } // namespace tinygettext

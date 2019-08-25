@@ -28,8 +28,6 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 using namespace irr::core;
@@ -77,7 +75,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
 
     /* Used to display kart icons for the selected replay(s) */
     irr::gui::STKModifiedSpriteBank *icon_bank = GhostReplaySelection::getInstance()->getIconBank();
-    int icon_height = GUIEngine::getFontHeight() * 3 / 2;
+    int icon_height = getHeight()/18;
     m_replay_info_widget->setIcons(icon_bank, (int)icon_height);
 
     updateReplayDisplayedInfo();
@@ -142,20 +140,20 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
     // as the header doesn't work with modal dialogs
     if (is_linear)
         row.push_back(GUIEngine::ListWidget::ListCell
-            (_C("column_name", "Reverse"), -1, 3, true));
+            (_C("ghost_info", "Reverse"), -1, 3, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_C("column_name", "Difficulty"), -1, 4, true));
+        (_C("ghost_info", "Difficulty"), -1, 4, true));
     if (is_linear)
         row.push_back(GUIEngine::ListWidget::ListCell
-            (_C("column_name", "Laps"), -1, 3, true));
+            (_C("ghost_info", "Laps"), -1, 3, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_C("column_name", "Time"), -1, 3, true));
+        (_C("ghost_info", "Time"), -1, 3, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_C("column_name", "Kart"), -1, 1, true));
+        (_C("ghost_info", "Kart"), -1, 1, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_C("column_name", "User"), -1, 5, true));
+        (_C("ghost_info", "User"), -1, 5, true));
     row.push_back(GUIEngine::ListWidget::ListCell
-        (_C("column_name", "Version"), -1, 2, true));
+        (_C("ghost_info", "Version"), -1, 2, true));
 
     m_replay_info_widget->addItem(StringUtils::toString(0), row);
 

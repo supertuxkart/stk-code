@@ -12,7 +12,7 @@
                         I18N="Tab in help menu" text="General"/>
                 <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
                         I18N="Tab in help menu" text="Game Modes"/>
-                <icon-button id="page3" width="128" height="128" icon="gui/icons/gift.png"
+                <icon-button id="page3" width="128" height="128" icon="gui/icons/weapons.png"
                         I18N="Tab in help menu" text="Powerups"/>
                 <icon-button id="page4" width="128" height="128" icon="gui/icons/banana.png"
                         I18N="Tab in help menu" text="Bananas"/>
@@ -21,7 +21,7 @@
                 <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
                         I18N="Tab in help menu" text="Kart classes"/>
                 <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
-                        I18N="Tab in help menu" text="Multiplayer"/>
+                        I18N="Tab in help menu" text="Multi-player"/>
             </vertical-tabs>
 
             <spacer width="2%" height="100%"/>
@@ -36,7 +36,7 @@
                     <spacer width="25" height="25"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Mass - there are three classes of karts, depending on their mass: light, medium and heavy. Heavier karts are less affected by parachutes and are more resistant to explosions."/>
+                            text="Mass - there are three classes of karts, depending of their mass: light, medium and heavy. Heavier karts are less affected by parachutes and are more resistant to explosions."/>
                 </div>
                 
                 <div width="100%" proportion="4" layout="horizontal-row">

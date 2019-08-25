@@ -36,7 +36,7 @@
                     <spacer width="20" height="20"/>
 
                     <div layout="vertical-row" proportion="1" height="fit" id="inner_box">
-                        <gauge id="gfx_level" min_value="1" max_value="8" width="8f" align="center" />
+                        <gauge id="gfx_level" min_value="1" max_value="8" width="300" align="center" />
                         <spacer height="5" width="10"/>
                         <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
                     </div>
@@ -58,9 +58,9 @@
                 <spacer width="5" height="1%"/>
                 <label width="100%" I18N="In the video settings" text="Resolution"/>
 
-                <scrollable_ribbon id="resolutions" height="20%" label_location="each"
+                <scrollable_ribbon id="resolutions" proportion="1" label_location="each"
                                    width="100%" square_items="false"
-                                   align="center" child_width="128" child_height="128" />
+                                   align="center" child_width="128" child_height="128" max_height="150" />
 
                 <spacer width="5" height="1%"/>
 

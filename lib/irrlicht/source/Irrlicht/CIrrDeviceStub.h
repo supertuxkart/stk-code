@@ -119,22 +119,6 @@ namespace irr
 		//! Activate any joysticks, and generate events for them.
 		virtual bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo);
 
-		/** Onscreen keyboard addition, to determine how much to move vertically. */
-		virtual u32 getScreenHeight() const { return 0; }
-		virtual u32 getOnScreenKeyboardHeight() const { return 0; }
-		virtual s32 getMovedHeight() const { return 0; }
-		virtual void toggleOnScreenKeyboard(bool show, s32 type = 0) {}
-		virtual void registerGetMovedHeightFunction(HeightFunc) {}
-
-		//! Returns true if system has touch device
-		virtual bool supportsTouchDevice() const { return false; }
-
-		//! Returns true if system has hardware keyboard attached
-		virtual bool hasHardwareKeyboard() const { return true; }
-
-		//! Returns true if system has native on screen keyboard
-		virtual bool hasOnScreenKeyboard() const  { return false; }
-
 		//! Set the current Gamma Value for the Display
 		virtual bool setGammaRamp( f32 red, f32 green, f32 blue, f32 brightness, f32 contrast );
 
@@ -151,8 +135,9 @@ namespace irr
 		//! Remove all messages pending in the system message loop
 		virtual void clearSystemMessages();
 
-		void simulateMouse(const SEvent& event, core::position2d<s32>& mouse_pos);
+
 	protected:
+
 		void createGUIAndScene();
 
 		//! checks version of SDK and prints warning if there might be a problem
@@ -192,7 +177,7 @@ namespace irr
 		SMouseMultiClicks MouseMultiClicks;
 		video::CVideoModeList VideoModeList;
 		SIrrlichtCreationParameters CreationParams;
-		bool Close, IsMousePressed;
+		bool Close;
 	};
 
 } // end namespace irr

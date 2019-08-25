@@ -24,11 +24,9 @@
 #include "network/server.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
-#include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "utils/separate_process.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <irrString.h>
@@ -97,7 +95,7 @@ void CreateServerScreen::init()
     m_name_widget->setText(_("%s's server",
                              NetworkConfig::get()->isLAN() 
                              ? PlayerManager::getCurrentPlayer()->getName()
-                             : PlayerManager::getCurrentOnlineProfile()->getUserName()
+                             : PlayerManager::getCurrentOnlineUserName()
                              )
                           );
 

@@ -470,7 +470,7 @@ void Skidding::update(int ticks, bool is_on_ground,
                         * fabsf(getSteeringFraction());
             //FIXME : what is this for ?
             float r = kp->getWheelBase()
-                    / asinf(angle)*1.0f;
+                    / asin(angle)*1.0f;
 
             const int num_steps = 50;
 

@@ -45,7 +45,6 @@
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <string>
 
@@ -235,7 +234,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             return;
         }
         core::stringw instruction =
-            _("Enter the server address with IP optionally followed by : and"
+            _("Enter the server address with IP (optional) followed by : and"
             " then port.");
         auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
             [] (const irr::core::stringw& text) {},

@@ -18,9 +18,9 @@
 
 #include "guiengine/scalable_font.hpp"
 
-#include "font/font_manager.hpp"
 #include "font/font_settings.hpp"
 #include "font/font_with_face.hpp"
+#include "utils/translation.hpp"
 
 namespace irr
 {
@@ -30,7 +30,8 @@ namespace gui
 ScalableFont::ScalableFont(FontWithFace* face)
 {
     m_face = face;
-    m_font_settings = new FontSettings();
+    m_font_settings = new FontSettings(false/*black_border*/,
+        translations->isRTLLanguage());
 }   // ScalableFont
 
 // ----------------------------------------------------------------------------
@@ -40,37 +41,38 @@ ScalableFont::~ScalableFont()
 }   // ~ScalableFont
 
 // ----------------------------------------------------------------------------
+void ScalableFont::updateRTL()
+{
+    m_font_settings->setRTL(translations->isRTLLanguage());
+}   // updateRTL
+
+// ----------------------------------------------------------------------------
 void ScalableFont::setShadow(const irr::video::SColor &col)
 {
     m_font_settings->setShadow(true);
     m_font_settings->setShadowColor(col);
 }   // setShadow
-
 // ----------------------------------------------------------------------------
 void ScalableFont::disableShadow()
 {
     m_font_settings->setShadow(false);
 }   // disableShadow
-
 // ----------------------------------------------------------------------------
 void ScalableFont::setBlackBorder(bool enabled)
 {
     m_font_settings->setBlackBorder(enabled);
 }   // setBlackBorder
-
 // ----------------------------------------------------------------------------
 void ScalableFont::setColoredBorder(const irr::video::SColor &col)
 {
     m_font_settings->setColoredBorder(true);
     m_font_settings->setBorderColor(col);
 }   // setColoredBorder
-
 // ----------------------------------------------------------------------------
 void ScalableFont::setThinBorder(bool thin)
 {
     m_font_settings->setThinBorder(thin);
 }   // setThinBorder
-
 // ----------------------------------------------------------------------------
 void ScalableFont::disableColoredBorder()
 {
@@ -101,18 +103,10 @@ void ScalableFont::draw(const core::stringw& text,
                         bool hcenter, bool vcenter,
                         const core::rect<s32>* clip)
 {
-    m_face->drawText(text, position, color, hcenter, vcenter, clip,
+#ifndef SERVER_ONLY
+    m_face->render(text, position, color, hcenter, vcenter, clip,
         m_font_settings);
-}   // draw
-
-// ----------------------------------------------------------------------------
-void ScalableFont::draw(const std::vector<GlyphLayout>& gls,
-                        const core::rect<s32>& position, video::SColor color,
-                        bool hcenter, bool vcenter,
-                        const core::rect<s32>* clip)
-{
-    m_face->render(gls, position, color, hcenter, vcenter, clip,
-        m_font_settings);
+#endif
 }   // draw
 
 // ----------------------------------------------------------------------------
@@ -121,18 +115,17 @@ void ScalableFont::draw(const core::stringw& text,
                         const video::SColor& color, bool hcenter, bool vcenter,
                         const core::rect<s32>* clip, bool ignoreRTL)
 {
-    m_face->drawText(text, position, color, hcenter, vcenter, clip,
-        m_font_settings);
-}   // draw
+#ifndef SERVER_ONLY
+    bool previousRTL = m_font_settings->isRTL();
+    if (ignoreRTL)
+        m_font_settings->setRTL(false);
 
-// ----------------------------------------------------------------------------
-void ScalableFont::drawQuick(const core::stringw& text,
-                             const core::rect<s32>& position,
-                             const video::SColor color, bool hcenter,
-                             bool vcenter, const core::rect<s32>* clip)
-{
-    m_face->drawTextQuick(text, position, color, hcenter, vcenter, clip,
+    m_face->render(text, position, color, hcenter, vcenter, clip,
         m_font_settings);
+
+    if (ignoreRTL)
+        m_font_settings->setRTL(previousRTL);
+#endif
 }   // draw
 
 // ----------------------------------------------------------------------------
@@ -147,36 +140,13 @@ IGUISpriteBank* ScalableFont::getSpriteBank() const
     return m_face->getSpriteBank();
 }   // getSpriteBank
 
-// ----------------------------------------------------------------------------
-s32 ScalableFont::getHeightPerLine() const
+// ------------------------------------------------------------------------
+u32 ScalableFont::getSpriteNoFromChar(const wchar_t *c) const
 {
-    return m_face->getFontMaxHeight() * m_font_settings->getScale();
-}   // getHeightPerLine
-
-// ----------------------------------------------------------------------------
-/** Convert text to glyph layouts for fast rendering with caching enabled
- *  If line_data is not null, each broken line u32string will be saved and
- *  can be used for advanced glyph and text mapping, and cache will be
- *  disabled.
- */
-void ScalableFont::initGlyphLayouts(const core::stringw& text,
-                                    std::vector<GlyphLayout>& gls,
-                                    std::vector<std::u32string>* line_data)
-{
-#ifndef SERVER_ONLY
-    font_manager->initGlyphLayouts(text, gls, line_data);
-#endif
-}   // initGlyphLayouts
-
-// ----------------------------------------------------------------------------
-f32 ScalableFont::getInverseShaping() const
-{
-#ifndef SERVER_ONLY
-    return m_face->getInverseShaping();
-#else
-    return 1.0f;
-#endif
-}   // getShapingScale
+    const FontWithFace::FontArea& area =
+        m_face->getAreaFromCharacter(*c, NULL/*fallback_font*/);
+    return area.spriteno;
+}   // getSpriteNoFromChar
 
 } // end namespace gui
 } // end namespace irr

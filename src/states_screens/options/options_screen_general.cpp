@@ -38,8 +38,6 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
-#include "states_screens/dialogs/download_assets.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
 #include "states_screens/options/options_screen_input.hpp"
@@ -48,7 +46,6 @@
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
-#include "utils/extract_mobile_assets.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -84,27 +81,29 @@ void OptionsScreenGeneral::init()
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     ribbon->select( "tab_general", PLAYER_ID_GAME_MASTER );
 
-    CheckBoxWidget* internet_enabled = getWidget<CheckBoxWidget>("enable-internet");
-    assert( internet_enabled != NULL );
-    internet_enabled->setState( UserConfigParams::m_internet_status
+    CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
+    assert( news != NULL );
+    news->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
     CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
     assert( stats != NULL );
-    stats->setState(UserConfigParams::m_hw_report_enable);
+    LabelWidget *stats_label = getWidget<LabelWidget>("label-hw-report");
+    assert( stats_label );
+            stats->setState(UserConfigParams::m_hw_report_enable);
 
-    CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+    getWidget<CheckBoxWidget>("enable-lobby-chat")
+        ->setState(UserConfigParams::m_lobby_chat);
 
-    if(internet_enabled->getState())
+    if(news->getState())
     {
-        stats->setActive(true);
+        stats_label->setVisible(true);
+        stats->setVisible(true);
         stats->setState(UserConfigParams::m_hw_report_enable);
-        chat->setActive(true);
-        chat->setState(UserConfigParams::m_lobby_chat);
     }
     else
     {
-        stats->setActive(false);
-        chat->setActive(false);
+        stats_label->setVisible(false);
+        stats->setVisible(false);
     }
     CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
     assert( difficulty != NULL );
@@ -116,24 +115,6 @@ void OptionsScreenGeneral::init()
     assert( show_login!= NULL );
     show_login->setState( UserConfigParams::m_always_show_login_screen);
 
-#ifdef MOBILE_STK
-    if (ExtractMobileAssets::hasFullAssets())
-    {
-        // I18N: For mobile version for STK, uninstall the downloaded assets
-        getWidget("assets_settings")->setText(_("Uninstall full game assets"));
-    }
-    else
-    {
-        // I18N: For mobile version for STK, install the full game assets which
-        // will download from stk server
-        getWidget("assets_settings")->setText(_("Install full game assets"));
-    }
-    if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED ||
-        StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
-        getWidget("assets_settings")->setActive(false);
-#else
-    getWidget("assets_settings")->setVisible(false);
-#endif
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -186,25 +167,25 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
         CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+        LabelWidget* stats_label = getWidget<LabelWidget>("label-hw-report");
         CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+        LabelWidget* chat_label = getWidget<LabelWidget>("label-lobby-chat");
         if(internet->getState())
         {
             NewsManager::get()->init(false);
-            stats->setActive(true);
+            stats->setVisible(true);
+            stats_label->setVisible(true);
             stats->setState(UserConfigParams::m_hw_report_enable);
-            chat->setActive(true);
-            chat->setState(UserConfigParams::m_lobby_chat);
+            chat->setVisible(true);
+            stats->setState(UserConfigParams::m_lobby_chat);
+            chat_label->setVisible(true);
         }
         else
         {
-            chat->setActive(false);
-            stats->setActive(false);
-
-            // Disable this, so that the user has to re-check this if
-            // enabled later (for GDPR compliance).
-            UserConfigParams::m_hw_report_enable = false;
-            stats->setState(false);
-
+            chat->setVisible(false);
+            chat_label->setVisible(false);
+            stats->setVisible(false);
+            stats_label->setVisible(false);
             PlayerProfile* profile = PlayerManager::getCurrentPlayer();
             if (profile != NULL && profile->isLoggedIn())
                 profile->requestSignOut();
@@ -238,29 +219,6 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         assert( difficulty != NULL );
         UserConfigParams::m_per_player_difficulty = difficulty->getState();
     }
-#ifdef MOBILE_STK
-    else if (name=="assets_settings")
-    {
-        if (ExtractMobileAssets::hasFullAssets())
-        {
-            class AssetsDialogListener : public MessageDialog::IConfirmDialogListener
-            {
-            public:
-                virtual void onConfirm() OVERRIDE
-                {
-                    ModalDialog::dismiss();
-                    ExtractMobileAssets::uninstall();
-                }
-            };   // class AssetsDialogListener
-            new MessageDialog(
-                _("Are you sure to uninstall full game assets?"),
-                MessageDialog::MESSAGE_DIALOG_OK_CANCEL,
-                new AssetsDialogListener(), true);
-        }
-        else
-            new DownloadAssets();
-    }
-#endif
 #endif
 }   // eventCallback
 

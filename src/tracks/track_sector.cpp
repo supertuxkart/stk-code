@@ -177,64 +177,23 @@ float TrackSector::getRelativeDistanceToCenter() const
 }   // getRelativeDistanceToCenter
 
 // ----------------------------------------------------------------------------
-/** Only basket ball is used for rewind for TrackSector so save the minimum.
- */
 void TrackSector::saveState(BareNetworkString* buffer) const
 {
-    buffer->addUInt16((int16_t)m_current_graph_node);
-    buffer->addFloat(m_current_track_coords.getZ());
+    buffer->addUInt32(m_current_graph_node);
+    buffer->addUInt32(m_last_valid_graph_node);
+    buffer->add(m_current_track_coords);
+    buffer->add(m_latest_valid_track_coords);
+    buffer->addUInt8(m_on_road ? 1 : 0);
+    buffer->addUInt32(m_last_triggered_checkline);
 }   // saveState
 
 // ----------------------------------------------------------------------------
 void TrackSector::rewindTo(BareNetworkString* buffer)
 {
-    int16_t node = buffer->getUInt16();
-    m_current_graph_node = node;
-    m_current_track_coords.setZ(buffer->getFloat());
+    m_current_graph_node = buffer->getUInt32();
+    m_last_valid_graph_node = buffer->getUInt32();
+    m_current_track_coords = buffer->getVec3();
+    m_latest_valid_track_coords = buffer->getVec3();
+    m_on_road = buffer->getUInt8() == 1;
+    m_last_triggered_checkline = buffer->getUInt32();
 }   // rewindTo
-
-// ----------------------------------------------------------------------------
-/** Save completely for spectating in linear race
- */
-void TrackSector::saveCompleteState(BareNetworkString* bns)
-{
-    bns->addUInt32(m_current_graph_node);
-    bns->addUInt32(m_estimated_valid_graph_node);
-    bns->addUInt32(m_last_valid_graph_node);
-    bns->add(m_current_track_coords);
-    bns->add(m_estimated_valid_track_coords);
-    bns->add(m_latest_valid_track_coords);
-    bns->addUInt8(m_on_road ? 1 : 0);
-    bns->addUInt32(m_last_triggered_checkline);
-}   // saveCompleteState
-
-// ----------------------------------------------------------------------------
-void TrackSector::restoreCompleteState(const BareNetworkString& b)
-{
-    const int max_node = Graph::get()->getNumNodes();
-    m_current_graph_node = b.getUInt32();
-    if (m_current_graph_node >= max_node)
-    {
-        Log::warn("TrackSector", "Server has different graph node list.");
-        // 0 so that if any function is called before update track sector
-        // again it will have at least a valid node
-        m_current_graph_node = 0;
-    }
-    m_estimated_valid_graph_node = b.getUInt32();
-    if (m_estimated_valid_graph_node >= max_node)
-    {
-        Log::warn("TrackSector", "Server has different graph node list.");
-        m_estimated_valid_graph_node = 0;
-    }
-    m_last_valid_graph_node = b.getUInt32();
-    if (m_last_valid_graph_node >= max_node)
-    {
-        Log::warn("TrackSector", "Server has different graph node list.");
-        m_last_valid_graph_node = 0;
-    }
-    m_current_track_coords = b.getVec3();
-    m_estimated_valid_track_coords = b.getVec3();
-    m_latest_valid_track_coords = b.getVec3();
-    m_on_road = b.getUInt8() == 1;
-    m_last_triggered_checkline = b.getUInt32();
-}   // restoreCompleteState

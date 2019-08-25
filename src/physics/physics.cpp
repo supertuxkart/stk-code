@@ -234,7 +234,7 @@ void Physics::update(int ticks)
             }
             if (obj->isCrashReset())
             {
-                RescueAnimation::create(kart);
+                new RescueAnimation(kart);
             }
             else if (obj->isExplodeKartObject())
             {
@@ -271,7 +271,7 @@ void Physics::update(int ticks)
             if(anim->isCrashReset())
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
-                RescueAnimation::create(kart);
+                new RescueAnimation(kart);
             }
             else if (anim->isExplodeKartObject())
             {

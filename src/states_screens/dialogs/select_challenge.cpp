@@ -25,7 +25,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -35,78 +34,39 @@
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* c_data)
+core::stringw getLabel(RaceManager::Difficulty difficulty, const ChallengeData* c)
 {
-    core::stringw label, description;
-    
-    if (c_data->isGrandPrix())
-    {
-        description += _("Grand Prix");
-        description += L" - ";
-        description += RaceManager::getNameOf(c_data->getMinorMode());
-    } // if isGrandPrix
-    else
-    {
-        if (c_data->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
-        {
-            //I18N: In the Select challenge dialog
-            description += _("Nitro challenge");
-        }
-        else if (c_data->isGhostReplay())
-        {
-            //I18N: In the Select challenge dialog
-            description += _("Ghost replay race");
-        }
-        else
-            description += RaceManager::getNameOf(c_data->getMinorMode());
+    core::stringw label;
 
-        description += L" - ";
-        //I18N: In the Select challenge dialog
-        description += _("Laps: %i", c_data->getNumLaps());
+    if (c->getMaxPosition(difficulty) != -1)
+    {
+        int r = c->getMaxPosition(difficulty);
+        if (c->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
 
-        if (c_data->getReverse())
-        {
-            description += L" - ";
-            //I18N: In the Select challenge dialog, tell user this challenge has reversed laps
-            description += _("Mode: Reverse");
-        }
-    } // if !isGrandPrix
-    //I18N: In the Select challenge dialog, type of this challenge
-    label = _("Type: %s", description);
-    
-    if (c_data->getMaxPosition(difficulty) != -1)
-    {
-        int r = c_data->getMaxPosition(difficulty);
-        if (c_data->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER) r--;
-        label += L"\n";
-        //I18N: In the Select challenge dialog
-        label += _("Required Rank: %i", r);
+        if (label.size() > 0) label.append(L"\n");
+        label.append( _("Required Rank: %i", r) );
     }
-    if (c_data->getTimeRequirement(difficulty) > 0)
+    if (c->getTimeRequirement(difficulty) > 0)
     {
-        label += L"\n";
-        //I18N: In the Select challenge dialog
-        label += _("Required Time: %i",
-                        StringUtils::timeToString(c_data->getTimeRequirement(difficulty)).c_str());
+        if (label.size() > 0) label.append(L"\n");
+        label.append( _("Required Time: %i",
+                        StringUtils::timeToString(c->getTimeRequirement(difficulty)).c_str()) );
     }
-    if (c_data->getEnergy(difficulty) > 0)
+    if (c->getEnergy(difficulty) > 0)
     {
-        label += L"\n";
-        //I18N: In the Select challenge dialog
-        label += _("Required Nitro Points: %i", c_data->getEnergy(difficulty));
+        if (label.size() > 0) label.append(L"\n");
+        label.append( _("Required Nitro Points: %i", c->getEnergy(difficulty)) );
     }
-    if (!c_data->isGhostReplay())
+
+    if (!c->isGhostReplay())
     {
-        label += L"\n";
-        //I18N: In the Select challenge dialog
-        label += _("Number of AI Karts: %i", c_data->getNumKarts(difficulty) - 1);
+        if (label.size() > 0) label.append(L"\n");
+        label.append(_("Number of AI Karts: %i", c->getNumKarts(difficulty) - 1));
     }
 
     return label;
@@ -120,81 +80,78 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
                                              std::string challenge_id) :
     ModalDialog(percentWidth, percentHeight)
 {
-    loadFromFile("select_challenge.stkgui");
-    
+    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+        loadFromFile("select_challenge_nobest.stkgui");
+    else
+        loadFromFile("select_challenge.stkgui");
     m_challenge_id = challenge_id;
     World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
-    
-    GUIEngine::RibbonWidget* difficulty =
-        getWidget<GUIEngine::RibbonWidget>("difficulty");
-    
-    if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
-        PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+
+    switch (UserConfigParams::m_difficulty)
     {
-        difficulty->setSelection(RaceManager::DIFFICULTY_HARD, PLAYER_ID_GAME_MASTER);
-    }
-    else
-    {
-        difficulty->setSelection( UserConfigParams::m_difficulty, PLAYER_ID_GAME_MASTER );
+        case 0:
+            getWidget("novice")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+        case 1:
+            getWidget("intermediate")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+        case 2:
+            getWidget("expert")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+        case 3:
+        {
+            if(PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+                getWidget("expert")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            else
+                getWidget("supertux")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            break;
+        }
     }
 
     const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                              ->getChallengeStatus(challenge_id);
-    LabelWidget* challenge_info = getWidget<LabelWidget>("challenge_info");
-    
-    switch (UserConfigParams::m_difficulty)
-    {
-        case 0:
-            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_EASY,   c->getData()), false );
-            break;
-        case 1:
-            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_MEDIUM, c->getData()), false );
-            break;
-        case 2:
-            challenge_info->setText(getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
-            break;
-        case 3:
-            if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
-                PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-            {
-                challenge_info->setText(getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
-            }
-            else
-            {
-                challenge_info->setText(getLabel(RaceManager::DIFFICULTY_BEST,   c->getData()), false );
-            }
-            break;
-    }
-    
+
     updateSolvedIcon(c, RaceManager::DIFFICULTY_EASY,   "novice",       "cup_bronze.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_MEDIUM, "intermediate", "cup_silver.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_HARD,   "expert",       "cup_gold.png");
     updateSolvedIcon(c, RaceManager::DIFFICULTY_BEST,   "supertux",     "cup_platinum.png");
-    
+
+    LabelWidget* novice_label = getWidget<LabelWidget>("novice_label");
+    LabelWidget* medium_label = getWidget<LabelWidget>("intermediate_label");
+    LabelWidget* expert_label = getWidget<LabelWidget>("difficult_label");
+
+    novice_label->setText( getLabel(RaceManager::DIFFICULTY_EASY,   c->getData()), false );
+    medium_label->setText( getLabel(RaceManager::DIFFICULTY_MEDIUM, c->getData()), false );
+    expert_label->setText( getLabel(RaceManager::DIFFICULTY_HARD,   c->getData()), false );
+
+    if (!PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
+    {
+        LabelWidget* supertux_label = getWidget<LabelWidget>("supertux_label");
+        supertux_label->setText( getLabel(RaceManager::DIFFICULTY_BEST,   c->getData()), false );
+    }
+
     if (c->getData()->isGrandPrix())
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
-        getWidget<LabelWidget>("title")->setText(gp->getName(), true);
+        getWidget<LabelWidget>("title")->setText(translations->fribidize(gp->getName()), true);
     }
     else
     {
         const core::stringw track_name =
             track_manager->getTrack(c->getData()->getTrackId())->getName();
-        getWidget<LabelWidget>("title")->setText(track_name, true);
+        getWidget<LabelWidget>("title")->setText(translations->fribidize(track_name), true);
     }
-    
-    
-    
-    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-    {
-        getWidget<IconButtonWidget>("supertux")->setBadge(LOCKED_BADGE);
-        getWidget<IconButtonWidget>("supertux")->setActive(false);
-    }
+
+    LabelWidget* typeLbl = getWidget<LabelWidget>("race_type_val");
+    if (c->getData()->isGrandPrix())
+        typeLbl->setText(_("Grand Prix"), false );
+    else if (c->getData()->getEnergy(RaceManager::DIFFICULTY_EASY) > 0)
+        typeLbl->setText(_("Nitro challenge"), false );
+    else if (c->getData()->isGhostReplay())
+        typeLbl->setText(_("Ghost replay race"), false );
     else
-    {
-        getWidget<IconButtonWidget>("supertux")->unsetBadge(LOCKED_BADGE);
-        getWidget<IconButtonWidget>("supertux")->setActive(true);
-    }
+        typeLbl->setText( RaceManager::getNameOf(c->getData()->getMinorMode()), false );
+
 }
 
 // ----------------------------------------------------------------------------
@@ -233,149 +190,95 @@ void SelectChallengeDialog::onUpdate(float dt)
 GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::string& eventSourceParam)
 {
     std::string eventSource = eventSourceParam;
-    
-    GUIEngine::RibbonWidget* actions =
-            getWidget<GUIEngine::RibbonWidget>("actions");
-    GUIEngine::RibbonWidget* difficulty =
-            getWidget<GUIEngine::RibbonWidget>("difficulty");
-    
-    LabelWidget* challenge_info = getWidget<LabelWidget>("challenge_info");
-    
-    const ChallengeData* c_data = unlock_manager->getChallengeData(m_challenge_id);
-    
-    const ChallengeStatus* c_stat = PlayerManager::getCurrentPlayer()
-                             ->getChallengeStatus(m_challenge_id);
-    
-    if (eventSource == "actions")
+    if (eventSource == "back")
     {
-        const std::string& action =
-            actions->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        
-        if(action == "back")
-        {
-            m_self_destroy = true;
-            return GUIEngine::EVENT_BLOCK;
-        }
-        else if(action == "start")
-        {
-            if (c_data == NULL)
-            {
-                Log::error("SelectChallenge", "Cannot find challenge <%s>\n",
-                           m_challenge_id.c_str());
-                return GUIEngine::EVENT_LET;
-            }
-
-            PlayerManager::getCurrentPlayer()->setCurrentChallenge(m_challenge_id);
-
-            ModalDialog::dismiss();
-
-            core::rect<s32> pos(15,
-                                10,
-                                15 + UserConfigParams::m_width/2,
-                                10 + GUIEngine::getTitleFontHeight());
-
-            race_manager->exitRace();
-            //StateManager::get()->resetActivePlayers();
-
-            // Use latest used device
-#ifdef DEBUG
-            InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
-            assert(device != NULL);
-#endif
-            // Set up race manager appropriately
-            race_manager->setNumPlayers(1);
-            race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
-
-            //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
-            input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-
-            // ASSIGN should make sure that only input from assigned devices is read.
-            input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-
-            // Go straight to the race
-            StateManager::get()->enterGameState();
-
-            // Initialise global data - necessary even in local games to avoid
-            // many if tests in other places (e.g. if network_game call
-            // network_manager else call race_manager).
-            // network_manager->initCharacterDataStructures();
-            switch (UserConfigParams::m_difficulty)
-            {
-                case 0:
-                    c_data->setRace(RaceManager::DIFFICULTY_EASY);
-                    break;
-                case 1:
-                    c_data->setRace(RaceManager::DIFFICULTY_MEDIUM);
-                    break;
-                case 2:
-                    c_data->setRace(RaceManager::DIFFICULTY_HARD);
-                    break;
-                case 3:
-                    if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
-                        PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
-                    {
-                        c_data->setRace(RaceManager::DIFFICULTY_HARD);
-                    }
-                    else
-                    {
-                        c_data->setRace(RaceManager::DIFFICULTY_BEST);
-                    }
-                    break;
-            }
-            race_manager->setupPlayerKartInfo();
-            race_manager->startNew(true);
-
-            irr_driver->hidePointer();
-
-            return GUIEngine::EVENT_BLOCK;
-        }
-        else
-        {
-            Log::error("SelectChallenge", "Unknown widget <%s>\n",
-                        action.c_str());
-            //assert(false);
-            return GUIEngine::EVENT_LET;
-        }
+        m_self_destroy = true;
+        return GUIEngine::EVENT_BLOCK;
     }
 
-    if (eventSource == "difficulty")
+    if (eventSource == "novice" || eventSource == "intermediate" ||
+        eventSource == "expert" || eventSource == "supertux")
     {
-        const std::string& selected =
-            difficulty->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        
-        core::stringw description;
+        const ChallengeData* challenge = unlock_manager->getChallengeData(m_challenge_id);
 
-        // Select difficulty
-        if (selected == "novice")
+        if (challenge == NULL)
         {
-            description = getLabel(RaceManager::DIFFICULTY_EASY,   c_stat->getData());
+            Log::error("SelectChallenge", "Cannot find challenge <%s>\n",
+                       m_challenge_id.c_str());
+            return GUIEngine::EVENT_LET;
+        }
+
+        PlayerManager::getCurrentPlayer()->setCurrentChallenge(m_challenge_id);
+
+        ModalDialog::dismiss();
+
+        core::rect<s32> pos(15,
+                            10,
+                            15 + UserConfigParams::m_width/2,
+                            10 + GUIEngine::getTitleFontHeight());
+
+        race_manager->exitRace();
+        //StateManager::get()->resetActivePlayers();
+
+        // Use latest used device
+#ifdef DEBUG
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
+        assert(device != NULL);
+#endif
+        // Set up race manager appropriately
+        race_manager->setNumPlayers(1);
+        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+
+        //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
+        input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+
+        // ASSIGN should make sure that only input from assigned devices is read.
+        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+
+        // Go straight to the race
+        StateManager::get()->enterGameState();
+
+        // Initialise global data - necessary even in local games to avoid
+        // many if tests in other places (e.g. if network_game call
+        // network_manager else call race_manager).
+        // network_manager->initCharacterDataStructures();
+
+        // Launch challenge
+        if (eventSource == "novice")
+        {
+            challenge->setRace(RaceManager::DIFFICULTY_EASY);
             UserConfigParams::m_difficulty = 0;
         }
-        else if (selected == "intermediate")
+        else if (eventSource == "intermediate")
         {
-            description = getLabel(RaceManager::DIFFICULTY_MEDIUM, c_stat->getData());
+            challenge->setRace(RaceManager::DIFFICULTY_MEDIUM);
             UserConfigParams::m_difficulty = 1;
         }
-        else if (selected == "expert")
+        else if (eventSource == "expert")
         {
-            description = getLabel(RaceManager::DIFFICULTY_HARD,   c_stat->getData());
+            challenge->setRace(RaceManager::DIFFICULTY_HARD);
             UserConfigParams::m_difficulty = 2;
         }
-        else if (selected == "supertux")
+        else if (eventSource == "supertux")
         {
-            description = getLabel(RaceManager::DIFFICULTY_BEST,   c_stat->getData());
+            challenge->setRace(RaceManager::DIFFICULTY_BEST);
             UserConfigParams::m_difficulty = 3;
         }
         else
         {
             Log::error("SelectChallenge", "Unknown widget <%s>\n",
-                        selected.c_str());
+                        eventSource.c_str());
             //assert(false);
             return GUIEngine::EVENT_LET;
         }
 
-        challenge_info->setText(description, false );
         // Sets up kart info, including random list of kart for AI
+        race_manager->setupPlayerKartInfo();
+        race_manager->startNew(true);
+
+        irr_driver->hidePointer();
+
+        return GUIEngine::EVENT_BLOCK;
     }
 
     return GUIEngine::EVENT_LET;

@@ -36,7 +36,6 @@ private:
     MultitouchDevice* m_device;
     
     bool m_gui_action;
-    bool m_is_spectator_mode;
     unsigned int m_height;
     
     video::ITexture* m_steering_wheel_tex;
@@ -50,14 +49,9 @@ private:
     video::ITexture* m_bg_button_tex;
     video::ITexture* m_bg_button_focus_tex;
     video::ITexture* m_gui_action_tex;
-    video::ITexture* m_up_tex;
-    video::ITexture* m_down_tex;
 
     void init();
-    void createRaceGUI();
-    void createSpectatorGUI();
     void close();
-    static void onCustomButtonPress(unsigned int button_id, bool pressed);
 
 public:
      RaceGUIMultitouch(RaceGUIBase* race_gui);
@@ -67,10 +61,8 @@ public:
               const core::vector2df &scaling);
                                 
     unsigned int getHeight() {return m_height;}
-    bool isSpectatorMode() {return m_is_spectator_mode;}
     void setGuiAction(bool enabled = true) {m_gui_action = enabled;}
     void reset();
-    void recreate();
                                  
 };   // RaceGUIMultitouch
 

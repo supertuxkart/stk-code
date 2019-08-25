@@ -3,8 +3,6 @@
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
 #include "CWriteFile.h"
-
-#include "utils/file_utils.hpp"
 #include <stdio.h>
 
 namespace irr
@@ -83,7 +81,11 @@ void CWriteFile::openFile(bool append)
 		return;
 	}
 
-	File = FileUtils::fopenU8Path(Filename.c_str(), append ? "ab" : "wb");
+#if defined(_IRR_WCHAR_FILESYSTEM)
+	File = _wfopen(Filename.c_str(), append ? L"ab" : L"wb");
+#else
+	File = fopen(Filename.c_str(), append ? "ab" : "wb");
+#endif
 
 	if (File)
 	{

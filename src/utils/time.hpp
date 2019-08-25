@@ -47,8 +47,6 @@ private:
     *  (and the sfx threads needs real time at that time). */
     static irr::ITimer *m_timer;
 
-    /** Initalized when STK starts. */
-    static std::chrono::steady_clock::time_point m_mono_start;
 public:
     typedef time_t TimeType;
 
@@ -96,14 +94,17 @@ public:
      */
     static double getRealTime(long startAt=0);
     // ------------------------------------------------------------------------
-    /** Returns a time based since the starting of stk (monotonic clock).
+    /** Returns a time based since epoch.
      *  The value is a 64bit unsigned integer in milliseconds.
      */
-    static uint64_t getMonoTimeMs()
+    static uint64_t getRealTimeMs()
     {
-        auto duration = std::chrono::steady_clock::now() - m_mono_start;
+        auto now = std::chrono::system_clock::now();
+        auto now_ms =
+            std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+        auto epoch = now_ms.time_since_epoch();
         auto value =
-            std::chrono::duration_cast<std::chrono::milliseconds>(duration);
+            std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
         return value.count();
     }
     // ------------------------------------------------------------------------

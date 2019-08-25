@@ -29,7 +29,6 @@
 
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
 int   ProfileWorld::m_num_laps    = 0;

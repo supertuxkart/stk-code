@@ -88,8 +88,6 @@ public:
     // ------------------------------------------------------------------------
     void setEnable(bool val)                               { m_enabled = val; }
     // ------------------------------------------------------------------------
-    bool isEnabled() const                                { return m_enabled; }
-    // ------------------------------------------------------------------------
     void setSmoothRotation(bool val)               { m_smooth_rotation = val; }
     // ------------------------------------------------------------------------
     void setAdjustVerticalOffset(bool val)  { m_adjust_vertical_offset = val; }

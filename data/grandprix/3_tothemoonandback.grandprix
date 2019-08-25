@@ -1,10 +1,10 @@
 
 <supertuxkart_grand_prix name="To the Moon and Back">
 
-    <track id="olivermath"           laps="5" reverse="false" />
     <track id="gran_paradiso_island" laps="3" reverse="false" />
+    <track id="greenvalley"          laps="3" reverse="false" />
+    <track id="mansion"              laps="3" reverse="false" />
     <track id="lighthouse"           laps="4" reverse="false" />
     <track id="candela_city"         laps="3" reverse="false" />
-    <track id="snowmountain"         laps="3" reverse="false" />
     
 </supertuxkart_grand_prix>

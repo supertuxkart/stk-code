@@ -22,13 +22,10 @@
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
-#include "utils/utf8/core.h"
-#include "utils/utf8.h"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
-#include <IrrlichtDevice.h>
 
 using namespace irr;
 
@@ -40,8 +37,9 @@ public:
 
     MyCGUIEditBox(const wchar_t* text, bool border, gui::IGUIEnvironment* environment,
                  gui:: IGUIElement* parent, s32 id, const core::rect<s32>& rectangle) :
-        CGUIEditBox(text, border, environment, parent, id, rectangle)
+        CGUIEditBox(text, border, environment, parent, id, rectangle, translations->isRTLLanguage())
     {
+        if (translations->isRTLLanguage()) setTextAlignment(irr::gui::EGUIA_LOWERRIGHT, irr::gui::EGUIA_CENTER);
     }
 
     void addListener(GUIEngine::ITextBoxWidgetListener* listener)
@@ -54,40 +52,31 @@ public:
         m_listeners.clearWithoutDeleting();
     }
 
-    void handleTextUpdated()
-    {
-        for (unsigned n = 0; n < m_listeners.size(); n++)
-            m_listeners[n].onTextUpdated();
-    }
-
-    bool handleEnterPressed()
-    {
-        bool handled = false;
-        for (unsigned n = 0; n < m_listeners.size(); n++)
-        {
-            if (m_listeners[n].onEnterPressed(Text))
-            {
-                handled = true;
-                setText(L"");
-            }
-        }
-        return handled;
-    }
-
     virtual bool OnEvent(const SEvent& event)
     {
         bool out = CGUIEditBox::OnEvent(event);
 
-        if (event.EventType == EET_KEY_INPUT_EVENT &&
-            event.KeyInput.PressedDown)
-            handleTextUpdated();
-
-        if (event.EventType == EET_KEY_INPUT_EVENT &&
-            event.KeyInput.Key == IRR_KEY_RETURN)
-            handleEnterPressed();
-
+        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
+        {
+            for (unsigned int n=0; n<m_listeners.size(); n++)
+            {
+                m_listeners[n].onTextUpdated();
+            }
+        }
+        if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.Key == IRR_KEY_RETURN)
+        {
+            for (unsigned int n=0; n<m_listeners.size(); n++)
+            {
+                if (m_listeners[n].onEnterPressed(Text))
+                {
+                    Text = L"";
+                    CursorPos = 0;
+                }
+            }
+        }
         return out;
     }
+
 };
 
 using namespace GUIEngine;
@@ -157,13 +146,6 @@ void TextBoxWidget::setPasswordBox(bool passwordBox, wchar_t passwordChar)
     IGUIEditBox* textCtrl =  Widget::getIrrlichtElement<IGUIEditBox>();
     assert(textCtrl != NULL);
     textCtrl->setPasswordBox(passwordBox, passwordChar);
-    setTextBoxType(TBT_PASSWORD);
-}
-
-// -----------------------------------------------------------------------------
-void TextBoxWidget::setTextBoxType(TextBoxType t)
-{
-    ((MyCGUIEditBox*)m_element)->setTextBoxType(t);
 }
 
 // -----------------------------------------------------------------------------
@@ -246,144 +228,3 @@ EventPropagation TextBoxWidget::leftPressed (const int playerID)
 
     return EVENT_LET;
 }   // leftPressed
-
-// ============================================================================
-/* This callback will allow copying android edittext data directly to editbox,
- * which will allow composing text to be auto updated. */
-#ifdef ANDROID
-#include "jni.h"
-
-#if !defined(ANDROID_PACKAGE_CALLBACK_NAME)
-    #error
-#endif
-
-#define MAKE_EDITTEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_editText2STKEditbox(JNIEnv* env, jobject this_obj, jint widget_id, jstring text, jint start, jint end, jint composing_start, jint composing_end)
-#define ANDROID_EDITTEXT_CALLBACK(PKG_NAME) MAKE_EDITTEXT_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
-{
-    if (text == NULL)
-        return;
-
-    const uint16_t* utf16_text = (const uint16_t*)env->GetStringChars(text, NULL);
-    if (utf16_text == NULL)
-        return;
-    const size_t len = env->GetStringLength(text);
-    // Android use 32bit wchar_t and java use utf16 string
-    // We should not use the modified utf8 from java as it fails for emoji
-    // because it's larger than 16bit
-    std::u32string to_editbox;
-
-    std::vector<int> mappings;
-    int pos = 0;
-    mappings.push_back(pos++);
-    for (unsigned i = 0; i < len; i++)
-    {
-        if (utf8::internal::is_lead_surrogate(utf16_text[i]))
-        {
-            int duplicated_pos = pos++;
-            mappings.push_back(duplicated_pos);
-            mappings.push_back(duplicated_pos);
-            i++;
-        }
-        else
-            mappings.push_back(pos++);
-    }
-
-    // Correct start / end position for utf16
-    if (start < (int)mappings.size())
-        start = mappings[start];
-    if (end < (int)mappings.size())
-        end = mappings[end];
-    if (composing_start < (int)mappings.size())
-        composing_start = mappings[composing_start];
-    if (composing_end < (int)mappings.size())
-        composing_end = mappings[composing_end];
-
-    try
-    {
-        utf8::utf16to32(utf16_text, utf16_text + len,
-            back_inserter(to_editbox));
-    }
-    catch (std::exception& e)
-    {
-        (void)e;
-    }
-    env->ReleaseStringChars(text, utf16_text);
-
-    GUIEngine::addGUIFunctionBeforeRendering([widget_id, to_editbox, start,
-        end, composing_start, composing_end]()
-        {
-            TextBoxWidget* tb =
-                dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
-            if (!tb || (int)widget_id != tb->getID())
-                return;
-            MyCGUIEditBox* eb = tb->getIrrlichtElement<MyCGUIEditBox>();
-            if (!eb)
-                return;
-            core::stringw old_text = eb->getText();
-            eb->fromAndroidEditText(to_editbox, start, end, composing_start,
-                composing_end);
-            if (old_text != eb->getText())
-                eb->handleTextUpdated();
-        });
-}
-
-#define MAKE_HANDLE_ACTION_NEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleActionNext(JNIEnv* env, jobject this_obj, jint widget_id)
-#define ANDROID_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME) MAKE_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
-{
-    GUIEngine::addGUIFunctionBeforeRendering([widget_id]()
-        {
-            TextBoxWidget* tb =
-                dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
-            if (!tb || (int)widget_id != tb->getID())
-                return;
-            MyCGUIEditBox* eb = tb->getIrrlichtElement<MyCGUIEditBox>();
-            if (!eb)
-                return;
-
-            // First test for onEnterPressed, if true then close keyboard
-            if (eb->handleEnterPressed())
-            {
-                // Clear text like onEnterPressed callback
-                GUIEngine::getDevice()->toggleOnScreenKeyboard(false,
-                    1/*clear_text*/);
-                return;
-            }
-
-            // As it's action "next", check if below widget is a text box, if
-            // so focus it and keep the screen keyboard, so user can keep
-            // typing
-            int id = GUIEngine::EventHandler::get()->findIDClosestWidget(
-                NAV_DOWN, 0, tb, true/*ignore_disabled*/);
-            TextBoxWidget* closest_tb = NULL;
-            if (id != -1)
-            {
-                closest_tb =
-                    dynamic_cast<TextBoxWidget*>(GUIEngine::getWidget(id));
-            }
-
-            if (closest_tb)
-            {
-                closest_tb->setFocusForPlayer(0);
-            }
-            else
-            {
-                // Post an enter event and close the keyboard
-                SEvent enter_event;
-                enter_event.EventType = EET_KEY_INPUT_EVENT;
-                enter_event.KeyInput.Char = 0;
-                enter_event.KeyInput.PressedDown = true;
-                enter_event.KeyInput.Key = IRR_KEY_RETURN;
-                GUIEngine::getDevice()->postEventFromUser(enter_event);
-                enter_event.KeyInput.PressedDown = false;
-                GUIEngine::getDevice()->postEventFromUser(enter_event);
-                GUIEngine::getDevice()->toggleOnScreenKeyboard(false);
-            }
-        });
-}
-#endif

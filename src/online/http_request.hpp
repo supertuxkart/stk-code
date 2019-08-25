@@ -19,6 +19,7 @@
 #ifndef HEADER_HTTP_REQUEST_HPP
 #define HEADER_HTTP_REQUEST_HPP
 
+#include "io/file_manager.hpp"
 #include "online/request.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
@@ -70,12 +71,9 @@ namespace Online
         /** String to store the received data in. */
         std::string m_string_buffer;
 
-        struct curl_slist* m_http_header = NULL;
+        static struct curl_slist* m_http_header;
     protected:
         bool m_disable_sending_log;
-        /* If true, it will not call curl_easy_setopt CURLOPT_POSTFIELDS so
-         * it's just a GET request. */
-        bool m_download_assets_request = false;
 
         virtual void prepareOperation() OVERRIDE;
         virtual void operation() OVERRIDE;
@@ -97,8 +95,6 @@ namespace Online
                     int priority = 1);
         virtual           ~HTTPRequest()
         {
-            if (m_http_header)
-                curl_slist_free_all(m_http_header);
             if (m_curl_session)
             {
                 curl_easy_cleanup(m_curl_session);
@@ -112,9 +108,7 @@ namespace Online
         // ------------------------------------------------------------------------
         /** Returns true if there was an error downloading the file. */
         bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
-        // ------------------------------------------------------------------------
-        void setDownloadAssetsRequest(bool val)
-                                               { m_download_assets_request = val; }
+
         // ------------------------------------------------------------------------
         /** Returns the curl error message if an error has occurred.
          *  \pre m_curl_code!=CURLE_OK
@@ -149,7 +143,7 @@ namespace Online
         void addParameter(const std::string &name,
                           const irr::core::stringw &value)
         {
-            std::string s = StringUtils::wideToUtf8(value);
+            std::string s = StringUtils::xmlEncode(value);
 
             // Call the template to escape strings properly
             addParameter(name, s.c_str());
@@ -188,8 +182,7 @@ namespace Online
             assert(isPreparing());
             m_url = url;
         }   // setURL
-        // --------------------------------------------------------------------
-        const std::string& getFileName() const           { return m_filename; }
+
     };   // class HTTPRequest
 } //namespace Online
 #endif // HEADER_HTTP_REQUEST_HPP

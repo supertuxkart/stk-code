@@ -78,7 +78,10 @@ void Powerup::reset()
 void Powerup::saveState(BareNetworkString *buffer) const
 {
     buffer->addUInt8(uint8_t(m_type));
-    buffer->addUInt8(m_number);   // number is <=255
+    if(m_type!=PowerupManager::POWERUP_NOTHING)
+    {
+        buffer->addUInt8(m_number);   // number is <=255
+    }
 }   // saveState
 
 //-----------------------------------------------------------------------------

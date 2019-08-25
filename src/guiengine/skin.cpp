@@ -34,7 +34,6 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
@@ -184,14 +183,6 @@ namespace SkinConfig
         delete root;
     }   // loadFromFile
 };   // SkinConfig
-
-namespace GUIEngine
-{
-    /** The widget used to hold the scrollbar BG */
-    SkinWidgetContainer* g_bg_container = NULL;
-    /** The widget used to hold the scrollbar thumb */
-    SkinWidgetContainer* g_thumb_container = NULL;
-}
 
 // ============================================================================
 #if 0
@@ -372,7 +363,7 @@ void Skin::drawBgImage()
         const int clipped_x_space = (texture_w - screen_w);
 
         dest = core::recti(-clipped_x_space/2, 0,
-                               screen_w+clipped_x_space/2, screen_h);
+                               screen_w+clipped_x_space/2, texture_h);
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D();
@@ -731,7 +722,7 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
         core::recti sized_rect = rect;
         core::position2d<u32> center =
             core::position2d<u32>(irr_driver->getFrameSize()/2);
-        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
 
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
@@ -803,7 +794,7 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
     {
         core::position2d<u32> center =
             core::position2d<u32>(irr_driver->getFrameSize()/2);
-        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
 
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
@@ -826,20 +817,20 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
     {
         ProgressBarWidget * progress = (ProgressBarWidget*)w;
         drawProgressBarInScreen(w, rect, progress->getValue(),
-                                w->m_deactivated);
+            w->m_deactivated);
     }
 }   // drawProgress
 
 // ----------------------------------------------------------------------------
 void Skin::drawProgressBarInScreen(SkinWidgetContainer* swc,
-                                   const core::rect< s32 > &rect,
-                                   float progress, bool deactivated)
+                                   const core::rect< s32 > &rect, int progress,
+                                   bool deactivated)
 {
     drawBoxFromStretchableTexture(swc, rect,
         SkinConfig::m_render_params["progress::neutral"], deactivated);
     core::recti rect2 = rect;
     rect2.LowerRightCorner.X -= (rect.getWidth())
-                              - int(progress * rect.getWidth());
+                              - progress * rect.getWidth() / 100;
     drawBoxFromStretchableTexture(swc, rect2,
         SkinConfig::m_render_params["progress::fill"], deactivated);
 }   // drawProgress
@@ -981,7 +972,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
         if (mark_selected && (focused || parent_focused))
             params = &SkinConfig::m_render_params["tab::focused"];
-        else if (parent_focused && parentRibbon->m_mouse_focus == widget && mouseIn)
+        else if (parentRibbon->m_mouse_focus == widget && mouseIn)
             params = &SkinConfig::m_render_params["tab::focused"];
         else if (mark_selected)
             params = &SkinConfig::m_render_params["tab::down"];
@@ -1031,7 +1022,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
         if (mark_selected && (focused || parent_focused))
             params = &SkinConfig::m_render_params["verticalTab::focused"];
-        else if (parent_focused && parentRibbon->m_mouse_focus == widget && mouseIn)
+        else if (parentRibbon->m_mouse_focus == widget && mouseIn)
             params = &SkinConfig::m_render_params["verticalTab::focused"];
         else if (mark_selected)
             params = &SkinConfig::m_render_params["verticalTab::down"];
@@ -1160,7 +1151,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 const float dt = GUIEngine::getLatestDt();
                 glow_effect += dt * 3;
                 if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-                grow = (int)(45 + 10 * sinf(glow_effect));
+                grow = (int)(45 + 10 * sin(glow_effect));
 
 
 
@@ -1269,7 +1260,9 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
     } // end if icon ribbons
 
 
-    if (parent_focused && parentRibbon->m_mouse_focus == widget)
+    if (/*mark_selected && widget->hasTooltip() &&
+        (focused || parent_focused) &&*/
+        parentRibbon->m_mouse_focus == widget)
     {
         if (rect.isPointInside(irr_driver->getDevice()->getCursorControl()
                                                       ->getPosition()))
@@ -1379,7 +1372,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center(irr_driver->getFrameSize()/2);
-        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
                             - (int)center.X)*texture_size);
@@ -1406,10 +1399,8 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     {
         const int handle_size = (int)( widget->m_h*params->m_left_border
                                  /(float)params->getImage()->getSize().Height );
-        float value = (float)(w->getValue() - w->getMin())
+        const float value = (float)(w->getValue() - w->getMin())
                           / (w->getMax() - w->getMin());
-                          
-        if (value > 1.0f) value = 1.0f;
 
         if (value > 0.0f)
         {
@@ -1512,7 +1503,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
         const float dt = GUIEngine::getLatestDt();
         glow_effect += dt*3;
         if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-        grow = (int)(45 + 10*sinf(glow_effect));
+        grow = (int)(45 + 10*sin(glow_effect));
 
         const int glow_center_x = rect.UpperLeftCorner.X+rect.getWidth()/2;
         const int glow_center_y = rect.LowerRightCorner.Y;
@@ -1541,7 +1532,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
         widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center(irr_driver->getFrameSize()/2);
-        const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
+        const float texture_size = sin(m_dialog_size*M_PI*0.5f);
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
                             - (int)center.X)*texture_size);
@@ -1795,9 +1786,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                                      widget.m_x + widget.m_w,
                                      widget.m_y + widget.m_h );
                     drawBoxFromStretchableTexture(&widget, rect,
-                           widget.isSelected(0)
-                           ? SkinConfig::m_render_params["section::selected"]
-                           : SkinConfig::m_render_params["section::neutral"]);
+                              SkinConfig::m_render_params["section::neutral"]);
                 }
 
                 renderSections( &widget.m_children );
@@ -1859,10 +1848,10 @@ void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
     BoxRenderParams& p =
         SkinConfig::m_render_params["scrollbar_background::neutral"];
 
-    if (!g_bg_container)
-        g_bg_container = new SkinWidgetContainer();
-
-    drawBoxFromStretchableTexture(g_bg_container, rect2, p, false);
+    draw2DImage(p.getImage(), rect2,
+                                        p.m_source_area_center,
+                                        0 /* no clipping */, 0,
+                                        true /* alpha */);
 #endif
 }   // drawScrollbarBackground
 
@@ -1873,10 +1862,10 @@ void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
     BoxRenderParams& p =
         SkinConfig::m_render_params["scrollbar_thumb::neutral"];
 
-    if (!g_thumb_container)
-        g_thumb_container = new SkinWidgetContainer();
-
-    drawBoxFromStretchableTexture(g_thumb_container, rect, p, false);
+    draw2DImage(p.getImage(), rect,
+                                        p.m_source_area_center,
+                                        0 /* no clipping */, 0,
+                                        true /* alpha */);
 #endif
 }   // drawScrollbarThumb
 
@@ -2018,18 +2007,6 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     // irrLicht does not have widgets for everything we need. so at render
     // time, we just check which type this button represents and render
     // accordingly
-    bool list_header_widget = widget->m_event_handler != NULL &&
-        widget->m_event_handler->getType() == WTYPE_LIST;
-    if (list_header_widget)
-    {
-        drawListHeader(rect, widget);
-        if (type == WTYPE_ICON_BUTTON)
-        {
-            drawIconButton(
-                dynamic_cast<IconButtonWidget*>(widget)->getListHeaderIconRect(),
-                widget, pressed, focused);
-        }
-    }
 
     if (widget->m_event_handler != NULL &&
         widget->m_event_handler->m_type == WTYPE_RIBBON)
@@ -2049,13 +2026,21 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
         mvw->drawRTTScene(rect);
 #endif
     }
-    else if (type == WTYPE_ICON_BUTTON && !list_header_widget)
+    else if (type == WTYPE_ICON_BUTTON)
     {
         drawIconButton(rect, widget, pressed, focused);
     }
-    else if (type == WTYPE_BUTTON && !list_header_widget)
+    else if (type == WTYPE_BUTTON)
     {
-        drawButton(widget, rect, pressed, focused);
+        if (widget->m_event_handler != NULL &&
+            widget->m_event_handler->getType() == WTYPE_LIST)
+        {
+            drawListHeader(rect, widget);
+        }
+        else
+        {
+            drawButton(widget, rect, pressed, focused);
+        }
     }
     else if(type == WTYPE_PROGRESS)
     {
@@ -2159,7 +2144,7 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     }
     if (widget->m_badges & KEYBOARD_BADGE)
     {
-        float max_icon_size = 1.0f;
+        float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "keyboard.png");
         doDrawBadge(texture, rect, max_icon_size, true);
@@ -2257,7 +2242,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
             widget->m_parent->getType() == gui::EGUIET_WINDOW)
         {
             core::position2d<u32> center(irr_driver->getFrameSize()/2);
-            const float texture_size = sinf(m_dialog_size*M_PI*0.5f);
+            const float texture_size = sin(m_dialog_size*M_PI*0.5f);
 
             borderArea.UpperLeftCorner.X  =
                 center.X + (int)(((int)rect.UpperLeftCorner.X
@@ -2386,7 +2371,7 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
             core::position2d<s32> center = sized_rect.getCenter();
             const int w = sized_rect.getWidth();
             const int h = sized_rect.getHeight();
-            const float tex_size = sinf(m_dialog_size*M_PI*0.5f);
+            const float tex_size = sin(m_dialog_size*M_PI*0.5f);
             sized_rect.UpperLeftCorner.X  = (int)(center.X -(w/2.0f)*tex_size);
             sized_rect.UpperLeftCorner.Y  = (int)(center.Y -(h/2.0f)*tex_size);
             sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*tex_size);

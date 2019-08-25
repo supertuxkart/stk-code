@@ -18,7 +18,6 @@
 
 
 #include "input/gamepad_android_config.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <SKeyMap.h>

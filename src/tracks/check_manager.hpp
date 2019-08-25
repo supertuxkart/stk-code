@@ -53,7 +53,6 @@ public:
     void   update(float dt);
     void   reset(const Track &track);
     void   resetAfterKartMove(AbstractKart *kart);
-    void   resetAfterRewind();
     unsigned int getLapLineIndex() const;
     int    getChecklineTriggering(const Vec3 &from, const Vec3 &to) const;
     // ------------------------------------------------------------------------

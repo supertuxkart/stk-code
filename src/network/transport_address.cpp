@@ -17,8 +17,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/transport_address.hpp"
-#include "utils/log.hpp"
-#include "utils/string_utils.hpp"
 
 #ifdef WIN32
 #  include <iphlpapi.h>
@@ -28,37 +26,6 @@
 #  include <string.h>
 #  include <errno.h>
 #endif
-
-// ----------------------------------------------------------------------------
-/** Construct an IO address from a string in the format x.x.x.x with a
- *  port number. */
-TransportAddress::TransportAddress(const std::string& str, uint16_t port_number)
-{
-    std::vector<uint32_t> ip = StringUtils::splitToUInt(str, '.');
-    m_ip   = 0;
-    m_port = 0;
-    if (ip.size() >= 4)
-        m_ip = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
-
-    m_port = port_number;
-}   // TransportAddress(string of ip, port number)
-
-// ----------------------------------------------------------------------------
-/** Construct an IO address from a string in the format x.x.x.x:x. */
-TransportAddress::TransportAddress(const std::string& str)
-{
-    std::string combined = StringUtils::replace(str, ":", ".");
-    std::vector<uint32_t> ip = StringUtils::splitToUInt(combined, '.');
-    m_ip   = 0;
-    m_port = 0;
-    if (ip.size() >= 4)
-        m_ip = (ip[0] << 24) + (ip[1] << 16) + (ip[2] << 8) + ip[3];
-
-    if(ip.size()==5)
-        m_port = (uint16_t)(ip[4] < 65536 ? ip[4] : 0);
-    else
-        m_port = 0;
-}   // TransportAddress(string of ip)
 
 // ----------------------------------------------------------------------------
 /** Returns if this IP address belongs to a LAN, i.e. is in 192.168* or
@@ -250,20 +217,3 @@ void TransportAddress::unitTesting()
     assert(t20.getPort() == 123);
 
 }   // unitTesting
-
-// ----------------------------------------------------------------------------
-/** Returns a std::string representing the ip address and port in human
- *  readable format.
- *  \param show_port True if the port should be shown as well, otherwise
- *         only the ip address will be returned.
- */
-std::string TransportAddress::toString(bool show_port) const
-{
-    std::string s = 
-        StringUtils::insertValues("%d.%d.%d.%d",
-                                 ((m_ip >> 24) & 0xff), ((m_ip >> 16) & 0xff),
-                                 ((m_ip >>  8) & 0xff), ((m_ip >>  0) & 0xff));
-    if (show_port)
-        s += StringUtils::insertValues(":%d", m_port);
-    return s;
-}   // toString

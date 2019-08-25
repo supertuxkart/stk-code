@@ -23,7 +23,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_model.hpp"
-#include "modes/ctf_flag.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
@@ -33,12 +32,11 @@
 #include "states_screens/race_gui.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <algorithm>
 
-const float g_capture_length = 2.0f;
+const Vec3 g_kart_flag_offset(0.0, 0.2f, -0.5f);
+const float g_capture_length = 3.0f;
 const int g_captured_score = 10;
 
 // ----------------------------------------------------------------------------
@@ -70,8 +68,6 @@ CaptureTheFlag::CaptureTheFlag() : FreeForAll()
 CaptureTheFlag::~CaptureTheFlag()
 {
 #ifndef SERVER_ONLY
-    m_red_flag_node->drop();
-    m_blue_flag_node->drop();
     irr_driver->dropAllTextures(m_red_flag_mesh);
     irr_driver->dropAllTextures(m_blue_flag_mesh);
     irr_driver->removeMeshFromCache(m_red_flag_mesh);
@@ -84,8 +80,8 @@ CaptureTheFlag::~CaptureTheFlag()
 void CaptureTheFlag::init()
 {
     FreeForAll::init();
-    const btTransform& orig_red = Track::getCurrentTrack()->getRedFlag();
-    const btTransform& orig_blue = Track::getCurrentTrack()->getBlueFlag();
+    m_orig_red_trans = Track::getCurrentTrack()->getRedFlag();
+    m_orig_blue_trans = Track::getCurrentTrack()->getBlueFlag();
 
 #ifndef SERVER_ONLY
     m_red_flag_node = irr_driver->addAnimatedMesh(m_red_flag_mesh, "red_flag");
@@ -93,8 +89,6 @@ void CaptureTheFlag::init()
         "blue_flag");
     assert(m_red_flag_node);
     assert(m_blue_flag_node);
-    m_red_flag_node->grab();
-    m_blue_flag_node->grab();
 
     std::string red_path =
         file_manager->getAsset(FileManager::GUI_ICON, "red_arrow.png");
@@ -102,122 +96,73 @@ void CaptureTheFlag::init()
         file_manager->getAsset(FileManager::GUI_ICON, "blue_arrow.png");
 
     m_red_flag_indicator = irr_driver->addBillboard(
-        core::dimension2df(1.5f, 1.5f), red_path, NULL);
+            core::dimension2df(1.5f, 1.5f), red_path, NULL);
     m_red_flag_indicator->setPosition(Vec3(
-        orig_red(Vec3(0.0f, 2.5f, 0.0f))).toIrrVector());
+        m_orig_red_trans(Vec3(0.0f, 2.5f, 0.0f))).toIrrVector());
     m_blue_flag_indicator = irr_driver->addBillboard(
-        core::dimension2df(1.5f, 1.5f), blue_path, NULL);
+            core::dimension2df(1.5f, 1.5f), blue_path, NULL);
     m_blue_flag_indicator->setPosition(Vec3(
-        orig_blue(Vec3(0.0f, 2.5f, 0.0f))).toIrrVector());
-#endif
-
-    m_red_flag = std::make_shared<CTFFlag>(FC_RED, orig_red);
-    m_blue_flag = std::make_shared<CTFFlag>(FC_BLUE, orig_blue);
-    if (NetworkConfig::get()->isNetworking())
-    {
-        m_red_flag->rewinderAdd();
-        m_blue_flag->rewinderAdd();
-    }
-
-#ifndef SERVER_ONLY
-    m_red_flag->initFlagRenderInfo(m_red_flag_node);
-    m_blue_flag->initFlagRenderInfo(m_blue_flag_node);
+        m_orig_blue_trans(Vec3(0.0f, 2.5f, 0.0f))).toIrrVector());
 #endif
 }   // init
 
 // ----------------------------------------------------------------------------
 void CaptureTheFlag::reset(bool restart)
 {
-    // 5 bits for kart id (with -1 and -2 flag status)
-    if (m_karts.size() > 29)
-        Log::fatal("CaptureTheFlag", "Too many karts");
-
     FreeForAll::reset(restart);
-    m_red_scores = m_blue_scores = 0;
+    m_red_trans = m_orig_red_trans;
+    m_blue_trans = m_orig_blue_trans;
+    m_red_return_ticks = m_blue_return_ticks = m_red_scores =
+        m_blue_scores = 0;
+    m_red_holder = m_blue_holder = -1;
+    updateFlagNodes();
     m_swatter_reset_kart_ticks.clear();
-    m_last_captured_flag_ticks = 0;
-    m_red_flag_status = m_blue_flag_status = CTFFlag::IN_BASE;
-    m_red_flag->resetToBase();
-    m_blue_flag->resetToBase();
-#ifndef SERVER_ONLY
-    if (m_red_flag_node)
-        m_red_flag->updateFlagGraphics(m_red_flag_node);
-    if (m_blue_flag_node)
-        m_blue_flag->updateFlagGraphics(m_blue_flag_node);
-#endif
 }   // reset
 
 // ----------------------------------------------------------------------------
 void CaptureTheFlag::updateGraphics(float dt)
 {
     FreeForAll::updateGraphics(dt);
-
-#ifndef SERVER_ONLY
-    if (m_red_flag_node)
-        m_red_flag->updateFlagGraphics(m_red_flag_node);
-    if (m_blue_flag_node)
-        m_blue_flag->updateFlagGraphics(m_blue_flag_node);
-    if (m_red_flag_indicator)
-        m_red_flag_indicator->setVisible(!m_red_flag->isInBase());
-    if (m_blue_flag_indicator)
-        m_blue_flag_indicator->setVisible(!m_blue_flag->isInBase());
-
-    core::stringw msg;
-    // Don't show flag has been returned message if
-    // a point has been scored recently
-    const bool scored_recently =
-        getTicksSinceStart() > m_last_captured_flag_ticks &&
-        getTicksSinceStart() - m_last_captured_flag_ticks < stk_config->time2Ticks(2.0f);
-    if (m_red_flag_status != m_red_flag->getStatus())
+    if (!NetworkConfig::get()->isNetworking() ||
+        NetworkConfig::get()->isClient())
     {
-        if (m_red_flag->getHolder() != -1)
+        if (m_red_holder != -1)
         {
-            AbstractKart* kart = getKart(m_red_flag->getHolder());
-            const core::stringw& name = kart->getController()->getName();
-            // I18N: Show when a player gets the red flag in CTF
-            msg = _("%s has the red flag!", name);
-            if (kart->getController()->isLocalPlayerController())
-                SFXManager::get()->quickSound("wee");
+            m_red_trans = getKart(m_red_holder)->getSmoothedTrans();
+            m_red_trans.setOrigin(m_red_trans(g_kart_flag_offset));
+            m_red_flag_node->setAnimationSpeed(fabsf(getKart(m_red_holder)
+                ->getSpeed()) * 3.0f + 25.0f);
         }
-        else if (m_red_flag->isInBase() && !scored_recently)
+        else
+            m_red_flag_node->setAnimationSpeed(25.0f);
+
+        if (m_blue_holder != -1)
         {
-            // I18N: Show when the red flag is returned to its base in CTF
-            msg = _("The red flag has returned!");
+            m_blue_trans = getKart(m_blue_holder)->getSmoothedTrans();
+            m_blue_trans.setOrigin(m_blue_trans(g_kart_flag_offset));
+            m_blue_flag_node->setAnimationSpeed(fabsf(getKart(m_blue_holder)
+                ->getSpeed()) * 3.0f + 25.0f);
         }
-        m_red_flag_status = m_red_flag->getStatus();
+        else
+            m_blue_flag_node->setAnimationSpeed(25.0f);
+        m_red_flag_indicator->setVisible(!isRedFlagInBase());
+        m_blue_flag_indicator->setVisible(!isBlueFlagInBase());
     }
-    else if (m_blue_flag_status != m_blue_flag->getStatus())
-    {
-        if (m_blue_flag->getHolder() != -1)
-        {
-            AbstractKart* kart = getKart(m_blue_flag->getHolder());
-            const core::stringw& name = kart->getController()->getName();
-            // I18N: Show when a player gets the blue flag in CTF
-            msg = _("%s has the blue flag!", name);
-            if (kart->getController()->isLocalPlayerController())
-                SFXManager::get()->quickSound("wee");
-        }
-        else if (m_blue_flag->isInBase() && !scored_recently)
-        {
-            // I18N: Show when the blue flag is returned to its base in CTF
-            msg = _("The blue flag has returned!");
-        }
-        m_blue_flag_status = m_blue_flag->getStatus();
-    }
-    if (!msg.empty())
-        m_race_gui->addMessage(msg, NULL, 1.5f);
-#endif
 }   // updateGraphics
 
 // ----------------------------------------------------------------------------
 void CaptureTheFlag::update(int ticks)
 {
+    if (m_red_holder != -1 && m_blue_holder != -1 &&
+        m_red_holder == m_blue_holder)
+        Log::fatal("CaptureTheFlag", "Flag management messed up, abort.");
+
     FreeForAll::update(ticks);
 
     for (auto it = m_swatter_reset_kart_ticks.begin();
          it != m_swatter_reset_kart_ticks.end();)
     {
-        if (it->second < getTicksSinceStart() - stk_config->time2Ticks(8.0f))
+        if (it->second < getTicksSinceStart() - 1000)
         {
             it = m_swatter_reset_kart_ticks.erase(it);
         }
@@ -239,75 +184,93 @@ void CaptureTheFlag::update(int ticks)
                 kart->getBody()->proceedToTransform(t);
                 kart->setTrans(t);
                 kart->getPowerup()->reset();
-                static_cast<SmoothNetworkBody*>(kart)->reset();
             }
             it++;
         }
     }
 
-    // Update new flags position
-    m_red_flag->update(ticks);
-    m_blue_flag->update(ticks);
+    if (!NetworkConfig::get()->isNetworking() ||
+        NetworkConfig::get()->isClient())
+        return;
 
-    if (m_red_flag->getHolder() != -1 && m_blue_flag->isInBase() &&
-        (m_blue_flag->getBaseOrigin() - m_red_flag->getOrigin()).length() <
+    // Update new flags position
+    if (m_red_holder != -1)
+    {
+        m_red_trans = getKart(m_red_holder)->getTrans();
+        m_red_trans.setOrigin(m_red_trans(g_kart_flag_offset));
+    }
+    if (m_blue_holder != -1)
+    {
+        m_blue_trans = getKart(m_blue_holder)->getTrans();
+        m_blue_trans.setOrigin(m_blue_trans(g_kart_flag_offset));
+    }
+
+    const bool red_flag_in_base =
+        m_red_trans.getOrigin() == m_orig_red_trans.getOrigin();
+    const bool blue_flag_in_base =
+        m_blue_trans.getOrigin() == m_orig_blue_trans.getOrigin();
+
+    // Check if not returning for too long
+    if (m_red_holder != -1 || red_flag_in_base)
+        m_red_return_ticks = 0;
+    else
+        m_red_return_ticks++;
+
+    if (m_blue_holder != -1 || blue_flag_in_base)
+        m_blue_return_ticks = 0;
+    else
+        m_blue_return_ticks++;
+
+    const int max_flag_return_timeout = stk_config->time2Ticks(
+        ServerConfig::m_flag_return_timemout);
+    if (m_red_holder == -1 && m_red_return_ticks > max_flag_return_timeout)
+    {
+        resetRedFlagToOrigin();
+        m_red_return_ticks = 0;
+        return;
+    }
+    if (m_blue_holder == -1 && m_blue_return_ticks > max_flag_return_timeout)
+    {
+        resetBlueFlagToOrigin();
+        m_blue_return_ticks = 0;
+        return;
+    }
+
+    if (m_red_holder != -1 && m_blue_holder == -1 &&
+        blue_flag_in_base &&
+        (m_orig_blue_trans.getOrigin() - m_red_trans.getOrigin()).length() <
         g_capture_length)
     {
         // Blue team scored
-        if (!NetworkConfig::get()->isNetworking() ||
-            NetworkConfig::get()->isServer())
-        {
-            int red_holder = m_red_flag->getHolder();
-            int new_kart_scores = m_scores.at(red_holder) + g_captured_score;
-            int new_blue_scores = m_blue_scores + 1;
-            m_scores.at(red_holder) = new_kart_scores;
-            if (NetworkConfig::get()->isServer())
-            {
-                NetworkString p(PROTOCOL_GAME_EVENTS);
-                p.setSynchronous(true);
-                p.addUInt8(GameEventsProtocol::GE_CTF_SCORED)
-                    .addUInt8((int8_t)red_holder)
-                    .addUInt8(0/*red_team_scored*/)
-                    .addUInt16((int16_t)new_kart_scores)
-                    .addUInt8((uint8_t)m_red_scores)
-                    .addUInt8((uint8_t)new_blue_scores);
-                STKHost::get()->sendPacketToAllPeers(&p, true);
-            }
-            ctfScored(red_holder, false/*red_team_scored*/, new_kart_scores,
-                m_red_scores, new_blue_scores);
-        }
-        m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_red_flag->resetToBase(race_manager->getFlagDeactivatedTicks());
+        NetworkString p(PROTOCOL_GAME_EVENTS);
+        p.setSynchronous(true);
+        p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
+            .addUInt8(1 << 1 | 0) // Reset red flag
+            .addUInt8((int8_t)m_red_holder);
+        STKHost::get()->sendPacketToAllPeers(&p, true);
+        m_scores.at(m_red_holder) += g_captured_score;
+        m_red_holder = -1;
+        m_red_trans = m_orig_red_trans;
+        m_blue_scores++;
+        return;
     }
-    else if (m_blue_flag->getHolder() != -1 && m_red_flag->isInBase() &&
-        (m_red_flag->getBaseOrigin() - m_blue_flag->getOrigin()).length() <
+    else if (m_blue_holder != -1 && m_red_holder == -1 &&
+        red_flag_in_base &&
+        (m_orig_red_trans.getOrigin() - m_blue_trans.getOrigin()).length() <
         g_capture_length)
     {
         // Red team scored
-        if (!NetworkConfig::get()->isNetworking() ||
-            NetworkConfig::get()->isServer())
-        {
-            int blue_holder = m_blue_flag->getHolder();
-            int new_kart_scores = m_scores.at(blue_holder) + g_captured_score;
-            int new_red_scores = m_red_scores + 1;
-            m_scores.at(blue_holder) = new_kart_scores;
-            if (NetworkConfig::get()->isServer())
-            {
-                NetworkString p(PROTOCOL_GAME_EVENTS);
-                p.setSynchronous(true);
-                p.addUInt8(GameEventsProtocol::GE_CTF_SCORED)
-                    .addUInt8((int8_t)blue_holder)
-                    .addUInt8(1/*red_team_scored*/)
-                    .addUInt16((int16_t)new_kart_scores)
-                    .addUInt8((uint8_t)new_red_scores)
-                    .addUInt8((uint8_t)m_blue_scores);
-                STKHost::get()->sendPacketToAllPeers(&p, true);
-            }
-            ctfScored(blue_holder, true/*red_team_scored*/, new_kart_scores,
-                new_red_scores, m_blue_scores);
-        }
-        m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_blue_flag->resetToBase(race_manager->getFlagDeactivatedTicks());
+        NetworkString p(PROTOCOL_GAME_EVENTS);
+        p.setSynchronous(true);
+        p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
+            .addUInt8(0 << 1 | 0)  // Reset blue flag
+            .addUInt8((int8_t)m_blue_holder);
+        STKHost::get()->sendPacketToAllPeers(&p, true);
+        m_scores.at(m_blue_holder) += g_captured_score;
+        m_blue_holder = -1;
+        m_blue_trans = m_orig_blue_trans;
+        m_red_scores++;
+        return;
     }
 
     // Test if red or blue flag is touched
@@ -316,114 +279,220 @@ void CaptureTheFlag::update(int ticks)
         if (k->isEliminated() || k->getKartAnimation() || k->isSquashed())
             continue;
 
-        if (m_red_flag->canBeCaptured() &&
-            (k->getXYZ() - m_red_flag->getOrigin()).length() <
+        if (m_red_holder == -1 &&
+            (k->getXYZ() - m_red_trans.getOrigin()).length() <
             g_capture_length)
         {
             uint8_t kart_id = (uint8_t)k->getWorldKartId();
             if (getKartTeam(kart_id) == KART_TEAM_RED)
             {
-                if (!m_red_flag->isInBase())
+                if (!red_flag_in_base)
                 {
                     // Return the flag
-                    m_red_flag->resetToBase(
-                        race_manager->getFlagDeactivatedTicks());
+                    resetRedFlagToOrigin();
                 }
             }
             else
             {
                 // Get the flag
-                m_red_flag->setCapturedByKart(kart_id);
+                NetworkString p(PROTOCOL_GAME_EVENTS);
+                p.setSynchronous(true);
+                p.addUInt8(GameEventsProtocol::GE_CTF_ATTACH)
+                    .addUInt8(1)  // Attach red flag
+                    .addUInt8(kart_id);
+                STKHost::get()->sendPacketToAllPeers(&p, true);
+                m_red_holder = kart_id;
             }
         }
-        if (m_blue_flag->canBeCaptured() &&
-            (k->getXYZ() - m_blue_flag->getOrigin()).length() <
+        if (m_blue_holder == -1 &&
+            (k->getXYZ() - m_blue_trans.getOrigin()).length() <
             g_capture_length)
         {
             uint8_t kart_id = (uint8_t)k->getWorldKartId();
             if (getKartTeam(kart_id) == KART_TEAM_BLUE)
             {
-                if (!m_blue_flag->isInBase())
+                if (!blue_flag_in_base)
                 {
                     // Return the flag
-                    m_blue_flag->resetToBase(
-                        race_manager->getFlagDeactivatedTicks());
+                    resetBlueFlagToOrigin();
                 }
             }
             else
             {
                 // Get the flag
-                m_blue_flag->setCapturedByKart(kart_id);
+                NetworkString p(PROTOCOL_GAME_EVENTS);
+                p.setSynchronous(true);
+                p.addUInt8(GameEventsProtocol::GE_CTF_ATTACH)
+                    .addUInt8(0)  // Attach blue flag
+                    .addUInt8(kart_id);
+                STKHost::get()->sendPacketToAllPeers(&p, true);
+                m_blue_holder = kart_id;
             }
         }
     }
 }   // update
 
 // ----------------------------------------------------------------------------
-int CaptureTheFlag::getRedHolder() const
+void CaptureTheFlag::resetRedFlagToOrigin()
 {
-    return m_red_flag->getHolder();
-}   // getRedHolder
+    NetworkString p(PROTOCOL_GAME_EVENTS);
+    p.setSynchronous(true);
+    p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
+        .addUInt8(1 << 1 | 0)  // Reset red flag to original
+        .addUInt8(((int8_t)-1));
+    STKHost::get()->sendPacketToAllPeers(&p, true);
+    m_red_trans = m_orig_red_trans;
+}   // resetRedFlagToOrigin
 
 // ----------------------------------------------------------------------------
-int CaptureTheFlag::getBlueHolder() const
+void CaptureTheFlag::resetBlueFlagToOrigin()
 {
-    return m_blue_flag->getHolder();
-}   // getBlueHolder
+    NetworkString p(PROTOCOL_GAME_EVENTS);
+    p.setSynchronous(true);
+    p.addUInt8(GameEventsProtocol::GE_CTF_RESET)
+        .addUInt8(0 << 1 | 0)  // Reset blue flag to original
+        .addUInt8(((int8_t)-1));
+    STKHost::get()->sendPacketToAllPeers(&p, true);
+    m_blue_trans = m_orig_blue_trans;
+}   // resetBlueFlagToOrigin
 
 // ----------------------------------------------------------------------------
-bool CaptureTheFlag::isRedFlagInBase() const
+void CaptureTheFlag::updateFlagNodes()
 {
-    return m_red_flag->isInBase();
-}   // isRedFlagInBase
-
-// ----------------------------------------------------------------------------
-bool CaptureTheFlag::isBlueFlagInBase() const
-{
-    return m_blue_flag->isInBase();
-}   // isBlueFlagInBase
-
-// ----------------------------------------------------------------------------
-const Vec3& CaptureTheFlag::getRedFlag() const
-{
-    return m_red_flag->getOrigin();
-}   // getRedFlag
-
-// ----------------------------------------------------------------------------
-const Vec3& CaptureTheFlag::getBlueFlag() const
-{
-    return m_blue_flag->getOrigin();
-}   // getBlueFlag
-
-// ----------------------------------------------------------------------------
-void CaptureTheFlag::ctfScored(int kart_id, bool red_team_scored,
-                               int new_kart_score, int new_red_score,
-                               int new_blue_score)
-{
-    m_scores.at(kart_id) = new_kart_score;
-    AbstractKart* kart = getKart(kart_id);
-    core::stringw scored_msg;
-    const core::stringw& name = kart->getController()->getName();
-    m_red_scores = new_red_score;
-    m_blue_scores = new_blue_score;
-    if (red_team_scored)
+#ifndef SERVER_ONLY
+    Vec3 hpr;
+    if (m_red_holder == -1)
     {
-        scored_msg = _("%s captured the blue flag!", name);
+        m_red_flag_node->setPosition(
+            Vec3(m_red_trans.getOrigin()).toIrrVector());
+        hpr.setHPR(m_red_trans.getRotation());
+        m_red_flag_node->setRotation(hpr.toIrrHPR());
+    }
+
+    if (m_blue_holder == -1)
+    {
+        m_blue_flag_node->setPosition(
+            Vec3(m_blue_trans.getOrigin()).toIrrVector());
+        hpr.setHPR(m_blue_trans.getRotation());
+        m_blue_flag_node->setRotation(hpr.toIrrHPR());
+    }
+#endif
+}   // updateFlagNodes
+
+// ----------------------------------------------------------------------------
+void CaptureTheFlag::attachFlag(NetworkString& ns)
+{
+#ifndef SERVER_ONLY
+    bool attach_red_flag = ns.getUInt8() == 1;
+    unsigned kart_id = ns.getUInt8();
+    core::stringw get_msg;
+    const core::stringw& name = getKart(kart_id)->getController()
+        ->getName();
+    if (attach_red_flag)
+    {
+        m_red_holder = kart_id;
+        m_red_flag_node->setParent(getKart(kart_id)->getNode());
+        m_red_flag_node->setPosition(g_kart_flag_offset.toIrrVector());
+        m_red_flag_node->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
+        // I18N: Show when a player gets the flag in CTF
+        get_msg = _("%s has the red flag!", name);
     }
     else
     {
-        scored_msg = _("%s captured the red flag!", name);
+        m_blue_holder = kart_id;
+        m_blue_flag_node->setParent(getKart(kart_id)->getNode());
+        m_blue_flag_node->setPosition(g_kart_flag_offset.toIrrVector());
+        m_blue_flag_node->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
+        // I18N: Show when a player gets the flag in CTF
+        get_msg = _("%s has the blue flag!", name);
     }
-#ifndef SERVER_ONLY
-    // Don't set animation and show message if receiving in live join
-    if (isStartPhase())
-        return;
-    m_race_gui->addMessage(scored_msg, NULL, 3.0f);
-    kart->getKartModel()
-        ->setAnimation(KartModel::AF_WIN_START, true/*play_non_loop*/);
-    m_scored_sound->play();
+    if (getKart(kart_id)->getController()->isLocalPlayerController())
+        SFXManager::get()->quickSound("wee");
+    m_race_gui->addMessage(get_msg, NULL, 1.5f);
 #endif
-}   // ctfScored
+}   // attachFlag
+
+// ----------------------------------------------------------------------------
+void CaptureTheFlag::resetFlag(NetworkString& ns)
+{
+#ifndef SERVER_ONLY
+    uint8_t reset_info = ns.getUInt8();
+    bool reset_red_flag = (reset_info >> 1 & 1) == 1;
+    bool with_custom_transform = (reset_info & 1) == 1;
+    int8_t kart_id = ns.getUInt8();
+    if (kart_id != -1)
+    {
+        core::stringw scored_msg;
+        AbstractKart* kart = getKart(kart_id);
+        const core::stringw& name = kart->getController()->getName();
+        if (reset_red_flag)
+        {
+            m_scores.at(kart_id) += g_captured_score;
+            m_red_holder = -1;
+            m_red_trans = m_orig_red_trans;
+            // I18N: Show when a player captured the flag in CTF
+            scored_msg = _("%s captured the red flag!", name);
+            m_red_flag_node->setParent(
+                irr_driver->getSceneManager()->getRootSceneNode());
+            m_blue_scores++;
+        }
+        else
+        {
+            m_scores.at(kart_id) += g_captured_score;
+            m_blue_holder = -1;
+            m_blue_trans = m_orig_blue_trans;
+            // I18N: Show when a player captured the flag in CTF
+            scored_msg = _("%s captured the blue flag!", name);
+            m_blue_flag_node->setParent(
+                irr_driver->getSceneManager()->getRootSceneNode());
+            m_red_scores++;
+        }
+        m_race_gui->addMessage(scored_msg, NULL, 3.0f);
+        kart->getKartModel()
+            ->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
+        m_scored_sound->play();
+    }
+    else
+    {
+        core::stringw returned_msg;
+        if (reset_red_flag)
+        {
+            btTransform t = m_orig_red_trans;
+            // I18N: Show when the red flag is returned to its base in CTF
+            if (!with_custom_transform)
+                returned_msg = _("The red flag has returned!");
+            else
+            {
+                t.setOrigin(ns.getVec3());
+                t.setRotation(ns.getQuat());
+            }
+            m_red_holder = -1;
+            m_red_trans = t;
+            m_red_flag_node->setParent(
+                irr_driver->getSceneManager()->getRootSceneNode());
+        }
+        else
+        {
+            btTransform t = m_orig_blue_trans;
+            // I18N: Show when the blue flag is returned to its base in CTF
+            if (!with_custom_transform)
+                returned_msg = _("The blue flag has returned!");
+            else
+            {
+                t.setOrigin(ns.getVec3());
+                t.setRotation(ns.getQuat());
+            }
+            m_blue_holder = -1;
+            m_blue_trans = t;
+            m_blue_flag_node->setParent(
+                irr_driver->getSceneManager()->getRootSceneNode());
+        }
+        if (!returned_msg.empty())
+            m_race_gui->addMessage(returned_msg, NULL, 1.5f);
+    }
+    updateFlagNodes();
+#endif
+}   // resetFlag
 
 // ----------------------------------------------------------------------------
 bool CaptureTheFlag::getDroppedFlagTrans(const btTransform& kt,
@@ -476,47 +545,47 @@ bool CaptureTheFlag::isRaceOver()
 // ----------------------------------------------------------------------------
 void CaptureTheFlag::loseFlagForKart(int kart_id)
 {
-    if (!(m_red_flag->getHolder() == kart_id ||
-        m_blue_flag->getHolder() == kart_id))
+    if (!(m_red_holder == kart_id || m_blue_holder == kart_id))
         return;
 
-    bool drop_red_flag = m_red_flag->getHolder() == kart_id;
-    btTransform dropped_trans = drop_red_flag ?
-        m_red_flag->getBaseTrans() :
-        m_blue_flag->getBaseTrans();
+    bool reset_red_flag = m_red_holder == kart_id;
+    btTransform dropped_trans = reset_red_flag ?
+        m_orig_red_trans : m_orig_blue_trans;
     bool succeed = getDroppedFlagTrans(getKart(kart_id)->getTrans(),
         &dropped_trans);
-    if (drop_red_flag)
+    NetworkString p(PROTOCOL_GAME_EVENTS);
+    p.setSynchronous(true);
+    // If reset red flag
+    uint8_t reset_info = reset_red_flag ? 1 : 0;
+    reset_info <<= 1;
+    // With custom transform
+    if (succeed)
+        reset_info |= 1;
+    p.addUInt8(GameEventsProtocol::GE_CTF_RESET).addUInt8(reset_info)
+        .addUInt8(((int8_t)-1));
+    if (succeed)
     {
-        if (succeed)
-            m_red_flag->dropFlagAt(dropped_trans);
-        else
-        {
-            m_red_flag->resetToBase(
-                race_manager->getFlagDeactivatedTicks());
-        }
+        p.add(Vec3(dropped_trans.getOrigin()))
+            .add(dropped_trans.getRotation());
+    }
+    STKHost::get()->sendPacketToAllPeers(&p, true);
+    if (reset_red_flag)
+    {
+        m_red_holder = -1;
+        m_red_trans = dropped_trans;
     }
     else
     {
-        if (succeed)
-            m_blue_flag->dropFlagAt(dropped_trans);
-        else
-        {
-            m_blue_flag->resetToBase(
-                race_manager->getFlagDeactivatedTicks());
-        }
+        m_blue_holder = -1;
+        m_blue_trans = dropped_trans;
     }
 }   // loseFlagForKart
 
 // ----------------------------------------------------------------------------
 bool CaptureTheFlag::kartHit(int kart_id, int hitter)
 {
-    if (isRaceOver())
+    if (!FreeForAll::kartHit(kart_id, hitter))
         return false;
-
-    if (!NetworkConfig::get()->isNetworking() ||
-        NetworkConfig::get()->isServer())
-        handleScoreInServer(kart_id, hitter);
 
     loseFlagForKart(kart_id);
     return true;
@@ -535,18 +604,3 @@ const std::string& CaptureTheFlag::getIdent() const
 {
     return IDENT_CTF;
 }   // getIdent
-
-// ----------------------------------------------------------------------------
-void CaptureTheFlag::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
-{
-    FreeForAll::saveCompleteState(bns, peer);
-    bns->addUInt32(m_red_scores).addUInt32(m_blue_scores);
-}   // saveCompleteState
-
-// ----------------------------------------------------------------------------
-void CaptureTheFlag::restoreCompleteState(const BareNetworkString& b)
-{
-    FreeForAll::restoreCompleteState(b);
-    m_red_scores = b.getUInt32();
-    m_blue_scores = b.getUInt32();
-}   // restoreCompleteState

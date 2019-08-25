@@ -21,7 +21,7 @@ CIrrDeviceStub::CIrrDeviceStub(const SIrrlichtCreationParameters& params)
 : IrrlichtDevice(), VideoDriver(0), GUIEnvironment(0), SceneManager(0),
 	Timer(0), CursorControl(0), UserReceiver(params.EventReceiver), Logger(0), Operator(0),
 	Randomizer(0), FileSystem(0), InputReceivingSceneManager(0), CreationParams(params),
-	Close(false), IsMousePressed(false)
+	Close(false)
 {
 	Timer = new CTimer(params.UsePerformanceTimer);
 	if (os::Printer::Logger)
@@ -48,9 +48,9 @@ CIrrDeviceStub::CIrrDeviceStub(const SIrrlichtCreationParameters& params)
     }
     else
         FileSystem = io::createFileSystem();
-    core::stringc s = "..:: Antarctica Rendering Engine ";
-	s.append("2.0 ::..");
-	os::Printer::log(s.c_str(), ELL_INFORMATION);
+    //core::stringc s = "Irrlicht Engine version ";
+	//s.append(getVersion());
+	//os::Printer::log(s.c_str(), ELL_INFORMATION);
 
 	checkVersion(params.SDK_version_do_not_use);
 }
@@ -426,43 +426,7 @@ void CIrrDeviceStub::clearSystemMessages()
 {
 }
 
-void CIrrDeviceStub::simulateMouse(const SEvent& event, core::position2d<s32>& mouse_pos)
-{
-	if (!CursorControl) return;
-	CursorControl->setPosition(mouse_pos);
 
-	SEvent irrevent;
-	bool send_event = true;
-
-	switch (event.TouchInput.Event)
-	{
-	case ETIE_PRESSED_DOWN:
-		irrevent.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
-		IsMousePressed = true;
-		break;
-	case ETIE_LEFT_UP:
-		irrevent.MouseInput.Event = EMIE_LMOUSE_LEFT_UP;
-		IsMousePressed = false;
-		break;
-	case ETIE_MOVED:
-		irrevent.MouseInput.Event = EMIE_MOUSE_MOVED;
-		break;
-	default:
-		send_event = false;
-		break;
-	}
-
-	if (send_event)
-	{
-		irrevent.MouseInput.Control = false;
-		irrevent.MouseInput.Shift = false;
-		irrevent.MouseInput.ButtonStates = IsMousePressed ? irr::EMBSM_LEFT : 0;
-		irrevent.EventType = EET_MOUSE_INPUT_EVENT;
-		irrevent.MouseInput.X = mouse_pos.X;
-		irrevent.MouseInput.Y = mouse_pos.Y + getMovedHeight();
-		postEventFromUser(irrevent);
-	}
-}
 
 } // end namespace irr
 

@@ -32,9 +32,11 @@
  *          it to NULL.
  *  \param type The type of the protocol.
  */
-Protocol::Protocol(ProtocolType type)
+Protocol::Protocol(ProtocolType type, CallbackObject* callback_object)
 {
+    m_callback_object       = callback_object;
     m_type                  = type;
+    m_state                 = PROTOCOL_STATE_INITIALISING;
     m_handle_connections    = false;
     m_handle_disconnections = false;
 }   // Protocol
@@ -50,7 +52,7 @@ Protocol::~Protocol()
 /** Returns a network string with the given type.
  *  \capacity Default preallocated size for the message.
  */
-NetworkString* Protocol::getNetworkString(size_t capacity) const
+NetworkString* Protocol::getNetworkString(size_t capacity)
 {
     return new NetworkString(m_type, (int)capacity);
 }   // getNetworkString
@@ -65,7 +67,7 @@ bool Protocol::checkDataSize(Event* event, unsigned int minimum_size)
     const NetworkString &data = event->data();
     if (data.size() < minimum_size)
     {
-        Log::warn("Protocol", "Receiving a badly formatted message:");
+        Log::warn("Protocol", "Receiving a badly formated message:");
         Log::warn("Protocol", data.getLogMessage().c_str());
         return false;
     }
@@ -80,6 +82,24 @@ void Protocol::requestStart()
     if (auto pm = ProtocolManager::lock())
         pm->requestStart(shared_from_this());
 }   // requestStart
+
+// ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to pause this protocol.
+ */
+void Protocol::requestPause()
+{
+    if (auto pm = ProtocolManager::lock())
+        pm->requestPause(shared_from_this());
+}   // requestPause
+
+// ----------------------------------------------------------------------------
+/** Submits a request to the ProtocolManager to unpause this protocol.
+ */
+void Protocol::requestUnpause()
+{
+    if (auto pm = ProtocolManager::lock())
+        pm->requestUnpause(shared_from_this());
+}   // requestUnpause
 
 // ----------------------------------------------------------------------------
 /** Submits a request to the ProtocolManager to terminate this protocol.

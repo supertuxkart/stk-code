@@ -31,25 +31,15 @@
 #include "guiengine/skin.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/string_utils.hpp"
-#include "utils/utf8.h"
 
-#include "GlyphLayout.h"
 #include <array>
-
-#ifndef SERVER_ONLY
-extern "C"
-{
-    #include <mipmap/img.h>
-    #include <mipmap/imgresize.h>
-}
-#endif
 
 // ----------------------------------------------------------------------------
 /** Constructor. It will initialize the \ref m_spritebank and TTF files to use.
  *  \param name The name of face, used by irrlicht to distinguish spritebank.
  *  \param ttf \ref FaceTTF for this face to use.
  */
-FontWithFace::FontWithFace(const std::string& name)
+FontWithFace::FontWithFace(const std::string& name, FaceTTF* ttf)
 {
     m_spritebank = irr_driver->getGUI()->addEmptySpriteBank(name.c_str());
 
@@ -59,9 +49,8 @@ FontWithFace::FontWithFace(const std::string& name)
     m_fallback_font = NULL;
     m_fallback_font_scale = 1.0f;
     m_glyph_max_height = 0;
-    m_face_ttf = new FaceTTF();
-    m_face_dpi = 40;
-    m_inverse_shaping = 1.0f;
+    m_face_ttf = ttf;
+
 }   // FontWithFace
 // ----------------------------------------------------------------------------
 /** Destructor. Clears the glyph page and sprite bank.
@@ -76,7 +65,9 @@ FontWithFace::~FontWithFace()
     m_spritebank->drop();
     m_spritebank = NULL;
 
-    delete m_face_ttf;
+    // To be deleted by font_manager
+    m_face_ttf = NULL;
+
 }   // ~FontWithFace
 
 // ----------------------------------------------------------------------------
@@ -121,6 +112,7 @@ void FontWithFace::init()
 void FontWithFace::reset()
 {
     m_new_char_holder.clear();
+    m_character_area_map.clear();
     m_character_glyph_info_map.clear();
     for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
     {
@@ -128,7 +120,6 @@ void FontWithFace::reset()
             static_cast<STKTexture*>(m_spritebank->getTexture(i)));
     }
     m_spritebank->clear();
-    m_face_ttf->reset();
     createNewGlyphPage();
 }   // reset
 
@@ -147,7 +138,12 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
 
     unsigned int font_number = 0;
     unsigned int glyph_index = 0;
-    m_face_ttf->getFontAndGlyphFromChar(c, &font_number, &glyph_index);
+    while (font_number < m_face_ttf->getTotalFaces())
+    {
+        glyph_index = FT_Get_Char_Index(m_face_ttf->getFace(font_number), c);
+        if (glyph_index > 0) break;
+        font_number++;
+    }
     m_character_glyph_info_map[c] = GlyphInfo(font_number, glyph_index);
 #endif
 }   // loadGlyphInfo
@@ -162,7 +158,7 @@ void FontWithFace::createNewGlyphPage()
         return;
 
     uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() *
-    (CVS->isARBTextureSwizzleUsable() && !useColorGlyphPage() ? 1 : 4)]();
+    (CVS->isARBTextureSwizzleUsable() ? 1 : 4)]();
 #else
     uint8_t* data = NULL;
 #endif
@@ -173,7 +169,7 @@ void FontWithFace::createNewGlyphPage()
         StringUtils::toString(m_spritebank->getTextureCount()),
         getGlyphPageSize(),
 #ifndef SERVER_ONLY
-        CVS->isARBTextureSwizzleUsable() && !useColorGlyphPage()
+        CVS->isARBTextureSwizzleUsable()
 #else
         false
 #endif
@@ -183,55 +179,37 @@ void FontWithFace::createNewGlyphPage()
 
 // ----------------------------------------------------------------------------
 /** Render a glyph for a character into bitmap and save it into the glyph page.
- *  \param font_number Font number in \ref FaceTTF ttf list
- *  \param glyph_index Glyph index in ttf
+ *  \param c The character to be loaded.
+ *  \param c \ref GlyphInfo for the character.
  */
-void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
+void FontWithFace::insertGlyph(wchar_t c, const GlyphInfo& gi)
 {
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())
         return;
 
-    assert(glyph_index > 0);
-    assert(font_number < m_face_ttf->getTotalFaces());
-    FT_Face cur_face = m_face_ttf->getFace(font_number);
+    assert(gi.glyph_index > 0);
+    assert(gi.font_number < m_face_ttf->getTotalFaces());
+    FT_Face cur_face = m_face_ttf->getFace(gi.font_number);
     FT_GlyphSlot slot = cur_face->glyph;
 
-    if (FT_HAS_COLOR(cur_face))
-    {
-        font_manager->checkFTError(FT_Load_Glyph(cur_face, glyph_index,
-            FT_LOAD_DEFAULT | FT_LOAD_COLOR), "loading a glyph");
-    }
-    else
-    {
-        // Same face may be shared across the different FontWithFace,
-        // so reset dpi each time
-        font_manager->checkFTError(FT_Set_Pixel_Sizes(cur_face, 0, getDPI()),
-            "setting DPI");
+    // Same face may be shared across the different FontWithFace,
+    // so reset dpi each time
+    font_manager->checkFTError(FT_Set_Pixel_Sizes(cur_face, 0, getDPI()),
+        "setting DPI");
 
-        font_manager->checkFTError(FT_Load_Glyph(cur_face, glyph_index,
-            FT_LOAD_DEFAULT), "loading a glyph");
+    font_manager->checkFTError(FT_Load_Glyph(cur_face, gi.glyph_index,
+        FT_LOAD_DEFAULT), "loading a glyph");
 
-        font_manager->checkFTError(shapeOutline(&(slot->outline)),
-            "shaping outline");
+    font_manager->checkFTError(shapeOutline(&(slot->outline)),
+        "shaping outline");
 
-        font_manager->checkFTError(FT_Render_Glyph(slot,
-            FT_RENDER_MODE_NORMAL), "rendering a glyph to bitmap");
-    }
+    font_manager->checkFTError(FT_Render_Glyph(slot, FT_RENDER_MODE_NORMAL),
+        "rendering a glyph to bitmap");
 
     // Convert to an anti-aliased bitmap
     FT_Bitmap* bits = &(slot->bitmap);
-    float scale_ratio = 1.0f;
-    unsigned cur_glyph_width = bits->width;
-    unsigned cur_glyph_height = bits->rows;
-    if (bits->pixel_mode == FT_PIXEL_MODE_BGRA)
-    {
-        scale_ratio =
-                (float)getDPI() / (float)font_manager->getShapingDPI();
-        cur_glyph_width = (unsigned)(bits->width * scale_ratio);
-        cur_glyph_height = (unsigned)(bits->rows * scale_ratio);
-    }
-    core::dimension2du texture_size(cur_glyph_width + 1, cur_glyph_height + 1);
+    core::dimension2du texture_size(bits->width + 1, bits->rows + 1);
     if ((m_used_width + texture_size.Width > getGlyphPageSize() &&
         m_used_height + m_current_height + texture_size.Height >
         getGlyphPageSize())                                     ||
@@ -249,83 +227,29 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
         m_current_height = 0;
     }
 
-    const unsigned int cur_tex = m_spritebank->getTextureCount() - 1;
+    const unsigned int cur_tex = m_spritebank->getTextureCount() -1;
     if (bits->buffer != NULL && !ProfileWorld::isNoGraphics())
     {
         video::ITexture* tex = m_spritebank->getTexture(cur_tex);
         glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
-        if (bits->pixel_mode == FT_PIXEL_MODE_GRAY)
+        assert(bits->pixel_mode == FT_PIXEL_MODE_GRAY);
+        if (CVS->isARBTextureSwizzleUsable())
         {
-            if (CVS->isARBTextureSwizzleUsable() && !useColorGlyphPage())
-            {
-                glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                    bits->width, bits->rows, GL_RED, GL_UNSIGNED_BYTE,
-                    bits->buffer);
-            }
-            else
-            {
-                const unsigned int size = bits->width * bits->rows;
-                uint8_t* image_data = new uint8_t[size * 4];
-                memset(image_data, 255, size * 4);
-                for (unsigned int i = 0; i < size; i++)
-                    image_data[4 * i + 3] = bits->buffer[i];
-                glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                    bits->width, bits->rows, GL_RGBA, GL_UNSIGNED_BYTE,
-                    image_data);
-                delete[] image_data;
-            }
-        }
-        else if (bits->pixel_mode == FT_PIXEL_MODE_BGRA)
-        {
-            assert(useColorGlyphPage());
-            // Scale it to normal font dpi
-            video::IImage* unscaled = irr_driver->getVideoDriver()
-                ->createImageFromData(video::ECF_A8R8G8B8,
-                { bits->width, bits->rows },
-                bits->buffer, true/*ownForeignMemory*/, false/*deleteMemory*/);
-            assert(unscaled);
-            video::IImage* scaled = irr_driver
-                ->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
-                { cur_glyph_width , cur_glyph_height});
-            assert(scaled);
-            if (cur_glyph_width >= bits->width ||
-                cur_glyph_height >= bits->rows)
-            {
-                unscaled->copyToScaling(scaled);
-            }
-            else
-            {
-                imReduceOptions options;
-                imReduceSetOptions(&options, IM_REDUCE_FILTER_LINEAR/*filter*/,
-                    3/*hopcount*/, 16.0f/*alpha*/, 1.0f/*amplifynormal*/,
-                    0.0f/*normalsustainfactor*/);
-                int ret = imReduceImageKaiserData((unsigned char*)scaled->lock(),
-                    (unsigned char*)unscaled->lock(), bits->width, bits->rows, 4,
-                    bits->width * 4, cur_glyph_width , cur_glyph_height,
-                    &options);
-                if (ret != 1)
-                {
-                    Log::error("FontWithFace",
-                        "Error reduce bitmap font size.");
-                }
-            }
-            uint8_t* scaled_data = (uint8_t*)scaled->lock();
-            for (unsigned int i = 0; i < cur_glyph_width * cur_glyph_height;
-                 i++)
-            {
-                uint8_t tmp_val = scaled_data[i * 4];
-                scaled_data[i * 4] = scaled_data[i * 4 + 2];
-                scaled_data[i * 4 + 2] = tmp_val;
-            }
             glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                cur_glyph_width, cur_glyph_height, GL_RGBA, GL_UNSIGNED_BYTE,
-                scaled_data);
-            unscaled->drop();
-            scaled->drop();
+                bits->width, bits->rows, GL_RED, GL_UNSIGNED_BYTE,
+                bits->buffer);
         }
         else
         {
-            assert(false && "Invalid pixel mode");
+            const unsigned int size = bits->width * bits->rows;
+            uint8_t* image_data = new uint8_t[size * 4];
+            memset(image_data, 255, size * 4);
+            for (unsigned int i = 0; i < size; i++)
+                image_data[4 * i + 3] = bits->buffer[i];
+            glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
+                bits->width, bits->rows, GL_RGBA, GL_UNSIGNED_BYTE,
+                image_data);
+            delete[] image_data;
         }
         if (tex->hasMipMaps())
             glGenerateMipmap(GL_TEXTURE_2D);
@@ -336,7 +260,7 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
     gui::SGUISpriteFrame f;
     gui::SGUISprite s;
     core::rect<s32> rectangle(m_used_width, m_used_height,
-        m_used_width + cur_glyph_width, m_used_height + cur_glyph_height);
+        m_used_width + bits->width, m_used_height + bits->rows);
     f.rectNumber = m_spritebank->getPositions().size();
     f.textureNumber = cur_tex;
 
@@ -348,18 +272,15 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
 
     // Save glyph metrics
     FontArea a;
-    a.advance_x = (int)
-        (cur_face->glyph->advance.x / BEARING * scale_ratio);
-    a.bearing_x = (int)
-        (cur_face->glyph->metrics.horiBearingX / BEARING * scale_ratio);
-    const int cur_height =
-        (int)(cur_face->glyph->metrics.height / BEARING * scale_ratio);
+    a.advance_x = cur_face->glyph->advance.x / BEARING;
+    a.bearing_x = cur_face->glyph->metrics.horiBearingX / BEARING;
+    const int cur_height = (cur_face->glyph->metrics.height / BEARING);
     const int cur_offset_y = cur_height -
-        (int)(cur_face->glyph->metrics.horiBearingY / BEARING * scale_ratio);
+        (cur_face->glyph->metrics.horiBearingY / BEARING);
     a.offset_y = m_glyph_max_height - cur_height + cur_offset_y;
     a.offset_y_bt = -cur_offset_y;
     a.spriteno = f.rectNumber;
-    m_face_ttf->insertFontArea(a, font_number, glyph_index);
+    m_character_area_map[c] = a;
 
     // Store used area
     m_used_width += texture_size.Width;
@@ -380,7 +301,7 @@ void FontWithFace::updateCharactersList()
     for (const wchar_t& c : m_new_char_holder)
     {
         const GlyphInfo& gi = getGlyphInfo(c);
-        insertGlyph(gi.font_number, gi.glyph_index);
+        insertGlyph(c, gi);
     }
     m_new_char_holder.clear();
 
@@ -429,70 +350,45 @@ void FontWithFace::dumpGlyphPage()
  */
 void FontWithFace::setDPI()
 {
-    float scale = std::min(irr_driver->getActualScreenSize().Height,
-                             irr_driver->getActualScreenSize().Width)  / 720.0f;
-    int factorTwo = getScalingFactorTwo();
-    
-    if (UserConfigParams::m_font_size < 0)
-    {
-        UserConfigParams::m_font_size = 0;
-    }
-    else if (UserConfigParams::m_font_size > 6)
-    {
-        UserConfigParams::m_font_size = 6;
-    }
-    
-    factorTwo += UserConfigParams::m_font_size * 5 - 10;
-    m_face_dpi = int(factorTwo * getScalingFactorOne() * scale);
-#ifndef SERVER_ONLY
-    if (!disableTextShaping())
-    {
-        m_inverse_shaping = (1.0f / (float)font_manager->getShapingDPI()) *
-            float(m_face_dpi);
-    }
-#endif
-}   // setDPI
+    const int screen_width = irr_driver->getActualScreenSize().Width;
+    const int screen_height = irr_driver->getActualScreenSize().Height;
 
-// ----------------------------------------------------------------------------
-/* Get the question mark glyph to show unsupported charaters. */
-const FontArea* FontWithFace::getUnknownFontArea() const
-{
-#ifdef SERVER_ONLY
-    static FontArea area;
-    return &area;
-#else
-    std::map<wchar_t, GlyphInfo>::const_iterator n =
-        m_character_glyph_info_map.find(L'?');
-    assert(n != m_character_glyph_info_map.end());
-    const FontArea* area = m_face_ttf->getFontArea(n->second.font_number,
-        n->second.glyph_index);
-    assert(area != NULL);
-    return area;
-#endif
-}   // getUnknownFontArea
+    if (UserConfigParams::m_hidpi_enabled)
+    {
+        float scale = screen_height / 480.0f;
+        m_face_dpi = int(getScalingFactorTwo() * getScalingFactorOne() * scale);
+    }
+    else
+    {
+        float scale = std::max(0, screen_width - 640) / 564.0f;
+    
+        // attempt to compensate for small screens
+        if (screen_width < 1200)
+            scale = std::max(0, screen_width - 640) / 750.0f;
+        if (screen_width < 900 || screen_height < 700)
+            scale = std::min(scale, 0.05f);
+    
+        m_face_dpi = unsigned((getScalingFactorOne() + 0.2f * scale) *
+            getScalingFactorTwo());
+    }
+}   // setDPI
 
 // ----------------------------------------------------------------------------
 /** Return the \ref FontArea about a character.
  *  \param c The character to get.
  *  \param[out] fallback_font Whether fallback font is used.
  */
-const FontArea& FontWithFace::getAreaFromCharacter(const wchar_t c,
-                                                   bool* fallback_font) const
+const FontWithFace::FontArea&
+    FontWithFace::getAreaFromCharacter(const wchar_t c,
+                                       bool* fallback_font) const
 {
-    std::map<wchar_t, GlyphInfo>::const_iterator n =
-        m_character_glyph_info_map.find(c);
-    // Not found, return the first font area, which is a white-space
-    if (n == m_character_glyph_info_map.end())
-        return *getUnknownFontArea();
-
-#ifndef SERVER_ONLY
-    const FontArea* area = m_face_ttf->getFontArea(n->second.font_number,
-        n->second.glyph_index);
-    if (area != NULL)
+    std::map<wchar_t, FontArea>::const_iterator n =
+        m_character_area_map.find(c);
+    if (n != m_character_area_map.end())
     {
         if (fallback_font != NULL)
             *fallback_font = false;
-        return *area;
+        return n->second;
     }
     else if (m_fallback_font != NULL && fallback_font != NULL)
     {
@@ -503,9 +399,8 @@ const FontArea& FontWithFace::getAreaFromCharacter(const wchar_t c,
     // Not found, return the first font area, which is a white-space
     if (fallback_font != NULL)
         *fallback_font = false;
-#endif
+    return m_character_area_map.begin()->second;
 
-    return *getUnknownFontArea();
 }   // getAreaFromCharacter
 
 // ----------------------------------------------------------------------------
@@ -515,8 +410,8 @@ const FontArea& FontWithFace::getAreaFromCharacter(const wchar_t c,
  *  \param font_settings \ref FontSettings to use.
  *  \return The dimension of text
  */
-core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
-                                                  FontSettings* font_settings)
+core::dimension2d<u32> FontWithFace::getDimension(const wchar_t* text,
+                                            FontSettings* font_settings)
 {
 #ifdef SERVER_ONLY
     return core::dimension2d<u32>(1, 1);
@@ -525,18 +420,43 @@ core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
         return core::dimension2d<u32>(1, 1);
 
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
-    if (disableTextShaping())
+    // Test if lazy load char is needed
+    insertCharacters(text);
+    updateCharactersList();
+
+    assert(m_character_area_map.size() > 0);
+    core::dimension2d<float> dim(0.0f, 0.0f);
+    core::dimension2d<float> this_line(0.0f, m_font_max_height * scale);
+
+    for (const wchar_t* p = text; *p; ++p)
     {
-        return gui::getGlyphLayoutsDimension(text2GlyphsWithoutShaping(text),
-            m_font_max_height, 1.0f/*inverse shaping*/, scale);
+        if (*p == L'\r'  ||      // Windows breaks
+            *p == L'\n'      )   // Unix breaks
+        {
+            if (*p==L'\r' && p[1] == L'\n') // Windows breaks
+                ++p;
+            dim.Height += this_line.Height;
+            if (dim.Width < this_line.Width)
+                dim.Width = this_line.Width;
+            this_line.Width = 0;
+            continue;
+        }
+
+        bool fallback = false;
+        const FontArea &area = getAreaFromCharacter(*p, &fallback);
+
+        this_line.Width += getCharWidth(area, fallback, scale);
     }
 
-    auto& gls = font_manager->getCachedLayouts(text);
-    if (gls.empty() && !text.empty())
-        font_manager->shape(StringUtils::wideToUtf32(text), gls);
+    dim.Height += this_line.Height;
+    if (dim.Width < this_line.Width)
+        dim.Width = this_line.Width;
 
-    return gui::getGlyphLayoutsDimension(gls,
-        m_font_max_height * scale, m_inverse_shaping, scale);
+    core::dimension2d<u32> ret_dim(0, 0);
+    ret_dim.Width  = (u32)(dim.Width + 0.9f); // round up
+    ret_dim.Height = (u32)(dim.Height + 0.9f);
+
+    return ret_dim;
 #endif
 }   // getDimension
                                   
@@ -550,7 +470,6 @@ core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
 int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
                                       FontSettings* font_settings) const
 {
-#ifndef SERVER_ONLY
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
     float x = 0;
     int idx = 0;
@@ -568,14 +487,14 @@ int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
 
         ++idx;
     }
-#endif
+
     return -1;
 }   // getCharacterFromPos
 
 // ----------------------------------------------------------------------------
 /** Render text and clip it to the specified rectangle if wanted, it will also
  *  do checking for missing characters in font and lazy load them.
- *  \param gl GlyphLayout rendered by libraqm to be rendering.
+ *  \param text The text to be rendering.
  *  \param position The position to be rendering.
  *  \param color The color used when rendering.
  *  \param hcenter If rendered horizontally center.
@@ -584,7 +503,7 @@ int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
  *  \param font_settings \ref FontSettings to use.
  *  \param char_collector \ref FontCharCollector to render billboard text.
  */
-void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
+void FontWithFace::render(const core::stringw& text,
                           const core::rect<s32>& position,
                           const video::SColor& color, bool hcenter,
                           bool vcenter, const core::rect<s32>* clip,
@@ -592,13 +511,14 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
                           FontCharCollector* char_collector)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics() || gl.empty())
+    if (ProfileWorld::isNoGraphics())
         return;
 
     const bool black_border = font_settings ?
         font_settings->useBlackBorder() : false;
     const bool colored_border = font_settings ?
         font_settings->useColoredBorder() : false;
+    const bool rtl = font_settings ? font_settings->isRTL() : false;
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
     const float shadow = font_settings ? font_settings->useShadow() : false;
 
@@ -611,7 +531,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         core::rect<s32> shadowpos = position;
         shadowpos.LowerRightCorner.X += 2;
         shadowpos.LowerRightCorner.Y += 2;
-        render(gl, shadowpos, font_settings->getShadowColor(), hcenter,
+        render(text, shadowpos, font_settings->getShadowColor(), hcenter,
             vcenter, clip, font_settings);
 
         // Set back
@@ -621,44 +541,18 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
     core::position2d<float> offset(float(position.UpperLeftCorner.X),
         float(position.UpperLeftCorner.Y));
     core::dimension2d<s32> text_dimension;
-    auto width_per_line = gui::getGlyphLayoutsWidthPerLine(gl,
-        m_inverse_shaping, scale);
-    if (width_per_line.empty())
-        return;
 
-    bool too_long_broken_text = false;
-    float next_line_height = m_font_max_height * scale;
-    if (width_per_line.size() > 1 &&
-        width_per_line.size() * next_line_height > position.getHeight())
+    if (rtl || hcenter || vcenter || clip)
     {
-        // Make too long broken text draw as fit as possible
-        next_line_height = (float)position.getHeight() / width_per_line.size();
-        too_long_broken_text = true;
-    }
-
-    // The offset must be round to integer when setting the offests
-    // or * m_inverse_shaping, so the glyph is drawn without blurring effects
-    if (hcenter || vcenter || clip)
-    {
-        text_dimension = gui::getGlyphLayoutsDimension(
-            gl, next_line_height, m_inverse_shaping, scale);
+        text_dimension = getDimension(text.c_str(), font_settings);
 
         if (hcenter)
-        {
-            offset.X += (s32)(
-                (position.getWidth() - width_per_line[0]) / 2.0f);
-        }
+            offset.X += (position.getWidth() - text_dimension.Width) / 2;
+        else if (rtl)
+            offset.X += (position.getWidth() - text_dimension.Width);
+
         if (vcenter)
-        {
-            if (too_long_broken_text)
-                offset.Y -= (s32)
-                    ((m_font_max_height - m_glyph_max_height) * scale);
-            else
-            {
-                offset.Y += (s32)(
-                    (position.getHeight() - text_dimension.Height) / 2.0f);
-            }
-        }
+            offset.Y += (position.getHeight() - text_dimension.Height) / 2;
         if (clip)
         {
             core::rect<s32> clippedRect(core::position2d<s32>
@@ -669,87 +563,40 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
     }
 
     // Collect character locations
-    const unsigned int text_size = gl.size();
-    std::vector<std::pair<s32, bool> > indices;
+    const unsigned int text_size = text.size();
+    core::array<s32> indices(text_size);
     core::array<core::position2d<float>> offsets(text_size);
     std::vector<bool> fallback(text_size);
-    core::array<core::position2d<float>> gld_offsets;
-    gui::GlyphLayoutDraw df_used = gui::GLD_NONE;
 
-    // Check if the line is RTL
-    bool rtl = (gl[0].flags & gui::GLF_RTL_LINE) != 0;
-    if (!hcenter && rtl)
-        offset.X += (s32)(position.getWidth() - width_per_line[0]);
+    // Test again if lazy load char is needed,
+    // as some text isn't drawn with getDimension
+    insertCharacters(text.c_str());
+    updateCharactersList();
 
-    unsigned cur_line = 0;
-    bool line_changed = false;
-    for (unsigned i = 0; i < gl.size(); i++)
+    for (u32 i = 0; i < text_size; i++)
     {
-        const gui::GlyphLayout& glyph_layout = gl[i];
-        if ((glyph_layout.flags & gui::GLF_NEWLINE) != 0)
+        wchar_t c = text[i];
+
+        if (c == L'\r' ||          // Windows breaks
+            c == L'\n'    )        // Unix breaks
         {
-            offset.Y += (s32)next_line_height;
-            cur_line++;
-            line_changed = true;
-            continue;
-        }
-        if (line_changed)
-        {
-            line_changed = false;
-            rtl = (glyph_layout.flags & gui::GLF_RTL_LINE) != 0;
-            offset.X = float(position.UpperLeftCorner.X);
+            if (c==L'\r' && text[i+1]==L'\n')
+                c = text[++i];
+            offset.Y += m_font_max_height * scale;
+            offset.X  = float(position.UpperLeftCorner.X);
             if (hcenter)
-            {
-                offset.X += (s32)(
-                    (position.getWidth() - width_per_line.at(cur_line)) / 2.f);
-            }
-            else if (rtl)
-            {
-                offset.X +=
-                    (s32)(position.getWidth() - width_per_line.at(cur_line));
-            }
-        }
+                offset.X += (position.getWidth() - text_dimension.Width) >> 1;
+            continue;
+        }   // if lineBreak
 
         bool use_fallback_font = false;
-        const FontArea* area = NULL;
-        if (glyph_layout.index == 0)
-            area = getUnknownFontArea();
-        if (area == NULL)
-        {
-            if (m_face_ttf->enabledForFont(glyph_layout.face_idx))
-            {
-                area = m_face_ttf->getFontArea(
-                    glyph_layout.face_idx, glyph_layout.index);
-                if (area == NULL)
-                {
-                    insertGlyph(glyph_layout.face_idx, glyph_layout.index);
-                    area = m_face_ttf->getFontArea(
-                        glyph_layout.face_idx, glyph_layout.index);
-                }
-            }
-            else if (m_fallback_font && m_fallback_font
-                ->m_face_ttf->enabledForFont(glyph_layout.face_idx))
-            {
-                use_fallback_font = true;
-                area = m_fallback_font->m_face_ttf->getFontArea(
-                    glyph_layout.face_idx, glyph_layout.index);
-                if (area == NULL)
-                {
-                    m_fallback_font->insertGlyph(glyph_layout.face_idx,
-                        glyph_layout.index);
-                    area = m_fallback_font->m_face_ttf->getFontArea(
-                        glyph_layout.face_idx, glyph_layout.index);
-                }
-            }
-        }
+        const FontArea &area   = getAreaFromCharacter(c, &use_fallback_font);
         fallback[i]            = use_fallback_font;
         if (char_collector == NULL)
         {
-            float glyph_offset_x = (int)(area->bearing_x +
-                glyph_layout.x_offset * m_inverse_shaping) *
+            float glyph_offset_x = area.bearing_x *
                 (fallback[i] ? m_fallback_font_scale : scale);
-            float glyph_offset_y = (int)(area->offset_y -
-                glyph_layout.y_offset * m_inverse_shaping) *
+            float glyph_offset_y = area.offset_y *
                 (fallback[i] ? m_fallback_font_scale : scale);
             offset.X += glyph_offset_x;
             offset.Y += glyph_offset_y;
@@ -760,11 +607,9 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         else
         {
             // Billboard text specific, use offset_y_bt instead
-            float glyph_offset_x = (int)(area->bearing_x +
-                glyph_layout.x_offset * m_inverse_shaping) *
+            float glyph_offset_x = area.bearing_x *
                 (fallback[i] ? m_fallback_font_scale : scale);
-            float glyph_offset_y = (int)(area->offset_y_bt +
-                glyph_layout.y_offset * m_inverse_shaping) *
+            float glyph_offset_y = area.offset_y_bt *
                 (fallback[i] ? m_fallback_font_scale : scale);
             offset.X += glyph_offset_x;
             offset.Y += glyph_offset_y;
@@ -773,41 +618,8 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             offset.Y -= glyph_offset_y;
         }
 
-        indices.emplace_back(area->spriteno,
-            (glyph_layout.flags & gui::GLF_COLORED) != 0);
-        if ((glyph_layout.flags & gui::GLF_QUICK_DRAW) != 0)
-        {
-            offset.X += glyph_layout.x_advance * scale;
-        }
-        else
-        {
-            int width = (int)(glyph_layout.x_advance * m_inverse_shaping);
-            if (char_collector == NULL)
-            {
-                float each_size = width * scale /
-                    (float)glyph_layout.cluster.size();
-                float start = offset.X;
-                for (unsigned df = 0; df < glyph_layout.draw_flags.size();
-                     df++)
-                {
-                    if (glyph_layout.draw_flags[df] != gui::GLD_NONE)
-                    {
-                        if (df_used == gui::GLD_NONE)
-                        {
-                            if (glyph_layout.draw_flags[df] & gui::GLD_MARKED)
-                                df_used = gui::GLD_MARKED;
-                            else if (glyph_layout.draw_flags[df] &
-                                gui::GLD_COMPOSING)
-                                df_used = gui::GLD_COMPOSING;
-                        }
-                        gld_offsets.push_back({start, offset.Y});
-                        gld_offsets.push_back({start + each_size, offset.Y});
-                    }
-                    start += each_size;
-                }
-            }
-            offset.X += width * scale;
-        }
+        indices.push_back(area.spriteno);
+        offset.X += getCharWidth(area, fallback[i], scale);
     }   // for i < text_size
 
     // Do the actual rendering
@@ -839,10 +651,10 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
 
         for (int n = 0; n < indice_amount; n++)
         {
-            const int sprite_id = indices[n].first;
+            const int sprite_id = indices[n];
             if (!fallback[n] && (sprite_id < 0 || sprite_id >= sprite_amount))
                 continue;
-            if (indices[n].first == -1) continue;
+            if (indices[n] == -1) continue;
 
             const int tex_id = (fallback[n] ?
                 (*fallback_sprites)[sprite_id].Frames[0].textureNumber :
@@ -864,11 +676,9 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
                 m_fallback_font->m_spritebank->getTexture(tex_id) :
                 m_spritebank->getTexture(tex_id));
 
-            bool thin_border = font_settings ?
+            const bool thin_border = font_settings ?
                 font_settings->useThinBorder() : false;
 
-            if (fallback[n])
-                thin_border = true;
             int thickness = (thin_border) ? 1 : 2;
 
             for (int x_delta = -thickness; x_delta <= thickness; x_delta++)
@@ -884,33 +694,12 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         }
     }
 
-    std::array<video::SColor, 4> white =
-        { {
-              video::SColor(-1), video::SColor(-1),
-              video::SColor(-1), video::SColor(-1)
-        } };
-    video::SColor top = GUIEngine::getSkin()->getColor("font::top");
-    video::SColor bottom = GUIEngine::getSkin()->getColor("font::bottom");
-    top.setAlpha(color.getAlpha());
-    bottom.setAlpha(color.getAlpha());
-
-    std::array<video::SColor, 4> title_colors;
-    if (CVS->isGLSL())
-        title_colors = { { top, bottom, top, bottom } };
-    else
-        title_colors = { { bottom, top, top, bottom } };
-
-    video::SColor text_marked = GUIEngine::getSkin()->getColor(
-        "text_field::background_marked");
-    video::SColor text_neutral = GUIEngine::getSkin()->getColor(
-        "text::neutral");
-
     for (int n = 0; n < indice_amount; n++)
     {
-        const int sprite_id = indices[n].first;
+        const int sprite_id = indices[n];
         if (!fallback[n] && (sprite_id < 0 || sprite_id >= sprite_amount))
             continue;
-        if (indices[n].first == -1) continue;
+        if (indices[n] == -1) continue;
 
         const int tex_id = (fallback[n] ?
             (*fallback_sprites)[sprite_id].Frames[0].textureNumber :
@@ -932,166 +721,46 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             m_fallback_font->m_spritebank->getTexture(tex_id) :
             m_spritebank->getTexture(tex_id));
 
-        const bool is_colored = indices[n].second;
-        if (isBold())
+        if (fallback[n] || isBold())
         {
-            if (char_collector != NULL)
+            video::SColor top = GUIEngine::getSkin()->getColor("font::top");
+            video::SColor bottom = GUIEngine::getSkin()
+                ->getColor("font::bottom");
+            top.setAlpha(color.getAlpha());
+            bottom.setAlpha(color.getAlpha());
+
+            std::array<video::SColor, 4> title_colors;
+            if (CVS->isGLSL())
             {
-                char_collector->collectChar(texture, dest, source,
-                    is_colored ? white.data() : title_colors.data());
+                title_colors = { { top, bottom, top, bottom } };
             }
             else
             {
-                draw2DImage(texture, dest, source, clip,
-                    is_colored ? white.data() : title_colors.data(), true);
+                title_colors = { { bottom, top, top, bottom } };
+            }
+            if (char_collector != NULL)
+            {
+                char_collector->collectChar(texture, dest, source,
+                    title_colors.data());
+            }
+            else
+            {
+                draw2DImage(texture, dest, source, clip, title_colors.data(),
+                    true);
             }
         }
         else
         {
             if (char_collector != NULL)
             {
-                std::array<video::SColor, 4> single_color =
-                    { {color, color, color, color} };
-                char_collector->collectChar(texture, dest, source,
-                    is_colored ? white.data() : single_color.data());
+                video::SColor colors[] = {color, color, color, color};
+                char_collector->collectChar(texture, dest, source, colors);
             }
             else
             {
-                draw2DImage(texture, dest, source, clip,
-                    is_colored ? video::SColor(-1) : color, true);
+                draw2DImage(texture, dest, source, clip, color, true);
             }
-        }
-    }
-    for (unsigned i = 0; i < gld_offsets.size(); i += 2)
-    {
-        if (df_used == gui::GLD_MARKED)
-        {
-            core::rect<s32> gld((s32)gld_offsets[i].X, (s32)gld_offsets[i].Y,
-                (s32)gld_offsets[i + 1].X,
-                (s32)(gld_offsets[i + 1].Y + m_font_max_height * scale));
-            GL32_draw2DRectangle(text_marked, gld, clip);
-        }
-        else if (df_used == gui::GLD_COMPOSING)
-        {
-            float line1 = m_font_max_height * scale * 0.88f;
-            float line2 = m_font_max_height * scale * 0.92f;
-            core::rect<s32> gld((s32)gld_offsets[i].X,
-                (s32)gld_offsets[i].Y + line1, (s32)gld_offsets[i + 1].X,
-                (s32)(gld_offsets[i + 1].Y + line2));
-            GL32_draw2DRectangle(text_neutral, gld, clip);
         }
     }
 #endif
 }   // render
-
-// ----------------------------------------------------------------------------
-/** Return a character width.
- *  \param area \ref FontArea to get glyph metrics.
- *  \param fallback If fallback font is used.
- *  \param scale The scaling of the character.
- *  \return The calculated width with suitable scaling. */
-float FontWithFace::getCharWidth(const FontArea& area, bool fallback,
-                                 float scale) const
-{
-    if (fallback)
-        return area.advance_x * m_fallback_font_scale;
-    else
-        return area.advance_x * scale;
-}   // getCharWidth
-
-// ----------------------------------------------------------------------------
-/* Cached version of render to make drawing as fast as possible. */
-void FontWithFace::drawText(const core::stringw& text,
-                            const core::rect<s32>& position,
-                            const video::SColor& color, bool hcenter,
-                            bool vcenter, const core::rect<s32>* clip,
-                            FontSettings* font_settings,
-                            FontCharCollector* char_collector)
-
-{
-#ifndef SERVER_ONLY
-    if (text.empty() || ProfileWorld::isNoGraphics())
-        return;
-
-    if (disableTextShaping())
-    {
-        render(text2GlyphsWithoutShaping(text), position, color, hcenter,
-            vcenter, clip, font_settings, char_collector);
-        return;
-    }
-
-    auto& gls = font_manager->getCachedLayouts(text);
-    if (gls.empty() && !text.empty())
-        font_manager->shape(StringUtils::wideToUtf32(text), gls);
-
-    render(gls, position, color, hcenter, vcenter, clip,
-        font_settings, char_collector);
-#endif
-}   // drawText
-
-// ----------------------------------------------------------------------------
-/* No text shaping and bidi operation of drawText. */
-void FontWithFace::drawTextQuick(const core::stringw& text,
-                                 const core::rect<s32>& position,
-                                 const video::SColor& color, bool hcenter,
-                                 bool vcenter, const core::rect<s32>* clip,
-                                 FontSettings* font_settings,
-                                 FontCharCollector* char_collector)
-{
-#ifndef SERVER_ONLY
-    if (text.empty() || ProfileWorld::isNoGraphics())
-        return;
-
-    render(text2GlyphsWithoutShaping(text), position, color, hcenter,
-        vcenter, clip, font_settings, char_collector);
-#endif
-}   // drawTextQuick
-
-// ----------------------------------------------------------------------------
-/** Convert text to drawable GlyphLayout without text shaping, used in digit
- *  font or debugging message. */
-std::vector<gui::GlyphLayout> FontWithFace::
-    text2GlyphsWithoutShaping(const core::stringw& t)
-{
-    std::vector<gui::GlyphLayout> layouts;
-#ifndef SERVER_ONLY
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        wchar_t c = t[i];
-        gui::GlyphLayout gl = { 0 };
-        if (c == L'\r' ||          // Windows breaks
-            c == L'\n'    )        // Unix breaks
-        {
-            if (c == L'\r' && i != t.size() - 1 && t[i + 1] == L'\n')
-                i++;
-            gl.flags = gui::GLF_NEWLINE;
-            layouts.push_back(gl);
-            continue;
-        }
-        auto ret = m_character_glyph_info_map.find(c);
-        if (ret == m_character_glyph_info_map.end())
-        {
-            unsigned font = 0;
-            unsigned glyph = 0;
-            if (!m_face_ttf->getFontAndGlyphFromChar(c, &font, &glyph))
-            {
-                m_character_glyph_info_map[c] = GlyphInfo(font, glyph);
-                continue;
-            }
-            m_character_glyph_info_map[c] = GlyphInfo(font, glyph);
-            ret = m_character_glyph_info_map.find(c);
-            insertGlyph(font, glyph);
-        }
-        const FontArea* area = m_face_ttf->getFontArea
-            (ret->second.font_number, ret->second.glyph_index);
-        if (area == NULL)
-            continue;
-        gl.index = ret->second.glyph_index;
-        gl.x_advance = area->advance_x;
-        gl.face_idx = ret->second.font_number;
-        gl.flags = gui::GLF_QUICK_DRAW;
-        layouts.push_back(gl);
-    }
-#endif
-    return layouts;
-}   // text2GlyphsWithoutShaping

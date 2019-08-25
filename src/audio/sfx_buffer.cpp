@@ -21,7 +21,6 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
-#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 
 #ifdef ENABLE_SOUND
@@ -172,7 +171,7 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
         return false;
     }
 
-    file = FileUtils::fopenU8Path(name, "rb");
+    file = fopen(name.c_str(), "rb");
 
     if(!file)
     {

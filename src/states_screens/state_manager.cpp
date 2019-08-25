@@ -218,7 +218,7 @@ void StateManager::onGameStateChange(GameState new_state)
         if (new_state == MENU)
         {
             GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
-            if (screen != NULL && music_manager)
+            if (screen != NULL)
             {
                 music_manager->startMusic(
                     GUIEngine::getCurrentScreen()->getMusic());
@@ -233,14 +233,14 @@ void StateManager::onTopMostScreenChanged()
 {
     if (m_game_mode == MENU && GUIEngine::getCurrentScreen() != NULL)
     {
-        if (GUIEngine::getCurrentScreen()->getMusic() != NULL && music_manager)
+        if (GUIEngine::getCurrentScreen()->getMusic() != NULL)
         {
             music_manager->startMusic(GUIEngine::getCurrentScreen()->getMusic());
         }
     }
     else if (m_game_mode == INGAME_MENU && GUIEngine::getCurrentScreen() != NULL)
     {
-        if (GUIEngine::getCurrentScreen()->getInGameMenuMusic() != NULL && music_manager)
+        if (GUIEngine::getCurrentScreen()->getInGameMenuMusic() != NULL)
         {
             music_manager->startMusic(GUIEngine::getCurrentScreen()->getInGameMenuMusic());
         }
@@ -252,9 +252,13 @@ void StateManager::onTopMostScreenChanged()
 
 void StateManager::onStackEmptied()
 {
+    #ifdef ANDROID
+    ANativeActivity_finish(global_android_app->activity);
+    #else
     GUIEngine::cleanUp();
     GUIEngine::deallocate();
     main_loop->abort();
+    #endif
 }   // onStackEmptied
 
 // ============================================================================

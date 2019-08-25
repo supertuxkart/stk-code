@@ -21,18 +21,16 @@
 #define HEADER_TRACK_OBJECT_PRESENTATION_HPP
 
 #include "graphics/lod_node.hpp"
+#include "items/item.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/log.hpp"
-#include "utils/leak_check.hpp"
-#include "utils/time.hpp"
 #include "utils/vec3.hpp"
 
 #include <vector3d.h>
 #include <IAnimatedMeshSceneNode.h>
 
 #include <memory>
-#include <limits>
 #include <string>
 
 class SFXBase;
@@ -149,7 +147,6 @@ public:
         TrackObjectPresentation(xyz, hpr, scale)
     {
         m_node = node;
-        m_force_always_hidden = false;
     }   // TrackObjectPresentationSceneNode
 
     // ------------------------------------------------------------------------
@@ -169,8 +166,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the scene node, const version. */
     const scene::ISceneNode* getNode() const { return m_node; }
-    // ------------------------------------------------------------------------
-    bool isAlwaysHidden() const { return m_force_always_hidden; }
 };   // class TrackObjectPresentationSceneNode
 
 // ============================================================================
@@ -273,7 +268,8 @@ public:
 /** \ingroup tracks
  *  A track object representation that consists of a sound emitter
  */
-class TrackObjectPresentationSound : public TrackObjectPresentation
+class TrackObjectPresentationSound : public TrackObjectPresentation,
+                                     public TriggerItemListener
 {
 private:
 
@@ -294,7 +290,7 @@ public:
                                  scene::ISceneNode* parent,
                                  bool disable_for_multiplayer);
     virtual ~TrackObjectPresentationSound();
-    void onTriggerItemApproached();
+    virtual void onTriggerItemApproached() OVERRIDE;
     virtual void updateGraphics(float dt) OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
         const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
@@ -387,15 +383,14 @@ enum ActionTriggerType
 /** \ingroup tracks
  *  A track object representation that consists of an action trigger
  */
-class TrackObjectPresentationActionTrigger : public TrackObjectPresentation
+class TrackObjectPresentationActionTrigger : public TrackObjectPresentation,
+                                             public TriggerItemListener
 {
 private:
     /** For action trigger objects */
     std::string m_action, m_library_id, m_triggered_object, m_library_name;
 
-    float m_xml_reenable_timeout;
-
-    uint64_t m_reenable_timeout;
+    float m_xml_reenable_timeout, m_reenable_timeout;
 
     ActionTriggerType m_type;
 
@@ -408,25 +403,24 @@ public:
 
     virtual ~TrackObjectPresentationActionTrigger() {}
 
-    void onTriggerItemApproached();
+    virtual void onTriggerItemApproached() OVERRIDE;
     // ------------------------------------------------------------------------
     /** Reset the trigger (i.e. sets it to active again). */
-    virtual void reset() OVERRIDE 
-                             { m_reenable_timeout = StkTime::getMonoTimeMs(); }
+    virtual void reset() OVERRIDE                { m_reenable_timeout = 0.0f; }
     // ------------------------------------------------------------------------
-    /** Sets the trigger to be enabled or disabled. getMonoTimeMs is used to
-     *  to avoid called update which duplicated in network rewinding. */
+    virtual void update(float dt) OVERRIDE
+    {
+        if (m_reenable_timeout < 900000.0f)
+        {
+            m_reenable_timeout -= dt;
+        }
+    }
+    // ------------------------------------------------------------------------
+    /** Sets the trigger to be enabled or disabled. */
     virtual void setEnable(bool status) OVERRIDE
-    {
-        m_reenable_timeout = status ? StkTime::getMonoTimeMs() :
-            std::numeric_limits<uint64_t>::max();
-    }
+                            { m_reenable_timeout = status ? 0.0f : 999999.9f; }
     // ------------------------------------------------------------------------
-    void setReenableTimeout(float time)
-    {
-        m_reenable_timeout =
-            StkTime::getMonoTimeMs() + (uint64_t)(time * 1000.0f);
-    }
+    void setReenableTimeout(float time)          { m_reenable_timeout = time; }
 };   // class TrackObjectPresentationActionTrigger
 
 

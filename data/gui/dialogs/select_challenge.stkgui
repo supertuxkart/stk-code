@@ -2,33 +2,59 @@
 <stkgui>
     <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
 
-        <header id="title" height="10%" width="100%" text="Race Setup" align="center" text_align="center" />
+        <div width="100%" layout="horizontal-row" height="12%">
+            <icon-button id="back" width="12%" align="left" icon="gui/icons/back.png"/>
 
-        <spacer height="3%" width="1"/>
+            <header id="title" width="80%" text="Race Setup" align="center" text_align="center" />
 
-        <ribbon id="difficulty" height="25%" width="80%" align="center">
+            <spacer height="1" width="12%"/>
+        </div>
+
+        <spacer height="2%" width="1"/>
+
+        <div width="100%" layout="horizontal-row" height="fit">
+            <label id="race_type" text="Type:" I18N="Type of race, in a challenge"/>
+            <spacer width="5" height="1"/>
+            <label id="race_type_val" proportion="1"/>
+        </div>
+
+        <spacer height="2%" width="1"/>
+
+        <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="novice" icon="gui/icons/difficulty_easy.png"
-                    width="128" height="128" I18N="Difficulty" text="Novice"/>
+                    I18N="Difficulty" text="Novice" height="100%"/>
+            <spacer width="5%" height="1"/>
+            <label id="novice_label" proportion="1" height="100%"/>
+        </div>
+
+        <spacer height="6%" width="1"/>
+
+        <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="intermediate" icon="gui/icons/difficulty_medium.png"
-                    width="128" height="128" I18N="Difficulty" text="Intermediate"/>
+                    I18N="Difficulty" text="Intermediate" height="100%"/>
+            <spacer width="5%" height="1"/>
+            <label id="intermediate_label" proportion="1" height="100%"/>
+        </div>
+
+        <spacer height="6%" width="1"/>
+
+        <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="expert" icon="gui/icons/difficulty_hard.png"
-                    width="128" height="128" I18N="Difficulty" text="Expert"/>
+                    I18N="Difficulty" text="Expert" height="100%"/>
+            <spacer width="5%" height="1"/>
+            <label id="difficult_label" proportion="1" height="100%"/>
+        </div>
+
+        <spacer height="6%" width="1"/>
+
+        <div width="100%" proportion="1" layout="horizontal-row">
             <icon-button id="supertux" icon="gui/icons/difficulty_best.png"
-                    width="128" height="128" I18N="Difficulty" text="SuperTux"/>
-        </ribbon>
+                    I18N="Difficulty" text="SuperTux" height="100%"/>
+            <spacer width="5%" height="1"/>
+            <label id="supertux_label" proportion="1" height="100%"/>
+        </div>
 
-        <spacer height="3%" width="1"/>
-
-        <label id="challenge_info" height="35%" width="100%" text_align="center"/>
-
-        <spacer height="3%" width="1"/>
-
-        <buttonbar id="actions" height="20%" width="30%" align="center">
-            <icon-button id="back" icon="gui/icons/back.png"
-                    width="128" height="128" text="Back"/> 
-            <icon-button id="start" icon="gui/icons/green_check.png"
-                    width="128" height="128" text="Start Race"/>
-        </buttonbar>
+        <spacer height="2%" width="1"/>
 
     </div>
 </stkgui>

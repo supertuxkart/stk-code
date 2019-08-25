@@ -26,8 +26,6 @@
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
-#include "utils/extract_mobile_assets.hpp"
-#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -91,26 +89,17 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     CFStringRef cf_string_ref = CFURLCopyFileSystemPath(main_bundle_URL,
                                                         kCFURLPOSIXPathStyle);
     assert(cf_string_ref);
-    CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingUTF8);
+    CFStringGetCString(cf_string_ref, path, 1024, kCFStringEncodingASCII);
     CFRelease(main_bundle_URL);
     CFRelease(cf_string_ref);
 
-    // IOS version of stk store data folder directly inside supertuxkart.app
-    std::string contents = std::string(path) + "/";
-#ifndef IOS_STK
-    contents += std::string("Contents");
-#endif
+    std::string contents = std::string(path) + std::string("/Contents");
     if(contents.find(".app") != std::string::npos)
     {
-#ifdef IOS_STK
-        data_dir = contents;
-        return true;
-#else
         Log::debug("[FileManager]", "yes");
         // executable is inside an app bundle, use app bundle-relative paths
         data_dir = contents + std::string("/Resources/");
         return true;
-#endif
     }
     else
     {
@@ -126,12 +115,29 @@ FileManager* file_manager = 0;
 /** The constructor of the file manager creates an irrlicht file system and
  *  detects paths for the user config file and assets base directory (data).
  *  A second initialisation is done later once (see init()), once the user
- *  config file is read. This is necessary since part of discoverPaths
+ *  config file is read. This is necessary since part of discoverPaths 
  *  depend on artist debug mode.
  */
 FileManager::FileManager()
 {
-    resetSubdir();
+    m_subdir_name.resize(ASSET_COUNT);
+    m_subdir_name[CHALLENGE  ] = "challenges";
+    m_subdir_name[GFX        ] = "gfx";
+    m_subdir_name[GRANDPRIX  ] = "grandprix";
+    m_subdir_name[GUI_ICON   ] = "gui/icons";
+    m_subdir_name[GUI_SCREEN ] = "gui/screens";
+    m_subdir_name[GUI_DIALOG ] = "gui/dialogs";
+    m_subdir_name[LIBRARY    ] = "library";
+    m_subdir_name[MODEL      ] = "models";
+    m_subdir_name[MUSIC      ] = "music";
+    m_subdir_name[REPLAY     ] = "replay";
+    m_subdir_name[SCRIPT     ] = "tracks";
+    m_subdir_name[SFX        ] = "sfx";
+    m_subdir_name[SKIN       ] = "skins";
+    m_subdir_name[SHADER     ] = "shaders";
+    m_subdir_name[TEXTURE    ] = "textures";
+    m_subdir_name[TTF        ] = "ttf";
+    m_subdir_name[TRANSLATION] = "po";
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
     // since the code above may rely on it, save it to be able to restore
@@ -200,27 +206,19 @@ FileManager::FileManager()
 
     if (!m_file_system->existFile((root_dir + version).c_str()))
     {
-        Log::error("FileManager", "Could not find file '%s'in any "
+        Log::error("FileManager", "Could not file '%s'in any "
                    "standard location (esp. ../data).", version.c_str());
-        Log::error("FileManager",
+        Log::error("FileManager", 
                    "Last location checked '%s'.", root_dir.c_str());
-        Log::fatal("FileManager",
+        Log::fatal("FileManager", 
                    "Set $SUPERTUXKART_DATADIR to point to the data directory.");
         // fatal will exit the application
     }
-
+    
     addRootDirs(root_dir);
-
+    
     std::string assets_dir;
-#ifdef MOBILE_STK
-    m_stk_assets_download_dir = getenv("HOME");
-#ifdef IOS_STK
-    m_stk_assets_download_dir += "/Library/Application Support/SuperTuxKart/stk-assets/";
-#elif defined (ANDROID)
-    m_stk_assets_download_dir += "/stk-assets/";
-#endif
-
-#else
+    
     if (getenv("SUPERTUXKART_ASSETS_DIR") != NULL)
     {
         assets_dir = std::string(getenv("SUPERTUXKART_ASSETS_DIR"));
@@ -238,7 +236,7 @@ FileManager::FileManager()
         //is this needed?
         assets_dir = std::string(getenv("SUPERTUXKART_ROOT_PATH"));
     }
-#endif
+    
     if (!assets_dir.empty() && assets_dir != root_dir)
     {
         addRootDirs(assets_dir);
@@ -255,37 +253,10 @@ FileManager::FileManager()
 }   // FileManager
 
 // ----------------------------------------------------------------------------
-/** Reset subdirectories to initial state, for example after download assets
- */
-void FileManager::resetSubdir()
-{
-    m_subdir_name.clear();
-    m_subdir_name.resize(ASSET_COUNT);
-    m_subdir_name[CHALLENGE  ] = "challenges";
-    m_subdir_name[GFX        ] = "gfx";
-    m_subdir_name[GRANDPRIX  ] = "grandprix";
-    m_subdir_name[GUI_ICON   ] = "gui/icons";
-    m_subdir_name[GUI_SCREEN ] = "gui/screens";
-    m_subdir_name[GUI_DIALOG ] = "gui/dialogs";
-    m_subdir_name[LIBRARY    ] = "library";
-    m_subdir_name[MODEL      ] = "models";
-    m_subdir_name[MUSIC      ] = "music";
-    m_subdir_name[REPLAY     ] = "replay";
-    m_subdir_name[SCRIPT     ] = "tracks";
-    m_subdir_name[SFX        ] = "sfx";
-    m_subdir_name[SKIN       ] = "skins";
-    m_subdir_name[SHADER     ] = "shaders";
-    m_subdir_name[TEXTURE    ] = "textures";
-    m_subdir_name[TTF        ] = "ttf";
-    m_subdir_name[TRANSLATION] = "po";
-}   // resetSubdir
-
-// ----------------------------------------------------------------------------
 /** Detects where the assets are stored.
  */
 void FileManager::discoverPaths()
 {
-    resetSubdir();
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
     for(unsigned int i=0; i<m_root_dirs.size(); i++)
@@ -300,50 +271,11 @@ void FileManager::discoverPaths()
     Log::info("[FileManager]", "User-defined grand prix will be stored in '%s'.",
                m_gp_dir.c_str());
 
-    // Reset for re-downloading assets if needed
-    TrackManager::removeTrackSearchDirs();
-    KartPropertiesManager::removeKartSearchDirs();
-
     /** Now search for the path to all needed subdirectories. */
     // ==========================================================
     // This must be done here since otherwise translations will not be found.
     std::vector<bool> dir_found;
     dir_found.resize(ASSET_COUNT, false);
-#ifdef MOBILE_STK
-    assert(!m_root_dirs.empty());
-    for (unsigned j = ASSET_MIN; j <= BUILTIN_ASSETS; j++)
-    {
-        if (!dir_found[j] && fileExists(m_root_dirs[0] + m_subdir_name[j]))
-        {
-            dir_found[j] = true;
-            m_subdir_name[j] = m_root_dirs[0] + m_subdir_name[j] + "/";
-        }
-    }
-
-    // Use stk-assets-full for karts, tracks, textures..., otherwise in data/
-    std::string assets_root = ExtractMobileAssets::hasFullAssets() ?
-        m_stk_assets_download_dir : m_root_dirs[0];
-    for (unsigned j = LIBRARY; j <= ASSET_MAX; j++)
-    {
-        if (!dir_found[j] && fileExists(assets_root + m_subdir_name[j]))
-        {
-            dir_found[j] = true;
-            m_subdir_name[j] = assets_root + m_subdir_name[j] + "/";
-        }
-    }
-    if (fileExists(assets_root + "tracks/"))
-        TrackManager::addTrackSearchDir(assets_root + "tracks/");
-    if (fileExists(assets_root + "karts/"))
-        KartPropertiesManager::addKartSearchDir(assets_root + "karts/");
-
-    if (UserConfigParams::m_artist_debug_mode)
-    {
-        if (fileExists(assets_root + "wip-tracks/"))
-            TrackManager::addTrackSearchDir(assets_root + "wip-tracks/");
-        if (fileExists(assets_root + "wip-karts/"))
-            KartPropertiesManager::addKartSearchDir(assets_root + "wip-karts/");
-    }
-#else
     for(unsigned int i=0; i<m_root_dirs.size(); i++)
     {
         if(fileExists(m_root_dirs[i]+"tracks/"))
@@ -369,7 +301,6 @@ void FileManager::discoverPaths()
             }   // !dir_found && file_exist
         }   // for j=ASSET_MIN; j<=ASSET_MAX
     }   // for i<m_root_dirs
-#endif
 
     bool was_error = false;
     for(unsigned int i=ASSET_MIN; i<=ASSET_MAX; i++)
@@ -397,14 +328,6 @@ void FileManager::discoverPaths()
 void FileManager::init()
 {
     discoverPaths();
-    addAssetsSearchPath();
-    m_cert_bundle_location = m_file_system->getAbsolutePath(
-        getAsset("cacert.pem").c_str()).c_str();
-}   // init
-
-//-----------------------------------------------------------------------------
-void FileManager::addAssetsSearchPath()
-{
     // Note that we can't push the texture search path in the constructor
     // since this also adds a file archive to the file system - and
     // m_file_system is deleted (in irr_driver)
@@ -425,18 +348,9 @@ void FileManager::addAssetsSearchPath()
         for(int i=0;i<(int)dirs.size(); i++)
             pushMusicSearchPath(dirs[i]);
     }
-}   // addAssetsSearchPath
-
-//-----------------------------------------------------------------------------
-void FileManager::reinitAfterDownloadAssets()
-{
-    m_file_system->removeAllFileArchives();
-    m_texture_search_path.clear();
-    m_model_search_path.clear();
-    m_music_search_path.clear();
-    discoverPaths();
-    addAssetsSearchPath();
-}   // reinitAfterDownloadAssets
+    m_cert_location = m_file_system->getAbsolutePath(
+        getAsset("addons.supertuxkart.net.pem").c_str()).c_str();
+}   // init
 
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
@@ -470,7 +384,7 @@ FileManager::~FileManager()
             continue;
         }
         struct stat mystat;
-        FileUtils::statU8Path(full_path, &mystat);
+        stat(full_path.c_str(), &mystat);
         StkTime::TimeType current = StkTime::getTimeSinceEpoch();
         if(current - mystat.st_ctime <24*3600)
         {
@@ -882,7 +796,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 
     // Otherwise try to create the directory:
 #if defined(WIN32) && !defined(__CYGWIN__)
-    bool error = _wmkdir(StringUtils::utf8ToWide(path).c_str()) != 0;
+    bool error = _mkdir(path.c_str()) != 0;
 #else
     bool error = mkdir(path.c_str(), 0755) != 0;
 #endif
@@ -911,7 +825,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
         current_path += split[i] + "/";
         //Log::verbose("[FileManager]", "Checking for: '%s",
         //            current_path.c_str());
-
+        
         if (!checkAndCreateDirectory(current_path))
         {
             Log::error("[FileManager]", "Can't create dir '%s'",
@@ -943,13 +857,9 @@ void FileManager::checkAndCreateConfigDir()
 
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
-        std::vector<wchar_t> env;
-        // An environment variable has a maximum size limit of 32,767 characters
-        env.resize(32767, 0);
-        DWORD length = GetEnvironmentVariable(L"APPDATA", env.data(), 32767);
-        if (length != 0)
+        if (getenv("APPDATA") != NULL)
         {
-            m_user_config_dir = StringUtils::wideToUtf8(env.data());
+            m_user_config_dir  = getenv("APPDATA");
             if (!checkAndCreateDirectory(m_user_config_dir))
             {
                 Log::error("[FileManager]", "Can't create config dir '%s"
@@ -1020,19 +930,19 @@ void FileManager::checkAndCreateConfigDir()
     if(m_user_config_dir.size()>0 && *m_user_config_dir.rbegin()!='/')
         m_user_config_dir += "/";
 
-    m_user_config_dir += "config-0.10/";
+    m_user_config_dir +="0.10-git/";
     if(!checkAndCreateDirectoryP(m_user_config_dir))
     {
         Log::warn("FileManager", "Can not  create config dir '%s', "
                   "falling back to '.'.", m_user_config_dir.c_str());
         m_user_config_dir = "./";
     }
-
+    
     if (m_stdout_dir.empty())
     {
         m_stdout_dir = m_user_config_dir;
     }
-
+    
     return;
 }   // checkAndCreateConfigDir
 
@@ -1278,11 +1188,11 @@ void FileManager::setStdoutName(const std::string& filename)
 void FileManager::setStdoutDir(const std::string& dir)
 {
     m_stdout_dir = dir;
-
+    
     if (!m_stdout_dir.empty() && m_stdout_dir[m_stdout_dir.size() - 1] != '/')
     {
-        m_stdout_dir += "/";
-    }
+         m_stdout_dir += "/";
+     }
 }   // setStdoutDir
 
 //-----------------------------------------------------------------------------
@@ -1304,7 +1214,7 @@ void FileManager::redirectOutput()
         out_new << logoutfile << "." << i-1;
         if(fileExists(out_new.str()))
         {
-            FileUtils::renameU8Path(out_new.str(), out_old.str());
+            rename(out_new.str().c_str(), out_old.str().c_str());
         }
     }   // for i in NUM_BACKUPS
 
@@ -1313,7 +1223,7 @@ void FileManager::redirectOutput()
         std::ostringstream out;
         out << logoutfile<<".1";
         // No good place to log error messages when log is not yet initialised
-        FileUtils::renameU8Path(logoutfile, out.str());
+        rename(logoutfile.c_str(), out.str().c_str());
     }
 
     //Enable logging of stdout and stderr to logfile
@@ -1402,7 +1312,7 @@ bool FileManager::isDirectory(const std::string &path) const
     // a '/' at the end of the path.
     if(s[s.size()-1]=='/')
         s.erase(s.end()-1, s.end());
-    if(FileUtils::statU8Path(s, &mystat) < 0) return false;
+    if(stat(s.c_str(), &mystat) < 0) return false;
     return S_ISDIR(mystat.st_mode);
 }   // isDirectory
 
@@ -1462,15 +1372,9 @@ bool FileManager::removeFile(const std::string &name) const
        return true;
 
     struct stat mystat;
-    if(FileUtils::statU8Path(name, &mystat) < 0) return false;
+    if(stat(name.c_str(), &mystat) < 0) return false;
     if( S_ISREG(mystat.st_mode))
-    {
-#if defined(WIN32)
-        return _wremove(StringUtils::utf8ToWide(name).c_str()) == 0;
-#else
-        return remove(name.c_str()) == 0;
-#endif
-    }
+        return remove(name.c_str())==0;
     return false;
 }   // removeFile
 
@@ -1488,8 +1392,8 @@ bool FileManager::removeDirectory(const std::string &name) const
 
     for (std::string file : files)
     {
-        if (file == "." || file == ".." || file == name + "/." ||
-            file == name + "/..")
+        if (file == "." || file == ".." || file == name + "/." || 
+            file == name + "/..") 
             continue;
 
         if (UserConfigParams::logMisc())
@@ -1504,7 +1408,7 @@ bool FileManager::removeDirectory(const std::string &name) const
             // We need to remove whole data directory on Android though, i.e.
             // when we install newer STK version and new assets are extracted.
             // So enable it only for Android for now.
-            #ifdef MOBILE_STK
+            #ifdef ANDROID
             removeDirectory(file);
             #endif
         }
@@ -1513,9 +1417,9 @@ bool FileManager::removeDirectory(const std::string &name) const
             removeFile(file);
         }
     }
-
+    
 #if defined(WIN32)
-    return RemoveDirectory(StringUtils::utf8ToWide(name).c_str())==TRUE;
+    return RemoveDirectory(name.c_str())==TRUE;
 #else
     return remove(name.c_str())==0;
 #endif
@@ -1529,10 +1433,10 @@ bool FileManager::removeDirectory(const std::string &name) const
  */
 bool FileManager::copyFile(const std::string &source, const std::string &dest)
 {
-    FILE *f_source = FileUtils::fopenU8Path(source, "rb");
+    FILE *f_source = fopen(source.c_str(), "rb");
     if(!f_source) return false;
 
-    FILE *f_dest = FileUtils::fopenU8Path(dest, "wb");
+    FILE *f_dest = fopen(dest.c_str(), "wb");
     if(!f_dest)
     {
         fclose(f_source);
@@ -1567,7 +1471,6 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
     fclose(f_dest);
     return true;
 }   // copyFile
-
 // ----------------------------------------------------------------------------
 /** Returns true if the first file is newer than the second. The comparison is
 *   based on the modification time of the two files.
@@ -1576,7 +1479,8 @@ bool FileManager::fileIsNewer(const std::string& f1, const std::string& f2) cons
 {
     struct stat stat1;
     struct stat stat2;
-    FileUtils::statU8Path(f1, &stat1);
-    FileUtils::statU8Path(f2, &stat2);
+    stat(f1.c_str(), &stat1);
+    stat(f2.c_str(), &stat2);
     return stat1.st_mtime > stat2.st_mtime;
 }   // fileIsNewer
+

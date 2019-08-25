@@ -19,30 +19,20 @@
 #define HEADER_RACE_PAUSED_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
 #include "utils/cpp2011.hpp"
 
 namespace GUIEngine
 {
     class RibbonWidget;
-    class TextBoxWidget;
 }
 
 /**
  * \brief Dialog shown when the race is paused
  * \ingroup states_screens
  */
-class RacePausedDialog : public GUIEngine::ModalDialog,
-                         public GUIEngine::ITextBoxWidgetListener
+class RacePausedDialog : public GUIEngine::ModalDialog
 {
-private:
-    bool m_self_destroy;
-
-    GUIEngine::TextBoxWidget* m_text_box;
-
-    virtual void onTextUpdated() OVERRIDE {}
-    virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE;
-
+    
 protected:
     virtual void loadedFromFile() OVERRIDE;
 
@@ -56,16 +46,6 @@ public:
     GUIEngine::EventPropagation processEvent(const std::string& eventSource)
         OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual void onUpdate(float dt) OVERRIDE
-    {
-        // It's unsafe to delete from inside the event handler so we do it here
-        if (m_self_destroy)
-        {
-            ModalDialog::dismiss();
-            return;
-        }
-    }
 };
 
 #endif

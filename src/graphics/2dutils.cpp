@@ -309,8 +309,7 @@ void draw2DImage(const video::ITexture* texture,
         const core::dimension2d<u32>& render_target_size =
                            irr_driver->getActualScreenSize();
         glScissor(clip_rect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
 
@@ -385,8 +384,7 @@ void draw2DImage(const video::ITexture* texture,
         const core::dimension2d<u32>& render_target_size = 
                            irr_driver->getActualScreenSize();
         glScissor(clip_rect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
 
@@ -496,9 +494,8 @@ void draw2DImage(const video::ITexture* texture,
         glEnable(GL_SCISSOR_TEST);
         const core::dimension2d<u32>& render_target_size =
                             irr_driver->getActualScreenSize();
-        glScissor(clip_rect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+        glScissor(clip_rect->UpperLeftCorner.X, 
+                  render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
     if (colors)
@@ -574,8 +571,7 @@ void draw2DImage(const video::ITexture* texture,
         const core::dimension2d<u32>& render_target_size =
                             irr_driver->getActualScreenSize();
         glScissor(clip_rect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
     if (colors)
@@ -684,8 +680,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
         const core::dimension2d<u32>& render_target_size = 
                                             irr_driver->getActualScreenSize();
         glScissor(clip->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  render_target_size.Height - clip->LowerRightCorner.Y,
                   clip->getWidth(), clip->getHeight());
     }
 

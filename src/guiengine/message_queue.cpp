@@ -26,8 +26,12 @@
 #include "guiengine/skin.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/synchronised.hpp"
+#include "utils/translation.hpp"
 
-#include "GlyphLayout.h"
+#include "IGUIElement.h"
+#include "IGUIEnvironment.h"
+#include "IGUIStaticText.h"
+
 #include <atomic>
 
 using namespace GUIEngine;
@@ -93,17 +97,16 @@ private:
      *  or friend-message::neutral. */
     std::string m_render_type;
 
-    /** The text layout, can do linebreak if needed. */
-    std::vector<gui::GlyphLayout> m_gls;
+    /** The text label, can do linebreak if needed. */
+    gui::IGUIStaticText* m_text;
 
-    /** Drawing rectangle of text layout. */
-    core::recti m_text_rect;
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         Message(5.0f)
     {
         m_message_type = mt;
         m_message      = message;
+        m_text         = NULL;
         assert(mt != MessageQueue::MT_PROGRESS);
         if (mt == MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
@@ -117,6 +120,8 @@ public:
     // ------------------------------------------------------------------------
     ~TextMessage()
     {
+        assert(m_text != NULL);
+        m_text->drop();
     }
     // ------------------------------------------------------------------------
     /** Returns the type of the message.*/
@@ -126,75 +131,40 @@ public:
     /** Init the message text, do linebreak as required. */
     virtual void init()
     {
+        if (m_text)
+            m_text->drop();
         const GUIEngine::BoxRenderParams &brp =
             GUIEngine::getSkin()->getBoxRenderParams(m_render_type);
         const unsigned width = irr_driver->getActualScreenSize().Width;
         const unsigned height = irr_driver->getActualScreenSize().Height;
-        gui::IGUIFont* font = GUIEngine::getFont();
-        font->initGlyphLayouts(m_message, m_gls);
-        // Reserve space for 5 lines of text, it will occupy the circle
-        const int max_width = width - (brp.m_left_border +
-            brp.m_right_border) - (font->getHeightPerLine() * 5);
-        if (max_width < 0)
-        {
-            m_display_timer = -1;
-            return;
-        }
+        const unsigned max_width = width - (brp.m_left_border +
+            brp.m_right_border);
+        m_text =
+            GUIEngine::getGUIEnv()->addStaticText(m_message.c_str(),
+            core::recti(0, 0, max_width, height));
+        m_text->setRightToLeft(translations->isRTLText(m_message));
+        core::dimension2du dim(m_text->getTextWidth(),
+            m_text->getTextHeight());
+        dim.Width += brp.m_left_border + brp.m_right_border;
 
-        gui::breakGlyphLayouts(m_gls, max_width, font->getInverseShaping(),
-            font->getScale());
-        core::dimension2du dim = gui::getGlyphLayoutsDimension(m_gls,
-            font->getHeightPerLine(), font->getInverseShaping(),
-            font->getScale());
-
-        if ((int)dim.Height > font->getHeightPerLine() * 5)
-        {
-            // Max 5 lines to prevent too long message from network chat
-            int newline_count = 0;
-            for (unsigned i = 0; i < m_gls.size(); i++)
-            {
-                if (m_gls[i].flags & gui::GLF_NEWLINE)
-                {
-                    if (++newline_count >= 5)
-                    {
-                        m_gls.erase(m_gls.begin() + i, m_gls.end());
-                        dim.Height = font->getHeightPerLine() * 5;
-                        break;
-                    }
-                }
-            }
-        }
-
-        int left_icon_size = dim.Height;
-        int total_width = dim.Width + brp.m_left_border + brp.m_right_border +
-            left_icon_size;
-        int x = (width - total_width) / 2;
-        int y = height - int(dim.Height) - font->getHeightPerLine() / 2;
-
-        if (x < 0 || y < 0)
-        {
-            m_gls.clear();
-            m_display_timer = -1;
-            return;
-        }
-
-        m_area = irr::core::recti(x, y, x + total_width, y + dim.Height);
-        m_text_rect = core::recti(x, y, x + left_icon_size + total_width,
-            y + dim.Height);
+        int leftIconSize = dim.Height + 10;
+        int x = (width - dim.Width) / 2;
+        int y = height - int(1.5f * dim.Height);
+        m_area = irr::core::recti(x, y, x + dim.Width, y + dim.Height);
+        m_text->setRelativePosition(irr::core::recti(x + leftIconSize, y,
+            x + dim.Width - 10, y + dim.Height));
+        m_text->setTextAlignment(gui::EGUIA_CENTER, gui::EGUIA_CENTER);
+        m_text->grab();
+        m_text->remove();
     }
     // ------------------------------------------------------------------------
     /** Draw the message. */
     virtual void draw(float dt)
     {
-        if (m_gls.empty())
-        {
-            Message::draw(dt);
-            return;
-        }
         Message::draw(dt);
         GUIEngine::getSkin()->drawMessage(g_container, m_area, m_render_type);
-        GUIEngine::getFont()->draw(m_gls, m_text_rect,
-            GUIEngine::getSkin()->getColor("text::neutral"), true/*hcenter*/);
+        assert(m_text != NULL);
+        m_text->draw();
     }
     // ------------------------------------------------------------------------
     virtual void remove()                                      { delete this; }
@@ -271,7 +241,7 @@ public:
         Message::draw(dt);
         m_display_timer = 9999999.9f;
         GUIEngine::getSkin()->drawProgressBarInScreen(&m_swc, m_area,
-            (float)m_progress_value.load() / 100.0f);
+            m_progress_value.load());
         video::SColor color(255, 0, 0, 0);
         GUIEngine::getFont()->draw(m_message, m_area, color, true, true);
         if (m_progress_value.load() >= 100)
@@ -281,7 +251,7 @@ public:
         }
     }
     // ------------------------------------------------------------------------
-    void setProgress(int progress, const core::stringw& msg)
+    void setProgress(int progress, const wchar_t* msg)
     {
         if (progress < 0)
             return;
@@ -374,7 +344,7 @@ void update(float dt)
  *  used each time.
  *  \param progress Progress from 0 to 100.
  */
-void showProgressBar(int progress, const core::stringw& msg)
+void showProgressBar(int progress, const wchar_t* msg)
 {
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())

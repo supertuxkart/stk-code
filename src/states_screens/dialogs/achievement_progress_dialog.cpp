@@ -26,7 +26,6 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
@@ -207,9 +206,9 @@ core::stringw AchievementProgressDialog::niceGoalName(std::string internal_name)
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="ftl-finished") nice_name = _("Follow-the-Leader races finished");
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="three-strikes-started") nice_name = _("3 Strikes battles started");
+    if(internal_name=="three-strikes-started") nice_name = _("3 Strikes battle started");
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
-    if(internal_name=="three-strikes-finished") nice_name = _("3 Strikes battles finished");
+    if(internal_name=="three-strikes-finished") nice_name = _("3 Strikes battle finished");
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.
     if(internal_name=="soccer-started") nice_name = _("Soccer matches started");
     // I18N: A goal for achievements. If this text is in (), it's a precision added to multiple different goals.

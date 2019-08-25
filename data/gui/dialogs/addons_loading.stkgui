@@ -14,7 +14,9 @@
                         <label id="size"     width="100%" text="" />
                         <label id="revision" width="100%" text="" />
                     </div>
-                <ratingbar id="rating" height="1f" width="100%" />
+                    <div width="50%" height="32" layout="vertical-row">
+                        <ratingbar id="rating" height="64" width="100%" />
+                    </div>
                 </div>
                 <spacer height="10"/>
                 <label id="flags"    width="100%" text="" word_wrap="true" />
@@ -22,10 +24,7 @@
         </div>
 
         <bubble word_wrap="true" id="description" height="100%" width="90%" proportion="5" align="center" />
-        
-        <spacer proportion="1" />
-        
-        <div width="80%" proportion="4" align="center">
+        <div width="80%" proportion="5" align="center">
             <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
                 <icon-button id="install" width="128" height="128"
                              icon="gui/icons/package-update.png"
@@ -37,7 +36,7 @@
                              icon="gui/icons/back.png"
                              I18N="Add-on screen action" text="Back" />
             </buttonbar>
-            <progressbar id="progress" x="0" y="20%" width="100%" height="2f" />
+            <progressbar id="progress" x="0" y="20%" width="100%" height="30%" />
         </div>
     </div>
 </stkgui>

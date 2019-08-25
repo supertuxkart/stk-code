@@ -21,7 +21,6 @@
 #include "irrList.h"
 
 #if defined (_IRR_WINDOWS_API_)
-	#include "utils/string_utils.hpp"
 	#if !defined ( _WIN32_WCE )
 		#include <direct.h> // for _chdir
 		#include <io.h> // for _access
@@ -426,14 +425,6 @@ bool CFileSystem::addFileArchive(IFileArchive* archive)
 }
 
 
-void CFileSystem::removeAllFileArchives()
-{
-    for (u32 index = 0; index < FileArchives.size(); index++)
-        FileArchives[index]->drop();
-    FileArchives.clear();
-}
-
-
 //! removes an archive from the file system.
 bool CFileSystem::removeFileArchive(u32 index)
 {
@@ -506,10 +497,16 @@ const io::path& CFileSystem::getWorkingDirectory()
 		#if defined(_IRR_WINDOWS_CE_PLATFORM_)
 		// does not need this
 		#elif defined(_IRR_WINDOWS_API_)
-			wchar_t tmp[_MAX_PATH];
-			_wgetcwd(tmp, _MAX_PATH);
-			WorkingDirectory[FILESYSTEM_NATIVE] = StringUtils::wideToUtf8(tmp).c_str();
-			WorkingDirectory[FILESYSTEM_NATIVE].replace('\\', '/');
+			fschar_t tmp[_MAX_PATH];
+			#if defined(_IRR_WCHAR_FILESYSTEM )
+				_wgetcwd(tmp, _MAX_PATH);
+				WorkingDirectory[FILESYSTEM_NATIVE] = tmp;
+				WorkingDirectory[FILESYSTEM_NATIVE].replace(L'\\', L'/');
+			#else
+				_getcwd(tmp, _MAX_PATH);
+				WorkingDirectory[FILESYSTEM_NATIVE] = tmp;
+				WorkingDirectory[FILESYSTEM_NATIVE].replace('\\', '/');
+			#endif
 		#endif
 
 		#if (defined(_IRR_POSIX_API_) || defined(_IRR_OSX_PLATFORM_))
@@ -574,10 +571,18 @@ bool CFileSystem::changeWorkingDirectoryTo(const io::path& newDirectory)
 
 #if defined(_IRR_WINDOWS_CE_PLATFORM_)
 		success = true;
-#elif defined(_IRR_WINDOWS_API_)
-		success = (_wchdir(StringUtils::utf8ToWide(newDirectory.c_str()).c_str()) == 0);
+#elif defined(_MSC_VER)
+	#if defined(_IRR_WCHAR_FILESYSTEM)
+		success = (_wchdir(newDirectory.c_str()) == 0);
+	#else
+		success = (_chdir(newDirectory.c_str()) == 0);
+	#endif
 #else
-		success = (chdir(newDirectory.c_str()) == 0);
+    #if defined(_IRR_WCHAR_FILESYSTEM)
+		success = (_wchdir(newDirectory.c_str()) == 0);
+    #else
+        success = (chdir(newDirectory.c_str()) == 0);
+    #endif
 #endif
 	}
 
@@ -590,12 +595,18 @@ io::path CFileSystem::getAbsolutePath(const io::path& filename) const
 #if defined(_IRR_WINDOWS_CE_PLATFORM_)
 	return filename;
 #elif defined(_IRR_WINDOWS_API_)
-	wchar_t *p=0;
-	wchar_t fpath[_MAX_PATH];
-	p = _wfullpath(fpath, StringUtils::utf8ToWide(filename.c_str()).c_str(), _MAX_PATH);
-	core::stringw tmp(p);
-	tmp.replace(L'\\', L'/');
-	return StringUtils::wideToUtf8(tmp).c_str();
+	fschar_t *p=0;
+	fschar_t fpath[_MAX_PATH];
+	#if defined(_IRR_WCHAR_FILESYSTEM )
+		p = _wfullpath(fpath, filename.c_str(), _MAX_PATH);
+		core::stringw tmp(p);
+		tmp.replace(L'\\', L'/');
+	#else
+		p = _fullpath(fpath, filename.c_str(), _MAX_PATH);
+		core::stringc tmp(p);
+		tmp.replace('\\', '/');
+	#endif
+	return tmp;
 #elif (defined(_IRR_POSIX_API_) || defined(_IRR_OSX_PLATFORM_))
 	c8* p=0;
 	c8 fpath[4096];
@@ -820,17 +831,14 @@ IFileList* CFileSystem::createFileList(const io::path& directory)
 
 
 		intptr_t hFile;
-		std::string searchPath = Path.c_str();
-		searchPath += '*';
-		core::stringw search_path_w = StringUtils::utf8ToWide(searchPath);
+		io::path searchPath = Path;
+		searchPath.append('*');
 		struct _tfinddata_t c_file;
-		if( (hFile = _tfindfirst(search_path_w.c_str(), &c_file )) != -1L )
+		if( (hFile = _tfindfirst( _T(searchPath.c_str()), &c_file )) != -1L )
 		{
 			do
 			{
-				std::string full_path = Path.c_str();
-				full_path += StringUtils::wideToUtf8(c_file.name);
-				r->addItem(full_path.c_str(), 0, c_file.size, (_A_SUBDIR & c_file.attrib) != 0, 0);
+				r->addItem(Path + c_file.name, 0, c_file.size, (_A_SUBDIR & c_file.attrib) != 0, 0);
 			}
 			while( _tfindnext( hFile, &c_file ) == 0 );
 
@@ -953,15 +961,19 @@ bool CFileSystem::existFile(const io::path& filename) const
 #else
 	_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
 #if defined(_MSC_VER)
-	return (_waccess(StringUtils::utf8ToWide(filename.c_str()).c_str(), 0) != -1);
+    #if defined(_IRR_WCHAR_FILESYSTEM)
+        return (_waccess(filename.c_str(), 0) != -1);
+    #else
+        return (_access(filename.c_str(), 0) != -1);
+    #endif
 #elif defined(F_OK)
-	#if defined(_IRR_WINDOWS_API_)
-		return (_waccess(StringUtils::utf8ToWide(filename.c_str()).c_str(), F_OK) != -1);
-	#else
-		return (access(filename.c_str(), F_OK) != -1);
+    #if defined(_IRR_WCHAR_FILESYSTEM)
+        return (_waccess(filename.c_str(), F_OK) != -1);
+    #else
+        return (access(filename.c_str(), F_OK) != -1);
 	#endif
 #else
-	return (access(filename.c_str(), 0) != -1);
+    return (access(filename.c_str(), 0) != -1);
 #endif
 #endif
 }

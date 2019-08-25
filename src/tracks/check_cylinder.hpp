@@ -20,7 +20,6 @@
 #define HEADER_CHECK_CYLINDER_HPP
 
 #include "tracks/check_structure.hpp"
-#include <functional>
 
 class XMLNode;
 class CheckManager;
@@ -47,11 +46,10 @@ private:
     /** Stores the distance of each kart from the center of this sphere.
      *  This saves some computations. */
     std::vector<float> m_distance2;
-    /** Function to call when triggered. */
-    std::function<void()> m_triggering_function;
+    TriggerItemListener* m_listener;
 public:
-                 CheckCylinder(const XMLNode &node,
-                     std::function<void()> triggering_function);
+                 CheckCylinder(const XMLNode &node, unsigned int index,
+                     TriggerItemListener* listener);
     virtual     ~CheckCylinder() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              int kart_id);

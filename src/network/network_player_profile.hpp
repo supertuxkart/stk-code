@@ -25,10 +25,9 @@
 #include "utils/types.hpp"
 
 #include "irrString.h"
-#include <atomic>
-#include <limits>
 #include <memory>
 #include <string>
+#include <tuple>
 
 class STKPeer;
 enum KartTeam : int8_t;
@@ -53,7 +52,7 @@ private:
     uint32_t m_online_id;
 
     /** Per player difficulty. */
-    std::atomic<PerPlayerDifficulty> m_per_player_difficulty;
+    PerPlayerDifficulty m_per_player_difficulty;
 
     /** The selected kart id. */
     std::string m_kart_name; 
@@ -67,49 +66,23 @@ private:
     /** Overall time if grand prix. */
     float m_overall_time;
 
-    std::atomic<KartTeam> m_team;
-
-    /** 2-letter country code of player. */
-    std::string m_country_code;
+    KartTeam m_team;
 
 public:
-    // ------------------------------------------------------------------------
-    static std::shared_ptr<NetworkPlayerProfile>
-        getReservedProfile(KartTeam team)
-    {
-        return std::make_shared<NetworkPlayerProfile>(team);
-    }
-    // ------------------------------------------------------------------------
-    /* Placeholder profile for reserved player in live join, which its host id
-     * is uint32_t max. */
-    NetworkPlayerProfile(KartTeam team)
-    {
-        m_kart_name             = "tux";
-        m_host_id               = std::numeric_limits<uint32_t>::max();
-        m_default_kart_color    = 0.0f;
-        m_online_id             = 0;
-        m_per_player_difficulty.store((PerPlayerDifficulty)0);
-        m_local_player_id       = 0;
-        m_team.store(team);
-        resetGrandPrixData();
-    }
-    // ------------------------------------------------------------------------
     NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
                          const irr::core::stringw &name, uint32_t host_id,
                          float default_kart_color, uint32_t online_id,
                          PerPlayerDifficulty per_player_difficulty,
-                         uint8_t local_player_id, KartTeam team,
-                         const std::string& country_code)
+                         uint8_t local_player_id, KartTeam team)
     {
         m_peer                  = peer;
         m_player_name           = name;
         m_host_id               = host_id;
         m_default_kart_color    = default_kart_color;
         m_online_id             = online_id;
-        m_per_player_difficulty.store(per_player_difficulty);
+        m_per_player_difficulty = per_player_difficulty;
         m_local_player_id       = local_player_id;
-        m_team.store(team);
-        m_country_code          = country_code;
+        m_team                  = team;
         resetGrandPrixData();
     }
     // ------------------------------------------------------------------------
@@ -131,10 +104,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the per-player difficulty. */
     PerPlayerDifficulty getPerPlayerDifficulty() const
-                                     { return m_per_player_difficulty.load(); }
-    // ------------------------------------------------------------------------
-    void setPerPlayerDifficulty(PerPlayerDifficulty d)
-                                          { m_per_player_difficulty.store(d); }
+                                            { return m_per_player_difficulty; }
     // ------------------------------------------------------------------------
     /** Returns the name of this player. */
     const irr::core::stringw& getName() const         { return m_player_name; }
@@ -161,11 +131,10 @@ public:
         m_overall_time = 0.0f;
     }
     // ------------------------------------------------------------------------
-    void setTeam(KartTeam team)                         { m_team.store(team); }
+    void setTeam(KartTeam team)                            { m_team = team; }
     // ------------------------------------------------------------------------
-    KartTeam getTeam() const                          { return m_team.load(); }
-    // ------------------------------------------------------------------------
-    const std::string& getCountryCode() const        { return m_country_code; }
+    KartTeam getTeam() const                               { return m_team; }
+
 };   // class NetworkPlayerProfile
 
 #endif // HEADER_NETWORK_PLAYER_PROFILE

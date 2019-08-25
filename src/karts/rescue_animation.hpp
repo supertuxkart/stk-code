@@ -31,46 +31,31 @@ class Referee;
 class RescueAnimation: public AbstractKartAnimation
 {
 protected:
-friend class KartRewinder;
+    /** The coordinates where the kart was hit originally. */
+    Vec3 m_xyz;
+
+    /** Column 1 of btTransform of kart. */
+    Vec3 m_up_vector;
+
     /** The velocity with which the kart is moved. */
     float m_velocity;
 
-    /** When world ticks > this, it will move the kart above the
-     *  m_rescue_transform. */
     int m_rescue_moment;
 
+    /* Has the kart been moved onto the track */
+    bool m_kart_on_track = false;
+
     /** The referee during a rescue operation. */
-    Referee* m_referee;
+    Referee      *m_referee;
 
-    /* Final transformation to place kart. */
-    btTransform m_rescue_transform;
-
-    /* Compressed values for server to send to avoid compressing everytime. */
-    int m_rescue_transform_compressed[4];
-
-    // ------------------------------------------------------------------------
-    RescueAnimation(AbstractKart* kart, BareNetworkString* b);
-    // ------------------------------------------------------------------------
-    RescueAnimation(AbstractKart* kart, bool is_auto_rescue);
-    // ------------------------------------------------------------------------
-    void restoreData(BareNetworkString* b);
-    // ------------------------------------------------------------------------
-    void init(const btTransform& rescue_transform, float velocity);
 public:
-    // ------------------------------------------------------------------------
-    static RescueAnimation* create(AbstractKart* kart,
-                                   bool is_auto_rescue = false);
-    // ------------------------------------------------------------------------
-    virtual ~RescueAnimation();
-    // ------------------------------------------------------------------------
+                 RescueAnimation(AbstractKart *kart,
+                                 bool is_auto_rescue = false,
+                                 bool from_state = false);
+    float maximumHeight();
+    virtual     ~RescueAnimation();
     virtual void update(int ticks);
     // ------------------------------------------------------------------------
-    virtual void updateGraphics(float dt);
-    // ------------------------------------------------------------------------
     virtual KartAnimationType getAnimationType() const   { return KAT_RESCUE; }
-    // ------------------------------------------------------------------------
-    virtual void saveState(BareNetworkString* buffer);
-    // ------------------------------------------------------------------------
-    virtual void restoreState(BareNetworkString* buffer);
 };   // RescueAnimation
 #endif

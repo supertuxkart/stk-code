@@ -30,9 +30,8 @@
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
+#include "utils/ptr_vector.hpp"
 
 #include <iostream>
 
@@ -134,7 +133,6 @@ void AddonsScreen::init()
 {
     Screen::init();
 
-    m_sort_desc = false;
     m_reloading = false;
 
     getWidget<GUIEngine::RibbonWidget>("category")->setActive(false);
@@ -145,10 +143,9 @@ void AddonsScreen::init()
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
 
-    // This defines the row height !
-    m_icon_height = GUIEngine::getFontHeight() * 2;
+    m_icon_height = getHeight()/8.0f;
     // 128 is the height of the image file
-    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
+    m_icon_bank->setScale(m_icon_height/128.0f);
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
 
     m_type = "kart";
@@ -189,8 +186,9 @@ void AddonsScreen::tearDown()
 // ----------------------------------------------------------------------------
 /** Loads the list of all addons of the given type. The gui element will be
  *  updated.
+ *  \param type Must be 'kart' or 'track'.
  */
-void AddonsScreen::loadList()
+void AddonsScreen::loadList(bool sort_desc)
 {
 #ifndef SERVER_ONLY
     // Get the filter by words.
@@ -245,7 +243,7 @@ void AddonsScreen::loadList()
 
         sorted_list.push_back(&addon);
     }
-    sorted_list.insertionSort(/*start=*/0, m_sort_desc);
+    sorted_list.insertionSort(/*start=*/0, sort_desc);
 
     GUIEngine::ListWidget* w_list =
         getWidget<GUIEngine::ListWidget>("list_addons");
@@ -391,8 +389,7 @@ void AddonsScreen::onColumnClicked(int column_id, bool sort_desc, bool sort_defa
     default: assert(0); break;
     }   // switch
     /** \brief Toggle the sort order after column click **/
-    m_sort_desc = sort_desc && !sort_default;
-    loadList();
+    loadList(sort_desc && !sort_default);
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------

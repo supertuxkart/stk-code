@@ -24,7 +24,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <iostream>
 #include <IGUIElement.h>
@@ -123,8 +123,7 @@ void IconButtonWidget::add()
         m_scale_mode = SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO;
     }
 
-    if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO ||
-        m_scale_mode == SCALE_MODE_LIST_WIDGET)
+    if (m_scale_mode == SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO)
     {
         assert(m_texture->getOriginalSize().Height > 0);
         useAspectRatio = (float)m_texture->getOriginalSize().Width / 
@@ -151,16 +150,6 @@ void IconButtonWidget::add()
                                       y_from,
                                       x_from + suggested_w,
                                       y_from + suggested_h);
-
-    if (m_scale_mode == SCALE_MODE_LIST_WIDGET)
-    {
-        m_list_header_icon_rect = widget_size;
-        m_list_header_icon_rect.UpperLeftCorner.X = m_list_header_icon_rect.UpperLeftCorner.X + 4;
-        m_list_header_icon_rect.UpperLeftCorner.Y = m_list_header_icon_rect.UpperLeftCorner.Y + 4;
-        m_list_header_icon_rect.LowerRightCorner.X = m_list_header_icon_rect.LowerRightCorner.X - 4;
-        m_list_header_icon_rect.LowerRightCorner.Y = m_list_header_icon_rect.LowerRightCorner.Y - 4;
-        widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    }
 
     IGUIButton* btn = GUIEngine::getGUIEnv()->addButton(widget_size,
                                                         m_parent,
@@ -243,6 +232,7 @@ void IconButtonWidget::add()
 
         setLabelFont();
 
+        m_label->setRightToLeft(translations->isRTLText(message));
         m_label->setTextRestrainedInside(false);
     }
 

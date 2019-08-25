@@ -49,7 +49,7 @@ private:
     const uint32_t m_showing_id;
     Online::OnlineProfile * m_online_profile;
 
-    GUIEngine::LabelWidget * m_desc_widget;
+    GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
 
     GUIEngine::RibbonWidget * m_options_widget;

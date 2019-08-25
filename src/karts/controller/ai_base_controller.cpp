@@ -138,7 +138,7 @@ float AIBaseController::steerToPoint(const Vec3 &point)
     if(sin_steer_angle >=  1.0f)
         return  m_kart->getMaxSteerAngle()
                *m_ai_properties->m_skidding_threshold+0.1f;
-    float steer_angle     = asinf(sin_steer_angle);
+    float steer_angle     = asin(sin_steer_angle);
 
     // After doing the exact computation, we now return an 'oversteered'
     // value. This actually helps in making tighter turns, and also in
@@ -332,12 +332,11 @@ void AIBaseController::determineTurnRadius(const Vec3 &end, Vec3 *center,
 }   // determineTurnRadius
 
 //-----------------------------------------------------------------------------
-bool AIBaseController::saveState(BareNetworkString *buffer) const
+void AIBaseController::saveState(BareNetworkString *buffer) const
 {
     // Endcontroller needs this for proper offset in kart rewinder
     // Must match the number of bytes in Playercontroller.
-    buffer->addUInt16(0).addUInt16(0).addUInt8(0);
-    return false;
+    buffer->addUInt32(0).addUInt16(0).addUInt8(0);
 }   // copyToBuffer
 
 //-----------------------------------------------------------------------------
@@ -345,5 +344,5 @@ void AIBaseController::rewindTo(BareNetworkString *buffer)
 {
     // Endcontroller needs this for proper offset in kart rewinder.
     // Skip the same number of bytes as PlayerController.
-    buffer->skip(2 + 2 + 1);
+    buffer->skip(4 + 2 + 1);
 }   // rewindTo

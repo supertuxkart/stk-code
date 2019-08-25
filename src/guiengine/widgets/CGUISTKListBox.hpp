@@ -14,8 +14,6 @@
 #include <string>
 #include <vector>
 
-#include "GlyphLayout.h"
-
 namespace irr
 {
     namespace gui
@@ -33,9 +31,10 @@ namespace irr
                 struct ListCell
                 {
                     irr::core::stringw m_text;
+                    bool m_broken_text;
+                    std::vector<irr::core::stringw> m_text_lines;
                     int m_proportion;
                     s32 m_icon;
-                    std::vector<GlyphLayout> m_glyph_layouts;
                     bool m_center;
 
                     ListCell(irr::core::stringw text, s32 icon = -1, int proportion = 1, bool center = false)
@@ -44,6 +43,8 @@ namespace irr
                         m_proportion = proportion;
                         m_icon = icon;
                         m_center = center;
+                        m_broken_text = false;
+                        m_text_lines.clear();
                     }
                 };
 
@@ -54,7 +55,6 @@ namespace irr
                 int m_current_id;
 
                 bool m_word_wrap = false;
-                float m_line_height_scale = 0.0f;
 
                 // A multicolor extension
                 struct ListItemOverrideColor
@@ -170,7 +170,6 @@ namespace irr
             //! Sets whether to draw the background
             virtual void setDrawBackground(bool draw);
 
-            void setAlternatingDarkness(bool val) { m_alternating_darkness = val; }
     private:
 
             void recalculateItemHeight();
@@ -198,7 +197,6 @@ namespace irr
             bool MoveOverSelect;
             bool AutoScroll;
             bool HighlightWhenNotFocused;
-            bool m_alternating_darkness;
     };
 
 

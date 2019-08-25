@@ -527,12 +527,6 @@ public:
 		return array;
 	}
 
-	//! Returns character string
-	/** \return writable pointer to C-style NUL terminated string. */
-	T* data() const
-	{
-		return array;
-	}
 
 	//! Makes the string lower case.
 	string<T,TAlloc>& make_lower()

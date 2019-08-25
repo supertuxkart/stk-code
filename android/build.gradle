@@ -3,21 +3,11 @@ buildscript
     repositories
     {
         jcenter()
-        google()
     }
 
     dependencies
     {
-        classpath 'com.android.tools.build:gradle:3.3.2'
-    }
-}
-
-allprojects
-{
-    repositories
-    {
-        jcenter()
-        google()
+        classpath 'com.android.tools.build:gradle:2.2.3'
     }
 }
 

@@ -42,7 +42,6 @@ void showHelp()
     std::cout << "kickban #, kick and ban # peer of STKHost." << std::endl;
     std::cout << "listpeers, List all peers with host ID and IP." << std::endl;
     std::cout << "listban, List IP ban list of server." << std::endl;
-    std::cout << "speedstats, Show upload and download speed." << std::endl;
 }   // showHelp
 
 // ----------------------------------------------------------------------------
@@ -91,8 +90,11 @@ void mainLoop(STKHost* host)
                 peer->kick();
                 // ATM use permanently ban
                 auto sl = LobbyProtocol::get<ServerLobby>();
-                if (sl)
-                    sl->saveIPBanTable(peer->getAddress());
+                auto lock = sl->acquireConnectionMutex();
+                ServerConfig::m_server_ip_ban_list
+                    [peer->getAddress().toString(false/*show_port*/) + "/32"]
+                    = std::numeric_limits<uint32_t>::max();
+                sl->updateBanList();
             }
             else
                 std::cout << "Unknown host id: " << number << std::endl;
@@ -111,23 +113,27 @@ void mainLoop(STKHost* host)
         }
         else if (str == "listban")
         {
-            auto sl = LobbyProtocol::get<ServerLobby>();
-            if (sl)
-                sl->listBanTable();
-        }
-        else if (str == "speedstats")
-        {
-            std::cout << "Upload speed (KBps): " <<
-                (float)host->getUploadSpeed() / 1024.0f <<
-                "   Download speed (KBps): " <<
-                (float)host->getDownloadSpeed() / 1024.0f  << std::endl;
+            for (auto& ban : ServerConfig::m_server_ip_ban_list)
+            {
+                if (ban.first == "0.0.0.0/0")
+                    continue;
+                std::cout << "IP: " << ban.first << ", expire at: " <<
+                    ban.second << std::endl;
+            }
+            for (auto& ban : ServerConfig::m_server_online_id_ban_list)
+            {
+                if (ban.first == 0)
+                    continue;
+                std::cout << "Online id: " << ban.first << ", expire at: " <<
+                    ban.second << std::endl;
+            }
         }
         else
         {
             std::cout << "Unknown command: " << str << std::endl;
         }
     }   // while !stop
-    main_loop->requestAbort();
+    main_loop->abort();
 }   // mainLoop
 
 }

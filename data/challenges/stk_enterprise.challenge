@@ -3,22 +3,22 @@
     <unlock_list list="false"/>
     <track id="stk_enterprise" laps="3" reverse="false"/>
     <mode major="single" minor="timetrial"/>
-    <requirements trophies="145"/>
+    <requirements trophies="125"/>
     
     <best>
-        <karts number="10"/>
-        <requirements position="1" time="132"/>
+        <karts number="9"/>
+        <requirements position="1" time="135"/>
     </best>
     <hard>
-        <karts number="9"/>
+        <karts number="8"/>
         <requirements position="1"/>
     </hard>
     <medium>
-        <karts number="8"/>
+        <karts number="7"/>
         <requirements position="1"/>
     </medium>
     <easy>
-        <karts number="7"/>
+        <karts number="6"/>
         <requirements position="1"/>
     </easy>
 </challenge>

@@ -31,13 +31,11 @@
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
 #include "items/item_manager.hpp"
-#include "network/network_config.hpp"
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "tracks/track.hpp"
 #include "tracks/model_definition_loader.hpp"
-#include "utils/string_utils.hpp"
 
 #include <IAnimatedMeshSceneNode.h>
 #include <ISceneManager.h>
@@ -553,20 +551,6 @@ void TrackObject::update(float dt)
     if (m_animator) m_animator->updateWithWorldTicks(true/*has_physics*/);
 }   // update
 
-
-// ----------------------------------------------------------------------------
-/** This reset all physical object moved by 3d animation back to current ticks
- */
-void TrackObject::resetAfterRewind()
-{
-    if (!m_animator || !m_physical_object)
-        return;
-    m_animator->updateWithWorldTicks(true/*has_physics*/);
-    btTransform new_trans;
-    m_physical_object->getMotionState()->getWorldTransform(new_trans);
-    m_physical_object->getBody()->setCenterOfMassTransform(new_trans);
-}   // resetAfterRewind
-
 // ----------------------------------------------------------------------------
 /** Does a raycast against the track object. The object must have a physical
  *  object.
@@ -756,38 +740,3 @@ scene::IAnimatedMeshSceneNode* TrackObject::getMesh()
     Log::debug("TrackObject", "No animated mesh");
     return NULL;
 }   // getMesh
-
-// ----------------------------------------------------------------------------
-/* This function will join this (if true) static track object to main track
- * model, the geometry creator in irrlicht will draw its physical shape to
- * triangle mesh, so it can be combined to main track mesh.
- * \return True if this track object is joinable and can be removed if needeed
- */
-bool TrackObject::joinToMainTrack()
-{
-    // If no physical object or there is animator, skip it
-    // Also no joining if will affect kart (like moveable, flatten...)
-    if (!isEnabled() || !m_physical_object || m_animator ||
-        m_physical_object->isDynamic() || m_physical_object->isCrashReset() ||
-        m_physical_object->isExplodeKartObject() ||
-        m_physical_object->isFlattenKartObject())
-        return false;
-
-    // Scripting exploding barrel is assumed to be joinable in networking
-    // as it doesn't support it
-    if (!NetworkConfig::get()->isNetworking() &&
-        (!m_physical_object->getOnKartCollisionFunction().empty() ||
-        !m_physical_object->getOnItemCollisionFunction().empty()))
-        return false;
-
-    // Skip driveable non-exact shape object
-    // Notice driveable object should always has exact shape specified in
-    // blender
-    if (m_is_driveable && !m_physical_object->hasTriangleMesh())
-        return false;
-
-    m_physical_object->joinToMainTrack();
-    // This will remove the separated body
-    m_physical_object.reset();
-    return true;
-}   // joinToMainTrack

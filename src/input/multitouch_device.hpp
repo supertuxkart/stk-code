@@ -26,6 +26,10 @@
 #include "utils/types.hpp"
 #include "IEventReceiver.h"
 
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
+
 #define NUMBER_OF_MULTI_TOUCHES 10
 
 enum MultitouchButtonType
@@ -41,8 +45,7 @@ enum MultitouchButtonType
     BUTTON_UP,
     BUTTON_DOWN,
     BUTTON_LEFT,
-    BUTTON_RIGHT,
-    BUTTON_CUSTOM
+    BUTTON_RIGHT
 };
 
 struct MultitouchEvent
@@ -65,8 +68,6 @@ struct MultitouchButton
     int height;
     float axis_x;
     float axis_y;
-    unsigned int id;
-    void (*callback)(unsigned int, bool);
 };
 
 class Controller;
@@ -92,8 +93,10 @@ private:
     float m_orientation;
     uint64_t m_gyro_time;
 
-    /** Pointer to the irrlicht device */
-    IrrlichtDevice* m_irrlicht_device;
+#ifdef ANDROID
+    /** Pointer to the Android irrlicht device */
+    CIrrDeviceAndroid* m_android_device;
+#endif
 
     float getSteeringFactor(float value, float sensitivity);
     void handleControls(MultitouchButton* button);
@@ -115,7 +118,7 @@ public:
     unsigned int getActiveTouchesCount();
 
     void addButton(MultitouchButtonType type, int x, int y, int width,
-                   int height, void (*callback)(unsigned int, bool) = NULL);
+                   int height);
     void clearButtons();
     void reset();
 

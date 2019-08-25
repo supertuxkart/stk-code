@@ -22,20 +22,17 @@ RaceEventManager::~RaceEventManager()
 /** In network games this update function is called instead of
  *  World::updateWorld(). 
  *  \param ticks Number of physics time steps - should be 1.
- *  \param fast_forward If true, then only rewinders in network will be
- *  updated, but not the physics.
  */
-void RaceEventManager::update(int ticks, bool fast_forward)
+void RaceEventManager::update(int ticks)
 {
     // Replay all recorded events up to the current time
     // This might adjust dt - if a new state is being played, the dt is
     // determined from the last state till 'now'
     PROFILER_PUSH_CPU_MARKER("RaceEvent:play event", 100, 100, 100);
     RewindManager::get()->playEventsTill(World::getWorld()->getTicksSinceStart(),
-                                         fast_forward);
+                                         &ticks);
     PROFILER_POP_CPU_MARKER();
-    if (!fast_forward)
-        World::getWorld()->updateWorld(ticks);
+    World::getWorld()->updateWorld(ticks);
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -44,6 +41,7 @@ bool RaceEventManager::isRaceOver()
     if(!World::getWorld())
         return false;
     return (World::getWorld()->getPhase() > WorldStatus::RACE_PHASE &&
+        World::getWorld()->getPhase() != WorldStatus::GOAL_PHASE &&
         World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE);
 }   // isRaceOver
 

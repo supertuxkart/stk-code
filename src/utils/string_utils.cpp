@@ -21,12 +21,9 @@
 #include "utils/string_utils.hpp"
 
 #include "config/stk_config.hpp"
-#include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
-#include "utils/types.hpp"
 #include "utils/utf8.h"
-#include "irrArray.h"
 
 #include "coreutil.h"
 
@@ -221,67 +218,6 @@ namespace StringUtils
     /** Splits a string into substrings separated by a certain character, and
      *  returns a std::vector of all those substring. E.g.:
      *  split("a b=c d=e",' ')  --> ["a", "b=c", "d=e"]
-     *  \param s The string to split.
-     *  \param c The character  by which the string is split.
-     */
-    std::vector<std::u32string> split(const std::u32string& s, char32_t c,
-                                      bool keepSplitChar)
-    {
-        std::vector<std::u32string> result;
-
-        try
-        {
-            std::u32string::size_type start=0;
-            while(start < (unsigned int) s.size())
-            {
-                std::u32string::size_type i=s.find(c, start);
-                if (i!=std::u32string::npos)
-                {
-                    if (keepSplitChar)
-                    {
-                        int from = (int)start-1;
-                        if (from < 0) from = 0;
-
-                        result.push_back(std::u32string(s, from, i-from));
-                    }
-                    else result.push_back(std::u32string(s,start, i-start));
-
-                    start=i+1;
-                }
-                else   // end of string reached
-                {
-                    if (keepSplitChar && start != 0)
-                        result.push_back(std::u32string(s,start-1));
-                    else
-                        result.push_back(std::u32string(s,start));
-                    return result;
-                }
-            }
-            return result;
-        }
-        catch (std::exception& e)
-        {
-            Log::error("StringUtils",
-                       "Error in split(std::string) : %s @ line %i : %s.",
-                     __FILE__, __LINE__, e.what());
-            Log::error("StringUtils", "Splitting '%s'.",
-                       wideToUtf8(utf32ToWide(s)).c_str());
-
-            for (int n=0; n<(int)result.size(); n++)
-            {
-                Log::error("StringUtils", "Split : %s",
-                           wideToUtf8(utf32ToWide(result[n])).c_str());
-            }
-
-            assert(false); // in debug mode, trigger debugger
-            exit(1);
-        }
-    }   // split
-
-    //-------------------------------------------------------------------------
-    /** Splits a string into substrings separated by a certain character, and
-     *  returns a std::vector of all those substring. E.g.:
-     *  split("a b=c d=e",' ')  --> ["a", "b=c", "d=e"]
      *  This is the version for wide strings.
      *  \param s The string to split.
      *  \param c The character  by which the string is split.
@@ -420,7 +356,7 @@ namespace StringUtils
                 else
                 {
                     if(sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i' ||
-                       sv[i][1]=='f' || sv[i][1]=='u')
+                       sv[i][1]=='f')
                     {
                         if (insertValID >= all_vals.size())
                         {
@@ -493,7 +429,7 @@ namespace StringUtils
                 else
                 {
                     if (sv[i][1]=='s' || sv[i][1]=='d' || sv[i][1]=='i' ||
-                        sv[i][1]=='f' || sv[i][1]=='u')
+                        sv[i][1]=='f')
                     {
                         if (insertValID >= all_vals.size())
                         {
@@ -707,9 +643,9 @@ namespace StringUtils
      *  convenience function to type less in calls.
      *  \parameter s The string to which the loading dots are appended.
      */
-    irr::core::stringw loadingDots(const irr::core::stringw& s)
+    irr::core::stringw loadingDots(const wchar_t *s)
     {
-        return s + loadingDots();
+        return irr::core::stringw(s) + loadingDots();
     }   // loadingDots
 
     // ------------------------------------------------------------------------
@@ -745,7 +681,7 @@ namespace StringUtils
      */
     irr::core::stringw xmlDecode(const std::string& input)
     {
-        std::u32string output;
+        irr::core::stringw output;
         std::string entity;
         bool isHex = false;
 
@@ -769,15 +705,15 @@ namespace StringUtils
                     }
                     else
                     {
-                        output += char32_t(input[n]);
+                        output += wchar_t(input[n]);
                     }
                     break;
 
                 case ENTITY_PREAMBLE:
                     if (input[n] != '#')
                     {
-                        output += U"&";
-                        output += char32_t(input[n]);
+                        output += L"&";
+                        output += wchar_t(input[n]);
                         // This is actually an error, but we can't print a
                         // warning here: irrxml replaces &amp; in (e.g.)
                         // attribute values with '&' - so we can have a single
@@ -805,7 +741,7 @@ namespace StringUtils
                         const char* format = (isHex ? "%x" : "%i");
                         if (sscanf(entity.c_str(), format, &c) == 1)
                         {
-                            output += char32_t(c);
+                            output += wchar_t(c);
                         }
                         else
                         {
@@ -817,20 +753,13 @@ namespace StringUtils
                     }
                     else
                     {
-                        entity += char32_t(input[n]);
+                        entity += wchar_t(input[n]);
                     }
                     break;
             }
         }
-        if (sizeof(wchar_t) == 2)
-        {
-            return utf32ToWide(output);
-        }
-        else
-        {
-            const wchar_t* ptr = (const wchar_t*)output.c_str();
-            return irr::core::stringw(ptr);
-        }
+
+        return output;
     }   // xmlDecode
 
     // ------------------------------------------------------------------------
@@ -841,17 +770,16 @@ namespace StringUtils
     std::string xmlEncode(const irr::core::stringw &s)
     {
         std::ostringstream output;
-        const std::u32string& utf32 = wideToUtf32(s);
-        for(unsigned i = 0; i < utf32.size(); i++)
+        for(unsigned int i=0; i<s.size(); i++)
         {
-            if (utf32[i] >= 128 || utf32[i] == '&' || utf32[i] == '<' ||
-                utf32[i] == '>' || utf32[i] == '\"' || utf32[i] == ' ')
+            if (s[i] >= 128 || s[i] == '&' || s[i] == '<' || s[i] == '>' ||
+                s[i] == '\"' || s[i] == ' ')
             {
-                output << "&#x" << std::hex << std::uppercase << utf32[i] << ";";
+                output << "&#x" << std::hex << std::uppercase << s[i] << ";";
             }
             else
             {
-                irr::c8 c = (char)(utf32[i]);
+                irr::c8 c = (char)(s[i]);
                 output << c;
             }
         }
@@ -863,27 +791,8 @@ namespace StringUtils
     std::string wideToUtf8(const wchar_t* input)
     {
         std::vector<char> utf8line;
-        try
-        {
-            if (sizeof(wchar_t) == 2)
-            {
-                utf8::utf16to8(input, input + wcslen(input),
-                    back_inserter(utf8line));
-            }
-            else if (sizeof(wchar_t) == 4)
-            {
-                utf8::utf32to8(input, input + wcslen(input),
-                    back_inserter(utf8line));
-            }
-            utf8line.push_back(0);
-        }
-        catch (std::exception& e)
-        {
-            utf8line.push_back(0);
-            Log::error("StringUtils",
-                "wideToUtf8 error: %s, incompleted string: %s", e.what(),
-                utf8line.data());
-        }
+        utf8::utf16to8(input, input + wcslen(input), back_inserter(utf8line));
+        utf8line.push_back(0);
         return std::string(&utf8line[0]);
     }   // wideToUtf8
 
@@ -899,28 +808,10 @@ namespace StringUtils
     /** Converts the irrlicht wide string to an utf8-encoded std::string. */
     irr::core::stringw utf8ToWide(const char* input)
     {
-        std::vector<wchar_t> wchar_line;
-        try
-        {
-            if (sizeof(wchar_t) == 2)
-            {
-                utf8::utf8to16(input, input + strlen(input),
-                    back_inserter(wchar_line));
-            }
-            else if (sizeof(wchar_t) == 4)
-            {
-                utf8::utf8to32(input, input + strlen(input),
-                    back_inserter(wchar_line));
-            }
-            wchar_line.push_back(0);
-        }
-        catch (std::exception& e)
-        {
-            wchar_line.push_back(0);
-            Log::error("StringUtils",
-                "wideToUtf8 error: %s, input string: %s", e.what(), input);
-        }
-        return irr::core::stringw(&wchar_line[0]);
+        std::vector<wchar_t> utf16line;
+        utf8::utf8to16(input, input + strlen(input), back_inserter(utf16line));
+        utf16line.push_back(0);
+        return irr::core::stringw(&utf16line[0]);
     }   // utf8ToWide
 
     // ------------------------------------------------------------------------
@@ -930,36 +821,6 @@ namespace StringUtils
         return utf8ToWide(input.c_str());
     }   // utf8ToWide
 
-    // ------------------------------------------------------------------------
-    /** This functions tests if the string s contains "-WORDX", where 
-     *  word is the parameter, and X is a one digit integer number. If
-     *  the string is found, it is removed from s, pre-release gets the
-     *  value of X, and the function returns true. If the string is not
-     *  found, the return value is false, and nothing is changed.
-     *  Example:
-     *    std::string version_with_suffix = "10-alpha2";
-     *    checkForStringNumber(&version_with-suffix, "alpha", &x)
-     *  will set version_with_suffix to "10", x to 2, and return true.
-     *  \param version_with_suffix The string in which to search for WORD.
-     *  \param word The word to search for.
-     *  \param pre-release An integer pointer in which to store the result.
-     */
-    bool checkForStringNumber(std::string *version_with_suffix, const std::string &word,
-                              int *pre_release)
-    {
-        // First check if the word string is contained:
-        size_t pos = version_with_suffix->find(std::string("-")+word);
-        if (pos == std::string::npos) return false;
-
-        std::string word_string = std::string("-") + word + "%d";
-        if (sscanf(version_with_suffix->substr(pos).c_str(),
-                   word_string.c_str(), pre_release         ) == 1)
-        {
-            version_with_suffix->erase(pos);  // Erase the suffix (till end)
-            return true;
-        }
-        return false;
-    }   // checkForStringNumber
     // ------------------------------------------------------------------------
     /** Converts a version string (in the form of 'X.Y.Za-rcU' into an
      *  integer number.
@@ -971,66 +832,46 @@ namespace StringUtils
         if(version_string=="GIT" || version_string=="git")
         {
             // GIT version will be version 99.99.99i-rcJ
-            return   10000000*99
-                    +  100000*99
-                    +    1000*99
-                    +     100* 9
-                    +         99;
+            return 1000000*99
+                    +  10000*99
+                    +    100*99
+                    +     10* 9
+                    +         9;
         }
 
-        std::vector<std::string> version_parts
-            = StringUtils::split(version_string, '.');
-
-        // The string that might contain alpha, etc details
-        std::string version_with_suffix = version_parts.back();
-
-        // Fill up to a 3 digit number
-        while (version_parts.size() < 3)
-            version_parts.push_back("0");
-
+        std::string s=version_string;
         // To guarantee that a release gets a higher version number than
-        // an alpha, beta or release candidate, we assign a 'pre_release' number
-        // of 99 to versions which are not alpha/beta/RC. An alpha version
-        // gets the number 01 till 09; beta 11 till 19; and RC 21 till 29
-        int pre_release=99;
-        if(checkForStringNumber(&version_with_suffix, "alpha", &pre_release))
+        // a release candidate, we assign a 'release_candidate' number
+        // of 9 to versions which are not a RC. We assert that any RC
+        // is less than 9 to guarantee the ordering.
+        int release_candidate=9;
+        if(s.length()>4 && sscanf(s.substr(s.length()-4, 4).c_str(), "-rc%d",
+                &release_candidate)==1)
         {
-            assert(pre_release <= 9 && pre_release >0);
-            // Nothing to do, pre_release is between 1 and 9
+            s = s.substr(0, s.length()-4);
+            // Otherwise a RC can get a higher version number than
+            // the corresponding release! If this should ever get
+            // triggered, multiply all scaling factors above and
+            // below by 10, to get two digits for RC numbers.
+            assert(release_candidate<9);
         }
-        else if(checkForStringNumber(&version_with_suffix, "beta", &pre_release))
-        {
-            assert(pre_release <= 9 && pre_release > 0);
-            pre_release += 10;
-        }
-        else if (checkForStringNumber(&version_with_suffix, "rc", &pre_release))
-        {
-            assert(pre_release <= 9 && pre_release > 0);
-            pre_release += 20;
-        }
-
         int very_minor=0;
-        if(version_with_suffix.length()>0     &&
-           version_with_suffix.back() >= 'a'  &&
-           version_with_suffix.back() <= 'z'     )
+        if(s.length()>0 && s[s.size()-1]>='a' && s[s.size()-1]<='z')
         {
-            very_minor = version_with_suffix[version_with_suffix.size()-1]-'a'+1;
-            // Remove suffix character
-            version_with_suffix.erase(version_with_suffix.size()-1);
+            very_minor = s[s.size()-1]-'a'+1;
+            s = s.substr(0, s.size()-1);
         }
-
-        // This relies on the fact that atoi will stop at a non-digit:
-        // E.g. if the version is '1.0-rc1', the 'rc1' is converted and
-        // stored in pre_release, but the version_parts[1] string still
-        // contains the '-rc1' suffix.
-        int version = 10000000*atoi(version_parts[0].c_str())
-                    +   100000*atoi(version_parts[1].c_str())
-                    +     1000*atoi(version_parts[2].c_str())
-                    +      100*very_minor
-                    +          pre_release;
+        std::vector<std::string> l = StringUtils::split(s, '.');
+        while(l.size()<3)
+            l.push_back("0");
+        int version = 1000000*atoi(l[0].c_str())
+                    +   10000*atoi(l[1].c_str())
+                    +     100*atoi(l[2].c_str())
+                    +      10*very_minor
+                    +         release_candidate;
 
         if(version <= 0)
-            Log::error("StringUtils", "Invalid version string '%s'.", version_with_suffix.c_str());
+            Log::error("StringUtils", "Invalid version string '%s'.", s.c_str());
         return version;
     }   // versionToInt
 
@@ -1055,44 +896,16 @@ namespace StringUtils
     std::string removeWhitespaces(const std::string& input)
     {
         std::string out;
-
+        
         for (char ch : input)
         {
             if (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r')
                 continue;
-
+                
             out += ch;
         }
-
+        
         return out;
-    }
-
-    // ------------------------------------------------------------------------
-    std::string getHostNameFromURL(const std::string& url)
-    {
-        // Not even a valid URL
-        if (url.length() < 8)
-            return "";
-
-        // protocol is substr(0, first_color_position)
-        const size_t first_colon_position = url.find_first_of(":");
-        if (first_colon_position == std::string::npos)
-            return "";
-
-        // skip ://
-        const std::string url_without_protocol = url.substr(first_colon_position + 3);
-
-        // Find end with port
-        const size_t port_colon_position = url_without_protocol.find_first_of(":");
-        if (port_colon_position != std::string::npos)
-            return url_without_protocol.substr(0, port_colon_position);
-
-        // Find end with path
-        const size_t slash_position = url_without_protocol.find_first_of("/");
-        if (slash_position != std::string::npos)
-            return url_without_protocol.substr(0, slash_position);
-
-        return url_without_protocol;
     }
 
     // ------------------------------------------------------------------------
@@ -1201,25 +1014,6 @@ namespace StringUtils
 
             // Step 7
             push_text:
-            
-            // Calculate break index depending on max text length if there is no
-            // breakable character
-            if (break_index == 0)
-            {
-                for (unsigned int i = 0; i < work_copy.size(); i++)
-                {
-                    std::wstring text = work_copy.substr(0, i+1);
-                    unsigned int width = font->getDimension(text.c_str()).Width;
-                    
-                    if (width > max_width)
-                        break;
-                    
-                    break_index++;
-                }
-                
-                break_index = std::max(0, (int)break_index - 1);
-            }
-            
             // To include the char at break_index, we need a length of break_index+1
             std::wstring text_line = work_copy.substr(0,break_index+1);
             output.push_back(text_line);
@@ -1234,7 +1028,6 @@ namespace StringUtils
             {
                 work_copy = work_copy.substr(break_index+1); // All the string except the pushed back part
                 index = 0;
-                break_index = 0;
             }
         } // While(true) - active until the whole string has been broken and copied
         if (right_to_left)
@@ -1253,7 +1046,7 @@ namespace StringUtils
 	    if ((c > 12287 && c < 40960) || //Common CJK words
 	    	(c > 44031 && c < 55204)  || //Hangul
 	    	(c > 63743 && c < 64256)  || //More Chinese
-	    	c == 45 || c == 173 || c == L' ' || //Hypen, soft hyphen and white space
+	    	c == 173 || c == L' ' || //Soft hyphen and white space
 	    	c == 47 || c == 92) //Slash and blackslash
 	    	return true;
 	    return false;
@@ -1271,133 +1064,7 @@ namespace StringUtils
 #endif
     } // partOfLongUnicodeChar
 
-    // ------------------------------------------------------------------------
-    irr::core::stringw utf32ToWide(const std::u32string& input)
-    {
-        std::vector<wchar_t> wchar_line;
-        try
-        {
-            if (sizeof(wchar_t) == 2)
-            {
-                const uint32_t* chars = (const uint32_t*)input.c_str();
-                utf8::utf32to16(chars, chars + input.size(),
-                    back_inserter(wchar_line));
-            }
-            else if (sizeof(wchar_t) == sizeof(char32_t))
-            {
-                wchar_line.resize(input.size());
-                memcpy(wchar_line.data(), input.c_str(),
-                    input.size() * sizeof(char32_t));
-            }
-            wchar_line.push_back(0);
-        }
-        catch (std::exception& e)
-        {
-            wchar_line.push_back(0);
-            Log::error("StringUtils", "utf32ToWide error: %s", e.what());
-        }
-        return irr::core::stringw(&wchar_line[0]);
-    }   // utf32ToWide
-
-    // ------------------------------------------------------------------------
-    std::u32string utf8ToUtf32(const std::string &input)
-    {
-        std::u32string result;
-        try
-        {
-            utf8::utf8to32(input.c_str(), input.c_str() + input.size(),
-                back_inserter(result));
-        }
-        catch (std::exception& e)
-        {
-            Log::error("StringUtils",
-                "utf8ToUtf32 error: %s, input string: %s", e.what(),
-                input.c_str());
-        }
-        return result;
-    }   // utf8ToUtf32
-
-    // ------------------------------------------------------------------------
-    std::string utf32ToUtf8(const std::u32string& input)
-    {
-        std::string result;
-        try
-        {
-            utf8::utf32to8(input.c_str(), input.c_str() + input.size(),
-                back_inserter(result));
-        }
-        catch (std::exception& e)
-        {
-            Log::error("StringUtils",
-                "utf32ToUtf8 error: %s, incompleted string: %s", e.what(),
-                result.c_str());
-        }
-        return result;
-    }   // utf32ToUtf8
-
-    // ------------------------------------------------------------------------
-    std::u32string wideToUtf32(const irr::core::stringw& input)
-    {
-        std::u32string utf32_line;
-        try
-        {
-            if (sizeof(wchar_t) != sizeof(char32_t))
-            {
-                const uint16_t* chars = (const uint16_t*)input.c_str();
-                utf8::utf16to32(chars, chars + input.size(),
-                    back_inserter(utf32_line));
-            }
-            else if (sizeof(wchar_t) == sizeof(char32_t))
-                utf32_line = (const char32_t*)input.c_str();
-        }
-        catch (std::exception& e)
-        {
-            Log::error("StringUtils", "wideToUtf32 error: %s", e.what());
-        }
-        return utf32_line;
-    }   // wideToUtf32
-
-    // ------------------------------------------------------------------------
-    /** At the moment only versionToInt is tested. 
-     */
-    void unitTesting()
-    {
-        assert(versionToInt("git"             ) == 999999999);
-        assert(versionToInt("12.34.56-alpha1" ) == 123456001);   // alphaX  = 0X
-        assert(versionToInt("12.34.56-beta2"  ) == 123456012);   // betaX   = 1X
-        assert(versionToInt("12.34.56-rc3"    ) == 123456023);   // rcX     = 2X
-        assert(versionToInt("12.34.56"        ) == 123456099);   // release = 99
-        assert(versionToInt("12.34.56a-alpha4") == 123456104);
-        assert(versionToInt("12.34.56b-beta5" ) == 123456215);
-        assert(versionToInt("12.34.56c-rc6"   ) == 123456326);
-        assert(versionToInt("12.34.56d"       ) == 123456499);
-        assert(versionToInt("1-alpha7"        ) ==  10000007);
-        assert(versionToInt("1-beta8"         ) ==  10000018);
-        assert(versionToInt("1-rc9"           ) ==  10000029);
-        assert(versionToInt("1.0-rc1"         ) ==  10000021);   // same as 1-rc1
-    }   // unitTesting
-    // ------------------------------------------------------------------------
-    std::string getUserAgentString()
-    {
-        std::string uagent(std::string("SuperTuxKart/") + STK_VERSION);
-#if defined(IOS_STK)
-        uagent += (std::string)" (iOS)";
-#elif defined(WIN32)
-        uagent += (std::string)" (Windows)";
-#elif defined(__APPLE__)
-        uagent += (std::string)" (Macintosh)";
-#elif defined(__FreeBSD__)
-        uagent += (std::string)" (FreeBSD)";
-#elif defined(ANDROID)
-        uagent += (std::string)" (Android)";
-#elif defined(linux)
-        uagent += (std::string)" (Linux)";
-#else
-        // Unknown system type
-#endif
-        return uagent;
-    }   // getUserAgentString
-
 } // namespace StringUtils
+
 
 /* EOF */

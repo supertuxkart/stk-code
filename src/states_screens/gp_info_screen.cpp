@@ -35,9 +35,9 @@
 #include "race/grand_prix_data.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/online/tracks_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
@@ -214,11 +214,11 @@ void GPInfoScreen::init()
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
                             m_group_name, getReverse(), true);
 
-        getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
+        getWidget<LabelWidget>("name")->setText(translations->fribidize(m_gp.getName()), false);
     }
     else
     {
-        getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
+        getWidget<LabelWidget>("name")->setText(translations->fribidize(m_gp.getName()), false);
         m_gp.checkConsistency();
     }
 
@@ -269,7 +269,7 @@ void GPInfoScreen::addTracks()
     {
         const Track *track = track_manager->getTrack(tracks[i]);
         std::string s = StringUtils::toString(i);
-        list->addItem(s, track->getName());
+        list->addItem(s, translations->fribidize(track->getName()));
     }
 }   // addTracks
 

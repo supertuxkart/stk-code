@@ -41,20 +41,13 @@ class TrackSector;
 class SoccerWorld : public WorldWithRank
 {
 public:
-    struct ScorerData
+    class ScorerData
     {
+    public:
         /** World ID of kart which scores. */
-        unsigned int  m_id;
+        unsigned int    m_id;
         /** Whether this goal is socred correctly (identify for own goal). */
-        bool          m_correct_goal;
-        /** Time goal. */
-        float         m_time;
-        /** Kart ident which scores. */
-        std::string   m_kart;
-        /** Player name which scores. */
-        core::stringw m_player;
-        /** Country flag of player (used in server only). */
-        core::stringw m_country_flag;
+        bool            m_correct_goal;
     };   // ScorerData
 
 private:
@@ -271,6 +264,9 @@ private:
 
     SFXBase *m_goal_sound;
 
+    /** Timer for displaying goal text*/
+    int m_goal_timer;
+
     /** Counts ticks when the ball is off track, so a reset can be
      *  triggered if the ball is off for more than 2 seconds. */
     int m_ball_invalid_timer;
@@ -278,7 +274,9 @@ private:
 
     /** Goals data of each team scored */
     std::vector<ScorerData> m_red_scorers;
+    std::vector<float> m_red_score_times;
     std::vector<ScorerData> m_blue_scorers;
+    std::vector<float> m_blue_score_times;
 
     /** Data generated from navmesh */
     TrackSector* m_ball_track_sector;
@@ -298,8 +296,6 @@ private:
     std::vector<int> m_goal_frame;
 
     int m_reset_ball_ticks;
-    int m_ticks_back_to_own_goal;
-
     void resetKartsToSelfGoals();
 
 public:
@@ -351,6 +347,12 @@ public:
     const std::vector<ScorerData>& getScorers(KartTeam team) const
        { return (team == KART_TEAM_BLUE ? m_blue_scorers : m_red_scorers); }
     // ------------------------------------------------------------------------
+    const std::vector<float>& getScoreTimes(KartTeam team) const
+    {
+        return (team == KART_TEAM_BLUE ?
+            m_blue_score_times : m_red_score_times);
+    }
+    // ------------------------------------------------------------------------
     int getBallNode() const;
     // ------------------------------------------------------------------------
     const Vec3& getBallPosition() const
@@ -393,39 +395,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool hasTeam() const OVERRIDE                      { return true; }
     // ------------------------------------------------------------------------
-    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
-        OVERRIDE
-    {
-        std::pair<uint32_t, uint32_t> progress(
-            std::numeric_limits<uint32_t>::max(),
-            std::numeric_limits<uint32_t>::max());
-        if (race_manager->hasTimeTarget())
-        {
-            progress.first = (uint32_t)m_time;
-        }
-        else if (m_red_scorers.size() > m_blue_scorers.size())
-        {
-            progress.second = (uint32_t)((float)m_red_scorers.size() /
-                (float)race_manager->getMaxGoal() * 100.0f);
-        }
-        else
-        {
-            progress.second = (uint32_t)((float)m_blue_scorers.size() /
-                (float)race_manager->getMaxGoal() * 100.0f);
-        }
-        return progress;
-    }
-    // ------------------------------------------------------------------------
-    virtual void saveCompleteState(BareNetworkString* bns,
-                                   STKPeer* peer) OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual bool isGoalPhase() const OVERRIDE
-    {
-        int diff = m_ticks_back_to_own_goal - getTicksSinceStart();
-        return diff > 0 && diff < stk_config->time2Ticks(3.0f);
-    }
+
 };   // SoccerWorld
 
 

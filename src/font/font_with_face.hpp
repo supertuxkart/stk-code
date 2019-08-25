@@ -43,7 +43,6 @@ const int BEARING = 64;
 
 class FaceTTF;
 class FontSettings;
-struct FontArea;
 
 /** An abstract class which contains functions which convert vector fonts into
  *  bitmap and render them in STK. To make STK draw characters with different
@@ -69,6 +68,23 @@ public:
                                  const core::rect<float>& destRect,
                                  const core::rect<s32>& sourceRect,
                                  const video::SColor* const colors) = 0;
+    };
+
+    /** Glyph metrics for each glyph loaded. */
+    struct FontArea
+    {
+        FontArea() : advance_x(0), bearing_x(0) ,offset_y(0), offset_y_bt(0),
+                     spriteno(0) {}
+        /** Advance width for horizontal layout. */
+        int advance_x;
+        /** Left side bearing for horizontal layout. */
+        int bearing_x;
+        /** Top side bearing for horizontal layout. */
+        int offset_y;
+        /** Top side bearing for horizontal layout used in billboard text. */
+        int offset_y_bt;
+        /** Index number in sprite bank. */
+        int spriteno;
     };
 
 protected:
@@ -160,14 +176,25 @@ private:
     /** The dpi of this font. */
     unsigned int                 m_face_dpi;
 
-    /** Used to undo the scale on text shaping, only need to take care of
-     *  width. */
-    float                        m_inverse_shaping;
+    /** Store a list of supported character to a \ref FontArea. */
+    std::map<wchar_t, FontArea>  m_character_area_map;
+
     /** Store a list of loaded and tested character to a \ref GlyphInfo. */
     std::map<wchar_t, GlyphInfo> m_character_glyph_info_map;
 
     // ------------------------------------------------------------------------
-    float getCharWidth(const FontArea& area, bool fallback, float scale) const;
+    /** Return a character width.
+     *  \param area \ref FontArea to get glyph metrics.
+     *  \param fallback If fallback font is used.
+     *  \param scale The scaling of the character.
+     *  \return The calculated width with suitable scaling. */
+    float getCharWidth(const FontArea& area, bool fallback, float scale) const
+    {
+        if (fallback)
+            return area.advance_x * m_fallback_font_scale;
+        else
+            return area.advance_x * scale;
+    }
     // ------------------------------------------------------------------------
     /** Test if a character has already been tried to be loaded.
      *  \param c Character to test.
@@ -216,6 +243,8 @@ private:
     /** Add a character into \ref m_new_char_holder for lazy loading later. */
     void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
     // ------------------------------------------------------------------------
+    void insertGlyph(wchar_t c, const GlyphInfo& gi);
+    // ------------------------------------------------------------------------
     void setDPI();
     // ------------------------------------------------------------------------
     /** Override it if sub-class should not do lazy loading characters. */
@@ -234,11 +263,6 @@ private:
     /** Override it if sub-class has bold outline. */
     virtual bool isBold() const                               { return false; }
     // ------------------------------------------------------------------------
-    const FontArea* getUnknownFontArea() const;
-    // ------------------------------------------------------------------------
-    std::vector<gui::GlyphLayout> text2GlyphsWithoutShaping(
-                                                       const core::stringw& t);
-    // ------------------------------------------------------------------------
 #ifndef SERVER_ONLY
     /** Override it if any outline shaping is needed to be done before
      *  rendering the glyph into bitmap.
@@ -249,7 +273,7 @@ private:
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
-    FontWithFace(const std::string& name);
+    FontWithFace(const std::string& name, FaceTTF* ttf);
     // ------------------------------------------------------------------------
     virtual ~FontWithFace();
     // ------------------------------------------------------------------------
@@ -257,31 +281,17 @@ public:
     // ------------------------------------------------------------------------
     virtual void reset();
     // ------------------------------------------------------------------------
-    virtual core::dimension2d<u32> getDimension(const core::stringw& text,
-                                           FontSettings* font_settings = NULL);
+    core::dimension2d<u32> getDimension(const wchar_t* text,
+                                  FontSettings* font_settings = NULL);
     // ------------------------------------------------------------------------
     int getCharacterFromPos(const wchar_t* text, int pixel_x,
                             FontSettings* font_settings = NULL) const;
     // ------------------------------------------------------------------------
-    void render(const std::vector<gui::GlyphLayout>& gl,
-                const core::rect<s32>& position, const video::SColor& color,
-                bool hcenter, bool vcenter, const core::rect<s32>* clip,
+    void render(const core::stringw& text, const core::rect<s32>& position,
+                const video::SColor& color, bool hcenter, bool vcenter,
+                const core::rect<s32>* clip,
                 FontSettings* font_settings,
                 FontCharCollector* char_collector = NULL);
-    // ------------------------------------------------------------------------
-    virtual void drawText(const core::stringw& text,
-                          const core::rect<s32>& position,
-                          const video::SColor& color, bool hcenter,
-                          bool vcenter, const core::rect<s32>* clip,
-                          FontSettings* font_settings,
-                          FontCharCollector* char_collector = NULL);
-    // ------------------------------------------------------------------------
-    void drawTextQuick(const core::stringw& text,
-                       const core::rect<s32>& position,
-                       const video::SColor& color, bool hcenter, bool vcenter,
-                       const core::rect<s32>* clip,
-                       FontSettings* font_settings,
-                       FontCharCollector* char_collector = NULL);
     // ------------------------------------------------------------------------
     void dumpGlyphPage(const std::string& name);
     // ------------------------------------------------------------------------
@@ -295,18 +305,7 @@ public:
     // ------------------------------------------------------------------------
     /** Return the dpi of this face. */
     unsigned int getDPI() const                          { return m_face_dpi; }
-    // ------------------------------------------------------------------------
-    FaceTTF* getFaceTTF() const                          { return m_face_ttf; }
-    // ------------------------------------------------------------------------
-    void insertGlyph(unsigned font_number, unsigned glyph_index);
-    // ------------------------------------------------------------------------
-    int getFontMaxHeight() const                  { return m_font_max_height; }
-    // ------------------------------------------------------------------------
-    virtual bool disableTextShaping() const                   { return false; }
-    // ------------------------------------------------------------------------
-    float getInverseShaping() const               { return m_inverse_shaping; }
-    // ------------------------------------------------------------------------
-    virtual bool useColorGlyphPage() const                    { return false; }
+
 };   // FontWithFace
 
 #endif

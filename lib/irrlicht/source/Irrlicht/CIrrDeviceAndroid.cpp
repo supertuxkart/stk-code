@@ -9,34 +9,17 @@
 #ifdef _IRR_COMPILE_WITH_ANDROID_DEVICE_
 
 #include <assert.h>
-#include <atomic>
-#include <vector>
 #include "os.h"
 #include "CContextEGL.h"
 #include "CFileSystem.h"
 #include "COGLES2Driver.h"
-#include "MobileCursorControl.h"
-#include "../../../../src/utils/utf8/unchecked.h"
-
-// Call when android keyboard is opened or close, and save its height for
-// moving screen
-std::atomic<int> g_keyboard_height(0);
-
-#define MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveKeyboardHeight(JNIEnv* env, jobject this_obj, jint height)
-#define ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_SAVE_KBD_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
-{
-    g_keyboard_height.store((int)height);
-}
 
 namespace irr
 {
     namespace video
     {
         IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-            video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device);
+            video::SExposedVideoData& data, io::IFileSystem* io);
     }
 }
 
@@ -69,7 +52,8 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     Gyroscope(0),
     AccelerometerActive(false),
     GyroscopeActive(false),
-    HasTouchDevice(false),
+    TextInputEnabled(false),
+    IsMousePressed(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
     DefaultOrientation(ORIENTATION_UNKNOWN)
@@ -77,13 +61,10 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     #ifdef _DEBUG
     setDebugName("CIrrDeviceAndroid");
     #endif
-    m_screen_height = 0;
-    m_moved_height = 0;
-    m_moved_height_func = NULL;
-
+    
     createKeyMap();
 
-    CursorControl = new gui::MobileCursorControl();
+    CursorControl = new CCursorControl();
 
     Android = (android_app*)(param.PrivateData);
     
@@ -97,7 +78,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     {
         Android->userData = this;
         Android->onAppCmd = handleAndroidCommand;
-        Android->onAppCmdDirect = NULL;
+        Android->onAppCmdDirect = handleAndroidCommandDirect;
         Android->onInputEvent = handleInput;
         
         printConfig();
@@ -137,9 +118,6 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
         ExposedVideoData.OGLESAndroid.Window = Android->window;
     
         createVideoModeList();
-        
-        int32_t touch = AConfiguration_getTouchscreen(Android->config);
-        HasTouchDevice = touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH;
     }
 
     createDriver();
@@ -183,11 +161,11 @@ void CIrrDeviceAndroid::printConfig()
     int32_t ui_mode_night = AConfiguration_getUiModeNight(Android->config);
 
     os::Printer::log("Android configuration: ", ELL_DEBUG);
-    os::Printer::log("   country:", !std::string(country).empty() ? country : "unknown", ELL_DEBUG);
+    os::Printer::log("   country:", country != NULL ? country : "unknown", ELL_DEBUG);
     os::Printer::log("   density:", core::stringc(density).c_str(), ELL_DEBUG);
     os::Printer::log("   keyboard:", core::stringc(keyboard).c_str(), ELL_DEBUG);
     os::Printer::log("   keys_hidden:", core::stringc(keys_hidden).c_str(), ELL_DEBUG);
-    os::Printer::log("   language:", !std::string(language).empty() ? language : "unknown", ELL_DEBUG);
+    os::Printer::log("   language:", language != NULL ? language : "unknown", ELL_DEBUG);
     os::Printer::log("   mcc:", core::stringc(mcc).c_str(), ELL_DEBUG);
     os::Printer::log("   mnc:", core::stringc(mnc).c_str(), ELL_DEBUG);
     os::Printer::log("   nav_hidden:", core::stringc(nav_hidden).c_str(), ELL_DEBUG);
@@ -199,14 +177,6 @@ void CIrrDeviceAndroid::printConfig()
     os::Printer::log("   touch:", core::stringc(touch).c_str(), ELL_DEBUG);
     os::Printer::log("   ui_mode_type:", core::stringc(ui_mode_type).c_str(), ELL_DEBUG);
     os::Printer::log("   ui_mode_night:", core::stringc(ui_mode_night).c_str(), ELL_DEBUG);
-}
-
-u32 CIrrDeviceAndroid::getOnScreenKeyboardHeight() const
-{
-    int height = g_keyboard_height.load();
-    if (height > 0)
-        return height;
-    return 0;
 }
 
 void CIrrDeviceAndroid::createVideoModeList()
@@ -224,7 +194,6 @@ void CIrrDeviceAndroid::createVideoModeList()
     {
         CreationParams.WindowSize.Width = width;
         CreationParams.WindowSize.Height = height;
-        m_screen_height = height;
     }
 
     core::dimension2d<u32> size = core::dimension2d<u32>(
@@ -242,7 +211,7 @@ void CIrrDeviceAndroid::createDriver()
     {
     case video::EDT_OGLES2:
         #ifdef _IRR_COMPILE_WITH_OGLES2_
-        VideoDriver = video::createOGLES2Driver(CreationParams, ExposedVideoData, FileSystem, this);
+        VideoDriver = video::createOGLES2Driver(CreationParams, ExposedVideoData, FileSystem);
         #else
         os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
         #endif
@@ -267,8 +236,6 @@ bool CIrrDeviceAndroid::run()
     
     while (!Close)
     {
-        if (m_moved_height_func != NULL)
-            m_moved_height = m_moved_height_func(this);
         s32 Events = 0;
         android_poll_source* Source = 0;
         bool should_run = (IsStarted && IsFocused && !IsPaused);
@@ -422,6 +389,20 @@ E_DEVICE_TYPE CIrrDeviceAndroid::getType() const
     return EIDT_ANDROID;
 }
 
+void CIrrDeviceAndroid::handleAndroidCommandDirect(ANativeActivity* activity, 
+                                                   int32_t cmd)
+{
+    switch (cmd)
+    {
+    case APP_CMD_RESUME:
+        os::Printer::log("Android command direct APP_CMD_RESUME", ELL_DEBUG);   
+        hideNavBar(activity);   
+        break;
+    default:
+        break;
+    }
+}
+
 void CIrrDeviceAndroid::handleAndroidCommand(android_app* app, int32_t cmd)
 {
     CIrrDeviceAndroid* device = (CIrrDeviceAndroid *)app->userData;
@@ -564,7 +545,6 @@ s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
 
     bool touchReceived = true;
     bool simulate_mouse = false;
-    int adjusted_height = getMovedHeight();
     core::position2d<s32> mouse_pos = core::position2d<s32>(0, 0);
 
     switch (eventAction & AMOTION_EVENT_ACTION_MASK)
@@ -618,7 +598,7 @@ s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
                 
             event_data.event = event.TouchInput.Event;
             event_data.x = event.TouchInput.X;
-            event_data.y = event.TouchInput.Y + adjusted_height;
+            event_data.y = event.TouchInput.Y;
             
             postEventFromUser(event);
             
@@ -636,8 +616,44 @@ s32 CIrrDeviceAndroid::handleTouch(AInputEvent* androidEvent)
     // Simulate mouse event for first finger on multitouch device.
     // This allows to click on GUI elements.        
     if (simulate_mouse)
-        simulateMouse(event, mouse_pos);
+    {
+        CursorControl->setPosition(mouse_pos);
 
+        SEvent irrevent;
+        bool send_event = true;
+        
+        switch (event.TouchInput.Event)
+        {
+        case ETIE_PRESSED_DOWN:
+            irrevent.MouseInput.Event = EMIE_LMOUSE_PRESSED_DOWN;
+            IsMousePressed = true;
+            break;
+        case ETIE_LEFT_UP:
+            irrevent.MouseInput.Event = EMIE_LMOUSE_LEFT_UP;
+            IsMousePressed = false;
+            break;
+        case ETIE_MOVED:
+            irrevent.MouseInput.Event = EMIE_MOUSE_MOVED;
+            break;
+        default:
+            send_event = false;
+            break;
+        }
+        
+        if (send_event)
+        {
+            irrevent.MouseInput.Control = false;
+            irrevent.MouseInput.Shift = false;
+            irrevent.MouseInput.ButtonStates = IsMousePressed ? 
+                                                            irr::EMBSM_LEFT : 0;
+            irrevent.EventType = EET_MOUSE_INPUT_EVENT;
+            irrevent.MouseInput.X = mouse_pos.X;
+            irrevent.MouseInput.Y = mouse_pos.Y;
+
+            postEventFromUser(irrevent);
+        }
+    }
+    
     return status;
 }
 
@@ -668,6 +684,15 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
     {
         event.KeyInput.PressedDown = false;
     }
+    else if (keyAction == AKEY_EVENT_ACTION_MULTIPLE)
+    {
+        // TODO: Multiple duplicate key events have occurred in a row,
+        // or a complex string is being delivered. The repeat_count
+        // property of the key event contains the number of times the
+        // given key code should be executed.
+        // I guess this might necessary for more complicated i18n key input,
+        // but don't see yet how to handle this correctly.
+    }
 
     event.KeyInput.Shift = (keyMetaState & AMETA_SHIFT_ON ||
                             keyMetaState & AMETA_SHIFT_LEFT_ON ||
@@ -682,12 +707,17 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
 
     if (event.KeyInput.Key > 0)
     {
+        if (TextInputEnabled == true)
+        {
+            event.KeyInput.Char = getUnicodeChar(androidEvent);
+        }
+        
         if (event.KeyInput.Char == 0)
         {
             event.KeyInput.Char = getKeyChar(event);
         }
     }
-
+    
     // If button doesn't return key code, then at least use device-specific
     // scan code, because it's better than nothing
     if (event.KeyInput.Key == 0)
@@ -1151,153 +1181,215 @@ wchar_t CIrrDeviceAndroid::getKeyChar(SEvent& event)
     return key_char;
 }
 
-void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show, s32 type)
+wchar_t CIrrDeviceAndroid::getUnicodeChar(AInputEvent* event)
 {
-    if (!Android)
-        return;
-
     bool was_detached = false;
     JNIEnv* env = NULL;
-
+    
     jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
     if (status == JNI_EDETACHED)
     {
         JavaVMAttachArgs args;
         args.version = JNI_VERSION_1_6;
         args.name = "NativeThread";
         args.group = NULL;
-
+    
         status = Android->activity->vm->AttachCurrentThread(&env, &args);
         was_detached = true;
     }
+
     if (status != JNI_OK)
     {
-        os::Printer::log("Cannot attach current thread in showKeyboard.", ELL_DEBUG);
-        return;
+        os::Printer::log("Cannot get unicode character.", ELL_DEBUG);
+        return 0;
     }
 
-    jobject native_activity = Android->activity->clazz;
-    jclass class_native_activity = env->GetObjectClass(native_activity);
+    jlong down_time = AKeyEvent_getDownTime(event);
+    jlong event_time = AKeyEvent_getEventTime(event);
+    jint action = AKeyEvent_getAction(event);
+    jint code = AKeyEvent_getKeyCode(event);
+    jint repeat = AKeyEvent_getRepeatCount(event);
+    jint meta_state = AKeyEvent_getMetaState(event);
+    jint device_id = AInputEvent_getDeviceId(event);
+    jint scan_code = AKeyEvent_getScanCode(event);
+    jint flags = AKeyEvent_getFlags(event);
+    jint source = AInputEvent_getSource(event);
 
-    if (class_native_activity == NULL)
-    {
-        os::Printer::log("showKeyboard unable to find object class.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
-        return;
-    }
+    jclass key_event = env->FindClass("android/view/KeyEvent");
+    jmethodID key_event_constructor = env->GetMethodID(key_event, "<init>", 
+                                                       "(JJIIIIIIII)V");
+                                                       
+    jobject key_event_obj = env->NewObject(key_event, key_event_constructor, 
+                                           down_time, event_time, action, code, 
+                                           repeat, meta_state, device_id, 
+                                           scan_code, flags, source);
 
-    jmethodID method_id = NULL;
-    if (show)
-        method_id = env->GetMethodID(class_native_activity, "showKeyboard", "(I)V");
-    else
-        method_id = env->GetMethodID(class_native_activity, "hideKeyboard", "(Z)V");
+    jmethodID get_unicode = env->GetMethodID(key_event, "getUnicodeChar", "(I)I");
+    
+    wchar_t unicode_char = env->CallIntMethod(key_event_obj, get_unicode, 
+                                              meta_state);
 
-    if (method_id == NULL)
-    {
-        os::Printer::log("showKeyboard unable to find method id.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
-        return;
-    }
-
-    if (show)
-        env->CallVoidMethod(native_activity, method_id, (jint)type);
-    else
-        env->CallVoidMethod(native_activity, method_id, (jboolean)(type != 0));
     if (was_detached)
     {
         Android->activity->vm->DetachCurrentThread();
     }
+
+    return unicode_char;
 }
 
-void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end, int type)
+void CIrrDeviceAndroid::hideNavBar(ANativeActivity* activity)
 {
-    if (!Android)
+    if (activity == NULL)
+        return;
+
+    if (activity->sdkVersion < 19)
         return;
 
     bool was_detached = false;
     JNIEnv* env = NULL;
-
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    jint status = activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
     if (status == JNI_EDETACHED)
     {
         JavaVMAttachArgs args;
         args.version = JNI_VERSION_1_6;
         args.name = "NativeThread";
         args.group = NULL;
+    
+        status = activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
 
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot hide navbar.", ELL_DEBUG);
+        return;
+    }
+    
+    jobject activity_obj = activity->clazz;
+    
+    jclass activity_class = env->GetObjectClass(activity_obj);
+    jclass window_class = env->FindClass("android/view/Window");
+    jclass view_class = env->FindClass("android/view/View");
+
+    jmethodID get_window = env->GetMethodID(activity_class, "getWindow", 
+                                            "()Landroid/view/Window;");
+    jmethodID get_decor_view = env->GetMethodID(window_class, "getDecorView", 
+                                                "()Landroid/view/View;");
+    jmethodID set_system_ui_visibility = env->GetMethodID(view_class, 
+                                               "setSystemUiVisibility", "(I)V");
+
+    jobject window_obj = env->CallObjectMethod(activity_obj, get_window);
+    jobject decor_view_obj = env->CallObjectMethod(window_obj, get_decor_view);
+
+    jfieldID fullscreen_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_FULLSCREEN", "I");
+    jfieldID hide_navigation_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_HIDE_NAVIGATION", "I");
+    jfieldID immersive_sticky_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_IMMERSIVE_STICKY", "I");
+    jfieldID layout_stable_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_LAYOUT_STABLE", "I");
+    jfieldID layout_hide_navigation_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION", "I");
+    jfieldID layout_fullscreen_field = env->GetStaticFieldID(view_class, 
+                                "SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN", "I");
+
+    jint fullscreen = env->GetStaticIntField(view_class, fullscreen_field);
+    jint hide_navigation = env->GetStaticIntField(view_class, 
+                                                  hide_navigation_field);
+    jint immersive_sticky = env->GetStaticIntField(view_class, 
+                                                   immersive_sticky_field);
+    jint layout_stable = env->GetStaticIntField(view_class, 
+                                                layout_stable_field);
+    jint layout_hide_navigation = env->GetStaticIntField(view_class, 
+                                                  layout_hide_navigation_field);
+    jint layout_fullscreen = env->GetStaticIntField(view_class, 
+                                                    layout_fullscreen_field);
+    
+    jint flags = fullscreen | hide_navigation | immersive_sticky | 
+                 layout_stable | layout_hide_navigation | layout_fullscreen;
+
+    env->CallVoidMethod(decor_view_obj, set_system_ui_visibility, flags);
+    
+    if (was_detached)
+    {
+        activity->vm->DetachCurrentThread();
+    }
+}
+
+void CIrrDeviceAndroid::showKeyboard(bool show) 
+{
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
         status = Android->activity->vm->AttachCurrentThread(&env, &args);
         was_detached = true;
     }
+
     if (status != JNI_OK)
     {
-        os::Printer::log("Cannot attach current thread in fromSTKEditBox.", ELL_DEBUG);
+        os::Printer::log("Cannot show keyboard.", ELL_DEBUG);
         return;
     }
+    
+    jobject activity_obj = Android->activity->clazz;
+    jclass activity_class = env->GetObjectClass(activity_obj);
+    
+    jclass context = env->FindClass("android/content/Context");
+    jfieldID im_service_field = env->GetStaticFieldID(context, 
+                                  "INPUT_METHOD_SERVICE", "Ljava/lang/String;");
+    jobject im_service_obj = env->GetStaticObjectField(context, 
+                                                       im_service_field);
 
-    jobject native_activity = Android->activity->clazz;
-    jclass class_native_activity = env->GetObjectClass(native_activity);
+    jclass im_manager = env->FindClass(
+                                 "android/view/inputmethod/InputMethodManager");
+    jmethodID get_system_service = env->GetMethodID( activity_class, 
+                  "getSystemService", "(Ljava/lang/String;)Ljava/lang/Object;");
+    jobject im_manager_obj = env->CallObjectMethod(activity_obj, 
+                                            get_system_service, im_service_obj);
 
-    if (class_native_activity == NULL)
+    jmethodID get_window = env->GetMethodID(activity_class, "getWindow",
+                                            "()Landroid/view/Window;");
+    jobject window_obj = env->CallObjectMethod(activity_obj, get_window);
+    jclass window = env->FindClass("android/view/Window");
+    jmethodID get_decor_view = env->GetMethodID(window, "getDecorView", 
+                                                "()Landroid/view/View;");
+    jobject decor_view_obj = env->CallObjectMethod(window_obj, get_decor_view);
+
+    if (show) 
     {
-        os::Printer::log("fromSTKEditBox unable to find object class.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
-        return;
+        jmethodID show_soft_input = env->GetMethodID(im_manager, 
+                                    "showSoftInput", "(Landroid/view/View;I)Z");
+        jint flags = 0;
+        jboolean result = env->CallBooleanMethod(im_manager_obj, 
+                                        show_soft_input, decor_view_obj, flags);
+    } 
+    else 
+    {
+        jclass view = env->FindClass("android/view/View");
+        jmethodID get_window_token = env->GetMethodID(view, "getWindowToken", 
+                                                      "()Landroid/os/IBinder;");
+        jobject token = env->CallObjectMethod(decor_view_obj, get_window_token);
+
+        jmethodID hide_soft_input = env->GetMethodID(im_manager, 
+                        "hideSoftInputFromWindow", "(Landroid/os/IBinder;I)Z");
+        jint flags = 0;
+        jboolean result = env->CallBooleanMethod(im_manager_obj, 
+                                                 hide_soft_input, token, flags);
     }
 
-    jmethodID method_id = env->GetMethodID(class_native_activity, "fromSTKEditBox", "(ILjava/lang/String;III)V");
-    if (method_id == NULL)
-    {
-        os::Printer::log("fromSTKEditBox unable to find method id.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
-        return;
-    }
-
-    // Android use 32bit wchar_t and java use utf16 string
-    // We should not use the modified utf8 from java as it fails for emoji
-    // because it's larger than 16bit
-
-    std::vector<uint16_t> utf16;
-    // Use utf32 for emoji later
-    static_assert(sizeof(wchar_t) == sizeof(uint32_t), "wchar_t is not 32bit");
-    const uint32_t* chars = (const uint32_t*)text.c_str();
-    utf8::unchecked::utf32to16(chars, chars + text.size(), back_inserter(utf16));
-
-    std::vector<int> mappings;
-    int pos = 0;
-    mappings.push_back(pos++);
-    for (unsigned i = 0; i < utf16.size(); i++)
-    {
-        if (utf8::internal::is_lead_surrogate(utf16[i]))
-        {
-            pos++;
-            mappings.push_back(pos++);
-            i++;
-        }
-        else
-            mappings.push_back(pos++);
-    }
-
-    // Correct start / end position for utf16
-    if (selection_start < (int)mappings.size())
-        selection_start = mappings[selection_start];
-    if (selection_end < (int)mappings.size())
-        selection_end = mappings[selection_end];
-
-    jstring jstring_text = env->NewString((const jchar*)utf16.data(), utf16.size());
-
-    env->CallVoidMethod(native_activity, method_id, (jint)widget_id, jstring_text, (jint)selection_start, (jint)selection_end, (jint)type);
     if (was_detached)
     {
         Android->activity->vm->DetachCurrentThread();
@@ -1604,14 +1696,6 @@ bool CIrrDeviceAndroid::isGyroscopeAvailable()
     return (Gyroscope != NULL);
 }
 
-bool CIrrDeviceAndroid::hasHardwareKeyboard() const
-{
-    // This can happen when hosting server in android
-    if (!Android)
-        return true;
-    int32_t keyboard = AConfiguration_getKeyboard(Android->config);
-    return (keyboard == ACONFIGURATION_KEYBOARD_QWERTY);
-}
 
 } // end namespace irr
 

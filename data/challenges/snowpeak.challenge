@@ -3,11 +3,11 @@
     <unlock_list list="false"/>
     <track id="snowtuxpeak" laps="3" reverse="false"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="0"/>
+    <requirements trophies="45"/>
     
     <best>
         <karts number="8"/>
-        <requirements position="1" time="105"/>
+        <requirements position="1" time="108"/>
     </best>
     <hard>
         <karts number="7"/>

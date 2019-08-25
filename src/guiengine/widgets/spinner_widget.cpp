@@ -23,7 +23,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
-#include "utils/log.hpp"
+#include "utils/translation.hpp"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
@@ -157,6 +157,8 @@ void SpinnerWidget::add()
         label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
         label->setTabStop(false);
         label->setNotClipped(true);
+        label->setRightToLeft(translations->isRTLText(text));
+
 
         if (m_labels.size() > 0)
         {

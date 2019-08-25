@@ -18,7 +18,6 @@
 #include "replay/replay_base.hpp"
 
 #include "io/file_manager.hpp"
-#include "utils/file_utils.hpp"
 
 // -----------------------------------------------------------------------------
 ReplayBase::ReplayBase()
@@ -32,8 +31,8 @@ ReplayBase::ReplayBase()
  */
 FILE* ReplayBase::openReplayFile(bool writeable, bool full_path, int replay_file_number)
 {
-    FILE* fd = FileUtils::fopenU8Path(full_path ? getReplayFilename(replay_file_number) :
-        file_manager->getReplayDir() + getReplayFilename(replay_file_number),
+    FILE *fd = fopen(full_path ? getReplayFilename(replay_file_number).c_str() :
+        (file_manager->getReplayDir() + getReplayFilename(replay_file_number)).c_str(),
         writeable ? "w" : "r");
     if (!fd)
     {

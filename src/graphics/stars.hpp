@@ -62,7 +62,6 @@ private:
     void   showFor(float time);
     void   reset();
     void   update (float delta_t);
-    bool   isEnabled() const { return m_enabled; }
 };
 #endif
 

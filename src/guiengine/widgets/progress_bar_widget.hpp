@@ -44,12 +44,12 @@ namespace GUIEngine
 
         /**  Change the label on the widget */
         void setLabel(const irr::core::stringw label);
-        float m_value;
+        int m_value;
         bool m_show_label;
 
         /** Values for animation */
-        float m_target_value;
-        float m_previous_value;
+        int m_target_value;
+        int m_previous_value;
 
     public:
 
@@ -58,22 +58,17 @@ namespace GUIEngine
         virtual ~ProgressBarWidget();
 
         /** Change the value of the widget, it must be a percent. */
-        void setValue(float value);
+        void setValue(int value);
 
         /** Change the value of the widget smooth, it must be a percent. */
-        void moveValue(float value);
+        void moveValue(int value);
 
         virtual void update(float delta);
 
         void add();
 
-        // --------------------------------------------------------------------
         /** Get the current value of the widget. */
-        float getValue() {return m_value; };
-        // --------------------------------------------------------------------
-        /** Sets if the current fraction is shown as a percentage value
-         *  in the progress bar. */
-        void showLabel(bool show_label) { m_show_label = show_label; }
+        int getValue() {return m_value; };
 
     };
 }

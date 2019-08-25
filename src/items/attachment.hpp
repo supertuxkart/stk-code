@@ -19,16 +19,12 @@
 #ifndef HEADER_ATTACHMENT_HPP
 #define HEADER_ATTACHMENT_HPP
 
+#include "config/stk_config.hpp"
 #include "items/attachment_plugin.hpp"
 #include "utils/no_copy.hpp"
-#include "utils/types.hpp"
 
+#include <IAnimatedMeshSceneNode.h>
 using namespace irr;
-
-namespace irr
-{
-    namespace scene { class IAnimatedMeshSceneNode; }
-}
 
 class AbstractKart;
 class BareNetworkString;
@@ -48,7 +44,7 @@ class SFXBase;
  *  a scene node).
  *  \ingroup items
  */
-class Attachment: public NoCopy
+class Attachment: public NoCopy, public scene::IAnimationEndCallBack
 {
 public:
     // Some loop in attachment.cpp depend on ATTACH_FIRST and ATTACH_MAX.
@@ -57,7 +53,7 @@ public:
     enum AttachmentType
     {
         ATTACH_FIRST = 0,
-        // It is important that parachute, bomb and anvil stay in this order,
+        // It is importabt that parachute, bomb and anvil stay in this order,
         // since the attachment type is mapped to a random integer (and bomb
         // must be last, since a bomb will not be given in battle mode).
         ATTACH_PARACHUTE = 0,
@@ -79,20 +75,17 @@ private:
     /** Attachment type. */
     AttachmentType  m_type;
 
-    /** Graphical Attachment type (comparing in updateGraphics). */
-    AttachmentType m_graphical_type;
-
     /** Kart the attachment is attached to. */
     AbstractKart   *m_kart;
 
     /** Time left till attachment expires. */
     int16_t         m_ticks_left;
 
-    /** For parachutes only, stored in cm/s for networking. */
-    int16_t         m_initial_speed;
+    /** For parachutes only. */
+    float           m_initial_speed;
 
     /** For zoom-in animation */
-    int             m_scaling_end_ticks;
+    float           m_node_scale;
 
     /** Scene node of the attachment, which will be attached to the kart's
      *  scene node. */
@@ -109,13 +102,13 @@ private:
     /** Ticking sound for the bomb */
     SFXBase          *m_bomb_sound;
 
-    /** Sound for exploding bubble gum shield */
+    /** Soung for exploding bubble gum shield */
     SFXBase          *m_bubble_explode_sound;
 
 public:
           Attachment(AbstractKart* kart);
          ~Attachment();
-    void  clear();
+    void  clear ();
     void  hitBanana(ItemState *item);
     void  updateGraphics(float dt);
 
@@ -123,6 +116,7 @@ public:
     void  handleCollisionWithKart(AbstractKart *other);
     void  set (AttachmentType type, int ticks,
                AbstractKart *previous_kart=NULL,
+               bool disable_swatter_animation = false,
                bool set_by_rewind_parachute = false);
     void rewindTo(BareNetworkString *buffer);
     void saveState(BareNetworkString *buffer) const;
@@ -151,11 +145,16 @@ public:
     /** Return the currently associated scene node (used by e.g the swatter) */
     scene::IAnimatedMeshSceneNode* getNode() {return m_node;}
     // ------------------------------------------------------------------------
-    void reset()
-    {
-        clear();
-        m_scaling_end_ticks = -1;
-    }
+    /** Implement IAnimatedMeshSceneNode */
+    virtual void OnAnimationEnd(scene::IAnimatedMeshSceneNode* node);
+    // ------------------------------------------------------------------------
+    /** Nothing to undo when going back during a rewind, the full state info
+     *  will take care of creating the right attachment. */
+    virtual void undo(BareNetworkString *buffer) { }
+    // ------------------------------------------------------------------------
+    float getInitialSpeed() const                   { return m_initial_speed; }
+    // ------------------------------------------------------------------------
+    void setInitialSpeed(float speed)              { m_initial_speed = speed; }
 
 };   // Attachment
 

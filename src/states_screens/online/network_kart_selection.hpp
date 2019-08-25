@@ -21,36 +21,16 @@
 #include "states_screens/kart_selection.hpp"
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine
-{
-    class ProgressBarWidget;
-}
-
 #include <set>
 
 class NetworkKartSelectionScreen : public KartSelectionScreen,
                   public GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>
 {
-private:
-    /** Pointer to progress bar widget which is used as a timer 
-     *  (going backwards). */
-    GUIEngine::ProgressBarWidget *m_timer;
-
     friend class GUIEngine::ScreenSingleton<NetworkKartSelectionScreen>;
 
-    bool m_live_join;
-
-    bool m_all_players_done;
-
-    uint64_t m_exit_timeout;
 protected:
     // ------------------------------------------------------------------------
-    NetworkKartSelectionScreen() 
-                        : KartSelectionScreen("online/network_karts.stkgui")
-    {
-        m_live_join = false;
-        m_all_players_done = false;
-    }
+    NetworkKartSelectionScreen() : KartSelectionScreen("karts.stkgui") {}
     // ------------------------------------------------------------------------
     ~NetworkKartSelectionScreen() {}
     // ------------------------------------------------------------------------
@@ -62,13 +42,8 @@ private:
     // ------------------------------------------------------------------------
     virtual bool isIgnored(const std::string& ident) const OVERRIDE
            { return m_available_karts.find(ident) == m_available_karts.end(); }
-    // ------------------------------------------------------------------------
-    void updateProgressBarText();
 
 public:
-    /** \brief Implement per-frame callback. */
-    virtual void onUpdate(float dt) OVERRIDE;
-
     // ------------------------------------------------------------------------
     void setAvailableKartsFromServer(const std::set<std::string>& k)
                                                      { m_available_karts = k; }
@@ -79,8 +54,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool playerQuit(StateManager::ActivePlayer* player) OVERRIDE
                                                                { return true; }
-    // ------------------------------------------------------------------------
-    void setLiveJoin(bool val)                           { m_live_join = val; }
+
 };
 
 #endif // NETWORK_KART_SELECTION_HPP

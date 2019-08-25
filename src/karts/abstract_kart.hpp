@@ -75,18 +75,8 @@ private:
     /** Index of kart in world. */
     unsigned int m_world_kart_id;
 
-    /** Name of the kart with translation. */
-    core::stringw m_name;
-
-    // ------------------------------------------------------------------------
-    void loadKartProperties(const std::string& new_ident,
-                            PerPlayerDifficulty difficulty,
-                            std::shared_ptr<RenderInfo> ri);
-protected:
     btTransform m_starting_transform;
-
-    int m_live_join_util;
-
+protected:
     /** The kart properties. */
     std::unique_ptr<KartProperties> m_kart_properties;
 
@@ -96,10 +86,10 @@ protected:
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
      *  is used more than once. */
-    std::unique_ptr<KartModel> m_kart_model;
+    KartModel*   m_kart_model;
 
     /** Handles the attachment the kart might have. */
-    std::unique_ptr<Attachment> m_attachment;
+    Attachment  *m_attachment;
 
     /** The kart controls (e.g. steering, fire, ...). */
     KartControl  m_controls;
@@ -116,10 +106,7 @@ public:
                                 PerPlayerDifficulty difficulty,
                                 std::shared_ptr<RenderInfo> ri);
     virtual       ~AbstractKart();
-    // ------------------------------------------------------------------------
-    /** Returns a name to be displayed for this kart. */
-    const core::stringw& getName() const                     { return m_name; }
-    // ------------------------------------------------------------------------
+    virtual core::stringw getName() const;
     virtual void   reset();
     virtual void   init(RaceManager::KartType type) = 0;
     // ========================================================================
@@ -140,11 +127,7 @@ public:
     /** Returns the kart properties of this kart. */
     const KartProperties* getKartProperties() const
                             { return m_kart_properties.get(); }
-    // ========================================================================
-    /** Change to new kart instancely (used in network live join). */
-    virtual void changeKart(const std::string& new_ident,
-                            PerPlayerDifficulty difficulty,
-                            std::shared_ptr<RenderInfo> ri);
+
     // ========================================================================
     // Access to the per-player difficulty.
     // ------------------------------------------------------------------------
@@ -177,16 +160,16 @@ public:
     // Attachment related functions.
     // ------------------------------------------------------------------------
     /** Returns the current attachment. */
-    const Attachment* getAttachment() const {return m_attachment.get(); }
+    const Attachment* getAttachment() const {return m_attachment; }
     // ------------------------------------------------------------------------
     /** Returns the current attachment, non-const version. */
-    Attachment*    getAttachment() {return m_attachment.get(); }
+    Attachment*    getAttachment() {return m_attachment; }
 
     // ========================================================================
     // Access to the graphical kart model.
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
-    KartModel* getKartModel() const { return m_kart_model.get();      }
+    KartModel* getKartModel() const { return m_kart_model;      }
     // ------------------------------------------------------------------------
     /** Returns the length of the kart. */
     float getKartLength() const { return m_kart_length; }
@@ -517,7 +500,7 @@ public:
     // -------------------------------------------------------------------------
     /** Set a text that is displayed on top of a kart.
      */
-    virtual void setOnScreenText(const core::stringw& text) = 0;
+    virtual void setOnScreenText(const wchar_t *text) = 0;
     // ------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const = 0;
@@ -530,7 +513,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) = 0;
     // ------------------------------------------------------------------------
-    virtual bool isVisible() const = 0;
+    virtual bool isVisible() = 0;
     // ------------------------------------------------------------------------
     virtual void makeKartRest();
     // ------------------------------------------------------------------------
@@ -541,10 +524,6 @@ public:
     virtual float getStartupBoostFromStartTicks(int ticks) const = 0;
     // ------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const = 0;
-    // ------------------------------------------------------------------------
-    int getLiveJoinUntilTicks() const              { return m_live_join_util; }
-    // ------------------------------------------------------------------------
-    void setLiveJoinKart(int util_ticks)     { m_live_join_util = util_ticks; }
 };   // AbstractKart
 
 

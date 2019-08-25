@@ -40,9 +40,8 @@
 #include "network/network_config.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "utils/log.hpp"
-#include "utils/random_generator.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "utils/random_generator.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
@@ -1530,7 +1529,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         }
         else
         {
-            w->addItem(prop->getName(),
+            w->addItem(translations->fribidize(prop->getName()),
                        prop->getIdent(),
                        prop->getAbsoluteIconFile(), 0,
                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);

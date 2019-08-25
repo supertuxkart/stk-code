@@ -75,12 +75,6 @@ bool EventHandler::OnEvent (const SEvent &event)
 
     if(!Debug::onEvent(event))
         return false;
-        
-    if (ScreenKeyboard::isActive())
-    {
-        if (ScreenKeyboard::getCurrent()->onEvent(event))
-            return true; // EVENT_BLOCK
-    }
     
     // TO DEBUG HATS (when you don't actually have a hat)
     /*
@@ -176,7 +170,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         if (cmd == APP_CMD_PAUSE || cmd == APP_CMD_LOST_FOCUS)
         {
             // Make sure that pause/unpause is executed only once
-            if (music_manager && device->isWindowMinimized() == device->isWindowFocused())
+            if (device->isWindowMinimized() == device->isWindowFocused())
             {
                 music_manager->pauseMusic();
                 SFXManager::get()->pauseAll();
@@ -184,7 +178,7 @@ bool EventHandler::OnEvent (const SEvent &event)
         }
         else if (cmd == APP_CMD_RESUME || cmd == APP_CMD_GAINED_FOCUS)
         {
-            if (music_manager && device->isWindowActive())
+            if (device->isWindowActive())
             {
                 music_manager->resumeMusic();
                 SFXManager::get()->resumeAll();
@@ -404,22 +398,16 @@ void EventHandler::sendNavigationEvent(const NavigationDirection nav, const int 
 {
     Widget* w = GUIEngine::getFocusForPlayer(playerID);
     
-    if (w != NULL)
+    if (ScreenKeyboard::isActive() && 
+        !ScreenKeyboard::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
     {
-        if (ScreenKeyboard::isActive())
-        {
-            if (!ScreenKeyboard::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
-            {
-                w = NULL;
-            }
-        }
-        else if (ModalDialog::isADialogActive())
-        {
-            if (!ModalDialog::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
-            {
-                w = NULL;
-            }
-        }
+        w = NULL;
+    }
+    
+    if (ModalDialog::isADialogActive() && 
+        !ModalDialog::getCurrent()->isMyIrrChild(w->getIrrlichtElement()))
+    {
+        w = NULL;
     }
     
     if (w == NULL)
@@ -638,7 +626,7 @@ int EventHandler::findIDClosestWidget(const NavigationDirection nav, const int p
             // If w's left/right-mosts points are between w_test's,
             // right_offset and left_offset will be 0.
             // If w_test's are between w's,
-            // we subtract the smaller from the bigger
+            // we substract the smaller from the bigger
             // else, the smaller is 0 and we keep the bigger
             int right_offset = std::max(0, w_test->m_x - w->m_x);
             int left_offset  = std::max(0, (w->m_x + w->m_w) - rightmost);
@@ -852,9 +840,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 if (w == NULL) break;
                 if (!w->isActivated())
                 {
-                    // Some dialog in overworld could have deactivated widget, and no current screen in overworld
-                    if (GUIEngine::getCurrentScreen())
-                        GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
+                    GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
                     return EVENT_BLOCK;
                 }
 
@@ -916,7 +902,10 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                     if (ribbon == NULL) break;
 
                     // give the mouse "game master" priviledges
-                    const int playerID = PLAYER_ID_GAME_MASTER;
+                    const int playerID = PLAYER_ID_GAME_MASTER; //input_manager->getPlayerKeyboardID();
+
+                    if (playerID == -1) break;
+                    if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
 
                     ribbon->mouseHovered(w, playerID);
                     if (ribbon->m_event_handler != NULL) ribbon->m_event_handler->mouseHovered(w, playerID);
@@ -926,7 +915,9 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
                 {
                     // focus on hover for other widgets
                     // give the mouse "game master" priviledges
-                    const int playerID = PLAYER_ID_GAME_MASTER;
+                    const int playerID = PLAYER_ID_GAME_MASTER; //input_manager->getPlayerKeyboardID();
+                    if (input_manager->masterPlayerOnly() && playerID != PLAYER_ID_GAME_MASTER) break;
+                    if (playerID != -1)
                     {
                         // lists don't like that combined with scrollbars
                         // (FIXME: find why instead of working around)

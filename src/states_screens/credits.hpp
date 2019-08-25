@@ -73,7 +73,7 @@ public:
 
     /** \brief implement optional callback from parent class
      *  GUIEngine::Screen */
-    void onDraw(float dt) OVERRIDE;
+    void onUpdate(float dt) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     void init() OVERRIDE;

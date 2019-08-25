@@ -49,9 +49,9 @@ public:
     // ------------------------------------------------------------------------
     const FontSettings* getFontSettings() const     { return m_font_settings; }
     // ------------------------------------------------------------------------
-    virtual void setScale(float scale);
+    void setScale(float scale);
     // ------------------------------------------------------------------------
-    virtual float getScale() const;
+    float getScale() const;
     // ------------------------------------------------------------------------
     void setShadow(const irr::video::SColor &col);
     // ------------------------------------------------------------------------
@@ -65,6 +65,8 @@ public:
     // ------------------------------------------------------------------------
     void disableColoredBorder();
     // ------------------------------------------------------------------------
+    void updateRTL();
+    // ------------------------------------------------------------------------
     void draw(const core::stringw& text, const core::rect<s32>& position,
               const video::SColor& color, bool hcenter,
               bool vcenter, const core::rect<s32>* clip,
@@ -76,25 +78,8 @@ public:
                       video::SColor color, bool hcenter = false,
                       bool vcenter = false, const core::rect<s32>* clip = 0);
     // ------------------------------------------------------------------------
-    virtual void drawQuick(const core::stringw& text,
-                           const core::rect<s32>& position,
-                           video::SColor color, bool hcenter = false,
-                           bool vcenter = false,
-                           const core::rect<s32>* clip = 0);
-    // ------------------------------------------------------------------------
-    virtual void draw(const std::vector<GlyphLayout>& gls,
-                      const core::rect<s32>& position,
-                      video::SColor color, bool hcenter = false,
-                      bool vcenter = false, const core::rect<s32>* clip = 0);
-    // ------------------------------------------------------------------------
-   virtual void initGlyphLayouts(const core::stringw& text,
-                                 std::vector<GlyphLayout>& gls,
-                                std::vector<std::u32string>* line_data = NULL);
-    // ------------------------------------------------------------------------
     /** returns the dimension of a text */
     virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
-    // ------------------------------------------------------------------------
-    virtual s32 getHeightPerLine() const;
     // ------------------------------------------------------------------------
     /** Calculates the index of the character in the text which is on a
      * specific position. */
@@ -106,8 +91,8 @@ public:
     /** gets the sprite bank */
     virtual IGUISpriteBank* getSpriteBank() const;
     // ------------------------------------------------------------------------
-    /** returns the sprite number from a given character, unused in STK */
-    virtual u32 getSpriteNoFromChar(const wchar_t *c) const       { return 0; }
+    /** returns the sprite number from a given character */
+    virtual u32 getSpriteNoFromChar(const wchar_t *c) const;
     // ------------------------------------------------------------------------
     // Below is not used:
     /** set an Pixel Offset on Drawing ( scale position on width ) */
@@ -123,8 +108,6 @@ public:
     virtual s32 getKerningHeight() const                          { return 0; }
     // ------------------------------------------------------------------------
     virtual void setInvisibleCharacters( const wchar_t *s ) {}
-    // ------------------------------------------------------------------------
-    virtual f32 getInverseShaping() const;
 
 };
 

@@ -61,8 +61,9 @@ public:
     enum AssetType {ASSET_MIN,
                     CHALLENGE=ASSET_MIN,
                     GFX, GRANDPRIX, GUI_ICON, GUI_SCREEN, GUI_DIALOG,
-                    REPLAY, SHADER, SKIN,  TTF, TRANSLATION, BUILTIN_ASSETS=TRANSLATION,
-                    LIBRARY, MODEL, MUSIC, SFX, TEXTURE, SCRIPT, ASSET_MAX = SCRIPT,
+                    LIBRARY, MODEL, MUSIC, REPLAY,
+                    SCRIPT, SFX, SHADER, SKIN, TEXTURE, TTF,
+                    TRANSLATION, ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
 
 private:
@@ -85,7 +86,7 @@ private:
 
     /** Name of stdout file. */
     static std::string m_stdout_filename;
-
+    
     /** Directory of stdout file. */
     static std::string m_stdout_dir;
 
@@ -101,11 +102,7 @@ private:
     /** Directory where user-defined grand prix are stored. */
     std::string       m_gp_dir;
 
-    /** Location of the certificate bundle. */
-    std::string       m_cert_bundle_location;
-
-    /** Mobile stk specific to download stk-assets in the first. */
-    std::string       m_stk_assets_download_dir;
+    std::string       m_cert_location;
 
     std::vector<TextureSearchPath> m_texture_search_path;
 
@@ -130,8 +127,6 @@ private:
     void              checkAndCreateCachedTexturesDir();
     void              checkAndCreateGPDir();
     void              discoverPaths();
-    void              addAssetsSearchPath();
-    void              resetSubdir();
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
     std::string       checkAndCreateLinuxDir(const char *env_name,
                                              const char *dir_name,
@@ -143,7 +138,6 @@ public:
                       FileManager();
                      ~FileManager();
     void              init();
-    void              reinitAfterDownloadAssets();
     static void       addRootDirs(const std::string &roots);
     static void       setStdoutName(const std::string &name);
     static void       setStdoutDir(const std::string &dir);
@@ -183,7 +177,7 @@ public:
     std::string getUserConfigFile(const std::string& fname) const;
     bool        fileExists(const std::string& path) const;
     // ------------------------------------------------------------------------
-    /** Convenience function to save some typing in the
+    /** Convenience function to save some typing in the 
      *  file manager constructor. */
     bool        fileExists(const char *prefix, const std::string& path) const
     {
@@ -222,7 +216,7 @@ public:
         m_music_search_path.push_back(path);
     }   // pushMusicSearchPath
     // ------------------------------------------------------------------------
-    /** Returns the full path to a shader (this function could be modified
+    /** Returns the full path to a shader (this function could be modified 
      *  later to allow track-specific shaders).
      *  \param name Name of the shader.
      */
@@ -231,18 +225,12 @@ public:
         return getAsset(SHADER, name);
 
     }   // getShader
-
+    
     std::string getShadersDir() const
     {
         return m_subdir_name[SHADER];
     }
-    // ------------------------------------------------------------------------
-    const std::string& getSTKAssetsDownloadDir() const
-                                          { return m_stk_assets_download_dir; }
-    // ------------------------------------------------------------------------
-    const std::string& getCertBundleLocation() const
-                                             { return m_cert_bundle_location; }
-
+    const std::string& getCertLocation() const { return m_cert_location; }
 };   // FileManager
 
 extern FileManager* file_manager;

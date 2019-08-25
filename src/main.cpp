@@ -251,7 +251,6 @@
 #include "utils/log.hpp"
 #include "utils/mini_glm.hpp"
 #include "utils/profiler.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
@@ -569,7 +568,7 @@ void cmdLineHelp()
     "                          for battle server and --soccer-timed / goals for soccer server\n"
     "                          to control verbosely, see below:\n"
     "       --difficulty=N     N=0 Beginner, N=1 Intermediate, N=2 Expert, N=3 SuperTux.\n"
-    "       --battle-mode=n    Specify battle mode in network, 0 is Free-For-All and\n"
+    "       --battle-mode=n    Specify battle mode in netowrk, 0 is Free-For-All and\n"
     "                          1 is Capture The Flag.\n"
     "       --soccer-timed     Use time limit mode in network soccer game.\n"
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"
@@ -684,14 +683,6 @@ void cmdLineHelp()
     "       --apitrace          This will disable buffer storage and\n"
     "                           writing gpu query strings to opengl, which\n"
     "                           can be seen later in apitrace.\n"
-#if defined(__linux__) || defined(__FreeBSD__)
-    "\n"
-    "Environment variables:\n"
-    "       IRR_DEVICE_TYPE=[x11, wayland] Force x11/wayland device\n"
-    "       IRR_DISABLE_NETWM=1            Force to use legacy fullscreen\n"
-    "       IRR_VIDEO_OUTPUT=output_name   Force to use selected monitor for\n"
-    "                                      fullscreen window, eg. HDMI-0\n"
-#endif
     "\n"
     "You can visit SuperTuxKart's homepage at "
     "https://supertuxkart.net\n\n",
@@ -1058,12 +1049,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
     bool can_wan = false;
     if (!login.empty() && !password.empty())
     {
-        if (!PlayerManager::getCurrentPlayer())
-        {
-            Log::error("Main", "Run supertuxkart with --init-user");
-            cleanSuperTuxKart();
-            return false;
-        }
         irr::core::stringw s;
         PlayerManager::requestSignIn(login, password);
         while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
@@ -1668,19 +1653,6 @@ void initUserConfig()
 }   // initUserConfig
 
 //=============================================================================
-void clearGlobalVariables()
-{
-    // In android sometimes global variables is not reset when restart the app
-    // we clear it here as much as possible
-    race_manager = NULL;
-    music_manager = NULL;
-    irr_driver = NULL;
-#ifdef ENABLE_WIIUSE
-    wiimote_manager = NULL;
-#endif
-}   // clearGlobalVariables
-
-//=============================================================================
 void initRest()
 {
     SP::setMaxTextureSize();
@@ -1709,24 +1681,14 @@ void initRest()
     font_manager = new FontManager();
     font_manager->loadFonts();
     GUIEngine::init(device, driver, StateManager::get());
-    input_manager = new InputManager();
-    // Get into menu mode initially.
-    input_manager->setMode(InputManager::MENU);
 
-    stk_config->initMusicFiles();
     // This only initialises the non-network part of the add-ons manager. The
     // online section of the add-ons manager will be initialised from a
     // separate thread running in network HTTP.
 #ifndef SERVER_ONLY
     addons_manager = NULL;
     if (!ProfileWorld::isNoGraphics())
-    {
-        // Need to load shader after downloading assets as it reads prefilled
-        // textures
-        if (CVS->isGLSL())
-            SP::loadShaders();
         addons_manager = new AddonsManager();
-    }
 #endif
     Online::ProfileManager::create();
 
@@ -1836,21 +1798,17 @@ void askForInternetPermission()
         }   // onCancel
     };   // ConfirmServer
 
-    MessageDialog *dialog =
+    GUIEngine::ModalDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
         "to download add-ons and notify you of updates. We also collect "
         "anonymous hardware statistics to help with the development of STK. "
         "Please read our privacy policy at http://privacy.supertuxkart.net. "
         "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
-        "'General', and edit \"Connect to the "
+        "'User Interface', and edit \"Connect to the "
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.7f, 0.7f);
-
-    // Changes the default focus to be 'cancel' ('ok' as default is not
-    // GDPR compliant, see #3378).
-    dialog->setFocusCancel();
     GUIEngine::DialogQueue::get()->pushDialog(dialog, false);
 }   // askForInternetPermission
 
@@ -1881,13 +1839,8 @@ void main_abort()
 #endif
 
 // ----------------------------------------------------------------------------
-#ifdef IOS_STK
-int ios_main(int argc, char *argv[])
-#else
-int main(int argc, char *argv[])
-#endif
+int main(int argc, char *argv[] )
 {
-    clearGlobalVariables();
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
@@ -1988,10 +1941,14 @@ int main(int argc, char *argv[])
             profiler.init();
         initRest();
 
+        input_manager = new InputManager ();
+
 #ifdef ENABLE_WIIUSE
         wiimote_manager = new WiimoteManager();
 #endif
 
+        // Get into menu mode initially.
+        input_manager->setMode(InputManager::MENU);
         int parent_pid;
         bool has_parent_process = false;
         if (CommandLine::has("--parent-process", &parent_pid))
@@ -2005,9 +1962,6 @@ int main(int argc, char *argv[])
 
         // Preload the explosion effects (explode.png)
         ParticleKindManager::get()->getParticles("explosion.xml");
-        ParticleKindManager::get()->getParticles("explosion_bomb.xml");
-        ParticleKindManager::get()->getParticles("explosion_cake.xml");
-        ParticleKindManager::get()->getParticles("jump_explosion.xml");
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "options_video.png"));
@@ -2113,21 +2067,18 @@ int main(int argc, char *argv[])
                 Log::warn("main", "Screen size is too small!");
             }
             
-            #ifdef MOBILE_STK
+            #ifdef ANDROID
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {
-                #ifdef ANDROID
                 int32_t touch = AConfiguration_getTouchscreen(
                                                     global_android_app->config);
+                
                 if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
                 {
-                #endif
                     InitAndroidDialog* init_android = new InitAndroidDialog(
                                                                     0.6f, 0.6f);
                     GUIEngine::DialogQueue::get()->pushDialog(init_android);
-                #ifdef ANDROID
                 }
-                #endif
             }
             #endif
 
@@ -2146,7 +2097,7 @@ int main(int argc, char *argv[])
             }
             else if (!CVS->isGLSL())
             {
-                #if !defined(MOBILE_STK)
+                #if !defined(ANDROID)
                 if (UserConfigParams::m_old_driver_popup)
                 {
                     #ifdef USE_GLES2
@@ -2154,12 +2105,13 @@ int main(int argc, char *argv[])
                     #else
                     irr::core::stringw version = "OpenGL 3.3";
                     #endif
-                    MessageDialog *dialog = new MessageDialog(_(
-                        "Your graphics driver appears to be very old. Please "
-                        "check if an update is available. SuperTuxKart "
-                        "recommends a driver supporting %s or better. The game "
-                        "will likely still run, but in a reduced-graphics mode.",
-                        version), /*from queue*/ true);
+                    MessageDialog *dialog =
+                        new MessageDialog(_("Your OpenGL version appears to be "
+                                            "too old. Please verify if an "
+                                            "update for your video driver is "
+                                            "available. SuperTuxKart requires "
+                                            "%s or better.", version), 
+                                            /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
                 #endif
@@ -2337,7 +2289,7 @@ int main(int argc, char *argv[])
 #ifdef WIN32
 //routine for running under windows
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-                     LPSTR lpCmdLine, int nCmdShow)
+                     LPTSTR lpCmdLine, int nCmdShow)
 {
     return main(__argc, __argv);
 }
@@ -2356,10 +2308,8 @@ static void cleanSuperTuxKart()
 
     // Stop music (this request will go into the sfx manager queue, so it needs
     // to be done before stopping the thread).
-    if (music_manager)
-        music_manager->stopMusic();
-    if (SFXManager::get())
-        SFXManager::get()->stopThread();
+    music_manager->stopMusic();
+    SFXManager::get()->stopThread();
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();
@@ -2398,8 +2348,7 @@ static void cleanSuperTuxKart()
     if (!ProfileWorld::isNoGraphics())
     {
         if (UserConfigParams::m_internet_status == Online::RequestManager::
-            IPERM_ALLOWED && NewsManager::isRunning() &&
-            !NewsManager::get()->waitForReadyToDeleted(2.0f))
+            IPERM_ALLOWED && !NewsManager::get()->waitForReadyToDeleted(2.0f))
         {
             Log::info("Thread", "News manager not stopping, exiting anyway.");
         }
@@ -2407,20 +2356,16 @@ static void cleanSuperTuxKart()
     }
 #endif
 
-    if (Online::RequestManager::isRunning())
+    if (Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
     {
-        if (Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
-        {
-            Online::RequestManager::deallocate();
-        }
-        else
-        {
-            Log::warn("Thread", "Request Manager not aborting in time, proceeding without cleanup.");
-        }
+        Online::RequestManager::deallocate();
+    }
+    else
+    {
+        Log::warn("Thread", "Request Manager not aborting in time, proceeding without cleanup.");
     }
 
-    if (SFXManager::get() &&
-        !SFXManager::get()->waitForReadyToDeleted(2.0f))
+    if (!SFXManager::get()->waitForReadyToDeleted(2.0f))
     {
         Log::info("Thread", "SFXManager not stopping, exiting anyway.");
     }
@@ -2476,8 +2421,6 @@ void runUnitTests()
     NetworkString::unitTesting();
     Log::info("UnitTest", "TransportAddress");
     TransportAddress::unitTesting();
-    Log::info("UnitTest", "StringUtils::versionToInt");
-    StringUtils::unitTesting();
 
     Log::info("UnitTest", "Easter detection");
     // Test easter mode: in 2015 Easter is 5th of April - check with 0 days
@@ -2524,6 +2467,71 @@ void runUnitTests()
 
     Log::info("UnitTest", "RewindQueue");
     RewindQueue::unitTesting();
+
+    Log::info("UnitTest", "IP ban");
+    NetworkConfig::get()->unsetNetworking();
+    ServerLobby sl;
+    sl.setSaveServerConfig(false);
+
+    ServerConfig::m_server_ip_ban_list =
+        {
+            { "1.2.3.4/32", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.4")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.3.5")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.3.3")));
+
+    ServerConfig::m_server_ip_ban_list =
+        {
+            { "1.2.3.4/23", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(!sl.isBannedForIP(TransportAddress("1.2.1.255")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.0")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.3")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.4")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.2.5")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.3")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.4")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.5")));
+    assert(sl.isBannedForIP(TransportAddress("1.2.3.255")));
+    assert(!sl.isBannedForIP(TransportAddress("1.2.4.0")));
+
+    ServerConfig::m_server_ip_ban_list =
+        {
+            { "11.12.13.14/22", std::numeric_limits<uint32_t>::max() },
+            { "12.13.14.15/24", std::numeric_limits<uint32_t>::max() },
+            { "123.234.56.78/26", std::numeric_limits<uint32_t>::max() },
+            { "234.123.56.78/25", std::numeric_limits<uint32_t>::max() },
+            // Test for overlap handling
+            { "12.13.14.23/32", std::numeric_limits<uint32_t>::max() },
+            { "12.13.14.255/32", std::numeric_limits<uint32_t>::max() }
+        };
+    sl.updateBanList();
+    assert(!sl.isBannedForIP(TransportAddress("11.12.11.255")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.12.0")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.13.14")));
+    assert(sl.isBannedForIP(TransportAddress("11.12.15.255")));
+    assert(!sl.isBannedForIP(TransportAddress("11.12.16.0")));
+
+    assert(!sl.isBannedForIP(TransportAddress("12.13.13.255")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.0")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.15")));
+    assert(sl.isBannedForIP(TransportAddress("12.13.14.255")));
+    assert(!sl.isBannedForIP(TransportAddress("12.13.15.0")));
+
+    assert(!sl.isBannedForIP(TransportAddress("123.234.56.63")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.64")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.78")));
+    assert(sl.isBannedForIP(TransportAddress("123.234.56.127")));
+    assert(!sl.isBannedForIP(TransportAddress("123.234.56.128")));
+
+    assert(!sl.isBannedForIP(TransportAddress("234.123.55.255")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.0")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.78")));
+    assert(sl.isBannedForIP(TransportAddress("234.123.56.127")));
+    assert(!sl.isBannedForIP(TransportAddress("234.123.56.128")));
 
     Log::info("UnitTest", "=====================");
     Log::info("UnitTest", "Testing successful   ");

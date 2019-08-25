@@ -1478,7 +1478,6 @@ namespace video
 		*/
 		virtual void convertColor(const void* sP, ECOLOR_FORMAT sF, s32 sN,
 				void* dP, ECOLOR_FORMAT dF) const =0;
-		virtual u32 getDefaultFramebuffer() const =0;
 	};
 
 } // end namespace video

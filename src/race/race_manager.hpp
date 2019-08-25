@@ -32,6 +32,7 @@
 
 #include "network/remote_kart_info.hpp"
 #include "race/grand_prix_data.hpp"
+#include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 
 class AbstractKart;
@@ -175,7 +176,33 @@ public:
     }   // getIconOf
 
     // ------------------------------------------------------------------------
-    static const core::stringw getNameOf(const MinorRaceModeType mode);
+    /** Returns a (translated) name of a minor race mode.
+     *  \param mode Minor race mode.
+     */
+    static const core::stringw getNameOf(const MinorRaceModeType mode)
+    {
+        switch (mode)
+        {
+            //I18N: Game mode
+            case MINOR_MODE_NORMAL_RACE:    return _("Normal Race");
+            //I18N: Game mode
+            case MINOR_MODE_TIME_TRIAL:     return _("Time Trial");
+            //I18N: Game mode
+            case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
+            //I18N: Game mode
+            case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
+            //I18N: Game mode
+            case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");
+            //I18N: Game mode
+            case MINOR_MODE_CAPTURE_THE_FLAG: return _("Capture The Flag");
+            //I18N: Game mode
+            case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
+            //I18N: Game mode
+            case MINOR_MODE_SOCCER:         return _("Soccer");
+            default: assert(false); return L"";
+        }
+    }   // getNameOf
+
     // ------------------------------------------------------------------------
     /** Returns if the currently set minor game mode can be used by the AI. */
     bool hasAI()
@@ -227,8 +254,7 @@ public:
                           DIFFICULTY_HARD,
                           DIFFICULTY_BEST,
                           DIFFICULTY_LAST = DIFFICULTY_BEST,
-                          DIFFICULTY_COUNT,
-                          DIFFICULTY_NONE};
+                          DIFFICULTY_COUNT};
 
     /** Different kart types: A local player, a player connected via network,
      *  an AI kart, the leader kart (currently not used), a ghost kart and
@@ -270,8 +296,7 @@ public:
         bool        m_boosted_ai;
         /** The difficulty for this player. */
         PerPlayerDifficulty m_difficulty;
-        /** Kart color of player (used in gp win / lose screen). */
-        float       m_color;
+
         KartStatus(const std::string& ident, const int& prev_finish_pos,
                    int local_player_id, int global_player_id,
                    int init_gp_rank, KartType kt,
@@ -282,7 +307,7 @@ public:
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
                    m_gp_rank(init_gp_rank), m_difficulty(difficulty)
-                { m_boosted_ai = false; m_color = 0.0f; }
+                { m_boosted_ai = false; }
 
     };   // KartStatus
 private:
@@ -331,8 +356,6 @@ private:
     unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
-    unsigned                         m_flag_return_ticks;
-    unsigned                         m_flag_deactivated_ticks;
     int                              m_coin_target;
     float                            m_time_target;
     int                              m_goal_target;
@@ -480,7 +503,7 @@ public:
         m_time_target = time;
     }   // setTimeTarget
     // ------------------------------------------------------------------------
-    RemoteKartInfo& getKartInfo(unsigned int n)
+    const RemoteKartInfo& getKartInfo(unsigned int n) const
     {
         return m_player_karts[n];
     }   // getKartInfo
@@ -575,7 +598,19 @@ public:
     }   // getDifficultyAsString
 
     // ------------------------------------------------------------------------
-    core::stringw getDifficultyName(Difficulty diff) const;
+    /** Returns the specified difficulty as a string. */
+    core::stringw getDifficultyName(Difficulty diff) const
+    {
+        switch (diff)
+        {
+        case RaceManager::DIFFICULTY_EASY:   return _("Novice");   break;
+        case RaceManager::DIFFICULTY_MEDIUM: return _("Intermediate"); break;
+        case RaceManager::DIFFICULTY_HARD:   return _("Expert");   break;
+        case RaceManager::DIFFICULTY_BEST:   return _("SuperTux");   break;
+        default:  assert(false);
+        }
+        return "";
+    }   // getDifficultyName
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------
@@ -636,16 +671,6 @@ public:
     {
         return m_kart_status[kart].m_boosted_ai;
     }   // getKartRaceTime
-    // ------------------------------------------------------------------------
-    void setKartColor(int kart, float color)
-    {
-        m_kart_status[kart].m_color = color;
-    }   // setKartColor
-    // ------------------------------------------------------------------------
-    float getKartColor(int kart) const
-    {
-        return m_kart_status[kart].m_color;
-    }   // getKartColor
     // ------------------------------------------------------------------------
     int getCoinTarget() const { return m_coin_target; }
     // ------------------------------------------------------------------------
@@ -871,25 +896,7 @@ public:
         return m_minor_mode == MINOR_MODE_SOCCER ||
             m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG;
     }
-    // ------------------------------------------------------------------------
-    void setFlagReturnTicks(unsigned ticks)    { m_flag_return_ticks = ticks; }
-    // ------------------------------------------------------------------------
-    unsigned getFlagReturnTicks() const         { return m_flag_return_ticks; }
-    // ------------------------------------------------------------------------
-    void setFlagDeactivatedTicks(unsigned ticks)
-                                          { m_flag_deactivated_ticks = ticks; }
-    // ------------------------------------------------------------------------
-    unsigned getFlagDeactivatedTicks() const
-                                           { return m_flag_deactivated_ticks; }
-    // ------------------------------------------------------------------------
-    /** Whether the current game mode allow live joining even the current game
-     *. started in network*/
-    bool supportsLiveJoining() const
-    {
-        return m_minor_mode == MINOR_MODE_SOCCER ||
-            m_minor_mode == MINOR_MODE_CAPTURE_THE_FLAG ||
-            m_minor_mode == MINOR_MODE_FREE_FOR_ALL;
-    }
+
 };   // RaceManager
 
 extern RaceManager *race_manager;

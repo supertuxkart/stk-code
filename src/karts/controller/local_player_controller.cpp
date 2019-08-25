@@ -47,7 +47,6 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 /** The constructor for a loca player kart, i.e. a player that is playing
@@ -60,7 +59,7 @@
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              const int local_player_id,
                                              PerPlayerDifficulty d)
-                     : PlayerController(kart)
+                     : PlayerController(kart), m_sky_particles_emitter(NULL)
 {
     m_has_started = false;
     m_difficulty = d;
@@ -81,7 +80,26 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
     m_unfull_sound = SFXManager::get()->getBuffer("energy_bar_unfull");
 
     m_is_above_nitro_target = false;
-    initParticleEmitter();
+
+    // Attach Particle System
+    Track *track = Track::getCurrentTrack();
+#ifndef SERVER_ONLY
+    if (UserConfigParams::m_particles_effects > 1 &&
+        track->getSkyParticles() != NULL)
+    {
+        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
+
+        m_sky_particles_emitter =
+            new ParticleEmitter(track->getSkyParticles(),
+                                core::vector3df(0.0f, 30.0f, 100.0f),
+                                m_kart->getNode(),
+                                true);
+
+        // FIXME: in multiplayer mode, this will result in several instances
+        //        of the heightmap being calculated and kept in memory
+        m_sky_particles_emitter->addHeightMapAffector(track);
+    }
+#endif
 }   // LocalPlayerController
 
 //-----------------------------------------------------------------------------
@@ -90,32 +108,10 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
 LocalPlayerController::~LocalPlayerController()
 {
     m_wee_sound->deleteSFX();
+
+    if (m_sky_particles_emitter)
+        delete m_sky_particles_emitter;
 }   // ~LocalPlayerController
-
-//-----------------------------------------------------------------------------
-void LocalPlayerController::initParticleEmitter()
-{
-    // Attach Particle System
-    m_sky_particles_emitter = nullptr;
-    Track *track = Track::getCurrentTrack();
-#ifndef SERVER_ONLY
-    if (UserConfigParams::m_particles_effects > 1 &&
-        track->getSkyParticles() != NULL)
-    {
-        track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
-
-        m_sky_particles_emitter.reset(
-            new ParticleEmitter(track->getSkyParticles(),
-                                core::vector3df(0.0f, 30.0f, 100.0f),
-                                m_kart->getNode(),
-                                true));
-
-        // FIXME: in multiplayer mode, this will result in several instances
-        //        of the heightmap being calculated and kept in memory
-        m_sky_particles_emitter->addHeightMapAffector(track);
-    }
-#endif
-}   // initParticleEmitter
 
 //-----------------------------------------------------------------------------
 /** Resets the player kart for a new or restarted race.
@@ -182,10 +178,22 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         }
     }
 
+    // Check if skid key is pressed and if turn button is in disagreement
+    // with the current steering dominant, ignore the skid key press, see #3168
+    if (action == PA_DRIFT && value != 0)
+    {
+        if ((!PlayerController::action(PA_STEER_LEFT, 0, /*dry_run*/true) &&
+            m_controls->getSteer() < 0.0f) ||
+            (!PlayerController::action(PA_STEER_RIGHT, 0, /*dry_run*/true) &&
+            m_controls->getSteer() > 0.0f))
+            return false;
+    }
+
     // If this event does not change the control state (e.g.
     // it's a (auto) repeat event), do nothing. This especially
     // optimises traffic to the server and other clients.
-    if (!PlayerController::action(action, value, /*dry_run*/true)) return false;
+    if (!PlayerController::action(action, value, /*dry_run*/true))
+        return false;
 
     // Register event with history
     if(!history->replayHistory())
@@ -194,8 +202,7 @@ bool LocalPlayerController::action(PlayerAction action, int value,
     // If this is a client, send the action to networking layer
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isClient() &&
-        !RewindManager::get()->isRewinding() &&
-        World::getWorld() && !World::getWorld()->isLiveJoinWorld())
+        !RewindManager::get()->isRewinding())
     {
         if (auto gp = GameProtocol::lock())
         {
@@ -398,6 +405,9 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
             //More sounds are played by the kart class
             //See Kart::collectedItem()
             m_kart->playSound(m_ugh_sound);
+            break;
+        case Item::ITEM_TRIGGER:
+            // no default sound for triggers
             break;
         default:
             m_kart->playSound(m_grab_sound);

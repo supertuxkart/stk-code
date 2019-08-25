@@ -12,8 +12,8 @@
 
 #if defined(_IRR_COMPILE_WITH_OSX_DEVICE_)
 #include "MacOSX/CIrrDeviceMacOSX.h"
-#elif defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-#include "CIrrDeviceiOS.h"
+#elif defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+#include "iOS/CIrrDeviceiOS.h"
 #elif _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #include "CIrrDeviceWayland.h"
 #endif
@@ -22,7 +22,7 @@
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
 
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #elif defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
@@ -52,7 +52,7 @@ namespace video
 	class COGLES2Renderer2D;
 	class COGLES2NormalMapRenderer;
 	class COGLES2ParallaxMapRenderer;
-	class IContextManager;
+
 	class COGLES2Driver : public CNullDriver, public IMaterialRendererServices, public COGLES2ExtensionHandler
 	{
 		friend class COGLES2CallBridge;
@@ -62,7 +62,7 @@ namespace video
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 		COGLES2Driver(const SIrrlichtCreationParameters& params,
 					const SExposedVideoData& data,
-					io::IFileSystem* io, IrrlichtDevice* device);
+					io::IFileSystem* io);
 #endif
 
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
@@ -75,10 +75,10 @@ namespace video
 					io::IFileSystem* io, CIrrDeviceMacOSX *device);
 #endif
 
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		COGLES2Driver(const SIrrlichtCreationParameters& params, io::IFileSystem* io,
-					IrrlichtDevice* device, u32 default_fb);
-		virtual u32 getDefaultFramebuffer() const { return m_default_fb; }
+#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+		COGLES2Driver(const SIrrlichtCreationParameters& params,
+					const SExposedVideoData& data,
+					io::IFileSystem* io, CIrrDeviceIPhone* device);
 #endif
 
 		//! destructor
@@ -340,7 +340,7 @@ namespace video
 		//! Returns an image created from the last rendered frame.
 		virtual IImage* createScreenShot(video::ECOLOR_FORMAT format=video::ECF_UNKNOWN, video::E_RENDER_TARGET target=video::ERT_FRAME_BUFFER);
 
-		//! checks if an OpenGL error has happened and prints it
+		//! checks if an OpenGL error has happend and prints it
 		bool testGLError();
 
 		//! Set/unset a clipping plane.
@@ -381,7 +381,7 @@ namespace video
 
 		//! Get bridge calls.
         COGLES2CallBridge* getBridgeCalls() const;
-
+        
 #if defined(_IRR_COMPILE_WITH_EGL_)
 		ContextManagerEGL* getEGLContext() {return EglContext;}
 #endif
@@ -473,8 +473,11 @@ namespace video
 		ContextManagerEGL* EglContext;
 		bool EglContextExternal;
 #endif
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		u32 m_default_fb;
+#if defined(_IRR_COMPILE_WITH_IPHONE_DEVICE_)
+		CIrrDeviceIPhone* Device;
+		GLuint ViewFramebuffer;
+		GLuint ViewRenderbuffer;
+		GLuint ViewDepthRenderbuffer;
 #endif
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 		HDC HDc;

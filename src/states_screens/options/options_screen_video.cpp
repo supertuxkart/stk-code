@@ -53,51 +53,79 @@ void OptionsScreenVideo::initPresets()
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* light scatter */, false /* animatedCharacters */, 1 /* particles */,
-        0 /* image_quality */, false /* depth of field */, true /* degraded IBL */
+        false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
+        false /* depth of field */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        0 /* image_quality */, false /* depth of field */, true /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
+        false /* depth of field */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        1 /* image_quality */, false /* depth of field */, true /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+        false /* depth of field */, true /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */,
-        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        1 /* image_quality */, false /* depth of field */, false /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+        false /* depth of field */, false /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */,
-        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        2 /* image_quality */, true /* depth of field */, false /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        true /* depth of field */, false /* degraded IBL */
     });
 
     m_presets.push_back
     ({
         true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */,
-        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        2 /* image_quality */, true /* depth of field */, false /* degraded IBL */
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        true /* depth of field */, false /* degraded IBL */
     });
 
 }   // initPresets
+// ----------------------------------------------------------------------------
+
+struct Resolution
+{
+    int width, height;
+
+    Resolution()
+    {
+        width = 0;
+        height = 0;
+    }
+
+    Resolution(int w, int h)
+    {
+        width = w;
+        height = h;
+    }
+
+    bool operator< (Resolution r) const
+    {
+        return width < r.width || (width == r.width && height < r.height);
+    }
+
+    float getRatio() const
+    {
+        return (float) width / height;
+    }
+};
 
 // ----------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
@@ -191,27 +219,28 @@ void OptionsScreenVideo::init()
     assert( vsync != NULL );
     vsync->setState( UserConfigParams::m_vsync );
 
+
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
-    assert(res != NULL);
-    res->registerScrollCallback(onScrollResolutionsList, this);
+    assert( res != NULL );
+
 
     CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
     assert( full != NULL );
     full->setState( UserConfigParams::m_fullscreen );
     
+    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
+    assert( full_text != NULL );
+
     CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
     assert( rememberWinpos != NULL );
     rememberWinpos->setState(UserConfigParams::m_remember_window_location);
     rememberWinpos->setActive(!UserConfigParams::m_fullscreen);
-#ifdef DEBUG
-    LabelWidget* full_text = getWidget<LabelWidget>("fullscreenText");
-    assert( full_text != NULL );
-
+    
     LabelWidget* rememberWinposText = 
                                    getWidget<LabelWidget>("rememberWinposText");
     assert( rememberWinposText != NULL );
-#endif
+
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
     {
@@ -221,7 +250,7 @@ void OptionsScreenVideo::init()
                                                 irr_driver->getVideoModes();
         const int amount = (int)modes.size();
 
-        m_resolutions.clear();
+        std::vector<Resolution> resolutions;
         Resolution r;
 
         bool found_config_res = false;
@@ -236,8 +265,7 @@ void OptionsScreenVideo::init()
         {
             r.width  = modes[n].getWidth();
             r.height = modes[n].getHeight();
-            r.fullscreen = true;
-            m_resolutions.push_back(r);
+            resolutions.push_back(r);
 
             if (r.width  == UserConfigParams::m_width &&
                 r.height == UserConfigParams::m_height)
@@ -259,8 +287,7 @@ void OptionsScreenVideo::init()
         {
             r.width  = UserConfigParams::m_width;
             r.height = UserConfigParams::m_height;
-            r.fullscreen = false;
-            m_resolutions.push_back(r);
+            resolutions.push_back(r);
 
             if (r.width == 1024 && r.height == 768)
             {
@@ -272,31 +299,29 @@ void OptionsScreenVideo::init()
             }
         } // next found resolution
 
-#ifndef MOBILE_STK
+#ifndef ANDROID
         // Add default resolutions that were not found by irrlicht
         if (!found_1024_768)
         {
             r.width  = 1024;
             r.height = 768;
-            r.fullscreen = false;
-            m_resolutions.push_back(r);
+            resolutions.push_back(r);
         }
 
         if (!found_1280_720)
         {
             r.width  = 1280;
             r.height = 720;
-            r.fullscreen = false;
-            m_resolutions.push_back(r);
+            resolutions.push_back(r);
         }
 #endif
 
         // Sort resolutions by size
-        std::sort(m_resolutions.begin(), m_resolutions.end());
+        std::sort(resolutions.begin(), resolutions.end());
 
         // Add resolutions list
-        for(std::vector<Resolution>::iterator it = m_resolutions.begin();
-            it != m_resolutions.end(); it++)
+        for(std::vector<Resolution>::iterator it = resolutions.begin();
+            it != resolutions.end(); it++)
         {
             const float ratio = it->getRatio();
             char name[32];
@@ -356,52 +381,14 @@ void OptionsScreenVideo::init()
     gfx->setActive(!in_game);
     getWidget<ButtonWidget>("custom")->setActive(!in_game);
     
-#if defined(MOBILE_STK)
+#if defined(ANDROID)
     applyBtn->setVisible(false);
     full->setVisible(false);
-    getWidget<LabelWidget>("fullscreenText")->setVisible(false);
+    full_text->setVisible(false);
     rememberWinpos->setVisible(false);
-    getWidget<LabelWidget>("rememberWinposText")->setVisible(false);
+    rememberWinposText->setVisible(false);
 #endif
-
-    updateResolutionsList();
-    
 }   // init
-
-// ----------------------------------------------------------------------------
-
-void OptionsScreenVideo::updateResolutionsList()
-{
-    CheckBoxWidget* full = getWidget<CheckBoxWidget>("fullscreen");
-    assert(full != NULL);
-    bool fullscreen_selected = full->getState();
-    
-    for (auto resolution : m_resolutions)
-    {
-        DynamicRibbonWidget* drw = getWidget<DynamicRibbonWidget>("resolutions");
-        assert(drw != NULL);
-        assert(drw->m_rows.size() == 1);
-        
-        char name[128];
-        sprintf(name, "%ix%i", resolution.width, resolution.height);
-        
-        Widget* w = drw->m_rows[0].findWidgetNamed(name);
-        
-        if (w != NULL)
-        {
-            bool active = !fullscreen_selected || resolution.fullscreen;
-            w->setActive(active);
-        }
-    }
-}
-
-// ----------------------------------------------------------------------------
-
-void OptionsScreenVideo::onScrollResolutionsList(void* data)
-{
-    OptionsScreenVideo* screen = (OptionsScreenVideo*)data;
-    screen->updateResolutionsList();
-}
 
 // ----------------------------------------------------------------------------
 
@@ -425,7 +412,6 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].motionblur == UserConfigParams::m_motionblur &&
             m_presets[l].shadows == UserConfigParams::m_shadows_resolution &&
             m_presets[l].ssao == UserConfigParams::m_ssao &&
-            m_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
             m_presets[l].dof == UserConfigParams::m_dof &&
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
         {
@@ -456,22 +442,22 @@ void OptionsScreenVideo::updateTooltip()
 
     //I18N: in the graphical options tooltip;
     // indicates a graphical feature is enabled
-    const core::stringw enabled = _("Enabled");
+    const core::stringw enabled = _LTR("Enabled");
     //I18N: in the graphical options tooltip;
     // indicates a graphical feature is disabled
-    const core::stringw disabled = _("Disabled");
+    const core::stringw disabled = _LTR("Disabled");
     //I18N: if only important particles effects is enabled
-    const core::stringw important_only = _("Important only");
+    const core::stringw important_only = _LTR("Important only");
 
     //I18N: in the graphical options tooltip;
     // indicates the rendered image quality is very low
-    const core::stringw very_low = _("Very Low");
+    const core::stringw very_low = _LTR("Very Low");
     //I18N: in the graphical options tooltip;
     // indicates the rendered image quality is low
-    const core::stringw low = _("Low");
+    const core::stringw low = _LTR("Low");
     //I18N: in the graphical options tooltip;
     // indicates the rendered image quality is high
-    const core::stringw high = _("High");
+    const core::stringw high = _LTR("High");
 
     //I18N: in graphical options
     tooltip = _("Particles Effects: %s",
@@ -485,9 +471,6 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Dynamic lights: %s",
         UserConfigParams::m_dynamic_lights ? enabled : disabled);
-    //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Light scattering: %s",
-        UserConfigParams::m_light_scatter ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Motion blur: %s",
         UserConfigParams::m_motionblur ? enabled : disabled);
@@ -568,13 +551,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         DynamicRibbonWidget* w1=getWidget<DynamicRibbonWidget>("resolutions");
         assert(w1 != NULL);
-        assert(w1->m_rows.size() == 1);
-        
-        int index = w1->m_rows[0].getSelection(PLAYER_ID_GAME_MASTER);
-        Widget* selected_widget = &w1->m_rows[0].getChildren()[index];
-        
-        if (!selected_widget->isActivated())
-            return;
 
         const std::string& res =
             w1->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -611,7 +587,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_motionblur = m_presets[level].motionblur;
         UserConfigParams::m_shadows_resolution = m_presets[level].shadows;
         UserConfigParams::m_ssao = m_presets[level].ssao;
-        UserConfigParams::m_light_scatter = m_presets[level].light_scatter;
         UserConfigParams::m_dof = m_presets[level].dof;
         UserConfigParams::m_degraded_IBL = m_presets[level].degraded_ibl;
 
@@ -635,8 +610,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
-        
-        updateResolutionsList();
     }
 }   // eventCallback
 
@@ -644,12 +617,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
-#ifndef SERVER_ONLY
-    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
-        CVS->isGLSL())
-    {
+    if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights)
         irr_driver->sameRestart();
-    }
     else if (m_prev_img_quality != getImageQuality())
     {
         irr_driver->setMaxTextureSize();
@@ -657,7 +626,6 @@ void OptionsScreenVideo::tearDown()
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();
-#endif
 }   // tearDown
 
 // ----------------------------------------------------------------------------

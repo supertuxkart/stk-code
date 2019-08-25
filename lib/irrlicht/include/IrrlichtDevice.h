@@ -42,8 +42,6 @@ namespace irr
 	*/
 	class IrrlichtDevice : public virtual IReferenceCounted
 	{
-	protected:
-		typedef s32 (*HeightFunc)(const IrrlichtDevice*);
 	public:
 
 		//! Runs the device.
@@ -261,15 +259,6 @@ namespace irr
 		*/
 		virtual bool activateJoysticks(core::array<SJoystickInfo>& joystickInfo) =0;
 
-		//! Returns true if system has touch device
-		virtual bool supportsTouchDevice() const = 0;
-
-		//! Returns true if system has hardware keyboard attached
-		virtual bool hasHardwareKeyboard() const = 0;
-
-		//! Returns true if system has native on screen keyboard
-		virtual bool hasOnScreenKeyboard() const = 0;
-
 		//! Set the current Gamma Value for the Display
 		virtual bool setGammaRamp(f32 red, f32 green, f32 blue,
 					f32 relativebrightness, f32 relativecontrast) =0;
@@ -295,25 +284,6 @@ namespace irr
 		used. */
 		virtual E_DEVICE_TYPE getType() const = 0;
 
-		/** Onscreen keyboard addition, to determine how much to move vertically. */
-		virtual u32 getScreenHeight() const = 0;
-		virtual u32 getOnScreenKeyboardHeight() const = 0;
-		virtual s32 getMovedHeight() const = 0;
-		virtual void toggleOnScreenKeyboard(bool show, s32 type = 0) = 0;
-		virtual void registerGetMovedHeightFunction(HeightFunc) = 0;
-
-		virtual bool activateAccelerometer(float updateInterval) { return false; }
-		virtual bool deactivateAccelerometer() { return false; }
-		virtual bool isAccelerometerActive() { return false; }
-		virtual bool isAccelerometerAvailable() { return false; }
-		virtual bool activateGyroscope(float updateInterval) { return false; }
-		virtual bool deactivateGyroscope() { return false; }
-		virtual bool isGyroscopeActive() { return false; }
-		virtual bool isGyroscopeAvailable() { return false; }
-		virtual bool activateDeviceMotion(float updateInterval) { return false; }
-		virtual bool deactivateDeviceMotion() { return false; }
-		virtual bool isDeviceMotionActive() { return false; }
-		virtual bool isDeviceMotionAvailable() { return false; }
 		//! Check if a driver type is supported by the engine.
 		/** Even if true is returned the driver may not be available
 		for a configuration requested when creating the device. */

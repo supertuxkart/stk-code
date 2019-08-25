@@ -26,7 +26,7 @@
 #include "CIrrDeviceStub.h"
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
-#include "xdg_decoration_unstable_v1_client_protocol.h"
+#include "server_decoration_client_protocol.h"
 #include "xdg_shell_client_protocol.h"
 
 #include <wayland-client.h>
@@ -115,12 +115,6 @@ namespace irr
 
         //! Activate any joysticks, and generate events for them.
         virtual bool activateJoysticks(core::array<SJoystickInfo>& joystickInfo);
-        
-        //! Returns true if system has touch device
-        virtual bool supportsTouchDevice() const { return m_has_touch_device; }
-        
-        //! Returns true if system has hardware keyboard
-        virtual bool hasHardwareKeyboard() const { return m_has_hardware_keyboard; }
 
         //! Set the current Gamma Value for the Display
         virtual bool setGammaRamp(f32 red, f32 green, f32 blue,
@@ -175,7 +169,6 @@ namespace irr
         wl_display* m_display;
         wl_egl_window* m_egl_window;
         wl_keyboard* m_keyboard;
-        wl_touch* m_touch;
         wl_output* m_output;
         wl_pointer* m_pointer;
         wl_registry* m_registry;
@@ -197,8 +190,8 @@ namespace irr
         bool m_surface_configured;
         uint32_t m_xdg_wm_base_name;
         
-        zxdg_decoration_manager_v1* m_decoration_manager;
-        zxdg_toplevel_decoration_v1* m_decoration;
+        org_kde_kwin_server_decoration_manager* m_decoration_manager;
+        org_kde_kwin_server_decoration* m_decoration;
 
         xkb_context* m_xkb_context;
         xkb_compose_table* m_xkb_compose_table;
@@ -221,9 +214,7 @@ namespace irr
         uint32_t m_mouse_button_states;
         unsigned int m_width;
         unsigned int m_height;
-        unsigned int m_touches_count;
-        bool m_has_touch_device;
-        bool m_has_hardware_keyboard;
+
         bool m_window_has_focus;
         bool m_window_minimized;
         mutable core::stringc m_clipboard;

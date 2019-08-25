@@ -3,7 +3,7 @@
     <unlock_list list="false"/>
     <track id="xr591" laps="2" reverse="false"/>
     <mode major="single" minor="timetrial"/>
-    <requirements trophies="150"/>
+    <requirements trophies="135"/>
     
     <best>
         <karts number="1"/>

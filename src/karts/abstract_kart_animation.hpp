@@ -25,26 +25,17 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 
-#include <exception>
-#include <limits>
+#include <memory>
 #include <string>
 
 class AbstractKart;
-class BareNetworkString;
 
 enum KartAnimationType : uint8_t
 {
     KAT_RESCUE = 0,
-    KAT_EXPLOSION = 1,
-    KAT_CANNON = 2
-};
-
-/** Exception for kart animation creation in networking, so if thrown it will
- *  tell the num of bytes skipping in the game state. */
-class KartAnimationCreationException : public std::exception
-{
-public:
-    virtual int getSkippingOffset() const = 0;
+    KAT_EXPLOSION_DIRECT_HIT = 1,
+    KAT_EXPLOSION = 2,
+    KAT_CANNON = 3
 };
 
 /** The base class for all kart animation, like rescue, explosion, or cannon.
@@ -62,55 +53,65 @@ private:
     /** Name of this animation, used for debug prints only. */
     std::string m_name;
 
+    std::shared_ptr<int> m_check_created_ticks;
+
+    int m_created_ticks;
+
+    bool m_confirmed_by_network;
+
+    bool m_ignore_undo;
+
 protected:
    /** A pointer to the kart which is animated by this class. */
     AbstractKart *m_kart;
 
-    /** Time in ticks for the animation which ends in world count up ticks. */
+    /** Timer for the animation. */
+    int m_timer;
+
+    btTransform m_end_transform;
+
     int m_end_ticks;
 
-    /** Time in ticks for the animation creation. */
-    int m_created_ticks;
-
-    /** Transformation by the time the animation was created, used for rewind
-     *  to recreate the animation with the same one. */
-    btTransform m_created_transform;
-
-    /* Compressed values for server to send to avoid compressing everytime. */
-    int m_created_transform_compressed[4];
-
-    void resetPowerUp();
     // ------------------------------------------------------------------------
-    void restoreBasicState(BareNetworkString* buffer);
-    // ------------------------------------------------------------------------
-    float getMaximumHeight(const Vec3& up_vector, float height_remove);
-
+    void addNetworkAnimationChecker(bool reset_powerup);
 public:
-                 AbstractKartAnimation(AbstractKart* kart,
+                 AbstractKartAnimation(AbstractKart *kart,
                                        const std::string &name);
     virtual     ~AbstractKartAnimation();
     virtual void update(int ticks);
     // ------------------------------------------------------------------------
-    virtual void updateGraphics(float dt);
-    // ------------------------------------------------------------------------
-    virtual float getAnimationTimer() const;
+    /** Returns the current animation timer. */
+    virtual float getAnimationTimer() const
+                                    { return stk_config->ticks2Time(m_timer); }
     // ------------------------------------------------------------------------
     /** To easily allow printing the name of the animation being used atm.
      *  Used in AstractKart in case of an incorrect sequence of calls. */
     virtual const std::string &getName() const { return m_name; }
     // ------------------------------------------------------------------------
+    /** If true, the end transform can be determined early, used in network for
+     *  for client to synchronize with server. */
+    virtual bool usePredefinedEndTransform() const { return true; }
+    // ------------------------------------------------------------------------
+    const btTransform& getEndTransform() const { return m_end_transform; }
+    // ------------------------------------------------------------------------
+    void setEndTransformTicks(const btTransform& t, int ticks)
+    {
+        if (!usePredefinedEndTransform() || m_confirmed_by_network)
+            return;
+        m_confirmed_by_network = true;
+        m_end_transform = t;
+        m_end_ticks = ticks;
+    }
+    // ------------------------------------------------------------------------
+    void checkNetworkAnimationCreationSucceed(const btTransform& fb_trans);
+    // ------------------------------------------------------------------------
+    int getEndTicks() const { return m_end_ticks; }
+    // ------------------------------------------------------------------------
     virtual KartAnimationType getAnimationType() const = 0;
     // ------------------------------------------------------------------------
-    /* Used to ignore adding karts back to physics when destroying world. */
-    void handleResetRace()   { m_end_ticks = std::numeric_limits<int>::max(); }
-    // ------------------------------------------------------------------------
-    /* Used to recreate animation in \ref KartRewinder. */
-    virtual void saveState(BareNetworkString* buffer);
-    // ------------------------------------------------------------------------
-    /* Called when kart animation is the same in kart state, which make sure
-     * for example the end or created ticks are the same. */
-    virtual void restoreState(BareNetworkString* buffer)
-                                                 { restoreBasicState(buffer); }
+    /* Remove the timer changes by checkNetworkAnimationCreationSucceed if
+     * m_kart has been eliminated by network. */
+    void handleResetRace()                                  { m_timer = 9999; }
 };   // AbstractKartAnimation
 
 #endif

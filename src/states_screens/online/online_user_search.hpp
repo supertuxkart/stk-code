@@ -21,11 +21,10 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
 #include "online/online_profile.hpp"
+#include "online/request.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine { class Widget; }
-
-namespace Online { class XMLRequest; }
 
 /**
   * \brief

@@ -30,9 +30,9 @@ class FaceTTF;
 class BoldFace : public FontWithFace
 {
 private:
-    virtual unsigned int getGlyphPageSize() const OVERRIDE      { return 512; }
+    virtual unsigned int getGlyphPageSize() const OVERRIDE     { return 1024; }
     // ------------------------------------------------------------------------
-    virtual float getScalingFactorOne() const OVERRIDE         { return 0.3f; }
+    virtual float getScalingFactorOne() const OVERRIDE         { return 0.2f; }
     // ------------------------------------------------------------------------
     virtual unsigned int getScalingFactorTwo() const OVERRIDE   { return 120; }
     // ------------------------------------------------------------------------
@@ -45,7 +45,7 @@ private:
 public:
     LEAK_CHECK()
     // ------------------------------------------------------------------------
-    BoldFace();
+    BoldFace(FaceTTF* ttf);
     // ------------------------------------------------------------------------
     virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------

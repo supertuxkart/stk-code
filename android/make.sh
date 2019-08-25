@@ -23,48 +23,45 @@ export ARCH_ARMV7=arm
 export HOST_ARMV7=arm-linux-androideabi
 export NDK_PLATFORM_ARMV7=android-19
 export MIN_SDK_VERSION_ARMV7=19
-export TARGET_SDK_VERSION_ARMV7=29
-export COMPILE_SDK_VERSION_ARMV7=29
+export TARGET_SDK_VERSION_ARMV7=26
+export COMPILE_SDK_VERSION_ARMV7=26
 
 export NDK_ABI_AARCH64=arm64-v8a
 export ARCH_AARCH64=arm64
 export HOST_AARCH64=aarch64-linux-android
 export NDK_PLATFORM_AARCH64=android-21
 export MIN_SDK_VERSION_AARCH64=21
-export TARGET_SDK_VERSION_AARCH64=29
-export COMPILE_SDK_VERSION_AARCH64=29
+export TARGET_SDK_VERSION_AARCH64=26
+export COMPILE_SDK_VERSION_AARCH64=26
 
 export NDK_ABI_X86=x86
 export ARCH_X86=x86
 export HOST_X86=i686-linux-android
 export NDK_PLATFORM_X86=android-19
 export MIN_SDK_VERSION_X86=19
-export TARGET_SDK_VERSION_X86=29
-export COMPILE_SDK_VERSION_X86=29
+export TARGET_SDK_VERSION_X86=26
+export COMPILE_SDK_VERSION_X86=26
 
 export NDK_ABI_X86_64=x86_64
 export ARCH_X86_64=x86_64
 export HOST_X86_64=x86_64-linux-android
 export NDK_PLATFORM_X86_64=android-21
 export MIN_SDK_VERSION_X86_64=21
-export TARGET_SDK_VERSION_X86_64=29
-export COMPILE_SDK_VERSION_X86_64=29
+export TARGET_SDK_VERSION_X86_64=26
+export COMPILE_SDK_VERSION_X86_64=26
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
-export PACKAGE_CALLBACK_NAME_RELEASE="org_supertuxkart_stk"
 export APP_DIR_NAME_RELEASE="supertuxkart"
 export APP_ICON_RELEASE="$DIRNAME/icon.png"
 
 export APP_NAME_BETA="SuperTuxKart Beta"
 export PACKAGE_NAME_BETA="org.supertuxkart.stk_beta"
-export PACKAGE_CALLBACK_NAME_BETA="org_supertuxkart_stk_1beta"
 export APP_DIR_NAME_BETA="supertuxkart-beta"
 export APP_ICON_BETA="$DIRNAME/icon-dbg.png"
 
 export APP_NAME_DEBUG="SuperTuxKart Debug"
 export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dbg"
-export PACKAGE_CALLBACK_NAME_DEBUG="org_supertuxkart_stk_1dbg"
 export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
 
@@ -152,32 +149,43 @@ if [ -z "$BUILD_TYPE" ]; then
 fi
 
 if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
+    export ANT_BUILD_TYPE="debug"
     export GRADLE_BUILD_TYPE="assembleDebug"
     export IS_DEBUG_BUILD=1
     export APP_NAME="$APP_NAME_DEBUG"
     export PACKAGE_NAME="$PACKAGE_NAME_DEBUG"
-    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_DEBUG"
     export APP_DIR_NAME="$APP_DIR_NAME_DEBUG"
     export APP_ICON="$APP_ICON_DEBUG"
 elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
+    export ANT_BUILD_TYPE="release"
     export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_RELEASE"
     export PACKAGE_NAME="$PACKAGE_NAME_RELEASE"
-    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_RELEASE"
     export APP_DIR_NAME="$APP_DIR_NAME_RELEASE"
     export APP_ICON="$APP_ICON_RELEASE"
 elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
+    export ANT_BUILD_TYPE="release"
     export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_BETA"
     export PACKAGE_NAME="$PACKAGE_NAME_BETA"
-    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_BETA"
     export APP_DIR_NAME="$APP_DIR_NAME_BETA"
     export APP_ICON="$APP_ICON_BETA"
 else
     echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
          "debug, release"
+    exit
+fi
+
+# Check selected build tool
+if [ -z "$BUILD_TOOL" ]; then
+    BUILD_TOOL="gradle"
+fi
+
+if [ "$BUILD_TOOL" != "gradle" ] && [ "$BUILD_TOOL" != "ant" ]; then
+    echo "Unsupported BUILD_TOOL: $BUILD_TOOL. Possible values are: " \
+         "gradle, ant"
     exit
 fi
 
@@ -278,6 +286,22 @@ fi
 
 echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
 
+# Freetype
+if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
+    echo "Compiling freetype"
+    mkdir -p "$DIRNAME/obj/freetype"
+    cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
+
+    cd "$DIRNAME/obj/freetype"
+    ./configure --host=$HOST          \
+                --without-zlib        \
+                --without-png         \
+                --without-harfbuzz &&
+    make $@
+    check_error
+    touch "$DIRNAME/obj/freetype.stamp"
+fi
+
 # Zlib
 if [ ! -f "$DIRNAME/obj/zlib.stamp" ]; then
     echo "Compiling zlib"
@@ -308,73 +332,6 @@ if [ ! -f "$DIRNAME/obj/libpng.stamp" ]; then
     make $@
     check_error
     touch "$DIRNAME/obj/libpng.stamp"
-fi
-
-# Fribidi
-if [ ! -f "$DIRNAME/obj/fribidi.stamp" ]; then
-    echo "Compiling fribidi"
-    mkdir -p "$DIRNAME/obj/fribidi"
-    cp -a -f "$DIRNAME/../lib/fribidi/"* "$DIRNAME/obj/fribidi"
-
-    cd "$DIRNAME/obj/fribidi"
-    ./configure --host=$HOST --enable-static=yes &&
-    make $@
-    check_error
-    mkdir -p "$DIRNAME/obj/fribidi/include/fribidi"
-    cp $DIRNAME/obj/fribidi/lib/*.h "$DIRNAME/obj/fribidi/include/fribidi"
-    touch "$DIRNAME/obj/fribidi.stamp"
-fi
-
-# Freetype bootstrap
-if [ ! -f "$DIRNAME/obj/freetype_bootstrap.stamp" ]; then
-    echo "Compiling freetype"
-    mkdir -p "$DIRNAME/obj/freetype"
-    cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
-
-    cd "$DIRNAME/obj/freetype"
-    ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a"\
-    LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a"\
-    ./configure --host=$HOST --enable-shared=no \
-                --without-harfbuzz &&
-    make $@
-    check_error
-    # We need to rebuild freetype after harfbuzz is compiled
-    touch "$DIRNAME/obj/freetype_bootstrap.stamp"
-fi
-
-# Harfbuzz
-if [ ! -f "$DIRNAME/obj/harfbuzz.stamp" ]; then
-    echo "Compiling harfbuzz"
-    mkdir -p "$DIRNAME/obj/harfbuzz"
-    cp -a -f "$DIRNAME/../lib/harfbuzz/"* "$DIRNAME/obj/harfbuzz"
-
-    cd "$DIRNAME/obj/harfbuzz"
-    FREETYPE_CFLAGS="-I$DIRNAME/obj/freetype/include" \
-    FREETYPE_LIBS="$DIRNAME/obj/freetype/objs/.libs/libfreetype.a $DIRNAME/obj/zlib/libz.a $DIRNAME/obj/libpng/libpng.a"\
-    ./configure --host=$HOST --enable-shared=no \
-                --with-glib=no --with-gobject=no --with-cairo=no \
-                --with-fontconfig=no --with-icu=no --with-graphite2=no &&
-    make $@
-    check_error
-    mkdir -p "$DIRNAME/obj/harfbuzz/include/harfbuzz"
-    cp $DIRNAME/obj/harfbuzz/src/*.h "$DIRNAME/obj/harfbuzz/include/harfbuzz"
-    touch "$DIRNAME/obj/harfbuzz.stamp"
-fi
-
-# Freetype
-if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
-    echo "Compiling freetype"
-    mkdir -p "$DIRNAME/obj/freetype"
-    cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
-
-    cd "$DIRNAME/obj/freetype"
-    ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a" \
-    LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a" \
-    HARFBUZZ_CFLAGS="-I$DIRNAME/obj/harfbuzz/src/" HARFBUZZ_LIBS="$DIRNAME/obj/harfbuzz/src/.libs/libharfbuzz.a" \
-    ./configure --host=$HOST --enable-shared=no
-    make $@
-    check_error
-    touch "$DIRNAME/obj/freetype.stamp"
 fi
 
 # Openal
@@ -507,31 +464,13 @@ sed -i "s/targetSdkVersion=\".*\"/targetSdkVersion=\"$TARGET_SDK_VERSION\"/g" \
        
 sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
        "$DIRNAME/AndroidManifest.xml"
-
-sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
-       "$DIRNAME/src/main/java/STKEditText.java"
-
-sed -i "s/import org.supertuxkart.*/import $PACKAGE_NAME.STKInputConnection;/g" \
-       "$DIRNAME/src/main/java/STKEditText.java"
-
-sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
-       "$DIRNAME/src/main/java/STKInputConnection.java"
-
-sed -i "s/import org.supertuxkart.*.STKEditText;/import $PACKAGE_NAME.STKEditText;/g" \
-       "$DIRNAME/src/main/java/STKInputConnection.java"
-
-sed -i "s/package org.supertuxkart.*/package $PACKAGE_NAME;/g" \
-       "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
-
-sed -i "s/import org.supertuxkart.*/import $PACKAGE_NAME.STKEditText;/g" \
-       "$DIRNAME/src/main/java/SuperTuxKartActivity.java"
-
+       
 sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
        "$DIRNAME/AndroidManifest.xml"
        
 sed -i "s/versionCode=\".*\"/versionCode=\"$PROJECT_CODE\"/g" \
        "$DIRNAME/AndroidManifest.xml"
-
+       
 cp "banner.png" "$DIRNAME/res/drawable/banner.png"
 cp "$APP_ICON" "$DIRNAME/res/drawable/icon.png"
 convert -scale 72x72 "$APP_ICON" "$DIRNAME/res/drawable-hdpi/icon.png"
@@ -544,9 +483,15 @@ if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
     export PATH=$JAVA_HOME/bin:$PATH
 fi
 
-export ANDROID_HOME="$SDK_PATH"
-./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
-          -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
-          $GRADLE_BUILD_TYPE
+if [ "$BUILD_TOOL" = "gradle" ]; then
+    export ANDROID_HOME="$SDK_PATH"
+    gradle -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
+           -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
+           $GRADLE_BUILD_TYPE
+elif [ "$BUILD_TOOL" = "ant" ]; then
+    ant -Dsdk.dir="$SDK_PATH"  \
+        -Dtarget="android-$TARGET_SDK_VERSION" \
+        $ANT_BUILD_TYPE
+fi
 
 check_error

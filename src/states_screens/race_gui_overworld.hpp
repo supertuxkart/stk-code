@@ -54,6 +54,12 @@ private:
 
     bool             m_close_to_a_challenge;
 
+    /** Translated string 'lap' displayed every frame. */
+    core::stringw    m_string_lap;
+
+    /** Translated string 'rank' displayed every frame. */
+    core::stringw    m_string_rank;
+
     // Minimap related variables
     // -------------------------
     video::ITexture* m_trophy[4];
@@ -87,8 +93,8 @@ private:
     /** Distance of map from left side of screen. */
     int              m_map_left;
 
-    /** True if the minimap is initialized */
-    bool             m_is_minimap_initialized;
+    /** True if this is the first time the renderer is called. */
+    bool             m_is_first_render_call;
 
     /** Distance of map from bottom of screen. */
     int              m_map_bottom;
@@ -125,8 +131,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the size of the texture on which to render the minimap to. */
     virtual const core::dimension2du getMiniMapSize() const
-                       { return core::dimension2du(m_map_width, m_map_height); }
-    virtual void calculateMinimapSize();
+    { return core::dimension2du(m_map_width, m_map_height); }
 
 };   // RaceGUI
 

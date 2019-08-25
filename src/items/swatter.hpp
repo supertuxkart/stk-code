@@ -31,7 +31,6 @@
 
 using namespace irr;
 
-class Attachment;
 class AbstractKart;
 class Item;
 class Moveable;
@@ -49,49 +48,46 @@ private:
      *   - going down to the target
      *   - going up from the target
      */
-    enum AnimationPhase : uint8_t
-    {
-        SWATTER_AIMING = 0,
-        SWATTER_TO_TARGET = 1,
-        SWATTER_FROM_TARGET = 2
-    };
-    AnimationPhase m_animation_phase;
+    enum    {SWATTER_AIMING, SWATTER_TO_TARGET, SWATTER_FROM_TARGET}
+                    m_animation_phase;
+
+    /** True if the swatter will be discarded now. */
+    bool               m_discard_now;
 
     /** The kart the swatter is aiming at. */
+    Moveable          *m_target;
+
     AbstractKart      *m_closest_kart;
 
     SFXBase           *m_swat_sound;
 
     /** Set the end ticks to complete the removing an attached bomb animation. */
+    int                m_removed_bomb_ticks;
 
     /** The scene node of the attachment. */
     scene::IAnimatedMeshSceneNode *m_scene_node;
 
     /** The scene node where a bomb is saved (in case that the swatter
      *  replaces a bomb. */
-    scene::IAnimatedMeshSceneNode *m_bomb_scene_node;
+    scene::ISceneNode *m_bomb_scene_node;
 
-    int                m_discard_ticks;
+    /** For some reason the built-in animation system doesn't work correctly here?? */
+    float              m_swat_bomb_frame;
 
-    int                m_swatter_duration;
+    int                m_start_swat_ticks;
 
-    /** Set the bomb remaing ticks so we can set the timer on the removing
-     *  bomb animation. */
-    int16_t            m_bomb_remaining;
+    int                m_end_swat_ticks;
 
-    int16_t            m_swatter_animation_ticks;
+    const int          m_swatter_start_ticks;
 
-    /** True if the swatter will be discarded now. */
-    bool               m_discard_now;
+    const int          m_swatter_end_ticks;
 
-    /** True if the swatter animation has been played. */
-    bool               m_played_swatter_animation;
 public:
-             Swatter(AbstractKart *kart, int16_t bomb_ticks, int ticks,
-                     Attachment* attachment);
+             Swatter(AbstractKart *kart, bool was_bomb,
+                     scene::ISceneNode* bomb_scene_node, int ticks);
     virtual ~Swatter();
-    void     updateGraphics(float dt) OVERRIDE;
-    bool     updateAndTestFinished(int ticks) OVERRIDE;
+    void     updateGrahpics(float dt) OVERRIDE;
+    int      updateAndTestFinished(int ticks) OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Returns if the swatter is currently aiming, i.e. can be used to
@@ -101,9 +97,10 @@ public:
         return m_animation_phase == SWATTER_AIMING;
     }   // isSwatterReady
     // ------------------------------------------------------------------------
-    virtual void restoreState(BareNetworkString *buffer) OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
+    bool isRemovingBomb() const
+    {
+        return m_removed_bomb_ticks != std::numeric_limits<int>::max();
+    }
 
 private:
     /** Determine the nearest kart or item and update the current target accordingly */

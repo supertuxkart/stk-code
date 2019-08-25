@@ -59,9 +59,7 @@
 #include "main_loop.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "network/network_config.hpp"
 #include "network/stk_host.hpp"
-#include "network/stk_peer.hpp"
 #include "physics/physics.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/dialogs/confirm_resolution_dialog.hpp"
@@ -71,8 +69,6 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 #include "utils/vs.hpp"
 
 #include <irrlicht.h>
@@ -146,7 +142,6 @@ const bool ALLOW_1280_X_720    = true;
  */
 IrrDriver::IrrDriver()
 {
-    m_render_nw_debug = false;
     m_resolution_changing = RES_CHANGE_NONE;
 
     struct irr::SIrrlichtCreationParameters p;
@@ -174,7 +169,6 @@ IrrDriver::IrrDriver()
     m_skinning_joint             = 0;
     m_recording = false;
     m_sun_interposer = NULL;
-    m_scene_complexity           = 0;
 
 #ifndef SERVER_ONLY
     for (unsigned i = 0; i < Q_LAST; i++)
@@ -337,13 +331,10 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-#ifndef IOS_STK
-            // IOS returns the nativebounds in non uniform size
             if ((h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
                 (!(h==600 && w==800 && UserConfigParams::m_artist_debug_mode) &&
                 (!(h==720 && w==1280 && ALLOW_1280_X_720 == true))))
                 continue;
-#endif
 
             VideoMode mode(w, h);
             m_modes.push_back( mode );
@@ -545,7 +536,7 @@ void IrrDriver::initDevice()
     // fixed pipeline in this case.
     if (!ProfileWorld::isNoGraphics() &&
         (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE) ||
-        (CVS->isGLSL() && !CentralVideoSettings::m_supports_sp)))
+        !CentralVideoSettings::m_supports_sp))
     {
         Log::warn("irr_driver", "Driver doesn't support shader-based pipeline. "
                                 "Re-creating device to workaround the issue.");
@@ -737,41 +728,9 @@ void IrrDriver::initDevice()
 #ifndef SERVER_ONLY
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
-    if (!ProfileWorld::isNoGraphics())
-        m_device->getCursorControl()->setVisible(true);
+    m_device->getCursorControl()->setVisible(true);
 #endif
     m_pointer_shown = true;
-
-    if (ProfileWorld::isNoGraphics())
-        return;
-
-    m_device->registerGetMovedHeightFunction([]
-        (const IrrlichtDevice* device)->int
-        {
-            int screen_keyboard_height =
-                device->getOnScreenKeyboardHeight();
-            int screen_height = device->getScreenHeight();
-            if (screen_keyboard_height == 0 || screen_height == 0)
-                return 0;
-
-            GUIEngine::Widget* w = GUIEngine::getFocusForPlayer(0);
-            if (!w)
-                return 0;
-
-            core::rect<s32> pos =
-                w->getIrrlichtElement()->getAbsolutePosition();
-            // Add 10% margin
-            int element_height = (int)device->getScreenHeight() -
-                pos.LowerRightCorner.Y - int(screen_height * 0.01f);
-            if (element_height > screen_keyboard_height)
-                return 0;
-            else if (element_height < 0)
-            {
-                // For buttons near the edge of the bottom of screen
-                return screen_keyboard_height;
-            }
-            return screen_keyboard_height - element_height;
-        });
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -852,9 +811,6 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
 void IrrDriver::showPointer()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
-        return;
-
     if (!m_pointer_shown)
     {
         m_pointer_shown = true;
@@ -867,9 +823,6 @@ void IrrDriver::showPointer()
 void IrrDriver::hidePointer()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
-        return;
-
     // always visible in artist debug mode, to be able to use the context menu
     if (UserConfigParams::m_artist_debug_mode)
     {
@@ -950,16 +903,13 @@ void IrrDriver::applyResolutionSettings()
     m_video_driver->endScene();
     track_manager->removeAllCachedData();
     delete attachment_manager;
-    attachment_manager = NULL;
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager->unloadAllKarts();
     delete powerup_manager;
-    powerup_manager = NULL;
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
-    input_manager = NULL;
     delete font_manager;
     font_manager = NULL;
     GUIEngine::clear();
@@ -983,9 +933,7 @@ void IrrDriver::applyResolutionSettings()
 #endif
     // initDevice will drop the current device.
     delete m_renderer;
-    m_renderer = NULL;
     SharedGPUObjects::reset();
-    
     SP::setMaxTextureSize();
     initDevice();
 
@@ -994,8 +942,6 @@ void IrrDriver::applyResolutionSettings()
     {
         m_perf_query[i]->reset();
     }
-    if (CVS->isGLSL())
-        SP::loadShaders();
 #endif
 
     font_manager = new FontManager();
@@ -1763,11 +1709,10 @@ void IrrDriver::displayFPS()
     gui::IGUIFont* font = GUIEngine::getSmallFont();
     core::rect<s32> position;
 
-    const int fheight = font->getHeightPerLine();
     if (UserConfigParams::m_artist_debug_mode)
-        position = core::rect<s32>(51, 0, 30*fheight+51, 2*fheight + fheight / 3);
+        position = core::rect<s32>(75, 0, 1100, 40);
     else
-        position = core::rect<s32>(75, 0, 18*fheight+75 , fheight + fheight / 5);
+        position = core::rect<s32>(75, 0, 900, 40);
     GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
@@ -1802,7 +1747,7 @@ void IrrDriver::displayFPS()
         no_trust--;
 
         static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-        font->drawQuick(StringUtils::insertValues (L"FPS: ... Ping: %dms", ping),
+        font->draw(StringUtils::insertValues (L"FPS: ... Ping: %dms", ping),
             core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
@@ -1824,10 +1769,10 @@ void IrrDriver::displayFPS()
     {
         fps_string = StringUtils::insertValues
                     (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
-                      "%d Shadows - LightDist : %d\nComplexity %d, Total skinning joints: %d, "
+                      "%d Shadows - LightDist : %d, Total skinning joints: %d, "
                       "Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
-                    SP::sp_shadow_poly_count, m_last_light_bucket_distance, irr_driver->getSceneComplexity(),
+                    SP::sp_shadow_poly_count, m_last_light_bucket_distance,
                     m_skinning_joint, ping);
     }
     else
@@ -1846,7 +1791,7 @@ void IrrDriver::displayFPS()
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
 
-    font->drawQuick( fps_string.c_str(), position, fpsColor, false );
+    font->draw( fps_string.c_str(), position, fpsColor, false );
 #endif
 }   // updateFPS
 
@@ -1909,10 +1854,8 @@ void IrrDriver::doScreenShot()
 // ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
- *  \param is_loading True if the rendering is called during loading of world,
- *         in which case world, physics etc must not be accessed/
  */
-void IrrDriver::update(float dt, bool is_loading)
+void IrrDriver::update(float dt)
 {
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
@@ -1937,23 +1880,18 @@ void IrrDriver::update(float dt, bool is_loading)
 #endif
     World *world = World::getWorld();
 
-    int moved_height = irr_driver->getDevice()->getMovedHeight();
     if (world)
     {
 #ifndef SERVER_ONLY
-        m_renderer->render(dt, is_loading);
+        m_renderer->render(dt);
 
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
-            glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
-                irr_driver->getActualScreenSize().Height);
-            GUIEngine::render(dt, is_loading);
-            glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-                irr_driver->getActualScreenSize().Height);
+            GUIEngine::render(dt);
         }
 
-        if (!is_loading && Physics::getInstance())
+        if (Physics::getInstance())
         {
             IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
             if (debug_drawer != NULL && debug_drawer->debugEnabled())
@@ -1965,21 +1903,12 @@ void IrrDriver::update(float dt, bool is_loading)
     }
     else
     {
-#ifndef SERVER_ONLY
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
-        glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
-        GUIEngine::render(dt, is_loading);
-        if (m_render_nw_debug && !is_loading)
-        {
-            renderNetworkDebug();
-        }
-        glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
+        GUIEngine::render(dt);
+
         m_video_driver->endScene();
-#endif
     }
 
     if (m_request_screenshot) doScreenShot();
@@ -2000,68 +1929,6 @@ void IrrDriver::update(float dt, bool is_loading)
     }
 #endif
 }   // update
-
-// ----------------------------------------------------------------------------
-void IrrDriver::renderNetworkDebug()
-{
-#ifndef SERVER_ONLY
-    if (!NetworkConfig::get()->isNetworking() ||
-        NetworkConfig::get()->isServer() || !STKHost::existHost())
-        return;
-
-    auto peer = STKHost::get()->getServerPeerForClient();
-    if (!peer)
-        return;
-
-    const core::dimension2d<u32>& screen_size =
-        m_video_driver->getScreenSize();
-    core::rect<s32>background_rect(
-        (int)(0.02f * screen_size.Width),
-        (int)(0.3f * screen_size.Height),
-        (int)(0.98f * screen_size.Width),
-        (int)(0.6f * screen_size.Height));
-    video::SColor color(0x80, 0xFF, 0xFF, 0xFF);
-    GL32_draw2DRectangle(color, background_rect);
-    uint64_t r, d, h, m, s, f;
-    r = STKHost::get()->getNetworkTimer();
-    d = r / 86400000;
-    r = r % 86400000;
-    h = r / 3600000;
-    r = r % 3600000;
-    m = r / 60000;
-    r = r % 60000;
-    s = r / 1000;
-    f = r % 1000;
-    char str[128];
-    sprintf(str, "%d day(s), %02d:%02d:%02d.%03d",
-        (int)d, (int)h, (int)m, (int)s, (int)f);
-
-    gui::IGUIFont* font = GUIEngine::getFont();
-    unsigned height = font->getHeightPerLine() + 2;
-    background_rect.UpperLeftCorner.X += 5;
-    static video::SColor black = video::SColor(255, 0, 0, 0);
-    font->drawQuick(StringUtils::insertValues(
-        L"Server time: %s      Server state frequency: %d",
-        str, NetworkConfig::get()->getStateFrequency()),
-        background_rect, black, false);
-
-    background_rect.UpperLeftCorner.Y += height;
-    font->drawQuick(StringUtils::insertValues(
-        L"Upload speed (KBps): %f      Download speed (KBps): %f",
-        (float)STKHost::get()->getUploadSpeed() / 1024.0f,
-        (float)STKHost::get()->getDownloadSpeed() / 1024.0f,
-        NetworkConfig::get()->getStateFrequency()), background_rect, black,
-        false);
-
-    background_rect.UpperLeftCorner.Y += height;
-    font->drawQuick(StringUtils::insertValues(
-        L"Packet loss: %d      Packet loss variance: %d",
-        peer->getENetPeer()->packetLoss,
-        peer->getENetPeer()->packetLossVariance,
-        NetworkConfig::get()->getStateFrequency()), background_rect, black,
-        false);
-#endif
-}   // renderNetworkDebug
 
 // ----------------------------------------------------------------------------
 void IrrDriver::setRecording(bool val)

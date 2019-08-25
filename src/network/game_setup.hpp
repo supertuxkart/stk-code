@@ -22,17 +22,18 @@
 #ifndef GAME_SETUP_HPP
 #define GAME_SETUP_HPP
 
-#include <irrString.h>
+#include "network/remote_kart_info.hpp"
 
 #include <atomic>
 #include <cassert>
 #include <memory>
+#include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 class NetworkPlayerProfile;
 class NetworkString;
-class PeerVote;
 
 // ============================================================================
 /*! \class GameSetup
@@ -42,6 +43,11 @@ class PeerVote;
 class GameSetup
 {
 private:
+    mutable std::mutex m_players_mutex;
+
+    /** Information about all connected players. */
+    std::vector<std::weak_ptr<NetworkPlayerProfile> > m_players;
+
     std::vector<std::string> m_tracks;
 
     unsigned m_laps;
@@ -56,6 +62,8 @@ private:
 
     std::atomic_bool m_is_grand_prix;
 
+    std::atomic<uint32_t> m_connected_players_count;
+
     irr::core::stringw m_message_of_today;
 
     /** Utf8 server name (with xml decoded) */
@@ -67,7 +75,45 @@ public:
     // ------------------------------------------------------------------------
     ~GameSetup() {}
     // ------------------------------------------------------------------------
-    void setRace(const PeerVote &vote);
+    void addPlayer(std::shared_ptr<NetworkPlayerProfile> profile)
+                                              { m_players.push_back(profile); }
+    // ------------------------------------------------------------------------
+    void update(bool remove_disconnected_players);
+    // ------------------------------------------------------------------------
+    /** \brief Get the players that are / were in the game
+    *  \return A vector containing pointers on the players profiles. */
+    const std::vector<std::weak_ptr<NetworkPlayerProfile> >& getPlayers() const
+    {
+        std::lock_guard<std::mutex> lock(m_players_mutex);
+        return m_players;
+    }   // getPlayers
+    // ------------------------------------------------------------------------
+    /** \brief Get the players that are in the game
+    *  \return A vector containing pointers on the players profiles. */
+    std::vector<std::shared_ptr<NetworkPlayerProfile> >
+        getConnectedPlayers(bool same_offset = false) const
+    {
+        std::lock_guard<std::mutex> lock(m_players_mutex);
+        std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
+        for (auto player_weak : m_players)
+        {
+            if (auto player_connected = player_weak.lock())
+                players.push_back(player_connected);
+            else if (same_offset)
+                players.push_back(nullptr);
+        }
+        return players;
+    }   // getConnectedPlayers
+    // ------------------------------------------------------------------------
+    /** Returns the number of connected players. */
+    unsigned getPlayerCount()      { return m_connected_players_count.load(); }
+    // ------------------------------------------------------------------------
+    void setRace(const std::string& track, unsigned laps, bool reverse)
+    {
+        m_tracks.push_back(track);
+        m_laps = laps;
+        m_reverse = reverse;
+    }
     // ------------------------------------------------------------------------
     void reset()
     {
@@ -129,19 +175,17 @@ public:
     // ------------------------------------------------------------------------
     const std::vector<std::string>& getAllTracks() const   { return m_tracks; }
     // ------------------------------------------------------------------------
-    const std::string& getCurrentTrack() const      { return m_tracks.back(); }
+    void sortPlayersForGrandPrix();
     // ------------------------------------------------------------------------
-    void sortPlayersForGrandPrix(
-        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
-    // ------------------------------------------------------------------------
-    void sortPlayersForGame(
-        std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
+    void sortPlayersForGame();
     // ------------------------------------------------------------------------
     void setHitCaptureTime(int hc, float time)
     {
         m_hit_capture_limit = hc;
         m_battle_time_limit = time;
     }
+    // ------------------------------------------------------------------------
+    std::pair<int, int> getPlayerTeamInfo() const;
     // ------------------------------------------------------------------------
     const std::string& getServerNameUtf8() const { return m_server_name_utf8; }
 };

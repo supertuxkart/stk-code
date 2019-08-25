@@ -14,15 +14,13 @@
                 </box>
             </div>
         </div>
-        <spacer height="1%"/>
-        <div x="2%" width="96%" height="4f" layout="horizontal-row">
+        <spacer height="2%"/>
+        <div x="2%" width="96%" height="20%" layout="horizontal-row">
             <box proportion="2" height="100%" layout="vertical-row">
                 <div x="1%" width="98%" height="fit" layout="horizontal-row">
                     <textbox id="chat" proportion="1"/>
-                    <spacer width="2%" height="10"/>
-                    <button id="send" width="10%" height="fit" align="center" text=""/>
-                    <spacer width="1%" height="10"/>
-                    <button id="emoji" width="10%" height="fit" align="center" text=""/>
+                    <spacer width="3%" height="10"/>
+                    <button id="send" width="20%" height="fit" align="center" I18N="In the network lobby" text="Send"/>
                 </div>
                 <spacer height="5%" width="10"/>
                 <label id="timeout-message" x="1%" width="98%" proportion="1" text="" word_wrap="true" align="center"/>
@@ -38,7 +36,7 @@
                 </div>
             </div>
         </div>
-        <spacer height="1%"/>
+        <spacer height="2%"/>
     </div>
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
 </stkgui>

@@ -19,13 +19,11 @@
 
 #include "karts/abstract_kart.hpp"
 
-#include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
-#include "physics/physics.hpp"
 #include "utils/log.hpp"
 
 /** Creates a kart.
@@ -42,12 +40,38 @@ AbstractKart::AbstractKart(const std::string& ident,
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
-    loadKartProperties(ident, difficulty, ri);
+    m_kart_properties.reset(new KartProperties());
+    const KartProperties* kp = kart_properties_manager->getKart(ident);
+    if (kp == NULL)
+    {
+        Log::warn("Abstract_Kart", "Unknown kart %s, fallback to tux",
+            ident.c_str());
+        kp = kart_properties_manager->getKart(std::string("tux"));
+    }
+    m_kart_properties->copyForPlayer(kp, difficulty);
+    m_difficulty = difficulty;
+    m_kart_animation  = NULL;
+    assert(m_kart_properties);
+
+    // We have to take a copy of the kart model, since otherwise
+    // the animations will be mixed up (i.e. different instances of
+    // the same model will set different animation frames).
+    // Technically the mesh in m_kart_model needs to be grab'ed and
+    // released when the kart is deleted, but since the original
+    // kart_model is stored in the kart_properties all the time,
+    // there is no risk of a mesh being deleted too early.
+    m_kart_model  = m_kart_properties->getKartModelCopy(ri);
+    m_kart_width  = m_kart_model->getWidth();
+    m_kart_height = m_kart_model->getHeight();
+    m_kart_length = m_kart_model->getLength();
+    m_kart_highest_point = m_kart_model->getHighestPoint();
+    m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
 }   // AbstractKart
 
 // ----------------------------------------------------------------------------
 AbstractKart::~AbstractKart()
 {
+    delete m_kart_model;
     if (m_kart_animation)
     {
         m_kart_animation->handleResetRace();
@@ -58,7 +82,6 @@ AbstractKart::~AbstractKart()
 // ----------------------------------------------------------------------------
 void AbstractKart::reset()
 {
-    m_live_join_util = 0;
     // important to delete animations before calling reset, as some animations
     // set the kart velocity in their destructor (e.g. cannon) which "reset"
     // can then cancel. See #2738
@@ -72,51 +95,11 @@ void AbstractKart::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-void AbstractKart::loadKartProperties(const std::string& new_ident,
-                                      PerPlayerDifficulty difficulty,
-                                      std::shared_ptr<RenderInfo> ri)
+/** Returns a name to be displayed for this kart. */
+core::stringw AbstractKart::getName() const
 {
-    m_kart_properties.reset(new KartProperties());
-    const KartProperties* kp = kart_properties_manager->getKart(new_ident);
-    if (kp == NULL)
-    {
-        Log::warn("Abstract_Kart", "Unknown kart %s, fallback to tux",
-            new_ident.c_str());
-        kp = kart_properties_manager->getKart(std::string("tux"));
-    }
-    m_kart_properties->copyForPlayer(kp, difficulty);
-    m_name = m_kart_properties->getName();
-    m_difficulty = difficulty;
-    m_kart_animation  = NULL;
-    assert(m_kart_properties);
-
-    // We have to take a copy of the kart model, since otherwise
-    // the animations will be mixed up (i.e. different instances of
-    // the same model will set different animation frames).
-    // Technically the mesh in m_kart_model needs to be grab'ed and
-    // released when the kart is deleted, but since the original
-    // kart_model is stored in the kart_properties all the time,
-    // there is no risk of a mesh being deleted too early.
-    m_kart_model.reset(m_kart_properties->getKartModelCopy(ri));
-    m_kart_width  = m_kart_model->getWidth();
-    m_kart_height = m_kart_model->getHeight();
-    m_kart_length = m_kart_model->getLength();
-    m_kart_highest_point = m_kart_model->getHighestPoint();
-    m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
-}   // loadKartProperties
-
-// ----------------------------------------------------------------------------
-void AbstractKart::changeKart(const std::string& new_ident,
-                              PerPlayerDifficulty difficulty,
-                              std::shared_ptr<RenderInfo> ri)
-{
-    // Reset previous kart (including delete old animation above)
-    reset();
-    // Remove kart body
-    Physics::getInstance()->removeKart(this);
-    loadKartProperties(new_ident, difficulty, ri);
-}   // changeKart
-
+    return m_kart_properties->getName();
+}   // getName;
 // ----------------------------------------------------------------------------
 /** Returns a unique identifier for this kart (name of the directory the
  *  kart was loaded from). */
@@ -188,17 +171,10 @@ void AbstractKart::kartIsInRestNow()
  *  position in case there is a slope. */
 void AbstractKart::makeKartRest()
 {
-    btTransform t = m_starting_transform;
-    if (m_live_join_util != 0)
-    {
-        t.setOrigin(t.getOrigin() +
-            m_starting_transform.getBasis().getColumn(1) * 3.0f);
-    }
-
     btRigidBody *body = getBody();
     body->clearForces();
     body->setLinearVelocity(Vec3(0.0f));
     body->setAngularVelocity(Vec3(0.0f));
-    body->proceedToTransform(t);
-    setTrans(t);
+    body->proceedToTransform(m_starting_transform);
+    setTrans(m_starting_transform);
 }   // makeKartRest

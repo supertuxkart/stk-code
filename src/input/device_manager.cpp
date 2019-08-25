@@ -31,10 +31,9 @@
 #include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/file_utils.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
 
 #define INPUT_MODE_DEBUG 0
 
@@ -169,9 +168,7 @@ bool DeviceManager::initialize()
         addGamepad(gamepadDevice);
     } // end for
 
-    if ((UserConfigParams::m_multitouch_active == 1 && 
-        irr_driver->getDevice()->supportsTouchDevice()) ||
-        UserConfigParams::m_multitouch_active > 1)
+    if (UserConfigParams::m_multitouch_enabled)
     {
         m_multitouch_device = new MultitouchDevice();
     }
@@ -635,7 +632,8 @@ void DeviceManager::save()
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serializing input.xml...");
 
 
-    std::ofstream configfile(FileUtils::getPortableWritingPath(filepath));
+    std::ofstream configfile;
+    configfile.open (filepath.c_str());
 
     if(!configfile.is_open())
     {

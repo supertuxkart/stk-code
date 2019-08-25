@@ -37,19 +37,6 @@ void NetworkString::unitTesting()
     s.setSynchronous(false);
     assert(!s.isSynchronous());
 
-    // 24bit saving, min (-2^23) -0x800000, max (2^23 - 1) 0x7fffff
-    int min = -0x800000;
-    BareNetworkString smin;
-    smin.addInt24(min);
-    min = smin.getInt24();
-    assert(min == -0x800000);
-
-    int max = 0x7fffff;
-    BareNetworkString smax;
-    smax.addInt24(max);
-    max = smax.getInt24();
-    assert(max == 0x7fffff);
-
     // Check log message format
     BareNetworkString slog(28);
     for(unsigned int i=0; i<28; i++)
@@ -111,56 +98,7 @@ int BareNetworkString::decodeStringW(irr::core::stringw *out) const
     int len = decodeString(&s);
     *out = StringUtils::utf8ToWide(s);
     return len;
-}   // decodeStringW
-
-// ----------------------------------------------------------------------------
-/** Encode string with max length of 16bit and utf32, used in motd or
- *  chat. */
-BareNetworkString& BareNetworkString::encodeString16(
-                                               const irr::core::stringw& value)
-{
-    size_t utf32_len = 0;
-    const uint32_t* utf32 = NULL;
-    std::u32string convert;
-
-    if (sizeof(wchar_t) == 2)
-    {
-        convert = StringUtils::wideToUtf32(value);
-        utf32_len = convert.size();
-        utf32 = (const uint32_t*)convert.c_str();
-    }
-    else
-    {
-        utf32_len = value.size();
-        utf32 = (const uint32_t*)value.c_str();
-    }
-
-    uint16_t str_len = (uint16_t)utf32_len;
-    if (utf32_len > 65535)
-        str_len = 65535;
-    addUInt16(str_len);
-    for (unsigned i = 0; i < str_len; i++)
-        addUInt32(utf32[i]);
-    return *this;
-}   // encodeString16
-
-// ----------------------------------------------------------------------------
-int BareNetworkString::decodeString16(irr::core::stringw* out) const
-{
-    uint16_t str_len = getUInt16();
-    std::u32string convert;
-    for (unsigned i = 0; i < str_len; i++)
-    {
-        uint32_t c = getUInt32();
-        if (sizeof(wchar_t) == 2)
-            convert += (char32_t)c;
-        else
-            out->append((wchar_t)c);
-    }
-    if (str_len > 0 && !convert.empty())
-        *out = StringUtils::utf32ToWide(convert);
-    return str_len * 4 + 2;
-}   // decodeString16
+}   // decodeString 
 
 // ----------------------------------------------------------------------------
 /** Returns a string representing this message suitable to be printed

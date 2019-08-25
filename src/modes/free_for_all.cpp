@@ -22,8 +22,6 @@
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/stk_host.hpp"
-#include "tracks/track.hpp"
-#include "utils/string_utils.hpp"
 
 #include <algorithm>
 #include <utility>
@@ -55,7 +53,6 @@ void FreeForAll::init()
     WorldWithRank::init();
     m_display_rank = false;
     m_count_down_reached_zero = false;
-    m_use_highscores = false;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -64,7 +61,6 @@ void FreeForAll::init()
 void FreeForAll::reset(bool restart)
 {
     WorldWithRank::reset(restart);
-    m_count_down_reached_zero = false;
     if (race_manager->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
@@ -103,42 +99,22 @@ bool FreeForAll::kartHit(int kart_id, int hitter)
     if (isRaceOver())
         return false;
 
-    handleScoreInServer(kart_id, hitter);
+    NetworkString p(PROTOCOL_GAME_EVENTS);
+    p.setSynchronous(true);
+    p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
+    if (kart_id == hitter || hitter == -1)
+        p.addUInt8((uint8_t)kart_id).addUInt32(--m_scores[kart_id]);
+    else
+        p.addUInt8((uint8_t)hitter).addUInt32(++m_scores[hitter]);
+    STKHost::get()->sendPacketToAllPeers(&p, true);
     return true;
 }   // kartHit
-
-// ----------------------------------------------------------------------------
-/** Called when the score of kart needs updated.
- *  \param kart_id The world kart id of the kart that was hit.
- *  \param hitter The world kart id of the kart who hit(-1 if none).
- */
-void FreeForAll::handleScoreInServer(int kart_id, int hitter)
-{
-    int new_score = 0;
-    if (kart_id == hitter || hitter == -1)
-        new_score = --m_scores[kart_id];
-    else
-        new_score = ++m_scores[hitter];
-
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isServer())
-    {
-        NetworkString p(PROTOCOL_GAME_EVENTS);
-        p.setSynchronous(true);
-        p.addUInt8(GameEventsProtocol::GE_BATTLE_KART_SCORE);
-        if (kart_id == hitter || hitter == -1)
-            p.addUInt8((uint8_t)kart_id).addUInt16((int16_t)new_score);
-        else
-            p.addUInt8((uint8_t)hitter).addUInt16((int16_t)new_score);
-        STKHost::get()->sendPacketToAllPeers(&p, true);
-    }
-}   // handleScoreInServer
 
 // ----------------------------------------------------------------------------
 void FreeForAll::setKartScoreFromServer(NetworkString& ns)
 {
     int kart_id = ns.getUInt8();
-    int16_t score = ns.getUInt16();
+    int score = ns.getUInt32();
     m_scores.at(kart_id) = score;
 }   // setKartScoreFromServer
 
@@ -155,18 +131,10 @@ void FreeForAll::update(int ticks)
 {
     WorldWithRank::update(ticks);
     WorldWithRank::updateTrack(ticks);
-    if (Track::getCurrentTrack()->hasNavMesh())
-        updateSectorForKarts();
 
     std::vector<std::pair<int, int> > ranks;
     for (unsigned i = 0; i < m_scores.size(); i++)
-    {
-        // For eliminated (disconnected or reserved player) make his score
-        // int min so always last in rank
-        int cur_score = getKart(i)->isEliminated() ?
-            std::numeric_limits<int>::min() : m_scores[i];
-        ranks.emplace_back(i, cur_score);
-    }
+        ranks.emplace_back(i, m_scores[i]);
     std::sort(ranks.begin(), ranks.end(),
         [](const std::pair<int, int>& a, const std::pair<int, int>& b)
         {
@@ -189,12 +157,9 @@ bool FreeForAll::isRaceOver()
 
     if (!getKartAtPosition(1))
         return false;
-
-    const int top_id = getKartAtPosition(1)->getWorldKartId();
-    const int hit_capture_limit = race_manager->getHitCaptureLimit();
-
+    int top_id = getKartAtPosition(1)->getWorldKartId();
     return (m_count_down_reached_zero && race_manager->hasTimeTarget()) ||
-        (hit_capture_limit != 0 && m_scores[top_id] >= hit_capture_limit);
+        m_scores[top_id] >= race_manager->getHitCaptureLimit();
 }   // isRaceOver
 
 // ----------------------------------------------------------------------------
@@ -210,18 +175,7 @@ void FreeForAll::getKartsDisplayInfo(
         rank_info.lap = -1;
         rank_info.m_outlined_font = true;
         rank_info.m_color = getColor(i);
-        rank_info.m_text = getKart(i)->getController()->getName();
-        if (race_manager->getKartGlobalPlayerId(i) > -1)
-        {
-            const core::stringw& flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(i).getCountryCode());
-            if (!flag.empty())
-            {
-                rank_info.m_text += L" ";
-                rank_info.m_text += flag;
-            }
-        }
-        rank_info.m_text += core::stringw(L" (") +
+        rank_info.m_text = getKart(i)->getController()->getName() + L" (" +
             StringUtils::toWString(m_scores[i]) + L")";
     }
 }   // getKartsDisplayInfo
@@ -253,40 +207,3 @@ bool FreeForAll::getKartFFAResult(int kart_id) const
     int top_score = getKartScore(k->getWorldKartId());
     return getKartScore(kart_id) == top_score;
 }   // getKartFFAResult
-
-// ----------------------------------------------------------------------------
-void FreeForAll::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
-{
-    for (unsigned i = 0; i < m_scores.size(); i++)
-        bns->addUInt32(m_scores[i]);
-}   // saveCompleteState
-
-// ----------------------------------------------------------------------------
-void FreeForAll::restoreCompleteState(const BareNetworkString& b)
-{
-    for (unsigned i = 0; i < m_scores.size(); i++)
-        m_scores[i] = b.getUInt32();
-}   // restoreCompleteState
-
-// ----------------------------------------------------------------------------
-std::pair<uint32_t, uint32_t> FreeForAll::getGameStartedProgress() const
-{
-    std::pair<uint32_t, uint32_t> progress(
-        std::numeric_limits<uint32_t>::max(),
-        std::numeric_limits<uint32_t>::max());
-    if (race_manager->hasTimeTarget())
-    {
-        progress.first = (uint32_t)m_time;
-    }
-    AbstractKart* k = getKartAtPosition(1);
-    float score = -1.0f;
-    if (k)
-        score = (float)getKartScore(k->getWorldKartId());
-
-    if (score >= 0.0f)
-    {
-        progress.second = (uint32_t)(score /
-            (float)race_manager->getHitCaptureLimit() * 100.0f);
-    }
-    return progress;
-}   // getGameStartedProgress

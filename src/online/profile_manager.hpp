@@ -96,6 +96,7 @@ public:
     /** Destroys the singleton. */
     static void destroy()
     {
+        assert(m_profile_manager);
         delete m_profile_manager;
         m_profile_manager = NULL;
     }   // destroy

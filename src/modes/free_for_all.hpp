@@ -31,8 +31,6 @@ protected:
     bool m_count_down_reached_zero;
 
     std::vector<int> m_scores;
-    // ------------------------------------------------------------------------
-    void handleScoreInServer(int kart_id, int hitter);
 
 private:
     // ------------------------------------------------------------------------
@@ -70,20 +68,6 @@ public:
     int getKartScore(int kart_id) const        { return m_scores.at(kart_id); }
     // ------------------------------------------------------------------------
     bool getKartFFAResult(int kart_id) const;
-    // ------------------------------------------------------------------------
-    virtual std::pair<uint32_t, uint32_t> getGameStartedProgress() const
-        OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual void addReservedKart(int kart_id) OVERRIDE
-    {
-        WorldWithRank::addReservedKart(kart_id);
-        m_scores.at(kart_id) = 0;
-    }
-    // ------------------------------------------------------------------------
-    virtual void saveCompleteState(BareNetworkString* bns,
-                                   STKPeer* peer) OVERRIDE;
-    // ------------------------------------------------------------------------
-    virtual void restoreCompleteState(const BareNetworkString& b) OVERRIDE;
 };   // FreeForAll
 
 

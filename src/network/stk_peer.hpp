@@ -49,7 +49,7 @@ enum PeerDisconnectInfo : unsigned int
     PDI_TIMEOUT = 0, //!< Timeout disconnected (default in enet).
     PDI_NORMAL = 1, //!< Normal disconnction with acknowledgement
     PDI_KICK = 2, //!< Kick disconnection
-    PDI_KICK_HIGH_PING = 3, //!< Too high ping, kicked by server
+    PDI_BAD_CONNECTION = 3, //!< Bad connection disconnection
 };   // PeerDisconnectInfo
 
 /*! \class STKPeer
@@ -67,8 +67,6 @@ protected:
 
     /** True if this peer is waiting for game. */
     std::atomic_bool m_waiting_for_game;
-
-    std::atomic_bool m_spectator;
 
     std::atomic_bool m_disconnected;
 
@@ -99,10 +97,6 @@ protected:
     std::set<unsigned> m_available_kart_ids;
 
     std::string m_user_version;
-
-    /** List of client capabilities set when connecting it, to determine
-     *  features available in same version. */
-    std::set<std::string> m_client_capabilities;
 
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
@@ -142,7 +136,7 @@ public:
     uint32_t getHostId() const                            { return m_host_id; }
     // ------------------------------------------------------------------------
     float getConnectedTime() const
-       { return float(StkTime::getMonoTimeMs() - m_connected_time) / 1000.0f; }
+       { return float(StkTime::getRealTimeMs() - m_connected_time) / 1000.0f; }
     // ------------------------------------------------------------------------
     void setAvailableKartsTracks(std::set<std::string>& k,
                                  std::set<std::string>& t)
@@ -198,10 +192,6 @@ public:
     // ------------------------------------------------------------------------
     bool isWaitingForGame() const         { return m_waiting_for_game.load(); }
     // ------------------------------------------------------------------------
-    void setSpectator(bool val)                     { m_spectator.store(val); }
-    // ------------------------------------------------------------------------
-    bool isSpectator() const                     { return m_spectator.load(); }
-    // ------------------------------------------------------------------------
     bool isDisconnected() const               { return m_disconnected.load(); }
     // ------------------------------------------------------------------------
     void setDisconnected(bool val)        { return m_disconnected.store(val); }
@@ -217,30 +207,21 @@ public:
     bool availableKartID(unsigned id)
         { return m_available_kart_ids.find(id) != m_available_kart_ids.end(); }
     // ------------------------------------------------------------------------
-    const std::set<unsigned>& getAvailableKartIDs() const
-                                               { return m_available_kart_ids; }
-    // ------------------------------------------------------------------------
     void setUserVersion(const std::string& uv)         { m_user_version = uv; }
     // ------------------------------------------------------------------------
     const std::string& getUserVersion() const        { return m_user_version; }
     // ------------------------------------------------------------------------
     void updateLastActivity()
-                  { m_last_activity.store((int64_t)StkTime::getMonoTimeMs()); }
+                  { m_last_activity.store((int64_t)StkTime::getRealTimeMs()); }
     // ------------------------------------------------------------------------
     int idleForSeconds() const
     {
         int64_t diff =
-            (int64_t)StkTime::getMonoTimeMs() - m_last_activity.load();
+            (int64_t)StkTime::getRealTimeMs() - m_last_activity.load();
         if (diff < 0)
             return 0;
         return (int)(diff / 1000);
     }
-    // ------------------------------------------------------------------------
-    void setClientCapabilities(std::set<std::string>& caps)
-                                   { m_client_capabilities = std::move(caps); }
-    // ------------------------------------------------------------------------
-    const std::set<std::string>& getClientCapabilities() const
-                                              { return m_client_capabilities; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

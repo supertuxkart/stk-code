@@ -65,6 +65,7 @@ public:
     // ------------------------------------------------------------------------
     static void destroy()
     {
+        assert(m_achievements_manager);
         delete m_achievements_manager;
         m_achievements_manager = NULL;
     }   // destroy

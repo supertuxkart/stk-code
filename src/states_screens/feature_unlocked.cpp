@@ -45,7 +45,6 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <IAnimatedMeshSceneNode.h>
@@ -493,14 +492,14 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
         float progress_factor = (m_global_time - GIFT_EXIT_FROM) 
                               / (GIFT_EXIT_TO - GIFT_EXIT_FROM);
         float smoothed_progress_factor = 
-                                sinf((progress_factor - 0.5f)*M_PI)/2.0f + 0.5f;
+                                sin((progress_factor - 0.5f)*M_PI)/2.0f + 0.5f;
 
         for (int n=0; n<unlockedStuffCount; n++)
         {
             if (m_unlocked_stuff[n].m_root_gift_node == NULL) continue;
 
             core::vector3df pos = m_unlocked_stuff[n].m_root_gift_node->getPosition();
-            pos.Y = sinf(smoothed_progress_factor*2.5f)*10.0f;
+            pos.Y = sin(smoothed_progress_factor*2.5f)*10.0f;
 
             // when there are more than 1 unlocked items, make sure they each
             // have their own path when they move

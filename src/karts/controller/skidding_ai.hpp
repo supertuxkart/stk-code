@@ -190,9 +190,6 @@ private:
     /** Number of players ahead, used for rubber-banding. */
     int m_num_players_ahead;
 
-    /** This bool allows to make the AI use nitro by series of two bursts */
-    bool m_burster;
-
     /** A random number generator to decide if the AI should skid or not. */
     RandomGenerator m_random_skid;
 

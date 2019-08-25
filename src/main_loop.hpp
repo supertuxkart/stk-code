@@ -31,18 +31,16 @@ class MainLoop
 private:
     /** True if the main loop should exit. */
     std::atomic_bool m_abort;
-
+    
     std::atomic_bool m_request_abort;
 
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
-
+    
     /** True if dt is not decreased for low fps */
     bool m_allow_large_dt;
 
     bool m_frame_before_loading_world;
-
-    bool m_download_assets;
 
     Synchronised<int> m_ticks_adjustment;
 
@@ -50,9 +48,9 @@ private:
     uint64_t m_prev_time;
     unsigned m_parent_pid;
     float    getLimitedDt();
-    void     updateRace(int ticks, bool fast_forward);
+    void     updateRace(int ticks);
 public:
-         MainLoop(unsigned parent_pid, bool download_assets = false);
+         MainLoop(unsigned parent_pid);
         ~MainLoop();
     void run();
     /** Set the abort flag, causing the mainloop to be left. */
@@ -60,7 +58,6 @@ public:
     void requestAbort() { m_request_abort = true; }
     void setThrottleFPS(bool throttle) { m_throttle_fps = throttle; }
     void setAllowLargeDt(bool enable) { m_allow_large_dt = enable; }
-    void renderGUI(int phase, int loop_index=-1, int loop_size=-1);
     // ------------------------------------------------------------------------
     /** Returns true if STK is to be stoppe. */
     bool isAborted() const { return m_abort; }

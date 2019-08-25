@@ -47,19 +47,16 @@ namespace GUIEngine
     class ScreenKeyboard : public SkinWidgetContainer, 
                            public AbstractTopLevelContainer
     {
-    protected:
-        typedef std::vector<std::vector<std::string> > KeyboardLayout;
-        typedef std::vector<std::vector<int> > KeyboardLayoutProportions;
+    private:
         enum ButtonsType
         {
             BUTTONS_NONE,
             BUTTONS_LOWER,
             BUTTONS_UPPER,
             BUTTONS_DIGITS,
-            BUTTONS_DIGITS2,
-            BUTTONS_EMOJI
+            BUTTONS_DIGITS2
         };
-    private:
+        
         /** Global instance of the current screen keyboard */
         static ScreenKeyboard* m_screen_keyboard;
         
@@ -76,9 +73,6 @@ namespace GUIEngine
         
         /** True if backspace button was pressed */
         bool m_back_button_pressed;
-        
-        /** True if screen keyboard is going to be closed */
-        bool m_schedule_close;
         
         /** The edit box that is assigned to the keyboard */
         CGUIEditBox* m_edit_box;
@@ -101,9 +95,10 @@ namespace GUIEngine
         /** Remembered input mode that was used before keyboard creation */
         InputManager::InputDriverMode m_previous_mode;
 
+        void init();
         void createButtons();
         void assignButtons(ButtonsType buttons_type);
-        core::stringw getKeyName(std::string key_id);
+        std::wstring getKeyName(std::string key_id);
 
     public:
         LEAK_CHECK()
@@ -112,10 +107,8 @@ namespace GUIEngine
                        CGUIEditBox* edit_box);
         ~ScreenKeyboard();
 
-        void init();
-
         virtual EventPropagation processEvent(const std::string& eventSource);
-
+        
         static void dismiss();
         static bool onEscapePressed();
         /** Returns pointer to the created keyboard or NULL if keyboard was
@@ -126,12 +119,9 @@ namespace GUIEngine
         static bool isActive() {return m_screen_keyboard != NULL;}
 
         static bool shouldUseScreenKeyboard();
-        static bool hasSystemScreenKeyboard();
 
         /** Override to be notified of updates */
         virtual void onUpdate(float dt);
-        
-        bool onEvent(const SEvent &event);
         
         /** Get irrlicht window used by the keyboard widget */
         irr::gui::IGUIWindow* getIrrlichtElement() {return m_irrlicht_window;}
@@ -148,18 +138,6 @@ namespace GUIEngine
         
         /** Returns height of the screen keyboard */
         int getHeight() {return m_area.getHeight();}
-        
-        /** Returns assigned edit box */
-        CGUIEditBox* getEditBox() {return m_edit_box;}
-
-        virtual KeyboardLayoutProportions getKeyboardLayoutProportions() const;
-
-        virtual KeyboardLayout* getKeyboardLayout(ButtonsType bt) const;
-
-        virtual ButtonsType getDefaultButtonsType() const
-        {
-            return BUTTONS_LOWER;
-        }
     };
 }
 

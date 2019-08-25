@@ -40,10 +40,8 @@
 #endif
 
 #if defined(USE_GLES2)
-#ifndef __APPLE__
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
-#endif
 
 #ifdef ARB_DEBUG_OUTPUT
 #define GL_DEBUG_SEVERITY_HIGH_ARB            GL_DEBUG_SEVERITY_HIGH_KHR
@@ -160,12 +158,10 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
 #endif
 
 #ifdef USE_GLES2
-#ifndef IOS_STK
 GL_APICALL void(*GL_APIENTRY glDebugMessageControl)(GLenum source, GLenum type,
     GLenum severity, GLsizei count, const GLuint *ids, GLboolean enabled);
 GL_APICALL void(*GL_APIENTRY glDebugMessageInsert)(GLenum source, GLenum type,
     GLuint id, GLenum severity, GLsizei length, const char *message);
-#endif
 
 #define GL_DEBUG_SOURCE_APPLICATION 0x824A
 #define GL_DEBUG_TYPE_MARKER 0x8268
@@ -207,7 +203,6 @@ void initGL()
 #ifndef ANDROID
     if (SP::sp_apitrace && hasGLExtension("GL_KHR_debug"))
     {
-#ifndef IOS_STK
 #ifdef USE_GLES2
         glDebugMessageControl = (void(GL_APIENTRY*)(GLenum, GLenum, GLenum, GLsizei,
             const GLuint*, GLboolean))eglGetProcAddress("glDebugMessageControlKHR");
@@ -216,7 +211,6 @@ void initGL()
         assert(glDebugMessageControl && glDebugMessageInsert);
 #endif
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
-#endif
     }
     else
     {
@@ -228,7 +222,6 @@ void initGL()
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 {
 #ifndef ANDROID
-#ifndef IOS_STK
     if (SP::sp_apitrace)
     {
         std::string msg = timer.getName();
@@ -236,7 +229,6 @@ ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
         glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 100,
             GL_DEBUG_SEVERITY_NOTIFICATION, -1, msg.c_str());
     }
-#endif
 #endif
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
@@ -253,7 +245,6 @@ ScopedGPUTimer::ScopedGPUTimer(GPUTimer &t) : timer(t)
 ScopedGPUTimer::~ScopedGPUTimer()
 {
 #ifndef ANDROID
-#ifndef IOS_STK
     if (SP::sp_apitrace)
     {
         std::string msg = timer.getName();
@@ -261,7 +252,6 @@ ScopedGPUTimer::~ScopedGPUTimer()
         glDebugMessageInsert(GL_DEBUG_SOURCE_APPLICATION, GL_DEBUG_TYPE_MARKER, 100,
             GL_DEBUG_SEVERITY_NOTIFICATION, -1, msg.c_str());
     }
-#endif
 #endif
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
@@ -786,13 +776,6 @@ bool checkGLError()
     
     return err != GL_NO_ERROR;
 }
-
-#ifdef WIN32
-// Tell system that it should use nvidia on optimus devices
-extern "C" {
-    __declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
-}
-#endif
 
 #endif   // !SERVER_ONLY
 

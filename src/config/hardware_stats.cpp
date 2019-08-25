@@ -24,13 +24,15 @@
 #include "config/hardware_stats.hpp"
 
 #include "config/user_config.hpp"
-#include "config/stk_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "online/http_request.hpp"
-#include "utils/log.hpp"
 #include "utils/random_generator.hpp"
+
+#ifdef __APPLE__
+#  include <sys/sysctl.h>
+#endif
 
 #include <fstream>
 #include <set>
@@ -40,10 +42,6 @@
 #  include <sys/param.h>    // To get BSD macro
 #  include <sys/utsname.h>
 #endif
-#if defined(__APPLE__) || defined(BSD)
-#  include <sys/sysctl.h>
-#endif
-
 #include <vector>
 
 
@@ -84,7 +82,7 @@ int getRAM()
     return (int)ceil(memory_size/mbyte);
 #endif
 
-#if defined(__APPLE__) || defined(BSD)
+#ifdef __APPLE__
     size_t memory_size = 0;
     size_t len = sizeof(memory_size);
     // Argh, the API doesn't seem to be const-correct
@@ -104,7 +102,7 @@ int getRAM()
  */
 int getNumProcessors()
 {
-#if defined(__linux__) || defined(__CYGWIN__) || (defined(BSD) && !defined(__APPLE__))
+#if defined(__linux__) || defined(__CYGWIN__)
     return sysconf(_SC_NPROCESSORS_CONF);
 #endif
 #ifdef WIN32
@@ -112,7 +110,7 @@ int getNumProcessors()
     GetSystemInfo(&si);	// guaranteed to succeed
     return si.dwNumberOfProcessors;
 #endif
-#if defined(__APPLE__)
+#ifdef __APPLE__
     // Mac OS X doesn't have sysconf(_SC_NPROCESSORS_CONF)
     int mib[] = { CTL_HW, HW_NCPU };
     int ncpus;
@@ -157,7 +155,7 @@ bool readEtcReleaseFile(const std::string &filename)
 
 // ----------------------------------------------------------------------------
 /** Identify more details about the OS, e.g. on linux which distro
- *  and which version; on windows the version number.
+ *  and which verison; on windows the version number.
  *  \param json Json data structure to store the os info in.
  */
 void determineOSVersion()
@@ -210,7 +208,7 @@ void determineOSVersion()
 
     HKEY hKey;
     if (RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                      L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0,
+                      "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0,
                       KEY_QUERY_VALUE, &hKey) != ERROR_SUCCESS)
     {
         m_os_version = "windows-unknown";
@@ -218,7 +216,7 @@ void determineOSVersion()
     }
     char windows_version_string[20];
     DWORD size = sizeof(windows_version_string);
-    RegQueryValueEx(hKey, L"CurrentVersion", 0, 0, (LPBYTE)windows_version_string, &size);
+    RegQueryValueEx(hKey, "CurrentVersion", 0, 0, (LPBYTE)windows_version_string, &size);
     unsigned major = 0, minor = 0;
 
     std::stringstream sstr(windows_version_string);
@@ -291,18 +289,11 @@ void reportHardwareStats()
 #else
     json.add("os_win", 0);
 #endif
-
-#ifdef IOS_STK
-    json.add("os_ios", 1);
-    json.add("os_macosx", 0);
-#elif defined(__APPLE__)
-    json.add("os_ios", 0);
+#ifdef __APPLE__
     json.add("os_macosx", 1);
 #else
-    json.add("os_ios", 0);
     json.add("os_macosx", 0);
 #endif
-
 #ifdef ANDROID
     json.add("os_android", 1);
 #else
@@ -407,8 +398,7 @@ void reportHardwareStats()
     request->addParameter("type", "hwdetect");
     request->addParameter("version", report_version);
     request->addParameter("data", json.toString());
-    const std::string request_url = stk_config->m_server_hardware_report + "/upload/v1/";
-    request->setURL(request_url);
+    request->setURL((std::string)UserConfigParams::m_server_hw_report+"/upload/v1/");
     //request->setURL("http://127.0.0.1:8000/upload/v1/");
     request->queue();
 #endif   // !SERVER_ONLY

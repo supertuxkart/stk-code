@@ -40,7 +40,8 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/capture_the_flag.hpp"
-#include "network/network_string.hpp"
+#include "network/network_config.hpp"
+#include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
 
 #define SWAT_POS_OFFSET        core::vector3df(0.0, 0.2f, -0.4f)
@@ -49,39 +50,59 @@
 #define SWAT_ANGLE_OFFSET (90.0f + 15.0f)
 #define SWATTER_ANIMATION_SPEED 100.0f
 
-// ----------------------------------------------------------------------------
 /** Constructor: creates a swatter at a given attachment for a kart. If there
  *  was a bomb attached, it triggers the replace bomb animations.
  *  \param attachment The attachment instance where the swatter is attached to.
  *  \param kart The kart to which the swatter is attached.
- *  \param bomb_ticks Remaining bomb time in ticks, -1 if none.
- *  \param ticks Swatter duration.
- *  \param attachment class attachment from karts.
+ *  \param was_bomb True if the kart had a bomb as attachment.
+ *  \param bomb_scene_node The scene node of the bomb (i.e. the previous
+ *         attachment scene node).
  */
-Swatter::Swatter(AbstractKart *kart, int16_t bomb_ticks, int ticks,
-                  Attachment* attachment)
-       : AttachmentPlugin(kart, attachment)
+Swatter::Swatter(AbstractKart *kart, bool was_bomb,
+                 scene::ISceneNode* bomb_scene_node, int ticks)
+       : AttachmentPlugin(kart),
+         m_swatter_start_ticks(World::getWorld()->getTicksSinceStart()),
+         m_swatter_end_ticks(World::getWorld()->getTicksSinceStart() + ticks)
 {
     m_animation_phase  = SWATTER_AIMING;
     m_discard_now      = false;
+    m_target           = NULL;
     m_closest_kart     = NULL;
-    m_discard_ticks    = World::getWorld()->getTicksSinceStart() + ticks;
-    m_bomb_remaining   = bomb_ticks;
-    m_scene_node       = NULL;
-    m_bomb_scene_node  = NULL;
-    m_swatter_duration = stk_config->time2Ticks(
-        kart->getKartProperties()->getSwatterDuration());
-    if (m_bomb_remaining != -1)
+    m_bomb_scene_node  = bomb_scene_node;
+    m_swat_bomb_frame  = 0.0f;
+
+    // Setup the node
+    m_scene_node = kart->getAttachment()->getNode();
+    m_scene_node->setPosition(SWAT_POS_OFFSET);
+
+    if (was_bomb)
     {
+        m_scene_node->setMesh(attachment_manager
+            ->getMesh(Attachment::ATTACH_SWATTER_ANIM));
+        m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
+        m_scene_node->setAnimationSpeed(0.9f);
+        m_scene_node->setCurrentFrame(0.0f);
+        m_scene_node->setLoopMode(false);
         // There are 40 frames in blender for swatter_anim.blender
         // so 40 / 25 * 120
-        m_discard_ticks =
-            World::getWorld()->getTicksSinceStart() +
-            stk_config->time2Ticks(40.0f / 25.0f);
+        m_removed_bomb_ticks =
+            World::getWorld()->getTicksSinceStart() + 192;
     }
+    else
+    {
+        m_removed_bomb_ticks = std::numeric_limits<int>::max();
+        m_scene_node->setAnimationSpeed(0);
+    }
+
     m_swat_sound = NULL;
-    m_swatter_animation_ticks = 0;
-    m_played_swatter_animation = false;
+    m_start_swat_ticks = std::numeric_limits<int>::max();
+    m_end_swat_ticks = std::numeric_limits<int>::max();
+#ifndef SERVER_ONLY
+    if (kart->getIdent() == "nolok")
+        m_swat_sound = SFXManager::get()->createSoundSource("hammer");
+    else
+        m_swat_sound = SFXManager::get()->createSoundSource("swatter");
+#endif
 }   // Swatter
 
 // ----------------------------------------------------------------------------
@@ -103,142 +124,58 @@ Swatter::~Swatter()
 }   // ~Swatter
 
 // ----------------------------------------------------------------------------
-void Swatter::updateGraphics(float dt)
+void Swatter::updateGrahpics(float dt)
 {
 #ifndef SERVER_ONLY
-    if (m_bomb_remaining != -1)
+    if (m_removed_bomb_ticks != std::numeric_limits<int>::max())
     {
-        if (!m_scene_node)
-        {
-            m_scene_node = m_kart->getAttachment()->getNode();
-            m_scene_node->setPosition(SWAT_POS_OFFSET);
-            m_scene_node->setMesh(attachment_manager
-                ->getMesh(Attachment::ATTACH_SWATTER_ANIM));
-            m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
-            m_scene_node->setAnimationSpeed(0.9f);
-            m_scene_node->setCurrentFrame(0.0f);
-            m_scene_node->setLoopMode(false);
-        }
-        if (!m_bomb_scene_node)
-        {
-            m_bomb_scene_node = irr_driver->addAnimatedMesh(
-                attachment_manager->getMesh(Attachment::ATTACH_BOMB), "bomb");
-#ifdef DEBUG
-            std::string debug_name = m_kart->getIdent() + " (attachment)";
-            m_bomb_scene_node->setName(debug_name.c_str());
-#endif
-            m_bomb_scene_node->setParent(m_kart->getNode());
-            float time_left = stk_config->ticks2Time(m_bomb_remaining);
-            if (time_left <= (m_bomb_scene_node->getEndFrame() -
-                m_bomb_scene_node->getStartFrame() - 1))
-            {
-                m_bomb_scene_node->setCurrentFrame(
-                    m_bomb_scene_node->getEndFrame()
-                    - m_bomb_scene_node->getStartFrame() - 1 - time_left);
-            }
-            m_bomb_scene_node->setAnimationSpeed(0.0f);
-        }
-
-        float swat_bomb_frame = stk_config->ticks2Time(
-            World::getWorld()->getTicksSinceStart() -
-            (m_discard_ticks - stk_config->time2Ticks(40.0f / 25.0f)))
-            * 25.0f;
-
-        if (swat_bomb_frame >= (float)m_scene_node->getEndFrame())
-            swat_bomb_frame = (float)m_scene_node->getEndFrame();
-
+        m_swat_bomb_frame += dt*25.0f;
         m_scene_node->setRotation(core::vector3df(0.0, -180.0, 0.0));
-        m_scene_node->setCurrentFrame(swat_bomb_frame);
 
-        if (swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
+        m_scene_node->setCurrentFrame(m_swat_bomb_frame);
+
+        if (m_swat_bomb_frame >= 32.5f && m_bomb_scene_node != NULL)
         {
-            m_bomb_scene_node->setPosition(
-                core::vector3df(-(swat_bomb_frame - 32.5f), 0.0f, 0.0f));
-            m_bomb_scene_node->setRotation(
-                core::vector3df(-(swat_bomb_frame - 32.5f), 0.0f, 0.0f));
+            m_bomb_scene_node->setPosition(m_bomb_scene_node
+                ->getPosition() + core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
+            m_bomb_scene_node->setRotation(m_bomb_scene_node
+                ->getRotation() + core::vector3df(-dt*15.0f, 0.0f, 0.0f) );
         }
 
-        if (swat_bomb_frame >= 35)
+        if (m_swat_bomb_frame >= m_scene_node->getEndFrame())
         {
-            m_bomb_scene_node->setVisible(false);
+            return;
+        }
+        else if (m_swat_bomb_frame >= 35)
+        {
+            if (m_bomb_scene_node != NULL)
+            {
+                irr_driver->removeNode(m_bomb_scene_node);
+                m_bomb_scene_node = NULL;
+            }
         }   // bom_frame > 35
     }   // if removing bomb
-    else
-    {
-        if (!m_scene_node)
-        {
-            m_scene_node = m_kart->getAttachment()->getNode();
-            if (m_kart->getIdent() == "nolok")
-            {
-                m_scene_node->setMesh(attachment_manager
-                    ->getMesh(Attachment::ATTACH_NOLOKS_SWATTER));
-            }
-            else
-            {
-                m_scene_node->setMesh(attachment_manager
-                    ->getMesh(Attachment::ATTACH_SWATTER));
-            }
-            m_scene_node->setPosition(SWAT_POS_OFFSET);
-            m_scene_node->setLoopMode(false);
-            m_scene_node->setAnimationSpeed(0.0f);
-        }
-        if (!m_swat_sound)
-        {
-            if (m_kart->getIdent() == "nolok")
-                m_swat_sound = SFXManager::get()->createSoundSource("hammer");
-            else
-                m_swat_sound = SFXManager::get()->createSoundSource("swatter");
-        }
-        if (!m_discard_now)
-        {
-            switch (m_animation_phase)
-            {
-            case SWATTER_AIMING:
-                {
-                    pointToTarget();
-                    m_played_swatter_animation = false;
-                }
-                break;
-            case SWATTER_TO_TARGET:
-                {
-                    if (!m_played_swatter_animation)
-                    {
-                        m_played_swatter_animation = true;
-                        // Setup the animation
-                        m_scene_node->setCurrentFrame(0.0f);
-                        m_scene_node->setAnimationSpeed(SWATTER_ANIMATION_SPEED);
-                        Vec3 swatter_pos =
-                            m_kart->getTrans()(Vec3(SWAT_POS_OFFSET));
-                        m_swat_sound->setPosition(swatter_pos);
-                        m_swat_sound->play();
-                    }
-                    pointToTarget();
-                }
-                break;
-            case SWATTER_FROM_TARGET:
-                break;
-            }
-        }
-    }
 #endif
-}   // updateGraphics
+}   // updateGrahpics
 
 // ----------------------------------------------------------------------------
 /** Updates an armed swatter: it checks for any karts that are close enough
  *  and not invulnerable, it swats the kart.
- *  \param ticks Time step size.
- *  \return True if the attachment should be discarded.
+ *  \param dt Time step size.
+ *  \return World ticks to discard the swatter.
  */
-bool Swatter::updateAndTestFinished(int ticks)
+int Swatter::updateAndTestFinished(int ticks)
 {
     const int ticks_start = World::getWorld()->getTicksSinceStart();
-    if (World::getWorld()->getTicksSinceStart() > m_discard_ticks)
-        return true;
+    if (m_removed_bomb_ticks != std::numeric_limits<int>::max())
+    {
+        if (ticks_start >= m_removed_bomb_ticks)
+            return m_removed_bomb_ticks;
+        return -1;
+    }   // if removing bomb
 
-    // If removing bomb animation playing, it will only ends when
-    // m_discard_ticks > world ticks
-    if (m_bomb_remaining != -1)
-        return false;
+    if (RewindManager::get()->isRewinding())
+        return -1;
 
     if (!m_discard_now)
     {
@@ -248,13 +185,13 @@ bool Swatter::updateAndTestFinished(int ticks)
             {
                 // Avoid swatter near the start and the end lifetime of swatter
                 // to make sure all clients know the existence of swatter each other
-                if (m_swatter_duration - m_attachment->getTicksLeft() < 60 ||
-                    m_attachment->getTicksLeft() < 90) // ~20 and ~60 below
-                    return false;
+                if (ticks_start - m_swatter_start_ticks < 60 ||
+                    m_swatter_end_ticks - ticks_start < 60)
+                    return -1;
 
                 chooseTarget();
-                if (!m_closest_kart)
-                    break;
+                pointToTarget();
+                if(!m_target || !m_closest_kart) break;
 
                 // Get the node corresponding to the joint at the center of the
                 // swatter (by swatter, I mean the thing hold in the hand, not
@@ -275,45 +212,61 @@ bool Swatter::updateAndTestFinished(int ticks)
                 {
                     // Start squashing
                     m_animation_phase = SWATTER_TO_TARGET;
-                    m_swatter_animation_ticks =
-                        m_attachment->getTicksLeft() - 20;
+                    m_start_swat_ticks = ticks_start + 20;
+                    // Setup the animation
+                    m_scene_node->setCurrentFrame(0.0f);
+                    m_scene_node->setLoopMode(false);
+                    m_scene_node->setAnimationSpeed(SWATTER_ANIMATION_SPEED);
+
+#ifndef SERVER_ONLY
+                    // Play swat sound
+                    m_swat_sound->setPosition(swatter_pos);
+                    m_swat_sound->play();
+#endif
                 }
             }
             break;
         case SWATTER_TO_TARGET:
             {
+                pointToTarget();
                 // Did we just finish the first part of the movement?
-                if (m_attachment->getTicksLeft() < m_swatter_animation_ticks &&
-                    m_attachment->getTicksLeft() > 60)
+                if (ticks_start > m_start_swat_ticks)
                 {
+                    m_start_swat_ticks = std::numeric_limits<int>::max();
                     // Squash the karts and items around and
                     // change the current phase
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
                     const int end_ticks = ticks_start + 60;
                     if (race_manager->isBattleMode() ||
-                        race_manager->isSoccerMode())
+                        race_manager
+                        ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
                     {
                         // Remove swatter from kart in arena gameplay
                         // after one successful hit
                         m_discard_now = true;
-                        m_discard_ticks = end_ticks;
                     }
-                    m_swatter_animation_ticks =
-                        m_attachment->getTicksLeft() - 60;
+                    m_end_swat_ticks = end_ticks;
                 }
             }
             break;
+
         case SWATTER_FROM_TARGET:
-            {
-                if (m_attachment->getTicksLeft() < m_swatter_animation_ticks &&
-                    m_attachment->getTicksLeft() > 0)
-                    m_animation_phase = SWATTER_AIMING;
             break;
-            }
         }
     }
-    return false;
+
+    if (m_discard_now)
+    {
+        return m_end_swat_ticks;
+    }
+    else if (ticks_start > m_end_swat_ticks)
+    {
+        m_animation_phase = SWATTER_AIMING;
+        m_end_swat_ticks = std::numeric_limits<int>::max();
+        return -1;
+    }
+    return -1;
 }   // updateAndTestFinished
 
 // ----------------------------------------------------------------------------
@@ -350,11 +303,8 @@ void Swatter::chooseTarget()
             closest_kart = kart;
         }
     }
-    // Not larger than 2^5 - 1 for kart id for optimizing state saving
-    if (closest_kart && closest_kart->getWorldKartId() < 31)
-        m_closest_kart = closest_kart;
-    else
-        m_closest_kart = NULL;
+    m_target = closest_kart;    // may be NULL
+    m_closest_kart = closest_kart;
 }
 
 // ----------------------------------------------------------------------------
@@ -363,17 +313,16 @@ void Swatter::chooseTarget()
 void Swatter::pointToTarget()
 {
 #ifndef SERVER_ONLY
-    if (m_kart->isGhostKart() || !m_scene_node)
-        return;
+    if (m_kart->isGhostKart()) return;
 
-    if (!m_closest_kart)
+    if(!m_target)
     {
         m_scene_node->setRotation(core::vector3df());
     }
     else
     {
         Vec3 swatter_to_target =
-            m_kart->getTrans().inverse()(m_closest_kart->getXYZ());
+            m_kart->getTrans().inverse()(m_target->getXYZ());
         float dy = -swatter_to_target.getZ();
         float dx = swatter_to_target.getX();
         float angle = SWAT_ANGLE_OFFSET + atan2f(dy, dx) * 180 / M_PI;
@@ -392,13 +341,28 @@ void Swatter::squashThingsAround()
 
     const KartProperties *kp = m_kart->getKartProperties();
 
+    AbstractKart* closest_kart = m_closest_kart;
     float duration = kp->getSwatterSquashDuration();
     float slowdown =  kp->getSwatterSquashSlowdown();
     // The squash attempt may fail because of invulnerability, shield, etc.
     // Making a bomb explode counts as a success
-    bool success = m_closest_kart->setSquash(duration, slowdown);
+    bool success = closest_kart->setSquash(duration, slowdown);
     const bool has_created_explosion_animation =
-        success && m_closest_kart->getKartAnimation() != NULL;
+        success && closest_kart->getKartAnimation() != NULL;
+
+    // Locally add a event to replay the squash during rewind
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() &&
+        closest_kart->getKartAnimation() == NULL)
+    {
+        RewindManager::get()->addRewindInfoEventFunction(new
+            RewindInfoEventFunction(World::getWorld()->getTicksSinceStart(),
+            /*undo_function*/[](){},
+            /*replay_function*/[closest_kart, duration, slowdown]()
+            {
+                closest_kart->setSquash(duration, slowdown);
+            }));
+    }
 
     if (success)
     {
@@ -426,7 +390,7 @@ void Swatter::squashThingsAround()
         }
     }
 
-    if (has_created_explosion_animation && !RewindManager::get()->isRewinding())
+    if (has_created_explosion_animation)
     {
         HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
         if(m_kart->getController()->isLocalPlayerController())
@@ -436,52 +400,3 @@ void Swatter::squashThingsAround()
 
     // TODO: squash items
 }   // squashThingsAround
-
-// ----------------------------------------------------------------------------
-void Swatter::restoreState(BareNetworkString* buffer)
-{
-    int16_t prev_bomb_remaing = m_bomb_remaining;
-    m_bomb_remaining = buffer->getUInt16();
-    if (prev_bomb_remaing != m_bomb_remaining)
-    {
-        // Wrong state, clear mesh and let updateGraphics reset itself
-        m_scene_node = NULL;
-        if (m_bomb_scene_node)
-        {
-            irr_driver->removeNode(m_bomb_scene_node);
-            m_bomb_scene_node = NULL;
-        }
-    }
-    if (m_bomb_remaining == -1)
-    {
-        uint8_t combined = buffer->getUInt8();
-        int kart_id = combined & 31;
-        if (kart_id == 31)
-            m_closest_kart = NULL;
-        else
-            m_closest_kart = World::getWorld()->getKart(kart_id);
-        m_animation_phase = AnimationPhase((combined >> 5) & 3);
-        m_discard_now = (combined >> 7) == 1;
-        m_discard_ticks = buffer->getUInt32();
-        m_swatter_animation_ticks = buffer->getUInt16();
-    }
-    else
-        m_discard_ticks = buffer->getUInt32();
-}   // restoreState
-
-// ----------------------------------------------------------------------------
-void Swatter::saveState(BareNetworkString* buffer) const
-{
-    buffer->addUInt16(m_bomb_remaining);
-    if (m_bomb_remaining == -1)
-    {
-        uint8_t combined =
-            m_closest_kart ? (uint8_t)m_closest_kart->getWorldKartId() : 31;
-        combined |= m_animation_phase << 5;
-        combined |= (m_discard_now ? (1 << 7) : 0);
-        buffer->addUInt8(combined).addUInt32(m_discard_ticks)
-            .addUInt16(m_swatter_animation_ticks);
-    }
-    else
-        buffer->addUInt32(m_discard_ticks);
-}   // saveState

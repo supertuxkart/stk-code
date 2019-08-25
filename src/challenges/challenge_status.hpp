@@ -32,6 +32,7 @@
 
 #include "race/race_manager.hpp"
 #include "utils/no_copy.hpp"
+#include "utils/translation.hpp"
 
 class ChallengeData;
 class UTFWriter;
@@ -52,9 +53,12 @@ class XMLNode;
 class ChallengeStatus : public NoCopy
 {
 private:
-    // Stores the active and solved status for each difficulty with a bitmask
-    int m_active;
-    int m_solved;
+    /** The different states the challenge can be in. */
+    enum {CH_INACTIVE,                 // challenge not yet possible
+          CH_ACTIVE,                   // challenge possible, but not yet solved
+          CH_SOLVED}                   // challenge was solved
+
+    m_state[RaceManager::DIFFICULTY_COUNT];
 
     // If the challenge's SuperTux time requirement has been beaten
     // in a (s)lower difficulty.
@@ -67,8 +71,10 @@ public:
     ChallengeStatus(const ChallengeData* data)
     {
         m_data = data;
-        m_active = 0;
-        m_solved = 0;
+        m_state[RaceManager::DIFFICULTY_EASY]   = CH_INACTIVE;
+        m_state[RaceManager::DIFFICULTY_MEDIUM] = CH_INACTIVE;
+        m_state[RaceManager::DIFFICULTY_HARD]   = CH_INACTIVE;
+        m_state[RaceManager::DIFFICULTY_BEST]   = CH_INACTIVE;
         m_max_req_in_lower_diff = false;
     }
     virtual ~ChallengeStatus() {};
@@ -81,35 +87,29 @@ public:
      */
     bool isSolved(RaceManager::Difficulty d) const
     {
-        return ((m_solved >> (int) d)&0x01) == 1;
+        return m_state[d]==CH_SOLVED;
     }   // isSolved
     // ------------------------------------------------------------------------
     /** Returns true if this challenge was solved at any difficult.
      */
-    bool isSolvedAtAnyDifficulty() const { return m_solved != 0; }
-    /** Returns the highest difficulty at which this challenge was solved.
-     */
-    RaceManager::Difficulty highestSolved() const
+    bool isSolvedAtAnyDifficulty() const
     {
-        return (m_solved & 0x08) ? RaceManager::DIFFICULTY_BEST   :
-               (m_solved & 0x04) ? RaceManager::DIFFICULTY_HARD   :
-               (m_solved & 0x02) ? RaceManager::DIFFICULTY_MEDIUM :
-               (m_solved & 0x01) ? RaceManager::DIFFICULTY_EASY   :
-                                   RaceManager::DIFFICULTY_NONE;
-    }   // highestSolved
+        return m_state[0]==CH_SOLVED || m_state[1]==CH_SOLVED ||
+                m_state[2]==CH_SOLVED || m_state[3]==CH_SOLVED;
+    }   // isSolvedAtAnyDifficulty
     // ------------------------------------------------------------------------
     /** True if this challenge is active at the given difficulty.
      */
     bool isActive(RaceManager::Difficulty d) const
     {
-        return ((m_active >> (int) d)&0x01) == 1;
+        return m_state[d]==CH_ACTIVE;
     }   // isActive
     // ------------------------------------------------------------------------
     /** Sets this challenge to be active.
      */
     void setActive(RaceManager::Difficulty d)
     {
-        m_active |= (0x01 << (int) d);
+        m_state[d] = CH_ACTIVE;
     }   // setActive
     // ------------------------------------------------------------------------
     /** Returns if this challenge is only an unlock list */

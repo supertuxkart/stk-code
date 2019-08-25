@@ -4,16 +4,15 @@
 # 
 # Translators:
 # Jakub Vaněk <vanek.jakub4@seznam.cz>, 2015-2016
-# Pavel Borecki <pavel.borecki@gmail.com>, 2015-2019
+# Pavel Borecki <pavel.borecki@gmail.com>, 2015-2018
 # ToMáš Marný, 2015
 # ToMáš Marný, 2015-2016
-# Tomáš Pártl <tomaspartl@centrum.cz>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-24 15:48+0800\n"
-"PO-Revision-Date: 2019-07-24 16:41+0000\n"
+"POT-Creation-Date: 2018-11-23 23:45+0800\n"
+"PO-Revision-Date: 2018-12-06 16:58+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Czech (http://www.transifex.com/supertuxkart/supertuxkart/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -36,7 +35,7 @@ msgstr "Zásah!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
-msgstr "Zasáhněte 10 motokár bowlingovou koulí."
+msgstr "Zasáhněte 10 motokár kulečníkovou koulí."
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
@@ -52,14 +51,14 @@ msgstr "Maratonec"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr "Dokončete nějaký závod s nejméně dvojnásobkem výchozího počtu kol."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
 msgstr "Řada smyků"
 
 #. I18N: ./data/achievements.xml
-msgid "Skid 5 times in a single lap."
+msgid "Make 5 skidding in a single lap."
 msgstr "Proveďte 5 smyků v jednom kole."
 
 #. I18N: ./data/achievements.xml
@@ -70,7 +69,7 @@ msgstr "Zlatý řidič"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Vyhrajte proti nejméně 3 počítačem ovládaným motokárám v režimech normálního závodu, závodu na čas a následujte vedoucího."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -88,7 +87,7 @@ msgstr "Nezastavitelný"
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr "Vyhrajte 5 samostatných závodů v řadě proti nejméně 3 počítačem ovládaným motokárám. Pozor, restart závodu se počítá jako ztráta."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -114,17 +113,17 @@ msgstr "Lovec komárů"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr "Udělejte ze svých soupeřů komáry! V závodě alespoň 5 z nich plácačkou rozmáčkněte."
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
-msgstr "Za hranicí štěstí"
+msgstr ""
 
 #. I18N: ./data/achievements.xml
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "Vyhrajte 10 samostatných závodů v řadě v režimech Expert nebo SuperTux proti nejméně 5 počítačem ovládaným motokárám. Pozor, restart závodu se počítá jako ztráta."
+msgstr ""
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -156,10 +155,9 @@ msgstr "Odinstalovat"
 #. I18N: Add-on screen action
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:299
+#: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr "Zpět"
 
@@ -179,7 +177,7 @@ msgstr "Akcelerometr"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Gyroscope"
-msgstr "Gyroskop"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -259,17 +257,17 @@ msgstr "Pokročilé"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Deadzone"
-msgstr "Mrtvá zóna"
+msgstr "Zóna smrti"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity X"
-msgstr "Citlivost X"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity Y"
-msgstr "Citlivost Y"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Restore defaults"
@@ -277,9 +275,10 @@ msgstr "Obnovit výchozí nastavení"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/edit_gp_screen.cpp:261
-#: src/states_screens/ghost_replay_selection.cpp:388
+#: src/network/protocols/client_lobby.cpp:466
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/edit_gp_screen.cpp:260
+#: src/states_screens/ghost_replay_selection.cpp:386
 msgid "Yes"
 msgstr "Ano"
 
@@ -294,8 +293,6 @@ msgstr "Ano"
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: In the server configuration screen
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
@@ -309,12 +306,12 @@ msgstr "Ano"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/add_device_dialog.cpp:125
-#: src/states_screens/dialogs/addons_loading.cpp:238
-#: src/states_screens/online/register_screen.cpp:127
-#: src/states_screens/options/user_screen.cpp:128
+#: src/states_screens/dialogs/add_device_dialog.cpp:128
+#: src/states_screens/dialogs/addons_loading.cpp:236
+#: src/states_screens/online/register_screen.cpp:119
+#: src/states_screens/options/user_screen.cpp:126
 msgid "Cancel"
-msgstr "Zrušit"
+msgstr "Storno"
 
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
@@ -378,11 +375,6 @@ msgstr "Osvětlení založené na obrázku"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
-msgid "Light Scattering"
-msgstr "Rozptyl světla"
-
-#. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
-#. I18N: Video settings
 msgid "Animated characters"
 msgstr "Animované postavy"
 
@@ -394,7 +386,7 @@ msgstr "Komprese textur"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Particle effects"
-msgstr "Částicové efekty"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -415,9 +407,6 @@ msgstr "* Nová nastavení se projeví až po ukončení a opětovném spuštěn
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -425,8 +414,8 @@ msgstr "* Nová nastavení se projeví až po ukončení a opětovném spuštěn
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/message_dialog.cpp:125
-#: src/states_screens/dialogs/message_dialog.cpp:139
+#: src/states_screens/dialogs/message_dialog.cpp:123
+#: src/states_screens/dialogs/message_dialog.cpp:135
 msgid "OK"
 msgstr "OK"
 
@@ -445,11 +434,10 @@ msgstr "Pouze zhlédnout opakovačku"
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 msgid "Compare to another ghost"
-msgstr "Porovnat s jiným duchem"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 #. I18N: ./data/gui/screens/track_info.stkgui
@@ -460,7 +448,7 @@ msgstr "Start závodu"
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
 msgid "Compare ghost"
-msgstr "Porovnat ducha"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
@@ -476,7 +464,7 @@ msgstr "Odstranit"
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: Objective shown in achievement dialog
 msgid "Goal"
-msgstr "Cíl"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: Progress shown in achievement dialog
@@ -527,62 +515,6 @@ msgstr "Odeslat"
 msgid "Close"
 msgstr "Zavřít"
 
-#. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Back to Race"
-msgstr "Vrátit se do závodu"
-
-#. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
-#. I18N: Show in network ingame dialog to allow user to go back to lobby to
-#. end spectating (for example)
-msgid "Back to lobby"
-msgstr "Návrat do čekárny"
-
-#. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Restart Race"
-msgstr "Restartovat závod"
-
-#. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Give Up Race"
-msgstr "Vzdát závod"
-
-#. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
-#. I18N: In the in-game dialog
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/screens/main_menu.stkgui
-#. I18N: In the main screen
-msgid "Options"
-msgstr "Možnosti"
-
-#. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
-#. I18N: In the in-game dialog
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/screens/main_menu.stkgui
-#. I18N: In the main screen
-msgid "Help"
-msgstr "Nápověda"
-
-#. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
-#. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Exit Race"
-msgstr "Odejít ze závodu"
-
 #. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
 #. I18N: User info dialog
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
@@ -597,7 +529,7 @@ msgstr "Nejlepších 10 hráčů"
 
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 msgid "Refresh"
-msgstr "Načíst znovu"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -625,8 +557,8 @@ msgstr "Aby bylo možné obnovit heslo, vyplňte uživatelské jméno a e-mailov
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/online/online_profile_friends.cpp:72
-#: src/states_screens/online/online_user_search.cpp:72
+#: src/states_screens/online/online_profile_friends.cpp:71
+#: src/states_screens/online/online_user_search.cpp:71
 msgid "Username"
 msgstr "Uživatelské jméno"
 
@@ -654,109 +586,6 @@ msgstr "Souhlasím s výše uvedenými podmínkami a je mi 13 let a více. "
 msgid "Accept"
 msgstr "Přijmout"
 
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: In the server configuration screen
-msgid "Server Configuration"
-msgstr "Nastavení serveru"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
-msgid "Difficulty"
-msgstr "Obtížnost"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
-msgid "Novice"
-msgstr "Nováček"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
-msgid "Intermediate"
-msgstr "Pokročilý"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
-msgid "Expert"
-msgstr "Expert"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/dialogs/select_challenge.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Difficulty
-#. I18N: ./data/gui/screens/race_setup.stkgui
-#. I18N: Difficulty
-#: src/race/race_manager.cpp:1177
-msgid "SuperTux"
-msgstr "SuperTux"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: In the server creation screen
-#: src/states_screens/track_info_screen.cpp:212
-msgid "Game mode"
-msgstr "Herní režim"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
-msgid "Normal Race"
-msgstr "Normální závod"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
-msgid "Time Trial"
-msgstr "Závod na čas"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#: src/states_screens/race_setup_screen.cpp:112
-msgid "Battle"
-msgstr "Bitva"
-
-#. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: ./data/gui/screens/online/create_server.stkgui
-#. I18N: Multiplayer game mode
-#. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
-msgid "Soccer"
-msgstr "Fotbal"
-
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -779,7 +608,10 @@ msgstr "Přidat hráče"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
 #: src/states_screens/online/online_profile_achievements.cpp:75
+#: src/states_screens/online/server_selection.cpp:119
 msgid "Name"
 msgstr "Název"
 
@@ -791,20 +623,20 @@ msgstr "Handicap"
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Press the 'All players ready' button after the player list is ready."
-msgstr "Jakmile bude seznam hráčů připraven, stiskněte tlačítko 'Všichni hráči připraveni'."
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "All players ready"
-msgstr "Všichni hráči připraveni"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
-msgid "Clear players"
-msgstr "Vymazat hráče"
+msgid "Clear added player"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
+#. I18N: User info dialog' dialog
 msgid "User Info"
 msgstr "Informace o uživateli"
 
@@ -840,13 +672,31 @@ msgstr "Výběr motokáry"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+msgid "Options"
+msgstr "Možnosti"
+
+#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+msgid "Help"
+msgstr "Nápověda"
+
+#. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
+#. I18N: In the in-game dialog
 msgid "Back to menu"
 msgstr "Návrat do nabídky"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
 msgid "Press fully and release..."
-msgstr "Plně stiskněte a uvolněte..."
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -865,15 +715,89 @@ msgstr "Pro zrušení stiskněte ESC"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:236
+msgid "Back to Race"
+msgstr "Vrátit se do závodu"
+
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+#: src/states_screens/race_result_gui.cpp:232
 msgid "Setup New Race"
 msgstr "Nastavit nový závod"
 
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Restart Race"
+msgstr "Restartovat závod"
+
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Give Up Race"
+msgstr "Vzdát závod"
+
+#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
+#. I18N: Race paused button
+msgid "Exit Race"
+msgstr "Odejít ze závodu"
+
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 msgid "Race Setup"
 msgstr "Nastavení závodu"
+
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Type of race, in a challenge
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Type of race, in a challenge
+msgid "Type:"
+msgstr "Typ:"
+
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:590
+msgid "Novice"
+msgstr "Nováček"
+
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:591
+msgid "Intermediate"
+msgstr "Pokročilý"
+
+#. I18N: ./data/gui/dialogs/select_challenge_nobest.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:592
+msgid "Expert"
+msgstr "Expert"
+
+#. I18N: ./data/gui/dialogs/select_challenge.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Difficulty
+#. I18N: ./data/gui/screens/race_setup.stkgui
+#. I18N: Difficulty
+#: src/race/race_manager.hpp:593
+msgid "SuperTux"
+msgstr "SuperTux"
 
 #. I18N: ./data/gui/dialogs/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
@@ -882,8 +806,8 @@ msgstr "Nastavení závodu"
 #. I18N: ./data/gui/screens/grand_prix_win.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:175
-#: src/states_screens/race_result_gui.cpp:202
+#: src/states_screens/race_result_gui.cpp:173
+#: src/states_screens/race_result_gui.cpp:198
 msgid "Continue"
 msgstr "Pokračovat"
 
@@ -938,11 +862,11 @@ msgstr "Standardní"
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:82
-#: src/states_screens/easter_egg_screen.cpp:145
+#: src/states_screens/arenas_screen.cpp:81
+#: src/states_screens/easter_egg_screen.cpp:144
 #: src/states_screens/grand_prix_editor_screen.cpp:336
-#: src/states_screens/kart_selection.cpp:294
-#: src/states_screens/tracks_and_gp_screen.cpp:146
+#: src/states_screens/kart_selection.cpp:290
+#: src/states_screens/tracks_and_gp_screen.cpp:145
 msgid "Add-Ons"
 msgstr "Zásuvné moduly"
 
@@ -953,15 +877,15 @@ msgstr "Zásuvné moduly"
 #. I18N: Time filters for add-ons
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
-#: src/states_screens/addons_screen.cpp:48
-#: src/states_screens/arenas_screen.cpp:74
-#: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:146
+#: src/states_screens/addons_screen.cpp:47
+#: src/states_screens/arenas_screen.cpp:73
+#: src/states_screens/easter_egg_screen.cpp:136
+#: src/states_screens/edit_track_screen.cpp:145
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:333
-#: src/states_screens/kart_selection.cpp:286
-#: src/states_screens/online/tracks_screen.cpp:349
-#: src/states_screens/tracks_and_gp_screen.cpp:136
+#: src/states_screens/kart_selection.cpp:282
+#: src/states_screens/online/tracks_screen.cpp:225
+#: src/states_screens/tracks_and_gp_screen.cpp:135
 msgid "All"
 msgstr "Všechny"
 
@@ -972,28 +896,6 @@ msgstr "Poděkování"
 
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
-msgstr "Pomozte vylepšit SuperTuxKart!"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
 msgstr ""
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
@@ -1074,7 +976,7 @@ msgstr "Ukázat pouze nejlepší časy"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Compare replay"
-msgstr "Porovnat opakovačku"
+msgstr ""
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1084,17 +986,17 @@ msgstr "Zobrazovat pouze opakovačky odpovídající aktuální obtížnosti"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current version"
-msgstr "Zobrazit pouze opakovačky odpovídající aktuální verzi"
+msgstr ""
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Hide multiplayer replays"
-msgstr "Skrýt opakovačky z hry více hráčů"
+msgstr ""
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record a ghost replay"
-msgstr "Nahrát pro opakovačku s duchem"
+msgstr ""
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1103,6 +1005,7 @@ msgstr "Počet počítačem ovládaných motokár"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#: src/challenges/challenge_data.cpp:309
 msgid "Reverse"
 msgstr "Opačný směr"
 
@@ -1188,7 +1091,7 @@ msgstr "Herní režimy"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Powerups"
-msgstr "Bonusy"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1241,7 +1144,7 @@ msgstr "Režim příběhu"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Kart classes"
-msgstr "Třídy motokár"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1257,7 +1160,7 @@ msgstr "Třídy motokár"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
-msgid "Multiplayer"
+msgid "Multi-player"
 msgstr "Hra více hráčů"
 
 #. I18N: ./data/gui/screens/help1.stkgui
@@ -1267,7 +1170,7 @@ msgstr "Spustit výuku"
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue gift boxes, they will give you powerups."
-msgstr "Sbírejte modré krabice. Přidají vám bonusy."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1282,7 +1185,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr "Sběr nitra vám umožní získat zvýšení rychlosti, kdykoliv budete chtít, stisknutím přiřazené klávesy nebo tlačítka. Svou současnou úroveň nitra můžete vidět na indikátoru v pravém dolním rohu obrazovky závodu."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1298,34 +1201,27 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr "Pomocí speciální klávesy nebo tlačítka můžete udělat smyk. Postupné krátké smyky pomáhají dělat ostré zatáčky; zatímco střední smyky zvýší vaši rychlost, dlouhé smyky ještě více. Při smyku nemůžete přestat zatáčet, takže nejprve pečlivě orientujte svou motokáru!"
-
-#. I18N: ./data/gui/screens/help1.stkgui
-#. I18N: In the help menu
-msgid ""
-"You can get a startup boost by pressing the accelerate button at 'Set!', "
-"before the race's start."
-msgstr "Urychlit start můžete stisknutím tlačítka zrychlení při povelu 'Pozor!' před startem závodu."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
-msgid "* Current key bindings can be seen/changed in the Options menu"
-msgstr "* Stávající přiřazení kláves lze zobrazit/změnit v nabídce Možnosti"
+msgid "* Current key bindings can be seen/changed in menu Options"
+msgstr "* Stávající přiřazení kláves lze zobrazit/změnit v nabídce Předvolby"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 msgid "SuperTuxKart features several game modes:"
-msgstr "SuperTuxKart nabízí několik herních režimů:"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid ""
 "Regular Race: All blows allowed, so collect powerups and use them smartly!"
-msgstr "Běžný závod: Všechny údery jsou povoleny, takže sbírejte bonusy a chytře je používejte!"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr "Závod na čas: Neobsahuje žádné bonusy, takže záleží pouze na vašich řidičských schopnostech!"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1343,7 +1239,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr "Existují 3 typy bitevního režimu: V režimu Bitva na 3 zásahy musíte zasáhnout ostatní zbraněmi, dokud neztratí všechny své životy. V režimu Volný pro vše vyhraje hráč, který zasáhne ostatní nejvícekrát v daném časovém limitu. V režimu Zmocni se vlajky musí váš tým přivézt vlajku druhého týmu na vaši vlastní vlajkovou základnu, dokud vaše vlajka není polapena jiným týmem."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1353,23 +1249,23 @@ msgstr "Fotbal: Použijte svou motokáru k natlačení míče do branky."
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Lov vajíček: Prozkoumejte tratě a najděte všechna skrytá vejce."
+msgstr "Lov tajemství: Prozkoumejte tratě a najděte všechna skrytá zákoutí."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid ""
 "Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and"
 " record your own!"
-msgstr "Opakovačka s duchem: Závoďte proti záznamu s duchem v závodu na čas nebo v režimu lovu vajec a nahrajte si vlastní!"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid ""
-"* Many of these game modes can also be played in a Grand Prix fashion: "
+"* Most of these game modes can also be played in a Grand Prix fashion: "
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* Většinu těchto herních režimů lze hrát v módu Velké ceny: místo jednoho závodu jich pojedete několik v řadě. Čím lépe se umístíte, tím více bodů získáte. Kdo má na konci nejvíc bodů vyhrává pohár."
+msgstr "* Většinu těchto herních režimů lze hrát v módu Velké ceny: místo jednoho závodu jich pojedete několik. Čím lépe se umístíte, tím více bodů získáte. Kdo má na konci nejvíc bodů vyhrává Velkou cenu."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 #. I18N: In the help menu
@@ -1386,13 +1282,13 @@ msgstr "Žvýkačka – chraňte se jí jako štítem, nebo při pohledu dozadu 
 msgid ""
 "Zipper - will give you a strong speed boost. But beware of not losing "
 "control of your kart!"
-msgstr "Zipper - umožní vám výrazné zvýšení rychlosti. Ale dejte si pozor, abyste neztratili kontrolu nad svou motokárou!"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
 " It also affects other karts close to the explosion."
-msgstr "Dort - házejte na nejbližší soupeře, nejlépe na krátkých vzdálenostech a dlouhých rovinkách. Ovlivňuje také ostatní motokáry v blízkosti výbuchu."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1404,7 +1300,7 @@ msgstr "Přísavka – trefte protivníkova záda a přitáhněte se. Nebo se oh
 msgid ""
 "Bowling Ball - goes straight until it strikes, it can bounce off walls. If "
 "you are looking back, it will be thrown backwards."
-msgstr "Bowlingová koule - jede rovně dokud nenarazí, může se odrážet od stěn. Pokud se podíváte zpět, bude hozena dozadu."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid "Parachute - slows down all karts in a better position."
@@ -1414,7 +1310,7 @@ msgstr "Padák – zpomalí všechny hráče před vámi."
 msgid ""
 "Swapper - gift boxes are transformed into bananas, nitro cans into "
 "bubblegums, and vice versa for a short time."
-msgstr "Prohazovačka - dárky se na krátkou chvíli přemění na banány, plechovky s nitrem na žvýkačky a naopak."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1426,7 +1322,7 @@ msgstr "Basketbalový míč – odrazí se za vedoucím a může přitom přimá
 msgid ""
 "Swatter - will squash karts close by, slowing them down. Can also be used to"
 " remove parachutes and bombs."
-msgstr "Plácačka - rozplácne motokáry v blízkosti a tím je zpomalí. Lze ji také použít k odstranění padáků a bomb."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help4.stkgui
 msgid ""
@@ -1437,25 +1333,25 @@ msgstr "Náraz do banánu může mít za následek, že se připojí k motokář
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
 msgid "Anchor - slows down the kart suddenly."
-msgstr "Kotva – způsobuje náhlé zpomalení motokáry."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
 msgid ""
 "Parachute - slows down the kart, more progressively than the anchor. The "
 "faster you go, the stronger it slows you down."
-msgstr "Padák - zpomaluje motokáru, progresivněji než kotva. Čím rychleji jedete, tím silněji zpomaluje."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
 msgid ""
 "Bomb - detonates after some amount of time, throwing the kart up in the air."
 " Bump into another kart to transfer the bomb to it."
-msgstr "Bomba - po určité době vybuchne a vyhodí motokáru do vzduchu. Nárazem do jiné motokáry přehodíte bombu na jiného hráče."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help5.stkgui
 msgid "The evil Nolok has captured Gnu! Here are a few tips to help you:"
-msgstr "Zlý Nolok polapil Gnu! Zde je několik tipů, které vám pomohou:"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1464,7 +1360,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr "Tato ikona na minimapě zobrazuje dostupné výzvy, které jste nedokončili. V pravém horním rohu obrazovky se také dozvíte, kolik bodů aktuálně máte. Dokončete co nejvíce výzev a Nolok přijme závod proti vám. Vyhrajte a osvobozte Gnu!"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1472,25 +1368,25 @@ msgid ""
 "When you complete a challenge, you get a cup. Each cup is worth several "
 "points. The higher the difficulty you completed the challenge in, the better"
 " the cup and the more points it is worth."
-msgstr "Když dokončíte výzvu, dostanete pohár. Každý pohár má hodnotu několika bodů. Čím vyšší obtížnost jste dokončili, tím lepší pohár a více bodů dostanete."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
 msgid ""
 "When you get the number of points indicated below this icon, you'll be "
 "gifted a surprise. There are several to collect."
-msgstr "Když získáte pod touto ikonou uvedený počet bodů, budete odměněni. Je jich tu několik k výběru."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help6.stkgui
 msgid ""
 "Not all karts drive the same! They belong to classes with several "
 "differences:"
-msgstr "Ne všechny motokáry jezdí stejně! Patří do tříd s několika rozdíly:"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Mass - there are three classes of karts, depending on their mass: light, "
+"Mass - there are three classes of karts, depending of their mass: light, "
 "medium and heavy. Heavier karts are less affected by parachutes and are more"
 " resistant to explosions."
 msgstr ""
@@ -1501,7 +1397,7 @@ msgid ""
 "Acceleration - especially useful at start, after an accident, or in tracks "
 "with a lot of sharp curves. The lighter the kart, the faster it accelerates,"
 " especially at low speeds."
-msgstr "Zrychlení - obzvláště užitečné při startu, po nehodě nebo na tratích s mnoha ostrými zatáčkami. Čím je motokára lehčí, tím rychleji zrychluje, zejména při nízkých rychlostech."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1509,14 +1405,14 @@ msgid ""
 "Max speed - the higher it is, the faster the kart can go. Especially useful "
 "in tracks with straight lines and gentle curves. Heavier karts have a higher"
 " top speed."
-msgstr "Maximální rychlost - čím vyšší je, tím rychleji může jet motokára. Zvláště užitečné na tratích s přímým vedením a mírnými zatáčkami. Těžší motokáry mají vyšší maximální rychlost."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
 "Nitro consumption - the lower it is, the more speed you can get from a can "
 "of nitro. The lighter the kart, the lower its nitro consumption."
-msgstr "Spotřeba nitra - čím nižší je, tím větší rychlost z plechovky nitra dostanete. Čím lehčí je motokára, tím nižší je její spotřeba nitra."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1524,12 +1420,12 @@ msgid ""
 "If you follow closely another kart for a few seconds, you'll get a "
 "slipstream speed bonus when you overtake it. The lighter your kart, the "
 "easier it is."
-msgstr "Pokud budete několik vteřin těsně následovat další motokáru, dostanete aerodynamický rychlostní bonus, když ji předjedete. Čím lehčí je vaše motokára, tím je to jednodušší."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "SuperTuxKart can be played in multiplayer mode online...:"
-msgstr "SuperTuxKart lze hrát on-line v režimu pro více hráčů...:"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1538,8 +1434,8 @@ msgid ""
 "networking, or global networking (requires internet to be enabled in the "
 "options). Then, you can either create your own server with custom options, "
 "or search among a list of existing servers to join. Some of them are "
-"recommended servers with optionally ranked races."
-msgstr "Nejprve vyberte ikonu „On-line“ v hlavní nabídce. Vyberte místní síť nebo globální síť (v možnostech je třeba povolit internet). Potom si můžete vytvořit svůj vlastní server s vlastními volbami nebo si nějaký vyhledat v seznamu existujících serverů, ke kterým se můžete připojit. Některé z nich jsou doporučované servery s možností hodnocení závodů."
+"official servers with optionally ranked races."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1549,12 +1445,12 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon kart or track is allowed only if it exists on all "
 "joined players and the server."
-msgstr "Závod na serveru začne, jakmile se rozhodne jeho majitel (symbolizovaný korunou). Oficiální servery mohou automaticky startovat závody pouze pokud je dostatek hráčů. Pak si můžete vybrat motokáru a hlasovat pro další trať pro závod. Motokáry nebo tratě ze zásuvných modulů jsou povoleny pouze v případě, že existují u všech připojených hráčů a na serveru."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "... or on the same computer:"
-msgstr "...nebo na stejném počítači:"
+msgstr ""
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1564,7 +1460,7 @@ msgid ""
 "keyboard(s), each player will need a different set of keys, and most "
 "keyboards are not appropriate for multiplayer because they don't support "
 "multiple simultaneous keypresses."
-msgstr "Nejprve budete potřebovat několik vstupních zařízení. Pomocí obrazovky pro nastavení vstupu je nastavte. Ideální je více gamepadů nebo joysticků: na klávesnici (klávesnicích) bude každý hráč potřebovat jinou sadu kláves a většina klávesnic není vhodná pro hru více hráčů, protože nepodporují více současných stisknutí kláves."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1574,11 +1470,9 @@ msgid ""
 "join the game, and use their input device to select their kart. The game "
 "continues when everyone selected their kart. Note that the mouse may not be "
 "used for this operation."
-msgstr "Když jsou vstupní zařízení nastavena, vyberte v hlavní nabídce ikonu „Místní hra více hráčů“. Každý hráč může stisknout klávesu „Střelba“ svého gamepadu nebo klávesnice, aby se připojil ke hře, a pomocí svého vstupního zařízení vybrat svou motokáru. Hra pokračuje, když si každý vybere motokáru. Všimněte si, že pro tuto operaci nelze použít myš."
+msgstr ""
 
 #. I18N: ./data/gui/screens/karts.stkgui
-#. I18N: In the kart selection (player setup) screen
-#. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
 msgstr "Vyberte si motokáru"
@@ -1591,7 +1485,7 @@ msgstr "Hra jednoho hráče"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Local Multiplayer"
-msgstr "Místní hra více hráčů"
+msgstr ""
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1600,7 +1494,7 @@ msgstr "Místní hra více hráčů"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/online/online_profile_friends.cpp:240
+#: src/states_screens/online/online_profile_friends.cpp:239
 msgid "Online"
 msgstr "On-line"
 
@@ -1611,7 +1505,7 @@ msgstr "Zásuvné moduly"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:511
+#: src/states_screens/race_gui_overworld.cpp:552
 msgid "Tutorial"
 msgstr "Výuka"
 
@@ -1619,7 +1513,7 @@ msgstr "Výuka"
 #. I18N: In the main screen
 #. I18N: ./data/gui/screens/online/profile_achievements_tab.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online/online_profile_base.cpp:109
+#: src/states_screens/online/online_profile_base.cpp:107
 msgid "Achievements"
 msgstr "Úspěchy"
 
@@ -1651,12 +1545,50 @@ msgstr "Název serveru"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Max. number of players"
-msgstr "Maximální počet hráčů"
+msgstr "Max. počet hráčů"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Password for private server (optional)"
-msgstr "Heslo pro privátní server (volitelně)"
+msgstr ""
+
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+#: src/states_screens/online/server_selection.cpp:121
+msgid "Difficulty"
+msgstr "Obtížnost"
+
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: In the server creation screen
+#: src/states_screens/online/server_selection.cpp:122
+msgid "Game mode"
+msgstr "Herní režim"
+
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:230 src/race/race_manager.hpp:180
+msgid "Normal Race"
+msgstr "Normální závod"
+
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:232 src/race/race_manager.hpp:182
+msgid "Time Trial"
+msgstr "Závod na čas"
+
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+msgid "Battle"
+msgstr ""
+
+#. I18N: ./data/gui/screens/online/create_server.stkgui
+#. I18N: Multiplayer game mode
+#. I18N: Game mode
+#: src/network/server_config.cpp:234 src/race/race_manager.hpp:190
+msgid "Soccer"
+msgstr "Fotbal"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1678,34 +1610,37 @@ msgstr "Najít server"
 #. I18N: In the online multiplayer screen
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
-#: src/states_screens/online/create_server_screen.cpp:93
+#: src/states_screens/online/create_server_screen.cpp:91
 msgid "Create Server"
 msgstr "Vytvořit server"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:188
+#: src/states_screens/online/networking_lobby.cpp:153
 msgid "Lobby"
 msgstr "Čekárna"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:174
+msgid "Send"
+msgstr "Odslat"
+
+#. I18N: ./data/gui/screens/online/networking_lobby.stkgui
+#. I18N: In the network lobby
+#: src/states_screens/online/networking_lobby.cpp:155
 msgid "Start race"
 msgstr "Start závodu"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:182
-msgid "Configuration"
-msgstr "Nastavení"
+msgid "Server Configuration"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
 msgid "Enable splitscreen or player handicaps"
-msgstr "Povolit rozdělenou obrazovku nebo handicapy pro hráče"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -1724,9 +1659,9 @@ msgstr "Zadejte adresu serveru"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
-#: src/states_screens/online/online_profile_base.cpp:114
-#: src/states_screens/online/online_profile_base.cpp:124
-#: src/states_screens/online/online_screen.cpp:60
+#: src/states_screens/online/online_profile_base.cpp:112
+#: src/states_screens/online/online_profile_base.cpp:122
+#: src/states_screens/online/online_screen.cpp:59
 msgid "Your profile"
 msgstr "Váš profil"
 
@@ -1744,7 +1679,7 @@ msgstr "Hodnocení hráčů"
 
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online/online_profile_base.cpp:108
+#: src/states_screens/online/online_profile_base.cpp:106
 msgid "Friends"
 msgstr "Přátelé"
 
@@ -1769,7 +1704,7 @@ msgstr "Rychlá hra"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
-#: src/states_screens/online/online_profile_base.cpp:110
+#: src/states_screens/online/online_profile_base.cpp:108
 msgid "Account Settings"
 msgstr "Nastavení účtu"
 
@@ -1816,7 +1751,7 @@ msgstr "On-line uživatelské jméno"
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 msgid "Reset password"
-msgstr "Resetovat heslo"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -1833,12 +1768,12 @@ msgstr "Výběr serveru"
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Show private server(s)"
-msgstr "Zobrazit soukromé servery"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Hide servers with an ongoing game"
-msgstr "Skrýt servery, na kterých probíhá hra"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -1928,6 +1863,7 @@ msgstr "Uživatelské rozhraní"
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
+#: src/states_screens/online/server_selection.cpp:120
 msgid "Players"
 msgstr "Hráči"
 
@@ -1967,7 +1903,7 @@ msgstr "Ovládání"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Language"
-msgstr "Jazyk"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
@@ -1978,8 +1914,8 @@ msgstr "Hudba"
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:459
+#: src/states_screens/dialogs/custom_video_settings.cpp:64
+#: src/states_screens/options/options_screen_video.cpp:429
 msgid "Enabled"
 msgstr "Zapnuto"
 
@@ -2001,10 +1937,10 @@ msgstr "Smazat nastavení"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:121
-#: src/states_screens/options/options_screen_device.cpp:634
+#: src/states_screens/options/options_screen_device.cpp:120
+#: src/states_screens/options/options_screen_device.cpp:633
 msgid "Disable Configuration"
-msgstr "Vypnout nastavování"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
@@ -2014,12 +1950,7 @@ msgstr "Zpět k seznamu zařízení"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr "Internetové možnosti"
-
-#. I18N: ./data/gui/screens/options_general.stkgui
-#. I18N: In the general settings
-msgid "Always show login screen"
-msgstr "Vždy zobrazovat přihlašovací obrazovku"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2029,17 +1960,22 @@ msgstr "Připojit k Internetu"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Send anonymous hardware statistics"
-msgstr "Odesílat anonymní statistiky ohledně hardwaru"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
-msgid "Enable chatting in online games"
-msgstr "Povolit chatování v online hrách"
+msgid "Always show login screen"
+msgstr "Vždy zobrazovat přihlašovací obrazovku"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Enable chatting in networking lobby"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Miscellaneous options"
-msgstr "Různé možnosti"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2071,11 +2007,6 @@ msgstr "Motiv vzhledu"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Minimap"
-msgstr "Minimapa"
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Font size"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
@@ -2086,7 +2017,7 @@ msgstr "Zobrazovat počet snímků/s"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Multiplayer splits screen horizontally"
-msgstr "Hra více hráčů rozdělí obrazovku vodorovně"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2133,11 +2064,6 @@ msgstr "Vyberte herní režim"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-msgid "Use left/right to choose your team and press fire"
-msgstr "Tlačítky vlevo/vpravo zvolte svůj tým a stiskněte tlačítko střelby"
-
-#. I18N: ./data/gui/screens/soccer_setup.stkgui
-#. I18N: In soccer setup screen
 msgid "Red Team"
 msgstr "červený tým"
 
@@ -2146,14 +2072,46 @@ msgstr "červený tým"
 msgid "Blue Team"
 msgstr "modrý tým"
 
+#. I18N: ./data/gui/screens/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+#. I18N: In the create server screen
+#: src/states_screens/online/create_server_screen.cpp:190
+msgid "Soccer game type"
+msgstr ""
+
+#. I18N: ./data/gui/screens/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+#. I18N: In track screen
+#: src/states_screens/online/tracks_screen.cpp:317
+msgid "Number of goals to win"
+msgstr "Počet splněných cílů do vítězství"
+
+#. I18N: ./data/gui/screens/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+#. I18N: In track screen
+#: src/states_screens/online/tracks_screen.cpp:325
+msgid "Maximum time (min.)"
+msgstr "Maximální doba (min.)"
+
+#. I18N: ./data/gui/screens/soccer_setup.stkgui
+#. I18N: In soccer setup screen
+msgid "Use left/right to choose your team and press fire"
+msgstr "Tlačítky vlevo/vpravo zvolte svůj tým a stiskněte tlačítko střelby"
+
 #. I18N: ./data/gui/screens/track_info.stkgui
 msgid "= Highscores ="
 msgstr "= Nejvyšší skóre ="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: for empty highscores entries
+#: src/states_screens/track_info_screen.cpp:328
+msgid "(Empty)"
+msgstr "(Prázdné)"
+
+#. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:511
-#: src/states_screens/track_info_screen.cpp:239
+#. I18N: In track screen
+#: src/states_screens/online/tracks_screen.cpp:349
 msgid "Number of laps"
 msgstr "Počet kol"
 
@@ -2164,13 +2122,13 @@ msgstr "Počet počítačem ovládaných motokár"
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:51
+#: src/states_screens/dialogs/select_challenge.cpp:147
 msgid "Grand Prix"
 msgstr "Velká cena"
 
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: Used as a verb, appears on the main networking menu (login button)
-#: src/states_screens/online/online_screen.cpp:62
+#: src/states_screens/online/online_screen.cpp:61
 msgid "Login"
 msgstr "Přihlášení"
 
@@ -2193,7 +2151,7 @@ msgstr "Odstranit"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Kart color"
-msgstr "Barva motokáry"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2237,7 +2195,7 @@ msgstr "Nolok"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
-msgstr "Pidgin"
+msgstr "Holub Pidgin"
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
@@ -2280,10 +2238,6 @@ msgstr "Město Candela"
 msgid "Battle Island"
 msgstr "Bitevní ostrov"
 
-#. I18N: ../stk-assets/tracks/black_forest/track.xml
-msgid "Black Forest"
-msgstr "Černý les"
-
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
 msgstr "Jeskyně X"
@@ -2303,6 +2257,10 @@ msgstr "Pevnost Magma"
 #. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
 msgstr "Ostrov Velký ráj"
+
+#. I18N: ../stk-assets/tracks/greenvalley/track.xml
+msgid "Green Valley"
+msgstr "Zelené údolí"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
@@ -2345,11 +2303,15 @@ msgstr "Písečné duny"
 
 #. I18N: ../stk-assets/tracks/lasdunassoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
-msgstr "Fotbalový stadion Las Dunas"
+msgstr ""
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
 msgstr "Kolem majáku"
+
+#. I18N: ../stk-assets/tracks/mansion/track.xml
+msgid "Blackhill Mansion"
+msgstr "Temný zámek"
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
@@ -2363,17 +2325,13 @@ msgstr "Minigolf"
 msgid "Oliver's Math Class"
 msgstr "Hodina matiky"
 
-#. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
-msgid "Ravenbridge mansion"
-msgstr "Zámek Ravenbridge"
-
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
 msgstr "Tekuté písky"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
-msgid "Nessie's Pond"
-msgstr ""
+msgid "Nessie's pond"
+msgstr "Jezero Lochnesky"
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
@@ -2411,154 +2369,134 @@ msgstr "XR591"
 msgid "Zen Garden"
 msgstr "Japonská zahrada"
 
-#: src/achievements/achievement.cpp:387
+#: src/achievements/achievement.cpp:385
 #, c-format
 msgid "Completed achievement \"%s\"."
 msgstr "Cíl „%s“ dosažen."
 
-#: src/addons/addons_manager.cpp:107 src/addons/news_manager.cpp:347
+#: src/addons/addons_manager.cpp:106 src/addons/news_manager.cpp:324
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Nepodařilo se připojit k serveru doplňků SuperTuxKart."
 
-#: src/addons/news_manager.cpp:182
+#: src/addons/news_manager.cpp:181
 #, c-format
 msgid "Error downloading news: '%s'."
 msgstr "Chyba při stahování novinek: '%s'."
 
-#: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:262
-msgid "Normal Race (Grand Prix)"
-msgstr "Normální závod (Velká cena)"
+#. I18N: number of laps to race in a challenge
+#: src/challenges/challenge_data.cpp:299
+#: src/states_screens/race_result_gui.cpp:1632
+#, c-format
+msgid "Laps: %i"
+msgstr "Kol: %i"
 
 #: src/challenges/challenge_data.cpp:305
-msgid "Time-Trial (Grand Prix)"
-msgstr "Závod na čas (Velká cena)"
+msgid "Follow the leader"
+msgstr "Následujte vedoucího"
 
-#: src/challenges/challenge_data.cpp:310
-msgid "Time-Trial - beat the replay"
-msgstr "Závod na čas – porazte záznam z jízdy"
-
-#: src/challenges/challenge_data.cpp:312
-msgid "Time-Trial - nitro challenge"
-msgstr "Závod na čas – nitro výzva"
-
-#: src/challenges/challenge_data.cpp:314
-msgid "Normal Race (single race)"
-msgstr "Normální závod (jediný závod)"
-
-#: src/challenges/challenge_data.cpp:316
-msgid "Time-Trial (single race)"
-msgstr "Závod na čas (jediný závod)"
-
-#: src/challenges/challenge_data.cpp:318
-msgid "Follow the Leader (single race)"
-msgstr "Následujte vedoucího (jediný závod)"
-
-#. I18N: In the Select challenge dialog, tell user this challenge has reversed
-#. laps
-#: src/challenges/challenge_data.cpp:324
-#: src/states_screens/dialogs/select_challenge.cpp:78
-msgid "Mode: Reverse"
-msgstr "Režim: Opačný směr"
-
-#: src/challenges/challenge_data.cpp:601
+#: src/challenges/challenge_data.cpp:587
 #, c-format
 msgid "New track '%s' now available"
 msgstr "Nová trať '%s' nyní k dispozici"
 
-#: src/challenges/challenge_data.cpp:605
+#: src/challenges/challenge_data.cpp:591
 #, c-format
 msgid "New game mode '%s' now available"
 msgstr "Nový herní režim '%s' nyní k dispozici"
 
-#: src/challenges/challenge_data.cpp:615
+#: src/challenges/challenge_data.cpp:601
 #, c-format
 msgid "New Grand Prix '%s' now available"
 msgstr "Nová Velká cena '%s' je nyní k dispozici"
 
-#: src/challenges/challenge_data.cpp:619
+#: src/challenges/challenge_data.cpp:605
 #, c-format
 msgid "New difficulty '%s' now available"
 msgstr "Nová obtížnost '%s' nyní k dispozici"
 
-#: src/challenges/challenge_data.cpp:629
+#: src/challenges/challenge_data.cpp:615
 #, c-format
 msgid "New kart '%s' now available"
 msgstr "Nová motokára '%s' nyní k dispozici"
 
+#: src/config/player_manager.cpp:92
+msgid "Currently not signed in"
+msgstr "V tuto chvíli není přihlášený"
+
 #. I18N: Name of first guest player (without number)
-#: src/config/player_manager.cpp:387
+#: src/config/player_manager.cpp:395
 msgid "Guest"
 msgstr "Host"
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
-#: src/config/player_manager.cpp:392
+#: src/config/player_manager.cpp:400
 #, c-format
 msgid "Guest %d"
 msgstr "Host %d"
 
-#: src/config/user_config.cpp:689
+#: src/config/user_config.cpp:687
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
 msgstr "Soubor nastavení byl poškozen, proto byl smazán a bude vytvořen nový."
 
-#: src/config/user_config.cpp:700
+#: src/config/user_config.cpp:698
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr "Soubor nastavení byl zastaralý, proto byl smazán a bude vytvořen nový."
 
-#: src/graphics/irr_driver.cpp:594
+#: src/graphics/irr_driver.cpp:585
 msgid "Video recording started."
 msgstr "Zahájeno nahrávání videa."
 
-#: src/graphics/irr_driver.cpp:600
+#: src/graphics/irr_driver.cpp:591
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video uloženo do „%s“."
 
-#: src/graphics/irr_driver.cpp:604
+#: src/graphics/irr_driver.cpp:595
 msgid "Encoding progress:"
 msgstr "Průběh enkódování:"
 
-#: src/graphics/irr_driver.cpp:1837 src/graphics/irr_driver.cpp:1842
+#: src/graphics/irr_driver.cpp:1781 src/graphics/irr_driver.cpp:1786
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
-msgstr "FPS: %d/%d/%d - %d tisíc trojúhelníků, ping: %d ms"
+msgstr ""
 
-#: src/guiengine/engine.cpp:1374
+#: src/guiengine/engine.cpp:1329
 msgid "Loading"
 msgstr "Načítání"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:112
+#: src/guiengine/widgets/kart_stats_widget.cpp:111
 msgid "Mass"
-msgstr "Hmotnost"
+msgstr ""
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:121
+#: src/guiengine/widgets/kart_stats_widget.cpp:120
 msgid "Maximum speed"
-msgstr "Maximální rychlost"
+msgstr ""
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:132
+#: src/guiengine/widgets/kart_stats_widget.cpp:131
 msgid "Acceleration"
-msgstr "Zrychlení"
+msgstr ""
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:143
+#: src/guiengine/widgets/kart_stats_widget.cpp:142
 msgid "Nitro efficiency"
-msgstr "Nitro efektivita"
+msgstr ""
 
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
-#: src/guiengine/widgets/player_kart_widget.cpp:389
-#: src/guiengine/widgets/player_kart_widget.cpp:760
-#: src/karts/controller/local_player_controller.cpp:439
-#: src/karts/controller/player_controller.cpp:409
-#: src/network/protocols/client_lobby.cpp:786
-#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
+#: src/guiengine/widgets/player_kart_widget.cpp:386
+#: src/guiengine/widgets/player_kart_widget.cpp:759
+#: src/karts/controller/local_player_controller.cpp:449
+#: src/karts/controller/player_controller.cpp:408
+#: src/network/protocols/client_lobby.cpp:708
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:120
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (handicapovaný)"
 
-#: src/guiengine/widgets/player_kart_widget.cpp:446
+#: src/guiengine/widgets/player_kart_widget.cpp:445
 #, c-format
 msgid "%s is ready"
 msgstr "%s je připraven"
@@ -2699,7 +2637,7 @@ msgstr "Nonconvert"
 #: src/input/binding.cpp:147
 msgctxt "input_key"
 msgid "Accept"
-msgstr "Přijmout"
+msgstr "Accept"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:149
@@ -2738,31 +2676,31 @@ msgid "Home"
 msgstr "Home"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:161 src/input/gamepad_android_config.cpp:58
+#: src/input/binding.cpp:161 src/input/gamepad_android_config.cpp:57
 msgctxt "input_key"
 msgid "Left"
 msgstr "Doleva"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:163 src/input/gamepad_android_config.cpp:64
+#: src/input/binding.cpp:163 src/input/gamepad_android_config.cpp:63
 msgctxt "input_key"
 msgid "Up"
 msgstr "Nahoru"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:165 src/input/gamepad_android_config.cpp:61
+#: src/input/binding.cpp:165 src/input/gamepad_android_config.cpp:60
 msgctxt "input_key"
 msgid "Right"
 msgstr "Doprava"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:167 src/input/gamepad_android_config.cpp:67
+#: src/input/binding.cpp:167 src/input/gamepad_android_config.cpp:66
 msgctxt "input_key"
 msgid "Down"
 msgstr "Dolů"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:169 src/input/gamepad_android_config.cpp:109
+#: src/input/binding.cpp:169 src/input/gamepad_android_config.cpp:108
 msgctxt "input_key"
 msgid "Select"
 msgstr "Select"
@@ -3052,33 +2990,33 @@ msgid "Mouse axis %d %s"
 msgstr "Osa myši %d %s"
 
 #. I18N: shown when config file is too old
-#: src/input/device_manager.cpp:579
+#: src/input/device_manager.cpp:576
 msgid "Please re-configure your key bindings."
 msgstr "Prosím přenastavte své nastavení kláves."
 
-#: src/input/device_manager.cpp:580
+#: src/input/device_manager.cpp:577
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "Formát souboru s nastaveními ovládacích zařízení není slučitelný s touto verzí SuperTuxKart."
 
-#: src/input/gamepad_android_config.cpp:100
+#: src/input/gamepad_android_config.cpp:99
 msgctxt "input_key"
 msgid "Thumb Left"
-msgstr "Palec vlevo"
+msgstr ""
 
-#: src/input/gamepad_android_config.cpp:103
+#: src/input/gamepad_android_config.cpp:102
 msgctxt "input_key"
 msgid "Thumb Right"
-msgstr "Palec vpravo"
+msgstr ""
 
-#: src/input/gamepad_android_config.cpp:106
+#: src/input/gamepad_android_config.cpp:105
 msgctxt "input_key"
 msgid "Start"
-msgstr "Start"
+msgstr ""
 
-#: src/input/gamepad_android_config.cpp:112
+#: src/input/gamepad_android_config.cpp:111
 msgctxt "input_key"
 msgid "Mode"
-msgstr "Režim"
+msgstr ""
 
 #. I18N: Name of the black button on xbox controller
 #: src/input/gamepad_config.cpp:167
@@ -3191,12 +3129,12 @@ msgstr "Levý palec dolů"
 msgid "Left thumb up"
 msgstr "Levý palec nahoru"
 
-#: src/input/input_manager.cpp:860
+#: src/input/input_manager.cpp:850
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "„%s“ je ignorováno. Abyste se mohli zúčastnit, je třeba se do hry připojit dříve!"
 
-#: src/input/input_manager.cpp:896
+#: src/input/input_manager.cpp:880
 msgid "Only the Game Master may act at this point!"
 msgstr "V tomto okamžiku může jednat pouze hráč zakládající hru!"
 
@@ -3225,133 +3163,126 @@ msgstr[3] "Nalezeno %d Wiimote ovladačů"
 msgid "Could not detect any wiimote :/"
 msgstr "Nepodařilo se nalézt žádný Wiimote ovladač :/"
 
-#: src/karts/controller/local_player_controller.cpp:300
+#: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
 msgstr "Trestný čas!!"
 
-#: src/karts/controller/local_player_controller.cpp:303
+#: src/karts/controller/local_player_controller.cpp:310
 msgid "Don't accelerate before 'Set!'"
-msgstr "Nezrychlujte před povelem 'Pozor!'"
+msgstr ""
 
-#: src/karts/controller/spare_tire_ai.cpp:149
+#: src/karts/controller/spare_tire_ai.cpp:147
 msgid "You can have at most 3 lives!"
 msgstr "Můžete mít maximálně 3 životy!"
 
-#: src/karts/controller/spare_tire_ai.cpp:155
+#: src/karts/controller/spare_tire_ai.cpp:153
 msgid "+1 life."
 msgstr "+1 život."
 
-#: src/karts/kart.cpp:1030
+#: src/karts/kart.cpp:1000
 msgid "You won the race!"
 msgstr "Vyhráli jste závod!"
 
-#: src/karts/kart.cpp:1030
+#: src/karts/kart.cpp:1000
 msgid "You finished the race!"
 msgstr "Dokončili jste závod!"
 
-#. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:120 src/network/protocols/client_lobby.cpp:1067
-#, c-format
-msgid "%s left the game."
-msgstr "%s opustil(a) hru."
-
-#: src/main.cpp:1866
+#: src/main.cpp:1802
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
 "development of STK. Please read our privacy policy at "
 "http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
+"(To change this setting at a later time, go to options, select tab 'User "
+"Interface', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr "SuperTuxKart se může připojit k serveru pro stahování zásuvných modulů a upozornit vás o aktualizacích. Také shromažďujeme anonymní statistiky ohledně parametrů počítače za účelem pomoci s rozvojem STK. Přečtěte si prosím naše zásady ochrany osobních údajů na http://privacy.supertuxkart.net. Chtěli byste tuto funkci povolit? (Budete-li chtít změnit toto nastavení později, přejděte na Možnosti, zvolte záložku 'Obecné', a upravte volby \"Připojit k Internetu\" a \"Odesílat anonymní statistiky ohledně hardwaru\")."
+msgstr "SuperTuxKart se může připojit k serveru pro stahování zásuvných modulů a upozornit vás o aktualizacích. Také shromažďujeme anonymní statistiky ohledně parametrů počítače za účelem pomoci s rozvojem STK. Přečtěte si prosím naše zásady ochrany osobních údajů na http://privacy.supertuxkart.net. Chtěli byste tuto funkci povolit? (Budete-li chtít změnit toto nastavení později, přejděte na Možnosti, zvolte záložku 'Uživatelské rozhraní', a upravte volby \"Připojit k internetu\" a \"Posílat anonymní hardwarové statistiky\")."
 
-#: src/main.cpp:2134
+#: src/main.cpp:2062
 msgid "Your screen resolution is too low to run STK."
 msgstr "Vaše rozlišení obrazovky je příliš nízké pro spuštění STK."
 
-#: src/main.cpp:2166
+#: src/main.cpp:2091
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Ovladač grafické karty, který je nyní používán na tomto systému, je zastaralý. Nainstalujte jeho nejnovější verzi."
 
-#: src/main.cpp:2184
+#: src/main.cpp:2109
 #, c-format
 msgid ""
-"Your graphics driver appears to be very old. Please check if an update is "
-"available. SuperTuxKart recommends a driver supporting %s or better. The "
-"game will likely still run, but in a reduced-graphics mode."
-msgstr "Váš grafický ovladač se zdá být velmi starý. Zkontrolujte, zda je k dispozici aktualizace. SuperTuxKart doporučuje ovladač podporující %s nebo lepší. Hra pravděpodobně ještě poběží, ale v redukovaném grafickém režimu."
+"Your OpenGL version appears to be too old. Please verify if an update for "
+"your video driver is available. SuperTuxKart requires %s or better."
+msgstr "Vaše verze OpenGL se zdá být příliš stará. Prosím, ověřte, zda je k dispozici aktualizace pro váš ovladač videa. SuperTuxKart vyžaduje %s nebo vyšší."
 
-#: src/main_loop.cpp:379 src/network/protocols/client_lobby.cpp:96
+#: src/main_loop.cpp:345 src/network/protocols/client_lobby.cpp:85
 msgid "Server connection timed out."
 msgstr "Časový limit připojení k serveru vypršel."
 
-#. I18N: Show when a player gets the red flag in CTF
-#: src/modes/capture_the_flag.cpp:178
+#. I18N: Show when a player gets the flag in CTF
+#: src/modes/capture_the_flag.cpp:366
 #, c-format
 msgid "%s has the red flag!"
-msgstr "%s má červenou vlajku!"
+msgstr ""
 
-#. I18N: Show when the red flag is returned to its base in CTF
-#: src/modes/capture_the_flag.cpp:185
-msgid "The red flag has returned!"
-msgstr "Červená vlajka se vrátila!"
-
-#. I18N: Show when a player gets the blue flag in CTF
-#: src/modes/capture_the_flag.cpp:196
+#. I18N: Show when a player gets the flag in CTF
+#: src/modes/capture_the_flag.cpp:375
 #, c-format
 msgid "%s has the blue flag!"
-msgstr "%s má modrou vlajku!"
+msgstr ""
 
-#. I18N: Show when the blue flag is returned to its base in CTF
-#: src/modes/capture_the_flag.cpp:203
-msgid "The blue flag has returned!"
-msgstr "Modrá vlajka se vrátila!"
-
-#: src/modes/capture_the_flag.cpp:411
-#, c-format
-msgid "%s captured the blue flag!"
-msgstr "%s získal modrou vlajku!"
-
-#: src/modes/capture_the_flag.cpp:415
+#. I18N: Show when a player captured the flag in CTF
+#: src/modes/capture_the_flag.cpp:402
 #, c-format
 msgid "%s captured the red flag!"
-msgstr "%s získal červenou vlajku!"
+msgstr ""
 
-#: src/modes/easter_egg_hunt.cpp:226
+#. I18N: Show when a player captured the flag in CTF
+#: src/modes/capture_the_flag.cpp:413
+#, c-format
+msgid "%s captured the blue flag!"
+msgstr ""
+
+#: src/modes/capture_the_flag.cpp:431
+msgid "The red flag has returned!"
+msgstr ""
+
+#: src/modes/capture_the_flag.cpp:447
+msgid "The blue flag has returned!"
+msgstr ""
+
+#: src/modes/easter_egg_hunt.cpp:238
 #, c-format
 msgid "Eggs: %d / %d"
 msgstr "Vejce: %d / %d"
 
-#: src/modes/follow_the_leader.cpp:63 src/modes/follow_the_leader.cpp:297
+#: src/modes/follow_the_leader.cpp:62 src/modes/follow_the_leader.cpp:296
 msgid "Leader"
 msgstr "Vedoucí"
 
-#: src/modes/linear_world.cpp:392
+#: src/modes/linear_world.cpp:383
 msgid "Final lap!"
 msgstr "Poslední kolo!"
 
-#: src/modes/linear_world.cpp:421
+#: src/modes/linear_world.cpp:412
 #, c-format
 msgid "Lap %i"
 msgstr "Kolo %i"
 
-#: src/modes/linear_world.cpp:512
+#: src/modes/linear_world.cpp:502
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "%s od %s"
 
-#: src/modes/linear_world.cpp:517
+#: src/modes/linear_world.cpp:507
 msgid "New fastest lap"
 msgstr "Nové nejrychlejší kolo"
 
-#: src/modes/linear_world.cpp:1059
+#: src/modes/linear_world.cpp:1039
 msgid "WRONG WAY!"
 msgstr "ŠPATNÝ SMĚR!"
 
-#: src/modes/three_strikes_battle.cpp:641
+#: src/modes/three_strikes_battle.cpp:661
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
@@ -3360,235 +3291,227 @@ msgstr[1] "Vznikly %i náhradní pneumatiky pro motokáru!"
 msgstr[2] "Vzniklo %i náhradních pneumatik pro motokáru!"
 msgstr[3] "Vzniklo %i náhradních pneumatik pro motokáru!"
 
-#: src/modes/world.cpp:1303
+#: src/modes/world.cpp:1239
 msgid "You have been eliminated!"
 msgstr "Byli jste vyřazeni!"
 
-#: src/modes/world.cpp:1310
+#: src/modes/world.cpp:1246
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "„%s“ byl vyřazen."
 
-#: src/network/protocols/client_lobby.cpp:97
+#: src/network/protocols/client_lobby.cpp:86
 msgid "Server has been shut down."
 msgstr "Server byl vypnut."
 
-#: src/network/protocols/client_lobby.cpp:98
+#: src/network/protocols/client_lobby.cpp:87
 msgid "You were kicked from the server."
 msgstr "Byli jste vykopnutí ze serveru."
 
-#: src/network/protocols/client_lobby.cpp:100
-msgid "You were kicked: Ping too high."
-msgstr "Byli jste vykopnuti: Příliš vysoký ping."
-
-#: src/network/protocols/client_lobby.cpp:248
-#: src/network/protocols/client_lobby.cpp:824
+#: src/network/protocols/client_lobby.cpp:89
+#: src/network/protocols/client_lobby.cpp:235
+#: src/network/protocols/client_lobby.cpp:739
 msgid "Bad network connection is detected."
-msgstr "Bylo zjištěno špatné připojení k síti."
+msgstr ""
 
-#: src/network/protocols/client_lobby.cpp:576
+#: src/network/protocols/client_lobby.cpp:467
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:197
+#: src/states_screens/dialogs/message_dialog.cpp:129
+#: src/states_screens/edit_gp_screen.cpp:260
+#: src/states_screens/ghost_replay_selection.cpp:386
+msgid "No"
+msgstr "Ne"
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:473
+#, c-format
+msgid ""
+"Track: %s,\n"
+"random item location: %s"
+msgstr ""
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:481
+#, c-format
+msgid "Track: %s"
+msgstr ""
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:488
+#, c-format
+msgid ""
+"Track: %s,\n"
+"number of goals to win: %d,\n"
+"random item location: %s"
+msgstr ""
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:495
+#, c-format
+msgid ""
+"Track: %s,\n"
+"maximum time: %d,\n"
+"random item location: %s"
+msgstr ""
+
+#. I18N: Vote message in network game from a player
+#: src/network/protocols/client_lobby.cpp:503
+#, c-format
+msgid ""
+"Track: %s,\n"
+"laps: %d, reversed: %s"
+msgstr ""
+
+#: src/network/protocols/client_lobby.cpp:533
 #, c-format
 msgid "%s disconnected."
-msgstr "%s odpojen."
+msgstr ""
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:604
+#: src/network/protocols/client_lobby.cpp:560
 msgid ""
 "Press player name in the list for player management and ranking information."
-msgstr "Stiskněte jméno hráče v seznamu pro správu hráčů a informace o hodnocení."
+msgstr ""
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:658
+#: src/network/protocols/client_lobby.cpp:590
 #, c-format
 msgid "Server name: %s"
 msgstr "Název serveru: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:666
+#: src/network/protocols/client_lobby.cpp:598
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
-#: src/states_screens/race_result_gui.cpp:1717
+#: src/states_screens/race_result_gui.cpp:1640
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Obtížnost: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:671
+#: src/network/protocols/client_lobby.cpp:603
 #, c-format
 msgid "Max players: %d"
 msgstr "Maximálně hráčů: %d"
 
-#. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:684
-#: src/states_screens/dialogs/server_info_dialog.cpp:87
+#: src/network/protocols/client_lobby.cpp:620
+#: src/states_screens/dialogs/server_info_dialog.cpp:89
 #, c-format
 msgid "Game mode: %s"
 msgstr "Herní režim: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:697
-#: src/states_screens/dialogs/server_configuration_dialog.cpp:173
-#: src/states_screens/online/create_server_screen.cpp:196
-#: src/states_screens/track_info_screen.cpp:192
+#: src/network/protocols/client_lobby.cpp:632
+#: src/states_screens/online/create_server_screen.cpp:194
+#: src/states_screens/soccer_setup_screen.cpp:230
 msgid "Time limit"
 msgstr "Limit času"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:698
-#: src/states_screens/dialogs/server_configuration_dialog.cpp:174
-#: src/states_screens/online/create_server_screen.cpp:198
-#: src/states_screens/track_info_screen.cpp:193
+#: src/network/protocols/client_lobby.cpp:633
+#: src/states_screens/online/create_server_screen.cpp:196
+#: src/states_screens/soccer_setup_screen.cpp:231
 msgid "Goals limit"
 msgstr "Limit branek"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:702
+#: src/network/protocols/client_lobby.cpp:637
 #, c-format
 msgid "Soccer game type: %s"
-msgstr "Typ fotbalové hry: %s"
+msgstr ""
 
-#: src/network/protocols/client_lobby.cpp:712
+#: src/network/protocols/client_lobby.cpp:647
 #, c-format
 msgid "Grand prix progress: %d / %d"
-msgstr "Průběh Velké ceny: %d / %d"
+msgstr ""
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:816
+#: src/network/protocols/client_lobby.cpp:731
 msgid "All players joined red or blue team."
-msgstr "Všichni hráči se připojili k červenému nebo modrému týmu."
+msgstr ""
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:836
+#: src/network/protocols/client_lobby.cpp:752
 msgid "You are now the owner of server."
 msgstr "Nyní jste vlastníkem serveru."
 
-#: src/network/protocols/client_lobby.cpp:877
+#: src/network/protocols/client_lobby.cpp:790
 msgid "Connection refused: Server is busy."
 msgstr "Připojení odmítnuto: Server je zaneprázdněn."
 
-#: src/network/protocols/client_lobby.cpp:882
+#: src/network/protocols/client_lobby.cpp:794
 msgid "Connection refused: You are banned from the server."
-msgstr "Připojení odmítnuto: Ze serveru jste zakázáni."
+msgstr ""
 
-#: src/network/protocols/client_lobby.cpp:895
+#: src/network/protocols/client_lobby.cpp:798
 msgid "Connection refused: Server password is incorrect."
 msgstr "Připojení odmítnuto: Heslo serveru je nesprávné."
 
-#: src/network/protocols/client_lobby.cpp:899
+#: src/network/protocols/client_lobby.cpp:802
 msgid "Connection refused: Game data is incompatible."
 msgstr "Připojení odmítnuto: Údaje hry nejsou kompatibilní."
 
-#: src/network/protocols/client_lobby.cpp:903
+#: src/network/protocols/client_lobby.cpp:806
 msgid "Connection refused: Server is full."
 msgstr "Připojení odmítnuto: Server je plný."
 
-#: src/network/protocols/client_lobby.cpp:907
+#: src/network/protocols/client_lobby.cpp:810
 msgid "Connection refused: Invalid player connecting."
 msgstr "Připojení odmítnuto: Připojení neplatného hráče."
 
-#: src/network/protocols/client_lobby.cpp:935
-msgid "Failed to start the network game."
-msgstr "Nepodařilo se spustit síťovou hru."
-
-#. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1120
-msgid "The game has ended, you can't live join or spectate anymore."
-msgstr "Hra skončila, už se nemůžete živě připojit nebo dívat."
-
-#. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1124
-msgid "No remaining place in the arena - live join disabled."
-msgstr "Žádné zbývající místo v aréně - připojení zakázáno."
-
-#. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1128
-msgid "Only 1 player remaining, returning to lobby."
-msgstr "Zbývá pouze 1 hráč, návrat do čekárny."
-
-#. I18N: Show when player join red team of the started game in
-#. network
-#: src/network/protocols/client_lobby.cpp:1292
-#, c-format
-msgid "%s joined the red team."
-msgstr "%s se připojil(a) k červenému týmu."
-
-#. I18N: Show when player join blue team of the started game in
-#. network
-#: src/network/protocols/client_lobby.cpp:1298
-#, c-format
-msgid "%s joined the blue team."
-msgstr "%s se připojil(a) k modrému týmu."
-
-#. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1304
-#, c-format
-msgid "%s joined the game."
-msgstr "%s se připojil ke hře."
-
-#. I18N: Message shown in game to tell the player it's possible to change
-#. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1454
-#, c-format
-msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
-msgstr "Stiskněte <%s> nebo <%s> pro změnu zaměřeného hráče nebo <%s> pro polohu kamery."
-
-#. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1470
-#, c-format
-msgid "Successfully reported %s."
-msgstr "%s úspěšně nahlášen."
-
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:50
 msgid "No quick play server available."
-msgstr "Není k dispozici žádný server rychlé hry."
+msgstr ""
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:281
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nelze se připojit k serveru %s."
 
-#: src/network/server_config.cpp:264
+#: src/network/server_config.cpp:226
+msgid "Normal Race (Grand Prix)"
+msgstr "Normální závod (Velká cena)"
+
+#: src/network/server_config.cpp:228
 msgid "Time Trial (Grand Prix)"
 msgstr "Závod na čas (Velká cena)"
 
-#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
-#: src/states_screens/dialogs/server_configuration_dialog.cpp:160
-#: src/states_screens/online/create_server_screen.cpp:180
-#: src/states_screens/track_info_screen.cpp:215
+#: src/network/server_config.cpp:238
+#: src/states_screens/online/create_server_screen.cpp:178
 msgid "Free-For-All"
-msgstr "Volný pro vše"
+msgstr ""
 
-#. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
-#: src/states_screens/dialogs/server_configuration_dialog.cpp:161
-#: src/states_screens/online/create_server_screen.cpp:182
+#: src/network/server_config.cpp:240
+#: src/states_screens/online/create_server_screen.cpp:180
 msgid "Capture The Flag"
-msgstr "Zmocni se vlajky"
+msgstr ""
 
-#: src/online/online_player_profile.cpp:457
+#. I18N: Official means this server is hosted by STK team
+#: src/network/server.cpp:106
+msgid "Official"
+msgstr "Oficiální"
+
+#: src/online/online_player_profile.cpp:434
 #, c-format
 msgid "%s is now online."
 msgstr "%s je nyní on-line."
 
-#: src/online/online_player_profile.cpp:461
+#: src/online/online_player_profile.cpp:438
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s a %s jsou nyní on-line."
 
-#: src/online/online_player_profile.cpp:466
+#: src/online/online_player_profile.cpp:443
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s a %s jsou nyní on-line."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:472
+#: src/online/online_player_profile.cpp:449
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3598,12 +3521,12 @@ msgstr[2] "%d kamarádů je nyní on-line."
 msgstr[3] "%d kamarádů je nyní on-line."
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:521
+#: src/online/online_player_profile.cpp:498
 #, c-format
 msgid "%s is now on server \"%s\"."
-msgstr "%s je nyní na serveru \"%s\"."
+msgstr ""
 
-#: src/online/online_player_profile.cpp:552
+#: src/online/online_player_profile.cpp:529
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
@@ -3612,103 +3535,103 @@ msgstr[1] "Máte %d nové žádosti o přátelství!"
 msgstr[2] "Máte %d nových žádostí o kamarádství!"
 msgstr[3] "Máte %d nových žádostí o kamarádství!"
 
-#: src/online/online_player_profile.cpp:558
+#: src/online/online_player_profile.cpp:535
 msgid "You have a new friend request!"
 msgstr "Máte novou žádost o kamarádství!"
 
-#: src/online/xml_request.cpp:86
+#: src/online/xml_request.cpp:84
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
 msgstr "Nelze se připojit k serveru. Zkontrolujte své připojení k Internetu a případně\npřed dalším pokusem zkuste počkat."
 
-#: src/race/grand_prix_data.cpp:616
+#: src/race/grand_prix_data.hpp:174
 msgid "Random Grand Prix"
 msgstr "Náhodná Velká cena"
 
-#: src/race/highscore_manager.cpp:102
+#: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
 msgstr "Soubor s nejvyšším skóre byl příliš starý,\nvšechna nejvyšší skóre byla smazána."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1153
+#: src/race/race_manager.hpp:184
 msgid "Follow the Leader"
 msgstr "Následujte vedoucího"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:214
+#: src/race/race_manager.hpp:186
 msgid "3 Strikes Battle"
 msgstr "Bitva na 3 zásahy"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1161
+#: src/race/race_manager.hpp:188
 msgid "Egg Hunt"
 msgstr "Lov vajíček"
 
-#: src/replay/replay_recorder.cpp:360
+#: src/replay/replay_recorder.cpp:358
 msgid "Incomplete replay file will not be saved."
 msgstr "Neúplný soubor s opakovačkou nebude uložen."
 
-#: src/replay/replay_recorder.cpp:396
+#: src/replay/replay_recorder.cpp:394
 #, c-format
 msgid "Replay saved in \"%s\"."
 msgstr "Opakovačka uložena do „%s“."
 
-#: src/states_screens/addons_screen.cpp:49
+#: src/states_screens/addons_screen.cpp:48
 msgid "1 week"
 msgstr "1 týden"
 
-#: src/states_screens/addons_screen.cpp:50
+#: src/states_screens/addons_screen.cpp:49
 msgid "2 weeks"
 msgstr "2 týdny"
 
-#: src/states_screens/addons_screen.cpp:51
+#: src/states_screens/addons_screen.cpp:50
 msgid "1 month"
 msgstr "1 měsíc"
 
-#: src/states_screens/addons_screen.cpp:52
+#: src/states_screens/addons_screen.cpp:51
 msgid "3 months"
 msgstr "3 měsíce"
 
-#: src/states_screens/addons_screen.cpp:53
+#: src/states_screens/addons_screen.cpp:52
 msgid "6 months"
 msgstr "6 měsíců"
 
-#: src/states_screens/addons_screen.cpp:54
+#: src/states_screens/addons_screen.cpp:53
 msgid "9 months"
 msgstr "9 měsíců"
 
-#: src/states_screens/addons_screen.cpp:55
+#: src/states_screens/addons_screen.cpp:54
 msgid "1 year"
 msgstr "1 rok"
 
-#: src/states_screens/addons_screen.cpp:56
+#: src/states_screens/addons_screen.cpp:55
 msgid "2 years"
 msgstr "2 roky"
 
-#: src/states_screens/addons_screen.cpp:107
+#: src/states_screens/addons_screen.cpp:106
 msgid "Add-on name"
 msgstr "Název doplňku"
 
-#: src/states_screens/addons_screen.cpp:108
+#: src/states_screens/addons_screen.cpp:107
 msgid "Updated date"
 msgstr "Datum aktualizace"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:299
+#: src/states_screens/addons_screen.cpp:297
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s od %s"
 
-#: src/states_screens/addons_screen.cpp:420
+#: src/states_screens/addons_screen.cpp:417
 msgid "Please wait while addons are updated"
 msgstr "Chvíli strpení, aktualizují se doplňky"
 
-#: src/states_screens/addons_screen.cpp:498
-#: src/states_screens/main_menu_screen.cpp:564
+#: src/states_screens/addons_screen.cpp:495
+#: src/states_screens/main_menu_screen.cpp:558
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3719,28 +3642,28 @@ msgstr "Omlouváme se, během připojování k webu doplňků se vyskytla chyba.
 #. I18N: track group name
 #. I18N: kart group name
 #. I18N: track group name
-#: src/states_screens/arenas_screen.cpp:80
-#: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:292
-#: src/states_screens/tracks_and_gp_screen.cpp:144
+#: src/states_screens/arenas_screen.cpp:79
+#: src/states_screens/easter_egg_screen.cpp:142
+#: src/states_screens/kart_selection.cpp:288
+#: src/states_screens/tracks_and_gp_screen.cpp:143
 msgid "standard"
 msgstr "standardní"
 
-#: src/states_screens/arenas_screen.cpp:274
-#: src/states_screens/arenas_screen.cpp:326
-#: src/states_screens/easter_egg_screen.cpp:225
-#: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:890
-#: src/states_screens/kart_selection.cpp:1526
-#: src/states_screens/race_setup_screen.cpp:100
+#: src/states_screens/arenas_screen.cpp:273
+#: src/states_screens/arenas_screen.cpp:325
+#: src/states_screens/easter_egg_screen.cpp:224
+#: src/states_screens/easter_egg_screen.cpp:255
+#: src/states_screens/kart_selection.cpp:886
+#: src/states_screens/kart_selection.cpp:1522
+#: src/states_screens/race_setup_screen.cpp:99
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Zamčeno: splňte aktivní výzvy k získání přístupu!"
 
-#: src/states_screens/arenas_screen.cpp:338
+#: src/states_screens/arenas_screen.cpp:337
 msgid "Random Arena"
 msgstr "Náhodná aréna"
 
-#: src/states_screens/arenas_screen.cpp:342
+#: src/states_screens/arenas_screen.cpp:341
 #, c-format
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
@@ -3749,395 +3672,395 @@ msgstr[1] "%d arény nejsou k dispozici v režimu hry jednoho hráče."
 msgstr[2] "%d arén není k dispozici v režimu hry jednoho hráče."
 msgstr[3] "%d arén není k dispozici v režimu hry jednoho hráče."
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Launchpad Contributions:\nAri Green https://launchpad.net/~ariyoyah\nDavid Kolibáč https://launchpad.net/~david-kolibac\nDawid Gan https://launchpad.net/~deveee\ndonny https://launchpad.net/~michal-donat\ndtfjgk https://launchpad.net/~dtfjgk-deactivatedaccount\nFrantišek Zatloukal https://launchpad.net/~zatloukal-frantisek\nH0ff1 https://launchpad.net/~stefhoff\nJakub Talich https://launchpad.net/~jakub.talich-deactivatedaccount\nJakub Vaněk, 2015-2016\nJan Srb https://launchpad.net/~j-srb\nJirka Folta https://launchpad.net/~pholta-cz\nLukáš Machyán https://launchpad.net/~phobulos\nMichal Kundrát https://launchpad.net/~dreit\nMightyPork https://launchpad.net/~mighty-pork\nOndřej Holý https://launchpad.net/~ondrej-holy\nPavel Borecki, 2015\nPetr Wudi https://launchpad.net/~petr-wudi\nSTK-team https://launchpad.net/~stk\nTadeáš Pařík https://launchpad.net/~pariktadeas\nToMáš Marný, 2015\nToMáš Marný, 2015-2016\nTomáš Velecký https://launchpad.net/~elektron112"
 
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:64
 msgctxt "achievement_info"
 msgid "Subgoals"
-msgstr "Dílčí cíle"
+msgstr ""
 
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:67
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:66
 msgctxt "achievement_info"
 msgid "Progress"
-msgstr "Postup"
+msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:162
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:161
 msgid "Fulfill all the subgoals"
-msgstr "Splňte všechny dílčí úkoly"
+msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:164
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:163
 msgid "Fulfill all the subgoals at the same time"
-msgstr "Splňte všechny dílčí úkoly najednou"
+msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:166
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:165
 msgid "Fulfill at least one subgoal"
-msgstr "Splňte alespoň jeden dílčí úkol"
+msgstr ""
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:168
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:167
 msgid "The sum of the subgoals must reach the indicated value"
-msgstr "Součet dílčích úkolů musí dosáhnout uvedené hodnoty"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:170
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:276
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:301
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:169
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:275
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:300
 msgid "Races won"
-msgstr "Vyhrané závody"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:172
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:171
 msgid "Normal races won"
-msgstr "Vyhrát normální závod"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:174
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:173
 msgid "Time-trial races won"
-msgstr "Vyhrát závod na čas"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:176
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:175
 msgid "Follow-the-Leader races won"
-msgstr "Vyhrát závod následujte vedoucího"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:178
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:177
 msgid "Consecutive won races"
-msgstr "Postupné vítězství v závodech"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:180
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:179
 msgid "Consecutive won races in Expert or SuperTux"
-msgstr "Postupné vítězství v režimech Expert nebo SuperTux"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:182
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:181
 msgid "Novice races started"
-msgstr "Začaté nováčkovské závody"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:184
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:183
 msgid "Novice races finished"
-msgstr "Dokončené nováčkovské závody"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:186
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:185
 msgid "Intermediate races started"
-msgstr "Začaté středně pokročilé závody"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:188
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:187
 msgid "Intermediate races finished"
-msgstr "Dokončené pokročilé závody"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:190
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:189
 msgid "Expert races started"
-msgstr "Začaté expert závody"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:192
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:191
 msgid "Expert races finished"
-msgstr "Dokončené expert závody"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:194
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:193
 msgid "SuperTux races started"
-msgstr "Závody SuperTux začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:196
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:195
 msgid "SuperTux races finished"
-msgstr "Závody SuperTux skončily"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:198
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:197
 msgid "Normal races started"
-msgstr "Normální závody začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:200
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:199
 msgid "Normal races finished"
-msgstr "Normální závody skončily"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:202
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:201
 msgid "Time-trial races started"
-msgstr "Závody na čas začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:204
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:203
 msgid "Time-trial races finished"
-msgstr "Závody na čas dokončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:206
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:205
 msgid "Follow-the-Leader races started"
-msgstr "Závody následuj vedoucího začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:207
 msgid "Follow-the-Leader races finished"
-msgstr "Závody následuj vedoucího dokončeny"
-
-#. I18N: A goal for achievements. If this text is in (), it's a precision
-#. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:210
-msgid "3 Strikes battles started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
-msgid "3 Strikes battles finished"
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:209
+msgid "3 Strikes battle started"
 msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:214
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:211
+msgid "3 Strikes battle finished"
+msgstr ""
+
+#. I18N: A goal for achievements. If this text is in (), it's a precision
+#. added to multiple different goals.
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:213
 msgid "Soccer matches started"
-msgstr "Fotbalové zápasy začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:216
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:215
 msgid "Soccer matches finished"
-msgstr "Fotbalové zápasy skončily"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:218
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:217
 msgid "Egg Hunts started"
-msgstr "Lovy vajíček začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:220
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:219
 msgid "Egg Hunts finished"
-msgstr "Lovy vajíček dokončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:222
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:221
 msgid "Races started with a ghost replay"
-msgstr "Závody proti opakovačce s duchem zahájeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:224
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:223
 msgid "Races finished with a ghost replay"
-msgstr "Závody proti opakovačce s duchem zakončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:225
 msgid "Capture-the-Flag matches started"
-msgstr "Zápasy o vlajku zahájeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:228
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:227
 msgid "Capture-the-Flag matches finished"
-msgstr "Zápasy o vlajku zakončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:230
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:229
 msgid "Free-for-All matches started"
-msgstr "Zápasy volné pro všechny zahájeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:232
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:231
 msgid "Free-for-All matches finished"
-msgstr "Zápasy volné pro všechny skončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:234
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:236
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:233
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:235
 msgid "Powerups used"
-msgstr "Použité bonusy"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:236
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:240
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:248
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:262
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:235
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:239
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:243
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:247
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:249
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:253
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:261
 msgid " (1 race)"
-msgstr " (1 závod)"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:238
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:240
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:237
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:239
 msgid "Bowling ball hits"
-msgstr "Zásahy bowlingovou koulí"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:242
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:241
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:243
 msgid "Swatter hits"
-msgstr "Zásahy plácačkou"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:246
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:248
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:245
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:247
 msgid "All hits"
-msgstr "Všechny zásahy"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:249
 msgid "Hits against the same kart"
-msgstr "Zásahy stejné motokáry"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:252
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:251
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:253
 msgid "Bananas collected"
-msgstr "Posbírané banány"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #. I18N: Key binding name
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:281
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:255
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:259
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:266
+#: src/states_screens/options/options_screen_device.cpp:280
 msgid "Skidding"
 msgstr "Smyk"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:268
 msgid " (1 lap)"
-msgstr " (1 kolo)"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:272
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:297
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:271
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:296
 msgid "Races started"
-msgstr "Závody začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:272
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:276
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:278
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:280
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:282
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:284
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:286
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:294
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:271
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:273
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:275
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:277
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:279
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:281
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:283
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:285
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:287
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:293
 msgid " (maximum on one official track)"
-msgstr " (maximum na jedné oficiální trati)"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:299
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:273
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:298
 msgid "Races finished"
-msgstr "Závody dokončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:278
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:303
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:277
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:302
 msgid "Reverse direction races finished"
-msgstr "Závody v opačném směru dokončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:280
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:305
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:279
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:304
 msgid "Races finished alone"
-msgstr "Závod dokončen samotný"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:282
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:307
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:281
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:306
 msgid "Races with less than the default lap number"
-msgstr "Závody s méně než výchozím počtem kol"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:284
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:309
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:283
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:308
 msgid "Races with more than the default lap number"
-msgstr "Závody s více než výchozím počtem kol"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:286
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:311
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:285
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:310
 msgid "Races with at least twice as much as the default lap number"
-msgstr "Závody s nejméně dvojnásobkem výchozího počtu kol"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:287
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:312
 msgid "Egg hunts started"
-msgstr "Lovy vajíček začaly"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:292
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:317
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:291
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:316
 msgid "Egg hunts finished"
-msgstr "Lovy vajíček dokončeny"
+msgstr ""
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:297
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:299
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:301
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:303
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:305
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:307
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:309
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:311
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
-#: src/states_screens/dialogs/achievement_progress_dialog.cpp:319
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:296
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:298
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:300
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:302
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:304
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:306
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:308
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:310
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:312
+#: src/states_screens/dialogs/achievement_progress_dialog.cpp:318
 msgid " (official tracks matching the goal)"
-msgstr " (oficiální trasy odpovídající cíli)"
+msgstr ""
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -4147,84 +4070,84 @@ msgid ""
 msgstr "Pro přidání gamepadu/joysticku spusťte SuperTuxKart s připojeným zařízením, které se poté objeví v seznamu.\n\nPro přidání nastavení klávesnice můžete použít tlačítko dole, OVŠEM uvědomte si, že většina klávesnic podporuje pouze omezené množství současně stisknutých kláves a jsou proto nevhodné pro hru více hráčů. (Ovšem můžete připojit více klávesnic k počítači. Pamatujte, že každý hráč potřebuje jiné nastavení kláves.)"
 
 #. I18N: In the 'add new input device' dialog
-#: src/states_screens/dialogs/add_device_dialog.cpp:87
+#: src/states_screens/dialogs/add_device_dialog.cpp:90
 msgid "Add Wiimote"
 msgstr "Přidat Wiimote"
 
 #. I18N: In the 'add new input device' dialog
-#: src/states_screens/dialogs/add_device_dialog.cpp:108
+#: src/states_screens/dialogs/add_device_dialog.cpp:111
 msgid "Add Keyboard Configuration"
 msgstr "Přidat nastavení klávesnice"
 
-#: src/states_screens/dialogs/addons_loading.cpp:105
+#: src/states_screens/dialogs/addons_loading.cpp:103
 msgid "Update"
 msgstr "Aktualizovat"
 
-#: src/states_screens/dialogs/addons_loading.cpp:117
+#: src/states_screens/dialogs/addons_loading.cpp:115
 #, c-format
 msgid "Version: %d"
 msgstr "Verze: %d"
 
-#: src/states_screens/dialogs/addons_loading.cpp:148
+#: src/states_screens/dialogs/addons_loading.cpp:146
 msgid "featured"
 msgstr "oblíbené"
 
-#: src/states_screens/dialogs/addons_loading.cpp:174
+#: src/states_screens/dialogs/addons_loading.cpp:172
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:181
-#: src/states_screens/dialogs/addons_loading.cpp:185
+#: src/states_screens/dialogs/addons_loading.cpp:179
+#: src/states_screens/dialogs/addons_loading.cpp:183
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:186
+#: src/states_screens/dialogs/addons_loading.cpp:184
 #, c-format
 msgid "Size: %s"
 msgstr "Velikost: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:294
+#: src/states_screens/dialogs/addons_loading.cpp:292
 msgid "Sorry, downloading the add-on failed"
 msgstr "Omlouváme se, ale stahování doplňku se nezdařilo"
 
-#: src/states_screens/dialogs/addons_loading.cpp:378
+#: src/states_screens/dialogs/addons_loading.cpp:376
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "Problémy s instalací doplňku „%s“."
 
-#: src/states_screens/dialogs/addons_loading.cpp:389
-#: src/states_screens/dialogs/addons_loading.cpp:428
+#: src/states_screens/dialogs/addons_loading.cpp:387
+#: src/states_screens/dialogs/addons_loading.cpp:426
 msgid "Try again"
 msgstr "Zkuste znovu"
 
-#: src/states_screens/dialogs/addons_loading.cpp:417
+#: src/states_screens/dialogs/addons_loading.cpp:415
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "Problémy s odinstalací doplňku „%s“."
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:135
+#: src/states_screens/dialogs/change_password_dialog.cpp:134
 msgid "Current password invalid."
 msgstr "Stávající heslo je chybně zadané."
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:319
+#: src/states_screens/dialogs/change_password_dialog.cpp:140
+#: src/states_screens/online/register_screen.cpp:310
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Je třeba, aby heslo bylo dlouhé nejméně 8 a nejvíce 30 znaků!"
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:303
+#: src/states_screens/dialogs/change_password_dialog.cpp:147
+#: src/states_screens/online/register_screen.cpp:294
 msgid "Passwords don't match!"
 msgstr "Hesla se neshodují!"
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:211
+#: src/states_screens/dialogs/change_password_dialog.cpp:210
 msgid "Password successfully changed."
 msgstr "Heslo bylo úspěšně změněno."
 
-#: src/states_screens/dialogs/change_password_dialog.cpp:236
-#: src/states_screens/dialogs/recovery_dialog.cpp:210
-#: src/states_screens/online/register_screen.cpp:384
+#: src/states_screens/dialogs/change_password_dialog.cpp:235
+#: src/states_screens/dialogs/recovery_dialog.cpp:209
+#: src/states_screens/online/register_screen.cpp:375
 msgid "Validating info"
 msgstr "Ověřování informací"
 
@@ -4243,191 +4166,137 @@ msgstr[3] "Potvrďte rozlišení během %i sekund"
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr "Rozlišení menší než 1024x768 nebo 1280x720 nejsou podporována. Některé části uživatelského rozhraní nemusí fungovat správně."
+msgstr ""
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/dialogs/custom_video_settings.cpp:71
-#: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/online/create_server_screen.cpp:162
-#: src/states_screens/options/options_screen_video.cpp:462
+#: src/states_screens/dialogs/custom_video_settings.cpp:62
+#: src/states_screens/dialogs/custom_video_settings.cpp:69
+#: src/states_screens/dialogs/custom_video_settings.cpp:85
+#: src/states_screens/online/create_server_screen.cpp:160
+#: src/states_screens/options/options_screen_video.cpp:432
 msgid "Disabled"
 msgstr "Zakázáno"
 
 #. I18N: if only important particles effects is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:464
+#: src/states_screens/dialogs/custom_video_settings.cpp:63
+#: src/states_screens/options/options_screen_video.cpp:434
 msgid "Important only"
 msgstr "Pouze důležité"
 
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
-#: src/states_screens/dialogs/custom_video_settings.cpp:73
-#: src/states_screens/dialogs/custom_video_settings.cpp:82
-#: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:471
+#: src/states_screens/dialogs/custom_video_settings.cpp:71
+#: src/states_screens/dialogs/custom_video_settings.cpp:80
+#: src/states_screens/dialogs/custom_video_settings.cpp:86
+#: src/states_screens/options/options_screen_video.cpp:441
 msgid "Low"
 msgstr "Nízká"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
-#: src/states_screens/dialogs/custom_video_settings.cpp:83
-#: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:474
+#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:81
+#: src/states_screens/dialogs/custom_video_settings.cpp:87
+#: src/states_screens/options/options_screen_video.cpp:444
 msgid "High"
 msgstr "Vysoká"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:468
+#: src/states_screens/dialogs/custom_video_settings.cpp:79
+#: src/states_screens/options/options_screen_video.cpp:438
 msgid "Very Low"
 msgstr "Velmi nízká"
 
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:143
+#: src/states_screens/ghost_replay_selection.cpp:153
+msgctxt "ghost_info"
+msgid "Reverse"
+msgstr ""
+
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
-msgctxt "column_name"
-msgid "Reverse"
-msgstr "Opačný směr"
-
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
-#: src/states_screens/ghost_replay_selection.cpp:157
-#: src/states_screens/online/server_selection.cpp:119
-msgctxt "column_name"
+msgctxt "ghost_info"
 msgid "Difficulty"
-msgstr "Obtížnost"
+msgstr ""
+
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
+#: src/states_screens/ghost_replay_selection.cpp:157
+msgctxt "ghost_info"
+msgid "Laps"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
-#: src/states_screens/ghost_replay_selection.cpp:159
-msgctxt "column_name"
-msgid "Laps"
-msgstr "Kola"
+#: src/states_screens/ghost_replay_selection.cpp:158
+msgctxt "ghost_info"
+msgid "Time"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
-#: src/states_screens/ghost_replay_selection.cpp:160
-msgctxt "column_name"
-msgid "Time"
-msgstr "Čas"
+#: src/states_screens/ghost_replay_selection.cpp:159
+msgctxt "ghost_info"
+msgid "Kart"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
-#: src/states_screens/ghost_replay_selection.cpp:161
-msgctxt "column_name"
-msgid "Kart"
-msgstr "Motokára"
+#: src/states_screens/ghost_replay_selection.cpp:160
+msgctxt "ghost_info"
+msgid "User"
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
-#: src/states_screens/ghost_replay_selection.cpp:162
-msgctxt "column_name"
-msgid "User"
-msgstr "Uživatel"
-
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:158
-#: src/states_screens/ghost_replay_selection.cpp:166
-msgctxt "column_name"
+#: src/states_screens/ghost_replay_selection.cpp:164
+msgctxt "ghost_info"
 msgid "Version"
-msgstr "Verze"
+msgstr ""
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/dialogs/message_dialog.cpp:131
-#: src/states_screens/edit_gp_screen.cpp:261
-#: src/states_screens/ghost_replay_selection.cpp:388
-msgid "No"
-msgstr "Ne"
+#. I18N: In kart color choosing dialog
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:43
+msgid "Use original color"
+msgstr ""
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:45
-msgid "Use original color"
-msgstr "Použít původní barvu"
-
-#. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
 msgid "Pick a color from slider"
-msgstr "Barvu zvolíte posuvníkem"
+msgstr ""
 
-#. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:48
-msgid "Player info"
-msgstr "Informace o hráči"
-
-#. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:53
-#, c-format
-msgid "Player name: %s"
-msgstr "Jméno hráče: %s"
-
-#. I18N: In the network player dialog, show the player location with
-#. country name (based on IP geolocation)
-#: src/states_screens/dialogs/network_player_dialog.cpp:62
-#, c-format
-msgid "Player location: %s"
-msgstr "Umístění hráče: %s"
-
-#. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:105
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:82
 msgid "Kick"
-msgstr "Vykopnout"
+msgstr ""
 
-#. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:121
+#. I18N: In the network user dialog
+#: src/states_screens/dialogs/network_user_dialog.cpp:98
 msgid "Change team"
-msgstr "Změnit tým"
-
-#. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:136
-msgid "Enable handicap"
-msgstr "Povolit handicap"
-
-#. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:141
-msgid "Disable handicap"
-msgstr "Zakázat handicap"
-
-#. I18N: In the network player dialog,
-#. report player about for example abusive behaviour in game
-#: src/states_screens/dialogs/network_player_dialog.cpp:156
-msgid "Report player"
-msgstr "Nahlásit hráče"
+msgstr ""
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
-#: src/states_screens/dialogs/network_player_dialog.cpp:178
+#: src/states_screens/dialogs/network_user_dialog.cpp:122
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:140
 #, c-format
 msgid "Fetching ranking info for %s"
-msgstr "Načítání informací o hodnocení pro %s"
-
-#. I18N: In the network player dialog, instruction for reporting player
-#: src/states_screens/dialogs/network_player_dialog.cpp:186
-#, c-format
-msgid "Tell server administrator about this player (%s):"
-msgstr "Říct správci serveru o tomto hráči (%s):"
-
-#: src/states_screens/dialogs/race_paused_dialog.cpp:103
-#: src/states_screens/online/networking_lobby.cpp:231
-#: src/states_screens/online/networking_lobby.cpp:778
-msgid "Chat is disabled, enable in options menu."
-msgstr "Chat vypnut, zapnete v nabídce předvoleb."
+msgstr ""
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
-#: src/states_screens/dialogs/ranking_callback.hpp:60
+#: src/states_screens/dialogs/ranking_callback.hpp:57
 #, c-format
 msgid "%s has no ranking yet."
-msgstr "%s zatím nemá žádné hodnocení."
+msgstr ""
 
 #. I18N: In the network player dialog show rank and
 #. score of a player
-#: src/states_screens/dialogs/ranking_callback.hpp:71
+#: src/states_screens/dialogs/ranking_callback.hpp:68
 #, c-format
 msgid "%s is number %d in the rankings with a score of %f."
-msgstr "%s je číslo %d v žebříčku se skóre %f."
+msgstr ""
 
-#: src/states_screens/dialogs/recovery_dialog.cpp:122
+#: src/states_screens/dialogs/recovery_dialog.cpp:121
 msgid "Username and/or email address invalid."
 msgstr "Uživatelské jméno a/nebo e-mailová adresa jsou neplatné."
 
@@ -4438,275 +4307,216 @@ msgid ""
 "agree to these terms in order to register an account for STK. If you have "
 "any questions or comments regarding these terms, one of the members of the "
 "development team would gladly assist you."
-msgstr "Přečtěte si prosím smluvní podmínky pro SuperTuxKart na adrese '%s'. S těmito podmínkami musíte souhlasit, abyste si mohli zaregistrovat účet pro STK. Máte-li jakékoli dotazy nebo připomínky k těmto podmínkám, nějaký z členů vývojového týmu vám rád pomůže."
-
-#. I18N: In the Select challenge dialog
-#: src/states_screens/dialogs/select_challenge.cpp:60
-msgid "Nitro challenge"
-msgstr "Nitro výzva"
-
-#. I18N: In the Select challenge dialog
-#: src/states_screens/dialogs/select_challenge.cpp:65
-#: src/states_screens/race_setup_screen.cpp:136
-msgid "Ghost replay race"
-msgstr "Opakovaný závod s duchem"
-
-#. I18N: In the Select challenge dialog
-#: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1707
-#, c-format
-msgid "Laps: %i"
-msgstr "Kol: %i"
-
-#. I18N: In the Select challenge dialog, type of this challenge
-#: src/states_screens/dialogs/select_challenge.cpp:82
-#, c-format
-msgid "Type: %s"
 msgstr ""
 
-#. I18N: In the Select challenge dialog
-#: src/states_screens/dialogs/select_challenge.cpp:90
+#: src/states_screens/dialogs/select_challenge.cpp:52
 #, c-format
 msgid "Required Rank: %i"
 msgstr "Požadované hodnocení: %i"
 
-#. I18N: In the Select challenge dialog
-#: src/states_screens/dialogs/select_challenge.cpp:96
+#: src/states_screens/dialogs/select_challenge.cpp:57
 #, c-format
 msgid "Required Time: %i"
 msgstr "Požadovaný čas: %i"
 
-#. I18N: In the Select challenge dialog
-#: src/states_screens/dialogs/select_challenge.cpp:103
+#: src/states_screens/dialogs/select_challenge.cpp:63
 #, c-format
 msgid "Required Nitro Points: %i"
 msgstr "Požadovaných nitro bodů: %i"
 
-#. I18N: In the Select challenge dialog
-#: src/states_screens/dialogs/select_challenge.cpp:109
+#: src/states_screens/dialogs/select_challenge.cpp:69
 #, c-format
 msgid "Number of AI Karts: %i"
 msgstr "Počet motokár ovládaných počítačem: %i"
 
-#. I18N: In the create server screen, show various battle mode available
-#: src/states_screens/dialogs/server_configuration_dialog.cpp:157
-#: src/states_screens/online/create_server_screen.cpp:176
-msgid "Battle mode"
-msgstr "Režim bitvy"
+#: src/states_screens/dialogs/select_challenge.cpp:149
+msgid "Nitro challenge"
+msgstr "Nitro výzva"
 
-#. I18N: In the create server screen
-#: src/states_screens/dialogs/server_configuration_dialog.cpp:170
-#: src/states_screens/online/create_server_screen.cpp:192
-#: src/states_screens/track_info_screen.cpp:180
-msgid "Soccer game type"
-msgstr "Typ fotbalové hry"
+#: src/states_screens/dialogs/select_challenge.cpp:151
+#: src/states_screens/race_setup_screen.cpp:136
+msgid "Ghost replay race"
+msgstr "Opakovaný závod s duchem"
 
-#. I18N: In the server info dialog, show the server location with
-#. country name (based on IP geolocation)
-#: src/states_screens/dialogs/server_info_dialog.cpp:96
-#, c-format
-msgid "Server location: %s"
-msgstr "Umístění serveru: %s"
-
-#. I18N: In server info dialog, showing the current track playing in server
-#: src/states_screens/dialogs/server_info_dialog.cpp:105
-#, c-format
-msgid "Current track: %s"
-msgstr "Současná trať: %s"
-
-#: src/states_screens/dialogs/server_info_dialog.cpp:115
+#: src/states_screens/dialogs/server_info_dialog.cpp:99
+#: src/states_screens/race_gui_overworld.cpp:148
 msgid "Rank"
 msgstr "Pořadí"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:118
+#: src/states_screens/dialogs/server_info_dialog.cpp:102
 msgid "Player"
-msgstr "Hráč"
+msgstr ""
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:121
+#: src/states_screens/dialogs/server_info_dialog.cpp:105
 msgid "Scores"
-msgstr "Výsledky"
+msgstr ""
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:124
+#: src/states_screens/dialogs/server_info_dialog.cpp:108
 msgid "Time played"
-msgstr "Odehraný čas"
+msgstr ""
 
-#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:130
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:129
 msgid "Input device already exists."
 msgstr "Vstupní zařízení již existuje."
 
-#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:147
-#: src/states_screens/online/online_screen.cpp:233
+#: src/states_screens/dialogs/splitscreen_player_dialog.cpp:146
+#: src/states_screens/online/online_screen.cpp:232
 msgid "No player available for connecting to server."
-msgstr "Pro připojení k serveru není k dispozici žádný hráč."
+msgstr ""
 
-#. I18N: In the user info dialog
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
-#, c-format
-msgid "Username: %s"
-msgstr "Uživatelské jméno: %s"
-
-#: src/states_screens/dialogs/user_info_dialog.cpp:60
 msgid "Cancel Request"
 msgstr "Zrušit požadavek"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:160
-#: src/states_screens/dialogs/user_info_dialog.cpp:217
+#: src/states_screens/dialogs/user_info_dialog.cpp:156
+#: src/states_screens/dialogs/user_info_dialog.cpp:213
 msgid "Today"
 msgstr "Dnes"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:164
+#: src/states_screens/dialogs/user_info_dialog.cpp:160
 msgid "Friend request sent!"
 msgstr "Žádost o přátelství odeslána!"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:221
+#: src/states_screens/dialogs/user_info_dialog.cpp:217
 msgid "Friend request accepted!"
 msgstr "Žádost o přátelství přijata!"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:273
+#: src/states_screens/dialogs/user_info_dialog.cpp:269
 msgid "Friend request declined!"
 msgstr "Žádost o přátelství odmítnuta!"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:319
+#: src/states_screens/dialogs/user_info_dialog.cpp:315
 msgid "Friend removed!"
 msgstr "Kamarád odebrán!"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:370
+#: src/states_screens/dialogs/user_info_dialog.cpp:366
 msgid "Friend request cancelled!"
 msgstr "Žádost o přátelství zrušena!"
 
-#: src/states_screens/dialogs/user_info_dialog.cpp:480
+#: src/states_screens/dialogs/user_info_dialog.cpp:476
 msgid "Processing"
 msgstr "Zpracovávání"
 
-#: src/states_screens/dialogs/vote_dialog.cpp:173
+#: src/states_screens/dialogs/vote_dialog.cpp:172
 msgid "Fetching last vote"
 msgstr "Načítání posledního hlasování"
 
-#: src/states_screens/dialogs/vote_dialog.cpp:192
+#: src/states_screens/dialogs/vote_dialog.cpp:191
 msgid "You can adapt your previous rating by clicking the stars beneath."
 msgstr "Můžete upravit své předchozí hodnocení kliknutím na správný počet hvězd níže."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:197
+#: src/states_screens/dialogs/vote_dialog.cpp:196
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
 msgstr "Ještě jste nehlasovali pro tento zásuvný modul. Vyberte požadované hodnocení kliknutím na počet hvězd níže"
 
-#: src/states_screens/dialogs/vote_dialog.cpp:232
+#: src/states_screens/dialogs/vote_dialog.cpp:231
 msgid "Vote successful! You can now close the window."
 msgstr "Hlasování bylo úspěšné! Nyní můžete zavřít okno."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:249
+#: src/states_screens/dialogs/vote_dialog.cpp:248
 msgid "Performing vote"
 msgstr "Provádění hlasování"
 
-#. I18N: Shown when there is download error for assets download
-#. in the first run
-#: src/states_screens/download_assets.cpp:204
-msgid ""
-"Failed to download assets, check your storage space or internet connection "
-"and try again later."
-msgstr ""
-
-#: src/states_screens/easter_egg_screen.cpp:270
-#: src/states_screens/online/tracks_screen.cpp:601
-#: src/states_screens/tracks_and_gp_screen.cpp:290
+#: src/states_screens/easter_egg_screen.cpp:269
+#: src/states_screens/online/tracks_screen.cpp:440
+#: src/states_screens/tracks_and_gp_screen.cpp:289
 msgid "Random Track"
 msgstr "Náhodná trať"
 
-#: src/states_screens/edit_gp_screen.cpp:117
-#: src/states_screens/ghost_replay_selection.cpp:507
-#: src/states_screens/grand_prix_editor_screen.cpp:110
+#: src/states_screens/edit_gp_screen.cpp:116
+#: src/states_screens/ghost_replay_selection.cpp:505
+#: src/states_screens/grand_prix_editor_screen.cpp:109
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
 msgstr "Opravdu chcete odstranit „%s“?"
 
-#: src/states_screens/edit_gp_screen.cpp:134
+#: src/states_screens/edit_gp_screen.cpp:133
 msgid "Do you want to save your changes?"
 msgstr "Chcete uložit změny?"
 
-#: src/states_screens/edit_gp_screen.cpp:151
+#: src/states_screens/edit_gp_screen.cpp:150
 msgid "Track"
 msgstr "Trať"
 
-#: src/states_screens/edit_gp_screen.cpp:152
+#: src/states_screens/edit_gp_screen.cpp:151
 msgid "Laps"
 msgstr "Kol"
 
-#: src/states_screens/edit_gp_screen.cpp:153
+#: src/states_screens/edit_gp_screen.cpp:152
 msgid "Reversed"
 msgstr "Obráceně"
 
 #. I18N: Indicate that the grand prix is modified and not saved
-#: src/states_screens/edit_gp_screen.cpp:290
+#: src/states_screens/edit_gp_screen.cpp:289
 #, c-format
 msgid "%s (+)"
 msgstr "%s (+)"
 
-#: src/states_screens/edit_gp_screen.cpp:330
+#: src/states_screens/edit_gp_screen.cpp:329
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Vyskytla se chyba při pokusu uložit vaši Velkou cenu."
 
-#: src/states_screens/edit_track_screen.cpp:234
+#: src/states_screens/edit_track_screen.cpp:233
 msgid "Select a track"
 msgstr "Vyberte trať"
 
-#: src/states_screens/feature_unlocked.cpp:249
+#: src/states_screens/feature_unlocked.cpp:248
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr "Dokončili jste snadnou výzvu! Body získané na této úrovni: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:255
+#: src/states_screens/feature_unlocked.cpp:254
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr "Dokončili jste středně obtížnou výzvu! Body získané na této úrovni: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:261
+#: src/states_screens/feature_unlocked.cpp:260
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr "Dokončili jste obtížnou výzvu! Body získané na této úrovni: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:267
+#: src/states_screens/feature_unlocked.cpp:266
 #, c-format
 msgid ""
 "You completed the SuperTux challenge! Points earned on this level: %i/%i"
 msgstr "Dokončili jste výzvu! Body získané na této úrovni:  %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:310
+#: src/states_screens/feature_unlocked.cpp:309
 #, c-format
 msgid "You unlocked %s!"
-msgstr "Odemkli jste %s!"
+msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:629
+#: src/states_screens/feature_unlocked.cpp:628
 msgid "Challenge Completed"
 msgstr "Výzva dokončena"
 
-#: src/states_screens/feature_unlocked.cpp:668
+#: src/states_screens/feature_unlocked.cpp:667
 msgid "You unlocked track %0"
 msgstr "Odemkli jste trať %0"
 
-#: src/states_screens/feature_unlocked.cpp:714
+#: src/states_screens/feature_unlocked.cpp:713
 msgid "You unlocked grand prix %0"
 msgstr "Odemkli jste Velkou cenu %0"
 
-#: src/states_screens/ghost_replay_selection.cpp:153
-msgctxt "column_name"
+#: src/states_screens/ghost_replay_selection.cpp:151
+msgctxt "ghost_info"
 msgid "Track"
-msgstr "Trať"
+msgstr ""
 
-#: src/states_screens/ghost_replay_selection.cpp:164
-#: src/states_screens/online/server_selection.cpp:118
-msgctxt "column_name"
+#: src/states_screens/ghost_replay_selection.cpp:162
+msgctxt "ghost_info"
 msgid "Players"
-msgstr "Hráči"
+msgstr ""
 
 #: src/states_screens/gp_info_screen.cpp:72
 msgid "Default"
@@ -4725,13 +4535,13 @@ msgstr "Náhodně"
 msgid "Reload"
 msgstr "Načíst znovu"
 
-#: src/states_screens/grand_prix_cutscene.cpp:77
-#: src/states_screens/grand_prix_editor_screen.cpp:99
-#: src/states_screens/grand_prix_editor_screen.cpp:116
+#: src/states_screens/grand_prix_cutscene.cpp:75
+#: src/states_screens/grand_prix_editor_screen.cpp:98
+#: src/states_screens/grand_prix_editor_screen.cpp:115
 msgid "Please enter the name of the grand prix"
 msgstr "Zadejte název této Velké ceny"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:167
+#: src/states_screens/grand_prix_editor_screen.cpp:166
 msgid "Please select a Grand Prix"
 msgstr "Vyberte Velkou cenu"
 
@@ -4752,341 +4562,286 @@ msgid "Name is too long."
 msgstr "Název je příliš dlouhý."
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:156
+#: src/states_screens/grand_prix_lose.cpp:153
 msgid "Better luck next time!"
 msgstr "Příště více štěstí!"
 
-#: src/states_screens/grand_prix_win.cpp:165
-#: src/states_screens/race_result_gui.cpp:190
+#: src/states_screens/grand_prix_win.cpp:163
+#: src/states_screens/race_result_gui.cpp:186
 msgid "You completed a challenge!"
 msgstr "Dokončili jste výzvu!"
 
-#: src/states_screens/grand_prix_win.cpp:321
+#: src/states_screens/grand_prix_win.cpp:320
 msgid "You won the Grand Prix!"
-msgstr "Vyhráli jste velkou cenu!"
+msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:322
+#: src/states_screens/grand_prix_win.cpp:321
 msgid "You completed the Grand Prix!"
 msgstr "Velká cena dokončena!"
 
-#: src/states_screens/kart_selection.cpp:866
-#: src/states_screens/kart_selection.cpp:1544
+#: src/states_screens/kart_selection.cpp:862
+#: src/states_screens/kart_selection.cpp:1540
 msgid "Random Kart"
 msgstr "Náhodná motokára"
 
-#: src/states_screens/kart_selection.cpp:885
+#: src/states_screens/kart_selection.cpp:881
 msgid "Locked"
 msgstr "Zamčeno"
 
-#: src/states_screens/kart_selection.cpp:986
-#: src/states_screens/online/networking_lobby.cpp:478
+#: src/states_screens/kart_selection.cpp:982
+#: src/states_screens/online/networking_lobby.cpp:309
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Všem:\nDo hry se zapojíte stiskem tlačítka „Vybrat“"
 
-#: src/states_screens/main_menu_screen.cpp:501
-msgid ""
-"You can not play online without internet access. If you want to play online,"
-" go in the options menu, and check \"Connect to the Internet\"."
-msgstr "Nemůžete hrát on-line bez přístupu k internetu. Pokud chcete hrát on-line, přejděte do nabídky Možnosti a zaškrtněte „Připojit k Internetu“."
-
-#: src/states_screens/main_menu_screen.cpp:516
-msgid ""
-"You can not download addons without internet access. If you want to download"
-" addons, go in the options menu, and check \"Connect to the Internet\"."
-msgstr "Zásuvné moduly nelze stahovat bez přístupu k internetu. Pokud chcete stahovat zásuvné moduly, přejděte do nabídky Možností a zaškrtněte \"Připojit k Internetu\"."
-
-#: src/states_screens/main_menu_screen.cpp:524
-msgid ""
-"You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
-"\n"
-"You can however delete already downloaded addons."
-msgstr "Zásuvné moduly nelze stahovat bez přístupu k internetu. Pokud chcete stahovat zásuvné moduly, přejděte do nabídky Možností a zaškrtněte \"Připojit k Internetu\".\nMůžete však odstranit již stažené zásuvné moduly."
-
-#: src/states_screens/main_menu_screen.cpp:559
-msgid "The add-ons module is currently disabled in the Options screen"
-msgstr "Modul „Doplňky“ je momentálně vypnutý v nabídce „Předvolby“"
-
-#: src/states_screens/main_menu_screen.cpp:571
-msgid "Please wait while the add-ons are loading"
-msgstr "Chvíli strpení, načítají se doplňky"
-
-#: src/states_screens/online/create_server_screen.cpp:92
-msgid "Create LAN Server"
-msgstr "Vytvořit LAN server"
-
-#: src/states_screens/online/create_server_screen.cpp:97
-#, c-format
-msgid "%s's server"
-msgstr "Server %s"
-
-#. I18N: In the create server screen
-#: src/states_screens/online/create_server_screen.cpp:158
-msgid "No. of grand prix track(s)"
-msgstr "Počet kol velké ceny"
-
-#: src/states_screens/online/create_server_screen.cpp:241
-msgid "Name has to be between 4 and 30 characters long!"
-msgstr "Je třeba, aby délka názvu byla 4 až 30 znaků!"
-
-#: src/states_screens/online/create_server_screen.cpp:258
-msgid "Incorrect characters in password!"
-msgstr "Nepatřičné znaky v hesle!"
-
-#. I18N: In the networking lobby, ready button is to allow player to tell
-#. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:177
-msgid "Ready"
-msgstr "Připraveno"
-
-#. I18N: Live join is displayed in networking lobby to allow players
-#. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:180
-msgid "Live join"
-msgstr "Živě připojit"
-
-#. I18N: Spectate is displayed in networking lobby to allow players
-#. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:185
-msgid "Spectate"
-msgstr "Pozorovat"
-
-#: src/states_screens/online/networking_lobby.cpp:323
-#, c-format
-msgid "Lobby (ping: %dms)"
-msgstr "Čekárna (ping: %d ms)"
-
-#. I18N: In the networking lobby, show when player is required to
-#. wait before the current game finish with remaining time,
-#. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:358
-#, c-format
-msgid ""
-"Please wait for the current game's (%s) end, estimated remaining time: %s."
-msgstr "Počkejte prosím na konec aktuální hry (%s), odhadovaný zbývající čas: %s."
-
-#. I18N: In the networking lobby, show when player is required
-#. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:366
-#, c-format
-msgid "Please wait for the current game's end, estimated remaining time: %s."
-msgstr "Počkejte prosím na konec aktuální hry, odhadovaný zbývající čas: %s."
-
-#. I18N: In the networking lobby, show when player is required
-#. to wait before the current game finish with progress in
-#. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:378
-msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
-msgstr "Počkejte prosím na konec aktuální hry (%s), odhadovaný pokrok: %s%."
-
-#. I18N: In the networking lobby, show when player is required
-#. to wait before the current game finish with progress in
-#. percent
-#: src/states_screens/online/networking_lobby.cpp:387
-msgid "Please wait for the current game's end, estimated progress: %d%."
-msgstr "Počkejte prosím na konec aktuální hry, odhadovaný pokrok: %d%."
-
-#. I18N: In the networking lobby, show when player is required to
-#. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:395
-msgid "Please wait for the current game's end."
-msgstr "Počkejte prosím na konec aktuální hry."
-
-#: src/states_screens/online/networking_lobby.cpp:447
-#, c-format
-msgid "Game will start if there is more than %d player."
-msgid_plural "Game will start if there are more than %d players."
-msgstr[0] "Hra začne, pokud je zde více než %d hráč."
-msgstr[1] "Hra začne, pokud je zde více než %d hráčů."
-msgstr[2] "Hra začne, pokud je zde více než %d hráčů."
-msgstr[3] "Hra začne, pokud je zde více než %d hráčů."
-
-#. I18N: In the networking lobby, display the starting timeout
-#. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:461
-#, c-format
-msgid ""
-"Starting after %d second, or once everyone has pressed the 'Ready' button."
-msgid_plural ""
-"Starting after %d seconds, or once everyone has pressed the 'Ready' button."
-msgstr[0] "Start začne po %d sekundách, nebo jakmile každý stiskne tlačítko „Připraveno“."
-msgstr[1] "Start začne po %d sekundách, nebo jakmile každý stiskne tlačítko „Připraveno“."
-msgstr[2] "Start začne po %d sekundách, nebo jakmile každý stiskne tlačítko „Připraveno“."
-msgstr[3] "Start začne po %d sekundách, nebo jakmile každý stiskne tlačítko „Připraveno“."
-
-#: src/states_screens/online/networking_lobby.cpp:498
-#, c-format
-msgid "Connecting to server %s"
-msgstr "Připojení k serveru %s"
-
-#: src/states_screens/online/networking_lobby.cpp:503
-msgid "Finding a quick play server"
-msgstr "Vyhledání serveru rychlé hry"
-
-#. I18N: In kart screen, show before the voting period in network ends.
-#: src/states_screens/online/network_kart_selection.cpp:188
-#: src/states_screens/online/tracks_screen.cpp:857
-#, c-format
-msgid "Remaining time: %d"
-msgstr "Zbývající čas: %d"
-
-#. I18N: Goals in achievement
-#: src/states_screens/online/online_profile_achievements.cpp:82
-msgid "Goals"
-msgstr "Cíle"
-
-#: src/states_screens/online/online_profile_achievements.cpp:115
-#: src/states_screens/online/online_profile_achievements.cpp:314
-msgid "Fetching achievements"
-msgstr "Načítání úspěchů"
-
-#: src/states_screens/online/online_profile_base.cpp:117
-#, c-format
-msgid "%s's profile"
-msgstr "Profil %s"
-
-#: src/states_screens/online/online_profile_friends.cpp:75
-msgid "Since"
-msgstr "Od"
-
-#: src/states_screens/online/online_profile_friends.cpp:76
-msgid "Status"
-msgstr "Stav"
-
-#: src/states_screens/online/online_profile_friends.cpp:94
-#: src/states_screens/online/online_profile_friends.cpp:274
-msgid "Fetching friends"
-msgstr "Načítání kamarádů"
-
-#: src/states_screens/online/online_profile_friends.cpp:236
-msgid "New Request"
-msgstr "Nová žádost"
-
-#: src/states_screens/online/online_profile_friends.cpp:237
-msgid "Pending"
-msgstr "Čeká"
-
-#: src/states_screens/online/online_profile_friends.cpp:241
-msgid "Offline"
-msgstr "Nepřipojen"
-
-#. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online/online_screen.cpp:200
-msgid ""
-"You must be logged in to play Global networking. Click your username above."
-msgstr "Abyste mohli hrát přes globální síť, musíte být přihlášeni. Klikněte na své uživatelské jméno výše."
-
-#: src/states_screens/online/online_screen.cpp:210
+#: src/states_screens/main_menu_screen.cpp:492
+#: src/states_screens/online/online_screen.cpp:209
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr "Nemůžete hrát on-line bez přístupu k internetu. Pokud chcete hrát on-line, přejděte na Možnosti, zvolte záložku 'Uživatelské rozhraní', a upravte \"Připojit k internetu\"."
 
-#: src/states_screens/online/online_screen.cpp:238
+#: src/states_screens/main_menu_screen.cpp:508
 msgid ""
-"Enter the server address with IP optionally followed by : and then port."
+"You can not download addons without internet access. If you want to download"
+" addons, go to options, select the 'User Interface' tab, and check \"Connect"
+" to the Internet\"."
 msgstr ""
 
-#: src/states_screens/online/online_screen.cpp:249
+#: src/states_screens/main_menu_screen.cpp:517
+msgid ""
+"You can not download addons without internet access. If you want to download addons, go to options, select the 'User Interface' tab, and check \"Connect to the Internet\".\n"
+"\n"
+"You can however delete already downloaded addons."
+msgstr ""
+
+#: src/states_screens/main_menu_screen.cpp:553
+msgid "The add-ons module is currently disabled in the Options screen"
+msgstr "Modul „Doplňky“ je momentálně vypnutý v nabídce „Předvolby“"
+
+#: src/states_screens/main_menu_screen.cpp:565
+msgid "Please wait while the add-ons are loading"
+msgstr "Chvíli strpení, načítají se doplňky."
+
+#: src/states_screens/online/create_server_screen.cpp:90
+msgid "Create LAN Server"
+msgstr "Vytvořit LAN server"
+
+#: src/states_screens/online/create_server_screen.cpp:95
+#, c-format
+msgid "%s's server"
+msgstr "Server %s"
+
+#. I18N: In the create server screen
+#: src/states_screens/online/create_server_screen.cpp:156
+msgid "No. of grand prix track(s)"
+msgstr ""
+
+#. I18N: In the create server screen, show various battle mode available
+#: src/states_screens/online/create_server_screen.cpp:174
+msgid "Battle mode"
+msgstr ""
+
+#: src/states_screens/online/create_server_screen.cpp:239
+msgid "Name has to be between 4 and 30 characters long!"
+msgstr "Je třeba, aby délka názvu byla 4 až 30 znaků!"
+
+#: src/states_screens/online/create_server_screen.cpp:256
+msgid "Incorrect characters in password!"
+msgstr "Nepatřičné znaky v hesle!"
+
+#: src/states_screens/online/networking_lobby.cpp:186
+#: src/states_screens/online/networking_lobby.cpp:549
+msgid "Chat is disabled, enable in options menu."
+msgstr ""
+
+#: src/states_screens/online/networking_lobby.cpp:242
+#, c-format
+msgid "Lobby (ping: %dms)"
+msgstr ""
+
+#. I18N: In the networking lobby, show when player is required to wait
+#. before the current game finish
+#: src/states_screens/online/networking_lobby.cpp:251
+msgid "Please wait for current game to end."
+msgstr ""
+
+#: src/states_screens/online/networking_lobby.cpp:280
+#, c-format
+msgid "Game will start if there is more than %d player."
+msgid_plural "Game will start if there are more than %d players."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. I18N: In the networking lobby, display the starting timeout
+#. for owner-less server to begin a game
+#: src/states_screens/online/networking_lobby.cpp:294
+#, c-format
+msgid ""
+"Starting after %d second, or once everyone has pressed the 'Ready' button."
+msgid_plural ""
+"Starting after %d seconds, or once everyone has pressed the 'Ready' button."
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#: src/states_screens/online/networking_lobby.cpp:327
+#, c-format
+msgid "Connecting to server %s"
+msgstr "Připojení k serveru %s"
+
+#: src/states_screens/online/networking_lobby.cpp:332
+msgid "Finding a quick play server"
+msgstr ""
+
+#. I18N: In the networking lobby, ready button is to allow player to tell
+#. server that he is ready for next game for owner less server
+#: src/states_screens/online/networking_lobby.cpp:577
+msgid "Ready"
+msgstr ""
+
+#. I18N: Goals in achievement
+#: src/states_screens/online/online_profile_achievements.cpp:82
+msgid "Goals"
+msgstr ""
+
+#: src/states_screens/online/online_profile_achievements.cpp:115
+#: src/states_screens/online/online_profile_achievements.cpp:314
+msgid "Fetching achievements"
+msgstr "Načítání úspěchů"
+
+#: src/states_screens/online/online_profile_base.cpp:115
+#, c-format
+msgid "%s's profile"
+msgstr "Profil %s"
+
+#: src/states_screens/online/online_profile_friends.cpp:74
+msgid "Since"
+msgstr "Od"
+
+#: src/states_screens/online/online_profile_friends.cpp:75
+msgid "Status"
+msgstr "Stav"
+
+#: src/states_screens/online/online_profile_friends.cpp:93
+#: src/states_screens/online/online_profile_friends.cpp:273
+msgid "Fetching friends"
+msgstr "Načítání kamarádů"
+
+#: src/states_screens/online/online_profile_friends.cpp:235
+msgid "New Request"
+msgstr "Nová žádost"
+
+#: src/states_screens/online/online_profile_friends.cpp:236
+msgid "Pending"
+msgstr "Čeká"
+
+#: src/states_screens/online/online_profile_friends.cpp:240
+msgid "Offline"
+msgstr "Nepřipojen"
+
+#. I18N: Shown to players when he is not is not logged in
+#: src/states_screens/online/online_screen.cpp:199
+msgid ""
+"You must be logged in to play Global networking. Click your username above."
+msgstr ""
+
+#: src/states_screens/online/online_screen.cpp:237
+msgid ""
+"Enter the server address with IP (optional) followed by : and then port."
+msgstr ""
+
+#: src/states_screens/online/online_screen.cpp:248
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "Neplatná adresa serveru:  %s."
 
 #. I18N: In enter server ip address dialog
-#: src/states_screens/online/online_screen.cpp:274
+#: src/states_screens/online/online_screen.cpp:273
 msgid "Failed to detect port number."
-msgstr "Nepodařilo se zjistit číslo portu."
+msgstr ""
 
-#: src/states_screens/online/online_user_search.cpp:211
-#: src/states_screens/online/online_user_search.cpp:275
+#: src/states_screens/online/online_user_search.cpp:210
+#: src/states_screens/online/online_user_search.cpp:274
 msgid "Searching"
 msgstr "Hledání"
 
-#: src/states_screens/online/register_screen.cpp:128
-#: src/states_screens/options/user_screen.cpp:127
+#: src/states_screens/online/register_screen.cpp:120
+#: src/states_screens/options/user_screen.cpp:125
 msgid "Exit game"
 msgstr "Ukončit hru"
 
-#: src/states_screens/online/register_screen.cpp:241
-#: src/states_screens/online/register_screen.cpp:248
+#: src/states_screens/online/register_screen.cpp:232
+#: src/states_screens/online/register_screen.cpp:239
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "Nelze vytvořit hráče „%s“."
 
-#: src/states_screens/online/register_screen.cpp:265
+#: src/states_screens/online/register_screen.cpp:256
 msgid "User name cannot be empty."
-msgstr "Uživatelské jméno je třeba vyplnit."
+msgstr ""
 
-#: src/states_screens/online/register_screen.cpp:307
+#: src/states_screens/online/register_screen.cpp:298
 msgid "Emails don't match!"
 msgstr "E-maily se neshodují!"
 
-#: src/states_screens/online/register_screen.cpp:311
+#: src/states_screens/online/register_screen.cpp:302
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "On-line uživatelské jméno musí být dlouhé nejméně 3 a nejvíce 30 znaků!"
 
-#: src/states_screens/online/register_screen.cpp:315
+#: src/states_screens/online/register_screen.cpp:306
 msgid "Online username must not start with a number!"
 msgstr "On-line uživatelské jméno nesmí začínat číslem!"
 
-#: src/states_screens/online/register_screen.cpp:323
+#: src/states_screens/online/register_screen.cpp:314
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "Je třeba, aby e-mailová adresa byla dlouhá nejméně 5 a nejvíce 254 znaků!"
 
-#: src/states_screens/online/register_screen.cpp:329
+#: src/states_screens/online/register_screen.cpp:320
 msgid "Email is invalid!"
 msgstr "E-mail je neplatný!"
 
-#: src/states_screens/online/register_screen.cpp:392
+#: src/states_screens/online/register_screen.cpp:383
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Obdržíte e-mail s dalšími pokyny týkající se aktivace účtu. Prosím, buďte trpěliví a ujistěte se, že jste zkontrolovali i složku se spamem."
 
-#: src/states_screens/online/register_screen.cpp:432
+#: src/states_screens/online/register_screen.cpp:423
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Přístup k Internetu je zakázán – povolte ho v předvolbách"
 
-#: src/states_screens/online/server_selection.cpp:116
-msgctxt "column_name"
-msgid "Name"
-msgstr "Název"
-
-#: src/states_screens/online/server_selection.cpp:117
-msgctxt "column_name"
-msgid "Game mode"
-msgstr "Herní režim"
-
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/online/server_selection.cpp:124
-msgctxt "column_name"
+#: src/states_screens/online/server_selection.cpp:127
 msgid "Owner"
 msgstr "Vlastník"
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/online/server_selection.cpp:126
-msgctxt "column_name"
+#: src/states_screens/online/server_selection.cpp:129
 msgid "Distance (km)"
 msgstr "Vzdálenost (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:215
 msgid "Unknown"
 msgstr "Není známo"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:323
 msgid "No server is available."
 msgstr "Není k dispozici žádný server."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:331
 msgid "Fetching servers"
 msgstr "Načítání serverů"
 
 #. I18N: In track screen for networking, clarify voting phase
-#: src/states_screens/online/tracks_screen.cpp:312
+#: src/states_screens/online/tracks_screen.cpp:188
 msgid ""
 "If a majority of players all select the same track and race settings, voting"
 " will end early."
@@ -5094,158 +4849,150 @@ msgstr "Pokud většina hráčů vybere stejné nastavení trati a závodu, hlas
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:444
-#: src/states_screens/online/tracks_screen.cpp:492
-#: src/states_screens/track_info_screen.cpp:310
+#: src/states_screens/online/tracks_screen.cpp:288
+#: src/states_screens/online/tracks_screen.cpp:333
+#: src/states_screens/track_info_screen.cpp:219
 msgid "Random item location"
 msgstr "Náhodně rozmístěné položky"
 
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:474
-#: src/states_screens/track_info_screen.cpp:203
-#: src/states_screens/track_info_screen.cpp:551
-msgid "Number of goals to win"
-msgstr "Počet splněných cílů do vítězství"
-
-#. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:482
-#: src/states_screens/track_info_screen.cpp:198
-#: src/states_screens/track_info_screen.cpp:218
-#: src/states_screens/track_info_screen.cpp:546
-msgid "Maximum time (min.)"
-msgstr "Maximální doba (min.)"
-
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:522
-#: src/states_screens/track_info_screen.cpp:305
+#: src/states_screens/online/tracks_screen.cpp:357
+#: src/states_screens/track_info_screen.cpp:214
 msgid "Drive in reverse"
 msgstr "Jet pozpátku"
 
-#: src/states_screens/online/tracks_screen.cpp:587
-#: src/states_screens/tracks_and_gp_screen.cpp:276
+#: src/states_screens/online/tracks_screen.cpp:426
+#: src/states_screens/tracks_and_gp_screen.cpp:275
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Zamčeno: splň aktivní výzvy k získání přístupu!"
 
-#: src/states_screens/options/options_screen_device.cpp:71
+#. I18N: In tracks screen, about voting of tracks in network
+#: src/states_screens/online/tracks_screen.cpp:521
+#, c-format
+msgid "Remaining time: %d"
+msgstr "Zbývající čas: %d"
+
+#: src/states_screens/options/options_screen_device.cpp:70
 msgid "Action"
 msgstr "Akce"
 
-#: src/states_screens/options/options_screen_device.cpp:72
+#: src/states_screens/options/options_screen_device.cpp:71
 msgid "Key binding"
 msgstr "Přiřazená klávesa"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:106
-#: src/states_screens/options/options_screen_device.cpp:629
+#: src/states_screens/options/options_screen_device.cpp:105
+#: src/states_screens/options/options_screen_device.cpp:628
 msgid "Disable Device"
 msgstr "Zakázat zařízení"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:108
-#: src/states_screens/options/options_screen_device.cpp:630
+#: src/states_screens/options/options_screen_device.cpp:107
+#: src/states_screens/options/options_screen_device.cpp:629
 msgid "Enable Device"
 msgstr "Povolit zařízení"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:123
-#: src/states_screens/options/options_screen_device.cpp:635
+#: src/states_screens/options/options_screen_device.cpp:122
+#: src/states_screens/options/options_screen_device.cpp:634
 msgid "Enable Configuration"
-msgstr "Zapnout nastavení"
+msgstr ""
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:173
+#: src/states_screens/options/options_screen_device.cpp:172
 msgid "Game Keys"
 msgstr "Herní klávesy"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:187
+#: src/states_screens/options/options_screen_device.cpp:186
 msgid "Menu Keys"
 msgstr "Klávesy nabídky"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:263
+#: src/states_screens/options/options_screen_device.cpp:262
 msgid "Steer Left"
 msgstr "Zatočit doleva"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:266
+#: src/states_screens/options/options_screen_device.cpp:265
 msgid "Steer Right"
 msgstr "Zatočit doprava"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:269
+#: src/states_screens/options/options_screen_device.cpp:268
 msgid "Accelerate"
 msgstr "Zrychlení"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:272
+#: src/states_screens/options/options_screen_device.cpp:271
 msgid "Brake"
 msgstr "Brzda"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:275
+#: src/states_screens/options/options_screen_device.cpp:274
 msgid "Fire"
 msgstr "Střelba"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:278
+#: src/states_screens/options/options_screen_device.cpp:277
 msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:284
+#: src/states_screens/options/options_screen_device.cpp:283
 msgid "Look Back"
 msgstr "Ohlédnout se"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:287
+#: src/states_screens/options/options_screen_device.cpp:286
 msgid "Rescue"
 msgstr "Záchrana"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:290
+#: src/states_screens/options/options_screen_device.cpp:289
 msgid "Pause Game"
 msgstr "Pozastavit hru"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:295
+#: src/states_screens/options/options_screen_device.cpp:294
 msgid "Up"
 msgstr "Zrychlení"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:298
+#: src/states_screens/options/options_screen_device.cpp:297
 msgid "Down"
 msgstr "Dolů"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:301
+#: src/states_screens/options/options_screen_device.cpp:300
 msgid "Left"
 msgstr "Doleva"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:304
+#: src/states_screens/options/options_screen_device.cpp:303
 msgid "Right"
 msgstr "Doprava"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:307
+#: src/states_screens/options/options_screen_device.cpp:306
 msgid "Select"
 msgstr "Vybrat"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:310
+#: src/states_screens/options/options_screen_device.cpp:309
 msgid "Cancel/Back"
 msgstr "Zrušit/Zpět"
 
-#: src/states_screens/options/options_screen_device.cpp:405
+#: src/states_screens/options/options_screen_device.cpp:404
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Modrá položka znamená konflikt s jiným nastavením"
 
-#: src/states_screens/options/options_screen_device.cpp:410
+#: src/states_screens/options/options_screen_device.cpp:409
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Červená položka znamená konflikt ve stávajícím nastavení"
 
-#: src/states_screens/options/options_screen_device.cpp:516
+#: src/states_screens/options/options_screen_device.cpp:515
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5253,28 +5000,28 @@ msgid ""
 msgstr "Upozornění: Klávesa „Shift“ se nedoporučuje. Pokud zmáčknete „Shift“, všechny klávesy které představují znak, který je odlišný při stisknuté klávese „Shift“, zde přestanou fungovat."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:615
+#: src/states_screens/options/options_screen_device.cpp:614
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Opravdu chcete trvale smazat toto nastavení?"
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:110
+#: src/states_screens/options/options_screen_general.cpp:112
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
-msgstr "V režimu hry více hráčů si mohou hráči vybrat handicapované\n(obtížnější) profily na obrazovce s výběrem motokáry"
+msgstr ""
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:105
 msgid "Gamepad"
 msgstr "Gamepad"
 
-#: src/states_screens/options/options_screen_input.cpp:113
+#: src/states_screens/options/options_screen_input.cpp:114
 #, c-format
 msgid "Keyboard %i"
 msgstr "Klávesnice %i"
 
-#: src/states_screens/options/options_screen_input.cpp:152
+#: src/states_screens/options/options_screen_input.cpp:153
 msgid "Touch Device"
 msgstr "Dotykové zařízení"
 
@@ -5286,318 +5033,285 @@ msgstr "Systémový jazyk"
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:119
 msgid "In the bottom-left"
-msgstr "Vlevo dole"
+msgstr ""
 
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:121
 msgid "On the right side"
-msgstr "Na pravé straně"
+msgstr ""
 
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:123
 msgid "Hidden"
-msgstr "Skryté"
-
-#. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:142
-msgid "Very small"
-msgstr ""
-
-#. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:144
-msgid "Small"
-msgstr ""
-
-#. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:146
-msgid "Medium"
-msgstr ""
-
-#. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:148
-msgid "Large"
-msgstr ""
-
-#. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:150
-msgid "Very large"
 msgstr ""
 
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:441
+#: src/states_screens/options/options_screen_video.cpp:411
 msgid "Custom"
 msgstr "Vlastní"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:477
+#: src/states_screens/options/options_screen_video.cpp:447
 #, c-format
 msgid "Particles Effects: %s"
-msgstr "Částicové efekty: %s"
+msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:483
+#: src/states_screens/options/options_screen_video.cpp:453
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Animované postavy: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:486
+#: src/states_screens/options/options_screen_video.cpp:456
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Dynamická světla: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:489
-#, c-format
-msgid "Light scattering: %s"
-msgstr "Rozptyl světla: %s"
-
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:492
+#: src/states_screens/options/options_screen_video.cpp:459
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Pohybová neostrost: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:495
+#: src/states_screens/options/options_screen_video.cpp:462
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Vyhlazování hran: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:498
+#: src/states_screens/options/options_screen_video.cpp:465
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Zastínění okolím: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:502
+#: src/states_screens/options/options_screen_video.cpp:469
 #, c-format
 msgid "Shadows: %s"
 msgstr "Stíny: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:504
+#: src/states_screens/options/options_screen_video.cpp:471
 #, c-format
 msgid "Shadows: %i"
 msgstr "Stíny: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:507
+#: src/states_screens/options/options_screen_video.cpp:474
 #, c-format
 msgid "Bloom: %s"
 msgstr "Bloom: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:511
+#: src/states_screens/options/options_screen_video.cpp:478
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Záře (obrysy): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:515
+#: src/states_screens/options/options_screen_video.cpp:482
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Světelné paprsky: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:519
+#: src/states_screens/options/options_screen_video.cpp:486
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Hloubka ostrosti: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:524
+#: src/states_screens/options/options_screen_video.cpp:491
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Kvalita vykreslovaného obrazu: 1%s"
 
-#: src/states_screens/options/user_screen.cpp:366
+#: src/states_screens/options/user_screen.cpp:358
 msgid "Internet access is disabled. Do you want to enable it?"
-msgstr "Přístup k internetu je zakázán. Chcete ho povolit?"
+msgstr ""
 
-#: src/states_screens/options/user_screen.cpp:559
+#: src/states_screens/options/user_screen.cpp:551
 msgid "You need to enter a password."
 msgstr "Je třeba zadat heslo."
 
-#: src/states_screens/options/user_screen.cpp:580
+#: src/states_screens/options/user_screen.cpp:572
 #, c-format
 msgid "Logging out '%s'"
 msgstr "Odhlášení '%s'"
 
-#: src/states_screens/options/user_screen.cpp:581
+#: src/states_screens/options/user_screen.cpp:573
 #, c-format
 msgid "Logging in '%s'"
 msgstr "Přihlašování '%s'"
 
-#: src/states_screens/options/user_screen.cpp:662
+#: src/states_screens/options/user_screen.cpp:654
 msgid "You can't delete the only player."
-msgstr "Není možné smazat posledního zbývajícího hráče."
+msgstr ""
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:670
+#: src/states_screens/options/user_screen.cpp:662
 #, c-format
 msgid "Do you really want to delete player '%s'?"
-msgstr "Opravdu chcete hráče „%s“ smazat?"
+msgstr ""
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:70
+#: src/states_screens/race_gui_base.cpp:67
 msgid "Ready!"
 msgstr "Připravit!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:72
+#: src/states_screens/race_gui_base.cpp:69
 msgid "Set!"
 msgstr "Pozor!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:74
+#: src/states_screens/race_gui_base.cpp:71
 msgid "Go!"
 msgstr "Start!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:76
+#: src/states_screens/race_gui_base.cpp:73
 msgid "GOAL!"
 msgstr "GÓL!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:79
-#: src/states_screens/race_result_gui.cpp:272
+#: src/states_screens/race_gui_base.cpp:76
+#: src/states_screens/race_result_gui.cpp:268
 msgid "Waiting for others"
 msgstr "Čekání na ostatní"
 
-#. I18N: Shown waiting for the server in network if live join or specatate
-#: src/states_screens/race_gui_base.cpp:81
-msgid "Waiting for the server"
-msgstr "Čeká se na server"
-
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:586
+#: src/states_screens/race_gui_base.cpp:566
 msgid "by"
 msgstr "od"
 
-#: src/states_screens/race_gui_base.cpp:694
+#: src/states_screens/race_gui_base.cpp:671
 msgid "Collect nitro!"
 msgstr "Sbírejte nitro!"
 
-#: src/states_screens/race_gui_base.cpp:696
+#: src/states_screens/race_gui_base.cpp:673
 msgid "Follow the leader!"
 msgstr "Následujte vedoucího!"
 
-#. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:876
+#: src/states_screens/race_gui_base.cpp:846
 #, c-format
 msgid "Top %i"
 msgstr "Prvních %i"
 
-#: src/states_screens/race_gui.cpp:406
+#: src/states_screens/race_gui.cpp:389 src/states_screens/race_gui.cpp:391
 msgid "Challenge Failed"
 msgstr "Výzva selhala"
 
-#: src/states_screens/race_gui_overworld.cpp:518
+#. I18N: Shown at the end of a race
+#: src/states_screens/race_gui_overworld.cpp:147
+msgid "Lap"
+msgstr "Kolo"
+
+#: src/states_screens/race_gui_overworld.cpp:559
 msgid "Press fire to start the tutorial"
 msgstr "Stiskněte tlačítko střelby pro zahájení výuky"
 
-#: src/states_screens/race_gui_overworld.cpp:589
+#: src/states_screens/race_gui_overworld.cpp:598
+msgid "Type: Grand Prix"
+msgstr "Typ: Velká cena"
+
+#: src/states_screens/race_gui_overworld.cpp:635
 msgid "Press fire to start the challenge"
 msgstr "Stiskněte tlačítko střelby pro zahájení výzvy"
 
-#: src/states_screens/race_result_gui.cpp:178
+#: src/states_screens/race_result_gui.cpp:176
 msgid "Quit the server"
-msgstr "Opustit server"
+msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:191
+#: src/states_screens/race_result_gui.cpp:187
 msgid "You completed challenges!"
 msgstr "Dokončili jste výzvy!"
 
-#: src/states_screens/race_result_gui.cpp:207
+#: src/states_screens/race_result_gui.cpp:203
 msgid "Abort Grand Prix"
 msgstr "Ukončit Velkou cenu"
 
-#: src/states_screens/race_result_gui.cpp:223
+#: src/states_screens/race_result_gui.cpp:219
 msgid "Restart"
 msgstr "Restart"
 
-#: src/states_screens/race_result_gui.cpp:229
+#: src/states_screens/race_result_gui.cpp:225
 msgid "Back to challenge selection"
 msgstr "Zpět na výběr výzev"
 
-#: src/states_screens/race_result_gui.cpp:234
+#: src/states_screens/race_result_gui.cpp:230
 msgid "Race against the new ghost replay"
-msgstr "Závod proti nové opakovačce s duchem"
+msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:238
+#: src/states_screens/race_result_gui.cpp:234
 msgid "Back to the menu"
 msgstr "Zpět do nabídky"
 
-#: src/states_screens/race_result_gui.cpp:386
+#: src/states_screens/race_result_gui.cpp:379
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Opravdu chcete ukončit Velkou cenu?"
 
-#: src/states_screens/race_result_gui.cpp:471
+#: src/states_screens/race_result_gui.cpp:464
 msgid "Network grand prix has been finished."
-msgstr "Síťová Velká cena byla dokončena."
+msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:507
-#: src/states_screens/race_result_gui.cpp:1303
+#: src/states_screens/race_result_gui.cpp:497
+#: src/states_screens/race_result_gui.cpp:1231
 msgid "Red Team Wins"
 msgstr "Vyhrává červený tým"
 
-#: src/states_screens/race_result_gui.cpp:509
-#: src/states_screens/race_result_gui.cpp:1307
+#: src/states_screens/race_result_gui.cpp:499
+#: src/states_screens/race_result_gui.cpp:1235
 msgid "Blue Team Wins"
 msgstr "Vyhrává modrý tým"
 
-#: src/states_screens/race_result_gui.cpp:511
-#: src/states_screens/race_result_gui.cpp:1312
+#: src/states_screens/race_result_gui.cpp:501
+#: src/states_screens/race_result_gui.cpp:1240
 msgid "It's a draw"
 msgstr "Je to remíza"
 
-#: src/states_screens/race_result_gui.cpp:742
-#: src/states_screens/race_result_gui.cpp:1156
+#: src/states_screens/race_result_gui.cpp:563
+#: src/states_screens/race_result_gui.cpp:602
+#: src/states_screens/race_result_gui.cpp:700
+#: src/states_screens/race_result_gui.cpp:1084
 msgid "Eliminated"
 msgstr "Vyřazen"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1378
-#: src/states_screens/race_result_gui.cpp:1428
+#: src/states_screens/race_result_gui.cpp:1311
+#: src/states_screens/race_result_gui.cpp:1360
 msgid "(Own Goal)"
 msgstr "(vlastní gól)"
 
-#: src/states_screens/race_result_gui.cpp:1498
+#: src/states_screens/race_result_gui.cpp:1426
 #, c-format
 msgid "Track %i/%i"
 msgstr "Trať %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1582
+#: src/states_screens/race_result_gui.cpp:1510
 msgid "Grand Prix progress:"
 msgstr "Průběh Velké ceny:"
 
-#: src/states_screens/race_result_gui.cpp:1628
+#: src/states_screens/race_result_gui.cpp:1554
 msgid "Highscores"
 msgstr "Nejvyšší skóre"
 
-#: src/states_screens/race_result_gui.cpp:1731
+#: src/states_screens/race_result_gui.cpp:1652
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Nejlepší čas kola: %s"
 
-#. I18N: is used to indicate who has the bast laptime (best laptime "by
-#. kart_name")
-#: src/states_screens/race_result_gui.cpp:1745
-#, c-format
-msgid "by %s"
-msgstr "od %s"
-
-#: src/states_screens/race_setup_screen.cpp:88
+#: src/states_screens/race_setup_screen.cpp:87
 msgid "All blows allowed, so catch weapons and make clever use of them!"
 msgstr "Všechny údery povoleny, takže sbírejte zbraně a chytře je použijte!"
 
-#: src/states_screens/race_setup_screen.cpp:95
+#: src/states_screens/race_setup_screen.cpp:94
 msgid "Contains no powerups, so only your driving skills matter!"
 msgstr "Neobsahuje žádné bonusy, takže rozhodují pouze řidičské schopnosti!"
 
 #. I18N: short definition for follow-the-leader game mode
-#: src/states_screens/race_setup_screen.cpp:108
+#: src/states_screens/race_setup_screen.cpp:107
 msgid "Keep up with the leader kart but don't overtake it!"
 msgstr "Držte se vedoucího, ale nepředjíždějte ho!"
 
@@ -5611,7 +5325,7 @@ msgstr "Dotlačte míč do protihráčovy branky."
 
 #: src/states_screens/race_setup_screen.cpp:129
 msgid "Explore tracks to find all hidden eggs"
-msgstr "Prozkoumejte tratě a najděte všechna skrytá vejce"
+msgstr "Prozkoumejte tratě a najděte všechna skrytá zákoutí"
 
 #: src/states_screens/race_setup_screen.cpp:137
 msgid "Race against ghost karts and try to beat them!"
@@ -5619,37 +5333,39 @@ msgstr "Závoďte proti motokárám duchů a pokuste se je porazit!"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:143
+#: src/states_screens/track_info_screen.cpp:108
 #, c-format
 msgid "Track by %s"
 msgstr "Autor tratě: %s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:151
+#: src/states_screens/track_info_screen.cpp:116
 #, c-format
 msgid "Max players supported: %d"
 msgstr "Nejvyšší umožněný počet hráčů: %d"
 
-#. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:438
-msgid "(Empty)"
-msgstr "(Prázdné)"
-
 #. I18N: track group name
-#: src/states_screens/tracks_and_gp_screen.cpp:142
+#: src/states_screens/tracks_and_gp_screen.cpp:141
 msgid "all"
 msgstr "vše"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:193
+#: src/states_screens/tracks_and_gp_screen.cpp:192
 msgid "Locked!"
 msgstr "Zamčeno!"
 
 #. I18N: Format for dates (%d = day, %m = month, %Y = year). See
 #. http://www.cplusplus.com/reference/ctime/strftime/ for more info about date
 #. formats.
-#: src/utils/time.cpp:53
+#: src/utils/time.cpp:50
 msgid "%d/%m/%Y"
-msgstr "%d. %m. %Y"
+msgstr "%d/%m/%Y"
+
+#. I18N: Do NOT literally translate this string!! Please enter Y as the
+#. translation if your language is a RTL (right-to-left) language,
+#. N (or nothing) otherwise
+#: src/utils/translation.cpp:421
+msgid "   Is this a RTL language?"
+msgstr "   N"
 
 #: ../stk-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"

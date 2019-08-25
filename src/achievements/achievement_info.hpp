@@ -20,16 +20,16 @@
 #ifndef HEADER_ACHIEVEMENT_INFO_HPP
 #define HEADER_ACHIEVEMENT_INFO_HPP
 
+#include "io/xml_node.hpp"
+#include "utils/translation.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
 #include <string>
-#include <vector>
 
 // ============================================================================
 
 class Achievement;
-class XMLNode;
 
 /** This class stores an achievement definition from the xml file, including
  *  title, description, but also how to achieve this achievement.
@@ -62,10 +62,10 @@ private:
     uint32_t           m_id;
 
     /** The title of this achievement. */
-    std::string m_name;
+    irr::core::stringw m_name;
 
     /** The description of this achievement. */
-    std::string m_description;
+    irr::core::stringw m_description;
 
     /** A secret achievement has its progress not shown. */
     bool m_is_secret;
@@ -91,8 +91,8 @@ public:
     int                getGoalCount()         { return recursiveGoalCount(m_goal_tree); }
     int                getDepth()             { return getRecursiveDepth(m_goal_tree); }
     uint32_t           getID()          const { return m_id; }
-    irr::core::stringw getDescription() const;
-    irr::core::stringw getName()        const;
+    irr::core::stringw getDescription() const { return _(m_description.c_str()); }
+    irr::core::stringw getName()        const { return _LTR(m_name.c_str()); }
     bool               isSecret()       const { return m_is_secret; }
 
     // This function should not be called if copy already has children

@@ -5,38 +5,18 @@
         Older version will be ignored. -->
   <kart-version min="2" max="3"/>
 
-  <!-- Minimum and maximum track versions that be be read by this binary.
+  <!-- Minimum and maxium track versions that be be read by this binary.
        Older versions will be ignored. -->
   <track-version min="6" max="7"/>
 
-  <!-- Minimum and maximum server versions that be be read by this binary.
+  <!-- Minimum and maxium server versions that be be read by this binary.
        Older versions will be ignored. -->
-  <server-version min="6" max="6"/>
+  <server-version min="4" max="4"/>
 
   <!-- Maximum number of karts to be used at the same time. This limit
        can easily be increased, but some tracks might not have valid start
        positions for those additional karts. -->
   <karts max-number="20"/>
-
-  <!-- Everything related to hardware configuration.
-            url : The server used for reporting statistics to. -->
-  <HardwareReportServer url="https://stats.supertuxkart.net" />
-
-  <!-- Everything related to online play.
-            url: The server used for online multiplayer.
-            server-version : Version of the server API to use. -->
-  <OnlineServer
-    url="https://online.supertuxkart.net/api/"
-    server-version="2"
-  />
-
-  <!-- Addon and news related settings
-            url : The server used for addon.
-            allow-news-redirects : If true we allow all the server urls to be redirected by the addons news.xml file-->
-  <AddonServer
-    url="https://online.supertuxkart.net/dl/xml"
-    allow-news-redirects="true"
-  />
 
   <!-- Scores are the number of points given when the race ends. -->
   <grand-prix>
@@ -151,8 +131,8 @@
            solver-split-impulse-threshold="-0.00001"
            solver-mode=""/>
 
-  <!-- The title and default musics. -->
-  <music title="main_theme.music" default="kart_grand_prix.music"/>
+  <!-- The title music. -->
+  <music title="main_theme.music"/>
 
   <!--  Replay related values, mostly concerned with saving less data
         and using interpolation instead.
@@ -177,8 +157,7 @@
   <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
 
   <urls donate="https://supertuxkart.net/Donate"
-        password-reset="https://online.supertuxkart.net/password-reset.php"
-        assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
+        password-reset="http://addons.supertuxkart.net/password-reset.php" />
 
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over
@@ -194,7 +173,7 @@
   <delay-finish time="1.0"/>
 
   <!-- How long the music credits are shown. -->
-  <credits music="8"/>
+  <credits music="10"/>
 
   <!-- time is the time till a bomb explodes. time-increase is the time added
        to timer when bomb is passed on. -->
@@ -205,15 +184,13 @@
                 new:  always get a new item.
                 only-if-same: if the random item is the same one as the
                       one currently owned, increase the number, otherwise
-                      no more/new item s are given to the kart.
-       no-explosive-items-timeout determines if world time is less than this value
-       then no cake or basketball is given by bonus boxes. -->
-  <powerup collect-mode="new" no-explosive-items-timeout="15.0"/>
+                      no more/new item s are given to the kart. -->
+  <powerup collect-mode="new"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
              Order: giftbox, banana, big-nitro, small-nitro, bubble-gum, nolok-bubble-gum,
-                    easter egg-->
-  <switch time="5"  items="1 0 4 4 2 2 6"/>
+                    easter egg, trigger-->
+  <switch time="5"  items="1 0 4 4 2 2 6 7"/>
 
   <!-- disappear-counter: How often bubblegum gets driven over before it disappears.
        shield-time: How long the bubblegum shield lasts
@@ -225,6 +202,7 @@
   <explosion impulse-objects="500.0" />
 
   <!-- Networking
+       state-frequency: how many states the server will send per second.
        steering-reduction: Reduce a remote kart's steering by this factor
            each frame. This helps reduces oversteering by high latency
            clients when they only do minor steering adjustments.
@@ -232,7 +210,8 @@
            when networking is on. Objects will be hidden if total count is
            larger than this value.
   -->
-  <networking steering-reduction="1.0"
+  <networking state-frequency="10"
+              steering-reduction="1.0"
               max-moveable-objects="15"/>
 
   <!-- The field od views for 1-4 player split screen. fov-3 is
@@ -544,9 +523,8 @@
   which leads to crash with STK), but the fonts are to blame, what's the point of not
   using industry standard nowadays...
   -->
-  <fonts-list normal-ttf="Cantarell-Regular.otf wqy-microhei.ttf NotoSansThai-Regular.ttf NotoSansHebrew-Regular.ttf NotoNaskhArabicUI-Regular.ttf"
-              digit-ttf="SigmarOne.otf"
-              color-emoji-ttf="NotoColorEmoji.ttf"/>
+  <fonts-list normal-ttf="Cantarell-Regular.otf FreeSans.ttf wqy-microhei.ttf NotoNaskhArabicUI-Bold.ttf"
+              digit-ttf="SigmarOne.otf" />
 
   <!-- Maximum bones from all animated meshes in each frame to be uploaded for
        hardware skinning, For gles 3.0 the specification guarantees at least 2048, for
@@ -583,10 +561,4 @@
                      max-adjust-time="2.0"
                      adjust-length-threshold="4.0"/>
 
-  <!-- List of network capabilities to handle different servers with same version.
-  -->
-  <network-capabilities>
-      <capabilities name="report_player"/>
-      <capabilities name="color_emoji"/>
-  </network-capabilities>
 </config>

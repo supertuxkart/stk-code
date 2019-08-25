@@ -269,6 +269,7 @@ void RibbonWidget::add()
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
+                label->setRightToLeft(translations->isRTLText(message));
                 m_labels.push_back(label);
 
                 subbtn->setTabStop(false);
@@ -366,6 +367,7 @@ void RibbonWidget::add()
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
                 label->setTabStop(false);
                 label->setNotClipped(true);
+                label->setRightToLeft(translations->isRTLText(message));
                 m_labels.push_back(label);
 
                 subbtn->setTabStop(false);
@@ -479,7 +481,7 @@ void RibbonWidget::add()
 
 // ----------------------------------------------------------------------------
 
-void RibbonWidget::addTextChild(const core::stringw& text, const std::string &id)
+void RibbonWidget::addTextChild(const wchar_t* text, const std::string &id)
 {
     // This method should only be called BEFORE a widget is added
     assert(m_element == NULL);
@@ -493,7 +495,7 @@ void RibbonWidget::addTextChild(const core::stringw& text, const std::string &id
 
 // ----------------------------------------------------------------------------
 
-void RibbonWidget::addIconChild(const core::stringw& text, const std::string &id,
+void RibbonWidget::addIconChild(const wchar_t* text, const std::string &id,
                          const int w, const int h,
                          const std::string &icon,
                          const IconButtonWidget::IconPathType icon_path_type)
@@ -706,11 +708,8 @@ EventPropagation RibbonWidget::focused(const int playerID)
         if (m_mouse_focus == NULL && m_selection[playerID] != -1  &&
             (playerID == mousePlayerID || playerID == PLAYER_ID_GAME_MASTER))
         {
-            if (m_selection[playerID] < int(m_active_children.size()))
-            {
-                m_mouse_focus = m_active_children.get(m_selection[playerID]);
-                m_mouse_focus->focused(playerID);
-            }
+            m_mouse_focus = m_active_children.get(m_selection[playerID]);
+            m_mouse_focus->focused(playerID);
         }
     }
     else

@@ -44,12 +44,11 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/check_cylinder.hpp"
 #include "tracks/check_manager.hpp"
-#include "tracks/check_trigger.hpp"
+#include "tracks/check_sphere.hpp"
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "utils/string_utils.hpp"
 
 #include <IBillboardSceneNode.h>
 #include <ICameraSceneNode.h>
@@ -684,10 +683,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
 
     if (trigger_when_near)
     {
-        CheckManager::get()->add(
-            new CheckTrigger(m_init_xyz, trigger_distance, std::bind(
-            &TrackObjectPresentationSound::onTriggerItemApproached,
-            this)));
+        ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
     }
 
     if (disable_for_multiplayer)
@@ -1071,7 +1067,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     }
     m_xml_reenable_timeout = 999999.9f;
     xml_node.get("reenable-timeout", &m_xml_reenable_timeout);
-    setReenableTimeout(0.0f);
+    m_reenable_timeout = 0.0f;
 
     if (m_action.empty())
     {
@@ -1102,16 +1098,17 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 
     if (m_type == TRIGGER_TYPE_POINT)
     {
-        CheckManager::get()->add(
-            new CheckTrigger(m_init_xyz, trigger_distance, std::bind(
-            &TrackObjectPresentationActionTrigger::onTriggerItemApproached,
-            this)));
+        // TODO: rewrite as a sphere check structure?
+        ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
+        // 0 is the index, and is mostly used for debugging (i.e. to identify which check
+        // structure information is printed about) - not sure how to best use this
+        // with items added outside of the checkline manager. Best option would be to
+        // change CheckManager::add() to create the object?
+        // CheckManager::get()->add(new CheckSphere(xml_node, 0 /* TODO what is this? */));
     }
     else if (m_type == TRIGGER_TYPE_CYLINDER)
     {
-        CheckManager::get()->add(new CheckCylinder(xml_node, std::bind(
-            &TrackObjectPresentationActionTrigger::onTriggerItemApproached,
-            this)));
+        CheckManager::get()->add(new CheckCylinder(xml_node, 0 /* TODO what is this? */, this));
     }
     else
     {
@@ -1132,22 +1129,19 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     float trigger_distance = distance;
     m_action               = script_name;
     m_xml_reenable_timeout = 999999.9f;
-    setReenableTimeout(0.0f);
+    m_reenable_timeout     = 0.0f;
     m_type                 = TRIGGER_TYPE_POINT;
-    CheckManager::get()->add(
-        new CheckTrigger(m_init_xyz, trigger_distance, std::bind(
-        &TrackObjectPresentationActionTrigger::onTriggerItemApproached,
-        this)));
+    ItemManager::get()->placeTrigger(m_init_xyz, trigger_distance, this);
 }   // TrackObjectPresentationActionTrigger
 
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
 {
-    if (m_reenable_timeout > StkTime::getMonoTimeMs())
+    if (m_reenable_timeout > 0.0f)
     {
         return;
     }
-    setReenableTimeout(m_xml_reenable_timeout);
+    m_reenable_timeout = m_xml_reenable_timeout;
 
     int kart_id = 0;
     Camera* camera = Camera::getActiveCamera();

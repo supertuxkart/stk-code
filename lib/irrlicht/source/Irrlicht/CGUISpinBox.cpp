@@ -284,7 +284,7 @@ void CGUISpinBox::verifyValueRange()
 
 
 //! Sets the new caption of the element
-void CGUISpinBox::setText(const core::stringw& text)
+void CGUISpinBox::setText(const wchar_t* text)
 {
 	EditBox->setText(text);
 	setValue(getValue());

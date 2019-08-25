@@ -25,7 +25,6 @@
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
 #include "utils/profiler.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
 #include <pthread.h>
@@ -76,6 +75,7 @@ void SFXManager::create()
  */
 void SFXManager::destroy()
 {
+    assert(m_sfx_manager);
     delete m_sfx_manager;
     m_sfx_manager = NULL;
 }    // destroy
@@ -478,9 +478,9 @@ void* SFXManager::mainLoop(void *obj)
         {
             // Wait some time to let other threads run, then queue an
             // update event to keep music playing.
-            uint64_t t = StkTime::getMonoTimeMs();
+            uint64_t t = StkTime::getRealTimeMs();
             StkTime::sleep(1);
-            t = StkTime::getMonoTimeMs() - t;
+            t = StkTime::getRealTimeMs() - t;
             me->queue(SFX_UPDATE, (SFXBase*)NULL, float(t / 1000.0));
         }
         me->m_sfx_commands.lock();
@@ -626,13 +626,13 @@ SFXBuffer* SFXManager::addSingleSfx(const std::string &sfx_name,
                                     const std::string &sfx_file,
                                     bool               positional,
                                     float              rolloff,
-                                    float              max_dist,
+                                    float              max_width,
                                     float              gain,
                                     const bool         load)
 {
 
     SFXBuffer* buffer = new SFXBuffer(sfx_file, positional, rolloff, 
-                                      max_dist, gain);
+                                      max_width, gain);
 
     m_all_sfx_types[sfx_name] = buffer;
 
@@ -838,11 +838,11 @@ void SFXManager::reallyUpdateNow(SFXCommand *current)
     if (m_last_update_time == std::numeric_limits<uint64_t>::max())
     {
         // first time
-        m_last_update_time = StkTime::getMonoTimeMs();
+        m_last_update_time = StkTime::getRealTimeMs();
     }
 
     uint64_t previous_update_time = m_last_update_time;
-    m_last_update_time = StkTime::getMonoTimeMs();
+    m_last_update_time = StkTime::getRealTimeMs();
     float dt = float(m_last_update_time - previous_update_time) / 1000.0f;
 
     assert(current->m_command==SFX_UPDATE);

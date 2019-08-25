@@ -38,5 +38,5 @@ Controller::Controller(AbstractKart *kart)
 // ----------------------------------------------------------------------------
 core::stringw Controller::getName() const
 {
-    return m_kart->getName();
+    return translations->fribidize(m_kart->getName());
 }   // getName

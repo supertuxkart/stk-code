@@ -26,7 +26,6 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
-#include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
@@ -43,8 +42,8 @@ Profiler profiler;
 #define MARGIN_Y    0.02f    // top margin
 #define LINE_HEIGHT 0.030f   // height of a line representing a thread
 
-#define MARKERS_NAMES_POS     core::rect<s32>(50,100,150,600)
-#define GPU_MARKERS_NAMES_POS core::rect<s32>(50,165,150,300)
+#define MARKERS_NAMES_POS      core::rect<s32>(50,100,150,200)
+#define GPU_MARKERS_NAMES_POS      core::rect<s32>(50,165,150,250)
 
 // The width of the profiler corresponds to TIME_DRAWN_MS milliseconds
 #define TIME_DRAWN_MS 30.0f 
@@ -464,14 +463,14 @@ void Profiler::draw()
             text += oss.str().c_str();
             hovered_markers.pop();
         }
-        font->drawQuick(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
+        font->draw(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
 
         if (hovered_gpu_marker != Q_LAST)
         {
             std::ostringstream oss;
             oss << irr_driver->getGPUQueryPhaseName(hovered_gpu_marker) << " : "
                 << hovered_gpu_marker_elapsed << " us";
-            font->drawQuick(oss.str().c_str(), GPU_MARKERS_NAMES_POS,
+            font->draw(oss.str().c_str(), GPU_MARKERS_NAMES_POS,
                        video::SColor(0xFF, 0xFF, 0x00, 0x00));
         }
     }
@@ -546,8 +545,8 @@ void Profiler::writeToFile()
     // First CPU data
     for (int thread_id = 0; thread_id < m_threads_used; thread_id++)
     {
-        std::ofstream f(FileUtils::getPortableWritingPath(
-            base_name + ".profile-cpu-" + StringUtils::toString(thread_id)));
+        std::ofstream f(base_name + ".profile-cpu-" +
+                        StringUtils::toString(thread_id) );
         ThreadData &td = m_all_threads_data[thread_id];
         f << "#  ";
         for (unsigned int i = 0; i < td.m_ordered_headings.size(); i++)
@@ -568,7 +567,7 @@ void Profiler::writeToFile()
         f.close();
     }   // for all thread_ids
 
-    std::ofstream f_gpu(FileUtils::getPortableWritingPath(base_name + ".profile-gpu"));
+    std::ofstream f_gpu(base_name + ".profile-gpu");
     f_gpu << "# ";
 
     for (unsigned i = 0; i < Q_LAST; i++)

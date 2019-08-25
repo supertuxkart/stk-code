@@ -32,7 +32,6 @@
 #include "states_screens/soccer_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_and_gp_screen.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 const int CONFIG_CODE_NORMAL    = 0;
@@ -109,10 +108,11 @@ void RaceSetupScreen::init()
         w2->addItem(name3, IDENT_FTL, RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), false);
     }
 
-    irr::core::stringw name4 = irr::core::stringw(_("Battle")) + L"\n";
+    irr::core::stringw name4 = irr::core::stringw(
+        RaceManager::getNameOf(RaceManager::MINOR_MODE_3_STRIKES)) + L"\n";
     //FIXME: avoid duplicating descriptions from the help menu!
     name4 += _("Hit others with weapons until they lose all their lives.");
-    w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_FREE_FOR_ALL));
+    w2->addItem( name4, IDENT_STRIKES, RaceManager::getIconOf(RaceManager::MINOR_MODE_3_STRIKES));
 
     irr::core::stringw name5 = irr::core::stringw(
         RaceManager::getNameOf(RaceManager::MINOR_MODE_SOCCER)) + L"\n";

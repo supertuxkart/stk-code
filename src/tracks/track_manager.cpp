@@ -47,12 +47,6 @@ TrackManager::~TrackManager()
 }   // ~TrackManager
 
 //-----------------------------------------------------------------------------
-void TrackManager::removeTrackSearchDirs()
-{
-    m_track_search_path.clear();
-}   // removeTrackSearchDirs
-
-//-----------------------------------------------------------------------------
 /** Adds a directory from which tracks are loaded. The track manager checks if
  *  either this directory itself contains a track, and if any subdirectory
  *  contains a track.
@@ -150,10 +144,6 @@ void TrackManager::loadTrackList()
     m_arena_groups.clear();
     m_soccer_arena_groups.clear();
     m_track_avail.clear();
-    // This function is called when install a new addons, delete previous
-    // tracks
-    for (Track* track : m_tracks)
-        delete track;
     m_tracks.clear();
 
     for(unsigned int i=0; i<m_track_search_path.size(); i++)
@@ -332,12 +322,3 @@ void TrackManager::updateGroups(const Track* track)
 }   // updateGroups
 
 // ----------------------------------------------------------------------------
-int TrackManager::getTrackIndexByIdent(const std::string& ident) const
-{
-    for (unsigned i = 0; i < m_tracks.size(); i++)
-    {
-        if (m_tracks[i]->getIdent() == ident)
-            return i;
-    }
-    return -1;
-}   // getTrackIndexByIdent

@@ -32,8 +32,6 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
 #include "states_screens/state_manager.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
@@ -104,6 +102,12 @@ void ServerSelection::loadedFromFile()
     assert(m_searcher != NULL);
     m_game_started->setState(false);
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
+    video::ITexture* icon1 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
+    video::ITexture* icon2 = irr_driver->getTexture(
+        file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
+    m_icon_bank->addTextureAsSprite(icon1);
+    m_icon_bank->addTextureAsSprite(icon2);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -111,19 +115,18 @@ void ServerSelection::loadedFromFile()
  */
 void ServerSelection::beforeAddingWidget()
 {
-    m_icon_bank->clear();
     m_server_list_widget->clearColumns();
-    m_server_list_widget->addColumn( _C("column_name", "Name"), 7);
-    m_server_list_widget->addColumn(_C("column_name", "Game mode"), 3);
-    m_server_list_widget->addColumn( _C("column_name", "Players"), 2);
-    m_server_list_widget->addColumn(_C("column_name", "Difficulty"), 3);
+    m_server_list_widget->addColumn( _("Name"), 3);
+    m_server_list_widget->addColumn( _("Players"), 1);
+    m_server_list_widget->addColumn(_("Difficulty"), 1);
+    m_server_list_widget->addColumn(_("Game mode"), 2);
     if (NetworkConfig::get()->isWAN())
     {
         // I18N: In server selection screen, owner of server, only displayed
         // if it's localhost or friends'
-        m_server_list_widget->addColumn(_C("column_name", "Owner"), 3);
+        m_server_list_widget->addColumn(_("Owner"), 1);
         // I18N: In server selection screen, distance to server
-        m_server_list_widget->addColumn(_C("column_name", "Distance (km)"), 3);
+        m_server_list_widget->addColumn(_("Distance (km)"), 1);
     }
 }   // beforeAddingWidget
 
@@ -136,44 +139,11 @@ void ServerSelection::init()
     m_current_column = 5/*distance*/;
     m_searcher->clearListeners();
     m_searcher->addListener(this);
-
-    m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
-    m_icon_bank->setTargetIconSize(128, 128);
-
-    video::ITexture* icon1 = irr_driver->getTexture(
-        file_manager->getAsset(FileManager::GUI_ICON, "green_check.png"));
-    video::ITexture* icon2 = irr_driver->getTexture(
-        file_manager->getAsset(FileManager::GUI_ICON, "hourglass.png"));
-    m_icon_bank->addTextureAsSprite(icon1);
-    m_icon_bank->addTextureAsSprite(icon2);
-    for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
-    {
-        Track* t = track_manager->getTrack(i);
-        video::ITexture* tex = NULL;
-        if (t->isInternal())
-        {
-            tex = irr_driver->getTexture(file_manager
-                ->getAsset(FileManager::GUI_ICON, "main_help.png"));
-        }
-        else
-        {
-            tex = irr_driver->getTexture(t->getScreenshotFile());
-        }
-        if (!tex)
-        {
-            tex = irr_driver->getTexture(file_manager
-                ->getAsset(FileManager::GUI_ICON, "main_help.png"));
-        }
-        assert(tex);
-        m_icon_bank->addTextureAsSprite(tex);
-    }
-
-    int row_height = GUIEngine::getFontHeight() * 2;
-    
-    m_server_list_widget->setIcons(m_icon_bank, row_height);
+    m_icon_bank->setScale((float)getHeight() / 15.0f / 128.0f);
+    m_server_list_widget->setIcons(m_icon_bank,
+                                   int(getHeight() / 12.0f));
     m_sort_desc = false;
     /** Triggers the loading of the server list in the servers manager. */
-    ServersManager::get()->reset();
     refresh(true);
 }   // init
 
@@ -196,13 +166,13 @@ void ServerSelection::loadList()
                 return c->getLowerCaseName() > d->getLowerCaseName();
                 break;
             case 1:
-                return c->getServerMode() > d->getServerMode();
-                break;
-            case 2:
                 return c->getCurrentPlayers() > d->getCurrentPlayers();
                 break;
-            case 3:
+            case 2:
                 return c->getDifficulty() > d->getDifficulty();
+                break;
+            case 3:
+                return c->getServerMode() > d->getServerMode();
                 break;
             case 4:
                 return c->getServerOwnerLowerCaseName() >
@@ -217,46 +187,35 @@ void ServerSelection::loadList()
         });
     for (auto& server : m_servers)
     {
-        int icon = server->isGameStarted() ? 1 : 0;
-        Track* t = server->getCurrentTrack();
-        if (t)
-            icon = track_manager->getTrackIndexByIdent(t->getIdent()) + 2;
+        const int icon = server->isGameStarted() ? 1 : 0;
         core::stringw num_players;
         num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
         num_players.append("/");
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         std::vector<GUIEngine::ListWidget::ListCell> row;
         row.push_back(GUIEngine::ListWidget::ListCell(server->getName(), icon,
-            7));
-
-        core::stringw mode =
-            ServerConfig::getModeName(server->getServerMode());
-        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 3, true));
-
-        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 2,
+            3));
+        row.push_back(GUIEngine::ListWidget::ListCell(num_players, -1, 1,
             true));
 
         core::stringw difficulty =
             race_manager->getDifficultyName(server->getDifficulty());
-        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 3,
+        row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 1,
             true));
+
+        core::stringw mode =
+            ServerConfig::getModeName(server->getServerMode());
+        row.push_back(GUIEngine::ListWidget::ListCell(mode, -1, 2, true));
 
         if (NetworkConfig::get()->isWAN())
         {
             row.push_back(GUIEngine::ListWidget::ListCell(
-                server->getServerOwnerName(), -1, 3, true));
+                server->getServerOwnerName(), -1, 1, true));
             // I18N: In server selection screen, unknown distance to server
             core::stringw distance = _("Unknown");
             if (!(server->getDistance() < 0.0f))
                 distance = StringUtils::toWString(server->getDistance());
-            const core::stringw& flag = StringUtils::getCountryFlag(
-                server->getCountryCode());
-            if (!flag.empty())
-            {
-                distance += L" ";
-                distance += flag;
-            }
-            row.push_back(GUIEngine::ListWidget::ListCell(distance, -1, 3,
+            row.push_back(GUIEngine::ListWidget::ListCell(distance, -1, 1,
                 true));
         }
         m_server_list_widget->addItem("server", row);

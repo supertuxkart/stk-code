@@ -76,6 +76,7 @@ protected:
     // ------------------------------------------------------------------------
     void         determineTurnRadius(const Vec3 &end, Vec3 *center,
                                      float *radius) const;
+    virtual void update(int ticks) OVERRIDE;
     virtual void setSteering   (float angle, float dt);
     // ------------------------------------------------------------------------
     /** Return true if AI can skid now. */
@@ -104,11 +105,9 @@ public:
     };
     virtual void skidBonusTriggered() OVERRIDE {}
     // ------------------------------------------------------------------------
-    virtual bool saveState(BareNetworkString *buffer) const OVERRIDE;
+    virtual void saveState(BareNetworkString *buffer) const OVERRIDE;
     virtual void rewindTo(BareNetworkString *buffer) OVERRIDE;
     void setNetworkAI(bool val)                 { m_enabled_network_ai = val; }
-    // ------------------------------------------------------------------------
-    virtual void update(int ticks) OVERRIDE;
 
 };   // AIBaseController
 

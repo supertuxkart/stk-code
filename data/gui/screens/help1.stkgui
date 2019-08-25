@@ -12,7 +12,7 @@
                         I18N="Tab in help menu" text="General"/>
                 <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
                         I18N="Tab in help menu" text="Game Modes"/>
-                <icon-button id="page3" width="128" height="128" icon="gui/icons/gift.png"
+                <icon-button id="page3" width="128" height="128" icon="gui/icons/weapons.png"
                         I18N="Tab in help menu" text="Powerups"/>
                 <icon-button id="page4" width="128" height="128" icon="gui/icons/banana.png"
                         I18N="Tab in help menu" text="Bananas"/>
@@ -21,7 +21,7 @@
                 <icon-button id="page6" width="128" height="128" icon="gui/icons/mass.png"
                         I18N="Tab in help menu" text="Kart classes"/>
                 <icon-button id="page7" width="128" height="128" icon="gui/icons/options_input.png"
-                        I18N="Tab in help menu" text="Multiplayer"/>
+                        I18N="Tab in help menu" text="Multi-player"/>
             </vertical-tabs>
 
             <spacer width="2%" height="100%"/>
@@ -29,13 +29,13 @@
             <box width="80%" height="100%" layout="vertical-row">
 
                 <spacer width="5" height="1%"/>
-                <div width="50%" height="7%" align="center" layout="horizontal-row">
+                <div width="50%" proportion="2" align="center" layout="horizontal-row">
                     <icon id="tutorialIcon" width="64" height="64" align="center" icon="gui/icons/tutorial.png"/>
                     <button id="startTutorial" align="center" text="Start the tutorial"/>
                 </div>
-                <spacer width="5" height="2%"/>
+                <spacer width="5" height="1%"/>
 
-                <div width="100%" proportion="4" layout="horizontal-row">
+                <div width="100%" proportion="5" layout="horizontal-row">
                     <icon align="center" width="64" height="64" icon="gui/icons/gift.png"/>
                     <spacer width="25" height="25"/>
                     <bubble proportion="7" height="100%" word_wrap="true"
@@ -73,17 +73,9 @@
                             text="You can skid by pressing a special key or button. Successive short skids help to take sharp turns; while medium skids will boost your speed, long skids more so. You can't stop turning while skidding, so orient your kart carefully before!"/>
                 </div>
 
-                <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/speed.png"/>
-                    <spacer width="25" height="25"/>
-                    <bubble proportion="2" height="100%" word_wrap="true"
-                            I18N="In the help menu"
-                            text="You can get a startup boost by pressing the accelerate button at 'Set!', before the race's start."/>
-                </div>
+                <spacer height="3%" width="10"/>
 
-                <spacer height="2%" width="10"/>
-
-                <label align="center" word_wrap="true" I18N="in the help screen" text="* Current key bindings can be seen/changed in the Options menu"/>
+                <label align="center" word_wrap="true" I18N="in the help screen" text="* Current key bindings can be seen/changed in menu Options"/>
                 <spacer height="1%" width="10"/>
 
             </box>

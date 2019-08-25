@@ -683,15 +683,10 @@ namespace GUIEngine
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
-#include "utils/debug.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
-#include <algorithm>
 #include <iostream>
 #include <assert.h>
 #include <irrlicht.h>
-#include <mutex>
 
 using namespace irr::gui;
 using namespace irr::video;
@@ -720,10 +715,6 @@ namespace GUIEngine
         int large_font_height;
         int small_font_height;
         int title_font_height;
-#ifdef ANDROID
-        std::mutex m_gui_functions_mutex;
-        std::vector<std::function<void()> > m_gui_functions;
-#endif
     }
     using namespace Private;
 
@@ -745,7 +736,7 @@ namespace GUIEngine
         irr::core::stringw m_message;
         float m_time;
 
-        MenuMessage(const core::stringw& message, const float time)
+        MenuMessage(const wchar_t* message, const float time)
                    : m_message(message), m_time(time)
         {
         }
@@ -754,7 +745,7 @@ namespace GUIEngine
     std::vector<MenuMessage> gui_messages;
 
     // ------------------------------------------------------------------------
-    void showMessage(const core::stringw& message, const float time)
+    void showMessage(const wchar_t* message, const float time)
     {
         // check for duplicates
         const int count = (int) gui_messages.size();
@@ -864,7 +855,7 @@ namespace GUIEngine
         {
             frame++;
             if (frame == 2)
-                GUIEngine::EventHandler::get()->setAcceptEvents(true);
+                GUIEngine::EventHandler::get()->startAcceptingEvents();
         }
     }
     // ------------------------------------------------------------------------
@@ -880,7 +871,6 @@ namespace GUIEngine
 
     void clearScreenCache()
     {
-        StateManager::get()->clearMenuStack();
         Screen* screen;
         for_in (screen, g_loaded_screens)
         {
@@ -921,7 +911,6 @@ namespace GUIEngine
             return;
         }
 
-        Debug::closeDebugMenu();
         g_current_screen->beforeAddingWidget();
 
         // show screen
@@ -1154,21 +1143,8 @@ namespace GUIEngine
     }   // reloadSkin
 
     // -----------------------------------------------------------------------
-    void addGUIFunctionBeforeRendering(std::function<void()> func)
-    {
-#ifdef ANDROID
-        std::lock_guard<std::mutex> lock(m_gui_functions_mutex);
-        m_gui_functions.push_back(func);
-#endif
-    }   // addGUIFunctionBeforeRendering
 
-    // -----------------------------------------------------------------------
-    /** \brief called on every frame to trigger the rendering of the GUI.
-     *  \param elapsed_time Time since last rendering calls (in seconds).
-     *  \param is_loading True if the rendering is called during loading of world,
-     *         in which case world, physics etc must not be accessed.
-     */
-    void render(float elapsed_time, bool is_loading)
+    void render(float elapsed_time)
     {
 #ifndef SERVER_ONLY
         GUIEngine::dt = elapsed_time;
@@ -1176,55 +1152,15 @@ namespace GUIEngine
         // Not yet initialized, or already cleaned up
         if (g_skin == NULL) return;
 
-#ifdef ANDROID
-        // Run all GUI functions first (if any)
-        std::unique_lock<std::mutex> ul(m_gui_functions_mutex);
-        if (!m_gui_functions.empty())
-        {
-            std::vector<std::function<void()> > functions;
-            std::swap(functions, m_gui_functions);
-            ul.unlock();
-            for (auto& f : functions)
-                f();
-        }
-        else
-            ul.unlock();
-#endif
-
-        const GameState gamestate = g_state_manager->getGameState();
-
-        // ---- some menus may need updating
-        bool dialog_opened = false;
-        
-        if (ScreenKeyboard::isActive())
-        {
-            ScreenKeyboard::getCurrent()->onUpdate(dt);
-            dialog_opened = true;
-        }
-        else if (ModalDialog::isADialogActive())
-        {
-            ModalDialog::getCurrent()->onUpdate(dt);
-            dialog_opened = true;
-        }
-            
-        if (gamestate != GAME || is_loading)
-        {
-            Screen* screen = getCurrentScreen();
-
-            if (screen != NULL && 
-                (!dialog_opened || screen->getUpdateInBackground()))
-            {
-                screen->onUpdate(elapsed_time);
-            }
-        }
-
         // ---- menu drawing
 
         // draw background image and sections
 
-        if ( (gamestate == MENU &&
-              GUIEngine::getCurrentScreen() != NULL &&
-             !GUIEngine::getCurrentScreen()->needs3D()  ) || is_loading)
+        const GameState gamestate = g_state_manager->getGameState();
+
+        if (gamestate == MENU &&
+            GUIEngine::getCurrentScreen() != NULL &&
+            !GUIEngine::getCurrentScreen()->needs3D())
         {
             g_skin->drawBgImage();
         }
@@ -1244,10 +1180,45 @@ namespace GUIEngine
         // further render)
         g_env->drawAll();
 
-        if (gamestate == GAME && !is_loading && !dialog_opened)
+        // ---- some menus may need updating
+        if (gamestate != GAME)
         {
-            RaceGUIBase* rg = World::getWorld()->getRaceGUI();
-            if (rg != NULL) rg->renderGlobal(elapsed_time);
+            bool dialog_opened = false;
+            
+            if (ScreenKeyboard::isActive())
+            {
+                ScreenKeyboard::getCurrent()->onUpdate(dt);
+                dialog_opened = true;
+            }
+            else if (ModalDialog::isADialogActive())
+            {
+                ModalDialog::getCurrent()->onUpdate(dt);
+                dialog_opened = true;
+            }
+            
+            Screen* screen = getCurrentScreen();
+
+            if (screen != NULL && 
+                (!dialog_opened || screen->getUpdateInBackground()))
+            {
+                screen->onUpdate(elapsed_time);
+            }
+        }
+        else
+        {
+            if (ScreenKeyboard::isActive())
+            {
+                ScreenKeyboard::getCurrent()->onUpdate(dt);
+            }
+            else if (ModalDialog::isADialogActive())
+            {
+                ModalDialog::getCurrent()->onUpdate(dt);
+            }
+            else
+            {
+                RaceGUIBase* rg = World::getWorld()->getRaceGUI();
+                if (rg != NULL) rg->renderGlobal(elapsed_time);
+            }
         }
 
         MessageQueue::update(elapsed_time);
@@ -1258,18 +1229,10 @@ namespace GUIEngine
             if (rg != NULL) rg->renderGlobal(elapsed_time);
         }
 
-        if (gamestate != GAME || is_loading)
+        if (gamestate == MENU || gamestate == INGAME_MENU)
         {
-            Screen* screen = getCurrentScreen();
-
-            if (screen != NULL && 
-                (!dialog_opened || screen->getUpdateInBackground()))
-            {
-                screen->onDraw(elapsed_time);
-            }
+            g_skin->drawTooltips();
         }
-
-        g_skin->drawTooltips();
 
         if (gamestate != GAME && !gui_messages.empty())
         {
@@ -1378,7 +1341,7 @@ namespace GUIEngine
                            true/* center h */, false /* center v */ );
 
         const int icon_count = (int)g_loading_icons.size();
-        const int icon_size = (int)(std::min(screen_w, screen_h) / 10.0f);
+        const int icon_size = (int)(screen_w / 16.0f);
         const int ICON_MARGIN = 6;
         int x = ICON_MARGIN;
         int y = screen_h - icon_size - ICON_MARGIN;
@@ -1413,13 +1376,6 @@ namespace GUIEngine
                     ->beginScene(true, true, video::SColor(255,100,101,140));
             renderLoading(false);
             g_device->getVideoDriver()->endScene();
-#ifdef IOS_STK
-            // Apple will only update render buffer if you poll the event
-            // loop, we do this only in iOS so you don't get esc event when
-            // you press esc button in other OS, this will allow showing
-            // loading icon in iOS
-            g_device->run();
-#endif
         }
         else
         {

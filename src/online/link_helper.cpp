@@ -39,7 +39,7 @@ namespace Online
     {
 #if defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#elif defined(__APPLE__) && !defined(IOS_STK)
+#elif defined(__APPLE__)
         std::string command = std::string("open ").append(url);
         if (system(command.c_str()))
         {
@@ -47,30 +47,9 @@ namespace Online
         }
 #elif defined(__linux__) && !defined(__ANDROID__)
         std::string command = std::string("xdg-open ").append(url);
-        
-        const char* lib_path = getenv("LD_LIBRARY_PATH");
-        const char* system_lib_path = getenv("SYSTEM_LD_LIBRARY_PATH");
-
-        if (system_lib_path != NULL)
-        {
-            setenv("LD_LIBRARY_PATH", system_lib_path, 1);
-        }
-
         if (system(command.c_str()))
         {
             Log::error("OpenURL", "Command returned non-zero exit status");
-        }
-
-        if (system_lib_path != NULL)
-        {
-            if (lib_path != NULL)
-            {
-                setenv("LD_LIBRARY_PATH", lib_path, 1);
-            }
-            else
-            {
-                unsetenv("LD_LIBRARY_PATH");
-            }
         }
 #else
         Log::error("OpenURL", "Not implemented for this platform!");

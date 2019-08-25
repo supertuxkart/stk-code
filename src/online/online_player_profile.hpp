@@ -20,6 +20,10 @@
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
 #include "config/player_profile.hpp"
+#include "online/http_request.hpp"
+#include "online/online_profile.hpp"
+#include "online/request_manager.hpp"
+#include "online/xml_request.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
@@ -34,12 +38,32 @@ namespace Online
 {
     class OnlineProfile;
 
+    // ============================================================================
+
     /**
       * \brief Class that represents an online registered user
       * \ingroup online
       */
     class OnlinePlayerProfile : public PlayerProfile
     {
+    public:
+        // ----------------------------------------------------------------
+        class SignInRequest : public XMLRequest
+        {
+            virtual void callback ();
+        public:
+            SignInRequest(bool manage_memory)
+                : XMLRequest(manage_memory, /*priority*/10) {}
+        };   // SignInRequest
+
+        // ----------------------------------------------------------------
+        class PollRequest : public XMLRequest
+        {
+            virtual void callback ();
+        public:
+            PollRequest();
+        };   // PollRequest
+
     private:
         std::string                 m_token;
         OnlineProfile              *m_profile;

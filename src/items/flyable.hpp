@@ -47,6 +47,7 @@ class XMLNode;
 class Flyable : public Moveable, public TerrainInfo,
                 public Rewinder
 {
+public:
 private:
     bool              m_has_hit_something;
 
@@ -67,9 +68,6 @@ private:
      *  terrain yourself (e.g. order of operations is important)
      *  set this to false with a call do setDoTerrainInfo(). */
     bool              m_do_terrain_info;
-
-    /* Used in network to restore previous gravity in compressed form. */
-    uint32_t          m_compressed_gravity_vector;
 
     /** If the flyable is in a cannon, this is the pointer to the cannon
      *  animation. NULL otherwise. */
@@ -102,32 +100,15 @@ protected:
     float             m_speed;
 
     /** Mass of this Flyable. */
-    const float       m_mass;
+    float             m_mass;
 
     /** Size of this flyable. */
     Vec3              m_extend;
 
-    /** Time since thrown. used so a kart can't hit himself when trying
-     *  something, and also to put some time limit to some collectibles */
-    uint16_t          m_ticks_since_thrown;
-
-    /* True if this flyable exists in server, and will trigger a rewind.
-     * For each local state it will reset it to false and call moveToInfinity,
-     * and for each restoreState it will set it to true. Also when re-fire the
-     * flyable during rewind it will set to true too. */
+    bool              m_undo_creation;
+    bool              m_has_undone_destruction;
     bool              m_has_server_state;
-
-    /** If set to true, the kart that throwns this flyable can't collide
-     *  with it for a short time. */
-    bool              m_owner_has_temporary_immunity;
-
-    /* Set to true once when onDeleteFlyable, this is used to create HitEffect
-     * only once. */
-    bool              m_deleted_once;
-
-    /* Save the locally detected deleted ticks, if the confirmed state world
-     * ticks in computeError > this, the flyable can be deleted in client. */
-    int               m_last_deleted_ticks;
+    int               m_check_created_ticks;
 
     // The flyable class stores the values for each flyable type, e.g.
     // speed, min_height, max_height. These variables must be static,
@@ -152,12 +133,17 @@ protected:
     /** Size of the model. */
     static Vec3       m_st_extend[PowerupManager::POWERUP_MAX];
 
+    /** Time since thrown. used so a kart can't hit himself when trying
+     *  something, and also to put some time limit to some collectibles */
+    int16_t           m_ticks_since_thrown;
+
     /** Set to something > -1 if this flyable should auto-destrcut after
      *  that may ticks. */
     int               m_max_lifespan;
 
-    /* For debugging purpose */
-    int               m_created_ticks;
+    /** If set to true, the kart that throwns this flyable can't collide
+     *  with it for a short time. */
+    bool              m_owner_has_temporary_immunity;
 
     void              getClosestKart(const AbstractKart **minKart,
                                      float *minDistSquared,
@@ -182,8 +168,14 @@ protected:
                                     const bool turn_around=false,
                                     const btTransform* customDirection=NULL);
 
-    void              moveToInfinity(bool set_moveable_trans = true);
-    void              removePhysics();
+    void              moveToInfinity();
+    /** Used when undoing creation or destruction. */
+    btTransform m_saved_transform;
+    Vec3 m_saved_lv, m_saved_av, m_saved_gravity;
+
+    virtual void additionalPhysicsProperties() {}
+    virtual void hideNodeWhenUndoDestruction();
+
 public:
 
                  Flyable     (AbstractKart* kart,
@@ -253,7 +245,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void undoState(BareNetworkString *buffer) OVERRIDE {}
     // ------------------------------------------------------------------------
-    virtual void saveTransform() OVERRIDE;
+    virtual void saveTransform() OVERRIDE     { Moveable::prepareSmoothing(); }
     // ------------------------------------------------------------------------
     virtual void computeError() OVERRIDE;
     // ------------------------------------------------------------------------
@@ -262,16 +254,16 @@ public:
     // ------------------------------------------------------------------------
     virtual void restoreState(BareNetworkString *buffer, int count) OVERRIDE;
     // ------------------------------------------------------------------------
-    /* Return true if still in game state, or otherwise can be deleted. */
-    bool hasServerState() const                  { return m_has_server_state; }
+    virtual void addRewindInfoEventFunctionAfterFiring();
     // ------------------------------------------------------------------------
-    /** Call when the item is (re-)fired (during rewind if needed) by
-     *  projectile_manager. */
-    virtual void onFireFlyable();
+    virtual std::function<void()> getLocalStateRestoreFunction() OVERRIDE;
     // ------------------------------------------------------------------------
-    virtual void onDeleteFlyable();
+    bool isUndoCreation() const                     { return m_undo_creation; }
     // ------------------------------------------------------------------------
-    void setCreatedTicks(int ticks)                { m_created_ticks = ticks; }
+    bool hasUndoneDestruction() const      { return m_has_undone_destruction; }
+    // ------------------------------------------------------------------------
+    void handleUndoDestruction();
+
 };   // Flyable
 
 #endif

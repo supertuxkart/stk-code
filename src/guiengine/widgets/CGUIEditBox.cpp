@@ -13,27 +13,18 @@
 #include "Keycodes.h"
 
 #include "config/user_config.hpp"
-#include "font/font_manager.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/engine.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 #include "utils/time.hpp"
-#include "utils/utf8.h"
 
 #include "../../../lib/irrlicht/include/IrrCompileConfig.h"
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceLinux.h"
 
-#include <algorithm>
-#include <cstdlib>
-
 #ifdef ANDROID
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#endif
-
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceWin32.h"
 #endif
 
 /*
@@ -43,171 +34,54 @@
     double click/ctrl click: word select + drag to select whole words, triple click to select line
     optional? dragging selected text
     numerical
+    correct the mark position in RTL text, currently you can identify by highlight the text
 */
 
-#ifndef SERVER_ONLY
-#include <harfbuzz/hb.h>
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+#define UTF16_IS_SURROGATE_LO(c)	(((c) & 0xFC00) == 0xDC00)
+#define UTF16_IS_SURROGATE_HI(c)	(((c) & 0xFC00) == 0xD800)
 
-// Copied from libraqm
-namespace Grahem
+namespace irr
 {
-typedef enum
-{
-  RAQM_GRAPHEM_CR,
-  RAQM_GRAPHEM_LF,
-  RAQM_GRAPHEM_CONTROL,
-  RAQM_GRAPHEM_EXTEND,
-  RAQM_GRAPHEM_REGIONAL_INDICATOR,
-  RAQM_GRAPHEM_PREPEND,
-  RAQM_GRAPHEM_SPACING_MARK,
-  RAQM_GRAPHEM_HANGUL_SYLLABLE,
-  RAQM_GRAPHEM_OTHER
-} _raqm_grapheme_t;
-
-static _raqm_grapheme_t
-_raqm_get_grapheme_break (hb_codepoint_t ch,
-                          hb_unicode_general_category_t category);
-
-static bool
-_raqm_allowed_grapheme_boundary (hb_codepoint_t l_char,
-                                 hb_codepoint_t r_char)
-{
-  hb_unicode_general_category_t l_category;
-  hb_unicode_general_category_t r_category;
-  _raqm_grapheme_t l_grapheme, r_grapheme;
-  hb_unicode_funcs_t* unicode_funcs = hb_unicode_funcs_get_default ();
-
-  l_category = hb_unicode_general_category (unicode_funcs, l_char);
-  r_category = hb_unicode_general_category (unicode_funcs, r_char);
-  l_grapheme = _raqm_get_grapheme_break (l_char, l_category);
-  r_grapheme = _raqm_get_grapheme_break (r_char, r_category);
-
-  if (l_grapheme == RAQM_GRAPHEM_CR && r_grapheme == RAQM_GRAPHEM_LF)
-    return false; /*Do not break between a CR and LF GB3*/
-  if (l_grapheme == RAQM_GRAPHEM_CONTROL || l_grapheme == RAQM_GRAPHEM_CR ||
-      l_grapheme == RAQM_GRAPHEM_LF || r_grapheme == RAQM_GRAPHEM_CONTROL ||
-      r_grapheme == RAQM_GRAPHEM_CR || r_grapheme == RAQM_GRAPHEM_LF)
-    return true; /*Break before and after CONTROL GB4, GB5*/
-  if (r_grapheme == RAQM_GRAPHEM_HANGUL_SYLLABLE)
-    return false; /*Do not break Hangul syllable sequences. GB6, GB7, GB8*/
-  if (l_grapheme == RAQM_GRAPHEM_REGIONAL_INDICATOR &&
-      r_grapheme == RAQM_GRAPHEM_REGIONAL_INDICATOR)
-    return false; /*Do not break between regional indicator symbols. GB8a*/
-  if (r_grapheme == RAQM_GRAPHEM_EXTEND)
-    return false; /*Do not break before extending characters. GB9*/
-  /*Do not break before SpacingMarks, or after Prepend characters.GB9a, GB9b*/
-  if (l_grapheme == RAQM_GRAPHEM_PREPEND)
-    return false;
-  if (r_grapheme == RAQM_GRAPHEM_SPACING_MARK)
-    return false;
-  return true; /*Otherwise, break everywhere. GB1, GB2, GB10*/
+    void updateICPos(void* hWnd, s32 x, s32 y, s32 height);
 }
-
-static _raqm_grapheme_t
-_raqm_get_grapheme_break (hb_codepoint_t ch,
-                          hb_unicode_general_category_t category)
-{
-  _raqm_grapheme_t gb_type;
-
-  gb_type = RAQM_GRAPHEM_OTHER;
-  switch ((int)category)
-  {
-    case HB_UNICODE_GENERAL_CATEGORY_FORMAT:
-      if (ch == 0x200C || ch == 0x200D)
-        gb_type = RAQM_GRAPHEM_EXTEND;
-      else
-        gb_type = RAQM_GRAPHEM_CONTROL;
-      break;
-
-    case HB_UNICODE_GENERAL_CATEGORY_CONTROL:
-      if (ch == 0x000D)
-        gb_type = RAQM_GRAPHEM_CR;
-      else if (ch == 0x000A)
-        gb_type = RAQM_GRAPHEM_LF;
-      else
-        gb_type = RAQM_GRAPHEM_CONTROL;
-      break;
-
-    case HB_UNICODE_GENERAL_CATEGORY_SURROGATE:
-    case HB_UNICODE_GENERAL_CATEGORY_LINE_SEPARATOR:
-    case HB_UNICODE_GENERAL_CATEGORY_PARAGRAPH_SEPARATOR:
-    case HB_UNICODE_GENERAL_CATEGORY_UNASSIGNED:
-      if ((ch >= 0xFFF0 && ch <= 0xFFF8) ||
-          (ch >= 0xE0000 && ch <= 0xE0FFF))
-        gb_type = RAQM_GRAPHEM_CONTROL;
-      break;
-
-    case HB_UNICODE_GENERAL_CATEGORY_NON_SPACING_MARK:
-    case HB_UNICODE_GENERAL_CATEGORY_ENCLOSING_MARK:
-    case HB_UNICODE_GENERAL_CATEGORY_SPACING_MARK:
-      if (ch != 0x102B || ch != 0x102C || ch != 0x1038 ||
-          (ch <= 0x1062 && ch >= 0x1064) || (ch <= 0x1067 && ch >= 0x106D) ||
-          ch != 0x1083 || (ch <= 0x1087 && ch >= 0x108C) || ch != 0x108F ||
-          (ch <= 0x109A && ch >= 0x109C) || ch != 0x1A61 || ch != 0x1A63 ||
-          ch != 0x1A64 || ch != 0xAA7B || ch != 0xAA70 || ch != 0x11720 ||
-          ch != 0x11721) /**/
-        gb_type = RAQM_GRAPHEM_SPACING_MARK;
-
-      else if (ch == 0x09BE || ch == 0x09D7 ||
-          ch == 0x0B3E || ch == 0x0B57 || ch == 0x0BBE || ch == 0x0BD7 ||
-          ch == 0x0CC2 || ch == 0x0CD5 || ch == 0x0CD6 ||
-          ch == 0x0D3E || ch == 0x0D57 || ch == 0x0DCF || ch == 0x0DDF ||
-          ch == 0x1D165 || (ch >= 0x1D16E && ch <= 0x1D172))
-        gb_type = RAQM_GRAPHEM_EXTEND;
-      break;
-
-    case HB_UNICODE_GENERAL_CATEGORY_OTHER_LETTER:
-      if (ch == 0x0E33 || ch == 0x0EB3)
-        gb_type = RAQM_GRAPHEM_SPACING_MARK;
-      break;
-
-    case HB_UNICODE_GENERAL_CATEGORY_OTHER_SYMBOL:
-      if (ch >= 0x1F1E6 && ch <= 0x1F1FF)
-        gb_type = RAQM_GRAPHEM_REGIONAL_INDICATOR;
-      break;
-
-    default:
-      gb_type = RAQM_GRAPHEM_OTHER;
-      break;
-  }
-
-  return gb_type;
-}
-
-};
 #endif
+
+StkTime::TimeType getTime()
+{
+    return StkTime::getTimeSinceEpoch();
+}
 
 //! constructor
 CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
         IGUIEnvironment* environment, IGUIElement* parent, s32 id,
-        const core::rect<s32>& rectangle)
+        const core::rect<s32>& rectangle, bool is_rtl)
     : IGUIEditBox(environment, parent, id, rectangle), MouseMarking(false),
-    Border(border), OverrideColorEnabled(false), m_mark_begin(0), m_mark_end(0),
+    Border(border), OverrideColorEnabled(false), MarkBegin(0), MarkEnd(0),
     OverrideColor(video::SColor(101,255,255,255)), OverrideFont(0), LastBreakFont(0),
-    Operator(0), m_force_show_cursor_time(0), m_cursor_pos(0), m_scroll_pos(0), m_cursor_distance(0),
-    m_max_chars(0), AutoScroll(true), PasswordBox(false),
-    PasswordChar(U'*'), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER),
+    Operator(0), BlinkStartTime(0), CursorPos(0), HScrollPos(0), VScrollPos(0), Max(0),
+    WordWrap(false), MultiLine(false), AutoScroll(true), PasswordBox(false),
+    PasswordChar(L'*'), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER),
     CurrentTextRect(0,0,1,1), FrameRect(rectangle)
 {
-    m_from_android_edittext = false;
-    m_composing_start = 0;
-    m_composing_end = 0;
-    m_type = (GUIEngine::TextBoxType)0;
+    //m_rtl = is_rtl;
+    m_rtl = false;
+    // FIXME quick hack to enable mark movement with keyboard and mouse for rtl language,
+    // don't know why it's disabled in the first place, because STK fail
+    // to input unicode characters before?
 
     #ifdef _DEBUG
     setDebugName("CGUIEditBox");
     #endif
 
     Text = text;
-    m_edit_text = StringUtils::wideToUtf32(text);
 
-#ifndef SERVER_ONLY
     if (Environment)
         Operator = Environment->getOSOperator();
 
     if (Operator)
         Operator->grab();
-#endif
+
     // this element can be tabbed to
     setTabStop(true);
     setTabOrder(-1);
@@ -223,16 +97,19 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
         FrameRect.LowerRightCorner.Y -= skin->getSize(EGDS_TEXT_DISTANCE_Y)+1;
     }
 
-    m_scroll_pos = m_cursor_distance = 0;
+    breakText();
+
+    calculateScrollPos();
 }
 
 
 //! destructor
 CGUIEditBox::~CGUIEditBox()
 {
+#ifndef SERVER_ONLY
     if (OverrideFont)
         OverrideFont->drop();
-#ifndef SERVER_ONLY
+
     if (Operator)
         Operator->drop();
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
@@ -242,13 +119,15 @@ CGUIEditBox::~CGUIEditBox()
                                                        irr_driver->getDevice());
         dl->setIMEEnable(false);
     }
-#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-    DestroyCaret();
 #endif
-    if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-        GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
-        irr_driver->getDevice()->toggleOnScreenKeyboard(false);
-
+#ifdef ANDROID
+    if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+    {
+        CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+        dl->setTextInputEnabled(false);
+    }
+#endif
 #endif
 }
 
@@ -267,6 +146,7 @@ void CGUIEditBox::setOverrideFont(IGUIFont* font)
     if (OverrideFont)
         OverrideFont->grab();
 
+    breakText();
 }
 
 
@@ -303,10 +183,45 @@ bool CGUIEditBox::isOverrideColorEnabled() const
     return OverrideColorEnabled;
 }
 
+//! Enables or disables word wrap
+void CGUIEditBox::setWordWrap(bool enable)
+{
+    WordWrap = enable;
+    breakText();
+}
+
 
 void CGUIEditBox::updateAbsolutePosition()
 {
+    core::rect<s32> oldAbsoluteRect(AbsoluteRect);
     IGUIElement::updateAbsolutePosition();
+    if ( oldAbsoluteRect != AbsoluteRect )
+    {
+        breakText();
+    }
+}
+
+
+//! Checks if word wrap is enabled
+bool CGUIEditBox::isWordWrapEnabled() const
+{
+    _IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
+    return WordWrap;
+}
+
+
+//! Enables or disables newlines.
+void CGUIEditBox::setMultiLine(bool enable)
+{
+    MultiLine = enable;
+}
+
+
+//! Checks if multi line editing is enabled
+bool CGUIEditBox::isMultiLineEnabled() const
+{
+    _IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
+    return MultiLine;
 }
 
 
@@ -314,7 +229,12 @@ void CGUIEditBox::setPasswordBox(bool passwordBox, wchar_t passwordChar)
 {
     PasswordBox = passwordBox;
     if (PasswordBox)
-        PasswordChar = (char32_t)passwordChar;
+    {
+        PasswordChar = passwordChar;
+        setMultiLine(false);
+        setWordWrap(false);
+        BrokenText.clear();
+    }
 }
 
 
@@ -339,9 +259,6 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #ifndef SERVER_ONLY
     if (isEnabled())
     {
-        // Ignore key input if we only fromAndroidEditText
-        if (m_from_android_edittext && event.EventType == EET_KEY_INPUT_EVENT)
-            return true;
         switch(event.EventType)
         {
         case EET_GUI_EVENT:
@@ -352,53 +269,50 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     MouseMarking = false;
                     setTextMarkers(0,0);
                 }
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
                 if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
                 {
                     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
                     dl->setIMEEnable(false);
                 }
-#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-                DestroyCaret();
 #endif
-                m_from_android_edittext = false;
-                m_composing_start = 0;
-                m_composing_end = 0;
-                m_composing_text.clear();
+#ifdef ANDROID
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                {
+                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                    dl->setTextInputEnabled(false);
+                }
+#endif
             }
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
-                m_mark_begin = m_mark_end = m_cursor_pos = getTextCount();
 #ifdef _IRR_COMPILE_WITH_X11_DEVICE_
                 if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
                 {
                     CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
                     dl->setIMEEnable(true);
+                    dl->setIMELocation(calculateICPos());
                 }
 #endif
-                calculateScrollPos();
 #ifdef ANDROID
-                if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-                    GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
-                    irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
                 {
-                    // If user toggle with hacker keyboard with arrows, keep
-                    // using only text from STKEditTex
-                    m_from_android_edittext = true;
                     CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                        irr_driver->getDevice());
-                    dl->fromSTKEditBox(getID(), Text, m_mark_begin, m_mark_end, m_type);
+                    dl->setTextInputEnabled(true);
                 }
-                else
 #endif
-                {
-                    m_from_android_edittext = false;
-                }
-                m_composing_text.clear();
             }
             break;
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+        case EET_IMPUT_METHOD_EVENT:
+            if (processIMEEvent(event))
+                return true;
+            break;
+#endif
         case EET_KEY_INPUT_EVENT:
             if (processKey(event))
                 return true;
@@ -416,43 +330,17 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 }
 
 
-void CGUIEditBox::correctCursor(s32& cursor_pos, bool left)
-{
-#ifndef SERVER_ONLY
-    if (left)
-    {
-        if (cursor_pos >= (s32)m_edit_text.size())
-            return;
-        while (cursor_pos != 0 &&
-            !Grahem::_raqm_allowed_grapheme_boundary(m_edit_text[cursor_pos - 1],
-            m_edit_text[cursor_pos]))
-            cursor_pos--;
-    }
-    else
-    {
-        while (cursor_pos != 0 && cursor_pos != (s32)m_edit_text.size() &&
-            !Grahem::_raqm_allowed_grapheme_boundary(m_edit_text[cursor_pos - 1],
-            m_edit_text[cursor_pos]))
-            cursor_pos++;
-    }
-#endif
-}
-
-
 bool CGUIEditBox::processKey(const SEvent& event)
 {
-#ifdef SERVER_ONLY
-    return false;
-#else
     if (!event.KeyInput.PressedDown)
         return false;
 
-    bool text_changed = false;
-    s32 new_mark_begin = m_mark_begin;
-    s32 new_mark_end = m_mark_end;
-    s32 new_cursor_pos = m_cursor_pos;
+    bool textChanged = false;
+    s32 newMarkBegin = MarkBegin;
+    s32 newMarkEnd = MarkEnd;
 
     // control shortcut handling
+
     if (event.KeyInput.Control)
     {
         // german backlash '\' entered with control + '?'
@@ -466,138 +354,161 @@ bool CGUIEditBox::processKey(const SEvent& event)
         {
         case IRR_KEY_A:
             // select all
-            new_mark_begin = 0;
-            new_mark_end = (s32)m_edit_text.size();
-            new_cursor_pos = new_mark_end;
+            newMarkBegin = 0;
+            newMarkEnd = Text.size();
             break;
         case IRR_KEY_C:
             // copy to clipboard
-            if (!PasswordBox && Operator && m_mark_begin != m_mark_end)
+            if (!PasswordBox && Operator && MarkBegin != MarkEnd)
             {
-                const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-                const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
+                const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+                const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
-                std::u32string s = m_edit_text.substr(realmbgn, realmend - realmbgn);
+                core::stringw s;
+                s = Text.subString(realmbgn, realmend - realmbgn).c_str();
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-                Operator->copyToClipboard(StringUtils::utf32ToWide(s).c_str());
+                Operator->copyToClipboard(s.c_str());
 #else
-                Operator->copyToClipboard(StringUtils::utf32ToUtf8(s).c_str());
+                Operator->copyToClipboard(StringUtils::wideToUtf8(s).c_str());
 #endif
             }
             break;
         case IRR_KEY_X:
             // cut to the clipboard
-            if (!PasswordBox && Operator && m_mark_begin != m_mark_end)
+            if (!PasswordBox && Operator && MarkBegin != MarkEnd)
             {
-                const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-                const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
+                const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+                const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
                 // copy
-                std::u32string s = m_edit_text.substr(realmbgn, realmend - realmbgn);
+                core::stringw sc;
+                sc = Text.subString(realmbgn, realmend - realmbgn).c_str();
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-                Operator->copyToClipboard(StringUtils::utf32ToWide(s).c_str());
+                Operator->copyToClipboard(sc.c_str());
 #else
-                Operator->copyToClipboard(StringUtils::utf32ToUtf8(s).c_str());
+                Operator->copyToClipboard(StringUtils::wideToUtf8(sc).c_str());
 #endif
 
                 if (isEnabled())
                 {
                     // delete
-                    std::u32string sub_str = m_edit_text.substr(0, realmbgn);
-                    sub_str += m_edit_text.substr(realmend, m_edit_text.size() - realmend);
-                    m_edit_text = sub_str;
+                    core::stringw s;
+                    s = Text.subString(0, realmbgn);
+                    s.append( Text.subString(realmend, Text.size()-realmend) );
+                    Text = s;
 
-                    new_mark_begin = 0;
-                    new_mark_end = 0;
-                    new_cursor_pos = realmbgn;
-                    text_changed = true;
+                    CursorPos = realmbgn;
+                    newMarkBegin = 0;
+                    newMarkEnd = 0;
+                    textChanged = true;
                 }
             }
             break;
 
         case IRR_KEY_V:
-            if (!isEnabled())
+            if ( !isEnabled() )
                 break;
 
             // paste from the clipboard
             if (Operator)
             {
-                const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-                const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
+                const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+                const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
                 // add new character
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-                const std::u32string clipboard =
-                    StringUtils::wideToUtf32(Operator->getTextFromClipboard());
+                const wchar_t* p = Operator->getTextFromClipboard();
 #else
-                const std::u32string clipboard =
-                    StringUtils::utf8ToUtf32(Operator->getTextFromClipboard());
+                const c8* p = Operator->getTextFromClipboard();
 #endif
-                if (!clipboard.empty())
+                if (p)
                 {
-                    if (m_mark_begin == m_mark_end)
+                    if (MarkBegin == MarkEnd)
                     {
                         // insert text
-                        std::u32string sub_str = m_edit_text.substr(0, m_cursor_pos);
-                        sub_str += clipboard;
-                        sub_str += m_edit_text.substr(m_cursor_pos, m_edit_text.size() - m_cursor_pos);
+                        core::stringw s = Text.subString(0, CursorPos);
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                        s.append(StringUtils::utf8ToWide(p));
+#else
+                        s.append(p);
+#endif
+                        s.append( Text.subString(CursorPos, Text.size()-CursorPos) );
 
-                        if (m_max_chars == 0 || sub_str.size() <= m_max_chars) // thx to Fish FH for fix
+                        if (!Max || s.size()<=Max) // thx to Fish FH for fix
                         {
-                            m_edit_text = sub_str;
-                            new_cursor_pos = m_cursor_pos + (s32)clipboard.size();
+                            Text = s;
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                            s = StringUtils::utf8ToWide(p);
+#else
+                            s = p;
+#endif
+                            CursorPos += s.size();
                         }
                     }
                     else
                     {
                         // replace text
-                        std::u32string sub_str = m_edit_text.substr(0, realmbgn);
-                        sub_str += clipboard;
-                        sub_str += m_edit_text.substr(realmend, m_edit_text.size() - realmend);
 
-                        if (m_max_chars == 0 || sub_str.size() <= m_max_chars) // thx to Fish FH for fix
+                        core::stringw s = Text.subString(0, realmbgn);
+
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                        s.append(StringUtils::utf8ToWide(p));
+#else
+                        s.append(p);
+#endif
+                        s.append( Text.subString(realmend, Text.size()-realmend) );
+
+                        if (!Max || s.size()<=Max)  // thx to Fish FH for fix
                         {
-                            m_edit_text = sub_str;
-                            new_cursor_pos = realmbgn + (s32)sub_str.size();
+                            Text = s;
+#ifndef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+                            s = StringUtils::utf8ToWide(p);
+#else
+                            s = p;
+#endif
+                            CursorPos = realmbgn + s.size();
                         }
                     }
-                    new_mark_begin = 0;
-                    new_mark_end = 0;
-                    text_changed = true;
                 }
+
+                newMarkBegin = 0;
+                newMarkEnd = 0;
+                textChanged = true;
             }
             break;
         case IRR_KEY_HOME:
+            if (!m_rtl)
             {
                 // move/highlight to start of text
                 if (event.KeyInput.Shift)
                 {
-                    new_mark_end = m_cursor_pos;
-                    new_mark_begin = 0;
-                    new_cursor_pos = 0;
+                    newMarkEnd = CursorPos;
+                    newMarkBegin = 0;
+                    CursorPos = 0;
                 }
                 else
                 {
-                    new_cursor_pos = 0;
-                    new_mark_begin = 0;
-                    new_mark_end = 0;
+                    CursorPos = 0;
+                    newMarkBegin = 0;
+                    newMarkEnd = 0;
                 }
             }
             break;
         case IRR_KEY_END:
+            if (!m_rtl)
             {
                 // move/highlight to end of text
                 if (event.KeyInput.Shift)
                 {
-                    new_mark_begin = m_cursor_pos;
-                    new_mark_end = (s32)m_edit_text.size();
-                    new_cursor_pos = 0;
+                    newMarkBegin = CursorPos;
+                    newMarkEnd = Text.size();
+                    CursorPos = 0;
                 }
                 else
                 {
-                    new_mark_begin = 0;
-                    new_mark_end = 0;
-                    new_cursor_pos = (s32)m_edit_text.size();
+                    CursorPos = Text.size();
+                    newMarkBegin = 0;
+                    newMarkEnd = 0;
                 }
             }
             break;
@@ -612,201 +523,289 @@ bool CGUIEditBox::processKey(const SEvent& event)
             /*
         case IRR_KEY_Q:
             inputChar(L'\u05DC');
-            text_changed = true;
+            textChanged = true;
             return true;
         case IRR_KEY_W:
             inputChar(L'\u05DB');
-            text_changed = true;
+            textChanged = true;
             return true;
         case IRR_KEY_E:
             inputChar(L'\u05DA');
-            text_changed = true;
+            textChanged = true;
             return true;
         case IRR_KEY_R:
             inputChar(L'\u05D9');
-            text_changed = true;
+            textChanged = true;
             return true;
         case IRR_KEY_T:
             inputChar(L'\u05D8');
-            text_changed = true;
+            textChanged = true;
             return true;
         case IRR_KEY_Y:
             inputChar(L'\u05D7');
-            text_changed = true;
+            textChanged = true;
             return true;
             */
 
     case IRR_KEY_END:
+        if (!m_rtl)
         {
-            s32 p = getTextCount();
+            s32 p = Text.size();
+            if (WordWrap || MultiLine)
+            {
+                p = getLineFromPos(CursorPos);
+                p = BrokenTextPositions[p] + (s32)BrokenText[p].size();
+                if (p > 0 && (Text[p-1] == L'\r' || Text[p-1] == L'\n' ))
+                    p-=1;
+            }
+
             if (event.KeyInput.Shift)
             {
-                if (m_mark_begin == m_mark_end)
-                    new_mark_begin = m_cursor_pos;
-                new_mark_end = p;
+                if (MarkBegin == MarkEnd)
+                    newMarkBegin = CursorPos;
+
+                newMarkEnd = p;
             }
             else
             {
-                new_mark_begin = 0;
-                new_mark_end = 0;
+                newMarkBegin = 0;
+                newMarkEnd = 0;
             }
-            new_cursor_pos = p;
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
+            CursorPos = p;
+            BlinkStartTime = getTime();
         }
         break;
     case IRR_KEY_HOME:
+        if (!m_rtl)
         {
+
             s32 p = 0;
+            if (WordWrap || MultiLine)
+            {
+                p = getLineFromPos(CursorPos);
+                p = BrokenTextPositions[p];
+            }
+
             if (event.KeyInput.Shift)
             {
-                if (m_mark_begin == m_mark_end)
-                    new_mark_begin = m_cursor_pos;
-                new_mark_end = p;
+                if (MarkBegin == MarkEnd)
+                    newMarkBegin = CursorPos;
+                newMarkEnd = p;
             }
             else
             {
-                new_mark_begin = 0;
-                new_mark_end = 0;
+                newMarkBegin = 0;
+                newMarkEnd = 0;
             }
-            new_cursor_pos = p;
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
+            CursorPos = p;
+            BlinkStartTime = getTime();
         }
         break;
     case IRR_KEY_RETURN:
+        if (MultiLine)
         {
-            if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-                GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
-                irr_driver->getDevice()->toggleOnScreenKeyboard(false);
+            inputChar(L'\n');
+            return true;
+        }
+        else
+        {
+#ifdef ANDROID
+            if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID &&
+                UserConfigParams::m_screen_keyboard == 3)
+            {
+                CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                   irr_driver->getDevice());
+                dl->showKeyboard(false);
+            }
+#endif
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
         break;
     case IRR_KEY_LEFT:
+        if (!m_rtl)
         {
             if (event.KeyInput.Shift)
             {
-                if (m_cursor_pos > 0)
+                if (CursorPos > 0)
                 {
-                    if (m_mark_begin == m_mark_end)
-                        new_mark_begin = m_cursor_pos;
+                    if (MarkBegin == MarkEnd)
+                        newMarkBegin = CursorPos;
 
-                    new_mark_end = m_cursor_pos-1;
-                    correctCursor(new_mark_end, true/*left*/);
+                    newMarkEnd = CursorPos-1;
                 }
             }
             else
             {
-                new_mark_begin = 0;
-                new_mark_end = 0;
+                newMarkBegin = 0;
+                newMarkEnd = 0;
             }
 
-            if (m_cursor_pos > 0)
-            {
-                new_cursor_pos = m_cursor_pos - 1;
-                correctCursor(new_cursor_pos, true/*left*/);
-            }
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
+            if (CursorPos > 0) CursorPos--;
+            BlinkStartTime = getTime();
         }
         break;
 
     case IRR_KEY_RIGHT:
+        if (!m_rtl)
         {
             if (event.KeyInput.Shift)
             {
-                if (m_edit_text.size() > (u32)m_cursor_pos)
+                if (Text.size() > (u32)CursorPos)
                 {
-                    if (m_mark_begin == m_mark_end)
-                        new_mark_begin = m_cursor_pos;
+                    if (MarkBegin == MarkEnd)
+                        newMarkBegin = CursorPos;
 
-                    new_mark_end = m_cursor_pos + 1;
-                    correctCursor(new_mark_end, false/*left*/);
+                    newMarkEnd = CursorPos+1;
                 }
             }
             else
             {
-                new_mark_begin = 0;
-                new_mark_end = 0;
+                newMarkBegin = 0;
+                newMarkEnd = 0;
             }
 
-            if (m_edit_text.size() > (u32)m_cursor_pos)
-            {
-                new_cursor_pos = m_cursor_pos + 1;
-                correctCursor(new_cursor_pos, false/*left*/);
-            }
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
+            if (Text.size() > (u32)CursorPos) CursorPos++;
+            BlinkStartTime = getTime();
         }
         break;
     case IRR_KEY_UP:
+        if (MultiLine || (WordWrap && BrokenText.size() > 1) )
+        {
+            s32 lineNo = getLineFromPos(CursorPos);
+            s32 mb = (MarkBegin == MarkEnd) ? CursorPos : (MarkBegin > MarkEnd ? MarkBegin : MarkEnd);
+            if (lineNo > 0)
+            {
+                s32 cp = CursorPos - BrokenTextPositions[lineNo];
+                if ((s32)BrokenText[lineNo-1].size() < cp)
+                    CursorPos = BrokenTextPositions[lineNo-1] + (s32)BrokenText[lineNo-1].size()-1;
+                else
+                    CursorPos = BrokenTextPositions[lineNo-1] + cp;
+            }
+
+            if (event.KeyInput.Shift)
+            {
+                newMarkBegin = mb;
+                newMarkEnd = CursorPos;
+            }
+            else
+            {
+                newMarkBegin = 0;
+                newMarkEnd = 0;
+            }
+
+        }
+        else
+        {
+            return false;
+        }
+        break;
     case IRR_KEY_DOWN:
+        if (MultiLine || (WordWrap && BrokenText.size() > 1) )
+        {
+            s32 lineNo = getLineFromPos(CursorPos);
+            s32 mb = (MarkBegin == MarkEnd) ? CursorPos : (MarkBegin < MarkEnd ? MarkBegin : MarkEnd);
+            if (lineNo < (s32)BrokenText.size()-1)
+            {
+                s32 cp = CursorPos - BrokenTextPositions[lineNo];
+                if ((s32)BrokenText[lineNo+1].size() < cp)
+                    CursorPos = BrokenTextPositions[lineNo+1] + BrokenText[lineNo+1].size()-1;
+                else
+                    CursorPos = BrokenTextPositions[lineNo+1] + cp;
+            }
+
+            if (event.KeyInput.Shift)
+            {
+                newMarkBegin = mb;
+                newMarkEnd = CursorPos;
+            }
+            else
+            {
+                newMarkBegin = 0;
+                newMarkEnd = 0;
+            }
+
+        }
+        else
         {
             return false;
         }
         break;
 
     case IRR_KEY_BACK:
-        if (!isEnabled())
+        if ( !isEnabled() )
             break;
 
-        if (!m_edit_text.empty())
+        if (Text.size())
         {
-            std::u32string sub_str;
-            if (m_mark_begin != m_mark_end)
+            core::stringw s;
+
+            if (MarkBegin != MarkEnd)
             {
                 // delete marked text
-                const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-                const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
+                const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+                const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
-                std::u32string sub_str = m_edit_text.substr(0, realmbgn);
-                sub_str += m_edit_text.substr(realmend, m_edit_text.size() - realmend);
-                m_edit_text = sub_str;
-                new_cursor_pos = realmbgn;
+                s = Text.subString(0, realmbgn);
+                s.append( Text.subString(realmend, Text.size()-realmend) );
+                Text = s;
+
+                CursorPos = realmbgn;
             }
             else
             {
                 // delete text behind cursor
-                if (m_cursor_pos > 0)
-                    sub_str = m_edit_text.substr(0, m_cursor_pos - 1);
+                if (CursorPos>0)
+                    s = Text.subString(0, CursorPos-1);
                 else
-                    sub_str.clear();
-                sub_str += m_edit_text.substr(m_cursor_pos, m_edit_text.size() - m_cursor_pos);
-                m_edit_text = sub_str;
-                new_cursor_pos = m_cursor_pos - 1;
+                    s = L"";
+                s.append( Text.subString(CursorPos, Text.size()-CursorPos) );
+                Text = s;
+                --CursorPos;
             }
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
-            new_mark_begin = 0;
-            new_mark_end = 0;
-            text_changed = true;
+
+            if (CursorPos < 0)
+                CursorPos = 0;
+            BlinkStartTime = getTime();
+            newMarkBegin = 0;
+            newMarkEnd = 0;
+            textChanged = true;
         }
         break;
     case IRR_KEY_DELETE:
-        if (!isEnabled())
+        if ( !isEnabled() )
             break;
 
-        if (!m_edit_text.empty())
+        if (Text.size() != 0)
         {
-            std::u32string sub_str;
-            if (m_mark_begin != m_mark_end)
+            core::stringw s;
+
+            if (MarkBegin != MarkEnd)
             {
                 // delete marked text
-                const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-                const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
+                const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+                const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
 
-                sub_str = m_edit_text.substr(0, realmbgn);
-                sub_str += m_edit_text.substr(realmend, m_edit_text.size() - realmend);
-                m_edit_text = sub_str;
-                new_cursor_pos = realmbgn;
-                text_changed = true;
+                s = Text.subString(0, realmbgn);
+                s.append( Text.subString(realmend, Text.size()-realmend) );
+                Text = s;
+
+                CursorPos = realmbgn;
             }
-            else if (m_cursor_pos != getTextCount())
+            else
             {
                 // delete text before cursor
-                sub_str = m_edit_text.substr(0, m_cursor_pos);
-                sub_str += m_edit_text.substr(m_cursor_pos + 1, m_edit_text.size() - m_cursor_pos - 1);
-                m_edit_text = sub_str;
-                text_changed = true;
+                s = Text.subString(0, CursorPos);
+                s.append( Text.subString(CursorPos+1, Text.size()-CursorPos-1) );
+                Text = s;
             }
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
-            new_mark_begin = 0;
-            new_mark_end = 0;
+
+            if (CursorPos > (s32)Text.size())
+                CursorPos = (s32)Text.size();
+
+            BlinkStartTime = getTime();
+            newMarkBegin = 0;
+            newMarkEnd = 0;
+            textChanged = true;
         }
         break;
 
@@ -845,28 +844,119 @@ bool CGUIEditBox::processKey(const SEvent& event)
         return true;
     }
 
-    // Update glyph layouts, the next setTextMarks will update text to android
-    if (text_changed)
-    {
-        updateGlyphLayouts();
-    }
-
     // Set new text markers
-    setTextMarkers(new_mark_begin, new_mark_end);
+    setTextMarkers( newMarkBegin, newMarkEnd );
 
-    if (new_cursor_pos > getTextCount())
-        new_cursor_pos = getTextCount();
-    m_cursor_pos = new_cursor_pos;
-    if (m_cursor_pos < 0)
-        m_cursor_pos = 0;
+    // break the text if it has changed
+    if (textChanged)
+    {
+        breakText();
+        sendGuiEvent(EGET_EDITBOX_CHANGED);
+    }
 
     calculateScrollPos();
 
-    return true;
+    if (CursorPos > (s32)Text.size())
+        CursorPos = Text.size();
+
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+    switch(event.KeyInput.Key)
+    {
+    // If cursor points the surrogate low, send IRR_KEY_LEFT event.
+    case IRR_KEY_UP:
+    case IRR_KEY_DOWN:
+        if (MultiLine || (WordWrap && BrokenText.size() > 1) )
+        {
+            if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            {
+                SEvent leftEvent;
+                leftEvent = event;
+                leftEvent.KeyInput.Key = IRR_KEY_LEFT;
+                Environment->postEventFromUser(leftEvent);
+            }
+        }
+        break;
+    // If cursor points the surrogate low, send a same event.
+    case IRR_KEY_LEFT:
+    case IRR_KEY_RIGHT:
+    case IRR_KEY_DELETE:
+        if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            Environment->postEventFromUser(event);
+        break;
+    // If cursor points front of the surrogate high, send a same event.
+    case IRR_KEY_BACK:
+        if (CursorPos > 0)
+        {
+            if (UTF16_IS_SURROGATE_HI(Text[CursorPos-1]))
+                Environment->postEventFromUser(event);
+        }
+        break;
+    default:
+        break;
+    }
 #endif
+    return true;
 }
 
 
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+bool CGUIEditBox::processIMEEvent(const SEvent& event)
+{
+    switch(event.InputMethodEvent.Event)
+    {
+    case EIME_CHAR_INPUT:
+        inputChar(event.InputMethodEvent.Char);
+        return true;
+    case EIME_CHANGE_POS:
+    {
+        core::position2di pos = calculateICPos();
+
+        IGUIFont* font = OverrideFont;
+        IGUISkin* skin = Environment->getSkin();
+
+        if (!OverrideFont)
+            font = skin->getFont();
+
+        irr::updateICPos(event.InputMethodEvent.Handle, pos.X,pos.Y, font->getDimension(L"|").Height);
+
+        return true;
+    }
+    default:
+        break;
+    }
+
+    return false;
+}
+#endif
+
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+//! calculate the position of input composition window
+core::position2di CGUIEditBox::calculateICPos()
+{
+    core::position2di pos;
+    IGUIFont* font = OverrideFont;
+    IGUISkin* skin = Environment->getSkin();
+    if (!OverrideFont)
+        font = skin->getFont();
+
+    //drop the text that clipping on the right side
+    if (WordWrap | MultiLine)
+    {
+        // todo : It looks like a heavy drinker. Strange!!
+        pos.X = CurrentTextRect.LowerRightCorner.X - font->getDimension(Text.subString(CursorPos, BrokenTextPositions[getLineFromPos(CursorPos)] + BrokenText[getLineFromPos(CursorPos)].size() - CursorPos).c_str()).Width;
+        pos.Y = CurrentTextRect.UpperLeftCorner.Y + font->getDimension(L"|").Height + (Border ? 3 : 0) - ((MultiLine | WordWrap) ? 3 : 0);
+    }
+    else
+    {
+        pos.X = CurrentTextRect.LowerRightCorner.X - font->getDimension(Text.subString(CursorPos, Text.size() - CursorPos).c_str()).Width;
+        pos.Y = AbsoluteRect.getCenter().Y + (Border ? 3 : 0); //bug? The text is always drawn in the height of the center. SetTextAlignment() doesn't influence.
+    }
+
+    return pos;
+}
+
+
+#endif
 //! draws the element and its children
 void CGUIEditBox::draw()
 {
@@ -874,13 +964,8 @@ void CGUIEditBox::draw()
     if (!IsVisible)
         return;
 
-    if (Environment->hasFocus(this))
-        updateSurrogatePairText();
-    GUIEngine::ScreenKeyboard* screen_kbd = GUIEngine::ScreenKeyboard::getCurrent();
-    bool has_screen_kbd = (screen_kbd && screen_kbd->getEditBox() == this);
-    
-    const bool focus = Environment->hasFocus(this) || has_screen_kbd;
-    
+    const bool focus = Environment->hasFocus(this);
+
     IGUISkin* skin = Environment->getSkin();
     if (!skin)
         return;
@@ -888,10 +973,11 @@ void CGUIEditBox::draw()
     FrameRect = AbsoluteRect;
 
     // draw the border
+
     if (Border)
     {
         EGUI_DEFAULT_COLOR col = EGDC_GRAY_EDITABLE;
-        if (isEnabled())
+        if ( isEnabled() )
             col = focus ? EGDC_FOCUSED_EDITABLE : EGDC_EDITABLE;
         skin->draw3DSunkenPane(this, skin->getColor(col),
             false, true, FrameRect, &AbsoluteClippingRect);
@@ -904,106 +990,175 @@ void CGUIEditBox::draw()
     core::rect<s32> localClipRect = FrameRect;
     localClipRect.clipAgainst(AbsoluteClippingRect);
 
+    // draw the text
+
     IGUIFont* font = OverrideFont;
     if (!OverrideFont)
         font = skin->getFont();
 
-    if (!font)
-        return;
+    s32 cursorLine = 0;
+    s32 charcursorpos = 0;
 
-    setTextRect(0);
-    // Save the override color information.
-    // Then, alter it if the edit box is disabled.
-    const bool prevOver = OverrideColorEnabled;
-    const video::SColor prevColor = OverrideColor;
-
-    if (!isEnabled() && !OverrideColorEnabled)
+    if (font)
     {
-        OverrideColorEnabled = true;
-        OverrideColor = skin->getColor(EGDC_GRAY_TEXT);
-    }
-
-    const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-    const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
-    const s32 realcbgn = m_composing_start < m_composing_end ? m_composing_start : m_composing_end;
-    const s32 realcend = m_composing_start < m_composing_end ? m_composing_end : m_composing_start;
-
-    // draw the text layout
-    if (!m_composing_text.empty())
-    {
-        std::vector<gui::GlyphLayout> ct;
-        std::u32string total = m_edit_text;
-        const s32 realcbgn = m_cursor_pos;
-        const s32 realcend = m_cursor_pos + (s32)m_composing_text.size();
-        total.insert(m_cursor_pos, m_composing_text);
-        font_manager->shape(total, ct);
-        for (unsigned i = 0; i < ct.size(); i++)
+        if (LastBreakFont != font)
         {
-            GlyphLayout& glyph = ct[i];
-            auto& cluster = glyph.cluster;
-            for (unsigned c = 0; c < glyph.cluster.size(); c++)
+            breakText();
+        }
+
+        // calculate cursor pos
+
+        core::stringw *txtLine = &Text;
+        s32 startPos = 0;
+
+        core::stringw s, s2;
+
+        // get mark position
+        const bool ml = (!PasswordBox && (WordWrap || MultiLine));
+        const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+        const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+        const s32 hlineStart = ml ? getLineFromPos(realmbgn) : 0;
+        const s32 hlineCount = ml ? getLineFromPos(realmend) - hlineStart + 1 : 1;
+        const s32 lineCount = ml ? BrokenText.size() : 1;
+
+        // Save the override color information.
+        // Then, alter it if the edit box is disabled.
+        const bool prevOver = OverrideColorEnabled;
+        const video::SColor prevColor = OverrideColor;
+
+        if (Text.size())
+        {
+            if (!isEnabled() && !OverrideColorEnabled)
             {
-                if (realcbgn != realcend)
+                OverrideColorEnabled = true;
+                OverrideColor = skin->getColor(EGDC_GRAY_TEXT);
+            }
+
+            for (s32 i=0; i < lineCount; ++i)
+            {
+                setTextRect(i);
+
+                // clipping test - don't draw anything outside the visible area
+                core::rect<s32> c = localClipRect;
+                c.clipAgainst(CurrentTextRect);
+                if (!c.isValid())
+                    continue;
+
+                // get current line
+                if (PasswordBox)
                 {
-                    if (cluster[c] >= realcbgn && cluster[c] < realcend)
-                        glyph.draw_flags.at(c) = GLD_COMPOSING;
+                    if (BrokenText.size() != 1)
+                    {
+                        BrokenText.clear();
+                        BrokenText.push_back(core::stringw());
+                    }
+                    if (BrokenText[0].size() != Text.size())
+                    {
+                        BrokenText[0] = Text;
+                        for (u32 q = 0; q < Text.size(); ++q)
+                        {
+                            BrokenText[0] [q] = PasswordChar;
+                        }
+                    }
+                    txtLine = &BrokenText[0];
+                    startPos = 0;
                 }
                 else
-                    glyph.draw_flags.at(c) = GLD_NONE;
+                {
+                    txtLine = ml ? &BrokenText[i] : &Text;
+                    startPos = ml ? BrokenTextPositions[i] : 0;
+                }
+
+                font->draw(translations->fribidize(txtLine->c_str()), CurrentTextRect,
+                           OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+                           false, true, &localClipRect);
+                // draw with fribidize no matter what language, because in fribidize function,
+                // it will return the input pointer if (this->isRTLLanguage()) from Translations::isRTLText
+                // is false
+
+                // draw mark and marked text
+                if (focus && MarkBegin != MarkEnd && i >= hlineStart && i < hlineStart + hlineCount)
+                {
+
+                    s32 mbegin = 0, mend = 0;
+                    s32 lineStartPos = 0, lineEndPos = txtLine->size();
+
+                    if (i == hlineStart)
+                    {
+                        // highlight start is on this line
+                        s = txtLine->subString(0, realmbgn - startPos);
+                        mbegin = font->getDimension(s.c_str()).Width;
+
+                        // deal with kerning
+                        mbegin += font->getKerningWidth(
+                            &((*txtLine)[realmbgn - startPos]),
+                            realmbgn - startPos > 0 ? &((*txtLine)[realmbgn - startPos - 1]) : 0);
+
+                        lineStartPos = realmbgn - startPos;
+                    }
+                    if (i == hlineStart + hlineCount - 1)
+                    {
+                        // highlight end is on this line
+                        s2 = txtLine->subString(0, realmend - startPos);
+                        mend = font->getDimension(s2.c_str()).Width;
+                        lineEndPos = (s32)s2.size();
+                    }
+                    else
+                        mend = font->getDimension(txtLine->c_str()).Width;
+
+                    CurrentTextRect.UpperLeftCorner.X += mbegin;
+                    CurrentTextRect.LowerRightCorner.X = CurrentTextRect.UpperLeftCorner.X + mend - mbegin;
+
+                    // draw mark
+                    skin->draw2DRectangle(this, skin->getColor(EGDC_HIGH_LIGHT), CurrentTextRect, &localClipRect);
+
+                    // draw marked text
+                    s = txtLine->subString(lineStartPos, lineEndPos - lineStartPos);
+
+                    if (s.size())
+                        font->draw(s.c_str(), CurrentTextRect,
+                            OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_HIGH_LIGHT_TEXT),
+                            false, true, &localClipRect);
+
+                }
             }
+
+            // Return the override color information to its previous settings.
+            OverrideColorEnabled = prevOver;
+            OverrideColor = prevColor;
         }
-        font->draw(ct, CurrentTextRect,
-            OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-            false, true, &localClipRect);
-    }
-    else
-    {
-        for (unsigned i = 0; i < m_glyph_layouts.size(); i++)
+
+        // draw cursor
+
+        if (WordWrap || MultiLine)
         {
-            GlyphLayout& glyph = m_glyph_layouts[i];
-            auto& cluster = glyph.cluster;
-            for (unsigned c = 0; c < glyph.cluster.size(); c++)
-            {
-                if (realmbgn != realmend)
-                {
-                    if (cluster[c] >= realmbgn && cluster[c] < realmend)
-                        glyph.draw_flags.at(c) = GLD_MARKED;
-                }
-                else if (!PasswordBox && realcbgn != realcend)
-                {
-                    if (cluster[c] >= realcbgn && cluster[c] < realcend)
-                        glyph.draw_flags.at(c) = GLD_COMPOSING;
-                }
-                else
-                    glyph.draw_flags.at(c) = GLD_NONE;
-            }
+            cursorLine = getLineFromPos(CursorPos);
+            txtLine = &BrokenText[cursorLine];
+            startPos = BrokenTextPositions[cursorLine];
         }
-        font->draw(m_glyph_layouts, CurrentTextRect,
-            OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
-            false, true, &localClipRect);
-    }
+        s = txtLine->subString(0,CursorPos-startPos);
+        charcursorpos = font->getDimension(s.c_str()).Width ;
+        // + font->getKerningWidth(L"_", CursorPos-startPos > 0 ? &((*txtLine)[CursorPos-startPos-1]) : 0);
 
-    // Reset draw flags
-    for (unsigned i = 0; i < m_glyph_layouts.size(); i++)
-    {
-        GlyphLayout& glyph = m_glyph_layouts[i];
-        std::fill(glyph.draw_flags.begin(), glyph.draw_flags.end(), GLD_NONE);
-    }
+        if (focus && (getTime() - BlinkStartTime) % 2 == 0 && !m_rtl)
+        {
+            //setTextRect(cursorLine);
+            //CurrentTextRect.UpperLeftCorner.X += charcursorpos;
 
-    // draw cursor
-    uint64_t time_ms = StkTime::getMonoTimeMs();
-    if (focus &&
-        ((time_ms / 600) % 2 == 0 || m_force_show_cursor_time > time_ms))
-    {
-        core::rect< s32 > caret_rect = CurrentTextRect;
-        caret_rect.UpperLeftCorner.X += m_cursor_distance - 1;
-        caret_rect.LowerRightCorner.X = caret_rect.UpperLeftCorner.X + 2;
-        GL32_draw2DRectangle(video::SColor(255, 0, 0, 0), caret_rect);
-    }
+            setTextRect(0);
 
-    // Return the override color information to its previous settings.
-    OverrideColorEnabled = prevOver;
-    OverrideColor = prevColor;
+            core::rect< s32 > caret_rect = CurrentTextRect;
+            caret_rect.UpperLeftCorner.X += charcursorpos - 1;
+            caret_rect.LowerRightCorner.X = caret_rect.UpperLeftCorner.X + 2;
+            GL32_draw2DRectangle( video::SColor(255,0,0,0), caret_rect );
+
+            /*
+            font->draw(L"_", CurrentTextRect,
+                OverrideColorEnabled ? OverrideColor : skin->getColor(EGDC_BUTTON_TEXT),
+                false, true, &localClipRect);
+             */
+        }
+    }
 
     // draw children
     IGUIElement::draw();
@@ -1012,23 +1167,13 @@ void CGUIEditBox::draw()
 
 
 //! Sets the new caption of this element.
-void CGUIEditBox::setText(const core::stringw& text)
+void CGUIEditBox::setText(const wchar_t* text)
 {
-    m_edit_text = StringUtils::wideToUtf32(text);
-    updateGlyphLayouts();
-    m_mark_begin = m_mark_end = m_cursor_pos = getTextCount();
-    m_scroll_pos = 0;
-    calculateScrollPos();
-#ifdef ANDROID
-        if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-            GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
-            irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
-        {
-            CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
-                                                irr_driver->getDevice());
-            dl->fromSTKEditBox(getID(), Text, m_mark_begin, m_mark_end, m_type);
-        }
-#endif
+    Text = text;
+    if (u32(CursorPos) > Text.size())
+        CursorPos = Text.size();
+    HScrollPos = 0;
+    breakText();
 }
 
 
@@ -1053,19 +1198,19 @@ bool CGUIEditBox::isAutoScrollEnabled() const
 //! \return Returns the size in pixels of the text
 core::dimension2du CGUIEditBox::getTextDimension()
 {
-    IGUISkin* skin = Environment->getSkin();
-    if (!skin)
-        return core::dimension2du(0, 0);
+    core::rect<s32> ret;
 
-    IGUIFont* font = OverrideFont;
-    if (!OverrideFont)
-        font = skin->getFont();
+    setTextRect(0);
+    ret = CurrentTextRect;
 
-    if (!font)
-        return core::dimension2du(0, 0);
+    for (u32 i=1; i < BrokenText.size(); ++i)
+    {
+        setTextRect(i);
+        ret.addInternalPoint(CurrentTextRect.UpperLeftCorner);
+        ret.addInternalPoint(CurrentTextRect.LowerRightCorner);
+    }
 
-    return gui::getGlyphLayoutsDimension(m_glyph_layouts,
-        font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+    return core::dimension2du(ret.getSize());
 }
 
 
@@ -1074,16 +1219,17 @@ core::dimension2du CGUIEditBox::getTextDimension()
 //! infinity.
 void CGUIEditBox::setMax(u32 max)
 {
-    m_max_chars = max;
-    if (m_max_chars != 0 && m_edit_text.size() > m_max_chars)
-        m_edit_text.substr(0, m_max_chars);
+    Max = max;
+
+    if (Text.size() > Max && Max != 0)
+        Text = Text.subString(0, Max);
 }
 
 
 //! Returns maximum amount of characters, previously set by setMax();
 u32 CGUIEditBox::getMax() const
 {
-    return m_max_chars;
+    return Max;
 }
 
 
@@ -1092,31 +1238,38 @@ bool CGUIEditBox::processMouse(const SEvent& event)
     switch(event.MouseInput.Event)
     {
     case irr::EMIE_LMOUSE_LEFT_UP:
-        if (Environment->hasFocus(this))
+        if (Environment->hasFocus(this) && !m_rtl)
         {
-            m_cursor_pos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-            s32 old_cursor = m_cursor_pos;
-            correctCursor(m_cursor_pos, old_cursor < m_mark_begin);
-            correctCursor(m_mark_begin, old_cursor > m_mark_begin);
+            CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+            if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            {
+                if (CursorPos > 0)
+                    --CursorPos;
+            }
+#endif
             if (MouseMarking)
-                setTextMarkers(m_mark_begin, m_cursor_pos);
-
+            {
+                setTextMarkers( MarkBegin, CursorPos );
+            }
             MouseMarking = false;
             calculateScrollPos();
             return true;
-        }
-        else
-        {
-            MouseMarking = false;
         }
         break;
     case irr::EMIE_MOUSE_MOVED:
         {
             if (MouseMarking)
             {
-                m_cursor_pos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-                correctCursor(m_cursor_pos, m_cursor_pos < m_mark_begin);
-                setTextMarkers(m_mark_begin, m_cursor_pos);
+                CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+                if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+                {
+                    if (CursorPos > 0)
+                        --CursorPos;
+                }
+#endif
+                setTextMarkers( MarkBegin, CursorPos );
                 calculateScrollPos();
                 return true;
             }
@@ -1125,42 +1278,66 @@ bool CGUIEditBox::processMouse(const SEvent& event)
     case EMIE_LMOUSE_PRESSED_DOWN:
         if (!Environment->hasFocus(this))
         {
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
+            BlinkStartTime = getTime();
             MouseMarking = true;
-            m_cursor_pos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-            correctCursor(m_cursor_pos, m_cursor_pos < m_mark_begin);
-            setTextMarkers(m_cursor_pos, m_cursor_pos);
+            CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+            if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+            {
+                if (CursorPos > 0)
+                    --CursorPos;
+            }
+#endif
+            setTextMarkers(CursorPos, CursorPos );
             calculateScrollPos();
 
             return true;
         }
-        else
+        else if (!m_rtl)
         {
             if (!AbsoluteClippingRect.isPointInside(
                 core::position2d<s32>(event.MouseInput.X, event.MouseInput.Y)))
             {
                 return false;
             }
-            
-            if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
+            else if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
             {
-                if (GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
-                    irr_driver->getDevice()->toggleOnScreenKeyboard(true, m_type);
-                else
-                    openScreenKeyboard();
+                openScreenKeyboard();
+                return true;
             }
+#ifdef ANDROID
+            else if (UserConfigParams::m_screen_keyboard == 3)
+            {
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                {
+                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                    dl->showKeyboard(true);
+                }
+            }
+#endif
+            else
+            {
+                // move cursor
+                CursorPos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
 
-            // move cursor
-            m_cursor_pos = getCursorPos(event.MouseInput.X, event.MouseInput.Y);
-            s32 new_mark_begin = m_mark_begin;
-            if (!MouseMarking)
-                new_mark_begin = m_cursor_pos;
+#if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
+                if (UTF16_IS_SURROGATE_LO(Text[CursorPos]))
+                {
+                    if (CursorPos > 0)
+                        --CursorPos;
+                }
+#endif
+                s32 newMarkBegin = MarkBegin;
+                if (!MouseMarking)
+                    newMarkBegin = CursorPos;
 
-            MouseMarking = true;
-            setTextMarkers(new_mark_begin, m_cursor_pos);
-            calculateScrollPos();
+                MouseMarking = true;
+                setTextMarkers( newMarkBegin, CursorPos);
+                calculateScrollPos();
 
-            return true;
+                return true;
+            }
         }
     default:
         break;
@@ -1174,17 +1351,157 @@ s32 CGUIEditBox::getCursorPos(s32 x, s32 y)
 {
     IGUIFont* font = OverrideFont;
     IGUISkin* skin = Environment->getSkin();
-    if (!skin)
-        return 0;
     if (!OverrideFont)
         font = skin->getFont();
 
-    x -= AbsoluteRect.UpperLeftCorner.X;
-    x += m_scroll_pos;
-    if (x < 0)
-        x = 0;
-    return getCurosrFromDimension((f32)x, (f32)y, m_glyph_layouts, font->getHeightPerLine(),
-        font->getInverseShaping(), font->getScale());
+    const u32 lineCount = (WordWrap || MultiLine) ? BrokenText.size() : 1;
+
+    core::stringw *txtLine=0;
+    s32 startPos=0;
+    x+=3;
+
+    for (u32 i=0; i < lineCount; ++i)
+    {
+        setTextRect(i);
+        if (i == 0 && y < CurrentTextRect.UpperLeftCorner.Y)
+            y = CurrentTextRect.UpperLeftCorner.Y;
+        if (i == lineCount - 1 && y > CurrentTextRect.LowerRightCorner.Y )
+            y = CurrentTextRect.LowerRightCorner.Y;
+
+        // is it inside this region?
+        if (y >= CurrentTextRect.UpperLeftCorner.Y && y <= CurrentTextRect.LowerRightCorner.Y)
+        {
+            // we've found the clicked line
+            txtLine = (WordWrap || MultiLine) ? &BrokenText[i] : &Text;
+            startPos = (WordWrap || MultiLine) ? BrokenTextPositions[i] : 0;
+            break;
+        }
+    }
+
+    if (x < CurrentTextRect.UpperLeftCorner.X)
+        x = CurrentTextRect.UpperLeftCorner.X;
+
+    s32 idx = txtLine ? font->getCharacterFromPos(txtLine->c_str(), x - CurrentTextRect.UpperLeftCorner.X) : -1;
+
+    // click was on or left of the line
+    if (idx != -1)
+        return idx + startPos;
+
+    // click was off the right edge of the line, go to end.
+    return txtLine->size() + startPos;
+}
+
+
+//! Breaks the single text line.
+void CGUIEditBox::breakText()
+{
+    IGUISkin* skin = Environment->getSkin();
+
+    if ((!WordWrap && !MultiLine) || !skin)
+        return;
+
+    BrokenText.clear(); // need to reallocate :/
+    BrokenTextPositions.set_used(0);
+
+    IGUIFont* font = OverrideFont;
+    if (!OverrideFont)
+        font = skin->getFont();
+
+    if (!font)
+        return;
+
+    LastBreakFont = font;
+
+    core::stringw line;
+    core::stringw word;
+    core::stringw whitespace;
+    s32 lastLineStart = 0;
+    s32 size = Text.size();
+    s32 length = 0;
+    s32 elWidth = RelativeRect.getWidth() - 6;
+
+    for (s32 i=0; i<size; ++i)
+    {
+        wchar_t c = Text[i];
+        bool lineBreak = false;
+
+        if (c == L'\r') // Mac or Windows breaks
+        {
+            lineBreak = true;
+            c = ' ';
+            if (Text[i+1] == L'\n') // Windows breaks
+            {
+                Text.erase(i+1);
+                --size;
+            }
+        }
+        else if (c == L'\n') // Unix breaks
+        {
+            lineBreak = true;
+            c = ' ';
+        }
+
+        // don't break if we're not a multi-line edit box
+        if (!MultiLine)
+            lineBreak = false;
+
+        if (c == L' ' || c == 0 || i == (size-1))
+        {
+            if (word.size())
+            {
+                // here comes the next whitespace, look if
+                // we can break the last word to the next line.
+                s32 whitelgth = font->getDimension(whitespace.c_str()).Width;
+                s32 worldlgth = font->getDimension(word.c_str()).Width;
+
+                if (WordWrap && length + worldlgth + whitelgth > elWidth)
+                {
+                    // break to next line
+                    length = worldlgth;
+                    BrokenText.push_back(line);
+                    BrokenTextPositions.push_back(lastLineStart);
+                    lastLineStart = i - (s32)word.size();
+                    line = word;
+                }
+                else
+                {
+                    // add word to line
+                    line += whitespace;
+                    line += word;
+                    length += whitelgth + worldlgth;
+                }
+
+                word = L"";
+                whitespace = L"";
+            }
+
+            whitespace += c;
+
+            // compute line break
+            if (lineBreak)
+            {
+                line += whitespace;
+                line += word;
+                BrokenText.push_back(line);
+                BrokenTextPositions.push_back(lastLineStart);
+                lastLineStart = i+1;
+                line = L"";
+                word = L"";
+                whitespace = L"";
+                length = 0;
+            }
+        }
+        else
+        {
+            // yippee this is a word..
+            word += c;
+        }
+    }
+
+    line += whitespace;
+    line += word;
+    BrokenText.push_back(line);
+    BrokenTextPositions.push_back(lastLineStart);
 }
 
 
@@ -1202,8 +1519,18 @@ void CGUIEditBox::setTextRect(s32 line)
         return;
 
     // get text dimension
-    d = gui::getGlyphLayoutsDimension(m_glyph_layouts,
-        font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+    const u32 lineCount = (WordWrap || MultiLine) ? BrokenText.size() : 1;
+    if (WordWrap || MultiLine)
+    {
+        d = font->getDimension(BrokenText[line].c_str());
+    }
+    else
+    {
+        d = font->getDimension(Text.c_str());
+        d.Height = AbsoluteRect.getHeight();
+    }
+    d.Height += font->getKerningHeight();
+
     // justification
     switch (HAlign)
     {
@@ -1229,12 +1556,12 @@ void CGUIEditBox::setTextRect(s32 line)
     case EGUIA_CENTER:
         // align to v centre
         CurrentTextRect.UpperLeftCorner.Y =
-            (FrameRect.getHeight()/2) - (d.Height)/2 + d.Height*line;
+            (FrameRect.getHeight()/2) - (lineCount*d.Height)/2 + d.Height*line;
         break;
     case EGUIA_LOWERRIGHT:
         // align to bottom edge
         CurrentTextRect.UpperLeftCorner.Y =
-            FrameRect.getHeight() - d.Height + d.Height*line;
+            FrameRect.getHeight() - lineCount*d.Height + d.Height*line;
         break;
     default:
         // align to top edge
@@ -1242,8 +1569,9 @@ void CGUIEditBox::setTextRect(s32 line)
         break;
     }
 
-    CurrentTextRect.UpperLeftCorner.X  -= m_scroll_pos;
-    CurrentTextRect.LowerRightCorner.X -= m_scroll_pos;
+    CurrentTextRect.UpperLeftCorner.X  -= HScrollPos;
+    CurrentTextRect.LowerRightCorner.X -= HScrollPos;
+    CurrentTextRect.UpperLeftCorner.Y  -= VScrollPos;
     CurrentTextRect.LowerRightCorner.Y = CurrentTextRect.UpperLeftCorner.Y + d.Height;
 
     CurrentTextRect += FrameRect.UpperLeftCorner;
@@ -1251,176 +1579,136 @@ void CGUIEditBox::setTextRect(s32 line)
 }
 
 
-void CGUIEditBox::inputChar(char32_t c)
+s32 CGUIEditBox::getLineFromPos(s32 pos)
+{
+    if (!WordWrap && !MultiLine)
+        return 0;
+
+    s32 i=0;
+    while (i < (s32)BrokenTextPositions.size())
+    {
+        if (BrokenTextPositions[i] > pos)
+            return i-1;
+        ++i;
+    }
+    return (s32)BrokenTextPositions.size() - 1;
+}
+
+
+void CGUIEditBox::inputChar(wchar_t c)
 {
     if (!isEnabled())
         return;
 
-    // Ignore unsupported characters
-    if (c < 32)
-        return;
-
-    if (c < 65536)
+    if (c != 0)
     {
-        wchar_t wc = c & 65535;
-        if (utf8::internal::is_surrogate(wc) || !m_surrogate_chars.empty())
+        if (Text.size() < Max || Max == 0)
         {
-            // Handle utf16 to 32 conversion together later, including any emoji
-            // joint character (which is not surrogate)
-            m_surrogate_chars.push_back(wc);
-            return;
+            core::stringw s;
+
+            if (MarkBegin != MarkEnd)
+            {
+                // replace marked text
+                const s32 realmbgn = MarkBegin < MarkEnd ? MarkBegin : MarkEnd;
+                const s32 realmend = MarkBegin < MarkEnd ? MarkEnd : MarkBegin;
+
+                s = Text.subString(0, realmbgn);
+                s.append(c);
+                s.append( Text.subString(realmend, Text.size()-realmend) );
+                Text = s;
+                CursorPos = realmbgn+1;
+            }
+            else
+            {
+                // add new character
+                s = Text.subString(0, CursorPos);
+                s.append(c);
+                s.append( Text.subString(CursorPos, Text.size()-CursorPos) );
+                Text = s;
+                ++CursorPos;
+            }
+
+            BlinkStartTime = getTime();
+            setTextMarkers(0, 0);
         }
     }
-
-    if ((u32)getTextCount() < m_max_chars || m_max_chars == 0)
-    {
-        std::u32string sub_str;
-
-        if (m_mark_begin != m_mark_end)
-        {
-            // replace marked text
-            const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-            const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
-
-            sub_str = m_edit_text.substr(0, realmbgn);
-            sub_str += c;
-            sub_str += m_edit_text.substr(realmend, m_edit_text.size() - realmend);
-            m_edit_text = sub_str;
-            m_cursor_pos = realmbgn + 1;
-        }
-        else
-        {
-            // add new character
-            sub_str = m_edit_text.substr(0, m_cursor_pos);
-            sub_str += c;
-            sub_str += m_edit_text.substr(m_cursor_pos, m_edit_text.size() - m_cursor_pos);
-            m_edit_text = sub_str;
-            m_cursor_pos++;
-        }
-
-        m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
-        updateGlyphLayouts();
-        setTextMarkers(0, 0);
-        calculateScrollPos();
-    }
+    breakText();
+    sendGuiEvent(EGET_EDITBOX_CHANGED);
+    calculateScrollPos();
 }
 
-void CGUIEditBox::updateCursorDistance()
-{
-    m_cursor_distance = 0;
-    // Update cursor position
-    IGUISkin* skin = Environment->getSkin();
-    if (!skin)
-        return;
-    IGUIFont* font = OverrideFont ? OverrideFont : skin->getFont();
-    if (!font)
-        return;
-    if (m_glyph_layouts.empty())
-        return;
-    if (m_cursor_pos != 0)
-    {
-        m_cursor_distance = getGlyphLayoutsDimension(m_glyph_layouts,
-            font->getHeightPerLine(), font->getInverseShaping(),
-            font->getScale(), m_cursor_pos - 1).Width;
-    }
-    else if ((m_glyph_layouts[0].flags & GLF_RTL_LINE) != 0)
-    {
-        // For rtl line the cursor in the begining is total width
-        m_cursor_distance = getGlyphLayoutsDimension(m_glyph_layouts,
-            font->getHeightPerLine(), font->getInverseShaping(),
-            font->getScale()).Width;
-    }
-}
 
 void CGUIEditBox::calculateScrollPos()
 {
 #ifndef SERVER_ONLY
-    // Update cursor position
-    updateCursorDistance();
-
-    IGUISkin* skin = Environment->getSkin();
-    if (!skin)
-        return;
-    IGUIFont* font = OverrideFont ? OverrideFont : skin->getFont();
-    if (!font)
-        return;
-
     if (!AutoScroll)
         return;
-    setTextRect(0);
 
-    s32 cStart = CurrentTextRect.UpperLeftCorner.X + m_scroll_pos +
-        m_cursor_distance;
-    // Reserver 2x font height at border to see the clipped text
-    s32 cEnd = cStart + GUIEngine::getFontHeight() * 2;
+    // calculate horizontal scroll position
+    s32 cursLine = getLineFromPos(CursorPos);
+    setTextRect(cursLine);
 
-    if (FrameRect.LowerRightCorner.X < cEnd)
-        m_scroll_pos = cEnd - FrameRect.LowerRightCorner.X;
-    else if (FrameRect.UpperLeftCorner.X > cStart)
-        m_scroll_pos = cStart - FrameRect.UpperLeftCorner.X;
+    // don't do horizontal scrolling when wordwrap is enabled.
+    if (!WordWrap)
+    {
+        // get cursor position
+        IGUISkin* skin = Environment->getSkin();
+        if (!skin)
+            return;
+        IGUIFont* font = OverrideFont ? OverrideFont : skin->getFont();
+        if (!font)
+            return;
+
+        core::stringw *txtLine = MultiLine ? &BrokenText[cursLine] : &Text;
+        s32 cPos = MultiLine ? CursorPos - BrokenTextPositions[cursLine] : CursorPos;
+
+        s32 cStart = CurrentTextRect.UpperLeftCorner.X + HScrollPos +
+            font->getDimension(txtLine->subString(0, cPos).c_str()).Width;
+
+        s32 cEnd = cStart + font->getDimension(L"_ ").Width;
+
+        if (FrameRect.LowerRightCorner.X < cEnd)
+            HScrollPos = cEnd - FrameRect.LowerRightCorner.X;
+        else if (FrameRect.UpperLeftCorner.X > cStart)
+            HScrollPos = cStart - FrameRect.UpperLeftCorner.X;
+        else
+            HScrollPos = 0;
+
+        // todo: adjust scrollbar
+    }
+
+    // vertical scroll position
+    if (FrameRect.LowerRightCorner.Y < CurrentTextRect.LowerRightCorner.Y + VScrollPos)
+        VScrollPos = CurrentTextRect.LowerRightCorner.Y - FrameRect.LowerRightCorner.Y + VScrollPos;
+
+    else if (FrameRect.UpperLeftCorner.Y > CurrentTextRect.UpperLeftCorner.Y + VScrollPos)
+        VScrollPos = CurrentTextRect.UpperLeftCorner.Y - FrameRect.UpperLeftCorner.Y + VScrollPos;
     else
-        m_scroll_pos = 0;
+        VScrollPos = 0;
 
     // todo: adjust scrollbar
-    // calculate the position of input composition window
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-    m_ic_pos.X = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance;
-    // bug? The text is always drawn in the height of the center. SetTextAlignment() doesn't influence.
-    m_ic_pos.Y = AbsoluteRect.getCenter().Y + (Border ? 3 : 0);
     if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
     {
         CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
                                                        irr_driver->getDevice());
         if (dl)
         {
-            dl->setIMELocation(m_ic_pos);
+            dl->setIMELocation(calculateICPos());
         }
     }
-#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-    m_ic_pos.X = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance;
-    m_ic_pos.Y = CurrentTextRect.UpperLeftCorner.Y;
-
-    // We need a native windows api caret for ime language chooser
-    // positioning, we always hide it though and draw with our own
-    // opengl caret later
-    CIrrDeviceWin32* win = NULL;
-    if (irr_driver->getDevice()->getType() == irr::EIDT_WIN32)
-        win = dynamic_cast<CIrrDeviceWin32*>(irr_driver->getDevice());
-    if (!isVisible() || !win)
-        return;
-
-    CreateCaret(win->getHandle(), NULL, 1, GUIEngine::getFontHeight());
-    SetCaretPos(m_ic_pos.X, m_ic_pos.Y);
-    HideCaret(win->getHandle());
 #endif
-
 #endif   // SERVER_ONLY
 }
 
 //! set text markers
 void CGUIEditBox::setTextMarkers(s32 begin, s32 end)
 {
-    if (GUIEngine::ScreenKeyboard::isActive())
+    if ( begin != MarkBegin || end != MarkEnd )
     {
-        m_mark_begin = m_mark_end = 0;
-        return;
-    }
-
-    if (begin != m_mark_begin || end != m_mark_end)
-    {
-        m_mark_begin = begin;
-        m_mark_end = end;
+        MarkBegin = begin;
+        MarkEnd = end;
         sendGuiEvent(EGET_EDITBOX_MARKING_CHANGED);
-#ifdef ANDROID
-        if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
-            GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
-            irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
-        {
-            CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
-                                                irr_driver->getDevice());
-            dl->fromSTKEditBox(getID(), Text, m_mark_begin, m_mark_end, m_type);
-        }
-#endif
     }
 }
 
@@ -1447,11 +1735,13 @@ void CGUIEditBox::serializeAttributes(io::IAttributes* out, io::SAttributeReadWr
     out->addBool  ("OverrideColorEnabled",OverrideColorEnabled );
     out->addColor ("OverrideColor",       OverrideColor);
     // out->addFont("OverrideFont",OverrideFont);
-    out->addInt   ("MaxChars",            m_max_chars);
+    out->addInt   ("MaxChars",            Max);
+    out->addBool  ("WordWrap",            WordWrap);
+    out->addBool  ("MultiLine",           MultiLine);
     out->addBool  ("AutoScroll",          AutoScroll);
     out->addBool  ("PasswordBox",         PasswordBox);
     core::stringw ch = L" ";
-    ch[0] = (wchar_t)PasswordChar;
+    ch[0] = PasswordChar;
     out->addString("PasswordChar",        ch.c_str());
     out->addEnum  ("HTextAlign",          HAlign, GUIAlignmentNames);
     out->addEnum  ("VTextAlign",          VAlign, GUIAlignmentNames);
@@ -1468,6 +1758,8 @@ void CGUIEditBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadW
     setOverrideColor(in->getAttributeAsColor("OverrideColor"));
     enableOverrideColor(in->getAttributeAsBool("OverrideColorEnabled"));
     setMax(in->getAttributeAsInt("MaxChars"));
+    setWordWrap(in->getAttributeAsBool("WordWrap"));
+    setMultiLine(in->getAttributeAsBool("MultiLine"));
     setAutoScroll(in->getAttributeAsBool("AutoScroll"));
     core::stringw ch = in->getAttributeAsStringW("PasswordChar");
 
@@ -1484,120 +1776,16 @@ void CGUIEditBox::deserializeAttributes(io::IAttributes* in, io::SAttributeReadW
 
 void CGUIEditBox::openScreenKeyboard()
 {
-    // If the device has native on screen keyboard, always use it
-    if (GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
+    if (UserConfigParams::m_screen_keyboard == 3)
         return;
-
+    
     if (GUIEngine::ScreenKeyboard::getCurrent() != NULL)
         return;
-
-    GUIEngine::ScreenKeyboard* k = new GUIEngine::ScreenKeyboard(1.0f, 0.40f, this);
-    k->init();
-}
-
-// Real copying is happening in text_box_widget.cpp with static function
-void CGUIEditBox::fromAndroidEditText(const std::u32string& text, int start,
-                                      int end, int composing_start,
-                                      int composing_end)
-{
-    // When focus of this element is lost, this will be set to false again
-    m_from_android_edittext = true;
-    // Prevent invalid start or end
-    if ((unsigned)end > text.size())
-    {
-        end = (int)text.size();
-        start = end;
-    }
-    m_edit_text = text;
-    updateGlyphLayouts();
-    m_cursor_pos = end;
-    m_composing_start = 0;
-    m_composing_end = 0;
-
-    m_mark_begin = start;
-    m_mark_end = end;
-
-    if (composing_start != composing_end)
-    {
-        if (composing_start < 0)
-            composing_start = 0;
-        if (composing_end > end)
-            composing_end = end;
-        m_composing_start = composing_start;
-        m_composing_end = composing_end;
-    }
+    
+    CursorPos = Text.size();
+    setTextMarkers(CursorPos, CursorPos);
     calculateScrollPos();
+
+    new GUIEngine::ScreenKeyboard(0.98f, 0.30f, this);
 }
 
-void CGUIEditBox::updateGlyphLayouts()
-{
-#ifndef SERVER_ONLY
-    // Clear any unsupported characters
-    m_edit_text.erase(std::remove(m_edit_text.begin(), m_edit_text.end(),
-        U'\r'), m_edit_text.end());
-    m_edit_text.erase(std::remove(m_edit_text.begin(), m_edit_text.end(),
-        U'\t'), m_edit_text.end());
-    m_edit_text.erase(std::remove(m_edit_text.begin(), m_edit_text.end(),
-        U'\n'), m_edit_text.end());
-    m_glyph_layouts.clear();
-    if (PasswordBox)
-    {
-        font_manager->shape(std::u32string(m_edit_text.size(), PasswordChar),
-            m_glyph_layouts);
-    }
-    else
-        font_manager->shape(m_edit_text, m_glyph_layouts);
-    Text = StringUtils::utf32ToWide(m_edit_text);
-#endif
-}
-
-void CGUIEditBox::updateSurrogatePairText()
-{
-    if (!m_surrogate_chars.empty())
-    {
-        wchar_t last_char = m_surrogate_chars.back();
-        if (utf8::internal::is_trail_surrogate(last_char) ||
-            !utf8::internal::is_surrogate(last_char))
-        {
-            const s32 realmbgn = m_mark_begin < m_mark_end ? m_mark_begin : m_mark_end;
-            const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
-            m_surrogate_chars.push_back(0);
-            std::u32string result = StringUtils::wideToUtf32(m_surrogate_chars.data());
-            if (m_mark_begin == m_mark_end)
-            {
-                // insert text
-                std::u32string sub_str = m_edit_text.substr(0, m_cursor_pos);
-                sub_str += result;
-                sub_str += m_edit_text.substr(m_cursor_pos, m_edit_text.size() - m_cursor_pos);
-
-                if (m_max_chars == 0 || sub_str.size() <= m_max_chars) // thx to Fish FH for fix
-                {
-                    m_edit_text = sub_str;
-                    m_cursor_pos = m_cursor_pos + (s32)result.size();
-                }
-            }
-            else
-            {
-                // replace text
-                std::u32string sub_str = m_edit_text.substr(0, realmbgn);
-                sub_str += result;
-                sub_str += m_edit_text.substr(realmend, m_edit_text.size() - realmend);
-
-                if (m_max_chars == 0 || sub_str.size() <= m_max_chars) // thx to Fish FH for fix
-                {
-                    m_edit_text = sub_str;
-                    m_cursor_pos = realmbgn + (s32)sub_str.size();
-                }
-            }
-            m_force_show_cursor_time = StkTime::getMonoTimeMs() + 200;
-            updateGlyphLayouts();
-            setTextMarkers(0, 0);
-            if (m_cursor_pos > getTextCount())
-                m_cursor_pos = getTextCount();
-            if (m_cursor_pos < 0)
-                m_cursor_pos = 0;
-            calculateScrollPos();
-            m_surrogate_chars.clear();
-        }
-    }
-}

@@ -21,8 +21,6 @@
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 
-#include "irrString.h"
-
 #include <functional>
 
 namespace GUIEngine
@@ -57,7 +55,7 @@ private:
     bool m_self_destroy;
 
 public:
-    GeneralTextFieldDialog(const core::stringw& title, DismissCallback dm_cb,
+    GeneralTextFieldDialog(const wchar_t* title, DismissCallback dm_cb,
                            ValidationCallback val_cb = []
         (GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
         {

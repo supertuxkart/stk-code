@@ -320,8 +320,8 @@ SP::SPMesh* SlipStream::createMesh(Material* material, bool bonus_mesh)
             video::S3DVertexSkinnedMesh v;
             // Offset every 2nd circle by one half segment to increase
             // the number of planes so it looks better.
-            v.m_position.X =  sinf((i+(j%2)*0.5f)*f)*radius[j];
-            v.m_position.Y = -cosf((i+(j%2)*0.5f)*f)*radius[j];
+            v.m_position.X =  sin((i+(j%2)*0.5f)*f)*radius[j];
+            v.m_position.Y = -cos((i+(j%2)*0.5f)*f)*radius[j];
             v.m_position.Z = distance[j];
             // Enable texture matrix and dummy normal for visualization
             v.m_normal = 0x1FF << 10 | 1 << 30;

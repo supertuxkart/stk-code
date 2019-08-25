@@ -196,16 +196,6 @@ void TrackObjectManager::update(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-void TrackObjectManager::resetAfterRewind()
-{
-    TrackObject* curr;
-    for_in (curr, m_all_objects)
-    {
-        curr->resetAfterRewind();
-    }
-}   // resetAfterRewind
-
-// ----------------------------------------------------------------------------
 /** Does a raycast against all driveable objects. This way part of the track
  *  can be a physical object, and can e.g. be animated. A separate list of all
  *  driveable objects is maintained (in one case there were over 2000 bodies,
@@ -225,13 +215,12 @@ void TrackObjectManager::resetAfterRewind()
  *          variable will be set.
  
  */
-bool TrackObjectManager::castRay(const btVector3 &from,
-                                 const btVector3 &to, btVector3 *hit_point,
+void TrackObjectManager::castRay(const btVector3 &from, 
+                                 const btVector3 &to, btVector3 *hit_point, 
                                  const Material **material,
                                  btVector3 *normal,
                                  bool interpolate_normal) const
 {
-    bool result = false;
     float distance = 9999.9f;
     // If there was a hit already, compute the current distance
     if(*material)
@@ -260,11 +249,9 @@ bool TrackObjectManager::castRay(const btVector3 &from,
                 *hit_point = new_hit_point;
                 *normal    = new_normal;
                 distance   = new_distance;
-                result = true;
             }   // if new_distance < distance
         }   // if hit
     }   // for all track objects.
-    return result;
 }   // castRay
 
 // ----------------------------------------------------------------------------

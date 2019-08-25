@@ -52,16 +52,6 @@
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
-                    <label proportion="1" I18N="In the ui settings" text="Font size" align="center"/>
-                    <spacer width="2%" height="20"/>
-                    <div layout="horizontal-row" proportion="5" height="100%">
-                        <gauge id="font_size" width="60%"/>
-                    </div>
-                </div>
-
-                <spacer width="5" height="2%"/>
-
-                <div layout="horizontal-row" width="100%" height="fit">
                     <checkbox id="showfps"/>
                     <spacer width="1%" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Display FPS" word_wrap="true"/>

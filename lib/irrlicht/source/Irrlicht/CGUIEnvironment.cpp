@@ -403,7 +403,7 @@ void CGUIEnvironment::OnPostRender( u32 time )
 
 		pos.constrainTo(getAbsolutePosition());
 
-		ToolTip.Element = addStaticText(HoveredNoSubelement->getToolTipText(), pos, true, true, this, -1, true);
+		ToolTip.Element = addStaticText(HoveredNoSubelement->getToolTipText().c_str(), pos, true, true, this, -1, true);
 		ToolTip.Element->setOverrideColor(getSkin()->getColor(EGDC_TOOLTIP));
 		ToolTip.Element->setBackgroundColor(getSkin()->getColor(EGDC_TOOLTIP_BACKGROUND));
 		ToolTip.Element->setOverrideFont(getSkin()->getFont(EGDF_TOOLTIP));
@@ -573,6 +573,18 @@ bool CGUIEnvironment::postEventFromUser(const SEvent& event)
 
 		}
 		break;
+#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+	case EET_IMPUT_METHOD_EVENT:
+		{
+			// todo : if CGUIEdit has not focus, close input method. Use WM_NOTIFY message.
+			if (Focus)
+			{
+				_IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
+				return Focus->OnEvent(event);
+			}
+		}
+		break;
+#endif
 	default:
 		break;
 	} // end switch
@@ -1220,7 +1232,7 @@ IGUIColorSelectDialog* CGUIEnvironment::addColorSelectDialog(const wchar_t* titl
 
 
 //! adds a static text. The returned pointer must not be dropped.
-IGUIStaticText* CGUIEnvironment::addStaticText(const core::stringw& text,
+IGUIStaticText* CGUIEnvironment::addStaticText(const wchar_t* text,
 				const core::rect<s32>& rectangle,
 				bool border, bool wordWrap,
 				IGUIElement* parent, s32 id, bool background)

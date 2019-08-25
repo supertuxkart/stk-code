@@ -20,6 +20,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
+#include "utils/translation.hpp"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
@@ -84,6 +85,7 @@ void LabelWidget::add()
                                                           false, word_wrap, m_parent, -1);
         irrwidget->setTextRestrainedInside(false);
     }
+    irrwidget->setRightToLeft(translations->isRTLText(message));
 
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
@@ -115,15 +117,14 @@ void LabelWidget::add()
 
 // ----------------------------------------------------------------------------
 
-void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
+void LabelWidget::setText(const wchar_t *text, bool expandIfNeeded)
 {
     m_scroll_offset = 0;
 
     if (expandIfNeeded)
     {
         assert(m_element != NULL);
-        const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())
-            ->getDimension(text.c_str()).Width;
+        const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())->getDimension(text).Width;
         core::rect<s32> rect = m_element->getRelativePosition();
 
         if (rect.getWidth() < fwidth)
@@ -138,6 +139,8 @@ void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
         m_scroll_offset = (float)m_w;
 
     Widget::setText(text);
+    if (m_element)
+        getIrrlichtElement<IGUIStaticText>()->setRightToLeft(translations->isRTLText(getText()));
 }   // setText
 
 // ----------------------------------------------------------------------------

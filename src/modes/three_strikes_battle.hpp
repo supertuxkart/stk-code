@@ -38,20 +38,6 @@ class PhysicalObject;
 class ThreeStrikesBattle : public WorldWithRank
 {
 private:
-
-    // This struct is used to sort karts by time/lives
-    struct KartValues
-    {
-        int id;
-        int time;
-        int lives;
-
-        bool operator < (const KartValues& k) const
-        {
-            return (time == k.time) ? (lives < k.lives) : (time < k.time);
-        }   // operator <
-    }; // KartValues
-
     struct BattleInfo
     {
         int  m_lives;

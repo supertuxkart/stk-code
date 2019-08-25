@@ -24,6 +24,7 @@
 
 #include "guiengine/widgets/CGUISTKListBox.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 #include "IGUIElement.h"
@@ -56,9 +57,9 @@ namespace GUIEngine
         /** \brief if m_use_icons is true, this will contain the icon bank */
         irr::gui::STKModifiedSpriteBank* m_icons;
                 
-        PtrVector< Widget > m_header_elements;
+        PtrVector< ButtonWidget > m_header_elements;
         
-        Widget* m_selected_column;
+        ButtonWidget* m_selected_column;
         
         /** \brief whether this list is sorted in descending order */
         bool m_sort_desc;
@@ -73,17 +74,11 @@ namespace GUIEngine
         {
             irr::core::stringw m_text;
             int m_proportion;
-            irr::video::ITexture* m_texture;
+            
             Column(irr::core::stringw text, int proportion)
             {
                 m_text = text;
                 m_proportion = proportion;
-                m_texture = NULL;
-            }
-            Column(irr::video::ITexture* texture, int proportion)
-            {
-                m_proportion = proportion;
-                m_texture = texture;
             }
         };
         
@@ -279,7 +274,6 @@ namespace GUIEngine
           * \param proportion A column with proportion 2 will be twice as large as a column with proportion 1
           */
         void addColumn(irr::core::stringw col, int proportion=1) { m_header.push_back( Column(col, proportion) ); }
-        void addColumn(irr::video::ITexture* tex, int proportion=1) { m_header.push_back( Column(tex, proportion) ); }
 
         void setSortable(bool sortable) { m_sortable = sortable; }
     };

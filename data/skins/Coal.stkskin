@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!--
 
 Coal skin is based on Ocean skin
@@ -73,19 +72,19 @@ when the border that intersect at this corner are enabled.
 <element type="bottom-bar" image="coal/bottom_bar.png" />
 
 <element type="achievement-message" image="coal/achievement.png"
-      left_border="160" right_border="13" top_border="13" bottom_border="13"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0.3" vborder_out_portion="0"/>
 
 <element type="friend-message" image="coal/friend.png"
-      left_border="160" right_border="13" top_border="13" bottom_border="13"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="error-message" image="coal/error.png"
-      left_border="160" right_border="13" top_border="13" bottom_border="13"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="generic-message" image="coal/generic.png"
-      left_border="160" right_border="13" top_border="13" bottom_border="13"
+      left_border="128" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="button" state="neutral" image="coal/glassbutton.png"
@@ -114,7 +113,7 @@ when the border that intersect at this corner are enabled.
       left_border="20" right_border="20" top_border="0" bottom_border="0"
       preserve_h_aspect_ratios="true" />
 
-<element type="progress" state="neutral" image="common/progress_bg.png"
+<element type="progress" state="neutral" image="common/scrollbar_bg.png"
       left_border="31" right_border="31" top_border="15" bottom_border="15"
       preserve_h_aspect_ratios="true" />
       
@@ -229,13 +228,10 @@ when the border that intersect at this corner are enabled.
 <!-- Scrollbars. Background and thumb have no state (always neutral state).
      The buttons are the top and bottom arrows. Image must be top arrow, will
      be mirrorred for bottom. Buttons can be in neutral or down state.
-     Advanced stretching is only used for the background and thumb. -->
-<element type="scrollbar_background"          image="common/scrollbar_bg.png"
-    left_border="7" right_border="7" top_border="7" bottom_border="7"
-    hborder_out_portion="0.0" vborder_out_portion="0.0" />
-<element type="scrollbar_thumb"               image="coal/scrollbar_thumb.png"
-    left_border="7" right_border="7" top_border="7" bottom_border="7"
-    hborder_out_portion="-1.0" vborder_out_portion="-1.0" />
+     Advanced stretching is not used here.
+      -->
+<element type="scrollbar_background"          image="common/scrollbar_bg.png" />
+<element type="scrollbar_thumb"               image="coal/scrollbar_thumb.png" />
 <element type="scrollbar_button"              image="common/scrollbar_btn.png" />
 <element type="scrollbar_button" state="down" image="coal/scrollbar_btn_down.png" />
 
@@ -251,10 +247,6 @@ when the border that intersect at this corner are enabled.
 
 <!-- Stateless -->
 <element type="section" image="coal/glass_section.png"
-      left_border="15" right_border="15" top_border="15" bottom_border="15"
-      hborder_out_portion="0.0" vborder_out_portion="0.0" />
-
-<element type="section" state="selected" image="coal/glassbutton_focused.png"
       left_border="15" right_border="15" top_border="15" bottom_border="15"
       hborder_out_portion="0.0" vborder_out_portion="0.0" />
 
@@ -298,7 +290,6 @@ when the border that intersect at this corner are enabled.
 <color type="text_field" state="background" a="255" r="35" g="35" b="35" />
 <color type="text_field" state="background_focused" a="255" r="15" g="15" b="15" />
 <color type="text_field" state="background_deactivated" a="255" r="90" g="90" b="90" />
-<color type="text_field" state="background_marked" a="128" r="220" g="220" b="220" />
 <color type="text_field" state="neutral" a="255" r="35" g="35" b="35" />
 <color type="text_field" state="focused" a="255" r="15" g="15" b="15" />
 <color type="text_field" state="deactivated" a="255" r="90" g="90" b="90" />

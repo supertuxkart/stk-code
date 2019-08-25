@@ -3,11 +3,11 @@
     <unlock_list list="false"/>
     <track id="minigolf" laps="4" reverse="false"/>
     <mode major="single" minor="quickrace"/>
-    <requirements trophies="125"/>
+    <requirements trophies="130"/>
     
     <best>
         <karts number="10"/>
-        <requirements position="1" time="116"/>
+        <requirements position="1" time="122"/>
     </best>
     <hard>
         <karts number="9"/>

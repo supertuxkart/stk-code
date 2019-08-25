@@ -20,7 +20,6 @@
 #define HEADER_CHECK_LAP_HPP
 
 #include "tracks/check_structure.hpp"
-#include "utils/cpp2011.hpp"
 
 class XMLNode;
 class CheckManager;
@@ -41,9 +40,8 @@ public:
                  CheckLap(const XMLNode &node, unsigned int index);
     virtual     ~CheckLap() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
-                             int indx) OVERRIDE;
-    virtual void reset(const Track &track) OVERRIDE;
-    virtual bool triggeringCheckline() const OVERRIDE { return true; }
+                             int indx);
+    virtual void reset(const Track &track);
 };   // CheckLine
 
 #endif

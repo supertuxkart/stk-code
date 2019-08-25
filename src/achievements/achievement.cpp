@@ -25,10 +25,8 @@
 #include "config/player_manager.hpp"
 #include "guiengine/message_queue.hpp"
 #include "io/utf_writer.hpp"
-#include "io/xml_node.hpp"
-#include "online/xml_request.hpp"
+#include "config/player_manager.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <stdlib.h>

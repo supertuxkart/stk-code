@@ -36,8 +36,6 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <algorithm>
 #include <string>
@@ -228,7 +226,8 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
     // make kart lose a life, ignore if in profiling mode
     if (!UserConfigParams::m_arena_ai_stats)
         m_kart_info[kart_id].m_lives--;
-    else
+
+    if (UserConfigParams::m_arena_ai_stats)
         m_total_hit++;
 
     // record event
@@ -450,24 +449,45 @@ void ThreeStrikesBattle::updateKartRanks()
 
     const unsigned int NUM_KARTS = getNumKarts();
 
-    std::vector<KartValues> karts_list;
+    int *karts_list = new int[NUM_KARTS];
+    for( unsigned int n = 0; n < NUM_KARTS; ++n ) karts_list[n] = n;
+
+    bool sorted=false;
+    do
+    {
+        sorted = true;
+        for( unsigned int n = 0; n < NUM_KARTS-1; ++n )
+        {
+            const int this_karts_time =
+                  m_karts[karts_list[n]]->hasFinishedRace()
+                ? (int)m_karts[karts_list[n]]->getFinishTime()
+                : (int)WorldStatus::getTime();
+            const int next_karts_time =
+                   m_karts[karts_list[n+1]]->hasFinishedRace()
+                ? (int)m_karts[karts_list[n+1]]->getFinishTime()
+                : (int)WorldStatus::getTime();
+
+            // Swap if next kart survived longer or has more lives
+            bool swap = next_karts_time > this_karts_time ||
+                        m_kart_info[karts_list[n+1]].m_lives
+                        > m_kart_info[karts_list[n]].m_lives;
+
+            if(swap)
+            {
+                int tmp = karts_list[n+1];
+                karts_list[n+1] = karts_list[n];
+                karts_list[n] = tmp;
+                sorted = false;
+                break;
+            }
+        }   // for n = 0; n < NUM_KARTS-1
+    } while(!sorted);
+
     for( unsigned int n = 0; n < NUM_KARTS; ++n )
     {
-        KartValues k;
-        k.id = n;
-        k.time = m_karts[n]->hasFinishedRace() ? (int)m_karts[n]->getFinishTime()
-                                               : (int)WorldStatus::getTime();
-        k.lives = m_kart_info[n].m_lives;
-        karts_list.push_back(k);
+        setKartPosition(karts_list[n], n+1);
     }
-
-    std::sort(karts_list.rbegin(), karts_list.rend());
-
-    for( unsigned int n = 0; n < NUM_KARTS; ++n )
-    {
-        setKartPosition(karts_list[n].id, n+1);
-    }
-
+    delete [] karts_list;
     endSetKartPositions();
 }   // updateKartRank
 

@@ -127,6 +127,7 @@ namespace GUIEngine
         void hardResetAndGoToScreen()
         {
             if (m_game_mode != GAME) GUIEngine::getCurrentScreen()->tearDown();
+            m_menu_stack.clear();
 
             GUIEngine::clearScreenCache();
 

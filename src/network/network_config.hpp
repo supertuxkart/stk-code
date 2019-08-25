@@ -27,7 +27,6 @@
 #include "utils/no_copy.hpp"
 
 #include "irrString.h"
-#include <set>
 #include <tuple>
 #include <vector>
 
@@ -91,13 +90,6 @@ private:
 
     uint32_t m_joined_server_version;
 
-    /** Set by client or server which is required to be the same. */
-    int m_state_frequency;
-
-    /** List of server capabilities set when joining it, to determine features
-     *  available in same version. */
-    std::set<std::string> m_server_capabilities;
-
 public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -151,9 +143,9 @@ public:
     // ------------------------------------------------------------------------
     void unsetNetworking();
     // ------------------------------------------------------------------------
-    std::vector<std::tuple<InputDevice*, PlayerProfile*,
+    const std::vector<std::tuple<InputDevice*, PlayerProfile*,
                                  PerPlayerDifficulty> >&
-                        getNetworkPlayers()       { return m_network_players; }
+                        getNetworkPlayers() const { return m_network_players; }
     // ------------------------------------------------------------------------
     bool isAddingNetworkPlayers() const
                                      { return !m_done_adding_network_players; }
@@ -228,23 +220,6 @@ public:
     void setJoinedServerVersion(uint32_t v)    { m_joined_server_version = v; }
     // ------------------------------------------------------------------------
     uint32_t getJoinedServerVersion() const { return m_joined_server_version; }
-    // ------------------------------------------------------------------------
-    void clearActivePlayersForClient() const;
-    // ------------------------------------------------------------------------
-    void setStateFrequency(int frequency)    { m_state_frequency = frequency; }
-    // ------------------------------------------------------------------------
-    int getStateFrequency() const                 { return m_state_frequency; }
-    // ------------------------------------------------------------------------
-    bool roundValuesNow() const;
-    // ------------------------------------------------------------------------
-    void setServerCapabilities(std::set<std::string>& caps)
-                                   { m_server_capabilities = std::move(caps); }
-    // ------------------------------------------------------------------------
-    void clearServerCapabilities()           { m_server_capabilities.clear(); }
-    // ------------------------------------------------------------------------
-    const std::set<std::string>& getServerCapabilities() const
-                                              { return m_server_capabilities; }
-
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

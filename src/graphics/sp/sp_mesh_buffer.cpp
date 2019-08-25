@@ -27,8 +27,6 @@
 #include "utils/mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
-#include <set>
-
 namespace SP
 {
 // ----------------------------------------------------------------------------

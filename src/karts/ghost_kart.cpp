@@ -169,6 +169,7 @@ void GhostKart::update(int ticks)
     else if (attach_type != m_attachment->getType())
     {
         m_attachment->set(attach_type, attach_ticks, NULL,
+            /*disable_swatter_animation*/false,
             /*set_by_rewind_parachute*/true);
     }
 

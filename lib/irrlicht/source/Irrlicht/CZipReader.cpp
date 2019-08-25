@@ -17,7 +17,6 @@ extern "C" void bz_internal_error(int errorCode)
 #include "CFileList.h"
 #include "CReadFile.h"
 #include "coreutil.h"
-#include "utils/string_utils.hpp"
 
 #include "IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_ZLIB_
@@ -458,7 +457,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 	//99 - AES encryption, WinZip 9
 
 	const SZipFileEntry &e = FileInfo[Files[index].ID];
-	wchar_t buf[256];
+	wchar_t buf[64];
 	s16 actualCompressionMethod=e.header.CompressionMethod;
 	IReadFile* decrypted=0;
 	u8* decryptedBuf=0;
@@ -481,7 +480,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 			c8* pBuf = new c8[ uncompressedSize ];
 			if (!pBuf)
 			{
-				swprintf ( buf, 256, L"Not enough memory for decompressing %s", StringUtils::utf8ToWide(Files[index].FullName.c_str()).c_str());
+				swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
 				os::Printer::log( buf, ELL_ERROR);
 				if (decrypted)
 					decrypted->drop();
@@ -494,7 +493,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 				pcData = new u8[decryptedSize];
 				if (!pcData)
 				{
-					swprintf ( buf, 256, L"Not enough memory for decompressing %s", StringUtils::utf8ToWide(Files[index].FullName.c_str()).c_str());
+					swprintf ( buf, 64, L"Not enough memory for decompressing %s", Files[index].FullName.c_str() );
 					os::Printer::log( buf, ELL_ERROR);
 					delete [] pBuf;
 					return 0;
@@ -535,7 +534,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 
 			if (err != Z_OK)
 			{
-				swprintf ( buf, 256, L"Error decompressing %s", StringUtils::utf8ToWide(Files[index].FullName.c_str()).c_str());
+				swprintf ( buf, 64, L"Error decompressing %s", Files[index].FullName.c_str() );
 				os::Printer::log( buf, ELL_ERROR);
 				delete [] pBuf;
 				return 0;
@@ -562,7 +561,7 @@ IReadFile* CZipReader::createAndOpenFile(u32 index)
 		os::Printer::log("Decryption support not enabled. File cannot be read.", ELL_ERROR);
 		return 0;
 	default:
-		swprintf ( buf, 256, L"file has unsupported compression method. %s", StringUtils::utf8ToWide(Files[index].FullName.c_str()).c_str());
+		swprintf ( buf, 64, L"file has unsupported compression method. %s", Files[index].FullName.c_str() );
 		os::Printer::log( buf, ELL_ERROR);
 		return 0;
 	};

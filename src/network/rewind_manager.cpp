@@ -25,12 +25,8 @@
 #include "network/protocols/game_protocol.hpp"
 #include "network/rewinder.hpp"
 #include "network/rewind_info.hpp"
-#include "network/smooth_network_body.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
-#include "tracks/check_manager.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_object_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
@@ -83,8 +79,9 @@ void RewindManager::reset()
     m_is_rewinding = false;
     m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
-    m_state_frequency = stk_config->getPhysicsFPS() /
-        NetworkConfig::get()->getStateFrequency();
+    m_last_saved_state = -1;  // forces initial state save
+    m_state_frequency =
+        stk_config->getPhysicsFPS() / stk_config->m_network_state_frequeny;
 
     if (!m_enable_rewind_manager) return;
 
@@ -158,8 +155,26 @@ void RewindManager::saveState()
     m_overall_state_size = 0;
     std::vector<std::string> rewinder_using;
 
+    // We must save the item state first (so that it is restored first),
+    // otherwise state updates for a kart could be overwritten by
+    // e.g. simulating the item collection later (which resets bubblegum
+    // counter).
+    BareNetworkString* buffer = NULL;
+    if(auto r = m_all_rewinder["N"].lock())
+        buffer = r->saveState(&rewinder_using);
+    if (buffer)
+    {
+        m_overall_state_size += buffer->size();
+        gp->addState(buffer);
+    }
+    delete buffer;    // buffer can be freed
+
     for (auto& p : m_all_rewinder)
     {
+        // The Network ItemManager was saved first before this loop,
+        // so skip it here.
+        if(p.first=="N") continue;
+
         // TODO: check if it's worth passing in a sufficiently large buffer from
         // GameProtocol - this would save the copy operation.
         BareNetworkString* buffer = NULL;
@@ -192,7 +207,7 @@ void RewindManager::update(int ticks_not_used)
 
     m_not_rewound_ticks.store(ticks, std::memory_order_relaxed);
 
-    if (!shouldSaveState(ticks))
+    if (ticks - m_last_saved_state < m_state_frequency)
         return;
 
     // Save state, remove expired rewinder first
@@ -214,15 +229,15 @@ void RewindManager::update(int ticks_not_used)
             gp->sendState();
     }
     PROFILER_POP_CPU_MARKER();
+    m_last_saved_state = ticks;
 }   // update
 
 // ----------------------------------------------------------------------------
 /** Replays all events from the last event played till the specified time.
  *  \param world_ticks Up to (and inclusive) which time events will be replayed.
- *  \param fast_forward If true, then only rewinders in network will be
- *  updated, but not the physics.
+ *  \param ticks Number of time steps - should be 1.
  */
-void RewindManager::playEventsTill(int world_ticks, bool fast_forward)
+void RewindManager::playEventsTill(int world_ticks, int *ticks)
 {
     // We add the RewindInfoEventFunction to rewind queue before and after
     // possible rewind, some RewindInfoEventFunction can be created during
@@ -241,7 +256,7 @@ void RewindManager::playEventsTill(int world_ticks, bool fast_forward)
     {
         Log::setPrefix("Rewind");
         PROFILER_PUSH_CPU_MARKER("Rewind", 128, 128, 128);
-        rewindTo(rewind_ticks, world_ticks, fast_forward);
+        rewindTo(rewind_ticks, world_ticks);
         // This should replay everything up to 'now'
         assert(World::getWorld()->getTicksSinceStart() == world_ticks);
         PROFILER_POP_CPU_MARKER();
@@ -283,11 +298,8 @@ bool RewindManager::addRewinder(std::shared_ptr<Rewinder> rewinder)
  *  \param now_ticks Up to which ticks events are replayed: up to but 
  *         EXCLUDING new_ticks (the event at now_ticks are played in
  *         the calling subroutine playEventsTill).
- *  \param fast_forward If true, then only rewinders in network will be
- *  updated, but not the physics.
  */
-void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
-                             bool fast_forward)
+void RewindManager::rewindTo(int rewind_ticks, int now_ticks)
 {
     assert(!m_is_rewinding);
     bool is_history = history->replayHistory();
@@ -312,7 +324,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
 
     // Rewind the required state(s)
     // ----------------------------
-    World* world = World::getWorld();
+    World *world = World::getWorld();
 
     // Now start the rewind with the full state. It is important that the
     // world time is set first, since e.g. the NetworkItem manager relies
@@ -342,7 +354,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
                 break;
         }
     }
-    else if (!fast_forward)
+    else
     {
         Log::warn("RewindManager", "Missing local state at ticks %d",
             exact_rewind_ticks);
@@ -357,26 +369,13 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
         current = m_rewind_queue.getCurrent();
     }
 
-    // Update check line, so the cannon animation can be replayed correctly
-    CheckManager::get()->resetAfterRewind();
-
-    if (exact_rewind_ticks > 0)
-    {
-        // Restore all physical objects moved by 3d animation, as it only
-        // set the motion state of physical bodies, it has 1 frame delay
-        world->setTicksForRewind(exact_rewind_ticks - 1);
-        Track::getCurrentTrack()->getTrackObjectManager()->resetAfterRewind();
-        world->setTicksForRewind(exact_rewind_ticks);
-    }
-
     // Now go forward through the list of rewind infos till we reach 'now':
     while (world->getTicksSinceStart() < now_ticks)
     { 
         m_rewind_queue.replayAllEvents(world->getTicksSinceStart());
 
         // Now simulate the next time step
-        if (!fast_forward)
-            world->updateWorld(1);
+        world->updateWorld(1);
 #undef SHOW_ROLLBACK
 #ifdef SHOW_ROLLBACK
         irr_driver->update(stk_config->ticks2Time(1));
@@ -411,20 +410,3 @@ void RewindManager::mergeRewindInfoEventFunction()
         m_rewind_queue.insertRewindInfo(rief);
     m_pending_rief.clear();
 }   // mergeRewindInfoEventFunction
-
-// ----------------------------------------------------------------------------
-/** Reset all smooth network body of rewinders so the rubber band effect of
- *  moveable does not exist during firstly live join.
- */
-void RewindManager::resetSmoothNetworkBody()
-{
-    for (auto& p : m_all_rewinder)
-    {
-        if (auto r = p.second.lock())
-        {
-            auto snb = std::dynamic_pointer_cast<SmoothNetworkBody>(r);
-            if (snb)
-                snb->reset();
-        }
-    }
-}   // resetSmoothNetworkBody

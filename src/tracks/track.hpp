@@ -36,7 +36,7 @@ using namespace irr;
 #include "LinearMath/btTransform.h"
 
 #include "utils/aligned_array.hpp"
-#include "utils/log.hpp"
+#include "utils/translation.hpp"
 #include "utils/vec3.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -351,6 +351,7 @@ private:
 
     /** The render target for the mini map, which is displayed in the race gui. */
     RenderTarget           *m_render_target;
+    core::dimension2du      m_mini_map_size;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
 
@@ -393,6 +394,7 @@ private:
     void loadDriveGraph(unsigned int mode_id, const bool reverse);
     void loadArenaGraph(const XMLNode &node);
     btQuaternion getArenaStartRotation(const Vec3& xyz, float heading);
+    void convertTrackToBullet(scene::ISceneNode *node);
     bool loadMainTrack(const XMLNode &node);
     void loadMinimap();
     void createWater(const XMLNode &node);
@@ -431,9 +433,7 @@ public:
     void               reset();
     void               itemCommand(const XMLNode *node);
     Vec3               flagCommand(const XMLNode *node);
-    //-----------------------------------------------------------------------------
     core::stringw      getName() const;
-    //-----------------------------------------------------------------------------
     core::stringw      getSortName() const;
     bool               isInGroup(const std::string &group_name);
     const core::vector3df& getSunRotation();
@@ -449,7 +449,6 @@ public:
 
     std::vector< std::vector<float> > buildHeightMap();
     void               drawMiniMap(const core::rect<s32>& dest_rect) const;
-    void               updateMiniMapScale();
     // ------------------------------------------------------------------------
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }
@@ -696,8 +695,6 @@ public:
     const btTransform& getBlueFlag() const              { return m_blue_flag; }
     // ------------------------------------------------------------------------
     bool isAddon() const                                 { return m_is_addon; }
-    // ------------------------------------------------------------------------
-    void convertTrackToBullet(scene::ISceneNode *node);
 };   // class Track
 
 #endif

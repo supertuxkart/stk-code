@@ -64,7 +64,7 @@ void ShaderBasedRenderer::prepareForwardRenderer()
 
     glClear(GL_COLOR_BUFFER_BIT);
     glDepthMask(GL_TRUE);
-    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClearColor(clearColor.getRed() / 255.f, clearColor.getGreen() / 255.f,
         clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -235,7 +235,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
     }
     irr_driver->getSceneManager()->setActiveCamera(camnode);
 
-    PROFILER_PUSH_CPU_MARKER("- Draw Call Generation xxx", 0xFF, 0xFF, 0xFF);
+    PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
     m_draw_calls.prepareDrawCalls(camnode);
     PROFILER_POP_CPU_MARKER();
     PROFILER_PUSH_CPU_MARKER("Update Light Info", 0xFF, 0x0, 0x0);
@@ -275,10 +275,10 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         {
             specular_probe = m_skybox->getSpecularProbe();
         }
+
         m_lighting_passes.renderLights( hasShadow,
                                         m_rtts->getRenderTarget(RTT_NORMAL_AND_DEPTH),
                                         m_rtts->getDepthStencilTexture(),
-                                        m_rtts->getRenderTarget(RTT_COLOR),
                                         m_rtts->getShadowFrameBuffer(),
                                         specular_probe);
         PROFILER_POP_CPU_MARKER();
@@ -295,9 +295,9 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
 
     const Track * const track = Track::getCurrentTrack();
     // Render discrete lights scattering
-    if (UserConfigParams::m_light_scatter && track && track->isFogEnabled())
+    if (track && track->isFogEnabled())
     {
-        PROFILER_PUSH_CPU_MARKER("- Light Scatter", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- PointLight Scatter", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_LIGHTSCATTER));
         m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
                                               m_rtts->getFBO(FBO_HALF1),
@@ -564,7 +564,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
     }
     else if (irr_driver->getSSAOViz())
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         if (first_cam)
         {
              glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -578,7 +578,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
     }
     else
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         if (first_cam)
         {
              glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -700,7 +700,7 @@ void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
 }
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::render(float dt, bool is_loading)
+void ShaderBasedRenderer::render(float dt)
 {
     // Start the RTT for post-processing.
     // We do this before beginScene() because we want to capture the glClear()
@@ -761,7 +761,7 @@ void ShaderBasedRenderer::render(float dt, bool is_loading)
 
         debugPhysics();
         
-        if (CVS->isDeferredEnabled() && !is_loading)
+        if (CVS->isDeferredEnabled())
         {
             renderPostProcessing(camera, cam == 0);
         }
@@ -802,15 +802,7 @@ void ShaderBasedRenderer::render(float dt, bool is_loading)
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GUI));
         PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
         // Either render the gui, or the global elements of the race gui.
-        glViewport(0, irr_driver->getDevice()->getMovedHeight(),
-            irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
-        GUIEngine::render(dt, is_loading);
-
-        if (irr_driver->getRenderNetworkDebug() && !is_loading)
-            irr_driver->renderNetworkDebug();
-        glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
+        GUIEngine::render(dt);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -873,7 +865,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
         irr_driver->getActualScreenSize().Width,
         irr_driver->getActualScreenSize().Height);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 

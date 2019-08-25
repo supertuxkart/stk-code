@@ -19,6 +19,7 @@
 #ifndef HEADER_NETWORK_TIMER_SYNCHRONIZER_HPP
 #define HEADER_NETWORK_TIMER_SYNCHRONIZER_HPP
 
+#include "config/user_config.hpp"
 #include "network/stk_host.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -53,8 +54,6 @@ public:
         m_force_set_timer.store(true);
     }
     // ------------------------------------------------------------------------
-    void resynchroniseTimer()                  { m_synchronised.store(false); }
-    // ------------------------------------------------------------------------
     void addAndSetTime(uint32_t ping, uint64_t server_time)
     {
         if (m_synchronised.load() == true)
@@ -68,11 +67,11 @@ public:
             return;
         }
 
-        const uint64_t cur_time = StkTime::getMonoTimeMs();
+        const uint64_t cur_time = StkTime::getRealTimeMs();
         // Discard too close time compared to last ping
         // (due to resend when packet loss)
-        // 10 packets per second as seen in STKHost
-        const uint64_t frequency = (uint64_t)((1.0f / 10.0f) * 1000.0f) / 2;
+        const uint64_t frequency = (uint64_t)((1.0f /
+            (float)(stk_config->m_network_state_frequeny)) * 1000.0f) / 2;
         if (!m_times.empty() &&
             cur_time - std::get<2>(m_times.back()) < frequency)
             return;
@@ -96,7 +95,6 @@ public:
                 UserConfigParams::m_timer_sync_difference_tolerance)
             {
                 STKHost::get()->setNetworkTimer(averaged_time);
-                m_times.clear();
                 m_force_set_timer.store(false);
                 m_synchronised.store(true);
                 Log::info("NetworkTimerSynchronizer", "Network "

@@ -78,7 +78,7 @@ RaceGUIOverworld::RaceGUIOverworld()
     if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
         m_enabled = false;
 
-    m_is_minimap_initialized = false;
+    m_is_first_render_call = true;
     m_close_to_a_challenge = false;
     m_current_challenge = NULL;
     m_trophy[0] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_bronze.png");
@@ -86,21 +86,66 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_trophy[2] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png"  );
     m_trophy[3] = irr_driver->getTexture(FileManager::GUI_ICON, "cup_platinum.png"  );
 
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
-                               irr_driver->getDevice()->supportsTouchDevice()) ||
-                               UserConfigParams::m_multitouch_active > 1;
+    float scaling = irr_driver->getFrameSize().Height / 420.0f;
+    const float map_size = 250.0f;
     
-    if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
+    if (UserConfigParams::m_multitouch_enabled && 
+        UserConfigParams::m_multitouch_mode != 0 &&
         race_manager->getNumLocalPlayers() == 1)
     {
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }
 
-    calculateMinimapSize();
+    // Check if we have enough space for minimap when touch steering is enabled
+    if (m_multitouch_gui != NULL)
+    {
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+                                         m_multitouch_gui->getHeight());
+        
+        if ((map_size + 20.0f) * scaling > map_bottom)
+        {
+            scaling = map_bottom / (map_size + 20.0f);
+        }
+    }
+
+    // Marker texture has to be power-of-two for (old) OpenGL compliance
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_challenge_size = (int)( 12.0f * scaling);
+    m_minimap_player_size    = (int)( 24.0f * scaling);
+    m_map_width              = (int)(map_size * scaling);
+    m_map_height             = (int)(map_size * scaling);
+
+    m_map_left   = 20;
+    m_map_bottom = irr_driver->getActualScreenSize().Height-10;
+
+    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
+    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
+    m_map_rendered_width    = map_texture;
+    m_map_rendered_height   = map_texture;
+
+
+    // special case : when 3 players play, use available 4th space for such things
+    // TODO : determine if there are plans for multiplayer in story mode in the future
+    if (race_manager->getIfEmptyScreenSpaceExists())
+    {
+        m_map_left = irr_driver->getActualScreenSize().Width - m_map_width;
+    }
+    else if (m_multitouch_gui != NULL)
+    {
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+                                                        m_map_width) * 0.9f);
+        m_map_bottom = m_map_height + int(10 * scaling);
+    }
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     //createMarkerTexture();
+
+    // Translate strings only one in constructor to avoid calling
+    // gettext in each frame.
+    //I18N: Shown at the end of a race
+    m_string_lap      = _("Lap");
+    m_string_rank     = _("Rank");
 
     m_active_challenge = NULL;
 
@@ -129,56 +174,6 @@ RaceGUIOverworld::~RaceGUIOverworld()
 }   // ~RaceGUIOverworld
 
 //-----------------------------------------------------------------------------
-void RaceGUIOverworld::calculateMinimapSize()
-{
-    float scaling = std::min(irr_driver->getFrameSize().Height,  
-        irr_driver->getFrameSize().Width) / 420.0f;
-    const float map_size = 250.0f;
-    
-    // Check if we have enough space for minimap when touch steering is enabled
-    if (m_multitouch_gui != NULL)
-    {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
-                                         m_multitouch_gui->getHeight());
-        
-        if ((map_size + 20.0f) * scaling > map_bottom)
-        {
-            scaling = map_bottom / (map_size + 20.0f);
-        }
-        
-        // Use some reasonable minimum scale, because minimap size can be 
-        // changed during the race
-        scaling = std::max(scaling,
-                           irr_driver->getActualScreenSize().Height * 0.2f / 
-                           (map_size + 20.0f));
-    }
-
-    // Marker texture has to be power-of-two for (old) OpenGL compliance
-    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_minimap_challenge_size = (int)( 12.0f * scaling);
-    m_minimap_player_size    = (int)( 24.0f * scaling);
-    m_map_width              = (int)(map_size * scaling);
-    m_map_height             = (int)(map_size * scaling);
-
-    m_map_left   = 20;
-    m_map_bottom = irr_driver->getActualScreenSize().Height-10;
-
-    // Minimap is also rendered bigger via OpenGL, so find power-of-two again
-    const int map_texture   = 2 << ((int) ceil(1.0 + log(128.0 * scaling)));
-    m_map_rendered_width    = map_texture;
-    m_map_rendered_height   = map_texture;
-
-    if (m_multitouch_gui != NULL)
-    {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
-                                                        m_map_width) * 0.9f);
-        m_map_bottom = m_map_height + int(10 * scaling);
-    }
-    
-    m_is_minimap_initialized = false;
-}
-
-//-----------------------------------------------------------------------------
 /** Render all global parts of the race gui, i.e. things that are only
  *  displayed once even in splitscreen.
  *  \param dt Timestep sized.
@@ -189,6 +184,27 @@ void RaceGUIOverworld::renderGlobal(float dt)
     RaceGUIBase::renderGlobal(dt);
     cleanupMessages(dt);
 
+    // Special case : when 3 players play, use 4th window to display such
+    // stuff (but we must clear it)
+    //TODO : remove if no story mode multiplayer plans
+    if (race_manager->getIfEmptyScreenSpaceExists() &&
+        !GUIEngine::ModalDialog::isADialogActive())
+    {
+        static video::SColor black = video::SColor(255,0,0,0);
+        GL32_draw2DRectangle(black, irr_driver->getSplitscreenWindow(
+            race_manager->getNumLocalPlayers()));
+    }
+
+    World *world = World::getWorld();
+    assert(world != NULL);
+    if(world->getPhase() >= WorldStatus::READY_PHASE &&
+       world->getPhase() <= WorldStatus::GO_PHASE      )
+    {
+        drawGlobalReadySetGo();
+    }
+
+    // Timer etc. are not displayed unless the game is actually started.
+    if(!world->isRacePhase()) return;
     if (!m_enabled) return;
 
     if (m_multitouch_gui == NULL)
@@ -196,7 +212,12 @@ void RaceGUIOverworld::renderGlobal(float dt)
         drawTrophyPoints();
     }
 
+    // minimap has no mipmaps so disable material2D
+    //irr_driver->getVideoDriver()->enableMaterial2D(false);
     drawGlobalMiniMap();
+    //irr_driver->getVideoDriver()->enableMaterial2D();
+
+    m_is_first_render_call = false;
 #endif
 }   // renderGlobal
 
@@ -241,8 +262,10 @@ void RaceGUIOverworld::drawTrophyPoints()
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     const int points = player->getPoints();
     const int next_unlock_points = player->getNextUnlockPoints();
-    core::stringw sw(StringUtils::toString(points).c_str());
-    core::stringw swg(StringUtils::toString(next_unlock_points).c_str());
+    std::string s = StringUtils::toString(points);
+    std::string s_goal = StringUtils::toString(next_unlock_points);
+    core::stringw sw(s.c_str());
+    core::stringw swg(s_goal.c_str());
 
     static video::SColor time_color = video::SColor(255, 255, 255, 255);
 
@@ -255,8 +278,7 @@ void RaceGUIOverworld::drawTrophyPoints()
 
     bool vcenter = true;
 
-    const int size = std::min((int)irr_driver->getActualScreenSize().Width/20,
-                                      2 * GUIEngine::getFontHeight());
+    const int size = irr_driver->getActualScreenSize().Width/20;
     core::rect<s32> dest(size, pos.UpperLeftCorner.Y,
                          size*2, pos.UpperLeftCorner.Y + size);
     core::rect<s32> source(core::position2di(0, 0), m_trophy[3]->getSize());
@@ -288,7 +310,8 @@ void RaceGUIOverworld::drawTrophyPoints()
     dest = core::rect<s32>(pos.UpperLeftCorner.X - size, pos.UpperLeftCorner.Y,
                            pos.UpperLeftCorner.X, pos.UpperLeftCorner.Y + size);
 
-    draw2DImage(m_open_challenge, dest, source, NULL, NULL, true /* alpha */);
+    draw2DImage(m_open_challenge, dest, source, NULL,
+                                              NULL, true /* alpha */);
 
     core::dimension2du area = font->getDimension(L"9");
     int small_width = area.Width;
@@ -297,8 +320,11 @@ void RaceGUIOverworld::drawTrophyPoints()
     area = font->getDimension(L"999");
     int large_width = area.Width;
 
-    int number_width = (points <= 9)  ? small_width  :
-                       (points <= 99) ? middle_width : large_width;
+    int number_width;
+
+    if (points < 9) number_width = small_width;
+    else if (points <99) number_width = middle_width;
+    else number_width = large_width;
 
     pos.LowerRightCorner.Y = int(dest.LowerRightCorner.Y + 1.5f*size);
     pos.UpperLeftCorner.X -= int(0.5f*size + number_width*0.5f);
@@ -339,15 +365,18 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 {
 #ifndef SERVER_ONLY
     World *world = World::getWorld();
+    // arenas currently don't have a map.
     Track* track = Track::getCurrentTrack();
-    const std::vector<OverworldChallenge>& challenges = track->getChallengeList();
+    if(track->isArena() || track->isSoccer()) return;
+    const std::vector<OverworldChallenge>& challenges =
+                                                     track->getChallengeList();
 
     // The trophies might be to the left of the minimap on large displays
     // Adjust the left side of the minimap to take this into account.
     // This can't be done in the constructor of this object, since at
     // that time the scene.xml file has not been read (so the challenges
     // are not defined yet).
-    if (!m_is_minimap_initialized)
+    if(m_is_first_render_call)
     {
         float left_most = 0;
         float right_most = 0;
@@ -368,8 +397,6 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         {
             m_map_left -= (int)left_most;
         }
-        
-        m_is_minimap_initialized = true;
     }
 
     int upper_y = m_map_bottom - m_map_height;
@@ -382,42 +409,56 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
     Vec3 kart_xyz;
 
-    // There can be only player karts on the overworld.
-    for(unsigned int i=0; i<world->getNumKarts(); i++)
+    // In the first iteration, only draw AI karts, then only draw
+    // player karts. This guarantees that player kart icons are always
+    // on top of AI kart icons.
+    for(unsigned int only_draw_player_kart=0; only_draw_player_kart<=1;
+        only_draw_player_kart++)
     {
-        const AbstractKart *kart = world->getKart(i);
-
-        kart_xyz= kart->getXYZ();
-        Vec3 draw_at;
-        track->mapPoint2MiniMap(kart_xyz, &draw_at);
-
-        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
-        if (icon == NULL)
-            continue;
-
-        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
-        int marker_half_size = m_minimap_player_size>>1;
-        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
-                                 lower_y   -(int)(draw_at.getY()+marker_half_size),
-                                 m_map_left+(int)(draw_at.getX()+marker_half_size),
-                                 lower_y   -(int)(draw_at.getY()-marker_half_size));
-
-        // Highlight the player icons with some background image.
-        if (m_icons_frame != NULL)
+        for(unsigned int i=0; i<world->getNumKarts(); i++)
         {
-            video::SColor colors[4];
-            for (unsigned int i=0;i<4;i++)
+            const AbstractKart *kart = world->getKart(i);
+            if(kart->isEliminated()) continue;   // don't draw eliminated kart
+                                                 // Make sure to only draw AI kart icons first, then
+                                                 // only player karts.
+            if(kart->getController()->isLocalPlayerController()
+               !=(only_draw_player_kart==1)) continue;
+            kart_xyz= kart->getXYZ();
+            Vec3 draw_at;
+            track->mapPoint2MiniMap(kart_xyz, &draw_at);
+
+            video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+            if (icon == NULL)
             {
-                colors[i]=kart->getKartProperties()->getColor();
+                continue;
             }
-            const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                       m_icons_frame->getSize());
+            core::rect<s32> source(core::position2di(0, 0), icon->getSize());
+            int marker_half_size = (kart->getController()->isLocalPlayerController()
+                                    ? m_minimap_player_size
+                                    : m_minimap_challenge_size                        )>>1;
+            core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
+                                     lower_y   -(int)(draw_at.getY()+marker_half_size),
+                                     m_map_left+(int)(draw_at.getX()+marker_half_size),
+                                     lower_y   -(int)(draw_at.getY()-marker_half_size));
 
-            draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
-        }
+            // Highlight the player icons with some backgorund image.
+            if (kart->getController()->isLocalPlayerController() &&
+                m_icons_frame != NULL)
+            {
+                video::SColor colors[4];
+                for (unsigned int i=0;i<4;i++)
+                {
+                    colors[i]=kart->getKartProperties()->getColor();
+                }
+                const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                           m_icons_frame->getSize());
 
-        draw2DImage(icon, position, source, NULL, NULL, true);
-    }   // for i<getNumKarts
+                draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
+            }   // if isPlayerController
+
+            draw2DImage(icon, position, source, NULL, NULL, true);
+        }   // for i<getNumKarts
+    }   // for only_draw_player_kart
 
     m_current_challenge = NULL;
     for (unsigned int n=0; n<challenges.size(); n++)
@@ -546,7 +587,15 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(gp->getName(), pos, video::SColor(255,255,255,255),
+                font->draw(translations->fribidize(gp->getName()), pos, video::SColor(255,255,255,255),
+                           false, true /* vcenter */, NULL);
+
+                core::rect<s32> pos2(pos);
+                pos2.UpperLeftCorner.Y += 10 + GUIEngine::getTitleFontHeight();
+                pos2.LowerRightCorner.Y += 10 + GUIEngine::getTitleFontHeight();
+
+                //just below GP name
+                font->draw(_("Type: Grand Prix"), pos2, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
             }
             else
@@ -562,7 +611,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 }
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
-                font->draw(track->getName(),
+                font->draw(translations->fribidize(track->getName()),
                            pos, video::SColor(255, 255, 255, 255),
                            false, true /* vcenter */, NULL);
             }
@@ -575,21 +624,17 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 m_active_challenge = challenge;
                 m_challenge_description = challenge->getChallengeDescription();
             }
-
-            gui::ScalableFont* font = GUIEngine::getLargeFont();
-            //FIXME : large font is upscaled and blurry
-            font->setBlackBorder(true);
-            font->draw(m_challenge_description, pos, video::SColor(255,255,255,255),
-                       false, false /* vcenter */, NULL);
+            GUIEngine::getFont()->draw(m_challenge_description,
+                                       pos, video::SColor(255,255,255,255),
+                                       false, false /* vcenter */, NULL);
 
             core::rect<s32> pos2(0,
                                  irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                  irr_driver->getActualScreenSize().Width,
                                  irr_driver->getActualScreenSize().Height);
-            font->draw(_("Press fire to start the challenge"), pos2,
-                        GUIEngine::getSkin()->getColor("font::normal"),
-                        true, true /* vcenter */, NULL);
-            font->setBlackBorder(false);
+            GUIEngine::getOutlineFont()->draw(_("Press fire to start the challenge"), pos2,
+                                       GUIEngine::getSkin()->getColor("font::normal"),
+                                       true, true /* vcenter */, NULL);
         }
     }
     

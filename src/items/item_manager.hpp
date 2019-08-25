@@ -125,8 +125,7 @@ protected:
     virtual unsigned int insertItem(Item *item);
     void switchItemsInternal(std::vector < ItemState*> &all_items);
     void setSwitchItems(const std::vector<int> &switch_items);
-    void insertItemInQuad(Item *item);
-    void deleteItemInQuad(ItemState *item);
+
              ItemManager();
 public:
     virtual ~ItemManager();
@@ -137,6 +136,8 @@ public:
                                     const AbstractKart* parent,
                                     const Vec3 *server_xyz = NULL,
                                     const Vec3 *normal = NULL);
+    virtual Item* placeTrigger     (const Vec3& xyz, float distance,
+                                    TriggerItemListener* listener);
     void           update          (int ticks);
     void           updateGraphics  (float dt);
     void           checkItemHit    (AbstractKart* kart);

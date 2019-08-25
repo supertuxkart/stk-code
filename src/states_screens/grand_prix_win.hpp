@@ -23,7 +23,6 @@
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
-#include <utility>
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 namespace GUIEngine { class LabelWidget; }
@@ -75,7 +74,7 @@ public:
     MusicInformation* getInGameMenuMusic() const OVERRIDE;
 
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
-    void setKarts(const std::pair<std::string, float> karts[3]);
+    void setKarts(const std::string idents[3]);
     void setPlayerWon(bool some_player_won) { m_player_won = some_player_won; }
 };
 

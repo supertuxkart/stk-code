@@ -24,6 +24,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
+#include "utils/translation.hpp"
 
 #include <irrString.h>
 using namespace irr;
@@ -157,10 +158,17 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the name of this player. */
-    const core::stringw& getName() const
+    const core::stringw getName(bool ignore_rtl = false) const
     {
         assert(m_magic_number == 0xABCD1234);
-        return m_local_name;
+        if (ignore_rtl)
+            return m_local_name;
+        else
+        {
+            const core::stringw fribidized_name =
+                translations->fribidize(m_local_name);
+            return fribidized_name;
+        }
     }   // getName
 
     // ------------------------------------------------------------------------
@@ -174,9 +182,16 @@ public:
     }   // isGuestAccount
     // ------------------------------------------------------------------------
     /** Returns the last used online name. */
-    const core::stringw& getLastOnlineName() const
+    const core::stringw getLastOnlineName(bool ignore_rtl = false) const
     {
-        return m_last_online_name;
+        if (ignore_rtl)
+            return m_last_online_name;
+        else
+        {
+            const core::stringw fribidized_name =
+                translations->fribidize(m_last_online_name);
+            return fribidized_name;
+        }
     }   // getLastOnlineName
     // ------------------------------------------------------------------------
     /** Sets the last used online name. */

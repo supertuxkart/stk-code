@@ -24,7 +24,6 @@
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
-#include "graphics/render_info.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
@@ -41,7 +40,6 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <ICameraSceneNode.h>
@@ -232,7 +230,8 @@ void GrandPrixWin::onUpdate(float dt)
         {
             if (m_kart_node[k] != NULL)
             {
-                if (m_kart_x[k] != KARTS_PODIUM_X[k])
+
+                if (fabsf(m_kart_x[k] - KARTS_PODIUM_X[k]) > dt)
                 {
                     if (m_kart_x[k] < KARTS_PODIUM_X[k] - dt)
                         m_kart_x[k] += dt;
@@ -328,23 +327,23 @@ void GrandPrixWin::onUpdate(float dt)
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
+void GrandPrixWin::setKarts(const std::string idents_arg[3])
 {
     TrackObjectManager* tobjman = Track::getCurrentTrack()->getTrackObjectManager();
 
     // reorder in "podium order" (i.e. second player to the left, first player
     // in the middle, last at the right)
-    std::pair<std::string, float> idents[3];
+    std::string idents[3];
     idents[0] = idents_arg[1];
     idents[1] = idents_arg[0];
     idents[2] = idents_arg[2];
 
     for (int i = 0; i < 3; i++)
     {
-        const KartProperties* kp = kart_properties_manager->getKart(idents[i].first);
+        const KartProperties* kp = kart_properties_manager->getKart(idents[i]);
         if (kp == NULL) continue;
 
-        KartModel* kart_model = kp->getKartModelCopy(std::make_shared<RenderInfo>(idents[i].second));
+        KartModel* kart_model = kp->getKartModelCopy();
         m_all_kart_models.push_back(kart_model);
         scene::ISceneNode* kart_main_node = kart_model->attachModel(true, false);
         LODNode* lnode = dynamic_cast<LODNode*>(kart_main_node);

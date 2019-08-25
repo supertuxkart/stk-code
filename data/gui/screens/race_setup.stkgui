@@ -8,15 +8,15 @@
         <bright width="100%" text="Select a difficulty" align="center" text_align="left" />
         <spacer height="10" width="25"/>
         <box width="100%" proportion="3" padding="10" layout="vertical-row">
-            <spacer height="15%" width="25"/>
-            <ribbon id="difficulty" height="70%" width="100%" align="center">
-                <icon-button id="novice" width="128" height="128" icon="gui/icons/difficulty_easy.png"
+            
+            <ribbon id="difficulty" height="85%" width="100%" align="center">
+                <icon-button id="novice" width="fit" height="fit" icon="gui/icons/difficulty_easy.png"
                         I18N="Difficulty" text="Novice"/>
-                <icon-button id="intermediate" width="128" height="128" icon="gui/icons/difficulty_medium.png"
+                <icon-button id="intermediate" width="fit" height="fit" icon="gui/icons/difficulty_medium.png"
                         I18N="Difficulty" text="Intermediate"/>
-                <icon-button id="expert" width="128" height="128" icon="gui/icons/difficulty_hard.png"
+                <icon-button id="expert" width="fit" height="fit" icon="gui/icons/difficulty_hard.png"
                         I18N="Difficulty"  text="Expert"/>
-                <icon-button id="best" width="128" height="128" icon="gui/icons/difficulty_best.png"
+                <icon-button id="best" width="fit" height="fit" icon="gui/icons/difficulty_best.png"
                         I18N="Difficulty"  text="SuperTux"/>
             </ribbon>
         </box>

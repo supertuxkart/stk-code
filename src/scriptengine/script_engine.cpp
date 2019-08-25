@@ -37,7 +37,6 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
-#include "utils/file_utils.hpp"
 #include "utils/profiler.hpp"
 
 
@@ -95,7 +94,7 @@ namespace Scripting
     {
         //std::string script_path = World::getWorld()->getTrack()->getTrackFile(fileName);
 
-        FILE *f = FileUtils::fopenU8Path(script_path, "rb");
+        FILE *f = fopen(script_path.c_str(), "rb");
         if (f == NULL)
         {
             Log::debug("Scripting", "File does not exist : %s", script_path.c_str());

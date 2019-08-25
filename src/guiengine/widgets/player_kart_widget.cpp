@@ -29,9 +29,6 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/kart_selection.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
-
 #include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
@@ -372,7 +369,7 @@ void PlayerKartWidget::add()
     irr::core::stringw name; // name of the player
     if (m_associated_player)
         name = m_associated_player->getProfile()->getName();
-    core::stringw label = name;
+    core::stringw label = translations->fribidize(name);
 
     if (m_parent_screen->m_multiplayer)
     {
@@ -380,7 +377,7 @@ void PlayerKartWidget::add()
         for (int n=0; n<player_amount; n++)
         {
             core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
-            core::stringw label = name;
+            core::stringw label = translations->fribidize(name);
             m_player_ident_spinner->addLabel(label);
             if (UserConfigParams::m_per_player_difficulty)
             {
@@ -442,6 +439,8 @@ void PlayerKartWidget::markAsReady()
                                            m_player_ident_spinner->m_y),
                          core::dimension2di(m_player_ident_spinner->m_w,
                                             m_player_ident_spinner->m_h));
+    // 'playerNameString' is already fribidize, so we need to use
+    // 'insertValues' and not _("...", a) so it's not flipped again
     m_ready_text =
         GUIEngine::getGUIEnv()->addStaticText(_("%s is ready", playerNameString),
             rect);
@@ -664,15 +663,15 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     m_h = h;
 
     // -- sizes
-    player_name_h = GUIEngine::getFontHeight();
+    player_name_h = 40;
     // Set it a bit higher so there's space for "(handicapped)"
     if(UserConfigParams::m_per_player_difficulty)
-        player_name_w = std::min(GUIEngine::getFontHeight() * 12, w);
+        player_name_w = std::min(500, w);
     else
-        player_name_w = std::min(GUIEngine::getFontHeight() * 10, w);
+        player_name_w = std::min(400, w);
 
     kart_name_w = w;
-    kart_name_h = GUIEngine::getFontHeight();
+    kart_name_h = 25;
 
     // for shrinking effect
     if (h < 175)

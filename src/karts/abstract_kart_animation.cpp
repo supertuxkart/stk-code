@@ -19,17 +19,17 @@
 #include "karts/abstract_kart_animation.hpp"
 
 #include "graphics/slip_stream.hpp"
+#include "graphics/stars.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/explosion_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
-#include "network/network_string.hpp"
-#include "physics/btKart.hpp"
+#include "network/network_config.hpp"
+#include "network/rewind_info.hpp"
+#include "network/rewind_manager.hpp"
 #include "physics/physics.hpp"
-#include "physics/triangle_mesh.hpp"
-#include "tracks/track.hpp"
-#include "utils/mini_glm.hpp"
 
 #include <limits>
 
@@ -38,13 +38,19 @@
  *  \param kart Pointer to the kart that is animated, or NULL if the
  *         the animation is meant for a basket ball etc.
  */
-AbstractKartAnimation::AbstractKartAnimation(AbstractKart* kart,
+AbstractKartAnimation::AbstractKartAnimation(AbstractKart *kart,
                                              const std::string &name)
 {
-    m_kart = kart;
-    m_name = name;
+    m_timer = 0;
+    m_kart  = kart;
+    m_name  = name;
+    m_end_transform = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+    m_end_transform.setOrigin(Vec3(std::numeric_limits<float>::max()));
+    m_end_ticks = -1;
     m_created_ticks = World::getWorld()->getTicksSinceStart();
-    m_created_transform = btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
+    m_check_created_ticks = std::make_shared<int>(-1);
+    m_confirmed_by_network = false;
+    m_ignore_undo = false;
     // Remove previous animation if there is one
 #ifndef DEBUG
     // Use this code in non-debug mode to avoid a memory leak (and messed
@@ -62,7 +68,6 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart* kart,
     // later).
     if (kart)
     {
-        m_created_transform = kart->getTrans();
         kart->setKartAnimation(this);
         Physics::getInstance()->removeKart(m_kart);
         kart->getSkidding()->reset();
@@ -72,46 +77,121 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart* kart,
             // A time of 0 reset the squashing
             kart->setSquash(0.0f, 0.0f);
         }
+
+        // Reset the wheels (and any other animation played for that kart)
+        // This avoid the effect that some wheels might be way below the kart
+        // which is very obvious in the rescue animation.
+        m_kart->getKartModel()->resetVisualWheelPosition();
     }
-    MiniGLM::compressbtTransform(m_created_transform,
-        m_created_transform_compressed);
 }   // AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
 AbstractKartAnimation::~AbstractKartAnimation()
 {
-    // If m_end_ticks != int max, this object is deleted because the kart
+    // If m_timer >=0, this object is deleted because the kart
     // is deleted (at the end of a race), which means that
     // world is in the process of being deleted. In this case
     // we can't call getPhysics() anymore.
-    if (m_end_ticks != std::numeric_limits<int>::max() && m_kart)
+    if(m_timer < 0 && m_kart)
     {
+        m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         Vec3 linear_velocity = m_kart->getBody()->getLinearVelocity();
-        Vec3 angular_velocity = m_kart->getBody()->getAngularVelocity();
-        // Use getTrans so the setXYZ and setRotation from subclass result
-        // can be used here
-        btTransform transform = m_kart->getTrans();
+        btTransform transform = m_end_transform.getOrigin().x() ==
+            std::numeric_limits<float>::max() ?
+            m_kart->getBody()->getWorldTransform() : m_end_transform;
         m_kart->getBody()->setLinearVelocity(linear_velocity);
-        m_kart->getBody()->setAngularVelocity(angular_velocity);
         m_kart->getBody()->proceedToTransform(transform);
         m_kart->setTrans(transform);
-        // Reset all btKart members (bounce back ticks / rotation ticks..)
-        m_kart->getVehicle()->reset();
         Physics::getInstance()->addKart(m_kart);
+
+        if (RewindManager::get()->useLocalEvent() && !m_ignore_undo)
+        {
+            AbstractKart* kart = m_kart;
+            Vec3 angular_velocity = kart->getBody()->getAngularVelocity();
+            RewindManager::get()->addRewindInfoEventFunction(new
+                RewindInfoEventFunction(
+                World::getWorld()->getTicksSinceStart(),
+                [kart]()
+                {
+                    Physics::getInstance()->removeKart(kart);
+                },
+                [kart, linear_velocity, angular_velocity, transform]()
+                {
+                    kart->getBody()->setAngularVelocity(angular_velocity);
+                    kart->getBody()->setLinearVelocity(linear_velocity);
+                    kart->getBody()->proceedToTransform(transform);
+                    kart->setTrans(transform);
+                    Physics::getInstance()->addKart(kart);
+                }));
+        }
     }
 }   // ~AbstractKartAnimation
 
 // ----------------------------------------------------------------------------
-/** In CTF mode call this to reset kart powerup when get hit.
- */
-void AbstractKartAnimation::resetPowerUp()
+void AbstractKartAnimation::addNetworkAnimationChecker(bool reset_powerup)
 {
-    if (m_kart)
-        m_kart->getPowerup()->reset();
-}   // resetPowerUp
+    Powerup* p = NULL;
+    if (reset_powerup)
+    {
+        if (m_kart)
+        {
+            p = m_kart->getPowerup();
+            p->reset();
+        }
+    }
+
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient())
+    {
+        // Prevent access to deleted kart animation object
+        std::weak_ptr<int> cct = m_check_created_ticks;
+        Vec3 original_position;
+        AbstractKart* k = m_kart;
+        if (k)
+            original_position = k->getXYZ();
+        RewindManager::get()->addRewindInfoEventFunction(new
+            RewindInfoEventFunction(m_created_ticks,
+            /*undo_function*/[cct, k, original_position]()
+            {
+                auto cct_sp = cct.lock();
+                if (!cct_sp || !k)
+                    return;
+                k->setXYZ(original_position);
+            },
+            /*replay_function*/[p]()
+            {
+                if (p)
+                    p->reset();
+            },
+            /*delete_function*/[cct]()
+            {
+                auto cct_sp = cct.lock();
+                if (!cct_sp)
+                    return;
+                *cct_sp = World::getWorld()->getTicksSinceStart();
+            }));
+    }
+}   // addNetworkAnimationChecker
 
 // ----------------------------------------------------------------------------
-/** Updates the timer, and if it expires, the kart animation will be
+void AbstractKartAnimation::
+    checkNetworkAnimationCreationSucceed(const btTransform& fallback_trans)
+{
+    if (!m_confirmed_by_network && *m_check_created_ticks != -1 &&
+        World::getWorld()->getTicksSinceStart() > *m_check_created_ticks)
+    {
+        Log::warn("AbstractKartAnimation",
+            "No animation has been created on server, remove locally.");
+        m_timer = -1;
+        m_end_transform = fallback_trans;
+        m_ignore_undo = true;
+        if (dynamic_cast<ExplosionAnimation*>(this) && m_kart)
+            m_kart->getStarsEffect()->reset();
+    }
+}   // checkNetworkAnimationCreationSucceed
+
+// ----------------------------------------------------------------------------
+/** Updates the timer, and if it expires (<0), the kart animation will be
  *  removed from the kart and this object will be deleted.
  *  NOTE: calling this function must be the last thing done in any kart
  *  animation class, since this object might be deleted, so accessing any
@@ -120,84 +200,38 @@ void AbstractKartAnimation::resetPowerUp()
  */
 void AbstractKartAnimation::update(int ticks)
 {
-    // See if the timer expires, if so return the kart to normal game play
-    World* w = World::getWorld();
-    if (!w)
-        return;
-
-    if (m_end_ticks - w->getTicksSinceStart() == 0)
+    // Scale the timer according to m_end_ticks told by server if
+    // necessary
+    if (NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isClient() &&
+        World::getWorld()->getPhase() == World::RACE_PHASE &&
+        usePredefinedEndTransform() && m_end_ticks != -1)
     {
-        if (m_kart)
-            m_kart->setKartAnimation(NULL);
+        int cur_end_ticks = World::getWorld()->getTicksSinceStart() +
+            m_timer;
+
+        const int difference = cur_end_ticks - m_end_ticks;
+        if (World::getWorld()->getTicksSinceStart() > m_end_ticks)
+        {
+            // Stop right now
+            m_timer = -1;
+        }
+        else if (difference > 0)
+        {
+            // Speed up
+            m_timer -= ticks;
+        }
+        else if (difference < 0)
+        {
+            // Slow down
+            return;
+        }
+    }
+    // See if the timer expires, if so return the kart to normal game play
+    m_timer -= ticks;
+    if (m_timer < 0)
+    {
+        if(m_kart) m_kart->setKartAnimation(NULL);
         delete this;
     }
 }   // update
-
-// ----------------------------------------------------------------------------
-void AbstractKartAnimation::updateGraphics(float dt)
-{
-    // Reset the wheels (and any other animation played for that kart)
-    // This avoid the effect that some wheels might be way below the kart
-    // which is very obvious in the rescue animation.
-    if (m_kart)
-        m_kart->getKartModel()->resetVisualWheelPosition();
-}   // updateGraphics
-
-// ----------------------------------------------------------------------------
-/** Returns the current animation timer.
-  */
-float AbstractKartAnimation::getAnimationTimer() const
-{
-    World* w = World::getWorld();
-    if (!w)
-        return 0.0f;
-    return stk_config->ticks2Time(m_end_ticks - w->getTicksSinceStart());
-}   // getAnimationTimer
-
-// ----------------------------------------------------------------------------
-/** Determine maximum rescue height with up-raycast
- */
-float AbstractKartAnimation::getMaximumHeight(const Vec3& up_vector,
-                                              float height_remove)
-{
-    float hit_dest = 9999999.9f;
-    Vec3 hit;
-    const Material* m = NULL;
-    Vec3 to = up_vector * 10000.0f;
-    const TriangleMesh &tm = Track::getCurrentTrack()->getTriangleMesh();
-    if (tm.castRay(m_created_transform.getOrigin(), to, &hit, &m,
-        NULL/*normal*/, /*interpolate*/true))
-    {
-        hit_dest = (hit - m_created_transform.getOrigin()).length();
-        hit_dest -= height_remove;
-        if (hit_dest < 1.0f)
-        {
-            hit_dest = 1.0f;
-        }
-    }
-    return hit_dest;
-}   // getMaximumHeight
-
-// ----------------------------------------------------------------------------
-void AbstractKartAnimation::saveState(BareNetworkString* buffer)
-{
-    buffer->addUInt32(m_created_ticks);
-    buffer->addInt24(m_created_transform_compressed[0])
-        .addInt24(m_created_transform_compressed[1])
-        .addInt24(m_created_transform_compressed[2])
-        .addUInt32(m_created_transform_compressed[3]);
-}   // saveState
-
-// ----------------------------------------------------------------------------
-/** Used in constructor of sub-class as no virtual function can be used there.
- */
-void AbstractKartAnimation::restoreBasicState(BareNetworkString* buffer)
-{
-    m_created_ticks = buffer->getUInt32();
-    m_created_transform_compressed[0] = buffer->getInt24();
-    m_created_transform_compressed[1] = buffer->getInt24();
-    m_created_transform_compressed[2] = buffer->getInt24();
-    m_created_transform_compressed[3] = buffer->getUInt32();
-    m_created_transform =
-        MiniGLM::decompressbtTransform(m_created_transform_compressed);
-}   // restoreBasicState

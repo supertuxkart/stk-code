@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
-        <header id="title" width="100%" height="fit" text_align="center"
+    <div x="2%" y="2%" width="100%" height="96%" layout="vertical-row">
+        <header id="title" width="96%" height="fit" text_align="center"
                 word_wrap="true" I18N="In player rankings dialog"
                 text="Top 10 players"/>
-        
-         <spacer height="1%" width="20" />
 
         <box x="2%" width="90%" height="60%" align="center" layout="vertical-row"
                 padding="6">
@@ -14,17 +12,15 @@
 
         <label id="cur-rank" proportion="1" width="90%" align="center"
                text_align="center" word_wrap="true" text=""/>
-               
-        <spacer height="1%" width="20" />
 
-        <buttonbar id="options" width="90%" height="14%" align="center">
-            <icon-button id="ok" width="128" height="128"
+        <buttonbar id="options" width="90%" height="10%" align="center">
+            <icon-button id="ok" width="16" height="16"
                          icon="gui/icons/green_check.png" text="OK"
                          label_location="bottom"/>
-            <icon-button id="refresh" width="128" height="128"
+            <icon-button id="refresh" width="16" height="16"
                          icon="gui/icons/restart.png"
                          text="Refresh" label_location="bottom"/>
         </buttonbar>
-        <spacer height="1f" width="20"/>
+        <spacer width="20" height="2%" />
     </div>
 </stkgui>

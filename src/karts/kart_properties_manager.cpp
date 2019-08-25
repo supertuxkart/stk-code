@@ -56,12 +56,6 @@ KartPropertiesManager::~KartPropertiesManager()
 }   // ~KartPropertiesManager
 
 //-----------------------------------------------------------------------------
-void KartPropertiesManager::removeKartSearchDirs()
-{
-    m_kart_search_path.clear();
-}   // removeKartSearchDirs
-
-//-----------------------------------------------------------------------------
 /** Adds a directory from which karts are loaded. The kart manager checks if
  *  either this directory itself contains a kart, and if any subdirectory
  *  contains a kart.

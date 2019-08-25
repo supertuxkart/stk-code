@@ -128,9 +128,6 @@ private:
     /** True if this material can be colorized (like red/blue in team game). */
     bool             m_colorizable;
 
-    /** True if this material should use texture compression. */
-    bool             m_tex_compression;
-
     /** Minimum resulting saturation when colorized (from 0 to 1) */
     float            m_colorization_factor;
 
@@ -371,16 +368,7 @@ public:
         return m_sampler_path[layer];
     }
     // ------------------------------------------------------------------------
-    /* Return the container id used by texture compression to cache texture in
-     * cache folder with unique name, if no texture compression is used for
-     * this material, then it will always return empty. */
-    const std::string& getContainerId() const
-    {
-        static std::string empty;
-        if (!m_tex_compression)
-            return empty;
-        return m_container_id;
-    }
+    const std::string& getContainerId() const        { return m_container_id; }
 };
 
 

@@ -43,7 +43,6 @@ namespace GUIEngine
     class IconButtonWidget : public Widget
     {
     private:
-        irr::core::rect<s32>  m_list_header_icon_rect;
         irr::video::ITexture* m_texture;
         irr::video::ITexture* m_deactivated_texture;
         irr::video::ITexture* m_highlight_texture;
@@ -56,7 +55,6 @@ namespace GUIEngine
         enum ScaleMode
         {
             SCALE_MODE_STRETCH,
-            SCALE_MODE_LIST_WIDGET,
             SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO,
             SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO
         };
@@ -171,11 +169,6 @@ namespace GUIEngine
         {
             Widget::elementRemoved();
             m_label = NULL;
-        }
-        // --------------------------------------------------------------------
-        const irr::core::rect<s32>& getListHeaderIconRect() const
-        {
-            return m_list_header_icon_rect;
         }
     };
 }

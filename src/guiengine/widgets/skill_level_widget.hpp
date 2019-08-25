@@ -63,7 +63,7 @@ namespace GUIEngine
 
         SkillLevelWidget(core::recti area, const int player_id,
                          bool multiplayer, bool display_text,
-                         const float value = 0);
+                         const int value = 0);
 
         virtual ~SkillLevelWidget() {};
 
@@ -82,10 +82,10 @@ namespace GUIEngine
         void setSize(const int x, const int y, const int w, const int h);
 
         /** Change the value of the widget, it must be a percent. */
-        void setValue(const float value);
+        void setValue(const int value);
         
         /** Get the current values of the widget. */
-        float getValue() {return m_bar->getValue(); };
+        int getValue() {return m_bar->getValue(); };
 
         /** Change the label of the widget */
         void setLabel(const irr::core::stringw& label);

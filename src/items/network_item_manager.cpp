@@ -40,14 +40,9 @@ void NetworkItemManager::create()
 
 // ============================================================================
 /** Creates a new instance of the item manager. This is done at startup
- *  of each race.
- *  We must save the item state first (so that it is restored first), otherwise
- *  state updates for a kart could be overwritten by e.g. simulating the item
- *  collection later (which resets bubblegum counter), so a rewinder uid of
- *  "I" which is less than "Kx" (kart rewinder with id x)
- */
+ *  of each race. */
 NetworkItemManager::NetworkItemManager()
-                  : Rewinder({RN_ITEM_MANAGER}), ItemManager()
+                  : Rewinder("N"), ItemManager()
 {
     m_confirmed_switch_ticks = -1;
     m_last_confirmed_item_ticks.clear();
@@ -82,6 +77,21 @@ void NetworkItemManager::reset()
     m_confirmed_switch_ticks = -1;
     ItemManager::reset();
 }   // reset
+
+//-----------------------------------------------------------------------------
+/** Initialize state at the start of a race.
+ */
+void NetworkItemManager::initClientConfirmState()
+{
+    m_confirmed_state_time = 0;
+
+    m_confirmed_state.clear();
+    for(auto i : m_all_items)
+    {
+        ItemState *is = new ItemState(*i);
+        m_confirmed_state.push_back(is);
+    }
+}   // initClientConfirmState
 
 //-----------------------------------------------------------------------------
 /** Called when a kart collects an item. In network games only the server
@@ -176,11 +186,7 @@ void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
                                                  int ticks)
 {
     assert(NetworkConfig::get()->isServer());
-    std::unique_lock<std::mutex> ul(m_live_players_mutex);
-    // Peer may get removed earlier if peer request to go back to lobby
-    if (m_last_confirmed_item_ticks.find(peer) !=
-        m_last_confirmed_item_ticks.end() &&
-        ticks > m_last_confirmed_item_ticks.at(peer))
+    if (ticks > m_last_confirmed_item_ticks.at(peer))
         m_last_confirmed_item_ticks.at(peer) = ticks;
 
     // Now discard unneeded events and expired (disconnected) peer, i.e. all
@@ -199,7 +205,6 @@ void NetworkItemManager::setItemConfirmationTime(std::weak_ptr<STKPeer> peer,
             it++;
         }
     }
-    ul.unlock();
 
     // Find the last entry before the minimal confirmed time.
     // Since the event list is sorted, all events up to this
@@ -475,17 +480,14 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     // be the larger group (confirmed: when a new item was dropped
     // by a remote kart; all_items: if an item is predicted on
     // the client, but not yet confirmed). So 
-    size_t max_index = std::max(m_confirmed_state.size(),
+    unsigned int max_index = std::max(m_confirmed_state.size(),
                                       m_all_items.size()        );
-    m_all_items.resize(max_index, NULL);
 
     for(unsigned int i=0; i<max_index; i++)
     {
-        ItemState *item     = m_all_items[i];
+        ItemState *item     = i < m_all_items.size() ?  m_all_items[i] : NULL;
         const ItemState *is = i < m_confirmed_state.size() 
                             ? m_confirmed_state[i] : NULL;
-        // For every *(ItemState*)item = *is, all deactivated ticks, item id
-        // ... will be copied from item state to item
         if (is && item)
         {
             *(ItemState*)item = *is;
@@ -498,19 +500,31 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
             Vec3 normal = is->getNormal();
             Item *item_new = dropNewItem(is->getType(), is->getPreviousOwner(),
                                          &xyz, &normal );
-            *((ItemState*)item_new) = *is;
-            m_all_items[i] = item_new;
-            insertItemInQuad(item_new);
+            if (i != item_new->getItemId())
+            {
+                // The newly created item on the client has been given a 
+                // different index than the one given by the server. This
+                // indicates that this client has either a different item
+                // at the index that the server sent (i.e. client predicted
+                // an item, which the server has not confirmed), or the
+                // client found an empty slot that the server did not have
+                // (so an earlier index was found).
+                if(i < m_all_items.size() && m_all_items[i])
+                    deleteItem(m_all_items[i]);
+                // Move item_new from its position to the index given
+                // by the server
+                m_all_items[item_new->getItemId()] = NULL;
+                m_all_items[i] = item_new;
+                item_new->setItemId(i);
+            }
+            item_new->setDeactivatedTicks(is->getDeactivatedTicks());
+            *((ItemState*)m_all_items[i]) = *is;
         }
         else if (!is && item)
         {
-            deleteItemInQuad(item);
-            delete item;
-            m_all_items[i] = NULL;
+            deleteItem(m_all_items[i]);
         }
     }   // for i < max_index
-    // Clean up the rest
-    m_all_items.resize(m_confirmed_state.size());
 
     // Now set the clock back to the 'rewindto' time:
     world->setTicksForRewind(rewind_to_time);
@@ -519,50 +533,3 @@ void NetworkItemManager::restoreState(BareNetworkString *buffer, int count)
     m_confirmed_state_time   = world->getTicksSinceStart();
     m_confirmed_switch_ticks = m_switch_ticks;
 }   // restoreState
-
-//-----------------------------------------------------------------------------
-/** Save all current items at current ticks in server for live join
- */
-void NetworkItemManager::saveCompleteState(BareNetworkString* buffer) const
-{
-    const uint32_t all_items = (uint32_t)m_all_items.size();
-    buffer->addUInt32(World::getWorld()->getTicksSinceStart())
-        .addUInt32(m_switch_ticks).addUInt32(all_items);
-    for (unsigned i = 0; i < all_items; i++)
-    {
-        if (m_all_items[i])
-        {
-            buffer->addUInt8(1);
-            m_all_items[i]->saveCompleteState(buffer);
-        }
-        else
-            buffer->addUInt8(0);
-    }
-}   // saveCompleteState
-
-//-----------------------------------------------------------------------------
-/** Restore all current items at current ticks in client for live join
- *  or at the start of a race.
- */
-void NetworkItemManager::restoreCompleteState(const BareNetworkString& buffer)
-{
-    m_confirmed_state_time = buffer.getUInt32();
-    m_confirmed_switch_ticks = buffer.getUInt32();
-    uint32_t all_items = buffer.getUInt32();
-    for (ItemState* is : m_confirmed_state)
-    {
-        delete is;
-    }
-    m_confirmed_state.clear();
-    for (unsigned i = 0; i < all_items; i++)
-    {
-        const bool has_item = buffer.getUInt8() == 1;
-        if (has_item)
-        {
-            ItemState* is = new ItemState(buffer);
-            m_confirmed_state.push_back(is);
-        }
-        else
-            m_confirmed_state.push_back(NULL);
-    }
-}   // restoreCompleteState

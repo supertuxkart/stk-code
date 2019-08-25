@@ -28,8 +28,6 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <angelscript.h>
 #include "scriptarray.hpp"
@@ -93,7 +91,7 @@ namespace Scripting
         /** Get translated version of string */
         std::string translate(std::string* input)
         {
-            irr::core::stringw out = translations->w_gettext(input->c_str());
+            irr::core::stringw out = translations->fribidize(translations->w_gettext(input->c_str()));
 
             return StringUtils::wideToUtf8(out);
         }
@@ -106,6 +104,8 @@ namespace Scripting
             out = StringUtils::insertValues(out,
                                             StringUtils::utf8ToWide(*arg1));
 
+            out = translations->fribidize(out);
+
             return StringUtils::wideToUtf8(out);
         }
 
@@ -117,6 +117,8 @@ namespace Scripting
             out = StringUtils::insertValues(out,
                                             StringUtils::utf8ToWide(*arg1),
                                             StringUtils::utf8ToWide(*arg2));
+
+            out = translations->fribidize(out);
 
             return StringUtils::wideToUtf8(out);
         }
@@ -131,6 +133,8 @@ namespace Scripting
                                             StringUtils::utf8ToWide(*arg1),
                                             StringUtils::utf8ToWide(*arg2),
                                             StringUtils::utf8ToWide(*arg3));
+
+            out = translations->fribidize(out);
 
             return StringUtils::wideToUtf8(out);
         }

@@ -19,8 +19,6 @@
 #include "network/protocols/connect_to_server.hpp"
 
 #include "config/user_config.hpp"
-#include "io/file_manager.hpp"
-#include "io/xml_node.hpp"
 #include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/network.hpp"
@@ -35,8 +33,6 @@
 #include "states_screens/online/networking_lobby.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <algorithm>
 // ============================================================================
@@ -94,14 +90,14 @@ void ConnectToServer::getClientServerInfo()
     assert(m_server);
     // Allow up to 10 seconds for the separate process to fully start-up
     bool started = false;
-    uint64_t timeout = StkTime::getMonoTimeMs() + 10000;
+    uint64_t timeout = StkTime::getRealTimeMs() + 10000;
     const std::string& sid = NetworkConfig::get()->getServerIdFile();
     assert(!sid.empty());
     const std::string dir = StringUtils::getPath(sid);
     const std::string server_id_file = StringUtils::getBasename(sid);
     uint16_t port = 0;
     unsigned server_id = 0;
-    while (StkTime::getMonoTimeMs() < timeout)
+    while (StkTime::getRealTimeMs() < timeout)
     {
         std::set<std::string> files;
         file_manager->listFiles(files, dir);
@@ -184,19 +180,12 @@ void ConnectToServer::asynchronousUpdate()
 
                 if (!servers.empty())
                 {
-                    // For quick play we choose the server with the shortest
-                    // distance and not empty and full server
+                    // For quick play we choose the server with the least player
                     std::sort(servers.begin(), servers.end(), []
                         (const std::shared_ptr<Server> a,
                         const std::shared_ptr<Server> b)->bool
                         {
-                            return a->getDistance() < b->getDistance();
-                        });
-                    std::stable_partition(servers.begin(), servers.end(), []
-                        (const std::shared_ptr<Server> a)->bool
-                        {
-                            return a->getCurrentPlayers() != 0 &&
-                                a->getCurrentPlayers() != a->getMaxPlayers();
+                            return a->getCurrentPlayers() < b->getCurrentPlayers();
                         });
                     m_server = servers[0];
                     m_server_address = m_server->getAddress();
@@ -281,10 +270,8 @@ void ConnectToServer::update(int ticks)
             {
                 // Let main thread create ClientLobby for better
                 // synchronization with GUI
-                NetworkConfig::get()->clearActivePlayersForClient();
                 auto cl = LobbyProtocol::create<ClientLobby>(m_server_address,
                     m_server);
-                STKHost::get()->startListening();
                 cl->requestStart();
             }
             if (STKHost::get()->getPeerCount() == 0)

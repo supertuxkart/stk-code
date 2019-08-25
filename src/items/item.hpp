@@ -32,7 +32,6 @@
 
 #include <line3d.h>
 
-class BareNetworkString;
 class AbstractKart;
 class LODNode;
 
@@ -41,6 +40,19 @@ namespace irr
     namespace scene { class IMesh; class ISceneNode; }
 }
 using namespace irr;
+
+// ============================================================================
+
+/**
+ * \ingroup items
+ * \brief Listener class to go with Items of type ITEM_TRIGGER
+ */
+class TriggerItemListener
+{
+public:
+    virtual ~TriggerItemListener() {}
+    virtual void onTriggerItemApproached() = 0;
+};
 
 // ============================================================================
 /** \ingroup items
@@ -70,7 +82,11 @@ public:
 
         /** For easter egg mode only. */
         ITEM_EASTER_EGG,
-        ITEM_LAST = ITEM_EASTER_EGG,
+        /** An invisible item that can be used to trigger some behavior when
+        * approaching a point
+        */
+        ITEM_TRIGGER,
+        ITEM_LAST = ITEM_TRIGGER,
         ITEM_COUNT,
         ITEM_NONE
     };
@@ -144,11 +160,7 @@ protected:
     }   // hitLine
 
 public:
-    // ------------------------------------------------------------------------
          ItemState(ItemType type, const AbstractKart *owner=NULL, int id = -1);
-    // ------------------------------------------------------------------------
-         ItemState(const BareNetworkString& buffer);
-    // ------------------------------------------------------------------------
     void initItem(ItemType type, const Vec3& xyz, const Vec3& normal);
     void update(int ticks);
     void setDisappearCounter();
@@ -218,7 +230,7 @@ public:
     virtual void switchTo(ItemType type)
     {
         // triggers and easter eggs should not be switched
-        if (m_type == ITEM_EASTER_EGG) return;
+        if (m_type == ITEM_TRIGGER || m_type == ITEM_EASTER_EGG) return;
         m_original_type = m_type;
         setType(type);
         return;
@@ -229,6 +241,8 @@ public:
      */
     virtual bool switchBack()
     {
+        // triggers should not be switched
+        if (m_type == ITEM_TRIGGER) return true;
         // If the item is not switched, do nothing. This can happen if a bubble
         // gum is dropped while items are switched - when switching back, this
         // bubble gum has no original type.
@@ -312,8 +326,7 @@ public:
     {
         return m_original_rotation;
     }
-    // ------------------------------------------------------------------------
-    void saveCompleteState(BareNetworkString* buffer) const;
+
 };   // class ItemState
 
 // ============================================================================
@@ -332,6 +345,9 @@ private:
 
     /** Stores if the item was available in the previously rendered frame. */
     bool m_was_available_previously;
+
+    /** callback used if type == ITEM_TRIGGER */
+    TriggerItemListener* m_listener;
 
     /** square distance at which item is collected */
     float m_distance_2;
@@ -355,7 +371,10 @@ private:
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                        scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-                       const AbstractKart *owner);
+                       const AbstractKart *owner,
+                       bool is_predicted=false);
+                  Item(const Vec3& xyz, float distance,
+                       TriggerItemListener* trigger);
     virtual       ~Item ();
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset() OVERRIDE;
@@ -368,6 +387,8 @@ public:
     virtual void collected(const AbstractKart *kart)  OVERRIDE
     {
         ItemState::collected(kart);
+        if (m_listener != NULL)
+            m_listener->onTriggerItemApproached();
     }   // isCollected
     //-------------------------------------------------------------------------
     /** Switch backs to the original item. Returns true if the item was not
@@ -400,7 +421,8 @@ public:
         return lc.length2() < m_distance_2;
     }   // hitKart
     // ------------------------------------------------------------------------
-    bool rotating() const               { return getType() != ITEM_BUBBLEGUM; }
+    bool rotating() const
+           { return getType() != ITEM_BUBBLEGUM && getType() != ITEM_TRIGGER; }
 
 public:
     // ------------------------------------------------------------------------

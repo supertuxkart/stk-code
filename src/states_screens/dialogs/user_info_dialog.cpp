@@ -21,12 +21,10 @@
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "online/online_profile.hpp"
-#include "online/xml_request.hpp"
 #include "states_screens/online/online_profile_achievements.hpp"
 #include "states_screens/online/online_profile_friends.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
-#include "utils/string_utils.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -52,9 +50,7 @@ void UserInfoDialog::load()
     loadFromFile("online/user_info_dialog.stkgui");
     if(m_error)
         m_info_widget->setErrorColor();
-    //I18N: In the user info dialog
-    m_desc_widget->setText(_("Username: %s", m_online_profile->getUserName()),
-        false);
+    m_name_widget->setText(m_online_profile->getUserName(),false);
     m_info_widget->setText(m_info, false);
     if(m_remove_widget->isVisible() && !m_online_profile->isFriend())
         m_remove_widget->setLabel(_("Cancel Request"));
@@ -72,8 +68,8 @@ void UserInfoDialog::beforeAddingWidgets()
     m_self_destroy = false;
     m_enter_profile = false;
     m_processing = false;
-    m_desc_widget = getWidget<LabelWidget>("desc");
-    assert(m_desc_widget != NULL);
+    m_name_widget = getWidget<LabelWidget>("name");
+    assert(m_name_widget != NULL);
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
 

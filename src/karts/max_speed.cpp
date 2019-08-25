@@ -26,7 +26,6 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <cstdlib>
 
 /** This class handles maximum speed for karts. Several factors can influence
  *  the maximum speed a kart can drive, some will decrease the maximum speed,
@@ -97,56 +96,11 @@ void MaxSpeed::increaseMaxSpeed(unsigned int category, float add_speed,
     // Allow fade_out_time 0 if add_speed is set to 0.
     assert(add_speed==0.0f || fade_out_time>0.01f);
     assert(category>=MS_INCREASE_MIN && category <MS_INCREASE_MAX);
-
-    if (add_speed < 0.0f || engine_force < 0.0f)
-    {
-        Log::warn("MaxSpeed::increaseMaxSpeed",
-            "Negative add_speed %f or engine_force %f, ignored.",
-            add_speed, engine_force);
-        return;
-    }
-
-    int add_speed_i = (int)(add_speed * 1000.0f);
-    if (add_speed_i > 65535)
-    {
-        Log::warn("MaxSpeed::increaseMaxSpeed",
-            "%f add_speed too large.", add_speed);
-        add_speed_i = 65535;
-    }
-
-    int engine_force_i = (int)(engine_force * 10.0f);
-    if (engine_force_i > 65535)
-    {
-        Log::warn("MaxSpeed::increaseMaxSpeed",
-            "%f engine_force too large.", engine_force);
-        engine_force_i = 65535;
-    }
-
-    int16_t fade = 0;
-    if (fade_out_time > 32767)
-    {
-        Log::warn("MaxSpeed::increaseMaxSpeed",
-            "%d fade_out_time too large.", fade);
-        fade = (int16_t)32767;
-    }
-    else
-        fade = (int16_t)fade_out_time;
-
-    int16_t dur = 0;
-    if (duration > 32767)
-    {
-        Log::warn("MaxSpeed::increaseMaxSpeed",
-            "%d duration too large.", dur);
-        dur = (int16_t)32767;
-    }
-    else
-        dur = (int16_t)duration;
-
-    m_speed_increase[category].m_max_add_speed = (uint16_t)add_speed_i;
-    m_speed_increase[category].m_duration        = dur;
-    m_speed_increase[category].m_fade_out_time   = fade;
+    m_speed_increase[category].m_max_add_speed   = add_speed;
+    m_speed_increase[category].m_duration        = duration;
+    m_speed_increase[category].m_fade_out_time   = fade_out_time;
     m_speed_increase[category].m_current_speedup = add_speed;
-    m_speed_increase[category].m_engine_force = (uint16_t)engine_force_i;
+    m_speed_increase[category].m_engine_force    = engine_force;
 }   // increaseMaxSpeed
 
 // ----------------------------------------------------------------------------
@@ -194,38 +148,28 @@ void MaxSpeed::instantSpeedIncrease(unsigned int category,
  */
 void MaxSpeed::SpeedIncrease::update(int ticks)
 {
-    if (m_duration == std::numeric_limits<int16_t>::min())
-    {
-        m_current_speedup = 0;
-        m_max_add_speed = 0;
-        return;
-    }
     m_duration -= ticks;
     // End of increased max speed reached.
     if(m_duration < -m_fade_out_time)
     {
-        m_duration = std::numeric_limits<int16_t>::min();
         m_current_speedup = 0;
-        m_max_add_speed = 0;
         return;
     }
     // If we are still in main max speed increase time, do nothing
-    m_current_speedup = (float)m_max_add_speed / 1000.0f;
-    if (m_duration > 0)
-        return;
+    if(m_duration >0) return;
 
     // Now we are in the fade out period: decrease time linearly
-    m_current_speedup -= std::abs(m_duration - ticks) *
-        ((float)m_max_add_speed / 1000.0f) / m_fade_out_time;
+    m_current_speedup -= ticks*m_max_add_speed/m_fade_out_time;
 }   // SpeedIncrease::update
 
 // ----------------------------------------------------------------------------
 void MaxSpeed::SpeedIncrease::saveState(BareNetworkString *buffer) const
 {
-    buffer->addUInt16(m_max_add_speed);
-    buffer->addUInt16(m_duration);
-    buffer->addUInt16(m_fade_out_time);
-    buffer->addUInt16(m_engine_force);
+    buffer->addFloat(m_max_add_speed);
+    buffer->addUInt32(m_duration);
+    buffer->addUInt32(m_fade_out_time);
+    buffer->addFloat(m_current_speedup);
+    buffer->addFloat(m_engine_force);
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -234,10 +178,11 @@ void MaxSpeed::SpeedIncrease::rewindTo(BareNetworkString *buffer,
 {
     if(is_active)
     {
-        m_max_add_speed   = buffer->getUInt16();
-        m_duration        = buffer->getUInt16();
-        m_fade_out_time   = buffer->getUInt16();
-        m_engine_force    = buffer->getUInt16();
+        m_max_add_speed   = buffer->getFloat();
+        m_duration        = buffer->getUInt32();
+        m_fade_out_time   = buffer->getUInt32();
+        m_current_speedup = buffer->getFloat();
+        m_engine_force    = buffer->getFloat();
     }
     else   // make sure to disable this category
     {
@@ -258,46 +203,9 @@ void MaxSpeed::setSlowdown(unsigned int category, float max_speed_fraction,
                            int fade_in_ticks, int duration)
 {
     assert(category>=MS_DECREASE_MIN && category <MS_DECREASE_MAX);
-    if (max_speed_fraction < 0.0f)
-    {
-        Log::warn("MaxSpeed::increaseMaxSpeed",
-            "Negative max_speed_fraction %f, ignored.",
-            max_speed_fraction);
-        return;
-    }
-
-    int max_speed_fraction_i = (int)(max_speed_fraction * 1000.0f);
-    if (max_speed_fraction_i > 65535)
-    {
-        Log::warn("MaxSpeed::increaseMaxSpeed",
-            "%f max_speed_fraction too large.", max_speed_fraction);
-        max_speed_fraction_i = 65535;
-    }
-
-    int16_t fade = 0;
-    if (fade_in_ticks > 32767)
-    {
-        Log::warn("MaxSpeed::setSlowdown",
-            "%d fade_in_ticks too large.", fade);
-        fade = (int16_t)32767;
-    }
-    else
-        fade = (int16_t)fade_in_ticks;
-
-    int16_t dur = 0;
-    if (duration > 32767)
-    {
-        Log::warn("MaxSpeed::setSlowdown",
-            "%d duration too large.", dur);
-        dur = (int16_t)32767;
-    }
-    else
-        dur = (int16_t)duration;
-
-    m_speed_decrease[category].m_fade_in_ticks = fade;
-    m_speed_decrease[category].m_duration = dur;
-    m_speed_decrease[category].m_max_speed_fraction =
-        (uint16_t)max_speed_fraction_i;
+    m_speed_decrease[category].m_max_speed_fraction = max_speed_fraction;
+    m_speed_decrease[category].m_fade_in_ticks      = fade_in_ticks;
+    m_speed_decrease[category].m_duration           = duration;
 }   // setSlowdown
 
 // ----------------------------------------------------------------------------
@@ -314,22 +222,22 @@ void MaxSpeed::SpeedDecrease::update(int ticks)
         {
             m_duration           = 0;
             m_current_fraction   = 1.0f;
-            m_max_speed_fraction = 1000;
+            m_max_speed_fraction = 1.0f;
             return;
         }
     }
 
-    float diff = m_current_fraction - m_max_speed_fraction / 1000.0f;
+    float diff = m_current_fraction - m_max_speed_fraction;
 
     if (diff > 0)
     {
         if (diff * m_fade_in_ticks > ticks)
             m_current_fraction -= float(ticks) / float(m_fade_in_ticks);
         else
-            m_current_fraction = m_max_speed_fraction / 1000.0f;
+            m_current_fraction = m_max_speed_fraction;
     }
     else
-        m_current_fraction = m_max_speed_fraction / 1000.0f;
+        m_current_fraction = m_max_speed_fraction;
 }   // SpeedDecrease::update
 
 // ----------------------------------------------------------------------------
@@ -339,10 +247,10 @@ void MaxSpeed::SpeedDecrease::update(int ticks)
  */
 void MaxSpeed::SpeedDecrease::saveState(BareNetworkString *buffer) const
 {
-    buffer->addUInt16(m_max_speed_fraction);
+    buffer->addFloat(m_max_speed_fraction);
+    buffer->addUInt32(m_fade_in_ticks);
     buffer->addFloat(m_current_fraction);
-    buffer->addUInt16(m_fade_in_ticks);
-    buffer->addUInt16(m_duration);
+    buffer->addUInt32(m_duration);
 }   // saveState
 
 // ----------------------------------------------------------------------------
@@ -353,10 +261,10 @@ void MaxSpeed::SpeedDecrease::rewindTo(BareNetworkString *buffer,
 {
     if(is_active)
     {
-        m_max_speed_fraction = buffer->getUInt16();
+        m_max_speed_fraction = buffer->getFloat();
+        m_fade_in_ticks      = buffer->getUInt32();
         m_current_fraction   = buffer->getFloat();
-        m_fade_in_ticks      = buffer->getUInt16();
-        m_duration           = buffer->getUInt16();
+        m_duration           = buffer->getUInt32();
     }
     else   // make sure it is not active
     {
@@ -394,7 +302,7 @@ int MaxSpeed::isSpeedDecreaseActive(unsigned int category)
 // ----------------------------------------------------------------------------
 /** Updates all speed increase and decrease objects, and determines the
  *  current maximum speed. Note that the function can be called with
- *  dt=0, in which case the maximum speed will be updated, but no
+ *  dt=0, in which case the maxium speed will be updated, but no
  *  change to any of the speed increase/decrease objects will be done.
  *  \param dt Time step size (dt=0 only updates the current maximum speed).
  */

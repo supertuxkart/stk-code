@@ -58,6 +58,13 @@ include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
+# Freetype
+LOCAL_MODULE := freetype
+LOCAL_SRC_FILES := obj/freetype/objs/.libs/libfreetype.a
+include $(PREBUILT_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
 # zlib
 LOCAL_MODULE := zlib
 LOCAL_SRC_FILES := obj/zlib/libz.a
@@ -69,44 +76,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := png
 LOCAL_SRC_FILES := obj/libpng/libpng.a
 include $(PREBUILT_STATIC_LIBRARY)
-include $(CLEAR_VARS)
-
-
-# Fribidi
-LOCAL_MODULE       := fribidi
-LOCAL_SRC_FILES    := obj/fribidi/lib/.libs/libfribidi.a
-include $(PREBUILT_STATIC_LIBRARY)
-include $(CLEAR_VARS)
-
-
-# Freetype
-LOCAL_MODULE := freetype
-LOCAL_SRC_FILES := obj/freetype/objs/.libs/libfreetype.a
-include $(PREBUILT_STATIC_LIBRARY)
-include $(CLEAR_VARS)
-
-
-# Harfbuzz
-LOCAL_MODULE       := harfbuzz
-LOCAL_SRC_FILES    := obj/harfbuzz/src/.libs/libharfbuzz.a
-include $(PREBUILT_STATIC_LIBRARY)
-include $(CLEAR_VARS)
-
-
-# Raqm
-LOCAL_MODULE       := raqm
-LOCAL_PATH         := .
-LOCAL_CPP_FEATURES += rtti
-LOCAL_SRC_FILES    := $(wildcard ../lib/libraqm/*.c)
-LOCAL_CFLAGS       := -Iobj/fribidi/include             \
-                      -Iobj/freetype/include            \
-                      -Iobj/harfbuzz/include            \
-                      -DHAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES \
-                      -DHAVE_HB_BUFFER_SET_INVISIBLE_GLYPH \
-                      -DHAVE_HB_FT_FONT_CREATE_REFERENCED \
-                      -DHAVE_HB_FT_FONT_SET_LOAD_FLAGS \
-                      -std=c99
-include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
@@ -151,16 +120,6 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
-# Graphics utils
-LOCAL_MODULE       := graphics_utils
-LOCAL_PATH         := .
-LOCAL_CPP_FEATURES += rtti
-LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_utils/mipmap/*.c)
-LOCAL_CFLAGS       := -I../lib/graphics_utils/mipmap
-include $(BUILD_STATIC_LIBRARY)
-include $(CLEAR_VARS)
-
-
 # Irrlicht
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
@@ -170,11 +129,9 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)         
                       ../lib/irrlicht/source/Irrlicht/stk_android_native_app_glue.c
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
-                      -I../src                           \
                       -Iobj/jpeglib/                     \
                       -Iobj/libpng/                      \
-                      -Iobj/zlib/                        \
-                      -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
+                      -Iobj/zlib/                        
 LOCAL_CPPFLAGS     := -std=gnu++0x
 LOCAL_STATIC_LIBRARIES := jpeglib png zlib
 include $(BUILD_STATIC_LIBRARY)
@@ -191,35 +148,29 @@ LOCAL_SRC_FILES    := $(wildcard ../src/*.cpp)     \
 LOCAL_LDLIBS       := -llog -landroid -lEGL -lGLESv3 -lOpenSLES
 LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/bullet/src               \
-                      -I../lib/libraqm                  \
                       -I../lib/enet/include             \
                       -I../lib/ifaddrs                  \
                       -I../lib/irrlicht/include         \
                       -I../lib/irrlicht/source/Irrlicht \
-                      -I../lib/graphics_utils           \
                       -I../src                          \
                       -Iobj/curl/include                \
-                      -Iobj/fribidi/include             \
                       -Iobj/freetype/include            \
-                      -Iobj/harfbuzz/include            \
                       -Iobj/libogg/include              \
                       -Iobj/libvorbis/include           \
                       -Iobj/openal/include              \
                       -Iobj/openssl/include             \
                       -DUSE_GLES2      \
-                      -DMOBILE_STK     \
                       -DENABLE_SOUND   \
                       -DENABLE_CRYPTO_OPENSSL           \
                       -DNDEBUG         \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
                       -DANDROID_APP_DIR_NAME=\"$(APP_DIR_NAME)\"    \
-                      -DSUPERTUXKART_VERSION=\"$(PROJECT_VERSION)\" \
-                      -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
+                      -DSUPERTUXKART_VERSION=\"$(PROJECT_VERSION)\"
 LOCAL_CPPFLAGS     := -std=gnu++0x
 
-LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript  \
+LOCAL_STATIC_LIBRARIES := irrlicht bullet enet freetype ifaddrs angelscript  \
                           vorbisfile vorbis ogg openal curl libssl libcrypto \
-                          gnustl_static raqm fribidi harfbuzz freetype graphics_utils
+                          gnustl_static
 
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)

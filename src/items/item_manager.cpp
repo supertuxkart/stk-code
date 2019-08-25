@@ -73,9 +73,6 @@ void ItemManager::destroy()
  */
 void ItemManager::loadDefaultItemMeshes()
 {
-    m_item_mesh.clear();
-    m_item_lowres_mesh.clear();
-    m_glow_color.clear();
     m_item_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
     m_glow_color.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1,
                         video::SColorf(255.0f, 255.0f, 255.0f) );
@@ -89,6 +86,7 @@ void ItemManager::loadDefaultItemMeshes()
     item_names[ItemState::ITEM_BUBBLEGUM  ] = "bubblegum";
     item_names[ItemState::ITEM_NITRO_BIG  ] = "nitro-big";
     item_names[ItemState::ITEM_NITRO_SMALL] = "nitro-small";
+    item_names[ItemState::ITEM_TRIGGER    ] = "trigger";
     item_names[ItemState::ITEM_BUBBLEGUM_NOLOK] = "bubblegum-nolok";
     item_names[ItemState::ITEM_EASTER_EGG ] = "easter-egg";
 
@@ -139,8 +137,6 @@ void ItemManager::loadDefaultItemMeshes()
  */
 void ItemManager::removeTextures()
 {
-    if (m_item_mesh.empty() && m_item_lowres_mesh.empty())
-        return;
     for(unsigned int i=0; i<ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1; i++)
     {
         if(m_item_mesh[i])
@@ -239,18 +235,9 @@ unsigned int ItemManager::insertItem(Item *item)
         m_all_items[index] = item;
     }
     item->setItemId(index);
-    insertItemInQuad(item);
+
     // Now insert into the appropriate quad list, if there is a quad list
     // (i.e. race mode has a quad graph).
-    return index;
-}   // insertItem
-
-//-----------------------------------------------------------------------------
-/** Insert into the appropriate quad list, if there is a quad list
- *  (i.e. race mode has a quad graph).
- */
-void ItemManager::insertItemInQuad(Item *item)
-{
     if(m_items_in_quads)
     {
         int graph_node = item->getGraphNode();
@@ -262,7 +249,8 @@ void ItemManager::insertItemInQuad(Item *item)
         else  // otherwise store it in the 'outside' index
             (*m_items_in_quads)[m_items_in_quads->size()-1].push_back(item);
     }   // if m_items_in_quads
-}   // insertItemInQuad
+    return index;
+}   // insertItem
 
 //-----------------------------------------------------------------------------
 /** Creates a new item at the location of the kart (e.g. kart drops a
@@ -315,10 +303,7 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
                           m_item_lowres_mesh[mesh_type], /*prev_owner*/kart);
-
-    // restoreState in NetworkItemManager will handle the insert item
-    if (!server_xyz)
-        insertItem(item);
+    insertItem(item);
     if(m_switch_ticks>=0)
     {
         ItemState::ItemType new_type = m_switch_to[item->getType()];
@@ -356,6 +341,23 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     }
     return item;
 }   // placeItem
+
+//-----------------------------------------------------------------------------
+/** Creates a new trigger item. This is not synched between client and 
+ *  server, since the triggers are created at startup only and should
+ *  therefore always be in sync.
+ *  \param xyz  Position of the item.
+ *  \param listener The listener object that gets called when a kart
+ *         triggers this trigger.
+ */
+Item* ItemManager::placeTrigger(const Vec3& xyz, float distance,
+                                TriggerItemListener* listener)
+{
+    Item* item = new Item(xyz, distance, listener);
+    insertItem(item);
+
+    return item;
+}   // placeTrigger
 
 //-----------------------------------------------------------------------------
 /** Set an item as collected.
@@ -520,18 +522,6 @@ void ItemManager::updateGraphics(float dt)
 void ItemManager::deleteItem(ItemState *item)
 {
     // First check if the item needs to be removed from the items-in-quad list
-    deleteItemInQuad(item);
-    int index = item->getItemId();
-    m_all_items[index] = NULL;
-    delete item;
-}   // delete item
-
-//-----------------------------------------------------------------------------
-/** Removes an items from the items-in-quad list only
- *  \param The item to delete.
- */
-void ItemManager::deleteItemInQuad(ItemState* item)
-{
     if(m_items_in_quads)
     {
         int sector = item->getGraphNode();
@@ -543,7 +533,11 @@ void ItemManager::deleteItemInQuad(ItemState* item)
         assert(it!=items.end());
         items.erase(it);
     }   // if m_items_in_quads
-}   // deleteItemInQuad
+
+    int index = item->getItemId();
+    m_all_items[index] = NULL;
+    delete item;
+}   // delete item
 
 //-----------------------------------------------------------------------------
 /** Switches all items: boxes become bananas and vice versa for a certain
@@ -564,6 +558,15 @@ void ItemManager::switchItemsInternal(std::vector<ItemState*> &all_items)
                                i != all_items.end();  i++)
     {
         if(!*i) continue;
+
+        if ( (*i)->getType() == ItemState::ITEM_BUBBLEGUM ||
+             (*i)->getType() == ItemState::ITEM_BUBBLEGUM_NOLOK)
+        {
+            if (race_manager->getAISuperPower() == RaceManager::SUPERPOWER_NOLOK_BOSS)
+            {
+                continue;
+            }
+        }
 
         ItemState::ItemType new_type = m_switch_to[(*i)->getType()];
 

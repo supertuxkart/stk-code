@@ -17,7 +17,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "config/user_config.hpp"
-#include "graphics/graphics_restrictions.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen_keyboard.hpp"
@@ -27,75 +26,40 @@
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
-#include "utils/string_utils.hpp"
+
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#endif
 
 #include <algorithm>
 #include <string>
 
 using namespace GUIEngine;
-// ============================================================================
-ScreenKeyboard::KeyboardLayoutProportions
-                           ScreenKeyboard::getKeyboardLayoutProportions() const
-{
-    return
-        {
-            {2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-            {1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1},
-            {2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
-            {3, 2, 10, 2, 3}
-        };
-}   // getKeyboardLayoutProportions
 
-// ============================================================================
-ScreenKeyboard::KeyboardLayout*
-                        ScreenKeyboard::getKeyboardLayout(ButtonsType bt) const
-{
-    static KeyboardLayout layout_lower =
-            {{"q", "w", "e", "r", "t", "y", "u", "i", "o", "p"},
-             {"Separator", "a", "s", "d", "f", "g", "h", "j", "k", "l", "Separator"},
-             {"Shift", "z", "x", "c", "v", "b", "n", "m", "?", "Back"},
-             {"123", ",", "Space", ".", "Enter"}};
+#define KEYBOARD_COLS_NUM 11
+#define KEYBOARD_ROWS_NUM 3
+typedef std::string KeyboardLayout[KEYBOARD_ROWS_NUM][KEYBOARD_COLS_NUM];
+    
+KeyboardLayout layout_lower = 
+            {{"q", "w", "e", "r", "t", "y", "u", "i", "o", "p",     "123"  },
+             {"a", "s", "d", "f", "g", "h", "j", "k", "l", "Shift", "Back" },
+             {"z", "x", "c", "v", "b", "n", "m", ",", ".", "Space", "Enter"}};
+                                         
+KeyboardLayout layout_upper = 
+            {{"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P",     "123"  },
+             {"A", "S", "D", "F", "G", "H", "J", "K", "L", "Shift", "Back" },
+             {"Z", "X", "C", "V", "B", "N", "M", ",", ".", "Space", "Enter"}};
+             
+KeyboardLayout layout_digits = 
+            {{"1", "2", "3", "!", "@",  "#", "$", "%", "^", "&",     "Text" },
+             {"4", "5", "6", "*", "(",  ")", "-", "+", "?", "Shift", "Back" },               
+             {"7", "8", "9", "0", "\"", ";", ":", ",", ".", "Space", "Enter"}};
+                                    
+KeyboardLayout layout_digits2 = 
+            {{"1", "2", "3", "[", "]",  "{", "}", "~", "`", "\\",    "Text" },
+             {"4", "5", "6", "|", "<",  ">", "_", "=", "/", "Shift", "Back" },
+             {"7", "8", "9", "0", "\'", ";", ":", ",", ".", "Space", "Enter"}};
 
-    static KeyboardLayout layout_upper =
-            {{"Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"},
-             {"Separator", "A", "S", "D", "F", "G", "H", "J", "K", "L", "Separator"},
-             {"Shift", "Z", "X", "C", "V", "B", "N", "M", "!", "Back"},
-             {"123", ",", "Space", ".", "Enter"}};
-
-    static KeyboardLayout layout_digits =
-            {{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"},
-             {"Separator", "@", "#", "$", "%", "^", "&", "*", "(", ")", "Separator"},
-             {"Shift", "-", "+", ":", ";", "\"", "\'", "/", "?", "Back"},
-             {"Text", ",", "Space", ".", "Enter"}};
-
-    static KeyboardLayout layout_digits2 =
-            {{"1", "2", "3", "4", "5", "6", "7", "8", "9", "0"},
-             {"Separator", "@", "[", "]", "{", "}", "~", "`", "\\", "|", "Separator"},
-             {"Shift", "_", "=", ":", ";", "<", ">", "/", "!", "Back"},
-             {"Text", ",", "Space", ".", "Enter"}};
-
-    KeyboardLayout* keys = NULL;
-    switch (bt)
-    {
-    case BUTTONS_LOWER:
-        keys = &layout_lower;
-        break;
-    case BUTTONS_UPPER:
-        keys = &layout_upper;
-        break;
-    case BUTTONS_DIGITS:
-        keys = &layout_digits;
-        break;
-    case BUTTONS_DIGITS2:
-        keys = &layout_digits2;
-        break;
-    default:
-        break;
-    };
-    return keys;
-}   // getKeyboardLayout
-
-// ============================================================================
 ScreenKeyboard* ScreenKeyboard::m_screen_keyboard = NULL;
 
 // ----------------------------------------------------------------------------
@@ -125,7 +89,8 @@ ScreenKeyboard::ScreenKeyboard(float percent_width, float percent_height,
     m_back_button     = NULL;
     m_repeat_time     = 0;
     m_back_button_pressed = false;
-    m_schedule_close = false;
+    
+    init();
 }   // ScreenKeyboard
 
 // ----------------------------------------------------------------------------
@@ -144,14 +109,13 @@ ScreenKeyboard::~ScreenKeyboard()
 }   // ~ScreenKeyboard
 
 // ----------------------------------------------------------------------------
-/** Screen keyboard initialization, needs to be called after new to take into
- *  account for runtime polymorphism
+/** Internal function that makes whole screen keyboard initialization
  */
 void ScreenKeyboard::init()
 {
     const core::dimension2d<u32>& frame_size = irr_driver->getFrameSize();
 
-    int margin = 0;
+    int margin = 15;
     int w = int(frame_size.Width * m_percent_width);
     int h = int(frame_size.Height * m_percent_height);
     int x = frame_size.Width/2 - w/2;
@@ -178,7 +142,7 @@ void ScreenKeyboard::init()
     input_manager->setMode(InputManager::MENU);
     
     createButtons();
-    assignButtons(getDefaultButtonsType());
+    assignButtons(BUTTONS_LOWER);
     
     Widget* button_widget = getWidget<ButtonWidget>("Back");
     assert(button_widget != NULL);
@@ -190,43 +154,26 @@ void ScreenKeyboard::init()
  */
 void ScreenKeyboard::createButtons()
 {
-    const auto& layout_proportions = getKeyboardLayoutProportions();
-    int rows_num = layout_proportions.size();
-    int pos_y = 3;
+    int pos_x = 1;
+    int pos_y = 10;
+    int width = (m_area.getWidth() - 2 * pos_x) / KEYBOARD_COLS_NUM;
+    int height = (m_area.getHeight() - 2 * pos_y) / KEYBOARD_ROWS_NUM;
 
-    const int margin = 2;
-    int height = (m_area.getHeight() - 2 * pos_y) / rows_num - margin;
+    char width_str[100];
+    sprintf(width_str, "%i", width);
     char height_str[100];
     sprintf(height_str, "%i", height);
-
-    for (int i = 0; i < rows_num; i++)
+    
+    for (int i = 0; i < KEYBOARD_ROWS_NUM; i++)
     {
-        float pos_x = 3;
-        int total_width = m_area.getWidth() - 2 * (int)pos_x;
-
         char tmp[100];
-        sprintf(tmp, "%i", pos_y + (height + margin) * i);
+        sprintf(tmp, "%i", pos_y + height * i);
         std::string pos_y_str = tmp;
         
-        int total_proportions = 0;
-        
-        for (int value : layout_proportions[i])
+        for (int j = 0; j < KEYBOARD_COLS_NUM; j++)
         {
-            total_proportions += value;
-        }
-        
-        int cols_num = layout_proportions[i].size();
-        
-        for (int j = 0; j < cols_num; j++)
-        {
-            float width = (float)total_width * layout_proportions[i][j] 
-                                             / total_proportions - margin;
-            
-            char width_str[100];
-            sprintf(width_str, "%i", (int)roundf(width));
-            
             char tmp[100];
-            sprintf(tmp, "%i", (int)roundf(pos_x));
+            sprintf(tmp, "%i", pos_x + width * j);
             std::string pos_x_str = tmp;
             
             ButtonWidget* button = new ButtonWidget();
@@ -237,8 +184,6 @@ void ScreenKeyboard::createButtons()
             button->m_properties[PROP_Y] = pos_y_str;
             m_widgets.push_back(button);
             m_buttons.push_back(button);
-            
-            pos_x += width + margin;
         }
     }
 
@@ -250,12 +195,14 @@ void ScreenKeyboard::createButtons()
 }   // createButtons
 
 // ----------------------------------------------------------------------------
-core::stringw ScreenKeyboard::getKeyName(std::string key_id)
+
+std::wstring ScreenKeyboard::getKeyName(std::string key_id)
 {
-    core::stringw key_name;
+    std::wstring key_name;
+    
     if (key_id == "Enter")
     {
-        key_name = L"\u21B2";
+        key_name = L"\u23CE";
     }
     else if (key_id == "Shift")
     {
@@ -263,7 +210,7 @@ core::stringw ScreenKeyboard::getKeyName(std::string key_id)
     }
     else if (key_id == "Back")
     {
-        key_name = L"\u21E6";
+        key_name = L"\u232B";
     }
     else if (key_id == "Space")
     {
@@ -271,8 +218,10 @@ core::stringw ScreenKeyboard::getKeyName(std::string key_id)
     }
     else
     {
-        key_name = StringUtils::utf8ToWide(key_id);
+        std::wstring tmp(key_id.begin(), key_id.end());
+        key_name = tmp;
     }
+    
     return key_name;
 }
 
@@ -282,38 +231,40 @@ core::stringw ScreenKeyboard::getKeyName(std::string key_id)
  */
 void ScreenKeyboard::assignButtons(ButtonsType buttons_type)
 {
-    const auto& layout_proportions = getKeyboardLayoutProportions();
-    int rows_num = layout_proportions.size();
-
     m_buttons_type = buttons_type;
-    KeyboardLayout* keys = getKeyboardLayout(buttons_type);
-
-    unsigned int current_button_id = 0;
     
-    for (int i = 0; i < rows_num; i++)
+    KeyboardLayout* keys = NULL;
+    
+    switch (buttons_type)
     {
-        int cols_num = layout_proportions[i].size();
-
-        for (int j = 0; j < cols_num; j++)
+    case BUTTONS_LOWER:
+        keys = &layout_lower;
+        break;
+    case BUTTONS_UPPER:
+        keys = &layout_upper;
+        break;
+    case BUTTONS_DIGITS:
+        keys = &layout_digits;
+        break;
+    case BUTTONS_DIGITS2:
+        keys = &layout_digits2;
+        break;
+    default:
+        keys = NULL;
+        break;
+    };
+    
+    for (int i = 0; i < KEYBOARD_ROWS_NUM; i++)
+    {
+        for (int j = 0; j < KEYBOARD_COLS_NUM; j++)
         {
             std::string key = keys != NULL ? (*keys)[i][j] : "?";
-            const core::stringw& key_name = getKeyName(key);
+            std::wstring key_name = getKeyName(key);
 
-            assert(current_button_id < m_buttons.size());
-            ButtonWidget* button = m_buttons[current_button_id];
+            ButtonWidget* button = m_buttons[i * KEYBOARD_COLS_NUM + j];
             
-            if (key == "Separator")
-            {
-                button->setVisible(false);
-            }
-            else
-            {
-                button->setVisible(true);
-                button->setText(key_name);
-                button->m_properties[PROP_ID] = key;
-            }
-            
-            current_button_id++;
+            button->setText(key_name.c_str());
+            button->m_properties[PROP_ID] = key;
         }
     }
 }   // assignButtons
@@ -357,53 +308,6 @@ void ScreenKeyboard::onUpdate(float dt)
 }
 
 // ----------------------------------------------------------------------------
-/** A function that handles irrlicht events
- *  \param event Irrlicht event
- *  \return Block event if true
- */
-bool ScreenKeyboard::onEvent(const SEvent &event)
-{
-    if (event.EventType == EET_MOUSE_INPUT_EVENT)
-    {
-        core::position2d<s32> point(event.MouseInput.X, event.MouseInput.Y);
-        
-        if (m_edit_box->isPointInside(point))
-        {
-            m_edit_box->OnEvent(event);
-            return true;
-        }
-        else
-        {
-            bool is_point_inside = m_irrlicht_window->isPointInside(point);
-            
-            if (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
-            {
-                if (!is_point_inside)
-                {
-                    m_schedule_close = true;
-                    return true;
-                }
-            }
-            else if (event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
-            {
-                if (!is_point_inside && m_schedule_close)
-                {
-                    dismiss();
-                    return true;
-                }
-                else
-                {
-                    m_schedule_close = false;
-                    return false;
-                }
-            }
-        }
-    }
-    
-    return false;
-}
-
-// ----------------------------------------------------------------------------
 /** A function that handles buttons events
  *  \param eventSource Button ID
  *  \return Block event if edit box is assigned
@@ -416,8 +320,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     SEvent event;
     bool send_event = false;
     bool close_keyboard = false;
-    std::vector<char32_t> chars;
-
+        
     if (eventSource == "Shift")
     {
         switch (m_buttons_type)
@@ -449,7 +352,7 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     else if (eventSource == "Enter")
     {
         event.KeyInput.Key = IRR_KEY_RETURN;
-        chars.push_back(0);
+        event.KeyInput.Char = 0;
         send_event = true;
         close_keyboard = true;
     }
@@ -461,16 +364,13 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
     else if (eventSource == "Space")
     {
         event.KeyInput.Key = IRR_KEY_UNKNOWN;
-        chars.push_back(U' ');
+        event.KeyInput.Char = ' ';
         send_event = true;
     }
     else if (eventSource.size() > 0)
     {
         event.KeyInput.Key = IRR_KEY_UNKNOWN;
-        // For possible emoji ligatures
-        const std::u32string& s = StringUtils::utf8ToUtf32(eventSource);
-        for (char32_t c : s)
-            chars.push_back(c);
+        event.KeyInput.Char = eventSource.at(0);
         send_event = true;
     }
 
@@ -480,13 +380,10 @@ EventPropagation ScreenKeyboard::processEvent(const std::string& eventSource)
         event.KeyInput.PressedDown = true;
         event.KeyInput.Control = false;
         event.KeyInput.Shift = false;
-        for (char32_t c : chars)
-        {
-            event.KeyInput.Char = c;
-            m_edit_box->OnEvent(event);
-        }
-    }
 
+        m_edit_box->OnEvent(event);
+    }
+    
     if (close_keyboard)
     {
         dismiss();
@@ -514,31 +411,21 @@ bool ScreenKeyboard::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
-/** A function that determines if (native) screen keyboard should be activated
+/** A function that determines if screen keyboard should be activated
  */
 bool ScreenKeyboard::shouldUseScreenKeyboard()
 {
-    bool always_use_screen_keyboard =
-        UserConfigParams::m_screen_keyboard == 2;
-
-    // Enable if no hardware keyboard
+    bool use_screen_keyboard = UserConfigParams::m_screen_keyboard == 2;
+    
+    #ifdef ANDROID
     if (UserConfigParams::m_screen_keyboard == 1)
     {
-        if (irr_driver->getDevice()->hasHardwareKeyboard())
-            return false;
-        return true;
-    }
-
-    return always_use_screen_keyboard;
-}
-
-// ----------------------------------------------------------------------------
-/** Returns true if system screen keyboard is available
- */
-bool ScreenKeyboard::hasSystemScreenKeyboard()
-{
-    if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_SYSTEM_SCREEN_KEYBOARD))
-        return false;
+        int32_t keyboard = AConfiguration_getKeyboard(
+                                            global_android_app->config);
         
-    return irr_driver->getDevice()->hasOnScreenKeyboard();
+        use_screen_keyboard = (keyboard != ACONFIGURATION_KEYBOARD_QWERTY);
+    }
+    #endif
+    
+    return use_screen_keyboard;
 }

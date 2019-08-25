@@ -49,7 +49,6 @@
 #include "karts/abstract_characteristic.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/cached_characteristic.hpp"
-#include "karts/controller/local_player_controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
 #include "karts/explosion_animation.hpp"
@@ -67,9 +66,7 @@
 #include "modes/overworld.hpp"
 #include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
-#include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
-#include "network/protocols/client_lobby.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
@@ -85,10 +82,8 @@
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
-#include "utils/profiler.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 #include "utils/vs.hpp"
+#include "utils/profiler.hpp"
 
 #include <ICameraSceneNode.h>
 #include <ISceneManager.h>
@@ -123,17 +118,21 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
+    m_vehicle              = NULL;
     m_initial_position     = position;
     m_race_result          = false;
+
+    m_shadow               = NULL;
     m_wheel_box            = NULL;
     m_collision_particles  = NULL;
+    m_slipstream           = NULL;
+    m_skidmarks            = NULL;
     m_controller           = NULL;
     m_saved_controller     = NULL;
     m_stars_effect         = NULL;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
     m_fire_clicked         = 0;
-    m_default_suspension_force = 0.0f;
     m_boosted_ai           = false;
     m_type                 = RaceManager::KT_AI;
     m_flying               = false;
@@ -225,48 +224,13 @@ void Kart::init(RaceManager::KartType type)
 #endif
     loadData(type, animations);
 
+    m_kart_gfx = new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay());
+    m_skidding = new Skidding(this);
+    // Create the stars effect
+    m_stars_effect = new Stars(this);
+
     reset();
 }   // init
-
-// ----------------------------------------------------------------------------
-void Kart::changeKart(const std::string& new_ident,
-                      PerPlayerDifficulty difficulty,
-                      std::shared_ptr<RenderInfo> ri)
-{
-    AbstractKart::changeKart(new_ident, difficulty, ri);
-    m_kart_model->setKart(this);
-
-#ifdef SERVER_ONLY
-    bool animations = false;  // server never animates
-#else
-    bool animations = UserConfigParams::m_animated_characters;
-#endif
-    scene::ISceneNode* old_node = m_node;
-
-    loadData(m_type, animations);
-    m_wheel_box = NULL;
-
-    if (LocalPlayerController* lpc =
-        dynamic_cast<LocalPlayerController*>(getController()))
-        lpc->initParticleEmitter();
-
-    if (old_node)
-        old_node->remove();
-
-    // Reset 1 more time (add back the body)
-    reset();
-
-    for (int i = 0; i < m_vehicle->getNumWheels(); i++)
-    {
-        btWheelInfo &wi = m_vehicle->getWheelInfo(i);
-        wi.m_raycastInfo.m_suspensionLength = m_default_suspension_force /
-            m_vehicle->getNumWheels();
-    }
-    m_graphical_y_offset = -m_default_suspension_force /
-        m_vehicle->getNumWheels() + m_kart_model->getLowestPoint();
-    m_kart_model->setDefaultSuspension();
-    startEngineSFX();
-}   // changeKart
 
 // ----------------------------------------------------------------------------
 /** The destructor frees the memory of this kart, but note that the actual kart
@@ -290,9 +254,18 @@ Kart::~Kart()
         m_emitters[i]->deleteSFX();
 
     m_nitro_sound ->deleteSFX();
+    delete m_kart_gfx;
     if(m_terrain_sound)          m_terrain_sound->deleteSFX();
     if(m_previous_terrain_sound) m_previous_terrain_sound->deleteSFX();
     if(m_collision_particles)    delete m_collision_particles;
+    if(m_slipstream)             delete m_slipstream;
+    if(m_attachment)             delete m_attachment;
+    if(m_stars_effect)          delete m_stars_effect;
+
+#ifndef SERVER_ONLY
+    delete m_shadow;
+    if(m_skidmarks) delete m_skidmarks ;
+#endif
 
     if (m_wheel_box) m_wheel_box->remove();
 
@@ -300,8 +273,15 @@ Kart::~Kart()
     if(m_body)
     {
         Physics::getInstance()->removeKart(this);
+        delete m_vehicle;
+        delete m_vehicle_raycaster;
     }
 
+    for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
+    {
+        delete m_kart_chassis.getChildShape(i);
+    }
+    delete m_skidding;
     delete m_max_speed;
     delete m_terrain_info;
     delete m_powerup;
@@ -325,8 +305,6 @@ void Kart::reset()
     }
 
     m_network_finish_check_ticks = 0;
-    m_network_confirmed_finish_ticks = 0;
-    m_enabled_network_spectator = false;
     // Add karts back in case that they have been removed (i.e. in battle
     // mode) - but only if they actually have a body (e.g. ghost karts
     // don't have one).
@@ -358,7 +336,7 @@ void Kart::reset()
         m_saved_controller = NULL;
     }
     m_kart_model->setAnimation(KartModel::AF_DEFAULT);
-    m_attachment->reset();
+    m_attachment->clear();
     m_kart_gfx->reset();
     m_skidding->reset();
 
@@ -378,7 +356,7 @@ void Kart::reset()
     m_eliminated           = false;
     m_finish_time          = 0.0f;
     m_bubblegum_ticks      = 0;
-    m_bubblegum_torque_sign = true;
+    m_bubblegum_torque     = 0.0f;
     m_invulnerable_ticks   = 0;
     m_min_nitro_ticks      = 0;
     m_energy_to_min_ratio  = 0;
@@ -386,7 +364,6 @@ void Kart::reset()
     m_bounce_back_ticks    = 0;
     m_brake_ticks          = 0;
     m_ticks_last_crash     = 0;
-    m_ticks_last_zipper    = 0;
     m_speed                = 0.0f;
     m_current_lean         = 0.0f;
     m_falling_time         = 0.0f;
@@ -731,8 +708,7 @@ void Kart::createPhysics()
     // Shift center of gravity downwards, so that the kart
     // won't topple over too easy.
     shiftCenterOfGravity.setOrigin(m_kart_properties->getGravityCenterShift());
-    m_kart_chassis.reset(new btCompoundShape());
-    m_kart_chassis->addChildShape(shiftCenterOfGravity, hull);
+    m_kart_chassis.addChildShape(shiftCenterOfGravity, hull);
 
     // Set mass and inertia
     // --------------------
@@ -742,7 +718,7 @@ void Kart::createPhysics()
     // --------------------
     btTransform trans;
     trans.setIdentity();
-    createBody(mass, trans, m_kart_chassis.get(),
+    createBody(mass, trans, &m_kart_chassis,
                m_kart_properties->getRestitution(0.0f));
     std::vector<float> ang_fact = m_kart_properties->getStabilityAngularFactor();
     // The angular factor (with X and Z values <1) helps to keep the kart
@@ -760,11 +736,11 @@ void Kart::createPhysics()
 
     // Create the actual vehicle
     // -------------------------
-    m_vehicle_raycaster.reset(
+    m_vehicle_raycaster =
         new btKartRaycaster(Physics::getInstance()->getPhysicsWorld(),
                             stk_config->m_smooth_normals &&
-                            Track::getCurrentTrack()->smoothNormals()));
-    m_vehicle.reset(new btKart(m_body.get(), m_vehicle_raycaster.get(), this));
+                            Track::getCurrentTrack()->smoothNormals());
+    m_vehicle = new btKart(m_body, m_vehicle_raycaster, this);
 
     // never deactivate the vehicle
     m_body->setActivationState(DISABLE_DEACTIVATION);
@@ -886,7 +862,7 @@ void Kart::updateWeight()
     {
         m_weight = mass;
         btVector3 inertia;
-        m_kart_chassis->calculateLocalInertia(mass, inertia);
+        m_kart_chassis.calculateLocalInertia(mass, inertia);
         m_body->setMassProps(mass, inertia);
     }
 }   // updateWeight
@@ -899,9 +875,9 @@ float Kart::getSpeedForTurnRadius(float radius) const
     InterpolationArray turn_angle_at_speed = m_kart_properties->getTurnRadius();
     // Convert the turn radius into turn angle
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i)));
+        turn_angle_at_speed.setY(i, sin( 1.0f / turn_angle_at_speed.getY(i)));
 
-    float angle = sinf(1.0f / radius);
+    float angle = sin(1.0f / radius);
     return turn_angle_at_speed.getReverse(angle);
 }   // getSpeedForTurnRadius
 
@@ -918,7 +894,7 @@ float Kart::getMaxSteerAngle(float speed) const
     // across karts of different lengths sharing the same
     // turn radius properties
     for(int i = 0; i < (int)turn_angle_at_speed.size(); i++)
-        turn_angle_at_speed.setY(i, sinf( 1.0f / turn_angle_at_speed.getY(i))
+        turn_angle_at_speed.setY(i, sin( 1.0f / turn_angle_at_speed.getY(i))
                                     * m_kart_properties->getWheelBase());
 
     return turn_angle_at_speed.get(speed);
@@ -993,12 +969,6 @@ void Kart::finishedRace(float time, bool from_server)
             return;
         }
     }   // !from_server
-
-    if (NetworkConfig::get()->isClient())
-    {
-        m_network_confirmed_finish_ticks =
-            World::getWorld()->getTicksSinceStart();
-    }
 
     m_finished_race = true;
 
@@ -1153,17 +1123,17 @@ void Kart::collectedItem(ItemState *item_state)
              item_state->getPreviousOwner()->getIdent() == "nolok");
 
         // slow down
-        m_bubblegum_ticks = (int16_t)stk_config->time2Ticks(
-            m_kart_properties->getBubblegumDuration());
-        m_bubblegum_torque_sign =
+        m_bubblegum_ticks =
+            stk_config->time2Ticks(m_kart_properties->getBubblegumDuration());
+        m_bubblegum_torque =
             ((World::getWorld()->getTicksSinceStart() / 10) % 2 == 0) ?
-            true : false;
+            m_kart_properties->getBubblegumTorque() :
+            -m_kart_properties->getBubblegumTorque();
         m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
                                  m_kart_properties->getBubblegumSpeedFraction() ,
                                  m_kart_properties->getBubblegumFadeInTicks(),
                                  m_bubblegum_ticks);
-        if (!RewindManager::get()->isRewinding())
-            getNextEmitter()->play(getXYZ(), m_goo_sound);
+        getNextEmitter()->play(getXYZ(), m_goo_sound);
 
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
@@ -1291,8 +1261,8 @@ float Kart::getShieldTime() const
 // ------------------------------------------------------------------------
 /**
  * Decreases the kart's shield time.
- * \param t The time subtracted from the shield timer. If t == 0.0f, the
-             default amout of time is subtracted.
+ * \param t The time substracted from the shield timer. If t == 0.0f, the
+             default amout of time is substracted.
  */
 void Kart::decreaseShieldTime()
 {
@@ -1369,42 +1339,6 @@ void Kart::update(int ticks)
         m_saved_controller = NULL;
     }
 
-    auto cl = LobbyProtocol::get<ClientLobby>();
-    // Enable spectate mode after 2 seconds which allow player to
-    // release left / right button if they keep pressing it during
-    // finishing line (1 second here because m_network_finish_check_ticks is
-    // already 1 second ahead of time when crossing finished line)
-
-    if (cl && m_finished_race && m_controller->isLocalPlayerController() &&
-        race_manager->getNumLocalPlayers() == 1 &&
-        race_manager->modeHasLaps() &&
-        World::getWorld()->isActiveRacePhase() &&
-        m_network_confirmed_finish_ticks > 0 &&
-        World::getWorld()->getTicksSinceStart() >
-        m_network_confirmed_finish_ticks + stk_config->time2Ticks(1.0f) &&
-        !m_enabled_network_spectator)
-    {
-        m_enabled_network_spectator = true;
-        cl->setSpectator(true);
-
-        static bool msg_shown = false;
-        if (!msg_shown)
-        {
-            msg_shown = true;
-
-            RaceGUIBase* m = World::getWorld()->getRaceGUI();
-
-            if (m->getMultitouchGUI() != NULL)
-            {
-                m->recreateMultitouchGUI();
-            }
-            else
-            {
-                cl->addSpectateHelperMessage();
-            }
-        }
-    }
-
     m_powerup->update(ticks);
 
     // Reset any instant speed increase in the bullet kart
@@ -1413,6 +1347,15 @@ void Kart::update(int ticks)
     if (m_bubblegum_ticks > 0)
     {
         m_bubblegum_ticks -= ticks;
+        if (m_bubblegum_ticks <= 0)
+        {
+            m_bubblegum_torque = 0;
+        }
+    }
+    else
+    {
+        // Not strictly necessary, but makes sure torque has expected values
+        m_bubblegum_torque = 0;
     }
 
     // This is to avoid a rescue immediately after an explosion
@@ -1421,12 +1364,10 @@ void Kart::update(int ticks)
     // before updating the graphical position (which is done in
     // Moveable::update() ), otherwise 'stuttering' can happen (caused by
     // graphical and physical position not being the same).
-    if (has_animation_before)
+    if (has_animation_before && !RewindManager::get()->isRewinding())
     {
         m_kart_animation->update(ticks);
     }
-    else if (NetworkConfig::get()->roundValuesNow())
-        CompressNetworkBody::compress(m_body.get(), m_motion_state.get());
 
     float dt = stk_config->ticks2Time(ticks);
     if (!RewindManager::get()->isRewinding())
@@ -1452,27 +1393,6 @@ void Kart::update(int ticks)
 
     Vec3 front(0, 0, getKartLength()*0.5f);
     m_xyz_front = getTrans()(front);
-
-    // Hover the kart above reset position before entering the game
-    // Add invulnerability depends on kart
-    if (m_live_join_util != 0 &&
-        ((m_live_join_util > World::getWorld()->getTicksSinceStart() &&
-        World::getWorld()->isActiveRacePhase()) ||
-        World::getWorld()->isLiveJoinWorld()))
-    {
-        btRigidBody *body = getBody();
-        body->clearForces();
-        body->setLinearVelocity(Vec3(0.0f));
-        body->setAngularVelocity(Vec3(0.0f));
-        btTransform hovering = m_starting_transform;
-        hovering.setOrigin(hovering.getOrigin() +
-            m_starting_transform.getBasis().getColumn(1) * 3.0f);
-        body->proceedToTransform(hovering);
-        setTrans(hovering);
-        float time = getKartProperties()->getExplosionInvulnerabilityTime();
-        m_invulnerable_ticks = stk_config->time2Ticks(time);
-    }
-
     // Update the locally maintained speed of the kart (m_speed), which 
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
@@ -1589,29 +1509,19 @@ void Kart::update(int ticks)
     // To avoid this problem, we do the raycast for terrain detection from
     // the center of the 4 wheel positions (in world coordinates).
 
-    if (!has_animation_before)
-    {
-        Vec3 from(0.0f, 0.0f, 0.0f);
-        for (unsigned int i = 0; i < 4; i++)
-            from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
+    Vec3 from(0.0f, 0.0f, 0.0f);
+    for (unsigned int i = 0; i < 4; i++)
+        from += m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS;
 
-        // Add a certain epsilon (0.3) to the height of the kart. This avoids
-        // problems of the ray being cast from under the track (which happened
-        // e.g. on tux tollway when jumping down from the ramp, when the chassis
-        // partly tunnels through the track). While tunneling should not be
-        // happening (since Z velocity is clamped), the epsilon is left in place
-        // just to be on the safe side (it will not hit the chassis itself).
-        from = from/4 + (getTrans().getBasis() * Vec3(0.0f, 0.3f, 0.0f));
+    // Add a certain epsilon (0.3) to the height of the kart. This avoids
+    // problems of the ray being cast from under the track (which happened
+    // e.g. on tux tollway when jumping down from the ramp, when the chassis
+    // partly tunnels through the track). While tunneling should not be
+    // happening (since Z velocity is clamped), the epsilon is left in place
+    // just to be on the safe side (it will not hit the chassis itself).
+    from = from/4 + (getTrans().getBasis() * Vec3(0.0f, 0.3f, 0.0f));
 
-        m_terrain_info->update(getTrans().getBasis(), from);
-    }
-    else
-    {
-        // Use kart transform directly as wheel info is not updated when
-        // there is an animation
-        m_terrain_info->update(getTrans().getBasis(),
-            getXYZ() + getTrans().getBasis().getColumn(1) * 0.1f);
-    }
+    m_terrain_info->update(getTrans().getBasis(), from);
 
     if (m_body->getBroadphaseHandle())
     {
@@ -1646,42 +1556,13 @@ void Kart::update(int ticks)
             !has_animation_before && fabs(roll) > 60 * DEGREE_TO_RAD &&
             fabs(getSpeed()) < 3.0f)
         {
-            RescueAnimation::create(this, /*is_auto_rescue*/true);
+            new RescueAnimation(this, /*is_auto_rescue*/true);
             m_last_factor_engine_sound = 0.0f;
         }
     }
 
     // Update physics from newly updated material
     PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
-    const Material* material = m_terrain_info->getMaterial();
-    // Update gravity of kart first, as updateSliding in updatePhysics needs
-    // the newly set gravity to test for sliding
-    if (!material)   // kart falling off the track
-    {
-        if (!m_flying)
-        {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0, -g, 0);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            body->setGravity(gravity);
-        }
-    }
-    else
-    {
-        if (!m_flying)
-        {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0.0f, -g, 0.0f);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            // If the material should overwrite the gravity,
-            if (material->hasGravity())
-            {
-                Vec3 normal = m_terrain_info->getNormal();
-                gravity = normal * -g;
-            }
-            body->setGravity(gravity);
-        }   // if !flying
-    }
     updatePhysics(ticks);
     PROFILER_POP_CPU_MARKER();
 
@@ -1712,7 +1593,7 @@ void Kart::update(int ticks)
         "v(16-18) %f %f %f steerf(20) %f maxangle(22) %f speed(24) %f "
         "steering(26-27) %f %f clock(29) %lf skidstate(31) %d factor(33) %f "
         "maxspeed(35) %f engf(37) %f braketick(39) %d brakes(41) %d heading(43) %f "
-        "bubticks(45) %d",
+        "bubticks(45) %d bubtor(47) %f",
         getIdent().c_str(),
         World::getWorld()->getTime(), World::getWorld()->getTicksSinceStart(),
         getXYZ().getX(), getXYZ().getY(), getXYZ().getZ(),
@@ -1733,13 +1614,22 @@ void Kart::update(int ticks)
         m_brake_ticks, //39
         m_controls.getButtonsCompressed(),  //41
         getHeading(),  //43
-        m_bubblegum_ticks // 45
+        m_bubblegum_ticks, // 45
+        m_bubblegum_torque // 47
     );
 #endif
 
     PROFILER_PUSH_CPU_MARKER("Kart::Update (material)", 0x60, 0x34, 0x7F);
+    const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
+        if (!m_flying)
+        {
+            float g = Track::getCurrentTrack()->getGravity();
+            Vec3 gravity(0, -g, 0);
+            btRigidBody *body = getVehicle()->getRigidBody();
+            body->setGravity(gravity);
+        }
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         Track::getCurrentTrack()->getAABB(&min, &max);
@@ -1747,15 +1637,28 @@ void Kart::update(int ticks)
         if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !has_animation_before)
         {
-            RescueAnimation::create(this);
+            new RescueAnimation(this);
             m_last_factor_engine_sound = 0.0f;
         }
     }
     else
     {
+        if (!m_flying)
+        {
+            float g = Track::getCurrentTrack()->getGravity();
+            Vec3 gravity(0.0f, -g, 0.0f);
+            btRigidBody *body = getVehicle()->getRigidBody();
+            // If the material should overwrite the gravity,
+            if (material->hasGravity())
+            {
+                Vec3 normal = m_terrain_info->getNormal();
+                gravity = normal * -g;
+            }
+            body->setGravity(gravity);
+        }   // if !flying
         if (!has_animation_before && material->isDriveReset() && isOnGround())
         {
-            RescueAnimation::create(this);
+            new RescueAnimation(this);
             m_last_factor_engine_sound = 0.0f;
         }
         else if(material->isZipper()     && isOnGround())
@@ -2001,8 +1904,7 @@ void Kart::handleMaterialSFX()
     // FIXME: if there are already two sfx playing, don't add another
     // one. This should reduce the performance impact when driving 
     // on the bridge in Cocoa.
-    const Material* material =
-        isOnGround() ? m_terrain_info->getMaterial() : NULL;
+    const Material *material = m_terrain_info->getMaterial();
 
     // We can not use getLastMaterial() since, since the last material might
     // be updated several times during the physics updates, not indicating
@@ -2260,10 +2162,8 @@ void Kart::handleZipper(const Material *material, bool play_sound)
                                      stk_config->time2Ticks(duration),
                                      stk_config->time2Ticks(fade_out_time));
     // Play custom character sound (weee!)
-    int zipper_ticks = World::getWorld()->getTicksSinceStart();
-    if (zipper_ticks > m_ticks_last_zipper)
+    if (!RewindManager::get()->isRewinding())
     {
-        m_ticks_last_zipper = zipper_ticks;
         playCustomSFX(SFXManager::CUSTOM_ZIPPER);
         m_controller->handleZipper(play_sound);
     }
@@ -2366,8 +2266,7 @@ void Kart::crashed(AbstractKart *k, bool update_attachments)
  */
 void Kart::crashed(const Material *m, const Vec3 &normal)
 {
-    if (m && !(m->getCollisionReaction() == Material::RESCUE))
-        playCrashSFX(m, NULL);
+    playCrashSFX(m, NULL);
 #ifdef DEBUG
     // Simple debug output for people playing without sound.
     // This makes it easier to see if a kart hit the track (esp.
@@ -2433,7 +2332,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             else
                 impulse = Vec3(0, 0, -1); // Arbitrary
             impulse *= m_kart_properties->getCollisionTerrainImpulse();
-            m_bounce_back_ticks = (uint8_t)stk_config->time2Ticks(0.2f);
+            m_bounce_back_ticks = stk_config->time2Ticks(0.2f);
             m_vehicle->setTimedCentralImpulse(
                 (uint16_t)stk_config->time2Ticks(0.1f), impulse);
         }
@@ -2476,18 +2375,18 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
 #endif
         if (m->getCollisionReaction() == Material::RESCUE)
         {
-            RescueAnimation::create(this);
+            new RescueAnimation(this);
             m_last_factor_engine_sound = 0.0f;
         }
         else if (m->getCollisionReaction() == Material::PUSH_BACK)
         {
             // This variable is set to 0.2 in case of a kart-terrain collision
-            if (m_bounce_back_ticks <= (uint8_t)stk_config->time2Ticks(0.2f))
+            if (m_bounce_back_ticks <= stk_config->time2Ticks(0.2f))
             {
                 btVector3 push = m_body->getLinearVelocity().normalized();
                 push[1] = 0.1f;
                 m_body->applyCentralImpulse( -4000.0f*push );
-                m_bounce_back_ticks = (uint8_t)stk_config->time2Ticks(2.0f);
+                m_bounce_back_ticks = stk_config->time2Ticks(2.0f);
             }   // if m_bounce_back_ticks <= 0.2f
         }   // if (m->getCollisionReaction() == Material::PUSH_BACK)
     }   // if(m && m->getCollisionReaction() != Material::NORMAL &&
@@ -2509,7 +2408,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
     // After a collision disable the engine for a short time so that karts
     // can 'bounce back' a bit (without this the engine force will prevent
     // karts from bouncing back, they will instead stuck towards the obstable).
-    if(m_bounce_back_ticks == 0)
+    if(m_bounce_back_ticks <= 0)
     {
         if (getVelocity().length()> 0.555f)
         {
@@ -2553,7 +2452,7 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
                 crash_sound_emitter->play(getXYZ(), buffer);
             }
         }    // if lin_vel > 0.555
-    }   // if m_bounce_back_ticks == 0
+    }   // if m_bounce_back_ticks <= 0
 }   // playCrashSFX
 
 // -----------------------------------------------------------------------------
@@ -2655,7 +2554,7 @@ void Kart::updatePhysics(int ticks)
                 /*fade_out_time*/stk_config->time2Ticks(5.0f));
         }
     }
-    if (m_bounce_back_ticks > 0)
+    if (m_bounce_back_ticks > std::numeric_limits<int16_t>::min())
         m_bounce_back_ticks -= ticks;
 
     updateEnginePowerAndBrakes(ticks);
@@ -2786,7 +2685,7 @@ float Kart::applyAirFriction(float engine_power)
 
     if (friction_intensity < 0.0f) friction_intensity = 0.0f;
 
-    // We subtract the friction from the engine power
+    // We substract the friction from the engine power
     // 1)This is the logical behavior
     // 2)That way, engine boosts remain useful at high speed
     // 3)It helps heavier karts, who have an higher engine power
@@ -2816,9 +2715,7 @@ void Kart::updateEnginePowerAndBrakes(int ticks)
     if (m_bubblegum_ticks > 0)
     {
         engine_power = 0.0f;
-        m_body->applyTorque(btVector3(0.0,
-            m_kart_properties->getBubblegumTorque() *
-            (m_bubblegum_torque_sign ? 1.0f : -1.0f), 0.0));
+        m_body->applyTorque(btVector3(0.0, m_bubblegum_torque, 0.0));
     }
 
     if(m_controls.getAccel())   // accelerating
@@ -2994,8 +2891,8 @@ void Kart::updateFlying()
         if (velocity.length() < 25)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(100.0f*sinf(orientation), 0.0,
-                100.0f*cosf(orientation)));
+            m_body->applyCentralImpulse(btVector3(100.0f*sin(orientation), 0.0,
+                100.0f*cos(orientation)));
         }
     }
     else if (m_controls.getBrake())
@@ -3004,8 +2901,8 @@ void Kart::updateFlying()
         if (velocity.length() > -15)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(-100.0f*sinf(orientation), 0.0,
-                -100.0f*cosf(orientation)));
+            m_body->applyCentralImpulse(btVector3(-100.0f*sin(orientation), 0.0,
+                -100.0f*cos(orientation)));
         }
     }
 
@@ -3042,35 +2939,24 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     // scene node will exist (to which the attachment is added). But the
     // attachment is needed in createPhysics (which gets the mass, which
     // is dependent on the attachment).
-    m_attachment.reset(new Attachment(this));
+    m_attachment = new Attachment(this);
     createPhysics();
 
-    m_slipstream.reset(new SlipStream(this));
+    m_slipstream = new SlipStream(this);
 
 #ifndef SERVER_ONLY
-    m_skidmarks = nullptr;
-    m_shadow = nullptr;
-    if (!ProfileWorld::isNoGraphics() &&
-        m_kart_properties->getSkidEnabled() && CVS->isGLSL())
+    if (m_kart_properties->getSkidEnabled() && CVS->isGLSL())
     {
-        m_skidmarks.reset(new SkidMarks(*this));
+        m_skidmarks = new SkidMarks(*this);
     }
 
-    if (!ProfileWorld::isNoGraphics() &&
-        CVS->isGLSL() && !CVS->isShadowEnabled() && m_kart_properties
+    if (CVS->isGLSL() && !CVS->isShadowEnabled() && m_kart_properties
         ->getShadowMaterial()->getSamplerPath(0) != "unicolor_white")
     {
-        m_shadow.reset(new Shadow(m_kart_properties->getShadowMaterial(),
-            *this));
+        m_shadow = new Shadow(m_kart_properties->getShadowMaterial(), *this);
     }
 #endif
     World::getWorld()->kartAdded(this, m_node);
-    m_kart_gfx.reset(
-        new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay()));
-    m_skidding.reset(new Skidding(this));
-    // Create the stars effect
-    m_stars_effect.reset(new Stars(this));
-
 }   // loadData
 
 // ----------------------------------------------------------------------------
@@ -3112,11 +2998,11 @@ void Kart::applyEngineForce(float force)
 void Kart::kartIsInRestNow()
 {
     AbstractKart::kartIsInRestNow();
-    m_default_suspension_force = 0.0f;
-    for (int i = 0; i < m_vehicle->getNumWheels(); i++)
+    float f = 0;
+    for(int i=0; i<m_vehicle->getNumWheels(); i++)
     {
         const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
-        m_default_suspension_force += wi.m_raycastInfo.m_suspensionLength;
+        f += wi.m_raycastInfo.m_suspensionLength;
     }
 
     // The offset 'lowest point' is added to avoid that the
@@ -3124,8 +3010,8 @@ void Kart::kartIsInRestNow()
     // constant, there is no real reason to use the lowest point
     // but that value has worked good in the past). See documentation
     // for updateGraphics() for full details.
-    m_graphical_y_offset = -m_default_suspension_force /
-        m_vehicle->getNumWheels() + m_kart_model->getLowestPoint();
+    m_graphical_y_offset = -f / m_vehicle->getNumWheels()
+                         + m_kart_model->getLowestPoint();
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow
@@ -3252,26 +3138,6 @@ void Kart::updateGraphics(float dt)
         unsetSquash();
 #endif
 
-    // Disable smoothing network body so it doesn't smooth the animation
-    // for karts in client
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
-    {
-        if (m_kart_animation && SmoothNetworkBody::isEnabled())
-        {
-            SmoothNetworkBody::setEnable(false);
-        }
-        else if (!m_kart_animation && !SmoothNetworkBody::isEnabled())
-        {
-            SmoothNetworkBody::setEnable(true);
-            SmoothNetworkBody::reset();
-            SmoothNetworkBody::setSmoothedTransform(getTrans());
-        }
-    }
-
-    if (m_kart_animation)
-        m_kart_animation->updateGraphics(dt);
-
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());
     m_skid_sound->setPosition(getXYZ());
@@ -3280,16 +3146,9 @@ void Kart::updateGraphics(float dt)
     m_attachment->updateGraphics(dt);
 
     // update star effect (call will do nothing if stars are not activated)
-    // Remove it if no invulnerability
-    if (!isInvulnerable() && m_stars_effect->isEnabled())
-    {
-        m_stars_effect->reset();
-        m_stars_effect->update(1);
-    }
-    else
-        m_stars_effect->update(dt);
+    m_stars_effect->update(dt);
 
-    // Update particle effects (creation rate, and emitter size
+    // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     m_kart_gfx->update(dt);
     if (m_collision_particles) m_collision_particles->update(dt);
@@ -3367,7 +3226,7 @@ void Kart::updateGraphics(float dt)
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
-    float lean_height = tanf(m_current_lean) * getKartWidth()*0.5f;
+    float lean_height = tan(m_current_lean) * getKartWidth()*0.5f;
 
     Moveable::updateSmoothedGraphics(dt);
 
@@ -3400,10 +3259,9 @@ void Kart::updateGraphics(float dt)
     }
 #endif
 
-    // m_speed * dt is the distance the kart has moved, which determines
+    // m_speed*dt is the distance the kart has moved, which determines
     // how much the wheels need to rotate.
-    m_kart_model->update(dt, m_speed * dt, getSteerPercent(), m_speed,
-        m_current_lean);
+    m_kart_model->update(dt, m_speed*dt, getSteerPercent(), m_speed, lean_height);
 
 #ifndef SERVER_ONLY
     // Determine the shadow position from the terrain Y position. This
@@ -3434,7 +3292,7 @@ btQuaternion Kart::getVisualRotation() const
  *  output.
  *  \param text The text to display
  */
-void Kart::setOnScreenText(const core::stringw& text)
+void Kart::setOnScreenText(const wchar_t *text)
 {
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())
@@ -3447,7 +3305,7 @@ void Kart::setOnScreenText(const core::stringw& text)
         GUIEngine::getSkin()->getColor("font::top"),
         getNode(), irr_driver->getSceneManager(), -1,
         core::vector3df(0.0f, 1.5f, 0.0f),
-        core::vector3df(0.5f, 0.5f, 0.5f));
+        core::vector3df(0.35f, 0.35f, 0.35f));
     if (CVS->isGLSL())
         tb->init(text, bold_face);
     else
@@ -3505,7 +3363,7 @@ const video::SColor& Kart::getColor() const
 }   // getColor
 
 // ------------------------------------------------------------------------
-bool Kart::isVisible() const
+bool Kart::isVisible()
 {
     return m_node && m_node->isVisible();
 }   // isVisible
