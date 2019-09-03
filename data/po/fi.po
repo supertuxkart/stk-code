@@ -1812,7 +1812,7 @@ msgstr "Näytä yksityispalvelin (tai palvelimet)"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Use IPV6 connection if server supports"
+msgid "Use IPv6 connection if server supports"
 msgstr "Käytä IPv6-yhteyttä jos palvelin tukee sitä"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui

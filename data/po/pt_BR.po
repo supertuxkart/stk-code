@@ -1817,8 +1817,8 @@ msgstr "Mostrar servidor(es) privado(s)"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Use IPV6 connection if server supports"
-msgstr "Usar conexão IPV6 se o servidor suportar"
+msgid "Use IPv6 connection if server supports"
+msgstr "Usar conexão IPv6 se o servidor suportar"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"

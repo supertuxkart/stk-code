@@ -612,7 +612,7 @@ void cmdLineHelp()
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
     "                          public port.\n"
-    "       --connect-now6=ip   Connect to a server with IPV6 known now\n"
+    "       --connect-now6=ip   Connect to a server with IPv6 known now\n"
     "                          (in format [x:x:x:x:x:x:x:x]:xxx(port)), the port should be its\n"
     "                          public port.\n"
     "       --server-id=n      Server id in stk addons for --connect-now.\n"

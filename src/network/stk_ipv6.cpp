@@ -227,7 +227,7 @@ std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
 }   // getIPV6ReadableFromMappedAddress
 
 // ----------------------------------------------------------------------------
-/** Add a (fake or synthesized by ios / osx) ipv4 address and map it to an ipv6
+/** Add a (fake or synthesized by ios / osx) IPv4 address and map it to an IPv6
  *  one, used in client to set the game server address or server to initialize
  *  host.
  */
@@ -237,8 +237,8 @@ void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
 }   // addMappedAddress
 
 // ----------------------------------------------------------------------------
-/* This is called when enet needs to sent to an mapped ipv4 address, we look up
- * the map here and get the real ipv6 address, so you need to call
+/* This is called when enet needs to sent to an mapped IPv4 address, we look up
+ * the map here and get the real IPv6 address, so you need to call
  * addMappedAddress above first (for client mostly).
  */
 void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6)
@@ -260,7 +260,7 @@ void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6)
 
 // ----------------------------------------------------------------------------
 /* This is called when enet recieved a packet from its socket, we create an
- * real ipv4 address out of it or a fake one if it's from ipv6 connection.
+ * real IPv4 address out of it or a fake one if it's from IPv6 connection.
  */
 void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
 {
@@ -299,12 +299,12 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
     }
     else
     {
-        // Create a fake ipv4 address of 0.x.x.x if it's a real ipv6 connection
+        // Create a fake IPv4 address of 0.x.x.x if it's a real IPv6 connection
         if (g_mapped_ipv6_used >= 16777215)
             g_mapped_ipv6_used = 0;
         TransportAddress addr(++g_mapped_ipv6_used, ntohs(in6->sin6_port));
         *ea = addr.toEnetAddress();
-        Log::debug("IPV6", "Fake IPV4 address %s mapped to %s",
+        Log::debug("IPv6", "Fake IPv4 address %s mapped to %s",
             addr.toString().c_str(), getIPV6ReadableFromIn6(in6).c_str());
         addMappedAddress(ea, in6);
     }
@@ -312,7 +312,7 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
 
 // ----------------------------------------------------------------------------
 /* Called when a peer is expired (no activity for 20 seconds) and we remove its
- * reference to the ipv6.
+ * reference to the IPv6.
  */
 void removeDisconnectedMappedAddress()
 {
@@ -321,11 +321,11 @@ void removeDisconnectedMappedAddress()
         if (it->m_last_activity + 20000 < StkTime::getMonoTimeMs())
         {
             TransportAddress addr(it->m_addr);
-            Log::debug("IPV6", "Removing expired %s, ipv4 address %s.",
+            Log::debug("IPv6", "Removing expired %s, IPv4 address %s.",
                 getIPV6ReadableFromIn6(&it->m_in6).c_str(),
                 addr.toString().c_str());
             it = g_mapped_ips.erase(it);
-            Log::debug("IPV6", "Mapped address size now: %d.",
+            Log::debug("IPv6", "Mapped address size now: %d.",
                 g_mapped_ips.size());
         }
         else

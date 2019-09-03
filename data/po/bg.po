@@ -1813,8 +1813,8 @@ msgstr "Показване на частните сървъри"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Use IPV6 connection if server supports"
-msgstr "Използване на връзка чрез IPV6, ако сървърът го поддържа"
+msgid "Use IPv6 connection if server supports"
+msgstr "Използване на връзка чрез IPv6, ако сървърът го поддържа"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"

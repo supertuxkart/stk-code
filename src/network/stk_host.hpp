@@ -134,7 +134,7 @@ private:
     /** The public address found by stun (if WAN is used). */
     TransportAddress m_public_address;
 
-    /** The public ipv6 address found by stun (if WAN is used). */
+    /** The public IPv6 address found by stun (if WAN is used). */
     std::string m_public_ipv6_address;
 
     /** The public address stun server used. */

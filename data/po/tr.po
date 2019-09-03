@@ -1814,8 +1814,8 @@ msgstr "Özel sunucuları göster"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Use IPV6 connection if server supports"
-msgstr "Sunucu destekliyorsa IPV6 bağlantısını kullan"
+msgid "Use IPv6 connection if server supports"
+msgstr "Sunucu destekliyorsa IPv6 bağlantısını kullan"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"

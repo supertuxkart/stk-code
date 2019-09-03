@@ -78,7 +78,7 @@ The current server configuration xml looks like this:
     <!-- Disable it to turn off all stun related code in server, it allows saving server resource if your server is not behind a firewall. -->
     <firewalled-server value="true" />
 
-    <!-- Enable to allow ipv6 connection if you have a public ipv6 address. STK currently use dual-stack mode which requires server to have both ipv4 and ipv6 and listen to same port, firewalled-server will be disabled so you need to make sure this server has port forward configured properly if needed. -->
+    <!-- Enable to allow IPv6 connection if you have a public IPv6 address. STK currently use dual-stack mode which requires server to have both IPv4 and IPv6 and listen to same port, firewalled-server will be disabled so you need to make sure this server has port forward configured properly if needed. -->
     <ipv6-server value="false" />
 
     <!-- No server owner in lobby which can control the starting of game or kick any players. -->
@@ -224,9 +224,9 @@ You have the best gaming experience when choosing server having all players less
 
 Currently STK uses sqlite (if building with sqlite3 on) for server management with the following functions at the moment:
 1. Server statistics
-2. IPV4 / online ID ban list
+2. IPv4 / online ID ban list
 3. Player reports
-4. IPV4 geolocation
+4. IPv4 geolocation
 
 You need to create a database in sqlite first, run `sqlite3 stkservers.db` in the folder where (all) your server_config.xml(s) located.
 
@@ -236,7 +236,7 @@ CREATE TABLE IF NOT EXISTS (table name above)
 (
     host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer
     ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host
-    ipv6 TEXT NOT NULL DEFAULT '', -- IPV6 (if exists) in string of host (only created if ipv6 server)
+    ipv6 TEXT NOT NULL DEFAULT '', -- IPv6 (if exists) in string of host (only created if IPv6 server)
     port INTEGER UNSIGNED NOT NULL, -- Port of host
     online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)
     username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)
@@ -273,7 +273,7 @@ CREATE TABLE IF NOT EXISTS (table name above)
 
 If you want to see flags and readable names of countries in the above views, you need to initialize `v(server database version)_countries` table, check [this script](tools/generate-countries-table.py).
 
-For IPV4 and online ID ban list, player reports or IP mapping, you need to create one yourself:
+For IPv4 and online ID ban list, player reports or IP mapping, you need to create one yourself:
 ```sql
 CREATE TABLE ip_ban
 (
@@ -302,13 +302,13 @@ CREATE TABLE player_reports
 (
     server_uid TEXT NOT NULL, -- Report from which server unique id (config filename)
     reporter_ip INTEGER UNSIGNED NOT NULL, -- IP decimal of player who reports
-    reporter_ipv6 TEXT NOT NULL DEFAULT '', -- IPV6 (if exists) in string of player who reports (only needed for ipv6 server)
+    reporter_ipv6 TEXT NOT NULL DEFAULT '', -- IPv6 (if exists) in string of player who reports (only needed for IPv6 server)
     reporter_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player who reports, 0 for offline player
     reporter_username TEXT NOT NULL, -- Player name who reports
     reported_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time of reporting
     info TEXT NOT NULL, -- Report info by reporter
     reporting_ip INTEGER UNSIGNED NOT NULL, -- IP decimal of player being reported
-    reporting_ipv6 TEXT NOT NULL DEFAULT '', -- IPV6 (if exists) in string of player who reports (only needed for ipv6 server)
+    reporting_ipv6 TEXT NOT NULL DEFAULT '', -- IPv6 (if exists) in string of player who reports (only needed for IPv6 server)
     reporting_online_id INTEGER UNSIGNED NOT NULL, -- Online id of player being reported, 0 for offline player
     reporting_username TEXT NOT NULL -- Player name being reported
 );

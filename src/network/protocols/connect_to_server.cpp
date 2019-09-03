@@ -226,7 +226,7 @@ void ConnectToServer::asynchronousUpdate()
             }
             if (m_server->useIPV6Connection())
             {
-                // Disable STUN if using ipv6 (check in setPublicAddress)
+                // Disable STUN if using IPv6 (check in setPublicAddress)
                 setIPV6(1);
             }
             if (m_server->supportsEncryption())
@@ -265,10 +265,10 @@ void ConnectToServer::asynchronousUpdate()
             // direct connection to server first, if failed than use the one
             // that has stun mapped, the first 8 seconds allow the server to
             // start the connect to peer protocol first before the port is
-            // remapped. IPV6 has no stun so try once with any port
+            // remapped. IPv6 has no stun so try once with any port
             if (isIPV6())
             {
-                if (!tryConnect(2000, 15, true/*another_port*/, true/*ipv6*/))
+                if (!tryConnect(2000, 15, true/*another_port*/, true/*IPv6*/))
                     m_state = DONE;
             }
             else
@@ -396,7 +396,7 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
         // in iOS 9.2
         if (!m_server->useIPV6Connection())
         {
-            // From IPV4
+            // From IPv4
             addr_string = m_server->getAddress().toString(false/*show_port*/);
         }
 #endif

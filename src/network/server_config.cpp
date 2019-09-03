@@ -345,7 +345,7 @@ void loadServerLobbyFromConfig()
 #ifdef ENABLE_IPV6
         m_firewalled_server = false;
 #else
-        Log::warn("ServerConfig", "IPV6 support not compiled.");
+        Log::warn("ServerConfig", "IPv6 support not compiled.");
 #endif
     }
 

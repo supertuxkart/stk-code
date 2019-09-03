@@ -1815,7 +1815,7 @@ msgstr "Privéserver(s) tonen"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Use IPV6 connection if server supports"
+msgid "Use IPv6 connection if server supports"
 msgstr "IPv6-verbinding gebruiken als de server dat ondersteunt"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
