@@ -204,7 +204,7 @@ enet_socket_create (ENetSocketType type)
     if (isIPV6() && socket_fd != INVALID_SOCKET)
     {
         int no = 0;
-        // Allow ipv6 socket listen to ipv4 connection (as long as the host has ipv4 address)
+        // Allow IPv6 socket listen to IPv4 connection (as long as the host has IPv4 address)
         int ret = setsockopt(socket_fd, IPPROTO_IPV6, IPV6_V6ONLY, (void*)&no, sizeof(no));
         if (ret != 0)
         {

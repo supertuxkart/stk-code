@@ -37,7 +37,7 @@
 STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
        : m_peer_address(enet_peer->address), m_host(host)
 {
-    // We use 0.x.x.x ip to map to ipv6 address internally
+    // We use 0.x.x.x ip to map to IPv6 address internally
     if (m_peer_address.getIP() < 16777216)
         m_ipv6_address = getIPV6ReadableFromMappedAddress(&enet_peer->address);
     m_enet_peer           = enet_peer;
@@ -205,7 +205,7 @@ void STKPeer::setCrypto(std::unique_ptr<Crypto>&& c)
 }   // setCrypto
 
 //-----------------------------------------------------------------------------
-/* Return an IPV6 or IPV4 address, used for debug printing.
+/* Return an IPv6 or IPv4 address, used for debug printing.
  */
 std::string STKPeer::getRealAddress() const
 {

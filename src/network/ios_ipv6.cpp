@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-// Minimum code to allow iOS device to connect to ipv4 non-firewalled game server
+// Minimum code to allow iOS device to connect to IPv4 non-firewalled game server
 
 #ifdef IOS_STK
 
@@ -266,9 +266,9 @@ namespace Mars
 }
 
 // ============================================================================
-/** Return 1 if this iOS device has only IPV6 address, in this case we always
+/** Return 1 if this iOS device has only IPv6 address, in this case we always
  *  create inet6 socket in enet and try to use the NAT64 (provided by iOS)
- *  to connect to ipv4 server. */
+ *  to connect to IPv4 server. */
 int isIPV6Only()
 {
     using namespace Mars;

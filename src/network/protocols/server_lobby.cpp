@@ -227,7 +227,7 @@ void ServerLobby::initServerStatsTable()
         "    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer\n"
         "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n";
     if (ServerConfig::m_ipv6_server)
-        oss << "    ipv6 TEXT NOT NULL DEFAULT '', -- IPV6 (if exists) in string of host\n";
+        oss << "    ipv6 TEXT NOT NULL DEFAULT '', -- IPv6 (if exists) in string of host\n";
     oss << "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
         "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
         "    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)\n"
@@ -936,7 +936,7 @@ void ServerLobby::writePlayerReport(Event* event)
     std::string query;
     if (ServerConfig::m_ipv6_server)
     {
-        // We don't save the internally mapped ipv4 (0.x.x.x)
+        // We don't save the internally mapped IPv4 (0.x.x.x)
         query = StringUtils::insertValues(
             "INSERT INTO %s "
             "(server_uid, reporter_ip, reporter_ipv6, reporter_online_id, reporter_username, "
@@ -1899,7 +1899,7 @@ bool ServerLobby::registerServer(bool now)
     {
         request->addParameter("address_ipv6",
             STKHost::get()->getPublicIPV6Address());
-        Log::info("ServerLobby", "Public IPV6 server address %s",
+        Log::info("ServerLobby", "Public IPv6 server address %s",
             STKHost::get()->getPublicIPV6Address().c_str());
     }
     if (now)
@@ -3057,7 +3057,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     std::string query;
     if (ServerConfig::m_ipv6_server && !peer->getIPV6Address().empty())
     {
-        // We don't save the internally mapped ipv4 (0.x.x.x)
+        // We don't save the internally mapped IPv4 (0.x.x.x)
         query = StringUtils::insertValues(
             "INSERT INTO %s "
             "(host_id, ip, ipv6 ,port, online_id, username, player_num, "
@@ -3885,7 +3885,7 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
     if (!m_db || !m_ip_ban_table_exists)
         return;
 
-    // We only test for ipv4 atm
+    // We only test for IPv4 atm
     if (!peer->getIPV6Address().empty())
         return;
 
