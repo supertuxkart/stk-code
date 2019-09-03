@@ -22,7 +22,7 @@
                 <checkbox width="fit" id="ipv6" text_align="left"/>
                 <spacer width="10"/>
                 <label proportion="1" height="100%" text_align="left"
-                       I18N="In the server selection screen" text="Use IPV6 connection if server supports"/>
+                       I18N="In the server selection screen" text="Use IPv6 connection if server supports"/>
             </div>
         </div>
     </div>

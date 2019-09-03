@@ -394,7 +394,7 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
         return "";
     }
 
-    // We specify ai_family, so only ipv4 or ipv6 is found
+    // We specify ai_family, so only IPv4 or IPv6 is found
     if (res == NULL)
         return "";
 
@@ -406,7 +406,7 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
             struct sockaddr_in* ipv4_addr = (struct sockaddr_in*)(res->ai_addr);
             m_stun_address.setIP(ntohl(ipv4_addr->sin_addr.s_addr));
             m_stun_address.setPort(ntohs(ipv4_addr->sin_port));
-            // Change address to ::ffff:ipv4 format for ipv6 socket
+            // Change address to ::ffff:IPv4 format for IPv6 socket
             std::string ipv4_mapped = "::ffff:";
             ipv4_mapped += m_stun_address.toString(false/*show_port*/);
             freeaddrinfo(res);
@@ -640,7 +640,7 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
                 }
                 if (port != m_public_address.getPort())
                 {
-                    Log::error("STKHost", "IPV6 has different port than IPV4.");
+                    Log::error("STKHost", "IPv6 has different port than IPv4.");
                     return "";
                 }
             }
@@ -694,9 +694,9 @@ void STKHost::setPublicAddress()
 {
     if (isIPV6() && NetworkConfig::get()->isClient())
     {
-        // IPV6 client doesn't support connection to firewalled server,
+        // IPv6 client doesn't support connection to firewalled server,
         // so no need to test STUN
-        Log::info("STKHost", "IPV6 only environment detected.");
+        Log::info("STKHost", "IPv6 only environment detected.");
         m_public_address = TransportAddress("169.254.0.0:65535");
         return;
     }
@@ -726,7 +726,7 @@ void STKHost::setPublicAddress()
         Log::debug("STKHost", "Using STUN server %s", server_name.c_str());
         uint64_t ping = StkTime::getMonoTimeMs();
         std::string ipv4_string = getIPFromStun(
-            (int)m_network->getENetHost()->socket, server_name, true/*ipv4*/);
+            (int)m_network->getENetHost()->socket, server_name, true/*IPv4*/);
         TransportAddress addr(ipv4_string);
         if (!addr.isUnset())
         {
@@ -738,10 +738,10 @@ void STKHost::setPublicAddress()
             {
                 m_public_ipv6_address = getIPFromStun(
                     (int)m_network->getENetHost()->socket, server_name,
-                    false/*ipv4*/);
+                    false/*IPv4*/);
                 if (m_public_ipv6_address.empty())
                 {
-                    Log::warn("STKHost", "Failed to get public ipv6 address "
+                    Log::warn("STKHost", "Failed to get public IPv6 address "
                         "for this host.");
                 }
             }
@@ -881,7 +881,7 @@ void STKHost::mainLoop()
         bool socket_ipv6 = isIPV6() == 1 ? true : false;
         if (socket_ipv6)
             setIPV6(0);
-        // direct_socket use IPV4 only atm
+        // direct_socket use IPv4 only atm
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
         if (socket_ipv6)
             setIPV6(1);

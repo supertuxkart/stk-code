@@ -91,7 +91,7 @@ void mainLoop(STKHost* host)
                 peer->kick();
                 // ATM use permanently ban
                 auto sl = LobbyProtocol::get<ServerLobby>();
-                // We don't support banning ipv6 address atm
+                // We don't support banning IPv6 address atm
                 if (sl && peer->getIPV6Address().empty())
                     sl->saveIPBanTable(peer->getAddress());
             }
