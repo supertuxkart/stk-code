@@ -646,6 +646,10 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam         m_font_size
         PARAM_DEFAULT(  FloatUserConfigParam(3, "font_size",
         &m_video_group,"The size of fonts. 0 is the smallest and 6 is the biggest") );
+    PARAM_PREFIX FloatUserConfigParam         m_widget_extra_size
+        PARAM_DEFAULT(FloatUserConfigParam(0, "widget_extra_size",
+        &m_video_group, "Blank space on the top and bottom of the fonts."
+                        "0 is the smallest and 3 is the biggest."));
 
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group

@@ -22,6 +22,7 @@
 #include <IGUIFont.h>
 #include <ITexture.h>
 
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/engine.hpp"
@@ -67,7 +68,7 @@ bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int*
     else if( x[x.size()-1] == 'f' ) // font height
     {
         *absolute = i * GUIEngine::getFontHeight();
-    	return true;
+        return true;
     }
     else // absolute number
     {
@@ -76,6 +77,20 @@ bool LayoutManager::convertToCoord(std::string& x, int* absolute /* out */, int*
     }
 }
 
+// ----------------------------------------------------------------------------
+
+float LayoutManager::getExtraSize(Widget* self)
+{
+    if(UserConfigParams::m_widget_extra_size < 0)
+        UserConfigParams::m_widget_extra_size = 0;
+    if(UserConfigParams::m_widget_extra_size > 3.0f)
+        UserConfigParams::m_widget_extra_size = 3.0f;
+    
+    float extra_size = UserConfigParams::m_widget_extra_size;
+    if(self->getType() == WTYPE_RIBBON || self == nullptr) // Ribbons have their own handling
+        extra_size = 0;
+    return extra_size / 15; // Better and fitter space after / 15
+}
 
 // ----------------------------------------------------------------------------
 
@@ -293,6 +308,11 @@ void LayoutManager::readCoords(Widget* self)
         else if (texture_h > -1)                 self->m_absolute_h = texture_h;
         else if (label_h > -1)                   self->m_absolute_h = label_h;
     }
+
+    // Set vertical extra space
+    self->m_absolute_h += self->m_absolute_h * getExtraSize(self);
+    // Set horizontal extra space
+    self->m_absolute_w += self->m_absolute_w * getExtraSize(self);
 }
 
 // ----------------------------------------------------------------------------
@@ -751,4 +771,3 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
         }
     }
 }   // calculateLayout
-

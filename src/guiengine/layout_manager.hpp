@@ -69,6 +69,9 @@ namespace GUIEngine
          */
         static void applyCoords(Widget* self, AbstractTopLevelContainer* topLevelContainer, Widget* parent);
 
+        /** Get the true widget extra size */
+        static float getExtraSize(Widget* self);
+
         /**
          * \brief Find a widget's x, y, w and h coords from what is specified in the XML properties.
          * (First step; 'applyCoords' is the second step)
