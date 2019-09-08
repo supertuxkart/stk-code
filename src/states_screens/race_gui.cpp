@@ -211,8 +211,8 @@ void RaceGUI::calculateMinimapSize()
     m_map_width             = (int)(map_size * scaling);
     m_map_height            = (int)(map_size * scaling);
 
-    if(UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
-       race_manager->getNumLocalPlayers() == 1)
+    if ((UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
+       race_manager->getNumLocalPlayers() == 1) || m_multitouch_gui)
     {
         m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
                                                         m_map_width - 10.0f*scaling);
