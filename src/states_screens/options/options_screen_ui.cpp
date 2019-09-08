@@ -161,6 +161,22 @@ void OptionsScreenUI::loadedFromFile()
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
         font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     }
+    
+    GUIEngine::SpinnerWidget* widget_extra_size = getWidget<GUIEngine::SpinnerWidget>("widget_extra_size");
+    assert( widget_extra_size != NULL );
+
+    widget_extra_size->clearLabels();
+    //I18N: In the UI options, Disable widget extra size
+    widget_extra_size->addLabel(_("Disabled"));
+    //I18N: In the UI options, Small widget extra size
+    widget_extra_size->addLabel(_("Small"));
+    //I18N: In the UI options, Medium widget extra size
+    widget_extra_size->addLabel(_("Medium"));
+    //I18N: In the UI options, Large widget extra size
+    widget_extra_size->addLabel(_("Large"));
+
+    widget_extra_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    widget_extra_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "3";
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -207,6 +223,18 @@ void OptionsScreenUI::init()
     font_size->setValue(size_int);
     UserConfigParams::m_font_size = font_size->getValue();
     font_size->setActive(!in_game);
+    
+    GUIEngine::SpinnerWidget* widget_extra_size = getWidget<GUIEngine::SpinnerWidget>("widget_extra_size");
+    assert( widget_extra_size != NULL );
+    
+    m_prev_widget_extra_size = UserConfigParams::m_widget_extra_size;
+    int size_int_2 = (int)roundf(UserConfigParams::m_widget_extra_size);
+    if (size_int_2 < 0 || size_int_2 > 3)
+        size_int_2 = 0;
+
+    widget_extra_size->setValue(size_int_2);
+    UserConfigParams::m_widget_extra_size = widget_extra_size->getValue();
+    widget_extra_size->setActive(!in_game);
 
     // ---- video modes
     CheckBoxWidget* splitscreen_method = getWidget<CheckBoxWidget>("split_screen_horizontally");
@@ -300,6 +328,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( font_size != NULL );
         UserConfigParams::m_font_size = font_size->getValue();
     }
+    else if (name == "widget_extra_size")
+    {
+        GUIEngine::SpinnerWidget* widget_extra_size = getWidget<GUIEngine::SpinnerWidget>("widget_extra_size");
+        assert( widget_extra_size != NULL );
+        UserConfigParams::m_widget_extra_size = widget_extra_size->getValue();
+    }
     else if (name == "split_screen_horizontally")
     {
         CheckBoxWidget* split_screen_horizontally = getWidget<CheckBoxWidget>("split_screen_horizontally");
@@ -320,7 +354,8 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
 void OptionsScreenUI::tearDown()
 {
-    if (m_prev_font_size != UserConfigParams::m_font_size)
+    if (m_prev_font_size != UserConfigParams::m_font_size
+     || m_prev_widget_extra_size != UserConfigParams::m_widget_extra_size)
     {
         irr_driver->sameRestart();
     }
