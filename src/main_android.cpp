@@ -56,16 +56,19 @@ void override_default_params_for_mobile()
         UserConfigParams::m_multitouch_scale = 1.3f;
         UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
         UserConfigParams::m_font_size = 5.0f;
+        UserConfigParams::m_widget_extra_size = 3.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_LARGE:
         UserConfigParams::m_multitouch_scale = 1.2f;
         UserConfigParams::m_multitouch_sensitivity_x = 0.15f;
         UserConfigParams::m_font_size = 5.0f;
+        UserConfigParams::m_widget_extra_size = 2.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_XLARGE:
         UserConfigParams::m_multitouch_scale = 1.1f;
         UserConfigParams::m_multitouch_sensitivity_x = 0.2f;
         UserConfigParams::m_font_size = 4.0f;
+        UserConfigParams::m_widget_extra_size = 2.0f;
         break;
     default:
         break;

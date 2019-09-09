@@ -86,10 +86,11 @@ float LayoutManager::getExtraSize(Widget* self)
     if(UserConfigParams::m_widget_extra_size > 3.0f)
         UserConfigParams::m_widget_extra_size = 3.0f;
     
-    float extra_size = UserConfigParams::m_widget_extra_size;
-    if(self->getType() == WTYPE_RIBBON || self == nullptr) // Ribbons have their own handling
-        extra_size = 0;
-    return extra_size / 15; // Better and fitter space after / 15
+    if(self->getType() == WTYPE_BUTTON
+    || self->getType() == WTYPE_CHECKBOX
+    || self->getType() == WTYPE_SPINNER)
+		return UserConfigParams::m_widget_extra_size / 10; // Better and fitter space after / 10
+    return 0; 
 }
 
 // ----------------------------------------------------------------------------
