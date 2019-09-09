@@ -61,7 +61,7 @@ private:
     std::vector<std::shared_ptr<Server> > m_servers;
 
     GUIEngine::CheckBoxWidget* m_private_server;
-    GUIEngine::CheckBoxWidget* m_game_started;
+    GUIEngine::CheckBoxWidget* m_ipv6;
     GUIEngine::IconButtonWidget* m_reload_widget;
     GUIEngine::LabelWidget* m_update_status;
     GUIEngine::ListWidget* m_server_list_widget;

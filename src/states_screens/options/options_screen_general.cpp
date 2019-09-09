@@ -131,6 +131,8 @@ void OptionsScreenGeneral::init()
     if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED ||
         StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
         getWidget("assets_settings")->setActive(false);
+    else
+        getWidget("assets_settings")->setActive(true);
 #else
     getWidget("assets_settings")->setVisible(false);
 #endif
@@ -194,11 +196,17 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
             stats->setState(UserConfigParams::m_hw_report_enable);
             chat->setActive(true);
             chat->setState(UserConfigParams::m_lobby_chat);
+#ifdef MOBILE_STK
+            getWidget("assets_settings")->setActive(true);
+#endif
         }
         else
         {
             chat->setActive(false);
             stats->setActive(false);
+#ifdef MOBILE_STK
+            getWidget("assets_settings")->setActive(false);
+#endif
 
             // Disable this, so that the user has to re-check this if
             // enabled later (for GDPR compliance).

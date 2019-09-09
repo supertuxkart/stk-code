@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-24 15:48+0800\n"
-"PO-Revision-Date: 2019-07-24 16:41+0000\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Catalan (http://www.transifex.com/supertuxkart/supertuxkart/language/ca/)\n"
 "MIME-Version: 1.0\n"
@@ -415,7 +415,6 @@ msgstr "Cal reiniciar el STK per aplicar la nova configuració"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -972,28 +971,6 @@ msgstr "Crèdits"
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "Dóna per ajudar a mantenir el SuperTuxKart!"
 
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr ""
-
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
@@ -1491,7 +1468,7 @@ msgid ""
 "Mass - there are three classes of karts, depending on their mass: light, "
 "medium and heavy. Heavier karts are less affected by parachutes and are more"
 " resistant to explosions."
-msgstr ""
+msgstr "Massa - hi ha tres classes de kart, depenent de la seva massa: lleuger, mitjà i pesat. Als karts més pesats no els afecten tant els paracaigudes, i són més resistents a les explosions."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1835,8 +1812,8 @@ msgstr "Mostra els servidors privats"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "Amaga els servidors amb partides en curs"
+msgid "Use IPV6 connection if server supports"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -2371,7 +2348,7 @@ msgstr "Arenes movedisses"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 msgid "Nessie's Pond"
-msgstr ""
+msgstr "L'estany de Nessie"
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
@@ -3251,7 +3228,7 @@ msgstr "Has acabat la cursa!"
 msgid "%s left the game."
 msgstr "%s ha abandonat la partida."
 
-#: src/main.cpp:1866
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3262,16 +3239,16 @@ msgid ""
 "statistics\")."
 msgstr "El SuperTuxKart pot connectar-se a un servidor per descarregar complements i notificar-te actualitzacions. També recollim estadístiques anònimes de maquinari per ajudar en el desenvolupament del STK. Llegeix la nostra política de privacitat a http://privacy.supertuxkart.net. T'agradaria habilitar aquesta característica? (Per canviar aquest paràmetre més endavant, vés a les opcions, selecciona la pestanya \"General\", i edita els paràmetres \"Connectat a Internet\" i \"Envia estadístiques anònimes del maquinari\")."
 
-#: src/main.cpp:2134
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr "La resolució de la teva pantalla és massa baixa per executar el STK."
 
-#: src/main.cpp:2166
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "La versió del teu controlador és massa antiga. Si us plau, instal·la la darrera versió."
 
-#: src/main.cpp:2184
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3536,11 +3513,11 @@ msgstr "Prem <%s> o <%s> per canviar de jugador o <%s> per canviar la posició d
 msgid "Successfully reported %s."
 msgstr "%s ha estat reportat."
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr "No hi ha disponible cap servidor de partides ràpides."
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "No s'ha pogut connectar al servidor %s."
@@ -3698,7 +3675,7 @@ msgid "Please wait while addons are updated"
 msgstr "Espera mentre s'actualitzen els complements"
 
 #: src/states_screens/addons_screen.cpp:498
-#: src/states_screens/main_menu_screen.cpp:564
+#: src/states_screens/main_menu_screen.cpp:575
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3897,13 +3874,13 @@ msgstr "Curses segueix al líder acabades"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:210
 msgid "3 Strikes battles started"
-msgstr ""
+msgstr "Batalles a 3 cops començades"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
 msgid "3 Strikes battles finished"
-msgstr ""
+msgstr "Batalles a 3 cops acabades"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4158,6 +4135,7 @@ msgid "featured"
 msgstr "Destacats"
 
 #: src/states_screens/dialogs/addons_loading.cpp:174
+#: src/states_screens/dialogs/download_assets.cpp:106
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
@@ -4168,12 +4146,15 @@ msgstr "%s MB"
 msgid "%s KB"
 msgstr "%s KB"
 
+#. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:186
+#: src/states_screens/dialogs/download_assets.cpp:108
 #, c-format
 msgid "Size: %s"
 msgstr "Mida: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:294
+#: src/states_screens/dialogs/download_assets.cpp:182
 msgid "Sorry, downloading the add-on failed"
 msgstr "No s'ha pogut descarregar el complement"
 
@@ -4184,6 +4165,7 @@ msgstr "Problemes instal·lant el complement '%s'."
 
 #: src/states_screens/dialogs/addons_loading.cpp:389
 #: src/states_screens/dialogs/addons_loading.cpp:428
+#: src/states_screens/dialogs/download_assets.cpp:255
 msgid "Try again"
 msgstr "Tornar-ho a provar"
 
@@ -4274,6 +4256,22 @@ msgstr "Alt"
 #: src/states_screens/options/options_screen_video.cpp:468
 msgid "Very Low"
 msgstr "Molt baix"
+
+#. I18N: In download assets dialog
+#: src/states_screens/dialogs/download_assets.cpp:112
+msgid ""
+"SuperTuxKart will download full assets (including all tracks, high quality "
+"textures and music) for better gaming experience, this will use your mobile "
+"data if you don't have a wifi connection."
+msgstr "El SuperTuxKart descarregarà els recursos complets (inclosos tots els circuits, textures d'alta qualitat i música) per a una millor experiència de joc. Això farà servir les teves dades mòbils si no tens una connexió wifi."
+
+#. I18N: Shown when there is download error for assets download
+#. in the first run
+#: src/states_screens/dialogs/download_assets.cpp:239
+msgid ""
+"Failed to download assets, check your storage space or internet connection "
+"and try again later."
+msgstr "No s'han pogut descarregar els recursos, comprova el teu espai d'emmagatzematge o la teva connexió a Internet i torna-ho a provar."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4592,14 +4590,6 @@ msgstr "El vot s'ha enviat correctament! Ja pots tancar la finestra."
 msgid "Performing vote"
 msgstr "S'està realitzant la votació"
 
-#. I18N: Shown when there is download error for assets download
-#. in the first run
-#: src/states_screens/download_assets.cpp:204
-msgid ""
-"Failed to download assets, check your storage space or internet connection "
-"and try again later."
-msgstr ""
-
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:601
 #: src/states_screens/tracks_and_gp_screen.cpp:290
@@ -4771,30 +4761,30 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr "Tothom:\nPremeu el botó 'Seleccionar' per unir-vos a la partida"
 
-#: src/states_screens/main_menu_screen.cpp:501
+#: src/states_screens/main_menu_screen.cpp:512
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia, vés al menú d'opcions i selecciona \"Connectat a Internet\"."
 
-#: src/states_screens/main_menu_screen.cpp:516
+#: src/states_screens/main_menu_screen.cpp:527
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "No pots descarregar complements sense accés a Internet. Si vols descarregar complements, vés al menú d'opcions i selecciona \"Connectat a Internet\"."
 
-#: src/states_screens/main_menu_screen.cpp:524
+#: src/states_screens/main_menu_screen.cpp:535
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "No pots descarregar complements sense accés a Internet. Si vols descarregar complements, vés al menú d'opcions i selecciona \"Connectat a Internet\".\n\nPerò sí que pots eliminar complements ja descarregats."
 
-#: src/states_screens/main_menu_screen.cpp:559
+#: src/states_screens/main_menu_screen.cpp:570
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "El mòdul de complements actualment es troba deshabilitat a la finestra d'opcions"
 
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/main_menu_screen.cpp:582
 msgid "Please wait while the add-ons are loading"
 msgstr "Espera mentre es carreguen els complements"
 
@@ -4969,7 +4959,7 @@ msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia
 #: src/states_screens/online/online_screen.cpp:238
 msgid ""
 "Enter the server address with IP optionally followed by : and then port."
-msgstr ""
+msgstr "Introdueix l'adreça del servidor, amb la IP opcionalment seguida per : i després el port."
 
 #: src/states_screens/online/online_screen.cpp:249
 #, c-format
@@ -5055,15 +5045,15 @@ msgid "Distance (km)"
 msgstr "Distància (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "Desconegut"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr "No hi ha cap servidor disponible."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr "Obtenint servidors"
 
@@ -5241,11 +5231,26 @@ msgstr "Estàs segur que vols esborrar permanentment aquesta configuració?"
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:110
+#: src/states_screens/options/options_screen_general.cpp:113
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
 msgstr "En mode multijugador els jugadors poden seleccionar perfils limitats\n(més difícils) a la pantalla de selecció de karts"
+
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:123
+msgid "Uninstall full game assets"
+msgstr "Desinstal·lar els recursos complets"
+
+#. I18N: For mobile version for STK, install the full game assets which
+#. will download from stk server
+#: src/states_screens/options/options_screen_general.cpp:129
+msgid "Install full game assets"
+msgstr "Instal·lar els recursos complets"
+
+#: src/states_screens/options/options_screen_general.cpp:264
+msgid "Are you sure to uninstall full game assets?"
+msgstr "Estàs segur de que vols desinstal·lar els recursos complets?"
 
 #: src/states_screens/options/options_screen_input.cpp:104
 msgid "Gamepad"

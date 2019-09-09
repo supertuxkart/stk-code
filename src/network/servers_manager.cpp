@@ -370,7 +370,7 @@ void ServersManager::addAllBroadcastAddresses(const TransportAddress &a, int len
 
 // ----------------------------------------------------------------------------
 /** Updates a list of all possible broadcast addresses on this machine.
- *  It queries all adapters for active IPV4 interfaces, determines their
+ *  It queries all adapters for active IPv4 interfaces, determines their
  *  netmask to create the broadcast addresses. It will also add 'smaller'
  *  broadcast addesses, e.g. in a /16 network, it will add *.*.255.255 and
  *  *.*.*.255, since it was sometimes observed that routers would not let

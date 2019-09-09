@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-24 15:48+0800\n"
-"PO-Revision-Date: 2019-07-24 16:41+0000\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Greek (http://www.transifex.com/supertuxkart/supertuxkart/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -421,7 +421,6 @@ msgstr "* Επανεκκίνηση του STK για εφαρμογή νέων �
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -977,28 +976,6 @@ msgstr "Συντελεστές"
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "Δωρίστε για να βοηθήσετε το SuperTuxKart!"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr ""
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1841,8 +1818,8 @@ msgstr "Εμφάνιση ιδιωτικού(ών) server"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "Κρύψε τους servers με ένα παιχνίδι σε εξέλιξη"
+msgid "Use IPV6 connection if server supports"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -3257,7 +3234,7 @@ msgstr "Ολοκλήρωσες τον αγώνα!"
 msgid "%s left the game."
 msgstr "%s έφυγε απο το παινχίδι."
 
-#: src/main.cpp:1866
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3268,16 +3245,16 @@ msgid ""
 "statistics\")."
 msgstr "Το SuperTuxKart μπορεί να συνδεθεί σε έναν server για να κατεβάζετε πρόσθετα και σας ειδοποιεί για ενημερώσεις. Επίσης συλλέγουμε ανώνυμα στατιστικά υλικού για να βοηθηθεί η ανάπτυξη του STK. Παρακαλούμε διαβάστε την πολιτική απορρήτου στην σελίδα http://privacy.supertuxkart.net. Θέλετε αυτό το χαρακτηριστικό να ενεργοποιηθεί; (Για να αλλάξετε αυτή τη ρύθμιση σε μεταγενέστερο χρόνο, πηγαίνετε στις επιλογές, επιλέξτε την καρτέλα «Εμφάνιση» και επεξεργαστείτε τα \"Σύνδεση στο Internet\" και \"Αποστολή στατιστικών υλικού ανώνυμα\")."
 
-#: src/main.cpp:2134
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr "Η ανάλυση της οθόνης σας είναι πολύ χαμηλή για να τρέξει το STK."
 
-#: src/main.cpp:2166
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Η έκδοση του οδηγού γραφικών είναι πολύ παλιά. Παρακαλώ εγκαταστήστε τον πιο πρόσφατο οδηγό γραφικών."
 
-#: src/main.cpp:2184
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3542,11 +3519,11 @@ msgstr "Πάτηστε <%s> ή <%s> για να αλλάξετε τον παίκ
 msgid "Successfully reported %s."
 msgstr "Πετύχε το παράπονο %s."
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr "Δεν υπάρχει server διαθέσιμος για γρήγορο παιχνίδι."
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Δεν είναι δυνατή η σύνδεση στον server  %s."
@@ -3704,7 +3681,7 @@ msgid "Please wait while addons are updated"
 msgstr "Παρακαλώ περιμένετε καθώς ενημερώνονται τα πρόσθετα"
 
 #: src/states_screens/addons_screen.cpp:498
-#: src/states_screens/main_menu_screen.cpp:564
+#: src/states_screens/main_menu_screen.cpp:575
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3903,13 +3880,13 @@ msgstr "Ακολουθόντας-τον-Αρχηγό αγώνες που ολο�
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:210
 msgid "3 Strikes battles started"
-msgstr ""
+msgstr "Η μονομαχία 3 χτυπημάτων Άρχισε"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
 msgid "3 Strikes battles finished"
-msgstr ""
+msgstr "Η μονομαχία 3 χτυπημάτων Ολοκληρώθηκε"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4164,6 +4141,7 @@ msgid "featured"
 msgstr "προτεινόμενο"
 
 #: src/states_screens/dialogs/addons_loading.cpp:174
+#: src/states_screens/dialogs/download_assets.cpp:106
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
@@ -4174,12 +4152,15 @@ msgstr "%s MB"
 msgid "%s KB"
 msgstr "%s KB"
 
+#. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:186
+#: src/states_screens/dialogs/download_assets.cpp:108
 #, c-format
 msgid "Size: %s"
 msgstr "Mέγεθος: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:294
+#: src/states_screens/dialogs/download_assets.cpp:182
 msgid "Sorry, downloading the add-on failed"
 msgstr "Λυπούμαστε, η λήψη του πρόσθετου απέτυχε."
 
@@ -4190,6 +4171,7 @@ msgstr "Προβλήματα κατά την εγκατάσταση του πρ�
 
 #: src/states_screens/dialogs/addons_loading.cpp:389
 #: src/states_screens/dialogs/addons_loading.cpp:428
+#: src/states_screens/dialogs/download_assets.cpp:255
 msgid "Try again"
 msgstr "Προσπαθήστε ξανά"
 
@@ -4280,6 +4262,22 @@ msgstr "Υψηλή"
 #: src/states_screens/options/options_screen_video.cpp:468
 msgid "Very Low"
 msgstr "Πολύ χαμηλή"
+
+#. I18N: In download assets dialog
+#: src/states_screens/dialogs/download_assets.cpp:112
+msgid ""
+"SuperTuxKart will download full assets (including all tracks, high quality "
+"textures and music) for better gaming experience, this will use your mobile "
+"data if you don't have a wifi connection."
+msgstr ""
+
+#. I18N: Shown when there is download error for assets download
+#. in the first run
+#: src/states_screens/dialogs/download_assets.cpp:239
+msgid ""
+"Failed to download assets, check your storage space or internet connection "
+"and try again later."
+msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4598,14 +4596,6 @@ msgstr "Ψηφοφορία επιτυχής! Μπορείτε να κλείσε�
 msgid "Performing vote"
 msgstr "Εκτέλεση ψηφοφορίας"
 
-#. I18N: Shown when there is download error for assets download
-#. in the first run
-#: src/states_screens/download_assets.cpp:204
-msgid ""
-"Failed to download assets, check your storage space or internet connection "
-"and try again later."
-msgstr ""
-
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:601
 #: src/states_screens/tracks_and_gp_screen.cpp:290
@@ -4777,30 +4767,30 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr "Όλοι:\nΠάτησε το πλήκτρο \"Select\" για να μπείς στο παιχνίδι"
 
-#: src/states_screens/main_menu_screen.cpp:501
+#: src/states_screens/main_menu_screen.cpp:512
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Δεν μπορείτε να παίξετε online χωρίς πρόσβαση στο internet. Αν θέλετε να παίξετε online, πηγαίνετε στις ρυθμίσεις, επιλέξτε την καρτέλα «Ρυθμίσεις Χρήστη» και ελέγξτε το \"Σύνδεση στο Internet\". "
 
-#: src/states_screens/main_menu_screen.cpp:516
+#: src/states_screens/main_menu_screen.cpp:527
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Δεν μπορείται να κατεβάσετε πρόσθετα χωρίς σύνδεση στο internet. Άμα θέλετε να κατεβάσετε πρόσθετα πηγαίνετε στις ρυθμίσεις, επιλέξτε την κατηγορία 'Ρυθμίσεις Χρήστη' και επιλέξτε \"Σύνδεση στο Internet\"."
 
-#: src/states_screens/main_menu_screen.cpp:524
+#: src/states_screens/main_menu_screen.cpp:535
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "Δεν μπορείται να κατεβάσετε πρόσθετα χωρίς σύνδεση στο internet. Άμα θέλετε να κατεβάσετε πρόσθετα, πηγαίνετε στις ρυθμίσεις, επιλέξτε την καρτελα 'Ρυθμίσεις Χρήστη' και ελέγξτε \"Σύνδεση στο Internet\".\n\nΜπορείται όμως να διαγράψετε ήδη εγκατεστημένα πρόσθετα. "
 
-#: src/states_screens/main_menu_screen.cpp:559
+#: src/states_screens/main_menu_screen.cpp:570
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Τα πρόσθετα είναι προς το παρόν απενεργοποιημένα στην οθόνη Επιλογές"
 
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/main_menu_screen.cpp:582
 msgid "Please wait while the add-ons are loading"
 msgstr "Παρακαλώ περιμένετε καθώς φορτώνονται τα πρόσθετα"
 
@@ -5061,15 +5051,15 @@ msgid "Distance (km)"
 msgstr "Απόσταση (χλμ.)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "Άγνωστο"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr "Δεν υπάρχει διαθέσιμος server."
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr "Λήψη των server"
 
@@ -5247,11 +5237,26 @@ msgstr "Είστε βέβαιοι ότι θέλετε να διαγράψετε 
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:110
+#: src/states_screens/options/options_screen_general.cpp:113
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
 msgstr "Στην κατηγορία για αγώνες με φίλους, οι παίκτες μπορούν να διαλέξουν να παίξουν μειονεκτηκά.\n(πιό δύσκολο) στην οθόνη επιλογής kart"
+
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:123
+msgid "Uninstall full game assets"
+msgstr ""
+
+#. I18N: For mobile version for STK, install the full game assets which
+#. will download from stk server
+#: src/states_screens/options/options_screen_general.cpp:129
+msgid "Install full game assets"
+msgstr ""
+
+#: src/states_screens/options/options_screen_general.cpp:264
+msgid "Are you sure to uninstall full game assets?"
+msgstr ""
 
 #: src/states_screens/options/options_screen_input.cpp:104
 msgid "Gamepad"

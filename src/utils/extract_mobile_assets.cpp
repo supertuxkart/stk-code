@@ -21,6 +21,7 @@
 #include "addons/zip.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -76,6 +77,10 @@ void ExtractMobileAssets::reinit()
     file_manager->reinitAfterDownloadAssets();
     irr_driver->sameRestart();
     track_manager->loadTrackList();
+
+    delete grand_prix_manager;
+    grand_prix_manager = new GrandPrixManager();
+    grand_prix_manager->checkConsistency();
 }   // reinit
 
 // ----------------------------------------------------------------------------

@@ -15,12 +15,25 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <enet/enet.h>
+#include <string>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-int isIPV6Only();
+int isIPV6();
+void setIPV6(int val);
+void stkInitialize();
+void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
+void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
+void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6);
+int getaddrinfo_compat(const char* hostname, const char* servname,
+                       const struct addrinfo* hints, struct addrinfo** res);
 #ifdef __cplusplus
 }
 #endif
-
+std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea);
+std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in);
+bool sameIPV6(const struct sockaddr_in6* in_1,
+              const struct sockaddr_in6* in_2);
+void removeDisconnectedMappedAddress();

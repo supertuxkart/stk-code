@@ -205,7 +205,7 @@ void GameProtocol::handleControllerAction(Event *event)
             !peer->availableKartID(kart_id))
         {
             Log::warn("GameProtocol", "Wrong kart id %d from %s.",
-                kart_id, peer->getAddress().toString().c_str());
+                kart_id, peer->getRealAddress().c_str());
             return;
         }
 

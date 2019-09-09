@@ -36,6 +36,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
 {
     const XMLNode& xml = *server_info.getNode("server-info");
 
+    m_ipv6_connection = false;
     m_name = "";
     m_server_id = 0;
     m_current_players = 0;
@@ -57,6 +58,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("max_players", &m_max_players);
     xml.get("current_players", &m_current_players);
     xml.get("current_track", &m_current_track);
+    xml.get("ipv6", &m_ipv6_address);
     uint32_t ip;
     xml.get("ip", &ip);
     m_address.setIP(ip);
@@ -170,6 +172,7 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                bool game_started, const std::string& current_track)
       : m_supports_encrytion(false)
 {
+    m_ipv6_connection = false;
     m_name               = name;
     m_lower_case_name    = StringUtils::toLowerCase(StringUtils::wideToUtf8(name));
     m_server_id          = server_id;

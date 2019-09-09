@@ -4,6 +4,7 @@
 # 
 # Translators:
 # David Blaszyk <david@sudomail.ne.jp>, 2017
+# Happymc! <isena200536@gmail.com>, 2019
 # lindwurm, 2015
 # Kidokoro Kosuke <kousukeK@outlook.com>, 2019
 # Sugahara Masayuki <brindflontia@gmail.com>, 2015
@@ -14,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-24 15:48+0800\n"
-"PO-Revision-Date: 2019-07-24 16:41+0000\n"
+"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"PO-Revision-Date: 2019-08-21 15:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -419,7 +420,6 @@ msgstr "※新しい設定を適用するには、SuperTuxKartの再起動が必
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
-#. I18N: ./data/gui/screens/download_assets.stkgui
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -975,28 +975,6 @@ msgstr "クレジット"
 #. I18N: ./data/gui/screens/credits.stkgui
 msgid "Donate to help keep SuperTuxKart going!"
 msgstr "SuperTuxKartの展開を応戦するために寄付しよう！"
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid "Download game assets"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen
-msgid ""
-"SuperTuxKart needs to download assets required to play the game now, this "
-"will use your mobile data if you don't have a wifi connection."
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Include all tracks"
-msgstr ""
-
-#. I18N: ./data/gui/screens/download_assets.stkgui
-#. I18N: In the download assets screen, download options of assets
-msgid "Use high quality textures and music"
-msgstr ""
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1623,7 +1601,7 @@ msgstr "チュートリアル"
 #. I18N: Section in the profile screen
 #: src/states_screens/online/online_profile_base.cpp:109
 msgid "Achievements"
-msgstr ""
+msgstr "実績"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -1707,7 +1685,7 @@ msgstr "設定"
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
 msgid "Enable splitscreen or player handicaps"
-msgstr ""
+msgstr "スプリットスクリーンやプレイヤーハンディキャップを可能にする"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -1839,8 +1817,8 @@ msgstr "プライベートサーバーを表示"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Hide servers with an ongoing game"
-msgstr "進行中のゲームのサーバーを非表示"
+msgid "Use IPV6 connection if server supports"
+msgstr ""
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -2036,7 +2014,7 @@ msgstr "匿名のハードウェア統計情報を送信する"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Enable chatting in online games"
-msgstr ""
+msgstr "オンラインゲーム中チャットを可能にする"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2046,7 +2024,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Enable per-player handicaps"
-msgstr ""
+msgstr "プレイヤーハンディキャップを可能にする"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -2073,12 +2051,12 @@ msgstr "スキン"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Minimap"
-msgstr ""
+msgstr "ミニマップ"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Font size"
-msgstr ""
+msgstr "フォントサイズ"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2312,7 +2290,7 @@ msgstr "ハーシエンダ"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
-msgstr ""
+msgstr "凍ったサッカー場"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2343,11 +2321,11 @@ msgstr " でもお前は絶対にオレに勝つことはできない…カー�
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
-msgstr ""
+msgstr "ラス・ダナス・アリーナ"
 
 #. I18N: ../stk-assets/tracks/lasdunassoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
-msgstr ""
+msgstr "ラス・ダナス・サッカースタジアム"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
@@ -2429,11 +2407,11 @@ msgstr "ニューズをダウンロードエラー： '1%s'"
 
 #: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:262
 msgid "Normal Race (Grand Prix)"
-msgstr ""
+msgstr "通常レース (グランプリ)"
 
 #: src/challenges/challenge_data.cpp:305
 msgid "Time-Trial (Grand Prix)"
-msgstr ""
+msgstr "タイムトライアル (グランプリ)"
 
 #: src/challenges/challenge_data.cpp:310
 msgid "Time-Trial - beat the replay"
@@ -2441,19 +2419,19 @@ msgstr ""
 
 #: src/challenges/challenge_data.cpp:312
 msgid "Time-Trial - nitro challenge"
-msgstr ""
+msgstr "タイムトライアル - ニトロチャレンジ"
 
 #: src/challenges/challenge_data.cpp:314
 msgid "Normal Race (single race)"
-msgstr ""
+msgstr "通常レース (シングルレース)"
 
 #: src/challenges/challenge_data.cpp:316
 msgid "Time-Trial (single race)"
-msgstr ""
+msgstr "タイムトライアル (シングルレース)"
 
 #: src/challenges/challenge_data.cpp:318
 msgid "Follow the Leader (single race)"
-msgstr ""
+msgstr "リーダーに続け (シングルレース)"
 
 #. I18N: In the Select challenge dialog, tell user this challenge has reversed
 #. laps
@@ -2689,13 +2667,13 @@ msgstr "エスケープキー"
 #: src/input/binding.cpp:143
 msgctxt "input_key"
 msgid "Convert"
-msgstr ""
+msgstr "変換キー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:145
 msgctxt "input_key"
 msgid "Nonconvert"
-msgstr ""
+msgstr "無変換キー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:147
@@ -2719,13 +2697,13 @@ msgstr "スペースキー"
 #: src/input/binding.cpp:153
 msgctxt "input_key"
 msgid "Page Up"
-msgstr ""
+msgstr "Page Upキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:155
 msgctxt "input_key"
 msgid "Page Down"
-msgstr ""
+msgstr "Page Downキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:157
@@ -2785,19 +2763,19 @@ msgstr ""
 #: src/input/binding.cpp:175
 msgctxt "input_key"
 msgid "Print Screen"
-msgstr ""
+msgstr "Print Screenキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:177
 msgctxt "input_key"
 msgid "Insert"
-msgstr ""
+msgstr "lnsertキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:179
 msgctxt "input_key"
 msgid "Delete"
-msgstr ""
+msgstr "Deleteキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:181
@@ -2929,13 +2907,13 @@ msgstr ""
 #: src/input/binding.cpp:285
 msgctxt "input_key"
 msgid "Left Shift"
-msgstr ""
+msgstr "左 Shiftキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:287
 msgctxt "input_key"
 msgid "Right Shift"
-msgstr ""
+msgstr "右 Shiftキー"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:289
@@ -3252,9 +3230,9 @@ msgstr "ゴールしました！"
 #: src/karts/kart_rewinder.cpp:120 src/network/protocols/client_lobby.cpp:1067
 #, c-format
 msgid "%s left the game."
-msgstr ""
+msgstr "%sがゲームから抜けました。"
 
-#: src/main.cpp:1866
+#: src/main.cpp:1863
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3265,16 +3243,16 @@ msgid ""
 "statistics\")."
 msgstr ""
 
-#: src/main.cpp:2134
+#: src/main.cpp:2131
 msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
-#: src/main.cpp:2166
+#: src/main.cpp:2163
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "最新のビデオドライバーを使用してください。"
 
-#: src/main.cpp:2184
+#: src/main.cpp:2181
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3284,7 +3262,7 @@ msgstr "グラフィックスドライバーは非常に古いようだ。アッ
 
 #: src/main_loop.cpp:379 src/network/protocols/client_lobby.cpp:96
 msgid "Server connection timed out."
-msgstr ""
+msgstr "サーバーへの接続がタイムアウトしました。"
 
 #. I18N: Show when a player gets the red flag in CTF
 #: src/modes/capture_the_flag.cpp:178
@@ -3371,7 +3349,7 @@ msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:98
 msgid "You were kicked from the server."
-msgstr ""
+msgstr "あなたはサーバーからキックされました。"
 
 #: src/network/protocols/client_lobby.cpp:100
 msgid "You were kicked: Ping too high."
@@ -3413,7 +3391,7 @@ msgstr "難しさ： %s"
 #: src/network/protocols/client_lobby.cpp:671
 #, c-format
 msgid "Max players: %d"
-msgstr ""
+msgstr "最大のプレイヤー数: %d"
 
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:684
@@ -3428,7 +3406,7 @@ msgstr "ゲームモード %s"
 #: src/states_screens/online/create_server_screen.cpp:196
 #: src/states_screens/track_info_screen.cpp:192
 msgid "Time limit"
-msgstr ""
+msgstr "タイムリミット"
 
 #. I18N: In the create server screen for soccer server
 #: src/network/protocols/client_lobby.cpp:698
@@ -3486,7 +3464,7 @@ msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:935
 msgid "Failed to start the network game."
-msgstr ""
+msgstr "インターネットゲームを開始できませんでした"
 
 #. I18N: Error message shown if live join or spectate failed in network
 #: src/network/protocols/client_lobby.cpp:1120
@@ -3508,20 +3486,20 @@ msgstr ""
 #: src/network/protocols/client_lobby.cpp:1292
 #, c-format
 msgid "%s joined the red team."
-msgstr ""
+msgstr "%sが赤チームに参加しました。"
 
 #. I18N: Show when player join blue team of the started game in
 #. network
 #: src/network/protocols/client_lobby.cpp:1298
 #, c-format
 msgid "%s joined the blue team."
-msgstr ""
+msgstr "%sが青チームに参加しました。"
 
 #. I18N: Show when player join the started game in network
 #: src/network/protocols/client_lobby.cpp:1304
 #, c-format
 msgid "%s joined the game."
-msgstr ""
+msgstr "%sがゲームに参加しました。"
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
@@ -3538,18 +3516,18 @@ msgstr ""
 msgid "Successfully reported %s."
 msgstr ""
 
-#: src/network/protocols/connect_to_server.cpp:54
+#: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
 msgstr ""
 
-#: src/network/protocols/connect_to_server.cpp:294
+#: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
-msgstr ""
+msgstr "%sというサーバーに接続できません"
 
 #: src/network/server_config.cpp:264
 msgid "Time Trial (Grand Prix)"
-msgstr ""
+msgstr "タイムトライアル (グランプリ)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -3566,7 +3544,7 @@ msgstr ""
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:182
 msgid "Capture The Flag"
-msgstr ""
+msgstr "旗を運べ"
 
 #: src/online/online_player_profile.cpp:457
 #, c-format
@@ -3698,7 +3676,7 @@ msgid "Please wait while addons are updated"
 msgstr "アドオンが更新されるまで、しばらくお待ち下さい"
 
 #: src/states_screens/addons_screen.cpp:498
-#: src/states_screens/main_menu_screen.cpp:564
+#: src/states_screens/main_menu_screen.cpp:575
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -4157,6 +4135,7 @@ msgid "featured"
 msgstr "featured"
 
 #: src/states_screens/dialogs/addons_loading.cpp:174
+#: src/states_screens/dialogs/download_assets.cpp:106
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
@@ -4167,12 +4146,15 @@ msgstr "%s MB"
 msgid "%s KB"
 msgstr "%s KB"
 
+#. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:186
+#: src/states_screens/dialogs/download_assets.cpp:108
 #, c-format
 msgid "Size: %s"
 msgstr "サイズ: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:294
+#: src/states_screens/dialogs/download_assets.cpp:182
 msgid "Sorry, downloading the add-on failed"
 msgstr "アドオンのダウンロードに失敗しました。"
 
@@ -4183,6 +4165,7 @@ msgstr "アドオン'%s'のインストール中に問題が発生しました."
 
 #: src/states_screens/dialogs/addons_loading.cpp:389
 #: src/states_screens/dialogs/addons_loading.cpp:428
+#: src/states_screens/dialogs/download_assets.cpp:255
 msgid "Try again"
 msgstr "もういちど"
 
@@ -4273,6 +4256,22 @@ msgstr ""
 msgid "Very Low"
 msgstr ""
 
+#. I18N: In download assets dialog
+#: src/states_screens/dialogs/download_assets.cpp:112
+msgid ""
+"SuperTuxKart will download full assets (including all tracks, high quality "
+"textures and music) for better gaming experience, this will use your mobile "
+"data if you don't have a wifi connection."
+msgstr ""
+
+#. I18N: Shown when there is download error for assets download
+#. in the first run
+#: src/states_screens/dialogs/download_assets.cpp:239
+msgid ""
+"Failed to download assets, check your storage space or internet connection "
+"and try again later."
+msgstr ""
+
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
 msgctxt "column_name"
@@ -4284,13 +4283,13 @@ msgstr ""
 #: src/states_screens/online/server_selection.cpp:119
 msgctxt "column_name"
 msgid "Difficulty"
-msgstr ""
+msgstr "難易度"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
 msgctxt "column_name"
 msgid "Laps"
-msgstr ""
+msgstr "ラップ"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
 #: src/states_screens/ghost_replay_selection.cpp:160
@@ -4302,19 +4301,19 @@ msgstr ""
 #: src/states_screens/ghost_replay_selection.cpp:161
 msgctxt "column_name"
 msgid "Kart"
-msgstr ""
+msgstr "カート"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
 #: src/states_screens/ghost_replay_selection.cpp:162
 msgctxt "column_name"
 msgid "User"
-msgstr ""
+msgstr "ユーザー"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:158
 #: src/states_screens/ghost_replay_selection.cpp:166
 msgctxt "column_name"
 msgid "Version"
-msgstr ""
+msgstr "バージョン"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
 #: src/states_screens/dialogs/message_dialog.cpp:131
@@ -4326,7 +4325,7 @@ msgstr "いいえ"
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:45
 msgid "Use original color"
-msgstr ""
+msgstr "オリジナルカラーを使う"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
@@ -4359,12 +4358,12 @@ msgstr ""
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:121
 msgid "Change team"
-msgstr ""
+msgstr "チームを変える"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:136
 msgid "Enable handicap"
-msgstr ""
+msgstr "ハンディキャップを可能にする"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:141
@@ -4375,7 +4374,7 @@ msgstr ""
 #. report player about for example abusive behaviour in game
 #: src/states_screens/dialogs/network_player_dialog.cpp:156
 msgid "Report player"
-msgstr ""
+msgstr "プレイヤーを通報する"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
@@ -4590,14 +4589,6 @@ msgstr ""
 msgid "Performing vote"
 msgstr "票を施行中"
 
-#. I18N: Shown when there is download error for assets download
-#. in the first run
-#: src/states_screens/download_assets.cpp:204
-msgid ""
-"Failed to download assets, check your storage space or internet connection "
-"and try again later."
-msgstr ""
-
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:601
 #: src/states_screens/tracks_and_gp_screen.cpp:290
@@ -4769,30 +4760,30 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr "みんなさん：ゲームを参加するのに選択ボタンを押す"
 
-#: src/states_screens/main_menu_screen.cpp:501
+#: src/states_screens/main_menu_screen.cpp:512
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "インターネット接続なしでプレイできるよ。プレイしたいなら、設定メニューで「ネットに接続する」をチェックしてください。"
 
-#: src/states_screens/main_menu_screen.cpp:516
+#: src/states_screens/main_menu_screen.cpp:527
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "インターネット接続なしでアドオンはダウンロードできない。アドオンをダウンロードしたいなら、設定メニューで「ネットに接続」をチェックしてください。"
 
-#: src/states_screens/main_menu_screen.cpp:524
+#: src/states_screens/main_menu_screen.cpp:535
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "インターネット接続なしでアドオンはダウンロードできない。アドオンをダウンロードしたいなら、設定メニューで「ネットに接続」をチェックしてください。ただダウンロード済みのアドオンは勝手に削除できるよ。"
 
-#: src/states_screens/main_menu_screen.cpp:559
+#: src/states_screens/main_menu_screen.cpp:570
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "アドオンモジュールは現在オプション画面で使用できません"
 
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/main_menu_screen.cpp:582
 msgid "Please wait while the add-ons are loading"
 msgstr "アドオンがロードされるまで、しばらくお待ち下さい"
 
@@ -5051,15 +5042,15 @@ msgid "Distance (km)"
 msgstr ""
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:249
+#: src/states_screens/online/server_selection.cpp:255
 msgid "Unknown"
 msgstr "不詳"
 
-#: src/states_screens/online/server_selection.cpp:364
+#: src/states_screens/online/server_selection.cpp:374
 msgid "No server is available."
 msgstr ""
 
-#: src/states_screens/online/server_selection.cpp:372
+#: src/states_screens/online/server_selection.cpp:382
 msgid "Fetching servers"
 msgstr ""
 
@@ -5237,11 +5228,26 @@ msgstr "このコンフィグを本当に削除しますか?"
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:110
+#: src/states_screens/options/options_screen_general.cpp:113
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
 msgstr "二人プレイモードで、カート選択画面でハンディキャップ（もっと難しい）プロファイルが選択できる"
+
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:123
+msgid "Uninstall full game assets"
+msgstr ""
+
+#. I18N: For mobile version for STK, install the full game assets which
+#. will download from stk server
+#: src/states_screens/options/options_screen_general.cpp:129
+msgid "Install full game assets"
+msgstr ""
+
+#: src/states_screens/options/options_screen_general.cpp:264
+msgid "Are you sure to uninstall full game assets?"
+msgstr ""
 
 #: src/states_screens/options/options_screen_input.cpp:104
 msgid "Gamepad"
@@ -5593,7 +5599,7 @@ msgstr "トラックを探検して、すべての卵を探しだせ!"
 
 #: src/states_screens/race_setup_screen.cpp:137
 msgid "Race against ghost karts and try to beat them!"
-msgstr ""
+msgstr "ゴーストカートと競争して、記録を破ってみてください！"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)

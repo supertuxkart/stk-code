@@ -55,6 +55,8 @@ protected:
 
     std::string m_lower_case_player_names;
 
+    std::string m_ipv6_address;
+
     uint32_t m_server_id;
     uint32_t m_server_owner;
 
@@ -91,6 +93,8 @@ protected:
     bool m_supports_encrytion;
 
     bool m_game_started;
+
+    bool m_ipv6_connection;
 
     std::vector<std::tuple<
         /*rank*/int, core::stringw, /*scores*/double, /*playing time*/float
@@ -166,5 +170,19 @@ public:
     Track* getCurrentTrack() const;
     // ------------------------------------------------------------------------
     const std::string& getCountryCode() const        { return m_country_code; }
+    // ------------------------------------------------------------------------
+    void setIPV6Connection(bool val)
+    {
+        if (m_ipv6_address.empty())
+            m_ipv6_connection = false;
+        else
+            m_ipv6_connection = val;
+    }
+    // ------------------------------------------------------------------------
+    bool useIPV6Connection() const                { return m_ipv6_connection; }
+    // ------------------------------------------------------------------------
+    void setIPV6Address(const std::string& addr)     { m_ipv6_address = addr; }
+    // ------------------------------------------------------------------------
+    const std::string& getIPV6Address() const        { return m_ipv6_address; }
 };   // Server
 #endif // HEADER_SERVER_HPP

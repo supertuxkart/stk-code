@@ -108,7 +108,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             if (!event->getPeer()->availableKartID(kart_id))
             {
                 Log::warn("GameProtocol", "Wrong kart id %d from %s.",
-                    kart_id, event->getPeer()->getAddress().toString().c_str());
+                    kart_id, event->getPeer()->getRealAddress().c_str());
                 return true;
             }
             float f = LobbyProtocol::get<ServerLobby>()

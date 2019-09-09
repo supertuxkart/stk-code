@@ -98,11 +98,11 @@ void ServerSelection::loadedFromFile()
     m_private_server = getWidget<GUIEngine::CheckBoxWidget>("private_server");
     assert(m_private_server != NULL);
     m_private_server->setState(false);
-    m_game_started = getWidget<GUIEngine::CheckBoxWidget>("game_started");
-    assert(m_game_started != NULL);
+    m_ipv6 = getWidget<GUIEngine::CheckBoxWidget>("ipv6");
+    assert(m_ipv6 != NULL);
     m_searcher = getWidget<GUIEngine::TextBoxWidget>("searcher");
     assert(m_searcher != NULL);
-    m_game_started->setState(false);
+    m_ipv6->setState(false);
     m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
 }   // loadedFromFile
 
@@ -133,6 +133,12 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
+
+#ifndef ENABLE_IPV6
+    m_ipv6->setState(false);
+    m_ipv6->setActive(false);
+#endif
+
     m_current_column = 5/*distance*/;
     m_searcher->clearListeners();
     m_searcher->addListener(this);
@@ -296,7 +302,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
     {
         refresh(true);
     }
-    else if (name == "private_server" || name == "game_started")
+    else if (name == "private_server" || name == "ipv6")
     {
         copyFromServersManager();
     }
@@ -310,6 +316,10 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
         {
             return;
         }
+#ifdef ENABLE_IPV6
+        if (!m_servers[selected_index]->getIPV6Address().empty())
+            m_servers[selected_index]->setIPV6Connection(m_ipv6->getState());
+#endif
         new ServerInfoDialog(m_servers[selected_index]);
     }   // click on server
 
@@ -388,7 +398,7 @@ void ServerSelection::copyFromServersManager()
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
         [this](const std::shared_ptr<Server>& a)->bool
         {
-            if (m_game_started->getState() && a->isGameStarted())
+            if (m_ipv6->getState() && a->getIPV6Address().empty())
                 return true;
             return false;
         }), m_servers.end());

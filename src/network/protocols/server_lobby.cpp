@@ -222,11 +222,13 @@ void ServerLobby::initServerStatsTable()
         StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
         ServerConfig::m_server_uid + "_stats";
 
-    std::string query = StringUtils::insertValues(
-        "CREATE TABLE IF NOT EXISTS %s (\n"
+    std::ostringstream oss;
+    oss << "CREATE TABLE IF NOT EXISTS " << table_name << " (\n"
         "    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer\n"
-        "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n"
-        "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
+        "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n";
+    if (ServerConfig::m_ipv6_server)
+        oss << "    ipv6 TEXT NOT NULL DEFAULT '', -- IPv6 (if exists) in string of host\n";
+    oss << "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
         "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
         "    username TEXT NOT NULL, -- First player name in the host (if the host has splitscreen player)\n"
         "    player_num INTEGER UNSIGNED NOT NULL, -- Number of player(s) from the host, more than 1 if it has splitscreen player\n"
@@ -235,7 +237,8 @@ void ServerLobby::initServerStatsTable()
         "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
         "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
         "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host\n"
-        ") WITHOUT ROWID;", table_name.c_str());
+        ") WITHOUT ROWID;";
+    std::string query = oss.str();
     sqlite3_stmt* stmt = NULL;
     int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
     if (ret == SQLITE_OK)
@@ -278,11 +281,13 @@ void ServerLobby::initServerStatsTable()
     std::string full_stats_view_name = std::string("v") +
         StringUtils::toString(ServerConfig::m_server_db_version) + "_" +
         ServerConfig::m_server_uid + "_full_stats";
-    std::ostringstream oss;
+    oss.str("");
     oss << "CREATE VIEW IF NOT EXISTS " << full_stats_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
-        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num,\n"
+        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
+    if (ServerConfig::m_ipv6_server)
+        oss << "    ipv6,";
+    oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, disconnected_time, ping FROM " << m_server_stats_table << "\n"
@@ -302,8 +307,10 @@ void ServerLobby::initServerStatsTable()
     oss.clear();
     oss << "CREATE VIEW IF NOT EXISTS " << current_players_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
-        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n"
-        << "    port, online_id, username, player_num,\n"
+        << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
+    if (ServerConfig::m_ipv6_server)
+        oss << "    ipv6,";
+    oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", 'now') - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
         << "    connected_time, ping FROM " << m_server_stats_table << "\n"
@@ -338,7 +345,10 @@ void ServerLobby::initServerStatsTable()
     else
     {
         oss << "CREATE VIEW IF NOT EXISTS " << player_stats_view_name << " AS\n"
-            << "    SELECT a.online_id, a.username, a.ip, a.ip_readable, a.port, a.player_num,\n"
+            << "    SELECT a.online_id, a.username, a.ip, a.ip_readable,\n";
+        if (ServerConfig::m_ipv6_server)
+            oss << "    a.ipv6,";
+        oss << "    a.port, a.player_num,\n"
             << "    a.country_code, a.country_flag, a.country_name, a.version, a.ping,\n"
             << "    b.num_connections, b.first_connected_time, b.first_disconnected_time,\n"
             << "    a.connected_time AS last_connected_time, a.disconnected_time AS last_disconnected_time,\n"
@@ -923,14 +933,32 @@ void ServerLobby::writePlayerReport(Event* event)
         return;
     auto reporting_npp = reporting_peer->getPlayerProfiles()[0];
 
-    std::string query = StringUtils::insertValues(
-        "INSERT INTO %s "
-        "(server_uid, reporter_ip, reporter_online_id, reporter_username, "
-        "info, reporting_ip, reporting_online_id, reporting_username) "
-        "VALUES (?, %u, %u, ?, ?, %u, %u, ?);",
-        ServerConfig::m_player_reports_table.c_str(),
-        reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
-        reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId());
+    std::string query;
+    if (ServerConfig::m_ipv6_server)
+    {
+        // We don't save the internally mapped IPv4 (0.x.x.x)
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(server_uid, reporter_ip, reporter_ipv6, reporter_online_id, reporter_username, "
+            "info, reporting_ip, reporting_ipv6, reporting_online_id, reporting_username) "
+            "VALUES (?, %u, \"%s\", %u, ?, ?, %u, \"%s\", %u, ?);",
+            ServerConfig::m_player_reports_table.c_str(),
+            reporter->getIPV6Address().empty() ? reporter->getAddress().getIP() : 0,
+            reporter->getIPV6Address(), reporter_npp->getOnlineId(),
+            reporting_peer->getIPV6Address().empty() ? reporting_peer->getAddress().getIP() : 0,
+            reporting_peer->getIPV6Address(), reporting_npp->getOnlineId());
+    }
+    else
+    {
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(server_uid, reporter_ip, reporter_online_id, reporter_username, "
+            "info, reporting_ip, reporting_online_id, reporting_username) "
+            "VALUES (?, %u, %u, ?, ?, %u, %u, ?);",
+            ServerConfig::m_player_reports_table.c_str(),
+            reporter->getAddress().getIP(), reporter_npp->getOnlineId(),
+            reporting_peer->getAddress().getIP(), reporting_npp->getOnlineId());
+    }
     bool written = easySQLQuery(query,
         [reporter_npp, reporting_npp, info](sqlite3_stmt* stmt)
         {
@@ -1387,14 +1415,14 @@ void ServerLobby::liveJoinRequest(Event* event)
         for (int id : used_id)
         {
             Log::info("ServerLobby", "%s live joining with reserved kart id %d.",
-                peer->getAddress().toString().c_str(), id);
+                peer->getRealAddress().c_str(), id);
             peer->addAvailableKartID(id);
         }
     }
     else
     {
         Log::info("ServerLobby", "%s spectating now.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
     }
 
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players =
@@ -1532,7 +1560,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     if (!live_joined_in_time)
     {
         Log::warn("ServerLobby", "%s can't live-join in time.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         rejectLiveJoin(peer.get(), BLR_NO_GAME_FOR_LIVE_JOIN);
         return;
     }
@@ -1553,12 +1581,12 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
         const RemoteKartInfo& rki = race_manager->getKartInfo(id);
         addLiveJoiningKart(id, rki, m_last_live_join_util_ticks);
         Log::info("ServerLobby", "%s succeeded live-joining with kart id %d.",
-            peer->getAddress().toString().c_str(), id);
+            peer->getRealAddress().c_str(), id);
     }
     if (peer->getAvailableKartIDs().empty())
     {
         Log::info("ServerLobby", "%s spectating succeeded.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         spectator = true;
     }
 
@@ -1631,7 +1659,7 @@ void ServerLobby::update(int ticks)
                 // Remove loading world too long (60 seconds) live join peer
                 Log::info("ServerLobby", "%s hasn't live-joined within"
                     " 60 seconds, remove it.",
-                    peer->getAddress().toString().c_str());
+                    peer->getRealAddress().c_str());
                 rki.makeReserved();
                 continue;
             }
@@ -1642,7 +1670,7 @@ void ServerLobby::update(int ticks)
                     continue;
                 Log::info("ServerLobby", "%s %s has been idle for more than"
                     " %d seconds, kick.",
-                    peer->getAddress().toString().c_str(),
+                    peer->getRealAddress().c_str(),
                     StringUtils::wideToUtf8(rki.getPlayerName()).c_str(), sec);
                 peer->kick();
             }
@@ -1867,7 +1895,13 @@ bool ServerLobby::registerServer(bool now)
 
     Log::info("ServerLobby", "Public server address %s",
         m_server_address.toString().c_str());
-
+    if (!STKHost::get()->getPublicIPV6Address().empty())
+    {
+        request->addParameter("address_ipv6",
+            STKHost::get()->getPublicIPV6Address());
+        Log::info("ServerLobby", "Public IPv6 server address %s",
+            STKHost::get()->getPublicIPV6Address().c_str());
+    }
     if (now)
     {
         request->executeNow();
@@ -3004,7 +3038,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
                 Log::info("ServerLobby",
                     "New player %s with online id %u from %s with %s.",
                     StringUtils::wideToUtf8(npp->getName()).c_str(),
-                    npp->getOnlineId(), peer->getAddress().toString().c_str(),
+                    npp->getOnlineId(), peer->getRealAddress().c_str(),
                     peer->getUserVersion().c_str());
             }
         }
@@ -3020,14 +3054,30 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
 #ifdef ENABLE_SQLITE3
     if (m_server_stats_table.empty())
         return;
-    std::string query = StringUtils::insertValues(
-        "INSERT INTO %s "
-        "(host_id, ip, port, online_id, username, player_num, "
-        "country_code, version, ping) "
-        "VALUES (%u, %u, %u, %u, ?, %u, ?, ?, %u);",
-        m_server_stats_table.c_str(), peer->getHostId(),
-        peer->getAddress().getIP(), peer->getAddress().getPort(), online_id,
-        player_count, peer->getAveragePing());
+    std::string query;
+    if (ServerConfig::m_ipv6_server && !peer->getIPV6Address().empty())
+    {
+        // We don't save the internally mapped IPv4 (0.x.x.x)
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(host_id, ip, ipv6 ,port, online_id, username, player_num, "
+            "country_code, version, ping) "
+            "VALUES (%u, 0, \"%s\" ,%u, %u, ?, %u, ?, ?, %u);",
+            m_server_stats_table.c_str(), peer->getHostId(),
+            peer->getIPV6Address(), peer->getAddress().getPort(), online_id,
+            player_count, peer->getAveragePing());
+    }
+    else
+    {
+        query = StringUtils::insertValues(
+            "INSERT INTO %s "
+            "(host_id, ip, port, online_id, username, player_num, "
+            "country_code, version, ping) "
+            "VALUES (%u, %u, %u, %u, ?, %u, ?, ?, %u);",
+            m_server_stats_table.c_str(), peer->getHostId(),
+            peer->getAddress().getIP(), peer->getAddress().getPort(),
+            online_id, player_count, peer->getAveragePing());
+    }
     easySQLQuery(query, [peer, country_code](sqlite3_stmt* stmt)
         {
             if (sqlite3_bind_text(stmt, 1, StringUtils::wideToUtf8(
@@ -3721,7 +3771,7 @@ void ServerLobby::configPeersStartTime()
         {
             Log::warn("ServerLobby",
                 "Peer %s cannot catch up with max ping %d.",
-                peer->getAddress().toString().c_str(), max_ping);
+                peer->getRealAddress().c_str(), max_ping);
             continue;
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
@@ -3796,7 +3846,7 @@ void ServerLobby::addWaitingPlayersToGame()
                     "New player %s with online id %u from %s with %s.",
                     StringUtils::wideToUtf8(profile->getName()).c_str(),
                     profile->getOnlineId(),
-                    peer->getAddress().toString().c_str(),
+                    peer->getRealAddress().c_str(),
                     peer->getUserVersion().c_str());
             }
         }
@@ -3835,6 +3885,10 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
     if (!m_db || !m_ip_ban_table_exists)
         return;
 
+    // We only test for IPv4 atm
+    if (!peer->getIPV6Address().empty())
+        return;
+
     int row_id = -1;
     unsigned ip_start = 0;
     unsigned ip_end = 0;
@@ -3862,7 +3916,7 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
             const char* desc = (char*)sqlite3_column_text(stmt, 4);
             Log::info("ServerLobby", "%s banned by IP: %s "
                 "(rowid: %d, description: %s).",
-                peer->getAddress().toString().c_str(), reason, row_id, desc);
+                peer->getRealAddress().c_str(), reason, row_id, desc);
             kickPlayerWithReason(peer, reason);
         }
         ret = sqlite3_finalize(stmt);
@@ -3921,7 +3975,7 @@ void ServerLobby::testBannedForOnlineId(STKPeer* peer,
             const char* desc = (char*)sqlite3_column_text(stmt, 2);
             Log::info("ServerLobby", "%s banned by online id: %s "
                 "(online id: %u rowid: %d, description: %s).",
-                peer->getAddress().toString().c_str(), reason, online_id,
+                peer->getRealAddress().c_str(), reason, online_id,
                 row_id, desc);
             kickPlayerWithReason(peer, reason);
         }
@@ -4323,7 +4377,7 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
     if (!w || !worldIsActive() || peer->isWaitingForGame())
     {
         Log::warn("ServerLobby", "%s try to leave the game at wrong time.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         return;
     }
 
@@ -4333,14 +4387,14 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
         if (rki.getHostId() == peer->getHostId())
         {
             Log::info("ServerLobby", "%s left the game with kart id %d.",
-                peer->getAddress().toString().c_str(), id);
+                peer->getRealAddress().c_str(), id);
             rki.setNetworkPlayerProfile(
                 std::shared_ptr<NetworkPlayerProfile>());
         }
         else
         {
             Log::error("ServerLobby", "%s doesn't exist anymore in server.",
-                peer->getAddress().toString().c_str());
+                peer->getRealAddress().c_str());
         }
     }
     NetworkItemManager* nim =
@@ -4376,7 +4430,7 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
     {
         Log::warn("ServerLobby",
             "%s try to leave selecting assets at wrong time.",
-            peer->getAddress().toString().c_str());
+            peer->getRealAddress().c_str());
         return;
     }
 

@@ -23,9 +23,11 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/stk_ipv6.hpp"
 #include "network/stk_host.hpp"
 #include "network/transport_address.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 
 #include <string.h>
@@ -35,6 +37,9 @@
 STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
        : m_peer_address(enet_peer->address), m_host(host)
 {
+    // We use 0.x.x.x ip to map to IPv6 address internally
+    if (m_peer_address.getIP() < 16777216)
+        m_ipv6_address = getIPV6ReadableFromMappedAddress(&enet_peer->address);
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
     m_connected_time      = StkTime::getMonoTimeMs();
@@ -198,3 +203,13 @@ void STKPeer::setCrypto(std::unique_ptr<Crypto>&& c)
 {
     m_crypto = std::move(c);
 }   // setCrypto
+
+//-----------------------------------------------------------------------------
+/* Return an IPv6 or IPv4 address, used for debug printing.
+ */
+std::string STKPeer::getRealAddress() const
+{
+    return m_ipv6_address.empty() ? m_peer_address.toString() :
+        std::string("[") + m_ipv6_address + "]:" +
+        StringUtils::toString(m_peer_address.getPort());
+}   // getRealAddress
