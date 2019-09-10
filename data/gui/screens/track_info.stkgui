@@ -8,7 +8,7 @@
         <spacer width="1" height="2%"/>
 
         <div width="100%" height="91%" layout="horizontal-row">
-			
+            
            <!-- Left pane -->
             <div width="68%" height="100%" layout="vertical-row">
                 <box width="100%" height="49%" padding="10" layout="vertical-row">
@@ -100,9 +100,9 @@
                 <spacer width="1" height="2%"/>
                 
                 <buttonbar id="buttons" height="17%" width="100%" align="center">
-					<icon-button id="start" width="64" height="64" icon="gui/icons/green_check.png"
-							I18N="In the track info screen" text="Start Race"/>
-				</buttonbar>
+                    <icon-button id="start" width="64" height="64" icon="gui/icons/green_check.png"
+                            I18N="In the track info screen" text="Start Race"/>
+                </buttonbar>
             </div>
             
             <spacer width="1" height="2%"/>

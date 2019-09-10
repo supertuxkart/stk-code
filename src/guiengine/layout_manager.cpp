@@ -89,7 +89,7 @@ float LayoutManager::getExtraSize(Widget* self)
     if(self->getType() == WTYPE_BUTTON
     || self->getType() == WTYPE_CHECKBOX
     || self->getType() == WTYPE_SPINNER)
-		return UserConfigParams::m_widget_extra_size / 10; // Better and fitter space after / 10
+        return UserConfigParams::m_widget_extra_size / 10; // Better and fitter space after / 10
     return 0; 
 }
 
