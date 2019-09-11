@@ -575,6 +575,11 @@ void STKConfig::getAllData(const XMLNode * root)
  */
 void STKConfig::initMusicFiles()
 {
+    if (m_title_music)
+        delete m_title_music;
+    if (m_default_music)
+        delete m_title_music;
+
     m_title_music = MusicInformation::create(m_title_music_file);
     if (!m_title_music)
     {
