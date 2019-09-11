@@ -22,7 +22,9 @@
 #include <iostream>
 #include <algorithm>
 
+#include "audio/music_information.hpp"
 #include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/central_settings.hpp"
 #include "guiengine/engine.hpp"
@@ -173,6 +175,22 @@ namespace SkinConfig
             else if (node->getName() == "color")
             {
                 parseColor(node);
+            }
+            else if (node->getName() == "menumusic")
+            {                
+                std::string title_music_file;
+                node->get("name", &title_music_file);
+                assert(title_music_file.size() > 0);
+                title_music_file = file_manager->getAsset(FileManager::MUSIC, title_music_file);
+                if (title_music_file.size() <= 0)
+                {
+                    Log::error("Theming", "Cannot load theme-specific menu music: %s", title_music_file.c_str());
+                }
+                else
+                {
+                    stk_config->m_title_music_file = title_music_file;
+                    Log::info("Theming", "Theme-specific menu music loaded: %s", title_music_file.c_str());
+                }
             }
             else
             {

@@ -195,6 +195,7 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
 
+    m_prev_title_music_file = stk_config->m_title_music_file;
     m_prev_font_size = UserConfigParams::m_font_size;
     int size_int = (int)roundf(UserConfigParams::m_font_size);
     if (size_int < 0 || size_int > 6)
@@ -320,7 +321,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
 void OptionsScreenUI::tearDown()
 {
-    if (m_prev_font_size != UserConfigParams::m_font_size)
+    if (m_prev_font_size != UserConfigParams::m_font_size || m_prev_title_music_file != stk_config->m_title_music_file)
     {
         irr_driver->sameRestart();
     }

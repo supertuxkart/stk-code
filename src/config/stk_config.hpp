@@ -162,9 +162,11 @@ public:
     std::vector<int> m_score_increase;
 
     /** Filename of the title music to play.*/
+    std::string m_title_music_file;
     MusicInformation *m_title_music;
 
     /** Filename of the music that is played when the track's music was not found */
+    std::string m_default_music_file;
     MusicInformation *m_default_music;
 
     /** Maximum number of transform events of a replay. */
@@ -246,8 +248,6 @@ private:
     /** Default FPS rate for physics. */
     int m_physics_fps;
 
-    std::string m_title_music_file;
-    std::string m_default_music_file;
     /** String of the currently loaded stk_config.xml */
     std::string m_stk_config_file;
 
