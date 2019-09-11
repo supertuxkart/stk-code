@@ -77,6 +77,8 @@ void STKConfig::load(const std::string &filename)
     if(m_has_been_loaded) return;
     m_has_been_loaded = true;
 
+    m_stk_config_file = filename;
+
     init_defaults();
 
     XMLNode *root = 0;

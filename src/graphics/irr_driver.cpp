@@ -998,6 +998,9 @@ void IrrDriver::applyResolutionSettings()
         SP::loadShaders();
 #endif
 
+    stk_config->m_has_been_loaded = false;
+    stk_config->load(stk_config->getSTKConfigPath());
+
     font_manager = new FontManager();
     font_manager->loadFonts();
     // Re-init GUI engine
