@@ -1573,13 +1573,27 @@ void World::setAITeam()
     }
 
     int available_ai = total_karts - red_players - blue_players;
-    int additional_blue = red_players - blue_players;
 
-    m_blue_ai = (available_ai - additional_blue) / 2 + additional_blue;
-    m_red_ai  = (available_ai - additional_blue) / 2;
+    // Distribute AI based on settings read from GUI
+    if (UserConfigParams::m_soccer_team_mix==0){ // balanced distribution
+        int additional_blue = red_players - blue_players;
 
-    if ((available_ai + additional_blue)%2 == 1)
-        (additional_blue < 0) ? m_red_ai++ : m_blue_ai++;
+        m_blue_ai = (available_ai - additional_blue) / 2 + additional_blue;
+        m_red_ai  = (available_ai - additional_blue) / 2;
+
+        if ((available_ai + additional_blue)%2 == 1)
+            (additional_blue < 0) ? m_red_ai++ : m_blue_ai++;
+    }else if (UserConfigParams::m_soccer_team_mix==1){ // make all AI blue
+        m_blue_ai = available_ai;
+        m_red_ai = 0;
+        // make sure there is at least one AI
+        if ( (m_red_ai + red_players)==0 ) {m_red_ai++; m_blue_ai--;}
+    }else if (UserConfigParams::m_soccer_team_mix==2){ // make all AI red
+        m_blue_ai = 0;
+	m_red_ai = available_ai;
+        // make sure there is at least one AI
+        if ( (m_blue_ai + blue_players)==0 ) {m_red_ai--; m_blue_ai++;}
+    }
 
     Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 

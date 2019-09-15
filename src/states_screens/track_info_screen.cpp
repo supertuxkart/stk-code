@@ -66,6 +66,8 @@ void TrackInfoScreen::loadedFromFile()
 {
     m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner");
     m_target_type_label     = getWidget <LabelWidget>("target-type-text");
+    m_ai_mix_type_spinner   = getWidget<SpinnerWidget>("ai-mix-spinner");
+    m_ai_mix_type_label     = getWidget <LabelWidget>("ai-mix-text");
     m_target_type_div       = getWidget<Widget>("target-type-div");
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
@@ -173,6 +175,9 @@ void TrackInfoScreen::init()
     m_target_value_spinner->setVisible(false);
     m_target_value_label->setVisible(false);
 
+    m_ai_mix_type_spinner->setVisible(false);
+    m_ai_mix_type_label->setVisible(false);
+
     // Soccer options
     // -------------
     if (m_is_soccer)
@@ -203,6 +208,15 @@ void TrackInfoScreen::init()
             m_target_value_label->setText(_("Number of goals to win"), false);
             m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
         }
+
+        // Options to distribute AI in soccer
+        m_ai_mix_type_spinner->setVisible(true);
+        m_ai_mix_type_label->setVisible(true);
+        m_ai_mix_type_spinner->clearLabels();
+        m_ai_mix_type_spinner->addLabel(_("Balanced"));
+        m_ai_mix_type_spinner->addLabel(_("All AI blue"));
+        m_ai_mix_type_spinner->addLabel(_("All AI red"));
+        m_ai_mix_type_spinner->setValue(UserConfigParams::m_soccer_team_mix);
     }
 
     // options for free-for-all and three strikes battle
@@ -585,6 +599,13 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             race_manager->setNumLaps(num_laps);
             UserConfigParams::m_num_laps = num_laps;
             updateHighScores();
+        }
+    }
+    else if (name == "ai-mix-spinner")
+    {
+        if (m_is_soccer)
+        {
+            UserConfigParams::m_soccer_team_mix = m_ai_mix_type_spinner->getValue();
         }
     }
     else if (name == "option")
