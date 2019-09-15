@@ -513,6 +513,21 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
+# check if linking against libatomic is required
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+#include <atomic>
+#include <cstdint>
+int main() {
+  std::atomic<uint64_t> x{0};
+  x.load();
+  return 0;
+}
+" NO_LIBATOMIC_NEEDED)
+if (NOT NO_LIBATOMIC_NEEDED)
+    target_link_libraries(supertuxkart atomic)
+endif()
+
 # CURL and OpenSSL or Nettle
 # 1.0.1d for compatible AES GCM handling
 SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
