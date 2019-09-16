@@ -1590,7 +1590,7 @@ void World::setAITeam()
         m_blue_ai = available_ai;
         m_red_ai = 0;
         // make sure there is at least one AI
-        if ( (m_red_ai + red_players)==0 )
+        if ((m_red_ai + red_players) == 0)
 	{
 	    m_red_ai++; m_blue_ai--;
 	}
@@ -1600,7 +1600,7 @@ void World::setAITeam()
         m_blue_ai = 0;
 	m_red_ai = available_ai;
         // make sure there is at least one AI
-        if ( (m_blue_ai + blue_players)==0 )
+        if ((m_blue_ai + blue_players) == 0)
 	{
 	    m_red_ai--; m_blue_ai++;
 	}
