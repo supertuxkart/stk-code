@@ -1555,31 +1555,39 @@ void World::setAITeam()
     // No AI
     if ((total_karts - total_players) == 0) return;
 
-    int red_players = 0;
-    int blue_players = 0;
-    for (int i = 0; i < total_players; i++)
+    if (UserConfigParams::m_soccer_team_mix_balanced == 0) // AI distribution: Balanced
     {
-        KartTeam team = race_manager->getKartInfo(i).getKartTeam();
-
-        // Happen in profiling mode
-        if (team == KART_TEAM_NONE)
+        int red_players = 0;
+        int blue_players = 0;
+        for (int i = 0; i < total_players; i++)
         {
-            race_manager->setKartTeam(i, KART_TEAM_BLUE);
-            team = KART_TEAM_BLUE;
-            continue; //FIXME, this is illogical
+            KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+
+            // Happen in profiling mode
+            if (team == KART_TEAM_NONE)
+            {
+                race_manager->setKartTeam(i, KART_TEAM_BLUE);
+                team = KART_TEAM_BLUE;
+                continue; //FIXME, this is illogical
+            }
+
+            team == KART_TEAM_BLUE ? blue_players++ : red_players++;
         }
 
-        team == KART_TEAM_BLUE ? blue_players++ : red_players++;
+        int available_ai = total_karts - red_players - blue_players;
+        int additional_blue = red_players - blue_players;
+
+        m_blue_ai = (available_ai - additional_blue) / 2 + additional_blue;
+        m_red_ai  = (available_ai - additional_blue) / 2;
+
+        if ((available_ai + additional_blue)%2 == 1)
+            (additional_blue < 0) ? m_red_ai++ : m_blue_ai++;
     }
-
-    int available_ai = total_karts - red_players - blue_players;
-    int additional_blue = red_players - blue_players;
-
-    m_blue_ai = (available_ai - additional_blue) / 2 + additional_blue;
-    m_red_ai  = (available_ai - additional_blue) / 2;
-
-    if ((available_ai + additional_blue)%2 == 1)
-        (additional_blue < 0) ? m_red_ai++ : m_blue_ai++;
+    else // AI distribution: Custom
+    {
+        m_red_ai  = UserConfigParams::m_soccer_red_ai_num;
+        m_blue_ai = UserConfigParams::m_soccer_blue_ai_num;
+    }
 
     Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 

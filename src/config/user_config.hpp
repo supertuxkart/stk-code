@@ -449,6 +449,15 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_kart_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_kart_group",
                                                  "Last selected kart group") );
+    PARAM_PREFIX IntUserConfigParam          m_soccer_team_mix_balanced
+            PARAM_DEFAULT(  IntUserConfigParam(0, "m_soccer_team_mix_balanced",
+            &m_race_setup_group, "Options to control how to mix teams in soccer mode. 0=Balanced(default), 1=Custom") );
+    PARAM_PREFIX IntUserConfigParam          m_soccer_red_ai_num
+            PARAM_DEFAULT(  IntUserConfigParam(0, "m_soccer_red_ai_num",
+            &m_race_setup_group, "Number of red AI karts in soccer mode.") );
+    PARAM_PREFIX IntUserConfigParam          m_soccer_blue_ai_num
+            PARAM_DEFAULT(  IntUserConfigParam(0, "m_soccer_blue_ai_num",
+            &m_race_setup_group, "Number of blue AI karts in soccer mode.") );
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
