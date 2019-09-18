@@ -69,7 +69,7 @@
                             <spinner id="ai-spinner-allies" width="100%" align="center" wrap_around="true" />
                         </div>
                         <spacer width="3%"/>
-                        <label id="ai-text-allies" proportion="3" I18N="In the track info screen" text="Number of AI allies" text_align="left" align="center"/>
+                        <label id="ai-text-allies" proportion="3" I18N="In the track info screen" text_align="left" align="center"/>
                     </div>
                     <spacer width="1" height="1%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >

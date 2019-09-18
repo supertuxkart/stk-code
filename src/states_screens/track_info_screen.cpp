@@ -213,6 +213,10 @@ void TrackInfoScreen::init()
             UserConfigParams::m_num_allies = max_arena_players;
         m_ai_kart_spinner_allies->setVisible(true);
         m_ai_kart_label_allies->setVisible(true);
+        if(UserConfigParams::m_soccer_default_team)
+            m_ai_kart_label_allies->setText(_("Number of AI allies (blue team)"), false);
+        else
+            m_ai_kart_label_allies->setText(_("Number of AI allies (red team)"), false);
         m_ai_kart_spinner_allies->setValue(UserConfigParams::m_num_allies);
     }
 
