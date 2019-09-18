@@ -636,6 +636,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         if(m_is_soccer)
         {
             m_ai_kart_spinner_allies->setMax(num_ai - (UserConfigParams::m_artist_debug_mode ? 0 : 1));
+            UserConfigParams::m_num_allies = num_ai / 2;
             m_ai_kart_spinner_allies->setValue(num_ai / 2);
         }
         UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
