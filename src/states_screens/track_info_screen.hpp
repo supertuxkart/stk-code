@@ -75,11 +75,11 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** The label besides the AI karts spinner. */
     GUIEngine::LabelWidget* m_ai_kart_label;
     
-    /** Spinner for number of AI karts. Shows in teamed gamemode. */
-    GUIEngine::SpinnerWidget* m_ai_kart_spinner_2;
+    /** Spinner for number of AI allies. Shows in teamed gamemode. */
+    GUIEngine::SpinnerWidget* m_ai_kart_spinner_allies;
 
-    /** The label besides the AI karts. Shows in teamed gamemode. */
-    GUIEngine::LabelWidget* m_ai_kart_label_2;
+    /** The label besides the AI allies spinner. Shows in teamed gamemode. */
+    GUIEngine::LabelWidget* m_ai_kart_label_allies;
 
     /** Check box for reverse mode or random item in arena. */
     GUIEngine::CheckBoxWidget* m_option;

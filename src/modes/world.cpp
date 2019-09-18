@@ -1568,8 +1568,16 @@ void World::setAITeam()
         }
     }
 
-    m_red_ai = UserConfigParams::m_num_team_red;
-    m_blue_ai = UserConfigParams::m_num_team_blue;
+    if(UserConfigParams::m_soccer_default_team) // The user has selected blue team
+    {
+        m_blue_ai = UserConfigParams::m_num_allies;
+        m_red_ai = total_karts - total_players - m_blue_ai;
+    }
+    else
+    {
+        m_red_ai = UserConfigParams::m_num_allies;
+        m_blue_ai = total_karts - total_players - m_red_ai;
+    }
 
     Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 
