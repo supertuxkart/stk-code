@@ -61,6 +61,18 @@ namespace Scripting
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), 0.0f));
             World::getWorld()->moveKartTo(kart, s);
         }
+        
+        /** Teleports the kart to the specified Vec3 location */
+        void teleportExact(int idKart, SimpleVec3* position)
+        {
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            Vec3 v(position->getX(), position->getY(), position->getZ());
+            kart->setXYZ(v);
+            btTransform s;
+            s.setRotation(kart->getRotation());
+            s.setOrigin(v);
+            World::getWorld()->moveKartTo(kart, s);
+        }
 
         /** Attempts to project kart to the given 2D location, to the position
           * with height 0, at a 45 degree angle.
@@ -144,6 +156,10 @@ namespace Scripting
                                                
             r = engine->RegisterGlobalFunction("void teleport(int id, const Vec3 &in)", 
                                                mp ? WRAP_FN(teleport) : asFUNCTION(teleport), 
+                                               call_conv); assert(r >= 0);
+                                               
+            r = engine->RegisterGlobalFunction("void teleportExact(int id, const Vec3 &in)", 
+                                               mp ? WRAP_FN(teleportExact) : asFUNCTION(teleportExact), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void setVelocity(int id, const Vec3 &in)", 
