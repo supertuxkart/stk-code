@@ -726,8 +726,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
 
                 m_ai_kart_spinner->setMin(m_red_lower);
                 m_ai_blue_spinner->setMin(m_blue_lower);
-                m_ai_kart_spinner->setMax(std::min( UserConfigParams::m_soccer_red_ai_num+1, m_red_upper_hard )); // +1 to allow adding AI
-                m_ai_blue_spinner->setMax(std::min( UserConfigParams::m_soccer_blue_ai_num+1, m_blue_upper_hard )); // +1 to allow adding AI
+                m_ai_kart_spinner->setMax(std::min( UserConfigParams::m_soccer_red_ai_num + (UserConfigParams::m_soccer_red_ai_num == m_red_lower ? 0 : 1), m_red_upper_hard )); // +1 to allow adding AI
+                m_ai_blue_spinner->setMax(std::min( UserConfigParams::m_soccer_blue_ai_num + (UserConfigParams::m_soccer_blue_ai_num == m_blue_lower ? 0 : 1), m_blue_upper_hard )); // +1 to allow adding AI
 
                 // Set the values
                 m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
