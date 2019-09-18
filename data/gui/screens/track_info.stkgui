@@ -57,15 +57,6 @@
                     <spacer width="1" height="1%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <div proportion="1" height="fit" layout="horizontal-row">
-                            <spinner id="ai-mix-spinner" width="100%" min_value="1" max_value="20" align="center"
-                                     wrap_around="true" />
-                        </div>
-                        <spacer width="3%"/>
-                        <label id="ai-mix-text" proportion="3" I18N="In the track info screen" text="AI team distribution" text_align="left" align="center"/>
-                    </div>
-                    <spacer width="1" height="1%"/>
-                    <div width="100%" height="fit" layout="horizontal-row" >
-                        <div proportion="1" height="fit" layout="horizontal-row">
                             <spinner id="ai-spinner" width="100%" min_value="1" max_value="20" align="center"
                                      wrap_around="true" />
                         </div>
