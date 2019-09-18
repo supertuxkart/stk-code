@@ -358,8 +358,8 @@ void TrackInfoScreen::init()
 
 	    m_ai_kart_spinner->setMin(m_red_lower);
 	    m_ai_blue_spinner->setMin(m_blue_lower);
-	    m_ai_kart_spinner->setMax(std::min( UserConfigParams::m_soccer_red_ai_num+1, m_red_upper_hard )); // +1 to allow adding AI
-	    m_ai_blue_spinner->setMax(std::min( UserConfigParams::m_soccer_blue_ai_num+1, m_blue_upper_hard )); // +1 to allow adding AI
+	    m_ai_kart_spinner->setMax(std::min( m_red_ai + (m_red_ai == m_red_lower ? 0 : 1), m_red_upper_hard )); // +1 to allow adding AI
+	    m_ai_blue_spinner->setMax(std::min( m_blue_ai + (m_blue_ai == m_blue_lower ? 0 : 1), m_blue_upper_hard )); // +1 to allow adding AI
 
 	    // Set the values
 	    m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
@@ -782,8 +782,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
                 m_blue_upper = num_ai - m_red; // recalculate the upper bound determined by the new m_red
             }
 
-            m_ai_kart_spinner->setMax(std::min( m_red_upper+1, m_red_upper_hard )); // cannot be higher than the hard upper limit
-            m_ai_blue_spinner->setMax(std::min( m_blue_upper+1, m_blue_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_kart_spinner->setMax(std::min( m_red_upper + (m_red == m_red_lower ? 0 : 1), m_red_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_blue_spinner->setMax(std::min( m_blue_upper + (m_blue == m_blue_lower ? 0 : 1), m_blue_upper_hard )); // cannot be higher than the hard upper limit
 	    m_ai_kart_spinner->setMin(m_red_lower);
 	    m_ai_blue_spinner->setMin(m_blue_lower);
             m_ai_kart_spinner->setValue(m_red);
@@ -870,8 +870,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
                 m_red_upper = num_ai - m_blue; // recalculate the upper bound determined by the new m_blue
             }
 
-            m_ai_blue_spinner->setMax(std::min( m_blue_upper+1, m_blue_upper_hard )); // cannot be higher than the hard upper limit
-            m_ai_kart_spinner->setMax(std::min( m_red_upper+1, m_red_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_kart_spinner->setMax(std::min( m_red_upper + (m_red == m_red_lower ? 0 : 1), m_red_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_blue_spinner->setMax(std::min( m_blue_upper + (m_blue == m_blue_lower ? 0 : 1), m_blue_upper_hard )); // cannot be higher than the hard upper limit
 	    m_ai_kart_spinner->setMin(m_red_lower);
 	    m_ai_blue_spinner->setMin(m_blue_lower);
             m_ai_kart_spinner->setValue(m_red);
