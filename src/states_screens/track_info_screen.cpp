@@ -105,6 +105,9 @@ void TrackInfoScreen::loadedFromFile()
 
     m_is_soccer = false;
     m_show_ffa_spinner = false;
+
+    m_red_players = 0;
+    m_blue_players = 0;
 }   // loadedFromFile
 
 
@@ -277,24 +280,9 @@ void TrackInfoScreen::init()
             int num_ai = max_arena_players - local_players; // For soccer, use all possible AI by default
 
             // Balanced distribution by default
-            int red_players = 0;
-            int blue_players = 0;
-            for (int i = 0; i < local_players; i++)
-            {
-                KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+	    getRedBluePlayerNumber();
 
-                // Happen in profiling mode
-                if (team == KART_TEAM_NONE)
-                {
-                    race_manager->setKartTeam(i, KART_TEAM_BLUE);
-                    team = KART_TEAM_BLUE;
-                    continue; //FIXME, this is illogical
-                }
-
-                team == KART_TEAM_BLUE ? blue_players++ : red_players++;
-            }
-
-            int additional_blue = red_players - blue_players;
+            int additional_blue = m_red_players - m_blue_players;
             int m_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
             int m_red_ai  = (num_ai - additional_blue) / 2;
 
@@ -304,8 +292,8 @@ void TrackInfoScreen::init()
             UserConfigParams::m_soccer_red_ai_num  = m_red_ai;
             UserConfigParams::m_soccer_blue_ai_num = m_blue_ai;
 
-            int m_blue_lower = (blue_players > 0) ? 0 : 1;
-            int m_red_lower = (red_players > 0) ? 0 : 1;
+            int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int m_red_lower = (m_red_players > 0) ? 0 : 1;
             int m_blue_upper_hard = max_arena_players - local_players - m_red_lower; // possible upper bound
             int m_red_upper_hard  = max_arena_players - local_players - m_blue_lower;// possible upper bound
 
@@ -706,25 +694,10 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             int m_red  = m_ai_kart_spinner->getValue();
             int m_blue = m_ai_blue_spinner->getValue();
 
-            int red_players = 0;
-            int blue_players = 0;
-            for (int i = 0; i < local_players; i++)
-            {
-                KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+	    getRedBluePlayerNumber();
 
-                // Happen in profiling mode
-                if (team == KART_TEAM_NONE)
-                {
-                    race_manager->setKartTeam(i, KART_TEAM_BLUE);
-                    team = KART_TEAM_BLUE;
-                    continue; //FIXME, this is illogical
-                }
-
-                team == KART_TEAM_BLUE ? blue_players++ : red_players++;
-            }
-
-            int m_blue_lower = (blue_players > 0) ? 0 : 1;
-            int m_red_lower = (red_players > 0) ? 0 : 1;
+            int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int m_red_lower = (m_red_players > 0) ? 0 : 1;
             int m_blue_upper      = num_ai - m_red;       // upper bound determined by the new m_red
             int m_blue_upper_hard = num_ai - m_red_lower; // possible upper bound
             int m_red_upper       = num_ai - m_blue;      // upper bound determined by the new m_blue
@@ -767,25 +740,10 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             int m_red  = m_ai_kart_spinner->getValue();
             int m_blue = m_ai_blue_spinner->getValue();
 
-            int red_players = 0;
-            int blue_players = 0;
-            for (int i = 0; i < local_players; i++)
-            {
-                KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+	    getRedBluePlayerNumber();
 
-                // Happen in profiling mode
-                if (team == KART_TEAM_NONE)
-                {
-                    race_manager->setKartTeam(i, KART_TEAM_BLUE);
-                    team = KART_TEAM_BLUE;
-                    continue; //FIXME, this is illogical
-                }
-
-                team == KART_TEAM_BLUE ? blue_players++ : red_players++;
-            }
-
-            int m_blue_lower = (blue_players > 0) ? 0 : 1;
-            int m_red_lower = (red_players > 0) ? 0 : 1;
+            int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int m_red_lower = (m_red_players > 0) ? 0 : 1;
             int m_blue_upper      = num_ai - m_red;       // upper bound determined by the new m_red
             int m_blue_upper_hard = num_ai - m_red_lower; // possible upper bound
             int m_red_upper       = num_ai - m_blue;      // upper bound determined by the new m_blue
@@ -813,6 +771,30 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         }
     }
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+void TrackInfoScreen::getRedBluePlayerNumber()
+{
+    const int local_players = race_manager->getNumLocalPlayers();
+    int red_players = 0;
+    int blue_players = 0;
+    for (int i = 0; i < local_players; i++)
+    {
+	KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+
+	// Happen in profiling mode
+	if (team == KART_TEAM_NONE)
+	{
+	    race_manager->setKartTeam(i, KART_TEAM_BLUE);
+	    team = KART_TEAM_BLUE;
+	    continue; //FIXME, this is illogical
+	}
+
+	team == KART_TEAM_BLUE ? blue_players++ : red_players++;
+    }
+    m_red_players = red_players;
+    m_blue_players = blue_players;
+} // getRedBluePlayerNumber
 
 // ----------------------------------------------------------------------------
 
