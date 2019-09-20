@@ -564,6 +564,11 @@ void STKConfig::getAllData(const XMLNode * root)
     for (unsigned int i = 0; i < child_node->getNumNodes(); ++i)
     {
         const XMLNode* type = child_node->getNode(i);
+
+        // Avoid memory leak on re-load of stk_config
+        if (m_kart_properties[type->getName()])
+            delete m_kart_properties[type->getName()];
+
         m_kart_properties[type->getName()] = new KartProperties();
         m_kart_properties[type->getName()]->copyFrom(m_default_kart_properties);
         m_kart_properties[type->getName()]->getAllData(type);
