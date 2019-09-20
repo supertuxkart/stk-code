@@ -280,7 +280,7 @@ void TrackInfoScreen::init()
             int num_ai = max_arena_players - local_players; // For soccer, use all possible AI by default
 
             // Balanced distribution by default
-	    getRedBluePlayerNumber();
+            getRedBluePlayerNumber();
 
             int additional_blue = m_red_players - m_blue_players;
             int m_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
@@ -694,7 +694,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             int m_red  = m_ai_kart_spinner->getValue();
             int m_blue = m_ai_blue_spinner->getValue();
 
-	    getRedBluePlayerNumber();
+            getRedBluePlayerNumber();
 
             int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
             int m_red_lower = (m_red_players > 0) ? 0 : 1;
@@ -740,7 +740,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             int m_red  = m_ai_kart_spinner->getValue();
             int m_blue = m_ai_blue_spinner->getValue();
 
-	    getRedBluePlayerNumber();
+            getRedBluePlayerNumber();
 
             int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
             int m_red_lower = (m_red_players > 0) ? 0 : 1;
@@ -780,17 +780,17 @@ void TrackInfoScreen::getRedBluePlayerNumber()
     int blue_players = 0;
     for (int i = 0; i < local_players; i++)
     {
-	KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+        KartTeam team = race_manager->getKartInfo(i).getKartTeam();
 
-	// Happen in profiling mode
-	if (team == KART_TEAM_NONE)
-	{
-	    race_manager->setKartTeam(i, KART_TEAM_BLUE);
-	    team = KART_TEAM_BLUE;
-	    continue; //FIXME, this is illogical
-	}
+        // Happen in profiling mode
+        if (team == KART_TEAM_NONE)
+        {
+            race_manager->setKartTeam(i, KART_TEAM_BLUE);
+            team = KART_TEAM_BLUE;
+            continue; //FIXME, this is illogical
+        }
 
-	team == KART_TEAM_BLUE ? blue_players++ : red_players++;
+        team == KART_TEAM_BLUE ? blue_players++ : red_players++;
     }
     m_red_players = red_players;
     m_blue_players = blue_players;
