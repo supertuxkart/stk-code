@@ -278,26 +278,33 @@ void TrackInfoScreen::init()
 
             const int max_arena_players = m_track->getMaxArenaPlayers();
             const int local_players = race_manager->getNumLocalPlayers();
+            const int num_ai = max_arena_players - local_players; // possible AI number
 
-            int num_ai = max_arena_players - local_players; // For soccer, use all possible AI by default
-
-            // Balanced distribution by default
             getRedBluePlayerNumber();
-
-            int additional_blue = m_red_players - m_blue_players;
-            int num_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
-            int num_red_ai  = (num_ai - additional_blue) / 2;
-
-            if ((num_ai + additional_blue)%2 == 1)
-                (additional_blue < 0) ? num_red_ai++ : num_blue_ai++;
-
-            UserConfigParams::m_soccer_red_ai_num  = num_red_ai;
-            UserConfigParams::m_soccer_blue_ai_num = num_blue_ai;
 
             int num_blue_lower = (m_blue_players > 0) ? 0 : 1;
             int num_red_lower = (m_red_players > 0) ? 0 : 1;
             int num_blue_upper_hard = max_arena_players - local_players - num_red_lower; // possible upper bound
             int num_red_upper_hard  = max_arena_players - local_players - num_blue_lower;// possible upper bound
+
+            int num_red_ai  = UserConfigParams::m_soccer_red_ai_num;
+            int num_blue_ai = UserConfigParams::m_soccer_blue_ai_num;
+
+            // Try the saved value, recalculate AI number (Balanced) if cannot use the saved values
+            if (!((num_red_ai  >= num_red_lower)  && (num_red_ai  <= num_red_upper_hard)  &&
+                  (num_blue_ai >= num_blue_lower) && (num_blue_ai <= num_blue_upper_hard) &&
+                  (num_red_ai + num_blue_ai <= num_ai)))
+            {
+                int additional_blue = m_red_players - m_blue_players;
+                num_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
+                num_red_ai  = (num_ai - additional_blue) / 2;
+
+                if ((num_ai + additional_blue)%2 == 1)
+                    (additional_blue < 0) ? num_red_ai++ : num_blue_ai++;
+
+                UserConfigParams::m_soccer_red_ai_num  = num_red_ai;
+                UserConfigParams::m_soccer_blue_ai_num = num_blue_ai;
+            }
 
             m_ai_kart_spinner->setMin(num_red_lower);
             m_ai_blue_spinner->setMin(num_blue_lower);
