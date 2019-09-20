@@ -283,24 +283,24 @@ void TrackInfoScreen::init()
             getRedBluePlayerNumber();
 
             int additional_blue = m_red_players - m_blue_players;
-            int m_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
-            int m_red_ai  = (num_ai - additional_blue) / 2;
+            int num_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
+            int num_red_ai  = (num_ai - additional_blue) / 2;
 
             if ((num_ai + additional_blue)%2 == 1)
-                (additional_blue < 0) ? m_red_ai++ : m_blue_ai++;
+                (additional_blue < 0) ? num_red_ai++ : num_blue_ai++;
 
-            UserConfigParams::m_soccer_red_ai_num  = m_red_ai;
-            UserConfigParams::m_soccer_blue_ai_num = m_blue_ai;
+            UserConfigParams::m_soccer_red_ai_num  = num_red_ai;
+            UserConfigParams::m_soccer_blue_ai_num = num_blue_ai;
 
-            int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
-            int m_red_lower = (m_red_players > 0) ? 0 : 1;
-            int m_blue_upper_hard = max_arena_players - local_players - m_red_lower; // possible upper bound
-            int m_red_upper_hard  = max_arena_players - local_players - m_blue_lower;// possible upper bound
+            int num_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int num_red_lower = (m_red_players > 0) ? 0 : 1;
+            int num_blue_upper_hard = max_arena_players - local_players - num_red_lower; // possible upper bound
+            int num_red_upper_hard  = max_arena_players - local_players - num_blue_lower;// possible upper bound
 
-            m_ai_kart_spinner->setMin(m_red_lower);
-            m_ai_blue_spinner->setMin(m_blue_lower);
-            m_ai_kart_spinner->setMax(std::min( m_red_ai + (m_red_ai == m_red_lower ? 0 : 1), m_red_upper_hard )); // +1 to allow adding AI
-            m_ai_blue_spinner->setMax(std::min( m_blue_ai + (m_blue_ai == m_blue_lower ? 0 : 1), m_blue_upper_hard )); // +1 to allow adding AI
+            m_ai_kart_spinner->setMin(num_red_lower);
+            m_ai_blue_spinner->setMin(num_blue_lower);
+            m_ai_kart_spinner->setMax(std::min( num_red_ai + (num_red_ai == num_red_lower ? 0 : 1), num_red_upper_hard )); // +1 to allow adding AI
+            m_ai_blue_spinner->setMax(std::min( num_blue_ai + (num_blue_ai == num_blue_lower ? 0 : 1), num_blue_upper_hard )); // +1 to allow adding AI
 
             // Set the values
             m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
@@ -691,36 +691,36 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             const int max_arena_players = m_track->getMaxArenaPlayers();
             const int local_players = race_manager->getNumLocalPlayers();
             const int num_ai = max_arena_players - local_players; // possible AI number
-            int m_red  = m_ai_kart_spinner->getValue();
-            int m_blue = m_ai_blue_spinner->getValue();
+            int num_red  = m_ai_kart_spinner->getValue();
+            int num_blue = m_ai_blue_spinner->getValue();
 
             getRedBluePlayerNumber();
 
-            int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
-            int m_red_lower = (m_red_players > 0) ? 0 : 1;
-            int m_blue_upper      = num_ai - m_red;       // upper bound determined by the new m_red
-            int m_blue_upper_hard = num_ai - m_red_lower; // possible upper bound
-            int m_red_upper       = num_ai - m_blue;      // upper bound determined by the new m_blue
-            int m_red_upper_hard  = num_ai - m_blue_lower;// possible upper bound
+            int num_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int num_red_lower = (m_red_players > 0) ? 0 : 1;
+            int num_blue_upper      = num_ai - num_red;       // upper bound determined by the new num_red
+            int num_blue_upper_hard = num_ai - num_red_lower; // possible upper bound
+            int num_red_upper       = num_ai - num_blue;      // upper bound determined by the new num_blue
+            int num_red_upper_hard  = num_ai - num_blue_lower;// possible upper bound
 
             // Check if need to change blue in response to the red change
-            if (m_blue > m_blue_upper)
+            if (num_blue > num_blue_upper)
             {
-                m_blue = m_blue_upper; // change blue
-                m_red_upper = num_ai - m_blue; // recalculate the upper bound determined by the new m_blue
+                num_blue = num_blue_upper; // change blue
+                num_red_upper = num_ai - num_blue; // recalculate the upper bound determined by the new num_blue
             }
 
-            m_ai_kart_spinner->setMax(std::min( (m_red == m_red_lower ?  m_red_upper_hard : m_red_upper + 1), m_red_upper_hard )); // cannot be higher than the hard upper limit
-            m_ai_blue_spinner->setMax(std::min( (m_blue == m_blue_lower ? m_blue_upper_hard : m_blue_upper + 1), m_blue_upper_hard )); // cannot be higher than the hard upper limit
-            m_ai_kart_spinner->setMin(m_red_lower);
-            m_ai_blue_spinner->setMin(m_blue_lower);
-            m_ai_kart_spinner->setValue(m_red);
-            m_ai_blue_spinner->setValue(m_blue);
+            m_ai_kart_spinner->setMax(std::min( (num_red == num_red_lower ?  num_red_upper_hard : num_red_upper + 1), num_red_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_blue_spinner->setMax(std::min( (num_blue == num_blue_lower ? num_blue_upper_hard : num_blue_upper + 1), num_blue_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_kart_spinner->setMin(num_red_lower);
+            m_ai_blue_spinner->setMin(num_blue_lower);
+            m_ai_kart_spinner->setValue(num_red);
+            m_ai_blue_spinner->setValue(num_blue);
 
-            UserConfigParams::m_soccer_red_ai_num  = m_red;
-            UserConfigParams::m_soccer_blue_ai_num = m_blue;
+            UserConfigParams::m_soccer_red_ai_num  = num_red;
+            UserConfigParams::m_soccer_blue_ai_num = num_blue;
 
-            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() +  m_red + m_blue;
+            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() +  num_red + num_blue;
             //updateHighScores();
         }
         else // Other modes
@@ -737,36 +737,36 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             const int max_arena_players = m_track->getMaxArenaPlayers();
             const int local_players = race_manager->getNumLocalPlayers();
             const int num_ai = max_arena_players - local_players; // possible AI number
-            int m_red  = m_ai_kart_spinner->getValue();
-            int m_blue = m_ai_blue_spinner->getValue();
+            int num_red  = m_ai_kart_spinner->getValue();
+            int num_blue = m_ai_blue_spinner->getValue();
 
             getRedBluePlayerNumber();
 
-            int m_blue_lower = (m_blue_players > 0) ? 0 : 1;
-            int m_red_lower = (m_red_players > 0) ? 0 : 1;
-            int m_blue_upper      = num_ai - m_red;       // upper bound determined by the new m_red
-            int m_blue_upper_hard = num_ai - m_red_lower; // possible upper bound
-            int m_red_upper       = num_ai - m_blue;      // upper bound determined by the new m_blue
-            int m_red_upper_hard  = num_ai - m_blue_lower;// possible upper bound
+            int num_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int num_red_lower = (m_red_players > 0) ? 0 : 1;
+            int num_blue_upper      = num_ai - num_red;       // upper bound determined by the new num_red
+            int num_blue_upper_hard = num_ai - num_red_lower; // possible upper bound
+            int num_red_upper       = num_ai - num_blue;      // upper bound determined by the new num_blue
+            int num_red_upper_hard  = num_ai - num_blue_lower;// possible upper bound
 
             // Check if need to change red in response to the blue change
-            if (m_red > m_red_upper)
+            if (num_red > num_red_upper)
             {
-                m_red = m_red_upper; // change red
-                m_blue_upper = num_ai - m_red; // recalculate the upper bound determined by the new m_red
+                num_red = num_red_upper; // change red
+                num_blue_upper = num_ai - num_red; // recalculate the upper bound determined by the new num_red
             }
 
-            m_ai_kart_spinner->setMax(std::min( (m_red == m_red_lower ? m_red_upper_hard : m_red_upper + 1), m_red_upper_hard )); // cannot be higher than the hard upper limit
-            m_ai_blue_spinner->setMax(std::min( (m_blue == m_blue_lower ? m_blue_upper_hard : m_blue_upper + 1), m_blue_upper_hard )); // cannot be higher than the hard upper limit
-            m_ai_kart_spinner->setMin(m_red_lower);
-            m_ai_blue_spinner->setMin(m_blue_lower);
-            m_ai_kart_spinner->setValue(m_red);
-            m_ai_blue_spinner->setValue(m_blue);
+            m_ai_kart_spinner->setMax(std::min( (num_red == num_red_lower ? num_red_upper_hard : num_red_upper + 1), num_red_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_blue_spinner->setMax(std::min( (num_blue == num_blue_lower ? num_blue_upper_hard : num_blue_upper + 1), num_blue_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_kart_spinner->setMin(num_red_lower);
+            m_ai_blue_spinner->setMin(num_blue_lower);
+            m_ai_kart_spinner->setValue(num_red);
+            m_ai_blue_spinner->setValue(num_blue);
 
-            UserConfigParams::m_soccer_red_ai_num  = m_red;
-            UserConfigParams::m_soccer_blue_ai_num = m_blue;
+            UserConfigParams::m_soccer_red_ai_num  = num_red;
+            UserConfigParams::m_soccer_blue_ai_num = num_blue;
 
-            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + m_red + m_blue;
+            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_red + num_blue;
             //updateHighScores();
         }
     }
