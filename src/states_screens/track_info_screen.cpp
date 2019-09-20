@@ -123,8 +123,10 @@ void TrackInfoScreen::beforeAddingWidget()
     else
         m_target_type_div->setCollapsed(true, this);
 
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER) // if not soccer, hide 'Number of blue team AI karts'
-        m_ai_blue_div->setCollapsed(true, this);  // not show the 'blue team AI' if not soccer
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER) // show 'Number of blue team AI karts' if soccer
+        m_ai_blue_div->setCollapsed(false, this);
+    else
+        m_ai_blue_div->setCollapsed(true, this);
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
