@@ -68,6 +68,7 @@ void TrackInfoScreen::loadedFromFile()
     m_target_type_label     = getWidget <LabelWidget>("target-type-text");
     m_ai_blue_spinner       = getWidget<SpinnerWidget>("ai-blue-spinner");
     m_ai_blue_label         = getWidget <LabelWidget>("ai-blue-text");
+    m_ai_blue_div           = getWidget<Widget>("ai-blue-div");
     m_target_type_div       = getWidget<Widget>("target-type-div");
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
@@ -118,6 +119,9 @@ void TrackInfoScreen::beforeAddingWidget()
         m_target_type_div->setCollapsed(false, this);
     else
         m_target_type_div->setCollapsed(true, this);
+
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER) // if not soccer, hide 'Number of blue team AI karts'
+        m_ai_blue_div->setCollapsed(true, this);  // not show the 'blue team AI' if not soccer
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
