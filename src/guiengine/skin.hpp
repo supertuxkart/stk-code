@@ -420,7 +420,11 @@ namespace GUIEngine
 
         gui::IGUISkin* getFallbackSkin() { return m_fallback_skin; }
 
+        const std::string& getDataPath() const;
 
+        bool hasIconTheme() const;
+
+        std::string getThemedIcon(const std::string& relative_path) const;
     };   // Skin
 }   // guiengine
 #endif

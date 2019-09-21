@@ -53,6 +53,8 @@ namespace SkinConfig
 {
     static std::map<std::string, BoxRenderParams> m_render_params;
     static std::map<std::string, SColor> m_colors;
+    static std::string m_data_path;
+    static bool m_icon_theme;
 
     static void parseElement(const XMLNode* node)
     {
@@ -153,6 +155,12 @@ namespace SkinConfig
       */
     static void loadFromFile(std::string file)
     {
+        // Clear global variables for android
+        m_render_params.clear();
+        m_colors.clear();
+        m_data_path.clear();
+        m_icon_theme = false;
+
         XMLNode* root = file_manager->createXMLTree(file);
         if(!root)
         {
@@ -161,6 +169,8 @@ namespace SkinConfig
             throw std::runtime_error("Invalid skin file");
         }
 
+        m_data_path = StringUtils::getPath(file_manager
+            ->getFileSystem()->getAbsolutePath(file.c_str()).c_str()) + "/";
         const int amount = root->getNumNodes();
         for (int i=0; i<amount; i++)
         {
@@ -173,6 +183,15 @@ namespace SkinConfig
             else if (node->getName() == "color")
             {
                 parseColor(node);
+            }
+            else if (node->getName() == "advanced")
+            {
+                bool ret = false;
+                if (node->get("icon_theme", &ret))
+                {
+                    if (file_manager->fileExists(m_data_path + "data/gui/icons/"))
+                        m_icon_theme = true;
+                }
             }
             else
             {
@@ -2610,3 +2629,40 @@ void Skin::setSpriteBank (IGUISpriteBank *bank)
 {
     m_fallback_skin->setSpriteBank(bank);
 }   // setSpriteBank
+
+// -----------------------------------------------------------------------------
+const std::string& Skin::getDataPath() const
+{
+    return SkinConfig::m_data_path;
+}   // getDataPath
+
+// -----------------------------------------------------------------------------
+bool Skin::hasIconTheme() const
+{
+    return SkinConfig::m_icon_theme;
+}   // hasIconTheme
+
+// -----------------------------------------------------------------------------
+/* Return a themed icon from its relative path, if not found return the bundled
+ * icon. */
+std::string Skin::getThemedIcon(const std::string& relative_path) const
+{
+    if (!SkinConfig::m_icon_theme ||
+        relative_path.find("gui/icons/") == std::string::npos)
+    {
+        return file_manager->getAsset(relative_path);
+    }
+
+    if (relative_path.find(SkinConfig::m_data_path) != std::string::npos &&
+        file_manager->fileExists(relative_path))
+    {
+        // Absolute path given
+        return relative_path;
+    }
+
+    std::string test_path = SkinConfig::m_data_path + "data/" + relative_path;
+    if (file_manager->fileExists(test_path))
+        return test_path;
+    else
+        return file_manager->getAsset(relative_path);
+}   // getThemedIcon

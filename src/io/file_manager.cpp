@@ -23,6 +23,8 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/skin.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/command_line.hpp"
@@ -131,6 +133,7 @@ FileManager* file_manager = 0;
  */
 FileManager::FileManager()
 {
+    m_root_dirs.clear();
     resetSubdir();
 #ifdef __APPLE__
     // irrLicht's createDevice method has a nasty habit of messing the CWD.
@@ -775,7 +778,16 @@ std::string FileManager::getAssetChecked(FileManager::AssetType type,
 std::string FileManager::getAsset(FileManager::AssetType type,
                                   const std::string &name) const
 {
-    return m_subdir_name[type]+name;
+    if (type == GUI_ICON && GUIEngine::getSkin()->hasIconTheme())
+    {
+        const std::string test_path = GUIEngine::getSkin()->getDataPath() +
+            "data/gui/icons/" + name;
+        if (fileExists(test_path))
+            return test_path;
+        else
+            return m_subdir_name[type] + name;
+    }
+    return m_subdir_name[type] + name;
 }   // getAsset
 
 //-----------------------------------------------------------------------------
