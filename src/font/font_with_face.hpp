@@ -216,8 +216,6 @@ private:
     /** Add a character into \ref m_new_char_holder for lazy loading later. */
     void addLazyLoadChar(wchar_t c)            { m_new_char_holder.insert(c); }
     // ------------------------------------------------------------------------
-    void setDPI();
-    // ------------------------------------------------------------------------
     /** Override it if sub-class should not do lazy loading characters. */
     virtual bool supportLazyLoadChar() const                   { return true; }
     // ------------------------------------------------------------------------
@@ -307,6 +305,8 @@ public:
     float getInverseShaping() const               { return m_inverse_shaping; }
     // ------------------------------------------------------------------------
     virtual bool useColorGlyphPage() const                    { return false; }
+    // ------------------------------------------------------------------------
+    void setDPI();
 };   // FontWithFace
 
 #endif

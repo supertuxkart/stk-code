@@ -195,7 +195,7 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
     FT_Face cur_face = m_face_ttf->getFace(font_number);
     FT_GlyphSlot slot = cur_face->glyph;
 
-    if (FT_HAS_COLOR(cur_face))
+    if (FT_HAS_COLOR(cur_face) && cur_face->num_fixed_sizes != 0)
     {
         font_manager->checkFTError(FT_Load_Glyph(cur_face, glyph_index,
             FT_LOAD_DEFAULT | FT_LOAD_COLOR), "loading a glyph");
@@ -207,8 +207,10 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
         font_manager->checkFTError(FT_Set_Pixel_Sizes(cur_face, 0, getDPI()),
             "setting DPI");
 
+        unsigned flag = FT_HAS_COLOR(cur_face) ?
+            (FT_LOAD_DEFAULT | FT_LOAD_COLOR) : FT_LOAD_DEFAULT;
         font_manager->checkFTError(FT_Load_Glyph(cur_face, glyph_index,
-            FT_LOAD_DEFAULT), "loading a glyph");
+            flag), "loading a glyph");
 
         font_manager->checkFTError(shapeOutline(&(slot->outline)),
             "shaping outline");
