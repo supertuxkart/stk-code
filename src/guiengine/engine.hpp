@@ -116,6 +116,7 @@ namespace GUIEngine
 
     void deallocate();
 
+    void resetGlobalVariables();
 
     /**
       * \return the irrlicht device object

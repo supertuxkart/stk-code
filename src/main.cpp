@@ -1701,6 +1701,8 @@ void clearGlobalVariables()
 #ifdef ENABLE_WIIUSE
     wiimote_manager = NULL;
 #endif
+    World::setWorld(NULL);
+    GUIEngine::resetGlobalVariables();
 }   // clearGlobalVariables
 
 //=============================================================================
