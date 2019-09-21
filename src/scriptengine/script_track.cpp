@@ -598,6 +598,10 @@ namespace Scripting
                                              mp ? WRAP_MFN(::TrackObject, moveTo) : asMETHOD(::TrackObject, moveTo), 
                                              call_conv_thiscall); assert(r >= 0);
                                              
+            r = engine->RegisterObjectMethod("TrackObject", "void reset()", 
+                                             mp ? WRAP_MFN(::TrackObject, reset) : asMETHOD(::TrackObject, reset), 
+                                             call_conv_thiscall); assert(r >= 0);
+                                             
             r = engine->RegisterObjectMethod("TrackObject", "Vec3 getCenterPosition()", 
                                              mp ? WRAP_OBJ_LAST(TrackObject::getCenterPosition): asFUNCTION(TrackObject::getCenterPosition), 
                                              call_conv_objlast); assert(r >= 0);
