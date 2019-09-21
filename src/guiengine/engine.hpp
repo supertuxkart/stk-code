@@ -107,8 +107,10 @@ namespace GUIEngine
       * \param device        An initialized irrlicht device object
       * \param driver        An initialized irrlicht driver object
       * \param state_manager An instance of a class derived from abstract base AbstractStateManager
+      * \param loading if it's (re-)loading the GUIEngine
       */
-    void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver, AbstractStateManager* state_manager);
+    void init(irr::IrrlichtDevice* device, irr::video::IVideoDriver* driver,
+              AbstractStateManager* state_manager, bool loading = true);
 
     void cleanUp();
 

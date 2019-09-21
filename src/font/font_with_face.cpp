@@ -36,6 +36,8 @@
 #include "GlyphLayout.h"
 #include <array>
 
+#include "../lib/irrlicht/source/Irrlicht/CGUISpriteBank.h"
+
 #ifndef SERVER_ONLY
 extern "C"
 {
@@ -51,11 +53,7 @@ extern "C"
  */
 FontWithFace::FontWithFace(const std::string& name)
 {
-    m_spritebank = irr_driver->getGUI()->addEmptySpriteBank(name.c_str());
-
-    assert(m_spritebank != NULL);
-    m_spritebank->grab();
-
+    m_spritebank = new irr::gui::CGUISpriteBank(irr_driver->getGUI());
     m_fallback_font = NULL;
     m_fallback_font_scale = 1.0f;
     m_glyph_max_height = 0;
@@ -63,6 +61,7 @@ FontWithFace::FontWithFace(const std::string& name)
     m_face_dpi = 40;
     m_inverse_shaping = 1.0f;
 }   // FontWithFace
+
 // ----------------------------------------------------------------------------
 /** Destructor. Clears the glyph page and sprite bank.
  */
@@ -74,7 +73,6 @@ FontWithFace::~FontWithFace()
             static_cast<STKTexture*>(m_spritebank->getTexture(i)));
     }
     m_spritebank->drop();
-    m_spritebank = NULL;
 
     delete m_face_ttf;
 }   // ~FontWithFace

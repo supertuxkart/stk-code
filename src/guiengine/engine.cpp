@@ -1038,7 +1038,7 @@ namespace GUIEngine
 
     // -----------------------------------------------------------------------
     void init(IrrlichtDevice* device_a, IVideoDriver* driver_a,
-              AbstractStateManager* state_manager )
+              AbstractStateManager* state_manager, bool loading)
     {
         g_env = device_a->getGUIEnvironment();
         g_device = device_a;
@@ -1117,10 +1117,13 @@ namespace GUIEngine
         // set event receiver
         g_device->setEventReceiver(EventHandler::get());
 
-        g_device->getVideoDriver()
-                ->beginScene(true, true, video::SColor(255,100,101,140));
-        renderLoading();
-        g_device->getVideoDriver()->endScene();
+        if (loading)
+        {
+            g_device->getVideoDriver()
+                    ->beginScene(true, true, video::SColor(255,100,101,140));
+            renderLoading();
+            g_device->getVideoDriver()->endScene();
+        }
     }   // init
 
     // -----------------------------------------------------------------------

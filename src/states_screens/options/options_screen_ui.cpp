@@ -212,7 +212,6 @@ void OptionsScreenUI::init()
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
 
-    m_prev_font_size = UserConfigParams::m_font_size;
     int size_int = (int)roundf(UserConfigParams::m_font_size);
     if (size_int < 0 || size_int > 6)
         size_int = 3;
@@ -333,6 +332,22 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
         assert( font_size != NULL );
         UserConfigParams::m_font_size = font_size->getValue();
+        GUIEngine::clear();
+        GUIEngine::cleanUp();
+        GUIEngine::clearScreenCache();
+        delete font_manager;
+        font_manager = new FontManager();
+        font_manager->loadFonts();
+        GUIEngine::init(irr_driver->getDevice(), irr_driver->getVideoDriver(),
+            StateManager::get(), false/*loading*/);
+        Screen* screen_list[] =
+            {
+                MainMenuScreen::getInstance(),
+                OptionsScreenUI::getInstance(),
+                nullptr
+            };
+        GUIEngine::switchToScreen(MainMenuScreen::getInstance());
+        StateManager::get()->resetAndSetStack(screen_list);
     }
     else if (name == "split_screen_horizontally")
     {
@@ -354,11 +369,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
 void OptionsScreenUI::tearDown()
 {
-    if (m_prev_font_size != UserConfigParams::m_font_size)
-    {
-        irr_driver->sameRestart();
-    }
-    
     Screen::tearDown();
     // save changes when leaving screen
     user_config->saveConfig();

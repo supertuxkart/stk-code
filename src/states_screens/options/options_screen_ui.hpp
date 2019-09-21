@@ -35,7 +35,6 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 {
     OptionsScreenUI();
     bool m_inited;
-    float m_prev_font_size;
 
     std::map<core::stringw, std::string> m_skins;
 
