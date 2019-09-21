@@ -78,17 +78,38 @@ void OptionsScreenUI::loadedFromFile()
     m_skins.clear();
     skinSelector->clearLabels();
 
-    std::set<std::string> skinFiles;
-    file_manager->listFiles(skinFiles /* out */, file_manager->getAsset(FileManager::SKIN,""),
+    std::set<std::string> skin_files;
+    file_manager->listFiles(skin_files /* out */, file_manager->getAsset(FileManager::SKIN,""),
+                            true /* make full path */ );
+    std::set<std::string> addon_skin_files;
+    file_manager->listFiles(addon_skin_files /* out */, file_manager->getAddonsFile("skins/"),
                             true /* make full path */ );
 
-    for (std::set<std::string>::iterator it = skinFiles.begin(); it != skinFiles.end(); it++)
-    {
-        if(StringUtils::getExtension(*it)=="stkskin")
+    auto lb = [](const std::set<std::string>& files, bool addon,
+                 std::map<core::stringw, std::string>& result)->void
         {
-            m_skins.push_back( *it );
-        }
-    }
+            for (auto& f : files)
+            {
+                std::string stkskin = f + "/stkskin.xml";
+                if (file_manager->fileExists(stkskin))
+                {
+                    XMLNode* root = file_manager->createXMLTree(stkskin);
+                    if (!root)
+                        continue;
+                    core::stringw skin_name;
+                    if (root->get("name", &skin_name))
+                    {
+                        std::string skin_id = StringUtils::getBasename(f);
+                        if (addon)
+                            skin_id = std::string("addon_") + skin_id;
+                        result[skin_name] = skin_id;
+                    }
+                    delete root;
+                }
+            }
+        };
+    lb(skin_files, false, m_skins);
+    lb(addon_skin_files, true, m_skins);
 
     if (m_skins.size() == 0)
     {
@@ -99,12 +120,8 @@ void OptionsScreenUI::loadedFromFile()
     }
 
     const int skin_count = (int)m_skins.size();
-    for (int n=0; n<skin_count; n++)
-    {
-        const std::string skinFileName = StringUtils::getBasename(m_skins[n]);
-        const std::string skinName = StringUtils::removeExtension( skinFileName );
-        skinSelector->addLabel( core::stringw(skinName.c_str()) );
-    }
+    for (auto& p : m_skins)
+        skinSelector->addLabel(p.first);
     skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
     skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skin_count-1);
 
@@ -222,11 +239,13 @@ void OptionsScreenUI::init()
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
-    const int skinCount = (int) m_skins.size();
-    std::string user_skin = StringUtils::toLowerCase(UserConfigParams::m_skin_file.c_str());
-    for (int n=0; n<skinCount; n++)
+    const std::string& user_skin = UserConfigParams::m_skin_file;
+    for (int n = 0; n < skinSelector->getMax(); n++)
     {
-        const std::string skinFileName = StringUtils::toLowerCase(StringUtils::getBasename(m_skins[n]));
+        auto ret = m_skins.find(skinSelector->getStringValueFromID(n));
+        if (ret == m_skins.end())
+            continue;
+        const std::string skinFileName = ret->second;
 
         if (user_skin == skinFileName)
         {
@@ -283,7 +302,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( skinSelector != NULL );
 
         const core::stringw selectedSkin = skinSelector->getStringValue();
-        UserConfigParams::m_skin_file = core::stringc(selectedSkin.c_str()).c_str() + std::string(".stkskin");
+        UserConfigParams::m_skin_file = m_skins[selectedSkin];
         irr_driver->unsetMaxTextureSize();
         GUIEngine::reloadSkin();
         irr_driver->setMaxTextureSize();

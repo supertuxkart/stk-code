@@ -170,6 +170,17 @@ namespace GUIEngine
         irr::core::stringw getStringValue() const;
 
         /**
+          * \brief retrieve the value of the spinner from id
+          * \return the value of the spinner from id, in a string form
+          */
+        irr::core::stringw getStringValueFromID(unsigned id) const
+        {
+            if (id > m_labels.size())
+                return L"";
+            return m_labels[id];
+        }
+
+        /**
           * \return the maximum value the spinner can take
           */
         // --------------------------------------------------------------------

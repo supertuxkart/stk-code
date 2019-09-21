@@ -61,6 +61,7 @@ namespace SkinConfig
         std::string type;
         std::string state = "neutral";
         std::string image;
+        bool common_img = false;
         int leftborder = 0, rightborder=0, topborder=0, bottomborder=0;
         float hborder_out_portion = 0.5f, vborder_out_portion = 1.0f;
         bool preserve_h_aspect_ratios = false;
@@ -90,7 +91,7 @@ namespace SkinConfig
         node->get("preserve_h_aspect_ratios", &preserve_h_aspect_ratios);
 
         node->get("areas", &areas);
-
+        node->get("common", &common_img);
 
         BoxRenderParams new_param;
         new_param.m_left_border = leftborder;
@@ -103,7 +104,9 @@ namespace SkinConfig
 
         // call last since it calculates coords considering all other
         // parameters
-        new_param.setTexture( irr_driver->getTexture(FileManager::SKIN, image));
+        new_param.setTexture(common_img ?
+            irr_driver->getTexture(FileManager::SKIN, std::string("common/") + image) :
+            irr_driver->getTexture(m_data_path + image));
 
         if (areas.size() > 0)
         {
@@ -318,8 +321,11 @@ X##_yflip.LowerRightCorner.Y =  y1;}
 
 Skin::Skin(IGUISkin* fallback_skin)
 {
-    std::string skin_name = file_manager->getAsset(FileManager::SKIN,
-                                                   UserConfigParams::m_skin_file);
+    std::string skin_id = UserConfigParams::m_skin_file;
+    std::string skin_name = skin_id.find("addon_") != std::string::npos ?
+        file_manager->getAddonsFile(
+            std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
+        file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
 
     try
     {
@@ -330,9 +336,9 @@ Skin::Skin(IGUISkin* fallback_skin)
         (void)e;   // avoid compiler warning
         // couldn't load skin. Try to revert to default
         UserConfigParams::m_skin_file.revertToDefaults();
-
+        std::string default_skin_id = UserConfigParams::m_skin_file;
         skin_name = file_manager->getAsset(FileManager::SKIN,
-                                           UserConfigParams::m_skin_file);
+                                           default_skin_id + "/stkskin.xml");
         SkinConfig::loadFromFile( skin_name );
     }
 
