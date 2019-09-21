@@ -62,9 +62,29 @@ all areas to be rendered. Then you can pass parameter areas="body+left+right+top
 and explicitely specify which parts you want to see. The 4 corner areas are only visible
 when the border that intersect at this corner are enabled.
 
+When there is a common="y" with image tag, the image will be loaded only from data/skins/common in stk-code.
 -->
 
 <skin name="Peach" author="Dakal & Marianne Gagnon (Auria)">
+
+<!--
+Here you can configure advanced theming rules for this skin
+Currently STK supports:
+1. Icon theme
+2. Font
+
+To allow icon theme, use the tag icon_theme="y" and then place the replacement png into
+(local skin folder)/data/gui/icons, STK will prefer those first, if not found it will fallback to bundled icon.
+
+For TTF specify the list like the following, for normal and digit ttf it will be added in the beginning of font
+list in STK, so those TTF will be used first, and any missing character will be rendered from the bundled font
+list. For color emoji ttf it will be replace the bundled color emoji directly. You are not required to specify
+all types of ttf.
+<advanced icon_theme="y"
+          normal_ttf="xxx.ttf yyy.ttf"
+          digit_ttf="zzz.ttf"
+          color_emoji_ttf="www.ttf"/>
+-->
 
 <!--  Stateless -->
 <element type="background" common="y" image="background.jpg" />
