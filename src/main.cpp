@@ -1729,8 +1729,14 @@ void initRest()
         exit(0);
     }
 
+    // We need a temporary skin to load the font list from skin (if any)
+    GUIEngine::Skin* tmp_skin = new GUIEngine::Skin(NULL);
+    GUIEngine::setSkin(tmp_skin);
     font_manager = new FontManager();
     font_manager->loadFonts();
+    delete tmp_skin;
+    GUIEngine::setSkin(NULL);
+
     GUIEngine::init(device, driver, StateManager::get());
     input_manager = new InputManager();
     // Get into menu mode initially.

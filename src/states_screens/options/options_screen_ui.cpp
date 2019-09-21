@@ -306,10 +306,28 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_skin_file = m_skins[selectedSkin];
         irr_driver->unsetMaxTextureSize();
         bool prev_icon_theme = GUIEngine::getSkin()->hasIconTheme();
+        bool prev_font = GUIEngine::getSkin()->hasFont();
         GUIEngine::reloadSkin();
-        if (GUIEngine::getSkin()->hasIconTheme() != prev_icon_theme)
+        if (GUIEngine::getSkin()->hasIconTheme() != prev_icon_theme ||
+            prev_font != GUIEngine::getSkin()->hasFont())
         {
+            if (prev_font != GUIEngine::getSkin()->hasFont())
+            {
+                GUIEngine::clear();
+                GUIEngine::cleanUp();
+            }
+
             GUIEngine::clearScreenCache();
+
+            if (prev_font != GUIEngine::getSkin()->hasFont())
+            {
+                delete font_manager;
+                font_manager = new FontManager();
+                font_manager->loadFonts();
+                GUIEngine::init(irr_driver->getDevice(), irr_driver->getVideoDriver(),
+                    StateManager::get(), false/*loading*/);
+            }
+
             Screen* screen_list[] =
                 {
                     MainMenuScreen::getInstance(),

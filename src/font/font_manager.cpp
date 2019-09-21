@@ -18,12 +18,13 @@
 
 #include "font/font_manager.hpp"
 
-#include "config/stk_config.hpp"
 #include "io/file_manager.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
 #include "font/face_ttf.hpp"
 #include "font/regular_face.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/skin.hpp"
 #include "modes/profile_world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -89,10 +90,8 @@ std::vector<FT_Face>
     for (const std::string& font : ttf_list)
     {
         FT_Face face = NULL;
-        const std::string loc = file_manager
-            ->getAssetChecked(FileManager::TTF, font.c_str(), true);
         font_manager->checkFTError(FT_New_Face(
-            m_ft_library, loc.c_str(), 0, &face), loc + " is loaded");
+            m_ft_library, font.c_str(), 0, &face), font + " is loaded");
         ret.push_back(face);
     }
     return ret;
@@ -563,12 +562,11 @@ void FontManager::initGlyphLayouts(const core::stringw& text,
 // ----------------------------------------------------------------------------
 FT_Face FontManager::loadColorEmoji()
 {
-    if (stk_config->m_color_emoji_ttf.empty())
+    if (GUIEngine::getSkin()->getColorEmojiTTF().empty())
         return NULL;
     FT_Face face = NULL;
-    const std::string loc = file_manager->getAssetChecked(FileManager::TTF,
-        stk_config->m_color_emoji_ttf.c_str(), true);
-    FT_Error err = FT_New_Face(m_ft_library, loc.c_str(), 0, &face);
+    FT_Error err = FT_New_Face(m_ft_library,
+        GUIEngine::getSkin()->getColorEmojiTTF().c_str(), 0, &face);
     if (err > 0)
     {
         Log::error("FontManager", "Something wrong when loading color emoji! "
@@ -579,7 +577,7 @@ FT_Face FontManager::loadColorEmoji()
     if (!FT_HAS_COLOR(face) || face->num_fixed_sizes == 0)
     {
         Log::error("FontManager", "Bad %s color emoji, ignored.",
-            stk_config->m_color_emoji_ttf.c_str());
+            GUIEngine::getSkin()->getColorEmojiTTF().c_str());
         checkFTError(FT_Done_Face(face), "removing faces for emoji");
         return NULL;
     }
@@ -601,7 +599,8 @@ void FontManager::loadFonts()
 {
 #ifndef SERVER_ONLY
     // First load the TTF files required by each font
-    std::vector<FT_Face> normal_ttf = loadTTF(stk_config->m_normal_ttf);
+    std::vector<FT_Face> normal_ttf = loadTTF(
+        GUIEngine::getSkin()->getNormalTTF());
     std::vector<FT_Face> bold_ttf = normal_ttf;
     if (!ProfileWorld::isNoGraphics())
     {
@@ -622,7 +621,8 @@ void FontManager::loadFonts()
             m_ft_faces_to_index[normal_ttf[i]] = i;
     }
 
-    std::vector<FT_Face> digit_ttf = loadTTF(stk_config->m_digit_ttf);
+    std::vector<FT_Face> digit_ttf =
+        loadTTF(GUIEngine::getSkin()->getDigitTTF());
     if (!digit_ttf.empty())
         m_digit_face = digit_ttf.front();
 #endif

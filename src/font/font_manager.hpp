@@ -75,6 +75,9 @@ private:
         std::vector<irr::gui::GlyphLayout> > m_cached_gls;
 
     bool m_has_color_emoji;
+    // ------------------------------------------------------------------------
+    std::vector<FT_Face> loadTTF(const std::vector<std::string>& ttf_list);
+
 #endif
 
     /** Map type for each \ref FontWithFace with a index, save getting time in
@@ -119,8 +122,6 @@ public:
     // ------------------------------------------------------------------------
     /** Return the \ref m_ft_library. */
     FT_Library getFTLibrary() const                    { return m_ft_library; }
-    // ------------------------------------------------------------------------
-    std::vector<FT_Face> loadTTF(const std::vector<std::string>& ttf_list);
     // ------------------------------------------------------------------------
     FT_Face loadColorEmoji();
     // ------------------------------------------------------------------------

@@ -54,7 +54,11 @@ namespace SkinConfig
     static std::map<std::string, BoxRenderParams> m_render_params;
     static std::map<std::string, SColor> m_colors;
     static std::string m_data_path;
+    static std::vector<std::string> m_normal_ttf;
+    static std::vector<std::string> m_digit_ttf;
+    static std::string m_color_emoji_ttf;
     static bool m_icon_theme;
+    static bool m_font;
 
     static void parseElement(const XMLNode* node)
     {
@@ -156,13 +160,26 @@ namespace SkinConfig
       * \brief loads skin information from a STK skin file
       * \throw std::runtime_error if file cannot be read
       */
-    static void loadFromFile(std::string file)
+    static void loadFromFile(std::string file, bool load_advanced_only)
     {
         // Clear global variables for android
         m_render_params.clear();
         m_colors.clear();
         m_data_path.clear();
+        m_normal_ttf.clear();
+        for (auto& p : stk_config->m_normal_ttf)
+            m_normal_ttf.push_back(file_manager->getAssetChecked(FileManager::TTF, p, true));
+        m_digit_ttf.clear();
+        for (auto& p : stk_config->m_digit_ttf)
+            m_digit_ttf.push_back(file_manager->getAssetChecked(FileManager::TTF, p, true));
+        m_color_emoji_ttf.clear();
+        if (!stk_config->m_color_emoji_ttf.empty())
+        {
+            m_color_emoji_ttf = file_manager->getAssetChecked(FileManager::TTF,
+                stk_config->m_color_emoji_ttf, true);
+        }
         m_icon_theme = false;
+        m_font = false;
 
         XMLNode* root = file_manager->createXMLTree(file);
         if(!root)
@@ -179,11 +196,11 @@ namespace SkinConfig
         {
             const XMLNode* node = root->getNode(i);
 
-            if (node->getName() == "element")
+            if (node->getName() == "element" && !load_advanced_only)
             {
                 parseElement(node);
             }
-            else if (node->getName() == "color")
+            else if (node->getName() == "color" && !load_advanced_only)
             {
                 parseColor(node);
             }
@@ -195,8 +212,54 @@ namespace SkinConfig
                     if (file_manager->fileExists(m_data_path + "data/gui/icons/"))
                         m_icon_theme = true;
                 }
+                std::string color_ttf;
+                if (node->get("color_emoji_ttf", &color_ttf))
+                {
+                    std::string test_path = m_data_path + "data/ttf/" + color_ttf;
+                    if (file_manager->fileExists(test_path))
+                    {
+                        m_color_emoji_ttf = test_path;
+                        m_font = true;
+                    }
+                }
+                std::vector<std::string> list_ttf;
+                std::vector<std::string> list_ttf_path;
+                if (node->get("normal_ttf", &list_ttf))
+                {
+                    for (auto& t : list_ttf)
+                    {
+                        std::string test_path = m_data_path + "data/ttf/" + t;
+                        if (file_manager->fileExists(test_path))
+                        {
+                            list_ttf_path.push_back(test_path);
+                            m_font = true;
+                        }
+                    }
+                    // We append at the begining of default ttf, so if some
+                    // character missing from skin font we will fallback to
+                    // bundled font later
+                    m_normal_ttf.insert(m_normal_ttf.begin(),
+                        list_ttf_path.begin(), list_ttf_path.end());
+                }
+                list_ttf.clear();
+                list_ttf_path.clear();
+                if (node->get("digit_ttf", &list_ttf))
+                {
+                    m_digit_ttf.clear();
+                    for (auto& t : list_ttf)
+                    {
+                        std::string test_path = m_data_path + "data/ttf/" + t;
+                        if (file_manager->fileExists(test_path))
+                        {
+                            list_ttf_path.push_back(test_path);
+                            m_font = true;
+                        }
+                    }
+                    m_digit_ttf.insert(m_digit_ttf.begin(),
+                        list_ttf_path.begin(), list_ttf_path.end());
+                }
             }
-            else
+            else if (!load_advanced_only)
             {
                 Log::error("skin", "Unknown node in XML file '%s'.",
                            node->getName().c_str());
@@ -321,6 +384,7 @@ X##_yflip.LowerRightCorner.Y =  y1;}
 
 Skin::Skin(IGUISkin* fallback_skin)
 {
+    // fallback_skin will be null if load only basic theming data
     std::string skin_id = UserConfigParams::m_skin_file;
     std::string skin_name = skin_id.find("addon_") != std::string::npos ?
         file_manager->getAddonsFile(
@@ -329,7 +393,7 @@ Skin::Skin(IGUISkin* fallback_skin)
 
     try
     {
-        SkinConfig::loadFromFile( skin_name );
+        SkinConfig::loadFromFile(skin_name, /*load_advanced_only*/fallback_skin == NULL);
     }
     catch (std::runtime_error& e)
     {
@@ -339,14 +403,18 @@ Skin::Skin(IGUISkin* fallback_skin)
         std::string default_skin_id = UserConfigParams::m_skin_file;
         skin_name = file_manager->getAsset(FileManager::SKIN,
                                            default_skin_id + "/stkskin.xml");
-        SkinConfig::loadFromFile( skin_name );
+        SkinConfig::loadFromFile(skin_name, /*load_advanced_only*/fallback_skin == NULL);
     }
 
     m_bg_image = NULL;
 
-    m_fallback_skin = fallback_skin;
-    m_fallback_skin->grab();
-    assert(fallback_skin != NULL);
+    m_fallback_skin = NULL;
+    if (fallback_skin)
+    {
+        m_fallback_skin = fallback_skin;
+        m_fallback_skin->grab();
+        assert(fallback_skin != NULL);
+    }
 
     m_dialog = false;
     m_dialog_size = 0.0f;
@@ -355,7 +423,8 @@ Skin::Skin(IGUISkin* fallback_skin)
 // ----------------------------------------------------------------------------
 Skin::~Skin()
 {
-    m_fallback_skin->drop();
+    if (m_fallback_skin)
+        m_fallback_skin->drop();
 }   // ~Skin
 
 // ----------------------------------------------------------------------------
@@ -2643,10 +2712,35 @@ const std::string& Skin::getDataPath() const
 }   // getDataPath
 
 // -----------------------------------------------------------------------------
+/* All TTF list here are in absolute path. */
+const std::vector<std::string>& Skin::getNormalTTF() const
+{
+    return SkinConfig::m_normal_ttf;
+}   // getNormalTTF
+
+// -----------------------------------------------------------------------------
+const std::vector<std::string>& Skin::getDigitTTF() const
+{
+    return SkinConfig::m_digit_ttf;
+}   // getDigitTTF
+
+// -----------------------------------------------------------------------------
+const std::string& Skin::getColorEmojiTTF() const
+{
+    return SkinConfig::m_color_emoji_ttf;
+}   // getColorEmojiTTF
+
+// -----------------------------------------------------------------------------
 bool Skin::hasIconTheme() const
 {
     return SkinConfig::m_icon_theme;
 }   // hasIconTheme
+
+// -----------------------------------------------------------------------------
+bool Skin::hasFont() const
+{
+    return SkinConfig::m_font;
+}   // hasFont
 
 // -----------------------------------------------------------------------------
 /* Return a themed icon from its relative path, if not found return the bundled
