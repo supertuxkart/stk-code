@@ -240,6 +240,8 @@ void OptionsScreenUI::init()
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const std::string& user_skin = UserConfigParams::m_skin_file;
+    skinSelector->setActive(!in_game);
+
     for (int n = 0; n < skinSelector->getMax(); n++)
     {
         auto ret = m_skins.find(skinSelector->getStringValueFromID(n));
@@ -304,7 +306,20 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         const core::stringw selectedSkin = skinSelector->getStringValue();
         UserConfigParams::m_skin_file = m_skins[selectedSkin];
         irr_driver->unsetMaxTextureSize();
+        bool prev_icon_theme = GUIEngine::getSkin()->hasIconTheme();
         GUIEngine::reloadSkin();
+        if (GUIEngine::getSkin()->hasIconTheme() != prev_icon_theme)
+        {
+            GUIEngine::clearScreenCache();
+            Screen* screen_list[] =
+                {
+                    MainMenuScreen::getInstance(),
+                    OptionsScreenUI::getInstance(),
+                    nullptr
+                };
+            GUIEngine::switchToScreen(MainMenuScreen::getInstance());
+            StateManager::get()->resetAndSetStack(screen_list);
+        }
         irr_driver->setMaxTextureSize();
     }
     else if (name == "minimap")
