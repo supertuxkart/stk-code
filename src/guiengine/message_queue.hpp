@@ -47,6 +47,6 @@ namespace MessageQueue
     void showProgressBar(int progress, const core::stringw& msg);
     void updatePosition();
     void update(float dt);
-
+    void clear();
 };   // namespace GUIEngine
 #endif

@@ -384,6 +384,23 @@ void showProgressBar(int progress, const core::stringw& msg)
 #endif
 }   // showProgressBar
 
+// ----------------------------------------------------------------------------
+/** Clear all message, called when destroying the GUIEngine.
+ */
+void clear()
+{
+#ifndef SERVER_ONLY
+    g_all_messages.lock();
+    while (!g_all_messages.getData().empty())
+    {
+        Message* msg = g_all_messages.getData().top();
+        delete msg;
+        g_all_messages.getData().pop();
+    }
+    g_all_messages.unlock();
+#endif
+}
+
 }   // namespace GUIEngine
 
 // ----------------------------------------------------------------------------
