@@ -288,7 +288,12 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
                 ->getVideoDriver()->createImage(video::ECF_A8R8G8B8,
                 { cur_glyph_width , cur_glyph_height});
             assert(scaled);
-            if (cur_glyph_width >= bits->width ||
+            if (cur_glyph_width == bits->width &&
+                cur_glyph_height == bits->rows)
+            {
+                unscaled->copyTo(scaled);
+            }
+            else if (cur_glyph_width >= bits->width ||
                 cur_glyph_height >= bits->rows)
             {
                 unscaled->copyToScaling(scaled);
