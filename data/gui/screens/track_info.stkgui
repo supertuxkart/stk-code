@@ -64,6 +64,15 @@
                         <label id="ai-text" proportion="3" I18N="In the track info screen" text="Number of AI karts" text_align="left" align="center"/>
                     </div>
                     <spacer width="1" height="1%"/>
+                    <div width="100%" height="fit" layout="horizontal-row" id="ai-blue-div">
+                        <div proportion="1" height="fit" layout="horizontal-row">
+                            <spinner id="ai-blue-spinner" width="100%" min_value="1" max_value="20" align="center"
+                                     wrap_around="true" />
+                        </div>
+                        <spacer width="3%"/>
+                        <label id="ai-blue-text" proportion="3" I18N="In the track info screen" text="Number of blue team AI karts" text_align="left" align="center"/>
+                    </div>
+                    <spacer width="1" height="1%"/>
                     <div width="100%" height="fit" layout="horizontal-row" >
                         <div proportion="1" height="fit" layout="horizontal-row">
                             <div width="100%" height="fit" text-align="center" layout="vertical-row" >

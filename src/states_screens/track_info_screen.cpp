@@ -66,6 +66,9 @@ void TrackInfoScreen::loadedFromFile()
 {
     m_target_type_spinner   = getWidget<SpinnerWidget>("target-type-spinner");
     m_target_type_label     = getWidget <LabelWidget>("target-type-text");
+    m_ai_blue_spinner       = getWidget<SpinnerWidget>("ai-blue-spinner");
+    m_ai_blue_label         = getWidget <LabelWidget>("ai-blue-text");
+    m_ai_blue_div           = getWidget<Widget>("ai-blue-div");
     m_target_type_div       = getWidget<Widget>("target-type-div");
     m_target_value_spinner  = getWidget<SpinnerWidget>("target-value-spinner");
     m_target_value_label    = getWidget<LabelWidget>("target-value-text");
@@ -102,6 +105,9 @@ void TrackInfoScreen::loadedFromFile()
 
     m_is_soccer = false;
     m_show_ffa_spinner = false;
+
+    m_red_players = 0;
+    m_blue_players = 0;
 }   // loadedFromFile
 
 
@@ -116,6 +122,11 @@ void TrackInfoScreen::beforeAddingWidget()
         m_target_type_div->setCollapsed(false, this);
     else
         m_target_type_div->setCollapsed(true, this);
+
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER) // show 'Number of blue team AI karts' if soccer
+        m_ai_blue_div->setCollapsed(false, this);
+    else
+        m_ai_blue_div->setCollapsed(true, this);
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -172,6 +183,10 @@ void TrackInfoScreen::init()
 
     m_target_value_spinner->setVisible(false);
     m_target_value_label->setVisible(false);
+
+    m_ai_blue_spinner->setVisible(false);
+    m_ai_blue_label->setVisible(false);
+    m_ai_blue_label->setActive(false);
 
     // Soccer options
     // -------------
@@ -254,39 +269,90 @@ void TrackInfoScreen::init()
     if (has_AI)
     {
         m_ai_kart_spinner->setActive(true);
-
-        int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
-            [race_manager->getMinorMode()]) - local_players;
-
-        // Avoid negative numbers (which can happen if e.g. the number of karts
-        // in a previous race was lower than the number of players now.
-
-        if (num_ai < 0) num_ai = 0;
-        m_ai_kart_spinner->setValue(num_ai);
-
-        race_manager->setNumKarts(num_ai + local_players);
-        // Set the max karts supported based on the battle arena selected
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
-           race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
+        if (m_is_soccer) // Soccer mode: red + blue AI
         {
-            m_ai_kart_spinner->setMax(max_arena_players - local_players);
+            m_ai_blue_spinner->setVisible(true);
+            m_ai_blue_label->setVisible(true);
+            m_ai_blue_spinner->setActive(true);
+            m_ai_kart_label->setText(_("Number of red team AI karts"), false);
+
+            const int max_arena_players = m_track->getMaxArenaPlayers();
+            const int local_players = race_manager->getNumLocalPlayers();
+            const int num_ai = max_arena_players - local_players; // possible AI number
+
+            getRedBluePlayerNumber();
+
+            int num_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int num_red_lower = (m_red_players > 0) ? 0 : 1;
+            int num_blue_upper_hard = max_arena_players - local_players - num_red_lower; // possible upper bound
+            int num_red_upper_hard  = max_arena_players - local_players - num_blue_lower;// possible upper bound
+
+            int num_red_ai  = UserConfigParams::m_soccer_red_ai_num;
+            int num_blue_ai = UserConfigParams::m_soccer_blue_ai_num;
+
+            // Try the saved value, recalculate AI number (Balanced) if cannot use the saved values
+            if (!((num_red_ai  >= num_red_lower)  && (num_red_ai  <= num_red_upper_hard)  &&
+                  (num_blue_ai >= num_blue_lower) && (num_blue_ai <= num_blue_upper_hard) &&
+                  (num_red_ai + num_blue_ai <= num_ai)))
+            {
+                int additional_blue = m_red_players - m_blue_players;
+                num_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
+                num_red_ai  = (num_ai - additional_blue) / 2;
+
+                if ((num_ai + additional_blue)%2 == 1)
+                    (additional_blue < 0) ? num_red_ai++ : num_blue_ai++;
+
+                UserConfigParams::m_soccer_red_ai_num  = num_red_ai;
+                UserConfigParams::m_soccer_blue_ai_num = num_blue_ai;
+            }
+
+            m_ai_kart_spinner->setMin(num_red_lower);
+            m_ai_blue_spinner->setMin(num_blue_lower);
+            m_ai_kart_spinner->setMax(std::min( num_red_ai + (num_red_ai == num_red_lower ? 0 : 1), num_red_upper_hard )); // +1 to allow adding AI
+            m_ai_blue_spinner->setMax(std::min( num_blue_ai + (num_blue_ai == num_blue_lower ? 0 : 1), num_blue_upper_hard )); // +1 to allow adding AI
+
+            // Set the values
+            m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
+            m_ai_blue_spinner->setValue(UserConfigParams::m_soccer_blue_ai_num);
+
+            race_manager->setNumKarts(num_ai + local_players);
         }
         else
-            m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
-        // A ftl reace needs at least three karts to make any sense
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
-            m_ai_kart_spinner->setMin(std::max(0, 3 - local_players));
-        }
-        // Make sure in battle and soccer mode at least 1 ai for single player
-        else if((race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
-            race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER) &&
-            local_players == 1 &&
-            !UserConfigParams::m_artist_debug_mode)
-            m_ai_kart_spinner->setMin(1);
-        else
-            m_ai_kart_spinner->setMin(0);
+            m_ai_kart_label->setText(_("Number of AI karts"), false); // change to label back for other modes
 
+            int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
+                [race_manager->getMinorMode()]) - local_players;
+
+            // Avoid negative numbers (which can happen if e.g. the number of karts
+            // in a previous race was lower than the number of players now.
+
+            if (num_ai < 0) num_ai = 0;
+            m_ai_kart_spinner->setValue(num_ai);
+
+            race_manager->setNumKarts(num_ai + local_players);
+            // Set the max karts supported based on the battle arena selected
+            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+               race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
+            {
+                m_ai_kart_spinner->setMax(max_arena_players - local_players);
+            }
+            else
+                m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
+            // A ftl reace needs at least three karts to make any sense
+            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            {
+                m_ai_kart_spinner->setMin(std::max(0, 3 - local_players));
+            }
+            // Make sure in battle and soccer mode at least 1 ai for single player
+            else if((race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
+                     race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER) &&
+                    local_players == 1 &&
+                    !UserConfigParams::m_artist_debug_mode)
+                m_ai_kart_spinner->setMin(1);
+            else
+                m_ai_kart_spinner->setMin(0);
+        }
     }   // has_AI
     else
         race_manager->setNumKarts(local_players);
@@ -482,7 +548,16 @@ void TrackInfoScreen::onEnterPressedInternal()
 
     int num_ai = 0;
     if (has_AI)
-       num_ai = m_ai_kart_spinner->getValue();
+    {
+        if (m_is_soccer) // Soccer mode
+        {
+            num_ai = UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num;
+        }
+        else // Other modes
+        {
+            num_ai = m_ai_kart_spinner->getValue();
+        }
+    }
 
     const int selected_target_type = m_target_type_spinner->getValue();
     const int selected_target_value = m_target_value_spinner->getValue();
@@ -620,11 +695,115 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name=="ai-spinner")
     {
-        const int num_ai = m_ai_kart_spinner->getValue();
-        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
-        updateHighScores();
+        if (m_is_soccer) // Soccer mode
+        {
+            const int max_arena_players = m_track->getMaxArenaPlayers();
+            const int local_players = race_manager->getNumLocalPlayers();
+            const int num_ai = max_arena_players - local_players; // possible AI number
+            int num_red  = m_ai_kart_spinner->getValue();
+            int num_blue = m_ai_blue_spinner->getValue();
+
+            getRedBluePlayerNumber();
+
+            int num_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int num_red_lower = (m_red_players > 0) ? 0 : 1;
+            int num_blue_upper      = num_ai - num_red;       // upper bound determined by the new num_red
+            int num_blue_upper_hard = num_ai - num_red_lower; // possible upper bound
+            int num_red_upper       = num_ai - num_blue;      // upper bound determined by the new num_blue
+            int num_red_upper_hard  = num_ai - num_blue_lower;// possible upper bound
+
+            // Check if need to change blue in response to the red change
+            if (num_blue > num_blue_upper)
+            {
+                num_blue = num_blue_upper; // change blue
+                num_red_upper = num_ai - num_blue; // recalculate the upper bound determined by the new num_blue
+            }
+
+            m_ai_kart_spinner->setMax(std::min( (num_red == num_red_lower ?  num_red_upper_hard : num_red_upper + 1), num_red_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_blue_spinner->setMax(std::min( (num_blue == num_blue_lower ? num_blue_upper_hard : num_blue_upper + 1), num_blue_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_kart_spinner->setMin(num_red_lower);
+            m_ai_blue_spinner->setMin(num_blue_lower);
+            m_ai_kart_spinner->setValue(num_red);
+            m_ai_blue_spinner->setValue(num_blue);
+
+            UserConfigParams::m_soccer_red_ai_num  = num_red;
+            UserConfigParams::m_soccer_blue_ai_num = num_blue;
+
+            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() +  num_red + num_blue;
+            //updateHighScores();
+        }
+        else // Other modes
+        {
+            const int num_ai = m_ai_kart_spinner->getValue();
+            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
+            updateHighScores();
+        }
+    }
+    else if (name == "ai-blue-spinner")
+    {
+        if (m_is_soccer) // AI distribution: Custom
+        {
+            const int max_arena_players = m_track->getMaxArenaPlayers();
+            const int local_players = race_manager->getNumLocalPlayers();
+            const int num_ai = max_arena_players - local_players; // possible AI number
+            int num_red  = m_ai_kart_spinner->getValue();
+            int num_blue = m_ai_blue_spinner->getValue();
+
+            getRedBluePlayerNumber();
+
+            int num_blue_lower = (m_blue_players > 0) ? 0 : 1;
+            int num_red_lower = (m_red_players > 0) ? 0 : 1;
+            int num_blue_upper      = num_ai - num_red;       // upper bound determined by the new num_red
+            int num_blue_upper_hard = num_ai - num_red_lower; // possible upper bound
+            int num_red_upper       = num_ai - num_blue;      // upper bound determined by the new num_blue
+            int num_red_upper_hard  = num_ai - num_blue_lower;// possible upper bound
+
+            // Check if need to change red in response to the blue change
+            if (num_red > num_red_upper)
+            {
+                num_red = num_red_upper; // change red
+                num_blue_upper = num_ai - num_red; // recalculate the upper bound determined by the new num_red
+            }
+
+            m_ai_kart_spinner->setMax(std::min( (num_red == num_red_lower ? num_red_upper_hard : num_red_upper + 1), num_red_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_blue_spinner->setMax(std::min( (num_blue == num_blue_lower ? num_blue_upper_hard : num_blue_upper + 1), num_blue_upper_hard )); // cannot be higher than the hard upper limit
+            m_ai_kart_spinner->setMin(num_red_lower);
+            m_ai_blue_spinner->setMin(num_blue_lower);
+            m_ai_kart_spinner->setValue(num_red);
+            m_ai_blue_spinner->setValue(num_blue);
+
+            UserConfigParams::m_soccer_red_ai_num  = num_red;
+            UserConfigParams::m_soccer_blue_ai_num = num_blue;
+
+            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_red + num_blue;
+            //updateHighScores();
+        }
     }
 }   // eventCallback
+
+// ----------------------------------------------------------------------------
+void TrackInfoScreen::getRedBluePlayerNumber()
+{
+    const int local_players = race_manager->getNumLocalPlayers();
+    int red_players = 0;
+    int blue_players = 0;
+    for (int i = 0; i < local_players; i++)
+    {
+        KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+
+        // Happen in profiling mode
+        if (team == KART_TEAM_NONE)
+        {
+            race_manager->setKartTeam(i, KART_TEAM_BLUE);
+            team = KART_TEAM_BLUE;
+            continue; //FIXME, this is illogical
+        }
+
+        team == KART_TEAM_BLUE ? blue_players++ : red_players++;
+    }
+    m_red_players = red_players;
+    m_blue_players = blue_players;
+} // getRedBluePlayerNumber
 
 // ----------------------------------------------------------------------------
 
