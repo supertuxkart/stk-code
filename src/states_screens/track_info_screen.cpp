@@ -279,10 +279,11 @@ void TrackInfoScreen::init()
 
         race_manager->setNumKarts(num_ai + local_players);
         
+        // Check if there's any local players in both team
+            int num_blue_players = 0, num_red_players = 0;
+        
         if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         {
-            // Check if there's any local players in both team
-            int num_blue_players = 0, num_red_players = 0;
             for (int i = 0; i < local_players; i++) 
             {
                 KartTeam team = race_manager->getKartInfo(i).getKartTeam();
@@ -319,12 +320,12 @@ void TrackInfoScreen::init()
         if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES ||
            race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         {
-            m_ai_kart_spinner->setMax(max_arena_players - local_players - 1);
-            m_ai_blue_spinner->setMax(max_arena_players - local_players - 1);
-            if(num_blue_players || UserConfigParams::m_artist_debug_mode)
-                m_ai_kart_spinner->setMax(max_arena_players - local_players);
-            if(num_red_players || UserConfigParams::m_artist_debug_mode)
-                m_ai_blue_spinner->setMax(max_arena_players - local_players);
+            m_ai_kart_spinner->setMax(max_arena_players - local_players);
+            m_ai_blue_spinner->setMax(max_arena_players - local_players);
+            if(num_blue_players == 0 && !UserConfigParams::m_artist_debug_mode)
+                m_ai_kart_spinner->setMax(max_arena_players - local_players - 1);
+            if(num_red_players == 0 && !UserConfigParams::m_artist_debug_mode)
+                m_ai_blue_spinner->setMax(max_arena_players - local_players - 1);
         }
         else
             m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
@@ -340,12 +341,12 @@ void TrackInfoScreen::init()
             m_ai_kart_spinner->setMin(1);
         else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         {   
-            m_ai_blue_spinner->setMin(1);
-            m_ai_kart_spinner->setMin(1);
-            if(num_blue_players || UserConfigParams::m_artist_debug_mode)
-                m_ai_blue_spinner->setMin(0);
-            if(num_red_players || UserConfigParams::m_artist_debug_mode)
-                m_ai_kart_spinner->setMin(0);
+            m_ai_blue_spinner->setMin(0);
+            m_ai_kart_spinner->setMin(0);
+            if(num_blue_players == 0 && !UserConfigParams::m_artist_debug_mode)
+                m_ai_blue_spinner->setMin(1);
+            if(num_red_players == 0 && !UserConfigParams::m_artist_debug_mode)
+                m_ai_kart_spinner->setMin(1);
         }
         else
             m_ai_kart_spinner->setMin(0);
