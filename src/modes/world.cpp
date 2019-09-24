@@ -1549,8 +1549,21 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
 //-----------------------------------------------------------------------------
 void World::setAITeam()
 {
-    m_red_ai  = UserConfigParams::m_soccer_red_ai_num;
-    m_blue_ai = UserConfigParams::m_soccer_blue_ai_num;
+    m_red_ai  = race_manager->getNumberOfRedAIKarts();
+    m_blue_ai = race_manager->getNumberOfBlueAIKarts();
+    
+    for (int i = 0; i < (int)race_manager->getNumLocalPlayers(); i++)
+    {
+        KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+
+        // Happen in profiling mode
+        if (team == KART_TEAM_NONE)
+        {
+            race_manager->setKartTeam(i, KART_TEAM_BLUE);
+            team = KART_TEAM_BLUE;
+            continue; //FIXME, this is illogical
+        }
+    }
 
     Log::debug("World", "Blue AI: %d red AI: %d", m_blue_ai, m_red_ai);
 
