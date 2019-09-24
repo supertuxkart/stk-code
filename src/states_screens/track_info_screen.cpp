@@ -306,10 +306,12 @@ void TrackInfoScreen::init()
                 UserConfigParams::m_soccer_blue_ai_num = num_blue_ai;
             }
 
+	    int num_blue_upper = max_arena_players - local_players - num_red_ai;
+	    int num_red_upper  = max_arena_players - local_players - num_blue_ai;
             m_ai_kart_spinner->setMin(num_red_lower);
             m_ai_blue_spinner->setMin(num_blue_lower);
-            m_ai_kart_spinner->setMax(std::min( num_red_ai + (num_red_ai == num_red_lower ? 0 : 1), num_red_upper_hard )); // +1 to allow adding AI
-            m_ai_blue_spinner->setMax(std::min( num_blue_ai + (num_blue_ai == num_blue_lower ? 0 : 1), num_blue_upper_hard )); // +1 to allow adding AI
+            m_ai_kart_spinner->setMax(std::min( (num_red_ai == num_red_lower ? num_red_upper_hard : num_red_upper + 1), num_red_upper_hard )); // +1 to allow adding AI
+            m_ai_blue_spinner->setMax(std::min( (num_blue_ai == num_blue_lower ? num_blue_upper_hard : num_blue_upper + 1), num_blue_upper_hard )); // +1 to allow adding AI
 
             // Set the values
             m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
