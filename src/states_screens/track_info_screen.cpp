@@ -296,14 +296,15 @@ void TrackInfoScreen::init()
         
         if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         {
+			const int max_num_ai = max_arena_players - local_players;
             // Try the saved value, recalculate AI number (Balanced) if cannot use the saved values
-            if (UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_red_ai_num > num_ai)
+            if (UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num > max_num_ai)
             {
                 const int additional_blue = num_red_players - num_blue_players;
-                int num_blue_ai = (num_ai - additional_blue) / 2 + additional_blue;
-                int num_red_ai  = (num_ai - additional_blue) / 2;
+                int num_blue_ai = (max_num_ai - additional_blue) / 2 + additional_blue;
+                int num_red_ai  = (max_num_ai - additional_blue) / 2;
 
-                if ((num_ai + additional_blue)%2 == 1)
+                if ((max_num_ai + additional_blue)%2 == 1)
                     additional_blue < 0 ? num_red_ai++ : num_blue_ai++;
 
                 UserConfigParams::m_soccer_red_ai_num  = num_red_ai;
