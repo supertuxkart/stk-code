@@ -186,24 +186,11 @@ void TrackInfoScreen::init()
     m_ai_blue_spinner->setVisible(false);
     m_ai_blue_label->setVisible(false);
     m_ai_blue_label->setActive(false);
-    
-    // Check if there's any local players in both team
-    int num_blue_players = 0, num_red_players = 0;
 
     // Soccer options
     // -------------
     if (m_is_soccer)
     {
-        for (int i = 0; i < local_players; i++) 
-        {
-            KartTeam team = race_manager->getKartInfo(i).getKartTeam();
-            // Happen in profiling mode
-            if (team == KART_TEAM_NONE)
-                num_blue_players ++; // None team will set to blue
-            else
-                team == KART_TEAM_BLUE ? num_blue_players ++ : num_red_players ++;
-        }
-        
         m_target_type_label->setText(_("Soccer game type"), false);
 
         m_target_value_spinner->setVisible(true);
@@ -230,8 +217,6 @@ void TrackInfoScreen::init()
             m_target_value_label->setText(_("Number of goals to win"), false);
             m_target_value_spinner->setValue(UserConfigParams::m_num_goals);
         }
-
-        m_ai_kart_spinner->setActive(true);
     }
 
     // options for free-for-all and three strikes battle
@@ -296,7 +281,19 @@ void TrackInfoScreen::init()
         
         if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         {
-			const int max_num_ai = max_arena_players - local_players;
+            // Check if there's any local players in both team
+            int num_blue_players = 0, num_red_players = 0;
+            for (int i = 0; i < local_players; i++) 
+            {
+                KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+                // Happen in profiling mode
+                if (team == KART_TEAM_NONE)
+                    num_blue_players ++; // None team will set to blue
+                else
+                    team == KART_TEAM_BLUE ? num_blue_players ++ : num_red_players ++;
+            }
+            
+            const int max_num_ai = max_arena_players - local_players;
             // Try the saved value, recalculate AI number (Balanced) if cannot use the saved values
             if (UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num > max_num_ai)
             {
