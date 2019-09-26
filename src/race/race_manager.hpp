@@ -327,6 +327,8 @@ private:
     GrandPrixData                    m_grand_prix;
     SavedGrandPrix*                  m_saved_gp;
     int                              m_num_karts;
+    unsigned int                     m_num_red_ai;
+    unsigned int                     m_num_blue_ai;
     unsigned int                     m_num_ghost_karts;
     unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
@@ -474,6 +476,16 @@ public:
         m_ai_superpower = SUPERPOWER_NONE;
     }   // setNumKarts
     // ------------------------------------------------------------------------
+    void setNumRedAI(unsigned int num)
+    {
+        m_num_red_ai = num;
+    }   // setNumRedAI
+    // ------------------------------------------------------------------------
+    void setNumBlueAI(unsigned int num)
+    {
+        m_num_blue_ai = num;
+    }   // setNumBlueAI
+    // ------------------------------------------------------------------------
     void setTimeTarget(float time)
     {
         m_goal_target = 0;
@@ -505,12 +517,16 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the selected number of karts (selected number of players and
      *  AI karts. */
-    unsigned int getNumberOfKarts() const {return m_num_karts; }
+    unsigned int getNumberOfKarts() const { return m_num_karts; }
     // ------------------------------------------------------------------------
     unsigned int getNumberOfAIKarts() const
     {
         return (unsigned int)m_ai_kart_list.size(); 
     }   // getNumberOfAIKarts
+    // ------------------------------------------------------------------------
+    unsigned int getNumberOfRedAIKarts() const { return m_num_red_ai; }
+    // ------------------------------------------------------------------------
+    unsigned int getNumberOfBlueAIKarts() const { return m_num_blue_ai; }
     // ------------------------------------------------------------------------
     unsigned int getNumNonGhostKarts() const
                                     { return m_num_karts - m_num_ghost_karts; }

@@ -100,13 +100,7 @@ class TrackInfoScreen : public GUIEngine::Screen,
     
     int m_icon_unknown_kart;
 
-    /* The number of red and blue players */
-    int m_red_players;
-    int m_blue_players;
-
     void updateHighScores();
-
-    void getRedBluePlayerNumber();
 
 public:
     TrackInfoScreen();
