@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 14:50+0800\n"
+"POT-Creation-Date: 2019-09-26 10:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -709,7 +709,7 @@ msgstr ""
 #. I18N: In the server configuration screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/track_info_screen.cpp:212
+#: src/states_screens/track_info_screen.cpp:226
 msgid "Game mode"
 msgstr ""
 
@@ -1804,7 +1804,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
-msgid "Use IPV6 connection if server supports"
+msgid "Use IPv6 connection if server supports"
 msgstr ""
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
@@ -2120,13 +2120,19 @@ msgstr ""
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:511
-#: src/states_screens/track_info_screen.cpp:239
+#: src/states_screens/track_info_screen.cpp:253
 msgid "Number of laps"
 msgstr ""
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
+#: src/states_screens/track_info_screen.cpp:269
 msgid "Number of AI karts"
+msgstr ""
+
+#. I18N: ./data/gui/screens/track_info.stkgui
+#. I18N: In the track info screen
+msgid "Number of blue team AI karts"
 msgstr ""
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
@@ -2492,7 +2498,7 @@ msgstr ""
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr ""
 
-#: src/guiengine/engine.cpp:1374
+#: src/guiengine/engine.cpp:1391
 msgid "Loading"
 msgstr ""
 
@@ -3217,7 +3223,7 @@ msgstr ""
 msgid "%s left the game."
 msgstr ""
 
-#: src/main.cpp:1863
+#: src/main.cpp:1871
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3227,16 +3233,16 @@ msgid ""
 "\"Connect to the Internet\" and \"Send anonymous HW statistics\")."
 msgstr ""
 
-#: src/main.cpp:2131
+#: src/main.cpp:2139
 msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
-#: src/main.cpp:2163
+#: src/main.cpp:2171
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:2181
+#: src/main.cpp:2189
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3389,7 +3395,7 @@ msgstr ""
 #: src/network/protocols/client_lobby.cpp:697
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:173
 #: src/states_screens/online/create_server_screen.cpp:196
-#: src/states_screens/track_info_screen.cpp:192
+#: src/states_screens/track_info_screen.cpp:206
 msgid "Time limit"
 msgstr ""
 
@@ -3397,7 +3403,7 @@ msgstr ""
 #: src/network/protocols/client_lobby.cpp:698
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:198
-#: src/states_screens/track_info_screen.cpp:193
+#: src/states_screens/track_info_screen.cpp:207
 msgid "Goals limit"
 msgstr ""
 
@@ -3519,7 +3525,7 @@ msgstr ""
 #: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:180
-#: src/states_screens/track_info_screen.cpp:215
+#: src/states_screens/track_info_screen.cpp:229
 msgid "Free-For-All"
 msgstr ""
 
@@ -3593,7 +3599,7 @@ msgid "Follow the Leader"
 msgstr ""
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:214
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:228
 msgid "3 Strikes Battle"
 msgstr ""
 
@@ -4421,7 +4427,7 @@ msgstr ""
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:170
 #: src/states_screens/online/create_server_screen.cpp:192
-#: src/states_screens/track_info_screen.cpp:180
+#: src/states_screens/track_info_screen.cpp:194
 msgid "Soccer game type"
 msgstr ""
 
@@ -5009,28 +5015,28 @@ msgstr ""
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:444
 #: src/states_screens/online/tracks_screen.cpp:492
-#: src/states_screens/track_info_screen.cpp:310
+#: src/states_screens/track_info_screen.cpp:373
 msgid "Random item location"
 msgstr ""
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:474
-#: src/states_screens/track_info_screen.cpp:203
-#: src/states_screens/track_info_screen.cpp:551
+#: src/states_screens/track_info_screen.cpp:217
+#: src/states_screens/track_info_screen.cpp:626
 msgid "Number of goals to win"
 msgstr ""
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:482
-#: src/states_screens/track_info_screen.cpp:198
-#: src/states_screens/track_info_screen.cpp:218
-#: src/states_screens/track_info_screen.cpp:546
+#: src/states_screens/track_info_screen.cpp:212
+#: src/states_screens/track_info_screen.cpp:232
+#: src/states_screens/track_info_screen.cpp:621
 msgid "Maximum time (min.)"
 msgstr ""
 
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:522
-#: src/states_screens/track_info_screen.cpp:305
+#: src/states_screens/track_info_screen.cpp:368
 msgid "Drive in reverse"
 msgstr ""
 
@@ -5211,42 +5217,42 @@ msgid "System Language"
 msgstr ""
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:119
+#: src/states_screens/options/options_screen_ui.cpp:136
 msgid "In the bottom-left"
 msgstr ""
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:121
+#: src/states_screens/options/options_screen_ui.cpp:138
 msgid "On the right side"
 msgstr ""
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:123
+#: src/states_screens/options/options_screen_ui.cpp:140
 msgid "Hidden"
 msgstr ""
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:142
+#: src/states_screens/options/options_screen_ui.cpp:159
 msgid "Very small"
 msgstr ""
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:144
+#: src/states_screens/options/options_screen_ui.cpp:161
 msgid "Small"
 msgstr ""
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:146
+#: src/states_screens/options/options_screen_ui.cpp:163
 msgid "Medium"
 msgstr ""
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:148
+#: src/states_screens/options/options_screen_ui.cpp:165
 msgid "Large"
 msgstr ""
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:150
+#: src/states_screens/options/options_screen_ui.cpp:167
 msgid "Very large"
 msgstr ""
 
@@ -5544,19 +5550,23 @@ msgstr ""
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:143
+#: src/states_screens/track_info_screen.cpp:153
 #, c-format
 msgid "Track by %s"
 msgstr ""
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:151
+#: src/states_screens/track_info_screen.cpp:161
 #, c-format
 msgid "Max players supported: %d"
 msgstr ""
 
+#: src/states_screens/track_info_screen.cpp:314
+msgid "Number of red team AI karts"
+msgstr ""
+
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:438
+#: src/states_screens/track_info_screen.cpp:501
 msgid "(Empty)"
 msgstr ""
 
