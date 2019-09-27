@@ -574,7 +574,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 
 	genericDriverInit();
 
-	extGlSwapInterval(Params.Vsync ? 1 : 0);
+	extGlSwapInterval(Params.SwapInterval);
 	return true;
 }
 
@@ -687,7 +687,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceLinux* device)
 	genericDriverInit();
 
 	// set vsync
-	extGlSwapInterval(Params.Vsync ? 1 : 0);
+	extGlSwapInterval(Params.SwapInterval);
 	return true;
 }
 

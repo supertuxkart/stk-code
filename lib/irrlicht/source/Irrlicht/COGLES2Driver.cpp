@@ -84,7 +84,7 @@ namespace video
 		egl_params.handle_srgb = Params.HandleSRGB;
 		egl_params.force_legacy_device = Params.ForceLegacyDevice;
 		egl_params.with_alpha_channel = Params.WithAlphaChannel;
-		egl_params.vsync_enabled = Params.Vsync;
+		egl_params.swap_interval = Params.SwapInterval;
 	
 #if defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
 		egl_params.window = (EGLNativeWindowType)(data.OpenGLWin32.HWnd);

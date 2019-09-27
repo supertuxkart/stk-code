@@ -29,7 +29,7 @@ namespace irr
 			ZBufferBits(16),
 			Fullscreen(false),
 			Stencilbuffer(false),
-			Vsync(false),
+			SwapInterval(0),
 			AntiAlias(0),
 			HandleSRGB(false),
 			WithAlphaChannel(false),
@@ -67,7 +67,7 @@ namespace irr
 			ZBufferBits = other.ZBufferBits;
 			Fullscreen = other.Fullscreen;
 			Stencilbuffer = other.Stencilbuffer;
-			Vsync = other.Vsync;
+			SwapInterval = other.SwapInterval;
 			AntiAlias = other.AntiAlias;
 			HandleSRGB = other.HandleSRGB;
 			WithAlphaChannel = other.WithAlphaChannel;
@@ -130,10 +130,9 @@ namespace irr
 		bool Stencilbuffer;
 
 		//! Specifies vertical syncronisation.
-		/** If set to true, the driver will wait for the vertical
-		retrace period, otherwise not. May be silently ignored.
-		Default: false */
-		bool Vsync;
+		/** 0 = disabled, 1 = full, 2 = half
+		Default: 0 */
+		int SwapInterval;
 
 		//! Specifies if the device should use fullscreen anti aliasing
 		/** Makes sharp/pixelated edges softer, but requires more

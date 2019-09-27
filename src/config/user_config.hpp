@@ -838,10 +838,10 @@ namespace UserConfigParams
                            &m_graphics_quality,
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
 
-    PARAM_PREFIX BoolUserConfigParam         m_vsync
-            PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
+    PARAM_PREFIX IntUserConfigParam         m_swap_interval
+            PARAM_DEFAULT( IntUserConfigParam(0, "swap_interval",
                            &m_graphics_quality,
-                           "Whether vertical sync is enabled") );
+                           "Swap interval for vsync: 0 = disabled, 1 = full, 2 = half") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "motionblur_enabled", &m_graphics_quality,

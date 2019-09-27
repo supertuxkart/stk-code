@@ -154,7 +154,7 @@ IrrDriver::IrrDriver()
     p.WindowSize    = core::dimension2d<u32>(640,480);
     p.Bits          = 16U;
     p.Fullscreen    = false;
-    p.Vsync         = false;
+    p.SwapInterval  = 0;
     p.EventReceiver = NULL;
     p.FileSystem    = file_manager->getFileSystem();
 #ifdef ANDROID
@@ -462,7 +462,7 @@ void IrrDriver::initDevice()
             params.Bits          = bits;
             params.EventReceiver = this;
             params.Fullscreen    = UserConfigParams::m_fullscreen;
-            params.Vsync         = UserConfigParams::m_vsync;
+            params.SwapInterval  = UserConfigParams::m_swap_interval;
             params.FileSystem    = file_manager->getFileSystem();
             params.WindowSize    =
                 core::dimension2du(UserConfigParams::m_width,
@@ -515,7 +515,7 @@ void IrrDriver::initDevice()
                                     32, //bits per pixel
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
-                                    false,  // vsync
+                                    0,  // vsync
                                     this,   // event receiver
                                     file_manager->getFileSystem()
                                     );

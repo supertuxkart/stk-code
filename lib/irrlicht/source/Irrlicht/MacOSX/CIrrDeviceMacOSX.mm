@@ -904,7 +904,7 @@ bool CIrrDeviceMacOSX::createWindow()
 		if(CreationParams.DriverType == video::EDT_OPENGL)
 		{
 			CGLSetCurrentContext(CGLContext);
-			newSwapInterval = (CreationParams.Vsync) ? 1 : 0;
+			newSwapInterval = CreationParams.SwapInterval;
 			CGLSetParameter(CGLContext,kCGLCPSwapInterval,&newSwapInterval);
 		}
 	}

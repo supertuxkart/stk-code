@@ -145,7 +145,7 @@ bool ContextManagerEGL::init(const ContextEGLParams& params)
         return false;
     }
 
-    eglSwapInterval(m_egl_display, m_creation_params.vsync_enabled ? 1 : 0);
+    eglSwapInterval(m_egl_display, m_creation_params.swap_interval);
 
     m_initialized = true;
     return true;

@@ -83,7 +83,7 @@ struct ContextEGLParams
     bool force_legacy_device;
     bool handle_srgb;
     bool with_alpha_channel;
-    bool vsync_enabled;
+    int swap_interval;
     int pbuffer_width;
     int pbuffer_height;
 };
