@@ -185,11 +185,17 @@ void OptionsScreenVideo::init()
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
-
-    GUIEngine::CheckBoxWidget* vsync =
-        getWidget<GUIEngine::CheckBoxWidget>("vsync");
+    
+    GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
     assert( vsync != NULL );
-    vsync->setState( UserConfigParams::m_swap_interval > 0 );
+
+    vsync->clearLabels();
+    vsync->addLabel(L"Disabled");
+    //I18N: In the video options
+    vsync->addLabel(_("Full"));
+    //I18N: In the video options
+    vsync->addLabel(_("Half"));
+    vsync->setValue(UserConfigParams::m_swap_interval);
 
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
@@ -619,10 +625,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "vsync")
     {
-        GUIEngine::CheckBoxWidget* vsync =
-            getWidget<GUIEngine::CheckBoxWidget>("vsync");
+        GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
         assert( vsync != NULL );
-        UserConfigParams::m_swap_interval = (int)vsync->getState();
+        UserConfigParams::m_swap_interval = vsync->getValue();
     }
     else if (name == "rememberWinpos")
     {
