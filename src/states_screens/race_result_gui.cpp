@@ -190,11 +190,11 @@ void RaceResultGUI::enableAllButtons()
          (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
           race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
     {
-        left->setLabel(n == 1 ? _("You completed a challenge!")
+        middle->setLabel(n == 1 ? _("You completed a challenge!")
             : _("You completed challenges!"));
-        left->setImage("gui/icons/cup_gold.png");
-        left->setVisible(true);
-        left->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        middle->setImage("gui/icons/cup_gold.png");
+        middle->setVisible(true);
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
@@ -233,28 +233,28 @@ void RaceResultGUI::enableAllButtons()
         // Normal race
         // -----------
 
-        middle->setLabel(_("Restart"));
-        middle->setImage("gui/icons/restart.png");
-        middle->setVisible(true);
-        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        left->setLabel(_("Restart"));
+        left->setImage("gui/icons/restart.png");
+        left->setVisible(true);
+        left->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         if (race_manager->raceWasStartedFromOverworld())
         {
-            left->setVisible(false);
+            middle->setVisible(false);
             right->setLabel(_("Back to challenge selection"));
             right->setImage("gui/icons/back.png");
         }
         else
         {
-            left->setImage("gui/icons/main_race.png");
+            middle->setImage("gui/icons/main_race.png");
             if (race_manager->isRecordingRace())
-                left->setLabel(_("Race against the new ghost replay"));
+                middle->setLabel(_("Race against the new ghost replay"));
             else
-                left->setLabel(_("Setup New Race"));
-            left->setVisible(true);
+                middle->setLabel(_("Setup New Race"));
+            middle->setVisible(true);
             right->setLabel(_("Back to the menu"));
             right->setImage("gui/icons/back.png");
-            right->setVisible(true);
         }
+        right->setVisible(true);
     }
 }   // enableAllButtons
 
@@ -318,7 +318,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
               race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
 
         {
-            if (action == "left")
+            if (action == "middle")
             {
                 if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
                 {
@@ -416,7 +416,11 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
 
         StateManager::get()->popMenu();
-        if (action == "left")                 // Setup new race
+        if (action == "left")        // Restart
+        {
+            race_manager->rerunRace();
+        }
+        else if (action == "middle")                 // Setup new race
         {
             // Save current race data for race against new ghost
             std::string track_name = race_manager->getTrackName();
@@ -458,10 +462,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                                       NULL };
                 StateManager::get()->resetAndSetStack(newStack);
             }
-        }
-        else if (action == "middle")        // Restart
-        {
-            race_manager->rerunRace();
         }
         else if (action == "right")        // Back to main
         {
