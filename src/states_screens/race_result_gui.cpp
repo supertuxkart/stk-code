@@ -84,9 +84,9 @@ void RaceResultGUI::init()
 
     m_timer = 0;
 
-    getWidget("top")->setVisible(false);
+    getWidget("left")->setVisible(false);
     getWidget("middle")->setVisible(false);
-    getWidget("bottom")->setVisible(false);
+    getWidget("right")->setVisible(false);
 
     music_manager->stopMusic();
 
@@ -172,13 +172,13 @@ void RaceResultGUI::enableAllButtons()
     // If we're in a network world, change the buttons text
     if (World::getWorld()->isNetworkWorld())
     {
-        left->setText(_("Continue"));
-        left->setImage("green_check.png");
+        left->setLabel(_("Continue"));
+        left->setImage("gui/icons/green_check.png");
         left->setVisible(true);
         left->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         middle->setVisible(false);
-        right->setText(_("Quit the server"));
-        right->setImage("main_quit.png");
+        right->setLabel(_("Quit the server"));
+        right->setImage("gui/icons/main_quit.png");
         right->setVisible(true);
         return;
     }
@@ -190,30 +190,40 @@ void RaceResultGUI::enableAllButtons()
          (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
           race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
     {
-        middle->setText(n == 1 ? _("You completed a challenge!")
+        left->setLabel(n == 1 ? _("You completed a challenge!")
             : _("You completed challenges!"));
-        middle->setImage("green_check.png");
-        middle->setVisible(true);
-        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        left->setImage("gui/icons/cup_gold.png");
+        left->setVisible(true);
+        left->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         // In case of a GP:
         // ----------------
-        left->setVisible(false);
-        left->setFocusable(false);
+        middle->setLabel(_("Continue"));
+        middle->setImage("gui/icons/green_check.png");
+        middle->setVisible(false);
+        middle->setFocusable(false);
         right->setVisible(false);
+        right->setFocusable(false);
 
-        middle->setText(_("Continue"));
-        middle->setImage("green_check.png");
-        middle->setVisible(true);
+        // Two continue buttons to make sure the buttons in the bar is balanced
+        left->setLabel(_("Continue"));
+        left->setImage("gui/icons/green_check.png");
+        left->setVisible(true);
 
         if (race_manager->getTrackNumber() + 1 < race_manager->getNumOfTracks()) 
         {
-            right->setText(_("Abort Grand Prix"));
-            right->setImage("race_giveup.png");
+            right->setLabel(_("Abort Grand Prix"));
+            right->setImage("gui/icons/race_giveup.png");
             right->setVisible(true);
             right->setFocusable(true);
+        }
+        else
+        {
+            left->setVisible(false);
+            left->setFocusable(false);
+            middle->setVisible(true);
         }
 
         middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -223,27 +233,28 @@ void RaceResultGUI::enableAllButtons()
         // Normal race
         // -----------
 
-        left->setText(_("Restart"));
-        left->setImage("restart.png");
-        left->setVisible(true);
-        left->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        middle->setLabel(_("Restart"));
+        middle->setImage("gui/icons/restart.png");
+        middle->setVisible(true);
+        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
         if (race_manager->raceWasStartedFromOverworld())
         {
-            middle->setVisible(false);
-            right->setText(_("Back to challenge selection"));
-            right->setImage("back.png");
+            left->setVisible(false);
+            right->setLabel(_("Back to challenge selection"));
+            right->setImage("gui/icons/back.png");
         }
         else
         {
-            middle->setImage("main_race.png");
+            left->setImage("gui/icons/main_race.png");
             if (race_manager->isRecordingRace())
-                middle->setText(_("Race against the new ghost replay"));
+                left->setLabel(_("Race against the new ghost replay"));
             else
-                middle->setText(_("Setup New Race"));
-            right->setText(_("Back to the menu"));
-            right->setImage("back.png");
+                left->setLabel(_("Setup New Race"));
+            left->setVisible(true);
+            right->setLabel(_("Back to the menu"));
+            right->setImage("gui/icons/back.png");
+            right->setVisible(true);
         }
-        right->setVisible(true);
     }
 }   // enableAllButtons
 
@@ -268,22 +279,20 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     
     if(name == "operations")
     {
-        GUIEngine::RibbonWidget* operations =
-        getWidget<GUIEngine::RibbonWidget>("operations");
         const std::string& action =
-            operations->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+            getWidget<GUIEngine::RibbonWidget>("operations")->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         // If we're playing online :
         if (World::getWorld()->isNetworkWorld())
         {
-            if (action == "middle") // Continue button (return to server lobby)
+            if (action == "left") // Continue button (return to server lobby)
             {
                 // Signal to the server that this client is back in the lobby now.
                 auto cl = LobbyProtocol::get<ClientLobby>();
                 if (cl)
                     cl->doneWithResults();
-                getWidget("middle")->setText(_("Waiting for others"));
+                getWidget<GUIEngine::IconButtonWidget>("left")->setLabel(_("Waiting for others"));
             }
-            if (action == "bottom") // Quit server (return to online lan / wan menu)
+            if (action == "right") // Quit server (return to online lan / wan menu)
             {
                 race_manager->clearNetworkGrandPrixResult();
                 if (STKHost::existHost())
@@ -309,7 +318,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
               race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
 
         {
-            if (action == "top")
+            if (action == "left")
             {
                 if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
                 {
@@ -387,13 +396,13 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         // -----------------
         if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
-            if (action == "middle")        // Next GP
+            if (action == "left" || action == "middle")        // Next GP
             {
                 cleanupGPProgress();
                 StateManager::get()->popMenu();
                 race_manager->next();
             }
-            else if (action == "bottom")        // Abort
+            else if (action == "right")        // Abort
             {
                 new MessageDialog(_("Do you really want to abort the Grand Prix?"),
                     MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false);
@@ -407,7 +416,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
 
         StateManager::get()->popMenu();
-        if (action == "top")                 // Setup new race
+        if (action == "left")                 // Setup new race
         {
             // Save current race data for race against new ghost
             std::string track_name = race_manager->getTrackName();
@@ -454,7 +463,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         {
             race_manager->rerunRace();
         }
-        else if (action == "bottom")        // Back to main
+        else if (action == "right")        // Back to main
         {
             race_manager->exitRace();
             race_manager->setAIKartOverride("");
@@ -465,10 +474,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 OverWorld::enterOverWorld();
             }
         }
-        else
-            Log::warn("RaceResultGUI", "Incorrect event '%s' for normal race.",
-                action.c_str());
     }
+    else
+        Log::warn("RaceResultGUI", "Incorrect event '%s' for normal race.",
+            name.c_str());
     return;
 }   // eventCallback
 
