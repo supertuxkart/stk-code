@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 2.8.4)
-# Je rajoute un commentaire pour faire un test, c'est cool enfaite ?
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
 set(PROJECT_VERSION "git")
