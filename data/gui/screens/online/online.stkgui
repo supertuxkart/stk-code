@@ -25,7 +25,7 @@
                          icon="gui/icons/menu_multi.png" focus_icon="gui/icons/menu_multi_focus.png"
                          I18N="Networking menu button" text="Local networking"/>
             <icon-button id="wan" width="128" height="128"
-                         icon="gui/icons/menu_multi.png" focus_icon="gui/icons/menu_multi_focus.png"
+                         icon="gui/icons/menu_online.png" focus_icon="gui/icons/menu_online_focus.png"
                          I18N="Networking menu button" text="Global networking"/>
             <icon-button id="enter-address" width="128" height="128"
                          icon="gui/icons/online/menu_quick_play.png" focus_icon="gui/icons/online/menu_quick_play_hover.png"
