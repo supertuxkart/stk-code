@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.4)
-
+# Je rajoute un commentaire pour faire un test, c'est cool enfaite ?
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
 set(PROJECT_VERSION "git")
@@ -54,8 +54,8 @@ endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
-    
-    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
+
+    if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR
        (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
         option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
     else()
