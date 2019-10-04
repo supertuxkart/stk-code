@@ -588,7 +588,7 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
 
                 binding_to_set = (PlayerAction)n;
 
-                new PressAKeyDialog(0.5f, 0.4f);
+                new PressAKeyDialog(0.5f, 0.4f, m_config->isKeyboard());
 
                 if (m_config->isKeyboard())
                 {

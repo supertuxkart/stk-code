@@ -28,10 +28,15 @@ using namespace irr::gui;
 
 // ------------------------------------------------------------------------------------------------------
 
-PressAKeyDialog::PressAKeyDialog(const float w, const float h) :
+PressAKeyDialog::PressAKeyDialog(const float w, const float h, const bool isKeyboardFlag) :
         ModalDialog(w, h)
 {
     loadFromFile("press_a_key_dialog.stkgui");
+    if(isKeyboardFlag)
+    {
+        Widget* title = getWidget("title");
+        title->setText("Press any key...");
+    }
 }
 
 // ------------------------------------------------------------------------------------------------------

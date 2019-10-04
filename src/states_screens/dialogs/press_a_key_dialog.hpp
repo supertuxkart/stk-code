@@ -31,7 +31,7 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    PressAKeyDialog(const float percentWidth, const float percentHeight);
+    PressAKeyDialog(const float percentWidth, const float percentHeight, const bool isKeyboardFlag);
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
 
