@@ -22,7 +22,7 @@ To build SuperTuxKart from source, you'll need to install the following packages
 * Fribidi (libfribidi-dev)
 * libcurl (libcurl-devel)
 * libbluetooth (bluez-devel)
-* libnettle (nettle-dev)
+* openssl (openssl-dev)
 * libpng (libpng-devel)
 * zlib (zlib-devel)
 * jpeg (libjpeg-turbo-devel)
@@ -33,7 +33,7 @@ Fedora command:
 sudo dnf install @development-tools cmake bluez-libs-devel \
 openssl-devel libcurl-devel freetype-devel harfbuzz-devel fribidi-devel mesa-libGL-devel \
 libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
-libvorbis-devel libXrandr-devel libGLEW nettle-devel pkgconf zlib-devel
+libvorbis-devel libXrandr-devel libGLEW openssl-devel pkgconf zlib-devel
 ```
 
 Mageia 6 command:
