@@ -882,8 +882,9 @@ bool onEvent(const SEvent &event)
             
         // Create the menu (only one menu at a time)
         #ifdef MOBILE_STK
-        int pos = 30 * irr_driver->getActualScreenSize().Height / 480;
-        if (event.MouseInput.X < pos && event.MouseInput.Y < pos &&
+        int x = 10 * irr_driver->getActualScreenSize().Height / 480;
+        int y = 30 * irr_driver->getActualScreenSize().Height / 480;
+        if (event.MouseInput.X < x && event.MouseInput.Y < y &&
         #else
         if (event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN &&
         #endif
