@@ -30,10 +30,14 @@ To build SuperTuxKart from source, you'll need to install the following packages
 Fedora command:
 
 ```bash
-sudo dnf install @development-tools cmake bluez-libs-devel \
-openssl-devel libcurl-devel freetype-devel harfbuzz-devel fribidi-devel mesa-libGL-devel \
-libjpeg-turbo-devel libogg-devel openal-soft-devel libpng-devel \
-libvorbis-devel libXrandr-devel libGLEW openssl-devel pkgconf zlib-devel
+sudo dnf install @development-tools angelscript-devel \ 
+bluez-libs-devel cmake desktop-file-utils  \
+freealut-devel freeglut-devel freetype-devel fribidi-devel \
+gcc-c++ git-core libXrandr-devel libcurl-devel libjpeg-turbo-devel \ 
+libpng-devel libsquish-devel libtool libvorbis-devel mesa-libEGL-devel \ 
+mesa-libGLES-devel openal-soft-devel openssl-devel libcurl-devel harfbuzz-devel \ 
+fribidi-devel mesa-libGL-devel libogg-devel libGLEW openssl-devel pkgconf \
+wiiuse-devel zlib-devel
 ```
 
 Mageia 6 command:
