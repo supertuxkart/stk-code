@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the supertuxkart package.
-# 
+#
 # Translators:
 # Ben Au, 2015
 # Benau, 2016,2018-2019
@@ -5150,7 +5150,7 @@ msgstr "加速"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:272
-msgid "Brake"
+msgid "Brake/Reverse"
 msgstr "煞車"
 
 #. I18N: Key binding name

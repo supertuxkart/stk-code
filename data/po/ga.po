@@ -5173,7 +5173,7 @@ msgstr "Luathaigh"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:272
-msgid "Brake"
+msgid "Brake/Reverse"
 msgstr "Coscán"
 
 #. I18N: Key binding name

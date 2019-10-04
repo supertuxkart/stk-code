@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the supertuxkart package.
-# 
+#
 # Translators:
 msgid ""
 msgstr ""
@@ -5148,8 +5148,8 @@ msgstr "Accelerate"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:272
-msgid "Brake"
-msgstr "Brake"
+msgid "Brake/Reverse"
+msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:275
