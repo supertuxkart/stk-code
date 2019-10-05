@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="0" y="0" height="9%" icon="gui/icons/back.png"/>
 
-    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
-
-        <header width="80%" text="Race Setup" align="center" text_align="center" />
-
+    <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" >
+        <header height="8%" width="80%" text="Race Setup" align="center" text_align="center" />
         <spacer height="1%" width="25"/>
 
         <bubble height="fit" width="100%" id="lblLeftRight" I18N="In soccer setup screen" text="Use left/right to choose your team and press fire" word_wrap="true" text_align="center"/>

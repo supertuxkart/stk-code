@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="0" y="0" height="9%" icon="gui/icons/back.png"/>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-        <header width="80%" height="7%" align="center" text="SuperTuxKart Help" text_align="center"/>
+        <header width="80%" height="8%" align="center" text="SuperTuxKart Help" text_align="center"/>
         <spacer height="1%" width="100%"/>
 
-        <div width="100%" height="92%" layout="horizontal-row" >
+        <div width="100%" height="91%" layout="horizontal-row" >
 
             <vertical-tabs id="category" height="100%" width="18%">
                 <icon-button id="page1" width="128" height="128" icon="gui/icons/options_general.png"

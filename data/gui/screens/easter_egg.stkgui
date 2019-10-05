@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="0" y="0" height="9%" icon="gui/icons/back.png"/>
 
     <div x="2%" y="1%" width="96%" height="99%" layout="vertical-row" >
 
-        <header width="80%" I18N="Section in easter egg tracks selection screen" text="All Tracks"
+        <header height="8%" width="80%" I18N="Section in easter egg tracks selection screen" text="All Tracks"
                 align="center" text_align="center" />
-
-        <spacer width="20" height="5" />
+        <spacer width="20" height="1%" />
 
         <box proportion="1" width="100%" layout="vertical-row" padding="2">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"

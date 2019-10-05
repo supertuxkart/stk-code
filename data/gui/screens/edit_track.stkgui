@@ -2,11 +2,12 @@
 <stkgui>
     <div x="2%" y="1%" width="96%" height="98%" layout="vertical-row" padding="10">
 
-        <header id="selected_track" width="80%"
+        <header id="selected_track" height="8%" width="80%"
             I18N="No neeed to translate this, it will be overwritten by the track name"
             text="" align="center" text_align="center" />
+        <spacer height="1%" />
 
-        <spacer height="20" />
+        <spacer height="2%" />
 
         <!-- Track selection -->
         <box proportion="3" width="100%" layout="vertical-row">

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="0%" y="0%" width="100%" height="98%" layout="vertical-row" >
-        <div x="0" y="0" width="100%" layout="horizontal-row" height="8%">
-            <icon-button id="back"   height="100%" icon="gui/icons/back.png"/>
-            <header text_align="center" proportion="1" text="SuperTuxKart Addons" align="center"/>
-            <icon-button id="reload"   height="90%" icon="gui/icons/restart.png"/>
-        </div>
+    <div x="0" y="0" width="100%" layout="horizontal-row" height="9%">
+        <icon-button id="back" height="100%" icon="gui/icons/back.png"/>
+        <spacer proportion="1" height="5"/>
+        <icon-button id="reload" height="90%" icon="gui/icons/restart.png"/>
+    </div>
+
+    <div x="0%" y="1%" width="100%" height="98%" layout="vertical-row" >
+        <header width="80%" height="8%" align="center" text_align="center" text="SuperTuxKart Addons"/>
+        <spacer width="100%" height="1%"/>
 
         <box id="filter_box" width="97%" height="2f" layout="vertical-row" align="center">
             <div x="0" y="0" width="98%" height="100%" layout="horizontal-row" align="center">

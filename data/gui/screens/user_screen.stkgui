@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-
-        <header align="center" width="80%" text="Login" text_align="center"/>
-        <spacer height="15" width="10"/>
+        <header align="center" height="8%"width="80%" text="Login" text_align="center"/>
+        <spacer height="1%" width="10"/>
 
         <box proportion="1" width="98%" layout="vertical-row">
 
@@ -77,5 +76,5 @@
         <spacer width="20" height="15"/>
     </div>
 
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="0" y="0" height="9%" icon="gui/icons/back.png"/>
 </stkgui>

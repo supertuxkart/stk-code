@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="0" y="0" width="100%" height="100%" layout="vertical-row" >
-        <header id="title" text_align="center" width="80%" align="center" I18N="In the server creation screen" text="Server Creation"/>
-        <box proportion="1" width="90%" layout="vertical-row" align="center">
+    <div x="0" y="1%" width="100%" height="99%" layout="vertical-row" >
+        <header id="title" text_align="center" height="8%" width="80%" align="center" I18N="In the server creation screen" text="Server Creation"/>
+        <spacer width="100%" height="1%"/>
+
+        <box proportion="1" width="89%" layout="vertical-row" align="center">
 
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" text_align="left" I18N="In the server creation screen" text="Name of the server"/>
                 <textbox proportion="1" id="name" I18N="In the server creation screen"/>
             </div>
 
-            <spacer height="2%" width="20"/>
+            <spacer height="1%" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" text_align="left" I18N="In the server creation screen" text="Max. number of players"/>
                 <gauge id="max_players" proportion="1" min_value="2"/>
             </div>
 
-            <spacer height="2%" width="20"/>
+            <spacer height="1%" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" text_align="left" I18N="In the server creation screen" text="Password for private server (optional)"/>
@@ -48,7 +50,7 @@
                         I18N="Multiplayer game mode" text="Soccer"/>
             </ribbon>
 
-            <spacer height="2%" width="20"/>
+            <spacer height="1%" width="20"/>
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label id="more-options"  proportion="1" text_align="left"/>
                 <spinner id="more-options-spinner" proportion="1" wrap_around="true"/>
