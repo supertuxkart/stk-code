@@ -21,6 +21,7 @@
 #include "input/input_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/options/options_screen_device.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
@@ -35,7 +36,7 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h, const bool isKeyb
     if(isKeyboardFlag)
     {
         Widget* title = getWidget("title");
-        title->setText("Press any key...");
+        title->setText(_("Press any key..."));
     }
 }
 
