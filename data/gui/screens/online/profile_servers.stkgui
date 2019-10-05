@@ -22,7 +22,7 @@
                          I18N="In the online multiplayer screen" text="Quick Play"/>
         </buttonbar>
 
-        <spacer height="10%" width="10"/>
+        <spacer height="5%" width="10"/>
         
     </div>
 </stkgui>

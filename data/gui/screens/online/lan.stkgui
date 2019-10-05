@@ -24,7 +24,7 @@
                          -->
         </buttonbar>
 
-        <spacer height="10%" width="10"/>
+        <spacer height="5%" width="10"/>
         
     </div>
 </stkgui>

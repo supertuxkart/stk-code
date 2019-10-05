@@ -3,8 +3,9 @@
     <div x="0" y="1%" width="100%" height="98%" layout="vertical-row" >
         <header text_align="center" height="8%" width="80%" align="center" text="Online"/>
         <spacer height="1%" width="10"/>
+
         <button id="user-id" width="12f" height="fit" align="center"/>
-        <spacer height="20"/>
+        <spacer height="2%" width="10"/>
 
         <box width="fit" height="fit"  layout="horizontal-row" align="center" valign="center">
             <spacer width="25"/>
@@ -15,10 +16,7 @@
             <spacer width="25"/>
         </box>
 
-        <spacer height="15" width="10"/>
         <icon id="logo" align="center" proportion="4" width="100%" icon="gui/icons/logo.png"/>
-
-        <spacer height="15" width="10"/>
         
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="lan" width="128" height="128"
@@ -35,7 +33,7 @@
                          I18N="Networking menu button" text="Your profile"/>
         </buttonbar>
 
-        <spacer height="10%" width="10"/>
+        <spacer height="5%" width="10"/>
 
     </div>
     

@@ -34,7 +34,7 @@ using namespace irr::core;
 GeneralTextFieldDialog::GeneralTextFieldDialog(const core::stringw& title,
                                                DismissCallback dm_cb,
                                                ValidationCallback val_cb)
-                  : ModalDialog(0.95f, 0.4f,
+                  : ModalDialog(0.95f, 0.5f,
                     GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM),
                     m_dm_cb(dm_cb), m_val_cb(val_cb), m_self_destroy(false)
 {
