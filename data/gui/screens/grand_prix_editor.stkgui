@@ -34,7 +34,7 @@
                 I18N="Menu item" text="New" />
             <icon-button id="copy" width="128" height="128" icon="gui/icons/gp_copy.png"
                 I18N="Menu item" text="Copy" />
-            <icon-button id="edit" width="128" height="128" icon="gui/icons/edit.png"
+            <icon-button id="edit" width="128" height="128" icon="gui/icons/gp_edit.png"
                 I18N="Menu item" text="Edit" />
             <icon-button id="remove" width="128" height="128" icon="gui/icons/gp_remove.png"
                 I18N="Menu item" text="Remove" />
