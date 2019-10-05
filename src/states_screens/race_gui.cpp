@@ -120,7 +120,7 @@ RaceGUI::RaceGUI()
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
-    m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "gp_new.png");
+    m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
