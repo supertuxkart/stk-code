@@ -15,7 +15,7 @@
                 <icon-button id="tab_audio" width="128" height="128" icon="gui/icons/options_audio.png"
                         I18N="Section in the settings menu" text="Audio"/>
                 <icon-button id="tab_ui" width="128" height="128" icon="gui/icons/options_ui.png"
-                        I18N="Section in the settings menu" text="User Interface"/>
+                        I18N="Section in the settings menu" text="Interface"/>
                 <icon-button id="tab_players" width="128" height="128" icon="gui/icons/options_players.png"
                         I18N="Section in the settings menu" text="Players"/>
                 <icon-button id="tab_controls" width="128" height="128" icon="gui/icons/options_input.png"
