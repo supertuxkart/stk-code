@@ -163,6 +163,8 @@ void RaceResultGUI::enableAllButtons()
     GUIEngine::IconButtonWidget *left = getWidget<GUIEngine::IconButtonWidget>("left");
     GUIEngine::IconButtonWidget *middle = getWidget<GUIEngine::IconButtonWidget>("middle");
     GUIEngine::IconButtonWidget *right = getWidget<GUIEngine::IconButtonWidget>("right");
+    GUIEngine::RibbonWidget *operations = getWidget<GUIEngine::RibbonWidget>("operations");
+    operations->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
@@ -175,7 +177,7 @@ void RaceResultGUI::enableAllButtons()
         left->setLabel(_("Continue"));
         left->setImage("gui/icons/green_check.png");
         left->setVisible(true);
-        left->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        operations->select("left", PLAYER_ID_GAME_MASTER);
         middle->setVisible(false);
         right->setLabel(_("Quit the server"));
         right->setImage("gui/icons/main_quit.png");
@@ -194,7 +196,7 @@ void RaceResultGUI::enableAllButtons()
             : _("You completed challenges!"));
         middle->setImage("gui/icons/cup_gold.png");
         middle->setVisible(true);
-        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        operations->select("middle", PLAYER_ID_GAME_MASTER);
     }
     else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
@@ -218,15 +220,16 @@ void RaceResultGUI::enableAllButtons()
             right->setImage("gui/icons/race_giveup.png");
             right->setVisible(true);
             right->setFocusable(true);
+            operations->select("left", PLAYER_ID_GAME_MASTER);
         }
         else
         {
             left->setVisible(false);
             left->setFocusable(false);
             middle->setVisible(true);
+            operations->select("middle", PLAYER_ID_GAME_MASTER);
         }
 
-        middle->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else
     {
@@ -236,7 +239,7 @@ void RaceResultGUI::enableAllButtons()
         left->setLabel(_("Restart"));
         left->setImage("gui/icons/restart.png");
         left->setVisible(true);
-        left->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        operations->select("left", PLAYER_ID_GAME_MASTER);
         if (race_manager->raceWasStartedFromOverworld())
         {
             middle->setVisible(false);
