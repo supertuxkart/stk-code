@@ -138,6 +138,8 @@ void OptionsScreenUI::loadedFromFile()
     minimap_options->addLabel( core::stringw(_("On the right side")));
     //I18N: In the UI options, minimap position in the race UI 
     minimap_options->addLabel( core::stringw(_("Hidden")));
+    //I18N: In the UI options, minimap position in the race UI
+    minimap_options->addLabel( core::stringw(_("Centered")));
     minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
 
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
@@ -148,7 +150,7 @@ void OptionsScreenUI::loadedFromFile()
     {
         minimap_options->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     }
-    minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "3";
 
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
