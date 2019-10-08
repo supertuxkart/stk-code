@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-26 10:23+0800\n"
+"POT-Creation-Date: 2019-10-08 09:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -856,7 +856,7 @@ msgstr ""
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:236
+#: src/states_screens/race_result_gui.cpp:255
 msgid "Setup New Race"
 msgstr ""
 
@@ -873,8 +873,9 @@ msgstr ""
 #. I18N: ./data/gui/screens/grand_prix_win.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:175
-#: src/states_screens/race_result_gui.cpp:202
+#: src/states_screens/race_result_gui.cpp:177
+#: src/states_screens/race_result_gui.cpp:205
+#: src/states_screens/race_result_gui.cpp:213
 msgid "Continue"
 msgstr ""
 
@@ -1836,6 +1837,8 @@ msgstr ""
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: Section in the settings menu
+#. I18N: ./data/gui/screens/options_video.stkgui
+#. I18N: In the video settings
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Graphics"
@@ -1876,7 +1879,7 @@ msgstr ""
 #. I18N: Section in the settings menu
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
-msgid "User Interface"
+msgid "Interface"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
@@ -1946,7 +1949,7 @@ msgstr ""
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:459
+#: src/states_screens/options/options_screen_video.cpp:465
 msgid "Enabled"
 msgstr ""
 
@@ -2057,7 +2060,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
-msgid "Graphical Effects Level"
+msgid "Vertical Sync (requires restart)"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
@@ -2067,7 +2070,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
-msgid "Vertical Sync (requires restart)"
+msgid "Graphical Effects Level"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
@@ -3373,7 +3376,7 @@ msgstr ""
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:666
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
-#: src/states_screens/race_result_gui.cpp:1717
+#: src/states_screens/race_result_gui.cpp:1742
 #, c-format
 msgid "Difficulty: %s"
 msgstr ""
@@ -4166,13 +4169,14 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:162
-#: src/states_screens/options/options_screen_video.cpp:462
+#: src/states_screens/options/options_screen_video.cpp:193
+#: src/states_screens/options/options_screen_video.cpp:468
 msgid "Disabled"
 msgstr ""
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:464
+#: src/states_screens/options/options_screen_video.cpp:470
 msgid "Important only"
 msgstr ""
 
@@ -4182,7 +4186,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:471
+#: src/states_screens/options/options_screen_video.cpp:477
 msgid "Low"
 msgstr ""
 
@@ -4192,14 +4196,14 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:474
+#: src/states_screens/options/options_screen_video.cpp:480
 msgid "High"
 msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:468
+#: src/states_screens/options/options_screen_video.cpp:474
 msgid "Very Low"
 msgstr ""
 
@@ -4337,6 +4341,11 @@ msgstr ""
 msgid "Tell server administrator about this player (%s):"
 msgstr ""
 
+#. I18N: In press a key dialog, tell user to press a key to bind configuration
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:40
+msgid "Press any key..."
+msgstr ""
+
 #: src/states_screens/dialogs/race_paused_dialog.cpp:103
 #: src/states_screens/online/networking_lobby.cpp:231
 #: src/states_screens/online/networking_lobby.cpp:778
@@ -4383,7 +4392,7 @@ msgstr ""
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1707
+#: src/states_screens/race_result_gui.cpp:1732
 #, c-format
 msgid "Laps: %i"
 msgstr ""
@@ -4679,7 +4688,7 @@ msgid "Better luck next time!"
 msgstr ""
 
 #: src/states_screens/grand_prix_win.cpp:165
-#: src/states_screens/race_result_gui.cpp:190
+#: src/states_screens/race_result_gui.cpp:195
 msgid "You completed a challenge!"
 msgstr ""
 
@@ -5098,7 +5107,7 @@ msgstr ""
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:272
-msgid "Brake"
+msgid "Brake / Reverse"
 msgstr ""
 
 #. I18N: Key binding name
@@ -5256,88 +5265,98 @@ msgstr ""
 msgid "Very large"
 msgstr ""
 
-#. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:441
-msgid "Custom"
+#. I18N: In the video options, full vertical sync (usually 60fps)
+#: src/states_screens/options/options_screen_video.cpp:195
+msgid "Full"
 msgstr ""
 
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:477
-#, c-format
-msgid "Particles Effects: %s"
+#. I18N: In the video options, half vertical sync (usually 30fps)
+#: src/states_screens/options/options_screen_video.cpp:197
+msgid "Half"
+msgstr ""
+
+#. I18N: custom video settings
+#: src/states_screens/options/options_screen_video.cpp:447
+msgid "Custom"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:483
 #, c-format
-msgid "Animated Characters: %s"
-msgstr ""
-
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:486
-#, c-format
-msgid "Dynamic lights: %s"
+msgid "Particles Effects: %s"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:489
 #, c-format
-msgid "Light scattering: %s"
+msgid "Animated Characters: %s"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:492
 #, c-format
-msgid "Motion blur: %s"
+msgid "Dynamic lights: %s"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:495
 #, c-format
-msgid "Anti-aliasing: %s"
+msgid "Light scattering: %s"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:498
 #, c-format
+msgid "Motion blur: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:501
+#, c-format
+msgid "Anti-aliasing: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:504
+#, c-format
 msgid "Ambient occlusion: %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:502
+#: src/states_screens/options/options_screen_video.cpp:508
 #, c-format
 msgid "Shadows: %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:504
+#: src/states_screens/options/options_screen_video.cpp:510
 #, c-format
 msgid "Shadows: %i"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:507
+#: src/states_screens/options/options_screen_video.cpp:513
 #, c-format
 msgid "Bloom: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:511
+#: src/states_screens/options/options_screen_video.cpp:517
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:515
+#: src/states_screens/options/options_screen_video.cpp:521
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:519
+#: src/states_screens/options/options_screen_video.cpp:525
 #, c-format
 msgid "Depth of field: %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:524
+#: src/states_screens/options/options_screen_video.cpp:530
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr ""
@@ -5393,7 +5412,7 @@ msgstr ""
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:79
-#: src/states_screens/race_result_gui.cpp:272
+#: src/states_screens/race_result_gui.cpp:296
 msgid "Waiting for others"
 msgstr ""
 
@@ -5433,88 +5452,88 @@ msgstr ""
 msgid "Press fire to start the challenge"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:178
+#: src/states_screens/race_result_gui.cpp:182
 msgid "Quit the server"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:191
+#: src/states_screens/race_result_gui.cpp:196
 msgid "You completed challenges!"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:207
+#: src/states_screens/race_result_gui.cpp:219
 msgid "Abort Grand Prix"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:223
+#: src/states_screens/race_result_gui.cpp:239
 msgid "Restart"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:229
+#: src/states_screens/race_result_gui.cpp:246
 msgid "Back to challenge selection"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:234
+#: src/states_screens/race_result_gui.cpp:253
 msgid "Race against the new ghost replay"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:238
+#: src/states_screens/race_result_gui.cpp:257
 msgid "Back to the menu"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:386
+#: src/states_screens/race_result_gui.cpp:410
 msgid "Do you really want to abort the Grand Prix?"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:471
+#: src/states_screens/race_result_gui.cpp:496
 msgid "Network grand prix has been finished."
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:507
-#: src/states_screens/race_result_gui.cpp:1303
+#: src/states_screens/race_result_gui.cpp:532
+#: src/states_screens/race_result_gui.cpp:1328
 msgid "Red Team Wins"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:509
-#: src/states_screens/race_result_gui.cpp:1307
+#: src/states_screens/race_result_gui.cpp:534
+#: src/states_screens/race_result_gui.cpp:1332
 msgid "Blue Team Wins"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:511
-#: src/states_screens/race_result_gui.cpp:1312
+#: src/states_screens/race_result_gui.cpp:536
+#: src/states_screens/race_result_gui.cpp:1337
 msgid "It's a draw"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:742
-#: src/states_screens/race_result_gui.cpp:1156
+#: src/states_screens/race_result_gui.cpp:767
+#: src/states_screens/race_result_gui.cpp:1181
 msgid "Eliminated"
 msgstr ""
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1378
-#: src/states_screens/race_result_gui.cpp:1428
+#: src/states_screens/race_result_gui.cpp:1403
+#: src/states_screens/race_result_gui.cpp:1453
 msgid "(Own Goal)"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1498
+#: src/states_screens/race_result_gui.cpp:1523
 #, c-format
 msgid "Track %i/%i"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1582
+#: src/states_screens/race_result_gui.cpp:1607
 msgid "Grand Prix progress:"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1628
+#: src/states_screens/race_result_gui.cpp:1653
 msgid "Highscores"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1731
+#: src/states_screens/race_result_gui.cpp:1756
 #, c-format
 msgid "Best lap time: %s"
 msgstr ""
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by kart_name")
-#: src/states_screens/race_result_gui.cpp:1745
+#: src/states_screens/race_result_gui.cpp:1770
 #, c-format
 msgid "by %s"
 msgstr ""

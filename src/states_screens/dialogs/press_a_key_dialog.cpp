@@ -36,6 +36,7 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h, const bool isKeyb
     if(isKeyboardFlag)
     {
         Widget* title = getWidget("title");
+        // I18N: In press a key dialog, tell user to press a key to bind configuration
         title->setText(_("Press any key..."));
     }
 }

@@ -190,10 +190,10 @@ void OptionsScreenVideo::init()
     assert( vsync != NULL );
 
     vsync->clearLabels();
-    vsync->addLabel(L"Disabled");
-    //I18N: In the video options
+    vsync->addLabel(_("Disabled"));
+    //I18N: In the video options, full vertical sync (usually 60fps)
     vsync->addLabel(_("Full"));
-    //I18N: In the video options
+    //I18N: In the video options, half vertical sync (usually 30fps)
     vsync->addLabel(_("Half"));
     vsync->setValue(UserConfigParams::m_swap_interval);
 
