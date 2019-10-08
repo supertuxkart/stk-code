@@ -1253,6 +1253,9 @@ void CIrrDeviceWayland::createDriver()
 
 void CIrrDeviceWayland::updateCursor()
 {
+    if (!m_pointer)
+        return;
+
     if (!getCursorControl()->isVisible() && CreationParams.Fullscreen)
     {
         wl_pointer_set_cursor(m_pointer, m_enter_serial, NULL, 0, 0);
