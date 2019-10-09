@@ -37,6 +37,7 @@
 #include <enet/enet.h>
 
 #include <atomic>
+#include <cassert>
 #include <list>
 #include <functional>
 #include <map>
@@ -340,9 +341,15 @@ public:
     // ------------------------------------------------------------------------
     void sendToServer(NetworkString *data, bool reliable = true);
     // ------------------------------------------------------------------------
-    /** True if this is a client and server in graphics mode made by server
-     *  creation screen. */
-    bool isClientServer() const          { return m_separate_process != NULL; }
+    bool isClientServer() const;
+    // ------------------------------------------------------------------------
+    bool hasServerAI() const;
+    // ------------------------------------------------------------------------
+    void setSeparateProcess(SeparateProcess* p)
+    {
+        assert(m_separate_process == NULL);
+        m_separate_process = p;
+    }
     // ------------------------------------------------------------------------
     void initClientNetwork(ENetEvent& event, Network* new_network);
     // ------------------------------------------------------------------------

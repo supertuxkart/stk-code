@@ -361,10 +361,12 @@ void ClientLobby::update(int ticks)
     case LINKED:
     {
         NetworkConfig::get()->clearServerCapabilities();
+        std::string ua = StringUtils::getUserAgentString();
+        if (NetworkConfig::get()->isNetworkAITester())
+            ua = "AI";
         NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
-            .addUInt32(ServerConfig::m_server_version)
-            .encodeString(StringUtils::getUserAgentString())
+            .addUInt32(ServerConfig::m_server_version).encodeString(ua)
             .addUInt16((uint16_t)stk_config->m_network_capabilities.size());
         for (const std::string& cap : stk_config->m_network_capabilities)
             ns->encodeString(cap);
@@ -391,7 +393,10 @@ void ClientLobby::update(int ticks)
 
         bool encryption = false;
         uint32_t id = PlayerManager::getCurrentOnlineId();
-
+        bool lan_ai = !m_server->supportsEncryption() &&
+            NetworkConfig::get()->isNetworkAITester();
+        if (lan_ai)
+            id = 0;
         BareNetworkString* rest = new BareNetworkString();
         if (m_server->supportsEncryption() && id != 0)
         {
@@ -410,11 +415,22 @@ void ClientLobby::update(int ticks)
 
         rest->encodeString(ServerConfig::m_private_server_password)
             .addUInt8(player_count);
-        for (auto& p : NetworkConfig::get()->getNetworkPlayers())
+        for (unsigned i = 0;
+             i < NetworkConfig::get()->getNetworkPlayers().size(); i++)
         {
-            core::stringw name;
+            auto& p = NetworkConfig::get()->getNetworkPlayers()[i];
             PlayerProfile* player = std::get<1>(p);
-            rest->encodeString(player->getName()).
+            core::stringw name = player->getName();
+            if (lan_ai)
+            {
+                // I18N: Shown in lobby to indicate it's a bot in LAN game
+                name = _("Bot");
+                if (i > 0)
+                {
+                    name += core::stringw(" ") + StringUtils::toWString(i);
+                }
+            }
+            rest->encodeString(name).
                 addFloat(player->getDefaultKartColor());
             // Per-player handicap
             rest->addUInt8(std::get<2>(p));

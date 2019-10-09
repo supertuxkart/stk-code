@@ -1639,3 +1639,17 @@ void STKHost::updatePlayers(unsigned* ingame, unsigned* waiting,
     if (total)
         *total = total_players;
 }   // updatePlayers
+
+// ----------------------------------------------------------------------------
+/** True if this is a client and server in graphics mode made by server
+  *  creation screen. */
+bool STKHost::isClientServer() const
+{
+    return NetworkConfig::get()->isClient() && m_separate_process != NULL;
+}   // isClientServer
+
+// ----------------------------------------------------------------------------
+bool STKHost::hasServerAI() const
+{
+    return NetworkConfig::get()->isServer() && m_separate_process != NULL;
+}   // hasServerAI

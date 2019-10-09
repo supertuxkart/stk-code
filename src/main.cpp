@@ -251,6 +251,7 @@
 #include "utils/log.hpp"
 #include "utils/mini_glm.hpp"
 #include "utils/profiler.hpp"
+#include "utils/separate_process.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -1326,6 +1327,14 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         }
     }
 
+    int ai_num = 0;
+    if (CommandLine::has("--server-ai", &ai_num))
+    {
+        Log::info("main", "Add %d server ai(s) server configurable will be "
+            "disabled.", ai_num);
+        ServerConfig::m_server_configurable = false;
+    }
+
     std::string ipv4;
     std::string ipv6;
     bool has_ipv4 = CommandLine::has("--connect-now", &ipv4);
@@ -1406,6 +1415,18 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             ServerConfig::loadServerLobbyFromConfig();
             Log::info("main", "Creating a LAN server '%s'.",
                 server_name.c_str());
+        }
+        if (ai_num > 0)
+        {
+            STKHost::get()->setSeparateProcess(
+                new SeparateProcess(
+                SeparateProcess::getCurrentExecutableLocation(),
+                std::string("--stdout=server_ai.log --no-graphics"
+                    " --auto-connect --connect-now=127.0.0.1:") +
+                    StringUtils::toString(STKHost::get()->getPrivatePort()) +
+                    " --no-console-log --network-ai="
+                    + StringUtils::toString(ai_num), false/*create_pipe*/,
+                    "childprocess_ai"/*childprocess_name*/));
         }
     }
 

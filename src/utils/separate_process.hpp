@@ -51,7 +51,8 @@ private:
 
     // ------------------------------------------------------------------------
     bool createChildProcess(const std::string& exe,
-                            const std::string& argument, bool create_pipe);
+                            const std::string& argument, bool create_pipe,
+                            const std::string& childprocess_name);
     // ------------------------------------------------------------------------
     std::string getLine();
 
@@ -60,7 +61,8 @@ public:
     static std::string getCurrentExecutableLocation();
     // ------------------------------------------------------------------------
      SeparateProcess(const std::string& exe, const std::string& argument,
-                     bool create_pipe = false);
+                     bool create_pipe = false,
+                     const std::string& childprocess_name = "childprocess");
     // ------------------------------------------------------------------------
     ~SeparateProcess();
     // ------------------------------------------------------------------------

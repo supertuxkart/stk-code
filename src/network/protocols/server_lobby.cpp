@@ -3201,7 +3201,7 @@ void ServerLobby::updateServerOwner()
     for (auto peer: peers)
     {
         // Only 127.0.0.1 can be server owner in case of graphics-client-server
-        if (peer->isValidated() &&
+        if (peer->isValidated() && peer->getUserVersion() != "AI" &&
             (NetworkConfig::get()->getServerIdFile().empty() ||
             peer->getAddress().getIP() == 0x7f000001))
         {

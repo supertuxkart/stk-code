@@ -34,6 +34,8 @@ class CreateServerScreen :      public GUIEngine::Screen,
 private:
     int m_prev_mode, m_prev_value;
 
+    bool m_supports_ai;
+
     friend class GUIEngine::ScreenSingleton<CreateServerScreen>;
 
     CreateServerScreen();

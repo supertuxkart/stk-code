@@ -86,6 +86,7 @@ void CreateServerScreen::loadedFromFile()
 void CreateServerScreen::init()
 {
     Screen::init();
+    m_supports_ai = NetworkConfig::get()->isLAN();
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
@@ -142,7 +143,14 @@ void CreateServerScreen::eventCallback(Widget* widget, const std::string& name,
         updateMoreOption(selection);
         m_prev_mode = selection;
     }
-
+    else if (name == m_max_players_widget->m_properties[PROP_ID] &&
+        m_supports_ai)
+    {
+        m_prev_value = m_more_options_spinner->getValue();
+        const int selection =
+            m_game_mode_widget->getSelection(PLAYER_ID_GAME_MASTER);
+        updateMoreOption(selection);
+    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
@@ -154,17 +162,39 @@ void CreateServerScreen::updateMoreOption(int game_mode)
         case 1:
         {
             m_more_options_text->setVisible(true);
-            //I18N: In the create server screen
-            m_more_options_text->setText(_("No. of grand prix track(s)"),
-                false);
             m_more_options_spinner->setVisible(true);
             m_more_options_spinner->clearLabels();
-            m_more_options_spinner->addLabel(_("Disabled"));
-            for (int i = 1; i <= 20; i++)
+            if (m_supports_ai)
             {
-                m_more_options_spinner->addLabel(StringUtils::toWString(i));
+                m_more_options_text->setText(_("Number of AI karts"),
+                    false);
+                for (int i = 0; i <= m_max_players_widget->getValue() - 2; i++)
+                {
+                    m_more_options_spinner->addLabel(
+                        StringUtils::toWString(i));
+                }
+                if (m_prev_value > m_max_players_widget->getValue() - 2)
+                {
+                    m_more_options_spinner->setValue(
+                        m_max_players_widget->getValue() - 2);
+                }
+                else
+                    m_more_options_spinner->setValue(m_prev_value);
+
             }
-            m_more_options_spinner->setValue(m_prev_value);
+            else
+            {
+                //I18N: In the create server screen
+                m_more_options_text->setText(_("No. of grand prix track(s)"),
+                    false);
+                m_more_options_spinner->addLabel(_("Disabled"));
+                for (int i = 1; i <= 20; i++)
+                {
+                    m_more_options_spinner->addLabel(
+                        StringUtils::toWString(i));
+                }
+                m_more_options_spinner->setValue(m_prev_value);
+            }
             break;
         }
         case 2:
@@ -360,9 +390,17 @@ void CreateServerScreen::createServer()
         }
         else
         {
-            // Grand prix track count
-            if (esi > 0)
-                server_cfg << " --network-gp=" << esi;
+            if (m_supports_ai)
+            {
+                if (esi > 0)
+                    server_cfg << " --server-ai=" << esi;
+            }
+            else
+            {
+                // Grand prix track count
+                if (esi > 0)
+                    server_cfg << " --network-gp=" << esi;
+            }
         }
         m_prev_mode = gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER);
         m_prev_value = esi;
