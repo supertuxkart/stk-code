@@ -1418,15 +1418,18 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         }
         if (ai_num > 0)
         {
+            std::string cmd =
+                std::string("--stdout=server_ai.log --no-graphics"
+                " --auto-connect --connect-now=127.0.0.1:") +
+                StringUtils::toString(STKHost::get()->getPrivatePort()) +
+                " --no-console-log --network-ai="
+                + StringUtils::toString(ai_num);
+            if (!server_password.empty())
+                cmd += " --server-password=" + server_password;
             STKHost::get()->setSeparateProcess(
                 new SeparateProcess(
-                SeparateProcess::getCurrentExecutableLocation(),
-                std::string("--stdout=server_ai.log --no-graphics"
-                    " --auto-connect --connect-now=127.0.0.1:") +
-                    StringUtils::toString(STKHost::get()->getPrivatePort()) +
-                    " --no-console-log --network-ai="
-                    + StringUtils::toString(ai_num), false/*create_pipe*/,
-                    "childprocess_ai"/*childprocess_name*/));
+                SeparateProcess::getCurrentExecutableLocation(), cmd,
+                false/*create_pipe*/, "childprocess_ai"/*childprocess_name*/));
         }
     }
 
