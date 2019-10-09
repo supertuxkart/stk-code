@@ -12,7 +12,7 @@
                          I18N="Main menu button" text="Singleplayer"/>
             <icon-button id="multiplayer" width="128" height="128"
                          icon="gui/icons/menu_multi.png" focus_icon="gui/icons/menu_multi_focus.png"
-                         I18N="Main menu button" text="Local Multiplayer"/>
+                         I18N="Main menu button" text="Splitscreen Multiplayer"/>
             <icon-button id="online" width="128" height="128"
                          icon="gui/icons/menu_online.png" focus_icon="gui/icons/menu_online_focus.png"
                          I18N="Main menu button" text="Online"/>
