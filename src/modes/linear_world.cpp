@@ -32,10 +32,12 @@
 #include "guiengine/modaldialog.hpp"
 #include "physics/physics.hpp"
 #include "network/network_config.hpp"
+#include "network/network_player_profile.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_peer.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/check_manager.hpp"
@@ -170,6 +172,28 @@ void LinearWorld::reset(bool restart)
  */
 void LinearWorld::update(int ticks)
 {
+    if (NetworkConfig::get()->isServer() && getPhase() == RACE_PHASE)
+    {
+        bool all_players_finished = true;
+        bool has_ai = false;
+        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        {
+            auto npp =
+                race_manager->getKartInfo(i).getNetworkPlayerProfile().lock();
+            if (!npp)
+                continue;
+            if (npp)
+            {
+                auto peer = npp->getPeer();
+                if (peer && peer->getUserVersion() == "AI")
+                    has_ai = true;
+                else if (!getKart(i)->hasFinishedRace())
+                    all_players_finished = false;
+            }
+        }
+        if (all_players_finished && has_ai)
+            m_finish_timeout = -1.0f;
+    }
     if (getPhase() == RACE_PHASE &&
         m_finish_timeout != std::numeric_limits<float>::max())
     {
