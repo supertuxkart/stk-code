@@ -2961,7 +2961,8 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         PerPlayerDifficulty per_player_difficulty =
             (PerPlayerDifficulty)data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>
-            (peer, i == 0 && !online_name.empty() ? online_name : name,
+            (peer, i == 0 && !online_name.empty() && !peer->isAIPeer() ?
+            online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
             per_player_difficulty, (uint8_t)i, KART_TEAM_NONE,
             country_code);
@@ -3156,6 +3157,8 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             m_peers_ready.find(p) != m_peers_ready.end() &&
             m_peers_ready.at(p))
             boolean_combine |= (1 << 3);
+        if (p && p->isAIPeer())
+            boolean_combine |= (1 << 4);
         pl->addUInt8(boolean_combine);
         pl->addUInt8(profile->getPerPlayerDifficulty());
         if (ServerConfig::m_team_choosing &&
@@ -3201,7 +3204,7 @@ void ServerLobby::updateServerOwner()
     for (auto peer: peers)
     {
         // Only 127.0.0.1 can be server owner in case of graphics-client-server
-        if (peer->isValidated() && peer->getUserVersion() != "AI" &&
+        if (peer->isValidated() && !peer->isAIPeer() &&
             (NetworkConfig::get()->getServerIdFile().empty() ||
             peer->getAddress().getIP() == 0x7f000001))
         {

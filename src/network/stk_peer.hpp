@@ -248,6 +248,8 @@ public:
     // ------------------------------------------------------------------------
     const std::set<std::string>& getClientCapabilities() const
                                               { return m_client_capabilities; }
+    // ------------------------------------------------------------------------
+    bool isAIPeer() const                    { return m_user_version == "AI"; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

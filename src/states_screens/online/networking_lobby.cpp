@@ -133,12 +133,15 @@ void NetworkingLobby::loadedFromFile()
         (file_manager->getAsset(FileManager::GUI_ICON, "main_options.png"));
     m_spectate_texture = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "screen_other.png"));
+    video::ITexture* icon_6 = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "android/robot.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);
     m_icon_bank->addTextureAsSprite(icon_4);
     m_icon_bank->addTextureAsSprite(icon_5);
     m_icon_bank->addTextureAsSprite(m_spectate_texture);
+    m_icon_bank->addTextureAsSprite(icon_6);
 
     m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 96.0f);
 }   // loadedFromFile

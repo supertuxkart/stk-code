@@ -421,7 +421,7 @@ void ClientLobby::update(int ticks)
             auto& p = NetworkConfig::get()->getNetworkPlayers()[i];
             PlayerProfile* player = std::get<1>(p);
             core::stringw name = player->getName();
-            if (lan_ai)
+            if (NetworkConfig::get()->isNetworkAITester())
             {
                 // I18N: Shown in lobby to indicate it's a bot in LAN game
                 name = _("Bot");
@@ -787,9 +787,12 @@ void ClientLobby::updatePlayerList(Event* event)
         bool is_spectator = ((boolean_combine >> 1) & 1) == 1;
         bool is_peer_server_owner = ((boolean_combine >> 2) & 1) == 1;
         bool ready = ((boolean_combine >> 3) & 1) == 1;
+        bool ai = ((boolean_combine >> 4) & 1) == 1;
         // icon to be used, see NetworkingLobby::loadedFromFile
         lp.m_icon_id = is_peer_server_owner ? 0 :
             lp.m_online_id != 0 /*if online account*/ ? 1 : 2;
+        if (ai)
+            lp.m_icon_id = 6;
         if (waiting && !is_peer_waiting_for_game)
             lp.m_icon_id = 3;
         if (is_spectator)
