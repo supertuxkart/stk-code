@@ -27,7 +27,7 @@
  *  \param triggering_function callback function to be used when triggered
  */
 CheckTrigger::CheckTrigger(const Vec3& center, float distance,
-                           std::function<void()> triggering_function)
+                           std::function<void(int)> triggering_function)
             : CheckStructure(CheckManager::get()->getCheckStructureCount()),
               m_center(center), m_distance2(distance * distance),
               m_triggering_function(triggering_function)

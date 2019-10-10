@@ -28,7 +28,7 @@
 #include "tracks/check_manager.hpp"
 
 CheckCylinder::CheckCylinder(const XMLNode &node,
-                             std::function<void()> triggering_function)
+                             std::function<void(int)> triggering_function)
            : CheckStructure(CheckManager::get()->getCheckStructureCount())
 {
     m_radius2 = 1;
@@ -76,7 +76,7 @@ bool CheckCylinder::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
            (old_dist2< m_radius2 && new_dist2 >=m_radius2);
 
     if (triggered && m_triggering_function)
-        m_triggering_function();
+        m_triggering_function(kart_id);
 
     return triggered;
 }   // isTriggered

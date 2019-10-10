@@ -687,7 +687,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(
         CheckManager::get()->add(
             new CheckTrigger(m_init_xyz, trigger_distance, std::bind(
             &TrackObjectPresentationSound::onTriggerItemApproached,
-            this)));
+            this, std::placeholders::_1)));
     }
 
     if (disable_for_multiplayer)
@@ -735,7 +735,7 @@ void TrackObjectPresentationSound::updateGraphics(float dt)
 }   // update
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationSound::onTriggerItemApproached()
+void TrackObjectPresentationSound::onTriggerItemApproached(int kart_id)
 {
     if (m_sound != NULL && m_sound->getStatus() != SFXBase::SFX_PLAYING && m_enabled)
     {
@@ -1105,13 +1105,13 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
         CheckManager::get()->add(
             new CheckTrigger(m_init_xyz, trigger_distance, std::bind(
             &TrackObjectPresentationActionTrigger::onTriggerItemApproached,
-            this)));
+            this, std::placeholders::_1)));
     }
     else if (m_type == TRIGGER_TYPE_CYLINDER)
     {
         CheckManager::get()->add(new CheckCylinder(xml_node, std::bind(
             &TrackObjectPresentationActionTrigger::onTriggerItemApproached,
-            this)));
+            this, std::placeholders::_1)));
     }
     else
     {
@@ -1137,11 +1137,11 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
     CheckManager::get()->add(
         new CheckTrigger(m_init_xyz, trigger_distance, std::bind(
         &TrackObjectPresentationActionTrigger::onTriggerItemApproached,
-        this)));
+        this, std::placeholders::_1)));
 }   // TrackObjectPresentationActionTrigger
 
 // ----------------------------------------------------------------------------
-void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
+void TrackObjectPresentationActionTrigger::onTriggerItemApproached(int kart_id)
 {
     if (m_reenable_timeout > StkTime::getMonoTimeMs())
     {
@@ -1149,12 +1149,6 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached()
     }
     setReenableTimeout(m_xml_reenable_timeout);
 
-    int kart_id = 0;
-    Camera* camera = Camera::getActiveCamera();
-    if (camera != NULL && camera->getKart() != NULL)
-    {
-        kart_id = camera->getKart()->getWorldKartId();
-    }
     if (!m_library_id.empty() && !m_triggered_object.empty() &&
         !m_library_name.empty())
     {

@@ -48,10 +48,10 @@ private:
      *  This saves some computations. */
     std::vector<float> m_distance2;
     /** Function to call when triggered. */
-    std::function<void()> m_triggering_function;
+    std::function<void(int)> m_triggering_function;
 public:
                  CheckCylinder(const XMLNode &node,
-                     std::function<void()> triggering_function);
+                     std::function<void(int)> triggering_function);
     virtual     ~CheckCylinder() {};
     virtual bool isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                              int kart_id);
