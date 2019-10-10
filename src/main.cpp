@@ -1070,10 +1070,19 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         }
         irr::core::stringw s;
         PlayerManager::requestSignIn(login, password);
+        uint64_t started_time = StkTime::getMonoTimeMs();
         while (PlayerManager::getCurrentOnlineState() != PlayerProfile::OS_SIGNED_IN)
         {
             Online::RequestManager::get()->update(0.0f);
             StkTime::sleep(1);
+            if (StkTime::getMonoTimeMs() > started_time + 20000)
+            {
+                Log::error("Main",
+                    "Timed out trying login, check login info or connection "
+                    "to stk addons.");
+                cleanSuperTuxKart();
+                return false;
+            }
         }
         Log::info("Main", "Logged in from command-line.");
         if (init_user)
@@ -1312,11 +1321,20 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         if (!can_wan && player && player->wasOnlineLastTime() &&
             player->wasOnlineLastTime() && player->hasSavedSession())
         {
+            uint64_t started_time = StkTime::getMonoTimeMs();
             while (PlayerManager::getCurrentOnlineState() !=
                 PlayerProfile::OS_SIGNED_IN)
             {
                 Online::RequestManager::get()->update(0.0f);
                 StkTime::sleep(1);
+                if (StkTime::getMonoTimeMs() > started_time + 20000)
+                {
+                    Log::error("Main",
+                        "Timed out trying to login saved session, check "
+                        "connection to stk addons or rerun --init-user.");
+                    cleanSuperTuxKart();
+                    return false;
+                }
             }
             can_wan = true;
         }
