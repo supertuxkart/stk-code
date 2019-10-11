@@ -17,6 +17,7 @@
 
 #include "states_screens/dialogs/kart_color_slider_dialog.hpp"
 
+#include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"
 #include "karts/kart_model.hpp"
@@ -71,6 +72,7 @@ KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
 // ----------------------------------------------------------------------------
 KartColorSliderDialog::~KartColorSliderDialog()
 {
+    PlayerManager::get()->save();
 }   // ~KartColorSliderDialog
 
 // ----------------------------------------------------------------------------
