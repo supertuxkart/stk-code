@@ -664,6 +664,9 @@ find assets/* -type d | sort > assets/directories.txt
 sed -i s/'.\/assets\/'// assets/directories.txt
 sed -i s/'assets\/'// assets/directories.txt
 
+# A file that can be used to check if apk has assets
+echo "has_assets" > assets/has_assets.txt
+
 
 # It will be probably ignored by ant, but create it anyway...
 touch assets/.nomedia
