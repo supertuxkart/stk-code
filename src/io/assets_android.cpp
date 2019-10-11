@@ -517,11 +517,18 @@ void AssetsAndroid::removeData()
     
     if (!data_path.empty())
     {
-        const std::string child_path = data_path + "/files/libchildprocess.so";
-    
-        if (m_file_manager->fileExists(child_path))
+        const std::vector<std::string> child_paths = 
         {
-            Log::info("AssetsAndroid", "Deleting old libchildprocess: %s", 
+            data_path + "/files/libchildprocess.so",
+            data_path + "/files/libchildprocess_ai.so"
+        };
+    
+        for (auto child_path : child_paths)
+        {
+            if (!m_file_manager->fileExists(child_path))
+                continue;
+                
+            Log::info("AssetsAndroid", "Deleting old childprocess: %s", 
                       child_path.c_str());
             m_file_manager->removeFile(child_path);
         }
