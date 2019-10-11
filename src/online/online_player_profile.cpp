@@ -253,6 +253,7 @@ namespace Online
             m_online_state = OS_SIGNED_IN;
             if(rememberPassword())
             {
+                setWasOnlineLastTime(true);
                 saveSession(getOnlineId(), getToken());
             }
 
