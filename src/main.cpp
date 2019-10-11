@@ -1898,6 +1898,7 @@ void askForInternetPermission()
             if (need_to_start_news_manager)
                 NewsManager::get()->init(false);
 #endif
+            user_config->saveConfig();
             GUIEngine::ModalDialog::dismiss();
         }   // onConfirm
         // --------------------------------------------------------
