@@ -889,7 +889,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
 	// If player number is large (small icon), rescale font size
 	int font_height = font->getDimension(L"X").Height;
-	if ((float)ICON_PLAYER_WIDTH*0.7f <= (float)font_height)
+	if ((float)ICON_PLAYER_WIDTH*0.7f < (float)font_height)
 	    font->setScale(0.7f*(float)ICON_PLAYER_WIDTH / (float)font_height);
 
         if (info.m_text.size() > 0)
