@@ -659,15 +659,18 @@ std::string AssetsAndroid::getDataPath()
     {
         Log::warn("AssetsAndroid", "Cannot use standard data dir");
         
-        AndroidApplicationInfo application_info = 
-            CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+        if (global_android_app)
+        {
+            AndroidApplicationInfo application_info = 
+                CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+            
+            data_path = application_info.data_dir;
+        }
         
-        data_path = application_info.data_dir;
-    }
-    
-    if (access(data_path.c_str(), R_OK) != 0)
-    {
-        data_path = "";
+        if (access(data_path.c_str(), R_OK) != 0)
+        {
+            data_path = "";
+        }
     }
     
     return data_path;
@@ -683,10 +686,15 @@ std::string AssetsAndroid::getDataPath()
 std::string AssetsAndroid::getLibPath()
 {
 #ifdef ANDROID
-    AndroidApplicationInfo application_info = 
-        CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
-
-    std::string lib_path = application_info.native_lib_dir;
+    std::string lib_path;
+    
+    if (global_android_app)
+    {
+        AndroidApplicationInfo application_info = 
+            CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+    
+        lib_path = application_info.native_lib_dir;
+    }
 
     if (access(lib_path.c_str(), R_OK) != 0)
     {
