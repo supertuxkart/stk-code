@@ -27,7 +27,16 @@
 
 extern int main(int argc, char *argv[]);
 
-struct android_app* global_android_app;
+struct android_app* global_android_app = NULL;
+ANativeActivity* global_android_activity = NULL;
+
+extern "C"
+{
+void set_global_android_activity(ANativeActivity* activity)
+{
+    global_android_activity = activity;
+}
+}
 
 void override_default_params_for_mobile()
 {
@@ -92,6 +101,7 @@ void android_main(struct android_app* app)
     Log::info("AndroidMain", "Loading application...");
         
     global_android_app = app;
+    global_android_activity = app->activity;
     
     // Initialize global Android window state variables
     CIrrDeviceAndroid::onCreate();

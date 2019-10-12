@@ -44,6 +44,7 @@
 #include <dlfcn.h>
 #include <fstream>
 
+#include "main_android.hpp"
 #include "io/assets_android.hpp"
 #endif
 
@@ -387,6 +388,21 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
         m_child_handle = NULL;
         return false;
     }
+
+    typedef void (*set_activity_proc_t)(ANativeActivity*);
+    set_activity_proc_t set_activity_proc = 
+        (set_activity_proc_t)dlsym(m_child_handle, "set_global_android_activity");
+    
+    if (set_activity_proc == NULL)
+    {
+        Log::error("SeparateProcess", "Error: Cannot get handle to "
+                   "set_global_android_activity()");
+        dlclose(m_child_handle);
+        m_child_handle = NULL;
+        return false;
+    }
+
+    set_activity_proc(global_android_activity);
     
     const std::string exe_file = StringUtils::getBasename(exe);
     auto rest_argv = StringUtils::split(argument, ' ');

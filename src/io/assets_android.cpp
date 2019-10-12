@@ -659,10 +659,10 @@ std::string AssetsAndroid::getDataPath()
     {
         Log::warn("AssetsAndroid", "Cannot use standard data dir");
         
-        if (global_android_app)
+        if (global_android_activity)
         {
             AndroidApplicationInfo application_info = 
-                CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+                CIrrDeviceAndroid::getApplicationInfo(global_android_activity);
             
             data_path = application_info.data_dir;
         }
@@ -688,10 +688,10 @@ std::string AssetsAndroid::getLibPath()
 #ifdef ANDROID
     std::string lib_path;
     
-    if (global_android_app)
+    if (global_android_activity)
     {
         AndroidApplicationInfo application_info = 
-            CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+            CIrrDeviceAndroid::getApplicationInfo(global_android_activity);
     
         lib_path = application_info.native_lib_dir;
     }
