@@ -350,7 +350,7 @@ if [ ! -f "$DIRNAME/obj/harfbuzz.stamp" ]; then
 
     cd "$DIRNAME/obj/harfbuzz"
     FREETYPE_CFLAGS="-I$DIRNAME/obj/freetype/include" \
-    FREETYPE_LIBS="$DIRNAME/obj/freetype/objs/.libs/libfreetype.a $DIRNAME/obj/zlib/libz.a $DIRNAME/obj/libpng/libpng.a"\
+    FREETYPE_LIBS="$DIRNAME/obj/freetype/objs/.libs/libfreetype.a $DIRNAME/obj/libpng/libpng.a $DIRNAME/obj/zlib/libz.a"\
     ./configure --host=$HOST --enable-shared=no \
                 --with-glib=no --with-gobject=no --with-cairo=no \
                 --with-fontconfig=no --with-icu=no --with-graphite2=no &&
