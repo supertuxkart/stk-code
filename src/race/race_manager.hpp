@@ -275,7 +275,7 @@ public:
         /** Kart color of player (used in gp win / lose screen). */
         float       m_color;
         KartStatus(const std::string& ident, const int& prev_finish_pos,
-                   int local_player_id, int global_player_id, int spawn_id,
+                   int local_player_id, int global_player_id,
                    int init_gp_rank, KartType kt,
                    PerPlayerDifficulty difficulty) :
                    m_ident(ident), m_score(0), m_last_score(0),
@@ -283,7 +283,7 @@ public:
                    m_kart_type(kt),
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
-                   m_spawn_id(spawn_id),
+                   m_spawn_id(-1),
                    m_gp_rank(init_gp_rank), m_difficulty(difficulty)
                 { m_boosted_ai = false; m_color = 0.0f; }
 
@@ -863,7 +863,7 @@ public:
     void addSpareTireKart(const std::string& name)
     {
         m_kart_status.push_back(KartStatus(name, 0, -1, -1,
-            -1, -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
+            -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
         m_num_spare_tire_karts++;
         m_num_karts++;
     }   // addSpareTireKart

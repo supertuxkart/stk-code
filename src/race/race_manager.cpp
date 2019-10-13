@@ -405,7 +405,7 @@ void RaceManager::startNew(bool from_overworld)
         for(unsigned int i = 0; i < m_num_ghost_karts; i++)
         {
             m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
-                i, -1, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+                i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
             init_gp_rank ++;
         }
     }
@@ -415,7 +415,7 @@ void RaceManager::startNew(bool from_overworld)
     const unsigned int ai_kart_count = (unsigned int)m_ai_kart_list.size();
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
-        m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1, -1,
+        m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
             init_gp_rank, KT_AI, PLAYER_DIFFICULTY_NORMAL));
         init_gp_rank ++;
         if(UserConfigParams::m_ftl_debug)
@@ -434,7 +434,6 @@ void RaceManager::startNew(bool from_overworld)
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),
-                                           m_player_karts[i].getSpawnId(),
                                            init_gp_rank, kt,
                                            m_player_karts[i].getDifficulty()));
         
@@ -1098,7 +1097,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
     for(int i = 0; i < m_num_karts; i++)
     {
         m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
-            i, -1, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+            i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
         init_gp_rank ++;
     }
 
