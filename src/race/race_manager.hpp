@@ -263,6 +263,8 @@ public:
         int         m_local_player_id;
         /** Global ID of player. */
         int         m_global_player_id;
+        /** Spawn ID used for randomizing the player spawn in battle modes. */
+        int         m_spawn_id;
         /** In GPs, at the end, will hold the overall rank of this kart
          *  (0<=m_gp_rank < num_karts-1). */
         int         m_gp_rank;
@@ -628,6 +630,10 @@ public:
         return m_kart_status[k].m_global_player_id;
     }   // getKartGlobalPlayerId
     // ------------------------------------------------------------------------
+    int getKartSpawnId(int k) const {
+        return m_kart_status[k].m_spawn_id;
+    }   // getKartLocalPlayerId
+    // ------------------------------------------------------------------------
     float getOverallTime(int kart) const
     {
         return m_kart_status[kart].m_overall_time;
@@ -855,7 +861,7 @@ public:
     void addSpareTireKart(const std::string& name)
     {
         m_kart_status.push_back(KartStatus(name, 0, -1, -1,
-            -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
+            -1, -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
         m_num_spare_tire_karts++;
         m_num_karts++;
     }   // addSpareTireKart

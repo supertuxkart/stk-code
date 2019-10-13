@@ -221,6 +221,7 @@ void World::init()
                                : race_manager->getKartIdent(i);
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
+        int spawn_id         = race_manager->getKartSpawnId(i);
         std::shared_ptr<AbstractKart> new_kart;
         if (hasTeam())
         {
@@ -231,7 +232,7 @@ void World::init()
         else
         {
             new_kart = createKart(kart_ident, i, local_player_id,
-                global_player_id, race_manager->getKartType(i),
+                global_player_id, spawn_id > 0 ? spawn_id : i, race_manager->getKartType(i),
                 race_manager->getPlayerDifficulty(i));
         }
         new_kart->setBoostAI(race_manager->hasBoostedAI(i));
@@ -419,7 +420,7 @@ void World::createRaceGUI()
  */
 std::shared_ptr<AbstractKart> World::createKart
     (const std::string &kart_ident, int index, int local_player_id,
-    int global_player_id, RaceManager::KartType kart_type,
+    int global_player_id, int spawn_id, RaceManager::KartType kart_type,
     PerPlayerDifficulty difficulty)
 {
     unsigned int gk = 0;
@@ -437,7 +438,7 @@ std::shared_ptr<AbstractKart> World::createKart
     }
 
     int position           = index+1;
-    btTransform init_pos   = getStartTransform(index - gk);
+    btTransform init_pos   = getStartTransform(spawn_id - gk);
     std::shared_ptr<AbstractKart> new_kart;
     if (RewindManager::get()->isEnabled())
     {
