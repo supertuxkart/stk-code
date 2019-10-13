@@ -263,6 +263,8 @@ public:
         int         m_local_player_id;
         /** Global ID of player. */
         int         m_global_player_id;
+        /** Spawn ID used for randomizing the player spawn in battle modes. */
+        int         m_spawn_id;
         /** In GPs, at the end, will hold the overall rank of this kart
          *  (0<=m_gp_rank < num_karts-1). */
         int         m_gp_rank;
@@ -273,7 +275,7 @@ public:
         /** Kart color of player (used in gp win / lose screen). */
         float       m_color;
         KartStatus(const std::string& ident, const int& prev_finish_pos,
-                   int local_player_id, int global_player_id,
+                   int local_player_id, int global_player_id, int spawn_id,
                    int init_gp_rank, KartType kt,
                    PerPlayerDifficulty difficulty) :
                    m_ident(ident), m_score(0), m_last_score(0),
@@ -281,6 +283,7 @@ public:
                    m_kart_type(kt),
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
+                   m_spawn_id(spawn_id),
                    m_gp_rank(init_gp_rank), m_difficulty(difficulty)
                 { m_boosted_ai = false; m_color = 0.0f; }
 
@@ -404,6 +407,7 @@ public:
     void setDifficulty(Difficulty diff);
     static Difficulty convertDifficulty(const std::string &difficulty);
     void startNew(bool from_overworld);
+    void randomizeSpawn();
     void next();
     void rerunRace();
     void exitRace(bool delete_world=true);
@@ -627,6 +631,10 @@ public:
     {
         return m_kart_status[k].m_global_player_id;
     }   // getKartGlobalPlayerId
+    // ------------------------------------------------------------------------
+    int getKartSpawnId(int k) const {
+        return m_kart_status[k].m_spawn_id;
+    }   // getKartLocalPlayerId
     // ------------------------------------------------------------------------
     float getOverallTime(int kart) const
     {
@@ -855,7 +863,7 @@ public:
     void addSpareTireKart(const std::string& name)
     {
         m_kart_status.push_back(KartStatus(name, 0, -1, -1,
-            -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
+            -1, -1, KT_SPARE_TIRE, PLAYER_DIFFICULTY_NORMAL));
         m_num_spare_tire_karts++;
         m_num_karts++;
     }   // addSpareTireKart

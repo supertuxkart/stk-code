@@ -386,6 +386,7 @@ void RaceManager::startNew(bool from_overworld)
 
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
+    
     m_kart_status.clear();
     if (m_num_ghost_karts > 0)
         m_num_karts += m_num_ghost_karts;
@@ -404,7 +405,7 @@ void RaceManager::startNew(bool from_overworld)
         for(unsigned int i = 0; i < m_num_ghost_karts; i++)
         {
             m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
-                i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+                i, -1, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
             init_gp_rank ++;
         }
     }
@@ -414,7 +415,7 @@ void RaceManager::startNew(bool from_overworld)
     const unsigned int ai_kart_count = (unsigned int)m_ai_kart_list.size();
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
-        m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
+        m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1, -1,
             init_gp_rank, KT_AI, PLAYER_DIFFICULTY_NORMAL));
         init_gp_rank ++;
         if(UserConfigParams::m_ftl_debug)
@@ -433,8 +434,10 @@ void RaceManager::startNew(bool from_overworld)
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),
+                                           m_player_karts[i].getSpawnId(),
                                            init_gp_rank, kt,
                                            m_player_karts[i].getDifficulty()));
+        
         if(UserConfigParams::m_ftl_debug)
         {
             Log::debug("RaceManager", "[ftl] rank %d kart %s", init_gp_rank,
@@ -469,8 +472,39 @@ void RaceManager::startNew(bool from_overworld)
         }   // if m_continue_saved_gp
     }   // if grand prix
 
+    if (m_minor_mode == MINOR_MODE_3_STRIKES || m_minor_mode == MINOR_MODE_FREE_FOR_ALL)
+    {
+        randomizeSpawn();
+    }
+
     startNextRace();
 }   // startNew
+
+//-----------------------------------------------------------------------------
+/** \brief Gives each kart a random spawn id.
+ * It goes through all the AI and human player karts and
+ * randomizes an available id from 0 to the maximum number of
+ * players supported for the selected track.
+ */
+void RaceManager::randomizeSpawn() {
+    RandomGenerator random;
+    Track* track = track_manager->getTrack(race_manager->getTrackName());
+    const int m_max_arena_players = track->getMaxArenaPlayers();
+    std::vector<int> spawn_ids(m_max_arena_players);
+    for (int n = 0; n < spawn_ids.size(); n++)
+    {
+        spawn_ids[n] = n;
+    }
+    for (auto &kart : m_kart_status) {
+        if (spawn_ids.empty())
+            return;
+        if (kart.m_spawn_id && (kart.m_kart_type == KT_PLAYER || kart.m_kart_type == KT_AI)) {
+            int spawn_index = random.get(spawn_ids.size());
+            kart.m_spawn_id = spawn_ids[spawn_index];
+            spawn_ids.erase(spawn_ids.begin() + spawn_index);
+        }
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** \brief Starts the next (or first) race.
@@ -1060,7 +1094,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
     for(int i = 0; i < m_num_karts; i++)
     {
         m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
-            i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+            i, -1, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
         init_gp_rank ++;
     }
 

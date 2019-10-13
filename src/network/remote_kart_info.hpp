@@ -51,6 +51,7 @@ class RemoteKartInfo
         irr::core::stringw  m_user_name;
         int                 m_local_player_id;
         int                 m_global_player_id;
+		int                 m_spawn_id;
         uint32_t            m_host_id;
         KartTeam            m_kart_team;
         bool                m_network_player;
@@ -65,6 +66,7 @@ public:
                     bool network)
                   : m_kart_name(kart_name), m_user_name(user_name),
                     m_local_player_id(player_id), m_global_player_id(-1),
+                    m_spawn_id(-1),
                     m_host_id(host_id), m_kart_team(KART_TEAM_NONE),
                     m_network_player(network),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
@@ -72,7 +74,7 @@ public:
      {}
      RemoteKartInfo(const std::string& kart_name) : m_kart_name(kart_name),
                     m_user_name(""), m_local_player_id(-1),
-                    m_global_player_id(-1),
+                    m_global_player_id(-1), m_spawn_id(-1),
                     m_host_id(std::numeric_limits<uint32_t>::max()),
                     m_kart_team(KART_TEAM_NONE), m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
@@ -80,6 +82,7 @@ public:
      {}
      RemoteKartInfo() : m_kart_name(""), m_user_name(""),
                     m_local_player_id(-1), m_global_player_id(-1),
+                    m_spawn_id(-1),
                     m_host_id(std::numeric_limits<uint32_t>::max()),
                     m_kart_team(KART_TEAM_NONE), m_network_player(false),
                     m_difficulty(PLAYER_DIFFICULTY_NORMAL),
@@ -90,6 +93,7 @@ public:
     void setHostId(uint32_t id)              { m_host_id = id;            }
     void setLocalPlayerId(int id)            { m_local_player_id = id;    }
     void setGlobalPlayerId(int id)           { m_global_player_id = id;   }
+    void setSpawnId(int id)                  { m_spawn_id = id;           }
     void setKartTeam(KartTeam team)      { m_kart_team = team;      }
     void setNetworkPlayer(bool value)        { m_network_player = value;  }
     void setDefaultKartColor(float value) { m_default_kart_color = value; }
@@ -99,6 +103,7 @@ public:
     uint32_t getHostId() const               { return m_host_id;          }
     int  getLocalPlayerId() const            { return m_local_player_id;  }
     int  getGlobalPlayerId() const           { return m_global_player_id; }
+    int  getSpawnId() const                  { return m_spawn_id;         }
     bool  isNetworkPlayer() const            { return m_network_player;   }
     const std::string& getKartName() const   { return m_kart_name;        }
     const irr::core::stringw& getPlayerName() const { return m_user_name; }
