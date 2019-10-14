@@ -386,7 +386,6 @@ void RaceManager::startNew(bool from_overworld)
 
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
-    
     m_kart_status.clear();
     if (m_num_ghost_karts > 0)
         m_num_karts += m_num_ghost_karts;
@@ -436,7 +435,6 @@ void RaceManager::startNew(bool from_overworld)
                                            m_player_karts[i].getGlobalPlayerId(),
                                            init_gp_rank, kt,
                                            m_player_karts[i].getDifficulty()));
-        
         if(UserConfigParams::m_ftl_debug)
         {
             Log::debug("RaceManager", "[ftl] rank %d kart %s", init_gp_rank,
