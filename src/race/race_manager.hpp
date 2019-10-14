@@ -263,8 +263,6 @@ public:
         int         m_local_player_id;
         /** Global ID of player. */
         int         m_global_player_id;
-        /** Spawn ID used for randomizing the player spawn in battle modes. */
-        int         m_spawn_id;
         /** In GPs, at the end, will hold the overall rank of this kart
          *  (0<=m_gp_rank < num_karts-1). */
         int         m_gp_rank;
@@ -283,7 +281,6 @@ public:
                    m_kart_type(kt),
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
-                   m_spawn_id(-1),
                    m_gp_rank(init_gp_rank), m_difficulty(difficulty)
                 { m_boosted_ai = false; m_color = 0.0f; }
 
@@ -631,10 +628,6 @@ public:
     {
         return m_kart_status[k].m_global_player_id;
     }   // getKartGlobalPlayerId
-    // ------------------------------------------------------------------------
-    int getKartSpawnId(int k) const {
-        return m_kart_status[k].m_spawn_id;
-    }   // getKartLocalPlayerId
     // ------------------------------------------------------------------------
     float getOverallTime(int kart) const
     {

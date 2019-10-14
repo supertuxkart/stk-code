@@ -139,7 +139,7 @@ protected:
 
     virtual std::shared_ptr<AbstractKart> createKart
         (const std::string &kart_ident, int index, int local_player_id,
-        int global_player_id, int spawn_id, RaceManager::KartType type,
+        int global_player_id, RaceManager::KartType type,
         PerPlayerDifficulty difficulty);
 
     /** Pointer to the race GUI. The race GUI is handled by world. */

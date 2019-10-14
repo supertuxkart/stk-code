@@ -471,43 +471,8 @@ void RaceManager::startNew(bool from_overworld)
         }   // if m_continue_saved_gp
     }   // if grand prix
 
-    if (m_minor_mode == MINOR_MODE_3_STRIKES || m_minor_mode == MINOR_MODE_FREE_FOR_ALL)
-    {
-        randomizeSpawn();
-    }
-
     startNextRace();
 }   // startNew
-
-//-----------------------------------------------------------------------------
-/** \brief Gives each kart a random spawn id in local play.
- * It goes through all the AI and human player karts and
- * randomizes an available id from 0 to the maximum number of
- * players supported for the selected track.
- */
-void RaceManager::randomizeSpawn() {
-    RandomGenerator random;
-    Track* track = track_manager->getTrack(race_manager->getTrackName());
-    const int m_max_arena_players = track->getMaxArenaPlayers();
-    std::vector<int> spawn_ids(m_max_arena_players);
-    for (int n = 0; n < spawn_ids.size(); n++)
-    {
-        spawn_ids[n] = n;
-    }
-    for (auto &kart : m_kart_status)
-    {
-        if (spawn_ids.empty())
-            return;
-
-        if (kart.m_global_player_id == -1 &&
-            (kart.m_kart_type == KT_PLAYER || kart.m_kart_type == KT_AI))
-        {
-            int spawn_index = random.get(spawn_ids.size());
-            kart.m_spawn_id = spawn_ids[spawn_index];
-            spawn_ids.erase(spawn_ids.begin() + spawn_index);
-        }
-    }
-}
 
 //-----------------------------------------------------------------------------
 /** \brief Starts the next (or first) race.
