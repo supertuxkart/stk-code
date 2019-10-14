@@ -404,7 +404,6 @@ public:
     void setDifficulty(Difficulty diff);
     static Difficulty convertDifficulty(const std::string &difficulty);
     void startNew(bool from_overworld);
-    void randomizeSpawn();
     void next();
     void rerunRace();
     void exitRace(bool delete_world=true);
