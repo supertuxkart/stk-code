@@ -202,7 +202,7 @@ void World::init()
     // Shuffles the start transforms with playing 3-strikes or free for all battles.
     if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
-         race_manager->getKartGlobalPlayerId(0) == -1)
+         !NetworkConfig::get()->isNetworking())
     {
         track->shuffleStartTransforms();
     }
