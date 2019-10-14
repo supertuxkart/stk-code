@@ -1362,6 +1362,8 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         NetworkConfig::get()->setIsServer(false);
         if (CommandLine::has("--network-ai", &n))
         {
+            // We need an existing current player
+            PlayerManager::get()->enforceCurrentPlayer();
             NetworkConfig::get()->setNetworkAITester(true);
             PlayerManager::get()->createGuestPlayers(n);
             for (int i = 0; i < n; i++)
