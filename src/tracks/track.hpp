@@ -28,6 +28,7 @@
 
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include <irrlicht.h>
 
@@ -515,6 +516,13 @@ public:
         if (index >= m_start_transforms.size())
             Log::fatal("Track", "No start position for kart %i.", index);
         return m_start_transforms[index];
+    }
+    // ------------------------------------------------------------------------
+    /** Shuffles the start transformations
+    */
+    void shuffleStartTransforms()
+    {
+        std::random_shuffle(m_start_transforms.begin(), m_start_transforms.end());
     }
     // ------------------------------------------------------------------------
     /** Sets pointer to the aabb of this track. */

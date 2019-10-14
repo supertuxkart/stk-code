@@ -199,6 +199,14 @@ void World::init()
     // This also defines the static Track::getCurrentTrack function.
     track->loadTrackModel(race_manager->getReverseTrack());
 
+    // Shuffles the start transforms with playing 3-strikes or free for all battles.
+    if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
+         !NetworkConfig::get()->isNetworking())
+    {
+        track->shuffleStartTransforms();
+    }
+
     main_loop->renderGUI(6998);
     if (gk > 0)
     {
