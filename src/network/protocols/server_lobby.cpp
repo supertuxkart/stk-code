@@ -1683,7 +1683,8 @@ void ServerLobby::update(int ticks)
                 rki.makeReserved();
                 continue;
             }
-            if (sec > 0 && peer->idleForSeconds() > sec &&
+            if (!peer->isAIPeer() &&
+                sec > 0 && peer->idleForSeconds() > sec &&
                 !peer->isDisconnected() && NetworkConfig::get()->isWAN())
             {
                 if (w && w->getKart(i)->hasFinishedRace())
