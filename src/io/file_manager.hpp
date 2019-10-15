@@ -132,7 +132,7 @@ private:
     void              discoverPaths();
     void              addAssetsSearchPath();
     void              resetSubdir();
-#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
+#if !defined(WIN32) && !defined(__APPLE__)
     std::string       checkAndCreateLinuxDir(const char *env_name,
                                              const char *dir_name,
                                              const char *fallback1,

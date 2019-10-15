@@ -64,7 +64,7 @@ namespace irr {
 #  include <direct.h>
 #  include <windows.h>
 #  include <stdio.h>
-#  if !defined(__CYGWIN__ ) && !defined(__MINGW32__)
+#  if !defined(__MINGW32__)
      /*Needed by the remove directory function */
 #    define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
 #    define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
@@ -898,7 +898,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
     Log::info("FileManager", "Creating directory '%s'.", path.c_str());
 
     // Otherwise try to create the directory:
-#if defined(WIN32) && !defined(__CYGWIN__)
+#if defined(WIN32)
     bool error = _wmkdir(StringUtils::utf8ToWide(path).c_str()) != 0;
 #else
     bool error = mkdir(path.c_str(), 0755) != 0;
@@ -956,7 +956,7 @@ void FileManager::checkAndCreateConfigDir()
     else
     {
 
-#if defined(WIN32) || defined(__CYGWIN__)
+#if defined(WIN32)
 
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
@@ -1060,7 +1060,7 @@ void FileManager::checkAndCreateConfigDir()
  */
 void FileManager::checkAndCreateAddonsDir()
 {
-#if defined(WIN32) || defined(__CYGWIN__)
+#if defined(WIN32)
     m_addons_dir  = m_user_config_dir+"../addons/";
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
@@ -1097,7 +1097,7 @@ void FileManager::checkAndCreateAddonsDir()
  */
 void FileManager::checkAndCreateScreenshotDir()
 {
-#if defined(WIN32) || defined(__CYGWIN__)
+#if defined(WIN32)
     m_screenshot_dir  = m_user_config_dir+"screenshots/";
 #elif defined(__APPLE__)
     m_screenshot_dir  = getenv("HOME");
@@ -1123,7 +1123,7 @@ void FileManager::checkAndCreateScreenshotDir()
  */
 void FileManager::checkAndCreateReplayDir()
 {
-#if defined(WIN32) || defined(__CYGWIN__)
+#if defined(WIN32)
     m_replay_dir = m_user_config_dir + "replay/";
 #elif defined(__APPLE__)
     m_replay_dir  = getenv("HOME");
@@ -1149,7 +1149,7 @@ void FileManager::checkAndCreateReplayDir()
 */
 void FileManager::checkAndCreateCachedTexturesDir()
 {
-#if defined(WIN32) || defined(__CYGWIN__)
+#if defined(WIN32)
     m_cached_textures_dir = m_user_config_dir + "cached-textures/";
 #elif defined(__APPLE__)
     m_cached_textures_dir = getenv("HOME");
@@ -1174,7 +1174,7 @@ void FileManager::checkAndCreateCachedTexturesDir()
  */
 void FileManager::checkAndCreateGPDir()
 {
-#if defined(WIN32) || defined(__CYGWIN__)
+#if defined(WIN32)
     m_gp_dir = m_user_config_dir + "grandprix/";
 #elif defined(__APPLE__)
     m_gp_dir  = getenv("HOME");
@@ -1195,7 +1195,7 @@ void FileManager::checkAndCreateGPDir()
 }   // checkAndCreateGPDir
 
 // ----------------------------------------------------------------------------
-#if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
+#if !defined(WIN32) && !defined(__APPLE__)
 
 /** Find a directory to use for remaining unix variants. Use the new standards
  *  for config directory based on XDG_* environment variables, or a
