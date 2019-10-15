@@ -424,7 +424,11 @@ void ClientLobby::update(int ticks)
             if (NetworkConfig::get()->isNetworkAITester())
             {
                 // I18N: Shown in lobby to indicate it's a bot in LAN game
+#ifdef SERVER_ONLY
+                name = L"Bot";
+#else
                 name = _("Bot");
+#endif
                 if (i > 0)
                 {
                     name += core::stringw(" ") + StringUtils::toWString(i);
