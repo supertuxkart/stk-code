@@ -254,6 +254,8 @@ void MusicInformation::update(float dt)
         float fraction=m_time_since_faster/m_faster_time;
         m_normal_music->setVolume(1-fraction);
         m_fast_music->setVolume(fraction);
+        m_normal_music->update();
+        m_fast_music->update();
         break;
                        }
     case SOUND_FASTER: {

@@ -235,13 +235,13 @@ bool MusicOggStream::pauseMusic()
 //-----------------------------------------------------------------------------
 bool MusicOggStream::resumeMusic()
 {
-    m_playing.store(true);
-
     if (m_fileName == "")
     {
         // nothing is loaded
         return true;
     }
+
+    m_playing.store(true);
 
     alSourcePlay(m_soundSource);
     m_pausedMusic= false;

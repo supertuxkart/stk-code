@@ -113,6 +113,44 @@ generate_assets()
     cd -
 }
 
+generate_full_assets()
+{
+    echo "Generate zip file with full assets"
+
+    if [ -f "./android-output/stk-assets.zip" ]; then
+        echo "Full assets already found in ./android-output/stk-assets.zip"
+        return
+    fi
+
+    cp -a ./android/generate_assets.sh ./android-output/
+
+    cd ./android-output/
+
+    ONLY_ASSETS=1        \
+    TRACKS="all"         \
+    TEXTURE_SIZE=512     \
+    JPEG_QUALITY=95      \
+    PNG_QUALITY=95       \
+    PNGQUANT_QUALITY=95  \
+    SOUND_QUALITY=112    \
+    SOUND_MONO=0         \
+    SOUND_SAMPLE=44100   \
+    ./generate_assets.sh
+
+    if [ ! -f "./assets/directories.txt" ]; then
+        echo "Error: Couldn't generate assets"
+        return
+    fi
+
+    cd ./assets/data
+    zip -r ../../stk-assets.zip ./*
+    cd ../../
+
+    rm ./generate_assets.sh
+
+    cd ../
+}
+
 build_package()
 {
     export ARCH1=$1
@@ -195,3 +233,6 @@ PROJECT_CODE=$(($PROJECT_CODE + 1))
 if [ -z "$1" ] || [ "$1" = "x86_64" ]; then
     build_package x86_64 x86_64
 fi
+
+# Generate zip file with full assets
+generate_full_assets

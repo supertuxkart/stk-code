@@ -40,6 +40,7 @@ export SOUND_SAMPLE_DEFAULT=32000
 export RUN_OPTIMIZE_SCRIPT_DEFAULT=0
 export DECREASE_QUALITY_DEFAULT=1
 export CONVERT_TO_JPG_DEFAULT=1
+export ONLY_ASSETS_DEFAULT=0
 
 export ASSETS_PATHS="../data                    \
                      ../../stk-assets           \
@@ -104,6 +105,10 @@ fi
 
 if [ -z "$CONVERT_TO_JPG" ]; then
     export CONVERT_TO_JPG="$CONVERT_TO_JPG_DEFAULT"
+fi
+
+if [ -z "$ONLY_ASSETS" ]; then
+    export ONLY_ASSETS=$ONLY_ASSETS_DEFAULT
 fi
 
 # Find assets path
@@ -641,8 +646,10 @@ fi
 
 
 # Copy data directory
-echo "Copy data directory"
-cp -a ../data/* assets/data/
+if [ $ONLY_ASSETS -eq 0 ]; then
+    echo "Copy data directory"
+    cp -a ../data/* assets/data/
+fi
 
 
 # Remove unused files
@@ -663,6 +670,9 @@ echo "Generate directories list"
 find assets/* -type d | sort > assets/directories.txt
 sed -i s/'.\/assets\/'// assets/directories.txt
 sed -i s/'assets\/'// assets/directories.txt
+
+# A file that can be used to check if apk has assets
+echo "has_assets" > assets/has_assets.txt
 
 
 # It will be probably ignored by ant, but create it anyway...

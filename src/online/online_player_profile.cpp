@@ -253,6 +253,7 @@ namespace Online
             m_online_state = OS_SIGNED_IN;
             if(rememberPassword())
             {
+                setWasOnlineLastTime(true);
                 saveSession(getOnlineId(), getToken());
             }
 
@@ -427,7 +428,7 @@ namespace Online
                      OnlineProfile::RelationInfo * relation_info =
                                                 profile->getRelationInfo();
 
-                     if (relation_info->isOnline())
+                     if (relation_info && relation_info->isOnline())
                      {
                          if (!now_online) // the friend went offline
                          {
@@ -435,7 +436,7 @@ namespace Online
                              went_offline = true;
                          }
                      }
-                     else
+                     else if (relation_info)
                      {
                          if (now_online) // friend came online
                          {

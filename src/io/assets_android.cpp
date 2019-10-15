@@ -231,17 +231,21 @@ void AssetsAndroid::init()
     {
         m_progress_bar = new ProgressBarAndroid();
         m_progress_bar->draw(0.01f);
+        
+        if (hasAssets())
+        {
+            removeData();
+            extractData();
             
-        removeData();
-        extractData();
+            if (!m_file_manager->fileExists(m_stk_dir + "/.extracted"))
+            {
+                Log::fatal("AssetsAndroid", "Fatal error: Assets were not "
+                           "extracted properly");
+            }
+        }
         
         delete m_progress_bar;
 
-        if (!m_file_manager->fileExists(m_stk_dir + "/.extracted"))
-        {
-            Log::fatal("AssetsAndroid", "Fatal error: Assets were not "
-                       "extracted properly");
-        }
     }
 
 #endif
@@ -513,16 +517,49 @@ void AssetsAndroid::removeData()
     
     if (!data_path.empty())
     {
-        const std::string child_path = data_path + "/files/libchildprocess.so";
-    
-        if (m_file_manager->fileExists(child_path))
+        const std::vector<std::string> child_paths = 
         {
-            Log::info("AssetsAndroid", "Deleting old libchildprocess: %s", 
+            data_path + "/files/libchildprocess.so",
+            data_path + "/files/libchildprocess_ai.so"
+        };
+    
+        for (auto child_path : child_paths)
+        {
+            if (!m_file_manager->fileExists(child_path))
+                continue;
+                
+            Log::info("AssetsAndroid", "Deleting old childprocess: %s", 
                       child_path.c_str());
             m_file_manager->removeFile(child_path);
         }
     }
 #endif
+}
+
+//-----------------------------------------------------------------------------
+/** A function that checks if assets are included in the package
+ *  \return true if apk has assets
+ */
+bool AssetsAndroid::hasAssets()
+{
+#ifdef ANDROID
+    AAssetManager* amgr = global_android_app->activity->assetManager;
+    
+    AAsset* asset = AAssetManager_open(amgr, "has_assets.txt",
+                                       AASSET_MODE_STREAMING);
+
+    if (asset == NULL)
+    {
+        Log::info("AssetsAndroid", "Package doesn't have assets");
+        return false;
+    }
+
+    Log::info("AssetsAndroid", "Package has assets");
+    AAsset_close(asset);
+    return true;
+#endif
+
+    return false;
 }
 
 //-----------------------------------------------------------------------------
@@ -622,15 +659,18 @@ std::string AssetsAndroid::getDataPath()
     {
         Log::warn("AssetsAndroid", "Cannot use standard data dir");
         
-        AndroidApplicationInfo application_info = 
-            CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
+        if (global_android_activity)
+        {
+            AndroidApplicationInfo application_info = 
+                CIrrDeviceAndroid::getApplicationInfo(global_android_activity);
+            
+            data_path = application_info.data_dir;
+        }
         
-        data_path = application_info.data_dir;
-    }
-    
-    if (access(data_path.c_str(), R_OK) != 0)
-    {
-        data_path = "";
+        if (access(data_path.c_str(), R_OK) != 0)
+        {
+            data_path = "";
+        }
     }
     
     return data_path;
@@ -646,10 +686,15 @@ std::string AssetsAndroid::getDataPath()
 std::string AssetsAndroid::getLibPath()
 {
 #ifdef ANDROID
-    AndroidApplicationInfo application_info = 
-        CIrrDeviceAndroid::getApplicationInfo(global_android_app->activity);
-
-    std::string lib_path = application_info.native_lib_dir;
+    std::string lib_path;
+    
+    if (global_android_activity)
+    {
+        AndroidApplicationInfo application_info = 
+            CIrrDeviceAndroid::getApplicationInfo(global_android_activity);
+    
+        lib_path = application_info.native_lib_dir;
+    }
 
     if (access(lib_path.c_str(), R_OK) != 0)
     {
