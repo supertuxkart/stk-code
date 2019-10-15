@@ -266,7 +266,11 @@ STKHost::STKHost(bool server)
         if (addr.port == 0 && !UserConfigParams::m_random_server_port)
             addr.port = stk_config->m_server_port;
         // Reserve 1 peer to deliver full server message
-        m_network = new Network(ServerConfig::m_server_max_players + 1,
+        int peer_count = ServerConfig::m_server_max_players + 1;
+        // 1 more peer to hold ai peer
+        if (ServerConfig::m_ai_handling)
+            peer_count++;
+        m_network = new Network(peer_count,
             /*channel_limit*/EVENT_CHANNEL_COUNT, /*max_in_bandwidth*/0,
             /*max_out_bandwidth*/ 0, &addr, true/*change_port_if_bound*/);
     }
@@ -1059,7 +1063,8 @@ void STKHost::mainLoop()
 
                 // Remove peer which has not been validated after a specific time
                 // It is validated when the first connection request has finished
-                if (!it->second->isValidated() &&
+                if (!it->second->isAIPeer() &&
+                    !it->second->isValidated() &&
                     it->second->getConnectedTime() > timeout)
                 {
                     Log::info("STKHost", "%s has not been validated for more"
@@ -1155,7 +1160,7 @@ void STKHost::mainLoop()
                     getPeerCount());
                 // Client always trust the server
                 if (!is_server)
-                    stk_peer->setValidated();
+                    stk_peer->setValidated(true);
             }   // ENET_EVENT_TYPE_CONNECT
             else if (event.type == ENET_EVENT_TYPE_DISCONNECT)
             {
@@ -1510,6 +1515,8 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
     {
         if (peer.second->isDisconnected() || !peer.second->isValidated())
             continue;
+        if (ServerConfig::m_ai_handling && peer.second->isAIPeer())
+            continue;
         auto peer_profile = peer.second->getPlayerProfiles();
         p.insert(p.end(), peer_profile.begin(), peer_profile.end());
     }
@@ -1561,7 +1568,7 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
     }
     auto stk_peer = std::make_shared<STKPeer>(event.peer, this,
         m_next_unique_host_id++);
-    stk_peer->setValidated();
+    stk_peer->setValidated(true);
     m_peers[event.peer] = stk_peer;
     setPrivatePort();
     auto pm = ProtocolManager::lock();
@@ -1599,6 +1606,8 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
         auto& stk_peer = p.second;
         if (stk_peer->isWaitingForGame())
             continue;
+        if (ServerConfig::m_ai_handling && stk_peer->isAIPeer())
+            continue;
         for (auto& q : stk_peer->getPlayerProfiles())
             players.push_back(q);
     }
@@ -1622,6 +1631,8 @@ void STKHost::updatePlayers(unsigned* ingame, unsigned* waiting,
     {
         auto& stk_peer = p.second;
         if (!stk_peer->isValidated())
+            continue;
+        if (ServerConfig::m_ai_handling && stk_peer->isAIPeer())
             continue;
         if (stk_peer->isWaitingForGame())
             waiting_players += (uint32_t)stk_peer->getPlayerProfiles().size();

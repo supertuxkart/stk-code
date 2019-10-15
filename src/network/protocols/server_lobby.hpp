@@ -116,6 +116,8 @@ private:
      * (disconnected). */
     std::weak_ptr<STKPeer> m_server_owner;
 
+    std::weak_ptr<STKPeer> m_ai_peer;
+
     std::atomic<uint32_t> m_server_owner_id;
 
     /** Official karts and tracks available in server. */
@@ -207,6 +209,9 @@ private:
 
     uint64_t m_client_starting_time;
 
+    // Calculated before each game started
+    unsigned m_ai_count;
+
     // connection management
     void clientDisconnected(Event* event);
     void connectionRequested(Event* event);
@@ -227,19 +232,7 @@ private:
     void updateServerOwner();
     void handleServerConfiguration(Event* event);
     void updateTracksForMode();
-    bool checkPeersReady() const
-    {
-        bool all_ready = true;
-        for (auto p : m_peers_ready)
-        {
-            if (p.first.expired())
-                continue;
-            all_ready = all_ready && p.second;
-            if (!all_ready)
-                return false;
-        }
-        return true;
-    }
+    bool checkPeersReady(bool ignore_ai_peer) const;
     void resetPeersReady()
     {
         for (auto it = m_peers_ready.begin(); it != m_peers_ready.end();)
@@ -333,6 +326,7 @@ private:
     void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
     void writeDisconnectInfoTable(STKPeer* peer);
     void writePlayerReport(Event* event);
+    bool supportsAI();
 public:
              ServerLobby();
     virtual ~ServerLobby();

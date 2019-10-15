@@ -385,6 +385,12 @@ namespace ServerConfig
         "empty to disable. "
         "This table can be shared for all servers if you use the same name."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_ai_handling
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ai-handling",
+        "If true this server will auto add / remove AI connected with "
+        "network-ai=x, which will kick N - 1 bot(s) where N is the number "
+        "of human players. Only use this for non-GP racing server."));
+
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
     static const uint32_t m_server_version = 6;

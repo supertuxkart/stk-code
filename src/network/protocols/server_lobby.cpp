@@ -536,6 +536,7 @@ void ServerLobby::setup()
     m_item_seed = 0;
     m_winner_peer_id = 0;
     m_client_starting_time = 0;
+    m_ai_count = 0;
     auto players = STKHost::get()->getPlayersForNewGame();
     if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
     {
@@ -545,6 +546,11 @@ void ServerLobby::setup()
     if (!m_game_setup->isGrandPrix() || !m_game_setup->isGrandPrixStarted())
     {
         for (auto player : players)
+            player->setKartName("");
+    }
+    if (auto ai = m_ai_peer.lock())
+    {
+        for (auto player : ai->getPlayerProfiles())
             player->setKartName("");
     }
 
@@ -664,7 +670,8 @@ void ServerLobby::kickHost(Event* event)
     NetworkString& data = event->data();
     uint32_t host_id = data.getUInt32();
     std::shared_ptr<STKPeer> peer = STKHost::get()->findPeerByHostId(host_id);
-    if (peer)
+    // Ignore kicking ai peer if ai handling is on
+    if (peer && (!ServerConfig::m_ai_handling || !peer->isAIPeer()))
         peer->kick();
 }   // kickHost
 
@@ -1113,7 +1120,7 @@ void ServerLobby::asynchronousUpdate()
                 m_timeout.store(std::numeric_limits<int64_t>::max());
             }
             if (m_timeout.load() < (int64_t)StkTime::getMonoTimeMs() ||
-                (checkPeersReady() &&
+                (checkPeersReady(true/*ignore_ai_peer*/) &&
                 (int)players >= ServerConfig::m_min_start_game_players))
             {
                 resetPeersReady();
@@ -1151,7 +1158,8 @@ void ServerLobby::asynchronousUpdate()
         // m_server_has_loaded_world is set by main thread with atomic write
         if (m_server_has_loaded_world.load() == false)
             return;
-        if (!checkPeersReady())
+        if (!checkPeersReady(
+            ServerConfig::m_ai_handling && m_ai_count == 0/*ignore_ai_peer*/))
             return;
         // Reset for next state usage
         resetPeersReady();
@@ -1188,6 +1196,17 @@ void ServerLobby::asynchronousUpdate()
             ItemManager::updateRandomSeed(m_item_seed);
             m_game_setup->setRace(winner_vote);
             auto players = STKHost::get()->getPlayersForNewGame();
+            auto ai = m_ai_peer.lock();
+            if (supportsAI() && ai)
+            {
+                auto ai_profiles = ai->getPlayerProfiles();
+                if (m_ai_count > 0)
+                {
+                    ai_profiles.resize(m_ai_count);
+                    players.insert(players.end(), ai_profiles.begin(),
+                        ai_profiles.end());
+                }
+            }
             m_game_setup->sortPlayersForGrandPrix(players);
             m_game_setup->sortPlayersForGame(players);
             for (unsigned i = 0; i < players.size(); i++)
@@ -1795,7 +1814,7 @@ void ServerLobby::update(int ticks)
         Log::info("ServerLobby", "End of game message sent");
         break;
     case RESULT_DISPLAY:
-        if (checkPeersReady() ||
+        if (checkPeersReady(true/*ignore_ai_peer*/) ||
             (int64_t)StkTime::getMonoTimeMs() > m_timeout.load())
         {
             // Send a notification to all clients to exit
@@ -2016,10 +2035,33 @@ void ServerLobby::startSelection(const Event *event)
         m_available_kts.second.erase(track_erase);
     }
 
+    unsigned max_player = 0;
+    STKHost::get()->updatePlayers(&max_player);
+    if (auto ai = m_ai_peer.lock())
+    {
+        if (supportsAI())
+        {
+            unsigned total_ai_available =
+                (unsigned)ai->getPlayerProfiles().size();
+            m_ai_count = max_player > total_ai_available ?
+                0 : total_ai_available - max_player + 1;
+            // Disable ai peer for this game
+            if (m_ai_count == 0)
+                ai->setValidated(false);
+            else
+                ai->setValidated(true);
+        }
+        else
+        {
+            ai->setValidated(false);
+            m_ai_count = 0;
+        }
+    }
+    else
+        m_ai_count = 0;
+
     if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
-        unsigned max_player = 0;
-        STKHost::get()->updatePlayers(&max_player);
         auto it = m_available_kts.second.begin();
         while (it != m_available_kts.second.end())
         {
@@ -2842,6 +2884,7 @@ void ServerLobby::connectionRequested(Event* event)
     // Reject non-valiated player joinning if WAN server and not disabled
     // encforement of validation, unless it's player from localhost or lan
     // And no duplicated online id or split screen players in ranked server
+    // AIPeer only from lan and only 1 if ai handling
     std::set<uint32_t> all_online_ids =
         STKHost::get()->getAllPlayerOnlineIds();
     bool duplicated_ranked_player =
@@ -2853,7 +2896,11 @@ void ServerLobby::connectionRequested(Event* event)
         NetworkConfig::get()->isWAN() &&
         ServerConfig::m_validating_player) ||
         (ServerConfig::m_strict_players &&
-        (player_count != 1 || online_id == 0 || duplicated_ranked_player)))
+        (player_count != 1 || online_id == 0 || duplicated_ranked_player)) ||
+        (peer->isAIPeer() && !peer->getAddress().isLAN()) ||
+        (peer->isAIPeer() &&
+        ServerConfig::m_ai_handling && !m_ai_peer.expired()) ||
+        (peer->isAIPeer() && m_game_setup->isGrandPrix()))
     {
         NetworkString* message = getNetworkString(2);
         message->setSynchronous(true);
@@ -2864,6 +2911,9 @@ void ServerLobby::connectionRequested(Event* event)
         Log::verbose("ServerLobby", "Player refused: invalid player");
         return;
     }
+
+    if (ServerConfig::m_ai_handling && peer->isAIPeer())
+        m_ai_peer = peer;
 
     if (encrypted_size != 0)
     {
@@ -2984,7 +3034,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         peer->addPlayer(player);
     }
 
-    peer->setValidated();
+    peer->setValidated(true);
 
     // send a message to the one that asked to connect
     NetworkString* server_info = getNetworkString();
@@ -3053,7 +3103,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         }
     }
 #ifdef ENABLE_SQLITE3
-    if (m_server_stats_table.empty())
+    if (m_server_stats_table.empty() || peer->isAIPeer())
         return;
     std::string query;
     if (ServerConfig::m_ipv6_server && !peer->getIPV6Address().empty())
@@ -3135,6 +3185,31 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         return;
 
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
+    // N - 1 AI
+    auto ai = m_ai_peer.lock();
+    if (supportsAI() && ai)
+    {
+        auto ai_profiles = ai->getPlayerProfiles();
+        if (m_state.load() == WAITING_FOR_START_GAME ||
+            update_when_reset_server)
+        {
+            if (all_profiles.size() > ai_profiles.size())
+                ai_profiles.clear();
+            else if (!all_profiles.empty())
+            {
+                ai_profiles.resize(
+                    ai_profiles.size() - all_profiles.size() + 1);
+            }
+        }
+        else
+        {
+            // Use fixed number of AI calculated when started game
+            ai_profiles.resize(m_ai_count);
+        }
+        all_profiles.insert(all_profiles.end(), ai_profiles.begin(),
+            ai_profiles.end());
+    }
+
     NetworkString* pl = getNetworkString();
     pl->setSynchronous(true);
     pl->addUInt8(LE_UPDATE_PLAYER_LIST)
@@ -3390,6 +3465,8 @@ bool ServerLobby::handleAllVotes(PeerVote* winner_vote,
     auto peers = STKHost::get()->getPeers();
     for (auto peer : peers)
     {
+        if (peer->isAIPeer())
+            continue;
         if (peer->hasPlayerProfiles() && !peer->isWaitingForGame())
             cur_players += 1.0f;
     }
@@ -3862,6 +3939,9 @@ void ServerLobby::addWaitingPlayersToGame()
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
         }
     }
+    // Re-activiate the ai
+    if (auto ai = m_ai_peer.lock())
+        ai->setValidated(true);
 }   // addWaitingPlayersToGame
 
 //-----------------------------------------------------------------------------
@@ -4465,3 +4545,27 @@ void ServerLobby::saveInitialItems()
     assert(nim);
     nim->saveCompleteState(m_items_complete_state);
 }   // saveInitialItems
+
+//-----------------------------------------------------------------------------
+bool ServerLobby::supportsAI()
+{
+    return getGameMode() == 3 || getGameMode() == 4;
+}   // supportsAI
+
+//-----------------------------------------------------------------------------
+bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
+{
+    bool all_ready = true;
+    for (auto p : m_peers_ready)
+    {
+        auto peer = p.first.lock();
+        if (ignore_ai_peer && peer->isAIPeer())
+            continue;
+        if (!peer)
+            continue;
+        all_ready = all_ready && p.second;
+        if (!all_ready)
+            return false;
+    }
+    return true;
+}   // checkPeersReady

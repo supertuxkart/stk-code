@@ -140,7 +140,7 @@ public:
     void addPlayer(std::shared_ptr<NetworkPlayerProfile> p)
                                                     { m_players.push_back(p); }
     // ------------------------------------------------------------------------
-    void setValidated()                            { m_validated.store(true); }
+    void setValidated(bool val)                     { m_validated.store(val); }
     // ------------------------------------------------------------------------
     /** Returns if the client is validated by server. */
     bool isValidated() const                     { return m_validated.load(); }

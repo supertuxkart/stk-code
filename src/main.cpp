@@ -1440,7 +1440,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         {
             std::string cmd =
                 std::string("--stdout=server_ai.log --no-graphics"
-                " --auto-connect --connect-now=127.0.0.1:") +
+                " --connect-now=127.0.0.1:") +
                 StringUtils::toString(STKHost::get()->getPrivatePort()) +
                 " --no-console-log --network-ai="
                 + StringUtils::toString(ai_num);
