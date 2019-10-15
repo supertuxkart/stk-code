@@ -537,6 +537,7 @@ void ServerLobby::setup()
     m_winner_peer_id = 0;
     m_client_starting_time = 0;
     m_ai_count = 0;
+    m_lobby_players.store(0);
     auto players = STKHost::get()->getPlayersForNewGame();
     if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
     {
@@ -2302,8 +2303,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     const TransportAddress &addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
-    request->addParameter("current-players",
-        STKHost::get()->getTotalPlayers());
+    request->addParameter("current-players", getLobbyPlayers());
     request->addParameter("game-started",
         m_state.load() == WAITING_FOR_START_GAME ? 0 : 1);
     Track* current_track = getPlayingTrack();
@@ -3209,6 +3209,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         all_profiles.insert(all_profiles.end(), ai_profiles.begin(),
             ai_profiles.end());
     }
+    m_lobby_players.store((int)all_profiles.size());
 
     NetworkString* pl = getNetworkString();
     pl->setSynchronous(true);

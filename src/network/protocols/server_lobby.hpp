@@ -191,6 +191,8 @@ private:
 
     std::atomic<int> m_game_mode;
 
+    std::atomic<int> m_lobby_players;
+
     std::atomic<uint64_t> m_last_success_poll_time;
 
     uint64_t m_server_started_at, m_server_delay;
@@ -351,6 +353,7 @@ public:
     float getStartupBoostOrPenaltyForKart(uint32_t ping, unsigned kart_id);
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
+    int getLobbyPlayers() const              { return m_lobby_players.load(); }
     void saveInitialItems();
     void saveIPBanTable(const TransportAddress& addr);
     void listBanTable();
