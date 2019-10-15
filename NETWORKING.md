@@ -174,6 +174,9 @@ The current server configuration xml looks like this:
     <!-- IP geolocation table, you only need this table if you want to geolocate IP from non-stk-addons connection, as all validated players connecting from stk-addons will provide the location info, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
     <ip-geolocation-table value="ip_mapping" />
 
+    <!-- If true this server will auto add / remove AI connected with network-ai=x, which will kick N - 1 bot(s) where N is the number of human players. Only use this for non-GP racing server. -->
+    <ai-handling value="false" />
+
 </server-config>
 
 ```
@@ -202,15 +205,11 @@ After the first time configuration, you can just start the server with the comma
 You can find out that directory location [here (See Where is the configuration stored?)](https://supertuxkart.net/FAQ)
 
 ## Testing server
-There is a network AI tester in STK which can use AI on player controller for server hosting linear races game mode, which helps automating the testing for servers, to enable it use:
+There is a network AI tester in STK which can use AI on player controller for server hosting linear races game mode, which helps automating the testing for servers, to enable it use it on lan server:
 
-`supertuxkart --connect-now=x.x.x.x:y --server-id=id --network-ai=n --auto-connect --no-graphics`
+`supertuxkart --connect-now=x.x.x.x:y --network-ai=n --no-graphics`
 
-x.x.x.x:y is your server ip address with its port, id is the id field of server-info in STK server xml list, omit it if you are testing LAN server, n is the number of AI you want to create.
-
-You can see STK server xml list [here](https://online.supertuxkart.net/api/v2/server/get-all).
-
-You can remove `--auto-connect` if you have another client which can control the starting of games in server, or you can consider enable owner-less mode on server so the games on server can keep going. Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
+Remove `--no-graphics` if you want to see the AI racing. You can also run network AI tester in server-only build of STK.
 
 With the network AI tester, it's easier to for example simulate high-loaded servers or bad (high ping with packet loss) network.
 
