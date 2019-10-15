@@ -100,6 +100,7 @@
  */
 ServerLobby::ServerLobby() : LobbyProtocol()
 {
+    m_lobby_players.store(0);
     std::vector<int> all_k =
         kart_properties_manager->getKartsInGroup("standard");
     std::vector<int> all_t =
@@ -537,7 +538,6 @@ void ServerLobby::setup()
     m_winner_peer_id = 0;
     m_client_starting_time = 0;
     m_ai_count = 0;
-    m_lobby_players.store(0);
     auto players = STKHost::get()->getPlayersForNewGame();
     if (m_game_setup->isGrandPrix() && !m_game_setup->isGrandPrixStarted())
     {
@@ -3179,11 +3179,6 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
     const bool game_started = m_state.load() != WAITING_FOR_START_GAME &&
         !update_when_reset_server;
 
-    // No need to update player list (for started grand prix currently)
-    if (!allowJoinedPlayersWaiting() &&
-        m_state.load() > WAITING_FOR_START_GAME && !update_when_reset_server)
-        return;
-
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
     // N - 1 AI
     auto ai = m_ai_peer.lock();
@@ -3210,6 +3205,11 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             ai_profiles.end());
     }
     m_lobby_players.store((int)all_profiles.size());
+
+    // No need to update player list (for started grand prix currently)
+    if (!allowJoinedPlayersWaiting() &&
+        m_state.load() > WAITING_FOR_START_GAME && !update_when_reset_server)
+        return;
 
     NetworkString* pl = getNetworkString();
     pl->setSynchronous(true);
