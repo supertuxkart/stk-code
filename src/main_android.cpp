@@ -56,6 +56,11 @@ void override_default_params_for_mobile()
     // Enable multitouch race GUI
     UserConfigParams::m_multitouch_draw_gui = true;
 
+#ifdef IOS_STK
+    // Default 30 fps for battery saving
+    UserConfigParams::m_swap_interval = 2;
+#endif
+
 #ifdef ANDROID
     // Set multitouch device scale depending on actual screen size
     int32_t screen_size = AConfiguration_getScreenSize(global_android_app->config);

@@ -205,12 +205,20 @@ float MainLoop::getLimitedDt()
         // the noise the fan on a graphics card makes.
         // When in menus, reduce FPS much, it's not necessary to push to the
         // maximum for plain menus
+#ifdef IOS_STK
+        // For iOS devices seems that they has fps locked at 60 anyway
+        const int max_fps =
+            UserConfigParams::m_swap_interval == 2 ? 30 :
+            UserConfigParams::m_swap_interval == 1 ? 60 :
+            UserConfigParams::m_max_fps;
+#else
         const int max_fps = (irr_driver->isRecording() &&
                              UserConfigParams::m_limit_game_fps )
                           ? UserConfigParams::m_record_fps 
                           : ( StateManager::get()->throttleFPS() 
                               ? 60 
                               : UserConfigParams::m_max_fps     );
+#endif
         const int current_fps = (int)(1000.0f / dt);
         if (!m_throttle_fps || current_fps <= max_fps ||
             ProfileWorld::isProfileMode()                )  break;
