@@ -27,6 +27,7 @@
 
 extern int main(int argc, char *argv[]);
 
+#ifdef ANDROID
 struct android_app* global_android_app = NULL;
 ANativeActivity* global_android_activity = NULL;
 
@@ -37,6 +38,7 @@ void set_global_android_activity(ANativeActivity* activity)
     global_android_activity = activity;
 }
 }
+#endif
 
 void override_default_params_for_mobile()
 {
