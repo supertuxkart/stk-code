@@ -4561,9 +4561,9 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
     for (auto p : m_peers_ready)
     {
         auto peer = p.first.lock();
-        if (ignore_ai_peer && peer->isAIPeer())
-            continue;
         if (!peer)
+            continue;
+        if (ignore_ai_peer && peer->isAIPeer())
             continue;
         all_ready = all_ready && p.second;
         if (!all_ready)
