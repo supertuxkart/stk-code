@@ -27,6 +27,7 @@ class AIBaseController;
 class NetworkAIController : public PlayerController
 {
 private:
+    static int m_ai_frequency;
     int m_prev_update_ticks;
     AIBaseController* m_ai_controller;
     KartControl* m_ai_controls;
@@ -37,6 +38,7 @@ public:
     virtual     ~NetworkAIController();
     virtual void update(int ticks) OVERRIDE;
     virtual void reset() OVERRIDE;
+    static void setAIFrequency(int freq) { m_ai_frequency = freq; }
 };   // class NetworkAIController
 
 #endif // HEADER_PLAYER_CONTROLLER_HPP

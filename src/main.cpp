@@ -207,7 +207,8 @@
 #include "items/powerup_manager.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/combined_characteristic.hpp"
-#include "karts/controller/ai_base_lap_controller.hpp"
+#include "karts/controller/ai_base_controller.hpp"
+#include "karts/controller/network_ai_controller.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -1096,6 +1097,11 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         return false;
     }
 
+    if (CommandLine::has( "--network-ai-freq", &n))
+        NetworkAIController::setAIFrequency(n);
+    else
+        NetworkAIController::setAIFrequency(30);
+
     if (!can_wan && CommandLine::has("--login-id", &n) &&
         CommandLine::has("--token", &s))
     {
@@ -1440,9 +1446,9 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         {
             std::string cmd =
                 std::string("--stdout=server_ai.log --no-graphics"
-                " --connect-now=127.0.0.1:") +
+                " --network-ai-freq=10 --connect-now=127.0.0.1:") +
                 StringUtils::toString(STKHost::get()->getPrivatePort()) +
-                " --no-console-log --network-ai="
+                " --no-console-log --disable-polling --network-ai="
                 + StringUtils::toString(ai_num);
             if (!server_password.empty())
                 cmd += " --server-password=" + server_password;

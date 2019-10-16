@@ -27,7 +27,7 @@
 #include "network/rewind_manager.hpp"
 
 // ============================================================================
-const int UPDATE_FREQUENCY = 30;
+int NetworkAIController::m_ai_frequency = 30;
 // ----------------------------------------------------------------------------
 NetworkAIController::NetworkAIController(AbstractKart *kart,
                                          int local_player_id,
@@ -56,8 +56,8 @@ void NetworkAIController::update(int ticks)
             World::getWorld()->getTicksSinceStart() > m_prev_update_ticks)
         {
             m_prev_update_ticks = World::getWorld()->getTicksSinceStart() +
-                UPDATE_FREQUENCY;
-            m_ai_controller->update(UPDATE_FREQUENCY);
+                m_ai_frequency;
+            m_ai_controller->update(m_ai_frequency);
             convertAIToPlayerActions();
         }
     }
