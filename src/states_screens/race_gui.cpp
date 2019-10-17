@@ -219,6 +219,14 @@ void RaceGUI::calculateMinimapSize()
         m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
                                                         m_map_height);
     }
+    else if ((UserConfigParams::m_minimap_display == 3 && /*map on the center of the screen*/
+       race_manager->getNumLocalPlayers() == 1) || m_multitouch_gui)
+    {
+        m_map_left          = (int)(irr_driver->getActualScreenSize().Width / 2);
+        if (m_map_left + m_map_width > (int)irr_driver->getActualScreenSize().Width)
+          m_map_left        = (int)(irr_driver->getActualScreenSize().Width - m_map_width);
+        m_map_bottom        = (int)( 10.0f * scaling);
+    }
     else // default, map in the bottom-left corner
     {
         m_map_left          = (int)( 10.0f * scaling);

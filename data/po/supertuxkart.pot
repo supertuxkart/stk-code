@@ -5246,6 +5246,11 @@ msgstr ""
 msgid "Hidden"
 msgstr ""
 
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:142
+msgid "Centered"
+msgstr ""
+
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:159
 msgid "Very small"

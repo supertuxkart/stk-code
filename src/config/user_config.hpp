@@ -924,7 +924,7 @@ namespace UserConfigParams
 
     PARAM_PREFIX IntUserConfigParam        m_minimap_display
         PARAM_DEFAULT(IntUserConfigParam(0, "minimap_display",
-                      "Minimap: 0 bottom-left, 1 middle-right, 2 hidden"));
+                      "Minimap: 0 bottom-left, 1 middle-right, 2 hidden, 3 center"));
 
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap
