@@ -225,10 +225,7 @@ void RaceGUI::calculateMinimapSize()
         m_map_left          = (int)(irr_driver->getActualScreenSize().Width / 2);
         if (m_map_left + m_map_width > (int)irr_driver->getActualScreenSize().Width)
           m_map_left        = (int)(irr_driver->getActualScreenSize().Width - m_map_width);
-        m_map_bottom        = (
-            m_map_height >
-            (int)(irr_driver->getActualScreenSize().Height/2)
-            ) ? 0 : (int)( 10.0f * scaling);
+        m_map_bottom        = (int)( 10.0f * scaling);
     }
     else // default, map in the bottom-left corner
     {
