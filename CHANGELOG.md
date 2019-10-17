@@ -5,6 +5,33 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shorcut for overall contribution.
 
+## SuperTuxKart 1.1 (in development)
+
+(List to be completed. Currently include relevant change of commits from 28/09 to 16/10)
+
+### Networking
+* Add AI support to local networking servers, by Benau. This AI is not as strong as the normal AI due to networking lag, but should offer enough challenge for a majority of players.
+
+### Race gameplay and physics
+* Random spawn point in local battle mode, by Aleman778
+
+### General
+
+### Android
+* Various bugfixes by deveee, dos1
+
+### iOS
+* Add iOS support, by Benau
+
+### User Interface
+* Add emoji support, by Benau
+* Show country flags for servers and players in online multiplayer, by Benau
+* Add an option to show everyone's items with the left characters icons, by Fouks
+* Better scaling of many UI elements to large resolutions, by dumaosen and others
+* Scale down the lap time indicator next to the kart icons when there are many karts, by risostk
+* Add icons for the available options in the race result screens, by dumaosen
+* Many minor tweaks
+
 ## SuperTuxKart 1.0 (20. April 2019)
 ### Networking
 * Networking support for normal race, time trial, free for all, capture the flag and soccer by Benau and hiker :
