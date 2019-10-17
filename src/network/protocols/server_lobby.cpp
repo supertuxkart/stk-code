@@ -1744,6 +1744,16 @@ void ServerLobby::update(int ticks)
             RaceEventManager::getInstance()->getProtocol()->requestTerminate();
             GameProtocol::lock()->requestTerminate();
         }
+        else if (auto ai = m_ai_peer.lock())
+        {
+            // Reset AI peer for empty server, which will delete world
+            NetworkString* back_to_lobby = getNetworkString(2);
+            back_to_lobby->setSynchronous(true);
+            back_to_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_NONE);
+            ai->sendPacket(back_to_lobby, /*reliable*/true);
+            delete back_to_lobby;
+        }
+
         resetVotingTime();
         m_game_setup->stopGrandPrix();
         m_rs_state.store(RS_WAITING);
