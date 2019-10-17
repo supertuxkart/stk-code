@@ -625,7 +625,7 @@ void cmdLineHelp()
     "       --init-user        Save the above login and password (if set) in config.\n"
     "       --disable-polling  Don't poll for logged in user.\n"
     "       --port=n           Port number to use.\n"
-    "       --auto-connect     Automatically connect to fist server and start race\n"
+    "       --auto-connect     Automatically connect to first server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
     "       --min-players=n    Minimum number of clients for owner less server(server only).\n"
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
