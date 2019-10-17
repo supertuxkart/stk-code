@@ -1075,6 +1075,27 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
         draw2DImage(icon, pos4, rect4, NULL, NULL, true);
     }
 
+    // Current item(s) and how many if > 1
+    const Powerup* powerup = kart->getPowerup();
+    if (powerup->getType() != PowerupManager::POWERUP_NOTHING && !kart->hasFinishedRace())
+    {
+        int numberItems = kart->getPowerup()->getNum();
+        video::ITexture *iconItem = powerup->getIcon()->getTexture();
+        assert(iconItem);
+
+        const core::rect<s32> rect(core::position2d<s32>(0,0), iconItem->getSize());
+        const core::rect<s32> posItem(x + w/2, y + w/2, x + 5*w/4, y + 5*w/4);
+        draw2DImage(iconItem, posItem, rect, NULL, NULL, true);
+
+        if (numberItems > 1)
+        {
+            gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+            const core::rect<s32> posNumber(x + w, y + w/4, x + 7*w/4, y + w);
+            font->setScale(3.f*((float) w)/(4.f*(float)font->getDimension(L"X").Height));
+            font->draw(StringUtils::toWString(numberItems), posNumber, video::SColor(255, 255, 255, 255));
+        }
+    }
+
     //Plunger
     if (kart->getBlockedByPlungerTicks()>0)
     {
