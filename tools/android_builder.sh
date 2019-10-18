@@ -138,7 +138,7 @@ generate_full_assets()
     ./generate_assets.sh
 
     if [ ! -f "./assets/directories.txt" ]; then
-        echo "Error: Couldn't generate assets"
+        echo "Error: Couldn't generate full assets"
         return
     fi
 
@@ -147,7 +147,16 @@ generate_full_assets()
     cd ../../
 
     rm ./generate_assets.sh
+    
+    if [ ! -f "./stk-assets.zip" ]; then
+        echo "Error: Couldn't generate full assets"
+        return
+    fi
 
+    FULL_ASSETS_SIZE=`du -b ./stk-assets.zip | cut -f1`
+    sed -i "s/stk_assets_size = .*\;/stk_assets_size = $FULL_ASSETS_SIZE\;/g" \
+           "../src/utils/download_assets_size.hpp"
+    
     cd ../
 }
 
@@ -211,6 +220,7 @@ fi
 init_directories
 
 generate_assets
+generate_full_assets
 
 if [ -z "$1" ] || [ "$1" = "armv7" ]; then
     build_package armv7 armeabi-v7a
@@ -233,6 +243,3 @@ PROJECT_CODE=$(($PROJECT_CODE + 1))
 if [ -z "$1" ] || [ "$1" = "x86_64" ]; then
     build_package x86_64 x86_64
 fi
-
-# Generate zip file with full assets
-generate_full_assets
