@@ -231,6 +231,10 @@ void OptionsScreenUI::init()
     assert(splitscreen_method != NULL);
     splitscreen_method->setState(UserConfigParams::split_screen_horizontally);
 
+    CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
+    assert(karts_powerup_gui != NULL);
+    karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
+
     //Forbid changing this setting in game
     splitscreen_method->setActive(!in_game);
 
@@ -374,7 +378,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* split_screen_horizontally = getWidget<CheckBoxWidget>("split_screen_horizontally");
         assert(split_screen_horizontally != NULL);
         UserConfigParams::split_screen_horizontally = split_screen_horizontally->getState();
-
+    }
+    else if (name == "karts_powerup_gui")
+    {
+        CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
+        assert(karts_powerup_gui != NULL);
+        UserConfigParams::m_karts_powerup_gui = karts_powerup_gui->getState();
     }
     else if (name == "showfps")
     {

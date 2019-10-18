@@ -1077,7 +1077,8 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
 
     // Current item(s) and how many if > 1
     const Powerup* powerup = kart->getPowerup();
-    if (powerup->getType() != PowerupManager::POWERUP_NOTHING && !kart->hasFinishedRace())
+    if (UserConfigParams::m_karts_powerup_gui &&
+        powerup->getType() != PowerupManager::POWERUP_NOTHING && !kart->hasFinishedRace())
     {
         int numberItems = kart->getPowerup()->getNum();
         video::ITexture *iconItem = powerup->getIcon()->getTexture();
