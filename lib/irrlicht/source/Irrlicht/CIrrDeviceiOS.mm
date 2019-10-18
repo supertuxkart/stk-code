@@ -15,6 +15,9 @@
 
 #import <CoreMotion/CoreMotion.h>
 #import <GLKit/GLKView.h>
+#import <sys/utsname.h>
+
+extern void getConfigForDevice(const char* dev);
 
 /* Important information */
 
@@ -187,6 +190,11 @@ namespace irr
      name:UIDeviceOrientationDidChangeNotification
      object:[UIDevice currentDevice]];
     override_default_params_for_mobile();
+    struct utsname system_info;
+    uname(&system_info);
+    NSString* model = [NSString stringWithCString:system_info.machine
+        encoding:NSUTF8StringEncoding];
+    getConfigForDevice([model UTF8String]);
     ios_main(0, {});
     // App store may not like this
     exit(0);
