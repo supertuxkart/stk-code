@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-09 15:35+0800\n"
-"PO-Revision-Date: 2019-10-09 18:28+0000\n"
+"PO-Revision-Date: 2019-10-18 11:10+0000\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/supertuxkart/supertuxkart/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -5309,6 +5309,11 @@ msgstr "Rechts"
 #: src/states_screens/options/options_screen_ui.cpp:140
 msgid "Hidden"
 msgstr "Verborgen"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:142
+msgid "Centered"
+msgstr "Gecentreerd"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:159

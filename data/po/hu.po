@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-09 15:35+0800\n"
-"PO-Revision-Date: 2019-10-10 07:38+0000\n"
+"PO-Revision-Date: 2019-10-18 08:36+0000\n"
 "Last-Translator: Balázs Úr\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -5309,6 +5309,11 @@ msgstr "A jobb oldalon"
 #: src/states_screens/options/options_screen_ui.cpp:140
 msgid "Hidden"
 msgstr "Rejtett"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:142
+msgid "Centered"
+msgstr "Középre igazított"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:159

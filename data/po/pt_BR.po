@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-09 15:35+0800\n"
-"PO-Revision-Date: 2019-10-09 13:50+0000\n"
+"PO-Revision-Date: 2019-10-18 05:59+0000\n"
 "Last-Translator: Adevair Junior <adevairhpj@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/supertuxkart/supertuxkart/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
@@ -5310,6 +5310,11 @@ msgstr "No lado direito"
 #: src/states_screens/options/options_screen_ui.cpp:140
 msgid "Hidden"
 msgstr "Oculto"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:142
+msgid "Centered"
+msgstr "Centrado"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:159

@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-10-09 15:35+0800\n"
-"PO-Revision-Date: 2019-10-09 10:25+0000\n"
+"PO-Revision-Date: 2019-10-18 10:21+0000\n"
 "Last-Translator: Любомир Василев\n"
 "Language-Team: Bulgarian (http://www.transifex.com/supertuxkart/supertuxkart/language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -5306,6 +5306,11 @@ msgstr "Отдясно"
 #: src/states_screens/options/options_screen_ui.cpp:140
 msgid "Hidden"
 msgstr "Скрита"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:142
+msgid "Centered"
+msgstr "Центрирана"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:159
