@@ -32,29 +32,39 @@
 
                 <spacer width="5" height="1%"/>
 
-                <!-- ************ VSYNC ************ -->
+                <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spacer width="20" height="100%" />
-                    <div layout="vertical-row" width="fit" height="fit">
-                        <spinner id="vsync" width="8f" align="center" />
+                    <div layout="vertical-row" width="8f" height="fit">
+                        <gauge id="gfx_level" min_value="1" max_value="8" width="100%" align="center" />
                     </div>
-                    <div layout="vertical-row" proportion="1" height="fit">
-                        <label I18N="In the video settings" text="Vertical Sync (requires restart)" align="left"/>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the video settings" text="Graphical Effects Level" align="left"/>
                     </div>
                 </div>
 
                 <spacer width="5" height="1%"/>
 
-                <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
+                <!-- ************ VSYNC ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="20" height="100%" />
-                    <div layout="vertical-row" width="fit" height="fit" id="inner_box">
-                        <gauge id="gfx_level" min_value="1" max_value="8" width="8f" align="center" />
-                        <spacer height="5" width="10"/>
+                    <div layout="vertical-row" width="8f" height="fit" id="inner_box">
+                        <spinner id="vsync" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the video settings" text="Vertical Sync (requires restart)" align="left"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="1%"/>
+				
+                <!-- ************ CUSTOM SETTINGS ************ -->
+                <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
+                    <spacer width="20" height="100%" />
+                    <div layout="vertical-row" width="8f" height="fit" id="inner_box">
                         <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
                     </div>
-                    <div layout="vertical-row" proportion="1" height="fit">
-                        <label I18N="In the video settings" text="Graphical Effects Level" align="left"/>
+                    <div layout="vertical-row" proportion="1" height="100%">
                     </div>
                 </div>
 
@@ -81,7 +91,7 @@
                     <spacer width="40" height="100%" />
                     <checkbox id="rememberWinpos"/>
                     <spacer width="20" height="100%" />
-                    <label id="rememberWinposText" I18N="In the video settings" text="Remember window location"/>
+                    <label id="rememberWinposText" height="100%" I18N="In the video settings" text="Remember window location"/>
                 </div>
 
                 <spacer width="5" height="1%"/>
