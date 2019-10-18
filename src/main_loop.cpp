@@ -19,6 +19,7 @@
 
 #include "main_loop.hpp"
 
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
@@ -110,6 +111,35 @@ MainLoop::~MainLoop()
 float MainLoop::getLimitedDt()
 {
     m_prev_time = m_curr_time;
+
+#ifdef IOS_STK
+    IrrlichtDevice* dev = irr_driver->getDevice();
+    if (dev)
+    {
+        // When ios apps entering background it should not run any
+        // opengl command from apple document, so we stop here
+        bool win_active = dev->isWindowActive();
+        bool has_focus = dev->isWindowFocused();
+        bool first_out_focus = !has_focus;
+        while (!has_focus || !win_active)
+        {
+            if (first_out_focus)
+            {
+                first_out_focus = false;
+                music_manager->pauseMusic();
+                SFXManager::get()->pauseAll();
+            }
+            dev->run();
+            win_active = dev->isWindowActive();
+            has_focus = dev->isWindowFocused();
+            if (has_focus && win_active)
+            {
+                music_manager->resumeMusic();
+                SFXManager::get()->resumeAll();
+            }
+        }
+    }
+#endif
     float dt = 0;
 
     // In profile mode without graphics, run with a fixed dt of 1/60
