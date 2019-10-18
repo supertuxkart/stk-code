@@ -31,31 +31,34 @@
                 <spacer width="5" height="1%"/>
 
                 <!-- ************ SKIN CHOICE ************ -->
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <label proportion="1" I18N="In the ui settings" text="Skin" align="center"/>
-                    <spacer width="2%" height="20"/>
-                    <div layout="horizontal-row" proportion="5" height="100%">
-                        <spinner id="skinchoice" width="60%"/>
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <div layout="vertical-row" width="10f" height="fit">
+                        <spinner id="skinchoice" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the ui settings" text="Skin" align="left"/>
                     </div>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <label proportion="1" I18N="In the ui settings" text="Minimap" align="center"/>
-                    <spacer width="2%" height="20"/>
-                    <div layout="horizontal-row" proportion="5" height="100%">
-                        <spinner id="minimap" width="60%"/>
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <div layout="vertical-row" width="10f" height="fit">
+                        <spinner id="minimap" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the ui settings" text="Minimap" align="left"/>
                     </div>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <label proportion="1" I18N="In the ui settings" text="Font size" align="center"/>
-                    <spacer width="2%" height="20"/>
-                    <div layout="horizontal-row" proportion="5" height="100%">
-                        <gauge id="font_size" width="60%"/>
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <div layout="vertical-row" width="10f" height="fit">
+                        <gauge id="font_size" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the ui settings" text="Font size" align="left"/>
                     </div>
                 </div>
 
@@ -74,6 +77,8 @@
                     <spacer width="1%" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Multiplayer splits screen horizontally" word_wrap="true"/>
                 </div>
+
+                <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
                     <checkbox id="karts_powerup_gui"/>
