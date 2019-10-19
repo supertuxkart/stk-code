@@ -497,7 +497,12 @@ CIrrDeviceMacOSX::CIrrDeviceMacOSX(const SIrrlichtCreationParameters& param)
 			[[NSAutoreleasePool alloc] init];
 			[NSApplication sharedApplication];
 			[NSApp setDelegate:[[[AppDelegate alloc] initWithDevice:this] autorelease]];
-			[NSBundle loadNibNamed:@"MainMenu" owner:[NSApp delegate]];
+			NSMenu* mainMenu = [[[NSMenu alloc] initWithTitle:@""] autorelease];
+			[NSApp setMainMenu:mainMenu];
+			NSMenuItem* menuItem = [mainMenu addItemWithTitle:@"" action:nil keyEquivalent:@""];
+			NSMenu* menu = [[NSMenu alloc] initWithTitle:@""];
+			[menu addItemWithTitle:@"Quit SuperTuxKart" action:@selector(terminate:) keyEquivalent:@"q"];
+			[menuItem setSubmenu:[menu autorelease]];
 			[NSApp finishLaunching];
 		}
 

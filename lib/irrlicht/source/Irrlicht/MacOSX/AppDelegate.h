@@ -10,7 +10,7 @@
 #import <Cocoa/Cocoa.h>
 #import "CIrrDeviceMacOSX.h"
 
-@interface AppDelegate : NSObject
+@interface AppDelegate : NSObject <NSApplicationDelegate>
 {
 	BOOL			_quit;
 	irr::CIrrDeviceMacOSX	*_device;
