@@ -1415,6 +1415,12 @@ namespace GUIEngine
                 x = ICON_MARGIN;
             }
         }
+        // This will avoid no response in windows, also allow showing loading
+        // icon in apple device, because apple device only update render
+        // buffer if you poll the mainloop
+        g_device->setEventReceiver(NULL);
+        g_device->run();
+        g_device->setEventReceiver(EventHandler::get());
 #endif
     } // renderLoading
 
@@ -1430,13 +1436,6 @@ namespace GUIEngine
                     ->beginScene(true, true, video::SColor(255,100,101,140));
             renderLoading(false);
             g_device->getVideoDriver()->endScene();
-#ifdef IOS_STK
-            // Apple will only update render buffer if you poll the event
-            // loop, we do this only in iOS so you don't get esc event when
-            // you press esc button in other OS, this will allow showing
-            // loading icon in iOS
-            g_device->run();
-#endif
         }
         else
         {
