@@ -234,6 +234,10 @@ void OptionsScreenUI::init()
     CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
     assert(karts_powerup_gui != NULL);
     karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
+    
+    CheckBoxWidget* speedometer_total_kart_gui = getWidget<CheckBoxWidget>("speedometer_total_kart_gui");
+    assert(speedometer_total_kart_gui != NULL);
+    speedometer_total_kart_gui->setState(UserConfigParams::m_speedometer_total_kart_gui);
 
     //Forbid changing this setting in game
     splitscreen_method->setActive(!in_game);
@@ -396,6 +400,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
         assert(karts_powerup_gui != NULL);
         UserConfigParams::m_karts_powerup_gui = karts_powerup_gui->getState();
+    }
+    else if (name == "speedometer_total_kart_gui")
+    {
+        CheckBoxWidget* speedometer_total_kart_gui = getWidget<CheckBoxWidget>("speedometer_total_kart_gui");
+        assert(speedometer_total_kart_gui != NULL);
+        UserConfigParams::m_speedometer_total_kart_gui = speedometer_total_kart_gui->getState();
     }
     else if (name == "showfps")
     {

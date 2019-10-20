@@ -458,6 +458,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
             PARAM_DEFAULT(  BoolUserConfigParam(false, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui.") );
+    PARAM_PREFIX BoolUserConfigParam          m_speedometer_total_kart_gui
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "speedometer-total-kart-gui",
+            &m_race_setup_group, "Show total number of karts in speedometer in race gui.") );
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group

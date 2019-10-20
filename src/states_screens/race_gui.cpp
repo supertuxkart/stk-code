@@ -882,23 +882,59 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    
     int font_height = font->getDimension(L"X").Height;
-    font->setScale((float)meter_height / font_height * 0.4f * scale);
     font->setShadow(video::SColor(255, 128, 0, 0));
-    std::ostringstream oss;
-    oss << rank; // the current font has no . :(   << ".";
+    
+    if(UserConfigParams::m_speedometer_total_kart_gui)
+    {
+        int num_karts = race_manager->getNumberOfKarts();
+        if(num_karts > 9)
+            scale *= 0.85f;
+        if(rank > 9)
+            scale *= 0.75f;
 
-    core::recti pos;
-    pos.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
-                                           int(offset.Y - 0.49f*meter_height));
-    pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
-                                          int(offset.Y - 0.49f*meter_height));
+        font->setScale((float)meter_height / font_height * 0.4f * scale);
+        std::ostringstream oss;
+        oss << rank; // the current font has no . :(   << ".";
 
-    font->setBlackBorder(true);
-    font->draw(oss.str().c_str(), pos, color, true, true);
+        core::recti pos;
+        pos.LowerRightCorner = core::vector2di(int(offset.X + 0.53f*meter_width),
+                                               int(offset.Y - 0.49f*meter_height));
+        pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.53f*meter_width),
+                                              int(offset.Y - 0.49f*meter_height));
+
+        font->setBlackBorder(true);
+        font->draw(oss.str().c_str(), pos, color, true, true);
+        font->setScale((float)meter_height / font_height * 0.2f * scale);
+        std::ostringstream oss2;
+        oss2 << "/" << num_karts; // the current font has no . :(   << ".";
+
+        core::recti num_karts_pos;
+        num_karts_pos.LowerRightCorner = core::vector2di(int(offset.X + 0.75f*meter_width),
+                                               int(offset.Y - 0.43f*meter_height));
+        num_karts_pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.75f*meter_width),
+                                              int(offset.Y - 0.43f*meter_height));
+
+        font->draw(oss2.str().c_str(), num_karts_pos, color, true, true);
+    }
+    else
+    {
+        font->setScale((float)meter_height / font_height * 0.4f * scale);
+        std::ostringstream oss;
+        oss << rank; // the current font has no . :(   << ".";
+
+        core::recti pos;
+        pos.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
+                                               int(offset.Y - 0.49f*meter_height));
+        pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
+                                              int(offset.Y - 0.49f*meter_height));
+
+        font->setBlackBorder(true);
+        font->draw(oss.str().c_str(), pos, color, true, true);
+    }
+
+    font->setScale(1.0f); // Reset scale
     font->setBlackBorder(false);
-    font->setScale(1.0f);
 }   // drawRank
 
 //-----------------------------------------------------------------------------
