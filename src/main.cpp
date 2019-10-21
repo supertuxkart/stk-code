@@ -1790,6 +1790,8 @@ void initRest()
     GUIEngine::setSkin(NULL);
 
     GUIEngine::init(device, driver, StateManager::get());
+
+    GUIEngine::renderLoading();
     input_manager = new InputManager();
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
