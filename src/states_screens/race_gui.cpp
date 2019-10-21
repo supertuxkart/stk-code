@@ -394,7 +394,7 @@ void RaceGUI::drawGlobalTimer()
 
     float elapsed_time = World::getWorld()->getTime();
     if (!race_manager->hasTimeTarget() ||
-        race_manager ->getMinorMode()==RaceManager::MINOR_MODE_SOCCER ||
+        race_manager->getMinorMode() ==RaceManager::MINOR_MODE_SOCCER ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
         race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {

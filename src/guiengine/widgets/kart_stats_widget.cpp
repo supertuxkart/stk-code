@@ -106,7 +106,6 @@ void KartStatsWidget::setValues(const KartProperties* props,
     
     // The base speed is of 25
     // Here we are not fully proportional, because small differences matter more
-
     setSkillValues(SKILL_SPEED,
                    (kp_computed.getCombinedCharacteristic()->getEngineMaxSpeed() - 20.0f) * 15.0f,
                    "speed.png", "speed", _("Maximum speed"));
@@ -114,14 +113,12 @@ void KartStatsWidget::setValues(const KartProperties* props,
     // The acceleration depend on power and mass, and it changes depending on speed
     // We call a function which gives us a single number to represent it
     // power/mass gives numbers in the 1-10 range, so we multiply it by 10.
-
     setSkillValues(SKILL_ACCELERATION,
                    kp_computed.getAccelerationEfficiency()*10.0f,
                    "power.png", "acceleration", _("Acceleration"));
 
     // The base nitro consumption is 1, higher for heavier karts.
     // Nitro efficiency is hence 90/nitro_consumption
-
     setSkillValues(SKILL_NITRO_EFFICIENCY,
                     90.0f/kp_computed.getCombinedCharacteristic()->getNitroConsumption(),
                    "nitro.png", "nitro", _("Nitro efficiency"));
@@ -212,4 +209,4 @@ void KartStatsWidget::setDisplayIcons(bool display_icons)
     {
         m_skills[i]->setDisplayIcon(display_icons);
     }
-}   // setDisplayText
+}   // setDisplayIcons
