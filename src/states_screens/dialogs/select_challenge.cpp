@@ -182,8 +182,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             track_manager->getTrack(c->getData()->getTrackId())->getName();
         getWidget<LabelWidget>("title")->setText(track_name, true);
     }
-    
-    
+
     
     if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
@@ -195,6 +194,10 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
         getWidget<IconButtonWidget>("supertux")->unsetBadge(LOCKED_BADGE);
         getWidget<IconButtonWidget>("supertux")->setActive(true);
     }
+
+    GUIEngine::RibbonWidget* actions =
+            getWidget<GUIEngine::RibbonWidget>("actions");
+     actions->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
 
 // ----------------------------------------------------------------------------
