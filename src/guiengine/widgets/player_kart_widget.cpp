@@ -51,10 +51,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_parent_screen = parent;
 
     m_associated_player = associated_player;
-    x_speed = 1.0f;
-    y_speed = 1.0f;
-    w_speed = 1.0f;
-    h_speed = 1.0f;
+    x_speed = y_speed = w_speed = h_speed = 1.0f;
     m_ready = false;
     m_difficulty = PLAYER_DIFFICULTY_NORMAL;
     m_not_updated_yet = true;
