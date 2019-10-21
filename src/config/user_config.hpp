@@ -197,6 +197,7 @@ public:
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
     irr::core::stringc toString() const;
+    void setDefaultValue(int v)  { m_value = m_default_value = v;    }
     void revertToDefaults()      { m_value = m_default_value;        }
     int getDefaultValue()        { return  m_default_value;          }
     operator int() const         { return m_value;                   }
@@ -297,6 +298,7 @@ public:
 
     irr::core::stringc toString() const;
     void revertToDefaults() { m_value = m_default_value; }
+    void setDefaultValue(bool v)  { m_value = m_default_value = v; }
 
     operator bool() const { return m_value; }
     bool& operator=(const bool& v) { m_value = v; return m_value; }
@@ -330,6 +332,7 @@ public:
 
     irr::core::stringc toString() const;
     void revertToDefaults() { m_value = m_default_value; }
+    void setDefaultValue(float v)  { m_value = m_default_value = v; }
 
     operator float() const { return m_value; }
     float& operator=(const float& v) { m_value = v; return m_value; }
