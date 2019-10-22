@@ -7,7 +7,6 @@ sudo: false
 language: cpp
 os:
   - linux
-  - osx
 compiler:
   - gcc
   - clang
