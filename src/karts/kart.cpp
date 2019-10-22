@@ -3465,19 +3465,11 @@ void Kart::setOnScreenText(const core::stringw& text)
 
 // ------------------------------------------------------------------------
 /** Returns the normal of the terrain the kart is over atm. This is
-  * defined even if the kart is flying.
-  */
+  * defined even if the kart is flying. */
 const Vec3& Kart::getNormal() const
 {
     return m_terrain_info->getNormal();
-}   // getNormal
-
-// ------------------------------------------------------------------------
-/** Returns the position 0.25s before */
-const Vec3& Kart::getPreviousXYZ() const
-{
-    return m_previous_xyz[m_xyz_history_size-1];
-}   // getPreviousXYZ
+} // getNormal
 
 // ------------------------------------------------------------------------
 /** Returns a more recent different previous position */
@@ -3487,13 +3479,6 @@ const Vec3& Kart::getRecentPreviousXYZ() const
     //irregular on some tracks whose roads are not smooth enough
     return m_previous_xyz[m_xyz_history_size/5];
 }   // getRecentPreviousXYZ
-
-// ------------------------------------------------------------------------
-/** Returns the time at which the recent previoux position occured */
-const float Kart::getRecentPreviousXYZTime() const
-{
-    return m_previous_xyz_times[m_xyz_history_size/5];
-}   // getRecentPreviousXYZTime
 
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)
@@ -3506,12 +3491,12 @@ void Kart::playSound(SFXBuffer* buffer)
 const video::SColor& Kart::getColor() const
 {
     return m_kart_properties->getColor();
-}   // getColor
+} // getColor
 
 // ------------------------------------------------------------------------
 bool Kart::isVisible() const
 {
     return m_node && m_node->isVisible();
-}   // isVisible
+} // isVisible
 
 /* EOF */
