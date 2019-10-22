@@ -245,6 +245,13 @@ bool ReplayPlay::addReplayFile(const std::string& fn, bool custom_replay, int ca
         return false;
     }
     rd.m_track_name = std::string(s1);
+
+    // If former official tracks are present as addons, show the matching replays.
+    if (rd.m_track_name.compare("greenvalley") == 0)
+        rd.m_track_name = std::string("addon_green-valley");
+    if (rd.m_track_name.compare("mansion") == 0)
+        rd.m_track_name = std::string("addon_blackhill-mansion");
+
     Track* t = track_manager->getTrack(rd.m_track_name);
     if (t == NULL)
     {
