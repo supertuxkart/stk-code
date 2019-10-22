@@ -3080,7 +3080,12 @@ void Kart::kartIsInRestNow()
 
 SFXBase* Kart::getNextEmitter()
 {
-    m_emitter_id = (m_emitter_id + 1) % 3;
+    m_emitter_id = (m_emitter_id + 1) % EMITTER_COUNT;
+
+    // The emitter is requested when a new sound is to be played.
+    // Always reset the volume to 1.0f (full), see #3596
+    m_emitters[m_emitter_id]->setVolume(1.0f);
+
     return m_emitters[m_emitter_id];
 }
 

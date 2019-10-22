@@ -392,8 +392,6 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
         switch(item_state.getType())
         {
         case Item::ITEM_BANANA:
-            m_kart->playSound(m_ugh_sound);
-            break;
         case Item::ITEM_BUBBLEGUM:
             //More sounds are played by the kart class
             //See Kart::collectedItem()
