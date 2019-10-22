@@ -77,7 +77,7 @@ RaceGUIBase::RaceGUIBase()
     // I18N: Shown waiting for other players in network to finish loading or
     // waiting
     m_string_waiting_for_others = _("Waiting for others");
-    // I18N: Shown waiting for the server in network if live join or specatate
+    // I18N: Shown waiting for the server in network if live join or spectate
     m_string_waiting_for_the_server = _("Waiting for the server");
 
     m_music_icon = irr_driver->getTexture("notes.png");
@@ -163,6 +163,7 @@ void RaceGUIBase::reset()
     m_plunger_offset    = core::vector2di(0,0);
     m_plunger_speed     = core::vector2df(0,0);
     m_plunger_state     = PLUNGER_STATE_INIT;
+    m_enabled_network_spectator = false;
     clearAllMessages();
     
     if (m_multitouch_gui != NULL)
@@ -486,6 +487,45 @@ void RaceGUIBase::update(float dt)
             m_referee->removeFromSceneGraph();
         }
     }   // if referee node
+
+    // Check if switching to spectate mode is need
+    auto cl = LobbyProtocol::get<ClientLobby>();
+    World* w = World::getWorld();
+    if (m_enabled_network_spectator || !cl || !w)
+        return;
+
+    if (race_manager->getNumLocalPlayers() != 1 ||
+        !race_manager->modeHasLaps() ||
+        !w->isActiveRacePhase())
+        return;
+
+    for (unsigned i = 0; i < w->getNumKarts(); i++)
+    {
+        AbstractKart* k = w->getKart(i);
+        if (!k->getController()->isLocalPlayerController()
+            || !k->hasFinishedRace())
+            continue;
+        // Enable spectate mode after 2 seconds which allow the player to
+        // release left / right button if they keep pressing it after the
+        // finishing line (1 second here because m_network_finish_check_ticks is
+        // already 1 second ahead of time when crossing finished line)
+        if (k->getNetworkConfirmedFinishTicks() > 0
+            && w->getTicksSinceStart() >
+            k->getNetworkConfirmedFinishTicks() + stk_config->time2Ticks(1.0f))
+        {
+            m_enabled_network_spectator = true;
+            cl->setSpectator(true);
+            static bool msg_shown = false;
+            if (getMultitouchGUI() != NULL)
+                recreateMultitouchGUI();
+            else if (!msg_shown)
+            {
+                msg_shown = true;
+                cl->addSpectateHelperMessage();
+            }
+        }
+    }
+
 }   // update
 
 // ----------------------------------------------------------------------------

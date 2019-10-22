@@ -327,7 +327,6 @@ void Kart::reset()
 
     m_network_finish_check_ticks = 0;
     m_network_confirmed_finish_ticks = 0;
-    m_enabled_network_spectator = false;
     // Add karts back in case that they have been removed (i.e. in battle
     // mode) - but only if they actually have a body (e.g. ghost karts
     // don't have one).
@@ -1368,43 +1367,6 @@ void Kart::update(int ticks)
         m_controller = m_saved_controller;
         m_saved_controller = NULL;
     }
-
-    // FIXME: This shouldn't be in kart.cpp
-    auto cl = LobbyProtocol::get<ClientLobby>();
-
-    // Enable spectate mode after 2 seconds which allow the player to
-    // release left / right button if they keep pressing it after the
-    // finishing line (1 second here because m_network_finish_check_ticks is
-    // already 1 second ahead of time when crossing finished line)
-    if (cl && m_finished_race && m_controller->isLocalPlayerController()
-        && race_manager->getNumLocalPlayers() == 1
-        && race_manager->modeHasLaps()
-        && World::getWorld()->isActiveRacePhase()
-        && m_network_confirmed_finish_ticks > 0
-        && World::getWorld()->getTicksSinceStart() >
-           m_network_confirmed_finish_ticks + stk_config->time2Ticks(1.0f)
-        && !m_enabled_network_spectator)
-    {
-        m_enabled_network_spectator = true;
-        cl->setSpectator(true);
-
-        static bool msg_shown = false;
-        if (!msg_shown)
-        {
-            msg_shown = true;
-
-            RaceGUIBase* m = World::getWorld()->getRaceGUI();
-
-            if (m->getMultitouchGUI() != NULL)
-            {
-                m->recreateMultitouchGUI();
-            }
-            else
-            {
-                cl->addSpectateHelperMessage();
-            }
-        }
-    }//END OF FIXME
 
     m_powerup->update(ticks);
 

@@ -545,6 +545,10 @@ public:
     int getLiveJoinUntilTicks() const              { return m_live_join_util; }
     // ------------------------------------------------------------------------
     void setLiveJoinKart(int util_ticks)     { m_live_join_util = util_ticks; }
+    // ------------------------------------------------------------------------
+    /** Return the confirmed finish ticks (sent by the server)
+     *  indicating that this kart has really finished the race. */
+    virtual int getNetworkConfirmedFinishTicks() const = 0;
 };   // AbstractKart
 
 

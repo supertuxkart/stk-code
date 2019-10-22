@@ -98,8 +98,6 @@ protected:
     /** Is time flying activated */
     bool m_is_jumping;
 
-    bool m_enabled_network_spectator;
-
     /** The sign of torque to apply after hitting a bubble gum. */
     bool        m_bubblegum_torque_sign;
 
@@ -589,6 +587,11 @@ public:
     // ----------------------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const OVERRIDE
                                                { return m_stars_effect.get(); }
+    // ------------------------------------------------------------------------
+    /** Return the confirmed finish ticks (sent by the server)
+     *  indicating that this kart has really finished the race. */
+    int getNetworkConfirmedFinishTicks() const OVERRIDE
+                                   { return m_network_confirmed_finish_ticks; }
 
 };   // Kart
 
