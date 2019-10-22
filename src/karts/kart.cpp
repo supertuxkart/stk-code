@@ -1330,17 +1330,14 @@ void Kart::eliminate()
     }
 
     if (m_attachment)
-    {
         m_attachment->clear();
-    }
 
     if (m_slipstream)
-    {
         m_slipstream->reset();
-    }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_kart_gfx->setGFXInvisible();
+
     if (m_engine_sound)
         m_engine_sound->stop();
 
@@ -1348,9 +1345,7 @@ void Kart::eliminate()
 
 #ifndef SERVER_ONLY
     if (m_shadow)
-    {
         m_shadow->update(false);
-    }
 #endif
     m_node->setVisible(false);
 }   // eliminate
@@ -1374,20 +1369,21 @@ void Kart::update(int ticks)
         m_saved_controller = NULL;
     }
 
+    // FIXME: This shouldn't be in kart.cpp
     auto cl = LobbyProtocol::get<ClientLobby>();
-    // Enable spectate mode after 2 seconds which allow player to
-    // release left / right button if they keep pressing it during
+
+    // Enable spectate mode after 2 seconds which allow the player to
+    // release left / right button if they keep pressing it after the
     // finishing line (1 second here because m_network_finish_check_ticks is
     // already 1 second ahead of time when crossing finished line)
-
-    if (cl && m_finished_race && m_controller->isLocalPlayerController() &&
-        race_manager->getNumLocalPlayers() == 1 &&
-        race_manager->modeHasLaps() &&
-        World::getWorld()->isActiveRacePhase() &&
-        m_network_confirmed_finish_ticks > 0 &&
-        World::getWorld()->getTicksSinceStart() >
-        m_network_confirmed_finish_ticks + stk_config->time2Ticks(1.0f) &&
-        !m_enabled_network_spectator)
+    if (cl && m_finished_race && m_controller->isLocalPlayerController()
+        && race_manager->getNumLocalPlayers() == 1
+        && race_manager->modeHasLaps()
+        && World::getWorld()->isActiveRacePhase()
+        && m_network_confirmed_finish_ticks > 0
+        && World::getWorld()->getTicksSinceStart() >
+           m_network_confirmed_finish_ticks + stk_config->time2Ticks(1.0f)
+        && !m_enabled_network_spectator)
     {
         m_enabled_network_spectator = true;
         cl->setSpectator(true);
@@ -1408,7 +1404,7 @@ void Kart::update(int ticks)
                 cl->addSpectateHelperMessage();
             }
         }
-    }
+    }//END OF FIXME
 
     m_powerup->update(ticks);
 
@@ -1416,9 +1412,7 @@ void Kart::update(int ticks)
     m_vehicle->resetMaxSpeed();
 
     if (m_bubblegum_ticks > 0)
-    {
         m_bubblegum_ticks -= ticks;
-    }
 
     // This is to avoid a rescue immediately after an explosion
     const bool has_animation_before = m_kart_animation != NULL;
@@ -1523,17 +1517,17 @@ void Kart::update(int ticks)
 #endif
 
     // if its view is blocked by plunger, decrease remaining time
-    if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= ticks;
-    //unblock the view if kart just became shielded
-    if(isShielded())
+    if(m_view_blocked_by_plunger > 0)
     {
-        m_view_blocked_by_plunger = 0;
+        m_view_blocked_by_plunger -= ticks;
+        //unblock the view if kart just became shielded
+        if(isShielded())
+            m_view_blocked_by_plunger = 0;
     }
-    // Decrease remaining invulnerability time
+
+    // Decrease the remaining invulnerability time
     if(m_invulnerable_ticks>0)
-    {
         m_invulnerable_ticks -= ticks;
-    }
 
     if (!RewindManager::get()->isRewinding())
         m_slipstream->update(ticks);
@@ -1551,9 +1545,7 @@ void Kart::update(int ticks)
         speed.setY(speed.getY() * 0.25f); // or 0.0f for sharp neutralization of yaw
         speed.setZ(speed.getZ() * 0.95f);
         m_body->setAngularVelocity(speed);
-        // This one keeps the kart pointing "100% as launched" instead,
-        // like in ski jump sports, too boring but also works.
-        //m_body->setAngularVelocity(btVector3(0,0,0));
+
         // When the kart is jumping, linear damping reduces the falling speed
         // of a kart so much that it can appear to be in slow motion. So
         // disable linear damping if a kart is in the air
@@ -1565,8 +1557,7 @@ void Kart::update(int ticks)
                            m_kart_properties->getStabilityChassisAngularDamping());
     }
 
-    // Used to prevent creating a rescue animation after an explosion animation
-    // got deleted
+    // Used to prevent creating a rescue animation after an explosion animation got deleted
 
     m_attachment->update(ticks);
 
@@ -1619,9 +1610,7 @@ void Kart::update(int ticks)
     }
 
     if (m_body->getBroadphaseHandle())
-    {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
-    }
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -1659,33 +1648,23 @@ void Kart::update(int ticks)
     // Update physics from newly updated material
     PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
     const Material* material = m_terrain_info->getMaterial();
-    // Update gravity of kart first, as updateSliding in updatePhysics needs
-    // the newly set gravity to test for sliding
-    if (!material)   // kart falling off the track
+
+    // First update the gravity of the kart, as updateSliding in updatePhysics
+    // need the newly set gravity to test for sliding.
+    if (!m_flying)
     {
-        if (!m_flying)
+        float g = Track::getCurrentTrack()->getGravity();
+        Vec3 gravity(0.0f, -g, 0.0f);
+        btRigidBody *body = getVehicle()->getRigidBody();
+
+        // If the material should overwrite the gravity,
+        if (material && material->hasGravity())
         {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0, -g, 0);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            body->setGravity(gravity);
+            Vec3 normal = m_terrain_info->getNormal();
+            gravity = normal * -g;
         }
-    }
-    else
-    {
-        if (!m_flying)
-        {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0.0f, -g, 0.0f);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            // If the material should overwrite the gravity,
-            if (material->hasGravity())
-            {
-                Vec3 normal = m_terrain_info->getNormal();
-                gravity = normal * -g;
-            }
-            body->setGravity(gravity);
-        }   // if !flying
+
+        body->setGravity(gravity);
     }
     updatePhysics(ticks);
     PROFILER_POP_CPU_MARKER();
