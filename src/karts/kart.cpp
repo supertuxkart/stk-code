@@ -84,6 +84,7 @@
 #include "tracks/track_manager.hpp"
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
+#include "utils/helpers.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -3319,54 +3320,34 @@ void Kart::updateGraphics(float dt)
     // leaning might get less if a kart gets a special that increases
     // its maximum speed, but not the current speed (by much). On the
     // other hand, that ratio can often be greater than 1.
+
     float speed_frac = m_speed / m_kart_properties->getEngineMaxSpeed();
-    if(speed_frac>1.0f)
-        speed_frac = 1.0f;
-    else if (speed_frac < 0.0f)  // no leaning when backwards driving
-        speed_frac = 0.0f;
-
-    const float steer_frac = m_skidding->getSteeringFraction();
-
+    float steer_frac = m_skidding->getSteeringFraction();
     const float roll_speed = m_kart_properties->getLeanSpeed() * DEGREE_TO_RAD;
 
-    if(speed_frac > 0.8f && fabsf(steer_frac)>0.5f)
+    if(speed_frac > 0.8f && fabsf(steer_frac)>0.2f)
     {
-        // Use steering ^ 7, which means less effect at lower
-        // steering
+        // Use steering and speed ^ 2,
+        // which means less effect at lower steering and speed.
+        speed_frac = std::min(speed_frac - 0.6f, 1.0f);
+        steer_frac = (steer_frac+0.25f)*0.8f;
         const float f = m_skidding->getSteeringFraction();
-        const float f2 = f*f;
         const float max_lean = -m_kart_properties->getLeanMax() * DEGREE_TO_RAD
-                             * f2*f2*f2*f
-                             * speed_frac;
-        if(max_lean>0)
-        {
-            m_current_lean += dt* roll_speed;
-            if(m_current_lean > max_lean)
-                m_current_lean = max_lean;
-        }
-        else if(max_lean<0)
-        {
-            m_current_lean -= dt*roll_speed;
-            if(m_current_lean < max_lean)
-                m_current_lean = max_lean;
-        }
+                             * f * speed_frac * speed_frac;
+
+        int max_lean_sign = extract_sign(max_lean);
+        m_current_lean += max_lean_sign * dt* roll_speed;
+        if(  (max_lean > 0 && m_current_lean > max_lean)
+           ||(max_lean < 0 && m_current_lean < max_lean)) 
+            m_current_lean = max_lean;
     }
     else if(m_current_lean!=0.0f)
     {
         // Disable any potential roll factor that is still applied
-        // --------------------------------------------------------
-        if(m_current_lean>0)
-        {
-            m_current_lean -= dt * roll_speed;
-            if(m_current_lean < 0.0f)
-                m_current_lean = 0.0f;
-        }
-        else
-        {
-            m_current_lean += dt * roll_speed;
-            if(m_current_lean>0.0f)
-                m_current_lean = 0.0f;
-        }
+        int lean_sign = extract_sign(m_current_lean);
+        m_current_lean -= lean_sign * dt * roll_speed;
+        if (lean_sign != extract_sign(m_current_lean))
+            m_current_lean = 0.0f;
     }
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
