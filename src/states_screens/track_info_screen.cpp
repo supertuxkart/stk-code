@@ -711,6 +711,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         else // Other modes
         {
             const int num_ai = m_ai_kart_spinner->getValue();
+            race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
             UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
             updateHighScores();
         }

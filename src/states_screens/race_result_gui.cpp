@@ -73,7 +73,7 @@ RaceResultGUI::RaceResultGUI() : Screen("race_result.stkgui",
 
 //-----------------------------------------------------------------------------
 /** Besides calling init in the base class this makes all buttons of this
- *  screen invisible. The buttons will only displayed once the animation is
+ *  screen invisible. The buttons will be displayed only once the animation is
  *  over.
  */
 void RaceResultGUI::init()
