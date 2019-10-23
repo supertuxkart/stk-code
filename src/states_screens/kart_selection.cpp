@@ -463,8 +463,11 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
     }
     else if (device == NULL)
     {
-        Log::error("KartSelectionScreen", "joinPlayer(): Received null "
-                  "device pointer");
+        if (!NetworkConfig::get()->isNetworkAITester())
+        {
+            Log::error("KartSelectionScreen", "joinPlayer(): Received null "
+                    "device pointer");
+        }
         return false;
     }
 
