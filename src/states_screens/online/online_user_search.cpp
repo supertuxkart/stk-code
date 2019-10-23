@@ -230,7 +230,7 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
     else if (name == m_user_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         int selected_index = m_user_list_widget->getSelectionID();
-        if (selected_index != -1)
+        if (selected_index != -1 && selected_index < (int)m_users.size())
             new UserInfoDialog(m_users[selected_index]);
     }
     else if (name == m_search_button_widget->m_properties[GUIEngine::PROP_ID])
