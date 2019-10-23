@@ -353,14 +353,18 @@ namespace ServerConfig
         "ip-ban-table",
         "Ip ban list table name, you need to create the table first, see "
         "NETWORKING.md for details, empty to disable. "
-        "This table can be shared for all servers if you use the same name."));
+        "This table can be shared for all servers if you use the same name. "
+        "STK can auto kick active peer from ban list (update per minute) which"
+        "allows live kicking peer by inserting record to database."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_online_id_ban_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("online_id_ban",
         "online-id-ban-table",
         "Online ID ban list table name, you need to create the table first, "
         "see NETWORKING.md for details, empty to disable. "
-        "This table can be shared for all servers if you use the same name."));
+        "This table can be shared for all servers if you use the same name. "
+        "STK can auto kick active peer from ban list (update per minute) which"
+        "allows live kicking peer by inserting record to database."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_player_reports_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("player_reports",

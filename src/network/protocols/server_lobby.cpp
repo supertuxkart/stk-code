@@ -172,7 +172,7 @@ ServerLobby::~ServerLobby()
 void ServerLobby::initDatabase()
 {
 #ifdef ENABLE_SQLITE3
-    m_last_cleanup_db_time = StkTime::getMonoTimeMs();
+    m_last_poll_db_time = StkTime::getMonoTimeMs();
     m_db = NULL;
     m_ip_ban_table_exists = false;
     m_online_id_ban_table_exists = false;
@@ -731,19 +731,95 @@ void ServerLobby::createServerIdFile()
 
 //-----------------------------------------------------------------------------
 #ifdef ENABLE_SQLITE3
-/* Every 1 minute STK will clean up database:
+/* Every 1 minute STK will poll database:
  * 1. Set disconnected time to now for non-exists host.
  * 2. Clear expired player reports if necessary
+ * 3. Kick active peer from ban list
  */
-void ServerLobby::cleanupDatabase()
+void ServerLobby::pollDatabase()
 {
     if (!ServerConfig::m_sql_management || !m_db)
         return;
 
-    if (StkTime::getMonoTimeMs() < m_last_cleanup_db_time + 60000)
+    if (StkTime::getMonoTimeMs() < m_last_poll_db_time + 60000)
         return;
 
-    m_last_cleanup_db_time = StkTime::getMonoTimeMs();
+    m_last_poll_db_time = StkTime::getMonoTimeMs();
+
+    if (m_ip_ban_table_exists)
+    {
+        std::string query =
+            "SELECT ip_start, ip_end, reason, description FROM ";
+        query += ServerConfig::m_ip_ban_table;
+        query += " WHERE datetime('now') > datetime(starting_time) AND "
+            "(expired_days is NULL OR datetime"
+            "(starting_time, '+'||expired_days||' days') > datetime('now'));";
+        auto peers = STKHost::get()->getPeers();
+        sqlite3_exec(m_db, query.c_str(),
+            [](void* ptr, int count, char** data, char** columns)
+            {
+                std::vector<std::shared_ptr<STKPeer> >* peers_ptr =
+                    (std::vector<std::shared_ptr<STKPeer> >*)ptr;
+                for (std::shared_ptr<STKPeer>& p : *peers_ptr)
+                {
+                    // IPv4 ban list atm
+                    if (p->isAIPeer() || !p->getIPV6Address().empty())
+                        continue;
+
+                    uint32_t ip_start = 0;
+                    uint32_t ip_end = 0;
+                    if (!StringUtils::fromString(data[0], ip_start))
+                        continue;
+                    if (!StringUtils::fromString(data[1], ip_end))
+                        continue;
+                    uint32_t peer_addr = p->getAddress().getIP();
+                    if (ip_start <= peer_addr && ip_end >= peer_addr)
+                    {
+                        Log::info("ServerLobby",
+                            "Kick %s, reason: %s, description: %s",
+                            p->getAddress().toString().c_str(),
+                            data[2], data[3]);
+                        p->kick();
+                    }
+                }
+                return 0;
+            }, &peers, NULL);
+    }
+
+    if (m_online_id_ban_table_exists)
+    {
+        std::string query = "SELECT online_id, reason, description FROM ";
+        query += ServerConfig::m_online_id_ban_table;
+        query += " WHERE datetime('now') > datetime(starting_time) AND "
+            "(expired_days is NULL OR datetime"
+            "(starting_time, '+'||expired_days||' days') > datetime('now'));";
+        auto peers = STKHost::get()->getPeers();
+        sqlite3_exec(m_db, query.c_str(),
+            [](void* ptr, int count, char** data, char** columns)
+            {
+                std::vector<std::shared_ptr<STKPeer> >* peers_ptr =
+                    (std::vector<std::shared_ptr<STKPeer> >*)ptr;
+                for (std::shared_ptr<STKPeer>& p : *peers_ptr)
+                {
+                    if (p->isAIPeer()
+                        || p->getPlayerProfiles().empty())
+                        continue;
+
+                    uint32_t online_id = 0;
+                    if (!StringUtils::fromString(data[0], online_id))
+                        continue;
+                    if (online_id == p->getPlayerProfiles()[0]->getOnlineId())
+                    {
+                        Log::info("ServerLobby",
+                            "Kick %s, reason: %s, description: %s",
+                            p->getAddress().toString().c_str(),
+                            data[1], data[2]);
+                        p->kick();
+                    }
+                }
+                return 0;
+            }, &peers, NULL);
+    }
 
     if (m_player_reports_table_exists &&
         ServerConfig::m_player_reports_expired_days != 0.0f)
@@ -795,7 +871,7 @@ void ServerLobby::cleanupDatabase()
         query = oss.str();
     }
     easySQLQuery(query);
-}   // cleanupDatabase
+}   // pollDatabase
 
 //-----------------------------------------------------------------------------
 /** Run simple query with write lock waiting and optional function, this
@@ -1023,7 +1099,7 @@ void ServerLobby::asynchronousUpdate()
     }
 
 #ifdef ENABLE_SQLITE3
-    cleanupDatabase();
+    pollDatabase();
 #endif
 
     // Check if server owner has left

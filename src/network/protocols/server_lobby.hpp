@@ -84,9 +84,9 @@ private:
 
     bool m_ip_geolocation_table_exists;
 
-    uint64_t m_last_cleanup_db_time;
+    uint64_t m_last_poll_db_time;
 
-    void cleanupDatabase();
+    void pollDatabase();
 
     bool easySQLQuery(const std::string& query,
         std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
