@@ -124,6 +124,7 @@ ClientLobby::~ClientLobby()
 //-----------------------------------------------------------------------------
 void ClientLobby::setup()
 {
+    m_ranking_changes.clear();
     m_spectator = false;
     m_server_send_live_load_world = false;
     m_auto_back_to_lobby_time = std::numeric_limits<uint64_t>::max();
@@ -1094,6 +1095,20 @@ void ClientLobby::raceFinished(Event* event)
                 k->finishedRace(World::getWorld()->getTime(),
                     true/*from_server*/);
             }
+        }
+    }
+
+    m_ranking_changes.clear();
+    // Ranking changes from server
+    if (NetworkConfig::get()->getServerCapabilities().find("ranking_changes")
+        != NetworkConfig::get()->getServerCapabilities().end())
+    {
+        bool has_ranking_changes = (data.getUInt8() & 1) != 0;
+        if (has_ranking_changes)
+        {
+            unsigned count = data.getUInt8();
+            for (unsigned i = 0; i < count; i++)
+                m_ranking_changes.push_back(data.getFloat());
         }
     }
 

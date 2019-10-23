@@ -2389,6 +2389,12 @@ void ServerLobby::checkRaceFinished()
         m_result_ns->encodeString(static_cast<LinearWorld*>(World::getWorld())
             ->getFastestLapKartName());
     }
+
+    uint8_t ranking_changes_indication = 0;
+    if (ServerConfig::m_ranked && race_manager->modeHasLaps())
+        ranking_changes_indication = 1;
+    m_result_ns->addUInt8(ranking_changes_indication);
+
     if (ServerConfig::m_ranked)
     {
         computeNewRankings();
@@ -2411,13 +2417,17 @@ void ServerLobby::computeNewRankings()
     // Would this be worth it ?
     std::vector<double> scores_change;
     std::vector<double> new_scores;
+    std::vector<double> prev_scores;
 
     unsigned player_count = race_manager->getNumPlayers();
+    m_result_ns->addUInt8((uint8_t)player_count);
     for (unsigned i = 0; i < player_count; i++)
     {
         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
-        new_scores.push_back(m_scores.at(id));
+        double prev_score = m_scores.at(id);
+        new_scores.push_back(prev_score);
         new_scores[i] += distributeBasePoints(id);
+        prev_scores.push_back(prev_score);
     }
  
     // First, update the number of ranked races
@@ -2536,6 +2546,13 @@ void ServerLobby::computeNewRankings()
         m_scores.at(id) =  new_scores[i];
         if (m_scores.at(id) > m_max_scores.at(id))
             m_max_scores.at(id) = m_scores.at(id);
+    }
+
+    for (unsigned i = 0; i < player_count; i++)
+    {
+        const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
+        double change = m_scores.at(id) - prev_scores[i];
+        m_result_ns->addFloat((float)change);
     }
 }   // computeNewRankings
 

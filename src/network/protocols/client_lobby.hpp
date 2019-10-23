@@ -128,6 +128,8 @@ private:
 
     std::vector<LobbyPlayer> m_lobby_players;
 
+    std::vector<float> m_ranking_changes;
+
     irr::core::stringw m_total_players;
 
     void liveJoinAcknowledged(Event* event);
@@ -178,6 +180,8 @@ public:
                                       { return m_server_enabled_track_voting; }
     bool serverEnabledReportPlayer() const
                                      { return m_server_enabled_report_player; }
+    const std::vector<float>& getRankingChanges() const
+                                                  { return m_ranking_changes; }
 };
 
 #endif // CLIENT_LOBBY_HPP

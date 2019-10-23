@@ -735,6 +735,7 @@ void RaceResultGUI::displayCTFResults()
         int time_precision = race_manager->currentModeTimePrecision();
         bool active_gp = (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX);
 
+        auto cl = LobbyProtocol::get<ClientLobby>();
         for (unsigned int position = first_position;
         position <= race_manager->getNumberOfKarts() - sta; position++)
         {
@@ -779,6 +780,22 @@ void RaceResultGUI::displayCTFResults()
                 if (time > max_finish_time) max_finish_time = time;
                 std::string time_string = StringUtils::timeToString(time, time_precision);
                 ri->m_finish_time_string = time_string.c_str();
+            }
+            if (cl && !cl->getRankingChanges().empty())
+            {
+                unsigned kart_id = kart->getWorldKartId();
+                if (kart_id < cl->getRankingChanges().size())
+                {
+                    ri->m_finish_time_string += L" ";
+                    float ranking_change = cl->getRankingChanges()[kart_id];
+                    if (ranking_change > 0)
+                    {
+                        ri->m_finish_time_string += L"+";
+                        ri->m_finish_time_string += StringUtils::toWString(ranking_change);
+                    }
+                    else
+                        ri->m_finish_time_string += StringUtils::toWString(ranking_change);
+                }
             }
 
             core::dimension2du rect =

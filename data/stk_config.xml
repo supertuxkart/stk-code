@@ -588,5 +588,6 @@
   <network-capabilities>
       <capabilities name="report_player"/>
       <capabilities name="color_emoji"/>
+      <capabilities name="ranking_changes"/>
   </network-capabilities>
 </config>
