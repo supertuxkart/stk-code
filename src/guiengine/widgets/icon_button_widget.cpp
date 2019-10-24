@@ -145,7 +145,20 @@ void IconButtonWidget::add()
         suggested_w = (int)(suggested_w*needed_scale_factor);
         suggested_h = (int)(suggested_h*needed_scale_factor);
     }
-    const int x_from = m_x + (m_w - suggested_w)/2; // center horizontally
+    
+    // This is a bit messy, because m_x gives position of left side of an image,
+    // but in most cases we need to scale it based on center of the image, so
+    // this is the default action here.
+    // There are some cases when it causes issues though, for example when we
+    // explicitly want particular widget position or left/right align. So let's 
+    // just use left/right align in this case.
+    bool left_horizontal = m_properties[PROP_X].size() > 0 ||
+                           m_properties[PROP_ALIGN] == "left";
+    bool right_horizontal = m_properties[PROP_ALIGN] == "right";
+    
+    const int x_from = right_horizontal ? m_x + (m_w - suggested_w) :
+                       left_horizontal  ? m_x :
+                                          m_x + (m_w - suggested_w)/2;
     const int y_from = m_y + (m_h - suggested_h)/2; // center vertically
 
     rect<s32> widget_size = rect<s32>(x_from,
