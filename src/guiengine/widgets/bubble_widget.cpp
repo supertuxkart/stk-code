@@ -89,6 +89,7 @@ void BubbleWidget::replaceText()
         m_expanded_size.LowerRightCorner.Y += additionalNeededSize/2 + 10;
 
         // reduce text to fit in the available space if it's too long
+        // FIXME : this loop is ugly
         while (text_height > m_shrinked_size.getHeight() && message.size() > 10)
         {
             message = message.subString(0, message.size() - 10) + "...";
@@ -127,13 +128,9 @@ void BubbleWidget::updateSize()
     m_element->setRelativePosition(currsize);
 
     if (m_zoom > 0.5f)
-    {
         getIrrlichtElement<IGUIStaticText>()->setText(getText().c_str());
-    }
     else
-    {
         getIrrlichtElement<IGUIStaticText>()->setText(m_shrinked_text.c_str());
-    }
 }
 
 // ----------------------------------------------------------------------------

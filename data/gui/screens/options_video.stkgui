@@ -45,6 +45,18 @@
 
                 <spacer width="5" height="1%"/>
 
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="20" height="100%" />
+                    <div layout="vertical-row" width="8f" height="fit">
+                        <gauge id="blur_level" min_value="0" max_value="2" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the video settings" text="Blur Effects Level" align="left"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="1%"/>
+
                 <!-- ************ VSYNC ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
                     <spacer width="20" height="100%" />
