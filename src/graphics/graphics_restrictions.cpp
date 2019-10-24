@@ -227,12 +227,11 @@ public:
             || card_name.find("Radeon") != std::string::npos)
         {
             std::vector<std::string> s = StringUtils::split(driver_version, ' ');
-            if (s.size() == 5)
+            if (s.size() == 5 || s.size() == 6)
             {
                 convertVersionString(s[4]);
                 return;
             }
-
         }
 
         // ATI: other drivers use "4.0.10188 Core Profile Context"
