@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="0" y="0" height="9%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
 
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
         <header width="80%" height="8%" align="center" I18N="Title in grand prix editor screen" text="Grand Prix editor" text_align="center"/>

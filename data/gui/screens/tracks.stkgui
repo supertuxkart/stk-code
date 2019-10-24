@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="0" y="0" height="9%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
 
     <div id="all-track" x="1%" y="1%" width="60%" height="88%" layout="vertical-row" >
         <header height="8%" width="80%" I18N="In the track selection screen" text="All Tracks"
