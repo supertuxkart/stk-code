@@ -218,6 +218,7 @@ void ServerLobby::initDatabase()
     m_last_poll_db_time = StkTime::getMonoTimeMs();
     m_db = NULL;
     m_ip_ban_table_exists = false;
+    m_ipv6_ban_table_exists = false;
     m_online_id_ban_table_exists = false;
     m_ip_geolocation_table_exists = false;
     if (!ServerConfig::m_sql_management)
@@ -248,6 +249,7 @@ void ServerLobby::initDatabase()
     sqlite3_create_function(m_db, "insideIPv6CIDR", 2, SQLITE_UTF8, NULL,
         &insideIPv6CIDRSQL, NULL, NULL);
     checkTableExists(ServerConfig::m_ip_ban_table, m_ip_ban_table_exists);
+    checkTableExists(ServerConfig::m_ipv6_ban_table, m_ipv6_ban_table_exists);
     checkTableExists(ServerConfig::m_online_id_ban_table,
         m_online_id_ban_table_exists);
     checkTableExists(ServerConfig::m_player_reports_table,
@@ -823,6 +825,40 @@ void ServerLobby::pollDatabase()
                             "Kick %s, reason: %s, description: %s",
                             p->getAddress().toString().c_str(),
                             data[2], data[3]);
+                        p->kick();
+                    }
+                }
+                return 0;
+            }, &peers, NULL);
+    }
+
+    if (m_ipv6_ban_table_exists)
+    {
+        std::string query =
+            "SELECT ipv6_cidr, reason, description FROM ";
+        query += ServerConfig::m_ipv6_ban_table;
+        query += " WHERE datetime('now') > datetime(starting_time) AND "
+            "(expired_days is NULL OR datetime"
+            "(starting_time, '+'||expired_days||' days') > datetime('now'));";
+        auto peers = STKHost::get()->getPeers();
+        sqlite3_exec(m_db, query.c_str(),
+            [](void* ptr, int count, char** data, char** columns)
+            {
+                std::vector<std::shared_ptr<STKPeer> >* peers_ptr =
+                    (std::vector<std::shared_ptr<STKPeer> >*)ptr;
+                for (std::shared_ptr<STKPeer>& p : *peers_ptr)
+                {
+                    // IPv6 ban list atm
+                    if (p->isAIPeer() || p->getIPV6Address().empty())
+                        continue;
+
+                    char* ipv6_cidr = data[0];
+                    if (insideIPv6CIDR(ipv6_cidr,
+                        p->getIPV6Address().c_str()) == 1)
+                    {
+                        Log::info("ServerLobby",
+                            "Kick %s, reason: %s, description: %s",
+                            p->getIPV6Address().c_str(), data[1], data[2]);
                         p->kick();
                     }
                 }
@@ -3008,6 +3044,10 @@ void ServerLobby::connectionRequested(Event* event)
     if (peer->isDisconnected())
         return;
 
+    testBannedForIPv6(peer.get());
+    if (peer->isDisconnected())
+        return;
+
     if (online_id != 0)
         testBannedForOnlineId(peer.get(), online_id);
     // Will be disconnected if banned by online id
@@ -4117,7 +4157,7 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
     if (!m_db || !m_ip_ban_table_exists)
         return;
 
-    // We only test for IPv4 atm
+    // Test for IPv4
     if (!peer->getIPV6Address().empty())
         return;
 
@@ -4176,6 +4216,84 @@ void ServerLobby::testBannedForIP(STKPeer* peer) const
     }
 #endif
 }   // testBannedForIP
+
+//-----------------------------------------------------------------------------
+void ServerLobby::testBannedForIPv6(STKPeer* peer) const
+{
+#ifdef ENABLE_SQLITE3
+    if (!m_db || !m_ipv6_ban_table_exists)
+        return;
+
+    // Test for IPv6
+    if (peer->getIPV6Address().empty())
+        return;
+
+    int row_id = -1;
+    std::string ipv6_cidr;
+    std::string query = StringUtils::insertValues(
+        "SELECT rowid, ipv6_cidr, reason, description FROM %s "
+        "WHERE insideIPv6CIDR(ipv6_cidr, ?) = 1 "
+        "AND datetime('now') > datetime(starting_time) AND "
+        "(expired_days is NULL OR datetime"
+        "(starting_time, '+'||expired_days||' days') > datetime('now')) "
+        "LIMIT 1;",
+        ServerConfig::m_ipv6_ban_table.c_str());
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        if (sqlite3_bind_text(stmt, 1, peer->getIPV6Address().c_str(),
+            -1, SQLITE_TRANSIENT) != SQLITE_OK)
+        {
+            Log::error("ServerLobby", "Error binding ipv6 addr for query: %s",
+                sqlite3_errmsg(m_db));
+        }
+
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW)
+        {
+            row_id = sqlite3_column_int(stmt, 0);
+            ipv6_cidr = (char*)sqlite3_column_text(stmt, 1);
+            const char* reason = (char*)sqlite3_column_text(stmt, 2);
+            const char* desc = (char*)sqlite3_column_text(stmt, 3);
+            Log::info("ServerLobby", "%s banned by IP: %s "
+                "(rowid: %d, description: %s).",
+                peer->getRealAddress().c_str(), reason, row_id, desc);
+            kickPlayerWithReason(peer, reason);
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
+        return;
+    }
+    if (row_id != -1)
+    {
+        query = StringUtils::insertValues(
+            "UPDATE %s SET trigger_count = trigger_count + 1, "
+            "last_trigger = datetime('now') "
+            "WHERE ipv6_cidr = ?;", ServerConfig::m_ipv6_ban_table.c_str());
+        easySQLQuery(query, [ipv6_cidr](sqlite3_stmt* stmt)
+            {
+                if (sqlite3_bind_text(stmt, 1, ipv6_cidr.c_str(),
+                    -1, SQLITE_TRANSIENT) != SQLITE_OK)
+                {
+                    Log::error("easySQLQuery", "Failed to bind %s.",
+                        ipv6_cidr.c_str());
+                }
+            });
+    }
+#endif
+}   // testBannedForIPv6
 
 //-----------------------------------------------------------------------------
 void ServerLobby::testBannedForOnlineId(STKPeer* peer,

@@ -159,8 +159,11 @@ The current server configuration xml looks like this:
     <!-- Specified in millisecond for maximum time waiting in sqlite3_busy_handler. You may need a higher value if your database is shared by many servers or having a slow hard disk. -->
     <database-timeout value="1000" />
 
-    <!-- Ip ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) which allows live kicking peer by inserting record to database. -->
+    <!-- IPv4 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) whichallows live kicking peer by inserting record to database. -->
     <ip-ban-table value="ip_ban" />
+
+    <!-- IPv6 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) whichallows live kicking peer by inserting record to database. -->
+    <ipv6-ban-table value="ipv6_ban" />
 
     <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) which allows live kicking peer by inserting record to database. -->
     <online-id-ban-table value="online_id_ban" />
@@ -223,7 +226,7 @@ You have the best gaming experience when choosing server having all players less
 
 Currently STK uses sqlite (if building with sqlite3 on) for server management with the following functions at the moment:
 1. Server statistics
-2. IPv4 / online ID ban list
+2. IP / online ID ban list
 3. Player reports
 4. IPv4 geolocation
 
@@ -278,6 +281,17 @@ CREATE TABLE ip_ban
 (
     ip_start INTEGER UNSIGNED NOT NULL UNIQUE, -- Starting of ip decimal for banning (inclusive)
     ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- Ending of ip decimal for banning (inclusive)
+    starting_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Starting time of this banning entry to be effective
+    expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
+    reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty
+    description TEXT NOT NULL DEFAULT '', -- Private description for server admin
+    trigger_count INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Number of banning triggered by this ban entry
+    last_trigger TIMESTAMP NULL DEFAULT NULL -- Latest time this banning entry was triggered
+);
+
+CREATE TABLE ipv6_ban
+(
+    ipv6_cidr TEXT NOT NULL UNIQUE, -- IPv6 CIDR range for banning (for example 2001::/64), use /128 for a specific ip
     starting_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Starting time of this banning entry to be effective
     expired_days REAL NULL DEFAULT NULL, -- Days for this banning to be expired, use NULL for a permanent ban
     reason TEXT NOT NULL DEFAULT '', -- Banned reason shown in user stk menu, can be empty

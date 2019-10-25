@@ -351,7 +351,16 @@ namespace ServerConfig
     SERVER_CFG_PREFIX StringServerConfigParam m_ip_ban_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("ip_ban",
         "ip-ban-table",
-        "Ip ban list table name, you need to create the table first, see "
+        "IPv4 ban list table name, you need to create the table first, see "
+        "NETWORKING.md for details, empty to disable. "
+        "This table can be shared for all servers if you use the same name. "
+        "STK can auto kick active peer from ban list (update per minute) which"
+        "allows live kicking peer by inserting record to database."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_ipv6_ban_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("ipv6_ban",
+        "ipv6-ban-table",
+        "IPv6 ban list table name, you need to create the table first, see "
         "NETWORKING.md for details, empty to disable. "
         "This table can be shared for all servers if you use the same name. "
         "STK can auto kick active peer from ban list (update per minute) which"

@@ -80,6 +80,8 @@ private:
 
     bool m_ip_ban_table_exists;
 
+    bool m_ipv6_ban_table_exists;
+
     bool m_online_id_ban_table_exists;
 
     bool m_ip_geolocation_table_exists;
@@ -325,6 +327,7 @@ private:
     void clientSelectingAssetsWantsToBackLobby(Event* event);
     void kickPlayerWithReason(STKPeer* peer, const char* reason) const;
     void testBannedForIP(STKPeer* peer) const;
+    void testBannedForIPv6(STKPeer* peer) const;
     void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
     void writeDisconnectInfoTable(STKPeer* peer);
     void writePlayerReport(Event* event);
