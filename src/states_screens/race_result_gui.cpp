@@ -712,7 +712,7 @@ void RaceResultGUI::displayCTFResults()
 
         unsigned int first_position = 1;
         unsigned int sta = race_manager->getNumSpareTireKarts();
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if (race_manager->isFollowMode())
             first_position = 2;
 
         // Use only the karts that are supposed to be displayed (and
@@ -762,13 +762,12 @@ void RaceResultGUI::displayCTFResults()
             ri->m_kart_icon = icon;
 
             // FTL karts will get a time assigned, they are not shown as eliminated
-            if (kart->isEliminated() &&
-                race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            if (kart->isEliminated() && !(race_manager->isFollowMode()))
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
-            else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-                race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+            else if (   race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
+                     || race_manager->isCTFMode())
             {
                 assert(ffa);
                 ri->m_finish_time_string =
@@ -871,7 +870,7 @@ void RaceResultGUI::displayCTFResults()
         m_table_width = m_width_icon + m_width_column_space
             + m_width_kart_name;
 
-        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if (!race_manager->isFollowMode())
             m_table_width += m_width_finish_time + m_width_column_space;
 
         // Only in GP mode are the points displayed.
@@ -1072,12 +1071,11 @@ void RaceResultGUI::displayCTFResults()
         // Second phase: update X and Y positions for the various animations
         // =================================================================
         float v = 0.9f*UserConfigParams::m_width / m_time_single_scroll;
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        if (race_manager->isSoccerMode())
         {
             displaySoccerResults();
         }
-        else if (race_manager->getMinorMode() ==
-            RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        else if (race_manager->isCTFMode())
         {
             displayCTFResults();
         }
@@ -1107,7 +1105,7 @@ void RaceResultGUI::displayCTFResults()
                     WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
                     assert(wwr);
                     int most_points;
-                    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+                    if (race_manager->isFollowMode())
                         most_points = wwr->getScoreForPosition(2);
                     else
                         most_points = wwr->getScoreForPosition(1);
@@ -1192,8 +1190,7 @@ void RaceResultGUI::displayCTFResults()
             }
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
-            if (kart->isEliminated() &&
-                race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            if (kart->isEliminated() && !(race_manager->isFollowMode()))
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
@@ -1208,8 +1205,7 @@ void RaceResultGUI::displayCTFResults()
             ri->m_y_pos = (float)(m_top + rank*m_distance_between_rows);
             int p = race_manager->getKartPrevScore(kart_id);
             ri->m_current_displayed_points = (float)p;
-            if (kart->isEliminated() &&
-                race_manager->getMinorMode() != RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            if (kart->isEliminated() && !(race_manager->isFollowMode()))
             {
                 ri->m_new_points = 0;
             }
@@ -1741,7 +1737,7 @@ void RaceResultGUI::displayCTFResults()
             }
         }
 
-        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+        if (!race_manager->isSoccerMode())
         {
             // display lap count
             if (race_manager->modeHasLaps())

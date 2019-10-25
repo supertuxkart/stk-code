@@ -119,7 +119,7 @@ void TrackInfoScreen::beforeAddingWidget()
     m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner, this);
 
     // show 'Number of blue team AI karts' if soccer
-    m_ai_blue_div->setCollapsed((race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER), this);
+    m_ai_blue_div->setCollapsed(!(race_manager->isSoccerMode()), this);
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -282,8 +282,8 @@ void TrackInfoScreen::init()
 
     // Reverse track or random item in arena
     // -------------
-    const bool reverse_available = m_track->reverseAvailable() &&
-               race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG;
+    const bool reverse_available =     m_track->reverseAvailable()
+                                   && !(race_manager->isEggHuntMode());
     const bool random_item = m_track->hasNavMesh();
 
     m_option->setVisible(reverse_available || random_item);
@@ -556,7 +556,7 @@ void TrackInfoScreen::onEnterPressedInternal()
     const bool has_AI =
         (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
          race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-         race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ?
+         race_manager->isSoccerMode() ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
          race_manager->hasAI());
 
