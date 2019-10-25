@@ -40,6 +40,7 @@
 #include "network/race_event_manager.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_ipv6.hpp"
 #include "network/stk_peer.hpp"
 #include "online/online_profile.hpp"
 #include "online/xml_request.hpp"
@@ -58,6 +59,48 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+
+
+#ifdef ENABLE_SQLITE3
+// ----------------------------------------------------------------------------
+void insideIPv6CIDRSQL(sqlite3_context* context, int argc,
+                       sqlite3_value** argv)
+{
+    if (argc != 2)
+    {
+        sqlite3_result_int(context, 0);
+        return;
+    }
+
+    char* ipv6_cidr = (char*)sqlite3_value_text(argv[0]);
+    char* ipv6_in = (char*)sqlite3_value_text(argv[1]);
+    if (ipv6_cidr == NULL || ipv6_in == NULL)
+    {
+        sqlite3_result_int(context, 0);
+        return;
+    }
+    sqlite3_result_int(context, insideIPv6CIDR(ipv6_cidr, ipv6_in));
+}   // insideIPv6CIDRSQL
+
+// ----------------------------------------------------------------------------
+/*
+Copy below code so it can be use as loadable extension to be used in sqlite3
+command interface (together with andIPv6 and insideIPv6CIDR from stk_ipv6)
+
+#include "sqlite3ext.h"
+SQLITE_EXTENSION_INIT1
+// ----------------------------------------------------------------------------
+sqlite3_extension_init(sqlite3* db, char** pzErrMsg,
+                       const sqlite3_api_routines* pApi)
+{
+    SQLITE_EXTENSION_INIT2(pApi)
+    sqlite3_create_function(db, "insideIPv6CIDR", 2, SQLITE_UTF8, NULL,
+        insideIPv6CIDRSQL, NULL, NULL);
+    return 0;
+}   // sqlite3_extension_init
+*/
+
+#endif
 
 /** This is the central game setup protocol running in the server. It is
  *  mostly a finite state machine. Note that all nodes in ellipses and light
@@ -202,7 +245,8 @@ void ServerLobby::initDatabase()
             // Return zero to let caller return SQLITE_BUSY immediately
             return 0;
         }, NULL);
-
+    sqlite3_create_function(m_db, "insideIPv6CIDR", 2, SQLITE_UTF8, NULL,
+        &insideIPv6CIDRSQL, NULL, NULL);
     checkTableExists(ServerConfig::m_ip_ban_table, m_ip_ban_table_exists);
     checkTableExists(ServerConfig::m_online_id_ban_table,
         m_online_id_ban_table_exists);
