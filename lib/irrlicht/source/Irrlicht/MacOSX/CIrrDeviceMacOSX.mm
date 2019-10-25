@@ -990,10 +990,7 @@ void CIrrDeviceMacOSX::flush()
 {
 #ifndef SERVER_ONLY
 	if (CGLContext != NULL)
-	{
-		glFinish();
 		CGLFlushDrawable(CGLContext);
-	}
 #endif
 }
 
