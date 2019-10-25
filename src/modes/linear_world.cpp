@@ -493,8 +493,11 @@ void LinearWorld::newLap(unsigned int kart_index)
             float prev_distance_before_line = Track::getCurrentTrack()->getTrackLength()
                                               - prev_sector.getDistanceFromStart(false);
 
-            float finish_proportion = curr_distance_after_line
-                                      / (prev_distance_before_line + curr_distance_after_line);
+            float finish_proportion = 0.0f;
+            // Workaround against some bugs caused by the "distance is zero on a band" issue, see #4109
+            if (curr_distance_after_line + prev_distance_before_line != 0.0f)
+                finish_proportion =   curr_distance_after_line
+                                   / (prev_distance_before_line + curr_distance_after_line);
         
             float prev_time = kart->getRecentPreviousXYZTime();
             float finish_time = prev_time*finish_proportion + getTime()*(1.0f-finish_proportion);
