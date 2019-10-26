@@ -1436,7 +1436,7 @@ void ServerLobby::encodePlayers(BareNetworkString* bns,
             .addUInt32(player->getHostId())
             .addFloat(player->getDefaultKartColor())
             .addUInt32(player->getOnlineId())
-            .addUInt8(player->getPerPlayerDifficulty())
+            .addUInt8(player->getHandicap())
             .addUInt8(player->getLocalPlayerId())
             .addUInt8(
             race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
@@ -1630,7 +1630,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
                     nullptr, rki.getPlayerName(),
                     std::numeric_limits<uint32_t>::max(),
                     rki.getDefaultKartColor(),
-                    rki.getOnlineId(), rki.getDifficulty(),
+                    rki.getOnlineId(), rki.getHandicap(),
                     rki.getLocalPlayerId(), KART_TEAM_NONE,
                     rki.getCountryCode());
                 player->setKartName(rki.getKartName());
@@ -2606,8 +2606,8 @@ void ServerLobby::computeNewRankings()
         double player1_time  = race_manager->getKartRaceTime(i);
         double player1_factor =
             computeRankingFactor(race_manager->getKartInfo(i).getOnlineId());
-        double player1_handicap = (   w->getKart(i)->getPerPlayerDifficulty()
-                                   == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
+        double player1_handicap = (   w->getKart(i)->getHandicap()
+                                   == HANDICAP_NONE               ) ? 0 : HANDICAP_OFFSET;
 
         for (unsigned j = 0; j < player_count; j++)
         {
@@ -2627,8 +2627,8 @@ void ServerLobby::computeNewRankings()
 
             double player2_scores = new_scores[j];
             double player2_time = race_manager->getKartRaceTime(j);
-            double player2_handicap = (   w->getKart(j)->getPerPlayerDifficulty()
-                                       == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
+            double player2_handicap = (   w->getKart(j)->getHandicap()
+                                       == HANDICAP_NONE               ) ? 0 : HANDICAP_OFFSET;
 
             // Compute the result and race ranking importance
             double player_factors = std::min(player1_factor,
@@ -3196,13 +3196,12 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         if (name.empty())
             name = L"unnamed";
         float default_kart_color = data.getFloat();
-        PerPlayerDifficulty per_player_difficulty =
-            (PerPlayerDifficulty)data.getUInt8();
+        HandicapLevel handicap = (HandicapLevel)data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>
             (peer, i == 0 && !online_name.empty() && !peer->isAIPeer() ?
             online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
-            per_player_difficulty, (uint8_t)i, KART_TEAM_NONE,
+            handicap, (uint8_t)i, KART_TEAM_NONE,
             country_code);
         if (ServerConfig::m_team_choosing)
         {
@@ -3424,7 +3423,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         if (p && p->isAIPeer())
             boolean_combine |= (1 << 4);
         pl->addUInt8(boolean_combine);
-        pl->addUInt8(profile->getPerPlayerDifficulty());
+        pl->addUInt8(profile->getHandicap());
         if (ServerConfig::m_team_choosing &&
             race_manager->teamEnabled())
             pl->addUInt8(profile->getTeam());
@@ -4543,14 +4542,14 @@ void ServerLobby::changeHandicap(Event* event)
     }
     uint8_t local_id = data.getUInt8();
     auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
-    uint8_t difficulty_id = data.getUInt8();
-    if (difficulty_id >= PLAYER_DIFFICULTY_COUNT)
+    uint8_t handicap_id = data.getUInt8();
+    if (handicap_id >= HANDICAP_COUNT)
     {
-        Log::warn("ServerLobby", "Wrong handicap %d.", difficulty_id);
+        Log::warn("ServerLobby", "Wrong handicap %d.", handicap_id);
         return;
     }
-    PerPlayerDifficulty d = (PerPlayerDifficulty)difficulty_id;
-    player->setPerPlayerDifficulty(d);
+    HandicapLevel h = (HandicapLevel)handicap_id;
+    player->setHandicap(h);
     updatePlayerList();
 }   // changeHandicap
 
@@ -4708,7 +4707,7 @@ void ServerLobby::handleKartInfo(Event* event)
     ns->addUInt8(LE_KART_INFO).addUInt32(live_join_util_ticks)
         .addUInt8(kart_id) .encodeString(rki.getPlayerName())
         .addUInt32(rki.getHostId()).addFloat(rki.getDefaultKartColor())
-        .addUInt32(rki.getOnlineId()).addUInt8(rki.getDifficulty())
+        .addUInt32(rki.getOnlineId()).addUInt8(rki.getHandicap())
         .addUInt8((uint8_t)rki.getLocalPlayerId())
         .encodeString(rki.getKartName()).encodeString(rki.getCountryCode());
     peer->sendPacket(ns, true/*reliable*/);

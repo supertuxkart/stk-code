@@ -292,7 +292,7 @@ protected:
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
-                        PerPlayerDifficulty difficulty,
+                        HandicapLevel handicap,
                         std::shared_ptr<RenderInfo> ri);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type) OVERRIDE;
@@ -336,7 +336,7 @@ public:
     virtual void   setController(Controller *controller) OVERRIDE;
     virtual void   setXYZ(const Vec3& a) OVERRIDE;
     virtual void changeKart(const std::string& new_ident,
-                            PerPlayerDifficulty difficulty,
+                            HandicapLevel handicap,
                             std::shared_ptr<RenderInfo> ri) OVERRIDE;
 
     // ========================================================================================

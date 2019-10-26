@@ -130,7 +130,7 @@ void NetworkPlayerDialog::beforeAddingWidgets()
     {
         m_handicap_widget = getWidget<IconButtonWidget>("remove");
         m_handicap_widget->setVisible(true);
-        if (m_per_player_difficulty == PLAYER_DIFFICULTY_NORMAL)
+        if (m_handicap == HANDICAP_NONE)
         {
             //I18N: In the network player dialog
             m_handicap_widget->setText(_("Enable handicap"));
@@ -257,14 +257,14 @@ GUIEngine::EventPropagation
         else if (m_handicap_widget &&
             selection == m_handicap_widget->m_properties[PROP_ID])
         {
-            PerPlayerDifficulty new_difficulty = PLAYER_DIFFICULTY_NORMAL;
-            if (m_per_player_difficulty == PLAYER_DIFFICULTY_NORMAL)
+            HandicapLevel new_handicap = HANDICAP_NONE;
+            if (m_handicap == HANDICAP_NONE)
             {
-                new_difficulty = PLAYER_DIFFICULTY_HANDICAP;
+                new_handicap = HANDICAP_MEDIUM;
             }
             NetworkString change_handicap(PROTOCOL_LOBBY_ROOM);
             change_handicap.addUInt8(LobbyProtocol::LE_CHANGE_HANDICAP)
-                .addUInt8(m_local_id).addUInt8(new_difficulty);
+                .addUInt8(m_local_id).addUInt8(new_handicap);
             STKHost::get()->sendToServer(&change_handicap, true/*reliable*/);
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;

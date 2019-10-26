@@ -80,7 +80,7 @@
                    <spacer width="5" height="4%"/>
 
                    <div layout="horizontal-row" width="100%" height="fit">
-                       <checkbox id="perPlayerDifficulty"/>
+                       <checkbox id="enable-handicap"/>
                        <spacer width="1%" height="100%" />
                        <label height="100%" I18N="In the general settings" text="Enable per-player handicaps" word_wrap="true"/>
                    </div>

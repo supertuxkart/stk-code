@@ -113,9 +113,9 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty, std::shared_ptr<RenderInfo> ri)
+            HandicapLevel handicap, std::shared_ptr<RenderInfo> ri)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty, ri)
+             handicap, ri)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
@@ -231,10 +231,10 @@ void Kart::init(RaceManager::KartType type)
 
 // ----------------------------------------------------------------------------
 void Kart::changeKart(const std::string& new_ident,
-                      PerPlayerDifficulty difficulty,
+                      HandicapLevel handicap,
                       std::shared_ptr<RenderInfo> ri)
 {
-    AbstractKart::changeKart(new_ident, difficulty, ri);
+    AbstractKart::changeKart(new_ident, handicap, ri);
     m_kart_model->setKart(this);
 
 #ifdef SERVER_ONLY

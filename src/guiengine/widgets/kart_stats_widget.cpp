@@ -76,22 +76,21 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
         m_children.push_back(skill_bar);
     }
 
-	setValues(props, PLAYER_DIFFICULTY_NORMAL);
+	setValues(props, HANDICAP_NONE);
 
     move(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
          area.getWidth(), area.getHeight());
 }   // KartStatsWidget
 
 // -----------------------------------------------------------------------------
-void KartStatsWidget::setValues(const KartProperties* props,
-                                PerPlayerDifficulty d)
+void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
 {
     // Use kart properties computed for best difficulty to show the user, so
     // that properties don't change according to the the last used difficulty
     RaceManager::Difficulty previous_difficulty = race_manager->getDifficulty();
     race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
     KartProperties kp_computed;
-    kp_computed.copyForPlayer(props, d);
+    kp_computed.copyForPlayer(props, h);
     for (SkillLevelWidget* skills : m_skills)
         skills->setVisible(true);
 

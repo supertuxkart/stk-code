@@ -32,7 +32,7 @@
 
 class STKPeer;
 enum KartTeam : int8_t;
-enum PerPlayerDifficulty : uint8_t;
+enum HandicapLevel : uint8_t;
 
 /*! \class NetworkPlayerProfile
  *  \brief Contains the profile of a player.
@@ -52,8 +52,8 @@ private:
 
     uint32_t m_online_id;
 
-    /** Per player difficulty. */
-    std::atomic<PerPlayerDifficulty> m_per_player_difficulty;
+    /** Handicap level of this player. */
+    std::atomic<HandicapLevel> m_handicap;
 
     /** The selected kart id. */
     std::string m_kart_name; 
@@ -88,7 +88,7 @@ public:
         m_host_id               = std::numeric_limits<uint32_t>::max();
         m_default_kart_color    = 0.0f;
         m_online_id             = 0;
-        m_per_player_difficulty.store((PerPlayerDifficulty)0);
+        m_handicap.store((HandicapLevel)0);
         m_local_player_id       = 0;
         m_team.store(team);
         resetGrandPrixData();
@@ -97,7 +97,7 @@ public:
     NetworkPlayerProfile(std::shared_ptr<STKPeer> peer,
                          const irr::core::stringw &name, uint32_t host_id,
                          float default_kart_color, uint32_t online_id,
-                         PerPlayerDifficulty per_player_difficulty,
+                         HandicapLevel handicap,
                          uint8_t local_player_id, KartTeam team,
                          const std::string& country_code)
     {
@@ -106,7 +106,7 @@ public:
         m_host_id               = host_id;
         m_default_kart_color    = default_kart_color;
         m_online_id             = online_id;
-        m_per_player_difficulty.store(per_player_difficulty);
+        m_handicap.store(handicap);
         m_local_player_id       = local_player_id;
         m_team.store(team);
         m_country_code          = country_code;
@@ -129,12 +129,10 @@ public:
     /** Retuens the local player id for this player. */
     uint8_t getLocalPlayerId() const              { return m_local_player_id; }
     // ------------------------------------------------------------------------
-    /** Returns the per-player difficulty. */
-    PerPlayerDifficulty getPerPlayerDifficulty() const
-                                     { return m_per_player_difficulty.load(); }
+    /** Returns the player's handicap. */
+    HandicapLevel getHandicap() const { return m_handicap.load(); }
     // ------------------------------------------------------------------------
-    void setPerPlayerDifficulty(PerPlayerDifficulty d)
-                                          { m_per_player_difficulty.store(d); }
+    void setHandicap(HandicapLevel h) { m_handicap.store(h); }
     // ------------------------------------------------------------------------
     /** Returns the name of this player. */
     const irr::core::stringw& getName() const         { return m_player_name; }

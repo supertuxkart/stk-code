@@ -43,7 +43,7 @@ namespace GUIEngine
         /** Whether this player confirmed their selection */
         bool m_ready;
         /** If the player is handicapped. */
-        PerPlayerDifficulty m_difficulty;
+        HandicapLevel m_handicap;
 
         /** widget coordinates */
         int player_name_x, player_name_y, player_name_w, player_name_h;
@@ -132,8 +132,8 @@ namespace GUIEngine
         bool isReady();
 
         // ------------------------------------------------------------------------
-        /** \return Per player difficulty */
-        PerPlayerDifficulty getDifficulty();
+        /** \return handicap */
+        HandicapLevel getHandicap();
 
         // -------------------------------------------------------------------------
         /** Updates the animation (moving/shrinking/etc.) */

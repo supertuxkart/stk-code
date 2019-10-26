@@ -97,14 +97,14 @@ RaceManager::RaceManager()
     setSpareTireKartNum(0);
 }   // RaceManager
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Destructor for the race manager.
  */
 RaceManager::~RaceManager()
 {
 }   // ~RaceManager
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Resets the race manager in preparation for a new race. It sets the
  *  counter of finished karts to zero. It is called by world when 
  *  restarting a race.
@@ -144,7 +144,7 @@ void RaceManager::setDefaultAIKartList(const std::vector<std::string>& ai_list)
     }
 }   // setDefaultAIKartList
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Sets a player kart (local and non-local).
  *  \param player_id  Id of the player.
  *  \param ki         Kart info structure for this player.
@@ -164,7 +164,7 @@ void RaceManager::setPlayerKart(unsigned int player_id,
     m_player_karts[player_id] = rki;
 }   // setPlayerKart
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Sets additional information for a player to indicate which soccer team it
  *  belongs to.
 */
@@ -175,18 +175,17 @@ void RaceManager::setKartTeam(unsigned int player_id, KartTeam team)
     m_player_karts[player_id].setKartTeam(team);
 }   // setKartTeam
 
-//-----------------------------------------------------------------------------
-/** Sets the per-player difficulty for a player.
+//---------------------------------------------------------------------------------------------
+/** Sets the handicap for a player.
  */
-void RaceManager::setPlayerDifficulty(unsigned int player_id,
-                                      PerPlayerDifficulty difficulty)
+void RaceManager::setPlayerHandicap(unsigned int player_id, HandicapLevel handicap)
 {
     assert(player_id < m_player_karts.size());
 
-    m_player_karts[player_id].setPerPlayerDifficulty(difficulty);
-}   // setPlayerDifficulty
+    m_player_karts[player_id].setHandicap(handicap);
+}   // setPlayerHandicap
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Returns a pointer to the kart which has a given GP rank.
  *  \param n The rank (1 to number of karts) to look for.
  */
@@ -198,7 +197,7 @@ const AbstractKart *RaceManager::getKartWithGPRank(unsigned int n)
     return NULL;
 }   // getKLartWithGPRank
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Returns the GP rank (between 1 and number of karts) of a local player.
  *  \param player_id Local id of the player.
  */
@@ -215,7 +214,7 @@ int RaceManager::getLocalPlayerGPRank(const int player_id) const
     return -1;
 }   // getLocalPlayerGPRank
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Sets the number of players and optional the number of local players.
  *  \param num Number of players.
  *  \param local_players Number of local players, only used from networking.
@@ -253,7 +252,7 @@ RaceManager::Difficulty
         return DIFFICULTY_HARD;
 }   // convertDifficulty
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Sets the difficulty to use.
  *  \param diff The difficulty to use.
  */
@@ -262,7 +261,7 @@ void RaceManager::setDifficulty(Difficulty diff)
     m_difficulty = diff;
 }   // setDifficulty
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Sets a single track to be used in the next race.
  *  \param track The identifier of the track to use.
  */
@@ -274,7 +273,7 @@ void RaceManager::setTrack(const std::string& track)
     m_coin_target = 0;
 }   // setTrack
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Computes the list of random karts to be used for the AI.
  *  If a command line option specifies karts, they will be used first
  */
@@ -318,7 +317,7 @@ void RaceManager::computeRandomKartList()
 
 }   // computeRandomKartList
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Starts a new race or GP (or other mode).
  *  It sets up the list of player karts, AI karts, GP tracks if relevant
  *  etc.
@@ -404,7 +403,7 @@ void RaceManager::startNew(bool from_overworld)
         for(unsigned int i = 0; i < m_num_ghost_karts; i++)
         {
             m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
-                i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+                i, -1, -1, init_gp_rank, KT_GHOST, HANDICAP_NONE));
             init_gp_rank ++;
         }
     }
@@ -415,7 +414,7 @@ void RaceManager::startNew(bool from_overworld)
     for(unsigned int i = 0; i < ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
-            init_gp_rank, KT_AI, PLAYER_DIFFICULTY_NORMAL));
+            init_gp_rank, KT_AI, HANDICAP_NONE));
         init_gp_rank ++;
         if(UserConfigParams::m_ftl_debug)
         {
@@ -434,7 +433,7 @@ void RaceManager::startNew(bool from_overworld)
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),
                                            init_gp_rank, kt,
-                                           m_player_karts[i].getDifficulty()));
+                                           m_player_karts[i].getHandicap()));
         if(UserConfigParams::m_ftl_debug)
         {
             Log::debug("RaceManager", "[ftl] rank %d kart %s", init_gp_rank,
@@ -472,7 +471,7 @@ void RaceManager::startNew(bool from_overworld)
     startNextRace();
 }   // startNew
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Starts the next (or first) race.
  *  It sorts the kart status data structure
  *  according to the number of points, and then creates the world().
@@ -634,7 +633,7 @@ void RaceManager::startNextRace()
     main_loop->renderGUI(8200);
 }   // startNextRace
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Start the next race or go back to the start screen
  * If there are more races to do, starts the next race, otherwise
  * calls exitRace to finish the race.
@@ -662,7 +661,7 @@ void RaceManager::next()
     }
 }   // next
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Saves the current GP to the config.
  */
 void RaceManager::saveGP()
@@ -710,7 +709,7 @@ void RaceManager::saveGP()
     user_config->saveConfig();
 }   // saveGP
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 
 /** This class is only used in computeGPRanks, but the C++ standard
  *  forbids the usage of local data type in templates, so we have to
@@ -796,7 +795,7 @@ void RaceManager::computeGPRanks()
     }
 }   // computeGPRanks
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Exit a race (and don't start the next one)
  * \note In GP, displays the GP result screen first
  * \param delete_world If set deletes the world.
@@ -910,7 +909,7 @@ void RaceManager::exitRace(bool delete_world)
     m_track_number = 0;
 }   // exitRace
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** A kart has finished the race at the specified time (which can be
  *  different from World::getWorld()->getClock() in case of setting
  *  extrapolated arrival times). This function is only called from
@@ -946,7 +945,7 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
         m_num_finished_players++;
 }   // kartFinishedRace
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Rerun the same race again
  * This is called after a race is finished, and it will adjust
  * the number of points and the overall time before restarting the race.
@@ -962,7 +961,7 @@ void RaceManager::rerunRace()
     World::getWorld()->reset(true /* restart */);
 }   // rerunRace
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Higher-level method to start a GP without having to care about
  *  the exact startup sequence
  */
@@ -978,7 +977,7 @@ void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
     startNew(from_overworld);
 }
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Higher-level method to start a GP without having to care about
  *  the exact startup sequence.
  * \param trackIdent Internal name of the track to race on
@@ -1026,7 +1025,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     startNew(from_overworld);
 }   // startSingleRace
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Fills up the remaining kart slots with AI karts.
  */
 void RaceManager::setupPlayerKartInfo()
@@ -1034,7 +1033,7 @@ void RaceManager::setupPlayerKartInfo()
     computeRandomKartList();
 }   // setupPlayerKartInfo
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** \brief Function to start the race with only ghost kart(s) and watch.
  * \param trackIdent Internal name of the track to race on
  * \param num_laps   Number of laps to race, or -1 if number of laps is
@@ -1060,7 +1059,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
     for(int i = 0; i < m_num_karts; i++)
     {
         m_kart_status.push_back(KartStatus(ReplayPlay::get()->getGhostKartName(i),
-            i, -1, -1, init_gp_rank, KT_GHOST, PLAYER_DIFFICULTY_NORMAL));
+            i, -1, -1, init_gp_rank, KT_GHOST, HANDICAP_NONE));
         init_gp_rank ++;
     }
 
@@ -1068,7 +1067,7 @@ void RaceManager::startWatchingReplay(const std::string &track_ident,
     startNextRace();
 }   // startWatchingReplay
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
 {
     setMajorMode(MAJOR_MODE_GRAND_PRIX);
@@ -1123,7 +1122,7 @@ void RaceManager::configGrandPrixResultFromNetwork(NetworkString& ns)
     }
 }   // configGrandPrixResultFromNetwork
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 void RaceManager::clearNetworkGrandPrixResult()
 {
     if (m_major_mode != MAJOR_MODE_GRAND_PRIX)
@@ -1137,7 +1136,7 @@ void RaceManager::clearNetworkGrandPrixResult()
 
 }   // clearNetworkGrandPrixResult
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Returns a (translated) name of a minor race mode.
  *  \param mode Minor race mode.
  */
@@ -1165,7 +1164,7 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
     }
 }   // getNameOf
 
-//-----------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 /** Returns the specified difficulty as a string. */
 core::stringw RaceManager::getDifficultyName(Difficulty diff) const
 {

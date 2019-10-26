@@ -1944,7 +1944,7 @@ void SkiddingAI::computeNearestKarts()
             target_index  = target_index / (num_ai - 1);
         }
 
-        assert(target_index >= 0 && target_index <= (int)n-1);
+        assert(target_index >= 0 && target_index <= n-1);
         target_overall_distance = overall_distance[target_index];
     }
     // Now convert 'maximum overall distance' to distance to player.
