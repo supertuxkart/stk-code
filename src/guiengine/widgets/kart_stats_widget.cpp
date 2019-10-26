@@ -158,8 +158,8 @@ void KartStatsWidget::move(int x, int y, int w, int h)
 {
     Widget::move(x,y,w,h);
     setSize(m_x, m_y, m_w, m_h);
-    int margin = m_h / SKILL_COUNT / 2;
-    int offset = m_h / 4;
+    int margin = m_h / SKILL_COUNT * 0.6f;
+    int offset = m_h / 5;
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
         m_skills[i]->move(m_skill_bar_x,
@@ -197,7 +197,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
 
     // -- sizes
     m_skill_bar_w = w - m_w / 16; // make sure the bars can't be out of screen 
-    m_skill_bar_h = m_h / SKILL_COUNT / 5;
+    m_skill_bar_h = m_h / SKILL_COUNT / 4;
 
     m_skill_bar_x = x;
 }   // setSize
