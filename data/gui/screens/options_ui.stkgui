@@ -36,6 +36,7 @@
 
                 <!-- ************ SKIN CHOICE ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="20" height="100%" />
                     <div layout="vertical-row" width="10f" height="fit">
                         <spinner id="skinchoice" width="100%" align="center" />
                     </div>
@@ -47,6 +48,7 @@
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="20" height="100%" />
                     <div layout="vertical-row" width="10f" height="fit">
                         <gauge id="font_size" width="100%" align="center" />
                     </div>
@@ -62,6 +64,7 @@
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
+                    <spacer width="20" height="100%" />
                     <div layout="vertical-row" width="10f" height="fit">
                         <spinner id="minimap" width="100%" align="center" />
                     </div>
@@ -73,6 +76,7 @@
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
+                    <spacer width="40" height="100%" />
                     <checkbox id="showfps"/>
                     <spacer width="1%" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Display FPS" word_wrap="true"/>
@@ -81,6 +85,7 @@
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
+                    <spacer width="40" height="100%" />
                     <checkbox id="split_screen_horizontally"/>
                     <spacer width="1%" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Multiplayer splits screen horizontally" word_wrap="true"/>
@@ -89,6 +94,7 @@
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
+                    <spacer width="40" height="100%" />
                     <checkbox id="karts_powerup_gui"/>
                     <spacer width="1%" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Show other karts' held powerups" word_wrap="true"/>
