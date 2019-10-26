@@ -120,8 +120,8 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_w = w;
     m_h = h;
     
-    int iconbox_h = h * 4 / 3; 
-    int iconbox_w = h * 4 / 3; //assuming square icon
+    int iconbox_h = h * 5 / 3; 
+    int iconbox_w = h * 5 / 3; //assuming square icon
     
     m_iconbutton_h = iconbox_h; 
     m_iconbutton_w = iconbox_w; 
