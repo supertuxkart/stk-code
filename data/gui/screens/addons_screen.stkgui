@@ -32,7 +32,7 @@
                     I18N="In the addons screen" text="Karts"/>
             <icon-button id="tab_track" width="128" height="128" icon="gui/icons/mode_normal.png"
                     I18N="In the addons screen" text="Tracks"/>
-            <icon-button id="tab_arena" width="128" height="128" icon="gui/icons/mode_normal.png"
+            <icon-button id="tab_arena" width="128" height="128" icon="gui/icons/mode_weapons.png"
                     I18N="In the addons screen" text="Arenas"/>
         </tabs>
 
