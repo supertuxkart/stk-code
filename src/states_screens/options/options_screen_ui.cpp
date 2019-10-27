@@ -247,7 +247,7 @@ void OptionsScreenUI::init()
     const std::string& user_skin = UserConfigParams::m_skin_file;
     skinSelector->setActive(!in_game);
 
-    for (int n = 0; n < skinSelector->getMax(); n++)
+    for (int n = 0; n <= skinSelector->getMax(); n++)
     {
         auto ret = m_skins.find(skinSelector->getStringValueFromID(n));
         if (ret == m_skins.end())
