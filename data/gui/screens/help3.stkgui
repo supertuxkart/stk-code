@@ -32,58 +32,58 @@
                 <spacer height="2%" width="10"/>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/bubblegum-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/bubblegum-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%" text="BubbleGum - protect yourself with a shield, or use while looking back to leave a sticky pink puddle behind you."/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                     <icon align="center" width="64" height="64" icon="models/zipper_collect.png"/>
-                     <spacer width="25" height="25"/>
+                     <icon align="center" width="8%" height="100%" icon="models/zipper_collect.png"/>
+                     <spacer width="3%" height="100%"/>
                      <bubble proportion="1" height="100%" text="Zipper - will give you a strong speed boost. But beware of not losing control of your kart!"/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/cake-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/cake-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             text="Cake - thrown at the closest rival, best on short ranges and long straights. It also affects other karts close to the explosion."/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/plunger-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/plunger-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%" text="Plunger - throw straight to pull an opponent back, or throw while looking back to make one lose sight."/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/bowling-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/bowling-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             text="Bowling Ball - goes straight until it strikes, it can bounce off walls. If you are looking back, it will be thrown backwards."/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/parachute-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/parachute-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%" text="Parachute - slows down all karts in a better position."/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/swap-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/swap-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%" text="Swapper - gift boxes are transformed into bananas, nitro cans into bubblegums, and vice versa for a short time."/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                     <icon align="center" width="64" height="64" icon="models/rubber_ball-icon.png"/>
-                     <spacer width="25" height="25"/>
+                     <icon align="center" width="8%" height="100%" icon="models/rubber_ball-icon.png"/>
+                     <spacer width="3%" height="100%"/>
                      <bubble proportion="1" height="100%" text="Basket Ball - bounces after the leader, and might squash and slow down karts down on the way."/>
                 </div>
 
                 <div width="100%" proportion="1" layout="horizontal-row">
-                     <icon align="center" width="64" height="64" icon="models/swatter-icon.png"/>
-                     <spacer width="25" height="25"/>
+                     <icon align="center" width="8%" height="100%" icon="models/swatter-icon.png"/>
+                     <spacer width="3%" height="100%"/>
                      <bubble proportion="1" height="100%" text="Swatter - will squash karts close by, slowing them down. Can also be used to remove parachutes and bombs."/>
                 </div>
 

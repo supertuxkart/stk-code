@@ -29,16 +29,16 @@
             <box width="80%" height="100%" layout="vertical-row">
                 <label align="center" I18N="In the help menu" text="SuperTuxKart can be played in multiplayer mode online...:"/>
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/networking_icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/networking_icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="First, select the 'online' icon in the main menu. Choose either local networking, or global networking (requires internet to be enabled in the options). Then, you can either create your own server with custom options, or search among a list of existing servers to join. Some of them are recommended servers with optionally ranked races."/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/crown.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/crown.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Once in a server, a race will begin once its owner (symbolized with the crown) decides so. Official servers may auto-start races only when there are enough players. Then, you can choose your kart and vote for the next track to race on. An addon kart or track is allowed only if it exists on all joined players and the server."/>
@@ -47,16 +47,16 @@
                 <label align="center" I18N="In the help menu" text="... or on the same computer:"/>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/options_input.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/options_input.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="First, you will need several input devices. Use the input configuration screen to set them up. Multiple gamepads or joysticks are ideal: on keyboard(s), each player will need a different set of keys, and most keyboards are not appropriate for multiplayer because they don't support multiple simultaneous keypresses."/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/random_kart.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/random_kart.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="When input devices are configured, select the 'multiplayer' icon in the main menu. Each player can press the 'fire' key of their gamepad or keyboard to join the game, and use their input device to select their kart. The game continues when everyone selected their kart. Note that the mouse may not be used for this operation."/>

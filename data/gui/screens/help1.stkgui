@@ -30,52 +30,52 @@
 
                 <spacer width="5" height="1%"/>
                 <div width="50%" height="7%" align="center" layout="horizontal-row">
-                    <icon id="tutorialIcon" width="64" height="64" align="center" icon="gui/icons/tutorial.png"/>
+                    <icon id="tutorialIcon" width="8%" height="100%" align="center" icon="gui/icons/tutorial.png"/>
                     <button id="startTutorial" align="center" text="Start the tutorial"/>
                 </div>
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/gift.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/gift.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="7" height="100%" word_wrap="true"
                             I18N="In the help menu"
                             text="Collect blue gift boxes, they will give you powerups."/>
-                    <spacer width="25" height="25"/>
-                    <icon align="center" width="64" height="64" icon="gui/icons/banana.png"/>
-                    <spacer width="25" height="25"/>
+                    <spacer width="3%" height="100%"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/banana.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="3" height="100%" word_wrap="true"
                             I18N="In the help menu"
                             text="Avoid bananas!"/>
                 </div>
 
                 <div width="100%" proportion="6" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/nitro.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/nitro.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="3" height="100%" word_wrap="true"
                             I18N="In the help menu"
                             text="Collecting nitro allows you to get speed boosts whenever you wish by pressing the appropriate key or button. You can see your current level of nitro in the gauge at the bottom-right of the race screen."/>
                     </div>
 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/gui_lock.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/gui_lock.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="2" height="100%" word_wrap="true"
                             I18N="In the help menu"
                             text="If you see a button with a lock like this one, you need to complete a challenge to unlock it."/>
                 </div>
 
                 <div width="100%" proportion="6" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/android/drift.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/android/drift.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="2" height="100%" word_wrap="true"
                             I18N="In the help menu"
                             text="You can skid by pressing a special key or button. Successive short skids help to take sharp turns; while medium skids will boost your speed, long skids more so. You can't stop turning while skidding, so orient your kart carefully before!"/>
                 </div>
 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/speed.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/speed.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="2" height="100%" word_wrap="true"
                             I18N="In the help menu"
                             text="You can get a startup boost by pressing the accelerate button at 'Set!', before the race's start."/>

@@ -32,55 +32,55 @@
                 <spacer height="2%" width="10"/>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mode_normal.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_normal.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Regular Race: All blows allowed, so collect powerups and use them smartly!"/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mode_tt.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_tt.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Time Trial: Contains no powerups, so only your driving skills matter!"/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mode_ftl.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_ftl.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Follow the leader: Run for second place, as the last kart will be disqualified every time the counter hits zero. Beware: going in front of the leader will get you eliminated too!"/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mode_weapons.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_weapons.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="There are 3 types of battle mode: In 3 Strikes Battle, you need to hit others with weapons until they lose all their lives. In Free-For-All, the player who hits others the most will win in a given hit or time limit. In Capture The Flag, your team needs to bring the flag of the other team to your own flag base, as long as your flag is not captured by the other team."/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mode_soccer.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_soccer.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Soccer: Use your kart to push the ball into the goal."/>
                 </div>
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mode_easter.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_easter.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Egg hunt: Explore tracks to find all hidden eggs."/>
                 </div>
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mode_ghost.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mode_ghost.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and record your own!"/>
