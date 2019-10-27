@@ -283,7 +283,8 @@ void ServerLobby::initServerStatsTable()
         "    version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)\n"
         "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
         "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
-        "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host\n"
+        "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Ping of the host\n"
+        "    packet_loss INTEGER NOT NULL DEFAULT 0 -- Mean packet loss count from ENet (saved when disconnected)\n"
         ") WITHOUT ROWID;";
     std::string query = oss.str();
     sqlite3_stmt* stmt = NULL;
@@ -337,7 +338,7 @@ void ServerLobby::initServerStatsTable()
     oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
-        << "    connected_time, disconnected_time, ping FROM " << m_server_stats_table << "\n"
+        << "    connected_time, disconnected_time, ping, packet_loss FROM " << m_server_stats_table << "\n"
         << "    LEFT JOIN " << country_table_name << " ON "
         <<      country_table_name << ".country_code = " << m_server_stats_table << ".country_code\n"
         << "    ORDER BY connected_time DESC;";
@@ -396,7 +397,7 @@ void ServerLobby::initServerStatsTable()
         if (ServerConfig::m_ipv6_server)
             oss << "    a.ipv6,";
         oss << "    a.port, a.player_num,\n"
-            << "    a.country_code, a.country_flag, a.country_name, a.version, a.ping,\n"
+            << "    a.country_code, a.country_flag, a.country_name, a.version, a.ping, a.packet_loss,\n"
             << "    b.num_connections, b.first_connected_time, b.first_disconnected_time,\n"
             << "    a.connected_time AS last_connected_time, a.disconnected_time AS last_disconnected_time,\n"
             << "    a.time_played AS last_time_played, b.total_time_played, b.average_time_played,\n"
@@ -486,9 +487,11 @@ void ServerLobby::writeDisconnectInfoTable(STKPeer* peer)
     if (m_server_stats_table.empty())
         return;
     std::string query = StringUtils::insertValues(
-        "UPDATE %s SET disconnected_time = datetime('now'), ping = %d "
+        "UPDATE %s SET disconnected_time = datetime('now'), "
+        "ping = %d, packet_loss = %d "
         "WHERE host_id = %u;", m_server_stats_table.c_str(),
-        peer->getAveragePing(), peer->getHostId());
+        peer->getAveragePing(), peer->getPacketLoss(),
+        peer->getHostId());
     easySQLQuery(query);
 #endif
 }   // writeDisconnectInfoTable

@@ -96,6 +96,8 @@ protected:
 
     std::atomic<uint32_t> m_average_ping;
 
+    std::atomic<int> m_packet_loss;
+
     std::set<unsigned> m_available_kart_ids;
 
     std::string m_user_version;
@@ -250,6 +252,10 @@ public:
                                               { return m_client_capabilities; }
     // ------------------------------------------------------------------------
     bool isAIPeer() const                    { return m_user_version == "AI"; }
+    // ------------------------------------------------------------------------
+    void setPacketLoss(int loss)                 { m_packet_loss.store(loss); }
+    // ------------------------------------------------------------------------
+    int getPacketLoss() const                  { return m_packet_loss.load(); }
 };   // STKPeer
 
 #endif // STK_PEER_HPP
