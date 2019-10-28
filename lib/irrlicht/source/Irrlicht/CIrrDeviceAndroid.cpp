@@ -1151,6 +1151,64 @@ wchar_t CIrrDeviceAndroid::getKeyChar(SEvent& event)
     return key_char;
 }
 
+void CIrrDeviceAndroid::openURL(const std::string& url)
+{
+    if (!Android)
+        return;
+
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+
+    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+
+        status = Android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot attach current thread in openURL.", ELL_DEBUG);
+        return;
+    }
+
+    jobject native_activity = Android->activity->clazz;
+    jclass class_native_activity = env->GetObjectClass(native_activity);
+
+    if (class_native_activity == NULL)
+    {
+        os::Printer::log("openURL unable to find object class.", ELL_ERROR);
+        if (was_detached)
+        {
+            Android->activity->vm->DetachCurrentThread();
+        }
+        return;
+    }
+
+    jmethodID method_id = env->GetMethodID(class_native_activity, "openURL", "(Ljava/lang/String;)V");
+
+    if (method_id == NULL)
+    {
+        os::Printer::log("openURL unable to find method id.", ELL_ERROR);
+        if (was_detached)
+        {
+            Android->activity->vm->DetachCurrentThread();
+        }
+        return;
+    }
+    jstring url_jstring = env->NewStringUTF(url.c_str());
+    env->CallVoidMethod(native_activity, method_id, url_jstring);
+
+    if (was_detached)
+    {
+        Android->activity->vm->DetachCurrentThread();
+    }
+}
+
 void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show, s32 type)
 {
     if (!Android)

@@ -15,11 +15,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "online/link_helper.hpp"
+#include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 #include <string>
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
+#endif
+
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #endif
 
 using namespace Online;
@@ -28,7 +33,7 @@ namespace Online
 {
     bool LinkHelper::isSupported()
     {
-#if defined(_WIN32) || defined(__APPLE__) || (defined(__linux__) && !defined(__ANDROID__))
+#if defined(_WIN32) || defined(__APPLE__) || (defined(__linux__))
         return true;
 #else
         return false;
@@ -37,7 +42,11 @@ namespace Online
 
     void LinkHelper::openURL (std::string url)
     {
-#if defined(_WIN32)
+#if defined(ANDROID)
+        CIrrDeviceAndroid* android = dynamic_cast<CIrrDeviceAndroid*>(irr_driver->getDevice());
+        if (android)
+            android->openURL(url);
+#elif defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #elif defined(__APPLE__) && !defined(IOS_STK)
         std::string command = std::string("open ").append(url);
@@ -45,7 +54,7 @@ namespace Online
         {
             Log::error("OpenURL", "Command returned non-zero exit status");
         }
-#elif defined(__linux__) && !defined(__ANDROID__)
+#elif defined(__linux__)
         std::string command = std::string("xdg-open ").append(url);
         
         const char* lib_path = getenv("LD_LIBRARY_PATH");
