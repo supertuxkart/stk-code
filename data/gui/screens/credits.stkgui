@@ -12,7 +12,7 @@
 
             <spacer proportion="1" />
 
-            <button id="donate" width="fit" align="center" text="Donate to help keep SuperTuxKart going!"/>
+            <!--<button id="donate" width="fit" align="center" text="Donate to help keep SuperTuxKart going!"/>>
 
         </div>
 
