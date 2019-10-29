@@ -167,38 +167,38 @@ when the border that intersect at this corner are enabled.
 <element type="focusHalo" image="glass_iconhighlight_focus.png"  />
 
 <element type="spinner" state="neutral" common="y" image="glassspinner.png"
-    left_border="110" right_border="110" top_border="5" bottom_border="41"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
 <element type="spinner" state="focused" image="glassspinner_focus.png"
-    left_border="110" right_border="110" top_border="5" bottom_border="41"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
 <element type="spinner" state="deactivated" common="y" image="glassspinner_deactivated.png"
-    left_border="110" right_border="110" top_border="5" bottom_border="41"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
 <!-- player name spinner color in multiplayer-->
 <element type="spinner1" state="neutral" common="y" image="glass_square_pink.png"
-      left_border="110" right_border="110" top_border="5" bottom_border="41"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 <element type="spinner2" state="neutral" common="y" image="glass_square_cyan.png"
-      left_border="110" right_border="110" top_border="5" bottom_border="41"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 <element type="spinner3" state="neutral" common="y" image="glass_square_green.png"
-      left_border="110" right_border="110" top_border="5" bottom_border="41"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 <element type="spinner4" state="neutral" common="y" image="glass_square_yellow.png"
-      left_border="110" right_border="110" top_border="5" bottom_border="41"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 <element type="spinner5" state="neutral" common="y" image="glass_square_red.png"
-      left_border="110" right_border="110" top_border="5" bottom_border="41"
+      left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
 <!-- This one is a bit special. Only area(s) LEFT and/or RIGHT will be rendered. They will be overlaid
      on top of the spinner's background -->
 <element type="spinner" state="down" image="glassspinner_down.png"
-    left_border="110" right_border="110" top_border="5" bottom_border="41"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
 <!-- For checkboxes, no splitting into 9 areas is done; the image is just stretched -->
