@@ -145,7 +145,7 @@ public:
     virtual void requestSignOut() = 0;
     virtual bool isLoggedIn() const { return false;  }
     const std::string getIconFilename() const;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Sets the name of this player. */
     void setName(const core::stringw& name)
     {
@@ -155,7 +155,7 @@ public:
         m_local_name = name;
     }   // setName
 
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the name of this player. */
     const core::stringw& getName() const
     {
@@ -163,7 +163,7 @@ public:
         return m_local_name;
     }   // getName
 
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns true if this player is a guest account. */
     bool isGuestAccount() const
     {
@@ -172,80 +172,96 @@ public:
         #endif
         return m_is_guest_account;
     }   // isGuestAccount
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the last used online name. */
     const core::stringw& getLastOnlineName() const
     {
         return m_last_online_name;
     }   // getLastOnlineName
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Sets the last used online name. */
     void setLastOnlineName(const core::stringw &name)
     {
         m_last_online_name = name;
     }   // setLastOnlineName
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the unique id of this player. */
     unsigned int getUniqueID() const { return m_unique_id; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const
     {
         return m_story_mode_status->isLocked(feature);
     }   // isLocked
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns all active challenges. */
     void computeActive() { m_story_mode_status->computeActive(); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the list of recently completed challenges. */
     std::vector<const ChallengeData*> getRecentlyCompletedChallenges()
     {
         return m_story_mode_status->getRecentlyCompletedChallenges();
     }   // getRecently Completed Challenges
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Sets the currently active challenge. */
     void setCurrentChallenge(const std::string &name)
     {
         m_story_mode_status->setCurrentChallenge(name);
     }   // setCurrentChallenge
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Callback when a GP is finished (to test if a challenge was
      *  fulfilled). */
     void grandPrixFinished() { m_story_mode_status->grandPrixFinished(); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     unsigned int getNumCompletedChallenges() const { return m_story_mode_status->getNumCompletedChallenges(); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     unsigned int getPoints() const { return m_story_mode_status->getPoints(); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     unsigned int getPointsBefore() const { return m_story_mode_status->getPointsBefore(); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     unsigned int getNextUnlockPoints() const { return m_story_mode_status->getNextUnlockPoints(); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     void setFirstTime(bool b) { m_story_mode_status->setFirstTime(b); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+    void setFinished() { m_story_mode_status->setFinished(); }
+    // ----------------------------------------------------------------------------------------
+    bool isFinished() const { return m_story_mode_status->isFinished(); }
+    // ----------------------------------------------------------------------------------------
+    void setSpeedrunFinished() { m_story_mode_status->setSpeedrunFinished(); }
+    // ----------------------------------------------------------------------------------------
+    bool isSpeedrunFinished() { return m_story_mode_status->isSpeedrunFinished(); }
+    // ----------------------------------------------------------------------------------------
+    void setStoryModeTimer(int ms)  {  m_story_mode_status->setStoryModeTimer(ms); }
+    // ----------------------------------------------------------------------------------------
+    int getStoryModeTimer()  {  return m_story_mode_status->getStoryModeTimer(); }
+    // ----------------------------------------------------------------------------------------
+    void setSpeedrunTimer(int ms)  {  m_story_mode_status->setSpeedrunTimer(ms); }
+    // ----------------------------------------------------------------------------------------
+    int getSpeedrunTimer()  {  return m_story_mode_status->getSpeedrunTimer(); }
+    // ----------------------------------------------------------------------------------------
     void clearUnlocked()
     {
         m_story_mode_status->clearUnlocked();
     }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the current challenge for this player. */
     const ChallengeStatus* getCurrentChallengeStatus() const
     {
         return m_story_mode_status->getCurrentChallengeStatus();
     }   // getCurrentChallengeStatus
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     const ChallengeStatus* getChallengeStatus(const std::string &id)
     {
         return m_story_mode_status->getChallengeStatus(id);
     }   // getChallengeStatus
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     unsigned int getNumEasyTrophies() const
     {
         return m_story_mode_status->getNumEasyTrophies();
     }   // getNumEasyTrophies
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     unsigned int getNumMediumTrophies() const
     {
         return m_story_mode_status->getNumMediumTrophies();
@@ -259,47 +275,47 @@ public:
     {
         return m_story_mode_status->getNumBestTrophies();
     }   // getNumBestTrophies
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     AchievementsStatus* getAchievementsStatus()
     {
         return m_achievements_status;
     }   // getAchievementsStatus
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns true if a session was saved for this player. */
     bool hasSavedSession() const { return m_saved_session;  }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     StoryModeStatus* getStoryModeStatus() { return m_story_mode_status; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** If a session was saved, return the id of the saved user. */
     int getSavedUserId() const
     {
         assert(m_saved_session);
         return m_saved_user_id;
     }   // getSavedUserId
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** If a session was saved, return the token to use. */
     const std::string& getSavedToken() const
     {
         assert(m_saved_session);
         return m_saved_token;
     }   // getSavedToken
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns if the last time this player was used it was used online or
      *  offline. */
     bool wasOnlineLastTime() const { return m_last_was_online; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Sets if this player was logged in last time it was used. */
     void setWasOnlineLastTime(bool b) { m_last_was_online = b; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns if the last time this player was used it was used online or
      *  offline. */
     bool rememberPassword() const { return m_remember_password; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Sets if this player was logged in last time it was used. */
     void setRememberPassword(bool b) { m_remember_password = b; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     void setDefaultKartColor(float c) { m_default_kart_color = c; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     float getDefaultKartColor() const { return m_default_kart_color; }
 
 };   // class PlayerProfile

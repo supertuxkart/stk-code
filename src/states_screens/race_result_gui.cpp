@@ -21,6 +21,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -187,7 +188,8 @@ void RaceResultGUI::enableAllButtons()
 
     // If something was unlocked
     // -------------------------
-    int n = (int)PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
+    int n = (int)PlayerManager::getCurrentPlayer()
+        ->getRecentlyCompletedChallenges().size();
     if (n > 0 &&
          (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
           race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
@@ -314,8 +316,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         // If something was unlocked, the 'continue' button was
         // actually used to display "Show unlocked feature(s)" text.
         // ---------------------------------------------------------
-        int n = (int)PlayerManager::getCurrentPlayer()
-            ->getRecentlyCompletedChallenges().size();
+        PlayerProfile *player = PlayerManager::getCurrentPlayer();
+
+        int n = (int)player->getRecentlyCompletedChallenges().size();
+
         if (n > 0 &&
              (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
               race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
@@ -328,8 +332,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                     cleanupGPProgress();
                 }
 
-                std::vector<const ChallengeData*> unlocked =
-                    PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+                std::vector<const ChallengeData*> unlocked = player->getRecentlyCompletedChallenges();
 
                 bool gameCompleted = false;
                 for (unsigned int n = 0; n < unlocked.size(); n++)
@@ -337,6 +340,14 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                     if (unlocked[n]->getChallengeId() == "fortmagma")
                     {
                         gameCompleted = true;
+                        story_mode_timer->stopTimer();
+                        player->setFinished();
+                        player->setStoryModeTimer(story_mode_timer->getStoryModeTime());
+                        if (story_mode_timer->speedrunIsFinished())
+                        {
+                            player->setSpeedrunTimer(story_mode_timer->getSpeedrunTime());
+                            player->setSpeedrunFinished();
+                        }
                         break;
                     }
                 }

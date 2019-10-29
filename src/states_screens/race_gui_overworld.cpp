@@ -20,6 +20,7 @@
 #include "states_screens/race_gui_overworld.hpp"
 
 #include "challenges/challenge_status.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -196,6 +197,12 @@ void RaceGUIOverworld::renderGlobal(float dt)
         drawTrophyPoints();
     }
 
+    // Display the story mode timer if not in speedrun mode
+    // If in speedrun mode, it is taken care of in GUI engine
+    // as it must be displayed in all the game's screens
+    if (UserConfigParams::m_display_story_mode_timer && !UserConfigParams::m_speedrun_mode)
+        irr_driver->displayStoryModeTimer();
+
     drawGlobalMiniMap();
 #endif
 }   // renderGlobal
@@ -261,6 +268,9 @@ void RaceGUIOverworld::drawTrophyPoints()
                          size*2, pos.UpperLeftCorner.Y + size);
     core::rect<s32> source(core::position2di(0, 0), m_trophy[3]->getSize());
 
+    float place_between_trophies =
+        PlayerManager::getCurrentPlayer()->isLocked("difficulty_best") ? size*2.0f : size*1.0f;
+
     // Draw trophies icon and the number of trophy obtained by type
     for (unsigned int i=0;i<4;i++)
     {
@@ -282,7 +292,7 @@ void RaceGUIOverworld::drawTrophyPoints()
         font->draw(trophiesW.c_str(), dest, time_color, false, vcenter, NULL, true /* ignore RTL */);
         font->setBlackBorder(false);
 
-        dest += core::position2di(size*2, 0);
+        dest += core::position2di(place_between_trophies, 0);
     }
 
     dest = core::rect<s32>(pos.UpperLeftCorner.X - size, pos.UpperLeftCorner.Y,

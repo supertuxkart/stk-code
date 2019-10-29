@@ -20,6 +20,7 @@
 #include "addons/news_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "config/hardware_stats.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -38,6 +39,7 @@
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
 #include "states_screens/options/options_screen_general.hpp"
@@ -242,6 +244,30 @@ void OptionsScreenUI::init()
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
 
+    CheckBoxWidget* story_timer = getWidget<CheckBoxWidget>("story-mode-timer");
+    assert( story_timer != NULL );
+    story_timer->setState( UserConfigParams::m_display_story_mode_timer );
+    CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
+    assert( speedrun_timer != NULL );
+    if (UserConfigParams::m_speedrun_mode)
+    {
+        if (!story_mode_timer->playerCanRun())
+        {
+            UserConfigParams::m_speedrun_mode = false;
+            new MessageDialog(_("Speedrun mode disabled. It can only be enabled if the game"
+                                " has not been closed since the launch of the story mode.\n\n"
+                                "Closing the game before the story mode's"
+                                " completion invalidates the timer.\n\n"
+                                "To use the speedrun mode, please use a new profile."),
+                                MessageDialog::MESSAGE_DIALOG_OK,
+                                NULL, false, false, 0.6f, 0.7f);
+        }
+    }
+    speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
+    speedrun_timer->setVisible( UserConfigParams::m_display_story_mode_timer );
+    getWidget<LabelWidget>("speedrun-timer-text")
+        ->setVisible(UserConfigParams::m_display_story_mode_timer);
+
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const std::string& user_skin = UserConfigParams::m_skin_file;
@@ -402,6 +428,46 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
         assert( fps != NULL );
         UserConfigParams::m_display_fps = fps->getState();
+    }
+    else if (name == "story-mode-timer")
+    {
+        CheckBoxWidget* story_timer = getWidget<CheckBoxWidget>("story-mode-timer");
+        assert( story_timer != NULL );
+        UserConfigParams::m_display_story_mode_timer = story_timer->getState();
+
+        CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
+        assert( speedrun_timer != NULL );
+        speedrun_timer->setActive( UserConfigParams::m_display_story_mode_timer );
+        getWidget<LabelWidget>("speedrun-timer-text")
+            ->setActive(UserConfigParams::m_display_story_mode_timer);
+
+        // Disable speedrun mode if the story mode timer is disabled
+        if (!UserConfigParams::m_display_story_mode_timer)
+        {
+            UserConfigParams::m_speedrun_mode = false;
+            speedrun_timer->setState(false);
+        }
+
+    }
+    else if (name == "speedrun-timer")
+    {
+        CheckBoxWidget* speedrun_timer = getWidget<CheckBoxWidget>("speedrun-timer");
+        assert( speedrun_timer != NULL );
+        if (speedrun_timer->getState())
+        {
+            if (!story_mode_timer->playerCanRun())
+            {
+                speedrun_timer->setState(false);
+                new MessageDialog(_("Speedrun mode can only be enabled if the game has not"
+                                    " been closed since the launch of the story mode.\n\n"
+                                    "Closing the game before the story mode's"
+                                    " completion invalidates the timer.\n\n"
+                                    "To use the speedrun mode, please use a new profile."),
+                                    MessageDialog::MESSAGE_DIALOG_OK,
+                                    NULL, false, false, 0.6f, 0.7f);
+            }
+        }
+        UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
     }
 #endif
 }   // eventCallback

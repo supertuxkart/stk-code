@@ -658,6 +658,7 @@ namespace GUIEngine
 
 #include "guiengine/engine.hpp"
 
+#include "challenges/story_mode_timer.hpp"
 #include "config/user_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
@@ -1135,7 +1136,7 @@ namespace GUIEngine
         {
             g_device->getVideoDriver()
                     ->beginScene(true, true, video::SColor(255,100,101,140));
-            renderLoading();
+            renderLoading(true, true);
             g_device->getVideoDriver()->endScene();
         }
     }   // init
@@ -1328,6 +1329,12 @@ namespace GUIEngine
         // draw FPS if enabled
         if ( UserConfigParams::m_display_fps ) irr_driver->displayFPS();
 
+        // draw speedrun timer if enabled
+        if ( UserConfigParams::m_speedrun_mode ) irr_driver->displayStoryModeTimer();
+        // Update the story mode and speedrun timer (even if not enabled)
+        story_mode_timer->unpauseTimer(/* exit loading pause */ true);
+        story_mode_timer->updateTimer();
+
         g_driver->enableMaterial2D(false);
 
 
@@ -1349,7 +1356,7 @@ namespace GUIEngine
     // -----------------------------------------------------------------------
     std::vector<irr::video::ITexture*> g_loading_icons;
 
-    void renderLoading(bool clearIcons)
+    void renderLoading(bool clearIcons, bool launching)
     {
 #ifndef SERVER_ONLY
         if (clearIcons) g_loading_icons.clear();
@@ -1421,6 +1428,17 @@ namespace GUIEngine
         g_device->setEventReceiver(NULL);
         g_device->run();
         g_device->setEventReceiver(EventHandler::get());
+
+        // If launch is finished, pause & display the story mode timers
+        if ( !launching)
+        {
+            // For speedruns only, display the timer on loading screens
+            if (UserConfigParams::m_speedrun_mode)
+                irr_driver->displayStoryModeTimer();
+
+            //pause the timer during loading
+            story_mode_timer->pauseTimer(true);
+        }
 #endif
     } // renderLoading
 
@@ -1434,7 +1452,7 @@ namespace GUIEngine
 
             g_device->getVideoDriver()
                     ->beginScene(true, true, video::SColor(255,100,101,140));
-            renderLoading(false);
+            renderLoading(false, true);
             g_device->getVideoDriver()->endScene();
         }
         else
