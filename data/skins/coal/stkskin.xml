@@ -90,15 +90,15 @@ when the border that intersect at this corner are enabled.
 
 <element type="button" state="neutral" image="glassbutton.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+      hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="button" state="focused" image="glassbutton_focused.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+      hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="button" state="deactivated" common="y" image="glassbutton_deactivated.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+      hborder_out_portion="0" vborder_out_portion="0"/>
 
 <!-- TODO : buttons could support 'pressed' state -->
 
@@ -111,12 +111,10 @@ when the border that intersect at this corner are enabled.
       hborder_out_portion="0.7" vborder_out_portion="0.3" />
       
 <element type="progress" state="fill" image="glasssgauge_fill.png"
-      left_border="20" right_border="20" top_border="0" bottom_border="0"
-      preserve_h_aspect_ratios="true" />
+      left_border="5" right_border="5" top_border="5" bottom_border="5" />
 
 <element type="progress" state="neutral" common="y" image="progress_bg.png"
-      left_border="31" right_border="31" top_border="15" bottom_border="15"
-      preserve_h_aspect_ratios="true" />
+      left_border="31" right_border="31" top_border="15" bottom_border="15" />
       
       
 <element type="tab" state="neutral" image="glasstab.png"
@@ -265,7 +263,7 @@ when the border that intersect at this corner are enabled.
 
 <!-- Stateless -->
 <element type="window" image="dialog.png"
-      left_border="7" right_border="7" top_border="50" bottom_border="50"
+      left_border="7" right_border="7" top_border="7" bottom_border="7"
       hborder_out_portion="1.0" vborder_out_portion="0.2" />
 
 <!-- Stateless -->
