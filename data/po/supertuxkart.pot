@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-28 11:17+0800\n"
+"POT-Creation-Date: 2019-10-29 12:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -958,10 +958,6 @@ msgstr ""
 #. I18N: ./data/gui/screens/credits.stkgui
 #. I18N: Title in credits screen
 msgid "Credits"
-msgstr ""
-
-#. I18N: ./data/gui/screens/credits.stkgui
-msgid "Donate to help keep SuperTuxKart going!"
 msgstr ""
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
@@ -1948,8 +1944,8 @@ msgstr ""
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:516
-#: src/states_screens/options/options_screen_video.cpp:589
+#: src/states_screens/options/options_screen_video.cpp:528
+#: src/states_screens/options/options_screen_video.cpp:601
 msgid "Enabled"
 msgstr ""
 
@@ -4189,14 +4185,14 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:190
 #: src/states_screens/options/options_screen_video.cpp:215
-#: src/states_screens/options/options_screen_video.cpp:519
-#: src/states_screens/options/options_screen_video.cpp:590
+#: src/states_screens/options/options_screen_video.cpp:531
+#: src/states_screens/options/options_screen_video.cpp:602
 msgid "Disabled"
 msgstr ""
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:521
+#: src/states_screens/options/options_screen_video.cpp:533
 msgid "Important only"
 msgstr ""
 
@@ -4206,7 +4202,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:528
+#: src/states_screens/options/options_screen_video.cpp:540
 msgid "Low"
 msgstr ""
 
@@ -4216,14 +4212,14 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:531
+#: src/states_screens/options/options_screen_video.cpp:543
 msgid "High"
 msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:525
+#: src/states_screens/options/options_screen_video.cpp:537
 msgid "Very Low"
 msgstr ""
 
@@ -5298,89 +5294,111 @@ msgstr ""
 msgid "Half"
 msgstr ""
 
+#. I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
+#: src/states_screens/options/options_screen_video.cpp:223
+msgid ""
+"Vsync forces the graphics card to supply a new frame\n"
+"only when the monitor is ready to display it."
+msgstr ""
+
+#. I18N: in graphical options.
+#: src/states_screens/options/options_screen_video.cpp:226
+msgid "Full: one frame per monitor refresh"
+msgstr ""
+
+#. I18N: in graphical options.
+#: src/states_screens/options/options_screen_video.cpp:228
+msgid "Half: one frame every two monitor refreshes"
+msgstr ""
+
+#. I18N: in graphical options.
+#: src/states_screens/options/options_screen_video.cpp:230
+msgid "Vsync will not work if your drivers don't support it."
+msgstr ""
+
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:467
-#: src/states_screens/options/options_screen_video.cpp:499
+#: src/states_screens/options/options_screen_video.cpp:479
+#: src/states_screens/options/options_screen_video.cpp:511
 msgid "Custom"
-msgstr ""
-
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:534
-#, c-format
-msgid "Particles Effects: %s"
-msgstr ""
-
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:540
-#, c-format
-msgid "Animated Characters: %s"
-msgstr ""
-
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:543
-#, c-format
-msgid "Dynamic lights: %s"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:546
 #, c-format
-msgid "Light scattering: %s"
-msgstr ""
-
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:549
-#, c-format
-msgid "Anti-aliasing: %s"
+msgid "Particles Effects: %s"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:552
 #, c-format
-msgid "Ambient occlusion: %s"
+msgid "Animated Characters: %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:556
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:555
 #, c-format
-msgid "Shadows: %s"
+msgid "Dynamic lights: %s"
 msgstr ""
 
+#. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:558
 #, c-format
-msgid "Shadows: %i"
+msgid "Light scattering: %s"
 msgstr ""
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:561
 #, c-format
+msgid "Anti-aliasing: %s"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:564
+#, c-format
+msgid "Ambient occlusion: %s"
+msgstr ""
+
+#: src/states_screens/options/options_screen_video.cpp:568
+#, c-format
+msgid "Shadows: %s"
+msgstr ""
+
+#: src/states_screens/options/options_screen_video.cpp:570
+#, c-format
+msgid "Shadows: %i"
+msgstr ""
+
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:573
+#, c-format
 msgid "Bloom: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:565
+#: src/states_screens/options/options_screen_video.cpp:577
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:569
+#: src/states_screens/options/options_screen_video.cpp:581
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:574
+#: src/states_screens/options/options_screen_video.cpp:586
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:593
+#: src/states_screens/options/options_screen_video.cpp:605
 #, c-format
 msgid "Motion blur: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:597
+#: src/states_screens/options/options_screen_video.cpp:609
 #, c-format
 msgid "Depth of field: %s"
 msgstr ""
@@ -5683,7 +5701,7 @@ msgstr ""
 
 #: ../stk-assets/tracks/tutorial/scripting.as:82
 msgid ""
-"Press mirror icon to look behind. Fire the weapon behind by holding the "
+"Press the mirror icon to look behind. Fire the weapon behind by holding the "
 "bowling icon and then swiping to the mirror icon!"
 msgstr ""
 
