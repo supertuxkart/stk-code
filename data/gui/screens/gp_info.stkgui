@@ -17,7 +17,7 @@
             </div>
         </box>
         <spacer width="1" height="1%"/>
-        <box width="100%" height="33%" layout="vertical-row">
+        <box width="100%" height="31%" layout="vertical-row">
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label id="ai-text" proportion="1" I18N="In the grand prix info screen" text="AI karts" text_align="right"/>
                 <spacer width="40"/>
