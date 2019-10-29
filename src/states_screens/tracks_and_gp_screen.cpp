@@ -107,6 +107,12 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
             gpis->push();
         }
     }
+    else if (name == "rand-gp")
+    {
+        // Random GP
+        GPInfoScreen::getInstance()->setGP(GrandPrixData::getRandomGPID());
+        GPInfoScreen::getInstance()->push();
+    }
     else if (name == "trackgroups")
     {
         RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
@@ -204,16 +210,7 @@ void TracksAndGPScreen::init()
         }
     }
 
-    // Random GP
-    std::vector<std::string> screenshots;
-    screenshots.push_back(file_manager->getAsset(FileManager::GUI_ICON, "main_help.png"));
-    gps_widget->addAnimatedItem(GrandPrixData::getRandomGPName(),
-                                GrandPrixData::getRandomGPID(),
-                                screenshots, 1.5f, 0,
-                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-
     gps_widget->updateItemDisplay();
-
 
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->select(UserConfigParams::m_last_used_track_group, PLAYER_ID_GAME_MASTER);
@@ -288,7 +285,7 @@ void TracksAndGPScreen::buildTrackList()
     }
 
     tracks_widget->addItem(_("Random Track"), "random_track",
-                           "/gui/icons/track_random.png", 0 /* no badge */,
+                           "", 0 /* no badge */,
                            IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     tracks_widget->updateItemDisplay();
