@@ -1902,9 +1902,18 @@ void SkiddingAI::computeNearestKarts()
         unsigned int kart_id = m_world->getPlayerKart(i)->getWorldKartId();
         overall_distance.push_back(m_world->getOverallDistance(kart_id));
     }
-   
+
     // Sort the list in descending order
     std::sort(overall_distance.begin(), overall_distance.end(), std::greater<float>());
+   
+    // Get the AI's position (the position update may not be done, leading to crashes)
+    int curr_position = 1;
+    for(unsigned int i=0; i<m_world->getNumKarts(); i++)
+    {
+        if(   m_world->getOverallDistance(i) > own_overall_distance
+           && !m_world->getKart(i)->isEliminated())
+            curr_position++;
+    }
 
     for(unsigned int i=0; i<n; i++)
     {
@@ -1930,7 +1939,7 @@ void SkiddingAI::computeNearestKarts()
     else
     {
         int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
-        int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
+        int position_among_ai = curr_position - m_num_players_ahead;
 
         // Converts a position among AI to a position among players
         // The 1st player get an index of 0, the 2nd an index of 2, etc.
