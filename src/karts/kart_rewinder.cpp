@@ -46,14 +46,14 @@
 KartRewinder::KartRewinder(const std::string& ident,
                            unsigned int world_kart_id, int position,
                            const btTransform& init_transform,
-                           PerPlayerDifficulty difficulty,
+                           HandicapLevel handicap,
                            std::shared_ptr<RenderInfo> ri)
             : Rewinder(
               {
                   RN_KART,
                   static_cast<char>(world_kart_id)
               })
-            , Kart(ident, world_kart_id, position, init_transform, difficulty,
+            , Kart(ident, world_kart_id, position, init_transform, handicap,
                    ri)
 {
     m_steering_smoothing_dt = -1.0f;

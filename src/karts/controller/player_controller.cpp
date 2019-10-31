@@ -405,7 +405,7 @@ core::stringw PlayerController::getName() const
         const RemoteKartInfo& rki = race_manager->getKartInfo(
             m_kart->getWorldKartId());
         name = rki.getPlayerName();
-        if (rki.getDifficulty() == PLAYER_DIFFICULTY_HANDICAP)
+        if (rki.getHandicap() == HANDICAP_MEDIUM)
             name = _("%s (handicapped)", name);
     }
     return name;

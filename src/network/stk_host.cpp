@@ -971,6 +971,9 @@ void STKHost::mainLoop()
                 {
                     m_peer_pings.getData()[p.second->getHostId()] =
                         p.second->getPing();
+                    // Set packet loss before enet command, so if the peer is
+                    // disconnected later the loss won't be cleared
+                    p.second->setPacketLoss(p.first->packetLoss);
                     const unsigned ap = p.second->getAveragePing();
                     const unsigned max_ping = ServerConfig::m_max_ping;
                     if (p.second->isValidated() &&

@@ -61,12 +61,14 @@ void BubbleWidget::add()
     m_element->setTabStop(true);
 
     m_element->setNotClipped(true);
-    irrwidget->setDrawBorder(true);
 }
 
 void BubbleWidget::replaceText()
 {
     IGUIStaticText* irrwidget = (IGUIStaticText*) m_element;
+    // Take border into account for line breaking (happens in setText)
+    irrwidget->setDrawBorder(true);
+
     stringw message = getText();
 
     EGUI_ALIGNMENT align = EGUIA_UPPERLEFT;

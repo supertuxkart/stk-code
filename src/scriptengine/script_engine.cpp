@@ -450,8 +450,8 @@ namespace Scripting
         Scripting::Kart::registerScriptEnums(m_engine);
         Scripting::Physics::registerScriptFunctions(m_engine);
         Scripting::Utils::registerScriptFunctions(m_engine);
-        Scripting::GUI::registerScriptFunctions(m_engine);
         Scripting::GUI::registerScriptEnums(m_engine);
+        Scripting::GUI::registerScriptFunctions(m_engine);
         Scripting::Audio::registerScriptFunctions(m_engine);
 
         // It is possible to register the functions, properties, and types in 

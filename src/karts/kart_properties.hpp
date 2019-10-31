@@ -208,16 +208,16 @@ private:
 
     void  load              (const std::string &filename,
                              const std::string &node);
-    void combineCharacteristics(PerPlayerDifficulty d);
+    void combineCharacteristics(HandicapLevel h);
 
 public:
-    /** Returns the string representation of a per-player difficulty. */
-    static std::string      getPerPlayerDifficultyAsString(PerPlayerDifficulty d);
+    /** Returns the string representation of a handicap level. */
+    static std::string      getHandicapAsString(HandicapLevel h);
 
           KartProperties    (const std::string &filename="");
          ~KartProperties    ();
     void  copyForPlayer     (const KartProperties *source,
-                             PerPlayerDifficulty d = PLAYER_DIFFICULTY_NORMAL);
+                             HandicapLevel h = HANDICAP_NONE);
     void  copyFrom          (const KartProperties *source);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);

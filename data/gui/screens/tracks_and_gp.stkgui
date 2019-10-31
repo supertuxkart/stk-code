@@ -6,11 +6,16 @@
         <header width="8%" I18N="In the track and grand prix selection screen" text="Grand Prix"
                 align="center" text_align="center" />
         <spacer width="100%" height="1%" />
-
-        <box width="100%" proportion="1" layout="vertical-row" padding="0">
-            <scrollable_toolbar id="gps" x="1%" y="1%" width="98%" height="98%" align="center" label_location="each"
-                                square_items="true" child_width="175" child_height="120" />
-        </box>
+        
+        <div width="100%" proportion="1" layout="horizontal-row" >
+            <box width="80%" height="100%" layout="vertical-row" padding="0">
+                <scrollable_toolbar id="gps" x="1%" y="1%" width="98%" height="98%" align="center" label_location="each"
+                                    square_items="true" child_width="175" child_height="120" />
+            </box>
+            <spacer width="2%" height="20" />
+            <icon-button id="rand-gp" width="18%" height="80%" icon="gui/icons/gp_new.png" align="center"
+                    I18N="In the track and grand prix selection screen" text="Random Grand Prix"/>
+        </div>
 
         <header width="8%" I18N="In the track and grand prix selection screen" text="All Tracks"
                 align="center" text_align="center" />

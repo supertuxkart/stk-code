@@ -210,11 +210,6 @@ void CreditsScreen::loadedFromFile()
         // translations should be just before the last screen
         m_sections.swap( m_sections.size() - 1, m_sections.size() - 2 );
     }
-
-    if (!Online::LinkHelper::isSupported())
-    {
-        getWidget("donate")->setVisible(false);
-    }
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------

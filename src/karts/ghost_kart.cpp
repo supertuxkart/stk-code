@@ -35,7 +35,7 @@ GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
                      int position, float color_hue)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
-                 PLAYER_DIFFICULTY_NORMAL,
+                 HANDICAP_NONE,
                  std::make_shared<RenderInfo>(color_hue, true/*transparent*/))
 {
 }   // GhostKart

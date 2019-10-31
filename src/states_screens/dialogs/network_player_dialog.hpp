@@ -48,7 +48,7 @@ private:
 
     const uint8_t m_local_id;
 
-    PerPlayerDifficulty m_per_player_difficulty;
+    HandicapLevel m_handicap;
 
     const core::stringw m_name;
 
@@ -81,9 +81,9 @@ public:
     NetworkPlayerDialog(uint32_t host_id, uint32_t online_id, uint8_t local_id,
                         const core::stringw& name,
                         const std::string& country_code,
-                        bool allow_change_team, PerPlayerDifficulty d)
+                        bool allow_change_team, HandicapLevel h)
         : ModalDialog(0.8f,0.8f), m_host_id(host_id), m_online_id(online_id),
-          m_local_id(local_id), m_per_player_difficulty(d),
+          m_local_id(local_id), m_handicap(h),
           m_name(name), m_country_code(country_code),
           m_allow_change_team(allow_change_team), m_self_destroy(false),
           m_open_report_textbox(false),

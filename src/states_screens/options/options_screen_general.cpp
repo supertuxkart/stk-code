@@ -106,11 +106,11 @@ void OptionsScreenGeneral::init()
         stats->setActive(false);
         chat->setActive(false);
     }
-    CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
-    assert( difficulty != NULL );
-    difficulty->setState( UserConfigParams::m_per_player_difficulty );
+    CheckBoxWidget* handicap = getWidget<CheckBoxWidget>("enable-handicap");
+    assert( handicap != NULL );
+    handicap->setState( UserConfigParams::m_per_player_difficulty );
     // I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text fits the screen in low resolutions.
-    difficulty->setTooltip(_("In multiplayer mode, players can select handicapped\n(more difficult) profiles on the kart selection screen"));
+    handicap->setTooltip(_("In multiplayer mode, players can select handicapped\n(more difficult) profiles on the kart selection screen"));
 
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
@@ -240,11 +240,11 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         assert( show_login != NULL );
         UserConfigParams::m_always_show_login_screen = show_login->getState();
     }
-    else if (name=="perPlayerDifficulty")
+    else if (name=="enable-handicap")
     {
-        CheckBoxWidget* difficulty = getWidget<CheckBoxWidget>("perPlayerDifficulty");
-        assert( difficulty != NULL );
-        UserConfigParams::m_per_player_difficulty = difficulty->getState();
+        CheckBoxWidget* handicap = getWidget<CheckBoxWidget>("enable-handicap");
+        assert( handicap != NULL );
+        UserConfigParams::m_per_player_difficulty = handicap->getState();
     }
 #ifdef MOBILE_STK
     else if (name=="assets_settings")

@@ -219,6 +219,18 @@ void OptionsScreenVideo::init()
     vsync->addLabel(_("Half"));
     vsync->setValue(UserConfigParams::m_swap_interval);
 
+    //I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
+    core::stringw vsync_tooltip = _("Vsync forces the graphics card to supply a new frame\nonly when the monitor is ready to display it.");
+
+    //I18N: in graphical options.
+    vsync_tooltip = vsync_tooltip + L"\n" + _("Full: one frame per monitor refresh");
+    //I18N: in graphical options.
+    vsync_tooltip = vsync_tooltip + L"\n" + _("Half: one frame every two monitor refreshes");
+    //I18N: in graphical options.
+    vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
+
+    vsync->setTooltip(vsync_tooltip);
+
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
     assert(res != NULL);

@@ -109,15 +109,15 @@ all types of ttf.
 
 <element type="button" state="neutral" image="glassbutton.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+      hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="button" state="focused" image="glassbutton_focused.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+      hborder_out_portion="0" vborder_out_portion="0"/>
 
 <element type="button" state="deactivated" common="y" image="glassbutton_deactivated.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+      hborder_out_portion="0" vborder_out_portion="0"/>
 
 <!-- TODO : buttons could support 'pressed' state -->
 
@@ -130,12 +130,10 @@ all types of ttf.
       hborder_out_portion="0.7" vborder_out_portion="0.3" />
 
 <element type="progress" state="fill" image="glasssgauge_fill.png"
-      left_border="15" right_border="15" top_border="15" bottom_border="15"
-      preserve_h_aspect_ratios="false" />
+      left_border="10" right_border="10" top_border="10" bottom_border="10" />
 
 <element type="progress" state="neutral" common="y" image="progress_bg.png"
-      left_border="31" right_border="31" top_border="15" bottom_border="15"
-      preserve_h_aspect_ratios="true" />
+      left_border="31" right_border="31" top_border="15" bottom_border="15" />
       
       
 <element type="tab" state="neutral" image="glasstab.png"
@@ -282,7 +280,7 @@ all types of ttf.
 
 <!-- Stateless -->
 <element type="window" common="y" image="dialog.png"
-      left_border="7" right_border="7" top_border="50" bottom_border="50"
+      left_border="7" right_border="7" top_border="7" bottom_border="7"
       hborder_out_portion="1.0" vborder_out_portion="0.2" />
 
 <!-- Stateless -->

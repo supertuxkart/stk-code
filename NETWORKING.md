@@ -144,6 +144,9 @@ The current server configuration xml looks like this:
     <!-- Kick players whose ping is above max-ping. -->
     <kick-high-ping-players value="false" />
 
+    <!-- Allow players exceeding max-ping to have a playable game, if enabled kick-high-ping-players will be disabled, please also use a default value for max-ping and jitter-tolerance with it. -->
+    <high-ping-workaround value="true" />
+
     <!-- Kick idle player which has no network activity to server for more than some seconds during game, unless he has finished the race. Negative value to disable, and this option will always be disabled for LAN server. -->
     <kick-idle-player-seconds value="60" />
 
@@ -159,10 +162,10 @@ The current server configuration xml looks like this:
     <!-- Specified in millisecond for maximum time waiting in sqlite3_busy_handler. You may need a higher value if your database is shared by many servers or having a slow hard disk. -->
     <database-timeout value="1000" />
 
-    <!-- IPv4 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) whichallows live kicking peer by inserting record to database. -->
+    <!-- IPv4 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) which allows live kicking peer by inserting record to database. -->
     <ip-ban-table value="ip_ban" />
 
-    <!-- IPv6 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) whichallows live kicking peer by inserting record to database. -->
+    <!-- IPv6 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) which allows live kicking peer by inserting record to database. -->
     <ipv6-ban-table value="ipv6_ban" />
 
     <!-- Online ID ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) which allows live kicking peer by inserting record to database. -->

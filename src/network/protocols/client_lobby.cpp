@@ -320,7 +320,7 @@ void ClientLobby::addAllPlayers(Event* event)
 std::vector<std::shared_ptr<NetworkPlayerProfile> >
   ClientLobby::decodePlayers(const BareNetworkString& data,
                              std::shared_ptr<STKPeer> peer,
-                             bool* is_specator) const
+                             bool* is_spectator) const
 {
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     unsigned player_count = data.getUInt8();
@@ -331,15 +331,15 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
         uint32_t host_id = data.getUInt32();
         float kart_color = data.getFloat();
         uint32_t online_id = data.getUInt32();
-        PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
+        HandicapLevel handicap = (HandicapLevel)data.getUInt8();
         uint8_t local_id = data.getUInt8();
         KartTeam team = (KartTeam)data.getUInt8();
         std::string country_code;
         data.decodeString(&country_code);
-        if (is_specator && host_id == STKHost::get()->getMyHostId())
-            *is_specator = false;
+        if (is_spectator && host_id == STKHost::get()->getMyHostId())
+            *is_spectator = false;
         auto player = std::make_shared<NetworkPlayerProfile>(peer, player_name,
-            host_id, kart_color, online_id, ppd, local_id, team, country_code);
+            host_id, kart_color, online_id, handicap, local_id, team, country_code);
         std::string kart_name;
         data.decodeString(&kart_name);
         player->setKartName(kart_name);
@@ -783,7 +783,7 @@ void ClientLobby::updatePlayerList(Event* event)
         lp.m_host_id = data.getUInt32();
         lp.m_online_id = data.getUInt32();
         uint8_t local_id = data.getUInt8();
-        lp.m_difficulty = PLAYER_DIFFICULTY_NORMAL;
+        lp.m_handicap = HANDICAP_NONE;
         lp.m_local_player_id = local_id;
         data.decodeStringW(&lp.m_user_name);
         total_players += lp.m_user_name;
@@ -804,8 +804,8 @@ void ClientLobby::updatePlayerList(Event* event)
             lp.m_icon_id = 5;
         if (ready)
             lp.m_icon_id = 4;
-        lp.m_difficulty = (PerPlayerDifficulty)data.getUInt8();
-        if (lp.m_difficulty == PLAYER_DIFFICULTY_HANDICAP)
+        lp.m_handicap = (HandicapLevel)data.getUInt8();
+        if (lp.m_handicap != HANDICAP_NONE)
         {
             lp.m_user_name = _("%s (handicapped)", lp.m_user_name);
         }
@@ -815,7 +815,7 @@ void ClientLobby::updatePlayerList(Event* event)
             if (is_peer_server_owner)
                 client_server_owner = true;
             auto& local_players = NetworkConfig::get()->getNetworkPlayers();
-            std::get<2>(local_players.at(local_id)) = lp.m_difficulty;
+            std::get<2>(local_players.at(local_id)) = lp.m_handicap;
         }
         data.decodeString(&lp.m_country_code);
         m_lobby_players.push_back(lp);
@@ -1302,7 +1302,7 @@ void ClientLobby::handleKartInfo(Event* event)
     uint32_t host_id = data.getUInt32();
     float kart_color = data.getFloat();
     uint32_t online_id = data.getUInt32();
-    PerPlayerDifficulty ppd = (PerPlayerDifficulty)data.getUInt8();
+    HandicapLevel h = (HandicapLevel)data.getUInt8();
     uint8_t local_id = data.getUInt8();
     std::string kart_name;
     data.decodeString(&kart_name);
@@ -1314,7 +1314,7 @@ void ClientLobby::handleKartInfo(Event* event)
     rki.setHostId(host_id);
     rki.setDefaultKartColor(kart_color);
     rki.setOnlineId(online_id);
-    rki.setPerPlayerDifficulty(ppd);
+    rki.setHandicap(h);
     rki.setLocalPlayerId(local_id);
     rki.setKartName(kart_name);
     rki.setCountryCode(country_code);

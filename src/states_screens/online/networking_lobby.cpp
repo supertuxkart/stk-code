@@ -597,7 +597,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             m_player_list->getSelectionInternalName()).m_country_code,
             m_allow_change_team,
             m_player_names.at(
-            m_player_list->getSelectionInternalName()).m_difficulty);
+            m_player_list->getSelectionInternalName()).m_handicap);
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {

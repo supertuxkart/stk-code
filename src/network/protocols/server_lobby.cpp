@@ -283,7 +283,8 @@ void ServerLobby::initServerStatsTable()
         "    version TEXT NOT NULL, -- SuperTuxKart version of the host (with OS info)\n"
         "    connected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when connected\n"
         "    disconnected_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Time when disconnected (saved when disconnected)\n"
-        "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0 -- Ping of the host\n"
+        "    ping INTEGER UNSIGNED NOT NULL DEFAULT 0, -- Ping of the host\n"
+        "    packet_loss INTEGER NOT NULL DEFAULT 0 -- Mean packet loss count from ENet (saved when disconnected)\n"
         ") WITHOUT ROWID;";
     std::string query = oss.str();
     sqlite3_stmt* stmt = NULL;
@@ -337,7 +338,7 @@ void ServerLobby::initServerStatsTable()
     oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version,\n"
         << "    ROUND((STRFTIME(\"%s\", disconnected_time) - STRFTIME(\"%s\", connected_time)) / 60.0, 2) AS time_played,\n"
-        << "    connected_time, disconnected_time, ping FROM " << m_server_stats_table << "\n"
+        << "    connected_time, disconnected_time, ping, packet_loss FROM " << m_server_stats_table << "\n"
         << "    LEFT JOIN " << country_table_name << " ON "
         <<      country_table_name << ".country_code = " << m_server_stats_table << ".country_code\n"
         << "    ORDER BY connected_time DESC;";
@@ -396,7 +397,7 @@ void ServerLobby::initServerStatsTable()
         if (ServerConfig::m_ipv6_server)
             oss << "    a.ipv6,";
         oss << "    a.port, a.player_num,\n"
-            << "    a.country_code, a.country_flag, a.country_name, a.version, a.ping,\n"
+            << "    a.country_code, a.country_flag, a.country_name, a.version, a.ping, a.packet_loss,\n"
             << "    b.num_connections, b.first_connected_time, b.first_disconnected_time,\n"
             << "    a.connected_time AS last_connected_time, a.disconnected_time AS last_disconnected_time,\n"
             << "    a.time_played AS last_time_played, b.total_time_played, b.average_time_played,\n"
@@ -486,9 +487,11 @@ void ServerLobby::writeDisconnectInfoTable(STKPeer* peer)
     if (m_server_stats_table.empty())
         return;
     std::string query = StringUtils::insertValues(
-        "UPDATE %s SET disconnected_time = datetime('now'), ping = %d "
+        "UPDATE %s SET disconnected_time = datetime('now'), "
+        "ping = %d, packet_loss = %d "
         "WHERE host_id = %u;", m_server_stats_table.c_str(),
-        peer->getAveragePing(), peer->getHostId());
+        peer->getAveragePing(), peer->getPacketLoss(),
+        peer->getHostId());
     easySQLQuery(query);
 #endif
 }   // writeDisconnectInfoTable
@@ -1436,7 +1439,7 @@ void ServerLobby::encodePlayers(BareNetworkString* bns,
             .addUInt32(player->getHostId())
             .addFloat(player->getDefaultKartColor())
             .addUInt32(player->getOnlineId())
-            .addUInt8(player->getPerPlayerDifficulty())
+            .addUInt8(player->getHandicap())
             .addUInt8(player->getLocalPlayerId())
             .addUInt8(
             race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
@@ -1630,7 +1633,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
                     nullptr, rki.getPlayerName(),
                     std::numeric_limits<uint32_t>::max(),
                     rki.getDefaultKartColor(),
-                    rki.getOnlineId(), rki.getDifficulty(),
+                    rki.getOnlineId(), rki.getHandicap(),
                     rki.getLocalPlayerId(), KART_TEAM_NONE,
                     rki.getCountryCode());
                 player->setKartName(rki.getKartName());
@@ -2606,8 +2609,8 @@ void ServerLobby::computeNewRankings()
         double player1_time  = race_manager->getKartRaceTime(i);
         double player1_factor =
             computeRankingFactor(race_manager->getKartInfo(i).getOnlineId());
-        double player1_handicap = (   w->getKart(i)->getPerPlayerDifficulty()
-                                   == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
+        double player1_handicap = (   w->getKart(i)->getHandicap()
+                                   == HANDICAP_NONE               ) ? 0 : HANDICAP_OFFSET;
 
         for (unsigned j = 0; j < player_count; j++)
         {
@@ -2627,8 +2630,8 @@ void ServerLobby::computeNewRankings()
 
             double player2_scores = new_scores[j];
             double player2_time = race_manager->getKartRaceTime(j);
-            double player2_handicap = (   w->getKart(j)->getPerPlayerDifficulty()
-                                       == PLAYER_DIFFICULTY_HANDICAP             ) ? HANDICAP_OFFSET : 0;
+            double player2_handicap = (   w->getKart(j)->getHandicap()
+                                       == HANDICAP_NONE               ) ? 0 : HANDICAP_OFFSET;
 
             // Compute the result and race ranking importance
             double player_factors = std::min(player1_factor,
@@ -3196,13 +3199,12 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         if (name.empty())
             name = L"unnamed";
         float default_kart_color = data.getFloat();
-        PerPlayerDifficulty per_player_difficulty =
-            (PerPlayerDifficulty)data.getUInt8();
+        HandicapLevel handicap = (HandicapLevel)data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>
             (peer, i == 0 && !online_name.empty() && !peer->isAIPeer() ?
             online_name : name,
             peer->getHostId(), default_kart_color, i == 0 ? online_id : 0,
-            per_player_difficulty, (uint8_t)i, KART_TEAM_NONE,
+            handicap, (uint8_t)i, KART_TEAM_NONE,
             country_code);
         if (ServerConfig::m_team_choosing)
         {
@@ -3424,7 +3426,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         if (p && p->isAIPeer())
             boolean_combine |= (1 << 4);
         pl->addUInt8(boolean_combine);
-        pl->addUInt8(profile->getPerPlayerDifficulty());
+        pl->addUInt8(profile->getHandicap());
         if (ServerConfig::m_team_choosing &&
             race_manager->teamEnabled())
             pl->addUInt8(profile->getTeam());
@@ -4031,6 +4033,7 @@ void ServerLobby::configPeersStartTime()
 {
     uint32_t max_ping = 0;
     const unsigned max_ping_from_peers = ServerConfig::m_max_ping;
+    bool peer_exceeded_max_ping = false;
     for (auto p : m_peers_ready)
     {
         auto peer = p.first.lock();
@@ -4041,14 +4044,16 @@ void ServerLobby::configPeersStartTime()
             Log::warn("ServerLobby",
                 "Peer %s cannot catch up with max ping %d.",
                 peer->getRealAddress().c_str(), max_ping);
+            peer_exceeded_max_ping = true;
             continue;
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
     }
-    if (ServerConfig::m_live_players && race_manager->supportsLiveJoining())
+    if ((ServerConfig::m_high_ping_workaround && peer_exceeded_max_ping) ||
+        (ServerConfig::m_live_players && race_manager->supportsLiveJoining()))
     {
         Log::info("ServerLobby", "Max ping to ServerConfig::m_max_ping for "
-            "live joining.");
+            "live joining or high ping workaround.");
         max_ping = ServerConfig::m_max_ping;
     }
     // Start up time will be after 2500ms, so even if this packet is sent late
@@ -4543,14 +4548,14 @@ void ServerLobby::changeHandicap(Event* event)
     }
     uint8_t local_id = data.getUInt8();
     auto& player = event->getPeer()->getPlayerProfiles().at(local_id);
-    uint8_t difficulty_id = data.getUInt8();
-    if (difficulty_id >= PLAYER_DIFFICULTY_COUNT)
+    uint8_t handicap_id = data.getUInt8();
+    if (handicap_id >= HANDICAP_COUNT)
     {
-        Log::warn("ServerLobby", "Wrong handicap %d.", difficulty_id);
+        Log::warn("ServerLobby", "Wrong handicap %d.", handicap_id);
         return;
     }
-    PerPlayerDifficulty d = (PerPlayerDifficulty)difficulty_id;
-    player->setPerPlayerDifficulty(d);
+    HandicapLevel h = (HandicapLevel)handicap_id;
+    player->setHandicap(h);
     updatePlayerList();
 }   // changeHandicap
 
@@ -4708,7 +4713,7 @@ void ServerLobby::handleKartInfo(Event* event)
     ns->addUInt8(LE_KART_INFO).addUInt32(live_join_util_ticks)
         .addUInt8(kart_id) .encodeString(rki.getPlayerName())
         .addUInt32(rki.getHostId()).addFloat(rki.getDefaultKartColor())
-        .addUInt32(rki.getOnlineId()).addUInt8(rki.getDifficulty())
+        .addUInt32(rki.getOnlineId()).addUInt8(rki.getHandicap())
         .addUInt8((uint8_t)rki.getLocalPlayerId())
         .encodeString(rki.getKartName()).encodeString(rki.getCountryCode());
     peer->sendPacket(ns, true/*reliable*/);

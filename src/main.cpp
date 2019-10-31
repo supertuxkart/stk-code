@@ -1376,14 +1376,14 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             {
                 NetworkConfig::get()->addNetworkPlayer(
                     NULL, PlayerManager::get()->getPlayer(i),
-                    PLAYER_DIFFICULTY_NORMAL);
+                    HANDICAP_NONE);
             }
         }
         else
         {
             NetworkConfig::get()->addNetworkPlayer(
                 input_manager->getDeviceManager()->getLatestUsedDevice(),
-                PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
+                PlayerManager::getCurrentPlayer(), HANDICAP_NONE);
         }
         std::string fixed_ipv6 = StringUtils::findAndReplace(ipv6, "[", " ");
         fixed_ipv6 = StringUtils::findAndReplace(fixed_ipv6, "]", " ");

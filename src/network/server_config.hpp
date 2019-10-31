@@ -311,6 +311,13 @@ namespace ServerConfig
         "kick-high-ping-players",
         "Kick players whose ping is above max-ping."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_high_ping_workaround
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true,
+        "high-ping-workaround",
+        "Allow players exceeding max-ping to have a playable game, if enabled "
+        "kick-high-ping-players will be disabled, please also use a default "
+        "value for max-ping and jitter-tolerance with it."));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_kick_idle_player_seconds
         SERVER_CFG_DEFAULT(IntServerConfigParam(60,
         "kick-idle-player-seconds",
@@ -363,8 +370,8 @@ namespace ServerConfig
         "IPv6 ban list table name, you need to create the table first, see "
         "NETWORKING.md for details, empty to disable. "
         "This table can be shared for all servers if you use the same name. "
-        "STK can auto kick active peer from ban list (update per minute) which"
-        "allows live kicking peer by inserting record to database."));
+        "STK can auto kick active peer from ban list (update per minute) "
+        "which allows live kicking peer by inserting record to database."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_online_id_ban_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("online_id_ban",
@@ -372,8 +379,8 @@ namespace ServerConfig
         "Online ID ban list table name, you need to create the table first, "
         "see NETWORKING.md for details, empty to disable. "
         "This table can be shared for all servers if you use the same name. "
-        "STK can auto kick active peer from ban list (update per minute) which"
-        "allows live kicking peer by inserting record to database."));
+        "STK can auto kick active peer from ban list (update per minute) "
+        "which allows live kicking peer by inserting record to database."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_player_reports_table
         SERVER_CFG_DEFAULT(StringServerConfigParam("player_reports",

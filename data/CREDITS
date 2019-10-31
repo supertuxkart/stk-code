@@ -7,19 +7,25 @@ A Kart Racing Game Featuring Tux & Friends
 
 = Joerg Henrichs (hiker) =
 
-Developer and project leader
-- Lead programming
-- Windows Packaging
+Former project leader
+- Project leader and lead programmer up to STK 1.0
+- Among too many things to list:
+-   Work on physics, AI, networking
+-   A lot of bugfixes and enhancements
+-   Windows packaging
 
 = Marianne Gagnon (Auria) =
 
 Developer
-- Lead Programming
+- Former lead programmer
 - Mac OS X Packager
+- Among too many things to list:
+-   GUI engine and user interface
+-   A lot of bugfixes and enhancements
 
 = Benau =
 
-Developer, modeller & animator
+Lead developer, modeller & animator
 - Soccer and battle mode AI, Shader, graphics
 - SPM file format definition, importer and exporter
 - A lot of networking code
@@ -43,18 +49,10 @@ Lead graphical artist
 
 = Alayan =
 
-Developer
+Lead developer
 - Story mode and gameplay improvements
 - AI improvements
 - General improvements and bugfixes
-
-= Magne Djupvik (Arthur) =
-
-Public relations and faithful follower
-- SuperTuxKart Blog
-- Play testing
-- Pun master
-
 
 = Online =
 Add-ons website
@@ -64,42 +62,13 @@ Add-ons website
 
 = Additional Programming =
 
-Main Contributors
-- Marc Coll : Grand Prix editor
-- Flakebi
-- Konstin
-- math07
-- Elderme : Work on graphical engine
-
-
-Google Summer of Code Students
-- Robin Nicollet
-- Glenn de Jonghe
-- Lauri Kasanen
-- Daniel Butum
-- Bart Cools
-
-
-Google Summer of Code Students
-- Csaba Molnar
-- Sachith Seneviratne
-- Akshay Singhvi
-
-
-Bug fixes & misc contributions
-- Divya Kukar (divvy81)
-- Fabien Sanglard : normal map shader
-- Damien
-- David (Work on flying items)
-- Stephen Dunn (Work on audio)
-- Patrick Ammann
-
-
-Bug fixes & misc contributions
-- Ward Muylaert
+Signifcant bug fixes & misc. contributions for 1.0 and 1.1
 - Fantasmos
 - QwertyChouskie
 - Dumaosen
+- Mrxx99
+- Pelya
+
 
 = Visual art =
 
@@ -110,10 +79,10 @@ Tracks
 - Ponzino : Volcan Island
 
 Tracks
-- Canis Lupus : Original 'Northern Resort' & Scotland
+- Canis Lupus : Original 'Northern Resort' & 'Scotland'
 - Ivar ten Cate (Varivar) : Original 'Old Mine' & 'Snow Peaks' Improvements
 - MacIO : Cave X
-- Steve and Oliver Baker : Oliver's Math Class
+- Steve and Oliver Baker : Original 'Oliver's Math Class'
 
 Karts
 - JunglePenguin : Xue
@@ -231,15 +200,18 @@ Website
 Packaging
 - Auria: MacOS package
 - hiker: Windows
-- Dawid Gan: Static packages
+- Dawid Gan: Linux and Android packages
 
-Testing
-- Magne Djupvik
-- KroArtem
-- Everyone else who helped test STK!
+Testing for 1.0 and 1.1
+- Alayan
+- deveee
+- Wuzzy
+- The speedrunners who found many exploits
+- Everyone else who made good issues report!
 
 Development Babies
 - Florian
+
 
 = Software =
 
@@ -257,6 +229,79 @@ Software used
 - fribidi
 - blender
 - wiiuse
+
+
+= Previous contributors =
+
+Magne Djupvik (Arthur)
+- Public relations and faithful follower
+- SuperTuxKart Blog
+- Play testing
+- Pun master
+
+Google Summer of Code Students
+- Robin Nicollet
+- Glenn de Jonghe
+- Lauri Kasanen
+- Daniel Butum
+- Bart Cools
+
+
+Google Summer of Code Students
+- Csaba Molnar
+- Sachith Seneviratne
+- Akshay Singhvi
+
+No longer active
+- Marc Coll : Grand Prix editor
+- Flakebi
+- Konstin
+- math07
+- Elderme : Work on graphical engine
+- Ward Muylaert
+
+No longer active
+- Divya Kukar (divvy81)
+- Fabien Sanglard : normal map shader
+- Damien
+- David (Work on flying items)
+- Stephen Dunn (Work on audio)
+- Patrick Ammann
+
+No longer active
+- Vincent Lejeune (vlj) : 3D engine
+- Eduardo Hernandez Munoz (Coz) : Former Admin
+- Constantin Pelikan (conso) : Former Admin
+- Sam Clarke : Windows Installer
+- Hans "the farmer" Dzaack : Physics tuning
+- Maik Semder (Ikework) : Bug fixes
+
+No longer active
+- Xapantu : add-ons website
+- Lionel Fuentes (Funto) : Soccer mode and other contributions
+- Mohammad Al-Ghannam (Yasin) : Soccer mode
+- Johannesr1 : Bubble gum shield
+- Glenn De Jonghe (Unitraxx) : Grand Prix progress saving
+- MCMic : reverse mode
+
+No longer active
+- Yann Leprince (sciyann)
+- Xenux : Add-Ons filtering
+- jmimu
+- Paul Elms (scifly)
+- Robert Schuster
+
+
+Game of the Month (STK version 0.0)
+- Craig Keogh, Ingo Ruhnke, Jacob Persson
+- James Gregory, Pascal Giard
+- Matthias Braun, Oliver Jeeves
+- Paul Carley, Ricardo Cruz, Caleb Sawtell
+- Willian Padovani Germano, James Gregory
+
+Original Tuxkart
+- Steve Baker (http://www.sjbaker.org/)
+- Oliver Baker
 
 
 = Donations =
@@ -390,43 +435,6 @@ Donations
 - Sebastian Rode, OpenGameArt.org, Tux_penguin, Magne Djupvik
 - Markus Liukka, Phelippeau Rudy, Javier Pedros Cholvi, Michael Roessner
 - Ivan Wright, Carl Olsson, Sergey V. Spiridonov
-
-= Previous contributors =
-
-No longer active
-- Vincent Lejeune (vlj) : 3D engine
-- Eduardo Hernandez Munoz (Coz) : Former Admin
-- Constantin Pelikan (conso) : Former Admin
-- Sam Clarke : Windows Installer
-- Hans "the farmer" Dzaack : Physics tuning
-- Maik Semder (Ikework) : Bug fixes
-
-No longer active
-- Xapantu : add-ons website
-- Lionel Fuentes (Funto) : Soccer mode and other contributions
-- Mohammad Al-Ghannam (Yasin) : Soccer mode
-- Johannesr1 : Bubble gum shield
-- Glenn De Jonghe (Unitraxx) : Grand Prix progress saving
-- MCMic : reverse mode
-
-No longer active
-- Yann Leprince (sciyann)
-- Xenux : Add-Ons filtering
-- jmimu
-- Paul Elms (scifly)
-- Robert Schuster
-
-
-Game of the Month (STK version 0.0)
-- Craig Keogh, Ingo Ruhnke, Jacob Persson
-- James Gregory, Pascal Giard
-- Matthias Braun, Oliver Jeeves
-- Paul Carley, Ricardo Cruz, Caleb Sawtell
-- Willian Padovani Germano, James Gregory
-
-Original Tuxkart
-- Steve Baker (http://www.sjbaker.org/)
-- Oliver Baker
 
 = Thanks for Playing! =
 Do not hesitate to contribute!
