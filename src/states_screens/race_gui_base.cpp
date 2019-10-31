@@ -927,10 +927,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             break;
         }
 
-	// If player number is large (small icon), rescale font size
-	int font_height = font->getDimension(L"X").Height;
-	if ((float)ICON_PLAYER_WIDTH*0.7f < (float)font_height)
-	    font->setScale(0.7f*(float)ICON_PLAYER_WIDTH / (float)font_height);
+        // If player number is large (small icon), rescale font size
+        int font_height = font->getDimension(L"X").Height;
+        if ((float)ICON_PLAYER_WIDTH*0.7f < (float)font_height)
+            font->setScale(0.7f*(float)ICON_PLAYER_WIDTH / (float)font_height);
 
         if (info.m_text.size() > 0)
         {
@@ -969,7 +969,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             font->setThinBorder(false);
             font->setBlackBorder(false);
         }
-	font->setScale(1.0f);
+        font->setScale(1.0f);
 
 
         AbstractKart* target_kart = NULL;
@@ -1134,6 +1134,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
             const core::rect<s32> posNumber(x + w, y + w/4, x + 7*w/4, y + w);
             font->setScale(3.f*((float) w)/(4.f*(float)font->getDimension(L"X").Height));
             font->draw(StringUtils::toWString(numberItems), posNumber, video::SColor(255, 255, 255, 255));
+            font->setScale(1.0f);
         }
     }
 
