@@ -330,6 +330,8 @@ void loadServerLobbyFromConfig()
 
     if (m_live_players)
         m_official_karts_threshold = 1.0f;
+    if (m_high_ping_workaround)
+        m_kick_high_ping_players = false;
     auto modes = getLocalGameModeFromConfig();
     race_manager->setMinorMode(modes.first);
     race_manager->setMajorMode(modes.second);

@@ -144,6 +144,9 @@ The current server configuration xml looks like this:
     <!-- Kick players whose ping is above max-ping. -->
     <kick-high-ping-players value="false" />
 
+    <!-- Allow players exceeding max-ping to have a playable game, if enabled kick-high-ping-players will be disabled, please also use a default value for max-ping and jitter-tolerance with it. -->
+    <high-ping-workaround value="true" />
+
     <!-- Kick idle player which has no network activity to server for more than some seconds during game, unless he has finished the race. Negative value to disable, and this option will always be disabled for LAN server. -->
     <kick-idle-player-seconds value="60" />
 

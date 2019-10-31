@@ -4033,6 +4033,7 @@ void ServerLobby::configPeersStartTime()
 {
     uint32_t max_ping = 0;
     const unsigned max_ping_from_peers = ServerConfig::m_max_ping;
+    bool peer_exceeded_max_ping = false;
     for (auto p : m_peers_ready)
     {
         auto peer = p.first.lock();
@@ -4043,14 +4044,16 @@ void ServerLobby::configPeersStartTime()
             Log::warn("ServerLobby",
                 "Peer %s cannot catch up with max ping %d.",
                 peer->getRealAddress().c_str(), max_ping);
+            peer_exceeded_max_ping = true;
             continue;
         }
         max_ping = std::max(peer->getAveragePing(), max_ping);
     }
-    if (ServerConfig::m_live_players && race_manager->supportsLiveJoining())
+    if ((ServerConfig::m_high_ping_workaround && peer_exceeded_max_ping) ||
+        (ServerConfig::m_live_players && race_manager->supportsLiveJoining()))
     {
         Log::info("ServerLobby", "Max ping to ServerConfig::m_max_ping for "
-            "live joining.");
+            "live joining or high ping workaround.");
         max_ping = ServerConfig::m_max_ping;
     }
     // Start up time will be after 2500ms, so even if this packet is sent late

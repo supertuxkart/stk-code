@@ -311,6 +311,13 @@ namespace ServerConfig
         "kick-high-ping-players",
         "Kick players whose ping is above max-ping."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_high_ping_workaround
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true,
+        "high-ping-workaround",
+        "Allow players exceeding max-ping to have a playable game, if enabled "
+        "kick-high-ping-players will be disabled, please also use a default "
+        "value for max-ping and jitter-tolerance with it."));
+
     SERVER_CFG_PREFIX IntServerConfigParam m_kick_idle_player_seconds
         SERVER_CFG_DEFAULT(IntServerConfigParam(60,
         "kick-idle-player-seconds",
