@@ -323,8 +323,13 @@ void FileManager::discoverPaths()
         }
     }
 
+    bool has_full_assets = ExtractMobileAssets::hasFullAssets();
+    // Clear previous assets version to free space
+    if (!has_full_assets && fileExists(m_stk_assets_download_dir))
+        removeDirectory(m_stk_assets_download_dir);
+
     // Use stk-assets-full for karts, tracks, textures..., otherwise in data/
-    std::string assets_root = ExtractMobileAssets::hasFullAssets() ?
+    std::string assets_root = has_full_assets ?
         m_stk_assets_download_dir : m_root_dirs[0];
     for (unsigned j = LIBRARY; j <= ASSET_MAX; j++)
     {
