@@ -56,10 +56,18 @@ StoryModeStatus::StoryModeStatus(const XMLNode *node)
             m_story_mode_finished     = !m_first_time;
         if(!node->get("speedrun-finished", &m_valid_speedrun_finished))
             m_valid_speedrun_finished = false;
+        // Disable showing story mode timer if starting stk with old
+        // players.xml
         if(!node->get("story-ms", &m_story_mode_milliseconds))
+        {
+            UserConfigParams::m_display_story_mode_timer = false;
             m_story_mode_milliseconds = -1;
+        }
         if(!node->get("speedrun-ms", &m_speedrun_milliseconds))
+        {
+            UserConfigParams::m_display_story_mode_timer = false;
             m_speedrun_milliseconds   = -1;
+        }
     }   // if node
 }   // StoryModeStatus
 
