@@ -2323,6 +2323,10 @@ int main(int argc, char *argv[])
         }
 #endif
 
+        // Create the story mode timer before going in the main loop
+        // as it needs to be able to run continuously
+        story_mode_timer = new StoryModeTimer();
+
         // Replay a race
         // =============
         if(history->replayHistory())
@@ -2361,10 +2365,6 @@ int main(int argc, char *argv[])
             race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
-
-        // Create the story mode timer before going in the main loop
-        // as it needs to be able to run continuously
-        story_mode_timer = new StoryModeTimer();
 
         main_loop->run();
 
