@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/time.hpp"
 #include "utils/translation.hpp"
 
 StoryModeTimer *story_mode_timer = 0;
@@ -60,9 +61,8 @@ void StoryModeTimer::reset()
     m_player_can_speedrun     = false;
     m_speedrun_milliseconds   = 0;
     m_story_mode_milliseconds = 0;
-    std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
-    m_speedrun_total_pause_time = now-now;//the zero() function doesn't work
-    m_story_mode_total_pause_time = now-now;
+    m_speedrun_total_pause_time = 0;
+    m_story_mode_total_pause_time = 0;
 }
 
 void StoryModeTimer::startTimer()
@@ -70,9 +70,9 @@ void StoryModeTimer::startTimer()
     // The speedrun timer runs even if not enabled, as long
     // as the conditions match, as the ovrehead is minimal
     // and it thus persist if the user disable/reenable it.
-	if (!m_valid_speedrun_started && m_player_can_speedrun)
+    if (!m_valid_speedrun_started && m_player_can_speedrun)
     {
-        m_speedrun_start = std::chrono::system_clock::now();
+        m_speedrun_start = StkTime::getMonoTimeMs();
         m_valid_speedrun_started = true;
     }
 
@@ -81,22 +81,22 @@ void StoryModeTimer::startTimer()
     // and is correct
     if (!m_story_mode_started)
     {
-        m_story_mode_start = std::chrono::system_clock::now();
+        m_story_mode_start = StkTime::getMonoTimeMs();
         m_story_mode_started = true;
     }
 }
 
 void StoryModeTimer::stopTimer()
 {
-	if (m_valid_speedrun_started)
+    if (m_valid_speedrun_started)
     {
-        m_speedrun_end = std::chrono::system_clock::now();
+        m_speedrun_end = StkTime::getMonoTimeMs();
         m_valid_speedrun_ended = true;
-	}
+    }
 
     if (m_story_mode_started)
     {
-        m_story_mode_end = std::chrono::system_clock::now();
+        m_story_mode_end = StkTime::getMonoTimeMs();
         m_story_mode_ended = true;
     }
     updateTimer();
@@ -111,7 +111,7 @@ void StoryModeTimer::pauseTimer(bool loading)
     // Don't change the pause time if there is no run,
     // if it is finished, or if it is already set.
 
-	if ( m_valid_speedrun_started && !m_speedrun_pause_active &&
+    if ( m_valid_speedrun_started && !m_speedrun_pause_active &&
          !m_valid_speedrun_ended && loading)
     {
         pauseSpeedrunTimer();
@@ -126,13 +126,13 @@ void StoryModeTimer::pauseTimer(bool loading)
 
 void StoryModeTimer::pauseSpeedrunTimer()
 {
-    m_speedrun_pause_start = std::chrono::system_clock::now();
+    m_speedrun_pause_start = StkTime::getMonoTimeMs();
     m_speedrun_pause_active = true;
 }
 
 void StoryModeTimer::pauseStoryModeTimer()
 {
-    m_story_mode_pause_start = std::chrono::system_clock::now();
+    m_story_mode_pause_start = StkTime::getMonoTimeMs();
     m_story_mode_pause_active = true;
 }
 
@@ -140,11 +140,11 @@ void StoryModeTimer::pauseStoryModeTimer()
 void StoryModeTimer::unpauseTimer(bool loading)
 {
     //Don't unpause if there is no run or no previous pause
-	if (m_valid_speedrun_started && m_speedrun_pause_active && !m_valid_speedrun_ended && loading)
+    if (m_valid_speedrun_started && m_speedrun_pause_active && !m_valid_speedrun_ended && loading)
     {
         unpauseSpeedrunTimer();
     }
-	if (m_story_mode_started && m_story_mode_pause_active &&
+    if (m_story_mode_started && m_story_mode_pause_active &&
         !m_story_mode_ended && (m_loading_pause || ( !m_loading_pause && !loading)))
     {
         unpauseStoryModeTimer();
@@ -153,17 +153,16 @@ void StoryModeTimer::unpauseTimer(bool loading)
 
 void StoryModeTimer::unpauseSpeedrunTimer()
 {
-    std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
+    uint64_t now = StkTime::getMonoTimeMs();
     m_speedrun_total_pause_time += now - m_speedrun_pause_start;
     m_speedrun_pause_active = false;
 
-    int milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(m_speedrun_total_pause_time).count();
-    Log::verbose("StoryModeTimer", "Total speedrun pause time : %ims.",milliseconds);
+    Log::verbose("StoryModeTimer", "Total speedrun pause time : %ims.", (int)m_speedrun_total_pause_time);
 } // unpauseSpeedrunTimer
 
 void StoryModeTimer::unpauseStoryModeTimer()
 {
-    std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
+    uint64_t now = StkTime::getMonoTimeMs();
     m_story_mode_total_pause_time += now - m_story_mode_pause_start;
     m_story_mode_pause_active = false;
 } // unpauseStoryModeTimer
@@ -182,37 +181,35 @@ void StoryModeTimer::updateTimer()
 
 void StoryModeTimer::updateSpeedrunTimer()
 {
-	std::chrono::duration<double> elapsed_time;
+    uint64_t elapsed_time;
 
-	if (m_valid_speedrun_ended)
+    if (m_valid_speedrun_ended)
     {
-		elapsed_time = m_speedrun_end - m_speedrun_start - m_speedrun_total_pause_time;
+        elapsed_time = m_speedrun_end - m_speedrun_start - m_speedrun_total_pause_time;
     }
-	else
+    else
     {
-		std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
-		elapsed_time = now - m_speedrun_start - m_speedrun_total_pause_time;
-	}
+        uint64_t now = StkTime::getMonoTimeMs();
+        elapsed_time = now - m_speedrun_start - m_speedrun_total_pause_time;
+    }
 
-	m_speedrun_milliseconds = m_stored_speedrun_milliseconds +
-                              std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+    m_speedrun_milliseconds = m_stored_speedrun_milliseconds + elapsed_time;
 }
 
 void StoryModeTimer::updateStoryModeTimer()
 {
-	std::chrono::duration<double> elapsed_time;
+    uint64_t elapsed_time;
 
-	if (m_story_mode_ended)
+    if (m_story_mode_ended)
     {
-		elapsed_time = m_story_mode_end - m_story_mode_start - m_story_mode_total_pause_time;
+        elapsed_time = m_story_mode_end - m_story_mode_start - m_story_mode_total_pause_time;
     }
-	else
+    else
     {
-		std::chrono::time_point<std::chrono::system_clock> now(std::chrono::system_clock::now());
-		elapsed_time = now - m_story_mode_start - m_story_mode_total_pause_time;
-	}
-    m_story_mode_milliseconds = m_stored_story_mode_milliseconds +
-                                std::chrono::duration_cast<std::chrono::milliseconds>(elapsed_time).count();
+        uint64_t now = StkTime::getMonoTimeMs();
+        elapsed_time = now - m_story_mode_start - m_story_mode_total_pause_time;
+    }
+    m_story_mode_milliseconds = m_stored_story_mode_milliseconds + elapsed_time;
 }
 
 //Check if the current player has already entered story mode or not
@@ -254,7 +251,7 @@ void StoryModeTimer::playerHasChanged()
 
 std::string StoryModeTimer::getTimerString()
 {
-	if (UserConfigParams::m_speedrun_mode && !m_valid_speedrun_started && !m_valid_speedrun_ended)
+    if (UserConfigParams::m_speedrun_mode && !m_valid_speedrun_started && !m_valid_speedrun_ended)
     {
         return StringUtils::timeToString(/*time in seconds*/ 0,
                                          /*precision*/ 3, true, /* display hours*/ true);

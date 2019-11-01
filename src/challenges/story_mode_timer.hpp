@@ -19,7 +19,7 @@
 #ifndef HEADER_STORY_MODE_TIMER_HPP
 #define HEADER_STORY_MODE_TIMER_HPP
 
-#include <chrono>
+#include "utils/types.hpp"
 #include <iomanip>
 
 class StoryModeTimer
@@ -39,16 +39,16 @@ private:
     int m_stored_speedrun_milliseconds;
     int m_stored_story_mode_milliseconds;
 
-	std::chrono::time_point<std::chrono::system_clock> m_speedrun_start;
-	std::chrono::time_point<std::chrono::system_clock> m_speedrun_end;
-	std::chrono::time_point<std::chrono::system_clock> m_speedrun_pause_start;
+    uint64_t m_speedrun_start;
+    uint64_t m_speedrun_end;
+    uint64_t m_speedrun_pause_start;
 
-	std::chrono::time_point<std::chrono::system_clock> m_story_mode_start;
-	std::chrono::time_point<std::chrono::system_clock> m_story_mode_end;
-	std::chrono::time_point<std::chrono::system_clock> m_story_mode_pause_start;
+    uint64_t m_story_mode_start;
+    uint64_t m_story_mode_end;
+    uint64_t m_story_mode_pause_start;
 
-    std::chrono::duration<double> m_speedrun_total_pause_time;
-    std::chrono::duration<double> m_story_mode_total_pause_time;
+    uint64_t m_speedrun_total_pause_time;
+    uint64_t m_story_mode_total_pause_time;
 
     void reset();
 
