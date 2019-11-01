@@ -206,6 +206,11 @@ void TracksScreen::unloaded()
 {
     delete m_track_icons;
     m_track_icons = NULL;
+    m_timer = NULL;
+    m_vote_list = NULL;
+    m_selected_track = NULL;
+    m_laps = NULL;
+    m_reversed = NULL;
 }   // unloaded
 
 // -----------------------------------------------------------------------------
