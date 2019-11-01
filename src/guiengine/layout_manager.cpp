@@ -247,7 +247,8 @@ void LayoutManager::readCoords(Widget* self)
         //Add padding to <box> elements
         if (self->getType() == WTYPE_DIV && self->m_show_bounding_box)
         {
-            int padding = GUIEngine::getFontHeight() / 2;
+            int padding = std::min(irr_driver->getActualScreenSize().Height,
+                                   irr_driver->getActualScreenSize().Width)  / 72.0f
             if (self->m_properties[PROP_DIV_PADDING].length() > 0)
                 padding = atoi(self->m_properties[PROP_DIV_PADDING].c_str());
             child_max_height += padding * 2;
@@ -322,7 +323,8 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
     
     if (parent != NULL && parent->getType() == WTYPE_DIV && parent->m_show_bounding_box)
     {
-        int padding = GUIEngine::getFontHeight() / 2;
+        int padding = std::min(irr_driver->getActualScreenSize().Height,
+                               irr_driver->getActualScreenSize().Width)  / 72.0f
         if (parent->m_properties[PROP_DIV_PADDING].length() > 0)
             padding = atoi(parent->m_properties[PROP_DIV_PADDING].c_str());
             
