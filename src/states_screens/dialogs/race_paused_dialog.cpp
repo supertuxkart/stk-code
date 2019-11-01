@@ -21,6 +21,7 @@
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/emoji_keyboard.hpp"
 #include "guiengine/engine.hpp"
@@ -56,9 +57,12 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     ModalDialog(percentWidth, percentHeight)
 {
     m_self_destroy = false;
+    m_from_overworld = false;
+
     if (dynamic_cast<OverWorld*>(World::getWorld()) != NULL)
     {
         loadFromFile("overworld_dialog.stkgui");
+        m_from_overworld = true;
     }
     else if (!NetworkConfig::get()->isNetworking())
     {
@@ -222,6 +226,11 @@ GUIEngine::EventPropagation
             else
             {
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+
+                // Pause story mode timer when quitting story mode
+                if (m_from_overworld)
+                    story_mode_timer->pauseTimer(/*loading screen*/ false);
+
                 if (race_manager->raceWasStartedFromOverworld())
                 {
                     OverWorld::enterOverWorld();

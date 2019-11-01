@@ -20,6 +20,7 @@
 #include "states_screens/main_menu_screen.hpp"
 
 #include "addons/news_manager.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -475,6 +476,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         NetworkConfig::get()->unsetNetworking();
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
+
+        // Start the story mode (and speedrun) timer
+        story_mode_timer->startTimer();
+
         if (player->isFirstTime())
         {
             CutsceneWorld::setUseDuration(true);
@@ -493,6 +498,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
+            // Unpause the story mode timer when entering back the story mode
+            story_mode_timer->unpauseTimer(/* exit loading pause */ false);
+
             const std::string default_kart = UserConfigParams::m_default_kart;
             if (player->isLocked(default_kart))
             {

@@ -87,6 +87,23 @@
                 </div>
 
                 <spacer width="5" height="2%"/>
+
+
+                <div layout="horizontal-row" width="100%" height="fit">
+                    <checkbox id="story-mode-timer"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Enable the story mode timer" word_wrap="true"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <div layout="horizontal-row" width="100%" height="fit">
+                    <checkbox id="speedrun-timer"/>
+                    <spacer width="1%" height="100%" />
+                    <label id="speedrun-timer-text" height="100%" I18N="In the ui settings" text="Enable the speedrun timer" word_wrap="true"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
             </box>
         </div>
     </div>
