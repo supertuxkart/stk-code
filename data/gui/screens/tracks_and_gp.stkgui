@@ -7,10 +7,10 @@
                 align="center" text_align="center" />
         <spacer width="100%" height="1%" />
         
-        <div width="100%" proportion="1" layout="horizontal-row" >
+        <div width="100%" proportion="3" layout="horizontal-row" >
             <box width="80%" height="100%" layout="vertical-row" padding="0">
                 <scrollable_toolbar id="gps" x="1%" y="1%" width="98%" height="98%" align="center" label_location="each"
-                                    square_items="true" child_width="175" child_height="120" />
+                                    square_items="true" child_width="165" child_height="120" />
             </box>
             <spacer width="2%" height="20" />
             <box width="18%" height="100%" layout="vertical-row">
@@ -24,7 +24,7 @@
                 align="center" text_align="center" />
         <spacer width="100%" height="1%" />
 
-        <box proportion="3" width="100%" layout="vertical-row" padding="1">
+        <box proportion="8" width="100%" layout="vertical-row" padding="1">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
                 label_location="bottom" align="center" max_rows="3"
                 child_width="160" child_height="120" />
