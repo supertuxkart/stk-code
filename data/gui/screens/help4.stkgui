@@ -32,24 +32,24 @@
                 <spacer height="2%" width="10"/>                
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/anchor-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/anchor-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Anchor - slows down the kart suddenly."/>
                 </div>
                 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="models/parachute-icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="models/parachute-icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Parachute - slows down the kart, more progressively than the anchor. The faster you go, the stronger it slows you down."/>
                 </div>
                 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/bomb_icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/bomb_icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Bomb - detonates after some amount of time, throwing the kart up in the air. Bump into another kart to transfer the bomb to it."/>
