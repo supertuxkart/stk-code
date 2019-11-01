@@ -30,8 +30,6 @@ speed*.png by Alayan, released under CC-0
 
 gauge*.png by Alayan, released under CC-0
 
-nitro.png by dumaosen, released under CC-0
-
 menu_story by tavariz91, released under CC-0
 
 mass.png by Auria, released under CC-0
