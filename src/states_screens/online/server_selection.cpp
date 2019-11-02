@@ -138,6 +138,14 @@ void ServerSelection::init()
     m_ipv6->setState(false);
     m_ipv6->setActive(false);
 #endif
+    if (NetworkConfig::get()->isLAN())
+    {
+        m_ipv6->setState(false);
+        m_ipv6->setVisible(false);
+        getWidget("ipv6_text")->setVisible(false);
+    }
+    else
+        getWidget("ipv6_text")->setVisible(true);
 
     m_current_column = 5/*distance*/;
     m_searcher->clearListeners();

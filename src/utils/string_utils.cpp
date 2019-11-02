@@ -1247,7 +1247,7 @@ namespace StringUtils
     } // breakText
 
     /* This function checks if a char is suitable to break lines.
-     * Currently a copy of the function found at irrlicht/include/utfwrapping.h */
+     * Based on the function found at irrlicht/include/utfwrapping.h */
     bool breakable (wchar_t c)
     {
 	    if ((c > 12287 && c < 40960) || //Common CJK words

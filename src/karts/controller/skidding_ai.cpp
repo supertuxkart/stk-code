@@ -339,11 +339,8 @@ void SkiddingAI::update(int ticks)
 
     // Make sure that not all AI karts use the zipper at the same
     // time in time trial at start up, so disable it during the 5 first seconds
-    if(race_manager->getMinorMode()== RaceManager::MINOR_MODE_TIME_TRIAL &&
-        (m_world->getTime()<5.0f) )
-    {
+    if(race_manager->isTimeTrialMode() && (m_world->getTime()<5.0f) )
         m_controls->setFire(false);
-    }
 
     /*And obviously general kart stuff*/
     AIBaseLapController::update(ticks);
@@ -1881,23 +1878,14 @@ void SkiddingAI::computeNearestKarts()
 
     m_distance_leader = m_distance_ahead = m_distance_behind = 9999999.9f;
     float my_dist = m_world->getOverallDistance(m_kart->getWorldKartId());
+
     if(m_kart_ahead)
-    {
-        m_distance_ahead =
-            m_world->getOverallDistance(m_kart_ahead->getWorldKartId())
-            -my_dist;
-    }
+        m_distance_ahead = m_world->getOverallDistance(m_kart_ahead->getWorldKartId()) - my_dist;
     if(m_kart_behind)
-    {
-        m_distance_behind = my_dist
-            -m_world->getOverallDistance(m_kart_behind->getWorldKartId());
-    }
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-       m_kart->getWorldKartId() != 0)
-    {
-        m_distance_leader = m_world->getOverallDistance(0 /*leader kart ID*/)
-                            -my_dist;
-    }
+        m_distance_behind = my_dist - m_world->getOverallDistance(m_kart_behind->getWorldKartId());
+
+    if(   race_manager->isFollowMode() && m_kart->getWorldKartId() != 0)
+        m_distance_leader = m_world->getOverallDistance(0 /*leader kart ID*/) - my_dist;
 
     // Compute distance to target player kart
 
@@ -1905,8 +1893,7 @@ void SkiddingAI::computeNearestKarts()
     float own_overall_distance = m_world->getOverallDistance(m_kart->getWorldKartId());
     m_num_players_ahead = 0;
 
-    unsigned int n = ProfileWorld::isProfileMode()
-                   ? 0 : race_manager->getNumPlayers();
+    unsigned int n = ProfileWorld::isProfileMode() ? 0 : race_manager->getNumPlayers();
 
     std::vector<float> overall_distance;
     // Get the players distances
@@ -1915,9 +1902,18 @@ void SkiddingAI::computeNearestKarts()
         unsigned int kart_id = m_world->getPlayerKart(i)->getWorldKartId();
         overall_distance.push_back(m_world->getOverallDistance(kart_id));
     }
+
+    // Sort the list in descending order
+    std::sort(overall_distance.begin(), overall_distance.end(), std::greater<float>());
    
-    // Sort the list
-    std::sort(overall_distance.begin(), overall_distance.end());
+    // Get the AI's position (the position update may not be done, leading to crashes)
+    int curr_position = 1;
+    for(unsigned int i=0; i<m_world->getNumKarts(); i++)
+    {
+        if(   m_world->getOverallDistance(i) > own_overall_distance
+           && !m_world->getKart(i)->isEliminated())
+            curr_position++;
+    }
 
     for(unsigned int i=0; i<n; i++)
     {
@@ -1926,14 +1922,16 @@ void SkiddingAI::computeNearestKarts()
     }
 
     // Force best driving when profiling and for FTL leaders
-    if(ProfileWorld::isProfileMode() ||
-       (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        m_kart->getWorldKartId() == 0))
+    if(   ProfileWorld::isProfileMode()
+       || ( race_manager->isFollowMode() && m_kart->getWorldKartId() == 0))
         target_overall_distance = 999999.9f;
-    // In higher difficulties, rubber band towards the first player,
-    // if at all (SuperTux has currently no rubber banding at all)
-    else if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
-             race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST)
+
+    // In higher difficulties and in follow the leader, rubber band towards the first player,
+    // if at all (SuperTux has no rubber banding at all). Boosted AIs also target the 1st player.
+    else if (   race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD
+             || race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST
+             || race_manager->isFollowMode()
+             || m_kart->getBoostAI())
     {
         target_overall_distance = overall_distance[n-1]; // Highest player distance
     }
@@ -1941,21 +1939,21 @@ void SkiddingAI::computeNearestKarts()
     else
     {
         int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
-        int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
+        int position_among_ai = curr_position - m_num_players_ahead;
+
         // Converts a position among AI to a position among players
-        float ideal_target = 1.0f;
+        // The 1st player get an index of 0, the 2nd an index of 2, etc.
+        int target_index = 0;
        
-        // Avoid a division by 0.
-        // If there is only one AI, it will target the first player
+        // Avoid a division by 0. If there is only one AI, it will target the first player
         if (num_ai > 1)
-            ideal_target = ((position_among_ai-1) / ((float) num_ai-1)
-                             * ((float) race_manager->getNumPlayers()-1)) + 1.0f;
-        
-        // Substract 1 as index start from 0 and add 0.5 to get rounding
-        // The cast truncate the decimals, so it won't go over n-1
-        // as the highest possible ideal_target is n
-        int target_index = (int) (ideal_target - 0.5f);
-        assert(target_index >= 0 && target_index <= (int)n-1);
+        {
+            target_index  = (position_among_ai-1) * (race_manager->getNumPlayers()-1);
+            target_index += (num_ai/2) - 1;
+            target_index  = target_index / (num_ai - 1);
+        }
+
+        assert(target_index >= 0 && target_index <= n-1);
         target_overall_distance = overall_distance[target_index];
     }
     // Now convert 'maximum overall distance' to distance to player.
@@ -2055,10 +2053,9 @@ void SkiddingAI::handleBraking(float max_turn_speed, float min_speed)
     // TODO : if there is still time in the countdown and the leader is faster,
     //        the AI kart should not slow down too much, to stay closer to the
     //        leader once overtaken.
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
-        m_distance_leader < 2                                                &&
-        m_kart->getInitialPosition()>1                                       &&
-        m_world->getOverallDistance(m_kart->getWorldKartId()) > 0             )
+    if(   race_manager->isFollowMode() && m_distance_leader < 2
+       && m_kart->getInitialPosition()>1
+       && m_world->getOverallDistance(m_kart->getWorldKartId()) > 0 )
     {
 #ifdef DEBUG
     if(m_ai_debug)
@@ -2213,10 +2210,8 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
 
     // No point in building a big nitro reserve in nitro for FTL AIs,
     // just keep enough to help accelerating after an accident
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-    {
+    if(race_manager->isFollowMode())
         energy_reserve = std::min(2.0f, energy_reserve);
-    }
    
     // Don't use nitro or zipper if we are braking
     if(m_controls->getBrake()) return;

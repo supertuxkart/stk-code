@@ -18,7 +18,7 @@
 #include "IImagePresenter.h"
 
 #include <map>
-
+#include <string>
 
 namespace irr
 {
@@ -89,7 +89,7 @@ namespace irr
         static void onCreate();
         static const AndroidApplicationInfo& getApplicationInfo(
                                                     ANativeActivity* activity);
-
+        void openURL(const std::string& url);
     private:
         s32 m_moved_height;
         u32 m_screen_height;

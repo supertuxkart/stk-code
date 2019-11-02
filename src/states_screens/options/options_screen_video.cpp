@@ -46,60 +46,75 @@
 
 using namespace GUIEngine;
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::initPresets()
 {
-    m_presets.push_back
+    m_presets.push_back // Level 1
     ({
-        false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
-        false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* light scatter */, false /* animatedCharacters */, 1 /* particles */,
-        0 /* image_quality */, false /* depth of field */, true /* degraded IBL */
+        false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
+        false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
+        false /* animatedCharacters */, 1 /* particles */, 0 /* image_quality */,
+        true /* degraded IBL */
     });
 
-    m_presets.push_back
+    m_presets.push_back // Level 2
     ({
-        false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
-        false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        0 /* image_quality */, false /* depth of field */, true /* degraded IBL */
+        false /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
+        false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 0 /* image_quality */,
+        true /* degraded IBL */
     });
 
-    m_presets.push_back
+    m_presets.push_back // Level 3
     ({
-        true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
-        false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */,
-        false /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        1 /* image_quality */, false /* depth of field */, true /* degraded IBL */
+        true /* light */, 0 /* shadow */, false /* bloom */, false /* lightshaft */,
+        false /* glow */, false /* mlaa */, false /* ssao */, false /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+        true /* degraded IBL */
     });
 
-    m_presets.push_back
+    m_presets.push_back // Level 4
     ({
-        true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
-        true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */,
-        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        1 /* image_quality */, false /* depth of field */, false /* degraded IBL */
+        true /* light */, 0 /* shadow */, false /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 1 /* image_quality */,
+        false /* degraded IBL */
     });
 
-    m_presets.push_back
+    m_presets.push_back // Level 5
     ({
-        true /* light */, 512 /* shadow */, true /* bloom */, true /* motionblur */,
-        true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */,
-        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        2 /* image_quality */, true /* depth of field */, false /* degraded IBL */
+        true /* light */, 512 /* shadow */, true /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, false /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        false /* degraded IBL */
     });
 
-    m_presets.push_back
+    m_presets.push_back // Level 6
     ({
-        true /* light */, 1024 /* shadow */, true /* bloom */, true /* motionblur */,
-        true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */,
-        true /* light scatter */, true /* animatedCharacters */, 2 /* particles */,
-        2 /* image_quality */, true /* depth of field */, false /* degraded IBL */
+        true /* light */, 1024 /* shadow */, true /* bloom */, true /* lightshaft */,
+        true /* glow */, true /* mlaa */, true /* ssao */, true /* light scatter */,
+        true /* animatedCharacters */, 2 /* particles */, 2 /* image_quality */,
+        false /* degraded IBL */
+    });
+
+    m_blur_presets.push_back
+    ({
+        false /* motionblur */, false /* depth of field */
+    });
+
+    m_blur_presets.push_back
+    ({
+        true  /* motionblur */, false /* depth of field */
+    });
+
+    m_blur_presets.push_back
+    ({
+        true  /* motionblur */, true  /* depth of field */
     });
 
 }   // initPresets
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 int OptionsScreenVideo::getImageQuality()
 {
     if (UserConfigParams::m_anisotropic == 2 &&
@@ -117,7 +132,7 @@ int OptionsScreenVideo::getImageQuality()
     return 1;
 }   // getImageQuality
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::setImageQuality(int quality)
 {
     switch (quality)
@@ -142,7 +157,7 @@ void OptionsScreenVideo::setImageQuality(int quality)
     }
 }   // setImageQuality
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
                                            m_prev_adv_pipline(false),
@@ -152,21 +167,28 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
     initPresets();
 }   // OptionsScreenVideo
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::loadedFromFile()
 {
     m_inited = false;
     assert(m_presets.size() == 6);
+    assert(m_blur_presets.size() == 3);
 
     GUIEngine::SpinnerWidget* gfx =
         getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     gfx->m_properties[GUIEngine::PROP_MAX_VALUE] =
         StringUtils::toString(m_presets.size());
 
+    GUIEngine::SpinnerWidget* blur =
+        getWidget<GUIEngine::SpinnerWidget>("blur_level");
+    blur->m_properties[GUIEngine::PROP_MAX_VALUE] =
+        StringUtils::toString(m_blur_presets.size() - 1);
+    blur->m_properties[GUIEngine::PROP_MIN_VALUE] =
+        StringUtils::toString(0);
 }   // loadedFromFile
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::init()
 {
@@ -196,6 +218,18 @@ void OptionsScreenVideo::init()
     //I18N: In the video options, half vertical sync (usually 30fps)
     vsync->addLabel(_("Half"));
     vsync->setValue(UserConfigParams::m_swap_interval);
+
+    //I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
+    core::stringw vsync_tooltip = _("Vsync forces the graphics card to supply a new frame\nonly when the monitor is ready to display it.");
+
+    //I18N: in graphical options.
+    vsync_tooltip = vsync_tooltip + L"\n" + _("Full: one frame per monitor refresh");
+    //I18N: in graphical options.
+    vsync_tooltip = vsync_tooltip + L"\n" + _("Half: one frame every two monitor refreshes");
+    //I18N: in graphical options.
+    vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
+
+    vsync->setTooltip(vsync_tooltip);
 
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
@@ -350,6 +384,7 @@ void OptionsScreenVideo::init()
 
     // --- set gfx settings values
     updateGfxSlider();
+    updateBlurSlider();
 
     // ---- forbid changing resolution or animation settings from in-game
     // (we need to disable them last because some items can't be edited when
@@ -374,7 +409,7 @@ void OptionsScreenVideo::init()
     
 }   // init
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::updateResolutionsList()
 {
@@ -401,7 +436,7 @@ void OptionsScreenVideo::updateResolutionsList()
     }
 }
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::onScrollResolutionsList(void* data)
 {
@@ -409,12 +444,11 @@ void OptionsScreenVideo::onScrollResolutionsList(void* data)
     screen->updateResolutionsList();
 }
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::updateGfxSlider()
 {
-    GUIEngine::SpinnerWidget* gfx =
-    getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+    GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
 
     bool found = false;
@@ -428,11 +462,9 @@ void OptionsScreenVideo::updateGfxSlider()
             m_presets[l].lights == UserConfigParams::m_dynamic_lights &&
             m_presets[l].lightshaft == UserConfigParams::m_light_shaft &&
             m_presets[l].mlaa == UserConfigParams::m_mlaa &&
-            m_presets[l].motionblur == UserConfigParams::m_motionblur &&
             m_presets[l].shadows == UserConfigParams::m_shadows_resolution &&
             m_presets[l].ssao == UserConfigParams::m_ssao &&
             m_presets[l].light_scatter == UserConfigParams::m_light_scatter &&
-            m_presets[l].dof == UserConfigParams::m_dof &&
             m_presets[l].degraded_ibl == UserConfigParams::m_degraded_IBL)
         {
             gfx->setValue(l + 1);
@@ -445,17 +477,48 @@ void OptionsScreenVideo::updateGfxSlider()
     {
         //I18N: custom video settings
         gfx->setCustomText( _("Custom") );
+
+        // Enable the blur slider if the modern renderer is used
+        getWidget<GUIEngine::SpinnerWidget>("blur_level")->
+            setActive(UserConfigParams::m_dynamic_lights);
     }
 
     updateTooltip();
-}
+} // updateGfxSlider
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
+
+void OptionsScreenVideo::updateBlurSlider()
+{
+    GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
+    assert( blur != NULL );
+
+    bool found = false;
+    for (unsigned int l = 0; l < m_blur_presets.size(); l++)
+    {
+        if (m_blur_presets[l].motionblur == UserConfigParams::m_motionblur &&
+            m_blur_presets[l].dof == UserConfigParams::m_dof)
+        {
+            blur->setValue(l);
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        //I18N: custom video settings
+        blur->setCustomText( _("Custom") );
+    }
+
+    updateBlurTooltip();
+} // updateBlurSlider
+
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::updateTooltip()
 {
-    GUIEngine::SpinnerWidget* gfx =
-        getWidget<GUIEngine::SpinnerWidget>("gfx_level");
+    GUIEngine::SpinnerWidget* gfx = getWidget<GUIEngine::SpinnerWidget>("gfx_level");
     assert( gfx != NULL );
 
     core::stringw tooltip;
@@ -495,9 +558,6 @@ void OptionsScreenVideo::updateTooltip()
     tooltip = tooltip + L"\n" + _("Light scattering: %s",
         UserConfigParams::m_light_scatter ? enabled : disabled);
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Motion blur: %s",
-        UserConfigParams::m_motionblur ? enabled : disabled);
-    //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Anti-aliasing: %s",
         UserConfigParams::m_mlaa ? enabled : disabled);
     //I18N: in graphical options
@@ -522,10 +582,6 @@ void OptionsScreenVideo::updateTooltip()
         UserConfigParams::m_light_shaft ? enabled : disabled);
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Depth of field: %s",
-        UserConfigParams::m_dof ? enabled : disabled);
-
-    //I18N: in graphical options
     int quality = getImageQuality();
     tooltip = tooltip + L"\n" + _("Rendered image quality: %s",
         quality == 0 ? very_low : quality == 1 ? low : high);
@@ -533,7 +589,30 @@ void OptionsScreenVideo::updateTooltip()
     gfx->setTooltip(tooltip);
 }   // updateTooltip
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
+
+void OptionsScreenVideo::updateBlurTooltip()
+{
+    GUIEngine::SpinnerWidget* blur = getWidget<GUIEngine::SpinnerWidget>("blur_level");
+    assert( blur != NULL );
+
+    core::stringw tooltip;
+
+    const core::stringw enabled = _("Enabled");
+    const core::stringw disabled = _("Disabled");
+
+    //I18N: in graphical options
+    tooltip = tooltip + _("Motion blur: %s",
+        UserConfigParams::m_motionblur ? enabled : disabled);
+
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Depth of field: %s",
+        UserConfigParams::m_dof ? enabled : disabled);
+
+    blur->setTooltip(tooltip);
+}   // updateBlurTooltip
+
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
@@ -606,6 +685,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         const int level = gfx_level->getValue() - 1;
 
+        // Enable the blur spinner only if the new renderer is on
+        getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 2);
+
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
         setImageQuality(m_presets[level].image_quality);
@@ -614,14 +696,28 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_dynamic_lights = m_presets[level].lights;
         UserConfigParams::m_light_shaft = m_presets[level].lightshaft;
         UserConfigParams::m_mlaa = m_presets[level].mlaa;
-        UserConfigParams::m_motionblur = m_presets[level].motionblur;
         UserConfigParams::m_shadows_resolution = m_presets[level].shadows;
         UserConfigParams::m_ssao = m_presets[level].ssao;
         UserConfigParams::m_light_scatter = m_presets[level].light_scatter;
-        UserConfigParams::m_dof = m_presets[level].dof;
         UserConfigParams::m_degraded_IBL = m_presets[level].degraded_ibl;
 
         updateGfxSlider();
+    }
+    else if (name == "blur_level")
+    {
+        GUIEngine::SpinnerWidget* blur_level =
+            getWidget<GUIEngine::SpinnerWidget>("blur_level");
+        assert( blur_level != NULL );
+
+        const int level = blur_level->getValue();
+
+        if (UserConfigParams::m_dynamic_lights)
+        {
+            UserConfigParams::m_motionblur = m_blur_presets[level].motionblur;
+            UserConfigParams::m_dof = m_blur_presets[level].dof;
+        }
+
+        updateBlurSlider();
     }
     else if (name == "vsync")
     {
@@ -645,7 +741,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     }
 }   // eventCallback
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::tearDown()
 {
@@ -665,11 +761,11 @@ void OptionsScreenVideo::tearDown()
 #endif
 }   // tearDown
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------
 
 void OptionsScreenVideo::unloaded()
 {
     m_inited = false;
 }   // unloaded
 
-// ----------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------

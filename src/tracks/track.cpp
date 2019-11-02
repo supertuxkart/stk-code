@@ -734,7 +734,7 @@ void Track::loadArenaGraph(const XMLNode &node)
 {
     // Determine if rotate minimap is needed for soccer mode (for blue team)
     // Only need to test local player
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    if (race_manager->isSoccerMode())
     {
         const unsigned pk = race_manager->getNumPlayers();
         for (unsigned i = 0; i < pk; i++)
@@ -1878,8 +1878,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     // Load the un-raycasted flag position first (for minimap)
-    if (m_is_ctf &&
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    if (m_is_ctf && race_manager->isCTFMode())
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -1933,7 +1932,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if (race_manager->isFollowMode())
         {
             // In a FTL race the non-leader karts are placed at the end of the
             // field, so we need all start positions.
@@ -2196,8 +2195,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     main_loop->renderGUI(5700);
 
-    if (m_is_ctf &&
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    if (m_is_ctf && race_manager->isCTFMode())
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -2282,8 +2280,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
     unsigned int start_position_counter = 0;
 
     unsigned int node_count = root->getNumNodes();
-    const bool is_mode_ctf = m_is_ctf && race_manager->getMinorMode() ==
-        RaceManager::MINOR_MODE_CAPTURE_THE_FLAG;
+    const bool is_mode_ctf = m_is_ctf && race_manager->isCTFMode();
 
     // We keep track of the complexity of the scene (amount of objects loaded, etc)
     irr_driver->addSceneComplexity(node_count);
@@ -2623,8 +2620,7 @@ void Track::itemCommand(const XMLNode *node)
 {
     const std::string &name = node->getName();
 
-    const bool is_mode_ctf = m_is_ctf &&
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG;
+    const bool is_mode_ctf = m_is_ctf && race_manager->isCTFMode();
     bool ctf = false;
     node->get("ctf", &ctf);
     if ((is_mode_ctf && !ctf) || (!is_mode_ctf && ctf))
@@ -2651,8 +2647,7 @@ void Track::itemCommand(const XMLNode *node)
         return;
 
     // Only do easter eggs in easter egg mode.
-    if(type==Item::ITEM_EASTER_EGG &&
-        !(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG))
+    if(!(race_manager->isEggHuntMode()) && type==Item::ITEM_EASTER_EGG)
     {
         Log::warn("track",
                   "Found easter egg in non-easter-egg mode - ignored.\n");

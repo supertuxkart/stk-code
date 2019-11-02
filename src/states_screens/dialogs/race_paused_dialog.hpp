@@ -37,6 +37,7 @@ class RacePausedDialog : public GUIEngine::ModalDialog,
 {
 private:
     bool m_self_destroy;
+    bool m_from_overworld;
 
     GUIEngine::TextBoxWidget* m_text_box;
 

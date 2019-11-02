@@ -7,30 +7,64 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 1.1 (in development)
 
-(List to be completed. Currently include relevant change of commits from 28/09 to 16/10)
+(List to be completed. Currently include relevant change of commits from 20/04 to 12/05 and from 18/08 to 29/10)
+
+### >>> Partial features <<<
+* Addon skin support and skin-specified font by Benau
+* Structure for allowing icon themes by Benau
 
 ### Networking
+* Add support for IPv6 clients and servers, by Benau
 * Add AI support to local networking servers, by Benau. This AI is not as strong as the normal AI due to networking lag, but should offer enough challenge for a majority of players.
+* Add support for AI bots for the server host, by Benau
+* Add packet loss data to the server databases, by Benau
+* New management features for server hosts, by Benau
+    * IP / online ID ban tables
+    * Server statistics
+* Make the auto-end finish time more lenient, so it doesn't tank ranking score because of another player, by Alayan
+* Add a player reporting function, by Benau
+* Fix a bug that allowed to exceed a server's player limit if two players connected at the same time, by Benau
 
 ### Race gameplay and physics
 * Random spawn point in local battle mode, by Aleman778
+* Add an option to show everyone's items with the left characters icons, by Fouks
+* Allow to choose the number of AI per team in soccer, by risostk
+* In CTF mode, fix a bug that prevented scoring a point when the team's flag was in its immunity state, by Alayan
+* Fix a bug that could result in the finish time being shown as 0:00:00, by Alayan
+* Fix a bug that made AIs, in multiplayer and low difficulty, rubber-band towards the wrong player, by Alayan. Each player now correctly has its AIs, helping a weaker player to not be condemned to the last position.
 
 ### General
+* Add emoji support, by Benau
+* Avoid "this program is not responding" warnings in Windows and Mac, by Benau
+* Remove an incorrect function call that could significantly hurt performance for Mac, by Benau
+* Fix a nasty bug that made several sound effects to be played at a low volume after a crash, by Alayan
+* Some code clean-up, by Alayan
+* Fix an incorrect outdated driver warning for recent AMD cards on Windows, by Alayan
+* Scripting enhancements, by deveee
+* Various tweaks and bugfixes
+
 
 ### Android
 * Various bugfixes by deveee, dos1
+* The tutorial text is now tailored for touchscreen usage, instead of the main keyboard text, by Benau
 
 ### iOS
 * Add iOS support, by Benau
-
+    *
+    *
+    
 ### User Interface
-* Add emoji support, by Benau
 * Show country flags for servers and players in online multiplayer, by Benau
-* Add an option to show everyone's items with the left characters icons, by Fouks
+* Add a new option to change font size on the fly, by Benau
 * Better scaling of many UI elements to large resolutions, by dumaosen and others
 * Scale down the lap time indicator next to the kart icons when there are many karts, by risostk
 * Add icons for the available options in the race result screens, by dumaosen
-* Many minor tweaks
+* Display all the relevant info in the challenge dialog in Story Mode, by Alayan
+* Show the number of ranking points won or lost after a ranked race, by Benau
+* Separate blurring visual effects from the main graphics presets, by Alayan
+* Fix incorrect text resizing in the help menu, by Benau
+* Make the custom random GP option more proeminent in the track selection screen, by dumaosen
+* Many minor tweaks and bugfixes
 
 ## SuperTuxKart 1.0 (20. April 2019)
 ### Networking

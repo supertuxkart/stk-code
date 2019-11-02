@@ -30,7 +30,6 @@ struct GFXPreset
     bool lights;
     int shadows;
     bool bloom;
-    bool motionblur;
     bool lightshaft;
     bool glow;
     bool mlaa;
@@ -39,9 +38,14 @@ struct GFXPreset
     bool animatedCharacters;
     int particles;
     int image_quality;
+    bool degraded_ibl;
+};
+
+struct BlurPreset
+{
+    bool motionblur;
     /** Depth of field */
     bool dof;
-    bool degraded_ibl;
 };
 
 struct Resolution
@@ -85,9 +89,11 @@ private:
     OptionsScreenVideo();
     bool m_inited;
     std::vector<GFXPreset> m_presets;
+    std::vector<BlurPreset> m_blur_presets;
     std::vector<Resolution> m_resolutions;
 
     void updateTooltip();
+    void updateBlurTooltip();
     void updateResolutionsList();
     void initPresets();
     static void onScrollResolutionsList(void* data);
@@ -111,6 +117,7 @@ public:
     virtual void unloaded() OVERRIDE;
 
     void         updateGfxSlider();
+    void         updateBlurSlider();
     static int getImageQuality();
     static void setImageQuality(int quality);
 };

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <icon-button id="back" x="0" y="0" height="9%" icon="gui/icons/back.png"/>
+    <icon-button id="back" x="1%" y="0" height="9%" icon="gui/icons/back.png"/>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
         <header width="80%" height="8%" align="center" text="SuperTuxKart Options" text_align="center"/>
         <spacer width="100%" height="1%"/>
@@ -80,7 +80,7 @@
                    <spacer width="5" height="4%"/>
 
                    <div layout="horizontal-row" width="100%" height="fit">
-                       <checkbox id="perPlayerDifficulty"/>
+                       <checkbox id="enable-handicap"/>
                        <spacer width="1%" height="100%" />
                        <label height="100%" I18N="In the general settings" text="Enable per-player handicaps" word_wrap="true"/>
                    </div>

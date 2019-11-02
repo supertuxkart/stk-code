@@ -4,17 +4,18 @@
 # 
 # Translators:
 # , 2015
+# Denis Kim <dvkim98@gmail.com>, 2019
 # Viktar Vauchkevich, 2017-2019
 # Zmicer Turok <nashtlumach@gmail.com>, 2018
 # Zmicer Turok <zmicerturok@gmail.com >, 2018
-# Денис Ким <dvkim98@gmail.com>, 2019
+# Denis Kim <dvkim98@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-09 15:35+0800\n"
-"PO-Revision-Date: 2019-10-18 03:36+0000\n"
-"Last-Translator: Auria <auria.mg@gmail.com>\n"
+"POT-Creation-Date: 2019-10-29 12:42+0800\n"
+"PO-Revision-Date: 2019-10-30 10:49+0000\n"
+"Last-Translator: Denis Kim <dvkim98@gmail.com>\n"
 "Language-Team: Belarusian (http://www.transifex.com/supertuxkart/supertuxkart/language/be/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -673,7 +674,7 @@ msgstr "Складанасць"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1173
 msgid "Novice"
 msgstr "Пачатковец"
 
@@ -685,7 +686,7 @@ msgstr "Пачатковец"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1174
 msgid "Intermediate"
 msgstr "Сярэднячок"
 
@@ -697,7 +698,7 @@ msgstr "Сярэднячок"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1175
 msgid "Expert"
 msgstr "Эксперт"
 
@@ -709,7 +710,7 @@ msgstr "Эксперт"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1177
+#: src/race/race_manager.cpp:1176
 msgid "SuperTux"
 msgstr "Супер Тукс"
 
@@ -717,7 +718,7 @@ msgstr "Супер Тукс"
 #. I18N: In the server configuration screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
-#: src/states_screens/track_info_screen.cpp:226
+#: src/states_screens/track_info_screen.cpp:253
 msgid "Game mode"
 msgstr "Рэжым гульні"
 
@@ -726,7 +727,7 @@ msgstr "Рэжым гульні"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
 msgid "Normal Race"
 msgstr "Звычайная гонка"
 
@@ -735,7 +736,7 @@ msgstr "Звычайная гонка"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
 msgid "Time Trial"
 msgstr "Гонка на час"
 
@@ -752,7 +753,7 @@ msgstr "Бітва"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
 msgid "Soccer"
 msgstr "Футбол"
 
@@ -969,10 +970,6 @@ msgstr "Усе"
 #. I18N: Title in credits screen
 msgid "Credits"
 msgstr "Стваральнікі"
-
-#. I18N: ./data/gui/screens/credits.stkgui
-msgid "Donate to help keep SuperTuxKart going!"
-msgstr "Ахвяруйце, каб дапамагчы SuperTuxKart рухацца!"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -1249,8 +1246,7 @@ msgstr "Збірайце сінія скрыні — яны даюць бону�
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
-#: ../stk-assets/tracks/tutorial/scripting.as:32
-#: ../stk-assets/tracks/tutorial/triggers.as:16
+#: ../stk-assets/tracks/tutorial/scripting.as:52
 msgid "Avoid bananas!"
 msgstr "Абмінайце бананы!"
 
@@ -1364,13 +1360,13 @@ msgstr "Жуйка — абароніць з дапамогай шчыта аб�
 msgid ""
 "Zipper - will give you a strong speed boost. But beware of not losing "
 "control of your kart!"
-msgstr ""
+msgstr "Паскаральнік - дае вам вялікую прыбаўку ў хуткасці. Але будзьце асцярожнымі і не губляйце кантроль над сваім картам!"
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
 " It also affects other karts close to the explosion."
-msgstr ""
+msgstr "Піражок - ляціць у бліжэйшага суперніка. Лепш за ўсё ўжываць яго на кароткіх дыстанцыях і доўгіх прамых. Таксама ўплывае на іншыя карты побач з выбухам."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1404,7 +1400,7 @@ msgstr "Баскетбольны мяч — скача за лідарам го�
 msgid ""
 "Swatter - will squash karts close by, slowing them down. Can also be used to"
 " remove parachutes and bombs."
-msgstr ""
+msgstr "Мухабойка — расплюшчвае і запавольвае карты, што знаходзяцца побач. Можа таксама выкарыстоўвацца, каб пазбавіцца ад парашутаў і бомб."
 
 #. I18N: ./data/gui/screens/help4.stkgui
 msgid ""
@@ -1422,14 +1418,14 @@ msgstr "Якар - нечакана запавольвае карт."
 msgid ""
 "Parachute - slows down the kart, more progressively than the anchor. The "
 "faster you go, the stronger it slows you down."
-msgstr ""
+msgstr "Парашут - запавольвае карт больш паступова, чым якар. Чым хутчэй вы спрабуеце рухацца, тым больш ваш карт запавольваецца."
 
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
 msgid ""
 "Bomb - detonates after some amount of time, throwing the kart up in the air."
 " Bump into another kart to transfer the bomb to it."
-msgstr ""
+msgstr "Бомба - ўзрываецца пасля кароткага прамежку часу і падкідвае карт у паветра. Ударце іншы карт, каб перадаць бомбу іншаму гульцу."
 
 #. I18N: ./data/gui/screens/help5.stkgui
 msgid "The evil Nolok has captured Gnu! Here are a few tips to help you:"
@@ -1442,7 +1438,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr ""
+msgstr "Гэтая іконка на міні-мапе паказвае даступныя выклікі, якія вы яшчэ не скончылі. У правым верхнім куце экрана вы можаце бачыць, колькі пунктаў вы ўжо маеце. Скончыце як мага больш выклікаў, і Нолак згадзіцца на спаборніцтва з вамі. Будзьце хутчэй за яго, каб вызваліць Гну!"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1450,14 +1446,14 @@ msgid ""
 "When you complete a challenge, you get a cup. Each cup is worth several "
 "points. The higher the difficulty you completed the challenge in, the better"
 " the cup and the more points it is worth."
-msgstr ""
+msgstr "Калі вы скончыце выклік, вы атрымаеце кубак. Кожны кубак каштуе некалькі пунктаў. Чым вышэйшая складанасць скончанага вамі выкліка, тым лепш кубак і тым больш пунктаў ён каштуе."
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
 msgid ""
 "When you get the number of points indicated below this icon, you'll be "
 "gifted a surprise. There are several to collect."
-msgstr ""
+msgstr "Калі вы атрымаеце столькі пунктаў, колькі пазначана ўнізе гэтай іконкі, вы атрымаеце сюрпрыз. Усяго ёсць некалькі сюрпрызаў, якія вы можаце сабраць."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 msgid ""
@@ -1494,7 +1490,7 @@ msgstr "Максімальная хуткасць - чым яна больш, т
 msgid ""
 "Nitro consumption - the lower it is, the more speed you can get from a can "
 "of nitro. The lighter the kart, the lower its nitro consumption."
-msgstr ""
+msgstr "Спажыванне нітра - чым яно меншае, тым большую хуткасць вы можаце атрымаць ад аднаго нітра-зарада. Чым лягчэйшы карт, тым меншае спажыванне нітра ён мае."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1502,7 +1498,7 @@ msgid ""
 "If you follow closely another kart for a few seconds, you'll get a "
 "slipstream speed bonus when you overtake it. The lighter your kart, the "
 "easier it is."
-msgstr ""
+msgstr "Калі вы блізка прытрымліваецеся іншага карта на працягу некалькіх секунд і спрабуеце яго абагнаць, вы атрымліваеце бонус да хуткасці ад сліпстрыму. Чым лягчэйшы ваш карт, тым лягчэй атрымаць бонус."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1517,7 +1513,7 @@ msgid ""
 "options). Then, you can either create your own server with custom options, "
 "or search among a list of existing servers to join. Some of them are "
 "recommended servers with optionally ranked races."
-msgstr ""
+msgstr "Спачатку націсніце кнопку сеціўнай гульні ў галоўным меню. Абярыце лакальнае злучэнне або глабальнае злучэнне (што патрабуе далучэння да інтэрнэту ў наладах). Затым вы можаце або стварыць свой сервер са спецыяльнымі наладамі, або знайсці які-небудзь сервер у спісе існуючых сервераў і далучыцца да яго. Некаторыя серверы ў спісе з'яўляюцца рэкамендаванымі і, магчыма, праводзяць рэйтынгавыя гонкі."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1527,12 +1523,12 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon kart or track is allowed only if it exists on all "
 "joined players and the server."
-msgstr ""
+msgstr "Калі вы знаходзіцеся на серверы, гонка пачынаецца, як толькі гаспадар сервера (адзначаны каронай) вырашае яе пачаць. На афіцыйных серверах гонка можа пачынацца аўтаматычна праз некаторы час, калі прысутнічае дастатковая колькасць гульцоў. Затым, вы можаце абраць свой карт і прагаласаваць за трасу, на якой пройдзе гонка. Дадатковыя карты ці трасы можна абраць, толькі калі яны ўсталяваны ва ўсіх прысутных гульцоў і на серверы."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "... or on the same computer:"
-msgstr ""
+msgstr "...або на адным і тым жа камп'ютары."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1542,7 +1538,7 @@ msgid ""
 "keyboard(s), each player will need a different set of keys, and most "
 "keyboards are not appropriate for multiplayer because they don't support "
 "multiple simultaneous keypresses."
-msgstr ""
+msgstr "Па-першае, вам спатрэбяцца некалькі прыладаў уводу. Каб наладзіць іх, карыстайцеся адпаведным экранам наладаў. Ідэальна вам патрэбны некалькі геймпадаў або джойсцікаў, бо для гульні на клавіятуры(ах) кожнаму гульцу спатрэбяцца розныя наборы клавішаў. Але большасць клавіятур не падыходзяць для сумеснай гульні, таму што не падтрымліваюць адначасовае націсканне на некалькі клавішаў."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1552,7 +1548,7 @@ msgid ""
 "join the game, and use their input device to select their kart. The game "
 "continues when everyone selected their kart. Note that the mouse may not be "
 "used for this operation."
-msgstr ""
+msgstr "Калі прылады ўводу наладжаныя, абярыце кнопку сумеснай гульні ў галоўным меню. Кожны гулец можа націснуць кнопку стральбы на сваім геймпадзе/клавіятуры, каб далучыцца да гульні, і выкарыстаць сваю прыладу ўводу, каб абраць свой карт. Гульня працягваецца, калі ўсе абралі свае карты. Увага: мыш нельга выкарыстоўваць для выбару карта."
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1569,7 +1565,7 @@ msgstr "Адзіночная гульня"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Splitscreen Multiplayer"
-msgstr ""
+msgstr "Сумесная гульня з падзеленым экранам"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1959,7 +1955,8 @@ msgstr "Музыка"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:465
+#: src/states_screens/options/options_screen_video.cpp:528
+#: src/states_screens/options/options_screen_video.cpp:601
 msgid "Enabled"
 msgstr "Уключана"
 
@@ -2041,7 +2038,7 @@ msgstr "Дадаць прыладу"
 msgid ""
 "* Which config to use will be inferred from which 'Select' key is pressed to"
 " join the game."
-msgstr "* Якую канфігурацыю выкарыстаць будзе вызначана паводле таго, якая кнопка 'Абраць' націснута для ўвахода ў гульню."
+msgstr "* Тое, якую канфігурацыю выкарыстаць, будзе вызначана паводле таго, якая кнопка 'Абраць' націснута для ўвахода ў гульню."
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2068,6 +2065,21 @@ msgstr "Паказваць FPS"
 msgid "Multiplayer splits screen horizontally"
 msgstr "Дзяліць экран па гарызанталі пры сумеснай гульні"
 
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Show other karts' held powerups"
+msgstr "Паказваць зброю іншых картаў"
+
+#. I18N: ./data/gui/screens/options_video.stkgui
+#. I18N: In the video settings
+msgid "Graphical Effects Level"
+msgstr "Узровень графічных эфектаў"
+
+#. I18N: ./data/gui/screens/options_video.stkgui
+#. I18N: In the video settings
+msgid "Blur Effects Level"
+msgstr "Узровень эфектаў размытасці"
+
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync (requires restart)"
@@ -2077,11 +2089,6 @@ msgstr "Вертыкальная сінхранізацыя (спатрэбіц�
 #. I18N: In the video settings
 msgid "Custom settings..."
 msgstr "Асабістыя налады…"
-
-#. I18N: ./data/gui/screens/options_video.stkgui
-#. I18N: In the video settings
-msgid "Graphical Effects Level"
-msgstr "Узровень графічных эфектаў"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2133,14 +2140,14 @@ msgstr "= Рэкорды ="
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:511
-#: src/states_screens/track_info_screen.cpp:253
+#: src/states_screens/track_info_screen.cpp:280
 msgid "Number of laps"
 msgstr "Колькасць кругоў"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 #: src/states_screens/online/create_server_screen.cpp:169
-#: src/states_screens/track_info_screen.cpp:269
+#: src/states_screens/track_info_screen.cpp:199
 msgid "Number of AI karts"
 msgstr "Колькасць картаў-кампутараў"
 
@@ -2517,35 +2524,35 @@ msgstr "FPS: %d/%d/%d - %d KTris, Пінг: %dмс"
 msgid "Loading"
 msgstr "Запуск"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:112
+#: src/guiengine/widgets/kart_stats_widget.cpp:104
 msgid "Mass"
 msgstr "Маса"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:121
+#: src/guiengine/widgets/kart_stats_widget.cpp:110
 msgid "Maximum speed"
 msgstr "Максімальная хуткасць"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:132
+#: src/guiengine/widgets/kart_stats_widget.cpp:117
 msgid "Acceleration"
 msgstr "Паскарэнне"
 
-#: src/guiengine/widgets/kart_stats_widget.cpp:143
+#: src/guiengine/widgets/kart_stats_widget.cpp:123
 msgid "Nitro efficiency"
 msgstr "Эфектыўнасць нітра"
 
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
-#: src/guiengine/widgets/player_kart_widget.cpp:389
-#: src/guiengine/widgets/player_kart_widget.cpp:760
-#: src/karts/controller/local_player_controller.cpp:439
+#: src/guiengine/widgets/player_kart_widget.cpp:386
+#: src/guiengine/widgets/player_kart_widget.cpp:757
+#: src/karts/controller/local_player_controller.cpp:437
 #: src/karts/controller/player_controller.cpp:409
-#: src/network/protocols/client_lobby.cpp:805
+#: src/network/protocols/client_lobby.cpp:810
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (з гандыкапам)"
 
-#: src/guiengine/widgets/player_kart_widget.cpp:446
+#: src/guiengine/widgets/player_kart_widget.cpp:443
 #, c-format
 msgid "%s is ready"
 msgstr "%s гатовы"
@@ -3228,21 +3235,25 @@ msgstr "Вы можаце мець максімум 3 жыцця!"
 msgid "+1 life."
 msgstr "+1 жыццё."
 
-#: src/karts/kart.cpp:1030
+#: src/karts/kart.cpp:1032
+msgid "You were too slow!"
+msgstr "Вы былі занадта павольныя!"
+
+#: src/karts/kart.cpp:1033
 msgid "You won the race!"
 msgstr "Вы перамаглі ў гонцы!"
 
-#: src/karts/kart.cpp:1030
+#: src/karts/kart.cpp:1034
 msgid "You finished the race!"
 msgstr "Вы завяршылі гонку!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:120 src/network/protocols/client_lobby.cpp:1086
+#: src/karts/kart_rewinder.cpp:120 src/network/protocols/client_lobby.cpp:1091
 #, c-format
 msgid "%s left the game."
 msgstr "%s пакінуў гульню."
 
-#: src/main.cpp:1892
+#: src/main.cpp:1924
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3251,26 +3262,26 @@ msgid ""
 "(To change this setting at a later time, go to options, select tab "
 "'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr ""
+msgstr "SuperTuxKart можа падлучацца да сервера, каб спампаваць дадаткі і паведамляць вам пра абнаўленні. Мы таксама можам збіраць ананімную статыстыку пра апаратныя сродкі, каб дапамагчы распрацоўцы STK. Калі ласка, прачытайце нашую палітыку прыватнасці на http://privacy.supertuxkart.net. Жадаеце, каб гэтыя магчымасці былі ўключаны? (Каб змяніць гэта пазней, перайдзіце ў налады, абярыце «Асноўнае», і змяніце «Злучэнне з інтэрнэтам» і/або «Адпраўляць ананімную апаратную статыстыку»). "
 
-#: src/main.cpp:2160
+#: src/main.cpp:2192
 msgid "Your screen resolution is too low to run STK."
 msgstr "Раздзяляльная здольнасць вашага экрана занадта нізкая для STK."
 
-#: src/main.cpp:2192
+#: src/main.cpp:2224
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Ваш відэадрайвер занадта стары. Калі ласка, абнавіце яго."
 
-#: src/main.cpp:2210
+#: src/main.cpp:2242
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
 "available. SuperTuxKart recommends a driver supporting %s or better. The "
 "game will likely still run, but in a reduced-graphics mode."
-msgstr ""
+msgstr "Вашы графічныя драйверы занадта старыя. Калі ласка, праверце, ці ёсць да іх абнаўленні. SuperTuxKart рэкамендуе драйверы, што падтрымліваюць %sабо лепш. Гульня, хутчэй за ўсё, будзе працаваць, але ў рэжыме зніжанай графікі."
 
-#: src/main_loop.cpp:379 src/network/protocols/client_lobby.cpp:96
+#: src/main_loop.cpp:417 src/network/protocols/client_lobby.cpp:96
 msgid "Server connection timed out."
 msgstr "Час злучэння з серверам выйшаў"
 
@@ -3324,17 +3335,17 @@ msgstr "Апошні круг!"
 msgid "Lap %i"
 msgstr "Круг %i"
 
-#: src/modes/linear_world.cpp:536
+#: src/modes/linear_world.cpp:539
 #, c-format
 msgctxt "fastest_lap"
 msgid "%s by %s"
 msgstr "лепшы круг %s з %s"
 
-#: src/modes/linear_world.cpp:541
+#: src/modes/linear_world.cpp:544
 msgid "New fastest lap"
 msgstr "Новы хуткі круг"
 
-#: src/modes/linear_world.cpp:1083
+#: src/modes/linear_world.cpp:1086
 msgid "WRONG WAY!"
 msgstr "НЯПРАВІЛЬНЫ НАКІРУНАК!"
 
@@ -3347,11 +3358,11 @@ msgstr[1] "%i запаскі для карта з'явіліся!"
 msgstr[2] "%i запасак для карта з'явілася!"
 msgstr[3] "%i запасак для карта з'явілася!"
 
-#: src/modes/world.cpp:1303
+#: src/modes/world.cpp:1311
 msgid "You have been eliminated!"
 msgstr "Вас дыскваліфікавалі!"
 
-#: src/modes/world.cpp:1310
+#: src/modes/world.cpp:1318
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "«%s» дыскваліфікаваны."
@@ -3368,160 +3379,159 @@ msgstr "Вас вытурылі з сервера."
 msgid "You were kicked: Ping too high."
 msgstr "Вас вытурылі з сервера - пінг занадта высокі."
 
-#: src/network/protocols/client_lobby.cpp:248
-#: src/network/protocols/client_lobby.cpp:843
+#: src/network/protocols/client_lobby.cpp:249
+#: src/network/protocols/client_lobby.cpp:848
 msgid "Bad network connection is detected."
 msgstr "Выяўлена кепскае падключэнне да сеціва."
 
-#. I18N: Shown in lobby to indicate it's a bot in LAN game
-#: src/network/protocols/client_lobby.cpp:427
+#: src/network/protocols/client_lobby.cpp:431
 msgid "Bot"
 msgstr "Бот"
 
-#: src/network/protocols/client_lobby.cpp:592
+#: src/network/protocols/client_lobby.cpp:597
 #, c-format
 msgid "%s disconnected."
 msgstr "%s адлучаны."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:620
+#: src/network/protocols/client_lobby.cpp:625
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Націсніце імя гульца ў спісе, каб даведацца пра яго рэйтынг і кіраваць дзеяннямі ў адносінах да яго."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:674
+#: src/network/protocols/client_lobby.cpp:679
 #, c-format
 msgid "Server name: %s"
 msgstr "Назва сервера: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:682
+#: src/network/protocols/client_lobby.cpp:687
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
-#: src/states_screens/race_result_gui.cpp:1742
+#: src/states_screens/race_result_gui.cpp:1755
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Складанасць: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:687
+#: src/network/protocols/client_lobby.cpp:692
 #, c-format
 msgid "Max players: %d"
 msgstr "Максімум гульцоў: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:700
+#: src/network/protocols/client_lobby.cpp:705
 #: src/states_screens/dialogs/server_info_dialog.cpp:87
 #, c-format
 msgid "Game mode: %s"
 msgstr "Рэжым гульні: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:713
+#: src/network/protocols/client_lobby.cpp:718
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:173
 #: src/states_screens/online/create_server_screen.cpp:226
-#: src/states_screens/track_info_screen.cpp:206
+#: src/states_screens/track_info_screen.cpp:368
 msgid "Time limit"
 msgstr "Ліміт часу"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:714
+#: src/network/protocols/client_lobby.cpp:719
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:228
-#: src/states_screens/track_info_screen.cpp:207
+#: src/states_screens/track_info_screen.cpp:369
 msgid "Goals limit"
 msgstr "Ліміт галоў"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:718
+#: src/network/protocols/client_lobby.cpp:723
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Тып футбола: %s"
 
-#: src/network/protocols/client_lobby.cpp:728
+#: src/network/protocols/client_lobby.cpp:733
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Прагрэс Гран-пры: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:835
+#: src/network/protocols/client_lobby.cpp:840
 msgid "All players joined red or blue team."
 msgstr "Усе гульцы далучыліся да чырвонай або да сіняй каманды."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:855
+#: src/network/protocols/client_lobby.cpp:860
 msgid "You are now the owner of server."
 msgstr "Цяпер вы ўладальнік сервера"
 
-#: src/network/protocols/client_lobby.cpp:896
+#: src/network/protocols/client_lobby.cpp:901
 msgid "Connection refused: Server is busy."
 msgstr "У злучэнні адмоўлена: сервер заняты"
 
-#: src/network/protocols/client_lobby.cpp:901
+#: src/network/protocols/client_lobby.cpp:906
 msgid "Connection refused: You are banned from the server."
 msgstr "У злучэнні адмоўлена: вас заблакавалі на серверы"
 
-#: src/network/protocols/client_lobby.cpp:914
+#: src/network/protocols/client_lobby.cpp:919
 msgid "Connection refused: Server password is incorrect."
 msgstr "У злучэнні адмоўлена: хібны пароль."
 
-#: src/network/protocols/client_lobby.cpp:918
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Game data is incompatible."
 msgstr "У злучэнні адмоўлена: даныя гульні несумяшчальныя."
 
-#: src/network/protocols/client_lobby.cpp:922
+#: src/network/protocols/client_lobby.cpp:927
 msgid "Connection refused: Server is full."
 msgstr "У злучэнні адмоўлена: няма месца на серверы."
 
-#: src/network/protocols/client_lobby.cpp:926
+#: src/network/protocols/client_lobby.cpp:931
 msgid "Connection refused: Invalid player connecting."
 msgstr "У злучэнні адмоўлена: хібнае падлучэнне гульца."
 
-#: src/network/protocols/client_lobby.cpp:954
+#: src/network/protocols/client_lobby.cpp:959
 msgid "Failed to start the network game."
 msgstr "Не ўдалося пачаць сеціўную гульню."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1139
+#: src/network/protocols/client_lobby.cpp:1158
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Гульня скончылася, вы больш не можаце далучыцца да гульні ці назіраць яе."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1143
+#: src/network/protocols/client_lobby.cpp:1162
 msgid "No remaining place in the arena - live join disabled."
 msgstr "У арэне больш няма месца - далучэнне да гульні адключана."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1147
+#: src/network/protocols/client_lobby.cpp:1166
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Толькі 1 гулец застаўся, вяртаемся ў лобі."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1311
+#: src/network/protocols/client_lobby.cpp:1330
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s далучыўся да чырвонай каманды."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1317
+#: src/network/protocols/client_lobby.cpp:1336
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s далучыўся да сіняй каманды."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1323
+#: src/network/protocols/client_lobby.cpp:1342
 #, c-format
 msgid "%s joined the game."
 msgstr "%s далучыўся да гульні."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1473
+#: src/network/protocols/client_lobby.cpp:1492
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player or <%s> for the camera "
@@ -3529,7 +3539,7 @@ msgid ""
 msgstr "Націсніце <%s> ці <%s>, каб змяніць мэту камеры, або <%s>, каб змяніць пазіцыю камеры."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1489
+#: src/network/protocols/client_lobby.cpp:1508
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Паспяхова паскардзіліся на %s."
@@ -3549,38 +3559,38 @@ msgstr "Часовая гонка (Гран-пры)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
-#: src/states_screens/track_info_screen.cpp:229
+#: src/states_screens/track_info_screen.cpp:256
 msgid "Free-For-All"
 msgstr "Свабодная гульня"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
 msgstr "Захоп сцяга"
 
-#: src/online/online_player_profile.cpp:457
+#: src/online/online_player_profile.cpp:458
 #, c-format
 msgid "%s is now online."
 msgstr "%s зараз у сеціве."
 
-#: src/online/online_player_profile.cpp:461
+#: src/online/online_player_profile.cpp:462
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s і %s зараз у сеціве."
 
-#: src/online/online_player_profile.cpp:466
+#: src/online/online_player_profile.cpp:467
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s і %s зараз у сеціве."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:472
+#: src/online/online_player_profile.cpp:473
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3590,12 +3600,12 @@ msgstr[2] "%d сяброў цяпер анлайн."
 msgstr[3] "%d сяброў цяпер анлайн."
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:521
+#: src/online/online_player_profile.cpp:522
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "%s цяпер на серверы \"%s\"."
 
-#: src/online/online_player_profile.cpp:552
+#: src/online/online_player_profile.cpp:553
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
@@ -3604,7 +3614,7 @@ msgstr[1] "У вас %d новыя запыты на сяброўства!"
 msgstr[2] "У вас %d новых запытаў на сяброўства!"
 msgstr[3] "У вас %d новых запытаў на сяброўства!"
 
-#: src/online/online_player_profile.cpp:558
+#: src/online/online_player_profile.cpp:559
 msgid "You have a new friend request!"
 msgstr "У вас новы запыт на сяброўства!"
 
@@ -3625,17 +3635,17 @@ msgid ""
 msgstr "Файл вынікаў занадта стары.\nУсе вынікі выдалены."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1153
+#: src/race/race_manager.cpp:1152
 msgid "Follow the Leader"
 msgstr "Руш за лідарам"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:228
+#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "Бітва 3 удараў"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1161
+#: src/race/race_manager.cpp:1160
 msgid "Egg Hunt"
 msgstr "Паляванне на яйкі"
 
@@ -3722,8 +3732,8 @@ msgstr "стандарт"
 #: src/states_screens/arenas_screen.cpp:326
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:890
-#: src/states_screens/kart_selection.cpp:1526
+#: src/states_screens/kart_selection.cpp:893
+#: src/states_screens/kart_selection.cpp:1529
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Заблакавана: перамажыце ў дзейных спаборніцтвах, каб атрымаць доступ да новых!"
@@ -3773,7 +3783,7 @@ msgstr "Выканаць хаця б адну падмэту"
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:168
 msgid "The sum of the subgoals must reach the indicated value"
-msgstr ""
+msgstr "Колькасць выкананых падмэтаў павінна дасягнуць пазначанай велічыні"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4000,7 +4010,7 @@ msgstr "Удараў шаром для боўлінга"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:242
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
 msgid "Swatter hits"
-msgstr ""
+msgstr "Удараў мухабойкай"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4013,7 +4023,7 @@ msgstr "Усяго ўдараў"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
 msgid "Hits against the same kart"
-msgstr ""
+msgstr "Удараў супраць аднаго і таго ж карта"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4065,21 +4075,21 @@ msgstr "(не больш, чым на адной афіцыйнай трасе)"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:299
 msgid "Races finished"
-msgstr ""
+msgstr "Скончаных гонак"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:278
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:303
 msgid "Reverse direction races finished"
-msgstr ""
+msgstr "Скончаных гонак у адваротным напрамку"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:280
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:305
 msgid "Races finished alone"
-msgstr ""
+msgstr "Скончана гонак без супернікаў"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4240,7 +4250,7 @@ msgstr[3] "Пацвердзіць памер экрана з цягам %i се�
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr ""
+msgstr "Разрозненні, меншыя за 1024x768 або 1280x720, не падтрымліваюцца. Некаторыя часткі інтэрфейсу могуць працаваць няправільна."
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
@@ -4249,14 +4259,15 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:190
-#: src/states_screens/options/options_screen_video.cpp:193
-#: src/states_screens/options/options_screen_video.cpp:468
+#: src/states_screens/options/options_screen_video.cpp:215
+#: src/states_screens/options/options_screen_video.cpp:531
+#: src/states_screens/options/options_screen_video.cpp:602
 msgid "Disabled"
 msgstr "Выключана"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:470
+#: src/states_screens/options/options_screen_video.cpp:533
 msgid "Important only"
 msgstr "Толькі важнае"
 
@@ -4266,7 +4277,7 @@ msgstr "Толькі важнае"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:477
+#: src/states_screens/options/options_screen_video.cpp:540
 msgid "Low"
 msgstr "Нізкі"
 
@@ -4276,14 +4287,14 @@ msgstr "Нізкі"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:480
+#: src/states_screens/options/options_screen_video.cpp:543
 msgid "High"
 msgstr "Высокі"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:474
+#: src/states_screens/options/options_screen_video.cpp:537
 msgid "Very Low"
 msgstr "Вельмі нізкі"
 
@@ -4293,7 +4304,7 @@ msgid ""
 "SuperTuxKart will download full assets (including all tracks, high quality "
 "textures and music) for better gaming experience, this will use your mobile "
 "data if you don't have a wifi connection."
-msgstr ""
+msgstr "SuperTuxKart спампуе поўныя рэсурсы гульні (што ўключаюць ўсе афіцыйныя трасы, тэкстуры высокай якасці і музыку) для лепшай якасці гульні. Калі вы не маеце wifi-злучэння, ваша мабільнае злучэнне з Інтэрнэтам будзе выкарыстана."
 
 #. I18N: Shown when there is download error for assets download
 #. in the first run
@@ -4301,7 +4312,7 @@ msgstr ""
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
-msgstr ""
+msgstr "Не ўдалося спампаваць рэсурсы, праверце памяць вашай прылады і злучэнне з Інтэрнэтам і паспрабуйце пазней яшчэ раз."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4354,12 +4365,12 @@ msgid "No"
 msgstr "Не"
 
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:45
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:46
 msgid "Use original color"
 msgstr "Выкарыстоўваць зыходны колер"
 
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:48
 msgid "Pick a color from slider"
 msgstr "Выбраць колер са слайдэру"
 
@@ -4430,7 +4441,7 @@ msgstr "Націсніце любую клавішу..."
 #: src/states_screens/online/networking_lobby.cpp:234
 #: src/states_screens/online/networking_lobby.cpp:781
 msgid "Chat is disabled, enable in options menu."
-msgstr ""
+msgstr "Чат зараз выключаны, уключыце яго ў меню наладаў."
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
@@ -4472,7 +4483,7 @@ msgstr "Паўтор гонкі з прывідам"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1732
+#: src/states_screens/race_result_gui.cpp:1745
 #, c-format
 msgid "Laps: %i"
 msgstr "Кругоў: %i"
@@ -4516,7 +4527,7 @@ msgstr "Рэжым бітвы"
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:170
 #: src/states_screens/online/create_server_screen.cpp:222
-#: src/states_screens/track_info_screen.cpp:194
+#: src/states_screens/track_info_screen.cpp:356
 msgid "Soccer game type"
 msgstr "Тып футболу"
 
@@ -4547,7 +4558,7 @@ msgstr "Гулец"
 #. the scores of user calculated by player rankings
 #: src/states_screens/dialogs/server_info_dialog.cpp:121
 msgid "Scores"
-msgstr ""
+msgstr "Рэйтынг"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
@@ -4780,16 +4791,16 @@ msgstr "Вы перамаглі ў Гран-Пры!"
 msgid "You completed the Grand Prix!"
 msgstr "Вы завяршылі Гран-пры!"
 
-#: src/states_screens/kart_selection.cpp:866
-#: src/states_screens/kart_selection.cpp:1544
+#: src/states_screens/kart_selection.cpp:869
+#: src/states_screens/kart_selection.cpp:1547
 msgid "Random Kart"
 msgstr "Выпадковы карт"
 
-#: src/states_screens/kart_selection.cpp:885
+#: src/states_screens/kart_selection.cpp:888
 msgid "Locked"
 msgstr "Заблакавана"
 
-#: src/states_screens/kart_selection.cpp:986
+#: src/states_screens/kart_selection.cpp:989
 #: src/states_screens/online/networking_lobby.cpp:481
 msgid ""
 "Everyone:\n"
@@ -5107,28 +5118,26 @@ msgstr "Калі большасць гульцоў абярэ трасу і на
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:444
 #: src/states_screens/online/tracks_screen.cpp:492
-#: src/states_screens/track_info_screen.cpp:373
+#: src/states_screens/track_info_screen.cpp:299
 msgid "Random item location"
 msgstr "Выпадкова размешчаныя бонусы"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:474
-#: src/states_screens/track_info_screen.cpp:217
-#: src/states_screens/track_info_screen.cpp:626
+#: src/states_screens/track_info_screen.cpp:440
 msgid "Number of goals to win"
 msgstr "Колькасць галоў для перамогі"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:482
-#: src/states_screens/track_info_screen.cpp:212
-#: src/states_screens/track_info_screen.cpp:232
-#: src/states_screens/track_info_screen.cpp:621
+#: src/states_screens/track_info_screen.cpp:259
+#: src/states_screens/track_info_screen.cpp:435
 msgid "Maximum time (min.)"
 msgstr "Максімальны час (хв.)"
 
 #. I18N: In the track info screen
 #: src/states_screens/online/tracks_screen.cpp:522
-#: src/states_screens/track_info_screen.cpp:368
+#: src/states_screens/track_info_screen.cpp:294
 msgid "Drive in reverse"
 msgstr "Адваротны накірунак"
 
@@ -5161,7 +5170,7 @@ msgstr "Уключыць прыладу"
 #: src/states_screens/options/options_screen_device.cpp:123
 #: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enable Configuration"
-msgstr ""
+msgstr "Уключыць канфігурацыю"
 
 #. I18N: Key binding section
 #: src/states_screens/options/options_screen_device.cpp:173
@@ -5191,7 +5200,7 @@ msgstr "Паскарэнне"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:272
 msgid "Brake / Reverse"
-msgstr ""
+msgstr "Тормаз / Задні ход"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:275
@@ -5327,128 +5336,152 @@ msgstr "Схаваная"
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:142
 msgid "Centered"
-msgstr ""
+msgstr "У цэнтры"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:159
+#: src/states_screens/options/options_screen_ui.cpp:161
 msgid "Very small"
 msgstr "Вельмі маленькі"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:161
+#: src/states_screens/options/options_screen_ui.cpp:163
 msgid "Small"
 msgstr "Маленькі"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:163
+#: src/states_screens/options/options_screen_ui.cpp:165
 msgid "Medium"
 msgstr "Сярэдні"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:165
+#: src/states_screens/options/options_screen_ui.cpp:167
 msgid "Large"
 msgstr "Вялікі"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:167
+#: src/states_screens/options/options_screen_ui.cpp:169
 msgid "Very large"
 msgstr "Велізарны"
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
-#: src/states_screens/options/options_screen_video.cpp:195
+#: src/states_screens/options/options_screen_video.cpp:217
 msgid "Full"
-msgstr ""
+msgstr "Поўная"
 
 #. I18N: In the video options, half vertical sync (usually 30fps)
-#: src/states_screens/options/options_screen_video.cpp:197
+#: src/states_screens/options/options_screen_video.cpp:219
 msgid "Half"
-msgstr ""
+msgstr "Палавіністая"
+
+#. I18N: in graphical options. The \n is a newline character, place it where
+#. appropriate, two can be used if required.
+#: src/states_screens/options/options_screen_video.cpp:223
+msgid ""
+"Vsync forces the graphics card to supply a new frame\n"
+"only when the monitor is ready to display it."
+msgstr "Вертыкальная сінхранізацыя прымушае графічную карту згенераваць наступны кадр толькі тады, калі экран гатовы яго паказаць."
+
+#. I18N: in graphical options.
+#: src/states_screens/options/options_screen_video.cpp:226
+msgid "Full: one frame per monitor refresh"
+msgstr "Поўная: адзін кадр на кожнае аднаўленне экрану"
+
+#. I18N: in graphical options.
+#: src/states_screens/options/options_screen_video.cpp:228
+msgid "Half: one frame every two monitor refreshes"
+msgstr "Палавіністая: адзін кадр на кожныя два аднаўленні экрану"
+
+#. I18N: in graphical options.
+#: src/states_screens/options/options_screen_video.cpp:230
+msgid "Vsync will not work if your drivers don't support it."
+msgstr "Вертыкальная сінхранізацыя не будзе працаваць, калі вашы драйверы яе не падтрымліваюць."
 
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:447
+#: src/states_screens/options/options_screen_video.cpp:479
+#: src/states_screens/options/options_screen_video.cpp:511
 msgid "Custom"
 msgstr "Адвольны"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:483
+#: src/states_screens/options/options_screen_video.cpp:546
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Эфекты часціц: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:489
+#: src/states_screens/options/options_screen_video.cpp:552
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Анімацыя персанажаў: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:492
+#: src/states_screens/options/options_screen_video.cpp:555
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Дынамічае асвятленне: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:495
+#: src/states_screens/options/options_screen_video.cpp:558
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Рассейванне святла: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:498
-#, c-format
-msgid "Motion blur: %s"
-msgstr "Размыццё руху: %s"
-
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:501
+#: src/states_screens/options/options_screen_video.cpp:561
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Згладжванне: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:504
+#: src/states_screens/options/options_screen_video.cpp:564
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Навакольная аклюзія: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:508
+#: src/states_screens/options/options_screen_video.cpp:568
 #, c-format
 msgid "Shadows: %s"
 msgstr "Цені: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:510
+#: src/states_screens/options/options_screen_video.cpp:570
 #, c-format
 msgid "Shadows: %i"
 msgstr "Цені: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:513
+#: src/states_screens/options/options_screen_video.cpp:573
 #, c-format
 msgid "Bloom: %s"
 msgstr "Свячэнне: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:517
+#: src/states_screens/options/options_screen_video.cpp:577
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Контурнае свячэнне: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:521
+#: src/states_screens/options/options_screen_video.cpp:581
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Промні святла (God rays): %s"
 
-#. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:525
-#, c-format
-msgid "Depth of field: %s"
-msgstr "Глыбіня рэзкасці: %s"
-
-#: src/states_screens/options/options_screen_video.cpp:530
+#: src/states_screens/options/options_screen_video.cpp:586
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Якасць апрацаванай выявы: %s"
+
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:605
+#, c-format
+msgid "Motion blur: %s"
+msgstr "Размыццё руху: %s"
+
+#. I18N: in graphical options
+#: src/states_screens/options/options_screen_video.cpp:609
+#, c-format
+msgid "Depth of field: %s"
+msgstr "Глыбіня рэзкасці: %s"
 
 #: src/states_screens/options/user_screen.cpp:366
 msgid "Internet access is disabled. Do you want to enable it?"
@@ -5505,32 +5538,32 @@ msgstr "ГОЛ!"
 msgid "Waiting for others"
 msgstr "Чаканне астатніх"
 
-#. I18N: Shown waiting for the server in network if live join or specatate
+#. I18N: Shown waiting for the server in network if live join or spectate
 #: src/states_screens/race_gui_base.cpp:81
 msgid "Waiting for the server"
 msgstr "Чакаем сервер"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:586
+#: src/states_screens/race_gui_base.cpp:626
 msgid "by"
 msgstr "у выкананні"
 
-#: src/states_screens/race_gui_base.cpp:694
+#: src/states_screens/race_gui_base.cpp:734
 msgid "Collect nitro!"
 msgstr "Збірайце нітра!"
 
-#: src/states_screens/race_gui_base.cpp:696
+#: src/states_screens/race_gui_base.cpp:736
 msgid "Follow the leader!"
 msgstr "Руш за лідарам!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:876
+#: src/states_screens/race_gui_base.cpp:916
 #, c-format
 msgid "Top %i"
 msgstr "Топ %i"
 
-#: src/states_screens/race_gui.cpp:406
+#: src/states_screens/race_gui.cpp:414
 msgid "Challenge Failed"
 msgstr "Спаборніцтва правалена."
 
@@ -5579,52 +5612,52 @@ msgid "Network grand prix has been finished."
 msgstr "Сеціўнае Гран-пры завершана."
 
 #: src/states_screens/race_result_gui.cpp:532
-#: src/states_screens/race_result_gui.cpp:1328
+#: src/states_screens/race_result_gui.cpp:1341
 msgid "Red Team Wins"
 msgstr "Перамаглі чырвоныя"
 
 #: src/states_screens/race_result_gui.cpp:534
-#: src/states_screens/race_result_gui.cpp:1332
+#: src/states_screens/race_result_gui.cpp:1345
 msgid "Blue Team Wins"
 msgstr "Перамаглі сінія"
 
 #: src/states_screens/race_result_gui.cpp:536
-#: src/states_screens/race_result_gui.cpp:1337
+#: src/states_screens/race_result_gui.cpp:1350
 msgid "It's a draw"
 msgstr "Гэта нічыя"
 
 #: src/states_screens/race_result_gui.cpp:767
-#: src/states_screens/race_result_gui.cpp:1181
+#: src/states_screens/race_result_gui.cpp:1195
 msgid "Eliminated"
 msgstr "Выбыў"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1403
-#: src/states_screens/race_result_gui.cpp:1453
+#: src/states_screens/race_result_gui.cpp:1416
+#: src/states_screens/race_result_gui.cpp:1466
 msgid "(Own Goal)"
 msgstr "(Гол сабе)"
 
-#: src/states_screens/race_result_gui.cpp:1523
+#: src/states_screens/race_result_gui.cpp:1536
 #, c-format
 msgid "Track %i/%i"
 msgstr "Траса %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1607
+#: src/states_screens/race_result_gui.cpp:1620
 msgid "Grand Prix progress:"
 msgstr "Прагрэс Гран-пры:"
 
-#: src/states_screens/race_result_gui.cpp:1653
+#: src/states_screens/race_result_gui.cpp:1666
 msgid "Highscores"
 msgstr "Рэкорды"
 
-#: src/states_screens/race_result_gui.cpp:1756
+#: src/states_screens/race_result_gui.cpp:1769
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Лепшы час круга: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1770
+#: src/states_screens/race_result_gui.cpp:1783
 #, c-format
 msgid "by %s"
 msgstr "ад %s"
@@ -5660,23 +5693,23 @@ msgstr "Едзьце з картамі-прывідамі і спрабуйце 
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
-#: src/states_screens/track_info_screen.cpp:153
+#: src/states_screens/track_info_screen.cpp:148
 #, c-format
 msgid "Track by %s"
 msgstr "Аўтар %s"
 
 #. I18N: the max players supported by an arena.
-#: src/states_screens/track_info_screen.cpp:161
+#: src/states_screens/track_info_screen.cpp:156
 #, c-format
 msgid "Max players supported: %d"
 msgstr "Максімальная колькасць гульцоў: %d"
 
-#: src/states_screens/track_info_screen.cpp:314
+#: src/states_screens/track_info_screen.cpp:382
 msgid "Number of red team AI karts"
 msgstr "Колькасць ботаў у чырвонай камандзе"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:501
+#: src/states_screens/track_info_screen.cpp:518
 msgid "(Empty)"
 msgstr "(Пуста)"
 
@@ -5708,71 +5741,95 @@ msgid ""
 "available challenges."
 msgstr "Вам патрэбна больш балаў для\nўдзелу ў гэтым спаборніцтве!\nШукайце даступныя\nспаборніцтвы на мінімапе."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:21
+#: ../stk-assets/tracks/tutorial/scripting.as:24
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
 msgstr "Паскарайцеся пры дапамозе <%s> і кіруйце — <%s> і <%s>."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:37
-#: ../stk-assets/tracks/tutorial/triggers.as:38
+#: ../stk-assets/tracks/tutorial/scripting.as:33
+msgid ""
+"Accelerate by touching the upper part of the wheel, and steer by moving left"
+" or right."
+msgstr "Паскарайцеся з дапамогай націску на верхнюю частку руля. Каб павярнуць, перамясціце дотык налева/направа."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:38
+msgid ""
+"Accelerate by moving the accelerator upwards, and steer by titling your "
+"device."
+msgstr "Каб паскорыцца, перадвіньце акселератар наверх. Каб павярнуць, нахіліце вашу прыладу."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:43
+msgid ""
+"Accelerate by moving the accelerator upwards, and steer by rotating your "
+"device."
+msgstr "Каб паскорыцца, перадвіньце акселератар наверх. Каб павярнуць, павярніце вашу прыладу."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
 msgstr "Збірайце скрыні з падарункамі ды страляйце пры дапамозе <%s>, каб прыбраць вялікія скрыні з дарогі!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:43
-#: ../stk-assets/tracks/tutorial/triggers.as:44
+#: ../stk-assets/tracks/tutorial/scripting.as:63
+msgid ""
+"Collect gift boxes, and fire by pressing the bowling icon to blow away these"
+" boxes!"
+msgstr "Збірайце скрыні з падарункамі ды страляйце пры дапамозе іконкі шара для боўлінга, каб прыбраць вялікія скрыні з дарогі! "
+
+#: ../stk-assets/tracks/tutorial/scripting.as:72
 #, c-format
 msgid ""
 "Press <%s> to look behind. Fire the weapon with <%s> while pressing <%s> to "
 "fire behind!"
 msgstr "Націсніце <%s>, каб азірнуцца. Страляйце ўзад пры дапамозе <%s> утрымліваючы <%s>!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:53
-#: ../stk-assets/tracks/tutorial/triggers.as:54
+#: ../stk-assets/tracks/tutorial/scripting.as:82
+msgid ""
+"Press the mirror icon to look behind. Fire the weapon behind by holding the "
+"bowling icon and then swiping to the mirror icon!"
+msgstr "Націсніце на іконку люстэрка, каб паглядзець назад. Каб запусціць зброю назад, націсніце на іконку стральбы і правядзіце ад яе да іконцы люстэрка!"
+
+#: ../stk-assets/tracks/tutorial/scripting.as:90
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
 msgstr "Выкарыстоўвайце назбіранае нітра пры дапамозе <%s>!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:58
+#: ../stk-assets/tracks/tutorial/scripting.as:92
+msgid "Use the nitro you collected by pressing the nitro icon"
+msgstr "Націсніце іконку нітра, каб выкарыстаць сабраныя нітра-зарады"
+
+#: ../stk-assets/tracks/tutorial/scripting.as:97
 msgid "Collect nitro bottles (we will use them after the curve)."
 msgstr "Збірайце бутэлькі з нітра (выкарыстаем іх пасля павароту)."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:63
+#: ../stk-assets/tracks/tutorial/scripting.as:103
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
 msgstr "Вой! Калі ў вас праблемы, націсніце <%s> для выратавання."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:69
-#: ../stk-assets/tracks/tutorial/triggers.as:70
+#: ../stk-assets/tracks/tutorial/scripting.as:105
+msgid "Oops! When you're in trouble, press the bird icon to be rescued."
+msgstr "Вой! Калі ў вас праблемы, націсніце іконку птушкі для выратавання."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:113
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
 msgstr "Разганіцеся і націсніце <%s> падчас заносу. Слізганне дапаможа вам мінуць крутыя павароты хутчэй."
 
-#: ../stk-assets/tracks/tutorial/scripting.as:77
-#: ../stk-assets/tracks/tutorial/triggers.as:78
+#: ../stk-assets/tracks/tutorial/scripting.as:121
+msgid ""
+"Accelerate and press the skid icon while turning to skid. Skidding for a "
+"short while can help you turn faster to take sharp turns."
+msgstr "Разганіцеся і націсніце іконку заносу пры павароце, каб пайсці ў занос. Слізганне на кароткі час дапаможа вам мінуць крутыя павароты хутчэй."
+
+#: ../stk-assets/tracks/tutorial/scripting.as:130
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
 msgstr "Звярніце ўвагу, што калі вы кантралюеце занос некалькі секунд, то атрымаеце бонус хуткасці!"
 
-#: ../stk-assets/tracks/tutorial/scripting.as:82
-#: ../stk-assets/tracks/tutorial/triggers.as:83
+#: ../stk-assets/tracks/tutorial/scripting.as:135
 msgid "You are now ready to race. Good luck!"
 msgstr "Цяпер вы падрыхтаваны да гонкі. Удачы!"
-
-#: ../stk-assets/tracks/tutorial/triggers.as:28
-#, c-format
-msgid "Accelerate with <%s> and steer with <%s> and <%s>"
-msgstr "Ехаць на <%s>, збочваць на <%s> і <%s>"
-
-#: ../stk-assets/tracks/tutorial/triggers.as:59
-msgid "Collect nitro bottles (we will use them after the curve)"
-msgstr "Збірайце бутэлькі з нітра (выкарыстаем іх пасля павароту)."
-
-#: ../stk-assets/tracks/tutorial/triggers.as:64
-#, c-format
-msgid "Oops! When you're in trouble, press <%s> to be rescued"
-msgstr "Вой! Калі ў вас праблемы, націсніце <%s> для выратавання."

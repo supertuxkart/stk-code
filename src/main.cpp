@@ -176,6 +176,7 @@
 #include "addons/news_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/hardware_stats.hpp"
 #include "config/player_manager.hpp"
@@ -610,7 +611,7 @@ void cmdLineHelp()
     "       --wan-server=name  Start a Wan server (not a playing client).\n"
     "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
-    "       --server-password= Sets a password for a server (both client&server).\n"
+    "       --server-password= Sets a password for a server (both client and server).\n"
     "       --connect-now=ip   Connect to a server with IP known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
     "                          public port.\n"
@@ -627,7 +628,7 @@ void cmdLineHelp()
     "       --port=n           Port number to use.\n"
     "       --auto-connect     Automatically connect to first server and start race\n"
     "       --max-players=n    Maximum number of clients (server only).\n"
-    "       --min-players=n    Minimum number of clients for owner less server(server only).\n"
+    "       --min-players=n    Minimum number of clients for ownerless server(server only).\n"
     "       --motd             Message showing in all lobby of clients, can specify a .txt file.\n"
     "       --auto-end         Automatically end network game after 1st player finished\n"
     "                          for some time (currently his finished time * 0.25 + 15.0). \n"
@@ -640,8 +641,8 @@ void cmdLineHelp()
     "       --ranked           Server will submit ranking to stk addons server.\n"
     "       --no-ranked        Server will not submit ranking to stk addons server.\n"
     "                          You require permission for that.\n"
-    "       --owner-less       Race will auto start and no one can kick players in server.\n"
-    "       --no-owner-less    Race will not auto start and server owner can kick players in server.\n"
+    "       --owner-less       Race will autostart and no one can kick players in server.\n"
+    "       --no-owner-less    Race will not autostart and server owner can kick players in server.\n"
     "       --firewalled-server Turn on all stun related code in server.\n"
     "       --no-firewalled-server Turn off all stun related code in server.\n"
     "       --connection-debug Print verbose info for sending or receiving packets.\n"
@@ -680,8 +681,8 @@ void cmdLineHelp()
     "       --disable-ibl      Disable image based lighting.\n"
     "       --enable-hd-textures Enable high definition textures.\n"
     "       --disable-hd-textures Disable high definition textures.\n"
-    "       --enable-dynamic-lights Enable advanced pipline.\n"
-    "       --disable-dynamic-lights Disable advanced pipline.\n"
+    "       --enable-dynamic-lights Enable advanced pipeline.\n"
+    "       --disable-dynamic-lights Disable advanced pipeline.\n"
     "       --anisotropic=n     Anisotropic filtering quality (0 to disable).\n"
     "                           Takes precedence over trilinear or bilinear\n"
     "                           texture filtering.\n"
@@ -1376,14 +1377,14 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             {
                 NetworkConfig::get()->addNetworkPlayer(
                     NULL, PlayerManager::get()->getPlayer(i),
-                    PLAYER_DIFFICULTY_NORMAL);
+                    HANDICAP_NONE);
             }
         }
         else
         {
             NetworkConfig::get()->addNetworkPlayer(
                 input_manager->getDeviceManager()->getLatestUsedDevice(),
-                PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
+                PlayerManager::getCurrentPlayer(), HANDICAP_NONE);
         }
         std::string fixed_ipv6 = StringUtils::findAndReplace(ipv6, "[", " ");
         fixed_ipv6 = StringUtils::findAndReplace(fixed_ipv6, "]", " ");
@@ -1790,6 +1791,8 @@ void initRest()
     GUIEngine::setSkin(NULL);
 
     GUIEngine::init(device, driver, StateManager::get());
+
+    GUIEngine::renderLoading(true, true);
     input_manager = new InputManager();
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
@@ -2320,6 +2323,10 @@ int main(int argc, char *argv[])
         }
 #endif
 
+        // Create the story mode timer before going in the main loop
+        // as it needs to be able to run continuously
+        story_mode_timer = new StoryModeTimer();
+
         // Replay a race
         // =============
         if(history->replayHistory())
@@ -2358,6 +2365,7 @@ int main(int argc, char *argv[])
             race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
         }
+
         main_loop->run();
 
     }  // try
@@ -2467,6 +2475,7 @@ static void cleanSuperTuxKart()
     GUIEngine::cleanUp();
     GUIEngine::clearScreenCache();
     if(font_manager)            delete font_manager;
+    if(story_mode_timer)        delete story_mode_timer;
 
     // Now finish shutting down objects which a separate thread. The
     // RequestManager has been signaled to shut down as early as possible,

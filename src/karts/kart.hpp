@@ -98,8 +98,6 @@ protected:
     /** Is time flying activated */
     bool m_is_jumping;
 
-    bool m_enabled_network_spectator;
-
     /** The sign of torque to apply after hitting a bubble gum. */
     bool        m_bubblegum_torque_sign;
 
@@ -294,15 +292,13 @@ protected:
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
                         int position, const btTransform& init_transform,
-                        PerPlayerDifficulty difficulty,
+                        HandicapLevel handicap,
                         std::shared_ptr<RenderInfo> ri);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type) OVERRIDE;
     virtual void   kartIsInRestNow() OVERRIDE;
     virtual void   updateGraphics(float dt) OVERRIDE;
     virtual void   createPhysics    ();
-    virtual float  getSpeedForTurnRadius(float radius) const OVERRIDE;
-    virtual float  getMaxSteerAngle(float speed) const;
     virtual bool   isInRest         () const OVERRIDE;
     virtual void   applyEngineForce (float force);
 
@@ -310,18 +306,6 @@ public:
     virtual void   flyDown() OVERRIDE;
 
     virtual void   startEngineSFX   () OVERRIDE;
-    virtual void   adjustSpeed      (float f) OVERRIDE;
-    virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
-                                    float engine_force, int duration,
-                                    int fade_out_time) OVERRIDE;
-    virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
-                                    float speed_boost, float engine_force, 
-                                    int duration, int fade_out_time) OVERRIDE;
-    virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
-                               int fade_in_time) OVERRIDE;
-    virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const OVERRIDE;
-    virtual void  setBoostAI     (bool boosted) OVERRIDE;
-    virtual bool  getBoostAI     () const OVERRIDE;
     virtual void  collectedItem(ItemState *item) OVERRIDE;
     virtual float getStartupBoostFromStartTicks(int ticks) const OVERRIDE;
     virtual float getStartupBoost() const OVERRIDE  { return m_startup_boost; }
@@ -346,155 +330,107 @@ public:
     virtual void   setPosition      (int p) OVERRIDE;
     virtual void   beep             () OVERRIDE;
     virtual void   showZipperFire   () OVERRIDE;
-    virtual float  getCurrentMaxSpeed() const OVERRIDE;
+
 
     virtual bool   playCustomSFX    (unsigned int type) OVERRIDE;
     virtual void   setController(Controller *controller) OVERRIDE;
     virtual void   setXYZ(const Vec3& a) OVERRIDE;
     virtual void changeKart(const std::string& new_ident,
-                            PerPlayerDifficulty difficulty,
+                            HandicapLevel handicap,
                             std::shared_ptr<RenderInfo> ri) OVERRIDE;
-    // ========================================================================
-    // Powerup related functions.
-    // ------------------------------------------------------------------------
+
+    // ========================================================================================
+    // SPEED and speed-boost related functions
+    // ----------------------------------------------------------------------------------------
+    virtual void   adjustSpeed      (float f) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual void   increaseMaxSpeed(unsigned int category, float add_speed,
+                                    float engine_force, int duration,
+                                    int fade_out_time) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual void   instantSpeedIncrease(unsigned int category, float add_max_speed,
+                                    float speed_boost, float engine_force, 
+                                    int duration, int fade_out_time) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual void   setSlowdown(unsigned int category, float max_speed_fraction,
+                               int fade_in_time) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual int   getSpeedIncreaseTicksLeft(unsigned int category) const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual float  getSpeed() const OVERRIDE { return m_speed; }
+    // ----------------------------------------------------------------------------------------
+    virtual float  getCurrentMaxSpeed() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** This is used on the client side only to set the speed of the kart
+     *  from the server information. */
+    virtual void setSpeed(float s) OVERRIDE { m_speed = s; }
+
+    // ========================================================================================
+    // STEERING and skidding related functions
+    // ----------------------------------------------------------------------------------------
+    /** Returns the maximum steering angle for this kart, which depends on the
+     *  speed. */
+    virtual float getMaxSteerAngle () const OVERRIDE
+                    { return getMaxSteerAngle(getSpeed()); }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the time till full steering is reached for this kart.
+     *  \param steer Current steer value (must be >=0), on which the time till
+     *         full steer depends. */
+    virtual float getTimeFullSteer(float steer) const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual float  getSpeedForTurnRadius(float radius) const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual float  getMaxSteerAngle(float speed) const;
+    // ----------------------------------------------------------------------------------------
+    /** Returns the skidding object for this kart (which can be used to query
+     *  skidding related values). */
+    virtual const Skidding *getSkidding() const OVERRIDE { return m_skidding.get(); }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the skidding object for this kart (which can be used to query
+     *  skidding related values) - non-const. */
+    virtual Skidding *getSkidding() OVERRIDE { return m_skidding.get(); }
+
+    // ========================================================================================
+    // NITRO related functions.
+    // ----------------------------------------------------------------------------------------
+    /** Returns the remaining collected energy. */
+    virtual float getEnergy() const OVERRIDE { return m_collected_energy; }
+    // ----------------------------------------------------------------------------------------
+    /** Sets the energy the kart has collected. */
+    virtual void setEnergy(float val) OVERRIDE { m_collected_energy = val; }
+    // ----------------------------------------------------------------------------------------
+    /** Return whether nitro is being used despite the nitro button not being
+     *  pressed due to minimal use time requirements
+     */
+    virtual bool isOnMinNitroTime() const OVERRIDE { return m_min_nitro_ticks > 0; }
+
+    // ========================================================================================
+    // POWERUP related functions.
+    // ----------------------------------------------------------------------------------------
     /** Sets a new powerup. */
     virtual void setPowerup (PowerupManager::PowerupType t, int n) OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Sets the last used powerup. */
     virtual void setLastUsedPowerup (PowerupManager::PowerupType t);
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual const Powerup* getPowerup() const OVERRIDE { return m_powerup; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the current powerup. */
     virtual Powerup* getPowerup() OVERRIDE  { return m_powerup; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the last used powerup. */
     virtual PowerupManager::PowerupType getLastUsedPowerup() OVERRIDE
     {
         return m_last_used_powerup;
     }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the number of powerups. */
     virtual int getNumPowerup() const OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Returns a points to this kart's graphical effects. */
-    virtual KartGFX* getKartGFX() OVERRIDE         { return m_kart_gfx.get(); }
-    // ------------------------------------------------------------------------
-    /** Returns the remaining collected energy. */
-    virtual float  getEnergy() const OVERRIDE 
-    {
-        return m_collected_energy;
-    }
-    // ------------------------------------------------------------------------
-    /** Returns the current position of this kart in the race. */
-    virtual int getPosition() const OVERRIDE
-    {
-        return m_race_position;
-    }
-    // ------------------------------------------------------------------------
-    /** Returns the coordinates of the front of the kart. This is used for
-     *  determining when the lap line is crossed. */
-    virtual const Vec3& getFrontXYZ() const OVERRIDE { return m_xyz_front; }
-    // ------------------------------------------------------------------------
-    /** Returns the initial position of this kart. */
-    virtual int getInitialPosition () const OVERRIDE
-    {
-        return m_initial_position;
-    }
-    // ------------------------------------------------------------------------
-    /** Returns the finished time for a kart. */
-    virtual float getFinishTime () const OVERRIDE
-    {
-        return m_finish_time;
-    }
-    // ------------------------------------------------------------------------
-    /** Returns true if this kart has finished the race. */
-    virtual bool hasFinishedRace () const OVERRIDE
-    {
-        return m_finished_race;
-    }
-    // ------------------------------------------------------------------------
-    /** Returns true if the kart has a plunger attached to its face. */
-    virtual int getBlockedByPlungerTicks() const OVERRIDE
-                                         { return m_view_blocked_by_plunger; }
-    // ------------------------------------------------------------------------
-    /** Sets that the view is blocked by a plunger. The duration depends on
-     *  the difficulty, see KartPorperties getPlungerInFaceTime. */
-    virtual void   blockViewWithPlunger() OVERRIDE;
-    // -------------------------------------------------------------------------
-    /** Returns a bullet transform object located at the kart's position
-        and oriented in the direction the kart is going. Can be useful
-        e.g. to calculate the starting point and direction of projectiles. */
-    virtual btTransform getAlignedTransform(const float customPitch=-1) OVERRIDE;
-    // -------------------------------------------------------------------------
-    /** Returns the color used for this kart. */
-    const irr::video::SColor &getColor() const;
-    // ------------------------------------------------------------------------
-    /** Returns the time till full steering is reached for this kart.
-     *  \param steer Current steer value (must be >=0), on which the time till
-     *         full steer depends. */
-    virtual float getTimeFullSteer(float steer) const OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Returns the maximum steering angle for this kart, which depends on the
-     *  speed. */
-    virtual float getMaxSteerAngle () const OVERRIDE
-                    { return getMaxSteerAngle(getSpeed()); }
-    // ------------------------------------------------------------------------
-    /** Returns the skidding object for this kart (which can be used to query
-     *  skidding related values). */
-    virtual const Skidding *getSkidding() const OVERRIDE
-                                                   { return m_skidding.get(); }
-    // ------------------------------------------------------------------------
-    /** Returns the skidding object for this kart (which can be used to query
-     *  skidding related values) - non-const. */
-    virtual Skidding *getSkidding() OVERRIDE { return m_skidding.get(); }
-    // ------------------------------------------------------------------------
-    virtual RaceManager::KartType getType() const OVERRIDE { return m_type; }
-    // ------------------------------------------------------------------------
-    /** Returns the bullet vehicle which represents this kart. */
-    virtual btKart *getVehicle() const OVERRIDE { return m_vehicle.get(); }
-    // ------------------------------------------------------------------------
-    /** Returns the speed of the kart in meters/second. */
-    virtual float  getSpeed() const OVERRIDE { return m_speed; }
-    // ------------------------------------------------------------------------
-    /** This is used on the client side only to set the speed of the kart
-     *  from the server information. */
-    virtual void setSpeed(float s) OVERRIDE { m_speed = s; }
-    // ------------------------------------------------------------------------
-    virtual btQuaternion getVisualRotation() const OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Returns the slipstream object of this kart. */
-    virtual const SlipStream* getSlipstream() const OVERRIDE
-                                                 { return m_slipstream.get(); }
-    // ------------------------------------------------------------------------
-    /** Returns the slipstream object of this kart. */
-    virtual SlipStream* getSlipstream() OVERRIDE  {return m_slipstream.get(); }
-    // ------------------------------------------------------------------------
-    /** Activates a slipstream effect, atm that is display some nitro. */
-    virtual void setSlipstreamEffect(float f) OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Returns the start transform, i.e. position and rotation. */
-    const btTransform& getResetTransform() const {return m_reset_transform;}
-    // ------------------------------------------------------------------------
-    /** Returns the controller of this kart. */
-    virtual Controller* getController() OVERRIDE { return m_controller; }
-    // ------------------------------------------------------------------------
-    /** Returns the controller of this kart (const version). */
-    const Controller* getController() const OVERRIDE { return m_controller; }
-    // ------------------------------------------------------------------------
-    /** True if the wheels are touching the ground. */
-    virtual bool isOnGround() const OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Returns true if the kart is close to the ground, used to dis/enable
-     *  the upright constraint to allow for more realistic explosions. */
-    bool isNearGround() const;
-    // ------------------------------------------------------------------------
-    /** Returns true if the kart is eliminated.  */
-    virtual bool isEliminated() const OVERRIDE { return m_eliminated; }
-    // ------------------------------------------------------------------------
-    virtual void eliminate() OVERRIDE;
-    // ------------------------------------------------------------------------
+
+    // ========================================================================================
+    // SPECIAL-STATUS related functions (plunger, squash, shield, immunity).
+    // ----------------------------------------------------------------------------------------
     /** Makes a kart invulnerable for a certain amount of time. */
     virtual void setInvulnerableTicks(int ticks) OVERRIDE
     {
@@ -503,84 +439,159 @@ public:
             ticks = 32767;
         m_invulnerable_ticks = ticks;
     }   // setInvulnerableTicks
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns if the kart is invulnerable. */
-    virtual bool isInvulnerable() const OVERRIDE
-    {
-        return m_invulnerable_ticks > 0;
-    }
-    // ------------------------------------------------------------------------
+    virtual bool isInvulnerable() const OVERRIDE { return m_invulnerable_ticks > 0; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns true if the kart has a plunger attached to its face. */
+    virtual int getBlockedByPlungerTicks() const OVERRIDE
+                                         { return m_view_blocked_by_plunger; }
+    // ----------------------------------------------------------------------------------------
+    /** Sets the view to blocked by a plunger. The duration depends on
+     *  the difficulty, see KartProperties getPlungerInFaceTime. */
+    virtual void blockViewWithPlunger() OVERRIDE;
+    // ----------------------------------------------------------------------------------------
     /** Enables a kart shield protection for a certain amount of time. */
     virtual void setShieldTime(float t) OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns if the kart is protected by a shield. */
     virtual bool isShielded() const OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the remaining time the kart is protected by a shield. */
     virtual float getShieldTime() const OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Decreases the kart's shield time. */
     virtual void decreaseShieldTime() OVERRIDE;
-    // ------------------------------------------------------------------------
-
-    /** Sets the energy the kart has collected. */
-    virtual void   setEnergy(float val) OVERRIDE { m_collected_energy = val; }
-    // ------------------------------------------------------------------------
-    /** Return whether nitro is being used despite the nitro button not being
-     *  pressed due to minimal use time requirements
-     */
-    virtual bool isOnMinNitroTime() const OVERRIDE { return m_min_nitro_ticks > 0; }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns if the kart is currently being squashed. */
     virtual bool isSquashed() const OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Shows the star effect for a certain time. */
-    virtual void showStarEffect(float t) OVERRIDE;
-    // ------------------------------------------------------------------------
-    /** Returns the terrain info oject. */
-    virtual const TerrainInfo *getTerrainInfo() const OVERRIDE
-    {
-        return m_terrain_info;
-    }
-    // ------------------------------------------------------------------------
-    virtual void setOnScreenText(const core::stringw& text) OVERRIDE;
-    // ------------------------------------------------------------------------
+
+    // ========================================================================================
+    // CONTROLLER related functions
+    // ----------------------------------------------------------------------------------------
+    virtual void  setBoostAI     (bool boosted) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual bool  getBoostAI     () const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns the controller of this kart. */
+    virtual Controller* getController() OVERRIDE { return m_controller; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the controller of this kart (const version). */
+    const Controller* getController() const OVERRIDE { return m_controller; }
+
+    // ========================================================================================
+    // LOCATION ON-TRACK related functions
+    // ----------------------------------------------------------------------------------------
+    /** Returns the coordinates of the front of the kart. This is used for
+     *  determining when the lap line is crossed. */
+    virtual const Vec3& getFrontXYZ() const OVERRIDE { return m_xyz_front; }
+    // -----------------------------------------------------------------------------------------
+    /** Returns a bullet transform object located at the kart's position
+        and oriented in the direction the kart is going. Can be useful
+        e.g. to calculate the starting point and direction of projectiles. */
+    virtual btTransform getAlignedTransform(const float customPitch=-1) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns the start transform, i.e. position and rotation. */
+    const btTransform& getResetTransform() const {return m_reset_transform;}
+    // ----------------------------------------------------------------------------------------
+    /** True if the wheels are touching the ground. */
+    virtual bool isOnGround() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns true if the kart is close to the ground, used to dis/enable
+     *  the upright constraint to allow for more realistic explosions. */
+    bool isNearGround() const;
+    // ----------------------------------------------------------------------------------------
     /** Returns the normal of the terrain the kart is over atm. This is
      *  defined even if the kart is flying. */
     virtual const Vec3& getNormal() const OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the position 0.25s before */
-    virtual const Vec3& getPreviousXYZ() const OVERRIDE;
-    // ------------------------------------------------------------------------
+    virtual const Vec3& getPreviousXYZ() const OVERRIDE
+            { return m_previous_xyz[m_xyz_history_size-1]; }
+    // ----------------------------------------------------------------------------------------
     /** Returns a more recent different previous position */
     virtual const Vec3& getRecentPreviousXYZ() const OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns the time at which the recent previous position occured */
-    virtual const float getRecentPreviousXYZTime() const OVERRIDE;
-    // ------------------------------------------------------------------------
+    virtual const float getRecentPreviousXYZTime() const OVERRIDE
+            { return m_previous_xyz_times[m_xyz_history_size/5]; }
+    // ----------------------------------------------------------------------------------------
     /** For debugging only: check if a kart is flying. */
     bool isFlying() const { return m_flying;  }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+    /** Returns whether this kart is jumping. */
+    virtual bool isJumping() const OVERRIDE { return m_is_jumping; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the terrain info oject. */
+    virtual const TerrainInfo *getTerrainInfo() const OVERRIDE { return m_terrain_info; }
+
+    // ========================================================================================
+    // ----------------------------------------------------------------------------------------
+    /** Returns a pointer to this kart's graphical effects. */
+    virtual KartGFX* getKartGFX() OVERRIDE         { return m_kart_gfx.get(); }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the current position of this kart in the race. */
+    virtual int getPosition() const OVERRIDE { return m_race_position; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the initial position of this kart. */
+    virtual int getInitialPosition () const OVERRIDE { return m_initial_position; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the finished time for a kart. */
+    virtual float getFinishTime () const OVERRIDE { return m_finish_time; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns true if this kart has finished the race. */
+    virtual bool hasFinishedRace () const OVERRIDE { return m_finished_race; }
+    // -----------------------------------------------------------------------------------------
+    /** Returns the color used for this kart. */
+    const irr::video::SColor &getColor() const;
+    // ----------------------------------------------------------------------------------------
+    virtual RaceManager::KartType getType() const OVERRIDE { return m_type; }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the bullet vehicle which represents this kart. */
+    virtual btKart *getVehicle() const OVERRIDE { return m_vehicle.get(); }
+    // ----------------------------------------------------------------------------------------
+    virtual btQuaternion getVisualRotation() const OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    /** Returns the slipstream object of this kart. */
+    virtual const SlipStream* getSlipstream() const OVERRIDE { return m_slipstream.get(); }
+    // ----------------------------------------------------------------------------------------
+    /** Returns the slipstream object of this kart. */
+    virtual SlipStream* getSlipstream() OVERRIDE  {return m_slipstream.get(); }
+    // ----------------------------------------------------------------------------------------
+    /** Activates a slipstream effect, atm that is display some nitro. */
+    virtual void setSlipstreamEffect(float f) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual bool isEliminated() const OVERRIDE { return m_eliminated; }
+    // ----------------------------------------------------------------------------------------
+    virtual void eliminate() OVERRIDE;
+    // ----------------------------------------------------------------------------------------
+    virtual void setOnScreenText(const core::stringw& text) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
     /** Returns whether this kart wins or loses. */
     virtual bool getRaceResult() const OVERRIDE { return m_race_result;  }
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Set this kart race result. */
     void setRaceResult();
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     /** Returns whether this kart is a ghost (replay) kart. */
     virtual bool isGhostKart() const OVERRIDE { return false;  }
-    // ------------------------------------------------------------------------
-    /** Returns whether this kart is jumping. */
-    virtual bool isJumping() const OVERRIDE { return m_is_jumping; };
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     SFXBase* getNextEmitter();
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     virtual void playSound(SFXBuffer* buffer) OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
     virtual bool isVisible() const OVERRIDE;
-    // ------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------------------
+    /** Shows the star effect for a certain time. */
+    virtual void showStarEffect(float t) OVERRIDE;
+    // ----------------------------------------------------------------------------------------
     virtual Stars* getStarsEffect() const OVERRIDE
                                                { return m_stars_effect.get(); }
+    // ------------------------------------------------------------------------
+    /** Return the confirmed finish ticks (sent by the server)
+     *  indicating that this kart has really finished the race. */
+    int getNetworkConfirmedFinishTicks() const OVERRIDE
+                                   { return m_network_confirmed_finish_ticks; }
 
 };   // Kart
 

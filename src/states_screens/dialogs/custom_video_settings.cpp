@@ -178,6 +178,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         ModalDialog::dismiss();
         OptionsScreenVideo::getInstance()->updateGfxSlider();
+        OptionsScreenVideo::getInstance()->updateBlurSlider();
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "dynamiclight")

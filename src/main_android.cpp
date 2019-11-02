@@ -70,18 +70,18 @@ void override_default_params_for_mobile()
     {
     case ACONFIGURATION_SCREENSIZE_SMALL:
     case ACONFIGURATION_SCREENSIZE_NORMAL:
-        UserConfigParams::m_multitouch_scale = 1.3f;
-        UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
+        UserConfigParams::m_multitouch_scale.setDefaultValue(1.3f);
+        UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.1f);
         UserConfigParams::m_font_size = 5.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_LARGE:
-        UserConfigParams::m_multitouch_scale = 1.2f;
-        UserConfigParams::m_multitouch_sensitivity_x = 0.15f;
+        UserConfigParams::m_multitouch_scale.setDefaultValue(1.2f);
+        UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.15f);
         UserConfigParams::m_font_size = 5.0f;
         break;
     case ACONFIGURATION_SCREENSIZE_XLARGE:
-        UserConfigParams::m_multitouch_scale = 1.1f;
-        UserConfigParams::m_multitouch_sensitivity_x = 0.2f;
+        UserConfigParams::m_multitouch_scale.setDefaultValue(1.1f);
+        UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.2f);
         UserConfigParams::m_font_size = 4.0f;
         break;
     default:
@@ -112,8 +112,8 @@ void getConfigForDevice(const char* dev)
     if (device.find("iPhone") != std::string::npos)
     {
         // Normal configuration default
-        UserConfigParams::m_multitouch_scale = 1.3f;
-        UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
+        UserConfigParams::m_multitouch_scale.setDefaultValue(1.3f);
+        UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.1f);
         UserConfigParams::m_font_size = 5.0f;
         device.erase(0, 6);
         auto versions = StringUtils::splitToUInt(device, ',');
@@ -136,16 +136,16 @@ void getConfigForDevice(const char* dev)
                 )
             {
                 // Those phones have small screen
-                UserConfigParams::m_multitouch_scale = 1.45f;
+                UserConfigParams::m_multitouch_scale.setDefaultValue(1.45f);
             }
         }
     }
     else if (device.find("iPad") != std::string::npos)
     {
         // Normal configuration default
-        UserConfigParams::m_multitouch_scale = 1.1f;
-        UserConfigParams::m_multitouch_sensitivity_x = 0.2f;
-        UserConfigParams::m_font_size = 4.0f;
+        UserConfigParams::m_multitouch_scale.setDefaultValue(1.1f);
+        UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.2f);
+        UserConfigParams::m_font_size = 3.0f;
         device.erase(0, 4);
         auto versions = StringUtils::splitToUInt(device, ',');
         if (versions.size() == 2)
@@ -161,8 +161,8 @@ void getConfigForDevice(const char* dev)
     {
         // All iPod touch has small screen
         UserConfigParams::m_font_size = 5.0f;
-        UserConfigParams::m_multitouch_scale = 1.45f;
-        UserConfigParams::m_multitouch_sensitivity_x = 0.1f;
+        UserConfigParams::m_multitouch_scale.setDefaultValue(1.45f);
+        UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.1f);
         device.erase(0, 4);
         auto versions = StringUtils::splitToUInt(device, ',');
         if (versions.size() == 2)

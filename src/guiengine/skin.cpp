@@ -1247,21 +1247,16 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 if (widget->m_properties[PROP_ID] == RibbonWidget::NO_ITEM_ID)
                     return;
 
-                int grow = 45;
                 static float glow_effect = 0;
-
 
                 const float dt = GUIEngine::getLatestDt();
                 glow_effect += dt * 3;
                 if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-                grow = (int)(45 + 10 * sinf(glow_effect));
-
-
+                float grow = 10.0f * sinf(glow_effect);
 
                 const int glow_center_x = rect.UpperLeftCorner.X
                     + rect.getWidth() / 2;
-                const int glow_center_y = rect.UpperLeftCorner.Y
-                    + rect.getHeight() - 5;
+                const int glow_center_y = rect.LowerRightCorner.Y;
 
                 ITexture* tex_ficonhighlight =
                     SkinConfig::m_render_params["focusHalo::neutral"]
@@ -1271,11 +1266,12 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
                 core::recti source_area(0, 0, texture_w, texture_h);
 
-
-                const core::recti rect2(glow_center_x - 45 - grow,
-                    glow_center_y - 25 - grow / 2,
-                    glow_center_x + 45 + grow,
-                    glow_center_y + 25 + grow / 2);
+                float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+                int size = (int)((90.0f + grow) * scale);
+                const core::recti rect2(glow_center_x - size,
+                                        glow_center_y - size / 2,
+                                        glow_center_x + size,
+                                        glow_center_y + size / 2);
 
                 draw2DImage(tex_ficonhighlight, rect2,
                     source_area,
@@ -1600,13 +1596,12 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
     if (focused)
     {
-        int grow = 45;
         static float glow_effect = 0;
 
         const float dt = GUIEngine::getLatestDt();
         glow_effect += dt*3;
         if (glow_effect > 6.2832f /* 2*PI */) glow_effect -= 6.2832f;
-        grow = (int)(45 + 10*sinf(glow_effect));
+        float grow = 10*sinf(glow_effect);
 
         const int glow_center_x = rect.UpperLeftCorner.X+rect.getWidth()/2;
         const int glow_center_y = rect.LowerRightCorner.Y;
@@ -1618,11 +1613,12 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
         core::recti source_area = core::recti(0, 0, texture_w, texture_h);
 
-
-        const core::recti rect2(glow_center_x - 45 - grow,
-                                glow_center_y - 25 - grow/2,
-                                glow_center_x + 45 + grow,
-                                glow_center_y + 25 + grow/2);
+        float scale = (float)irr_driver->getActualScreenSize().Height / 1080.0f;
+        int size = (int)((90.0f + grow) * scale);
+        const core::recti rect2(glow_center_x - size,
+                                glow_center_y - size / 2,
+                                glow_center_x + size,
+                                glow_center_y + size / 2);
 
         draw2DImage(tex_ficonhighlight, rect2,
                                             source_area,

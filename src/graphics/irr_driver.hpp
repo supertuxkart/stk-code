@@ -215,6 +215,7 @@ public:
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
     scene::IMesh         *getMesh(const std::string &name);
     void displayFPS();
+    void displayStoryModeTimer();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColorf &light,
                                           bool force_SH_computation = true);

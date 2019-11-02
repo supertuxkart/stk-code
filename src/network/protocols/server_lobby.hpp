@@ -80,13 +80,15 @@ private:
 
     bool m_ip_ban_table_exists;
 
+    bool m_ipv6_ban_table_exists;
+
     bool m_online_id_ban_table_exists;
 
     bool m_ip_geolocation_table_exists;
 
-    uint64_t m_last_cleanup_db_time;
+    uint64_t m_last_poll_db_time;
 
-    void cleanupDatabase();
+    void pollDatabase();
 
     bool easySQLQuery(const std::string& query,
         std::function<void(sqlite3_stmt* stmt)> bind_function = nullptr) const;
@@ -325,6 +327,7 @@ private:
     void clientSelectingAssetsWantsToBackLobby(Event* event);
     void kickPlayerWithReason(STKPeer* peer, const char* reason) const;
     void testBannedForIP(STKPeer* peer) const;
+    void testBannedForIPv6(STKPeer* peer) const;
     void testBannedForOnlineId(STKPeer* peer, uint32_t online_id) const;
     void writeDisconnectInfoTable(STKPeer* peer);
     void writePlayerReport(Event* event);

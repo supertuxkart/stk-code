@@ -638,7 +638,6 @@ void MainLoop::run()
  */
 void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 {
-    return;
 #ifdef SERVER_ONLY
     return;
 #else
@@ -647,6 +646,11 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
     {
         return;
     }
+    // Atm ignore all input when loading only
+    irr_driver->getDevice()->setEventReceiver(NULL);
+    irr_driver->getDevice()->run();
+    irr_driver->getDevice()->setEventReceiver(GUIEngine::EventHandler::get());
+    return;
     // Rendering past phase 7000 causes the minimap to not work
     // on higher graphical settings
     if (phase > 7000)

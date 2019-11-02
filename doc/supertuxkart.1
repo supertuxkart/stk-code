@@ -1,0 +1,581 @@
+.TH "SUPERTUXKART" "1" "10/20/2019" "SuperTuxKart 1.0" "SuperTuxKart Manual"
+.SH NAME
+supertuxkart \(em a fun racing game with go-karts
+.SH SYNOPSIS
+.PP
+supertuxkart [options] [<args>]
+.SH OPTIONS
+.PP
+This program accepts some optional parameters.
+
+." TODO: Fix indentation for inner "sub-options" as
+." '--gp=NAME' under '-t'. // 2019
+
+.PP
+.BR \-N ", " \-\-no\-start\-screen
+.RS 4
+Immediately start race without showing a menu.
+.RE
+
+.PP
+.BR \-R ", " \-\-race\-now
+.RS 4
+Same as \-N but also skip the ready\-set\-go phase and the music.
+.RE
+
+.PP
+.BR \-t ", " \-\-track=NAME
+.RS 4
+Start track NAME.
+.RE
+
+.PP
+.BR \-\-gp=NAME
+.RS 4
+Start the specified Grand Prix.
+.RE
+.PP
+.BR \-\-add\-gp\-dir=DIR
+.RS 4
+Load Grand Prix files in DIR. Setting will be saved
+in config.xml under additional_gp_directory. Use
+"\-\-add\-gp\-dir=" to unset.
+.RE
+.PP
+.BR \-\-stk\-config=FILE
+.RS 4
+use ./data/FILE instead of ./data/stk_config.xml
+.RE
+.PP
+.BR \-k ", " \-\-numkarts=NUM
+.RS 4
+Set number of karts on the race track.
+.RE
+.PP
+.BR \-\-kart=NAME
+.RS 4
+Use kart NAME.
+.RE
+.PP
+.BR \-\-ai=a,b,...
+.RS 4
+Use the karts a, b, ... for the AI, and additional player kart.
+.RE
+.PP
+.BR \-\-aiNP=a,b,...
+.RS 4
+Use the karts a,b, ... for the AI, no additional player kart.
+.RE
+.PP
+.BR \-\-laps=N
+.RS 4
+Define number of laps to N.
+.RE
+.PP
+.BR \-\-mode=N
+.RS 4
+N=0 Normal, N=1 Time trial, N=2 Battle, N=3 Soccer,
+N=4 Follow The Leader. In configure server use "\-\-battle\-mode=N"
+for battle server and "\-\-soccer\-timed" / goals for soccer server
+to control verbosely, see below.
+.RE
+.PP
+.BR \-\-difficulty=N
+.RS 4
+N=0 Beginner, N=1 Intermediate, N=2 Expert, N=3 SuperTux.
+.RE
+.PP
+.BR \-\-battle\-mode=N
+.RS 4
+Specify battle mode in network, 0 is Free\-For\-All and
+1 is Capture The Flag.
+.RE
+.PP
+.BR \-\-soccer\-timed
+.RS 4
+Use time limit mode in network soccer game.
+.RE
+.PP
+.BR \-\-soccer\-goals
+.RS 4
+Use goals limit mode in network soccer game.
+.RE
+.PP
+.BR \-\-reverse
+.RS 4
+Play track in reverse (if allowed)
+.RE
+.PP
+.BR \-f ", " \-\-fullscreen
+.RS 4
+Use fullscreen display.
+.RE
+.PP
+.BR \-w ", " \-\-windowed
+.RS 4
+Use windowed display (default).
+.RE
+.PP
+.BR \-s ", " \-\-screensize=WxH
+.RS 4
+Set the display size (e.g. 320x200).
+.RE
+.PP
+.BR \-v ", " \-\-version
+.RS 4
+Print version of SuperTuxKart.
+.RE
+.PP
+.BR \-\-trackdir=DIR
+.RS 4
+A directory from which additional tracks are
+loaded.
+.RE
+.PP
+.BR \-\-seed=N
+.RS 4
+Seed for random number generation to provide reproducible behavior.
+.RE
+.PP
+.BR \-\-profile\-laps=N
+.RS 4
+Enable automatic driven profile mode for N laps.
+.RE
+.PP
+.BR \-\-profile\-time=N
+.RS 4
+Enable automatic driven profile mode for N seconds.
+.RE
+.PP
+.BR \-\-unlock\-all
+.RS 4
+Permanently unlock all karts and tracks for testing.
+.RE
+.PP
+.BR \-\-no\-unlock\-all
+.RS 4
+Disable unlock\-all (i.e. base unlocking on player achievement).
+.RE
+.PP
+.BR \-\-no\-graphics
+.RS 4
+Do not display the actual race.
+.RE
+.PP
+.BR \-\-sp\-shader\-debug
+.RS 4
+Enables debug in sp shader, it will print all unavailable uniforms.
+.RE
+.PP
+.BR \-\-demo\-mode=t
+.RS 4
+Enables demo mode after t seconds of idle time in main menu.
+.RE
+.PP
+.BR \-\-demo\-tracks=t1,t2
+.RS 4
+List of tracks to be used in demo mode. No spaces are allowed in
+the track names.
+.RE
+.PP
+.BR \-\-demo\-laps=N
+.RS 4
+Number of laps to use in a demo.
+.RE
+.PP
+.BR \-\-demo\-karts=N
+.RS 4
+Number of karts to use in a demo.
+.RE
+.PP
+." .BR \-\-history
+." Replay history file 'history.dat'.
+." .BR \-\-test\-ai=N
+." Use the test\-ai for every n\-th AI kart.
+." (so n=1 means all Ais will be the test ai)
+."
+." .BR \-\-disable\-item\-collection
+." Disable item collection. Useful for
+." debugging client/server item management.
+." .BR \-\-network\-item\-debugging
+." Print item handling debug information.
+.BR \-\-server\-config=file
+.RS 4
+Specify the server_config.xml for server hosting,
+it will create one if not found.
+.RE
+.PP
+.BR \-\-network\-console
+.RS 4
+Enable network console.
+.RE
+.PP
+.BR \-\-wan\-server=NAME
+.RS 4
+Start a Wan server (not a playing client).
+.RE
+.PP
+.BR \-\-public\-server
+.RS 4
+Allow direct connection to the server (without STK server)
+.RE
+.PP
+.BR \-\-lan\-server=NAME
+.RS 4
+Start a LAN server (not a playing client).
+.RE
+.PP
+.BR \-\-server\-password=PASS
+.RS 4
+Sets a password for a server (both client and server).
+.RE
+.PP
+.BR \-\-connect\-now=IP
+.RS 4
+Connect to a server with IP known now (in format
+x.x.x.x:xxx(port)), the port should be its public port.
+.RE
+.PP
+.BR \-\-connect\-now6=IP
+.RS 4
+Connect to a server with IPv6 known now (in format
+[x:x:x:x:x:x:x:x]:xxx(port)), the port should be its
+public port.
+.RE
+.PP
+.BR \-\-server\-id=N
+.RS 4
+Server id in STK addons for "\-\-connect\-now".
+.RE
+.PP
+.BR \-\-network\-ai=N
+.RS 4
+Numbers of AI for connecting to linear race server, used
+together with "\-\-connect\-now".
+.RE
+.PP
+.BR \-\-login=S
+.RS 4
+Automatically log in (set the login).
+.RE
+.PP
+.BR \-\-password=S
+.RS 4
+Automatically log in (set the password).
+.RE
+.PP
+.BR \-\-init\-user
+.RS 4
+Save the above login and password (if set) in config.
+.RE
+.PP
+.BR \-\-disable\-polling
+.RS 4
+Don't poll for logged in user.
+.RE
+.PP
+.BR \-\-port=N
+.RS 4
+Port number to use.
+.RE
+.PP
+.BR \-\-auto\-connect
+.RS 4
+Automatically connect to first server and start race.
+.RE
+.PP
+.BR \-\-max\-players=N
+.RS 4
+Maximum number of clients (server only).
+.RE
+.PP
+.BR \-\-min\-players=N
+.RS 4
+Minimum number of clients for ownerless server (server only).
+.RE
+.PP
+.BR \-\-motd
+.RS 4
+Message showing in all lobby of clients, can specify a .txt file.
+.RE
+.PP
+.BR \-\-auto\-end
+.RS 4
+Automatically end network game after 1st player finished
+for some time (currently his finished time * 0.25 + 15.0).
+.RE
+.PP
+.BR \-\-no\-auto\-end
+.RS 4
+Don't automatically end network game after 1st player finished.
+.RE
+.PP
+.BR \-\-team\-choosing
+.RS 4
+Enable choosing team in lobby for team game.
+.RE
+.PP
+.BR \-\-no\-team\-choosing
+.RS 4
+Disable choosing team in lobby for team game.
+.RE
+.PP
+.BR \-\-network\-gp=N
+.RS 4
+Specify number of tracks used in network grand prix.
+.RE
+.PP
+.BR \-\-graphical\-server
+.RS 4
+Enable graphical view in server.
+.RE
+.PP
+.BR \-\-no\-validation
+.RS 4
+Allow non validated and unencrypted connection in wan.
+.RE
+.PP
+.BR \-\-ranked
+.RS 4
+Server will submit ranking to STK addons server.
+.RE
+.PP
+.BR \-\-no\-ranked
+.RS 4
+Server will not submit ranking to STK addons server. You
+require permission for that.
+.RE
+.PP
+.BR \-\-owner\-less
+.RS 4
+Race will autostart and no one can kick players in server.
+.RE
+.PP
+.BR \-\-no\-owner\-less
+.RS 4
+Race will not autostart and server owner can kick players in server.
+.RE
+.PP
+.BR \-\-firewalled\-server
+.RS 4
+Turn on all stun related code in server.
+.RE
+.PP
+.BR \-\-no\-firewalled\-server
+.RS 4
+Turn off all stun related code in server.
+.RE
+.PP
+.BR \-\-connection\-debug
+.RS 4
+Print verbose info for sending or receiving packets.
+.RE
+.PP
+.BR \-\-no\-console\-log
+.RS 4
+Does not write messages in the console but to stdout.log.
+.RE
+.PP
+.BR \-h ", "\-\-help
+.RS 4
+Show this help.
+.RE
+.PP
+.BR \-\-log=N
+.RS 4
+Set the verbosity to a value between 0 (Debug) and 5 (Only
+Fatal messages).
+.RE
+.PP
+.BR \-\-logbuffer=N
+.RS 4
+Buffers up to N lines log lines before writing.
+.RE
+.PP
+.BR \-\-root=DIR
+.RS 4
+Path to add to the list of STK root directories. You can
+specify more than one by separating them with colons (:).
+.RE
+.PP
+.BR \-\-cutscene=NAME
+.RS 4
+Launch the specified track as a cutscene. This is for internal
+debugging use only.
+.RE
+.PP
+.BR \-\-enable\-glow
+.RS 4
+Enable glow effect.
+.RE
+.PP
+.BR \-\-disable\-glow
+.RS 4
+Disable glow effect.
+.RE
+.PP
+.BR \-\-enable\-bloom
+.RS 4
+Enable bloom effect.
+.RE
+.PP
+.BR \-\-disable\-bloom
+.RS 4
+Disable bloom effect.
+.RE
+.PP
+.BR \-\-enable\-light\-shaft
+.RS 4
+Enable light shafts (God rays).
+.RE
+.PP
+.BR \-\-disable\-light\-shaft
+.RS 4
+Disable light shafts (God rays).
+.RE
+.PP
+.BR \-\-enable\-dof
+.RS 4
+Enable depth of field.
+.RE
+.PP
+.BR \-\-disable\-dof
+.RS 4
+Disable depth of field.
+.RE
+.PP
+.BR \-\-enable\-particles
+.RS 4
+Enable particles.
+.RE
+.PP
+.BR \-\-disable\-particles
+.RS 4
+Disable particles.
+.RE
+.PP
+.BR \-\-enable\-animated\-characters
+.RS 4
+Enable animated characters.
+.RE
+.PP
+.BR \-\-disable\-animated\-characters
+.RS 4
+Disable animated characters.
+.RE
+.PP
+.BR \-\-enable\-motion\-blur
+.RS 4
+Enable motion blur.
+.RE
+.PP
+.BR \-\-disable\-motion\-blur
+.RS 4
+Disable motion blur.
+.RE
+.PP
+.BR \-\-enable\-mlaa
+.RS 4
+Enable anti\-aliasing.
+.RE
+.PP
+.BR \-\-disable\-mlaa
+.RS 4
+Disable anti\-aliasing.
+.RE
+.PP
+.BR \-\-enable\-texture\-compression
+.RS 4
+Enable texture compression.
+.RE
+.PP
+.BR \-\-disable\-texture\-compression
+.RS 4
+Disable texture compression.
+.RE
+.PP
+.BR \-\-enable\-ssao
+.RS 4
+Enable screen space ambient occlusion.
+.RE
+.PP
+.BR \-\-disable\-ssao
+.RS 4
+Disable screen space ambient occlusion.
+.RE
+.PP
+.BR \-\-enable\-ibl
+.RS 4
+Enable image based lighting.
+.RE
+.PP
+.BR \-\-disable\-ibl
+.RS 4
+Disable image based lighting.
+.RE
+.PP
+.BR \-\-enable\-hd\-textures
+.RS 4
+Enable high definition textures.
+.RE
+.PP
+.BR \-\-disable\-hd\-textures
+.RS 4
+Disable high definition textures.
+.RE
+.PP
+.BR \-\-enable\-dynamic\-lights
+.RS 4
+Enable advanced pipeline.
+.RE
+.PP
+.BR \-\-disable\-dynamic\-lights
+.RS 4
+Disable advanced pipeline.
+.RE
+.PP
+.BR \-\-anisotropic=N
+.RS 4
+Anisotropic filtering quality (0 to disable). Takes
+precedence over trilinear or bilinear texture filtering.
+.RE
+.PP
+.BR \-\-shadows=N
+.RS 4
+Set resolution of shadows (0 to disable).
+.RE
+.PP
+.BR \-\-apitrace
+.RS 4
+This will disable buffer storage and writing gpu query
+strings to opengl, which can be seen later in apitrace.
+.RE
+
+.SH "AUTHOR"
+.PP
+This manual page was based an earlier one written by Gonéri Le Bouder
+<goneri@rulezlan.org> (2006, GPLv2) for the GNU/Linux Debian Operating System,
+in addition to the official SuperTuxKart command-line options, Steve Baker
+<sjbaker1@airmail.net> (2004-2015, GPL v3), Joerg Henrichs, Marianne Gagnon
+(2011-2015, GPLv3). Edited by J. T-Katiska (2019, GPLv3).
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 3
+of the License, or (at your option) any later version.
+
+.PP
+On Debian systems, the complete text of the GNU General Public
+License can be found in /usr/share/common-licenses/GPL.
+
+.SH "NOTES"
+
+.IP "1." 4
+STK homepage: https://supertuxkart.net/Main_Page
+.IP "2." 4
+The SuperTuxKart official FAQ: https://supertuxkart.net/FAQ
+.IP "3." 4
+Previous manual page:
+https://web.archive.org/save/https://manpages.debian.org/buster/supertuxkart/supertuxkart.6.en.html
+
+.\" created by instant / docbook-to-man, edited afterwards

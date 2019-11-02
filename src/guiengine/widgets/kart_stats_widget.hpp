@@ -31,7 +31,7 @@
 #include "guiengine/widgets/skill_level_widget.hpp"
 
 class KartProperties;
-enum PerPlayerDifficulty : uint8_t;
+enum HandicapLevel : uint8_t;
 
 namespace GUIEngine
 {
@@ -41,6 +41,18 @@ namespace GUIEngine
       */
     class KartStatsWidget : public Widget
     {
+    public:
+
+        enum Stats
+        {
+            SKILL_MASS,
+            SKILL_SPEED,
+            SKILL_ACCELERATION,
+            SKILL_NITRO_EFFICIENCY,
+            SKILL_COUNT
+        };
+
+    private:
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getWidthNeededAroundLabel()  const { return 35; }
@@ -58,17 +70,11 @@ namespace GUIEngine
 
         std::vector<SkillLevelWidget*> m_skills;
 
+        void setSkillValues(Stats skill_type, float value, const std::string icon_name,
+                            const std::string skillbar_propID, const irr::core::stringw icon_tooltip);
+
 
     public:
-
-        enum Stats
-        {
-            SKILL_MASS,
-            SKILL_SPEED,
-            SKILL_ACCELERATION,
-            SKILL_NITRO_EFFICIENCY,
-            SKILL_COUNT
-        };
 
         LEAK_CHECK()
 
@@ -96,7 +102,7 @@ namespace GUIEngine
          * inside itself */
         void setSize(const int x, const int y, const int w, const int h);
 
-        void setValues(const KartProperties* props, PerPlayerDifficulty d);
+        void setValues(const KartProperties* props, HandicapLevel h);
 
         void hideAll();
 

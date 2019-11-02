@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include <string.h>
 #ifdef WIN32
 #ifdef __GNUC__
 #    include <ws2tcpip.h>    // Mingw / gcc on windows
@@ -26,6 +27,7 @@
 extern "C"
 {
    WINSOCK_API_LINKAGE  PCSTR WSAAPI inet_ntop(INT Family, PVOID pAddr, PSTR pStringBuf, size_t StringBufSize);
+   WINSOCK_API_LINKAGE  INT WSAAPI inet_pton(INT Family, PCSTR pszAddrString, PVOID pAddrBuf);
 }
 
 #else
@@ -126,7 +128,53 @@ extern "C" int getaddrinfo_compat(const char* hostname,
 #else
     return getaddrinfo(hostname, servname, hints, res);
 #endif
-}
+}   // getaddrinfo_compat
+
+// ----------------------------------------------------------------------------
+void andIPv6(struct in6_addr* ipv6, const struct in6_addr* mask)
+{
+    for (unsigned i = 0; i < sizeof(struct in6_addr); i++)
+        ipv6->s6_addr[i] &= mask->s6_addr[i];
+}   // andIPv6
+
+// ----------------------------------------------------------------------------
+extern "C" int insideIPv6CIDR(const char* ipv6_cidr, const char* ipv6_in)
+{
+    const char* mask_location = strchr(ipv6_cidr, '/');
+    if (mask_location == NULL)
+        return 0;
+    struct in6_addr v6_in;
+    if (inet_pton(AF_INET6, ipv6_in, &v6_in) != 1)
+        return 0;
+
+    char ipv6[INET6_ADDRSTRLEN] = {};
+    memcpy(ipv6, ipv6_cidr, mask_location - ipv6_cidr);
+    struct in6_addr cidr;
+    if (inet_pton(AF_INET6, ipv6, &cidr) != 1)
+        return 0;
+
+    int mask_length = atoi(mask_location + 1);
+    if (mask_length > 128 || mask_length <= 0)
+        return 0;
+
+    struct in6_addr mask = {};
+    for (int i = mask_length, j = 0; i > 0; i -= 8, j++)
+    {
+        if (i >= 8)
+            mask.s6_addr[j] = 0xff;
+        else
+            mask.s6_addr[j] = (unsigned long)(0xffU << (8 - i));
+    }
+
+    andIPv6(&cidr, &mask);
+    andIPv6(&v6_in, &mask);
+    for (unsigned i = 0; i < sizeof(struct in6_addr); i++)
+    {
+        if (cidr.s6_addr[i] != v6_in.s6_addr[i])
+            return 0;
+    }
+    return 1;
+}   // andIPv6
 
 #ifndef ENABLE_IPV6
 #include "network/stk_ipv6.hpp"

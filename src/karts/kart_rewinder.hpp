@@ -35,7 +35,7 @@ private:
 public:
     KartRewinder(const std::string& ident, unsigned int world_kart_id,
                  int position, const btTransform& init_transform,
-                 PerPlayerDifficulty difficulty,
+                 HandicapLevel handicap,
                  std::shared_ptr<RenderInfo> ri);
     ~KartRewinder() {}
     virtual void saveTransform() OVERRIDE;

@@ -101,6 +101,9 @@ class TrackInfoScreen : public GUIEngine::Screen,
     int m_icon_unknown_kart;
 
     void updateHighScores();
+    void setSoccerWidgets(bool has_AI);
+    void setSoccerTarget(bool time_limit);
+    void soccerSpinnerUpdate(bool blue_spinner);
 
 public:
     TrackInfoScreen();

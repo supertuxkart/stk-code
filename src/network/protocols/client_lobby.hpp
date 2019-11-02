@@ -31,7 +31,7 @@
 
 enum PeerDisconnectInfo : unsigned int;
 enum KartTeam : int8_t;
-enum PerPlayerDifficulty : uint8_t;
+enum HandicapLevel : uint8_t;
 
 class BareNetworkString;
 class Server;
@@ -42,7 +42,7 @@ struct LobbyPlayer
     int m_local_player_id;
     uint32_t m_host_id;
     KartTeam m_kart_team;
-    PerPlayerDifficulty m_difficulty;
+    HandicapLevel m_handicap;
     uint32_t m_online_id;
     /* Icon used in networking lobby, see NetworkingLobby::loadedFromFile. */
     int m_icon_id;
@@ -128,6 +128,8 @@ private:
 
     std::vector<LobbyPlayer> m_lobby_players;
 
+    std::vector<float> m_ranking_changes;
+
     irr::core::stringw m_total_players;
 
     void liveJoinAcknowledged(Event* event);
@@ -136,7 +138,7 @@ private:
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
          decodePlayers(const BareNetworkString& data,
          std::shared_ptr<STKPeer> peer = nullptr,
-         bool* is_specator = NULL) const;
+         bool* is_spectator = NULL) const;
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
@@ -178,6 +180,8 @@ public:
                                       { return m_server_enabled_track_voting; }
     bool serverEnabledReportPlayer() const
                                      { return m_server_enabled_report_player; }
+    const std::vector<float>& getRankingChanges() const
+                                                  { return m_ranking_changes; }
 };
 
 #endif // CLIENT_LOBBY_HPP

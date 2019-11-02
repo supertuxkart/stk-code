@@ -102,9 +102,6 @@ GraphicsRestrictionsType getTypeForName(const std::string &name)
 class Version
 {
 private:
-    /** The array containing the version number. */
-    std::vector<uint32_t> m_version;
-
     // ----------------------------------------------------------------------------
     /** Searches for the first number in the string, then converts the rest of the
      *  string into a tuple. E.g. "Build 12.34.56" --> [12,34,56].
@@ -120,6 +117,8 @@ private:
     }   // convertVersionString
 
 public:
+    /** The array containing the version number. */
+    std::vector<uint32_t> m_version;
     // ------------------------------------------------------------------------
     /** Dummy default constructor. */
     Version() {}
@@ -228,12 +227,11 @@ public:
             || card_name.find("Radeon") != std::string::npos)
         {
             std::vector<std::string> s = StringUtils::split(driver_version, ' ');
-            if (s.size() == 5)
+            if (s.size() == 5 || s.size() == 6)
             {
                 convertVersionString(s[4]);
                 return;
             }
-
         }
 
         // ATI: other drivers use "4.0.10188 Core Profile Context"
@@ -268,68 +266,47 @@ public:
     {
         return !this->operator==(other);
     }   // operator!=
-    // ------------------------------------------------------------------------
-    /** If *this < other. */
-    bool operator< (const Version &other) const
-    {
-        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
-        for (unsigned int i = 0; i<min_n; i++)
-        {
-            if (m_version[i] > other.m_version[i]) return false;
-            if (m_version[i] < other.m_version[i]) return true;
-        }
-        if (m_version.size() >= other.m_version.size())
-            return false;
-        else
-            return true;
-    }   // operator<
-    // ------------------------------------------------------------------------
-    /** If *this <= other. */
-    bool operator<= (const Version &other) const
-    {
-        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
-        for (unsigned int i = 0; i<min_n; i++)
-        {
-            if (m_version[i] > other.m_version[i]) return false;
-            if (m_version[i] < other.m_version[i]) return true;
-        }
-        if (m_version.size() > other.m_version.size())
-            return false;
-        else
-            return true;
-    }   // operator<=
-    // ------------------------------------------------------------------------
-    /** If *this > other. */
-    bool operator> (const Version &other) const
-    {
-        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
-        for (unsigned int i = 0; i<min_n; i++)
-        {
-            if (m_version[i] > other.m_version[i]) return true;
-            if (m_version[i] < other.m_version[i]) return false;
-        }
-        if (m_version.size() > other.m_version.size())
-            return true;
-        else
-            return false;
-    }   // operator>
-    // ------------------------------------------------------------------------
-    /** If *this >= other. */
-    bool operator>= (const Version &other) const
-    {
-        unsigned int min_n = (unsigned int)std::min(m_version.size(), other.m_version.size());
-        for (unsigned int i = 0; i<min_n; i++)
-        {
-            if (m_version[i] > other.m_version[i]) return true;
-            if (m_version[i] < other.m_version[i]) return false;
-        }
-        if (m_version.size() >= other.m_version.size())
-            return true;
-        else
-            return false;
-    }   // operator>=
 
 };   // class Version
+
+// ------------------------------------------------------------------------
+/** Compares two version numbers. If  left < right. */
+bool operator< (const Version &left, const Version &right)
+{
+    unsigned int min_n = (unsigned int)std::min(left.m_version.size(), right.m_version.size());
+    for (unsigned int i = 0; i<min_n; i++)
+    {
+        if (left.m_version[i] > right.m_version[i]) return false;
+        if (left.m_version[i] < right.m_version[i]) return true;
+    }
+    return (left.m_version.size() < right.m_version.size());
+}   // operator<
+// ------------------------------------------------------------------------
+/** Compares two version numbers. If left > right. */
+bool operator> (const Version &left, const Version &right)
+{
+    unsigned int min_n = (unsigned int)std::min(left.m_version.size(), right.m_version.size());
+    for (unsigned int i = 0; i<min_n; i++)
+    {
+        if (left.m_version[i] > right.m_version[i]) return true;
+        if (left.m_version[i] < right.m_version[i]) return false;
+    }
+    return (left.m_version.size() > right.m_version.size());
+}   // operator>
+// ------------------------------------------------------------------------
+/** Compares two version numbers. If left <= right. */
+bool operator<= (const Version &left, const Version &right)
+{
+    return !(left > right);
+}   // operator<=
+
+// ------------------------------------------------------------------------
+/** Compares two version numbers. If *this >= other. */
+bool operator>= (const Version &left, const Version &right)
+{
+    return !(left < right);
+}   // operator>=
+
 // ============================================================================
 class Rule : public NoCopy
 {
@@ -371,33 +348,23 @@ public:
         m_card_test = CARD_IGNORE;
 
         if (rule->get("is", &m_card_name))
-        {
             m_card_test = CARD_IS;
-        }
         else if (rule->get("contains", &m_card_name))
-        {
             m_card_test = CARD_CONTAINS;
-        }
 
         rule->get("os", &m_os);
         rule->get("vendor", &m_vendor);
 
         std::string s;
-        
+
         if (rule->get("version", &s) && s.size() > 1)
-        {
             addVersion(s);
-        }
-        
+
         if (rule->get("version2", &s) && s.size() > 1)
-        {
             addVersion(s);
-        }
 
         if (rule->get("disable", &s))
-        {
             m_disable_options = StringUtils::split(s, ' ');
-        }
     }   // Rule
     
     // ------------------------------------------------------------------------

@@ -4,7 +4,9 @@ import org.supertuxkart.stk_dbg.STKEditText;
 
 import android.app.NativeActivity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -178,6 +180,14 @@ public class SuperTuxKartActivity extends NativeActivity
                 hideKeyboardNative(clear_text);
             }
         });
+    }
+    // ------------------------------------------------------------------------
+    /* Called by STK in JNI. */
+    public void openURL(final String url)
+    {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(url));
+        startActivity(i);
     }
     // ------------------------------------------------------------------------
     /* Called by STK in JNI. */

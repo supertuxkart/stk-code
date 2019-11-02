@@ -59,11 +59,11 @@
  */
 LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              const int local_player_id,
-                                             PerPlayerDifficulty d)
+                                             HandicapLevel h)
                      : PlayerController(kart)
 {
     m_has_started = false;
-    m_difficulty = d;
+    m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
     if(m_player)
         m_player->setKart(kart);
@@ -392,8 +392,6 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
         switch(item_state.getType())
         {
         case Item::ITEM_BANANA:
-            m_kart->playSound(m_ugh_sound);
-            break;
         case Item::ITEM_BUBBLEGUM:
             //More sounds are played by the kart class
             //See Kart::collectedItem()
@@ -435,7 +433,7 @@ core::stringw LocalPlayerController::getName() const
         return PlayerController::getName();
 
     core::stringw name = m_player->getProfile()->getName();
-    if (m_difficulty == PLAYER_DIFFICULTY_HANDICAP)
+    if (m_handicap != HANDICAP_NONE)
         name = _("%s (handicapped)", name);
 
     return name;

@@ -80,7 +80,7 @@ private:
 
     // ------------------------------------------------------------------------
     void loadKartProperties(const std::string& new_ident,
-                            PerPlayerDifficulty difficulty,
+                            HandicapLevel handicap,
                             std::shared_ptr<RenderInfo> ri);
 protected:
     btTransform m_starting_transform;
@@ -90,8 +90,8 @@ protected:
     /** The kart properties. */
     std::unique_ptr<KartProperties> m_kart_properties;
 
-    /** The per-player difficulty. */
-    PerPlayerDifficulty m_difficulty;
+    /** The handicap level of this kart. */
+    HandicapLevel m_handicap;
 
     /** This stores a copy of the kart model. It has to be a copy
      *  since otherwise incosistencies can happen if the same kart
@@ -113,7 +113,7 @@ public:
                    AbstractKart(const std::string& ident,
                                 int world_kart_id,
                                 int position, const btTransform& init_transform,
-                                PerPlayerDifficulty difficulty,
+                                HandicapLevel handicap,
                                 std::shared_ptr<RenderInfo> ri);
     virtual       ~AbstractKart();
     // ------------------------------------------------------------------------
@@ -143,17 +143,16 @@ public:
     // ========================================================================
     /** Change to new kart instancely (used in network live join). */
     virtual void changeKart(const std::string& new_ident,
-                            PerPlayerDifficulty difficulty,
+                            HandicapLevel handicap,
                             std::shared_ptr<RenderInfo> ri);
     // ========================================================================
-    // Access to the per-player difficulty.
+    // Access to the handicap.
     // ------------------------------------------------------------------------
-    /** Returns the per-player difficulty of this kart. */
-    const PerPlayerDifficulty getPerPlayerDifficulty() const
-                            { return m_difficulty; }
+    /** Returns the handicap of this kart. */
+    const HandicapLevel getHandicap() const { return m_handicap; }
     // ------------------------------------------------------------------------
-    /** Sets the per-player difficulty. */
-    void setPerPlayerDifficulty(const PerPlayerDifficulty d) { m_difficulty=d; }
+    /** Sets the handicap. */
+    void setHandicap(const HandicapLevel h) { m_handicap=h; }
 
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
@@ -545,6 +544,10 @@ public:
     int getLiveJoinUntilTicks() const              { return m_live_join_util; }
     // ------------------------------------------------------------------------
     void setLiveJoinKart(int util_ticks)     { m_live_join_util = util_ticks; }
+    // ------------------------------------------------------------------------
+    /** Return the confirmed finish ticks (sent by the server)
+     *  indicating that this kart has really finished the race. */
+    virtual int getNetworkConfirmedFinishTicks() const = 0;
 };   // AbstractKart
 
 

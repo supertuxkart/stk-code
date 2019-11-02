@@ -463,8 +463,11 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
     }
     else if (device == NULL)
     {
-        Log::error("KartSelectionScreen", "joinPlayer(): Received null "
-                  "device pointer");
+        if (!NetworkConfig::get()->isNetworkAITester())
+        {
+            Log::error("KartSelectionScreen", "joinPlayer(): Received null "
+                    "device pointer");
+        }
         return false;
     }
 
@@ -831,7 +834,7 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
 
     if (kp != NULL)
     {
-        w->setValues(kp, m_kart_widgets[widget_id].getDifficulty());
+        w->setValues(kp, m_kart_widgets[widget_id].getHandicap());
         w->update(0);
     }
     else
@@ -1257,9 +1260,9 @@ void KartSelectionScreen::allPlayersDone()
 
         race_manager->setPlayerKart(n, selected_kart);
 
-        // Set per player difficulty if needed
+        // Set handicap if needed
         if (m_multiplayer && UserConfigParams::m_per_player_difficulty)
-            race_manager->setPlayerDifficulty(n, m_kart_widgets[n].getDifficulty());
+            race_manager->setPlayerHandicap(n, m_kart_widgets[n].getHandicap());
     }
 
     // ---- Switch to assign mode

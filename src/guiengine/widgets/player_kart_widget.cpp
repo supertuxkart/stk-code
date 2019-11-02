@@ -51,12 +51,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_parent_screen = parent;
 
     m_associated_player = associated_player;
-    x_speed = 1.0f;
-    y_speed = 1.0f;
-    w_speed = 1.0f;
-    h_speed = 1.0f;
+    x_speed = y_speed = w_speed = h_speed = 1.0f;
     m_ready = false;
-    m_difficulty = PLAYER_DIFFICULTY_NORMAL;
+    m_handicap = HANDICAP_NONE;
     m_not_updated_yet = true;
 
     m_irrlicht_widget_id = irrlicht_widget_id;
@@ -472,12 +469,12 @@ bool PlayerKartWidget::isReady()
 }   // isReady
 
 // ------------------------------------------------------------------------
-/** \return Per player difficulty */
-PerPlayerDifficulty PlayerKartWidget::getDifficulty()
+/** \return Handicap */
+HandicapLevel PlayerKartWidget::getHandicap()
 {
     assert(m_magic_number == 0x33445566);
-    return m_difficulty;
-}   // getDifficulty
+    return m_handicap;
+}   // getHandicap
 
 // -------------------------------------------------------------------------
 /** Updates the animation (moving/shrinking/etc.) */
@@ -630,19 +627,19 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
             m_associated_player->setPlayerProfile(profile);
             if(UserConfigParams::m_per_player_difficulty && spinner_value % 2 != 0)
             {
-                m_difficulty = PLAYER_DIFFICULTY_HANDICAP;
+                m_handicap = HANDICAP_MEDIUM;
                 m_model_view->setBadge(ANCHOR_BADGE);
                 m_kart_stats->setValues(
                     kart_properties_manager->getKart(m_kart_internal_name),
-                    PLAYER_DIFFICULTY_HANDICAP);
+                    HANDICAP_MEDIUM);
             }
             else
             {
-                m_difficulty = PLAYER_DIFFICULTY_NORMAL;
+                m_handicap = HANDICAP_NONE;
                 m_model_view->unsetBadge(ANCHOR_BADGE);
                 m_kart_stats->setValues(
                     kart_properties_manager->getKart(m_kart_internal_name),
-                    PLAYER_DIFFICULTY_NORMAL);
+                    HANDICAP_NONE);
             }
             m_model_view->getModelViewRenderInfo()->setHue(
                 m_associated_player->getConstProfile()->getDefaultKartColor());
@@ -752,11 +749,11 @@ EventPropagation PlayerKartWidget::onSpinnerConfirmed()
 // -------------------------------------------------------------------------
 void PlayerKartWidget::enableHandicapForNetwork()
 {
-    m_difficulty = PLAYER_DIFFICULTY_HANDICAP;
+    m_handicap = HANDICAP_MEDIUM;
     m_model_view->setBadge(ANCHOR_BADGE);
     m_kart_stats->setValues(
         kart_properties_manager->getKart(m_kart_internal_name),
-        PLAYER_DIFFICULTY_HANDICAP);
+        HANDICAP_MEDIUM);
     core::stringw label = _("%s (handicapped)",
         m_player_ident_spinner->getCustomText());
     m_player_ident_spinner->setCustomText(label);

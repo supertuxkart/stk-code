@@ -18,7 +18,7 @@
 
 #include "script_track.hpp"
 
-#include "animations/three_d_animation.hpp"
+#include "config/user_config.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
@@ -44,6 +44,13 @@ namespace Scripting
 
     namespace GUI
     {
+        enum RaceGUIType
+        {
+            RGT_KEYBOARD_GAMEPAD = 0,
+            RGT_STEERING_WHEEL = 1,
+            RGT_ACCELEROMETER = 2,
+            RGT_GYROSCOPE = 3,
+        };
         /** \addtogroup Scripting
         * @{
         */
@@ -161,6 +168,20 @@ namespace Scripting
         {
             return translate(formatString, arg1, arg2, arg3);
         }
+
+        RaceGUIType getRaceGUIType()
+        {
+            if (UserConfigParams::m_multitouch_draw_gui)
+            {
+                if (UserConfigParams::m_multitouch_controls == 1)
+                    return RGT_STEERING_WHEEL;
+                else if (UserConfigParams::m_multitouch_controls == 2)
+                    return RGT_ACCELEROMETER;
+                else if (UserConfigParams::m_multitouch_controls == 3)
+                    return RGT_GYROSCOPE;
+            }
+            return RGT_KEYBOARD_GAMEPAD;
+        }
         /** \endcond */
         
         void registerScriptFunctions(asIScriptEngine *engine)
@@ -182,7 +203,11 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void clearOverlayMessages()", 
                                                mp ? WRAP_FN(clearOverlayMessages) : asFUNCTION(clearOverlayMessages), 
                                                call_conv); assert(r >= 0);
-                                               
+
+            r = engine->RegisterGlobalFunction("RaceGUIType getRaceGUIType()",
+                                               mp ? WRAP_FN(getRaceGUIType) : asFUNCTION(getRaceGUIType),
+                                               call_conv); assert(r >= 0);
+
             r = engine->RegisterGlobalFunction("string getKeyBinding(int input)", 
                                                mp ? WRAP_FN(getKeyBinding) : asFUNCTION(getKeyBinding), 
                                                call_conv); assert(r >= 0);
@@ -229,6 +254,11 @@ namespace Scripting
             engine->RegisterEnumValue("PlayerAction", "MENU_RIGHT", PA_MENU_RIGHT);
             engine->RegisterEnumValue("PlayerAction", "MENU_SELECT", PA_MENU_SELECT);
             engine->RegisterEnumValue("PlayerAction", "MENU_CANCEL", PA_MENU_CANCEL);
+            engine->RegisterEnum("RaceGUIType");
+            engine->RegisterEnumValue("RaceGUIType", "KEYBOARD_GAMEPAD", RGT_KEYBOARD_GAMEPAD);
+            engine->RegisterEnumValue("RaceGUIType", "STEERING_WHEEL", RGT_STEERING_WHEEL);
+            engine->RegisterEnumValue("RaceGUIType", "ACCELEROMETER", RGT_ACCELEROMETER);
+            engine->RegisterEnumValue("RaceGUIType", "GYROSCOPE", RGT_GYROSCOPE);
         }
     }
 

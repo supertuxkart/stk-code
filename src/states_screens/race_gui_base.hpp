@@ -149,7 +149,10 @@ private:
 
     /** The referee scene node. */
     Referee *m_referee;
-    
+
+    /* True if spectating is possible in current GUI (when local player
+     * finished). */
+    bool m_enabled_network_spectator;
 
 protected:
 

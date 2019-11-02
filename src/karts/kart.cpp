@@ -84,6 +84,7 @@
 #include "tracks/track_manager.hpp"
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
+#include "utils/helpers.hpp"
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -112,9 +113,9 @@
  */
 Kart::Kart (const std::string& ident, unsigned int world_kart_id,
             int position, const btTransform& init_transform,
-            PerPlayerDifficulty difficulty, std::shared_ptr<RenderInfo> ri)
+            HandicapLevel handicap, std::shared_ptr<RenderInfo> ri)
      : AbstractKart(ident, world_kart_id, position, init_transform,
-             difficulty, ri)
+             handicap, ri)
 
 #if defined(WIN32) && !defined(__CYGWIN__) && !defined(__MINGW32__)
 #  pragma warning(1:4355)
@@ -230,10 +231,10 @@ void Kart::init(RaceManager::KartType type)
 
 // ----------------------------------------------------------------------------
 void Kart::changeKart(const std::string& new_ident,
-                      PerPlayerDifficulty difficulty,
+                      HandicapLevel handicap,
                       std::shared_ptr<RenderInfo> ri)
 {
-    AbstractKart::changeKart(new_ident, difficulty, ri);
+    AbstractKart::changeKart(new_ident, handicap, ri);
     m_kart_model->setKart(this);
 
 #ifdef SERVER_ONLY
@@ -326,7 +327,6 @@ void Kart::reset()
 
     m_network_finish_check_ticks = 0;
     m_network_confirmed_finish_ticks = 0;
-    m_enabled_network_spectator = false;
     // Add karts back in case that they have been removed (i.e. in battle
     // mode) - but only if they actually have a body (e.g. ghost karts
     // don't have one).
@@ -1016,7 +1016,7 @@ void Kart::finishedRace(float time, bool from_server)
         RaceGUIBase* m = World::getWorld()->getRaceGUI();
         if (m)
         {
-            bool won_the_race = false;
+            bool won_the_race = false, too_slow = false;
             unsigned int win_position = 1;
 
             if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -1026,8 +1026,12 @@ void Kart::finishedRace(float time, bool from_server)
                 World::getWorld()->getNumKarts() > win_position)
                 won_the_race = true;
 
-            m->addMessage((won_the_race ?
-            _("You won the race!") : _("You finished the race!")) ,
+            if (race_manager->hasTimeTarget() && m_finish_time > race_manager->getTimeTarget())
+                too_slow = true;
+
+            m->addMessage((too_slow     ? _("You were too slow!") :
+                           won_the_race ? _("You won the race!")  :
+                                          _("You finished the race!")),
             this, 2.0f, video::SColor(255, 255, 255, 255), true, true, true);
         }
     }
@@ -1325,17 +1329,14 @@ void Kart::eliminate()
     }
 
     if (m_attachment)
-    {
         m_attachment->clear();
-    }
 
     if (m_slipstream)
-    {
         m_slipstream->reset();
-    }
 
     m_kart_gfx->setCreationRateAbsolute(KartGFX::KGFX_TERRAIN, 0);
     m_kart_gfx->setGFXInvisible();
+
     if (m_engine_sound)
         m_engine_sound->stop();
 
@@ -1343,9 +1344,7 @@ void Kart::eliminate()
 
 #ifndef SERVER_ONLY
     if (m_shadow)
-    {
         m_shadow->update(false);
-    }
 #endif
     m_node->setVisible(false);
 }   // eliminate
@@ -1369,51 +1368,13 @@ void Kart::update(int ticks)
         m_saved_controller = NULL;
     }
 
-    auto cl = LobbyProtocol::get<ClientLobby>();
-    // Enable spectate mode after 2 seconds which allow player to
-    // release left / right button if they keep pressing it during
-    // finishing line (1 second here because m_network_finish_check_ticks is
-    // already 1 second ahead of time when crossing finished line)
-
-    if (cl && m_finished_race && m_controller->isLocalPlayerController() &&
-        race_manager->getNumLocalPlayers() == 1 &&
-        race_manager->modeHasLaps() &&
-        World::getWorld()->isActiveRacePhase() &&
-        m_network_confirmed_finish_ticks > 0 &&
-        World::getWorld()->getTicksSinceStart() >
-        m_network_confirmed_finish_ticks + stk_config->time2Ticks(1.0f) &&
-        !m_enabled_network_spectator)
-    {
-        m_enabled_network_spectator = true;
-        cl->setSpectator(true);
-
-        static bool msg_shown = false;
-        if (!msg_shown)
-        {
-            msg_shown = true;
-
-            RaceGUIBase* m = World::getWorld()->getRaceGUI();
-
-            if (m->getMultitouchGUI() != NULL)
-            {
-                m->recreateMultitouchGUI();
-            }
-            else
-            {
-                cl->addSpectateHelperMessage();
-            }
-        }
-    }
-
     m_powerup->update(ticks);
 
     // Reset any instant speed increase in the bullet kart
     m_vehicle->resetMaxSpeed();
 
     if (m_bubblegum_ticks > 0)
-    {
         m_bubblegum_ticks -= ticks;
-    }
 
     // This is to avoid a rescue immediately after an explosion
     const bool has_animation_before = m_kart_animation != NULL;
@@ -1518,17 +1479,17 @@ void Kart::update(int ticks)
 #endif
 
     // if its view is blocked by plunger, decrease remaining time
-    if(m_view_blocked_by_plunger > 0) m_view_blocked_by_plunger -= ticks;
-    //unblock the view if kart just became shielded
-    if(isShielded())
+    if(m_view_blocked_by_plunger > 0)
     {
-        m_view_blocked_by_plunger = 0;
+        m_view_blocked_by_plunger -= ticks;
+        //unblock the view if kart just became shielded
+        if(isShielded())
+            m_view_blocked_by_plunger = 0;
     }
-    // Decrease remaining invulnerability time
+
+    // Decrease the remaining invulnerability time
     if(m_invulnerable_ticks>0)
-    {
         m_invulnerable_ticks -= ticks;
-    }
 
     if (!RewindManager::get()->isRewinding())
         m_slipstream->update(ticks);
@@ -1546,9 +1507,7 @@ void Kart::update(int ticks)
         speed.setY(speed.getY() * 0.25f); // or 0.0f for sharp neutralization of yaw
         speed.setZ(speed.getZ() * 0.95f);
         m_body->setAngularVelocity(speed);
-        // This one keeps the kart pointing "100% as launched" instead,
-        // like in ski jump sports, too boring but also works.
-        //m_body->setAngularVelocity(btVector3(0,0,0));
+
         // When the kart is jumping, linear damping reduces the falling speed
         // of a kart so much that it can appear to be in slow motion. So
         // disable linear damping if a kart is in the air
@@ -1560,8 +1519,7 @@ void Kart::update(int ticks)
                            m_kart_properties->getStabilityChassisAngularDamping());
     }
 
-    // Used to prevent creating a rescue animation after an explosion animation
-    // got deleted
+    // Used to prevent creating a rescue animation after an explosion animation got deleted
 
     m_attachment->update(ticks);
 
@@ -1614,9 +1572,7 @@ void Kart::update(int ticks)
     }
 
     if (m_body->getBroadphaseHandle())
-    {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
-    }
 
     // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
@@ -1654,33 +1610,23 @@ void Kart::update(int ticks)
     // Update physics from newly updated material
     PROFILER_PUSH_CPU_MARKER("Kart::updatePhysics", 0x60, 0x34, 0x7F);
     const Material* material = m_terrain_info->getMaterial();
-    // Update gravity of kart first, as updateSliding in updatePhysics needs
-    // the newly set gravity to test for sliding
-    if (!material)   // kart falling off the track
+
+    // First update the gravity of the kart, as updateSliding in updatePhysics
+    // need the newly set gravity to test for sliding.
+    if (!m_flying)
     {
-        if (!m_flying)
+        float g = Track::getCurrentTrack()->getGravity();
+        Vec3 gravity(0.0f, -g, 0.0f);
+        btRigidBody *body = getVehicle()->getRigidBody();
+
+        // If the material should overwrite the gravity,
+        if (material && material->hasGravity())
         {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0, -g, 0);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            body->setGravity(gravity);
+            Vec3 normal = m_terrain_info->getNormal();
+            gravity = normal * -g;
         }
-    }
-    else
-    {
-        if (!m_flying)
-        {
-            float g = Track::getCurrentTrack()->getGravity();
-            Vec3 gravity(0.0f, -g, 0.0f);
-            btRigidBody *body = getVehicle()->getRigidBody();
-            // If the material should overwrite the gravity,
-            if (material->hasGravity())
-            {
-                Vec3 normal = m_terrain_info->getNormal();
-                gravity = normal * -g;
-            }
-            body->setGravity(gravity);
-        }   // if !flying
+
+        body->setGravity(gravity);
     }
     updatePhysics(ticks);
     PROFILER_POP_CPU_MARKER();
@@ -3134,7 +3080,13 @@ void Kart::kartIsInRestNow()
 
 SFXBase* Kart::getNextEmitter()
 {
-    m_emitter_id = (m_emitter_id + 1) % 3;
+    m_emitter_id = (m_emitter_id + 1) % EMITTER_COUNT;
+
+    // The emitter is requested when a new sound is to be played.
+    // Always reset the volume to 1.0f (full), as crashes may
+    // have altered it. See issue #3596
+    m_emitters[m_emitter_id]->setVolume(1.0f);
+
     return m_emitters[m_emitter_id];
 }
 
@@ -3315,54 +3267,34 @@ void Kart::updateGraphics(float dt)
     // leaning might get less if a kart gets a special that increases
     // its maximum speed, but not the current speed (by much). On the
     // other hand, that ratio can often be greater than 1.
+
     float speed_frac = m_speed / m_kart_properties->getEngineMaxSpeed();
-    if(speed_frac>1.0f)
-        speed_frac = 1.0f;
-    else if (speed_frac < 0.0f)  // no leaning when backwards driving
-        speed_frac = 0.0f;
-
-    const float steer_frac = m_skidding->getSteeringFraction();
-
+    float steer_frac = m_skidding->getSteeringFraction();
     const float roll_speed = m_kart_properties->getLeanSpeed() * DEGREE_TO_RAD;
 
-    if(speed_frac > 0.8f && fabsf(steer_frac)>0.5f)
+    if(speed_frac > 0.8f && fabsf(steer_frac)>0.2f)
     {
-        // Use steering ^ 7, which means less effect at lower
-        // steering
+        // Use steering and speed ^ 2,
+        // which means less effect at lower steering and speed.
+        speed_frac = std::min(speed_frac - 0.6f, 1.0f);
+        steer_frac = (steer_frac+0.25f)*0.8f;
         const float f = m_skidding->getSteeringFraction();
-        const float f2 = f*f;
         const float max_lean = -m_kart_properties->getLeanMax() * DEGREE_TO_RAD
-                             * f2*f2*f2*f
-                             * speed_frac;
-        if(max_lean>0)
-        {
-            m_current_lean += dt* roll_speed;
-            if(m_current_lean > max_lean)
-                m_current_lean = max_lean;
-        }
-        else if(max_lean<0)
-        {
-            m_current_lean -= dt*roll_speed;
-            if(m_current_lean < max_lean)
-                m_current_lean = max_lean;
-        }
+                             * f * speed_frac * speed_frac;
+
+        int max_lean_sign = extract_sign(max_lean);
+        m_current_lean += max_lean_sign * dt* roll_speed;
+        if(  (max_lean > 0 && m_current_lean > max_lean)
+           ||(max_lean < 0 && m_current_lean < max_lean)) 
+            m_current_lean = max_lean;
     }
     else if(m_current_lean!=0.0f)
     {
         // Disable any potential roll factor that is still applied
-        // --------------------------------------------------------
-        if(m_current_lean>0)
-        {
-            m_current_lean -= dt * roll_speed;
-            if(m_current_lean < 0.0f)
-                m_current_lean = 0.0f;
-        }
-        else
-        {
-            m_current_lean += dt * roll_speed;
-            if(m_current_lean>0.0f)
-                m_current_lean = 0.0f;
-        }
+        int lean_sign = extract_sign(m_current_lean);
+        m_current_lean -= lean_sign * dt * roll_speed;
+        if (lean_sign != extract_sign(m_current_lean))
+            m_current_lean = 0.0f;
     }
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
@@ -3461,19 +3393,11 @@ void Kart::setOnScreenText(const core::stringw& text)
 
 // ------------------------------------------------------------------------
 /** Returns the normal of the terrain the kart is over atm. This is
-  * defined even if the kart is flying.
-  */
+  * defined even if the kart is flying. */
 const Vec3& Kart::getNormal() const
 {
     return m_terrain_info->getNormal();
-}   // getNormal
-
-// ------------------------------------------------------------------------
-/** Returns the position 0.25s before */
-const Vec3& Kart::getPreviousXYZ() const
-{
-    return m_previous_xyz[m_xyz_history_size-1];
-}   // getPreviousXYZ
+} // getNormal
 
 // ------------------------------------------------------------------------
 /** Returns a more recent different previous position */
@@ -3483,13 +3407,6 @@ const Vec3& Kart::getRecentPreviousXYZ() const
     //irregular on some tracks whose roads are not smooth enough
     return m_previous_xyz[m_xyz_history_size/5];
 }   // getRecentPreviousXYZ
-
-// ------------------------------------------------------------------------
-/** Returns the time at which the recent previoux position occured */
-const float Kart::getRecentPreviousXYZTime() const
-{
-    return m_previous_xyz_times[m_xyz_history_size/5];
-}   // getRecentPreviousXYZTime
 
 // ------------------------------------------------------------------------
 void Kart::playSound(SFXBuffer* buffer)
@@ -3502,12 +3419,12 @@ void Kart::playSound(SFXBuffer* buffer)
 const video::SColor& Kart::getColor() const
 {
     return m_kart_properties->getColor();
-}   // getColor
+} // getColor
 
 // ------------------------------------------------------------------------
 bool Kart::isVisible() const
 {
     return m_node && m_node->isVisible();
-}   // isVisible
+} // isVisible
 
 /* EOF */
