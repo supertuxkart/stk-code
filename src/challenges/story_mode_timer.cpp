@@ -30,7 +30,20 @@ StoryModeTimer *story_mode_timer = 0;
 StoryModeTimer::StoryModeTimer()
 {
     m_player_tested           = false;
-    reset();
+    m_valid_speedrun_ended    = false;
+    m_story_mode_ended        = false;
+    m_stored_speedrun_milliseconds   = 0;
+    m_stored_story_mode_milliseconds = 0;
+    m_valid_speedrun_started  = false;
+    m_story_mode_started      = false;
+    m_speedrun_pause_active   = false;
+    m_story_mode_pause_active = false;
+    m_loading_pause           = false;
+    m_player_can_speedrun     = false;
+    m_speedrun_milliseconds   = 0;
+    m_story_mode_milliseconds = 0;
+    m_speedrun_total_pause_time = 0;
+    m_story_mode_total_pause_time = 0;
 }  // SpeedrunTimer
 
 void StoryModeTimer::reset()

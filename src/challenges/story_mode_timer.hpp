@@ -50,8 +50,6 @@ private:
     uint64_t m_speedrun_total_pause_time;
     uint64_t m_story_mode_total_pause_time;
 
-    void reset();
-
     void testPlayerRun();
 
     void pauseSpeedrunTimer();
@@ -71,6 +69,7 @@ public:
     void pauseTimer(bool loading);
     void unpauseTimer(bool loading);
     void updateTimer();
+    void reset();
 
     void playerHasChanged();
     std::string getTimerString();
