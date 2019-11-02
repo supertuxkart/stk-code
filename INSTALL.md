@@ -145,11 +145,11 @@ Open your file browser and find somewhere you want to put the development versio
 
 5. If you got the development version go to SuperTuxKart-dev in your file browser, right-click somewhere empty, select "Git clone..." and paste <https://github.com/supertuxkart/dependencies.git> in the URL field; click OK. When finished, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory; rename the latter to `dependencies-64bit` if you want to compile a 64-bit build.
 
-6. Download CMake from here: [CMake - download page](https://cmake.org/download/), install it; once CMake is installed, double click on the CMake icon on your desktop, and point it towards your `stk-code` directory in the 'Where is the source code' field, and point it to a new directory called `build` or `bld` inside the stk-code directory.
+6. Download CMake from here: [CMake - download page](https://cmake.org/download/), install it; once CMake is installed, double click on the CMake icon on your desktop, and point it towards your `stk-code` directory in the 'Where is the source code' field, and point 'Where to build the binaries' to a new directory called `build` or `bld` inside the stk-code directory.
 
 7. Press 'Configure'; CMake will ask you if it is OK to create the aforementioned directory, press `Yes`. CMake will then ask you about your version of Visual Studio.
 
-    Confirm your selection; *Please look at the table below to avoid confusion between version numbers and releases of Visual Studio*; CMake will begin creating the required files for the build in the directory. If you want to do a 64-bit build, select the version of Visual Studio you installed with "Win64" appended.
+    Confirm your selection; *Please look at the table below to avoid confusion between version numbers and releases of Visual Studio*; CMake will begin creating the required files for the build in the directory. If you want to do a 64-bit build, select the version of Visual Studio you installed with "Win64" appended. Press 'Generate' button.
 
 8. Navigate to your build directory and open the `SuperTuxKart.sln` file; Visual Studio will now load the solution.
 
@@ -161,6 +161,7 @@ Open your file browser and find somewhere you want to put the development versio
 
 Visual Studio Release | Version
 ----------------------|------------
+Visual Studio 2019| 16
 Visual Studio 2017| 15
 Visual Studio 2015| 14
 Visual Studio 2013| 13
