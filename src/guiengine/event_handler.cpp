@@ -509,7 +509,7 @@ void EventHandler::navigate(const NavigationDirection nav, const int playerID)
         {
             ListWidget* list = (ListWidget*) closest_widget;
             assert(list != NULL);
-            list->setSelectionID(nav == NAV_UP ? list->getItemCount() - 1 : 0);
+            list->focusHeader(nav);
         }
         // Similar exception for vertical tabs, only apply when entering with down/up
         if (closest_widget->m_type == GUIEngine::WTYPE_RIBBON && (nav == NAV_UP || nav == NAV_DOWN))

@@ -47,6 +47,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sort_col = 0;
     m_sortable = true;
     m_header_created = false;
+    m_choosing_header = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -360,6 +361,9 @@ irr::core::stringw ListWidget::getSelectionLabel(const int cell) const
 
 void ListWidget::selectItemWithLabel(const irr::core::stringw& name)
 {
+    // Disable focusing header for choosing
+    m_choosing_header = false;
+
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
     return list->setSelectedByCellText( name.c_str() );
@@ -392,6 +396,9 @@ void ListWidget::setSelectionID(const int index)
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
+
+    // Disable focusing header for choosing
+    m_choosing_header = false;
 
     CGUISTKListBox* irritem = getIrrlichtElement<CGUISTKListBox>();
 
@@ -527,7 +534,7 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 
         m_sort_col = originator[(m_properties[PROP_ID] + "_column_").size()] - '0';
         m_selected_column = m_header_elements.get(m_sort_col);
-
+        m_choosing_header = true;
         /** \brief Allows sort icon to change depending on sort order **/
 
         /*
@@ -560,6 +567,57 @@ EventPropagation ListWidget::downPressed(const int playerID)
     return moveToNextItem(/*reverse*/ false);
 } // downPressed
 
+// -----------------------------------------------------------------------------
+
+EventPropagation ListWidget::leftPressed(const int playerID)
+{
+    if (m_deactivated || !m_choosing_header)
+        return EVENT_BLOCK;
+
+    m_sort_col--;
+    repairSortCol();
+    m_sort_default = true;
+    m_selected_column = m_header_elements.get(m_sort_col);
+    m_selected_column->setFocusForPlayer(0);
+
+    return EVENT_LET;
+} // upPressed
+
+// -----------------------------------------------------------------------------
+
+EventPropagation ListWidget::rightPressed(const int playerID)
+{
+    if (m_deactivated || !m_choosing_header)
+        return EVENT_BLOCK;
+
+    m_sort_col++;
+    repairSortCol();
+    m_sort_default = true;
+    m_selected_column = m_header_elements.get(m_sort_col);
+    m_selected_column->setFocusForPlayer(0);
+
+    return EVENT_LET;
+} // downPressed
+
+// -----------------------------------------------------------------------------
+
+void ListWidget::focusHeader(const NavigationDirection nav)
+{
+    if (m_header.empty() || getItemCount() == 0)
+    {
+        setSelectionID(nav == NAV_UP ? getItemCount() - 1 : 0);
+    }
+    else
+    {
+        repairSortCol();
+        m_selected_column = m_header_elements.get(m_sort_col);
+        m_selected_column->setFocusForPlayer(0);
+        m_choosing_header = true;
+    }
+}
+
+// -----------------------------------------------------------------------------
+
 EventPropagation ListWidget::moveToNextItem(const bool reverse)
 {
     // if widget is deactivated, do nothing
@@ -570,6 +628,11 @@ EventPropagation ListWidget::moveToNextItem(const bool reverse)
 
     if (stay_within_list)
     {
+        if (m_choosing_header)
+        {
+            m_choosing_header = false;
+            setFocusForPlayer(0);
+        }
         if (reverse)
             setSelectionID(getSelectionID() - 1);
         else
@@ -578,6 +641,17 @@ EventPropagation ListWidget::moveToNextItem(const bool reverse)
     }
     else
     {
+        if (reverse && !m_choosing_header &&
+            m_sort_col < (int)m_header_elements.size())
+        {
+            // Up pressed
+            repairSortCol();
+            m_selected_column = m_header_elements.get(m_sort_col);
+            m_selected_column->setFocusForPlayer(0);
+            setSelectionID(-1); // select nothing
+            m_choosing_header = true;
+            return EVENT_LET;
+        }
         setSelectionID(-1); // select nothing
     }
     return EVENT_BLOCK;

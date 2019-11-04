@@ -1822,20 +1822,20 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
                           Widget* widget)
 {
 #ifndef SERVER_ONLY
+    ListWidget* list = static_cast<ListWidget*>(widget->m_event_handler);
     bool isSelected =
-         (((ListWidget*)widget->m_event_handler)->m_selected_column == widget &&
-         ((ListWidget*)widget->m_event_handler)->m_sort_default == false);
+        (list->m_selected_column == widget && list->m_choosing_header);
 
     drawBoxFromStretchableTexture(widget, rect,
             (isSelected ? SkinConfig::m_render_params["list_header::down"]
                         : SkinConfig::m_render_params["list_header::neutral"]),
             false, NULL /* clip */);
 
-    if (isSelected)
+    if (list->m_selected_column == widget && !list->m_sort_default)
     {
         /** \brief img sets the icon for the column according to sort order **/
         ITexture* img;
-        if (((ListWidget*)widget->m_event_handler)->m_sort_desc)
+        if (list->m_sort_desc)
             img =
                 SkinConfig::m_render_params["list_sort_down::neutral"].getImage();
         else

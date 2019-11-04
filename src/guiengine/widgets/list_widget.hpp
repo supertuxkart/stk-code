@@ -68,7 +68,9 @@ namespace GUIEngine
         
         /** index of column*/
         int m_sort_col;
-        
+
+        bool m_choosing_header;
+
         struct Column
         {
             irr::core::stringw m_text;
@@ -95,6 +97,16 @@ namespace GUIEngine
         bool m_sortable;
 
         bool m_header_created;
+
+        void repairSortCol()
+        {
+            // Exclude scrollbar
+            int max_size = (int)m_header_elements.size() - 1;
+            if (m_sort_col < 0)
+                m_sort_col = max_size - 1;
+            else if (m_sort_col >= max_size)
+                m_sort_col = 0;
+        }
 
     public:
         typedef irr::gui::CGUISTKListBox::ListItem ListItem;
@@ -266,6 +278,12 @@ namespace GUIEngine
         /** \brief implementing method from base class Widget */
         virtual EventPropagation downPressed(const int playerID);
 
+        /** \brief implementing method from base class Widget */
+        virtual EventPropagation leftPressed(const int playerID);
+
+        /** \brief implementing method from base class Widget */
+        virtual EventPropagation rightPressed(const int playerID);
+
         /** \brief implement common core parts of upPressed and downPressed */ 
         EventPropagation moveToNextItem(const bool down);
         
@@ -282,6 +300,8 @@ namespace GUIEngine
         void addColumn(irr::video::ITexture* tex, int proportion=1) { m_header.push_back( Column(tex, proportion) ); }
 
         void setSortable(bool sortable) { m_sortable = sortable; }
+        void focusHeader(const NavigationDirection nav);
+
     };
 }
 
