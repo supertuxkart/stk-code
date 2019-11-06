@@ -67,9 +67,15 @@ void KartRewinder::reset()
 {
     Kart::reset();
     Rewinder::reset();
-    SmoothNetworkBody::setEnable(true);
-    SmoothNetworkBody::setSmoothRotation(true);
-    SmoothNetworkBody::setAdjustVerticalOffset(true);
+    // Can be null for the first time
+    if (getController() && !getController()->isLocalPlayerController())
+    {
+        SmoothNetworkBody::setEnable(true);
+        SmoothNetworkBody::setSmoothRotation(true);
+        SmoothNetworkBody::setAdjustVerticalOffset(true);
+    }
+    else
+        SmoothNetworkBody::setEnable(false);
     m_has_server_state = false;
 }   // reset
 

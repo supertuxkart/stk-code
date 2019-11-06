@@ -3207,7 +3207,8 @@ void Kart::updateGraphics(float dt)
     // Disable smoothing network body so it doesn't smooth the animation
     // for karts in client
     if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isClient())
+        NetworkConfig::get()->isClient() &&
+        (!getController() || !getController()->isLocalPlayerController()))
     {
         if (m_kart_animation && SmoothNetworkBody::isEnabled())
         {
