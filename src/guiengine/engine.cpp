@@ -1425,9 +1425,12 @@ namespace GUIEngine
         // This will avoid no response in windows, also allow showing loading
         // icon in apple device, because apple device only update render
         // buffer if you poll the mainloop
-        g_device->setEventReceiver(NULL);
-        g_device->run();
-        g_device->setEventReceiver(EventHandler::get());
+        if (!ProfileWorld::isNoGraphics())
+        {
+            g_device->setEventReceiver(NULL);
+            g_device->run();
+            g_device->setEventReceiver(EventHandler::get());
+        }
 
         // If launch is finished, pause & display the story mode timers
         if ( !launching)

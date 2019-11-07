@@ -641,8 +641,9 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 #ifdef SERVER_ONLY
     return;
 #else
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isServer()         )
+    if ((NetworkConfig::get()->isNetworking() &&
+        NetworkConfig::get()->isServer()) ||
+        ProfileWorld::isNoGraphics())
     {
         return;
     }
