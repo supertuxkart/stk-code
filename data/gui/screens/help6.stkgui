@@ -32,40 +32,40 @@
                 <spacer height="2%" width="10"/>                
 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mass.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mass.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Mass - there are three classes of karts, depending on their mass: light, medium and heavy. Heavier karts are less affected by parachutes and are more resistant to explosions."/>
                 </div>
                 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/power.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/power.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Acceleration - especially useful at start, after an accident, or in tracks with a lot of sharp curves. The lighter the kart, the faster it accelerates, especially at low speeds."/>
                 </div>
                 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/speed.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/speed.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Max speed - the higher it is, the faster the kart can go. Especially useful in tracks with straight lines and gentle curves. Heavier karts have a higher top speed."/>
                 </div>
 
                 <div width="100%" proportion="3" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/nitro.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/nitro.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="Nitro consumption - the lower it is, the more speed you can get from a can of nitro. The lighter the kart, the lower its nitro consumption."/>
                 </div>
 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="128" height="128" icon="gui/icons/slipstream_icon.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="12%" height="100%" icon="gui/icons/slipstream_icon.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%" word_wrap="true"
                             I18N="In the help menu"
                             text="If you follow closely another kart for a few seconds, you'll get a slipstream speed bonus when you overtake it. The lighter your kart, the easier it is."/>

@@ -150,6 +150,7 @@ void GPInfoScreen::beforeAddingWidget()
         int id_continue_button = ribbonButtons->findItemNamed("continue");
         ribbonButtons->setItemVisible(id_continue_button, true);
         ribbonButtons->setLabel(id_continue_button, _("Reload"));
+        getWidget<IconButtonWidget>("continue")->setImage("gui/icons/restart.png");
     }
 }
 

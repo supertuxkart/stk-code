@@ -32,24 +32,24 @@
                 <spacer height="2%" width="10"/>
                 
                 <div width="100%" proportion="5" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/challenge.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/challenge.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="This icon on the minimap shows the available challenges you've not completed. In the top-right of the screen, it also tells you how many points you currently have. Complete as many challenges as possible, and Nolok will accept to race against you. Win to liberate Gnu!"/>
                 </div>
                 
                 <div width="100%" proportion="4" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/cup_gold.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/cup_gold.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="When you complete a challenge, you get a cup. Each cup is worth several points. The higher the difficulty you completed the challenge in, the better the cup and the more points it is worth."/>
                 </div>
                 
                 <div width="100%" proportion="3" layout="horizontal-row">
-                    <icon align="center" width="64" height="64" icon="gui/icons/mystery_unlock.png"/>
-                    <spacer width="25" height="25"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/mystery_unlock.png"/>
+                    <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
                             text="When you get the number of points indicated below this icon, you'll be gifted a surprise. There are several to collect."/>
