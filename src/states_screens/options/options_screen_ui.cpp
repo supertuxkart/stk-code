@@ -169,18 +169,19 @@ void OptionsScreenUI::loadedFromFile()
     font_size->addLabel(_("Large"));
     //I18N: In the UI options, Very large font size
     font_size->addLabel(_("Very large"));
-    font_size->addLabel(_("Extremely large"));
+    font_size->addLabel(L"Extremely large");
 
     if (UserConfigParams::m_artist_debug_mode)
     {
         // Only show extreme size in artist debug mode
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
     }
     else
     {
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+        font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     }
-    font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "6";
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
