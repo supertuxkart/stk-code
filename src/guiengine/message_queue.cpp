@@ -132,9 +132,9 @@ public:
         const unsigned height = irr_driver->getActualScreenSize().Height;
         gui::IGUIFont* font = GUIEngine::getFont();
         font->initGlyphLayouts(m_message, m_gls);
-        // Reserve space for 5 lines of text, it will occupy the circle
+        // Reserve space for 3 lines of text, it will occupy the circle
         const int max_width = width - (brp.m_left_border +
-            brp.m_right_border) - (font->getHeightPerLine() * 5);
+            brp.m_right_border) - (font->getHeightPerLine() * 3);
         if (max_width < 0)
         {
             m_display_timer = -1;
@@ -147,18 +147,18 @@ public:
             font->getHeightPerLine(), font->getInverseShaping(),
             font->getScale());
 
-        if ((int)dim.Height > font->getHeightPerLine() * 5)
+        if ((int)dim.Height > font->getHeightPerLine() * 3)
         {
-            // Max 5 lines to prevent too long message from network chat
+            // Max 3 lines to prevent too long message from network chat
             int newline_count = 0;
             for (unsigned i = 0; i < m_gls.size(); i++)
             {
                 if (m_gls[i].flags & gui::GLF_NEWLINE)
                 {
-                    if (++newline_count >= 5)
+                    if (++newline_count >= 3)
                     {
                         m_gls.erase(m_gls.begin() + i, m_gls.end());
-                        dim.Height = font->getHeightPerLine() * 5;
+                        dim.Height = font->getHeightPerLine() * 3;
                         break;
                     }
                 }

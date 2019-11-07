@@ -874,7 +874,7 @@ void ClientLobby::handleChat(Event* event)
     {
         if (GUIEngine::getCurrentScreen() == NetworkingLobby::getInstance())
             NetworkingLobby::getInstance()->addMoreServerInfo(message);
-        else
+        else if (UserConfigParams::m_race_chat)
             MessageQueue::add(MessageQueue::MT_GENERIC, message);
     }
 }   // handleChat

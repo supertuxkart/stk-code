@@ -38,6 +38,8 @@ class OptionsScreenGeneral : public GUIEngine::Screen, public GUIEngine::ScreenS
 
     std::vector<std::string> m_skins;
 
+    void setInternetCheckboxes(bool activate);
+
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenGeneral>;
 

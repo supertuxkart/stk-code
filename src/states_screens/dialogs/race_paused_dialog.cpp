@@ -86,7 +86,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
         getWidget("send")->setText(L"\u21B2");
         // Unicode smile emoji
         getWidget("emoji")->setText(L"\u263A");
-        if (UserConfigParams::m_lobby_chat)
+        if (UserConfigParams::m_lobby_chat && UserConfigParams::m_race_chat)
         {
             m_text_box->setActive(true);
             getWidget("send")->setVisible(true);

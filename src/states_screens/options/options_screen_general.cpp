@@ -88,24 +88,9 @@ void OptionsScreenGeneral::init()
     assert( internet_enabled != NULL );
     internet_enabled->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
-    CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-    assert( stats != NULL );
-    stats->setState(UserConfigParams::m_hw_report_enable);
 
-    CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+    setInternetCheckboxes(internet_enabled->getState());
 
-    if(internet_enabled->getState())
-    {
-        stats->setActive(true);
-        stats->setState(UserConfigParams::m_hw_report_enable);
-        chat->setActive(true);
-        chat->setState(UserConfigParams::m_lobby_chat);
-    }
-    else
-    {
-        stats->setActive(false);
-        chat->setActive(false);
-    }
     CheckBoxWidget* handicap = getWidget<CheckBoxWidget>("enable-handicap");
     assert( handicap != NULL );
     handicap->setState( UserConfigParams::m_per_player_difficulty );
@@ -187,36 +172,12 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         // If internet gets enabled, re-initialise the addon manager (which
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
-        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
-        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+        setInternetCheckboxes(internet->getState());
+        PlayerProfile* profile = PlayerManager::getCurrentPlayer();
         if(internet->getState())
-        {
             NewsManager::get()->init(false);
-            stats->setActive(true);
-            stats->setState(UserConfigParams::m_hw_report_enable);
-            chat->setActive(true);
-            chat->setState(UserConfigParams::m_lobby_chat);
-#ifdef MOBILE_STK
-            getWidget("assets_settings")->setActive(true);
-#endif
-        }
-        else
-        {
-            chat->setActive(false);
-            stats->setActive(false);
-#ifdef MOBILE_STK
-            getWidget("assets_settings")->setActive(false);
-#endif
-
-            // Disable this, so that the user has to re-check this if
-            // enabled later (for GDPR compliance).
-            UserConfigParams::m_hw_report_enable = false;
-            stats->setState(false);
-
-            PlayerProfile* profile = PlayerManager::getCurrentPlayer();
-            if (profile != NULL && profile->isLoggedIn())
-                profile->requestSignOut();
-        }
+        else if (profile != NULL && profile->isLoggedIn())
+            profile->requestSignOut();
 
         // Deactivate internet after 'requestSignOut' so that the sign out request is allowed
         if (!internet->getState())
@@ -233,6 +194,13 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
     {
         CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
         UserConfigParams::m_lobby_chat = chat->getState();
+        CheckBoxWidget* race_chat = getWidget<CheckBoxWidget>("enable-race-chat");
+        race_chat->setActive(UserConfigParams::m_lobby_chat);
+    }
+    else if (name=="enable-race-chat")
+    {
+        CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-race-chat");
+        UserConfigParams::m_race_chat = chat->getState();
     }
     else if (name=="show-login")
     {
@@ -271,6 +239,39 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
 #endif
 #endif
 }   // eventCallback
+
+void OptionsScreenGeneral::setInternetCheckboxes(bool activate)
+{
+    CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+    CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
+    CheckBoxWidget* race_chat = getWidget<CheckBoxWidget>("enable-race-chat");
+
+    if (activate)
+    {
+        stats->setActive(true);
+        stats->setState(UserConfigParams::m_hw_report_enable);
+        chat->setActive(true);
+        chat->setState(UserConfigParams::m_lobby_chat);
+        race_chat->setActive(UserConfigParams::m_lobby_chat);
+        race_chat->setState(UserConfigParams::m_race_chat);
+#ifdef MOBILE_STK
+        getWidget("assets_settings")->setActive(true);
+#endif
+        }
+    else
+    {
+        chat->setActive(false);
+        stats->setActive(false);
+        race_chat->setActive(false);
+#ifdef MOBILE_STK
+        getWidget("assets_settings")->setActive(false);
+#endif
+        // Disable this, so that the user has to re-check this if
+        // enabled later (for GDPR compliance).
+        UserConfigParams::m_hw_report_enable = false;
+        stats->setState(false);
+    }
+} // setInternetCheckboxes
 
 // -----------------------------------------------------------------------------
 

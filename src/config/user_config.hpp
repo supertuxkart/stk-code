@@ -792,6 +792,9 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(true, "lobby-chat",
         &m_network_group, "Enable chatting in networking lobby, if off than "
         "no chat message will be displayed from any players."));
+    PARAM_PREFIX BoolUserConfigParam m_race_chat
+        PARAM_DEFAULT(BoolUserConfigParam(true, "race-chat",
+        &m_network_group, "Enable chatting during races."));
     PARAM_PREFIX IntUserConfigParam m_max_players
         PARAM_DEFAULT(IntUserConfigParam(8, "max-players",
         &m_network_group, "Maximum number of players on the server "
