@@ -16,9 +16,9 @@
                          Setting text=" " is important, otherwise the height of the
                          widget is incorrect.                             -->
                 <buttonbar id="operations" width="65%" height="18%" align="center">
-                    <icon-button id="left"   width="128" height="128" raw_text="Left"/>
-                    <icon-button id="middle" width="128" height="128" raw_text="Middle"/>
-                    <icon-button id="right"  width="128" height="128" raw_text="Right"/>
+                    <icon-button id="left" icon="gui/icons/green_check.png" width="128" height="128" raw_text="Left"/>
+                    <icon-button id="middle" icon="gui/icons/green_check.png" width="128" height="128" raw_text="Middle"/>
+                    <icon-button id="right" icon="gui/icons/green_check.png" width="128" height="128" raw_text="Right"/>
                 </buttonbar>
             </div>
         </roundedbox>
