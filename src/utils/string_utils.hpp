@@ -300,6 +300,9 @@ namespace StringUtils
      */
     std::string getHostNameFromURL(const std::string& url);
     // ------------------------------------------------------------------------
+    std::pair<std::string, std::string> extractVersionOS(
+                                                const std::string& user_agent);
+    // ------------------------------------------------------------------------
     /* Get line from istream with taking into account for its line ending. */
     inline std::istream& safeGetline(std::istream& is, std::string& t)
     {
