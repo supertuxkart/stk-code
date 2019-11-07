@@ -107,15 +107,13 @@
                     <spacer width="1" height="20%"/>
                 </box>
                 
-                <spacer width="1" height="2%"/>
+                <spacer width="1" height="1%"/>
                 
-                <buttonbar id="buttons" height="17%" width="100%" align="center">
+                <buttonbar id="buttons" height="20%" width="100%" align="center">
                     <icon-button id="start" width="64" height="64" icon="gui/icons/green_check.png"
                             I18N="In the track info screen" text="Start Race"/>
                 </buttonbar>
             </div>
-            
-            <spacer width="1" height="2%"/>
 
         </div>
 
