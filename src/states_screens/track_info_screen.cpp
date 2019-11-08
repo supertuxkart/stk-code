@@ -451,6 +451,8 @@ TrackInfoScreen::~TrackInfoScreen()
 // ----------------------------------------------------------------------------
 void TrackInfoScreen::tearDown()
 {
+    // This will save number of ai karts per game mode
+    user_config->saveConfig();
     m_highscore_entries->setIcons(NULL);
 }
 
