@@ -40,6 +40,14 @@ namespace GUIEngine
         RIBBON_TABS,    //!< a tab bar
         RIBBON_VERTICAL_TABS //!< a vertical tab bar
     };
+    
+    /** Filp directions of ribbons */
+    enum RibbonFlip
+    {
+        FLIP_NO, // For non-tab ribbons
+        FLIP_UP_LEFT, // For horizontal tabs it goes up vertical ones it goes left
+        FLIP_DOWN_RIGHT // For horizontal tabs it goes down vertical ones it goes right
+    };
 
     /** \brief A static text/icons/tabs bar widget.
       * The contents of this ribbon are static.
@@ -69,6 +77,9 @@ namespace GUIEngine
         
         /** The type of this ribbon (toolbar, combo, tabs, vertical tabs) */
         RibbonType m_ribbon_type;
+        
+        /** The flip direction of this ribbon */
+        RibbonFlip m_ribbon_flip;
                 
         /** Each item within the ribbon holds a flag saying whether it is
          *  selected or not. This method updates the flag in all of this
@@ -130,6 +141,9 @@ namespace GUIEngine
          *  for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
         // --------------------------------------------------------------------
+        /** Returns the flip direction of thin ribbon */
+        RibbonFlip getRibbonFlip() const { return m_ribbon_flip; }
+        // --------------------------------------------------------------------
         /** Returns the number of active items within the ribbon */
         int getActiveChildrenNumber(const int playerID) const
                                               { return m_active_children.size(); }
@@ -167,6 +181,8 @@ namespace GUIEngine
         void setLabel(const unsigned int id, irr::core::stringw new_name);
         
         void setItemVisible(const unsigned int id, bool visible);
+        
+        void setFlip(RibbonFlip direction);
 
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);

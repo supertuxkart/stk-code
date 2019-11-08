@@ -51,6 +51,7 @@ void GrandPrixEditorScreen::beforeAddingWidget()
     assert (tabs != NULL);
 
     tabs->clearAllChildren();
+    tabs->setFlip(FLIP_DOWN_RIGHT);
     for (int i = 0; i < GrandPrixData::GP_GROUP_COUNT; i++)
     {
         core::stringw label = getGroupName((enum GrandPrixData::GPGroupType)i);

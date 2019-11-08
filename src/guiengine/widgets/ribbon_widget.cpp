@@ -460,7 +460,7 @@ void RibbonWidget::add()
         }
         else
         {
-            Log::warn("RiggonWidget", "Invalid contents type in ribbon");
+            Log::warn("RibbonWidget", "Invalid contents type in ribbon");
         }
 
 
@@ -921,7 +921,15 @@ void RibbonWidget::setItemVisible(const unsigned int id, bool visible)
     if (m_labels.size() == 0) return;
 
     m_labels[id].setVisible(visible);
-} // RibbonWidget
+} // setItemVisible
+
+void RibbonWidget::setFlip(RibbonFlip direction)
+{
+    if(m_ribbon_type == RIBBON_TABS || m_ribbon_type == RIBBON_VERTICAL_TABS)
+        m_ribbon_flip = direction;
+    else
+        m_ribbon_flip = FLIP_NO;
+}
 
 // ----------------------------------------------------------------------------
 int RibbonWidget::findItemNamed(const char* internalName)
@@ -942,4 +950,4 @@ Widget* RibbonWidget::findWidgetNamed(const char* internalName)
     if (id >= 0)
         return m_children.get(id);
     return NULL;
-}   // findItemNamed
+}   // findWidgetNamed
