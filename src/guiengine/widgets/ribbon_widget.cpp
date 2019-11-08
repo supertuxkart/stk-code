@@ -928,7 +928,10 @@ void RibbonWidget::setFlip(RibbonFlip direction)
     if(m_ribbon_type == RIBBON_TABS || m_ribbon_type == RIBBON_VERTICAL_TABS)
         m_ribbon_flip = direction;
     else
+    {
+        Log::warn("RibbonWidget", "A flip is set to a not-tab ribbon.");
         m_ribbon_flip = FLIP_NO;
+    }
 }
 
 // ----------------------------------------------------------------------------
