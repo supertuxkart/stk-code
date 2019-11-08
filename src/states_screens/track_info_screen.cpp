@@ -328,7 +328,10 @@ void TrackInfoScreen::init()
     {
         m_record_race->setActive(true);
         m_record_race->setState(false);
+        m_ai_kart_spinner->setActive(true);
     }
+    else
+        m_ai_kart_spinner->setActive(true);
 
     // ---- High Scores
     m_highscore_label->setVisible(has_highscores);
