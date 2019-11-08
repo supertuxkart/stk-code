@@ -1082,11 +1082,17 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         else
             params = &SkinConfig::m_render_params["tab::neutral"];
 
+        RibbonFlip flip = parentRibbon->getRibbonFlip();
 
         // automatically guess from position on-screen if tabs go up or down
-        const bool vertical_flip =
+        bool vertical_flip =
             (unsigned int)rect.UpperLeftCorner.Y <
                 irr_driver->getActualScreenSize().Height / 2;
+        // force flip direction when the direction is pointed out
+        if(flip == FLIP_UP_LEFT)
+            vertical_flip = true;
+        else if(flip == FLIP_DOWN_RIGHT)
+            vertical_flip = false;
         params->m_vertical_flip = vertical_flip;
 
         core::recti rect2 = rect;
@@ -1132,11 +1138,17 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         else
             params = &SkinConfig::m_render_params["verticalTab::neutral"];
 
+        RibbonFlip flip = parentRibbon->getRibbonFlip();
 
         // automatically guess from position on-screen if tabs go left or right
         unsigned int screen_width = irr_driver->getActualScreenSize().Width;
-        const bool horizontal_flip =
+        bool horizontal_flip =
             (unsigned int)rect.UpperLeftCorner.X > screen_width/ 2;
+        // force flip direction when the direction is pointed out
+        if(flip == FLIP_UP_LEFT)
+            horizontal_flip = true;
+        else if(flip == FLIP_DOWN_RIGHT)
+            horizontal_flip = false;
         params->m_vertical_flip = false;
 
         core::recti rect2 = rect;
