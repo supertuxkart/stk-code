@@ -22,6 +22,7 @@
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "race/grand_prix_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
