@@ -77,6 +77,8 @@ void ExtractMobileAssets::reinit()
     file_manager->reinitAfterDownloadAssets();
     irr_driver->sameRestart();
     track_manager->loadTrackList();
+    // Update the replay file list to use latest track pointer
+    ReplayPlay::get()->loadAllReplayFile();
 
     delete grand_prix_manager;
     grand_prix_manager = new GrandPrixManager();

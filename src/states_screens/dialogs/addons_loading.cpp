@@ -30,6 +30,8 @@
 #include "io/file_manager.hpp"
 #include "online/request_manager.hpp"
 #include "online/xml_request.hpp"
+#include "race/grand_prix_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/vote_dialog.hpp"
@@ -397,6 +399,11 @@ void AddonsLoading::doInstall()
     }
 
     track_manager->loadTrackList();
+    // Update the replay file list to use latest track pointer
+    ReplayPlay::get()->loadAllReplayFile();
+    delete grand_prix_manager;
+    grand_prix_manager = new GrandPrixManager();
+    grand_prix_manager->checkConsistency();
 #endif
 }   // doInstall
 
@@ -434,5 +441,10 @@ void AddonsLoading::doUninstall()
         AddonsScreen::getInstance()->loadList();
         dismiss();
     }
+    // Update the replay file list to use latest track pointer
+    ReplayPlay::get()->loadAllReplayFile();
+    delete grand_prix_manager;
+    grand_prix_manager = new GrandPrixManager();
+    grand_prix_manager->checkConsistency();
 #endif
 }   // doUninstall
