@@ -44,6 +44,17 @@ StoryModeTimer::StoryModeTimer()
     m_story_mode_milliseconds = 0;
     m_speedrun_total_pause_time = 0;
     m_story_mode_total_pause_time = 0;
+    m_speedrun_start = 0;
+    m_speedrun_end = 0;
+    m_speedrun_pause_start = 0;
+
+    m_story_mode_start = 0;
+    m_story_mode_end = 0;
+    m_story_mode_pause_start = 0;
+
+    m_speedrun_total_pause_time = 0;
+    m_story_mode_total_pause_time = 0;
+
 }  // SpeedrunTimer
 
 void StoryModeTimer::reset()
@@ -74,6 +85,16 @@ void StoryModeTimer::reset()
     m_player_can_speedrun     = false;
     m_speedrun_milliseconds   = 0;
     m_story_mode_milliseconds = 0;
+    m_speedrun_total_pause_time = 0;
+    m_story_mode_total_pause_time = 0;
+    m_speedrun_start = 0;
+    m_speedrun_end = 0;
+    m_speedrun_pause_start = 0;
+
+    m_story_mode_start = 0;
+    m_story_mode_end = 0;
+    m_story_mode_pause_start = 0;
+
     m_speedrun_total_pause_time = 0;
     m_story_mode_total_pause_time = 0;
 }
