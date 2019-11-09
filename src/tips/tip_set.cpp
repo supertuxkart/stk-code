@@ -60,17 +60,17 @@ TipSet::TipSet(const XMLNode * input)
 
 // ----------------------------------------------------------------------------
 /** Parses recursively the list of goals, to construct the tree of goals */
-void TipSet::parseTips(const XMLNode * input, vector<tip> &parent)
+void TipSet::parseTips(const XMLNode * input, std::vector<tip> &parent)
 {
     // Now load the goal nodes
     for (unsigned int n = 0; n < input->getNumNodes(); n++)
     {
         const XMLNode *node = input->getNode(n);
-        if (node->getName() != "goal")
+        if (node->getName() != "tip")
             continue; // ignore incorrect node
 
         std::string text;
-        if(!node->get("text", &type))
+        if(!node->get("text", &text))
             continue; // missing text, ignore node
 
         std::string icon_path;
@@ -87,12 +87,12 @@ void TipSet::parseTips(const XMLNode * input, vector<tip> &parent)
 
         tip child;
         child.text = text;
-        child.icon_path = value;
+        child.icon_path = icon_path;
         if (goto_type == "no")
             child.goto_type = GOTO_NO;
         else if (goto_type == "screen")
             child.goto_type = GOTO_SCREEN;
-        else if (operation == "website")
+        else if (goto_type == "website")
             child.goto_type = GOTO_WEBSITE;
         else
         {
@@ -133,7 +133,7 @@ void TipSet::tip::runGoto()
 
 // ----------------------------------------------------------------------------
 /** Get a tip depend on the tipset's type */
-tip TipSet::getTip()
+TipSet::tip TipSet::getTip()
 {
     if(m_type == TIPSET_NOTYPE)
     {
