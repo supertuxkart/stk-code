@@ -18,13 +18,17 @@
 
 #include "tips/tips_manager.hpp"
 
-TipsManager* TipsManager::m_achievements_manager = NULL;
+#include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
+#include "utils/log.hpp"
+
+TipsManager* TipsManager::m_tips_manager = NULL;
 
 // ----------------------------------------------------------------------------
 /** Constructor, which reads data/tips.xml and stores the information
  *  in objects.
  */
-AchievementsManager::AchievementsManager()
+TipsManager::TipsManager()
 {
     const std::string file_name = file_manager->getAsset("tips.xml");
     const XMLNode *root = file_manager->createXMLTree(file_name);
@@ -32,60 +36,32 @@ AchievementsManager::AchievementsManager()
     for (unsigned int i = 0; i < num_nodes; i++)
     {
         const XMLNode *node = root->getNode(i);
-        AchievementInfo * achievement_info = new AchievementInfo(node);
-        m_achievements_info[achievement_info->getID()] = achievement_info;
+        TipSet * tip_set = new TipSet(node);
+        m_all_tip_sets[tip_set->getID()] = tip_set;
     }
-    if (num_nodes != m_achievements_info.size())
-        Log::error("AchievementsManager",
-                   "Multiple achievements with the same id!");
+    if (num_nodes != m_all_tip_sets.size())
+        Log::error("TipsManager",
+                   "Multiple tipsets with the same id!");
 
     delete root;
-}   // AchievementsManager
+}   // TipsManager
 
 // ----------------------------------------------------------------------------
-AchievementsManager::~AchievementsManager()
+TipsManager::~TipsManager()
 {
-    std::map<uint32_t, AchievementInfo *>::iterator it;
-    for ( it = m_achievements_info.begin(); it != m_achievements_info.end(); ++it ) {
+    std::map<std::string, TipSet*>::iterator it;
+    for ( it = m_all_tip_sets.begin(); it != m_all_tip_sets.end(); ++it ) {
         delete it->second;
     }
-    m_achievements_info.clear();
-}   // ~AchievementsManager
+    m_all_tip_sets.clear();
+}   // ~TipsManager
 
 // ----------------------------------------------------------------------------
-/** Create a new AchievementStatus object that stores all achievement status
- *  information for a single player.
- *  \param node The XML of saved data, or NULL if no saved data exists.
- */
-AchievementsStatus*
-             AchievementsManager::createAchievementsStatus(const XMLNode *node)
+TipSet* TipsManager::getTipSet(std::string id) const
 {
-    AchievementsStatus *status = new AchievementsStatus();
-
-    // First add all achievements, before restoring the saved data.
-    std::map<uint32_t, AchievementInfo *>::const_iterator it;
-    for (it  = m_achievements_info.begin();
-         it != m_achievements_info.end(); ++it)
-    {
-        Achievement * achievement;
-        achievement = new Achievement(it->second);
-        status->add(achievement);
-    }
-
-    status->updateAllAchievementsProgress();
-
-    if (node)
-        status->load(node);
-
-    return status;
-}   // createAchievementStatus
-
-// ----------------------------------------------------------------------------
-AchievementInfo * AchievementsManager::getAchievementInfo(uint32_t id) const
-{
-    std::map<uint32_t, AchievementInfo*>::const_iterator info =
-        m_achievements_info.find(id);
-    if (info != m_achievements_info.end())
+    std::map<std::string, TipSet*>::const_iterator info =
+        m_all_tip_sets.find(id);
+    if (info != m_all_tip_sets.end())
         return info->second;
     return NULL;
 }

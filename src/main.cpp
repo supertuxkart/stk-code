@@ -243,6 +243,7 @@
 #include "states_screens/options/user_screen.hpp"
 #include "states_screens/dialogs/init_android_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "tips/tips_manager.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -2197,6 +2198,10 @@ int main(int argc, char *argv[])
                 }
                 Log::warn("main", "Screen size is too small!");
             }
+
+            MessageDialog *start_tip =
+                        new MessageDialog(TipsManager::get()->getTipSet("start")->getTip().getWText(), true);
+            GUIEngine::DialogQueue::get()->pushDialog(start_tip);
             
             #ifdef MOBILE_STK
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)

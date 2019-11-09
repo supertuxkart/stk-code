@@ -19,25 +19,11 @@
 #ifndef HEADER_TIPS_MANAGER_HPP
 #define HEADER_TIPS_MANAGER_HPP
 
+#include "tips/tip_set.hpp"
+
+#include <assert.h>
 #include <string>
 #include <map>
-
-class Tip
-{
-private:
-    /** The content of the tip.
-    */
-    std::string m_content;
-    
-    /** The icon path of the tip.
-    */
-    std::string m_icon_path;
-
-public:
-    std::string getContent() const { return m_content; }
-    // ----------------------------------------------------------------------------------------
-    std::string getIconPath() const { return m_icon_path; }
-} // Tip
 
 /** This class manages the list of all tips. It reads the
  *  data/tips.xml file, which contains the contents for
@@ -47,45 +33,37 @@ class TipsManager
 {
 private:
     /** Pointer to the single instance. */
-    static AchievementsManager* m_achievements_manager;
+    static TipsManager* m_tips_manager;
 
-    std::map<uint32_t, AchievementInfo *> m_achievements_info;
+    std::map<std::string, TipSet *> m_all_tip_sets;
 
     TipsManager      ();
     ~TipsManager     ();
-    AchievementsStatus * createNewSlot(unsigned int id, bool online);
 
 public:
-    /** Static function to create the instance of the achievement manager. */
+    /** Static function to create the instance of the tips manager. */
     static void create()
     {
-        
+        assert(!m_tips_manager);
+        m_tips_manager = new TipsManager();
     }   // create
     // ------------------------------------------------------------------------
-    /** Static function to get the achievement manager. */
-    static AchievementsManager* get()
+    /** Static function to get the tips manager. */
+    static TipsManager* get()
     {
-        assert(m_achievements_manager);
-        return m_achievements_manager;
+        assert(m_tips_manager);
+        return m_tips_manager;
     }   // get
     // ------------------------------------------------------------------------
     static void destroy()
     {
-        delete m_achievements_manager;
-        m_achievements_manager = NULL;
+        delete m_tips_manager;
+        m_tips_manager = NULL;
     }   // destroy
     // ========================================================================
 
-    AchievementInfo* getAchievementInfo(uint32_t id) const;
-    AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);
+    TipSet* getTipSet(std::string id) const;
     // ------------------------------------------------------------------------
-    const std::map<uint32_t, AchievementInfo *> & getAllInfo()
-    {
-        return m_achievements_info;
-    }  // getAllInfo
-
-};   // class AchievementsManager
+};   // class TipsManager
 
 #endif
-
-/*EOF*/

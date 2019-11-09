@@ -1,1 +1,8 @@
- 
+<tips>
+    <tipset id="start" type="random" important="false">
+        <tip text="Benau is the core developer of the game." icon="gui/icons/main_about.png" />
+        <tip text="Donate the game!" icon="gui/icons/heart.png" goto="website" address="www.baidu.com"/>
+    </tipset>
+    <tipset id="lose" type="random">
+    </tipset>
+</tips>

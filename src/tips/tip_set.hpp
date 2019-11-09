@@ -1,79 +1,94 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2006-2019 SuperTuxKart-Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_ACHIEVEMENT_INFO_HPP
-#define HEADER_ACHIEVEMENT_INFO_HPP
+#ifndef HEADER_TIP_SET_HPP
+#define HEADER_TIP_SET_HPP
 
-#include "utils/types.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <irrString.h>
 #include <string>
 #include <vector>
 
-// ============================================================================
-
-class Achievement;
 class XMLNode;
 
-/** This class stores an achievement definition from the xml file, including
- *  title, description, but also how to achieve this achievement.
- *  Contrast with the Achievement class, which is a player-specific instance
- *  tracking the progress of the achievement.
- * \ingroup achievements
+/** This class stores a set of tip definition from the xml file, including
+ *  texts, icons and goto button.
+ * \ingroup tips
  */
 class TipSet
 {
 public:
-    // The operations supported for a goal
-    enum operationType {
-        OP_NONE      = 0,
-        OP_ADD       = 1,
-        OP_SUBSTRACT = 2,
+    // The tipset types
+    enum tipSetType
+    {
+        TIPSET_NOTYPE,
+        TIPSET_QUEUE,
+        TIPSET_RANDOM
     };
 
-    // We store goals in a recursive tree.
-    // This structure matching the algorithms
-    // we use to manipulate it simplify code.
-    struct tipsTree
+    // The goto types supported for a tip
+    enum gotoType
     {
-        std::string m_texts;
-        std::string m_icon_path;
-        std::vector<tipsTree> children;
+        GOTO_NO,
+        GOTO_SCREEN,
+        GOTO_WEBSITE
+    };
+
+    // Essential things a tip has
+    struct tip
+    {
+        std::string text;
+        std::string icon_path;
+        gotoType goto_type;
+        std::string goto_address;
+        void runGoto();
+        irr::core::stringw getWText() const { return _(text.c_str()); }
     };
 
 private:
-    /** The id of this tips. */
+    /** The id of this tipset. */
     std::string m_id;
+    
+    /** The type of this tipset. */
+    tipSetType m_type;
 
-    /** A secret achievement has its progress not shown. */
-    bool m_is_secret;
+    /** When it's a queued tip, store the progress. */
+    int m_progress;
 
-    void parseGoals(const XMLNode * input, goalTree &parent);
-    int  recursiveGoalCount(goalTree &parent);
-    int  recursiveProgressCount(goalTree &parent);
-    int  getRecursiveDepth(goalTree &parent);
+    /** An important tipset which should be always shown. */
+    bool m_is_important;
 
-    /** The tree storing all tips */
-    tipsTree           m_goal_tree;
+    void parseTips(const XMLNode * input, std::vector<tip> &parent);
+
+    /** The vector storing all tips */
+    std::vector<tip> m_tipset;
 
 public:
-             AchievementInfo(const XMLNode * input);
-    virtual ~AchievementInfo() {};
+             TipSet(const XMLNode * input);
+    virtual ~TipSet() {};
 
-    virtual irr::core::stringw goalString();
-    virtual irr::core::stringw progressString();
+    std::string getID() const { return m_id; }
+    bool isImportant()  const { return m_is_important; }
 
-    int                getProgressTarget()    { return recursiveProgressCount(m_goal_tree); }
-    int                getGoalCount()         { return recursiveGoalCount(m_goal_tree); }
-    int                getDepth()             { return getRecursiveDepth(m_goal_tree); }
-    uint32_t           getID()          const { return m_id; }
-    irr::core::stringw getDescription() const;
-    irr::core::stringw getName()        const;
-    bool               isSecret()       const { return m_is_secret; }
+    tip getTip();
 
-    // This function should not be called if copy already has children
-    void copyGoalTree(goalTree &copy, goalTree &model, bool set_values_to_zero);
-};   // class AchievementInfo
-
+};   // class TipSet
 
 #endif
-
-/*EOF*/
