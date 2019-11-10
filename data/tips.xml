@@ -1,7 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <tips>
-    <tipset id="start" type="queue" important="false">
-        <tip text="Benau is the core developer of the game." icon="gui/icons/main_about.png" />
-        <tip text="Donate the game!" icon="gui/icons/heart.png" goto="website" address="www.baidu.com"/>
+    <tipset id="start" type="random" important="false">
+        <tip text="Add more tips so that the game will be more user-friendly!" icon="gui/icons/main_about.png" />
+        <tip text="If you fly using sara the wizard, you will see her underware!" icon="gui/icons/main_race.png" />
+        <tip text="Tips without icons will defaultly use question mark!">
+        <tip icon="Tips without texts will be defaultly ignored!">
+        <tip text="Donate to help SuperTuxKart keep going!" icon="gui/icons/heart.png" goto="website" address="https://supertuxkart.net/Donate"/>
     </tipset>
     <tipset id="lose" type="random">
     </tipset>

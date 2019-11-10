@@ -109,7 +109,7 @@ void TipSet::parseTips(const XMLNode * input, std::vector<tip> &parent)
     if (parent.size() != input->getNumNodes())
         Log::error("TipSet",
                   "Incorrect tips for the entries of tipset \"%s\".", m_id.c_str());
-} // parseGoals
+} // parseTips
 
 // ----------------------------------------------------------------------------
 /** Run a tip's goto */
@@ -129,7 +129,7 @@ void TipSet::tip::runGoto()
     {
         Online::LinkHelper::openURL(goto_address);
     }
-}
+} // runGoto
 
 // ----------------------------------------------------------------------------
 /** Get a tip depend on the tipset's type */
@@ -143,6 +143,8 @@ TipSet::tip TipSet::getTip()
     else if(m_type == TIPSET_QUEUE)
     {
         ++ m_progress;
+        if(m_progress >= (int)m_tipset.size())
+            m_progress = 0;
         return m_tipset[m_progress];
     }
     else if(m_type == TIPSET_RANDOM)
@@ -150,4 +152,23 @@ TipSet::tip TipSet::getTip()
         RandomGenerator randgen;
         return m_tipset[randgen.get(m_tipset.size())];
     }
-}
+} //getTip
+
+// ----------------------------------------------------------------------------
+/** Reset a queued tip to the first one */
+void TipSet::resetTip()
+{
+    if(m_type == TIPSET_NOTYPE)
+    {
+        Log::error("TipSet",
+                   "Unknown type for tipset \"%s\".", m_id);
+    }
+    else if(m_type == TIPSET_QUEUE)
+    {
+        m_progress = -1;
+    }
+    else if(m_type == TIPSET_RANDOM)
+    {
+        return;
+    }
+} //getTip

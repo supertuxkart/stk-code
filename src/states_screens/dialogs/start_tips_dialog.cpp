@@ -35,15 +35,40 @@ using namespace GUIEngine;
  *  \param start_tip The tipset it wants to read from.
  */
 StartTipsDialog::StartTipsDialog(TipSet* start_tip)
-             : ModalDialog(0.6f, 0.6f)
+             : ModalDialog(0.7f, 0.7f)
+{
+    m_start_tip = start_tip;
+}   // StartTipsDialog(TipSet)
+
+// ----------------------------------------------------------------------------
+
+StartTipsDialog::~StartTipsDialog()
+{
+}
+
+// ----------------------------------------------------------------------------
+
+void StartTipsDialog::load()
 {
     loadFromFile("start_tips.stkgui");
-    m_start_tip = start_tip;
+}
+
+// ----------------------------------------------------------------------------
+
+void StartTipsDialog::beforeAddingWidgets()
+{
     showATip();
 
     CheckBoxWidget* box = getWidget<CheckBoxWidget>("showtips");
+    
     box->setState(UserConfigParams::m_show_start_tips);
-}   // StartTipsDialog(TipSet)
+    if(m_start_tip->isImportant())
+    {
+        box->setActive(false);
+    }
+    
+    getWidget<RibbonWidget>("buttons")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+}
 
 // ----------------------------------------------------------------------------
 /** Change the tip showing.
@@ -53,21 +78,20 @@ void StartTipsDialog::showATip()
     m_tip = m_start_tip->getTip();
 
     LabelWidget* text = getWidget<LabelWidget>("text");
-    text->setText(m_tip.getWText(), true);
+    text->setText(m_tip.getWText(), false);
 
     IconButtonWidget* icon = getWidget<IconButtonWidget>("icon");
     icon->setImage(m_tip.icon_path);
 
-    getWidget<ButtonWidget>("goto")->setVisible(true);
-    getWidget<ButtonWidget>("goto")->setFocusable(true);
+    icon->setFocusable(true);
     if(m_tip.goto_type == TipSet::GOTO_SCREEN)
-        getWidget<ButtonWidget>("goto")->setText(_("Go to the screen"));
+        icon->setTooltip(_("Go to the screen"));
     else if(m_tip.goto_type == TipSet::GOTO_WEBSITE)
-        getWidget<ButtonWidget>("goto")->setText(_("Go to the website"));
+        icon->setTooltip(_("Go to the website"));
     else if(m_tip.goto_type == TipSet::GOTO_NO)
     {
-        getWidget<ButtonWidget>("goto")->setVisible(false);
-        getWidget<ButtonWidget>("goto")->setFocusable(false);
+        icon->setTooltip("");
+        icon->setFocusable(false);
     }
 }
 
@@ -85,17 +109,21 @@ GUIEngine::EventPropagation StartTipsDialog::processEvent(const std::string& eve
         }
         else if (ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == "close")
         {
+            ModalDialog::dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
     }
-    else if(event_source == "goto")
+    else if(event_source == "icon")
     {
         m_tip.runGoto();
     }
     else if(event_source == "showtips")
     {
-        CheckBoxWidget* box = getWidget<CheckBoxWidget>("showtips");
-        UserConfigParams::m_show_start_tips = box->getState();
+        if(!m_start_tip->isImportant())
+        {
+            CheckBoxWidget* box = getWidget<CheckBoxWidget>("showtips");
+            UserConfigParams::m_show_start_tips = box->getState();
+        }
     }
 
     return GUIEngine::EVENT_LET;

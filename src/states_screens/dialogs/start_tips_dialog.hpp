@@ -44,6 +44,10 @@ public:
       * \param start_tip The tipset it wants to read from.
       */
     StartTipsDialog(TipSet* start_tip);
+    ~StartTipsDialog();
+    
+    virtual void beforeAddingWidgets();
+    virtual void load();
 
     GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
 

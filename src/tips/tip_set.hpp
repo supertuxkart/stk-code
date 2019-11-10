@@ -85,9 +85,11 @@ public:
     virtual ~TipSet() {};
 
     std::string getID() const { return m_id; }
+    tipSetType getType() const { return m_type; }
     bool isImportant()  const { return m_is_important; }
 
     tip getTip();
+    void resetTip();
 
 };   // class TipSet
 

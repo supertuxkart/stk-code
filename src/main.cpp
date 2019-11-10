@@ -2204,9 +2204,9 @@ int main(int argc, char *argv[])
             }
             
             // Show tips
-            if(UserConfigParams::m_show_start_tips)
+            TipSet* tipset = TipsManager::get()->getTipSet("start");
+            if(UserConfigParams::m_show_start_tips || tipset->isImportant())
             {
-                TipSet* tipset = TipsManager::get()->getTipSet("start");
                 StartTipsDialog* tip = new StartTipsDialog(tipset);
                 GUIEngine::DialogQueue::get()->pushDialog(tip);
             }

@@ -25,6 +25,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -57,6 +58,8 @@
 #include "states_screens/grand_prix_win.hpp"
 #endif
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/start_tips_dialog.hpp"
+#include "tips/tips_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -399,7 +402,14 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else
 #endif
-    if (selection == "new")
+    if (selection == "tips")
+    {
+        TipSet* tipset = TipsManager::get()->getTipSet("start");
+        tipset->resetTip();
+        StartTipsDialog* tip = new StartTipsDialog(tipset);
+        GUIEngine::DialogQueue::get()->pushDialog(tip);
+    }
+    else if (selection == "new")
     {
         NetworkConfig::get()->unsetNetworking();
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
