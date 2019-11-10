@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="5%" width="96%" height="90%" layout="vertical-row" >
+        
+        <div layout="horizontal-row" height="65%" width="100%" />
+        
+            <div layout="vertical-row" height="100%" width="35%" id="title" text_align="top" word_wrap="true"/>
+
+                <icon-button id="icon" width="100%" height="75%" icon="gui/icons/main_about.png"
+                    I18N="In the start tips dialog" text="Next tip" align="center" />
+                
+                <spacer proportion="1" width="10" />
+                <button id="goto" />
+            </div>
+            
+            <label height="100%" width="65%" id="text" text_align="top" word_wrap="true"/>
+        </div>
+
+        <spacer height="5%" width="10" />
+
+        <buttonbar id="buttons" height="30%" width="30%" align="center">
+
+            <icon-button id="confirm" width="128" height="128" icon="gui/icons/main_about.png"
+                I18N="In the start tips dialog" text="Next tip" align="center"/>
+
+            <icon-button id="confirm" width="128" height="128" icon="gui/icons/green_check.png"
+                I18N="In the start tips dialog" text="Yes" align="center"/>
+
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/remove.png"
+                I18N="In the start tips dialog" text="Cancel" align="center"/>
+
+        </buttonbar>
+        
+        <spacer width="10" height="1f" />
+        
+    </div>
+</stkgui>

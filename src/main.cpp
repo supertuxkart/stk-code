@@ -243,6 +243,7 @@
 #include "states_screens/options/user_screen.hpp"
 #include "states_screens/dialogs/init_android_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/start_tips_dialog.hpp"
 #include "tips/tips_manager.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
@@ -2107,6 +2108,9 @@ int main(int argc, char *argv[])
         unlock_manager = new UnlockManager();
         AchievementsManager::create();
 
+        // Launch tips manager here.
+        TipsManager::create();
+
         // Reading the rest of the player data needs the unlock manager to
         // initialise the game slots of all players and the AchievementsManager
         // to initialise the AchievementsStatus, so it is done only now.
@@ -2198,11 +2202,15 @@ int main(int argc, char *argv[])
                 }
                 Log::warn("main", "Screen size is too small!");
             }
-
-            MessageDialog *start_tip =
-                        new MessageDialog(TipsManager::get()->getTipSet("start")->getTip().getWText(), true);
-            GUIEngine::DialogQueue::get()->pushDialog(start_tip);
             
+            if(UserConfigParams::m_show_start_tips)
+            {
+                printf("No problem\n");
+                StartTipsDialog* tip = new StartTipsDialog(TipsManager::get()->getTipSet("start"));
+                printf("No problem\n");
+                GUIEngine::DialogQueue::get()->pushDialog(tip);
+            }
+
             #ifdef MOBILE_STK
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {

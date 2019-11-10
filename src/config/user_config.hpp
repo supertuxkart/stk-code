@@ -626,7 +626,7 @@ namespace UserConfigParams
      *  Bit 1: setting done by default(0), or by user choice (2). This allows
      *  to e.g. disable h.d. textures on hd3000 as default, but still allow the
      *  user to enable it. */
-    PARAM_PREFIX IntUserConfigParam        m_high_definition_textures
+    PARAM_PREFIX IntUserConfigParam         m_high_definition_textures
         PARAM_DEFAULT(IntUserConfigParam(1, "enable_high_definition_textures",
         &m_video_group, "Enable high definition textures. Bit flag: "
                         "bit 0 = enabled/disabled; bit 1 = set by user/set as default"));
@@ -661,12 +661,15 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "hq_mipmap",
         &m_video_group, "Generate mipmap for textures using "
                         "high quality method with SSE"));
-    PARAM_PREFIX FloatUserConfigParam         m_font_size
+    PARAM_PREFIX FloatUserConfigParam       m_font_size
         PARAM_DEFAULT(  FloatUserConfigParam(3, "font_size",
         &m_video_group,"The size of fonts. 0 is the smallest and 6 is the biggest") );
+    PARAM_PREFIX BoolUserConfigParam        m_show_start_tips
+        PARAM_DEFAULT(BoolUserConfigParam(true, "show-tips-at-start",
+        &m_video_group, "Show the start tip dialog when the game is started"));
 
     // ---- Recording
-    PARAM_PREFIX GroupUserConfigParam        m_recording_group
+    PARAM_PREFIX GroupUserConfigParam       m_recording_group
         PARAM_DEFAULT(GroupUserConfigParam("Recording",
                             "Recording Settings"));
 
