@@ -75,7 +75,7 @@
  replay 
  # force karts and tracks on the same level, looks better this way
  subgraph { 
-  rank = same; karts; tracks; 1
+  rank = same; karts; tracks;
  } 
 
 }
@@ -2203,13 +2203,11 @@ int main(int argc, char *argv[])
                 Log::warn("main", "Screen size is too small!");
             }
             
+            // Show tips
             if(UserConfigParams::m_show_start_tips)
             {
-                printf("No problem\n");
                 TipSet* tipset = TipsManager::get()->getTipSet("start");
-                printf("No problem\n");
                 StartTipsDialog* tip = new StartTipsDialog(tipset);
-                printf("No problem\n");
                 GUIEngine::DialogQueue::get()->pushDialog(tip);
             }
 
