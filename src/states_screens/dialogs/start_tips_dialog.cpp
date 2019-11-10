@@ -58,6 +58,7 @@ void StartTipsDialog::showATip()
     IconButtonWidget* icon = getWidget<IconButtonWidget>("icon");
     icon->setImage(m_tip.icon_path);
 
+    getWidget<ButtonWidget>("goto")->setVisible(true);
     getWidget<ButtonWidget>("goto")->setFocusable(true);
     if(m_tip.goto_type == TipSet::GOTO_SCREEN)
         getWidget<ButtonWidget>("goto")->setText(_("Go to the screen"));

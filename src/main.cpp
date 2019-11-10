@@ -75,7 +75,7 @@
  replay 
  # force karts and tracks on the same level, looks better this way
  subgraph { 
-  rank = same; karts; tracks; 
+  rank = same; karts; tracks; 1
  } 
 
 }
@@ -2206,7 +2206,9 @@ int main(int argc, char *argv[])
             if(UserConfigParams::m_show_start_tips)
             {
                 printf("No problem\n");
-                StartTipsDialog* tip = new StartTipsDialog(TipsManager::get()->getTipSet("start"));
+                TipSet* tipset = TipsManager::get()->getTipSet("start");
+                printf("No problem\n");
+                StartTipsDialog* tip = new StartTipsDialog(tipset);
                 printf("No problem\n");
                 GUIEngine::DialogQueue::get()->pushDialog(tip);
             }
