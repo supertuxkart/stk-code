@@ -213,6 +213,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(layout,         PROP_LAYOUT);
                 READ_PROPERTY(align,          PROP_ALIGN);
                 READ_PROPERTY(custom_ratio,   PROP_CUSTOM_RATIO);
+                READ_PROPERTY(icon_align,     PROP_ICON_ALIGN);
 
                 READ_PROPERTY(icon,           PROP_ICON);
                 READ_PROPERTY(focus_icon,     PROP_FOCUS_ICON);

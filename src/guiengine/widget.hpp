@@ -114,6 +114,7 @@ namespace GUIEngine
         PROP_DIV_PADDING,
         PROP_KEEP_SELECTION,
         PROP_CUSTOM_RATIO,
+        PROP_ICON_ALIGN,
     };
 
     bool isWithinATextBox();
