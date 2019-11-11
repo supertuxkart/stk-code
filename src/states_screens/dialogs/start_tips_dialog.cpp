@@ -34,10 +34,12 @@ using namespace GUIEngine;
 /** Simple constructor for a tip.
  *  \param start_tip The tipset it wants to read from.
  */
-StartTipsDialog::StartTipsDialog(TipSet* start_tip)
+StartTipsDialog::StartTipsDialog(TipSet* start_tip, bool from_queue)
              : ModalDialog(0.7f, 0.7f)
 {
     m_start_tip = start_tip;
+    if(!from_queue)
+        loadFromFile("start_tips.stkgui");
 }   // StartTipsDialog(TipSet)
 
 // ----------------------------------------------------------------------------

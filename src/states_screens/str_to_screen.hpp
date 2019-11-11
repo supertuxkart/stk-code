@@ -16,42 +16,30 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_STR_TO_SCREEN_HPP
+#define HEADER_STR_TO_SCREEN_HPP
 
-#ifndef HEADER_START_TIPS_DIALOG_HPP
-#define HEADER_START_TIPS_DIALOG_HPP
+#include <string>
 
-#include "guiengine/modaldialog.hpp"
-#include "tips/tip_set.hpp"
-#include "utils/cpp2011.hpp"
-
-/**
- * \brief Dialog to show a tip when the game started
+/** This is a class function, which runs a screen from a string.
+ * Only those general screens are added in order to make everything simple.
  * \ingroup states_screens
  */
-class StartTipsDialog : public GUIEngine::ModalDialog
+class StrToScreen
 {
 
 private:
-    
-    TipSet* m_start_tip;
-    TipSet::tip m_tip;
-
-    void showATip();
+    /** The string of this strtoscreen. */
+    std::string m_screen;
 
 public:
 
-    /**
-      * \param start_tip The tipset it wants to read from.
-      * \param from_queue Whether the tip is from a queue.
-      */
-    StartTipsDialog(TipSet* start_tip, bool from_queue);
-    ~StartTipsDialog();
+    StrToScreen(std::string screen);
+
+    /** Running the screen the string points to. */
+    void runScreen();
     
-    virtual void beforeAddingWidgets();
-    virtual void load();
-
-    GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
-
-};
+};   // class StrToScreen
 
 #endif
+ 

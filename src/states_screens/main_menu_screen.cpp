@@ -25,7 +25,6 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
-#include "guiengine/dialog_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -406,8 +405,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         TipSet* tipset = TipsManager::get()->getTipSet("start");
         tipset->resetTip();
-        StartTipsDialog* tip = new StartTipsDialog(tipset);
-        GUIEngine::DialogQueue::get()->pushDialog(tip);
+        new StartTipsDialog(tipset, false);
     }
     else if (selection == "new")
     {

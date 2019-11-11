@@ -75,6 +75,9 @@ private:
     /** An important tipset which should be always shown. */
     bool m_is_important;
 
+    /** If the tipset uses hardcode */
+    bool m_hardcode;
+
     void parseTips(const XMLNode * input, std::vector<tip> &parent);
 
     /** The vector storing all tips */
@@ -90,6 +93,9 @@ public:
 
     tip getTip();
     void resetTip();
+
+    void addHardcodeTip(std::string text, std::string icon, gotoType goto_type,
+                        std::string address, int position);
 
 };   // class TipSet
 

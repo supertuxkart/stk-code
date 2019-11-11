@@ -20,6 +20,7 @@
 
 #include "io/xml_node.hpp"
 #include "online/link_helper.hpp"
+#include "states_screens/str_to_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 
@@ -33,6 +34,7 @@ TipSet::TipSet(const XMLNode * input)
     m_id               = "";
     m_type             = TIPSET_NOTYPE;
     m_is_important     = false;
+    m_hardcode         = false;
     
     if (!input->get("id", &m_id))
     {
@@ -54,6 +56,7 @@ TipSet::TipSet(const XMLNode * input)
         m_progress = -1; // Initialize progress when it's a queued tip
     
     input->get("important", &m_is_important);
+    input->get("hardcode", &m_hardcode);
 
     parseTips(input, m_tipset);
 }   // AchievementInfo
@@ -121,9 +124,8 @@ void TipSet::tip::runGoto()
     }
     else if(goto_type == GOTO_SCREEN)
     {
-        Log::warn("TipSet",
-                  "Goto screen is WIP!");
-        return;
+        StrToScreen screen = StrToScreen(goto_address);
+        screen.runScreen();
     }
     else if(goto_type == GOTO_WEBSITE)
     {
@@ -135,12 +137,7 @@ void TipSet::tip::runGoto()
 /** Get a tip depend on the tipset's type */
 TipSet::tip TipSet::getTip()
 {
-    if(m_type == TIPSET_NOTYPE)
-    {
-        Log::error("TipSet",
-                   "Unknown type for tipset \"%s\".", m_id);
-    }
-    else if(m_type == TIPSET_QUEUE)
+    if(m_type == TIPSET_QUEUE)
     {
         ++ m_progress;
         if(m_progress >= (int)m_tipset.size())
@@ -152,6 +149,12 @@ TipSet::tip TipSet::getTip()
         RandomGenerator randgen;
         return m_tipset[randgen.get(m_tipset.size())];
     }
+    else
+    {
+        Log::error("TipSet",
+                   "Unknown type for tipset \"%s\".", m_id);
+    }
+    
 } //getTip
 
 // ----------------------------------------------------------------------------
@@ -171,4 +174,21 @@ void TipSet::resetTip()
     {
         return;
     }
-} //getTip
+} //resetTip
+
+// ----------------------------------------------------------------------------
+void TipSet::addHardcodeTip(std::string text, std::string icon, gotoType goto_type,
+                            std::string address, int position)
+{
+    if(!m_hardcode)
+        return;
+    tip child;
+    child.text = text;
+    child.icon_path = icon;
+    child.goto_type = goto_type;
+    child.goto_address = address;
+    if(position >= (int)m_tipset.size())
+        m_tipset.push_back(child);
+    else
+        m_tipset.insert(m_tipset.begin() + position, child);
+}

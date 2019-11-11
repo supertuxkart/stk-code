@@ -2202,14 +2202,6 @@ int main(int argc, char *argv[])
                 }
                 Log::warn("main", "Screen size is too small!");
             }
-            
-            // Show tips
-            TipSet* tipset = TipsManager::get()->getTipSet("start");
-            if(UserConfigParams::m_show_start_tips || tipset->isImportant())
-            {
-                StartTipsDialog* tip = new StartTipsDialog(tipset);
-                GUIEngine::DialogQueue::get()->pushDialog(tip);
-            }
 
             #ifdef MOBILE_STK
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
@@ -2269,6 +2261,14 @@ int main(int argc, char *argv[])
             if(UserConfigParams::m_internet_status==Online::RequestManager::IPERM_ALLOWED)
             {
                 HardwareStats::reportHardwareStats();
+            }
+
+            // Show tips
+            TipSet* tipset = TipsManager::get()->getTipSet("start");
+            if(UserConfigParams::m_show_start_tips || tipset->isImportant())
+            {
+                StartTipsDialog* tip = new StartTipsDialog(tipset, true);
+                GUIEngine::DialogQueue::get()->pushDialog(tip);
             }
         }
 #endif
