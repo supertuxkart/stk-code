@@ -79,11 +79,13 @@ To allow icon theme, use the tag icon_theme="y" and then place the replacement p
 For TTF specify the list like the following, for normal and digit ttf it will be added in the beginning of font
 list in STK, so those TTF will be used first, and any missing character will be rendered from the bundled font
 list. For color emoji ttf it will be replace the bundled color emoji directly. You are not required to specify
-all types of ttf.
+all types of ttf. You can also edit the regular/bold outline to change the font thickness.
 <advanced icon_theme="y"
           normal_ttf="xxx.ttf yyy.ttf"
           digit_ttf="zzz.ttf"
-          color_emoji_ttf="www.ttf"/>
+          color_emoji_ttf="www.ttf"
+          regular_outline="a number"
+          bold_outline="a number"/>
 -->
 
 <!--  Stateless -->

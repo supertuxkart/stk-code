@@ -430,6 +430,10 @@ namespace GUIEngine
 
         const std::vector<std::string>& getDigitTTF() const;
 
+        const int getBoldOutline() const;
+
+        const int getRegularOutline() const;
+
         const std::string& getColorEmojiTTF() const;
 
         std::string getThemedIcon(const std::string& relative_path) const;

@@ -17,6 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "font/regular_face.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/skin.hpp"
 
 // ----------------------------------------------------------------------------
 /** Constructor of RegularFace.
@@ -49,3 +51,14 @@ void RegularFace::reset()
     insertCharacters(preload_chars.c_str());
     updateCharactersList();
 }   // reset
+
+// ----------------------------------------------------------------------------
+/** Embolden the glyph to make regular font using FT_Outline_Embolden.
+ *  \return A FT_Error value.
+ */
+#ifndef SERVER_ONLY
+int RegularFace::shapeOutline(FT_Outline* outline) const
+{
+    return FT_Outline_Embolden(outline, getDPI() * GUIEngine::getSkin()->getRegularOutline());
+}   // shapeOutline
+#endif

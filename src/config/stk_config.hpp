@@ -211,6 +211,8 @@ public:
     std::vector<std::string> m_normal_ttf;
     std::vector<std::string> m_digit_ttf;
     std::string m_color_emoji_ttf;
+    float m_regular_outline; // Thickness of regular font
+    float m_bold_outline; // Thickness of bold font
 
     /** Configurable values used in SmoothNetworkBody class. */
     float m_snb_min_adjust_length, m_snb_max_adjust_length,

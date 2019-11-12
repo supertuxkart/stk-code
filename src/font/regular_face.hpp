@@ -21,6 +21,8 @@
 
 #include "font/font_with_face.hpp"
 
+#include "guiengine/engine.hpp"
+
 class FaceTTF;
 
 /** A font which uses regular TTFs to render most text in STK.
@@ -45,6 +47,10 @@ public:
     virtual void reset() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual bool useColorGlyphPage() const  OVERRIDE           { return true; }
+    // ------------------------------------------------------------------------
+#ifndef SERVER_ONLY
+    virtual int shapeOutline(FT_Outline* outline) const OVERRIDE;
+#endif
 
 };   // RegularFace
 

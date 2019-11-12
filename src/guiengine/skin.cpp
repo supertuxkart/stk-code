@@ -59,6 +59,8 @@ namespace SkinConfig
     static std::string m_color_emoji_ttf;
     static bool m_icon_theme;
     static bool m_font;
+    static int m_regular_outline;
+    static int m_bold_outline;
 
     static void parseElement(const XMLNode* node)
     {
@@ -178,6 +180,9 @@ namespace SkinConfig
             m_color_emoji_ttf = file_manager->getAssetChecked(FileManager::TTF,
                 stk_config->m_color_emoji_ttf, true);
         }
+        m_regular_outline = stk_config->m_regular_outline;
+        m_bold_outline = stk_config->m_bold_outline;
+
         m_icon_theme = false;
         m_font = false;
 
@@ -224,6 +229,7 @@ namespace SkinConfig
                 }
                 std::vector<std::string> list_ttf;
                 std::vector<std::string> list_ttf_path;
+                std::vector<int> list_regular_thickness, list_bold_thickness;
                 if (node->get("normal_ttf", &list_ttf))
                 {
                     for (auto& t : list_ttf)
@@ -257,6 +263,14 @@ namespace SkinConfig
                     }
                     m_digit_ttf.insert(m_digit_ttf.begin(),
                         list_ttf_path.begin(), list_ttf_path.end());
+                }
+                if(node->get("regular_outline", &m_regular_outline))
+                {
+                    m_font = true;
+                }
+                if(node->get("bold_outline", &m_bold_outline))
+                {
+                    m_font = true;
                 }
             }
             else if (!load_advanced_only)
@@ -2718,6 +2732,18 @@ const std::vector<std::string>& Skin::getNormalTTF() const
 const std::vector<std::string>& Skin::getDigitTTF() const
 {
     return SkinConfig::m_digit_ttf;
+}   // getDigitTTF
+
+// -----------------------------------------------------------------------------
+const int Skin::getBoldOutline() const
+{
+    return SkinConfig::m_bold_outline;
+}   // getDigitTTF
+
+// -----------------------------------------------------------------------------
+const int Skin::getRegularOutline() const
+{
+    return SkinConfig::m_regular_outline;
 }   // getDigitTTF
 
 // -----------------------------------------------------------------------------
