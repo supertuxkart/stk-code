@@ -211,26 +211,29 @@ void RibbonWidget::add()
             }
             else if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
             {
-                rect<s32> icon_part = rect<s32>(15,
-                                                0,
-                                                subsize.getHeight()+15,
-                                                subsize.getHeight());
+                const int width = subsize.getWidth();
+                const int height = subsize.getHeight();
+
+                rect<s32> icon_part = rect<s32>(width * SkinConfig::getInnerPadding
+                                                (WTYPE_RIBBON, getRibbonType(), SkinConfig::HORIZONTAL),
+                                                height * SkinConfig::getInnerPadding
+                                                (WTYPE_RIBBON, getRibbonType(), SkinConfig::VERTICAL),
+                                                width*SkinConfig::getInnerPadding
+                                                (WTYPE_RIBBON, getRibbonType(), SkinConfig::HORIZONTAL) + 
+                                                height - (height * SkinConfig::getInnerPadding
+                                                (WTYPE_RIBBON, getRibbonType(), SkinConfig::VERTICAL)*2),
+                                                height - (height * SkinConfig::getInnerPadding
+                                                (WTYPE_RIBBON, getRibbonType(), SkinConfig::VERTICAL)));
 
                 if (message.size() == 0)
                 {
-                    const int x = subsize.getWidth()/2 - subsize.getHeight()/2;
+                    const int x = width / 2 - height / 2;
                     // no label, only icon, so center the icon
-                    icon_part = rect<s32>(x,
-                                          0,
-                                          x + subsize.getHeight(),
-                                          subsize.getHeight());
+                    icon_part = rect<s32>(x, 0, x + height, height);
                 }
 
                 // label at the *right* of the icon (for tabs)
-                rect<s32> label_part = rect<s32>(subsize.getHeight()+15,
-                                                 0,
-                                                 subsize.getWidth()-15,
-                                                 subsize.getHeight());
+                rect<s32> label_part = rect<s32>(height + 15, 0, height - 15, height);
 
                 // use the same ID for all subcomponents; since event handling
                 // is done per-ID, no matter which one your hover, this
@@ -304,30 +307,50 @@ void RibbonWidget::add()
 
             IGUIButton * subbtn = NULL;
 
-            // The buttons will overlap without this,
-            // as drawBoxFromStretchableTexture draw the borders outside
-            // of a widget's reserved area
-            int VERT_BORDER_MARGIN = 8;
-            rect<s32> subbtn_rec = rect<s32>(widget_x - tab_width/2+2,  widget_y + VERT_BORDER_MARGIN,
-                                             widget_x + tab_width/2-2,  widget_y - VERT_BORDER_MARGIN + one_button_height);
+            // Get these ints for later use
+            const int VERT_MARGIN = round(SkinConfig::getValue
+                                    (SkinConfig::MARGIN, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::VERTICAL));
+            const int VERT_PADDING = round(SkinConfig::getValue
+                                    (SkinConfig::PADDING, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::VERTICAL));
 
+            const int TOP_BORDER = round(SkinConfig::getValue
+                                    (SkinConfig::BORDER, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::TOP));
+            const int BOTTOM_BORDER = round(SkinConfig::getValue
+                                    (SkinConfig::BORDER, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::BOTTOM));
+            const int LEFT_BORDER = round(SkinConfig::getValue
+                                    (SkinConfig::BORDER, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::LEFT));
+            const int RIGHT_BORDER = round(SkinConfig::getValue
+                                    (SkinConfig::BORDER, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::RIGHT));
 
+            const int HORZ_MARGIN = round(SkinConfig::getValue
+                                    (SkinConfig::MARGIN, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::HORIZONTAL));
+            const int HORZ_PADDING = round(SkinConfig::getValue
+                                    (SkinConfig::PADDING, WTYPE_RIBBON, RIBBON_VERTICAL_TABS, SkinConfig::HORIZONTAL));
+
+            rect<s32> subbtn_rec = rect<s32>(widget_x - (tab_width/2) + HORZ_MARGIN,  widget_y + VERT_MARGIN,
+                                             widget_x + (tab_width/2) - HORZ_MARGIN,  widget_y - VERT_MARGIN + one_button_height);
+
+            // Used to position sub-elements, coords needs to be relative to button position
+            rect<s32> subbtn_contents_rec = rect<s32>(LEFT_BORDER + HORZ_PADDING, VERT_MARGIN + TOP_BORDER + VERT_PADDING,
+                                             subbtn_rec.getWidth() - RIGHT_BORDER - HORZ_PADDING*2, one_button_height
+                                              - VERT_MARGIN*2 - BOTTOM_BORDER - (int)VERT_PADDING*2);
+                                             
             // TODO Add support for BUTTON type when needed
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
             {
-                // The icon will take 1/3rd of the tab width at most, less if height is lacking
-                int icon_size = std::min(m_w/3, subbtn_rec.getHeight()+2*VERT_BORDER_MARGIN);
 
-                rect<s32> icon_part = rect<s32>(5,
-                                                one_button_height/2 - icon_size/2-VERT_BORDER_MARGIN,
-                                                icon_size+5,
-                                                one_button_height/2 + icon_size/2-VERT_BORDER_MARGIN);
+                rect<s32> icon_part = rect<s32>(subbtn_contents_rec.UpperLeftCorner.X,
+                                                subbtn_contents_rec.UpperLeftCorner.Y,
+                                                subbtn_contents_rec.UpperLeftCorner.X +
+                                                (subbtn_contents_rec.LowerRightCorner.Y -
+                                                subbtn_contents_rec.UpperLeftCorner.Y),
+                                                subbtn_contents_rec.LowerRightCorner.Y);
 
                 // label at the *right* of the icon (for tabs)
-                rect<s32> label_part = rect<s32>(icon_size+5,
-                                                 5-VERT_BORDER_MARGIN,
-                                                 subbtn_rec.getWidth()-5,
-                                                 one_button_height-5-VERT_BORDER_MARGIN);
+                rect<s32> label_part = rect<s32>(icon_part.LowerRightCorner.X,
+                                                 subbtn_contents_rec.UpperLeftCorner.Y,
+                                                 subbtn_contents_rec.LowerRightCorner.X,
+                                                 subbtn_contents_rec.LowerRightCorner.Y);
 
                 // use the same ID for all subcomponents; since event handling
                 // is done per-ID, no matter which one your hover, this

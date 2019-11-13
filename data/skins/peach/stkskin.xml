@@ -150,16 +150,16 @@ all types of ttf.
 
 
 <element type="verticalTab" state="neutral" image="glasstab_vert.png"
-      left_border="75" right_border="75" top_border="10" bottom_border="10"
-      hborder_out_portion="0.2" />
+      left_border="30" right_border="30" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" v_margin="8"/>
       
 <element type="verticalTab" state="focused" image="glasstab_vert_focus.png"
-      left_border="75" right_border="75" top_border="10" bottom_border="10"
-      hborder_out_portion="0.2" />
+      left_border="30" right_border="30" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" v_margin="8"/>
 
 <element type="verticalTab" state="down" image="glasstab_vert_down.png"
-      left_border="75" right_border="75" top_border="10" bottom_border="10"
-      hborder_out_portion="0.2" />
+      left_border="30" right_border="30" top_border="10" bottom_border="10"
+      hborder_out_portion="0.2" v_margin="8"/>
 
 <!-- Stateless -->
 <element type="squareFocusHaloBW" common="y" image="glass_square_focused_bw.png"
