@@ -233,7 +233,7 @@ void RibbonWidget::add()
                 }
 
                 // label at the *right* of the icon (for tabs)
-                rect<s32> label_part = rect<s32>(height + 15, 0, height - 15, height);
+                rect<s32> label_part = rect<s32>(height + 15, 0, width - 15, height);
 
                 // use the same ID for all subcomponents; since event handling
                 // is done per-ID, no matter which one your hover, this

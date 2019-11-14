@@ -138,15 +138,15 @@ all types of ttf.
       
 <element type="tab" state="neutral" image="glasstab.png"
       left_border="75" right_border="75" top_border="0" bottom_border="15"
-      hborder_out_portion="0.2" />
+      hborder_out_portion="0.2" h_inner_padding="0.03" v_inner_padding="0.05"/>
       
 <element type="tab" state="focused" image="glasstab_focus.png"
       left_border="75" right_border="75" top_border="0" bottom_border="15"
-      hborder_out_portion="0.2" />
+      hborder_out_portion="0.2" h_inner_padding="0.03" v_inner_padding="0.05"/>
 
 <element type="tab" state="down" image="glasstab_down.png"
       left_border="75" right_border="75" top_border="0" bottom_border="15"
-      hborder_out_portion="0.2" />
+      hborder_out_portion="0.2" h_inner_padding="0.03" v_inner_padding="0.05"/>
 
 
 <element type="verticalTab" state="neutral" image="glasstab_vert.png"
