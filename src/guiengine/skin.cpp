@@ -229,7 +229,6 @@ namespace SkinConfig
                 }
                 std::vector<std::string> list_ttf;
                 std::vector<std::string> list_ttf_path;
-                std::vector<int> list_regular_thickness, list_bold_thickness;
                 if (node->get("normal_ttf", &list_ttf))
                 {
                     for (auto& t : list_ttf)
