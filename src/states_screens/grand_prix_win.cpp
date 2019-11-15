@@ -167,8 +167,8 @@ void GrandPrixWin::init()
 
         const int label_height = GUIEngine::getFontHeight() + 15;
 
-        const int y_from       = frame_size.Height - label_height*2;
-        const int y_to         = frame_size.Height - label_height;
+        const int y_from       = frame_size.Height - label_height*2 - GUIEngine::getFontHeight();
+        const int y_to         = frame_size.Height - label_height - GUIEngine::getFontHeight();
 
         const int label_x_from = frame_size.Width/2 - message_width/2;
         const int label_x_to   = frame_size.Width/2 + message_width/2;
