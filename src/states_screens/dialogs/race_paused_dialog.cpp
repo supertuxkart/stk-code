@@ -209,6 +209,7 @@ GUIEngine::EventPropagation
 
         if (selection == "exit")
         {
+            bool from_overworld = m_from_overworld;
             ModalDialog::dismiss();
             if (STKHost::existHost())
             {
@@ -228,7 +229,7 @@ GUIEngine::EventPropagation
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
                 // Pause story mode timer when quitting story mode
-                if (m_from_overworld)
+                if (from_overworld)
                     story_mode_timer->pauseTimer(/*loading screen*/ false);
 
                 if (race_manager->raceWasStartedFromOverworld())
