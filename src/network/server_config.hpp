@@ -96,7 +96,7 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-port",
         "Port used in server, if you specify 0, it will use the server port "
         "specified in stk_config.xml. If you wish to use a random port, "
-        "set random-server-port="1" in user config. STK will automatically "
+        "set random-server-port to '1' in user config. STK will automatically "
         "switch to a random port if the port you specify fails to be bound."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_server_mode
