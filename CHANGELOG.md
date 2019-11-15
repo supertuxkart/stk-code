@@ -3,7 +3,7 @@ This file documents notable changes to SuperTuxKart across versions since its in
 
 It should be kept in mind that some versions have a less complete changelog than others, and that this changelog do not list the details of the many small bugfixes and improvements which together make a significant part of the progress between releases.
 
-For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shorcut for overall contribution.
+For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
 ## SuperTuxKart 1.1 (in development)
 
@@ -63,7 +63,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Show the number of ranking points won or lost after a ranked race, by Benau
 * Separate blurring visual effects from the main graphics presets, by Alayan
 * Fix incorrect text resizing in the help menu, by Benau
-* Make the custom random GP option more proeminent in the track selection screen, by dumaosen
+* Make the custom random GP option more prominent in the track selection screen, by dumaosen
 * Many minor tweaks and bugfixes
 
 ## SuperTuxKart 1.0 (20. April 2019)
@@ -444,7 +444,7 @@ Too many to list them all. Main points:
 * Improved AI
 * New GUI handling, including resolution switching GUI
 * Improved input handling	
-* Jump and look-back featue
+* Jump and look-back feature
 * Additional music and main theme
 ### Tracks and modeling
 #### Karts
