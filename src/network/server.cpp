@@ -120,7 +120,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
         return;
     }
 
-    // Display server owner name if he's your friend or localhost
+    // Display server owner name if they're your friend or localhost
     Online::OnlineProfile* opp =
         PlayerManager::getCurrentPlayer()->getProfile();
     // Check localhost owner
@@ -159,11 +159,11 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
  *  \param name Name of the server.
  *  \param max_players Maximum number of players allowed on this server.
  *  \param current_players The currently connected number of players.
- *  \param difficulty The difficulty of server.
- *  \param server_mode The game modes of server (including minor and major).
+ *  \param difficulty The difficulty of the server.
+ *  \param server_mode The game modes of the server (including minor and major).
  *  \param address IP and port of the server.
  *  \param password_protected True if can only be joined with a password.
- *  \param game_started True if there is already game begun in server.
+ *  \param game_started True if a game has already begun in the server.
  *  \param current_track If server is in game, store the track ident
  */
 Server::Server(unsigned server_id, const core::stringw &name, int max_players,

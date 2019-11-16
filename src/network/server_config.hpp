@@ -95,9 +95,9 @@ namespace ServerConfig
     SERVER_CFG_PREFIX IntServerConfigParam m_server_port
         SERVER_CFG_DEFAULT(IntServerConfigParam(0, "server-port",
         "Port used in server, if you specify 0, it will use the server port "
-        "specified in stk_config.xml or if random-server-port is enabled "
-        "in user config, than any port. STK will auto change to random "
-        "port if the port you specify failed to be bound."));
+        "specified in stk_config.xml. If you wish to use a random port, "
+        "set random-server-port to '1' in user config. STK will automatically "
+        "switch to a random port if the port you specify fails to be bound."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_server_mode
         SERVER_CFG_DEFAULT(IntServerConfigParam(3, "server-mode",
@@ -131,13 +131,13 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX IntServerConfigParam m_server_max_players
         SERVER_CFG_DEFAULT(IntServerConfigParam(8, "server-max-players",
-        "Maximum number of players on the server, setting it more than "
-        "8 will have performance degradation."));
+        "Maximum number of players on the server, setting this to a value "
+        "greater than 8 can cause performance degradation."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_private_server_password
         SERVER_CFG_DEFAULT(StringServerConfigParam("",
         "private-server-password", "Password for private server, "
-        "empty for a public server."));
+        "leave empty for a public server."));
 
     SERVER_CFG_PREFIX StringServerConfigParam m_motd
         SERVER_CFG_DEFAULT(StringServerConfigParam("",
@@ -146,12 +146,13 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_chat
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "chat",
-        "If off this server will ignore chat message from all players."));
+        "If this value is set to false, the server will ignore chat messages "
+        "from all players."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_track_voting
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "track-voting",
-        "Allow players to vote track to play, if off server will pick next "
-        "track to play randomly."));
+        "Allow players to vote for which track to play. If this value is set "
+        "to false, the server will randomly pick the next track to play."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_voting_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(30.0f, "voting-timeout",
@@ -162,7 +163,7 @@ namespace ServerConfig
     SERVER_CFG_PREFIX FloatServerConfigParam m_validation_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "validation-timeout",
         "Timeout in seconds for validation of clients in wan, currently "
-        "stk will use the stk-addons server to share AES key between client "
+        "stk will use the stk-addons server to share AES key between the client "
         "and server."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_validating_player
@@ -173,15 +174,15 @@ namespace ServerConfig
     SERVER_CFG_PREFIX BoolServerConfigParam m_firewalled_server
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "firewalled-server",
         "Disable it to turn off all stun related code in server, "
-        "it allows saving server resource if your server is not "
+        "it allows for saving of server resources if your server is not "
         "behind a firewall."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_ipv6_server
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ipv6-server",
         "Enable to allow IPv6 connection if you have a public IPv6 address. "
-        "STK currently use dual-stack mode which requires server to have both "
+        "STK currently uses dual-stack mode which requires server to have both "
         "IPv4 and IPv6 and listen to same port, firewalled-server will be "
-        "disabled so you need to make sure this server has port forward "
+        "disabled so you need to make sure this server has port-forwarding "
         "configured properly if needed."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_owner_less
