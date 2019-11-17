@@ -486,10 +486,11 @@ check_error
 echo "Building APK"
 
 mkdir -p "$DIRNAME/res/drawable/"
-mkdir -p "$DIRNAME/res/drawable-hdpi/"
 mkdir -p "$DIRNAME/res/drawable-mdpi/"
+mkdir -p "$DIRNAME/res/drawable-hdpi/"
 mkdir -p "$DIRNAME/res/drawable-xhdpi/"
 mkdir -p "$DIRNAME/res/drawable-xxhdpi/"
+mkdir -p "$DIRNAME/res/drawable-xxxhdpi/"
 mkdir -p "$DIRNAME/res/values/"
 
 STRINGS_FILE="$DIRNAME/res/values/strings.xml"
@@ -534,10 +535,11 @@ sed -i "s/versionCode=\".*\"/versionCode=\"$PROJECT_CODE\"/g" \
 
 cp "banner.png" "$DIRNAME/res/drawable/banner.png"
 cp "$APP_ICON" "$DIRNAME/res/drawable/icon.png"
-convert -scale 72x72 "$APP_ICON" "$DIRNAME/res/drawable-hdpi/icon.png"
 convert -scale 48x48 "$APP_ICON" "$DIRNAME/res/drawable-mdpi/icon.png"
+convert -scale 72x72 "$APP_ICON" "$DIRNAME/res/drawable-hdpi/icon.png"
 convert -scale 96x96 "$APP_ICON" "$DIRNAME/res/drawable-xhdpi/icon.png"
 convert -scale 144x144 "$APP_ICON" "$DIRNAME/res/drawable-xxhdpi/icon.png"
+convert -scale 192x192 "$APP_ICON" "$DIRNAME/res/drawable-xxxhdpi/icon.png"
 
 if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
     export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
