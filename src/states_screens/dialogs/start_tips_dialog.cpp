@@ -117,7 +117,15 @@ GUIEngine::EventPropagation StartTipsDialog::processEvent(const std::string& eve
     }
     else if(event_source == "icon")
     {
-        m_tip.runGoto();
+        if(m_tip.goto_type == TipSet::GOTO_SCREEN)
+        {
+            TipSet::tip tip = m_tip;
+            ModalDialog::dismiss();
+            tip.runGoto();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if(m_tip.goto_type == TipSet::GOTO_WEBSITE)
+            m_tip.runGoto();
     }
     else if(event_source == "showtips")
     {

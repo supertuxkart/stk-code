@@ -59,9 +59,9 @@ TipsManager::~TipsManager()
 // ----------------------------------------------------------------------------
 TipSet* TipsManager::getTipSet(std::string id) const
 {
-    std::map<std::string, TipSet*>::const_iterator info =
+    std::map<std::string, TipSet*>::const_iterator it =
         m_all_tip_sets.find(id);
-    if (info != m_all_tip_sets.end())
-        return info->second;
+    if (it != m_all_tip_sets.end())
+        return it->second;
     return NULL;
 }

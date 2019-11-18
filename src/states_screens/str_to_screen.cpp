@@ -18,12 +18,14 @@
 
 #include "str_to_screen.hpp"
 
+#include "challenges/story_mode_timer.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/screen.hpp"
-#include "states_screens/addons_screen.hpp"
-#include "states_screens/arenas_screen.hpp"
+#include "modes/cutscene_world.hpp"
+#include "modes/overworld.hpp"
+#include "network/network_config.hpp"
 #include "states_screens/credits.hpp"
-#include "states_screens/easter_egg_screen.hpp"
-#include "states_screens/ghost_replay_selection.hpp"
 #include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/help_screen_2.hpp"
@@ -32,15 +34,9 @@
 #include "states_screens/help_screen_5.hpp"
 #include "states_screens/help_screen_6.hpp"
 #include "states_screens/help_screen_7.hpp"
-#include "states_screens/online/create_server_screen.hpp"
-#include "states_screens/online/networking_lobby.hpp"
-#include "states_screens/online/online_lan.hpp"
+#include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online/online_profile_achievements.hpp"
-#include "states_screens/online/online_profile_friends.hpp"
-#include "states_screens/online/online_profile_servers.hpp"
-#include "states_screens/online/online_profile_settings.hpp"
 #include "states_screens/online/online_screen.hpp"
-#include "states_screens/online/online_user_search.hpp"
 #include "states_screens/online/register_screen.hpp"
 #include "states_screens/online/server_selection.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
@@ -51,10 +47,9 @@
 #include "states_screens/options/options_screen_ui.hpp"
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/options/user_screen.hpp"
-#include "states_screens/race_setup_screen.hpp"
-#include "states_screens/soccer_setup_screen.hpp"
-#include "states_screens/tracks_and_gp_screen.hpp"
 #include "utils/log.hpp"
+
+#include <vector>
 
 StrToScreen::StrToScreen(std::string screen)
 {
@@ -63,16 +58,10 @@ StrToScreen::StrToScreen(std::string screen)
 
 void StrToScreen::runScreen()
 {
-    if(m_screen == "addons")
-        AddonsScreen::getInstance()->push();
-    else if(m_screen == "arenas")
-        ArenasScreen::getInstance()->push();
+    if(m_screen == "achievements")
+        OnlineProfileAchievements::getInstance()->push();
     else if(m_screen == "credits")
         CreditsScreen::getInstance()->push();
-    else if(m_screen == "easter_egg")
-        EasterEggScreen::getInstance()->push();
-    else if(m_screen == "ghost_replay_selection")
-        GhostReplaySelection::getInstance()->push();
     else if(m_screen == "grand_prix_editor")
         GrandPrixEditorScreen::getInstance()->push();
     else if(m_screen == "help_1")
@@ -89,28 +78,8 @@ void StrToScreen::runScreen()
         HelpScreen6::getInstance()->push();
     else if(m_screen == "help_7")
         HelpScreen7::getInstance()->push();
-    else if(m_screen == "create_server")
-        CreateServerScreen::getInstance()->push();
-    else if(m_screen == "networking_lobby")
-        NetworkingLobby::getInstance()->push();
-    else if(m_screen == "online_lan")
-        OnlineLanScreen::getInstance()->push();
-    else if(m_screen == "profile_achievements")
-        OnlineProfileAchievements::getInstance()->push();
-    else if(m_screen == "profile_friends")
-        OnlineProfileFriends::getInstance()->push();
-    else if(m_screen == "profile_servers")
-        OnlineProfileServers::getInstance()->push();
-    else if(m_screen == "profile_settings")
-        OnlineProfileSettings::getInstance()->push();
-    else if(m_screen == "online")
-        OnlineScreen::getInstance()->push();
-    else if(m_screen == "user_search")
-        OnlineUserSearch::getInstance()->push();
     else if(m_screen == "register")
         RegisterScreen::getInstance()->push();
-    else if(m_screen == "server_selection")
-        ServerSelection::getInstance()->push();
     else if(m_screen == "options_general")
         OptionsScreenGeneral::getInstance()->push();
     else if(m_screen == "options_audio")
@@ -127,13 +96,64 @@ void StrToScreen::runScreen()
         OptionsScreenVideo::getInstance()->push();
     else if(m_screen == "user_screen")
         UserScreen::getInstance()->push();
-    else if(m_screen == "race_setup")
-        RaceSetupScreen::getInstance()->push();
-    else if(m_screen == "soccer_setup")
-        SoccerSetupScreen::getInstance()->push();
-    else if(m_screen == "tracks_and_gp")
-        TracksAndGPScreen::getInstance()->push();
+    else if(m_screen == "start_story")
+        runStory();
+    else if(m_screen == "start_singleplayer")
+        runOfflineGame(false);
+    else if(m_screen == "start_multiplayer")
+        runOfflineGame(true);
     else
         Log::warn("StrToScreen",
                   "Unsupported screen \"%s\"", m_screen.c_str());
+}
+
+void StrToScreen::runStory()
+{
+    NetworkConfig::get()->unsetNetworking();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
+
+    // Start the story mode (and speedrun) timer
+    story_mode_timer->startTimer();
+
+    if (player->isFirstTime())
+    {
+        CutsceneWorld::setUseDuration(true);
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->startSingleRace("introcutscene", 999, false);
+
+        std::vector<std::string> parts;
+        parts.push_back("introcutscene");
+        parts.push_back("introcutscene2");
+        ((CutsceneWorld*)World::getWorld())->setParts(parts);
+        //race_manager->startSingleRace("introcutscene2", 999, false);
+        return;
+    }
+    else
+    {
+        // Unpause the story mode timer when entering back the story mode
+        story_mode_timer->unpauseTimer(/* exit loading pause */ false);
+
+        const std::string default_kart = UserConfigParams::m_default_kart;
+        if (player->isLocked(default_kart))
+        {
+            KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
+            next->setGoToOverworldNext();
+            next->setMultiplayer(false);
+            next->push();
+            return;
+        }
+        OverWorld::enterOverWorld();
+    }
+}
+
+void StrToScreen::runOfflineGame(bool multiplayer)
+{
+    NetworkConfig::get()->unsetNetworking();
+    KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
+    s->setMultiplayer(multiplayer);
+    s->setFromOverworld(false);
+    s->push();
 }

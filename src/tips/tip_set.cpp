@@ -151,8 +151,9 @@ TipSet::tip TipSet::getTip()
     }
     else
     {
-        Log::error("TipSet",
-                   "Unknown type for tipset \"%s\".", m_id);
+        Log::warn("TipSet",
+                   "Unknown type for tipset \"%s\". Use the first tip as default", m_id);
+        return m_tipset[0];
     }
     
 } //getTip

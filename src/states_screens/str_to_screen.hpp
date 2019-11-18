@@ -31,6 +31,9 @@ class StrToScreen
 private:
     /** The string of this strtoscreen. */
     std::string m_screen;
+    
+    void runStory();
+    void runOfflineGame(bool multiplayer);
 
 public:
 
