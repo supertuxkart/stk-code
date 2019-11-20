@@ -406,7 +406,13 @@ core::stringw PlayerController::getName() const
             m_kart->getWorldKartId());
         name = rki.getPlayerName();
         if (rki.getHandicap() == HANDICAP_MEDIUM)
+        {
+#ifdef SERVER_ONLY
+            name += L" (handicapped)";
+#else
             name = _("%s (handicapped)", name);
+#endif
+        }
     }
     return name;
 }   // getName
