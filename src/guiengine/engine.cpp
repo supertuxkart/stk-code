@@ -1209,7 +1209,7 @@ namespace GUIEngine
             ul.unlock();
 #endif
 
-        const GameState gamestate = g_state_manager->getGameState();
+        GameState gamestate = g_state_manager->getGameState();
 
         // ---- some menus may need updating
         bool dialog_opened = false;
@@ -1235,6 +1235,8 @@ namespace GUIEngine
                 screen->onUpdate(elapsed_time);
             }
         }
+        
+        gamestate = g_state_manager->getGameState();
 
         // ---- menu drawing
 

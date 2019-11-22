@@ -1871,7 +1871,11 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
 void Skin::renderSections(PtrVector<Widget>* within_vector)
 {
 #ifndef SERVER_ONLY
-    if (within_vector == NULL) within_vector = &getCurrentScreen()->m_widgets;
+    if (within_vector == NULL && getCurrentScreen()) 
+        within_vector = &getCurrentScreen()->m_widgets;
+        
+    if (!within_vector)
+        return;
 
     const unsigned short widgets_amount = within_vector->size();
 
