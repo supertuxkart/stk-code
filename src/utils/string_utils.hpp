@@ -276,6 +276,34 @@ namespace StringUtils
     }   // getCountryFlag
 
     // ------------------------------------------------------------------------
+    /** Return string for UTF32 emoji. */
+    inline irr::core::stringw getUtf32Emoji(const uint32_t code)
+    {
+        uint32_t emoji[2] =
+        {
+            code,
+            0
+        };
+        if (sizeof(wchar_t) == 4)
+        {
+            return (wchar_t*)emoji;
+        }
+        else if (sizeof(wchar_t) == 2)
+        {
+            emoji[0] -= 0x10000;
+            wchar_t u16[3] =
+            {
+                //make a surrogate pair
+                static_cast<wchar_t>((emoji[0] >> 10) + 0xd800),
+                static_cast<wchar_t>((emoji[0] & 0x3ff) + 0xdc00),
+                0
+            };
+            return u16;
+        }
+        return L"";
+    }   // getUtf32Emoji
+
+    // ------------------------------------------------------------------------
     irr::core::stringw utf8ToWide(const char* input);
     irr::core::stringw utf8ToWide(const std::string &input);
     std::u32string utf8ToUtf32(const std::string &input);
