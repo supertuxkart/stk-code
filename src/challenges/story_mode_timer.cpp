@@ -116,6 +116,7 @@ void StoryModeTimer::startTimer()
     if (!m_story_mode_started)
     {
         m_story_mode_start = StkTime::getMonoTimeMs();
+        m_story_mode_end = m_story_mode_start;
         m_story_mode_started = true;
     }
 }
