@@ -393,6 +393,8 @@ void ClientLobby::update(int ticks)
         ns->addUInt8(player_count);
 
         bool encryption = false;
+        // Make sure there is a player before calling getCurrentOnlineId
+        PlayerManager::get()->enforceCurrentPlayer();
         uint32_t id = PlayerManager::getCurrentOnlineId();
         bool lan_ai = !m_server->supportsEncryption() &&
             NetworkConfig::get()->isNetworkAITester();
