@@ -143,7 +143,7 @@ void getConfigForDevice(const char* dev)
     else if (device.find("iPad") != std::string::npos)
     {
         // Normal configuration default
-        UserConfigParams::m_multitouch_scale.setDefaultValue(1.1f);
+        UserConfigParams::m_multitouch_scale.setDefaultValue(0.95f);
         UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.2f);
         UserConfigParams::m_font_size = 3.0f;
         device.erase(0, 4);
