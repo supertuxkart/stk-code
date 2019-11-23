@@ -215,6 +215,12 @@ void StoryModeTimer::updateTimer()
 
 void StoryModeTimer::updateSpeedrunTimer()
 {
+    if (m_stored_speedrun_milliseconds < 0)
+    {
+        m_speedrun_milliseconds = -1;
+        return;
+    }
+
     uint64_t elapsed_time;
 
     if (m_valid_speedrun_ended)
@@ -232,6 +238,12 @@ void StoryModeTimer::updateSpeedrunTimer()
 
 void StoryModeTimer::updateStoryModeTimer()
 {
+    if (m_stored_story_mode_milliseconds < 0)
+    {
+        m_story_mode_milliseconds = -1;
+        return;
+    }
+
     uint64_t elapsed_time;
 
     if (m_story_mode_ended)

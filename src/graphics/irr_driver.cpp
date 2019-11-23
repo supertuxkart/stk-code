@@ -1860,6 +1860,9 @@ void IrrDriver::displayFPS()
 void IrrDriver::displayStoryModeTimer()
 {
 #ifndef SERVER_ONLY
+    if (story_mode_timer->getStoryModeTime() < 0)
+        return;
+
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
 
     core::stringw timer_string;
@@ -1868,7 +1871,6 @@ void IrrDriver::displayStoryModeTimer()
     //The normal timer size ; to not write over it
     core::dimension2du area = font->getDimension(L"99:99.99");
     int regular_timer_width = area.Width;
-    int additional_height = 0;
     if (UserConfigParams::m_speedrun_mode)
         area = font->getDimension(L"99:99:99.999");
     else
@@ -1884,9 +1886,9 @@ void IrrDriver::displayStoryModeTimer()
 
     font->setColoredBorder(irr::video::SColor(255, 0, 32, 80));
 
-   	if ( (UserConfigParams::m_speedrun_mode && story_mode_timer->speedrunIsFinished()) ||
+    if ( (UserConfigParams::m_speedrun_mode && story_mode_timer->speedrunIsFinished()) ||
          (!UserConfigParams::m_speedrun_mode && PlayerManager::getCurrentPlayer()->isFinished()) )
-   		font->draw(timer_string.c_str(), position, video::SColor(255, 0, 255, 0), false, false, NULL, true);
+        font->draw(timer_string.c_str(), position, video::SColor(255, 0, 255, 0), false, false, NULL, true);
     else
         font->draw(timer_string.c_str(), position, video::SColor(255, 220, 255, 0), false, false, NULL, true);
 
