@@ -136,6 +136,10 @@ float MainLoop::getLimitedDt()
             {
                 music_manager->resumeMusic();
                 SFXManager::get()->resumeAll();
+                // Improve rubber banding effects of rewinders when going
+                // back to phone, because the smooth timer is paused
+                if (World::getWorld() && RewindManager::isEnabled())
+                    RewindManager::get()->resetSmoothNetworkBody();
             }
         }
     }

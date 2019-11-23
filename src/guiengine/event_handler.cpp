@@ -34,6 +34,7 @@
 #include "input/input_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/world.hpp"
+#include "network/rewind_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/profiler.hpp"
@@ -188,6 +189,10 @@ bool EventHandler::OnEvent (const SEvent &event)
             {
                 music_manager->resumeMusic();
                 SFXManager::get()->resumeAll();
+                // Improve rubber banding effects of rewinders when going
+                // back to phone, because the smooth timer is paused
+                if (World::getWorld() && RewindManager::isEnabled())
+                    RewindManager::get()->resetSmoothNetworkBody();
             }
         }
         else if (cmd == APP_CMD_LOW_MEMORY)
