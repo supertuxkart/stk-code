@@ -179,7 +179,9 @@ protected:
 
     /** Set when the world is online and counts network players. */
     bool m_is_network_world;
-    
+
+    bool m_ended_early;
+
     virtual void  onGo() OVERRIDE;
     /** Returns true if the race is over. Must be defined by all modes. */
     virtual bool  isRaceOver() = 0;
@@ -270,6 +272,8 @@ public:
                                const ItemState *item    ) {}
     // ------------------------------------------------------------------------
     virtual void endRaceEarly() { return; }
+    // ------------------------------------------------------------------------
+    virtual bool hasRaceEndedEarly() const { return m_ended_early; }
     // ------------------------------------------------------------------------
     /** Called to determine whether this race mode uses bonus boxes. */
     virtual bool haveBonusBoxes() { return true; }

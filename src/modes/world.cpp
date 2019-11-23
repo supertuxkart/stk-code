@@ -154,6 +154,7 @@ World::World() : WorldStatus()
  */
 void World::init()
 {
+    m_ended_early         = false;
     m_faster_music_active = false;
     m_fastest_kart        = 0;
     m_eliminated_karts    = 0;
@@ -334,6 +335,7 @@ void World::reset(bool restart)
         m_saved_race_gui = NULL;
     }
 
+    m_ended_early = false;
     m_schedule_pause = false;
     m_schedule_unpause = false;
 

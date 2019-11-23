@@ -166,4 +166,6 @@ void StandardRace::endRaceEarly()
     setPhase(RESULT_DISPLAY_PHASE);
     if (!isNetworkWorld() || NetworkConfig::get()->isServer())
         terminateRace();
+    if (!isNetworkWorld())
+        m_ended_early = true;
 } // endRaceEarly
