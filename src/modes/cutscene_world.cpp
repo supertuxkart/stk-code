@@ -32,6 +32,7 @@
 #include "modes/overworld.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/credits.hpp"
+#include "states_screens/cutscene_general.hpp"
 #include "states_screens/cutscene_gui.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/offline_kart_selection.hpp"
@@ -591,6 +592,14 @@ void CutsceneWorld::enterRaceOverState()
 
         race_manager->exitRace();
         race_manager->startSingleRace(next_part, 999, race_manager->raceWasStartedFromOverworld());
+        
+        // Keep showing cutscene gui if previous scene was using it
+        CutSceneGeneral* csg = dynamic_cast<CutSceneGeneral*>(cs);
+        if (csg != NULL)
+        {
+            CutSceneGeneral* scene = CutSceneGeneral::getInstance();
+            scene->push();
+        }
     }
 
 }

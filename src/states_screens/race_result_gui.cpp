@@ -55,6 +55,7 @@
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "scriptengine/property_animator.hpp"
+#include "states_screens/cutscene_general.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
@@ -376,6 +377,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                     std::vector<std::string> parts;
                     parts.push_back("endcutscene");
                     ((CutsceneWorld*)World::getWorld())->setParts(parts);
+                    
+                    CutSceneGeneral* scene = CutSceneGeneral::getInstance();
+                    scene->push();
                 }
                 else
                 {

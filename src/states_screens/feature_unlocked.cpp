@@ -165,7 +165,7 @@ FeatureUnlockedCutScene::UnlockedThing::~UnlockedThing()
 #endif
 
 FeatureUnlockedCutScene::FeatureUnlockedCutScene()
-            : CutsceneScreen("feature_unlocked.stkgui")
+            : CutsceneScreen("cutscene.stkgui")
 {
     m_key_angle = 0;
 }  // FeatureUnlockedCutScene
