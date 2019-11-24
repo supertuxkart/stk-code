@@ -29,6 +29,8 @@
 #include <SColor.h>
 
 #include <assert.h>
+#include <algorithm>
+
 #include <map>
 #include <memory>
 #include <random>
@@ -172,6 +174,14 @@ public:
     ItemState* getItem(unsigned int n)
     {
         return dynamic_cast<Item*>(m_all_items[n]);
+    }
+    // ------------------------------------------------------------------------
+    bool itemExists(const ItemState* is) const
+    {
+        if (!is)
+            return false;
+        auto it = std::find(m_all_items.begin(), m_all_items.end(), is);
+        return it != m_all_items.end();
     }
     // ------------------------------------------------------------------------
     /** Returns a reference to the array of all items on the specified quad.

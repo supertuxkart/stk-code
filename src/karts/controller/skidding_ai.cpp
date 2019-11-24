@@ -222,6 +222,15 @@ unsigned int SkiddingAI::getNextSector(unsigned int index)
 void SkiddingAI::update(int ticks)
 {
     float dt = stk_config->ticks2Time(ticks);
+
+    // Clear stored items if they were deleted (for example a switched nitro)
+    if (m_item_to_collect &&
+        !ItemManager::get()->itemExists(m_item_to_collect))
+        m_item_to_collect = NULL;
+    if (m_last_item_random &&
+        !ItemManager::get()->itemExists(m_last_item_random))
+        m_last_item_random = NULL;
+
     m_controls->setRescue(false);
 
     // This is used to enable firing an item backwards.
