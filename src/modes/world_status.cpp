@@ -450,7 +450,9 @@ void WorldStatus::updateTime(int ticks)
             {
                 m_time_ticks = 0;
                 m_time = 0.0f;
-                m_count_up_ticks = 0;
+                // For rescue animation playing (if any) in result screen
+                if (!device->getTimer()->isStopped())
+                    m_count_up_ticks++;
                 break;
             }
 
