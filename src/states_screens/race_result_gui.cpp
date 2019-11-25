@@ -59,10 +59,12 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/race_setup_screen.hpp"
+#include "tips/tips_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
 #include <algorithm>
 
 /** Constructor, initialises internal data structures.
@@ -140,6 +142,10 @@ void RaceResultGUI::init()
         m_start_track = 0;
         m_end_track = (int)tracks.size();
     }
+
+    core::stringw tips_string = _("Tip: ") + TipsManager::get()->getTip("story");
+    GUIEngine::LabelWidget *tips = getWidget<GUIEngine::LabelWidget>("tips");
+    tips->setText(tips_string, false);
 }   // init
 
 //-----------------------------------------------------------------------------

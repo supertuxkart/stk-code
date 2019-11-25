@@ -1,0 +1,11 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+<tips>
+    <tipset id="story">
+        <tip text="Add more tips so that the game will be more user-friendly!"/>
+        <tip text="If you fly using sara the wizard, you will see her underware!"/>
+        <tip text="Donate to help SuperTuxKart keep going!"/>
+        <tip text="Skid more, and you will find you faster than before!"/>
+        <tip text="Using nitro after skidding can make you speed-up longer!"/>
+        <tip text="You can change the skin of UI in UI options!"/>
+    </tipset>
+</tips>
