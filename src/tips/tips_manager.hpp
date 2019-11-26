@@ -67,7 +67,7 @@ public:
         m_tips_manager = NULL;
     }   // destroy
     // ========================================================================
-    /** Get a tipset by an ID. */
+    /** Get a tip by ID. */
     irr::core::stringw getTip(std::string id);
     // ------------------------------------------------------------------------
 };   // class TipsManager

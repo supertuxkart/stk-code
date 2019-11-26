@@ -143,7 +143,7 @@ void RaceResultGUI::init()
         m_end_track = (int)tracks.size();
     }
 
-    core::stringw tips_string = _("Tip: ") + TipsManager::get()->getTip("story");
+    core::stringw tips_string = _("Tip: ") + TipsManager::get()->getTip("race");
     GUIEngine::LabelWidget *tips = getWidget<GUIEngine::LabelWidget>("tips");
     tips->setText(tips_string, false);
 }   // init

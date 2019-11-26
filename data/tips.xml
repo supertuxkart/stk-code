@@ -1,11 +1,21 @@
  <?xml version="1.0" encoding="UTF-8"?>
 <tips>
-    <tipset id="story">
-        <tip text="Add more tips so that the game will be more user-friendly!"/>
-        <tip text="If you fly using sara the wizard, you will see her underware!"/>
-        <tip text="Donate to help SuperTuxKart keep going!"/>
-        <tip text="Skid more, and you will find you faster than before!"/>
-        <tip text="Using nitro after skidding can make you speed-up longer!"/>
-        <tip text="You can change the skin of UI in UI options!"/>
+    <tipset id="normal">
+        <tip text="You can change the skin of gui in UI options."/>
+        <tip text="You can show more information in game by enabling some options in UI options"/>
+        <tip text="You can change the font size in UI options"/>
+        <tip text="You can visit https://supertuxkart.net/ for more information of the game."/>
+    </tipset>
+    <tipset id="race">
+        <tip text="Always do short nitro boosts. Re-use the nitro when your speed goes down again."/>
+        <tip text="Only use zipper when it is safe. Long straight lines are the best."/>
+        <tip text="Don't use multiple zippers quickly in row, instead, wait until the speed boost wears off."/>
+        <tip text="Skid more, and you will find you much faster than before."/>
+        <tip text="Using nitro after skidding can make you speed-up longer."/>
+        <tip text="You get a startup boost if you start accelerating during &quot;Set&quot;"/>
+        <tip text="If you slow down when a parachute attaches your kart, you will get rid of it quickly."/>
+        <tip text="For safety, try to stay away from other karts unless you have a bubble gum."/>
+        <tip text="Instead of bubblegum, you can also shoot backward a bowling, cake or plunger to kill a basketball."/>
+        <tip text="Try to avoid crashing into other karts unless you want to throw a kart off the track."/>
     </tipset>
 </tips>
