@@ -99,6 +99,7 @@ namespace GUIEngine
         PROP_ALIGN,
         // PROP_TEXT, // this one is a bit special, can't go along others since it's wide strings
         PROP_ICON,
+        PROP_ALT_ICON,
         PROP_FOCUS_ICON,
         PROP_TEXT_ALIGN,
         PROP_TEXT_VALIGN,

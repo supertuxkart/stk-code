@@ -82,6 +82,25 @@ void IconButtonWidget::add()
         }
     }
 
+    // ---- Alternative icon
+    if (m_texture == NULL)
+    {
+        // Use the alternative icon in case of original icon not found
+        if (m_properties[PROP_ALT_ICON] != "")
+        {
+            if (m_icon_path_type == ICON_PATH_TYPE_ABSOLUTE)
+            {
+                setTexture(irr_driver->getTexture(m_properties[PROP_ALT_ICON]));
+            }
+            else if (m_icon_path_type == ICON_PATH_TYPE_RELATIVE)
+            {
+                std::string file =
+                    GUIEngine::getSkin()->getThemedIcon(m_properties[PROP_ALT_ICON]);
+                setTexture(irr_driver->getTexture(file));
+            }
+        }
+    }
+
     if (m_texture == NULL)
     {
         if (m_properties[PROP_ICON].size() > 0)
