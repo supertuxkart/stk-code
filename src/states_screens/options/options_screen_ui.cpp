@@ -257,7 +257,10 @@ void OptionsScreenUI::init()
     else
     {
         story_timer->setActive(true);
-        speedrun_timer->setActive(true);
+
+        speedrun_timer->setActive(UserConfigParams::m_display_story_mode_timer);
+        getWidget<LabelWidget>("speedrun-timer-text")
+            ->setActive(UserConfigParams::m_display_story_mode_timer);
     }
     if (UserConfigParams::m_speedrun_mode)
     {
@@ -274,9 +277,6 @@ void OptionsScreenUI::init()
         }
     }
     speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
-    speedrun_timer->setVisible( UserConfigParams::m_display_story_mode_timer );
-    getWidget<LabelWidget>("speedrun-timer-text")
-        ->setVisible(UserConfigParams::m_display_story_mode_timer);
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
