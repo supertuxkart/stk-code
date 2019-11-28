@@ -34,7 +34,7 @@
 
                 <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <spacer width="20" height="100%" />
+                    <spacer width="3%" height="100%" />
                     <div layout="vertical-row" width="8f" height="fit">
                         <gauge id="gfx_level" min_value="1" max_value="8" width="100%" align="center" />
                     </div>
@@ -46,7 +46,7 @@
                 <spacer width="5" height="1%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <spacer width="20" height="100%" />
+                    <spacer width="3%" height="100%" />
                     <div layout="vertical-row" width="8f" height="fit">
                         <gauge id="blur_level" min_value="0" max_value="2" width="100%" align="center" />
                     </div>
@@ -59,7 +59,7 @@
 
                 <!-- ************ VSYNC ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
-                    <spacer width="20" height="100%" />
+                    <spacer width="3%" height="100%" />
                     <div layout="vertical-row" width="8f" height="fit" id="inner_box">
                         <spinner id="vsync" width="100%" align="center" />
                     </div>
@@ -72,12 +72,8 @@
 				
                 <!-- ************ CUSTOM SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row" id="outer_box" >
-                    <spacer width="20" height="100%" />
-                    <div layout="vertical-row" width="8f" height="fit" id="inner_box">
-                        <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
-                    </div>
-                    <div layout="vertical-row" proportion="1" height="100%">
-                    </div>
+                    <spacer width="5%" height="100%" />
+                    <button id="custom" text="Custom settings..." I18N="In the video settings" align="center"/>
                 </div>
 
                 <spacer width="5" height="3%"/>
@@ -93,23 +89,23 @@
                 <spacer width="5" height="1%"/>
 
                 <div width="75%" height="fit" layout="horizontal-row" >
-                    <spacer width="40" height="100%" />
+                    <spacer width="5%" height="100%" />
                     <checkbox id="fullscreen"/>
-                    <spacer width="20" height="100%" />
+                    <spacer width="1%" height="100%" />
                     <label id="fullscreenText" height="100%" I18N="In the video settings" text="Fullscreen"/>
                 </div>
 
                 <div width="75%" layout="horizontal-row" height="fit">
-                    <spacer width="40" height="100%" />
+                    <spacer width="5%" height="100%" />
                     <checkbox id="rememberWinpos"/>
-                    <spacer width="20" height="100%" />
+                    <spacer width="1%" height="100%" />
                     <label id="rememberWinposText" height="100%" I18N="In the video settings" text="Remember window location"/>
                 </div>
 
                 <spacer width="5" height="1%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <spacer width="40" height="100%" />
+                    <spacer width="5%" height="100%" />
                     <button id="apply_resolution"
                         I18N="In the video settings" text="Apply new resolution" />
                 </div>
