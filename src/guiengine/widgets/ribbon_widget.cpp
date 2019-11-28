@@ -52,6 +52,7 @@ RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
     m_selection[0] = 0; // only player 0 has a selection by default
 
     m_ribbon_type = type;
+    m_ribbon_flip = FLIP_NO;
     m_mouse_focus = NULL;
     m_listener    = NULL;
 
@@ -923,6 +924,7 @@ void RibbonWidget::setItemVisible(const unsigned int id, bool visible)
     m_labels[id].setVisible(visible);
 } // setItemVisible
 
+// ----------------------------------------------------------------------------
 void RibbonWidget::setFlip(RibbonFlip direction)
 {
     if(m_ribbon_type == RIBBON_TABS || m_ribbon_type == RIBBON_VERTICAL_TABS)
