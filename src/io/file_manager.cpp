@@ -1602,3 +1602,33 @@ bool FileManager::fileIsNewer(const std::string& f1, const std::string& f2) cons
     FileUtils::statU8Path(f2, &stat2);
     return stat1.st_mtime > stat2.st_mtime;
 }   // fileIsNewer
+
+// ----------------------------------------------------------------------------
+/** Move the source directory into the target directory location.
+*   The target directory must be on the same drive as the source.
+*/
+bool FileManager::moveDirectoryInto(std::string source, std::string target)
+{
+    if (!isDirectory(source) || !isDirectory(target))
+        return false;
+
+    // Remove the last '/'
+    if (source[source.size() - 1] == '/')
+        source.erase(source.end() - 1, source.end());
+    std::string folder = StringUtils::getBasename(source);
+    if (target[target.size() - 1] != '/')
+        target += "/";
+    target += folder;
+
+    // The result target directory must not already exist
+    if (isDirectory(target))
+        return false;
+
+#if defined(WIN32)
+    return MoveFileExW(StringUtils::utf8ToWide(source).c_str(),
+        StringUtils::utf8ToWide(target).c_str(),
+        MOVEFILE_WRITE_THROUGH) != 0;
+#else
+    return rename(source.c_str(), target.c_str()) != -1;
+#endif
+}   // moveDirectoryInto
