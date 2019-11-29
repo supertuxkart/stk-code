@@ -178,6 +178,7 @@ void DownloadAssets::onUpdate(float delta)
         {
             // Avoid displaying '-100%' in case of an error.
             m_progress->setVisible(false);
+            m_download_request->setManageMemory(true);
             dismiss();
             new MessageDialog(_("Sorry, downloading the add-on failed"));
             return;
