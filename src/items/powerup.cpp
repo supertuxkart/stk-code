@@ -65,6 +65,9 @@ void Powerup::reset()
     m_type = PowerupManager::POWERUP_NOTHING;
     m_number = 0;
 
+    // Ghost kart will update powerup every frame
+    if (m_kart->isGhostKart())
+        return;
     int type, number;
     World::getWorld()->getDefaultCollectibles( &type, &number );
     set( (PowerupManager::PowerupType)type, number );
