@@ -1528,6 +1528,9 @@ bool FileManager::removeDirectory(const std::string &name) const
             // So enable it only for Android for now.
             #ifdef MOBILE_STK
             removeDirectory(file);
+            #else
+            if (file.find(m_addons_dir) != std::string::npos)
+                removeDirectory(file);
             #endif
         }
         else
