@@ -63,7 +63,7 @@ public:
     void         init(const XMLNode *xml, bool force_refresh);
     void         initAddons(const XMLNode *xml);
     void         checkInstalledAddons();
-    const Addon* getAddon(const std::string &id) const;
+    Addon* getAddon(const std::string &id);
     int          getAddonIndex(const std::string &id) const;
     bool         install(const Addon &addon);
     bool         uninstall(const Addon &addon);

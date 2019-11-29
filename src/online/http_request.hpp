@@ -57,9 +57,6 @@ namespace Online
         /** The POST parameters that will be send with the request. */
         std::string m_parameters;
 
-        /** Contains a filename if the data should be saved into a file
-         *  instead of being kept in in memory. Otherwise this is "". */
-        std::string m_filename;
 
         /** Pointer to the curl data structure for this request. */
         CURL *m_curl_session = NULL;
@@ -72,6 +69,10 @@ namespace Online
 
         struct curl_slist* m_http_header = NULL;
     protected:
+        /** Contains a filename if the data should be saved into a file
+         *  instead of being kept in in memory. Otherwise this is "". */
+        std::string m_filename;
+
         bool m_disable_sending_log;
         /* If true, it will not call curl_easy_setopt CURLOPT_POSTFIELDS so
          * it's just a GET request. */
