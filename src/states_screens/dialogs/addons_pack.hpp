@@ -38,15 +38,15 @@ private:
     /** A pointer to the download request, which gives access
      *  to the progress of a download. */
     AddonsPackRequest* m_download_request;
-
-public:
     AddonsPack(const std::string& url);
-
+public:
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;
     virtual void init() OVERRIDE;
     void onUpdate(float delta) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
+    static void install(const std::string& name);
+    static void uninstall(const std::string& name);
 };   // DownloadAssets
 
 #endif

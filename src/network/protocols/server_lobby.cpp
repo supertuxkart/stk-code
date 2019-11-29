@@ -755,6 +755,8 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_CLIENT_BACK_LOBBY:
             clientSelectingAssetsWantsToBackLobby(event);         break;
         case LE_REPORT_PLAYER: writePlayerReport(event);          break;
+        case LE_ASSETS_UPDATE:
+            handleAssets(event->data(), event->getPeer());        break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -2914,72 +2916,21 @@ void ServerLobby::saveIPBanTable(const TransportAddress& addr)
 }   // saveIPBanTable
 
 //-----------------------------------------------------------------------------
-void ServerLobby::connectionRequested(Event* event)
+bool ServerLobby::handleAssets(const NetworkString& ns, STKPeer* peer) const
 {
-    std::shared_ptr<STKPeer> peer = event->getPeerSP();
-    NetworkString& data = event->data();
-    if (!checkDataSize(event, 14)) return;
-
-    peer->cleanPlayerProfiles();
-
-    // can we add the player ?
-    if (!allowJoinedPlayersWaiting() &&
-        (m_state.load() != WAITING_FOR_START_GAME ||
-        m_game_setup->isGrandPrixStarted()))
-    {
-        NetworkString *message = getNetworkString(2);
-        message->setSynchronous(true);
-        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BUSY);
-        // send only to the peer that made the request and disconnect it now
-        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
-        peer->reset();
-        delete message;
-        Log::verbose("ServerLobby", "Player refused: selection started");
-        return;
-    }
-
-    // Check server version
-    int version = data.getUInt32();
-    if (version < stk_config->m_min_server_version ||
-        version > stk_config->m_max_server_version)
-    {
-        NetworkString *message = getNetworkString(2);
-        message->setSynchronous(true);
-        message->addUInt8(LE_CONNECTION_REFUSED)
-                .addUInt8(RR_INCOMPATIBLE_DATA);
-        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
-        peer->reset();
-        delete message;
-        Log::verbose("ServerLobby", "Player refused: wrong server version");
-        return;
-    }
-    std::string user_version;
-    data.decodeString(&user_version);
-    event->getPeer()->setUserVersion(user_version);
-
-    unsigned list_caps = data.getUInt16();
-    std::set<std::string> caps;
-    for (unsigned i = 0; i < list_caps; i++)
-    {
-        std::string cap;
-        data.decodeString(&cap);
-        caps.insert(cap);
-    }
-    event->getPeer()->setClientCapabilities(caps);
-
     std::set<std::string> client_karts, client_tracks;
-    const unsigned kart_num = data.getUInt16();
-    const unsigned track_num = data.getUInt16();
+    const unsigned kart_num = ns.getUInt16();
+    const unsigned track_num = ns.getUInt16();
     for (unsigned i = 0; i < kart_num; i++)
     {
         std::string kart;
-        data.decodeString(&kart);
+        ns.decodeString(&kart);
         client_karts.insert(kart);
     }
     for (unsigned i = 0; i < track_num; i++)
     {
         std::string track;
-        data.decodeString(&track);
+        ns.decodeString(&track);
         client_tracks.insert(track);
     }
 
@@ -3032,12 +2983,70 @@ void ServerLobby::connectionRequested(Event* event)
         peer->reset();
         delete message;
         Log::verbose("ServerLobby", "Player has incompatible karts / tracks.");
-        return;
+        return false;
     }
 
     // Save available karts and tracks from clients in STKPeer so if this peer
     // disconnects later in lobby it won't affect current players
     peer->setAvailableKartsTracks(client_karts, client_tracks);
+    return true;
+}   // handleAssets
+
+//-----------------------------------------------------------------------------
+void ServerLobby::connectionRequested(Event* event)
+{
+    std::shared_ptr<STKPeer> peer = event->getPeerSP();
+    NetworkString& data = event->data();
+    if (!checkDataSize(event, 14)) return;
+
+    peer->cleanPlayerProfiles();
+
+    // can we add the player ?
+    if (!allowJoinedPlayersWaiting() &&
+        (m_state.load() != WAITING_FOR_START_GAME ||
+        m_game_setup->isGrandPrixStarted()))
+    {
+        NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
+        message->addUInt8(LE_CONNECTION_REFUSED).addUInt8(RR_BUSY);
+        // send only to the peer that made the request and disconnect it now
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: selection started");
+        return;
+    }
+
+    // Check server version
+    int version = data.getUInt32();
+    if (version < stk_config->m_min_server_version ||
+        version > stk_config->m_max_server_version)
+    {
+        NetworkString *message = getNetworkString(2);
+        message->setSynchronous(true);
+        message->addUInt8(LE_CONNECTION_REFUSED)
+                .addUInt8(RR_INCOMPATIBLE_DATA);
+        peer->sendPacket(message, true/*reliable*/, false/*encrypted*/);
+        peer->reset();
+        delete message;
+        Log::verbose("ServerLobby", "Player refused: wrong server version");
+        return;
+    }
+    std::string user_version;
+    data.decodeString(&user_version);
+    event->getPeer()->setUserVersion(user_version);
+
+    unsigned list_caps = data.getUInt16();
+    std::set<std::string> caps;
+    for (unsigned i = 0; i < list_caps; i++)
+    {
+        std::string cap;
+        data.decodeString(&cap);
+        caps.insert(cap);
+    }
+    event->getPeer()->setClientCapabilities(caps);
+    if (!handleAssets(data, event->getPeer()))
+        return;
 
     unsigned player_count = data.getUInt8();
     uint32_t online_id = 0;

@@ -316,6 +316,7 @@ private:
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     std::vector<std::shared_ptr<NetworkPlayerProfile> > getLivePlayers() const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
+    bool handleAssets(const NetworkString& ns, STKPeer* peer) const;
     void liveJoinRequest(Event* event);
     void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
     bool canLiveJoinNow() const;

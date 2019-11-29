@@ -568,7 +568,18 @@ void NetworkingLobby::updatePlayerPings()
 bool NetworkingLobby::onEnterPressed(const irr::core::stringw& text)
 {
     if (auto cl = LobbyProtocol::get<ClientLobby>())
-        cl->sendChat(text);
+    {
+        if (!text.empty())
+        {
+            if (text[0] == L'/' && text.size() > 1)
+            {
+                std::string cmd = StringUtils::wideToUtf8(text);
+                cl->handleClientCommand(cmd.erase(0, 1));
+            }
+            else
+                cl->sendChat(text);
+        }
+    }
     return true;
 }   // onEnterPressed
 
@@ -601,8 +612,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {
-        if (auto cl = LobbyProtocol::get<ClientLobby>())
-            cl->sendChat(m_chat_box->getText());
+        onEnterPressed(m_chat_box->getText());
         m_chat_box->setText("");
     }   // send chat message
     else if (name == m_emoji_button->m_properties[PROP_ID] &&

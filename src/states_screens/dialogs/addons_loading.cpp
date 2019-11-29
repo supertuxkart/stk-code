@@ -28,6 +28,7 @@
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "online/request_manager.hpp"
 #include "online/xml_request.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -81,7 +82,12 @@ AddonsLoading::~AddonsLoading()
 {
     // Select the last selected item in the addons_screen, so that
     // users can keep on installing from the last selected item.
-    AddonsScreen::getInstance()->setLastSelected();
+    // This dialog can be called in network lobby screen atm for live addon
+    // install
+    AddonsScreen* as = dynamic_cast<AddonsScreen*>(
+        GUIEngine::getCurrentScreen());
+    if (as)
+        as->setLastSelected();
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------
@@ -210,7 +216,25 @@ bool AddonsLoading::onEscapePressed()
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
+void AddonsLoading::tryInstall()
+{
+#ifndef SERVER_ONLY
+    // Only display the progress bar etc. if we are not uninstalling an addon.
+    if (!m_addon.isInstalled() || m_addon.needsUpdate())
+    {
+        m_progress->setValue(0);
+        m_progress->setVisible(true);
+        // Change the 'back' button into a 'cancel' button.
+        m_back_button->setLabel(_("Cancel"));
+        GUIEngine::RibbonWidget* actions_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("actions");
+        actions_ribbon->setVisible(false);
+        startDownload();
+    }
+#endif
+}   // tryInstall
 
+// ----------------------------------------------------------------------------
 GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event_source)
 {
 #ifndef SERVER_ONLY
@@ -230,19 +254,7 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         }
         else if(selection == "install")
         {
-            // Only display the progress bar etc. if we are
-            // not uninstalling an addon.
-            if(!m_addon.isInstalled() || m_addon.needsUpdate())
-            {
-                m_progress->setValue(0);
-                m_progress->setVisible(true);
-                // Change the 'back' button into a 'cancel' button.
-                m_back_button->setLabel(_("Cancel"));
-
-                actions_ribbon->setVisible(false);
-
-                startDownload();
-            }
+            tryInstall();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "uninstall")
@@ -395,7 +407,10 @@ void AddonsLoading::doInstall()
     {
         // The list of the addon screen needs to be updated to correctly
         // display the newly (un)installed addon.
-        AddonsScreen::getInstance()->loadList();
+        AddonsScreen* as = dynamic_cast<AddonsScreen*>(
+            GUIEngine::getCurrentScreen());
+        if (as)
+            as->loadList();
         dismiss();
     }
 
@@ -405,6 +420,9 @@ void AddonsLoading::doInstall()
     delete grand_prix_manager;
     grand_prix_manager = new GrandPrixManager();
     grand_prix_manager->checkConsistency();
+
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+        cl->updateAssetsToServer();
 #endif
 }   // doInstall
 
@@ -439,7 +457,10 @@ void AddonsLoading::doUninstall()
     {
         // The list of the addon screen needs to be updated to correctly
         // display the newly (un)installed addon.
-        AddonsScreen::getInstance()->loadList();
+        AddonsScreen* as = dynamic_cast<AddonsScreen*>(
+            GUIEngine::getCurrentScreen());
+        if (as)
+            as->loadList();
         dismiss();
     }
     // Update the replay file list to use latest track pointer
@@ -447,5 +468,8 @@ void AddonsLoading::doUninstall()
     delete grand_prix_manager;
     grand_prix_manager = new GrandPrixManager();
     grand_prix_manager->checkConsistency();
+
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+        cl->updateAssetsToServer();
 #endif
 }   // doUninstall

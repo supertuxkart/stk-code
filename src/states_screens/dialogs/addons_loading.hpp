@@ -71,6 +71,7 @@ public:
      * */
     void onUpdate(float delta) OVERRIDE;
     void voteClicked();
+    void tryInstall();
     virtual bool onEscapePressed() OVERRIDE;
     
 };   // AddonsLoading

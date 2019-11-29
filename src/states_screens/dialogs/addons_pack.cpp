@@ -24,10 +24,12 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "online/http_request.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "states_screens/addons_screen.hpp"
+#include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
@@ -239,8 +241,7 @@ void AddonsPack::doInstall()
         {
             if (r == ".." || r == ".")
                 continue;
-            std::string addon_id = "addon_";
-            addon_id += r;
+            std::string addon_id = Addon::createAddonId(r);
             // We assume the addons pack the user downloaded use the latest
             // revision from the stk-addons (if exists)
             if (file_manager->fileExists(tmp_extract + r + "/stkskin.xml"))
@@ -301,8 +302,44 @@ void AddonsPack::doInstall()
             GUIEngine::getCurrentScreen());
         if (as)
             as->loadList();
+        if (auto cl = LobbyProtocol::get<ClientLobby>())
+            cl->updateAssetsToServer();
         delete request;
     }
 }   // doInstall
+
+// ----------------------------------------------------------------------------
+void AddonsPack::install(const std::string& name)
+{
+    // Only install addon live in menu
+    if (StateManager::get()->getGameState() != GUIEngine::MENU &&
+        !ModalDialog::isADialogActive())
+        return;
+    Addon* addon = addons_manager->getAddon(Addon::createAddonId(name));
+    if (addon)
+    {
+        AddonsLoading* al = new AddonsLoading(addon->getId());
+        al->tryInstall();
+    }
+    else
+    {
+        // Assume it's addon pack url
+        new AddonsPack(name);
+    }
+}   // install
+
+// ----------------------------------------------------------------------------
+void AddonsPack::uninstall(const std::string& name)
+{
+    // Only uninstall addon live in menu
+    if (StateManager::get()->getGameState() != GUIEngine::MENU)
+        return;
+    Addon* addon = addons_manager->getAddon(Addon::createAddonId(name));
+    if (addon && addons_manager->uninstall(*addon))
+    {
+        if (auto cl = LobbyProtocol::get<ClientLobby>())
+            cl->updateAssetsToServer();
+    }
+}   // uninstall
 
 #endif

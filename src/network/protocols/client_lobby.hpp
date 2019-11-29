@@ -139,6 +139,7 @@ private:
          decodePlayers(const BareNetworkString& data,
          std::shared_ptr<STKPeer> peer = nullptr,
          bool* is_spectator = NULL) const;
+    void getKartsTracksNetworkString(BareNetworkString* ns);
 public:
              ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
@@ -182,6 +183,8 @@ public:
                                      { return m_server_enabled_report_player; }
     const std::vector<float>& getRankingChanges() const
                                                   { return m_ranking_changes; }
+    void handleClientCommand(const std::string& cmd);
+    void updateAssetsToServer();
 };
 
 #endif // CLIENT_LOBBY_HPP
