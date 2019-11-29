@@ -59,7 +59,6 @@ private:
         file_manager->checkAndCreateDirectory(tmp_extract);
         m_extraction_error =
             !extract_zip(getFileName(), tmp_extract, true/*recursive*/);
-        file_manager->removeFile(getFileName());
     }
 public:
     AddonsPackRequest(const std::string& url)
@@ -78,15 +77,12 @@ public:
     }
     ~AddonsPackRequest()
     {
-        if (isCancelled())
-        {
-            const std::string& zip = getFileName();
-            const std::string zip_part = zip + ".part";
-            if (file_manager->fileExists(zip))
-                file_manager->removeFile(zip);
-            if (file_manager->fileExists(zip_part))
-                file_manager->removeFile(zip_part);
-        }
+        const std::string& zip = getFileName();
+        const std::string zip_part = zip + ".part";
+        if (file_manager->fileExists(zip))
+            file_manager->removeFile(zip);
+        if (file_manager->fileExists(zip_part))
+            file_manager->removeFile(zip_part);
         file_manager->removeDirectory(
             file_manager->getAddonsFile("tmp_extract"));
     }
