@@ -142,7 +142,7 @@ void OnlineProfile::fetchAchievements()
     class AchievementsRequest : public XMLRequest
     {
     public:
-        AchievementsRequest() : XMLRequest(true, true) {}
+        AchievementsRequest() : XMLRequest() {}
         virtual void callback()
         {
             uint32_t user_id = 0;
@@ -195,7 +195,7 @@ void OnlineProfile::fetchFriends()
     class FriendsListRequest : public XMLRequest
     {
     public:
-        FriendsListRequest() : XMLRequest(true, true) {}
+        FriendsListRequest() : XMLRequest() {}
         virtual void callback()
         {
             uint32_t user_id = 0;

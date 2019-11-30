@@ -2461,7 +2461,7 @@ void ServerLobby::checkIncomingConnectionRequests()
         }
     public:
         PollServerRequest(std::shared_ptr<ServerLobby> sl)
-        : XMLRequest(true), m_server_lobby(sl)
+        : XMLRequest(), m_server_lobby(sl)
         {
             m_disable_sending_log = true;
         }

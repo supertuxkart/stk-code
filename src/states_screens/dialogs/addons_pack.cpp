@@ -62,8 +62,7 @@ private:
     }
 public:
     AddonsPackRequest(const std::string& url)
-    : HTTPRequest(StringUtils::getBasename(url), /*manage mem*/false,
-                  /*priority*/5)
+    : HTTPRequest(StringUtils::getBasename(url), /*priority*/5)
     {
         m_extraction_error = true;
         if (url.find("https://") != std::string::npos ||
@@ -166,7 +165,6 @@ void AddonsPack::onUpdate(float delta)
         {
             // Avoid displaying '-100%' in case of an error.
             m_progress->setVisible(false);
-            m_download_request->setManageMemory(true);
             dismiss();
             new MessageDialog(_("Sorry, downloading the add-on failed"));
             return;

@@ -85,8 +85,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getWANRefreshRequest() const
     class WANRefreshRequest : public Online::XMLRequest
     {
     public:
-        WANRefreshRequest() : Online::XMLRequest(/*manage_memory*/true,
-                                                 /*priority*/100) {}
+        WANRefreshRequest() : Online::XMLRequest(/*priority*/100) {}
         // --------------------------------------------------------------------
         virtual void afterOperation() OVERRIDE
         {
@@ -120,7 +119,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
     public:
 
         /** High priority for this request. */
-        LANRefreshRequest() : XMLRequest(true, 100) {m_success = false;}
+        LANRefreshRequest() : XMLRequest(/*priority*/100) {m_success = false;}
         // --------------------------------------------------------------------
         virtual ~LANRefreshRequest() {}
         // --------------------------------------------------------------------

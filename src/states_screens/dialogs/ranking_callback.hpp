@@ -81,7 +81,7 @@ protected:
                                        uint32_t online_id,
                                        GUIEngine::LabelWidget* info,
                                        std::shared_ptr<bool> done)
-                : XMLRequest(true)
+                : XMLRequest()
             {
                 m_name = name;
                 m_info = info;

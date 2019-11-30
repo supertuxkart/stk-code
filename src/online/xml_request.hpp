@@ -54,7 +54,7 @@ namespace Online
         virtual void afterOperation() OVERRIDE;
 
     public :
-        XMLRequest(bool manage_memory = false, int priority = 1);
+        XMLRequest(int priority = 1);
         virtual ~XMLRequest();
 
         // ------------------------------------------------------------------------

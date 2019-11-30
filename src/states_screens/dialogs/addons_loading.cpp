@@ -345,7 +345,7 @@ void AddonsLoading::startDownload()
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
     m_download_request = std::make_shared<Online::HTTPRequest>(
-        save, /*manage mem*/false, /*priority*/5);
+        save, /*priority*/5);
     m_download_request->setURL(m_addon.getZipFileName());
     m_download_request->queue();
 #endif

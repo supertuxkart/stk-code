@@ -54,7 +54,7 @@ namespace Online
             virtual void callback();
         public:
             SignInRequest()
-                : XMLRequest(true/*manage_memory*/, /*priority*/10) {}
+                : XMLRequest(/*priority*/10) {}
         };   // SignInRequest
 
         // ----------------------------------------------------------------
@@ -298,7 +298,7 @@ namespace Online
              *  happens before a following logout.
              */
             SignOutRequest(PlayerProfile *player)
-                        : XMLRequest(true,/*priority*/RequestManager::HTTP_MAX_PRIORITY)
+                        : XMLRequest(/*priority*/RequestManager::HTTP_MAX_PRIORITY)
             {
                 m_player = player;
                 setAbortable(false);
@@ -366,7 +366,7 @@ namespace Online
 
     // ------------------------------------------------------------------------
     PrivateRequest::PollRequest::PollRequest()
-                       : XMLRequest(true)
+                       : XMLRequest()
     {
     }   // PollRequest
 

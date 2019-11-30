@@ -396,7 +396,7 @@ void AddonsManager::downloadIcons()
             public:
                 IconRequest(const std::string &filename,
                             const std::string &url,
-                            Addon *addon     ) : HTTPRequest(filename, true, 1)
+                            Addon *addon     ) : HTTPRequest(filename,/*priority*/1)
                 {
                     m_addon = addon;  setURL(url);
                 }   // IconRequest

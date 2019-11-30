@@ -49,7 +49,7 @@ private:
     }
 public:
     DownloadAssetsRequest()
-    : HTTPRequest("stk-assets.zip", /*manage mem*/false, /*priority*/5)
+    : HTTPRequest("stk-assets.zip", /*priority*/5)
     {
         m_extraction_error = true;
         std::string download_url = stk_config->m_assets_download_url;

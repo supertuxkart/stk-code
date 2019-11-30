@@ -145,8 +145,7 @@ namespace Online
         // quit request).
         // Required for std::make_shared as it takes reference
         int priority = HTTP_MAX_PRIORITY;
-        auto quit = std::make_shared<Request>(true, priority,
-            Request::RT_QUIT);
+        auto quit = std::make_shared<Request>(priority, Request::RT_QUIT);
         quit->setAbortable(false);
         addRequest(quit);
 

@@ -91,11 +91,9 @@ namespace Online
         void init();
 
     public :
-        HTTPRequest(bool manage_memory = false, int priority = 1);
-        HTTPRequest(const std::string &filename, bool manage_memory = false,
-                    int priority = 1);
-        HTTPRequest(const char * const filename, bool manage_memory = false,
-                    int priority = 1);
+        HTTPRequest(int priority = 1);
+        HTTPRequest(const std::string &filename, int priority = 1);
+        HTTPRequest(const char * const filename, int priority = 1);
         virtual           ~HTTPRequest()
         {
             if (m_http_header)

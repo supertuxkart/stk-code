@@ -370,7 +370,7 @@ void reportHardwareStats()
         /** Version number of the hw report. */
         int m_version;
     public:
-        HWReportRequest(int version) : Online::HTTPRequest(/*manage memory*/true, 1)
+        HWReportRequest(int version) : Online::HTTPRequest(/*priority*/1)
                                      , m_version(version)
         {}
         // --------------------------------------------------------------------
