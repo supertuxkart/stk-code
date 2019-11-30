@@ -1868,11 +1868,10 @@ void ServerLobby::update(int ticks)
 
     if (w && w->getPhase() == World::RACE_PHASE)
     {
-        storePlayingTrack(track_manager->getTrackIndexByIdent(
-            race_manager->getTrackName()));
+        storePlayingTrack(race_manager->getTrackName());
     }
     else
-        storePlayingTrack(-1);
+        storePlayingTrack("");
 
     // Reset server to initial state if no more connected players
     if (m_rs_state.load() == RS_WAITING)
@@ -2481,9 +2480,9 @@ void ServerLobby::checkIncomingConnectionRequests()
     request->addParameter("current-players", getLobbyPlayers());
     request->addParameter("game-started",
         m_state.load() == WAITING_FOR_START_GAME ? 0 : 1);
-    Track* current_track = getPlayingTrack();
-    if (current_track)
-        request->addParameter("current-track", current_track->getIdent());
+    std::string current_track = getPlayingTrackIdent();
+    if (!current_track.empty())
+        request->addParameter("current-track", getPlayingTrackIdent());
     request->queue();
 
 }   // checkIncomingConnectionRequests

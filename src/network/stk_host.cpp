@@ -34,8 +34,6 @@
 #include "network/server_config.hpp"
 #include "network/stk_ipv6.hpp"
 #include "network/stk_peer.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/separate_process.hpp"
 #include "utils/string_utils.hpp"
@@ -1026,11 +1024,7 @@ void STKHost::mainLoop()
                     auto progress = sl->getGameStartedProgress();
                     ping_packet.addUInt32(progress.first)
                         .addUInt32(progress.second);
-                    std::string current_track;
-                    Track* t = sl->getPlayingTrack();
-                    if (t)
-                        current_track = t->getIdent();
-                    ping_packet.encodeString(current_track);
+                    ping_packet.encodeString(sl->getPlayingTrackIdent());
                 }
                 else
                 {
@@ -1245,9 +1239,7 @@ void STKHost::mainLoop()
                             {
                                 lp->setGameStartedProgress(
                                     std::make_pair(remaining_time, progress));
-                                int idx = track_manager
-                                    ->getTrackIndexByIdent(current_track);
-                                lp->storePlayingTrack(idx);
+                                lp->storePlayingTrack(current_track);
                             }
                         }
                     }
@@ -1340,10 +1332,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.addUInt8((uint8_t)
             (sl->getCurrentState() == ServerLobby::WAITING_FOR_START_GAME ?
             0 : 1));
-        std::string current_track;
-        if (Track* t = sl->getPlayingTrack())
-            current_track = t->getIdent();
-        s.encodeString(current_track);
+        s.encodeString(sl->getPlayingTrackIdent());
         direct_socket->sendRawPacket(s, sender);
     }   // if message is server-requested
     else if (command == connection_cmd)
