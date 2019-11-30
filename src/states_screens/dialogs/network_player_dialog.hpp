@@ -20,7 +20,6 @@
 #define HEADER_NETWORK_USER_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "states_screens/dialogs/ranking_callback.hpp"
 #include "utils/types.hpp"
 
 #include <string>
@@ -34,12 +33,14 @@ namespace GUIEngine
     class RibbonWidget;
 }
 
+class RankingCallback;
+enum HandicapLevel : uint8_t;
+
 /**
  * \brief Dialog that handle player in network lobby
  * \ingroup states_screens
  */
-class NetworkPlayerDialog : public GUIEngine::ModalDialog,
-                            public RankingCallback
+class NetworkPlayerDialog : public GUIEngine::ModalDialog
 {
 private:
     const uint32_t m_host_id;
@@ -58,7 +59,7 @@ private:
 
     bool m_self_destroy, m_open_report_textbox;
 
-    std::shared_ptr<bool> m_fetched_ranking;
+    std::shared_ptr<RankingCallback> m_ranking_callback;
 
     GUIEngine::RibbonWidget* m_options_widget;
 
@@ -86,8 +87,7 @@ public:
           m_local_id(local_id), m_handicap(h),
           m_name(name), m_country_code(country_code),
           m_allow_change_team(allow_change_team), m_self_destroy(false),
-          m_open_report_textbox(false),
-          m_fetched_ranking(std::make_shared<bool>(false))
+          m_open_report_textbox(false)
     {
         loadFromFile("online/user_info_dialog.stkgui");
     }

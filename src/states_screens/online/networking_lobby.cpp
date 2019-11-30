@@ -51,6 +51,7 @@
 #include "states_screens/dialogs/server_configuration_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 using namespace Online;
