@@ -81,7 +81,7 @@ bool extract_zip(const std::string &from, const std::string &to, bool recursive)
         if (!recursive)
             base = StringUtils::getBasename(base);
 
-        Log::info("addons", "Unzipping file '%s'.", base.c_str());
+        Log::debug("addons", "Unzipping file '%s'.", base.c_str());
 
         IReadFile* src_file =
             zip_archive->createAndOpenFile(base.c_str());
