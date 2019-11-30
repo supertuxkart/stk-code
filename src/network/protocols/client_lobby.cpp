@@ -117,7 +117,7 @@ ClientLobby::~ClientLobby()
         NetworkConfig::get()->setServerDetails(request,
             "clear-user-joined-server");
         request->queue();
-        ConnectToServer::m_previous_unjoin = request->observeExistence();
+        ConnectToServer::m_previous_unjoin = request;
     }
 }   // ClientLobby
 

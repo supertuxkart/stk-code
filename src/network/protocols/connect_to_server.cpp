@@ -47,7 +47,7 @@
 
 #include <algorithm>
 // ============================================================================
-std::weak_ptr<bool> ConnectToServer::m_previous_unjoin;
+std::weak_ptr<Online::Request> ConnectToServer::m_previous_unjoin;
 TransportAddress ConnectToServer::m_server_address;
 int ConnectToServer::m_retry_count = 0;
 bool ConnectToServer::m_done_intecept = false;
@@ -78,7 +78,7 @@ ConnectToServer::~ConnectToServer()
         NetworkConfig::get()->setServerDetails(request,
             "clear-user-joined-server");
         request->queue();
-        m_previous_unjoin = request->observeExistence();
+        m_previous_unjoin = request;
     }
 }   // ~ConnectToServer
 

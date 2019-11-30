@@ -2106,7 +2106,7 @@ bool ServerLobby::registerServer(bool now)
     else
     {
         request->queue();
-        m_server_recovering = request->observeExistence();
+        m_server_recovering = request;
     }
     return true;
 }   // registerServer
@@ -2119,7 +2119,7 @@ bool ServerLobby::registerServer(bool now)
 void ServerLobby::unregisterServer(bool now)
 {
     auto request = std::make_shared<Online::XMLRequest>();
-    m_server_unregistered = request->observeExistence();
+    m_server_unregistered = request;
     NetworkConfig::get()->setServerDetails(request, "stop");
 
     request->addParameter("address", m_server_address.getIP());

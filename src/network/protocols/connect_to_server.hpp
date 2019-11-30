@@ -28,6 +28,11 @@
 
 #include "irrString.h"
 
+namespace Online
+{
+    class Request;
+}
+
 class Server;
 
 class ConnectToServer : public Protocol
@@ -56,7 +61,7 @@ private:
     static int m_retry_count;
     static bool m_done_intecept;
 public:
-    static std::weak_ptr<bool> m_previous_unjoin;
+    static std::weak_ptr<Online::Request> m_previous_unjoin;
              ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();
     virtual void setup() OVERRIDE;
