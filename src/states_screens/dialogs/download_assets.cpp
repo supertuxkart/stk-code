@@ -81,8 +81,6 @@ public:
 DownloadAssets::DownloadAssets()
               : ModalDialog(0.8f, 0.8f)
 {
-    m_download_request = NULL;
-
     loadFromFile("addons_loading.stkgui");
     m_install_button   = getWidget<IconButtonWidget> ("install" );
     m_progress         = getWidget<ProgressBarWidget>("progress");
@@ -178,7 +176,6 @@ void DownloadAssets::onUpdate(float delta)
         {
             // Avoid displaying '-100%' in case of an error.
             m_progress->setVisible(false);
-            m_download_request->setManageMemory(true);
             dismiss();
             new MessageDialog(_("Sorry, downloading the add-on failed"));
             return;
@@ -199,7 +196,7 @@ void DownloadAssets::onUpdate(float delta)
  **/
 void DownloadAssets::startDownload()
 {
-    m_download_request = new DownloadAssetsRequest();
+    m_download_request = std::make_shared<DownloadAssetsRequest>();
     m_download_request->queue();
 }   // startDownload
 
@@ -213,15 +210,8 @@ void DownloadAssets::stopDownload()
     // (and not uninstalling an installed one):
     if (m_download_request)
     {
-        // In case of a cancel we can't free the memory, since the
-        // request manager thread is potentially working on this request. So
-        // in order to avoid a memory leak, we let the request manager
-        // free the data. This is thread safe since freeing the data is done
-        // when the request manager handles the result queue - and this is
-        // done by the main thread (i.e. this thread).
-        m_download_request->setManageMemory(true);
         m_download_request->cancel();
-        m_download_request = NULL;
+        m_download_request = nullptr;
     }
 }   // startDownload
 
@@ -239,8 +229,7 @@ void DownloadAssets::doInstall()
         // in the first run
         msg = _("Failed to download assets, check your storage space or internet connection and try again later.");
     }
-    delete m_download_request;
-    m_download_request = NULL;
+    m_download_request = nullptr;
     if (!msg.empty())
     {
         getWidget<BubbleWidget>("description")->setText(msg);

@@ -49,7 +49,7 @@ void PlayerManager::create()
  *  \param request The http request.
  *  \param action If not empty, the action to be set.
  */
-void PlayerManager::setUserDetails(Online::HTTPRequest *request,
+void PlayerManager::setUserDetails(std::shared_ptr<Online::HTTPRequest> request,
     const std::string &action,
     const std::string &php_name)
 {

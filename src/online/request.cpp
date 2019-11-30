@@ -50,7 +50,7 @@ namespace Online
      */
     void Request::queue()
     {
-        RequestManager::get()->addRequest(this);
+        RequestManager::get()->addRequest(shared_from_this());
     }   // queue
 
     // ------------------------------------------------------------------------

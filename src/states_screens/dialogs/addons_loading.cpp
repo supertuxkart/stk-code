@@ -57,7 +57,6 @@ AddonsLoading::AddonsLoading(const std::string &id)
 {
     
     m_icon_shown       = false;
-    m_download_request = NULL;
 
     loadFromFile("addons_loading.stkgui");
 
@@ -304,7 +303,6 @@ void AddonsLoading::onUpdate(float delta)
         {
             // Avoid displaying '-100%' in case of an error.
             m_progress->setVisible(false);
-            m_download_request->setManageMemory(true);
             dismiss();
             new MessageDialog( _("Sorry, downloading the add-on failed"));
             return;
@@ -346,8 +344,8 @@ void AddonsLoading::startDownload()
 #ifndef SERVER_ONLY
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
-    m_download_request = new Online::HTTPRequest(save, /*manage mem*/false,
-                                                 /*priority*/5);
+    m_download_request = std::make_shared<Online::HTTPRequest>(
+        save, /*manage mem*/false, /*priority*/5);
     m_download_request->setURL(m_addon.getZipFileName());
     m_download_request->queue();
 #endif
@@ -361,17 +359,10 @@ void AddonsLoading::stopDownload()
 {
     // Cancel a download only if we are installing/upgrading one
     // (and not uninstalling an installed one):
-    if(m_download_request)
+    if (m_download_request)
     {
-        // In case of a cancel we can't free the memory, since the 
-        // request manager thread is potentially working on this request. So 
-        // in order to avoid a memory leak, we let the request manager
-        // free the data. This is thread safe since freeing the data is done
-        // when the request manager handles the result queue - and this is
-        // done by the main thread (i.e. this thread).
-        m_download_request->setManageMemory(true);
         m_download_request->cancel();
-        m_download_request = NULL;
+        m_download_request = nullptr;
     };
 }   // startDownload
 
@@ -382,8 +373,7 @@ void AddonsLoading::stopDownload()
 void AddonsLoading::doInstall()
 {
 #ifndef SERVER_ONLY
-    delete m_download_request;
-    m_download_request = NULL;
+    m_download_request = nullptr;
 
     assert(!m_addon.isInstalled() || m_addon.needsUpdate());
     bool error = !addons_manager->install(m_addon);
@@ -431,8 +421,7 @@ void AddonsLoading::doInstall()
 void AddonsLoading::doUninstall()
 {
 #ifndef SERVER_ONLY
-    delete m_download_request;
-    m_download_request = NULL;
+    m_download_request = nullptr;
     bool error = !addons_manager->uninstall(m_addon);
     if(error)
     {

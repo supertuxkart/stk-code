@@ -110,7 +110,7 @@ void RegisterScreen::init()
     m_password_widget->setPasswordBox(true, L'*');
     getWidget<TextBoxWidget>("password_confirm")->setPasswordBox(true, L'*');
 
-    m_signup_request = NULL;
+    m_signup_request = nullptr;
     m_info_message_shown = false;
 
     onDialogClose();
@@ -364,7 +364,7 @@ void RegisterScreen::acceptTerms()
     core::stringw password_confirm= getWidget<TextBoxWidget>("password_confirm")->getText().trim();
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
 
-    m_signup_request = new XMLRequest();
+    m_signup_request = std::make_shared<XMLRequest>();
     m_signup_request->setApiURL(API::USER_PATH, "register");
     m_signup_request->addParameter("username",         username        );
     m_signup_request->addParameter("password",         password        );
@@ -403,8 +403,7 @@ void RegisterScreen::onUpdate(float dt)
                 m_info_widget->setErrorColor();
                 m_info_widget->setText(m_signup_request->getInfo(), false);
             }
-            delete m_signup_request;
-            m_signup_request = NULL;
+            m_signup_request = nullptr;
             m_options_widget->setActive(true);
         }
     }

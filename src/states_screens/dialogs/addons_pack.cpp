@@ -110,7 +110,7 @@ AddonsPack::AddonsPack(const std::string& url) : ModalDialog(0.8f, 0.8f)
     GUIEngine::RibbonWidget* actions_ribbon =
             getWidget<GUIEngine::RibbonWidget>("actions");
     actions_ribbon->setVisible(false);
-    m_download_request = new AddonsPackRequest(url);
+    m_download_request = std::make_shared<AddonsPackRequest>(url);
     m_download_request->queue();
 }   // AddonsPack
 
@@ -191,15 +191,8 @@ void AddonsPack::stopDownload()
     // (and not uninstalling an installed one):
     if (m_download_request)
     {
-        // In case of a cancel we can't free the memory, since the
-        // request manager thread is potentially working on this request. So
-        // in order to avoid a memory leak, we let the request manager
-        // free the data. This is thread safe since freeing the data is done
-        // when the request manager handles the result queue - and this is
-        // done by the main thread (i.e. this thread).
-        m_download_request->setManageMemory(true);
         m_download_request->cancel();
-        m_download_request = NULL;
+        m_download_request = nullptr;
     }
 }   // startDownload
 
@@ -220,13 +213,12 @@ void AddonsPack::doInstall()
 
     if (!msg.empty())
     {
-        delete m_download_request;
         dismiss();
         new MessageDialog(msg);
     }
     else
     {
-        AddonsPackRequest* request = m_download_request;
+        std::shared_ptr<AddonsPackRequest> request = m_download_request;
         dismiss();
         std::set<std::string> result;
         std::string tmp_extract = file_manager->getAddonsFile("tmp_extract");
@@ -300,7 +292,6 @@ void AddonsPack::doInstall()
             as->loadList();
         if (auto cl = LobbyProtocol::get<ClientLobby>())
             cl->updateAssetsToServer();
-        delete request;
     }
 }   // doInstall
 

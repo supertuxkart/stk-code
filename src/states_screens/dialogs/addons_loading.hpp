@@ -54,7 +54,7 @@ private:
 
     /** A pointer to the download request, which gives access
      *  to the progress of a download. */
-    Online::HTTPRequest *m_download_request;
+    std::shared_ptr<Online::HTTPRequest> m_download_request;
 
 public:
     AddonsLoading(const std::string &addon_name);

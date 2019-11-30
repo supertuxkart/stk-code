@@ -229,7 +229,7 @@ GUIEngine::EventPropagation
         }
         else if (selection == m_friend_widget->m_properties[PROP_ID])
         {
-            XMLRequest *request = new XMLRequest();
+            auto request = std::make_shared<XMLRequest>();
             PlayerManager::setUserDetails(request, "friend-request");
             request->addParameter("friendid", m_online_id);
             request->queue();

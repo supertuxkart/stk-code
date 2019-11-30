@@ -126,17 +126,15 @@ void AddonsManager::init(const XMLNode *xml,
     if (download)
     {
         Log::info("addons", "Downloading updated addons.xml.");
-        Online::HTTPRequest *download_request = new Online::HTTPRequest("addons.xml");
+        auto download_request = std::make_shared<Online::HTTPRequest>("addons.xml");
         download_request->setURL(addon_list_url);
         download_request->executeNow();
         if(download_request->hadDownloadError())
         {
             Log::error("addons", "Error on download addons.xml: %s.",
                        download_request->getDownloadErrorMessage());
-            delete download_request;
             return;
         }
-        delete download_request;
         UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
     }
     else
@@ -403,7 +401,7 @@ void AddonsManager::downloadIcons()
                     m_addon = addon;  setURL(url);
                 }   // IconRequest
             };
-            IconRequest *r = new IconRequest("icons/"+icon, url, &addon);
+            auto r = std::make_shared<IconRequest>("icons/"+icon, url, &addon);
             r->queue();
         }
         else

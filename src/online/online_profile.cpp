@@ -154,7 +154,7 @@ void OnlineProfile::fetchAchievements()
     };   // class AchievementsRequest
     // ------------------------------------------------------------------------
 
-    AchievementsRequest * request = new AchievementsRequest();
+    auto request = std::make_shared<AchievementsRequest>();
     PlayerManager::setUserDetails(request, "get-achievements");
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);
@@ -207,7 +207,7 @@ void OnlineProfile::fetchFriends()
     };   // class FriendsListRequest
     // ------------------------------------------------------------------------
 
-    FriendsListRequest * request = new FriendsListRequest();
+    auto request = std::make_shared<FriendsListRequest>();
     PlayerManager::setUserDetails(request, "get-friends-list");
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);

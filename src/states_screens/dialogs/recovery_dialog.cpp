@@ -37,7 +37,6 @@ using namespace Online;
  */
 RecoveryDialog::RecoveryDialog() : ModalDialog(0.8f,0.8f)
 {
-    m_recovery_request    = NULL;
     m_self_destroy        = false;
     m_show_recovery_input = true;
     m_show_recovery_info  = false;
@@ -49,7 +48,6 @@ RecoveryDialog::RecoveryDialog() : ModalDialog(0.8f,0.8f)
  */
 RecoveryDialog::~RecoveryDialog()
 {
-    delete m_recovery_request;
 }   //~RecoverDialog
 
 // -----------------------------------------------------------------------------
@@ -127,7 +125,7 @@ void RecoveryDialog::processInput()
         m_info_widget->setDefaultColor();
         m_options_widget->setActive(false);
 
-        m_recovery_request = new XMLRequest();
+        m_recovery_request = std::make_shared<XMLRequest>();
 
         // This function also works when the current user is not logged in
         PlayerManager::setUserDetails(m_recovery_request, "recover");
@@ -185,7 +183,7 @@ void RecoveryDialog::onEnterPressedInternal()
  */
 void RecoveryDialog::onUpdate(float dt)
 {
-    if(m_recovery_request  != NULL)
+    if (m_recovery_request)
     {
         if(m_recovery_request->isDone())
         {
@@ -201,8 +199,7 @@ void RecoveryDialog::onUpdate(float dt)
                 m_options_widget->setActive(true);
             }
 
-            delete m_recovery_request;
-            m_recovery_request = NULL;
+            m_recovery_request = nullptr;
         }
         else
         {

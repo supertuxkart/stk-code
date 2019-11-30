@@ -73,7 +73,7 @@ void NetworkConfig::unsetNetworking()
 }   // unsetNetworking
 
 // ----------------------------------------------------------------------------
-void NetworkConfig::setUserDetails(Online::XMLRequest* r,
+void NetworkConfig::setUserDetails(std::shared_ptr<Online::XMLRequest> r,
                                    const std::string& name)
 {
     assert(!m_cur_user_token.empty());
@@ -83,8 +83,8 @@ void NetworkConfig::setUserDetails(Online::XMLRequest* r,
 }   // setUserDetails
 
 // ----------------------------------------------------------------------------
-void NetworkConfig::setServerDetails(Online::XMLRequest* r,
-                                   const std::string& name)
+void NetworkConfig::setServerDetails(std::shared_ptr<Online::XMLRequest> r,
+                                     const std::string& name)
 {
     assert(!m_cur_user_token.empty());
     r->setApiURL(Online::API::SERVER_PATH, name);

@@ -20,7 +20,6 @@
 #define HEADER_ONLINE_REQUEST_HPP
 
 #include "utils/cpp2011.hpp"
-#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
 
@@ -29,6 +28,7 @@
 #endif
 #include <curl/curl.h>
 #include <assert.h>
+#include <memory>
 #include <string>
 
 namespace Online
@@ -57,11 +57,10 @@ namespace Online
      *
      * \ingroup online
      */
-    class Request : public NoCopy
+    class Request : public std::enable_shared_from_this<Request>,
+                    public NoCopy
     {
     private:
-        LEAK_CHECK()
-
         /** Type of the request. Has 0 as default value. */
         const int m_type;
 
@@ -236,7 +235,8 @@ namespace Online
         public:
             /** Compares two requests, returns if the first request has a lower
              *  priority than the second one. */
-            bool operator() (const Request *a, const Request *b) const
+            bool operator() (const std::shared_ptr<Request>& a,
+                             const std::shared_ptr<Request>& b) const
             {
                 return a->getPriority() < b->getPriority();
             }

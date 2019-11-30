@@ -105,11 +105,11 @@ void PlayerRankingsDialog::updateTopTenList()
             }
         }   // callback
     public:
-        UpdateTopTenRequest() : XMLRequest(true) {}
+        UpdateTopTenRequest() : XMLRequest() {}
     };   // UpdateTopTenRequest
     // ------------------------------------------------------------------------
 
-    UpdateTopTenRequest *request = new UpdateTopTenRequest();
+    auto request = std::make_shared<UpdateTopTenRequest>();
     PlayerManager::setUserDetails(request, "top-players");
     request->addParameter("ntop", 10);
     request->queue();

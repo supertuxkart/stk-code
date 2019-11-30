@@ -55,7 +55,7 @@ private:
     bool m_show_recovery_input;
     bool m_show_recovery_info;
 
-    Online::XMLRequest * m_recovery_request;
+    std::shared_ptr<Online::XMLRequest> m_recovery_request;
 
     GUIEngine::TextBoxWidget * m_username_widget;
     GUIEngine::TextBoxWidget * m_email_widget;

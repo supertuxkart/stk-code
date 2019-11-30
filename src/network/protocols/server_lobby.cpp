@@ -2025,6 +2025,7 @@ bool ServerLobby::registerServer(bool now)
     {
     private:
         std::weak_ptr<ServerLobby> m_server_lobby;
+        const bool m_execute_now;
     protected:
         virtual void afterOperation()
         {
@@ -2062,15 +2063,15 @@ bool ServerLobby::registerServer(bool now)
                 StringUtils::wideToUtf8(getInfo()).c_str());
             // For auto server recovery wait 3 seconds for next try
             // This sleep only the request manager thread
-            if (manageMemory())
+            if (!m_execute_now)
                 StkTime::sleep(3000);
         }
     public:
         RegisterServerRequest(bool now, std::shared_ptr<ServerLobby> sl)
-        : XMLRequest(!now/*manage memory*/), m_server_lobby(sl) {}
+        : XMLRequest(), m_server_lobby(sl), m_execute_now(now) {}
     };   // RegisterServerRequest
 
-    RegisterServerRequest *request = new RegisterServerRequest(now,
+    auto request = std::make_shared<RegisterServerRequest>(now,
         std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
     NetworkConfig::get()->setServerDetails(request, "create");
     request->addParameter("address",      m_server_address.getIP()        );
@@ -2099,7 +2100,6 @@ bool ServerLobby::registerServer(bool now)
     if (now)
     {
         request->executeNow();
-        delete request;
         if (m_server_id_online.load() == 0)
             return false;
     }
@@ -2118,8 +2118,7 @@ bool ServerLobby::registerServer(bool now)
  */
 void ServerLobby::unregisterServer(bool now)
 {
-    Online::XMLRequest* request =
-        new Online::XMLRequest(!now/*manage memory*/);
+    auto request = std::make_shared<Online::XMLRequest>();
     m_server_unregistered = request->observeExistence();
     NetworkConfig::get()->setServerDetails(request, "stop");
 
@@ -2132,7 +2131,6 @@ void ServerLobby::unregisterServer(bool now)
     if (now)
     {
         request->executeNow();
-        delete request;
     }
     else
         request->queue();
@@ -2470,7 +2468,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     };   // PollServerRequest
     // ========================================================================
 
-    PollServerRequest* request = new PollServerRequest(
+    auto request = std::make_shared<PollServerRequest>(
         std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
     NetworkConfig::get()->setServerDetails(request,
         "poll-connection-requests");
@@ -3952,7 +3950,7 @@ bool ServerLobby::decryptConnectionRequest(std::shared_ptr<STKPeer> peer,
 //-----------------------------------------------------------------------------
 void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
 {
-    Online::XMLRequest* request = new Online::XMLRequest();
+    auto request = std::make_shared<Online::XMLRequest>();
     NetworkConfig::get()->setUserDetails(request, "get-ranking");
 
     const uint32_t id = p->getOnlineId();
@@ -3987,7 +3985,6 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
     m_scores[id] = score;
     m_max_scores[id] = max_score;
     m_num_ranked_races[id] = num_races;
-    delete request;
 }   // getRankingForPlayer
 
 //-----------------------------------------------------------------------------
@@ -4004,7 +4001,7 @@ void ServerLobby::submitRankingsToAddons()
         SumbitRankingRequest(uint32_t online_id, double scores,
                              double max_scores, unsigned num_races,
                              const std::string& country_code)
-            : XMLRequest(true)
+            : XMLRequest()
         {
             addParameter("id", online_id);
             addParameter("scores", scores);
@@ -4029,7 +4026,7 @@ void ServerLobby::submitRankingsToAddons()
     for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
     {
         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
-        SumbitRankingRequest* request = new SumbitRankingRequest
+        auto request = std::make_shared<SumbitRankingRequest>
             (id, m_scores.at(id), m_max_scores.at(id),
             m_num_ranked_races.at(id),
             race_manager->getKartInfo(i).getCountryCode());
@@ -4495,8 +4492,7 @@ void ServerLobby::handleServerConfiguration(Event* event)
         Log::info("ServerLobby", "Updating server info with new "
             "difficulty: %d, game mode: %d to stk-addons.", new_difficulty,
             new_game_mode);
-        Online::XMLRequest* request =
-            new Online::XMLRequest(true/*manage_memory*/);
+        auto request = std::make_shared<Online::XMLRequest>();
         NetworkConfig::get()->setServerDetails(request, "update-config");
         request->addParameter("address", m_server_address.getIP());
         request->addParameter("port", m_server_address.getPort());

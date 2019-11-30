@@ -113,8 +113,7 @@ ClientLobby::~ClientLobby()
 {
     if (m_server->supportsEncryption())
     {
-        Online::XMLRequest* request =
-            new Online::XMLRequest(true/*manager_memory*/);
+        auto request = std::make_shared<Online::XMLRequest>();
         NetworkConfig::get()->setServerDetails(request,
             "clear-user-joined-server");
         request->queue();

@@ -51,7 +51,7 @@ namespace Online
         virtual void signOut(bool success, const XMLNode * input,
                             const irr::core::stringw &info);
         virtual uint32_t getOnlineId() const;
-        virtual void setUserDetails(Online::HTTPRequest *request,
+        virtual void setUserDetails(std::shared_ptr<HTTPRequest> request,
                                     const std::string &action,
                                     const std::string &url_path = "") const;
 

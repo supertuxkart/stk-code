@@ -106,11 +106,11 @@ void ChangePasswordDialog::changePassword(const stringw &current_password,
         }   // callback
 
     public:
-        ChangePasswordRequest() : XMLRequest(true) {}
+        ChangePasswordRequest() : XMLRequest() {}
     };   // ChangePasswordRequest
     // ------------------------------------------------------------------------
 
-    ChangePasswordRequest * request = new ChangePasswordRequest();
+    auto request = std::make_shared<ChangePasswordRequest>();
     PlayerManager::setUserDetails(request, "change-password");
     request->addParameter("current", current_password);
 

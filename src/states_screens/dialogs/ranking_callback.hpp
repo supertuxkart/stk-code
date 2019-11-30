@@ -90,8 +90,8 @@ protected:
         };   // UpdatePlayerRankingRequest
 
         // --------------------------------------------------------------------
-        UpdatePlayerRankingRequest* request =
-            new UpdatePlayerRankingRequest(name, online_id, info, done);
+        auto request = std::make_shared<UpdatePlayerRankingRequest>(
+            name, online_id, info, done);
         PlayerManager::setUserDetails(request, "get-ranking");
         request->addParameter("id", online_id);
         request->queue();
