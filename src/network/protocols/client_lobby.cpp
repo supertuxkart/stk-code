@@ -18,6 +18,7 @@
 
 #include "network/protocols/client_lobby.hpp"
 
+#include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
@@ -62,6 +63,8 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <cstdlib>
 
 // ============================================================================
 /** The protocol that manages starting a race with the server. It uses a 
@@ -1509,6 +1512,27 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
         AddonsPack::install(argv[1]);
     else if (argv[0] == "uninstalladdon" && argv.size() == 2)
         AddonsPack::uninstall(argv[1]);
+    else if (argv[0] == "music" && argv.size() == 2)
+    {
+        int vol = atoi(argv[1].c_str());
+        if (vol > 10)
+            vol = 10;
+        else if (vol < 0)
+            vol = 0;
+        if (vol == 0 && UserConfigParams::m_music)
+        {
+            UserConfigParams::m_music = false;
+            music_manager->stopMusic();
+        }
+        else if (vol != 0 && !UserConfigParams::m_music)
+        {
+            UserConfigParams::m_music = true;
+            music_manager->startMusic();
+            music_manager->setMasterMusicVolume((float)vol / 10);
+        }
+        else
+            music_manager->setMasterMusicVolume((float)vol / 10);
+    }
     else
     {
         // Send for server command
