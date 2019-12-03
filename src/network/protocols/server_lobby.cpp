@@ -4896,6 +4896,8 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
 void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
 {
     NetworkString& data = event->data();
+    std::string language;
+    data.decodeString(&language);
     std::string cmd;
     data.decodeString(&cmd);
     auto argv = StringUtils::split(cmd, ' ');

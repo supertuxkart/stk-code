@@ -1570,7 +1570,8 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
     {
         // Send for server command
         NetworkString* cmd_ns = getNetworkString(1);
-        cmd_ns->addUInt8(LE_COMMAND).encodeString(cmd);
+        const std::string& language = UserConfigParams::m_language;
+        cmd_ns->addUInt8(LE_COMMAND).encodeString(language).encodeString(cmd);
         sendToServer(cmd_ns, /*reliable*/true);
         delete cmd_ns;
     }
