@@ -1537,8 +1537,8 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
     else if (argv[0] == "listaddons" && argv.size() <= 2)
     {
 	// Usage: /listaddons or /listaddons string
-	core::stringw namelist;
-	for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
+        core::stringw namelist;
+        for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
 	{
 	    const Addon & addon = addons_manager->getAddon(i);
 	    core::stringw name = core::stringw(addon.getName().c_str());
