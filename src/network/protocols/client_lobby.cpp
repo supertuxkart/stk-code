@@ -18,6 +18,7 @@
 
 #include "network/protocols/client_lobby.hpp"
 
+#include "addons/addons_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
@@ -1532,6 +1533,38 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
         }
         else
             music_manager->setMasterMusicVolume((float)vol / 10);
+    }
+    else if (argv[0] == "liststkaddon")
+    {
+        if (argv.size() != 2)
+        {
+            NetworkingLobby::getInstance()->addMoreServerInfo(
+                L"Usage: /liststkaddon [addon prefix letter(s) to find]");
+        }
+        else
+        {
+            std::string msg = "";
+            for (unsigned i = 0; i < addons_manager->getNumAddons(); i++)
+            {
+                // addon_ (6 letters)
+                const Addon& addon = addons_manager->getAddon(i);
+                const std::string& addon_id = addon.getId();
+                if (addon.testStatus(Addon::AS_APPROVED) &&
+                    addon_id.compare(6, argv[1].length(), argv[1]) == 0)
+                {
+                    msg += addon_id.substr(6);
+                    msg += ", ";
+                }
+            }
+            if (msg.empty())
+                NetworkingLobby::getInstance()->addMoreServerInfo(L"Addon not found");
+            else
+            {
+                msg = msg.substr(0, msg.size() - 2);
+                NetworkingLobby::getInstance()->addMoreServerInfo(
+                    (std::string("STK addon: ") + msg).c_str());
+            }
+        }
     }
     else
     {
