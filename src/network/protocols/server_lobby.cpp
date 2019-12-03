@@ -5000,6 +5000,39 @@ void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
         peer->sendPacket(chat, true/*reliable*/);
         delete chat;
     }
+    else if (argv[0] == "serverhasaddon")
+    {
+        NetworkString* chat = getNetworkString();
+        chat->addUInt8(LE_CHAT);
+        chat->setSynchronous(true);
+        if (argv.size() != 2)
+        {
+            chat->encodeString16(
+                L"Usage: /serverhasaddon [addon_identity]");
+        }
+        else
+        {
+            std::set<std::string> total_addons;
+            total_addons.insert(m_addon_kts.first.begin(), m_addon_kts.first.end());
+            total_addons.insert(m_addon_kts.second.begin(), m_addon_kts.second.end());
+            total_addons.insert(m_addon_arenas.begin(), m_addon_arenas.end());
+            total_addons.insert(m_addon_soccers.begin(), m_addon_soccers.end());
+            std::string addon_id_test = Addon::createAddonId(argv[1]);
+            bool found = total_addons.find(addon_id_test) != total_addons.end();
+            if (found)
+            {
+                chat->encodeString16((std::string
+                    ("Server has addon ") + argv[1]).c_str());
+            }
+            else
+            {
+                chat->encodeString16((std::string
+                    ("Server has no addon ") + argv[1]).c_str());
+            }
+        }
+        peer->sendPacket(chat, true/*reliable*/);
+        delete chat;
+    }
     else
     {
         NetworkString* chat = getNetworkString();
