@@ -77,57 +77,6 @@ void OptionsScreenUI::loadedFromFile()
 
     skinSelector->m_properties[PROP_WRAP_AROUND] = "true";
 
-    m_skins.clear();
-    skinSelector->clearLabels();
-
-    std::set<std::string> skin_files;
-    file_manager->listFiles(skin_files /* out */, file_manager->getAsset(FileManager::SKIN,""),
-                            true /* make full path */ );
-    std::set<std::string> addon_skin_files;
-    file_manager->listFiles(addon_skin_files /* out */, file_manager->getAddonsFile("skins/"),
-                            true /* make full path */ );
-
-    auto lb = [](const std::set<std::string>& files, bool addon,
-                 std::map<core::stringw, std::string>& result)->void
-        {
-            for (auto& f : files)
-            {
-                std::string stkskin = f + "/stkskin.xml";
-                if (file_manager->fileExists(stkskin))
-                {
-                    XMLNode* root = file_manager->createXMLTree(stkskin);
-                    if (!root)
-                        continue;
-                    core::stringw skin_name;
-                    if (root->get("name", &skin_name))
-                    {
-                        std::string skin_id = StringUtils::getBasename(f);
-                        if (addon)
-                            skin_id = std::string("addon_") + skin_id;
-                        result[skin_name] = skin_id;
-                    }
-                    delete root;
-                }
-            }
-        };
-    lb(skin_files, false, m_skins);
-    lb(addon_skin_files, true, m_skins);
-
-    if (m_skins.size() == 0)
-    {
-        Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
-                                     "the data files are correctly installed");
-        skinSelector->setActive(false);
-        return;
-    }
-
-    const int skin_count = (int)m_skins.size();
-    for (auto& p : m_skins)
-        skinSelector->addLabel(p.first);
-    skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skin_count-1);
-
-
     // Setup the minimap options spinner
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
@@ -196,6 +145,56 @@ void OptionsScreenUI::init()
 
     GUIEngine::SpinnerWidget* skinSelector = getWidget<GUIEngine::SpinnerWidget>("skinchoice");
     assert( skinSelector != NULL );
+
+    m_skins.clear();
+    skinSelector->clearLabels();
+
+    std::set<std::string> skin_files;
+    file_manager->listFiles(skin_files /* out */, file_manager->getAsset(FileManager::SKIN,""),
+                            true /* make full path */ );
+    std::set<std::string> addon_skin_files;
+    file_manager->listFiles(addon_skin_files /* out */, file_manager->getAddonsFile("skins/"),
+                            true /* make full path */ );
+
+    auto lb = [](const std::set<std::string>& files, bool addon,
+                 std::map<core::stringw, std::string>& result)->void
+        {
+            for (auto& f : files)
+            {
+                std::string stkskin = f + "/stkskin.xml";
+                if (file_manager->fileExists(stkskin))
+                {
+                    XMLNode* root = file_manager->createXMLTree(stkskin);
+                    if (!root)
+                        continue;
+                    core::stringw skin_name;
+                    if (root->get("name", &skin_name))
+                    {
+                        std::string skin_id = StringUtils::getBasename(f);
+                        if (addon)
+                            skin_id = std::string("addon_") + skin_id;
+                        result[skin_name] = skin_id;
+                    }
+                    delete root;
+                }
+            }
+        };
+    lb(skin_files, false, m_skins);
+    lb(addon_skin_files, true, m_skins);
+
+    if (m_skins.size() == 0)
+    {
+        Log::warn("OptionsScreenUI", "Could not find a single skin, make sure that "
+                                     "the data files are correctly installed");
+        skinSelector->setActive(false);
+        return;
+    }
+
+    const int skin_count = (int)m_skins.size();
+    for (auto& p : m_skins)
+        skinSelector->addLabel(p.first);
+    skinSelector->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    skinSelector->m_properties[GUIEngine::PROP_MAX_VALUE] = StringUtils::toString(skin_count-1);
 
     GUIEngine::SpinnerWidget* minimap_options = getWidget<GUIEngine::SpinnerWidget>("minimap");
     assert( minimap_options != NULL );
