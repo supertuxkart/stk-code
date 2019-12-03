@@ -1566,6 +1566,62 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
             }
         }
     }
+    else if (argv[0] == "listclientaddon")
+    {
+        if (argv.size() != 2)
+        {
+            NetworkingLobby::getInstance()->addMoreServerInfo(
+                L"Usage: /listclientaddon [addon prefix letter(s) to find]");
+        }
+        else
+        {
+            std::set<std::string> total_addons;
+            for (unsigned i = 0;
+                i < kart_properties_manager->getNumberOfKarts(); i++)
+            {
+                const KartProperties* kp =
+                    kart_properties_manager->getKartById(i);
+                if (kp->isAddon())
+                    total_addons.insert(kp->getIdent());
+            }
+            for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
+            {
+                const Track* track = track_manager->getTrack(i);
+                if (track->isAddon())
+                    total_addons.insert(track->getIdent());
+            }
+            std::set<std::string> addon_skin_files;
+            std::string skin_folder = file_manager->getAddonsFile("skins/");
+            file_manager->listFiles(addon_skin_files/*out*/, skin_folder,
+                false/*make full path*/);
+            for (auto& skin : addon_skin_files)
+            {
+                if (skin == "." || skin == "..")
+                    continue;
+                std::string stkskin = skin_folder + skin + "/stkskin.xml";
+                if (file_manager->fileExists(stkskin))
+                    total_addons.insert(Addon::createAddonId(skin));
+            }
+            std::string msg = "";
+            for (auto& addon : total_addons)
+            {
+                // addon_ (6 letters)
+                if (addon.compare(6, argv[1].length(), argv[1]) == 0)
+                {
+                    msg += addon.substr(6);
+                    msg += ", ";
+                }
+            }
+            if (msg.empty())
+                NetworkingLobby::getInstance()->addMoreServerInfo(L"Addon not found");
+            else
+            {
+                msg = msg.substr(0, msg.size() - 2);
+                NetworkingLobby::getInstance()->addMoreServerInfo(
+                    (std::string("Client addon: ") + msg).c_str());
+            }
+        }
+    }
     else
     {
         // Send for server command
