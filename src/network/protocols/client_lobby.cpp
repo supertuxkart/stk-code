@@ -1543,17 +1543,19 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
 	    const Addon & addon = addons_manager->getAddon(i);
 	    core::stringw name = core::stringw(addon.getName().c_str());
 	    core::stringw findstr = core::stringw(argv[1].c_str());
+	    core::stringw id = core::stringw(addon.getId().c_str());
+	    id.trim("addon_"); // remove addon_
 
 	    if(addon.getType()!="track") continue; // only show tracks
 
 	    if (argv.size() == 2 && name.make_lower().find(findstr.make_lower().c_str()) == -1) continue;// if not find it
 
 	    if (addon.isInstalled())
-		name += L" (y)";
+		id += L" (y)";
 	    else
-		name += L" (n)";
+		id += L" (n)";
 
-	    namelist += name;
+	    namelist += id;
 	    namelist += L", ";
 	}
 	printf("%ls\n",namelist.c_str());
