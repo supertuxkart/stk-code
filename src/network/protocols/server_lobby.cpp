@@ -18,6 +18,7 @@
 
 #include "network/protocols/server_lobby.hpp"
 
+#include "addons/addon.hpp"
 #include "config/user_config.hpp"
 #include "items/network_item_manager.hpp"
 #include "items/powerup_manager.hpp"
@@ -4937,6 +4938,63 @@ void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
             {
                 msg = msg.substr(0, msg.size() - 2);
                 chat->encodeString16((std::string("Server addon: ") + msg).c_str());
+            }
+        }
+        peer->sendPacket(chat, true/*reliable*/);
+        delete chat;
+    }
+    else if (StringUtils::startsWith(cmd, "playerhasaddon"))
+    {
+        NetworkString* chat = getNetworkString();
+        chat->addUInt8(LE_CHAT);
+        chat->setSynchronous(true);
+        std::string part;
+        if (cmd.length() > 15)
+            part = cmd.substr(15);
+        std::string addon_id = part.substr(0, part.find(' '));
+        std::string player_name;
+        if (part.length() > addon_id.length() + 1)
+            player_name = part.substr(addon_id.length() + 1);
+        std::shared_ptr<STKPeer> player_peer = STKHost::get()->findPeerByName(
+            StringUtils::utf8ToWide(player_name));
+        if (player_name.empty() || !player_peer || addon_id.empty())
+        {
+            chat->encodeString16(
+                L"Usage: /playerhasaddon [addon_identity] [player name]");
+        }
+        else
+        {
+            std::string addon_id_test = Addon::createAddonId(addon_id);
+            bool found = false;
+            const auto& kt = player_peer->getClientAssets();
+            for (auto& kart : kt.first)
+            {
+                if (kart == addon_id_test)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                for (auto& track : kt.second)
+                {
+                    if (track == addon_id_test)
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            if (found)
+            {
+                chat->encodeString16(StringUtils::utf8ToWide
+                    (player_name + " has addon " + addon_id));
+            }
+            else
+            {
+                chat->encodeString16(StringUtils::utf8ToWide
+                    (player_name + " has no addon " + addon_id));
             }
         }
         peer->sendPacket(chat, true/*reliable*/);

@@ -158,7 +158,7 @@ public:
               { m_available_kts = std::make_pair(std::move(k), std::move(t)); }
     // ------------------------------------------------------------------------
     void eraseServerKarts(const std::set<std::string>& server_karts,
-                          std::set<std::string>& karts_erase)
+                          std::set<std::string>& karts_erase) const
     {
         if (m_available_kts.first.empty())
             return;
@@ -173,7 +173,7 @@ public:
     }
     // ------------------------------------------------------------------------
     void eraseServerTracks(const std::set<std::string>& server_tracks,
-                           std::set<std::string>& tracks_erase)
+                           std::set<std::string>& tracks_erase) const
     {
         if (m_available_kts.second.empty())
             return;
