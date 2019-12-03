@@ -63,6 +63,7 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "addons/addons_manager.hpp"
 
 #include <cstdlib>
 
@@ -1532,6 +1533,30 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
         }
         else
             music_manager->setMasterMusicVolume((float)vol / 10);
+    }
+    else if (argv[0] == "listaddons" && argv.size() <= 2)
+    {
+	// Usage: /listaddons or /listaddons string
+	core::stringw namelist;
+	for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
+	{
+	    const Addon & addon = addons_manager->getAddon(i);
+	    core::stringw name = core::stringw(addon.getName().c_str());
+	    core::stringw findstr = core::stringw(argv[1].c_str());
+
+	    if(addon.getType()!="track") continue; // only show tracks
+
+	    if (argv.size() == 2 && name.make_lower().find(findstr.make_lower().c_str()) == -1) continue;// if not find it
+
+	    if (addon.isInstalled())
+		name += L" (y)";
+	    else
+		name += L" (n)";
+
+	    namelist += name;
+	    namelist += L", ";
+	}
+	printf("%ls\n",namelist.c_str());
     }
     else
     {
