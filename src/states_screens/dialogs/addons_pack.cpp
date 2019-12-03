@@ -31,6 +31,7 @@
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -303,6 +304,14 @@ void AddonsPack::install(const std::string& name)
     Addon* addon = addons_manager->getAddon(Addon::createAddonId(name));
     if (addon)
     {
+        NetworkingLobby* nl = dynamic_cast<NetworkingLobby*>(
+            GUIEngine::getCurrentScreen());
+        if (addon->isInstalled())
+        {
+            if (nl)
+                nl->addMoreServerInfo(L"Addon already installed");
+            return;
+        }
         AddonsLoading* al = new AddonsLoading(addon->getId());
         al->tryInstall();
     }
@@ -320,10 +329,14 @@ void AddonsPack::uninstall(const std::string& name)
     if (StateManager::get()->getGameState() != GUIEngine::MENU)
         return;
     Addon* addon = addons_manager->getAddon(Addon::createAddonId(name));
+    NetworkingLobby* nl = dynamic_cast<NetworkingLobby*>(
+        GUIEngine::getCurrentScreen());
     if (addon && addons_manager->uninstall(*addon))
     {
         if (auto cl = LobbyProtocol::get<ClientLobby>())
             cl->updateAssetsToServer();
+        if (nl)
+            nl->addMoreServerInfo(L"Addon uninstalled");
     }
 }   // uninstall
 
