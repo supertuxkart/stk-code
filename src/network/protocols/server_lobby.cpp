@@ -152,6 +152,14 @@ ServerLobby::ServerLobby() : LobbyProtocol()
         track_manager->getArenasInGroup("standard", false);
     std::vector<int> all_soccers =
         track_manager->getArenasInGroup("standard", true);
+    std::vector<int> addon_karts =
+        kart_properties_manager->getKartsInGroup("Add-Ons");
+    std::vector<int> addon_tracks =
+        track_manager->getTracksInGroup("Add-Ons");
+    std::vector<int> addon_arenas =
+        track_manager->getArenasInGroup("Add-Ons", false);
+    std::vector<int> addon_soccers =
+        track_manager->getArenasInGroup("Add-Ons", true);
     all_t.insert(all_t.end(), all_arenas.begin(), all_arenas.end());
     all_t.insert(all_t.end(), all_soccers.begin(), all_soccers.end());
 
@@ -166,6 +174,31 @@ ServerLobby::ServerLobby() : LobbyProtocol()
         Track* t = track_manager->getTrack(track);
         if (!t->isAddon())
             m_official_kts.second.insert(t->getIdent());
+    }
+
+    for (int kart : addon_karts)
+    {
+        const KartProperties* kp = kart_properties_manager->getKartById(kart);
+        if (kp->isAddon())
+            m_addon_kts.first.insert(kp->getIdent());
+    }
+    for (int track : addon_tracks)
+    {
+        Track* t = track_manager->getTrack(track);
+        if (t->isAddon())
+            m_addon_kts.second.insert(t->getIdent());
+    }
+    for (int arena : addon_arenas)
+    {
+        Track* t = track_manager->getTrack(arena);
+        if (t->isAddon())
+            m_addon_arenas.insert(t->getIdent());
+    }
+    for (int soccer : addon_soccers)
+    {
+        Track* t = track_manager->getTrack(soccer);
+        if (t->isAddon())
+            m_addon_soccers.insert(t->getIdent());
     }
 
     m_rs_state.store(RS_NONE);
@@ -757,6 +790,8 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_REPORT_PLAYER: writePlayerReport(event);          break;
         case LE_ASSETS_UPDATE:
             handleAssets(event->data(), event->getPeer());        break;
+        case LE_COMMAND:
+            handleServerCommand(event, event->getPeer());         break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -4856,3 +4891,63 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
     }
     return true;
 }   // checkPeersReady
+
+//-----------------------------------------------------------------------------
+void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
+{
+    NetworkString& data = event->data();
+    std::string cmd;
+    data.decodeString(&cmd);
+    auto argv = StringUtils::split(cmd, ' ');
+    if (argv.size() == 0)
+        return;
+    if (argv[0] == "listserveraddon")
+    {
+        NetworkString* chat = getNetworkString();
+        chat->addUInt8(LE_CHAT);
+        chat->setSynchronous(true);
+        if (argv.size() != 2)
+        {
+            chat->encodeString16(
+                L"Usage: /listserveraddon [addon prefix letter(s) to find]");
+        }
+        else
+        {
+            std::set<std::string> total_addons;
+            total_addons.insert(m_addon_kts.first.begin(), m_addon_kts.first.end());
+            total_addons.insert(m_addon_kts.second.begin(), m_addon_kts.second.end());
+            total_addons.insert(m_addon_arenas.begin(), m_addon_arenas.end());
+            total_addons.insert(m_addon_soccers.begin(), m_addon_soccers.end());
+            std::string msg = "";
+            for (auto& addon : total_addons)
+            {
+                // addon_ (6 letters)
+                if (addon.compare(6, argv[1].length(), argv[1]) == 0)
+                {
+                    msg += addon.substr(6);
+                    msg += ", ";
+                }
+            }
+            if (msg.empty())
+                chat->encodeString16(L"Addon not found");
+            else
+            {
+                msg = msg.substr(0, msg.size() - 2);
+                chat->encodeString16((std::string("Server addon: ") + msg).c_str());
+            }
+        }
+        peer->sendPacket(chat, true/*reliable*/);
+        delete chat;
+    }
+    else
+    {
+        NetworkString* chat = getNetworkString();
+        chat->addUInt8(LE_CHAT);
+        chat->setSynchronous(true);
+        std::string msg = "Unknown command: ";
+        msg += cmd;
+        chat->encodeString16( msg.c_str());
+        peer->sendPacket(chat, true/*reliable*/);
+        delete chat;
+    }
+}   // handleServerCommand

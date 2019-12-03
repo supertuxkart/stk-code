@@ -130,6 +130,15 @@ private:
     /** Official karts and tracks available in server. */
     std::pair<std::set<std::string>, std::set<std::string> > m_official_kts;
 
+    /** Addon karts and tracks available in server. */
+    std::pair<std::set<std::string>, std::set<std::string> > m_addon_kts;
+
+     /** Addon arenas available in server. */
+    std::set<std::string> m_addon_arenas;
+
+     /** Addon soccers available in server. */
+    std::set<std::string> m_addon_soccers;
+
     /** Available karts and tracks for all clients, this will be initialized
      *  with data in server first. */
     std::pair<std::set<std::string>, std::set<std::string> > m_available_kts;
@@ -322,6 +331,7 @@ private:
     std::vector<std::shared_ptr<NetworkPlayerProfile> > getLivePlayers() const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
     bool handleAssets(const NetworkString& ns, STKPeer* peer) const;
+    void handleServerCommand(Event* event, STKPeer* peer) const;
     void liveJoinRequest(Event* event);
     void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
     bool canLiveJoinNow() const;
