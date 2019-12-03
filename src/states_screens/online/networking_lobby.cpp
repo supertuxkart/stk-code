@@ -352,6 +352,13 @@ void NetworkingLobby::onUpdate(float delta)
         Track* t = cl->getPlayingTrack();
         if (t)
             current_track = t->getName();
+        // Show addon identity so player can install it live in lobby
+        if (current_track.empty())
+        {
+            std::string track_id = cl->getPlayingTrackIdent();
+            if (StringUtils::startsWith(track_id, "addon_"))
+                current_track = track_id.substr(6).c_str();
+        }
         if (progress.first != std::numeric_limits<uint32_t>::max())
         {
             if (!current_track.empty())
