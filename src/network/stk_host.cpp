@@ -1548,6 +1548,28 @@ std::shared_ptr<STKPeer> STKHost::findPeerByHostId(uint32_t id) const
 }   // findPeerByHostId
 
 //-----------------------------------------------------------------------------
+std::shared_ptr<STKPeer>
+    STKHost::findPeerByName(const core::stringw& name) const
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    auto ret = std::find_if(m_peers.begin(), m_peers.end(),
+        [name](const std::pair<ENetPeer*, std::shared_ptr<STKPeer> >& p)
+        {
+            bool found = false;
+            for (auto& profile : p.second->getPlayerProfiles())
+            {
+                if (profile->getName() == name)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            return found;
+        });
+    return ret != m_peers.end() ? ret->second : nullptr;
+}   // findPeerByName
+
+//-----------------------------------------------------------------------------
 void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
 {
     assert(NetworkConfig::get()->isClient());
