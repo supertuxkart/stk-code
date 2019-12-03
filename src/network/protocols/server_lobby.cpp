@@ -152,14 +152,6 @@ ServerLobby::ServerLobby() : LobbyProtocol()
         track_manager->getArenasInGroup("standard", false);
     std::vector<int> all_soccers =
         track_manager->getArenasInGroup("standard", true);
-    std::vector<int> addon_karts =
-        kart_properties_manager->getKartsInGroup("Add-Ons");
-    std::vector<int> addon_tracks =
-        track_manager->getTracksInGroup("Add-Ons");
-    std::vector<int> addon_arenas =
-        track_manager->getArenasInGroup("Add-Ons", false);
-    std::vector<int> addon_soccers =
-        track_manager->getArenasInGroup("Add-Ons", true);
     all_t.insert(all_t.end(), all_arenas.begin(), all_arenas.end());
     all_t.insert(all_t.end(), all_soccers.begin(), all_soccers.end());
 
@@ -176,29 +168,38 @@ ServerLobby::ServerLobby() : LobbyProtocol()
             m_official_kts.second.insert(t->getIdent());
     }
 
-    for (int kart : addon_karts)
+    std::set<std::string> total_addons;
+    for (unsigned i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
     {
-        const KartProperties* kp = kart_properties_manager->getKartById(kart);
+        const KartProperties* kp =
+            kart_properties_manager->getKartById(i);
         if (kp->isAddon())
+            total_addons.insert(kp->getIdent());
+    }
+    for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
+    {
+        const Track* track = track_manager->getTrack(i);
+        if (track->isAddon())
+            total_addons.insert(track->getIdent());
+    }
+
+    for (auto& addon : total_addons)
+    {
+        const KartProperties* kp = kart_properties_manager->getKart(addon);
+        if (kp && kp->isAddon())
+        {
             m_addon_kts.first.insert(kp->getIdent());
-    }
-    for (int track : addon_tracks)
-    {
-        Track* t = track_manager->getTrack(track);
-        if (t->isAddon())
-            m_addon_kts.second.insert(t->getIdent());
-    }
-    for (int arena : addon_arenas)
-    {
-        Track* t = track_manager->getTrack(arena);
-        if (t->isAddon())
+            continue;
+        }
+        Track* t = track_manager->getTrack(addon);
+        if (!t || !t->isAddon() || t->isInternal())
+            continue;
+        if (t->isArena())
             m_addon_arenas.insert(t->getIdent());
-    }
-    for (int soccer : addon_soccers)
-    {
-        Track* t = track_manager->getTrack(soccer);
-        if (t->isAddon())
+        else if (t->isSoccer())
             m_addon_soccers.insert(t->getIdent());
+        else
+            m_addon_kts.second.insert(t->getIdent());
     }
 
     m_rs_state.store(RS_NONE);
