@@ -30,6 +30,7 @@
 
 #include <enet/enet.h>
 
+#include <array>
 #include <atomic>
 #include <deque>
 #include <memory>
@@ -51,6 +52,15 @@ enum PeerDisconnectInfo : unsigned int
     PDI_KICK = 2, //!< Kick disconnection
     PDI_KICK_HIGH_PING = 3, //!< Too high ping, kicked by server
 };   // PeerDisconnectInfo
+
+enum AddonScore : int
+{
+    AS_KART = 0,
+    AS_TRACK = 1,
+    AS_ARENA = 2,
+    AS_SOCCER = 3,
+    AS_TOTAL = 4,
+};   // AddonScore
 
 /*! \class STKPeer
  *  \brief Represents a peer.
@@ -108,6 +118,7 @@ protected:
      *  features available in same version. */
     std::set<std::string> m_client_capabilities;
 
+    std::array<int, AS_TOTAL> m_addons_scores;
 public:
     STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id);
     // ------------------------------------------------------------------------
@@ -256,6 +267,12 @@ public:
     void setPacketLoss(int loss)                 { m_packet_loss.store(loss); }
     // ------------------------------------------------------------------------
     int getPacketLoss() const                  { return m_packet_loss.load(); }
+    // ------------------------------------------------------------------------
+    const std::array<int, AS_TOTAL>& getAddonsScores() const
+                                                    { return m_addons_scores; }
+    // ------------------------------------------------------------------------
+    void setAddonsScores(const std::array<int, AS_TOTAL>& scores)
+                                                  { m_addons_scores = scores; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP
