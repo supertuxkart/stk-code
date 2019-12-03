@@ -1566,12 +1566,12 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
             }
         }
     }
-    else if (argv[0] == "listclientaddon")
+    else if (argv[0] == "listlocaladdon")
     {
         if (argv.size() != 2)
         {
             NetworkingLobby::getInstance()->addMoreServerInfo(
-                L"Usage: /listclientaddon [addon prefix letter(s) to find]");
+                L"Usage: /listlocaladdon [addon prefix letter(s) to find]");
         }
         else
         {
@@ -1618,7 +1618,7 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
             {
                 msg = msg.substr(0, msg.size() - 2);
                 NetworkingLobby::getInstance()->addMoreServerInfo(
-                    (std::string("Client addon: ") + msg).c_str());
+                    (std::string("Local addon: ") + msg).c_str());
             }
         }
     }
