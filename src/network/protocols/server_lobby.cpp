@@ -4986,7 +4986,8 @@ void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
             else
             {
                 msg = msg.substr(0, msg.size() - 2);
-                chat->encodeString16((std::string("Server addon: ") + msg).c_str());
+                chat->encodeString16(StringUtils::utf8ToWide(
+                    std::string("Server addon: ") + msg));
             }
         }
         peer->sendPacket(chat, true/*reliable*/);
@@ -5113,13 +5114,13 @@ void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
             bool found = total_addons.find(addon_id_test) != total_addons.end();
             if (found)
             {
-                chat->encodeString16((std::string
-                    ("Server has addon ") + argv[1]).c_str());
+                chat->encodeString16(StringUtils::utf8ToWide(std::string
+                    ("Server has addon ") + argv[1]));
             }
             else
             {
-                chat->encodeString16((std::string
-                    ("Server has no addon ") + argv[1]).c_str());
+                chat->encodeString16(StringUtils::utf8ToWide(std::string
+                    ("Server has no addon ") + argv[1]));
             }
         }
         peer->sendPacket(chat, true/*reliable*/);
@@ -5132,7 +5133,7 @@ void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
         chat->setSynchronous(true);
         std::string msg = "Unknown command: ";
         msg += cmd;
-        chat->encodeString16( msg.c_str());
+        chat->encodeString16(StringUtils::utf8ToWide(msg));
         peer->sendPacket(chat, true/*reliable*/);
         delete chat;
     }

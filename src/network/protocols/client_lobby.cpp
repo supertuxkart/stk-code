@@ -1562,7 +1562,8 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
             {
                 msg = msg.substr(0, msg.size() - 2);
                 NetworkingLobby::getInstance()->addMoreServerInfo(
-                    (std::string("STK addon: ") + msg).c_str());
+                    StringUtils::utf8ToWide
+                    (std::string("STK addon: ") + msg));
             }
         }
     }
@@ -1618,7 +1619,8 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
             {
                 msg = msg.substr(0, msg.size() - 2);
                 NetworkingLobby::getInstance()->addMoreServerInfo(
-                    (std::string("Local addon: ") + msg).c_str());
+                    StringUtils::utf8ToWide(
+                    std::string("Local addon: ") + msg));
             }
         }
     }
