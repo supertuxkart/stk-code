@@ -4081,10 +4081,10 @@ void ServerLobby::submitRankingsToAddons()
         return;
 
     // ========================================================================
-    class SumbitRankingRequest : public Online::XMLRequest
+    class SubmitRankingRequest : public Online::XMLRequest
     {
     public:
-        SumbitRankingRequest(uint32_t online_id, double scores,
+        SubmitRankingRequest(uint32_t online_id, double scores,
                              double max_scores, unsigned num_races,
                              const std::string& country_code)
             : XMLRequest()
@@ -4112,7 +4112,7 @@ void ServerLobby::submitRankingsToAddons()
     for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
     {
         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
-        auto request = std::make_shared<SumbitRankingRequest>
+        auto request = std::make_shared<SubmitRankingRequest>
             (id, m_scores.at(id), m_max_scores.at(id),
             m_num_ranked_races.at(id),
             race_manager->getKartInfo(i).getCountryCode());
