@@ -7,7 +7,7 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 1.1 (in development)
 
-(List to be completed. Currently include relevant change of commits from 20/04 to 12/05 and from 18/08 to 29/10)
+(List to be completed. Currently include relevant change of commits from 20/04 to 22/06 and from 18/08 to 22/11)
 
 ### >>> Partial features <<<
 * Addon skin support and skin-specified font by Benau
@@ -17,6 +17,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add support for IPv6 clients and servers, by Benau
 * Add AI support to local networking servers, by Benau. This AI is not as strong as the normal AI due to networking lag, but should offer enough challenge for a majority of players.
 * Add support for AI bots for the server host, by Benau
+* Improved handling of collisions, by Benau
 * Add packet loss data to the server databases, by Benau
 * New management features for server hosts, by Benau
     * IP / online ID ban tables
@@ -36,6 +37,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### General
 * Add emoji support, by Benau
 * Avoid "this program is not responding" warnings in Windows and Mac, by Benau
+* Add a Story Mode timer, by Alayan
 * Remove an incorrect function call that could significantly hurt performance for Mac, by Benau
 * Fix a nasty bug that made several sound effects to be played at a low volume after a crash, by Alayan
 * Some code clean-up, by Alayan
@@ -46,6 +48,8 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Android
 * Various bugfixes by deveee, dos1
+* Screen keyboard handling improvements, by deveee and Benau
+* Allow copying text from the edit box, by Benau
 * The tutorial text is now tailored for touchscreen usage, instead of the main keyboard text, by Benau
 
 ### iOS
@@ -54,16 +58,24 @@ For similar reasons, and because some features are vastly more complex than othe
     *
     
 ### User Interface
+* Better scaling of many many UI elements to large resolutions, by dumaosen and others
 * Show country flags for servers and players in online multiplayer, by Benau
-* Add a new option to change font size on the fly, by Benau
-* Better scaling of many UI elements to large resolutions, by dumaosen and others
+* Add a new option to change font size on the fly, by Benau and deveee
 * Scale down the lap time indicator next to the kart icons when there are many karts, by risostk
 * Add icons for the available options in the race result screens, by dumaosen
+* Make the highscore list scrollable, by deveee
 * Display all the relevant info in the challenge dialog in Story Mode, by Alayan
+* New challenge selection interface, by dumaosen
 * Show the number of ranking points won or lost after a ranked race, by Benau
 * Separate blurring visual effects from the main graphics presets, by Alayan
 * Fix incorrect text resizing in the help menu, by Benau
 * Make the custom random GP option more prominent in the track selection screen, by dumaosen
+* Allow sorting lists with the keyboard, by Benau
+* Allow tooltip drawing outside of menus, by deveee
+* Prevent some font scaling blur caused by non-integer offsets, by Benau
+* Limit how long chat and in-race messages can be, by Benau and Alayan
+* Add an option to disable in-race messages only, by Alayan
+* Allow to explicitly set the flip direction of tabs, by dumaosen
 * Many minor tweaks and bugfixes
 
 ## SuperTuxKart 1.0 (20. April 2019)
