@@ -800,9 +800,9 @@ namespace StringUtils
                     }
                     else if (input[n] == ';')
                     {
-                        int c;
+                        unsigned int c;
 
-                        const char* format = (isHex ? "%x" : "%i");
+                        const char* format = (isHex ? "%x" : "%u");
                         if (sscanf(entity.c_str(), format, &c) == 1)
                         {
                             output += char32_t(c);
