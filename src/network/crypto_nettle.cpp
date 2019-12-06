@@ -23,6 +23,7 @@
 #include "network/network_string.hpp"
 
 #include <nettle/base64.h>
+#include <nettle/sha.h>
 #include <nettle/version.h>
 
 #if NETTLE_VERSION_MAJOR > 3 || \
@@ -66,6 +67,17 @@ std::vector<uint8_t> Crypto::decode64(std::string input)
 #endif
     return result;
 }   // decode64
+
+// ============================================================================
+std::array<uint8_t, 32> Crypto::sha256(const std::string& input)
+{
+    std::array<uint8_t, SHA256_DIGEST_SIZE> result;
+    struct sha256_ctx hash;
+    sha256_init(&hash);
+    sha256_update(&hash, input.size(), (const uint8_t*)input.c_str());
+    sha256_digest(&hash, SHA256_DIGEST_SIZE, result.data());
+    return result;
+}   // sha256
 
 // ============================================================================
 std::string Crypto::m_client_key;

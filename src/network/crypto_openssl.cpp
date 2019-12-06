@@ -25,6 +25,7 @@
 #include <openssl/aes.h>
 #include <openssl/buffer.h>
 #include <openssl/hmac.h>
+#include <openssl/sha.h>
 
 // ============================================================================
 // AES GCM modes never writes anything when finalize, it only handles the tag
@@ -76,6 +77,18 @@ std::vector<uint8_t> Crypto::decode64(std::string input)
 
     return result;
 }   // decode64
+
+// ============================================================================
+std::array<uint8_t, 32> Crypto::sha256(const std::string& input)
+{
+    std::array<uint8_t, SHA256_DIGEST_LENGTH> result;
+    SHA256_CTX sha256_ctx;
+    SHA256_Init(&sha256_ctx);
+    SHA256_Update(&sha256_ctx, (const unsigned char*)input.c_str(),
+        input.size());
+    SHA256_Final(result.data(), &sha256_ctx);
+    return result;
+}   // sha256
 
 // ============================================================================
 std::string Crypto::m_client_key;
