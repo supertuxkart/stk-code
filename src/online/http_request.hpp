@@ -22,11 +22,11 @@
 #include "online/request.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
-#include "utils/synchronised.hpp"
 
 #ifdef WIN32
 #  include <winsock2.h>
 #endif
+#include <atomic>
 #include <curl/curl.h>
 #include <assert.h>
 #include <string>
@@ -49,7 +49,9 @@ namespace Online
          *  packet is downloaded. Guaranteed to be <1 while the download
          *  is in progress, it will be set to either -1 (error) or 1
          *  (everything ok) at the end. */
-        Synchronised<float> m_progress;
+        std::atomic<float> m_progress;
+
+        std::atomic<double> m_total_size;
 
         /** The url to download. */
         std::string m_url;
@@ -171,11 +173,11 @@ namespace Online
 
         // --------------------------------------------------------------------
         /** Returns the current progress. */
-        float getProgress() const { return m_progress.getAtomic(); }
+        float getProgress() const { return m_progress.load(); }
 
         // --------------------------------------------------------------------
         /** Sets the current progress. */
-        void setProgress(float f) { m_progress.setAtomic(f); }
+        void setProgress(float f) { m_progress.store(f); }
 
         // --------------------------------------------------------------------
         const std::string & getURL() const { assert(isBusy()); return m_url;}
@@ -189,6 +191,10 @@ namespace Online
         }   // setURL
         // --------------------------------------------------------------------
         const std::string& getFileName() const           { return m_filename; }
+        // --------------------------------------------------------------------
+        double getTotalSize() const             { return m_total_size.load(); }
+        // --------------------------------------------------------------------
+        void setTotalSize(double d)                  { m_total_size.store(d); }
     };   // class HTTPRequest
 } //namespace Online
 #endif // HEADER_HTTP_REQUEST_HPP

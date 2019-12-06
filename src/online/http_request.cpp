@@ -90,7 +90,8 @@ namespace Online
         m_filename      = "";
         m_parameters    = "";
         m_curl_code     = CURLE_OK;
-        m_progress.setAtomic(0);
+        m_progress.store(0.0f);
+        m_total_size.store(-1.0);
         m_disable_sending_log = false;
     }   // init
 
@@ -368,6 +369,7 @@ namespace Online
         }
 
         float f;
+        request->setTotalSize(download_total);
         if (download_now < download_total)
         {
             f = (float)download_now / (float)download_total;
