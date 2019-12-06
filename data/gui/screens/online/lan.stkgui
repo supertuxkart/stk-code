@@ -7,7 +7,7 @@
         <spacer width="100%" height="1%"/>
 
         <spacer height="5%" width="10"/>
-        <icon id="logo" align="center" proportion="1" width="100%" icon="gui/icons/logo.png"/>
+        <icon id="logo" align="center" proportion="1" width="100%" alt_icon="gui/icons/logo.png"/>
         <spacer height="5%" width="10"/>
         
         <buttonbar id="lan" proportion="1" width="90%" align="center">

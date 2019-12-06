@@ -16,7 +16,7 @@
             <spacer width="25"/>
         </box>
 
-        <icon id="logo" align="center" proportion="4" width="100%" icon="gui/icons/logo.png"/>
+        <icon id="logo" align="center" proportion="4" width="100%" alt_icon="gui/icons/logo.png"/>
         
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="lan" width="128" height="128"
