@@ -19,6 +19,7 @@
 #include "input/input_manager.hpp"
 
 #include "config/user_config.hpp"
+#include "input/keyboard_static_keys.hpp"
 #include "graphics/camera_fps.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
@@ -35,7 +36,6 @@
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/demo_world.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -126,38 +126,8 @@ void InputManager::handleStaticAction(int key, int value)
         world->onFirePressed(NULL);
     }
 
-
-    if (world != NULL && UserConfigParams::m_artist_debug_mode &&
-        control_is_pressed && value > 0)
-    {
-        if (Debug::handleStaticAction(key))
-            return;
-    }
-
-    // TODO: move debug shortcuts to Debug::handleStaticAction
     switch (key)
     {
-#ifdef DEBUG
-        // Special debug options for profile mode: switch the
-        // camera to show a different kart.
-        case IRR_KEY_1:
-        case IRR_KEY_2:
-        case IRR_KEY_3:
-        case IRR_KEY_4:
-        case IRR_KEY_5:
-        case IRR_KEY_6:
-        case IRR_KEY_7:
-        case IRR_KEY_8:
-        case IRR_KEY_9:
-        {
-            if(!ProfileWorld::isProfileMode() || !world) break;
-            int kart_id = key - IRR_KEY_1;
-            if(kart_id<0 || kart_id>=(int)world->getNumKarts()) break;
-            Camera::getCamera(0)->setKart(world->getKart(kart_id));
-            break;
-        }
-#endif
-
         case IRR_KEY_CONTROL:
         case IRR_KEY_RCONTROL:
         case IRR_KEY_LCONTROL:
@@ -165,124 +135,27 @@ void InputManager::handleStaticAction(int key, int value)
         case IRR_KEY_LMENU:
         case IRR_KEY_LWIN:
             control_is_pressed = value!=0;
+            return;
             break;
         case IRR_KEY_LSHIFT:
         case IRR_KEY_RSHIFT:
         case IRR_KEY_SHIFT:
-            shift_is_pressed = value!=0; break;
+            shift_is_pressed = value!=0;
+            return;
+            break;
+    }
 
-        // Flying up and down
-        case IRR_KEY_I:
-        {
-            if (!world || !UserConfigParams::m_artist_debug_mode) break;
+    int kbd_key = key;
+    if (control_is_pressed) kbd_key += KBD_CTRL;
+    if (shift_is_pressed) kbd_key += KBD_SHIFT;
 
-            AbstractKart* kart = world->getLocalPlayerKart(0);
-            if (kart == NULL) break;
+    if (Debug::handleStaticAction(kbd_key, value, control_is_pressed, shift_is_pressed))
+      return;
 
-            kart->flyUp();
-            break;
-        }
-        case IRR_KEY_K:
-        {
-            if (!world || !UserConfigParams::m_artist_debug_mode) break;
-
-            AbstractKart* kart = world->getLocalPlayerKart(0);
-            if (kart == NULL) break;
-
-            kart->flyDown();
-            break;
-        }
-        // Moving the first person camera
-        case IRR_KEY_W:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && UserConfigParams::m_artist_debug_mode && cam  )
-            {
-                core::vector3df vel(cam->getLinearVelocity());
-                vel.Z = value ? cam->getMaximumVelocity() : 0;
-                cam->setLinearVelocity(vel);
-            }
-            break;
-        }
-        case IRR_KEY_S:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && UserConfigParams::m_artist_debug_mode && cam)
-            {
-                core::vector3df vel(cam->getLinearVelocity());
-                vel.Z = value ? -cam->getMaximumVelocity() : 0;
-                cam->setLinearVelocity(vel);
-            }
-            break;
-        }
-        case IRR_KEY_D:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && !UserConfigParams::m_artist_debug_mode && cam)
-            {
-                core::vector3df vel(cam->getLinearVelocity());
-                vel.X = value ? -cam->getMaximumVelocity() : 0;
-                cam->setLinearVelocity(vel);
-            }
-            break;
-        }
-        case IRR_KEY_A:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && UserConfigParams::m_artist_debug_mode && cam)
-            {
-                core::vector3df vel(cam->getLinearVelocity());
-                vel.X = value ? cam->getMaximumVelocity() : 0;
-                cam->setLinearVelocity(vel);
-            }
-            break;
-        }
-        case IRR_KEY_R:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && UserConfigParams::m_artist_debug_mode && cam)
-            {
-                core::vector3df vel(cam->getLinearVelocity());
-                vel.Y = value ? cam->getMaximumVelocity() : 0;
-                cam->setLinearVelocity(vel);
-            }
-            break;
-        }
-        case IRR_KEY_F:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && UserConfigParams::m_artist_debug_mode && cam)
-            {
-                core::vector3df vel(cam->getLinearVelocity());
-                vel.Y = value ? -cam->getMaximumVelocity() : 0;
-                cam->setLinearVelocity(vel);
-            }
-            break;
-        }
-        // Rotating the first person camera
-        case IRR_KEY_Q:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && UserConfigParams::m_artist_debug_mode && cam )
-            {
-                cam->setAngularVelocity(value ?
-                    UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
-            }
-            break;
-        }
-        case IRR_KEY_E:
-        {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (world && UserConfigParams::m_artist_debug_mode && cam)
-            {
-                cam->setAngularVelocity(value ?
-                    -UserConfigParams::m_fpscam_max_angular_velocity : 0);
-            }
-            break;
-        }
-
+    switch (kbd_key)
+    {
         case IRR_KEY_SNAPSHOT:
-        case IRR_KEY_PRINT:
+        case KBD_KEY_SCREENSHOT:
             // on windows we don't get a press event, only release.  So
             // save on release only (to avoid saving twice on other platforms)
             if (value == 0)
@@ -298,7 +171,7 @@ void InputManager::handleStaticAction(int key, int value)
                 }
             }
             break;
-        case IRR_KEY_F11:
+        case KBD_KEY_REWIND:
             if(value && shift_is_pressed && world && RewindManager::isEnabled())
             {
                 printf("Enter rewind to time in ticks:");
@@ -408,7 +281,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
             */
-        case IRR_KEY_F10:
+        case KBD_KEY_SAVE_REPLAY:
             if(world && value)
             {
                 if(control_is_pressed)
@@ -426,7 +299,7 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
             */
-        case IRR_KEY_F12:
+        case KBD_KEY_SHOW_FPS:
             if(value)
                 UserConfigParams::m_display_fps =
                     !UserConfigParams::m_display_fps;

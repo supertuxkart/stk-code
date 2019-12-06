@@ -19,6 +19,7 @@
 #include "debug.hpp"
 
 #include "config/user_config.hpp"
+#include "input/keyboard_static_keys.hpp"
 #include "font/bold_face.hpp"
 #include "font/digit_face.hpp"
 #include "font/font_manager.hpp"
@@ -45,6 +46,7 @@
 #include "karts/controller/controller.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
+#include "modes/profile_world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
@@ -1036,61 +1038,146 @@ bool onEvent(const SEvent &event)
     return !g_debug_menu_visible;    
 }   // onEvent
 
+
 // ----------------------------------------------------------------------------
-
-bool handleStaticAction(int key)
+bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_is_pressed)
 {
-    Camera* camera = Camera::getActiveCamera();
-    unsigned int kart_num = 0;
-    if (camera != NULL && camera->getKart() != NULL)
-    {
-        kart_num = camera->getKart()->getWorldKartId();
-    }
+    bool ret=false;
 
-    if (key == IRR_KEY_F1)
-    {
-        handleContextMenuAction(DEBUG_GUI_CAM_FREE);
-    }
-    else if (key == IRR_KEY_F2)
-    {
-        handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
-    }
-    else if (key == IRR_KEY_F3)
-    {
+    World *world = World::getWorld();
+
+    if (world && UserConfigParams::m_artist_debug_mode) {
+      Camera* camera = Camera::getActiveCamera();
+      unsigned int kart_num = 0;
+      if (camera != NULL && camera->getKart() != NULL)
+      {
+          kart_num = camera->getKart()->getWorldKartId();
+      }
+
+#define GET_KART()                \
+      AbstractKart* kart = world->getLocalPlayerKart(0); \
+      if (kart == NULL) break;
+
+#define GET_CAMERA()                \
+      CameraFPS *cam = dynamic_cast<CameraFPS*>(camera); \
+      if (cam == NULL ) break;
+
+#define CAM_MOVE(sign, axis)                \
+      GET_CAMERA();                       \
+      core::vector3df vel(cam->getLinearVelocity()); \
+      vel.axis = value ? sign*cam->getMaximumVelocity() : 0; \
+      cam->setLinearVelocity(vel);
+
+      ret = true;
+      switch (key)
+      {
+        case KBD_KEY_DEBUG_CAMERA_FREE:
+          {
+          handleContextMenuAction(DEBUG_GUI_CAM_FREE);
+          break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_NORMAL:
+          {
+          handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
+          break;
+          }
 #ifndef SERVER_ONLY
-        SP::SPTextureManager::get()->reloadTexture("");
+        case KBD_KEY_DEBUG_RELOAD_TEXTURE:
+          {
+          SP::SPTextureManager::get()->reloadTexture("");
+          break;
+          }
 #endif
-        return true;
+        case KBD_KEY_DEBUG_FOLLOW_PREVIOUS_KART:
+          {
+          kart_num = (kart_num == 0 ? World::getWorld()->getNumKarts() : kart_num) - 1;
+          Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+          break;
+          }
+        case KBD_KEY_DEBUG_FOLLOW_NEXT_KART:
+          {
+          kart_num = (kart_num == World::getWorld()->getNumKarts() - 1 ? 0 : kart_num + 1);
+          Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+          break;
+          }
+        case KBD_KEY_DEBUG_KART_FLY_UP:
+          {
+            GET_KART(); kart->flyUp(); break;
+          }
+        case KBD_KEY_DEBUG_KART_FLY_DOWN:
+          {
+            GET_KART(); kart->flyDown(); break;
+          }
+          // Moving the first person camera
+        case KBD_KEY_DEBUG_CAMERA_MOVE_FORWARD:
+          {
+            CAM_MOVE(1, Z); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_BACKWARD:
+          {
+            CAM_MOVE(-1, Z); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_LEFT:
+          {
+            CAM_MOVE(-1, X); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_RIGHT:
+          {
+            CAM_MOVE(1, X); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_UP:
+          {
+            CAM_MOVE(1, Y); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_DOWN:
+          {
+            CAM_MOVE(-1, Y); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_ROTATE_CLOCKWISE:
+          {
+            GET_CAMERA();
+            cam->setAngularVelocity(value ?
+                UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_ROTATE_COUNTER_CLOCKWISE:
+          {
+            GET_CAMERA();
+            cam->setAngularVelocity(value ?
+                -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            break;
+          }
+        // TODO: create more keyboard shortcuts
+        default: ret=false;
+      }
     }
-    else if (key == IRR_KEY_F5)
-    {
-        if (kart_num == 0)
-        {
-            kart_num += World::getWorld()->getNumKarts() - 1;
-        }
-        else
-        {
-            kart_num--;
-        }
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        return true;
+#ifdef DEBUG
+    if (!ret) { 
+      switch (key)
+      {
+        // Special debug options for profile mode: switch the
+        // camera to show a different kart.
+        case IRR_KEY_1:
+        case IRR_KEY_2:
+        case IRR_KEY_3:
+        case IRR_KEY_4:
+        case IRR_KEY_5:
+        case IRR_KEY_6:
+        case IRR_KEY_7:
+        case IRR_KEY_8:
+        case IRR_KEY_9:
+          {
+            if(!ProfileWorld::isProfileMode() || !world) break;
+            int kart_id = key - IRR_KEY_1;
+            if(kart_id<0 || kart_id>=(int)world->getNumKarts()) break;
+            Camera::getCamera(0)->setKart(world->getKart(kart_id));
+            return true;
+            break;
+          }
+      }
     }
-    else if (key == IRR_KEY_F6)
-    {
-        if (kart_num == World::getWorld()->getNumKarts() - 1)
-        {
-            kart_num = 0;
-        }
-        else
-        {
-             kart_num++;
-        }
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        return true;
-    }
-    // TODO: create more keyboard shortcuts
-
-    return false;
+#endif
+    return ret;
 }
 
 // ----------------------------------------------------------------------------
