@@ -1788,10 +1788,19 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     World* w = World::getWorld();
     assert(w);
 
-    // Give 3 seconds for all peers to get new kart info
-    m_last_live_join_util_ticks = w->getTicksSinceStart() +
-        stk_config->time2Ticks(3.0f);
     uint64_t live_join_start_time = STKHost::get()->getNetworkTimer();
+
+    // Instead of using getTicksSinceStart we caculate the current world ticks
+    // only from network timer, because if the server hangs in between the
+    // world ticks may not be up to date
+    // 2000 is the time for ready set, remove 3 ticks after for minor
+    // correction (make it more looks like getTicksSinceStart if server has no
+    // hang
+    int cur_world_ticks = stk_config->time2Ticks(
+        (live_join_start_time - m_server_started_at - 2000) / 1000.f) - 3;
+    // Give 3 seconds for all peers to get new kart info
+    m_last_live_join_util_ticks =
+        cur_world_ticks + stk_config->time2Ticks(3.0f);
     live_join_start_time -= m_server_delay;
     live_join_start_time += 3000;
 
