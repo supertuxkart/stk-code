@@ -331,7 +331,7 @@ private:
     std::vector<std::shared_ptr<NetworkPlayerProfile> > getLivePlayers() const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
     bool handleAssets(const NetworkString& ns, STKPeer* peer) const;
-    void handleServerCommand(Event* event, STKPeer* peer) const;
+    void handleServerCommand(Event* event, std::shared_ptr<STKPeer> peer) const;
     void liveJoinRequest(Event* event);
     void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
     bool canLiveJoinNow() const;
