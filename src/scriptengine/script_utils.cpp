@@ -22,9 +22,11 @@
 #include "input/device_manager.hpp"
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
+#include "network/crypto.hpp"
 #include "network/network_config.hpp"
 #include "scriptengine/aswrappedcall.hpp"
 #include "scriptengine/script_engine.hpp"
+#include "scriptengine/scriptarray.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -157,6 +159,25 @@ namespace Scripting
             Log::error("Script", "%s", log->c_str());
         }
 
+        CScriptArray* sha256(std::string* input)
+        {
+            asIScriptContext* ctx = asGetActiveContext();
+            asIScriptEngine* engine = ctx->GetEngine();
+            asITypeInfo* t = engine->GetTypeInfoByDecl("array<uint8>");
+            auto result = Crypto::sha256(*input);
+            CScriptArray* script_array = CScriptArray::Create(t, 32);
+            for (unsigned int i = 0; i < 32; i++)
+                script_array->SetValue(i, result.data() + i);
+            return script_array;
+        }
+
+        std::string toHex(uint64_t num)
+        {
+            std::ostringstream output;
+            output << std::hex << num;
+            return output.str();
+        }
+
         bool isNetworking()
         {
             return NetworkConfig::get()->isNetworking();
@@ -251,7 +272,13 @@ namespace Scripting
                                                mp ? WRAP_FN(isNetworking) : asFUNCTION(isNetworking),
                                                call_conv); assert(r >= 0);
 
+            r = engine->RegisterGlobalFunction("array<uint8>@ sha256(const string &in)",
+                                               mp ? WRAP_FN(sha256) : asFUNCTION(sha256),
+                                               call_conv); assert(r >= 0);
 
+            r = engine->RegisterGlobalFunction("string toHex(uint64 num)",
+                                               mp ? WRAP_FN(toHex) : asFUNCTION(toHex),
+                                               call_conv); assert(r >= 0);
         }
     }
 

@@ -89,6 +89,8 @@ public:
     // ------------------------------------------------------------------------
     static std::vector<uint8_t> decode64(std::string input);
     // ------------------------------------------------------------------------
+    static std::array<uint8_t, 32> sha256(const std::string& input);
+    // ------------------------------------------------------------------------
     static std::unique_ptr<Crypto> getClientCrypto()
     {
         assert(!m_client_key.empty());
