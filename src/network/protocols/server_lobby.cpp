@@ -793,7 +793,7 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
         case LE_ASSETS_UPDATE:
             handleAssets(event->data(), event->getPeer());        break;
         case LE_COMMAND:
-            handleServerCommand(event, event->getPeer());         break;
+            handleServerCommand(event, event->getPeerSP());       break;
         default:                                                  break;
         }   // switch
     } // if (event->getType() == EVENT_TYPE_MESSAGE)
@@ -4953,7 +4953,8 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
 }   // checkPeersReady
 
 //-----------------------------------------------------------------------------
-void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
+void ServerLobby::handleServerCommand(Event* event,
+                                      std::shared_ptr<STKPeer> peer) const
 {
     NetworkString& data = event->data();
     std::string language;
@@ -5058,6 +5059,38 @@ void ServerLobby::handleServerCommand(Event* event, STKPeer* peer) const
         }
         peer->sendPacket(chat, true/*reliable*/);
         delete chat;
+    }
+    else if (StringUtils::startsWith(cmd, "kick"))
+    {
+        if (m_server_owner.lock() != peer)
+        {
+            NetworkString* chat = getNetworkString();
+            chat->addUInt8(LE_CHAT);
+            chat->setSynchronous(true);
+            chat->encodeString16(L"You are not server owner");
+            peer->sendPacket(chat, true/*reliable*/);
+            delete chat;
+            return;
+        }
+        std::string player_name;
+        if (cmd.length() > 5)
+            player_name = cmd.substr(5);
+        std::shared_ptr<STKPeer> player_peer = STKHost::get()->findPeerByName(
+            StringUtils::utf8ToWide(player_name));
+        if (player_name.empty() || !player_peer || player_peer->isAIPeer())
+        {
+            NetworkString* chat = getNetworkString();
+            chat->addUInt8(LE_CHAT);
+            chat->setSynchronous(true);
+            chat->encodeString16(
+                L"Usage: /kick [player name]");
+            peer->sendPacket(chat, true/*reliable*/);
+            delete chat;
+        }
+        else
+        {
+            player_peer->kick();
+        }
     }
     else if (StringUtils::startsWith(cmd, "playeraddonscore"))
     {
