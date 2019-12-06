@@ -24,6 +24,7 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 #include "utils/types.hpp"
 #include "utils/utf8.h"
 #include "irrArray.h"
@@ -1414,7 +1415,29 @@ namespace StringUtils
 #endif
         return uagent;
     }   // getUserAgentString
-
+    // ------------------------------------------------------------------------
+    irr::core::stringw getReadableFileSize(uint64_t n)
+    {
+        irr::core::stringw unit="";
+        if(n>1024*1024)
+        {
+            float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
+            char s[32];
+            sprintf(s, "%.1f", f);
+            unit = _("%s MB", s);
+        }
+        else if(n>1024)
+        {
+            float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
+            char s[32];
+            sprintf(s, "%.1f", f);
+            unit = _("%s KB", s);
+        }
+        else
+            // Anything smaller just let it be 1 KB
+            unit = _("%s KB", 1);
+        return unit;
+    }   // getReadableFileSize
 } // namespace StringUtils
 
 /* EOF */

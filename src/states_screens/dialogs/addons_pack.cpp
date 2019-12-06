@@ -97,7 +97,8 @@ AddonsPack::AddonsPack(const std::string& url) : ModalDialog(0.8f, 0.8f)
 {
     loadFromFile("addons_loading.stkgui");
     getWidget<IconButtonWidget>("install")->setVisible(false);
-    getWidget<LabelWidget>("size")->setVisible(false);
+    m_size = getWidget<LabelWidget>("size");
+    m_size->setVisible(false);
     getWidget<BubbleWidget>("description")->setText(
         StringUtils::utf8ToWide(url));
 
@@ -160,6 +161,15 @@ void AddonsPack::onUpdate(float delta)
 {
     if (m_download_request)
     {
+        if (!m_size->isVisible() && m_download_request->getTotalSize() > 0)
+        {
+            m_size->setVisible(true);
+            core::stringw unit = StringUtils::getReadableFileSize(
+                m_download_request->getTotalSize());
+            core::stringw size = _("Size: %s", unit.c_str());
+            m_size->setText(size, false);
+        }
+
         float progress = m_download_request->getProgress();
         // Last 1% for unzipping
         m_progress->setValue(progress * 99.0f);

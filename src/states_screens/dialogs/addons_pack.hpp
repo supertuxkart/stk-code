@@ -30,7 +30,9 @@ class AddonsPackRequest;
 class AddonsPack : public GUIEngine::ModalDialog
 {
 private:
-    GUIEngine::ProgressBarWidget *m_progress;
+    GUIEngine::ProgressBarWidget* m_progress;
+
+    GUIEngine::LabelWidget* m_size;
 
     void stopDownload();
     void doInstall();
