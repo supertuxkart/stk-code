@@ -25,6 +25,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -166,6 +167,10 @@ void MainMenuScreen::init()
     r = getWidget<RibbonWidget>("menu_toprow");
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     DemoWorld::resetIdleTime();
+
+    const std::string path = StringUtils::wideToUtf8(_("gui/icons/logo.png"));
+    getWidget<IconButtonWidget>("logo")->setImage(path,
+        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
 #if _IRR_MATERIAL_MAX_TEXTURES_ < 8
     getWidget<IconButtonWidget>("logo")->setImage("gui/icons/logo_broken.png",

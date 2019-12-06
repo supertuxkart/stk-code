@@ -18,11 +18,13 @@
 #include "states_screens/online/online_profile_servers.hpp"
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "network/network_config.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/create_server_screen.hpp"
 #include "states_screens/online/online_lan.hpp"
 #include "states_screens/online/server_selection.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIButton.h>
@@ -60,6 +62,10 @@ void OnlineLanScreen::init()
     assert(ribbon != NULL);
     ribbon->select("find_lan_server", PLAYER_ID_GAME_MASTER);
     ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+
+    const std::string path = StringUtils::wideToUtf8(_("gui/icons/logo.png"));
+    getWidget<IconButtonWidget>("logo")->setImage(path,
+        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 }   // init
 
 // -----------------------------------------------------------------------------

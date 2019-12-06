@@ -22,6 +22,7 @@
 #include "config/user_config.hpp"
 #include "guiengine/message_queue.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -101,6 +102,10 @@ void OnlineScreen::init()
             PlayerManager::getCurrentPlayer(), PLAYER_DIFFICULTY_NORMAL);
         NetworkConfig::get()->doneAddingNetworkPlayers();
     }
+
+    const std::string path = StringUtils::wideToUtf8(_("gui/icons/logo.png"));
+    getWidget<IconButtonWidget>("logo")->setImage(path,
+        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 }   // init
 
 // ----------------------------------------------------------------------------
