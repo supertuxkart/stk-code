@@ -28,6 +28,7 @@ using irr::core::stringc;
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "online/link_helper.hpp"
 #include "states_screens/state_manager.hpp"
@@ -224,6 +225,10 @@ void CreditsScreen::init()
     Screen::init();
     Widget* w = getWidget<Widget>("animated_area");
     assert(w != NULL);
+
+    const std::string path = StringUtils::wideToUtf8(_("gui/icons/logo.png"));
+    getWidget<IconButtonWidget>("logo")->setImage(path,
+        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
     reset();
     
