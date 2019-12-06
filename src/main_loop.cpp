@@ -414,6 +414,8 @@ void MainLoop::run()
 
         // Shutdown next frame if shutdown request is sent while loading the
         // world
+        bool was_server = NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isServer();
         if ((STKHost::existHost() && STKHost::get()->requestedShutdown()) ||
             m_request_abort)
         {
@@ -467,7 +469,6 @@ void MainLoop::run()
                         NetworkConfig::get()->getResetScreens().data());
                     MessageQueue::add(MessageQueue::MT_ERROR, msg);
                 }
-                
                 NetworkConfig::get()->unsetNetworking();
             }
 
@@ -476,6 +477,9 @@ void MainLoop::run()
                 m_abort = true;
             }
         }
+
+        if (was_server && !STKHost::existHost())
+            m_abort = true;
 
         if (!m_abort)
         {
