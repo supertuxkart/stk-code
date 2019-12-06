@@ -226,7 +226,7 @@ void CreditsScreen::init()
     Widget* w = getWidget<Widget>("animated_area");
     assert(w != NULL);
 
-    const std::string path = StringUtils::wideToUtf8(_("gui/icons/logo.png"));
+    const std::string path = StringUtils::wideToUtf8(_("gui/icons/logo_slim.png"));
     getWidget<IconButtonWidget>("logo")->setImage(path,
         IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
 
