@@ -41,6 +41,7 @@ private:
      *  to the progress of a download. */
     std::shared_ptr<AddonsPackRequest> m_download_request;
     AddonsPack(const std::string& url);
+    ~AddonsPack();
 public:
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;
