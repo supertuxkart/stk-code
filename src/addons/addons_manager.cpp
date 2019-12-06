@@ -492,7 +492,7 @@ bool AddonsManager::install(const Addon &addon)
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
     std::string to        = addon.getDataDir();
 
-    bool success = extract_zip(from, to);
+    bool success = extract_zip(from, to, true/*recursive*/);
     if (!success)
     {
         // TODO: show a message in the interface
