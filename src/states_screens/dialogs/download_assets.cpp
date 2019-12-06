@@ -111,6 +111,12 @@ DownloadAssets::DownloadAssets()
 }   // DownloadAssets
 
 // ----------------------------------------------------------------------------
+DownloadAssets::~DownloadAssets()
+{
+    stopDownload();
+}   // ~DownloadAssets
+
+// ----------------------------------------------------------------------------
 void DownloadAssets::beforeAddingWidgets()
 {
     getWidget("uninstall")->setVisible(false);
@@ -125,7 +131,6 @@ void DownloadAssets::init()
 // ----------------------------------------------------------------------------
 bool DownloadAssets::onEscapePressed()
 {
-    stopDownload();
     ModalDialog::dismiss();
     return true;
 }   // onEscapePressed
@@ -142,7 +147,6 @@ GUIEngine::EventPropagation DownloadAssets::processEvent(const std::string& even
             actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == "back")
         {
-            stopDownload();
             dismiss();
             return GUIEngine::EVENT_BLOCK;
         }

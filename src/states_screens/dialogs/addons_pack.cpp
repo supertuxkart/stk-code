@@ -117,6 +117,12 @@ AddonsPack::AddonsPack(const std::string& url) : ModalDialog(0.8f, 0.8f)
 }   // AddonsPack
 
 // ----------------------------------------------------------------------------
+AddonsPack::~AddonsPack()
+{
+    stopDownload();
+}   // ~AddonsPack
+
+// ----------------------------------------------------------------------------
 void AddonsPack::beforeAddingWidgets()
 {
     getWidget("uninstall")->setVisible(false);
@@ -131,7 +137,6 @@ void AddonsPack::init()
 // ----------------------------------------------------------------------------
 bool AddonsPack::onEscapePressed()
 {
-    stopDownload();
     ModalDialog::dismiss();
     return true;
 }   // onEscapePressed
@@ -148,7 +153,6 @@ GUIEngine::EventPropagation AddonsPack::processEvent(const std::string& event_so
             actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == "back")
         {
-            stopDownload();
             dismiss();
             return GUIEngine::EVENT_BLOCK;
         }

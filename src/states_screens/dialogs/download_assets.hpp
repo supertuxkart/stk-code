@@ -45,6 +45,7 @@ private:
 
 public:
     DownloadAssets();
+    ~DownloadAssets();
 
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;

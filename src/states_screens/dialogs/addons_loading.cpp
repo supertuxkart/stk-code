@@ -79,6 +79,7 @@ AddonsLoading::AddonsLoading(const std::string &id)
  */
 AddonsLoading::~AddonsLoading()
 {
+    stopDownload();
     // Select the last selected item in the addons_screen, so that
     // users can keep on installing from the last selected item.
     // This dialog can be called in network lobby screen atm for live addon
@@ -191,7 +192,6 @@ void AddonsLoading::init()
 // ----------------------------------------------------------------------------
 bool AddonsLoading::onEscapePressed()
 {
-    stopDownload();
     ModalDialog::dismiss();
     return true;
 }   // onEscapePressed
@@ -229,7 +229,6 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         
         if(selection == "back")
         {
-            stopDownload();
             dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
@@ -345,7 +344,7 @@ void AddonsLoading::stopDownload()
     {
         m_download_request->cancel();
         m_download_request = nullptr;
-    };
+    }
 }   // startDownload
 
 
