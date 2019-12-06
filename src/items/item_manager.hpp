@@ -54,6 +54,8 @@ private:
     static bool m_disable_item_collection;
 
     static std::mt19937 m_random_engine;
+
+    static uint32_t m_random_seed;
 protected:
     /** The instance of ItemManager while a race is on. */
     static std::shared_ptr<ItemManager> m_item_manager;
@@ -66,7 +68,14 @@ public:
     static void updateRandomSeed(uint32_t seed_number)
     {
         m_random_engine.seed(seed_number);
+        m_random_seed = seed_number;
     }   // updateRandomSeed
+    // ------------------------------------------------------------------------
+    static uint32_t getRandomSeed()
+    {
+        return m_random_seed;
+    }   // getRandomSeed
+
     // ------------------------------------------------------------------------
 
     /** Disable item collection, useful to test client mispreditions or
