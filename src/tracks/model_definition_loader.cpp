@@ -142,6 +142,13 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                 lod_node->add(group[m].m_distance, scene_node, true);
             }
         }
+        if (lod_node->getAllNodes().empty())
+        {
+            Log::warn("ModelDefinitionLoader",
+                "Nothing has been added to LOD node '%s'.", groupname.c_str());
+            irr_driver->removeNode(lod_node);
+            return NULL;
+        }
         vector3df scale = vector3df(1.f, 1.f, 1.f);
         node->get("scale", &scale);
         // TODO samuncle: can be enabled after RC
