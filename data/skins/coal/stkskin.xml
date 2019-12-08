@@ -292,6 +292,9 @@ when the border that intersect at this corner are enabled.
 <!-- Color used to fade out background when a dialog is shown -->
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />
 
+<!-- Color used for tips in the loading screen -->
+<color type="tips_background" state="neutral" a="120" r="0" g="0" b="0" />
+
 <!-- Text field color -->
 <color type="text_field" state="background" a="255" r="35" g="35" b="35" />
 <color type="text_field" state="background_focused" a="255" r="15" g="15" b="15" />

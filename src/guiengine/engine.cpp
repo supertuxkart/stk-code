@@ -1388,8 +1388,8 @@ namespace GUIEngine
         const int screen_h = frame_size.Height;
 
         // used in drawing tips
-        const int text_height = getSmallFontHeight() + 20;
-        const int y_from = screen_h - text_height * 0.4f;
+        const int text_height = getFontHeight() * 1.2f;
+        const int y_from = screen_h - text_height * 0.3f;
 
         const core::rect< s32 > dest_area =
             core::rect< s32 >(screen_w/2 - stretched_size/2,
@@ -1416,12 +1416,12 @@ namespace GUIEngine
         // Draw a tip during loading
         core::rect<s32> tipRect(core::position2d<s32>(0, y_from - text_height),
                                 core::dimension2d<s32>(screen_w, text_height));
-        GL32_draw2DRectangle(Skin::getColor("dialog_background::neutral"), tipRect);
-        Private::g_small_font->draw(g_tips_string.c_str(), tipRect, Skin::getColor("brighttext::neutral"),
+        GL32_draw2DRectangle(Skin::getColor("tips_background::neutral"), tipRect);
+        Private::g_font->draw(g_tips_string.c_str(), tipRect, Skin::getColor("brighttext::neutral"),
                             true /* hcenter */, true /* vcenter */);
 
         const int icon_count = (int)g_loading_icons.size();
-        const int icon_size = (int)(std::min(screen_w, screen_h) / 10.0f);
+        const int icon_size = (int)(std::min(screen_w, screen_h) / 12.0f);
         const int ICON_MARGIN = 6;
         int x = ICON_MARGIN;
         int y = y_from - icon_size - ICON_MARGIN - text_height * 1.2f;
@@ -1474,7 +1474,7 @@ namespace GUIEngine
 
             g_device->getVideoDriver()
                     ->beginScene(true, true, video::SColor(255,100,101,140));
-            renderLoading(false, true);
+            renderLoading(false, true, false);
             g_device->getVideoDriver()->endScene();
         }
         else
