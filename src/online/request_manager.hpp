@@ -34,6 +34,7 @@
 #endif
 
 #include <curl/curl.h>
+#include <memory>
 #include <queue>
 #include <pthread.h>
 
@@ -94,7 +95,7 @@ namespace Online
             float                     m_time_since_poll;
 
             /** The current requested being worked on. */
-            Online::Request *         m_current_request;
+            std::shared_ptr<Online::Request> m_current_request;
 
             /** A conditional variable to wake up the main loop. */
             pthread_cond_t            m_cond_request;
@@ -114,8 +115,8 @@ namespace Online
             /** The list of pointers to all requests that still need to be
              *  handled. */
             Synchronised< std::priority_queue <
-                                                Online::Request*,
-                                                std::vector<Online::Request*>,
+                                                std::shared_ptr<Online::Request>,
+                                                std::vector<std::shared_ptr<Online::Request> >,
                                                 Online::Request::Compare
                                                >
                         >  m_request_queue;
@@ -123,9 +124,9 @@ namespace Online
             /** The list of pointers to all requests that are already executed
              *  by the networking thread, but still need to be processed by the
              *  main thread. */
-            Synchronised< std::queue<Online::Request*> >    m_result_queue;
+            Synchronised< std::queue<std::shared_ptr<Online::Request> > >    m_result_queue;
 
-            void addResult(Online::Request *request);
+            void addResult(std::shared_ptr<Online::Request> request);
             void handleResultQueue();
 
             static void *mainLoop(void *obj);
@@ -154,7 +155,7 @@ namespace Online
             static void deallocate();
             static bool isRunning();
 
-            void addRequest(Online::Request *request);
+            void addRequest(std::shared_ptr<Online::Request> request);
             void startNetworkThread();
             void stopNetworkThread();
 

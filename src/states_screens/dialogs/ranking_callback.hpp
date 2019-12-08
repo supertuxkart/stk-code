@@ -20,7 +20,6 @@
 #define HEADER_RANKING_CALLBACK_HPP
 
 #include "config/player_manager.hpp"
-#include "guiengine/widgets/label_widget.hpp"
 #include "io/xml_node.hpp"
 #include "online/xml_request.hpp"
 #include "utils/string_utils.hpp"
@@ -28,73 +27,52 @@
 
 #include <memory>
 
-class RankingCallback
+class RankingCallback : public Online::XMLRequest
 {
-protected:
-    // ------------------------------------------------------------------------
-    void updatePlayerRanking(const core::stringw& name, uint32_t online_id,
-                             GUIEngine::LabelWidget* info,
-                             std::shared_ptr<bool> done)
+private:
+    core::stringw m_name;
+
+    core::stringw m_ranking_result;
+    // ----------------------------------------------------------------
+    /** Callback for the request to update rank of a player. Shows his
+    *   rank and score.
+    */
+    virtual void callback()
     {
-        // --------------------------------------------------------------------
-        class UpdatePlayerRankingRequest : public Online::XMLRequest
+        // I18N: In the network player dialog, indiciating a network
+        // player has no ranking
+        m_ranking_result = _("%s has no ranking yet.", m_name);
+        if (isSuccess())
         {
-        private:
-            std::weak_ptr<bool> m_done;
-
-            core::stringw m_name;
-
-            GUIEngine::LabelWidget* m_info;
-            // ----------------------------------------------------------------
-            /** Callback for the request to update rank of a player. Shows his
-            *   rank and score.
-            */
-            virtual void callback()
+            int rank = -1;
+            float score = 0.0f;
+            getXMLData()->get("rank", &rank);
+            getXMLData()->get("scores", &score);
+            if (rank > 0)
             {
-                auto done = m_done.lock();
-                // Dialog deleted
-                if (!done)
-                    return;
-                // I18N: In the network player dialog, indiciating a network
-                // player has no ranking
-                core::stringw result = _("%s has no ranking yet.", m_name);
-                if (isSuccess())
-                {
-                    int rank = -1;
-                    float score = 0.0f;
-                    getXMLData()->get("rank", &rank);
-                    getXMLData()->get("scores", &score);
-                    if (rank > 0)
-                    {
-                        // I18N: In the network player dialog show rank and
-                        // score of a player
-                        result = _("%s is number %d in the rankings with a score of %f.",
-                            m_name, rank, score);
-                    }
-                }
-                *done = true;
-                m_info->setText(result, false);
-
-            }   // callback
-        public:
-            UpdatePlayerRankingRequest(const core::stringw& name,
-                                       uint32_t online_id,
-                                       GUIEngine::LabelWidget* info,
-                                       std::shared_ptr<bool> done)
-                : XMLRequest(true)
-            {
-                m_name = name;
-                m_info = info;
-                m_done = done;
+                // I18N: In the network player dialog show rank and
+                // score of a player
+                m_ranking_result =
+                    _("%s is number %d in the rankings with a score of %f.",
+                     m_name, rank, score);
             }
-        };   // UpdatePlayerRankingRequest
-
-        // --------------------------------------------------------------------
-        UpdatePlayerRankingRequest* request =
-            new UpdatePlayerRankingRequest(name, online_id, info, done);
-        PlayerManager::setUserDetails(request, "get-ranking");
-        request->addParameter("id", online_id);
-        request->queue();
+        }   // callback
     }
-};
+public:
+    RankingCallback(const core::stringw& name, uint32_t online_id)
+    : XMLRequest()
+    {
+        m_name = name;
+    }
+    const core::stringw& getRankingResult() const { return m_ranking_result; }
+    static std::shared_ptr<RankingCallback> getRankingCallback(
+        const core::stringw& name, uint32_t online_id)
+    {
+        auto rc = std::make_shared<RankingCallback>(name, online_id);
+        PlayerManager::setUserDetails(rc, "get-ranking");
+        rc->addParameter("id", online_id);
+        return rc;
+    }
+};   // RankingCallback
+
 #endif

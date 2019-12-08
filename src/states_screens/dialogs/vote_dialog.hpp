@@ -45,10 +45,10 @@ private:
 
     /** The request to fetch the current vote, which is submitted
      *  immediately when this dialog is opened. */
-    Online::XMLRequest * m_fetch_vote_request;
+    std::shared_ptr<Online::XMLRequest> m_fetch_vote_request;
 
     /** The request to perform a vote. */
-    Online::XMLRequest* m_perform_vote_request;
+    std::shared_ptr<Online::XMLRequest> m_perform_vote_request;
 
     /** Pointer to the info widget of this dialog. */
     GUIEngine::LabelWidget * m_info_widget;

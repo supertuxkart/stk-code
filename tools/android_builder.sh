@@ -58,6 +58,8 @@ init_directories()
         ln -s ../android/gradlew
         ln -s ../android/icon.png
         ln -s ../android/icon-dbg.png
+        ln -s ../android/icon_adaptive_fg.png
+        ln -s ../android/icon_adaptive_fg-dbg.png
         ln -s ../android/make.sh
         ln -s ../android/android-ndk
         ln -s ../android/android-sdk

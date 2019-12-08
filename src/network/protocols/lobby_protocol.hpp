@@ -31,6 +31,7 @@ class Track;
 #include <cassert>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -74,8 +75,10 @@ public:
         LE_LIVE_JOIN_ACK, // Server tell client live join or spectate succeed
         LE_KART_INFO, // Client or server exchange new kart info
         LE_CLIENT_BACK_LOBBY, // Client tell server to go back lobby
-        LE_REPORT_PLAYER // Client report some player in server
+        LE_REPORT_PLAYER, // Client report some player in server
                          // (like abusive behaviour)
+        LE_ASSETS_UPDATE, // Client tell server with updated assets
+        LE_COMMAND, // Command
     };
 
     enum RejectReason : uint8_t
@@ -123,8 +126,11 @@ protected:
       * transformation in server, and reset smooth network body in client. */
     int m_last_live_join_util_ticks;
 
-    /** Store current playing track in id. */
-    std::atomic<int> m_current_track;
+    /** Mutex to protect m_current_track. */
+    mutable std::mutex m_current_track_mutex;
+
+    /** Store current playing track in name. */
+    std::string m_current_track;
 
     /** Stores data about the online game to play. */
     GameSetup* m_game_setup;
@@ -220,7 +226,17 @@ public:
     // ------------------------------------------------------------------------
     bool hasLiveJoiningRecently() const;
     // ------------------------------------------------------------------------
-    void storePlayingTrack(int track_id)   { m_current_track.store(track_id); }
+    void storePlayingTrack(const std::string& track_ident)
+    {
+        std::lock_guard<std::mutex> lock(m_current_track_mutex);
+        m_current_track = track_ident;
+    }
+    // ------------------------------------------------------------------------
+    std::string getPlayingTrackIdent() const
+    {
+        std::lock_guard<std::mutex> lock(m_current_track_mutex);
+        return m_current_track;
+    }
     // ------------------------------------------------------------------------
     Track* getPlayingTrack() const;
 };   // class LobbyProtocol

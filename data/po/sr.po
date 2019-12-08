@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# CYBER FIGHTER <to0pnegati@gmail.com>, 2019
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Siddhartha Gautama <kantarevicnikola@gmail.com>, 2016,2018
 # Siddhartha Gautama <kantarevicnikola@gmail.com>, 2016,2018-2019
@@ -17,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-29 12:42+0800\n"
-"PO-Revision-Date: 2019-10-29 04:46+0000\n"
+"POT-Creation-Date: 2019-11-27 12:23+0800\n"
+"PO-Revision-Date: 2019-11-27 04:24+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Serbian (http://www.transifex.com/supertuxkart/supertuxkart/language/sr/)\n"
 "MIME-Version: 1.0\n"
@@ -33,15 +34,15 @@ msgstr "Кристофер Колумбо"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr "Одиграјте по једном сваку званичну стазу."
+msgstr "Одиграјте сваку званичну стазу по једном."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
-msgstr "Удар!"
+msgstr "Ударац!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
-msgstr "Погодите 10 колица куглом."
+msgstr "Погодите 10 возила са куглом."
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
@@ -49,7 +50,7 @@ msgstr "Главни такмац"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit the same kart at least 5 times in one race."
-msgstr "Погодите иста колица најмање 5 пута у истој трци."
+msgstr "Погодите истог играча барем 5 пута у једној трци."
 
 #. I18N: ./data/achievements.xml
 msgid "Marathoner"
@@ -57,15 +58,15 @@ msgstr "Маратонац"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr ""
+msgstr "Заврши трку са барем два пута више кругова од обичне трке."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
-msgstr "Тегљења"
+msgstr "Проклизавање"
 
 #. I18N: ./data/achievements.xml
 msgid "Skid 5 times in a single lap."
-msgstr "Извршите 5 тегљења у једном кругу."
+msgstr "Проклизавајте 5 пута у једном кругу."
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
@@ -75,7 +76,7 @@ msgstr "Златни возач"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Победите најмање 3 робота у обичној, временској трци, или  праћењу вође."
+msgstr "Победи против најмање 3 роботских играча у обичној трци, временској трци, и у праћењу вође."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -83,7 +84,7 @@ msgstr "Љубав према појачањима"
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
-msgstr "Употребите 10 или више појачања по трци."
+msgstr "Искористи 10 или више појачања у једној трци."
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
@@ -93,7 +94,7 @@ msgstr "Незаустављив"
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr "Победите у 5 појединачних трка против најмање 3 робота. Пажња, поновно покретање трке се сматра губљењем."
+msgstr "Победите у 5 трка заредом против најмање 3 роботцкх играча. Пажња, рестартовање трке се сматра губитком."
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -101,11 +102,11 @@ msgstr "Бананождер"
 
 #. I18N: ./data/achievements.xml
 msgid "Collect at least 5 bananas in one race."
-msgstr "Сакупите најмање 5 банана у једној трци."
+msgstr "Покупите најмање 5 банана у једној трци."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "Тајна је"
+msgstr "То је тајна"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
@@ -119,38 +120,38 @@ msgstr "Ловац на комарце"
 msgid ""
 "Take your opponents for mosquitos! With the swatter, squash them at least 5 "
 "times in a race."
-msgstr "Сматрајте своје противнике комарцима! Млатилом их смождите најмање 5 пута по трци."
+msgstr "Сматрајте своје противнике комарцима! Са мувопичем, их барем 5 пута згњечите у једној трци."
 
 #. I18N: ./data/achievements.xml
 msgid "Beyond Luck"
-msgstr "Преко среће"
+msgstr "Више од Среће"
 
 #. I18N: ./data/achievements.xml
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "Победите у 10 трка за редом као стручњак или Супертакс против најмање 5 робота. Пажња, поновно покретање трке се сматра губитком."
+msgstr "Победите 10 трка заредом у стручном или у SuperTux-у са барем 5 компјутерских играча. Пажња, рестартовање трке се сматра губитком."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
-msgstr "Пингвиново игралиште"
+msgstr "Пингвиново Игралиште"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the Beaten Track"
-msgstr "Низ утабану стазу"
+msgstr "Низ Ван Стазе"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 msgid "To the Moon and Back"
-msgstr "До Месеца и назад"
+msgstr "До Месеца и Назад"
 
 #. I18N: ./data/grandprix/4_atworldsend.grandprix
 msgid "At World's End"
-msgstr "На крају света"
+msgstr "На Крају Света"
 
 #. I18N: ./data/gui/dialogs/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Install"
-msgstr "Угради"
+msgstr "Инсталирај"
 
 #. I18N: ./data/gui/dialogs/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -164,13 +165,13 @@ msgstr "Уклони"
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:299
+#: src/states_screens/dialogs/addons_loading.cpp:301
 msgid "Back"
 msgstr "Назад"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "Select a type of control that you prefer"
-msgstr "Одаберите омиљену врсту управљања"
+msgstr "Одаберите врсту управљања који вам се више свиђа"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
@@ -189,11 +190,11 @@ msgstr "Чигра"
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
 msgid "Steering wheel"
-msgstr "Управљач"
+msgstr "Волан"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
-msgstr "Можете је заменити касније у поставкама додирног уређаја."
+msgstr "Можете је заменити касније у опцијама додирног уређаја."
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
@@ -204,7 +205,7 @@ msgstr "Примени"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Touch Device Settings"
-msgstr "Поставке додирног уређаја"
+msgstr "Опције Додирног Уређаја"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -239,22 +240,22 @@ msgstr "Поставке додирног уређаја"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "General"
-msgstr "Опште"
+msgstr "Уопште"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Device enabled"
-msgstr "Уређај је омогућен"
+msgstr "Укључен уређај"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Inverted buttons"
-msgstr "Преокренут распоред дугмади"
+msgstr "Преокренута дугма"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr "Баждарење дугмади"
+msgstr "Величина дугмада"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -274,11 +275,11 @@ msgstr "Осетљивост Х"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Sensitivity Y"
-msgstr "Осетљивос У"
+msgstr "Осетљивост У"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Restore defaults"
-msgstr "Поврати подразумевано"
+msgstr "Поврати обично"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
@@ -315,7 +316,7 @@ msgstr "Да"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
-#: src/states_screens/dialogs/addons_loading.cpp:238
+#: src/states_screens/dialogs/addons_loading.cpp:240
 #: src/states_screens/online/register_screen.cpp:127
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
@@ -325,11 +326,11 @@ msgstr "Откажи"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Keep this resolution"
-msgstr "Задржи ову размеру"
+msgstr "Задржи ову резолуцију"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
-msgstr "Поставке слике"
+msgstr "Графикне Опције"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -339,7 +340,7 @@ msgstr "Напредне ставке (светла, итд.)"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Shadows"
-msgstr "Сене"
+msgstr "Сенке"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -349,7 +350,7 @@ msgstr "Руменило"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light shaft (God rays)"
-msgstr "Лева палица (божји зраци)"
+msgstr "Светлосна основина (Божји зраци)"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -359,7 +360,7 @@ msgstr "Окружење"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Depth of field"
-msgstr "Дубина поља"
+msgstr "Дубљина поља"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -374,47 +375,47 @@ msgstr "Умекшавање"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Motion blur"
-msgstr "Замућење покрета"
+msgstr "Покретно Замућење"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Image-based lighting"
-msgstr "Осветљење засновано на сликама"
+msgstr "Осветљење засновано сликама"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light Scattering"
-msgstr "Расипање светла"
+msgstr "Расипање Светла"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Animated characters"
-msgstr "Оживљени ликови"
+msgstr "Анимирани карактери"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Texture compression"
-msgstr "Сажимање плетива"
+msgstr "Текстурна компресија"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Particle effects"
-msgstr "Дејства честица"
+msgstr "Ефекти партикуле"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Rendered image quality"
-msgstr "Каквоћа приказа слике"
+msgstr "Донети квалитет слике"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Geometry detail"
-msgstr "Појединости геометрије"
+msgstr "Геометријски детаљи"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "* Restart STK to apply new settings"
-msgstr "* Покрените поново СТК-а за примену нових поставки"
+msgstr "* Рестартујте STK да применујете нове опције"
 
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
@@ -432,19 +433,19 @@ msgstr "* Покрените поново СТК-а за примену нови
 #: src/states_screens/dialogs/message_dialog.cpp:125
 #: src/states_screens/dialogs/message_dialog.cpp:139
 msgid "OK"
-msgstr "У реду"
+msgstr "ОК"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr "Забележи трку за поновно гледање са духом"
+msgstr "Снимај трку за духовни снимак"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 msgid "Watch replay only"
-msgstr "Само гледај поновљени снимак"
+msgstr "Само гледај снимак"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
@@ -459,7 +460,7 @@ msgstr "Упореди са још једним духом"
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Start Race"
-msgstr "Почни трку"
+msgstr "Почни Трку"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
@@ -492,17 +493,17 @@ msgstr "Напредак"
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Password Change"
-msgstr "Измени лозинку"
+msgstr "Промени Шифру"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "Current Password"
-msgstr "Тренутна лозинка"
+msgstr "Тренутна Шифра"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
 msgid "New Password"
-msgstr "Нова лозинка"
+msgstr "Нова Шифра"
 
 #. I18N: ./data/gui/dialogs/online/change_password.stkgui
 #. I18N: In the change password dialog
@@ -536,27 +537,27 @@ msgstr "Затвори"
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Back to Race"
-msgstr "Назад на трку"
+msgstr "Назад на Трку"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
 #. end spectating (for example)
 msgid "Back to lobby"
-msgstr "Назад у предворје"
+msgstr "Назад у Хол"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Restart Race"
-msgstr "Понови трку"
+msgstr "Понови Трку"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
 msgid "Give Up Race"
-msgstr "Одустани од трке"
+msgstr "Одустани Од Трке"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -567,7 +568,7 @@ msgstr "Одустани од трке"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
 msgid "Options"
-msgstr "Могућности"
+msgstr "Опције"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -597,7 +598,7 @@ msgstr "Преглед"
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 #. I18N: In player rankings dialog
 msgid "Top 10 players"
-msgstr "Врхунских 10 играча"
+msgstr "Топ 10 играча"
 
 #. I18N: ./data/gui/dialogs/online/player_rankings_dialog.stkgui
 msgid "Refresh"
@@ -608,20 +609,20 @@ msgstr "Освежи"
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr "Опоравак налога"
+msgstr "Опоравак Налога"
 
 #. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr "Примићете поруку електронске поште са даљим упутствима о томе како опоравити лозинку. Молимо, будите стрпљиви и за сваки случај проверите одељак нежељене поште."
+msgstr "Примићете поруку е-поште са даљим упутствима како опоравити шифру. Молимо вас, да будете стрпљиви и да за сваки случај проверите вашу нежељену пошту."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr "Да би поништили садашњу лозинку, унесите корисничко име и адресу е-поште којим сте се уписали."
+msgstr "Унесите корисничко име и е-пошту којим сте се уписали да би могли да поништите вашу шифру."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -644,12 +645,12 @@ msgstr "Е-пошта"
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "Terms and Agreement"
-msgstr "Услови уговора"
+msgstr "Услови Уговора"
 
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr "Слажем се са условима изнад и навршио сам 13 година. "
+msgstr "Слажем се са условима изнад и ја имам 13 година или више."
 
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -661,7 +662,7 @@ msgstr "Прихвати"
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
 msgid "Server Configuration"
-msgstr "Поставке служитеља"
+msgstr "Конфигурација Сервера"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
@@ -692,7 +693,7 @@ msgstr "Новајлија"
 #. I18N: Difficulty
 #: src/race/race_manager.cpp:1174
 msgid "Intermediate"
-msgstr "Осредњи"
+msgstr "Осредњак"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Difficulty
@@ -716,7 +717,7 @@ msgstr "Стручњак"
 #. I18N: Difficulty
 #: src/race/race_manager.cpp:1176
 msgid "SuperTux"
-msgstr "Супертакс"
+msgstr "SuperTux"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
@@ -724,7 +725,7 @@ msgstr "Супертакс"
 #. I18N: In the server creation screen
 #: src/states_screens/track_info_screen.cpp:253
 msgid "Game mode"
-msgstr "Начин игре"
+msgstr "Начин Игре"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
@@ -733,7 +734,7 @@ msgstr "Начин игре"
 #. I18N: Game mode
 #: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
 msgid "Normal Race"
-msgstr "Обична трка"
+msgstr "Обична Трка"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
@@ -742,7 +743,7 @@ msgstr "Обична трка"
 #. I18N: Game mode
 #: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
 msgid "Time Trial"
-msgstr "Временом ограничена трка"
+msgstr "Временска Трка"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
@@ -750,7 +751,7 @@ msgstr "Временом ограничена трка"
 #. I18N: Multiplayer game mode
 #: src/states_screens/race_setup_screen.cpp:112
 msgid "Battle"
-msgstr "Бој"
+msgstr "Двобој"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
@@ -769,12 +770,12 @@ msgstr "Фудбал"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Password"
-msgstr "Лозинка"
+msgstr "Шифра"
 
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
 msgid "Join"
-msgstr "Прикључи се"
+msgstr "Уђи"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -790,32 +791,32 @@ msgstr "Име"
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Handicap"
-msgstr "Сметња"
+msgstr "Хендикеп"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Press the 'All players ready' button after the player list is ready."
-msgstr "Стисните дугме „Сви играчи позор“ по припреми играчког списка."
+msgstr "Стисните „Сви играчи спремни“ дугме после када је играчки списак спреман."
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "All players ready"
-msgstr "Сви играчи позор"
+msgstr "Сви играчи спремни"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Clear players"
-msgstr "Почисти играче"
+msgstr "Рашчисти играче"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "User Info"
-msgstr "Подаци о кориснику"
+msgstr "Кориснички Подаци"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Add Friend"
-msgstr "Додај пријатеља"
+msgstr "Додај Пријатеља"
 
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
@@ -825,93 +826,93 @@ msgstr "Одбиј"
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
 msgid "Vote"
-msgstr "Гласајте"
+msgstr "Гласај"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 msgid "Paused"
-msgstr "Застанак"
+msgstr "Паузирано"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Back to Game"
-msgstr "Назад на игру"
+msgstr "Назад на Игру"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Select kart"
-msgstr "Изаберите колица"
+msgstr "Изаберите возило"
 
 #. I18N: ./data/gui/dialogs/overworld_dialog.stkgui
 #. I18N: In the in-game dialog
 msgid "Back to menu"
-msgstr "Назад на изборник"
+msgstr "Назад на мени"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
 msgid "Press fully and release..."
-msgstr "Стисни до краја и пусти..."
+msgstr "Скроз стисните и пустите..."
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign to ESC key"
-msgstr "Додели дугмету излаза"
+msgstr "Додели на \"ESC\" дугме"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign nothing"
-msgstr "Немој ништа да доделиш"
+msgstr "Додели ништа"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Press ESC to cancel"
-msgstr "Притисните Изађи за прекид"
+msgstr "Стисните \"ESC\" да прекинете"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:255
+#: src/states_screens/race_result_gui.cpp:262
 msgid "Setup New Race"
-msgstr "Подеси нову трку"
+msgstr "Подеси Нову Трку"
 
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 msgid "Race Setup"
-msgstr "Подешавање трке"
+msgstr "Подешавање Трке"
 
 #. I18N: ./data/gui/dialogs/tutorial_message_dialog.stkgui
 #. I18N: Button in tutorial
-#. I18N: ./data/gui/screens/feature_unlocked.stkgui
+#. I18N: ./data/gui/screens/cutscene.stkgui
 #. I18N: ./data/gui/screens/grand_prix_lose.stkgui
 #. I18N: ./data/gui/screens/grand_prix_win.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:177
-#: src/states_screens/race_result_gui.cpp:205
-#: src/states_screens/race_result_gui.cpp:213
+#: src/states_screens/race_result_gui.cpp:179
+#: src/states_screens/race_result_gui.cpp:208
+#: src/states_screens/race_result_gui.cpp:216
 msgid "Continue"
 msgstr "Настави"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 msgid "SuperTuxKart Addons"
-msgstr "Додаци Супертаксових колица"
+msgstr "SuperTuxKart Додаци "
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
 #. show only recently updated items
 msgid "Updated"
-msgstr "Освежено"
+msgstr "Ажурирано"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
 #. show only items with good rating
 msgid "Rating >="
-msgstr "Углед >="
+msgstr "Оцена >="
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In the addons screen
 msgid "Karts"
-msgstr "Колица"
+msgstr "Возила"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In the addons screen
@@ -925,13 +926,13 @@ msgstr "Стазе"
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: Section in arena tracks selection screen
 msgid "Arenas"
-msgstr "Борилишта"
+msgstr "Арене"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
-#: src/states_screens/grand_prix_editor_screen.cpp:334
+#: src/states_screens/grand_prix_editor_screen.cpp:335
 msgid "Standard"
 msgstr "Уобичајено"
 
@@ -945,9 +946,9 @@ msgstr "Уобичајено"
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:82
 #: src/states_screens/easter_egg_screen.cpp:145
-#: src/states_screens/grand_prix_editor_screen.cpp:336
+#: src/states_screens/grand_prix_editor_screen.cpp:337
 #: src/states_screens/kart_selection.cpp:294
-#: src/states_screens/tracks_and_gp_screen.cpp:146
+#: src/states_screens/tracks_and_gp_screen.cpp:152
 msgid "Add-Ons"
 msgstr "Додаци"
 
@@ -963,17 +964,17 @@ msgstr "Додаци"
 #: src/states_screens/easter_egg_screen.cpp:137
 #: src/states_screens/edit_track_screen.cpp:146
 #: src/states_screens/gp_info_screen.cpp:74
-#: src/states_screens/grand_prix_editor_screen.cpp:333
+#: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:286
-#: src/states_screens/online/tracks_screen.cpp:349
-#: src/states_screens/tracks_and_gp_screen.cpp:136
+#: src/states_screens/online/tracks_screen.cpp:354
+#: src/states_screens/tracks_and_gp_screen.cpp:142
 msgid "All"
 msgstr "Све"
 
 #. I18N: ./data/gui/screens/credits.stkgui
 #. I18N: Title in credits screen
 msgid "Credits"
-msgstr "Заслуге"
+msgstr "Кредити"
 
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: Section in easter egg tracks selection screen
@@ -982,22 +983,22 @@ msgstr "Заслуге"
 #. I18N: ./data/gui/screens/tracks.stkgui
 #. I18N: In the track selection screen
 msgid "All Tracks"
-msgstr "Све стазе"
+msgstr "Све Стазе"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Title in edit grand prix screen
 msgid "Edit Grand Prix"
-msgstr "Уреди трку за велику награду"
+msgstr "Подеси Велику Награду"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
 msgid "Move up"
-msgstr "Помери навише"
+msgstr "Помери горе"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
 msgid "Move down"
-msgstr "Помери наниже"
+msgstr "Помери доле"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
@@ -1013,7 +1014,7 @@ msgstr "Додај"
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
 msgid "Edit"
-msgstr "Уреди"
+msgstr "Подеси"
 
 #. I18N: ./data/gui/screens/edit_gp.stkgui
 #. I18N: Menu item
@@ -1033,17 +1034,17 @@ msgstr "Уназад:"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Ghost Replay Selection"
-msgstr "Одабир духа за поновљени снимак"
+msgstr "Одабравање Духовног Снимка"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Time trial"
-msgstr "Трка с’ временом"
+msgstr "Временска Трка"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Egg hunt"
-msgstr "Лов на јаје"
+msgstr "Лов на јаја"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1053,32 +1054,32 @@ msgstr "Приказуј само најбоља времена"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Compare replay"
-msgstr "Упореди поновни снимак"
+msgstr "Упореди снимак"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr "Само приказуј поновљене снимке са тренутном тежином"
+msgstr "Само приказуј снимке са тренутном тежином"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current version"
-msgstr "Само приказуј поновљене снимке подударајуће са тренутним издањем"
+msgstr "Само приказуј снимке са тренутном верзијом"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Hide multiplayer replays"
-msgstr "Сакриј понављање снимака игре са више играча"
+msgstr "Сакриј мултиплејер снимке"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Record a ghost replay"
-msgstr "Сними за понављање са духом"
+msgstr "Снимај духовни снимак"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr "Роботска колица"
+msgstr "Роботска возила"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1088,18 +1089,18 @@ msgstr "Уназад"
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Track group"
-msgstr "Скуп стаза"
+msgstr "Стазна група"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 #: src/states_screens/gp_info_screen.cpp:145
 msgid "Continue saved GP"
-msgstr "Настави сачувану трку за велику награду"
+msgstr "Настави сачувану ВН"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Title in grand prix editor screen
 msgid "Grand Prix editor"
-msgstr "Уредник трка за велику награду"
+msgstr "Едитор за Велику Награду"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
@@ -1109,7 +1110,7 @@ msgstr "Ново"
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
 msgid "Copy"
-msgstr "Умножи"
+msgstr "Копирај"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
@@ -1118,12 +1119,12 @@ msgstr "Умножи"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Rename"
-msgstr "Преименуј"
+msgstr "Промени Име"
 
 #. I18N: ./data/gui/screens/grand_prix_lose.stkgui
 #. I18N: ./data/gui/screens/grand_prix_win.stkgui
 msgid "Save Grand Prix"
-msgstr "Сачувај трку за велику награду"
+msgstr "Сачувај Велику Награду"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: ./data/gui/screens/help2.stkgui
@@ -1133,7 +1134,7 @@ msgstr "Сачувај трку за велику награду"
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: ./data/gui/screens/help7.stkgui
 msgid "SuperTuxKart Help"
-msgstr "Помоћ за Супертаксова колица"
+msgstr "SuperTuxKart Помоћ"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1150,7 +1151,7 @@ msgstr "Помоћ за Супертаксова колица"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Game Modes"
-msgstr "Начини игре"
+msgstr "Начини Игре"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1203,7 +1204,7 @@ msgstr "Банане"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Story Mode"
-msgstr "Прича"
+msgstr "Прични Начин"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1220,7 +1221,7 @@ msgstr "Прича"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Kart classes"
-msgstr "Класе колица"
+msgstr "Класе возила"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1237,16 +1238,16 @@ msgstr "Класе колица"
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: Tab in help menu
 msgid "Multiplayer"
-msgstr "Игра више играча"
+msgstr "Мултиплејер"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 msgid "Start the tutorial"
-msgstr "Покрени упознавање"
+msgstr "Почни Туториал"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue gift boxes, they will give you powerups."
-msgstr "Скупи модре кутије дарова, даће ти снагу."
+msgstr "Покупи плаве поклоне, они ће вам дати појачање."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1260,14 +1261,14 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr "Скупљање нитра омогућава убрзање кад год вам треба притиском на одговоарајуће дугма. Можете видети тренуни ниво нитра на мерачу доле-десно на приказу трке."
+msgstr "Сакупљавање нитро-а вам омогућава да добијете убрзање кад год ви желите тако што стиснете одговарајуће дугме. Можете видети тренутни ниво нитро-а на мерачу у доњем-десном ћошку екрана."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "Уколико видите дугме са катанцем попут овог, треба да завршите изазов да бисте га откључали."
+msgstr "Уколико видите дугме са катанцем попут овог, треба те да завршите изазов да би сте га откључали."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1276,34 +1277,34 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr "Можете клизнути дугметом. Узастопна кратка клизања помажу оштра скретања; док осредња клизања убрзавају, дуга клизања више. Не можете прекинути скретање при клизању, зато усмерите своја колица пажљиво пре тога!"
+msgstr "Можете се клизати тако што стиснете специално дугме. Кратко клизање помаже да се пређу оштра скретања; док средње клизање убрзавају, дуга клизања још више. Не можете прекинути да се окрећете док се кизате, па се ориентишите пажљиво!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "You can get a startup boost by pressing the accelerate button at 'Set!', "
 "before the race's start."
-msgstr ""
+msgstr "Можете добити почетно убрзавање тако што стиснете дугме за убрзавање када пише 'Позор!', пре него што почне трка."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
 msgid "* Current key bindings can be seen/changed in the Options menu"
-msgstr ""
+msgstr "* Садашња подешавања се могу видети/променути у Опцијама."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 msgid "SuperTuxKart features several game modes:"
-msgstr ""
+msgstr "SuperTuxKart садржи више начина игре:"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid ""
 "Regular Race: All blows allowed, so collect powerups and use them smartly!"
-msgstr ""
+msgstr "Обична трка: Сва оружја су дозвољена, па покупи појачања и паметно их искористи!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr ""
+msgstr "Временска трка: Не садржи појачање, па вам је само возачка вештина потреба!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1311,7 +1312,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware: going in front of the"
 " leader will get you eliminated too!"
-msgstr "Прати вођу : возите за друго место, јер ће последња колица бити избачена из трке сваки пут кад време буде одбројано. Пазите : одлазак испред вође ће вас такође избацити!"
+msgstr "Прати вођу : возите за друго место, јер ће последњи играч бити избачен из трке сваки пут кад време буде одбројано. Пазите: одлазак испред вође ће вас такође избацити!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1321,24 +1322,24 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr ""
+msgstr "Ту су 3 врсте борбеног начина: У 3 Ударца, морате ударити друге са оружјама пре него што изгубе сва живота. У Сви-За-Све, играч који је погодио друге највише ће победити у датом ударцу или у временском року. У Ухвати Заставу, Ваш тим мора да донесе заставу другог тима у вашу базу, све док ваша застава није ухваћена."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Soccer: Use your kart to push the ball into the goal."
-msgstr "Ногомет: Употребите гурање лопте колицима за погодак."
+msgstr "Фудбал: Користите ваше возило да гурате лопту у непријатељском голу."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Лов на јаје: Истражујте стазе у потрази за скривеним јајима."
+msgstr "Лов на јаја: Истражујте стазе да нађете сва скривена јаја."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid ""
 "Ghost replay: Race against ghost replays in time-trial or egg hunt mode, and"
 " record your own!"
-msgstr ""
+msgstr "Духовни снимак: Тркај се против духовним снимцима у времнским тркама или у лов на јаја и снимај ваше!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1347,7 +1348,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr ""
+msgstr "* Много од ових начина се могу играти у Великој Награди: Уместо једне игре, играш пуно заредом. Што боље завршиш, то више поена добијеш. На крају, играч са највише поена добије награду."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 #. I18N: In the help menu
@@ -1364,76 +1365,76 @@ msgstr "Жвакаћа гума - браните се штитом, или је 
 msgid ""
 "Zipper - will give you a strong speed boost. But beware of not losing "
 "control of your kart!"
-msgstr ""
+msgstr "Зиппер - вам даје велико убрзавање. Али пазите да не изгубите контролу вашег возила!"
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Cake - thrown at the closest rival, best on short ranges and long straights."
 " It also affects other karts close to the explosion."
-msgstr ""
+msgstr "Колач - бачен према најближем противнику, најбољи на кратким дометима и дугим правцима. Још и утица на друга возила која су близа експлозији."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
-msgstr "Клип — баците га право напред да повучете противника уназад, или га баците док гледате позади да бисте некоме заклонили видик."
+msgstr "Клип — баците га напред да повучете противника уназад, или га баците док гледате уназад да бисте некоме заклонили вид."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Bowling Ball - goes straight until it strikes, it can bounce off walls. If "
 "you are looking back, it will be thrown backwards."
-msgstr ""
+msgstr "Кугла - иде правилно пре него што погоди нешто, може да одскаче са зида. Ако гледате уназад, биће бачен уназад."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid "Parachute - slows down all karts in a better position."
-msgstr "Падобран — успорава све колица у бољем положају."
+msgstr "Падобран — успорава сва возила у бољем положају."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Swapper - gift boxes are transformed into bananas, nitro cans into "
 "bubblegums, and vice versa for a short time."
-msgstr ""
+msgstr "Мењач - Поклони су претворени у банана, Нитро конзерве у жваке, и тако даље за кратко време."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts"
 " down on the way."
-msgstr "Кошаркашка лопта одскаче за вођом, и може спљоштити и успорити колица успут."
+msgstr "Кошаркашка Лопта - одскаче за вођом, и можда згњечи и успори возила успут."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
 "Swatter - will squash karts close by, slowing them down. Can also be used to"
 " remove parachutes and bombs."
-msgstr ""
+msgstr "Мувопич - Згњечи ближа возила, успоројући их. Може се и користити да се отарашиш падобрана и бомби."
 
 #. I18N: ./data/gui/screens/help4.stkgui
 msgid ""
 "Hitting a banana can result in one of the following being attached to the "
 "kart:"
-msgstr "Удар у банану може довести до добијања следећих терета на колица:"
+msgstr "Удар у банану може довести до добијања следећих терета на возило:"
 
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
 msgid "Anchor - slows down the kart suddenly."
-msgstr ""
+msgstr "Сидро - одма успорава возила."
 
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
 msgid ""
 "Parachute - slows down the kart, more progressively than the anchor. The "
 "faster you go, the stronger it slows you down."
-msgstr ""
+msgstr "Падобран - успорава возилпо, више преко времена него сидро. Што си бржи, то те више успорава."
 
 #. I18N: ./data/gui/screens/help4.stkgui
 #. I18N: In the help menu
 msgid ""
 "Bomb - detonates after some amount of time, throwing the kart up in the air."
 " Bump into another kart to transfer the bomb to it."
-msgstr ""
+msgstr "Бомба - експлодира после неког времена, бацајући возило горе у ваздуху. Удари другог играча да пренесеш бомбу њему."
 
 #. I18N: ./data/gui/screens/help5.stkgui
 msgid "The evil Nolok has captured Gnu! Here are a few tips to help you:"
-msgstr ""
+msgstr "Зли нолок је ухватио Гну! Ево вам неколико савета да вам помогне:"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1442,7 +1443,7 @@ msgid ""
 "completed. In the top-right of the screen, it also tells you how many points"
 " you currently have. Complete as many challenges as possible, and Nolok will"
 " accept to race against you. Win to liberate Gnu!"
-msgstr ""
+msgstr "Ова икона на малој карти показује доступне изазове које нисте завршили. У горњем-десном ћошку екрана, вам говори колико имате бодова. Заврши што више изазова могуће, и Нолок ће прихватити да се трка против тебе. Победи да Ослободиш Гну-а!"
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1450,20 +1451,20 @@ msgid ""
 "When you complete a challenge, you get a cup. Each cup is worth several "
 "points. The higher the difficulty you completed the challenge in, the better"
 " the cup and the more points it is worth."
-msgstr ""
+msgstr "Када завршиш изазов, добијеш медаљу. Свака медаља вреди неколико бодова. Што је већа тежина, то је боља медаља и то вреди више поена."
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
 msgid ""
 "When you get the number of points indicated below this icon, you'll be "
 "gifted a surprise. There are several to collect."
-msgstr ""
+msgstr "Када добијеш број поена назначен испод ове иконе, добићеш изненађење. Има доста да се скупља."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 msgid ""
 "Not all karts drive the same! They belong to classes with several "
 "differences:"
-msgstr ""
+msgstr "Не возе сва возила исто! Они припадају у класе са неколико разлика:"
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1471,7 +1472,7 @@ msgid ""
 "Mass - there are three classes of karts, depending on their mass: light, "
 "medium and heavy. Heavier karts are less affected by parachutes and are more"
 " resistant to explosions."
-msgstr ""
+msgstr "Маса - ту су три класе возила, зависни на своју масу: лаки, средњи и тешки. Тежа возила су мање утицани од падобрана и више су издржљиви на експлозије."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1479,7 +1480,7 @@ msgid ""
 "Acceleration - especially useful at start, after an accident, or in tracks "
 "with a lot of sharp curves. The lighter the kart, the faster it accelerates,"
 " especially at low speeds."
-msgstr ""
+msgstr "Убрзање - веома корисно у почетку, после несреће, или у стазама са пуно оштрих скретања. Што је лакше возило, брже убрзава, веома у малим брзинама."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1487,14 +1488,14 @@ msgid ""
 "Max speed - the higher it is, the faster the kart can go. Especially useful "
 "in tracks with straight lines and gentle curves. Heavier karts have a higher"
 " top speed."
-msgstr ""
+msgstr "Топ брзина - што је већа, то брже возило може да иде. Веома корисно у стазама са правим линијама и глатких скретања. Тежа возила имају већу топ брзину."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
 "Nitro consumption - the lower it is, the more speed you can get from a can "
 "of nitro. The lighter the kart, the lower its nitro consumption."
-msgstr ""
+msgstr "Потрошња нитро-а - Што је нижа, то више брзине можеш добити од канте за нитро. Што је лакше возило, то је мања потрошња нитро-а."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1502,12 +1503,12 @@ msgid ""
 "If you follow closely another kart for a few seconds, you'll get a "
 "slipstream speed bonus when you overtake it. The lighter your kart, the "
 "easier it is."
-msgstr ""
+msgstr "Ако близу пратиш друго возило за неколико секунди, добићеш клизањско убрзање када га престигнеш. Што је лакше возило, то је лакше."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "SuperTuxKart can be played in multiplayer mode online...:"
-msgstr ""
+msgstr "SuperTuxKart се може играти са више играча онлајн...."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1517,7 +1518,7 @@ msgid ""
 "options). Then, you can either create your own server with custom options, "
 "or search among a list of existing servers to join. Some of them are "
 "recommended servers with optionally ranked races."
-msgstr ""
+msgstr "Прво, кликните 'онлајн' икону и мениу. Изаберите или локалну, или глобалну мрежу (потребан је интернет да буде упаљен у опцијама). Онда, можете или направити ваш сервер са прилагођеним опцијама, или потражити листу постојаћих сервера. Неки од њих су препоручујени сервери са бодованим тркама."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1527,12 +1528,12 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon kart or track is allowed only if it exists on all "
 "joined players and the server."
-msgstr ""
+msgstr "Када у серверу, трка ће почети само када власник (означен са крунем) одлучи. Званични сервери ће аутоматски почети трке само када је ту довољно играча. Онда, можете изабрати ваше возило и да гласате за следећу стазу. Додаци су дозвољени само ако га сви играчи И сервер преузимају."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "... or on the same computer:"
-msgstr ""
+msgstr "... или на истом компјутеру:"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1547,11 +1548,11 @@ msgstr ""
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid ""
-"When input devices are configured, select the 'multiplayer' icon in the main"
-" menu. Each player can press the 'fire' key of their gamepad or keyboard to "
-"join the game, and use their input device to select their kart. The game "
-"continues when everyone selected their kart. Note that the mouse may not be "
-"used for this operation."
+"When input devices are configured, select the 'Splitscreen Multiplayer' icon"
+" in the main menu. Each player can press the 'fire' key of their gamepad or "
+"keyboard to join the game, and use their input device to select their kart. "
+"The game continues when everyone selected their kart. Note that the mouse "
+"may not be used for this operation."
 msgstr ""
 
 #. I18N: ./data/gui/screens/karts.stkgui
@@ -1559,7 +1560,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
-msgstr "Изаберите колица"
+msgstr "Изаберите возило"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1569,7 +1570,7 @@ msgstr "Самостална игра"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
 msgid "Splitscreen Multiplayer"
-msgstr ""
+msgstr "Мултиплејер са подељеним екраном."
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1580,7 +1581,7 @@ msgstr ""
 #. I18N: In the user screen
 #: src/states_screens/online/online_profile_friends.cpp:240
 msgid "Online"
-msgstr "На мрежи"
+msgstr "Онлајн"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1589,9 +1590,9 @@ msgstr "Додаци"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:511
+#: src/states_screens/race_gui_overworld.cpp:521
 msgid "Tutorial"
-msgstr "Упознавање"
+msgstr "Туториал"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -1604,12 +1605,12 @@ msgstr "Достигнућа"
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
 msgid "Grand Prix Editor"
-msgstr "Уредник трка за велику награду"
+msgstr "Едитор Велике Награде"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
 msgid "About"
-msgstr "О програму"
+msgstr "О Програму"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -1619,12 +1620,12 @@ msgstr "Изађи"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Server Creation"
-msgstr "Прављење служитеља"
+msgstr "Прављење Серера"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Name of the server"
-msgstr "Име служитеља"
+msgstr "Име Сервера"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1634,7 +1635,7 @@ msgstr "Највећи број играча"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Password for private server (optional)"
-msgstr "Лозинка личног служитеља (додатно)"
+msgstr "Шифра за приватни сервер (није потребно)"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1643,14 +1644,14 @@ msgstr "Направи"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 msgid "Local Networking"
-msgstr "Месно умрежавање"
+msgstr "Локална Мрежа"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 #. I18N: In the online multiplayer screen
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Find Server"
-msgstr "Пронађи служитеља"
+msgstr "Тражи Сервер"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 #. I18N: In the online multiplayer screen
@@ -1658,20 +1659,20 @@ msgstr "Пронађи служитеља"
 #. I18N: In the online multiplayer screen
 #: src/states_screens/online/create_server_screen.cpp:94
 msgid "Create Server"
-msgstr "Направи служитеља"
+msgstr "Направи Сервер"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
 #: src/states_screens/online/networking_lobby.cpp:191
 msgid "Lobby"
-msgstr "Предворје"
+msgstr "Хол"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #: src/states_screens/online/networking_lobby.cpp:177
 msgid "Start race"
-msgstr "Почни трку"
+msgstr "Почни Трку"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
@@ -1683,22 +1684,22 @@ msgstr "Подешавање"
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
 msgid "Enable splitscreen or player handicaps"
-msgstr "Омогући поделу приказа или сметње"
+msgstr "Омогући поделу екрана или хендикеп"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Local networking"
-msgstr "Месна мрежа"
+msgstr "Локална мрежа"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Global networking"
-msgstr "Општа мрежа"
+msgstr "Глобална мрежа"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Enter server address"
-msgstr "Унесите адресу служитеља"
+msgstr "Унесите адресу сервера"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -1706,7 +1707,7 @@ msgstr "Унесите адресу служитеља"
 #: src/states_screens/online/online_profile_base.cpp:124
 #: src/states_screens/online/online_screen.cpp:60
 msgid "Your profile"
-msgstr "Пресек Ваших личних података"
+msgstr "Ваш профил"
 
 #. I18N: ./data/gui/screens/online/profile_achievements.stkgui
 #. I18N: ./data/gui/screens/online/profile_achievements_tab.stkgui
@@ -1738,63 +1739,63 @@ msgstr "Тражи"
 
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 msgid "Global Networking"
-msgstr "Опште  умрежавање"
+msgstr "Глобална мрежа"
 
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
 msgid "Quick Play"
-msgstr "Брза игра"
+msgstr "Брза Игра"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: Section in the profile screen
 #: src/states_screens/online/online_profile_base.cpp:110
 msgid "Account Settings"
-msgstr "Поставке налога"
+msgstr "Опције Налога"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "Password:"
-msgstr "Лозинка:"
+msgstr "Шифра:"
 
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 msgid "Change"
-msgstr "Измени"
+msgstr "Промени"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Create User"
-msgstr "Направи играча"
+msgstr "Направи Корисника"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "New Online Account"
-msgstr "Нови налог на мрежи"
+msgstr "Нови Онлајн Налог"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Existing Online Account"
-msgstr "Постојећи налог на мрежи"
+msgstr "Постојаћи Онлајн Налог"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: Section in the register screen
 msgid "Offline Account"
-msgstr "Налог ван мреже"
+msgstr "Офлајн Налог"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Local Name"
-msgstr "Месно име"
+msgstr "Локално Име"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Online Username"
-msgstr "Име играча за мрежну игру"
+msgstr "Онлајн Корисничко име"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 msgid "Reset password"
-msgstr "Поништи лозинку"
+msgstr "Поништи шифру"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -1802,25 +1803,25 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr "Можете играти без стварања налога на мрежи одабиром налога ван мреже. Али, тада се не можете повезати са пријатељима, гласати за додатке итд. Молимо, прочитајте нашу објаву о заштити личности на http://privacy.supertuxkart.net -у"
+msgstr "Можете играти без стварања налога на мрежи одабиром налога ван мреже. Али, тада се не можете повезати са пријатељима, гласати за додатке итд. Молимо вас да прочитајте нашу објаву о заштити личности на http://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 msgid "Server Selection"
-msgstr "Избор служитеља"
+msgstr "Избор Сервера"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Show private server(s)"
-msgstr "Приказуј личне служитеље"
+msgstr "Прикажи приватн(и/е) сервер(е)"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Use IPv6 connection if server supports"
-msgstr ""
+msgstr "Користи IPv6 конекцију ако сервер подржава"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
-msgstr "Претрага корисника"
+msgstr "Корисничка претрага"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: ./data/gui/screens/options_device.stkgui
@@ -1831,7 +1832,7 @@ msgstr "Претрага корисника"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 msgid "SuperTuxKart Options"
-msgstr "Могућности Супертаксових колица"
+msgstr "SuperTuxKart Опције"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -1852,7 +1853,7 @@ msgstr "Могућности Супертаксових колица"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Graphics"
-msgstr "Исцртавање"
+msgstr "Графика"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -1890,7 +1891,7 @@ msgstr "Звук"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Interface"
-msgstr ""
+msgstr "Приступ"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -1928,7 +1929,7 @@ msgstr "Играчи"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Controls"
-msgstr "Управљачи"
+msgstr "Контроле"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -1967,17 +1968,17 @@ msgstr "Укључено"
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Volume"
-msgstr "Гласноћа"
+msgstr "Јачина Звука"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: In the audio options screen
 msgid "Sound Effects"
-msgstr "Звучни ефекти"
+msgstr "Звучни Ефекти"
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 msgid "Delete Configuration"
-msgstr "Избриши подешавање"
+msgstr "Обриши Подешавање"
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
@@ -1985,7 +1986,7 @@ msgstr "Избриши подешавање"
 #: src/states_screens/options/options_screen_device.cpp:121
 #: src/states_screens/options/options_screen_device.cpp:634
 msgid "Disable Configuration"
-msgstr "Онемогући подешавање"
+msgstr "Искључи Подешавање"
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
@@ -1995,7 +1996,7 @@ msgstr "Назад на списак уређаја"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Internet options"
-msgstr "Могућности интернета"
+msgstr "Опције Интернета"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2005,32 +2006,37 @@ msgstr "Увек приказуј екран за пријаву"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Connect to the Internet"
-msgstr "Повежи се на интернет"
+msgstr "Повежи се на Интернет"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Send anonymous hardware statistics"
-msgstr "Пошаљи безимено статистику тврдотворина"
+msgstr "Пошаљи безимену статистику уређаја"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
+msgid "Enable chatting online"
+msgstr "Укључи онлајн дописивање"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Enable chatting in online games"
-msgstr "Омогући ћаскање у играма на мрежи"
+msgstr "Омогући ћаскање у онлајн играма"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Miscellaneous options"
-msgstr "Разне могућности"
+msgstr "Разне опције"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Enable per-player handicaps"
-msgstr "Омогућите сметње по сваком играчу посебно"
+msgstr "Укључи хендикеп по сваком играчу посебно"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
-msgstr "Притисните унеси или кликните двапут на уређај да га подесите"
+msgstr "Притисните ентер или дво-кликните на уређај да га подесите"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -2047,7 +2053,7 @@ msgstr "* Одабир поставки ће се извршити по томе
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Skin"
-msgstr "Кошуљица"
+msgstr "Тема"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2057,62 +2063,72 @@ msgstr "Мала карта"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Font size"
-msgstr ""
+msgstr "Величина фонте"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Display FPS"
-msgstr "Прикажи број сличица по секунди"
+msgstr "Прикаи FPS"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Multiplayer splits screen horizontally"
-msgstr "Подељен приказ водоравно за више играча"
+msgstr "Подели екран хоризонтално у милтиплејеру"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Show other karts' held powerups"
-msgstr ""
+msgstr "Покажи шта други играчи држе"
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Enable the story mode timer"
+msgstr "Укључи причну штоперицу"
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Enable the speedrun timer"
+msgstr "Укључи 'speedrun' штоперицу"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Graphical Effects Level"
-msgstr "Ступањ исцртавајућих дејстава"
+msgstr "Ниво графичних Ефеката"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Blur Effects Level"
-msgstr ""
+msgstr "Ниво Замућења"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync (requires restart)"
-msgstr "Усправно усклађивање (захтева поновно покретање)"
+msgstr "Вертикално Усклађивање (захтева рестарт)"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Произвољне поставке..."
+msgstr "Прилагођене опције..."
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Resolution"
-msgstr "Размера"
+msgstr "Резолуција"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Fullscreen"
-msgstr "Пун приказ"
+msgstr "Цео-Екран"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Remember window location"
-msgstr "Запамти положај прозора"
+msgstr "Запамти локацију прозора"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Apply new resolution"
-msgstr "Примени нову размеру"
+msgstr "Примени нову резолуцију"
 
 #. I18N: ./data/gui/screens/race_setup.stkgui
 msgid "Select a difficulty"
@@ -2125,25 +2141,25 @@ msgstr "Изаберите начин игре"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Use left/right to choose your team and press fire"
-msgstr "Скрећите лево/десно за одабир дружине и притисните пали"
+msgstr "Користи лево/десно да промените ваш тим и стисните 'пали'"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Red Team"
-msgstr "Црвена дружина"
+msgstr "Црвена Тим"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Blue Team"
-msgstr "Плава дружина"
+msgstr "Плава Тим"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 msgid "= Highscores ="
-msgstr "= Најбоља достигнућа ="
+msgstr "= Најбоља времена="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:511
+#: src/states_screens/online/tracks_screen.cpp:516
 #: src/states_screens/track_info_screen.cpp:280
 msgid "Number of laps"
 msgstr "Број кругова"
@@ -2153,18 +2169,24 @@ msgstr "Број кругова"
 #: src/states_screens/online/create_server_screen.cpp:169
 #: src/states_screens/track_info_screen.cpp:199
 msgid "Number of AI karts"
-msgstr "Број роботских колица"
+msgstr "Број роботских играча"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Number of blue team AI karts"
-msgstr ""
+msgstr "Број роботских играча у плавом тиму"
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
 #: src/states_screens/dialogs/select_challenge.cpp:51
 msgid "Grand Prix"
-msgstr "Велика награда"
+msgstr "Велика Награда"
+
+#. I18N: ./data/gui/screens/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
+#: src/race/grand_prix_data.cpp:616
+msgid "Random Grand Prix"
+msgstr "Насумична Велика Награда"
 
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: Used as a verb, appears on the main networking menu (login button)
@@ -2177,7 +2199,7 @@ msgstr "Пријава"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Remember password"
-msgstr "Запамти лозинку"
+msgstr "Запамти шифру"
 
 #. I18N: ./data/gui/screens/user_screen.stkgui
 #. I18N: In the user screen
@@ -2191,11 +2213,11 @@ msgstr "Обриши"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 msgid "Kart color"
-msgstr "Боја колица"
+msgstr "Боја Возила"
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
-msgstr "Ађуми"
+msgstr "Адиуми"
 
 #. I18N: ../stk-assets/karts/amanda/kart.xml
 msgid "Amanda"
@@ -2207,11 +2229,11 @@ msgstr "Зверчица"
 
 #. I18N: ../stk-assets/karts/emule/kart.xml
 msgid "Emule"
-msgstr "Јемазга"
+msgstr "Емул"
 
 #. I18N: ../stk-assets/karts/gavroche/kart.xml
 msgid "Gavroche"
-msgstr "Гаврош"
+msgstr "Гаврох"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
@@ -2219,7 +2241,7 @@ msgstr "Гну"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
-msgstr "Шестли"
+msgstr "Хексли"
 
 #. I18N: ../stk-assets/karts/kiki/kart.xml
 msgid "Kiki"
@@ -2235,7 +2257,7 @@ msgstr "Нолок"
 
 #. I18N: ../stk-assets/karts/pidgin/kart.xml
 msgid "Pidgin"
-msgstr "Голупко"
+msgstr "Пиџин"
 
 #. I18N: ../stk-assets/karts/puffy/kart.xml
 msgid "Puffy"
@@ -2243,11 +2265,11 @@ msgstr "Пуфко"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Sara the Racer"
-msgstr "Тркачица Сара"
+msgstr "Цара Тркачица"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara the Wizard"
-msgstr "Чаробница Сара"
+msgstr "Сара Чаробница"
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -2255,7 +2277,7 @@ msgstr "Сузана"
 
 #. I18N: ../stk-assets/karts/tux/kart.xml
 msgid "Tux"
-msgstr "Такс"
+msgstr "Тукс"
 
 #. I18N: ../stk-assets/karts/wilber/kart.xml
 msgid "Wilber"
@@ -2263,24 +2285,24 @@ msgstr "Вилбер"
 
 #. I18N: ../stk-assets/karts/xue/kart.xml
 msgid "Xue"
-msgstr "Стју"
+msgstr "Ксуе"
 
 #. I18N: ../stk-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
-msgstr "Препотопски бездан"
+msgstr "Препотопни Понор"
 
 #. I18N: ../stk-assets/tracks/arena_candela_city/track.xml
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
-msgstr "Град свећа"
+msgstr "Град Кандела"
 
 #. I18N: ../stk-assets/tracks/battleisland/track.xml
 msgid "Battle Island"
-msgstr "Острво битака"
+msgstr "Борбено Острво"
 
 #. I18N: ../stk-assets/tracks/black_forest/track.xml
 msgid "Black Forest"
-msgstr "Црна гора"
+msgstr "Црна Шума"
 
 #. I18N: ../stk-assets/tracks/cave/track.xml
 msgid "Cave X"
@@ -2288,110 +2310,110 @@ msgstr "Пећина Икс"
 
 #. I18N: ../stk-assets/tracks/cocoa_temple/track.xml
 msgid "Cocoa Temple"
-msgstr "Замак какаоа"
+msgstr "Храм Какаоа"
 
 #. I18N: ../stk-assets/tracks/cornfield_crossing/track.xml
 msgid "Cornfield Crossing"
-msgstr "Кукурузни прелаз"
+msgstr "Кукурузни Прелаз"
 
 #. I18N: ../stk-assets/tracks/fortmagma/track.xml
 msgid "Fort Magma"
-msgstr "Утврђење Магма"
+msgstr "Кула Магме"
 
 #. I18N: ../stk-assets/tracks/gran_paradiso_island/track.xml
 msgid "Gran Paradiso Island"
-msgstr "Острво великог раја"
+msgstr "Острво Великог Раја"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
-msgstr "Хацијенда"
+msgstr "Хациенда"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
-msgstr "Ледено ногометно игралиште"
+msgstr "Ледени Фудбалски Стадиум"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr "Шта није у реду, мали хипчићи? Нема вашег силног вође гнуа?"
+msgstr "Шта није у реду, мали хипији? Нема вашег сјајног вође гну-а?"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "О, да, види, он је сада у мом дворцу, и биће служен за вечеру..."
+msgstr "О да, видиш, он је сада у мом дворцу, и биће служен за вечеру..."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr "Али, ја сам поштено створење, нагодићу се са тобом."
+msgstr "Али, ја сам поштено биће, па ћу се договорити са вама."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr "Ако ме успеш победити у трци, ослободићу стару ништарију."
+msgstr "Ако успете да ме победите у трци, ослободићу стару ништарију."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr " Али, ви бедне мале ништарије никад нећете моћи да победите мене - Краља колица!"
+msgstr "Али ви патетични мали никовићи никад нећете моћи да ме победите - Краља Возила!"
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
-msgstr "Борилиште Дуна"
+msgstr "Арена Лас Дунаса"
 
 #. I18N: ../stk-assets/tracks/lasdunassoccer/track.xml
 msgid "Las Dunas Soccer Stadium"
-msgstr "Ногометно игралиште Дуне"
+msgstr "Фудбалски Стадиум Лас Дунаса"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the lighthouse"
-msgstr "Око светионика"
+msgstr "Око Светионика"
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
-msgstr "Стари рудник"
+msgstr "Стари Рудник"
 
 #. I18N: ../stk-assets/tracks/minigolf/track.xml
 msgid "Minigolf"
-msgstr "Мали голф"
+msgstr "Миниголф"
 
 #. I18N: ../stk-assets/tracks/olivermath/track.xml
 msgid "Oliver's Math Class"
-msgstr "Оливеров час математике"
+msgstr "Оливеров Час Математике"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
-msgstr "Палата Вранове ћуприје"
+msgstr "Палата Врановог моста"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
-msgstr "Живи песак"
+msgstr "Живи Песак"
 
 #. I18N: ../stk-assets/tracks/scotland/track.xml
 msgid "Nessie's Pond"
-msgstr ""
+msgstr "Несино Језерце"
 
 #. I18N: ../stk-assets/tracks/snowmountain/track.xml
 msgid "Northern Resort"
-msgstr "Северно одмориште"
+msgstr "Северно Одмориште"
 
 #. I18N: ../stk-assets/tracks/snowtuxpeak/track.xml
 msgid "Snow Peak"
-msgstr "Снежни вршак"
+msgstr "Снежни Врх"
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer field"
-msgstr "Ногометно игралиште"
+msgstr "Фудбалски терен"
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
-msgstr "Игралиште"
+msgstr "Стадиум"
 
 #. I18N: ../stk-assets/tracks/stk_enterprise/track.xml
 msgid "STK Enterprise"
-msgstr "Предузеће СТК-а"
+msgstr "STK Предузеће"
 
 #. I18N: ../stk-assets/tracks/temple/track.xml
 msgid "Temple"
@@ -2399,7 +2421,7 @@ msgstr "Замак"
 
 #. I18N: ../stk-assets/tracks/volcano_island/track.xml
 msgid "Volcan Island"
-msgstr "Острво вулкана"
+msgstr "Вулканско Острво"
 
 #. I18N: ../stk-assets/tracks/xr591/track.xml
 msgid "XR591"
@@ -2407,7 +2429,7 @@ msgstr "ХР591"
 
 #. I18N: ../stk-assets/tracks/zengarden/track.xml
 msgid "Zen Garden"
-msgstr "Зенова башта"
+msgstr "Зенова Башта"
 
 #: src/achievements/achievement.cpp:387
 #, c-format
@@ -2416,80 +2438,90 @@ msgstr "Испуњена достигнућа „%s“."
 
 #: src/addons/addons_manager.cpp:107 src/addons/news_manager.cpp:347
 msgid "Failed to connect to the SuperTuxKart add-ons server."
-msgstr "Нисам успео да се повежем са служитељем додатака Супер Таксових колица."
+msgstr "Неуспешно повезивање са SuperTuxKart додатним сервером."
 
 #: src/addons/news_manager.cpp:182
 #, c-format
 msgid "Error downloading news: '%s'."
-msgstr "Десила се грешка приликом преузимања новости: „%s“."
+msgstr "Грешка преузимања новости: '%s'."
 
 #: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:262
 msgid "Normal Race (Grand Prix)"
-msgstr "Обична трка (велика награда)"
+msgstr "Обична Трка (Велика Награда)"
 
 #: src/challenges/challenge_data.cpp:305
 msgid "Time-Trial (Grand Prix)"
-msgstr ""
+msgstr "Временска Трка (Велика Награда)"
 
 #: src/challenges/challenge_data.cpp:310
 msgid "Time-Trial - beat the replay"
-msgstr ""
+msgstr "Временска Трка - победи против духа"
 
 #: src/challenges/challenge_data.cpp:312
 msgid "Time-Trial - nitro challenge"
-msgstr ""
+msgstr "Временска Трка - изазов нитро-а"
 
 #: src/challenges/challenge_data.cpp:314
 msgid "Normal Race (single race)"
-msgstr ""
+msgstr "Обична Трка (једна трка)"
 
 #: src/challenges/challenge_data.cpp:316
 msgid "Time-Trial (single race)"
-msgstr ""
+msgstr "Временска Трка (једна трка)"
 
 #: src/challenges/challenge_data.cpp:318
 msgid "Follow the Leader (single race)"
-msgstr ""
+msgstr "Прати Вођу (једна трка)"
 
 #. I18N: In the Select challenge dialog, tell user this challenge has reversed
 #. laps
 #: src/challenges/challenge_data.cpp:324
 #: src/states_screens/dialogs/select_challenge.cpp:78
 msgid "Mode: Reverse"
-msgstr ""
+msgstr "Начин: Уназад"
 
 #: src/challenges/challenge_data.cpp:601
 #, c-format
 msgid "New track '%s' now available"
-msgstr "Нова стаза „%s“ је сада доступна"
+msgstr "Нова стаза '%s' је сада доступна"
 
 #: src/challenges/challenge_data.cpp:605
 #, c-format
 msgid "New game mode '%s' now available"
-msgstr "Нови начин игре „%s“ је сада доступан"
+msgstr "Нови начин игре '%s' је сада доступан"
 
 #: src/challenges/challenge_data.cpp:615
 #, c-format
 msgid "New Grand Prix '%s' now available"
-msgstr "Нова велика награда „%s“ је сада доступна"
+msgstr "Нова Велика Награда '%s' је сада доступна"
 
 #: src/challenges/challenge_data.cpp:619
 #, c-format
 msgid "New difficulty '%s' now available"
-msgstr "Нова тежина „%s“ је сада доступна"
+msgstr "Нова тежина '%s' је сада доступна"
 
 #: src/challenges/challenge_data.cpp:629
 #, c-format
 msgid "New kart '%s' now available"
-msgstr "Нова колица „%s“ су сада доступна"
+msgstr "Нови карактер '%s' је сада доступан"
+
+#: src/challenges/story_mode_timer.cpp:281
+#: src/states_screens/options/options_screen_ui.cpp:267
+msgid ""
+"Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
+"\n"
+"Closing the game before the story mode's completion invalidates the timer.\n"
+"\n"
+"To use the speedrun mode, please use a new profile."
+msgstr "\"Speedrun\" мод је искључен. Може се само укључити ако игрица није била затворена пре почетка причног начина.\n\nЗатварање игре пре него што се прични начин заврши поништава штоперицу\n\nДа користите \"Speedrun\" мод, молимо вас да користите нови профил."
 
 #. I18N: Name of first guest player (without number)
-#: src/config/player_manager.cpp:387
+#: src/config/player_manager.cpp:388
 msgid "Guest"
 msgstr "Гост"
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
-#: src/config/player_manager.cpp:392
+#: src/config/player_manager.cpp:393
 #, c-format
 msgid "Guest %d"
 msgstr "Гост %d"
@@ -2498,35 +2530,35 @@ msgstr "Гост %d"
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "Ваша датотека подешавања је била неисправна, те је обрисана и нова ће бити направљена."
+msgstr "Ваш конфиг фајл је био неисправан и нови ће бити направљен."
 
 #: src/config/user_config.cpp:700
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr "Ваша датотека подешавања је била превише стара, те је обрисана и нова ће бити направљена."
+msgstr "Ваш конфиг фајл је био престар и нови ће бити направљен."
 
-#: src/graphics/irr_driver.cpp:594
+#: src/graphics/irr_driver.cpp:596
 msgid "Video recording started."
 msgstr "Снимање видеа је почело."
 
-#: src/graphics/irr_driver.cpp:600
+#: src/graphics/irr_driver.cpp:602
 #, c-format
 msgid "Video saved in \"%s\"."
-msgstr "Видео је сачуван у „%s“"
+msgstr "Видео се сачувао у \"%s\"."
 
-#: src/graphics/irr_driver.cpp:604
+#: src/graphics/irr_driver.cpp:606
 msgid "Encoding progress:"
 msgstr "Напредак кодирања:"
 
-#: src/graphics/irr_driver.cpp:1837 src/graphics/irr_driver.cpp:1842
+#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
-msgstr "СПС:%d/%d/%d - %d , Одзив: %dms"
+msgstr "FPS:%d/%d/%d - %d KTris, Пинг: %dms"
 
-#: src/guiengine/engine.cpp:1391
+#: src/guiengine/engine.cpp:1400
 msgid "Loading"
-msgstr "Учитавам"
+msgstr "Учитавање"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:104
 msgid "Mass"
@@ -2534,7 +2566,7 @@ msgstr "Маса"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:110
 msgid "Maximum speed"
-msgstr "Највиша брзина"
+msgstr "Топ брзина"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:117
 msgid "Acceleration"
@@ -2542,19 +2574,19 @@ msgstr "Убрзање"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:123
 msgid "Nitro efficiency"
-msgstr "Учинак нитра"
+msgstr "Потрошња нитро-а"
 
 #. I18N: 'handicapped' indicates that per-player handicaps are
 #. activated for this kart (i.e. it will drive slower)
 #: src/guiengine/widgets/player_kart_widget.cpp:386
 #: src/guiengine/widgets/player_kart_widget.cpp:757
 #: src/karts/controller/local_player_controller.cpp:437
-#: src/karts/controller/player_controller.cpp:409
-#: src/network/protocols/client_lobby.cpp:810
+#: src/karts/controller/player_controller.cpp:413
+#: src/network/protocols/client_lobby.cpp:812
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
 #, c-format
 msgid "%s (handicapped)"
-msgstr "%s (ометен)"
+msgstr "%s (хендикепиран)"
 
 #: src/guiengine/widgets/player_kart_widget.cpp:443
 #, c-format
@@ -2606,13 +2638,13 @@ msgstr "Дугме миша икс2"
 #: src/input/binding.cpp:116
 msgctxt "input_key"
 msgid "Backspace"
-msgstr "Повратница"
+msgstr "Уназад"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:118
 msgctxt "input_key"
 msgid "Tab"
-msgstr "Језичак"
+msgstr "Таб"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:120
@@ -2636,7 +2668,7 @@ msgstr "Помак"
 #: src/input/binding.cpp:126
 msgctxt "input_key"
 msgid "Control"
-msgstr "Управљање"
+msgstr "Контрола"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:128
@@ -2648,13 +2680,13 @@ msgstr "Мења/изборник"
 #: src/input/binding.cpp:130
 msgctxt "input_key"
 msgid "Pause"
-msgstr "Одмор"
+msgstr "Пауза"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:132
 msgctxt "input_key"
 msgid "Caps Lock"
-msgstr "Закључавање_слова"
+msgstr "Велика Слова"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:134
@@ -2673,7 +2705,7 @@ msgstr "Јуња"
 #: src/input/binding.cpp:139
 msgctxt "input_key"
 msgid "Final"
-msgstr "Коначно"
+msgstr "Финално"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:141
@@ -2745,7 +2777,7 @@ msgstr "Лево"
 #: src/input/binding.cpp:163 src/input/gamepad_android_config.cpp:64
 msgctxt "input_key"
 msgid "Up"
-msgstr "Навише"
+msgstr "Горе"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:165 src/input/gamepad_android_config.cpp:61
@@ -2781,7 +2813,7 @@ msgstr "Изврши"
 #: src/input/binding.cpp:175
 msgctxt "input_key"
 msgid "Print Screen"
-msgstr "Штампај екран"
+msgstr "Сликај Екран"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:177
@@ -2925,37 +2957,37 @@ msgstr "Закључавање клизања"
 #: src/input/binding.cpp:285
 msgctxt "input_key"
 msgid "Left Shift"
-msgstr "Леви помак"
+msgstr "Леви Помак"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:287
 msgctxt "input_key"
 msgid "Right Shift"
-msgstr "Десни помак"
+msgstr "Десни Помак"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:289
 msgctxt "input_key"
 msgid "Left Control"
-msgstr "Леви управљач"
+msgstr "Леви Управљач"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:291
 msgctxt "input_key"
 msgid "Right Control"
-msgstr "Десни управљач"
+msgstr "Десни Управљач"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:293
 msgctxt "input_key"
 msgid "Left Menu"
-msgstr "Леви изборник"
+msgstr "Леви Изборник"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:295
 msgctxt "input_key"
 msgid "Right Menu"
-msgstr "Десни изборник"
+msgstr "Десни Изборник"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:301
@@ -3003,7 +3035,7 @@ msgstr "Па1"
 #: src/input/binding.cpp:315
 msgctxt "input_key"
 msgid "Oem Clear"
-msgstr "Очисти произвођача"
+msgstr "Очисти Произвођача"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
 #: src/input/binding.cpp:355 src/input/binding.cpp:360
@@ -3056,7 +3088,7 @@ msgstr "Молим поново подесите дугмиће игре."
 
 #: src/input/device_manager.cpp:580
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "Датотека подешавања уноса није сагласна са овим издањем СТК-а."
+msgstr "Ваш конфиг фајл не садржава ову верзију STK-а."
 
 #: src/input/gamepad_android_config.cpp:100
 msgctxt "input_key"
@@ -3202,7 +3234,7 @@ msgstr "Само мајстор игре може да делује у овом 
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr "Повежите вимот са управником Блутута, затим кликните на У реду. Ближа упутства се налазе на supertuxkart.net/Wiimote"
+msgstr "Повежите ваш Wiimote са Bluetooth управником, затим кликните ОК. Детаљнија упутства се налазе код supertuxkart.net/Wiimote"
 
 #: src/input/wiimote_manager.cpp:391
 msgid ""
@@ -3216,19 +3248,19 @@ msgid "Found %d wiimote"
 msgid_plural "Found %d wiimotes"
 msgstr[0] "Пронађен је %d вимот"
 msgstr[1] "Пронађена су %d вимота"
-msgstr[2] "Пронађено је %d вимота"
+msgstr[2] "Пронађено је %d wiimote-а"
 
 #: src/input/wiimote_manager.cpp:419
 msgid "Could not detect any wiimote :/"
-msgstr "Нисам успео да препознам даљински управљач вија :/"
+msgstr "Неуспешно препознавање wiimote-а :/"
 
 #: src/karts/controller/local_player_controller.cpp:300
 msgid "Penalty time!!"
-msgstr "Казнено време!!"
+msgstr "Казна!!!"
 
 #: src/karts/controller/local_player_controller.cpp:303
 msgid "Don't accelerate before 'Set!'"
-msgstr "Не убрзавај пре узвика „Позор!“"
+msgstr "Не убрзавај пре 'Позор!'"
 
 #: src/karts/controller/spare_tire_ai.cpp:149
 msgid "You can have at most 3 lives!"
@@ -3240,7 +3272,7 @@ msgstr "+1 живот."
 
 #: src/karts/kart.cpp:1032
 msgid "You were too slow!"
-msgstr ""
+msgstr "Био си превише спор!"
 
 #: src/karts/kart.cpp:1033
 msgid "You won the race!"
@@ -3251,12 +3283,12 @@ msgid "You finished the race!"
 msgstr "Завршили сте трку!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:120 src/network/protocols/client_lobby.cpp:1091
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1093
 #, c-format
 msgid "%s left the game."
-msgstr "%s је напустио игру."
+msgstr "%s је изашао са игре."
 
-#: src/main.cpp:1924
+#: src/main.cpp:1925
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3265,28 +3297,28 @@ msgid ""
 "(To change this setting at a later time, go to options, select tab "
 "'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr "Супертаксова колица се могу повезивати са служитељем ради преузимања додатака и обавештења о надоградњама. Такође, сакупљамо податке о уређајима безимено ради олакшања развоја СТК-а. Смернице о поштовању личности можете прочитати на http://privacy.supertuxkart.net. Да ли желите да ово омогућите? (Ради касније измене ових поставки, идите на могућности, изаберите лист „Опште“, и уредите „Повежите се са Интернетом“ и „Шаљи безимене податке о уређају“)."
+msgstr "SuperTuxKart може да се конектује на сервер и да преузима додатке и да вас обавештава о ажурирањима. Ми такође сакупљамо безимене податке ради олакшања развој STK-а. Молимо вас да нам прочитате полису приватности код http://privacy.supertuxkart.net. Да ли желите да ово буде укључено? (Да промените ову опцију касније, идите у опције, изаберите  'Уопсте', и промените 'Повежи се на Интернет' и 'Пошаљи безимену статистику уређаја')."
 
-#: src/main.cpp:2192
+#: src/main.cpp:2196
 msgid "Your screen resolution is too low to run STK."
-msgstr "Размера екрана је премала за покретање СТК-а."
+msgstr "Ваша резолуција је превише мала за STK."
 
-#: src/main.cpp:2224
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
-msgstr "Издање управљачких програма видео картице је застарело. Покушајте да уградите новије управљачке програме."
+msgstr "Ваш управљачки програм је застарео. Молимо вас да инсталирате најновије издање управљачког програма."
 
-#: src/main.cpp:2242
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
 "available. SuperTuxKart recommends a driver supporting %s or better. The "
 "game will likely still run, but in a reduced-graphics mode."
-msgstr ""
+msgstr "Ваш графички управљачки програм изгледа да је веома стар. Молимо вас да проверите дали је ажурирање могуће. SuperTuxKart препоручује управљачки програм који подржава %s или боље. Игрица би сигурно и даље радила, али у смањеним-графикама моду"
 
-#: src/main_loop.cpp:417 src/network/protocols/client_lobby.cpp:96
+#: src/main_loop.cpp:421 src/network/protocols/client_lobby.cpp:96
 msgid "Server connection timed out."
-msgstr "Истекла је веза са служитељем."
+msgstr "Истекла је веза са сервера."
 
 #. I18N: Show when a player gets the red flag in CTF
 #: src/modes/capture_the_flag.cpp:178
@@ -3303,22 +3335,22 @@ msgstr "Црвена застава је враћена!"
 #: src/modes/capture_the_flag.cpp:196
 #, c-format
 msgid "%s has the blue flag!"
-msgstr "%s има модру заставу!"
+msgstr "%s има плаву заставу!"
 
 #. I18N: Show when the blue flag is returned to its base in CTF
 #: src/modes/capture_the_flag.cpp:203
 msgid "The blue flag has returned!"
-msgstr "Модра застава је враћена!"
+msgstr "Плава застава је враћена!"
 
 #: src/modes/capture_the_flag.cpp:411
 #, c-format
 msgid "%s captured the blue flag!"
-msgstr "%s је узео модру заставу!"
+msgstr "%s је освојио плаву заставу!"
 
 #: src/modes/capture_the_flag.cpp:415
 #, c-format
 msgid "%s captured the red flag!"
-msgstr "%s је узео црвену заставу!"
+msgstr "%s је освојио црвену заставу!"
 
 #: src/modes/easter_egg_hunt.cpp:226
 #, c-format
@@ -3358,206 +3390,206 @@ msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i колица са новим гумама су створена!"
 msgstr[1] "%i колица са новим гумама су створена!"
-msgstr[2] "%i колица са новим гумама су створена!"
+msgstr[2] "%i возача са резерним гумама су се створила!"
 
-#: src/modes/world.cpp:1311
+#: src/modes/world.cpp:1313
 msgid "You have been eliminated!"
-msgstr "Испали сте!"
+msgstr "Елиминисани сте!"
 
-#: src/modes/world.cpp:1318
+#: src/modes/world.cpp:1320
 #, c-format
 msgid "'%s' has been eliminated."
-msgstr "„%s“ испаде."
+msgstr "'%s' је елиминисан."
 
 #: src/network/protocols/client_lobby.cpp:97
 msgid "Server has been shut down."
-msgstr "Служитељ је искључен."
+msgstr "Сервер се угасио."
 
 #: src/network/protocols/client_lobby.cpp:98
 msgid "You were kicked from the server."
-msgstr "Избачени сте са служитеља."
+msgstr "Избачени сте са сервера."
 
 #: src/network/protocols/client_lobby.cpp:100
 msgid "You were kicked: Ping too high."
 msgstr "Избачени сте: одзив је превише висок."
 
 #: src/network/protocols/client_lobby.cpp:249
-#: src/network/protocols/client_lobby.cpp:848
+#: src/network/protocols/client_lobby.cpp:850
 msgid "Bad network connection is detected."
 msgstr "Лоша веза је препозната."
 
-#: src/network/protocols/client_lobby.cpp:431
+#: src/network/protocols/client_lobby.cpp:433
 msgid "Bot"
-msgstr ""
+msgstr "Бот"
 
-#: src/network/protocols/client_lobby.cpp:597
+#: src/network/protocols/client_lobby.cpp:599
 #, c-format
 msgid "%s disconnected."
-msgstr "%s је откачен."
+msgstr "%s је прекинуо везу."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:625
+#: src/network/protocols/client_lobby.cpp:627
 msgid ""
 "Press player name in the list for player management and ranking information."
-msgstr "Притисните име играча на списку управљања и података о поретку."
+msgstr "Притисните име играча на списку за управљање и података."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:679
+#: src/network/protocols/client_lobby.cpp:681
 #, c-format
 msgid "Server name: %s"
-msgstr "Име служитеља: %s"
+msgstr "Име сервера: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:687
+#: src/network/protocols/client_lobby.cpp:689
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
-#: src/states_screens/race_result_gui.cpp:1755
+#: src/states_screens/race_result_gui.cpp:1775
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Тежина: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:692
+#: src/network/protocols/client_lobby.cpp:694
 #, c-format
 msgid "Max players: %d"
 msgstr "Највише играча: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:705
+#: src/network/protocols/client_lobby.cpp:707
 #: src/states_screens/dialogs/server_info_dialog.cpp:87
 #, c-format
 msgid "Game mode: %s"
 msgstr "Начин игре: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:718
+#: src/network/protocols/client_lobby.cpp:720
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:173
 #: src/states_screens/online/create_server_screen.cpp:226
-#: src/states_screens/track_info_screen.cpp:368
+#: src/states_screens/track_info_screen.cpp:371
 msgid "Time limit"
 msgstr "Временско ограничење"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:719
+#: src/network/protocols/client_lobby.cpp:721
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:228
-#: src/states_screens/track_info_screen.cpp:369
+#: src/states_screens/track_info_screen.cpp:372
 msgid "Goals limit"
-msgstr "Ограничење погодака"
+msgstr "Ограничење голова"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:723
+#: src/network/protocols/client_lobby.cpp:725
 #, c-format
 msgid "Soccer game type: %s"
-msgstr "Врста ногометне игре: %s"
+msgstr "Врста фудбалске игре: %s"
 
-#: src/network/protocols/client_lobby.cpp:733
+#: src/network/protocols/client_lobby.cpp:735
 #, c-format
 msgid "Grand prix progress: %d / %d"
-msgstr "Напредак трке велике награде: %d / %d"
+msgstr "Напредак Велике Награде: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:840
+#: src/network/protocols/client_lobby.cpp:842
 msgid "All players joined red or blue team."
-msgstr "Сви играчи су се прикључили модром или црвеној дружини."
+msgstr "Сви играчи су ушли или у црвени, или у плави тим."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:860
+#: src/network/protocols/client_lobby.cpp:862
 msgid "You are now the owner of server."
-msgstr "Нисте власник служитеља."
+msgstr "Ви сте тренутно власник овог сервера."
 
-#: src/network/protocols/client_lobby.cpp:901
+#: src/network/protocols/client_lobby.cpp:903
 msgid "Connection refused: Server is busy."
-msgstr "Веза је одбијена: служитељ је заузет."
+msgstr "Веза је одбијена: сервер је заузет."
 
-#: src/network/protocols/client_lobby.cpp:906
+#: src/network/protocols/client_lobby.cpp:908
 msgid "Connection refused: You are banned from the server."
-msgstr "Веза је одбијена: Прогнани сте са служитеља."
+msgstr "Веза је одбијена: забрањени сте са сервера."
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:921
 msgid "Connection refused: Server password is incorrect."
-msgstr "Веза је одбијена: лозинка служитеља није тачна."
+msgstr "Веза је одбијена: нисте погодили шифру сервера."
 
-#: src/network/protocols/client_lobby.cpp:923
+#: src/network/protocols/client_lobby.cpp:925
 msgid "Connection refused: Game data is incompatible."
 msgstr "Веза је одбијена: подаци игре нису одговарајући."
 
-#: src/network/protocols/client_lobby.cpp:927
+#: src/network/protocols/client_lobby.cpp:929
 msgid "Connection refused: Server is full."
-msgstr "Веза је одбијена: служитељ је пун."
+msgstr "Веза је одбијена: сервер је пун."
 
-#: src/network/protocols/client_lobby.cpp:931
+#: src/network/protocols/client_lobby.cpp:933
 msgid "Connection refused: Invalid player connecting."
-msgstr "Веза је одбијена: повезивање невредећег играча."
+msgstr "Веза је одбијена: неважећи играч се повезује."
 
-#: src/network/protocols/client_lobby.cpp:959
+#: src/network/protocols/client_lobby.cpp:961
 msgid "Failed to start the network game."
-msgstr ""
+msgstr "Неуспешно стартовање нетворкске игре."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1158
+#: src/network/protocols/client_lobby.cpp:1160
 msgid "The game has ended, you can't live join or spectate anymore."
-msgstr ""
+msgstr "Игра се завршила, Неможете ући или посматрати више."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1162
+#: src/network/protocols/client_lobby.cpp:1164
 msgid "No remaining place in the arena - live join disabled."
-msgstr ""
+msgstr "Нема више места у арени - улаз је искључен."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1166
+#: src/network/protocols/client_lobby.cpp:1168
 msgid "Only 1 player remaining, returning to lobby."
-msgstr ""
+msgstr "Само 1 играч је остао, враћање на хол."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1330
+#: src/network/protocols/client_lobby.cpp:1332
 #, c-format
 msgid "%s joined the red team."
-msgstr ""
+msgstr "%sје ушао у црвени тим."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1336
+#: src/network/protocols/client_lobby.cpp:1338
 #, c-format
 msgid "%s joined the blue team."
-msgstr ""
+msgstr "%sје ушао у плави тим."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1342
+#: src/network/protocols/client_lobby.cpp:1344
 #, c-format
 msgid "%s joined the game."
-msgstr ""
+msgstr "%sје ушао у игру."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1492
+#: src/network/protocols/client_lobby.cpp:1494
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player or <%s> for the camera "
 "position."
-msgstr ""
+msgstr "Стисните  <%s> или <%s> да промените нишаног играча или <%s> за позицију камере."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1508
+#: src/network/protocols/client_lobby.cpp:1510
 #, c-format
 msgid "Successfully reported %s."
-msgstr ""
+msgstr "успешно пријављење %s."
 
 #: src/network/protocols/connect_to_server.cpp:61
 msgid "No quick play server available."
-msgstr "Нема доступних брзих служитеља."
+msgstr "Нема доступних брзих сервера."
 
 #: src/network/protocols/connect_to_server.cpp:320
 #, c-format
 msgid "Cannot connect to server %s."
-msgstr "Нисам успео да се повежем са служитељем %s."
+msgstr "Неуспешно конектовање на сервер %s."
 
 #: src/network/server_config.cpp:264
 msgid "Time Trial (Grand Prix)"
-msgstr "Трка с’ временом (велика награда)"
+msgstr "Временска Трка (Велика Награда)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -3566,7 +3598,7 @@ msgstr "Трка с’ временом (велика награда)"
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
 msgid "Free-For-All"
-msgstr ""
+msgstr "Сви-За-Себе"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
@@ -3574,45 +3606,45 @@ msgstr ""
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
-msgstr ""
+msgstr "Ухвати Заставу"
 
 #: src/online/online_player_profile.cpp:458
 #, c-format
 msgid "%s is now online."
-msgstr "%s је сада повезан на мрежу."
+msgstr "%s је сада онлајн."
 
 #: src/online/online_player_profile.cpp:462
 #, c-format
 msgid "%s and %s are now online."
-msgstr "%s и %s су сада повезани са мрежом."
+msgstr "%s и %s су сада онлајн."
 
 #: src/online/online_player_profile.cpp:467
 #, c-format
 msgid "%s, %s and %s are now online."
-msgstr "%s, %s и %s су сада повезани са мрежом."
+msgstr "%s, %s и %s су сада онлајн."
 
 #. I18N: Only used for count > 3
 #: src/online/online_player_profile.cpp:473
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
-msgstr[0] "%d пријатељ је на мрежи."
-msgstr[1] "%d пријатеља су на мрежи."
-msgstr[2] "%d пријатеља је на мрежи."
+msgstr[0] "%d пријатељ је сада онлајн."
+msgstr[1] "%d пријатеља су сада онлајн."
+msgstr[2] "%d пријатеља су сада онлајн."
 
 #. I18N: Tell your friend if he is on any server in game
 #: src/online/online_player_profile.cpp:522
 #, c-format
 msgid "%s is now on server \"%s\"."
-msgstr ""
+msgstr "%sје сада на серверу \"%s\"."
 
 #: src/online/online_player_profile.cpp:553
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
-msgstr[0] "Имате %d захтев за пријатељством!"
-msgstr[1] "Имате %d захтева за пријатељством!"
-msgstr[2] "Имате %d захтева за пријатељством!"
+msgstr[0] "Имате %d нови захтев за пријатељство!"
+msgstr[1] "Имате %d нових захтева за пријатељство!"
+msgstr[2] "Имате %d нових захтева за пријатељство!"
 
 #: src/online/online_player_profile.cpp:559
 msgid "You have a new friend request!"
@@ -3622,49 +3654,45 @@ msgstr "Имате нови захтев за пријатељство!"
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
-msgstr "Нисам успео да се повежем са служитељем. Проверите мрежну везу, или покушајте поново касније."
-
-#: src/race/grand_prix_data.cpp:616
-msgid "Random Grand Prix"
-msgstr "Насумична трка за велику награду"
+msgstr "Неуспешно конектовање на сервер. Проверите вашу интернет конекцију или покушајте поново касније."
 
 #: src/race/highscore_manager.cpp:102
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "Датотека са најбољим бодовима је превише стара,\nсви записи најбољих бодовања су избрисани."
+msgstr "Фајл са најбољим временима је превише стар,\nсви најбољи времени су избрисани."
 
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1152
 msgid "Follow the Leader"
-msgstr "Прати вођу"
+msgstr "Прати Вођу"
 
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
-msgstr "Борба на 3 удара"
+msgstr "Борба на 3 Ударца"
 
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1160
 msgid "Egg Hunt"
-msgstr "Лов на јаје"
+msgstr "Лов на Јаја"
 
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
-msgstr "Непотпуна датотека поновљеног снимка се не може чувати."
+msgstr "Непотпун духовни снимак се неће сачувати."
 
 #: src/replay/replay_recorder.cpp:396
 #, c-format
 msgid "Replay saved in \"%s\"."
-msgstr "Снимак за поновно гледање је сачуван у „%s“."
+msgstr "Духовни снимак је сачуван у \"%s\"."
 
 #: src/states_screens/addons_screen.cpp:49
 msgid "1 week"
-msgstr "1 седмица"
+msgstr "1 недеља"
 
 #: src/states_screens/addons_screen.cpp:50
 msgid "2 weeks"
-msgstr "2 седмице"
+msgstr "2 недеље"
 
 #: src/states_screens/addons_screen.cpp:51
 msgid "1 month"
@@ -3696,7 +3724,7 @@ msgstr "Назив додатка"
 
 #: src/states_screens/addons_screen.cpp:108
 msgid "Updated date"
-msgstr "Освежени датум"
+msgstr "Датум ажурирања"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:299
@@ -3707,15 +3735,15 @@ msgstr "%s од %s"
 
 #: src/states_screens/addons_screen.cpp:420
 msgid "Please wait while addons are updated"
-msgstr "Молим сачекајте док се не надограде додаци"
+msgstr "Молимо вас да сачекате док се додаци ажурирају"
 
 #: src/states_screens/addons_screen.cpp:498
-#: src/states_screens/main_menu_screen.cpp:575
+#: src/states_screens/main_menu_screen.cpp:593
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "Извините, дошло је до греше приликом ступања у везу са страницом додатака на мрежи. Проверите да ли сте повезани на Интернет и да ли ду Супертаксова колица спречена ватреним зидом"
+msgstr "Извините, дошло је до греше приликом ступања у везу са страницом додатака. Проверите да ли сте повезани на Интернет и да SuperTuxKart није блокиран од 'firewall'"
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -3724,7 +3752,7 @@ msgstr "Извините, дошло је до греше приликом ст�
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:143
 #: src/states_screens/kart_selection.cpp:292
-#: src/states_screens/tracks_and_gp_screen.cpp:144
+#: src/states_screens/tracks_and_gp_screen.cpp:150
 msgid "standard"
 msgstr "уобичајено"
 
@@ -3736,19 +3764,19 @@ msgstr "уобичајено"
 #: src/states_screens/kart_selection.cpp:1529
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr "Закључано : одрадите садашње изазове да добијете приступ другима!"
+msgstr "Закључано : Победите активне изазове да добијете приступ другима!"
 
 #: src/states_screens/arenas_screen.cpp:338
 msgid "Random Arena"
-msgstr "Насумично борилиште"
+msgstr "Насумична Арена"
 
 #: src/states_screens/arenas_screen.cpp:342
 #, c-format
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
-msgstr[0] "%d борилиште је доступно за самосталну игру."
-msgstr[1] "%d борилишта су доступна за самосталну игру."
-msgstr[2] "%d борилишта је доступно за самосталну игру."
+msgstr[0] "%d арена није доступна за самосталну игру."
+msgstr[1] "%d арена није доступно за самосталну игру."
+msgstr[2] "%d арена није доступно за самосталну игру."
 
 #: src/states_screens/credits.cpp:186
 msgid "translator-credits"
@@ -3757,32 +3785,32 @@ msgstr "Launchpad Contributions:\n  STK-team https://launchpad.net/~stk\n  dboki
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
 msgid "Subgoals"
-msgstr ""
+msgstr "Подциљеви"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:67
 msgctxt "achievement_info"
 msgid "Progress"
-msgstr ""
+msgstr "Напредак"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:162
 msgid "Fulfill all the subgoals"
-msgstr ""
+msgstr "Потпуни сва подциљева"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:164
 msgid "Fulfill all the subgoals at the same time"
-msgstr ""
+msgstr "Потпуни све подциљеве у исто време"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:166
 msgid "Fulfill at least one subgoal"
-msgstr ""
+msgstr "Потпуни барем један подциљ"
 
 #. I18N: For achievements, a parent goal linking logically several subgoals
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:168
 msgid "The sum of the subgoals must reach the indicated value"
-msgstr ""
+msgstr "Збир подциљева мора достићи назначену вредност"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -3790,200 +3818,200 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:276
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:301
 msgid "Races won"
-msgstr ""
+msgstr "Побеђених трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:172
 msgid "Normal races won"
-msgstr ""
+msgstr "Побеђених обичних трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:174
 msgid "Time-trial races won"
-msgstr ""
+msgstr "Побеђених Временских трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:176
 msgid "Follow-the-Leader races won"
-msgstr ""
+msgstr "Побеђених Прати-Вођу трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:178
 msgid "Consecutive won races"
-msgstr ""
+msgstr "Заредом побеђених трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:180
 msgid "Consecutive won races in Expert or SuperTux"
-msgstr ""
+msgstr "Заредом побеђених трка у стручном или у SuperTux-ом"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:182
 msgid "Novice races started"
-msgstr ""
+msgstr "Почнутих Новајлијских трка "
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:184
 msgid "Novice races finished"
-msgstr ""
+msgstr "Завршених Новајлијских трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:186
 msgid "Intermediate races started"
-msgstr ""
+msgstr "Почнутих Осредњих трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:188
 msgid "Intermediate races finished"
-msgstr ""
+msgstr "Завршених Осредњих трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:190
 msgid "Expert races started"
-msgstr ""
+msgstr "Почнутих Стручних трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:192
 msgid "Expert races finished"
-msgstr ""
+msgstr "Завршених Стручних трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:194
 msgid "SuperTux races started"
-msgstr ""
+msgstr "Почнутих SuperTux трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:196
 msgid "SuperTux races finished"
-msgstr ""
+msgstr "Завршених SuperTux трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:198
 msgid "Normal races started"
-msgstr ""
+msgstr "Почнутих Обичних трка "
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:200
 msgid "Normal races finished"
-msgstr ""
+msgstr "Завршених Обичних трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:202
 msgid "Time-trial races started"
-msgstr ""
+msgstr "Почнутих Временских трка "
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:204
 msgid "Time-trial races finished"
-msgstr ""
+msgstr "Завршених Временских трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:206
 msgid "Follow-the-Leader races started"
-msgstr ""
+msgstr "Почнутих Прати-Вођу трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:208
 msgid "Follow-the-Leader races finished"
-msgstr ""
+msgstr "Завршених Прати-Вођу трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:210
 msgid "3 Strikes battles started"
-msgstr ""
+msgstr "Почнутих 3 Ударца рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:212
 msgid "3 Strikes battles finished"
-msgstr ""
+msgstr "Завршених 3 Ударца рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:214
 msgid "Soccer matches started"
-msgstr ""
+msgstr "Почнутих Фудбалских рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:216
 msgid "Soccer matches finished"
-msgstr ""
+msgstr "Завршених Фудбалских рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:218
 msgid "Egg Hunts started"
-msgstr ""
+msgstr "Почнутих Лов на јаја"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:220
 msgid "Egg Hunts finished"
-msgstr ""
+msgstr "Завршених Лов на јаја"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:222
 msgid "Races started with a ghost replay"
-msgstr ""
+msgstr "Почнутих трка са духним снимком"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:224
 msgid "Races finished with a ghost replay"
-msgstr ""
+msgstr "Завршених трка са духним снимком"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
 msgid "Capture-the-Flag matches started"
-msgstr ""
+msgstr "Почнутих Ухвати Заставу рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:228
 msgid "Capture-the-Flag matches finished"
-msgstr ""
+msgstr "Завршених Ухвати Заставу рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:230
 msgid "Free-for-All matches started"
-msgstr ""
+msgstr "Почнутих Сви-за-Све рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:232
 msgid "Free-for-All matches finished"
-msgstr ""
+msgstr "Завршених Сви-за-Све рунди"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:234
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:236
 msgid "Powerups used"
-msgstr ""
+msgstr "Искоришћених појачања"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -3995,21 +4023,21 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:262
 msgid " (1 race)"
-msgstr ""
+msgstr "(1 трка)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:238
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:240
 msgid "Bowling ball hits"
-msgstr ""
+msgstr "Ударца са лоптом за куглање"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:242
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:244
 msgid "Swatter hits"
-msgstr ""
+msgstr "Ударца са мувопичем"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4022,14 +4050,14 @@ msgstr "Сви поготци"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:250
 msgid "Hits against the same kart"
-msgstr ""
+msgstr "Ударца према истом играчу"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:252
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
 msgid "Bananas collected"
-msgstr ""
+msgstr "Ухваћених банана"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4045,14 +4073,14 @@ msgstr "Проклизавање"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
 msgid " (1 lap)"
-msgstr ""
+msgstr "(1 круг)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:272
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:297
 msgid "Races started"
-msgstr "Трке су почеле"
+msgstr "Почнутих трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4067,63 +4095,63 @@ msgstr "Трке су почеле"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:294
 msgid " (maximum on one official track)"
-msgstr ""
+msgstr "(највише на једној званичној стази)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:274
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:299
 msgid "Races finished"
-msgstr "Трке су завршене"
+msgstr "Завршених Трка"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:278
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:303
 msgid "Reverse direction races finished"
-msgstr ""
+msgstr "Завршених Трка у супротном правцу"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:280
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:305
 msgid "Races finished alone"
-msgstr ""
+msgstr "Трка завршених самим"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:282
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:307
 msgid "Races with less than the default lap number"
-msgstr ""
+msgstr "Трка са мање кругова од обичне трке"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:284
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:309
 msgid "Races with more than the default lap number"
-msgstr ""
+msgstr "Трка са више кругова од обичне трке"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:286
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:311
 msgid "Races with at least twice as much as the default lap number"
-msgstr ""
+msgstr "Трка са барем два пута више кругова од обичне трке"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 msgid "Egg hunts started"
-msgstr ""
+msgstr "Почнутих Лов на јаја"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:292
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:317
 msgid "Egg hunts finished"
-msgstr ""
+msgstr "Завршених Лов на јаја"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4138,7 +4166,7 @@ msgstr ""
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:319
 msgid " (official tracks matching the goal)"
-msgstr ""
+msgstr "(званичних стаза уклапање циља)"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -4150,83 +4178,83 @@ msgstr "Да бисте додали нови гејмпед/џојстик ур
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:87
 msgid "Add Wiimote"
-msgstr "Додај даљински управљач конзоле Ви"
+msgstr "Додај Wiimote"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:108
 msgid "Add Keyboard Configuration"
-msgstr "Додај подешавање тастатуре"
+msgstr "Додај Подешавање Тастатуре"
 
-#: src/states_screens/dialogs/addons_loading.cpp:105
+#: src/states_screens/dialogs/addons_loading.cpp:107
 msgid "Update"
-msgstr "Освежи"
+msgstr "Ажурирај"
 
-#: src/states_screens/dialogs/addons_loading.cpp:117
+#: src/states_screens/dialogs/addons_loading.cpp:119
 #, c-format
 msgid "Version: %d"
-msgstr "Издање: %d"
+msgstr "Верзија: %d"
 
-#: src/states_screens/dialogs/addons_loading.cpp:148
+#: src/states_screens/dialogs/addons_loading.cpp:150
 msgid "featured"
-msgstr "нова својства"
+msgstr "изабран"
 
-#: src/states_screens/dialogs/addons_loading.cpp:174
+#: src/states_screens/dialogs/addons_loading.cpp:176
 #: src/states_screens/dialogs/download_assets.cpp:106
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/states_screens/dialogs/addons_loading.cpp:181
-#: src/states_screens/dialogs/addons_loading.cpp:185
+#: src/states_screens/dialogs/addons_loading.cpp:183
+#: src/states_screens/dialogs/addons_loading.cpp:187
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
 
 #. I18N: File size of game assets or addons downloading
-#: src/states_screens/dialogs/addons_loading.cpp:186
+#: src/states_screens/dialogs/addons_loading.cpp:188
 #: src/states_screens/dialogs/download_assets.cpp:108
 #, c-format
 msgid "Size: %s"
 msgstr "Величина: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:294
+#: src/states_screens/dialogs/addons_loading.cpp:296
 #: src/states_screens/dialogs/download_assets.cpp:182
 msgid "Sorry, downloading the add-on failed"
-msgstr "Жао ми је, преузимање додатака није успело"
+msgstr "Извините, преузимање додатака је неуспешно"
 
-#: src/states_screens/dialogs/addons_loading.cpp:378
+#: src/states_screens/dialogs/addons_loading.cpp:380
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr "Потешкоћа приликом уградње додатка „%s“."
+msgstr "Проблеми са преузимања додатка '%s' ."
 
-#: src/states_screens/dialogs/addons_loading.cpp:389
-#: src/states_screens/dialogs/addons_loading.cpp:428
+#: src/states_screens/dialogs/addons_loading.cpp:391
+#: src/states_screens/dialogs/addons_loading.cpp:435
 #: src/states_screens/dialogs/download_assets.cpp:255
 msgid "Try again"
 msgstr "Покушајте поново"
 
-#: src/states_screens/dialogs/addons_loading.cpp:417
+#: src/states_screens/dialogs/addons_loading.cpp:424
 #, c-format
 msgid "Problems removing the addon '%s'."
-msgstr "Потешкоћа приликом уклањања додатка „%s“."
+msgstr "Проблеми са уклањањем додатка '%s'."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:135
 msgid "Current password invalid."
-msgstr "Тренутна лозинка није исправна."
+msgstr "Тренутна шифра је неисправна."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
 #: src/states_screens/online/register_screen.cpp:319
 msgid "Password has to be between 8 and 30 characters long!"
-msgstr "Лозинка мора да има између 8 и 30 знакова!"
+msgstr "Шифра мора да има између 8 и 30 карактера!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
 #: src/states_screens/online/register_screen.cpp:303
 msgid "Passwords don't match!"
-msgstr "Лозинке се не поклапају!"
+msgstr "Шифре се не поклапају!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:211
 msgid "Password successfully changed."
-msgstr "Лозинка је успешно промењена."
+msgstr "Шифра је успешно промењена."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:210
@@ -4240,15 +4268,15 @@ msgstr "Подаци о исправности"
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
-msgstr[0] "Потврди размеру у наредној %i секунди"
-msgstr[1] "Потврди размеру у наредне %i секунде"
-msgstr[2] "Потврди размеру у наредних %i секунди"
+msgstr[0] "Потврди резолуцију у наредној %i секунди"
+msgstr[1] "Потврди резолуцију у наредне %i секунде"
+msgstr[2] "Потврди резолуцију у наредних %i секунди"
 
 #: src/states_screens/dialogs/confirm_resolution_dialog.cpp:92
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
-msgstr ""
+msgstr "Резолуције мање од 1024x768 или 1280x720 нису подржани. Неки делови UI можда неће нормално радити."
 
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
@@ -4261,7 +4289,7 @@ msgstr ""
 #: src/states_screens/options/options_screen_video.cpp:531
 #: src/states_screens/options/options_screen_video.cpp:602
 msgid "Disabled"
-msgstr "Онемогућен"
+msgstr "Искључен"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
@@ -4277,7 +4305,7 @@ msgstr "Само битни"
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
 #: src/states_screens/options/options_screen_video.cpp:540
 msgid "Low"
-msgstr "Ниска"
+msgstr "Ниско"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
@@ -4287,14 +4315,14 @@ msgstr "Ниска"
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
 #: src/states_screens/options/options_screen_video.cpp:543
 msgid "High"
-msgstr "Висока"
+msgstr "Високо"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
 #: src/states_screens/options/options_screen_video.cpp:537
 msgid "Very Low"
-msgstr "Врло ниска"
+msgstr "Веома ниско"
 
 #. I18N: In download assets dialog
 #: src/states_screens/dialogs/download_assets.cpp:112
@@ -4302,7 +4330,7 @@ msgid ""
 "SuperTuxKart will download full assets (including all tracks, high quality "
 "textures and music) for better gaming experience, this will use your mobile "
 "data if you don't have a wifi connection."
-msgstr ""
+msgstr "SuperTuxKart ће инсталирати цело игрино средство (Укључујући све стазе, квалитетне текстуре и мусику) за бољег искуства, ово ће искористити мобилне податке ако немате интернет конекцију."
 
 #. I18N: Shown when there is download error for assets download
 #. in the first run
@@ -4310,50 +4338,50 @@ msgstr ""
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
-msgstr ""
+msgstr "Неуспешно скидање средства, провери ваше место или интернет конекцију и покушајте поново."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
 msgctxt "column_name"
 msgid "Reverse"
-msgstr ""
+msgstr "Уназад"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
 #: src/states_screens/online/server_selection.cpp:119
 msgctxt "column_name"
 msgid "Difficulty"
-msgstr ""
+msgstr "Тежина"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
 msgctxt "column_name"
 msgid "Laps"
-msgstr ""
+msgstr "Кругова"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
 #: src/states_screens/ghost_replay_selection.cpp:160
 msgctxt "column_name"
 msgid "Time"
-msgstr ""
+msgstr "Време"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
 #: src/states_screens/ghost_replay_selection.cpp:161
 msgctxt "column_name"
 msgid "Kart"
-msgstr ""
+msgstr "Возило"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
 #: src/states_screens/ghost_replay_selection.cpp:162
 msgctxt "column_name"
 msgid "User"
-msgstr ""
+msgstr "Корисник"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:158
 #: src/states_screens/ghost_replay_selection.cpp:166
 msgctxt "column_name"
 msgid "Version"
-msgstr ""
+msgstr "Верзија"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
 #: src/states_screens/dialogs/message_dialog.cpp:131
@@ -4365,56 +4393,56 @@ msgstr "Не"
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:46
 msgid "Use original color"
-msgstr ""
+msgstr "Користи оригиналну боју"
 
 #. I18N: In kart color choosing dialog
 #: src/states_screens/dialogs/kart_color_slider_dialog.cpp:48
 msgid "Pick a color from slider"
-msgstr ""
+msgstr "Узми боју са клизача"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:48
 msgid "Player info"
-msgstr ""
+msgstr "Информације о играчу"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:53
 #, c-format
 msgid "Player name: %s"
-msgstr ""
+msgstr "Име играча: %s"
 
 #. I18N: In the network player dialog, show the player location with
 #. country name (based on IP geolocation)
 #: src/states_screens/dialogs/network_player_dialog.cpp:62
 #, c-format
 msgid "Player location: %s"
-msgstr ""
+msgstr "Локација играча: %s"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:105
 msgid "Kick"
-msgstr "Протерај"
+msgstr "Избаци"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:121
 msgid "Change team"
-msgstr ""
+msgstr "Промени тим"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:136
 msgid "Enable handicap"
-msgstr ""
+msgstr "Укључи хендикеп"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:141
 msgid "Disable handicap"
-msgstr ""
+msgstr "Искључи хендикеп"
 
 #. I18N: In the network player dialog,
 #. report player about for example abusive behaviour in game
 #: src/states_screens/dialogs/network_player_dialog.cpp:156
 msgid "Report player"
-msgstr ""
+msgstr "Пријави играча"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
@@ -4422,38 +4450,38 @@ msgstr ""
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:140
 #, c-format
 msgid "Fetching ranking info for %s"
-msgstr ""
+msgstr "Тражење ранкираног инфо-а за %s"
 
 #. I18N: In the network player dialog, instruction for reporting player
 #: src/states_screens/dialogs/network_player_dialog.cpp:186
 #, c-format
 msgid "Tell server administrator about this player (%s):"
-msgstr ""
+msgstr "Реци сервер администратору о овом играчу (%s):"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:40
 msgid "Press any key..."
-msgstr ""
+msgstr "Стисните било који тастер..."
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:103
+#: src/states_screens/dialogs/race_paused_dialog.cpp:107
 #: src/states_screens/online/networking_lobby.cpp:234
 #: src/states_screens/online/networking_lobby.cpp:781
 msgid "Chat is disabled, enable in options menu."
-msgstr ""
+msgstr "Допициање је искључено, укључи их у опцијама."
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
 #: src/states_screens/dialogs/ranking_callback.hpp:60
 #, c-format
 msgid "%s has no ranking yet."
-msgstr "%s још увек нема бодове."
+msgstr "%s тренутно нема ранк."
 
 #. I18N: In the network player dialog show rank and
 #. score of a player
 #: src/states_screens/dialogs/ranking_callback.hpp:71
 #, c-format
 msgid "%s is number %d in the rankings with a score of %f."
-msgstr ""
+msgstr "%s је на ранку %d са %f поена."
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:122
 msgid "Username and/or email address invalid."
@@ -4471,17 +4499,17 @@ msgstr ""
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:60
 msgid "Nitro challenge"
-msgstr "Изазов нитром"
+msgstr "Изазов нитро-а"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:65
 #: src/states_screens/race_setup_screen.cpp:136
 msgid "Ghost replay race"
-msgstr "Поновљени снимак трке са духом"
+msgstr "Трка са духовним снимком"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1745
+#: src/states_screens/race_result_gui.cpp:1765
 #, c-format
 msgid "Laps: %i"
 msgstr "Кругова: %i"
@@ -4490,42 +4518,42 @@ msgstr "Кругова: %i"
 #: src/states_screens/dialogs/select_challenge.cpp:82
 #, c-format
 msgid "Type: %s"
-msgstr ""
+msgstr "Врста:  %s"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:90
 #, c-format
 msgid "Required Rank: %i"
-msgstr "Захтевано место: %i"
+msgstr "Тражено место: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:96
 #, c-format
 msgid "Required Time: %i"
-msgstr "Захтевано време : %i"
+msgstr "Тражено време : %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:103
 #, c-format
 msgid "Required Nitro Points: %i"
-msgstr "Захтевани бодови нитра: %i"
+msgstr "Тражени бодови нитро-а: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:109
 #, c-format
 msgid "Number of AI Karts: %i"
-msgstr "Број нељудских колица: %i"
+msgstr "Број роботских играча: %i"
 
 #. I18N: In the create server screen, show various battle mode available
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:157
 #: src/states_screens/online/create_server_screen.cpp:206
 msgid "Battle mode"
-msgstr ""
+msgstr "Нападајући мод"
 
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:170
 #: src/states_screens/online/create_server_screen.cpp:222
-#: src/states_screens/track_info_screen.cpp:356
+#: src/states_screens/track_info_screen.cpp:359
 msgid "Soccer game type"
 msgstr "Врста ногометне игре"
 
@@ -4534,17 +4562,17 @@ msgstr "Врста ногометне игре"
 #: src/states_screens/dialogs/server_info_dialog.cpp:96
 #, c-format
 msgid "Server location: %s"
-msgstr ""
+msgstr "Локација Сервера: %s"
 
 #. I18N: In server info dialog, showing the current track playing in server
 #: src/states_screens/dialogs/server_info_dialog.cpp:105
 #, c-format
 msgid "Current track: %s"
-msgstr ""
+msgstr "Тренутна стаза: %s"
 
 #: src/states_screens/dialogs/server_info_dialog.cpp:115
 msgid "Rank"
-msgstr "Положај"
+msgstr "Бодови"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
@@ -4556,7 +4584,7 @@ msgstr "Играч"
 #. the scores of user calculated by player rankings
 #: src/states_screens/dialogs/server_info_dialog.cpp:121
 msgid "Scores"
-msgstr ""
+msgstr "Резултати"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
@@ -4577,11 +4605,11 @@ msgstr "Нема доступних играча за повезивање са 
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
 #, c-format
 msgid "Username: %s"
-msgstr ""
+msgstr "Корисничко име: %s"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:60
 msgid "Cancel Request"
-msgstr "Откажи захтев"
+msgstr "Откажи Захтев"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:160
 #: src/states_screens/dialogs/user_info_dialog.cpp:217
@@ -4606,15 +4634,15 @@ msgstr "Уклоњен је пријатељ!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:370
 msgid "Friend request cancelled!"
-msgstr "Отказана је потврда захтева за пријатељство!"
+msgstr "Захтев за пријатељство је отказано!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:480
 msgid "Processing"
-msgstr "Обрађујем"
+msgstr "Обрађивање"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:173
 msgid "Fetching last vote"
-msgstr "Добављање података о последњем гласању"
+msgstr "Тражење последњог гласа"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:192
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -4635,21 +4663,21 @@ msgid "Performing vote"
 msgstr "Гласање"
 
 #: src/states_screens/easter_egg_screen.cpp:270
-#: src/states_screens/online/tracks_screen.cpp:601
-#: src/states_screens/tracks_and_gp_screen.cpp:290
+#: src/states_screens/online/tracks_screen.cpp:606
+#: src/states_screens/tracks_and_gp_screen.cpp:287
 msgid "Random Track"
 msgstr "Насумична стаза"
 
 #: src/states_screens/edit_gp_screen.cpp:117
 #: src/states_screens/ghost_replay_selection.cpp:507
-#: src/states_screens/grand_prix_editor_screen.cpp:110
+#: src/states_screens/grand_prix_editor_screen.cpp:111
 #, c-format
 msgid "Are you sure you want to remove '%s'?"
-msgstr "Да ли сигурно желите да уклоните „%s“?"
+msgstr "Да ли сте сигурни да желите да уклоните '%s'?"
 
 #: src/states_screens/edit_gp_screen.cpp:134
 msgid "Do you want to save your changes?"
-msgstr "Да ли желите да сачувате измене поставки?"
+msgstr "Да ли желите да сачувате ваше промене?"
 
 #: src/states_screens/edit_gp_screen.cpp:151
 msgid "Track"
@@ -4671,7 +4699,7 @@ msgstr "%s (+)"
 
 #: src/states_screens/edit_gp_screen.cpp:330
 msgid "An error occurred while trying to save your grand prix."
-msgstr "Десила се грешка приликом покушаја чувања велике награде."
+msgstr "Десила се грешка приликом покушаја сачувања велике награде."
 
 #: src/states_screens/edit_track_screen.cpp:234
 msgid "Select a track"
@@ -4680,25 +4708,25 @@ msgstr "Изаберите стазу"
 #: src/states_screens/feature_unlocked.cpp:249
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
-msgstr "Испунили сте лак изазов! Бодови зарађени на овом ступњу: %i/%i"
+msgstr "Завршили сте новајлијски изазов! Бодова зарађених на овом нивоу:  %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:255
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
-msgstr "Завршили сте међуизазов! На овом ступњу сте зарадили бодове: %i/%i"
+msgstr "Завршили сте осредњи изазов! Бодова зарађених на овом нивоу: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:261
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
-msgstr "Испунили сте тежак изазов изазов! Бодови зарађени на овом ступњу: %i/%i"
+msgstr "Завршили сте стручни изазов! Бодова зарађених на овом нивоу:%i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:267
 #, c-format
 msgid ""
 "You completed the SuperTux challenge! Points earned on this level: %i/%i"
-msgstr "Испунили сте изазов Супер Такса! Бодови зарађени на овом нивоу: %i/%i"
+msgstr " Завршили сте SuperTux изазов! Бодова зарађених на овом нивоу: %i/%i"
 
 #: src/states_screens/feature_unlocked.cpp:310
 #, c-format
@@ -4707,7 +4735,7 @@ msgstr "Откључали сте %s!"
 
 #: src/states_screens/feature_unlocked.cpp:629
 msgid "Challenge Completed"
-msgstr "Изазов је испуњен"
+msgstr "Завршен Изазов"
 
 #: src/states_screens/feature_unlocked.cpp:668
 msgid "You unlocked track %0"
@@ -4720,13 +4748,13 @@ msgstr "Откључали сте велику награду %0"
 #: src/states_screens/ghost_replay_selection.cpp:153
 msgctxt "column_name"
 msgid "Track"
-msgstr ""
+msgstr "Стаза"
 
 #: src/states_screens/ghost_replay_selection.cpp:164
 #: src/states_screens/online/server_selection.cpp:118
 msgctxt "column_name"
 msgid "Players"
-msgstr ""
+msgstr "Играчи"
 
 #: src/states_screens/gp_info_screen.cpp:72
 msgid "Default"
@@ -4740,36 +4768,36 @@ msgstr "Ништа"
 msgid "Random"
 msgstr "Насумично"
 
-#: src/states_screens/gp_info_screen.cpp:152
-#: src/states_screens/gp_info_screen.cpp:177
+#: src/states_screens/gp_info_screen.cpp:153
+#: src/states_screens/gp_info_screen.cpp:179
 msgid "Reload"
-msgstr "Поново учитај"
+msgstr "Освежи"
 
 #: src/states_screens/grand_prix_cutscene.cpp:77
-#: src/states_screens/grand_prix_editor_screen.cpp:99
-#: src/states_screens/grand_prix_editor_screen.cpp:116
+#: src/states_screens/grand_prix_editor_screen.cpp:100
+#: src/states_screens/grand_prix_editor_screen.cpp:117
 msgid "Please enter the name of the grand prix"
-msgstr "Молим, унесите име трке за велику награду"
+msgstr "Молимо вас да унесете име велике награде"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:167
+#: src/states_screens/grand_prix_editor_screen.cpp:168
 msgid "Please select a Grand Prix"
-msgstr "Молим, изаберите трку за велику награду"
+msgstr "Молимо вас да изаберете Велику Награду"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:335
+#: src/states_screens/grand_prix_editor_screen.cpp:336
 msgid "User defined"
 msgstr "Кориснички одређено"
 
-#: src/states_screens/grand_prix_editor_screen.cpp:348
+#: src/states_screens/grand_prix_editor_screen.cpp:349
 msgid "Name is empty."
-msgstr "Нема имена."
+msgstr "Име је празно."
 
-#: src/states_screens/grand_prix_editor_screen.cpp:356
+#: src/states_screens/grand_prix_editor_screen.cpp:357
 msgid "Another grand prix with this name already exists."
-msgstr "Трка за велику награду са таквим именом већ постоји."
+msgstr "Још једна Велика Награда са овим именом већ постоји."
 
-#: src/states_screens/grand_prix_editor_screen.cpp:362
+#: src/states_screens/grand_prix_editor_screen.cpp:363
 msgid "Name is too long."
-msgstr "Име је предугачко."
+msgstr "Име је превише дуго."
 
 #. I18N: when failing a GP
 #: src/states_screens/grand_prix_lose.cpp:156
@@ -4777,22 +4805,22 @@ msgid "Better luck next time!"
 msgstr "Више среће следећи пут!"
 
 #: src/states_screens/grand_prix_win.cpp:165
-#: src/states_screens/race_result_gui.cpp:195
+#: src/states_screens/race_result_gui.cpp:198
 msgid "You completed a challenge!"
-msgstr "Испунили сте изазов!"
+msgstr "Завршили сте изазов!"
 
 #: src/states_screens/grand_prix_win.cpp:321
 msgid "You won the Grand Prix!"
-msgstr "Освојили сте велику награду!"
+msgstr "Освојили сте Велику Награду!"
 
 #: src/states_screens/grand_prix_win.cpp:322
 msgid "You completed the Grand Prix!"
-msgstr "Завршили сте велику трку!"
+msgstr "Завршили сте Велику Трку!"
 
 #: src/states_screens/kart_selection.cpp:869
 #: src/states_screens/kart_selection.cpp:1547
 msgid "Random Kart"
-msgstr "Насумични колица"
+msgstr "Насумично Возило"
 
 #: src/states_screens/kart_selection.cpp:888
 msgid "Locked"
@@ -4803,43 +4831,43 @@ msgstr "Закључано"
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
-msgstr "Сви:\nПритисните „Одабери“ сада ради прикључења игри"
+msgstr "Сви:\nПритисните „Изабери“ дугме да уђете у игру"
 
-#: src/states_screens/main_menu_screen.cpp:512
+#: src/states_screens/main_menu_screen.cpp:530
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
-msgstr ""
+msgstr "Неможете играти онлајн без приступа интернету. Ако желите да играте онлајн, идите у опције, и укључите \"Повежи се на Интернет\"."
 
-#: src/states_screens/main_menu_screen.cpp:527
+#: src/states_screens/main_menu_screen.cpp:545
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
-msgstr ""
+msgstr "Неможете преузети додатке без приступа интернету. Ако желите да преузмете додатке, идите у опције, и укључите \"Повежи се на Интернет\"."
 
-#: src/states_screens/main_menu_screen.cpp:535
+#: src/states_screens/main_menu_screen.cpp:553
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr ""
+msgstr "Неможете преузети додатке без приступа интернету. Ако желите да преузмете додатке, идите у опције, и укључите \"Повежи се на Интернет\".\n\nМеђутим ви можете обрисати већ преузмете додатке."
 
-#: src/states_screens/main_menu_screen.cpp:570
+#: src/states_screens/main_menu_screen.cpp:588
 msgid "The add-ons module is currently disabled in the Options screen"
-msgstr "Јединица додатака је тренутно искључена на заклону могућности"
+msgstr "Јединица додатака је тренутно искључена у Опцијама"
 
-#: src/states_screens/main_menu_screen.cpp:582
+#: src/states_screens/main_menu_screen.cpp:600
 msgid "Please wait while the add-ons are loading"
-msgstr "Молим сачекајте док се не учитају додаци"
+msgstr "Молимо вас да сачекате док се учитају додаци"
 
 #: src/states_screens/online/create_server_screen.cpp:93
 msgid "Create LAN Server"
-msgstr "Створи месног служитеља"
+msgstr "Направи LAN Сервер"
 
 #: src/states_screens/online/create_server_screen.cpp:98
 #, c-format
 msgid "%s's server"
-msgstr "%s-ов служитељ"
+msgstr "%s-ов сервер"
 
 #. I18N: In the create server screen
 #: src/states_screens/online/create_server_screen.cpp:188
@@ -4852,7 +4880,7 @@ msgstr "Име мора да има између 4 и 30 знакова!"
 
 #: src/states_screens/online/create_server_screen.cpp:288
 msgid "Incorrect characters in password!"
-msgstr "Неодговарајући знаци у лозинки!"
+msgstr "Нетачн знакови у шифри!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
@@ -4864,7 +4892,7 @@ msgstr "Спремни"
 #. to join the current started in-progress game
 #: src/states_screens/online/networking_lobby.cpp:183
 msgid "Live join"
-msgstr "Прикључивање уживо"
+msgstr "Уђи уживо"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
@@ -4875,7 +4903,7 @@ msgstr "Посматрај"
 #: src/states_screens/online/networking_lobby.cpp:326
 #, c-format
 msgid "Lobby (ping: %dms)"
-msgstr "Предворје (одзив: %dms)"
+msgstr "Хол (одзив: %dms)"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
@@ -4884,42 +4912,42 @@ msgstr "Предворје (одзив: %dms)"
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
-msgstr ""
+msgstr "Молимо вас да чекате да се тренутна игра (%s) заврши, прорачуно време до краја: %s."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
 #: src/states_screens/online/networking_lobby.cpp:369
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
-msgstr ""
+msgstr "Молимо вас да чекате да се тренутна игра заврши, прорачуно време до краја: %s."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
 #: src/states_screens/online/networking_lobby.cpp:381
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
-msgstr ""
+msgstr "Молимо вас да чекате да се тренутна игра (%s) заврши, прорачун напредак: %s%."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
 #: src/states_screens/online/networking_lobby.cpp:390
 msgid "Please wait for the current game's end, estimated progress: %d%."
-msgstr ""
+msgstr "Молимо вас да чекате да се тренутна игра заврши, прорачун напредак: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
 #: src/states_screens/online/networking_lobby.cpp:398
 msgid "Please wait for the current game's end."
-msgstr ""
+msgstr "Молимо вас да чекате да се тренутна игра заврши."
 
 #: src/states_screens/online/networking_lobby.cpp:450
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Игра ће почети ако је ту више од %d играча."
+msgstr[1] "Игра ће почети ако су ту више од %d играча."
+msgstr[2] "Игра ће почети ако су ту више од %d играча."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
@@ -4929,22 +4957,22 @@ msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
 msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Почиње игра после %d секунде, осим ако су сви стиснули 'Спремни' дугме."
+msgstr[1] "Почиње игра после %d секунде, осим ако су сви стиснули 'Спремни' дугме."
+msgstr[2] "Почиње игра после %d секунди, осим ако су сви стиснули 'Спремни' дугме."
 
 #: src/states_screens/online/networking_lobby.cpp:501
 #, c-format
 msgid "Connecting to server %s"
-msgstr "Повезивање са служитељем %s"
+msgstr "Повезивање са сервером %s"
 
 #: src/states_screens/online/networking_lobby.cpp:506
 msgid "Finding a quick play server"
-msgstr "Тражим служитеља брзог играња"
+msgstr "Тражење брзог сервера"
 
 #. I18N: In kart screen, show before the voting period in network ends.
 #: src/states_screens/online/network_kart_selection.cpp:188
-#: src/states_screens/online/tracks_screen.cpp:857
+#: src/states_screens/online/tracks_screen.cpp:862
 #, c-format
 msgid "Remaining time: %d"
 msgstr "Преостало време: %d"
@@ -4952,17 +4980,17 @@ msgstr "Преостало време: %d"
 #. I18N: Goals in achievement
 #: src/states_screens/online/online_profile_achievements.cpp:82
 msgid "Goals"
-msgstr ""
+msgstr "Циљеви"
 
 #: src/states_screens/online/online_profile_achievements.cpp:115
 #: src/states_screens/online/online_profile_achievements.cpp:314
 msgid "Fetching achievements"
-msgstr "Добављање података о достигнућима"
+msgstr "Тражење достигнућа"
 
 #: src/states_screens/online/online_profile_base.cpp:117
 #, c-format
 msgid "%s's profile"
-msgstr "%s-ов пресек личних података"
+msgstr "%s-ов профил"
 
 #: src/states_screens/online/online_profile_friends.cpp:75
 msgid "Since"
@@ -4975,11 +5003,11 @@ msgstr "Стање"
 #: src/states_screens/online/online_profile_friends.cpp:94
 #: src/states_screens/online/online_profile_friends.cpp:274
 msgid "Fetching friends"
-msgstr "Добављање података о пријатељима"
+msgstr "Тражење пријатеља"
 
 #: src/states_screens/online/online_profile_friends.cpp:236
 msgid "New Request"
-msgstr "Нови захтев"
+msgstr "Нови Захтев"
 
 #: src/states_screens/online/online_profile_friends.cpp:237
 msgid "Pending"
@@ -4987,13 +5015,13 @@ msgstr "На чекању"
 
 #: src/states_screens/online/online_profile_friends.cpp:241
 msgid "Offline"
-msgstr "Ван мреже"
+msgstr "Офлајн"
 
 #. I18N: Shown to players when he is not is not logged in
 #: src/states_screens/online/online_screen.cpp:200
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
-msgstr ""
+msgstr "Морате бити пријављени да играте у Глобалној мрежи. Кликните ваше корисничко име горе."
 
 #: src/states_screens/online/online_screen.cpp:210
 msgid ""
@@ -5005,37 +5033,37 @@ msgstr "Не можете да играте на мрежи без присту�
 #: src/states_screens/online/online_screen.cpp:238
 msgid ""
 "Enter the server address with IP optionally followed by : and then port."
-msgstr ""
+msgstr "Унесите адресу сервера са IP по потреби праћено са : и онда порт."
 
 #: src/states_screens/online/online_screen.cpp:249
 #, c-format
 msgid "Invalid server address: %s."
-msgstr "Неисправна адреса служитеља: %s."
+msgstr "Неисправна адреса сервера: %s."
 
 #. I18N: In enter server ip address dialog
 #: src/states_screens/online/online_screen.cpp:274
 msgid "Failed to detect port number."
-msgstr ""
+msgstr "Неуспешно откривање број порта."
 
 #: src/states_screens/online/online_user_search.cpp:211
 #: src/states_screens/online/online_user_search.cpp:275
 msgid "Searching"
-msgstr "Претражујем"
+msgstr "Претраживање"
 
 #: src/states_screens/online/register_screen.cpp:128
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
-msgstr "Напусти игру"
+msgstr "Изађи са игре"
 
 #: src/states_screens/online/register_screen.cpp:241
 #: src/states_screens/online/register_screen.cpp:248
 #, c-format
 msgid "Could not create player '%s'."
-msgstr "Нисам успео да створим играча „%s“."
+msgstr "Неуспешно прављење играча '%s'."
 
 #: src/states_screens/online/register_screen.cpp:265
 msgid "User name cannot be empty."
-msgstr ""
+msgstr "Корисничко име неможе бити празно."
 
 #: src/states_screens/online/register_screen.cpp:307
 msgid "Emails don't match!"
@@ -5043,11 +5071,11 @@ msgstr "Е-пошта се не поклапа!"
 
 #: src/states_screens/online/register_screen.cpp:311
 msgid "Online username has to be between 3 and 30 characters long!"
-msgstr "Име играча за мрежну игру мора да има између 3 и 30 знакова!"
+msgstr "Корисничко име мора да има између 3 и 30 знакова!"
 
 #: src/states_screens/online/register_screen.cpp:315
 msgid "Online username must not start with a number!"
-msgstr "Име играча за мрежну игру не сме да почиње бројем!"
+msgstr "Корисничко име не сме да се почиње са бројем!"
 
 #: src/states_screens/online/register_screen.cpp:323
 msgid "Email has to be between 5 and 254 characters long!"
@@ -5061,50 +5089,50 @@ msgstr "Е-пошта није исправна!"
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
-msgstr "Добићете поруку е-поште са даљим упутствима у вези покретања налога. Молим, будите стрпљиви и проверите сандуче непожељених порука."
+msgstr "Добићете поруку е-поште са даљим упутствима у вези активирања налога. Молимо вас да будете стрпљиви и да проверите вашу нежељену пошту."
 
 #: src/states_screens/online/register_screen.cpp:432
 msgid "Internet access is disabled, please enable it in the options"
-msgstr "Приступ интернету је онемогућен, молим, укључите га у могућностима"
+msgstr "Приступ интернету је искључен, молимо вас да га укључите у опцијама"
 
 #: src/states_screens/online/server_selection.cpp:116
 msgctxt "column_name"
 msgid "Name"
-msgstr ""
+msgstr "Име"
 
 #: src/states_screens/online/server_selection.cpp:117
 msgctxt "column_name"
 msgid "Game mode"
-msgstr ""
+msgstr "Начин Игре"
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
 #: src/states_screens/online/server_selection.cpp:124
 msgctxt "column_name"
 msgid "Owner"
-msgstr ""
+msgstr "Власник"
 
 #. I18N: In server selection screen, distance to server
 #: src/states_screens/online/server_selection.cpp:126
 msgctxt "column_name"
 msgid "Distance (km)"
-msgstr ""
+msgstr "Даљина (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:255
+#: src/states_screens/online/server_selection.cpp:263
 msgid "Unknown"
 msgstr "Непознато"
 
-#: src/states_screens/online/server_selection.cpp:374
+#: src/states_screens/online/server_selection.cpp:382
 msgid "No server is available."
 msgstr "Нема доступних служитеља."
 
-#: src/states_screens/online/server_selection.cpp:382
+#: src/states_screens/online/server_selection.cpp:390
 msgid "Fetching servers"
-msgstr "Добављање података о служитељима"
+msgstr "Тражење сервера"
 
 #. I18N: In track screen for networking, clarify voting phase
-#: src/states_screens/online/tracks_screen.cpp:312
+#: src/states_screens/online/tracks_screen.cpp:317
 msgid ""
 "If a majority of players all select the same track and race settings, voting"
 " will end early."
@@ -5112,33 +5140,33 @@ msgstr "Ако већина играча изабере исту стазу и �
 
 #. I18N: In track screen
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:444
-#: src/states_screens/online/tracks_screen.cpp:492
+#: src/states_screens/online/tracks_screen.cpp:449
+#: src/states_screens/online/tracks_screen.cpp:497
 #: src/states_screens/track_info_screen.cpp:299
 msgid "Random item location"
 msgstr "Положај насумичних ставки"
 
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:474
-#: src/states_screens/track_info_screen.cpp:440
+#: src/states_screens/online/tracks_screen.cpp:479
+#: src/states_screens/track_info_screen.cpp:443
 msgid "Number of goals to win"
 msgstr "Циљни број погодака"
 
 #. I18N: In track screen
-#: src/states_screens/online/tracks_screen.cpp:482
+#: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:435
+#: src/states_screens/track_info_screen.cpp:438
 msgid "Maximum time (min.)"
 msgstr "Најмање време (мин.)"
 
 #. I18N: In the track info screen
-#: src/states_screens/online/tracks_screen.cpp:522
+#: src/states_screens/online/tracks_screen.cpp:527
 #: src/states_screens/track_info_screen.cpp:294
 msgid "Drive in reverse"
 msgstr "Вози уназад"
 
-#: src/states_screens/online/tracks_screen.cpp:587
-#: src/states_screens/tracks_and_gp_screen.cpp:276
+#: src/states_screens/online/tracks_screen.cpp:592
+#: src/states_screens/tracks_and_gp_screen.cpp:273
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Закључано : одрадите садашње изазове да добијете приступ осталим изазовима!"
 
@@ -5166,7 +5194,7 @@ msgstr "Омогући уређај"
 #: src/states_screens/options/options_screen_device.cpp:123
 #: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enable Configuration"
-msgstr ""
+msgstr "Укључи конфигурацију"
 
 #. I18N: Key binding section
 #: src/states_screens/options/options_screen_device.cpp:173
@@ -5196,7 +5224,7 @@ msgstr "Убрзај"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:272
 msgid "Brake / Reverse"
-msgstr ""
+msgstr "Кочи / Уназад"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:275
@@ -5275,26 +5303,26 @@ msgstr "Да ли сте сигурни да желите трајно избр�
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:113
+#: src/states_screens/options/options_screen_general.cpp:98
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
 msgstr ""
 
 #. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:123
+#: src/states_screens/options/options_screen_general.cpp:108
 msgid "Uninstall full game assets"
-msgstr ""
+msgstr "Отарасите се цело игрино средство"
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
-#: src/states_screens/options/options_screen_general.cpp:129
+#: src/states_screens/options/options_screen_general.cpp:114
 msgid "Install full game assets"
-msgstr ""
+msgstr "Инсталирајте цело игрино средство"
 
-#: src/states_screens/options/options_screen_general.cpp:264
+#: src/states_screens/options/options_screen_general.cpp:232
 msgid "Are you sure to uninstall full game assets?"
-msgstr ""
+msgstr "Да ли сте сигурни да желите да се отарасите целог игриног средства?"
 
 #: src/states_screens/options/options_screen_input.cpp:104
 msgid "Gamepad"
@@ -5315,59 +5343,68 @@ msgid "System Language"
 msgstr "Језик склопа"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:136
-msgid "In the bottom-left"
-msgstr ""
-
-#. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:138
-msgid "On the right side"
-msgstr ""
+msgid "In the bottom-left"
+msgstr "У доњем-левој"
 
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:140
+msgid "On the right side"
+msgstr "На десној страни"
+
+#. I18N: In the UI options, minimap position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:142
 msgid "Hidden"
 msgstr "Скривено"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:142
+#: src/states_screens/options/options_screen_ui.cpp:144
 msgid "Centered"
-msgstr ""
+msgstr "У средини"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:161
+#: src/states_screens/options/options_screen_ui.cpp:163
 msgid "Very small"
-msgstr ""
+msgstr "Веома мало"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:163
+#: src/states_screens/options/options_screen_ui.cpp:165
 msgid "Small"
-msgstr ""
+msgstr "Мало"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:165
+#: src/states_screens/options/options_screen_ui.cpp:167
 msgid "Medium"
-msgstr ""
+msgstr "Средње"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:167
+#: src/states_screens/options/options_screen_ui.cpp:169
 msgid "Large"
-msgstr ""
+msgstr "Велико"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:169
+#: src/states_screens/options/options_screen_ui.cpp:171
 msgid "Very large"
+msgstr "Веома велико"
+
+#: src/states_screens/options/options_screen_ui.cpp:471
+msgid ""
+"Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
+"\n"
+"Closing the game before the story mode's completion invalidates the timer.\n"
+"\n"
+"To use the speedrun mode, please use a new profile."
 msgstr ""
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:217
 msgid "Full"
-msgstr ""
+msgstr "Цело"
 
 #. I18N: In the video options, half vertical sync (usually 30fps)
 #: src/states_screens/options/options_screen_video.cpp:219
 msgid "Half"
-msgstr ""
+msgstr "Пола"
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
@@ -5481,7 +5518,7 @@ msgstr "Дубина поља: %s"
 
 #: src/states_screens/options/user_screen.cpp:366
 msgid "Internet access is disabled. Do you want to enable it?"
-msgstr ""
+msgstr "Приступ интернету је искључен. Да ли желите да га укључите?"
 
 #: src/states_screens/options/user_screen.cpp:559
 msgid "You need to enter a password."
@@ -5499,18 +5536,18 @@ msgstr "Пријављујем вас на „%s“"
 
 #: src/states_screens/options/user_screen.cpp:662
 msgid "You can't delete the only player."
-msgstr ""
+msgstr "Неможете обрисати јединог играча."
 
 #. I18N: In the player info dialog (when deleting)
 #: src/states_screens/options/user_screen.cpp:670
 #, c-format
 msgid "Do you really want to delete player '%s'?"
-msgstr ""
+msgstr "Да ли стварно желите да обришете играча  '%s'?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:70
 msgid "Ready!"
-msgstr "Спремни!"
+msgstr "Припрема!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:72
@@ -5525,25 +5562,25 @@ msgstr "Крени!"
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:76
 msgid "GOAL!"
-msgstr "Погодак!"
+msgstr "ГОЛ!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:79
-#: src/states_screens/race_result_gui.cpp:296
+#: src/states_screens/race_result_gui.cpp:304
 msgid "Waiting for others"
-msgstr "Чекам остале"
+msgstr "Чекање других"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
 #: src/states_screens/race_gui_base.cpp:81
 msgid "Waiting for the server"
-msgstr ""
+msgstr "Чекање сервера"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
 #: src/states_screens/race_gui_base.cpp:626
 msgid "by"
-msgstr "изводи"
+msgstr "од"
 
 #: src/states_screens/race_gui_base.cpp:734
 msgid "Collect nitro!"
@@ -5557,106 +5594,106 @@ msgstr "Прати вођу!"
 #: src/states_screens/race_gui_base.cpp:916
 #, c-format
 msgid "Top %i"
-msgstr "Најбољих %i"
+msgstr "Топ %i"
 
-#: src/states_screens/race_gui.cpp:414
+#: src/states_screens/race_gui.cpp:423
 msgid "Challenge Failed"
-msgstr "Изазов није испуњен"
+msgstr "Неуспешан Изазов"
 
-#: src/states_screens/race_gui_overworld.cpp:518
+#: src/states_screens/race_gui_overworld.cpp:528
 msgid "Press fire to start the tutorial"
-msgstr "Окини за покретање упознавања са игром"
+msgstr "Пуцај да почнеш туториал"
 
-#: src/states_screens/race_gui_overworld.cpp:589
+#: src/states_screens/race_gui_overworld.cpp:599
 msgid "Press fire to start the challenge"
-msgstr "Притисните пали за покретање изазова"
+msgstr "Пуцај да почнеш изазов"
 
-#: src/states_screens/race_result_gui.cpp:182
+#: src/states_screens/race_result_gui.cpp:184
 msgid "Quit the server"
-msgstr "Напусти служитеља"
+msgstr "Напусти сервер"
 
-#: src/states_screens/race_result_gui.cpp:196
+#: src/states_screens/race_result_gui.cpp:199
 msgid "You completed challenges!"
 msgstr "Испунили сте изазове!"
 
-#: src/states_screens/race_result_gui.cpp:219
+#: src/states_screens/race_result_gui.cpp:222
 msgid "Abort Grand Prix"
 msgstr "Прекини Велику награду"
 
-#: src/states_screens/race_result_gui.cpp:239
+#: src/states_screens/race_result_gui.cpp:242
 msgid "Restart"
 msgstr "Поново покрени"
 
-#: src/states_screens/race_result_gui.cpp:246
+#: src/states_screens/race_result_gui.cpp:249
 msgid "Back to challenge selection"
 msgstr "Назад на избор изазова"
 
-#: src/states_screens/race_result_gui.cpp:253
-msgid "Race against the new ghost replay"
-msgstr "Трка против новог духа поновног снимка"
-
 #: src/states_screens/race_result_gui.cpp:257
+msgid "Race against the new ghost replay"
+msgstr "Тркај против новог духног снимка"
+
+#: src/states_screens/race_result_gui.cpp:265
 msgid "Back to the menu"
 msgstr "Назад на изборник"
 
-#: src/states_screens/race_result_gui.cpp:410
+#: src/states_screens/race_result_gui.cpp:430
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Да ли заиста желите да напустите велику награду?"
 
-#: src/states_screens/race_result_gui.cpp:496
+#: src/states_screens/race_result_gui.cpp:516
 msgid "Network grand prix has been finished."
 msgstr "Мрежна трка велике награде је завршена ."
 
-#: src/states_screens/race_result_gui.cpp:532
-#: src/states_screens/race_result_gui.cpp:1341
+#: src/states_screens/race_result_gui.cpp:552
+#: src/states_screens/race_result_gui.cpp:1361
 msgid "Red Team Wins"
-msgstr "Победа црвених"
+msgstr "Црвени тим је победио"
 
-#: src/states_screens/race_result_gui.cpp:534
-#: src/states_screens/race_result_gui.cpp:1345
+#: src/states_screens/race_result_gui.cpp:554
+#: src/states_screens/race_result_gui.cpp:1365
 msgid "Blue Team Wins"
-msgstr "Плави су победили"
+msgstr "Плави тим је победио"
 
-#: src/states_screens/race_result_gui.cpp:536
-#: src/states_screens/race_result_gui.cpp:1350
+#: src/states_screens/race_result_gui.cpp:556
+#: src/states_screens/race_result_gui.cpp:1370
 msgid "It's a draw"
 msgstr "Нерешено је"
 
-#: src/states_screens/race_result_gui.cpp:767
-#: src/states_screens/race_result_gui.cpp:1195
+#: src/states_screens/race_result_gui.cpp:787
+#: src/states_screens/race_result_gui.cpp:1215
 msgid "Eliminated"
 msgstr "Избачен"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1416
-#: src/states_screens/race_result_gui.cpp:1466
+#: src/states_screens/race_result_gui.cpp:1436
+#: src/states_screens/race_result_gui.cpp:1486
 msgid "(Own Goal)"
-msgstr "(Самопогодак)"
+msgstr "(Ауто-гол)"
 
-#: src/states_screens/race_result_gui.cpp:1536
+#: src/states_screens/race_result_gui.cpp:1556
 #, c-format
 msgid "Track %i/%i"
 msgstr "Стаза %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1620
+#: src/states_screens/race_result_gui.cpp:1640
 msgid "Grand Prix progress:"
 msgstr "Напредак у трци за велику награду:"
 
-#: src/states_screens/race_result_gui.cpp:1666
+#: src/states_screens/race_result_gui.cpp:1686
 msgid "Highscores"
-msgstr "Најбоља достигнућа"
+msgstr "Најбоља времена"
 
-#: src/states_screens/race_result_gui.cpp:1769
+#: src/states_screens/race_result_gui.cpp:1789
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Време најбржег круга: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1783
+#: src/states_screens/race_result_gui.cpp:1803
 #, c-format
 msgid "by %s"
-msgstr ""
+msgstr "од %s"
 
 #: src/states_screens/race_setup_screen.cpp:88
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -5692,7 +5729,7 @@ msgstr "Тркајте се против колица духа и покушај
 #: src/states_screens/track_info_screen.cpp:148
 #, c-format
 msgid "Track by %s"
-msgstr "Стазу је направио — %s"
+msgstr "Стаза од %s"
 
 #. I18N: the max players supported by an arena.
 #: src/states_screens/track_info_screen.cpp:156
@@ -5700,21 +5737,21 @@ msgstr "Стазу је направио — %s"
 msgid "Max players supported: %d"
 msgstr "Највећи подржани број играча: %d"
 
-#: src/states_screens/track_info_screen.cpp:382
+#: src/states_screens/track_info_screen.cpp:385
 msgid "Number of red team AI karts"
-msgstr ""
+msgstr "Број роботних играча у црвеном тиму"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:518
+#: src/states_screens/track_info_screen.cpp:523
 msgid "(Empty)"
 msgstr "(Празно)"
 
 #. I18N: track group name
-#: src/states_screens/tracks_and_gp_screen.cpp:142
+#: src/states_screens/tracks_and_gp_screen.cpp:148
 msgid "all"
 msgstr "све"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:193
+#: src/states_screens/tracks_and_gp_screen.cpp:199
 msgid "Locked!"
 msgstr "Закључано!"
 
@@ -5727,7 +5764,7 @@ msgstr "%d/%m/%Y"
 
 #: ../stk-assets/tracks/overworld/scripting.as:15
 msgid "Complete all challenges to unlock the big door!"
-msgstr "Да би откључали велика врата, испуните све изазове!"
+msgstr "Завршите све изазове да отворите велике врата!"
 
 #: ../stk-assets/tracks/overworld/scripting.as:63
 msgid ""
@@ -5746,19 +5783,19 @@ msgstr "Убрзајте са <%s>, и управљајте уз помоћ <%s>
 msgid ""
 "Accelerate by touching the upper part of the wheel, and steer by moving left"
 " or right."
-msgstr ""
+msgstr "Убрзајте тако што стиснете горњи део точка, и управљајте померајући га лево или десно."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:38
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by titling your "
 "device."
-msgstr ""
+msgstr "Убрзајте тако што померате убрзивач горе, и управљајте тако што окренете ваш уређај."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:43
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr ""
+msgstr "Убрзајте тако што померате убрзивач горе, и управљајте тако што окренете ваш уређај."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
@@ -5792,7 +5829,7 @@ msgstr "Нитро који сте покупили употребите при�
 
 #: ../stk-assets/tracks/tutorial/scripting.as:92
 msgid "Use the nitro you collected by pressing the nitro icon"
-msgstr ""
+msgstr "Користи нитро који сте покупили тако што стискасте нитро икону"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:97
 msgid "Collect nitro bottles (we will use them after the curve)."
@@ -5801,11 +5838,11 @@ msgstr "Сакупљајте боце са нитром (користићемо 
 #: ../stk-assets/tracks/tutorial/scripting.as:103
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
-msgstr "Јој! Када сте у неприлици, притисните <%s> за спашавање."
+msgstr "Упс! Када сте у несрећи, притисните <%s> да будете спашени."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:105
 msgid "Oops! When you're in trouble, press the bird icon to be rescued."
-msgstr ""
+msgstr "Упс! Када сте у несрећи, притисните птичју икону да будете спашени."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:113
 #, c-format
@@ -5828,4 +5865,4 @@ msgstr "Знајте да ако успете да клизате неколик
 
 #: ../stk-assets/tracks/tutorial/scripting.as:135
 msgid "You are now ready to race. Good luck!"
-msgstr "Спремни сте за трку. Срећно!"
+msgstr "Ви сте сада спремни да се тркате. Срећно!"

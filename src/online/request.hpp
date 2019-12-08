@@ -20,7 +20,6 @@
 #define HEADER_ONLINE_REQUEST_HPP
 
 #include "utils/cpp2011.hpp"
-#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/synchronised.hpp"
 
@@ -29,6 +28,7 @@
 #endif
 #include <curl/curl.h>
 #include <assert.h>
+#include <memory>
 #include <string>
 
 namespace Online
@@ -57,19 +57,12 @@ namespace Online
      *
      * \ingroup online
      */
-    class Request : public NoCopy
+    class Request : public std::enable_shared_from_this<Request>,
+                    public NoCopy
     {
     private:
-        LEAK_CHECK()
-
         /** Type of the request. Has 0 as default value. */
         const int m_type;
-
-        /** True if the memory for this Request should be managed by
-        *  http connector (i.e. this object is freed once the request
-        *  is handled). Otherwise the memory is not freed, so it must
-        *  be freed by the calling function. */
-        bool m_manage_memory;
 
         /** The priority of this request. The higher the value the more
         important this request is. */
@@ -131,7 +124,7 @@ namespace Online
             RT_QUIT = 1
         };
 
-        Request(bool manage_memory, int priority, int type);
+        Request(int priority, int type);
         virtual ~Request() {}
         void     execute();
         void     executeNow();
@@ -144,17 +137,6 @@ namespace Online
         // --------------------------------------------------------------------
         /** Returns the type of the request. */
         int getType() const  { return m_type; }
-
-        // --------------------------------------------------------------------
-        /** Returns if the memory for this object should be managed by
-        *  by network_http (i.e. freed once the request is handled). */
-        bool manageMemory() const   { return m_manage_memory; }
-
-        // --------------------------------------------------------------------
-        /** Sets the memory management flag of this request. This function
-         *  must only be called by the main thread, since it is only tested by
-         *  the main thread. */
-        void setManageMemory(bool m) { m_manage_memory = m;  }
 
         // --------------------------------------------------------------------
         /** Returns the priority of this request. */
@@ -236,7 +218,8 @@ namespace Online
         public:
             /** Compares two requests, returns if the first request has a lower
              *  priority than the second one. */
-            bool operator() (const Request *a, const Request *b) const
+            bool operator() (const std::shared_ptr<Request>& a,
+                             const std::shared_ptr<Request>& b) const
             {
                 return a->getPriority() < b->getPriority();
             }

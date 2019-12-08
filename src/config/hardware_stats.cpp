@@ -370,7 +370,7 @@ void reportHardwareStats()
         /** Version number of the hw report. */
         int m_version;
     public:
-        HWReportRequest(int version) : Online::HTTPRequest(/*manage memory*/true, 1)
+        HWReportRequest(int version) : Online::HTTPRequest(/*priority*/1)
                                      , m_version(version)
         {}
         // --------------------------------------------------------------------
@@ -401,7 +401,7 @@ void reportHardwareStats()
     };   // HWReportRequest
     // ------------------------------------------------------------------------
 
-    Online::HTTPRequest *request = new HWReportRequest(report_version);
+    auto request = std::make_shared<HWReportRequest>(report_version);
     request->addParameter("user_id", UserConfigParams::m_random_identifier);
     request->addParameter("time", StkTime::getTimeSinceEpoch());
     request->addParameter("type", "hwdetect");

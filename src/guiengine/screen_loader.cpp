@@ -17,6 +17,7 @@
 
 
 #include "guiengine/screen.hpp"
+#include "io/file_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
 #include "utils/string_utils.hpp"
@@ -215,7 +216,22 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(custom_ratio,   PROP_CUSTOM_RATIO);
                 READ_PROPERTY(icon_align,     PROP_ICON_ALIGN);
 
-                READ_PROPERTY(icon,           PROP_ICON);
+                READ_PROPERTY(alt_icon,       PROP_ICON);
+                if (widget.m_properties[PROP_ICON].empty())
+                {
+                    // No alternative icon
+                    READ_PROPERTY(icon, PROP_ICON);
+                }
+                else
+                {
+                    // Use alternative icon if default icon cannot be themed
+                    const std::string alt_icon = widget.m_properties[PROP_ICON];
+                    READ_PROPERTY(icon, PROP_ICON);
+                    const std::string test_icon = GUIEngine::getSkin()
+                        ->getThemedIcon(widget.m_properties[PROP_ICON]);
+                    if (!file_manager->fileExists(test_icon))
+                        widget.m_properties[PROP_ICON] = alt_icon;
+                }
                 READ_PROPERTY(focus_icon,     PROP_FOCUS_ICON);
                 READ_PROPERTY(text_align,     PROP_TEXT_ALIGN);
                 READ_PROPERTY(text_valign,    PROP_TEXT_VALIGN);

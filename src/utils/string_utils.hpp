@@ -21,6 +21,7 @@
 #ifndef HEADER_STRING_UTILS_HPP
 #define HEADER_STRING_UTILS_HPP
 
+#include "utils/types.hpp"
 #include <limits>
 #include <string>
 #include <vector>
@@ -284,6 +285,7 @@ namespace StringUtils
     std::string utf32ToUtf8(const std::u32string& input);
     std::string findAndReplace(const std::string& source, const std::string& find, const std::string& replace);
     std::string removeWhitespaces(const std::string& input);
+    irr::core::stringw getReadableFileSize(uint64_t n);
     void breakText(const std::wstring& input, std::vector<std::wstring> &output,
                    unsigned int max_width, irr::gui::IGUIFont* font, bool right_to_left=false);
     bool breakable (wchar_t c);

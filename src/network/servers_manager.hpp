@@ -55,9 +55,9 @@ private:
     // ------------------------------------------------------------------------
     void setWanServers(bool success, const XMLNode* input);
     // ------------------------------------------------------------------------
-    Online::XMLRequest* getWANRefreshRequest() const;
+    std::shared_ptr<Online::XMLRequest> getWANRefreshRequest() const;
     // ------------------------------------------------------------------------
-    Online::XMLRequest* getLANRefreshRequest() const;
+    std::shared_ptr<Online::XMLRequest> getLANRefreshRequest() const;
     // ------------------------------------------------------------------------
     void setLanServers(const std::map<irr::core::stringw, 
                                       std::shared_ptr<Server> >& servers);

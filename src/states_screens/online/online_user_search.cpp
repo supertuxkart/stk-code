@@ -37,7 +37,6 @@ using namespace Online;
 
 OnlineUserSearch::OnlineUserSearch() : Screen("online/user_search.stkgui")
 {
-    m_search_request     = NULL;
     m_search_string      = "";
     m_last_search_string = "";
 }   // OnlineUserSearch
@@ -86,45 +85,14 @@ void OnlineUserSearch::init()
  */
 void OnlineUserSearch::tearDown()
 {
-    // The search request can be in one of three states:
-    // 1. It does not exist, nothing more to do.
-    // 2. It has been executed by the request manager, had its callback done
-    //    and waits for this widget to collect the results. In this case, the
-    //    requests state is 'isDone', and the memory of this object need to be
-    //    freed here.
-    // 3. It is being executed by the request manager thread. In this case the
-    //    request can not be freed (since the request manager might still
-    //    write to it). In this case we set the flag that the request manager
-    //    should manage the memory for the request, i.e. the request will be
-    //    deleted once it is in the request manager's ready queue.
-    // Note that there is no race condition here: setting a request to be
-    // 'done', and checking if its memory need to be freed is done by the
-    // main thread (i.e. the same thread that executes this function ). So it
-    // is not possible that the thread stage changes to be 'isDone' while
-    // this function executes, or that the request is checked if it should
-    // be freed.
-
+    // Cancel the work in progress request when leaving the screen
     if (m_search_request)
     {
-        // Check if the request is ready (but its result have not been
-        // received here ... otherwise it would have been deleted).
-        if (m_search_request->isDone())
+        if (!m_search_request->isDone())
         {
-            delete m_search_request;
-        }
-        else
-        {
-            // This request is currently being handled by the request manager.
-            // We can set the memory management flag, since the separate
-            // request manager thread does not read or write this flag.
-            // The actual deletion of the request is done by the main
-            // thread, so there is no risk that the request is deleted
-            // between the next two calls!!
-            m_search_request->setManageMemory(true);
-
-            // Set cancel flag to speed up cancellation of this request
             m_search_request->cancel();
         }
+        m_search_request = nullptr;
     }   // if m_search_request
 }   // tearDown
 
@@ -201,7 +169,7 @@ void OnlineUserSearch::search()
 {
     if (m_search_string != "" && m_last_search_string != m_search_string)
     {
-        m_search_request = new XMLRequest();
+        m_search_request = std::make_shared<XMLRequest>();
         PlayerManager::setUserDetails(m_search_request, "user-search");
         m_search_request->addParameter("search-string", m_search_string);
         m_search_request->queue();
@@ -248,7 +216,7 @@ void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
  */
 void OnlineUserSearch::onUpdate(float dt)
 {
-    if(m_search_request != NULL)
+    if (m_search_request)
     {
         if(m_search_request->isDone())
         {
@@ -263,8 +231,7 @@ void OnlineUserSearch::onUpdate(float dt)
                 new MessageDialog(m_search_request->getInfo());
             }
 
-            delete m_search_request;
-            m_search_request = NULL;
+            m_search_request = nullptr;
             m_back_widget->setActive(true);
             m_search_box_widget->setActive(true);
             m_search_button_widget->setActive(true);

@@ -337,7 +337,18 @@ void RacePausedDialog::beforeAddingWidgets()
 bool RacePausedDialog::onEnterPressed(const irr::core::stringw& text)
 {
     if (auto cl = LobbyProtocol::get<ClientLobby>())
-        cl->sendChat(text);
+    {
+        if (!text.empty())
+        {
+            if (text[0] == L'/' && text.size() > 1)
+            {
+                std::string cmd = StringUtils::wideToUtf8(text);
+                cl->handleClientCommand(cmd.erase(0, 1));
+            }
+            else
+                cl->sendChat(text);
+        }
+    }
     m_self_destroy = true;
     return true;
 }   // onEnterPressed

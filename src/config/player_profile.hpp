@@ -129,7 +129,7 @@ public:
     void addIcon();
 
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
-    virtual void setUserDetails(Online::HTTPRequest *request,
+    virtual void setUserDetails(std::shared_ptr<Online::HTTPRequest> request,
                                 const std::string &action,
                                 const std::string &url_path = "") const = 0;
     virtual uint32_t getOnlineId() const = 0;

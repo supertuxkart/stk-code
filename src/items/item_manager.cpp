@@ -50,6 +50,7 @@ std::vector<video::SColorf>  ItemManager::m_glow_color;
 bool                         ItemManager::m_disable_item_collection = false;
 std::shared_ptr<ItemManager> ItemManager::m_item_manager;
 std::mt19937                 ItemManager::m_random_engine;
+uint32_t                     ItemManager::m_random_seed = 0;
 
 //-----------------------------------------------------------------------------
 /** Creates one instance of the item manager. */

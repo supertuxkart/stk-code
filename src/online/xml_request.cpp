@@ -34,18 +34,15 @@ namespace Online
 {
     /** Creates a HTTP(S) request that will automatically parse the answer into
      *  a XML structure.
-     *  \param manage_memory whether or not the RequestManager should take care of
-     *         deleting the object after all callbacks have been done.
      *  \param priority by what priority should the RequestManager take care of
      *         this request.
      */
-    XMLRequest::XMLRequest(bool manage_memory, int priority)
-              : HTTPRequest(manage_memory, priority)
+    XMLRequest::XMLRequest(int priority)
+              : HTTPRequest(priority)
     {
         m_info     = "";
         m_success  = false;
         m_xml_data = NULL;
-        m_exists = std::make_shared<bool>(true);
     }   // XMLRequest
 
     // ------------------------------------------------------------------------

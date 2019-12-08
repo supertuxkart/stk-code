@@ -391,7 +391,7 @@ void Achievement::onCompletion()
     // completed, if a user is signed in.
     if (PlayerManager::isCurrentLoggedIn())
     {
-        Online::HTTPRequest * request = new Online::HTTPRequest(true);
+        auto request = std::make_shared<Online::HTTPRequest>();
         PlayerManager::setUserDetails(request, "achieving");
         request->addParameter("achievementid", getID());
         request->queue();

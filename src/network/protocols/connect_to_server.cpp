@@ -47,7 +47,7 @@
 
 #include <algorithm>
 // ============================================================================
-std::weak_ptr<bool> ConnectToServer::m_previous_unjoin;
+std::weak_ptr<Online::Request> ConnectToServer::m_previous_unjoin;
 TransportAddress ConnectToServer::m_server_address;
 int ConnectToServer::m_retry_count = 0;
 bool ConnectToServer::m_done_intecept = false;
@@ -74,12 +74,11 @@ ConnectToServer::~ConnectToServer()
     auto cl = LobbyProtocol::get<ClientLobby>();
     if (!cl && m_server && m_server->supportsEncryption())
     {
-        Online::XMLRequest* request =
-            new Online::XMLRequest(true/*manager_memory*/);
+        auto request = std::make_shared<Online::XMLRequest>();
         NetworkConfig::get()->setServerDetails(request,
             "clear-user-joined-server");
         request->queue();
-        m_previous_unjoin = request->observeExistence();
+        m_previous_unjoin = request;
     }
 }   // ~ConnectToServer
 
@@ -463,7 +462,7 @@ void ConnectToServer::registerWithSTKServer()
     }
 
     const TransportAddress& addr = STKHost::get()->getPublicAddress();
-    Online::XMLRequest *request  = new Online::XMLRequest();
+    auto request = std::make_shared<Online::XMLRequest>();
     NetworkConfig::get()->setServerDetails(request, "join-server-key");
     request->addParameter("server-id", m_server->getServerId());
     request->addParameter("address", addr.getIP());
@@ -495,6 +494,4 @@ void ConnectToServer::registerWithSTKServer()
             error.c_str());
         m_state = DONE;
     }
-    delete request;
-
 }   // registerWithSTKServer

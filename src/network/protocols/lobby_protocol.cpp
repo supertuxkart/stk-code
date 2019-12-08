@@ -45,7 +45,6 @@ LobbyProtocol::LobbyProtocol()
     resetGameStartedProgress();
     m_game_setup = new GameSetup();
     m_end_voting_period.store(0);
-    m_current_track.store(-1);
 }   // LobbyProtocol
 
 // ----------------------------------------------------------------------------
@@ -149,7 +148,9 @@ void LobbyProtocol::configRemoteKart(
  */
 void LobbyProtocol::setup()
 {
-    m_current_track.store(-1);
+    std::unique_lock<std::mutex> ul(m_current_track_mutex);
+    m_current_track.clear();
+    ul.unlock();
     m_last_live_join_util_ticks = 0;
     resetVotingTime();
     m_peers_votes.clear();
@@ -236,8 +237,8 @@ bool LobbyProtocol::hasLiveJoiningRecently() const
 //-----------------------------------------------------------------------------
 Track* LobbyProtocol::getPlayingTrack() const
 {
-    int cur_idx = m_current_track.load();
-    if (cur_idx != -1)
-        return track_manager->getTrack(cur_idx);
-    return NULL;
+    std::unique_lock<std::mutex> ul(m_current_track_mutex);
+    std::string track_ident = m_current_track;
+    ul.unlock();
+    return track_manager->getTrack(track_ident);
 }   // getPlayingTrack

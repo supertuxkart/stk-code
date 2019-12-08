@@ -39,8 +39,6 @@ using namespace Online;
 VoteDialog::VoteDialog(const std::string & addon_id)
          : ModalDialog(0.8f,0.6f), m_addon_id(addon_id)
 {
-    m_fetch_vote_request   = NULL;
-    m_perform_vote_request = NULL;
     m_self_destroy         = false;
     loadFromFile("online/vote_dialog.stkgui");
 
@@ -60,7 +58,7 @@ VoteDialog::VoteDialog(const std::string & addon_id)
 
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    m_fetch_vote_request = new XMLRequest();
+    m_fetch_vote_request = std::make_shared<XMLRequest>();
     PlayerManager::setUserDetails(m_fetch_vote_request, "get-addon-vote");
     m_fetch_vote_request->addParameter("addonid", addon_id.substr(6));
     m_fetch_vote_request->queue();
@@ -74,8 +72,6 @@ VoteDialog::VoteDialog(const std::string & addon_id)
  */
 VoteDialog::~VoteDialog()
 {
-    delete m_fetch_vote_request;
-    delete m_perform_vote_request;
 }   // ~VoteDialog
 
 // -----------------------------------------------------------------------------
@@ -119,7 +115,7 @@ void VoteDialog::sendVote()
     };   // SetAddonVoteRequest
     // ------------------------------------------------------------------------
 
-    m_perform_vote_request = new SetAddonVoteRequest();
+    m_perform_vote_request = std::make_shared<SetAddonVoteRequest>();
     PlayerManager::setUserDetails(m_perform_vote_request, "set-addon-vote");
     m_perform_vote_request->addParameter("addonid", m_addon_id.substr(6));
     m_perform_vote_request->addParameter("rating", m_rating_widget->getRating());
@@ -209,8 +205,7 @@ void VoteDialog::updateFetchVote()
         m_cancel_widget->setActive(true);
     }   // !isSuccess
 
-    delete m_fetch_vote_request;
-    m_fetch_vote_request = NULL;
+    m_fetch_vote_request = nullptr;
 
 }   // updateFetchVote
 
@@ -222,7 +217,7 @@ void VoteDialog::onUpdate(float dt)
 {
     updateFetchVote();
 
-    if(m_perform_vote_request != NULL)
+    if(m_perform_vote_request)
     {
         if(m_perform_vote_request->isDone())
         {
@@ -241,8 +236,7 @@ void VoteDialog::onUpdate(float dt)
                 m_cancel_widget->setActive(true);
                 m_rating_widget->setActive(true);
             }   // !isSuccess
-            delete m_perform_vote_request;
-            m_perform_vote_request = NULL;
+            m_perform_vote_request = nullptr;
         }   // isDone
         else
         {

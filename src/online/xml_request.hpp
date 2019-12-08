@@ -28,7 +28,6 @@
 #endif
 #include <curl/curl.h>
 #include <assert.h>
-#include <memory>
 #include <string>
 
 class XMLNode;
@@ -43,12 +42,11 @@ namespace Online
         /** On a successful download contains the converted XML tree. */
         XMLNode *m_xml_data;
 
-        std::shared_ptr<bool> m_exists;
     protected:
 
-		/** Additional info contained the downloaded data (or an error
-		*  message if a problem occurred). */
-		irr::core::stringw m_info;
+        /** Additional info contained the downloaded data (or an error
+        *  message if a problem occurred). */
+        irr::core::stringw m_info;
 
         /** True if the request was successful executed on the server. */
         bool m_success;
@@ -56,7 +54,7 @@ namespace Online
         virtual void afterOperation() OVERRIDE;
 
     public :
-        XMLRequest(bool manage_memory = false, int priority = 1);
+        XMLRequest(int priority = 1);
         virtual ~XMLRequest();
 
         // ------------------------------------------------------------------------
@@ -91,9 +89,6 @@ namespace Online
             assert(hasBeenExecuted());
             return m_success;
         }   // isSuccess
-        // --------------------------------------------------------------------
-        std::weak_ptr<bool> observeExistence() const       { return m_exists; }
-
     };   // class XMLRequest
 } //namespace Online
 #endif // HEADER_XML_REQUEST_HPP

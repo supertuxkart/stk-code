@@ -762,9 +762,9 @@ namespace UserConfigParams
 
     // ---- Networking
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers",
-        "The stun servers that will be used to know the public address with"
-        " port", {{ "stun-server", "address", "ping" }},
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv6",
+        "The stun servers that will be used to know the public address "
+        "(including ipv6) with port", {{ "stun-server", "address", "ping" }},
             {
                 { "stun.stunprotocol.org:3478", 0u },
                 { "stun.l.google.com:19302", 0u },
@@ -934,7 +934,7 @@ namespace UserConfigParams
                            "Last selected track group") );
 
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-            PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_file",
+            PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_name",
                                                   "Name of the skin to use") );
 
     PARAM_PREFIX IntUserConfigParam        m_minimap_display

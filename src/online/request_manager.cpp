@@ -143,7 +143,9 @@ namespace Online
         // Put in a high priortity quit request in. It has the same priority
         // as a sign-out request (so the sign-out will be executed before the
         // quit request).
-        Request *quit = new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT);
+        // Required for std::make_shared as it takes reference
+        int priority = HTTP_MAX_PRIORITY;
+        auto quit = std::make_shared<Request>(priority, Request::RT_QUIT);
         quit->setAbortable(false);
         addRequest(quit);
 
@@ -163,7 +165,7 @@ namespace Online
      *  sorted by priority.
      *  \param request The pointer to the new request to insert.
      */
-    void RequestManager::addRequest(Request *request)
+    void RequestManager::addRequest(std::shared_ptr<Online::Request> request)
     {
         if (UserConfigParams::m_internet_status == RequestManager::IPERM_NOT_ALLOWED
             && request->getType() != Request::RT_QUIT)
@@ -193,7 +195,7 @@ namespace Online
         VS::setThreadName("RequestManager");
         RequestManager *me = (RequestManager*) obj;
 
-        me->m_current_request = NULL;
+        me->m_current_request = nullptr;
         me->m_request_queue.lock();
         while (me->m_request_queue.getData().empty() ||
                me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
@@ -213,7 +215,6 @@ namespace Online
 
             if (me->m_current_request->getType() == Request::RT_QUIT)
             {
-                delete me->m_current_request;
                 break;
             }
 
@@ -223,11 +224,7 @@ namespace Online
             // (otherwise the assert in addResult will be triggered).
             if (!me->getAbort())
                 me->addResult(me->m_current_request);
-            else if (me->m_current_request->manageMemory())
-            {
-                delete me->m_current_request;
-                me->m_current_request = NULL;
-            }
+            me->m_current_request = nullptr;
             me->m_request_queue.lock();
         } // while handle all requests
 
@@ -239,12 +236,7 @@ namespace Online
         // At this stage we have the lock for m_request_queue
         while (!me->m_request_queue.getData().empty())
         {
-            Online::Request *request = me->m_request_queue.getData().top();
             me->m_request_queue.getData().pop();
-
-            // Manage memory can be ignored here, all requests
-            // need to be freed.
-            delete request;
         }
         me->m_request_queue.unlock();
         pthread_exit(NULL);
@@ -256,7 +248,7 @@ namespace Online
     /** Inserts a request into the queue of results.
      *  \param request The pointer to the request to insert.
      */
-    void RequestManager::addResult(Online::Request *request)
+    void RequestManager::addResult(std::shared_ptr<Online::Request> request)
     {
         assert(request->hasBeenExecuted());
         m_result_queue.lock();
@@ -271,7 +263,7 @@ namespace Online
      */
     void RequestManager::handleResultQueue()
     {
-        Request * request = NULL;
+        std::shared_ptr<Request> request;
         m_result_queue.lock();
         if (!m_result_queue.getData().empty())
         {
@@ -279,16 +271,10 @@ namespace Online
             m_result_queue.getData().pop();
         }
         m_result_queue.unlock();
-        if (request != NULL)
+        if (request)
         {
             request->callback();
-            if(request->manageMemory())
-            {
-                delete request;
-                request = NULL;
-            }
-            else
-                request->setDone();
+            request->setDone();
         }
     }   // handleResultQueue
 

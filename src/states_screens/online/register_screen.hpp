@@ -53,7 +53,7 @@ private:
     GUIEngine::TextBoxWidget *m_password_widget;
 
     /** The XML request to the server. */
-    Online::XMLRequest *m_signup_request;
+    std::shared_ptr<Online::XMLRequest> m_signup_request;
 
     /** Pointer to an existing player if the screen is doing a rename,
      *  NULL otherwise. */

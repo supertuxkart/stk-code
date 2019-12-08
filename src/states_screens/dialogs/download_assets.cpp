@@ -49,7 +49,7 @@ private:
     }
 public:
     DownloadAssetsRequest()
-    : HTTPRequest("stk-assets.zip", /*manage mem*/false, /*priority*/5)
+    : HTTPRequest("stk-assets.zip", /*priority*/5)
     {
         m_extraction_error = true;
         std::string download_url = stk_config->m_assets_download_url;
@@ -81,8 +81,6 @@ public:
 DownloadAssets::DownloadAssets()
               : ModalDialog(0.8f, 0.8f)
 {
-    m_download_request = NULL;
-
     loadFromFile("addons_loading.stkgui");
     m_install_button   = getWidget<IconButtonWidget> ("install" );
     m_progress         = getWidget<ProgressBarWidget>("progress");
@@ -98,12 +96,8 @@ DownloadAssets::DownloadAssets()
     icon->setImage(file_manager->getAsset(FileManager::GUI_ICON, "logo.png"),
         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
-    core::stringw unit = "";
-    unsigned n = getDownloadAssetsSize();
-    float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
-    char s[32];
-    sprintf(s, "%.1f", f);
-    unit = _("%s MB", s);
+    core::stringw unit =
+        StringUtils::getReadableFileSize(getDownloadAssetsSize());
     // I18N: File size of game assets or addons downloading
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
@@ -115,6 +109,12 @@ DownloadAssets::DownloadAssets()
         "a wifi connection.");
     getWidget<BubbleWidget>("description")->setText(msg);
 }   // DownloadAssets
+
+// ----------------------------------------------------------------------------
+DownloadAssets::~DownloadAssets()
+{
+    stopDownload();
+}   // ~DownloadAssets
 
 // ----------------------------------------------------------------------------
 void DownloadAssets::beforeAddingWidgets()
@@ -131,7 +131,6 @@ void DownloadAssets::init()
 // ----------------------------------------------------------------------------
 bool DownloadAssets::onEscapePressed()
 {
-    stopDownload();
     ModalDialog::dismiss();
     return true;
 }   // onEscapePressed
@@ -148,7 +147,6 @@ GUIEngine::EventPropagation DownloadAssets::processEvent(const std::string& even
             actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == "back")
         {
-            stopDownload();
             dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
@@ -198,7 +196,7 @@ void DownloadAssets::onUpdate(float delta)
  **/
 void DownloadAssets::startDownload()
 {
-    m_download_request = new DownloadAssetsRequest();
+    m_download_request = std::make_shared<DownloadAssetsRequest>();
     m_download_request->queue();
 }   // startDownload
 
@@ -212,15 +210,8 @@ void DownloadAssets::stopDownload()
     // (and not uninstalling an installed one):
     if (m_download_request)
     {
-        // In case of a cancel we can't free the memory, since the
-        // request manager thread is potentially working on this request. So
-        // in order to avoid a memory leak, we let the request manager
-        // free the data. This is thread safe since freeing the data is done
-        // when the request manager handles the result queue - and this is
-        // done by the main thread (i.e. this thread).
-        m_download_request->setManageMemory(true);
         m_download_request->cancel();
-        m_download_request = NULL;
+        m_download_request = nullptr;
     }
 }   // startDownload
 
@@ -238,8 +229,7 @@ void DownloadAssets::doInstall()
         // in the first run
         msg = _("Failed to download assets, check your storage space or internet connection and try again later.");
     }
-    delete m_download_request;
-    m_download_request = NULL;
+    m_download_request = nullptr;
     if (!msg.empty())
     {
         getWidget<BubbleWidget>("description")->setText(msg);

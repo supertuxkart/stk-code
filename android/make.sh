@@ -55,18 +55,24 @@ export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
 export PACKAGE_CALLBACK_NAME_RELEASE="org_supertuxkart_stk"
 export APP_DIR_NAME_RELEASE="supertuxkart"
 export APP_ICON_RELEASE="$DIRNAME/icon.png"
+export APP_ICON_ADAPTIVE_BG_RELEASE="$DIRNAME/icon_adaptive_bg.png"
+export APP_ICON_ADAPTIVE_FG_RELEASE="$DIRNAME/icon_adaptive_fg.png"
 
 export APP_NAME_BETA="SuperTuxKart Beta"
 export PACKAGE_NAME_BETA="org.supertuxkart.stk_beta"
 export PACKAGE_CALLBACK_NAME_BETA="org_supertuxkart_stk_1beta"
 export APP_DIR_NAME_BETA="supertuxkart-beta"
 export APP_ICON_BETA="$DIRNAME/icon-dbg.png"
+export APP_ICON_ADAPTIVE_BG_BETA="$DIRNAME/icon_adaptive_bg-dbg.png"
+export APP_ICON_ADAPTIVE_FG_BETA="$DIRNAME/icon_adaptive_fg-dbg.png"
 
 export APP_NAME_DEBUG="SuperTuxKart Debug"
 export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dbg"
 export PACKAGE_CALLBACK_NAME_DEBUG="org_supertuxkart_stk_1dbg"
 export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
+export APP_ICON_ADAPTIVE_BG_DEBUG="$DIRNAME/icon_adaptive_bg-dbg.png"
+export APP_ICON_ADAPTIVE_FG_DEBUG="$DIRNAME/icon_adaptive_fg-dbg.png"
 
 
 # A helper function that checks if error ocurred
@@ -159,6 +165,8 @@ if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
     export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_DEBUG"
     export APP_DIR_NAME="$APP_DIR_NAME_DEBUG"
     export APP_ICON="$APP_ICON_DEBUG"
+    export APP_ICON_ADAPTIVE_BG="$APP_ICON_ADAPTIVE_BG_DEBUG"
+    export APP_ICON_ADAPTIVE_FG="$APP_ICON_ADAPTIVE_FG_DEBUG"
 elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
@@ -167,6 +175,8 @@ elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_RELEASE"
     export APP_DIR_NAME="$APP_DIR_NAME_RELEASE"
     export APP_ICON="$APP_ICON_RELEASE"
+    export APP_ICON_ADAPTIVE_BG="$APP_ICON_ADAPTIVE_BG_RELEASE"
+    export APP_ICON_ADAPTIVE_FG="$APP_ICON_ADAPTIVE_FG_RELEASE"
 elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
     export GRADLE_BUILD_TYPE="assembleRelease"
     export IS_DEBUG_BUILD=0
@@ -175,6 +185,8 @@ elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
     export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_BETA"
     export APP_DIR_NAME="$APP_DIR_NAME_BETA"
     export APP_ICON="$APP_ICON_BETA"
+    export APP_ICON_ADAPTIVE_BG="$APP_ICON_ADAPTIVE_BG_BETA"
+    export APP_ICON_ADAPTIVE_FG="$APP_ICON_ADAPTIVE_FG_BETA"
 else
     echo "Unsupported BUILD_TYPE: $BUILD_TYPE. Possible values are: " \
          "debug, release"
@@ -486,6 +498,7 @@ check_error
 echo "Building APK"
 
 mkdir -p "$DIRNAME/res/drawable/"
+mkdir -p "$DIRNAME/res/drawable-anydpi-v26/"
 mkdir -p "$DIRNAME/res/drawable-mdpi/"
 mkdir -p "$DIRNAME/res/drawable-hdpi/"
 mkdir -p "$DIRNAME/res/drawable-xhdpi/"
@@ -499,6 +512,15 @@ echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>"       >  "$STRINGS_FILE"
 echo "<resources>"                                      >> "$STRINGS_FILE"
 echo "    <string name=\"app_name\">$APP_NAME</string>" >> "$STRINGS_FILE"
 echo "</resources>"                                     >> "$STRINGS_FILE"
+
+ADAPTIVE_ICON_FILE="$DIRNAME/res/drawable-anydpi-v26/icon.xml"
+
+echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>"                      >  "$ADAPTIVE_ICON_FILE"
+echo "<adaptive-icon"                                                  >> "$ADAPTIVE_ICON_FILE"
+echo "  xmlns:android=\"http://schemas.android.com/apk/res/android\">" >> "$ADAPTIVE_ICON_FILE"
+echo "    <background android:drawable=\"@drawable/icon_bg\" />"       >> "$ADAPTIVE_ICON_FILE"
+echo "    <foreground android:drawable=\"@drawable/icon_fg\" />"       >> "$ADAPTIVE_ICON_FILE"
+echo "</adaptive-icon>"                                                >> "$ADAPTIVE_ICON_FILE"
 
 sed -i "s/minSdkVersion=\".*\"/minSdkVersion=\"$MIN_SDK_VERSION\"/g" \
        "$DIRNAME/AndroidManifest.xml"
@@ -540,6 +562,24 @@ convert -scale 72x72 "$APP_ICON" "$DIRNAME/res/drawable-hdpi/icon.png"
 convert -scale 96x96 "$APP_ICON" "$DIRNAME/res/drawable-xhdpi/icon.png"
 convert -scale 144x144 "$APP_ICON" "$DIRNAME/res/drawable-xxhdpi/icon.png"
 convert -scale 192x192 "$APP_ICON" "$DIRNAME/res/drawable-xxxhdpi/icon.png"
+
+#convert -scale 108x108 "$APP_ICON_ADAPTIVE_BG" "$DIRNAME/res/drawable-mdpi/icon_bg.png"
+#convert -scale 162x162 "$APP_ICON_ADAPTIVE_BG" "$DIRNAME/res/drawable-hdpi/icon_bg.png"
+#convert -scale 216x216 "$APP_ICON_ADAPTIVE_BG" "$DIRNAME/res/drawable-xhdpi/icon_bg.png"
+#convert -scale 324x324 "$APP_ICON_ADAPTIVE_BG" "$DIRNAME/res/drawable-xxhdpi/icon_bg.png"
+#convert -scale 432x432 "$APP_ICON_ADAPTIVE_BG" "$DIRNAME/res/drawable-xxxhdpi/icon_bg.png"
+
+convert -scale 108x108 xc:"rgba(255,255,255,255)" "$DIRNAME/res/drawable-mdpi/icon_bg.png"
+convert -scale 162x162 xc:"rgba(255,255,255,255)" "$DIRNAME/res/drawable-hdpi/icon_bg.png"
+convert -scale 216x216 xc:"rgba(255,255,255,255)" "$DIRNAME/res/drawable-xhdpi/icon_bg.png"
+convert -scale 324x324 xc:"rgba(255,255,255,255)" "$DIRNAME/res/drawable-xxhdpi/icon_bg.png"
+convert -scale 432x432 xc:"rgba(255,255,255,255)" "$DIRNAME/res/drawable-xxxhdpi/icon_bg.png"
+
+convert -scale 108x108 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-mdpi/icon_fg.png"
+convert -scale 162x162 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-hdpi/icon_fg.png"
+convert -scale 216x216 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-xhdpi/icon_fg.png"
+convert -scale 324x324 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-xxhdpi/icon_fg.png"
+convert -scale 432x432 "$APP_ICON_ADAPTIVE_FG" "$DIRNAME/res/drawable-xxxhdpi/icon_fg.png"
 
 if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
     export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"

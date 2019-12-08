@@ -150,7 +150,7 @@ void* NewsManager::downloadNews(void *obj)
     {
         core::stringw error_message("");
 
-        HTTPRequest *download_req = new HTTPRequest(m_news_filename);
+        auto download_req = std::make_shared<HTTPRequest>(m_news_filename);
         download_req->setAddonsURL(m_news_filename);
 
         // Initialise the online portion of the addons manager.
@@ -164,11 +164,9 @@ void* NewsManager::downloadNews(void *obj)
             // with the default server address again (just in case
             // that a redirect went wrong, or a wrong/incorrect
             // address somehow made its way into the config file.
-            delete download_req;
-
             // We need a new object, since the state of the old
             // download request is now done.
-            download_req = new HTTPRequest(m_news_filename);
+            download_req = std::make_shared<HTTPRequest>(m_news_filename);
 
             // make sure the new server address is actually used
             download_req->setAddonsURL(m_news_filename);
@@ -190,7 +188,6 @@ void* NewsManager::downloadNews(void *obj)
 
         if(!download_req->hadDownloadError())
             UserConfigParams::m_news_last_updated = StkTime::getTimeSinceEpoch();
-        delete download_req;
 
         // No download error, update the last_updated time value, and delete
         // the potentially loaded xml file

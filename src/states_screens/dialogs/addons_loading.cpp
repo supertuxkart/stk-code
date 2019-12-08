@@ -28,6 +28,7 @@
 #include "guiengine/widgets.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "online/request_manager.hpp"
 #include "online/xml_request.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -56,7 +57,6 @@ AddonsLoading::AddonsLoading(const std::string &id)
 {
     
     m_icon_shown       = false;
-    m_download_request = NULL;
 
     loadFromFile("addons_loading.stkgui");
 
@@ -79,9 +79,15 @@ AddonsLoading::AddonsLoading(const std::string &id)
  */
 AddonsLoading::~AddonsLoading()
 {
+    stopDownload();
     // Select the last selected item in the addons_screen, so that
     // users can keep on installing from the last selected item.
-    AddonsScreen::getInstance()->setLastSelected();
+    // This dialog can be called in network lobby screen atm for live addon
+    // install
+    AddonsScreen* as = dynamic_cast<AddonsScreen*>(
+        GUIEngine::getCurrentScreen());
+    if (as)
+        as->setLastSelected();
 }   // AddonsLoading
 
 // ----------------------------------------------------------------------------
@@ -166,25 +172,7 @@ void AddonsLoading::beforeAddingWidgets()
 
     // Display the size
     // ================
-    int n = m_addon.getSize();
-    core::stringw unit="";
-    if(n>1024*1024)
-    {
-        float f = ((int)(n/1024.0f/1024.0f*10.0f+0.5f))/10.0f;
-        char s[32];
-        sprintf(s, "%.1f", f);
-        unit = _("%s MB", s);
-    }
-    else if(n>1024)
-    {
-        float f = ((int)(n/1024.0f*10.0f+0.5f))/10.0f;
-        char s[32];
-        sprintf(s, "%.1f", f);
-        unit = _("%s KB", s);
-    }
-    else
-        // Anything smaller just let it be 1 KB
-        unit = _("%s KB", 1);
+    core::stringw unit = StringUtils::getReadableFileSize(m_addon.getSize());
     core::stringw size = _("Size: %s", unit.c_str());
     getWidget<LabelWidget>("size")->setText(size, false);
 #endif
@@ -204,13 +192,30 @@ void AddonsLoading::init()
 // ----------------------------------------------------------------------------
 bool AddonsLoading::onEscapePressed()
 {
-    stopDownload();
     ModalDialog::dismiss();
     return true;
 }   // onEscapePressed
 
 // ----------------------------------------------------------------------------
+void AddonsLoading::tryInstall()
+{
+#ifndef SERVER_ONLY
+    // Only display the progress bar etc. if we are not uninstalling an addon.
+    if (!m_addon.isInstalled() || m_addon.needsUpdate())
+    {
+        m_progress->setValue(0);
+        m_progress->setVisible(true);
+        // Change the 'back' button into a 'cancel' button.
+        m_back_button->setLabel(_("Cancel"));
+        GUIEngine::RibbonWidget* actions_ribbon =
+            getWidget<GUIEngine::RibbonWidget>("actions");
+        actions_ribbon->setVisible(false);
+        startDownload();
+    }
+#endif
+}   // tryInstall
 
+// ----------------------------------------------------------------------------
 GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event_source)
 {
 #ifndef SERVER_ONLY
@@ -224,25 +229,12 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
         
         if(selection == "back")
         {
-            stopDownload();
             dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == "install")
         {
-            // Only display the progress bar etc. if we are
-            // not uninstalling an addon.
-            if(!m_addon.isInstalled() || m_addon.needsUpdate())
-            {
-                m_progress->setValue(0);
-                m_progress->setVisible(true);
-                // Change the 'back' button into a 'cancel' button.
-                m_back_button->setLabel(_("Cancel"));
-
-                actions_ribbon->setVisible(false);
-
-                startDownload();
-            }
+            tryInstall();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "uninstall")
@@ -333,8 +325,8 @@ void AddonsLoading::startDownload()
 #ifndef SERVER_ONLY
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
-    m_download_request = new Online::HTTPRequest(save, /*manage mem*/false,
-                                                 /*priority*/5);
+    m_download_request = std::make_shared<Online::HTTPRequest>(
+        save, /*priority*/5);
     m_download_request->setURL(m_addon.getZipFileName());
     m_download_request->queue();
 #endif
@@ -348,18 +340,11 @@ void AddonsLoading::stopDownload()
 {
     // Cancel a download only if we are installing/upgrading one
     // (and not uninstalling an installed one):
-    if(m_download_request)
+    if (m_download_request)
     {
-        // In case of a cancel we can't free the memory, since the 
-        // request manager thread is potentially working on this request. So 
-        // in order to avoid a memory leak, we let the request manager
-        // free the data. This is thread safe since freeing the data is done
-        // when the request manager handles the result queue - and this is
-        // done by the main thread (i.e. this thread).
-        m_download_request->setManageMemory(true);
         m_download_request->cancel();
-        m_download_request = NULL;
-    };
+        m_download_request = nullptr;
+    }
 }   // startDownload
 
 
@@ -369,8 +354,7 @@ void AddonsLoading::stopDownload()
 void AddonsLoading::doInstall()
 {
 #ifndef SERVER_ONLY
-    delete m_download_request;
-    m_download_request = NULL;
+    m_download_request = nullptr;
 
     assert(!m_addon.isInstalled() || m_addon.needsUpdate());
     bool error = !addons_manager->install(m_addon);
@@ -394,7 +378,10 @@ void AddonsLoading::doInstall()
     {
         // The list of the addon screen needs to be updated to correctly
         // display the newly (un)installed addon.
-        AddonsScreen::getInstance()->loadList();
+        AddonsScreen* as = dynamic_cast<AddonsScreen*>(
+            GUIEngine::getCurrentScreen());
+        if (as)
+            as->loadList();
         dismiss();
     }
 
@@ -404,6 +391,9 @@ void AddonsLoading::doInstall()
     delete grand_prix_manager;
     grand_prix_manager = new GrandPrixManager();
     grand_prix_manager->checkConsistency();
+
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+        cl->updateAssetsToServer();
 #endif
 }   // doInstall
 
@@ -412,8 +402,7 @@ void AddonsLoading::doInstall()
 void AddonsLoading::doUninstall()
 {
 #ifndef SERVER_ONLY
-    delete m_download_request;
-    m_download_request = NULL;
+    m_download_request = nullptr;
     bool error = !addons_manager->uninstall(m_addon);
     if(error)
     {
@@ -438,7 +427,10 @@ void AddonsLoading::doUninstall()
     {
         // The list of the addon screen needs to be updated to correctly
         // display the newly (un)installed addon.
-        AddonsScreen::getInstance()->loadList();
+        AddonsScreen* as = dynamic_cast<AddonsScreen*>(
+            GUIEngine::getCurrentScreen());
+        if (as)
+            as->loadList();
         dismiss();
     }
     // Update the replay file list to use latest track pointer
@@ -446,5 +438,8 @@ void AddonsLoading::doUninstall()
     delete grand_prix_manager;
     grand_prix_manager = new GrandPrixManager();
     grand_prix_manager->checkConsistency();
+
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+        cl->updateAssetsToServer();
 #endif
 }   // doUninstall

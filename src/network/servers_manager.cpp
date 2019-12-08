@@ -77,7 +77,7 @@ ServersManager::~ServersManager()
 /** Returns a WAN update-list-of-servers request. It queries the
  *  STK server for an up-to-date list of servers.
  */
-Online::XMLRequest* ServersManager::getWANRefreshRequest() const
+std::shared_ptr<Online::XMLRequest> ServersManager::getWANRefreshRequest() const
 {
     // ========================================================================
     /** A small local class that triggers an update of the ServersManager
@@ -85,8 +85,7 @@ Online::XMLRequest* ServersManager::getWANRefreshRequest() const
     class WANRefreshRequest : public Online::XMLRequest
     {
     public:
-        WANRefreshRequest() : Online::XMLRequest(/*manage_memory*/true,
-                                                 /*priority*/100) {}
+        WANRefreshRequest() : Online::XMLRequest(/*priority*/100) {}
         // --------------------------------------------------------------------
         virtual void afterOperation() OVERRIDE
         {
@@ -97,7 +96,7 @@ Online::XMLRequest* ServersManager::getWANRefreshRequest() const
     };   // RefreshRequest
     // ========================================================================
 
-    Online::XMLRequest *request = new WANRefreshRequest();
+    auto request = std::make_shared<WANRefreshRequest>();
     request->setApiURL(Online::API::SERVER_PATH, "get-all");
 
     return request;
@@ -108,7 +107,7 @@ Online::XMLRequest* ServersManager::getWANRefreshRequest() const
  *  to find LAN servers, and waits for a certain amount of time fr 
  *  answers.
  */
-Online::XMLRequest* ServersManager::getLANRefreshRequest() const
+std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
 {
     /** A simple class that uses LAN broadcasts to find local servers.
      *  It is based on XML request, but actually does not use any of the
@@ -120,7 +119,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
     public:
 
         /** High priority for this request. */
-        LANRefreshRequest() : XMLRequest(true, 100) {m_success = false;}
+        LANRefreshRequest() : XMLRequest(/*priority*/100) {m_success = false;}
         // --------------------------------------------------------------------
         virtual ~LANRefreshRequest() {}
         // --------------------------------------------------------------------
@@ -222,7 +221,7 @@ Online::XMLRequest* ServersManager::getLANRefreshRequest() const
     };   // LANRefreshRequest
     // ========================================================================
 
-    return new LANRefreshRequest();
+    return std::make_shared<LANRefreshRequest>();
 
 }   // getLANRefreshRequest
 

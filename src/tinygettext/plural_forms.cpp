@@ -76,17 +76,22 @@ PluralForms::from_string(const std::string& str)
     plural_forms["Plural-Forms:nplurals=2;plural=n==1||n%10==1?0:1;"] = PluralForms(2, plural2_mk);
 
     //FIXME wrong plural equation in be/ru translation files! (transifex error?) nplurals of be/ru is 3 indeed.
-    plural_forms["Plural-Forms:nplurals=4;plural=(n%10==1&&n%100!=11?0:n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?1:n%10==0||(n%10>=5&&n%10<=9)||(n%100>=11&&n%100<=14)?2:3);"] = PluralForms(3, plural3_be);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n%10==1&&n%100!=11?0:n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?1:n%10==0||(n%10>=5&&n%10<=9)||(n%100>=11&&n%100<=14)?2:3);"] = PluralForms(4, plural3_be);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n%1==0&&n%10==1&&n%100!=11?0:n%1==0&&n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?1:n%1==0&&(n%10==0||(n%10>=5&&n%10<=9)||(n%100>=11&&n%100<=14))?2:3);"] = PluralForms(4, plural3_be);
     plural_forms["Plural-Forms:nplurals=3;plural=n%10==1&&n%100!=11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2;"] = PluralForms(3, plural3_be);
     plural_forms["Plural-Forms:nplurals=3;plural=(n%10==1&&n%100!=11?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2);"] = PluralForms(3, plural3_be);
     //FIXME wrong again
-    plural_forms["Plural-Forms:nplurals=4;plural=(n==1)?0:(n==2)?1:(n==3)?2:3;"] = PluralForms(3, plural3_kw);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n==1)?0:(n==2)?1:(n==3)?2:3;"] = PluralForms(4, plural3_kw);
+    plural_forms["Plural-Forms:nplurals=3;plural=(n==1?0:n==2?1:2);"] = PluralForms(3, plural3_kw);
     plural_forms["Plural-Forms:nplurals=3;plural=(n%10==1&&n%100!=11?0:n!=0?1:2);"] = PluralForms(3, plural3_lv);
     plural_forms["Plural-Forms:nplurals=3;plural=(n%10==1&&n%100!=11?0:n%10>=2&&(n%100<10||n%100>=20)?1:2);"] = PluralForms(3, plural3_lt);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n%10==1&&(n%100>19||n%100<11)?0:(n%10>=2&&n%10<=9)&&(n%100>19||n%100<11)?1:n%1!=0?2:3);"] = PluralForms(4, plural3_lt);
     plural_forms["Plural-Forms:nplurals=3;plural=(n==1?0:n%10>=2&&n%10<=4&&(n%100<10||n%100>=20)?1:2);"] = PluralForms(3, plural3_pl);
     plural_forms["Plural-Forms:nplurals=4;plural=(n==1?0:(n%10>=2&&n%10<=4)&&(n%100<12||n%100>14)?1:n!=1&&(n%10>=0&&n%10<=1)||(n%10>=5&&n%10<=9)||(n%100>=12&&n%100<=14)?2:3);"] = PluralForms(4, plural3_pl);
     plural_forms["Plural-Forms:nplurals=3;plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));"] = PluralForms(3, plural3_ro);
     plural_forms["Plural-Forms:nplurals=3;plural=(n==1)?0:(n>=2&&n<=4)?1:2;"] = PluralForms(3, plural3_sk);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n%1==0&&n==1?0:n%1==0&&n>=2&&n<=4?1:n%1!=0?2:3);"] = PluralForms(4, plural3_sk);
+    plural_forms["Plural-Forms:nplurals=4;plural=(n==1&&n%1==0)?0:(n>=2&&n<=4&&n%1==0)?1:(n%1!=0)?2:3;"] = PluralForms(4, plural3_sk);
 
     plural_forms["Plural-Forms:nplurals=4;plural=(n%100==1?0:n%100==2?1:n%100==3||n%100==4?2:3);"] = PluralForms(4, plural4_sl);
     plural_forms["Plural-Forms:nplurals=4;plural=(n==1||n==11)?0:(n==2||n==12)?1:(n>2&&n<20)?2:3;"] = PluralForms(4, plural4_gd);

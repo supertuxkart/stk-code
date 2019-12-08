@@ -41,10 +41,11 @@ private:
 
     /** A pointer to the download request, which gives access
      *  to the progress of a download. */
-    DownloadAssetsRequest* m_download_request;
+    std::shared_ptr<DownloadAssetsRequest> m_download_request;
 
 public:
     DownloadAssets();
+    ~DownloadAssets();
 
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source) OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;

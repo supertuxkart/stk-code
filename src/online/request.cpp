@@ -30,15 +30,13 @@ namespace Online
     // ========================================================================
     /**
      *  Creates a request that can be handled by the RequestManager
-     *  \param manage_memory whether or not the RequestManager should take care of
-     *         deleting the object after all callbacks have been done
      *  \param priority by what priority should the RequestManager take care of
      *         this request
      *  \param type indicates whether the request has a special task for the
      *         RequestManager
      */
-    Request::Request(bool manage_memory, int priority, int type)
-        : m_type(type), m_manage_memory(manage_memory), m_priority(priority)
+    Request::Request(int priority, int type)
+        : m_type(type), m_priority(priority)
     {
         m_cancel.setAtomic(false);
         m_state.setAtomic(S_PREPARING);
@@ -50,7 +48,7 @@ namespace Online
      */
     void Request::queue()
     {
-        RequestManager::get()->addRequest(this);
+        RequestManager::get()->addRequest(shared_from_this());
     }   // queue
 
     // ------------------------------------------------------------------------

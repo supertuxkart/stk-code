@@ -27,6 +27,7 @@
 #include "utils/no_copy.hpp"
 
 #include "irrString.h"
+#include <memory>
 #include <set>
 #include <tuple>
 #include <vector>
@@ -213,9 +214,11 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getCurrentUserToken() const { return m_cur_user_token; }
     // ------------------------------------------------------------------------
-    void setUserDetails(Online::XMLRequest* r, const std::string& name);
+    void setUserDetails(std::shared_ptr<Online::XMLRequest> r,
+                        const std::string& name);
     // ------------------------------------------------------------------------
-    void setServerDetails(Online::XMLRequest* r, const std::string& name);
+    void setServerDetails(std::shared_ptr<Online::XMLRequest> r,
+                          const std::string& name);
     // ------------------------------------------------------------------------
     void setServerIdFile(const std::string& id) { m_server_id_file = id; }
     // ------------------------------------------------------------------------

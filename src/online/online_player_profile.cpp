@@ -53,8 +53,8 @@ namespace Online
         {
             virtual void callback();
         public:
-            SignInRequest(bool manage_memory)
-                : XMLRequest(manage_memory, /*priority*/10) {}
+            SignInRequest()
+                : XMLRequest(/*priority*/10) {}
         };   // SignInRequest
 
         // ----------------------------------------------------------------
@@ -71,7 +71,7 @@ namespace Online
      *  \param request The http request.
      *  \param action the action performed
      */
-    void OnlinePlayerProfile::setUserDetails(HTTPRequest *request,
+    void OnlinePlayerProfile::setUserDetails(std::shared_ptr<HTTPRequest> request,
                                              const std::string &action,
                                              const std::string &url_path) const
     {
@@ -115,8 +115,7 @@ namespace Online
     {
         if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
-            PrivateRequest::SignInRequest *request =
-                new PrivateRequest::SignInRequest(true);
+            auto request = std::make_shared<PrivateRequest::SignInRequest>();
             setUserDetails(request, "saved-session");
 
             // The userid must be taken from the saved data,
@@ -140,8 +139,7 @@ namespace Online
         // logout stil happening.
         assert(m_online_state == OS_SIGNED_OUT ||
                m_online_state == OS_SIGNING_OUT);
-        PrivateRequest::SignInRequest * request =
-            new PrivateRequest::SignInRequest(true);
+        auto request = std::make_shared<PrivateRequest::SignInRequest>();
 
         // We can't use setUserDetail here, since there is no token yet
         request->setApiURL(API::USER_PATH, "connect");
@@ -300,18 +298,17 @@ namespace Online
              *  happens before a following logout.
              */
             SignOutRequest(PlayerProfile *player)
-                        : XMLRequest(true,/*priority*/RequestManager::HTTP_MAX_PRIORITY)
+                        : XMLRequest(/*priority*/RequestManager::HTTP_MAX_PRIORITY)
             {
                 m_player = player;
-                m_player->setUserDetails(this,
-                    m_player->rememberPassword() ? "client-quit"
-                                                 : "disconnect");
                 setAbortable(false);
             }   // SignOutRequest
         };   // SignOutRequest
         // ----------------------------------------------------------------
 
-        HTTPRequest *request = new SignOutRequest(this);
+        auto request = std::make_shared<SignOutRequest>(this);
+        setUserDetails(request,
+            rememberPassword() ? "client-quit" : "disconnect");
         request->queue();
         m_online_state = OS_SIGNING_OUT;
     }   // requestSignOut
@@ -362,15 +359,14 @@ namespace Online
     {
         assert(m_online_state == OS_SIGNED_IN);
 
-        PrivateRequest::PollRequest *request =
-            new PrivateRequest::PollRequest();
+        auto request = std::make_shared<PrivateRequest::PollRequest>();
         setUserDetails(request, "poll");
         request->queue();
     }   // requestPoll()
 
     // ------------------------------------------------------------------------
     PrivateRequest::PollRequest::PollRequest()
-                       : XMLRequest(true)
+                       : XMLRequest()
     {
     }   // PollRequest
 

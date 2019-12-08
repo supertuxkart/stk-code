@@ -126,17 +126,15 @@ void AddonsManager::init(const XMLNode *xml,
     if (download)
     {
         Log::info("addons", "Downloading updated addons.xml.");
-        Online::HTTPRequest *download_request = new Online::HTTPRequest("addons.xml");
+        auto download_request = std::make_shared<Online::HTTPRequest>("addons.xml");
         download_request->setURL(addon_list_url);
         download_request->executeNow();
         if(download_request->hadDownloadError())
         {
             Log::error("addons", "Error on download addons.xml: %s.",
                        download_request->getDownloadErrorMessage());
-            delete download_request;
             return;
         }
-        delete download_request;
         UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
     }
     else
@@ -398,12 +396,12 @@ void AddonsManager::downloadIcons()
             public:
                 IconRequest(const std::string &filename,
                             const std::string &url,
-                            Addon *addon     ) : HTTPRequest(filename, true, 1)
+                            Addon *addon     ) : HTTPRequest(filename,/*priority*/1)
                 {
                     m_addon = addon;  setURL(url);
                 }   // IconRequest
             };
-            IconRequest *r = new IconRequest("icons/"+icon, url, &addon);
+            auto r = std::make_shared<IconRequest>("icons/"+icon, url, &addon);
             r->queue();
         }
         else
@@ -447,7 +445,7 @@ void AddonsManager::loadInstalledAddons()
  *  found!
  *  \param id The id to search for.
  */
-const Addon* AddonsManager::getAddon(const std::string &id) const
+Addon* AddonsManager::getAddon(const std::string &id)
 {
     int i = getAddonIndex(id);
     return (i<0) ? NULL : &(m_addons_list.getData()[i]);
@@ -494,7 +492,7 @@ bool AddonsManager::install(const Addon &addon)
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
     std::string to        = addon.getDataDir();
 
-    bool success = extract_zip(from, to);
+    bool success = extract_zip(from, to, true/*recursive*/);
     if (!success)
     {
         // TODO: show a message in the interface

@@ -38,13 +38,11 @@ namespace Online
 
     /** Creates a HTTP(S) request that will have a raw string as result. (Can
      *  of course be used if the result doesn't matter.)
-     *  \param manage_memory whether or not the RequestManager should take care of
-     *         deleting the object after all callbacks have been done.
      *  \param priority by what priority should the RequestManager take care of
      *         this request.
      */
-    HTTPRequest::HTTPRequest(bool manage_memory, int priority)
-               : Request(manage_memory, priority, 0)
+    HTTPRequest::HTTPRequest(int priority)
+               : Request(priority, 0)
     {
         init();
     }   // HTTPRequest
@@ -52,14 +50,11 @@ namespace Online
     // ------------------------------------------------------------------------
     /** This constructor configures this request to save the data in a flie.
      *  \param filename Name of the file to save the data to.
-     *  \param manage_memory whether or not the RequestManager should take care of
-     *         deleting the object after all callbacks have been done.
      *  \param priority by what priority should the RequestManager take care of
      *         this request.
      */
-    HTTPRequest::HTTPRequest(const std::string &filename, bool manage_memory,
-                                       int priority)
-               : Request(manage_memory, priority, 0)
+    HTTPRequest::HTTPRequest(const std::string &filename, int priority)
+               : Request(priority, 0)
     {
         // A http request should not even be created when internet is disabled
         assert(UserConfigParams::m_internet_status ==
@@ -74,9 +69,8 @@ namespace Online
     /** Char * needs a separate constructor, otherwise it will be considered
      *  to be the no-filename constructor (char* -> bool).
      */
-    HTTPRequest::HTTPRequest(const char* const filename, bool manage_memory,
-                                       int priority)
-               : Request(manage_memory, priority, 0)
+    HTTPRequest::HTTPRequest(const char* const filename, int priority)
+               : Request(priority, 0)
     {
         // A http request should not even be created when internet is disabled
         assert(UserConfigParams::m_internet_status ==
@@ -96,7 +90,8 @@ namespace Online
         m_filename      = "";
         m_parameters    = "";
         m_curl_code     = CURLE_OK;
-        m_progress.setAtomic(0);
+        m_progress.store(0.0f);
+        m_total_size.store(-1.0);
         m_disable_sending_log = false;
     }   // init
 
@@ -374,6 +369,7 @@ namespace Online
         }
 
         float f;
+        request->setTotalSize(download_total);
         if (download_now < download_total)
         {
             f = (float)download_now / (float)download_total;

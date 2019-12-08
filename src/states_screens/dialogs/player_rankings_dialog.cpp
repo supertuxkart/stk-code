@@ -25,6 +25,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "online/online_profile.hpp"
+#include "states_screens/dialogs/ranking_callback.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 
@@ -42,8 +43,7 @@ std::vector<std::tuple<int, core::stringw, float> >
 PlayerRankingsDialog::PlayerRankingsDialog(uint32_t online_id,
                                            const core::stringw& name)
                     : ModalDialog(0.8f,0.9f), m_online_id(online_id),
-                      m_name(name), m_self_destroy(false),
-                      m_fetched_ranking(std::make_shared<bool>(false))
+                      m_name(name), m_self_destroy(false)
 {
     loadFromFile("online/player_rankings_dialog.stkgui");
     m_top_ten = getWidget<ListWidget>("top-ten");
@@ -68,8 +68,9 @@ void PlayerRankingsDialog::beforeAddingWidgets()
 
     m_ranking_info = getWidget<LabelWidget>("cur-rank");
     assert(m_ranking_info != NULL);
-    updatePlayerRanking(m_name, m_online_id, m_ranking_info,
-        m_fetched_ranking);
+    m_ranking_callback =
+        RankingCallback::getRankingCallback(m_name, m_online_id);
+    m_ranking_callback->queue();
 }   // beforeAddingWidgets
 
 // ----------------------------------------------------------------------------
@@ -105,11 +106,11 @@ void PlayerRankingsDialog::updateTopTenList()
             }
         }   // callback
     public:
-        UpdateTopTenRequest() : XMLRequest(true) {}
+        UpdateTopTenRequest() : XMLRequest() {}
     };   // UpdateTopTenRequest
     // ------------------------------------------------------------------------
 
-    UpdateTopTenRequest *request = new UpdateTopTenRequest();
+    auto request = std::make_shared<UpdateTopTenRequest>();
     PlayerManager::setUserDetails(request, "top-players");
     request->addParameter("ntop", 10);
     request->queue();
@@ -135,10 +136,15 @@ void PlayerRankingsDialog::fillTopTenList()
 // -----------------------------------------------------------------------------
 void PlayerRankingsDialog::onUpdate(float dt)
 {
-    if (*m_fetched_ranking == false)
+    if (m_ranking_callback && !m_ranking_callback->isDone())
     {
         core::stringw msg = _("Fetching ranking info for %s", m_name);
         m_ranking_info->setText(StringUtils::loadingDots(msg.c_str()), false);
+    }
+    else if (m_ranking_callback && m_ranking_callback->isDone())
+    {
+        m_ranking_info->setText(m_ranking_callback->getRankingResult(), false);
+        m_ranking_callback = nullptr;
     }
 
     // It's unsafe to delete from inside the event handler so we do it here
@@ -171,9 +177,9 @@ GUIEngine::EventPropagation
                 return GUIEngine::EVENT_BLOCK;
 
             timer = StkTime::getMonoTimeMs();
-            *m_fetched_ranking = false;
-            updatePlayerRanking(m_name, m_online_id, m_ranking_info,
-                m_fetched_ranking);
+            m_ranking_callback =
+                RankingCallback::getRankingCallback(m_name, m_online_id);
+            m_ranking_callback->queue();
             updateTopTenList();
             return GUIEngine::EVENT_BLOCK;
         }

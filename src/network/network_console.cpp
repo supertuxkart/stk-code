@@ -29,8 +29,17 @@
 #include <iostream>
 #include <limits>
 
+#ifndef WIN32
+#  include <stdint.h>
+#  include <sys/time.h>
+#  include <unistd.h>
+#endif
+
 namespace NetworkConsole
 {
+#ifndef WIN32
+std::string g_cmd_buffer;
+#endif
 // ----------------------------------------------------------------------------
 void showHelp()
 {
@@ -46,15 +55,60 @@ void showHelp()
 }   // showHelp
 
 // ----------------------------------------------------------------------------
+#ifndef WIN32
+bool pollCommand()
+{
+    struct timeval timeout;
+    fd_set rfds;
+    int fd;
+    char c;
+
+    // stdin file descriptor is 0
+    fd = 0;
+    timeout.tv_sec = 0;
+    timeout.tv_usec = 10000;
+
+    FD_ZERO(&rfds);
+    FD_SET(fd, &rfds);
+
+    if (select(fd + 1, &rfds, NULL, NULL, &timeout) <= 0)
+        return false;
+    if (read(fd, &c, 1) != 1)
+        return false;
+
+    if (c == '\n')
+        return true;
+    g_cmd_buffer += c;
+    return false;
+}   // pollCommand
+#endif
+
+// ----------------------------------------------------------------------------
 void mainLoop(STKHost* host)
 {
     VS::setThreadName("NetworkConsole");
+
+#ifndef WIN32
+    g_cmd_buffer.clear();
+#endif
+
     showHelp();
     std::string str = "";
     while (!host->requestedShutdown())
     {
+#ifndef WIN32
+        if (!pollCommand())
+            continue;
+
+        std::stringstream ss(g_cmd_buffer);
+        if (g_cmd_buffer.empty())
+            continue;
+        g_cmd_buffer.clear();
+#else
         getline(std::cin, str);
         std::stringstream ss(str);
+#endif
+
         int number = -1;
         ss >> str >> number;
         if (str == "help")

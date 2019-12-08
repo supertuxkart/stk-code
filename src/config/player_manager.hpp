@@ -28,6 +28,7 @@
 #include <irrString.h>
 
 #include <cstddef>  // NULL
+#include <memory>
 
 class AchievementsStatus;
 
@@ -97,7 +98,7 @@ public:
     const PlayerProfile *getPlayerById(unsigned int id);
     void enforceCurrentPlayer();
     unsigned int getNumNonGuestPlayers() const;
-    static void setUserDetails(Online::HTTPRequest *request,
+    static void setUserDetails(std::shared_ptr<Online::HTTPRequest> request,
                                const std::string &action,
                                const std::string &php_name = "");
     static unsigned int getCurrentOnlineId();

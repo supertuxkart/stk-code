@@ -196,7 +196,7 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
     if (forward == Graph::UNKNOWN_SECTOR ||
         m_target_node == Graph::UNKNOWN_SECTOR)
     {
-        Log::error("ArenaAI", "Next node is unknown, path finding failed!");
+        Log::debug("ArenaAI", "Next node is unknown, path finding failed!");
         return false;
     }
 
@@ -212,7 +212,7 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
 
     if (next_node == Graph::UNKNOWN_SECTOR)
     {
-        Log::error("ArenaAI", "Next node is unknown, did you forget to link"
+        Log::debug("ArenaAI", "Next node is unknown, did you forget to link"
                    " adjacent face in navmesh?");
         return false;
     }
@@ -224,7 +224,7 @@ bool ArenaAI::updateAimingPosition(Vec3* target_point)
         next_node = m_graph->getNextNode(previous_node, m_target_node);
         if (next_node == Graph::UNKNOWN_SECTOR)
         {
-            Log::error("ArenaAI", "Next node is unknown, did you forget to"
+            Log::debug("ArenaAI", "Next node is unknown, did you forget to"
                        " link adjacent face in navmesh?");
             return false;
         }

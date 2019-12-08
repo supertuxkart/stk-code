@@ -142,7 +142,7 @@ void OnlineProfile::fetchAchievements()
     class AchievementsRequest : public XMLRequest
     {
     public:
-        AchievementsRequest() : XMLRequest(true, true) {}
+        AchievementsRequest() : XMLRequest() {}
         virtual void callback()
         {
             uint32_t user_id = 0;
@@ -154,7 +154,7 @@ void OnlineProfile::fetchAchievements()
     };   // class AchievementsRequest
     // ------------------------------------------------------------------------
 
-    AchievementsRequest * request = new AchievementsRequest();
+    auto request = std::make_shared<AchievementsRequest>();
     PlayerManager::setUserDetails(request, "get-achievements");
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);
@@ -195,7 +195,7 @@ void OnlineProfile::fetchFriends()
     class FriendsListRequest : public XMLRequest
     {
     public:
-        FriendsListRequest() : XMLRequest(true, true) {}
+        FriendsListRequest() : XMLRequest() {}
         virtual void callback()
         {
             uint32_t user_id = 0;
@@ -207,7 +207,7 @@ void OnlineProfile::fetchFriends()
     };   // class FriendsListRequest
     // ------------------------------------------------------------------------
 
-    FriendsListRequest * request = new FriendsListRequest();
+    auto request = std::make_shared<FriendsListRequest>();
     PlayerManager::setUserDetails(request, "get-friends-list");
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);

@@ -42,6 +42,7 @@
 #include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
+#include "states_screens/cutscene_general.hpp"
 #include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/offline_kart_selection.hpp"
@@ -381,6 +382,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         parts.push_back("introcutscene2");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
         //race_manager->startSingleRace("introcutscene2", 999, false);
+        
+        CutSceneGeneral* scene = CutSceneGeneral::getInstance();
+        scene->push();
         return;
     }
     else if (selection == "test_outro")
@@ -396,6 +400,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         std::vector<std::string> parts;
         parts.push_back("endcutscene");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
+        
+        CutSceneGeneral* scene = CutSceneGeneral::getInstance();
+        scene->push();
     }
     else
 #endif
@@ -494,6 +501,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             parts.push_back("introcutscene2");
             ((CutsceneWorld*)World::getWorld())->setParts(parts);
             //race_manager->startSingleRace("introcutscene2", 999, false);
+            
+            CutSceneGeneral* scene = CutSceneGeneral::getInstance();
+            scene->push();
             return;
         }
         else
