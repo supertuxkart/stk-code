@@ -1,6 +1,6 @@
  <?xml version="1.0" encoding="UTF-8"?>
 <tips>
-    <tipset id="normal">
+    <tipset id="general">
         <tip text="You can change the skin of gui in UI options."/>
         <tip text="You can show more information in game by enabling some options in UI options"/>
         <tip text="You can change the font size in UI options"/>

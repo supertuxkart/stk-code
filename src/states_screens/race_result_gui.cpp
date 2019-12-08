@@ -144,8 +144,7 @@ void RaceResultGUI::init()
     }
 
     core::stringw tips_string = _("Tip: ") + TipsManager::get()->getTip("race");
-    GUIEngine::LabelWidget *tips = getWidget<GUIEngine::LabelWidget>("tips");
-    tips->setText(tips_string, false);
+    MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
 }   // init
 
 //-----------------------------------------------------------------------------

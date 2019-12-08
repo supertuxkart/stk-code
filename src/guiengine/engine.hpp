@@ -232,7 +232,7 @@ namespace GUIEngine
     void render(float dt, bool is_loading = false);
 
     /** \brief renders a "loading" screen */
-    void renderLoading(bool clearIcons = true, bool launching = false);
+    void renderLoading(bool clearIcons = true, bool launching = false, bool update_tips = false);
 
     /** \brief to spice up a bit the loading icon : add icons to the loading screen */
     void addLoadingIcon(irr::video::ITexture* icon);

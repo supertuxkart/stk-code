@@ -484,7 +484,7 @@ void RaceManager::startNextRace()
     // sfx_manager->dump();
 
     IrrlichtDevice* device = irr_driver->getDevice();
-    GUIEngine::renderLoading();
+    GUIEngine::renderLoading(true, false, true);
     device->getVideoDriver()->endScene();
     device->getVideoDriver()->beginScene(true, true,
                                          video::SColor(255,100,101,140));
