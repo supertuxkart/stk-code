@@ -1428,12 +1428,19 @@ void RaceResultGUI::displayCTFResults()
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
             result_text = scorers.at(i).m_player;
+            if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
+                result_text = _("%s (handicapped)", result_text);
 
             if (own_goal)
             {
                 result_text.append(" ");
                 //I18N: indicates a player that scored in their own goal in result screen
                 result_text.append(_("(Own Goal)"));
+            }
+            if (!scorers.at(i).m_country_code.empty())
+            {
+                result_text += " ";
+                result_text += StringUtils::getCountryFlag(scorers.at(i).m_country_code);
             }
 
             result_text.append("  ");
@@ -1479,11 +1486,19 @@ void RaceResultGUI::displayCTFResults()
             const bool own_goal = !(scorers.at(i).m_correct_goal);
 
             result_text = scorers.at(i).m_player;
+            if (scorers.at(i).m_handicap_level == HANDICAP_MEDIUM)
+                result_text = _("%s (handicapped)", result_text);
 
             if (own_goal)
             {
                 result_text.append(" ");
+                //I18N: indicates a player that scored in their own goal in result screen
                 result_text.append(_("(Own Goal)"));
+            }
+            if (!scorers.at(i).m_country_code.empty())
+            {
+                result_text += " ";
+                result_text += StringUtils::getCountryFlag(scorers.at(i).m_country_code);
             }
 
             result_text.append("  ");
