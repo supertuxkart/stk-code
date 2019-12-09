@@ -82,7 +82,7 @@ private:
 
     bool m_allow_change_team, m_has_auto_start_in_server,
         m_server_configurable, m_client_live_joinable,
-        m_reload_server_info;
+        m_reload_server_info, m_displayed_addon_install_cmd;
 
     video::ITexture* m_config_texture;
     video::ITexture* m_spectate_texture;
