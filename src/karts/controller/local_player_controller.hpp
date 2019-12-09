@@ -89,7 +89,7 @@ public:
     virtual bool isLocalPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
-    core::stringw getName() const OVERRIDE;
+    core::stringw getName(bool include_handicap_string = true) const OVERRIDE;
 
 };   // LocalPlayerController
 

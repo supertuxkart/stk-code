@@ -53,8 +53,10 @@ public:
         std::string   m_kart;
         /** Player name which scores. */
         core::stringw m_player;
-        /** Country flag of player (used in server only). */
-        core::stringw m_country_flag;
+        /** Country code of player. */
+        std::string m_country_code;
+        /** Handicap of player. */
+        HandicapLevel m_handicap_level;
     };   // ScorerData
 
 private:

@@ -111,7 +111,7 @@ public:
     /** Display name of the controller.
      *  Defaults to kart name; overriden by controller classes
      *  (such as player controllers) to display username. */
-    virtual core::stringw getName() const;
+    virtual core::stringw getName(bool include_handicap_string = true) const;
     // ------------------------------------------------------------------------
     /** Returns the kart controlled by this controller. */
     AbstractKart *getKart() const { return m_kart; }

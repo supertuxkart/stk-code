@@ -90,7 +90,7 @@ public:
     }   // finishedRace
     // ------------------------------------------------------------------------
     /** Returns the name of the player profile. */
-    core::stringw getName() const OVERRIDE;
+    core::stringw getName(bool include_handicap_string = true) const OVERRIDE;
     // ------------------------------------------------------------------------
     /** Called when this kart started too early and got a start penalty. */
     virtual void  displayPenaltyWarning();
