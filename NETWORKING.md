@@ -5,7 +5,7 @@ First of all, you can compile STK with `-DSERVER_ONLY=ON` which will produce a G
 The dependencies for RHEL/CentOS 7 are installed with:
 ```bash
 yum install wget; cd /tmp; wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm; rpm -Uvh epel-release*rpm
-yum install gcc-c++ cmake openssl-devel libcurl-devel zlib-devel enet gcc-c++
+yum install gcc-c++ cmake openssl-devel libcurl-devel zlib-devel enet
 ```
 ### Hosting WAN (public internet) server
 You are required to have an stk online account first, go [here](https://online.supertuxkart.net/register.php) for registration.
