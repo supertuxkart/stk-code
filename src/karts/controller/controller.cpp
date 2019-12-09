@@ -36,7 +36,7 @@ Controller::Controller(AbstractKart *kart)
 }   // Controller
 
 // ----------------------------------------------------------------------------
-core::stringw Controller::getName() const
+core::stringw Controller::getName(bool include_handicap_string) const
 {
     return m_kart->getName();
 }   // getName

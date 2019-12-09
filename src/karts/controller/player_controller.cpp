@@ -397,7 +397,7 @@ void PlayerController::rewindTo(BareNetworkString *buffer)
 }   // rewindTo
 
 // ----------------------------------------------------------------------------
-core::stringw PlayerController::getName() const
+core::stringw PlayerController::getName(bool include_handicap_string) const
 {
     core::stringw name = m_kart->getName();
     if (NetworkConfig::get()->isNetworking())
@@ -405,7 +405,7 @@ core::stringw PlayerController::getName() const
         const RemoteKartInfo& rki = race_manager->getKartInfo(
             m_kart->getWorldKartId());
         name = rki.getPlayerName();
-        if (rki.getHandicap() == HANDICAP_MEDIUM)
+        if (include_handicap_string && rki.getHandicap() == HANDICAP_MEDIUM)
         {
 #ifdef SERVER_ONLY
             name += L" (handicapped)";

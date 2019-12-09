@@ -90,9 +90,10 @@ public:
 
     // ------------------------------------------------------------------------
     /** Return the display name; if not set, use default display name (kart name) */
-    core::stringw getName() const OVERRIDE
+    core::stringw getName(bool include_handicap_string = true) const OVERRIDE
     {
-        return m_display_name.empty() ? Controller::getName() : m_display_name;
+        return m_display_name.empty() ?
+            Controller::getName(include_handicap_string) : m_display_name;
     }
 };   // GhostController
 

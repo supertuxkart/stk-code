@@ -113,7 +113,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of the previous controller (which has the right
      *  player name associated). */
-    core::stringw getName() const { return m_previous_controller->getName(); }
+    core::stringw getName(bool include_handicap_string = true) const
+            { return m_previous_controller->getName(include_handicap_string); }
 
 };   // EndKart
 

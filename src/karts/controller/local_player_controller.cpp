@@ -427,13 +427,13 @@ bool LocalPlayerController::canGetAchievements() const
 }   // canGetAchievements
 
 // ----------------------------------------------------------------------------
-core::stringw LocalPlayerController::getName() const
+core::stringw LocalPlayerController::getName(bool include_handicap_string) const
 {
     if (NetworkConfig::get()->isNetworking())
         return PlayerController::getName();
 
     core::stringw name = m_player->getProfile()->getName();
-    if (m_handicap != HANDICAP_NONE)
+    if (include_handicap_string && m_handicap != HANDICAP_NONE)
         name = _("%s (handicapped)", name);
 
     return name;

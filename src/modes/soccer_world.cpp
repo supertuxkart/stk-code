@@ -276,11 +276,13 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         sd.m_id = m_ball_hitter;
         sd.m_correct_goal = isCorrectGoal(m_ball_hitter, first_goal);
         sd.m_kart = getKart(m_ball_hitter)->getIdent();
-        sd.m_player = getKart(m_ball_hitter)->getController()->getName();
+        sd.m_player = getKart(m_ball_hitter)->getController()
+            ->getName(false/*include_handicap_string*/);
+        sd.m_handicap_level = getKart(m_ball_hitter)->getHandicap();
         if (race_manager->getKartGlobalPlayerId(m_ball_hitter) > -1)
         {
-            sd.m_country_flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(m_ball_hitter).getCountryCode());
+            sd.m_country_code =
+                race_manager->getKartInfo(m_ball_hitter).getCountryCode();
         }
         if (sd.m_correct_goal)
         {
@@ -325,25 +327,20 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 .addUInt8((uint8_t)sd.m_id).addUInt8(sd.m_correct_goal)
                 .addUInt8(first_goal).addFloat(sd.m_time)
                 .addTime(m_ticks_back_to_own_goal)
-                .encodeString(sd.m_kart);
-            core::stringw player_name = sd.m_player;
-            NetworkString p_with_flag = p;
-            p.encodeString(player_name);
-            if (!sd.m_country_flag.empty())
-            {
-                player_name += L" ";
-                player_name += sd.m_country_flag;
-            }
-            p_with_flag.encodeString(player_name);
+                .encodeString(sd.m_kart).encodeString(sd.m_player);
+            // Added in 1.1, add missing handicap info and country code
+            NetworkString p_1_1 = p;
+            p_1_1.encodeString(sd.m_country_code)
+                .addUInt8(sd.m_handicap_level);
             auto peers = STKHost::get()->getPeers();
             for (auto& peer : peers)
             {
                 if (peer->isValidated() && !peer->isWaitingForGame())
                 {
-                    if (peer->getClientCapabilities().find("color_emoji") !=
+                    if (peer->getClientCapabilities().find("soccer_fixes") !=
                         peer->getClientCapabilities().end())
                     {
-                        peer->sendPacket(&p_with_flag, true/*reliable*/);
+                        peer->sendPacket(&p_1_1, true/*reliable*/);
                     }
                     else
                     {
@@ -388,6 +385,13 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     int ticks_back_to_own_goal = ns.getTime();
     ns.decodeString(&sd.m_kart);
     ns.decodeStringW(&sd.m_player);
+    // Added in 1.1, add missing handicap info and country code
+    if (NetworkConfig::get()->getServerCapabilities().find("soccer_fixes")
+        != NetworkConfig::get()->getServerCapabilities().end())
+    {
+        ns.decodeString(&sd.m_country_code);
+        sd.m_handicap_level = (HandicapLevel)ns.getUInt8();
+    }
 
     if (first_goal)
     {
@@ -778,15 +782,14 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
         bns->addUInt8((uint8_t)m_red_scorers[i].m_id)
             .addUInt8(m_red_scorers[i].m_correct_goal)
             .addFloat(m_red_scorers[i].m_time)
-            .encodeString(m_red_scorers[i].m_kart);
-        core::stringw player_name = m_red_scorers[i].m_player;
-        if (peer->getClientCapabilities().find("color_emoji") !=
+            .encodeString(m_red_scorers[i].m_kart)
+            .encodeString(m_red_scorers[i].m_player);
+        if (peer->getClientCapabilities().find("soccer_fixes") !=
             peer->getClientCapabilities().end())
         {
-            player_name += L" ";
-            player_name += m_red_scorers[i].m_country_flag;
+            bns->encodeString(m_red_scorers[i].m_country_code)
+                .addUInt8(m_red_scorers[i].m_handicap_level);
         }
-        bns->encodeString(player_name);
     }
 
     const unsigned blue_scorers = (unsigned)m_blue_scorers.size();
@@ -796,15 +799,14 @@ void SoccerWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
         bns->addUInt8((uint8_t)m_blue_scorers[i].m_id)
             .addUInt8(m_blue_scorers[i].m_correct_goal)
             .addFloat(m_blue_scorers[i].m_time)
-            .encodeString(m_blue_scorers[i].m_kart);
-        core::stringw player_name = m_blue_scorers[i].m_player;
-        if (peer->getClientCapabilities().find("color_emoji") !=
+            .encodeString(m_blue_scorers[i].m_kart)
+            .encodeString(m_blue_scorers[i].m_player);
+        if (peer->getClientCapabilities().find("soccer_fixes") !=
             peer->getClientCapabilities().end())
         {
-            player_name += L" ";
-            player_name += m_blue_scorers[i].m_country_flag;
+            bns->encodeString(m_blue_scorers[i].m_country_code)
+                .addUInt8(m_blue_scorers[i].m_handicap_level);
         }
-        bns->encodeString(player_name);
     }
     bns->addTime(m_reset_ball_ticks).addTime(m_ticks_back_to_own_goal);
 }   // saveCompleteState
@@ -824,6 +826,12 @@ void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
         sd.m_time = b.getFloat();
         b.decodeString(&sd.m_kart);
         b.decodeStringW(&sd.m_player);
+        if (NetworkConfig::get()->getServerCapabilities().find("soccer_fixes")
+            != NetworkConfig::get()->getServerCapabilities().end())
+        {
+            b.decodeString(&sd.m_country_code);
+            sd.m_handicap_level = (HandicapLevel)b.getUInt8();
+        }
         m_red_scorers.push_back(sd);
     }
 
@@ -836,6 +844,12 @@ void SoccerWorld::restoreCompleteState(const BareNetworkString& b)
         sd.m_time = b.getFloat();
         b.decodeString(&sd.m_kart);
         b.decodeStringW(&sd.m_player);
+        if (NetworkConfig::get()->getServerCapabilities().find("soccer_fixes")
+            != NetworkConfig::get()->getServerCapabilities().end())
+        {
+            b.decodeString(&sd.m_country_code);
+            sd.m_handicap_level = (HandicapLevel)b.getUInt8();
+        }
         m_blue_scorers.push_back(sd);
     }
     m_reset_ball_ticks = b.getTime();
