@@ -192,8 +192,12 @@ public:
             return;
         }
         Message::draw(dt);
-        GUIEngine::getSkin()->drawMessage(g_container, m_area, m_render_type);
-        GUIEngine::getFont()->draw(m_gls, m_text_rect,
+        core::position2di raise = core::position2di(0,
+            irr_driver->getDevice()->getOnScreenKeyboardHeight() -
+            irr_driver->getDevice()->getMovedHeight());
+        GUIEngine::getSkin()->drawMessage(g_container, m_area - raise,
+            m_render_type);
+        GUIEngine::getFont()->draw(m_gls, m_text_rect - raise,
             GUIEngine::getSkin()->getColor("text::neutral"), true/*hcenter*/);
     }
     // ------------------------------------------------------------------------
@@ -270,10 +274,14 @@ public:
     {
         Message::draw(dt);
         m_display_timer = 9999999.9f;
-        GUIEngine::getSkin()->drawProgressBarInScreen(&m_swc, m_area,
+        core::position2di raise = core::position2di(0,
+            irr_driver->getDevice()->getOnScreenKeyboardHeight() -
+            irr_driver->getDevice()->getMovedHeight());
+        GUIEngine::getSkin()->drawProgressBarInScreen(&m_swc, m_area - raise,
             (float)m_progress_value.load() / 100.0f);
         video::SColor color(255, 0, 0, 0);
-        GUIEngine::getFont()->draw(m_message, m_area, color, true, true);
+        GUIEngine::getFont()->draw(m_message, m_area - raise, color, true,
+            true);
         if (m_progress_value.load() >= 100)
         {
             m_display_timer = -1.0f;
