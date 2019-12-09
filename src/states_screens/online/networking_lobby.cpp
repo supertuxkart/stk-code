@@ -83,6 +83,7 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_send_button = NULL;
     m_icon_bank = NULL;
     m_reload_server_info = false;
+    m_displayed_addon_install_cmd = false;
 
     // Allows one to update chat and counter even if dialog window is opened
     setUpdateInBackground(true);
@@ -169,6 +170,7 @@ void NetworkingLobby::init()
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
     m_client_live_joinable = false;
+    m_displayed_addon_install_cmd = false;
     m_ping_update_timer = 0;
     m_start_timeout = std::numeric_limits<float>::max();
     m_cur_starting_timer = std::numeric_limits<int64_t>::max();
@@ -352,12 +354,16 @@ void NetworkingLobby::onUpdate(float delta)
         Track* t = cl->getPlayingTrack();
         if (t)
             current_track = t->getName();
+        std::string missing_addon_track_id;
         // Show addon identity so player can install it live in lobby
         if (current_track.empty())
         {
             std::string track_id = cl->getPlayingTrackIdent();
             if (StringUtils::startsWith(track_id, "addon_"))
-                current_track = track_id.substr(6).c_str();
+            {
+                missing_addon_track_id = track_id.substr(6).c_str();
+                current_track = missing_addon_track_id.c_str();
+            }
         }
         if (progress.first != std::numeric_limits<uint32_t>::max())
         {
@@ -404,6 +410,18 @@ void NetworkingLobby::onUpdate(float delta)
             //I18N: In the networking lobby, show when player is required to
             //wait before the current game finish
             msg = _("Please wait for the current game's end.");
+        }
+
+        if (!missing_addon_track_id.empty() &&
+            !m_displayed_addon_install_cmd)
+        {
+            m_displayed_addon_install_cmd = true;
+            core::stringw cmd = L"/installaddon ";
+            cmd += missing_addon_track_id.c_str();
+            //I18N: In the networking lobby,
+            //tell user the command to install addon now
+            core::stringw info = _("Send %s in chat box to install addon now.", cmd);
+            addMoreServerInfo(info);
         }
 
         // You can live join or spectator if u have the current play track
