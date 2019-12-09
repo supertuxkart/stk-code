@@ -49,7 +49,8 @@ public:
     void onUpdate(float delta) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
     static void install(const std::string& name);
-    static void uninstall(const std::string& name);
+    static void uninstall(const std::string& name, bool force_remove_skin = false);
+    static void uninstallByName(const std::string& name, bool force_remove_skin = false);
 };   // DownloadAssets
 
 #endif

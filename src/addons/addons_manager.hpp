@@ -53,7 +53,6 @@ private:
     // Synchronise the state between threads (e.g. GUI and update thread)
     Synchronised<STATE_TYPE> m_state;
 
-    void  saveInstalled();
     void  loadInstalledAddons();
     void  downloadIcons();
 
@@ -81,6 +80,8 @@ public:
     // ------------------------------------------------------------------------
     /** Marks addon as not being available. */
     void         setErrorState() { m_state.setAtomic(STATE_ERROR); }
+    // ------------------------------------------------------------------------
+    void         saveInstalled();
     // ------------------------------------------------------------------------
     /** Returns the list of addons (installed and uninstalled). */
     unsigned int getNumAddons() const { return (unsigned int) m_addons_list.getData().size();}
