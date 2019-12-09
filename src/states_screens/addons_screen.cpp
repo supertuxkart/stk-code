@@ -167,6 +167,8 @@ void AddonsScreen::init()
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     w_filter_rating->setValue(0);
 
+    getWidget<GUIEngine::CheckBoxWidget>("show_possessed")->setState(false);
+
     // Set the default sort order
     Addon::setSortOrder(Addon::SO_DEFAULT);
     loadList();
@@ -218,6 +220,9 @@ void AddonsScreen::loadList()
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
         const Addon & addon = addons_manager->getAddon(i);
+        // Ignore unpossessed addons if the checkbox is activate
+        if(getWidget<GUIEngine::CheckBoxWidget>("show_possessed")->getState() && !addon.isInstalled())
+            continue;
         // Ignore addons of a different type
         if(addon.getType()!=m_type) continue;
         // Ignore invisible addons
@@ -453,7 +458,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             loadList();
         }
     }
-    else if (name == "filter_search")
+    else if (name == "filter_search" || name == "show_possessed")
     {
         loadList();
     }
