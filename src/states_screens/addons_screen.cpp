@@ -167,6 +167,10 @@ void AddonsScreen::init()
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     w_filter_rating->setValue(0);
 
+    GUIEngine::CheckBoxWidget* w_show_possessed = 
+        getWidget<GUIEngine::CheckBoxWidget>("show_possessed");
+    w_show_possessed->setState(false);
+
     // Set the default sort order
     Addon::setSortOrder(Addon::SO_DEFAULT);
     loadList();
@@ -212,12 +216,18 @@ void AddonsScreen::loadList()
     GUIEngine::SpinnerWidget* w_filter_rating =
                         getWidget<GUIEngine::SpinnerWidget>("filter_rating");
     float rating = w_filter_rating->getValue() / 2.0f;
+    
+    GUIEngine::CheckBoxWidget* w_show_possessed = 
+        getWidget<GUIEngine::CheckBoxWidget>("show_possessed");
 
     // First create a list of sorted entries
     PtrVector<const Addon, REF> sorted_list;
     for(unsigned int i=0; i<addons_manager->getNumAddons(); i++)
     {
         const Addon & addon = addons_manager->getAddon(i);
+        // Ignore not installed addons if the checkbox is enabled
+        if(w_show_possessed->getState() && !addon.isInstalled())
+            continue;
         // Ignore addons of a different type
         if(addon.getType()!=m_type) continue;
         // Ignore invisible addons
@@ -453,7 +463,7 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
             loadList();
         }
     }
-    else if (name == "filter_search")
+    else if (name == "filter_search" || name == "show_possessed")
     {
         loadList();
     }
