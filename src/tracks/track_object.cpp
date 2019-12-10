@@ -565,6 +565,7 @@ void TrackObject::resetAfterRewind()
     btTransform new_trans;
     m_physical_object->getMotionState()->getWorldTransform(new_trans);
     m_physical_object->getBody()->setCenterOfMassTransform(new_trans);
+    m_physical_object->getBody()->saveKinematicState(stk_config->ticks2Time(1));
 }   // resetAfterRewind
 
 // ----------------------------------------------------------------------------
