@@ -76,6 +76,11 @@ namespace Debug {
  */
 static bool g_debug_menu_visible = false;
 
+/**
+ * This lock is used for events that occur on keydown
+ */
+static bool g_one_hit_key_locked = false;
+
 // -----------------------------------------------------------------------------
 // Commands for the debug menu
 enum DebugMenuCommand
@@ -1044,6 +1049,8 @@ bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_
 {
     bool ret=false;
 
+    if (!value) g_one_hit_key_locked=false;
+
     World *world = World::getWorld();
 
     if (world && UserConfigParams::m_artist_debug_mode) {
@@ -1069,6 +1076,30 @@ bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_
       cam->setLinearVelocity(vel);
 
       ret = true;
+      switch (key)
+      { // continous pressure keybindings
+        case KBD_KEY_DEBUG_CAMERA_ROTATE_CLOCKWISE:
+          {
+            GET_CAMERA();
+            cam->setAngularVelocity(value ?
+                UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_ROTATE_COUNTER_CLOCKWISE:
+          {
+            GET_CAMERA();
+            cam->setAngularVelocity(value ?
+                -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            break;
+          }
+        default: ret=false;
+      }
+      if (ret) return ret;
+
+      // Now manage one hit keybindings
+      if (g_one_hit_key_locked) return false;
+
+      ret=true;
       switch (key)
       {
         case KBD_KEY_DEBUG_CAMERA_FREE:
@@ -1133,26 +1164,12 @@ bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_
           {
             CAM_MOVE(-1, Y); break;
           }
-        case KBD_KEY_DEBUG_CAMERA_ROTATE_CLOCKWISE:
-          {
-            GET_CAMERA();
-            cam->setAngularVelocity(value ?
-                UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
-            break;
-          }
-        case KBD_KEY_DEBUG_CAMERA_ROTATE_COUNTER_CLOCKWISE:
-          {
-            GET_CAMERA();
-            cam->setAngularVelocity(value ?
-                -UserConfigParams::m_fpscam_max_angular_velocity : 0);
-            break;
-          }
         // TODO: create more keyboard shortcuts
         default: ret=false;
       }
     }
 #ifdef DEBUG
-    if (!ret) { 
+    if (!ret) {
       switch (key)
       {
         // Special debug options for profile mode: switch the
@@ -1171,12 +1188,13 @@ bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_
             int kart_id = key - IRR_KEY_1;
             if(kart_id<0 || kart_id>=(int)world->getNumKarts()) break;
             Camera::getCamera(0)->setKart(world->getKart(kart_id));
-            return true;
+            ret=true;
             break;
           }
       }
     }
 #endif
+    if (ret) g_one_hit_key_locked=true;
     return ret;
 }
 
