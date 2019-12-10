@@ -129,6 +129,10 @@ private:
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);
+    void drawSpeed             (const AbstractKart *kart,
+                                const core::vector2df &offset,
+                                float min_ratio, int meter_width,
+                                int meter_height, float dt);
 
     /* Helper functions for drawing meters */
 

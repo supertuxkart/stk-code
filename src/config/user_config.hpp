@@ -461,6 +461,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
             PARAM_DEFAULT(  BoolUserConfigParam(false, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui.") );
+    PARAM_PREFIX BoolUserConfigParam          m_rank_total_kart_gui
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "rank-total-kart-gui",
+            &m_race_setup_group, "Show total number of karts in rank in race gui.") );
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
@@ -940,6 +943,10 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam        m_minimap_display
         PARAM_DEFAULT(IntUserConfigParam(0, "minimap_display",
                       "Minimap: 0 bottom-left, 1 middle-right, 2 hidden, 3 center"));
+
+    PARAM_PREFIX IntUserConfigParam        m_speedometer_digit
+        PARAM_DEFAULT(IntUserConfigParam(1, "speedometer_digit",
+                      "Speedometer: 0 show nothing, 1 show rank, 2 show speed evaluation"));
 
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap

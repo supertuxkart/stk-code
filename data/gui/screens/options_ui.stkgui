@@ -52,6 +52,17 @@
                 </div>
 
                 <spacer width="5" height="2%"/>
+                
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <div layout="vertical-row" width="10f" height="fit">
+                        <spinner id="speedometer" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the ui settings" text="Speedometer digit" align="left"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
                     <div layout="vertical-row" width="10f" height="fit">
@@ -87,7 +98,14 @@
                 </div>
 
                 <spacer width="5" height="2%"/>
+                
+                <div layout="horizontal-row" width="100%" height="fit">
+                    <checkbox id="rank_total_kart_gui"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Show total number of karts in rank" word_wrap="true"/>
+                </div>
 
+                <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
                     <checkbox id="story-mode-timer"/>

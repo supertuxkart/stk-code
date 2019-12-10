@@ -103,6 +103,20 @@ void OptionsScreenUI::loadedFromFile()
     }
     minimap_options->m_properties[GUIEngine::PROP_MAX_VALUE] = "3";
 
+    // Setup the speedometer digit spinner
+    GUIEngine::SpinnerWidget* speedometer = getWidget<GUIEngine::SpinnerWidget>("speedometer");
+    assert( speedometer != NULL );
+
+    speedometer->m_properties[PROP_WRAP_AROUND] = "true";
+    speedometer->clearLabels();
+    //I18N: In the UI options, speedometer digit in the race UI 
+    speedometer->addLabel( core::stringw(_("Hidden")));
+    //I18N: In the UI options, speedometer digit in the race UI 
+    speedometer->addLabel( core::stringw(_("Show rank")));
+    //I18N: In the UI options, speedometer digit in the race UI 
+    speedometer->addLabel( core::stringw(_("Show speed evaluation")));
+    speedometer->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+
     GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
     assert( font_size != NULL );
 
@@ -209,6 +223,10 @@ void OptionsScreenUI::init()
         UserConfigParams::m_minimap_display = 1;
     }
     minimap_options->setValue(UserConfigParams::m_minimap_display);
+
+    GUIEngine::SpinnerWidget* speedometer = getWidget<GUIEngine::SpinnerWidget>("speedometer");
+    assert( speedometer != NULL );
+    speedometer->setValue(UserConfigParams::m_speedometer_digit);
     
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
     
@@ -235,6 +253,10 @@ void OptionsScreenUI::init()
     CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
     assert(karts_powerup_gui != NULL);
     karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
+
+    CheckBoxWidget* rank_total_kart_gui = getWidget<CheckBoxWidget>("rank_total_kart_gui");
+    assert(rank_total_kart_gui != NULL);
+    rank_total_kart_gui->setState(UserConfigParams::m_rank_total_kart_gui);
 
     //Forbid changing this setting in game
     splitscreen_method->setActive(!in_game);
@@ -392,6 +414,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( minimap_options != NULL );
         UserConfigParams::m_minimap_display = minimap_options->getValue();
     }
+    else if (name == "speedometer")
+    {
+        GUIEngine::SpinnerWidget* speedometer = getWidget<GUIEngine::SpinnerWidget>("speedometer");
+        assert( speedometer != NULL );
+        UserConfigParams::m_speedometer_digit = speedometer->getValue();
+    }
     else if (name == "font_size")
     {
         GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
@@ -431,6 +459,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
         assert(karts_powerup_gui != NULL);
         UserConfigParams::m_karts_powerup_gui = karts_powerup_gui->getState();
+    }
+    else if (name == "speedometer_total_kart_gui")
+    {
+        CheckBoxWidget* rank_total_kart_gui = getWidget<CheckBoxWidget>("rank_total_kart_gui");
+        assert(rank_total_kart_gui != NULL);
+        UserConfigParams::m_rank_total_kart_gui = rank_total_kart_gui->getState();
     }
     else if (name == "showfps")
     {

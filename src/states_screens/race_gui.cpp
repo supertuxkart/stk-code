@@ -826,14 +826,14 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
  *  \param kart The kart of the player.
  *  \param offset Offset of top left corner for this display (for splitscreen).
  *  \param min_ratio Scaling of the screen (for splitscreen).
- *  \param meter_width Width of the meter (inside which the rank is shown).
- *  \param meter_height Height of the meter (inside which the rank is shown).
+ *  \param width Width of the meter (inside which the rank is shown).
+ *  \param height Height of the meter (inside which the rank is shown).
  *  \param dt Time step size.
  */
 void RaceGUI::drawRank(const AbstractKart *kart,
                       const core::vector2df &offset,
-                      float min_ratio, int meter_width,
-                      int meter_height, float dt)
+                      float min_ratio, int width,
+                      int height, float dt)
 {
     static video::SColor color = video::SColor(255, 255, 255, 255);
 
@@ -891,24 +891,106 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    
     int font_height = font->getDimension(L"X").Height;
-    font->setScale((float)meter_height / font_height * 0.4f * scale);
     font->setShadow(video::SColor(255, 128, 0, 0));
-    std::ostringstream oss;
-    oss << rank; // the current font has no . :(   << ".";
+    
+    if(UserConfigParams::m_rank_total_kart_gui)
+    {
+        int num_karts = race_manager->getNumberOfKarts();
+        if(num_karts > 9)
+            scale *= 0.85f;
+        if(rank > 9)
+            scale *= 0.75f;
+
+        font->setScale((float)height / font_height * 0.4f * scale);
+        std::ostringstream oss;
+        oss << rank; // the current font has no . :(   << ".";
+
+        core::recti pos;
+        pos.LowerRightCorner = core::vector2di(int(offset.X + 0.53f*width),
+                                               int(offset.Y - 0.49f*height));
+        pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.53f*width),
+                                              int(offset.Y - 0.49f*height));
+
+        font->setBlackBorder(true);
+        font->draw(oss.str().c_str(), pos, color, true, true);
+        font->setScale((float)height / font_height * 0.2f * scale);
+        std::ostringstream oss2;
+        oss2 << "/" << num_karts; // the current font has no . :(   << ".";
+
+        core::recti num_karts_pos;
+        num_karts_pos.LowerRightCorner = core::vector2di(int(offset.X + 0.75f*width),
+                                               int(offset.Y - 0.43f*height));
+        num_karts_pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.75f*width),
+                                              int(offset.Y - 0.43f*height));
+
+        font->draw(oss2.str().c_str(), num_karts_pos, color, true, true);
+    }
+    else
+    {
+        font->setScale((float)height / font_height * 0.4f * scale);
+        std::ostringstream oss;
+        oss << rank; // the current font has no . :(   << ".";
+
+        core::recti pos;
+        pos.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*width),
+                                               int(offset.Y - 0.49f*height));
+        pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*width),
+                                              int(offset.Y - 0.49f*height));
+
+        font->setBlackBorder(true);
+        font->draw(oss.str().c_str(), pos, color, true, true);
+    }
+
+    font->setScale(1.0f); // Reset scale
+    font->setBlackBorder(false);
+}   // drawRank
+
+//-----------------------------------------------------------------------------
+/** Draws the speed evaluation of a player.
+ *  \param kart The kart of the player.
+ *  \param offset Offset of top left corner for this display (for splitscreen).
+ *  \param min_ratio Scaling of the screen (for splitscreen).
+ *  \param meter_width Width of the meter (inside which the rank is shown).
+ *  \param meter_height Height of the meter (inside which the rank is shown).
+ *  \param dt Time step size.
+ */
+void RaceGUI::drawSpeed(const AbstractKart *kart,
+                        const core::vector2df &offset,
+                        float min_ratio, int meter_width,
+                        int meter_height, float dt)
+{
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    int font_height = font->getDimension(L"X").Height;
+    font->setShadow(video::SColor(255, 128, 0, 0));
+    const float speed =  std::fabs(kart->getSpeed() * 3.6f);
+
+    std::ostringstream oss, oss2;
+    oss << (int)speed; // the current font has no . :(   << ".";
+    oss2 << "km/h";
 
     core::recti pos;
     pos.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
-                                           int(offset.Y - 0.49f*meter_height));
+                                            int(offset.Y - 0.53f*meter_height));
     pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
-                                          int(offset.Y - 0.49f*meter_height));
+                                            int(offset.Y - 0.53f*meter_height));
+    core::recti pos2;
+    pos2.LowerRightCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
+                                            int(offset.Y - 0.38f*meter_height));
+    pos2.UpperLeftCorner = core::vector2di(int(offset.X + 0.64f*meter_width),
+                                            int(offset.Y - 0.38f*meter_height));
 
     font->setBlackBorder(true);
+    font->setScale((float)meter_height / font_height * 0.24f);
     font->draw(oss.str().c_str(), pos, color, true, true);
+
+    font->setScale((float)meter_height / font_height * 0.14f);
+    font->draw(oss2.str().c_str(), pos2, color, true, true);
+
+    font->setScale(1.0f); // Reset scale
     font->setBlackBorder(false);
-    font->setScale(1.0f);
-}   // drawRank
+}
 
 //-----------------------------------------------------------------------------
 /** Draws the speedometer, the display of available nitro, and
@@ -951,10 +1033,15 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
     // TODO: temporary workaround, shouldn't have to use
     // draw2DVertexPrimitiveList to render a simple rectangle
 
+    if(UserConfigParams::m_speedometer_digit > 2 || UserConfigParams::m_speedometer_digit < 0)
+        UserConfigParams::m_speedometer_digit = 1;
+    
+    if(UserConfigParams::m_speedometer_digit == 2)
+        drawSpeed(kart, offset, min_ratio, meter_width, meter_height, dt);
+    else if(UserConfigParams::m_speedometer_digit == 1)
+        drawRank(kart, offset, min_ratio, meter_width, meter_height, dt);
+
     const float speed =  kart->getSpeed();
-
-    drawRank(kart, offset, min_ratio, meter_width, meter_height, dt);
-
 
     if(speed <=0) return;  // Nothing to do if speed is negative.
 
