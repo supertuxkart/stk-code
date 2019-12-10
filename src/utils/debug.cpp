@@ -1078,6 +1078,43 @@ bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_
       ret = true;
       switch (key)
       { // continous pressure keybindings
+        case KBD_KEY_DEBUG_KART_FLY_UP:
+          {
+            GET_KART();
+            if (value) kart->flyUp();
+            break;
+          }
+        case KBD_KEY_DEBUG_KART_FLY_DOWN:
+          {
+            GET_KART();
+            if (value) kart->flyDown();
+            break;
+          }
+          // Moving the first person camera
+        case KBD_KEY_DEBUG_CAMERA_MOVE_FORWARD:
+          {
+            CAM_MOVE(1, Z); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_BACKWARD:
+          {
+            CAM_MOVE(-1, Z); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_LEFT:
+          {
+            CAM_MOVE(-1, X); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_RIGHT:
+          {
+            CAM_MOVE(1, X); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_UP:
+          {
+            CAM_MOVE(1, Y); break;
+          }
+        case KBD_KEY_DEBUG_CAMERA_MOVE_DOWN:
+          {
+            CAM_MOVE(-1, Y); break;
+          }
         case KBD_KEY_DEBUG_CAMERA_ROTATE_CLOCKWISE:
           {
             GET_CAMERA();
@@ -1097,7 +1134,10 @@ bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_
       if (ret) return ret;
 
       // Now manage one hit keybindings
-      if (g_one_hit_key_locked) return false;
+
+      // Note : assuming no debug event is associated to the same key
+      //        that another static event
+      if (g_one_hit_key_locked || !value) return false;  // return "i didn't found any appropriate key"
 
       ret=true;
       switch (key)
@@ -1130,39 +1170,6 @@ bool handleStaticAction(int key, int value, bool control_is_pressed, bool shift_
           kart_num = (kart_num == World::getWorld()->getNumKarts() - 1 ? 0 : kart_num + 1);
           Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
           break;
-          }
-        case KBD_KEY_DEBUG_KART_FLY_UP:
-          {
-            GET_KART(); kart->flyUp(); break;
-          }
-        case KBD_KEY_DEBUG_KART_FLY_DOWN:
-          {
-            GET_KART(); kart->flyDown(); break;
-          }
-          // Moving the first person camera
-        case KBD_KEY_DEBUG_CAMERA_MOVE_FORWARD:
-          {
-            CAM_MOVE(1, Z); break;
-          }
-        case KBD_KEY_DEBUG_CAMERA_MOVE_BACKWARD:
-          {
-            CAM_MOVE(-1, Z); break;
-          }
-        case KBD_KEY_DEBUG_CAMERA_MOVE_LEFT:
-          {
-            CAM_MOVE(-1, X); break;
-          }
-        case KBD_KEY_DEBUG_CAMERA_MOVE_RIGHT:
-          {
-            CAM_MOVE(1, X); break;
-          }
-        case KBD_KEY_DEBUG_CAMERA_MOVE_UP:
-          {
-            CAM_MOVE(1, Y); break;
-          }
-        case KBD_KEY_DEBUG_CAMERA_MOVE_DOWN:
-          {
-            CAM_MOVE(-1, Y); break;
           }
         // TODO: create more keyboard shortcuts
         default: ret=false;
