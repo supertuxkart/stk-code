@@ -286,7 +286,8 @@ public:
         // Fix compiler warning.
         return true;
     }   // operator<
-
+    // ------------------------------------------------------------------------
+    const std::string& getDirName() const { return m_dir_name; }
 };   // Addon
 
 
