@@ -460,7 +460,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert(karts_powerup_gui != NULL);
         UserConfigParams::m_karts_powerup_gui = karts_powerup_gui->getState();
     }
-    else if (name == "speedometer_total_kart_gui")
+    else if (name == "rank_total_kart_gui")
     {
         CheckBoxWidget* rank_total_kart_gui = getWidget<CheckBoxWidget>("rank_total_kart_gui");
         assert(rank_total_kart_gui != NULL);
