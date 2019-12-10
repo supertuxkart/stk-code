@@ -31,6 +31,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "online/http_request.hpp"
 #include "online/request_manager.hpp"
+#include "states_screens/dialogs/addons_pack.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -477,9 +478,9 @@ bool AddonsManager::anyAddonsInstalled() const
 }   // anyAddonsInstalled
 
 // ----------------------------------------------------------------------------
-/** Installs or updates (i.e. = install on top of an existing installation) an
- *  addon. It checks for the directories and then unzips the file (which must
- *  already have been downloaded).
+/** Installs or updates (i.e. remove old and then install a new) an addon.
+ *  It checks for the directories and then unzips the file (which must already
+ *  have been downloaded).
  *  \param addon Addon data for the addon to install.
  *  \return true if installation was successful.
  */
@@ -492,14 +493,14 @@ bool AddonsManager::install(const Addon &addon)
     std::string from      = file_manager->getAddonsFile("tmp/"+base_name);
     std::string to        = addon.getDataDir();
 
+    // Remove old addon first (including non official way to install addons)
+    AddonsPack::uninstallByName(addon.getDirName(), true/*false_remove_skin*/);
     bool success = extract_zip(from, to, true/*recursive*/);
     if (!success)
     {
         // TODO: show a message in the interface
         Log::error("addons", "Failed to unzip '%s' to '%s'.",
                     from.c_str(), to.c_str());
-        Log::error("addons", "Zip file will not be removed.");
-        return false;
     }
 
     if(!file_manager->removeFile(from))
@@ -507,6 +508,8 @@ bool AddonsManager::install(const Addon &addon)
         Log::error("addons", "Problems removing temporary file '%s'.",
                     from.c_str());
     }
+    if (!success)
+        return false;
 
     int index = getAddonIndex(addon.getId());
     assert(index>=0 && index < (int)m_addons_list.getData().size());
