@@ -1493,8 +1493,8 @@ msgstr "Velocità massima: più è alta, più veloce è il kart. Utile nelle pis
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Consumo di Nitro: più è basso, più velocità puoi avere da un barattolo di nitro. Più il kart è leggero, più il consumo sarà basso."
 
 #. I18N: ./data/gui/screens/help6.stkgui
