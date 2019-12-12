@@ -1487,8 +1487,8 @@ msgstr "Azami hız - daha yüksek, araç daha hızlı gidebilir. Özellikle düz
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Nitro tüketimi - ne kadar düşükse, bir kutu nitrodan alabileceğiniz hız o kadar fazla olur. Sraç ne kadar hafif olursa, nitro tüketimi o kadar düşük olur."
 
 #. I18N: ./data/gui/screens/help6.stkgui
