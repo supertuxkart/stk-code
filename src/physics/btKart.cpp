@@ -981,11 +981,14 @@ void btKart::adjustSpeed(btScalar min_speed, btScalar max_speed)
             btVector3 upright_component = normal * normal.dot(velocity);
             // Subtract the upright velocity component,
             btVector3 v = velocity - upright_component;
-            const float velocity_ratio = min_speed / v.length();
-            // Scale the velocity in the plane, then add the upright component
-            // of the velocity back in.
-            m_chassisBody->setLinearVelocity( v*velocity_ratio 
-                                              + upright_component );
+            if (!v.fuzzyZero())
+            {
+                const float velocity_ratio = min_speed / v.length();
+                // Scale the velocity in the plane, then add the upright component
+                // of the velocity back in.
+                m_chassisBody->setLinearVelocity( v*velocity_ratio
+                                                + upright_component );
+            }
         }
     }
     else if (speed >0 && max_speed >= 0 && speed > max_speed)
