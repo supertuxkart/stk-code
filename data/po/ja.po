@@ -1490,8 +1490,8 @@ msgstr "最高速度 - 高いほどカートは速く移動できます。 直�
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "ニトロ消費量 - 少ないほど、ニトロ缶から得られる速度が多くなります。 カートが軽いほどニトロ消費量は少なくなります。"
 
 #. I18N: ./data/gui/screens/help6.stkgui
