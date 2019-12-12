@@ -1493,8 +1493,8 @@ msgstr "Топ брзина - што је већа, то брже возило �
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Потрошња нитро-а - Што је нижа, то више брзине можеш добити од канте за нитро. Што је лакше возило, то је мања потрошња нитро-а."
 
 #. I18N: ./data/gui/screens/help6.stkgui
