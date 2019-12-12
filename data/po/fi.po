@@ -1485,8 +1485,8 @@ msgstr "Enimmäisnopeus - mitä korkeampi, sitä kovempaa auto kulkee. Erityisen
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Nitron kulutus – mitä pienempi se on, sitä enemmän nopeuslisäystä voit saada yhdestä nitropullosta. Nitron kulutus on sitä pienempi, mitä kevyempi auto on."
 
 #. I18N: ./data/gui/screens/help6.stkgui
