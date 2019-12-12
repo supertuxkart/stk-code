@@ -1487,8 +1487,8 @@ msgstr "Maximální rychlost - čím vyšší je, tím rychleji může jet motok
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Spotřeba nitra - čím nižší je, tím větší rychlost z plechovky nitra dostanete. Čím lehčí je motokára, tím nižší je její spotřeba nitra."
 
 #. I18N: ./data/gui/screens/help6.stkgui
