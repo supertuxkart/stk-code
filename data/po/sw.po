@@ -1483,8 +1483,8 @@ msgstr "Upeo wa juu - mkubwa ilipo, haraka gari inaweza kuenda. Upesi kubwa kwa 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Utumizi wa nitro - ikiwa ndogo, upesi unaweza kuongea na mkebe mmoja wa nitro itakuwa kubwa zaidi. Gari nyepesi ina utumizi wa nitro ndogo."
 
 #. I18N: ./data/gui/screens/help6.stkgui
