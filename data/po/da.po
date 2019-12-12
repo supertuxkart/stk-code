@@ -1487,8 +1487,8 @@ msgstr "Topfart - jo højere den er, des hurtigere er karten. Særlig nyttig på
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Nitroforbrug - jo lavere den er, des mere fart kan du få fra en flaske med nitro. Jo lettere karten er, des lavere er dens nitroforbrug."
 
 #. I18N: ./data/gui/screens/help6.stkgui
