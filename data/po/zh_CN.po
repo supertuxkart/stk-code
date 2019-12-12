@@ -1489,8 +1489,8 @@ msgstr "最高速度 - 最高速度越高，赛车越快。 在直线和幅度�
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "氮气消耗 - 氮气消耗越低，使用一瓶氮气就可以得到更多的加速。 赛车越轻，其氮气消耗越低。"
 
 #. I18N: ./data/gui/screens/help6.stkgui
