@@ -698,6 +698,20 @@ void ServerLobby::handleChat(Event* event)
     // Update so that the peer is not kicked
     event->getPeer()->updateLastActivity();
     const bool sender_in_game = event->getPeer()->isWaitingForGame();
+
+    int last_message = event->getPeer()->getLastMessage();
+    int elipsed_time = StkTime::getMonoTimeMs() - last_message;
+
+    // Increment consecutive_messages if last message is less than 5s ago
+    if (elipsed_time < 5000)
+        event->getPeer()->updateConsecutiveMessages(true);
+    else
+        event->getPeer()->updateConsecutiveMessages(false);
+
+    // Ignore message if there is already 3 consecutive messages
+    if (event->getPeer()->getConsecutiveMessages() >= 3)
+        return;
+    
     core::stringw message;
     event->data().decodeString16(&message, 360/*max_len*/);
     if (message.size() > 0)
@@ -718,6 +732,7 @@ void ServerLobby::handleChat(Event* event)
                 }
                 return true;
             }, chat);
+            event->getPeer()->updateLastMessage();
         delete chat;
     }
 }   // handleChat

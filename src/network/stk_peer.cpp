@@ -52,6 +52,8 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_disconnected.store(false);
     m_warned_for_high_ping.store(false);
     m_last_activity.store((int64_t)StkTime::getMonoTimeMs());
+    m_last_message.store(0);
+    m_consecutive_messages = 0;
 }   // STKPeer
 
 //-----------------------------------------------------------------------------
