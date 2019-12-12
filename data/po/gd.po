@@ -1486,8 +1486,8 @@ msgstr "An luaths as motha – mar as àirde a bhios e ’s ann as luaithe as ur
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
+"Nitro efficiency - The higher it is, the more speed you get from a "
+"can of nitro. A lighter kart will have higher nitro efficiency."
 msgstr "Caitheamh naidhtreo – mar as ìsle e ’s ann as motha a luaths a gheibh thu à cana naidhtreo. Mar as aotruime an cart ’s ann as lugha a naidhtreo a chaitheas e"
 
 #. I18N: ./data/gui/screens/help6.stkgui
