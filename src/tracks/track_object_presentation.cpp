@@ -332,19 +332,15 @@ TrackObjectPresentationLibraryNode::~TrackObjectPresentationLibraryNode()
 }   // TrackObjectPresentationLibraryNode
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationLibraryNode::move(const core::vector3df& xyz, const core::vector3df& hpr,
-    const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies)
+    const core::vector3df& scale, bool isAbsoluteCoord)
 {
     TrackObjectPresentationSceneNode::move(xyz, hpr, scale, isAbsoluteCoord);
 
-    if (moveChildrenPhysicalBodies)
+    for (TrackObject* obj : m_parent->getChildren())
     {
-        for (TrackObject* obj : m_parent->getChildren())
+        if (obj->getPhysicalObject() != NULL)
         {
-            obj->reset();
-            if (obj->getPhysicalObject() != NULL)
-            {
-                obj->movePhysicalBodyToGraphicalNode(obj->getAbsolutePosition(), obj->getRotation());
-            }
+            obj->movePhysicalBodyToGraphicalNode(obj->getAbsolutePosition(), obj->getRotation());
         }
     }
 }

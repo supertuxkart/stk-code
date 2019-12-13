@@ -706,24 +706,11 @@ void TrackObject::addChild(TrackObject* child)
 // scripting function
 void TrackObject::moveTo(const Scripting::SimpleVec3* pos, bool isAbsoluteCoord)
 {
-    TrackObjectPresentationLibraryNode *libnode =
-        dynamic_cast<TrackObjectPresentationLibraryNode*>(m_presentation);
-    if (libnode != NULL)
-    {
-        libnode->move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
-            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
-            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
-            isAbsoluteCoord,
-            true /* moveChildrenPhysicalBodies */);
-    }
-    else
-    {
-        move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
-            core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
-            core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
-            true, // updateRigidBody
-            isAbsoluteCoord);
-    }
+    move(core::vector3df(pos->getX(), pos->getY(), pos->getZ()),
+        core::vector3df(0.0f, 0.0f, 0.0f), // TODO: preserve rotation
+        core::vector3df(1.0f, 1.0f, 1.0f), // TODO: preserve scale
+        true, // updateRigidBody
+        isAbsoluteCoord);
 }
 
 // ----------------------------------------------------------------------------

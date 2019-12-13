@@ -206,8 +206,8 @@ public:
         m_reset_executed = false;
         TrackObjectPresentationSceneNode::reset();
     }
-    void move(const core::vector3df& xyz, const core::vector3df& hpr,
-        const core::vector3df& scale, bool isAbsoluteCoord, bool moveChildrenPhysicalBodies);
+    virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
+        const core::vector3df& scale, bool isAbsoluteCoord) OVERRIDE;
 };   // TrackObjectPresentationLibraryNode
 
 // ============================================================================
