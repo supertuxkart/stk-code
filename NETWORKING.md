@@ -63,6 +63,9 @@ The current server configuration xml looks like this:
     <!-- If this value is set to false, the server will ignore chat messages from all players. -->
     <chat value="true" />
 
+    <!-- If client sends more than chat-consecutive-interval / 2 chats within this value (read in seconds), it will be ignore, negative value to disable. -->
+    <chat-consecutive-interval value="8" />
+
     <!-- Allow players to vote for which track to play. If this value is set to false, the server will randomly pick the next track to play. -->
     <track-voting value="true" />
 

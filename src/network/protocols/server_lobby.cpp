@@ -699,19 +699,29 @@ void ServerLobby::handleChat(Event* event)
     event->getPeer()->updateLastActivity();
     const bool sender_in_game = event->getPeer()->isWaitingForGame();
 
-    int last_message = event->getPeer()->getLastMessage();
-    int elipsed_time = StkTime::getMonoTimeMs() - last_message;
+    int64_t last_message = event->getPeer()->getLastMessage();
+    int64_t elapsed_time = (int64_t)StkTime::getMonoTimeMs() - last_message;
 
-    // Increment consecutive_messages if last message is less than 5s ago
-    if (elipsed_time < 5000)
+    // Read ServerConfig for formula and details
+    if (ServerConfig::m_chat_consecutive_interval > 0 &&
+        elapsed_time < ServerConfig::m_chat_consecutive_interval * 1000)
         event->getPeer()->updateConsecutiveMessages(true);
     else
         event->getPeer()->updateConsecutiveMessages(false);
 
-    // Ignore message if there is already 3 consecutive messages
-    if (event->getPeer()->getConsecutiveMessages() >= 3)
+    if (ServerConfig::m_chat_consecutive_interval > 0 &&
+        event->getPeer()->getConsecutiveMessages() >
+        ServerConfig::m_chat_consecutive_interval / 2)
+    {
+        NetworkString* chat = getNetworkString();
+        chat->setSynchronous(true);
+        core::stringw warn = "Spam detected";
+        chat->addUInt8(LE_CHAT).encodeString16(warn);
+        event->getPeer()->sendPacket(chat, true/*reliable*/);
+        delete chat;
         return;
-    
+    }
+
     core::stringw message;
     event->data().decodeString16(&message, 360/*max_len*/);
     if (message.size() > 0)

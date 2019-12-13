@@ -149,6 +149,12 @@ namespace ServerConfig
         "If this value is set to false, the server will ignore chat messages "
         "from all players."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_chat_consecutive_interval
+        SERVER_CFG_DEFAULT(IntServerConfigParam(8, "chat-consecutive-interval",
+        "If client sends more than chat-consecutive-interval / 2 chats within "
+        "this value (read in seconds), it will be ignore, negative value to "
+        "disable."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_track_voting
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "track-voting",
         "Allow players to vote for which track to play. If this value is set "

@@ -281,19 +281,18 @@ public:
     void updateLastMessage()
                    { m_last_message.store((int64_t)StkTime::getMonoTimeMs()); }
     // ------------------------------------------------------------------------
-    int getLastMessage()
+    int64_t getLastMessage() const
                                                      { return m_last_message; }
     // ------------------------------------------------------------------------
-    void updateConsecutiveMessages(bool tooFast)
+    void updateConsecutiveMessages(bool too_fast)
     {
-        if (tooFast)
+        if (too_fast)
             m_consecutive_messages++;
         else
             m_consecutive_messages = 0;
     }
     // ------------------------------------------------------------------------
-    int getConsecutiveMessages()
-                                             { return m_consecutive_messages; }
+    int getConsecutiveMessages() const       { return m_consecutive_messages; }
 };   // STKPeer
 
 #endif // STK_PEER_HPP
