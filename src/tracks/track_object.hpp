@@ -231,6 +231,16 @@ public:
     // ------------------------------------------------------------------------
     const ThreeDAnimation* getAnimator() const { return m_animator; }
     // ------------------------------------------------------------------------
+    /* Return true if it has animator or its parent library has */
+    bool hasAnimatorRecursively() const
+    {
+        if (m_animator)
+            return true;
+        if (!m_parent_library)
+            return false;
+        return m_parent_library->hasAnimatorRecursively();
+    }
+    // ------------------------------------------------------------------------
     void setPaused(bool mode){ m_animator->setPaused(mode); }
     // ------------------------------------------------------------------------
     void setInitiallyVisible(bool val)           { m_initially_visible = val; }

@@ -755,7 +755,7 @@ bool TrackObject::joinToMainTrack()
 {
     // If no physical object or there is animator, skip it
     // Also no joining if will affect kart (like moveable, flatten...)
-    if (!isEnabled() || !m_physical_object || m_animator ||
+    if (!isEnabled() || !m_physical_object || hasAnimatorRecursively() ||
         m_physical_object->isDynamic() || m_physical_object->isCrashReset() ||
         m_physical_object->isExplodeKartObject() ||
         m_physical_object->isFlattenKartObject())
