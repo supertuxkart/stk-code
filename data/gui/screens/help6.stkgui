@@ -60,7 +60,7 @@
                     <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Nitro consumption - the lower it is, the more speed you can get from a can of nitro. The lighter the kart, the lower its nitro consumption."/>
+                            text="Nitro efficiency - The higher it is, the more speed you get from a can of nitro. A lighter kart will have higher nitro efficiency."/>
                 </div>
 
                 <div width="100%" proportion="4" layout="horizontal-row">
