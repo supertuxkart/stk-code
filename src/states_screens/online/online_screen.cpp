@@ -235,14 +235,15 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             return;
         }
         core::stringw instruction =
-            _("Enter the server address with IP optionally followed by : and"
+            _("Enter the server address optionally followed by : and"
             " then port.");
         auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
             [] (const irr::core::stringw& text) {},
             [this] (GUIEngine::LabelWidget* lw,
                    GUIEngine::TextBoxWidget* tb)->bool
             {
-                TransportAddress server_addr(
+                TransportAddress server_addr =
+                    TransportAddress::fromDomain(
                     StringUtils::wideToUtf8(tb->getText()));
                 if (server_addr.getIP() == 0)
                 {

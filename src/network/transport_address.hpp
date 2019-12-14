@@ -73,6 +73,8 @@ public:
     static void unitTesting();
 public:
     // ------------------------------------------------------------------------
+    static TransportAddress fromDomain(const std::string& str);
+    // ------------------------------------------------------------------------
     bool isPublicAddressLocalhost() const;
     // ------------------------------------------------------------------------
     bool isLAN() const;

@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/transport_address.hpp"
+#include "network/stk_ipv6.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -28,6 +29,59 @@
 #  include <string.h>
 #  include <errno.h>
 #endif
+
+#if defined(WIN32)
+#  include "ws2tcpip.h"
+#  define inet_ntop InetNtop
+#else
+#  include <arpa/inet.h>
+#  include <errno.h>
+#  include <sys/socket.h>
+#endif
+
+#ifdef __MINGW32__
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT 0x501
+#endif
+
+#ifdef WIN32
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#else
+#  include <netdb.h>
+#endif
+#include <sys/types.h>
+
+// ----------------------------------------------------------------------------
+/* Return TransportAddress (with optionally port) from string, it can also be
+ * used with an ipv4 string too. */
+TransportAddress TransportAddress::fromDomain(const std::string& str)
+{
+    TransportAddress result;
+    auto split = StringUtils::split(str, ':');
+    if (split.empty())
+        return result;
+    struct addrinfo hints;
+    struct addrinfo* res = NULL;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_STREAM;
+
+    int status = getaddrinfo_compat(split[0].c_str(),
+        split.size() > 1 ? split[1].c_str() : NULL, &hints, &res);
+    if (status != 0 || res == NULL)
+    {
+        Log::error("TransportAddress", "Error in getaddrinfo for fromDomain"
+            " %s: %s", split[0].c_str(), gai_strerror(status));
+        return result;
+    }
+    struct sockaddr_in* ipv4_addr = (struct sockaddr_in*)(res->ai_addr);
+    result.setIP(ntohl(ipv4_addr->sin_addr.s_addr));
+    result.setPort(ntohs(ipv4_addr->sin_port));
+    freeaddrinfo(res);
+    return result;
+}   // fromDomain
 
 // ----------------------------------------------------------------------------
 /** Construct an IO address from a string in the format x.x.x.x with a

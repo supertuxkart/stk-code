@@ -612,7 +612,7 @@ void cmdLineHelp()
     "       --public-server    Allow direct connection to the server (without stk server)\n"
     "       --lan-server=name  Start a LAN server (not a playing client).\n"
     "       --server-password= Sets a password for a server (both client and server).\n"
-    "       --connect-now=ip   Connect to a server with IP known now\n"
+    "       --connect-now=ip   Connect to a server with IP or domain known now\n"
     "                          (in format x.x.x.x:xxx(port)), the port should be its\n"
     "                          public port.\n"
     "       --connect-now6=ip   Connect to a server with IPv6 known now\n"
@@ -1397,7 +1397,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         }
         else
             fixed_ipv6.clear();
-        TransportAddress server_addr(ipv4);
+        TransportAddress server_addr = TransportAddress::fromDomain(ipv4);
         auto server = std::make_shared<Server>(0,
             StringUtils::utf8ToWide(server_addr.toString()), 0, 0, 0, 0,
             server_addr, !server_password.empty(), false);
