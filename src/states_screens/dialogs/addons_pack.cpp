@@ -322,9 +322,9 @@ void AddonsPack::doInstall()
 // ----------------------------------------------------------------------------
 void AddonsPack::install(const std::string& name)
 {
-    // Only install addon live in menu
-    if (StateManager::get()->getGameState() != GUIEngine::MENU &&
-        !ModalDialog::isADialogActive())
+    // Only install addon live in menu with no dialog opened
+    if (StateManager::get()->getGameState() != GUIEngine::MENU ||
+        ModalDialog::isADialogActive())
         return;
 
     NetworkingLobby* nl = dynamic_cast<NetworkingLobby*>(
@@ -416,8 +416,9 @@ void AddonsPack::uninstallByName(const std::string& name,
 // ----------------------------------------------------------------------------
 void AddonsPack::uninstall(const std::string& name, bool force_remove_skin)
 {
-    // Only uninstall addon live in menu
-    if (StateManager::get()->getGameState() != GUIEngine::MENU)
+    // Only uninstall addon live in menu or no dialog opened
+    if (StateManager::get()->getGameState() != GUIEngine::MENU ||
+        ModalDialog::isADialogActive())
         return;
 
     uninstallByName(name, force_remove_skin);
