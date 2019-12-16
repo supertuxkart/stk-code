@@ -3,8 +3,10 @@ package org.supertuxkart.stk_dbg;
 import org.supertuxkart.stk_dbg.STKEditText;
 
 import android.app.NativeActivity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -185,9 +187,17 @@ public class SuperTuxKartActivity extends NativeActivity
     /* Called by STK in JNI. */
     public void openURL(final String url)
     {
-        Intent i = new Intent(Intent.ACTION_VIEW);
-        i.setData(Uri.parse(url));
-        startActivity(i);
+        try
+        {
+            Uri uri = Uri.parse(url);
+            Intent i = new Intent(Intent.ACTION_VIEW, uri);
+            if (i.resolveActivity(getPackageManager()) != null)
+                startActivity(i);
+        }
+        catch (ActivityNotFoundException e)
+        {
+            e.printStackTrace();
+        }
     }
     // ------------------------------------------------------------------------
     /* Called by STK in JNI. */
