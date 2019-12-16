@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <string>
 
+#include "addons/addons_manager.hpp"
 #include "config/user_config.hpp"
 #include "config/player_manager.hpp"
 #include "font/font_manager.hpp"
@@ -412,7 +413,9 @@ void NetworkingLobby::onUpdate(float delta)
             msg = _("Please wait for the current game's end.");
         }
 
-        if (!missing_addon_track_id.empty() &&
+        Addon* addon = addons_manager->getAddon(
+            Addon::createAddonId(missing_addon_track_id));
+        if (addon &&
             !m_displayed_addon_install_cmd)
         {
             m_displayed_addon_install_cmd = true;
