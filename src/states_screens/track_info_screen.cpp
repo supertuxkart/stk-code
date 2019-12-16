@@ -398,11 +398,17 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
             else
                 team == KART_TEAM_BLUE ? num_blue_players++ : num_red_players++;
         }
-    
+
         const int max_num_ai = max_arena_players - local_players;
+        // Make sure each team has at least 1 ai if only all players join same team
+        bool reset_ai = ((num_blue_players == 0 || num_red_players == 0) &&
+            ((UserConfigParams::m_soccer_red_ai_num == 0 && UserConfigParams::m_soccer_blue_ai_num != 0) ||
+            (UserConfigParams::m_soccer_blue_ai_num == 0 && UserConfigParams::m_soccer_red_ai_num != 0)));
+
         // Try the saved values.
         // If they can't be used, use default balanced values
-        if (UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num > max_num_ai)
+        if (UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num > max_num_ai ||
+            reset_ai)
         {
             const int additional_blue = num_red_players - num_blue_players;
             int num_blue_ai = (max_num_ai - additional_blue) / 2 + additional_blue;
@@ -413,6 +419,8 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
 
             UserConfigParams::m_soccer_red_ai_num  = num_red_ai;
             UserConfigParams::m_soccer_blue_ai_num = num_blue_ai;
+            m_ai_kart_spinner->setValue(UserConfigParams::m_soccer_red_ai_num);
+            m_ai_blue_spinner->setValue(UserConfigParams::m_soccer_blue_ai_num);
         }
 
         if(  local_players == 1
@@ -425,9 +433,9 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
         }
 
         if(num_blue_players == 0 && !UserConfigParams::m_artist_debug_mode)
-                m_ai_kart_spinner->setMax(max_arena_players - local_players - 1);
+            m_ai_kart_spinner->setMax(max_arena_players - local_players - 1);
         if(num_red_players == 0 && !UserConfigParams::m_artist_debug_mode)
-                m_ai_blue_spinner->setMax(max_arena_players - local_players - 1);
+            m_ai_blue_spinner->setMax(max_arena_players - local_players - 1);
     }
 } // setSoccerWidgets
 
@@ -735,7 +743,49 @@ void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
             m_ai_blue_spinner->setValue(num_ai - m_ai_kart_spinner->getValue());
     }
 
+    KartTeam all_team = KART_TEAM_NONE;
+    unsigned num_red = 0;
+    unsigned num_blue = 0;
+    for (unsigned i = 0; i < race_manager->getNumLocalPlayers(); i++)
+    {
+        race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED ?
+            num_red++ : num_blue++;
+    }
+    if (num_red == 0)
+        all_team = KART_TEAM_BLUE;
+    else if (num_blue == 0)
+        all_team = KART_TEAM_RED;
+
+    // Need at least 1 kart at each side to avoid soccer ai crash,
+    // if there is any ai
+    if (blue_spinner)
+    {
+        if (all_team == KART_TEAM_BLUE &&
+            (m_ai_blue_spinner->getValue() == 0 || m_ai_kart_spinner->getValue() == 0))
+        {
+            if (m_ai_kart_spinner->getValue() == 0)
+                m_ai_kart_spinner->setValue(1);
+        }
+        if (all_team == KART_TEAM_RED && m_ai_blue_spinner->getValue() == 0 &&
+            m_ai_kart_spinner->getValue() != 0)
+            m_ai_blue_spinner->setValue(1);
+    }
+    else
+    {
+        if (all_team == KART_TEAM_RED &&
+            (m_ai_kart_spinner->getValue() == 0 || m_ai_blue_spinner->getValue() == 0))
+        {
+            if (m_ai_blue_spinner->getValue() == 0)
+                m_ai_blue_spinner->setValue(1);
+        }
+        if (all_team == KART_TEAM_BLUE && m_ai_kart_spinner->getValue() == 0 &&
+            m_ai_blue_spinner->getValue() != 0)
+            m_ai_kart_spinner->setValue(1);
+    }
+
     UserConfigParams::m_soccer_red_ai_num  = m_ai_kart_spinner->getValue();
     UserConfigParams::m_soccer_blue_ai_num = m_ai_blue_spinner->getValue();
+
+
 } // soccerSpinnerUpdate
 // ----------------------------------------------------------------------------
