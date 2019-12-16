@@ -326,11 +326,12 @@ void AddonsPack::install(const std::string& name)
     if (StateManager::get()->getGameState() != GUIEngine::MENU &&
         !ModalDialog::isADialogActive())
         return;
+
+    NetworkingLobby* nl = dynamic_cast<NetworkingLobby*>(
+        GUIEngine::getCurrentScreen());
     Addon* addon = addons_manager->getAddon(Addon::createAddonId(name));
     if (addon)
     {
-        NetworkingLobby* nl = dynamic_cast<NetworkingLobby*>(
-            GUIEngine::getCurrentScreen());
         if (addon->isInstalled())
         {
             if (nl)
@@ -340,21 +341,31 @@ void AddonsPack::install(const std::string& name)
         AddonsLoading* al = new AddonsLoading(addon->getId());
         al->tryInstall();
     }
-    else
+    else if (StringUtils::startsWith(name, "http"))
     {
         // Assume it's addon pack url
         new AddonsPack(name);
+    }
+    else
+    {
+        if (nl)
+            nl->addMoreServerInfo(L"Bad addon id");
     }
 }   // install
 
 // ----------------------------------------------------------------------------
 void AddonsPack::uninstallByName(const std::string& name,
-                                 bool force_remove_skin)
+                                 bool force_clear)
 {
     if (StateManager::get()->getGameState() != GUIEngine::MENU)
         return;
     NetworkingLobby* nl = dynamic_cast<NetworkingLobby*>(
         GUIEngine::getCurrentScreen());
+    // force_clear is true when removing the existing folder when install new
+    // addon, in this case we don't need more logging in lobby
+    if (force_clear)
+        nl = NULL;
+
     std::string addon_id = Addon::createAddonId(name);
     const KartProperties* prop =
         kart_properties_manager->getKart(addon_id);
@@ -384,7 +395,7 @@ void AddonsPack::uninstallByName(const std::string& name,
     std::string skin_file = skin_folder + "/stkskin.xml";
     if (file_manager->fileExists(skin_file))
     {
-        if (!force_remove_skin &&
+        if (!force_clear &&
             addon_id == UserConfigParams::m_skin_file.c_str())
         {
             if (nl)

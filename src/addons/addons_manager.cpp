@@ -494,7 +494,7 @@ bool AddonsManager::install(const Addon &addon)
     std::string to        = addon.getDataDir();
 
     // Remove old addon first (including non official way to install addons)
-    AddonsPack::uninstallByName(addon.getDirName(), true/*false_remove_skin*/);
+    AddonsPack::uninstallByName(addon.getDirName(), true/*force_clear*/);
     bool success = extract_zip(from, to, true/*recursive*/);
     if (!success)
     {
