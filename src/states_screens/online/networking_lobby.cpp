@@ -413,6 +413,7 @@ void NetworkingLobby::onUpdate(float delta)
             msg = _("Please wait for the current game's end.");
         }
 
+#ifndef SERVER_ONLY
         Addon* addon = addons_manager->getAddon(
             Addon::createAddonId(missing_addon_track_id));
         if (addon &&
@@ -426,6 +427,7 @@ void NetworkingLobby::onUpdate(float delta)
             core::stringw info = _("Send %s in chat box to install addon now.", cmd);
             addMoreServerInfo(info);
         }
+#endif
 
         // You can live join or spectator if u have the current play track
         // and network timer is synchronized, and no game protocols exist
