@@ -46,6 +46,7 @@
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
+#include "tips/tips_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -189,6 +190,9 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
         user_config->saveConfig();
 
         OptionsScreenLanguage::getInstance()->push();
+        // Update tips for new translation
+        TipsManager::destroy();
+        TipsManager::create();
     }
 #endif
 }   // eventCallback
