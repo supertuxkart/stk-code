@@ -684,6 +684,7 @@ namespace GUIEngine
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tips/tips_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -1357,10 +1358,14 @@ namespace GUIEngine
 
     // -----------------------------------------------------------------------
     std::vector<irr::video::ITexture*> g_loading_icons;
+    core::stringw g_tips_string;
 
-    void renderLoading(bool clearIcons, bool launching)
+    void renderLoading(bool clearIcons, bool launching, bool update_tips)
     {
 #ifndef SERVER_ONLY
+        if(update_tips)
+            g_tips_string =  _("Tip: ") + TipsManager::get()->getTip("general");
+
         if (clearIcons) g_loading_icons.clear();
 
         g_skin->drawBgImage();
@@ -1381,6 +1386,10 @@ namespace GUIEngine
             GUIEngine::getDriver()->getCurrentRenderTargetSize();
         const int screen_w = frame_size.Width;
         const int screen_h = frame_size.Height;
+
+        // used in drawing tips
+        const int text_height = getFontHeight() * 1.2f;
+        const int y_from = screen_h - text_height * 0.3f;
 
         const core::rect< s32 > dest_area =
             core::rect< s32 >(screen_w/2 - stretched_size/2,
@@ -1404,11 +1413,18 @@ namespace GUIEngine
                            SColor(255,255,255,255),
                            true/* center h */, false /* center v */ );
 
+        // Draw a tip during loading
+        core::rect<s32> tipRect(core::position2d<s32>(0, y_from - text_height),
+                                core::dimension2d<s32>(screen_w, text_height));
+        GL32_draw2DRectangle(Skin::getColor("tips_background::neutral"), tipRect);
+        Private::g_font->draw(g_tips_string.c_str(), tipRect, Skin::getColor("brighttext::neutral"),
+                            true /* hcenter */, true /* vcenter */);
+
         const int icon_count = (int)g_loading_icons.size();
-        const int icon_size = (int)(std::min(screen_w, screen_h) / 10.0f);
+        const int icon_size = (int)(std::min(screen_w, screen_h) / 12.0f);
         const int ICON_MARGIN = 6;
         int x = ICON_MARGIN;
-        int y = screen_h - icon_size - ICON_MARGIN;
+        int y = y_from - icon_size - ICON_MARGIN - text_height * 1.2f;
         for (int n=0; n<icon_count; n++)
         {
             draw2DImage(g_loading_icons[n],
@@ -1458,7 +1474,7 @@ namespace GUIEngine
 
             g_device->getVideoDriver()
                     ->beginScene(true, true, video::SColor(255,100,101,140));
-            renderLoading(false, true);
+            renderLoading(false, true, false);
             g_device->getVideoDriver()->endScene();
         }
         else

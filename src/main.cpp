@@ -197,6 +197,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
+#include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/keyboard_device.hpp"
@@ -243,6 +244,7 @@
 #include "states_screens/options/user_screen.hpp"
 #include "states_screens/dialogs/init_android_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "tips/tips_manager.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -1792,7 +1794,7 @@ void initRest()
 
     GUIEngine::init(device, driver, StateManager::get());
 
-    GUIEngine::renderLoading(true, true);
+    GUIEngine::renderLoading(true, true, false);
     input_manager = new InputManager();
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
@@ -2025,6 +2027,9 @@ int main(int argc, char *argv[])
         // ServerConfig will use stk_config for server version testing
         stk_config->load(file_manager->getAsset("stk_config.xml"));
         bool no_graphics = !CommandLine::has("--graphical-server");
+
+        TipsManager::create();
+
         // Load current server config first, if any option is specified than
         // override it later
         // Disable sound if found server-config or wan/lan server name
