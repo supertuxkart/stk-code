@@ -37,11 +37,12 @@
         </tabs>
 
         <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
-            <div layout="horizontal-row" width="100%" height="8%">
-                <checkbox id="show_possessed"/>
+            <div layout="horizontal-row" width="100%" height="2f">
                 <spacer width="1%" />
-                <label height="100%" I18N="In the addons screen, above the list of addons to be installed"
-                       text="Show only possessed" word_wrap="true"/>
+                <label text="Installed" align="center" I18N="In addons screen, above the list of addons to be installed"/>
+                <spacer width="1%" />
+                <spinner id="filter_installation" proportion="5" align="center" min_value="0" wrap_around="true"/>
+                <spacer width="50%" />
             </div>
             <list id="list_addons" x="0" y="0" width="100%" height="92%" word_wrap="true" alternate_bg="true"/>
         </box>
