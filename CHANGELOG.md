@@ -7,17 +7,15 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 1.1 (in development)
 
-(List to be completed. Currently include relevant change of commits from 20/04 to 22/06 and from 18/08 to 22/11)
-
-### >>> Partial features <<<
-* Addon skin support and skin-specified font by Benau
-* Structure for allowing icon themes by Benau
+(Include relevant change of commits from 20/04 to 17/12)
 
 ### Networking
 * Add support for IPv6 clients and servers, by Benau
 * Add AI support to local networking servers, by Benau. This AI is not as strong as the normal AI due to networking lag, but should offer enough challenge for a majority of players.
 * Add support for AI bots for the server host, by Benau
 * Improved handling of collisions, by Benau
+* Improved support for playing addons on servers, by Benau
+* Support using an IPV4 domain name to connect to a server, by Benau
 * Add packet loss data to the server databases, by Benau
 * New management features for server hosts, by Benau
     * IP / online ID ban tables
@@ -35,27 +33,41 @@ For similar reasons, and because some features are vastly more complex than othe
 * Fix a bug that made AIs, in multiplayer and low difficulty, rubber-band towards the wrong player, by Alayan. Each player now correctly has its AIs, helping a weaker player to not be condemned to the last position.
 
 ### General
+* Screen space reflection graphical effect, by samuncle
+* Support unicode file paths, by Benau
 * Add emoji support, by Benau
 * Avoid "this program is not responding" warnings in Windows and Mac, by Benau
 * Add a Story Mode timer, by Alayan
+* Make text billboards size consistent accross resolutions, by Benau
+* Don't trigger road sounds when the kart is flying, by Benau
 * Remove an incorrect function call that could significantly hurt performance for Mac, by Benau
 * Fix a nasty bug that made several sound effects to be played at a low volume after a crash, by Alayan
 * Some code clean-up, by Alayan
+* Addon skin support and skin-specified font by Benau
+* Structure for allowing icon themes by Benau
+* Add support for custom per-kart engine sounds, by Benau
 * Fix an incorrect outdated driver warning for recent AMD cards on Windows, by Alayan
 * Scripting enhancements, by deveee
-* Various tweaks and bugfixes
+* Add a continue button to cutscenes (mostly useful for touchscreen devices), by deveee
+* Request the use of the performance GPU on Optimus systems, by deveee
+* Fixed plural forms for translations in several languages, by deveee
+* Close STK if Wayland crashes, by mstoeckl
+* Support nested directories for addons, by Benau
+* Various tweaks and bugfixes, including crash fixes
 
-
-### Android
+### Mobile
+* Add a screen allowing to download official assets that can't be included in the release package because of size limits, by Benau
+* The tutorial text is now tailored for touchscreen usage, instead of the main keyboard text, by Benau
+* Enhanced acceleration handle, by Benau
+#### Android
 * Various bugfixes by deveee, dos1
 * Screen keyboard handling improvements, by deveee and Benau
 * Allow copying text from the edit box, by Benau
-* The tutorial text is now tailored for touchscreen usage, instead of the main keyboard text, by Benau
-
-### iOS
+* STK for Android now targets the version 29 of the API (Android 10.0), up from 26 (Android 8.0)
+#### iOS
 * Add iOS support, by Benau
-    *
-    *
+    * The Android code has been widely put to use for iOS
+    * Several changes or fixes to ensure proper behavior (input, screen-scaling, and more)
     
 ### User Interface
 * Better scaling of many many UI elements to large resolutions, by dumaosen and others
@@ -70,13 +82,23 @@ For similar reasons, and because some features are vastly more complex than othe
 * Separate blurring visual effects from the main graphics presets, by Alayan
 * Fix incorrect text resizing in the help menu, by Benau
 * Make the custom random GP option more prominent in the track selection screen, by dumaosen
+* Improvements to the scrollbars, by QwertyChouskie
 * Allow sorting lists with the keyboard, by Benau
 * Allow tooltip drawing outside of menus, by deveee
 * Prevent some font scaling blur caused by non-integer offsets, by Benau
 * Limit how long chat and in-race messages can be, by Benau and Alayan
+* Add a (configurable) limit to chat message frequency, by GuillaumeBft and Benau
 * Add an option to disable in-race messages only, by Alayan
 * Allow to explicitly set the flip direction of tabs, by dumaosen
+* Allow to download addons from the server lobby interface, by Benau
 * Many minor tweaks and bugfixes
+
+### Tracks and modeling
+#### Tracks
+ * A handful of minor graphical fixes and enhancements
+ * Fixed checklines that could be missed too easily in XR591 and the Old Mine.
+#### Arenas
+ * Pumpkin Park, by samuncle
 
 ## SuperTuxKart 1.0 (20. April 2019)
 ### Networking
@@ -153,14 +175,17 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Tracks
 * Black Forest by Sven Andreas Belting, replacing Green Valley
 * Ravenbridge Mansion by samuncle, replacing Black Hill Mansion
-* Las Dunas Soccer by samuncle
-* Candela City arena by Benau based on samuncle's track
 * Unwanted shortcuts and exploits found by several players and fixed mostly by Auria in many tracks :
     * Antediluvian Abyss, Around the Lighthouse, Fort Magma, Grand Paradisio Island, Hacienda, Minigolf, Nessie's Pond, Northern Resort, The Old Mine, Oliver's Math Class, Shifting Sands, STK Enterprise, XR591
 * Smoothness issues causing collisions and kart slowdown fixed by Auria :
     * Nessie's Pond, Old Mine, Shifting Sands, Volcano Island, XR591
 * Item (boxes, nitro, bananas) positions improvement by Alayan and theThomasPat :
     * Around the Lighthouse, Black Forest, Candela City, Hacienda, Minigolf, Northern Resort, Oliver's Math Class, STK Enterprise, The Old Mine, Volcano Island, Zen Garden
+    
+#### Arenas
+* Las Dunas Soccer, by samuncle
+* Candela City arena by Benau, based on samuncle's track
+
 #### Karts
 * New version of Beastie by Jymis
 * New version of Kiki by Benau
