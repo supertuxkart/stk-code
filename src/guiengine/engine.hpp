@@ -231,6 +231,8 @@ namespace GUIEngine
       */
     void render(float dt, bool is_loading = false);
 
+    void clearLoadingTips();
+
     /** \brief renders a "loading" screen */
     void renderLoading(bool clearIcons = true, bool launching = false, bool update_tips = true);
 

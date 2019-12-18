@@ -1360,6 +1360,12 @@ namespace GUIEngine
     std::vector<irr::video::ITexture*> g_loading_icons;
     core::stringw g_tips_string;
 
+    void clearLoadingTips()
+    {
+        g_tips_string = L"";
+    }
+
+    // -----------------------------------------------------------------------
     void renderLoading(bool clearIcons, bool launching, bool update_tips)
     {
 #ifndef SERVER_ONLY
@@ -1418,11 +1424,15 @@ namespace GUIEngine
                            true/* center h */, false /* center v */ );
 
         // Draw a tip during loading
-        core::rect<s32> tipRect(core::position2d<s32>(0, y_from - text_height),
-                                core::dimension2d<s32>(screen_w, text_height));
-        GL32_draw2DRectangle(Skin::getColor("tips_background::neutral"), tipRect);
-        Private::g_font->draw(g_tips_string.c_str(), tipRect, Skin::getColor("brighttext::neutral"),
-                            true /* hcenter */, true /* vcenter */);
+        if (!g_tips_string.empty())
+        {
+            core::rect<s32> tipRect(core::position2d<s32>(0, y_from - text_height),
+                                    core::dimension2d<s32>(screen_w, text_height));
+            GL32_draw2DRectangle(Skin::getColor("tips_background::neutral"), tipRect);
+            Private::g_font->draw(g_tips_string, tipRect,
+                Skin::getColor("brighttext::neutral"),
+                true /* hcenter */, true /* vcenter */);
+        }
 
         const int icon_count = (int)g_loading_icons.size();
         const int icon_size = (int)(std::min(screen_w, screen_h) / 12.0f);

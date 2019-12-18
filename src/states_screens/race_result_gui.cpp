@@ -145,7 +145,7 @@ void RaceResultGUI::init()
     }
 
 #ifndef SERVER_ONLY
-    if (!NetworkConfig::get()->isNetworking())
+    if (!human_win && !NetworkConfig::get()->isNetworking())
     {
         core::stringw tips_string = _("Tip: ");
         tips_string += TipsManager::get()->getTip("race");
