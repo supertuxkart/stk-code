@@ -33,7 +33,7 @@ CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
 CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of the built-in version, when available." ON
     "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
-    "NOT SERVER_ONLY;NOT MINGW;NOT CYGWIN" OFF)
+    "NOT SERVER_ONLY;NOT CYGWIN" OFF)
 
 if(APPLE AND NOT IOS)
     list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)

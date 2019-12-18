@@ -43,7 +43,8 @@
 #include <hidsdi.h>
 #include <setupapi.h>
 
-#ifdef __MINGW32__
+// Not needed in mxe gcc 5.5 nor clang 9
+#if 0//def __MINGW32__
 /* this prototype is missing from the mingw headers so we must add it
         or suffer linker errors. */
 #ifdef __cplusplus
@@ -55,7 +56,7 @@ WINHIDSDI BOOL WINAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
 #endif
 #endif
 
-static int clock_gettime(int X, struct timeval *tv);
+static int clock_gettime_wiiuse(int X, struct timeval *tv);
 
 int wiiuse_os_find(struct wiimote_t **wm, int max_wiimotes, int timeout)
 {
@@ -368,7 +369,7 @@ unsigned long wiiuse_os_ticks()
     unsigned long ms;
     struct timeval tp;
 
-    clock_gettime(0, &tp);
+    clock_gettime_wiiuse(0, &tp);
     ms = (unsigned long)(1000 * tp.tv_sec + tp.tv_usec / 1e3);
     return ms;
 }
@@ -395,7 +396,7 @@ static LARGE_INTEGER getFILETIMEoffset()
     return (t);
 }
 
-static int clock_gettime(int X, struct timeval *tv)
+static int clock_gettime_wiiuse(int X, struct timeval *tv)
 {
     LARGE_INTEGER t;
     FILETIME f;
