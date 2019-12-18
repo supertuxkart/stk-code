@@ -145,8 +145,12 @@ void RaceResultGUI::init()
     }
 
 #ifndef SERVER_ONLY
-    core::stringw tips_string = _("Tip: ") + TipsManager::get()->getTip("race");
-    MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
+    if (!NetworkConfig::get()->isNetworking())
+    {
+        core::stringw tips_string = _("Tip: ");
+        tips_string += TipsManager::get()->getTip("race");
+        MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
+    }
 #endif
 }   // init
 
