@@ -1363,8 +1363,12 @@ namespace GUIEngine
     void renderLoading(bool clearIcons, bool launching, bool update_tips)
     {
 #ifndef SERVER_ONLY
-        if(update_tips)
-            g_tips_string =  _("Tip: ") + TipsManager::get()->getTip("general");
+        if (update_tips)
+        {
+            //I18N: tip shown in gui for giving player hints
+            g_tips_string = _("Tip: ");
+            g_tips_string += TipsManager::get()->getTip("general");
+        }
 
         if (clearIcons) g_loading_icons.clear();
 

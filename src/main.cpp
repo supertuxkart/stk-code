@@ -2028,7 +2028,9 @@ int main(int argc, char *argv[])
         stk_config->load(file_manager->getAsset("stk_config.xml"));
         bool no_graphics = !CommandLine::has("--graphical-server");
 
+#ifndef SERVER_ONLY
         TipsManager::create();
+#endif
 
         // Load current server config first, if any option is specified than
         // override it later
@@ -2452,6 +2454,10 @@ static void cleanSuperTuxKart()
 
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
+
+#ifndef SERVER_ONLY
+    TipsManager::destroy();
+#endif
 
     // Stop music (this request will go into the sfx manager queue, so it needs
     // to be done before stopping the thread).

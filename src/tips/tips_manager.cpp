@@ -16,9 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef SERVER_ONLY
+
 #include "tips/tips_manager.hpp"
 
 #include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
 #include "utils/log.hpp"
 #include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
@@ -36,35 +39,33 @@ TipsManager::TipsManager()
     const XMLNode *root = file_manager->createXMLTree(file_name);
     unsigned int num_nodes = root->getNumNodes();
 
-    for(unsigned int i = 0; i < num_nodes; i++)
+    for (unsigned int i = 0; i < num_nodes; i++)
     {
         const XMLNode *node = root->getNode(i);
         addTipSet(node);
     }
 
-    if(num_nodes != m_all_tip_sets.size())
+    if (num_nodes != m_all_tip_sets.size())
+    {
         Log::error("TipsManager",
                    "Multiple tipsets with the same id!");
+    }
 
     delete root;
 } // TipsManager
-
-// ----------------------------------------------------------------------------
-TipsManager::~TipsManager()
-{
-    m_all_tip_sets.clear();
-} // ~TipsManager
 
 // ----------------------------------------------------------------------------
 void TipsManager::addTipSet(const XMLNode *input)
 {
     std::string id;
 
-    if(!input->get("id", &id))
+    if (!input->get("id", &id))
+    {
         Log::error("TipSet",
                    "Undefined id for tipset.");
+    }
 
-    for(unsigned int n = 0; n < input->getNumNodes(); n++)
+    for (unsigned int n = 0; n < input->getNumNodes(); n++)
     {
         const XMLNode *node = input->getNode(n);
         if (node->getName() != "tip")
@@ -77,14 +78,26 @@ void TipsManager::addTipSet(const XMLNode *input)
         // Gettext is used here
         m_all_tip_sets[id].push_back(_(text.c_str()));
     }
-    if(m_all_tip_sets[id].size() != input->getNumNodes())
+    if (m_all_tip_sets[id].size() != input->getNumNodes())
+    {
         Log::error("TipSet",
-                   "Incorrect tips for the entries of tipset \"%s\".", id.c_str());
+            "Incorrect tips for the entries of tipset \"%s\".", id.c_str());
+    }
 }
 
 // ----------------------------------------------------------------------------
-irr::core::stringw TipsManager::getTip(std::string id)
+const irr::core::stringw& TipsManager::getTip(const std::string& id) const
 {
+    auto ret = m_all_tip_sets.find(id);
+    if (ret == m_all_tip_sets.end())
+    {
+        // Should not happen
+        static core::stringw empty;
+        return empty;
+    }
     RandomGenerator randgen;
-    return m_all_tip_sets[id][randgen.get(m_all_tip_sets[id].size())];
+    unsigned pos = randgen.get(ret->second.size());
+    return ret->second.at(pos);
 } // getTipSet
+
+#endif

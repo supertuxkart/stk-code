@@ -70,6 +70,7 @@ For similar reasons, and because some features are vastly more complex than othe
     * Several changes or fixes to ensure proper behavior (input, screen-scaling, and more)
     
 ### User Interface
+* Showing tips for players when loading and after race ends, by dumaosen
 * Better scaling of many many UI elements to large resolutions, by dumaosen and others
 * Show country flags for servers and players in online multiplayer, by Benau
 * Add a new option to change font size on the fly, by Benau and deveee

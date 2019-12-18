@@ -15,11 +15,12 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#ifndef SERVER_ONLY
 
 #ifndef HEADER_TIPS_MANAGER_HPP
 #define HEADER_TIPS_MANAGER_HPP
 
-#include "io/xml_node.hpp"
+class XMLNode;
 
 #include <assert.h>
 #include <irrString.h>
@@ -42,7 +43,6 @@ private:
     std::map<std::string, TipSet> m_all_tip_sets;
 
     TipsManager      ();
-    ~TipsManager     ();
 
     void addTipSet(const XMLNode *input);
 
@@ -68,8 +68,9 @@ public:
     }   // destroy
     // ========================================================================
     /** Get a tip by ID. */
-    irr::core::stringw getTip(std::string id);
+    const irr::core::stringw& getTip(const std::string& id) const;
     // ------------------------------------------------------------------------
 };   // class TipsManager
 
+#endif
 #endif

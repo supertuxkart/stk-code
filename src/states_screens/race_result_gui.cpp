@@ -144,8 +144,10 @@ void RaceResultGUI::init()
         m_end_track = (int)tracks.size();
     }
 
+#ifndef SERVER_ONLY
     core::stringw tips_string = _("Tip: ") + TipsManager::get()->getTip("race");
     MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
+#endif
 }   // init
 
 //-----------------------------------------------------------------------------
