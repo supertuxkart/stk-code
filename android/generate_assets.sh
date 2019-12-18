@@ -20,14 +20,14 @@
 ################################################################################
 
 export KARTS_DEFAULT="all"
-export TRACKS_DEFAULT="abyss arena_candela_city battleisland cave              \
-                       cornfield_crossing endcutscene featunlocked fortmagma   \
-                       gplose gpwin hacienda icy_soccer_field introcutscene    \
-                       introcutscene2 lasdunasarena lasdunassoccer lighthouse  \
-                       mines minigolf olivermath overworld ravenbridge_mansion \
-                       sandtrack scotland snowmountain snowtuxpeak             \
-                       soccer_field stadium stk_enterprise temple tutorial     \
-                       volcano_island xr591 zengarden"
+export TRACKS_DEFAULT="abyss arena_candela_city battleisland cave             \
+                       cornfield_crossing endcutscene featunlocked fortmagma  \
+                       gplose gpwin hacienda icy_soccer_field introcutscene   \
+                       introcutscene2 lasdunasarena lasdunassoccer lighthouse \
+                       mines minigolf olivermath overworld pumpkin_park       \
+                       ravenbridge_mansion sandtrack scotland snowmountain    \
+                       snowtuxpeak soccer_field stadium stk_enterprise temple \
+                       tutorial volcano_island xr591 zengarden"
 
 export TEXTURE_SIZE_DEFAULT=256
 export JPEG_QUALITY_DEFAULT=85
