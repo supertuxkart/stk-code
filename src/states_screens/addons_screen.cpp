@@ -134,6 +134,7 @@ void AddonsScreen::beforeAddingWidget()
     w_filter_installation->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
     w_filter_installation->addLabel(_("All"));
     w_filter_installation->addLabel(_("Installed"));
+    //I18N: Addon not installed for fillter
     w_filter_installation->addLabel(_("Not installed"));
 }
 // ----------------------------------------------------------------------------
