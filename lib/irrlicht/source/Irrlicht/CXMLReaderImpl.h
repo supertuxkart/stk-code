@@ -570,7 +570,7 @@ private:
 			pos = origstr.findNext(L'&', pos);
 		}
 
-		if (oldPos < (int)origstr.size()-1)
+		if ((int)origstr.size()-oldPos > 0)
 			newstr.append(origstr.subString(oldPos, origstr.size()-oldPos));
 
 		return newstr;
