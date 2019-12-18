@@ -14,6 +14,7 @@ XML_FILE_LIST="`find ./data                        \
                      ../supertuxkart-assets/tracks \
                      ../supertuxkart-assets/karts  \
                      -name 'achievements.xml' -or  \
+                     -name 'tips.xml' -or  \
                      -name 'kart.xml' -or          \
                      -name 'track.xml' -or         \
                      -name 'scene.xml' -or         \

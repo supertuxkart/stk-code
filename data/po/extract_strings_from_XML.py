@@ -54,10 +54,9 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, isAchievements, lev
                # print "Label=", e.getAttribute("text"), " Comment=", comment
                line = ""
                if comment == None:
-                   line += "//I18N: " + file + "\n_(\"" + e.getAttribute("text") + "\")\n\n"
+                   line += "//I18N: " + file + "\n_(\"" + e.getAttribute("text").replace("\"", "\\\"") + "\")\n\n"
                else:
                    line += "//I18N: " + file + "\n//I18N: " + comment + "\n_(\"" + e.getAttribute("text") + "\");\n\n"
-               
                f.write( line.encode( "utf-8" ) )
 
         # don't recurse in children nodes for karts, they can contain sounds, etc. that should not be translated
