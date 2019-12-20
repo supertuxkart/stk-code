@@ -35,6 +35,7 @@ namespace irr
 
 @interface HideStatusBarView : UIViewController
 -(BOOL)prefersStatusBarHidden;
+-(BOOL)prefersHomeIndicatorAutoHidden;
 @end
 
 @implementation HideStatusBarView {}
@@ -43,6 +44,12 @@ namespace irr
 {
     return YES;
 }
+
+-(BOOL)prefersHomeIndicatorAutoHidden
+{
+    return YES;
+}
+
 @end
 
 /* CIrrDelegateiOS */
