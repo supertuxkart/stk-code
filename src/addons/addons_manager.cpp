@@ -290,10 +290,9 @@ void AddonsManager::initAddons(const XMLNode *xml)
     }
     m_addons_list.unlock();
 
-    m_state.setAtomic(STATE_READY);
-
     if (UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED)
         downloadIcons();
+    m_state.setAtomic(STATE_READY);
 }   // initAddons
 
 // ----------------------------------------------------------------------------
@@ -391,12 +390,9 @@ void AddonsManager::downloadIcons()
             class IconRequest : public Online::HTTPRequest
             {
                 Addon *m_addon;  // stores this addon object
-                void afterOperation()
-                {
-                    m_addon->setIconReady();
-                }   // afterOperation
                 void callback()
                 {
+                    m_addon->setIconReady();
                     if (!hadDownloadError())
                         addons_manager->m_downloaded_icons = true;
                 }   // callback
