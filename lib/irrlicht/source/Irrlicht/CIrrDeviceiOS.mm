@@ -37,11 +37,20 @@ namespace irr
 -(BOOL)prefersStatusBarHidden;
 -(BOOL)prefersHomeIndicatorAutoHidden;
 -(void)viewDidAppear:(BOOL)animated;
+-(void)viewDidLoad;
+-(void)dealloc;
 @end
 
 @implementation HideStatusBarView
 {
     irr::CIrrDeviceiOS* Device;
+}
+
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [[UIDevice currentDevice] endGeneratingDeviceOrientationNotifications];
+    [super dealloc];
 }
 
 - (id)init: (irr::CIrrDeviceiOS*)device
@@ -59,6 +68,45 @@ namespace irr
 -(BOOL)prefersHomeIndicatorAutoHidden
 {
     return YES;
+}
+
+- (void)orientationChanged:(NSNotification*)note
+{
+    UIDevice* dev = [UIDevice currentDevice];
+    if (dev == nil)
+        return;
+
+    UIDeviceOrientation orientation = [dev orientation];
+    switch(orientation)
+    {
+        case UIDeviceOrientationLandscapeLeft:
+            Device->setUpsideDown(true);
+            break;
+        case UIDeviceOrientationLandscapeRight:
+            Device->setUpsideDown(false);
+            break;
+        default:
+            break;
+    };
+}
+
+-(void)viewDidLoad
+{
+    [super viewDidLoad];
+    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter]
+     addObserver:self selector:@selector(orientationChanged:)
+     name:UIDeviceOrientationDidChangeNotification
+     object:nil];
+
+    // On first lanuch orientationChanged returns UIDeviceOrientationUnknown,
+    // so we get the first oritentation from statusBarOrientation
+    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
+    // Those values are inverted with UIDeviceOrientation enum for landscape
+    if (orientation == UIInterfaceOrientationLandscapeLeft)
+        Device->setUpsideDown(false);
+    else if (orientation == UIInterfaceOrientationLandscapeRight)
+        Device->setUpsideDown(true);
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -191,34 +239,8 @@ namespace irr
     Focus = true;
 }
 
-- (void)orientationChanged:(NSNotification*)note
-{
-    if (Device == nil)
-        return;
-    UIDevice* device = note.object;
-    switch(device.orientation)
-    {
-        case UIDeviceOrientationLandscapeLeft:
-            Device->setUpsideDown(true);
-            break;
-        case UIDeviceOrientationLandscapeRight:
-            Device->setUpsideDown(false);
-            break;
-        case UIDeviceOrientationPortrait:
-        case UIDeviceOrientationPortraitUpsideDown:
-            break;
-        default:
-            break;
-    };
-}
-
 - (void)runSTK
 {
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    [[NSNotificationCenter defaultCenter]
-     addObserver:self selector:@selector(orientationChanged:)
-     name:UIDeviceOrientationDidChangeNotification
-     object:[UIDevice currentDevice]];
     override_default_params_for_mobile();
     struct utsname system_info;
     uname(&system_info);
