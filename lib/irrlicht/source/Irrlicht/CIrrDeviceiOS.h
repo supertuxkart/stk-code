@@ -113,7 +113,30 @@ namespace irr
             m_touch_id_map.clear();
         }
         void setUpsideDown(bool val) { m_upside_down = val; }
+        void setPaddings(float top, float bottom, float left, float right)
+        {
+            m_top_padding = top;
+            m_bottom_padding = bottom;
+            m_left_padding = left;
+            m_right_padding = right;
+        }
         static std::string getSystemLanguageCode();
+        virtual s32 getTopPadding()
+        {
+            return m_top_padding * m_native_scale;
+        }
+        virtual s32 getBottomPadding()
+        {
+            return m_bottom_padding * m_native_scale;
+        }
+        virtual s32 getLeftPadding()
+        {
+            return m_left_padding * m_native_scale;
+        }
+        virtual s32 getRightPadding()
+        {
+            return m_right_padding * m_native_scale;
+        }
     private:
         void createWindow();
         void createViewAndDriver();
@@ -124,6 +147,11 @@ namespace irr
 
         std::map<void*, size_t> m_touch_id_map;
         bool m_upside_down;
+        float m_top_padding;
+        float m_bottom_padding;
+        float m_left_padding;
+        float m_right_padding;
+        float m_native_scale;
     };
 
 }

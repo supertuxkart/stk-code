@@ -36,9 +36,20 @@ namespace irr
 @interface HideStatusBarView : UIViewController
 -(BOOL)prefersStatusBarHidden;
 -(BOOL)prefersHomeIndicatorAutoHidden;
+-(void)viewDidAppear:(BOOL)animated;
 @end
 
-@implementation HideStatusBarView {}
+@implementation HideStatusBarView
+{
+    irr::CIrrDeviceiOS* Device;
+}
+
+- (id)init: (irr::CIrrDeviceiOS*)device
+{
+    self = [super init];
+    Device = device;
+    return self;
+}
 
 -(BOOL)prefersStatusBarHidden
 {
@@ -48,6 +59,18 @@ namespace irr
 -(BOOL)prefersHomeIndicatorAutoHidden
 {
     return YES;
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear : animated];
+    if (@available(iOS 11.0, *))
+    {
+        Device->setPaddings(self.view.safeAreaInsets.top,
+            self.view.safeAreaInsets.bottom,
+            self.view.safeAreaInsets.left,
+            self.view.safeAreaInsets.right);
+    }
 }
 
 @end
@@ -427,6 +450,11 @@ namespace irr
     CIrrDeviceiOS::CIrrDeviceiOS(const SIrrlichtCreationParameters& params)
                  : CIrrDeviceStub(params), DataStorage(0), Close(false), m_upside_down(false)
     {
+        m_top_padding = 0.0f;
+        m_bottom_padding = 0.0f;
+        m_left_padding = 0.0f;
+        m_right_padding = 0.0f;
+        m_native_scale = 1.0f;
 #ifdef _DEBUG
         setDebugName("CIrrDeviceiOS");
 #endif
@@ -819,7 +847,7 @@ namespace irr
         {
             SIrrDeviceiOSDataStorage* dataStorage = static_cast<SIrrDeviceiOSDataStorage*>(DataStorage);
             dataStorage->Window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-            dataStorage->ViewController = [[HideStatusBarView alloc] init];
+            dataStorage->ViewController = [[HideStatusBarView alloc] init: this];
             dataStorage->Window.rootViewController = dataStorage->ViewController;
             [dataStorage->Window makeKeyAndVisible];
         }
@@ -846,7 +874,8 @@ namespace irr
                     CIrrViewiOS* view = [[CIrrViewiOS alloc] initWithFrame:[[UIScreen mainScreen] bounds]
                         forDevice:this forContext:dataStorage->m_eagl_context];
                     dataStorage->View = view;
-                    view.contentScaleFactor = dataStorage->Window.screen.nativeScale;
+                    m_native_scale = dataStorage->Window.screen.nativeScale;
+                    view.contentScaleFactor = m_native_scale;
                     // This will initialize the default framebuffer, which bind its valus to GL_FRAMEBUFFER_BINDING
                     beginScene();
                     GLint default_fb = 0;

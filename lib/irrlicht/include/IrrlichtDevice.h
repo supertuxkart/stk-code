@@ -314,6 +314,10 @@ namespace irr
 		virtual bool deactivateDeviceMotion() { return false; }
 		virtual bool isDeviceMotionActive() { return false; }
 		virtual bool isDeviceMotionAvailable() { return false; }
+		virtual s32 getTopPadding() { return 0; }
+		virtual s32 getBottomPadding() { return 0; }
+		virtual s32 getLeftPadding() { return 0; }
+		virtual s32 getRightPadding() { return 0; }
 		//! Check if a driver type is supported by the engine.
 		/** Even if true is returned the driver may not be available
 		for a configuration requested when creating the device. */
