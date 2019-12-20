@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-27 12:23+0800\n"
-"PO-Revision-Date: 2019-11-27 04:24+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2019-12-18 14:33+0800\n"
+"PO-Revision-Date: 2019-12-19 20:58+0000\n"
+"Last-Translator: Deve <deveee@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/supertuxkart/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -159,7 +159,7 @@ msgstr "Odinstaluj"
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:216
-#: src/states_screens/dialogs/addons_loading.cpp:301
+#: src/states_screens/dialogs/addons_loading.cpp:293
 msgid "Back"
 msgstr "Powrót"
 
@@ -310,7 +310,7 @@ msgstr "Tak"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
-#: src/states_screens/dialogs/addons_loading.cpp:240
+#: src/states_screens/dialogs/addons_loading.cpp:209
 #: src/states_screens/online/register_screen.cpp:127
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
@@ -480,7 +480,7 @@ msgstr "Cel"
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
 #. I18N: Progress shown in achievement dialog
 #. I18N: Progress in achievement
-#: src/states_screens/online/online_profile_achievements.cpp:84
+#: src/states_screens/online/online_profile_achievements.cpp:85
 msgid "Progress"
 msgstr "Postęp"
 
@@ -625,7 +625,7 @@ msgstr "Wpisz nazwę użytkownika i adres e-mail podany przy rejestracji w celu 
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/online/online_profile_friends.cpp:72
-#: src/states_screens/online/online_user_search.cpp:72
+#: src/states_screens/online/online_user_search.cpp:71
 msgid "Username"
 msgstr "Nazwa użytkownika"
 
@@ -778,7 +778,7 @@ msgstr "Dodaj gracza"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
-#: src/states_screens/online/online_profile_achievements.cpp:75
+#: src/states_screens/online/online_profile_achievements.cpp:76
 msgid "Name"
 msgstr "Nazwa"
 
@@ -864,7 +864,7 @@ msgstr "Naciśnij ESC, aby anulować"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:262
+#: src/states_screens/race_result_gui.cpp:273
 msgid "Setup New Race"
 msgstr "Nowy wyścig"
 
@@ -881,9 +881,9 @@ msgstr "Ustawienia wyścigu"
 #. I18N: ./data/gui/screens/grand_prix_win.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:179
-#: src/states_screens/race_result_gui.cpp:208
-#: src/states_screens/race_result_gui.cpp:216
+#: src/states_screens/race_result_gui.cpp:190
+#: src/states_screens/race_result_gui.cpp:219
+#: src/states_screens/race_result_gui.cpp:227
 msgid "Continue"
 msgstr "Kontynuuj"
 
@@ -922,6 +922,12 @@ msgstr "Trasy"
 msgid "Arenas"
 msgstr "Areny"
 
+#. I18N: ./data/gui/screens/addons_screen.stkgui
+#. I18N: In addons screen, above the list of addons to be installed
+#: src/states_screens/addons_screen.cpp:136
+msgid "Installed"
+msgstr "Zainstalowany"
+
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
@@ -954,6 +960,7 @@ msgstr "Dodatki"
 #. I18N: name of the tab that will show arenas from all groups
 #. I18N: name of the tab that will show tracks from all groups
 #: src/states_screens/addons_screen.cpp:48
+#: src/states_screens/addons_screen.cpp:135
 #: src/states_screens/arenas_screen.cpp:74
 #: src/states_screens/easter_egg_screen.cpp:137
 #: src/states_screens/edit_track_screen.cpp:146
@@ -1487,9 +1494,9 @@ msgstr "Maksymalna prędkość - im wyższa, tym szybciej może jechać Twój go
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
 msgid ""
-"Nitro consumption - the lower it is, the more speed you can get from a can "
-"of nitro. The lighter the kart, the lower its nitro consumption."
-msgstr "Zużycie nitro - im mniejsze, tym mniej zużyjesz nitro aby się rozpędzić. Lżejsze gokarty zużywają mniej nitro."
+"Nitro efficiency - The higher it is, the more speed you get from a can of "
+"nitro. A lighter kart will have higher nitro efficiency."
+msgstr "Wydajność nitro - Im większa, tym mniej zużyjesz nitro, aby się rozpędzić. Lżejsze gokarty zużywają mniej nitro."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1547,7 +1554,7 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr ""
+msgstr "Gdy urządzenia zostały skonfigurowane, wybierz ikonę \"Podzielony ekran\" w menu głównym. Aby dołączyć do gry każdy gracz powinien nacisnąć klawisz \"ognia\" na gamepadzie lub klawiaturze. Gracze mogą używać dowolnego urządzenia do wyboru własnego gokartu. Gra będzie kontynuowana, kiedy wszyscy wybiorą swoje gokarty. Mysz nie może być używana podczas tej operacji."
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1658,20 +1665,20 @@ msgstr "Utwórz serwer"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:191
+#: src/states_screens/online/networking_lobby.cpp:195
 msgid "Lobby"
 msgstr "Pokój"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:177
+#: src/states_screens/online/networking_lobby.cpp:181
 msgid "Start race"
 msgstr "Zacznij wyścig"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:185
+#: src/states_screens/online/networking_lobby.cpp:189
 msgid "Configuration"
 msgstr "Konfiguracja"
 
@@ -2077,12 +2084,12 @@ msgstr "Pokaż bronie innych gokartów"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the story mode timer"
-msgstr ""
+msgstr "Włącz licznik trybu historii"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the speedrun timer"
-msgstr ""
+msgstr "Włącz licznik Speedrun"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2208,6 +2215,91 @@ msgstr "Usuń"
 #. I18N: In the user screen
 msgid "Kart color"
 msgstr "Kolor gokarta"
+
+#. I18N: ./data/tips.xml
+msgid "The GUI skin can be changed in the UI options."
+msgstr "Skórkę interfejsu można zmienić w opcjach"
+
+#. I18N: ./data/tips.xml
+msgid "An UI option allows to see other karts' powerups."
+msgstr "Istnieje opcja pozwalająca zobaczyć bronie innych gokartów."
+
+#. I18N: ./data/tips.xml
+msgid "The font size can be changed in the UI options."
+msgstr "Rozmiar czcionki można zmienić w opcjach."
+
+#. I18N: ./data/tips.xml
+msgid "The help menu has many useful informations."
+msgstr "Pomocnik zawiera wiele przydatnych informacji."
+
+#. I18N: ./data/tips.xml
+msgid "In single-player, you can watch and challenge recorded time-trials."
+msgstr "W trybie jednego gracza możesz obejrzeć lub rzucić wyzwanie nagranym Czasówkom."
+
+#. I18N: ./data/tips.xml
+msgid ""
+"You can visit https://supertuxkart.net/ for more information about the game."
+msgstr "Możesz odwiedzić https://supertuxkart.net/ aby dowiedzieć się więcej o grze."
+
+#. I18N: ./data/tips.xml
+msgid "Short nitro boosts are more efficient."
+msgstr "Krótkie przyspieszenia z użyciem nitro są bardziej skuteczne."
+
+#. I18N: ./data/tips.xml
+msgid "Only use zippers when it is safe. Long straight lines are ideal."
+msgstr "Używaj suwaków tylko gdy jest to bezpieczne. Najlepsze są długie proste."
+
+#. I18N: ./data/tips.xml
+msgid ""
+"Don't use multiple zippers quickly in row, instead, wait until the speed "
+"boost wears off."
+msgstr "Nie używaj kilku suwaków na raz. Lepiej poczekaj, aż przyspieszenie będzie się kończyć."
+
+#. I18N: ./data/tips.xml
+msgid "Skidding makes you much faster, do it whenever safe."
+msgstr "Jedziesz dużo szybciej, jeśli się ślizgasz. Używaj ślizgania tam, gdzie jest to bezpieczne."
+
+#. I18N: ./data/tips.xml
+msgid "The swatter can be used to remove bombs or parachutes."
+msgstr "Możesz użyć packi, aby pozbyć się bomby lub spadochronu."
+
+#. I18N: ./data/tips.xml
+msgid ""
+"You can't stop turning while skidding. Good kart orientation at the skid's "
+"start is paramount."
+msgstr "Podczas ślizgania nie można przestać skręcać. Odpowiedni kierunek gokarta na początku ślizgania jest najważniejszy."
+
+#. I18N: ./data/tips.xml
+msgid "You get a startup boost if you start accelerating during \"Set\"."
+msgstr "Możesz otrzymać dodatkowe przyspieszenie na starcie, jeśli zaczniesz przyspieszać podczas komendy \"Do startu!\"."
+
+#. I18N: ./data/tips.xml
+msgid "Braking allows to get rid of parachutes quicker."
+msgstr "Hamowanie pozwala szybciej pozbyć się spadochronu."
+
+#. I18N: ./data/tips.xml
+msgid "First and foremost, focus on where your kart is going."
+msgstr "Pierwsze i najważniejsze, skup się na tym gdzie Twój gokart jedzie."
+
+#. I18N: ./data/tips.xml
+msgid "The rescue key (button) is very useful."
+msgstr "Przycisk ratunku jest bardzo przydatny."
+
+#. I18N: ./data/tips.xml
+msgid "Be careful when close to other karts, they may attack you!"
+msgstr "Uważaj, gdy jesteś blisko innych gokartów. Mogą Cię zaatakować!"
+
+#. I18N: ./data/tips.xml
+msgid ""
+"Basketballs can be destroyed using precise backward shots with a bowling "
+"ball, cake or plunger."
+msgstr "Piłkę do koszykówki można zniszczyć precyzyjnym strzałem kulą do kręgli, ciastkiem lub odtykaczką."
+
+#. I18N: ./data/tips.xml
+msgid ""
+"Try to avoid crashing into other karts unless you want to throw them off the"
+" track."
+msgstr "Unikaj uderzania w inne gokarty, chyba że chcesz je zepchnąć z trasy."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2377,6 +2469,10 @@ msgstr "Minigolf"
 msgid "Oliver's Math Class"
 msgstr "Klasa Matematyczna Olivera"
 
+#. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
+msgid "Pumpkin Park"
+msgstr "Park Dyniowy"
+
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
 msgstr "Dwór Ravenbridge"
@@ -2430,11 +2526,11 @@ msgstr "Ogród Zen"
 msgid "Completed achievement \"%s\"."
 msgstr "Ukończone osiągnięcie \"%s\"."
 
-#: src/addons/addons_manager.cpp:107 src/addons/news_manager.cpp:347
+#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Nie można połączyć się z serwerem dodatków SuperTuxKart."
 
-#: src/addons/news_manager.cpp:182
+#: src/addons/news_manager.cpp:180
 #, c-format
 msgid "Error downloading news: '%s'."
 msgstr "Błąd podczas pobierania aktualności: \"%s\"."
@@ -2500,14 +2596,14 @@ msgid "New kart '%s' now available"
 msgstr "Nowy gracz '%s' już dostępny"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:267
+#: src/states_screens/options/options_screen_ui.cpp:269
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "Tryb Speedrun jest nieaktywny. Może zostać włączony tylko, jeśli gra nie została zamknięta od czasu włączenia trybu historii\n\nZamknięcie gry przed ukończeniem trybu historii unieważnia licznik.\n\nAby użyć trybu Speedrun, utwórz nowy profil."
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:388
@@ -2550,7 +2646,12 @@ msgstr "Postęp kodowania:"
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#: src/guiengine/engine.cpp:1400
+#. I18N: tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
+msgid "Tip: "
+msgstr "Wskazówka:"
+
+#: src/guiengine/engine.cpp:1414
 msgid "Loading"
 msgstr "Ładowanie"
 
@@ -2576,8 +2677,10 @@ msgstr "Wydajność nitro"
 #: src/guiengine/widgets/player_kart_widget.cpp:757
 #: src/karts/controller/local_player_controller.cpp:437
 #: src/karts/controller/player_controller.cpp:413
-#: src/network/protocols/client_lobby.cpp:812
+#: src/network/protocols/client_lobby.cpp:802
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
+#: src/states_screens/race_result_gui.cpp:1443
+#: src/states_screens/race_result_gui.cpp:1501
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (z utrudnieniem)"
@@ -3278,12 +3381,12 @@ msgid "You finished the race!"
 msgstr "Ukończyłeś wyścig!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1093
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1083
 #, c-format
 msgid "%s left the game."
 msgstr "%s opuścił grę."
 
-#: src/main.cpp:1925
+#: src/main.cpp:1927
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3294,16 +3397,16 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart może łączyć się z serwerem w celu pobrania dodatków oraz powiadamiania o aktualizacjach. Zbieramy również anonimowe statystyki, które pomagają w rozwoju gry. Zapoznaj się z naszą polityką prywatności na http://privacy.supertuxkart.net. Czy chcesz włączyć tą opcję? Aby zmienić to ustawienie później, edytuj pola \"Połącz się z siecią\" oraz \"Wysyłaj anonimowe dane o sprzęcie\" w zakładce \"Ogólne\"."
 
-#: src/main.cpp:2196
+#: src/main.cpp:2203
 msgid "Your screen resolution is too low to run STK."
 msgstr "Twoja rozdzielczość ekranu jest zbyt niska, aby uruchomić grę."
 
-#: src/main.cpp:2228
+#: src/main.cpp:2235
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Twój sterownik karty graficznej jest przestarzały. Zainstaluj najnowszą wersję."
 
-#: src/main.cpp:2246
+#: src/main.cpp:2253
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3311,7 +3414,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Sterownik karty graficznej wygląda na bardzo stary. Sprawdź czy jest dostępna aktualizacja. SuperTuxKart działa najlepiej ze sterownikiem wspierającym co najmniej %s. Gra powinna wciąż działać, ale w trybie z ograniczoną grafiką."
 
-#: src/main_loop.cpp:421 src/network/protocols/client_lobby.cpp:96
+#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Upłynął limit czasu połączenia z serwerem."
 
@@ -3397,69 +3500,69 @@ msgstr "Zostałeś wyeliminowany!"
 msgid "'%s' has been eliminated."
 msgstr "'%s' został wyeliminowany."
 
-#: src/network/protocols/client_lobby.cpp:97
+#: src/network/protocols/client_lobby.cpp:102
 msgid "Server has been shut down."
 msgstr "Serwer został zamknięty."
 
-#: src/network/protocols/client_lobby.cpp:98
+#: src/network/protocols/client_lobby.cpp:103
 msgid "You were kicked from the server."
 msgstr "Zostałeś wyrzucony z serwera."
 
-#: src/network/protocols/client_lobby.cpp:100
+#: src/network/protocols/client_lobby.cpp:105
 msgid "You were kicked: Ping too high."
 msgstr "Zostałeś wyrzucony: zbyt wysoki ping."
 
-#: src/network/protocols/client_lobby.cpp:249
-#: src/network/protocols/client_lobby.cpp:850
+#: src/network/protocols/client_lobby.cpp:253
+#: src/network/protocols/client_lobby.cpp:840
 msgid "Bad network connection is detected."
 msgstr "Wykryto złe połączenie."
 
-#: src/network/protocols/client_lobby.cpp:433
+#: src/network/protocols/client_lobby.cpp:423
 msgid "Bot"
 msgstr "Bot"
 
-#: src/network/protocols/client_lobby.cpp:599
+#: src/network/protocols/client_lobby.cpp:589
 #, c-format
 msgid "%s disconnected."
 msgstr "%s rozłączył się."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:627
+#: src/network/protocols/client_lobby.cpp:617
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Wybierz nazwę gracza na liście, aby zarządzać graczem i zobaczyć informację o rankingu."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:681
+#: src/network/protocols/client_lobby.cpp:671
 #, c-format
 msgid "Server name: %s"
 msgstr "Nazwa serwera: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:689
+#: src/network/protocols/client_lobby.cpp:679
 #: src/states_screens/dialogs/server_info_dialog.cpp:83
-#: src/states_screens/race_result_gui.cpp:1775
+#: src/states_screens/race_result_gui.cpp:1801
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Poziom trudności: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:694
+#: src/network/protocols/client_lobby.cpp:684
 #, c-format
 msgid "Max players: %d"
 msgstr "Maksymalna liczba graczy: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:707
+#: src/network/protocols/client_lobby.cpp:697
 #: src/states_screens/dialogs/server_info_dialog.cpp:87
 #, c-format
 msgid "Game mode: %s"
 msgstr "Tryb gry: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:720
+#: src/network/protocols/client_lobby.cpp:710
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:173
 #: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:371
@@ -3467,7 +3570,7 @@ msgid "Time limit"
 msgstr "Limit czasu"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:721
+#: src/network/protocols/client_lobby.cpp:711
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:228
 #: src/states_screens/track_info_screen.cpp:372
@@ -3475,93 +3578,93 @@ msgid "Goals limit"
 msgstr "Limit bramek"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:725
+#: src/network/protocols/client_lobby.cpp:715
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Piłka nożna - rodzaj gry: %s"
 
-#: src/network/protocols/client_lobby.cpp:735
+#: src/network/protocols/client_lobby.cpp:725
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Postęp Grand Prix: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:842
+#: src/network/protocols/client_lobby.cpp:832
 msgid "All players joined red or blue team."
 msgstr "Wszyscy gracze dołączyli do czerwonej lub niebieskiej drużyny."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:862
+#: src/network/protocols/client_lobby.cpp:852
 msgid "You are now the owner of server."
 msgstr "Jesteś teraz właścicielem serwera."
 
-#: src/network/protocols/client_lobby.cpp:903
+#: src/network/protocols/client_lobby.cpp:893
 msgid "Connection refused: Server is busy."
 msgstr "Połączenie odrzucone: Serwer jest zajęty."
 
-#: src/network/protocols/client_lobby.cpp:908
+#: src/network/protocols/client_lobby.cpp:898
 msgid "Connection refused: You are banned from the server."
 msgstr "Połączenie odrzucone: Zostałeś zbanowany na tym serwerze."
 
-#: src/network/protocols/client_lobby.cpp:921
+#: src/network/protocols/client_lobby.cpp:911
 msgid "Connection refused: Server password is incorrect."
 msgstr "Połączenie odrzucone: Hasło serwera jest niepoprawne."
 
-#: src/network/protocols/client_lobby.cpp:925
+#: src/network/protocols/client_lobby.cpp:915
 msgid "Connection refused: Game data is incompatible."
 msgstr "Połączenie odrzucone: Dane gry są niekompatybilne."
 
-#: src/network/protocols/client_lobby.cpp:929
+#: src/network/protocols/client_lobby.cpp:919
 msgid "Connection refused: Server is full."
 msgstr "Połączenie odrzucone: Serwer jest pełny."
 
-#: src/network/protocols/client_lobby.cpp:933
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Invalid player connecting."
 msgstr "Połączenie odrzucone: nieuwierzytelniony gracz."
 
-#: src/network/protocols/client_lobby.cpp:961
+#: src/network/protocols/client_lobby.cpp:951
 msgid "Failed to start the network game."
 msgstr "Nie udało się uruchomić gry sieciowej."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1160
+#: src/network/protocols/client_lobby.cpp:1150
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Gra zakończyła się, nie możesz już dołączyć ani obserwować."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1164
+#: src/network/protocols/client_lobby.cpp:1154
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Nie ma wystarczająco dużo miejsca na arenie - dołączanie nieaktywne"
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1168
+#: src/network/protocols/client_lobby.cpp:1158
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Pozostał tylko 1 gracz, powrót do pokoju."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1332
+#: src/network/protocols/client_lobby.cpp:1322
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s dołączył do czerwonej drużyny."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1338
+#: src/network/protocols/client_lobby.cpp:1328
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s dołączył do niebieskiej drużyny."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1344
+#: src/network/protocols/client_lobby.cpp:1334
 #, c-format
 msgid "%s joined the game."
 msgstr "%s dołączył do gry."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1494
+#: src/network/protocols/client_lobby.cpp:1484
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player or <%s> for the camera "
@@ -3569,7 +3672,7 @@ msgid ""
 msgstr "Naciśnij <%s> lub <%s> aby zmienić obserwowanego gracza, lub <%s> aby zmienić kamerę."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1510
+#: src/network/protocols/client_lobby.cpp:1500
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Pomyślnie zgłoszono %s."
@@ -3578,7 +3681,7 @@ msgstr "Pomyślnie zgłoszono %s."
 msgid "No quick play server available."
 msgstr "Nie ma dostępnych serwerów szybkiej gry."
 
-#: src/network/protocols/connect_to_server.cpp:320
+#: src/network/protocols/connect_to_server.cpp:319
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nie można się połączyć z serwerem %s."
@@ -3604,23 +3707,23 @@ msgstr "Każdy na Każdego"
 msgid "Capture The Flag"
 msgstr "Zdobądź Flagę"
 
-#: src/online/online_player_profile.cpp:458
+#: src/online/online_player_profile.cpp:454
 #, c-format
 msgid "%s is now online."
 msgstr "%s jest dostępny"
 
-#: src/online/online_player_profile.cpp:462
+#: src/online/online_player_profile.cpp:458
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s i %s są dostępni"
 
-#: src/online/online_player_profile.cpp:467
+#: src/online/online_player_profile.cpp:463
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s i %s są dostępni"
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:473
+#: src/online/online_player_profile.cpp:469
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3630,12 +3733,12 @@ msgstr[2] "%d przyjaciół jest dostępnych"
 msgstr[3] "%d przyjaciół jest dostępnych"
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:522
+#: src/online/online_player_profile.cpp:518
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "%s jest teraz na serwerze \"%s\"."
 
-#: src/online/online_player_profile.cpp:553
+#: src/online/online_player_profile.cpp:549
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
@@ -3644,11 +3747,11 @@ msgstr[1] "Otrzymałeś %d nowe zaproszenia!"
 msgstr[2] "Otrzymałeś %d nowych zaproszeń!"
 msgstr[3] "Otrzymałeś %d nowych zaproszeń!"
 
-#: src/online/online_player_profile.cpp:559
+#: src/online/online_player_profile.cpp:555
 msgid "You have a new friend request!"
 msgstr "Otrzymałeś nowe zaproszenie!"
 
-#: src/online/xml_request.cpp:86
+#: src/online/xml_request.cpp:83
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
@@ -3724,18 +3827,23 @@ msgstr "Nazwa dodatku"
 msgid "Updated date"
 msgstr "Data aktualizacji"
 
+#. I18N: Addon not installed for fillter
+#: src/states_screens/addons_screen.cpp:138
+msgid "Not installed"
+msgstr "Nie zainstalowany"
+
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:299
+#: src/states_screens/addons_screen.cpp:319
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s, autor: %s"
 
-#: src/states_screens/addons_screen.cpp:420
+#: src/states_screens/addons_screen.cpp:440
 msgid "Please wait while addons are updated"
 msgstr "Proszę czekać, dodatki się aktualizują"
 
-#: src/states_screens/addons_screen.cpp:498
+#: src/states_screens/addons_screen.cpp:518
 #: src/states_screens/main_menu_screen.cpp:593
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
@@ -4184,58 +4292,57 @@ msgstr "Dodaj konsolę Wiimote"
 msgid "Add Keyboard Configuration"
 msgstr "Dodaj konfigurację klawiatury"
 
-#: src/states_screens/dialogs/addons_loading.cpp:107
+#: src/states_screens/dialogs/addons_loading.cpp:113
 msgid "Update"
 msgstr "Aktualizacja"
 
-#: src/states_screens/dialogs/addons_loading.cpp:119
+#: src/states_screens/dialogs/addons_loading.cpp:125
 #, c-format
 msgid "Version: %d"
 msgstr "Wersja: %d"
 
-#: src/states_screens/dialogs/addons_loading.cpp:150
+#: src/states_screens/dialogs/addons_loading.cpp:156
 msgid "featured"
 msgstr "zalecane"
 
-#: src/states_screens/dialogs/addons_loading.cpp:176
-#: src/states_screens/dialogs/download_assets.cpp:106
-#, c-format
-msgid "%s MB"
-msgstr "%s MB"
-
-#: src/states_screens/dialogs/addons_loading.cpp:183
-#: src/states_screens/dialogs/addons_loading.cpp:187
-#, c-format
-msgid "%s KB"
-msgstr "%s KB"
-
 #. I18N: File size of game assets or addons downloading
-#: src/states_screens/dialogs/addons_loading.cpp:188
-#: src/states_screens/dialogs/download_assets.cpp:108
+#: src/states_screens/dialogs/addons_loading.cpp:176
+#: src/states_screens/dialogs/addons_pack.cpp:173
+#: src/states_screens/dialogs/download_assets.cpp:102
 #, c-format
 msgid "Size: %s"
 msgstr "Rozmiar: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:296
-#: src/states_screens/dialogs/download_assets.cpp:182
+#: src/states_screens/dialogs/addons_loading.cpp:288
+#: src/states_screens/dialogs/addons_pack.cpp:185
+#: src/states_screens/dialogs/download_assets.cpp:180
 msgid "Sorry, downloading the add-on failed"
 msgstr "Pobieranie nie powiodło się"
 
-#: src/states_screens/dialogs/addons_loading.cpp:380
+#: src/states_screens/dialogs/addons_loading.cpp:364
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "Problemy z instalacją dodatku '%s'"
 
-#: src/states_screens/dialogs/addons_loading.cpp:391
-#: src/states_screens/dialogs/addons_loading.cpp:435
-#: src/states_screens/dialogs/download_assets.cpp:255
+#: src/states_screens/dialogs/addons_loading.cpp:375
+#: src/states_screens/dialogs/addons_loading.cpp:424
+#: src/states_screens/dialogs/download_assets.cpp:245
 msgid "Try again"
 msgstr "Spróbuj ponownie"
 
-#: src/states_screens/dialogs/addons_loading.cpp:424
+#: src/states_screens/dialogs/addons_loading.cpp:413
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "Problemy z usunięciem dodatku '%s'"
+
+#. I18N: Shown when there is download error for assets download
+#. in the first run
+#: src/states_screens/dialogs/addons_pack.cpp:225
+#: src/states_screens/dialogs/download_assets.cpp:230
+msgid ""
+"Failed to download assets, check your storage space or internet connection "
+"and try again later."
+msgstr "Nie udało się pobrać zasobów gry. Sprawdź ilość wolnego miejsca oraz połączenie z internetem i spróbuj ponownie."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:135
 msgid "Current password invalid."
@@ -4256,7 +4363,7 @@ msgid "Password successfully changed."
 msgstr "Hasło zostało zmienione."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
-#: src/states_screens/dialogs/recovery_dialog.cpp:210
+#: src/states_screens/dialogs/recovery_dialog.cpp:207
 #: src/states_screens/online/register_screen.cpp:384
 msgid "Validating info"
 msgstr "Sprawdzanie poprawności danych"
@@ -4325,20 +4432,12 @@ msgid "Very Low"
 msgstr "Bardzo niskie"
 
 #. I18N: In download assets dialog
-#: src/states_screens/dialogs/download_assets.cpp:112
+#: src/states_screens/dialogs/download_assets.cpp:106
 msgid ""
 "SuperTuxKart will download full assets (including all tracks, high quality "
 "textures and music) for better gaming experience, this will use your mobile "
 "data if you don't have a wifi connection."
 msgstr "SuperTuxKart pobierze pełne zasoby gry (wszystkie trasy, wysokiej jakości tekstury i muzykę) dla lepszych wrażeń z gry. Jeśli nie masz połączenia z siecią wifi, zostanie użyta mobilna transmisja danych."
-
-#. I18N: Shown when there is download error for assets download
-#. in the first run
-#: src/states_screens/dialogs/download_assets.cpp:239
-msgid ""
-"Failed to download assets, check your storage space or internet connection "
-"and try again later."
-msgstr "Nie udało się pobrać zasobów gry. Sprawdź ilość wolnego miejsca oraz połączenie z internetem i spróbuj ponownie."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4401,59 +4500,59 @@ msgid "Pick a color from slider"
 msgstr "Wybierz kolor suwakiem"
 
 #. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:48
+#: src/states_screens/dialogs/network_player_dialog.cpp:49
 msgid "Player info"
 msgstr "Informacje o graczu"
 
 #. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:53
+#: src/states_screens/dialogs/network_player_dialog.cpp:54
 #, c-format
 msgid "Player name: %s"
 msgstr "Nazwa gracza: %s"
 
 #. I18N: In the network player dialog, show the player location with
 #. country name (based on IP geolocation)
-#: src/states_screens/dialogs/network_player_dialog.cpp:62
+#: src/states_screens/dialogs/network_player_dialog.cpp:63
 #, c-format
 msgid "Player location: %s"
 msgstr "Lokalizacja gracza: %s"
 
 #. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:105
+#: src/states_screens/dialogs/network_player_dialog.cpp:107
 msgid "Kick"
 msgstr "Wyrzuć"
 
 #. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:121
+#: src/states_screens/dialogs/network_player_dialog.cpp:123
 msgid "Change team"
 msgstr "Zmień drużynę"
 
 #. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:136
+#: src/states_screens/dialogs/network_player_dialog.cpp:138
 msgid "Enable handicap"
 msgstr "Włącz utrudnienia"
 
 #. I18N: In the network player dialog
-#: src/states_screens/dialogs/network_player_dialog.cpp:141
+#: src/states_screens/dialogs/network_player_dialog.cpp:143
 msgid "Disable handicap"
 msgstr "Wyłącz utrudnienia"
 
 #. I18N: In the network player dialog,
 #. report player about for example abusive behaviour in game
-#: src/states_screens/dialogs/network_player_dialog.cpp:156
+#: src/states_screens/dialogs/network_player_dialog.cpp:158
 msgid "Report player"
 msgstr "Zgłoś gracza"
 
 #. I18N: In the network player dialog, showing when waiting for
 #. the result of the ranking info of a player
-#: src/states_screens/dialogs/network_player_dialog.cpp:178
-#: src/states_screens/dialogs/player_rankings_dialog.cpp:140
+#: src/states_screens/dialogs/network_player_dialog.cpp:180
+#: src/states_screens/dialogs/player_rankings_dialog.cpp:141
 #, c-format
 msgid "Fetching ranking info for %s"
 msgstr "Pobieranie informacji o rankingu dla %s."
 
 #. I18N: In the network player dialog, instruction for reporting player
-#: src/states_screens/dialogs/network_player_dialog.cpp:186
+#: src/states_screens/dialogs/network_player_dialog.cpp:193
 #, c-format
 msgid "Tell server administrator about this player (%s):"
 msgstr "Powiedz administratorowi serwera o tym graczu(%s)"
@@ -4464,26 +4563,24 @@ msgid "Press any key..."
 msgstr "Naciśnij dowolny klawisz..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:107
-#: src/states_screens/online/networking_lobby.cpp:234
-#: src/states_screens/online/networking_lobby.cpp:781
+#: src/states_screens/online/networking_lobby.cpp:238
+#: src/states_screens/online/networking_lobby.cpp:822
 msgid "Chat is disabled, enable in options menu."
 msgstr "Czat jest wyłączony, możesz go włączyć w opcjach."
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
-#: src/states_screens/dialogs/ranking_callback.hpp:60
+#: src/states_screens/dialogs/ranking_callback.hpp:44
 #, c-format
 msgid "%s has no ranking yet."
 msgstr "%s nie ma jeszcze rankingu."
 
-#. I18N: In the network player dialog show rank and
-#. score of a player
-#: src/states_screens/dialogs/ranking_callback.hpp:71
+#: src/states_screens/dialogs/ranking_callback.hpp:56
 #, c-format
 msgid "%s is number %d in the rankings with a score of %f."
 msgstr "%s jest na %d miejscu w rankingu z liczbą punktów %f."
 
-#: src/states_screens/dialogs/recovery_dialog.cpp:122
+#: src/states_screens/dialogs/recovery_dialog.cpp:120
 msgid "Username and/or email address invalid."
 msgstr "Nazwa użytkownika lub adres e-mail jest niepoprawny."
 
@@ -4509,7 +4606,7 @@ msgstr "Wyścig z duchem"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1765
+#: src/states_screens/race_result_gui.cpp:1791
 #, c-format
 msgid "Laps: %i"
 msgstr "Okrążenia: %i"
@@ -4640,25 +4737,25 @@ msgstr "Zaproszenie anulowane!"
 msgid "Processing"
 msgstr "Przetwarzanie"
 
-#: src/states_screens/dialogs/vote_dialog.cpp:173
+#: src/states_screens/dialogs/vote_dialog.cpp:169
 msgid "Fetching last vote"
 msgstr "Pobieranie ostatniej oceny"
 
-#: src/states_screens/dialogs/vote_dialog.cpp:192
+#: src/states_screens/dialogs/vote_dialog.cpp:188
 msgid "You can adapt your previous rating by clicking the stars beneath."
 msgstr "Możesz zmienić swoją poprzednią ocenę klikając na gwiazdki poniżej."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:197
+#: src/states_screens/dialogs/vote_dialog.cpp:193
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
 msgstr "Nie oceniałeś jeszcze tego dodatku. Możesz to zrobić klikając na gwiazdki poniżej."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:232
+#: src/states_screens/dialogs/vote_dialog.cpp:227
 msgid "Vote successful! You can now close the window."
 msgstr "Głosowanie powiodło się. Możesz teraz zamknąć okno."
 
-#: src/states_screens/dialogs/vote_dialog.cpp:249
+#: src/states_screens/dialogs/vote_dialog.cpp:243
 msgid "Performing vote"
 msgstr "Dokonywanie oceny"
 
@@ -4805,7 +4902,7 @@ msgid "Better luck next time!"
 msgstr "Powodzenia następnym razem!"
 
 #: src/states_screens/grand_prix_win.cpp:165
-#: src/states_screens/race_result_gui.cpp:198
+#: src/states_screens/race_result_gui.cpp:209
 msgid "You completed a challenge!"
 msgstr "Ukończono wyzwanie!"
 
@@ -4827,7 +4924,7 @@ msgid "Locked"
 msgstr "Zablokowane"
 
 #: src/states_screens/kart_selection.cpp:989
-#: src/states_screens/online/networking_lobby.cpp:481
+#: src/states_screens/online/networking_lobby.cpp:512
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -4884,23 +4981,23 @@ msgstr "Hasło zawiera nieprawidłowe znaki!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:180
+#: src/states_screens/online/networking_lobby.cpp:184
 msgid "Ready"
 msgstr "Gotowy"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:183
+#: src/states_screens/online/networking_lobby.cpp:187
 msgid "Live join"
 msgstr "Dołącz"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:188
+#: src/states_screens/online/networking_lobby.cpp:192
 msgid "Spectate"
 msgstr "Obserwuj"
 
-#: src/states_screens/online/networking_lobby.cpp:326
+#: src/states_screens/online/networking_lobby.cpp:330
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Pokój (ping: %d ms)"
@@ -4908,7 +5005,7 @@ msgstr "Pokój (ping: %d ms)"
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:361
+#: src/states_screens/online/networking_lobby.cpp:376
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -4916,7 +5013,7 @@ msgstr "Proszę czekać do zakończenia aktualnej gry (%s), szacowany pozostały
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:369
+#: src/states_screens/online/networking_lobby.cpp:384
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "Proszę czekać do zakończenia aktualnej gry, szacowany pozostały czas: %s."
@@ -4924,24 +5021,31 @@ msgstr "Proszę czekać do zakończenia aktualnej gry, szacowany pozostały czas
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:381
+#: src/states_screens/online/networking_lobby.cpp:396
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr "Proszę czekać do zakończenia aktualnej gry (%s), szacowany postęp: %s%."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:390
+#: src/states_screens/online/networking_lobby.cpp:405
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "Proszę czekać do zakończenia aktualnej gry, szacowany postęp: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:398
+#: src/states_screens/online/networking_lobby.cpp:413
 msgid "Please wait for the current game's end."
 msgstr "Proszę czekać do zakończenia aktualnej gry."
 
-#: src/states_screens/online/networking_lobby.cpp:450
+#. I18N: In the networking lobby,
+#. tell user the command to install addon now
+#: src/states_screens/online/networking_lobby.cpp:427
+#, c-format
+msgid "Send %s in chat box to install addon now."
+msgstr "Wpisz %s w okienku czatu, żeby zainstalować dodatek."
+
+#: src/states_screens/online/networking_lobby.cpp:481
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -4952,7 +5056,7 @@ msgstr[3] "Gra rozpocznie się gdy dołączy więcej niż %d graczy."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:464
+#: src/states_screens/online/networking_lobby.cpp:495
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -4963,12 +5067,12 @@ msgstr[1] "Rozpoczęcie po %d sekundach, lub gdy wszyscy wcisną przycisk \"Goto
 msgstr[2] "Rozpoczęcie po %d sekundach, lub gdy wszyscy wcisną przycisk \"Gotowy\"."
 msgstr[3] "Rozpoczęcie po %d sekundach, lub gdy wszyscy wcisną przycisk \"Gotowy\"."
 
-#: src/states_screens/online/networking_lobby.cpp:501
+#: src/states_screens/online/networking_lobby.cpp:532
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Łączenie z serwerem %s"
 
-#: src/states_screens/online/networking_lobby.cpp:506
+#: src/states_screens/online/networking_lobby.cpp:537
 msgid "Finding a quick play server"
 msgstr "Znajdowanie serwera dla szybkiej gry."
 
@@ -4980,12 +5084,12 @@ msgid "Remaining time: %d"
 msgstr "Pozostały czas: %d"
 
 #. I18N: Goals in achievement
-#: src/states_screens/online/online_profile_achievements.cpp:82
+#: src/states_screens/online/online_profile_achievements.cpp:83
 msgid "Goals"
 msgstr "Cele"
 
-#: src/states_screens/online/online_profile_achievements.cpp:115
-#: src/states_screens/online/online_profile_achievements.cpp:314
+#: src/states_screens/online/online_profile_achievements.cpp:116
+#: src/states_screens/online/online_profile_achievements.cpp:315
 msgid "Fetching achievements"
 msgstr "Pobieranie osiągnięć"
 
@@ -5033,22 +5137,21 @@ msgid ""
 msgstr "Nie możesz grać online bez dostępu do sieci. Jeśli chcesz grać online, zaznacz pole \"Połącz się z siecią\" w ustawieniach w zakładce \"Interfejs użytkownika\"."
 
 #: src/states_screens/online/online_screen.cpp:238
-msgid ""
-"Enter the server address with IP optionally followed by : and then port."
-msgstr "Wpisz adres IP serwera, opcjonalnie podając numer portu po dwukropku."
+msgid "Enter the server address optionally followed by : and then port."
+msgstr "Wpisz adres serwera, opcjonalnie podając numer portu po dwukropku."
 
-#: src/states_screens/online/online_screen.cpp:249
+#: src/states_screens/online/online_screen.cpp:250
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "Nieprawidłowy adres serwera: %s."
 
 #. I18N: In enter server ip address dialog
-#: src/states_screens/online/online_screen.cpp:274
+#: src/states_screens/online/online_screen.cpp:275
 msgid "Failed to detect port number."
 msgstr "Nie można wykryć numeru portu."
 
-#: src/states_screens/online/online_user_search.cpp:211
-#: src/states_screens/online/online_user_search.cpp:275
+#: src/states_screens/online/online_user_search.cpp:179
+#: src/states_screens/online/online_user_search.cpp:242
 msgid "Searching"
 msgstr "Wyszukiwanie"
 
@@ -5093,7 +5196,7 @@ msgid ""
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Otrzymasz e-mail z dalszymi instrukcjami jak aktywować konto. Bądź cierpliwy i sprawdź czy wiadomość nie znalazła się w spamie."
 
-#: src/states_screens/online/register_screen.cpp:432
+#: src/states_screens/online/register_screen.cpp:431
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Dostęp do sieci jest nieaktywny, włącz go w ustawieniach"
 
@@ -5150,14 +5253,14 @@ msgstr "Losowe rozmieszczenie przedmiotów"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:443
+#: src/states_screens/track_info_screen.cpp:451
 msgid "Number of goals to win"
 msgstr "Liczba bramek, aby wygrać"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:438
+#: src/states_screens/track_info_screen.cpp:446
 msgid "Maximum time (min.)"
 msgstr "Maksymalny czas (min.)"
 
@@ -5340,63 +5443,63 @@ msgid "Touch Device"
 msgstr "Urządzenie dotykowe"
 
 #. I18N: in the language choice, to select the same language as the OS
-#: src/states_screens/options/options_screen_language.cpp:88
+#: src/states_screens/options/options_screen_language.cpp:89
 msgid "System Language"
 msgstr "Język Systemu"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:138
+#: src/states_screens/options/options_screen_ui.cpp:87
 msgid "In the bottom-left"
 msgstr "Na dole po lewej"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:140
+#: src/states_screens/options/options_screen_ui.cpp:89
 msgid "On the right side"
 msgstr "Po prawej"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:142
+#: src/states_screens/options/options_screen_ui.cpp:91
 msgid "Hidden"
 msgstr "Ukryty"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:144
+#: src/states_screens/options/options_screen_ui.cpp:93
 msgid "Centered"
 msgstr "Na środku"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:163
+#: src/states_screens/options/options_screen_ui.cpp:112
 msgid "Very small"
 msgstr "Bardzo mały"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:165
+#: src/states_screens/options/options_screen_ui.cpp:114
 msgid "Small"
 msgstr "Mały"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:167
+#: src/states_screens/options/options_screen_ui.cpp:116
 msgid "Medium"
 msgstr "Średni"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:169
+#: src/states_screens/options/options_screen_ui.cpp:118
 msgid "Large"
 msgstr "Duży"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:171
+#: src/states_screens/options/options_screen_ui.cpp:120
 msgid "Very large"
 msgstr "Bardzo duży"
 
-#: src/states_screens/options/options_screen_ui.cpp:471
+#: src/states_screens/options/options_screen_ui.cpp:470
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "Tryb Speedrun może zostać włączony, jeśli gra nie została zamknięta od czasu włączenia trybu historii.\n\nZamknięcie gry przed ukończeniem trybu historii unieważnia licznik.\n\nAby użyć trybu Speedrun, utwórz nowy profil."
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:217
@@ -5414,22 +5517,22 @@ msgstr "Połowiczna"
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
-msgstr ""
+msgstr "Synchronizacja pionowa wymusza wysyłanie nowej ramki\ndopiero gdy monitor jest gotowy, żeby ją wyświetlić."
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:226
 msgid "Full: one frame per monitor refresh"
-msgstr ""
+msgstr "Pełna: jedna ramka na odświeżenie monitora"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:228
 msgid "Half: one frame every two monitor refreshes"
-msgstr ""
+msgstr "Połowiczna: jedna ramka na dwa odświeżenia monitora"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:230
 msgid "Vsync will not work if your drivers don't support it."
-msgstr ""
+msgstr "Synchronizacja pionowa nie będzie działać, jeśli \nnie jest obsługiwana przez sterownik."
 
 #. I18N: custom video settings
 #: src/states_screens/options/options_screen_video.cpp:479
@@ -5569,7 +5672,7 @@ msgstr "BRAMKA!"
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:79
-#: src/states_screens/race_result_gui.cpp:304
+#: src/states_screens/race_result_gui.cpp:315
 msgid "Waiting for others"
 msgstr "Oczekiwanie na innych"
 
@@ -5610,89 +5713,89 @@ msgstr "Naciśnij 'Ognia' aby zacząć samouczek"
 msgid "Press fire to start the challenge"
 msgstr "Naciśnij 'Ognia', aby rozpocząć wyzwanie"
 
-#: src/states_screens/race_result_gui.cpp:184
+#: src/states_screens/race_result_gui.cpp:195
 msgid "Quit the server"
 msgstr "Opuść serwer."
 
-#: src/states_screens/race_result_gui.cpp:199
+#: src/states_screens/race_result_gui.cpp:210
 msgid "You completed challenges!"
 msgstr "Ukończono wyzwania!"
 
-#: src/states_screens/race_result_gui.cpp:222
+#: src/states_screens/race_result_gui.cpp:233
 msgid "Abort Grand Prix"
 msgstr "Zakończ Grand Prix"
 
-#: src/states_screens/race_result_gui.cpp:242
+#: src/states_screens/race_result_gui.cpp:253
 msgid "Restart"
 msgstr "Ponowny start"
 
-#: src/states_screens/race_result_gui.cpp:249
+#: src/states_screens/race_result_gui.cpp:260
 msgid "Back to challenge selection"
 msgstr "Powrót do wyboru wyzwania"
 
-#: src/states_screens/race_result_gui.cpp:257
+#: src/states_screens/race_result_gui.cpp:268
 msgid "Race against the new ghost replay"
 msgstr "Graj z nowym duchem"
 
-#: src/states_screens/race_result_gui.cpp:265
+#: src/states_screens/race_result_gui.cpp:276
 msgid "Back to the menu"
 msgstr "Powrót do menu"
 
-#: src/states_screens/race_result_gui.cpp:430
+#: src/states_screens/race_result_gui.cpp:441
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Czy na pewno chcesz opuścić Grand Prix?"
 
-#: src/states_screens/race_result_gui.cpp:516
+#: src/states_screens/race_result_gui.cpp:527
 msgid "Network grand prix has been finished."
 msgstr "Sieciowe Grand Prix zostało ukończone."
 
-#: src/states_screens/race_result_gui.cpp:552
-#: src/states_screens/race_result_gui.cpp:1361
+#: src/states_screens/race_result_gui.cpp:563
+#: src/states_screens/race_result_gui.cpp:1372
 msgid "Red Team Wins"
 msgstr "Wygrywa drużyna czerwona"
 
-#: src/states_screens/race_result_gui.cpp:554
-#: src/states_screens/race_result_gui.cpp:1365
+#: src/states_screens/race_result_gui.cpp:565
+#: src/states_screens/race_result_gui.cpp:1376
 msgid "Blue Team Wins"
 msgstr "Wygrywa drużyna niebieska"
 
-#: src/states_screens/race_result_gui.cpp:556
-#: src/states_screens/race_result_gui.cpp:1370
+#: src/states_screens/race_result_gui.cpp:567
+#: src/states_screens/race_result_gui.cpp:1381
 msgid "It's a draw"
 msgstr "Remis"
 
-#: src/states_screens/race_result_gui.cpp:787
-#: src/states_screens/race_result_gui.cpp:1215
+#: src/states_screens/race_result_gui.cpp:798
+#: src/states_screens/race_result_gui.cpp:1226
 msgid "Eliminated"
 msgstr "Odpada"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1436
-#: src/states_screens/race_result_gui.cpp:1486
+#: src/states_screens/race_result_gui.cpp:1449
+#: src/states_screens/race_result_gui.cpp:1507
 msgid "(Own Goal)"
 msgstr "(Własny)"
 
-#: src/states_screens/race_result_gui.cpp:1556
+#: src/states_screens/race_result_gui.cpp:1582
 #, c-format
 msgid "Track %i/%i"
 msgstr "Trasa %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1640
+#: src/states_screens/race_result_gui.cpp:1666
 msgid "Grand Prix progress:"
 msgstr "Postęp Grand Prix:"
 
-#: src/states_screens/race_result_gui.cpp:1686
+#: src/states_screens/race_result_gui.cpp:1712
 msgid "Highscores"
 msgstr "Najlepsze wyniki"
 
-#: src/states_screens/race_result_gui.cpp:1789
+#: src/states_screens/race_result_gui.cpp:1815
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Najlepsze okrążenie: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1803
+#: src/states_screens/race_result_gui.cpp:1829
 #, c-format
 msgid "by %s"
 msgstr "autor %s"
@@ -5744,7 +5847,7 @@ msgid "Number of red team AI karts"
 msgstr "Komputery w czerwonej drużynie"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:523
+#: src/states_screens/track_info_screen.cpp:531
 msgid "(Empty)"
 msgstr "(Pusty)"
 
@@ -5756,6 +5859,16 @@ msgstr "wszystko"
 #: src/states_screens/tracks_and_gp_screen.cpp:199
 msgid "Locked!"
 msgstr "Zablokowane!"
+
+#: src/utils/string_utils.cpp:1427
+#, c-format
+msgid "%s MB"
+msgstr "%s MB"
+
+#: src/utils/string_utils.cpp:1434 src/utils/string_utils.cpp:1438
+#, c-format
+msgid "%s KB"
+msgstr "%s KB"
 
 #. I18N: Format for dates (%d = day, %m = month, %Y = year). See
 #. http://www.cplusplus.com/reference/ctime/strftime/ for more info about date
@@ -5785,19 +5898,19 @@ msgstr "Przyspiesz używając <%s> i skręcaj za pomocą <%s> i <%s>\""
 msgid ""
 "Accelerate by touching the upper part of the wheel, and steer by moving left"
 " or right."
-msgstr ""
+msgstr "Przyspiesz dotykając górnej części kierownicy i skręcaj przesuwając ją w lewo lub w prawo."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:38
 msgid ""
-"Accelerate by moving the accelerator upwards, and steer by titling your "
+"Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "Przyspiesz przesuwając drążek w górę i skręcaj przechylając swoje urządzenie."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:43
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr ""
+msgstr "Przyspiesz przesuwając drążek w górę i skręcaj obracając swoje urządzenie."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
@@ -5809,7 +5922,7 @@ msgstr "Zbierz prezenty i wystrzel broń używając <%s> aby pozbyć się tych s
 msgid ""
 "Collect gift boxes, and fire by pressing the bowling icon to blow away these"
 " boxes!"
-msgstr ""
+msgstr "Zbierz prezenty i wystrzel broń używając ikony z kulą, aby pozbyć się tych skrzyni!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:72
 #, c-format
@@ -5821,8 +5934,8 @@ msgstr "Wciśnij <%s> aby spojrzeć w tył, a następnie wciśnij <%s> ciągle t
 #: ../stk-assets/tracks/tutorial/scripting.as:82
 msgid ""
 "Press the mirror icon to look behind. Fire the weapon behind by holding the "
-"bowling icon and then swiping to the mirror icon!"
-msgstr ""
+"mirror icon and then swiping to the bowling icon!"
+msgstr "Naciśnij ikonę z lusterkiem, aby spojrzeć w tył. Wystrzej broń do tyłu przyciskając ikonę lusterka, a następnie przesuwając na ikonę z kulą do kręgli."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:90
 #, c-format
@@ -5831,7 +5944,7 @@ msgstr "Użyj zebranego nitro naciskając <%s>!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:92
 msgid "Use the nitro you collected by pressing the nitro icon"
-msgstr ""
+msgstr "Użyj zebranego nitro naciskając ikonę z nitro!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:97
 msgid "Collect nitro bottles (we will use them after the curve)."
@@ -5844,7 +5957,7 @@ msgstr "Ups! Mamy kłopoty, wciśnij <%s> aby zawołać pomoc."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:105
 msgid "Oops! When you're in trouble, press the bird icon to be rescued."
-msgstr ""
+msgstr "Ups! Mamy kłopoty, wciśnij ikonę z ptakiem, aby zawołać pomoc."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:113
 #, c-format
@@ -5857,7 +5970,7 @@ msgstr "Przyspiesz i podczas skręcania wciśnij <%s> aby się ślizgać. Chwilo
 msgid ""
 "Accelerate and press the skid icon while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Przyspiesz i podczas skręcania wciśnij ikonę ślizgania, aby się ślizgać. Chwilowe ślizganie może pomóc Ci szybciej się obrócić, aby pokonać ostre zakręty."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:130
 msgid ""
