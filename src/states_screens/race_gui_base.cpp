@@ -756,6 +756,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         return;
 
     int x_base = 10;
+    if (irr_driver->getDevice()->getLeftPadding() > 0)
+        x_base += irr_driver->getDevice()->getLeftPadding();
     int y_base = 25;
     unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff

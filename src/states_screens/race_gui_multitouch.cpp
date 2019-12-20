@@ -199,7 +199,10 @@ void RaceGUIMultitouch::createRaceGUI()
 
     const float scale = UserConfigParams::m_multitouch_scale;
 
-    const int w = irr_driver->getActualScreenSize().Width;
+    int w = irr_driver->getActualScreenSize().Width;
+    if (w - irr_driver->getDevice()->getRightPadding() > 0)
+        w -= irr_driver->getDevice()->getRightPadding();
+
     const int h = irr_driver->getActualScreenSize().Height;
     const float btn_size = 0.125f * h * scale;
     const float btn2_size = 0.35f * h * scale;
@@ -212,19 +215,25 @@ void RaceGUIMultitouch::createRaceGUI()
     const float margin_small = small_ratio * margin;
     const float col_small_size = small_ratio * col_size;
 
+    float left_padding = 0.0f;
+    if (irr_driver->getDevice()->getLeftPadding() > 0)
+        left_padding = irr_driver->getDevice()->getLeftPadding();
+
     float first_column_x = w - 2 * col_size;
     float second_column_x = w - 1 * col_size;
     float steering_wheel_margin = 0.6f * margin;
     float steering_wheel_x = steering_wheel_margin;
+    steering_wheel_x += left_padding;
     float steering_wheel_y = h - steering_wheel_margin - btn2_size;
     float steering_accel_margin = margin;
     float steering_accel_x = steering_accel_margin;
+    steering_accel_x += left_padding;
     float steering_accel_y = h - steering_accel_margin - btn2_size;
-    
+
     if (UserConfigParams::m_multitouch_inverted)
     {
-        first_column_x = margin + 1 * col_size;
-        second_column_x = margin;
+        first_column_x = margin + 1 * col_size + left_padding;
+        second_column_x = margin + left_padding;
         steering_wheel_x = w - btn2_size - steering_wheel_margin;
         steering_accel_x = w - btn2_size / 2 - steering_accel_margin;
     }

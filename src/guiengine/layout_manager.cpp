@@ -308,8 +308,14 @@ void LayoutManager::applyCoords(Widget* self, AbstractTopLevelContainer* topLeve
         //parent_w = frame_size.Width;
         //parent_h = frame_size.Height;
         parent_w = topLevelContainer->getWidth();
+        int total_padding = irr_driver->getDevice()->getLeftPadding() +
+            irr_driver->getDevice()->getRightPadding();
+        if (parent_w - total_padding > 0)
+            parent_w -= total_padding;
         parent_h = topLevelContainer->getHeight();
         parent_x = 0;
+        if (irr_driver->getDevice()->getLeftPadding() > 0)
+            parent_x = irr_driver->getDevice()->getLeftPadding();
         parent_y = 0;
     }
     else
