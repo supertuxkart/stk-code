@@ -19,6 +19,9 @@
 
 #include "main_loop.hpp"
 
+#ifdef IOS_STK
+#include "addons/addons_manager.hpp"
+#endif
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
@@ -128,6 +131,8 @@ float MainLoop::getLimitedDt()
                 first_out_focus = false;
                 music_manager->pauseMusic();
                 SFXManager::get()->pauseAll();
+                if (addons_manager->hasDownloadedIcons())
+                    addons_manager->saveInstalled();
             }
             dev->run();
             win_active = dev->isWindowActive();

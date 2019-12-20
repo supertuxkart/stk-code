@@ -59,6 +59,7 @@ AddonsManager* addons_manager = 0;
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
                                  m_state(STATE_INIT)
 {
+    m_downloaded_icons = false;
     // Clean .part file which may be left behind
     std::string addons_part = file_manager->getAddonsFile("addons.xml.part");
     if (file_manager->fileExists(addons_part))
@@ -393,6 +394,11 @@ void AddonsManager::downloadIcons()
                 void afterOperation()
                 {
                     m_addon->setIconReady();
+                }   // afterOperation
+                void callback()
+                {
+                    if (!hadDownloadError())
+                        addons_manager->m_downloaded_icons = true;
                 }   // callback
             public:
                 IconRequest(const std::string &filename,
@@ -632,6 +638,7 @@ void AddonsManager::saveInstalled()
     }
     xml_installed << "</addons>" << std::endl;
     xml_installed.close();
+    m_downloaded_icons = false;
 }   // saveInstalled
 
 #endif

@@ -17,6 +17,9 @@
 
 #include "guiengine/event_handler.hpp"
 
+#ifdef ANDROID
+#include "addons/addons_manager.hpp"
+#endif
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/user_config.hpp"
@@ -182,6 +185,8 @@ bool EventHandler::OnEvent (const SEvent &event)
                 music_manager->pauseMusic();
                 SFXManager::get()->pauseAll();
             }
+            if (addons_manager->hasDownloadedIcons())
+                addons_manager->saveInstalled();
         }
         else if (cmd == APP_CMD_RESUME || cmd == APP_CMD_GAINED_FOCUS)
         {

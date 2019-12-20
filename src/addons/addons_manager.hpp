@@ -53,6 +53,12 @@ private:
     // Synchronise the state between threads (e.g. GUI and update thread)
     Synchronised<STATE_TYPE> m_state;
 
+    /* Return true if any icons have been downloaded, so we need to call
+     * saveInstalled in mobile stk when pressing home button, so the icons
+     * won't need to be redownload when stk is killed by OS in the
+     * background. */
+    bool m_downloaded_icons;
+
     void  loadInstalledAddons();
     void  downloadIcons();
 
@@ -88,7 +94,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the i-th addons. */
     const Addon& getAddon(unsigned int i) { return m_addons_list.getData()[i];}
-
+    // ------------------------------------------------------------------------
+    bool hasDownloadedIcons() const { return m_downloaded_icons; }
 };   // class AddonsManager
 
 extern AddonsManager *addons_manager;
