@@ -121,6 +121,7 @@ namespace irr
             m_right_padding = right;
         }
         static std::string getSystemLanguageCode();
+        static void openURLiOS(const char* url);
         virtual s32 getTopPadding()
         {
             return m_top_padding * m_native_scale;

@@ -950,6 +950,13 @@ namespace irr
         NSString* language = [[NSLocale preferredLanguages] firstObject];
         return std::string([language UTF8String]);
     }
+    void CIrrDeviceiOS::openURLiOS(const char* url)
+    {
+        UIApplication* application = [UIApplication sharedApplication];
+        NSString* url_nsstring = [NSString stringWithCString:url encoding:NSUTF8StringEncoding];
+        NSURL* nsurl_val = [NSURL URLWithString:url_nsstring];
+        [application openURL:nsurl_val];
+    }
 }
 
 #ifdef _IRR_COMPILE_WITH_IOS_BUILTIN_MAIN_

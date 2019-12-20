@@ -27,6 +27,10 @@
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #endif
 
+#ifdef IOS_STK
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceiOS.h"
+#endif
+
 using namespace Online;
 
 namespace Online
@@ -48,7 +52,9 @@ namespace Online
             android->openURL(url);
 #elif defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#elif defined(__APPLE__) && !defined(IOS_STK)
+#elif defined(IOS_STK)
+        irr::CIrrDeviceiOS::openURLiOS(url.c_str());
+#elif defined(__APPLE__)
         std::string command = std::string("open ").append(url);
         if (system(command.c_str()))
         {
