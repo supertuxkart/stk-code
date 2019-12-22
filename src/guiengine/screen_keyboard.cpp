@@ -138,7 +138,8 @@ ScreenKeyboard::~ScreenKeyboard()
     GUIEngine::getGUIEnv()->removeFocus(m_irrlicht_window);
     m_irrlicht_window->remove();
 
-    input_manager->setMode(m_previous_mode);
+    if (input_manager)
+        input_manager->setMode(m_previous_mode);
 
     elementsWereDeleted();
 }   // ~ScreenKeyboard
