@@ -156,7 +156,7 @@ private:
     int                  m_scene_complexity;
 
     /** Internal method that applies the resolution in user settings. */
-    void                 applyResolutionSettings();
+    void                 applyResolutionSettings(bool recreate_device);
     void                 createListOfVideoModes();
 
     bool                 m_request_screenshot;

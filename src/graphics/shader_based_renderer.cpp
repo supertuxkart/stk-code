@@ -302,7 +302,7 @@ void ShaderBasedRenderer::renderSceneDeferred(scene::ICameraSceneNode * const ca
         m_lighting_passes.renderLightsScatter(m_rtts->getDepthStencilTexture(),
                                               m_rtts->getFBO(FBO_HALF1),
                                               m_rtts->getFBO(FBO_HALF2),
-                                              m_post_processing);
+                                              m_post_processing.get());
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -574,7 +574,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
     }
     else if (irr_driver->getShadowViz() && m_rtts->getShadowFrameBuffer())
     {
-        m_shadow_matrices.renderShadowsDebug(m_rtts->getShadowFrameBuffer(), m_post_processing);
+        m_shadow_matrices.renderShadowsDebug(m_rtts->getShadowFrameBuffer(), m_post_processing.get());
     }
     else
     {
@@ -598,19 +598,24 @@ ShaderBasedRenderer::ShaderBasedRenderer()
     SharedGPUObjects::init();
     SP::init();
     SP::initSTKRenderer(this);
-    m_post_processing = new PostProcessing();
+    createPostProcessing();
 }
 
 // ----------------------------------------------------------------------------
 ShaderBasedRenderer::~ShaderBasedRenderer()
 {
-    delete m_post_processing;
     delete m_spherical_harmonics;
     delete m_skybox;
     delete m_rtts;
     ShaderBase::killShaders();
     SP::destroy();
     ShaderFilesManager::kill();
+}
+
+// ----------------------------------------------------------------------------
+void ShaderBasedRenderer::createPostProcessing()
+{
+    m_post_processing.reset(new PostProcessing());
 }
 
 // ----------------------------------------------------------------------------
@@ -702,11 +707,6 @@ void ShaderBasedRenderer::addSunLight(const core::vector3df &pos)
 // ----------------------------------------------------------------------------
 void ShaderBasedRenderer::render(float dt, bool is_loading)
 {
-    // Start the RTT for post-processing.
-    // We do this before beginScene() because we want to capture the glClear()
-    // because of tracks that do not have skyboxes (generally add-on tracks)
-    m_post_processing->begin();
-
     World *world = World::getWorld(); // Never NULL.
     Track *track = Track::getCurrentTrack();
     
@@ -859,7 +859,7 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     if (CVS->isDeferredEnabled())
     {
         renderSceneDeferred(camera, dt, false, true);
-        render_target->setFrameBuffer(m_post_processing
+        render_target->setFrameBuffer(m_post_processing.get()
             ->render(camera, false, m_rtts));
     }
     else

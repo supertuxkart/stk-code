@@ -35,13 +35,16 @@
 #include "graphics/per_camera_node.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/shader.hpp"
 #include "graphics/shader_based_renderer.hpp"
+#include "graphics/shader_files_manager.hpp"
 #include "graphics/shared_gpu_objects.hpp"
 #include "graphics/sp_mesh_loader.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
+#include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
@@ -939,17 +942,20 @@ void IrrDriver::changeResolution(const int w, const int h,
 
 //-----------------------------------------------------------------------------
 
-void IrrDriver::applyResolutionSettings()
+void IrrDriver::applyResolutionSettings(bool recreate_device)
 {
 #ifndef SERVER_ONLY
     // show black before resolution switch so we don't see OpenGL's buffer
     // garbage during switch
-    m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
-    GL32_draw2DRectangle( video::SColor(255, 0, 0, 0),
-                            core::rect<s32>(0, 0,
-                                            UserConfigParams::m_prev_width,
-                                            UserConfigParams::m_prev_height) );
-    m_video_driver->endScene();
+    if (recreate_device)
+    {
+        m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
+        GL32_draw2DRectangle( video::SColor(255, 0, 0, 0),
+                                core::rect<s32>(0, 0,
+                                                UserConfigParams::m_prev_width,
+                                                UserConfigParams::m_prev_height) );
+        m_video_driver->endScene();
+    }
     track_manager->removeAllCachedData();
     delete attachment_manager;
     attachment_manager = NULL;
@@ -967,10 +973,12 @@ void IrrDriver::applyResolutionSettings()
     GUIEngine::clear();
     GUIEngine::cleanUp();
 
-    m_device->closeDevice();
-    m_device->clearSystemMessages();
-    m_device->run();
-
+    if (recreate_device)
+    {
+        m_device->closeDevice();
+        m_device->clearSystemMessages();
+        m_device->run();
+    }
     delete material_manager;
     material_manager = NULL;
 
@@ -980,21 +988,37 @@ void IrrDriver::applyResolutionSettings()
     // (we're sure to update main.cpp at some point and forget this one...)
     STKTexManager::getInstance()->kill();
 #ifdef ENABLE_RECORDER
-    ogrDestroy();
-    m_recording = false;
+    if (recreate_device)
+    {
+        ogrDestroy();
+        m_recording = false;
+    }
 #endif
     // initDevice will drop the current device.
-    delete m_renderer;
-    m_renderer = NULL;
-    SharedGPUObjects::reset();
-    
-    SP::setMaxTextureSize();
-    initDevice();
+    if (recreate_device)
+    {
+        delete m_renderer;
+        m_renderer = NULL;
+        SharedGPUObjects::reset();
 
+        SP::setMaxTextureSize();
+        initDevice();
+    }
 #ifndef SERVER_ONLY
     for (unsigned i = 0; i < Q_LAST; i++)
     {
         m_perf_query[i]->reset();
+    }
+    if (!recreate_device)
+    {
+        SP::SPTextureManager::get()->stopThreads();
+        SP::SPShaderManager::destroy();
+        SP::SPTextureManager::destroy();
+        ShaderBase::killShaders();
+        ShaderFilesManager::getInstance()->removeAllShaderFiles();
+        unsetMaxTextureSize();
+        SP::setMaxTextureSize();
+        m_renderer->createPostProcessing();
     }
     if (CVS->isGLSL())
         SP::loadShaders();
@@ -1964,7 +1988,7 @@ void IrrDriver::update(float dt, bool is_loading)
     // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)
     {
-        applyResolutionSettings();
+        applyResolutionSettings(m_resolution_changing != RES_CHANGE_SAME);
         if(m_resolution_changing==RES_CHANGE_YES)
             new ConfirmResolutionDialog(false);
         else if(m_resolution_changing==RES_CHANGE_YES_WARN)

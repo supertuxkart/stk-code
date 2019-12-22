@@ -46,7 +46,7 @@ private:
     DrawCalls                   m_draw_calls;
     LightingPasses              m_lighting_passes;
     ShadowMatrices              m_shadow_matrices;
-    PostProcessing             *m_post_processing;
+    std::unique_ptr<PostProcessing> m_post_processing;
 
     void prepareForwardRenderer();
 
@@ -111,7 +111,8 @@ public:
 
     RTT* getRTTs() { return m_rtts; }
     ShadowMatrices* getShadowMatrices() { return &m_shadow_matrices; }
-    PostProcessing* getPostProcessing() { return m_post_processing; }
+    PostProcessing* getPostProcessing() { return m_post_processing.get(); }
+    void createPostProcessing() OVERRIDE;
 
 };
 

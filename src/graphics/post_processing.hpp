@@ -51,12 +51,8 @@ private:
 
 public:
                  PostProcessing();
-    virtual     ~PostProcessing() {}
 
     void         reset();
-    /** Those should be called around the part where we render the scene to be
-     *  post-processed */
-    void         begin() {}
     void         update(float dt);
 
     void renderBloom(GLuint in);
