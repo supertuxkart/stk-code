@@ -1933,7 +1933,7 @@ void askForInternetPermission()
         "'General', and edit \"Connect to the "
         "Internet\" and \"Send anonymous HW statistics\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
-        new ConfirmServer(), true, true, 0.7f, 0.7f);
+        new ConfirmServer(), true, true, 0.85f, 0.85f);
 
     // Changes the default focus to be 'cancel' ('ok' as default is not
     // GDPR compliant, see #3378).
