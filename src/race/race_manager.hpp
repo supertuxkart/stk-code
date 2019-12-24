@@ -741,10 +741,7 @@ public:
      /** \brief Returns the number of second's decimals to display */
     int currentModeTimePrecision() const
     {
-        if (isEggHuntMode() || isTimeTrialMode())
-            return 3;//display milliseconds
-
-        return 2;//display centiseconds
+        return 3; // display milliseconds
     }   // currentModeTimePrecision
     // ----------------------------------------------------------------------------------------
     /** \brief Returns true if the current mode has laps. */
