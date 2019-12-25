@@ -1637,7 +1637,6 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
             {
                 std::set<std::string> addon_skin_files;
                 std::string skin_folder = file_manager->getAddonsFile("skins/");
-                printf("skin folder %s\n",skin_folder.c_str());
                 file_manager->listFiles(addon_skin_files/*out*/, skin_folder,
                                         false/*make full path*/);
                 for (auto& skin : addon_skin_files)
@@ -1647,8 +1646,6 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
                     std::string stkskin = skin_folder + skin + "/stkskin.xml";
                     if (file_manager->fileExists(stkskin))
                         total_addons.insert(Addon::createAddonId(skin));
-
-                    printf("skin %s\n",stkskin.c_str());
                 }
             }
             std::string msg = "";
