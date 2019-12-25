@@ -4994,27 +4994,56 @@ void ServerLobby::handleServerCommand(Event* event,
         NetworkString* chat = getNetworkString();
         chat->addUInt8(LE_CHAT);
         chat->setSynchronous(true);
-        if (argv.size() != 2)
+        if (argv.size() > 3)
         {
             chat->encodeString16(
-                L"Usage: /listserveraddon [addon prefix letter(s) to find]");
+                L"Usage: /listserveraddon [option][addon prefix letter(s) to find]. Available options: -track, -arena, -kart, -soccer.");
         }
         else
         {
+            std::string type = "";
+            std::string text = "";
+            if(argv.size() > 1)
+            {
+                if(argv[1].compare("-track") == 0 ||
+                   argv[1].compare("-arena") == 0 ||
+                   argv[1].compare("-kart" ) == 0 ||
+                   argv[1].compare("-soccer" ) == 0)
+                    type = argv[1].substr(1);
+                if((argv.size() == 2 && type.empty()) || argv.size() == 3)
+                    text = argv[argv.size()-1];
+            }
+
             std::set<std::string> total_addons;
-            total_addons.insert(m_addon_kts.first.begin(), m_addon_kts.first.end());
-            total_addons.insert(m_addon_kts.second.begin(), m_addon_kts.second.end());
-            total_addons.insert(m_addon_arenas.begin(), m_addon_arenas.end());
-            total_addons.insert(m_addon_soccers.begin(), m_addon_soccers.end());
+            if(type.empty() || // not specify addon type
+               (!type.empty() && type.compare("kart") == 0)) // list kart addon
+            {
+                total_addons.insert(m_addon_kts.first.begin(), m_addon_kts.first.end());
+            }
+            if(type.empty() || // not specify addon type
+               (!type.empty() && type.compare("track") == 0))
+            {
+                total_addons.insert(m_addon_kts.second.begin(), m_addon_kts.second.end());
+            }
+            if(type.empty() || // not specify addon type
+               (!type.empty() && type.compare("arena") == 0))
+            {
+                total_addons.insert(m_addon_arenas.begin(), m_addon_arenas.end());
+            }
+            if(type.empty() || // not specify addon type
+               (!type.empty() && type.compare("soccer") == 0))
+            {
+                total_addons.insert(m_addon_soccers.begin(), m_addon_soccers.end());
+            }
             std::string msg = "";
             for (auto& addon : total_addons)
             {
                 // addon_ (6 letters)
-                if (addon.compare(6, argv[1].length(), argv[1]) == 0)
-                {
-                    msg += addon.substr(6);
-                    msg += ", ";
-                }
+                if (!text.empty() && addon.find(text, 6) == std::string::npos)
+                    continue;
+
+                msg += addon.substr(6);
+                msg += ", ";
             }
             if (msg.empty())
                 chat->encodeString16(L"Addon not found");
