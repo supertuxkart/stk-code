@@ -165,7 +165,16 @@ namespace Scripting
         {
             return race_manager->getNumLocalPlayers();
         }
-
+        
+        /**
+          * Gets the kart type, such as local player, networked player, AI, etc.
+          * @return A KartType enum as defined in race_manager.hpp, implicitly casted to an int
+          */
+        int getKartType(int kartId)
+        {
+            return race_manager->getKartType(kartId);
+        }
+        
         bool isTrackReverse()
         {
             return race_manager->getReverseTrack();
@@ -553,6 +562,10 @@ namespace Scripting
                                                
             r = engine->RegisterGlobalFunction("int getNumLocalPlayers()", 
                                                mp ? WRAP_FN(getNumLocalPlayers) : asFUNCTION(getNumLocalPlayers), 
+                                               call_conv); assert(r >= 0);
+            
+            r = engine->RegisterGlobalFunction("int getKartType(int kartId)", 
+                                               mp ? WRAP_FN(getKartType) : asFUNCTION(getKartType), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("bool isReverse()", 
