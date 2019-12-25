@@ -96,7 +96,7 @@
                    <spacer width="5" height="3%"/>
                    <div width="100%" height="fit" layout="horizontal-row" >
                        <spacer width="1%" height="100%"/>
-                       <button id="assets_settings" raw_text="Android specific options"/>
+                       <button id="assets_settings" text="Uninstall full game assets"/>
                    </div>
                    <spacer width="5" height="3%"/>
                </box>
