@@ -24,6 +24,7 @@
 #endif
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -131,6 +132,7 @@ float MainLoop::getLimitedDt()
                 first_out_focus = false;
                 music_manager->pauseMusic();
                 SFXManager::get()->pauseAll();
+                PlayerManager::get()->save();
                 if (addons_manager->hasDownloadedIcons())
                     addons_manager->saveInstalled();
             }

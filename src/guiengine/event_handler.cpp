@@ -22,6 +22,7 @@
 #endif
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_tex_manager.hpp"
@@ -185,6 +186,7 @@ bool EventHandler::OnEvent (const SEvent &event)
                 music_manager->pauseMusic();
                 SFXManager::get()->pauseAll();
             }
+            PlayerManager::get()->save();
             if (addons_manager->hasDownloadedIcons())
                 addons_manager->saveInstalled();
         }
