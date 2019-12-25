@@ -205,6 +205,11 @@ void ScreenKeyboard::createButtons()
         float pos_x = 3;
         int total_width = m_area.getWidth() - 2 * (int)pos_x;
 
+        int total_padding = irr_driver->getDevice()->getLeftPadding() +
+            irr_driver->getDevice()->getRightPadding();
+        if (total_width - total_padding > 0)
+            total_width -= total_padding;
+
         char tmp[100];
         sprintf(tmp, "%i", pos_y + (height + margin) * i);
         std::string pos_y_str = tmp;
