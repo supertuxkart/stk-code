@@ -1371,9 +1371,9 @@ namespace GUIEngine
 #ifndef SERVER_ONLY
         if (update_tips)
         {
-            //I18N: tip shown in gui for giving player hints
-            g_tips_string = _("Tip: ");
-            g_tips_string += TipsManager::get()->getTip("general");
+            core::stringw tip = TipsManager::get()->getTip("general");
+            //I18N: Tip shown in gui for giving player hints
+            g_tips_string = _("Tip: %s", tip);
         }
 
         if (clearIcons) g_loading_icons.clear();
