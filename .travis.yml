@@ -6,8 +6,9 @@
 sudo: false
 language: cpp
 os:
-  - osx
+  - linux
 compiler:
+  - gcc
   - clang
 
 matrix:
@@ -15,6 +16,8 @@ matrix:
 
 env:
   matrix:
+    - BUILD_TYPE="Debug" SERVER_ONLY="OFF"
+    - BUILD_TYPE="Debug" SERVER_ONLY="ON"
     - BUILD_TYPE="Release" SERVER_ONLY="OFF"
     - BUILD_TYPE="Release" SERVER_ONLY="ON"
 
