@@ -6,7 +6,7 @@
                 <div id="result-table" width="100%" height="80%">
                     <!-- Contents is added programatically -->
                 </div>
-                <spacer height="3%" width="100%"/>
+                <spacer height="2%" width="100%"/>
                     <!-- The actual button texts will vary depending on what type of race
                          was being run, and if something was unlocked etc. So we don't
                          specify a text here, and label the buttons :
@@ -16,12 +16,11 @@
                          Setting text=" " is important, otherwise the height of the
                          widget is incorrect.                             -->
                 <buttonbar id="operations" width="65%" height="18%" align="center">
-                    <icon-button id="left" icon="gui/icons/green_check.png" width="128" height="128" raw_text="Left"/>
-                    <icon-button id="middle" icon="gui/icons/green_check.png" width="128" height="128" raw_text="Middle"/>
-                    <icon-button id="right" icon="gui/icons/green_check.png" width="128" height="128" raw_text="Right"/>
+                    <icon-button id="left" icon="gui/icons/green_check.png" width="100" height="100" raw_text="Left" word_wrap="true"/>
+                    <icon-button id="middle" icon="gui/icons/green_check.png" width="100" height="100" raw_text="Middle" word_wrap="true"/>
+                    <icon-button id="right" icon="gui/icons/green_check.png" width="100" height="100" raw_text="Right" word_wrap="true"/>
                 </buttonbar>
             </div>
         </roundedbox>
-        <spacer height="3%" width="90%"/>
     </div>
 </stkgui>

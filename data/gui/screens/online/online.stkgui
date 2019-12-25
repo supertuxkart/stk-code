@@ -21,16 +21,16 @@
         <buttonbar id="menu_toprow" proportion="3" width="90%" align="center">
             <icon-button id="lan" width="128" height="128"
                          icon="gui/icons/menu_multi.png" focus_icon="gui/icons/menu_multi_focus.png"
-                         I18N="Networking menu button" text="Local networking"/>
+                         I18N="Networking menu button" text="Local networking" word_wrap="true"/>
             <icon-button id="wan" width="128" height="128"
                          icon="gui/icons/menu_online.png" focus_icon="gui/icons/menu_online_focus.png"
-                         I18N="Networking menu button" text="Global networking"/>
+                         I18N="Networking menu button" text="Global networking" word_wrap="true"/>
             <icon-button id="enter-address" width="128" height="128"
                          icon="gui/icons/online/menu_quick_play.png" focus_icon="gui/icons/online/menu_quick_play_hover.png"
-                         I18N="Networking menu button" text="Enter server address"/>
+                         I18N="Networking menu button" text="Enter server address" word_wrap="true"/>
             <icon-button id="online" width="128" height="128"
                          icon="gui/icons/menu_online.png" focus_icon="gui/icons/menu_online_focus.png"
-                         I18N="Networking menu button" text="Your profile"/>
+                         I18N="Networking menu button" text="Your profile" word_wrap="true"/>
         </buttonbar>
 
         <spacer height="5%" width="10"/>
