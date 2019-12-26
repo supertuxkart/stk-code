@@ -4994,10 +4994,18 @@ void ServerLobby::handleServerCommand(Event* event,
         NetworkString* chat = getNetworkString();
         chat->addUInt8(LE_CHAT);
         chat->setSynchronous(true);
-        if (argv.size() > 3)
+        if (argv.size() == 1 || argv.size() > 3 || argv[1].size() < 3 ||
+            (argv.size() == 2 &&
+            (argv[1].compare("-track") == 0 ||
+            argv[1].compare("-arena") == 0 ||
+            argv[1].compare("-kart") == 0 ||
+            argv[1].compare("-soccer") == 0)) ||
+            (argv.size() == 3 && argv[2].size() < 3))
         {
             chat->encodeString16(
-                L"Usage: /listserveraddon [option][addon prefix letter(s) to find]. Available options: -track, -arena, -kart, -soccer.");
+                L"Usage: /listserveraddon [option][addon string to find "
+                "(at least 3 characters)]. Available options: "
+                "-track, -arena, -kart, -soccer.");
         }
         else
         {
