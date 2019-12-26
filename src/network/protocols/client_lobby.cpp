@@ -1536,10 +1536,12 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
     }
     else if (argv[0] == "liststkaddon")
     {
-        if (argv.size() != 2)
+        if (argv.size() > 3)
         {
             NetworkingLobby::getInstance()->addMoreServerInfo(
-                L"Usage: /liststkaddon [addon prefix letter(s) to find]");
+                L"Usage: /liststkaddon [option][addon prefix letter(s) to find]");
+            NetworkingLobby::getInstance()->addMoreServerInfo(
+                L"available options: -kart, -track, -arena.");
         }
         else
         {
@@ -1549,9 +1551,25 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
                 // addon_ (6 letters)
                 const Addon& addon = addons_manager->getAddon(i);
                 const std::string& addon_id = addon.getId();
-                if (addon.testStatus(Addon::AS_APPROVED) &&
-                    addon_id.compare(6, argv[1].length(), argv[1]) == 0)
+                if (addon.testStatus(Addon::AS_APPROVED))
                 {
+                    std::string type = "";
+                    std::string text = "";
+                    if(argv.size() > 1)
+                    {
+                        if(argv[1].compare("-track") == 0 ||
+                           argv[1].compare("-arena") == 0 ||
+                           argv[1].compare("-kart" ) == 0)
+                            type = argv[1].substr(1);
+                        if((argv.size() == 2 && type.empty()) || argv.size() == 3)
+                            text = argv[argv.size()-1];
+                    }
+
+                    if(!type.empty() && addon.getType()!=type)
+                        continue; // only show given type
+                    if(!text.empty() && addon_id.find(text, 6) == std::string::npos)
+                        continue; // only show matched
+
                     msg += addon_id.substr(6);
                     msg += ", ";
                 }
@@ -1569,49 +1587,76 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
     }
     else if (argv[0] == "listlocaladdon")
     {
-        if (argv.size() != 2)
+        if (argv.size() > 3)
         {
             NetworkingLobby::getInstance()->addMoreServerInfo(
-                L"Usage: /listlocaladdon [addon prefix letter(s) to find]");
+                L"Usage: /listlocaladdon [option][addon prefix letter(s) to find]");
+            NetworkingLobby::getInstance()->addMoreServerInfo(
+                L"available options: -kart, -track/-arena, -skin.");
         }
         else
         {
+            std::string type = "";
+            std::string text = "";
+            if(argv.size() > 1)
+            {
+                if(argv[1].compare("-track") == 0 ||
+                   argv[1].compare("-arena") == 0 ||
+                   argv[1].compare("-kart" ) == 0 ||
+                   argv[1].compare("-skin" ) == 0)
+                    type = argv[1].substr(1);
+                if((argv.size() == 2 && type.empty()) || argv.size() == 3)
+                    text = argv[argv.size()-1];
+            }
+
             std::set<std::string> total_addons;
-            for (unsigned i = 0;
-                i < kart_properties_manager->getNumberOfKarts(); i++)
+            if(type.empty() || // not specify addon type
+               (!type.empty() && type.compare("kart") == 0)) // list kart addon
             {
-                const KartProperties* kp =
-                    kart_properties_manager->getKartById(i);
-                if (kp->isAddon())
-                    total_addons.insert(kp->getIdent());
+                for (unsigned i = 0;
+                     i < kart_properties_manager->getNumberOfKarts(); i++)
+                {
+                    const KartProperties* kp =
+                        kart_properties_manager->getKartById(i);
+                    if (kp->isAddon())
+                        total_addons.insert(kp->getIdent());
+                }
             }
-            for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
+            if(type.empty() || // not specify addon type
+               (!type.empty() && (type.compare("track") == 0 || type.compare("arena") == 0)))
             {
-                const Track* track = track_manager->getTrack(i);
-                if (track->isAddon())
-                    total_addons.insert(track->getIdent());
+                for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
+                {
+                    const Track* track = track_manager->getTrack(i);
+                    if (track->isAddon())
+                        total_addons.insert(track->getIdent());
+                }
             }
-            std::set<std::string> addon_skin_files;
-            std::string skin_folder = file_manager->getAddonsFile("skins/");
-            file_manager->listFiles(addon_skin_files/*out*/, skin_folder,
-                false/*make full path*/);
-            for (auto& skin : addon_skin_files)
+            if(type.empty() || // not specify addon type
+               (!type.empty() && type.compare("skin") == 0))
             {
-                if (skin == "." || skin == "..")
-                    continue;
-                std::string stkskin = skin_folder + skin + "/stkskin.xml";
-                if (file_manager->fileExists(stkskin))
-                    total_addons.insert(Addon::createAddonId(skin));
+                std::set<std::string> addon_skin_files;
+                std::string skin_folder = file_manager->getAddonsFile("skins/");
+                file_manager->listFiles(addon_skin_files/*out*/, skin_folder,
+                                        false/*make full path*/);
+                for (auto& skin : addon_skin_files)
+                {
+                    if (skin == "." || skin == "..")
+                        continue;
+                    std::string stkskin = skin_folder + skin + "/stkskin.xml";
+                    if (file_manager->fileExists(stkskin))
+                        total_addons.insert(Addon::createAddonId(skin));
+                }
             }
             std::string msg = "";
             for (auto& addon : total_addons)
             {
                 // addon_ (6 letters)
-                if (addon.compare(6, argv[1].length(), argv[1]) == 0)
-                {
-                    msg += addon.substr(6);
-                    msg += ", ";
-                }
+                if (!text.empty() && addon.find(text, 6) == std::string::npos)
+                    continue;
+
+                msg += addon.substr(6);
+                msg += ", ";
             }
             if (msg.empty())
                 NetworkingLobby::getInstance()->addMoreServerInfo(L"Addon not found");
