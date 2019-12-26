@@ -14,7 +14,7 @@
 #if !defined(_IRR_SOLARIS_PLATFORM_) && !defined(__CYGWIN__)
 #include <sys/param.h>
 #include <sys/types.h>
-#ifdef ANDROID
+#if defined(ANDROID) || (defined(__linux__) && !defined(__GLIBC__))
 #include <linux/sysctl.h>
 #else
 #include <sys/sysctl.h>
