@@ -245,6 +245,14 @@ CGUIEditBox::~CGUIEditBox()
 #elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
     DestroyCaret();
 #endif
+#ifdef ANDROID
+    if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+    {
+        CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+        dl->setTextInputEnabled(false);
+    }
+#endif
     if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
         GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
         irr_driver->getDevice()->toggleOnScreenKeyboard(false);
@@ -362,6 +370,14 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
                 DestroyCaret();
 #endif
+#ifdef ANDROID
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                {
+                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                    dl->setTextInputEnabled(false);
+                }
+#endif
                 m_from_android_edittext = false;
                 m_composing_start = 0;
                 m_composing_end = 0;
@@ -380,6 +396,13 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #endif
                 calculateScrollPos();
 #ifdef ANDROID
+                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
+                {
+                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
+                                                       irr_driver->getDevice());
+                    dl->setTextInputEnabled(true);
+                }
+
                 if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
                     GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
                     irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)

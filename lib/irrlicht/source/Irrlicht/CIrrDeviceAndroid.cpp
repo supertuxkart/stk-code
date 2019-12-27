@@ -69,6 +69,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     Gyroscope(0),
     AccelerometerActive(false),
     GyroscopeActive(false),
+    TextInputEnabled(false),
     HasTouchDevice(false),
     GamepadAxisX(0),
     GamepadAxisY(0),
@@ -682,6 +683,11 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
 
     if (event.KeyInput.Key > 0)
     {
+        if (TextInputEnabled == true)
+        {
+            event.KeyInput.Char = getUnicodeChar(androidEvent);
+        }
+
         if (event.KeyInput.Char == 0)
         {
             event.KeyInput.Char = getKeyChar(event);
@@ -1149,6 +1155,63 @@ wchar_t CIrrDeviceAndroid::getKeyChar(SEvent& event)
     }
     
     return key_char;
+}
+
+wchar_t CIrrDeviceAndroid::getUnicodeChar(AInputEvent* event)
+{
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+    
+    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+    
+        status = Android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot get unicode character.", ELL_DEBUG);
+        return 0;
+    }
+
+    jlong down_time = AKeyEvent_getDownTime(event);
+    jlong event_time = AKeyEvent_getEventTime(event);
+    jint action = AKeyEvent_getAction(event);
+    jint code = AKeyEvent_getKeyCode(event);
+    jint repeat = AKeyEvent_getRepeatCount(event);
+    jint meta_state = AKeyEvent_getMetaState(event);
+    jint device_id = AInputEvent_getDeviceId(event);
+    jint scan_code = AKeyEvent_getScanCode(event);
+    jint flags = AKeyEvent_getFlags(event);
+    jint source = AInputEvent_getSource(event);
+
+    jclass key_event = env->FindClass("android/view/KeyEvent");
+    jmethodID key_event_constructor = env->GetMethodID(key_event, "<init>", 
+                                                       "(JJIIIIIIII)V");
+                                                       
+    jobject key_event_obj = env->NewObject(key_event, key_event_constructor, 
+                                           down_time, event_time, action, code, 
+                                           repeat, meta_state, device_id, 
+                                           scan_code, flags, source);
+
+    jmethodID get_unicode = env->GetMethodID(key_event, "getUnicodeChar", "(I)I");
+    
+    wchar_t unicode_char = env->CallIntMethod(key_event_obj, get_unicode, 
+                                              meta_state);
+
+    if (was_detached)
+    {
+        Android->activity->vm->DetachCurrentThread();
+    }
+
+    return unicode_char;
 }
 
 void CIrrDeviceAndroid::openURL(const std::string& url)
