@@ -14,6 +14,8 @@
         <buttonbar id="backbtnribbon" proportion="4" width="100%" align="center">
             <icon-button id="backbtn" width="128" height="128" align="center" icon="gui/icons/back.png"
                          extend_label="200" I18N="Race paused button" text="Back to Race"/>
+            <icon-button id="touch_device" width="128" height="128" align="center" icon="gui/icons/android/gyroscope_icon.png"
+                         extend_label="200" I18N="Race paused button" text="Gyroscope"/>
         </buttonbar>
 
         <spacer width="20" height="8%" />

@@ -38,11 +38,14 @@ class RacePausedDialog : public GUIEngine::ModalDialog,
 private:
     bool m_self_destroy;
     bool m_from_overworld;
+    int m_touch_controls;
 
     GUIEngine::TextBoxWidget* m_text_box;
 
     virtual void onTextUpdated() OVERRIDE {}
     virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE;
+    
+    void updateTouchDeviceIcon();
 
 protected:
     virtual void loadedFromFile() OVERRIDE;
@@ -57,6 +60,7 @@ public:
     GUIEngine::EventPropagation processEvent(const std::string& eventSource)
         OVERRIDE;
     virtual void beforeAddingWidgets() OVERRIDE;
+    virtual void init() OVERRIDE;
     // ------------------------------------------------------------------------
     virtual void onUpdate(float dt) OVERRIDE
     {
