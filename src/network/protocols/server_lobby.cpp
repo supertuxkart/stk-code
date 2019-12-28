@@ -839,8 +839,9 @@ void ServerLobby::createServerIdFile()
         std::fstream fs;
         sid += StringUtils::toString(m_server_id_online.load()) + "_" +
             StringUtils::toString(STKHost::get()->getPrivatePort());
-        fs.open(sid, std::ios::out);
-        fs.close();
+        io::IWriteFile* file = irr::io::createWriteFile(sid.c_str(), false);
+        if (file)
+            file->drop();
         m_has_created_server_id_file = true;
     }
 }   // createServerIdFile
