@@ -189,6 +189,7 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
                                          bool create_pipe,
                                          const std::string& childprocess_name)
 {
+    int error = 0;
     // Based on: https://msdn.microsoft.com/en-us/library/windows/desktop/ms682499(v=vs.85).aspx
     SECURITY_ATTRIBUTES sec_attr;
 
@@ -202,28 +203,36 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     {
         if (!CreatePipe(&m_child_stdout_read, &m_child_stdout_write, &sec_attr, 0))
         {
-            Log::error("SeparateProcess", "Error creating StdoutRd CreatePipe");
+            error = GetLastError();
+            Log::error("SeparateProcess", "StdoutRd CreatePipe error code: %d",
+                error);
             return false;
         }
 
         // Ensure the read handle to the pipe for STDOUT is not inherited.
         if (!SetHandleInformation(m_child_stdout_read, HANDLE_FLAG_INHERIT, 0))
         {
-            Log::error("SeparateProcess", "Stdout SetHandleInformation");
+            error = GetLastError();
+            Log::error("SeparateProcess",
+                "Stdout SetHandleInformation error code: %d", error);
             return false;
         }
 
         // Create a pipe for the child process's STDIN.
         if (!CreatePipe(&m_child_stdin_read, &m_child_stdin_write, &sec_attr, 0))
         {
-            Log::error("SeparateProcess", "Stdin CreatePipe");
+            error = GetLastError();
+            Log::error("SeparateProcess", "Stdin CreatePipe error code: %d",
+                error);
             return false;
         }
 
         // Ensure the write handle to the pipe for STDIN is not inherited.
         if (!SetHandleInformation(m_child_stdin_write, HANDLE_FLAG_INHERIT, 0))
         {
-            Log::error("SeparateProcess", "Stdin SetHandleInformation");
+            error = GetLastError();
+            Log::error("SeparateProcess",
+                "Stdin SetHandleInformation error code: %d", error);
             return false;
         }
     }
@@ -248,10 +257,12 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     }
 
     // Create the child process.
-    std::string cmd = exe + argument + " --parent-process=" +
+    std::string cmd = " "; // Required for 1st argument
+    cmd += argument + " --parent-process=" +
         StringUtils::toString(GetCurrentProcessId());
+    core::stringw exe_w = StringUtils::utf8ToWide(exe);
     core::stringw cmd_w = StringUtils::utf8ToWide(cmd);
-    bool success = CreateProcess(NULL,
+    bool success = CreateProcess(exe_w.data(), // application name
         cmd_w.data(),          // command line
         NULL,                  // process security attributes
         NULL,                  // primary thread security attributes
@@ -264,6 +275,8 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
 
     if (!success)
     {
+        error = GetLastError();
+        Log::error("SeparateProcess", "CreateProcess error code: %d", error);
         return false;
     }
 

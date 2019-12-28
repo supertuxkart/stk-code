@@ -332,9 +332,6 @@ void CreateServerScreen::createServer()
 
     NetworkConfig::get()->setIsServer(false);
     std::ostringstream server_cfg;
-#ifdef WIN32
-    server_cfg << " ";
-#endif
 
     const std::string server_name = StringUtils::xmlEncode(name);
     if (NetworkConfig::get()->isWAN())
