@@ -113,7 +113,8 @@ void ConnectToServer::getClientServerInfo()
     const std::string server_id_file = StringUtils::getBasename(sid);
     uint16_t port = 0;
     unsigned server_id = 0;
-    while (StkTime::getMonoTimeMs() < timeout)
+    while (!ProtocolManager::lock()->isExiting() &&
+        StkTime::getMonoTimeMs() < timeout)
     {
         std::set<std::string> files;
         file_manager->listFiles(files, dir);
