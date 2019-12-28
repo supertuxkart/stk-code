@@ -14,6 +14,17 @@ Original project (0.12 and earlier):
     most recent archive from 2010 (looks identical on homepage to 2011 snapshot above)
     <https://web.archive.org/web/20100216015311/http://wiiuse.sourceforge.net/>
 
+v0.15.5 -- 24-Nov-2019
+--------------------
+
+Fixed:
+
+- Windows build - Fixed support for the -TR Wiimote (big thanks to
+	Philipp Hartl!)
+- Windows build - Fixed name clash in the WIIUSE_DEBUG macro
+- Windows build - Fixed build of the SDL example
+
+
 v0.15.4 -- 28-Nov-2018
 --------------------
 

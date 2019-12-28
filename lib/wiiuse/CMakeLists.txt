@@ -4,6 +4,8 @@
 
 cmake_minimum_required(VERSION 2.8.0)
 
+# Added for STK, silences CMake warning
+# See https://github.com/supertuxkart/stk-code/commit/b0ff15873ee7fa8901672672b47def9039a5534b#diff-a3e272598233e89e4b577a434cc2a89d
 if(NOT (CMAKE_MAJOR_VERSION VERSION_LESS 3))
   cmake_policy(SET CMP0048 OLD)
 endif()
@@ -24,6 +26,7 @@ message(STATUS "Configuring WiiUse version ${CPACK_PACKAGE_VERSION}")
 
 option(BUILD_EXAMPLE "Should we build the example app?" YES)
 option(BUILD_EXAMPLE_SDL "Should we build the SDL-based example app?" YES)
+# Modified for STK, see https://github.com/supertuxkart/stk-code/commit/aea2739e9de42f566ceb6ba0c6396a9f97fe90d4#diff-a3e272598233e89e4b577a434cc2a89d
 option(BUILD_WIIUSE_SHARED_LIB "Should we build as a shared library (dll/so)?" NO)
 option(INSTALL_EXAMPLES "Should we install the example apps?" YES)
 

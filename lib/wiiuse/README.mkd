@@ -67,6 +67,7 @@ Additional Contributors:
 - Mattes D <https://github.com/madmaxoft>
 - Chadwick Boulay <https://github.com/cboulay>
 - Florian Baumgartl <https://github.com/Baumgartl>
+- Philipp Hartl <https://github.com/phHartl>
 
 ## License
 

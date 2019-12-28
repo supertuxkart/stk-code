@@ -82,11 +82,11 @@ extern FILE *logtarget[];
     {                                                                                               \
         if (OUTF_DEBUG)                                                                             \
         {                                                                                           \
-            char *file = __FILE__;                                                                  \
-            int i      = strlen(file) - 1;                                                          \
-            for (; i && (file[i] != '\\'); --i)                                                     \
+            char *___filename = __FILE__;                                                           \
+            int ___i      = strlen(___filename) - 1;                                                \
+            for (; ___i && (___filename[___i] != '\\'); --___i)                                     \
                 ;                                                                                   \
-            fprintf(OUTF_DEBUG, "[DEBUG] %s:%i: " fmt "\n", file + i + 1, __LINE__, ##__VA_ARGS__); \
+            fprintf(OUTF_DEBUG, "[DEBUG] %s:%i: " fmt "\n", ___filename + ___i + 1, __LINE__, ##__VA_ARGS__); \
         }                                                                                           \
     } while (0)
 #else

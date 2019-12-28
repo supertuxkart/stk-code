@@ -43,6 +43,7 @@
 #include <hidsdi.h>
 #include <setupapi.h>
 
+// Modified for STK, see https://github.com/supertuxkart/stk-code/commit/16736c94bc7bb0853a4f2a3ca4a7a61d64f6297b#diff-888f3f4cc3f5fe319c3eb3a61958de77
 // Not needed in mxe gcc 5.5 nor clang 9
 #if 0//def __MINGW32__
 /* this prototype is missing from the mingw headers so we must add it
@@ -56,6 +57,7 @@ WINHIDSDI BOOL WINAPI HidD_SetOutputReport(HANDLE, PVOID, ULONG);
 #endif
 #endif
 
+// Modified for STK, see https://github.com/supertuxkart/stk-code/commit/16736c94bc7bb0853a4f2a3ca4a7a61d64f6297b#diff-888f3f4cc3f5fe319c3eb3a61958de77
 static int clock_gettime_wiiuse(int X, struct timeval *tv);
 
 int wiiuse_os_find(struct wiimote_t **wm, int max_wiimotes, int timeout)
@@ -129,6 +131,7 @@ int wiiuse_os_find(struct wiimote_t **wm, int max_wiimotes, int timeout)
             if (attr.ProductID == WM_PRODUCT_ID_TR)
                 wm[found]->type = WIIUSE_WIIMOTE_MOTION_PLUS_INSIDE;
 
+// Modified for STK, see https://github.com/supertuxkart/stk-code/commit/c3379764136da2bfa7890b6a49189e734c45422e#diff-888f3f4cc3f5fe319c3eb3a61958de77
             wm[found]->hid_overlap.hEvent     = CreateEvent(NULL, 1, 1, L"");
             wm[found]->hid_overlap.Offset     = 0;
             wm[found]->hid_overlap.OffsetHigh = 0;
@@ -343,8 +346,9 @@ int wiiuse_os_write(struct wiimote_t *wm, byte report_type, byte *buf, int len)
         return 0;
     }
 
+	/* Windows should always use WriteFile instead of HidD_SetOutputReport to communicate -> data pipe instead of control pipe*/
     case WIIUSE_STACK_MS:
-        return HidD_SetOutputReport(wm->dev_handle, write_buffer, len + 1);
+        return WriteFile(wm->dev_handle, write_buffer, 22, &bytes, &wm->hid_overlap);
 
     case WIIUSE_STACK_BLUESOLEIL:
         return WriteFile(wm->dev_handle, write_buffer, 22, &bytes, &wm->hid_overlap);
@@ -369,6 +373,7 @@ unsigned long wiiuse_os_ticks()
     unsigned long ms;
     struct timeval tp;
 
+// Modified for STK, see https://github.com/supertuxkart/stk-code/commit/16736c94bc7bb0853a4f2a3ca4a7a61d64f6297b#diff-888f3f4cc3f5fe319c3eb3a61958de77
     clock_gettime_wiiuse(0, &tp);
     ms = (unsigned long)(1000 * tp.tv_sec + tp.tv_usec / 1e3);
     return ms;
@@ -396,6 +401,7 @@ static LARGE_INTEGER getFILETIMEoffset()
     return (t);
 }
 
+// Modified for STK, see https://github.com/supertuxkart/stk-code/commit/16736c94bc7bb0853a4f2a3ca4a7a61d64f6297b#diff-888f3f4cc3f5fe319c3eb3a61958de77
 static int clock_gettime_wiiuse(int X, struct timeval *tv)
 {
     LARGE_INTEGER t;
