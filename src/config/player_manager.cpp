@@ -349,6 +349,9 @@ void PlayerManager::addDefaultPlayer()
 {
     core::stringw username = "Player";
 
+#ifndef MOBILE_STK
+    // For mobile stk always use the name Player as in iOS the following
+    // getenv return "mobile" for some reason
 #if defined(WIN32)
     std::vector<wchar_t> env;
     // An environment variable has a maximum size limit of 32,767 characters
@@ -361,6 +364,7 @@ void PlayerManager::addDefaultPlayer()
         username = getenv("USER");
     else if (getenv("LOGNAME") != NULL)  // Linux, Macs
         username = getenv("LOGNAME");
+#endif
 #endif
 
     // Set the name as the default name, but don't mark it as 'default'
