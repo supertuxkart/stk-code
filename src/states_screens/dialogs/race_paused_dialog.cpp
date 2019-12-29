@@ -41,6 +41,7 @@
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "states_screens/race_gui_multitouch.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/state_manager.hpp"
@@ -391,7 +392,8 @@ void RacePausedDialog::beforeAddingWidgets()
     bool has_multitouch_gui = false;
     
     if (World::getWorld() && World::getWorld()->getRaceGUI() && 
-        World::getWorld()->getRaceGUI()->getMultitouchGUI())
+        World::getWorld()->getRaceGUI()->getMultitouchGUI() &&
+        !World::getWorld()->getRaceGUI()->getMultitouchGUI()->isSpectatorMode())
     {
         has_multitouch_gui = true;
     }
