@@ -30,10 +30,10 @@
 #include <vector>
 
 
-#ifdef __GNUC__
+#if defined(__GLIBC__)
 #  define VALIST __gnuc_va_list
 #else
-#  define VALIST char*
+#  define VALIST va_list
 #endif
 
 #if defined(_WIN32) && defined(_MSC_VER) && _MSC_VER < 1800
