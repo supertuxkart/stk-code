@@ -399,6 +399,12 @@ void MultitouchDevice::updateDeviceState(unsigned int event_id)
         {
             update_controls = true;
         }
+        
+        if (button->type == MultitouchButtonType::BUTTON_UP_DOWN && 
+            !button->pressed)
+        {
+            update_controls = false;
+        }
 
         if (update_controls)
         {
