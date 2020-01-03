@@ -367,6 +367,7 @@ const char *    set_encoding(
     const char *    loc = "";
     int     alias;
     char    norm[ NAMLEN];
+    memset(norm, 0, NAMLEN);
             /*
              * Normalized name (removed 'xxxxx.', stripped '_', '-', '.'
              * and lowered.
