@@ -116,13 +116,19 @@ namespace Scripting
         std::string cmd3 = "-P";
         // -j Don't output the source line in diagnostics.
         std::string cmd4 = "-j";
-        std::string cmd5 = script_file;
+        // -e <encoding>   Change the default multi-byte character encoding to one of:
+        //    euc_jp, gb2312, ksc5601, big5, sjis, iso2022_jp, utf8.
+        std::string cmd5 = "-e";
+        std::string cmd6 = "utf8";
+        std::string cmd7 = script_file;
         std::vector<char*> all_cmds;
         all_cmds.push_back(&cmd1[0]);
         all_cmds.push_back(&cmd2[0]);
         all_cmds.push_back(&cmd3[0]);
         all_cmds.push_back(&cmd4[0]);
         all_cmds.push_back(&cmd5[0]);
+        all_cmds.push_back(&cmd6[0]);
+        all_cmds.push_back(&cmd7[0]);
         mcpp_use_mem_buffers(1);
         mcpp_lib_main(all_cmds.size(), all_cmds.data());
 
