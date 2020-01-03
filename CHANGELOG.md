@@ -5,9 +5,7 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.1 (in development)
-
-(Include relevant change of commits from 20/04 to 17/12)
+## SuperTuxKart 1.1 (4. January 2020)
 
 ### Networking
 * Add support for IPv6 clients and servers, by Benau
@@ -23,6 +21,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Make the auto-end finish time more lenient, so it doesn't tank ranking score because of another player, by Alayan
 * Add a player reporting function, by Benau
 * Fix a bug that allowed to exceed a server's player limit if two players connected at the same time, by Benau
+* Add lobby commands, by Benau
 
 ### Race gameplay and physics
 * Random spawn point in local battle mode, by Aleman778
@@ -35,6 +34,7 @@ For similar reasons, and because some features are vastly more complex than othe
 ### General
 * Screen space reflection graphical effect, by samuncle
 * Support unicode file paths, by Benau
+* Complex text layout support, by Benau
 * Add emoji support, by Benau
 * Avoid "this program is not responding" warnings in Windows and Mac, by Benau
 * Add a Story Mode timer, by Alayan
@@ -54,11 +54,13 @@ For similar reasons, and because some features are vastly more complex than othe
 * Close STK if Wayland crashes, by mstoeckl
 * Support nested directories for addons, by Benau
 * Various tweaks and bugfixes, including crash fixes
+* Scripting preprocessing for STK version, by Benau
 
 ### Mobile
 * Add a screen allowing to download official assets that can't be included in the release package because of size limits, by Benau
 * The tutorial text is now tailored for touchscreen usage, instead of the main keyboard text, by Benau
 * Enhanced acceleration handle, by Benau
+* Allow changing touchscreen controller type in race paused dialog, by deveee
 #### Android
 * Various bugfixes by deveee, dos1
 * Screen keyboard handling improvements, by deveee and Benau
