@@ -236,9 +236,9 @@ typedef struct fileinfo {
         int             sys_header; /* System header file or not    */
         int             include_opt;        /* Specified by -include option */
         const char **   dirp;       /* Include directory the file resides   */
-        const char *    src_dir;    /* Directory of source file     */
+        char *          src_dir;    /* Directory of source file     */
         const char *    real_fname; /* Real file name               */
-        const char *    full_fname; /* Real full path list          */
+        char *          full_fname; /* Real full path list          */
         char *          filename;   /* File/macro name (maybe changed)      */
         char *          buffer;     /* Buffer of current input line */
 #if MCPP_LIB
@@ -479,7 +479,7 @@ extern FILEINFO *   unget_string( const char * text, const char * name);
 extern char *   save_string( const char * text);
                 /* Stuff string in malloc mem.  */
 extern FILEINFO *   get_file( const char * name, const char * src_dir
-        , const char * fullname, size_t bufsize, int include_opt);
+        , char * fullname, size_t bufsize, int include_opt);
                 /* New FILEINFO initialization  */
 extern char *   (xmalloc)( size_t size);
                 /* Get memory or die            */
@@ -518,7 +518,7 @@ extern void     put_depend( const char * filename);
 extern int      do_include( int next);
                 /* Process #include directive   */
 extern void     add_file( FILE * fp, const char * src_dir
-        , const char * filename, const char * fullname, int include_opt);
+        , char * filename, char * fullname, int include_opt);
                 /* Chain the included file      */
 extern void     sharp( FILEINFO * sharp_file, int marker);
                 /* Output # line number         */

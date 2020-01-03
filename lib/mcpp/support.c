@@ -2274,7 +2274,7 @@ char *  save_string(
 FILEINFO *  get_file(
     const char *    name,                   /* File or macro name   */
     const char *    src_dir,                /* Source file directory*/
-    const char *    fullname,               /* Full path list       */
+    char *          fullname,               /* Full path list       */
     size_t      bufsize,                    /* Line buffer size     */
     int         include_opt         /* Specified by -include opt (for GCC)  */
 )

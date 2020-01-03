@@ -175,9 +175,9 @@ static int      is_full_path( const char * path);
 static int      search_dir( char * filename, int searchlocal, int next);
                 /* Search the include directories   */
 static int      open_file( const char ** dirp, const char * src_dir
-        , const char * filename, int local, int include_opt, int sys_frame);
+        , char * filename, int local, int include_opt, int sys_frame);
                 /* Open a source file       */
-static const char *     set_fname( const char * filename);
+static char *   set_fname( char * filename);
                 /* Remember the source filename     */
 #if SYSTEM == SYS_MAC
 #if COMPILER == GNUC
@@ -207,7 +207,7 @@ static char *   bsl2sl( char * filename);
 #endif
 static int      is_junk( void);
                 /* The directive has trailing junk? */
-static void     do_once( const char * fullname);
+static void     do_once( char * fullname);
                 /* Process #pragma once             */
 static int      included( const char * fullname);
                 /* The file has been once included? */
@@ -3375,7 +3375,7 @@ static int  search_dir(
 static int  open_file(
     const char **   dirp,           /* Pointer to include directory */
     const char *    src_dir,        /* Source directory of includer */
-    const char *    filename,       /* Filename (possibly has directory)    */
+    char *    filename,             /* Filename (possibly has directory)    */
     int         local,                      /* #include "file"      */
     int         include_opt,        /* Specified by -include option */
     int         sys_frame           /* System framework header (for SYS_MAC)*/
@@ -3520,8 +3520,8 @@ false:
 void    add_file(
     FILE *      fp,                         /* Open file pointer    */
     const char *    src_dir,                /* Directory of source  */
-    const char *    filename,               /* Name of the file     */
-    const char *    fullname,               /* Full path list       */
+    char *          filename,               /* Name of the file     */
+    char *          fullname,               /* Full path list       */
     int         include_opt         /* File specified by -include option    */
 )
 /*
@@ -3576,8 +3576,8 @@ void    add_file(
     include_nest++;
 }
 
-static const char *     set_fname(
-    const char *    filename
+static char *     set_fname(
+    char *    filename
 )
 /*
  * Register the source filename to fnamelist[].
@@ -4250,7 +4250,7 @@ skip_nl: /* Don't use skip_nl() which skips to the newline in source file */
 }
 
 static void do_once(
-    const char *    fullname        /* Full-path-list of the header */
+    char *    fullname        /* Full-path-list of the header */
 )
 /*
  * Process #pragma once so as not to re-include the file later.
@@ -4595,7 +4595,7 @@ static void do_preprocessed( void)
     const char **   incptr;
     char *          comment = NULL;
     char *          colon = NULL;
-    const char *    dir;
+    char *          dir;
 #if STD_LINE_PREFIX == FALSE
     char            conv[ NBUFF];
     char *          arg;

@@ -251,7 +251,7 @@ static int      prescan( const DEFBUF * defp, const char ** arglist
 static char *   catenate( const DEFBUF * defp, const char ** arglist
         , char * out, char * out_end, char ** token_p);
                 /* Catenate tokens                  */
-static const char * remove_magics( const char * argp, int from_last);
+static char * remove_magics( const char * argp, int from_last);
                 /* Remove pair of magic characters  */
 #if DEBUG_MACRO_ANN
 static void     chk_symmetry( char *  start_id, char *  end_id, size_t  len);
@@ -710,7 +710,8 @@ static char *   replace(
         } else {
             m_inf->locs.start_col = m_inf->locs.start_line = 0L;
         }
-        m_inf->args = m_inf->loc_args = NULL;       /* Default args */
+        m_inf->args = NULL;       /* Default args */
+        m_inf->loc_args = NULL;       /* Default args */
         for (num = 1, recurs = 0; num < m_num; num++)
             if (mac_inf[ num].defp == defp)
                 recurs++;           /* Recursively nested macro     */
@@ -1233,7 +1234,7 @@ static char *   catenate(
     return  out;
 }
 
-static const char *     remove_magics(
+static char *     remove_magics(
     const char *    argp,       /* The argument list    */
     int     from_last           /* token is the last or first?  */
 )
@@ -1953,7 +1954,6 @@ static char *   rescan(
                     if (inner->nargs >= 0 && mgc_seq.magic_start) {
                         /* Magic sequence is found between macro */
                         /* name and '('.  This is a nuisance.    */
-                        char *      mgc_cleared;
                         size_t      seq_len;
                         size_t      arg_elen = option_flags.v ? ARG_E_LEN_V
                                             : ARG_E_LEN;
@@ -1972,7 +1972,7 @@ static char *   rescan(
                         seq_len = mgc_seq.magic_end - mgc_seq.magic_start;
                         if (seq_len) {
                             insert_to_bptr( mgc_seq.magic_start, seq_len);
-                            mgc_cleared = remove_magics(
+                            char * mgc_cleared = remove_magics(
                                     (const char *) infile->bptr, FALSE);
                                         /* Remove pair of magics    */
                             strcpy( infile->bptr, mgc_cleared);
