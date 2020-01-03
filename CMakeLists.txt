@@ -239,6 +239,19 @@ if(NOT SERVER_ONLY)
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 endif()
 
+# Libmcpp
+find_library(MCPP_LIBRARY NAMES mcpp libmcpp)
+find_path(MCPP_INCLUDEDIR NAMES mcpp_lib.h PATHS)
+if (NOT MCPP_LIBRARY OR NOT MCPP_INCLUDEDIR)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/mcpp")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/mcpp")
+    SET(MCPP_LIBRARY mcpp)
+    message(STATUS "System libmcpp not found, use the bundled one.")
+else()
+    include_directories("${MCPP_INCLUDEDIR}")
+    MESSAGE(STATUS "Use system libmcpp: ${MCPP_LIBRARY}")
+endif()
+
 if(NOT SERVER_ONLY)
     if(USE_SYSTEM_SQUISH)
         find_library(SQUISH_LIBRARY NAMES squish libsquish)
@@ -578,6 +591,7 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
+    mcpp
     )
 
 if (USE_SQLITE3)
