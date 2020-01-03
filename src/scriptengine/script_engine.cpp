@@ -16,6 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+extern "C"
+{
+    #include <mcpp_lib.h>
+}
 #include <assert.h>
 #include <angelscript.h>
 #include "io/file_manager.hpp"
@@ -38,6 +42,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/file_utils.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/profiler.hpp"
 
 
@@ -93,31 +98,70 @@ namespace Scripting
     */
     std::string getScript(std::string script_path)
     {
-        //std::string script_path = World::getWorld()->getTrack()->getTrackFile(fileName);
-
-        FILE *f = FileUtils::fopenU8Path(script_path, "rb");
-        if (f == NULL)
+        std::string script_file = FileUtils::getPortableReadingPath(script_path);
+        if (!file_manager->fileExists(script_file))
         {
             Log::debug("Scripting", "File does not exist : %s", script_path.c_str());
             return "";
         }
 
-        // Determine the size of the file   
-        fseek(f, 0, SEEK_END);
-        int len = ftell(f);
-        fseek(f, 0, SEEK_SET);
+        // libmcpp ignores the first argument (like real main which is the exe)
+        std::string cmd1 = "mcpp";
+        std::string int_version =
+            StringUtils::toString(StringUtils::versionToInt(STK_VERSION));
+        // Preprocessing (atm add stk version)
+        std::string cmd2  = "-DSTK_VERSION=";
+        cmd2 += int_version;
+        // -P Don't output #line lines.
+        std::string cmd3 = "-P";
+        // -j Don't output the source line in diagnostics.
+        std::string cmd4 = "-j";
+        std::string cmd5 = script_file;
+        std::vector<char*> all_cmds;
+        all_cmds.push_back(&cmd1[0]);
+        all_cmds.push_back(&cmd2[0]);
+        all_cmds.push_back(&cmd3[0]);
+        all_cmds.push_back(&cmd4[0]);
+        all_cmds.push_back(&cmd5[0]);
+        mcpp_use_mem_buffers(1);
+        mcpp_lib_main(all_cmds.size(), all_cmds.data());
 
-        // Read the entire file
-        std::string script;
-        script.resize(len);
-        size_t c = fread(&script[0], len, 1, f);
-        fclose(f);
-        if (c != 1)
+        char* err = mcpp_get_mem_buffer((OUTDEST)1/*error buffer*/);
+        bool has_error = false;
+        if (err)
         {
-            Log::error("Scripting", "Failed to load script file.");
-            return "";
+            std::string total = err;
+            auto errs = StringUtils::split(total, '\n');
+            for (auto& e : errs)
+            {
+                if (e.find("warning: Converted [CR+LF] to [LF]") !=
+                    std::string::npos)
+                    continue;
+
+                if (e.find("fatal:") != std::string::npos ||
+                    e.find("error:") != std::string::npos)
+                {
+                    has_error = true;
+                    Log::error("Scripting preprocessing", "%s", e.c_str());
+                }
+                else
+                {
+                    Log::warn("Scripting preprocessing", "%s", e.c_str());
+                }
+            }
         }
-        return script;
+
+        std::string result;
+        if (!has_error)
+        {
+            char* buf = mcpp_get_mem_buffer((OUTDEST)0/*output buffer*/);
+            if (buf)
+                result = buf;
+        }
+
+        // Calling this again causes the memory buffers to be freed.
+        mcpp_use_mem_buffers(1);
+        return result;
     }
 
     //-----------------------------------------------------------------------------
