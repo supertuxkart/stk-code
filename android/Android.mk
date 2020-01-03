@@ -161,6 +161,16 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
+# MCPP
+LOCAL_MODULE       := mcpp
+LOCAL_PATH         := .
+LOCAL_CPP_FEATURES += rtti
+LOCAL_SRC_FILES    := $(wildcard ../lib/mcpp/*.c)
+LOCAL_CFLAGS       := -DMCPP_LIB -DHAVE_CONFIG_H
+include $(BUILD_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
 # Irrlicht
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
@@ -197,6 +207,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/irrlicht/include         \
                       -I../lib/irrlicht/source/Irrlicht \
                       -I../lib/graphics_utils           \
+                      -I../lib/mcpp                     \
                       -I../src                          \
                       -Iobj/curl/include                \
                       -Iobj/fribidi/include             \
@@ -218,7 +229,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
 LOCAL_CPPFLAGS     := -std=gnu++0x
 
-LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript  \
+LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript mcpp \
                           vorbisfile vorbis ogg openal curl libssl libcrypto \
                           gnustl_static raqm fribidi harfbuzz freetype graphics_utils
 

@@ -52,6 +52,40 @@
 /* Define the target system. */
 #define SYSTEM SYS_MAC
 
+#elif defined(ANDROID)
+
+// Android.
+
+/* Define to 1 if the system has the type `intmax_t'. */
+#define HAVE_INTMAX_T 1
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#define HAVE_INTTYPES_H 1
+
+/* Define to 1 if the system has the type `long long'. */
+#define HAVE_LONG_LONG 1
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#define HAVE_STDINT_H 1
+
+/* Define to 1 if you have the `stpcpy' function. */
+#define HAVE_STPCPY 0
+
+/* Define the host compiler. */
+#define HOST_COMPILER GNUC
+
+/* Define the host system. */
+#define HOST_SYSTEM SYS_LINUX
+
+/* Define printf length modifier for the longest integer. */
+#define LL_FORM "j"
+
+/* Define the suffix of object file. */
+#define OBJEXT "o"
+
+/* Define the target system. */
+#define SYSTEM SYS_LINUX
+
 #else
 
 // Linux.
