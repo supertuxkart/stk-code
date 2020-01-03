@@ -898,7 +898,8 @@ plus:
             mkdep |= MD_MKDEP;
             break;
 
-#if SYS_FAMILY == SYS_UNIX
+// CPU code useless in STK
+#if 0 //SYS_FAMILY == SYS_UNIX
         case 'm':
             if (str_eq( mcpp_optarg, "64")) {               /* -m64 */
                 if (str_eq( CPU, "i386"))
@@ -1286,6 +1287,7 @@ Version:
                         /* Search framework[] next to the directory */
 #endif
 
+#if 0 // CPU code useless in STK
 #if COMPILER == GNUC && SYSTEM == SYS_MAC
     if (arch[ 0]) {             /* -arch option has been specified  */
         if (((str_eq( CPU, "i386") || str_eq( CPU, "x86_64"))
@@ -1304,6 +1306,7 @@ Version:
     }
 #if COMPILER != GNUC
     init_cpu_macro( gval, sse);
+#endif
 #endif
 
 #if COMPILER == GNUC
@@ -1370,11 +1373,7 @@ static void version( void)
 /* Write messages here, for example, "MySomeTool with ".    */
 #endif
 
-#ifdef  VERSION_MSG
-        "MCPP V.2.7.2-ned (2017/02) "
-#else
-        "MCPP V.", VERSION, "-ned (", DATE, ") "
-#endif
+        "MCPP V.2.7.2-stk (", DATE, ") "
 #if     COMPILER == INDEPENDENT
             , "compiler-independent-build "
 #else
@@ -1812,7 +1811,8 @@ static void     chk_opts(
                 /* Set function pointer to macro expansion routine  */
 }
 
-#if COMPILER != GNUC
+// CPU code useless in STK
+#if 0//COMPILER != GNUC
 
 static void init_cpu_macro (
     int     gval,               /* Argument of -G option for MSC    */
