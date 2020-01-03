@@ -31,6 +31,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
 #include <angelscript.h>
@@ -159,6 +160,7 @@ namespace Scripting
             Log::error("Script", "%s", log->c_str());
         }
 
+        /** Return a sha256 checksum of string in an array of integers of size 32 */
         CScriptArray* sha256(std::string* input)
         {
             asIScriptContext* ctx = asGetActiveContext();
@@ -171,6 +173,7 @@ namespace Scripting
             return script_array;
         }
 
+        /* Convert an integer to its hexadecimal value */
         std::string toHex(uint64_t num)
         {
             std::ostringstream output;
@@ -178,11 +181,24 @@ namespace Scripting
             return output.str();
         }
 
+        /* Return true if current game is networking (ie playing online),
+         * where some limitation of scripting exists */
         bool isNetworking()
         {
             return NetworkConfig::get()->isNetworking();
         }
 
+        /* Return a (STK) version string to its integer value */
+        int versionToInt(const std::string* version)
+        {
+            return StringUtils::versionToInt(*version);
+        }
+
+        /* Return the current STK version in string */
+        std::string getSTKVersion()
+        {
+            return STK_VERSION;
+        }
         /** @}*/
         /** @}*/
 
@@ -241,7 +257,15 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("int randomInt(int, int)", 
                                                mp ? WRAP_FN(randomInt) : asFUNCTION(randomInt), 
                                                call_conv); assert(r >= 0);
-                                               
+
+            r = engine->RegisterGlobalFunction("int versionToInt(const string &in)",
+                                               mp ? WRAP_FN(versionToInt) : asFUNCTION(versionToInt),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("string getSTKVersion()",
+                                               mp ? WRAP_FN(getSTKVersion) : asFUNCTION(getSTKVersion),
+                                               call_conv); assert(r >= 0);
+
             r = engine->RegisterGlobalFunction("float randomFloat(int, int)", 
                                                mp ? WRAP_FN(randomFloat) : asFUNCTION(randomFloat),
                                                call_conv); assert(r >= 0);
