@@ -229,6 +229,13 @@ Software used
 - fribidi
 - blender
 - wiiuse
+- harfbuzz
+
+Software used
+- libraqm
+- sqlite
+- openssl
+- mcpp
 
 
 = Previous contributors =
@@ -307,13 +314,20 @@ Original Tuxkart
 = Donations =
 
 Donations
+- Максим Мурин, John Clark, Wing On Cheung, Jan
+- ANNOP CHAWALITSITTHIKUN, ARTYOM DEMAKOV, Rio Marco Rathje
+- Tibor Dikó, Luca TEDESCHI, Merle Nicolaou, Michael ISSARTEL
+- ALEKSANDR ZHEMCHUGOV, Tobias Brohl, Dzianis Kim
+- Joshua Miller, Brenda Punzel, Peter M Estes, Benedikt Kleinmeier
+
+
+Donations
 - Trevor Hass, Thomas Belvin, Simona-A.-Petronela Crefelean
 - Schmidt Christian, Roberto Giuliani, Robert A Swearingen
 - Rene Genz, René Schubert, Pazurik Laszlo Adam, Oskar Vigren
 - M J Angove, Florian Lehebel, David E Scourfield, Michael Laube
 - Merlin Juusola, Matthias Wiege, Matthew Toppenberg, Martin Rejman
 - Mark Gannon, Lukas Palme, Lennart Mellqvist, Joshua Dye, Jan Havran
-
 
 
 Donations
