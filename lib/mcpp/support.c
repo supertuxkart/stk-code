@@ -822,7 +822,7 @@ escape:
         if (diag && iscntrl( c) && ((char_type[ c] & SPA) == 0)
                 && (warn_level & 1))
             cwarn(
-            "Illegal control character %.0s0lx%02x in quotation"    /* _W1_ */
+            "Illegal control character %.0s0x%02x in quotation"    /* _W1_ */
                     , NULL, (long) c, NULL);
         *out_p++ = c;
 chk_limit:
@@ -861,10 +861,10 @@ chk_limit:
                 if (mcpp_mode != POST_STD && option_flags.lang_asm) {
                     /* STD, KR      */
                     if (warn_level & 1)
-                        cwarn( unterm_char, out, 0L, NULL); /* _W1_ */
+                        cwarn( unterm_char, NULL, (long)delim, NULL); /* _W1_ */
                     goto  done;
                 } else {
-                    cerror( unterm_char, out, 0L, skip);    /* _E_  */
+                    cerror( unterm_char, NULL, (long)delim, skip);    /* _E_  */
                 }
             } else {
                 cerror( "Unterminated header name %s%.0ld%s"        /* _E_  */
@@ -875,9 +875,9 @@ chk_limit:
             if (mcpp_mode != POST_STD && option_flags.lang_asm) {
                 /* STD, KR      */
                 if (warn_level & 1)
-                    cwarn( empty_const, out, 0L, skip);     /* _W1_ */
+                    cwarn( empty_const, NULL, (long)delim, skip);     /* _W1_ */
             } else {
-                cerror( empty_const, out, 0L, skip);        /* _E_  */
+                cerror( empty_const, NULL, (long)delim, skip);        /* _E_  */
                 out_p = NULL;
                 goto  done;
             }
@@ -1747,9 +1747,11 @@ not_comment:
                     *tp++ = '\t';
                 else
                     *tp++ = ' ';            /* Convert to ' '       */
-            } else if (! (char_type[ *(tp - 1) & UCHARMAX] & HSP)) {
+            } else if (temp == tp
+                       || ! (char_type[ *(tp - 1) & UCHARMAX] & HSP)) {
                 *tp++ = ' ';                /* Squeeze white spaces */
-            } else if (mcpp_mode == OLD_PREP && *(tp - 1) == COM_SEP) {
+            } else if (mcpp_mode == OLD_PREP && tp > temp
+                       && *(tp - 1) == COM_SEP) {
                 *(tp - 1) = ' ';    /* Replace COM_SEP with ' '     */
             }
             break;
@@ -1772,7 +1774,7 @@ not_comment:
         default:
             if (iscntrl( c)) {
                 cerror(             /* Skip the control character   */
-    "Illegal control character %.0s0x%lx, skipped the character"    /* _E_  */
+    "Illegal control character %.0s0x%02x, skipped the character"    /* _E_  */
                         , NULL, (long) c, NULL);
             } else {                        /* Any valid character  */
                 *tp++ = c;
@@ -1946,6 +1948,9 @@ static char *   get_line(
             dump_string( NULL, ptr);
         }
         len = strlen( ptr);
+        if (len == 0)
+                cwarn( "null character ignored", NULL, 0L, NULL);
+
         if (NBUFF - 1 <= ptr - infile->buffer + len
                 && *(ptr + len - 1) != '\n') {
                 /* The line does not yet end, though the buffer is full.    */
