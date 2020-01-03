@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>git</string>
+	<string>${PROJECT_VERSION}</string>
 	<key>CFBundleSignature</key>
 	<string>SPTK</string>
 	<key>CFBundleVersion</key>
-	<string>git</string>
+	<string>${PROJECT_VERSION}</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>LSMinimumSystemVersion</key>
