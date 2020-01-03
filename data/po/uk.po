@@ -10,8 +10,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-18 06:39+0000\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-25 07:24+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Ukrainian (http://www.transifex.com/supertuxkart/supertuxkart/language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -671,7 +671,7 @@ msgstr "Складність"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "Початківець"
 
@@ -683,7 +683,7 @@ msgstr "Початківець"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "Середній рівень"
 
@@ -695,7 +695,7 @@ msgstr "Середній рівень"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "Експерт"
 
@@ -707,7 +707,7 @@ msgstr "Експерт"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -724,7 +724,7 @@ msgstr "Режим гри"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "Звичайна гонка"
 
@@ -733,7 +733,7 @@ msgstr "Звичайна гонка"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "Гонка на час"
 
@@ -750,7 +750,7 @@ msgstr "Битва"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "Футбол"
 
@@ -2032,6 +2032,12 @@ msgstr "Різні опції"
 msgid "Enable per-player handicaps"
 msgstr "Увімкнути труднощі для гравців"
 
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr ""
+
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
@@ -2524,7 +2530,7 @@ msgstr "Сад у стилі дзен"
 msgid "Completed achievement \"%s\"."
 msgstr "Завершене досягнення \"%s\"."
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Помилка підключення до серверу з додатками для SuperTuxKart"
 
@@ -2626,30 +2632,31 @@ msgid ""
 "created."
 msgstr "Ваш файл налаштувань застарів. Він буде вилучений і замінений новим."
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "Запис відео розпочато."
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Відео збережено в \"%s\"."
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "Поступ кодування:"
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "Кадр./сек: %d/%d/%d - %d KTris, Пінг: %dмс"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
 msgstr ""
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "Завантаження"
 
@@ -3412,7 +3419,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr ""
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Час з'єднання з сервером закінчився."
 
@@ -3690,7 +3697,7 @@ msgstr "Гонка на час (Велике Змагання)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3699,7 +3706,7 @@ msgstr "Вільно для всіх"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3762,17 +3769,17 @@ msgid ""
 msgstr "Таблиця результатів застаріла,\nусі результати були видалені."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "Слідуй за лідером"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "Битва трьох ударів"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "Полювання за яйцями"
 
@@ -5412,11 +5419,6 @@ msgid ""
 "(more difficult) profiles on the kart selection screen"
 msgstr ""
 
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr ""
-
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
 #: src/states_screens/options/options_screen_general.cpp:114
@@ -5694,7 +5696,7 @@ msgid "Follow the leader!"
 msgstr "Слідуй за лідером!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "Найкращі %i"

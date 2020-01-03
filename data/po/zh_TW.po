@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-18 12:40+0000\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-25 07:25+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/supertuxkart/supertuxkart/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -678,7 +678,7 @@ msgstr "難度"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "新手難度"
 
@@ -690,7 +690,7 @@ msgstr "新手難度"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "中等難度"
 
@@ -702,7 +702,7 @@ msgstr "中等難度"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "專家"
 
@@ -714,7 +714,7 @@ msgstr "專家"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -731,7 +731,7 @@ msgstr "遊戲模式"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "正常比賽"
 
@@ -740,7 +740,7 @@ msgstr "正常比賽"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "競速計時"
 
@@ -757,7 +757,7 @@ msgstr "對戰"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "足球"
 
@@ -2039,6 +2039,12 @@ msgstr "雜項選項"
 msgid "Enable per-player handicaps"
 msgstr "啟用每個玩家的讓賽功能"
 
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr "解除安裝完整遊戲資源"
+
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
@@ -2531,7 +2537,7 @@ msgstr "禪意花園"
 msgid "Completed achievement \"%s\"."
 msgstr "已完成成就「%s」"
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "無法連線至 SuperTuxKart 附加元件伺服器。"
 
@@ -2633,30 +2639,31 @@ msgid ""
 "created."
 msgstr "您的設定檔太舊了，它已經被移除並由一份新的取代。"
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "開始視訊錄製。"
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "視訊儲存於「%s」。"
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "編碼進度："
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS：%d/%d/%d - %d KTris，Ping：%d毫秒"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
-msgstr "訣竅："
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
+msgstr "訣竅：%s"
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "載入中"
 
@@ -3416,7 +3423,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "您的顯示卡驅動程式似乎很老舊了。請檢查是否有更新。SuperTuxKart 建議支援 %s 或更新的驅動程式。遊戲仍然可以執行，但會使用較低畫質的模式。"
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "伺服器連線逾時。"
 
@@ -3691,7 +3698,7 @@ msgstr "競速計時（大獎賽）"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3700,7 +3707,7 @@ msgstr "自由對戰"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3757,17 +3764,17 @@ msgid ""
 msgstr "高分榜的檔案格式太舊了，\n所有的高分紀錄都將被清除。"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "緊隨領隊"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "三擊對戰"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "復活節彩蛋狩獵"
 
@@ -5395,11 +5402,6 @@ msgid ""
 "(more difficult) profiles on the kart selection screen"
 msgstr "在多人模式中，玩家可以在賽車選取\n畫面中選取讓賽（較困難）的設定檔"
 
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr "解除安裝完整遊戲資源"
-
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
 #: src/states_screens/options/options_screen_general.cpp:114
@@ -5677,7 +5679,7 @@ msgid "Follow the leader!"
 msgstr "緊隨領隊！"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "前 %i 名"

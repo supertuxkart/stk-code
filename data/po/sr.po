@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-19 17:03+0000\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-26 13:51+0000\n"
 "Last-Translator: CYBER FIGHTER <to0pnegati@gmail.com>\n"
 "Language-Team: Serbian (http://www.transifex.com/supertuxkart/supertuxkart/language/sr/)\n"
 "MIME-Version: 1.0\n"
@@ -679,7 +679,7 @@ msgstr "Тежина"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "Новајлија"
 
@@ -691,7 +691,7 @@ msgstr "Новајлија"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "Осредњак"
 
@@ -703,7 +703,7 @@ msgstr "Осредњак"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "Стручњак"
 
@@ -715,7 +715,7 @@ msgstr "Стручњак"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "Супертукс"
 
@@ -732,7 +732,7 @@ msgstr "Начин Игре"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "Обична Трка"
 
@@ -741,7 +741,7 @@ msgstr "Обична Трка"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "Временска Трка"
 
@@ -758,7 +758,7 @@ msgstr "Борба"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "Фудбал"
 
@@ -932,7 +932,7 @@ msgstr "Арене"
 #. I18N: In addons screen, above the list of addons to be installed
 #: src/states_screens/addons_screen.cpp:136
 msgid "Installed"
-msgstr ""
+msgstr "Инсталирано"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -1502,7 +1502,7 @@ msgstr "Топ брзина - што је већа, то брже возило �
 msgid ""
 "Nitro efficiency - The higher it is, the more speed you get from a can of "
 "nitro. A lighter kart will have higher nitro efficiency."
-msgstr ""
+msgstr "Ефикасност нитро-а - Што је веће, то више добијеш брзине од једне конзерве нитро-а. Лакше возило има већу ефикасност нитро-а."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1550,7 +1550,7 @@ msgid ""
 "keyboard(s), each player will need a different set of keys, and most "
 "keyboards are not appropriate for multiplayer because they don't support "
 "multiple simultaneous keypresses."
-msgstr ""
+msgstr "Прво, треба вам доста улазних уређаја. Искористите конфигурацију уређаја да их подесите. Више Гејмпедова или џојстикова су идеални: на тастатурама, сваки играч ће морати да има другачији комплет тастера, и много тастатура нису за мултиплејер зато што не подржавају више истовремених додира."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1560,7 +1560,7 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr ""
+msgstr "Када су улазни уређаји подешени, изаберите 'Мултиплејер' икону у мени-у. Сви играч морају да стисну дугме за пуцање на њиховом гејмпаду или тастатури да уђу у игру, и да користе своје улазне уређаје да изаберу своја возила. Игра наставља када су сви изабрали своја возила. Пазите зато што миш се можда не користи за ову операцију."
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -2040,6 +2040,12 @@ msgstr "Разне опције"
 msgid "Enable per-player handicaps"
 msgstr "Укључи хендикеп по сваком играчу посебно"
 
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr "Уклони цело игрино средство"
+
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
@@ -2224,7 +2230,7 @@ msgstr "Боја Возила"
 
 #. I18N: ./data/tips.xml
 msgid "The GUI skin can be changed in the UI options."
-msgstr ""
+msgstr "Тема се може променити у прступним опцијама."
 
 #. I18N: ./data/tips.xml
 msgid "An UI option allows to see other karts' powerups."
@@ -2236,16 +2242,16 @@ msgstr "Величина фонте се може променити у опци
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has many useful informations."
-msgstr ""
+msgstr "Помоћни мени има много корисних информација"
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr ""
+msgstr "у самосталној игри, можете гледати и изазвати снимљене временске трке."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can visit https://supertuxkart.net/ for more information about the game."
-msgstr ""
+msgstr "Можете посетити https://supertuxkart.net/ за више информација о игри."
 
 #. I18N: ./data/tips.xml
 msgid "Short nitro boosts are more efficient."
@@ -2253,13 +2259,13 @@ msgstr "Кратко убрзање нитро-а је више ефикасно
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr ""
+msgstr "Користите зиппере само када је безбедно. Дуги правци су идеални."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't use multiple zippers quickly in row, instead, wait until the speed "
 "boost wears off."
-msgstr ""
+msgstr "Немојте користити више зипера пуно пута заредом. Уместо тога, чекајте док се убрзање потроши."
 
 #. I18N: ./data/tips.xml
 msgid "Skidding makes you much faster, do it whenever safe."
@@ -2273,11 +2279,11 @@ msgstr "Можете користити мувопич да се отараси�
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "Не можете прекинути да се окрећете док се кизате. Добра ориентација возила у почетку клизања је најважнија."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "Добијете почетно убрзање ако почнете да убрзавате док пише 'Позор!'."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
@@ -2285,27 +2291,27 @@ msgstr "Може те се отарасити падобрана брже так
 
 #. I18N: ./data/tips.xml
 msgid "First and foremost, focus on where your kart is going."
-msgstr ""
+msgstr "Прво и најважније, фокусирајте се где се ваше возило креће."
 
 #. I18N: ./data/tips.xml
 msgid "The rescue key (button) is very useful."
-msgstr ""
+msgstr "Дугме за спашавање је веома корисно."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr ""
+msgstr "Чувајте се када сте близу других возила, могу вас напасти!"
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake or plunger."
-msgstr ""
+msgstr "Кошаркашке лопте се могу уништити прецизним ударцем уназад са куглом, тортом или са клипом."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other karts unless you want to throw them off the"
 " track."
-msgstr ""
+msgstr "Покушајте да се не ударате са другим возилима осим ако желите да их баците са стазе."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2442,14 +2448,14 @@ msgstr "Али, ја сам поштено биће, па ћу се догово
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr "Ако успете да ме победите у трци, ослободићу стару ништарију."
+msgstr "Ако успете да ме поразите у трци, ослободићу стару ништарију."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid ""
 " But you pathetic little twerps will never be able to beat me - King of the "
 "Karts!"
-msgstr "Али ви патетични мали никовићи никад нећете моћи да ме победите - Краља Возила!"
+msgstr "Али ви патетични мали никовићи никад нећете моћи да ме поразите - Краља Возила!"
 
 #. I18N: ../stk-assets/tracks/lasdunasarena/track.xml
 msgid "Las Dunas Arena"
@@ -2477,7 +2483,7 @@ msgstr "Оливеров Час Математике"
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
-msgstr ""
+msgstr "Парк Бундева"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
@@ -2532,7 +2538,7 @@ msgstr "Зенова Башта"
 msgid "Completed achievement \"%s\"."
 msgstr "Испуњена достигнућа „%s“."
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Неуспешно повезивање са SuperTuxKart додатним сервером."
 
@@ -2634,30 +2640,31 @@ msgid ""
 "created."
 msgstr "Ваш конфиг фајл је био престар и нови ће бити направљен."
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "Снимање видеа је почело."
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Видео се сачувао у \"%s\"."
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "Напредак кодирања:"
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS:%d/%d/%d - %d KTris, Одзив: %dms"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
-msgstr ""
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
+msgstr "Савет: %s"
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "Учитавање"
 
@@ -3419,7 +3426,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Ваш графички управљачки програм изгледа да је веома стар. Молимо вас да проверите дали је ажурирање могуће. SuperTuxKart препоручује управљачки програм који подржава %s или боље. Игрица би сигурно и даље радила, али у смањеним-графикама моду"
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Истекла је веза са сервера."
 
@@ -3696,7 +3703,7 @@ msgstr "Временска Трка (Велика Награда)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3705,7 +3712,7 @@ msgstr "Сви-За-Себе"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3739,7 +3746,7 @@ msgstr[2] "%d пријатеља су сада онлајн."
 #: src/online/online_player_profile.cpp:518
 #, c-format
 msgid "%s is now on server \"%s\"."
-msgstr "%sје сада на серверу \"%s\"."
+msgstr "%s је сада на серверу \"%s\"."
 
 #: src/online/online_player_profile.cpp:549
 #, c-format
@@ -3766,17 +3773,17 @@ msgid ""
 msgstr "Фајл са најбољим временима је превише стар,\nсви најбољи времени су избрисани."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "Прати Вођу"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "Борба на 3 Ударца"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "Лов на Јаја"
 
@@ -3832,7 +3839,7 @@ msgstr "Датум ажурирања"
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
 msgid "Not installed"
-msgstr ""
+msgstr "Није инсталирано"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:319
@@ -4566,7 +4573,7 @@ msgstr "Стисните било који тастер..."
 #: src/states_screens/online/networking_lobby.cpp:238
 #: src/states_screens/online/networking_lobby.cpp:822
 msgid "Chat is disabled, enable in options menu."
-msgstr "Допициање је искључено, укључи их у опцијама."
+msgstr "Дописиање је искључено, укључите их у опцијама."
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
@@ -4591,7 +4598,7 @@ msgid ""
 "agree to these terms in order to register an account for STK. If you have "
 "any questions or comments regarding these terms, one of the members of the "
 "development team would gladly assist you."
-msgstr ""
+msgstr "Молимо вас да прочитате услове за SuperTuxKart код '%s'. Морате да се слажете да овим условима да можете направити налог са STK. Ако имате питања или коментара у вези ових услова, један чланак тима ће вам врло радо помоћи."
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:60
@@ -5043,7 +5050,7 @@ msgstr "Молимо вас да чекате да се тренутна игр�
 #: src/states_screens/online/networking_lobby.cpp:427
 #, c-format
 msgid "Send %s in chat box to install addon now."
-msgstr ""
+msgstr "шаљите %s у чету да инсталирате додатак одма."
 
 #: src/states_screens/online/networking_lobby.cpp:481
 #, c-format
@@ -5136,7 +5143,7 @@ msgstr "Не можете да играте на мрежи без присту�
 
 #: src/states_screens/online/online_screen.cpp:238
 msgid "Enter the server address optionally followed by : and then port."
-msgstr ""
+msgstr "Унесите адресу сервера по потреби праћено са : и онда порт."
 
 #: src/states_screens/online/online_screen.cpp:250
 #, c-format
@@ -5410,12 +5417,7 @@ msgstr "Да ли сте сигурни да желите трајно избр�
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
-msgstr ""
-
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr "Уклони цело игрино средство"
+msgstr "У игри са више играча, играчи могу да изаберу хендикепирену\n(тежу) профилу на селекцији возила"
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
@@ -5497,7 +5499,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "\"Speedrun\" штоперица се може укључити само ако се игра није угасила од почетка причног начина.\n\nЗатварање игре пре завршетка причног начина квари штоперицу.\n\nДа користите \"Speedrun\" штоперицу, молимо вас да користите нови профил."
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:217
@@ -5515,22 +5517,22 @@ msgstr "Пола"
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
-msgstr ""
+msgstr "В-усклађивање тера графичку карту да понуди нову слику\nсамо  када је монитор спреман да га приказује."
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:226
 msgid "Full: one frame per monitor refresh"
-msgstr ""
+msgstr "Пуно: једна слика сваког освежења монитора"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:228
 msgid "Half: one frame every two monitor refreshes"
-msgstr ""
+msgstr "Пола: једна слика сваког другог освежења монитора"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:230
 msgid "Vsync will not work if your drivers don't support it."
-msgstr ""
+msgstr "В-усклађивање неће радити ако га ваши управљачки програми неподржавају."
 
 #. I18N: custom video settings
 #: src/states_screens/options/options_screen_video.cpp:479
@@ -5694,7 +5696,7 @@ msgid "Follow the leader!"
 msgstr "Прати вођу!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "Топ %i"
@@ -5902,7 +5904,7 @@ msgstr "Убрзајте тако што стиснете горњи део во
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "Убрзајте тако што померате убрзивач горе, и управљајте тако што окренете ваш уређај."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:43
 msgid ""
@@ -5933,7 +5935,7 @@ msgstr "Притисните <%s> за поглед уназад. Гађајте
 msgid ""
 "Press the mirror icon to look behind. Fire the weapon behind by holding the "
 "mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Стисните икону ретровизора да гледате уназад. Пуцајте оружје уназад тако што држите икону ретровизора и онда прелазите прстом ка икону кугле!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:90
 #, c-format

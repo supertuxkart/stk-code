@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Benau, 2018
+# Benau, 2018-2019
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Любомир Василев, 2015-2016
 # Любомир Василев, 2016-2019
@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-18 21:13+0000\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-30 21:40+0000\n"
 "Last-Translator: Любомир Василев\n"
 "Language-Team: Bulgarian (http://www.transifex.com/supertuxkart/supertuxkart/language/bg/)\n"
 "MIME-Version: 1.0\n"
@@ -672,7 +672,7 @@ msgstr "Трудност"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "За начинаещи"
 
@@ -684,7 +684,7 @@ msgstr "За начинаещи"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "Средно"
 
@@ -696,7 +696,7 @@ msgstr "Средно"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "Трудно"
 
@@ -708,7 +708,7 @@ msgstr "Трудно"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "Супер Тъкс"
 
@@ -725,7 +725,7 @@ msgstr "Режим на игра"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "Обикновено състезание"
 
@@ -734,7 +734,7 @@ msgstr "Обикновено състезание"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "Състезание за време"
 
@@ -751,7 +751,7 @@ msgstr "Битка"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "Футбол"
 
@@ -925,7 +925,7 @@ msgstr "Арени"
 #. I18N: In addons screen, above the list of addons to be installed
 #: src/states_screens/addons_screen.cpp:136
 msgid "Installed"
-msgstr "Инсталирани"
+msgstr "Инсталирано"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -2033,6 +2033,12 @@ msgstr "Други настройки"
 msgid "Enable per-player handicaps"
 msgstr "Затруднения за отделни играчи"
 
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr "Деинсталиране на големите файлове на играта"
+
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
@@ -2525,7 +2531,7 @@ msgstr "Дзен градина"
 msgid "Completed achievement \"%s\"."
 msgstr "Изпълнено е постижението „%s“."
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Не може да бъде установена връзка със сървъра за добавки."
 
@@ -2627,30 +2633,31 @@ msgid ""
 "created."
 msgstr "Файлът с настройките беше твърде стар, затова беше изтрит и ще бъде създаден нов."
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "Записът на видео започна."
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Видеото е запазено в „%s“."
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "Напредък по кодирането:"
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "кадри/сек: %d/%d/%d - %d хил. триъгълника, закъснение: %dмсек"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
-msgstr "Съвет: "
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
+msgstr "Съвет: %s"
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "Зареждане"
 
@@ -3411,7 +3418,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Драйверът за графичната карта изглежда е много стар. Моля, провери дали има по-нов. Супер Тъкс Карт препоръчва драйвер, който поддържа %s или по-нова версия. Играта най-вероятно пак ще работи, но в ограничен графичен режим."
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Времето за изчакване на сървъра изтече."
 
@@ -3687,7 +3694,7 @@ msgstr "Състезание за време (Голяма награда)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3696,7 +3703,7 @@ msgstr "Свободна битка"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3755,17 +3762,17 @@ msgid ""
 msgstr "Файлът с най-добри резултати беше твърде стар.\nВсички резултати бяха изтрити."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "Следвай водача"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "3 удара"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "Лов на яйца"
 
@@ -3821,7 +3828,7 @@ msgstr "Дата на обновяване"
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
 msgid "Not installed"
-msgstr "Не исталирано"
+msgstr "Не инсталирано"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:319
@@ -5397,11 +5404,6 @@ msgid ""
 "(more difficult) profiles on the kart selection screen"
 msgstr "В режима на мрежова игра, играчите могат да избират\nзатрудняващи (по-трудни) профили на екрана за избор на количка"
 
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr "Деинсталиране на големите файлове на играта"
-
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
 #: src/states_screens/options/options_screen_general.cpp:114
@@ -5679,7 +5681,7 @@ msgid "Follow the leader!"
 msgstr "Следвай водача!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "Най-добрите %i"

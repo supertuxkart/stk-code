@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-19 12:05+0000\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-25 11:25+0000\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/supertuxkart/supertuxkart/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -675,7 +675,7 @@ msgstr "Moeilijkheidsgraad"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "Beginner"
 
@@ -687,7 +687,7 @@ msgstr "Beginner"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "Behendig"
 
@@ -699,7 +699,7 @@ msgstr "Behendig"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "Deskundig"
 
@@ -711,7 +711,7 @@ msgstr "Deskundig"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -728,7 +728,7 @@ msgstr "Spelvorm"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "Normale race"
 
@@ -737,7 +737,7 @@ msgstr "Normale race"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "Tijdrit"
 
@@ -754,7 +754,7 @@ msgstr "Gevecht"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "Voetbal"
 
@@ -1287,7 +1287,7 @@ msgstr "Je kunt slippen door op een speciale toets of knop te drukken. Korte sli
 msgid ""
 "You can get a startup boost by pressing the accelerate button at 'Set!', "
 "before the race's start."
-msgstr "Je kunt extra beginsnelheid krijgen door op de toets 'gas geven' te drukken zodra de tekst 'Klaar!' in beeld verschijnt."
+msgstr "Je krijgt een snelheidsverhoging als je op de toets 'gas geven' drukt zodra de tekst 'Klaar!' verschijnt."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
@@ -2036,6 +2036,12 @@ msgstr "Overige instellingen"
 msgid "Enable per-player handicaps"
 msgstr "Gebruikers met handicaps toestaan"
 
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr "Alle spelelementen verwijderen"
+
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
@@ -2236,72 +2242,72 @@ msgstr "Het menu 'Hulp' bevat veel bruikbare informatie."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr ""
+msgstr "In de éénspelermodus kun je tijdritten terugkijken en je eigen tijd proberen te verbeteren."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can visit https://supertuxkart.net/ for more information about the game."
-msgstr ""
+msgstr "Ga naar https://supertuxkart.net/ voor meer informatie over dit spel."
 
 #. I18N: ./data/tips.xml
 msgid "Short nitro boosts are more efficient."
-msgstr ""
+msgstr "Korte turboboosts zijn efficiënter."
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr ""
+msgstr "Gebruik ritsen alleen als de situatie veilig is. Lange, rechte stukken zijn hiervoor ideaal."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't use multiple zippers quickly in row, instead, wait until the speed "
 "boost wears off."
-msgstr ""
+msgstr "Activeer niet meerdere ritsen achter elkaar; wacht tot de snelheidsboost afneemt."
 
 #. I18N: ./data/tips.xml
 msgid "Skidding makes you much faster, do it whenever safe."
-msgstr ""
+msgstr "Slippen verhoogt je snelheid, maar doe het alleen als de situatie veilig is."
 
 #. I18N: ./data/tips.xml
 msgid "The swatter can be used to remove bombs or parachutes."
-msgstr ""
+msgstr "Met de vliegenmepper kun je bommen en parachutes van je af slaan."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "Tijdens het slippen is je stuurpositie vergrendeld. Een goede positie aan het begin van de slipactie is daarom cruciaal."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "Je krijgt een snelheidsverhoging als je begint met optrekken zodra de tekst 'Klaar!' verschijnt."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
-msgstr ""
+msgstr "Je verliest je parachute sneller als je remt."
 
 #. I18N: ./data/tips.xml
 msgid "First and foremost, focus on where your kart is going."
-msgstr ""
+msgstr "Let allereerst goed op waar je kart heen gaat."
 
 #. I18N: ./data/tips.xml
 msgid "The rescue key (button) is very useful."
-msgstr ""
+msgstr "De reddingsknop is erg handig."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr ""
+msgstr "Kom niet te dicht bij andere karts, anders vallen ze je misschien aan!"
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake or plunger."
-msgstr ""
+msgstr "Je kunt basketballen vernietigen door een bowlingbal, taart of plopper héél nauwkeurig naar achteren te schieten."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other karts unless you want to throw them off the"
 " track."
-msgstr ""
+msgstr "Probeer te voorkomen dat je tegen andere karts botst, tenzij je ze van de baan wilt duwen."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2473,7 +2479,7 @@ msgstr "Oliviers wiskundeklas"
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
-msgstr ""
+msgstr "Pompoenpark"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
@@ -2528,7 +2534,7 @@ msgstr "Meditatietuin"
 msgid "Completed achievement \"%s\"."
 msgstr "Je hebt de prestatie '%s' behaald."
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Kan niet verbinden met de SuperTuxKart-uitbreidingsserver."
 
@@ -2630,30 +2636,31 @@ msgid ""
 "created."
 msgstr "Je configuratiebestand was verouderd. Het is verwijderd en er wordt een nieuw bestand aangemaakt."
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "Video-opname gestart."
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "De video is opgeslagen in '%s'."
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "Omzetproces:"
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
-msgstr ""
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
+msgstr "Tip: %s"
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "Bezig met laden..."
 
@@ -3414,7 +3421,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Je grafische stuurprogramma lijkt verouderd; controleer of er een update beschikbaar is. SuperTuxKart raadt je aan om een stuurprogramma te gebruiken met ondersteuning voor %s of hoger. Het spel draait waarschijnlijk nog wel, maar met lagere grafische instellingen."
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Serververbinding verbroken."
 
@@ -3690,7 +3697,7 @@ msgstr "Tijdrit (Grand Prix)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3699,7 +3706,7 @@ msgstr "Vrijheid, blijheid"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3758,17 +3765,17 @@ msgid ""
 msgstr "Het recordbestand was te oud;\nde records zijn verwijderd."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "Zwaan-kleef-aan"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "Veldslag"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "Eieren zoeken"
 
@@ -3824,7 +3831,7 @@ msgstr "Bijgewerkt op"
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
 msgid "Not installed"
-msgstr ""
+msgstr "Niet geïnstalleerd"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:319
@@ -5400,11 +5407,6 @@ msgid ""
 "(more difficult) profiles on the kart selection screen"
 msgstr "In meerderespelersmodus kunnen spelers een extra moeilijkheidsgraad (handicaps)\ninstellen op het kartselectiescherm."
 
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr "Alle spelelementen verwijderen"
-
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
 #: src/states_screens/options/options_screen_general.cpp:114
@@ -5682,7 +5684,7 @@ msgid "Follow the leader!"
 msgstr "Zwaan, kleef aan!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "Top %i"
@@ -5921,7 +5923,7 @@ msgstr "Gebruik <%s> om achterom te kijken. Gebruik de vuurknop <%s> tegelijk me
 msgid ""
 "Press the mirror icon to look behind. Fire the weapon behind by holding the "
 "mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Druk op het spiegelpictogram om achterom te kijken. Schiet naar achteren met je wapen door het spiegelpictogram ingedrukt te houden en te vegen over het bowlingbalpictogram!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:90
 #, c-format

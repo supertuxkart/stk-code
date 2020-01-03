@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-18 06:39+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-25 22:00+0000\n"
+"Last-Translator: Marc Coll Carrillo <marc.coll.carrillo@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/supertuxkart/supertuxkart/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -671,7 +671,7 @@ msgstr "Dificultat"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "Novell"
 
@@ -683,7 +683,7 @@ msgstr "Novell"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "Intermedi"
 
@@ -695,7 +695,7 @@ msgstr "Intermedi"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "Expert"
 
@@ -707,7 +707,7 @@ msgstr "Expert"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -724,7 +724,7 @@ msgstr "Mode de joc"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "Cursa normal"
 
@@ -733,7 +733,7 @@ msgstr "Cursa normal"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "Contra rellotge"
 
@@ -750,7 +750,7 @@ msgstr "Batalla"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "Futbol"
 
@@ -924,7 +924,7 @@ msgstr "Arenes"
 #. I18N: In addons screen, above the list of addons to be installed
 #: src/states_screens/addons_screen.cpp:136
 msgid "Installed"
-msgstr ""
+msgstr "Instal·lat"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -1494,7 +1494,7 @@ msgstr "Velocitat màxima: com més alta sigui, més ràpid pot anar el kart. Es
 msgid ""
 "Nitro efficiency - The higher it is, the more speed you get from a can of "
 "nitro. A lighter kart will have higher nitro efficiency."
-msgstr ""
+msgstr "Eficiència de nitro: com més alta sigui, més velocitat podràs obtenir d'una ampolla de nitro. Com més lleuger sigui el kart, major serà la seva eficiència de nitro."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -2032,6 +2032,12 @@ msgstr "Opcions diverses"
 msgid "Enable per-player handicaps"
 msgstr "Habilita les limitacions per jugador"
 
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr "Desinstal·lar els recursos complets"
+
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
@@ -2216,88 +2222,88 @@ msgstr "Color del kart"
 
 #. I18N: ./data/tips.xml
 msgid "The GUI skin can be changed in the UI options."
-msgstr ""
+msgstr "L'aparença de la interfície es pot canviar des de les opcions d'interfície d'usuari."
 
 #. I18N: ./data/tips.xml
 msgid "An UI option allows to see other karts' powerups."
-msgstr ""
+msgstr "Una opció d'interfície d'usuari permet veure les millores dels altres karts."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
-msgstr ""
+msgstr "La mida de la font es potcanviar des de les opcions d'interfície d'usuari."
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has many useful informations."
-msgstr ""
+msgstr "El menú d'ajuda conté molta informació útil."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr ""
+msgstr "En mode d'un jugador, pots mirar i desafiar les contra rellotges desades."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can visit https://supertuxkart.net/ for more information about the game."
-msgstr ""
+msgstr "Pots visitar https://supertuxkart.net/ per obtenir més informació sobre el joc."
 
 #. I18N: ./data/tips.xml
 msgid "Short nitro boosts are more efficient."
-msgstr ""
+msgstr "Els increments de nitro curts són més eficients."
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr ""
+msgstr "Fes servir els turbos quan sigui segur. Les rectes llargues són ideals."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't use multiple zippers quickly in row, instead, wait until the speed "
 "boost wears off."
-msgstr ""
+msgstr "No facis servir múltiples turbos seguits. És millor esperar fins que l'increment de velocitat hagi desaparegut."
 
 #. I18N: ./data/tips.xml
 msgid "Skidding makes you much faster, do it whenever safe."
-msgstr ""
+msgstr "Derrapar et fa anar molt mes ràpid, fes-ho semrpe que sigui segur."
 
 #. I18N: ./data/tips.xml
 msgid "The swatter can be used to remove bombs or parachutes."
-msgstr ""
+msgstr "El matamosques es pot fer servir per eliminar bombes o paracaigudes."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "No pots parar mentre derrapes. Una bona orientació del kart al començar el derrapatge és fonamental."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "Arrencaràs més ràpid a l'inici de la cursa si comences a accelerar durant el \"Llestos\"."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
-msgstr ""
+msgstr "Frenar ajuda a desfer-se dels paracaigudes més ràpid."
 
 #. I18N: ./data/tips.xml
 msgid "First and foremost, focus on where your kart is going."
-msgstr ""
+msgstr "Primer i més important, centra't en veure cap a on va el teu kart."
 
 #. I18N: ./data/tips.xml
 msgid "The rescue key (button) is very useful."
-msgstr ""
+msgstr "La tecla (o botó) de rescat és molt útil."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr ""
+msgstr "Ves amb compte quan estiguis a prop dels altres karts, podrien atacarte!"
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake or plunger."
-msgstr ""
+msgstr "Les pilotes de bàsquet es poden destruir disparant enrere amb precisió una bola de bitlles, un pastís o un desembussador."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other karts unless you want to throw them off the"
 " track."
-msgstr ""
+msgstr "Procura no picar contra els altres karts a no ser que els vulguis fer fora del circuit."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2469,7 +2475,7 @@ msgstr "Classe de mates de l'Oliver"
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
-msgstr ""
+msgstr "Parc de les carbasses"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
@@ -2524,7 +2530,7 @@ msgstr "Jardí zen"
 msgid "Completed achievement \"%s\"."
 msgstr "Has completat l'assoliment '%s'."
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "No s'ha pogut connectar al servidor de complements de SuperTuxKart."
 
@@ -2626,30 +2632,31 @@ msgid ""
 "created."
 msgstr "El teu fitxer de configuració era massa antic, així que s'ha esborrat i s'en crearà un de nou."
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "S'ha iniciat la gravació de video"
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video desat a \"%s\"."
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "Codificació en curs:"
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
-msgstr ""
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
+msgstr "Consell: %s"
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "Carregant"
 
@@ -3410,7 +3417,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "El treu controlador gràfic sembla ser molt antic. Si us plau, comprova si hia una actualització disponible. SuperTuxKart recomana un controlador que admeti %s o millor. El joc probablement funcioni, però en un mode gràfic reduit."
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "La connexió amb el servidor ha excedit el temps d'espera."
 
@@ -3686,7 +3693,7 @@ msgstr "Contra rellotge (campionat)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3695,7 +3702,7 @@ msgstr "Per lliure"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3754,17 +3761,17 @@ msgid ""
 msgstr "El fitxer de puntuacions era massa antic,\ntotes les puntuacions han estat esborrades."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "Segueix al líder"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "Batalla a 3 cops"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "A la recerca dels ous perduts"
 
@@ -3820,7 +3827,7 @@ msgstr "Data d'actualització"
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
 msgid "Not installed"
-msgstr ""
+msgstr "No instal·lat"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:319
@@ -5029,7 +5036,7 @@ msgstr "Si us plau, espera't a que acabi la partida actual."
 #: src/states_screens/online/networking_lobby.cpp:427
 #, c-format
 msgid "Send %s in chat box to install addon now."
-msgstr ""
+msgstr "Envia %s a la caixa del xat per instal·lar el complement ara."
 
 #: src/states_screens/online/networking_lobby.cpp:481
 #, c-format
@@ -5120,7 +5127,7 @@ msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia
 
 #: src/states_screens/online/online_screen.cpp:238
 msgid "Enter the server address optionally followed by : and then port."
-msgstr ""
+msgstr "Introdueix l'adreça del servidor opcionalment seguida per : i després el port."
 
 #: src/states_screens/online/online_screen.cpp:250
 #, c-format
@@ -5395,11 +5402,6 @@ msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
 msgstr "En mode multijugador els jugadors poden seleccionar perfils limitats\n(més difícils) a la pantalla de selecció de karts"
-
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr "Desinstal·lar els recursos complets"
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
@@ -5678,7 +5680,7 @@ msgid "Follow the leader!"
 msgstr "Segueix al líder!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "Top %i"
@@ -5886,7 +5888,7 @@ msgstr "Accelera tocant la part superior del volant, i gira movent-te a dreta o 
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "Accelera movent l'accelerador cap amunt, i gira inclinant el teu dispositiu."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:43
 msgid ""
@@ -5917,7 +5919,7 @@ msgstr "Prem <%s> per mirar darrera teu. Dispara l'arma amb <%s> mentre prems <%
 msgid ""
 "Press the mirror icon to look behind. Fire the weapon behind by holding the "
 "mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Prem el botó del retrovisor per mirar cap enrere. Dispara l'arma pel darrera prement la icona de les bitlles i després lliscant cap a la icona del retrovisor."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:90
 #, c-format

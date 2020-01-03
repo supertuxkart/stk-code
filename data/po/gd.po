@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-18 06:39+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-29 21:32+0000\n"
+"Last-Translator: GunChleoc\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/supertuxkart/supertuxkart/language/gd/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -672,7 +672,7 @@ msgstr "Duilgheas"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "Foghlamaiche"
 
@@ -684,7 +684,7 @@ msgstr "Foghlamaiche"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "Meadhanach"
 
@@ -696,7 +696,7 @@ msgstr "Meadhanach"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "Eòlaiche"
 
@@ -708,7 +708,7 @@ msgstr "Eòlaiche"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -725,7 +725,7 @@ msgstr "Modh a’ gheama"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "Rèis àbhaisteach"
 
@@ -734,7 +734,7 @@ msgstr "Rèis àbhaisteach"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "An aghaidh na h-ùine"
 
@@ -751,7 +751,7 @@ msgstr "Còmhrag"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "Ball-coise"
 
@@ -925,7 +925,7 @@ msgstr "Raon spòrs"
 #. I18N: In addons screen, above the list of addons to be installed
 #: src/states_screens/addons_screen.cpp:136
 msgid "Installed"
-msgstr ""
+msgstr "Air a stàladh"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -1377,7 +1377,7 @@ msgstr "Cèic - tilg air an fharpaiseach as fhaisge e, tha i as fhearr air amasa
 msgid ""
 "Plunger - throw straight to pull an opponent back, or throw while looking "
 "back to make one lose sight."
-msgstr "Loinid - tilg gu dìreach gus maille a chur air co-fharpaisiche, no tilg a’ coimhead air ais gus fear a dhalladh."
+msgstr "Loinid – tilg gu dìreach gus maille a chur air co-fharpaisiche, no tilg a’ coimhead air ais gus fear a dhalladh."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1399,7 +1399,7 @@ msgstr "Suaipear - thèid bogsaichean tìodhlaic ’nam bananathan agus canaiche
 msgid ""
 "Basket Ball - bounces after the leader, and might squash and slow down karts"
 " down on the way."
-msgstr "Bàla basket - bocaidh e an tòir an toisiche is cuiridh e cartaichean air an rathad ’nan spleuchd no maille orra, ’s dòcha."
+msgstr "Ball-basgaid – bocaidh e an tòir an toisiche is cuiridh e cartaichean air an rathad ’nan spleuchd no maille orra, ’s dòcha."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1495,7 +1495,7 @@ msgstr "An luaths as motha – mar as àirde a bhios e ’s ann as luaithe as ur
 msgid ""
 "Nitro efficiency - The higher it is, the more speed you get from a can of "
 "nitro. A lighter kart will have higher nitro efficiency."
-msgstr ""
+msgstr "Èifeachdachd naidhtreo – mar as àirde a bhios e ’s ann as luaithe a thèid thu nuair a chleachdas tu cana de naidhtreo. Tha èifeachd naidhtreo nas àirde aig cartaichean aotrom."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -2033,6 +2033,12 @@ msgstr "Roghainnean measgaichte"
 msgid "Enable per-player handicaps"
 msgstr "Cuir ana-cothrom nan cluicheadairean air"
 
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr "Dì-stàlaich maoin slàna a’ gheama"
+
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
 msgid "Press enter or double-click on a device to configure it"
@@ -2217,88 +2223,88 @@ msgstr "Dath a’ chairt"
 
 #. I18N: ./data/tips.xml
 msgid "The GUI skin can be changed in the UI options."
-msgstr ""
+msgstr "’S urrainn dhut craiceann na h-eadar-aghaidh atharrachadh ann an roghainnean na h-eadar-aghaidh."
 
 #. I18N: ./data/tips.xml
 msgid "An UI option allows to see other karts' powerups."
-msgstr ""
+msgstr "Leigidh roghainn clàir-thaice leat cumhachdan chartaichean eile fhaicinn."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
-msgstr ""
+msgstr "’S urrainn dhut meud a’ chrutha-chlò atharrachadh ann an roghainnean na h-eadar-aghaidh."
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has many useful informations."
-msgstr ""
+msgstr "Tha iomadh fiosrachadh feumail ann an clàr-taice na cobharach."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr ""
+msgstr "Sa mhodh aon-chluicheadair, ’s urrainn dhut coimhead air rèisean clàraichte an aghaidh na h-ùine is dùbhlan a thoirt orra."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can visit https://supertuxkart.net/ for more information about the game."
-msgstr ""
+msgstr "Tadhail air https://supertuxkart.net/ airson barrachd fiosrachaidh mun gheama."
 
 #. I18N: ./data/tips.xml
 msgid "Short nitro boosts are more efficient."
-msgstr ""
+msgstr "Tha luathachaidhean naidhtreo goirid nas èifeachdaiche."
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr ""
+msgstr "Na cleachd siopair ach nuair a bhios sin sàbhailte. Tha loidhnichean dìreach fada as fheàrr."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't use multiple zippers quickly in row, instead, wait until the speed "
 "boost wears off."
-msgstr ""
+msgstr "Na cleachd iomadh siopair às dèidh càch a chèile ach fuirich gus an dig maille ort an toiseach."
 
 #. I18N: ./data/tips.xml
 msgid "Skidding makes you much faster, do it whenever safe."
-msgstr ""
+msgstr "Bidh thu nas luaithe le sleamhnachadh is cleachd e gach turas a bhios e sàbhailte."
 
 #. I18N: ./data/tips.xml
 msgid "The swatter can be used to remove bombs or parachutes."
-msgstr ""
+msgstr "’S urrainn dhut cuidhteas fhaighinn de bhomaichean is paraisiutaichean leis a’ bhualadair."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "Chan urrainn dhut sgur de thionndadh nuair a bhios tu a’ sleamhnachadh. Tha e glè cudromach d’ aire a thoirt air comhair a’ chairt mus tòisich thu air sleamhnachadh."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "Thèid do luathachadh aig an toiseach ma thòisicheas tu air luathachadh rè “Dèonach”."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
-msgstr ""
+msgstr "Gheibh thu cuidhteas de pharaisiut nas luaithe ma chleachdas tu a’ bhrèig."
 
 #. I18N: ./data/tips.xml
 msgid "First and foremost, focus on where your kart is going."
-msgstr ""
+msgstr "Thoir an dian-aire air far an dèid a’ chart agad."
 
 #. I18N: ./data/tips.xml
 msgid "The rescue key (button) is very useful."
-msgstr ""
+msgstr "Tha an iuchair (putan) teasairg glè fheumail."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr ""
+msgstr "Thoir an aire nuair a bhios tu faisg air cartaichean eile, ’s dòcha gun doir iad ionnsaigh ort!"
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake or plunger."
-msgstr ""
+msgstr "’S urrainn dhut ball-basgaid a mhilleadh le losgadh bàla bobhlaireachd, cèic no loinid dhan chùlaibh gu pongail."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other karts unless you want to throw them off the"
 " track."
-msgstr ""
+msgstr "Feuch an seachnaich thu bualadh ri cartaichean eile ach ma tha thu airson am brùthadh far na slighe."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2470,7 +2476,7 @@ msgstr "Clas matamataig Oliver"
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
-msgstr ""
+msgstr "Pàirc na peapaige"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
@@ -2525,7 +2531,7 @@ msgstr "Lios Zen"
 msgid "Completed achievement \"%s\"."
 msgstr "Choilean thu “%s”."
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Cha deach leinn ceangal ri frithealaiche tuilleadan SuperTuxKart."
 
@@ -2627,30 +2633,31 @@ msgid ""
 "created."
 msgstr "Bha am faidhle rèiteachaidh agad ro shean, mar sin chaidh sguabadh às is thèid fear ùr a chruthachadh."
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "Thòisich clàradh a’ video."
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Chaidh a’ video a shàbhaladh an-seo: “%s”."
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "Adhartas a’ chòdachaidh:"
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTriantain, Ping: %dms"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
-msgstr ""
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
+msgstr "Gliocas: %s"
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "’Ga luchdadh"
 
@@ -3413,7 +3420,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Tha coltas gu bheil draibhear na grafaigeachd agad glè shean. An doir thu sùil feuch a bheil ùrachadh ri fhaighinn? Tha SuperTuxKart a’ moladh draibhear a chuireas taic ri %s no tionndadh nas ùire dheth. Tha sinn an dùil gun obraich an geama ann am modh grafaigeachd ìslichte fhathast co-dhiù."
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Dh’fhalbh an ùine air a’ cheangal dhan fhrithealaiche."
 
@@ -3691,7 +3698,7 @@ msgstr "An aghaidh na h-ùine (Grand Prix)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3700,7 +3707,7 @@ msgstr "An aghaidh càch a chèile"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3763,17 +3770,17 @@ msgid ""
 msgstr "Bha faidhle nan sgòran àrda ro shean,\nchaidh na h-uile sgòr àrd a sguabadh às."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "Lean air an toisiche"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "Còmhrag 3 buillean"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "Lorg uighean"
 
@@ -3829,7 +3836,7 @@ msgstr "Air ùrachadh"
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
 msgid "Not installed"
-msgstr ""
+msgstr "Cha deach a stàladh"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:319
@@ -5042,7 +5049,7 @@ msgstr "Fuirich ort gus am bi an geama làithreach deiseil."
 #: src/states_screens/online/networking_lobby.cpp:427
 #, c-format
 msgid "Send %s in chat box to install addon now."
-msgstr ""
+msgstr "Cuir a-null %s ann am bogsa na cabadaich airson an tuilleadan a stàladh an-dràsta."
 
 #: src/states_screens/online/networking_lobby.cpp:481
 #, c-format
@@ -5137,7 +5144,7 @@ msgstr "Chan urrainn cluich air loidhne gun inntrigeadh gun eadar-lìon. Ma tha 
 
 #: src/states_screens/online/online_screen.cpp:238
 msgid "Enter the server address optionally followed by : and then port."
-msgstr ""
+msgstr "Cuir a-steach seòladh an fhrithealaiche agus ma thogras tu : agus am port na dhèidh."
 
 #: src/states_screens/online/online_screen.cpp:250
 #, c-format
@@ -5412,11 +5419,6 @@ msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
 msgstr "’Sa mhodh ioma-chluicheadair, ’s urrainn dha na cluicheadairean pròifil le ana-chothrom\n(nas dorra) a thaghadh air sgrìn taghadh nan cartaichean"
-
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr "Dì-stàlaich maoin slàna a’ gheama"
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
@@ -5695,7 +5697,7 @@ msgid "Follow the leader!"
 msgstr "Lean air an toisiche!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "An %i as àirde"
@@ -5903,7 +5905,7 @@ msgstr "Luathaich le suathadh ri bàrr na cuibhle agus stiùirich a ghluasad gu 
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "Luathaich le gluasad an luathaicheir suas agus stiùirich le claonadh an uidheim."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:43
 msgid ""
@@ -5934,7 +5936,7 @@ msgstr "Brùth air <%s> gus coimhead air do chùlaibh. Loisg an t-arm le <%s> fh
 msgid ""
 "Press the mirror icon to look behind. Fire the weapon behind by holding the "
 "mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Brùth air ìomhaigheag an sgàthain airson coimhead air ais. Loisg an t-arm an comhair a chùil le brùthadh air ìomhaigheag an sgàthain ’s a’ grad-shlaighdeadh gu ìomhaigheag a’ bhobhlaidh!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:90
 #, c-format

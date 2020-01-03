@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Benau, 2018
+# Benau, 2018-2019
 # Bruno Ramalhete <bram.512@gmail.com>, 2015
 # Crystal Da Eevee <rutmaria3333@hotmail.com>, 2019
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-18 14:33+0800\n"
-"PO-Revision-Date: 2019-12-18 06:39+0000\n"
+"POT-Creation-Date: 2019-12-25 15:22+0800\n"
+"PO-Revision-Date: 2019-12-29 02:12+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Portuguese (http://www.transifex.com/supertuxkart/supertuxkart/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -676,7 +676,7 @@ msgstr "Dificuldade"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1173
+#: src/race/race_manager.cpp:1174
 msgid "Novice"
 msgstr "Principiante"
 
@@ -688,7 +688,7 @@ msgstr "Principiante"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1174
+#: src/race/race_manager.cpp:1175
 msgid "Intermediate"
 msgstr "Intermédio"
 
@@ -700,7 +700,7 @@ msgstr "Intermédio"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1175
+#: src/race/race_manager.cpp:1176
 msgid "Expert"
 msgstr "Perito"
 
@@ -712,7 +712,7 @@ msgstr "Perito"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1176
+#: src/race/race_manager.cpp:1177
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -729,7 +729,7 @@ msgstr "Modo de jogo"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1148
+#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1149
 msgid "Normal Race"
 msgstr "Corrida normal"
 
@@ -738,7 +738,7 @@ msgstr "Corrida normal"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1150
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1151
 msgid "Time Trial"
 msgstr "Contra-relógio"
 
@@ -755,7 +755,7 @@ msgstr "Batalha"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1162
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1163
 msgid "Soccer"
 msgstr "Futebol"
 
@@ -929,7 +929,7 @@ msgstr "Arenas"
 #. I18N: In addons screen, above the list of addons to be installed
 #: src/states_screens/addons_screen.cpp:136
 msgid "Installed"
-msgstr ""
+msgstr "Instalado"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -1499,7 +1499,7 @@ msgstr "Velocidade máxima: quanto maior, mais rápido o kart pode ir. É útil 
 msgid ""
 "Nitro efficiency - The higher it is, the more speed you get from a can of "
 "nitro. A lighter kart will have higher nitro efficiency."
-msgstr ""
+msgstr "Eficiência do nitro - Quanto maior for, maior será o impulso que terás de uma garrafa de nitro. Um kart mais leve terá uma eficiência de nitro maior."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1557,7 +1557,7 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr ""
+msgstr "Quando dispositivos de entrada estiverem configurados, seleciona 'Multi-Jogador em Ecrã Dividido' no menu principal. Cada jogador poderá pressionar o botão 'Disparar' do seu controlador ou teclado para juntar ao jogo, e usar o seu dispositivo de entrada para escolher o seu kart. O jogo continuará quando todos os jogadores tiverem selecionado o seu kart. Nota que o rato poderá não ser usado nesta operação."
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -2020,7 +2020,7 @@ msgstr "Enviar estatísticas anónimas de hardware"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Enable chatting online"
-msgstr ""
+msgstr "Ativar bate-papo online"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2036,6 +2036,12 @@ msgstr "Opções extra"
 #. I18N: In the general settings
 msgid "Enable per-player handicaps"
 msgstr "Ativar desvantagem em jogadores"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: For mobile version for STK, uninstall the downloaded assets
+#: src/states_screens/options/options_screen_general.cpp:108
+msgid "Uninstall full game assets"
+msgstr "Desinstalar o pacote completo dos recursos do jogo"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
@@ -2082,17 +2088,17 @@ msgstr "Dividir ecrã na horizontal no modo multi-jogador"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Show other karts' held powerups"
-msgstr ""
+msgstr "Mostrar os powerups dos outros karts"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the story mode timer"
-msgstr ""
+msgstr "Ativar o temporizador para o Modo História"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the speedrun timer"
-msgstr ""
+msgstr "Ativar o temporizador para Speedrun"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2102,7 +2108,7 @@ msgstr "Nível de Efeitos Gráficos"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Blur Effects Level"
-msgstr ""
+msgstr "Nivel de Efeitos de Desfoque"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2221,88 +2227,88 @@ msgstr "Cor do kart"
 
 #. I18N: ./data/tips.xml
 msgid "The GUI skin can be changed in the UI options."
-msgstr ""
+msgstr "O tema do jogo pode ser mudado nas definiçôes de IU."
 
 #. I18N: ./data/tips.xml
 msgid "An UI option allows to see other karts' powerups."
-msgstr ""
+msgstr "Uma opção de IU deixa-te ver os powerups dos outros karts."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
-msgstr ""
+msgstr "O tamanho da fonte de letras pode ser mudado nas definições de IU."
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has many useful informations."
-msgstr ""
+msgstr "A secção de Ajuda contêm imensas informações úteis."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr ""
+msgstr "No modo Um Jogador, podes ver e correr contra repetições de contra-relógio."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can visit https://supertuxkart.net/ for more information about the game."
-msgstr ""
+msgstr "Podes visitar https://supertuxkart.net/ para mais informações sobre o jogo."
 
 #. I18N: ./data/tips.xml
 msgid "Short nitro boosts are more efficient."
-msgstr ""
+msgstr "Carregar apenas uma vez, sem manter premido, para usar o nitro, é mais eficiente. "
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr ""
+msgstr "Usa zippers só quando for ideal. Secções longas em linha reta são um bom exemplo para o uso de zippers."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't use multiple zippers quickly in row, instead, wait until the speed "
 "boost wears off."
-msgstr ""
+msgstr "Não uses vários zippers de seguida, espera até que o seu efeito desapareça, se não acabas por desperdiçá-los."
 
 #. I18N: ./data/tips.xml
 msgid "Skidding makes you much faster, do it whenever safe."
-msgstr ""
+msgstr "Derrapar faz-te mais rápido, por isso derrapa sempre que for possível."
 
 #. I18N: ./data/tips.xml
 msgid "The swatter can be used to remove bombs or parachutes."
-msgstr ""
+msgstr "O mata-moscas pode ser usado para remover bombas ou pára-quedas."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "Não consegues parar de virar enquanto derrapas. Uma boa orientação do teu kart no começo de uma derrapagem é primordial."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "Podes ter um impulso no principio da corrida se começares a acelerar no momento em que \"Preparar\" aparecer."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
-msgstr ""
+msgstr "Travar até um certo ponto livra-te dos pára-quedas mais rapidamente."
 
 #. I18N: ./data/tips.xml
 msgid "First and foremost, focus on where your kart is going."
-msgstr ""
+msgstr "Tem sempre em foco onde o teu kart vai."
 
 #. I18N: ./data/tips.xml
 msgid "The rescue key (button) is very useful."
-msgstr ""
+msgstr "O botão de resgatar (reiniciar, que te põe de volta na pista em segurança) é muito útil."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr ""
+msgstr "Tem cuidado quando estiveres perto de outros karts, eles podem-te atacar!"
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake or plunger."
-msgstr ""
+msgstr "Bolas de basketball podes ser destruídas usando tiros certeiros para trás com uma bola de bowling, um bolo ou um desentupidor. "
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other karts unless you want to throw them off the"
 " track."
-msgstr ""
+msgstr "Evita bater em outros karts, que vai-te desacelerar, a não ser que tenhas intenções de os puxares para fora da pista."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2474,7 +2480,7 @@ msgstr "Aula de Matemática do Oliver"
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
-msgstr ""
+msgstr "Parque da Abóbora "
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge mansion"
@@ -2529,7 +2535,7 @@ msgstr "Jardim Zen"
 msgid "Completed achievement \"%s\"."
 msgstr "Proeza concluída \"%s\"."
 
-#: src/addons/addons_manager.cpp:108 src/addons/news_manager.cpp:344
+#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:344
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Não foi possível ligar ao servidor de add-ons do SuperTuxKart."
 
@@ -2606,7 +2612,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "Modo Speedrun desativado. Só pode ser ativado se o jogo não foi fechado desde o inicio do modo história.\n\nFechar o jogo antes de completares o modo história invalida o temporizador.\n\nPara usares o modo speedrun, por favor usa um perfil novo."
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:388
@@ -2631,30 +2637,31 @@ msgid ""
 "created."
 msgstr "O ficheiro de configurações é antigo e por isso foi eliminado. Vai ser criado um novo."
 
-#: src/graphics/irr_driver.cpp:596
+#: src/graphics/irr_driver.cpp:599
 msgid "Video recording started."
 msgstr "Começou a gravação do vídeo."
 
-#: src/graphics/irr_driver.cpp:602
+#: src/graphics/irr_driver.cpp:605
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Vídeo gravado em \"%s\"."
 
-#: src/graphics/irr_driver.cpp:606
+#: src/graphics/irr_driver.cpp:609
 msgid "Encoding progress:"
 msgstr "Processo de codificação:"
 
-#: src/graphics/irr_driver.cpp:1839 src/graphics/irr_driver.cpp:1844
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
-#. I18N: tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1369 src/states_screens/race_result_gui.cpp:150
-msgid "Tip: "
-msgstr ""
+#. I18N: Tip shown in gui for giving player hints
+#: src/guiengine/engine.cpp:1376 src/states_screens/race_result_gui.cpp:151
+#, c-format
+msgid "Tip: %s"
+msgstr "Dica: %s"
 
-#: src/guiengine/engine.cpp:1414
+#: src/guiengine/engine.cpp:1420
 msgid "Loading"
 msgstr "A carregar"
 
@@ -3371,7 +3378,7 @@ msgstr "+1 vida."
 
 #: src/karts/kart.cpp:1032
 msgid "You were too slow!"
-msgstr ""
+msgstr "Foste demasiado lento! "
 
 #: src/karts/kart.cpp:1033
 msgid "You won the race!"
@@ -3415,7 +3422,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "O teu driver de gráficos parece ser muito antigo. Por favor verifica se existe uma atualização disponível. O SuperTuxKart recomenda um driver que suporte %s ou superior. Mesmo assim, provavelmente o jogo poderá ser executado, mas no modo de gráficos reduzidos."
 
-#: src/main_loop.cpp:423 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:430 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "A conexão ao servidor excedeu o tempo limite."
 
@@ -3691,7 +3698,7 @@ msgstr "Contra-relógio (Campeonato)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1156
+#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1157
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:160
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/track_info_screen.cpp:256
@@ -3700,7 +3707,7 @@ msgstr "Todos contra Todos"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1158
+#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1159
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:212
 msgid "Capture The Flag"
@@ -3759,17 +3766,17 @@ msgid ""
 msgstr "O ficheiro de recordes era muito antigo.\nForam eliminados todos os recordes."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1152
+#: src/race/race_manager.cpp:1153
 msgid "Follow the Leader"
 msgstr "Seguir o Líder"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1154 src/states_screens/track_info_screen.cpp:255
+#: src/race/race_manager.cpp:1155 src/states_screens/track_info_screen.cpp:255
 msgid "3 Strikes Battle"
 msgstr "Batalha de 3 Vidas"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1160
+#: src/race/race_manager.cpp:1161
 msgid "Egg Hunt"
 msgstr "Caça aos Ovos"
 
@@ -3825,7 +3832,7 @@ msgstr "Últ. atualização"
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
 msgid "Not installed"
-msgstr ""
+msgstr "Não instalado"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:319
@@ -5034,7 +5041,7 @@ msgstr "Por favor aguarda que o jogo atual termine."
 #: src/states_screens/online/networking_lobby.cpp:427
 #, c-format
 msgid "Send %s in chat box to install addon now."
-msgstr ""
+msgstr "Escreve %s no bate-papo para instalar o addon agora."
 
 #: src/states_screens/online/networking_lobby.cpp:481
 #, c-format
@@ -5125,7 +5132,7 @@ msgstr "Não podes jogar online sem acesso à Internet. Se quiseres jogar online
 
 #: src/states_screens/online/online_screen.cpp:238
 msgid "Enter the server address optionally followed by : and then port."
-msgstr ""
+msgstr "Escreve o endereço do servidor, seguido opcionalmente de : e a porta. "
 
 #: src/states_screens/online/online_screen.cpp:250
 #, c-format
@@ -5401,11 +5408,6 @@ msgid ""
 "(more difficult) profiles on the kart selection screen"
 msgstr "No modo multi-jogador, os jogadores podem selecionar perfis em\ndesvantagem (mais difícil) no ecrã de seleção do kart"
 
-#. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
-msgid "Uninstall full game assets"
-msgstr "Desinstalar o pacote completo dos recursos do jogo"
-
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
 #: src/states_screens/options/options_screen_general.cpp:114
@@ -5486,7 +5488,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "O modo Speedrun só pode ser ativado se o jogo não foi fechado desde o inicio do modo história.\n\nFechar o jogo antes de completares o modo história invalida o temporizador.\n\nPara usares o modo speedrun, por favor usa um perfil novo."
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:217
@@ -5504,22 +5506,22 @@ msgstr "Sincronizaçâo Meia-Vertical"
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
-msgstr ""
+msgstr "SyncV força a placa de gráficos para fornecer um novo fotograma\nsó quando o monitor estiver pronto a mostrá-lo."
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:226
 msgid "Full: one frame per monitor refresh"
-msgstr ""
+msgstr "Cheio: um fotograma por refresco de monitor"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:228
 msgid "Half: one frame every two monitor refreshes"
-msgstr ""
+msgstr "Metade: um fotograma a cada dois refrescos de monitor"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:230
 msgid "Vsync will not work if your drivers don't support it."
-msgstr ""
+msgstr "SyncV não vai funcionar se as tuas placas não suportarem."
 
 #. I18N: custom video settings
 #: src/states_screens/options/options_screen_video.cpp:479
@@ -5683,7 +5685,7 @@ msgid "Follow the leader!"
 msgstr "Segue o líder!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:916
+#: src/states_screens/race_gui_base.cpp:918
 #, c-format
 msgid "Top %i"
 msgstr "Os primeiros %i"
@@ -5885,19 +5887,19 @@ msgstr "Acelera com <%s> e vira com <%s> e <%s>"
 msgid ""
 "Accelerate by touching the upper part of the wheel, and steer by moving left"
 " or right."
-msgstr ""
+msgstr "Acelera tocando na parte de cima do volante, e vira movendo para a esquerda ou direita."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:38
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "Acelera movendo o acelerador para cima, e vira inclinando o teu dispositivo."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:43
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr ""
+msgstr "Acelera movendo o acelerador para cima, e vira rodando o teu dispositivo."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
@@ -5909,7 +5911,7 @@ msgstr "Apanha as caixas de prémios e dispara a arma com <%s> para destruir as 
 msgid ""
 "Collect gift boxes, and fire by pressing the bowling icon to blow away these"
 " boxes!"
-msgstr ""
+msgstr "Apanha presentes, e dispara tocando no ícone da bola de bowling para derrubares estas caixas!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:72
 #, c-format
@@ -5922,16 +5924,16 @@ msgstr "Carrega em <%s> para olhar para trás. Dispara a arma com <%s> enquanto 
 msgid ""
 "Press the mirror icon to look behind. Fire the weapon behind by holding the "
 "mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Toca no ícone do espelho para olhar para trás. Dispara uma arma para trás mantendo o dedo no ícone do espelho e depois deslizando-o para o ícone da bola de bowling!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:90
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
-msgstr "Usa o nitro carregando na tecla <%s>!"
+msgstr "Usa o nitro que apanhaste carregando na tecla <%s>!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:92
 msgid "Use the nitro you collected by pressing the nitro icon"
-msgstr ""
+msgstr "Usa o nitro que apanhaste tocando no ícone da garrafa de nitro"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:97
 msgid "Collect nitro bottles (we will use them after the curve)."
@@ -5944,7 +5946,7 @@ msgstr "Aiii! Quando estiveres com problemas carrega na tecla <%s> para chamar o
 
 #: ../stk-assets/tracks/tutorial/scripting.as:105
 msgid "Oops! When you're in trouble, press the bird icon to be rescued."
-msgstr ""
+msgstr "Oops! Quando estiveres com problemas, carrega no ícone do Thunderbird para ser resgatado."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:113
 #, c-format
@@ -5957,7 +5959,7 @@ msgstr "Acelera e carrega na tecla <%s> numa curva para derrapar. As derrapagens
 msgid ""
 "Accelerate and press the skid icon while turning to skid. Skidding for a "
 "short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Acelera e toca no ícone de derrapagem enquanto viras para derrapar. Derrapar por um curto período ajuda-te a virar facilmente em curvas apertadas."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:130
 msgid ""
