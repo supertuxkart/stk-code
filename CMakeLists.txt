@@ -27,7 +27,7 @@ option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when av
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
-option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." ON)
+option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
 CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of the built-in version, when available." ON
