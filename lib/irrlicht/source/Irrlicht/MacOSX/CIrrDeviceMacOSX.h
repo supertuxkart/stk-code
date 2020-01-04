@@ -16,6 +16,7 @@
 #include "IGUIEnvironment.h"
 #include "ICursorControl.h"
 
+#define GL_SILENCE_DEPRECATION
 #include <OpenGL/OpenGL.h>
 #include <map>
 
