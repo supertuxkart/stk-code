@@ -38,6 +38,7 @@ extern "C"
 
 #else
 
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <err.h>
 #include <netdb.h>
