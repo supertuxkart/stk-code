@@ -29,9 +29,11 @@
             <box width="80%" height="100%" layout="vertical-row">
 
                 <spacer width="5" height="1%"/>
-                <div width="50%" height="7%" align="center" layout="horizontal-row">
-                    <icon id="tutorialIcon" width="8%" height="100%" align="center" icon="gui/icons/tutorial.png"/>
-                    <button id="startTutorial" align="center" text="Start the tutorial"/>
+                <div width="70%" height="fit" align="left" layout="horizontal-row">
+                    <spacer proportion="1"/>
+                    <icon id="tutorialIcon" height="100%" icon="gui/icons/tutorial.png"/>
+                    <button id="startTutorial" text="Start the tutorial"/>
+                    <spacer proportion="1"/>
                 </div>
                 <spacer width="5" height="2%"/>
 
