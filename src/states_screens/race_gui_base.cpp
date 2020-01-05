@@ -43,6 +43,7 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "states_screens/race_gui_multitouch.hpp"
@@ -752,9 +753,6 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 #ifndef SERVER_ONLY
     // For now, don't draw player icons when in soccer mode
     const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
-    if(minor_mode == RaceManager::MINOR_MODE_SOCCER)
-        return;
-
     int x_base = 10;
     if (irr_driver->getDevice()->getLeftPadding() > 0)
         x_base += irr_driver->getDevice()->getLeftPadding();
@@ -858,6 +856,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         // In battle mode mode there is no distance along track etc.
         if (minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
             minor_mode==RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+            minor_mode==RaceManager::MINOR_MODE_SOCCER ||
             minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
             minor_mode==RaceManager::MINOR_MODE_EASTER_EGG)
         {
@@ -1002,6 +1001,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
     kart->getKartProperties()->getIconMaterial()->getTexture();
 
     CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
+    SoccerWorld* soccer = dynamic_cast<SoccerWorld*>(World::getWorld());
     unsigned int kart_id = kart->getWorldKartId();
 
     // CTF
@@ -1027,6 +1027,26 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                 (x - 20, y - 10, x + w - 20, y + w - 30);
             draw2DImage(blue, pos1, rect, NULL, NULL, true);
         }
+    } else if (soccer)
+    {
+        KartTeam team = soccer->getKartTeam((int)kart_id);
+        std::string flag_color = "blue";
+        if (team == KART_TEAM_RED) {
+            flag_color = "red";
+        }
+        video::ITexture* flag =
+            irr_driver->getTexture(FileManager::GUI_ICON, flag_color + "_flag.png");
+        const core::rect<s32> rect(core::position2d<s32>(0, 0),
+            flag->getSize());
+        const core::rect<s32> pos1
+            (x - 20, y - 10, x + w - 20, y + w - 30);
+        draw2DImage(flag, pos1, rect, NULL, NULL, true);
+  
+        core::stringw m_player = kart->getController()->getName();
+        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+        const core::rect<s32> posNumber(x + w, y + w/4, x + 7*w/4, y + w);
+        font->setScale(1.f*((float) w)/(4.f*(float)font->getDimension(L"X").Height));
+        font->draw(m_player, posNumber, video::SColor(255, 255, 255, 255));
     }
 
     const core::rect<s32> pos(x, y, x+w, y+w);

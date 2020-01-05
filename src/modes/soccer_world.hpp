@@ -281,6 +281,7 @@ private:
     /** Goals data of each team scored */
     std::vector<ScorerData> m_red_scorers;
     std::vector<ScorerData> m_blue_scorers;
+    std::vector<int> m_scores;
 
     /** Data generated from navmesh */
     TrackSector* m_ball_track_sector;
