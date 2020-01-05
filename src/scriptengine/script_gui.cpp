@@ -30,6 +30,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "guiengine/message_queue.hpp"
 
 #include <angelscript.h>
 #include "scriptarray.hpp"
@@ -74,6 +75,22 @@ namespace Scripting
         {
             irr::core::stringw out = StringUtils::utf8ToWide(*input);
             new TutorialMessageDialog((out), true);
+        }
+
+        /** Display a Message using MessageQueue */
+        void displayGenericMessage(std::string* input)
+        {
+        	irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+			MessageQueue::MessageType type = MessageQueue::MT_GENERIC;
+        	MessageQueue::add(type, msg);
+        }
+
+        /** Display a Error Message using MessageQueue */
+        void displayErrorMessage(std::string* input)
+        {
+        	irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+			MessageQueue::MessageType type = MessageQueue::MT_ERROR;
+        	MessageQueue::add(type, msg);
         }
 
         void clearOverlayMessages()
@@ -192,8 +209,16 @@ namespace Scripting
             asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
             int r; // of type asERetCodes
             
-            r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)", 
-                                               mp ? WRAP_FN(displayModalMessage) : asFUNCTION(displayModalMessage), 
+            r = engine->RegisterGlobalFunction("void displayGenericMessage(const string &in)",
+                                               mp ? WRAP_FN(displayGenericMessage) : asFUNCTION(displayGenericMessage),
+                                               call_conv); assert(r >= 0);
+
+			r = engine->RegisterGlobalFunction("void displayErrorMessage(const string &in)",
+                                               mp ? WRAP_FN(displayErrorMessage) : asFUNCTION(displayErrorMessage),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)",
+                                               mp ? WRAP_FN(displayModalMessage) : asFUNCTION(displayModalMessage),
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void displayOverlayMessage(const string &in)", 
