@@ -31,7 +31,6 @@
 #include <pthread.h>
 #include <stdexcept>
 #include <algorithm>
-#include <cerrno>
 #include <map>
 
 #include <stdio.h>
