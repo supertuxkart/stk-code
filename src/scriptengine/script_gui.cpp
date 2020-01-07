@@ -52,6 +52,15 @@ namespace Scripting
             RGT_ACCELEROMETER = 2,
             RGT_GYROSCOPE = 3,
         };
+
+        enum MsgType
+        {
+        	MSG_GENERIC = 0,
+        	MSG_ERROR = 1,
+        	MSG_ACHIEVEMENT = 2,
+        	MSG_FRIEND = 3
+        };
+
         /** \addtogroup Scripting
         * @{
         */
@@ -77,20 +86,28 @@ namespace Scripting
             new TutorialMessageDialog((out), true);
         }
 
-        /** Display a Message using MessageQueue */
-        void displayGenericMessage(std::string* input)
+        /** Display a Message using MessageQueue (enum GUI::MsgType)*/
+        void displayMessage(std::string* input, int Enum_value)
         {
-        	irr::core::stringw msg = StringUtils::utf8ToWide(*input);
-			MessageQueue::MessageType type = MessageQueue::MT_GENERIC;
-        	MessageQueue::add(type, msg);
-        }
-
-        /** Display a Error Message using MessageQueue */
-        void displayErrorMessage(std::string* input)
-        {
-        	irr::core::stringw msg = StringUtils::utf8ToWide(*input);
-			MessageQueue::MessageType type = MessageQueue::MT_ERROR;
-        	MessageQueue::add(type, msg);
+			irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+			MsgType msg_type = (MsgType)Enum_value;
+			MessageQueue::MessageType type;
+			switch (msg_type)
+			{
+				case MSG_ERROR:
+					type = MessageQueue::MT_ERROR;
+					break;
+				case MSG_FRIEND:
+					type = MessageQueue::MT_FRIEND;
+					break;
+				case MSG_ACHIEVEMENT:
+					type = MessageQueue::MT_ACHIEVEMENT;
+					break;
+				default:
+					type = MessageQueue::MT_GENERIC;
+					break;
+			}
+			MessageQueue::add(type, msg);
         }
 
         void clearOverlayMessages()
@@ -165,6 +182,16 @@ namespace Scripting
         // documented function whose name is exposed in angelscript (these proxies exist so that
         // angelscript can properly resolve overloads, but doxygen can still generate the right docs
         /** \cond DOXYGEN_IGNORE */
+        void proxy_displayMessage(std::string* msgString)
+        {
+            return displayMessage(msgString, MSG_GENERIC);
+        }
+
+        void proxy_displayMessageAndInsertValues1(std::string* msgString, int msgType)
+        {
+            return displayMessage(msgString, msgType);
+        }
+
         std::string proxy_translate(std::string* formatString)
         {
             return translate(formatString);
@@ -208,13 +235,14 @@ namespace Scripting
             bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
             asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
             int r; // of type asERetCodes
-            
-            r = engine->RegisterGlobalFunction("void displayGenericMessage(const string &in)",
-                                               mp ? WRAP_FN(displayGenericMessage) : asFUNCTION(displayGenericMessage),
+
+            r = engine->RegisterGlobalFunction("void displayMessage(const string &in)",
+                                               mp ? WRAP_FN(proxy_displayMessage) : asFUNCTION(proxy_displayMessage),
                                                call_conv); assert(r >= 0);
 
-			r = engine->RegisterGlobalFunction("void displayErrorMessage(const string &in)",
-                                               mp ? WRAP_FN(displayErrorMessage) : asFUNCTION(displayErrorMessage),
+            r = engine->RegisterGlobalFunction("void displayMessage(const string &in, int MessageType)",
+                                               mp ? WRAP_FN(proxy_displayMessageAndInsertValues1)
+                                                  : asFUNCTION(proxy_displayMessageAndInsertValues1),
                                                call_conv); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)",
@@ -284,6 +312,11 @@ namespace Scripting
             engine->RegisterEnumValue("RaceGUIType", "STEERING_WHEEL", RGT_STEERING_WHEEL);
             engine->RegisterEnumValue("RaceGUIType", "ACCELEROMETER", RGT_ACCELEROMETER);
             engine->RegisterEnumValue("RaceGUIType", "GYROSCOPE", RGT_GYROSCOPE);
+            engine->RegisterEnum("MsgType");
+            engine->RegisterEnumValue("MsgType", "GENERIC", MSG_GENERIC);
+            engine->RegisterEnumValue("MsgType", "ERROR", MSG_ERROR);
+            engine->RegisterEnumValue("MsgType", "ACHIEVEMENT", MSG_ACHIEVEMENT);
+            engine->RegisterEnumValue("MsgType", "FRIEND", MSG_FRIEND);
         }
     }
 
