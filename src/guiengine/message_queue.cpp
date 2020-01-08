@@ -85,7 +85,7 @@ public:
 /** A small helper class to store and sort text messages to be displayed. */
 class TextMessage : public Message
 {
-private:
+protected:
     /** The type of the message. */
     MessageQueue::MessageType m_message_type;
 
@@ -204,6 +204,50 @@ public:
     virtual void remove()                                      { delete this; }
 
 };   // class TextMessage
+
+class StaticTextMessage : public TextMessage
+{
+private:
+	core::stringw m_msg_id;
+public:
+	StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message, const core::stringw &msg_id) :
+        TextMessage(mt, message)
+    {
+        m_message_type = mt;
+        m_message      = message;
+        m_msg_id 	   = msg_id;
+        assert(mt != MessageQueue::MT_PROGRESS);
+        if (mt == MessageQueue::MT_ACHIEVEMENT)
+            m_render_type = "achievement-message::neutral";
+        else if (mt == MessageQueue::MT_ERROR)
+            m_render_type = "error-message::neutral";
+        else if (mt == MessageQueue::MT_GENERIC)
+            m_render_type = "generic-message::neutral";
+        else
+            m_render_type = "friend-message::neutral";
+    }   // Message
+    // ------------------------------------------------------------------------
+    ~StaticTextMessage()
+    {
+    }
+    // ------------------------------------------------------------------------
+    /** Discards the message. */
+    core::stringw getID() const { return m_msg_id; }
+    // ------------------------------------------------------------------------
+    /** Draw the message. */
+    virtual void draw(float dt)
+    {
+    	TextMessage::draw(dt);
+    	m_display_timer = 9999999.9f;
+    }
+    // ------------------------------------------------------------------------
+    /** Discards the message. */
+    void discard()
+    {
+    	m_display_timer = -1.0f;
+    }
+    // ------------------------------------------------------------------------
+};
 
 // ============================================================================
 /** A function class to compare messages, required for priority_queue. */
@@ -340,6 +384,22 @@ void add(MessageType mt, const irr::core::stringw &message)
 }   // add
 
 // ----------------------------------------------------------------------------
+/** Adds a Text message to the message queue which has to be discarded manually.
+ *  \param mt The MessageType of the message.
+ *  \param message The actual message.
+ *  \param msg_id the id for the Message, necessary to dicard it.
+ */
+void addStatic(MessageType mt, const irr::core::stringw &message, const irr::core::stringw &msg_id)
+{
+#ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+    Message *m = new StaticTextMessage(mt, message, msg_id);
+    privateAdd(m);
+#endif
+}   // addStatic
+
+// ----------------------------------------------------------------------------
 /** Update function called from the GUIEngine to handle displaying of the
  *  messages. It will make sure that each message is shown for a certain
  *  amount of time, before it is discarded and the next message (if any)
@@ -391,6 +451,16 @@ void showProgressBar(int progress, const core::stringw& msg)
     g_progress_bar_msg.setProgress(progress, msg);
 #endif
 }   // showProgressBar
+
+// ----------------------------------------------------------------------------
+/** Remove an static Message from the queue.
+ *  \param msg_id the id for the Message.
+ */
+void discardStatic(const core::stringw &msg_id)
+{
+#ifndef SERVER_ONLY
+#endif
+}	// discardStatic
 
 // ----------------------------------------------------------------------------
 /** Clear all message, called when destroying the GUIEngine.

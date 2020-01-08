@@ -44,9 +44,11 @@ namespace MessageQueue
     };
 
     void add(MessageType mt, const core::stringw &message);
+    void addStatic(MessageType mt, const core::stringw &message, const core::stringw &msg_id);
     void showProgressBar(int progress, const core::stringw& msg);
     void updatePosition();
     void update(float dt);
+    void discardStatic(const core::stringw &msg_id);
     void clear();
 };   // namespace GUIEngine
 #endif

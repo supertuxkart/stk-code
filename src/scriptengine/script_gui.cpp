@@ -24,6 +24,7 @@
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/aswrappedcall.hpp"
+#include "scriptengine/script_track.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
@@ -110,6 +111,11 @@ namespace Scripting
 			MessageQueue::add(type, msg);
         }
 
+        /** Display a Message which is dismissed by an Trigger (enum GUI::MsgType)*/
+        void displayTriggeredMessage(std::string* input, int Enum_value, std::string* triggerID)
+        {
+        }
+
         void clearOverlayMessages()
         {
             World::getWorld()->getRaceGUI()->clearAllMessages();
@@ -192,6 +198,16 @@ namespace Scripting
             return displayMessage(msgString, msgType);
         }
 
+		void proxy_displayTriggeredMessage(std::string* msgString, std::string* triggerID)
+        {
+            return displayTriggeredMessage(msgString, MSG_GENERIC, triggerID);
+        }
+
+        void proxy_displayTriggeredMessageAndInsertValues1(std::string* msgString, int msgType, std::string* triggerID)
+        {
+            return displayTriggeredMessage(msgString, msgType, triggerID);
+        }
+
         std::string proxy_translate(std::string* formatString)
         {
             return translate(formatString);
@@ -243,6 +259,15 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void displayMessage(const string &in, int MessageType)",
                                                mp ? WRAP_FN(proxy_displayMessageAndInsertValues1)
                                                   : asFUNCTION(proxy_displayMessageAndInsertValues1),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void displayTriggeredMessage(const string &in, const string &in)",
+                                               mp ? WRAP_FN(proxy_displayTriggeredMessage) : asFUNCTION(proxy_displayTriggeredMessage),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void displayTriggeredMessage(const string &in, int MessageType, const string &in)",
+                                               mp ? WRAP_FN(proxy_displayTriggeredMessageAndInsertValues1)
+                                                  : asFUNCTION(proxy_displayTriggeredMessageAndInsertValues1),
                                                call_conv); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)",
