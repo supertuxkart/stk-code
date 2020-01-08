@@ -457,6 +457,8 @@ void discardStatic()
 void clear()
 {
 #ifndef SERVER_ONLY
+	g_static_message->discard();
+	g_static_message = 0;
     g_all_messages.lock();
     while (!g_all_messages.getData().empty())
     {
