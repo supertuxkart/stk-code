@@ -49,7 +49,7 @@ libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
 mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
 ```
 
-OpenSUSE command:
+openSUSE command:
 
 ```bash
 sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel \
