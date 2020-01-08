@@ -111,9 +111,36 @@ namespace Scripting
 			MessageQueue::add(type, msg);
         }
 
-        /** Display a Message which is dismissed by an Trigger (enum GUI::MsgType)*/
-        void displayTriggeredMessage(std::string* input, int Enum_value, std::string* triggerID)
+        /** Displays an static Message. (enum GUI::MsgType)
+         *  This Message has to be discarded by discardStaticMessage() manually.
+         *  Otherwise it can be overridden.
+         */
+        void displayStaticMessage(std::string* input, int Enum_value)
         {
+        	irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+			MsgType msg_type = (MsgType)Enum_value;
+			MessageQueue::MessageType type;
+			switch (msg_type)
+			{
+				case MSG_ERROR:
+					type = MessageQueue::MT_ERROR;
+					break;
+				case MSG_FRIEND:
+					type = MessageQueue::MT_FRIEND;
+					break;
+				case MSG_ACHIEVEMENT:
+					type = MessageQueue::MT_ACHIEVEMENT;
+					break;
+				default:
+					type = MessageQueue::MT_GENERIC;
+					break;
+			}
+        	MessageQueue::addStatic(type, msg);
+        }
+
+        void discardStaticMessage()
+        {
+        	MessageQueue::discardStatic();
         }
 
         void clearOverlayMessages()
@@ -198,14 +225,19 @@ namespace Scripting
             return displayMessage(msgString, msgType);
         }
 
-		void proxy_displayTriggeredMessage(std::string* msgString, std::string* triggerID)
+        void proxy_displayStaticMessage(std::string* msgString)
         {
-            return displayTriggeredMessage(msgString, MSG_GENERIC, triggerID);
+            return displayStaticMessage(msgString, MSG_GENERIC);
         }
 
-        void proxy_displayTriggeredMessageAndInsertValues1(std::string* msgString, int msgType, std::string* triggerID)
+        void proxy_displayStaticMessageAndInsertValues1(std::string* msgString, int msgType)
         {
-            return displayTriggeredMessage(msgString, msgType, triggerID);
+            return displayStaticMessage(msgString, msgType);
+        }
+
+        void proxy_discardStaticMessage()
+        {
+            return discardStaticMessage();
         }
 
         std::string proxy_translate(std::string* formatString)
@@ -261,13 +293,17 @@ namespace Scripting
                                                   : asFUNCTION(proxy_displayMessageAndInsertValues1),
                                                call_conv); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("void displayTriggeredMessage(const string &in, const string &in)",
-                                               mp ? WRAP_FN(proxy_displayTriggeredMessage) : asFUNCTION(proxy_displayTriggeredMessage),
+			r = engine->RegisterGlobalFunction("void displayStaticMessage(const string &in)",
+                                               mp ? WRAP_FN(proxy_displayStaticMessage) : asFUNCTION(proxy_displayStaticMessage),
                                                call_conv); assert(r >= 0);
 
-            r = engine->RegisterGlobalFunction("void displayTriggeredMessage(const string &in, int MessageType, const string &in)",
-                                               mp ? WRAP_FN(proxy_displayTriggeredMessageAndInsertValues1)
-                                                  : asFUNCTION(proxy_displayTriggeredMessageAndInsertValues1),
+            r = engine->RegisterGlobalFunction("void displayStaticMessage(const string &in, int MessageType)",
+                                               mp ? WRAP_FN(proxy_displayStaticMessageAndInsertValues1)
+                                                  : asFUNCTION(proxy_displayStaticMessageAndInsertValues1),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void discardStaticMessage()",
+                                               mp ? WRAP_FN(discardStaticMessage) : asFUNCTION(discardStaticMessage),
                                                call_conv); assert(r >= 0);
 
             r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)",

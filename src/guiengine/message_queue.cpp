@@ -207,15 +207,12 @@ public:
 
 class StaticTextMessage : public TextMessage
 {
-private:
-	core::stringw m_msg_id;
 public:
-	StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message, const core::stringw &msg_id) :
+	StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         TextMessage(mt, message)
     {
         m_message_type = mt;
         m_message      = message;
-        m_msg_id 	   = msg_id;
         assert(mt != MessageQueue::MT_PROGRESS);
         if (mt == MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
@@ -231,20 +228,11 @@ public:
     {
     }
     // ------------------------------------------------------------------------
-    /** Discards the message. */
-    core::stringw getID() const { return m_msg_id; }
-    // ------------------------------------------------------------------------
     /** Draw the message. */
     virtual void draw(float dt)
     {
     	TextMessage::draw(dt);
     	m_display_timer = 9999999.9f;
-    }
-    // ------------------------------------------------------------------------
-    /** Discards the message. */
-    void discard()
-    {
-    	m_display_timer = -1.0f;
     }
     // ------------------------------------------------------------------------
 };
@@ -267,6 +255,10 @@ public:
 /** List of all messages. */
 Synchronised<std::priority_queue<Message*, std::vector<Message*>,
                    CompareMessages> > g_all_messages;
+
+// ============================================================================
+/** The Storage for a Static Message */
+StaticTextMessage* g_static_message = 0;
 
 // ============================================================================
 /** Add any message to the message queue.
@@ -357,14 +349,11 @@ ProgressBarMessage g_progress_bar_msg;
  *  position of the message. */
 void updatePosition()
 {
+	if (g_static_message != 0)
+		g_static_message->init();
     g_all_messages.lock();
-    bool empty = g_all_messages.getData().empty();
-    if (empty)
-    {
-        g_all_messages.unlock();
-        return;
-    }
-    g_all_messages.getData().top()->init();
+    if (!g_all_messages.getData().empty())
+    	g_all_messages.getData().top()->init();
     g_all_messages.unlock();
 }   // updatePosition
 
@@ -384,18 +373,17 @@ void add(MessageType mt, const irr::core::stringw &message)
 }   // add
 
 // ----------------------------------------------------------------------------
-/** Adds a Text message to the message queue which has to be discarded manually.
+/** Adds a Text message which has to be discarded or overridden manually.
+ *  It is only possible to show one static Message at a time!
  *  \param mt The MessageType of the message.
  *  \param message The actual message.
- *  \param msg_id the id for the Message, necessary to dicard it.
  */
-void addStatic(MessageType mt, const irr::core::stringw &message, const irr::core::stringw &msg_id)
+void addStatic(MessageType mt, const irr::core::stringw &message)
 {
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())
         return;
-    Message *m = new StaticTextMessage(mt, message, msg_id);
-    privateAdd(m);
+    g_static_message = new StaticTextMessage(mt, message);
 #endif
 }   // addStatic
 
@@ -413,23 +401,24 @@ void update(float dt)
         return;
 
     if (!g_container)
+    {
         g_container = new SkinWidgetContainer();
+	}
+
+	if (g_static_message != 0)
+		g_static_message->draw(dt);
 
     g_all_messages.lock();
-    bool empty = g_all_messages.getData().empty();
-    if (empty)
+    if (!g_all_messages.getData().empty())
     {
-        g_all_messages.unlock();
-        return;
-    }
+		Message* current = g_all_messages.getData().top();
+	    current->draw(dt);
 
-    Message* current = g_all_messages.getData().top();
-    current->draw(dt);
-
-    if (current->canBeRemoved())
-    {
-        g_all_messages.getData().pop();
-        current->remove();
+		if (current->canBeRemoved())
+		{
+		    g_all_messages.getData().pop();
+		    current->remove();
+		}
     }
     g_all_messages.unlock();
 #endif
@@ -453,12 +442,12 @@ void showProgressBar(int progress, const core::stringw& msg)
 }   // showProgressBar
 
 // ----------------------------------------------------------------------------
-/** Remove an static Message from the queue.
- *  \param msg_id the id for the Message.
+/** Remove the static Message from display.
  */
-void discardStatic(const core::stringw &msg_id)
+void discardStatic()
 {
 #ifndef SERVER_ONLY
+	g_static_message = 0;
 #endif
 }	// discardStatic
 
