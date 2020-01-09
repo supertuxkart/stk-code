@@ -37,6 +37,10 @@ namespace MessageQueue
 // ============================================================================
 /** The label widget used to show the current message. */
 SkinWidgetContainer* g_container = NULL;
+SkinWidgetContainer* g_static_container = NULL;
+
+/** Stores the height of an static container to allow showing both. */
+int s_msg_raise = 0;
 
 // ============================================================================
 /** A base class for any messages. */
@@ -98,10 +102,15 @@ protected:
 
     /** Drawing rectangle of text layout. */
     core::recti m_text_rect;
+
+	/** A pointer to the Container for the Message */
+    SkinWidgetContainer* m_container;
+
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         Message(5.0f)
     {
+    	m_container = g_container;
         m_message_type = mt;
         m_message      = message;
         assert(mt != MessageQueue::MT_PROGRESS);
@@ -181,6 +190,9 @@ public:
         m_area = irr::core::recti(x, y, x + total_width, y + dim.Height);
         m_text_rect = core::recti(x, y, x + left_icon_size + total_width,
             y + dim.Height);
+
+        if (m_container == g_static_container)
+        	s_msg_raise = int(dim.Height) + font->getHeightPerLine() / 10;
     }
     // ------------------------------------------------------------------------
     /** Draw the message. */
@@ -192,10 +204,13 @@ public:
             return;
         }
         Message::draw(dt);
+        int pos_transform = 0;
+        if (m_container == g_container)
+			pos_transform = s_msg_raise;
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
-            irr_driver->getDevice()->getMovedHeight());
-        GUIEngine::getSkin()->drawMessage(g_container, m_area - raise,
+            irr_driver->getDevice()->getMovedHeight() + pos_transform);
+        GUIEngine::getSkin()->drawMessage(m_container, m_area - raise,
             m_render_type);
         GUIEngine::getFont()->draw(m_gls, m_text_rect - raise,
             GUIEngine::getSkin()->getColor("text::neutral"), true/*hcenter*/);
@@ -211,6 +226,7 @@ public:
 	StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         TextMessage(mt, message)
     {
+    	m_container = g_static_container;
         m_message_type = mt;
         m_message      = message;
         assert(mt != MessageQueue::MT_PROGRESS);
@@ -404,6 +420,10 @@ void update(float dt)
     {
         g_container = new SkinWidgetContainer();
 	}
+	if (!g_static_container)
+    {
+        g_static_container = new SkinWidgetContainer();
+	}
 
 	if (g_static_message != 0)
 		g_static_message->draw(dt);
@@ -448,6 +468,7 @@ void discardStatic()
 {
 #ifndef SERVER_ONLY
 	g_static_message = 0;
+	s_msg_raise = 0;
 #endif
 }	// discardStatic
 
