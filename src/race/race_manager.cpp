@@ -27,6 +27,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -805,6 +806,8 @@ void RaceManager::exitRace(bool delete_world)
 {
     // Only display the grand prix result screen if all tracks
     // were finished, and not when a race is aborted.
+    MessageQueue::discardStatic();
+
     if ( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
          m_track_number==(int)m_tracks.size()   )
     {
