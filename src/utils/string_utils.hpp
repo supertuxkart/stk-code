@@ -47,7 +47,6 @@ namespace StringUtils
     std::string removeExtension(const std::string& filename);
     std::string getExtension(const std::string& filename);
 
-    bool notEmpty(const irr::core::stringw& input);
     std::string ticksTimeToString(int time);
     std::string timeToString(float time, unsigned int precision=2,
                              bool display_minutes_if_zero = true, bool display_hours = false);
