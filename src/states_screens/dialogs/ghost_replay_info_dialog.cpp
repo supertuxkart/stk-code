@@ -205,7 +205,7 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(rd.m_laps), -1, 3, true));
         row.push_back(GUIEngine::ListWidget::ListCell
-            (StringUtils::toWString(rd.m_min_time) + L"s", -1, 3, true));
+            (StringUtils::toWString(StringUtils::timeToString(rd.m_min_time)), -1, 3, true));
         row.push_back(GUIEngine::ListWidget::ListCell
             ("", icon, 1, true));
         row.push_back(GUIEngine::ListWidget::ListCell
