@@ -399,6 +399,7 @@ void addStatic(MessageType mt, const irr::core::stringw &message)
 #ifndef SERVER_ONLY
     if (ProfileWorld::isNoGraphics())
         return;
+    delete g_static_message;
     g_static_message = new StaticTextMessage(mt, message);
 #endif
 }   // addStatic
@@ -467,7 +468,7 @@ void showProgressBar(int progress, const core::stringw& msg)
 void discardStatic()
 {
 #ifndef SERVER_ONLY
-    g_static_message = 0;
+    delete g_static_message;
     s_msg_raise = 0;
 #endif
 }    // discardStatic
