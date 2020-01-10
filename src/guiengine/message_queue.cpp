@@ -274,7 +274,7 @@ Synchronised<std::priority_queue<Message*, std::vector<Message*>,
 
 // ============================================================================
 /** The Storage for a Static Message */
-StaticTextMessage* g_static_message = 0;
+StaticTextMessage* g_static_message = NULL;
 
 // ============================================================================
 /** Add any message to the message queue.
@@ -400,7 +400,7 @@ void addStatic(MessageType mt, const irr::core::stringw &message)
     if (ProfileWorld::isNoGraphics())
         return;
     delete g_static_message;
-    g_static_message = 0;
+    g_static_message = NULL;
     g_static_message = new StaticTextMessage(mt, message);
 #endif
 }   // addStatic
@@ -470,7 +470,7 @@ void discardStatic()
 {
 #ifndef SERVER_ONLY
     delete g_static_message;
-    g_static_message = 0;
+    g_static_message = NULL;
     s_msg_raise = 0;
 #endif
 }    // discardStatic
@@ -482,7 +482,7 @@ void clear()
 {
 #ifndef SERVER_ONLY
     delete g_static_message;
-    g_static_message = 0;
+    g_static_message = NULL;
     g_all_messages.lock();
     while (!g_all_messages.getData().empty())
     {
@@ -491,6 +491,21 @@ void clear()
         g_all_messages.getData().pop();
     }
     g_all_messages.unlock();
+#endif
+}
+
+// ----------------------------------------------------------------------------
+/** Reset global variables (for clear starting in android).
+ */
+void resetGlobalVariables()
+{
+#ifndef SERVER_ONLY
+    g_container = NULL;
+    g_static_container = NULL;
+    g_static_message = NULL;
+    s_msg_raise = 0;
+    while (!g_all_messages.getData().empty())
+        g_all_messages.getData().pop();
 #endif
 }
 

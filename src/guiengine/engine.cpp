@@ -1047,6 +1047,7 @@ namespace GUIEngine
         g_loaded_screens.m_contents_vector.clear();
         g_current_screen = NULL;
         gui_messages.clear();
+        MessageQueue::resetGlobalVariables();
 #ifdef ANDROID
         m_gui_functions.clear();
 #endif
