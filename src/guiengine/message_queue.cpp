@@ -400,6 +400,7 @@ void addStatic(MessageType mt, const irr::core::stringw &message)
     if (ProfileWorld::isNoGraphics())
         return;
     delete g_static_message;
+    g_static_message = 0;
     g_static_message = new StaticTextMessage(mt, message);
 #endif
 }   // addStatic
@@ -469,6 +470,7 @@ void discardStatic()
 {
 #ifndef SERVER_ONLY
     delete g_static_message;
+    g_static_message = 0;
     s_msg_raise = 0;
 #endif
 }    // discardStatic
@@ -479,6 +481,7 @@ void discardStatic()
 void clear()
 {
 #ifndef SERVER_ONLY
+    delete g_static_message;
     g_static_message = 0;
     g_all_messages.lock();
     while (!g_all_messages.getData().empty())
