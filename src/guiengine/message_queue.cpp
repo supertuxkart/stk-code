@@ -103,14 +103,14 @@ protected:
     /** Drawing rectangle of text layout. */
     core::recti m_text_rect;
 
-	/** A pointer to the Container for the Message */
+    /** A pointer to the Container for the Message */
     SkinWidgetContainer* m_container;
 
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         Message(5.0f)
     {
-    	m_container = g_container;
+        m_container = g_container;
         m_message_type = mt;
         m_message      = message;
         assert(mt != MessageQueue::MT_PROGRESS);
@@ -192,7 +192,7 @@ public:
             y + dim.Height);
 
         if (m_container == g_static_container)
-        	s_msg_raise = int(dim.Height) + font->getHeightPerLine() / 10;
+            s_msg_raise = int(dim.Height) + font->getHeightPerLine() / 10;
     }
     // ------------------------------------------------------------------------
     /** Draw the message. */
@@ -206,7 +206,7 @@ public:
         Message::draw(dt);
         int pos_transform = 0;
         if (m_container == g_container)
-			pos_transform = s_msg_raise;
+            pos_transform = s_msg_raise;
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
             irr_driver->getDevice()->getMovedHeight() + pos_transform);
@@ -223,10 +223,10 @@ public:
 class StaticTextMessage : public TextMessage
 {
 public:
-	StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
+    StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         TextMessage(mt, message)
     {
-    	m_container = g_static_container;
+        m_container = g_static_container;
         m_message_type = mt;
         m_message      = message;
         assert(mt != MessageQueue::MT_PROGRESS);
@@ -247,8 +247,8 @@ public:
     /** Draw the message. */
     virtual void draw(float dt)
     {
-    	TextMessage::draw(dt);
-    	m_display_timer = 9999999.9f;
+        TextMessage::draw(dt);
+        m_display_timer = 9999999.9f;
     }
     // ------------------------------------------------------------------------
 };
@@ -365,11 +365,11 @@ ProgressBarMessage g_progress_bar_msg;
  *  position of the message. */
 void updatePosition()
 {
-	if (g_static_message != 0)
-		g_static_message->init();
+    if (g_static_message != 0)
+        g_static_message->init();
     g_all_messages.lock();
     if (!g_all_messages.getData().empty())
-    	g_all_messages.getData().top()->init();
+        g_all_messages.getData().top()->init();
     g_all_messages.unlock();
 }   // updatePosition
 
@@ -419,26 +419,26 @@ void update(float dt)
     if (!g_container)
     {
         g_container = new SkinWidgetContainer();
-	}
-	if (!g_static_container)
+    }
+    if (!g_static_container)
     {
         g_static_container = new SkinWidgetContainer();
-	}
+    }
 
-	if (g_static_message != 0)
-		g_static_message->draw(dt);
+    if (g_static_message != 0)
+        g_static_message->draw(dt);
 
     g_all_messages.lock();
     if (!g_all_messages.getData().empty())
     {
-		Message* current = g_all_messages.getData().top();
-	    current->draw(dt);
+        Message* current = g_all_messages.getData().top();
+        current->draw(dt);
 
-		if (current->canBeRemoved())
-		{
-		    g_all_messages.getData().pop();
-		    current->remove();
-		}
+        if (current->canBeRemoved())
+        {
+            g_all_messages.getData().pop();
+            current->remove();
+        }
     }
     g_all_messages.unlock();
 #endif
@@ -467,10 +467,10 @@ void showProgressBar(int progress, const core::stringw& msg)
 void discardStatic()
 {
 #ifndef SERVER_ONLY
-	g_static_message = 0;
-	s_msg_raise = 0;
+    g_static_message = 0;
+    s_msg_raise = 0;
 #endif
-}	// discardStatic
+}    // discardStatic
 
 // ----------------------------------------------------------------------------
 /** Clear all message, called when destroying the GUIEngine.
@@ -478,7 +478,7 @@ void discardStatic()
 void clear()
 {
 #ifndef SERVER_ONLY
-	g_static_message = 0;
+    g_static_message = 0;
     g_all_messages.lock();
     while (!g_all_messages.getData().empty())
     {

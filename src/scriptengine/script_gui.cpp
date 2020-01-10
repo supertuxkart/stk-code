@@ -56,10 +56,11 @@ namespace Scripting
 
         enum MsgType
         {
-        	MSG_GENERIC = 0,
-        	MSG_ERROR = 1,
-        	MSG_ACHIEVEMENT = 2,
-        	MSG_FRIEND = 3
+
+            MSG_FRIEND = 0,
+            MSG_ACHIEVEMENT = 1,
+            MSG_GENERIC = 2,
+            MSG_ERROR = 3
         };
 
         /** \addtogroup Scripting
@@ -90,25 +91,25 @@ namespace Scripting
         /** Display a Message using MessageQueue (enum GUI::MsgType)*/
         void displayMessage(std::string* input, int Enum_value)
         {
-			irr::core::stringw msg = StringUtils::utf8ToWide(*input);
-			MsgType msg_type = (MsgType)Enum_value;
-			MessageQueue::MessageType type;
-			switch (msg_type)
-			{
-				case MSG_ERROR:
-					type = MessageQueue::MT_ERROR;
-					break;
-				case MSG_FRIEND:
-					type = MessageQueue::MT_FRIEND;
-					break;
-				case MSG_ACHIEVEMENT:
-					type = MessageQueue::MT_ACHIEVEMENT;
-					break;
-				default:
-					type = MessageQueue::MT_GENERIC;
-					break;
-			}
-			MessageQueue::add(type, msg);
+            irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+            MsgType msg_type = (MsgType)Enum_value;
+            MessageQueue::MessageType type;
+            switch (msg_type)
+            {
+                case MSG_ERROR:
+                    type = MessageQueue::MT_ERROR;
+                    break;
+                case MSG_FRIEND:
+                    type = MessageQueue::MT_FRIEND;
+                    break;
+                case MSG_ACHIEVEMENT:
+                    type = MessageQueue::MT_ACHIEVEMENT;
+                    break;
+                default:
+                    type = MessageQueue::MT_GENERIC;
+                    break;
+            }
+            MessageQueue::add(type, msg);
         }
 
         /** Displays an static Message. (enum GUI::MsgType)
@@ -117,30 +118,30 @@ namespace Scripting
          */
         void displayStaticMessage(std::string* input, int Enum_value)
         {
-        	irr::core::stringw msg = StringUtils::utf8ToWide(*input);
-			MsgType msg_type = (MsgType)Enum_value;
-			MessageQueue::MessageType type;
-			switch (msg_type)
-			{
-				case MSG_ERROR:
-					type = MessageQueue::MT_ERROR;
-					break;
-				case MSG_FRIEND:
-					type = MessageQueue::MT_FRIEND;
-					break;
-				case MSG_ACHIEVEMENT:
-					type = MessageQueue::MT_ACHIEVEMENT;
-					break;
-				default:
-					type = MessageQueue::MT_GENERIC;
-					break;
-			}
-        	MessageQueue::addStatic(type, msg);
+            irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+            MsgType msg_type = (MsgType)Enum_value;
+            MessageQueue::MessageType type;
+            switch (msg_type)
+            {
+                case MSG_ERROR:
+                    type = MessageQueue::MT_ERROR;
+                    break;
+                case MSG_FRIEND:
+                    type = MessageQueue::MT_FRIEND;
+                    break;
+                case MSG_ACHIEVEMENT:
+                    type = MessageQueue::MT_ACHIEVEMENT;
+                    break;
+                default:
+                    type = MessageQueue::MT_GENERIC;
+                    break;
+            }
+            MessageQueue::addStatic(type, msg);
         }
 
         void discardStaticMessage()
         {
-        	MessageQueue::discardStatic();
+            MessageQueue::discardStatic();
         }
 
         void clearOverlayMessages()
@@ -293,7 +294,7 @@ namespace Scripting
                                                   : asFUNCTION(proxy_displayMessageAndInsertValues1),
                                                call_conv); assert(r >= 0);
 
-			r = engine->RegisterGlobalFunction("void displayStaticMessage(const string &in)",
+            r = engine->RegisterGlobalFunction("void displayStaticMessage(const string &in)",
                                                mp ? WRAP_FN(proxy_displayStaticMessage) : asFUNCTION(proxy_displayStaticMessage),
                                                call_conv); assert(r >= 0);
 
