@@ -136,17 +136,17 @@ when the border that intersect at this corner are enabled.
 <element type="verticalTab" state="neutral" image="glasstab_vert.png"
       left_border="16" right_border="16" top_border="10" bottom_border="10"
       hborder_out_portion="0.0" vborder_out_portion="0.0"
-      h_inner_padding="-1" v_inner_padding="-1" h_margin="0" v_margin="2" />
+      h_inner_padding="-1" v_inner_padding="-1" h_margin="0" v_margin="0" />
       
 <element type="verticalTab" state="focused" image="glasstab_vert_focus.png"
       left_border="16" right_border="16" top_border="10" bottom_border="10"
       hborder_out_portion="0.0" vborder_out_portion="0.0"
-      h_inner_padding="-1" v_inner_padding="-1" h_margin="0" v_margin="2" />
+      h_inner_padding="-1" v_inner_padding="-1" h_margin="0" v_margin="0" />
 
 <element type="verticalTab" state="down" image="glasstab_vert_down.png"
       left_border="16" right_border="16" top_border="10" bottom_border="10"
       hborder_out_portion="0.0" vborder_out_portion="0.0"
-      h_inner_padding="-1" v_inner_padding="-1" h_margin="0" v_margin="2" />
+      h_inner_padding="-1" v_inner_padding="-1" h_margin="0" v_margin="0" />
 
 <!-- Stateless -->
 <element type="squareFocusHaloBW" common="y" image="glass_square_focused_bw.png"
