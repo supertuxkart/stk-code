@@ -140,7 +140,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Improvements to ghost replays (more data saved, live time difference, replay comparison, egg hunt replays) by Alayan
 * Kart color customization by Benau
 * Multithreading contention fixes by Benau
-* Local multiplayer improvements by Fantasmos
+* Local multiplayer improvements by Ben Krajancic
 * Major revamp of the achievement system to make adding new achievements much easier and flexible, also fixing some related bugs by Alayan
 * Store up to 5 highscores for a track/difficulty/mode/kart number combination, instead of 3
 * Smooth turning for non-keyboard inputs for improved consistency between input mode by deveee
