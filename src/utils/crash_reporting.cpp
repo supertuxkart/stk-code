@@ -342,6 +342,10 @@
     #include <execinfo.h>
     #include <bfd.h>
 
+    #if defined(__FreeBSD__)
+    #include <sys/sysctl.h>
+    #endif
+
     #include "string_utils.hpp"
 
     namespace CrashReporting
@@ -411,7 +415,18 @@
 
         void loadSTKBFD()
         {
-            const char* path = realpath("/proc/self/exe", NULL);
+            char *path = NULL;
+#if defined(__linux__)
+            path = realpath("/proc/self/exe", NULL);
+#elif defined(__FreeBSD__)
+            int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
+            size_t len = PATH_MAX;
+            path = (char*)malloc(PATH_MAX+1);
+            if (sysctl(mib, 4, path, &len, NULL, 0) == -1) {
+                free((void*)path);
+                return;
+            }
+#endif
             m_stk_bfd = bfd_openr(path, NULL);
             free((void*)path);
 
