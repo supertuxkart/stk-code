@@ -20,6 +20,7 @@
 	#define GL_GLEXT_PROTOTYPES 1
 #endif
 #if defined(_IRR_OSX_PLATFORM_)
+	#define GL_SILENCE_DEPRECATION
 	#include <OpenGL/gl.h>
 #else
 	#include <GL/gl.h>

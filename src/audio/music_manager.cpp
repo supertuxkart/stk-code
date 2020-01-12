@@ -24,6 +24,7 @@
 
 #ifdef ENABLE_SOUND
 #  ifdef __APPLE__
+#    define OPENAL_DEPRECATED
 #    include <OpenAL/al.h>
 #    include <OpenAL/alc.h>
 #  else

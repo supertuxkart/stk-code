@@ -38,16 +38,6 @@
 #include <limits>
 #include <math.h>
 
-#ifdef ENABLE_SOUND
-#  ifdef __APPLE__
-#    include <OpenAL/al.h>
-#    include <OpenAL/alc.h>
-#  else
-#    include <AL/al.h>
-#    include <AL/alc.h>
-#  endif
-#endif
-
 // Define this if the profiler should also collect data of the sfx manager
 #undef ENABLE_PROFILING_FOR_SFX_MANAGER
 #ifndef ENABLE_PROFILING_FOR_SFX_MANAGER

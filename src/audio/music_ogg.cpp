@@ -21,11 +21,6 @@
 #include "audio/music_ogg.hpp"
 
 #include <stdexcept>
-#ifdef __APPLE__
-#  include <OpenAL/al.h>
-#else
-#  include <AL/al.h>
-#endif
 
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"

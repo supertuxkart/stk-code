@@ -27,12 +27,6 @@
 #include "modes/world.hpp"
 #include "utils/vs.hpp"
 
-#ifdef __APPLE__
-#  include <OpenAL/al.h>
-#else
-#  include <AL/al.h>
-#endif
-
 #include <assert.h>
 #include <cmath>
 #include <stdio.h>

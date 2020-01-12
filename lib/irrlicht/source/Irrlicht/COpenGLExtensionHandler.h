@@ -7,6 +7,7 @@
 
 #include "IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_OPENGL_
+#define GL_SILENCE_DEPRECATION
 
 #include "EDriverFeatures.h"
 #include "irrTypes.h"
