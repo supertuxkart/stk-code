@@ -238,6 +238,7 @@ public:
 private:
 
     bool m_started_from_overworld;
+    std::string m_started_challenge_id;
 
 public:
 
@@ -773,7 +774,17 @@ public:
     {
         return m_started_from_overworld;
     }   // raceWasStartedFromOverworld
-
+    // ----------------------------------------------------------------------------------------
+    std::string getStartedChallengeID() const
+    {
+		assert(m_started_from_overworld);
+		return m_started_challenge_id;
+	}
+	// ----------------------------------------------------------------------------------------
+	void setStartedChallengeID(std::string id)
+	{
+		m_started_challenge_id = id;
+	}
     // ----------------------------------------------------------------------------------------
     /** \name Callbacks from the race classes
      * These methods are to be used by the classes that manage the various

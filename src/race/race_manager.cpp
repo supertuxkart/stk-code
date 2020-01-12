@@ -80,6 +80,7 @@ RaceManager::RaceManager()
     m_track_number       = 0;
     m_coin_target        = 0;
     m_started_from_overworld = false;
+    m_started_challenge_id = "";
     m_have_kart_last_position_on_overworld = false;
     m_num_local_players = 0;
     m_hit_capture_limit = 0;

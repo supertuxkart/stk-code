@@ -269,6 +269,8 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
             }
 
             PlayerManager::getCurrentPlayer()->setCurrentChallenge(m_challenge_id);
+            
+            race_manager->setStartedChallengeID(m_challenge_id);
 
             ModalDialog::dismiss();
 
