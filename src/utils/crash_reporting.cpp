@@ -476,7 +476,7 @@
         void installHandlers()
         {
             loadSTKBFD();
-            struct sigaction sa = {0};
+            struct sigaction sa = {{0}};
             sa.sa_handler = &signalHandler;
             sigemptyset(&sa.sa_mask);
             sa.sa_flags = SA_RESTART;
