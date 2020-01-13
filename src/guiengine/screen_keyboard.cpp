@@ -197,8 +197,6 @@ void ScreenKeyboard::createButtons()
 
     const int margin = 2;
     int height = (m_area.getHeight() - 2 * pos_y) / rows_num - margin;
-    char height_str[100];
-    sprintf(height_str, "%i", height);
 
     for (int i = 0; i < rows_num; i++)
     {
@@ -225,17 +223,21 @@ void ScreenKeyboard::createButtons()
         
         for (int j = 0; j < cols_num; j++)
         {
+            ButtonWidget* button = new ButtonWidget();
+
             float width = (float)total_width * layout_proportions[i][j] 
                                              / total_proportions - margin;
             
             char width_str[100];
-            sprintf(width_str, "%i", (int)roundf(width));
+            sprintf(width_str, "%i", (int)roundf(width / (SkinConfig::getHorizontalInnerPadding(button->getType(), button)+1.0f)));
+
+            char height_str[100];
+            sprintf(height_str, "%i", (int)roundf(height / (SkinConfig::getVerticalInnerPadding(button->getType(), button)+1.0f)));
             
             char tmp[100];
             sprintf(tmp, "%i", (int)roundf(pos_x));
             std::string pos_x_str = tmp;
             
-            ButtonWidget* button = new ButtonWidget();
             button->setParent(m_irrlicht_window);
             button->m_properties[PROP_WIDTH] = width_str;
             button->m_properties[PROP_HEIGHT] = height_str;

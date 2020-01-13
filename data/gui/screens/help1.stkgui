@@ -7,7 +7,7 @@
 
         <div width="100%" height="91%" layout="horizontal-row" >
 
-            <vertical-tabs id="category" height="100%" width="18%">
+            <vertical-tabs id="category" height="100%" width="20%">
                 <icon-button id="page1" width="128" height="128" icon="gui/icons/options_general.png"
                         I18N="Tab in help menu" text="General"/>
                 <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
@@ -26,12 +26,14 @@
 
             <spacer width="2%" height="100%"/>
 
-            <box width="80%" height="100%" layout="vertical-row">
+            <box width="78%" height="100%" layout="vertical-row">
 
                 <spacer width="5" height="1%"/>
-                <div width="50%" height="7%" align="center" layout="horizontal-row">
-                    <icon id="tutorialIcon" width="8%" height="100%" align="center" icon="gui/icons/tutorial.png"/>
-                    <button id="startTutorial" align="center" text="Start the tutorial"/>
+                <div width="70%" height="fit" align="left" layout="horizontal-row">
+                    <spacer proportion="1"/>
+                    <icon id="tutorialIcon" height="100%" icon="gui/icons/tutorial.png"/>
+                    <button id="startTutorial" text="Start the tutorial"/>
+                    <spacer proportion="1"/>
                 </div>
                 <spacer width="5" height="2%"/>
 

@@ -68,6 +68,8 @@ namespace SkinConfig
         bool common_img = false;
         int leftborder = 0, rightborder=0, topborder=0, bottomborder=0;
         float hborder_out_portion = 0.5f, vborder_out_portion = 1.0f;
+        float horizontal_inner_padding = 0.0f, vertical_inner_padding = 0.0f;
+        float horizontal_margin = 0.0f, vertical_margin = 0.0f;
         bool preserve_h_aspect_ratios = false;
         std::string areas;
 
@@ -92,6 +94,12 @@ namespace SkinConfig
         node->get("hborder_out_portion", &hborder_out_portion);
         node->get("vborder_out_portion", &vborder_out_portion);
 
+        node->get("h_inner_padding", &horizontal_inner_padding);
+        node->get("v_inner_padding", &vertical_inner_padding);
+        
+        node->get("h_margin", &horizontal_margin);
+        node->get("v_margin", &vertical_margin);
+
         node->get("preserve_h_aspect_ratios", &preserve_h_aspect_ratios);
 
         node->get("areas", &areas);
@@ -104,6 +112,10 @@ namespace SkinConfig
         new_param.m_bottom_border = bottomborder;
         new_param.m_hborder_out_portion = hborder_out_portion;
         new_param.m_vborder_out_portion = vborder_out_portion;
+        new_param.m_horizontal_inner_padding = horizontal_inner_padding;
+        new_param.m_vertical_inner_padding = vertical_inner_padding;
+        new_param.m_horizontal_margin = horizontal_margin;
+        new_param.m_vertical_margin = vertical_margin;
         new_param.m_preserve_h_aspect_ratios = preserve_h_aspect_ratios;
 
         // call last since it calculates coords considering all other
@@ -268,7 +280,113 @@ namespace SkinConfig
 
         delete root;
     }   // loadFromFile
-};   // SkinConfig
+
+    // ------------------------------------------------------------------------
+    float getVerticalInnerPadding(int wtype, Widget* widget)
+    {
+        if (widget != nullptr)
+        {
+            RibbonWidget* ribbon = (RibbonWidget*)widget;
+            RibbonType rtype = ribbon->getRibbonType();
+
+            return getInnerPadding(wtype, rtype, VERTICAL);
+        }
+        else
+            return getInnerPadding(wtype, 0, VERTICAL);
+    } // getVerticalInnerPadding
+
+    // ------------------------------------------------------------------------
+    float getHorizontalInnerPadding(int wtype, Widget* widget)
+    {
+        if (widget != nullptr)
+        {
+            RibbonWidget* ribbon = (RibbonWidget*)widget;
+            RibbonType rtype = ribbon->getRibbonType();
+
+            return getInnerPadding(wtype, rtype, HORIZONTAL);
+        }
+        else
+            return getInnerPadding(wtype, 0, HORIZONTAL);
+    } // getHorizontalInnerPadding
+
+    // ------------------------------------------------------------------------
+    float getInnerPadding(int wtype, int rtype, int axis)
+    {
+        return getValue(PADDING, wtype, rtype, axis);
+    } // getInnerPadding
+
+    // ------------------------------------------------------------------------
+    float getValue(int value_type, int widget_type, int ribbon_type, int axis)
+    {
+        std::string state = "neutral"; //FIXME: support all states?
+        std::string type = "";
+
+        switch (widget_type)
+        {
+            case WTYPE_SPINNER:     type = "spinner"; break;
+            case WTYPE_BUTTON:      type = "button"; break;
+            case WTYPE_CHECKBOX:    type = "checkbox"; state = "neutral+unchecked"; break;
+            case WTYPE_BUBBLE:      type = "textbubble"; break;
+            case WTYPE_LIST:        type = "list"; break;
+            case WTYPE_PROGRESS:    type = "progress"; break;
+            case WTYPE_RATINGBAR:   type = "rating"; break;
+            case WTYPE_RIBBON:
+                if (ribbon_type == RIBBON_VERTICAL_TABS)
+                    type = "verticalTab";
+                else if (ribbon_type == RIBBON_TABS)
+                    type = "tab";
+                break;
+            default: return 0.0f; // Widget type not supported
+        }
+
+        if (value_type == PADDING)
+        {
+            if (axis == HORIZONTAL)
+                return m_render_params[type+"::"+state].m_horizontal_inner_padding;
+            else if (axis == VERTICAL)
+                return m_render_params[type+"::"+state].m_vertical_inner_padding;
+            else
+            {
+                Log::error("GUI", "Invalid axis type passed to getValue!");
+                return 0.0f;
+            }
+        }
+        else if (value_type == BORDER)
+        {
+            if (axis == LEFT)
+                return m_render_params[type+"::"+state].m_left_border;
+            else if (axis == RIGHT)
+                return m_render_params[type+"::"+state].m_right_border;
+            else if (axis == TOP)
+                return m_render_params[type+"::"+state].m_top_border;
+            else if (axis == BOTTOM)
+                return m_render_params[type+"::"+state].m_bottom_border;
+            else
+            {
+                Log::error("GUI", "Invalid axis type passed to getValue!");
+                return 0.0f;
+            }
+        }
+        else if (value_type == MARGIN)
+        {
+            if (axis == HORIZONTAL)
+                return m_render_params[type+"::"+state].m_horizontal_margin;
+            else if (axis == VERTICAL)
+                return m_render_params[type+"::"+state].m_vertical_margin;
+            else
+            {
+                Log::error("GUI", "Invalid axis type passed to getValue!");
+                return 0.0f;
+            }
+        }
+        else
+        {
+            Log::error("GUI", "Invalid value_type passed to getValue!");
+            return 0.0f;
+        }
+    } // getValue
+
+};   // Namespace SkinConfig
 
 namespace GUIEngine
 {
@@ -294,6 +412,11 @@ BoxRenderParams::BoxRenderParams()
 
     m_hborder_out_portion = 0.5;
     m_vborder_out_portion = 1.0;
+
+    m_horizontal_margin = 0.0f;
+    m_vertical_margin = 0.0f;
+    m_horizontal_inner_padding = 0.0f;
+    m_vertical_inner_padding = 0.0f;
 
     areas = BODY | LEFT | RIGHT | TOP | BOTTOM;
     m_vertical_flip = false;
@@ -498,6 +621,12 @@ void Skin::drawMessage(SkinWidgetContainer* w, const core::recti &dest,
 {
     drawBoxFromStretchableTexture(w, dest, SkinConfig::m_render_params[type]);
 }   // drawMessage
+
+// ----------------------------------------------------------------------------
+float Skin::getScalingFactor(std::string params, float height)
+{
+    return height / SkinConfig::m_render_params[params].getImage()->getSize().Height;
+}   // getScalingFactor
 
 // ----------------------------------------------------------------------------
 void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,

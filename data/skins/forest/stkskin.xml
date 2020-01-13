@@ -118,29 +118,35 @@ when the border that intersect at this corner are enabled.
       
       
 <element type="tab" state="neutral" image="glasstab.png"
-      left_border="75" right_border="75" top_border="0" bottom_border="15"
-      hborder_out_portion="0.2" />
+      left_border="11" right_border="11" top_border="6" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
       
 <element type="tab" state="focused" image="glasstab_focus.png"
-      left_border="75" right_border="75" top_border="0" bottom_border="15"
-      hborder_out_portion="0.2" />
+      left_border="11" right_border="11" top_border="6" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
 
-<element type="tab" state="down" image="glasstab_down.png"
-      left_border="75" right_border="75" top_border="0" bottom_border="15"
-      hborder_out_portion="0.2" />
+<element type="tab" state="down" image="glasstab.png"
+      left_border="11" right_border="11" top_border="6" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
 
 
 <element type="verticalTab" state="neutral" image="glasstab_vert.png"
-      left_border="75" right_border="75" top_border="10" bottom_border="10"
-      hborder_out_portion="0.2" />
+      left_border="10" right_border="10" top_border="10" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
       
 <element type="verticalTab" state="focused" image="glasstab_vert_focus.png"
-      left_border="75" right_border="75" top_border="10" bottom_border="10"
-      hborder_out_portion="0.2" />
+      left_border="10" right_border="10" top_border="10" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
 
-<element type="verticalTab" state="down" image="glasstab_vert_down.png"
-      left_border="75" right_border="75" top_border="10" bottom_border="10"
-      hborder_out_portion="0.2" />
+<element type="verticalTab" state="down" image="glasstab_vert.png"
+      left_border="10" right_border="10" top_border="10" bottom_border="10"
+      preserve_h_aspect_ratios="false" hborder_out_portion="0.0" vborder_out_portion="0.0"
+      h_inner_padding="0" v_inner_padding="0" h_margin="0" v_margin="0" />
 
 <!-- Stateless -->
 <element type="squareFocusHaloBW" common="y" image="glass_square_focused_bw.png"

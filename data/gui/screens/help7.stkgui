@@ -7,7 +7,7 @@
 
         <div width="100%" height="91%" layout="horizontal-row" >
 
-            <vertical-tabs id="category" height="100%" width="18%">
+            <vertical-tabs id="category" height="100%" width="20%">
                 <icon-button id="page1" width="128" height="128" icon="gui/icons/options_general.png"
                         I18N="Tab in help menu" text="General"/>
                 <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
@@ -26,7 +26,7 @@
 
             <spacer width="2%" height="100%"/>
 
-            <box width="80%" height="100%" layout="vertical-row">
+            <box width="78%" height="100%" layout="vertical-row">
                 <label align="center" I18N="In the help menu" text="SuperTuxKart can be played in multiplayer mode online...:"/>
                 <div width="100%" proportion="2" layout="horizontal-row">
                     <icon align="center" width="8%" height="100%" icon="gui/icons/networking_icon.png"/>

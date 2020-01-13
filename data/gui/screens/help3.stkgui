@@ -7,7 +7,7 @@
 
         <div width="100%" height="91%" layout="horizontal-row" >
 
-            <vertical-tabs id="category" height="100%" width="18%">
+            <vertical-tabs id="category" height="100%" width="20%">
                 <icon-button id="page1" width="128" height="128" icon="gui/icons/options_general.png"
                         I18N="Tab in help menu" text="General"/>
                 <icon-button id="page2" width="128" height="128" icon="gui/icons/mode_ftl.png"
@@ -26,7 +26,7 @@
 
             <spacer width="2%" height="100%"/>
 
-            <box width="80%" height="100%" layout="vertical-row">
+            <box width="78%" height="100%" layout="vertical-row">
                 <spacer height="1%" width="10"/>
                 <label align="center" word_wrap="true" I18N="In the help menu" text="To help you win, there are some powerups you can collect:"/>
                 <spacer height="2%" width="10"/>

@@ -23,6 +23,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/layout_manager.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/skin.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
@@ -160,6 +161,18 @@ void RibbonWidget::add()
     //        so care must be taken to not break things
     for (int i=0; i<subbuttons_amount; i++)
     {
+        // Get these ints for easy later use
+        const int HORZ_MARGIN  = round(SkinConfig::getValue(SkinConfig::MARGIN, WTYPE_RIBBON, getRibbonType(), SkinConfig::HORIZONTAL));
+        const int VERT_MARGIN  = round(SkinConfig::getValue(SkinConfig::MARGIN, WTYPE_RIBBON, getRibbonType(), SkinConfig::VERTICAL));
+
+        int TOP_BORDER    = round(SkinConfig::getValue(SkinConfig::BORDER, WTYPE_RIBBON, getRibbonType(), SkinConfig::TOP));
+        int BOTTOM_BORDER = round(SkinConfig::getValue(SkinConfig::BORDER, WTYPE_RIBBON, getRibbonType(), SkinConfig::BOTTOM));
+        int LEFT_BORDER   = round(SkinConfig::getValue(SkinConfig::BORDER, WTYPE_RIBBON, getRibbonType(), SkinConfig::LEFT));
+        int RIGHT_BORDER  = round(SkinConfig::getValue(SkinConfig::BORDER, WTYPE_RIBBON, getRibbonType(), SkinConfig::RIGHT));
+
+        int HORZ_PADDING  = round(SkinConfig::getValue(SkinConfig::PADDING, WTYPE_RIBBON, getRibbonType(), SkinConfig::HORIZONTAL));
+        int VERT_PADDING  = round(SkinConfig::getValue(SkinConfig::PADDING, WTYPE_RIBBON, getRibbonType(), SkinConfig::VERTICAL));
+
         // ---- tab ribbons
         if (getRibbonType() == RIBBON_TABS)
         {
@@ -182,81 +195,102 @@ void RibbonWidget::add()
                 else widget_x += large_tab/2;
             }
 
-            IGUIButton * subbtn = NULL;
-            rect<s32> subsize = rect<s32>(widget_x - large_tab/2+2,  0,
-                                          widget_x + large_tab/2-2,  m_h);
+            IGUIButton * tab = NULL;
+
+            rect<s32> tab_rect_abs;
 
             if (message.size() == 0)
             {
-                subsize = rect<s32>(widget_x - small_tab/2+2,  0,
-                                    widget_x + small_tab/2-2,  m_h);
+                tab_rect_abs = rect<s32>(widget_x - small_tab/2 + HORZ_MARGIN, VERT_MARGIN,
+                                         widget_x + small_tab/2 - HORZ_MARGIN, m_h - VERT_MARGIN);
+            }
+            else
+            {
+                tab_rect_abs = rect<s32>(widget_x - large_tab/2 + HORZ_MARGIN, VERT_MARGIN,
+                                         widget_x + large_tab/2 - HORZ_MARGIN, m_h - VERT_MARGIN);
             }
 
-            if (m_active_children[i].m_type == WTYPE_BUTTON)
-            {
-                subbtn = GUIEngine::getGUIEnv()
-                       ->addButton(subsize, btn, getNewNoFocusID(),
-                                   message.c_str(), L"");
-                subbtn->setTabStop(false);
-                subbtn->setTabGroup(false);
+            // Once height is available to us, adjust for scaling
+            TOP_BORDER    = round( GUIEngine::getSkin()->getScalingFactor("tab::neutral", tab_rect_abs.getHeight()) * (float)TOP_BORDER    );
+            BOTTOM_BORDER = round( GUIEngine::getSkin()->getScalingFactor("tab::neutral", tab_rect_abs.getHeight()) * (float)BOTTOM_BORDER );
+            LEFT_BORDER   = round( GUIEngine::getSkin()->getScalingFactor("tab::neutral", tab_rect_abs.getHeight()) * (float)LEFT_BORDER   );
+            RIGHT_BORDER  = round( GUIEngine::getSkin()->getScalingFactor("tab::neutral", tab_rect_abs.getHeight()) * (float)RIGHT_BORDER  );
 
-                if ((int)GUIEngine::getFont()->getDimension(message.c_str())
-                                              .Width > subsize.getWidth()  &&
-                    message.findFirst(L' ') == -1                          &&
-                    message.findFirst(L'\u00AD') == -1                        )
-                {
-                    // if message too long and contains no space and no soft
-                    // hyphen, make the font smaller
-                    subbtn->setOverrideFont(GUIEngine::getSmallFont());
-                }
-            }
-            else if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
+            HORZ_PADDING  = round( GUIEngine::getSkin()->getScalingFactor("tab::neutral", tab_rect_abs.getHeight()) * (float)HORZ_PADDING );
+            VERT_PADDING  = round( GUIEngine::getSkin()->getScalingFactor("tab::neutral", tab_rect_abs.getHeight()) * (float)VERT_PADDING );
+
+            // Automatically guess from position on-screen if tabs go up or down
+            RibbonFlip flip = getRibbonFlip();
+            bool vertical_flip = (unsigned int)widget_size.UpperLeftCorner.Y <
+                                 irr_driver->getActualScreenSize().Height / 2;
+            // Force flip direction when the direction is defined
+            if(flip == FLIP_UP_LEFT)
+                vertical_flip = true;
+            else if(flip == FLIP_DOWN_RIGHT)
+                vertical_flip = false;
+
+            if (vertical_flip)
+                swap(TOP_BORDER, BOTTOM_BORDER);
+
+            // Used to position sub-elements, coords needs to be relative to tab_rect_abs
+            rect<s32> tab_contents_rect = rect<s32>(LEFT_BORDER + HORZ_PADDING,
+                                                    TOP_BORDER  + VERT_PADDING,
+                                                    tab_rect_abs.getWidth()  - RIGHT_BORDER  - HORZ_PADDING,
+                                                    tab_rect_abs.getHeight() - BOTTOM_BORDER - VERT_PADDING);
+
+            if (m_active_children[i].m_type == WTYPE_ICON_BUTTON || m_active_children[i].m_type == WTYPE_BUTTON)
             {
-                rect<s32> icon_part = rect<s32>(15,
-                                                0,
-                                                subsize.getHeight()+15,
-                                                subsize.getHeight());
+                rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
+                                                tab_contents_rect.UpperLeftCorner.Y,
+                                                tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),
+                                                tab_contents_rect.UpperLeftCorner.Y + tab_contents_rect.getHeight());
 
                 if (message.size() == 0)
                 {
-                    const int x = subsize.getWidth()/2 - subsize.getHeight()/2;
+                    const int x = tab_contents_rect.getWidth()/2 - tab_contents_rect.getHeight()/2;
                     // no label, only icon, so center the icon
-                    icon_part = rect<s32>(x,
-                                          0,
-                                          x + subsize.getHeight(),
-                                          subsize.getHeight());
+                    icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X + x,
+                                          tab_contents_rect.UpperLeftCorner.Y,
+                                          tab_contents_rect.UpperLeftCorner.X + x + tab_contents_rect.getHeight(),
+                                          tab_contents_rect.UpperLeftCorner.Y + tab_contents_rect.getHeight());
                 }
 
+                rect<s32> label_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
+                                                 tab_contents_rect.UpperLeftCorner.Y,
+                                                 tab_contents_rect.LowerRightCorner.X,
+                                                 tab_contents_rect.LowerRightCorner.Y);
+
                 // label at the *right* of the icon (for tabs)
-                rect<s32> label_part = rect<s32>(subsize.getHeight()+15,
-                                                 0,
-                                                 subsize.getWidth()-15,
-                                                 subsize.getHeight());
+                if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
+                    label_part.UpperLeftCorner.X += icon_part.getWidth() + 15;
 
                 // use the same ID for all subcomponents; since event handling
                 // is done per-ID, no matter which one your hover, this
                 // widget will get it
                 int same_id = getNewNoFocusID();
-                subbtn = GUIEngine::getGUIEnv()->addButton(subsize, btn,
+                tab = GUIEngine::getGUIEnv()->addButton(tab_rect_abs, btn,
                                                            same_id, L"", L"");
 
-                IGUIButton* icon =
-                    GUIEngine::getGUIEnv()->addButton(icon_part, subbtn,
-                                                      same_id, L"");
-                icon->setScaleImage(true);
-                std::string filename = GUIEngine::getSkin()->getThemedIcon(
-                                     m_active_children[i].m_properties[PROP_ICON]);
-                icon->setImage( irr_driver->getTexture(filename.c_str()) );
-                icon->setUseAlphaChannel(true);
-                icon->setDrawBorder(false);
-                icon->setTabStop(false);
+                if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
+                {
+                    IGUIButton* icon =
+                        GUIEngine::getGUIEnv()->addButton(icon_part, tab,
+                                                          same_id, L"");
+                    icon->setScaleImage(true);
+                    std::string filename = GUIEngine::getSkin()->getThemedIcon(
+                                         m_active_children[i].m_properties[PROP_ICON]);
+                    icon->setImage( irr_driver->getTexture(filename.c_str()) );
+                    icon->setUseAlphaChannel(true);
+                    icon->setDrawBorder(false);
+                    icon->setTabStop(false);
+                }
 
                 IGUIStaticText* label =
                     GUIEngine::getGUIEnv()->addStaticText(message.c_str(),
                                                           label_part,
                                                           false /* border */,
                                                           true /* word wrap */,
-                                                          subbtn, same_id);
+                                                          tab, same_id);
 
                 if ((int)GUIEngine::getFont()->getDimension(message.c_str())
                                               .Width > label_part.getWidth()&&
@@ -272,15 +306,15 @@ void RibbonWidget::add()
                 label->setNotClipped(true);
                 m_labels.push_back(label);
 
-                subbtn->setTabStop(false);
-                subbtn->setTabGroup(false);
+                tab->setTabStop(false);
+                tab->setTabGroup(false);
             }
             else
             {
                 Log::error("RibbonWidget", "Invalid tab bar contents");
             }
 
-            m_active_children[i].m_element = subbtn;
+            m_active_children[i].m_element = tab;
 
             if (message.size() == 0) widget_x += small_tab/2;
             else                     widget_x += large_tab/2;
@@ -303,42 +337,49 @@ void RibbonWidget::add()
             else
                 widget_y += one_button_height;
 
-            IGUIButton * subbtn = NULL;
+            IGUIButton * tab = NULL;
 
-            // The buttons will overlap without this,
-            // as drawBoxFromStretchableTexture draw the borders outside
-            // of a widget's reserved area
-            int VERT_BORDER_MARGIN = 8;
-            rect<s32> subbtn_rec = rect<s32>(widget_x - tab_width/2+2,  widget_y + VERT_BORDER_MARGIN,
-                                             widget_x + tab_width/2-2,  widget_y - VERT_BORDER_MARGIN + one_button_height);
+            rect<s32> tab_rect_abs = rect<s32>(widget_x - (tab_width/2) - HORZ_MARGIN, widget_y + VERT_MARGIN,
+                                               widget_x + (tab_width/2) + HORZ_MARGIN, widget_y + one_button_height - VERT_MARGIN);
 
+            // Once height is available to us, adjust for scaling
+            TOP_BORDER    = round( GUIEngine::getSkin()->getScalingFactor("verticalTab::neutral", tab_rect_abs.getHeight()) * (float)TOP_BORDER    );
+            BOTTOM_BORDER = round( GUIEngine::getSkin()->getScalingFactor("verticalTab::neutral", tab_rect_abs.getHeight()) * (float)BOTTOM_BORDER );
+            LEFT_BORDER   = round( GUIEngine::getSkin()->getScalingFactor("verticalTab::neutral", tab_rect_abs.getHeight()) * (float)LEFT_BORDER   );
+            RIGHT_BORDER  = round( GUIEngine::getSkin()->getScalingFactor("verticalTab::neutral", tab_rect_abs.getHeight()) * (float)RIGHT_BORDER  );
+
+            HORZ_PADDING  = round( GUIEngine::getSkin()->getScalingFactor("verticalTab::neutral", tab_rect_abs.getHeight()) * (float)HORZ_PADDING  );
+            VERT_PADDING  = round( GUIEngine::getSkin()->getScalingFactor("verticalTab::neutral", tab_rect_abs.getHeight()) * (float)VERT_PADDING  );
+
+            // Used to position sub-elements, coords needs to be relative to tab_rect_abs
+            rect<s32> tab_contents_rect = rect<s32>(LEFT_BORDER + HORZ_PADDING,
+                                                    TOP_BORDER  + VERT_PADDING,
+                                                    tab_rect_abs.getWidth()  - RIGHT_BORDER  - HORZ_PADDING,
+                                                    tab_rect_abs.getHeight() - BOTTOM_BORDER - VERT_PADDING);
 
             // TODO Add support for BUTTON type when needed
             if (m_active_children[i].m_type == WTYPE_ICON_BUTTON)
             {
-                // The icon will take 1/3rd of the tab width at most, less if height is lacking
-                int icon_size = std::min(m_w/3, subbtn_rec.getHeight()+2*VERT_BORDER_MARGIN);
-
-                rect<s32> icon_part = rect<s32>(5,
-                                                one_button_height/2 - icon_size/2-VERT_BORDER_MARGIN,
-                                                icon_size+5,
-                                                one_button_height/2 + icon_size/2-VERT_BORDER_MARGIN);
+                rect<s32> icon_part = rect<s32>(tab_contents_rect.UpperLeftCorner.X,
+                                                tab_contents_rect.UpperLeftCorner.Y,
+                                                tab_contents_rect.UpperLeftCorner.X + tab_contents_rect.getHeight(),
+                                                tab_contents_rect.UpperLeftCorner.Y + tab_contents_rect.getHeight());
 
                 // label at the *right* of the icon (for tabs)
-                rect<s32> label_part = rect<s32>(icon_size+5,
-                                                 5-VERT_BORDER_MARGIN,
-                                                 subbtn_rec.getWidth()-5,
-                                                 one_button_height-5-VERT_BORDER_MARGIN);
+                rect<s32> label_part = rect<s32>(icon_part.LowerRightCorner.X+5,
+                                                 tab_contents_rect.UpperLeftCorner.Y,
+                                                 tab_contents_rect.LowerRightCorner.X,
+                                                 tab_contents_rect.LowerRightCorner.Y);
 
                 // use the same ID for all subcomponents; since event handling
                 // is done per-ID, no matter which one your hover, this
                 // widget will get it
                 int same_id = getNewNoFocusID();
-                subbtn = GUIEngine::getGUIEnv()->addButton(subbtn_rec, btn,
+                tab = GUIEngine::getGUIEnv()->addButton(tab_rect_abs, btn,
                                                            same_id, L"", L"");
 
                 IGUIButton* icon =
-                    GUIEngine::getGUIEnv()->addButton(icon_part, subbtn,
+                    GUIEngine::getGUIEnv()->addButton(icon_part, tab,
                                                       same_id, L"");
                 icon->setScaleImage(true);
                 std::string filename = GUIEngine::getSkin()->getThemedIcon(
@@ -353,15 +394,19 @@ void RibbonWidget::add()
                                                           label_part,
                                                           false /* border */,
                                                           true /* word wrap */,
-                                                          subbtn, same_id);
+                                                          tab, same_id);
 
-                if ((int)GUIEngine::getFont()->getDimension(message.c_str())
-                                              .Width > label_part.getWidth()&&
-                    message.findFirst(L' ') == -1                           &&
-                    message.findFirst(L'\u00AD') == -1                        )
+                if (((int)GUIEngine::getFont()->getDimension(message.c_str())
+                                              .Width > label_part.getWidth() &&
+                    message.findFirst(L' ') == -1                            &&
+                    message.findFirst(L'\u00AD') == -1) || 
+                    ((int)GUIEngine::getFont()->getDimension(message.c_str())
+                                              .Width > label_part.getWidth() && 
+                    (int)GUIEngine::getFont()->getDimension(message.c_str())
+                                              .Height*2 > label_part.getHeight()))
                 {
-                    // if message too long and contains no space and no soft
-                    // hyphen, make the font smaller
+                    // if message is too long and contains no space and no soft
+                    // hyphen, or too tall, make the font smaller
                     label->setOverrideFont(GUIEngine::getSmallFont());
                 }
                 label->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
@@ -369,15 +414,15 @@ void RibbonWidget::add()
                 label->setNotClipped(true);
                 m_labels.push_back(label);
 
-                subbtn->setTabStop(false);
-                subbtn->setTabGroup(false);
+                tab->setTabStop(false);
+                tab->setTabGroup(false);
             }
             else
             {
                 Log::error("RibbonWidget", "Invalid tab bar contents");
             }
 
-            m_active_children[i].m_element = subbtn;
+            m_active_children[i].m_element = tab;
         } // vertical-tabs
 
 
@@ -405,6 +450,7 @@ void RibbonWidget::add()
             // calculate the size of the image
             std::string filename =
                 GUIEngine::getSkin()->getThemedIcon(m_active_children[i].m_properties[PROP_ICON]);
+
             video::ITexture* image =
                 irr_driver->getTexture((filename).c_str());
             if(!image)
@@ -413,7 +459,7 @@ void RibbonWidget::add()
                 image = irr_driver->getTexture(file);
                 if(!image)
                     Log::fatal("RibbonWidget",
-                        "Can't find fallback texture 'gui/icons/main_help.png, aborting.");
+                        "Can't find fallback texture 'main_help.png', aborting.");
             }
 
             float image_h = (float)image->getSize().Height;
@@ -465,7 +511,7 @@ void RibbonWidget::add()
         }
 
 
-        //m_children[i].id = subbtn->getID();
+        //m_children[i].id = tab->getID();
         m_active_children[i].m_event_handler = this;
     }// next sub-button
 
