@@ -1737,7 +1737,7 @@ void RaceResultGUI::displayCTFResults()
                 }
 
                 int current_x = x;
-                current_y = y + (int)((i + 1) * m_distance_between_meta_rows);
+                current_y = y + (int)((i + 1) * m_distance_between_meta_rows * 0.85f);
 
                 const KartProperties* prop = kart_properties_manager->getKart(kart_name);
                 if (prop != NULL)
@@ -1778,8 +1778,9 @@ void RaceResultGUI::displayCTFResults()
             // display lap count
             if (race_manager->modeHasLaps())
             {
+				current_y += int(m_distance_between_meta_rows * 0.6f);
                 core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
-                current_y += int(m_distance_between_meta_rows * 0.8f * 2);
+                current_y += int(m_distance_between_meta_rows * 0.8f);
                 printLine(laps, white_color, x, current_y);
             }
             // display difficulty
@@ -1818,17 +1819,28 @@ void RaceResultGUI::displayCTFResults()
         // Display challenge result and goals
         if(race_manager->raceWasStartedFromOverworld())
         {
-			current_y += int(m_distance_between_meta_rows * 0.8f);
+			current_y += int(m_distance_between_meta_rows * 0.5f);
 
 			const ChallengeData* c_data = unlock_manager->getChallengeData(race_manager->getStartedChallengeID());
-			int n = (int)PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
 			RaceManager::Difficulty difficulty = race_manager->getDifficulty();
 			video::SColor win_color = video::SColor(255, 64, 255, 64);
 			video::SColor lose_color = video::SColor(255, 255, 64, 64);
-			video::SColor warn_color = video::SColor(255, 192, 192, 64);
+			video::SColor warn_color = video::SColor(255, 255, 255, 0);
+			AbstractKart* kart = World::getWorld()->getPlayerKart(0);
+			bool lose_all = false;
 			
-			core::stringw text_string = n ? _("You completed the challenge!") : _("You failed the challenge!");
-			video::SColor text_color = n ? win_color : lose_color;
+			if (kart->isEliminated())
+				lose_all = true;
+			bool position_passed = (kart->getPosition() <= c_data->getMaxPosition(difficulty) && lose_all == false)
+								|| c_data->getMaxPosition(difficulty) == -1;
+			bool time_passed = (kart->getFinishTime() <= c_data->getTimeRequirement(difficulty) && lose_all == false)
+								|| c_data->getTimeRequirement(difficulty) <= 0.0f;
+			bool energy_passed = (kart->getEnergy() >= c_data->getEnergy(difficulty) && lose_all == false)
+								|| c_data->getEnergy(difficulty) <= 0;
+			bool all_passed = position_passed && time_passed && energy_passed;
+			
+			core::stringw text_string = all_passed ? _("You completed the challenge!") : _("You failed the challenge!");
+			video::SColor text_color = all_passed ? win_color : lose_color;
 			current_y += int(m_distance_between_meta_rows * 0.8f);
 			printLine(text_string, text_color, x, current_y);
 			
@@ -1840,14 +1852,15 @@ void RaceResultGUI::displayCTFResults()
 					r --;
 				
 				text_string = _("Required Rank: %i", r);
+				text_color = position_passed ? win_color : lose_color;
 				current_y += int(m_distance_between_meta_rows * 0.8f);
 				printLine(text_string, text_color, x, current_y);
 			}
 			if (c_data->getTimeRequirement(difficulty) > 0)
 			{
-				std::string time_string = StringUtils::timeToString(c_data->getTimeRequirement(difficulty)).c_str();
-				
-				text_string = _("Required Time: %s", time_string);
+				text_string = _("Required Time: %i",
+					StringUtils::timeToString(c_data->getTimeRequirement(difficulty)).c_str());
+				text_color = time_passed ? win_color : lose_color;
 				current_y += int(m_distance_between_meta_rows * 0.8f);
 				printLine(text_string, text_color, x, current_y);
 			}
@@ -1856,13 +1869,14 @@ void RaceResultGUI::displayCTFResults()
 				int energy = c_data->getEnergy(difficulty);
 				
 				text_string = _("Required Nitro Points: %i", energy);
+				text_color = energy_passed ? win_color : lose_color;
 				current_y += int(m_distance_between_meta_rows * 0.8f);
 				printLine(text_string, text_color, x, current_y);
 			}
 			
 			bool best_while_slower = c_data->getSpecialType() == ChallengeData::SPECIAL_MAX_REQ_IN_LOWER_DIFF;
 			
-			text_string = _("Reached requirement in supertux difficulty");
+			text_string = _("Best while slower");
 			text_color = best_while_slower ? win_color : warn_color;
 			current_y += int(m_distance_between_meta_rows * 0.8f);
 			printLine(text_string, text_color, x, current_y);
@@ -1907,7 +1921,7 @@ void RaceResultGUI::displayCTFResults()
     }
 
     // ----------------------------------------------------------------------------
-    void printLine(core::stringw text, video::SColor color, int x, int y)
+    void RaceResultGUI::printLine(core::stringw text, video::SColor color, int x, int y)
     {
 		int width = UserConfigParams::m_width * 0.96f; // 0.96 from stkgui
 		GUIEngine::getFont()->draw(text, core::recti(x, y, width, y + GUIEngine::getFontHeight()), color,
@@ -1915,7 +1929,7 @@ void RaceResultGUI::displayCTFResults()
 	}
 	
     // ----------------------------------------------------------------------------
-    void printSmallLine(core::stringw text, video::SColor color, int x, int y)
+    void RaceResultGUI::printSmallLine(core::stringw text, video::SColor color, int x, int y)
     {
 		int width = UserConfigParams::m_width * 0.96f; // 0.96 from stkgui
 		GUIEngine::getSmallFont()->draw(text, core::recti(x, y, width, y + GUIEngine::getSmallFontHeight()), color,
