@@ -29,6 +29,7 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
 void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6);
 int getaddrinfo_compat(const char* hostname, const char* servname,
                        const struct addrinfo* hints, struct addrinfo** res);
+int64_t upperIPv6(const char* ipv6);
 int insideIPv6CIDR(const char* ipv6_cidr, const char* ipv6_in);
 #ifdef __cplusplus
 }

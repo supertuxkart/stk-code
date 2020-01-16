@@ -183,6 +183,9 @@ The current server configuration xml looks like this:
     <!-- IP geolocation table, you only need this table if you want to geolocate IP from non-stk-addons connection, as all validated players connecting from stk-addons will provide the location info, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
     <ip-geolocation-table value="ip_mapping" />
 
+    <!-- IPv6 geolocation table, you only need this table if you want to geolocate IP from non-stk-addons connection, as all validated players connecting from stk-addons will provide the location info, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
+    <ipv6-geolocation-table value="ipv6_mapping" />
+
     <!-- If true this server will auto add / remove AI connected with network-ai=x, which will kick N - 1 bot(s) where N is the number of human players. Only use this for non-GP racing server. -->
     <ai-handling value="false" />
 
@@ -341,6 +344,15 @@ CREATE TABLE ip_mapping
     longitude REAL NOT NULL, -- Longitude of this IP range
     country_code TEXT NOT NULL -- 2-letter country code
 ) WITHOUT ROWID;
+
+CREATE TABLE ipv6_mapping
+(
+    ip_start INTEGER UNSIGNED NOT NULL PRIMARY KEY UNIQUE, -- IP decimal (upper 64bit) start
+    ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- IP decimal (upper 64bit) end
+    latitude REAL NOT NULL, -- Latitude of this IP range
+    longitude REAL NOT NULL, -- Longitude of this IP range
+    country_code TEXT NOT NULL -- 2-letter country code
+)
 ```
 
 For initialization of `ip_mapping` table, check [this script](tools/generate-ip-mappings.py).

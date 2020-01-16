@@ -412,6 +412,16 @@ namespace ServerConfig
         "empty to disable. "
         "This table can be shared for all servers if you use the same name."));
 
+    SERVER_CFG_PREFIX StringServerConfigParam m_ipv6_geolocation_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("ipv6_mapping",
+        "ipv6-geolocation-table",
+        "IPv6 geolocation table, you only need this table if you want to "
+        "geolocate IP from non-stk-addons connection, as all validated "
+        "players connecting from stk-addons will provide the location info, "
+        "you need to create the table first, see NETWORKING.md for details, "
+        "empty to disable. "
+        "This table can be shared for all servers if you use the same name."));
+
     SERVER_CFG_PREFIX BoolServerConfigParam m_ai_handling
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ai-handling",
         "If true this server will auto add / remove AI connected with "

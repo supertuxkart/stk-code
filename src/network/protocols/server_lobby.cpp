@@ -63,6 +63,26 @@
 
 
 #ifdef ENABLE_SQLITE3
+
+// ----------------------------------------------------------------------------
+static void upperIPv6SQL(sqlite3_context* context, int argc,
+                         sqlite3_value** argv)
+{
+    if (argc != 1)
+    {
+        sqlite3_result_int64(context, 0);
+        return;
+    }
+
+    char* ipv6 = (char*)sqlite3_value_text(argv[0]);
+    if (ipv6 == NULL)
+    {
+        sqlite3_result_int64(context, 0);
+        return;
+    }
+    sqlite3_result_int64(context, upperIPv6(ipv6));
+}
+
 // ----------------------------------------------------------------------------
 void insideIPv6CIDRSQL(sqlite3_context* context, int argc,
                        sqlite3_value** argv)
@@ -97,6 +117,8 @@ sqlite3_extension_init(sqlite3* db, char** pzErrMsg,
     SQLITE_EXTENSION_INIT2(pApi)
     sqlite3_create_function(db, "insideIPv6CIDR", 2, SQLITE_UTF8, NULL,
         insideIPv6CIDRSQL, NULL, NULL);
+    sqlite3_create_function(db, "upperIPv6", 1, SQLITE_UTF8,  0, upperIPv6SQL,
+        0, 0);
     return 0;
 }   // sqlite3_extension_init
 */
@@ -256,6 +278,7 @@ void ServerLobby::initDatabase()
     m_ipv6_ban_table_exists = false;
     m_online_id_ban_table_exists = false;
     m_ip_geolocation_table_exists = false;
+    m_ipv6_geolocation_table_exists = false;
     if (!ServerConfig::m_sql_management)
         return;
     const std::string& path = ServerConfig::getConfigDirectory() + "/" +
@@ -285,6 +308,8 @@ void ServerLobby::initDatabase()
         }, NULL);
     sqlite3_create_function(m_db, "insideIPv6CIDR", 2, SQLITE_UTF8, NULL,
         &insideIPv6CIDRSQL, NULL, NULL);
+    sqlite3_create_function(m_db, "upperIPv6", 1, SQLITE_UTF8, NULL,
+        &upperIPv6SQL, NULL, NULL);
     checkTableExists(ServerConfig::m_ip_ban_table, m_ip_ban_table_exists);
     checkTableExists(ServerConfig::m_ipv6_ban_table, m_ipv6_ban_table_exists);
     checkTableExists(ServerConfig::m_online_id_ban_table,
@@ -293,6 +318,8 @@ void ServerLobby::initDatabase()
         m_player_reports_table_exists);
     checkTableExists(ServerConfig::m_ip_geolocation_table,
         m_ip_geolocation_table_exists);
+    checkTableExists(ServerConfig::m_ipv6_geolocation_table,
+        m_ipv6_geolocation_table_exists);
 #endif
 }   // initDatabase
 
@@ -1143,6 +1170,47 @@ std::string ServerLobby::ip2Country(const TransportAddress& addr) const
     }
     return cc_code;
 }   // ip2Country
+
+//-----------------------------------------------------------------------------
+std::string ServerLobby::ipv62Country(const std::string& ipv6) const
+{
+    if (!m_db || !m_ipv6_geolocation_table_exists)
+        return "";
+
+    std::string cc_code;
+    std::string query = StringUtils::insertValues(
+        "SELECT country_code FROM %s "
+        "WHERE `ip_start` <= upperIPv6(\"%s\") AND `ip_end` >= upperIPv6(\"%s\") "
+        "ORDER BY `ip_start` DESC LIMIT 1;",
+        ServerConfig::m_ipv6_geolocation_table.c_str(), ipv6.c_str(),
+        ipv6.c_str());
+
+    sqlite3_stmt* stmt = NULL;
+    int ret = sqlite3_prepare_v2(m_db, query.c_str(), -1, &stmt, 0);
+    if (ret == SQLITE_OK)
+    {
+        ret = sqlite3_step(stmt);
+        if (ret == SQLITE_ROW)
+        {
+            const char* country_code = (char*)sqlite3_column_text(stmt, 0);
+            cc_code = country_code;
+        }
+        ret = sqlite3_finalize(stmt);
+        if (ret != SQLITE_OK)
+        {
+            Log::error("ServerLobby",
+                "Error finalize database for query %s: %s",
+                query.c_str(), sqlite3_errmsg(m_db));
+        }
+    }
+    else
+    {
+        Log::error("ServerLobby", "Error preparing database for query %s: %s",
+            query.c_str(), sqlite3_errmsg(m_db));
+        return "";
+    }
+    return cc_code;
+}   // ipv62Country
 
 #endif
 
@@ -3317,8 +3385,10 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     }
 
 #ifdef ENABLE_SQLITE3
-    if (country_code.empty())
+    if (country_code.empty() && peer->getIPV6Address().empty())
         country_code = ip2Country(peer->getAddress());
+    if (country_code.empty() && !peer->getIPV6Address().empty())
+        country_code = ipv62Country(peer->getIPV6Address());
 #endif
 
     auto red_blue = STKHost::get()->getAllPlayersTeamInfo();

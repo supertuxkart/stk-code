@@ -139,6 +139,23 @@ void andIPv6(struct in6_addr* ipv6, const struct in6_addr* mask)
 }   // andIPv6
 
 // ----------------------------------------------------------------------------
+extern "C" int64_t upperIPv6(const char* ipv6)
+{
+    struct in6_addr v6_in;
+    if (inet_pton(AF_INET6, ipv6, &v6_in) != 1)
+        return 0;
+    uint64_t result = 0;
+    unsigned shift = 56;
+    for (unsigned i = 0; i < 8; i++)
+    {
+        uint64_t val = v6_in.s6_addr[i];
+        result += val << shift;
+        shift -= 8;
+    }
+    return result;
+}
+
+// ----------------------------------------------------------------------------
 extern "C" int insideIPv6CIDR(const char* ipv6_cidr, const char* ipv6_in)
 {
     const char* mask_location = strchr(ipv6_cidr, '/');

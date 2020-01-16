@@ -91,6 +91,8 @@ private:
 
     bool m_ip_geolocation_table_exists;
 
+    bool m_ipv6_geolocation_table_exists;
+
     uint64_t m_last_poll_db_time;
 
     void pollDatabase();
@@ -101,6 +103,8 @@ private:
     void checkTableExists(const std::string& table, bool& result);
 
     std::string ip2Country(const TransportAddress& addr) const;
+
+    std::string ipv62Country(const std::string& ipv6) const;
 #endif
     void initDatabase();
 
