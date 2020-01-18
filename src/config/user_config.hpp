@@ -761,6 +761,22 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
     // ---- Networking
+    // These stk domains have only a record to each ipv6 stun below,
+    // so we can use this to know ipv4 address of nat64 gateway (if any)
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers_v4
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv4",
+        "The stun servers that will be used to know the public address "
+        "(ipv4 only) with port", {{ "stun-server", "address", "ping" }},
+            {
+                { "stunv4.1.supertuxkart.net:3478", 0u },
+                { "stunv4.2.supertuxkart.net:19302", 0u },
+                { "stunv4.3.supertuxkart.net:19302", 0u },
+                { "stunv4.4.supertuxkart.net:19302", 0u },
+                { "stunv4.5.supertuxkart.net:19302", 0u },
+                { "stunv4.6.supertuxkart.net:19302", 0u }
+            }
+        ));
+
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
         PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv6",
         "The stun servers that will be used to know the public address "
