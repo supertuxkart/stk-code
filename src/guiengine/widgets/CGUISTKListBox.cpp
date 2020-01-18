@@ -409,7 +409,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
         case EET_LOG_TEXT_EVENT:
         case EET_USER_EVENT:
         case EET_JOYSTICK_INPUT_EVENT:
-        case EGUIET_FORCE_32_BIT:
+        case EEVENT_TYPE::EGUIET_FORCE_32_BIT:
             break;
         default:
             break;

@@ -311,6 +311,9 @@ void reportHardwareStats()
 #if defined(__linux__) && !defined(ANDROID)
     json.add("os_linux", 1);
     json.add("os_unix", 1);
+#elif defined(__FreeBSD__)
+    json.add("os_freebsd", 1);
+    json.add("os_unix", 1);
 #else
     json.add("os_linux", 0);
     json.add("os_unix", 0);
