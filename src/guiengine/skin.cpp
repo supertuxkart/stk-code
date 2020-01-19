@@ -284,9 +284,9 @@ namespace SkinConfig
     // ------------------------------------------------------------------------
     float getVerticalInnerPadding(int wtype, Widget* widget)
     {
-        if (widget != nullptr)
+        RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
+        if (ribbon)
         {
-            RibbonWidget* ribbon = (RibbonWidget*)widget;
             RibbonType rtype = ribbon->getRibbonType();
 
             return getInnerPadding(wtype, rtype, VERTICAL);
@@ -298,9 +298,9 @@ namespace SkinConfig
     // ------------------------------------------------------------------------
     float getHorizontalInnerPadding(int wtype, Widget* widget)
     {
-        if (widget != nullptr)
+        RibbonWidget* ribbon = dynamic_cast<RibbonWidget*>(widget);
+        if (ribbon)
         {
-            RibbonWidget* ribbon = (RibbonWidget*)widget;
             RibbonType rtype = ribbon->getRibbonType();
 
             return getInnerPadding(wtype, rtype, HORIZONTAL);
