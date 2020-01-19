@@ -145,7 +145,7 @@ void MainMenuScreen::init()
     input_manager->getDeviceManager()->clearLatestUsedDevice();
 
 #ifndef SERVER_ONLY
-    if (addons_manager->isLoading())
+    if (addons_manager && addons_manager->isLoading())
     {
         IconButtonWidget* w = getWidget<IconButtonWidget>("addons");
         w->setActive(false);
