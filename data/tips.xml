@@ -6,7 +6,7 @@
         <tip text="The font size can be changed in the UI options."/>
         <tip text="The help menu has a lot of useful information."/>
         <tip text="In single-player, you can watch and race against recorded time trials."/>
-        <tip text="You can visit upertuxkart.net for more information about the game."/>
+        <tip text="You can visit supertuxkart.net for more information about the game."/>
     </tipset>
     <tipset id="race">
         <tip text="Short nitro boosts are more efficient."/>
