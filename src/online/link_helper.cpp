@@ -60,7 +60,7 @@ namespace Online
         {
             Log::error("OpenURL", "Command returned non-zero exit status");
         }
-#elif defined(__linux__)
+#elif defined(__linux__) || defined(__FreeBSD__)
         std::string command = std::string("xdg-open ").append(url);
         
         const char* lib_path = getenv("LD_LIBRARY_PATH");
