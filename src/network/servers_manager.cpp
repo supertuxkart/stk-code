@@ -32,7 +32,9 @@
 #include "utils/time.hpp"
 
 #include <assert.h>
+#include <functional>
 #include <string>
+#include <thread>
 
 #if defined(WIN32)
 #  undef _WIN32_WINNT
@@ -84,14 +86,29 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getWANRefreshRequest() const
      *  when the request is finished. */
     class WANRefreshRequest : public Online::XMLRequest
     {
+    private:
+        // Run the ip detect in separate thread, so it can be done parallel
+        // with the wan server request (which takes few seconds too)
+        std::thread m_ip_detect_thread;
     public:
-        WANRefreshRequest() : Online::XMLRequest(/*priority*/100) {}
+        WANRefreshRequest() : Online::XMLRequest(/*priority*/100)
+        {
+            m_ip_detect_thread = std::thread(std::bind(
+                &NetworkConfig::detectIPType, NetworkConfig::get()));
+        }
+        ~WANRefreshRequest()
+        {
+            if (m_ip_detect_thread.joinable())
+                m_ip_detect_thread.join();
+        }
         // --------------------------------------------------------------------
         virtual void afterOperation() OVERRIDE
         {
             Online::XMLRequest::afterOperation();
+            if (m_ip_detect_thread.joinable())
+                m_ip_detect_thread.join();
             ServersManager::get()->setWanServers(isSuccess(), getXMLData());
-        }   // callback
+        }   // afterOperation
         // --------------------------------------------------------------------
     };   // RefreshRequest
     // ========================================================================

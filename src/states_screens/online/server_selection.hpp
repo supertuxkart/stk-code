@@ -84,6 +84,8 @@ private:
 
     void refresh(bool full_refresh);
 
+    bool m_ipv6_only_without_nat64;
+    bool m_ip_warning_shown;
 public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

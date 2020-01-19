@@ -51,7 +51,7 @@ class NetworkConfig : public NoCopy
 public:
     enum IPType : uint8_t
     {
-        IP_NONE, IP_V4, IP_V6, IP_DUAL_STACK
+        IP_NONE, IP_V4, IP_V6, IP_V6_NAT64, IP_DUAL_STACK
     };
 private:
     /** The singleton instance. */
