@@ -369,6 +369,37 @@ void STKHost::shutdown()
 }   // shutdown
 
 //-----------------------------------------------------------------------------
+/** Get the stun network string required for binding request
+ *  \param stun_tansaction_id 16 bytes array for filling to validate later.
+ */
+BareNetworkString STKHost::getStunRequest(uint8_t* stun_tansaction_id)
+{
+    // Assemble the message for the stun server
+    BareNetworkString s(20);
+
+    constexpr uint32_t magic_cookie = 0x2112A442;
+    // bytes 0-1: the type of the message
+    // bytes 2-3: message length added to header (attributes)
+    uint16_t message_type = 0x0001; // binding request
+    uint16_t message_length = 0x0000;
+    s.addUInt16(message_type).addUInt16(message_length)
+        .addUInt32(magic_cookie);
+
+    stun_tansaction_id[0] = 0x21;
+    stun_tansaction_id[1] = 0x12;
+    stun_tansaction_id[2] = 0xA4;
+    stun_tansaction_id[3] = 0x42;
+    // bytes 8-19: the transaction id
+    for (int i = 0; i < 12; i++)
+    {
+        uint8_t random_byte = rand() % 256;
+        s.addUInt8(random_byte);
+        stun_tansaction_id[i + 4] = random_byte;
+    }
+    return s;
+}   // getStunRequest
+
+//-----------------------------------------------------------------------------
 std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
                                    bool ipv4)
 {
@@ -437,29 +468,9 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
         m_stun_address.setPort(ntohs(ipv4_addr->sin_port));
     }
 
-    // Assemble the message for the stun server
-    BareNetworkString s(20);
-
-    constexpr uint32_t magic_cookie = 0x2112A442;
-    // bytes 0-1: the type of the message
-    // bytes 2-3: message length added to header (attributes)
-    uint16_t message_type = 0x0001; // binding request
-    uint16_t message_length = 0x0000;
-    s.addUInt16(message_type).addUInt16(message_length)
-        .addUInt32(magic_cookie);
-
     uint8_t stun_tansaction_id[16];
-    stun_tansaction_id[0] = 0x21;
-    stun_tansaction_id[1] = 0x12;
-    stun_tansaction_id[2] = 0xA4;
-    stun_tansaction_id[3] = 0x42;
-    // bytes 8-19: the transaction id
-    for (int i = 0; i < 12; i++)
-    {
-        uint8_t random_byte = rand() % 256;
-        s.addUInt8(random_byte);
-        stun_tansaction_id[i + 4] = random_byte;
-    }
+    constexpr uint32_t magic_cookie = 0x2112A442;
+    BareNetworkString s = getStunRequest(stun_tansaction_id);
 
     sendto(socket, s.getData(), s.size(), 0, stun_addr, isIPV6() ?
         sizeof(sockaddr_in6) : sizeof(sockaddr_in));

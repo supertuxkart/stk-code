@@ -160,6 +160,10 @@ public:
         m_elements = std::map<T,U>(v);
         return m_elements;
     }
+    size_t size() const
+    {
+        return m_elements.size();
+    }
     U& operator[] (const T key)
     {
         return m_elements[key];

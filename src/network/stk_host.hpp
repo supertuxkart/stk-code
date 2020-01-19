@@ -393,6 +393,8 @@ public:
     // ------------------------------------------------------------------------
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
         getPlayersForNewGame() const;
+    // ------------------------------------------------------------------------
+    static BareNetworkString getStunRequest(uint8_t* stun_tansaction_id);
 };   // class STKHost
 
 #endif // STK_HOST_HPP

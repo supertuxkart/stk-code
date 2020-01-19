@@ -27,6 +27,7 @@
 #include "utils/no_copy.hpp"
 
 #include "irrString.h"
+#include <atomic>
 #include <memory>
 #include <set>
 #include <tuple>
@@ -47,6 +48,11 @@ class PlayerProfile;
 
 class NetworkConfig : public NoCopy
 {
+public:
+    enum IPType : uint8_t
+    {
+        IP_NONE, IP_V4, IP_V6, IP_DUAL_STACK
+    };
 private:
     /** The singleton instance. */
     static NetworkConfig *m_network_config;
@@ -55,6 +61,8 @@ private:
     {
         NETWORK_NONE, NETWORK_WAN, NETWORK_LAN
     };
+
+    std::atomic<IPType> m_ip_type;
 
     /** Keeps the type of network connection: none (yet), LAN or WAN. */
     NetworkType m_network_type;
@@ -98,6 +106,10 @@ private:
      *  available in same version. */
     std::set<std::string> m_server_capabilities;
 
+    /** For IPv6 only network we try to detect the NAT64 prefix so we can
+     *  use it to connect to ipv4 only servers. STK assumes that for all ipv4
+     *  addresses they use the same prefix for each initIPTest. */
+    std::string m_nat64_prefix;
 public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -245,7 +257,12 @@ public:
     // ------------------------------------------------------------------------
     const std::set<std::string>& getServerCapabilities() const
                                               { return m_server_capabilities; }
-
+    // ------------------------------------------------------------------------
+    void detectIPType();
+    // ------------------------------------------------------------------------
+    IPType getIPType() const                       { return m_ip_type.load(); }
+    // ------------------------------------------------------------------------
+    const std::string& getNAT64Prefix() const        { return m_nat64_prefix; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG
