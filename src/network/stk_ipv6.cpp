@@ -226,7 +226,7 @@ void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
 #else
 
 #include "network/stk_ipv6.hpp"
-#include "network/ios_ipv6.hpp"
+#include "network/network_config.hpp"
 #include "network/transport_address.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
@@ -271,10 +271,14 @@ void stkInitialize()
     g_mapped_ipv6_used = 0;
     g_ipv6 = 0;
     g_mapped_ips.clear();
-#ifdef IOS_STK
-    if (isIPV6Only())
-        g_ipv6 = 1;
-#endif
+
+    // For now only auto enable ipv6 socket in client with nat64, so in
+    // connect to server it will change the ipv4 address to nat64 one
+    if (NetworkConfig::get()->isClient())
+    {
+        if (NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
+            g_ipv6 = 1;
+    }
 }   // stkInitialize
 
 // ----------------------------------------------------------------------------

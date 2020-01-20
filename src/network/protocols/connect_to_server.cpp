@@ -391,15 +391,14 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
         std::string addr_string = m_server->getIPV6Address();
         std::string port =
             StringUtils::toString(m_server->getAddress().getPort());
-#ifdef IOS_STK
-        // The ability to synthesize IPv6 addresses was added to getaddrinfo
-        // in iOS 9.2
-        if (!m_server->useIPV6Connection())
+        // Convert to a NAT64 address from IPv4
+        if (!m_server->useIPV6Connection() &&
+            NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
         {
             // From IPv4
             addr_string = m_server->getAddress().toString(false/*show_port*/);
+            addr_string = NetworkConfig::get()->getNAT64Prefix() + addr_string;
         }
-#endif
         if (getaddrinfo_compat(addr_string.c_str(), port.c_str(),
             &hints, &res) != 0 || res == NULL)
             return false;
