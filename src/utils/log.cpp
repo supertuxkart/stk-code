@@ -30,6 +30,10 @@
 #  include <android/log.h>
 #endif
 
+#ifdef IOS_STK
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceiOS.h"
+#endif
+
 #ifdef WIN32
 #  define WIN32_LEAN_AND_MEAN
 #  include <windows.h>
@@ -243,6 +247,8 @@ void Log::writeLine(const char *line, int level)
             default:         alp = ANDROID_LOG_FATAL;
             }
             __android_log_print(alp, "SuperTuxKart", "%s", line);
+#elif defined(IOS_STK)
+            CIrrDeviceiOS::debugPrint(line);
 #else
             printf("%s", line);
 #endif
