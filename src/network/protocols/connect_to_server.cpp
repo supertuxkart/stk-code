@@ -94,7 +94,7 @@ void ConnectToServer::setup()
     {
         m_state = GOT_SERVER_ADDRESS;
         if (m_server->useIPV6Connection())
-            setIPV6(1);
+            setIPv6Socket(1);
     }
     else
         m_state = SET_PUBLIC_ADDRESS;
@@ -227,7 +227,7 @@ void ConnectToServer::asynchronousUpdate()
             if (m_server->useIPV6Connection())
             {
                 // Disable STUN if using IPv6 (check in setPublicAddress)
-                setIPV6(1);
+                setIPv6Socket(1);
             }
             if (m_server->supportsEncryption())
             {
@@ -266,7 +266,7 @@ void ConnectToServer::asynchronousUpdate()
             // that has stun mapped, the first 8 seconds allow the server to
             // start the connect to peer protocol first before the port is
             // remapped. IPv6 has no stun so try once with any port
-            if (isIPV6())
+            if (isIPv6Socket())
             {
                 if (!tryConnect(2000, 15, true/*another_port*/, true/*IPv6*/))
                     m_state = DONE;

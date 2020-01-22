@@ -11,7 +11,7 @@
 #ifdef ENABLE_IPV6
 #include <ws2tcpip.h>
 extern void stkInitialize(void);
-extern int isIPV6(void);
+extern int isIPv6Socket(void);
 extern void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
 extern void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
 #endif
@@ -134,7 +134,7 @@ enet_socket_bind (ENetSocket socket, const ENetAddress * address)
 {
 #ifdef ENABLE_IPV6
     // In STK we only bind port and listen to any address
-    if (isIPV6())
+    if (isIPv6Socket())
     {
         struct sockaddr_in6 sin;
         memset (&sin, 0, sizeof (struct sockaddr_in6));
@@ -195,13 +195,13 @@ ENetSocket
 enet_socket_create (ENetSocketType type)
 {
 #ifdef ENABLE_IPV6
-    int af_family = isIPV6() == 1 ? PF_INET6 : PF_INET;
+    int af_family = isIPv6Socket() == 1 ? PF_INET6 : PF_INET;
 #else
     int af_family = PF_INET;
 #endif
     SOCKET socket_fd = socket (af_family, type == ENET_SOCKET_TYPE_DATAGRAM ? SOCK_DGRAM : SOCK_STREAM, 0);
 #ifdef ENABLE_IPV6
-    if (isIPV6() && socket_fd != INVALID_SOCKET)
+    if (isIPv6Socket() && socket_fd != INVALID_SOCKET)
     {
         int no = 0;
         // Allow IPv6 socket listen to IPv4 connection (as long as the host has IPv4 address)
@@ -352,7 +352,7 @@ enet_socket_send (ENetSocket socket,
     if (address != NULL)
     {
 #ifdef ENABLE_IPV6
-        if (isIPV6())
+        if (isIPv6Socket())
         {
             getIPV6FromMappedAddress(address, &sin6);
             sin_send = (struct sockaddr*)&sin6;
@@ -417,7 +417,7 @@ enet_socket_receive (ENetSocket socket,
 #ifdef ENABLE_IPV6
     if (address != NULL)
     {
-        if (isIPV6())
+        if (isIPv6Socket())
         {
             sin_recv = (struct sockaddr*)&sin6;
             sinLength = sizeof(struct sockaddr_in6);
@@ -456,7 +456,7 @@ enet_socket_receive (ENetSocket socket,
     if (address != NULL)
     {
 #ifdef ENABLE_IPV6
-        if (isIPV6())
+        if (isIPv6Socket())
         {
             getMappedFromIPV6(&sin6, address);
         }

@@ -259,7 +259,7 @@ STKHost::STKHost(bool server)
 
     if (server)
     {
-        setIPV6(ServerConfig::m_ipv6_server ? 1 : 0);
+        setIPv6Socket(ServerConfig::m_ipv6_server ? 1 : 0);
         addr.port = ServerConfig::m_server_port;
         if (addr.port == 0 && !UserConfigParams::m_random_server_port)
             addr.port = stk_config->m_server_port;
@@ -432,7 +432,7 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
         return "";
 
     struct sockaddr* stun_addr = NULL;
-    if (isIPV6())
+    if (isIPv6Socket())
     {
         if (ipv4)
         {
@@ -472,7 +472,7 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
     constexpr uint32_t magic_cookie = 0x2112A442;
     BareNetworkString s = getStunRequest(stun_tansaction_id);
 
-    sendto(socket, s.getData(), s.size(), 0, stun_addr, isIPV6() ?
+    sendto(socket, s.getData(), s.size(), 0, stun_addr, isIPv6Socket() ?
         sizeof(sockaddr_in6) : sizeof(sockaddr_in));
 
     // Recieve now
@@ -482,9 +482,9 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
 
     struct sockaddr_in addr4_rev;
     struct sockaddr_in6 addr6_rev;
-    struct sockaddr* addr_rev = isIPV6() ?
+    struct sockaddr* addr_rev = isIPv6Socket() ?
         (struct sockaddr*)(&addr6_rev) : (struct sockaddr*)(&addr4_rev);
-    socklen_t from_len = isIPV6() ? sizeof(addr6_rev) : sizeof(addr4_rev);
+    socklen_t from_len = isIPv6Socket() ? sizeof(addr6_rev) : sizeof(addr4_rev);
     int len = -1;
     int count = 0;
     while (len < 0 && count < 2000)
@@ -504,7 +504,7 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
         return "";
     }
 
-    if (isIPV6())
+    if (isIPv6Socket())
     {
         if (!sameIPV6((sockaddr_in6*)stun_addr, &addr6_rev))
         {
@@ -705,7 +705,7 @@ std::string STKHost::getIPFromStun(int socket, const std::string& stun_address,
  */
 void STKHost::setPublicAddress()
 {
-    if (isIPV6() && NetworkConfig::get()->isClient())
+    if (isIPv6Socket() && NetworkConfig::get()->isClient())
     {
         // IPv6 client doesn't support connection to firewalled server,
         // so no need to test STUN
@@ -747,7 +747,7 @@ void STKHost::setPublicAddress()
             ping = StkTime::getMonoTimeMs() - ping;
             // Succeed, save ping
             UserConfigParams::m_stun_servers[server_name] = (uint32_t)(ping);
-            if (isIPV6())
+            if (isIPv6Socket())
             {
                 m_public_ipv6_address = getIPFromStun(
                     (int)m_network->getENetHost()->socket, server_name,
@@ -768,7 +768,7 @@ void STKHost::setPublicAddress()
 //-----------------------------------------------------------------------------
 void STKHost::setPrivatePort()
 {
-    if (isIPV6())
+    if (isIPv6Socket())
     {
         struct sockaddr_in6 sin6;
         socklen_t len = sizeof(sin6);
@@ -891,13 +891,13 @@ void STKHost::mainLoop()
     {
         TransportAddress address(0, stk_config->m_server_discovery_port);
         ENetAddress eaddr = address.toEnetAddress();
-        bool socket_ipv6 = isIPV6() == 1 ? true : false;
+        bool socket_ipv6 = isIPv6Socket() == 1 ? true : false;
         if (socket_ipv6)
-            setIPV6(0);
+            setIPv6Socket(0);
         // direct_socket use IPv4 only atm
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
         if (socket_ipv6)
-            setIPV6(1);
+            setIPv6Socket(1);
         if (direct_socket->getENetHost() == NULL)
         {
             Log::warn("STKHost", "No direct socket available, this "
@@ -950,7 +950,7 @@ void STKHost::mainLoop()
 
         if (is_server)
         {
-            if (isIPV6() &&
+            if (isIPv6Socket() &&
                 last_disconnect_time_update < StkTime::getMonoTimeMs())
             {
                 // Check per 20 second, don't need to check client because it

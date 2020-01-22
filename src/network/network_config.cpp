@@ -196,11 +196,11 @@ void NetworkConfig::detectIPType()
     // used in ipv4 or ipv6
     uint8_t stun_tansaction_id[16] = {};
     BareNetworkString s = STKHost::getStunRequest(stun_tansaction_id);
-    setIPV6(0);
+    setIPv6Socket(0);
     auto ipv4 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &addr));
-    setIPV6(1);
+    setIPv6Socket(1);
     auto ipv6 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &addr));
-    setIPV6(0);
+    setIPv6Socket(0);
 
     auto ipv4_it = UserConfigParams::m_stun_servers_v4.begin();
     int adv = rand() % UserConfigParams::m_stun_servers_v4.size();

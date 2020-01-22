@@ -197,13 +197,13 @@ extern "C" int insideIPv6CIDR(const char* ipv6_cidr, const char* ipv6_in)
 #ifndef ENABLE_IPV6
 #include "network/stk_ipv6.hpp"
 // ----------------------------------------------------------------------------
-int isIPV6()
+int isIPv6Socket()
 {
     return 0;
 }   // isIPV6
 
 // ----------------------------------------------------------------------------
-void setIPV6(int val)
+void setIPv6Socket(int val)
 {
 }   // setIPV6
 
@@ -253,13 +253,13 @@ struct MappedAddress
 };
 std::vector<MappedAddress> g_mapped_ips;
 // ============================================================================
-int isIPV6()
+int isIPv6Socket()
 {
     return g_ipv6;
 }   // isIPV6
 
 // ----------------------------------------------------------------------------
-void setIPV6(int val)
+void setIPv6Socket(int val)
 {
     g_ipv6 = val;
 }   // setIPV6
