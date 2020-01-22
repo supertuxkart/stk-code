@@ -1431,6 +1431,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
                 // Server owner online account will keep online as long as
                 // server is live
                 Online::RequestManager::m_disable_polling = true;
+                NetworkConfig::get()->detectIPType();
                 NetworkConfig::get()->setIsWAN();
                 NetworkConfig::get()->setIsPublicServer();
                 ServerConfig::loadServerLobbyFromConfig();

@@ -172,8 +172,8 @@ private:
     // ------------------------------------------------------------------------
     void mainLoop();
     // ------------------------------------------------------------------------
-    std::string getIPFromStun(int socket, const std::string& stun_address,
-                              bool ipv4);
+    void getIPFromStun(int socket, const std::string& stun_address, bool ipv4,
+                       std::string* ip_string, uint16_t* port);
 public:
     /** If a network console should be started. */
     static bool m_enable_console;
@@ -212,7 +212,7 @@ public:
     // ------------------------------------------------------------------------
     void setPrivatePort();
     // ------------------------------------------------------------------------
-    void setPublicAddress();
+    void setPublicAddress(bool ipv4);
     // ------------------------------------------------------------------------
     void disconnectAllPeers(bool timeout_waiting = false);
     // ------------------------------------------------------------------------
@@ -393,6 +393,12 @@ public:
     // ------------------------------------------------------------------------
     std::vector<std::shared_ptr<NetworkPlayerProfile> >
         getPlayersForNewGame() const;
+    // ------------------------------------------------------------------------
+    void replaceNetwork(Network* new_network)
+    {
+        m_network = new_network;
+        setPrivatePort();
+    }
     // ------------------------------------------------------------------------
     static BareNetworkString getStunRequest(uint8_t* stun_tansaction_id);
 };   // class STKHost

@@ -271,14 +271,6 @@ void stkInitialize()
     g_mapped_ipv6_used = 0;
     g_ipv6 = 0;
     g_mapped_ips.clear();
-
-    // For now only auto enable ipv6 socket in client with nat64, so in
-    // connect to server it will change the ipv4 address to nat64 one
-    if (NetworkConfig::get()->isClient())
-    {
-        if (NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
-            g_ipv6 = 1;
-    }
 }   // stkInitialize
 
 // ----------------------------------------------------------------------------

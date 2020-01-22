@@ -224,14 +224,27 @@ void ConnectToServer::asynchronousUpdate()
                 }
                 servers.clear();
             }
-            if (m_server->useIPV6Connection())
+            // Auto enable IPv6 socket in client with nat64, so in
+            // connect to server it will change the ipv4 address to nat64 one
+            if (m_server->useIPV6Connection() ||
+                NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
             {
-                // Disable STUN if using IPv6 (check in setPublicAddress)
+                // Free the bound socket first
+                delete STKHost::get()->getNetwork();
                 setIPv6Socket(1);
+                ENetAddress addr;
+                addr.host = STKHost::HOST_ANY;
+                addr.port = NetworkConfig::get()->getClientPort();
+                auto new_network = new Network(/*peer_count*/1,
+                    /*channel_limit*/EVENT_CHANNEL_COUNT,
+                    /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &addr,
+                    true/*change_port_if_bound*/);
+                STKHost::get()->replaceNetwork(new_network);
             }
             if (m_server->supportsEncryption())
             {
-                STKHost::get()->setPublicAddress();
+                STKHost::get()->setPublicAddress(
+                    !m_server->useIPV6Connection());
                 registerWithSTKServer();
             }
             // Set to DONE will stop STKHost is not connected
@@ -466,6 +479,8 @@ void ConnectToServer::registerWithSTKServer()
     NetworkConfig::get()->setServerDetails(request, "join-server-key");
     request->addParameter("server-id", m_server->getServerId());
     request->addParameter("address", addr.getIP());
+    request->addParameter("address_ipv6",
+        STKHost::get()->getPublicIPV6Address());
     request->addParameter("port", addr.getPort());
 
     Crypto::initClientAES();
@@ -473,7 +488,9 @@ void ConnectToServer::registerWithSTKServer()
     request->addParameter("aes-iv", Crypto::getClientIV());
 
     Log::info("ConnectToServer", "Registering addr %s",
-        addr.toString().c_str());
+        STKHost::get()->getPublicIPV6Address().empty() ?
+        addr.toString().c_str() :
+        STKHost::get()->getPublicIPV6Address().c_str());
 
     // This can be done blocking: till we are registered with the
     // stk server, there is no need to to react to any other 

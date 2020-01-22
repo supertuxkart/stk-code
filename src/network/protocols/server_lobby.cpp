@@ -1357,7 +1357,17 @@ void ServerLobby::asynchronousUpdate()
             createServerIdFile();
             return;
         }
-        STKHost::get()->setPublicAddress();
+        auto ip_type = NetworkConfig::get()->getIPType();
+        // Set the IPv6 address first for possible IPv6 only server
+        if (ip_type >= NetworkConfig::IP_V6)
+        {
+            STKHost::get()->setPublicAddress(false/*ipv4*/);
+        }
+        if (ip_type == NetworkConfig::IP_V4 ||
+            ip_type == NetworkConfig::IP_DUAL_STACK)
+        {
+            STKHost::get()->setPublicAddress(true/*ipv4*/);
+        }
         if (STKHost::get()->getPublicAddress().isUnset())
         {
             m_state = ERROR_LEAVE;
