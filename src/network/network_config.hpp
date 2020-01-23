@@ -262,6 +262,8 @@ public:
     // ------------------------------------------------------------------------
     IPType getIPType() const                       { return m_ip_type.load(); }
     // ------------------------------------------------------------------------
+    void setIPType(IPType ip_type)                { m_ip_type.store(ip_type); }
+    // ------------------------------------------------------------------------
     const std::string& getNAT64Prefix() const        { return m_nat64_prefix; }
 };   // class NetworkConfig
 

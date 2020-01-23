@@ -1359,7 +1359,7 @@ void ServerLobby::asynchronousUpdate()
         }
         auto ip_type = NetworkConfig::get()->getIPType();
         // Set the IPv6 address first for possible IPv6 only server
-        if (ip_type >= NetworkConfig::IP_V6)
+        if (isIPv6Socket() && ip_type >= NetworkConfig::IP_V6)
         {
             STKHost::get()->setPublicAddress(false/*ipv4*/);
         }

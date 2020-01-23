@@ -728,7 +728,11 @@ void STKHost::setPublicAddress(bool ipv4)
             if (NetworkConfig::get()->isServer() && ipv4 &&
                 port != m_public_address.getPort())
             {
-                Log::error("STKHost", "IPv6 has different port than IPv4.");
+                if (ServerConfig::m_ipv6_server)
+                {
+                    Log::error("STKHost",
+                        "IPv6 has different port than IPv4.");
+                }
                 m_public_ipv6_address.clear();
             }
             if (ipv4)
