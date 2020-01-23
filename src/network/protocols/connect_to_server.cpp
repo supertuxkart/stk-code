@@ -278,19 +278,11 @@ void ConnectToServer::asynchronousUpdate()
             // direct connection to server first, if failed than use the one
             // that has stun mapped, the first 8 seconds allow the server to
             // start the connect to peer protocol first before the port is
-            // remapped. IPv6 has no stun so try once with any port
-            if (isIPv6Socket())
-            {
-                if (!tryConnect(2000, 15, true/*another_port*/, true/*IPv6*/))
-                    m_state = DONE;
-            }
-            else
-            {
-                if (tryConnect(2000, 4, true/*another_port*/))
-                    break;
-                if (!tryConnect(2000, 11))
-                    m_state = DONE;
-            }
+            // remapped.
+            if (tryConnect(2000, 4, true/*another_port*/, isIPv6Socket()))
+                break;
+            if (!tryConnect(2000, 11, false/*another_port*/, isIPv6Socket()))
+                m_state = DONE;
             break;
         }
         case DONE:
