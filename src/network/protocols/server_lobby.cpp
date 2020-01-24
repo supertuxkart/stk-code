@@ -866,6 +866,10 @@ void ServerLobby::createServerIdFile()
         std::fstream fs;
         sid += StringUtils::toString(m_server_id_online.load()) + "_" +
             StringUtils::toString(STKHost::get()->getPrivatePort());
+        if (isIPv6Socket())
+            sid += "_v6";
+        else
+            sid += "_v4";
         io::IWriteFile* file = irr::io::createWriteFile(sid.c_str(), false);
         if (file)
             file->drop();

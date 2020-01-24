@@ -260,6 +260,14 @@ STKHost::STKHost(bool server)
     if (server)
     {
         setIPv6Socket(ServerConfig::m_ipv6_server ? 1 : 0);
+#ifdef ENABLE_IPV6
+        if (NetworkConfig::get()->getIPType() == NetworkConfig::IP_V4 &&
+            ServerConfig::m_ipv6_server)
+        {
+            Log::warn("STKHost", "Disable IPv6 socket due to missing IPv6.");
+            setIPv6Socket(0);
+        }
+#endif
         addr.port = ServerConfig::m_server_port;
         if (addr.port == 0 && !UserConfigParams::m_random_server_port)
             addr.port = stk_config->m_server_port;
@@ -728,7 +736,7 @@ void STKHost::setPublicAddress(bool ipv4)
             if (NetworkConfig::get()->isServer() && ipv4 &&
                 port != m_public_address.getPort())
             {
-                if (ServerConfig::m_ipv6_server)
+                if (isIPv6Socket())
                 {
                     Log::error("STKHost",
                         "IPv6 has different port than IPv4.");

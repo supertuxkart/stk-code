@@ -189,6 +189,7 @@ bool NetworkConfig::roundValuesNow() const
  */
 void NetworkConfig::detectIPType()
 {
+#ifdef ENABLE_IPV6
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
     addr.port = STKHost::PORT_ANY;
@@ -346,4 +347,7 @@ void NetworkConfig::detectIPType()
                 "NAT64 prefix is %s.", m_nat64_prefix.c_str());
         }
     }
+#else
+    m_ip_type = IP_V4;
+#endif
 }   // detectIPType

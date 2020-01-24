@@ -105,6 +105,7 @@ void ConnectToServer::getClientServerInfo()
 {
     assert(m_server);
     // Allow up to 10 seconds for the separate process to fully start-up
+    bool server_ipv6_socket = false;
     bool started = false;
     uint64_t timeout = StkTime::getMonoTimeMs() + 10000;
     const std::string& sid = NetworkConfig::get()->getServerIdFile();
@@ -123,12 +124,13 @@ void ConnectToServer::getClientServerInfo()
             if (f.find(server_id_file) != std::string::npos)
             {
                 auto split = StringUtils::split(f, '_');
-                if (split.size() != 3)
+                if (split.size() != 4)
                     continue;
                 if (!StringUtils::fromString(split[1], server_id))
                     continue;
                 if (!StringUtils::fromString(split[2], port))
                     continue;
+                server_ipv6_socket = split[3] == "v6";
                 file_manager->removeFile(dir + "/" + f);
                 started = true;
                 break;
@@ -151,6 +153,11 @@ void ConnectToServer::getClientServerInfo()
         assert(port != 0);
         m_server_address.setPort(port);
         m_server->setPrivatePort(port);
+        if (server_ipv6_socket)
+        {
+            m_server->setIPV6Address("::1");
+            m_server->setIPV6Connection(true);
+        }
         if (server_id != 0)
         {
             m_server->setSupportsEncryption(true);
@@ -404,13 +411,13 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
         hints.ai_socktype = SOCK_STREAM;
         std::string addr_string = m_server->getIPV6Address();
         std::string port =
-            StringUtils::toString(m_server->getAddress().getPort());
+            StringUtils::toString(m_server_address.getPort());
         // Convert to a NAT64 address from IPv4
         if (!m_server->useIPV6Connection() &&
             NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
         {
             // From IPv4
-            addr_string = m_server->getAddress().toString(false/*show_port*/);
+            addr_string = m_server_address.toString(false/*show_port*/);
             addr_string = NetworkConfig::get()->getNAT64Prefix() + addr_string;
         }
         if (getaddrinfo_compat(addr_string.c_str(), port.c_str(),
