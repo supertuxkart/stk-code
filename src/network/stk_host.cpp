@@ -933,17 +933,17 @@ void STKHost::mainLoop()
             }
         }   // if discovery host
 
+        if (isIPv6Socket() &&
+            last_disconnect_time_update < StkTime::getMonoTimeMs())
+        {
+            // Check per 20 second, client needs to be handled too in case
+            // the address changed in intercept callback
+            // (see ConnectToServer::interceptCallback)
+            last_disconnect_time_update = StkTime::getMonoTimeMs() + 20000;
+            removeDisconnectedMappedAddress();
+        }
         if (is_server)
         {
-            if (isIPv6Socket() &&
-                last_disconnect_time_update < StkTime::getMonoTimeMs())
-            {
-                // Check per 20 second, don't need to check client because it
-                // only has 1 peer
-                last_disconnect_time_update = StkTime::getMonoTimeMs() + 20000;
-                removeDisconnectedMappedAddress();
-            }
-
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
             const float timeout = ServerConfig::m_validation_timeout;
             bool need_ping = false;

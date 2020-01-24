@@ -355,8 +355,18 @@ int ConnectToServer::interceptCallback(ENetHost* host, ENetEvent* event)
         TransportAddress server_addr = host->receivedAddress;
         if (server_addr != m_server_address)
         {
+            std::string new_address = server_addr.toString();
+            if (isIPv6Socket())
+            {
+                // It was already mapped to real IPv6 before the intercept
+                // callback
+                ENetAddress en_addr = server_addr.toEnetAddress();
+                new_address = "[";
+                new_address += getIPV6ReadableFromMappedAddress
+                    (&en_addr) + "]:" + StringUtils::toString(en_addr.port);
+            }
             Log::info("ConnectToServer", "Using new server address %s",
-                server_addr.toString().c_str());
+                new_address.c_str());
             m_retry_count = 15;
             m_server_address = server_addr;
             m_done_intecept = true;
@@ -385,7 +395,6 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
     m_done_intecept = false;
     nw->getENetHost()->intercept = ConnectToServer::interceptCallback;
 
-    std::string connecting_address = m_server_address.toString();
     if (ipv6)
     {
         struct addrinfo hints;
@@ -414,10 +423,8 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
             {
                 struct sockaddr_in6* ipv6_sock =
                     (struct sockaddr_in6*)addr->ai_addr;
-                ENetAddress addr = m_server_address.toEnetAddress();
-                connecting_address = std::string("[") + addr_string + "]:" +
-                    StringUtils::toString(addr.port);
-                addMappedAddress(&addr, ipv6_sock);
+                ENetAddress en_addr = m_server_address.toEnetAddress();
+                addMappedAddress(&en_addr, ipv6_sock);
                 break;
             }
         }
@@ -426,6 +433,14 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
 
     while (--m_retry_count >= 0 && !ProtocolManager::lock()->isExiting())
     {
+        std::string connecting_address = m_server_address.toString();
+        if (ipv6)
+        {
+            ENetAddress en_addr = m_server_address.toEnetAddress();
+            connecting_address = "[";
+            connecting_address += getIPV6ReadableFromMappedAddress
+                (&en_addr) + "]:" + StringUtils::toString(en_addr.port);
+        }
         ENetPeer* p = nw->connectTo(m_server_address);
         if (!p)
             break;
