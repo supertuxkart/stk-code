@@ -320,7 +320,14 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
             Log::verbose("ServersManager", "Skipping a server");
             continue;
         }
-        m_servers.emplace_back(std::make_shared<Server>(*s));
+        std::shared_ptr<Server> ser = std::make_shared<Server>(*s);
+        if (ser->getAddress().isUnset() &&
+            NetworkConfig::get()->getIPType() == NetworkConfig::IP_V4)
+        {
+            Log::verbose("ServersManager", "Skipping an IPv6 only server");
+            continue;
+        }
+        m_servers.emplace_back(ser);
     }
     m_last_load_time.store(StkTime::getMonoTimeMs());
     m_list_updated = true;

@@ -231,6 +231,11 @@ void ConnectToServer::asynchronousUpdate()
                 }
                 servers.clear();
             }
+            // Always use IPv6 connection for IPv6 only server
+            if (m_server->getAddress().isUnset() &&
+                NetworkConfig::get()->getIPType() != NetworkConfig::IP_V4)
+                m_server->setIPV6Connection(true);
+
             // Auto enable IPv6 socket in client with nat64, so in
             // connect to server it will change the ipv4 address to nat64 one
             if (m_server->useIPV6Connection() ||
