@@ -1372,7 +1372,8 @@ void ServerLobby::asynchronousUpdate()
         {
             STKHost::get()->setPublicAddress(true/*ipv4*/);
         }
-        if (STKHost::get()->getPublicAddress().isUnset())
+        if (STKHost::get()->getPublicAddress().isUnset() &&
+            STKHost::get()->getPublicIPV6Address().empty())
         {
             m_state = ERROR_LEAVE;
         }
@@ -2242,14 +2243,18 @@ bool ServerLobby::registerServer(bool now)
     request->addParameter("password", (unsigned)(!pw.empty()));
     request->addParameter("version", (unsigned)ServerConfig::m_server_version);
 
-    Log::info("ServerLobby", "Public server address %s",
-        m_server_address.toString().c_str());
+    bool ipv6_only = m_server_address.isUnset();
+    if (!ipv6_only)
+    {
+        Log::info("ServerLobby", "Public server address %s",
+            m_server_address.toString().c_str());
+    }
     if (!STKHost::get()->getPublicIPV6Address().empty())
     {
         request->addParameter("address_ipv6",
             STKHost::get()->getPublicIPV6Address());
         Log::info("ServerLobby", "Public IPv6 server address %s",
-            STKHost::get()->getPublicIPV6Address().c_str());
+            STKHost::get()->getVaildPublicAddress().c_str());
     }
     if (now)
     {
@@ -2278,8 +2283,18 @@ void ServerLobby::unregisterServer(bool now)
 
     request->addParameter("address", m_server_address.getIP());
     request->addParameter("port", m_server_address.getPort());
-    Log::info("ServerLobby", "Unregister server address %s",
-        m_server_address.toString().c_str());
+    bool ipv6_only = m_server_address.isUnset();
+    if (!ipv6_only)
+    {
+        Log::info("ServerLobby", "Unregister server address %s",
+            m_server_address.toString().c_str());
+    }
+    else
+    {
+        Log::info("ServerLobby", "Unregister server address %s",
+            STKHost::get()->getVaildPublicAddress().c_str());
+    }
+
     // No need to check for result as server will be auto-cleared anyway
     // when no polling is done
     if (now)

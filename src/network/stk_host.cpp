@@ -693,12 +693,6 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
  */
 void STKHost::setPublicAddress(bool ipv4)
 {
-    if (isIPv6Socket() && !ipv4)
-    {
-        // Set an unused IPv4 first for possible IPv6 only network
-        m_public_address = TransportAddress("169.254.0.0:65535");
-    }
-
     auto& stun_map = ipv4 ? UserConfigParams::m_stun_servers_v4 :
         UserConfigParams::m_stun_servers;
     std::vector<std::pair<std::string, uint32_t> > untried_server;
@@ -1682,3 +1676,18 @@ bool STKHost::hasServerAI() const
 {
     return NetworkConfig::get()->isServer() && m_separate_process != NULL;
 }   // hasServerAI
+
+// ----------------------------------------------------------------------------
+/** Return an valid public IPv4 or IPv6 address with port, empty if both are
+ *  unset, IPv6 will come first if both exists. */
+std::string STKHost::getVaildPublicAddress() const
+{
+    if (!m_public_ipv6_address.empty() && m_public_address.getPort() != 0)
+    {
+        return std::string("[") + m_public_ipv6_address + "]:" +
+            StringUtils::toString(m_public_address.getPort());
+    }
+    if (!m_public_address.isUnset())
+        return m_public_address.toString();
+    return "";
+}   // getVaildPublicAddress

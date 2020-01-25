@@ -255,13 +255,14 @@ void ConnectToServer::asynchronousUpdate()
                 registerWithSTKServer();
             }
             // Set to DONE will stop STKHost is not connected
-            m_state = STKHost::get()->getPublicAddress().isUnset() ?
+            m_state = STKHost::get()->getVaildPublicAddress().empty() ?
                 DONE : GOT_SERVER_ADDRESS;
             break;
         }
         case GOT_SERVER_ADDRESS:
         {
-            if (!STKHost::get()->isClientServer() &&
+            if (!STKHost::get()->getPublicAddress().isUnset() &&
+                !STKHost::get()->isClientServer() &&
                 m_server_address.getIP() ==
                 STKHost::get()->getPublicAddress().getIP())
             {
@@ -314,8 +315,7 @@ void ConnectToServer::update(int ticks)
         {
             // lobby room protocol if we're connected only
             if (STKHost::get()->getPeerCount() > 0 &&
-                STKHost::get()->getServerPeerForClient()->isConnected() &&
-                !m_server_address.isUnset())
+                STKHost::get()->getServerPeerForClient()->isConnected())
             {
                 // Let main thread create ClientLobby for better
                 // synchronization with GUI
@@ -493,7 +493,7 @@ void ConnectToServer::registerWithSTKServer()
     NetworkConfig::get()->setServerDetails(request, "join-server-key");
     request->addParameter("server-id", m_server->getServerId());
     request->addParameter("address", addr.getIP());
-    request->addParameter("address_ipv6",
+    request->addParameter("address-ipv6",
         STKHost::get()->getPublicIPV6Address());
     request->addParameter("port", addr.getPort());
 
@@ -502,9 +502,7 @@ void ConnectToServer::registerWithSTKServer()
     request->addParameter("aes-iv", Crypto::getClientIV());
 
     Log::info("ConnectToServer", "Registering addr %s",
-        STKHost::get()->getPublicIPV6Address().empty() ?
-        addr.toString().c_str() :
-        STKHost::get()->getPublicIPV6Address().c_str());
+        STKHost::get()->getVaildPublicAddress().c_str());
 
     // This can be done blocking: till we are registered with the
     // stk server, there is no need to to react to any other 
