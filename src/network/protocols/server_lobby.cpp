@@ -2260,7 +2260,7 @@ bool ServerLobby::registerServer(bool now)
         request->addParameter("address_ipv6",
             STKHost::get()->getPublicIPV6Address());
         Log::info("ServerLobby", "Public IPv6 server address %s",
-            STKHost::get()->getVaildPublicAddress().c_str());
+            STKHost::get()->getValidPublicAddress().c_str());
     }
     if (now)
     {
@@ -2298,7 +2298,7 @@ void ServerLobby::unregisterServer(bool now)
     else
     {
         Log::info("ServerLobby", "Unregister server address %s",
-            STKHost::get()->getVaildPublicAddress().c_str());
+            STKHost::get()->getValidPublicAddress().c_str());
     }
 
     // No need to check for result as server will be auto-cleared anyway

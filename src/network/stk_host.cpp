@@ -1652,7 +1652,7 @@ bool STKHost::hasServerAI() const
 // ----------------------------------------------------------------------------
 /** Return an valid public IPv4 or IPv6 address with port, empty if both are
  *  unset, IPv6 will come first if both exists. */
-std::string STKHost::getVaildPublicAddress() const
+std::string STKHost::getValidPublicAddress() const
 {
     if (!m_public_ipv6_address.empty() && m_public_address.getPort() != 0)
     {
@@ -1662,7 +1662,7 @@ std::string STKHost::getVaildPublicAddress() const
     if (!m_public_address.isUnset())
         return m_public_address.toString();
     return "";
-}   // getVaildPublicAddress
+}   // getValidPublicAddress
 
 // ----------------------------------------------------------------------------
 int STKHost::receiveRawPacket(char *buffer, int buffer_len,

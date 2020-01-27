@@ -258,10 +258,11 @@ void ConnectToServer::asynchronousUpdate()
             {
                 STKHost::get()->setPublicAddress(
                     !m_server->useIPV6Connection());
-                registerWithSTKServer();
+                if (!STKHost::get()->getValidPublicAddress().empty())
+                    registerWithSTKServer();
             }
             // Set to DONE will stop STKHost is not connected
-            m_state = STKHost::get()->getVaildPublicAddress().empty() ?
+            m_state = STKHost::get()->getValidPublicAddress().empty() ?
                 DONE : GOT_SERVER_ADDRESS;
             break;
         }
@@ -517,7 +518,7 @@ void ConnectToServer::registerWithSTKServer()
     request->addParameter("aes-iv", Crypto::getClientIV());
 
     Log::info("ConnectToServer", "Registering addr %s",
-        STKHost::get()->getVaildPublicAddress().c_str());
+        STKHost::get()->getValidPublicAddress().c_str());
 
     // This can be done blocking: till we are registered with the
     // stk server, there is no need to to react to any other 

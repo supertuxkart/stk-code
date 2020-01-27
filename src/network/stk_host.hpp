@@ -207,7 +207,7 @@ public:
     const std::string& getPublicIPV6Address() const
                                               { return m_public_ipv6_address; }
     // ------------------------------------------------------------------------
-    std::string getVaildPublicAddress() const;
+    std::string getValidPublicAddress() const;
     // ------------------------------------------------------------------------
     const TransportAddress& getStunAddress() const   { return m_stun_address; }
     // ------------------------------------------------------------------------
