@@ -227,6 +227,7 @@
 #include "network/server.hpp"
 #include "network/server_config.hpp"
 #include "network/servers_manager.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/profile_manager.hpp"
@@ -2586,6 +2587,8 @@ void runUnitTests()
     NetworkString::unitTesting();
     Log::info("UnitTest", "TransportAddress");
     TransportAddress::unitTesting();
+    Log::info("UnitTest", "SocketAddress");
+    SocketAddress::unitTesting();
     Log::info("UnitTest", "StringUtils::versionToInt");
     StringUtils::unitTesting();
 

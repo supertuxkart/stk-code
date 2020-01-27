@@ -39,3 +39,4 @@ std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in);
 bool sameIPV6(const struct sockaddr_in6* in_1,
               const struct sockaddr_in6* in_2);
 void removeDisconnectedMappedAddress();
+bool isIPv4MappedAddress(const struct sockaddr_in6* in6);

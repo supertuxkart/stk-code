@@ -49,6 +49,28 @@ extern "C"
 #include <string>
 
 // ----------------------------------------------------------------------------
+bool isIPv4MappedAddress(const struct sockaddr_in6* in6)
+{
+    uint8_t w0 = in6->sin6_addr.s6_addr[0];
+    uint8_t w1 = in6->sin6_addr.s6_addr[1];
+    uint8_t w2 = in6->sin6_addr.s6_addr[2];
+    uint8_t w3 = in6->sin6_addr.s6_addr[3];
+    uint8_t w4 = in6->sin6_addr.s6_addr[4];
+    uint8_t w5 = in6->sin6_addr.s6_addr[5];
+    uint8_t w6 = in6->sin6_addr.s6_addr[6];
+    uint8_t w7 = in6->sin6_addr.s6_addr[7];
+    uint8_t w8 = in6->sin6_addr.s6_addr[8];
+    uint8_t w9 = in6->sin6_addr.s6_addr[9];
+    uint8_t w10 = in6->sin6_addr.s6_addr[10];
+    uint8_t w11 = in6->sin6_addr.s6_addr[11];
+    if (w0 == 0 && w1 == 0 && w2 == 0 && w3 == 0 && w4 == 0 &&
+        w5 == 0 && w6 == 0 && w7 == 0 && w8 == 0 && w9 == 0 &&
+        w10 == 0xff && w11 == 0xff)
+        return true;
+    return false;
+}   // isIPv4MappedAddress
+
+// ----------------------------------------------------------------------------
 std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in)
 {
     std::string result;
@@ -338,21 +360,7 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
         return;
     }
 
-    uint8_t w0 = in6->sin6_addr.s6_addr[0];
-    uint8_t w1 = in6->sin6_addr.s6_addr[1];
-    uint8_t w2 = in6->sin6_addr.s6_addr[2];
-    uint8_t w3 = in6->sin6_addr.s6_addr[3];
-    uint8_t w4 = in6->sin6_addr.s6_addr[4];
-    uint8_t w5 = in6->sin6_addr.s6_addr[5];
-    uint8_t w6 = in6->sin6_addr.s6_addr[6];
-    uint8_t w7 = in6->sin6_addr.s6_addr[7];
-    uint8_t w8 = in6->sin6_addr.s6_addr[8];
-    uint8_t w9 = in6->sin6_addr.s6_addr[9];
-    uint8_t w10 = in6->sin6_addr.s6_addr[10];
-    uint8_t w11 = in6->sin6_addr.s6_addr[11];
-    if (w0 == 0 && w1 == 0 && w2 == 0 && w3 == 0 && w4 == 0 &&
-        w5 == 0 && w6 == 0 && w7 == 0 && w8 == 0 && w9 == 0 &&
-        w10 == 0xff && w11 == 0xff)
+    if (isIPv4MappedAddress(in6))
     {
         ea->host = ((in_addr*)(in6->sin6_addr.s6_addr + 12))->s_addr;
         ea->port = ntohs(in6->sin6_port);
