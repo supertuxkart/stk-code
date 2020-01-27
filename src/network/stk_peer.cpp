@@ -23,6 +23,7 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_ipv6.hpp"
 #include "network/stk_host.hpp"
 #include "network/transport_address.hpp"
@@ -38,9 +39,25 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
        : m_peer_address(enet_peer->address), m_host(host)
 {
     m_addons_scores.fill(-1);
-    // We use 0.x.x.x ip to map to IPv6 address internally
-    if (m_peer_address.getIP() < 16777216)
-        m_ipv6_address = getIPV6ReadableFromMappedAddress(&enet_peer->address);
+    uint32_t addr = htonl(enet_peer->address.host);
+#ifdef ENABLE_IPV6
+    if (isIPv6Socket())
+    {
+        // This will return the mapped IPv4 address too for IPv6 socket
+        // So we can sendto directly with it
+        struct sockaddr_in6 in6 = {};
+        getIPV6FromMappedAddress(&enet_peer->address, &in6);
+        m_socket_address.reset(new SocketAddress());
+        m_socket_address->setSockAddrIn(AF_INET6, (sockaddr*)&in6, sizeof(in6));
+        if (m_socket_address->isIPv6())
+            m_ipv6_address = m_socket_address->toString(false/*show_port*/);
+    }
+    else
+#endif
+    {
+        m_socket_address.reset(
+            new SocketAddress(addr, enet_peer->address.port));
+    }
     m_enet_peer           = enet_peer;
     m_host_id             = host_id;
     m_connected_time      = StkTime::getMonoTimeMs();

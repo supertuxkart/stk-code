@@ -31,6 +31,7 @@
 #include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/game_setup.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/peer_vote.hpp"
@@ -2604,7 +2605,9 @@ void ServerLobby::checkIncomingConnectionRequests()
             {
                 uint32_t addr, id;
                 uint16_t port;
+                std::string ipv6;
                 users_xml->getNode(i)->get("ip", &addr);
+                users_xml->getNode(i)->get("ipv6", &ipv6);
                 users_xml->getNode(i)->get("port", &port);
                 users_xml->getNode(i)->get("id", &id);
                 users_xml->getNode(i)->get("aes-key", &keys[id].m_aes_key);
@@ -2615,7 +2618,10 @@ void ServerLobby::checkIncomingConnectionRequests()
                 keys[id].m_tried = false;
                 if (ServerConfig::m_firewalled_server)
                 {
-                    TransportAddress peer_addr(addr, port);
+                    SocketAddress peer_addr(addr, port);
+                    if (!ipv6.empty())
+                        peer_addr.init(ipv6, port);
+                    peer_addr.convertForIPv6Socket();
                     std::string peer_addr_str = peer_addr.toString();
                     if (sl->m_pending_peer_connection.find(peer_addr_str) !=
                         sl->m_pending_peer_connection.end())

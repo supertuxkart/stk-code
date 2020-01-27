@@ -54,6 +54,7 @@ class NetworkTimerSynchronizer;
 class Server;
 class ServerLobby;
 class SeparateProcess;
+class SocketAddress;
 
 enum ENetCommandType : unsigned int
 {
@@ -273,6 +274,8 @@ public:
     // ------------------------------------------------------------------------
     bool peerExists(const TransportAddress& peer_address);
     // ------------------------------------------------------------------------
+    bool peerExists(const SocketAddress& peer_address);
+    // ------------------------------------------------------------------------
     bool isConnectedTo(const TransportAddress& peer_address);
     // ------------------------------------------------------------------------
     std::shared_ptr<STKPeer> getServerPeerForClient() const;
@@ -306,6 +309,12 @@ public:
     {
         m_network->sendRawPacket(buffer, dst);
     }  // sendRawPacket
+    // ------------------------------------------------------------------------
+    int receiveRawPacket(char *buffer, int buffer_len,
+                         SocketAddress* sender, int max_tries = -1);
+    // ------------------------------------------------------------------------
+    void sendRawPacket(const BareNetworkString &buffer,
+                       const SocketAddress& dst);
     // ------------------------------------------------------------------------
     Network* getNetwork() const                           { return m_network; }
     // ------------------------------------------------------------------------

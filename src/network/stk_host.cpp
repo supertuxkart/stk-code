@@ -1302,7 +1302,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     const int LEN=2048;
     char buffer[LEN];
 
-    TransportAddress sender;
+    SocketAddress sender;
     int len = direct_socket->receiveRawPacket(buffer, LEN, &sender, 1);
     if(len<=0) return;
     BareNetworkString message(buffer, len);
@@ -1378,6 +1378,25 @@ bool STKHost::peerExists(const TransportAddress& peer)
             ((stk_peer->getAddress().isPublicAddressLocalhost() ||
             peer.isPublicAddressLocalhost()) &&
             stk_peer->getAddress().getPort() == peer.getPort()))
+            return true;
+    }
+    return false;
+}   // peerExists
+
+// ----------------------------------------------------------------------------
+/** \brief Tells if a peer is known.
+ *  \return True if the peer is known, false elseway.
+ */
+bool STKHost::peerExists(const SocketAddress& peer)
+{
+    std::lock_guard<std::mutex> lock(m_peers_mutex);
+    for (auto p : m_peers)
+    {
+        auto stk_peer = p.second;
+        if (stk_peer->getSocketAddress() == peer ||
+            ((stk_peer->getSocketAddress().isPublicAddressLocalhost() &&
+            peer.isPublicAddressLocalhost()) &&
+            stk_peer->getSocketAddress().getPort() == peer.getPort()))
             return true;
     }
     return false;
@@ -1691,3 +1710,17 @@ std::string STKHost::getVaildPublicAddress() const
         return m_public_address.toString();
     return "";
 }   // getVaildPublicAddress
+
+// ----------------------------------------------------------------------------
+int STKHost::receiveRawPacket(char *buffer, int buffer_len,
+                              SocketAddress* sender, int max_tries)
+{
+    return m_network->receiveRawPacket(buffer, buffer_len, sender,
+                                           max_tries);
+}   // receiveRawPacket
+// ----------------------------------------------------------------------------
+void STKHost::sendRawPacket(const BareNetworkString &buffer,
+                            const SocketAddress& dst)
+{
+    m_network->sendRawPacket(buffer, dst);
+}  // sendRawPacket

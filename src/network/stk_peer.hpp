@@ -43,7 +43,7 @@ class Crypto;
 class NetworkPlayerProfile;
 class NetworkString;
 class STKHost;
-class TransportAddress;
+class SocketAddress;
 
 enum PeerDisconnectInfo : unsigned int
 {
@@ -88,6 +88,8 @@ protected:
     uint32_t m_host_id;
 
     TransportAddress m_peer_address;
+
+    std::unique_ptr<SocketAddress> m_socket_address;
 
     STKHost* m_host;
 
@@ -293,6 +295,9 @@ public:
     }
     // ------------------------------------------------------------------------
     int getConsecutiveMessages() const       { return m_consecutive_messages; }
+    // ------------------------------------------------------------------------
+    const SocketAddress& getSocketAddress() const
+                                            { return *m_socket_address.get(); }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

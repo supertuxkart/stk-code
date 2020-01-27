@@ -20,7 +20,7 @@
 #define CONNECT_TO_PEER_HPP
 
 #include "network/protocol.hpp"
-#include "network/transport_address.hpp"
+#include "network/socket_address.hpp"
 #include "utils/cpp2011.hpp"
 
 /** One instance of this is started for every peer who tries to
@@ -29,8 +29,7 @@
 class ConnectToPeer : public Protocol
 {
 protected:
-
-    TransportAddress m_peer_address;
+    SocketAddress m_peer_address;
 
     /** Timer use for tracking broadcast. */
     uint64_t m_timer = 0;
@@ -46,7 +45,7 @@ protected:
     }  m_state;
 
 public:
-             ConnectToPeer(const TransportAddress &address);
+             ConnectToPeer(const SocketAddress &address);
     virtual ~ConnectToPeer() {}
     virtual void setup() OVERRIDE {}
     virtual void update(int ticks) OVERRIDE {}
