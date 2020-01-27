@@ -36,6 +36,7 @@
 
 class Track;
 class XMLNode;
+class SocketAddress;
 
 /**
  * \ingroup online
@@ -55,7 +56,11 @@ protected:
 
     std::string m_lower_case_player_names;
 
-    std::string m_ipv6_address;
+    /** We need to use full socket address structure instead of string to hold
+     *  it, because for local link address the scope id matters for
+     *  multicasting.
+     */
+    std::unique_ptr<SocketAddress> m_ipv6_address;
 
     uint32_t m_server_id;
     uint32_t m_server_owner;
@@ -173,7 +178,7 @@ public:
     // ------------------------------------------------------------------------
     void setIPV6Connection(bool val)
     {
-        if (m_ipv6_address.empty())
+        if (!m_ipv6_address)
             m_ipv6_connection = false;
         else
             m_ipv6_connection = val;
@@ -181,8 +186,13 @@ public:
     // ------------------------------------------------------------------------
     bool useIPV6Connection() const                { return m_ipv6_connection; }
     // ------------------------------------------------------------------------
-    void setIPV6Address(const std::string& addr)     { m_ipv6_address = addr; }
+    void setIPV6Address(const SocketAddress& addr);
     // ------------------------------------------------------------------------
-    const std::string& getIPV6Address() const        { return m_ipv6_address; }
+    SocketAddress* getIPV6Address() const
+    {
+        if (!m_ipv6_address)
+            return NULL;
+        return m_ipv6_address.get();
+    }
 };   // Server
 #endif // HEADER_SERVER_HPP

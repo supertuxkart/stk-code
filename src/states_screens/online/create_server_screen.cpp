@@ -23,6 +23,7 @@
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/server_config.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"

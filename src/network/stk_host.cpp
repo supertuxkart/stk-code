@@ -878,13 +878,8 @@ void STKHost::mainLoop()
     {
         TransportAddress address(0, stk_config->m_server_discovery_port);
         ENetAddress eaddr = address.toEnetAddress();
-        bool socket_ipv6 = isIPv6Socket() == 1 ? true : false;
-        if (socket_ipv6)
-            setIPv6Socket(0);
         // direct_socket use IPv4 only atm
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
-        if (socket_ipv6)
-            setIPv6Socket(1);
         if (direct_socket->getENetHost() == NULL)
         {
             Log::warn("STKHost", "No direct socket available, this "

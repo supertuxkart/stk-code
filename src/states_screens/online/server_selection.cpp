@@ -347,7 +347,9 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
             return;
         }
 #ifdef ENABLE_IPV6
-        if (!m_servers[selected_index]->getIPV6Address().empty())
+        // Lan server is set IPv6 during broadcasting
+        if (NetworkConfig::get()->isWAN() &&
+            m_servers[selected_index]->getIPV6Address())
             m_servers[selected_index]->setIPV6Connection(m_ipv6->getState());
 #endif
         new ServerInfoDialog(m_servers[selected_index]);
@@ -436,7 +438,7 @@ void ServerSelection::copyFromServersManager()
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
         [this](const std::shared_ptr<Server>& a)->bool
         {
-            if (m_ipv6->getState() && a->getIPV6Address().empty())
+            if (m_ipv6->getState() && !a->getIPV6Address())
                 return true;
             return false;
         }), m_servers.end());

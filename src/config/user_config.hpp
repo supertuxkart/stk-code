@@ -815,6 +815,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_race_chat
         PARAM_DEFAULT(BoolUserConfigParam(true, "race-chat",
         &m_network_group, "Enable chatting during races."));
+    PARAM_PREFIX BoolUserConfigParam m_ipv6_lan
+        PARAM_DEFAULT(BoolUserConfigParam(true, "ipv6-lan",
+        &m_network_group, "Enable IPv6 LAN server discovery."));
     PARAM_PREFIX IntUserConfigParam m_max_players
         PARAM_DEFAULT(IntUserConfigParam(8, "max-players",
         &m_network_group, "Maximum number of players on the server "

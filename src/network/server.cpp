@@ -22,6 +22,7 @@
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
 #include "network/network_config.hpp"
+#include "network/socket_address.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -58,13 +59,16 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("max_players", &m_max_players);
     xml.get("current_players", &m_current_players);
     xml.get("current_track", &m_current_track);
-    xml.get("ipv6", &m_ipv6_address);
     uint32_t ip;
     xml.get("ip", &ip);
     m_address.setIP(ip);
     uint16_t port;
     xml.get("port", &port);
     m_address.setPort(port);
+    std::string ipv6_address;
+    xml.get("ipv6", &ipv6_address);
+    if (!ipv6_address.empty())
+        m_ipv6_address.reset(new SocketAddress(ipv6_address, port));
     xml.get("private_port", &m_private_port);
     xml.get("password", &m_password_protected);
     xml.get("game_started", &m_game_started);
@@ -213,3 +217,9 @@ bool Server::searchByName(const std::string& lower_case_word)
     }
     return server_name_found;
 }   // searchByName
+
+// ----------------------------------------------------------------------------
+void Server::setIPV6Address(const SocketAddress& addr)
+{
+    m_ipv6_address.reset(new SocketAddress(addr));
+}   // setIPV6Address

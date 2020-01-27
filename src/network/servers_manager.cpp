@@ -25,7 +25,9 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/server.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
+#include "network/stk_ipv6.hpp"
 #include "online/xml_request.hpp"
 #include "online/request_manager.hpp"
 #include "utils/translation.hpp"
@@ -33,6 +35,7 @@
 
 #include <assert.h>
 #include <functional>
+#include <set>
 #include <string>
 #include <thread>
 
@@ -42,6 +45,7 @@
 #  include <iphlpapi.h>
 #else
 #  include <ifaddrs.h>
+#  include <net/if.h>
 #endif
 
 const int64_t SERVER_REFRESH_INTERVAL = 5000;
@@ -158,8 +162,9 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
             ENetAddress addr;
             addr.host = STKHost::HOST_ANY;
             addr.port = STKHost::PORT_ANY;
+            setIPv6Socket(UserConfigParams::m_ipv6_lan ? 1 : 0);
             Network *broadcast = new Network(1, 1, 0, 0, &addr);
-            const std::vector<TransportAddress> &all_bcast =
+            const std::vector<SocketAddress> &all_bcast =
                 ServersManager::get()->getBroadcastAddresses();
             for (auto &bcast_addr : all_bcast)
             {
@@ -187,7 +192,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
             std::map<irr::core::stringw, std::shared_ptr<Server> > servers_now;
             while (StkTime::getMonoTimeMs() - start_time < DURATION)
             {
-                TransportAddress sender;
+                SocketAddress sender;
                 int len = broadcast->receiveRawPacket(buffer, LEN, &sender, 1);
                 if (len > 0)
                 {
@@ -219,13 +224,20 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
                     {
                         (void)e;
                     }
-                    servers_now.insert(std::make_pair(name, 
-                        std::make_shared<Server>(cur_server_id++, name, 
-                        max_players, players, difficulty, mode, sender, 
-                        password == 1, game_started == 1, current_track)));
+                    auto server = std::make_shared<Server>(cur_server_id++,
+                        name, max_players, players, difficulty, mode,
+                        TransportAddress(sender.getIP(), sender.getPort()),
+                        password == 1, game_started == 1, current_track);
+                    if (sender.isIPv6())
+                    {
+                        server->setIPV6Address(sender);
+                        server->setIPV6Connection(true);
+                    }
+                    servers_now.insert(std::make_pair(name, server));
                     //all_servers.[name] = servers_now.back();
                 }   // if received_data
             }    // while still waiting
+            setIPv6Socket(0);
             m_success = true;
             ServersManager::get()->setLanServers(servers_now);
             delete broadcast;
@@ -370,14 +382,14 @@ void ServersManager::setDefaultBroadcastAddresses()
  *         to be created.
  *  \param len Number of bits to be or'ed.
  */
-void ServersManager::addAllBroadcastAddresses(const TransportAddress &a, int len)
+void ServersManager::addAllBroadcastAddresses(const SocketAddress &a, int len)
 {
     // Try different broadcast addresses - by masking on
     // byte boundaries
     while (len > 0)
     {
         unsigned int mask = (1 << len) - 1;
-        TransportAddress bcast(a.getIP() | mask,
+        SocketAddress bcast(a.getIP() | mask,
             stk_config->m_server_discovery_port);
         Log::info("Broadcast", "address %s length %d mask %x --> %s",
             a.toString().c_str(),
@@ -403,59 +415,32 @@ void ServersManager::addAllBroadcastAddresses(const TransportAddress &a, int len
 void ServersManager::updateBroadcastAddresses()
 {
     m_broadcast_address.clear();
-    
-#ifdef WIN32
-    IP_ADAPTER_ADDRESSES *addresses;
-    int count = 100, return_code;
-
-    int iteration = 0;
-    do
-    {
-        addresses = new IP_ADAPTER_ADDRESSES[count];
-        ULONG buf_len = sizeof(IP_ADAPTER_ADDRESSES)*count;
-        long flags = 0;
-        return_code = GetAdaptersAddresses(AF_INET, flags, NULL, addresses,
-            &buf_len);
-        iteration++;
-    } while (return_code == ERROR_BUFFER_OVERFLOW && iteration<10);
-
-    if (return_code == ERROR_BUFFER_OVERFLOW)
-    {
-        Log::warn("ServerManager", "Can not get broadcast addresses.");
-        setDefaultBroadcastAddresses();
-        return;
-    }
-
-    for (IP_ADAPTER_ADDRESSES *p = addresses; p; p = p->Next)
-    {
-        // Check all operational IP4 adapters
-        if (p->OperStatus == IfOperStatusUp &&
-            p->FirstUnicastAddress->Address.lpSockaddr->sa_family == AF_INET)
-        {
-            const sockaddr_in *sa = (sockaddr_in*)p->FirstUnicastAddress->Address.lpSockaddr;
-            // Use sa->sin_addr.S_un.S_addr and htonl?
-            TransportAddress ta(sa->sin_addr.S_un.S_un_b.s_b1,
-                sa->sin_addr.S_un.S_un_b.s_b2,
-                sa->sin_addr.S_un.S_un_b.s_b3,
-                sa->sin_addr.S_un.S_un_b.s_b4);
-            int len = 32 - p->FirstUnicastAddress->OnLinkPrefixLength;
-            addAllBroadcastAddresses(ta, len);
-        }
-    }
-#else
+    std::vector<SocketAddress> result;
+#ifndef WIN32
     struct ifaddrs *addresses, *p;
 
     if (getifaddrs(&addresses) == -1)
     {
-        Log::warn("ServerManager", "Error in getifaddrs");
+        Log::warn("SocketAddress", "Error in getifaddrs");
         return;
     }
+    std::set<uint32_t> used_scope_id;
     for (p = addresses; p; p = p->ifa_next)
     {
-        if (p->ifa_addr != NULL && p->ifa_addr->sa_family == AF_INET)
+        SocketAddress socket_address;
+        if (p->ifa_addr == NULL)
+            continue;
+        if (p->ifa_addr->sa_family == AF_INET)
         {
             struct sockaddr_in *sa = (struct sockaddr_in *) p->ifa_addr;
-            TransportAddress ta(htonl(sa->sin_addr.s_addr), 0);
+            uint32_t addr = htonl(sa->sin_addr.s_addr);
+
+            // Skip 169.254.*.* local link address
+            if (((addr >> 24) & 0xff) == 169 &&
+                ((addr >> 16) & 0xff) == 254)
+                continue;
+
+            SocketAddress saddr(addr, 0);
             uint32_t u = ((sockaddr_in*)(p->ifa_netmask))->sin_addr.s_addr;
             // Convert mask to #bits:  SWAT algorithm
             u = u - ((u >> 1) & 0x55555555);
@@ -464,18 +449,108 @@ void ServersManager::updateBroadcastAddresses()
 
             Log::debug("ServerManager",
                 "Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,
-                ta.toString().c_str(), u);
-            addAllBroadcastAddresses(ta, u);
+                saddr.toString().c_str(), u);
+            addAllBroadcastAddresses(saddr, u);
+        }
+        else if (p->ifa_addr->sa_family == AF_INET6)
+        {
+            uint32_t idx = if_nametoindex(p->ifa_name);
+            if (used_scope_id.find(idx) != used_scope_id.end())
+                continue;
+            used_scope_id.insert(idx);
+            SocketAddress socket_address("ff02::1",
+                stk_config->m_server_discovery_port);
+            sockaddr_in6* in6 = (sockaddr_in6*)socket_address.getSockaddr();
+            in6->sin6_scope_id = idx;
+            m_broadcast_address.push_back(socket_address);
         }
     }
     freeifaddrs(addresses);
+#else
+    // From docs from microsoft it recommends 15k size
+    const int WORKING_BUFFER_SIZE = 15000;
+    PIP_ADAPTER_ADDRESSES paddr = NULL;
+    unsigned long len = WORKING_BUFFER_SIZE;
+    int return_code = 0;
+    int iteration = 0;
+    do
+    {
+        paddr = (IP_ADAPTER_ADDRESSES*)malloc(len);
+        if (paddr == NULL)
+            return;
+        long flags = 0;
+        return_code = GetAdaptersAddresses(AF_UNSPEC, flags, NULL, paddr,
+            &len);
+        if (return_code == ERROR_BUFFER_OVERFLOW)
+        {
+            free(paddr);
+            paddr = NULL;
+        }
+        else
+            break;
+        iteration++;
+    } while ((return_code == ERROR_BUFFER_OVERFLOW) && (iteration < 10));
+
+    if (return_code == ERROR_BUFFER_OVERFLOW)
+    {
+        Log::warn("ServerManager", "Can not get broadcast addresses.");
+        setDefaultBroadcastAddresses();
+        return;
+    }
+
+    for (IP_ADAPTER_ADDRESSES *p = paddr; p; p = p->Next)
+    {
+        if (p->OperStatus != IfOperStatusUp)
+            continue;
+
+        std::set<uint32_t> used_scope_id;
+        for (PIP_ADAPTER_UNICAST_ADDRESS unicast = p->FirstUnicastAddress;
+            unicast != NULL; unicast = unicast->Next)
+        {
+            SocketAddress socket_address;
+            if (unicast->Address.lpSockaddr->sa_family == AF_INET)
+            {
+                const sockaddr_in *sa =
+                    (const sockaddr_in*)unicast->Address.lpSockaddr;
+
+                // Skip 169.254.*.* local link address
+                if (sa->sin_addr.S_un.S_un_b.s_b1 == 169 &&
+                    sa->sin_addr.S_un.S_un_b.s_b2 == 254)
+                    continue;
+
+                // Use sa->sin_addr.S_un.S_addr and htonl?
+                SocketAddress ta(sa->sin_addr.S_un.S_un_b.s_b1,
+                    sa->sin_addr.S_un.S_un_b.s_b2,
+                    sa->sin_addr.S_un.S_un_b.s_b3,
+                    sa->sin_addr.S_un.S_un_b.s_b4);
+                int len = 32 - unicast->OnLinkPrefixLength;
+                addAllBroadcastAddresses(ta, len);
+            }
+            if (unicast->Address.lpSockaddr->sa_family == AF_INET6)
+            {
+                sockaddr_in6* in6 =
+                    (sockaddr_in6*)unicast->Address.lpSockaddr;
+                const uint32_t scope_id = in6->sin6_scope_id;
+                if (used_scope_id.find(scope_id) !=
+                    used_scope_id.end())
+                    continue;
+                used_scope_id.insert(scope_id);
+                SocketAddress socket_address("ff02::1",
+                    stk_config->m_server_discovery_port);
+                in6 = (sockaddr_in6*)socket_address.getSockaddr();
+                in6->sin6_scope_id = scope_id;
+                m_broadcast_address.push_back(socket_address);
+            }
+        }
+    }
+    free(paddr);
 #endif
 }   // updateBroadcastAddresses
 
 // ----------------------------------------------------------------------------
 /** Returns a list of all possible broadcast addresses on this machine.
  */
-const std::vector<TransportAddress>& ServersManager::getBroadcastAddresses()
+const std::vector<SocketAddress>& ServersManager::getBroadcastAddresses()
 {
     if (m_broadcast_address.empty())
     {

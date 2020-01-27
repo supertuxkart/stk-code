@@ -32,6 +32,7 @@
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/server_config.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/request_manager.hpp"

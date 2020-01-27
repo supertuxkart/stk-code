@@ -29,6 +29,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/server.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_ipv6.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -155,7 +156,7 @@ void ConnectToServer::getClientServerInfo()
         m_server->setPrivatePort(port);
         if (server_ipv6_socket)
         {
-            m_server->setIPV6Address("::1");
+            m_server->setIPV6Address(SocketAddress("::1", port));
             m_server->setIPV6Connection(true);
         }
         if (server_id != 0)
@@ -409,38 +410,47 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
 
     if (ipv6)
     {
-        struct addrinfo hints;
-        struct addrinfo* res = NULL;
-        memset(&hints, 0, sizeof(hints));
-        hints.ai_family = AF_UNSPEC;
-        hints.ai_socktype = SOCK_STREAM;
-        std::string addr_string = m_server->getIPV6Address();
-        std::string port =
-            StringUtils::toString(m_server_address.getPort());
         // Convert to a NAT64 address from IPv4
         if (!m_server->useIPV6Connection() &&
             NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
         {
+            struct addrinfo hints;
+            struct addrinfo* res = NULL;
+            memset(&hints, 0, sizeof(hints));
+            hints.ai_family = AF_UNSPEC;
+            hints.ai_socktype = SOCK_STREAM;
             // From IPv4
-            addr_string = m_server_address.toString(false/*show_port*/);
+            std::string addr_string =
+                m_server_address.toString(false/*show_port*/);
             addr_string = NetworkConfig::get()->getNAT64Prefix() + addr_string;
-        }
-        if (getaddrinfo_compat(addr_string.c_str(), port.c_str(),
-            &hints, &res) != 0 || res == NULL)
-            return false;
-        for (const struct addrinfo* addr = res; addr != NULL;
-             addr = addr->ai_next)
-        {
-            if (addr->ai_family == AF_INET6)
+            std::string port =
+                StringUtils::toString(m_server_address.getPort());
+            if (getaddrinfo_compat(addr_string.c_str(), port.c_str(),
+                &hints, &res) != 0 || res == NULL)
+                return false;
+            for (const struct addrinfo* addr = res; addr != NULL;
+                addr = addr->ai_next)
             {
-                struct sockaddr_in6* ipv6_sock =
-                    (struct sockaddr_in6*)addr->ai_addr;
-                ENetAddress en_addr = m_server_address.toEnetAddress();
-                addMappedAddress(&en_addr, ipv6_sock);
-                break;
+                if (addr->ai_family == AF_INET6)
+                {
+                    struct sockaddr_in6* ipv6_sock =
+                        (struct sockaddr_in6*)addr->ai_addr;
+                    ENetAddress en_addr = m_server_address.toEnetAddress();
+                    addMappedAddress(&en_addr, ipv6_sock);
+                    break;
+                }
             }
+            freeaddrinfo(res);
         }
-        freeaddrinfo(res);
+        else
+        {
+            SocketAddress* sa = m_server->getIPV6Address();
+            if (!sa)
+                return false;
+            ENetAddress en_addr = m_server_address.toEnetAddress();
+            struct sockaddr_in6* in6 = (struct sockaddr_in6*)sa->getSockaddr();
+            addMappedAddress(&en_addr, in6);
+        }
     }
 
     while (--m_retry_count >= 0 && !ProtocolManager::lock()->isExiting())
