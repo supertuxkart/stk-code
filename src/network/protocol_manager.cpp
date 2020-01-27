@@ -22,6 +22,7 @@
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/server_lobby.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -382,7 +383,7 @@ void ProtocolManager::update(int ticks)
         }
         catch (std::exception& e)
         {
-            const std::string& name = (*i)->getPeer()->getRealAddress();
+            const std::string& name = (*i)->getPeer()->getAddress().toString();
             Log::error("ProtocolManager",
                 "Synchronous event error from %s: %s", name.c_str(), e.what());
             Log::error("ProtocolManager", (*i)->data().getLogMessage().c_str());
@@ -441,7 +442,7 @@ void ProtocolManager::asynchronousUpdate()
         }
         catch (std::exception& e)
         {
-            const std::string& name = (*i)->getPeer()->getRealAddress();
+            const std::string& name = (*i)->getPeer()->getAddress().toString();
             Log::error("ProtocolManager", "Asynchronous event "
                 "error from %s: %s", name.c_str(), e.what());
             Log::error("ProtocolManager",

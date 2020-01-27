@@ -11,6 +11,7 @@
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/rewind_manager.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "race/race_manager.hpp"
@@ -108,7 +109,7 @@ bool GameEventsProtocol::notifyEvent(Event* event)
             if (!event->getPeer()->availableKartID(kart_id))
             {
                 Log::warn("GameProtocol", "Wrong kart id %d from %s.",
-                    kart_id, event->getPeer()->getRealAddress().c_str());
+                    kart_id, event->getPeer()->getAddress().toString().c_str());
                 return true;
             }
             float f = LobbyProtocol::get<ServerLobby>()

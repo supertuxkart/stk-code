@@ -811,29 +811,6 @@ void STKHost::setErrorMessage(const irr::core::stringw &message)
     m_error_message = message;
 }   // setErrorMessage
 
-//-----------------------------------------------------------------------------
-/** \brief Try to establish a connection to a given transport address.
- *  \param peer : The transport address which you want to connect to.
- *  \return True if we're successfully connected. False elseway.
- */
-bool STKHost::connect(const TransportAddress& address)
-{
-    assert(NetworkConfig::get()->isClient());
-    if (peerExists(address))
-        return isConnectedTo(address);
-
-    ENetPeer* peer = m_network->connectTo(address);
-
-    if (peer == NULL)
-    {
-        Log::error("STKHost", "Could not try to connect to server.");
-        return false;
-    }
-    TransportAddress a(peer->address);
-    Log::verbose("STKPeer", "Connecting to %s", a.toString().c_str());
-    return true;
-}   // connect
-
 // ----------------------------------------------------------------------------
 /** \brief Starts the listening of events from ENet.
  *  Starts a thread for receiveData that updates it as often as possible.
@@ -984,7 +961,7 @@ void STKHost::mainLoop()
                         {
                             Log::info("STKHost", "%s %s with ping %d is higher"
                                 " than %d ms when not in game, kick.",
-                                p.second->getRealAddress().c_str(),
+                                p.second->getAddress().toString().c_str(),
                                 player_name.c_str(), ap, max_ping);
                             p.second->setWarnedForHighPing(true);
                             p.second->setDisconnected(true);
@@ -997,7 +974,7 @@ void STKHost::mainLoop()
                         {
                             Log::info("STKHost", "%s %s with ping %d is higher"
                                 " than %d ms.",
-                                p.second->getRealAddress().c_str(),
+                                p.second->getAddress().toString().c_str(),
                                 player_name.c_str(), ap, max_ping);
                             p.second->setWarnedForHighPing(true);
                             NetworkString msg(PROTOCOL_LOBBY_ROOM);
@@ -1059,7 +1036,7 @@ void STKHost::mainLoop()
                 {
                     Log::info("STKHost", "%s has not been validated for more"
                         " than %f seconds, disconnect it by force.",
-                        it->second->getRealAddress().c_str(),
+                        it->second->getAddress().toString().c_str(),
                         timeout);
                     enet_host_flush(host);
                     enet_peer_reset(it->first);
@@ -1146,7 +1123,7 @@ void STKHost::mainLoop()
                 stk_event = new Event(&event, stk_peer);
                 TransportAddress addr(event.peer->address);
                 Log::info("STKHost", "%s has just connected. There are "
-                    "now %u peers.", stk_peer->getRealAddress().c_str(),
+                    "now %u peers.", stk_peer->getAddress().toString().c_str(),
                     getPeerCount());
                 // Client always trust the server
                 if (!is_server)
@@ -1169,7 +1146,7 @@ void STKHost::mainLoop()
                 if (m_peers.find(event.peer) != m_peers.end())
                 {
                     std::shared_ptr<STKPeer>& peer = m_peers.at(event.peer);
-                    addr = peer->getRealAddress();
+                    addr = peer->getAddress().toString();
                     stk_event = new Event(&event, peer);
                     std::lock_guard<std::mutex> lock(m_peers_mutex);
                     m_peers.erase(event.peer);
@@ -1363,35 +1340,16 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
 /** \brief Tells if a peer is known.
  *  \return True if the peer is known, false elseway.
  */
-bool STKHost::peerExists(const TransportAddress& peer)
-{
-    std::lock_guard<std::mutex> lock(m_peers_mutex);
-    for (auto p : m_peers)
-    {
-        auto stk_peer = p.second;
-        if (stk_peer->getAddress() == peer ||
-            ((stk_peer->getAddress().isPublicAddressLocalhost() ||
-            peer.isPublicAddressLocalhost()) &&
-            stk_peer->getAddress().getPort() == peer.getPort()))
-            return true;
-    }
-    return false;
-}   // peerExists
-
-// ----------------------------------------------------------------------------
-/** \brief Tells if a peer is known.
- *  \return True if the peer is known, false elseway.
- */
 bool STKHost::peerExists(const SocketAddress& peer)
 {
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto p : m_peers)
     {
         auto stk_peer = p.second;
-        if (stk_peer->getSocketAddress() == peer ||
-            ((stk_peer->getSocketAddress().isPublicAddressLocalhost() &&
+        if (stk_peer->getAddress() == peer ||
+            ((stk_peer->getAddress().isPublicAddressLocalhost() &&
             peer.isPublicAddressLocalhost()) &&
-            stk_peer->getSocketAddress().getPort() == peer.getPort()))
+            stk_peer->getAddress().getPort() == peer.getPort()))
             return true;
     }
     return false;

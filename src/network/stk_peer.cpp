@@ -36,7 +36,7 @@
 /** Constructor for an empty peer.
  */
 STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
-       : m_peer_address(enet_peer->address), m_host(host)
+       : m_address(enet_peer->address), m_host(host)
 {
     m_addons_scores.fill(-1);
     uint32_t addr = htonl(enet_peer->address.host);
@@ -83,9 +83,9 @@ void STKPeer::disconnect()
 {
     if (m_disconnected.load())
         return;
-    TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        a != m_peer_address)
+        (m_enet_peer->address.host != m_address.host &&
+        m_enet_peer->address.port != m_address.port))
         return;
     m_disconnected.store(true);
     m_host->addEnetCommand(m_enet_peer, NULL, PDI_NORMAL, ECT_DISCONNECT);
@@ -98,9 +98,9 @@ void STKPeer::kick()
 {
     if (m_disconnected.load())
         return;
-    TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        a != m_peer_address)
+        (m_enet_peer->address.host != m_address.host &&
+        m_enet_peer->address.port != m_address.port))
         return;
     m_disconnected.store(true);
     m_host->addEnetCommand(m_enet_peer, NULL, PDI_KICK, ECT_DISCONNECT);
@@ -113,9 +113,9 @@ void STKPeer::reset()
 {
     if (m_disconnected.load())
         return;
-    TransportAddress a(m_enet_peer->address);
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        a != m_peer_address)
+        (m_enet_peer->address.host != m_address.host &&
+        m_enet_peer->address.port != m_address.port))
         return;
     m_disconnected.store(true);
     m_host->addEnetCommand(m_enet_peer, NULL, 0, ECT_RESET);
@@ -135,7 +135,8 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
     // Enet will reuse a disconnected peer so we check here to avoid sending
     // to wrong peer
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        a != m_peer_address)
+        (m_enet_peer->address.host != m_address.host &&
+        m_enet_peer->address.port != m_address.port))
         return;
 
     ENetPacket* packet = NULL;
@@ -224,13 +225,3 @@ void STKPeer::setCrypto(std::unique_ptr<Crypto>&& c)
 {
     m_crypto = std::move(c);
 }   // setCrypto
-
-//-----------------------------------------------------------------------------
-/* Return an IPv6 or IPv4 address, used for debug printing.
- */
-std::string STKPeer::getRealAddress() const
-{
-    return m_ipv6_address.empty() ? m_peer_address.toString() :
-        std::string("[") + m_ipv6_address + "]:" +
-        StringUtils::toString(m_peer_address.getPort());
-}   // getRealAddress

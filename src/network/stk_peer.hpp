@@ -23,7 +23,6 @@
 #ifndef STK_PEER_HPP
 #define STK_PEER_HPP
 
-#include "network/transport_address.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/time.hpp"
 #include "utils/types.hpp"
@@ -72,6 +71,8 @@ protected:
     /** Pointer to the corresponding ENet peer data structure. */
     ENetPeer* m_enet_peer;
 
+    ENetAddress m_address;
+
     /** True if this peer is validated by server. */
     std::atomic_bool m_validated;
 
@@ -86,8 +87,6 @@ protected:
 
     /** Host id of this peer. */
     uint32_t m_host_id;
-
-    TransportAddress m_peer_address;
 
     std::unique_ptr<SocketAddress> m_socket_address;
 
@@ -140,11 +139,8 @@ public:
     void reset();
     // ------------------------------------------------------------------------
     bool isConnected() const;
-    const TransportAddress& getAddress() const { return m_peer_address; }
     // ------------------------------------------------------------------------
     const std::string& getIPV6Address() const  { return m_ipv6_address; }
-    // ------------------------------------------------------------------------
-    std::string getRealAddress() const;
     // ------------------------------------------------------------------------
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
@@ -296,8 +292,7 @@ public:
     // ------------------------------------------------------------------------
     int getConsecutiveMessages() const       { return m_consecutive_messages; }
     // ------------------------------------------------------------------------
-    const SocketAddress& getSocketAddress() const
-                                            { return *m_socket_address.get(); }
+    const SocketAddress& getAddress() const { return *m_socket_address.get(); }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

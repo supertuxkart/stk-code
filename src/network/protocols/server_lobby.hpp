@@ -42,6 +42,7 @@ class BareNetworkString;
 class NetworkString;
 class NetworkPlayerProfile;
 class STKPeer;
+class SocketAddress;
 
 namespace Online
 {
@@ -102,9 +103,9 @@ private:
 
     void checkTableExists(const std::string& table, bool& result);
 
-    std::string ip2Country(const TransportAddress& addr) const;
+    std::string ip2Country(const SocketAddress& addr) const;
 
-    std::string ipv62Country(const std::string& ipv6) const;
+    std::string ipv62Country(const SocketAddress& addr) const;
 #endif
     void initDatabase();
 
@@ -378,7 +379,7 @@ public:
     int getGameMode() const                      { return m_game_mode.load(); }
     int getLobbyPlayers() const              { return m_lobby_players.load(); }
     void saveInitialItems();
-    void saveIPBanTable(const TransportAddress& addr);
+    void saveIPBanTable(const SocketAddress& addr);
     void listBanTable();
     void initServerStatsTable();
 };   // class ServerLobby

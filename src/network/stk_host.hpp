@@ -218,8 +218,6 @@ public:
     void setPublicAddress(bool ipv4);
     // ------------------------------------------------------------------------
     void disconnectAllPeers(bool timeout_waiting = false);
-    // ------------------------------------------------------------------------
-    bool connect(const TransportAddress& peer);
     //-------------------------------------------------------------------------
     /** Requests that the network infrastructure is to be shut down. This
     *   function is called from a thread, but the actual shutdown needs to be
@@ -271,8 +269,6 @@ public:
     void startListening();
     // ------------------------------------------------------------------------
     void stopListening();
-    // ------------------------------------------------------------------------
-    bool peerExists(const TransportAddress& peer_address);
     // ------------------------------------------------------------------------
     bool peerExists(const SocketAddress& peer_address);
     // ------------------------------------------------------------------------
