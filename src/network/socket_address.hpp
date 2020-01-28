@@ -58,11 +58,12 @@ public:
     // ------------------------------------------------------------------------
     /** IPv4 Constructor (4 bytes). */
     SocketAddress(uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4,
-                  uint16_t port=0);
+                  uint16_t port = 0);
     // ------------------------------------------------------------------------
-    SocketAddress(const std::string& str, uint16_t port_number = 0)
+    SocketAddress(const std::string& str, uint16_t port_number = 0,
+                  short family = AF_UNSPEC)
     {
-        init(str, port_number);
+        init(str, port_number, family);
     }
     // ------------------------------------------------------------------------
     bool operator==(const SocketAddress& other) const;
@@ -121,6 +122,16 @@ public:
     }
     // ------------------------------------------------------------------------
     short getFamily() const                                { return m_family; }
+    // ------------------------------------------------------------------------
+    void setIPv6(const uint8_t* bytes, uint16_t port = 0)
+    {
+        m_family = AF_INET6;
+        m_sockaddr.fill(0);
+        sockaddr_in6* in6 = (sockaddr_in6*)m_sockaddr.data();
+        in6->sin6_family = AF_INET6;
+        memcpy(in6->sin6_addr.s6_addr, bytes, 16);
+        setPort(port);
+    }
     // ------------------------------------------------------------------------
     bool isPublicAddressLocalhost() const;
     // ------------------------------------------------------------------------

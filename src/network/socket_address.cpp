@@ -506,10 +506,15 @@ void SocketAddress::convertForIPv6Socket()
         std::string ipv4 = toString(false/*show_port*/);
         uint16_t port = getPort();
         auto ip_type = NetworkConfig::get()->getIPType();
-        if (ip_type == NetworkConfig::IP_DUAL_STACK)
-            ipv4 = std::string("::ffff:") + ipv4;
-        else if (ip_type == NetworkConfig::IP_V6_NAT64)
+        if (ip_type == NetworkConfig::IP_V6_NAT64)
+        {
             ipv4 = NetworkConfig::get()->getNAT64Prefix() + ipv4;
+        }
+        else
+        {
+            // Assume the system has dual stack if it uses an IPv6 socket
+            ipv4 = std::string("::ffff:") + ipv4;
+        }
         init(ipv4, port);
     }
 #endif

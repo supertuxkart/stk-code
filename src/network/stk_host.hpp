@@ -176,7 +176,7 @@ private:
     void mainLoop();
     // ------------------------------------------------------------------------
     void getIPFromStun(int socket, const std::string& stun_address, bool ipv4,
-                       std::string* ip_string, uint16_t* port);
+                       SocketAddress* result);
 public:
     /** If a network console should be started. */
     static bool m_enable_console;

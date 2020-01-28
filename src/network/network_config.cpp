@@ -24,6 +24,7 @@
 #include "network/network.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/server_config.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_ipv6.hpp"
 #include "online/xml_request.hpp"
@@ -191,17 +192,17 @@ void NetworkConfig::detectIPType()
 {
     m_nat64_prefix_data.fill(-1);
 #ifdef ENABLE_IPV6
-    ENetAddress addr;
-    addr.host = STKHost::HOST_ANY;
-    addr.port = STKHost::PORT_ANY;
+    ENetAddress eaddr;
+    eaddr.host = STKHost::HOST_ANY;
+    eaddr.port = STKHost::PORT_ANY;
     // We don't need to result of stun, just to check if the socket can be
     // used in ipv4 or ipv6
     uint8_t stun_tansaction_id[16] = {};
     BareNetworkString s = STKHost::getStunRequest(stun_tansaction_id);
     setIPv6Socket(0);
-    auto ipv4 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &addr));
+    auto ipv4 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
     setIPv6Socket(1);
-    auto ipv6 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &addr));
+    auto ipv6 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
     setIPv6Socket(0);
 
     auto ipv4_it = UserConfigParams::m_stun_servers_v4.begin();
@@ -211,57 +212,34 @@ void NetworkConfig::detectIPType()
     adv = rand() % UserConfigParams::m_stun_servers.size();
     std::advance(ipv6_it, adv);
 
-    std::vector<std::string> addrv4_and_port =
-        StringUtils::split(ipv4_it->first, ':');
-    if (addrv4_and_port.size() != 2)
-    {
-        Log::error("NetworkConfig", "Wrong server address and port");
-        return;
-    }
-
-    struct addrinfo hints;
-    struct addrinfo* res = NULL;
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    int status = getaddrinfo_compat(addrv4_and_port[0].c_str(),
-        addrv4_and_port[1].c_str(), &hints, &res);
+    SocketAddress stun_v4(ipv4_it->first, 0/*port specified in addr*/,
+        AF_INET);
     bool sent_ipv4 = false;
-    if (status == 0 && res != NULL)
+    if (!stun_v4.isUnset())
     {
-        if (res->ai_family == AF_INET)
-        {
-            sendto(ipv4->getENetHost()->socket, s.getData(), s.size(), 0,
-                res->ai_addr, sizeof(sockaddr_in));
-            sent_ipv4 = true;
-        }
-        freeaddrinfo(res);
+        sendto(ipv4->getENetHost()->socket, s.getData(), s.size(), 0,
+            stun_v4.getSockaddr(), stun_v4.getSocklen());
+        sent_ipv4 = true;
+    }
+    else
+    {
+        Log::error("NetworkConfig", "Invalid IPv4: %s",
+            ipv4_it->first.c_str());
     }
 
-    std::vector<std::string> addrv6_and_port =
-        StringUtils::split(ipv6_it->first, ':');
-    if (addrv6_and_port.size() != 2)
-    {
-        Log::error("NetworkConfig", "Wrong server address and port");
-        return;
-    }
-
-    res = NULL;
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_INET6;
-    hints.ai_socktype = SOCK_STREAM;
-    status = getaddrinfo_compat(addrv6_and_port[0].c_str(),
-        addrv6_and_port[1].c_str(), &hints, &res);
+    SocketAddress stun_v6(ipv6_it->first, 0/*port specified in addr*/,
+        AF_INET6);
     bool sent_ipv6 = false;
-    if (status == 0 && res != NULL)
+    if (!stun_v6.isUnset())
     {
-        if (res->ai_family == AF_INET6)
-        {
-            sendto(ipv6->getENetHost()->socket, s.getData(), s.size(), 0,
-                res->ai_addr, sizeof(sockaddr_in6));
-            sent_ipv6 = true;
-        }
-        freeaddrinfo(res);
+        sendto(ipv6->getENetHost()->socket, s.getData(), s.size(), 0,
+            stun_v6.getSockaddr(), stun_v6.getSocklen());
+        sent_ipv6 = true;
+    }
+    else
+    {
+        Log::error("NetworkConfig", "Invalid IPv6: %s",
+            ipv6_it->first.c_str());
     }
 
     bool has_ipv4 = false;
@@ -291,39 +269,27 @@ void NetworkConfig::detectIPType()
             // All IPv4 only stun servers are *.supertuxkart.net which only
             // have A record, so the below code which forces to get an AF_INET6
             // will return their NAT64 addresses
-            res = NULL;
-            memset(&hints, 0, sizeof hints);
-            hints.ai_family = AF_INET6;
-            hints.ai_socktype = SOCK_STREAM;
-            status = getaddrinfo_compat(addrv4_and_port[0].c_str(),
-                addrv4_and_port[1].c_str(), &hints, &res);
-            if (status == 0 && res != NULL)
+            SocketAddress nat64(ipv4_it->first, 0/*port specified in addr*/,
+                AF_INET6);
+            if (!nat64.isUnset() && nat64.getFamily() == AF_INET6)
             {
-                if (res->ai_family == AF_INET6)
-                {
-                    struct sockaddr_in6 nat64 = {};
-                    // Copy first 12 bytes
-                    struct sockaddr_in6* out =
-                        (struct sockaddr_in6*)res->ai_addr;
-                    memcpy(nat64.sin6_addr.s6_addr, out->sin6_addr.s6_addr,
-                        12);
-                    m_nat64_prefix_data[0] =
-                        ((uint32_t)(nat64.sin6_addr.s6_addr[0]) << 8) | nat64.sin6_addr.s6_addr[1];
-                    m_nat64_prefix_data[1] =
-                        ((uint32_t)(nat64.sin6_addr.s6_addr[2]) << 8) | nat64.sin6_addr.s6_addr[3];
-                    m_nat64_prefix_data[2] =
-                        ((uint32_t)(nat64.sin6_addr.s6_addr[4]) << 8) | nat64.sin6_addr.s6_addr[5];
-                    m_nat64_prefix_data[3] =
-                        ((uint32_t)(nat64.sin6_addr.s6_addr[6]) << 8) | nat64.sin6_addr.s6_addr[7];
-                    m_nat64_prefix_data[4] =
-                        ((uint32_t)(nat64.sin6_addr.s6_addr[8]) << 8) | nat64.sin6_addr.s6_addr[9];
-                    m_nat64_prefix_data[5] =
-                        ((uint32_t)(nat64.sin6_addr.s6_addr[10]) << 8) | nat64.sin6_addr.s6_addr[11];
-                    m_nat64_prefix_data[6] = 0;
-                    m_nat64_prefix_data[7] = 0;
-                    m_nat64_prefix = getIPV6ReadableFromIn6(&nat64);
-                }
-                freeaddrinfo(res);
+                // Remove last 4 bytes which is IPv4 format
+                struct sockaddr_in6* in6 =
+                    (struct sockaddr_in6*)nat64.getSockaddr();
+                uint8_t* byte = &(in6->sin6_addr.s6_addr[0]);
+                byte[12] = 0;
+                byte[13] = 0;
+                byte[14] = 0;
+                byte[15] = 0;
+                m_nat64_prefix_data[0] = ((uint32_t)(byte[0]) << 8) | byte[1];
+                m_nat64_prefix_data[1] = ((uint32_t)(byte[2]) << 8) | byte[3];
+                m_nat64_prefix_data[2] = ((uint32_t)(byte[4]) << 8) | byte[5];
+                m_nat64_prefix_data[3] = ((uint32_t)(byte[6]) << 8) | byte[7];
+                m_nat64_prefix_data[4] = ((uint32_t)(byte[8]) << 8) | byte[9];
+                m_nat64_prefix_data[5] = ((uint32_t)(byte[10]) << 8) | byte[11];
+                m_nat64_prefix_data[6] = 0;
+                m_nat64_prefix_data[7] = 0;
+                m_nat64_prefix = getIPV6ReadableFromIn6(in6);
             }
         }
     }

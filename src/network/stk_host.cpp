@@ -411,92 +411,37 @@ BareNetworkString STKHost::getStunRequest(uint8_t* stun_tansaction_id)
 
 //-----------------------------------------------------------------------------
 void STKHost::getIPFromStun(int socket, const std::string& stun_address,
-                            bool ipv4, std::string* ip_string, uint16_t* port)
+                            bool ipv4, SocketAddress* result)
 {
-    std::vector<std::string> addr_and_port =
-        StringUtils::split(stun_address, ':');
-    if (addr_and_port.size() != 2)
-    {
-        Log::error("STKHost", "Wrong server address and port");
-        return;
-    }
-    struct addrinfo hints;
-    struct addrinfo* res = NULL;
-
-    memset(&hints, 0, sizeof hints);
-    hints.ai_family = ipv4 ? AF_INET : AF_INET6;
-
+    short family = ipv4 ? AF_INET : AF_INET6;
     // The IPv4 stun address has no AAAA record, so give it an AF_INET6 will
     // return one using NAT64 and DNS64
     if (isIPv6Socket() && ipv4 &&
         NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
-        hints.ai_family = AF_INET6;
+        family = AF_INET6;
 
-    hints.ai_socktype = SOCK_STREAM;
-
-    // Resolve the stun server name so we can send it a STUN request
-    int status = getaddrinfo_compat(addr_and_port[0].c_str(),
-        addr_and_port[1].c_str(), &hints, &res);
-    if (status != 0)
-    {
-        Log::error("STKHost", "Error in getaddrinfo for stun server"
-            " %s: %s", addr_and_port[0].c_str(), gai_strerror(status));
-        return;
-    }
-
+    SocketAddress stun(stun_address, 0/*port is specified in address*/,
+        family);
     // We specify ai_family, so only IPv4 or IPv6 is found
-    if (res == NULL)
+    if (stun.isUnset())
         return;
+    stun.convertForIPv6Socket();
 
-    struct sockaddr* stun_addr = NULL;
-    if (isIPv6Socket())
+    // We only need to keep the stun address for server to keep the port open
+    if (NetworkConfig::get()->isServer())
     {
-        if (res->ai_family == AF_INET)
-        {
-            struct sockaddr_in* ipv4_addr = (struct sockaddr_in*)(res->ai_addr);
-            SocketAddress stun_v4;
-            stun_v4.setIP(ntohl(ipv4_addr->sin_addr.s_addr));
-            stun_v4.setPort(ntohs(ipv4_addr->sin_port));
-            // Change address to ::ffff:IPv4 format for dual stack socket
-            std::string ipv4_mapped = "::ffff:";
-            ipv4_mapped += stun_v4.toString(false/*show_port*/);
-            freeaddrinfo(res);
-            res = NULL;
-            hints.ai_family = AF_INET6;
-            status = getaddrinfo_compat(ipv4_mapped.c_str(),
-                addr_and_port[1].c_str(), &hints, &res);
-            if (status != 0 || res == NULL)
-            {
-                Log::error("STKHost", "Error in getaddrinfo for stun server"
-                    " %s: %s", addr_and_port[0].c_str(), gai_strerror(status));
-                    return;
-            }
-            stun_addr = res->ai_addr;
-            m_stun_ipv4.reset(new SocketAddress());
-            m_stun_ipv4->setSockAddrIn(AF_INET6, stun_addr,
-                sizeof(sockaddr_in6));
-        }
+        if (stun.isIPv6())
+            m_stun_ipv6.reset(new SocketAddress(stun));
         else
-        {
-            stun_addr = res->ai_addr;
-            m_stun_ipv6.reset(new SocketAddress());
-            m_stun_ipv6->setSockAddrIn(AF_INET6, stun_addr,
-                sizeof(sockaddr_in6));
-        }
-    }
-    else if (ipv4)
-    {
-        stun_addr = res->ai_addr;
-        m_stun_ipv4.reset(new SocketAddress());
-        m_stun_ipv4->setSockAddrIn(AF_INET, stun_addr, sizeof(sockaddr_in));
+            m_stun_ipv4.reset(new SocketAddress(stun));
     }
 
     uint8_t stun_tansaction_id[16];
     constexpr uint32_t magic_cookie = 0x2112A442;
     BareNetworkString s = getStunRequest(stun_tansaction_id);
 
-    sendto(socket, s.getData(), s.size(), 0, stun_addr, isIPv6Socket() ?
-        sizeof(sockaddr_in6) : sizeof(sockaddr_in));
+    sendto(socket, s.getData(), s.size(), 0, stun.getSockaddr(),
+        stun.getSocklen());
 
     // Recieve now
     const int LEN = 2048;
@@ -522,11 +467,8 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
     if (len <= 0)
     {
         Log::error("STKHost", "STUN response contains no data at all");
-        freeaddrinfo(res);
         return;
     }
-
-    freeaddrinfo(res);
 
     // Convert to network string.
     BareNetworkString response(buffer, len);
@@ -564,8 +506,7 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
 
     // The stun message is valid, so we parse it now:
     // Those are the port and the address to be detected
-    SocketAddress addr, non_xor_addr, xor_addr;
-    std::string ipv6_addr_non_xor, ipv6_addr_xor;
+    SocketAddress non_xor_addr, xor_addr;
     while (true)
     {
         if (response.size() < 4)
@@ -609,20 +550,20 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
                     Log::error("STKHost", "Invalid STUN mapped address length.");
                     return;
                 }
-                *port = response.getUInt16();
+                uint16_t port = response.getUInt16();
                 uint32_t ip = response.getUInt32();
                 if (type == xor_mapped_address)
                 {
                     // Obfuscation is described in Section 15.2 of RFC 5389.
-                    *port ^= magic_cookie >> 16;
+                    port ^= magic_cookie >> 16;
                     ip ^= magic_cookie;
                     xor_addr.setIP(ip);
-                    xor_addr.setPort(*port);
+                    xor_addr.setPort(port);
                 }
                 else
                 {
                     non_xor_addr.setIP(ip);
-                    non_xor_addr.setPort(*port);
+                    non_xor_addr.setPort(port);
                 }
             }
             else if (ip_type == ipv6_returned)
@@ -633,23 +574,20 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
                     Log::error("STKHost", "Invalid STUN mapped address length.");
                     return;
                 }
-                *port = response.getUInt16();
-                struct sockaddr_in6 ipv6_addr = {};
+                uint16_t port = response.getUInt16();
                 uint8_t bytes[16];
                 for (int i = 0; i < 16; i++)
                     bytes[i] = response.getUInt8();
                 if (type == xor_mapped_address)
                 {
-                    *port ^= magic_cookie >> 16;
+                    port ^= magic_cookie >> 16;
                     for (int i = 0; i < 16; i++)
                         bytes[i] ^= stun_tansaction_id[i];
-                    memcpy(&(ipv6_addr.sin6_addr), &bytes[0], 16);
-                    ipv6_addr_xor = getIPV6ReadableFromIn6(&ipv6_addr);
+                    xor_addr.setIPv6(bytes, port);
                 }
                 else
                 {
-                    memcpy(&(ipv6_addr.sin6_addr), &bytes[0], 16);
-                    ipv6_addr_non_xor = getIPV6ReadableFromIn6(&ipv6_addr);
+                    non_xor_addr.setIPv6(bytes, port);
                 }
             }
         }   // type == mapped_address || type == xor_mapped_address
@@ -662,36 +600,21 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
         }
     }   // while true
     // Found public address and port
-    if (ipv4)
+    if (!xor_addr.isUnset() || !non_xor_addr.isUnset())
     {
-        if (!xor_addr.isUnset() || !non_xor_addr.isUnset())
+        // Use XOR mapped address when possible to avoid translation of
+        // the packet content by application layer gateways (ALGs) that
+        // perform deep packet inspection in an attempt to perform
+        // alternate NAT traversal methods.
+        if (!xor_addr.isUnset())
         {
-            // Use XOR mapped address when possible to avoid translation of
-            // the packet content by application layer gateways (ALGs) that
-            // perform deep packet inspection in an attempt to perform
-            // alternate NAT traversal methods.
-            if (!xor_addr.isUnset())
-            {
-                addr = xor_addr;
-            }
-            else
-            {
-                Log::warn("STKHost", "Only non xor-mapped address returned.");
-                addr = non_xor_addr;
-            }
+            *result = xor_addr;
         }
-        *ip_string = addr.toString(false/*show_port*/);
-    }
-    else
-    {
-        if (ipv6_addr_xor.empty() && ipv6_addr_non_xor.empty())
-            return;
-        if (ipv6_addr_xor.empty())
+        else
         {
             Log::warn("STKHost", "Only non xor-mapped address returned.");
-            *ip_string = ipv6_addr_non_xor;
+            *result = non_xor_addr;
         }
-        *ip_string = ipv6_addr_xor;
     }
 }   // getIPFromStun
 
@@ -726,16 +649,15 @@ void STKHost::setPublicAddress(bool ipv4)
         stun_map[server_name] = (uint32_t)-1;
         Log::debug("STKHost", "Using STUN server %s", server_name.c_str());
         uint64_t ping = StkTime::getMonoTimeMs();
-        std::string ip_string;
-        uint16_t port = 0;
+        SocketAddress result;
         getIPFromStun((int)m_network->getENetHost()->socket, server_name, ipv4,
-            &ip_string, &port);
-        if (!ip_string.empty())
+            &result);
+        if (!result.isUnset())
         {
             // For dual stack server we get the IPv6 address and then IPv4, if
             // their ports differ we discard the public IPv6 address of server
             if (NetworkConfig::get()->isServer() && ipv4 &&
-                port != m_public_address->getPort())
+                result.getPort() != m_public_address->getPort())
             {
                 if (isIPv6Socket())
                 {
@@ -745,10 +667,10 @@ void STKHost::setPublicAddress(bool ipv4)
                 m_public_ipv6_address.clear();
             }
             if (ipv4)
-                m_public_address->init(ip_string);
+                *m_public_address = result;
             else
-                m_public_ipv6_address = ip_string;
-            m_public_address->setPort(port);
+                m_public_ipv6_address = result.toString(false/*show_port*/);
+            m_public_address->setPort(result.getPort());
             ping = StkTime::getMonoTimeMs() - ping;
             // Succeed, save ping
             stun_map[server_name] = (uint32_t)(ping);
