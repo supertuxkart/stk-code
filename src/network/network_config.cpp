@@ -71,6 +71,7 @@ NetworkConfig::NetworkConfig()
     m_joined_server_version = 0;
     m_network_ai_tester = false;
     m_state_frequency = 10;
+    m_nat64_prefix_data.fill(-1);
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------
@@ -188,6 +189,7 @@ bool NetworkConfig::roundValuesNow() const
  */
 void NetworkConfig::detectIPType()
 {
+    m_nat64_prefix_data.fill(-1);
 #ifdef ENABLE_IPV6
     ENetAddress addr;
     addr.host = STKHost::HOST_ANY;
@@ -305,6 +307,20 @@ void NetworkConfig::detectIPType()
                         (struct sockaddr_in6*)res->ai_addr;
                     memcpy(nat64.sin6_addr.s6_addr, out->sin6_addr.s6_addr,
                         12);
+                    m_nat64_prefix_data[0] =
+                        ((uint32_t)(nat64.sin6_addr.s6_addr[0]) << 8) | nat64.sin6_addr.s6_addr[1];
+                    m_nat64_prefix_data[1] =
+                        ((uint32_t)(nat64.sin6_addr.s6_addr[2]) << 8) | nat64.sin6_addr.s6_addr[3];
+                    m_nat64_prefix_data[2] =
+                        ((uint32_t)(nat64.sin6_addr.s6_addr[4]) << 8) | nat64.sin6_addr.s6_addr[5];
+                    m_nat64_prefix_data[3] =
+                        ((uint32_t)(nat64.sin6_addr.s6_addr[6]) << 8) | nat64.sin6_addr.s6_addr[7];
+                    m_nat64_prefix_data[4] =
+                        ((uint32_t)(nat64.sin6_addr.s6_addr[8]) << 8) | nat64.sin6_addr.s6_addr[9];
+                    m_nat64_prefix_data[5] =
+                        ((uint32_t)(nat64.sin6_addr.s6_addr[10]) << 8) | nat64.sin6_addr.s6_addr[11];
+                    m_nat64_prefix_data[6] = 0;
+                    m_nat64_prefix_data[7] = 0;
                     m_nat64_prefix = getIPV6ReadableFromIn6(&nat64);
                 }
                 freeaddrinfo(res);

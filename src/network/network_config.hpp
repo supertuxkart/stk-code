@@ -26,6 +26,7 @@
 #include "utils/no_copy.hpp"
 
 #include "irrString.h"
+#include <array>
 #include <atomic>
 #include <memory>
 #include <set>
@@ -109,6 +110,7 @@ private:
      *  use it to connect to ipv4 only servers. STK assumes that for all ipv4
      *  addresses they use the same prefix for each initIPTest. */
     std::string m_nat64_prefix;
+    std::array<uint32_t, 8> m_nat64_prefix_data;
 public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -264,6 +266,9 @@ public:
     void setIPType(IPType ip_type)                { m_ip_type.store(ip_type); }
     // ------------------------------------------------------------------------
     const std::string& getNAT64Prefix() const        { return m_nat64_prefix; }
+    // ------------------------------------------------------------------------
+    const std::array<uint32_t, 8>& getNAT64PrefixData() const
+                                                { return m_nat64_prefix_data; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG
