@@ -62,27 +62,91 @@ SocketAddress::SocketAddress(uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4,
 }   // SocketAddress(uint8_t,...)
 
 // ----------------------------------------------------------------------------
-/** String initialization (Can be IPv4, IPv6 or domain). */
-void SocketAddress::init(const std::string& str, uint16_t port_number)
+/** String initialization (Can be IPv4, IPv6 or domain).
+ *  \param str The address (can have a port with :)
+ *  \param port_number The port number, default is 0 or overwritten if
+ *  specified in str
+ *  \param family AF_UNSPEC, AF_INET or AF_INET6 for example
+ */
+void SocketAddress::init(const std::string& str, uint16_t port_number,
+                         short family)
 {
     clear();
+    if (str.empty())
+    {
+        Log::error("SocketAddress", "Empty address is specified.");
+        return;
+    }
+
+    std::string addr_str;
+    std::string port_str;
+
+    bool only_1_colon = false;
+    size_t colon_pos = std::string::npos;
+    // Check if only 1 colon, if so then it's either domain:port or IPv4:port
+    for (size_t i = 0; i < str.size(); i++)
+    {
+        if (str[i] == ':')
+        {
+            if (colon_pos == std::string::npos)
+            {
+                colon_pos = i;
+                only_1_colon = true;
+            }
+            else
+                only_1_colon = false;
+        }
+    }
+    if (only_1_colon)
+    {
+        addr_str = std::string(str, 0, colon_pos);
+        if (colon_pos + 1 < str.size())
+            port_str = std::string(str, colon_pos + 1, str.size());
+        else
+            port_str = StringUtils::toString(port_number);
+    }
+    else if (str[0] == '[')
+    {
+        // Handle [IPv6 address]:port format
+        size_t pos = str.find(']');
+        if (pos == std::string::npos || pos - 1 == 0)
+        {
+            Log::error("SocketAddress", "Invalid IPv6 address is specified.");
+            return;
+        }
+        addr_str = std::string(str, 1, pos - 1);
+        if (pos + 2 < str.size() && str[pos + 1] == ':')
+            port_str = std::string(str, pos + 2, str.size());
+        else
+            port_str = StringUtils::toString(port_number);
+    }
+    else
+    {
+        addr_str = str;
+        port_str = StringUtils::toString(port_number);
+    }
+
     struct addrinfo hints;
     struct addrinfo* res = NULL;
-    std::string port_str = StringUtils::toString(port_number);
-
     memset(&hints, 0, sizeof hints);
-    hints.ai_family = AF_UNSPEC;
+    hints.ai_family = family;
     hints.ai_socktype = SOCK_STREAM;
 
-    int status = getaddrinfo_compat(str.c_str(), port_str.c_str(), &hints,
+    int status = getaddrinfo_compat(addr_str.c_str(), port_str.c_str(), &hints,
         &res);
-    if (status != 0 || res == NULL)
+    if (status != 0)
     {
-        Log::error("TransportAddress", "Error in getaddrinfo for "
-            " TransportAddress (str constructor) %s: %s",
+        Log::error("SocketAddress", "Error in getaddrinfo for "
+            " SocketAddress (str constructor) %s: %s",
             str.c_str(), gai_strerror(status));
         return;
     }
+    if (res == NULL)
+    {
+        Log::error("SocketAddress", "No address is resolved.");
+        return;
+    }
+
     bool found = false;
     for (struct addrinfo* addr = res; addr != NULL; addr = addr->ai_next)
     {
@@ -573,4 +637,13 @@ void SocketAddress::unitTesting()
 
     SocketAddress v6_11("fec0::");
     assert(!v6_11.isLAN());
+
+    SocketAddress ipv4_port("0.0.0.1:1");
+    assert(ipv4_port.getIP() == 1);
+    assert(ipv4_port.getPort() == 1);
+
+    SocketAddress ipv6_port("[::2]:1");
+    assert(ipv6_port.toString(false) == "::2");
+    assert(ipv6_port.getPort() == 1);
+
 }   // unitTesting

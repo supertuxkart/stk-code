@@ -69,7 +69,8 @@ public:
     // ------------------------------------------------------------------------
     bool operator!=(const SocketAddress& other) const;
     // ------------------------------------------------------------------------
-    void init(const std::string& str, uint16_t port_number = 0);
+    void init(const std::string& str, uint16_t port_number = 0,
+              short family = AF_UNSPEC);
     // ------------------------------------------------------------------------
     bool isLAN() const;
     // ------------------------------------------------------------------------
