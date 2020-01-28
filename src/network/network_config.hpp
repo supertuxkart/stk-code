@@ -22,7 +22,6 @@
 #ifndef HEADER_NETWORK_CONFIG
 #define HEADER_NETWORK_CONFIG
 
-#include "network/transport_address.hpp"
 #include "race/race_manager.hpp"
 #include "utils/no_copy.hpp"
 

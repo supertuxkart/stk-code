@@ -131,7 +131,6 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
 {
     if (m_disconnected.load())
         return;
-    TransportAddress a(m_enet_peer->address);
     // Enet will reuse a disconnected peer so we check here to avoid sending
     // to wrong peer
     if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
@@ -158,7 +157,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
         if (Network::m_connection_debug)
         {
             Log::verbose("STKPeer", "sending packet of size %d to %s at %lf",
-                packet->dataLength, a.toString().c_str(),
+                packet->dataLength, getAddress().toString().c_str(),
                 StkTime::getRealTime());
         }
         m_host->addEnetCommand(m_enet_peer, packet,

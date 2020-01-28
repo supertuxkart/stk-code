@@ -34,6 +34,7 @@
 #include "network/server_config.hpp"
 #include "network/stk_ipv6.hpp"
 #include "network/stk_peer.hpp"
+#include "network/transport_address.hpp"
 #include "utils/log.hpp"
 #include "utils/separate_process.hpp"
 #include "utils/string_utils.hpp"
@@ -251,6 +252,7 @@ constexpr bool isPingPacket(unsigned char* data, size_t length)
  */
 STKHost::STKHost(bool server)
 {
+    m_public_address.reset(new SocketAddress());
     init();
     m_host_id = std::numeric_limits<uint32_t>::max();
 
@@ -452,11 +454,12 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
         if (res->ai_family == AF_INET)
         {
             struct sockaddr_in* ipv4_addr = (struct sockaddr_in*)(res->ai_addr);
-            m_stun_address.setIP(ntohl(ipv4_addr->sin_addr.s_addr));
-            m_stun_address.setPort(ntohs(ipv4_addr->sin_port));
+            SocketAddress stun_v4;
+            stun_v4.setIP(ntohl(ipv4_addr->sin_addr.s_addr));
+            stun_v4.setPort(ntohs(ipv4_addr->sin_port));
             // Change address to ::ffff:IPv4 format for dual stack socket
             std::string ipv4_mapped = "::ffff:";
-            ipv4_mapped += m_stun_address.toString(false/*show_port*/);
+            ipv4_mapped += stun_v4.toString(false/*show_port*/);
             freeaddrinfo(res);
             res = NULL;
             hints.ai_family = AF_INET6;
@@ -469,18 +472,23 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
                     return;
             }
             stun_addr = res->ai_addr;
+            m_stun_ipv4.reset(new SocketAddress());
+            m_stun_ipv4->setSockAddrIn(AF_INET6, stun_addr,
+                sizeof(sockaddr_in6));
         }
         else
         {
             stun_addr = res->ai_addr;
+            m_stun_ipv6.reset(new SocketAddress());
+            m_stun_ipv6->setSockAddrIn(AF_INET6, stun_addr,
+                sizeof(sockaddr_in6));
         }
     }
     else if (ipv4)
     {
         stun_addr = res->ai_addr;
-        struct sockaddr_in* ipv4_addr = (struct sockaddr_in*)(res->ai_addr);
-        m_stun_address.setIP(ntohl(ipv4_addr->sin_addr.s_addr));
-        m_stun_address.setPort(ntohs(ipv4_addr->sin_port));
+        m_stun_ipv4.reset(new SocketAddress());
+        m_stun_ipv4->setSockAddrIn(AF_INET, stun_addr, sizeof(sockaddr_in));
     }
 
     uint8_t stun_tansaction_id[16];
@@ -491,7 +499,6 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
         sizeof(sockaddr_in6) : sizeof(sockaddr_in));
 
     // Recieve now
-    TransportAddress sender;
     const int LEN = 2048;
     char buffer[LEN];
 
@@ -557,7 +564,7 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
 
     // The stun message is valid, so we parse it now:
     // Those are the port and the address to be detected
-    TransportAddress addr, non_xor_addr, xor_addr;
+    SocketAddress addr, non_xor_addr, xor_addr;
     std::string ipv6_addr_non_xor, ipv6_addr_xor;
     while (true)
     {
@@ -728,7 +735,7 @@ void STKHost::setPublicAddress(bool ipv4)
             // For dual stack server we get the IPv6 address and then IPv4, if
             // their ports differ we discard the public IPv6 address of server
             if (NetworkConfig::get()->isServer() && ipv4 &&
-                port != m_public_address.getPort())
+                port != m_public_address->getPort())
             {
                 if (isIPv6Socket())
                 {
@@ -738,10 +745,10 @@ void STKHost::setPublicAddress(bool ipv4)
                 m_public_ipv6_address.clear();
             }
             if (ipv4)
-                m_public_address = ip_string;
+                m_public_address->init(ip_string);
             else
                 m_public_ipv6_address = ip_string;
-            m_public_address.setPort(port);
+            m_public_address->setPort(port);
             ping = StkTime::getMonoTimeMs() - ping;
             // Succeed, save ping
             stun_map[server_name] = (uint32_t)(ping);
@@ -853,9 +860,9 @@ void STKHost::mainLoop()
     if ((NetworkConfig::get()->isLAN() && is_server) ||
         NetworkConfig::get()->isPublicServer())
     {
-        TransportAddress address(0, stk_config->m_server_discovery_port);
-        ENetAddress eaddr = address.toEnetAddress();
-        // direct_socket use IPv4 only atm
+        ENetAddress eaddr;
+        eaddr.host = STKHost::HOST_ANY;
+        eaddr.port = stk_config->m_server_discovery_port;
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
         if (direct_socket->getENetHost() == NULL)
         {
@@ -1121,7 +1128,6 @@ void STKHost::mainLoop()
                 m_peers[event.peer] = stk_peer;
                 lock.unlock();
                 stk_event = new Event(&event, stk_peer);
-                TransportAddress addr(event.peer->address);
                 Log::info("STKHost", "%s has just connected. There are "
                     "now %u peers.", stk_peer->getAddress().toString().c_str(),
                     getPeerCount());
@@ -1654,13 +1660,13 @@ bool STKHost::hasServerAI() const
  *  unset, IPv6 will come first if both exists. */
 std::string STKHost::getValidPublicAddress() const
 {
-    if (!m_public_ipv6_address.empty() && m_public_address.getPort() != 0)
+    if (!m_public_ipv6_address.empty() && m_public_address->getPort() != 0)
     {
         return std::string("[") + m_public_ipv6_address + "]:" +
-            StringUtils::toString(m_public_address.getPort());
+            StringUtils::toString(m_public_address->getPort());
     }
-    if (!m_public_address.isUnset())
-        return m_public_address.toString();
+    if (!m_public_address->isUnset())
+        return m_public_address->toString();
     return "";
 }   // getValidPublicAddress
 

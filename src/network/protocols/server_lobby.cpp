@@ -1379,13 +1379,12 @@ void ServerLobby::asynchronousUpdate()
             STKHost::get()->setPublicAddress(true/*ipv4*/);
         }
         if (STKHost::get()->getPublicAddress().isUnset() &&
-            STKHost::get()->getPublicIPV6Address().empty())
+            STKHost::get()->getPublicIPv6Address().empty())
         {
             m_state = ERROR_LEAVE;
         }
         else
         {
-            m_server_address = STKHost::get()->getPublicAddress();
             STKHost::get()->startListening();
             m_state = REGISTER_SELF_ADDRESS;
         }
@@ -2235,8 +2234,9 @@ bool ServerLobby::registerServer(bool now)
     auto request = std::make_shared<RegisterServerRequest>(now,
         std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
     NetworkConfig::get()->setServerDetails(request, "create");
-    request->addParameter("address",      m_server_address.getIP()        );
-    request->addParameter("port",         m_server_address.getPort()      );
+    const SocketAddress& addr = STKHost::get()->getPublicAddress();
+    request->addParameter("address",      addr.getIP()        );
+    request->addParameter("port",         addr.getPort()      );
     request->addParameter("private_port",
                                     STKHost::get()->getPrivatePort()      );
     request->addParameter("name", m_game_setup->getServerNameUtf8());
@@ -2249,18 +2249,18 @@ bool ServerLobby::registerServer(bool now)
     request->addParameter("password", (unsigned)(!pw.empty()));
     request->addParameter("version", (unsigned)ServerConfig::m_server_version);
 
-    bool ipv6_only = m_server_address.isUnset();
+    bool ipv6_only = addr.isUnset();
     if (!ipv6_only)
     {
-        Log::info("ServerLobby", "Public server address %s",
-            m_server_address.toString().c_str());
+        Log::info("ServerLobby", "Public IPv4 server address %s",
+            addr.toString().c_str());
     }
-    if (!STKHost::get()->getPublicIPV6Address().empty())
+    if (!STKHost::get()->getPublicIPv6Address().empty())
     {
         request->addParameter("address_ipv6",
-            STKHost::get()->getPublicIPV6Address());
+            STKHost::get()->getPublicIPv6Address());
         Log::info("ServerLobby", "Public IPv6 server address %s",
-            STKHost::get()->getValidPublicAddress().c_str());
+            STKHost::get()->getPublicIPv6Address().c_str());
     }
     if (now)
     {
@@ -2287,13 +2287,14 @@ void ServerLobby::unregisterServer(bool now)
     m_server_unregistered = request;
     NetworkConfig::get()->setServerDetails(request, "stop");
 
-    request->addParameter("address", m_server_address.getIP());
-    request->addParameter("port", m_server_address.getPort());
-    bool ipv6_only = m_server_address.isUnset();
+    const SocketAddress& addr = STKHost::get()->getPublicAddress();
+    request->addParameter("address", addr.getIP());
+    request->addParameter("port", addr.getPort());
+    bool ipv6_only = addr.isUnset();
     if (!ipv6_only)
     {
         Log::info("ServerLobby", "Unregister server address %s",
-            m_server_address.toString().c_str());
+            addr.toString().c_str());
     }
     else
     {
@@ -2566,7 +2567,12 @@ void ServerLobby::checkIncomingConnectionRequests()
     {
         BareNetworkString data;
         data.addUInt8(0);
-        STKHost::get()->sendRawPacket(data, STKHost::get()->getStunAddress());
+        const SocketAddress* stun_v4 = STKHost::get()->getStunIPv4Address();
+        const SocketAddress* stun_v6 = STKHost::get()->getStunIPv6Address();
+        if (stun_v4)
+            STKHost::get()->sendRawPacket(data, *stun_v4);
+        if (stun_v6)
+            STKHost::get()->sendRawPacket(data, *stun_v6);
     }
 
     // Now poll the stk server
@@ -2652,7 +2658,7 @@ void ServerLobby::checkIncomingConnectionRequests()
         std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
     NetworkConfig::get()->setServerDetails(request,
         "poll-connection-requests");
-    const TransportAddress &addr = STKHost::get()->getPublicAddress();
+    const SocketAddress& addr = STKHost::get()->getPublicAddress();
     request->addParameter("address", addr.getIP()  );
     request->addParameter("port",    addr.getPort());
     request->addParameter("current-players", getLobbyPlayers());
@@ -4726,8 +4732,9 @@ void ServerLobby::handleServerConfiguration(Event* event)
             new_game_mode);
         auto request = std::make_shared<Online::XMLRequest>();
         NetworkConfig::get()->setServerDetails(request, "update-config");
-        request->addParameter("address", m_server_address.getIP());
-        request->addParameter("port", m_server_address.getPort());
+        const SocketAddress& addr = STKHost::get()->getPublicAddress();
+        request->addParameter("address", addr.getIP());
+        request->addParameter("port", addr.getPort());
         request->addParameter("new-difficulty", new_difficulty);
         request->addParameter("new-game-mode", new_game_mode);
         request->queue();

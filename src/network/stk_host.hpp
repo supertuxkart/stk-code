@@ -24,7 +24,6 @@
 
 #include "network/network.hpp"
 #include "network/network_string.hpp"
-#include "network/transport_address.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/time.hpp"
 
@@ -134,13 +133,16 @@ private:
     irr::core::stringw m_error_message;
 
     /** The public address found by stun (if WAN is used). */
-    TransportAddress m_public_address;
+    std::unique_ptr<SocketAddress> m_public_address;
 
     /** The public IPv6 address found by stun (if WAN is used). */
     std::string m_public_ipv6_address;
 
-    /** The public address stun server used. */
-    TransportAddress m_stun_address;
+    /** The public IPv4 address stun server used. */
+    std::unique_ptr<SocketAddress> m_stun_ipv4;
+
+    /** The public IPv6 address stun server used. */
+    std::unique_ptr<SocketAddress> m_stun_ipv6;
 
     Synchronised<std::map<uint32_t, uint32_t> > m_peer_pings;
 
@@ -201,15 +203,19 @@ public:
     /** Checks if the STKHost has been created. */
     static bool existHost() { return m_stk_host != NULL; }
     // ------------------------------------------------------------------------
-    const TransportAddress& getPublicAddress() const
-                                                   { return m_public_address; }
+    const SocketAddress& getPublicAddress() const
+                                            { return *m_public_address.get(); }
     // ------------------------------------------------------------------------
-    const std::string& getPublicIPV6Address() const
+    const std::string& getPublicIPv6Address() const
                                               { return m_public_ipv6_address; }
     // ------------------------------------------------------------------------
     std::string getValidPublicAddress() const;
     // ------------------------------------------------------------------------
-    const TransportAddress& getStunAddress() const   { return m_stun_address; }
+    const SocketAddress* getStunIPv4Address() const
+                                                  { return m_stun_ipv4.get(); }
+    // ------------------------------------------------------------------------
+    const SocketAddress* getStunIPv6Address() const
+                                                  { return m_stun_ipv6.get(); }
     // ------------------------------------------------------------------------
     uint16_t getPrivatePort() const                  { return m_private_port; }
     // ------------------------------------------------------------------------

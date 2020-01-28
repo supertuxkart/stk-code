@@ -26,7 +26,6 @@
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_ipv6.hpp"
-#include "network/transport_address.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"

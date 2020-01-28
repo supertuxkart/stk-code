@@ -504,13 +504,13 @@ void ConnectToServer::registerWithSTKServer()
         StkTime::sleep(1);
     }
 
-    const TransportAddress& addr = STKHost::get()->getPublicAddress();
+    const SocketAddress& addr = STKHost::get()->getPublicAddress();
     auto request = std::make_shared<Online::XMLRequest>();
     NetworkConfig::get()->setServerDetails(request, "join-server-key");
     request->addParameter("server-id", m_server->getServerId());
     request->addParameter("address", addr.getIP());
     request->addParameter("address-ipv6",
-        STKHost::get()->getPublicIPV6Address());
+        STKHost::get()->getPublicIPv6Address());
     request->addParameter("port", addr.getPort());
 
     Crypto::initClientAES();
