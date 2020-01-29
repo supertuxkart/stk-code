@@ -452,7 +452,8 @@ void ServersManager::updateBroadcastAddresses()
                 saddr.toString().c_str(), u);
             addAllBroadcastAddresses(saddr, u);
         }
-        else if (p->ifa_addr->sa_family == AF_INET6)
+        else if (p->ifa_addr->sa_family == AF_INET6 &&
+            UserConfigParams::m_ipv6_lan)
         {
             uint32_t idx = if_nametoindex(p->ifa_name);
             if (used_scope_id.find(idx) != used_scope_id.end())
@@ -526,7 +527,8 @@ void ServersManager::updateBroadcastAddresses()
                 int len = 32 - unicast->OnLinkPrefixLength;
                 addAllBroadcastAddresses(ta, len);
             }
-            if (unicast->Address.lpSockaddr->sa_family == AF_INET6)
+            if (unicast->Address.lpSockaddr->sa_family == AF_INET6 &&
+                UserConfigParams::m_ipv6_lan)
             {
                 sockaddr_in6* in6 =
                     (sockaddr_in6*)unicast->Address.lpSockaddr;
@@ -545,6 +547,14 @@ void ServersManager::updateBroadcastAddresses()
     }
     free(paddr);
 #endif
+    if (UserConfigParams::m_ipv6_lan)
+    {
+        // Convert IPv4 socket address to ::ffff:x.y.z.w
+        setIPv6Socket(1);
+        for (auto& addr : m_broadcast_address)
+            addr.convertForIPv6Socket();
+        setIPv6Socket(0);
+    }
 }   // updateBroadcastAddresses
 
 // ----------------------------------------------------------------------------
