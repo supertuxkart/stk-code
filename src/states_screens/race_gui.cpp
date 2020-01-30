@@ -572,19 +572,6 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     DRAWLINE(r4, r1, color);
 
     Vec3 th;
-#define DRAW3DGROUNDRECTANGLE(a, h, color, rect_width) \
-    tx = a-h; \
-    tx = Vec3(-(tx.getZ()), tx.getY(), tx.getX()).normalize() * rect_width; \
-    ty = Vec3(0, a.getY(), 0); \
-    th = Vec3(0, h.getY(), 0); \
-    r1 = a-tx-ty; \
-    r2 = a+tx-ty; \
-    r3 = h+tx-th; \
-    r4 = h-tx-th; \
-    DRAWLINE(r1, r2, color); \
-    DRAWLINE(r2, r3, color); \
-    DRAWLINE(r3, r4, color); \
-    DRAWLINE(r4, r1, color);
 
 #define DRAWPYRAMID(a, h, color, rect_size, height) \
     tx = a-h; \
@@ -631,7 +618,16 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     Vec3 radar_offset = Vec3(0, UserConfigParams::m_radar_offset_y, 0);
     float radar_size = UserConfigParams::m_radar_size*.10f;
     float radar_outer_size = UserConfigParams::m_radar_size*.12f;
+    float radar_mid_size = UserConfigParams::m_radar_size*.11f;
+    float radar_low_size = UserConfigParams::m_radar_size*.105f;
+    float radar_inner_size = UserConfigParams::m_radar_size*.09f;
+    float radar_circle_size = UserConfigParams::m_radar_size;
+    float radar_circle_outer_size = UserConfigParams::m_radar_size*1.2f;
+    float radar_circle_mid_size = UserConfigParams::m_radar_size*1.1f;
+    float radar_circle_low_size = UserConfigParams::m_radar_size*1.05f;
+    float radar_circle_inner_size = UserConfigParams::m_radar_size*0.9f;
     Vec3 radar_pos=cur_kart_pos + radar_offset;
+    Vec3 radar_circle_pos=cur_kart_pos + Vec3(0,0.5f,0);
     Vec3 radar_spot_pos;
 
     Vec3 kart_pos ;
@@ -644,7 +640,9 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     video::SColor target_align_color = video::SColor(255, 0, 255, 0);
     video::SColor kart_tunnel_color = video::SColor(220, 109, 109, 109);
     video::SColor radar_arrow_color = video::SColor(255,255,255,255);
+    video::SColor radar_circle_color = video::SColor(255,255,255,255);
     video::SColor radar_inside_default_color = video::SColor(255,0,0,0);
+    video::SColor radar_tick_color = video::SColor(255,109,109,109);
     video::SColor radar_inside_color = radar_inside_default_color;
 
     KartTeam cur_team = world->getKartTeam(target_kart->getWorldKartId());
@@ -658,17 +656,38 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
 #define GETANGLE(a,b) \
     angle = atan2f((a.getX()*b.getZ()-b.getX()*a.getZ()),(a.getX()*b.getX())+(a.getZ()*b.getZ()));
 
-#define DRAWRADARPOINT(base_color, color, p1, p2) \
-    tx = (radar_spot_pos-radar_pos).normalize(); \
-    GETANGLE(direction, tx); \
+#define DRAWTICKAROUNDRADAR(angle, color, p1, p2) \
     ty = Vec3(0, 1, 0); \
-    r1 = radar_pos + (ty*p1); \
-    r2 = radar_pos + (ty*p2); \
-    DRAWLINE(r1, r2, base_color); \
     ty = ty.rotate(cam_direction, angle); \
-    r1 = radar_pos + (ty*p1); \
-    r2 = radar_pos + (ty*p2); \
+    r1 = radar_circle_pos + (ty*p1); \
+    r2 = radar_circle_pos + (ty*p2); \
     DRAWLINE(r1, r2, color);
+
+#define DRAWTHICKTICKAROUNDRADAR(angle, color, p1, p2, d, d2, color2, angle2) \
+    ty = Vec3(0, 1, 0); \
+    r4 = ty.rotate(cam_direction, angle); \
+    r2 = radar_circle_pos + (r4*(p2+d)); \
+    r1 = radar_circle_pos + (r4*p2); \
+    DRAWLINE(r1, r2, color);\
+    r3 = r2 + (r4.rotate(cam_direction, angle2)*d2); \
+    DRAWLINE(r3, r2, color2);\
+    r2 = r1; \
+    angle-=10*DEGREE_TO_RAD;\
+    r4 = ty.rotate(cam_direction, angle); \
+    r1 = radar_circle_pos + (r4*p1); \
+    DRAWLINE(r1, r2, color); \
+    angle+=20*DEGREE_TO_RAD;\
+    r4 = ty.rotate(cam_direction, angle); \
+    r1 = radar_circle_pos + (r4*p1); \
+    DRAWLINE(r1, r2, color);
+
+    float angle2;
+#define DRAWRADARPOINT(color, p1, p2, d, d2, mvrepr, color2) \
+    tx = (radar_spot_pos-radar_pos).normalize(); \
+    GETANGLE(tx, mvrepr); \
+    angle2=angle;\
+    GETANGLE(direction, tx); \
+    DRAWTHICKTICKAROUNDRADAR(angle, color, p1, p2, d, d2, color2, angle2);\
 
     Vec3 delta_pos;
     float powerup_speed=25.0f;
@@ -758,7 +777,6 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
       Vec3 ball_pos_delta;
       radar_spot_pos=ball_pos + radar_offset;
 
-      DRAWRADARPOINT(kart_line_color, radar_inside_default_color, 0.3f, 0.6f);
       /* check alignement from kart to ball */
       distance = TRIANGLE_AREA(ball_pos, cur_kart_pos, cur_kart_front_pos);
       if (distance < 0.015f)
@@ -772,32 +790,39 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
       if (distance > 255) {
         distance=255;
       }
-      radar_inside_color = video::SColor(200, 255-distance, 120+(distance/2), distance);
+      radar_inside_color = video::SColor(250, 255-distance, 120+(distance/2), distance);
       if (distance < 50) {
         DRAWSQUARE( ball_pos_delta, cur_kart_front_pos_delta, radar_inside_color, 0.2f);
       }
-      ADD_RADAR_SQUARE(radar_inside_color);
+      // ADD_RADAR_SQUARE(radar_inside_color);
+
+
+      /* draw ball moving vector on the radar with a rectangle representing the shock if the kart touch the ball */
+      distance3 = DISTANCE(linear_velocity, cur_kart_velocity)/100 + 0.1f;
+      Vec3 ball_velocity_repr = (cur_kart_pos + linear_velocity/4) + radar_offset;
+      distance2 = DISTANCE(radar_pos, ball_velocity_repr)/10;
+      DRAWSQUARE(ball_pos, cur_kart_front_pos, ball_line_color, 0.1f); 
+      DRAWSQUARE(ball_pos, cur_kart_front_pos, ball_line_color, distance3); 
+
 
       /* draw ball position from the kart with color tips for alignement (blue = cold, red=hot, green=perfect)*/
       distance = DISTANCE(cur_kart_pos1, ball_pos1) / 50;
-      DRAWPYRAMID(radar_pos, radar_spot_pos, radar_arrow_color, radar_size, distance);
+      DRAWRADARPOINT(radar_inside_default_color, radar_circle_inner_size, radar_circle_size, distance, distance2, ball_velocity_repr, ball_line_color);
 
-      distance = DISTANCE(ball_pos_delta, ball_pos);
-      radar_inside_color = video::SColor(200, 255-distance, 120+(distance/2), distance);
-      ADD_RADAR_SQUARE(radar_inside_color);
+      distance = (DISTANCE(ball_pos_delta, ball_pos) + DISTANCE(ball_pos_delta, kart_pos)) / 2;
+      video::SColor radar_inside_color2 = video::SColor(250, 255-distance, 120+(distance/2), distance);
 
-
-      distance = DISTANCE(ball_pos_delta, kart_pos);
-      radar_inside_color = video::SColor(200, 255-distance, 120+(distance/2), distance);
-      ADD_RADAR_SQUARE(radar_inside_color);
-
-      /* draw ball moving vector on the radar with a rectangle representing the shock if the kart touch the ball */
-      distance3 = DISTANCE(linear_velocity, cur_kart_velocity)/100 + radar_size;
-      Vec3 ball_velocity_repr = (cur_kart_pos + linear_velocity/4) + radar_offset;
-      distance2 = DISTANCE(radar_pos, ball_velocity_repr)/10;
-      DRAWPYRAMID(radar_pos, ball_velocity_repr, ball_move_color, radar_size/2, distance2);
-      DRAWSQUARE(ball_pos, cur_kart_front_pos, ball_line_color, radar_size); 
-      DRAWSQUARE(ball_pos, cur_kart_front_pos, ball_line_color, distance3); 
+      for (int i=0;i<360;i++)
+      {
+        angle = i * DEGREE_TO_RAD;
+        if (i % 30 == 0) {
+          DRAWTICKAROUNDRADAR(angle, radar_inside_color, radar_circle_size, radar_circle_outer_size);
+        } else if (i % 5 == 0) {
+          DRAWTICKAROUNDRADAR(angle, radar_inside_color, radar_circle_size,  radar_circle_mid_size);
+        } else {
+          DRAWTICKAROUNDRADAR(angle, radar_inside_color2, radar_circle_size,  radar_circle_low_size);
+        }
+      }
 
       BOWLING_CHECK(ball_pos, linear_velocity, 300.0f);
 
