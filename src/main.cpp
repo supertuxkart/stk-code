@@ -2031,6 +2031,8 @@ int main(int argc, char *argv[])
 
         // ServerConfig will use stk_config for server version testing
         stk_config->load(file_manager->getAsset("stk_config.xml"));
+        // Client port depends on user config file and stk_config
+        NetworkConfig::get()->initClientPort();
         bool no_graphics = !CommandLine::has("--graphical-server");
 
 #ifndef SERVER_ONLY

@@ -67,13 +67,22 @@ NetworkConfig::NetworkConfig()
     m_done_adding_network_players = false;
     m_cur_user_id           = 0;
     m_cur_user_token        = "";
-    m_client_port = UserConfigParams::m_random_client_port ?
-        0 : stk_config->m_client_port;
+    m_client_port = 0;
     m_joined_server_version = 0;
     m_network_ai_tester = false;
     m_state_frequency = 10;
     m_nat64_prefix_data.fill(-1);
 }   // NetworkConfig
+
+// ----------------------------------------------------------------------------
+/** Separated from constructor because this needs to be run after user config
+ *  is load.
+ */
+void NetworkConfig::initClientPort()
+{
+    m_client_port = UserConfigParams::m_random_client_port ?
+        0 : stk_config->m_client_port;
+}   // initClientPort
 
 // ----------------------------------------------------------------------------
 /** Set that this is not a networked game.

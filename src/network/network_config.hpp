@@ -269,6 +269,8 @@ public:
     // ------------------------------------------------------------------------
     const std::array<uint32_t, 8>& getNAT64PrefixData() const
                                                 { return m_nat64_prefix_data; }
+    // ------------------------------------------------------------------------
+    void initClientPort();
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG
