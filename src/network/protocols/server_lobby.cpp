@@ -4211,12 +4211,28 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
         }
         else
         {
-            Log::error("ServerLobby", "No ranking info found.");
+            Log::error("ServerLobby", "No ranking info found for player %s.",
+                StringUtils::wideToUtf8(p->getName()).c_str());
+            // Kick the player to avoid his score being reset in case
+            // connection to stk addons is broken
+            auto peer = p->getPeer();
+            if (peer)
+            {
+                peer->kick();
+                return;
+            }
         }
     }
     else
     {
-        Log::error("ServerLobby", "No ranking info found.");
+        Log::error("ServerLobby", "No ranking info found for player %s.",
+            StringUtils::wideToUtf8(p->getName()).c_str());
+        auto peer = p->getPeer();
+        if (peer)
+        {
+            peer->kick();
+            return;
+        }
     }
     m_ranked_players[id] = p;
     m_scores[id] = score;
