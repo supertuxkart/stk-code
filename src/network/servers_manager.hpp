@@ -62,9 +62,9 @@ private:
     void setLanServers(const std::map<irr::core::stringw, 
                                       std::shared_ptr<Server> >& servers);
                                       
-    void setDefaultBroadcastAddresses();
-    void addAllBroadcastAddresses(const SocketAddress &a, int len);
-    void updateBroadcastAddresses();
+    std::vector<SocketAddress> getDefaultBroadcastAddresses();
+    void addAllBroadcastAddresses(const SocketAddress &a, int len,
+                                  std::vector<SocketAddress>* result);
 public:
     // ------------------------------------------------------------------------
     // Singleton
@@ -80,7 +80,7 @@ public:
     // ------------------------------------------------------------------------
     bool listUpdated() const                         { return m_list_updated; }
     // ------------------------------------------------------------------------
-    const std::vector<SocketAddress>& getBroadcastAddresses();
+    std::vector<SocketAddress> getBroadcastAddresses(bool ipv6);
     // ------------------------------------------------------------------------
     void reset()
     {

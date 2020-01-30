@@ -2632,7 +2632,7 @@ void ServerLobby::checkIncomingConnectionRequests()
                     SocketAddress peer_addr(addr, port);
                     if (!ipv6.empty())
                         peer_addr.init(ipv6, port);
-                    peer_addr.convertForIPv6Socket();
+                    peer_addr.convertForIPv6Socket(isIPv6Socket());
                     std::string peer_addr_str = peer_addr.toString();
                     if (sl->m_pending_peer_connection.find(peer_addr_str) !=
                         sl->m_pending_peer_connection.end())

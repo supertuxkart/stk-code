@@ -165,7 +165,8 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
             setIPv6Socket(UserConfigParams::m_ipv6_lan ? 1 : 0);
             Network *broadcast = new Network(1, 1, 0, 0, &addr);
             const std::vector<SocketAddress> &all_bcast =
-                ServersManager::get()->getBroadcastAddresses();
+                ServersManager::get()->getBroadcastAddresses(
+                UserConfigParams::m_ipv6_lan);
             for (auto &bcast_addr : all_bcast)
             {
                 Log::info("Server Discovery", "Broadcasting to %s",
@@ -291,14 +292,8 @@ bool ServersManager::refresh(bool full_refresh)
     }
     else
     {
-        if (full_refresh)
-        {
-            updateBroadcastAddresses();
-        }
-        
         Online::RequestManager::get()->addRequest(getLANRefreshRequest());
     }
-    
     return true;
 }   // refresh
 
@@ -350,24 +345,25 @@ void ServersManager::setWanServers(bool success, const XMLNode* input)
  *  broadcast address is found. This list includes default private network
  *  addresses.
  */
-void ServersManager::setDefaultBroadcastAddresses()
+std::vector<SocketAddress> ServersManager::getDefaultBroadcastAddresses()
 {
     // Add some common LAN addresses
-    m_broadcast_address.emplace_back(std::string("192.168.255.255"));
-    m_broadcast_address.emplace_back(std::string("192.168.0.255")  );
-    m_broadcast_address.emplace_back(std::string("192.168.1.255")  );
-    m_broadcast_address.emplace_back(std::string("172.31.255.255") );
-    m_broadcast_address.emplace_back(std::string("172.16.255.255") );
-    m_broadcast_address.emplace_back(std::string("172.16.0.255")   );
-    m_broadcast_address.emplace_back(std::string("10.255.255.255") );
-    m_broadcast_address.emplace_back(std::string("10.0.255.255")   );
-    m_broadcast_address.emplace_back(std::string("10.0.0.255")     );
-    m_broadcast_address.emplace_back(std::string("255.255.255.255"));
-    m_broadcast_address.emplace_back(std::string("127.0.0.255")    );
-    m_broadcast_address.emplace_back(std::string("127.0.0.1")      );
-    for (auto& addr : m_broadcast_address)
-        addr.setPort(stk_config->m_server_discovery_port);
-}   // setDefaultBroadcastAddresses
+    std::vector<SocketAddress> result;
+    uint16_t port = stk_config->m_server_discovery_port;
+    result.emplace_back(std::string("192.168.255.255"), port);
+    result.emplace_back(std::string("192.168.0.255"), port);
+    result.emplace_back(std::string("192.168.1.255"), port);
+    result.emplace_back(std::string("172.31.255.255"), port);
+    result.emplace_back(std::string("172.16.255.255"), port);
+    result.emplace_back(std::string("172.16.0.255"), port);
+    result.emplace_back(std::string("10.255.255.255"), port);
+    result.emplace_back(std::string("10.0.255.255"), port);
+    result.emplace_back(std::string("10.0.0.255"), port);
+    result.emplace_back(std::string("255.255.255.255"), port);
+    result.emplace_back(std::string("127.0.0.255"), port);
+    result.emplace_back(std::string("127.0.0.1"), port);
+    return result;
+}   // getDefaultBroadcastAddresses
 
 // ----------------------------------------------------------------------------
 /** This masks various possible broadcast addresses. For example, in a /16
@@ -381,8 +377,10 @@ void ServersManager::setDefaultBroadcastAddresses()
  *  \param a The transport address for which the broadcast addresses need
  *         to be created.
  *  \param len Number of bits to be or'ed.
+ *  \param result Location to put address.
  */
-void ServersManager::addAllBroadcastAddresses(const SocketAddress &a, int len)
+void ServersManager::addAllBroadcastAddresses(const SocketAddress &a, int len,
+                                            std::vector<SocketAddress>* result)
 {
     // Try different broadcast addresses - by masking on
     // byte boundaries
@@ -395,7 +393,7 @@ void ServersManager::addAllBroadcastAddresses(const SocketAddress &a, int len)
             a.toString().c_str(),
             len, mask,
             bcast.toString().c_str());
-        m_broadcast_address.push_back(bcast);
+        result->push_back(bcast);
         if (len % 8 != 0)
             len -= (len % 8);
         else
@@ -404,7 +402,7 @@ void ServersManager::addAllBroadcastAddresses(const SocketAddress &a, int len)
 }   // addAllBroadcastAddresses
 
 // ----------------------------------------------------------------------------
-/** Updates a list of all possible broadcast addresses on this machine.
+/** Returns a list of all possible broadcast addresses on this machine.
  *  It queries all adapters for active IPv4 interfaces, determines their
  *  netmask to create the broadcast addresses. It will also add 'smaller'
  *  broadcast addesses, e.g. in a /16 network, it will add *.*.255.255 and
@@ -412,9 +410,8 @@ void ServersManager::addAllBroadcastAddresses(const SocketAddress &a, int len)
  *  all broadcast addresses through. Duplicated answers (from the same server
  *  to different addersses) will be filtered out in ServersManager.
  */
-void ServersManager::updateBroadcastAddresses()
+std::vector<SocketAddress> ServersManager::getBroadcastAddresses(bool ipv6)
 {
-    m_broadcast_address.clear();
     std::vector<SocketAddress> result;
 #ifndef WIN32
     struct ifaddrs *addresses, *p;
@@ -422,7 +419,7 @@ void ServersManager::updateBroadcastAddresses()
     if (getifaddrs(&addresses) == -1)
     {
         Log::warn("SocketAddress", "Error in getifaddrs");
-        return;
+        return result;
     }
     std::set<uint32_t> used_scope_id;
     for (p = addresses; p; p = p->ifa_next)
@@ -450,10 +447,9 @@ void ServersManager::updateBroadcastAddresses()
             Log::debug("ServerManager",
                 "Interface: %s\tAddress: %s\tmask: %x\n", p->ifa_name,
                 saddr.toString().c_str(), u);
-            addAllBroadcastAddresses(saddr, u);
+            addAllBroadcastAddresses(saddr, u, &result);
         }
-        else if (p->ifa_addr->sa_family == AF_INET6 &&
-            UserConfigParams::m_ipv6_lan)
+        else if (p->ifa_addr->sa_family == AF_INET6 && ipv6)
         {
             uint32_t idx = if_nametoindex(p->ifa_name);
             if (used_scope_id.find(idx) != used_scope_id.end())
@@ -463,7 +459,7 @@ void ServersManager::updateBroadcastAddresses()
                 stk_config->m_server_discovery_port);
             sockaddr_in6* in6 = (sockaddr_in6*)socket_address.getSockaddr();
             in6->sin6_scope_id = idx;
-            m_broadcast_address.push_back(socket_address);
+            result.push_back(socket_address);
         }
     }
     freeifaddrs(addresses);
@@ -478,7 +474,7 @@ void ServersManager::updateBroadcastAddresses()
     {
         paddr = (IP_ADAPTER_ADDRESSES*)malloc(len);
         if (paddr == NULL)
-            return;
+            return result;
         long flags = 0;
         return_code = GetAdaptersAddresses(AF_UNSPEC, flags, NULL, paddr,
             &len);
@@ -495,8 +491,8 @@ void ServersManager::updateBroadcastAddresses()
     if (return_code == ERROR_BUFFER_OVERFLOW)
     {
         Log::warn("ServerManager", "Can not get broadcast addresses.");
-        setDefaultBroadcastAddresses();
-        return;
+        result = getDefaultBroadcastAddresses();
+        paddr = NULL;
     }
 
     for (IP_ADAPTER_ADDRESSES *p = paddr; p; p = p->Next)
@@ -525,10 +521,9 @@ void ServersManager::updateBroadcastAddresses()
                     sa->sin_addr.S_un.S_un_b.s_b3,
                     sa->sin_addr.S_un.S_un_b.s_b4);
                 int len = 32 - unicast->OnLinkPrefixLength;
-                addAllBroadcastAddresses(ta, len);
+                addAllBroadcastAddresses(ta, len, &result);
             }
-            if (unicast->Address.lpSockaddr->sa_family == AF_INET6 &&
-                UserConfigParams::m_ipv6_lan)
+            if (unicast->Address.lpSockaddr->sa_family == AF_INET6 && ipv6)
             {
                 sockaddr_in6* in6 =
                     (sockaddr_in6*)unicast->Address.lpSockaddr;
@@ -541,31 +536,17 @@ void ServersManager::updateBroadcastAddresses()
                     stk_config->m_server_discovery_port);
                 in6 = (sockaddr_in6*)socket_address.getSockaddr();
                 in6->sin6_scope_id = scope_id;
-                m_broadcast_address.push_back(socket_address);
+                result.push_back(socket_address);
             }
         }
     }
     free(paddr);
 #endif
-    if (UserConfigParams::m_ipv6_lan)
+    if (ipv6)
     {
         // Convert IPv4 socket address to ::ffff:x.y.z.w
-        setIPv6Socket(1);
-        for (auto& addr : m_broadcast_address)
-            addr.convertForIPv6Socket();
-        setIPv6Socket(0);
+        for (auto& addr : result)
+            addr.convertForIPv6Socket(ipv6);
     }
-}   // updateBroadcastAddresses
-
-// ----------------------------------------------------------------------------
-/** Returns a list of all possible broadcast addresses on this machine.
- */
-const std::vector<SocketAddress>& ServersManager::getBroadcastAddresses()
-{
-    if (m_broadcast_address.empty())
-    {
-        updateBroadcastAddresses();
-    }
-
-    return m_broadcast_address;
+    return result;
 }   // getBroadcastAddresses

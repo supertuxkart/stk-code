@@ -279,8 +279,8 @@ void ConnectToServer::asynchronousUpdate()
                     StringUtils::toString(m_server->getPrivatePort()));
                 // If use lan connection for wan server, send to all broadcast
                 // addresses
-                for (auto& addr :
-                    ServersManager::get()->getBroadcastAddresses())
+                for (auto& addr : ServersManager::get()
+                    ->getBroadcastAddresses(isIPv6Socket()))
                 {
                     for (int i = 0; i < 5; i++)
                     {

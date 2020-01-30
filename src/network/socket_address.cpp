@@ -498,10 +498,10 @@ std::string SocketAddress::toString(bool show_port) const
 }   // toString
 
 // ----------------------------------------------------------------------------
-void SocketAddress::convertForIPv6Socket()
+void SocketAddress::convertForIPv6Socket(bool ipv6)
 {
 #ifdef ENABLE_IPV6
-    if (m_family == AF_INET && isIPv6Socket())
+    if (m_family == AF_INET && ipv6)
     {
         std::string ipv4 = toString(false/*show_port*/);
         uint16_t port = getPort();

@@ -150,7 +150,7 @@ public:
     // ------------------------------------------------------------------------
     bool isLoopback() const;
     // ------------------------------------------------------------------------
-    void convertForIPv6Socket();
+    void convertForIPv6Socket(bool ipv6);
 };   // SocketAddress
 
 #endif // HEADER_SOCKET_ADDRESS_HPP

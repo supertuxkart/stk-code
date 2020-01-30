@@ -425,7 +425,7 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
     // We specify ai_family, so only IPv4 or IPv6 is found
     if (stun.isUnset())
         return;
-    stun.convertForIPv6Socket();
+    stun.convertForIPv6Socket(isIPv6Socket());
 
     // We only need to keep the stun address for server to keep the port open
     if (NetworkConfig::get()->isServer())
