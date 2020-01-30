@@ -469,7 +469,7 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
             break;
         Log::info("ConnectToServer", "Trying connecting to %s from port %d, "
             "retry remain: %d", connecting_address.c_str(),
-            nw->getENetHost()->address.port, m_retry_count);
+            nw->getPort(), m_retry_count);
         while (enet_host_service(nw->getENetHost(), &event, timeout) != 0)
         {
             if (event.type == ENET_EVENT_TYPE_CONNECT)

@@ -115,9 +115,6 @@ private:
     /** Id of thread listening to enet events. */
     std::thread m_listening_thread;
 
-    /** The private port enet socket is bound. */
-    uint16_t m_private_port;
-
     /** Flag which is set from the protocol manager thread which
      *  triggers a shutdown of the STKHost (and the Protocolmanager). */
     std::atomic_bool m_shutdown;
@@ -217,9 +214,7 @@ public:
     const SocketAddress* getStunIPv6Address() const
                                                   { return m_stun_ipv6.get(); }
     // ------------------------------------------------------------------------
-    uint16_t getPrivatePort() const                  { return m_private_port; }
-    // ------------------------------------------------------------------------
-    void setPrivatePort();
+    uint16_t getPrivatePort() const;
     // ------------------------------------------------------------------------
     void setPublicAddress(bool ipv4);
     // ------------------------------------------------------------------------
@@ -410,7 +405,6 @@ public:
     void replaceNetwork(Network* new_network)
     {
         m_network = new_network;
-        setPrivatePort();
     }
     // ------------------------------------------------------------------------
     static BareNetworkString getStunRequest(uint8_t* stun_tansaction_id);

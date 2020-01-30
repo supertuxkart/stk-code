@@ -24,6 +24,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/socket_address.hpp"
+#include "network/stk_ipv6.hpp"
 #include "network/transport_address.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
@@ -63,10 +64,9 @@ Network::Network(int peer_count, int channel_limit,
                  uint32_t max_outgoing_bandwidth,
                  ENetAddress* address, bool change_port_if_bound)
 {
+    m_port = 0;
     m_host = enet_host_create(address, peer_count, channel_limit, 0, 0);
-    if (m_host)
-        return;
-    if (change_port_if_bound)
+    if (!m_host && change_port_if_bound)
     {
         Log::warn("Network", "%d port is in used, use another port",
             address->port);
@@ -77,6 +77,30 @@ Network::Network(int peer_count, int channel_limit,
         m_host = enet_host_create(&new_addr, peer_count, channel_limit, 0, 0);
         if (!m_host)
             Log::fatal("Network", "Failed to create socket with any port.");
+    }
+    if (m_host && isIPv6Socket())
+    {
+        struct sockaddr_in6 sin6;
+        socklen_t len = sizeof(sin6);
+        if (getsockname(m_host->socket, (struct sockaddr*)&sin6, &len) == -1)
+        {
+            Log::error("STKHost", "Error while using getsockname().");
+            m_port = 0;
+        }
+        else
+            m_port = ntohs(sin6.sin6_port);
+    }
+    else if (m_host)
+    {
+        struct sockaddr_in sin;
+        socklen_t len = sizeof(sin);
+        if (getsockname(m_host->socket, (struct sockaddr*)&sin, &len) == -1)
+        {
+            Log::error("STKHost", "Error while using getsockname().");
+            m_port = 0;
+        }
+        else
+            m_port = ntohs(sin.sin_port);
     }
 }   // Network
 

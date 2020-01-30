@@ -298,9 +298,8 @@ STKHost::STKHost(bool server)
         Log::fatal("STKHost", "An error occurred while trying to create an "
                               "ENet server host.");
     }
-    setPrivatePort();
     if (server)
-        Log::info("STKHost", "Server port is %d", m_private_port);
+        Log::info("STKHost", "Server port is %d", getPrivatePort());
 }   // STKHost
 
 // ----------------------------------------------------------------------------
@@ -680,37 +679,6 @@ void STKHost::setPublicAddress(bool ipv4)
             untried_server.pop_back();
     }
 }   // setPublicAddress
-
-//-----------------------------------------------------------------------------
-void STKHost::setPrivatePort()
-{
-    if (isIPv6Socket())
-    {
-        struct sockaddr_in6 sin6;
-        socklen_t len = sizeof(sin6);
-        ENetHost *host = m_network->getENetHost();
-        if (getsockname(host->socket, (struct sockaddr *)&sin6, &len) == -1)
-        {
-            Log::error("STKHost", "Error while using getsockname().");
-            m_private_port = 0;
-        }
-        else
-            m_private_port = ntohs(sin6.sin6_port);
-    }
-    else
-    {
-        struct sockaddr_in sin;
-        socklen_t len = sizeof(sin);
-        ENetHost *host = m_network->getENetHost();
-        if (getsockname(host->socket, (struct sockaddr *)&sin, &len) == -1)
-        {
-            Log::error("STKHost", "Error while using getsockname().");
-            m_private_port = 0;
-        }
-        else
-            m_private_port = ntohs(sin.sin_port);
-    }
-}   // setPrivatePort
 
 //-----------------------------------------------------------------------------
 /** Disconnect all connected peers.
@@ -1209,7 +1177,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     std::string command;
     message.decodeString(&command);
     const std::string connection_cmd = std::string("connection-request") +
-        StringUtils::toString(m_private_port);
+        StringUtils::toString(getPrivatePort());
 
     if (command == "stk-server")
     {
@@ -1223,7 +1191,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
         s.encodeString(name);
         s.addUInt8((uint8_t)ServerConfig::m_server_max_players);
         s.addUInt8((uint8_t)sl->getLobbyPlayers());
-        s.addUInt16(m_private_port);
+        s.addUInt16(getPrivatePort());
         s.addUInt8((uint8_t)sl->getDifficulty());
         s.addUInt8((uint8_t)sl->getGameMode());
         s.addUInt8(!pw.empty());
@@ -1255,7 +1223,7 @@ void STKHost::handleDirectSocketRequest(Network* direct_socket,
     else if (command == "stk-server-port")
     {
         BareNetworkString s;
-        s.addUInt16(m_private_port);
+        s.addUInt16(getPrivatePort());
         direct_socket->sendRawPacket(s, sender);
     }
     else
@@ -1482,7 +1450,6 @@ void STKHost::initClientNetwork(ENetEvent& event, Network* new_network)
         m_next_unique_host_id++);
     stk_peer->setValidated(true);
     m_peers[event.peer] = stk_peer;
-    setPrivatePort();
     auto pm = ProtocolManager::lock();
     if (pm && !pm->isExiting())
         pm->propagateEvent(new Event(&event, stk_peer));
@@ -1599,9 +1566,16 @@ int STKHost::receiveRawPacket(char *buffer, int buffer_len,
     return m_network->receiveRawPacket(buffer, buffer_len, sender,
                                            max_tries);
 }   // receiveRawPacket
+
 // ----------------------------------------------------------------------------
 void STKHost::sendRawPacket(const BareNetworkString &buffer,
                             const SocketAddress& dst)
 {
     m_network->sendRawPacket(buffer, dst);
 }  // sendRawPacket
+
+// ----------------------------------------------------------------------------
+uint16_t STKHost::getPrivatePort() const
+{
+    return m_network->getPort();
+}  // getPrivatePort

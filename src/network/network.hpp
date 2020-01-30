@@ -49,6 +49,8 @@ private:
     /** ENet host interfacing sockets. */
     ENetHost*  m_host;
 
+    uint16_t m_port;
+
     /** Where to log packets. If NULL for FILE* logging is disabled. */
     static Synchronised<FILE*> m_log_file;
 
@@ -75,7 +77,8 @@ public:
                          SocketAddress* sender, int max_tries = -1);
     void     broadcastPacket(NetworkString *data,
                              bool reliable = true);
-
+    // ------------------------------------------------------------------------
+    uint16_t getPort() const { return m_port; }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */
     ENetHost* getENetHost() { return m_host; }
