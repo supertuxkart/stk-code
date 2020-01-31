@@ -951,7 +951,7 @@ namespace UserConfigParams
                       "Enable radar (show target in ctf and soccer modes)"));
 
     PARAM_PREFIX FloatUserConfigParam         m_radar_offset_y
-        PARAM_DEFAULT(FloatUserConfigParam(1.0f, "offset",  &m_radar,
+        PARAM_DEFAULT(FloatUserConfigParam(0.2f, "offset",  &m_radar,
                       "Radar offset above a the kart"));
 
     PARAM_PREFIX FloatUserConfigParam         m_radar_size
