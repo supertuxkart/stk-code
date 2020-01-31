@@ -200,6 +200,12 @@ bool NetworkConfig::roundValuesNow() const
 void NetworkConfig::detectIPType()
 {
     m_nat64_prefix_data.fill(-1);
+    if (UserConfigParams::m_default_ip_type != IP_NONE)
+    {
+        int ip_type = UserConfigParams::m_default_ip_type;
+        m_ip_type.store((IPType)ip_type);
+        return;
+    }
 #ifdef ENABLE_IPV6
     ENetAddress eaddr;
     eaddr.host = STKHost::HOST_ANY;

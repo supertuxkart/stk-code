@@ -825,6 +825,10 @@ namespace UserConfigParams
      PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance
         PARAM_DEFAULT(IntUserConfigParam(5, "timer-sync-difference-tolerance",
         &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
+    PARAM_PREFIX IntUserConfigParam m_default_ip_type
+        PARAM_DEFAULT(IntUserConfigParam(0, "default-ip-type",
+        &m_network_group, "Default IP type of this machine, "
+        "0 detect every time, 1 IPv4, 2 IPv6, 3 IPv6 NAT64, 4 Dual stack."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode

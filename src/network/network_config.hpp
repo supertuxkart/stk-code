@@ -49,7 +49,7 @@ class PlayerProfile;
 class NetworkConfig : public NoCopy
 {
 public:
-    enum IPType : uint8_t
+    enum IPType : int
     {
         IP_NONE, IP_V4, IP_V6, IP_V6_NAT64, IP_DUAL_STACK
     };
