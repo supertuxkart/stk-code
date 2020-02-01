@@ -22,8 +22,6 @@
 #ifndef STK_HOST_HPP
 #define STK_HOST_HPP
 
-#include "network/network.hpp"
-#include "network/network_string.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/time.hpp"
 
@@ -45,15 +43,22 @@
 #include <set>
 #include <thread>
 #include <tuple>
+#include <vector>
 
+class BareNetworkString;
 class GameSetup;
 class LobbyProtocol;
+class Network;
 class NetworkPlayerProfile;
+class NetworkString;
 class NetworkTimerSynchronizer;
 class Server;
 class ServerLobby;
 class SeparateProcess;
 class SocketAddress;
+class STKPeer;
+
+using namespace irr;
 
 enum ENetCommandType : unsigned int
 {
@@ -293,19 +298,6 @@ public:
     /** Returns true if a shutdown of the network infrastructure was
      *  requested. */
     bool requestedShutdown() const                { return m_shutdown.load(); }
-    // ------------------------------------------------------------------------
-    int receiveRawPacket(char *buffer, int buffer_len, 
-                         TransportAddress* sender, int max_tries = -1)
-    {
-        return m_network->receiveRawPacket(buffer, buffer_len, sender,
-                                           max_tries);
-    }   // receiveRawPacket
-    // ------------------------------------------------------------------------
-    void sendRawPacket(const BareNetworkString &buffer,
-                       const TransportAddress& dst)
-    {
-        m_network->sendRawPacket(buffer, dst);
-    }  // sendRawPacket
     // ------------------------------------------------------------------------
     int receiveRawPacket(char *buffer, int buffer_len,
                          SocketAddress* sender, int max_tries = -1);

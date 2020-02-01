@@ -22,6 +22,7 @@
 #include "input/device_manager.hpp"
 #include "modes/world.hpp"
 #include "network/network.hpp"
+#include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/server_config.hpp"
 #include "network/socket_address.hpp"

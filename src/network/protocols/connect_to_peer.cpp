@@ -18,6 +18,7 @@
 
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/network.hpp"
+#include "network/network_string.hpp"
 #include "network/stk_host.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"

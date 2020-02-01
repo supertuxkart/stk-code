@@ -36,7 +36,6 @@
 
 class BareNetworkString;
 class NetworkString;
-class TransportAddress;
 class SocketAddress;
 
 /** \class EnetHost
@@ -67,10 +66,6 @@ public:
     static void logPacket(const BareNetworkString &ns, bool incoming);
     static void closeLog();
     ENetPeer *connectTo(const ENetAddress &address);
-    void     sendRawPacket(const BareNetworkString &buffer,
-                           const TransportAddress& dst);
-    int receiveRawPacket(char *buffer, int buf_len,
-                         TransportAddress* sender, int max_tries = -1);
     void     sendRawPacket(const BareNetworkString &buffer,
                            const SocketAddress& dst);
     int receiveRawPacket(char *buffer, int buf_len,

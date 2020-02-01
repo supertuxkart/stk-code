@@ -21,6 +21,7 @@
 #include "guiengine/widgets/progress_bar_widget.hpp"
 #include "input/device_manager.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"

@@ -41,6 +41,7 @@
 #include "network/game_setup.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/client_lobby.hpp"

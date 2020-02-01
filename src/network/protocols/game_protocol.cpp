@@ -25,6 +25,7 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/game_setup.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol_manager.hpp"

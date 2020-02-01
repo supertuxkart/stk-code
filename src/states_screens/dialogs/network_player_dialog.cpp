@@ -26,6 +26,7 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "online/online_profile.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"

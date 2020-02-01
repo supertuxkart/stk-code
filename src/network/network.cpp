@@ -25,7 +25,6 @@
 #include "network/network_string.hpp"
 #include "network/socket_address.hpp"
 #include "network/stk_ipv6.hpp"
-#include "network/transport_address.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -121,87 +120,6 @@ ENetPeer* Network::connectTo(const ENetAddress &address)
 {
     return enet_host_connect(m_host, &address, EVENT_CHANNEL_COUNT, 0);
 }   // connectTo
-
-// ----------------------------------------------------------------------------
-/** \brief Sends a packet whithout ENet adding its headers.
- *  This function is used in particular to achieve the STUN protocol.
- *  \param data : Data to send.
- *  \param dst : Destination of the packet.
- */
-void Network::sendRawPacket(const BareNetworkString &buffer,
-                            const TransportAddress& dst)
-{
-    struct sockaddr_in to;
-    int to_len = sizeof(to);
-    memset(&to,0,to_len);
-
-    to.sin_family = AF_INET;
-    to.sin_port = htons(dst.getPort());
-    to.sin_addr.s_addr = htonl(dst.getIP());
-
-    sendto(m_host->socket, buffer.getData(), buffer.size(), 0,
-           (sockaddr*)&to, to_len);
-    if (m_connection_debug)
-    {
-        Log::verbose("Network", "Raw packet sent to %s",
-            dst.toString().c_str());
-    }
-    Network::logPacket(buffer, false);
-}   // sendRawPacket
-
-// ----------------------------------------------------------------------------
-/** \brief Receives a packet directly from the network interface and
- *  filter its address.
- *  Receive a packet whithout ENet processing it. Checks that the
- *  sender of the packet is the one that corresponds to the sender
- *  parameter. Does not check the port right now.
- *  \param buffer A buffer to receive the data in.
- *  \param buf_len  Length of the buffer.
- *  \param[out] sender : Transport address of the original sender of the
- *                  wanted packet. If the ip address is 0, do not check
- *                  the sender's ip address, otherwise wait till a message
- *                  from the specified sender arrives. All other messages
- *                  are discarded.
- *  \param max_tries : Number of times we try to read data from the
- *                  socket. This is aproximately the time we wait in
- *                  milliseconds. -1 means eternal tries.
- *  \return Length of the received data, or -1 if no data was received.
- */
-int Network::receiveRawPacket(char *buffer, int buf_len, 
-                              TransportAddress *sender, int max_tries)
-{
-    memset(buffer, 0, buf_len);
-
-    struct sockaddr_in addr;
-    socklen_t from_len = sizeof(addr);
-
-    int len = recvfrom(m_host->socket, buffer, buf_len, 0,
-                       (struct sockaddr*)(&addr), &from_len    );
-
-    int count = 0;
-    // wait to receive the message because enet sockets are non-blocking
-    while(len < 0 && (count<max_tries || max_tries==-1) )
-    {
-        count++;
-        StkTime::sleep(1); // wait 1 millisecond between two checks
-        len = recvfrom(m_host->socket, buffer, buf_len, 0, 
-                       (struct sockaddr*)(&addr), &from_len);
-    }
-
-    // No message received
-    if(len<0)
-        return -1;
-
-    Network::logPacket(BareNetworkString(buffer, len), true);
-    sender->setIP(ntohl((uint32_t)(addr.sin_addr.s_addr)) );
-    sender->setPort( ntohs(addr.sin_port) );
-    if (addr.sin_family == AF_INET && m_connection_debug)
-    {
-        Log::verbose("Network", "IPv4 Address of the sender was %s",
-            sender->toString().c_str());
-    }
-    return len;
-}   // receiveRawPacket
 
 // ----------------------------------------------------------------------------
 /** \brief Sends a packet whithout ENet adding its headers.
