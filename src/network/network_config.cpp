@@ -273,13 +273,9 @@ void NetworkConfig::detectIPType()
         // to IPv4 only servers
         if (!has_ipv4)
         {
-            // Detect NAT64 prefix by using the IPv4 only stun:
-            // All IPv4 only stun servers are *.supertuxkart.net which only
-            // have A record, so the below code which forces to get an AF_INET6
-            // will return their NAT64 addresses
-            SocketAddress nat64(ipv4_it->first, 0/*port specified in addr*/,
-                AF_INET6);
-            if (!nat64.isUnset() && nat64.getFamily() == AF_INET6)
+            // Detect NAT64 prefix by using ipv4only.arpa (RFC 7050)
+            SocketAddress nat64("ipv4only.arpa", 0/*port*/, AF_INET6);
+            if (nat64.getFamily() == AF_INET6)
             {
                 // Remove last 4 bytes which is IPv4 format
                 struct sockaddr_in6* in6 =
