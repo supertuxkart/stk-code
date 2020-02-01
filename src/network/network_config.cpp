@@ -228,6 +228,7 @@ void NetworkConfig::detectIPType()
     adv = StkTime::getMonoTimeMs() % UserConfigParams::m_stun_servers.size();
     std::advance(ipv6_it, adv);
 
+    SocketAddress::g_ignore_error_message = true;
     SocketAddress stun_v4(ipv4_it->first, 0/*port specified in addr*/,
         AF_INET);
     bool sent_ipv4 = false;
@@ -236,11 +237,6 @@ void NetworkConfig::detectIPType()
         sendto(ipv4->getENetHost()->socket, s.getData(), s.size(), 0,
             stun_v4.getSockaddr(), stun_v4.getSocklen());
         sent_ipv4 = true;
-    }
-    else
-    {
-        Log::error("NetworkConfig", "Invalid IPv4: %s",
-            ipv4_it->first.c_str());
     }
 
     SocketAddress stun_v6(ipv6_it->first, 0/*port specified in addr*/,
@@ -252,11 +248,7 @@ void NetworkConfig::detectIPType()
             stun_v6.getSockaddr(), stun_v6.getSocklen());
         sent_ipv6 = true;
     }
-    else
-    {
-        Log::error("NetworkConfig", "Invalid IPv6: %s",
-            ipv6_it->first.c_str());
-    }
+    SocketAddress::g_ignore_error_message = false;
 
     bool has_ipv4 = false;
     bool has_ipv6 = false;

@@ -45,6 +45,8 @@
 #include <sys/types.h>
 
 // ----------------------------------------------------------------------------
+bool SocketAddress::g_ignore_error_message = false;
+// ----------------------------------------------------------------------------
 /** IPv4 Constructor. */
 SocketAddress::SocketAddress(uint32_t ip, uint16_t port)
 {
@@ -137,24 +139,32 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
     if (status != 0)
     {
 #ifdef WIN32
-        wchar_t msgbuf[256] = {};
-        DWORD flags = FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
-            FORMAT_MESSAGE_MAX_WIDTH_MASK;
-        FormatMessage(flags, NULL, WSAGetLastError(), 0, msgbuf,
-            sizeof(msgbuf) / sizeof(wchar_t), NULL);
-        Log::error("SocketAddress", "Error in getaddrinfo for "
-            "SocketAddress (str constructor) %s: %s",
-            str.c_str(), StringUtils::wideToUtf8(msgbuf).c_str());
+        if (!g_ignore_error_message)
+        {
+            wchar_t msgbuf[256] = {};
+            DWORD flags =
+                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS |
+                FORMAT_MESSAGE_MAX_WIDTH_MASK;
+            FormatMessage(flags, NULL, WSAGetLastError(), 0, msgbuf,
+                sizeof(msgbuf) / sizeof(wchar_t), NULL);
+            Log::error("SocketAddress", "Error in getaddrinfo for "
+                "SocketAddress (str constructor) %s: %s",
+                str.c_str(), StringUtils::wideToUtf8(msgbuf).c_str());
+        }
 #else
-        Log::error("SocketAddress", "Error in getaddrinfo for "
-            "SocketAddress (str constructor) %s: %s",
-            str.c_str(), gai_strerror(status));
+        if (!g_ignore_error_message)
+        {
+            Log::error("SocketAddress", "Error in getaddrinfo for "
+                "SocketAddress (str constructor) %s: %s",
+                str.c_str(), gai_strerror(status));
+        }
 #endif
         return;
     }
     if (res == NULL)
     {
-        Log::error("SocketAddress", "No address is resolved.");
+        if (!g_ignore_error_message)
+            Log::error("SocketAddress", "No address is resolved.");
         return;
     }
 
