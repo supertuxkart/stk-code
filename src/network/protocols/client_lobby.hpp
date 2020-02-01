@@ -21,8 +21,9 @@
 
 #include "input/input.hpp"
 #include "network/protocols/lobby_protocol.hpp"
-#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
+
+#include <enet/enet.h>
 
 #include <atomic>
 #include <map>
@@ -71,7 +72,7 @@ private:
     void handleBadConnection();
     void becomingServerOwner();
 
-    TransportAddress m_server_address;
+    ENetAddress m_server_address;
 
     std::shared_ptr<Server> m_server;
 
@@ -141,7 +142,7 @@ private:
          bool* is_spectator = NULL) const;
     void getKartsTracksNetworkString(BareNetworkString* ns);
 public:
-             ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s);
+             ClientLobby(const ENetAddress& a, std::shared_ptr<Server> s);
     virtual ~ClientLobby();
     void doneWithResults();
     bool receivedServerResult()            { return m_received_server_result; }

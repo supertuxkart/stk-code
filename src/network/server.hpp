@@ -24,7 +24,6 @@
   * Represents a server that is joinable
   */
 
-#include "network/transport_address.hpp"
 #include "race/race_manager.hpp"
 #include "utils/types.hpp"
 
@@ -72,7 +71,7 @@ protected:
     int m_current_players;
 
     /** The public ip address and port of this server. */
-    TransportAddress m_address;
+    std::unique_ptr<SocketAddress> m_address;
 
     /** This is the private port of the server. This is used if a WAN game
      *  is started, but one client is discovered on the same LAN, so a direct
@@ -114,12 +113,14 @@ public:
          Server(const XMLNode& server_info);
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
-                unsigned server_mode, const TransportAddress &address,
+                unsigned server_mode, const SocketAddress &address,
                 bool password_protected, bool game_started,
                 const std::string& current_track = "");
     // ------------------------------------------------------------------------
-    /** Returns ip address and port of this server. */
-    const TransportAddress& getAddress() const { return m_address; }
+    /** Returns IPv4 address and port of this server. */
+    const SocketAddress& getAddress() const { return *m_address.get(); }
+    // ------------------------------------------------------------------------
+    void setAddress(const SocketAddress& addr);
     // ------------------------------------------------------------------------
     /** Returns the lower case name of the server. */
     const std::string& getLowerCaseName() const { return m_lower_case_name; }

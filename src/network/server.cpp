@@ -36,6 +36,7 @@
 Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
 {
     const XMLNode& xml = *server_info.getNode("server-info");
+    m_address.reset(new SocketAddress());
 
     m_ipv6_connection = false;
     m_name = "";
@@ -61,10 +62,10 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     xml.get("current_track", &m_current_track);
     uint32_t ip;
     xml.get("ip", &ip);
-    m_address.setIP(ip);
+    m_address->setIP(ip);
     uint16_t port;
     xml.get("port", &port);
-    m_address.setPort(port);
+    m_address->setPort(port);
     std::string ipv6_address;
     xml.get("ipv6", &ipv6_address);
     if (!ipv6_address.empty())
@@ -172,7 +173,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
  */
 Server::Server(unsigned server_id, const core::stringw &name, int max_players,
                int current_players, unsigned difficulty, unsigned server_mode,
-               const TransportAddress &address, bool password_protected,
+               const SocketAddress &address, bool password_protected,
                bool game_started, const std::string& current_track)
       : m_supports_encrytion(false)
 {
@@ -183,9 +184,10 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
     m_server_owner       = 0;
     m_current_players    = current_players;
     m_max_players        = max_players;
-    m_address            = address;
+    m_address.reset(new SocketAddress(address));
+
     // In case of LAN server, public and private port are the same.
-    m_private_port       = m_address.getPort();
+    m_private_port       = m_address->getPort();
     m_difficulty         = (RaceManager::Difficulty)difficulty;
     m_server_mode        = server_mode;
     m_password_protected = password_protected;
@@ -223,3 +225,9 @@ void Server::setIPV6Address(const SocketAddress& addr)
 {
     m_ipv6_address.reset(new SocketAddress(addr));
 }   // setIPV6Address
+
+// ----------------------------------------------------------------------------
+void Server::setAddress(const SocketAddress& addr)
+{
+    m_address.reset(new SocketAddress(addr));
+}   // setAddress

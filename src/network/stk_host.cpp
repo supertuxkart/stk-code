@@ -1267,12 +1267,13 @@ std::shared_ptr<STKPeer> STKHost::getServerPeerForClient() const
 /** \brief Tells if a peer is known and connected.
  *  \return True if the peer is known and connected, false elseway.
  */
-bool STKHost::isConnectedTo(const TransportAddress& peer)
+bool STKHost::isConnectedTo(const ENetAddress& peer)
 {
     ENetHost *host = m_network->getENetHost();
     for (unsigned int i = 0; i < host->peerCount; i++)
     {
-        if (peer == host->peers[i].address &&
+        if (peer.host == host->peers[i].address.host &&
+            peer.port == host->peers[i].address.port &&
             host->peers[i].state == ENET_PEER_STATE_CONNECTED)
         {
             return true;

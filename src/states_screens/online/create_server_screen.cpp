@@ -295,7 +295,7 @@ void CreateServerScreen::createServer()
     ServerConfig::m_private_server_password = password;
     password = std::string(" --server-password=") + password;
 
-    TransportAddress server_address(0x7f000001,
+    SocketAddress server_address(0x7f000001,
         stk_config->m_server_discovery_port);
 
     auto server = std::make_shared<Server>(0/*server_id*/, name,

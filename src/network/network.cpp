@@ -117,10 +117,9 @@ Network::~Network()
 }   // ~Network
 
 // ----------------------------------------------------------------------------
-ENetPeer *Network::connectTo(const TransportAddress &address)
+ENetPeer* Network::connectTo(const ENetAddress &address)
 {
-    const ENetAddress enet_address = address.toEnetAddress();
-    return enet_host_connect(m_host, &enet_address, EVENT_CHANNEL_COUNT, 0);
+    return enet_host_connect(m_host, &address, EVENT_CHANNEL_COUNT, 0);
 }   // connectTo
 
 // ----------------------------------------------------------------------------

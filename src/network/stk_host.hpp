@@ -273,7 +273,7 @@ public:
     // ------------------------------------------------------------------------
     bool peerExists(const SocketAddress& peer_address);
     // ------------------------------------------------------------------------
-    bool isConnectedTo(const TransportAddress& peer_address);
+    bool isConnectedTo(const ENetAddress& peer_address);
     // ------------------------------------------------------------------------
     std::shared_ptr<STKPeer> getServerPeerForClient() const;
     // ------------------------------------------------------------------------

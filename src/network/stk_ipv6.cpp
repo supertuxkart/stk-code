@@ -364,8 +364,7 @@ void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
 #else
 
 #include "network/stk_ipv6.hpp"
-#include "network/network_config.hpp"
-#include "network/transport_address.hpp"
+#include "network/protocols/connect_to_server.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -480,7 +479,6 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
     {
         ea->host = ((in_addr*)(in6->sin6_addr.s6_addr + 12))->s_addr;
         ea->port = ntohs(in6->sin6_port);
-        TransportAddress addr(*ea);
         addMappedAddress(ea, in6);
     }
     else
@@ -488,10 +486,11 @@ void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
         // Create a fake IPv4 address of 0.x.x.x if it's a real IPv6 connection
         if (g_mapped_ipv6_used >= 16777215)
             g_mapped_ipv6_used = 0;
-        TransportAddress addr(++g_mapped_ipv6_used, ntohs(in6->sin6_port));
-        *ea = addr.toEnetAddress();
+        *ea = ConnectToServer::toENetAddress(++g_mapped_ipv6_used,
+            ntohs(in6->sin6_port));
         Log::debug("IPv6", "Fake IPv4 address %s mapped to %s",
-            addr.toString().c_str(), getIPV6ReadableFromIn6(in6).c_str());
+            ConnectToServer::enetAddressToString(*ea).c_str(),
+            getIPV6ReadableFromIn6(in6).c_str());
         addMappedAddress(ea, in6);
     }
 }   // getMappedFromIPV6
@@ -506,10 +505,9 @@ void removeDisconnectedMappedAddress()
     {
         if (it->m_last_activity + 20000 < StkTime::getMonoTimeMs())
         {
-            TransportAddress addr(it->m_addr);
             Log::debug("IPv6", "Removing expired %s, IPv4 address %s.",
                 getIPV6ReadableFromIn6(&it->m_in6).c_str(),
-                addr.toString().c_str());
+                ConnectToServer::enetAddressToString(it->m_addr).c_str());
             it = g_mapped_ips.erase(it);
             Log::debug("IPv6", "Mapped address size now: %d.",
                 g_mapped_ips.size());

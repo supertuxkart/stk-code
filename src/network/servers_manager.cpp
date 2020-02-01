@@ -227,7 +227,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
                     }
                     auto server = std::make_shared<Server>(cur_server_id++,
                         name, max_players, players, difficulty, mode,
-                        TransportAddress(sender.getIP(), sender.getPort()),
+                        SocketAddress(sender.getIP(), sender.getPort()),
                         password == 1, game_started == 1, current_track);
                     if (sender.isIPv6())
                     {

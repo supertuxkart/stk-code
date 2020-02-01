@@ -66,7 +66,7 @@ public:
     static void openLog();
     static void logPacket(const BareNetworkString &ns, bool incoming);
     static void closeLog();
-    ENetPeer *connectTo(const TransportAddress &address);
+    ENetPeer *connectTo(const ENetAddress &address);
     void     sendRawPacket(const BareNetworkString &buffer,
                            const TransportAddress& dst);
     int receiveRawPacket(char *buffer, int buf_len,

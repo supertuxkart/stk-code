@@ -87,7 +87,7 @@ engine.
 
 */
 
-ClientLobby::ClientLobby(const TransportAddress& a, std::shared_ptr<Server> s)
+ClientLobby::ClientLobby(const ENetAddress& a, std::shared_ptr<Server> s)
            : LobbyProtocol()
 {
     m_auto_started = false;

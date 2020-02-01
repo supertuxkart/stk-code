@@ -49,7 +49,7 @@
 #include <algorithm>
 // ============================================================================
 std::weak_ptr<Online::Request> ConnectToServer::m_previous_unjoin;
-TransportAddress ConnectToServer::m_server_address;
+ENetAddress ConnectToServer::m_server_address;
 int ConnectToServer::m_retry_count = 0;
 bool ConnectToServer::m_done_intecept = false;
 // ----------------------------------------------------------------------------
@@ -60,11 +60,10 @@ ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
     m_quick_play_err_msg = _("No quick play server available.");
+    m_server_address.host = 0;
+    m_server_address.port = 0;
     if (server)
-    {
-        m_server         = server;
-        m_server_address = m_server->getAddress();
-    }
+        m_server = server;
 }   // ConnectToServer(server, host)
 
 // ----------------------------------------------------------------------------
@@ -152,7 +151,7 @@ void ConnectToServer::getClientServerInfo()
     else
     {
         assert(port != 0);
-        m_server_address.setPort(port);
+        m_server->setAddress(SocketAddress("127.0.0.1", port));
         m_server->setPrivatePort(port);
         if (server_ipv6_socket)
         {
@@ -220,7 +219,6 @@ void ConnectToServer::asynchronousUpdate()
                                 a->getCurrentPlayers() != a->getMaxPlayers();
                         });
                     m_server = servers[0];
-                    m_server_address = m_server->getAddress();
                 }
                 else
                 {
@@ -268,9 +266,20 @@ void ConnectToServer::asynchronousUpdate()
         }
         case GOT_SERVER_ADDRESS:
         {
+            // Detect port from possible connect-now or enter server address
+            // dialog
+            if ((m_server->useIPV6Connection() &&
+                m_server->getIPV6Address()->getPort() == 0) ||
+                (!m_server->useIPV6Connection() &&
+                m_server->getAddress().getPort() == 0))
+            {
+                if (!detectPort())
+                    return;
+            }
+
             if (!STKHost::get()->getPublicAddress().isUnset() &&
                 !STKHost::get()->isClientServer() &&
-                m_server_address.getIP() ==
+                m_server->getAddress().getIP() ==
                 STKHost::get()->getPublicAddress().getIP())
             {
                 Log::info("ConnectToServer", "Server is in the same lan");
@@ -366,23 +375,24 @@ int ConnectToServer::interceptCallback(ENetHost* host, ENetEvent* event)
         host->receivedData[8] == '-' && host->receivedData[9] == 's' &&
         host->receivedData[10] == 't' && host->receivedData[11] == 'k')
     {
-        TransportAddress server_addr = host->receivedAddress;
-        if (server_addr != m_server_address)
+        if (host->receivedAddress.host != m_server_address.host ||
+            host->receivedAddress.port != m_server_address.port)
         {
-            std::string new_address = server_addr.toString();
+            std::string new_address =
+                enetAddressToString(host->receivedAddress);
             if (isIPv6Socket())
             {
                 // It was already mapped to real IPv6 before the intercept
                 // callback
-                ENetAddress en_addr = server_addr.toEnetAddress();
                 new_address = "[";
                 new_address += getIPV6ReadableFromMappedAddress
-                    (&en_addr) + "]:" + StringUtils::toString(en_addr.port);
+                    (&host->receivedAddress) + "]:" +
+                    StringUtils::toString(host->receivedAddress.port);
             }
             Log::info("ConnectToServer", "Using new server address %s",
                 new_address.c_str());
             m_retry_count = 15;
-            m_server_address = server_addr;
+            m_server_address = host->receivedAddress;
             m_done_intecept = true;
             return 1;
         }
@@ -422,10 +432,10 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
             hints.ai_socktype = SOCK_STREAM;
             // From IPv4
             std::string addr_string =
-                m_server_address.toString(false/*show_port*/);
+                m_server->getAddress().toString(false/*show_port*/);
             addr_string = NetworkConfig::get()->getNAT64Prefix() + addr_string;
             std::string port =
-                StringUtils::toString(m_server_address.getPort());
+                StringUtils::toString(m_server->getAddress().getPort());
             if (getaddrinfo_compat(addr_string.c_str(), port.c_str(),
                 &hints, &res) != 0 || res == NULL)
                 return false;
@@ -436,8 +446,7 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
                 {
                     struct sockaddr_in6* ipv6_sock =
                         (struct sockaddr_in6*)addr->ai_addr;
-                    ENetAddress en_addr = m_server_address.toEnetAddress();
-                    addMappedAddress(&en_addr, ipv6_sock);
+                    addMappedAddress(&m_server_address, ipv6_sock);
                     break;
                 }
             }
@@ -448,21 +457,26 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
             SocketAddress* sa = m_server->getIPV6Address();
             if (!sa)
                 return false;
-            ENetAddress en_addr = m_server_address.toEnetAddress();
             struct sockaddr_in6* in6 = (struct sockaddr_in6*)sa->getSockaddr();
-            addMappedAddress(&en_addr, in6);
+            addMappedAddress(&m_server_address, in6);
         }
+    }
+    else
+    {
+        // IPv4 address
+        m_server_address = toENetAddress(m_server->getAddress().getIP(),
+            m_server->getAddress().getPort());
     }
 
     while (--m_retry_count >= 0 && !ProtocolManager::lock()->isExiting())
     {
-        std::string connecting_address = m_server_address.toString();
+        std::string connecting_address = enetAddressToString(m_server_address);
         if (ipv6)
         {
-            ENetAddress en_addr = m_server_address.toEnetAddress();
             connecting_address = "[";
             connecting_address += getIPV6ReadableFromMappedAddress
-                (&en_addr) + "]:" + StringUtils::toString(en_addr.port);
+                (&m_server_address) + "]:" +
+                StringUtils::toString(m_server->getIPV6Address()->getPort());
         }
         ENetPeer* p = nw->connectTo(m_server_address);
         if (!p)
@@ -540,3 +554,77 @@ void ConnectToServer::registerWithSTKServer()
         m_state = DONE;
     }
 }   // registerWithSTKServer
+
+// ----------------------------------------------------------------------------
+std::string ConnectToServer::enetAddressToString(const ENetAddress& addr)
+{
+    uint32_t ip = htonl(addr.host);
+    std::string s = 
+        StringUtils::insertValues("%d.%d.%d.%d",
+                                 ((ip >> 24) & 0xff), ((ip >> 16) & 0xff),
+                                 ((ip >>  8) & 0xff), ((ip >>  0) & 0xff));
+    s += StringUtils::insertValues(":%d", addr.port);
+    return s;
+}   // enetAddressToString
+
+// ----------------------------------------------------------------------------
+ENetAddress ConnectToServer::toENetAddress(uint32_t ip, uint16_t port)
+{
+    // because ENet wants little endian
+    ENetAddress a;
+    a.host = ((ip & 0xff000000) >> 24) +
+        ((ip & 0x00ff0000) >> 8) + ((ip & 0x0000ff00) << 8) +
+        ((ip & 0x000000ff) << 24);
+    a.port = port;
+    return a;
+}   // toENetAddress
+
+// ----------------------------------------------------------------------------
+bool ConnectToServer::detectPort()
+{
+    ENetAddress ea;
+    ea.host = STKHost::HOST_ANY;
+    ea.port = STKHost::PORT_ANY;
+    Network* nw = new Network(/*peer_count*/1,
+        /*channel_limit*/EVENT_CHANNEL_COUNT,
+        /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
+        true/*change_port_if_bound*/);
+    BareNetworkString s(std::string("stk-server-port"));
+    SocketAddress address;
+    if (m_server->useIPV6Connection())
+        address = *m_server->getIPV6Address();
+    else
+        address = m_server->getAddress();
+    address.setPort(stk_config->m_server_discovery_port);
+    nw->sendRawPacket(s, address);
+    SocketAddress sender;
+    const int LEN = 2048;
+    char buffer[LEN];
+    int len = nw->receiveRawPacket(buffer, LEN, &sender, 2000);
+    if (len != 2)
+    {
+        const core::stringw& n = m_server->getName();
+        //I18N: Show the failed detect port server name
+        core::stringw e = _("Failed to detect port number for server %s.", n);
+        delete nw;
+        STKHost::get()->setErrorMessage(e);
+        STKHost::get()->requestShutdown();
+        m_state = EXITING;
+        return false;
+    }
+    BareNetworkString server_port(buffer, len);
+    uint16_t port = server_port.getUInt16();
+    sender.setPort(port);
+    // We replace the server address with sender with the detected port
+    // completely, so we can use input like ff02::1 and then get the correct
+    // local link server address
+    if (m_server->useIPV6Connection())
+        m_server->setIPV6Address(sender);
+    else
+        m_server->setAddress(sender);
+    Log::info("ConnectToServer",
+        "Detected new address %s for server address: %s.",
+        sender.toString().c_str(), address.toString(false).c_str());
+    delete nw;
+    return true;
+}   // detectPort
