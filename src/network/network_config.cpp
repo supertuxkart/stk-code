@@ -222,10 +222,10 @@ void NetworkConfig::detectIPType()
     setIPv6Socket(0);
 
     auto ipv4_it = UserConfigParams::m_stun_servers_v4.begin();
-    int adv = rand() % UserConfigParams::m_stun_servers_v4.size();
+    int adv = StkTime::getMonoTimeMs() % UserConfigParams::m_stun_servers_v4.size();
     std::advance(ipv4_it, adv);
     auto ipv6_it = UserConfigParams::m_stun_servers.begin();
-    adv = rand() % UserConfigParams::m_stun_servers.size();
+    adv = StkTime::getMonoTimeMs() % UserConfigParams::m_stun_servers.size();
     std::advance(ipv6_it, adv);
 
     SocketAddress stun_v4(ipv4_it->first, 0/*port specified in addr*/,
