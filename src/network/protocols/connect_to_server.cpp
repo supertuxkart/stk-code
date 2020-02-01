@@ -235,8 +235,8 @@ void ConnectToServer::asynchronousUpdate()
                 NetworkConfig::get()->getIPType() != NetworkConfig::IP_V4)
                 m_server->setIPV6Connection(true);
 
-            // Auto enable IPv6 socket in client with nat64, so in
-            // connect to server it will change the ipv4 address to nat64 one
+            // Auto enable IPv6 socket in client with NAT64, then we convert
+            // the IPv4 address to NAT64 one in GOT_SERVER_ADDRESS
             if (m_server->useIPV6Connection() ||
                 NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
             {
@@ -252,6 +252,7 @@ void ConnectToServer::asynchronousUpdate()
                     true/*change_port_if_bound*/);
                 STKHost::get()->replaceNetwork(new_network);
             }
+
             if (m_server->supportsEncryption())
             {
                 STKHost::get()->setPublicAddress(
@@ -266,6 +267,29 @@ void ConnectToServer::asynchronousUpdate()
         }
         case GOT_SERVER_ADDRESS:
         {
+            // Convert to a NAT64 address from IPv4
+            if (!m_server->useIPV6Connection() &&
+                NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
+            {
+                // From IPv4
+                std::string addr_string =
+                    m_server->getAddress().toString(false/*show_port*/);
+                addr_string =
+                    NetworkConfig::get()->getNAT64Prefix() + addr_string;
+                SocketAddress nat64(addr_string,
+                    m_server->getAddress().getPort());
+                if (nat64.isUnset() || !nat64.isIPv6())
+                {
+                    Log::error("ConnectToServer", "Failed to synthesize IPv6 "
+                        "address from %s", addr_string.c_str());
+                    STKHost::get()->requestShutdown();
+                    m_state = EXITING;
+                    return;
+                }
+                m_server->setIPV6Address(nat64);
+                m_server->setIPV6Connection(true);
+            }
+
             // Detect port from possible connect-now or enter server address
             // dialog
             if ((m_server->useIPV6Connection() &&
@@ -421,45 +445,11 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
 
     if (ipv6)
     {
-        // Convert to a NAT64 address from IPv4
-        if (!m_server->useIPV6Connection() &&
-            NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
-        {
-            struct addrinfo hints;
-            struct addrinfo* res = NULL;
-            memset(&hints, 0, sizeof(hints));
-            hints.ai_family = AF_UNSPEC;
-            hints.ai_socktype = SOCK_STREAM;
-            // From IPv4
-            std::string addr_string =
-                m_server->getAddress().toString(false/*show_port*/);
-            addr_string = NetworkConfig::get()->getNAT64Prefix() + addr_string;
-            std::string port =
-                StringUtils::toString(m_server->getAddress().getPort());
-            if (getaddrinfo_compat(addr_string.c_str(), port.c_str(),
-                &hints, &res) != 0 || res == NULL)
-                return false;
-            for (const struct addrinfo* addr = res; addr != NULL;
-                addr = addr->ai_next)
-            {
-                if (addr->ai_family == AF_INET6)
-                {
-                    struct sockaddr_in6* ipv6_sock =
-                        (struct sockaddr_in6*)addr->ai_addr;
-                    addMappedAddress(&m_server_address, ipv6_sock);
-                    break;
-                }
-            }
-            freeaddrinfo(res);
-        }
-        else
-        {
-            SocketAddress* sa = m_server->getIPV6Address();
-            if (!sa)
-                return false;
-            struct sockaddr_in6* in6 = (struct sockaddr_in6*)sa->getSockaddr();
-            addMappedAddress(&m_server_address, in6);
-        }
+        SocketAddress* sa = m_server->getIPV6Address();
+        if (!sa)
+            return false;
+        struct sockaddr_in6* in6 = (struct sockaddr_in6*)sa->getSockaddr();
+        addMappedAddress(&m_server_address, in6);
     }
     else
     {
