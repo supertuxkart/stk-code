@@ -25,6 +25,7 @@
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/dialog_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
@@ -187,22 +188,6 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 {
 #ifndef SERVER_ONLY
-    PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
-       PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
-    {
-        m_user_id->setText(player->getLastOnlineName() + "@stk");
-    }
-    else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
-    {
-        m_user_id->setText(player->getName());
-    }
-    else
-    {
-        // now must be either logging in or logging out
-        m_user_id->setText(player->getName());
-    }
-
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -235,8 +220,86 @@ void MainMenuScreen::onUpdate(float delta)
         const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
         w->setText(news_text, true);
     }
+
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
+    if (!player)
+        return;
+    if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
+       PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
+    {
+        m_user_id->setText(player->getLastOnlineName() + "@stk");
+    }
+    else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
+    {
+        m_user_id->setText(player->getName());
+    }
+    else
+    {
+        // now must be either logging in or logging out
+        m_user_id->setText(player->getName());
+    }
+
+    // Ask if user want to play tutorial when profile is newly created
+    if (player->getUseFrequency() != 0)
+        return;
+
+    player->incrementUseFrequency();
+    class PlayTutorial :
+          public MessageDialog::IConfirmDialogListener
+    {
+    public:
+        virtual void onConfirm()
+        {
+            GUIEngine::ModalDialog::dismiss();
+            MainMenuScreen::getInstance()->startTutorial();
+        }   // onConfirm
+    };   // PlayTutorial
+
+    MessageDialog* dialog =
+    new MessageDialog(_("Would you like to play the tutorial of the game?"),
+        MessageDialog::MESSAGE_DIALOG_YESNO, new PlayTutorial(),
+        true/*delete_listener*/, true/*from_queue*/);
+    GUIEngine::DialogQueue::get()->pushDialog(dialog,
+        false/*closes_any_dialog*/);
 #endif
 }   // onUpdate
+
+// ----------------------------------------------------------------------------
+void MainMenuScreen::startTutorial()
+{
+    race_manager->setNumPlayers(1);
+    race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+    race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+    race_manager->setNumKarts( 1 );
+    race_manager->setTrack("tutorial");
+    race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
+    race_manager->setReverseTrack(false);
+
+    // Use keyboard 0 by default (FIXME: let player choose?)
+    InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
+
+    // Create player and associate player with keyboard
+    StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
+        device);
+
+    if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+    {
+        Log::warn("MainMenuScreen", "Cannot find kart '%s', will revert to default",
+            UserConfigParams::m_default_kart.c_str());
+        UserConfigParams::m_default_kart.revertToDefaults();
+    }
+    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+
+    // ASSIGN should make sure that only input from assigned devices
+    // is read.
+    input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+    input_manager->getDeviceManager()
+        ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+
+    StateManager::get()->enterGameState();
+    race_manager->setupPlayerKartInfo();
+    race_manager->startNew(false);
+}   // startTutorial
 
 // ----------------------------------------------------------------------------
 
@@ -446,38 +509,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "startTutorial")
     {
-        race_manager->setNumPlayers(1);
-        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-        race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-        race_manager->setNumKarts( 1 );
-        race_manager->setTrack( "tutorial" );
-        race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-        race_manager->setReverseTrack(false);
-
-        // Use keyboard 0 by default (FIXME: let player choose?)
-        InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
-
-        // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
-                                                device);
-
-        if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-        {
-            Log::warn("MainMenuScreen", "Cannot find kart '%s', will revert to default",
-                      UserConfigParams::m_default_kart.c_str());
-            UserConfigParams::m_default_kart.revertToDefaults();
-        }
-        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
-
-        // ASSIGN should make sure that only input from assigned devices
-        // is read.
-        input_manager->getDeviceManager()->setAssignMode(ASSIGN);
-        input_manager->getDeviceManager()
-            ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
-
-        StateManager::get()->enterGameState();
-        race_manager->setupPlayerKartInfo();
-        race_manager->startNew(false);
+        startTutorial();
     }
     else if (selection == "story")
     {

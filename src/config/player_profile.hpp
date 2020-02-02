@@ -122,6 +122,7 @@ public:
     void loadRemainingData(const XMLNode *node);
     void initRemainingData();
     void incrementUseFrequency();
+    int getUseFrequency() const { return m_use_frequency; }
     bool operator<(const PlayerProfile &other);
     void raceFinished();
     void saveSession(int user_id, const std::string &token);
