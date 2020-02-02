@@ -317,6 +317,11 @@ void ArenaGraph::loadGoalNodes(const XMLNode *node)
             int last = Graph::UNKNOWN_SECTOR;
             findRoadSector(p2, &last, NULL, true);
 
+            // Avoid possible infinite loop
+            if (first == Graph::UNKNOWN_SECTOR ||
+                last == Graph::UNKNOWN_SECTOR)
+                continue;
+
             first_goal ? m_blue_node.insert(first) : m_red_node.insert(first);
             first_goal ? m_blue_node.insert(last) : m_red_node.insert(last);
             while (first != last)
