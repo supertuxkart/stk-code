@@ -83,7 +83,11 @@ namespace Online
         assert(isPreparing());
         setBusy();
         execute();
+        if (RequestManager::isRunning() &&
+            RequestManager::get()->getAbort() && isAbortable()) return;
         callback();
+        if (RequestManager::isRunning() &&
+            RequestManager::get()->getAbort() && isAbortable()) return;
         setDone();
     }   // executeNow
 
