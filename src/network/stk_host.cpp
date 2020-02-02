@@ -410,12 +410,11 @@ BareNetworkString STKHost::getStunRequest(uint8_t* stun_tansaction_id)
 
 //-----------------------------------------------------------------------------
 void STKHost::getIPFromStun(int socket, const std::string& stun_address,
-                            bool ipv4, SocketAddress* result)
+                            short family, SocketAddress* result)
 {
-    short family = ipv4 ? AF_INET : AF_INET6;
     // The IPv4 stun address has no AAAA record, so give it an AF_INET6 will
     // return one using NAT64 and DNS64
-    if (isIPv6Socket() && ipv4 &&
+    if (isIPv6Socket() && family == AF_INET &&
         NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
         family = AF_INET6;
 
@@ -620,9 +619,9 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
 //-----------------------------------------------------------------------------
 /** Set the public address using stun protocol.
  */
-void STKHost::setPublicAddress(bool ipv4)
+void STKHost::setPublicAddress(short family)
 {
-    auto& stun_map = ipv4 ? UserConfigParams::m_stun_servers_v4 :
+    auto& stun_map = family == AF_INET ? UserConfigParams::m_stun_servers_v4 :
         UserConfigParams::m_stun_servers;
     std::vector<std::pair<std::string, uint32_t> > untried_server;
     for (auto& p : stun_map)
@@ -649,13 +648,22 @@ void STKHost::setPublicAddress(bool ipv4)
         Log::debug("STKHost", "Using STUN server %s", server_name.c_str());
         uint64_t ping = StkTime::getMonoTimeMs();
         SocketAddress result;
-        getIPFromStun((int)m_network->getENetHost()->socket, server_name, ipv4,
+        getIPFromStun((int)m_network->getENetHost()->socket, server_name, family,
             &result);
         if (!result.isUnset())
         {
+            if (result.getFamily() != family)
+            {
+                Log::error("STKHost",
+                    "Public address family differ from request");
+                // This happens when you force to use IPv6 connection to detect
+                // public address if there is only IPv4 connection, which it
+                // will give you an IPv4 address, so we can exit earlier
+                return;
+            }
             // For dual stack server we get the IPv6 address and then IPv4, if
             // their ports differ we discard the public IPv6 address of server
-            if (NetworkConfig::get()->isServer() && ipv4 &&
+            if (NetworkConfig::get()->isServer() && family == AF_INET &&
                 result.getPort() != m_public_address->getPort())
             {
                 if (isIPv6Socket())
@@ -665,7 +673,7 @@ void STKHost::setPublicAddress(bool ipv4)
                 }
                 m_public_ipv6_address.clear();
             }
-            if (ipv4)
+            if (family == AF_INET)
                 *m_public_address = result;
             else
                 m_public_ipv6_address = result.toString(false/*show_port*/);

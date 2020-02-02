@@ -177,8 +177,8 @@ private:
     // ------------------------------------------------------------------------
     void mainLoop();
     // ------------------------------------------------------------------------
-    void getIPFromStun(int socket, const std::string& stun_address, bool ipv4,
-                       SocketAddress* result);
+    void getIPFromStun(int socket, const std::string& stun_address,
+                       short family, SocketAddress* result);
 public:
     /** If a network console should be started. */
     static bool m_enable_console;
@@ -221,7 +221,7 @@ public:
     // ------------------------------------------------------------------------
     uint16_t getPrivatePort() const;
     // ------------------------------------------------------------------------
-    void setPublicAddress(bool ipv4);
+    void setPublicAddress(short family);
     // ------------------------------------------------------------------------
     void disconnectAllPeers(bool timeout_waiting = false);
     //-------------------------------------------------------------------------

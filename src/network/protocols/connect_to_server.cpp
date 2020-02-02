@@ -256,7 +256,7 @@ void ConnectToServer::asynchronousUpdate()
             if (m_server->supportsEncryption())
             {
                 STKHost::get()->setPublicAddress(
-                    !m_server->useIPV6Connection());
+                    m_server->useIPV6Connection() ? AF_INET6 : AF_INET);
                 if (!STKHost::get()->getValidPublicAddress().empty())
                     registerWithSTKServer();
             }

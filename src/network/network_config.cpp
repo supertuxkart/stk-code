@@ -232,7 +232,7 @@ void NetworkConfig::detectIPType()
     SocketAddress stun_v4(ipv4_it->first, 0/*port specified in addr*/,
         AF_INET);
     bool sent_ipv4 = false;
-    if (!stun_v4.isUnset())
+    if (!stun_v4.isUnset() && stun_v4.getFamily() == AF_INET)
     {
         sendto(ipv4->getENetHost()->socket, s.getData(), s.size(), 0,
             stun_v4.getSockaddr(), stun_v4.getSocklen());
@@ -242,7 +242,7 @@ void NetworkConfig::detectIPType()
     SocketAddress stun_v6(ipv6_it->first, 0/*port specified in addr*/,
         AF_INET6);
     bool sent_ipv6 = false;
-    if (!stun_v6.isUnset())
+    if (!stun_v6.isUnset() && stun_v6.getFamily() == AF_INET6)
     {
         sendto(ipv6->getENetHost()->socket, s.getData(), s.size(), 0,
             stun_v6.getSockaddr(), stun_v6.getSocklen());

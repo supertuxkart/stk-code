@@ -1371,12 +1371,12 @@ void ServerLobby::asynchronousUpdate()
         // Set the IPv6 address first for possible IPv6 only server
         if (isIPv6Socket() && ip_type >= NetworkConfig::IP_V6)
         {
-            STKHost::get()->setPublicAddress(false/*ipv4*/);
+            STKHost::get()->setPublicAddress(AF_INET6);
         }
         if (ip_type == NetworkConfig::IP_V4 ||
             ip_type == NetworkConfig::IP_DUAL_STACK)
         {
-            STKHost::get()->setPublicAddress(true/*ipv4*/);
+            STKHost::get()->setPublicAddress(AF_INET);
         }
         if (STKHost::get()->getPublicAddress().isUnset() &&
             STKHost::get()->getPublicIPv6Address().empty())
