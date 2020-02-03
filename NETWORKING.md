@@ -4,7 +4,7 @@
 First of all, you can compile STK with `-DSERVER_ONLY=ON` which will produce a GUI-less STK binary optimized for size and memory usage, useful for situation like in VPS.
 The dependencies for RHEL/CentOS 7 are installed with:
 ```bash
-yum install wget; cd /tmp; wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm; rpm -Uvh epel-release*rpm
+yum install wget; cd /tmp; wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm; rpm -Uvh epel-release*rpm
 yum install gcc-c++ cmake openssl-devel libcurl-devel zlib-devel enet
 ```
 ### Hosting WAN (public internet) server
