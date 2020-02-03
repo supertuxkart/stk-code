@@ -19,7 +19,6 @@
 
 #ifdef ANDROID
 #include "addons/addons_manager.hpp"
-#include "io/file_manager.hpp"
 #endif
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -191,10 +190,6 @@ bool EventHandler::OnEvent (const SEvent &event)
                 PlayerManager::get()->save();
                 if (addons_manager->hasDownloadedIcons())
                     addons_manager->saveInstalled();
-                // Clean temp files manually as destructor of file manager
-                // won't be called at all in mobile if user just press home
-                // button
-                file_manager->cleanTempFiles();
             }
         }
         else if (cmd == APP_CMD_RESUME || cmd == APP_CMD_GAINED_FOCUS)

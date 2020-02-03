@@ -137,10 +137,6 @@ float MainLoop::getLimitedDt()
                 PlayerManager::get()->save();
                 if (addons_manager->hasDownloadedIcons())
                     addons_manager->saveInstalled();
-                // Clean temp files manually as destructor of file manager
-                // won't be called at all in mobile if user just press home
-                // button
-                file_manager->cleanTempFiles();
             }
             dev->run();
             win_active = dev->isWindowActive();
