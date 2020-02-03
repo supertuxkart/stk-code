@@ -270,7 +270,7 @@ void KartSelectionScreen::beforeAddingWidget()
 {
     if (useContinueButton())
     {
-        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "90%";
+        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
         getWidget("continue")->setVisible(true);
     }
     else

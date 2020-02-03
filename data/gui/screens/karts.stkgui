@@ -13,7 +13,7 @@
 
         <spacer height="1f"/>
         <div width="100%" height="30%" layout="horizontal-row" >
-            <div id="kartlist" width="90%" height="100%" layout="vertical-row" >
+            <div id="kartlist" width="85%" height="100%" layout="vertical-row" >
                 <box proportion="2" width="100%" layout="vertical-row" padding="2">
                     <ribbon_grid id="karts" proportion="1" square_items="true" width="100%" align="center"
                                 child_width="90" child_height="90" max_rows="2"/>
@@ -23,9 +23,9 @@
                 </tabs>
                 <spacer width="100%" height="2%"/>
             </div>
-            <spacer width="2%"/>
+            <spacer width="5%"/>
             <icon-button id="continue" icon="gui/icons/green_check.png" text="Continue"/>
-            <spacer width="2%"/>
+            <spacer width="5%"/>
         </div>
     </div>
 
