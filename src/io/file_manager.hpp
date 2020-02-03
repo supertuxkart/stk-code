@@ -245,7 +245,8 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getCertBundleLocation() const
                                              { return m_cert_bundle_location; }
-
+    // ------------------------------------------------------------------------
+    void cleanTempFiles();
 };   // FileManager
 
 extern FileManager* file_manager;

@@ -19,6 +19,7 @@
 
 #ifdef ANDROID
 #include "addons/addons_manager.hpp"
+#include "io/file_manager.hpp"
 #endif
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -181,21 +182,29 @@ bool EventHandler::OnEvent (const SEvent &event)
         if (cmd == APP_CMD_PAUSE || cmd == APP_CMD_LOST_FOCUS)
         {
             // Make sure that pause/unpause is executed only once
-            if (music_manager && device->isWindowMinimized() == device->isWindowFocused())
+            if (device->isWindowMinimized() == device->isWindowFocused())
             {
-                music_manager->pauseMusic();
-                SFXManager::get()->pauseAll();
+                if (music_manager)
+                    music_manager->pauseMusic();
+                if (SFXManager::get())
+                    SFXManager::get()->pauseAll();
+                PlayerManager::get()->save();
+                if (addons_manager->hasDownloadedIcons())
+                    addons_manager->saveInstalled();
+                // Clean temp files manually as destructor of file manager
+                // won't be called at all in mobile if user just press home
+                // button
+                file_manager->cleanTempFiles();
             }
-            PlayerManager::get()->save();
-            if (addons_manager->hasDownloadedIcons())
-                addons_manager->saveInstalled();
         }
         else if (cmd == APP_CMD_RESUME || cmd == APP_CMD_GAINED_FOCUS)
         {
-            if (music_manager && device->isWindowActive())
+            if (device->isWindowActive())
             {
-                music_manager->resumeMusic();
-                SFXManager::get()->resumeAll();
+                if (music_manager)
+                    music_manager->resumeMusic();
+                if (SFXManager::get())
+                    SFXManager::get()->resumeAll();
                 // Improve rubber banding effects of rewinders when going
                 // back to phone, because the smooth timer is paused
                 if (World::getWorld() && RewindManager::isEnabled())

@@ -130,19 +130,27 @@ float MainLoop::getLimitedDt()
             if (first_out_focus)
             {
                 first_out_focus = false;
-                music_manager->pauseMusic();
-                SFXManager::get()->pauseAll();
+                if (music_manager)
+                    music_manager->pauseMusic();
+                if (SFXManager::get())
+                    SFXManager::get()->pauseAll();
                 PlayerManager::get()->save();
                 if (addons_manager->hasDownloadedIcons())
                     addons_manager->saveInstalled();
+                // Clean temp files manually as destructor of file manager
+                // won't be called at all in mobile if user just press home
+                // button
+                file_manager->cleanTempFiles();
             }
             dev->run();
             win_active = dev->isWindowActive();
             has_focus = dev->isWindowFocused();
             if (has_focus && win_active)
             {
-                music_manager->resumeMusic();
-                SFXManager::get()->resumeAll();
+                if (music_manager)
+                    music_manager->resumeMusic();
+                if (SFXManager::get())
+                    SFXManager::get()->resumeAll();
                 // Improve rubber banding effects of rewinders when going
                 // back to phone, because the smooth timer is paused
                 if (World::getWorld() && RewindManager::isEnabled())

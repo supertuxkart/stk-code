@@ -454,6 +454,20 @@ void FileManager::reinitAfterDownloadAssets()
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
 {
+    cleanTempFiles();
+    // Clean up rest of file manager
+    // =============================
+    popMusicSearchPath();
+    popModelSearchPath();
+    popTextureSearchPath();
+    popTextureSearchPath();
+    m_file_system->drop();
+    m_file_system = NULL;
+}   // ~FileManager
+
+// ----------------------------------------------------------------------------
+void FileManager::cleanTempFiles()
+{
     // Clean up left-over files in addons/tmp that are older than 24h
     // ==============================================================
     // (The 24h delay is useful when debugging a problem with a zip file)
@@ -498,16 +512,7 @@ FileManager::~FileManager()
         removeFile(full_path);
 
     }   // for i in all files in tmp
-
-    // Clean up rest of file manager
-    // =============================
-    popMusicSearchPath();
-    popModelSearchPath();
-    popTextureSearchPath();
-    popTextureSearchPath();
-    m_file_system->drop();
-    m_file_system = NULL;
-}   // ~FileManager
+}   // cleanTempFiles
 
 // ----------------------------------------------------------------------------
 /** Returns true if the specified file exists.
