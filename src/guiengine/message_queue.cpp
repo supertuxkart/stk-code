@@ -487,8 +487,8 @@ void clear()
     while (!g_all_messages.getData().empty())
     {
         Message* msg = g_all_messages.getData().top();
-        delete msg;
         g_all_messages.getData().pop();
+        delete msg;
     }
     g_all_messages.unlock();
 #endif
