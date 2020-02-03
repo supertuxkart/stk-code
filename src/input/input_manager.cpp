@@ -751,7 +751,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                      action == PA_MENU_CANCEL ) )
             {
                 // returns true if the event was handled
-                if (KartSelectionScreen::getRunningInstance()->playerQuit( player ))
+                // Ignore release event (otherwise it exit the kart selection screen
+                // when back from race setup screen)
+                if (value != 0 &&
+                    KartSelectionScreen::getRunningInstance()->playerQuit( player ))
                 {
                     return; // we're done here
                 }
