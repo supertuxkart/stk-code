@@ -268,6 +268,28 @@ void KartSelectionScreen::loadedFromFile()
 
 void KartSelectionScreen::beforeAddingWidget()
 {
+    if (useContinueButton())
+    {
+        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "90%";
+        getWidget("continue")->setVisible(true);
+    }
+    else
+    {
+        getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "100%";
+        getWidget("continue")->setVisible(false);
+    }
+    // Remove dispatcher from m_widgets before calculateLayout otherwise a
+    // dummy button is shown in kart screen
+    bool removed_dispatcher = false;
+    if (m_widgets.contains(m_dispatcher))
+    {
+        m_widgets.remove(m_dispatcher);
+        removed_dispatcher = true;
+    }
+    calculateLayout();
+    if (removed_dispatcher)
+        m_widgets.push_back(m_dispatcher);
+
     // Dynamically add tabs
     RibbonWidget* tabs = getWidget<RibbonWidget>("kartgroups");
     assert( tabs != NULL );
@@ -1098,7 +1120,14 @@ void KartSelectionScreen::eventCallback(Widget* widget,
     }
     else if (name == "karts")
     {
-        if (m_kart_widgets.size() > unsigned(player_id))
+        if (!useContinueButton() &&
+            m_kart_widgets.size() > unsigned(player_id))
+            playerConfirm(player_id);
+    }
+    else if (name == "continue")
+    {
+        if (useContinueButton() &&
+            m_kart_widgets.size() > unsigned(player_id))
             playerConfirm(player_id);
     }
     else if (name == "back")
@@ -1551,6 +1580,15 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
 }
 
 // ----------------------------------------------------------------------------
+bool KartSelectionScreen::useContinueButton() const
+{
+    if (m_multiplayer)
+        return false;
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
+        irr_driver->getDevice()->supportsTouchDevice()) ||
+        UserConfigParams::m_multitouch_active > 1;
+    return multitouch_enabled;
+}   // useContinueButton
 
 #if 0
 #pragma mark -

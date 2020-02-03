@@ -33,11 +33,17 @@
 using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
+void NetworkKartSelectionScreen::beforeAddingWidget()
+{
+    m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
+    KartSelectionScreen::beforeAddingWidget();
+}   // beforeAddingWidget
+
+// ----------------------------------------------------------------------------
 void NetworkKartSelectionScreen::init()
 {
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     m_all_players_done = false;
-    m_multiplayer = NetworkConfig::get()->getNetworkPlayers().size() != 1;
     KartSelectionScreen::init();
 
     m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
