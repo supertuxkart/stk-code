@@ -178,9 +178,14 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
             found = true;
             break;
         case AF_INET6:
-            m_family = AF_INET6;
-            memcpy(m_sockaddr.data(), addr->ai_addr, sizeof(sockaddr_in6));
-            found = true;
+            if (!isIPv4MappedAddress((const struct sockaddr_in6*)addr->ai_addr))
+            {
+                // OSX and iOS can return AF_INET6 with ::ffff:x.y.z.w for server
+                // with A record, skip them and make it only get real AAAA record
+                m_family = AF_INET6;
+                memcpy(m_sockaddr.data(), addr->ai_addr, sizeof(sockaddr_in6));
+                found = true;
+            }
             break;
         default:
             break;
