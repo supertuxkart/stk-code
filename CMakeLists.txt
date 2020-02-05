@@ -162,7 +162,11 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 if(WIN32)
     set(LIBRESOLV_LIBRARY)
 else()
-    find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
+    if (NOT CMAKE_SYSTEM_NAME MATCHES "BSD")
+        find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
+    else()
+        set(LIBRESOLV_LIBRARY)
+    endif()
 endif()
 
 # Find system ENet library or build it if missing
