@@ -1395,9 +1395,9 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         SocketAddress ipv4_addr = server_addr;
         if (server_addr.isIPv6())
             ipv4_addr.setIP(0);
-        auto server = std::make_shared<Server>(0,
-            StringUtils::utf8ToWide(addr), 0, 0, 0, 0, ipv4_addr,
-            !server_password.empty(), false);
+        auto server = std::make_shared<UserDefinedServer>(
+            StringUtils::utf8ToWide(addr), ipv4_addr,
+            !server_password.empty());
         if (server_addr.isIPv6())
         {
             server->setIPV6Address(server_addr);

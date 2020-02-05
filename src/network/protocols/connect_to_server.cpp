@@ -357,6 +357,7 @@ void ConnectToServer::update(int ticks)
             if (STKHost::get()->getPeerCount() > 0 &&
                 STKHost::get()->getServerPeerForClient()->isConnected())
             {
+                m_server->saveServer();
                 // Let main thread create ClientLobby for better
                 // synchronization with GUI
                 NetworkConfig::get()->clearActivePlayersForClient();

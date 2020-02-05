@@ -51,7 +51,8 @@ private:
 
     std::shared_ptr<Server> m_entered_server;
 
-    core::stringw m_entered_server_address;
+    /** Save the previous successfully connected server name. */
+    core::stringw m_entered_server_name;
 
     OnlineScreen();
 
@@ -75,6 +76,8 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual bool onEscapePressed() OVERRIDE;
 
+    void setEnteredServerName(const core::stringw& name)
+                                              { m_entered_server_name = name; }
 };
 
 #endif

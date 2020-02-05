@@ -247,7 +247,6 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                 SocketAddress server_addr(addr_u);
                 if (server_addr.getIP() == 0 && !server_addr.isIPv6())
                 {
-                    m_entered_server_address = L"";
                     core::stringw err = _("Invalid server address: %s.",
                         addr_w);
                     lw->setText(err, true);
@@ -256,21 +255,19 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
                 SocketAddress ipv4_addr = server_addr;
                 if (server_addr.isIPv6())
                     ipv4_addr.setIP(0);
-                auto server = std::make_shared<Server>(0, addr_w, 0, 0, 0, 0,
-                    ipv4_addr, false, false);
+                auto server =
+                    std::make_shared<UserDefinedServer>(addr_w, ipv4_addr);
                 if (server_addr.isIPv6())
                 {
                     server->setIPV6Address(server_addr);
                     server->setIPV6Connection(true);
                 }
                 m_entered_server = server;
-                m_entered_server_address =
-                    StringUtils::utf8ToWide(server_addr.toString());
                 return true;
             });
-        if (!m_entered_server_address.empty())
+        if (!m_entered_server_name.empty())
         {
-            gtfd->getTextField()->setText(m_entered_server_address);
+            gtfd->getTextField()->setText(m_entered_server_name);
         }
     }
 }   // eventCallback

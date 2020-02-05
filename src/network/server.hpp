@@ -117,6 +117,8 @@ public:
                 bool password_protected, bool game_started,
                 const std::string& current_track = "");
     // ------------------------------------------------------------------------
+    virtual ~Server();
+    // ------------------------------------------------------------------------
     /** Returns IPv4 address and port of this server. */
     const SocketAddress& getAddress() const { return *m_address.get(); }
     // ------------------------------------------------------------------------
@@ -195,5 +197,18 @@ public:
             return NULL;
         return m_ipv6_address.get();
     }
+    // ------------------------------------------------------------------------
+    virtual void saveServer() const {}
 };   // Server
+
+class UserDefinedServer : public Server
+{
+public:
+    UserDefinedServer(const core::stringw& name, const SocketAddress& ipv4,
+                      bool password_protected = false)
+        : Server(0, name, 0, 0, 0, 0, ipv4, password_protected, false) {}
+    // ------------------------------------------------------------------------
+    virtual void saveServer() const;
+};   // UserDefinedServer
+
 #endif // HEADER_SERVER_HPP

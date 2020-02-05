@@ -23,6 +23,7 @@
 #include "online/profile_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/socket_address.hpp"
+#include "states_screens/online/online_screen.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -198,6 +199,11 @@ Server::Server(unsigned server_id, const core::stringw &name, int max_players,
 }   // server(server_id, ...)
 
 // ----------------------------------------------------------------------------
+Server::~Server()
+{
+}   // ~Server
+
+// ----------------------------------------------------------------------------
 Track* Server::getCurrentTrack() const
 {
     if (!m_current_track.empty())
@@ -231,3 +237,9 @@ void Server::setAddress(const SocketAddress& addr)
 {
     m_address.reset(new SocketAddress(addr));
 }   // setAddress
+
+// ----------------------------------------------------------------------------
+void UserDefinedServer::saveServer() const
+{
+    OnlineScreen::getInstance()->setEnteredServerName(m_name);
+}   // saveServer
