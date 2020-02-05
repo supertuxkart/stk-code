@@ -159,6 +159,12 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
+if(WIN32)
+    set(LIBRESOLV_LIBRARY)
+else()
+    find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
+endif()
+
 # Find system ENet library or build it if missing
 if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET AND NOT USE_IPV6)
     pkg_check_modules(ENET libenet>=1.3.4)
@@ -590,6 +596,7 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
+    ${LIBRESOLV_LIBRARY}
     mcpp
     )
 
@@ -676,7 +683,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(MINGW)
-    target_link_libraries(supertuxkart -ldxguid -ldinput8)
+    target_link_libraries(supertuxkart -ldxguid -ldinput8 -ldnsapi)
     if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
         target_link_libraries(supertuxkart -mwindows)
     endif()

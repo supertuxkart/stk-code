@@ -41,9 +41,17 @@
 #include "utils/translation.hpp"
 
 #ifdef WIN32
+#  include <windns.h>
 #  include <ws2tcpip.h>
+#ifndef __MINGW32__
+#  pragma comment(lib, "dnsapi.lib")
+#endif
 #else
+#  include <arpa/nameser.h>
+#  include <arpa/nameser_compat.h>
 #  include <netdb.h>
+#  include <netinet/in.h>
+#  include <resolv.h>
 #endif
 
 #include <algorithm>
@@ -573,13 +581,94 @@ ENetAddress ConnectToServer::toENetAddress(uint32_t ip, uint16_t port)
 // ----------------------------------------------------------------------------
 bool ConnectToServer::detectPort()
 {
+    // DNS txt record lookup, we will do stk-server-port server discovery port
+    // too to get an updated sever address, in case it's differ then the
+    // A / AAAA record (possible in LAN environment with multiple IPs assigned)
+    int port_from_dns = 0;
+    auto get_port = [](const std::string& txt_record)->int
+    {
+        const char* match = "stk-server-port=";
+        size_t len = strlen(match);
+        auto it = txt_record.find(match);
+        if (it != std::string::npos && it + len < txt_record.size())
+        {
+            const std::string& ss =
+                txt_record.substr(it + len, txt_record.size());
+            int result = atoi(ss.c_str());
+            if (result > 65535)
+                result = 0;
+            if (result != 0)
+            {
+                Log::info("ConnectToServer",
+                    "Port %d found in DNS txt record %s", result,
+                    txt_record.c_str());
+                return result;
+            }
+        }
+        return 0;
+    };
+#ifdef WIN32
+    PDNS_RECORD dns_record = NULL;
+    DnsQuery(m_server->getName().c_str(), DNS_TYPE_TEXT,
+        DNS_QUERY_STANDARD, NULL, &dns_record, NULL);
+    if (dns_record)
+    {
+        for (PDNS_RECORD curr = dns_record; curr; curr = curr->pNext)
+        {
+            if (curr->wType == DNS_TYPE_TEXT)
+            {
+                for (unsigned i = 0; i < curr->Data.TXT.dwStringCount; i++)
+                {
+                    std::string txt_record = StringUtils::wideToUtf8(
+                        curr->Data.TXT.pStringArray[i]);
+                    port_from_dns = get_port(txt_record);
+                    if (port_from_dns != 0)
+                        break;
+                }
+            }
+            if (port_from_dns != 0)
+                break;
+        }
+        DnsRecordListFree(dns_record, DnsFreeRecordListDeep);
+    }
+#else
+    unsigned char response[512] = {};
+    const std::string& utf8name = StringUtils::wideToUtf8(m_server->getName());
+    int response_len = res_query(utf8name.c_str(), C_IN, T_TXT, response, 512);
+    if (response_len > 0)
+    {
+        ns_msg query;
+        if (ns_initparse(response, response_len, &query) >= 0)
+        {
+            unsigned msg_count = ns_msg_count(query, ns_s_an);
+            for (unsigned i = 0; i < msg_count; i++)
+            {
+                ns_rr rr;
+                if (ns_parserr(&query, ns_s_an, i, &rr) >= 0)
+                {
+                    // obtain the record data
+                    const unsigned char* rd = ns_rr_rdata(rr);
+                    // the first byte is the length of the data
+                    size_t length = rd[0];
+                    if (length == 0)
+                        continue;
+                    std::string txt_record((char*)rd + 1, length);
+                    port_from_dns = get_port(txt_record);
+                    if (port_from_dns != 0)
+                        break;
+                }
+            }
+        }
+    }
+#endif
+
     ENetAddress ea;
     ea.host = STKHost::HOST_ANY;
     ea.port = STKHost::PORT_ANY;
-    Network* nw = new Network(/*peer_count*/1,
+    std::unique_ptr<Network> nw(new Network(/*peer_count*/1,
         /*channel_limit*/EVENT_CHANNEL_COUNT,
         /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
-        true/*change_port_if_bound*/);
+        true/*change_port_if_bound*/));
     BareNetworkString s(std::string("stk-server-port"));
     SocketAddress address;
     if (m_server->useIPV6Connection())
@@ -592,30 +681,47 @@ bool ConnectToServer::detectPort()
     const int LEN = 2048;
     char buffer[LEN];
     int len = nw->receiveRawPacket(buffer, LEN, &sender, 2000);
-    if (len != 2)
+    if (len == 2)
+    {
+        BareNetworkString server_port(buffer, len);
+        uint16_t port = server_port.getUInt16();
+        sender.setPort(port);
+        // Use the DNS detected port over direct socket one, because only
+        // one direct socket exists in a host even they have many stk servers
+        if (port_from_dns != 0)
+            sender.setPort((uint16_t)port_from_dns);
+        // We replace the server address with sender with the detected port
+        // completely, so we can use input like ff02::1 and then get the
+        // correct local link server address
+        if (m_server->useIPV6Connection())
+            m_server->setIPV6Address(sender);
+        else
+            m_server->setAddress(sender);
+        Log::info("ConnectToServer",
+            "Detected new address %s for server address: %s.",
+            sender.toString().c_str(), address.toString(false).c_str());
+    }
+    else if (port_from_dns != 0)
+    {
+        // Use only from dns record
+        if (m_server->useIPV6Connection())
+            m_server->getIPV6Address()->setPort(port_from_dns);
+        else
+        {
+            SocketAddress addr = m_server->getAddress();
+            addr.setPort(port_from_dns);
+            m_server->setAddress(addr);
+        }
+    }
+    else
     {
         const core::stringw& n = m_server->getName();
         //I18N: Show the failed detect port server name
         core::stringw e = _("Failed to detect port number for server %s.", n);
-        delete nw;
         STKHost::get()->setErrorMessage(e);
         STKHost::get()->requestShutdown();
         m_state = EXITING;
         return false;
     }
-    BareNetworkString server_port(buffer, len);
-    uint16_t port = server_port.getUInt16();
-    sender.setPort(port);
-    // We replace the server address with sender with the detected port
-    // completely, so we can use input like ff02::1 and then get the correct
-    // local link server address
-    if (m_server->useIPV6Connection())
-        m_server->setIPV6Address(sender);
-    else
-        m_server->setAddress(sender);
-    Log::info("ConnectToServer",
-        "Detected new address %s for server address: %s.",
-        sender.toString().c_str(), address.toString(false).c_str());
-    delete nw;
     return true;
 }   // detectPort
