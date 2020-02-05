@@ -36,6 +36,7 @@
  *      1. specify the constants in "configed.H" or "noconfig.H",
  *      2. append the system-dependent routines in this file.
  */
+#define _POSIX_C_SOURCE 200809L
 #if PREPROCESSED
 #include    "mcpp.H"
 #else

@@ -42,6 +42,7 @@ extern "C"
 #include <err.h>
 #include <netdb.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <stdlib.h>
 #endif
 
