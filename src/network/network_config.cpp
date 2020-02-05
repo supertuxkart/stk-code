@@ -200,10 +200,11 @@ bool NetworkConfig::roundValuesNow() const
  */
 void NetworkConfig::detectIPType()
 {
-    m_nat64_prefix_data.fill(-1);
     if (UserConfigParams::m_default_ip_type != IP_NONE)
     {
         int ip_type = UserConfigParams::m_default_ip_type;
+        m_nat64_prefix.clear();
+        m_nat64_prefix_data.fill(-1);
         m_ip_type.store((IPType)ip_type);
         return;
     }
@@ -274,6 +275,8 @@ void NetworkConfig::detectIPType()
         if (!has_ipv4)
         {
             // Detect NAT64 prefix by using ipv4only.arpa (RFC 7050)
+            m_nat64_prefix.clear();
+            m_nat64_prefix_data.fill(-1);
             SocketAddress nat64("ipv4only.arpa", 0/*port*/, AF_INET6);
             if (nat64.getFamily() == AF_INET6)
             {
@@ -301,11 +304,15 @@ void NetworkConfig::detectIPType()
     if (has_ipv4 && has_ipv6)
     {
         Log::info("NetworkConfig", "System is dual stack network.");
+        m_nat64_prefix.clear();
+        m_nat64_prefix_data.fill(-1);
         m_ip_type = IP_DUAL_STACK;
     }
     else if (has_ipv4)
     {
         Log::info("NetworkConfig", "System is IPv4 only.");
+        m_nat64_prefix.clear();
+        m_nat64_prefix_data.fill(-1);
         m_ip_type = IP_V4;
     }
     else if (has_ipv6)
@@ -316,7 +323,8 @@ void NetworkConfig::detectIPType()
     }
     else
     {
-        Log::error("NetworkConfig", "Cannot detect network type using stun.");
+        Log::error("NetworkConfig", "Cannot detect network type using stun, "
+            "using previously detected type: %d", (int)m_ip_type.load());
     }
     if (has_ipv6)
     {
