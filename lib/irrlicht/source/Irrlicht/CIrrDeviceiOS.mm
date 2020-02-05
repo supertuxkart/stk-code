@@ -959,11 +959,8 @@ namespace irr
     }
     void CIrrDeviceiOS::debugPrint(const char* line)
     {
-#ifdef ENABLE_IOS_DEBUG_PRINT
-        NSString* ns = [NSString stringWithCString:line
-            encoding:[NSString defaultCStringEncoding]];
+        NSString* ns = [NSString stringWithUTF8String:line];
         NSLog(@"%@", ns);
-#endif
     }
 }
 
