@@ -443,7 +443,7 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
         event.GUIEvent.Caller = this;
         event.GUIEvent.Element = 0;
         
-#if !defined(ANDROID)
+#if !defined(MOBILE_STK)
         if (Selected != oldSelected /*|| now < selectTime + 500*/)
             event.GUIEvent.EventType = EGET_LISTBOX_CHANGED;
         else
