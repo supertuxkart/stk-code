@@ -37,6 +37,7 @@ typedef unsigned int ALuint;
 #include "utils/leak_check.hpp"
 
 #include <string>
+#include <memory>
 
 class SFXBase;
 class XMLNode;

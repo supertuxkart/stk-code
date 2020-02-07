@@ -35,8 +35,7 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
 {
     if (tc != NULL)
     {
-        m_tex_config = (TexConfig*)malloc(sizeof(TexConfig));
-        memcpy(m_tex_config, tc, sizeof(TexConfig));
+        m_tex_config = new TexConfig(*tc);
     }
 #ifndef SERVER_ONLY
     if (m_tex_config)
@@ -86,7 +85,7 @@ STKTexture::~STKTexture()
 #endif   // !SERVER_ONLY
     if (m_texture_image != NULL)
         m_texture_image->drop();
-    free(m_tex_config);
+    delete m_tex_config;
 }   // ~STKTexture
 
 // ----------------------------------------------------------------------------

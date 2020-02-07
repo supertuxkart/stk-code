@@ -186,17 +186,11 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     // always 16 bit data
     long len = (long)ov_pcm_total(&oggFile, -1) * info->channels * 2;
 
-    char *data = (char *) malloc(len);
-    if(!data)
-    {
-        ov_clear(&oggFile);
-        Log::error("SFXBuffer", "[SFXBuffer] Could not allocate decode buffer.");
-        return false;
-    }
+    std::unique_ptr<char []> data = std::unique_ptr<char []>(new char[len]);
 
     int bs = -1;
     long todo = len;
-    char *bufpt = data;
+    char *bufpt = data.get();
 
     while (todo)
     {
@@ -207,10 +201,8 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
 
     alBufferData(buffer, (info->channels == 1) ? AL_FORMAT_MONO16
                  : AL_FORMAT_STEREO16,
-                 data, len, info->rate);
+                 data.get(), len, info->rate);
     success = true;
-
-    free(data);
 
     ov_clear(&oggFile);
     fclose(file);
