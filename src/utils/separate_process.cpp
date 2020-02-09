@@ -140,11 +140,6 @@ SeparateProcess::~SeparateProcess()
         dlclose(m_child_handle);
         m_child_handle = NULL;
         m_child_abort_proc = NULL;
-
-        for (char* arg : m_child_args)
-        {
-            delete[] arg;
-        }
     }
 
 #else
@@ -420,19 +415,19 @@ bool SeparateProcess::createChildProcess(const std::string& exe,
     const std::string exe_file = StringUtils::getBasename(exe);
     auto rest_argv = StringUtils::split(argument, ' ');
 
-    char* arg = new char[exe_file.size() + 1]();
-    memcpy(arg, exe_file.c_str(), exe_file.size());
+    std::unique_ptr<char []> arg = std::unique_ptr<char []>(new char[exe_file.size() + 1]);
+    memcpy(arg.get(), exe_file.c_str(), exe_file.size());
     m_child_args.push_back(arg);
     
     for (unsigned i = 0; i < rest_argv.size(); i++)
     {
-        char* arg = new char[rest_argv[i].size() + 1]();
-        memcpy(arg, rest_argv[i].c_str(), rest_argv[i].size());
+	std::unique_ptr<char []> arg = std::unique_ptr<new char>([rest_argv[i].size() + 1]);
+        memcpy(arg.get(), rest_argv[i].c_str(), rest_argv[i].size());
         m_child_args.push_back(arg);
     }
     
     Log::info("SeparateProcess", "Starting main()");
-    m_child_thread = std::thread(main_proc, m_child_args.size(), &m_child_args[0]);
+    m_child_thread = std::thread(main_proc, m_child_args.size(), &m_child_args[0].get());
     
     return true;
 }

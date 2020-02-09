@@ -32,6 +32,7 @@
 #include "utils/vs.hpp"
 
 #include <iostream>
+#include <thread>
 
 using namespace Online;
 
@@ -76,19 +77,16 @@ void NewsManager::init(bool force_refresh)
     // thread anyway (and the addons menu is disabled as a result).
     if(UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED)
     {
-        pthread_attr_t  attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        pthread_t thread_id;
-        int error = pthread_create(&thread_id, &attr,
-            &NewsManager::downloadNews, this);
-        if (error)
-        {
-            Log::warn("news", "Could not create thread, error=%d", error);
-            // In this case just execute the downloading code with this thread
-            downloadNews(this);
-        }
-        pthread_attr_destroy(&attr);
+	    try
+	    {
+		    std::thread thread_id(NewsManager::downloadNews, this);
+		    thread_id.detach();
+	    } catch (std::exception& e)
+	    {
+		    Log::warn("news", "Could not create thread, error=%s", e.what());
+		    // In this case just execute the downloading code with this thread
+		    (void)downloadNews(this);
+	    }
     }
 
 }   //init
@@ -97,12 +95,11 @@ void NewsManager::init(bool force_refresh)
 /** This function submits request which will download the m_news_filename file
  *  if necessary. It is running in its own thread, so we can use blocking
  *  download calls without blocking the GUI.
- *  \param obj This is 'this' object, passed on during pthread creation.
+ *  \param obj This is 'this' object, passed on during thread creation.
  */
-void* NewsManager::downloadNews(void *obj)
+int NewsManager::downloadNews(NewsManager *me)
 {
     VS::setThreadName("downloadNews");
-    NewsManager *me = (NewsManager*)obj;
     me->clearErrorMessage();
 
     std::string xml_file = file_manager->getAddonsFile(m_news_filename);
@@ -213,7 +210,6 @@ void* NewsManager::downloadNews(void *obj)
     // this part of the code is reached (since otherwise the file
     // manager might be access after it was deleted).
     me->setCanBeDeleted();
-    pthread_exit(NULL);
     return 0;  // prevent warning
 }   // downloadNews
 

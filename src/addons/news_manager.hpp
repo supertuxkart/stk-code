@@ -104,7 +104,7 @@ private:
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
     bool          conditionFulfilled(const std::string &cond);
-    static void*  downloadNews(void *obj);
+    static int downloadNews(NewsManager *ne);
     NewsManager();
     ~NewsManager();
 
