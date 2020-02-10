@@ -632,15 +632,16 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
         {
             return;
         }
+        LobbyPlayer& lp =
+            m_player_names.at(m_player_list->getSelectionInternalName());
+        // For client server AI it doesn't make any sense to open the dialog
+        // There is no way to kick or add handicap to them
+        if (STKHost::get()->isClientServer() > 0 && lp.isAI())
+            return;
         new NetworkPlayerDialog(host_online_local_ids[0],
             host_online_local_ids[1], host_online_local_ids[2],
-            m_player_names.at(
-            m_player_list->getSelectionInternalName()).m_user_name,
-            m_player_names.at(
-            m_player_list->getSelectionInternalName()).m_country_code,
-            m_allow_change_team,
-            m_player_names.at(
-            m_player_list->getSelectionInternalName()).m_handicap);
+            lp.m_user_name, lp.m_country_code, m_allow_change_team,
+            lp.m_handicap);
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
     {

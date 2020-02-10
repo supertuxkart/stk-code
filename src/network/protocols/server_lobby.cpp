@@ -57,6 +57,7 @@
 #include "utils/random_generator.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 
 #include <algorithm>
 #include <fstream>
@@ -670,6 +671,8 @@ void ServerLobby::setup()
         for (auto player : ai->getPlayerProfiles())
             player->setKartName("");
     }
+    for (auto ai : m_ai_profiles)
+        ai->setKartName("");
 
     StateManager::get()->resetActivePlayers();
     // We use maximum 16bit unsigned limit
@@ -1512,15 +1515,23 @@ void ServerLobby::asynchronousUpdate()
             ItemManager::updateRandomSeed(m_item_seed);
             m_game_setup->setRace(winner_vote);
             auto players = STKHost::get()->getPlayersForNewGame();
-            auto ai = m_ai_peer.lock();
-            if (supportsAI() && ai)
+            auto ai_instance = m_ai_peer.lock();
+            if (supportsAI())
             {
-                auto ai_profiles = ai->getPlayerProfiles();
-                if (m_ai_count > 0)
+                if (ai_instance)
                 {
-                    ai_profiles.resize(m_ai_count);
-                    players.insert(players.end(), ai_profiles.begin(),
-                        ai_profiles.end());
+                    auto ai_profiles = ai_instance->getPlayerProfiles();
+                    if (m_ai_count > 0)
+                    {
+                        ai_profiles.resize(m_ai_count);
+                        players.insert(players.end(), ai_profiles.begin(),
+                            ai_profiles.end());
+                    }
+                }
+                else if (!m_ai_profiles.empty())
+                {
+                    players.insert(players.end(), m_ai_profiles.begin(),
+                        m_ai_profiles.end());
                 }
             }
             m_game_setup->sortPlayersForGrandPrix(players);
@@ -3303,7 +3314,7 @@ void ServerLobby::connectionRequested(Event* event)
 
     unsigned total_players = 0;
     STKHost::get()->updatePlayers(NULL, NULL, &total_players);
-    if (total_players + player_count >
+    if (total_players + player_count + m_ai_profiles.size() >
         (unsigned)ServerConfig::m_server_max_players)
     {
         NetworkString *message = getNetworkString(2);
@@ -3506,6 +3517,29 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
         .addUInt8(m_player_reports_table_exists ? 1 : 0);
 
     peer->setSpectator(false);
+
+    // The 127.* or ::1/128 will be in charged for controlling AI
+    if (m_ai_profiles.empty() && peer->getAddress().isLoopback())
+    {
+        unsigned ai_add = NetworkConfig::get()->getNumFixedAI();
+        // We need to reserve at least 1 slot for new player
+        if (player_count + ai_add + 1 > ServerConfig::m_server_max_players)
+            ai_add = ServerConfig::m_server_max_players - player_count - 1;
+        for (unsigned i = 0; i < ai_add; i++)
+        {
+#ifdef SERVER_ONLY
+            core::stringw name = L"Bot";
+#else
+            core::stringw name = _("Bot");
+#endif
+            if (i > 0)
+                name += core::stringw(" ") + StringUtils::toWString(i);
+            m_ai_profiles.insert(std::make_shared<NetworkPlayerProfile>
+                (peer, name, peer->getHostId(), 0.0f, 0, HANDICAP_NONE,
+                player_count + i, KART_TEAM_NONE, ""));
+        }
+    }
+
     if (game_started)
     {
         peer->setWaitingForGame(true);
@@ -3538,6 +3572,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
             getRankingForPlayer(peer->getPlayerProfiles()[0]);
         }
     }
+
 #ifdef ENABLE_SQLITE3
     if (m_server_stats_table.empty() || peer->isAIPeer())
         return;
@@ -3624,28 +3659,36 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
 
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
     // N - 1 AI
-    auto ai = m_ai_peer.lock();
-    if (supportsAI() && ai)
+    auto ai_instance = m_ai_peer.lock();
+    if (supportsAI())
     {
-        auto ai_profiles = ai->getPlayerProfiles();
-        if (m_state.load() == WAITING_FOR_START_GAME ||
-            update_when_reset_server)
+        if (ai_instance)
         {
-            if (all_profiles.size() > ai_profiles.size())
-                ai_profiles.clear();
-            else if (!all_profiles.empty())
+            auto ai_profiles = ai_instance->getPlayerProfiles();
+            if (m_state.load() == WAITING_FOR_START_GAME ||
+                update_when_reset_server)
             {
-                ai_profiles.resize(
-                    ai_profiles.size() - all_profiles.size() + 1);
+                if (all_profiles.size() > ai_profiles.size())
+                    ai_profiles.clear();
+                else if (!all_profiles.empty())
+                {
+                    ai_profiles.resize(
+                        ai_profiles.size() - all_profiles.size() + 1);
+                }
             }
+            else
+            {
+                // Use fixed number of AI calculated when started game
+                ai_profiles.resize(m_ai_count);
+            }
+            all_profiles.insert(all_profiles.end(), ai_profiles.begin(),
+                ai_profiles.end());
         }
-        else
+        else if (!m_ai_profiles.empty())
         {
-            // Use fixed number of AI calculated when started game
-            ai_profiles.resize(m_ai_count);
+            all_profiles.insert(all_profiles.end(), m_ai_profiles.begin(),
+                m_ai_profiles.end());
         }
-        all_profiles.insert(all_profiles.end(), ai_profiles.begin(),
-            ai_profiles.end());
     }
     m_lobby_players.store((int)all_profiles.size());
 
@@ -3676,7 +3719,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             m_peers_ready.find(p) != m_peers_ready.end() &&
             m_peers_ready.at(p))
             boolean_combine |= (1 << 3);
-        if (p && p->isAIPeer())
+        if ((p && p->isAIPeer()) || isAIProfile(profile))
             boolean_combine |= (1 << 4);
         pl->addUInt8(boolean_combine);
         pl->addUInt8(profile->getHandicap());

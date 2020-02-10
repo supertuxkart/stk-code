@@ -35,6 +35,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -172,7 +173,8 @@ void LinearWorld::reset(bool restart)
  */
 void LinearWorld::update(int ticks)
 {
-    if (NetworkConfig::get()->isServer() && getPhase() == RACE_PHASE)
+    auto sl = LobbyProtocol::get<ServerLobby>();
+    if (sl && getPhase() == RACE_PHASE)
     {
         bool all_players_finished = true;
         bool has_ai = false;
@@ -185,7 +187,7 @@ void LinearWorld::update(int ticks)
             if (npp)
             {
                 auto peer = npp->getPeer();
-                if (peer && peer->isAIPeer())
+                if ((peer && peer->isAIPeer()) || sl->isAIProfile(npp))
                     has_ai = true;
                 else if (!getKart(i)->hasFinishedRace())
                     all_players_finished = false;

@@ -468,7 +468,16 @@ std::shared_ptr<AbstractKart> World::createKart
     {
     case RaceManager::KT_PLAYER:
     {
-        if (NetworkConfig::get()->isNetworkAIInstance())
+        int local_player_count = -1;
+        if (NetworkConfig::get()->isClient())
+        {
+            local_player_count =
+                (int)NetworkConfig::get()->getNetworkPlayers().size();
+        }
+        // local_player_id >= local_player_count for fixed AI defined in create
+        // server screen
+        if (NetworkConfig::get()->isNetworkAIInstance() ||
+            local_player_id >= local_player_count)
         {
             AIBaseController* ai = NULL;
             if (race_manager->isBattleMode())
@@ -495,8 +504,6 @@ std::shared_ptr<AbstractKart> World::createKart
     case RaceManager::KT_NETWORK_PLAYER:
     {
         controller = new NetworkPlayerController(new_kart.get());
-        if (!online_name.empty())
-            new_kart->setOnScreenText(online_name.c_str());
         m_num_players++;
         break;
     }
@@ -511,6 +518,8 @@ std::shared_ptr<AbstractKart> World::createKart
         break;
     }
 
+    if (!controller->isLocalPlayerController() && !online_name.empty())
+        new_kart->setOnScreenText(online_name.c_str());
     new_kart->setController(controller);
     race_manager->setKartColor(index, ri->getHue());
     return new_kart;

@@ -20,6 +20,7 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "karts/controller/network_ai_controller.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/server_config.hpp"
@@ -391,7 +392,10 @@ void CreateServerScreen::createServer()
             if (m_supports_ai)
             {
                 if (esi > 0)
+                {
                     server_cfg << " --server-ai=" << esi;
+                    NetworkAIController::setAIFrequency(10);
+                }
             }
             else
             {

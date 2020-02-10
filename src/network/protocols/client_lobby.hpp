@@ -50,6 +50,7 @@ struct LobbyPlayer
     std::string m_country_code;
     /* Icon id for spectator in NetworkingLobby::loadedFromFile is 5. */
     bool isSpectator() const { return m_icon_id == 5; }
+    bool isAI() const { return m_icon_id == 6; }
 };
 
 class ClientLobby : public LobbyProtocol

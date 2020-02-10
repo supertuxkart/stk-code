@@ -99,6 +99,12 @@ void LobbyProtocol::configRemoteKart(
     // Set number of global and local players.
     race_manager->setNumPlayers((int)players.size(), local_player_size);
 
+    int local_player_count = -1;
+    if (NetworkConfig::get()->isClient())
+    {
+        local_player_count =
+            (int)NetworkConfig::get()->getNetworkPlayers().size();
+    }
     // Create the kart information for the race manager:
     // -------------------------------------------------
     for (unsigned int i = 0; i < players.size(); i++)
@@ -110,7 +116,10 @@ void LobbyProtocol::configRemoteKart(
         // on the server, and all non-local players on a client (the local
         // karts are created in the ClientLobby).
         int local_player_id = profile->getLocalPlayerId();
-        if (!is_local)
+
+        // local_player_id >= local_player_count for fixed AI defined in create
+        // server screen
+        if (!is_local || local_player_id >= local_player_count)
         {
             // No device or player profile is needed for remote kart.
             local_player_id =

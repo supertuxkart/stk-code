@@ -85,6 +85,11 @@ private:
      *  AI. (usually used together with ai-handling in server config) */
     bool m_network_ai_instance;
 
+    /** No. of fixed AI in all-in-one graphical client server, the player
+     *  connecting with 127.* or ::1/128 will be in charged of controlling the
+     *  AI. */
+    unsigned m_num_fixed_ai;
+
     /** The LAN port on which a client is waiting for a server connection. */
     uint16_t m_client_port;
 
@@ -273,6 +278,10 @@ public:
                                                 { return m_nat64_prefix_data; }
     // ------------------------------------------------------------------------
     void initClientPort();
+    // ------------------------------------------------------------------------
+    void setNumFixedAI(unsigned num)                  { m_num_fixed_ai = num; }
+    // ------------------------------------------------------------------------
+    unsigned getNumFixedAI() const                   { return m_num_fixed_ai; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

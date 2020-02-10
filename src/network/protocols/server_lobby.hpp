@@ -127,7 +127,13 @@ private:
      * (disconnected). */
     std::weak_ptr<STKPeer> m_server_owner;
 
+    /** AI peer which holds the list of reserved AI for dedicated server. */
     std::weak_ptr<STKPeer> m_ai_peer;
+
+    /** AI profiles for all-in-one graphical client server, this will be a
+     *  fixed count thorough the live time of server, which its value is
+     *  configured in NetworkConfig. */
+    std::set<std::shared_ptr<NetworkPlayerProfile> > m_ai_profiles;
 
     std::atomic<uint32_t> m_server_owner_id;
 
@@ -379,6 +385,8 @@ public:
     void saveIPBanTable(const SocketAddress& addr);
     void listBanTable();
     void initServerStatsTable();
+    bool isAIProfile(const std::shared_ptr<NetworkPlayerProfile>& npp) const
+                     { return m_ai_profiles.find(npp) != m_ai_profiles.end(); }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

@@ -1355,11 +1355,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     int ai_num = 0;
     if (CommandLine::has("--server-ai", &ai_num))
-    {
-        Log::info("main", "Add %d server ai(s) server configurable will be "
-            "disabled.", ai_num);
-        ServerConfig::m_server_configurable = false;
-    }
+        NetworkConfig::get()->setNumFixedAI(ai_num);
 
     std::string addr;
     bool has_addr = CommandLine::has("--connect-now", &addr);
@@ -1443,21 +1439,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             ServerConfig::loadServerLobbyFromConfig();
             Log::info("main", "Creating a LAN server '%s'.",
                 server_name.c_str());
-        }
-        if (ai_num > 0)
-        {
-            std::string cmd =
-                std::string("--stdout=server_ai.log --no-graphics"
-                " --network-ai-freq=10 --connect-now=127.0.0.1:") +
-                StringUtils::toString(STKHost::get()->getPrivatePort()) +
-                " --no-console-log --disable-polling --network-ai="
-                + StringUtils::toString(ai_num);
-            if (!server_password.empty())
-                cmd += " --server-password=" + server_password;
-            STKHost::get()->setSeparateProcess(
-                new SeparateProcess(
-                SeparateProcess::getCurrentExecutableLocation(), cmd,
-                false/*create_pipe*/, "childprocess_ai"/*childprocess_name*/));
         }
     }
 
