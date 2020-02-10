@@ -81,7 +81,9 @@ private:
 
     bool m_done_adding_network_players;
 
-    bool m_network_ai_tester;
+    /** True if this STK instance is an AI instance which is used for server
+     *  AI. (usually used together with ai-handling in server config) */
+    bool m_network_ai_instance;
 
     /** The LAN port on which a client is waiting for a server connection. */
     uint16_t m_client_port;
@@ -177,7 +179,7 @@ public:
     {
         for (auto& p : m_network_players)
         {
-            if (std::get<0>(p) == device && !m_network_ai_tester)
+            if (std::get<0>(p) == device && !m_network_ai_instance)
                 return false;
             if (std::get<1>(p) == profile)
                 return false;
@@ -215,9 +217,9 @@ public:
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
     // ------------------------------------------------------------------------
-    void setNetworkAITester(bool b) { m_network_ai_tester = b; }
+    void setNetworkAIInstance(bool b) { m_network_ai_instance = b; }
     // ------------------------------------------------------------------------
-    bool isNetworkAITester() const { return m_network_ai_tester; }
+    bool isNetworkAIInstance() const { return m_network_ai_instance; }
     // ------------------------------------------------------------------------
     void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
     // ------------------------------------------------------------------------

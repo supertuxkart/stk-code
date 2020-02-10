@@ -468,7 +468,7 @@ std::shared_ptr<AbstractKart> World::createKart
     {
     case RaceManager::KT_PLAYER:
     {
-        if (NetworkConfig::get()->isNetworkAITester())
+        if (NetworkConfig::get()->isNetworkAIInstance())
         {
             AIBaseController* ai = NULL;
             if (race_manager->isBattleMode())

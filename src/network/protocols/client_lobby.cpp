@@ -367,7 +367,7 @@ void ClientLobby::update(int ticks)
     {
         NetworkConfig::get()->clearServerCapabilities();
         std::string ua = StringUtils::getUserAgentString();
-        if (NetworkConfig::get()->isNetworkAITester())
+        if (NetworkConfig::get()->isNetworkAIInstance())
             ua = "AI";
         NetworkString* ns = getNetworkString();
         ns->addUInt8(LE_CONNECTION_REQUESTED)
@@ -387,7 +387,7 @@ void ClientLobby::update(int ticks)
         PlayerManager::get()->enforceCurrentPlayer();
         uint32_t id = PlayerManager::getCurrentOnlineId();
         bool lan_ai = !m_server->supportsEncryption() &&
-            NetworkConfig::get()->isNetworkAITester();
+            NetworkConfig::get()->isNetworkAIInstance();
         if (lan_ai)
             id = 0;
         BareNetworkString* rest = new BareNetworkString();
@@ -414,7 +414,7 @@ void ClientLobby::update(int ticks)
             auto& p = NetworkConfig::get()->getNetworkPlayers()[i];
             PlayerProfile* player = std::get<1>(p);
             core::stringw name = player->getName();
-            if (NetworkConfig::get()->isNetworkAITester())
+            if (NetworkConfig::get()->isNetworkAIInstance())
             {
                 // I18N: Shown in lobby to indicate it's a bot in LAN game
 #ifdef SERVER_ONLY

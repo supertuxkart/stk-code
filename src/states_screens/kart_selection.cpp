@@ -485,7 +485,7 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
     }
     else if (device == NULL)
     {
-        if (!NetworkConfig::get()->isNetworkAITester())
+        if (!NetworkConfig::get()->isNetworkAIInstance())
         {
             Log::error("KartSelectionScreen", "joinPlayer(): Received null "
                     "device pointer");

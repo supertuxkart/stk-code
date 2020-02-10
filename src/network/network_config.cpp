@@ -70,7 +70,7 @@ NetworkConfig::NetworkConfig()
     m_cur_user_token        = "";
     m_client_port = 0;
     m_joined_server_version = 0;
-    m_network_ai_tester = false;
+    m_network_ai_instance = false;
     m_state_frequency = 10;
     m_nat64_prefix_data.fill(-1);
 }   // NetworkConfig
