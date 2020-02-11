@@ -468,8 +468,9 @@ std::shared_ptr<AbstractKart> World::createKart
     {
     case RaceManager::KT_PLAYER:
     {
-        int local_player_count = -1;
-        if (NetworkConfig::get()->isClient())
+        int local_player_count = 99999;
+        if (NetworkConfig::get()->isNetworking() &&
+            NetworkConfig::get()->isClient())
         {
             local_player_count =
                 (int)NetworkConfig::get()->getNetworkPlayers().size();

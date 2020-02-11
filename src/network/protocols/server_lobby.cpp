@@ -3522,9 +3522,10 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     if (m_ai_profiles.empty() && peer->getAddress().isLoopback())
     {
         unsigned ai_add = NetworkConfig::get()->getNumFixedAI();
+        unsigned max_players = ServerConfig::m_server_max_players;
         // We need to reserve at least 1 slot for new player
-        if (player_count + ai_add + 1 > ServerConfig::m_server_max_players)
-            ai_add = ServerConfig::m_server_max_players - player_count - 1;
+        if (player_count + ai_add + 1 > max_players)
+            ai_add = max_players - player_count - 1;
         for (unsigned i = 0; i < ai_add; i++)
         {
 #ifdef SERVER_ONLY
