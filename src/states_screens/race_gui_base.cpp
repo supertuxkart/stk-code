@@ -94,7 +94,14 @@ RaceGUIBase::RaceGUIBase()
     }
 
     //read frame picture for icons in the mini map.
-    m_icons_frame = irr_driver->getTexture("icons-frame.png");
+    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {   // show the kart direction in soccer
+        m_icons_frame = irr_driver->getTexture("icons-frame_arrow.png");
+    }
+    else
+    {
+        m_icons_frame = irr_driver->getTexture("icons-frame.png");
+    }
     if (!m_icons_frame)
     {
         Log::error("RaceGuiBase",
