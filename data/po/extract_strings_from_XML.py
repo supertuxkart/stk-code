@@ -87,9 +87,9 @@ for file in filenames:
     try:
         doc = xml.dom.minidom.parse(file)
     except Exception as ex:
-        print "============================================"
-        print "/!\\ Expat doesn't like ", file, "! Error=", type(ex), " (", ex.args, ")"
-        print "============================================"
+        print("============================================")
+        print("/!\\ Expat doesn't like ", file, "! Error=", type(ex), " (", ex.args, ")")
+        print("============================================")
 
     traverse(file, doc, isChallenge, isGP, isKart, isTrack, isAchievements)
     
