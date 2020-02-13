@@ -509,6 +509,9 @@ public:
     /** Returns if the track is during day time */
     const bool getIsDuringDay () const {return m_is_day;               }
     // ------------------------------------------------------------------------
+    /** Returns if invert minimap */
+    const bool getMinimapInvert () const {return m_minimap_invert_x_z;               }
+    // ------------------------------------------------------------------------
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */
     const btTransform& getStartTransform (unsigned int index) const
