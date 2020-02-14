@@ -211,9 +211,9 @@ bool LocalPlayerController::action(PlayerAction action, int value,
  */
 void LocalPlayerController::steer(int ticks, int steer_val)
 {
-    if(UserConfigParams::m_gamepad_debug)
+    RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
+    if (gui_base && UserConfigParams::m_gamepad_debug)
     {
-        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val),
                              m_kart, 1.0f,

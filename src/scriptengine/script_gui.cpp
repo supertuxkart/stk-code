@@ -146,16 +146,18 @@ namespace Scripting
 
         void clearOverlayMessages()
         {
-            World::getWorld()->getRaceGUI()->clearAllMessages();
+            if (World::getWorld()->getRaceGUI())
+                World::getWorld()->getRaceGUI()->clearAllMessages();
         }
 
         /** Display text in the center of the screen for a few seconds */
         void displayOverlayMessage(std::string* input)
         {
+            if (!World::getWorld()->getRaceGUI())
+                return;
             irr::core::stringw msg = StringUtils::utf8ToWide(*input);
             std::vector<core::stringw> parts =
                 StringUtils::split(msg, '\n', false);
-                        
             for (unsigned int n = 0; n < parts.size(); n++)
             {
                 World::getWorld()->getRaceGUI()

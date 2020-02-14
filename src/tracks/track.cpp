@@ -1154,6 +1154,9 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 void Track::loadMinimap()
 {
 #ifndef SERVER_ONLY
+    if (ProfileWorld::isNoGraphics())
+        return;
+
     //Create the minimap resizing it as necessary.
     core::dimension2du mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
 

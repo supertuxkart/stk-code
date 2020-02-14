@@ -252,7 +252,8 @@ void World::init()
     loadCustomModels();
     main_loop->renderGUI(7100);
     // Must be called after all karts are created
-    m_race_gui->init();
+    if (m_race_gui)
+        m_race_gui->init();
 
     powerup_manager->computeWeightsForRace(race_manager->getNumberOfKarts());
     main_loop->renderGUI(7200);
@@ -387,7 +388,8 @@ void World::reset(bool restart)
     Track::getCurrentTrack()->reset();
 
     // Reset the race gui.
-    m_race_gui->reset();
+    if (m_race_gui)
+        m_race_gui->reset();
 
     // Start music from beginning
     music_manager->stopMusic();
@@ -414,7 +416,8 @@ void World::reset(bool restart)
 
 void World::createRaceGUI()
 {
-    m_race_gui = new RaceGUI();
+    if (!ProfileWorld::isNoGraphics())
+        m_race_gui = new RaceGUI();
 }
 
 //-----------------------------------------------------------------------------
@@ -725,19 +728,17 @@ void World::terminateRace()
     assert(m_saved_race_gui==NULL);
     m_saved_race_gui = m_race_gui;
 
-    RaceResultGUI* results = RaceResultGUI::getInstance();
-    m_race_gui       = results;
-
-    if (best_highscore_rank > 0)
+    if (!ProfileWorld::isNoGraphics())
     {
-        results->setHighscore(best_highscore_rank);
-    }
-    else
-    {
-        results->clearHighscores();
+        RaceResultGUI* results = RaceResultGUI::getInstance();
+        m_race_gui = results;
+        if (best_highscore_rank > 0)
+            results->setHighscore(best_highscore_rank);
+        else
+            results->clearHighscores();
+        results->push();
     }
 
-    results->push();
     WorldStatus::terminateRace();
 }   // terminateRace
 
@@ -1314,7 +1315,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
     if (kart->isGhostKart()) return;
 
     // Display a message about the eliminated kart in the race gui
-    if (notify_of_elimination)
+    if (m_race_gui && notify_of_elimination)
     {
         for(unsigned int i=0; i<Camera::getNumCameras(); i++)
         {
