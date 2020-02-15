@@ -690,7 +690,7 @@ void RaceGUI::drawGlobalMiniMap()
                 float rotation = atan2f(direction.getZ(),direction.getX());
                 if (track->getMinimapInvert())
                 {   // correction the direction
-                    rotation = -1.0f * rotation;
+                    rotation = rotation + M_PI;
                 }
                 rotation = -1.0f * rotation + 0.25f * M_PI; // icons-frame_arrow.png was rotated by 45 degrees
                 draw2DImage(m_icons_frame, position, rect, NULL, colors, true, false, rotation);
