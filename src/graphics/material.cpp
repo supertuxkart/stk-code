@@ -34,7 +34,6 @@
 #include "graphics/stk_tex_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "modes/profile_world.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"

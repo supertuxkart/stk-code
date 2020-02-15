@@ -29,7 +29,6 @@
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
-#include "modes/profile_world.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/utf8.h"
 
@@ -84,7 +83,7 @@ void FontWithFace::init()
 {
     setDPI();
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
     {
         reset();
         return;
@@ -140,7 +139,7 @@ void FontWithFace::reset()
 void FontWithFace::loadGlyphInfo(wchar_t c)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     unsigned int font_number = 0;
@@ -156,7 +155,7 @@ void FontWithFace::loadGlyphInfo(wchar_t c)
 void FontWithFace::createNewGlyphPage()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() *
@@ -187,7 +186,7 @@ void FontWithFace::createNewGlyphPage()
 void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     assert(glyph_index > 0);
@@ -250,7 +249,7 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
     }
 
     const unsigned int cur_tex = m_spritebank->getTextureCount() - 1;
-    if (bits->buffer != NULL && !ProfileWorld::isNoGraphics())
+    if (bits->buffer != NULL && !GUIEngine::isNoGraphics())
     {
         video::ITexture* tex = m_spritebank->getTexture(cur_tex);
         glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
@@ -526,7 +525,7 @@ core::dimension2d<u32> FontWithFace::getDimension(const core::stringw& text,
 #ifdef SERVER_ONLY
     return core::dimension2d<u32>(1, 1);
 #else
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return core::dimension2d<u32>(1, 1);
 
     const float scale = font_settings ? font_settings->getScale() : 1.0f;
@@ -597,7 +596,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
                           FontCharCollector* char_collector)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics() || gl.empty())
+    if (GUIEngine::isNoGraphics() || gl.empty())
         return;
 
     const bool black_border = font_settings ?
@@ -1015,7 +1014,7 @@ void FontWithFace::drawText(const core::stringw& text,
 
 {
 #ifndef SERVER_ONLY
-    if (text.empty() || ProfileWorld::isNoGraphics())
+    if (text.empty() || GUIEngine::isNoGraphics())
         return;
 
     if (disableTextShaping())
@@ -1044,7 +1043,7 @@ void FontWithFace::drawTextQuick(const core::stringw& text,
                                  FontCharCollector* char_collector)
 {
 #ifndef SERVER_ONLY
-    if (text.empty() || ProfileWorld::isNoGraphics())
+    if (text.empty() || GUIEngine::isNoGraphics())
         return;
 
     render(text2GlyphsWithoutShaping(text), position, color, hcenter,

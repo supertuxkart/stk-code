@@ -23,17 +23,20 @@
 
 #include <irrlicht.h>
 
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
+#include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/bowling.hpp"
 #include "items/cake.hpp"
 #include "items/plunger.hpp"
 #include "items/rubber_ball.hpp"
-#include "modes/profile_world.hpp"
+#include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
@@ -150,7 +153,7 @@ void PowerupManager::loadPowerupsModels()
 
     delete root;
 
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
     {
         for (unsigned i = POWERUP_FIRST; i <= POWERUP_LAST; i++)
         {

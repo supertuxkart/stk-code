@@ -52,7 +52,6 @@
 #include "karts/kart_rewinder.hpp"
 #include "main_loop.hpp"
 #include "modes/overworld.hpp"
-#include "modes/profile_world.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
@@ -266,7 +265,7 @@ void World::init()
     {
         auto cl = LobbyProtocol::get<ClientLobby>();
         if ( (NetworkConfig::get()->isServer() && 
-              !ProfileWorld::isNoGraphics()       ) ||
+              !GUIEngine::isNoGraphics()       ) ||
             race_manager->isWatchingReplay()        ||
             (cl && cl->isSpectator()))
         {
@@ -416,7 +415,7 @@ void World::reset(bool restart)
 
 void World::createRaceGUI()
 {
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
         m_race_gui = new RaceGUI();
 }
 
@@ -728,7 +727,7 @@ void World::terminateRace()
     assert(m_saved_race_gui==NULL);
     m_saved_race_gui = m_race_gui;
 
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         RaceResultGUI* results = RaceResultGUI::getInstance();
         m_race_gui = results;

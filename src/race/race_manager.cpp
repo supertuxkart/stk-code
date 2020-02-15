@@ -41,7 +41,6 @@
 #include "modes/follow_the_leader.hpp"
 #include "modes/free_for_all.hpp"
 #include "modes/overworld.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/standard_race.hpp"
 #include "modes/tutorial_world.hpp"
 #include "modes/world.hpp"

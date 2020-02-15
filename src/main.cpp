@@ -216,7 +216,6 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/demo_world.hpp"
-#include "modes/profile_world.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
@@ -1686,7 +1685,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     CommandLine::reportInvalidParameters();
 
-    if (ProfileWorld::isProfileMode() || ProfileWorld::isNoGraphics())
+    if (ProfileWorld::isProfileMode() || GUIEngine::isNoGraphics())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects
         UserConfigParams::m_music = false;// and music when profiling
@@ -1785,7 +1784,7 @@ void initRest()
     // separate thread running in network HTTP.
 #ifndef SERVER_ONLY
     addons_manager = NULL;
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         // Need to load shader after downloading assets as it reads prefilled
         // textures
@@ -1803,7 +1802,7 @@ void initRest()
     PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
 #ifndef SERVER_ONLY
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
         NewsManager::get();   // this will create the news manager
 #endif
 
@@ -1885,7 +1884,7 @@ void askForInternetPermission()
             bool need_to_start_news_manager =
                 UserConfigParams::m_internet_status !=
                 Online::RequestManager::IPERM_ALLOWED &&
-                !ProfileWorld::isNoGraphics();
+                !GUIEngine::isNoGraphics();
             UserConfigParams::m_internet_status =
                                   Online::RequestManager::IPERM_ALLOWED;
             if (need_to_start_news_manager)
@@ -1993,7 +1992,7 @@ int main(int argc, char *argv[])
 #ifndef SERVER_ONLY
         if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
 #endif
-            ProfileWorld::disableGraphics();
+            GUIEngine::disableGraphics();
 
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
@@ -2021,7 +2020,7 @@ int main(int argc, char *argv[])
         {
             if (no_graphics)
             {
-                ProfileWorld::disableGraphics();
+                GUIEngine::disableGraphics();
                 UserConfigParams::m_enable_sound = false;
             }
             ServerConfig::loadServerConfig(server_config);
@@ -2034,7 +2033,7 @@ int main(int argc, char *argv[])
         {
             if (no_graphics)
             {
-                ProfileWorld::disableGraphics();
+                GUIEngine::disableGraphics();
                 UserConfigParams::m_enable_sound = false;
             }
             NetworkConfig::get()->setIsServer(true);
@@ -2049,7 +2048,7 @@ int main(int argc, char *argv[])
         {
             if (no_graphics)
             {
-                ProfileWorld::disableGraphics();
+                GUIEngine::disableGraphics();
                 UserConfigParams::m_enable_sound = false;
             }
             NetworkConfig::get()->setIsServer(true);
@@ -2058,7 +2057,7 @@ int main(int argc, char *argv[])
             ServerConfig::m_validating_player = false;
         }
 
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
             profiler.init();
         // Create the story mode timer with empty setting first, it will
         // be reset later after story mode status and player manager is loaded
@@ -2140,7 +2139,7 @@ int main(int argc, char *argv[])
             exit(0);
 
 #ifndef SERVER_ONLY
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
         {
             addons_manager->checkInstalledAddons();
 
@@ -2173,7 +2172,7 @@ int main(int argc, char *argv[])
         }
 
 #ifndef SERVER_ONLY
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
         {
             // Some Android devices have only 320x240 and height >= 480 is bare
             // minimum to make the GUI working as expected.
@@ -2302,7 +2301,7 @@ int main(int argc, char *argv[])
 
 #ifndef SERVER_ONLY
         // If an important news message exists it is shown in a popup dialog.
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
         {
             const core::stringw important_message =
                                         NewsManager::get()->getImportantMessage();
@@ -2483,7 +2482,7 @@ static void cleanSuperTuxKart()
     // the OS takes all threads down.
 
 #ifndef SERVER_ONLY
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         if (UserConfigParams::m_internet_status == Online::RequestManager::
             IPERM_ALLOWED && NewsManager::isRunning() &&

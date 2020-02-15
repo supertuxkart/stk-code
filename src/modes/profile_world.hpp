@@ -36,10 +36,6 @@ private:
     /** If profiling is done, and if so, which mode. */
     static ProfileType m_profile_mode;
 
-    /** If no graphics should be displayed. Useful for batch testing
-     *  of AI changes etc. */
-    static bool  m_no_graphics;
-
     /** In time based profiling only: time to run. */
     static float m_time;
 
@@ -91,12 +87,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if profile mode was selected. */
     static   bool isProfileMode() {return m_profile_mode!=PROFILE_NONE; }
-    // ------------------------------------------------------------------------
-    /** Switches off graphics. */
-    static   void disableGraphics() { m_no_graphics = true; }
-    // ------------------------------------------------------------------------
-    /** Returns true if no graphics should be displayed. */
-    static   bool isNoGraphics()  {return m_no_graphics; }
 };
 
 #endif

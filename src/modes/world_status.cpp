@@ -24,9 +24,10 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/profile_world.hpp"
+#include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
@@ -378,7 +379,7 @@ void WorldStatus::updateTime(int ticks)
                     music_manager->startMusic();
                 }
                 // no graphics mode goes race phase now
-                if (ProfileWorld::isNoGraphics())
+                if (GUIEngine::isNoGraphics())
                 {
                     m_race_ticks = -1;
                     m_phase = RACE_PHASE;

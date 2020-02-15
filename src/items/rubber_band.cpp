@@ -23,12 +23,13 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
+#include "guiengine/engine.hpp"
 #include "items/plunger.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/max_speed.hpp"
-#include "modes/profile_world.hpp"
+#include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
 #include "utils/mini_glm.hpp"
@@ -48,7 +49,7 @@ RubberBand::RubberBand(Plunger *plunger, AbstractKart *kart)
     m_hit_kart = NULL;
     m_attached_state = RB_TO_PLUNGER;
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics() || !CVS->isGLSL())
+    if (GUIEngine::isNoGraphics() || !CVS->isGLSL())
     {
         return;
     }

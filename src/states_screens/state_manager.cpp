@@ -29,9 +29,8 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "main_loop.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "utils/translation.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 
 using namespace GUIEngine;

@@ -65,7 +65,6 @@
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/overworld.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/soccer_world.hpp"
 #include "network/compress_network_body.hpp"
 #include "network/network_config.hpp"
@@ -2996,13 +2995,13 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 #ifndef SERVER_ONLY
     m_skidmarks = nullptr;
     m_shadow = nullptr;
-    if (!ProfileWorld::isNoGraphics() &&
+    if (!GUIEngine::isNoGraphics() &&
         m_kart_properties->getSkidEnabled() && CVS->isGLSL())
     {
         m_skidmarks.reset(new SkidMarks(*this));
     }
 
-    if (!ProfileWorld::isNoGraphics() &&
+    if (!GUIEngine::isNoGraphics() &&
         CVS->isGLSL() && !CVS->isShadowEnabled() && m_kart_properties
         ->getShadowMaterial()->getSamplerPath(0) != "unicolor_white")
     {
@@ -3370,7 +3369,7 @@ btQuaternion Kart::getVisualRotation() const
 void Kart::setOnScreenText(const core::stringw& text)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
         
     BoldFace* bold_face = font_manager->getFont<BoldFace>();

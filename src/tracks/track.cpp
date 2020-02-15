@@ -59,7 +59,6 @@
 #include "main_loop.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
-#include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "physics/physical_object.hpp"
@@ -318,7 +317,7 @@ void Track::cleanup()
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
         {
             CPUParticleManager::getInstance()->cleanMaterialMap();
         }
@@ -1154,7 +1153,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 void Track::loadMinimap()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     //Create the minimap resizing it as necessary.
@@ -1222,7 +1221,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 #ifdef SERVER_ONLY
     if (false)
 #else
-    if (m_version < 7 && !CVS->isGLSL() && !ProfileWorld::isNoGraphics())
+    if (m_version < 7 && !CVS->isGLSL() && !GUIEngine::isNoGraphics())
 #endif
     {
         // The mesh as returned does not have all mesh buffers with the same
@@ -1482,7 +1481,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
 
     // Free the tangent (track mesh) after converting to physics
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         tangent_mesh->freeMeshVertexBuffer();
 
     if (m_track_mesh == NULL)
@@ -1501,7 +1500,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 // ----------------------------------------------------------------------------
 void Track::freeCachedMeshVertexBuffer()
 {
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
     {
         for (unsigned i = 0; i < m_all_cached_meshes.size(); i++)
             m_all_cached_meshes[i]->freeMeshVertexBuffer();
@@ -1969,7 +1968,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     main_loop->renderGUI(3500);
 
 #ifndef SERVER_ONLY
-    if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() && m_use_fog)
+    if (!GUIEngine::isNoGraphics() && CVS->isGLSL() && m_use_fog)
     {
         glBindBuffer(GL_UNIFORM_BUFFER, SP::sp_fog_ubo);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, 4, &m_fog_start);

@@ -25,7 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
-#include "modes/profile_world.hpp"
+#include "guiengine/engine.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/arena_node_3d.hpp"
 #include "tracks/drive_node_2d.hpp"
@@ -395,7 +395,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
                                  bool invert_x_z)
 {
     // Skip minimap when profiling
-    if (ProfileWorld::isNoGraphics()) return NULL;
+    if (GUIEngine::isNoGraphics()) return NULL;
 
     const video::SColor oldClearColor = irr_driver->getClearColor();
     irr_driver->setClearbackBufferColor(video::SColor(0, 255, 255, 255));

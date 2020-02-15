@@ -34,7 +34,6 @@
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
 int   ProfileWorld::m_num_laps    = 0;
 float ProfileWorld::m_time        = 0.0f;
-bool  ProfileWorld::m_no_graphics = false;
 
 //-----------------------------------------------------------------------------
 /** The constructor sets the number of (local) players to 0, since only AI
@@ -206,7 +205,7 @@ void ProfileWorld::enterRaceOverState()
                  m_frame_count, runtime, (float)m_frame_count/runtime);
 
     // Print geometry statistics if we're not in no-graphics mode
-    if(!m_no_graphics)
+    if(!GUIEngine::isNoGraphics())
     {
         Log::verbose("profile", "Average # drawn nodes           %f k",
                      (float)m_num_triangles/m_frame_count);

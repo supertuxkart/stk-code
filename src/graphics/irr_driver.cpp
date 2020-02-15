@@ -62,7 +62,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
@@ -364,7 +363,7 @@ void IrrDriver::initDevice()
     SIrrlichtCreationParameters params;
 
     // If --no-graphics option was used, the null device can still be used.
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         // This code is only executed once. No need to reload the video
         // modes every time the resolution changes.
@@ -548,7 +547,7 @@ void IrrDriver::initDevice()
     // pipeline doesn't work for them. For example some radeon drivers
     // support only GLSL 1.3 and it causes STK to crash. We should force to use
     // fixed pipeline in this case.
-    if (!ProfileWorld::isNoGraphics() &&
+    if (!GUIEngine::isNoGraphics() &&
         (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE) ||
         (CVS->isGLSL() && !CentralVideoSettings::m_supports_sp)))
     {
@@ -561,7 +560,7 @@ void IrrDriver::initDevice()
 #endif
 
 #ifndef SERVER_ONLY
-    if (!ProfileWorld::isNoGraphics() && recreate_device)
+    if (!GUIEngine::isNoGraphics() && recreate_device)
     {
         m_device->closeDevice();
         m_device->clearSystemMessages();
@@ -698,7 +697,7 @@ void IrrDriver::initDevice()
 #endif
 
     // Only change video driver settings if we are showing graphics
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         m_device->setWindowClass("SuperTuxKart");
         m_device->setWindowCaption(L"SuperTuxKart");
@@ -742,12 +741,12 @@ void IrrDriver::initDevice()
 #ifndef SERVER_ONLY
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
         m_device->getCursorControl()->setVisible(true);
 #endif
     m_pointer_shown = true;
 
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     m_device->registerGetMovedHeightFunction([]
@@ -844,7 +843,7 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
                               std::string *version)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
         
     *vendor   = (char*)glGetString(GL_VENDOR  );
@@ -857,7 +856,7 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
 void IrrDriver::showPointer()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     if (!m_pointer_shown)
@@ -872,7 +871,7 @@ void IrrDriver::showPointer()
 void IrrDriver::hidePointer()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     // always visible in artist debug mode, to be able to use the context menu

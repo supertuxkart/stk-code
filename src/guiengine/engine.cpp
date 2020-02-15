@@ -755,6 +755,7 @@ namespace GUIEngine
 
     std::vector<MenuMessage> gui_messages;
 
+    bool g_is_no_graphics;
     // ------------------------------------------------------------------------
     void showMessage(const core::stringw& message, const float time)
     {
@@ -1051,6 +1052,7 @@ namespace GUIEngine
 #ifdef ANDROID
         m_gui_functions.clear();
 #endif
+        g_is_no_graphics = false;
     }   // resetGlobalVariables
 
     // -----------------------------------------------------------------------
@@ -1459,7 +1461,7 @@ namespace GUIEngine
         // This will avoid no response in windows, also allow showing loading
         // icon in apple device, because apple device only update render
         // buffer if you poll the mainloop
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
         {
             g_device->setEventReceiver(NULL);
             g_device->run();
@@ -1549,4 +1551,19 @@ namespace GUIEngine
 
         return screen->getWidget(id);
     }   // getWidget
+
+#ifndef SERVER_ONLY
+    // -----------------------------------------------------------------------
+    void disableGraphics()
+    {
+        g_is_no_graphics = true;
+    }   // disableGraphics
+
+    // -----------------------------------------------------------------------
+    bool isNoGraphics()
+    {
+        return g_is_no_graphics;
+    }   // isNoGraphics
+#endif
+
 }   // namespace GUIEngine

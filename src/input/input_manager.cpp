@@ -35,7 +35,6 @@
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/demo_world.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"

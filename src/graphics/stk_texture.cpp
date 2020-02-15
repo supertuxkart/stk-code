@@ -23,7 +23,7 @@
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
-#include "modes/profile_world.hpp"
+#include "guiengine/engine.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -40,7 +40,7 @@ STKTexture::STKTexture(const std::string& path, TexConfig* tc, bool no_upload)
 #ifndef SERVER_ONLY
     if (m_tex_config)
     {
-        if (ProfileWorld::isNoGraphics() ||
+        if (GUIEngine::isNoGraphics() ||
             (!CVS->isDeferredEnabled()) || !CVS->isGLSL())
         {
             m_tex_config->m_srgb = false;
@@ -78,7 +78,7 @@ STKTexture::STKTexture(video::IImage* img, const std::string& name)
 STKTexture::~STKTexture()
 {
 #ifndef SERVER_ONLY
-    if (m_texture_name != 0 && !ProfileWorld::isNoGraphics())
+    if (m_texture_name != 0 && !GUIEngine::isNoGraphics())
     {
         glDeleteTextures(1, &m_texture_name);
     }
@@ -92,7 +92,7 @@ STKTexture::~STKTexture()
 void STKTexture::reload(bool no_upload, uint8_t* preload_data,
                         video::IImage* preload_img)
 {
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
     {
         m_orig_size.Width = 2;
         m_orig_size.Height = 2;

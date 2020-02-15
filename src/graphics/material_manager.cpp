@@ -29,7 +29,6 @@
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"

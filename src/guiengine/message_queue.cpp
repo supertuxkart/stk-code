@@ -24,7 +24,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
-#include "modes/profile_world.hpp"
 #include "utils/synchronised.hpp"
 
 #include "GlyphLayout.h"
@@ -381,7 +380,7 @@ void updatePosition()
 void add(MessageType mt, const irr::core::stringw &message)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
     Message *m = new TextMessage(mt, message);
     privateAdd(m);
@@ -397,7 +396,7 @@ void add(MessageType mt, const irr::core::stringw &message)
 void addStatic(MessageType mt, const irr::core::stringw &message)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
     delete g_static_message;
     g_static_message = NULL;
@@ -415,7 +414,7 @@ void addStatic(MessageType mt, const irr::core::stringw &message)
 void update(float dt)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     if (!g_container)
@@ -456,7 +455,7 @@ void update(float dt)
 void showProgressBar(int progress, const core::stringw& msg)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     g_progress_bar_msg.setProgress(progress, msg);

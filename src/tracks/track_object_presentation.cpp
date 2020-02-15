@@ -38,7 +38,6 @@
 #include "input/input_manager.hpp"
 #include "items/item_manager.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
@@ -822,7 +821,7 @@ TrackObjectPresentationBillboard::TrackObjectPresentationBillboard(
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationBillboard::updateGraphics(float dt)
 {
-    if (ProfileWorld::isNoGraphics()) return;
+    if (GUIEngine::isNoGraphics()) return;
 #ifndef SERVER_ONLY
     if (m_fade_out_when_close)
     {
