@@ -25,14 +25,14 @@ import sys
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print "Usage: getpo_authors.py PATH_TO_PO_FILE"
+        print("Usage: getpo_authors.py PATH_TO_PO_FILE")
         sys.exit(-1)
 
     for filename in sys.argv[1:]:
         print("Processing file %s" % filename)
         f = open(filename, "r")
         if not f:
-            print "Can not find", filename
+            print("Can not find", filename)
             exit
         lines = f.readlines()
 
