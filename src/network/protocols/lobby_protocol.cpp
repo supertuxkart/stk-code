@@ -21,6 +21,9 @@
 
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/message_queue.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "graphics/render_info.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -33,9 +36,13 @@
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 
 std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
 
@@ -251,3 +258,40 @@ Track* LobbyProtocol::getPlayingTrack() const
     ul.unlock();
     return track_manager->getTrack(track_ident);
 }   // getPlayingTrack
+
+//-----------------------------------------------------------------------------
+void LobbyProtocol::exitGameState()
+{
+    bool create_gp_msg = false;
+    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        race_manager->getTrackNumber() == race_manager->getNumOfTracks() - 1)
+    {
+        create_gp_msg = true;
+    }
+
+    race_manager->clearNetworkGrandPrixResult();
+    race_manager->exitRace();
+    race_manager->setAIKartOverride("");
+
+    if (GUIEngine::isNoGraphics())
+    {
+        // No screen is ever created when no graphics is on
+        StateManager::get()->enterMenuState();
+        return;
+    }
+
+    GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ScreenKeyboard::dismiss();
+    RaceResultGUI::getInstance()->cleanupGPProgress();
+    if (create_gp_msg)
+    {
+        core::stringw msg = _("Network grand prix has been finished.");
+        MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, msg);
+    }
+
+    if (GUIEngine::getCurrentScreen() != NetworkingLobby::getInstance())
+    {
+        StateManager::get()->resetAndSetStack(
+            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    }
+}   // exitGameState

@@ -49,8 +49,6 @@
 #include "online/request_manager.hpp"
 #include "online/xml_request.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/online/networking_lobby.hpp"
-#include "states_screens/race_result_gui.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -2055,7 +2053,7 @@ void ServerLobby::update(int ticks)
             !GameProtocol::emptyInstance())
             return;
 
-        RaceResultGUI::getInstance()->backToLobby();
+        exitGameState();
         m_rs_state.store(RS_ASYNC_RESET);
     }
 
@@ -2152,7 +2150,7 @@ void ServerLobby::update(int ticks)
             return;
 
         // This will go back to lobby in server (and exit the current race)
-        RaceResultGUI::getInstance()->backToLobby();
+        exitGameState();
         // Reset for next state usage
         resetPeersReady();
         // Set the delay before the server forces all clients to exit the race

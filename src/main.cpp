@@ -1408,7 +1408,10 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         else
             NetworkConfig::get()->setIsLAN();
         STKHost::create();
-        NetworkingLobby::getInstance()->setJoinedServer(server);
+        if (!GUIEngine::isNoGraphics())
+            NetworkingLobby::getInstance()->setJoinedServer(server);
+        else if (NetworkConfig::get()->isClient())
+            std::make_shared<ConnectToServer>(server)->requestStart();
     }
 
     if (NetworkConfig::get()->isServer())
@@ -2253,7 +2256,8 @@ int main(int argc, char *argv[])
 
         if (STKHost::existHost())
         {
-            NetworkingLobby::getInstance()->push();
+            if (!GUIEngine::isNoGraphics())
+                NetworkingLobby::getInstance()->push();
         }
         else if (!UserConfigParams::m_no_start_screen)
         {

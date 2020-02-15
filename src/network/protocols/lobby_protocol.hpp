@@ -149,6 +149,8 @@ protected:
     // ------------------------------------------------------------------------
     void addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
                             int live_join_util_ticks) const;
+    // ------------------------------------------------------------------------
+    void exitGameState();
 public:
 
     /** Creates either a client or server lobby protocol as a singleton. */

@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
+#include "guiengine/engine.hpp"
 #include "network/crypto.hpp"
 #include "network/event.hpp"
 #include "network/network.hpp"
@@ -356,7 +357,8 @@ void ConnectToServer::update(int ticks)
         {
             // Make sure lobby display the quick play server name
             assert(m_server);
-            NetworkingLobby::getInstance()->setJoinedServer(m_server);
+            if (!GUIEngine::isNoGraphics())
+                NetworkingLobby::getInstance()->setJoinedServer(m_server);
             break;
         }
         case DONE:

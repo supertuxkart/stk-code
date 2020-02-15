@@ -516,31 +516,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 }   // eventCallback
 
 //-----------------------------------------------------------------------------
-/** Sets up the gui to go back to the lobby. Can only be called in case of a
- *  networked game.
- */
-void RaceResultGUI::backToLobby()
-{
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
-        race_manager->getTrackNumber() == race_manager->getNumOfTracks() - 1)
-    {
-        core::stringw msg = _("Network grand prix has been finished.");
-        MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, msg);
-    }
-    race_manager->clearNetworkGrandPrixResult();
-    race_manager->exitRace();
-    race_manager->setAIKartOverride("");
-    GUIEngine::ModalDialog::dismiss();
-    GUIEngine::ScreenKeyboard::dismiss();
-    cleanupGPProgress();
-    if (GUIEngine::getCurrentScreen() != NetworkingLobby::getInstance())
-    {
-        StateManager::get()->resetAndSetStack(
-            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
-    }
-}   // backToLobby
-
-//-----------------------------------------------------------------------------
 void RaceResultGUI::displayCTFResults()
 {
 #ifndef SERVER_ONLY

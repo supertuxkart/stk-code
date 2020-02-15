@@ -53,6 +53,12 @@ void AbstractStateManager::enterGameState()
     assert(!ModalDialog::isADialogActive());
     assert(!ScreenKeyboard::isActive());
 
+    if (GUIEngine::isNoGraphics())
+    {
+        setGameState(GAME);
+        return;
+    }
+
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
     m_menu_stack.emplace_back(RACE_STATE_NAME, (Screen*)NULL);
