@@ -17,6 +17,7 @@
 
 
 #include "config/user_config.hpp"
+#include "guiengine/engine.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 #include "utils/progress_bar_android.hpp"
