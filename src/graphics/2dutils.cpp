@@ -109,7 +109,7 @@ public:
 
 class ColoredTextureRectShader : public TextureShader<ColoredTextureRectShader, 1,
                                                core::vector2df, core::vector2df,
-                                               core::vector2df, core::vector2df>
+                                               core::vector2df, core::vector2df, float>
 {
 public:
     GLuint m_color_vbo;
@@ -119,7 +119,7 @@ public:
     {
         loadProgram(OBJECT, GL_VERTEX_SHADER, "colortexturedquad.vert",
                             GL_FRAGMENT_SHADER, "colortexturedquad.frag");
-        assignUniforms("center", "size", "texcenter", "texsize");
+        assignUniforms("center", "size", "texcenter", "texsize", "rotation");
 
         assignSamplerNames(0, "tex", ST_BILINEAR_FILTERED);
 
@@ -150,7 +150,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
                                float height, float center_pos_x,
                                float center_pos_y, float tex_center_pos_x,
                                float tex_center_pos_y, float tex_width,
-                               float tex_height)
+                               float tex_height, float rotation)
 {
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
     glBindBuffer(GL_ARRAY_BUFFER,
@@ -166,7 +166,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
                       core::vector2df(width, height),
                       core::vector2df(tex_center_pos_x, tex_center_pos_y),
-                      core::vector2df(tex_width, tex_height));
+                      core::vector2df(tex_width, tex_height), rotation);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -524,7 +524,7 @@ void draw2DImage(const video::ITexture* texture,
     {
         drawTexColoredQuad(texture, colors, width, height, center_pos_x,
                            center_pos_y, tex_center_pos_x, tex_center_pos_y,
-                           tex_width, tex_height);
+                           tex_width, tex_height, rotation);
     }
     else
     {
@@ -656,7 +656,7 @@ void draw2DImage(const video::ITexture* texture,
     {
         drawTexColoredQuad(texture, colors, width, height, center_pos_x,
                            center_pos_y, tex_center_pos_x, tex_center_pos_y,
-                           tex_width, tex_height);
+                           tex_width, tex_height, 0.0f/*rotation*/);
     }
     else
     {

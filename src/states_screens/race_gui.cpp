@@ -680,7 +680,25 @@ void RaceGUI::drawGlobalMiniMap()
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                                         m_icons_frame->getSize());
 
-            draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
+            // show kart direction in soccer
+            if (soccer_world)
+            {
+                // Find the direction a kart is moving in
+                btTransform trans = kart->getTrans();
+                Vec3 direction(trans.getBasis().getColumn(2));
+                // Get the rotation to rotate the icon frame
+                float rotation = atan2f(direction.getZ(),direction.getX());
+                if (track->getMinimapInvert())
+                {   // correct the direction due to invert minimap for blue
+                    rotation = rotation + M_PI;
+                }
+                rotation = -1.0f * rotation + 0.25f * M_PI; // icons-frame_arrow.png was rotated by 45 degrees
+                draw2DImage(m_icons_frame, position, rect, NULL, colors, true, false, rotation);
+            }
+            else
+            {
+                draw2DImage(m_icons_frame, position, rect, NULL, colors, true);
+            }
         }   // if isPlayerController
 
         draw2DImage(icon, position, source, NULL, NULL, true);
