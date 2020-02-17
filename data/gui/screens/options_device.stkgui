@@ -53,6 +53,11 @@
 
                          <spacer width="50" height="2%" />
                      </div>
+
+                     <spacer width="2%" height="10" />
+                     
+                     <button id="rename_config" I18N="In the input configuration screen"  text="Rename Configuration"/>
+
                      <spacer width="2%" height="10" />
                      <label id="conflict" proportion="1" text="" word_wrap="true" align="center"/>
                  </div>
