@@ -107,10 +107,19 @@ void OptionsScreenInput::buildDeviceList()
         {
             const int icon = (config->isEnabled() ? 0 : 1);
 
-            // since irrLicht's list widget has the nasty tendency to put the
-            // icons very close to the text, I'm adding spaces to compensate.
-            devices->addItem(internal_name, (core::stringw("   ") + 
-                             _("Keyboard %i", i)).c_str(), icon);
+            //Display the configName instead of default name if it exists
+            if (!config->getConfigName().empty())
+            {
+                // since irrLicht's list widget has the nasty tendency to put the
+                // icons very close to the text, I'm adding spaces to compensate.
+                devices->addItem(internal_name, (core::stringw("   ") + 
+                    config->getConfigName()), icon);
+            }
+            else
+            {
+                devices->addItem(internal_name, (core::stringw("   ") + 
+                                _("Keyboard %i", i)).c_str(), icon);   
+            }
         }
     }
 
@@ -123,15 +132,26 @@ void OptionsScreenInput::buildDeviceList()
         // Don't display the configuration if a matching device is not available
         if (config->isPlugged())
         {
-            // since irrLicht's list widget has the nasty tendency to put the
-            // icons very close to the text, I'm adding spaces to compensate.
-            irr::core::stringw name = ("   " + config->getName()).c_str();
+            irr::core::stringw name;
 
-            if (config->getNumberOfDevices() > 1)
+            //Display the configName instead of default name if it exists
+            if (!config->getConfigName().empty())
             {
-                name += core::stringw(L" (x");
-                name += config->getNumberOfDevices();
-                name += core::stringw(L")");
+                // since irrLicht's list widget has the nasty tendency to put the
+                // icons very close to the text, I'm adding spaces to compensate.
+                name = (core::stringw("   ") + 
+                             config->getConfigName());
+            }
+            else
+            {
+                name = ("   " + config->getName()).c_str();   
+
+                if (config->getNumberOfDevices() > 1)
+                {
+                    name += core::stringw(L" (x");
+                    name += config->getNumberOfDevices();
+                    name += core::stringw(L")");
+                }
             }
 
             std::ostringstream gpname;

@@ -49,8 +49,11 @@ private:
     /** How many devices connected to the system which uses this config? */
     int m_plugged; 
 
-    /** Name of this configuratiom. */
+    /** Internal name of this configuration. */
     std::string m_name;
+
+    /** Name of this configuration (given by the user). */
+    irr::core::stringw m_config_name;
 
 protected:
 
@@ -126,11 +129,11 @@ public:
     }   // getNumberOfAxes
 
     // ------------------------------------------------------------------------
-    /** Sets the name of this device. */
+    /** Sets the internal name of this device. */
     void setName(const std::string &name) { m_name = name; }
 
     // ------------------------------------------------------------------------
-    /** Returns the name for this device configuration. */
+    /** Returns the internal name for this device configuration. */
     const std::string& getName() const { return m_name; };
 
     // ------------------------------------------------------------------------
@@ -156,6 +159,14 @@ public:
     // ------------------------------------------------------------------------
     /** Sets this config to be enabled or disabled. */
     void setEnabled(bool new_value) { m_enabled = new_value; }
+
+    // ------------------------------------------------------------------------
+    /** Sets the name of this device configuration */
+    irr::core::stringw getConfigName() const { return m_config_name;  }
+
+    // ------------------------------------------------------------------------
+    /** Returns the name of this device configuration */
+    void setConfigName( irr::core::stringw config_name ) { m_config_name = config_name; }
 };   // class DeviceConfig
 
 #endif
