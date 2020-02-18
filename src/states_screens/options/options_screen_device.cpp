@@ -641,17 +641,15 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
     }
     else if (name == "rename_config")
     {
-        core::stringw configName = StringUtils::utf8ToWide(m_config->getName());
+        core::stringw instruction =
+            _("Enter new configuration name, leave empty to revert default value.");
         DeviceConfig *the_config = m_config; //Can't give variable m_config directly
 
-        new GeneralTextFieldDialog(configName, [] (const irr::core::stringw& text) {},
+        new GeneralTextFieldDialog(instruction, [] (const irr::core::stringw& text) {},
             [the_config] (GUIEngine::LabelWidget* lw,
                 GUIEngine::TextBoxWidget* tb)->bool
             {
                 core::stringw info = tb->getText();
-                if (info.empty())
-                    return false;
-                
                 the_config->setConfigName(info);
                 input_manager->getDeviceManager()->save();
                 return true;
