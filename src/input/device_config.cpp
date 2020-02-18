@@ -74,7 +74,7 @@ DeviceConfig::DeviceConfig()
     m_name    = "";
     m_enabled = true;
     m_plugged = 0;
-    m_config_name= "";
+    m_config_name= L"";
 }   // DeviceConfig
 
 // ------------------------------------------------------------------------
@@ -295,7 +295,7 @@ void DeviceConfig::save (std::ofstream& stream)
     stream << "enabled=\""
         << (m_enabled ? "true\"" : "false\"") 
         << " configName=\"" 
-        << StringUtils::xmlEncode(StringUtils::utf8ToWide(m_config_name))
+        << StringUtils::xmlEncode(m_config_name)
         << "\">\n ";
 
     for(int n = 0; n < PA_COUNT; n++) // Start at 0?
@@ -317,10 +317,7 @@ bool DeviceConfig::load(const XMLNode *config)
 {
     config->get("name", &m_name);
     config->get("enabled", &m_enabled);
-    
-    irr::core::stringw wide_config_name;
-    config->getAndDecode("configName", &wide_config_name);
-    m_config_name = StringUtils::wideToUtf8(wide_config_name);
+    config->getAndDecode("configName", &m_config_name);
     bool error = false;
     for(unsigned int i=0; i<config->getNumNodes(); i++)
     {

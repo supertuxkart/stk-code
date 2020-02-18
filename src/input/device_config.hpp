@@ -53,7 +53,7 @@ private:
     std::string m_name;
 
     /** Name of this configuration (given by the user). */
-    std::string m_config_name;
+    irr::core::stringw m_config_name;
 
 protected:
 
@@ -162,11 +162,11 @@ public:
 
     // ------------------------------------------------------------------------
     /** Sets the name of this device configuration */
-    std::string getConfigName() const { return m_config_name;  }
+    irr::core::stringw getConfigName() const { return m_config_name;  }
 
     // ------------------------------------------------------------------------
     /** Returns the name of this device configuration */
-    void setConfigName( std::string config_name ) { m_config_name = config_name; }
+    void setConfigName( irr::core::stringw config_name ) { m_config_name = config_name; }
 };   // class DeviceConfig
 
 #endif
