@@ -372,7 +372,8 @@ void World::reset(bool restart)
         }
     }
 
-    Camera::resetAllCameras();
+    if (!GUIEngine::isNoGraphics())
+        Camera::resetAllCameras();
 
     if(race_manager->hasGhostKarts())
         ReplayPlay::get()->reset();
@@ -628,7 +629,8 @@ World::~World()
     race_manager->setTimeTarget(0.0f);
     race_manager->setSpareTireKartNum(0);
 
-    Camera::removeAllCameras();
+    if (!GUIEngine::isNoGraphics())
+        Camera::removeAllCameras();
 
     // In case that the track is not found, Physics was not instantiated,
     // but kill handles this correctly.

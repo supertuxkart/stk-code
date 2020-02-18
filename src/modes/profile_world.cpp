@@ -119,7 +119,8 @@ std::shared_ptr<AbstractKart> ProfileWorld::createKart
 
     // Create a camera for the last kart (since this way more of the
     // karts can be seen.
-    if (index == (int)race_manager->getNumberOfKarts()-1)
+    if (!GUIEngine::isNoGraphics() &&
+        index == (int)race_manager->getNumberOfKarts()-1)
     {
         // The camera keeps track of all cameras and will free them
         Camera::createCamera(new_kart.get(), local_player_id);
