@@ -108,7 +108,7 @@ void OptionsScreenInput::buildDeviceList()
             const int icon = (config->isEnabled() ? 0 : 1);
 
             //Display the configName instead of default name if it exists
-            if (wcslen(config->getConfigName().c_str()) != 0)
+            if (!config->getConfigName().empty())
             {
                 // since irrLicht's list widget has the nasty tendency to put the
                 // icons very close to the text, I'm adding spaces to compensate.
@@ -135,7 +135,7 @@ void OptionsScreenInput::buildDeviceList()
             irr::core::stringw name;
 
             //Display the configName instead of default name if it exists
-            if (wcslen(config->getConfigName().c_str()) != 0)
+            if (!config->getConfigName().empty())
             {
                 // since irrLicht's list widget has the nasty tendency to put the
                 // icons very close to the text, I'm adding spaces to compensate.

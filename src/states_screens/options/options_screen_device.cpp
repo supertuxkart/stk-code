@@ -652,7 +652,7 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
                 if (info.empty())
                     return false;
                 
-                the_config->setConfigName(info.c_str());
+                the_config->setConfigName(info);
                 input_manager->getDeviceManager()->save();
                 return true;
             });
