@@ -20,6 +20,7 @@
 #include "io/file_manager.hpp"
 #include "items/powerup.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/engine.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_model.hpp"
@@ -51,6 +52,9 @@ CaptureTheFlag::CaptureTheFlag() : FreeForAll()
     m_red_flag_mesh = m_blue_flag_mesh = NULL;
     m_scored_sound = NULL;
 #ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
     file_manager->pushTextureSearchPath(
         file_manager->getAsset(FileManager::MODEL,""), "models");
     m_red_flag_mesh = irr_driver->getAnimatedMesh
@@ -70,6 +74,9 @@ CaptureTheFlag::CaptureTheFlag() : FreeForAll()
 CaptureTheFlag::~CaptureTheFlag()
 {
 #ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
     m_red_flag_node->drop();
     m_blue_flag_node->drop();
     irr_driver->dropAllTextures(m_red_flag_mesh);
@@ -87,7 +94,18 @@ void CaptureTheFlag::init()
     const btTransform& orig_red = Track::getCurrentTrack()->getRedFlag();
     const btTransform& orig_blue = Track::getCurrentTrack()->getBlueFlag();
 
+    m_red_flag = std::make_shared<CTFFlag>(FC_RED, orig_red);
+    m_blue_flag = std::make_shared<CTFFlag>(FC_BLUE, orig_blue);
+    if (NetworkConfig::get()->isNetworking())
+    {
+        m_red_flag->rewinderAdd();
+        m_blue_flag->rewinderAdd();
+    }
+
 #ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
     m_red_flag_node = irr_driver->addAnimatedMesh(m_red_flag_mesh, "red_flag");
     m_blue_flag_node = irr_driver->addAnimatedMesh(m_blue_flag_mesh,
         "blue_flag");
@@ -109,17 +127,7 @@ void CaptureTheFlag::init()
         core::dimension2df(1.5f, 1.5f), blue_path, NULL);
     m_blue_flag_indicator->setPosition(Vec3(
         orig_blue(Vec3(0.0f, 2.5f, 0.0f))).toIrrVector());
-#endif
 
-    m_red_flag = std::make_shared<CTFFlag>(FC_RED, orig_red);
-    m_blue_flag = std::make_shared<CTFFlag>(FC_BLUE, orig_blue);
-    if (NetworkConfig::get()->isNetworking())
-    {
-        m_red_flag->rewinderAdd();
-        m_blue_flag->rewinderAdd();
-    }
-
-#ifndef SERVER_ONLY
     m_red_flag->initFlagRenderInfo(m_red_flag_node);
     m_blue_flag->initFlagRenderInfo(m_blue_flag_node);
 #endif
@@ -140,6 +148,9 @@ void CaptureTheFlag::reset(bool restart)
     m_red_flag->resetToBase();
     m_blue_flag->resetToBase();
 #ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
     if (m_red_flag_node)
         m_red_flag->updateFlagGraphics(m_red_flag_node);
     if (m_blue_flag_node)
@@ -416,7 +427,7 @@ void CaptureTheFlag::ctfScored(int kart_id, bool red_team_scored,
     }
 #ifndef SERVER_ONLY
     // Don't set animation and show message if receiving in live join
-    if (isStartPhase())
+    if (isStartPhase() || GUIEngine::isNoGraphics())
         return;
     if (m_race_gui)
         m_race_gui->addMessage(scored_msg, NULL, 3.0f);

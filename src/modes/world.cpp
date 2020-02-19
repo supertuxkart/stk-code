@@ -287,7 +287,7 @@ void World::init()
 //-----------------------------------------------------------------------------
 void World::initTeamArrows(AbstractKart* k)
 {
-    if (!hasTeam())
+    if (!hasTeam() || GUIEngine::isNoGraphics())
         return;
 #ifndef SERVER_ONLY
     //Loading the indicator textures
