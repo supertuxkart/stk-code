@@ -129,7 +129,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_collision_particles  = NULL;
     m_controller           = NULL;
     m_saved_controller     = NULL;
-    m_stars_effect         = NULL;
     m_consumption_per_tick = stk_config->ticks2Time(1) *
                              m_kart_properties->getNitroConsumption();
     m_fire_clicked         = 0;
@@ -341,7 +340,8 @@ void Kart::reset()
                              m_kart_properties->getNitroConsumption();
 
     // Reset star effect in case that it is currently being shown.
-    m_stars_effect->reset();
+    if (m_stars_effect)
+        m_stars_effect->reset();
     m_max_speed->reset();
     m_powerup->reset();
 
@@ -1311,7 +1311,8 @@ void Kart::decreaseShieldTime()
  */
 void Kart::showStarEffect(float t)
 {
-    m_stars_effect->showFor(t);
+    if (m_stars_effect)
+        m_stars_effect->showFor(t);
 }   // showStarEffect
 
 //-----------------------------------------------------------------------------
@@ -3014,7 +3015,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
         new KartGFX(this, Track::getCurrentTrack()->getIsDuringDay()));
     m_skidding.reset(new Skidding(this));
     // Create the stars effect
-    m_stars_effect.reset(new Stars(this));
+    if (!GUIEngine::isNoGraphics())
+        m_stars_effect.reset(new Stars(this));
 
 }   // loadData
 
@@ -3233,13 +3235,16 @@ void Kart::updateGraphics(float dt)
 
     // update star effect (call will do nothing if stars are not activated)
     // Remove it if no invulnerability
-    if (!isInvulnerable() && m_stars_effect->isEnabled())
+    if (m_stars_effect)
     {
-        m_stars_effect->reset();
-        m_stars_effect->update(1);
+        if (!isInvulnerable() && m_stars_effect->isEnabled())
+        {
+            m_stars_effect->reset();
+            m_stars_effect->update(1);
+        }
+        else
+            m_stars_effect->update(dt);
     }
-    else
-        m_stars_effect->update(dt);
 
     // Update particle effects (creation rate, and emitter size
     // depending on speed)

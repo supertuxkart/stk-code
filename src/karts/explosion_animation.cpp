@@ -288,7 +288,7 @@ void ExplosionAnimation::update(int ticks)
 // ----------------------------------------------------------------------------
 void ExplosionAnimation::updateGraphics(float dt)
 {
-    if (!m_kart->getStarsEffect()->isEnabled())
+    if (m_kart->getStarsEffect() && !m_kart->getStarsEffect()->isEnabled())
     {
         // Set graphical effects for invulnerable time in updateGraphics
         // to avoid issue with rewind
