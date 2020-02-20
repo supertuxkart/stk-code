@@ -968,6 +968,23 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(0, "minimap_display",
                       "Minimap: 0 bottom-left, 1 middle-right, 2 hidden, 3 center"));
 
+    // ---- Radar
+    PARAM_PREFIX GroupUserConfigParam        m_radar
+            PARAM_DEFAULT( GroupUserConfigParam("radar_display",
+                                                "Radar settings") );
+
+    PARAM_PREFIX BoolUserConfigParam         m_radar_enabled
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable",  &m_radar,
+                      "Enable radar (show target in ctf and soccer modes)"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_radar_offset_y
+        PARAM_DEFAULT(FloatUserConfigParam(0.25f, "offset",  &m_radar,
+                      "Radar offset above a the kart"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_radar_size
+        PARAM_DEFAULT(FloatUserConfigParam(0.5f, "size",  &m_radar,
+                      "Radar size (default: 1.0)"));
+
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap
             PARAM_DEFAULT( GroupUserConfigParam("Handicap",

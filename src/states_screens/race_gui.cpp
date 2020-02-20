@@ -40,6 +40,7 @@ using namespace irr;
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -381,6 +382,11 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
+
+    // Radar (experimental)
+    if (UserConfigParams::m_radar_enabled) 
+        RaceGUI::drawRadar(kart);
+    
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
@@ -518,19 +524,604 @@ void RaceGUI::drawLiveDifference()
 }   // drawLiveDifference
 
 //-----------------------------------------------------------------------------
-/** Draws the mini map and the position of all karts on it.
+/** Draws extra infos
  */
+
+
+#define DISTANCE(a, b)  float((a-b).length())
+
+#define TRIANGLE_AREA(e1, e2, e3) std::abs( \
+    e1.getX() * (e3.getZ() - e2.getZ()) + \
+    e2.getX() * (e1.getZ() - e3.getZ()) + \
+    e3.getX() * (e2.getZ() - e1.getZ()))
+
+typedef struct {
+  float angle;
+  int type;
+  video::SColor arrow_color;
+  float distance;
+  int angle_deg_max;  // angle of part to highlight on circle
+  video::SColor angle_deg_color;
+  float angle_deg;  // angle of part to highlight on circle
+} RadarArrow;
+
+//-----------------------------------------------------------------------------
+/** Draws the radar to represent targets in the current mode
+*/
+void RaceGUI::drawRadar(const AbstractKart* target_kart)
+{
+#ifndef SERVER_ONLY
+    if (target_kart == NULL  || target_kart->hasFinishedRace()) return;
+    World* world = World::getWorld();
+    if (world->isGoalPhase()) return ;
+    CaptureTheFlag *ctf_world = dynamic_cast<CaptureTheFlag*>(world);
+    SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*>(world);
+    World::KartList karts = world->getKarts();
+
+    std::vector<RadarArrow> radar_arrows;
+
+    Vec3 tx;
+    Vec3 ty;
+    Vec3 th;
+    Vec3 r1;
+    Vec3 r2;
+    Vec3 p;
+    Vec3 d;
+    Vec3 to_target;
+
+#define DRAWLINE(a, b, color) draw3DLine( a.toIrrVector(), b.toIrrVector(), color);
+
+#define SETPLAN(h) \
+    p = Vec3(-(h.getZ()), h.getY(), h.getX()).normalize();
+
+#define DRAWCIRCLE(size, color, definition){ \
+    ty = Vec3(0, size, 0); \
+    r2 = radar_circle_pos + ty; \
+    for (int i=0; i<definition; i++) { \
+      ty = ty.rotate(cam_direction, (360/definition) * DEGREE_TO_RAD); \
+      r1 = radar_circle_pos + ty; \
+      DRAWLINE(r1, r2, color); \
+      r2 = r1; \
+    } \
+}
+
+#define DRAWCENTEREDSEMIARROW(size, color, angle){ \
+    ty = Vec3(0, size, 0).rotate(cam_direction, angle * DEGREE_TO_RAD); \
+    r2 = radar_circle_pos + ty; \
+    tx = ty.rotate(cam_direction, 140 * DEGREE_TO_RAD); \
+    ty = ty.rotate(cam_direction, -140 * DEGREE_TO_RAD); \
+    r1 = radar_circle_pos + tx; \
+    DRAWLINE(r1, r2, color); \
+    ty = radar_circle_pos + ty; \
+    DRAWLINE(ty, r2, color); \
+}
+
+#define DRAWCENTEREDARROW(size, color, angle){ \
+    DRAWCENTEREDSEMIARROW(size, color, angle); \
+    DRAWLINE(r1, radar_circle_pos, color); \
+    DRAWLINE(ty, radar_circle_pos, color); \
+}
+
+#define DRAWCENTEREDARROW2(size, color, angle)\
+  DRAWCENTEREDARROW(size, color, angle); \
+  DRAWCENTEREDSEMIARROW(size + 0.01, color, angle);
+
+#define DRAWCIRCLE2(size, color, definition) \
+  DRAWCIRCLE(size, color, definition); \
+  DRAWCIRCLE(size + 0.01, color, definition);
+
+#define DRAWCIRCLE3(size, color, definition) \
+  DRAWCIRCLE(size, color, definition); \
+  DRAWCIRCLE(size + 0.01, color, definition); \
+  DRAWCIRCLE(size + 0.02, color, definition);
+
+
+#define DRAWSQUARE(a, color, rect_size) \
+    tx = p * rect_size; \
+    ty = Vec3(0, rect_size, 0); \
+    r1 = a-tx+ty; \
+    r2 = a+tx+ty; \
+    DRAWLINE(r1, r2, color); \
+    th = a-tx-ty; \
+    DRAWLINE(r1, th, color); \
+    tx = a+tx-ty; \
+    DRAWLINE(r2, tx, color); \
+    DRAWLINE(tx, th, color);
+
+    // Get the point 2 objects will meet
+    // a + >a * t = b + >b * t
+    // t = (a - b) / (>b - >a)
+#define CROSSPOINT(a, va, b, vb) a + va * ((a-b).length() / (vb-va).length());
+
+    float angle;
+    float deg_angle = 0;
+#define GETANGLE(a,b) \
+    angle = atan2f((a.getX()*b.getZ()-b.getX()*a.getZ()),(a.getX()*b.getX())+(a.getZ()*b.getZ())); \
+    deg_angle = 360.0f+(angle*RAD_TO_DEGREE);
+
+
+    Vec3 kart_velocity;
+    Vec3 cur_kart_velocity = target_kart->getBody()->getLinearVelocity();
+    Vec3 cur_kart_pos = target_kart->getSmoothedXYZ();
+    Vec3 cur_kart_axis = quatRotate(target_kart->getVisualRotation(), Vec3(0,0,1));
+    Vec3 cur_kart_front_pos = cur_kart_pos + cur_kart_axis;
+
+    const bool backwards = (target_kart->getControls()).getLookBack();
+    btTransform trans = target_kart->getTrans();
+    // get heading=trans.getBasis*(0,0,1) ... so save the multiplication:
+    Vec3 direction(trans.getBasis().getColumn(2));
+    direction = direction.normalize();
+    Vec3  v = backwards ? -direction : direction;
+
+    Camera* cam = Camera::getActiveCamera();
+    Vec3 cam_direction = (cur_kart_pos - cam->getXYZ()).normalize();
+
+    Vec3 radar_offset = Vec3(0, UserConfigParams::m_radar_offset_y, 0);
+    float radar_circle_size = UserConfigParams::m_radar_size;
+    float radar_incircle_max_size = UserConfigParams::m_radar_size*0.5f;
+    float radar_incircle_high_size = UserConfigParams::m_radar_size*0.75f;
+    float radar_incircle_mid_size = UserConfigParams::m_radar_size*0.85f;
+    float radar_incircle_low_size = UserConfigParams::m_radar_size*0.90f;
+    float radar_incircle_zero_size = UserConfigParams::m_radar_size*0.96f;
+    Vec3 radar_circle_pos=cur_kart_pos + radar_offset;
+
+    Vec3 kart_pos ;
+    float tick_angle;
+    float distance = 0;
+
+    Vec3 cur_kart_pos1 = cur_kart_pos + cur_kart_velocity/4;
+    if (cur_kart_velocity.length() > 1){
+      GETANGLE(v, cur_kart_velocity);
+      if (backwards) angle = -angle;
+    } else {
+      angle = 0;
+    }
+    tick_angle = angle * 1.5;
+    ty = cur_kart_velocity.rotate(cam_direction, tick_angle); \
+    Vec3 cur_kart_pos2 = cur_kart_pos1 + ty/4;
+    tick_angle = angle * 2;
+    ty = cur_kart_velocity.rotate(cam_direction, tick_angle); \
+    Vec3 cur_kart_pos3 = cur_kart_pos2 + ty/2;
+    tick_angle = angle * 3;
+    ty = cur_kart_velocity.rotate(cam_direction, tick_angle); \
+    Vec3 cur_kart_pos4 = cur_kart_pos3 + ty;
+    tick_angle = angle * 4;
+    ty = cur_kart_velocity.rotate(cam_direction, tick_angle); \
+    Vec3 cur_kart_pos5 = cur_kart_pos4 + ty;
+
+    video::SColor blue_color = video::SColor(255, 0, 0, 200);
+    video::SColor red_color = video::SColor(255, 200, 0, 0);
+    video::SColor ok_color = video::SColor(255, 0, 255, 0);
+    video::SColor kart_line_color = video::SColor(220, 73, 73, 0);
+    video::SColor target_align_color = video::SColor(255, 0, 255, 0);
+    video::SColor kart_tunnel_color = video::SColor(220, 109, 109, 109);
+    video::SColor radar_arrow_color = video::SColor(255,0,0,0);
+    video::SColor radar_circle_color = video::SColor(220,255,255,255);
+    video::SColor radar_circle_color_muted = video::SColor(180,255,255,255);
+    video::SColor radar_highlight_color = video::SColor(240,255,255,255);
+    video::SColor radar_pointer_color = video::SColor(255,255,255,255);
+    video::SColor radar_inside_color = video::SColor(220, 73, 73, 73);
+    video::SColor radar_inside_color2 = radar_inside_color;
+    video::SColor color = radar_inside_color;
+
+    KartTeam cur_team = world->getKartTeam(target_kart->getWorldKartId());
+    KartTeam other_team = (cur_team == KART_TEAM_BLUE ? KART_TEAM_RED: KART_TEAM_BLUE);
+
+#define TOLOG(a) ((std::log10(a+1) / 2) - 0.2)
+#define DISTANCELOG(a,b) (TOLOG(DISTANCE(a, b)))
+
+    Vec3 delta_pos;
+    float powerup_speed=25.0f;
+    float bowling_speed;
+    float slowingdown;
+    // evaluate the crosspoint of the target with the ball
+    //  speed factor of the ball is smoothed between 1 and 4
+    //  given the distance
+#define BOWLING_CHECK(a, va, max_distance) \
+      if (powerup_type == PowerupManager::POWERUP_BOWLING){ \
+        distance = DISTANCE(a, cur_kart_pos); \
+        if (distance < max_distance){ \
+        /* check future alignement from kart to target */ \
+        slowingdown = ( 1 - std::pow(0.8f, (int) (distance/10)) ); \
+        ty = va * slowingdown; \
+        bowling_speed = cur_kart_velocity.length() + (powerup_speed * 4.0f * slowingdown); \
+        tx = cur_kart_velocity.normalize() * bowling_speed; \
+        delta_pos = CROSSPOINT(a, ty, cur_kart_pos, tx); \
+        distance = TRIANGLE_AREA(delta_pos, cur_kart_pos, cur_kart_front_pos)*50; \
+        if (distance < 255) { \
+          d = a - cur_kart_pos; \
+          SETPLAN(d); \
+          if (distance < 10) { \
+            radar_inside_color = target_align_color; \
+            DRAWSQUARE(a, radar_inside_color, 1.0f); \
+          } \
+          else \
+          { \
+            radar_inside_color = COMPUTE_RADAR_COLOR(distance); \
+          } \
+          DRAWSQUARE( a, radar_inside_color, 0.55f); \
+          DRAWSQUARE( a, radar_inside_color, 0.5f); \
+          DRAWSQUARE( delta_pos, radar_pointer_color, 0.25f); \
+        } \
+      } \
+    }
+
+#define COMPUTE_RADAR_COLOR(distance) \
+      video::SColor(220, 255-distance, 120+(distance/2), distance);
+
+    // draw a vector representing the axis of the kart
+    r1 = (cur_kart_front_pos + cur_kart_axis);
+    DRAWLINE( cur_kart_front_pos, r1, kart_line_color);
+
+    /* draw player kart trajectory */
+    DRAWLINE( cur_kart_pos1, cur_kart_pos2, kart_line_color);
+    DRAWLINE( cur_kart_pos2, cur_kart_pos3, kart_line_color);
+    DRAWLINE( cur_kart_pos3, cur_kart_pos4, kart_line_color);
+    DRAWLINE( cur_kart_pos4, cur_kart_pos5, kart_line_color);
+    SETPLAN(v);
+    DRAWSQUARE( cur_kart_pos1, kart_tunnel_color, 0.05f);
+    DRAWSQUARE( cur_kart_pos2, kart_tunnel_color, 0.05f);
+    DRAWSQUARE( cur_kart_pos3, kart_tunnel_color, 0.05f);
+    DRAWSQUARE( cur_kart_pos4, kart_tunnel_color, 0.05f);
+    DRAWSQUARE( cur_kart_pos5, kart_tunnel_color, 0.05f);
+
+    PowerupManager::PowerupType powerup_type = PowerupManager::POWERUP_NOTHING;
+    if (target_kart->getNumPowerup() > 0){
+      const Powerup* powerup = target_kart->getPowerup();
+      powerup_type = powerup->getType();
+      /* how to get powerup_speed here ? */
+    }
+
+    Vec3 ball_pos1;
+    if (soccer_world){
+      video::SColor ball_line_color = video::SColor(240, 0, 255, 0);
+      video::SColor ball_line_color2 = video::SColor(150, 0, 255, 0);
+      video::SColor ball_tunnel_color = video::SColor(220, 0, 0, 0);
+
+      Vec3 ball_pos = soccer_world->getBallPosition();
+      Vec3 ball_pos_delta = ball_pos;
+      float ball_radius = (soccer_world->getBallDiameter()*0.9/2);
+
+      to_target = ball_pos - kart_pos;
+
+      ball_pos1 = ball_pos;
+      Vec3 ball_pos2 = ball_pos;
+      Vec3 ball_pos3 = ball_pos;
+      Vec3 ball_pos4 = ball_pos;
+      Vec3 linear_velocity = Vec3(0, 0, 0);
+
+      color=radar_circle_color;
+      if (!soccer_world->ballNotMoving()){
+         /* draw ball trajectory */
+         linear_velocity = soccer_world->getBallLinearVelocity();
+         ball_pos_delta = CROSSPOINT(ball_pos, linear_velocity, cur_kart_pos, cur_kart_velocity);
+
+         ball_pos1 = ball_pos + linear_velocity/4;
+         ball_pos2 = ball_pos + linear_velocity/2;
+         ball_pos3 = ball_pos + linear_velocity;
+         ball_pos4 = ball_pos + linear_velocity*2;
+         SETPLAN(linear_velocity);
+         DRAWSQUARE(ball_pos1, ball_tunnel_color, 0.25f);
+         DRAWSQUARE(ball_pos2, ball_tunnel_color, 0.25f);
+         DRAWSQUARE(ball_pos3, ball_tunnel_color, 0.25f);
+         DRAWSQUARE(ball_pos4, ball_tunnel_color, 0.25f);
+         DRAWLINE( ball_pos, ball_pos4, ball_line_color);
+         tx = ball_pos - (p.normalize() * ball_radius) ;
+         ty = ball_pos4 - (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos - (p.normalize() * ball_radius) ;
+         ty = ball_pos + (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos4 - (p.normalize() * ball_radius) ;
+         ty = ball_pos4 + (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos1 - (p.normalize() * ball_radius) ;
+         ty = ball_pos1 + (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos2 - (p.normalize() * ball_radius) ;
+         ty = ball_pos2 + (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos3 - (p.normalize() * ball_radius) ;
+         ty = ball_pos3 + (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos - (p.normalize() * ball_radius) ;
+         ty = ball_pos4 - (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos + (p.normalize() * ball_radius) ;
+         ty = ball_pos4 +(p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+         tx = ball_pos + (p.normalize() * ball_radius) ;
+         ty = ball_pos4 + (p.normalize() * ball_radius) ;
+         DRAWLINE( tx, ty, ball_line_color2);
+
+      }
+      DRAWCIRCLE(TOLOG(5)/2, radar_circle_color_muted, 36); 
+      DRAWCIRCLE(0.25, radar_circle_color_muted, 36); 
+      distance = DISTANCELOG(ball_pos, cur_kart_pos);
+      if (distance < 0.5) tx = (ball_pos_delta-cur_kart_pos).normalize();
+      else tx = (ball_pos - cur_kart_pos).normalize();
+      distance = distance/2;
+      GETANGLE(v, tx); 
+      DRAWCENTEREDARROW2(distance, color, deg_angle); 
+
+      Vec3 ball_aim_pos = soccer_world->getBallAimPosition(other_team, backwards);
+      ball_aim_pos = ball_pos + ((ball_aim_pos-ball_pos).normalize() * (ball_radius));
+      SETPLAN(linear_velocity);
+      DRAWSQUARE(ball_aim_pos, ok_color, 0.1f);
+      DRAWLINE(ball_aim_pos, ball_pos, ok_color);
+
+      /* draw ball a rectangle representing the shock if the kart touch the ball */
+      distance = DISTANCE(linear_velocity, cur_kart_velocity)/100 + 0.1f;
+      DRAWSQUARE(ball_pos, ball_line_color, 0.1f); 
+      DRAWSQUARE(ball_pos, ball_line_color, distance); 
+
+
+      Vec3 cur_kart_front_pos_delta;
+
+      /* check future alignement from kart to ball */
+      /* with color tips for alignement (blue = cold, red=hot, green=perfect)*/
+      distance = TRIANGLE_AREA(ball_pos_delta, cur_kart_pos, cur_kart_front_pos)*40;
+      if (distance > 255)  distance=255;
+      radar_inside_color2 = COMPUTE_RADAR_COLOR(distance);
+      d = ball_pos_delta - cur_kart_pos;
+      SETPLAN(d);
+      if (distance < 50) {
+        DRAWSQUARE(ball_pos_delta, radar_inside_color2, 0.2f);
+      }
+      /* check current alignement from kart to ball */
+      distance = TRIANGLE_AREA(ball_pos, cur_kart_pos, cur_kart_front_pos);
+      if (distance < 0.015f)
+      {
+        radar_inside_color = target_align_color;
+        SETPLAN(to_target);
+        DRAWSQUARE( ball_pos, radar_inside_color, 0.2f);
+      } else {
+        radar_inside_color = radar_inside_color2;
+      }
+
+      BOWLING_CHECK(ball_pos, linear_velocity, 300.0f);
+
+      tx = (ball_pos-cur_kart_pos).normalize();
+      GETANGLE(v, tx); 
+      distance = DISTANCELOG(cur_kart_pos1, ball_pos1); 
+      radar_arrows.push_back({angle, 1, radar_arrow_color, distance, 10, radar_highlight_color, deg_angle});
+
+    } /* end soccer case */
+    else if (ctf_world)
+    {
+        Vec3 base_pos;
+        bool is_flag_in_base=true;
+        bool is_red_holder=false;
+        bool is_blue_holder=false;
+
+        DRAWCIRCLE(TOLOG(5)/2, radar_circle_color_muted, 36); 
+        DRAWCIRCLE(0.25, radar_circle_color_muted, 36); 
+
+        /* if the flag is hold draw an arrow to the base */
+        if (cur_team == KART_TEAM_BLUE && (ctf_world->getRedHolder()  != -1)){
+          base_pos = ctf_world->getBlueFlag();
+          is_red_holder=true;
+          is_flag_in_base = ctf_world->isBlueFlagInBase();
+        }
+        if (cur_team == KART_TEAM_RED && (ctf_world->getBlueHolder()  != -1)){
+          base_pos = ctf_world->getRedFlag();
+          is_blue_holder=true;
+          is_flag_in_base = ctf_world->isRedFlagInBase();
+        }
+        if ((is_blue_holder || is_red_holder) && is_flag_in_base) {
+          distance = DISTANCELOG(cur_kart_pos, base_pos);
+          tx = (base_pos-cur_kart_pos).normalize();
+          GETANGLE(v, tx); 
+          radar_arrows.push_back({angle, 1, radar_arrow_color, distance, 10, radar_highlight_color, deg_angle});
+        }
+        /* draw an arrow to find the flag you need to get */
+        if (cur_team == KART_TEAM_BLUE ? !is_red_holder : !is_flag_in_base)
+        {
+          Vec3 red_flag_pos = ctf_world->getRedFlag();
+          distance = DISTANCELOG(cur_kart_pos, red_flag_pos);
+          tx = (red_flag_pos-cur_kart_pos).normalize();
+          GETANGLE(v, tx); 
+          radar_arrows.push_back({angle, 1, red_color, distance, 10, red_color, deg_angle});
+        }
+        if (cur_team == KART_TEAM_RED ? !is_blue_holder : !is_flag_in_base)
+        {
+          Vec3 blue_flag_pos =  ctf_world->getBlueFlag();
+          distance = DISTANCELOG(cur_kart_pos, blue_flag_pos);
+          tx = (blue_flag_pos-cur_kart_pos).normalize();
+          GETANGLE(v, tx); 
+          radar_arrows.push_back({angle, 1, blue_color, distance, 10, blue_color, deg_angle});
+        }
+        distance = distance/2;
+        DRAWCENTEREDARROW2(distance, radar_circle_color, deg_angle); 
+    } /* end ctf case */
+
+    bool has_teams = (ctf_world || soccer_world);
+    KartTeam team = KART_TEAM_NONE;
+    btTransform trans_projectile = target_kart->getTrans();
+
+    float minDistSquared = 999999.9f;
+    float minDistance = 999999.9f;
+    Vec3 minKart_pos = Vec3(0,0,0);
+    const AbstractKart *minKart = NULL;
+    bool in_front = false;
+    for (unsigned int i = 0; i < karts.size(); i++)
+    {
+      const AbstractKart *kart = karts[i].get();
+      if (kart == target_kart || kart -> isEliminated() || !kart->isVisible() || kart->getKartAnimation())
+        continue;
+      Vec3 kart_pos = kart->getSmoothedXYZ();
+      kart_velocity = kart->getBody()->getLinearVelocity();
+      Vec3 kart_pos1 = kart_pos + kart_velocity / 4;
+      if (has_teams) team = world->getKartTeam(kart->getWorldKartId());
+      distance = DISTANCE(cur_kart_pos1, kart_pos1);
+
+      to_target  = kart_pos - cur_kart_pos;
+      // Originally it used angle = to_target.angle( backwards ? -direction : direction );
+      // but sometimes due to rounding errors we get an acos(x) with x>1, causing
+      // an assertion failure. So we remove the whole acos() test here and copy the
+      // code from to_target.angle(...)
+      in_front = ((to_target.dot(v)/sqrt(v.length2() * to_target.length2()))>=0.54);
+
+      if (!kart->isInvulnerable() && !(has_teams && cur_team == team) && (distance <= 50) && in_front){
+
+        btTransform t=kart->getTrans();
+
+        Vec3 delta      = t.getOrigin()-trans_projectile.getOrigin();
+        float distance2 = delta.length2() + std::abs(t.getOrigin().getY()
+            - trans_projectile.getOrigin().getY())*2;
+
+        // Original test was: fabsf(acos(c))>1,  which is the same as
+        // c<cos(1) (acos returns values in [0, pi] anyway)
+        if(distance2 < minDistSquared)
+        {
+            minDistance = distance;
+            minKart  = kart;
+            minKart_pos  = kart_pos;
+        }
+      }
+
+      if (soccer_world) {
+        /* draw a cursor to represent each kart on the way to touch the ball */ 
+        distance = DISTANCE(kart_pos1, ball_pos1);
+        if (distance <= 25.0f) {
+          if (team == KART_TEAM_RED) color=video::SColor(200, 255-distance,distance, distance);
+          else if (team == KART_TEAM_BLUE)  color=video::SColor(200, distance,distance, 255-distance);
+          distance = DISTANCELOG(cur_kart_pos, kart_pos);
+          tx = (kart_pos1-cur_kart_pos).normalize();
+          GETANGLE(v, tx);
+          radar_arrows.push_back({angle, 0, color, distance, 0, color, deg_angle});
+        }
+      } else {
+        /* draw a cursor to represent each kart on the way to hit your kart */ 
+        if (distance <= 25.0f || race_manager->isBattleMode()) {
+          distance = TOLOG(distance);
+          tx = (kart_pos1-cur_kart_pos).normalize();
+          GETANGLE(v, tx);
+          color = kart->getKartProperties()->getColor();
+          radar_arrows.push_back({angle, 1, color, distance, 5, color, deg_angle});
+        }
+        BOWLING_CHECK(kart_pos, kart_velocity, 100.0f);
+      }
+    }
+    if (minKart) {
+      if (!soccer_world) {
+        distance = minDistance;
+        if (distance > 255)  distance=255;
+        radar_inside_color = COMPUTE_RADAR_COLOR(distance);
+        distance = TOLOG(minDistance)/2;
+        tx = (minKart_pos - cur_kart_pos).normalize();
+        GETANGLE(v, tx);
+        DRAWCENTEREDARROW2(distance, radar_circle_color, deg_angle); 
+      }
+      if (powerup_type == PowerupManager::POWERUP_CAKE && minDistance <= 25.0f){
+        to_target = minKart_pos - cur_kart_pos;
+        SETPLAN(to_target);
+        DRAWSQUARE(minKart_pos, radar_pointer_color, 0.4f);
+        DRAWSQUARE(minKart_pos, radar_pointer_color, 0.5f);
+      }
+    }
+
+#define DRAWTICKAROUNDRADAR(angle, color, p1, p2) \
+    ty = Vec3(0, 1, 0); \
+    ty = ty.rotate(cam_direction, angle); \
+    r1 = radar_circle_pos + (ty*p1); \
+    r2 = radar_circle_pos + (ty*p2); \
+    DRAWLINE(r1, r2, color);
+
+#define DRAW_RADAR_ARROW(angle, angletri, color, p1, p2, d) \
+    ty = Vec3(0, 1, 0); \
+    r1 = ty.rotate(cam_direction, angle); \
+    tx = radar_circle_pos + (r1*(p1+d)); \
+    th = radar_circle_pos + (r1*p2); \
+    DRAWLINE(tx, th, color);\
+    r1 = radar_circle_pos + (r1*p1); \
+    r2 = (tx - r1) ; \
+    angle-=angletri;\
+    r1 = ty.rotate(cam_direction, angle); \
+    tx = radar_circle_pos + (r1*p1); \
+    DRAWLINE(tx, th, color); \
+    angle+=2*angletri;\
+    r1 = ty.rotate(cam_direction, angle); \
+    ty = radar_circle_pos + (r1*p1); \
+    DRAWLINE(ty, th, color);\
+    DRAWLINE(ty, tx, color);\
+    r1 = ty + r2;\
+    r2 = tx + r2;\
+    DRAWLINE(r1, r2, color);
+
+    int nb_arrows = (int)radar_arrows.size();
+
+    float size;
+    bool ortho;
+    // DRAW RADAR
+    for (int i=0;i<36;i++)
+    {
+      ortho = false;
+      if (i % 9 == 0) {
+        color = radar_inside_color;
+        size = radar_incircle_high_size;
+        ortho = true;
+      } else if (i % 3 == 0) {
+        color = radar_inside_color;
+        size = radar_incircle_mid_size;
+        ortho = true;
+      } else {
+        size = radar_incircle_zero_size;
+      }
+      for (int n=0; n<nb_arrows ; n++) {
+        if (radar_arrows[n].angle_deg != 0) {
+          distance = radar_arrows[n].angle_deg-(i*10);
+          if (distance<0) distance+=360;
+          distance = (distance > 360) ? (distance - 360): (distance > 180 ? 360 - distance: distance);
+
+          if (distance < radar_arrows[n].angle_deg_max) {
+            if (ortho) {
+              color = radar_arrows[n].angle_deg_color;    
+              size = radar_incircle_max_size;
+            }
+            break;
+          }
+        }
+      }
+      tick_angle = i * 10 * DEGREE_TO_RAD;
+      DRAWTICKAROUNDRADAR(tick_angle, color, radar_circle_size, size);
+
+
+      if (i>0) DRAWLINE(th, r1, radar_inside_color)
+      else tx = r1; 
+      th = r1;
+    }
+    DRAWLINE(th, tx, radar_inside_color);
+    DRAWLINE(th, r1, radar_inside_color);
+
+    angle=4*DEGREE_TO_RAD;
+    float angle2=1.5*DEGREE_TO_RAD;
+
+    for (int n=0; n<nb_arrows ; n++) {
+      if (radar_arrows[n].type == 1) {
+        DRAW_RADAR_ARROW(radar_arrows[n].angle, angle, radar_arrows[n].arrow_color, radar_incircle_low_size, radar_circle_size, radar_arrows[n].distance);
+      } else if (radar_arrows[n].type == 0){
+        DRAW_RADAR_ARROW(radar_arrows[n].angle, angle2, radar_arrows[n].arrow_color, radar_incircle_low_size, radar_incircle_zero_size, radar_arrows[n].distance);
+      }
+    }
+
+#endif
+} // drawRadar
+
+//-----------------------------------------------------------------------------
+/** Draws the mini map and the position of all karts on it.
+*/
 void RaceGUI::drawGlobalMiniMap()
 {
 #ifndef SERVER_ONLY
     //TODO : exception for some game modes ? Another option "Hidden in race, shown in battle ?"
     if (UserConfigParams::m_minimap_display == 2) /*map hidden*/
         return;
-    
+
     if (m_multitouch_gui != NULL && !m_multitouch_gui->isSpectatorMode())
     {
         float max_scale = 1.3f;
-                                                      
+
         if (UserConfigParams::m_multitouch_scale > max_scale)
             return;
     }

@@ -129,6 +129,7 @@ private:
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
                                 int meter_height, float dt);
+    void drawRadar             (const AbstractKart *kart);
 
     /* Helper functions for drawing meters */
 
