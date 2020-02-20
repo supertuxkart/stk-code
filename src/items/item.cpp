@@ -23,6 +23,7 @@
 #include "graphics/lod_node.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
+#include "guiengine/engine.hpp"
 #include "items/item_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
@@ -201,28 +202,34 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     initItem(type, xyz, normal);
     m_graphical_type    = getGrahpicalType();
 
-    LODNode* lodnode =
-        new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
-                    irr_driver->getSceneManager());
-    scene::ISceneNode* meshnode =
-        irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
-
-    if (lowres_mesh != NULL)
+    m_node = NULL;
+    if (!GUIEngine::isNoGraphics())
     {
-        lodnode->add(35, meshnode, true);
+        LODNode* lodnode =
+            new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),
+            irr_driver->getSceneManager());
         scene::ISceneNode* meshnode =
-            irr_driver->addMesh(lowres_mesh,
-                                StringUtils::insertValues("item_lo_%i", (int)type));
-        lodnode->add(100, meshnode, true);
+            irr_driver->addMesh(mesh, StringUtils::insertValues("item_%i", (int)type));
+
+        if (lowres_mesh != NULL)
+        {
+            lodnode->add(35, meshnode, true);
+            scene::ISceneNode* meshnode =
+                irr_driver->addMesh(lowres_mesh,
+                StringUtils::insertValues("item_lo_%i", (int)type));
+            lodnode->add(100, meshnode, true);
+        }
+        else
+        {
+            lodnode->add(100, meshnode, true);
+        }
+        m_node = lodnode;
     }
-    else
-    {
-        lodnode->add(100, meshnode, true);
-    }
-    m_node              = lodnode;
     setType(type);
     handleNewMesh(getGrahpicalType());
 
+    if (!m_node)
+        return;
 #ifdef DEBUG
     std::string debug_name("item: ");
     debug_name += getType();
