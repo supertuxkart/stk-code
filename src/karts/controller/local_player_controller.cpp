@@ -103,7 +103,8 @@ void LocalPlayerController::initParticleEmitter()
     m_sky_particles_emitter = nullptr;
     Track *track = Track::getCurrentTrack();
 #ifndef SERVER_ONLY
-    if (UserConfigParams::m_particles_effects > 1 &&
+    if (!GUIEngine::isNoGraphics() &&
+        UserConfigParams::m_particles_effects > 1 &&
         track->getSkyParticles() != NULL)
     {
         track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);

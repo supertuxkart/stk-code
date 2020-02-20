@@ -27,6 +27,7 @@
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
+#include "guiengine/engine.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -61,6 +62,9 @@ Attachment::Attachment(AbstractKart* kart)
     m_initial_speed        = 0;
     m_graphical_type       = ATTACH_NOTHING;
     m_scaling_end_ticks    = -1;
+    m_node = NULL;
+    if (GUIEngine::isNoGraphics())
+        return;
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     if (kart->isGhostKart())

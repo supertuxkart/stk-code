@@ -177,6 +177,8 @@ void ThreeStrikesBattle::reset(bool restart)
  */
 void ThreeStrikesBattle::kartAdded(AbstractKart* kart, scene::ISceneNode* node)
 {
+    if (!node)
+        return;
     if (kart->getType() == RaceManager::KartType::KT_SPARE_TIRE)
     {
         // Add heart billboard above it

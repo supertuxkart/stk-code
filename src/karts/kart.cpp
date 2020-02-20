@@ -216,14 +216,7 @@ void Kart::init(RaceManager::KartType type)
         Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!");
     }
 
-
-#ifdef SERVER_ONLY
-    bool animations = false;  // server never animates
-#else
-    bool animations = UserConfigParams::m_animated_characters;
-#endif
-    loadData(type, animations);
-
+    loadData(type, UserConfigParams::m_animated_characters);
     reset();
 }   // init
 
@@ -235,14 +228,8 @@ void Kart::changeKart(const std::string& new_ident,
     AbstractKart::changeKart(new_ident, handicap, ri);
     m_kart_model->setKart(this);
 
-#ifdef SERVER_ONLY
-    bool animations = false;  // server never animates
-#else
-    bool animations = UserConfigParams::m_animated_characters;
-#endif
     scene::ISceneNode* old_node = m_node;
-
-    loadData(m_type, animations);
+    loadData(m_type, UserConfigParams::m_animated_characters);
     m_wheel_box = NULL;
 
     if (LocalPlayerController* lpc =
@@ -395,7 +382,8 @@ void Kart::reset()
     m_flying               = false;
     m_startup_boost        = 0.0f;
 
-    m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+    if (m_node)
+        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
 
     for (int i=0;i<m_xyz_history_size;i++)
     {
@@ -1346,7 +1334,8 @@ void Kart::eliminate()
     if (m_shadow)
         m_shadow->update(false);
 #endif
-    m_node->setVisible(false);
+    if (m_node)
+        m_node->setVisible(false);
 }   // eliminate
 
 //-----------------------------------------------------------------------------
@@ -1876,7 +1865,7 @@ bool Kart::setSquash(float time, float slowdown)
 void Kart::setSquashGraphics()
 {
 #ifndef SERVER_ONLY
-    if (isGhostKart()) return;
+    if (isGhostKart() || GUIEngine::isNoGraphics()) return;
 
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
     if (m_vehicle->getNumWheels() > 0)
@@ -1902,7 +1891,7 @@ void Kart::setSquashGraphics()
 void Kart::unsetSquash()
 {
 #ifndef SERVER_ONLY
-    if (isGhostKart()) return;
+    if (isGhostKart() || GUIEngine::isNoGraphics()) return;
 
     m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     if (m_vehicle && m_vehicle->getNumWheels() > 0)
@@ -2978,10 +2967,12 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 {
     bool always_animated = (type == RaceManager::KT_PLAYER &&
         race_manager->getNumLocalPlayers() == 1);
-    m_node = m_kart_model->attachModel(is_animated_model, always_animated);
+    if (!GUIEngine::isNoGraphics())
+        m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
 #ifdef DEBUG
-    m_node->setName( (getIdent()+"(lod-node)").c_str() );
+    if (m_node)
+        m_node->setName( (getIdent()+"(lod-node)").c_str() );
 #endif
 
     // Attachment must be created after attachModel, since only then the
@@ -3197,10 +3188,10 @@ void Kart::updateGraphics(float dt)
     }
      */
 #ifndef SERVER_ONLY
-    if (isSquashed() &&
+    if (m_node && isSquashed() &&
         m_node->getScale() != core::vector3df(1.0f, 0.5f, 1.0f))
         setSquashGraphics();
-    else if (!isSquashed() &&
+    else if (m_node && !isSquashed() &&
         m_node->getScale() != core::vector3df(1.0f, 1.0f, 1.0f))
         unsetSquash();
 #endif

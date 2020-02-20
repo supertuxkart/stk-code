@@ -148,7 +148,7 @@ RescueAnimation::~RescueAnimation()
 {
     m_kart->getBody()->setLinearVelocity(btVector3(0, 0, 0));
     m_kart->getBody()->setAngularVelocity(btVector3(0, 0, 0));
-    if (m_referee)
+    if (m_referee && m_kart->getNode())
     {
         m_kart->getNode()->removeChild(m_referee->getSceneNode());
         delete m_referee;
@@ -185,7 +185,7 @@ void RescueAnimation::update(int ticks)
 // ----------------------------------------------------------------------------
 void RescueAnimation::updateGraphics(float dt)
 {
-    if (m_referee == NULL)
+    if (m_referee == NULL && m_kart->getNode())
     {
         m_referee = new Referee(*m_kart);
         m_kart->getNode()->addChild(m_referee->getSceneNode());
