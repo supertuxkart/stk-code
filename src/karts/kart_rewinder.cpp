@@ -149,7 +149,8 @@ void KartRewinder::computeError()
             reset();
             // Final ticks come from server
             m_live_join_util = std::numeric_limits<int>::max();
-            getNode()->setVisible(false);
+            if (getNode())
+                getNode()->setVisible(false);
         }
     }
 }   // computeError

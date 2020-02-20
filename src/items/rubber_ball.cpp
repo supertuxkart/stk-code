@@ -474,7 +474,7 @@ bool RubberBall::updateAndDelete(int ticks)
         scale = height / m_extend.getY();
 
 #ifndef SERVER_ONLY
-    if (!RewindManager::get()->isRewinding())
+    if (m_node && !RewindManager::get()->isRewinding())
         m_node->setScale(core::vector3df(1.0f, scale, 1.0f));
 #endif
 

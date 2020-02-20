@@ -32,7 +32,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/stars.hpp"
+#include "guiengine/engine.hpp"
 #include "io/xml_node.hpp"
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -91,12 +91,16 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
 
     // Add the graphical model
 #ifndef SERVER_ONLY
-    setNode(irr_driver->addMesh(m_st_model[type], StringUtils::insertValues("flyable_%i", (int)type)));
+    if (!GUIEngine::isNoGraphics())
+    {
+        setNode(irr_driver->addMesh(m_st_model[type],
+            StringUtils::insertValues("flyable_%i", (int)type)));
 #ifdef DEBUG
-    std::string debug_name("flyable: ");
-    debug_name += type;
-    getNode()->setName(debug_name.c_str());
+        std::string debug_name("flyable: ");
+        debug_name += type;
+        getNode()->setName(debug_name.c_str());
 #endif
+    }
 #endif
     // Smooth network body for flyable doesn't seem to be needed, most of the
     // time it rewinds almost the same
