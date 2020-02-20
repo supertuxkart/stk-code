@@ -186,6 +186,8 @@ void Bowling::removeRollSfx()
  */
 HitEffect* Bowling::getHitEffect() const
 {
+    if (GUIEngine::isNoGraphics())
+        return NULL;
     if (m_deleted_once)
         return NULL;
     if(m_has_hit_kart)

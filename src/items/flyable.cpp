@@ -624,6 +624,8 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
  */
 HitEffect* Flyable::getHitEffect() const
 {
+    if (GUIEngine::isNoGraphics())
+        return NULL;
     return m_deleted_once ? NULL :
         new Explosion(getXYZ(), "explosion", "explosion_cake.xml");
 }   // getHitEffect
