@@ -100,6 +100,9 @@ generate_assets()
     fi
 
     cd ./android
+    DECREASE_QUALITY=0                              \
+    CONVERT_TO_JPG=0                                \
+    ASSETS_PATHS="../android-output/assets-lq/data" \
     ./generate_assets.sh
 
     if [ ! -f "./assets/directories.txt" ]; then
@@ -128,23 +131,24 @@ generate_full_assets()
 
     cd ./android-output/
 
-    ONLY_ASSETS=1        \
-    TRACKS="all"         \
-    TEXTURE_SIZE=512     \
-    JPEG_QUALITY=95      \
-    PNG_QUALITY=95       \
-    PNGQUANT_QUALITY=95  \
-    SOUND_QUALITY=112    \
-    SOUND_MONO=0         \
-    SOUND_SAMPLE=44100   \
+    ONLY_ASSETS=1           \
+    TRACKS="all"            \
+    TEXTURE_SIZE=512        \
+    JPEG_QUALITY=95         \
+    PNG_QUALITY=95          \
+    PNGQUANT_QUALITY=95     \
+    SOUND_QUALITY=112       \
+    SOUND_MONO=0            \
+    SOUND_SAMPLE=44100      \
+    OUTPUT_PATH="assets-hq" \
     ./generate_assets.sh
 
-    if [ ! -f "./assets/directories.txt" ]; then
+    if [ ! -f "./assets-hq/directories.txt" ]; then
         echo "Error: Couldn't generate full assets"
         return
     fi
 
-    cd ./assets/data
+    cd ./assets-hq/data
     zip -r ../../stk-assets.zip ./*
     cd ../../
 
@@ -158,6 +162,42 @@ generate_full_assets()
     FULL_ASSETS_SIZE=`du -b ./stk-assets.zip | cut -f1`
     sed -i "s/stk_assets_size = .*\;/stk_assets_size = $FULL_ASSETS_SIZE\;/g" \
            "../src/utils/download_assets_size.hpp"
+    
+    cd ../
+}
+
+generate_lq_assets()
+{
+    echo "Generate zip file with lq assets"
+
+    if [ -f "./android-output/stk-assets-lq.zip" ]; then
+        echo "Full assets already found in ./android-output/stk-assets-lq..zip"
+        return
+    fi
+
+    cp -a ./android/generate_assets.sh ./android-output/
+
+    cd ./android-output/
+
+    ONLY_ASSETS=1           \
+    OUTPUT_PATH="assets-lq" \
+    ./generate_assets.sh
+
+    if [ ! -f "./assets-lq/directories.txt" ]; then
+        echo "Error: Couldn't generate lq assets"
+        return
+    fi
+
+    cd ./assets-lq/data
+    zip -r ../../stk-assets-lq.zip ./*
+    cd ../../
+
+    rm ./generate_assets.sh
+    
+    if [ ! -f "./stk-assets-lq.zip" ]; then
+        echo "Error: Couldn't generate lq assets"
+        return
+    fi
     
     cd ../
 }
@@ -221,8 +261,9 @@ fi
 #Build packages
 init_directories
 
-generate_assets
+generate_lq_assets
 generate_full_assets
+generate_assets
 
 if [ -z "$1" ] || [ "$1" = "armv7" ]; then
     build_package armv7 armeabi-v7a
