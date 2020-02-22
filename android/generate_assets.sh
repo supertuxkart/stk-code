@@ -42,9 +42,11 @@ export DECREASE_QUALITY_DEFAULT=1
 export CONVERT_TO_JPG_DEFAULT=1
 export ONLY_ASSETS_DEFAULT=0
 
-export ASSETS_PATHS="../data                    \
-                     ../../stk-assets           \
-                     ../../supertuxkart-assets"
+export ASSETS_PATHS_DEFAULT="../data                    \
+                             ../../stk-assets           \
+                             ../../supertuxkart-assets"
+                             
+export OUTPUT_PATH_DEFAULT="assets"
 
 export ASSETS_DIRS="library models music sfx textures"
 
@@ -108,7 +110,15 @@ if [ -z "$CONVERT_TO_JPG" ]; then
 fi
 
 if [ -z "$ONLY_ASSETS" ]; then
-    export ONLY_ASSETS=$ONLY_ASSETS_DEFAULT
+    export ONLY_ASSETS="$ONLY_ASSETS_DEFAULT"
+fi
+
+if [ -z "$ASSETS_PATHS" ]; then
+    export ASSETS_PATHS="$ASSETS_PATHS_DEFAULT"
+fi
+
+if [ -z "$OUTPUT_PATH" ]; then
+    export OUTPUT_PATH="$OUTPUT_PATH_DEFAULT"
 fi
 
 # Find assets path
@@ -133,13 +143,13 @@ fi
 
 # Clear previous assets directory
 echo "Clear previous assets directory"
-rm -rf assets
+rm -rf "$OUTPUT_PATH"
 
 
 # Copy all assets
 echo "Copy all assets"
 
-mkdir -p assets/data
+mkdir -p "$OUTPUT_PATH/data"
 
 for DIR in `ls $ASSETS_PATH`; do
     CAN_BE_COPIED=0
@@ -161,7 +171,7 @@ for DIR in `ls $ASSETS_PATH`; do
     done;
 
     if [ $CAN_BE_COPIED -gt 0 ]; then
-        cp -a "$ASSETS_PATH/$DIR" assets/data/
+        cp -a "$ASSETS_PATH/$DIR" "$OUTPUT_PATH/data/"
     fi
 done;
 
@@ -169,7 +179,7 @@ done;
 # Copy selected tracks
 echo "Copy selected tracks"
 
-mkdir -p assets/data/tracks
+mkdir -p "$OUTPUT_PATH/data/tracks"
 
 for DIR in `ls $ASSETS_PATH/tracks`; do
     CAN_BE_COPIED=0
@@ -186,7 +196,7 @@ for DIR in `ls $ASSETS_PATH/tracks`; do
     fi
 
     if [ $CAN_BE_COPIED -gt 0 ]; then
-        cp -a "$ASSETS_PATH/tracks/$DIR" assets/data/tracks/
+        cp -a "$ASSETS_PATH/tracks/$DIR" "$OUTPUT_PATH/data/tracks/"
     fi
 done
 
@@ -194,7 +204,7 @@ done
 # Copy selected karts
 echo "Copy selected karts"
 
-mkdir -p assets/data/karts
+mkdir -p "$OUTPUT_PATH/data/karts"
 
 for DIR in `ls $ASSETS_PATH/karts`; do
     CAN_BE_COPIED=0
@@ -211,7 +221,7 @@ for DIR in `ls $ASSETS_PATH/karts`; do
     fi
 
     if [ $CAN_BE_COPIED -gt 0 ]; then
-        cp -a "$ASSETS_PATH/karts/$DIR" assets/data/karts/
+        cp -a "$ASSETS_PATH/karts/$DIR" "$OUTPUT_PATH/data/karts/"
     fi
 done
 
@@ -357,7 +367,7 @@ convert_to_jpg()
     BLACKLISTED=0
     
     for BLACKLIST_FILE in $CONVERT_TO_JPG_BLACKLIST; do
-        if [ "$FILE" = "assets/$BLACKLIST_FILE" ]; then
+        if [ "$FILE" = "$OUTPUT_PATH/$BLACKLIST_FILE" ]; then
             BLACKLISTED=1
             break
         fi
@@ -615,23 +625,23 @@ convert_to_jpg_update_xml()
 
 
 if [ $DECREASE_QUALITY -gt 0 ]; then
-    find assets/data -iname "*.png" | while read f; do convert_image "$f" "png"; done
-    find assets/data -iname "*.jpg" | while read f; do convert_image "$f" "jpg"; done
-    find assets/data -iname "*.ogg" | while read f; do convert_sound "$f"; done
+    find "$OUTPUT_PATH/data" -iname "*.png" | while read f; do convert_image "$f" "png"; done
+    find "$OUTPUT_PATH/data" -iname "*.jpg" | while read f; do convert_image "$f" "jpg"; done
+    find "$OUTPUT_PATH/data" -iname "*.ogg" | while read f; do convert_sound "$f"; done
 fi
 
 
 if [ $CONVERT_TO_JPG -gt 0 ]; then
     rm -f "./converted_textures"
     
-    find assets/data -not -path "assets/data/textures/*" \
-                     -not -path "assets/data/karts/*"    \
-                     -iname "*.png" | while read f; do convert_to_jpg "$f"; done
+    find "$OUTPUT_PATH/data" -not -path "$OUTPUT_PATH/data/textures/*" \
+                             -not -path "$OUTPUT_PATH/data/karts/*"    \
+                             -iname "*.png" | while read f; do convert_to_jpg "$f"; done
 
-    find assets/data -iname "*.b3dz" | while read f; do convert_to_jpg_extract_b3dz "$f"; done
-    find assets/data -iname "*.b3d" | while read f; do convert_to_jpg_update_b3d "$f"; done
-    find assets/data -iname "*.spm" | while read f; do convert_to_jpg_update_spm "$f"; done
-    find assets/data -iname "*.xml" | while read f; do convert_to_jpg_update_xml "$f"; done
+    find "$OUTPUT_PATH/data" -iname "*.b3dz" | while read f; do convert_to_jpg_extract_b3dz "$f"; done
+    find "$OUTPUT_PATH/data" -iname "*.b3d" | while read f; do convert_to_jpg_update_b3d "$f"; done
+    find "$OUTPUT_PATH/data" -iname "*.spm" | while read f; do convert_to_jpg_update_spm "$f"; done
+    find "$OUTPUT_PATH/data" -iname "*.xml" | while read f; do convert_to_jpg_update_xml "$f"; done
 
     if [ -s "./converted_textures" ]; then
         echo "Converted textures:"
@@ -641,42 +651,42 @@ if [ $CONVERT_TO_JPG -gt 0 ]; then
 fi
 
 if [ $DECREASE_QUALITY -gt 0 ]; then
-    find assets/data -iname "*.png" | while read f; do optimize_png "$f" "png"; done
+    find "$OUTPUT_PATH/data" -iname "*.png" | while read f; do optimize_png "$f" "png"; done
 fi
 
 
 # Copy data directory
 if [ $ONLY_ASSETS -eq 0 ]; then
     echo "Copy data directory"
-    cp -a ../data/* assets/data/
+    cp -a ../data/* "$OUTPUT_PATH/data"
 fi
 
 
 # Remove unused files
 for BLACKLIST_FILE in $BLACKLIST_FILES; do
-    rm -f "assets/$BLACKLIST_FILE"
+    rm -f "$OUTPUT_PATH/$BLACKLIST_FILE"
 done
 
 
 # Run optimize_data.sh script
 if [ $RUN_OPTIMIZE_SCRIPT -gt 0 ]; then
     echo "Run optimize_data.sh script"
-    sh -c 'cd assets/data; ../../../data/optimize_data.sh'
+    sh -c "cd "$OUTPUT_PATH/data"; ../../../data/optimize_data.sh"
 fi
 
 
 # Generate directories list
 echo "Generate directories list"
-find assets/* -type d | sort > assets/directories.txt
-sed -i s/'.\/assets\/'// assets/directories.txt
-sed -i s/'assets\/'// assets/directories.txt
+find "$OUTPUT_PATH"/* -type d | sort > "$OUTPUT_PATH/directories.txt"
+sed -i s/".\/$OUTPUT_PATH\/"// "$OUTPUT_PATH/directories.txt"
+sed -i s/"$OUTPUT_PATH\/"// "$OUTPUT_PATH/directories.txt"
 
 # A file that can be used to check if apk has assets
-echo "has_assets" > assets/has_assets.txt
+echo "has_assets" > "$OUTPUT_PATH/has_assets.txt"
 
 
 # It will be probably ignored by ant, but create it anyway...
-touch assets/.nomedia
+touch "$OUTPUT_PATH/.nomedia"
 
 
 echo "Done."
