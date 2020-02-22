@@ -426,7 +426,8 @@ void Swatter::squashThingsAround()
         }
     }
 
-    if (has_created_explosion_animation && !RewindManager::get()->isRewinding())
+    if (!GUIEngine::isNoGraphics() && has_created_explosion_animation &&
+        !RewindManager::get()->isRewinding())
     {
         HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
         if(m_kart->getController()->isLocalPlayerController())
