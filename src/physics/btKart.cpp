@@ -32,25 +32,18 @@
 
 #define ROLLING_INFLUENCE_FIX
 
-
-btRigidBody& btKart::getFixedBody()
-{
-    static btRigidBody s_fixed(0, 0,0);
-    s_fixed.setMassProps(btScalar(0.),btVector3(btScalar(0.),
-                         btScalar(0.),btScalar(0.)));
-    return s_fixed;
-}
-
 // ============================================================================
 btKart::btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster,
                Kart *kart)
-      : m_vehicleRaycaster(raycaster)
+      : m_vehicleRaycaster(raycaster), m_fixed_body(0, 0, 0)
 {
     m_chassisBody               = chassis;
     m_indexRightAxis            = 0;
     m_indexUpAxis               = 1;
     m_indexForwardAxis          = 2;
     m_kart                      = kart;
+    m_fixed_body.setMassProps(btScalar(0.),btVector3(btScalar(0.),
+        btScalar(0.),btScalar(0.)));
     reset();
 }   // btKart
 
@@ -298,7 +291,7 @@ btScalar btKart::rayCast(unsigned int index, float fraction)
         wheel.m_raycastInfo.m_isInContact = true;
         ///@todo for driving on dynamic/movable objects!;
         wheel.m_raycastInfo.m_triangle_index = rayResults.m_triangle_index;;
-        wheel.m_raycastInfo.m_groundObject = &getFixedBody();
+        wheel.m_raycastInfo.m_groundObject = &m_fixed_body;
 
         wheel.m_raycastInfo.m_suspensionLength = depth;
 
