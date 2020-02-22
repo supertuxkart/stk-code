@@ -1772,7 +1772,7 @@ void Kart::update(int ticks)
         m_is_jumping = false;
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
 
-        if (!has_animation_before)
+        if (!GUIEngine::isNoGraphics() && !has_animation_before)
         {
             HitEffect *effect =  new Explosion(getXYZ(), "jump",
                                               "jump_explosion.xml");
