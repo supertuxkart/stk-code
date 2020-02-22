@@ -79,6 +79,7 @@ endif()
 
 if(UNIX AND NOT APPLE)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
+    option(USE_TSAN   "Build with Thread sanitizer" OFF)
     option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
 endif()
 
@@ -649,6 +650,10 @@ if(UNIX AND NOT APPLE)
     if(USE_ASAN)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
         target_link_libraries(supertuxkart "-fsanitize=address")
+    endif()
+    if(USE_TSAN)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
+        target_link_libraries(supertuxkart "-fsanitize=thread")
     endif()
 endif()
 
