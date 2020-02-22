@@ -92,6 +92,9 @@ private:
     /** The rigid body that is the chassis of the kart. */
     btRigidBody        *m_chassisBody;
 
+    /** Used to replace the ground object. */
+    btRigidBody         m_fixed_body;
+
     /** Number of wheels that touch the ground. */
     int                 m_num_wheels_on_ground;
 
