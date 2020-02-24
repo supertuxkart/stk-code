@@ -84,8 +84,7 @@ protected:
     unsigned int      m_index;
 
     /** For CheckTrigger or CheckCylinder */
-    CheckStructure(unsigned index) : m_active_at_reset(true), m_index(index),
-        m_check_type(CT_TRIGGER) {}
+    CheckStructure();
 private:
     /** The type of this checkline. */
     CheckType         m_check_type;

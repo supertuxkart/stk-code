@@ -25,11 +25,10 @@
 #include "items/item.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/check_manager.hpp"
 
 CheckCylinder::CheckCylinder(const XMLNode &node,
                              std::function<void(int)> triggering_function)
-           : CheckStructure(CheckManager::get()->getCheckStructureCount())
+             : CheckStructure()
 {
     m_radius2 = 1;
     m_height = 0;

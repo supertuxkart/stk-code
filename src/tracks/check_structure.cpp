@@ -27,6 +27,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/check_lap.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/track.hpp"
 
 #include <algorithm>
 
@@ -71,6 +72,15 @@ CheckStructure::CheckStructure(const XMLNode &node, unsigned int index)
     // As a default, only lap lines, cannons and goals are activated
     m_active_at_reset= m_check_type==CT_NEW_LAP || m_check_type==CT_CANNON || m_check_type==CT_GOAL;
     node.get("active", &m_active_at_reset);
+}   // CheckStructure
+
+// ----------------------------------------------------------------------------
+CheckStructure::CheckStructure()
+              : m_active_at_reset(true),
+                m_index(Track::getCurrentTrack()->getCheckManager()
+                ->getCheckStructureCount()),
+                m_check_type(CT_TRIGGER)
+{
 }   // CheckStructure
 
 // ----------------------------------------------------------------------------
@@ -138,10 +148,10 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
         UserConfigParams::m_check_debug && race_manager->getNumPlayers()>0 &&
         kart_index == (int)World::getWorld()->getPlayerKart(0)->getWorldKartId();
 
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
     for(unsigned int i=0; i<indices.size(); i++)
     {
-        CheckStructure *cs =
-            CheckManager::get()->getCheckStructure(indices[i]);
+        CheckStructure *cs = cm->getCheckStructure(indices[i]);
         if (cs == NULL) continue;
 
         switch(change_state)
@@ -187,9 +197,9 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
 
     /*
     printf("--------\n");
-    for (int n=0; n<CheckManager::get()->getCheckStructureCount(); n++)
+    for (int n=0; n<m->getCheckStructureCount(); n++)
     {
-        CheckStructure *cs = CheckManager::get()->getCheckStructure(n);
+        CheckStructure *cs = cm->getCheckStructure(n);
         if (dynamic_cast<CheckLap*>(cs) != NULL)
             printf("Checkline %i (LAP) : %i\n", n, (int)cs->m_is_active[kart_index]);
         else

@@ -283,7 +283,7 @@ unsigned int DriveGraph::getStartNode() const
 void DriveGraph::computeChecklineRequirements()
 {
     computeChecklineRequirements(getNode(0),
-                                 CheckManager::get()->getLapLineIndex());
+                                 Track::getCurrentTrack()->getCheckManager()->getLapLineIndex());
 }   // computeChecklineRequirements
 
 // ----------------------------------------------------------------------------
@@ -302,7 +302,7 @@ void DriveGraph::computeChecklineRequirements(DriveNode* node,
 
         DriveNode* succ = getNode(succ_id);
         int new_latest_checkline =
-            CheckManager::get()->getChecklineTriggering(node->getCenter(),
+            Track::getCurrentTrack()->getCheckManager()->getChecklineTriggering(node->getCenter(),
                                                         succ->getCenter() );
         if(new_latest_checkline==-1)
             new_latest_checkline = latest_checkline;

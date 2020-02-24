@@ -78,7 +78,7 @@ RubberBall::RubberBall(AbstractKart *kart)
 void RubberBall::onFireFlyable()
 {
     Flyable::onFireFlyable();
-    CheckManager::get()->addFlyableToCannons(this);
+    Track::getCurrentTrack()->getCheckManager()->addFlyableToCannons(this);
     // Don't let Flyable update the terrain information, since this object
     // has to do it earlier than that.
     setDoTerrainInfo(false);
@@ -129,7 +129,7 @@ void RubberBall::onFireFlyable()
 RubberBall::~RubberBall()
 {
     removePingSFX();
-    CheckManager::get()->removeFlyableFromCannons(this);
+    Track::getCurrentTrack()->getCheckManager()->removeFlyableFromCannons(this);
 }   // ~RubberBall
 
 // ----------------------------------------------------------------------------

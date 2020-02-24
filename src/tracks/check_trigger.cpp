@@ -18,7 +18,6 @@
 #include "tracks/check_trigger.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
-#include "tracks/check_manager.hpp"
 #include "utils/time.hpp"
 
 /** Constructor for a check trigger.
@@ -28,7 +27,7 @@
  */
 CheckTrigger::CheckTrigger(const Vec3& center, float distance,
                            std::function<void(int)> triggering_function)
-            : CheckStructure(CheckManager::get()->getCheckStructureCount()),
+            : CheckStructure(),
               m_center(center), m_distance2(distance * distance),
               m_triggering_function(triggering_function)
 {

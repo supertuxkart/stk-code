@@ -29,6 +29,7 @@
 #include "network/network_string.hpp"
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/track.hpp"
 #include "utils/mini_glm.hpp"
 
 #include "LinearMath/btTransform.h"
@@ -399,13 +400,14 @@ void CannonAnimation::restoreData(BareNetworkString* buffer)
     };
 
     int cc_idx = buffer->getInt8();
-    if ((unsigned)cc_idx > CheckManager::get()->getCheckStructureCount())
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
+    if ((unsigned)cc_idx > cm->getCheckStructureCount())
     {
         throw CannonCreationException(
             "Server has different check structure size.", skipping_offset);
     }
     CheckCannon* cc = dynamic_cast<CheckCannon*>
-        (CheckManager::get()->getCheckStructure(cc_idx));
+        (cm->getCheckStructure(cc_idx));
     if (!cc)
     {
         throw CannonCreationException(

@@ -358,7 +358,7 @@ void RewindManager::rewindTo(int rewind_ticks, int now_ticks,
     }
 
     // Update check line, so the cannon animation can be replayed correctly
-    CheckManager::get()->resetAfterRewind();
+    Track::getCurrentTrack()->getCheckManager()->resetAfterRewind();
 
     if (exact_rewind_ticks >= 2)
     {

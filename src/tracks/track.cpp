@@ -164,6 +164,7 @@ Track::Track(const std::string &filename)
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
     m_render_target         = NULL;
+    m_check_manager         = NULL;
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
     m_force_disable_fog     = false;
@@ -289,7 +290,7 @@ void Track::removeCachedData()
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-    CheckManager::get()->reset(*this);
+    m_check_manager->reset(*this);
     ItemManager::get()->reset();
     m_track_object_manager->reset();
     m_startup_run = false;
@@ -347,7 +348,8 @@ void Track::cleanup()
 
     m_all_emitters.clearAndDeleteAll();
 
-    CheckManager::destroy();
+    delete m_check_manager;
+    m_check_manager = NULL;
 
     delete m_track_object_manager;
     m_track_object_manager = NULL;
@@ -1623,7 +1625,7 @@ void Track::update(int ticks)
         m_startup_run = true;
     }
     float dt = stk_config->ticks2Time(ticks);
-    CheckManager::get()->update(dt);
+    m_check_manager->update(dt);
     ItemManager::get()->update(ticks);
 
     // TODO: enable onUpdate scripts if we ever find a compelling use for them
@@ -1788,7 +1790,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         reverse_track = false;
     }
     main_loop->renderGUI(3000);
-    CheckManager::create();
+    m_check_manager = new CheckManager();
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
@@ -2222,7 +2224,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
-    if (CheckManager::get()->getCheckStructureCount()==0  &&
+    if (m_check_manager->getCheckStructureCount()==0  &&
         !race_manager->isBattleMode() && !m_is_cutscene)
     {
         Log::warn("track", "No check lines found in track '%s'.",
@@ -2342,7 +2344,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         }
         else if (name == "checks")
         {
-            CheckManager::get()->load(*node);
+            m_check_manager->load(*node);
         }
         else if (name == "particle-emitter")
         {

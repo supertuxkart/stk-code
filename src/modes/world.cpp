@@ -883,7 +883,7 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     // Project kart to surface of track
     // This will set the physics transform
     Track::getCurrentTrack()->findGround(kart);
-    CheckManager::get()->resetAfterKartMove(kart);
+    Track::getCurrentTrack()->getCheckManager()->resetAfterKartMove(kart);
 
 }   // moveKartTo
 
