@@ -52,7 +52,7 @@ private:
     /** Stores the cannon curve data. */
     Ipo *m_curve;
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(SERVER_ONLY)
     /** If track debugging is enabled, this will show the the curve of
      *  the cannon in the race. */
     ShowCurve* m_show_curve;
@@ -90,6 +90,8 @@ public:
     const Vec3& getTargetRight() const               { return m_target_right; }
     // ------------------------------------------------------------------------
     Ipo* getIpo() const                                     { return m_curve; }
+    // ------------------------------------------------------------------------
+    virtual CheckStructure* clone() OVERRIDE;
 };   // CheckCannon
 
 #endif

@@ -59,6 +59,8 @@ public:
     // -------------------------------------------------------------------------
     /** Returns the square of the radius of this sphere. */
     float getRadius2() const { return m_radius2; }
+    // ------------------------------------------------------------------------
+    virtual CheckStructure* clone()          { return new CheckSphere(*this); }
 };   // CheckSphere
 
 #endif

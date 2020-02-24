@@ -146,6 +146,9 @@ public:
     void restoreIsActive(int kart_id, const BareNetworkString& b);
     // ------------------------------------------------------------------------
     int getIndex() const { return m_index; }
+    // ------------------------------------------------------------------------
+    /** Clone to child process for server usage (atm no sound or scripting). */
+    virtual CheckStructure* clone() = 0;
 };   // CheckStructure
 
 #endif

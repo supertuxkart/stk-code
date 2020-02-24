@@ -109,7 +109,14 @@ public:
     const Vec3 &getLeftPoint() const { return m_left_point;  }
     // ------------------------------------------------------------------------
     const Vec3 &getRightPoint() const { return m_right_point; }
-
+    // ------------------------------------------------------------------------
+    virtual CheckStructure* clone() OVERRIDE
+    {
+        CheckLine* cl = new CheckLine(*this);
+        // Drop unneeded stuff
+        cl->m_debug_dy_dc = nullptr;
+        return cl;
+    }
 };   // CheckLine
 
 #endif
