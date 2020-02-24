@@ -1946,7 +1946,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
         spectator = true;
     }
 
-    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    const uint8_t cc = (uint8_t)Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount();
     NetworkString* ns = getNetworkString(10);
     ns->setSynchronous(true);
     ns->addUInt8(LE_LIVE_JOIN_ACK).addUInt64(m_client_starting_time)
@@ -4386,7 +4386,7 @@ void ServerLobby::configPeersStartTime()
     NetworkString* ns = getNetworkString(10);
     ns->setSynchronous(true);
     ns->addUInt8(LE_START_RACE).addUInt64(start_time);
-    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    const uint8_t cc = (uint8_t)Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount();
     ns->addUInt8(cc);
     *ns += *m_items_complete_state;
     m_client_starting_time = start_time;

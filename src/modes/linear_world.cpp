@@ -1163,10 +1163,11 @@ void LinearWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
     for (TrackSector* ts : m_kart_track_sector)
         ts->saveCompleteState(bns);
 
-    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
+    const uint8_t cc = (uint8_t)cm->getCheckStructureCount();
     bns->addUInt8(cc);
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->saveCompleteState(bns);
+        cm->getCheckStructure(i)->saveCompleteState(bns);
 }   // saveCompleteState
 
 // ----------------------------------------------------------------------------
@@ -1190,14 +1191,15 @@ void LinearWorld::restoreCompleteState(const BareNetworkString& b)
 
     updateRacePosition();
     const unsigned cc = b.getUInt8();
-    if (cc != CheckManager::get()->getCheckStructureCount())
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
+    if (cc != cm->getCheckStructureCount())
     {
         Log::warn("LinearWorld",
             "Server has different check structures size.");
         return;
     }
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->restoreCompleteState(b);
+        cm->getCheckStructure(i)->restoreCompleteState(b);
 }   // restoreCompleteState
 
 // ----------------------------------------------------------------------------
@@ -1229,10 +1231,11 @@ void LinearWorld::updateCheckLinesServer(int check_id, int kart_id)
     cl.addUInt32(m_fastest_lap_ticks);
     cl.encodeString(m_fastest_lap_kart_name);
 
-    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
+    const uint8_t cc = (uint8_t)cm->getCheckStructureCount();
     cl.addUInt8(cc);
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->saveIsActive(kart_id, &cl);
+        cm->getCheckStructure(i)->saveIsActive(kart_id, &cl);
 
     STKHost::get()->sendPacketToAllPeers(&cl, true);
 }   // updateCheckLinesServer
@@ -1256,17 +1259,17 @@ void LinearWorld::updateCheckLinesClient(const BareNetworkString& b)
     b.decodeStringW(&m_fastest_lap_kart_name);
 
     const unsigned cc = b.getUInt8();
-    if (cc != CheckManager::get()->getCheckStructureCount())
+    if (cc != Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount())
         return;
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->restoreIsActive(kart_id, b);
+        Track::getCurrentTrack()->getCheckManager()->getCheckStructure(i)->restoreIsActive(kart_id, b);
 
 }   // updateCheckLinesClient
 
 // ----------------------------------------------------------------------------
 void LinearWorld::handleServerCheckStructureCount(unsigned count)
 {
-    if (count != CheckManager::get()->getCheckStructureCount())
+    if (count != Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount())
     {
         Log::warn("LinearWorld",
             "Server has different check structures size.");

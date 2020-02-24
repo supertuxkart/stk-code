@@ -352,6 +352,7 @@ private:
 
     /** The render target for the mini map, which is displayed in the race gui. */
     RenderTarget           *m_render_target;
+    CheckManager*           m_check_manager;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
 
@@ -709,6 +710,8 @@ public:
     bool isAddon() const                                 { return m_is_addon; }
     // ------------------------------------------------------------------------
     void convertTrackToBullet(scene::ISceneNode *node);
+    // ------------------------------------------------------------------------
+    CheckManager* getCheckManager() const           { return m_check_manager; }
 };   // class Track
 
 #endif
