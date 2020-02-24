@@ -44,7 +44,9 @@ public:
                              int indx) OVERRIDE;
     virtual void reset(const Track &track) OVERRIDE;
     virtual bool triggeringCheckline() const OVERRIDE { return true; }
-};   // CheckLine
+    // ------------------------------------------------------------------------
+    virtual CheckStructure* clone() OVERRIDE    { return new CheckLap(*this); }
+};   // CheckLap
 
 #endif
 

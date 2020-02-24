@@ -57,6 +57,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
                       /*reverse*/race_manager->getReverseTrack());
 
 #if defined(DEBUG) && !defined(SERVER_ONLY)
+    m_show_curve = NULL;
     if(UserConfigParams::m_track_debug)
     {
         m_show_curve = new ShowCurve(0.5f, 0.5f);
@@ -98,8 +99,7 @@ CheckCannon::~CheckCannon()
 {
     delete m_curve;
 #if defined(DEBUG) && !defined(SERVER_ONLY)
-    if(UserConfigParams::m_track_debug)
-        delete m_show_curve;
+    delete m_show_curve;
     if (m_debug_target_dy_dc)
         m_debug_target_dy_dc->removeFromSP();
 #endif
@@ -173,3 +173,17 @@ void CheckCannon::update(float dt)
         flyable->setAnimation(animation);
     }   // for i in all flyables
 }   // update
+
+// ----------------------------------------------------------------------------
+CheckStructure* CheckCannon::clone()
+{
+    CheckCannon* cc = new CheckCannon(*this);
+#if defined(DEBUG) && !defined(SERVER_ONLY)
+    // Remove unsupported stuff when cloning
+    cc->m_show_curve = NULL;
+    cc->m_debug_target_dy_dc = nullptr;
+#endif
+    // IPO curve needs to be copied manually
+    cc->m_curve = m_curve->clone();
+    return cc;
+}   // clone
