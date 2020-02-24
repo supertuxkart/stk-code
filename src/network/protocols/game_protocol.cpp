@@ -34,6 +34,7 @@
 #include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "tracks/track.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 #include "main_loop.hpp"
@@ -58,6 +59,8 @@ std::shared_ptr<GameProtocol> GameProtocol::createInstance()
 GameProtocol::GameProtocol()
             : Protocol(PROTOCOL_CONTROLLER_EVENTS)
 {
+    m_network_item_manager = static_cast<NetworkItemManager*>
+        (Track::getCurrentTrack()->getItemManager());
     m_data_to_send = getNetworkString();
 }   // GameProtocol
 
@@ -271,8 +274,7 @@ void GameProtocol::handleItemEventConfirmation(Event *event)
 {
     assert(NetworkConfig::get()->isServer());
     int ticks = event->data().getTime();
-    NetworkItemManager::get()->setItemConfirmationTime(event->getPeerSP(),
-        ticks);
+    m_network_item_manager->setItemConfirmationTime(event->getPeerSP(), ticks);
 }   // handleItemEventConfirmation
 
 // ----------------------------------------------------------------------------

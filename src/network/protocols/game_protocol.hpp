@@ -32,6 +32,7 @@
 #include <tuple>
 
 class BareNetworkString;
+class NetworkItemManager;
 class NetworkString;
 class STKPeer;
 
@@ -78,6 +79,7 @@ private:
     void handleAdjustTime(Event *event);
     void handleItemEventConfirmation(Event *event);
     static std::weak_ptr<GameProtocol> m_game_protocol;
+    NetworkItemManager* m_network_item_manager;
     // Maximum value of values are only 32768
     std::tuple<uint8_t, uint16_t, uint16_t, uint16_t>
                                                 compressAction(const Action& a)
@@ -139,7 +141,6 @@ public:
     // ------------------------------------------------------------------------
     std::unique_lock<std::mutex> acquireWorldDeletingMutex() const
                { return std::unique_lock<std::mutex>(m_world_deleting_mutex); }
-
 };   // class GameProtocol
 
 #endif // GAME_PROTOCOL_HPP

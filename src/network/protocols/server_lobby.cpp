@@ -1953,8 +1953,8 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
         .addUInt8(cc).addUInt64(live_join_start_time)
         .addUInt32(m_last_live_join_util_ticks);
 
-    NetworkItemManager* nim =
-        dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    NetworkItemManager* nim = dynamic_cast<NetworkItemManager*>
+        (Track::getCurrentTrack()->getItemManager());
     assert(nim);
     nim->saveCompleteState(ns);
     nim->addLiveJoinPeer(peer);
@@ -5077,8 +5077,8 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
                 peer->getAddress().toString().c_str());
         }
     }
-    NetworkItemManager* nim =
-        dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    NetworkItemManager* nim = dynamic_cast<NetworkItemManager*>
+        (Track::getCurrentTrack()->getItemManager());
     assert(nim);
     nim->erasePeerInGame(peer);
     m_peers_ready.erase(peer);
@@ -5133,13 +5133,10 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
 }   // clientSelectingAssetsWantsToBackLobby
 
 //-----------------------------------------------------------------------------
-void ServerLobby::saveInitialItems()
+void ServerLobby::saveInitialItems(std::shared_ptr<NetworkItemManager> nim)
 {
     m_items_complete_state->getBuffer().clear();
     m_items_complete_state->reset();
-    NetworkItemManager* nim =
-        dynamic_cast<NetworkItemManager*>(ItemManager::get());
-    assert(nim);
     nim->saveCompleteState(m_items_complete_state);
 }   // saveInitialItems
 

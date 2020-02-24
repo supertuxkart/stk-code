@@ -1717,7 +1717,7 @@ void Kart::update(int ticks)
     }   // if there is material
     PROFILER_POP_CPU_MARKER();
 
-    ItemManager::get()->checkItemHit(this);
+    Track::getCurrentTrack()->getItemManager()->checkItemHit(this);
 
     const bool emergency = has_animation_before;
 

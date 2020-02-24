@@ -28,12 +28,14 @@
 #include "karts/rescue_animation.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
+#include "tracks/track.hpp"
 
 #include <algorithm>
 
 ArenaAI::ArenaAI(AbstractKart *kart)
        : AIBaseController(kart)
 {
+    m_item_manager = Track::getCurrentTrack()->getItemManager();
     m_debug_sphere = NULL;
     m_debug_sphere_next = NULL;
     m_graph = ArenaGraph::get();
@@ -580,7 +582,7 @@ void ArenaAI::tryCollectItem(Vec3* aim_point, int* target_node) const
 {
     float distance = 999999.9f;
     Item* selected = (*target_node == Graph::UNKNOWN_SECTOR ? NULL :
-        ItemManager::get()->getFirstItemInQuad(*target_node));
+        m_item_manager->getFirstItemInQuad(*target_node));
 
     // Don't look for a new item unless it's collected or swapped
     if (selected && selected->isAvailable() && !selected->isNegativeItem())
@@ -591,7 +593,7 @@ void ArenaAI::tryCollectItem(Vec3* aim_point, int* target_node) const
 
     for (unsigned int i = 0; i < m_graph->getNumNodes(); i++)
     {
-        Item* cur_item = ItemManager::get()->getFirstItemInQuad(i);
+        Item* cur_item = m_item_manager->getFirstItemInQuad(i);
         if (cur_item == NULL) continue;
         if (!cur_item->isAvailable() || cur_item->isNegativeItem())
             continue;
@@ -661,7 +663,7 @@ void ArenaAI::determinePath(int forward, std::vector<int>* path)
         // Only test few nodes ahead
         if (i == 6) break;
         const int node = (*path)[i];
-        Item* selected = ItemManager::get()->getFirstItemInQuad(node);
+        Item* selected = m_item_manager->getFirstItemInQuad(node);
 
         if (selected && selected->isAvailable() && selected->isNegativeItem())
         {

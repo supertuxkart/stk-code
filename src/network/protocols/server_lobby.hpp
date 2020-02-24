@@ -38,6 +38,7 @@
 #endif
 
 class BareNetworkString;
+class NetworkItemManager;
 class NetworkString;
 class NetworkPlayerProfile;
 class STKPeer;
@@ -381,7 +382,7 @@ public:
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
     int getLobbyPlayers() const              { return m_lobby_players.load(); }
-    void saveInitialItems();
+    void saveInitialItems(std::shared_ptr<NetworkItemManager> nim);
     void saveIPBanTable(const SocketAddress& addr);
     void listBanTable();
     void initServerStatsTable();
