@@ -961,8 +961,8 @@ void ClientLobby::startGame(Event* event)
     if (lw)
         lw->handleServerCheckStructureCount(check_structure_count);
 
-    NetworkItemManager* nim =
-    dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    NetworkItemManager* nim = dynamic_cast<NetworkItemManager*>
+        (Track::getCurrentTrack()->getItemManager());
     assert(nim);
     nim->restoreCompleteState(event->data());
 
@@ -1234,8 +1234,8 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
             k->setLiveJoinKart(m_last_live_join_util_ticks);
     }
 
-    NetworkItemManager* nim =
-    dynamic_cast<NetworkItemManager*>(ItemManager::get());
+    NetworkItemManager* nim = dynamic_cast<NetworkItemManager*>
+        (Track::getCurrentTrack()->getItemManager());
     assert(nim);
     nim->restoreCompleteState(data);
     w->restoreCompleteState(data);

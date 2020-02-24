@@ -32,7 +32,6 @@
 #include "tracks/arena_graph.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
-#include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
@@ -350,13 +349,13 @@ void Item::handleNewMesh(ItemType type)
 #ifndef SERVER_ONLY
     if (m_node == NULL)
         return;
-    setMesh(ItemManager::get()->getItemModel(type),
-        ItemManager::get()->getItemLowResolutionModel(type));
+    setMesh(ItemManager::getItemModel(type),
+        ItemManager::getItemLowResolutionModel(type));
     for (auto* node : m_node->getAllNodes())
     {
         SP::SPMeshNode* spmn = dynamic_cast<SP::SPMeshNode*>(node);
         if (spmn)
-            spmn->setGlowColor(ItemManager::get()->getGlowColor(type));
+            spmn->setGlowColor(ItemManager::getGlowColor(type));
     }
     Vec3 hpr;
     hpr.setHPR(getOriginalRotation());

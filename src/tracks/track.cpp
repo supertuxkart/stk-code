@@ -60,6 +60,7 @@
 #include "modes/linear_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
@@ -291,7 +292,7 @@ void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
     m_check_manager->reset(*this);
-    ItemManager::get()->reset();
+    m_item_manager->reset();
     m_track_object_manager->reset();
     m_startup_run = false;
 }   // reset
@@ -314,7 +315,7 @@ void Track::cleanup()
     file_manager->popModelSearchPath();
 
     Graph::destroy();
-    ItemManager::destroy();
+    m_item_manager = nullptr;
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
@@ -1609,7 +1610,7 @@ void Track::updateGraphics(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
-    ItemManager::get()->updateGraphics(dt);
+    m_item_manager->updateGraphics(dt);
 
 }   // updateGraphics
 
@@ -1626,7 +1627,7 @@ void Track::update(int ticks)
     }
     float dt = stk_config->ticks2Time(ticks);
     m_check_manager->update(dt);
-    ItemManager::get()->update(ticks);
+    m_item_manager->update(ticks);
 
     // TODO: enable onUpdate scripts if we ever find a compelling use for them
     //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
@@ -1907,13 +1908,17 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     main_loop->renderGUI(3340);
 
     if (NetworkConfig::get()->isNetworking())
-        NetworkItemManager::create();
+    {
+        auto nim = std::make_shared<NetworkItemManager>();
+        nim->rewinderAdd();
+        m_item_manager = nim;
+    }
     else
     {
         // Seed random engine locally
         uint32_t seed = (uint32_t)StkTime::getTimeSinceEpoch();
         ItemManager::updateRandomSeed(seed);
-        ItemManager::create();
+        m_item_manager = std::make_shared<ItemManager>();
         powerup_manager->setRandomSeed(seed);
     }
     main_loop->renderGUI(3360);
@@ -2181,7 +2186,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     freeCachedMeshVertexBuffer();
 
     const bool arena_random_item_created =
-        ItemManager::get()->randomItemsForArena(m_start_transforms);
+        m_item_manager->randomItemsForArena(m_start_transforms);
 
     if (!arena_random_item_created)
     {
@@ -2215,7 +2220,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     main_loop->renderGUI(5800);
 
     if (auto sl = LobbyProtocol::get<ServerLobby>())
-        sl->saveInitialItems();
+    {
+        sl->saveInitialItems(
+            std::dynamic_pointer_cast<NetworkItemManager>(m_item_manager));
+    }
 
     main_loop->renderGUI(5900);
 
@@ -2706,7 +2714,7 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    ItemManager::get()->placeItem(type, drop ? hit_point : loc, normal);
+    m_item_manager->placeItem(type, drop ? hit_point : loc, normal);
 }   // itemCommand
 
 // ----------------------------------------------------------------------------

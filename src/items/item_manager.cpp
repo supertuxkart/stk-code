@@ -48,26 +48,8 @@ std::vector<scene::IMesh *>  ItemManager::m_item_mesh;
 std::vector<scene::IMesh *>  ItemManager::m_item_lowres_mesh;
 std::vector<video::SColorf>  ItemManager::m_glow_color;
 bool                         ItemManager::m_disable_item_collection = false;
-std::shared_ptr<ItemManager> ItemManager::m_item_manager;
 std::mt19937                 ItemManager::m_random_engine;
 uint32_t                     ItemManager::m_random_seed = 0;
-
-//-----------------------------------------------------------------------------
-/** Creates one instance of the item manager. */
-void ItemManager::create()
-{
-    assert(!m_item_manager);
-    // Due to protected constructor use new instead of make_shared
-    m_item_manager = std::shared_ptr<ItemManager>(new ItemManager());
-}   // create
-
-//-----------------------------------------------------------------------------
-/** Destroys the one instance of the item manager. */
-void ItemManager::destroy()
-{
-    assert(m_item_manager);
-    m_item_manager = nullptr;
-}   // destroy
 
 //-----------------------------------------------------------------------------
 /** Loads the default item meshes (high- and low-resolution).

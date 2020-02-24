@@ -637,11 +637,12 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     // 1) Filter and sort all items close by
     // -------------------------------------
     const float max_item_lookahead_distance = 30.f;
+    ItemManager* im = Track::getCurrentTrack()->getItemManager();
     while(distance < max_item_lookahead_distance)
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
         const std::vector<ItemState *> &items_ahead =
-            ItemManager::get()->getItemsInQuads(n_index);
+            im->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
         {
             evaluateItems(items_ahead[i],  kart_aim_direction,

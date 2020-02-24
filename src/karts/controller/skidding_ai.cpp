@@ -61,6 +61,7 @@
 SkiddingAI::SkiddingAI(AbstractKart *kart)
                    : AIBaseLapController(kart)
 {
+    m_item_manager = Track::getCurrentTrack()->getItemManager();
     reset();
     // Determine if this AI has superpowers, which happens e.g.
     // for the final race challenge against nolok.
@@ -225,10 +226,10 @@ void SkiddingAI::update(int ticks)
 
     // Clear stored items if they were deleted (for example a switched nitro)
     if (m_item_to_collect &&
-        !ItemManager::get()->itemExists(m_item_to_collect))
+        !m_item_manager->itemExists(m_item_to_collect))
         m_item_to_collect = NULL;
     if (m_last_item_random &&
-        !ItemManager::get()->itemExists(m_last_item_random))
+        !m_item_manager->itemExists(m_last_item_random))
         m_last_item_random = NULL;
 
     m_controls->setRescue(false);
@@ -573,7 +574,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
         const std::vector<ItemState*> &items_ahead =
-                                  ItemManager::get()->getItemsInQuads(n_index);
+                                  m_item_manager->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
         {
             evaluateItems(items_ahead[i],  kart_aim_direction,
@@ -1163,7 +1164,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
         const std::vector<ItemState *> &items_ahead =
-            ItemManager::get()->getItemsInQuads(n_index);
+            m_item_manager->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
         {
             evaluateItems(items_ahead[i],  kart_aim_direction,
@@ -1435,7 +1436,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
     }
 
     if(m_distance_behind < 8.0f && straight_behind &&
-       (!ItemManager::get()->areItemsSwitched() || item_skill < 4))
+       (!m_item_manager->areItemsSwitched() || item_skill < 4))
     {
         m_controls->setFire(true);
         m_controls->setLookBack(true);

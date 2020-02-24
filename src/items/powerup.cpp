@@ -271,6 +271,7 @@ void Powerup::use()
 
     m_number--;
     World *world = World::getWorld();
+    ItemManager* im = Track::getCurrentTrack()->getItemManager();
     switch (m_type)
     {
     case PowerupManager::POWERUP_ZIPPER:
@@ -278,7 +279,7 @@ void Powerup::use()
         break ;
     case PowerupManager::POWERUP_SWITCH:
         {
-            ItemManager::get()->switchItems();
+            im->switchItems();
             if (!has_played_sound)
             {
                 m_sound_use->setPosition(m_kart->getXYZ());
@@ -310,8 +311,7 @@ void Powerup::use()
         // use the bubble gum the traditional way, if the kart is looking back
         if (m_kart->getControls().getLookBack())
         {
-            Item *new_item = 
-                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+            Item *new_item = im->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
 
             // E.g. ground not found in raycast.
             if(!new_item) return;
