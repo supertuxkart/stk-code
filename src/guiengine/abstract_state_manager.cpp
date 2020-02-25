@@ -49,15 +49,16 @@ AbstractStateManager::AbstractStateManager()
 
 void AbstractStateManager::enterGameState()
 {
-     // you need to close any dialog before calling this
-    assert(!ModalDialog::isADialogActive());
-    assert(!ScreenKeyboard::isActive());
-
     if (GUIEngine::isNoGraphics())
     {
+        // No graphics STK won't push dialog
         setGameState(GAME);
         return;
     }
+
+     // you need to close any dialog before calling this
+    assert(!ModalDialog::isADialogActive());
+    assert(!ScreenKeyboard::isActive());
 
     if (getCurrentScreen() != NULL) getCurrentScreen()->tearDown();
     m_menu_stack.clear();
