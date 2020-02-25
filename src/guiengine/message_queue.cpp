@@ -468,6 +468,9 @@ void showProgressBar(int progress, const core::stringw& msg)
 void discardStatic()
 {
 #ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
     delete g_static_message;
     g_static_message = NULL;
     s_msg_raise = 0;
