@@ -165,9 +165,8 @@ void Log::printMessage(int level, const char *component, const char *format,
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
     {
-        std::time_t result = std::time(nullptr);
         index += snprintf (line + index, remaining,
-            "%.24s [%s] %s: ", std::asctime(std::localtime(&result)),
+            "%s [%s] %s: ", StkTime::getLogTime().c_str(),
             names[level], component);
     }
     else

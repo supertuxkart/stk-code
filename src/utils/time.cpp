@@ -43,6 +43,26 @@ void StkTime::init()
 }   // init
 
 // ----------------------------------------------------------------------------
+/** Get the time in string for game server logging prefix (thread-safe)*/
+std::string StkTime::getLogTime()
+{
+    time_t time_now = 0;
+    time(&time_now);
+    std::tm timeptr = {};
+#ifdef WIN32
+    localtime_s(&timeptr, &time_now);
+#else
+    localtime_r(&time_now, &timeptr);
+#endif
+    std::string result;
+    result.resize(64);
+    strftime(&result[0], 64, "%a %b %d %H:%M:%S %Y", &timeptr);
+    size_t len = strlen(result.c_str());
+    result.resize(len);
+    return result;
+}   // getLogTime
+
+// ----------------------------------------------------------------------------
 
 /** Converts the time in this object to a human readable string. */
 std::string StkTime::toString(const TimeType &tt)
