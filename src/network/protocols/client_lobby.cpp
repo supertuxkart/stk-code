@@ -87,7 +87,7 @@ engine.
 
 */
 
-ClientLobby::ClientLobby(const ENetAddress& a, std::shared_ptr<Server> s)
+ClientLobby::ClientLobby(std::shared_ptr<Server> s)
            : LobbyProtocol()
 {
     m_auto_started = false;
@@ -95,7 +95,6 @@ ClientLobby::ClientLobby(const ENetAddress& a, std::shared_ptr<Server> s)
     m_server_auto_game_time = false;
     m_received_server_result = false;
     m_state.store(NONE);
-    m_server_address = a;
     m_server = s;
     setHandleDisconnections(true);
     m_disconnected_msg[PDI_TIMEOUT] = _("Server connection timed out.");
@@ -137,7 +136,8 @@ void ClientLobby::setup()
     if (!GUIEngine::isNoGraphics())
         TracksScreen::getInstance()->resetVote();
     LobbyProtocol::setup();
-    m_state.store(NONE);
+    // The client lobby is only created when connected to server
+    m_state.store(LINKED);
 }   // setup
 
 //-----------------------------------------------------------------------------
@@ -359,12 +359,6 @@ void ClientLobby::update(int ticks)
 {
     switch (m_state.load())
     {
-    case NONE:
-        if (STKHost::get()->isConnectedTo(m_server_address))
-        {
-            m_state.store(LINKED);
-        }
-        break;
     case LINKED:
     {
         NetworkConfig::get()->clearServerCapabilities();
@@ -483,6 +477,7 @@ void ClientLobby::update(int ticks)
     case SELECTING_ASSETS:
     case RACING:
     case EXITING:
+    case NONE:
         break;
     }
 }   // update
