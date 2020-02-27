@@ -334,188 +334,31 @@ extern "C" int insideIPv6CIDR(const char* ipv6_cidr, const char* ipv6_in)
 }   // andIPv6
 
 #ifndef ENABLE_IPV6
-#include "network/stk_ipv6.hpp"
 // ----------------------------------------------------------------------------
-int isIPv6Socket()
+extern "C" int isIPv6Socket()
 {
     return 0;
 }   // isIPV6
 
 // ----------------------------------------------------------------------------
-void setIPv6Socket(int val)
+extern "C" void setIPv6Socket(int val)
 {
 }   // setIPV6
 
-// ----------------------------------------------------------------------------
-std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
-{
-    return "";
-}   // getIPV6ReadableFromMappedAddress
-
-// ----------------------------------------------------------------------------
-void removeDisconnectedMappedAddress()
-{
-}   // removeDisconnectedMappedAddress
-
-// ----------------------------------------------------------------------------
-void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
-{
-}   // addMappedAddress
-
 #else
 
-#include "network/stk_ipv6.hpp"
-#include "network/protocols/connect_to_server.hpp"
-#include "utils/string_utils.hpp"
-#include "utils/log.hpp"
-#include "utils/time.hpp"
-#include "utils/types.hpp"
-
-#include <algorithm>
-#include <vector>
-
 // ============================================================================
-uint32_t g_mapped_ipv6_used;
 int g_ipv6;
-struct MappedAddress
-{
-    ENetAddress m_addr;
-    struct sockaddr_in6 m_in6;
-    uint64_t m_last_activity;
-    MappedAddress(const ENetAddress& addr, const struct sockaddr_in6& in6)
-    {
-        m_addr = addr;
-        m_in6 = in6;
-        m_last_activity = StkTime::getMonoTimeMs();
-    }
-};
-std::vector<MappedAddress> g_mapped_ips;
 // ============================================================================
-int isIPv6Socket()
+extern "C" int isIPv6Socket()
 {
     return g_ipv6;
 }   // isIPV6
 
 // ----------------------------------------------------------------------------
-void setIPv6Socket(int val)
+extern "C" void setIPv6Socket(int val)
 {
     g_ipv6 = val;
 }   // setIPV6
-
-// ----------------------------------------------------------------------------
-void stkInitialize()
-{
-    // Clear previous setting, in case user changed wifi or mobile data
-    g_mapped_ipv6_used = 0;
-    g_ipv6 = 0;
-    g_mapped_ips.clear();
-}   // stkInitialize
-
-// ----------------------------------------------------------------------------
-std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea)
-{
-    std::string result;
-    auto it = std::find_if(g_mapped_ips.begin(), g_mapped_ips.end(),
-        [ea](const MappedAddress& addr)
-        {
-            return ea->host == addr.m_addr.host &&
-                ea->port == addr.m_addr.port;
-        });
-    if (it != g_mapped_ips.end())
-        result = getIPV6ReadableFromIn6(&it->m_in6);
-    return result;
-}   // getIPV6ReadableFromMappedAddress
-
-// ----------------------------------------------------------------------------
-/** Add a (fake or synthesized by ios / osx) IPv4 address and map it to an IPv6
- *  one, used in client to set the game server address or server to initialize
- *  host.
- */
-void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6)
-{
-    g_mapped_ips.emplace_back(*ea, *in6);
-}   // addMappedAddress
-
-// ----------------------------------------------------------------------------
-/* This is called when enet needs to sent to an mapped IPv4 address, we look up
- * the map here and get the real IPv6 address, so you need to call
- * addMappedAddress above first (for client mostly).
- */
-void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6)
-{
-    auto it = std::find_if(g_mapped_ips.begin(), g_mapped_ips.end(),
-        [ea](const MappedAddress& addr)
-        {
-            return ea->host == addr.m_addr.host &&
-                ea->port == addr.m_addr.port;
-        });
-    if (it != g_mapped_ips.end())
-    {
-        it->m_last_activity = StkTime::getMonoTimeMs();
-        memcpy(in6, &it->m_in6, sizeof(struct sockaddr_in6));
-    }
-    else
-        memset(in6, 0, sizeof(struct sockaddr_in6));
-}   // getIPV6FromMappedAddress
-
-// ----------------------------------------------------------------------------
-/* This is called when enet recieved a packet from its socket, we create an
- * real IPv4 address out of it or a fake one if it's from IPv6 connection.
- */
-void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea)
-{
-    auto it = std::find_if(g_mapped_ips.begin(), g_mapped_ips.end(),
-        [in6](const MappedAddress& addr)
-        {
-            return sameIPV6(in6, &addr.m_in6);
-        });
-    if (it != g_mapped_ips.end())
-    {
-        it->m_last_activity = StkTime::getMonoTimeMs();
-        *ea = it->m_addr;
-        return;
-    }
-
-    if (isIPv4MappedAddress(in6))
-    {
-        ea->host = ((in_addr*)(in6->sin6_addr.s6_addr + 12))->s_addr;
-        ea->port = ntohs(in6->sin6_port);
-        addMappedAddress(ea, in6);
-    }
-    else
-    {
-        // Create a fake IPv4 address of 0.x.x.x if it's a real IPv6 connection
-        if (g_mapped_ipv6_used >= 16777215)
-            g_mapped_ipv6_used = 0;
-        *ea = ConnectToServer::toENetAddress(++g_mapped_ipv6_used,
-            ntohs(in6->sin6_port));
-        Log::debug("IPv6", "Fake IPv4 address %s mapped to %s",
-            ConnectToServer::enetAddressToString(*ea).c_str(),
-            getIPV6ReadableFromIn6(in6).c_str());
-        addMappedAddress(ea, in6);
-    }
-}   // getMappedFromIPV6
-
-// ----------------------------------------------------------------------------
-/* Called when a peer is expired (no activity for 20 seconds) and we remove its
- * reference to the IPv6.
- */
-void removeDisconnectedMappedAddress()
-{
-    for (auto it = g_mapped_ips.begin(); it != g_mapped_ips.end();)
-    {
-        if (it->m_last_activity + 20000 < StkTime::getMonoTimeMs())
-        {
-            Log::debug("IPv6", "Removing expired %s, IPv4 address %s.",
-                getIPV6ReadableFromIn6(&it->m_in6).c_str(),
-                ConnectToServer::enetAddressToString(it->m_addr).c_str());
-            it = g_mapped_ips.erase(it);
-            Log::debug("IPv6", "Mapped address size now: %d.",
-                g_mapped_ips.size());
-        }
-        else
-            it++;
-    }
-}   // removeDisconnectedMappedAddress
 
 #endif

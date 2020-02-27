@@ -69,7 +69,7 @@ Network::Network(int peer_count, int channel_limit,
     {
         Log::warn("Network", "%d port is in used, use another port",
             address->port);
-        ENetAddress new_addr;
+        ENetAddress new_addr = {};
         new_addr.host = address->host;
         // Any port
         new_addr.port = 0;

@@ -69,17 +69,6 @@ enum ENetCommandType : unsigned int
 
 class STKHost
 {
-public:
-    /** \brief Defines three host types for the server.
-    *  These values tells the host where he will accept connections from.
-    */
-    enum
-    {
-        HOST_ANY = 0,             //!< Any host.
-        HOST_BROADCAST = 0xFFFFFFFF,    //!< Defines the broadcast address.
-        PORT_ANY = 0              //!< Any port.
-    };
-
 private:
     /** Singleton pointer to the instance. */
     static STKHost* m_stk_host;

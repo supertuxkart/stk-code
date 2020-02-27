@@ -76,6 +76,19 @@ typedef enum _ENetSocketShutdown
 #define ENET_HOST_BROADCAST 0xFFFFFFFFU
 #define ENET_PORT_ANY       0
 
+typedef struct _ENetIP
+{
+   enet_uint32 p0; // uint32_t here for IPv4, or 4 uint32_t IPv6 address
+   enet_uint32 p1;
+   enet_uint32 p2;
+   enet_uint32 p3;
+   enet_uint32 p4; // sockaddr_in6 sin6_scope_id (required for local link address)
+} ENetIP;
+
+// We don't need to test sin6_scope_id as it only used for connection, and sin6_flowinfo is always zero
+#define enet_ip_equal(a, b) (a.p0 == b.p0 && a.p1 == b.p1 && a.p2 == b.p2 && a.p3 == b.p3)
+#define enet_ip_not_equal(a, b) (a.p0 != b.p0 || a.p1 != b.p1 || a.p2 != b.p2 || a.p3 != b.p3)
+
 /**
  * Portable internet address structure. 
  *
@@ -88,7 +101,7 @@ typedef enum _ENetSocketShutdown
  */
 typedef struct _ENetAddress
 {
-   enet_uint32 host;
+   ENetIP host;
    enet_uint16 port;
 } ENetAddress;
 

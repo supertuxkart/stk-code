@@ -68,8 +68,6 @@ public:
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
-    static std::string enetAddressToString(const ENetAddress& addr);
-    static ENetAddress toENetAddress(uint32_t ip, uint16_t port);
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

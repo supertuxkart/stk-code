@@ -210,9 +210,7 @@ void NetworkConfig::detectIPType()
         return;
     }
 #ifdef ENABLE_IPV6
-    ENetAddress eaddr;
-    eaddr.host = STKHost::HOST_ANY;
-    eaddr.port = STKHost::PORT_ANY;
+    ENetAddress eaddr = {};
     // We don't need to result of stun, just to check if the socket can be
     // used in ipv4 or ipv6
     uint8_t stun_tansaction_id[16] = {};

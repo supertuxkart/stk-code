@@ -117,8 +117,6 @@ protected:
 
     std::string m_user_version;
 
-    std::string m_ipv6_address;
-
     /** List of client capabilities set when connecting it, to determine
      *  features available in same version. */
     std::set<std::string> m_client_capabilities;
@@ -139,8 +137,6 @@ public:
     void reset();
     // ------------------------------------------------------------------------
     bool isConnected() const;
-    // ------------------------------------------------------------------------
-    const std::string& getIPV6Address() const  { return m_ipv6_address; }
     // ------------------------------------------------------------------------
     bool isSamePeer(const STKPeer* peer) const;
     bool isSamePeer(const ENetPeer* peer) const;
