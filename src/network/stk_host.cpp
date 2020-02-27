@@ -873,7 +873,7 @@ void STKHost::mainLoop()
                             std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
                             m_enet_cmd.emplace_back(p.second->getENetPeer(),
                                 (ENetPacket*)NULL, PDI_KICK_HIGH_PING,
-                                ECT_DISCONNECT);
+                                ECT_DISCONNECT, p.first->address);
                         }
                         else if (!p.second->hasWarnedForHighPing())
                         {
@@ -955,13 +955,27 @@ void STKHost::mainLoop()
             peer_lock.unlock();
         }
 
-        std::list<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
-            ENetCommandType> > copied_list;
+        std::vector<std::tuple<ENetPeer*, ENetPacket*, uint32_t,
+            ENetCommandType, ENetAddress> > copied_list;
         std::unique_lock<std::mutex> lock(m_enet_cmd_mutex);
         std::swap(copied_list, m_enet_cmd);
         lock.unlock();
         for (auto& p : copied_list)
         {
+            ENetPeer* peer = std::get<0>(p);
+            ENetAddress& ea = std::get<4>(p);
+            ENetAddress& ea_peer_now = peer->address;
+            ENetPacket* packet = std::get<1>(p);
+            // Enet will reuse a disconnected peer so we check here to avoid
+            // sending to wrong peer
+            if (peer->state != ENET_PEER_STATE_CONNECTED ||
+                (ea_peer_now.host != ea.host && ea_peer_now.port != ea.port))
+            {
+                if (packet != NULL)
+                    enet_packet_destroy(packet);
+                continue;
+            }
+
             switch (std::get<3>(p))
             {
             case ECT_SEND_PACKET:
@@ -969,24 +983,22 @@ void STKHost::mainLoop()
                 // If enet_peer_send failed, destroy the packet to
                 // prevent leaking, this can only be done if the packet
                 // is copied instead of shared sending to all peers
-                ENetPacket* packet = std::get<1>(p);
-                if (enet_peer_send(
-                    std::get<0>(p), (uint8_t)std::get<2>(p), packet) < 0)
+                if (enet_peer_send(peer, (uint8_t)std::get<2>(p), packet) < 0)
                 {
                     enet_packet_destroy(packet);
                 }
                 break;
             }
             case ECT_DISCONNECT:
-                enet_peer_disconnect(std::get<0>(p), std::get<2>(p));
+                enet_peer_disconnect(peer, std::get<2>(p));
                 break;
             case ECT_RESET:
                 // Flush enet before reset (so previous command is send)
                 enet_host_flush(host);
-                enet_peer_reset(std::get<0>(p));
+                enet_peer_reset(peer);
                 // Remove the stk peer of it
                 std::lock_guard<std::mutex> lock(m_peers_mutex);
-                m_peers.erase(std::get<0>(p));
+                m_peers.erase(peer);
                 break;
             }
         }

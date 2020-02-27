@@ -98,9 +98,9 @@ private:
 
     /** Let (atm enet_peer_send and enet_peer_disconnect) run in the listening
      *  thread. */
-    std::list<std::tuple</*peer receive*/ENetPeer*,
+    std::vector<std::tuple</*peer receive*/ENetPeer*,
         /*packet to send*/ENetPacket*, /*integer data*/uint32_t,
-        ENetCommandType> > m_enet_cmd;
+        ENetCommandType, ENetAddress> > m_enet_cmd;
 
     /** Protect \ref m_enet_cmd from multiple threads usage. */
     std::mutex m_enet_cmd_mutex;
@@ -285,10 +285,10 @@ public:
     void setErrorMessage(const irr::core::stringw &message);
     // ------------------------------------------------------------------------
     void addEnetCommand(ENetPeer* peer, ENetPacket* packet, uint32_t i,
-                        ENetCommandType ect)
+                        ENetCommandType ect, ENetAddress ea)
     {
         std::lock_guard<std::mutex> lock(m_enet_cmd_mutex);
-        m_enet_cmd.emplace_back(peer, packet, i, ect);
+        m_enet_cmd.emplace_back(peer, packet, i, ect, ea);
     }
     // ------------------------------------------------------------------------
     /** Returns the last error (or "" if no error has happened). */

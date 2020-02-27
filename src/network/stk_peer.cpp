@@ -83,12 +83,9 @@ void STKPeer::disconnect()
 {
     if (m_disconnected.load())
         return;
-    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        (m_enet_peer->address.host != m_address.host &&
-        m_enet_peer->address.port != m_address.port))
-        return;
     m_disconnected.store(true);
-    m_host->addEnetCommand(m_enet_peer, NULL, PDI_NORMAL, ECT_DISCONNECT);
+    m_host->addEnetCommand(m_enet_peer, NULL, PDI_NORMAL, ECT_DISCONNECT,
+        m_address);
 }   // disconnect
 
 //-----------------------------------------------------------------------------
@@ -98,12 +95,9 @@ void STKPeer::kick()
 {
     if (m_disconnected.load())
         return;
-    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        (m_enet_peer->address.host != m_address.host &&
-        m_enet_peer->address.port != m_address.port))
-        return;
     m_disconnected.store(true);
-    m_host->addEnetCommand(m_enet_peer, NULL, PDI_KICK, ECT_DISCONNECT);
+    m_host->addEnetCommand(m_enet_peer, NULL, PDI_KICK, ECT_DISCONNECT,
+        m_address);
 }   // kick
 
 //-----------------------------------------------------------------------------
@@ -113,12 +107,8 @@ void STKPeer::reset()
 {
     if (m_disconnected.load())
         return;
-    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        (m_enet_peer->address.host != m_address.host &&
-        m_enet_peer->address.port != m_address.port))
-        return;
     m_disconnected.store(true);
-    m_host->addEnetCommand(m_enet_peer, NULL, 0, ECT_RESET);
+    m_host->addEnetCommand(m_enet_peer, NULL, 0, ECT_RESET, m_address);
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -130,12 +120,6 @@ void STKPeer::reset()
 void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
 {
     if (m_disconnected.load())
-        return;
-    // Enet will reuse a disconnected peer so we check here to avoid sending
-    // to wrong peer
-    if (m_enet_peer->state != ENET_PEER_STATE_CONNECTED ||
-        (m_enet_peer->address.host != m_address.host &&
-        m_enet_peer->address.port != m_address.port))
         return;
 
     ENetPacket* packet = NULL;
@@ -162,7 +146,7 @@ void STKPeer::sendPacket(NetworkString *data, bool reliable, bool encrypted)
         }
         m_host->addEnetCommand(m_enet_peer, packet,
                 encrypted ? EVENT_CHANNEL_NORMAL : EVENT_CHANNEL_UNENCRYPTED,
-                ECT_SEND_PACKET);
+                ECT_SEND_PACKET, m_address);
     }
 }   // sendPacket
 
