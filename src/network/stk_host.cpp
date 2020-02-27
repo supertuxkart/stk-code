@@ -256,9 +256,7 @@ STKHost::STKHost(bool server)
     init();
     m_host_id = std::numeric_limits<uint32_t>::max();
 
-    ENetAddress addr;
-    addr.host = STKHost::HOST_ANY;
-
+    ENetAddress addr = {};
     if (server)
     {
         setIPv6Socket(ServerConfig::m_ipv6_server ? 1 : 0);
@@ -758,8 +756,7 @@ void STKHost::mainLoop()
     if ((NetworkConfig::get()->isLAN() && is_server) ||
         NetworkConfig::get()->isPublicServer())
     {
-        ENetAddress eaddr;
-        eaddr.host = STKHost::HOST_ANY;
+        ENetAddress eaddr = {};
         eaddr.port = stk_config->m_server_discovery_port;
         direct_socket = new Network(1, 1, 0, 0, &eaddr);
         if (direct_socket->getENetHost() == NULL)
@@ -774,7 +771,6 @@ void STKHost::mainLoop()
     uint64_t last_ping_time = StkTime::getMonoTimeMs();
     uint64_t last_update_speed_time = StkTime::getMonoTimeMs();
     uint64_t last_ping_time_update_for_client = StkTime::getMonoTimeMs();
-    uint64_t last_disconnect_time_update = StkTime::getMonoTimeMs();
     std::map<std::string, uint64_t> ctp;
     while (m_exit_timeout.load() > StkTime::getMonoTimeMs())
     {
@@ -812,15 +808,6 @@ void STKHost::mainLoop()
             }
         }   // if discovery host
 
-        if (isIPv6Socket() &&
-            last_disconnect_time_update < StkTime::getMonoTimeMs())
-        {
-            // Check per 20 second, client needs to be handled too in case
-            // the address changed in intercept callback
-            // (see ConnectToServer::interceptCallback)
-            last_disconnect_time_update = StkTime::getMonoTimeMs() + 20000;
-            removeDisconnectedMappedAddress();
-        }
         if (is_server)
         {
             std::unique_lock<std::mutex> peer_lock(m_peers_mutex);
@@ -969,7 +956,12 @@ void STKHost::mainLoop()
             // Enet will reuse a disconnected peer so we check here to avoid
             // sending to wrong peer
             if (peer->state != ENET_PEER_STATE_CONNECTED ||
+#ifdef ENABLE_IPV6
+                (enet_ip_not_equal(ea_peer_now.host, ea.host) &&
+                ea_peer_now.port != ea.port))
+#else
                 (ea_peer_now.host != ea.host && ea_peer_now.port != ea.port))
+#endif
             {
                 if (packet != NULL)
                     enet_packet_destroy(packet);

@@ -159,9 +159,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
         // --------------------------------------------------------------------
         virtual void operation() OVERRIDE
         {
-            ENetAddress addr;
-            addr.host = STKHost::HOST_ANY;
-            addr.port = STKHost::PORT_ANY;
+            ENetAddress addr = {};
             setIPv6Socket(UserConfigParams::m_ipv6_lan ? 1 : 0);
             NetworkConfig::get()->setIPType(UserConfigParams::m_ipv6_lan ?
                 NetworkConfig::IP_DUAL_STACK : NetworkConfig::IP_V4);

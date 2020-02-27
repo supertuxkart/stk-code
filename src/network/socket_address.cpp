@@ -64,6 +64,33 @@ SocketAddress::SocketAddress(uint8_t b1, uint8_t b2, uint8_t b3, uint8_t b4,
 }   // SocketAddress(uint8_t,...)
 
 // ----------------------------------------------------------------------------
+/** ENetAddress constructor. */
+SocketAddress::SocketAddress(const ENetAddress& ea)
+{
+#ifdef ENABLE_IPV6
+    if (isIPv6Socket())
+    {
+        m_family = AF_INET6;
+        m_sockaddr = {};
+        struct sockaddr_in6* in6 = (struct sockaddr_in6*)m_sockaddr.data();
+        in6->sin6_family = AF_INET6;
+        in6->sin6_port = htons(ea.port);
+        // We modify host to use 5 uint32_t (see enet.h)
+        memcpy(in6->sin6_addr.s6_addr, &ea.host.p0, 16);
+        in6->sin6_scope_id = ea.host.p4;
+    }
+    else
+    {
+        setIP(htonl(ea.host.p0));
+        setPort(ea.port);
+    }
+#else
+    setIP(htonl(ea.host));
+    setPort(ea.port);
+#endif
+}   // SocketAddress(const ENetAddress&)
+
+// ----------------------------------------------------------------------------
 /** String initialization (Can be IPv4, IPv6 or domain).
  *  \param str The address (can have a port with :)
  *  \param port_number The port number, default is 0 or overwritten if
@@ -680,3 +707,31 @@ void SocketAddress::unitTesting()
     assert(ipv6_port.getPort() == 1);
 
 }   // unitTesting
+
+// ----------------------------------------------------------------------------
+ENetAddress SocketAddress::toENetAddress() const
+{
+    ENetAddress ea = {};
+    uint32_t ip = getIP();
+#ifdef ENABLE_IPV6
+    if (isIPv6Socket())
+    {
+        struct sockaddr_in6* in6 = (struct sockaddr_in6*)m_sockaddr.data();
+        memcpy(&ea.host.p0, in6->sin6_addr.s6_addr, 16);
+        ea.host.p4 = in6->sin6_scope_id;
+    }
+    else
+    {
+        // because ENet wants little endian
+        ea.host.p0 = ((ip & 0xff000000) >> 24) +
+            ((ip & 0x00ff0000) >> 8) + ((ip & 0x0000ff00) << 8) +
+            ((ip & 0x000000ff) << 24);
+    }
+#else
+    ea.host = ((ip & 0xff000000) >> 24) +
+        ((ip & 0x00ff0000) >> 8) + ((ip & 0x0000ff00) << 8) +
+        ((ip & 0x000000ff) << 24);
+#endif
+    ea.port = getPort();
+    return ea;
+}   // toENetAddress

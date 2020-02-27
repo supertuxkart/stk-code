@@ -31,6 +31,7 @@
 #  include <netinet/in.h>
 #  include <sys/socket.h>
 #endif
+#include <enet/enet.h>
 
 #include <array>
 #include <cstring>
@@ -68,6 +69,8 @@ public:
     {
         init(str, port_number, family);
     }
+    // ------------------------------------------------------------------------
+    SocketAddress(const ENetAddress& ea);
     // ------------------------------------------------------------------------
     bool operator==(const SocketAddress& other) const;
     // ------------------------------------------------------------------------
@@ -154,6 +157,8 @@ public:
     bool isLoopback() const;
     // ------------------------------------------------------------------------
     void convertForIPv6Socket(bool ipv6);
+    // ------------------------------------------------------------------------
+    ENetAddress toENetAddress() const;
 };   // SocketAddress
 
 #endif // HEADER_SOCKET_ADDRESS_HPP
