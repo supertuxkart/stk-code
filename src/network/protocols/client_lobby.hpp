@@ -73,8 +73,6 @@ private:
     void handleBadConnection();
     void becomingServerOwner();
 
-    ENetAddress m_server_address;
-
     std::shared_ptr<Server> m_server;
 
     enum ClientState : unsigned int
@@ -143,7 +141,7 @@ private:
          bool* is_spectator = NULL) const;
     void getKartsTracksNetworkString(BareNetworkString* ns);
 public:
-             ClientLobby(const ENetAddress& a, std::shared_ptr<Server> s);
+             ClientLobby(std::shared_ptr<Server> s);
     virtual ~ClientLobby();
     void doneWithResults();
     bool receivedServerResult()            { return m_received_server_result; }
