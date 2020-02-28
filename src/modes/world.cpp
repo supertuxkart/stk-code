@@ -189,7 +189,7 @@ void World::init()
     Scripting::ScriptEngine::getInstance()->loadScript(script_path, true);
     main_loop->renderGUI(1200);
     // Create the physics
-    Physics::getInstance<Physics>();
+    Physics::create();
     main_loop->renderGUI(1300);
     unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     //assert(num_karts > 0);
@@ -634,7 +634,7 @@ World::~World()
 
     // In case that the track is not found, Physics was not instantiated,
     // but kill handles this correctly.
-    Physics::kill();
+    Physics::destroy();
 
     Scripting::ScriptEngine::kill();
 
@@ -756,7 +756,7 @@ void World::resetAllKarts()
 {
     // Reset the physics 'remaining' time to 0 so that the number
     // of timesteps is reproducible if doing a physics-based history run
-    Physics::getInstance()->getPhysicsWorld()->resetLocalTime();
+    Physics::get()->getPhysicsWorld()->resetLocalTime();
 
     // If track checking is requested, check all rescue positions if
     // they are high enough.
@@ -831,7 +831,7 @@ void World::resetAllKarts()
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
     for(int i=0; i<stk_config->getPhysicsFPS(); i++) 
-        Physics::getInstance()->update(1);
+        Physics::get()->update(1);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
@@ -1146,7 +1146,7 @@ void World::update(int ticks)
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (physics)", 0xa0, 0x7F, 0x00);
-    Physics::getInstance()->update(ticks);
+    Physics::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_POP_CPU_MARKER();

@@ -156,7 +156,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     m_shape = shape;
     createBody(m_mass, trans, m_shape, restitution);
     m_user_pointer.set(this);
-    Physics::getInstance()->addBody(getBody());
+    Physics::get()->addBody(getBody());
 
     m_body->setGravity(gravity);
     if (gravity.length2() != 0.0f && m_do_terrain_info)
@@ -237,7 +237,7 @@ void Flyable::removePhysics()
     }
     if (m_body.get())
     {
-        Physics::getInstance()->removeBody(m_body.get());
+        Physics::get()->removeBody(m_body.get());
         m_body.reset();
     }
 }   // removePhysics

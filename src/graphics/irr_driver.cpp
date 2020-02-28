@@ -2022,9 +2022,9 @@ void IrrDriver::update(float dt, bool is_loading)
                 irr_driver->getActualScreenSize().Height);
         }
 
-        if (!is_loading && Physics::getInstance())
+        if (!is_loading && Physics::get())
         {
-            IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
+            IrrDebugDrawer* debug_drawer = Physics::get()->getDebugDrawer();
             if (debug_drawer != NULL && debug_drawer->debugEnabled())
             {
                 debug_drawer->beginNextFrame();

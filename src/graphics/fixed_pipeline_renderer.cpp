@@ -71,7 +71,7 @@ void FixedPipelineRenderer::render(float dt, bool is_loading)
         // is not set up properly. This is only used for
         // the bullet debug view.
         if (UserConfigParams::m_artist_debug_mode)
-            Physics::getInstance()->draw();
+            Physics::get()->draw();
     }   // for i<world->getNumKarts()
 
     // Set the viewport back to the full screen for race gui
