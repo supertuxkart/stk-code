@@ -193,7 +193,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 // ----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
-    Physics::getInstance()->removeBody(m_body);
+    Physics::get()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
 
@@ -591,7 +591,7 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
 
-    Physics::getInstance()->addBody(m_body);
+    Physics::get()->addBody(m_body);
     m_body_added = true;
     if(m_triangle_mesh)
         m_triangle_mesh->setBody(m_body);
@@ -749,7 +749,7 @@ void PhysicalObject::removeBody()
 {
     if (m_body_added)
     {
-        Physics::getInstance()->removeBody(m_body);
+        Physics::get()->removeBody(m_body);
         m_body_added = false;
     }
 }   // Remove body
@@ -761,7 +761,7 @@ void PhysicalObject::addBody()
     if (!m_body_added)
     {
         m_body_added = true;
-        Physics::getInstance()->addBody(m_body);
+        Physics::get()->addBody(m_body);
     }
 }   // Add body
 

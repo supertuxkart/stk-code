@@ -260,7 +260,7 @@ bool handleContextMenuAction(s32 cmd_id)
     }
 
     World *world = World::getWorld();
-    Physics *physics = Physics::getInstance();
+    Physics *physics = Physics::get();
     SP::SPShader* nv = NULL;
 #ifndef SERVER_ONLY
     if (SP::getNormalVisualizer())
@@ -317,7 +317,7 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         irr_driver->resetDebugModes();
 
-        Physics *physics = Physics::getInstance();
+        Physics *physics = Physics::get();
         if (!physics) return false;
         physics->setDebugMode(IrrDebugDrawer::DM_NO_KARTS_GRAPHICS);
         break;

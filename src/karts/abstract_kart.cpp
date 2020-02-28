@@ -113,7 +113,7 @@ void AbstractKart::changeKart(const std::string& new_ident,
     // Reset previous kart (including delete old animation above)
     reset();
     // Remove kart body
-    Physics::getInstance()->removeKart(this);
+    Physics::get()->removeKart(this);
     loadKartProperties(new_ident, handicap, ri);
 }   // changeKart
 

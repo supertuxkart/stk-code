@@ -285,7 +285,7 @@ Kart::~Kart()
     // Ghost karts don't have a body
     if(m_body)
     {
-        Physics::getInstance()->removeKart(this);
+        Physics::get()->removeKart(this);
     }
 
     delete m_max_speed;
@@ -317,8 +317,8 @@ void Kart::reset()
     // don't have one).
     if(m_body)
     {
-        Physics::getInstance()->removeKart(this);
-        Physics::getInstance()->addKart(this);
+        Physics::get()->removeKart(this);
+        Physics::get()->addKart(this);
     }
 
     m_min_nitro_ticks = 0;
@@ -748,7 +748,7 @@ void Kart::createPhysics()
     // Create the actual vehicle
     // -------------------------
     m_vehicle_raycaster.reset(
-        new btKartRaycaster(Physics::getInstance()->getPhysicsWorld(),
+        new btKartRaycaster(Physics::get()->getPhysicsWorld(),
                             stk_config->m_smooth_normals &&
                             Track::getCurrentTrack()->smoothNormals()));
     m_vehicle.reset(new btKart(m_body.get(), m_vehicle_raycaster.get(), this));
@@ -1308,7 +1308,7 @@ void Kart::eliminate()
 {
     if (!getKartAnimation())
     {
-        Physics::getInstance()->removeKart(this);
+        Physics::get()->removeKart(this);
     }
     if (m_stars_effect)
     {

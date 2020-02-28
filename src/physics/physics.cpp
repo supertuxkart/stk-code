@@ -43,6 +43,31 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/profiler.hpp"
+#include "utils/stk_process.hpp"
+
+//=============================================================================
+Physics* g_physics[PT_COUNT];
+// ----------------------------------------------------------------------------
+Physics* Physics::get()
+{
+    ProcessType type = STKProcess::getType();
+    return g_physics[type];
+}   // get
+
+// ----------------------------------------------------------------------------
+void Physics::create()
+{
+    ProcessType type = STKProcess::getType();
+    g_physics[type] = new Physics();
+}   // create
+
+// ----------------------------------------------------------------------------
+void Physics::destroy()
+{
+    ProcessType type = STKProcess::getType();
+    delete g_physics[type];
+    g_physics[type] = NULL;
+}   // destroy
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
