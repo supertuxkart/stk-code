@@ -26,7 +26,7 @@ subject to the following restrictions:
 #include "LinearMath/btPoolAllocator.h"
 #include "BulletCollision/CollisionDispatch/btCollisionConfiguration.h"
 
-int gNumManifold = 0;
+//int gNumManifold = 0;
 
 #ifdef BT_DEBUG
 #include <stdio.h>
@@ -69,7 +69,7 @@ btCollisionDispatcher::~btCollisionDispatcher()
 
 btPersistentManifold*	btCollisionDispatcher::getNewManifold(void* b0,void* b1) 
 { 
-	gNumManifold++;
+	//gNumManifold++;
 	
 	//btAssert(gNumManifold < 65535);
 	
@@ -119,7 +119,7 @@ void btCollisionDispatcher::clearManifold(btPersistentManifold* manifold)
 void btCollisionDispatcher::releaseManifold(btPersistentManifold* manifold)
 {
 	
-	gNumManifold--;
+	//gNumManifold--;
 
 	//printf("releaseManifold: gNumManifold %d\n",gNumManifold);
 	clearManifold(manifold);
