@@ -210,6 +210,7 @@ public:
     // singleton
     static StateManager* get();
     static void deallocate();
+    static void clear();
     void clearMenuStack() { m_menu_stack.clear(); }
 private:
     /**

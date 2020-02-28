@@ -27,6 +27,7 @@
 #include "network/protocol.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
@@ -174,7 +175,7 @@ private:
     EventList m_controller_events_list;
 
     /*! Single instance of protocol manager.*/
-    static std::weak_ptr<ProtocolManager> m_protocol_manager;
+    static std::weak_ptr<ProtocolManager> m_protocol_manager[PT_COUNT];
 
     bool sendEvent(Event* event,
                    std::array<OneProtocolType, PROTOCOL_MAX>& protocols);
@@ -205,12 +206,12 @@ public:
     // ------------------------------------------------------------------------
     static bool emptyInstance()
     {
-        return m_protocol_manager.expired();
+        return m_protocol_manager[STKProcess::getType()].expired();
     }   // emptyInstance
     // ------------------------------------------------------------------------
     static std::shared_ptr<ProtocolManager> lock()
     {
-        return m_protocol_manager.lock();
+        return m_protocol_manager[STKProcess::getType()].lock();
     }   // lock
 
 };   // class ProtocolManager

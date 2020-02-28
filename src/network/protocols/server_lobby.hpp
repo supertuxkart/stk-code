@@ -388,6 +388,7 @@ public:
     void initServerStatsTable();
     bool isAIProfile(const std::shared_ptr<NetworkPlayerProfile>& npp) const
                      { return m_ai_profiles.find(npp) != m_ai_profiles.end(); }
+    uint32_t getServerIdOnline() const           { return m_server_id_online; }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

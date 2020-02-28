@@ -44,7 +44,7 @@
 #  include <netdb.h>
 #endif
 
-NetworkConfig *NetworkConfig::m_network_config = NULL;
+NetworkConfig *NetworkConfig::m_network_config[PT_COUNT];
 
 /** \class NetworkConfig
  *  This class is the interface between STK and the online code, particularly

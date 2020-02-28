@@ -22,6 +22,7 @@
 #ifndef STK_HOST_HPP
 #define STK_HOST_HPP
 
+#include "utils/stk_process.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/time.hpp"
 
@@ -35,6 +36,7 @@
 
 #include <atomic>
 #include <cassert>
+#include <cstring>
 #include <list>
 #include <functional>
 #include <map>
@@ -54,7 +56,7 @@ class NetworkString;
 class NetworkTimerSynchronizer;
 class Server;
 class ServerLobby;
-class SeparateProcess;
+class ChildLoop;
 class SocketAddress;
 class STKPeer;
 
@@ -71,10 +73,12 @@ class STKHost
 {
 private:
     /** Singleton pointer to the instance. */
-    static STKHost* m_stk_host;
+    static STKHost* m_stk_host[PT_COUNT];
 
     /** Separate process of server instance. */
-    SeparateProcess* m_separate_process;
+    ChildLoop* m_client_loop;
+
+    std::thread m_client_loop_thread;
 
     /** ENet host interfacing sockets. */
     Network* m_network;
@@ -164,7 +168,7 @@ private:
                                    std::shared_ptr<ServerLobby> sl,
                                    std::map<std::string, uint64_t>& ctp);
     // ------------------------------------------------------------------------
-    void mainLoop();
+    void mainLoop(ProcessType pt);
     // ------------------------------------------------------------------------
     void getIPFromStun(int socket, const std::string& stun_address,
                        short family, SocketAddress* result);
@@ -175,24 +179,29 @@ public:
     /** Creates the STKHost. It takes all confifguration parameters from
      *  NetworkConfig. This STKHost can either be a client or a server.
      */
-    static std::shared_ptr<LobbyProtocol> create(SeparateProcess* p = NULL);
+    static std::shared_ptr<LobbyProtocol> create(ChildLoop* cl = NULL);
     // ------------------------------------------------------------------------
     /** Returns the instance of STKHost. */
     static STKHost *get()
     {
-        assert(m_stk_host != NULL);
-        return m_stk_host;
+        ProcessType pt = STKProcess::getType();
+        assert(m_stk_host[pt] != NULL);
+        return m_stk_host[pt];
     }   // get
     // ------------------------------------------------------------------------
     static void destroy()
     {
-        assert(m_stk_host != NULL);
-        delete m_stk_host;
-        m_stk_host = NULL;
+        ProcessType pt = STKProcess::getType();
+        assert(m_stk_host[pt] != NULL);
+        delete m_stk_host[pt];
+        m_stk_host[pt] = NULL;
     }   // destroy
     // ------------------------------------------------------------------------
     /** Checks if the STKHost has been created. */
-    static bool existHost() { return m_stk_host != NULL; }
+    static bool existHost()
+                       { return m_stk_host[STKProcess::getType()] != NULL; }
+    // ------------------------------------------------------------------------
+    static void clear()          { memset(m_stk_host, 0, sizeof(m_stk_host)); }
     // ------------------------------------------------------------------------
     const SocketAddress& getPublicAddress() const
                                             { return *m_public_address.get(); }
@@ -332,14 +341,6 @@ public:
     // ------------------------------------------------------------------------
     bool isClientServer() const;
     // ------------------------------------------------------------------------
-    bool hasServerAI() const;
-    // ------------------------------------------------------------------------
-    void setSeparateProcess(SeparateProcess* p)
-    {
-        assert(m_separate_process == NULL);
-        m_separate_process = p;
-    }
-    // ------------------------------------------------------------------------
     void initClientNetwork(ENetEvent& event, Network* new_network);
     // ------------------------------------------------------------------------
     std::map<uint32_t, uint32_t> getPeerPings()
@@ -387,6 +388,8 @@ public:
     }
     // ------------------------------------------------------------------------
     static BareNetworkString getStunRequest(uint8_t* stun_tansaction_id);
+    // ------------------------------------------------------------------------
+    ChildLoop* getChildLoop() const { return m_client_loop; }
 };   // class STKHost
 
 #endif // STK_HOST_HPP
