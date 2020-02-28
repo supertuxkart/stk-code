@@ -687,6 +687,7 @@ namespace GUIEngine
 #include "tips/tips_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/translation.hpp"
 
 #include <algorithm>
@@ -755,7 +756,7 @@ namespace GUIEngine
 
     std::vector<MenuMessage> gui_messages;
 
-    bool g_is_no_graphics;
+    bool g_is_no_graphics[PT_COUNT];
     // ------------------------------------------------------------------------
     void showMessage(const core::stringw& message, const float time)
     {
@@ -1052,7 +1053,8 @@ namespace GUIEngine
 #ifdef ANDROID
         m_gui_functions.clear();
 #endif
-        g_is_no_graphics = false;
+        g_is_no_graphics[PT_MAIN] = false;
+        g_is_no_graphics[PT_CHILD] = false;
     }   // resetGlobalVariables
 
     // -----------------------------------------------------------------------
@@ -1556,13 +1558,13 @@ namespace GUIEngine
     // -----------------------------------------------------------------------
     void disableGraphics()
     {
-        g_is_no_graphics = true;
+        g_is_no_graphics[STKProcess::getType()] = true;
     }   // disableGraphics
 
     // -----------------------------------------------------------------------
     bool isNoGraphics()
     {
-        return g_is_no_graphics;
+        return g_is_no_graphics[STKProcess::getType()];
     }   // isNoGraphics
 #endif
 

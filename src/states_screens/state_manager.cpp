@@ -32,24 +32,33 @@
 #include "modes/world.hpp"
 #include "modes/profile_world.hpp"
 #include "utils/log.hpp"
+#include "utils/stk_process.hpp"
+
+#include <cstring>
 
 using namespace GUIEngine;
 
-static StateManager* state_manager_singleton = NULL;
+static StateManager* state_manager_singleton[PT_COUNT];
 
 StateManager* StateManager::get()
 {
-    if (state_manager_singleton == NULL)
-        state_manager_singleton = new StateManager();
-    return state_manager_singleton;
+    ProcessType type = STKProcess::getType();
+    if (state_manager_singleton[type] == NULL)
+        state_manager_singleton[type] = new StateManager();
+    return state_manager_singleton[type];
 }   // get
 
 void StateManager::deallocate()
 {
-    delete state_manager_singleton;
-    state_manager_singleton = NULL;
+    ProcessType type = STKProcess::getType();
+    delete state_manager_singleton[type];
+    state_manager_singleton[type] = NULL;
 }   // deallocate
 
+void StateManager::clear()
+{
+    memset(state_manager_singleton, 0, sizeof(state_manager_singleton));
+}   // clear
 
 // ============================================================================
 

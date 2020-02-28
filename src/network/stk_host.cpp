@@ -33,6 +33,7 @@
 #include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/server_config.hpp"
+#include "network/child_loop.hpp"
 #include "network/stk_ipv6.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
@@ -71,31 +72,37 @@
 #include <string>
 #include <utility>
 
-STKHost *STKHost::m_stk_host       = NULL;
+STKHost *STKHost::m_stk_host[PT_COUNT];
 bool     STKHost::m_enable_console = false;
 
-std::shared_ptr<LobbyProtocol> STKHost::create(SeparateProcess* p)
+std::shared_ptr<LobbyProtocol> STKHost::create(ChildLoop* cl)
 {
-    assert(m_stk_host == NULL);
+    ProcessType pt = STKProcess::getType();
+    assert(m_stk_host[pt] == NULL);
     std::shared_ptr<LobbyProtocol> lp;
     if (NetworkConfig::get()->isServer())
     {
         std::shared_ptr<ServerLobby> sl =
             LobbyProtocol::create<ServerLobby>();
-        m_stk_host = new STKHost(true/*server*/);
+        m_stk_host[pt] = new STKHost(true/*server*/);
         sl->initServerStatsTable();
         lp = sl;
     }
     else
     {
-        m_stk_host = new STKHost(false/*server*/);
+        m_stk_host[pt] = new STKHost(false/*server*/);
     }
     // Separate process for client-server gui if exists
-    m_stk_host->m_separate_process = p;
-    if (!m_stk_host->m_network)
+    m_stk_host[pt]->m_client_loop = cl;
+    if (cl)
     {
-        delete m_stk_host;
-        m_stk_host = NULL;
+        m_stk_host[pt]->m_client_loop_thread = std::thread(
+            std::bind(&ChildLoop::run, cl));
+    }
+    if (!m_stk_host[pt]->m_network)
+    {
+        delete m_stk_host[pt];
+        m_stk_host[pt] = NULL;
     }
     return lp;
 }   // create
@@ -342,6 +349,11 @@ void STKHost::init()
  */
 STKHost::~STKHost()
 {
+    // Abort the server loop earlier so it can be stopped in background as
+    // soon as possible
+    if (m_client_loop)
+        m_client_loop->requestAbort();
+
     NetworkConfig::get()->clearActivePlayersForClient();
     requestShutdown();
     if (m_network_console.joinable())
@@ -362,7 +374,11 @@ STKHost::~STKHost()
     }
     delete m_network;
     enet_deinitialize();
-    delete m_separate_process;
+    if (m_client_loop)
+    {
+        m_client_loop_thread.join();
+        delete m_client_loop;
+    }
 }   // ~STKHost
 
 //-----------------------------------------------------------------------------
@@ -721,7 +737,8 @@ void STKHost::setErrorMessage(const irr::core::stringw &message)
 void STKHost::startListening()
 {
     m_exit_timeout.store(std::numeric_limits<uint64_t>::max());
-    m_listening_thread = std::thread(std::bind(&STKHost::mainLoop, this));
+    m_listening_thread = std::thread(std::bind(&STKHost::mainLoop, this,
+        STKProcess::getType()));
 }   // startListening
 
 // ----------------------------------------------------------------------------
@@ -741,11 +758,16 @@ void STKHost::stopListening()
  *  This function tries to get data from network low-level functions as
  *  often as possible. When something is received, it generates an
  *  event and passes it to the Network Manager.
- *  \param self : used to pass the ENet host to the function.
+ *  \param pt : Used to register to different singleton.
  */
-void STKHost::mainLoop()
+void STKHost::mainLoop(ProcessType pt)
 {
-    VS::setThreadName("STKHost");
+    std::string thread_name = "STKHost";
+    if (pt == PT_CHILD)
+        thread_name += "_child";
+    VS::setThreadName(thread_name.c_str());
+
+    STKProcess::init(pt);
     Log::info("STKHost", "Listening has been started.");
     ENetEvent event;
     ENetHost* host = m_network->getENetHost();
@@ -1529,14 +1551,8 @@ void STKHost::updatePlayers(unsigned* ingame, unsigned* waiting,
   *  creation screen. */
 bool STKHost::isClientServer() const
 {
-    return NetworkConfig::get()->isClient() && m_separate_process != NULL;
+    return m_client_loop != NULL;
 }   // isClientServer
-
-// ----------------------------------------------------------------------------
-bool STKHost::hasServerAI() const
-{
-    return NetworkConfig::get()->isServer() && m_separate_process != NULL;
-}   // hasServerAI
 
 // ----------------------------------------------------------------------------
 /** Return an valid public IPv4 or IPv6 address with port, empty if both are

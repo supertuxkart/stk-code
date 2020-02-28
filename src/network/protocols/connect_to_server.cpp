@@ -30,6 +30,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/servers_manager.hpp"
 #include "network/server.hpp"
+#include "network/child_loop.hpp"
 #include "network/socket_address.hpp"
 #include "network/stk_ipv6.hpp"
 #include "network/stk_host.hpp"
@@ -113,42 +114,22 @@ void ConnectToServer::getClientServerInfo()
 {
     assert(m_server);
     // Allow up to 10 seconds for the separate process to fully start-up
-    bool server_ipv6_socket = false;
     bool started = false;
     uint64_t timeout = StkTime::getMonoTimeMs() + 10000;
-    const std::string& sid = NetworkConfig::get()->getServerIdFile();
-    assert(!sid.empty());
-    const std::string dir = StringUtils::getPath(sid);
-    const std::string server_id_file = StringUtils::getBasename(sid);
     uint16_t port = 0;
     unsigned server_id = 0;
+    ChildLoop* sl = STKHost::get()->getChildLoop();
+    assert(sl);
     while (!ProtocolManager::lock()->isExiting() &&
         StkTime::getMonoTimeMs() < timeout)
     {
-        std::set<std::string> files;
-        file_manager->listFiles(files, dir);
-        for (auto& f : files)
-        {
-            if (f.find(server_id_file) != std::string::npos)
-            {
-                auto split = StringUtils::split(f, '_');
-                if (split.size() != 4)
-                    continue;
-                if (!StringUtils::fromString(split[1], server_id))
-                    continue;
-                if (!StringUtils::fromString(split[2], port))
-                    continue;
-                server_ipv6_socket = split[3] == "v6";
-                file_manager->removeFile(dir + "/" + f);
-                started = true;
-                break;
-            }
-        }
+        port = sl->getPort();
+        server_id = sl->getServerOnlineId();
+        started = port != 0;
         if (started)
             break;
-        StkTime::sleep(10);
+        StkTime::sleep(1);
     }
-    NetworkConfig::get()->setServerIdFile("");
     if (!started)
     {
         Log::error("ConnectToServer",
@@ -161,7 +142,8 @@ void ConnectToServer::getClientServerInfo()
         assert(port != 0);
         m_server->setAddress(SocketAddress("127.0.0.1", port));
         m_server->setPrivatePort(port);
-        if (server_ipv6_socket)
+        // The server will decide if to use IPv6 socket
+        if (isIPv6Socket())
         {
             m_server->setIPV6Address(SocketAddress("::1", port));
             m_server->setIPV6Connection(true);
@@ -178,7 +160,7 @@ void ConnectToServer::getClientServerInfo()
 void ConnectToServer::asynchronousUpdate()
 {
     if (STKHost::get()->isClientServer() &&
-        !NetworkConfig::get()->getServerIdFile().empty())
+        m_server->getAddress().getPort() == 0)
     {
         getClientServerInfo();
     }

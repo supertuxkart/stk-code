@@ -44,7 +44,7 @@
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
 
-std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
+std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby[PT_COUNT];
 
 LobbyProtocol::LobbyProtocol()
                  : Protocol(PROTOCOL_LOBBY_ROOM)

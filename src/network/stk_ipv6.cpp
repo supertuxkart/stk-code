@@ -346,19 +346,20 @@ extern "C" void setIPv6Socket(int val)
 }   // setIPV6
 
 #else
-
+#include <atomic>
 // ============================================================================
-int g_ipv6;
+// For client and server in same process using different thread
+std::atomic<int> g_ipv6(0);
 // ============================================================================
 extern "C" int isIPv6Socket()
 {
-    return g_ipv6;
+    return g_ipv6.load();
 }   // isIPV6
 
 // ----------------------------------------------------------------------------
 extern "C" void setIPv6Socket(int val)
 {
-    g_ipv6 = val;
+    g_ipv6.store(val);
 }   // setIPV6
 
 #endif

@@ -222,6 +222,9 @@
 #include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/client_lobby.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/rewind_queue.hpp"
 #include "network/server.hpp"
@@ -1731,6 +1734,9 @@ void clearGlobalVariables()
     // In android sometimes global variables is not reset when restart the app
     // we clear it here as much as possible
     STKProcess::reset();
+    StateManager::clear();
+    NetworkConfig::clear();
+    STKHost::clear();
     race_manager = NULL;
     music_manager = NULL;
     irr_driver = NULL;
