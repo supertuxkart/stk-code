@@ -21,6 +21,7 @@
 #include "utils/cpp2011.hpp"
 #include <atomic>
 
+enum ProcessType : unsigned int;
 class SFXBase;
 
 /**
@@ -97,6 +98,9 @@ protected:
 
     /** If the start race should be played, disabled in cutscenes. */
     bool            m_play_racestart_sounds;
+
+    /** Process type of this world (main or child). */
+    const ProcessType m_process_type;
 
 private:
     /** Sound to play at the beginning of a race, during which a

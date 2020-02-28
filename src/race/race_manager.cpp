@@ -507,17 +507,20 @@ void RaceManager::startNew(bool from_overworld)
  */
 void RaceManager::startNextRace()
 {
-
+    ProcessType type = STKProcess::getType();
     main_loop->renderGUI(0);
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
-    IrrlichtDevice* device = irr_driver->getDevice();
-    GUIEngine::clearLoadingTips();
-    GUIEngine::renderLoading(true/*clearIcons*/, false/*launching*/, false/*update_tips*/);
-    device->getVideoDriver()->endScene();
-    device->getVideoDriver()->beginScene(true, true,
-                                         video::SColor(255,100,101,140));
+    if (type == PT_MAIN)
+    {
+        IrrlichtDevice* device = irr_driver->getDevice();
+        GUIEngine::clearLoadingTips();
+        GUIEngine::renderLoading(true/*clearIcons*/, false/*launching*/, false/*update_tips*/);
+        device->getVideoDriver()->endScene();
+        device->getVideoDriver()->beginScene(true, true,
+                                            video::SColor(255,100,101,140));
+    }
 
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -647,7 +650,8 @@ void RaceManager::startNextRace()
         }
     }
 
-    irr_driver->onLoadWorld();
+    if (type == PT_MAIN)
+        irr_driver->onLoadWorld();
     main_loop->renderGUI(8100);
 
     // Save the current score and set last time to zero. This is necessary
@@ -670,7 +674,8 @@ void RaceManager::startNextRace()
  */
 void RaceManager::next()
 {
-    PropertyAnimator::get()->clear();
+    if (STKProcess::getType() == PT_MAIN)
+        PropertyAnimator::get()->clear();
     World::deleteWorld();
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -835,6 +840,7 @@ void RaceManager::exitRace(bool delete_world)
     // Only display the grand prix result screen if all tracks
     // were finished, and not when a race is aborted.
     MessageQueue::discardStatic();
+    ProcessType type = STKProcess::getType();
 
     if ( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
          m_track_number==(int)m_tracks.size()   )
@@ -890,7 +896,8 @@ void RaceManager::exitRace(bool delete_world)
 
         if (delete_world)
         {
-            PropertyAnimator::get()->clear();
+            if (type == PT_MAIN)
+                PropertyAnimator::get()->clear();
             World::deleteWorld();
         }
         delete_world = false;
@@ -933,7 +940,8 @@ void RaceManager::exitRace(bool delete_world)
 
     if (delete_world)
     {
-        PropertyAnimator::get()->clear();
+        if (type == PT_MAIN)
+            PropertyAnimator::get()->clear();
         World::deleteWorld();
     }
 

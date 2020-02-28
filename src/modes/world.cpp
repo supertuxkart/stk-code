@@ -87,7 +87,7 @@
 #include <stdexcept>
 
 
-World* World::m_world = NULL;
+World* World::m_world[PT_COUNT];
 
 /** The main world class is used to handle the track and the karts.
  *  The end of the race is detected in two phases: first the (abstract)
@@ -176,17 +176,20 @@ void World::init()
     main_loop->renderGUI(1100);
     // Grab the track file
     Track *track = track_manager->getTrack(RaceManager::get()->getTrackName());
-    Scripting::ScriptEngine::getInstance<Scripting::ScriptEngine>();
-    if(!track)
+    if (m_process_type == PT_MAIN)
     {
-        std::ostringstream msg;
-        msg << "Track '" << RaceManager::get()->getTrackName()
-            << "' not found.\n";
-        throw std::runtime_error(msg.str());
-    }
+        Scripting::ScriptEngine::getInstance<Scripting::ScriptEngine>();
+        if(!track)
+        {
+            std::ostringstream msg;
+            msg << "Track '" << RaceManager::get()->getTrackName()
+                << "' not found.\n";
+            throw std::runtime_error(msg.str());
+        }
 
-    std::string script_path = track->getTrackFile("scripting.as");
-    Scripting::ScriptEngine::getInstance()->loadScript(script_path, true);
+        std::string script_path = track->getTrackFile("scripting.as");
+        Scripting::ScriptEngine::getInstance()->loadScript(script_path, true);
+    }
     main_loop->renderGUI(1200);
     // Create the physics
     Physics::create();
@@ -254,9 +257,10 @@ void World::init()
     if (m_race_gui)
         m_race_gui->init();
 
-    powerup_manager->computeWeightsForRace(RaceManager::get()->getNumberOfKarts());
+    if (m_process_type == PT_MAIN)
+        powerup_manager->computeWeightsForRace(RaceManager::get()->getNumberOfKarts());
     main_loop->renderGUI(7200);
-    if (UserConfigParams::m_particles_effects > 1)
+    if (m_process_type == PT_MAIN && UserConfigParams::m_particles_effects > 1)
     {
         Weather::getInstance<Weather>();   // create Weather instance
     }
@@ -348,7 +352,7 @@ void World::reset(bool restart)
     for ( KartList::iterator i = m_karts.begin(); i != m_karts.end() ; ++i )
     {
         (*i)->reset();
-        if ((*i)->getController()->canGetAchievements())
+        if (m_process_type == PT_MAIN && (*i)->getController()->canGetAchievements())
         {
             updateAchievementModeCounters(true /*start*/);
 
@@ -408,7 +412,8 @@ void World::reset(bool restart)
     }
 
     // Reset all data structures that depend on number of karts.
-    irr_driver->reset();
+    if (m_process_type == PT_MAIN)
+        irr_driver->reset();
     m_unfair_team = false;
 }   // reset
 
@@ -581,10 +586,13 @@ Controller* World::loadAIController(AbstractKart* kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
-    material_manager->unloadAllTextures();
+    if (m_process_type == PT_MAIN)
+        material_manager->unloadAllTextures();
+
     RewindManager::destroy();
 
-    irr_driver->onUnloadWorld();
+    if (m_process_type == PT_MAIN)
+        irr_driver->onUnloadWorld();
 
     ProjectileManager::get()->cleanup();
 
@@ -607,8 +615,9 @@ World::~World()
         // gui and this must be deleted.
         delete m_race_gui;
     }
-    
-    Weather::kill();
+
+    if (m_process_type == PT_MAIN)
+        Weather::kill();
 
     m_karts.clear();
     if(RaceManager::get()->hasGhostKarts() || RaceManager::get()->isRecordingRace())
@@ -636,11 +645,13 @@ World::~World()
     // but kill handles this correctly.
     Physics::destroy();
 
-    Scripting::ScriptEngine::kill();
+    if (m_process_type == PT_MAIN)
+        Scripting::ScriptEngine::kill();
 
-    m_world = NULL;
+    m_world[m_process_type] = NULL;
 
-    irr_driver->getSceneManager()->clear();
+    if (m_process_type == PT_MAIN)
+        irr_driver->getSceneManager()->clear();
 
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
@@ -719,9 +730,11 @@ void World::terminateRace()
         updateHighscores(&best_highscore_rank);
     }
 
-    updateAchievementDataEndRace();
-
-    PlayerManager::getCurrentPlayer()->raceFinished();
+    if (m_process_type == PT_MAIN)
+    {
+        updateAchievementDataEndRace();
+        PlayerManager::getCurrentPlayer()->raceFinished();
+    }
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of
@@ -839,9 +852,12 @@ void World::resetAllKarts()
     }
 
     // Initialise the cameras, now that the correct kart positions are set
-    for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+    if (!GUIEngine::isNoGraphics())
     {
-        Camera::getCamera(i)->setInitialTransform();
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+        {
+            Camera::getCamera(i)->setInitialTransform();
+        }
     }
 }   // resetAllKarts
 

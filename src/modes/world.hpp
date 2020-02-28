@@ -25,6 +25,7 @@
   * battle, etc.)
   */
 
+#include <cstring>
 #include <limits>
 #include <map>
 #include <memory>
@@ -37,6 +38,7 @@
 #include "states_screens/race_gui_base.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/random_generator.hpp"
+#include "utils/stk_process.hpp"
 
 #include "LinearMath/btTransform.h"
 
@@ -88,7 +90,7 @@ public:
     typedef std::vector<std::shared_ptr<AbstractKart> > KartList;
 private:
     /** A pointer to the global world object for a race. */
-    static World *m_world;
+    static World *m_world[PT_COUNT];
     // ------------------------------------------------------------------------
     void setAITeam();
     // ------------------------------------------------------------------------
@@ -208,16 +210,31 @@ public:
     // =================================
     // ------------------------------------------------------------------------
     /** Returns a pointer to the (singleton) world object. */
-    static World*   getWorld() { return m_world; }
+    static World*   getWorld()
+    {
+        ProcessType type = STKProcess::getType();
+        return m_world[type];
+    }
     // ------------------------------------------------------------------------
     /** Delete the )singleton) world object, if it exists, and sets the
       * singleton pointer to NULL. It's harmless to call this if the world
       *  has been deleted already. */
-    static void     deleteWorld() { delete m_world; m_world = NULL; }
+    static void     deleteWorld()
+    {
+        ProcessType type = STKProcess::getType();
+        delete m_world[type];
+        m_world[type] = NULL;
+    }
     // ------------------------------------------------------------------------
     /** Sets the pointer to the world object. This is only used by
      *  the race_manager.*/
-    static void     setWorld(World *world) {m_world = world; }
+    static void     setWorld(World *world)
+    {
+        ProcessType type = STKProcess::getType();
+        m_world[type] = world;
+    }
+    // ------------------------------------------------------------------------
+    static void     clear() { memset(m_world, 0, sizeof(m_world)); }
     // ------------------------------------------------------------------------
 
     // Pure virtual functions
