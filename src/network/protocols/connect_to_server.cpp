@@ -58,7 +58,6 @@
 
 #include <algorithm>
 // ============================================================================
-std::weak_ptr<Online::Request> ConnectToServer::m_previous_unjoin;
 ENetAddress ConnectToServer::m_server_address;
 int ConnectToServer::m_retry_count = 0;
 bool ConnectToServer::m_done_intecept = false;
@@ -87,7 +86,6 @@ ConnectToServer::~ConnectToServer()
         NetworkConfig::get()->setServerDetails(request,
             "clear-user-joined-server");
         request->queue();
-        m_previous_unjoin = request;
     }
 }   // ~ConnectToServer
 
@@ -472,14 +470,7 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
 void ConnectToServer::registerWithSTKServer()
 {
     // Our public address is now known, register details with
-    // STK server. If previous unjoin request is not finished, wait
-    if (!m_previous_unjoin.expired())
-    {
-        if (ProtocolManager::lock()->isExiting())
-            return;
-        StkTime::sleep(1);
-    }
-
+    // STK server
     const SocketAddress& addr = STKHost::get()->getPublicAddress();
     auto request = std::make_shared<Online::XMLRequest>();
     NetworkConfig::get()->setServerDetails(request, "join-server-key");

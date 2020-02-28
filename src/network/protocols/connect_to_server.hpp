@@ -62,7 +62,6 @@ private:
     static bool m_done_intecept;
     bool detectPort();
 public:
-    static std::weak_ptr<Online::Request> m_previous_unjoin;
              ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();
     virtual void setup() OVERRIDE;
