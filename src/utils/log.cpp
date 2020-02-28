@@ -173,16 +173,20 @@ void Log::printMessage(int level, const char *component, const char *format,
         remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     }
 
-#ifndef ANDROID
+#ifdef MOBILE_STK
+    // Mobile STK already has timestamp logging in console
+    std::string server_prefix = "Server";
+#else
+    std::string server_prefix = StkTime::getLogTime();
+#endif
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
     {
         index += snprintf (line + index, remaining,
-            "%s [%s] %s: ", StkTime::getLogTime().c_str(),
+            "%s [%s] %s: ", server_prefix.c_str(),
             names[level], component);
     }
     else
-#endif
     {
         index += snprintf (line + index, remaining,
             "[%s] %s: ", names[level], component);
