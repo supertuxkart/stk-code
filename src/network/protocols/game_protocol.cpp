@@ -40,7 +40,7 @@
 #include "main_loop.hpp"
 
 // ============================================================================
-std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol;
+std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol[PT_COUNT];
 // ============================================================================
 std::shared_ptr<GameProtocol> GameProtocol::createInstance()
 {
@@ -50,7 +50,8 @@ std::shared_ptr<GameProtocol> GameProtocol::createInstance()
         return NULL;
     }
     auto gm = std::make_shared<GameProtocol>();
-    m_game_protocol = gm;
+    ProcessType pt = STKProcess::getType();
+    m_game_protocol[pt] = gm;
     return gm;
 }   // createInstance
 
