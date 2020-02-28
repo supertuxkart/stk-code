@@ -157,8 +157,6 @@ private:
     /** Keeps track of the server state. */
     std::atomic_bool m_server_has_loaded_world;
 
-    bool m_has_created_server_id_file;
-
     bool m_registered_for_once_only;
 
     bool m_save_server_config;
@@ -167,7 +165,7 @@ private:
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
-    std::weak_ptr<Online::Request> m_server_recovering;
+    std::weak_ptr<Online::Request> m_server_registering;
 
     /** Timeout counter for various state. */
     std::atomic<int64_t> m_timeout;
@@ -219,7 +217,7 @@ private:
 
     std::atomic<uint64_t> m_last_success_poll_time;
 
-    uint64_t m_server_started_at, m_server_delay;
+    uint64_t m_last_unsuccess_poll_time, m_server_started_at, m_server_delay;
 
     // Default game settings if no one has ever vote, and save inside here for
     // final vote (for live join)
@@ -246,14 +244,14 @@ private:
     // Track(s) votes
     void handlePlayerVote(Event *event);
     void playerFinishedResult(Event *event);
-    bool registerServer(bool now);
+    void registerServer();
     void finishedLoadingWorldClient(Event *event);
     void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
     void handleChat(Event* event);
-    void unregisterServer(bool now);
-    void createServerIdFile();
+    void unregisterServer(bool now,
+        std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
     void handleServerConfiguration(Event* event);
