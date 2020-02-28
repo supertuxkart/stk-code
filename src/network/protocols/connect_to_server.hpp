@@ -53,7 +53,7 @@ private:
     std::atomic<ConnectState> m_state;
 
     void getClientServerInfo();
-    void registerWithSTKServer();
+    bool registerWithSTKServer();
     bool tryConnect(int timeout, int retry, bool another_port = false,
                     bool ipv6 = false);
     static ENetAddress m_server_address;

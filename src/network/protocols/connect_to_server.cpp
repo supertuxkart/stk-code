@@ -244,12 +244,15 @@ void ConnectToServer::asynchronousUpdate()
             {
                 STKHost::get()->setPublicAddress(
                     m_server->useIPV6Connection() ? AF_INET6 : AF_INET);
-                if (!STKHost::get()->getValidPublicAddress().empty())
-                    registerWithSTKServer();
+                if (STKHost::get()->getValidPublicAddress().empty() ||
+                    registerWithSTKServer() == false)
+                {
+                    // Set to DONE will stop STKHost is not connected
+                    m_state = DONE;
+                    break;
+                }
             }
-            // Set to DONE will stop STKHost is not connected
-            m_state = STKHost::get()->getValidPublicAddress().empty() ?
-                DONE : GOT_SERVER_ADDRESS;
+            m_state = GOT_SERVER_ADDRESS;
             break;
         }
         case GOT_SERVER_ADDRESS:
@@ -467,7 +470,7 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
 // ----------------------------------------------------------------------------
 /** Register this client with the STK server.
  */
-void ConnectToServer::registerWithSTKServer()
+bool ConnectToServer::registerWithSTKServer()
 {
     // Our public address is now known, register details with
     // STK server
@@ -498,13 +501,14 @@ void ConnectToServer::registerWithSTKServer()
     if(result->get("success", &success) && success == "yes")
     {
         Log::debug("ConnectToServer", "Address registered successfully.");
+        return true;
     }
     else
     {
         irr::core::stringc error(request->getInfo().c_str());
         Log::error("ConnectToServer", "Failed to register client address: %s",
             error.c_str());
-        m_state = DONE;
+        return false;
     }
 }   // registerWithSTKServer
 
