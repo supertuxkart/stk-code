@@ -232,9 +232,9 @@ ServerLobby::ServerLobby() : LobbyProtocol()
 
     m_rs_state.store(RS_NONE);
     m_last_success_poll_time.store(StkTime::getMonoTimeMs() + 30000);
+    m_last_unsuccess_poll_time = StkTime::getMonoTimeMs();
     m_server_owner_id.store(-1);
     m_registered_for_once_only = false;
-    m_has_created_server_id_file = false;
     setHandleDisconnections(true);
     m_state = SET_PUBLIC_ADDRESS;
     m_save_server_config = true;
@@ -260,8 +260,7 @@ ServerLobby::ServerLobby() : LobbyProtocol()
  */
 ServerLobby::~ServerLobby()
 {
-    if (NetworkConfig::get()->isNetworking() &&
-        NetworkConfig::get()->isWAN())
+    if (m_server_id_online.load() != 0)
     {
         // For child process the request manager will keep on running
         unregisterServer(m_process_type == PT_MAIN ? true : false/*now*/);
@@ -865,27 +864,6 @@ bool ServerLobby::notifyEventAsynchronous(Event* event)
 }   // notifyEventAsynchronous
 
 //-----------------------------------------------------------------------------
-/** Create the server id file to let the graphics server client connect. */
-void ServerLobby::createServerIdFile()
-{
-    std::string sid = NetworkConfig::get()->getServerIdFile();
-    if (!sid.empty() && !m_has_created_server_id_file)
-    {
-        std::fstream fs;
-        sid += StringUtils::toString(m_server_id_online.load()) + "_" +
-            StringUtils::toString(STKHost::get()->getPrivatePort());
-        if (isIPv6Socket())
-            sid += "_v6";
-        else
-            sid += "_v4";
-        io::IWriteFile* file = irr::io::createWriteFile(sid.c_str(), false);
-        if (file)
-            file->drop();
-        m_has_created_server_id_file = true;
-    }
-}   // createServerIdFile
-
-//-----------------------------------------------------------------------------
 #ifdef ENABLE_SQLITE3
 /* Every 1 minute STK will poll database:
  * 1. Set disconnected time to now for non-exists host.
@@ -1346,18 +1324,22 @@ void ServerLobby::asynchronousUpdate()
     if (allowJoinedPlayersWaiting() || (m_game_setup->isGrandPrix() &&
         m_state.load() == WAITING_FOR_START_GAME))
     {
-        // Only poll the STK server if this is a WAN server.
-        if (NetworkConfig::get()->isWAN())
+        // Only poll the STK server if server has been registered.
+        if (m_server_id_online.load() != 0 &&
+            m_state.load() != REGISTER_SELF_ADDRESS)
             checkIncomingConnectionRequests();
         handlePendingConnection();
     }
 
-    if (NetworkConfig::get()->isWAN() &&
-        allowJoinedPlayersWaiting() && m_server_recovering.expired() &&
+    if (m_server_id_online.load() != 0 &&
+        allowJoinedPlayersWaiting() &&
+        StkTime::getMonoTimeMs() > m_last_unsuccess_poll_time &&
         StkTime::getMonoTimeMs() > m_last_success_poll_time.load() + 30000)
     {
         Log::warn("ServerLobby", "Trying auto server recovery.");
-        registerServer(false/*now*/);
+        // For auto server recovery wait 3 seconds for next try
+        m_last_unsuccess_poll_time = StkTime::getMonoTimeMs() + 3000;
+        registerServer();
     }
 
     switch (m_state.load())
@@ -1370,7 +1352,6 @@ void ServerLobby::asynchronousUpdate()
         {
             m_state = WAITING_FOR_START_GAME;
             STKHost::get()->startListening();
-            createServerIdFile();
             return;
         }
         auto ip_type = NetworkConfig::get()->getIPType();
@@ -1406,16 +1387,25 @@ void ServerLobby::asynchronousUpdate()
         // Register this server with the STK server. This will block
         // this thread, because there is no need for the protocol manager
         // to react to any requests before the server is registered.
-        if (registerServer(true/*now*/))
+        if (m_server_registering.expired() && m_server_id_online.load() == 0)
+            registerServer();
+
+        if (m_server_registering.expired())
         {
-            if (allowJoinedPlayersWaiting())
-                m_registered_for_once_only = true;
-            m_state = WAITING_FOR_START_GAME;
-            createServerIdFile();
-        }
-        else
-        {
-            m_state = ERROR_LEAVE;
+            // Finished registering server
+            if (m_server_id_online.load() != 0)
+            {
+                // For non grand prix server we only need to register to stk
+                // addons once
+                if (allowJoinedPlayersWaiting())
+                    m_registered_for_once_only = true;
+                m_state = WAITING_FOR_START_GAME;
+            }
+            else
+            {
+                // Exit now if failed to register to stk addons
+                m_state = ERROR_LEAVE;
+            }
         }
         break;
     }
@@ -2189,14 +2179,13 @@ void ServerLobby::update(int ticks)
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.
  */
-bool ServerLobby::registerServer(bool now)
+void ServerLobby::registerServer()
 {
     // ========================================================================
     class RegisterServerRequest : public Online::XMLRequest
     {
     private:
         std::weak_ptr<ServerLobby> m_server_lobby;
-        const bool m_execute_now;
     protected:
         virtual void afterOperation()
         {
@@ -2232,18 +2221,14 @@ bool ServerLobby::registerServer(bool now)
             }
             Log::error("ServerLobby", "%s",
                 StringUtils::wideToUtf8(getInfo()).c_str());
-            // For auto server recovery wait 3 seconds for next try
-            // This sleep only the request manager thread
-            if (!m_execute_now)
-                StkTime::sleep(3000);
         }
     public:
-        RegisterServerRequest(bool now, std::shared_ptr<ServerLobby> sl)
+        RegisterServerRequest(std::shared_ptr<ServerLobby> sl)
         : XMLRequest(Online::RequestManager::HTTP_MAX_PRIORITY),
-        m_server_lobby(sl), m_execute_now(now) {}
+        m_server_lobby(sl) {}
     };   // RegisterServerRequest
 
-    auto request = std::make_shared<RegisterServerRequest>(now,
+    auto request = std::make_shared<RegisterServerRequest>(
         std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
     NetworkConfig::get()->setServerDetails(request, "create");
     const SocketAddress& addr = STKHost::get()->getPublicAddress();
@@ -2274,18 +2259,8 @@ bool ServerLobby::registerServer(bool now)
         Log::info("ServerLobby", "Public IPv6 server address %s",
             STKHost::get()->getPublicIPv6Address().c_str());
     }
-    if (now)
-    {
-        request->executeNow();
-        if (m_server_id_online.load() == 0)
-            return false;
-    }
-    else
-    {
-        request->queue();
-        m_server_recovering = request;
-    }
-    return true;
+    request->queue();
+    m_server_registering = request;
 }   // registerServer
 
 //-----------------------------------------------------------------------------
@@ -2293,10 +2268,38 @@ bool ServerLobby::registerServer(bool now)
  *  currently when karts enter kart selection screen it will be done or quit
  *  stk.
  */
-void ServerLobby::unregisterServer(bool now)
+void ServerLobby::unregisterServer(bool now, std::weak_ptr<ServerLobby> sl)
 {
-    int priority = Online::RequestManager::HTTP_MAX_PRIORITY;
-    auto request = std::make_shared<Online::XMLRequest>(priority);
+    // ========================================================================
+    class UnRegisterServerRequest : public Online::XMLRequest
+    {
+    private:
+        std::weak_ptr<ServerLobby> m_server_lobby;
+    protected:
+        virtual void afterOperation()
+        {
+            Online::XMLRequest::afterOperation();
+            const XMLNode* result = getXMLData();
+            std::string rec_success;
+
+            if (result->get("success", &rec_success) &&
+                rec_success == "yes")
+            {
+                // Clear the server online for next register
+                // For grand prix server
+                if (auto sl = m_server_lobby.lock())
+                    sl->m_server_id_online.store(0);
+                return;
+            }
+            Log::error("ServerLobby", "%s",
+                StringUtils::wideToUtf8(getInfo()).c_str());
+        }
+    public:
+        UnRegisterServerRequest(std::weak_ptr<ServerLobby> sl)
+        : XMLRequest(Online::RequestManager::HTTP_MAX_PRIORITY),
+        m_server_lobby(sl) {}
+    };   // UnRegisterServerRequest
+    auto request = std::make_shared<UnRegisterServerRequest>(sl);
     NetworkConfig::get()->setServerDetails(request, "stop");
 
     const SocketAddress& addr = STKHost::get()->getPublicAddress();
@@ -2508,9 +2511,10 @@ void ServerLobby::startSelection(const Event *event)
     if (!allowJoinedPlayersWaiting())
     {
         ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONNECTION);
-        if (NetworkConfig::get()->isWAN())
+        if (m_server_id_online.load() != 0)
         {
-            unregisterServer(false/*now*/);
+            unregisterServer(false/*now*/,
+                std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
         }
     }
 
@@ -2569,8 +2573,7 @@ void ServerLobby::checkIncomingConnectionRequests()
     const uint64_t POLL_INTERVAL = 5000;
     static uint64_t last_poll_time = 0;
     if (StkTime::getMonoTimeMs() < last_poll_time + POLL_INTERVAL ||
-        StkTime::getMonoTimeMs() > m_last_success_poll_time.load() + 30000 ||
-        m_server_id_online.load() == 0)
+        StkTime::getMonoTimeMs() > m_last_success_poll_time.load() + 30000)
         return;
 
     // Keep the port open, it can be sent to anywhere as we will send to the
