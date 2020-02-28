@@ -19,6 +19,7 @@
 
 #include "graphics/camera_normal.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "input/device_manager.hpp"

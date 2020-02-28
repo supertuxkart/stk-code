@@ -18,6 +18,7 @@
 
 #include "guiengine/widgets/player_kart_widget.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/render_info.hpp"
