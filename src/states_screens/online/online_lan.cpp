@@ -43,17 +43,6 @@ OnlineLanScreen::OnlineLanScreen() : GUIEngine::Screen("online/lan.stkgui")
 
 // -----------------------------------------------------------------------------
 
-void OnlineLanScreen::beforeAddingWidget()
-{
-#ifdef IOS_STK
-    Widget* w = getWidget("create_lan_server");
-    if (w)
-        w->setVisible(false);
-#endif
-}   // beforeAddingWidget
-
-// -----------------------------------------------------------------------------
-
 void OnlineLanScreen::init()
 {
     RibbonWidget* ribbon = getWidget<RibbonWidget>("lan");
@@ -81,13 +70,11 @@ void OnlineLanScreen::eventCallback(Widget* widget, const std::string& name, con
             NetworkConfig::get()->setIsServer(false);
             ServerSelection::getInstance()->push();
         }
-#ifndef IOS_STK
         else if (selection == "create_lan_server")
         {
             NetworkConfig::get()->setIsLAN();
             CreateServerScreen::getInstance()->push();
         }
-#endif
     }
     
 }   // eventCallback
