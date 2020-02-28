@@ -47,7 +47,8 @@
 std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby[PT_COUNT];
 
 LobbyProtocol::LobbyProtocol()
-                 : Protocol(PROTOCOL_LOBBY_ROOM)
+             : Protocol(PROTOCOL_LOBBY_ROOM),
+               m_process_type(STKProcess::getType())
 {
     resetGameStartedProgress();
     m_game_setup = new GameSetup();
@@ -86,7 +87,9 @@ void LobbyProtocol::loadWorld()
     StateManager::ActivePlayer *ap = RaceManager::get()->getNumLocalPlayers()>1
                                    ? NULL
                                    : StateManager::get()->getActivePlayer(0);
-    input_manager->getDeviceManager()->setSinglePlayer(ap);
+    // We only need to use input manager in main process
+    if (m_process_type == PT_MAIN)
+        input_manager->getDeviceManager()->setSinglePlayer(ap);
 
     // Load the actual world.
     m_game_setup->loadWorld();

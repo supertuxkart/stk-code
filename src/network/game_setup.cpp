@@ -31,6 +31,7 @@
 #include "race/race_manager.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 
 #include <algorithm>
@@ -75,7 +76,7 @@ void GameSetup::loadWorld()
     // goals / time limit and random item location
     assert(!m_tracks.empty());
     // Disable accidentally unlocking of a challenge
-    if (PlayerManager::getCurrentPlayer())
+    if (STKProcess::getType() == PT_MAIN && PlayerManager::getCurrentPlayer())
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     RaceManager::get()->setTimeTarget(0.0f);
     if (RaceManager::get()->isSoccerMode() ||

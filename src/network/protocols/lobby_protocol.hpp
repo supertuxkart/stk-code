@@ -102,6 +102,7 @@ public:
     };
 
 protected:
+    const ProcessType m_process_type;
     /** Vote from each peer. The host id is used as a key. Note that
      *  host ids can be non-consecutive, so we cannot use std::vector. */
     std::map<uint32_t, PeerVote> m_peers_votes;
