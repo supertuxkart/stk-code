@@ -167,9 +167,6 @@ private:
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
-    /** It indicates if this server is unregistered with the stk server. */
-    std::weak_ptr<Online::Request> m_server_unregistered;
-
     std::weak_ptr<Online::Request> m_server_recovering;
 
     /** Timeout counter for various state. */
