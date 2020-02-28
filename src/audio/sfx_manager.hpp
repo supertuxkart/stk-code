@@ -98,7 +98,7 @@ public:
       *  Entries for custom SFX sounds.  These are unique for each kart.
       * eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
       */
-    enum CustomSFX
+    enum CustomSFX : int
     {
         CUSTOM_HORN,    //!< Replaces default horn
         CUSTOM_CRASH,   //!< Played when colliding with another kart

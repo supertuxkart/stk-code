@@ -18,7 +18,9 @@
 
 #include "karts/kart_properties.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "addons/addon.hpp"
+#include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/central_settings.hpp"
