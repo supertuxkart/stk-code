@@ -792,7 +792,8 @@ TrackObject* TrackObject::cloneToChild()
         to_clone->m_visibility_condition.clear();
         to_clone->m_presentation = NULL;
         to_clone->m_render_info.reset();
-        to_clone->m_animator = NULL;
+        if (m_animator)
+            to_clone->m_animator = m_animator->clone(to_clone);
         to_clone->m_parent_library = NULL;
         to_clone->m_movable_children.clear();
         to_clone->m_children.clear();
