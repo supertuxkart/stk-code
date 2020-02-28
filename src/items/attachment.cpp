@@ -311,7 +311,7 @@ void Attachment::hitBanana(ItemState *item_state)
                 "explosion_bomb.xml");
             if (m_kart->getController()->isLocalPlayerController())
                 he->setLocalPlayerKartHit();
-            projectile_manager->addHitEffect(he);
+            ProjectileManager::get()->addHitEffect(he);
         }
         if (m_kart->getKartAnimation() == NULL)
             ExplosionAnimation::create(m_kart);
@@ -520,7 +520,7 @@ void Attachment::update(int ticks)
                     "explosion_bomb.xml");
                 if (m_kart->getController()->isLocalPlayerController())
                     he->setLocalPlayerKartHit();
-                projectile_manager->addHitEffect(he);
+                ProjectileManager::get()->addHitEffect(he);
             }
             if (m_kart->getKartAnimation() == NULL)
                 ExplosionAnimation::create(m_kart);

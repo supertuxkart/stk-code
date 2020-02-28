@@ -1776,7 +1776,7 @@ void Kart::update(int ticks)
         {
             HitEffect *effect =  new Explosion(getXYZ(), "jump",
                                               "jump_explosion.xml");
-            projectile_manager->addHitEffect(effect);
+            ProjectileManager::get()->addHitEffect(effect);
         }
     }
 

@@ -1204,7 +1204,7 @@ void SkiddingAI::handleItems(const float dt)
             // Check if a flyable (cake, ...) is close. If so, use bubblegum
             // as shield
             if( !m_kart->isShielded() &&
-                projectile_manager->projectileIsClose(m_kart,
+                ProjectileManager::get()->projectileIsClose(m_kart,
                                     m_ai_properties->m_shield_incoming_radius) )
             {
                 m_controls->setFire(true);

@@ -1738,6 +1738,7 @@ void clearGlobalVariables()
     NetworkConfig::clear();
     STKHost::clear();
     RaceManager::clear();
+    ProjectileManager::clear();
     music_manager = NULL;
     irr_driver = NULL;
 #ifdef ENABLE_WIIUSE
@@ -1826,7 +1827,7 @@ void initRest()
     material_manager        = new MaterialManager      ();
     track_manager           = new TrackManager         ();
     kart_properties_manager = new KartPropertiesManager();
-    projectile_manager      = new ProjectileManager    ();
+    ProjectileManager::create();
     powerup_manager         = new PowerupManager       ();
     attachment_manager      = new AttachmentManager    ();
     highscore_manager       = new HighscoreManager     ();
@@ -2114,7 +2115,7 @@ int main(int argc, char *argv[])
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
-        projectile_manager->loadData();
+        ProjectileManager::get()->loadData();
 
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
@@ -2466,7 +2467,7 @@ static void cleanSuperTuxKart()
     if(attachment_manager)      delete attachment_manager;
     ItemManager::removeTextures();
     if(powerup_manager)         delete powerup_manager;
-    if(projectile_manager)      delete projectile_manager;
+    ProjectileManager::destroy();
     if(kart_properties_manager) delete kart_properties_manager;
     if(track_manager)           delete track_manager;
     if(material_manager)        delete material_manager;
