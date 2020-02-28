@@ -688,8 +688,11 @@ void World::onGo()
 void World::terminateRace()
 {
     // In case the user opened paused dialog in network
-    GUIEngine::ScreenKeyboard::dismiss();
-    GUIEngine::ModalDialog::dismiss();
+    if (!GUIEngine::isNoGraphics())
+    {
+        GUIEngine::ScreenKeyboard::dismiss();
+        GUIEngine::ModalDialog::dismiss();
+    }
 
     m_schedule_pause = false;
     m_schedule_unpause = false;
