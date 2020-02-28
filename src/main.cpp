@@ -256,7 +256,7 @@
 #include "utils/log.hpp"
 #include "utils/mini_glm.hpp"
 #include "utils/profiler.hpp"
-#include "utils/separate_process.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -1730,6 +1730,7 @@ void clearGlobalVariables()
 {
     // In android sometimes global variables is not reset when restart the app
     // we clear it here as much as possible
+    STKProcess::reset();
     race_manager = NULL;
     music_manager = NULL;
     irr_driver = NULL;
