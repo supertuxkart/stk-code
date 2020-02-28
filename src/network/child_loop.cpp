@@ -18,6 +18,7 @@
 #include "network/child_loop.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
+#include "items/projectile_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby.hpp"
@@ -78,6 +79,7 @@ void ChildLoop::run()
 
     GUIEngine::disableGraphics();
     RaceManager::create();
+    ProjectileManager::create();
     NetworkConfig::get()->setIsServer(true);
     if (m_cl_config->m_lan_server)
         NetworkConfig::get()->setIsLAN();
@@ -138,6 +140,7 @@ void ChildLoop::run()
     }
 
     RaceManager::destroy();
+    ProjectileManager::destroy();
     NetworkConfig::destroy();
     StateManager::deallocate();
 }   // run

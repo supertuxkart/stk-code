@@ -761,7 +761,7 @@ void Flyable::computeError()
             "doesn't exist on server, remove it.",
             typeid(*this).name(), StringUtils::wideToUtf8(
             m_owner->getController()->getName()).c_str(), m_created_ticks);
-        projectile_manager->removeByUID(uid);
+        ProjectileManager::get()->removeByUID(uid);
     }
 }   // computeError
 

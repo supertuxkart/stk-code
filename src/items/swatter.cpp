@@ -432,7 +432,7 @@ void Swatter::squashThingsAround()
         HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
         if(m_kart->getController()->isLocalPlayerController())
             he->setLocalPlayerKartHit();
-        projectile_manager->addHitEffect(he);
+        ProjectileManager::get()->addHitEffect(he);
     }   // if kart has bomb attached
 
     // TODO: squash items

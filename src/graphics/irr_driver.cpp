@@ -958,7 +958,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     track_manager->removeAllCachedData();
     delete attachment_manager;
     attachment_manager = NULL;
-    projectile_manager->removeTextures();
+    ProjectileManager::get()->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager->unloadAllKarts();
     delete powerup_manager;
@@ -1052,7 +1052,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
 
     powerup_manager->loadPowerupsModels();
     ItemManager::loadDefaultItemMeshes();
-    projectile_manager->loadData();
+    ProjectileManager::get()->loadData();
     Referee::init();
     GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gift.png")) );

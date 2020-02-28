@@ -298,7 +298,7 @@ void Powerup::use()
             Powerup::adjustSound();
             m_sound_use->play();
         }
-        projectile_manager->newProjectile(m_kart, m_type);
+        ProjectileManager::get()->newProjectile(m_kart, m_type);
         break ;
 
     case PowerupManager::POWERUP_SWATTER:

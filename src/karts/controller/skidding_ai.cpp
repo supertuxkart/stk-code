@@ -1298,13 +1298,13 @@ void SkiddingAI::handleBubblegum(int item_skill,
     float shield_radius = m_ai_properties->m_shield_incoming_radius;
 
     int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
-    projectile_types[0] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
-    projectile_types[1] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_PLUNGER);
-    projectile_types[2] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_CAKE);
-    projectile_types[3] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_RUBBERBALL);
+    projectile_types[0] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
+    projectile_types[1] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_PLUNGER);
+    projectile_types[2] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_CAKE);
+    projectile_types[3] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_RUBBERBALL);
    
     bool projectile_is_close = false;
-    projectile_is_close = projectile_manager->projectileIsClose(m_kart, shield_radius);
+    projectile_is_close = ProjectileManager::get()->projectileIsClose(m_kart, shield_radius);
 
     Attachment::AttachmentType type = m_kart->getAttachment()->getType();
     

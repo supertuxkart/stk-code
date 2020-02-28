@@ -59,6 +59,15 @@ private:
                                        PowerupManager::PowerupType type);
     void             updateServer(int ticks);
 public:
+    // ----------------------------------------------------------------------------------------
+    static ProjectileManager* get();
+    // ----------------------------------------------------------------------------------------
+    static void create();
+    // ----------------------------------------------------------------------------------------
+    static void destroy();
+    // ----------------------------------------------------------------------------------------
+    static void clear();
+    // ----------------------------------------------------------------------------------------
                      ProjectileManager() {}
                     ~ProjectileManager() {}
     void             loadData         ();
@@ -90,8 +99,6 @@ public:
     void removeByUID(const std::string& uid)
                                            { m_active_projectiles.erase(uid); }
 };
-
-extern ProjectileManager *projectile_manager;
 
 #endif
 

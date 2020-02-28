@@ -380,7 +380,7 @@ void World::reset(bool restart)
 
     // Remove all (if any) previous game flyables before reset karts, so no
     // explosion animation will be created
-    projectile_manager->cleanup();
+    ProjectileManager::get()->cleanup();
     resetAllKarts();
     // Note: track reset must be called after all karts exist, since check
     // objects need to allocate data structures depending on the number
@@ -586,7 +586,7 @@ World::~World()
 
     irr_driver->onUnloadWorld();
 
-    projectile_manager->cleanup();
+    ProjectileManager::get()->cleanup();
 
     // In case that a race is aborted (e.g. track not found) track is 0.
     if(Track::getCurrentTrack())
@@ -1085,7 +1085,7 @@ void World::updateGraphics(float dt)
     if (script_engine)
         script_engine->update(dt);
 
-    projectile_manager->updateGraphics(dt);
+    ProjectileManager::get()->updateGraphics(dt);
     Track::getCurrentTrack()->updateGraphics(dt);
 }   // updateGraphics
 
@@ -1142,7 +1142,7 @@ void World::update(int ticks)
     if(RaceManager::get()->isRecordingRace()) ReplayRecorder::get()->update(ticks);
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
-    projectile_manager->update(ticks);
+    ProjectileManager::get()->update(ticks);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("World::update (physics)", 0xa0, 0x7F, 0x00);
