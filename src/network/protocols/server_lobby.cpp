@@ -3776,11 +3776,11 @@ void ServerLobby::updateServerOwner()
     std::shared_ptr<STKPeer> owner;
     for (auto peer: peers)
     {
-        // Only loopback (127.* or ::1/128) can be server owner in case of
+        // Only matching host id can be server owner in case of
         // graphics-client-server
         if (peer->isValidated() && !peer->isAIPeer() &&
-            (NetworkConfig::get()->getServerIdFile().empty() ||
-            peer->getAddress().isLoopback()))
+            (m_process_type == PT_MAIN ||
+            peer->getHostId() == m_client_server_host_id.load()))
         {
             owner = peer;
             break;
