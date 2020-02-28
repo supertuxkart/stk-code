@@ -2909,7 +2909,14 @@ void Track::copyFromMainProcess()
         m_check_manager->add(cs->clone());
     }
 
+    TrackObjectManager* main_tom = m_track_object_manager;
     m_track_object_manager = new TrackObjectManager();
+    for (auto* to : main_tom->getObjects().m_contents_vector)
+    {
+        TrackObject* clone = to->cloneToChild();
+        if (clone)
+            m_track_object_manager->insertObject(clone);
+    }
 
     m_track_mesh = new TriangleMesh(/*can_be_transformed*/false);
     m_gfx_effect_mesh = new TriangleMesh(/*can_be_transformed*/false);
@@ -2940,6 +2947,12 @@ void Track::initChildTrack()
     Physics::get()->init(m_aabb_min, m_aabb_max);
     m_track_mesh->createPhysicalBody(m_friction);
     m_gfx_effect_mesh->createCollisionShape();
+
+    // All child track objects are only cloned if they have physical objects
+    for (auto* to : m_track_object_manager->getObjects().m_contents_vector)
+        to->getPhysicalObject()->addBody();
+    m_track_object_manager->init();
+
     if (auto sl = LobbyProtocol::get<ServerLobby>())
     {
         sl->saveInitialItems(

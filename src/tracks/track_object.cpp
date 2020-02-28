@@ -779,3 +779,27 @@ bool TrackObject::joinToMainTrack()
     m_physical_object.reset();
     return true;
 }   // joinToMainTrack
+
+// ----------------------------------------------------------------------------
+TrackObject* TrackObject::cloneToChild()
+{
+    // Only clone object that is enabled and has a physical object
+    // Soccer ball is made disabled by soccer world to hide initially
+    if ((isEnabled() || m_soccer_ball) && m_physical_object)
+    {
+        TrackObject* to_clone = new TrackObject(*this);
+        // We handle visibility condition in main process already
+        to_clone->m_visibility_condition.clear();
+        to_clone->m_presentation = NULL;
+        to_clone->m_render_info.reset();
+        to_clone->m_animator = NULL;
+        to_clone->m_parent_library = NULL;
+        to_clone->m_movable_children.clear();
+        to_clone->m_children.clear();
+        to_clone->m_physical_object = m_physical_object->clone(to_clone);
+        // All track objects need to be initially enabled in init
+        to_clone->m_enabled = true;
+        return to_clone;
+    }
+    return NULL;
+}   // joinToMainTrack
