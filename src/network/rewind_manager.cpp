@@ -36,24 +36,26 @@
 
 #include <algorithm>
 
-RewindManager* RewindManager::m_rewind_manager = NULL;
-bool           RewindManager::m_enable_rewind_manager = false;
+RewindManager* RewindManager::m_rewind_manager[PT_COUNT];
+std::atomic_bool RewindManager::m_enable_rewind_manager(false);
 
 /** Creates the singleton. */
 RewindManager *RewindManager::create()
 {
-    assert(!m_rewind_manager);
-    m_rewind_manager = new RewindManager();
-    return m_rewind_manager;
+    ProcessType pt = STKProcess::getType();
+    assert(!m_rewind_manager[pt]);
+    m_rewind_manager[pt] = new RewindManager();
+    return m_rewind_manager[pt];
 }   // create
 
 // ----------------------------------------------------------------------------
 /** Destroys the singleton. */
 void RewindManager::destroy()
 {
-    assert(m_rewind_manager);
-    delete m_rewind_manager;
-    m_rewind_manager = NULL;
+    ProcessType pt = STKProcess::getType();
+    assert(m_rewind_manager[pt]);
+    delete m_rewind_manager[pt];
+    m_rewind_manager[pt] = NULL;
 }   // destroy
 
 // ============================================================================
