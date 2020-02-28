@@ -185,6 +185,7 @@ public:
                                                   { return m_ranking_changes; }
     void handleClientCommand(const std::string& cmd);
     void updateAssetsToServer();
+    ClientState getCurrentState() const { return m_state.load(); }
 };
 
 #endif // CLIENT_LOBBY_HPP

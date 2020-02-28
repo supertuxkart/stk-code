@@ -170,6 +170,7 @@ sqlite3_extension_init(sqlite3* db, char** pzErrMsg,
  */
 ServerLobby::ServerLobby() : LobbyProtocol()
 {
+    m_client_server_host_id.store(0);
     m_lobby_players.store(0);
     std::vector<int> all_k =
         kart_properties_manager->getKartsInGroup("standard");
@@ -5063,6 +5064,37 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
         return;
     }
 
+    if (m_process_type == PT_CHILD &&
+        event->getPeer()->getHostId() == m_client_server_host_id.load())
+    {
+        // For child server the remaining client cannot go on player when the
+        // server owner quited the game (because the world will be deleted), so
+        // we reset all players
+        auto pm = ProtocolManager::lock();
+        if (RaceEventManager::get())
+        {
+            RaceEventManager::get()->stop();
+            pm->findAndTerminate(PROTOCOL_GAME_EVENTS);
+        }
+        auto gp = GameProtocol::lock();
+        if (gp)
+        {
+            auto lock = gp->acquireWorldDeletingMutex();
+            pm->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
+            exitGameState();
+        }
+        else
+            exitGameState();
+        NetworkString* back_to_lobby = getNetworkString(2);
+        back_to_lobby->setSynchronous(true);
+        back_to_lobby->addUInt8(LE_BACK_LOBBY)
+            .addUInt8(BLR_SERVER_ONWER_QUITED_THE_GAME);
+        sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
+        delete back_to_lobby;
+        m_rs_state.store(RS_ASYNC_RESET);
+        return;
+    }
+
     for (const int id : peer->getAvailableKartIDs())
     {
         RemoteKartInfo& rki = RaceManager::get()->getKartInfo(id);
@@ -5113,6 +5145,21 @@ void ServerLobby::clientSelectingAssetsWantsToBackLobby(Event* event)
         Log::warn("ServerLobby",
             "%s try to leave selecting assets at wrong time.",
             peer->getAddress().toString().c_str());
+        return;
+    }
+
+    if (m_process_type == PT_CHILD &&
+        event->getPeer()->getHostId() == m_client_server_host_id.load())
+    {
+        NetworkString* back_to_lobby = getNetworkString(2);
+        back_to_lobby->setSynchronous(true);
+        back_to_lobby->addUInt8(LE_BACK_LOBBY)
+            .addUInt8(BLR_SERVER_ONWER_QUITED_THE_GAME);
+        sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
+        delete back_to_lobby;
+        resetVotingTime();
+        resetServer();
+        m_rs_state.store(RS_NONE);
         return;
     }
 
