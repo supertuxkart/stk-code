@@ -180,6 +180,19 @@ public:
     }   // get
 
     // ------------------------------------------------------------------------
+    /** Returns specific singleton client or server lobby protocol. */
+    template<class T> static std::shared_ptr<T> getByType(ProcessType pt)
+    {
+        if (std::shared_ptr<LobbyProtocol> lp = m_lobby[pt].lock())
+        {
+            std::shared_ptr<T> new_type = std::dynamic_pointer_cast<T>(lp);
+            if (new_type)
+                return new_type;
+        }
+        return nullptr;
+    }   // get
+
+    // ------------------------------------------------------------------------
 
              LobbyProtocol();
     virtual ~LobbyProtocol();

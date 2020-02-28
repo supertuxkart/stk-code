@@ -4403,10 +4403,12 @@ void ServerLobby::configPeersStartTime()
     m_state = WAIT_FOR_RACE_STARTED;
 
     World::getWorld()->setPhase(WorldStatus::SERVER_READY_PHASE);
+    // Different stk process thread may have different stk host
+    STKHost* stk_host = STKHost::get();
     joinStartGameThread();
-    m_start_game_thread = std::thread([start_time, this]()
+    m_start_game_thread = std::thread([start_time, stk_host, this]()
         {
-            const uint64_t cur_time = STKHost::get()->getNetworkTimer();
+            const uint64_t cur_time = stk_host->getNetworkTimer();
             assert(start_time > cur_time);
             int sleep_time = (int)(start_time - cur_time);
             //Log::info("ServerLobby", "Start game after %dms", sleep_time);

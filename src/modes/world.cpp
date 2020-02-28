@@ -52,9 +52,11 @@
 #include "karts/kart_rewinder.hpp"
 #include "main_loop.hpp"
 #include "modes/overworld.hpp"
+#include "network/child_loop.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/network_config.hpp"
 #include "network/rewind_manager.hpp"
+#include "network/stk_host.hpp"
 #include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -200,7 +202,20 @@ void World::init()
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
     // This also defines the static Track::getCurrentTrack function.
-    track->loadTrackModel(RaceManager::get()->getReverseTrack());
+    if (m_process_type == PT_MAIN)
+        track->loadTrackModel(RaceManager::get()->getReverseTrack());
+    else
+    {
+        Track* child_track = Track::getCurrentTrack();
+        ChildLoop* child_loop = STKHost::getByType(PT_MAIN)->getChildLoop();
+        while (!child_loop->isAborted() && child_track == NULL)
+        {
+            StkTime::sleep(1);
+            child_track = Track::getCurrentTrack();
+        }
+        if (!child_loop->isAborted())
+            child_track->initChildTrack();
+    }
 
     // Shuffles the start transforms with playing 3-strikes or free for all battles.
     if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
@@ -597,8 +612,13 @@ World::~World()
     ProjectileManager::get()->cleanup();
 
     // In case that a race is aborted (e.g. track not found) track is 0.
-    if(Track::getCurrentTrack())
-        Track::getCurrentTrack()->cleanup();
+    if (m_process_type == PT_MAIN)
+    {
+        if(Track::getCurrentTrack())
+            Track::getCurrentTrack()->cleanup();
+    }
+    else
+        Track::cleanChildTrack();
 
     // Delete the in-race-gui:
     if(m_saved_race_gui)
