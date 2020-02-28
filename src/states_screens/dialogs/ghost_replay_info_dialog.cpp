@@ -97,7 +97,7 @@ GhostReplayInfoDialog::GhostReplayInfoDialog(unsigned int replay_id,
     m_watch_widget = getWidget<CheckBoxWidget>("watch-only");
     m_compare_widget = getWidget<CheckBoxWidget>("compare-ghost");
 
-    if (race_manager->getNumLocalPlayers() > 1)
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
         // No watching replay when split-screen
         m_watch_widget->setVisible(false);
@@ -198,7 +198,7 @@ void GhostReplayInfoDialog::updateReplayDisplayedInfo()
             row.push_back(GUIEngine::ListWidget::ListCell
                 (rd.m_reverse ? _("Yes") : _("No"), -1, 3, true));
         row.push_back(GUIEngine::ListWidget::ListCell
-            (race_manager->
+            (RaceManager::get()->
                 getDifficultyName((RaceManager::Difficulty) rd.m_difficulty),
                                                               -1, 4, true));
         if (is_linear)
@@ -230,15 +230,15 @@ GUIEngine::EventPropagation
         if(selection == "start")
         {
             // Make sure to enable the correct race mode
-            race_manager->setMinorMode(GhostReplaySelection::getInstance()->getActiveMode());
+            RaceManager::get()->setMinorMode(GhostReplaySelection::getInstance()->getActiveMode());
 
             bool reverse = m_rd.m_reverse;
             std::string track_name = m_rd.m_track_name;
             int laps = m_rd.m_laps;
             int replay_id = m_replay_id;
 
-            race_manager->setRecordRace(m_record_race);
-            race_manager->setWatchingReplay(m_watch_only);
+            RaceManager::get()->setRecordRace(m_record_race);
+            RaceManager::get()->setWatchingReplay(m_watch_only);
           
             ReplayPlay::get()->setReplayFile(replay_id);
             if (m_compare_ghost)
@@ -250,26 +250,26 @@ GUIEngine::EventPropagation
             else
                 ReplayPlay::get()->setSecondReplayFile(0, /* use a second replay*/ false);
 
-            race_manager->setRaceGhostKarts(true);
+            RaceManager::get()->setRaceGhostKarts(true);
 
             // The race manager automatically adds karts for the ghosts
             // so only set it to the number of human players
-            race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+            RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers());
 
             // Disable accidentally unlocking of a challenge
             PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
-            race_manager->setReverseTrack(reverse);
+            RaceManager::get()->setReverseTrack(reverse);
 
             //Reset comparison if active
             GhostReplaySelection::getInstance()->setCompare(false);
 
             ModalDialog::dismiss();
           
-            if (race_manager->isWatchingReplay())
-                race_manager->startWatchingReplay(track_name, laps);
+            if (RaceManager::get()->isWatchingReplay())
+                RaceManager::get()->startWatchingReplay(track_name, laps);
             else
-                race_manager->startSingleRace(track_name, laps, false);
+                RaceManager::get()->startSingleRace(track_name, laps, false);
 
             return GUIEngine::EVENT_BLOCK;
         }

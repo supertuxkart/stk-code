@@ -87,8 +87,8 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
 {
     // Use kart properties computed for best difficulty to show the user, so
     // that properties don't change according to the the last used difficulty
-    RaceManager::Difficulty previous_difficulty = race_manager->getDifficulty();
-    race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
+    RaceManager::Difficulty previous_difficulty = RaceManager::get()->getDifficulty();
+    RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_BEST);
     KartProperties kp_computed;
     kp_computed.copyForPlayer(props, h);
     for (SkillLevelWidget* skills : m_skills)
@@ -122,7 +122,7 @@ void KartStatsWidget::setValues(const KartProperties* props, HandicapLevel h)
                     90.0f/kp_computed.getCombinedCharacteristic()->getNitroConsumption(),
                    "nitro.png", "nitro", _("Nitro efficiency"));
     
-    race_manager->setDifficulty(previous_difficulty);
+    RaceManager::get()->setDifficulty(previous_difficulty);
 }   // setValues
 
 // -----------------------------------------------------------------------------

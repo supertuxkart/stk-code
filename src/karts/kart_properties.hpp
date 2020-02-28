@@ -340,7 +340,7 @@ public:
     /** Returns a pointer to the AI properties. */
     const AIProperties *getAIPropertiesForDifficulty() const
     {
-        return m_ai_properties[race_manager->getDifficulty()].get();
+        return m_ai_properties[RaceManager::get()->getDifficulty()].get();
     }   // getAIProperties
 
     // ------------------------------------------------------------------------

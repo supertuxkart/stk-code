@@ -413,7 +413,7 @@ void CutsceneWorld::enterRaceOverState()
     int partId = -1;
     for (int i=0; i<(int)m_parts.size(); i++)
     {
-        if (m_parts[i] == race_manager->getTrackName())
+        if (m_parts[i] == RaceManager::get()->getTrackName())
         {
             partId = i;
             break;
@@ -429,16 +429,16 @@ void CutsceneWorld::enterRaceOverState()
             credits->setVictoryMusic(true);
             MainMenuScreen* mainMenu = MainMenuScreen::getInstance();
             GUIEngine::Screen* newStack[] = { mainMenu, credits, NULL };
-            race_manager->exitRace();
+            RaceManager::get()->exitRace();
             StateManager::get()->resetAndSetStack(newStack);
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
         {
-            race_manager->exitRace();
+            RaceManager::get()->exitRace();
 
             // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
-            race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+            RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
             //TODO : this code largely duplicate a similar code present in raceResultGUI.
             //       Try to reduce duplication
@@ -450,10 +450,10 @@ void CutsceneWorld::enterRaceOverState()
                 PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
-                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-                race_manager->setNumKarts(0);
-                race_manager->setNumPlayers(0);
-                race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
+                RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                RaceManager::get()->setNumKarts(0);
+                RaceManager::get()->setNumPlayers(0);
+                RaceManager::get()->startSingleRace("featunlocked", 999, RaceManager::get()->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();
@@ -462,14 +462,14 @@ void CutsceneWorld::enterRaceOverState()
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
                 assert(unlocked.size() > 0);
-                scene->addTrophy(race_manager->getDifficulty(),true);
-                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
+                scene->addTrophy(RaceManager::get()->getDifficulty(),true);
+                scene->findWhatWasUnlocked(RaceManager::get()->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
             else
             {
-                if (race_manager->raceWasStartedFromOverworld())
+                if (RaceManager::get()->raceWasStartedFromOverworld())
                 {
                     //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                     OverWorld::enterOverWorld();
@@ -485,15 +485,15 @@ void CutsceneWorld::enterRaceOverState()
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (m_parts.size() == 1 && m_parts[0] == "gplose")
         {
-            //race_manager->exitRace();
+            //RaceManager::get()->exitRace();
             //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            //if (race_manager->raceWasStartedFromOverworld())
+            //if (RaceManager::get()->raceWasStartedFromOverworld())
             //    OverWorld::enterOverWorld();
 
-            race_manager->exitRace();
+            RaceManager::get()->exitRace();
 
             // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
-            race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+            RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
             std::vector<const ChallengeData*> unlocked =
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
@@ -503,10 +503,10 @@ void CutsceneWorld::enterRaceOverState()
                 PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
-                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-                race_manager->setNumKarts(0);
-                race_manager->setNumPlayers(0);
-                race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
+                RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                RaceManager::get()->setNumKarts(0);
+                RaceManager::get()->setNumPlayers(0);
+                RaceManager::get()->startSingleRace("featunlocked", 999, RaceManager::get()->raceWasStartedFromOverworld());
 
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();
@@ -514,14 +514,14 @@ void CutsceneWorld::enterRaceOverState()
                 parts.push_back("featunlocked");
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
-                scene->addTrophy(race_manager->getDifficulty(),true);
-                scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
+                scene->addTrophy(RaceManager::get()->getDifficulty(),true);
+                scene->findWhatWasUnlocked(RaceManager::get()->getDifficulty(),unlocked);
 
                 StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
             else
             {
-                if (race_manager->raceWasStartedFromOverworld())
+                if (RaceManager::get()->raceWasStartedFromOverworld())
                 {
                     //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                     OverWorld::enterOverWorld();
@@ -535,13 +535,13 @@ void CutsceneWorld::enterRaceOverState()
             }
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
-        else if (race_manager->getTrackName() == "introcutscene" ||
-                 race_manager->getTrackName() == "introcutscene2")
+        else if (RaceManager::get()->getTrackName() == "introcutscene" ||
+                 RaceManager::get()->getTrackName() == "introcutscene2")
         {
             PlayerProfile *player = PlayerManager::getCurrentPlayer();
             if (player->isFirstTime())
             {
-                race_manager->exitRace();
+                RaceManager::get()->exitRace();
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                 player->setFirstTime(false);
                 PlayerManager::get()->save();
@@ -551,7 +551,7 @@ void CutsceneWorld::enterRaceOverState()
                 s->push();
             } else
             {
-                race_manager->exitRace();
+                RaceManager::get()->exitRace();
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                 OverWorld::enterOverWorld();
             }
@@ -559,20 +559,20 @@ void CutsceneWorld::enterRaceOverState()
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (m_parts.size() == 1 && m_parts[0] == "featunlocked")
         {
-            if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
             {
                 // in GP mode, continue GP after viewing this screen
                 StateManager::get()->popMenu();
-                race_manager->next();
+                RaceManager::get()->next();
             }
             else
             {
                 // back to menu or overworld
-                race_manager->exitRace();
+                RaceManager::get()->exitRace();
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                 //StateManager::get()->popMenu();
 
-                if (race_manager->raceWasStartedFromOverworld())
+                if (RaceManager::get()->raceWasStartedFromOverworld())
                 {
                     OverWorld::enterOverWorld();
                 }
@@ -580,7 +580,7 @@ void CutsceneWorld::enterRaceOverState()
         }
         else
         {
-            race_manager->exitRace();
+            RaceManager::get()->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             OverWorld::enterOverWorld();
         }
@@ -590,8 +590,8 @@ void CutsceneWorld::enterRaceOverState()
         // 'exitRace' will destroy this object so get the next part right now
         std::string next_part = m_parts[partId + 1];
 
-        race_manager->exitRace();
-        race_manager->startSingleRace(next_part, 999, race_manager->raceWasStartedFromOverworld());
+        RaceManager::get()->exitRace();
+        RaceManager::get()->startSingleRace(next_part, 999, RaceManager::get()->raceWasStartedFromOverworld());
         
         // Keep showing cutscene gui if previous scene was using it
         CutSceneGeneral* csg = dynamic_cast<CutSceneGeneral*>(cs);

@@ -117,8 +117,8 @@ void InputManager::handleStaticAction(int key, int value)
     World *world = World::getWorld();
 
     // When no players... a cutscene
-    if (race_manager &&
-        race_manager->getNumPlayers() == 0 && world != NULL && value > 0 &&
+    if (RaceManager::get() &&
+        RaceManager::get()->getNumPlayers() == 0 && world != NULL && value > 0 &&
         (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
         key == IRR_KEY_BUTTON_A))
     {
@@ -398,7 +398,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-                if(control_is_pressed && race_manager->getMinorMode()!=
+                if(control_is_pressed && RaceManager::get()->getMinorMode()!=
                                           RaceManager::MINOR_MODE_3_STRIKES)
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL,
                                      10000);
@@ -647,7 +647,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
     // Abort demo mode if a key is pressed during the race in demo mode
     if(dynamic_cast<DemoWorld*>(World::getWorld()))
     {
-        race_manager->exitRace();
+        RaceManager::get()->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         return;
     }
@@ -804,7 +804,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         if (StateManager::get()->getGameState() == GUIEngine::GAME &&
              !GUIEngine::ModalDialog::isADialogActive()            &&
              !GUIEngine::ScreenKeyboard::isActive()                &&
-             !race_manager->isWatchingReplay() && !is_nw_spectator)
+             !RaceManager::get()->isWatchingReplay() && !is_nw_spectator)
         {
             if (player == NULL)
             {
@@ -825,8 +825,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
         }
-        else if (race_manager &&
-            race_manager->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive())
+        else if (RaceManager::get() &&
+            RaceManager::get()->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive())
         {
             // Get the first ghost kart
             World::getWorld()->getKart(0)

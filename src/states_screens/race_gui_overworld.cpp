@@ -92,7 +92,7 @@ RaceGUIOverworld::RaceGUIOverworld()
                                UserConfigParams::m_multitouch_active > 1;
     
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
-        race_manager->getNumLocalPlayers() == 1)
+        RaceManager::get()->getNumLocalPlayers() == 1)
     {
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }

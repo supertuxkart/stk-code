@@ -267,13 +267,13 @@ void MainMenuScreen::onUpdate(float delta)
 // ----------------------------------------------------------------------------
 void MainMenuScreen::startTutorial()
 {
-    race_manager->setNumPlayers(1);
-    race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-    race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-    race_manager->setNumKarts( 1 );
-    race_manager->setTrack("tutorial");
-    race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-    race_manager->setReverseTrack(false);
+    RaceManager::get()->setNumPlayers(1);
+    RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+    RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+    RaceManager::get()->setNumKarts( 1 );
+    RaceManager::get()->setTrack("tutorial");
+    RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
+    RaceManager::get()->setReverseTrack(false);
 
     // Use keyboard 0 by default (FIXME: let player choose?)
     InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
@@ -288,7 +288,7 @@ void MainMenuScreen::startTutorial()
             UserConfigParams::m_default_kart.c_str());
         UserConfigParams::m_default_kart.revertToDefaults();
     }
-    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+    RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
 
     // ASSIGN should make sure that only input from assigned devices
     // is read.
@@ -297,8 +297,8 @@ void MainMenuScreen::startTutorial()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
     StateManager::get()->enterGameState();
-    race_manager->setupPlayerKartInfo();
-    race_manager->startNew(false);
+    RaceManager::get()->setupPlayerKartInfo();
+    RaceManager::get()->startNew(false);
 }   // startTutorial
 
 // ----------------------------------------------------------------------------
@@ -326,17 +326,17 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     if (selection == "story")
     {
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts( 0 );
-        race_manager->setNumPlayers(0);
-        race_manager->setNumPlayers(0);
-        race_manager->startSingleRace("endcutscene", 999, false);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        RaceManager::get()->setNumKarts( 0 );
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->startSingleRace("endcutscene", 999, false);
 
         std::vector<std::string> parts;
         parts.push_back("introcutscene");
         parts.push_back("introcutscene2");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
-        //race_manager->startSingleRace("introcutscene2", 999, false);
+        //RaceManager::get()->startSingleRace("introcutscene2", 999, false);
         return;
     }
     */
@@ -349,11 +349,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             RaceManager::DIFFICULTY_HARD);
 
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
-        race_manager->setNumPlayers(0);
-        race_manager->startSingleRace("gpwin", 999, false);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        RaceManager::get()->setNumKarts(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
         scene->push();
         const std::pair<std::string, float> winners[] =
@@ -367,11 +367,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "test_gplose")
     {
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
-        race_manager->setNumPlayers(0);
-        race_manager->startSingleRace("gplose", 999, false);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        RaceManager::get()->setNumKarts(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->startSingleRace("gplose", 999, false);
         GrandPrixLose* scene = GrandPrixLose::getInstance();
         scene->push();
         std::vector<std::pair<std::string, float> > losers;
@@ -388,11 +388,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             RaceManager::DIFFICULTY_HARD);
 
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
-        race_manager->setNumPlayers(0);
-        race_manager->startSingleRace("featunlocked", 999, false);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        RaceManager::get()->setNumKarts(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->startSingleRace("featunlocked", 999, false);
 
         FeatureUnlockedCutScene* scene =
             FeatureUnlockedCutScene::getInstance();
@@ -434,17 +434,17 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         CutsceneWorld::setUseDuration(true);
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
-        race_manager->setNumPlayers(0);
-        race_manager->startSingleRace("introcutscene", 999, false);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        RaceManager::get()->setNumKarts(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->startSingleRace("introcutscene", 999, false);
 
         std::vector<std::string> parts;
         parts.push_back("introcutscene");
         parts.push_back("introcutscene2");
         ((CutsceneWorld*)World::getWorld())->setParts(parts);
-        //race_manager->startSingleRace("introcutscene2", 999, false);
+        //RaceManager::get()->startSingleRace("introcutscene2", 999, false);
         
         CutSceneGeneral* scene = CutSceneGeneral::getInstance();
         scene->push();
@@ -454,11 +454,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         CutsceneWorld::setUseDuration(true);
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
-        race_manager->setNumPlayers(0);
-        race_manager->startSingleRace("endcutscene", 999, false);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        RaceManager::get()->setNumKarts(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->setNumPlayers(0);
+        RaceManager::get()->startSingleRace("endcutscene", 999, false);
 
         std::vector<std::string> parts;
         parts.push_back("endcutscene");
@@ -523,16 +523,16 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         {
             CutsceneWorld::setUseDuration(true);
             StateManager::get()->enterGameState();
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-            race_manager->setNumKarts( 0 );
-            race_manager->setNumPlayers(0);
-            race_manager->startSingleRace("introcutscene", 999, false);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+            RaceManager::get()->setNumKarts( 0 );
+            RaceManager::get()->setNumPlayers(0);
+            RaceManager::get()->startSingleRace("introcutscene", 999, false);
 
             std::vector<std::string> parts;
             parts.push_back("introcutscene");
             parts.push_back("introcutscene2");
             ((CutsceneWorld*)World::getWorld())->setParts(parts);
-            //race_manager->startSingleRace("introcutscene2", 999, false);
+            //RaceManager::get()->startSingleRace("introcutscene2", 999, false);
             
             CutSceneGeneral* scene = CutSceneGeneral::getInstance();
             scene->push();

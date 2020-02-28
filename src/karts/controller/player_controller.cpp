@@ -402,7 +402,7 @@ core::stringw PlayerController::getName(bool include_handicap_string) const
     core::stringw name = m_kart->getName();
     if (NetworkConfig::get()->isNetworking())
     {
-        const RemoteKartInfo& rki = race_manager->getKartInfo(
+        const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(
             m_kart->getWorldKartId());
         name = rki.getPlayerName();
         if (include_handicap_string && rki.getHandicap() == HANDICAP_MEDIUM)

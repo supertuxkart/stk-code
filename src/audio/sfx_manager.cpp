@@ -310,8 +310,8 @@ void SFXManager::queueCommand(SFXCommand *command)
         
     m_sfx_commands.lock();
     if(World::getWorld() && 
-        m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20 &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
+        m_sfx_commands.getData().size() > 20*RaceManager::get()->getNumberOfKarts()+20 &&
+        RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
         if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
            command->m_command==SFX_SPEED    || 
@@ -697,7 +697,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 {
     bool positional = false;
 
-    if (race_manager->getNumLocalPlayers() < 2)
+    if (RaceManager::get()->getNumLocalPlayers() < 2)
     {
         positional = buffer->isPositional();
     }

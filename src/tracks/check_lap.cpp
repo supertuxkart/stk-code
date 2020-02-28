@@ -37,7 +37,7 @@ CheckLap::CheckLap(const XMLNode &node, unsigned int index)
 {
     // Note that when this is called the karts have not been allocated
     // in world, so we can't call world->getNumKarts()
-    m_previous_distance.resize(race_manager->getNumberOfKarts());
+    m_previous_distance.resize(RaceManager::get()->getNumberOfKarts());
 }   // CheckLap
 
 // ----------------------------------------------------------------------------

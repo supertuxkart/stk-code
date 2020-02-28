@@ -1220,7 +1220,7 @@ void KartSelectionScreen::allPlayersDone()
             ->incrementUseFrequency();
     }
     // ---- Give player info to race manager
-    race_manager->setNumPlayers(players.size());
+    RaceManager::get()->setNumPlayers(players.size());
 
     // ---- Manage 'random kart' selection(s)
     RandomGenerator random;
@@ -1287,11 +1287,11 @@ void KartSelectionScreen::allPlayersDone()
             UserConfigParams::m_default_kart = selected_kart;
         }
 
-        race_manager->setPlayerKart(n, selected_kart);
+        RaceManager::get()->setPlayerKart(n, selected_kart);
 
         // Set handicap if needed
         if (m_multiplayer && UserConfigParams::m_per_player_difficulty)
-            race_manager->setPlayerHandicap(n, m_kart_widgets[n].getHandicap());
+            RaceManager::get()->setPlayerHandicap(n, m_kart_widgets[n].getHandicap());
     }
 
     // ---- Switch to assign mode

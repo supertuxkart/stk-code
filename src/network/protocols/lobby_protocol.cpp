@@ -82,7 +82,7 @@ void LobbyProtocol::loadWorld()
 
     // Make sure that if there is only a single local player this player can
     // use all input devices.
-    StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
+    StateManager::ActivePlayer *ap = RaceManager::get()->getNumLocalPlayers()>1
                                    ? NULL
                                    : StateManager::get()->getActivePlayer(0);
     input_manager->getDeviceManager()->setSinglePlayer(ap);
@@ -101,10 +101,10 @@ void LobbyProtocol::configRemoteKart(
     int local_player_size) const
 {
     // The number of karts includes the AI karts, which are not supported atm
-    race_manager->setNumKarts((int)players.size());
+    RaceManager::get()->setNumKarts((int)players.size());
 
     // Set number of global and local players.
-    race_manager->setNumPlayers((int)players.size(), local_player_size);
+    RaceManager::get()->setNumPlayers((int)players.size(), local_player_size);
 
     int local_player_count = -1;
     if (NetworkConfig::get()->isClient())
@@ -146,15 +146,15 @@ void LobbyProtocol::configRemoteKart(
         rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setHandicap(profile->getHandicap());
         rki.setOnlineId(profile->getOnlineId());
-        if (race_manager->teamEnabled())
+        if (RaceManager::get()->teamEnabled())
             rki.setKartTeam(profile->getTeam());
         rki.setCountryCode(profile->getCountryCode());
         rki.setNetworkPlayerProfile(profile);
         // Inform the race manager about the data for this kart.
-        race_manager->setPlayerKart(i, rki);
+        RaceManager::get()->setPlayerKart(i, rki);
     }   // for i in players
     // Clean all previous AI if exists in offline game
-    race_manager->computeRandomKartList();
+    RaceManager::get()->computeRandomKartList();
     Log::info("LobbyProtocol", "Player configuration ready.");
 }   // configRemoteKart
 
@@ -263,15 +263,15 @@ Track* LobbyProtocol::getPlayingTrack() const
 void LobbyProtocol::exitGameState()
 {
     bool create_gp_msg = false;
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
-        race_manager->getTrackNumber() == race_manager->getNumOfTracks() - 1)
+    if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        RaceManager::get()->getTrackNumber() == RaceManager::get()->getNumOfTracks() - 1)
     {
         create_gp_msg = true;
     }
 
-    race_manager->clearNetworkGrandPrixResult();
-    race_manager->exitRace();
-    race_manager->setAIKartOverride("");
+    RaceManager::get()->clearNetworkGrandPrixResult();
+    RaceManager::get()->exitRace();
+    RaceManager::get()->setAIKartOverride("");
 
     if (GUIEngine::isNoGraphics())
     {

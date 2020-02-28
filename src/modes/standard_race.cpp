@@ -35,25 +35,25 @@ StandardRace::StandardRace() : LinearWorld()
  */
 bool StandardRace::isRaceOver()
 {
-    if (race_manager->isWatchingReplay())
+    if (RaceManager::get()->isWatchingReplay())
     {
         return dynamic_cast<GhostController*>
             (m_karts[0]->getController())->isReplayEnd();
     }
     // The race is over if all players have finished the race. Remaining
     // times for AI opponents will be estimated in enterRaceOverState
-    return race_manager->allPlayerFinished();
+    return RaceManager::get()->allPlayerFinished();
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
 void StandardRace::getDefaultCollectibles(int *collectible_type, int *amount)
 {
     // in time trial mode, give zippers
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL &&
-        !race_manager->isWatchingReplay())
+    if(RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL &&
+        !RaceManager::get()->isWatchingReplay())
     {
         *collectible_type = PowerupManager::POWERUP_ZIPPER;
-        *amount = race_manager->getNumLaps();
+        *amount = RaceManager::get()->getNumLaps();
     }
     else World::getDefaultCollectibles(collectible_type, amount);
 }   // getDefaultCollectibles
@@ -64,7 +64,7 @@ void StandardRace::getDefaultCollectibles(int *collectible_type, int *amount)
 bool StandardRace::haveBonusBoxes()
 {
     // in time trial mode, don't use bonus boxes
-    return race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
+    return RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL;
 }   // haveBonusBoxes
 
 //-----------------------------------------------------------------------------
@@ -72,7 +72,7 @@ bool StandardRace::haveBonusBoxes()
  */
 const std::string& StandardRace::getIdent() const
 {
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+    if(RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
         return IDENT_TTRIAL;
     else
         return IDENT_STD;

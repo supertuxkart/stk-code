@@ -456,7 +456,7 @@ void SFXOpenAL::reallySetPosition(const Vec3 &position)
         // in multiplayer, all sounds are positional, so in this case don't
         // bug users with an error message if (note that 0 players is also
         // possible, in cutscenes)
-        if (race_manager->getNumLocalPlayers() < 2)
+        if (RaceManager::get()->getNumLocalPlayers() < 2)
         {
             Log::warn("SFX", "Position called on non-positional SFX");
         }

@@ -213,7 +213,7 @@ void StateManager::onGameStateChange(GameState new_state)
 {
     if (new_state == GAME)
     {
-        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_OVERWORLD)
+        if (RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_OVERWORLD)
             irr_driver->hidePointer();
         input_manager->setMode(InputManager::INGAME);
     }

@@ -114,7 +114,7 @@ void GhostKart::update(int ticks)
     }
 
     const unsigned int idx = gc->getCurrentReplayIndex();
-    if (!race_manager->isWatchingReplay())
+    if (!RaceManager::get()->isWatchingReplay())
     {
         if (idx == 0)
         {
@@ -184,7 +184,7 @@ void GhostKart::update(int ticks)
     m_powerup->set(item_type, m_all_bonus_info[idx].m_item_amount);
 
     // Update special values in easter egg and battle modes
-    if (race_manager->isEggHuntMode())
+    if (RaceManager::get()->isEggHuntMode())
     {
         if (idx > m_last_egg_idx &&
             m_all_bonus_info[idx].m_special_value >
@@ -247,7 +247,7 @@ float GhostKart::getSpeed() const
 void GhostKart::computeFinishTime()
 {
     // In egg hunts, the finish time is the moment at which all egs are collected
-    if (race_manager->isEggHuntMode())
+    if (RaceManager::get()->isEggHuntMode())
     {
         EasterEggHunt *world = dynamic_cast<EasterEggHunt*>(World::getWorld());
         assert(world);
@@ -256,7 +256,7 @@ void GhostKart::computeFinishTime()
     }
     else // linear races
     {
-        float full_distance = race_manager->getNumLaps()
+        float full_distance = RaceManager::get()->getNumLaps()
                             * Track::getCurrentTrack()->getTrackLength();
         m_finish_time = getTimeForDistance(full_distance);
     }

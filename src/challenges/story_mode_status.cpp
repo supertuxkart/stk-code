@@ -275,7 +275,7 @@ void StoryModeStatus::setCurrentChallenge(const std::string &challenge_id)
 void StoryModeStatus::raceFinished()
 {
     if(m_current_challenge                                            &&
-        race_manager->getDifficulty() != RaceManager::DIFFICULTY_BEST &&
+        RaceManager::get()->getDifficulty() != RaceManager::DIFFICULTY_BEST &&
         m_current_challenge->getData()->isChallengeFulfilled(true /*best*/))
     {
         ChallengeStatus* c = const_cast<ChallengeStatus*>(m_current_challenge);
@@ -283,14 +283,14 @@ void StoryModeStatus::raceFinished()
     }
 
     if(m_current_challenge                                           &&
-        m_current_challenge->isActive(race_manager->getDifficulty()) &&
+        m_current_challenge->isActive(RaceManager::get()->getDifficulty()) &&
         m_current_challenge->getData()->isChallengeFulfilled()           )
     {
         // cast const away so that the challenge can be set to fulfilled.
         // The 'clean' implementation would involve searching the challenge
         // in m_challenges_state, which is a bit of an overkill
         unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge),
-                      race_manager->getDifficulty());
+                      RaceManager::get()->getDifficulty());
     }   // if isActive && challenge solved
     
     //This updates the number of points.
@@ -305,7 +305,7 @@ void StoryModeStatus::raceFinished()
 void StoryModeStatus::grandPrixFinished()
 {
     if(m_current_challenge                                           &&
-        m_current_challenge->isActive(race_manager->getDifficulty()) )
+        m_current_challenge->isActive(RaceManager::get()->getDifficulty()) )
     {
         ChallengeData::GPLevel unlock_level = m_current_challenge->getData()->isGPFulfilled();
 
@@ -314,7 +314,7 @@ void StoryModeStatus::grandPrixFinished()
         switch (unlock_level)
         {
         case ChallengeData::GP_NONE:
-            race_manager->setCoinTarget(0);
+            RaceManager::get()->setCoinTarget(0);
             return; //No cup unlocked
         case ChallengeData::GP_EASY:
             difficulty = RaceManager::DIFFICULTY_EASY;
@@ -330,11 +330,11 @@ void StoryModeStatus::grandPrixFinished()
             break;
         }
 
-        race_manager->setDifficulty(difficulty);
+        RaceManager::get()->setDifficulty(difficulty);
         unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge), difficulty);
     }   // if isActive && challenge solved
 
-    race_manager->setCoinTarget(0);
+    RaceManager::get()->setCoinTarget(0);
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------

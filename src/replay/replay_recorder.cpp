@@ -90,12 +90,12 @@ void ReplayRecorder::reset()
 void ReplayRecorder::init()
 {
     reset();
-    m_transform_events.resize(race_manager->getNumberOfKarts());
-    m_physic_info.resize(race_manager->getNumberOfKarts());
-    m_bonus_info.resize(race_manager->getNumberOfKarts());
-    m_kart_replay_event.resize(race_manager->getNumberOfKarts());
+    m_transform_events.resize(RaceManager::get()->getNumberOfKarts());
+    m_physic_info.resize(RaceManager::get()->getNumberOfKarts());
+    m_bonus_info.resize(RaceManager::get()->getNumberOfKarts());
+    m_kart_replay_event.resize(RaceManager::get()->getNumberOfKarts());
 
-    for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    for(unsigned int i=0; i<RaceManager::get()->getNumberOfKarts(); i++)
     {
         m_transform_events[i].resize(m_max_frames);
         m_physic_info[i].resize(m_max_frames);
@@ -103,8 +103,8 @@ void ReplayRecorder::init()
         m_kart_replay_event[i].resize(m_max_frames);
     }
 
-    m_count_transforms.resize(race_manager->getNumberOfKarts(), 0);
-    m_last_saved_time.resize(race_manager->getNumberOfKarts(), -1.0f);
+    m_count_transforms.resize(RaceManager::get()->getNumberOfKarts(), 0);
+    m_last_saved_time.resize(RaceManager::get()->getNumberOfKarts(), -1.0f);
 
 }   // init
 
@@ -117,7 +117,7 @@ void ReplayRecorder::update(int ticks)
     if (m_incorrect_replay || m_complete_replay) return;
 
     World *world = World::getWorld();
-    const bool single_player = race_manager->getNumPlayers() == 1;
+    const bool single_player = RaceManager::get()->getNumPlayers() == 1;
     unsigned int num_karts = world->getNumKarts();
 
     float time = world->getTime();
@@ -143,7 +143,7 @@ void ReplayRecorder::update(int ticks)
 
         // In egg hunt mode, use store the number of eggs found so far
         // This assumes that egg hunt mode is only available in single-player
-        if (race_manager->isEggHuntMode())
+        if (RaceManager::get()->isEggHuntMode())
         {
             EasterEggHunt *easterworld = dynamic_cast<EasterEggHunt*>(World::getWorld());
             special_value = easterworld->numberOfEggsFound();
@@ -219,9 +219,9 @@ void ReplayRecorder::update(int ticks)
             // If close to the end of the race, reduce the time step
             // for extra precision
             // TODO : fast updates when close to the last egg in egg hunt
-            if (race_manager->isLinearRaceMode())
+            if (RaceManager::get()->isLinearRaceMode())
             {
-                float full_distance = race_manager->getNumLaps()
+                float full_distance = RaceManager::get()->getNumLaps()
                         * Track::getCurrentTrack()->getTrackLength();
 
                 const LinearWorld *linearworld = dynamic_cast<LinearWorld*>(World::getWorld());
@@ -293,7 +293,7 @@ void ReplayRecorder::update(int ticks)
         b->m_special_value     = special_value;
 
         //Only saves distance if recording a linear race
-        if (race_manager->isLinearRaceMode())
+        if (RaceManager::get()->isLinearRaceMode())
         {
             const LinearWorld *linearworld = dynamic_cast<LinearWorld*>(World::getWorld());
             r->m_distance = linearworld->getOverallDistance(kart->getWorldKartId());
@@ -330,10 +330,10 @@ uint64_t ReplayRecorder::computeUID(float min_time)
     date_uid = date_uid*12 + (month-1);;
     date_uid = date_uid*31 + (day-1);
 
-    int reverse = race_manager->getReverseTrack() ? 1 : 0;
+    int reverse = RaceManager::get()->getReverseTrack() ? 1 : 0;
     unique_identifier += reverse;
-    unique_identifier += race_manager->getDifficulty()*2;
-    unique_identifier += (race_manager->getNumLaps()-1)*8;
+    unique_identifier += RaceManager::get()->getDifficulty()*2;
+    unique_identifier += (RaceManager::get()->getNumLaps()-1)*8;
     unique_identifier += min_time_uid*160;
     unique_identifier += date_uid*9600000;
 
@@ -421,13 +421,13 @@ void ReplayRecorder::save()
 
     m_last_uid = computeUID(min_time);
 
-    int num_laps = race_manager->getNumLaps();
+    int num_laps = RaceManager::get()->getNumLaps();
     if (num_laps == 9999) num_laps = 0; // no lap in that race mode
 
     fprintf(fd, "kart_list_end\n");
-    fprintf(fd, "reverse: %d\n",    (int)race_manager->getReverseTrack());
-    fprintf(fd, "difficulty: %d\n", race_manager->getDifficulty());
-    fprintf(fd, "mode: %s\n",       race_manager->getMinorModeName().c_str());
+    fprintf(fd, "reverse: %d\n",    (int)RaceManager::get()->getReverseTrack());
+    fprintf(fd, "difficulty: %d\n", RaceManager::get()->getDifficulty());
+    fprintf(fd, "mode: %s\n",       RaceManager::get()->getMinorModeName().c_str());
     fprintf(fd, "track: %s\n",      Track::getCurrentTrack()->getIdent().c_str());
     fprintf(fd, "laps: %d\n",       num_laps);
     fprintf(fd, "min_time: %f\n",   min_time);

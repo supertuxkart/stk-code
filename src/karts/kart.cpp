@@ -197,12 +197,12 @@ void Kart::init(RaceManager::KartType type)
     m_type = type;
 
     // In multiplayer mode, sounds are NOT positional
-    if (race_manager->getNumLocalPlayers() > 1)
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
-        float factor = 1.0f / race_manager->getNumberOfKarts();
+        float factor = 1.0f / RaceManager::get()->getNumberOfKarts();
         // players have louder sounds than AIs
         if (type == RaceManager::KT_PLAYER)
-            factor = std::min(1.0f, race_manager->getNumLocalPlayers()/2.0f);
+            factor = std::min(1.0f, RaceManager::get()->getNumLocalPlayers()/2.0f);
 
         for (int i = 0; i < EMITTER_COUNT; i++)
             m_emitters[i]->setVolume(factor);
@@ -822,10 +822,10 @@ void Kart::startEngineSFX()
     // In multiplayer mode, sounds are NOT positional (because we have
     // multiple listeners) so the engine sounds of all AIs is constantly
     // heard. So reduce volume of all sounds.
-    if (race_manager->getNumLocalPlayers() > 1)
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
-        const int np = race_manager->getNumLocalPlayers();
-        const int nai = race_manager->getNumberOfKarts() - np;
+        const int np = RaceManager::get()->getNumLocalPlayers();
+        const int nai = RaceManager::get()->getNumberOfKarts() - np;
 
         // player karts twice as loud as AIs toghether
         const float players_volume = (np * 2.0f) / (np*2.0f + np);
@@ -933,9 +933,9 @@ void Kart::finishedRace(float time, bool from_server)
     if (m_finished_race) return;
 
     const bool is_linear_race =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER;
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER;
     if (NetworkConfig::get()->isNetworking() && !from_server)
     {
         if (NetworkConfig::get()->isServer())
@@ -993,7 +993,7 @@ void Kart::finishedRace(float time, bool from_server)
 
     m_controller->finishedRace(time);
     m_kart_model->finishedRace();
-    race_manager->kartFinishedRace(this, time);
+    RaceManager::get()->kartFinishedRace(this, time);
 
     // If this is spare tire kart, end now
     if (dynamic_cast<SpareTireAI*>(m_controller) != NULL) return;
@@ -1006,14 +1006,14 @@ void Kart::finishedRace(float time, bool from_server)
             bool won_the_race = false, too_slow = false;
             unsigned int win_position = 1;
 
-            if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
                 win_position = 2;
 
             if (getPosition() == (int)win_position &&
                 World::getWorld()->getNumKarts() > win_position)
                 won_the_race = true;
 
-            if (race_manager->hasTimeTarget() && m_finish_time > race_manager->getTimeTarget())
+            if (RaceManager::get()->hasTimeTarget() && m_finish_time > RaceManager::get()->getTimeTarget())
                 too_slow = true;
 
             m->addMessage((too_slow     ? _("You were too slow!") :
@@ -1023,8 +1023,8 @@ void Kart::finishedRace(float time, bool from_server)
         }
     }
 
-    if (race_manager->isLinearRaceMode() || race_manager->isBattleMode() ||
-        race_manager->isSoccerMode()     || race_manager->isEggHuntMode())
+    if (RaceManager::get()->isLinearRaceMode() || RaceManager::get()->isBattleMode() ||
+        RaceManager::get()->isSoccerMode()     || RaceManager::get()->isEggHuntMode())
     {
         // Save for music handling in race result gui
         setRaceResult();
@@ -1048,8 +1048,8 @@ void Kart::finishedRace(float time, bool from_server)
 //-----------------------------------------------------------------------------
 void Kart::setRaceResult()
 {
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
     {
         if (m_controller->isLocalPlayerController()) // if player is on this computer
         {
@@ -1081,28 +1081,28 @@ void Kart::setRaceResult()
                 m_race_result = false;
         }
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-             race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
     {
         // the kart wins if it isn't eliminated
         m_race_result = !this->isEliminated();
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
         m_race_result = ffa->getKartFFAResult(getWorldKartId());
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         CaptureTheFlag* ctf = dynamic_cast<CaptureTheFlag*>(World::getWorld());
         m_race_result = ctf->getKartCTFResult(getWorldKartId());
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
     {
         SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
         m_race_result = sw->getKartSoccerResult(this->getWorldKartId());
     }
-    else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
+    else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG)
     {
         // Easter egg mode only has one player, so always win
         m_race_result = true;
@@ -1964,7 +1964,7 @@ void Kart::handleMaterialSFX()
         // In multiplayer mode sounds are NOT positional, because we have
         // multiple listeners. This would make the sounds of all AIs be
         // audible at all times. So silence AI karts.
-        if (!sound_name.empty() && (race_manager->getNumPlayers()==1 ||
+        if (!sound_name.empty() && (RaceManager::get()->getNumPlayers()==1 ||
                                     m_controller->isLocalPlayerController() ) )
         {
             m_terrain_sound = SFXManager::get()->createSoundSource(sound_name);
@@ -2967,7 +2967,7 @@ void Kart::updateFlying()
 void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 {
     bool always_animated = (type == RaceManager::KT_PLAYER &&
-        race_manager->getNumLocalPlayers() == 1);
+        RaceManager::get()->getNumLocalPlayers() == 1);
     if (!GUIEngine::isNoGraphics())
         m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 

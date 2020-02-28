@@ -67,7 +67,7 @@ void ArenaAI::reset()
     m_steering_angle = 0.0f;
     m_on_node.clear();
 
-    m_cur_difficulty = race_manager->getDifficulty();
+    m_cur_difficulty = RaceManager::get()->getDifficulty();
     AIBaseController::reset();
 }   // reset
 

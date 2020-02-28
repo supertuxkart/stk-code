@@ -326,7 +326,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
 
     // In FTL mode the first section is for the leader, the 
     // second section is used for the first non-leader kart.
-    if (race_manager->isFollowMode() && rank == 2)
+    if (RaceManager::get()->isFollowMode() && rank == 2)
     {
         *prev = *next = 1;
         *weight = 1.0f;
@@ -338,7 +338,7 @@ void PowerupManager::WeightsData::convertRankToSection(int rank, int *prev,
 
     // Get the first index that is used for a section (FTL is
     // special since index 2 is for the first non-leader kart):
-    int first_section_index = race_manager->isFollowMode() ? 2 : 1;
+    int first_section_index = RaceManager::get()->isFollowMode() ? 2 : 1;
 
     // If we have five points, the first and last assigned to the first
     // and last kart, leaving 3 points 'inside' this interval, which define
@@ -517,7 +517,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     if (num_karts == 0) return;
 
     std::string class_name="";
-    switch (race_manager->getMinorMode())
+    switch (RaceManager::get()->getMinorMode())
     {
     case RaceManager::MINOR_MODE_TIME_TRIAL:       /* fall through */
     case RaceManager::MINOR_MODE_NORMAL_RACE:      class_name="race";     break;
@@ -532,7 +532,7 @@ void PowerupManager::computeWeightsForRace(int num_karts)
     case RaceManager::MINOR_MODE_SOCCER:           class_name="soccer";   break;
     default:
         Log::fatal("PowerupManager", "Invalid minor mode %d - aborting.",
-                    race_manager->getMinorMode());
+                    RaceManager::get()->getMinorMode());
     }
     class_name +="-weight-list";
 
@@ -627,7 +627,7 @@ void PowerupManager::unitTesting()
     // Test 1: Test all possible random numbers for tutorial, and
     // make sure that always three bowling balls are picked.
     // ----------------------------------------------------------
-    race_manager->setMinorMode(RaceManager::MINOR_MODE_TUTORIAL);
+    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TUTORIAL);
     powerup_manager->computeWeightsForRace(1);
     WeightsData wd = powerup_manager->m_current_item_weights;
     int num_weights = wd.m_summed_weights_for_rank[0].back();
@@ -642,7 +642,7 @@ void PowerupManager::unitTesting()
 
     // Test 2: Test all possible random numbers for 5 karts and rank 5
     // ---------------------------------------------------------------
-    race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
     int num_karts = 5;
     powerup_manager->computeWeightsForRace(num_karts);
     wd = powerup_manager->m_current_item_weights;

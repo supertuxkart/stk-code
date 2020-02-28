@@ -150,7 +150,7 @@ void ItemState::collected(const AbstractKart *kart)
         m_ticks_till_return = stk_config->time2Ticks(2.0f);
     }
 
-    if (race_manager->isBattleMode())
+    if (RaceManager::get()->isBattleMode())
     {
         m_ticks_till_return *= 3;
     }

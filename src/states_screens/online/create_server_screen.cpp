@@ -315,16 +315,16 @@ void CreateServerScreen::createServer()
     // FIXME: Long term we might add a 'vote' option (e.g. GP vs single race,
     // and normal vs FTL vs time trial could be voted about).
     std::string difficulty = difficulty_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    race_manager->setDifficulty(RaceManager::convertDifficulty(difficulty));
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    RaceManager::get()->setDifficulty(RaceManager::convertDifficulty(difficulty));
+    RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     std::string game_mode = gamemode_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     if (game_mode == "timetrial")
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
     else
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
 
-    race_manager->setReverseTrack(false);
+    RaceManager::get()->setReverseTrack(false);
     auto sl = STKHost::create();
     assert(sl);
     sl->requestStart();

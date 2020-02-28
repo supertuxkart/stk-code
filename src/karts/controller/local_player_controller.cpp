@@ -280,7 +280,7 @@ void LocalPlayerController::update(int ticks)
     }
 
     if (m_is_above_nitro_target == true &&
-        m_kart->getEnergy() < race_manager->getCoinTarget())
+        m_kart->getEnergy() < RaceManager::get()->getCoinTarget())
         nitroNotFullSound();
 #endif
     if (m_kart->getKartAnimation() && m_sound_schedule == false)
@@ -389,9 +389,9 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
     {
         m_kart->playSound(m_full_sound);
     }
-    else if (race_manager->getCoinTarget() > 0 &&
-             old_energy < race_manager->getCoinTarget() &&
-             m_kart->getEnergy() >= race_manager->getCoinTarget())
+    else if (RaceManager::get()->getCoinTarget() > 0 &&
+             old_energy < RaceManager::get()->getCoinTarget() &&
+             m_kart->getEnergy() >= RaceManager::get()->getCoinTarget())
     {
         m_kart->playSound(m_full_sound);
         m_is_above_nitro_target = true;

@@ -257,7 +257,7 @@ void ServerSelection::loadList()
             true));
 
         core::stringw difficulty =
-            race_manager->getDifficultyName(server->getDifficulty());
+            RaceManager::get()->getDifficultyName(server->getDifficulty());
         row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 3,
             true));
 

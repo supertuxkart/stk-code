@@ -138,13 +138,13 @@ void DriveGraph::load(const std::string &quad_file_name,
         bool ignored = false;
         std::string direction;
         xml_node->get("direction", &direction);
-        if (direction == "forward" && race_manager->getReverseTrack())
+        if (direction == "forward" && RaceManager::get()->getReverseTrack())
         {
             ignored = true;
             invisible = true;
             ai_ignore = true;
         }
-        else if (direction == "reverse" && !race_manager->getReverseTrack())
+        else if (direction == "reverse" && !RaceManager::get()->getReverseTrack())
         {
             ignored = true;
             invisible = true;
@@ -736,7 +736,7 @@ DriveNode* DriveGraph::getNode(unsigned int j) const
 bool DriveGraph::hasLapLine() const
 {
     if (Track::getCurrentTrack()->isCTF() &&
-        race_manager->getMinorMode() ==
+        RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         return false;
     return true;

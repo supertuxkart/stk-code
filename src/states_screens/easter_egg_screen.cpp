@@ -214,7 +214,7 @@ void EasterEggScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack( n );
-            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
+            if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
                 && !curr->hasEasterEggs())
                 continue;
             if (curr->isArena() || curr->isSoccer()) continue;
@@ -244,7 +244,7 @@ void EasterEggScreen::buildTrackList()
         for (int n=0; n<trackAmount; n++)
         {
             Track* curr = track_manager->getTrack( curr_group[n] );
-            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
+            if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
                 && !curr->hasEasterEggs())
                 continue;
             if (curr->isArena()) continue;

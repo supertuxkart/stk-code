@@ -60,11 +60,41 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-RaceManager* race_manager= NULL;
+//=============================================================================================
+RaceManager* g_race_manager[PT_COUNT];
+//---------------------------------------------------------------------------------------------
+RaceManager* RaceManager::get()
+{
+    ProcessType type = STKProcess::getType();
+    return g_race_manager[type];
+}   // get
 
+//---------------------------------------------------------------------------------------------
+void RaceManager::create()
+{
+    ProcessType type = STKProcess::getType();
+    g_race_manager[type] = new RaceManager();
+}   // create
+
+//---------------------------------------------------------------------------------------------
+void RaceManager::destroy()
+{
+    ProcessType type = STKProcess::getType();
+    delete g_race_manager[type];
+    g_race_manager[type] = NULL;
+}   // destroy
+
+//---------------------------------------------------------------------------------------------
+void RaceManager::clear()
+{
+    memset(g_race_manager, 0, sizeof(g_race_manager));
+}   // clear
+
+//---------------------------------------------------------------------------------------------
 /** Constructs the race manager.
  */
 RaceManager::RaceManager()
@@ -601,10 +631,10 @@ void RaceManager::startNextRace()
 
     if (NetworkConfig::get()->isNetworking())
     {
-        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        for (unsigned i = 0; i < getNumPlayers(); i++)
         {
             // Eliminate all reserved players in the begining
-            const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            const RemoteKartInfo& rki = getKartInfo(i);
             if (rki.isReserved())
             {
                 AbstractKart* k = World::getWorld()->getKart(i);
@@ -746,7 +776,7 @@ void RaceManager::computeGPRanks()
     PtrVector<computeGPRanksData::SortData> sort_data;
 
     // Ignore the first kart if it's a follow-the-leader race.
-    int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);
+    int start=(getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);
     if (start)
     {
         // fill values for leader
@@ -867,14 +897,14 @@ void RaceManager::exitRace(bool delete_world)
         delete_world = false;
 
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
+        setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        setNumKarts(0);
+        setNumPlayers(0);
 
         if (some_human_player_well_ranked)
         {
-            race_manager->startSingleRace("gpwin", 999,
-                                  race_manager->raceWasStartedFromOverworld());
+            startSingleRace("gpwin", 999,
+                                  raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             scene->push();
             scene->setKarts(winners);
@@ -882,8 +912,8 @@ void RaceManager::exitRace(bool delete_world)
         }
         else
         {
-            race_manager->startSingleRace("gplose", 999,
-                                  race_manager->raceWasStartedFromOverworld());
+            startSingleRace("gplose", 999,
+                                  raceWasStartedFromOverworld());
             GrandPrixLose* scene = GrandPrixLose::getInstance();
             scene->push();
 
@@ -973,7 +1003,7 @@ void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
 {
     StateManager::get()->enterGameState();
     setGrandPrix(gp);
-    race_manager->setupPlayerKartInfo();
+    setupPlayerKartInfo();
     m_continue_saved_gp = continue_saved_gp;
 
     setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
@@ -1023,7 +1053,7 @@ void RaceManager::startSingleRace(const std::string &track_ident,
 
     // if not in a network world, setup player karts
     if (!RaceEventManager::getInstance<RaceEventManager>()->isRunning())
-        race_manager->setupPlayerKartInfo(); // do this setup player kart
+        setupPlayerKartInfo(); // do this setup player kart
 
     startNew(from_overworld);
 }   // startSingleRace

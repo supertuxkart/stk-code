@@ -173,7 +173,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         //        the index of item needs to be same so we create and disable it
         //        in TrackObjectPresentationSound constructor
         m_presentation = new TrackObjectPresentationSound(xml_node, parent,
-            race_manager->getNumLocalPlayers() > 1);
+            RaceManager::get()->getNumLocalPlayers() > 1);
     }
     else if (type == "action-trigger")
     {

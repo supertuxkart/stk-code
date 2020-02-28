@@ -106,7 +106,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         }
 
         UserConfigParams::m_last_track = selection;
-        if (selection == "locked" && race_manager->getNumLocalPlayers() == 1)
+        if (selection == "locked" && RaceManager::get()->getNumLocalPlayers() == 1)
         {
             unlock_manager->playLockSound();
             return;
@@ -248,7 +248,7 @@ void TracksScreen::beforeAddingWidget()
         m_vote_list->clearColumns();
         auto cl = LobbyProtocol::get<ClientLobby>();
         assert(cl);
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
         {
             m_vote_list->addColumn(irr_driver->getTexture
                 (file_manager->getAsset(FileManager::GUI_ICON,
@@ -260,7 +260,7 @@ void TracksScreen::beforeAddingWidget()
                 (file_manager->getAsset(FileManager::MODEL,
                 "swap-icon.png")), 1);
         }
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             m_vote_list->addColumn(irr_driver->getTexture
                 (file_manager->getAsset(FileManager::GUI_ICON,
@@ -269,7 +269,7 @@ void TracksScreen::beforeAddingWidget()
                 (file_manager->getAsset(FileManager::GUI_ICON,
                 "track_random.png")), 2);
         }
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
             m_vote_list->addColumn(irr_driver->getTexture
                 (file_manager->getAsset(FileManager::GUI_ICON,
@@ -339,9 +339,9 @@ void TracksScreen::beforeAddingWidget()
     RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
     
-    RaceManager::MinorRaceModeType minor_mode = race_manager->getMinorMode();
+    RaceManager::MinorRaceModeType minor_mode = RaceManager::get()->getMinorMode();
     bool is_soccer = minor_mode == RaceManager::MINOR_MODE_SOCCER;
-    bool is_arena = is_soccer || race_manager->isBattleMode();
+    bool is_arena = is_soccer || RaceManager::get()->isBattleMode();
     
     const std::vector<std::string>& groups = 
                         is_arena ? track_manager->getAllArenaGroups(is_soccer)
@@ -439,7 +439,7 @@ void TracksScreen::init()
         if (UserConfigParams::m_num_laps == 0 ||
             UserConfigParams::m_num_laps > 20)
             UserConfigParams::m_num_laps = 1;
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
         {
             getWidget("lap-text")->setVisible(false);
             m_laps->setValue(0);
@@ -452,7 +452,7 @@ void TracksScreen::init()
             if (vote)
                 m_reversed->setState(vote->m_reverse);
         }
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             getWidget("lap-text")->setVisible(false);
             m_laps->setValue(0);
@@ -461,7 +461,7 @@ void TracksScreen::init()
             m_reversed->setState(false);
             m_reversed->setVisible(false);
         }
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         {
             if (cl->isServerAutoGameTime())
             {
@@ -563,7 +563,7 @@ void TracksScreen::buildTrackList()
     for (int n = 0; n < track_amount; n++)
     {
         Track* curr = track_manager->getTrack(n);
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
             && !curr->hasEasterEggs())
             continue;
         if (!is_network &&
@@ -586,7 +586,7 @@ void TracksScreen::buildTrackList()
         Track *curr = tracks.get(i);
         if (PlayerManager::getCurrentPlayer() &&
             PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
-            race_manager->getNumLocalPlayers() == 1 && !is_network)
+            RaceManager::get()->getNumLocalPlayers() == 1 && !is_network)
         {
             tracks_widget->addItem(
                 _("Locked: solve active challenges to gain access to more!"),
@@ -629,8 +629,8 @@ void TracksScreen::voteForPlayer()
     assert(m_laps);
     assert(m_reversed);
     // Remember reverse globally for each stk instance if not arena
-    if (!race_manager->isBattleMode() &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+    if (!RaceManager::get()->isBattleMode() &&
+        RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
     {
         UserConfigParams::m_num_laps = m_laps->getValue();
     }
@@ -643,12 +643,12 @@ void TracksScreen::voteForPlayer()
     if (PlayerManager::getCurrentPlayer())
         player_name = PlayerManager::getCurrentPlayer()->getName();
     vote.encodeString(player_name);
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         vote.encodeString(m_selected_track->getIdent())
             .addUInt8(0).addUInt8(m_reversed->getState() ? 1 : 0);
     }
-    else if (race_manager->getMinorMode() ==
+    else if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         vote.encodeString(m_selected_track->getIdent())
@@ -781,7 +781,7 @@ void TracksScreen::updatePlayerVotes()
         std::vector<GUIEngine::ListWidget::ListCell> row;
         core::stringw y = L"\u2714";
         core::stringw n = L"\u2716";
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
         {
             row.push_back(GUIEngine::ListWidget::ListCell
                 (p->m_player_name , -1, 5));
@@ -799,7 +799,7 @@ void TracksScreen::updatePlayerVotes()
             m_vote_list->addItem(
                 StringUtils::toString(m_index_to_hostid[i]), row);
         }
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             row.push_back(GUIEngine::ListWidget::ListCell
                 (p->m_player_name , -1, 6));

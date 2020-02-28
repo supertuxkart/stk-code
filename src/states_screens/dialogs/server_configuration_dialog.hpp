@@ -51,7 +51,7 @@ public:
     ServerConfigurationDialog(bool soccer_goal) : ModalDialog(0.8f, 0.8f)
     {
         m_self_destroy = false;
-        switch (race_manager->getMinorMode())
+        switch (RaceManager::get()->getMinorMode())
         {
             case RaceManager::MINOR_MODE_NORMAL_RACE:
             {
