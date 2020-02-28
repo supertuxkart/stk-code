@@ -44,8 +44,8 @@ and extract it to stk-code/lib. It contains sources of libraries that are used
 in STK, but are not availiable in stk-code repository (curl, freetype, openal).
 
 You need also Android SDK for android-19 platform (the API for Android 4.4) and
-Android NDK. Note that NDK >= r15 is atm. not supported. Version r12b is
-strongly recommended, because it's known that it works without issues.
+Android NDK. Version r20 is recommended, because it's known that it works
+without issues.
 
 You need to create proper "android-sdk" and "android-ndk" symlinks in the
 directory with Android project, so that the compilation script will have access
