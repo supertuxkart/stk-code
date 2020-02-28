@@ -202,7 +202,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     m_graphical_type    = getGrahpicalType();
 
     m_node = NULL;
-    if (!GUIEngine::isNoGraphics())
+    if (mesh && !GUIEngine::isNoGraphics())
     {
         LODNode* lodnode =
             new LODNode("item", irr_driver->getSceneManager()->getRootSceneNode(),

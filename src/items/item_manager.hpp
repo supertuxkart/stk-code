@@ -119,7 +119,6 @@ protected:
     int m_switch_ticks;
 
     void deleteItem(ItemState *item);
-    virtual unsigned int insertItem(Item *item);
     void switchItemsInternal(std::vector < ItemState*> &all_items);
     void setSwitchItems(const std::vector<int> &switch_items);
     void insertItemInQuad(Item *item);
@@ -198,6 +197,8 @@ public:
               ? NULL 
              : dynamic_cast<Item*>((*m_items_in_quads)[n].front());
     }   // getFirstItemInQuad
+    // ------------------------------------------------------------------------
+    unsigned int insertItem(Item *item);
 };   // ItemManager
 
 #endif

@@ -352,7 +352,7 @@ STKHost::~STKHost()
     // Abort the server loop earlier so it can be stopped in background as
     // soon as possible
     if (m_client_loop)
-        m_client_loop->requestAbort();
+        m_client_loop->abort();
 
     NetworkConfig::get()->clearActivePlayersForClient();
     requestShutdown();

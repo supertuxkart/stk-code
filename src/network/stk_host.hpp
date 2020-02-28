@@ -189,6 +189,12 @@ public:
         return m_stk_host[pt];
     }   // get
     // ------------------------------------------------------------------------
+    static STKHost *getByType(ProcessType pt)
+    {
+        assert(m_stk_host[pt] != NULL);
+        return m_stk_host[pt];
+    }   // get
+    // ------------------------------------------------------------------------
     static void destroy()
     {
         ProcessType pt = STKProcess::getType();

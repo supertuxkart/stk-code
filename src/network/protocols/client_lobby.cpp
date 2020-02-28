@@ -962,16 +962,18 @@ void ClientLobby::startGame(Event* event)
     nim->restoreCompleteState(event->data());
 
     core::stringw err_msg = _("Failed to start the network game.");
+    // Different stk process thread may have different stk host
+    STKHost* stk_host = STKHost::get();
     joinStartGameThread();
-    m_start_game_thread = std::thread([start_time, this, err_msg]()
+    m_start_game_thread = std::thread([start_time, stk_host, this, err_msg]()
         {
-            const uint64_t cur_time = STKHost::get()->getNetworkTimer();
+            const uint64_t cur_time = stk_host->getNetworkTimer();
             if (!(start_time > cur_time))
             {
                 Log::error("ClientLobby", "Network timer is too slow to catch "
                     "up, you must have a poor network.");
-                STKHost::get()->setErrorMessage(err_msg);
-                STKHost::get()->requestShutdown();
+                stk_host->setErrorMessage(err_msg);
+                stk_host->requestShutdown();
                 return;
             }
             int sleep_time = (int)(start_time - cur_time);

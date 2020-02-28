@@ -19,9 +19,11 @@
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "items/projectile_manager.hpp"
+#include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "race/race_manager.hpp"
@@ -104,13 +106,8 @@ void ChildLoop::run()
     float left_over_time = 0;
     while (!m_abort)
     {
-        if ((STKHost::existHost() && STKHost::get()->requestedShutdown()) ||
-            m_request_abort)
-        {
-            if (STKHost::existHost())
-                STKHost::get()->shutdown();
-            m_abort = true;
-        }
+        if (STKHost::existHost() && STKHost::get()->requestedShutdown())
+            break;
 
         // Tell the main process port and server id
         if (m_port == 0 && STKHost::existHost())
@@ -134,10 +131,32 @@ void ChildLoop::run()
             if (auto pm = ProtocolManager::lock())
                 pm->update(1);
 
-            if (m_abort || m_request_abort)
+            World* w = World::getWorld();
+            if (w && w->getPhase() == WorldStatus::SETUP_PHASE)
+            {
+                // Skip the large num steps contributed by loading time
+                w->updateTime(1);
+                break;
+            }
+
+            if (w)
+            {
+                auto rem = RaceEventManager::get();
+                if (rem && rem->isRunning())
+                    RaceEventManager::get()->update(1, false/*fast_forward*/);
+                else
+                    w->updateWorld(1);
+                w->updateTime(1);
+            }
+            if (m_abort)
                 break;
         }
     }
+
+    if (STKHost::existHost())
+        STKHost::get()->shutdown();
+    if (World::getWorld())
+        RaceManager::get()->exitRace();
 
     RaceManager::destroy();
     ProjectileManager::destroy();

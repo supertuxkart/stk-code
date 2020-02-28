@@ -37,8 +37,6 @@ private:
 
     std::atomic_bool m_abort;
 
-    std::atomic_bool m_request_abort;
-
     std::atomic<uint16_t> m_port;
 
     std::atomic<uint32_t> m_server_online_id;
@@ -51,7 +49,6 @@ public:
         : m_cl_config(new ChildLoopConfig(clc))
     {
         m_abort = false;
-        m_request_abort = false;
         m_prev_time = m_curr_time = 0;
         m_port = 0;
         m_server_online_id = 0;
@@ -59,7 +56,7 @@ public:
     void run();
     /** Set the abort flag, causing the mainloop to be left. */
     void abort() { m_abort = true; }
-    void requestAbort() { m_request_abort = true; }
+    bool isAborted() const { return m_abort; }
     uint16_t getPort() const { return m_port; }
     uint32_t getServerOnlineId() const { return m_server_online_id; }
 };   // ChildLoop

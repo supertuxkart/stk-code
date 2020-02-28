@@ -146,6 +146,18 @@ public:
         assert(indx < m_p1p2p3.size());
         return m_p1p2p3[indx];
     }
+    // ------------------------------------------------------------------------
+    void copyFrom(const TriangleMesh& tm)
+    {
+        for (int i = 0; i < tm.m_mesh.getNumTriangles(); i++)
+        {
+            btVector3 v[6];
+            tm.getTriangle(i, v, v + 1, v + 2);
+            tm.getNormals(i, v + 3, v + 4, v + 5);
+            const Material* m = tm.getMaterial(i);
+            addTriangle(v[0], v[1], v[2], v[3], v[4], v[5], m);
+        }
+    }
 };
 #endif
 /* EOF */
