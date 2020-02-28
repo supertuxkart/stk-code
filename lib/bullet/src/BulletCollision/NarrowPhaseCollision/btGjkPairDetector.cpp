@@ -36,9 +36,10 @@ subject to the following restrictions:
 //must be above the machine epsilon
 #define REL_ERROR2 btScalar(1.0e-6)
 
+// Disable global variables for STK with multiple physics instance
 //temp globals, to improve GJK/EPA/penetration calculations
-int gNumDeepPenetrationChecks = 0;
-int gNumGjkChecks = 0;
+//int gNumDeepPenetrationChecks = 0;
+//int gNumGjkChecks = 0;
 
 
 btGjkPairDetector::btGjkPairDetector(const btConvexShape* objectA,const btConvexShape* objectB,btSimplexSolverInterface* simplexSolver,btConvexPenetrationDepthSolver*	penetrationDepthSolver)
@@ -101,7 +102,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 	btScalar marginA = m_marginA;
 	btScalar marginB = m_marginB;
 
-	gNumGjkChecks++;
+	//gNumGjkChecks++;
 
 #ifdef DEBUG_SPU_COLLISION_DETECTION
 	spu_printf("inside gjk\n");
@@ -348,7 +349,7 @@ void btGjkPairDetector::getClosestPointsNonVirtual(const ClosestPointInput& inpu
 				// Penetration depth case.
 				btVector3 tmpPointOnA,tmpPointOnB;
 				
-				gNumDeepPenetrationChecks++;
+				//gNumDeepPenetrationChecks++;
 				m_cachedSeparatingAxis.setZero();
 
 				bool isValid2 = m_penetrationDepthSolver->calcPenDepth( 
