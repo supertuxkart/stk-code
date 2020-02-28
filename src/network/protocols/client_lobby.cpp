@@ -47,6 +47,7 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/server.hpp"
@@ -622,7 +623,11 @@ void ClientLobby::connectionAccepted(Event* event)
         MessageQueue::add(MessageQueue::MT_GENERIC, msg);
     }
 
-    STKHost::get()->setMyHostId(data.getUInt32());
+    uint32_t host_id = data.getUInt32();
+    STKHost::get()->setMyHostId(host_id);
+    if (auto sl = LobbyProtocol::getByType<ServerLobby>(PT_CHILD))
+        sl->setClientServerHostId(host_id);
+
     assert(!NetworkConfig::get()->isAddingNetworkPlayers());
     uint32_t server_version = data.getUInt32();
     NetworkConfig::get()->setJoinedServerVersion(server_version);
@@ -1181,6 +1186,12 @@ void ClientLobby::backToLobby(Event *event)
     case BLR_ONE_PLAYER_IN_RANKED_MATCH:
         // I18N: Error message shown if only 1 player remains in network
         msg = _("Only 1 player remaining, returning to lobby.");
+        break;
+    case BLR_SERVER_ONWER_QUITED_THE_GAME:
+        // I18N: Error message shown when all players will go back to lobby
+        // when server owner quited the game
+        if (!STKHost::get()->isClientServer())
+            msg = _("Server owner quited the game.");
         break;
     default:
         break;

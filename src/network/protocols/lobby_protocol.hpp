@@ -98,7 +98,8 @@ public:
         BLR_NONE = 0,
         BLR_NO_GAME_FOR_LIVE_JOIN = 1,
         BLR_NO_PLACE_FOR_LIVE_JOIN = 2,
-        BLR_ONE_PLAYER_IN_RANKED_MATCH = 3
+        BLR_ONE_PLAYER_IN_RANKED_MATCH = 3,
+        BLR_SERVER_ONWER_QUITED_THE_GAME = 4
     };
 
 protected:

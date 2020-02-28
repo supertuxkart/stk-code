@@ -212,6 +212,8 @@ private:
 
     std::atomic<uint32_t> m_server_id_online;
 
+    std::atomic<uint32_t> m_client_server_host_id;
+
     std::atomic<int> m_difficulty;
 
     std::atomic<int> m_game_mode;
@@ -389,6 +391,7 @@ public:
     bool isAIProfile(const std::shared_ptr<NetworkPlayerProfile>& npp) const
                      { return m_ai_profiles.find(npp) != m_ai_profiles.end(); }
     uint32_t getServerIdOnline() const           { return m_server_id_online; }
+    void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP
