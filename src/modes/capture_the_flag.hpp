@@ -140,19 +140,19 @@ public:
         std::pair<uint32_t, uint32_t> progress(
             std::numeric_limits<uint32_t>::max(),
             std::numeric_limits<uint32_t>::max());
-        if (race_manager->hasTimeTarget())
+        if (RaceManager::get()->hasTimeTarget())
         {
             progress.first = (uint32_t)m_time;
         }
         if (m_red_scores > m_blue_scores)
         {
             progress.second = (uint32_t)((float)m_red_scores /
-                (float)race_manager->getHitCaptureLimit() * 100.0f);
+                (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         else
         {
             progress.second = (uint32_t)((float)m_blue_scores /
-                (float)race_manager->getHitCaptureLimit() * 100.0f);
+                (float)RaceManager::get()->getHitCaptureLimit() * 100.0f);
         }
         return progress;
     }

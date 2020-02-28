@@ -114,7 +114,7 @@ void Plunger::onFireFlyable()
     setAdjustUpVelocity(false);
 
     const bool create_rubber_band =
-        !(m_reverse_mode || race_manager->isBattleMode());
+        !(m_reverse_mode || RaceManager::get()->isBattleMode());
     if (create_rubber_band && !m_rubber_band)
         m_rubber_band = new RubberBand(this, m_owner);
     else if (!create_rubber_band && m_rubber_band)
@@ -196,7 +196,7 @@ bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
-    if( m_reverse_mode || race_manager->isBattleMode() )
+    if( m_reverse_mode || RaceManager::get()->isBattleMode() )
     {
         if(kart)
         {

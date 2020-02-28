@@ -736,13 +736,13 @@ void Track::loadArenaGraph(const XMLNode &node)
 {
     // Determine if rotate minimap is needed for soccer mode (for blue team)
     // Only need to test local player
-    if (race_manager->isSoccerMode())
+    if (RaceManager::get()->isSoccerMode())
     {
-        const unsigned pk = race_manager->getNumPlayers();
+        const unsigned pk = RaceManager::get()->getNumPlayers();
         for (unsigned i = 0; i < pk; i++)
         {
-            if (!race_manager->getKartInfo(i).isNetworkPlayer() &&
-                race_manager->getKartInfo(i).getKartTeam() ==
+            if (!RaceManager::get()->getKartInfo(i).isNetworkPlayer() &&
+                RaceManager::get()->getKartInfo(i).getKartTeam() ==
                 KART_TEAM_BLUE)
             {
                 m_minimap_invert_x_z = true;
@@ -812,7 +812,7 @@ void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
-        if (race_manager->getNumberOfKarts() > 1)
+        if (RaceManager::get()->getNumberOfKarts() > 1)
         {
             Log::fatal("track", "I can handle the lack of driveline in single"
                 "kart mode, but not with AIs\n");
@@ -1883,7 +1883,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     // Load the un-raycasted flag position first (for minimap)
-    if (m_is_ctf && race_manager->isCTFMode())
+    if (m_is_ctf && RaceManager::get()->isCTFMode())
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -1941,14 +1941,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
-        if (race_manager->isFollowMode())
+        if (RaceManager::get()->isFollowMode())
         {
             // In a FTL race the non-leader karts are placed at the end of the
             // field, so we need all start positions.
             m_start_transforms.resize(stk_config->m_max_karts);
         }
         else
-            m_start_transforms.resize(race_manager->getNumberOfKarts());
+            m_start_transforms.resize(RaceManager::get()->getNumberOfKarts());
         DriveGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
@@ -2204,7 +2204,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     main_loop->renderGUI(5700);
 
-    if (m_is_ctf && race_manager->isCTFMode())
+    if (m_is_ctf && RaceManager::get()->isCTFMode())
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -2233,7 +2233,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
     if (m_check_manager->getCheckStructureCount()==0  &&
-        !race_manager->isBattleMode() && !m_is_cutscene)
+        !RaceManager::get()->isBattleMode() && !m_is_cutscene)
     {
         Log::warn("track", "No check lines found in track '%s'.",
                   m_ident.c_str());
@@ -2292,7 +2292,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
     unsigned int start_position_counter = 0;
 
     unsigned int node_count = root->getNumNodes();
-    const bool is_mode_ctf = m_is_ctf && race_manager->isCTFMode();
+    const bool is_mode_ctf = m_is_ctf && RaceManager::get()->isCTFMode();
 
     // We keep track of the complexity of the scene (amount of objects loaded, etc)
     irr_driver->addSceneComplexity(node_count);
@@ -2632,7 +2632,7 @@ void Track::itemCommand(const XMLNode *node)
 {
     const std::string &name = node->getName();
 
-    const bool is_mode_ctf = m_is_ctf && race_manager->isCTFMode();
+    const bool is_mode_ctf = m_is_ctf && RaceManager::get()->isCTFMode();
     bool ctf = false;
     node->get("ctf", &ctf);
     if ((is_mode_ctf && !ctf) || (!is_mode_ctf && ctf))
@@ -2659,7 +2659,7 @@ void Track::itemCommand(const XMLNode *node)
         return;
 
     // Only do easter eggs in easter egg mode.
-    if(!(race_manager->isEggHuntMode()) && type==Item::ITEM_EASTER_EGG)
+    if(!(RaceManager::get()->isEggHuntMode()) && type==Item::ITEM_EASTER_EGG)
     {
         Log::warn("track",
                   "Found easter egg in non-easter-egg mode - ignored.\n");

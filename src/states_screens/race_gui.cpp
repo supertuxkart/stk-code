@@ -86,9 +86,9 @@ RaceGUI::RaceGUI()
     area = font->getDimension(L"-");
     m_negative_timer_additional_width = area.Width;
 
-    if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        race_manager->isBattleMode()     ||
-        race_manager->getNumLaps() > 9)
+    if (RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+        RaceManager::get()->isBattleMode()     ||
+        RaceManager::get()->getNumLaps() > 9)
         m_lap_width = font->getDimension(L"99/99").Width;
     else
         m_lap_width = font->getDimension(L"9/9").Width;
@@ -98,14 +98,14 @@ RaceGUI::RaceGUI()
                                UserConfigParams::m_multitouch_active > 1;
     
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
-        race_manager->getNumLocalPlayers() == 1)
+        RaceManager::get()->getNumLocalPlayers() == 1)
     {
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }
     
     calculateMinimapSize();
 
-    m_is_tutorial = (race_manager->getTrackName() == "tutorial");
+    m_is_tutorial = (RaceManager::get()->getTrackName() == "tutorial");
 
     // Load speedmeter texture before rendering the first frame
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
@@ -137,7 +137,7 @@ void RaceGUI::init()
     RaceGUIBase::init();
     // Technically we only need getNumLocalPlayers, but using the
     // global kart id to find the data for a specific kart.
-    int n = race_manager->getNumberOfKarts();
+    int n = RaceManager::get()->getNumberOfKarts();
 
     m_animation_states.resize(n);
     m_rank_animation_duration.resize(n);
@@ -151,7 +151,7 @@ void RaceGUI::init()
 void RaceGUI::reset()
 {
     RaceGUIBase::reset();
-    for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    for(unsigned int i=0; i<RaceManager::get()->getNumberOfKarts(); i++)
     {
         m_animation_states[i] = AS_NONE;
         m_last_ranks[i]       = i+1;
@@ -165,14 +165,14 @@ void RaceGUI::calculateMinimapSize()
 
     // If there are four players or more in splitscreen
     // and the map is in a player view, scale down the map
-    if (race_manager->getNumLocalPlayers() >= 4 && !race_manager->getIfEmptyScreenSpaceExists())
+    if (RaceManager::get()->getNumLocalPlayers() >= 4 && !RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
         // If the resolution is wider than 4:3, we don't have to scaledown the minimap as much
         // Uses some margin, in case the game's screen is not exactly 4:3
         if ( ((float) irr_driver->getFrameSize().Width / (float) irr_driver->getFrameSize().Height) >
              (4.1f/3.0f))
         {
-            if (race_manager->getNumLocalPlayers() == 4)
+            if (RaceManager::get()->getNumLocalPlayers() == 4)
                 map_size_splitscreen = 0.75f;
             else
                 map_size_splitscreen = 0.5f;
@@ -213,7 +213,7 @@ void RaceGUI::calculateMinimapSize()
     m_map_height            = (int)(map_size * scaling);
 
     if ((UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
-       race_manager->getNumLocalPlayers() == 1) || m_multitouch_gui)
+       RaceManager::get()->getNumLocalPlayers() == 1) || m_multitouch_gui)
     {
         m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
                                                         m_map_width - 10.0f*scaling);
@@ -221,7 +221,7 @@ void RaceGUI::calculateMinimapSize()
                                                         m_map_height);
     }
     else if ((UserConfigParams::m_minimap_display == 3 && /*map on the center of the screen*/
-       race_manager->getNumLocalPlayers() == 1) || m_multitouch_gui)
+       RaceManager::get()->getNumLocalPlayers() == 1) || m_multitouch_gui)
     {
         m_map_left          = (int)(irr_driver->getActualScreenSize().Width / 2);
         if (m_map_left + m_map_width > (int)irr_driver->getActualScreenSize().Width)
@@ -241,7 +241,7 @@ void RaceGUI::calculateMinimapSize()
 
 
     // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getIfEmptyScreenSpaceExists())
+    if (RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
         m_map_left = irr_driver->getActualScreenSize().Width -
                      m_map_width - (int)( 10.0f * scaling);
@@ -269,13 +269,13 @@ void RaceGUI::renderGlobal(float dt)
 
     // Special case : when 3 players play, use 4th window to display such
     // stuff (but we must clear it)
-    if (race_manager->getIfEmptyScreenSpaceExists() &&
+    if (RaceManager::get()->getIfEmptyScreenSpaceExists() &&
         !GUIEngine::ModalDialog::isADialogActive())
     {
         static video::SColor black = video::SColor(255,0,0,0);
 
         GL32_draw2DRectangle(black, irr_driver->getSplitscreenWindow(
-            race_manager->getNumLocalPlayers()));
+            RaceManager::get()->getNumLocalPlayers()));
     }
 
     World *world = World::getWorld();
@@ -295,7 +295,7 @@ void RaceGUI::renderGlobal(float dt)
     // as it must be displayed in all the game's screens
     if (UserConfigParams::m_display_story_mode_timer &&
         !UserConfigParams::m_speedrun_mode &&
-        race_manager->raceWasStartedFromOverworld())
+        RaceManager::get()->raceWasStartedFromOverworld())
         irr_driver->displayStoryModeTimer();
 
     // MiniMap is drawn when the players wait for the start countdown to end
@@ -309,9 +309,9 @@ void RaceGUI::renderGlobal(float dt)
 
     if (!m_is_tutorial)
     {
-        if (race_manager->isLinearRaceMode() &&
-            race_manager->hasGhostKarts() &&
-            race_manager->getNumberOfKarts() >= 2 )
+        if (RaceManager::get()->isLinearRaceMode() &&
+            RaceManager::get()->hasGhostKarts() &&
+            RaceManager::get()->getNumberOfKarts() >= 2 )
             drawLiveDifference();
 
         if(world->getPhase() == WorldStatus::GO_PHASE ||
@@ -329,7 +329,7 @@ void RaceGUI::renderGlobal(float dt)
         }
         else if (UserConfigParams::m_minimap_display == 0 || /*map in the bottom-left*/
                 (UserConfigParams::m_minimap_display == 1 &&
-                race_manager->getNumLocalPlayers() >= 2))
+                RaceManager::get()->getNumLocalPlayers() >= 2))
         {
             drawGlobalPlayerIcons(m_map_height + m_map_bottom);
         }
@@ -402,17 +402,17 @@ void RaceGUI::drawGlobalTimer()
     bool use_digit_font = true;
 
     float elapsed_time = World::getWorld()->getTime();
-    if (!race_manager->hasTimeTarget() ||
-        race_manager->getMinorMode() ==RaceManager::MINOR_MODE_SOCCER ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+    if (!RaceManager::get()->hasTimeTarget() ||
+        RaceManager::get()->getMinorMode() ==RaceManager::MINOR_MODE_SOCCER ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         sw = core::stringw (
             StringUtils::timeToString(elapsed_time).c_str() );
     }
     else
     {
-        float time_target = race_manager->getTimeTarget();
+        float time_target = RaceManager::get()->getTimeTarget();
         if (elapsed_time < time_target)
         {
             sw = core::stringw (
@@ -435,7 +435,7 @@ void RaceGUI::drawGlobalTimer()
                         irr_driver->getActualScreenSize().Height*6/100);
 
     // special case : when 3 players play, use available 4th space for such things
-    if (race_manager->getIfEmptyScreenSpaceExists())
+    if (RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
         pos -= core::vector2d<s32>(0, pos.LowerRightCorner.Y / 2);
         pos += core::vector2d<s32>(0, irr_driver->getActualScreenSize().Height - irr_driver->getSplitscreenWindow(0).getHeight());
@@ -606,7 +606,7 @@ void RaceGUI::drawGlobalMiniMap()
     auto cl = LobbyProtocol::get<ClientLobby>();
     bool is_nw_spectate = cl && cl->isSpectator();
     // For network spectator highlight
-    if (race_manager->getNumLocalPlayers() == 1 && cam && is_nw_spectate)
+    if (RaceManager::get()->getNumLocalPlayers() == 1 && cam && is_nw_spectate)
         target_kart = cam->getKart();
 
     // Move AI/remote players to the beginning, so that local players icons
@@ -824,9 +824,9 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
     // Target
 
-    if (race_manager->getCoinTarget() > 0)
+    if (RaceManager::get()->getCoinTarget() > 0)
     {
-        float coin_target = (float)race_manager->getCoinTarget()
+        float coin_target = (float)RaceManager::get()->getCoinTarget()
                           / kart->getKartProperties()->getNitroMax();
 
         video::S3DVertex vertices[vertices_count];
@@ -1206,7 +1206,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // displayed under the time.
     if (viewport.UpperLeftCorner.Y == 0 &&
         viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
-        !race_manager->getIfEmptyScreenSpaceExists()) 
+        !RaceManager::get()->getIfEmptyScreenSpaceExists()) 
     {
         pos.UpperLeftCorner.Y = irr_driver->getActualScreenSize().Height*12/100;
     }
@@ -1222,11 +1222,11 @@ void RaceGUI::drawLap(const AbstractKart* kart,
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
     int hit_capture_limit =
-        (race_manager->getHitCaptureLimit() != std::numeric_limits<int>::max()
-         && race_manager->getHitCaptureLimit() != 0)
-        ? race_manager->getHitCaptureLimit() : -1;
-    int score_limit = sw && !race_manager->hasTimeTarget() ?
-        race_manager->getMaxGoal() : ctf ? hit_capture_limit : -1;
+        (RaceManager::get()->getHitCaptureLimit() != std::numeric_limits<int>::max()
+         && RaceManager::get()->getHitCaptureLimit() != 0)
+        ? RaceManager::get()->getHitCaptureLimit() : -1;
+    int score_limit = sw && !RaceManager::get()->hasTimeTarget() ?
+        RaceManager::get()->getMaxGoal() : ctf ? hit_capture_limit : -1;
     if (!ctf && ffa && hit_capture_limit != -1)
     {
         int icon_width = irr_driver->getActualScreenSize().Height/19;
@@ -1299,7 +1299,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     int lap = world->getFinishedLapsOfKart(kart->getWorldKartId());
     // Network race has larger lap than getNumLaps near finish line
     // due to waiting for final race result from server
-    if (lap + 1> race_manager->getNumLaps())
+    if (lap + 1> RaceManager::get()->getNumLaps())
         lap--;
     // don't display 'lap 0/..' at the start of a race
     if (lap < 0 ) return;
@@ -1321,7 +1321,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     pos.LowerRightCorner.X -= icon_width;
 
     std::ostringstream out;
-    out << lap + 1 << "/" << race_manager->getNumLaps();
+    out << lap + 1 << "/" << RaceManager::get()->getNumLaps();
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     font->setBlackBorder(true);

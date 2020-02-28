@@ -60,13 +60,13 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 {
     if (name == "startTutorial")
     {
-        race_manager->setNumPlayers(1);
-        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-        race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-        race_manager->setNumKarts( 1 );
-        race_manager->setTrack( "tutorial" );
-        race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-        race_manager->setReverseTrack(false);
+        RaceManager::get()->setNumPlayers(1);
+        RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+        RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+        RaceManager::get()->setNumKarts( 1 );
+        RaceManager::get()->setTrack( "tutorial" );
+        RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
+        RaceManager::get()->setReverseTrack(false);
 
         // Use keyboard 0 by default (FIXME: let player choose?)
         InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
@@ -81,7 +81,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
                       UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
-        race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+        RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
 
         // ASSIGN should make sure that only input from assigned devices
         // is read.
@@ -90,8 +90,8 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
             ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
         StateManager::get()->enterGameState();
-        race_manager->setupPlayerKartInfo();
-        race_manager->startNew(false);
+        RaceManager::get()->setupPlayerKartInfo();
+        RaceManager::get()->startNew(false);
     }
     else if (name == "category")
     {

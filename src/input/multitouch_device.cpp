@@ -612,7 +612,7 @@ void MultitouchDevice::handleControls(MultitouchButton* button)
         StateManager::get()->escapePressed();
     }
     
-    if (m_controller != NULL && !race_manager->isWatchingReplay())
+    if (m_controller != NULL && !RaceManager::get()->isWatchingReplay())
     {
         if (button->type == MultitouchButtonType::BUTTON_STEERING)
         {

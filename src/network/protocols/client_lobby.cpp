@@ -279,15 +279,15 @@ void ClientLobby::addAllPlayers(Event* event)
 
     uint32_t random_seed = data.getUInt32();
     ItemManager::updateRandomSeed(random_seed);
-    if (race_manager->isBattleMode())
+    if (RaceManager::get()->isBattleMode())
     {
         int hit_capture_limit = data.getUInt32();
         float time_limit = data.getFloat();
         m_game_setup->setHitCaptureTime(hit_capture_limit, time_limit);
         uint16_t flag_return_timeout = data.getUInt16();
-        race_manager->setFlagReturnTicks(flag_return_timeout);
+        RaceManager::get()->setFlagReturnTicks(flag_return_timeout);
         unsigned flag_deactivated_time = data.getUInt16();
-        race_manager->setFlagDeactivatedTicks(flag_deactivated_time);
+        RaceManager::get()->setFlagDeactivatedTicks(flag_deactivated_time);
     }
     configRemoteKart(players, isSpectator() ? 1 :
         (int)NetworkConfig::get()->getNetworkPlayers().size());
@@ -677,8 +677,8 @@ void ClientLobby::handleServerInfo(Event* event)
 
     u_data = data.getUInt8();
     const core::stringw& difficulty_name =
-        race_manager->getDifficultyName((RaceManager::Difficulty)u_data);
-    race_manager->setDifficulty((RaceManager::Difficulty)u_data);
+        RaceManager::get()->getDifficultyName((RaceManager::Difficulty)u_data);
+    RaceManager::get()->setDifficulty((RaceManager::Difficulty)u_data);
     //I18N: In the networking lobby
     total_lines += _("Difficulty: %s", difficulty_name);
     total_lines += L"\n";
@@ -692,9 +692,9 @@ void ClientLobby::handleServerInfo(Event* event)
     u_data = data.getUInt8();
     u_data = data.getUInt8();
     auto game_mode = ServerConfig::getLocalGameMode(u_data);
-    race_manager->setMinorMode(game_mode.first);
+    RaceManager::get()->setMinorMode(game_mode.first);
     // We use single mode in network even it's grand prix
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     //I18N: In the networking lobby
     core::stringw mode_name = ServerConfig::getModeName(u_data);
@@ -1080,9 +1080,9 @@ void ClientLobby::raceFinished(Event* event)
         data.decodeStringW(&kart_name);
         lw->setFastestLapTicks(t);
         lw->setFastestKartName(kart_name);
-        race_manager->configGrandPrixResultFromNetwork(data);
+        RaceManager::get()->configGrandPrixResultFromNetwork(data);
     }
-    else if (race_manager->modeHasLaps())
+    else if (RaceManager::get()->modeHasLaps())
     {
         int t = data.getUInt32();
         core::stringw kart_name;
@@ -1235,7 +1235,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
     nim->restoreCompleteState(data);
     w->restoreCompleteState(data);
 
-    if (race_manager->supportsLiveJoining() && data.size() > 0)
+    if (RaceManager::get()->supportsLiveJoining() && data.size() > 0)
     {
         // Get and update the players list 1 more time in case the was
         // player connection or disconnection
@@ -1249,7 +1249,7 @@ void ClientLobby::liveJoinAcknowledged(Event* event)
                 continue;
             k->reset();
             // Only need to change non local player karts
-            RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
             rki.copyFrom(players[i], players[i]->getLocalPlayerId());
             if (rki.isReserved())
             {
@@ -1324,7 +1324,7 @@ void ClientLobby::handleKartInfo(Event* event)
     std::string country_code;
     data.decodeString(&country_code);
 
-    RemoteKartInfo& rki = race_manager->getKartInfo(kart_id);
+    RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kart_id);
     rki.setPlayerName(player_name);
     rki.setHostId(host_id);
     rki.setDefaultKartColor(kart_color);
@@ -1336,7 +1336,7 @@ void ClientLobby::handleKartInfo(Event* event)
     addLiveJoiningKart(kart_id, rki, live_join_util_ticks);
 
     core::stringw msg;
-    if (race_manager->teamEnabled())
+    if (RaceManager::get()->teamEnabled())
     {
         if (w->getKartTeam(kart_id) == KART_TEAM_RED)
         {
@@ -1437,9 +1437,9 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
 
     World::KartList karts = World::getWorld()->getKarts();
     bool sort_kart_for_position =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
-        race_manager->modeHasLaps();
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
+        RaceManager::get()->modeHasLaps();
     if (sort_kart_for_position)
     {
         std::sort(karts.begin(), karts.end(), []

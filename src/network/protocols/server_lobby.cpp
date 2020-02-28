@@ -602,7 +602,7 @@ void ServerLobby::updateTracksForMode()
             while (it != m_available_kts.second.end())
             {
                 Track* t =  track_manager->getTrack(*it);
-                if (race_manager->getMinorMode() ==
+                if (RaceManager::get()->getMinorMode() ==
                     RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
                 {
                     if (!t->isCTF() || t->isInternal())
@@ -784,7 +784,7 @@ void ServerLobby::handleChat(Event* event)
 void ServerLobby::changeTeam(Event* event)
 {
     if (!ServerConfig::m_team_choosing ||
-        !race_manager->teamEnabled())
+        !RaceManager::get()->teamEnabled())
         return;
     if (!checkDataSize(event, 1)) return;
     NetworkString& data = event->data();
@@ -1575,10 +1575,10 @@ void ServerLobby::asynchronousUpdate()
                 m_battle_time_limit);
             uint16_t flag_return_time = (uint16_t)stk_config->time2Ticks(
                 ServerConfig::m_flag_return_timeout);
-            race_manager->setFlagReturnTicks(flag_return_time);
+            RaceManager::get()->setFlagReturnTicks(flag_return_time);
             uint16_t flag_deactivated_time = (uint16_t)stk_config->time2Ticks(
                 ServerConfig::m_flag_deactivated_time);
-            race_manager->setFlagDeactivatedTicks(flag_deactivated_time);
+            RaceManager::get()->setFlagDeactivatedTicks(flag_deactivated_time);
             configRemoteKart(players, 0);
 
             // Reset for next state usage
@@ -1610,7 +1610,7 @@ void ServerLobby::encodePlayers(BareNetworkString* bns,
             .addUInt8(player->getHandicap())
             .addUInt8(player->getLocalPlayerId())
             .addUInt8(
-            race_manager->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
+            RaceManager::get()->teamEnabled() ? player->getTeam() : KART_TEAM_NONE)
             .encodeString(player->getCountryCode());
         bns->encodeString(player->getKartName());
     }
@@ -1629,7 +1629,7 @@ NetworkString* ServerLobby::getLoadWorldMessage(
     load_world_message->addUInt8(live_join ? 1 : 0);
     encodePlayers(load_world_message, players);
     load_world_message->addUInt32(m_item_seed);
-    if (race_manager->isBattleMode())
+    if (RaceManager::get()->isBattleMode())
     {
         load_world_message->addUInt32(m_battle_hit_capture_limit)
             .addFloat(m_battle_time_limit);
@@ -1651,7 +1651,7 @@ bool ServerLobby::canLiveJoinNow() const
     bool live_join = ServerConfig::m_live_players && worldIsActive();
     if (!live_join)
         return false;
-    if (race_manager->modeHasLaps())
+    if (RaceManager::get()->modeHasLaps())
     {
         // No spectate when fastest kart is nearly finish, because if there
         // is endcontroller the spectating remote may not be knowing this
@@ -1671,7 +1671,7 @@ bool ServerLobby::canLiveJoinNow() const
         float progress = w->getOverallDistance(
             fastest_kart->getWorldKartId()) /
             (Track::getCurrentTrack()->getTrackLength() *
-            (float)race_manager->getNumLaps());
+            (float)RaceManager::get()->getNumLaps());
         if (progress > 0.9f)
             return false;
     }
@@ -1724,7 +1724,7 @@ void ServerLobby::liveJoinRequest(Event* event)
         return;
     }
     bool spectator = data.getUInt8() == 1;
-    if (race_manager->modeHasLaps() && !spectator)
+    if (RaceManager::get()->modeHasLaps() && !spectator)
     {
         // No live join for linear race
         rejectLiveJoin(peer, BLR_NO_GAME_FOR_LIVE_JOIN);
@@ -1750,7 +1750,7 @@ void ServerLobby::liveJoinRequest(Event* event)
                 peer->getPlayerProfiles()[i]->setKartName("");
             for (unsigned i = 0; i < used_id.size(); i++)
             {
-                RemoteKartInfo& rki = race_manager->getKartInfo(used_id[i]);
+                RemoteKartInfo& rki = RaceManager::get()->getKartInfo(used_id[i]);
                 rki.makeReserved();
             }
             Log::info("ServerLobby", "Too many players (%d) try to live join",
@@ -1788,14 +1788,14 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
                                             ServerLobby::getLivePlayers() const
 {
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
-    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
-        const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
         std::shared_ptr<NetworkPlayerProfile> player =
             rki.getNetworkPlayerProfile().lock();
         if (!player)
         {
-            if (race_manager->modeHasLaps())
+            if (RaceManager::get()->modeHasLaps())
             {
                 player = std::make_shared<NetworkPlayerProfile>(
                     nullptr, rki.getPlayerName(),
@@ -1809,7 +1809,7 @@ std::vector<std::shared_ptr<NetworkPlayerProfile> >
             else
             {
                 player = NetworkPlayerProfile::getReservedProfile(
-                    race_manager->getMinorMode() ==
+                    RaceManager::get()->getMinorMode() ==
                     RaceManager::MINOR_MODE_FREE_FOR_ALL ?
                     KART_TEAM_NONE : rki.getKartTeam());
             }
@@ -1826,28 +1826,28 @@ int ServerLobby::getReservedId(std::shared_ptr<NetworkPlayerProfile>& p,
                                unsigned local_id) const
 {
     const bool is_ffa =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
     int red_count = 0;
     int blue_count = 0;
-    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
-        RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
         if (rki.isReserved())
             continue;
         bool disconnected = rki.disconnected();
-        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
+        if (RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
             !disconnected)
             red_count++;
-        else if (race_manager->getKartInfo(i).getKartTeam() ==
+        else if (RaceManager::get()->getKartInfo(i).getKartTeam() ==
             KART_TEAM_BLUE && !disconnected)
             blue_count++;
     }
     KartTeam target_team = red_count > blue_count ? KART_TEAM_BLUE :
         KART_TEAM_RED;
 
-    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
-        RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
         std::shared_ptr<NetworkPlayerProfile> player =
             rki.getNetworkPlayerProfile().lock();
         if (!player)
@@ -1897,7 +1897,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     bool live_joined_in_time = true;
     for (const int id : peer->getAvailableKartIDs())
     {
-        const RemoteKartInfo& rki = race_manager->getKartInfo(id);
+        const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(id);
         if (rki.isReserved())
         {
             live_joined_in_time = false;
@@ -1934,7 +1934,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     for (const int id : peer->getAvailableKartIDs())
     {
         World::getWorld()->addReservedKart(id);
-        const RemoteKartInfo& rki = race_manager->getKartInfo(id);
+        const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(id);
         addLiveJoiningKart(id, rki, m_last_live_join_util_ticks);
         Log::info("ServerLobby", "%s succeeded live-joining with kart id %d.",
             peer->getAddress().toString().c_str(), id);
@@ -1960,7 +1960,7 @@ void ServerLobby::finishedLoadingLiveJoinClient(Event* event)
     nim->addLiveJoinPeer(peer);
 
     w->saveCompleteState(ns, peer.get());
-    if (race_manager->supportsLiveJoining())
+    if (RaceManager::get()->supportsLiveJoining())
     {
         // Only needed in non-racing mode as no need players can added after
         // starting of race
@@ -1993,9 +1993,9 @@ void ServerLobby::update(int ticks)
     int sec = ServerConfig::m_kick_idle_player_seconds;
     if (world_started)
     {
-        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
         {
-            RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
             std::shared_ptr<NetworkPlayerProfile> player =
                 rki.getNetworkPlayerProfile().lock();
             if (player)
@@ -2040,7 +2040,7 @@ void ServerLobby::update(int ticks)
 
     if (w && w->getPhase() == World::RACE_PHASE)
     {
-        storePlayingTrack(race_manager->getTrackName());
+        storePlayingTrack(RaceManager::get()->getTrackName());
     }
     else
         storePlayingTrack("");
@@ -2360,7 +2360,7 @@ void ServerLobby::startSelection(const Event *event)
 
 
     if (!ServerConfig::m_owner_less && ServerConfig::m_team_choosing &&
-        race_manager->teamEnabled())
+        RaceManager::get()->teamEnabled())
     {
         auto red_blue = STKHost::get()->getAllPlayersTeamInfo();
         if ((red_blue.first == 0 || red_blue.second == 0) &&
@@ -2423,7 +2423,7 @@ void ServerLobby::startSelection(const Event *event)
     else
         m_ai_count = 0;
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         auto it = m_available_kts.second.begin();
         while (it != m_available_kts.second.end())
@@ -2459,7 +2459,7 @@ void ServerLobby::startSelection(const Event *event)
     it = official_tracks.begin();
     std::advance(it, rg.get((int)official_tracks.size()));
     m_default_vote->m_track_name = *it;
-    switch (race_manager->getMinorMode())
+    switch (RaceManager::get()->getMinorMode())
     {
         case RaceManager::MINOR_MODE_NORMAL_RACE:
         case RaceManager::MINOR_MODE_TIME_TRIAL:
@@ -2729,14 +2729,14 @@ void ServerLobby::checkRaceFinished()
             m_result_ns->encodeString(gp_track);
 
         // each kart score and total time
-        m_result_ns->addUInt8((uint8_t)race_manager->getNumPlayers());
-        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        m_result_ns->addUInt8((uint8_t)RaceManager::get()->getNumPlayers());
+        for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
         {
-            int last_score = race_manager->getKartScore(i);
+            int last_score = RaceManager::get()->getKartScore(i);
             int cur_score = last_score;
-            float overall_time = race_manager->getOverallTime(i);
+            float overall_time = RaceManager::get()->getOverallTime(i);
             if (auto player =
-                race_manager->getKartInfo(i).getNetworkPlayerProfile().lock())
+                RaceManager::get()->getKartInfo(i).getNetworkPlayerProfile().lock())
             {
                 last_score = player->getScore();
                 cur_score += last_score;
@@ -2748,7 +2748,7 @@ void ServerLobby::checkRaceFinished()
                 .addFloat(overall_time);            
         }
     }
-    else if (race_manager->modeHasLaps())
+    else if (RaceManager::get()->modeHasLaps())
     {
         int fastest_lap =
             static_cast<LinearWorld*>(World::getWorld())->getFastestLapTicks();
@@ -2758,7 +2758,7 @@ void ServerLobby::checkRaceFinished()
     }
 
     uint8_t ranking_changes_indication = 0;
-    if (ServerConfig::m_ranked && race_manager->modeHasLaps())
+    if (ServerConfig::m_ranked && RaceManager::get()->modeHasLaps())
         ranking_changes_indication = 1;
     m_result_ns->addUInt8(ranking_changes_indication);
 
@@ -2776,7 +2776,7 @@ void ServerLobby::checkRaceFinished()
 void ServerLobby::computeNewRankings()
 {
     // No ranking for battle mode
-    if (!race_manager->modeHasLaps())
+    if (!RaceManager::get()->modeHasLaps())
         return;
 
     // Using a vector of vector, it would be possible to fill
@@ -2786,11 +2786,11 @@ void ServerLobby::computeNewRankings()
     std::vector<double> new_scores;
     std::vector<double> prev_scores;
 
-    unsigned player_count = race_manager->getNumPlayers();
+    unsigned player_count = RaceManager::get()->getNumPlayers();
     m_result_ns->addUInt8((uint8_t)player_count);
     for (unsigned i = 0; i < player_count; i++)
     {
-        const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
+        const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
         double prev_score = m_scores.at(id);
         new_scores.push_back(prev_score);
         new_scores[i] += distributeBasePoints(id);
@@ -2800,7 +2800,7 @@ void ServerLobby::computeNewRankings()
     // First, update the number of ranked races
     for (unsigned i = 0; i < player_count; i++)
     {
-         const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
+         const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
          m_num_ranked_races.at(id)++;
     }
 
@@ -2814,9 +2814,9 @@ void ServerLobby::computeNewRankings()
         double player1_scores = new_scores[i];
         // If the player has quitted before the race end,
         // the value will be incorrect, but it will not be used
-        double player1_time  = race_manager->getKartRaceTime(i);
+        double player1_time  = RaceManager::get()->getKartRaceTime(i);
         double player1_factor =
-            computeRankingFactor(race_manager->getKartInfo(i).getOnlineId());
+            computeRankingFactor(RaceManager::get()->getKartInfo(i).getOnlineId());
         double player1_handicap = (   w->getKart(i)->getHandicap()
                                    == HANDICAP_NONE               ) ? 0 : HANDICAP_OFFSET;
 
@@ -2837,14 +2837,14 @@ void ServerLobby::computeNewRankings()
                 continue;
 
             double player2_scores = new_scores[j];
-            double player2_time = race_manager->getKartRaceTime(j);
+            double player2_time = RaceManager::get()->getKartRaceTime(j);
             double player2_handicap = (   w->getKart(j)->getHandicap()
                                        == HANDICAP_NONE               ) ? 0 : HANDICAP_OFFSET;
 
             // Compute the result and race ranking importance
             double player_factors = std::min(player1_factor,
                 computeRankingFactor(
-                race_manager->getKartInfo(j).getOnlineId()));
+                RaceManager::get()->getKartInfo(j).getOnlineId()));
 
             double mode_factor = getModeFactor();
 
@@ -2890,8 +2890,8 @@ void ServerLobby::computeNewRankings()
             if (!w->getKart(i)->isEliminated() && !w->getKart(j)->isEliminated())
                 diff += player1_handicap - player2_handicap;
 
-            double uncertainty = std::max(getUncertaintySpread(race_manager->getKartInfo(i).getOnlineId()),
-                                          getUncertaintySpread(race_manager->getKartInfo(j).getOnlineId()) );
+            double uncertainty = std::max(getUncertaintySpread(RaceManager::get()->getKartInfo(i).getOnlineId()),
+                                          getUncertaintySpread(RaceManager::get()->getKartInfo(j).getOnlineId()) );
 
             expected_result = 1.0/ (1.0 + std::pow(10.0,
                 diff / (  BASE_RANKING_POINTS / 2.0
@@ -2909,7 +2909,7 @@ void ServerLobby::computeNewRankings()
     for (unsigned i = 0; i < player_count; i++)
     {
         new_scores[i] += scores_change[i];
-        const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
+        const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
         m_scores.at(id) =  new_scores[i];
         if (m_scores.at(id) > m_max_scores.at(id))
             m_max_scores.at(id) = m_scores.at(id);
@@ -2917,7 +2917,7 @@ void ServerLobby::computeNewRankings()
 
     for (unsigned i = 0; i < player_count; i++)
     {
-        const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
+        const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
         double change = m_scores.at(id) - prev_scores[i];
         m_result_ns->addFloat((float)change);
     }
@@ -2955,7 +2955,7 @@ double ServerLobby::computeRankingFactor(uint32_t online_id)
  */
 double ServerLobby::getModeFactor()
 {
-    if (race_manager->isTimeTrialMode())
+    if (RaceManager::get()->isTimeTrialMode())
         return 1.0;
     return 0.7;
 }   // getModeFactor
@@ -2966,7 +2966,7 @@ double ServerLobby::getModeFactor()
  */
 double ServerLobby::getModeSpread()
 {
-    if (race_manager->isTimeTrialMode())
+    if (RaceManager::get()->isTimeTrialMode())
         return 1.0;
 
     //TODO: the value used here for normal races is a wild guess.
@@ -3734,7 +3734,7 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         pl->addUInt8(boolean_combine);
         pl->addUInt8(profile->getHandicap());
         if (ServerConfig::m_team_choosing &&
-            race_manager->teamEnabled())
+            RaceManager::get()->teamEnabled())
             pl->addUInt8(profile->getTeam());
         else
             pl->addUInt8(KART_TEAM_NONE);
@@ -3857,7 +3857,7 @@ void ServerLobby::handlePlayerVote(Event* event)
     }
 
     // Remove / adjust any invalid settings
-    if (race_manager->modeHasLaps())
+    if (RaceManager::get()->modeHasLaps())
     {
         if (ServerConfig::m_auto_game_time_ratio > 0.0f)
         {
@@ -3870,7 +3870,7 @@ void ServerLobby::handlePlayerVote(Event* event)
         if (!t->reverseAvailable() && vote.m_reverse)
             vote.m_reverse = false;
     }
-    else if (race_manager->isSoccerMode())
+    else if (RaceManager::get()->isSoccerMode())
     {
         if (m_game_setup->isSoccerGoalTarget())
         {
@@ -3893,12 +3893,12 @@ void ServerLobby::handlePlayerVote(Event* event)
                 vote.m_num_laps = (uint8_t)7;
         }
     }
-    else if (race_manager->getMinorMode() ==
+    else if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         vote.m_num_laps = 0;
     }
-    else if (race_manager->getMinorMode() ==
+    else if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         vote.m_num_laps = 0;
@@ -4106,7 +4106,7 @@ void ServerLobby::getHitCaptureLimit()
 {
     int hit_capture_limit = std::numeric_limits<int>::max();
     float time_limit = 0.0f;
-    if (race_manager->getMinorMode() ==
+    if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
         if (ServerConfig::m_capture_limit > 0)
@@ -4298,7 +4298,7 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
 void ServerLobby::submitRankingsToAddons()
 {
     // No ranking for battle mode
-    if (!race_manager->modeHasLaps())
+    if (!RaceManager::get()->modeHasLaps())
         return;
 
     // ========================================================================
@@ -4330,17 +4330,17 @@ void ServerLobby::submitRankingsToAddons()
     };   // UpdatePlayerRankingRequest
     // ========================================================================
 
-    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
-        const uint32_t id = race_manager->getKartInfo(i).getOnlineId();
+        const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
         auto request = std::make_shared<SubmitRankingRequest>
             (id, m_scores.at(id), m_max_scores.at(id),
             m_num_ranked_races.at(id),
-            race_manager->getKartInfo(i).getCountryCode());
+            RaceManager::get()->getKartInfo(i).getCountryCode());
         NetworkConfig::get()->setUserDetails(request, "submit-ranking");
         Log::info("ServerLobby", "Submiting ranking for %s (%d) : %lf, %lf %d",
             StringUtils::wideToUtf8(
-            race_manager->getKartInfo(i).getPlayerName()).c_str(), id,
+            RaceManager::get()->getKartInfo(i).getPlayerName()).c_str(), id,
             m_scores.at(id), m_max_scores.at(id), m_num_ranked_races.at(id));
         request->queue();
     }
@@ -4373,7 +4373,7 @@ void ServerLobby::configPeersStartTime()
         max_ping = std::max(peer->getAveragePing(), max_ping);
     }
     if ((ServerConfig::m_high_ping_workaround && peer_exceeded_max_ping) ||
-        (ServerConfig::m_live_players && race_manager->supportsLiveJoining()))
+        (ServerConfig::m_live_players && RaceManager::get()->supportsLiveJoining()))
     {
         Log::info("ServerLobby", "Max ping to ServerConfig::m_max_ping for "
             "live joining or high ping workaround.");
@@ -4786,11 +4786,11 @@ void ServerLobby::handleServerConfiguration(Event* event)
         return;
     }
 
-    race_manager->setMinorMode(modes.first);
-    race_manager->setMajorMode(modes.second);
-    race_manager->setDifficulty(RaceManager::Difficulty(new_difficulty));
+    RaceManager::get()->setMinorMode(modes.first);
+    RaceManager::get()->setMajorMode(modes.second);
+    RaceManager::get()->setDifficulty(RaceManager::Difficulty(new_difficulty));
     m_game_setup->resetExtraServerInfo();
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         m_game_setup->setSoccerGoalTarget(new_soccer_goal_target);
 
     if (NetworkConfig::get()->isWAN() &&
@@ -4899,16 +4899,16 @@ void ServerLobby::handlePlayerDisconnection() const
     int red_count = 0;
     int blue_count = 0;
     unsigned total = 0;
-    for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+    for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
-        RemoteKartInfo& rki = race_manager->getKartInfo(i);
+        RemoteKartInfo& rki = RaceManager::get()->getKartInfo(i);
         if (rki.isReserved())
             continue;
         bool disconnected = rki.disconnected();
-        if (race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
+        if (RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_RED &&
             !disconnected)
             red_count++;
-        else if (race_manager->getKartInfo(i).getKartTeam() ==
+        else if (RaceManager::get()->getKartInfo(i).getKartTeam() ==
             KART_TEAM_BLUE && !disconnected)
             blue_count++;
 
@@ -4950,9 +4950,9 @@ void ServerLobby::handlePlayerDisconnection() const
 void ServerLobby::addLiveJoinPlaceholder(
     std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const
 {
-    if (!ServerConfig::m_live_players || !race_manager->supportsLiveJoining())
+    if (!ServerConfig::m_live_players || !RaceManager::get()->supportsLiveJoining())
         return;
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
     {
         Track* t = track_manager->getTrack(m_game_setup->getCurrentTrack());
         assert(t);
@@ -5025,13 +5025,13 @@ void ServerLobby::handleKartInfo(Event* event)
     STKPeer* peer = event->getPeer();
     const NetworkString& data = event->data();
     uint8_t kart_id = data.getUInt8();
-    if (kart_id > race_manager->getNumPlayers())
+    if (kart_id > RaceManager::get()->getNumPlayers())
         return;
 
     AbstractKart* k = w->getKart(kart_id);
     int live_join_util_ticks = k->getLiveJoinUntilTicks();
 
-    const RemoteKartInfo& rki = race_manager->getKartInfo(kart_id);
+    const RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kart_id);
 
     NetworkString* ns = getNetworkString(1);
     ns->setSynchronous(true);
@@ -5063,7 +5063,7 @@ void ServerLobby::clientInGameWantsToBackLobby(Event* event)
 
     for (const int id : peer->getAvailableKartIDs())
     {
-        RemoteKartInfo& rki = race_manager->getKartInfo(id);
+        RemoteKartInfo& rki = RaceManager::get()->getKartInfo(id);
         if (rki.getHostId() == peer->getHostId())
         {
             Log::info("ServerLobby", "%s left the game with kart id %d.",

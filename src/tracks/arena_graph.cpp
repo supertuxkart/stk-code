@@ -41,7 +41,7 @@ ArenaGraph::ArenaGraph(const std::string &navmesh, const XMLNode *node)
         computeDijkstra(i);
 
     setNearbyNodesOfAllNodes();
-    if (node && race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    if (node && RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
         loadGoalNodes(node);
 
     loadBoundingBoxNodes();

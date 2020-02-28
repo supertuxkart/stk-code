@@ -468,8 +468,8 @@ void MainLoop::run()
 
             if (World::getWorld())
             {
-                race_manager->clearNetworkGrandPrixResult();
-                race_manager->exitRace();
+                RaceManager::get()->clearNetworkGrandPrixResult();
+                RaceManager::get()->exitRace();
             }
 
             if (exist_host == true)

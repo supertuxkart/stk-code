@@ -277,7 +277,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
                                 15 + UserConfigParams::m_width/2,
                                 10 + GUIEngine::getTitleFontHeight());
 
-            race_manager->exitRace();
+            RaceManager::get()->exitRace();
             //StateManager::get()->resetActivePlayers();
 
             // Use latest used device
@@ -286,8 +286,8 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
             assert(device != NULL);
 #endif
             // Set up race manager appropriately
-            race_manager->setNumPlayers(1);
-            race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+            RaceManager::get()->setNumPlayers(1);
+            RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
 
             //int id = StateManager::get()->createActivePlayer( unlock_manager->getCurrentPlayer(), device );
             input_manager->getDeviceManager()->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
@@ -325,8 +325,8 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
                     }
                     break;
             }
-            race_manager->setupPlayerKartInfo();
-            race_manager->startNew(true);
+            RaceManager::get()->setupPlayerKartInfo();
+            RaceManager::get()->startNew(true);
 
             irr_driver->hidePointer();
 

@@ -292,7 +292,7 @@ void IrrDriver::updateConfigIfRelevant()
 }   // updateConfigIfRelevant
 core::recti IrrDriver::getSplitscreenWindow(int WindowNum) 
 {
-    const int playernum = race_manager->getNumLocalPlayers();
+    const int playernum = RaceManager::get()->getNumLocalPlayers();
     const float playernum_sqrt = sqrtf((float)playernum);
     
     int rows = int(  UserConfigParams::split_screen_horizontally
@@ -1943,7 +1943,7 @@ void IrrDriver::doScreenShot()
             timeInfo->tm_mday, timeInfo->tm_hour,
             timeInfo->tm_min, timeInfo->tm_sec);
 
-    std::string track_name = race_manager->getTrackName();
+    std::string track_name = RaceManager::get()->getTrackName();
     if (World::getWorld() == NULL) track_name = "menu";
     std::string path = file_manager->getScreenshotDir()+track_name+"-"
                      + time_buffer+".png";
@@ -2147,7 +2147,7 @@ void IrrDriver::setRecording(bool val)
     if (val == true)
     {
         std::string track_name = World::getWorld() != NULL ?
-            race_manager->getTrackName() : "menu";
+            RaceManager::get()->getTrackName() : "menu";
         time_t rawtime;
         time(&rawtime);
         tm* timeInfo = localtime(&rawtime);

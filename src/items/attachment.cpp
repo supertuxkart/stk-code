@@ -271,7 +271,7 @@ void Attachment::hitBanana(ItemState *item_state)
     if (m_kart->getController()->canGetAchievements())
     {
         PlayerManager::increaseAchievement(AchievementsStatus::BANANA, 1);
-        if (race_manager->isLinearRaceMode())
+        if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
     //Bubble gum shield effect:
@@ -286,7 +286,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     bool add_a_new_item = true;
 
-    if (race_manager->isBattleMode())
+    if (RaceManager::get()->isBattleMode())
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
         if (m_kart->getKartAnimation() == NULL)
@@ -342,7 +342,7 @@ void Attachment::hitBanana(ItemState *item_state)
         // so play the character sound ("Uh-Oh")
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
 
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
             new_attachment = AttachmentType(ticks % 2);
         else
             new_attachment = AttachmentType(ticks % 3);

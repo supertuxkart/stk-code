@@ -172,7 +172,7 @@ void GhostReplaySelection::beforeAddingWidget()
 void GhostReplaySelection::init()
 {
     Screen::init();
-    m_cur_difficulty = race_manager->getDifficulty();
+    m_cur_difficulty = RaceManager::get()->getDifficulty();
     
     int icon_height = GUIEngine::getFontHeight();
     int row_height = GUIEngine::getFontHeight() * 5 / 4;
@@ -395,7 +395,7 @@ void GhostReplaySelection::loadList()
                 display_lock = true;
 
             row.push_back(GUIEngine::ListWidget::ListCell
-                (race_manager->
+                (RaceManager::get()->
                     getDifficultyName((RaceManager::Difficulty) rd.m_difficulty),
                                        display_lock ? m_icon_lock : -1, 4, true));
         }
@@ -461,15 +461,15 @@ void GhostReplaySelection::eventCallback(GUIEngine::Widget* widget,
         else if (selection == "tab_egg_hunt")
             m_active_mode = RaceManager::MINOR_MODE_EASTER_EGG;
 
-        m_active_mode_is_linear = race_manager->isLinearRaceMode(m_active_mode);
+        m_active_mode_is_linear = RaceManager::get()->isLinearRaceMode(m_active_mode);
         m_is_comparing = false;
         m_compare_toggle_widget->setState(false);
         refresh(/*reload replay files*/ false, /* update columns */ true);
     }
     else if (name == "record-ghost")
     {
-        race_manager->setRecordRace(true);
-        race_manager->setMinorMode(m_active_mode);
+        RaceManager::get()->setRecordRace(true);
+        RaceManager::get()->setMinorMode(m_active_mode);
         TracksScreen::getInstance()->push();
     }
     else if (name == "replay_difficulty_toggle")
@@ -596,7 +596,7 @@ void GhostReplaySelection::defaultSort()
 bool GhostReplaySelection::onEscapePressed()
 {
     // Reset it when leave this screen
-    race_manager->setRecordRace(false);
+    RaceManager::get()->setRecordRace(false);
     return true;
 }   // onEscapePressed
 

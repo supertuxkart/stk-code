@@ -46,13 +46,13 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
     m_ignore_height = false;
     // Note that when this is called the karts have not been allocated
     // in world, so we can't call world->getNumKarts()
-    m_previous_sign.resize(race_manager->getNumberOfKarts());
+    m_previous_sign.resize(RaceManager::get()->getNumberOfKarts());
     std::string p1_string("p1");
     std::string p2_string("p2");
 
     // In case of a cannon in a reverse track, we have to use the target line
     // as check line
-    if(getType()==CT_CANNON && race_manager->getReverseTrack())
+    if(getType()==CT_CANNON && RaceManager::get()->getReverseTrack())
     {
         p1_string = "target-p1";
         p2_string = "target-p2";

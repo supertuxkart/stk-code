@@ -288,7 +288,7 @@ void CaptureTheFlag::update(int ticks)
                 m_red_scores, new_blue_scores);
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_red_flag->resetToBase(race_manager->getFlagDeactivatedTicks());
+        m_red_flag->resetToBase(RaceManager::get()->getFlagDeactivatedTicks());
     }
     else if (m_blue_flag->getHolder() != -1 && m_red_flag->isInBase() &&
         (m_red_flag->getBaseOrigin() - m_blue_flag->getOrigin()).length() <
@@ -318,7 +318,7 @@ void CaptureTheFlag::update(int ticks)
                 new_red_scores, m_blue_scores);
         }
         m_last_captured_flag_ticks = World::getWorld()->getTicksSinceStart();
-        m_blue_flag->resetToBase(race_manager->getFlagDeactivatedTicks());
+        m_blue_flag->resetToBase(RaceManager::get()->getFlagDeactivatedTicks());
     }
 
     // Test if red or blue flag is touched
@@ -338,7 +338,7 @@ void CaptureTheFlag::update(int ticks)
                 {
                     // Return the flag
                     m_red_flag->resetToBase(
-                        race_manager->getFlagDeactivatedTicks());
+                        RaceManager::get()->getFlagDeactivatedTicks());
                 }
             }
             else
@@ -358,7 +358,7 @@ void CaptureTheFlag::update(int ticks)
                 {
                     // Return the flag
                     m_blue_flag->resetToBase(
-                        race_manager->getFlagDeactivatedTicks());
+                        RaceManager::get()->getFlagDeactivatedTicks());
                 }
             }
             else
@@ -477,9 +477,9 @@ bool CaptureTheFlag::isRaceOver()
         NetworkConfig::get()->isClient())
         return false;
 
-    if ((m_count_down_reached_zero && race_manager->hasTimeTarget()) ||
-        (m_red_scores >= race_manager->getHitCaptureLimit() ||
-        m_blue_scores >= race_manager->getHitCaptureLimit()))
+    if ((m_count_down_reached_zero && RaceManager::get()->hasTimeTarget()) ||
+        (m_red_scores >= RaceManager::get()->getHitCaptureLimit() ||
+        m_blue_scores >= RaceManager::get()->getHitCaptureLimit()))
         return true;
 
     return false;
@@ -505,7 +505,7 @@ void CaptureTheFlag::loseFlagForKart(int kart_id)
         else
         {
             m_red_flag->resetToBase(
-                race_manager->getFlagDeactivatedTicks());
+                RaceManager::get()->getFlagDeactivatedTicks());
         }
     }
     else
@@ -515,7 +515,7 @@ void CaptureTheFlag::loseFlagForKart(int kart_id)
         else
         {
             m_blue_flag->resetToBase(
-                race_manager->getFlagDeactivatedTicks());
+                RaceManager::get()->getFlagDeactivatedTicks());
         }
     }
 }   // loseFlagForKart

@@ -153,7 +153,7 @@ RacePausedDialog::~RacePausedDialog()
 void RacePausedDialog::loadedFromFile()
 {
     // disable the "restart" button in GPs
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         GUIEngine::RibbonWidget* choice_ribbon =
             getWidget<GUIEngine::RibbonWidget>("choiceribbon");
@@ -167,8 +167,8 @@ void RacePausedDialog::loadedFromFile()
     // Remove "endrace" button for types not (yet?) implemented
     // Also don't show it unless the race has started. Prevents finishing in
     // a time of 0:00:00.
-    if ((race_manager->getMinorMode() != RaceManager::MINOR_MODE_NORMAL_RACE  &&
-         race_manager->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL ) ||
+    if ((RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_NORMAL_RACE  &&
+         RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_TIME_TRIAL ) ||
          World::getWorld()->isStartPhase() ||
          NetworkConfig::get()->isNetworking())
     {
@@ -272,8 +272,8 @@ GUIEngine::EventPropagation
             {
                 STKHost::get()->shutdown();
             }
-            race_manager->exitRace();
-            race_manager->setAIKartOverride("");
+            RaceManager::get()->exitRace();
+            RaceManager::get()->setAIKartOverride("");
 
             if (NetworkConfig::get()->isNetworking())
             {
@@ -289,7 +289,7 @@ GUIEngine::EventPropagation
                 if (from_overworld)
                     story_mode_timer->pauseTimer(/*loading screen*/ false);
 
-                if (race_manager->raceWasStartedFromOverworld())
+                if (RaceManager::get()->raceWasStartedFromOverworld())
                 {
                     OverWorld::enterOverWorld();
                 }
@@ -312,7 +312,7 @@ GUIEngine::EventPropagation
         {
             ModalDialog::dismiss();
             World::getWorld()->scheduleUnpause();
-            race_manager->rerunRace();
+            RaceManager::get()->rerunRace();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "newrace")
@@ -329,7 +329,7 @@ GUIEngine::EventPropagation
             else
             {
                 World::getWorld()->scheduleUnpause();
-                race_manager->exitRace();
+                RaceManager::get()->exitRace();
                 Screen* new_stack[] =
                     {
                         MainMenuScreen::getInstance(),
@@ -363,7 +363,7 @@ void RacePausedDialog::beforeAddingWidgets()
     GUIEngine::RibbonWidget* choice_ribbon =
         getWidget<GUIEngine::RibbonWidget>("choiceribbon");
 
-    bool showSetupNewRace = race_manager->raceWasStartedFromOverworld();
+    bool showSetupNewRace = RaceManager::get()->raceWasStartedFromOverworld();
     int index = choice_ribbon->findItemNamed("newrace");
     if (index != -1)
         choice_ribbon->setItemVisible(index, !showSetupNewRace);

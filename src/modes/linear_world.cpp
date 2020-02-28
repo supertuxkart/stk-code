@@ -178,10 +178,10 @@ void LinearWorld::update(int ticks)
     {
         bool all_players_finished = true;
         bool has_ai = false;
-        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
         {
             auto npp =
-                race_manager->getKartInfo(i).getNetworkPlayerProfile().lock();
+                RaceManager::get()->getKartInfo(i).getNetworkPlayerProfile().lock();
             if (!npp)
                 continue;
             if (npp)
@@ -236,7 +236,7 @@ void LinearWorld::update(int ticks)
     }
     // If one player and a ghost, or two compared ghosts,
     // compute the live time difference
-    if(race_manager->hasGhostKarts() && race_manager->getNumberOfKarts() == 2)
+    if(RaceManager::get()->hasGhostKarts() && RaceManager::get()->getNumberOfKarts() == 2)
         updateLiveDifference();
 
 #ifdef DEBUG
@@ -337,7 +337,7 @@ void LinearWorld::updateGraphics(float dt)
 void LinearWorld::updateLiveDifference()
 {
     // First check that the call requirements are verified
-    assert (race_manager->hasGhostKarts() && race_manager->getNumberOfKarts() >= 2);
+    assert (RaceManager::get()->hasGhostKarts() && RaceManager::get()->getNumberOfKarts() >= 2);
 
     AbstractKart* ghost_kart = getKart(0);
 
@@ -395,7 +395,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         return;
     }
 
-    const int lap_count = race_manager->getNumLaps();
+    const int lap_count = RaceManager::get()->getNumLaps();
 
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
@@ -473,7 +473,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Race finished
     // We compute the exact moment the kart crossed the line
     // This way, even with poor framerate, we get a time significant to the ms
-    if(kart_info.m_finished_laps >= race_manager->getNumLaps() && raceHasLaps())
+    if(kart_info.m_finished_laps >= RaceManager::get()->getNumLaps() && raceHasLaps())
     {
         if (kart->isGhostKart())
         {
@@ -670,10 +670,10 @@ void LinearWorld::getKartsDisplayInfo(
         else if (kart->hasFinishedRace())
         {
             rank_info.m_text = kart->getController()->getName();
-            if (race_manager->getKartGlobalPlayerId(i) > -1)
+            if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
             {
                 const core::stringw& flag = StringUtils::getCountryFlag(
-                    race_manager->getKartInfo(i).getCountryCode());
+                    RaceManager::get()->getKartInfo(i).getCountryCode());
                 if (!flag.empty())
                 {
                     rank_info.m_text += L" ";
@@ -686,7 +686,7 @@ void LinearWorld::getKartsDisplayInfo(
             rank_info.m_text = "";
         }
 
-        int numLaps = race_manager->getNumLaps();
+        int numLaps = RaceManager::get()->getNumLaps();
 
         if(kart_info.m_finished_laps>=numLaps)
         {  // kart is finished, display in green
@@ -736,7 +736,7 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 {
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
 
-    float full_distance = race_manager->getNumLaps()
+    float full_distance = RaceManager::get()->getNumLaps()
                         * Track::getCurrentTrack()->getTrackLength();
 
     // For ghost karts, use the replay data rather than estimating
@@ -949,7 +949,7 @@ void LinearWorld::updateRacePosition()
         // first kart is doing its last lap.
         if(!m_faster_music_active                                  &&
             p == 1                                                 &&
-            kart_info.m_finished_laps == race_manager->getNumLaps() - 1 &&
+            kart_info.m_finished_laps == RaceManager::get()->getNumLaps() - 1 &&
             useFastMusicNearEnd()                                       )
         {
             music_manager->switchToFastMusic();
@@ -1121,7 +1121,7 @@ std::pair<uint32_t, uint32_t> LinearWorld::getGameStartedProgress() const
         progress.second = (uint32_t)(
             getOverallDistance(slowest_kart->getWorldKartId()) /
             (Track::getCurrentTrack()->getTrackLength() *
-            (float)race_manager->getNumLaps()) * 100.0f);
+            (float)RaceManager::get()->getNumLaps()) * 100.0f);
     }
     return progress;
 }   // getGameStartedProgress

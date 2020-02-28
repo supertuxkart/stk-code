@@ -130,9 +130,9 @@ void KartRewinder::computeError()
             false/*notify_of_elimination*/);
         setPosition(World::getWorld()->getCurrentNumKarts() + 1);
         finishedRace(World::getWorld()->getTime(), true/*from_server*/);
-        if (race_manager->supportsLiveJoining())
+        if (RaceManager::get()->supportsLiveJoining())
         {
-            RemoteKartInfo& rki = race_manager->getKartInfo(kartid);
+            RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kartid);
             rki.makeReserved();
         }
     }

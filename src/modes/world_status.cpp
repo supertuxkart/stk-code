@@ -219,9 +219,9 @@ void WorldStatus::updateTime(int ticks)
 
             if (UserConfigParams::m_artist_debug_mode &&
                 !NetworkConfig::get()->isNetworking() &&
-                race_manager->getNumberOfKarts() -
-                race_manager->getNumSpareTireKarts() == 1 &&
-                race_manager->getTrackName() != "tutorial")
+                RaceManager::get()->getNumberOfKarts() -
+                RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                RaceManager::get()->getTrackName() != "tutorial")
             {
                 m_auxiliary_ticks += 6;
             }
@@ -318,9 +318,9 @@ void WorldStatus::updateTime(int ticks)
             // ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode     &&
                 !NetworkConfig::get()->isNetworking()     &&
-                race_manager->getNumberOfKarts() -
-                race_manager->getNumSpareTireKarts() == 1 &&
-                race_manager->getTrackName() != "tutorial")
+                RaceManager::get()->getNumberOfKarts() -
+                RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                RaceManager::get()->getTrackName() != "tutorial")
             {
                 m_auxiliary_ticks += 6;
             }
@@ -343,9 +343,9 @@ void WorldStatus::updateTime(int ticks)
                 m_start_music_ticks =
                     UserConfigParams::m_artist_debug_mode &&
                     !NetworkConfig::get()->isNetworking()     &&
-                    race_manager->getNumberOfKarts() -
-                    race_manager->getNumSpareTireKarts() == 1 &&
-                    race_manager->getTrackName() != "tutorial" ?
+                    RaceManager::get()->getNumberOfKarts() -
+                    RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                    RaceManager::get()->getTrackName() != "tutorial" ?
                     stk_config->time2Ticks(0.2f) :
                     stk_config->time2Ticks(1.0f);
                 // how long to display the 'music' message
@@ -359,9 +359,9 @@ void WorldStatus::updateTime(int ticks)
             // skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
                 !NetworkConfig::get()->isNetworking() &&
-                race_manager->getNumberOfKarts() -
-                race_manager->getNumSpareTireKarts() == 1 &&
-                race_manager->getTrackName() != "tutorial")
+                RaceManager::get()->getNumberOfKarts() -
+                RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                RaceManager::get()->getTrackName() != "tutorial")
             {
                 m_auxiliary_ticks += 6;
             }
@@ -504,9 +504,9 @@ void WorldStatus::setTicks(int ticks)
 void WorldStatus::setTicksForRewind(int ticks)
 {
     m_count_up_ticks = ticks;
-    if (race_manager->hasTimeTarget())
+    if (RaceManager::get()->hasTimeTarget())
     {
-        m_time_ticks = stk_config->time2Ticks(race_manager->getTimeTarget()) -
+        m_time_ticks = stk_config->time2Ticks(RaceManager::get()->getTimeTarget()) -
             m_count_up_ticks;
     }
     else

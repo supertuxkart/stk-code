@@ -23,6 +23,7 @@
 #include "network/protocols/server_lobby.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/stk_process.hpp"
@@ -76,6 +77,7 @@ void ChildLoop::run()
     STKProcess::init(PT_CHILD);
 
     GUIEngine::disableGraphics();
+    RaceManager::create();
     NetworkConfig::get()->setIsServer(true);
     if (m_cl_config->m_lan_server)
         NetworkConfig::get()->setIsLAN();
@@ -135,6 +137,7 @@ void ChildLoop::run()
         }
     }
 
+    RaceManager::destroy();
     NetworkConfig::destroy();
     StateManager::deallocate();
 }   // run

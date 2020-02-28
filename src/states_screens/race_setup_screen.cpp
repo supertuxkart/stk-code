@@ -66,7 +66,7 @@ void RaceSetupScreen::init()
     RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
     assert( w != NULL );
 
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
         PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
@@ -121,7 +121,7 @@ void RaceSetupScreen::init()
 
 #define ENABLE_EASTER_EGG_MODE
 #ifdef ENABLE_EASTER_EGG_MODE
-    if(race_manager->getNumLocalPlayers() == 1)
+    if(RaceManager::get()->getNumLocalPlayers() == 1)
     {
         irr::core::stringw name1 = irr::core::stringw(
             RaceManager::getNameOf(RaceManager::MINOR_MODE_EASTER_EGG)) + L"\n";
@@ -202,48 +202,48 @@ void RaceSetupScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (selectedMode == IDENT_STD)
         {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
             UserConfigParams::m_game_mode = CONFIG_CODE_NORMAL;
             TracksAndGPScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_TTRIAL)
         {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_TIMETRIAL;
             TracksAndGPScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_FTL)
         {
             // Make sure there are at least three karts, otherwise FTL doesn't
-            if(race_manager->getNumberOfKarts()<3)
-                race_manager->setNumKarts(3);
+            if(RaceManager::get()->getNumberOfKarts()<3)
+                RaceManager::get()->setNumKarts(3);
 
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
             UserConfigParams::m_game_mode = CONFIG_CODE_FTL;
             TracksAndGPScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_STRIKES)
         {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
             UserConfigParams::m_game_mode = CONFIG_CODE_3STRIKES;
             ArenasScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_EASTER)
         {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_EASTER_EGG);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_EASTER_EGG);
             UserConfigParams::m_game_mode = CONFIG_CODE_EASTER;
-            race_manager->setNumKarts( race_manager->getNumLocalPlayers() ); // no AI karts;
+            RaceManager::get()->setNumKarts( RaceManager::get()->getNumLocalPlayers() ); // no AI karts;
             EasterEggScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_SOCCER)
         {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
             UserConfigParams::m_game_mode = CONFIG_CODE_SOCCER;
             SoccerSetupScreen::getInstance()->push();
         }
         else if (selectedMode == IDENT_GHOST)
         {
-            race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
             UserConfigParams::m_game_mode = CONFIG_CODE_GHOST;
             GhostReplaySelection::getInstance()->push();
         }
@@ -272,7 +272,7 @@ void RaceSetupScreen::assignDifficulty()
     
     RaceManager::Difficulty diff = RaceManager::convertDifficulty(difficulty);
     UserConfigParams::m_difficulty = diff;
-    race_manager->setDifficulty(diff);
+    RaceManager::get()->setDifficulty(diff);
 }   // assignDifficulty
 
 // -----------------------------------------------------------------------------

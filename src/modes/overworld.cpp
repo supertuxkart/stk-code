@@ -50,7 +50,7 @@ OverWorld::OverWorld() : World()
 OverWorld::~OverWorld()
 {
     Vec3 kart_xyz = getKart(0)->getXYZ();
-    race_manager->setKartLastPositionOnOverworld(kart_xyz);
+    RaceManager::get()->setKartLastPositionOnOverworld(kart_xyz);
 }   // ~OverWorld
 
 //-----------------------------------------------------------------------------
@@ -60,19 +60,19 @@ void OverWorld::enterOverWorld()
     // update point count and the list of locked/unlocked stuff
     PlayerManager::getCurrentPlayer()->computeActive();
 
-    race_manager->setNumPlayers(1);
-    race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-    race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
-    race_manager->setNumKarts( 1 );
-    race_manager->setTrack( "overworld" );
+    RaceManager::get()->setNumPlayers(1);
+    RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+    RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
+    RaceManager::get()->setNumKarts( 1 );
+    RaceManager::get()->setTrack( "overworld" );
 
     if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
-        race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
+        RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD);
     }
     else
     {
-        race_manager->setDifficulty(RaceManager::DIFFICULTY_BEST);
+        RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_BEST);
     }
 
     // Use keyboard 0 by default (FIXME: let player choose?)
@@ -90,7 +90,7 @@ void OverWorld::enterOverWorld()
 
         UserConfigParams::m_default_kart.revertToDefaults();
     }
-    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+    RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
 
     // ASSIGN should make sure that only input from assigned devices
     // is read.
@@ -99,11 +99,11 @@ void OverWorld::enterOverWorld()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
     StateManager::get()->enterGameState();
-    race_manager->setupPlayerKartInfo();
-    race_manager->startNew(false);
-    if(race_manager->haveKartLastPositionOnOverworld()){
+    RaceManager::get()->setupPlayerKartInfo();
+    RaceManager::get()->startNew(false);
+    if(RaceManager::get()->haveKartLastPositionOnOverworld()){
             OverWorld *ow = (OverWorld*)World::getWorld();
-            ow->getKart(0)->setXYZ(race_manager->getKartLastPositionOnOverworld());
+            ow->getKart(0)->setXYZ(RaceManager::get()->getKartLastPositionOnOverworld());
             ow->moveKartAfterRescue(ow->getKart(0));
         }
     irr_driver->showPointer(); // User should be able to click on the minimap
@@ -163,7 +163,7 @@ void OverWorld::update(int ticks)
     if (m_return_to_garage)
     {
         m_return_to_garage = false;
-        race_manager->exitRace();
+        RaceManager::get()->exitRace();
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(true);
@@ -269,7 +269,7 @@ void OverWorld::onFirePressed(Controller* who)
 
                 if (unlocked)
                 {
-                    race_manager->setKartLastPositionOnOverworld(kart_xyz);
+                    RaceManager::get()->setKartLastPositionOnOverworld(kart_xyz);
                     new SelectChallengeDialog(0.9f, 0.9f,
                         challenges[n].m_challenge_id);
                 }

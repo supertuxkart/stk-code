@@ -372,7 +372,7 @@ void LightingPasses::updateLightsInfo(scene::ICameraSceneNode * const camnode,
     }
 
     m_point_light_count = 0;
-    bool multiplayer = (race_manager->getNumLocalPlayers() > 1);
+    bool multiplayer = (RaceManager::get()->getNumLocalPlayers() > 1);
 
     for (unsigned i = 0; i < 15; i++)
     {

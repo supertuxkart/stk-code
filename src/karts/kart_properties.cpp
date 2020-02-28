@@ -350,8 +350,8 @@ void KartProperties::combineCharacteristics(HandicapLevel handicap)
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getBaseCharacteristic());
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
-        getDifficultyCharacteristic(race_manager->getDifficultyAsString(
-            race_manager->getDifficulty())));
+        getDifficultyCharacteristic(RaceManager::get()->getDifficultyAsString(
+            RaceManager::get()->getDifficulty())));
 
     // Try to get the kart type
     const AbstractCharacteristic *characteristic = kart_properties_manager->

@@ -77,7 +77,7 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
         password_box->setCollapsed(true); // FIXME Doesn't reuse free space for other widgets
     }
 
-    core::stringw difficulty = race_manager->getDifficultyName(
+    core::stringw difficulty = RaceManager::get()->getDifficultyName(
         server->getDifficulty());
     //I18N: In server info dialog
     getWidget<LabelWidget>("server-info-1")->setText(_("Difficulty: %s", difficulty), false);

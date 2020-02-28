@@ -217,7 +217,7 @@ void Powerup::adjustSound()
     m_sound_use->setPosition(m_kart->getXYZ());
     // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
     // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
-    if (race_manager->getNumLocalPlayers() > 1)
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
         // player karts played at full volume; AI karts much dimmer
 
@@ -228,7 +228,7 @@ void Powerup::adjustSound()
         else
         {
             m_sound_use->setVolume( 
-                     std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
+                     std::min(0.5f, 1.0f / RaceManager::get()->getNumberOfKarts()) );
         }
     }
 }   // adjustSound
@@ -253,7 +253,7 @@ void Powerup::use()
         m_kart->getController()->canGetAchievements()    )
     {
         PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED, 1);
-        if (race_manager->isLinearRaceMode())
+        if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED_1RACE, 1);
     }
 

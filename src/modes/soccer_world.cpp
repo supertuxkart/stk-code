@@ -236,10 +236,10 @@ public:
  */
 SoccerWorld::SoccerWorld() : WorldWithRank()
 {
-    if (race_manager->hasTimeTarget())
+    if (RaceManager::get()->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
-            race_manager->getTimeTarget());
+            RaceManager::get()->getTimeTarget());
     }
     else
     {
@@ -278,7 +278,7 @@ void SoccerWorld::init()
     m_ball_hitter  = -1;
     m_ball         = NULL;
     m_ball_body    = NULL;
-    m_goal_target  = race_manager->getMaxGoal();
+    m_goal_target  = RaceManager::get()->getMaxGoal();
     m_goal_sound   = SFXManager::get()->createSoundSource("goal_scored");
 
     Track *track = Track::getCurrentTrack();
@@ -314,10 +314,10 @@ void SoccerWorld::init()
 void SoccerWorld::reset(bool restart)
 {
     WorldWithRank::reset(restart);
-    if (race_manager->hasTimeTarget())
+    if (RaceManager::get()->hasTimeTarget())
     {
         WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
-            race_manager->getTimeTarget());
+            RaceManager::get()->getTimeTarget());
     }
     else
     {
@@ -465,10 +465,10 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         sd.m_player = getKart(m_ball_hitter)->getController()
             ->getName(false/*include_handicap_string*/);
         sd.m_handicap_level = getKart(m_ball_hitter)->getHandicap();
-        if (race_manager->getKartGlobalPlayerId(m_ball_hitter) > -1)
+        if (RaceManager::get()->getKartGlobalPlayerId(m_ball_hitter) > -1)
         {
             sd.m_country_code =
-                race_manager->getKartInfo(m_ball_hitter).getCountryCode();
+                RaceManager::get()->getKartInfo(m_ball_hitter).getCountryCode();
         }
         if (sd.m_correct_goal)
         {
@@ -484,9 +484,9 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
 
         if (first_goal)
         {
-            if (race_manager->hasTimeTarget())
+            if (RaceManager::get()->hasTimeTarget())
             {
-                sd.m_time = race_manager->getTimeTarget() - getTime();
+                sd.m_time = RaceManager::get()->getTimeTarget() - getTime();
             }
             else
                 sd.m_time = getTime();
@@ -496,9 +496,9 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         }
         else
         {
-            if (race_manager->hasTimeTarget())
+            if (RaceManager::get()->hasTimeTarget())
             {
-                sd.m_time = race_manager->getTimeTarget() - getTime();
+                sd.m_time = RaceManager::get()->getTimeTarget() - getTime();
             }
             else
                 sd.m_time = getTime();
@@ -663,7 +663,7 @@ bool SoccerWorld::isRaceOver()
     if (m_unfair_team)
         return true;
 
-    if (race_manager->hasTimeTarget())
+    if (RaceManager::get()->hasTimeTarget())
     {
         return m_count_down_reached_zero;
     }

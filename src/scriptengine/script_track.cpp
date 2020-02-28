@@ -158,12 +158,12 @@ namespace Scripting
 
         int getNumberOfKarts()
         {
-            return race_manager->getNumberOfKarts();
+            return RaceManager::get()->getNumberOfKarts();
         }
 
         int getNumLocalPlayers()
         {
-            return race_manager->getNumLocalPlayers();
+            return RaceManager::get()->getNumLocalPlayers();
         }
         
         /**
@@ -172,22 +172,22 @@ namespace Scripting
           */
         int getKartType(int kartId)
         {
-            return race_manager->getKartType(kartId);
+            return RaceManager::get()->getKartType(kartId);
         }
         
         bool isTrackReverse()
         {
-            return race_manager->getReverseTrack();
+            return RaceManager::get()->getReverseTrack();
         }
 
         int getMajorRaceMode()
         {
-            return race_manager->getMajorMode();
+            return RaceManager::get()->getMajorMode();
         }
 
         int getMinorRaceMode()
         {
-            return race_manager->getMinorMode();
+            return RaceManager::get()->getMinorMode();
         }
 
         bool isDuringDay()

@@ -38,12 +38,12 @@ FollowTheLeaderRace::FollowTheLeaderRace() : LinearWorld()
     // in a FTL race (since otherwise its distance will not be computed
     // correctly, and as a result e.g. a leader might suddenly fall back
     // after crossing the start line
-    race_manager->setNumLaps(99999);
+    RaceManager::get()->setNumLaps(99999);
 
     m_leader_intervals = stk_config->m_leader_intervals;
     for(unsigned int i=0; i<m_leader_intervals.size(); i++)
         m_leader_intervals[i] +=
-            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
+            stk_config->m_leader_time_per_kart*RaceManager::get()->getNumberOfKarts();
     m_use_highscores   = false;  // disable high scores
     setClockMode(WorldStatus::CLOCK_COUNTDOWN, m_leader_intervals[0]);
     m_is_over_delay = 5.0f;
@@ -84,7 +84,7 @@ void FollowTheLeaderRace::reset(bool restart)
     m_leader_intervals    = stk_config->m_leader_intervals;
     for(unsigned int i=0; i<m_leader_intervals.size(); i++)
         m_leader_intervals[i] +=
-            stk_config->m_leader_time_per_kart*race_manager->getNumberOfKarts();
+            stk_config->m_leader_time_per_kart*RaceManager::get()->getNumberOfKarts();
     WorldStatus::setClockMode(WorldStatus::CLOCK_COUNTDOWN,
                               m_leader_intervals[0]);
     
@@ -113,7 +113,7 @@ const btTransform &FollowTheLeaderRace::getStartTransform(int index)
 
     // Otherwise the karts will start at the rear starting positions
     int start_index = stk_config->m_max_karts
-                    - race_manager->getNumberOfKarts() + index;
+                    - RaceManager::get()->getNumberOfKarts() + index;
     return Track::getCurrentTrack()->getStartTransform(start_index);
 }   // getStartTransform
 
@@ -175,7 +175,7 @@ void FollowTheLeaderRace::countdownReachedZero()
 
         // Move any camera for this kart to the leader, facing backwards,
         // so that the eliminated player has something to watch.
-        if (race_manager->getNumPlayers() > 1)
+        if (RaceManager::get()->getNumPlayers() > 1)
         {
             for(unsigned int i=0; i<Camera::getNumCameras(); i++)
             {

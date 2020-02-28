@@ -161,7 +161,7 @@ void World::init()
     m_num_players         = 0;
     unsigned int gk       = 0;
     m_red_ai = m_blue_ai = 0;
-    if (race_manager->hasGhostKarts())
+    if (RaceManager::get()->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
     // Create the race gui before anything else is attached to the scene node
@@ -175,12 +175,12 @@ void World::init()
     RewindManager::create();
     main_loop->renderGUI(1100);
     // Grab the track file
-    Track *track = track_manager->getTrack(race_manager->getTrackName());
+    Track *track = track_manager->getTrack(RaceManager::get()->getTrackName());
     Scripting::ScriptEngine::getInstance<Scripting::ScriptEngine>();
     if(!track)
     {
         std::ostringstream msg;
-        msg << "Track '" << race_manager->getTrackName()
+        msg << "Track '" << RaceManager::get()->getTrackName()
             << "' not found.\n";
         throw std::runtime_error(msg.str());
     }
@@ -191,17 +191,17 @@ void World::init()
     // Create the physics
     Physics::getInstance<Physics>();
     main_loop->renderGUI(1300);
-    unsigned int num_karts = race_manager->getNumberOfKarts();
+    unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     //assert(num_karts > 0);
 
     // Load the track models - this must be done before the karts so that the
     // karts can be positioned properly on (and not in) the tracks.
     // This also defines the static Track::getCurrentTrack function.
-    track->loadTrackModel(race_manager->getReverseTrack());
+    track->loadTrackModel(RaceManager::get()->getReverseTrack());
 
     // Shuffles the start transforms with playing 3-strikes or free for all battles.
-    if ((race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
+    if ((RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL) &&
          !NetworkConfig::get()->isNetworking())
     {
         track->shuffleStartTransforms();
@@ -223,26 +223,26 @@ void World::init()
     for(unsigned int i=0; i<num_karts; i++)
     {
         main_loop->renderGUI(7000, i, num_karts);
-        if (race_manager->getKartType(i) == RaceManager::KT_GHOST) continue;
+        if (RaceManager::get()->getKartType(i) == RaceManager::KT_GHOST) continue;
         std::string kart_ident = history->replayHistory()
                                ? history->getKartIdent(i)
-                               : race_manager->getKartIdent(i);
-        int local_player_id  = race_manager->getKartLocalPlayerId(i);
-        int global_player_id = race_manager->getKartGlobalPlayerId(i);
+                               : RaceManager::get()->getKartIdent(i);
+        int local_player_id  = RaceManager::get()->getKartLocalPlayerId(i);
+        int global_player_id = RaceManager::get()->getKartGlobalPlayerId(i);
         std::shared_ptr<AbstractKart> new_kart;
         if (hasTeam())
         {
             new_kart = createKartWithTeam(kart_ident, i, local_player_id,
-                global_player_id, race_manager->getKartType(i),
-                race_manager->getPlayerHandicap(i));
+                global_player_id, RaceManager::get()->getKartType(i),
+                RaceManager::get()->getPlayerHandicap(i));
         }
         else
         {
             new_kart = createKart(kart_ident, i, local_player_id,
-                global_player_id, race_manager->getKartType(i),
-                race_manager->getPlayerHandicap(i));
+                global_player_id, RaceManager::get()->getKartType(i),
+                RaceManager::get()->getPlayerHandicap(i));
         }
-        new_kart->setBoostAI(race_manager->hasBoostedAI(i));
+        new_kart->setBoostAI(RaceManager::get()->hasBoostedAI(i));
         m_karts.push_back(new_kart);
     }  // for i
 
@@ -254,7 +254,7 @@ void World::init()
     if (m_race_gui)
         m_race_gui->init();
 
-    powerup_manager->computeWeightsForRace(race_manager->getNumberOfKarts());
+    powerup_manager->computeWeightsForRace(RaceManager::get()->getNumberOfKarts());
     main_loop->renderGUI(7200);
     if (UserConfigParams::m_particles_effects > 1)
     {
@@ -266,7 +266,7 @@ void World::init()
         auto cl = LobbyProtocol::get<ClientLobby>();
         if ( (NetworkConfig::get()->isServer() && 
               !GUIEngine::isNoGraphics()       ) ||
-            race_manager->isWatchingReplay()        ||
+            RaceManager::get()->isWatchingReplay()        ||
             (cl && cl->isSpectator()))
         {
             // In case that the server is running with gui, watching replay or
@@ -353,19 +353,19 @@ void World::reset(bool restart)
             updateAchievementModeCounters(true /*start*/);
 
             PlayerManager::resetKartHits(getNumKarts());
-            if (race_manager->isLinearRaceMode())
+            if (RaceManager::get()->isLinearRaceMode())
             {
-                PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_STARTED);
+                PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_STARTED);
                 AchievementsStatus::AchievementData diff;
-                diff = (race_manager->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_STARTED :
-                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? AchievementsStatus::MEDIUM_STARTED :
-                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_STARTED :
+                diff = (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? AchievementsStatus::EASY_STARTED :
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? AchievementsStatus::MEDIUM_STARTED :
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? AchievementsStatus::HARD_STARTED :
                                                                                            AchievementsStatus::BEST_STARTED;
                 PlayerManager::increaseAchievement(diff,1);
             }
-            else if (race_manager->isEggHuntMode())
+            else if (RaceManager::get()->isEggHuntMode())
             {
-                PlayerManager::trackEvent(race_manager->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED);
+                PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED);
             }
             if (restart)
                 PlayerManager::onRaceEnd(true /* previous race aborted */);
@@ -375,7 +375,7 @@ void World::reset(bool restart)
     if (!GUIEngine::isNoGraphics())
         Camera::resetAllCameras();
 
-    if(race_manager->hasGhostKarts())
+    if(RaceManager::get()->hasGhostKarts())
         ReplayPlay::get()->reset();
 
     // Remove all (if any) previous game flyables before reset karts, so no
@@ -398,10 +398,10 @@ void World::reset(bool restart)
     SFXManager::get()->resumeAll();
 
     RewindManager::get()->reset();
-    race_manager->reset();
+    RaceManager::get()->reset();
     // Make sure to overwrite the data from the previous race.
     if(!history->replayHistory()) history->initRecording();
-    if(race_manager->isRecordingRace())
+    if(RaceManager::get()->isRecordingRace())
     {
         Log::info("World", "Start Recording race.");
         ReplayRecorder::get()->init();
@@ -436,16 +436,16 @@ std::shared_ptr<AbstractKart> World::createKart
     HandicapLevel handicap)
 {
     unsigned int gk = 0;
-    if (race_manager->hasGhostKarts())
+    if (RaceManager::get()->hasGhostKarts())
         gk = ReplayPlay::get()->getNumGhostKart();
 
     std::shared_ptr<RenderInfo> ri = std::make_shared<RenderInfo>();
     core::stringw online_name;
     if (global_player_id > -1)
     {
-        ri->setHue(race_manager->getKartInfo(global_player_id)
+        ri->setHue(RaceManager::get()->getKartInfo(global_player_id)
             .getDefaultKartColor());
-        online_name = race_manager->getKartInfo(global_player_id)
+        online_name = RaceManager::get()->getKartInfo(global_player_id)
             .getPlayerName();
     }
 
@@ -465,7 +465,7 @@ std::shared_ptr<AbstractKart> World::createKart
             init_pos, handicap, ri);
     }
 
-    new_kart->init(race_manager->getKartType(index));
+    new_kart->init(RaceManager::get()->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)
     {
@@ -484,7 +484,7 @@ std::shared_ptr<AbstractKart> World::createKart
             local_player_id >= local_player_count)
         {
             AIBaseController* ai = NULL;
-            if (race_manager->isBattleMode())
+            if (RaceManager::get()->isBattleMode())
                 ai = new BattleAI(new_kart.get());
             else
                 ai = new SkiddingAI(new_kart.get());
@@ -525,7 +525,7 @@ std::shared_ptr<AbstractKart> World::createKart
     if (!controller->isLocalPlayerController() && !online_name.empty())
         new_kart->setOnScreenText(online_name.c_str());
     new_kart->setController(controller);
-    race_manager->setKartColor(index, ri->getHue());
+    RaceManager::get()->setKartColor(index, ri->getHue());
     return new_kart;
 }   // createKart
 
@@ -546,10 +546,10 @@ Controller* World::loadAIController(AbstractKart* kart)
     Controller *controller;
     int turn=0;
 
-    if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES
-        || race_manager->getMinorMode()==RaceManager::MINOR_MODE_FREE_FOR_ALL)
+    if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES
+        || RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FREE_FOR_ALL)
         turn=1;
-    else if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
+    else if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_SOCCER)
         turn=2;
     // If different AIs should be used, adjust turn (or switch randomly
     // or dependent on difficulty)
@@ -611,7 +611,7 @@ World::~World()
     Weather::kill();
 
     m_karts.clear();
-    if(race_manager->hasGhostKarts() || race_manager->isRecordingRace())
+    if(RaceManager::get()->hasGhostKarts() || RaceManager::get()->isRecordingRace())
     {
         // Destroy the old replay object, which also stored the ghost
         // karts, and create a new one (which means that in further
@@ -621,13 +621,13 @@ World::~World()
         ReplayPlay::destroy();
         ReplayPlay::create();
     }
-    if(race_manager->isRecordingRace())
+    if(RaceManager::get()->isRecordingRace())
         ReplayRecorder::get()->reset();
-    race_manager->setRaceGhostKarts(false);
-    race_manager->setRecordRace(false);
-    race_manager->setWatchingReplay(false);
-    race_manager->setTimeTarget(0.0f);
-    race_manager->setSpareTireKartNum(0);
+    RaceManager::get()->setRaceGhostKarts(false);
+    RaceManager::get()->setRecordRace(false);
+    RaceManager::get()->setWatchingReplay(false);
+    RaceManager::get()->setTimeTarget(0.0f);
+    RaceManager::get()->setSpareTireKartNum(0);
 
     if (!GUIEngine::isNoGraphics())
         Camera::removeAllCameras();
@@ -974,21 +974,21 @@ void World::updateWorld(int ticks)
         if (m_schedule_exit_race)
         {
             m_schedule_exit_race = false;
-            race_manager->exitRace(false);
-            race_manager->setAIKartOverride("");
+            RaceManager::get()->exitRace(false);
+            RaceManager::get()->setAIKartOverride("");
 
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
             if (m_schedule_tutorial)
             {
                 m_schedule_tutorial = false;
-                race_manager->setNumPlayers(1);
-                race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-                race_manager->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
-                race_manager->setNumKarts( 1 );
-                race_manager->setTrack( "tutorial" );
-                race_manager->setDifficulty(RaceManager::DIFFICULTY_EASY);
-                race_manager->setReverseTrack(false);
+                RaceManager::get()->setNumPlayers(1);
+                RaceManager::get()->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
+                RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_TUTORIAL);
+                RaceManager::get()->setNumKarts( 1 );
+                RaceManager::get()->setTrack( "tutorial" );
+                RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
+                RaceManager::get()->setReverseTrack(false);
 
                 // Use keyboard 0 by default (FIXME: let player choose?)
                 InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
@@ -1004,7 +1004,7 @@ void World::updateWorld(int ticks)
                               UserConfigParams::m_default_kart.c_str());
                     UserConfigParams::m_default_kart.revertToDefaults();
                 }
-                race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+                RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
 
                 // ASSIGN should make sure that only input from assigned devices
                 // is read.
@@ -1015,14 +1015,14 @@ void World::updateWorld(int ticks)
                 delete this;
 
                 StateManager::get()->enterGameState();
-                race_manager->setupPlayerKartInfo();
-                race_manager->startNew(true);
+                RaceManager::get()->setupPlayerKartInfo();
+                RaceManager::get()->startNew(true);
             }
             else
             {
                 delete this;
 
-                if (race_manager->raceWasStartedFromOverworld())
+                if (RaceManager::get()->raceWasStartedFromOverworld())
                 {
                     OverWorld::enterOverWorld();
                 }
@@ -1139,7 +1139,7 @@ void World::update(int ticks)
             m_karts[i]->makeKartRest();
     }
     PROFILER_POP_CPU_MARKER();
-    if(race_manager->isRecordingRace()) ReplayRecorder::get()->update(ticks);
+    if(RaceManager::get()->isRecordingRace()) ReplayRecorder::get()->update(ticks);
 
     PROFILER_PUSH_CPU_MARKER("World::update (projectiles)", 0xa0, 0x7F, 0x00);
     projectile_manager->update(ticks);
@@ -1187,11 +1187,11 @@ Highscores* World::getHighscores() const
 
     Highscores * highscores =
         highscore_manager->getHighscores(type,
-                                         race_manager->getNumNonGhostKarts(),
-                                         race_manager->getDifficulty(),
-                                         race_manager->getTrackName(),
-                                         race_manager->getNumLaps(),
-                                         race_manager->getReverseTrack());
+                                         RaceManager::get()->getNumNonGhostKarts(),
+                                         RaceManager::get()->getDifficulty(),
+                                         RaceManager::get()->getTrackName(),
+                                         RaceManager::get()->getNumLaps(),
+                                         RaceManager::get()->getReverseTrack());
 
     return highscores;
 }   // getHighscores
@@ -1357,7 +1357,7 @@ void World::eliminateKart(int kart_id, bool notify_of_elimination)
     // a race can't be restarted. So it's only marked to be eliminated (and
     // ignored in all loops). Important:world->getCurrentNumKarts() returns
     // the number of karts still racing. This value can not be used for loops
-    // over all karts, use race_manager->getNumKarts() instead!
+    // over all karts, use RaceManager::get()->getNumKarts() instead!
     kart->eliminate();
     m_eliminated_karts++;
 
@@ -1465,23 +1465,23 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
     }
     else if (NetworkConfig::get()->isNetworking())
     {
-        m_kart_team_map[index] = race_manager->getKartInfo(index).getKartTeam();
-        team = race_manager->getKartInfo(index).getKartTeam();
+        m_kart_team_map[index] = RaceManager::get()->getKartInfo(index).getKartTeam();
+        team = RaceManager::get()->getKartInfo(index).getKartTeam();
     }
     else
     {
         int rm_id = index -
-            (race_manager->getNumberOfKarts() - race_manager->getNumPlayers());
+            (RaceManager::get()->getNumberOfKarts() - RaceManager::get()->getNumPlayers());
 
         assert(rm_id >= 0);
-        team = race_manager->getKartInfo(rm_id).getKartTeam();
+        team = RaceManager::get()->getKartInfo(rm_id).getKartTeam();
         m_kart_team_map[index] = team;
     }
 
     core::stringw online_name;
     if (global_player_id > -1)
     {
-        online_name = race_manager->getKartInfo(global_player_id)
+        online_name = RaceManager::get()->getKartInfo(global_player_id)
             .getPlayerName();
     }
 
@@ -1517,7 +1517,7 @@ std::shared_ptr<AbstractKart> World::createKartWithTeam
             init_pos, handicap, ri);
     }
 
-    new_kart->init(race_manager->getKartType(index));
+    new_kart->init(RaceManager::get()->getKartType(index));
     Controller *controller = NULL;
 
     switch(kart_type)
@@ -1573,17 +1573,17 @@ KartTeam World::getKartTeam(unsigned int kart_id) const
 //-----------------------------------------------------------------------------
 void World::setAITeam()
 {
-    m_red_ai  = race_manager->getNumberOfRedAIKarts();
-    m_blue_ai = race_manager->getNumberOfBlueAIKarts();
+    m_red_ai  = RaceManager::get()->getNumberOfRedAIKarts();
+    m_blue_ai = RaceManager::get()->getNumberOfBlueAIKarts();
     
-    for (int i = 0; i < (int)race_manager->getNumLocalPlayers(); i++)
+    for (int i = 0; i < (int)RaceManager::get()->getNumLocalPlayers(); i++)
     {
-        KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+        KartTeam team = RaceManager::get()->getKartInfo(i).getKartTeam();
 
         // Happen in profiling mode
         if (team == KART_TEAM_NONE)
         {
-            race_manager->setKartTeam(i, KART_TEAM_BLUE);
+            RaceManager::get()->setKartTeam(i, KART_TEAM_BLUE);
             team = KART_TEAM_BLUE;
             continue; //FIXME, this is illogical
         }
@@ -1612,60 +1612,60 @@ void World::updateAchievementDataEndRace()
         if (m_karts[i]->getController()->canGetAchievements())
         {
             // Increment won races counts and track finished counts
-            if (race_manager->isLinearRaceMode())
+            if (RaceManager::get()->isLinearRaceMode())
             {
                 ACS::AchievementData diff;
-                diff = (race_manager->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? ACS::EASY_FINISHED :
-                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? ACS::MEDIUM_FINISHED :
-                       (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? ACS::HARD_FINISHED :
+                diff = (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_EASY)   ? ACS::EASY_FINISHED :
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM) ? ACS::MEDIUM_FINISHED :
+                       (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD)   ? ACS::HARD_FINISHED :
                                                                                            ACS::BEST_FINISHED;
                 PlayerManager::increaseAchievement(diff,1);
 
-                PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_FINISHED);
-                if (race_manager->getReverseTrack())
-                    PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_FINISHED_REVERSE);
+                PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED);
+                if (RaceManager::get()->getReverseTrack())
+                    PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_REVERSE);
 
-                if (race_manager->modeHasLaps())
+                if (RaceManager::get()->modeHasLaps())
                 {
-                    Track* track = track_manager->getTrack(race_manager->getTrackName());
+                    Track* track = track_manager->getTrack(RaceManager::get()->getTrackName());
                     int default_lap_num = track->getDefaultNumberOfLaps();
-                    if (race_manager->getNumLaps() < default_lap_num)
+                    if (RaceManager::get()->getNumLaps() < default_lap_num)
                     {
-                        PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_LESS_LAPS);
+                        PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_LESS_LAPS);
                     }
-                    else if (race_manager->getNumLaps() > default_lap_num)
+                    else if (RaceManager::get()->getNumLaps() > default_lap_num)
                     {
-                        PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_MORE_LAPS);
-                        if (race_manager->getNumLaps() >= 2*default_lap_num)
-                            PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_MIN_TWICE_LAPS);
+                        PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_MORE_LAPS);
+                        if (RaceManager::get()->getNumLaps() >= 2*default_lap_num)
+                            PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_MIN_TWICE_LAPS);
                     }
                 }
 
                 int winner_position = 1;
                 //TODO : check this always work : what happens if the leader is overtaken between the last elimination
                 //       and the results screen ?
-                if (race_manager->isFollowMode()) winner_position = 2;
+                if (RaceManager::get()->isFollowMode()) winner_position = 2;
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position)
                 {
-                    if (race_manager->getNumNonGhostKarts() >= 2)
-                        PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_WON);
+                    if (RaceManager::get()->getNumNonGhostKarts() >= 2)
+                        PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_WON);
                     else
-                        PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_FINISHED_ALONE);
-                    if (race_manager->getNumberOfAIKarts() >= 3)
+                        PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_FINISHED_ALONE);
+                    if (RaceManager::get()->getNumberOfAIKarts() >= 3)
                     {
                         PlayerManager::increaseAchievement(ACS::WON_RACES,1);
                         PlayerManager::increaseAchievement(ACS::CONS_WON_RACES,1);
-                        if (race_manager->isTimeTrialMode())
+                        if (RaceManager::get()->isTimeTrialMode())
                             PlayerManager::increaseAchievement(ACS::WON_TT_RACES,1);
-                        else if (race_manager->isFollowMode())
+                        else if (RaceManager::get()->isFollowMode())
                             PlayerManager::increaseAchievement(ACS::WON_FTL_RACES,1);
                         else // normal race
                             PlayerManager::increaseAchievement(ACS::WON_NORMAL_RACES,1);
                     }
-                    if (race_manager->getNumberOfAIKarts() >= 5 &&
-                        (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
-                         race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST))
+                    if (RaceManager::get()->getNumberOfAIKarts() >= 5 &&
+                        (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+                         RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST))
                         PlayerManager::increaseAchievement(ACS::CONS_WON_RACES_HARD,1);
                 }
                 // Race lost, reset the consecutive wins counters
@@ -1677,9 +1677,9 @@ void World::updateAchievementDataEndRace()
             } // if isLinearMode
 
             // Increment egg hunt finished count
-            else if (race_manager->isEggHuntMode())
+            else if (RaceManager::get()->isEggHuntMode())
             {
-                PlayerManager::trackEvent(race_manager->getTrackName(), ACS::TR_EGG_HUNT_FINISHED);
+                PlayerManager::trackEvent(RaceManager::get()->getTrackName(), ACS::TR_EGG_HUNT_FINISHED);
             }
 
             updateAchievementModeCounters(false /*start*/);
@@ -1692,27 +1692,27 @@ void World::updateAchievementDataEndRace()
  * \param start - true if start, false if finish */
 void World::updateAchievementModeCounters(bool start)
 {
-    if (race_manager->isTimeTrialMode())
+    if (RaceManager::get()->isTimeTrialMode())
         PlayerManager::increaseAchievement(start ? ACS::TT_STARTED : ACS::TT_FINISHED,1);
-    else if (race_manager->isFollowMode())
+    else if (RaceManager::get()->isFollowMode())
         PlayerManager::increaseAchievement(start ? ACS::FTL_STARTED : ACS::FTL_FINISHED,1);
-    else if (race_manager->isEggHuntMode())
+    else if (RaceManager::get()->isEggHuntMode())
         PlayerManager::increaseAchievement(start ? ACS::EGG_HUNT_STARTED : ACS::EGG_HUNT_FINISHED,1);
-    else if (race_manager->isSoccerMode())
+    else if (RaceManager::get()->isSoccerMode())
         PlayerManager::increaseAchievement(start ? ACS::SOCCER_STARTED : ACS::SOCCER_FINISHED,1);
-    else if (race_manager->isBattleMode())
+    else if (RaceManager::get()->isBattleMode())
     {
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
             PlayerManager::increaseAchievement(start ? ACS::THREE_STRIKES_STARTED : ACS::THREE_STRIKES_FINISHED,1);
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
             PlayerManager::increaseAchievement(start ? ACS::CTF_STARTED : ACS::CTF_FINISHED,1);
-        else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL)
             PlayerManager::increaseAchievement(start ? ACS::FFA_STARTED : ACS::FFA_FINISHED,1);
     }
     else // normal races
         PlayerManager::increaseAchievement(start ? ACS::NORMAL_STARTED : ACS::NORMAL_FINISHED,1);
 
-    if (race_manager->hasGhostKarts())
+    if (RaceManager::get()->hasGhostKarts())
         PlayerManager::increaseAchievement(start ? ACS::WITH_GHOST_STARTED : ACS::WITH_GHOST_FINISHED,1);
 } // updateAchievementModeCounters
 #undef ACS

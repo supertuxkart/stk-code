@@ -256,7 +256,7 @@ void Physics::update(int ticks)
                 }
             }
             else if(obj->isSoccerBall() && 
-                    race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+                    RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
                 soccerWorld->setBallHitter(kartId);
@@ -328,7 +328,7 @@ void Physics::update(int ticks)
             flyable->hit(NULL, obj);
 
             if (obj->isSoccerBall() && 
-                race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+                RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
@@ -363,7 +363,7 @@ void Physics::update(int ticks)
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
                         PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT, 1);
-                        if (race_manager->isLinearRaceMode())
+                        if (RaceManager::get()->isLinearRaceMode())
                             PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT_1RACE, 1);
                     }   // is bowling ball
                 }   // if target_kart != kart && is a player kart and is current player

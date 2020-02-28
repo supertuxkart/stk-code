@@ -42,7 +42,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
     std::string p1("target-p1");
     std::string p2("target-p2");
 
-    if (race_manager->getReverseTrack())
+    if (RaceManager::get()->getReverseTrack())
     {
         p1 = "p1";
         p2 = "p2";
@@ -54,7 +54,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
 
     m_curve = new Ipo(*(node.getNode("curve")),
                       /*fps*/25,
-                      /*reverse*/race_manager->getReverseTrack());
+                      /*reverse*/RaceManager::get()->getReverseTrack());
 
 #if defined(DEBUG) && !defined(SERVER_ONLY)
     m_show_curve = NULL;

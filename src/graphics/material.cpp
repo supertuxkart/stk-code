@@ -763,7 +763,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
     // Default solid
     m->MaterialType = video::EMT_SOLID;
-    if (race_manager->getReverseTrack() &&
+    if (RaceManager::get()->getReverseTrack() &&
         m_mirror_axis_when_reverse != ' ')
     {
         if (m_mirrorred_mesh_buffers.find((void*)mb) == m_mirrorred_mesh_buffers.end())

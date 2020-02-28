@@ -98,9 +98,9 @@ void ThreeStrikesBattle::reset(bool restart)
     WorldWithRank::reset(restart);
 
     float next_spawn_time =
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
-        race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
+        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST ? 40.0f :
+        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ? 30.0f :
+        RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM ?
         25.0f : 20.0f;
     m_next_sta_spawn_ticks = stk_config->time2Ticks(next_spawn_time);
 
@@ -482,7 +482,7 @@ bool ThreeStrikesBattle::isRaceOver()
         return (irr_driver->getRealTime()-m_start_time)*0.001f > 20.0f;
 
     // for tests : never over when we have a single player there :)
-    if (race_manager->getNumberOfKarts() - m_spare_tire_karts.size () ==1 &&
+    if (RaceManager::get()->getNumberOfKarts() - m_spare_tire_karts.size () ==1 &&
         getCurrentNumKarts()==1 &&
         UserConfigParams::m_artist_debug_mode)
     {
@@ -615,7 +615,7 @@ void ThreeStrikesBattle::spawnSpareTireKarts()
     // The lifespan for sta: inc_factor / period * 1000 / 2
     // So in easier mode the sta lasts longer than spawn period
     float inc_factor, lifespan;
-    switch (race_manager->getDifficulty())
+    switch (RaceManager::get()->getDifficulty())
     {
     case RaceManager::DIFFICULTY_BEST: inc_factor = 0.7f;  lifespan = 17.5f;  break;
     case RaceManager::DIFFICULTY_HARD: inc_factor = 0.65f; lifespan = 21.66f; break;
@@ -715,13 +715,13 @@ void ThreeStrikesBattle::loadCustomModels()
                 sta->setController(new SpareTireAI(sta.get()));
 
                 m_karts.push_back(sta);
-                race_manager->addSpareTireKart(sta_list[i]);
+                RaceManager::get()->addSpareTireKart(sta_list[i]);
 
                 // Copy STA pointer to m_spare_tire_karts array, allowing them
                 // to respawn easily
                 m_spare_tire_karts.push_back(sta.get());
             }
-            unsigned int sta_num = race_manager->getNumSpareTireKarts();
+            unsigned int sta_num = RaceManager::get()->getNumSpareTireKarts();
             assert(m_spare_tire_karts.size() == sta_num);
             Log::info("ThreeStrikesBattle","%d spare tire kart(s) created.",
                 sta_num);
