@@ -20,8 +20,7 @@
 #define HEADER_REWIND_MANAGER_HPP
 
 #include "network/rewind_queue.hpp"
-#include "utils/ptr_vector.hpp"
-#include "utils/synchronised.hpp"
+#include "utils/stk_process.hpp"
 
 #include <assert.h>
 #include <atomic>
@@ -86,11 +85,11 @@ class RewindManager
 {
 private:
     /** Singleton pointer. */
-    static RewindManager *m_rewind_manager;
+    static RewindManager *m_rewind_manager[PT_COUNT];
 
     /** En- or Disable the rewind manager. This is used to disable storing
      *  rewind data in case of local races only. */
-    static bool           m_enable_rewind_manager;
+    static std::atomic_bool m_enable_rewind_manager;
 
     std::map<int, std::vector<std::function<void()> > > m_local_state;
 
@@ -150,8 +149,9 @@ public:
      *  the singleton. */
     static RewindManager *get()
     {
-        assert(m_rewind_manager);
-        return m_rewind_manager;
+        ProcessType pt = STKProcess::getType();
+        assert(m_rewind_manager[pt]);
+        return m_rewind_manager[pt];
     }   // get
 
     // Non-static function declarations:
