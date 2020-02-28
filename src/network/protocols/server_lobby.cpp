@@ -263,7 +263,8 @@ ServerLobby::~ServerLobby()
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isWAN())
     {
-        unregisterServer(true/*now*/);
+        // For child process the request manager will keep on running
+        unregisterServer(m_process_type == PT_MAIN ? true : false/*now*/);
     }
     delete m_result_ns;
     delete m_items_complete_state;
@@ -2190,9 +2191,6 @@ void ServerLobby::update(int ticks)
  */
 bool ServerLobby::registerServer(bool now)
 {
-    while (now && !m_server_unregistered.expired())
-        StkTime::sleep(1);
-
     // ========================================================================
     class RegisterServerRequest : public Online::XMLRequest
     {
@@ -2299,7 +2297,6 @@ void ServerLobby::unregisterServer(bool now)
 {
     int priority = Online::RequestManager::HTTP_MAX_PRIORITY;
     auto request = std::make_shared<Online::XMLRequest>(priority);
-    m_server_unregistered = request;
     NetworkConfig::get()->setServerDetails(request, "stop");
 
     const SocketAddress& addr = STKHost::get()->getPublicAddress();
