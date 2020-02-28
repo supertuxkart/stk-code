@@ -15,9 +15,10 @@ subject to the following restrictions:
 
 #include "btAlignedAllocator.h"
 
-int gNumAlignedAllocs = 0;
-int gNumAlignedFree = 0;
-int gTotalBytesAlignedAllocs = 0;//detect memory leaks
+// Disable global variables for STK with multiple physics instance
+//int gNumAlignedAllocs = 0;
+//int gNumAlignedFree = 0;
+//int gTotalBytesAlignedAllocs = 0;//detect memory leaks
 
 static void *btAllocDefault(size_t size)
 {
@@ -168,7 +169,7 @@ void    btAlignedFreeInternal   (void* ptr,int line,char* filename)
 
 void*	btAlignedAllocInternal	(size_t size, int alignment)
 {
-	gNumAlignedAllocs++;
+	//gNumAlignedAllocs++;
 	void* ptr;
 	ptr = sAlignedAllocFunc(size, alignment);
 //	printf("btAlignedAllocInternal %d, %x\n",size,ptr);
@@ -182,7 +183,7 @@ void	btAlignedFreeInternal	(void* ptr)
 		return;
 	}
 
-	gNumAlignedFree++;
+	//gNumAlignedFree++;
 //	printf("btAlignedFreeInternal %x\n",ptr);
 	sAlignedFreeFunc(ptr);
 }
