@@ -1684,8 +1684,8 @@ bool ServerLobby::canLiveJoinNow() const
  */
 bool ServerLobby::worldIsActive() const
 {
-    return World::getWorld() && RaceEventManager::getInstance()->isRunning() &&
-        !RaceEventManager::getInstance()->isRaceOver() &&
+    return World::getWorld() && RaceEventManager::get()->isRunning() &&
+        !RaceEventManager::get()->isRaceOver() &&
         World::getWorld()->getPhase() == WorldStatus::RACE_PHASE;
 }   // worldIsActive
 
@@ -2048,8 +2048,8 @@ void ServerLobby::update(int ticks)
     // Reset server to initial state if no more connected players
     if (m_rs_state.load() == RS_WAITING)
     {
-        if ((RaceEventManager::getInstance() &&
-            !RaceEventManager::getInstance()->protocolStopped()) ||
+        if ((RaceEventManager::get() &&
+            !RaceEventManager::get()->protocolStopped()) ||
             !GameProtocol::emptyInstance())
             return;
 
@@ -2064,8 +2064,8 @@ void ServerLobby::update(int ticks)
         (STKHost::get()->getPlayersInGame() == 0 ||
         all_players_in_world_disconnected))
     {
-        if (RaceEventManager::getInstance() &&
-            RaceEventManager::getInstance()->isRunning())
+        if (RaceEventManager::get() &&
+            RaceEventManager::get()->isRunning())
         {
             // Send a notification to all players who may have start live join
             // or spectate to go back to lobby
@@ -2075,8 +2075,8 @@ void ServerLobby::update(int ticks)
             sendMessageToPeersInServer(back_to_lobby, /*reliable*/true);
             delete back_to_lobby;
 
-            RaceEventManager::getInstance()->stop();
-            RaceEventManager::getInstance()->getProtocol()->requestTerminate();
+            RaceEventManager::get()->stop();
+            RaceEventManager::get()->getProtocol()->requestTerminate();
             GameProtocol::lock()->requestTerminate();
         }
         else if (auto ai = m_ai_peer.lock())
@@ -2138,14 +2138,14 @@ void ServerLobby::update(int ticks)
         m_state = WAIT_FOR_WORLD_LOADED;
         break;
     case RACING:
-        if (World::getWorld() &&
-            RaceEventManager::getInstance<RaceEventManager>()->isRunning())
+        if (World::getWorld() && RaceEventManager::get() &&
+            RaceEventManager::get()->isRunning())
         {
             checkRaceFinished();
         }
         break;
     case WAIT_FOR_RACE_STOPPED:
-        if (!RaceEventManager::getInstance()->protocolStopped() ||
+        if (!RaceEventManager::get()->protocolStopped() ||
             !GameProtocol::emptyInstance())
             return;
 
@@ -2698,16 +2698,16 @@ void ServerLobby::checkIncomingConnectionRequests()
  */
 void ServerLobby::checkRaceFinished()
 {
-    assert(RaceEventManager::getInstance()->isRunning());
+    assert(RaceEventManager::get()->isRunning());
     assert(World::getWorld());
-    if (!RaceEventManager::getInstance()->isRaceOver()) return;
+    if (!RaceEventManager::get()->isRaceOver()) return;
 
     Log::info("ServerLobby", "The game is considered finished.");
     // notify the network world that it is stopped
-    RaceEventManager::getInstance()->stop();
+    RaceEventManager::get()->stop();
 
     // stop race protocols before going back to lobby (end race)
-    RaceEventManager::getInstance()->getProtocol()->requestTerminate();
+    RaceEventManager::get()->getProtocol()->requestTerminate();
     GameProtocol::lock()->requestTerminate();
 
     // Save race result before delete the world

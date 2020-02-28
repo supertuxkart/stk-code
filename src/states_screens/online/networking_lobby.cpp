@@ -432,8 +432,8 @@ void NetworkingLobby::onUpdate(float delta)
 
         // You can live join or spectator if u have the current play track
         // and network timer is synchronized, and no game protocols exist
-        bool no_gep = !RaceEventManager::getInstance() ||
-            RaceEventManager::getInstance()->protocolStopped();
+        bool no_gep = !RaceEventManager::get() ||
+            RaceEventManager::get()->protocolStopped();
         bool no_gp = GameProtocol::emptyInstance();
         if (t &&
             STKHost::get()->getNetworkTimerSynchronizer()->isSynchronised() &&

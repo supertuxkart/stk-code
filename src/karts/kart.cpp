@@ -940,7 +940,7 @@ void Kart::finishedRace(float time, bool from_server)
     {
         if (NetworkConfig::get()->isServer())
         {
-            RaceEventManager::getInstance()->kartFinishedRace(this, time);
+            RaceEventManager::get()->kartFinishedRace(this, time);
         }   // isServer
 
         // Ignore local detection of a kart finishing a race in a 

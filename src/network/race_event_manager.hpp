@@ -19,8 +19,6 @@
 #ifndef NETWORK_WORLD_HPP
 #define NETWORK_WORLD_HPP
 
-#include "input/input.hpp"
-#include "utils/singleton.hpp"
 #include <memory>
 
 class Controller;
@@ -34,20 +32,25 @@ class Item;
  *  server to all clients. This object then triggers the right message
  *  from the various running protocols.
 */
-class RaceEventManager : public AbstractSingleton<RaceEventManager>
+class RaceEventManager
 {
 private:
     bool m_running;
-    float m_race_time;
 
     std::weak_ptr<GameEventsProtocol> m_game_events_protocol;
 
-    friend class AbstractSingleton<RaceEventManager>;
-
-             RaceEventManager();
-    virtual ~RaceEventManager();
+    RaceEventManager();
+    ~RaceEventManager();
 
 public:
+    // ----------------------------------------------------------------------------------------
+    static RaceEventManager* get();
+    // ----------------------------------------------------------------------------------------
+    static void create();
+    // ----------------------------------------------------------------------------------------
+    static void destroy();
+    // ----------------------------------------------------------------------------------------
+    static void clear();
     // ------------------------------------------------------------------------
     void update(int ticks, bool fast_forward);
     // ------------------------------------------------------------------------

@@ -291,9 +291,8 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
     if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
 
     // The race event manager will update world in case of an online race
-    if ( RaceEventManager::getInstance() && 
-         RaceEventManager::getInstance()->isRunning() )
-        RaceEventManager::getInstance()->update(ticks, fast_forward);
+    if (RaceEventManager::get() && RaceEventManager::get()->isRunning())
+        RaceEventManager::get()->update(ticks, fast_forward);
     else
         World::getWorld()->updateWorld(ticks);
 }   // updateRace

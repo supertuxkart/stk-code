@@ -181,7 +181,7 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         }
         else if (NetworkConfig::get()->isClient())
         {
-            auto ge = RaceEventManager::getInstance()->getProtocol();
+            auto ge = RaceEventManager::get()->getProtocol();
             assert(ge);
             ge->sendStartupBoost((uint8_t)m_kart->getWorldKartId());
         }
