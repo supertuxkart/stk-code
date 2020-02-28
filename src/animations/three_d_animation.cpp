@@ -21,6 +21,7 @@
 #include <stdio.h>
 
 #include "audio/sfx_base.hpp"
+#include "animations/ipo.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -118,3 +119,15 @@ void ThreeDAnimation::updateWithWorldTicks(bool has_physics)
         m_object->move(xyz.toIrrVector(), hpr, scale.toIrrVector(), true, false);
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+/** Copying to child process of track object.
+ */
+ThreeDAnimation* ThreeDAnimation::clone(TrackObject* obj)
+{
+    ThreeDAnimation* animation = new ThreeDAnimation(*this);
+    animation->m_object = obj;
+    for (unsigned i = 0; i < m_all_ipos.size(); i++)
+        animation->m_all_ipos[i] = m_all_ipos[i]->clone();
+    return animation;
+}   // clone

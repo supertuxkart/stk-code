@@ -81,6 +81,8 @@ public:
     bool isExplodeKartObject() const { return m_explode_kart; }
     bool isFlattenKartObject() const { return m_flatten_kart; }
     void setPaused(bool mode){ m_is_paused = mode; }
+    // ------------------------------------------------------------------------
+    ThreeDAnimation* clone(TrackObject* obj);
 };   // ThreeDAnimation
 #endif
 

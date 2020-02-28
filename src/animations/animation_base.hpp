@@ -26,14 +26,11 @@
  */
 
 #include <vector>
-
-// Note that ipo.hpp is included here in order that PtrVector<Ipo> can call
-// the proper destructor!
-#include "animations/ipo.hpp"
-#include "utils/ptr_vector.hpp"
-
 #include <algorithm>
 
+#include "utils/vec3.hpp"
+
+class Ipo;
 class XMLNode;
 
 /**
@@ -57,7 +54,7 @@ private:
 
 protected:
     /** All IPOs for this animation. */
-    PtrVector<Ipo>  m_all_ipos;
+    std::vector<Ipo*>  m_all_ipos;
 
     /** True if the animation is currently playing. */
     bool  m_playing;
@@ -70,7 +67,7 @@ protected:
 public:
                  AnimationBase(const XMLNode &node);
                  AnimationBase(Ipo *ipo);
-    virtual      ~AnimationBase() {}
+    virtual      ~AnimationBase();
     virtual void update(float dt,  Vec3 *xyz=NULL, Vec3 *hpr=NULL,
                                    Vec3 *scale=NULL);
     virtual void getAt(float time, Vec3 *xyz = NULL, Vec3 *hpr = NULL,
