@@ -38,6 +38,7 @@
 #include "audio/sfx_openal.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 
 MusicManager* music_manager= NULL;
@@ -180,6 +181,9 @@ void MusicManager::startMusic()
  */
 void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
 {
+    if (STKProcess::getType() != PT_MAIN)
+        return;
+
     // If this music is already playing, ignore this call.
     if (m_current_music != NULL &&
         m_current_music == mi &&
