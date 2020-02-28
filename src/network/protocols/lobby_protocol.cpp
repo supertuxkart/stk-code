@@ -57,8 +57,7 @@ LobbyProtocol::LobbyProtocol()
 // ----------------------------------------------------------------------------
 LobbyProtocol::~LobbyProtocol()
 {
-    if (RaceEventManager::getInstance())
-        RaceEventManager::getInstance()->stop();
+    RaceEventManager::destroy();
     delete m_game_setup;
     joinStartGameThread();
 }   // ~LobbyProtocol
@@ -78,7 +77,9 @@ void LobbyProtocol::loadWorld()
     // ---------------------
     // This creates the network world.
     auto gep = std::make_shared<GameEventsProtocol>();
-    RaceEventManager::getInstance<RaceEventManager>()->start(gep);
+    if (!RaceEventManager::get())
+        RaceEventManager::create();
+    RaceEventManager::get()->start(gep);
 
     // Make sure that if there is only a single local player this player can
     // use all input devices.

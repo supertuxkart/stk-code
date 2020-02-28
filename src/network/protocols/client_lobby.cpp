@@ -434,7 +434,7 @@ void ClientLobby::update(int ticks)
     }
     break;
     case RACE_FINISHED:
-        if (!RaceEventManager::getInstance()->protocolStopped() ||
+        if (!RaceEventManager::get()->protocolStopped() ||
             !GameProtocol::emptyInstance())
             return;
         if (!m_received_server_result)
@@ -573,9 +573,9 @@ void ClientLobby::disconnectedPlayer(Event* event)
     // If in-game world exists the kart rewinder will know which player
     // disconnects
     bool in_game_world = World::getWorld() &&
-        RaceEventManager::getInstance() &&
-        RaceEventManager::getInstance()->isRunning() &&
-        !RaceEventManager::getInstance()->isRaceOver();
+        RaceEventManager::get() &&
+        RaceEventManager::get()->isRunning() &&
+        !RaceEventManager::get()->isRaceOver();
 
     if (!in_game_world)
         SFXManager::get()->quickSound("appear");
@@ -1128,7 +1128,7 @@ void ClientLobby::raceFinished(Event* event)
     }
 
     // stop race protocols
-    RaceEventManager::getInstance()->stop();
+    RaceEventManager::get()->stop();
     ProtocolManager::lock()->findAndTerminate(PROTOCOL_GAME_EVENTS);
     ProtocolManager::lock()->findAndTerminate(PROTOCOL_CONTROLLER_EVENTS);
     m_state.store(RACE_FINISHED);
@@ -1149,9 +1149,9 @@ void ClientLobby::backToLobby(Event *event)
     m_auto_started = false;
     m_state.store(CONNECTED);
 
-    if (RaceEventManager::getInstance())
+    if (RaceEventManager::get())
     {
-        RaceEventManager::getInstance()->stop();
+        RaceEventManager::get()->stop();
         ProtocolManager::lock()->findAndTerminate(PROTOCOL_GAME_EVENTS);
     }
     auto gp = GameProtocol::lock();

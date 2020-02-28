@@ -7,7 +7,39 @@
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/rewind_manager.hpp"
 #include "utils/profiler.hpp"
+#include "utils/stk_process.hpp"
 
+//=============================================================================
+RaceEventManager* g_race_event_manager[PT_COUNT];
+// ----------------------------------------------------------------------------
+RaceEventManager* RaceEventManager::get()
+{
+    ProcessType type = STKProcess::getType();
+    return g_race_event_manager[type];
+}   // get
+
+// ----------------------------------------------------------------------------
+void RaceEventManager::create()
+{
+    ProcessType type = STKProcess::getType();
+    g_race_event_manager[type] = new RaceEventManager();
+}   // create
+
+// ----------------------------------------------------------------------------
+void RaceEventManager::destroy()
+{
+    ProcessType type = STKProcess::getType();
+    delete g_race_event_manager[type];
+    g_race_event_manager[type] = NULL;
+}   // destroy
+
+// ----------------------------------------------------------------------------
+void RaceEventManager::clear()
+{
+    memset(g_race_event_manager, 0, sizeof(g_race_event_manager));
+}   // clear
+
+// ----------------------------------------------------------------------------
 RaceEventManager::RaceEventManager()
 {
     m_running = false;

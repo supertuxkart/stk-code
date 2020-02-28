@@ -225,6 +225,7 @@
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/server_lobby.hpp"
+#include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/rewind_queue.hpp"
 #include "network/server.hpp"
@@ -1739,6 +1740,7 @@ void clearGlobalVariables()
     STKHost::clear();
     RaceManager::clear();
     ProjectileManager::clear();
+    RaceEventManager::clear();
     music_manager = NULL;
     irr_driver = NULL;
 #ifdef ENABLE_WIIUSE
