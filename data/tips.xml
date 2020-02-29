@@ -23,4 +23,13 @@
         <tip text="Basketballs can be destroyed using precise backward shots with a bowling ball, cake or plunger."/>
         <tip text="Try to avoid crashing into other karts unless you want to throw them off the track."/>
     </tipset>
+    <tipset id="soccer">
+        <tip text="You can use bowling balls to push and block the ball."/>
+        <tip text="In soccer, always work as a team for good results."/>
+        <tip text="If you miss the ball and an opponent is approaching, try hitting them with a powerup or block their way."/>
+        <tip text="Good rotation of positions (attack and defense) is essential."/>
+        <tip text="Make sure to store at least 2 big cans worth of nitro."/>
+        <tip text="Never use the three bowling balls all at the same time."/>
+        <tip text="Don't get in the way of a teammate carrying the ball, though you can try to hit opponents attempting to stop them from scoring."/>
+    </tipset>
 </tips>

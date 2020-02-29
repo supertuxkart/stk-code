@@ -147,7 +147,10 @@ void RaceResultGUI::init()
 #ifndef SERVER_ONLY
     if (!human_win && !NetworkConfig::get()->isNetworking())
     {
-        core::stringw tip = TipsManager::get()->getTip("race");
+        std::string tipset = "race";
+        if (RaceManager::get()->isSoccerMode())
+            tipset = "soccer";
+        core::stringw tip = TipsManager::get()->getTip(tipset);
         core::stringw tips_string = _("Tip: %s", tip);
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
     }
