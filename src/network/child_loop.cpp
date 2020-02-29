@@ -89,6 +89,8 @@ void ChildLoop::run()
     {
         NetworkConfig::get()->setIPType(NetworkConfig::IP_V4);
         NetworkConfig::get()->detectIPType();
+        NetworkConfig::getByType(PT_MAIN)->setIPType(
+            NetworkConfig::get()->getIPType());
         NetworkConfig::get()->setIsWAN();
         NetworkConfig::get()->setIsPublicServer();
     }
