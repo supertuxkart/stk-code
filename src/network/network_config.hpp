@@ -130,6 +130,11 @@ public:
         return m_network_config[type];
     }   // get
     // ------------------------------------------------------------------------
+    static NetworkConfig* getByType(ProcessType type)
+    {
+        return m_network_config[type];
+    }   // get
+    // ------------------------------------------------------------------------
     static void destroy()
     {
         ProcessType type = STKProcess::getType();
