@@ -34,6 +34,8 @@
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
@@ -106,6 +108,15 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::beforeAddingWidget()
 {
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
+        irr_driver->getDevice()->supportsTouchDevice()) ||
+        UserConfigParams::m_multitouch_active > 1;
+    if (multitouch_enabled)
+    {
+        Widget* team = getWidget<Widget>("choose_team");
+        //I18N: In soccer setup screen
+        team->setText(_("Press red or blue soccer icon to change team"));
+    }
     Widget* central_div = getWidget<Widget>("central_div");
 
     // Add the 3D views for the karts
