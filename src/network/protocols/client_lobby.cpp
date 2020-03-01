@@ -1190,7 +1190,7 @@ void ClientLobby::backToLobby(Event *event)
         // I18N: Error message shown when all players will go back to lobby
         // when server owner quited the game
         if (!STKHost::get()->isClientServer())
-            msg = _("Server owner quited the game.");
+            msg = _("Server owner quit the game");
         break;
     default:
         break;
