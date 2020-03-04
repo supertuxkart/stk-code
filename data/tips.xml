@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tips>
     <tipset id="general">
-        <tip text="The GUI skin can be changed in the UI options."/>
-        <tip text="An UI option allows to see other karts' powerups."/>
+        <tip text="The UI skin can be changed in the UI options."/>
+        <tip text="You can see other karts' powerups by enabling it in the UI options."/>
         <tip text="The font size can be changed in the UI options."/>
-        <tip text="The help menu has many useful informations."/>
+        <tip text="The help menu has lots of useful information."/>
         <tip text="In single-player, you can watch and challenge recorded time-trials."/>
         <tip text="You can visit https://supertuxkart.net/ for more information about the game."/>
     </tipset>
@@ -20,8 +20,8 @@
         <tip text="First and foremost, focus on where your kart is going."/>
         <tip text="The rescue key (button) is very useful."/>
         <tip text="Be careful when close to other karts, they may attack you!"/>
-        <tip text="Basketballs can be destroyed using precise backward shots with a bowling ball, cake or plunger."/>
-        <tip text="Try to avoid crashing into other karts unless you want to throw them off the track."/>
+        <tip text="Basketballs can be destroyed using precise backward shots with a bowling ball, cake, or plunger."/>
+        <tip text="Try to avoid crashing into other the backs of other karts, as it will slow you down."/>
     </tipset>
     <tipset id="soccer">
         <tip text="You can use bowling balls to push and block the ball."/>
