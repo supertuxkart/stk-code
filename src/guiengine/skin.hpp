@@ -208,6 +208,8 @@ namespace GUIEngine
         int m_left_border, m_right_border, m_top_border, m_bottom_border;
         bool m_preserve_h_aspect_ratios;
         float m_hborder_out_portion, m_vborder_out_portion;
+        float m_horizontal_inner_padding, m_vertical_inner_padding;
+        float m_horizontal_margin, m_vertical_margin;
 
         // this parameter is a bit special since it's the only one that can
         // change at runtime
@@ -221,6 +223,7 @@ namespace GUIEngine
         static const int RIGHT = 4;
         static const int TOP = 8;
         static const int BOTTOM = 16;
+        static const int ALL = BODY+LEFT+RIGHT+TOP+BOTTOM;
 
         core::rect<s32> m_source_area_left;
         core::rect<s32> m_source_area_center;
@@ -433,6 +436,27 @@ namespace GUIEngine
         const std::string& getColorEmojiTTF() const;
 
         std::string getThemedIcon(const std::string& relative_path) const;
+
+        float getScalingFactor(std::string params, float height);
     };   // Skin
 }   // guiengine
+
+namespace SkinConfig
+{
+    enum options {
+        MARGIN,
+        BORDER,
+        PADDING,
+        TOP,
+        BOTTOM,
+        LEFT,
+        RIGHT,
+        HORIZONTAL,
+        VERTICAL
+    };
+    float getVerticalInnerPadding(int wtype, GUIEngine::Widget* widget);
+    float getHorizontalInnerPadding(int wtype, GUIEngine::Widget* widget);
+    float getInnerPadding(int wtype, int rtype, int axis);
+    float getValue(int value_type, int widget_type, int ribbon_type, int axis);
+}
 #endif

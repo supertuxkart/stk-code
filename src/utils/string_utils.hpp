@@ -47,9 +47,8 @@ namespace StringUtils
     std::string removeExtension(const std::string& filename);
     std::string getExtension(const std::string& filename);
 
-    bool notEmpty(const irr::core::stringw& input);
     std::string ticksTimeToString(int time);
-    std::string timeToString(float time, unsigned int precision=2,
+    std::string timeToString(float time, unsigned int precision = 3,
                              bool display_minutes_if_zero = true, bool display_hours = false);
     irr::core::stringw loadingDots(float interval = 0.5f, int max_dots = 3);
     irr::core::stringw loadingDots(const irr::core::stringw& s);

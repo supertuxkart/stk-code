@@ -23,6 +23,7 @@
 #include "input/gamepad_android_config.hpp"
 #include "input/keyboard_config.hpp"
 #include "io/xml_node.hpp"
+#include "io/utf_writer.hpp"
 #include "utils/log.hpp"
 
 #include <SKeyMap.h>
@@ -73,6 +74,7 @@ DeviceConfig::DeviceConfig()
     m_name    = "";
     m_enabled = true;
     m_plugged = 0;
+    m_config_name= L"";
 }   // DeviceConfig
 
 // ------------------------------------------------------------------------
@@ -291,7 +293,10 @@ bool DeviceConfig::doGetAction(Input::InputType    type,
 void DeviceConfig::save (std::ofstream& stream)
 {
     stream << "enabled=\""
-        << (m_enabled ? "true\">\n" : "false\">\n");
+        << (m_enabled ? "true\"" : "false\"") 
+        << " configName=\"" 
+        << StringUtils::xmlEncode(m_config_name)
+        << "\">\n ";
 
     for(int n = 0; n < PA_COUNT; n++) // Start at 0?
     {
@@ -312,6 +317,7 @@ bool DeviceConfig::load(const XMLNode *config)
 {
     config->get("name", &m_name);
     config->get("enabled", &m_enabled);
+    config->getAndDecode("configName", &m_config_name);
     bool error = false;
     for(unsigned int i=0; i<config->getNumNodes(); i++)
     {

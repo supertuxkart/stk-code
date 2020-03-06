@@ -38,9 +38,6 @@ private:
      *  a unique number for each ball. */
     int m_id;
 
-    /** A class variable which stores the next id number to use. */
-    static int m_next_id;
-
     /** A class variable to store the default interval size. */
     static float m_st_interval;
 

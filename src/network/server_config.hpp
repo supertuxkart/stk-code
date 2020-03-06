@@ -88,7 +88,7 @@ namespace ServerConfig
         StringToUIntServerConfigParam;
     // ========================================================================
     SERVER_CFG_PREFIX StringServerConfigParam m_server_name
-        SERVER_CFG_DEFAULT(StringServerConfigParam("stk server", "server-name",
+        SERVER_CFG_DEFAULT(StringServerConfigParam("STK Server", "server-name",
         "Name of server, encode in XML if you want to use unicode "
         "characters."));
 
@@ -169,7 +169,7 @@ namespace ServerConfig
     SERVER_CFG_PREFIX FloatServerConfigParam m_validation_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "validation-timeout",
         "Timeout in seconds for validation of clients in wan, currently "
-        "stk will use the stk-addons server to share AES key between the client "
+        "STK will use the stk-addons server to share AES key between the client "
         "and server."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_validating_player
@@ -184,12 +184,14 @@ namespace ServerConfig
         "behind a firewall."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_ipv6_server
-        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ipv6-server",
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "ipv6-server",
         "Enable to allow IPv6 connection if you have a public IPv6 address. "
         "STK currently uses dual-stack mode which requires server to have both "
-        "IPv4 and IPv6 and listen to same port, firewalled-server will be "
-        "disabled so you need to make sure this server has port-forwarding "
-        "configured properly if needed."));
+        "IPv4 and IPv6 and listen to same port. If STK detects your server "
+        "has no public IPv6 address or port differs between IPv4 and IPv6 "
+        "then it will use IPv4 only socket. For system which doesn't support "
+        "dual-stack socket (like OpenBSD) you may fail to be connected by "
+        "IPv4 clients."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_owner_less
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "owner-less",
@@ -243,7 +245,7 @@ namespace ServerConfig
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_ranked
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ranked",
-        "Server will submit ranking to stk addons server "
+        "Server will submit ranking to stk-addons server "
         "for linear race games, you require permission for that. "
         "validating-player, auto-end, strict-player and owner-less will be "
         "turned on."));
@@ -351,7 +353,7 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(StringServerConfigParam("stkservers.db",
         "database-file",
         "Database filename for sqlite to use, it can be shared for all "
-        "servers created in this machine, and stk will create specific table "
+        "servers created in this machine, and STK will create specific table "
         "for each server. You need to create the database yourself first, see "
         "NETWORKING.md for details"));
 
@@ -406,6 +408,16 @@ namespace ServerConfig
         SERVER_CFG_DEFAULT(StringServerConfigParam("ip_mapping",
         "ip-geolocation-table",
         "IP geolocation table, you only need this table if you want to "
+        "geolocate IP from non-stk-addons connection, as all validated "
+        "players connecting from stk-addons will provide the location info, "
+        "you need to create the table first, see NETWORKING.md for details, "
+        "empty to disable. "
+        "This table can be shared for all servers if you use the same name."));
+
+    SERVER_CFG_PREFIX StringServerConfigParam m_ipv6_geolocation_table
+        SERVER_CFG_DEFAULT(StringServerConfigParam("ipv6_mapping",
+        "ipv6-geolocation-table",
+        "IPv6 geolocation table, you only need this table if you want to "
         "geolocate IP from non-stk-addons connection, as all validated "
         "players connecting from stk-addons will provide the location info, "
         "you need to create the table first, see NETWORKING.md for details, "

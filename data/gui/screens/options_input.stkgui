@@ -7,7 +7,7 @@
 
         <div width="100%" height="91%" layout="horizontal-row" >
 
-            <vertical-tabs id="options_choice" height="100%" width="18%">
+            <vertical-tabs id="options_choice" height="100%" width="20%">
                 <icon-button id="tab_general" width="128" height="128" icon="gui/icons/options_general.png"
                         I18N="Section in the settings menu" text="General"/>
                 <icon-button id="tab_video" width="128" height="128" icon="gui/icons/options_video.png"
@@ -26,7 +26,7 @@
 
             <spacer width="2%" height="100%"/>
 
-            <box width="80%" height="100%" layout="vertical-row">
+            <box width="78%" height="100%" layout="vertical-row">
                 <label width="100%"
                     I18N="In the input configuration screen"
                     text="Press enter or double-click on a device to configure it"

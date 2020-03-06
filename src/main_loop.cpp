@@ -35,8 +35,8 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "input/input_manager.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
+#include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
 #include "network/network_timer_synchronizer.hpp"
 #include "network/protocols/game_protocol.hpp"
@@ -130,8 +130,10 @@ float MainLoop::getLimitedDt()
             if (first_out_focus)
             {
                 first_out_focus = false;
-                music_manager->pauseMusic();
-                SFXManager::get()->pauseAll();
+                if (music_manager)
+                    music_manager->pauseMusic();
+                if (SFXManager::get())
+                    SFXManager::get()->pauseAll();
                 PlayerManager::get()->save();
                 if (addons_manager->hasDownloadedIcons())
                     addons_manager->saveInstalled();
@@ -141,8 +143,10 @@ float MainLoop::getLimitedDt()
             has_focus = dev->isWindowFocused();
             if (has_focus && win_active)
             {
-                music_manager->resumeMusic();
-                SFXManager::get()->resumeAll();
+                if (music_manager)
+                    music_manager->resumeMusic();
+                if (SFXManager::get())
+                    SFXManager::get()->resumeAll();
                 // Improve rubber banding effects of rewinders when going
                 // back to phone, because the smooth timer is paused
                 if (World::getWorld() && RewindManager::isEnabled())
@@ -154,7 +158,7 @@ float MainLoop::getLimitedDt()
     float dt = 0;
 
     // In profile mode without graphics, run with a fixed dt of 1/60
-    if ((ProfileWorld::isProfileMode() && ProfileWorld::isNoGraphics()) ||
+    if ((ProfileWorld::isProfileMode() && GUIEngine::isNoGraphics()) ||
         UserConfigParams::m_arena_ai_stats)
     {
         return 1.0f/60.0f;
@@ -172,7 +176,7 @@ float MainLoop::getLimitedDt()
             {
 #ifndef SERVER_ONLY
                 if (UserConfigParams::m_artist_debug_mode &&
-                    !ProfileWorld::isNoGraphics())
+                    !GUIEngine::isNoGraphics())
                 {
                     core::stringw err = L"System clock running backwards in"
                         " networking game.";
@@ -287,9 +291,8 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
     if (!World::getWorld())  return;   // No race on atm - i.e. we are in menu
 
     // The race event manager will update world in case of an online race
-    if ( RaceEventManager::getInstance() && 
-         RaceEventManager::getInstance()->isRunning() )
-        RaceEventManager::getInstance()->update(ticks, fast_forward);
+    if (RaceEventManager::get() && RaceEventManager::get()->isRunning())
+        RaceEventManager::get()->update(ticks, fast_forward);
     else
         World::getWorld()->updateWorld(ticks);
 }   // updateRace
@@ -431,7 +434,7 @@ void MainLoop::run()
 
             if (!m_request_abort)
             {
-                if (!ProfileWorld::isNoGraphics())
+                if (!GUIEngine::isNoGraphics())
                 {
                     SFXManager::get()->quickSound("anvil");
                     if (!STKHost::get()->getErrorMessage().empty())
@@ -464,13 +467,13 @@ void MainLoop::run()
 
             if (World::getWorld())
             {
-                race_manager->clearNetworkGrandPrixResult();
-                race_manager->exitRace();
+                RaceManager::get()->clearNetworkGrandPrixResult();
+                RaceManager::get()->exitRace();
             }
 
             if (exist_host == true)
             {
-                if (!ProfileWorld::isNoGraphics())
+                if (!GUIEngine::isNoGraphics())
                 {
                     StateManager::get()->resetAndSetStack(
                         NetworkConfig::get()->getResetScreens().data());
@@ -491,7 +494,7 @@ void MainLoop::run()
         if (!m_abort)
         {
             float frame_duration = num_steps * dt;
-            if (!ProfileWorld::isNoGraphics())
+            if (!GUIEngine::isNoGraphics())
             {
                 PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
                 if (World::getWorld())
@@ -606,7 +609,7 @@ void MainLoop::run()
 
             // Handle controller the last to avoid slow PC sending actions too 
             // late
-            if (!ProfileWorld::isNoGraphics())
+            if (!GUIEngine::isNoGraphics())
             {
                 // User aborted (e.g. closed window)
                 bool abort = !irr_driver->getDevice()->run();
@@ -658,7 +661,7 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 #else
     if ((NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer()) ||
-        ProfileWorld::isNoGraphics())
+        GUIEngine::isNoGraphics())
     {
         return;
     }

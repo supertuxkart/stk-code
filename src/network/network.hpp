@@ -36,7 +36,7 @@
 
 class BareNetworkString;
 class NetworkString;
-class TransportAddress;
+class SocketAddress;
 
 /** \class EnetHost
  *  A small wrapper around enet to allow sending and receiving
@@ -47,6 +47,8 @@ class Network
 private:
     /** ENet host interfacing sockets. */
     ENetHost*  m_host;
+
+    uint16_t m_port;
 
     /** Where to log packets. If NULL for FILE* logging is disabled. */
     static Synchronised<FILE*> m_log_file;
@@ -63,14 +65,15 @@ public:
     static void openLog();
     static void logPacket(const BareNetworkString &ns, bool incoming);
     static void closeLog();
-    ENetPeer *connectTo(const TransportAddress &address);
+    ENetPeer *connectTo(const ENetAddress &address);
     void     sendRawPacket(const BareNetworkString &buffer,
-                           const TransportAddress& dst);
+                           const SocketAddress& dst);
     int receiveRawPacket(char *buffer, int buf_len,
-                         TransportAddress* sender, int max_tries = -1);
+                         SocketAddress* sender, int max_tries = -1);
     void     broadcastPacket(NetworkString *data,
                              bool reliable = true);
-
+    // ------------------------------------------------------------------------
+    uint16_t getPort() const { return m_port; }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */
     ENetHost* getENetHost() { return m_host; }

@@ -31,9 +31,12 @@
 
 #ifdef ENABLE_SOUND
 #  ifdef __APPLE__
+#    define OPENAL_DEPRECATED
 #    include <OpenAL/al.h>
+#    include <OpenAL/alc.h>
 #  else
 #    include <AL/al.h>
+#    include <AL/alc.h>
 #  endif
 #else
   typedef unsigned int ALuint;
@@ -95,7 +98,7 @@ public:
       *  Entries for custom SFX sounds.  These are unique for each kart.
       * eg. kart->playCustomSFX(SFX_MANAGER::CUSTOM_HORN)
       */
-    enum CustomSFX
+    enum CustomSFX : int
     {
         CUSTOM_HORN,    //!< Replaces default horn
         CUSTOM_CRASH,   //!< Played when colliding with another kart

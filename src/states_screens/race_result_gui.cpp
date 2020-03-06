@@ -95,7 +95,7 @@ void RaceResultGUI::init()
     music_manager->stopMusic();
 
     bool human_win = true;
-    unsigned int num_karts = race_manager->getNumberOfKarts();
+    unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
         const AbstractKart *kart = World::getWorld()->getKart(kart_id);
@@ -129,9 +129,9 @@ void RaceResultGUI::init()
 
     // Calculate screenshot scrolling parameters
     const std::vector<std::string> tracks =
-        race_manager->getGrandPrix().getTrackNames();
+        RaceManager::get()->getGrandPrix().getTrackNames();
     int n_tracks = (int)tracks.size();
-    int currentTrack = race_manager->getTrackNumber();
+    int currentTrack = RaceManager::get()->getTrackNumber();
     m_start_track = currentTrack;
     if (n_tracks > m_max_tracks)
     {
@@ -147,7 +147,10 @@ void RaceResultGUI::init()
 #ifndef SERVER_ONLY
     if (!human_win && !NetworkConfig::get()->isNetworking())
     {
-        core::stringw tip = TipsManager::get()->getTip("race");
+        std::string tipset = "race";
+        if (RaceManager::get()->isSoccerMode())
+            tipset = "soccer";
+        core::stringw tip = TipsManager::get()->getTip(tipset);
         core::stringw tips_string = _("Tip: %s", tip);
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
     }
@@ -179,7 +182,7 @@ void RaceResultGUI::enableAllButtons()
     GUIEngine::RibbonWidget *operations = getWidget<GUIEngine::RibbonWidget>("operations");
     operations->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         enableGPProgress();
     }
@@ -203,8 +206,8 @@ void RaceResultGUI::enableAllButtons()
     int n = (int)PlayerManager::getCurrentPlayer()
         ->getRecentlyCompletedChallenges().size();
     if (n > 0 &&
-         (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
-          race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
+         (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+          RaceManager::get()->getTrackNumber() + 1 == RaceManager::get()->getNumOfTracks() ) )
     {
         middle->setLabel(n == 1 ? _("You completed a challenge!")
             : _("You completed challenges!"));
@@ -212,7 +215,7 @@ void RaceResultGUI::enableAllButtons()
         middle->setVisible(true);
         operations->select("middle", PLAYER_ID_GAME_MASTER);
     }
-    else if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    else if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         // In case of a GP:
         // ----------------
@@ -228,7 +231,7 @@ void RaceResultGUI::enableAllButtons()
         left->setImage("gui/icons/green_check.png");
         left->setVisible(true);
 
-        if (race_manager->getTrackNumber() + 1 < race_manager->getNumOfTracks()) 
+        if (RaceManager::get()->getTrackNumber() + 1 < RaceManager::get()->getNumOfTracks()) 
         {
             right->setLabel(_("Abort Grand Prix"));
             right->setImage("gui/icons/race_giveup.png");
@@ -254,7 +257,7 @@ void RaceResultGUI::enableAllButtons()
         left->setImage("gui/icons/restart.png");
         left->setVisible(true);
         operations->select("left", PLAYER_ID_GAME_MASTER);
-        if (race_manager->raceWasStartedFromOverworld())
+        if (RaceManager::get()->raceWasStartedFromOverworld())
         {
             middle->setVisible(false);
             right->setLabel(_("Back to challenge selection"));
@@ -263,7 +266,7 @@ void RaceResultGUI::enableAllButtons()
         else
         {
             middle->setImage("gui/icons/main_race.png");
-            if (race_manager->isRecordingRace())
+            if (RaceManager::get()->isRecordingRace())
             {
                 middle->setLabel(_("Race against the new ghost replay"));
                 middle->setVisible(!World::getWorld()->hasRaceEndedEarly());
@@ -284,7 +287,7 @@ void RaceResultGUI::enableAllButtons()
 void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     const std::string& name, const int playerID)
 {
-    int n_tracks = race_manager->getGrandPrix().getNumberOfTracks();
+    int n_tracks = RaceManager::get()->getGrandPrix().getNumberOfTracks();
     if (name == "up_button" && n_tracks > m_max_tracks && m_start_track > 0)
     {
         m_start_track--;
@@ -316,13 +319,13 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             if (action == "right") // Quit server (return to online lan / wan menu)
             {
-                race_manager->clearNetworkGrandPrixResult();
+                RaceManager::get()->clearNetworkGrandPrixResult();
                 if (STKHost::existHost())
                 {
                     STKHost::get()->shutdown();
                 }
-                race_manager->exitRace();
-                race_manager->setAIKartOverride("");
+                RaceManager::get()->exitRace();
+                RaceManager::get()->setAIKartOverride("");
                 StateManager::get()->resetAndSetStack(
                     NetworkConfig::get()->getResetScreens().data());
                 NetworkConfig::get()->unsetNetworking();
@@ -338,13 +341,13 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         int n = (int)player->getRecentlyCompletedChallenges().size();
 
         if (n > 0 &&
-             (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
-              race_manager->getTrackNumber() + 1 == race_manager->getNumOfTracks() ) )
+             (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+              RaceManager::get()->getTrackNumber() + 1 == RaceManager::get()->getNumOfTracks() ) )
 
         {
             if (action == "middle")
             {
-                if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+                if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
                 {
                     cleanupGPProgress();
                 }
@@ -380,10 +383,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 
                     CutsceneWorld::setUseDuration(true);
                     StateManager::get()->enterGameState();
-                    race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-                    race_manager->setNumKarts(0);
-                    race_manager->setNumPlayers(0);
-                    race_manager->startSingleRace("endcutscene", 999, false);
+                    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                    RaceManager::get()->setNumKarts(0);
+                    RaceManager::get()->setNumPlayers(0);
+                    RaceManager::get()->startSingleRace("endcutscene", 999, false);
 
                     std::vector<std::string> parts;
                     parts.push_back("endcutscene");
@@ -400,18 +403,18 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 
                     CutsceneWorld::setUseDuration(false);
                     StateManager::get()->enterGameState();
-                    race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-                    race_manager->setNumKarts(0);
-                    race_manager->setNumPlayers(0);
-                    race_manager->startSingleRace("featunlocked", 999, race_manager->raceWasStartedFromOverworld());
+                    RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                    RaceManager::get()->setNumKarts(0);
+                    RaceManager::get()->setNumPlayers(0);
+                    RaceManager::get()->startSingleRace("featunlocked", 999, RaceManager::get()->raceWasStartedFromOverworld());
 
                     FeatureUnlockedCutScene* scene =
                         FeatureUnlockedCutScene::getInstance();
 
-                    scene->addTrophy(race_manager->getDifficulty(),false);
-                    scene->findWhatWasUnlocked(race_manager->getDifficulty(),unlocked);
+                    scene->addTrophy(RaceManager::get()->getDifficulty(),false);
+                    scene->findWhatWasUnlocked(RaceManager::get()->getDifficulty(),unlocked);
                     scene->push();
-                    race_manager->setAIKartOverride("");
+                    RaceManager::get()->setAIKartOverride("");
 
                     std::vector<std::string> parts;
                     parts.push_back("featunlocked");
@@ -428,13 +431,13 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
 
         // Next check for GP
         // -----------------
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             if (action == "left" || action == "middle")        // Next GP
             {
                 cleanupGPProgress();
                 StateManager::get()->popMenu();
-                race_manager->next();
+                RaceManager::get()->next();
             }
             else if (action == "right")        // Abort
             {
@@ -452,21 +455,21 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         StateManager::get()->popMenu();
         if (action == "left")        // Restart
         {
-            race_manager->rerunRace();
+            RaceManager::get()->rerunRace();
         }
         else if (action == "middle")                 // Setup new race
         {
             // Save current race data for race against new ghost
-            std::string track_name = race_manager->getTrackName();
-            int laps = race_manager->getNumLaps();
-            bool reverse = race_manager->getReverseTrack();
-            bool new_ghost_race = race_manager->isRecordingRace();
+            std::string track_name = RaceManager::get()->getTrackName();
+            int laps = RaceManager::get()->getNumLaps();
+            bool reverse = RaceManager::get()->getReverseTrack();
+            bool new_ghost_race = RaceManager::get()->isRecordingRace();
 
-            race_manager->exitRace();
-            race_manager->setAIKartOverride("");
+            RaceManager::get()->exitRace();
+            RaceManager::get()->setAIKartOverride("");
 
             //If pressing continue quickly in a losing challenge
-            if (race_manager->raceWasStartedFromOverworld())
+            if (RaceManager::get()->raceWasStartedFromOverworld())
             {
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                 OverWorld::enterOverWorld();
@@ -478,16 +481,16 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 unsigned long long int last_uid = ReplayRecorder::get()->getLastUID();
                 ReplayPlay::get()->setReplayFileByUID(last_uid);
 
-                race_manager->setRecordRace(true);
-                race_manager->setRaceGhostKarts(true);
+                RaceManager::get()->setRecordRace(true);
+                RaceManager::get()->setRaceGhostKarts(true);
 
-                race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+                RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers());
 
                 // Disable accidentally unlocking of a challenge
                 PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
-                race_manager->setReverseTrack(reverse);
-                race_manager->startSingleRace(track_name, laps, false);
+                RaceManager::get()->setReverseTrack(reverse);
+                RaceManager::get()->startSingleRace(track_name, laps, false);
             }
             else
             {
@@ -499,11 +502,11 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
         else if (action == "right")        // Back to main
         {
-            race_manager->exitRace();
-            race_manager->setAIKartOverride("");
+            RaceManager::get()->exitRace();
+            RaceManager::get()->setAIKartOverride("");
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
-            if (race_manager->raceWasStartedFromOverworld())
+            if (RaceManager::get()->raceWasStartedFromOverworld())
             {
                 OverWorld::enterOverWorld();
             }
@@ -514,31 +517,6 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             name.c_str());
     return;
 }   // eventCallback
-
-//-----------------------------------------------------------------------------
-/** Sets up the gui to go back to the lobby. Can only be called in case of a
- *  networked game.
- */
-void RaceResultGUI::backToLobby()
-{
-    if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
-        race_manager->getTrackNumber() == race_manager->getNumOfTracks() - 1)
-    {
-        core::stringw msg = _("Network grand prix has been finished.");
-        MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, msg);
-    }
-    race_manager->clearNetworkGrandPrixResult();
-    race_manager->exitRace();
-    race_manager->setAIKartOverride("");
-    GUIEngine::ModalDialog::dismiss();
-    GUIEngine::ScreenKeyboard::dismiss();
-    cleanupGPProgress();
-    if (GUIEngine::getCurrentScreen() != NetworkingLobby::getInstance())
-    {
-        StateManager::get()->resetAndSetStack(
-            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
-    }
-}   // backToLobby
 
 //-----------------------------------------------------------------------------
 void RaceResultGUI::displayCTFResults()
@@ -622,10 +600,10 @@ void RaceResultGUI::displayCTFResults()
         if (ctf->getKartTeam(kart_id) != KART_TEAM_RED)
             continue;
         result_text = kart->getController()->getName();
-        if (race_manager->getKartGlobalPlayerId(kart_id) > -1)
+        if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
         {
             const core::stringw& flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(kart_id).getCountryCode());
+                RaceManager::get()->getKartInfo(kart_id).getCountryCode());
             if (!flag.empty())
             {
                 result_text += L" ";
@@ -670,10 +648,10 @@ void RaceResultGUI::displayCTFResults()
         if (ctf->getKartTeam(kart_id) != KART_TEAM_BLUE)
             continue;
         result_text = kart->getController()->getName();
-        if (race_manager->getKartGlobalPlayerId(kart_id) > -1)
+        if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
         {
             const core::stringw& flag = StringUtils::getCountryFlag(
-                race_manager->getKartInfo(kart_id).getCountryCode());
+                RaceManager::get()->getKartInfo(kart_id).getCountryCode());
             if (!flag.empty())
             {
                 result_text += L" ";
@@ -713,16 +691,16 @@ void RaceResultGUI::displayCTFResults()
 //-----------------------------------------------------------------------------
     void RaceResultGUI::onConfirm()
     {
-        //race_manager->saveGP(); // Save the aborted GP
+        //RaceManager::get()->saveGP(); // Save the aborted GP
         GUIEngine::ModalDialog::dismiss();
         cleanupGPProgress();
         StateManager::get()->popMenu();
-        race_manager->exitRace();
-        race_manager->setAIKartOverride("");
+        RaceManager::get()->exitRace();
+        RaceManager::get()->setAIKartOverride("");
         StateManager::get()->resetAndGoToScreen(
             MainMenuScreen::getInstance());
 
-        if (race_manager->raceWasStartedFromOverworld())
+        if (RaceManager::get()->raceWasStartedFromOverworld())
         {
             OverWorld::enterOverWorld();
         }
@@ -742,13 +720,13 @@ void RaceResultGUI::displayCTFResults()
         WorldWithRank *rank_world = (WorldWithRank*)World::getWorld();
 
         unsigned int first_position = 1;
-        unsigned int sta = race_manager->getNumSpareTireKarts();
-        if (race_manager->isFollowMode())
+        unsigned int sta = RaceManager::get()->getNumSpareTireKarts();
+        if (RaceManager::get()->isFollowMode())
             first_position = 2;
 
         // Use only the karts that are supposed to be displayed (and
         // ignore e.g. the leader in a FTL race).
-        unsigned int num_karts = race_manager->getNumberOfKarts() - first_position + 1 - sta;
+        unsigned int num_karts = RaceManager::get()->getNumberOfKarts() - first_position + 1 - sta;
 
         // Remove previous entries to avoid reserved kart in network being displayed
         m_all_row_infos.clear();
@@ -763,12 +741,12 @@ void RaceResultGUI::displayCTFResults()
 
         FreeForAll* ffa = dynamic_cast<FreeForAll*>(World::getWorld());
 
-        int time_precision = race_manager->currentModeTimePrecision();
-        bool active_gp = (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX);
+        int time_precision = RaceManager::get()->currentModeTimePrecision();
+        bool active_gp = (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX);
 
         auto cl = LobbyProtocol::get<ClientLobby>();
         for (unsigned int position = first_position;
-        position <= race_manager->getNumberOfKarts() - sta; position++)
+        position <= RaceManager::get()->getNumberOfKarts() - sta; position++)
         {
             const AbstractKart *kart = rank_world->getKartAtPosition(position);
 
@@ -778,10 +756,10 @@ void RaceResultGUI::displayCTFResults()
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
             ri->m_kart_name = kart->getController()->getName();
-            if (race_manager->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
+            if (RaceManager::get()->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
             {
                 const core::stringw& flag = StringUtils::getCountryFlag(
-                    race_manager->getKartInfo(kart->getWorldKartId()).getCountryCode());
+                    RaceManager::get()->getKartInfo(kart->getWorldKartId()).getCountryCode());
                 if (!flag.empty())
                 {
                     ri->m_kart_name += L" ";
@@ -793,12 +771,12 @@ void RaceResultGUI::displayCTFResults()
             ri->m_kart_icon = icon;
 
             // FTL karts will get a time assigned, they are not shown as eliminated
-            if (kart->isEliminated() && !(race_manager->isFollowMode()))
+            if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
-            else if (   race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
-                     || race_manager->isCTFMode())
+            else if (   RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
+                     || RaceManager::get()->isCTFMode())
             {
                 assert(ffa);
                 ri->m_finish_time_string =
@@ -901,7 +879,7 @@ void RaceResultGUI::displayCTFResults()
         m_table_width = m_width_icon + m_width_column_space
             + m_width_kart_name;
 
-        if (!race_manager->isFollowMode())
+        if (!RaceManager::get()->isFollowMode())
             m_table_width += m_width_finish_time + m_width_column_space;
 
         // Only in GP mode are the points displayed.
@@ -1025,7 +1003,7 @@ void RaceResultGUI::displayCTFResults()
                     RowInfo *ri = &(m_all_row_infos[i]);
                     ri->m_x_pos = (float)m_leftmost_column;
                 }
-                if (race_manager->getMajorMode() !=
+                if (RaceManager::get()->getMajorMode() !=
                     RaceManager::MAJOR_MODE_GRAND_PRIX)
                 {
                     m_animation_state = RR_WAIT_TILL_END;
@@ -1088,12 +1066,12 @@ void RaceResultGUI::displayCTFResults()
             }
             break;
         case RR_WAIT_TILL_END:
-            if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
                 displayGPProgress();
             if (m_timer - m_time_rotation > 1.0f &&
                 dynamic_cast<DemoWorld*>(World::getWorld()))
             {
-                race_manager->exitRace();
+                RaceManager::get()->exitRace();
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             }
             break;
@@ -1102,11 +1080,11 @@ void RaceResultGUI::displayCTFResults()
         // Second phase: update X and Y positions for the various animations
         // =================================================================
         float v = 0.9f*UserConfigParams::m_width / m_time_single_scroll;
-        if (race_manager->isSoccerMode())
+        if (RaceManager::get()->isSoccerMode())
         {
             displaySoccerResults();
         }
-        else if (race_manager->isCTFMode())
+        else if (RaceManager::get()->isCTFMode())
         {
             displayCTFResults();
         }
@@ -1136,7 +1114,7 @@ void RaceResultGUI::displayCTFResults()
                     WorldWithRank *wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
                     assert(wwr);
                     int most_points;
-                    if (race_manager->isFollowMode())
+                    if (RaceManager::get()->isFollowMode())
                         most_points = wwr->getScoreForPosition(2);
                     else
                         most_points = wwr->getScoreForPosition(1);
@@ -1167,7 +1145,7 @@ void RaceResultGUI::displayCTFResults()
         }
 
         // Display highscores
-        if (race_manager->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+        if (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
             m_animation_state == RR_RACE_RESULT)
         {
             displayPostRaceInfo();
@@ -1182,24 +1160,24 @@ void RaceResultGUI::displayCTFResults()
     void RaceResultGUI::determineGPLayout()
     {
 #ifndef SERVER_ONLY
-        unsigned int num_karts = race_manager->getNumberOfKarts();
+        unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
         std::vector<int> old_rank(num_karts, 0);
         // Update the kart GP ranks
         // This is useful, e.g., when continuing a saved GP.
-        race_manager->computeGPRanks();
+        RaceManager::get()->computeGPRanks();
 
-        int time_precision = race_manager->currentModeTimePrecision();
+        int time_precision = RaceManager::get()->currentModeTimePrecision();
 
         float max_time = 0;
         /* Compute highest overall time to know if hours should be displayed */
         for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
         {
-            max_time = std::max(race_manager->getOverallTime(kart_id), max_time);
+            max_time = std::max(RaceManager::get()->getOverallTime(kart_id), max_time);
         }
 
         for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
         {
-            int rank = race_manager->getKartGPRank(kart_id);
+            int rank = RaceManager::get()->getKartGPRank(kart_id);
             // In case of FTL mode: ignore the leader
             if (rank < 0) continue;
             old_rank[kart_id] = rank;
@@ -1209,10 +1187,10 @@ void RaceResultGUI::displayCTFResults()
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
             ri->m_kart_name = kart->getController()->getName();
-            if (race_manager->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
+            if (RaceManager::get()->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
             {
                 const core::stringw& flag = StringUtils::getCountryFlag(
-                    race_manager->getKartInfo(kart->getWorldKartId()).getCountryCode());
+                    RaceManager::get()->getKartInfo(kart->getWorldKartId()).getCountryCode());
                 if (!flag.empty())
                 {
                     ri->m_kart_name += L" ";
@@ -1221,22 +1199,22 @@ void RaceResultGUI::displayCTFResults()
             }
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
-            if (kart->isEliminated() && !(race_manager->isFollowMode()))
+            if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
             else
             {
-                float time = race_manager->getOverallTime(kart_id);
+                float time = RaceManager::get()->getOverallTime(kart_id);
                 ri->m_finish_time_string
                     = StringUtils::timeToString(time, time_precision, true, /*display hours*/ (max_time > 3599.99f)).c_str();
             }
             ri->m_start_at = m_time_between_rows * rank;
             ri->m_x_pos = (float)UserConfigParams::m_width;
             ri->m_y_pos = (float)(m_top + rank*m_distance_between_rows);
-            int p = race_manager->getKartPrevScore(kart_id);
+            int p = RaceManager::get()->getKartPrevScore(kart_id);
             ri->m_current_displayed_points = (float)p;
-            if (kart->isEliminated() && !(race_manager->isFollowMode()))
+            if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
             {
                 ri->m_new_points = 0;
             }
@@ -1251,17 +1229,17 @@ void RaceResultGUI::displayCTFResults()
 
         // Now update the GP ranks, and determine the new position
         // -------------------------------------------------------
-        race_manager->computeGPRanks();
+        RaceManager::get()->computeGPRanks();
         m_gp_position_was_changed = false;
         for (unsigned int i = 0; i < num_karts; i++)
         {
             int j = old_rank[i];
-            int gp_position = race_manager->getKartGPRank(i);
+            int gp_position = RaceManager::get()->getKartGPRank(i);
             m_gp_position_was_changed |= j != gp_position;
             RowInfo *ri = &(m_all_row_infos[j]);
             ri->m_radius = (j - gp_position)*(int)m_distance_between_rows*0.5f;
             ri->m_centre_point = m_top + (gp_position + j)*m_distance_between_rows*0.5f;
-            int p = race_manager->getKartScore(i);
+            int p = RaceManager::get()->getKartScore(i);
             ri->m_new_overall_points = p;
         }   // i < num_karts
 #endif
@@ -1315,7 +1293,7 @@ void RaceResultGUI::displayCTFResults()
 
         // Only display points in GP mode and when the GP results are displayed.
         // =====================================================================
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
             m_animation_state != RR_RACE_RESULT)
         {
             // Draw the new points
@@ -1559,12 +1537,12 @@ void RaceResultGUI::displayCTFResults()
     // ----------------------------------------------------------------------------
     void RaceResultGUI::enableGPProgress()
     {
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             GUIEngine::Widget* result_table = getWidget("result-table");
             assert(result_table != NULL);
 
-            int currentTrack = race_manager->getTrackNumber();
+            int currentTrack = RaceManager::get()->getTrackNumber();
             int font_height = getFontHeight();
             int w = (int)(UserConfigParams::m_width*0.17);
             int x = (int)(result_table->m_x + result_table->m_w - w - 15);
@@ -1580,7 +1558,7 @@ void RaceResultGUI::displayCTFResults()
             status_label->m_h = font_height;
             status_label->add();
             status_label->setText(_("Track %i/%i", currentTrack + 1,
-                race_manager->getGrandPrix().getNumberOfTracks()), true);
+                RaceManager::get()->getGrandPrix().getNumberOfTracks()), true);
             addGPProgressWidget(status_label);
             y = (status_label->m_y + status_label->m_h + 5);
 
@@ -1703,7 +1681,7 @@ void RaceResultGUI::displayCTFResults()
 
         int current_y = y;
 
-        int time_precision = race_manager->currentModeTimePrecision();
+        int time_precision = RaceManager::get()->currentModeTimePrecision();
 
         // In some case for exemple FTL they will be no highscores
         if (scores != NULL)
@@ -1783,12 +1761,12 @@ void RaceResultGUI::displayCTFResults()
             }
         }
 
-        if (!race_manager->isSoccerMode())
+        if (!RaceManager::get()->isSoccerMode())
         {
             // display lap count
-            if (race_manager->modeHasLaps())
+            if (RaceManager::get()->modeHasLaps())
             {
-                core::stringw laps = _("Laps: %i", race_manager->getNumLaps());
+                core::stringw laps = _("Laps: %i", RaceManager::get()->getNumLaps());
                 current_y += int(m_distance_between_meta_rows * 0.8f * 2);
                 GUIEngine::getFont()->draw(laps,
                     // 0.96 from stkgui
@@ -1797,7 +1775,7 @@ void RaceResultGUI::displayCTFResults()
             }
             // display difficulty
             const core::stringw& difficulty_name =
-                race_manager->getDifficultyName(race_manager->getDifficulty());
+                RaceManager::get()->getDifficultyName(RaceManager::get()->getDifficulty());
             core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
             current_y += int(m_distance_between_meta_rows * 0.8f);
             GUIEngine::getFont()->draw(difficulty_string,
@@ -1805,7 +1783,7 @@ void RaceResultGUI::displayCTFResults()
                 core::recti(x, current_y, UserConfigParams::m_width * 0.96f, current_y + GUIEngine::getFontHeight()),
                 white_color, false, false, nullptr, true);
             // show fastest lap
-            if (race_manager->modeHasLaps())
+            if (RaceManager::get()->modeHasLaps())
             {
                 float best_lap_time = static_cast<LinearWorld*>(World::getWorld())->getFastestLap();
                 // The fastest lap ticks is set to INT_MAX, so the best_lap_time will be
@@ -1845,8 +1823,8 @@ void RaceResultGUI::displayCTFResults()
     void RaceResultGUI::displayScreenShots()
     {
         const std::vector<std::string> tracks =
-            race_manager->getGrandPrix().getTrackNames();
-        int currentTrack = race_manager->getTrackNumber();
+            RaceManager::get()->getGrandPrix().getTrackNames();
+        int currentTrack = RaceManager::get()->getTrackNumber();
 
         int n_sshot = 1;
         for (int i = m_start_track; i < m_end_track; i++)

@@ -154,7 +154,7 @@ void addPowerup(PowerupManager::PowerupType powerup)
 {
     World* world = World::getWorld();
     if (!world) return;
-    for(unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+    for(unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
     {
         AbstractKart* kart = world->getLocalPlayerKart(i);
         kart->setPowerup(powerup, 10000);
@@ -260,7 +260,7 @@ bool handleContextMenuAction(s32 cmd_id)
     }
 
     World *world = World::getWorld();
-    Physics *physics = Physics::getInstance();
+    Physics *physics = Physics::get();
     SP::SPShader* nv = NULL;
 #ifndef SERVER_ONLY
     if (SP::getNormalVisualizer())
@@ -317,7 +317,7 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         irr_driver->resetDebugModes();
 
-        Physics *physics = Physics::getInstance();
+        Physics *physics = Physics::get();
         if (!physics) return false;
         physics->setDebugMode(IrrDebugDrawer::DM_NO_KARTS_GRAPHICS);
         break;
@@ -518,7 +518,7 @@ bool handleContextMenuAction(s32 cmd_id)
     {
         if (!world) return false;
         const unsigned int num_local_players =
-            race_manager->getNumLocalPlayers();
+            RaceManager::get()->getNumLocalPlayers();
         for (unsigned int i = 0; i < num_local_players; i++)
         {
             AbstractKart* kart = world->getLocalPlayerKart(i);
@@ -536,7 +536,7 @@ bool handleContextMenuAction(s32 cmd_id)
         addAttachment(Attachment::ATTACH_PARACHUTE);
         break;
     case DEBUG_ATTACHMENT_EXPLOSION:
-        for (unsigned int i = 0; i < race_manager->getNumLocalPlayers(); i++)
+        for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
             AbstractKart* kart = world->getLocalPlayerKart(i);
             ExplosionAnimation::create(kart, kart->getXYZ(), true);
@@ -824,10 +824,10 @@ bool handleContextMenuAction(s32 cmd_id)
                 }
                 CutsceneWorld::setUseDuration(true);
                 StateManager::get()->enterGameState();
-                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-                race_manager->setNumKarts(0);
-                race_manager->setNumPlayers(0);
-                race_manager->startSingleRace(parts.front(), 999, false);
+                RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                RaceManager::get()->setNumKarts(0);
+                RaceManager::get()->setNumPlayers(0);
+                RaceManager::get()->startSingleRace(parts.front(), 999, false);
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
             });
         break;

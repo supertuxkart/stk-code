@@ -957,6 +957,11 @@ namespace irr
         NSURL* nsurl_val = [NSURL URLWithString:url_nsstring];
         [application openURL:nsurl_val];
     }
+    void CIrrDeviceiOS::debugPrint(const char* line)
+    {
+        NSString* ns = [NSString stringWithUTF8String:line];
+        NSLog(@"%@", ns);
+    }
 }
 
 #ifdef _IRR_COMPILE_WITH_IOS_BUILTIN_MAIN_

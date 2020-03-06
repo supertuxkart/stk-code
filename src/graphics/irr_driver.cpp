@@ -62,7 +62,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "main_loop.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/stk_host.hpp"
@@ -293,7 +292,7 @@ void IrrDriver::updateConfigIfRelevant()
 }   // updateConfigIfRelevant
 core::recti IrrDriver::getSplitscreenWindow(int WindowNum) 
 {
-    const int playernum = race_manager->getNumLocalPlayers();
+    const int playernum = RaceManager::get()->getNumLocalPlayers();
     const float playernum_sqrt = sqrtf((float)playernum);
     
     int rows = int(  UserConfigParams::split_screen_horizontally
@@ -364,7 +363,7 @@ void IrrDriver::initDevice()
     SIrrlichtCreationParameters params;
 
     // If --no-graphics option was used, the null device can still be used.
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         // This code is only executed once. No need to reload the video
         // modes every time the resolution changes.
@@ -548,7 +547,7 @@ void IrrDriver::initDevice()
     // pipeline doesn't work for them. For example some radeon drivers
     // support only GLSL 1.3 and it causes STK to crash. We should force to use
     // fixed pipeline in this case.
-    if (!ProfileWorld::isNoGraphics() &&
+    if (!GUIEngine::isNoGraphics() &&
         (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE) ||
         (CVS->isGLSL() && !CentralVideoSettings::m_supports_sp)))
     {
@@ -561,7 +560,7 @@ void IrrDriver::initDevice()
 #endif
 
 #ifndef SERVER_ONLY
-    if (!ProfileWorld::isNoGraphics() && recreate_device)
+    if (!GUIEngine::isNoGraphics() && recreate_device)
     {
         m_device->closeDevice();
         m_device->clearSystemMessages();
@@ -698,7 +697,7 @@ void IrrDriver::initDevice()
 #endif
 
     // Only change video driver settings if we are showing graphics
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         m_device->setWindowClass("SuperTuxKart");
         m_device->setWindowCaption(L"SuperTuxKart");
@@ -742,12 +741,12 @@ void IrrDriver::initDevice()
 #ifndef SERVER_ONLY
     // set cursor visible by default (what's the default is not too clearly documented,
     // so let's decide ourselves...)
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
         m_device->getCursorControl()->setVisible(true);
 #endif
     m_pointer_shown = true;
 
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     m_device->registerGetMovedHeightFunction([]
@@ -844,7 +843,7 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
                               std::string *version)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
         
     *vendor   = (char*)glGetString(GL_VENDOR  );
@@ -857,7 +856,7 @@ void IrrDriver::getOpenGLData(std::string *vendor, std::string *renderer,
 void IrrDriver::showPointer()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     if (!m_pointer_shown)
@@ -872,7 +871,7 @@ void IrrDriver::showPointer()
 void IrrDriver::hidePointer()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     // always visible in artist debug mode, to be able to use the context menu
@@ -959,7 +958,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     track_manager->removeAllCachedData();
     delete attachment_manager;
     attachment_manager = NULL;
-    projectile_manager->removeTextures();
+    ProjectileManager::get()->removeTextures();
     ItemManager::removeTextures();
     kart_properties_manager->unloadAllKarts();
     delete powerup_manager;
@@ -1053,7 +1052,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
 
     powerup_manager->loadPowerupsModels();
     ItemManager::loadDefaultItemMeshes();
-    projectile_manager->loadData();
+    ProjectileManager::get()->loadData();
     Referee::init();
     GUIEngine::addLoadingIcon(
         irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON,"gift.png")) );
@@ -1944,7 +1943,7 @@ void IrrDriver::doScreenShot()
             timeInfo->tm_mday, timeInfo->tm_hour,
             timeInfo->tm_min, timeInfo->tm_sec);
 
-    std::string track_name = race_manager->getTrackName();
+    std::string track_name = RaceManager::get()->getTrackName();
     if (World::getWorld() == NULL) track_name = "menu";
     std::string path = file_manager->getScreenshotDir()+track_name+"-"
                      + time_buffer+".png";
@@ -2023,9 +2022,9 @@ void IrrDriver::update(float dt, bool is_loading)
                 irr_driver->getActualScreenSize().Height);
         }
 
-        if (!is_loading && Physics::getInstance())
+        if (!is_loading && Physics::get())
         {
-            IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
+            IrrDebugDrawer* debug_drawer = Physics::get()->getDebugDrawer();
             if (debug_drawer != NULL && debug_drawer->debugEnabled())
             {
                 debug_drawer->beginNextFrame();
@@ -2148,7 +2147,7 @@ void IrrDriver::setRecording(bool val)
     if (val == true)
     {
         std::string track_name = World::getWorld() != NULL ?
-            race_manager->getTrackName() : "menu";
+            RaceManager::get()->getTrackName() : "menu";
         time_t rawtime;
         time(&rawtime);
         tm* timeInfo = localtime(&rawtime);

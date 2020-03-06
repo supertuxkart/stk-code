@@ -30,7 +30,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/cannon_animation.hpp"
 #include "karts/skidding.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
 
 /** Constructor for a check cannon.
@@ -43,7 +42,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
     std::string p1("target-p1");
     std::string p2("target-p2");
 
-    if (race_manager->getReverseTrack())
+    if (RaceManager::get()->getReverseTrack())
     {
         p1 = "p1";
         p2 = "p2";
@@ -55,9 +54,10 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
 
     m_curve = new Ipo(*(node.getNode("curve")),
                       /*fps*/25,
-                      /*reverse*/race_manager->getReverseTrack());
+                      /*reverse*/RaceManager::get()->getReverseTrack());
 
 #if defined(DEBUG) && !defined(SERVER_ONLY)
+    m_show_curve = NULL;
     if(UserConfigParams::m_track_debug)
     {
         m_show_curve = new ShowCurve(0.5f, 0.5f);
@@ -65,7 +65,7 @@ CheckCannon::CheckCannon(const XMLNode &node,  unsigned int index)
         for(unsigned int i=0; i<p.size(); i++)
             m_show_curve->addPoint(p[i]);
     }
-    if (UserConfigParams::m_check_debug && !ProfileWorld::isNoGraphics())
+    if (UserConfigParams::m_check_debug && !GUIEngine::isNoGraphics())
     {
         m_debug_target_dy_dc = std::make_shared<SP::SPDynamicDrawCall>
             (scene::EPT_TRIANGLE_STRIP,
@@ -99,8 +99,7 @@ CheckCannon::~CheckCannon()
 {
     delete m_curve;
 #if defined(DEBUG) && !defined(SERVER_ONLY)
-    if(UserConfigParams::m_track_debug)
-        delete m_show_curve;
+    delete m_show_curve;
     if (m_debug_target_dy_dc)
         m_debug_target_dy_dc->removeFromSP();
 #endif
@@ -174,3 +173,17 @@ void CheckCannon::update(float dt)
         flyable->setAnimation(animation);
     }   // for i in all flyables
 }   // update
+
+// ----------------------------------------------------------------------------
+CheckStructure* CheckCannon::clone()
+{
+    CheckCannon* cc = new CheckCannon(*this);
+#if defined(DEBUG) && !defined(SERVER_ONLY)
+    // Remove unsupported stuff when cloning
+    cc->m_show_curve = NULL;
+    cc->m_debug_target_dy_dc = nullptr;
+#endif
+    // IPO curve needs to be copied manually
+    cc->m_curve = m_curve->clone();
+    return cc;
+}   // clone

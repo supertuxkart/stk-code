@@ -34,7 +34,6 @@
 ProfileWorld::ProfileType ProfileWorld::m_profile_mode=PROFILE_NONE;
 int   ProfileWorld::m_num_laps    = 0;
 float ProfileWorld::m_time        = 0.0f;
-bool  ProfileWorld::m_no_graphics = false;
 
 //-----------------------------------------------------------------------------
 /** The constructor sets the number of (local) players to 0, since only AI
@@ -42,12 +41,12 @@ bool  ProfileWorld::m_no_graphics = false;
  */
 ProfileWorld::ProfileWorld()
 {
-    race_manager->setNumPlayers(0);
+    RaceManager::get()->setNumPlayers(0);
     // Set number of laps so that the end of the race can be detected by
     // quering the number of finished karts from the race manager (in laps
     // based profiling) - in case of time based profiling, the number of
     // laps is set to 99999.
-    race_manager->setNumLaps(m_num_laps);
+    RaceManager::get()->setNumLaps(m_num_laps);
     setPhase(RACE_PHASE);
     m_frame_count      = 0;
     m_start_time       = irr_driver->getRealTime();
@@ -120,7 +119,8 @@ std::shared_ptr<AbstractKart> ProfileWorld::createKart
 
     // Create a camera for the last kart (since this way more of the
     // karts can be seen.
-    if (index == (int)race_manager->getNumberOfKarts()-1)
+    if (!GUIEngine::isNoGraphics() &&
+        index == (int)RaceManager::get()->getNumberOfKarts()-1)
     {
         // The camera keeps track of all cameras and will free them
         Camera::createCamera(new_kart.get(), local_player_id);
@@ -140,7 +140,7 @@ bool ProfileWorld::isRaceOver()
     if(m_profile_mode == PROFILE_LAPS )
     {
         // Now it must be laps based profiling:
-        return race_manager->getFinishedKarts()==getNumKarts();
+        return RaceManager::get()->getFinishedKarts()==getNumKarts();
     }
     // Unknown profile mode
     assert(false);
@@ -182,17 +182,17 @@ void ProfileWorld::enterRaceOverState()
     if(m_profile_mode==PROFILE_TIME)
     {
         int max_laps = -2;
-        for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+        for(unsigned int i=0; i<RaceManager::get()->getNumberOfKarts(); i++)
         {
             if(m_kart_info[i].m_finished_laps>max_laps)
                 max_laps = m_kart_info[i].m_finished_laps;
         }   // for i<getNumberOfKarts
-        race_manager->setNumLaps(max_laps+1);
+        RaceManager::get()->setNumLaps(max_laps+1);
     }
 
     StandardRace::enterRaceOverState();
     // Estimate finish time and set all karts to be finished.
-    for (unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    for (unsigned int i=0; i<RaceManager::get()->getNumberOfKarts(); i++)
     {
         // ---------- update rank ------
         if (m_karts[i]->hasFinishedRace() || m_karts[i]->isEliminated())
@@ -206,7 +206,7 @@ void ProfileWorld::enterRaceOverState()
                  m_frame_count, runtime, (float)m_frame_count/runtime);
 
     // Print geometry statistics if we're not in no-graphics mode
-    if(!m_no_graphics)
+    if(!GUIEngine::isNoGraphics())
     {
         Log::verbose("profile", "Average # drawn nodes           %f k",
                      (float)m_num_triangles/m_frame_count);
@@ -244,7 +244,7 @@ void ProfileWorld::enterRaceOverState()
 
         all_groups.insert(kart->getController()->getControllerName());
         float distance = (float)(m_profile_mode==PROFILE_LAPS
-                                 ? race_manager->getNumLaps() : 1);
+                                 ? RaceManager::get()->getNumLaps() : 1);
         distance *= Track::getCurrentTrack()->getTrackLength();
         ss << distance/kart->getFinishTime() << " " << kart->getTopSpeed() << " ";
         ss << kart->getSkiddingTime() << " " << kart->getRescueTime() << " ";
@@ -300,7 +300,7 @@ void ProfileWorld::enterRaceOverState()
             position_gain += 1+i - kart->getPosition();
 
             float distance = (float)(m_profile_mode==PROFILE_LAPS
-                                     ? race_manager->getNumLaps() : 1);
+                                     ? RaceManager::get()->getNumLaps() : 1);
             distance *= Track::getCurrentTrack()->getTrackLength();
 
             Log::verbose("profile",

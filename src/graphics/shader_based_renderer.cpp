@@ -500,12 +500,12 @@ void ShaderBasedRenderer::debugPhysics()
     // the bullet debug view, since otherwise the camera
     // is not set up properly. This is only used for
     // the bullet debug view.
-    if(Physics::getInstance())
+    if(Physics::get())
     {
         if (UserConfigParams::m_artist_debug_mode)
-            Physics::getInstance()->draw();
+            Physics::get()->draw();
 
-        IrrDebugDrawer* debug_drawer = Physics::getInstance()->getDebugDrawer();
+        IrrDebugDrawer* debug_drawer = Physics::get()->getDebugDrawer();
         if (debug_drawer != NULL && debug_drawer->debugEnabled())
         {
             const std::map<video::SColor, std::vector<float> >& lines = 

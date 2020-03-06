@@ -38,15 +38,18 @@ namespace MessageQueue
     {
         MT_FRIEND,
         MT_ACHIEVEMENT,
-        MT_ERROR,
         MT_GENERIC,
+        MT_ERROR,
         MT_PROGRESS
     };
 
     void add(MessageType mt, const core::stringw &message);
+    void addStatic(MessageType mt, const core::stringw &message);
     void showProgressBar(int progress, const core::stringw& msg);
     void updatePosition();
     void update(float dt);
+    void discardStatic();
     void clear();
+    void resetGlobalVariables();
 };   // namespace GUIEngine
 #endif

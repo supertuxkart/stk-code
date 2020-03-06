@@ -291,8 +291,8 @@ bool Swatter::updateAndTestFinished(int ticks)
                     squashThingsAround();
                     m_animation_phase = SWATTER_FROM_TARGET;
                     const int end_ticks = ticks_start + 60;
-                    if (race_manager->isBattleMode() ||
-                        race_manager->isSoccerMode())
+                    if (RaceManager::get()->isBattleMode() ||
+                        RaceManager::get()->isSoccerMode())
                     {
                         // Remove swatter from kart in arena gameplay
                         // after one successful hit
@@ -418,7 +418,7 @@ void Swatter::squashThingsAround()
             PlayerManager::addKartHit(m_closest_kart->getWorldKartId());
             PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT, 1);
             PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
-            if (race_manager->isLinearRaceMode())
+            if (RaceManager::get()->isLinearRaceMode())
             {
                 PlayerManager::increaseAchievement(AchievementsStatus::SWATTER_HIT_1RACE, 1);
                 PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
@@ -426,12 +426,13 @@ void Swatter::squashThingsAround()
         }
     }
 
-    if (has_created_explosion_animation && !RewindManager::get()->isRewinding())
+    if (!GUIEngine::isNoGraphics() && has_created_explosion_animation &&
+        !RewindManager::get()->isRewinding())
     {
         HitEffect *he = new Explosion(m_kart->getXYZ(),  "explosion", "explosion.xml");
         if(m_kart->getController()->isLocalPlayerController())
             he->setLocalPlayerKartHit();
-        projectile_manager->addHitEffect(he);
+        ProjectileManager::get()->addHitEffect(he);
     }   // if kart has bomb attached
 
     // TODO: squash items

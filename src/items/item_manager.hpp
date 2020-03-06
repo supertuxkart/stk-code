@@ -56,15 +56,9 @@ private:
     static std::mt19937 m_random_engine;
 
     static uint32_t m_random_seed;
-protected:
-    /** The instance of ItemManager while a race is on. */
-    static std::shared_ptr<ItemManager> m_item_manager;
-
 public:
     static void loadDefaultItemMeshes();
     static void removeTextures();
-    static void create();
-    static void destroy();
     static void updateRandomSeed(uint32_t seed_number)
     {
         m_random_engine.seed(seed_number);
@@ -97,14 +91,6 @@ public:
     /** Returns the glow color for an item. */
     static video::SColorf& getGlowColor(ItemState::ItemType type)
                                       { return m_glow_color[type]; }
-    // ------------------------------------------------------------------------
-    /** Return an instance of the item manager (it does not automatically
-     *  create one, call create for that). */
-    static ItemManager *get()
-    {
-        assert(m_item_manager);
-        return m_item_manager.get();
-    }   // get
 
     // ========================================================================
 protected:
@@ -133,13 +119,12 @@ protected:
     int m_switch_ticks;
 
     void deleteItem(ItemState *item);
-    virtual unsigned int insertItem(Item *item);
     void switchItemsInternal(std::vector < ItemState*> &all_items);
     void setSwitchItems(const std::vector<int> &switch_items);
     void insertItemInQuad(Item *item);
     void deleteItemInQuad(ItemState *item);
-             ItemManager();
 public:
+             ItemManager();
     virtual ~ItemManager();
 
     virtual Item*  placeItem       (ItemState::ItemType type, const Vec3& xyz,
@@ -212,6 +197,8 @@ public:
               ? NULL 
              : dynamic_cast<Item*>((*m_items_in_quads)[n].front());
     }   // getFirstItemInQuad
+    // ------------------------------------------------------------------------
+    unsigned int insertItem(Item *item);
 };   // ItemManager
 
 #endif

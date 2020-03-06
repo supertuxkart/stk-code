@@ -24,7 +24,6 @@
   * Represents a server that is joinable
   */
 
-#include "network/transport_address.hpp"
 #include "race/race_manager.hpp"
 #include "utils/types.hpp"
 
@@ -36,6 +35,7 @@
 
 class Track;
 class XMLNode;
+class SocketAddress;
 
 /**
  * \ingroup online
@@ -55,7 +55,11 @@ protected:
 
     std::string m_lower_case_player_names;
 
-    std::string m_ipv6_address;
+    /** We need to use full socket address structure instead of string to hold
+     *  it, because for local link address the scope id matters for
+     *  multicasting.
+     */
+    std::unique_ptr<SocketAddress> m_ipv6_address;
 
     uint32_t m_server_id;
     uint32_t m_server_owner;
@@ -67,7 +71,7 @@ protected:
     int m_current_players;
 
     /** The public ip address and port of this server. */
-    TransportAddress m_address;
+    std::unique_ptr<SocketAddress> m_address;
 
     /** This is the private port of the server. This is used if a WAN game
      *  is started, but one client is discovered on the same LAN, so a direct
@@ -109,12 +113,16 @@ public:
          Server(const XMLNode& server_info);
          Server(unsigned server_id, const irr::core::stringw &name,
                 int max_players, int current_players, unsigned difficulty,
-                unsigned server_mode, const TransportAddress &address,
+                unsigned server_mode, const SocketAddress &address,
                 bool password_protected, bool game_started,
                 const std::string& current_track = "");
     // ------------------------------------------------------------------------
-    /** Returns ip address and port of this server. */
-    const TransportAddress& getAddress() const { return m_address; }
+    virtual ~Server();
+    // ------------------------------------------------------------------------
+    /** Returns IPv4 address and port of this server. */
+    const SocketAddress& getAddress() const { return *m_address.get(); }
+    // ------------------------------------------------------------------------
+    void setAddress(const SocketAddress& addr);
     // ------------------------------------------------------------------------
     /** Returns the lower case name of the server. */
     const std::string& getLowerCaseName() const { return m_lower_case_name; }
@@ -173,7 +181,7 @@ public:
     // ------------------------------------------------------------------------
     void setIPV6Connection(bool val)
     {
-        if (m_ipv6_address.empty())
+        if (!m_ipv6_address)
             m_ipv6_connection = false;
         else
             m_ipv6_connection = val;
@@ -181,8 +189,26 @@ public:
     // ------------------------------------------------------------------------
     bool useIPV6Connection() const                { return m_ipv6_connection; }
     // ------------------------------------------------------------------------
-    void setIPV6Address(const std::string& addr)     { m_ipv6_address = addr; }
+    void setIPV6Address(const SocketAddress& addr);
     // ------------------------------------------------------------------------
-    const std::string& getIPV6Address() const        { return m_ipv6_address; }
+    SocketAddress* getIPV6Address() const
+    {
+        if (!m_ipv6_address)
+            return NULL;
+        return m_ipv6_address.get();
+    }
+    // ------------------------------------------------------------------------
+    virtual void saveServer() const {}
 };   // Server
+
+class UserDefinedServer : public Server
+{
+public:
+    UserDefinedServer(const core::stringw& name, const SocketAddress& ipv4,
+                      bool password_protected = false)
+        : Server(0, name, 0, 0, 0, 0, ipv4, password_protected, false) {}
+    // ------------------------------------------------------------------------
+    virtual void saveServer() const;
+};   // UserDefinedServer
+
 #endif // HEADER_SERVER_HPP

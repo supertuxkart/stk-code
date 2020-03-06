@@ -27,6 +27,7 @@
 #include "graphics/explosion.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
+#include "guiengine/engine.hpp"
 #include "items/attachment_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/projectile_manager.hpp"
@@ -38,8 +39,6 @@
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "network/rewind_manager.hpp"
-#include "physics/triangle_mesh.hpp"
-#include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -61,6 +60,9 @@ Attachment::Attachment(AbstractKart* kart)
     m_initial_speed        = 0;
     m_graphical_type       = ATTACH_NOTHING;
     m_scaling_end_ticks    = -1;
+    m_node = NULL;
+    if (GUIEngine::isNoGraphics())
+        return;
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.
     if (kart->isGhostKart())
@@ -269,7 +271,7 @@ void Attachment::hitBanana(ItemState *item_state)
     if (m_kart->getController()->canGetAchievements())
     {
         PlayerManager::increaseAchievement(AchievementsStatus::BANANA, 1);
-        if (race_manager->isLinearRaceMode())
+        if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::BANANA_1RACE, 1);
     }
     //Bubble gum shield effect:
@@ -284,7 +286,7 @@ void Attachment::hitBanana(ItemState *item_state)
 
     bool add_a_new_item = true;
 
-    if (race_manager->isBattleMode())
+    if (RaceManager::get()->isBattleMode())
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
         if (m_kart->getKartAnimation() == NULL)
@@ -303,13 +305,13 @@ void Attachment::hitBanana(ItemState *item_state)
     case ATTACH_BOMB:
         {
         add_a_new_item = false;
-        if (!RewindManager::get()->isRewinding())
+        if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
         {
             HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
                 "explosion_bomb.xml");
             if (m_kart->getController()->isLocalPlayerController())
                 he->setLocalPlayerKartHit();
-            projectile_manager->addHitEffect(he);
+            ProjectileManager::get()->addHitEffect(he);
         }
         if (m_kart->getKartAnimation() == NULL)
             ExplosionAnimation::create(m_kart);
@@ -340,7 +342,7 @@ void Attachment::hitBanana(ItemState *item_state)
         // so play the character sound ("Uh-Oh")
         m_kart->playCustomSFX(SFXManager::CUSTOM_ATTACH);
 
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
             new_attachment = AttachmentType(ticks % 2);
         else
             new_attachment = AttachmentType(ticks % 3);
@@ -512,13 +514,13 @@ void Attachment::update(int ticks)
         m_initial_speed = 0;
         if (m_ticks_left <= 0)
         {
-            if (!RewindManager::get()->isRewinding())
+            if (!GUIEngine::isNoGraphics() && !RewindManager::get()->isRewinding())
             {
                 HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
                     "explosion_bomb.xml");
                 if (m_kart->getController()->isLocalPlayerController())
                     he->setLocalPlayerKartHit();
-                projectile_manager->addHitEffect(he);
+                ProjectileManager::get()->addHitEffect(he);
             }
             if (m_kart->getKartAnimation() == NULL)
                 ExplosionAnimation::create(m_kart);
@@ -539,7 +541,7 @@ void Attachment::update(int ticks)
                 m_bubble_explode_sound->play();
             }
             if (!m_kart->isGhostKart())
-                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+                Track::getCurrentTrack()->getItemManager()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
         }
         break;
     }   // switch

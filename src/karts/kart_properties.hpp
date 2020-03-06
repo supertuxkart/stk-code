@@ -31,7 +31,6 @@ namespace irr
 }
 using namespace irr;
 
-#include "audio/sfx_manager.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 #include "utils/interpolation_array.hpp"
@@ -273,7 +272,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns custom sound effects for this kart. */
-    const int          getCustomSfxId (SFXManager::CustomSFX type)
+    const int          getCustomSfxId (int type)
                                        const  {return m_custom_sfx_id[type];  }
 
     // ------------------------------------------------------------------------
@@ -340,7 +339,7 @@ public:
     /** Returns a pointer to the AI properties. */
     const AIProperties *getAIPropertiesForDifficulty() const
     {
-        return m_ai_properties[race_manager->getDifficulty()].get();
+        return m_ai_properties[RaceManager::get()->getDifficulty()].get();
     }   // getAIProperties
 
     // ------------------------------------------------------------------------

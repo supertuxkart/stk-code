@@ -24,7 +24,7 @@
 
 #include "input/input.hpp"                // for PlayerAction
 #include "utils/cpp2011.hpp"
-#include "utils/singleton.hpp"
+#include "utils/stk_process.hpp"
 
 #include <cstdlib>
 #include <mutex>
@@ -32,6 +32,7 @@
 #include <tuple>
 
 class BareNetworkString;
+class NetworkItemManager;
 class NetworkString;
 class STKPeer;
 
@@ -77,7 +78,8 @@ private:
     void handleState(Event *event);
     void handleAdjustTime(Event *event);
     void handleItemEventConfirmation(Event *event);
-    static std::weak_ptr<GameProtocol> m_game_protocol;
+    static std::weak_ptr<GameProtocol> m_game_protocol[PT_COUNT];
+    NetworkItemManager* m_network_item_manager;
     // Maximum value of values are only 32768
     std::tuple<uint8_t, uint16_t, uint16_t, uint16_t>
                                                 compressAction(const Action& a)
@@ -126,12 +128,14 @@ public:
     // ------------------------------------------------------------------------
     static bool emptyInstance()
     {
-        return m_game_protocol.expired();
+        ProcessType pt = STKProcess::getType();
+        return m_game_protocol[pt].expired();
     }   // emptyInstance
     // ------------------------------------------------------------------------
     static std::shared_ptr<GameProtocol> lock()
     {
-        return m_game_protocol.lock();
+        ProcessType pt = STKProcess::getType();
+        return m_game_protocol[pt].lock();
     }   // lock
     // ------------------------------------------------------------------------
     /** Returns the NetworkString in which a state was saved. */
@@ -139,7 +143,6 @@ public:
     // ------------------------------------------------------------------------
     std::unique_lock<std::mutex> acquireWorldDeletingMutex() const
                { return std::unique_lock<std::mutex>(m_world_deleting_mutex); }
-
 };   // class GameProtocol
 
 #endif // GAME_PROTOCOL_HPP

@@ -2,8 +2,7 @@
 @page Installation Installation
 
 ENet should be trivially simple to integrate with most applications.
-First, make sure you download the latest source distribution here @ref
-SourceDistro.
+First, make sure you download the latest source distribution at @ref Downloads.
 
 @section Unix Unix-like Operating Systems
 

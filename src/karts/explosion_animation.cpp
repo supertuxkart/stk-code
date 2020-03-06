@@ -18,8 +18,10 @@
 
 #include "karts/explosion_animation.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/stars.hpp"
+#include "guiengine/engine.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
@@ -59,7 +61,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
         return NULL;
     }
 
-    if (race_manager->isFollowMode())
+    if (RaceManager::get()->isFollowMode())
     {
         FollowTheLeaderRace *ftl_world =
             dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
@@ -93,7 +95,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart* kart, bool direct_hit)
     memset(m_reset_trans_compressed, 0, 16);
     Vec3 normal = m_created_transform.getBasis().getColumn(1).normalized();
     // Put the kart back to its own flag base like rescue if direct hit in CTF
-    bool reset = race_manager->getMinorMode() ==
+    bool reset = RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit;
     if (reset)
     {
@@ -137,7 +139,7 @@ void ExplosionAnimation::restoreData(BareNetworkString* b)
     btTransform reset_transform =
         btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
 
-    if (race_manager->getMinorMode() ==
+    if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit)
     {
         m_reset_trans_compressed[0] = b->getInt24();
@@ -163,7 +165,7 @@ ExplosionAnimation::~ExplosionAnimation()
         m_kart->getBody()->setAngularVelocity(btVector3(0,0,0));
         // Don't reset spectate camera
         auto cl = LobbyProtocol::get<ClientLobby>();
-        if (!cl || !cl->isSpectator())
+        if (!GUIEngine::isNoGraphics() && (!cl || !cl->isSpectator()))
         {
             for (unsigned i = 0; i < Camera::getNumCameras(); i++)
             {
@@ -191,7 +193,7 @@ void ExplosionAnimation::init(bool direct_hit, const Vec3& normal,
     }
 
     // Put the kart back to its own flag base like rescue if direct hit in CTF
-    if (race_manager->getMinorMode() ==
+    if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && direct_hit)
     {
         m_reset_ticks = m_created_ticks +
@@ -287,7 +289,7 @@ void ExplosionAnimation::update(int ticks)
 // ----------------------------------------------------------------------------
 void ExplosionAnimation::updateGraphics(float dt)
 {
-    if (!m_kart->getStarsEffect()->isEnabled())
+    if (m_kart->getStarsEffect() && !m_kart->getStarsEffect()->isEnabled())
     {
         // Set graphical effects for invulnerable time in updateGraphics
         // to avoid issue with rewind
@@ -310,7 +312,7 @@ void ExplosionAnimation::saveState(BareNetworkString* buffer)
 {
     AbstractKartAnimation::saveState(buffer);
     buffer->addUInt8(m_direct_hit ? 1 : 0);
-    if (race_manager->getMinorMode() ==
+    if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG && m_direct_hit)
     {
         buffer->addInt24(m_reset_trans_compressed[0])

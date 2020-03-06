@@ -43,6 +43,31 @@
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "utils/profiler.hpp"
+#include "utils/stk_process.hpp"
+
+//=============================================================================
+Physics* g_physics[PT_COUNT];
+// ----------------------------------------------------------------------------
+Physics* Physics::get()
+{
+    ProcessType type = STKProcess::getType();
+    return g_physics[type];
+}   // get
+
+// ----------------------------------------------------------------------------
+void Physics::create()
+{
+    ProcessType type = STKProcess::getType();
+    g_physics[type] = new Physics();
+}   // create
+
+// ----------------------------------------------------------------------------
+void Physics::destroy()
+{
+    ProcessType type = STKProcess::getType();
+    delete g_physics[type];
+    g_physics[type] = NULL;
+}   // destroy
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
@@ -256,7 +281,7 @@ void Physics::update(int ticks)
                 }
             }
             else if(obj->isSoccerBall() && 
-                    race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+                    RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
                 soccerWorld->setBallHitter(kartId);
@@ -328,7 +353,7 @@ void Physics::update(int ticks)
             flyable->hit(NULL, obj);
 
             if (obj->isSoccerBall() && 
-                race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+                RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();
                 SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
@@ -363,7 +388,7 @@ void Physics::update(int ticks)
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
                         PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT, 1);
-                        if (race_manager->isLinearRaceMode())
+                        if (RaceManager::get()->isLinearRaceMode())
                             PlayerManager::increaseAchievement(AchievementsStatus::BOWLING_HIT_1RACE, 1);
                     }   // is bowling ball
                 }   // if target_kart != kart && is a player kart and is current player

@@ -17,7 +17,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "network/protocols/connect_to_peer.hpp"
-
+#include "network/network.hpp"
+#include "network/network_string.hpp"
 #include "network/stk_host.hpp"
 #include "utils/time.hpp"
 #include "utils/log.hpp"
@@ -26,7 +27,7 @@
 /** Constructor for peer address.
  *  \param address The address to connect to.
  */
-ConnectToPeer::ConnectToPeer(const TransportAddress &address)
+ConnectToPeer::ConnectToPeer(const SocketAddress &address)
              : Protocol(PROTOCOL_CONNECTION)
 {
     m_peer_address = address;
@@ -62,13 +63,14 @@ void ConnectToPeer::asynchronousUpdate()
                 // the client will use enet intercept to discover if server
                 // address or port is different from stk addons database.
                 // (Happens if there is firewall in between)
-                TransportAddress broadcast_address;
-                broadcast_address = m_peer_address;
+                BareNetworkString aloha("aloha-stk");
 
                 // Enet packet will not have 0xFFFF for first 2 bytes
-                BareNetworkString aloha("aloha-stk");
+                // We use the feature to distinguish between the enet packets
+                // and this aloha
                 aloha.getBuffer().insert(aloha.getBuffer().begin(), 2, 0xFF);
-                STKHost::get()->sendRawPacket(aloha, broadcast_address);
+
+                STKHost::get()->sendRawPacket(aloha, m_peer_address);
                 Log::debug("ConnectToPeer", "Broadcast aloha sent.");
                 // 20 seconds timeout
                 if (m_tried_connection++ > 10)

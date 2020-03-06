@@ -25,11 +25,10 @@
 #include "items/item.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
-#include "tracks/check_manager.hpp"
 
 CheckCylinder::CheckCylinder(const XMLNode &node,
                              std::function<void(int)> triggering_function)
-           : CheckStructure(CheckManager::get()->getCheckStructureCount())
+             : CheckStructure()
 {
     m_radius2 = 1;
     m_height = 0;
@@ -37,7 +36,7 @@ CheckCylinder::CheckCylinder(const XMLNode &node,
     node.get("radius", &m_radius2);
     m_radius2 *= m_radius2;
     node.get("xyz", &m_center_point);
-    unsigned int num_karts = race_manager->getNumberOfKarts();
+    unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     m_is_inside.resize(num_karts);
     m_distance2.resize(num_karts);
     for (unsigned int i=0; i<num_karts; i++)

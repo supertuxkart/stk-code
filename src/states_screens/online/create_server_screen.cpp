@@ -20,14 +20,17 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "karts/controller/network_ai_controller.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/server_config.hpp"
+#include "network/child_loop.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
-#include "utils/separate_process.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -292,10 +295,7 @@ void CreateServerScreen::createServer()
 
     const bool private_server = !password.empty();
     ServerConfig::m_private_server_password = password;
-    password = std::string(" --server-password=") + password;
-
-    TransportAddress server_address(0x7f000001,
-        stk_config->m_server_discovery_port);
+    SocketAddress server_address(0x7f000001, 0);
 
     auto server = std::make_shared<Server>(0/*server_id*/, name,
         max_players, /*current_player*/0, (RaceManager::Difficulty)
@@ -315,59 +315,48 @@ void CreateServerScreen::createServer()
     // FIXME: Long term we might add a 'vote' option (e.g. GP vs single race,
     // and normal vs FTL vs time trial could be voted about).
     std::string difficulty = difficulty_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-    race_manager->setDifficulty(RaceManager::convertDifficulty(difficulty));
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+    RaceManager::get()->setDifficulty(RaceManager::convertDifficulty(difficulty));
+    RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
     std::string game_mode = gamemode_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     if (game_mode == "timetrial")
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
     else
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
 
-    race_manager->setReverseTrack(false);
+    RaceManager::get()->setReverseTrack(false);
     auto sl = STKHost::create();
     assert(sl);
     sl->requestStart();
 #else
 
     NetworkConfig::get()->setIsServer(false);
-    std::ostringstream server_cfg;
 
-    const std::string server_name = StringUtils::xmlEncode(name);
-    if (NetworkConfig::get()->isWAN())
+    ServerConfig::m_server_name = StringUtils::xmlEncode(name);
+    // Server always configurable if created with this screen
+    ServerConfig::m_server_configurable = true;
+    struct ChildLoopConfig clc;
+    clc.m_lan_server = NetworkConfig::get()->isLAN();
+    clc.m_login_id = NetworkConfig::get()->getCurrentUserId();
+    clc.m_token = NetworkConfig::get()->getCurrentUserToken();
+    clc.m_server_ai = 0;
+
+    switch (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER))
     {
-        server_cfg << "--public-server --wan-server=" <<
-            server_name << " --login-id=" <<
-            NetworkConfig::get()->getCurrentUserId() << " --token=" <<
-            NetworkConfig::get()->getCurrentUserToken();
-    }
-    else
-    {
-        server_cfg << "--lan-server=" << server_name;
+    case 0:
+        ServerConfig::m_server_mode = 3;
+        break;
+    case 1:
+        ServerConfig::m_server_mode = 4;
+        break;
+    case 3:
+        ServerConfig::m_server_mode = 6;
+        break;
     }
 
-    // Clear previous stk-server-id-file_*
-    std::set<std::string> files;
-    const std::string server_id_file = "stk-server-id-file_";
-    file_manager->listFiles(files, file_manager->getUserConfigDir());
-    for (auto& f : files)
-    {
-        if (f.find(server_id_file) != std::string::npos)
-        {
-            file_manager->removeFile(file_manager->getUserConfigDir() + "/" +
-                f);
-        }
-    }
-    NetworkConfig::get()->setServerIdFile(
-        file_manager->getUserConfigFile(server_id_file));
-
-    server_cfg << " --stdout=server.log --mode=" <<
-        gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
-        " --difficulty=" <<
-        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER) <<
-        " --max-players=" << max_players <<
-        " --server-id-file=" << server_id_file <<
-        " --log=1 --no-console-log";
+    ServerConfig::m_server_difficulty =
+        difficulty_widget->getSelection(PLAYER_ID_GAME_MASTER);
+    ServerConfig::m_server_max_players = max_players;
 
     if (m_more_options_spinner->isVisible())
     {
@@ -376,27 +365,39 @@ void CreateServerScreen::createServer()
             3/*is soccer*/)
         {
             if (esi == 0)
-                server_cfg << " --soccer-timed";
+                ServerConfig::m_soccer_goal_target = false;
             else
-                server_cfg << " --soccer-goals";
+                ServerConfig::m_soccer_goal_target = true;
         }
         else if (gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER) ==
             2/*is battle*/)
         {
-            server_cfg << " --battle-mode=" << esi;
+            if (esi == 0)
+                ServerConfig::m_server_mode = 7;
+            else
+                ServerConfig::m_server_mode = 8;
         }
         else
         {
             if (m_supports_ai)
             {
                 if (esi > 0)
-                    server_cfg << " --server-ai=" << esi;
+                {
+                    clc.m_server_ai = esi;
+                    NetworkAIController::setAIFrequency(10);
+                }
             }
             else
             {
                 // Grand prix track count
                 if (esi > 0)
-                    server_cfg << " --network-gp=" << esi;
+                {
+                    ServerConfig::m_gp_track_count = esi;
+                    if (ServerConfig::m_server_mode == 3)
+                        ServerConfig::m_server_mode = 0;
+                    else
+                        ServerConfig::m_server_mode = 1;
+                }
             }
         }
         m_prev_mode = gamemode_widget->getSelection(PLAYER_ID_GAME_MASTER);
@@ -407,10 +408,8 @@ void CreateServerScreen::createServer()
         m_prev_mode = m_prev_value = 0;
     }
 
-    SeparateProcess* sp =
-        new SeparateProcess(SeparateProcess::getCurrentExecutableLocation(),
-        server_cfg.str() + password);
-    STKHost::create(sp);
+    ChildLoop* cl = new ChildLoop(clc);
+    STKHost::create(cl);
     NetworkingLobby::getInstance()->setJoinedServer(server);
 #endif
 }   // createServer

@@ -431,6 +431,8 @@ fatal_error_exit:
     clear_filelist();
     clear_symtable();
 #endif
+    if (stdin_name != in_file)
+        free(in_file);
 
     if (fp_in && fp_in != stdin)
         fclose( fp_in);

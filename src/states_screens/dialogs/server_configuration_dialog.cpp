@@ -22,6 +22,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
@@ -57,7 +58,7 @@ void ServerConfigurationDialog::init()
 
     RibbonWidget* difficulty = getWidget<RibbonWidget>("difficulty");
     assert(difficulty != NULL);
-    difficulty->setSelection((int)race_manager->getDifficulty(),
+    difficulty->setSelection((int)RaceManager::get()->getDifficulty(),
         PLAYER_ID_GAME_MASTER);
 
     RibbonWidget* gamemode = getWidget<RibbonWidget>("gamemode");

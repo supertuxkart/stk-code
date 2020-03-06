@@ -360,6 +360,15 @@ private:
 
     bool m_watching_replay;
 public:
+    // ----------------------------------------------------------------------------------------
+    static RaceManager* get();
+    // ----------------------------------------------------------------------------------------
+    static void create();
+    // ----------------------------------------------------------------------------------------
+    static void destroy();
+    // ----------------------------------------------------------------------------------------
+    static void clear();
+    // ----------------------------------------------------------------------------------------
          RaceManager();
         ~RaceManager();
 
@@ -741,10 +750,7 @@ public:
      /** \brief Returns the number of second's decimals to display */
     int currentModeTimePrecision() const
     {
-        if (isEggHuntMode() || isTimeTrialMode())
-            return 3;//display milliseconds
-
-        return 2;//display centiseconds
+        return 3; // display milliseconds
     }   // currentModeTimePrecision
     // ----------------------------------------------------------------------------------------
     /** \brief Returns true if the current mode has laps. */
@@ -899,7 +905,6 @@ public:
     }
 };   // RaceManager
 
-extern RaceManager *race_manager;
 #endif
 
 /* EOF */

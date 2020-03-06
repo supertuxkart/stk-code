@@ -66,14 +66,11 @@ private:
     Synchronised< std::vector<ItemEventInfo> > m_item_events;
 
     void forwardTime(int ticks);
-
-    NetworkItemManager();
-
 public:
 
     static bool m_network_item_debugging;
 
-    static void create();
+    NetworkItemManager();
     virtual ~NetworkItemManager();
     virtual void reset() OVERRIDE;
     virtual void setItemConfirmationTime(std::weak_ptr<STKPeer> peer,

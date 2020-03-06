@@ -471,7 +471,7 @@ void PlayerManager::setCurrentPlayer(PlayerProfile *player)
     {
         player_has_changed = true;
         save();
-        race_manager->clearKartLastPositionOnOverworld();
+        RaceManager::get()->clearKartLastPositionOnOverworld();
     }
 
     m_current_player = player;

@@ -35,6 +35,7 @@
 #include "network/network_player_profile.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_events_protocol.hpp"
+#include "network/protocols/server_lobby.hpp"
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
@@ -172,20 +173,21 @@ void LinearWorld::reset(bool restart)
  */
 void LinearWorld::update(int ticks)
 {
-    if (NetworkConfig::get()->isServer() && getPhase() == RACE_PHASE)
+    auto sl = LobbyProtocol::get<ServerLobby>();
+    if (sl && getPhase() == RACE_PHASE)
     {
         bool all_players_finished = true;
         bool has_ai = false;
-        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
         {
             auto npp =
-                race_manager->getKartInfo(i).getNetworkPlayerProfile().lock();
+                RaceManager::get()->getKartInfo(i).getNetworkPlayerProfile().lock();
             if (!npp)
                 continue;
             if (npp)
             {
                 auto peer = npp->getPeer();
-                if (peer && peer->isAIPeer())
+                if ((peer && peer->isAIPeer()) || sl->isAIProfile(npp))
                     has_ai = true;
                 else if (!getKart(i)->hasFinishedRace())
                     all_players_finished = false;
@@ -234,7 +236,7 @@ void LinearWorld::update(int ticks)
     }
     // If one player and a ghost, or two compared ghosts,
     // compute the live time difference
-    if(race_manager->hasGhostKarts() && race_manager->getNumberOfKarts() == 2)
+    if(RaceManager::get()->hasGhostKarts() && RaceManager::get()->getNumberOfKarts() == 2)
         updateLiveDifference();
 
 #ifdef DEBUG
@@ -335,7 +337,7 @@ void LinearWorld::updateGraphics(float dt)
 void LinearWorld::updateLiveDifference()
 {
     // First check that the call requirements are verified
-    assert (race_manager->hasGhostKarts() && race_manager->getNumberOfKarts() >= 2);
+    assert (RaceManager::get()->hasGhostKarts() && RaceManager::get()->getNumberOfKarts() >= 2);
 
     AbstractKart* ghost_kart = getKart(0);
 
@@ -393,7 +395,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         return;
     }
 
-    const int lap_count = race_manager->getNumLaps();
+    const int lap_count = RaceManager::get()->getNumLaps();
 
     // Only increase the lap counter and set the new time if the
     // kart hasn't already finished the race (otherwise the race_gui
@@ -411,7 +413,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Last lap message (kart_index's assert in previous block already)
     if (raceHasLaps() && kart_info.m_finished_laps+1 == lap_count)
     {
-        if (lap_count > 1 && !isLiveJoinWorld())
+        if (lap_count > 1 && !isLiveJoinWorld() && m_race_gui)
         {
             m_race_gui->addMessage(_("Final lap!"), kart,
                                3.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
@@ -440,7 +442,7 @@ void LinearWorld::newLap(unsigned int kart_index)
         }
     }
     else if (raceHasLaps() && kart_info.m_finished_laps > 0 &&
-             kart_info.m_finished_laps+1 < lap_count && !isLiveJoinWorld())
+             kart_info.m_finished_laps+1 < lap_count && !isLiveJoinWorld() && m_race_gui)
     {
         m_race_gui->addMessage(_("Lap %i", kart_info.m_finished_laps+1), kart,
                                2.0f, GUIEngine::getSkin()->getColor("font::normal"), true,
@@ -471,7 +473,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     // Race finished
     // We compute the exact moment the kart crossed the line
     // This way, even with poor framerate, we get a time significant to the ms
-    if(kart_info.m_finished_laps >= race_manager->getNumLaps() && raceHasLaps())
+    if(kart_info.m_finished_laps >= RaceManager::get()->getNumLaps() && raceHasLaps())
     {
         if (kart->isGhostKart())
         {
@@ -538,12 +540,13 @@ void LinearWorld::newLap(unsigned int kart_index)
         irr::core::stringw m_fastest_lap_message =
             _C("fastest_lap", "%s by %s", s.c_str(), kart_name);
 
-        m_race_gui->addMessage(m_fastest_lap_message, NULL,
-                               4.0f, video::SColor(255, 255, 255, 255), false);
-
-        m_race_gui->addMessage(_("New fastest lap"), NULL,
-                               4.0f, video::SColor(255, 255, 255, 255), false);
-
+        if (m_race_gui)
+        {
+            m_race_gui->addMessage(m_fastest_lap_message, NULL, 4.0f,
+                video::SColor(255, 255, 255, 255), false);
+            m_race_gui->addMessage(_("New fastest lap"), NULL, 4.0f,
+                video::SColor(255, 255, 255, 255), false);
+        }
     } // end if new fastest lap
 
     kart_info.m_lap_start_ticks = getTimeTicks();
@@ -667,10 +670,10 @@ void LinearWorld::getKartsDisplayInfo(
         else if (kart->hasFinishedRace())
         {
             rank_info.m_text = kart->getController()->getName();
-            if (race_manager->getKartGlobalPlayerId(i) > -1)
+            if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
             {
                 const core::stringw& flag = StringUtils::getCountryFlag(
-                    race_manager->getKartInfo(i).getCountryCode());
+                    RaceManager::get()->getKartInfo(i).getCountryCode());
                 if (!flag.empty())
                 {
                     rank_info.m_text += L" ";
@@ -683,7 +686,7 @@ void LinearWorld::getKartsDisplayInfo(
             rank_info.m_text = "";
         }
 
-        int numLaps = race_manager->getNumLaps();
+        int numLaps = RaceManager::get()->getNumLaps();
 
         if(kart_info.m_finished_laps>=numLaps)
         {  // kart is finished, display in green
@@ -733,7 +736,7 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 {
     const KartInfo &kart_info = m_kart_info[kart->getWorldKartId()];
 
-    float full_distance = race_manager->getNumLaps()
+    float full_distance = RaceManager::get()->getNumLaps()
                         * Track::getCurrentTrack()->getTrackLength();
 
     // For ghost karts, use the replay data rather than estimating
@@ -946,7 +949,7 @@ void LinearWorld::updateRacePosition()
         // first kart is doing its last lap.
         if(!m_faster_music_active                                  &&
             p == 1                                                 &&
-            kart_info.m_finished_laps == race_manager->getNumLaps() - 1 &&
+            kart_info.m_finished_laps == RaceManager::get()->getNumLaps() - 1 &&
             useFastMusicNearEnd()                                       )
         {
             music_manager->switchToFastMusic();
@@ -1081,7 +1084,7 @@ void LinearWorld::checkForWrongDirection(unsigned int i, float dt)
     if (kart->getKartAnimation())
         ki.m_wrong_way_timer = 0;
     
-    if (ki.m_wrong_way_timer > 1.0f)
+    if (ki.m_wrong_way_timer > 1.0f && m_race_gui)
     {
         m_race_gui->addMessage(_("WRONG WAY!"), kart,
                                /* time */ -1.0f,
@@ -1118,7 +1121,7 @@ std::pair<uint32_t, uint32_t> LinearWorld::getGameStartedProgress() const
         progress.second = (uint32_t)(
             getOverallDistance(slowest_kart->getWorldKartId()) /
             (Track::getCurrentTrack()->getTrackLength() *
-            (float)race_manager->getNumLaps()) * 100.0f);
+            (float)RaceManager::get()->getNumLaps()) * 100.0f);
     }
     return progress;
 }   // getGameStartedProgress
@@ -1160,10 +1163,11 @@ void LinearWorld::saveCompleteState(BareNetworkString* bns, STKPeer* peer)
     for (TrackSector* ts : m_kart_track_sector)
         ts->saveCompleteState(bns);
 
-    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
+    const uint8_t cc = (uint8_t)cm->getCheckStructureCount();
     bns->addUInt8(cc);
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->saveCompleteState(bns);
+        cm->getCheckStructure(i)->saveCompleteState(bns);
 }   // saveCompleteState
 
 // ----------------------------------------------------------------------------
@@ -1187,14 +1191,15 @@ void LinearWorld::restoreCompleteState(const BareNetworkString& b)
 
     updateRacePosition();
     const unsigned cc = b.getUInt8();
-    if (cc != CheckManager::get()->getCheckStructureCount())
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
+    if (cc != cm->getCheckStructureCount())
     {
         Log::warn("LinearWorld",
             "Server has different check structures size.");
         return;
     }
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->restoreCompleteState(b);
+        cm->getCheckStructure(i)->restoreCompleteState(b);
 }   // restoreCompleteState
 
 // ----------------------------------------------------------------------------
@@ -1226,10 +1231,11 @@ void LinearWorld::updateCheckLinesServer(int check_id, int kart_id)
     cl.addUInt32(m_fastest_lap_ticks);
     cl.encodeString(m_fastest_lap_kart_name);
 
-    const uint8_t cc = (uint8_t)CheckManager::get()->getCheckStructureCount();
+    CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
+    const uint8_t cc = (uint8_t)cm->getCheckStructureCount();
     cl.addUInt8(cc);
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->saveIsActive(kart_id, &cl);
+        cm->getCheckStructure(i)->saveIsActive(kart_id, &cl);
 
     STKHost::get()->sendPacketToAllPeers(&cl, true);
 }   // updateCheckLinesServer
@@ -1253,17 +1259,17 @@ void LinearWorld::updateCheckLinesClient(const BareNetworkString& b)
     b.decodeStringW(&m_fastest_lap_kart_name);
 
     const unsigned cc = b.getUInt8();
-    if (cc != CheckManager::get()->getCheckStructureCount())
+    if (cc != Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount())
         return;
     for (unsigned i = 0; i < cc; i++)
-        CheckManager::get()->getCheckStructure(i)->restoreIsActive(kart_id, b);
+        Track::getCurrentTrack()->getCheckManager()->getCheckStructure(i)->restoreIsActive(kart_id, b);
 
 }   // updateCheckLinesClient
 
 // ----------------------------------------------------------------------------
 void LinearWorld::handleServerCheckStructureCount(unsigned count)
 {
-    if (count != CheckManager::get()->getCheckStructureCount())
+    if (count != Track::getCurrentTrack()->getCheckManager()->getCheckStructureCount())
     {
         Log::warn("LinearWorld",
             "Server has different check structures size.");

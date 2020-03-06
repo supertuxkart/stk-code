@@ -13,7 +13,6 @@ export SDK_PATH_DEFAULT="$DIRNAME/android-sdk"
 export NDK_TOOLCHAIN_PATH="$DIRNAME/obj/bin"
 export NDK_BUILD_SCRIPT="$DIRNAME/Android.mk"
 export PATH="$DIRNAME/obj/bin:$PATH"
-export CROSS_SYSROOT="$DIRNAME/obj/sysroot"
 
 #export NDK_CCACHE=ccache
 export NDK_CPPFLAGS="-O3 -g"
@@ -298,7 +297,7 @@ if [ ! -f "$DIRNAME/obj/zlib.stamp" ]; then
 
     cd "$DIRNAME/obj/zlib"
     cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST &&
+            -DHOST=$HOST -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/zlib.stamp"
@@ -414,8 +413,10 @@ if [ ! -f "$DIRNAME/obj/openssl.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/openssl/"* "$DIRNAME/obj/openssl"
 
     cd "$DIRNAME/obj/openssl"
-    ./Configure android --cross-compile-prefix="$HOST-"
+    export ANDROID_NDK_HOME="$DIRNAME/obj/"
+    ./Configure android-$ARCH
     make $@
+    unset ANDROID_NDK_HOME
     check_error
     touch "$DIRNAME/obj/openssl.stamp"
 fi
@@ -447,7 +448,7 @@ if [ ! -f "$DIRNAME/obj/jpeglib.stamp" ]; then
 
     cd "$DIRNAME/obj/jpeglib"
     cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST &&
+            -DHOST=$HOST -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/jpeglib.stamp"
@@ -474,8 +475,10 @@ if [ ! -f "$DIRNAME/obj/libvorbis.stamp" ]; then
 
     cd "$DIRNAME/obj/libvorbis"
     CPPFLAGS="-I$DIRNAME/obj/libogg/include $CPPFLAGS" \
-    LDFLAGS="-L$DIRNAME/obj/libogg/src/.libs $LDFLAGS" \
+    LDFLAGS="-L$DIRNAME/obj/libogg/src/.libs -lm $LDFLAGS" \
     ./configure --host=$HOST &&
+    sed -i '/#define size_t/d' config.h
+    sed -i 's/-mno-ieee-fp//' lib/Makefile
     make $@
     check_error
     touch "$DIRNAME/obj/libvorbis.stamp"
@@ -489,7 +492,7 @@ ${NDK_PATH}/ndk-build $@                 \
     APP_ABI="$NDK_ABI"                   \
     APP_PLATFORM="$NDK_PLATFORM"         \
     APP_CPPFLAGS="$NDK_CPPFLAGS"         \
-    APP_STL=gnustl_static                \
+    APP_STL=c++_static                   \
     NDK_DEBUG=$IS_DEBUG_BUILD
 
 check_error

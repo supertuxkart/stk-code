@@ -24,12 +24,14 @@
 #include "input/input_manager.hpp"
 #include "modes/world.hpp"
 #include "scriptengine/aswrappedcall.hpp"
+#include "scriptengine/script_track.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "guiengine/message_queue.hpp"
 
 #include <angelscript.h>
 #include "scriptarray.hpp"
@@ -51,6 +53,16 @@ namespace Scripting
             RGT_ACCELEROMETER = 2,
             RGT_GYROSCOPE = 3,
         };
+
+        enum MsgType
+        {
+
+            MSG_FRIEND = 0,
+            MSG_ACHIEVEMENT = 1,
+            MSG_GENERIC = 2,
+            MSG_ERROR = 3
+        };
+
         /** \addtogroup Scripting
         * @{
         */
@@ -76,18 +88,76 @@ namespace Scripting
             new TutorialMessageDialog((out), true);
         }
 
+        /** Display a Message using MessageQueue (enum GUI::MsgType)*/
+        void displayMessage(std::string* input, int Enum_value)
+        {
+            irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+            MsgType msg_type = (MsgType)Enum_value;
+            MessageQueue::MessageType type;
+            switch (msg_type)
+            {
+                case MSG_ERROR:
+                    type = MessageQueue::MT_ERROR;
+                    break;
+                case MSG_FRIEND:
+                    type = MessageQueue::MT_FRIEND;
+                    break;
+                case MSG_ACHIEVEMENT:
+                    type = MessageQueue::MT_ACHIEVEMENT;
+                    break;
+                default:
+                    type = MessageQueue::MT_GENERIC;
+                    break;
+            }
+            MessageQueue::add(type, msg);
+        }
+
+        /** Displays an static Message. (enum GUI::MsgType)
+         *  This Message has to be discarded by discardStaticMessage() manually.
+         *  Otherwise it can be overridden.
+         */
+        void displayStaticMessage(std::string* input, int Enum_value)
+        {
+            irr::core::stringw msg = StringUtils::utf8ToWide(*input);
+            MsgType msg_type = (MsgType)Enum_value;
+            MessageQueue::MessageType type;
+            switch (msg_type)
+            {
+                case MSG_ERROR:
+                    type = MessageQueue::MT_ERROR;
+                    break;
+                case MSG_FRIEND:
+                    type = MessageQueue::MT_FRIEND;
+                    break;
+                case MSG_ACHIEVEMENT:
+                    type = MessageQueue::MT_ACHIEVEMENT;
+                    break;
+                default:
+                    type = MessageQueue::MT_GENERIC;
+                    break;
+            }
+            MessageQueue::addStatic(type, msg);
+        }
+
+        void discardStaticMessage()
+        {
+            MessageQueue::discardStatic();
+        }
+
         void clearOverlayMessages()
         {
-            World::getWorld()->getRaceGUI()->clearAllMessages();
+            if (World::getWorld()->getRaceGUI())
+                World::getWorld()->getRaceGUI()->clearAllMessages();
         }
 
         /** Display text in the center of the screen for a few seconds */
         void displayOverlayMessage(std::string* input)
         {
+            if (!World::getWorld()->getRaceGUI())
+                return;
             irr::core::stringw msg = StringUtils::utf8ToWide(*input);
             std::vector<core::stringw> parts =
                 StringUtils::split(msg, '\n', false);
-                        
             for (unsigned int n = 0; n < parts.size(); n++)
             {
                 World::getWorld()->getRaceGUI()
@@ -148,6 +218,31 @@ namespace Scripting
         // documented function whose name is exposed in angelscript (these proxies exist so that
         // angelscript can properly resolve overloads, but doxygen can still generate the right docs
         /** \cond DOXYGEN_IGNORE */
+        void proxy_displayMessage(std::string* msgString)
+        {
+            return displayMessage(msgString, MSG_GENERIC);
+        }
+
+        void proxy_displayMessageAndInsertValues1(std::string* msgString, int msgType)
+        {
+            return displayMessage(msgString, msgType);
+        }
+
+        void proxy_displayStaticMessage(std::string* msgString)
+        {
+            return displayStaticMessage(msgString, MSG_GENERIC);
+        }
+
+        void proxy_displayStaticMessageAndInsertValues1(std::string* msgString, int msgType)
+        {
+            return displayStaticMessage(msgString, msgType);
+        }
+
+        void proxy_discardStaticMessage()
+        {
+            return discardStaticMessage();
+        }
+
         std::string proxy_translate(std::string* formatString)
         {
             return translate(formatString);
@@ -191,9 +286,31 @@ namespace Scripting
             bool mp = strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY");
             asDWORD call_conv = mp ? asCALL_GENERIC : asCALL_CDECL;
             int r; // of type asERetCodes
-            
-            r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)", 
-                                               mp ? WRAP_FN(displayModalMessage) : asFUNCTION(displayModalMessage), 
+
+            r = engine->RegisterGlobalFunction("void displayMessage(const string &in)",
+                                               mp ? WRAP_FN(proxy_displayMessage) : asFUNCTION(proxy_displayMessage),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void displayMessage(const string &in, int MessageType)",
+                                               mp ? WRAP_FN(proxy_displayMessageAndInsertValues1)
+                                                  : asFUNCTION(proxy_displayMessageAndInsertValues1),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void displayStaticMessage(const string &in)",
+                                               mp ? WRAP_FN(proxy_displayStaticMessage) : asFUNCTION(proxy_displayStaticMessage),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void displayStaticMessage(const string &in, int MessageType)",
+                                               mp ? WRAP_FN(proxy_displayStaticMessageAndInsertValues1)
+                                                  : asFUNCTION(proxy_displayStaticMessageAndInsertValues1),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void discardStaticMessage()",
+                                               mp ? WRAP_FN(discardStaticMessage) : asFUNCTION(discardStaticMessage),
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void displayModalMessage(const string &in)",
+                                               mp ? WRAP_FN(displayModalMessage) : asFUNCTION(displayModalMessage),
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("void displayOverlayMessage(const string &in)", 
@@ -259,6 +376,11 @@ namespace Scripting
             engine->RegisterEnumValue("RaceGUIType", "STEERING_WHEEL", RGT_STEERING_WHEEL);
             engine->RegisterEnumValue("RaceGUIType", "ACCELEROMETER", RGT_ACCELEROMETER);
             engine->RegisterEnumValue("RaceGUIType", "GYROSCOPE", RGT_GYROSCOPE);
+            engine->RegisterEnum("MsgType");
+            engine->RegisterEnumValue("MsgType", "GENERIC", MSG_GENERIC);
+            engine->RegisterEnumValue("MsgType", "ERROR", MSG_ERROR);
+            engine->RegisterEnumValue("MsgType", "ACHIEVEMENT", MSG_ACHIEVEMENT);
+            engine->RegisterEnumValue("MsgType", "FRIEND", MSG_FRIEND);
         }
     }
 

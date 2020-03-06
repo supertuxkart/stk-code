@@ -34,6 +34,8 @@
 #include "karts/kart_properties_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 using namespace GUIEngine;
 
@@ -106,13 +108,22 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::beforeAddingWidget()
 {
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
+        irr_driver->getDevice()->supportsTouchDevice()) ||
+        UserConfigParams::m_multitouch_active > 1;
+    if (multitouch_enabled)
+    {
+        Widget* team = getWidget<Widget>("choose_team");
+        //I18N: In soccer setup screen
+        team->setText(_("Press red or blue soccer icon to change team"));
+    }
     Widget* central_div = getWidget<Widget>("central_div");
 
     // Add the 3D views for the karts
-    int nb_players = race_manager->getNumPlayers();
+    int nb_players = RaceManager::get()->getNumPlayers();
     for(int i=0 ; i < nb_players ; i++)
     {
-        const RemoteKartInfo&   kart_info   = race_manager->getKartInfo(i);
+        const RemoteKartInfo&   kart_info   = RaceManager::get()->getKartInfo(i);
         const std::string&      kart_name   = kart_info.getKartName();
 
         const KartProperties*   props       = kart_properties_manager->getKart(kart_name);
@@ -180,7 +191,7 @@ void SoccerSetupScreen::beforeAddingWidget()
         info.view  = kart_view;
         info.confirmed  = false;
         m_kart_view_info.push_back(info);
-        race_manager->setKartTeam(i, info.team);
+        RaceManager::get()->setKartTeam(i, info.team);
     }
 
     // Update layout
@@ -253,7 +264,7 @@ void SoccerSetupScreen::changeTeam(int player_id, KartTeam team)
         UserConfigParams::m_soccer_default_team = (int)team;
     }
 
-    race_manager->setKartTeam(player_id, team);
+    RaceManager::get()->setKartTeam(player_id, team);
     m_kart_view_info[player_id].team = team;
     updateKartViewsLayout();
 }
@@ -473,7 +484,7 @@ void SoccerSetupScreen::updateKartViewsLayout()
 // -----------------------------------------------------------------------------
 bool SoccerSetupScreen::onEscapePressed()
 {
-    race_manager->setTimeTarget(0.0f);
+    RaceManager::get()->setTimeTarget(0.0f);
     return true;
 }   // onEscapePressed
 

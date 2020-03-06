@@ -70,7 +70,7 @@ SkiddingAI::SkiddingAI(AbstractKart *kart)
     reset();
     // Determine if this AI has superpowers, which happens e.g.
     // for the final race challenge against nolok.
-    m_superpower = race_manager->getAISuperPower();
+    m_superpower = RaceManager::get()->getAISuperPower();
 
     m_point_selection_algorithm = PSA_DEFAULT;
     setControllerName("TestAI");
@@ -269,15 +269,15 @@ void SkiddingAI::update(int ticks)
             }
 
             // also give him some free nitro
-            if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM)
+            if (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM)
             {
                 if (m_kart->getPosition() > 1)
                     m_kart->setEnergy(m_kart->getEnergy() + 2);
                 else
                     m_kart->setEnergy(m_kart->getEnergy() + 1);
             }
-            else if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
-                race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST)
+            else if (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+                RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST)
             {
                 if (m_kart->getPosition() > 1)
                     m_kart->setEnergy(m_kart->getEnergy() + 7);
@@ -371,7 +371,7 @@ void SkiddingAI::update(int ticks)
         // Make sure that not all AI karts use the zipper at the same
         // time in time trial at start up, so during the first 5 seconds
         // this is done at random only.
-        if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_TIME_TRIAL ||
+        if(RaceManager::get()->getMinorMode()!=RaceManager::MINOR_MODE_TIME_TRIAL ||
             (m_world->getTime()<3.0f && rand()%50==1) )
         {
             m_controls->setNitro(false);
@@ -396,7 +396,7 @@ void SkiddingAI::handleBraking()
     m_controls->setBrake(false);
     // In follow the leader mode, the kart should brake if they are ahead of
     // the leader (and not the leader, i.e. don't have initial position 1)
-    if(race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
+    if(RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER &&
         m_kart->getPosition() < m_world->getKart(0)->getPosition()           &&
         m_kart->getInitialPosition()>1                                         )
     {
@@ -637,11 +637,12 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     // 1) Filter and sort all items close by
     // -------------------------------------
     const float max_item_lookahead_distance = 30.f;
+    ItemManager* im = Track::getCurrentTrack()->getItemManager();
     while(distance < max_item_lookahead_distance)
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
         const std::vector<ItemState *> &items_ahead =
-            ItemManager::get()->getItemsInQuads(n_index);
+            im->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
         {
             evaluateItems(items_ahead[i],  kart_aim_direction,
@@ -1203,7 +1204,7 @@ void SkiddingAI::handleItems(const float dt)
             // Check if a flyable (cake, ...) is close. If so, use bubblegum
             // as shield
             if( !m_kart->isShielded() &&
-                projectile_manager->projectileIsClose(m_kart,
+                ProjectileManager::get()->projectileIsClose(m_kart,
                                     m_ai_properties->m_shield_incoming_radius) )
             {
                 m_controls->setFire(true);
@@ -1233,7 +1234,7 @@ void SkiddingAI::handleItems(const float dt)
             if(m_time_since_last_shot > 3.0f &&
                 lin_world &&
                 lin_world->getFinishedLapsOfKart(m_kart->getWorldKartId())
-                                   == race_manager->getNumLaps()-1)
+                                   == RaceManager::get()->getNumLaps()-1)
             {
                 m_controls->setFire(true);
                 m_controls->setLookBack(true);
@@ -1390,7 +1391,7 @@ void SkiddingAI::handleItems(const float dt)
         // Wait one second more than a previous anvil
         if(m_time_since_last_shot < m_kart->getKartProperties()->getAnvilDuration() + 1.0f) break;
 
-        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             m_controls->setFire(m_world->getTime()<1.0f &&
                                 m_kart->getPosition()>2    );
@@ -1487,7 +1488,7 @@ void SkiddingAI::computeNearestKarts()
     // Compute distance to nearest player kart
     float max_overall_distance = 0.0f;
     unsigned int n = ProfileWorld::isProfileMode()
-                   ? 0 : race_manager->getNumPlayers();
+                   ? 0 : RaceManager::get()->getNumPlayers();
     for(unsigned int i=0; i<n; i++)
     {
         unsigned int kart_id =
@@ -1694,7 +1695,7 @@ void SkiddingAI::handleNitroAndZipper()
     // decrease (additionally some nitro will be saved when top speed
     // is reached).
     if(m_world->getLapForKart(m_kart->getWorldKartId())
-                        ==race_manager->getNumLaps()-1 &&
+                        ==RaceManager::get()->getNumLaps()-1 &&
        m_ai_properties->m_nitro_usage >= 2)
     {
         float finish =

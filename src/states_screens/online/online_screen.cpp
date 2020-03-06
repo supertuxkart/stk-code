@@ -28,10 +28,10 @@
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "input/device_manager.hpp"
 #include "network/event.hpp"
-#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/server.hpp"
 #include "network/server_config.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "online/request_manager.hpp"
@@ -242,60 +242,32 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             [this] (GUIEngine::LabelWidget* lw,
                    GUIEngine::TextBoxWidget* tb)->bool
             {
-                TransportAddress server_addr =
-                    TransportAddress::fromDomain(
-                    StringUtils::wideToUtf8(tb->getText()));
-                if (server_addr.getIP() == 0)
+                core::stringw addr_w = tb->getText();
+                std::string addr_u = StringUtils::wideToUtf8(addr_w);
+                SocketAddress server_addr(addr_u);
+                if (server_addr.getIP() == 0 && !server_addr.isIPv6())
                 {
                     core::stringw err = _("Invalid server address: %s.",
-                        tb->getText());
+                        addr_w);
                     lw->setText(err, true);
                     return false;
                 }
-                if (server_addr.getPort() == 0)
+                SocketAddress ipv4_addr = server_addr;
+                if (server_addr.isIPv6())
+                    ipv4_addr.setIP(0);
+                auto server =
+                    std::make_shared<UserDefinedServer>(addr_w, ipv4_addr);
+                if (server_addr.isIPv6())
                 {
-                    ENetAddress ea;
-                    ea.host = STKHost::HOST_ANY;
-                    ea.port = STKHost::PORT_ANY;
-                    Network* nw = new Network(/*peer_count*/1,
-                        /*channel_limit*/EVENT_CHANNEL_COUNT,
-                        /*max_in_bandwidth*/0, /*max_out_bandwidth*/0, &ea,
-                        true/*change_port_if_bound*/);
-                    BareNetworkString s(std::string("stk-server-port"));
-                    TransportAddress address(server_addr.getIP(),
-                        stk_config->m_server_discovery_port);
-                    nw->sendRawPacket(s, address);
-                    TransportAddress sender;
-                    const int LEN = 2048;
-                    char buffer[LEN];
-                    int len = nw->receiveRawPacket(buffer, LEN, &sender, 2000);
-                    if (len != 2)
-                    {
-                        //I18N: In enter server ip address dialog
-                        core::stringw err = _("Failed to detect port number.");
-                        lw->setText(err, true);
-                        delete nw;
-                        return false;
-                    }
-                    BareNetworkString server_port(buffer, len);
-                    uint16_t port = server_port.getUInt16();
-                    server_addr.setPort(port);
-                    Log::info("OnlineScreen",
-                        "Detected port %d for server address: %s.",
-                        port, server_addr.toString(false).c_str());
-                    delete nw;
+                    server->setIPV6Address(server_addr);
+                    server->setIPV6Connection(true);
                 }
-                auto server = std::make_shared<Server>(0,
-                    StringUtils::utf8ToWide(server_addr.toString()), 0, 0, 0, 0,
-                    server_addr, false, false);
                 m_entered_server = server;
-                m_entered_server_address = server_addr;
                 return true;
             });
-        if (!m_entered_server_address.isUnset())
+        if (!m_entered_server_name.empty())
         {
-            gtfd->getTextField()->setText(StringUtils::utf8ToWide(
-                m_entered_server_address.toString()));
+            gtfd->getTextField()->setText(m_entered_server_name);
         }
     }
 }   // eventCallback

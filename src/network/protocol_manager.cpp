@@ -22,6 +22,7 @@
 #include "network/network_config.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocols/server_lobby.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_peer.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -36,7 +37,7 @@
 #include <typeinfo>
 
 // ============================================================================
-std::weak_ptr<ProtocolManager> ProtocolManager::m_protocol_manager;
+std::weak_ptr<ProtocolManager> ProtocolManager::m_protocol_manager[PT_COUNT];
 // ============================================================================
 std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
 {
@@ -46,10 +47,17 @@ std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
             "Create only 1 instance of ProtocolManager!");
         return NULL;
     }
+    // This is called in STKHost creation, so its process type will be told
+    // here
+    ProcessType pt = STKProcess::getType();
     auto pm = std::make_shared<ProtocolManager>();
-    pm->m_asynchronous_update_thread = std::thread([pm]()
+    pm->m_asynchronous_update_thread = std::thread([pm, pt]()
         {
-            VS::setThreadName("ProtocolManager");
+            std::string thread_name = "PtlMgr";
+            if (pt == PT_CHILD)
+                thread_name += "_child";
+            VS::setThreadName(thread_name.c_str());
+            STKProcess::init(pt);
             while(!pm->m_exit.load())
             {
                 pm->asynchronousUpdate();
@@ -60,9 +68,10 @@ std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
         });
     if (NetworkConfig::get()->isServer())
     {
-        pm->m_game_protocol_thread = std::thread([pm]()
+        pm->m_game_protocol_thread = std::thread([pm, pt]()
             {
                 VS::setThreadName("CtrlEvents");
+                STKProcess::init(pt);
                 while (true)
                 {
                     std::unique_lock<std::mutex> ul(pm->m_game_protocol_mutex);
@@ -93,7 +102,7 @@ std::shared_ptr<ProtocolManager> ProtocolManager::createInstance()
                 }
             });
     }
-    m_protocol_manager = pm;
+    m_protocol_manager[pt] = pm;
     return pm;
 }   // createInstance
 
@@ -382,7 +391,7 @@ void ProtocolManager::update(int ticks)
         }
         catch (std::exception& e)
         {
-            const std::string& name = (*i)->getPeer()->getRealAddress();
+            const std::string& name = (*i)->getPeer()->getAddress().toString();
             Log::error("ProtocolManager",
                 "Synchronous event error from %s: %s", name.c_str(), e.what());
             Log::error("ProtocolManager", (*i)->data().getLogMessage().c_str());
@@ -441,7 +450,7 @@ void ProtocolManager::asynchronousUpdate()
         }
         catch (std::exception& e)
         {
-            const std::string& name = (*i)->getPeer()->getRealAddress();
+            const std::string& name = (*i)->getPeer()->getAddress().toString();
             Log::error("ProtocolManager", "Asynchronous event "
                 "error from %s: %s", name.c_str(), e.what());
             Log::error("ProtocolManager",

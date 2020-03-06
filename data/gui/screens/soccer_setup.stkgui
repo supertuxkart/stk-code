@@ -6,7 +6,7 @@
         <header height="8%" width="80%" text="Race Setup" align="center" text_align="center" />
         <spacer height="1%" width="25"/>
 
-        <bubble height="fit" width="100%" id="lblLeftRight" I18N="In soccer setup screen" text="Use left/right to choose your team and press fire" word_wrap="true" text_align="center"/>
+        <bubble height="fit" id="choose_team" width="100%" id="lblLeftRight" I18N="In soccer setup screen" text="Use left/right to choose your team and press fire" word_wrap="true" text_align="center"/>
 
         <spacer height="1%" width="25"/>
 

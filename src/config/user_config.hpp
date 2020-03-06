@@ -160,6 +160,10 @@ public:
         m_elements = std::map<T,U>(v);
         return m_elements;
     }
+    size_t size() const
+    {
+        return m_elements.size();
+    }
     U& operator[] (const T key)
     {
         return m_elements[key];
@@ -761,6 +765,22 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
     // ---- Networking
+    // These stk domains have only a record to each ipv6 stun below,
+    // so we can use this to know ipv4 address of nat64 gateway (if any)
+    PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers_v4
+        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv4",
+        "The stun servers that will be used to know the public address "
+        "(ipv4 only) with port", {{ "stun-server", "address", "ping" }},
+            {
+                { "stunv4.1.supertuxkart.net:3478", 0u },
+                { "stunv4.2.supertuxkart.net:19302", 0u },
+                { "stunv4.3.supertuxkart.net:19302", 0u },
+                { "stunv4.4.supertuxkart.net:19302", 0u },
+                { "stunv4.5.supertuxkart.net:19302", 0u },
+                { "stunv4.6.supertuxkart.net:19302", 0u }
+            }
+        ));
+
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
         PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv6",
         "The stun servers that will be used to know the public address "
@@ -795,6 +815,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam m_race_chat
         PARAM_DEFAULT(BoolUserConfigParam(true, "race-chat",
         &m_network_group, "Enable chatting during races."));
+    PARAM_PREFIX BoolUserConfigParam m_ipv6_lan
+        PARAM_DEFAULT(BoolUserConfigParam(true, "ipv6-lan",
+        &m_network_group, "Enable IPv6 LAN server discovery."));
     PARAM_PREFIX IntUserConfigParam m_max_players
         PARAM_DEFAULT(IntUserConfigParam(8, "max-players",
         &m_network_group, "Maximum number of players on the server "
@@ -802,6 +825,10 @@ namespace UserConfigParams
      PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance
         PARAM_DEFAULT(IntUserConfigParam(5, "timer-sync-difference-tolerance",
         &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
+    PARAM_PREFIX IntUserConfigParam m_default_ip_type
+        PARAM_DEFAULT(IntUserConfigParam(0, "default-ip-type",
+        &m_network_group, "Default IP type of this machine, "
+        "0 detect every time, 1 IPv4, 2 IPv6, 3 IPv6 NAT64, 4 Dual stack."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode

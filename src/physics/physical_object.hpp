@@ -27,8 +27,6 @@
 #include "network/smooth_network_body.hpp"
 #include "physics/user_pointer.hpp"
 #include "utils/vec3.hpp"
-#include "utils/leak_check.hpp"
-
 
 class Material;
 class TrackObject;
@@ -197,6 +195,7 @@ private:
      * when the object is not moving */
     bool                  m_no_server_state;
 
+    void copyFromMainProcess(TrackObject* track_obj);
 public:
                     PhysicalObject(bool is_dynamic, const Settings& settings,
                                    TrackObject* object);
@@ -293,7 +292,12 @@ public:
     virtual std::function<void()> getLocalStateRestoreFunction();
     bool hasTriangleMesh() const { return m_triangle_mesh != NULL; }
     void joinToMainTrack();
-    LEAK_CHECK()
+    std::shared_ptr<PhysicalObject> clone(TrackObject* track_obj)
+    {
+        PhysicalObject* obj = new PhysicalObject(*this);
+        obj->copyFromMainProcess(track_obj);
+        return std::shared_ptr<PhysicalObject>(obj);
+    }
 };  // PhysicalObject
 
 #endif

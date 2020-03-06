@@ -49,7 +49,7 @@ libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
 mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
 ```
 
-OpenSUSE command:
+openSUSE command:
 
 ```bash
 sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel \
@@ -238,7 +238,7 @@ Build STK
 ```bash
 mkdir cmake_build
 cd cmake_build
-CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/glew/:/usr/local/opt/fribidi/ cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib
+CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/glew/:/usr/local/opt/fribidi/ cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/
 make
 ```
 

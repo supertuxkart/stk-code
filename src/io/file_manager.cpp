@@ -408,6 +408,53 @@ void FileManager::init()
     addAssetsSearchPath();
     m_cert_bundle_location = m_file_system->getAbsolutePath(
         getAsset("cacert.pem").c_str()).c_str();
+
+    // Clean up left-over files in addons/tmp that are older than 24h
+    // ==============================================================
+    // (The 24h delay is useful when debugging a problem with a zip file)
+    // We do when starting STK because for mobile STK destructor of file
+    // manager may never be called if only home button is pressed
+    std::set<std::string> allfiles;
+    std::string tmp=getAddonsFile("tmp");
+    listFiles(allfiles, tmp);
+    for(std::set<std::string>::iterator i=allfiles.begin();
+        i!=allfiles.end(); i++)
+    {
+        if((*i)=="." || (*i)=="..") continue;
+        // For now there should be only zip files or .part files
+        // (not fully downloaded files) in tmp. Warn about any
+        // other files.
+        std::string full_path=tmp+"/"+*i;
+        if(StringUtils::getExtension(*i)!="zip" &&
+           StringUtils::getExtension(*i)!="part"    )
+        {
+            Log::warn("[FileManager]", "Unexpected tmp file '%s' found.",
+                       full_path.c_str());
+            continue;
+        }
+        if(isDirectory(full_path))
+        {
+            // Gee, a .zip file which is a directory - stay away from it
+            Log::warn("[FileManager]", "'%s' is a directory and will not be deleted.",
+                      full_path.c_str());
+            continue;
+        }
+        struct stat mystat;
+        FileUtils::statU8Path(full_path, &mystat);
+        StkTime::TimeType current = StkTime::getTimeSinceEpoch();
+        if(current - mystat.st_ctime <24*3600)
+        {
+            if(UserConfigParams::logAddons())
+                Log::verbose("[FileManager]", "'%s' is less than 24h old "
+                             "and will not be deleted.",
+                             full_path.c_str());
+            continue;
+        }
+        if(UserConfigParams::logAddons())
+            Log::verbose("[FileManager]", "Deleting tmp file'%s'.",full_path.c_str());
+        removeFile(full_path);
+
+    }   // for i in all files in tmp
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -454,51 +501,6 @@ void FileManager::reinitAfterDownloadAssets()
 //-----------------------------------------------------------------------------
 FileManager::~FileManager()
 {
-    // Clean up left-over files in addons/tmp that are older than 24h
-    // ==============================================================
-    // (The 24h delay is useful when debugging a problem with a zip file)
-    std::set<std::string> allfiles;
-    std::string tmp=getAddonsFile("tmp");
-    listFiles(allfiles, tmp);
-    for(std::set<std::string>::iterator i=allfiles.begin();
-        i!=allfiles.end(); i++)
-    {
-        if((*i)=="." || (*i)=="..") continue;
-        // For now there should be only zip files or .part files
-        // (not fully downloaded files) in tmp. Warn about any
-        // other files.
-        std::string full_path=tmp+"/"+*i;
-        if(StringUtils::getExtension(*i)!="zip" &&
-           StringUtils::getExtension(*i)!="part"    )
-        {
-            Log::warn("[FileManager]", "Unexpected tmp file '%s' found.",
-                       full_path.c_str());
-            continue;
-        }
-        if(isDirectory(full_path))
-        {
-            // Gee, a .zip file which is a directory - stay away from it
-            Log::warn("[FileManager]", "'%s' is a directory and will not be deleted.",
-                      full_path.c_str());
-            continue;
-        }
-        struct stat mystat;
-        FileUtils::statU8Path(full_path, &mystat);
-        StkTime::TimeType current = StkTime::getTimeSinceEpoch();
-        if(current - mystat.st_ctime <24*3600)
-        {
-            if(UserConfigParams::logAddons())
-                Log::verbose("[FileManager]", "'%s' is less than 24h old "
-                             "and will not be deleted.",
-                             full_path.c_str());
-            continue;
-        }
-        if(UserConfigParams::logAddons())
-            Log::verbose("[FileManager]", "Deleting tmp file'%s'.",full_path.c_str());
-        removeFile(full_path);
-
-    }   // for i in all files in tmp
-
     // Clean up rest of file manager
     // =============================
     popMusicSearchPath();

@@ -17,8 +17,8 @@
 
 
 #include "config/user_config.hpp"
+#include "guiengine/engine.hpp"
 #include "graphics/irr_driver.hpp"
-#include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 #include "utils/progress_bar_android.hpp"
 
@@ -49,7 +49,7 @@ ProgressBarAndroid::~ProgressBarAndroid()
 bool ProgressBarAndroid::compileShaders()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return false;
         
     const GLchar* vsh =
@@ -127,7 +127,7 @@ bool ProgressBarAndroid::compileShaders()
 void ProgressBarAndroid::deleteShaders()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
         
     glDeleteShader(m_vertex_shader);
@@ -139,7 +139,7 @@ void ProgressBarAndroid::deleteShaders()
 void ProgressBarAndroid::init()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
         
     SIrrlichtCreationParameters params;
@@ -185,7 +185,7 @@ void ProgressBarAndroid::init()
 void ProgressBarAndroid::close()
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
         
     glDisableVertexAttribArray(m_position);
@@ -210,7 +210,7 @@ void ProgressBarAndroid::close()
 void ProgressBarAndroid::draw(float value)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
         
     if (!m_initialized || m_close_event_received)

@@ -95,7 +95,14 @@ RaceGUIBase::RaceGUIBase()
     }
 
     //read frame picture for icons in the mini map.
-    m_icons_frame = irr_driver->getTexture("icons-frame.png");
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER)
+    {   // show the kart direction in soccer
+        m_icons_frame = irr_driver->getTexture("icons-frame_arrow.png");
+    }
+    else
+    {
+        m_icons_frame = irr_driver->getTexture("icons-frame.png");
+    }
     if (!m_icons_frame)
     {
         Log::error("RaceGuiBase",
@@ -126,13 +133,13 @@ RaceGUIBase::RaceGUIBase()
  */
 void RaceGUIBase::init()
 {
-    m_kart_display_infos.resize(race_manager->getNumberOfKarts());
+    m_kart_display_infos.resize(RaceManager::get()->getNumberOfKarts());
 
     // Do everything else required at a race restart as well, esp.
     // resetting the height of the referee.
     m_referee = new Referee();
-    m_referee_pos.resize(race_manager->getNumberOfKarts());
-    m_referee_rotation.resize(race_manager->getNumberOfKarts());
+    m_referee_pos.resize(RaceManager::get()->getNumberOfKarts());
+    m_referee_rotation.resize(RaceManager::get()->getNumberOfKarts());
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -145,7 +152,7 @@ void RaceGUIBase::reset()
     // we add all karts, since it's easier to get a world kart id from
     // the kart then the local player id (and it avoids problems in
     // profile mode where there might be a camera, but no player).
-    for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    for(unsigned int i=0; i<RaceManager::get()->getNumberOfKarts(); i++)
     {
         const AbstractKart *kart = World::getWorld()->getKart(i);
         m_referee_pos[i] = kart->getTrans()(Referee::getStartOffset());
@@ -239,7 +246,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
 
     // Draw less important messages first, at the very bottom of the screen
     // unimportant messages are skipped in multiplayer, they take too much screen space
-    if (race_manager->getNumLocalPlayers() < 2 &&
+    if (RaceManager::get()->getNumLocalPlayers() < 2 &&
         !m_ignore_unimportant_messages)
     {
         for (AllMessageType::const_iterator i = m_messages.begin();
@@ -278,7 +285,7 @@ void RaceGUIBase::drawAllMessages(const AbstractKart* kart,
     gui::ScalableFont* big_font = GUIEngine::getTitleFont();
 
     int font_height = m_max_font_height;
-    if (race_manager->getNumLocalPlayers() > 2)
+    if (RaceManager::get()->getNumLocalPlayers() > 2)
     {
         font = GUIEngine::getSmallFont();
     }
@@ -392,9 +399,9 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     }
 
     // When the viewport is smaller in splitscreen, reduce the top margin
-    if ((race_manager->getNumLocalPlayers() == 2    &&
+    if ((RaceManager::get()->getNumLocalPlayers() == 2    &&
         viewport.getWidth() > viewport.getHeight()) ||
-        race_manager->getNumLocalPlayers() >= 3       )
+        RaceManager::get()->getNumLocalPlayers() >= 3       )
         y1 = viewport.UpperLeftCorner.Y  + (int)(5 * scaling.Y);
     else
         y1 = viewport.UpperLeftCorner.Y  + (int)(20 * scaling.Y);
@@ -495,8 +502,8 @@ void RaceGUIBase::update(float dt)
     if (m_enabled_network_spectator || !cl || !w)
         return;
 
-    if (race_manager->getNumLocalPlayers() != 1 ||
-        !race_manager->modeHasLaps() ||
+    if (RaceManager::get()->getNumLocalPlayers() != 1 ||
+        !RaceManager::get()->modeHasLaps() ||
         !w->isActiveRacePhase())
         return;
 
@@ -731,9 +738,9 @@ void RaceGUIBase::drawGlobalReadySetGo()
         break;
     case WorldStatus::GO_PHASE:
         {
-            if (race_manager->getCoinTarget() > 0)
+            if (RaceManager::get()->getCoinTarget() > 0)
                 font->draw(_("Collect nitro!"), pos, color, true, true);
-            else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
                 font->draw(_("Follow the leader!"), pos, color, true, true);
             else
                 font->draw(m_string_go.c_str(), pos, color, true, true);
@@ -751,29 +758,28 @@ void RaceGUIBase::drawGlobalReadySetGo()
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
 #ifndef SERVER_ONLY
-    // For now, don't draw player icons when in soccer mode
-    const RaceManager::MinorRaceModeType  minor_mode = race_manager->getMinorMode();
+    const RaceManager::MinorRaceModeType  minor_mode = RaceManager::get()->getMinorMode();
     int x_base = 10;
     if (irr_driver->getDevice()->getLeftPadding() > 0)
         x_base += irr_driver->getDevice()->getLeftPadding();
     int y_base = 25;
     unsigned int y_space = irr_driver->getActualScreenSize().Height - bottom_margin - y_base;
     // Special case : when 3 players play, use 4th window to display such stuff
-    if (race_manager->getIfEmptyScreenSpaceExists())
+    if (RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
-        irr::core::recti Last_Space = irr_driver->getSplitscreenWindow(race_manager->getNumLocalPlayers());
+        irr::core::recti Last_Space = irr_driver->getSplitscreenWindow(RaceManager::get()->getNumLocalPlayers());
         x_base = Last_Space.UpperLeftCorner.X;
         y_base = Last_Space.UpperLeftCorner.Y;
         y_space = irr_driver->getActualScreenSize().Height - y_base;
     }
 
-    unsigned int sta = race_manager->getNumSpareTireKarts();
-    unsigned int total_karts = race_manager->getNumberOfKarts() - sta;
+    unsigned int sta = RaceManager::get()->getNumSpareTireKarts();
+    unsigned int total_karts = RaceManager::get()->getNumberOfKarts() - sta;
     unsigned int num_karts = 0;
     if (NetworkConfig::get()->isNetworking())
         num_karts = World::getWorld()->getCurrentNumKarts();
     else
-        num_karts = race_manager->getNumberOfKarts() - sta;
+        num_karts = RaceManager::get()->getNumberOfKarts() - sta;
     // May happen in spectate mode if all players disconnected before server
     // reset
     if (num_karts == 0)
@@ -828,7 +834,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
     //where is the limit to hide last icons
     int y_icons_limit = irr_driver->getActualScreenSize().Height - 
                                             bottom_margin - ICON_PLAYER_WIDTH;
-    if (race_manager->getIfEmptyScreenSpaceExists())
+    if (RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
         y_icons_limit = irr_driver->getActualScreenSize().Height - ICON_WIDTH;
     }
@@ -978,7 +984,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         auto cl = LobbyProtocol::get<ClientLobby>();
         bool is_nw_spectate = cl && cl->isSpectator();
         // For network spectator highlight
-        if (race_manager->getNumLocalPlayers() == 1 && cam && is_nw_spectate)
+        if (RaceManager::get()->getNumLocalPlayers() == 1 && cam && is_nw_spectate)
             target_kart = cam->getKart();
         bool is_local = is_nw_spectate ? kart == target_kart :
             kart->getController()->isLocalPlayerController();

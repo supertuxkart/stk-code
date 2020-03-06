@@ -49,6 +49,13 @@ AbstractStateManager::AbstractStateManager()
 
 void AbstractStateManager::enterGameState()
 {
+    if (GUIEngine::isNoGraphics())
+    {
+        // No graphics STK won't push dialog
+        setGameState(GAME);
+        return;
+    }
+
      // you need to close any dialog before calling this
     assert(!ModalDialog::isADialogActive());
     assert(!ScreenKeyboard::isActive());

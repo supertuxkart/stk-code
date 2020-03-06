@@ -64,7 +64,7 @@ AbstractKartAnimation::AbstractKartAnimation(AbstractKart* kart,
     {
         m_created_transform = kart->getTrans();
         kart->setKartAnimation(this);
-        Physics::getInstance()->removeKart(m_kart);
+        Physics::get()->removeKart(m_kart);
         kart->getSkidding()->reset();
         kart->getSlipstream()->reset();
         if (kart->isSquashed())
@@ -97,7 +97,7 @@ AbstractKartAnimation::~AbstractKartAnimation()
         m_kart->setTrans(transform);
         // Reset all btKart members (bounce back ticks / rotation ticks..)
         m_kart->getVehicle()->reset();
-        Physics::getInstance()->addKart(m_kart);
+        Physics::get()->addKart(m_kart);
     }
 }   // ~AbstractKartAnimation
 

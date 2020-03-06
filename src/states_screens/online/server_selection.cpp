@@ -23,6 +23,7 @@
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "io/file_manager.hpp"
 #include "network/network_config.hpp"
@@ -49,6 +50,8 @@ ServerSelection::ServerSelection() : Screen("online/server_selection.stkgui")
 {
     m_refreshing_server = false;
     m_refresh_timer = 0.0f;
+    m_ipv6_only_without_nat64 = false;
+    m_ip_warning_shown = false;
 }   // ServerSelection
 
 // ----------------------------------------------------------------------------
@@ -78,6 +81,7 @@ void ServerSelection::refresh(bool full_refresh)
     // 5 seconds), clear the list and display the waiting message:
     if (ServersManager::get()->refresh(full_refresh))
     {
+        m_ip_warning_shown = false;
         m_server_list_widget->clear();
         m_reload_widget->setActive(false);
         m_refreshing_server = true;
@@ -189,6 +193,8 @@ void ServerSelection::init()
     /** Triggers the loading of the server list in the servers manager. */
     ServersManager::get()->reset();
     refresh(true);
+    m_ipv6_only_without_nat64 = false;
+    m_ip_warning_shown = false;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -251,7 +257,7 @@ void ServerSelection::loadList()
             true));
 
         core::stringw difficulty =
-            race_manager->getDifficultyName(server->getDifficulty());
+            RaceManager::get()->getDifficultyName(server->getDifficulty());
         row.push_back(GUIEngine::ListWidget::ListCell(difficulty, -1, 3,
             true));
 
@@ -302,6 +308,10 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
                                     const std::string& name,
                                     const int playerID)
 {
+    //I18N: Message shown to user if no IPv4 detected by STK
+    auto v4 = _("No IPv4 detected, you may not be able to join any servers.");
+    //I18N: Message shown to user if no IPv6 detected by STK
+    auto v6 = _("No IPv6 detected, you may not be able to join any servers.");
     if (name == "back")
     {
         StateManager::get()->escapePressed();
@@ -312,6 +322,18 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == "private_server" || name == "ipv6")
     {
+        if (!m_ip_warning_shown && m_ipv6->getState() &&
+            NetworkConfig::get()->getIPType() == NetworkConfig::IP_V4)
+        {
+            m_ip_warning_shown = true;
+            MessageQueue::add(MessageQueue::MT_ERROR, v6);
+        }
+        else if (!m_ip_warning_shown && !m_ipv6->getState() &&
+            NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6)
+        {
+            m_ip_warning_shown = true;
+            MessageQueue::add(MessageQueue::MT_ERROR, v4);
+        }
         copyFromServersManager();
     }
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
@@ -325,7 +347,9 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
             return;
         }
 #ifdef ENABLE_IPV6
-        if (!m_servers[selected_index]->getIPV6Address().empty())
+        // Lan server is set IPv6 during broadcasting
+        if (NetworkConfig::get()->isWAN() &&
+            m_servers[selected_index]->getIPV6Address())
             m_servers[selected_index]->setIPV6Connection(m_ipv6->getState());
 #endif
         new ServerInfoDialog(m_servers[selected_index]);
@@ -357,6 +381,14 @@ void ServerSelection::onUpdate(float dt)
         {
             refresh(false);
         }
+    }
+
+    if (!m_ipv6_only_without_nat64 &&
+        NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6)
+    {
+        // Enable IPv6 button if IPv6 only without NAT64
+        m_ipv6_only_without_nat64 = true;
+        m_ipv6->setState(true);
     }
 
     if (!m_refreshing_server) return;
@@ -406,7 +438,7 @@ void ServerSelection::copyFromServersManager()
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
         [this](const std::shared_ptr<Server>& a)->bool
         {
-            if (m_ipv6->getState() && a->getIPV6Address().empty())
+            if (m_ipv6->getState() && !a->getIPV6Address())
                 return true;
             return false;
         }), m_servers.end());

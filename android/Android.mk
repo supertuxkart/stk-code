@@ -231,7 +231,7 @@ LOCAL_CPPFLAGS     := -std=gnu++0x
 
 LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript mcpp \
                           vorbisfile vorbis ogg openal curl libssl libcrypto \
-                          gnustl_static raqm fribidi harfbuzz freetype graphics_utils
+                          c++_static raqm fribidi harfbuzz freetype graphics_utils
 
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)

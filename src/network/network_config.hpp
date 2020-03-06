@@ -22,11 +22,14 @@
 #ifndef HEADER_NETWORK_CONFIG
 #define HEADER_NETWORK_CONFIG
 
-#include "network/transport_address.hpp"
 #include "race/race_manager.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/no_copy.hpp"
 
 #include "irrString.h"
+#include <array>
+#include <atomic>
+#include <cstring>
 #include <memory>
 #include <set>
 #include <tuple>
@@ -47,17 +50,24 @@ class PlayerProfile;
 
 class NetworkConfig : public NoCopy
 {
+public:
+    enum IPType : int
+    {
+        IP_NONE, IP_V4, IP_V6, IP_V6_NAT64, IP_DUAL_STACK
+    };
 private:
     /** The singleton instance. */
-    static NetworkConfig *m_network_config;
+    static NetworkConfig *m_network_config[PT_COUNT];
 
-    enum NetworkType
+    enum NetworkType : int
     {
         NETWORK_NONE, NETWORK_WAN, NETWORK_LAN
     };
 
+    std::atomic<IPType> m_ip_type;
+
     /** Keeps the type of network connection: none (yet), LAN or WAN. */
-    NetworkType m_network_type;
+    std::atomic<NetworkType> m_network_type;
 
     /** If set it allows clients to connect directly to this server without
      *  using the stk server in between. It requires obviously that this
@@ -65,7 +75,7 @@ private:
     bool m_is_public_server;
 
     /** True if this host is a server, false otherwise. */
-    bool m_is_server;
+    std::atomic_bool m_is_server;
 
     /** True if a client should connect to the first server it finds and
      *  immediately start a race. */
@@ -73,7 +83,14 @@ private:
 
     bool m_done_adding_network_players;
 
-    bool m_network_ai_tester;
+    /** True if this STK instance is an AI instance which is used for server
+     *  AI. (usually used together with ai-handling in server config) */
+    bool m_network_ai_instance;
+
+    /** No. of fixed AI in all-in-one graphical client server, the player
+     *  connecting with 127.* or ::1/128 will be in charged of controlling the
+     *  AI. */
+    unsigned m_num_fixed_ai;
 
     /** The LAN port on which a client is waiting for a server connection. */
     uint16_t m_client_port;
@@ -98,22 +115,37 @@ private:
      *  available in same version. */
     std::set<std::string> m_server_capabilities;
 
+    /** For IPv6 only network we try to detect the NAT64 prefix so we can
+     *  use it to connect to ipv4 only servers. STK assumes that for all ipv4
+     *  addresses they use the same prefix for each initIPTest. */
+    std::string m_nat64_prefix;
+    std::array<uint32_t, 8> m_nat64_prefix_data;
 public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
     {
-        if (!m_network_config)
-            m_network_config = new NetworkConfig();
-        return m_network_config;
+        ProcessType type = STKProcess::getType();
+        if (!m_network_config[type])
+            m_network_config[type] = new NetworkConfig();
+        return m_network_config[type];
     }   // get
-
+    // ------------------------------------------------------------------------
+    static NetworkConfig* getByType(ProcessType type)
+    {
+        return m_network_config[type];
+    }   // get
     // ------------------------------------------------------------------------
     static void destroy()
     {
-        delete m_network_config;   // It's ok to delete NULL
-        m_network_config = NULL;
+        ProcessType type = STKProcess::getType();
+        delete m_network_config[type];   // It's ok to delete NULL
+        m_network_config[type] = NULL;
     }   // destroy
-
+    // ------------------------------------------------------------------------
+    static void clear()
+    {
+        memset(m_network_config, 0, sizeof(m_network_config));
+    }   // clear
     // ------------------------------------------------------------------------
     /** Sets if this instance is a server or client. */
     void setIsServer(bool b)
@@ -164,7 +196,7 @@ public:
     {
         for (auto& p : m_network_players)
         {
-            if (std::get<0>(p) == device && !m_network_ai_tester)
+            if (std::get<0>(p) == device && !m_network_ai_instance)
                 return false;
             if (std::get<1>(p) == profile)
                 return false;
@@ -202,9 +234,9 @@ public:
      *  requested. */
     bool isAutoConnect() const { return m_auto_connect; }
     // ------------------------------------------------------------------------
-    void setNetworkAITester(bool b) { m_network_ai_tester = b; }
+    void setNetworkAIInstance(bool b) { m_network_ai_instance = b; }
     // ------------------------------------------------------------------------
-    bool isNetworkAITester() const { return m_network_ai_tester; }
+    bool isNetworkAIInstance() const { return m_network_ai_instance; }
     // ------------------------------------------------------------------------
     void setCurrentUserId(uint32_t id) { m_cur_user_id = id ; }
     // ------------------------------------------------------------------------
@@ -245,7 +277,23 @@ public:
     // ------------------------------------------------------------------------
     const std::set<std::string>& getServerCapabilities() const
                                               { return m_server_capabilities; }
-
+    // ------------------------------------------------------------------------
+    void detectIPType();
+    // ------------------------------------------------------------------------
+    IPType getIPType() const                       { return m_ip_type.load(); }
+    // ------------------------------------------------------------------------
+    void setIPType(IPType ip_type)                { m_ip_type.store(ip_type); }
+    // ------------------------------------------------------------------------
+    const std::string& getNAT64Prefix() const        { return m_nat64_prefix; }
+    // ------------------------------------------------------------------------
+    const std::array<uint32_t, 8>& getNAT64PrefixData() const
+                                                { return m_nat64_prefix_data; }
+    // ------------------------------------------------------------------------
+    void initClientPort();
+    // ------------------------------------------------------------------------
+    void setNumFixedAI(unsigned num)                  { m_num_fixed_ai = num; }
+    // ------------------------------------------------------------------------
+    unsigned getNumFixedAI() const                   { return m_num_fixed_ai; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

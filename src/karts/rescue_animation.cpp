@@ -76,7 +76,7 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
     m_kart->getAttachment()->clear();
 
     // Add a hit unless it was auto-rescue
-    if (race_manager->isBattleMode() &&
+    if (RaceManager::get()->isBattleMode() &&
         !is_auto_rescue)
     {
         World::getWorld()->kartHit(m_kart->getWorldKartId());
@@ -90,7 +90,7 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
     }
 
     // Allow FTL mode to apply special action when the leader is rescued
-    if (race_manager->isFollowMode())
+    if (RaceManager::get()->isFollowMode())
     {
         FollowTheLeaderRace *ftl_world =
             dynamic_cast<FollowTheLeaderRace*>(World::getWorld());
@@ -99,7 +99,7 @@ RescueAnimation::RescueAnimation(AbstractKart* kart, bool is_auto_rescue)
     }
 
     // Clear powerups when rescue in CTF
-    if (race_manager->getMinorMode() ==
+    if (RaceManager::get()->getMinorMode() ==
         RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         resetPowerUp();
 }   // RescueAnimation
@@ -148,7 +148,7 @@ RescueAnimation::~RescueAnimation()
 {
     m_kart->getBody()->setLinearVelocity(btVector3(0, 0, 0));
     m_kart->getBody()->setAngularVelocity(btVector3(0, 0, 0));
-    if (m_referee)
+    if (m_referee && m_kart->getNode())
     {
         m_kart->getNode()->removeChild(m_referee->getSceneNode());
         delete m_referee;
@@ -185,7 +185,7 @@ void RescueAnimation::update(int ticks)
 // ----------------------------------------------------------------------------
 void RescueAnimation::updateGraphics(float dt)
 {
-    if (m_referee == NULL)
+    if (m_referee == NULL && m_kart->getNode())
     {
         m_referee = new Referee(*m_kart);
         m_kart->getNode()->addChild(m_referee->getSceneNode());

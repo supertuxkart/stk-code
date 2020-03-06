@@ -38,7 +38,7 @@ private:
     const float m_distance2;
 
     /** Function to call when triggered. */
-    const std::function<void(int)> m_triggering_function;
+    std::function<void(int)> m_triggering_function;
 
     /** Time since last trigger, if any triggering between 2 seconds ignored
      *  (like items). */
@@ -55,10 +55,20 @@ public:
     // ------------------------------------------------------------------------
     virtual void trigger(unsigned int kart_index) OVERRIDE
     {
+        if (!m_triggering_function) return;
         m_triggering_function(kart_index);
         CheckStructure::trigger(kart_index);
     }
-};   // CheckSphere
+    // ------------------------------------------------------------------------
+    virtual CheckStructure* clone() OVERRIDE
+    {
+        CheckTrigger* ct = new CheckTrigger(*this);
+        // Drop unneeded stuff ( trigger function is not supported in server,
+        // no scripting atm)
+        ct->m_triggering_function = nullptr;
+        return ct;
+    }
+};   // CheckTrigger
 
 #endif
 

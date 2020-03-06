@@ -35,12 +35,12 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
+#include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
-#include "modes/profile_world.hpp"
 #include "physics/btKart.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -629,7 +629,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_kart_lowest_point  = kart_min.getY();
     initInverseBoneMatrices();
 
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         m_mesh->freeMeshVertexBuffer();
 
     // Load the speed weighted object models. We need to do that now because it can affect the dimensions of the kart
@@ -675,7 +675,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         obj.m_location.transformVect(transformed_max, obj_max.toIrrVector());
         kart_min.min(transformed_min);
         kart_max.max(transformed_max);
-        if (ProfileWorld::isNoGraphics())
+        if (GUIEngine::isNoGraphics())
             mesh->freeMeshVertexBuffer();
     }
 
@@ -689,7 +689,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
 #endif
         obj.getModel()->grab();
         irr_driver->grabAllTextures(obj.getModel());
-        if (ProfileWorld::isNoGraphics())
+        if (GUIEngine::isNoGraphics())
             obj.getModel()->freeMeshVertexBuffer();
     }
 
@@ -739,7 +739,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         // the destructor will only free the textures if a master
         // copy is freed.
         irr_driver->grabAllTextures(m_wheel_model[i]);
-        if (ProfileWorld::isNoGraphics())
+        if (GUIEngine::isNoGraphics())
             m_wheel_model[i]->freeMeshVertexBuffer();
     }   // for i<4
 

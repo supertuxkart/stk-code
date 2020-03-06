@@ -44,6 +44,11 @@
 #  include <pthread.h>
 #endif
 
+#if defined(__FreeBSD__)
+#  include <pthread.h>
+#  include <pthread_np.h>
+#endif
+
 namespace VS
 {
 #if defined(_MSC_VER) && defined(DEBUG)
@@ -82,17 +87,17 @@ namespace VS
         }
 
     }   // setThreadName
-#elif defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)
-    static void setThreadName(const char* name)
-    {
-#if __GLIBC__ > 2 || __GLIBC_MINOR__ > 11
-        pthread_setname_np(pthread_self(), name);
-#endif
-    }   // setThreadName
 #else
     static void setThreadName(const char* name)
     {
-    }
+#if defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)
+#if __GLIBC__ > 2 || __GLIBC_MINOR__ > 11
+        pthread_setname_np(pthread_self(), name);
+#endif
+#elif defined(__FreeBSD__)
+        pthread_set_name_np(pthread_self(), name);
+#endif
+    }   // setThreadName
 #endif
 
 }   // namespace VS

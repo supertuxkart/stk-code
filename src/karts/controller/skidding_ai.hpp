@@ -50,6 +50,7 @@
 
 #include <line3d.h>
 
+class ItemManager;
 class ItemState;
 class LinearWorld;
 class Track;
@@ -234,6 +235,7 @@ private:
     enum {PSA_DEFAULT, PSA_NEW}
           m_point_selection_algorithm;
 
+    ItemManager* m_item_manager;
 #ifdef AI_DEBUG
     /** For skidding debugging: shows the estimated turn shape. */
     ShowCurve **m_curve;

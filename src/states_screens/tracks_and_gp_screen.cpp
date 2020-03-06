@@ -62,7 +62,7 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
         }
 
         UserConfigParams::m_last_track = selection;
-        if (selection == "locked" && race_manager->getNumLocalPlayers() == 1)
+        if (selection == "locked" && RaceManager::get()->getNumLocalPlayers() == 1)
         {
             unlock_manager->playLockSound();
             return;
@@ -96,7 +96,7 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
         const std::string &selection =
                        gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "locked" && race_manager->getNumLocalPlayers()==1)
+        if (selection == "locked" && RaceManager::get()->getNumLocalPlayers()==1)
         {
             unlock_manager->playLockSound();
         }
@@ -194,7 +194,7 @@ void TracksAndGPScreen::init()
         assert(screenshots.size() > 0);
 
         if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()) &&
-            race_manager->getNumLocalPlayers() == 1)
+            RaceManager::get()->getNumLocalPlayers() == 1)
         {
             gps_widget->addAnimatedItem(_("Locked!"), "locked",
                                         screenshots, 1.5f,
@@ -252,7 +252,7 @@ void TracksAndGPScreen::buildTrackList()
     for (int n = 0; n < track_amount; n++)
     {
         Track* curr = track_manager->getTrack(n);
-        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
             && !curr->hasEasterEggs())
             continue;
         if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
@@ -267,7 +267,7 @@ void TracksAndGPScreen::buildTrackList()
     {
         Track *curr = tracks.get(i);
         if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()) &&
-            race_manager->getNumLocalPlayers() == 1)
+            RaceManager::get()->getNumLocalPlayers() == 1)
         {
             tracks_widget->addItem(
                 _("Locked: solve active challenges to gain access to more!"),

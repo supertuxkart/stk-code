@@ -22,7 +22,9 @@
 #ifdef ENABLE_SOUND
 
 #include <assert.h>
+#include <atomic>
 #ifdef __APPLE__
+#  define OPENAL_DEPRECATED
 #  include <OpenAL/al.h>
 #else
 #  include <AL/al.h>
@@ -47,7 +49,7 @@ private:
     ALuint       m_sound_source;
 
     /** The status of this SFX. */
-    SFXStatus    m_status;
+    std::atomic<SFXStatus> m_status;
 
     /** If the sfx is positional. */
     bool         m_positional;

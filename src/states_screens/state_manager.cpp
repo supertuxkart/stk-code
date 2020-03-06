@@ -29,28 +29,36 @@
 #include "input/input_device.hpp"
 #include "input/input_manager.hpp"
 #include "main_loop.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/world.hpp"
-#include "utils/translation.hpp"
+#include "modes/profile_world.hpp"
 #include "utils/log.hpp"
+#include "utils/stk_process.hpp"
+
+#include <cstring>
 
 using namespace GUIEngine;
 
-static StateManager* state_manager_singleton = NULL;
+static StateManager* state_manager_singleton[PT_COUNT];
 
 StateManager* StateManager::get()
 {
-    if (state_manager_singleton == NULL)
-        state_manager_singleton = new StateManager();
-    return state_manager_singleton;
+    ProcessType type = STKProcess::getType();
+    if (state_manager_singleton[type] == NULL)
+        state_manager_singleton[type] = new StateManager();
+    return state_manager_singleton[type];
 }   // get
 
 void StateManager::deallocate()
 {
-    delete state_manager_singleton;
-    state_manager_singleton = NULL;
+    ProcessType type = STKProcess::getType();
+    delete state_manager_singleton[type];
+    state_manager_singleton[type] = NULL;
 }   // deallocate
 
+void StateManager::clear()
+{
+    memset(state_manager_singleton, 0, sizeof(state_manager_singleton));
+}   // clear
 
 // ============================================================================
 
@@ -153,8 +161,8 @@ void StateManager::resetActivePlayers()
 bool StateManager::throttleFPS()
 {
 #ifndef SERVER_ONLY
-    return m_game_mode != GUIEngine::GAME  &&
-           GUIEngine::getCurrentScreen()->throttleFPS();
+    return m_game_mode != GUIEngine::GAME && GUIEngine::getCurrentScreen() &&
+        GUIEngine::getCurrentScreen()->throttleFPS();
 #else
     return true;
 #endif
@@ -205,7 +213,7 @@ void StateManager::onGameStateChange(GameState new_state)
 {
     if (new_state == GAME)
     {
-        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_OVERWORLD)
+        if (RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_OVERWORLD)
             irr_driver->hidePointer();
         input_manager->setMode(InputManager::INGAME);
     }

@@ -28,6 +28,7 @@
 #endif
 
 class ArenaGraph;
+class ItemManager;
 
 namespace irr
 {
@@ -40,6 +41,8 @@ namespace irr
 class ArenaAI : public AIBaseController
 {
 protected:
+    ItemManager* m_item_manager;
+
     /** Pointer to the \ref ArenaGraph. */
     ArenaGraph* m_graph;
 

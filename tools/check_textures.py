@@ -39,14 +39,14 @@ def getTexturesFromB3D(filename, textures):
     f = open(filename, "r")
     s = f.read(4)
     if s!="BB3D":
-        print filename,"is not a valid b3d file"
+        print(filename,"is not a valid b3d file")
         f.close()
         return
     start_texs = 12
     f.seek(start_texs)
     s = f.read(4)
     if s!="TEXS":
-        print "Can not handle '%s' b3d file - ignored."%filename
+        print("Can not handle '%s' b3d file - ignored."%filename)
         f.close()
         return
     n = struct.unpack("<i", f.read(4))[0]   # Read end of section
@@ -102,9 +102,9 @@ def findKartData(dir, textures, b3dfiles):
     else:
         f = open(dir+"scene.xml", "r")
         if not f: return
-        print "WARNING"
+        print("WARNING")
     if 1:
-        print "WARNING - kart.xml not done yet"
+        print("WARNING - kart.xml not done yet")
         f = open(dir+"kart.xml", "r")
         if not f: return
         r_screenshot = re.compile("^ *screenshot *= \"(.*)\" *$")
@@ -134,7 +134,7 @@ def checkDir(dir, shared_textures):
         if i[-4:]==".b3d":
             b3d_files_in_dir[i] = 1
         elif i[-5:]==".b3dz":
-            print "Can't handle file '%s'."%i
+            print("Can't handle file '%s'."%i)
             
     # Find all textures listed in materials.xml
     # -----------------------------------------
@@ -151,13 +151,13 @@ def checkDir(dir, shared_textures):
     # ===========================================
     for i in used_b3d_files.keys():
         if not b3d_files_in_dir.get(i):
-            print "File '%s' is missing."%(dir+i)
+            print("File '%s' is missing."%(dir+i))
         
     # 2) Check if there are any unnecessary b3d files
     # ===============================================
     for i in b3d_files_in_dir:
         if not used_b3d_files.get(i):
-            print "File '%s' is not used."%i
+            print("File '%s' is not used."%i)
             continue
         del used_b3d_files[i]
         # Load all textures used in this b3d file
@@ -168,14 +168,14 @@ def checkDir(dir, shared_textures):
     for i in used_textures:
         if not existing_textures.get(i)==1:
             if not shared_textures.get(i):
-                print "Cannot find texture '%s'."%i
+                print("Cannot find texture '%s'."%i)
                 continue
         else:
             del existing_textures[i]
             
 
     for i in existing_textures:
-        print "Texture '%s' is not used anywhere."%(dir+i)
+        print("Texture '%s' is not used anywhere."%(dir+i))
             
     # Now check that all entries in materials.xml are indeed used and exist
 

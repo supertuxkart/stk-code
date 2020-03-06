@@ -18,6 +18,7 @@
 	#include <windows.h>
 	#include <GL/gl.h>
 #elif defined(_IRR_OSX_PLATFORM_)
+	#define GL_SILENCE_DEPRECATION
 	#include <OpenGL/gl.h>
 #elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 	#define NO_SDL_GLEXT

@@ -422,9 +422,9 @@ void ChallengeData::setUnlocks(const std::string &id, RewardType reward)
 void ChallengeData::setRace(RaceManager::Difficulty d) const
 {
     if(m_mode==CM_GRAND_PRIX)
-        race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+        RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
     else if(m_mode==CM_SINGLE_RACE)
-        race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+        RaceManager::get()->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
     else
     {
         Log::error("challenge_data", "Invalid mode %d in setRace.", m_mode);
@@ -433,31 +433,31 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
 
     if(m_mode==CM_SINGLE_RACE)
     {
-        race_manager->setMinorMode(m_minor);
-        race_manager->setTrack(m_track_id);
-        race_manager->setNumLaps(m_num_laps);
-        race_manager->setReverseTrack(m_reverse);
-        race_manager->setNumKarts(m_default_num_karts[d]);
-        race_manager->setNumPlayers(1);
-        race_manager->setCoinTarget(m_energy[d]);
-        race_manager->setDifficulty(d);
+        RaceManager::get()->setMinorMode(m_minor);
+        RaceManager::get()->setTrack(m_track_id);
+        RaceManager::get()->setNumLaps(m_num_laps);
+        RaceManager::get()->setReverseTrack(m_reverse);
+        RaceManager::get()->setNumKarts(m_default_num_karts[d]);
+        RaceManager::get()->setNumPlayers(1);
+        RaceManager::get()->setCoinTarget(m_energy[d]);
+        RaceManager::get()->setDifficulty(d);
 
         if (m_time[d] >= 0.0f)
         {
-            race_manager->setTimeTarget(m_time[d]);
+            RaceManager::get()->setTimeTarget(m_time[d]);
         }
         else
         {
-            race_manager->setTimeTarget(0.0f);
+            RaceManager::get()->setTimeTarget(0.0f);
         }
     }
     else if(m_mode==CM_GRAND_PRIX)
     {
-        race_manager->setMinorMode(m_minor);
-        race_manager->setGrandPrix(*grand_prix_manager->getGrandPrix(m_gp_id));
-        race_manager->setDifficulty(d);
-        race_manager->setNumKarts(m_default_num_karts[d]);
-        race_manager->setNumPlayers(1);
+        RaceManager::get()->setMinorMode(m_minor);
+        RaceManager::get()->setGrandPrix(*grand_prix_manager->getGrandPrix(m_gp_id));
+        RaceManager::get()->setDifficulty(d);
+        RaceManager::get()->setNumKarts(m_default_num_karts[d]);
+        RaceManager::get()->setNumPlayers(1);
     }
 
     if (m_is_ghost_replay)
@@ -467,16 +467,16 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
             true/*custom_replay*/);
         if (!result)
             Log::fatal("ChallengeData", "Can't open replay for challenge!");
-        race_manager->setRaceGhostKarts(true);
+        RaceManager::get()->setRaceGhostKarts(true);
     }
 
     if (m_ai_kart_ident[d] != "")
     {
-        race_manager->setAIKartOverride(m_ai_kart_ident[d]);
+        RaceManager::get()->setAIKartOverride(m_ai_kart_ident[d]);
     }
     if (m_ai_superpower[d] != RaceManager::SUPERPOWER_NONE)
     {
-        race_manager->setAISuperPower(m_ai_superpower[d]);
+        RaceManager::get()->setAISuperPower(m_ai_superpower[d]);
     }
 }   // setRace
 
@@ -499,7 +499,7 @@ bool ChallengeData::isChallengeFulfilled(bool check_best) const
     std::string track_name = Track::getCurrentTrack()->getIdent();
 
     int d = (check_best) ? RaceManager::DIFFICULTY_BEST :
-                           race_manager->getDifficulty();
+                           RaceManager::get()->getDifficulty();
 
     AbstractKart* kart = world->getPlayerKart(0);
 
@@ -543,7 +543,7 @@ bool ChallengeData::isChallengeFulfilled(bool check_best) const
     }
 
     if (m_ai_superpower[d] != RaceManager::SUPERPOWER_NONE &&
-        race_manager->getAISuperPower() != m_ai_superpower[d])
+        RaceManager::get()->getAISuperPower() != m_ai_superpower[d])
     {
         return false;
     }
@@ -556,19 +556,19 @@ bool ChallengeData::isChallengeFulfilled(bool check_best) const
  */
 ChallengeData::GPLevel ChallengeData::isGPFulfilled() const
 {
-    int d = race_manager->getDifficulty();
+    int d = RaceManager::get()->getDifficulty();
 
-    // Note that we have to call race_manager->getNumKarts, since there
+    // Note that we have to call RaceManager::get()->getNumKarts, since there
     // is no world objects to query at this stage.
-    if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
-        race_manager->getMinorMode()  != m_minor                             ||
-        race_manager->getGrandPrix().getId() != m_gp_id                      ||
-        race_manager->getNumberOfKarts() < (unsigned int)m_default_num_karts[d]      ||
-        race_manager->getNumPlayers() > 1) return GP_NONE;
+    if (RaceManager::get()->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
+        RaceManager::get()->getMinorMode()  != m_minor                             ||
+        RaceManager::get()->getGrandPrix().getId() != m_gp_id                      ||
+        RaceManager::get()->getNumberOfKarts() < (unsigned int)m_default_num_karts[d]      ||
+        RaceManager::get()->getNumPlayers() > 1) return GP_NONE;
 
     // check if the player came first.
     // rank == 0 if first, 1 if second, etc.
-    const int rank = race_manager->getLocalPlayerGPRank(0);
+    const int rank = RaceManager::get()->getLocalPlayerGPRank(0);
 
     // In superior difficulty levels, losing a place means
     // getting a cup of the inferior level rather than

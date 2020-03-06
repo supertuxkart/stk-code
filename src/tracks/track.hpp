@@ -26,9 +26,11 @@
   * objects.
   */
 
+#include <algorithm>
+#include <atomic>
+#include <memory>
 #include <string>
 #include <vector>
-#include <algorithm>
 
 #include <irrlicht.h>
 
@@ -39,12 +41,13 @@ using namespace irr;
 #include "utils/aligned_array.hpp"
 #include "utils/log.hpp"
 #include "utils/vec3.hpp"
-#include "utils/ptr_vector.hpp"
+#include "utils/stk_process.hpp"
 
 class AbstractKart;
 class AnimationManager;
 class BezierCurve;
 class CheckManager;
+class ItemManager;
 class ModelDefinitionLoader;
 class MovingTexture;
 class MusicInformation;
@@ -99,7 +102,7 @@ private:
 
     /** If a race is in progress, this stores the active track object.
      *  NULL otherwise. */
-    static Track *m_current_track;
+    static std::atomic<Track*> m_current_track[PT_COUNT];
 
 #ifdef DEBUG
     unsigned int             m_magic_number;
@@ -187,7 +190,6 @@ private:
     std::vector<std::string> m_old_mesh_buffers;
 #endif
 
-    PtrVector<ParticleEmitter>      m_all_emitters;
     scene::ISceneNode  *m_sun;
     /** Used to collect the triangles for the bullet mesh. */
     TriangleMesh*            m_track_mesh;
@@ -352,6 +354,8 @@ private:
 
     /** The render target for the mini map, which is displayed in the race gui. */
     RenderTarget           *m_render_target;
+    CheckManager*           m_check_manager;
+    std::shared_ptr<ItemManager> m_item_manager;
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
 
@@ -402,11 +406,27 @@ private:
     void loadCurves(const XMLNode &node);
     void handleSky(const XMLNode &root, const std::string &filename);
     void freeCachedMeshVertexBuffer();
+    void copyFromMainProcess();
 public:
 
     /** Static function to get the current track. NULL if no current
      *  track is defined (i.e. no race is active atm) */
-    static Track* getCurrentTrack() { return m_current_track;  }
+    static Track* getCurrentTrack()
+    {
+        ProcessType type = STKProcess::getType();
+        return m_current_track[type];
+    }
+    // ------------------------------------------------------------------------
+    Track* clone()
+    {
+        Track* child_track = new Track(*this);
+        child_track->copyFromMainProcess();
+        return child_track;
+    }
+    // ------------------------------------------------------------------------
+    void initChildTrack();
+    // ------------------------------------------------------------------------
+    static void cleanChildTrack();
     // ------------------------------------------------------------------------
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
@@ -508,6 +528,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if the track is during day time */
     const bool getIsDuringDay () const {return m_is_day;               }
+    // ------------------------------------------------------------------------
+    /** Returns if invert minimap */
+    const bool getMinimapInvert () const {return m_minimap_invert_x_z;               }
     // ------------------------------------------------------------------------
     /** Returns the start coordinates for a kart with a given index.
      *  \param index Index of kart ranging from 0 to kart_num-1. */
@@ -706,6 +729,10 @@ public:
     bool isAddon() const                                 { return m_is_addon; }
     // ------------------------------------------------------------------------
     void convertTrackToBullet(scene::ISceneNode *node);
+    // ------------------------------------------------------------------------
+    CheckManager* getCheckManager() const           { return m_check_manager; }
+    // ------------------------------------------------------------------------
+    ItemManager* getItemManager() const        { return m_item_manager.get(); }
 };   // class Track
 
 #endif

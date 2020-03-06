@@ -21,23 +21,13 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 
 bool NetworkItemManager::m_network_item_debugging = false;
-
-//-----------------------------------------------------------------------------
-/** Creates one instance of the item manager. */
-void NetworkItemManager::create()
-{
-    assert(!m_item_manager);
-    auto nim = std::shared_ptr<NetworkItemManager>(new NetworkItemManager());
-    nim->rewinderAdd();
-    m_item_manager = nim;
-}   // create
-
 // ============================================================================
 /** Creates a new instance of the item manager. This is done at startup
  *  of each race.

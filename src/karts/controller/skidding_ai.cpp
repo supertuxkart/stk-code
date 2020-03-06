@@ -61,10 +61,11 @@
 SkiddingAI::SkiddingAI(AbstractKart *kart)
                    : AIBaseLapController(kart)
 {
+    m_item_manager = Track::getCurrentTrack()->getItemManager();
     reset();
     // Determine if this AI has superpowers, which happens e.g.
     // for the final race challenge against nolok.
-    m_superpower = race_manager->getAISuperPower();
+    m_superpower = RaceManager::get()->getAISuperPower();
 
     m_point_selection_algorithm = PSA_DEFAULT;
     setControllerName("Skidding");
@@ -225,10 +226,10 @@ void SkiddingAI::update(int ticks)
 
     // Clear stored items if they were deleted (for example a switched nitro)
     if (m_item_to_collect &&
-        !ItemManager::get()->itemExists(m_item_to_collect))
+        !m_item_manager->itemExists(m_item_to_collect))
         m_item_to_collect = NULL;
     if (m_last_item_random &&
-        !ItemManager::get()->itemExists(m_last_item_random))
+        !m_item_manager->itemExists(m_last_item_random))
         m_last_item_random = NULL;
 
     m_controls->setRescue(false);
@@ -275,15 +276,15 @@ void SkiddingAI::update(int ticks)
             }
 
             // also give him some free nitro
-            if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM)
+            if (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_MEDIUM)
             {
                 if (m_kart->getPosition() > 1)
                     m_kart->setEnergy(m_kart->getEnergy() + 2);
                 else
                     m_kart->setEnergy(m_kart->getEnergy() + 1);
             }
-            else if (race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
-                race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST)
+            else if (RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD ||
+                RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST)
             {
                 if (m_kart->getPosition() > 1)
                     m_kart->setEnergy(m_kart->getEnergy() + 7);
@@ -324,7 +325,7 @@ void SkiddingAI::update(int ticks)
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
 
-    int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
+    int num_ai = m_world->getNumKarts() - RaceManager::get()->getNumPlayers();
     int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
     // Karts with boosted AI get a better speed cap value
     if (m_kart->getBoostAI())
@@ -348,7 +349,7 @@ void SkiddingAI::update(int ticks)
 
     // Make sure that not all AI karts use the zipper at the same
     // time in time trial at start up, so disable it during the 5 first seconds
-    if(race_manager->isTimeTrialMode() && (m_world->getTime()<5.0f) )
+    if(RaceManager::get()->isTimeTrialMode() && (m_world->getTime()<5.0f) )
         m_controls->setFire(false);
 
     /*And obviously general kart stuff*/
@@ -573,7 +574,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
         const std::vector<ItemState*> &items_ahead =
-                                  ItemManager::get()->getItemsInQuads(n_index);
+                                  m_item_manager->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
         {
             evaluateItems(items_ahead[i],  kart_aim_direction,
@@ -1163,7 +1164,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     {
         int n_index= DriveGraph::get()->getNode(node)->getIndex();
         const std::vector<ItemState *> &items_ahead =
-            ItemManager::get()->getItemsInQuads(n_index);
+            m_item_manager->getItemsInQuads(n_index);
         for(unsigned int i=0; i<items_ahead.size(); i++)
         {
             evaluateItems(items_ahead[i],  kart_aim_direction,
@@ -1297,13 +1298,13 @@ void SkiddingAI::handleBubblegum(int item_skill,
     float shield_radius = m_ai_properties->m_shield_incoming_radius;
 
     int projectile_types[4]; //[3] basket, [2] cakes, [1] plunger, [0] bowling
-    projectile_types[0] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
-    projectile_types[1] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_PLUNGER);
-    projectile_types[2] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_CAKE);
-    projectile_types[3] = projectile_manager->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_RUBBERBALL);
+    projectile_types[0] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_BOWLING);
+    projectile_types[1] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_PLUNGER);
+    projectile_types[2] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_CAKE);
+    projectile_types[3] = ProjectileManager::get()->getNearbyProjectileCount(m_kart, shield_radius, PowerupManager::POWERUP_RUBBERBALL);
    
     bool projectile_is_close = false;
-    projectile_is_close = projectile_manager->projectileIsClose(m_kart, shield_radius);
+    projectile_is_close = ProjectileManager::get()->projectileIsClose(m_kart, shield_radius);
 
     Attachment::AttachmentType type = m_kart->getAttachment()->getType();
     
@@ -1435,7 +1436,7 @@ void SkiddingAI::handleBubblegum(int item_skill,
     }
 
     if(m_distance_behind < 8.0f && straight_behind &&
-       (!ItemManager::get()->areItemsSwitched() || item_skill < 4))
+       (!m_item_manager->areItemsSwitched() || item_skill < 4))
     {
         m_controls->setFire(true);
         m_controls->setLookBack(true);
@@ -1893,7 +1894,7 @@ void SkiddingAI::computeNearestKarts()
     if(m_kart_behind)
         m_distance_behind = my_dist - m_world->getOverallDistance(m_kart_behind->getWorldKartId());
 
-    if(   race_manager->isFollowMode() && m_kart->getWorldKartId() != 0)
+    if(   RaceManager::get()->isFollowMode() && m_kart->getWorldKartId() != 0)
         m_distance_leader = m_world->getOverallDistance(0 /*leader kart ID*/) - my_dist;
 
     // Compute distance to target player kart
@@ -1902,7 +1903,7 @@ void SkiddingAI::computeNearestKarts()
     float own_overall_distance = m_world->getOverallDistance(m_kart->getWorldKartId());
     m_num_players_ahead = 0;
 
-    unsigned int n = ProfileWorld::isProfileMode() ? 0 : race_manager->getNumPlayers();
+    unsigned int n = ProfileWorld::isProfileMode() ? 0 : RaceManager::get()->getNumPlayers();
 
     std::vector<float> overall_distance;
     // Get the players distances
@@ -1932,14 +1933,14 @@ void SkiddingAI::computeNearestKarts()
 
     // Force best driving when profiling and for FTL leaders
     if(   ProfileWorld::isProfileMode()
-       || ( race_manager->isFollowMode() && m_kart->getWorldKartId() == 0))
+       || ( RaceManager::get()->isFollowMode() && m_kart->getWorldKartId() == 0))
         target_overall_distance = 999999.9f;
 
     // In higher difficulties and in follow the leader, rubber band towards the first player,
     // if at all (SuperTux has no rubber banding at all). Boosted AIs also target the 1st player.
-    else if (   race_manager->getDifficulty() == RaceManager::DIFFICULTY_HARD
-             || race_manager->getDifficulty() == RaceManager::DIFFICULTY_BEST
-             || race_manager->isFollowMode()
+    else if (   RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_HARD
+             || RaceManager::get()->getDifficulty() == RaceManager::DIFFICULTY_BEST
+             || RaceManager::get()->isFollowMode()
              || m_kart->getBoostAI())
     {
         target_overall_distance = overall_distance[n-1]; // Highest player distance
@@ -1947,7 +1948,7 @@ void SkiddingAI::computeNearestKarts()
     // Distribute the AIs to players
     else
     {
-        int num_ai = m_world->getNumKarts() - race_manager->getNumPlayers();
+        int num_ai = m_world->getNumKarts() - RaceManager::get()->getNumPlayers();
         int position_among_ai = curr_position - m_num_players_ahead;
 
         // Converts a position among AI to a position among players
@@ -1957,7 +1958,7 @@ void SkiddingAI::computeNearestKarts()
         // Avoid a division by 0. If there is only one AI, it will target the first player
         if (num_ai > 1)
         {
-            target_index  = (position_among_ai-1) * (race_manager->getNumPlayers()-1);
+            target_index  = (position_among_ai-1) * (RaceManager::get()->getNumPlayers()-1);
             target_index += (num_ai/2) - 1;
             target_index  = target_index / (num_ai - 1);
         }
@@ -2062,7 +2063,7 @@ void SkiddingAI::handleBraking(float max_turn_speed, float min_speed)
     // TODO : if there is still time in the countdown and the leader is faster,
     //        the AI kart should not slow down too much, to stay closer to the
     //        leader once overtaken.
-    if(   race_manager->isFollowMode() && m_distance_leader < 2
+    if(   RaceManager::get()->isFollowMode() && m_distance_leader < 2
        && m_kart->getInitialPosition()>1
        && m_world->getOverallDistance(m_kart->getWorldKartId()) > 0 )
     {
@@ -2219,7 +2220,7 @@ void SkiddingAI::handleNitroAndZipper(float max_safe_speed)
 
     // No point in building a big nitro reserve in nitro for FTL AIs,
     // just keep enough to help accelerating after an accident
-    if(race_manager->isFollowMode())
+    if(RaceManager::get()->isFollowMode())
         energy_reserve = std::min(2.0f, energy_reserve);
    
     // Don't use nitro or zipper if we are braking

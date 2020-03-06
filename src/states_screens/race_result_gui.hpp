@@ -193,7 +193,6 @@ private:
     void enableGPProgress();
     void addGPProgressWidget(GUIEngine::Widget* widget);
     void displayGPProgress();
-    void cleanupGPProgress();
     void displayPostRaceInfo();
     void displayCTFResults();
     void displaySoccerResults();
@@ -217,9 +216,6 @@ public:
                                Input::InputType type, int playerId) OVERRIDE;
     void eventCallback(GUIEngine::Widget* widget, const std::string& name,
                        const int playerID) OVERRIDE;
-    void backToLobby();
-
-
     friend class GUIEngine::ScreenSingleton<RaceResultGUI>;
 
     /** Should not be called anymore.  */
@@ -260,6 +256,7 @@ public:
     void setHighscore(int rank);
 
     virtual void onConfirm() OVERRIDE;
+    void cleanupGPProgress();
 };   // RaceResultGUI
 
 #endif

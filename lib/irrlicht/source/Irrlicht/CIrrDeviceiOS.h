@@ -138,6 +138,7 @@ namespace irr
         {
             return m_right_padding * m_native_scale;
         }
+        static void debugPrint(const char* line);
     private:
         void createWindow();
         void createViewAndDriver();

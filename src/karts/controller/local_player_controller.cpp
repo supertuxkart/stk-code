@@ -70,9 +70,13 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
 
     // Keep a pointer to the camera to remove the need to search for
     // the right camera once per frame later.
-    Camera *camera = Camera::createCamera(kart, local_player_id);
+    m_camera_index = -1;
+    if (!GUIEngine::isNoGraphics())
+    {
+        Camera *camera = Camera::createCamera(kart, local_player_id);
+        m_camera_index = camera->getIndex();
+    }
 
-    m_camera_index = camera->getIndex();
     m_wee_sound    = SFXManager::get()->createSoundSource("wee");
     m_bzzt_sound   = SFXManager::get()->getBuffer("bzzt");
     m_ugh_sound    = SFXManager::get()->getBuffer("ugh");
@@ -99,7 +103,8 @@ void LocalPlayerController::initParticleEmitter()
     m_sky_particles_emitter = nullptr;
     Track *track = Track::getCurrentTrack();
 #ifndef SERVER_ONLY
-    if (UserConfigParams::m_particles_effects > 1 &&
+    if (!GUIEngine::isNoGraphics() &&
+        UserConfigParams::m_particles_effects > 1 &&
         track->getSkyParticles() != NULL)
     {
         track->getSkyParticles()->setBoxSizeXZ(150.0f, 150.0f);
@@ -176,7 +181,7 @@ bool LocalPlayerController::action(PlayerAction action, int value,
         }
         else if (NetworkConfig::get()->isClient())
         {
-            auto ge = RaceEventManager::getInstance()->getProtocol();
+            auto ge = RaceEventManager::get()->getProtocol();
             assert(ge);
             ge->sendStartupBoost((uint8_t)m_kart->getWorldKartId());
         }
@@ -211,9 +216,9 @@ bool LocalPlayerController::action(PlayerAction action, int value,
  */
 void LocalPlayerController::steer(int ticks, int steer_val)
 {
-    if(UserConfigParams::m_gamepad_debug)
+    RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
+    if (gui_base && UserConfigParams::m_gamepad_debug)
     {
-        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
         gui_base->clearAllMessages();
         gui_base->addMessage(StringUtils::insertValues(L"steer_val %i", steer_val),
                              m_kart, 1.0f,
@@ -245,8 +250,10 @@ void LocalPlayerController::update(int ticks)
     // look backward when the player requests or
     // if automatic reverse camera is active
 #ifndef SERVER_ONLY
-    Camera *camera = Camera::getCamera(m_camera_index);
-    if (camera->getType() != Camera::CM_TYPE_END)
+    Camera *camera = NULL;
+    if (!GUIEngine::isNoGraphics())
+        camera = Camera::getCamera(m_camera_index);
+    if (camera && camera->getType() != Camera::CM_TYPE_END)
     {
         if (m_controls->getLookBack() || (UserConfigParams::m_reverse_look_threshold > 0 &&
             m_kart->getSpeed() < -UserConfigParams::m_reverse_look_threshold))
@@ -273,7 +280,7 @@ void LocalPlayerController::update(int ticks)
     }
 
     if (m_is_above_nitro_target == true &&
-        m_kart->getEnergy() < race_manager->getCoinTarget())
+        m_kart->getEnergy() < RaceManager::get()->getCoinTarget())
         nitroNotFullSound();
 #endif
     if (m_kart->getKartAnimation() && m_sound_schedule == false)
@@ -340,7 +347,8 @@ void LocalPlayerController::setPosition(int p)
 void LocalPlayerController::finishedRace(float time)
 {
     // This will implicitly trigger setting the first end camera to be active
-    Camera::changeCamera(m_camera_index, Camera::CM_TYPE_END);
+    if (!GUIEngine::isNoGraphics())
+        Camera::changeCamera(m_camera_index, Camera::CM_TYPE_END);
 }   // finishedRace
 
 //-----------------------------------------------------------------------------
@@ -361,7 +369,8 @@ void LocalPlayerController::handleZipper(bool play_sound)
 
 #ifndef SERVER_ONLY
     // Apply the motion blur according to the speed of the kart
-    irr_driver->giveBoost(m_camera_index);
+    if (!GUIEngine::isNoGraphics())
+        irr_driver->giveBoost(m_camera_index);
 #endif
 
 }   // handleZipper
@@ -380,9 +389,9 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
     {
         m_kart->playSound(m_full_sound);
     }
-    else if (race_manager->getCoinTarget() > 0 &&
-             old_energy < race_manager->getCoinTarget() &&
-             m_kart->getEnergy() >= race_manager->getCoinTarget())
+    else if (RaceManager::get()->getCoinTarget() > 0 &&
+             old_energy < RaceManager::get()->getCoinTarget() &&
+             m_kart->getEnergy() >= RaceManager::get()->getCoinTarget())
     {
         m_kart->playSound(m_full_sound);
         m_is_above_nitro_target = true;

@@ -88,7 +88,7 @@ void COctreeSceneNode::render()
 {
 	video::IVideoDriver* driver = SceneManager->getVideoDriver();
 
-	if (VertexType == -1 || !driver)
+	if (VertexType == (video::E_VERTEX_TYPE)-1 || !driver)
 		return;
 
 	ICameraSceneNode* camera = SceneManager->getActiveCamera();

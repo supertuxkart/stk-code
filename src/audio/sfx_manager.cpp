@@ -24,6 +24,7 @@
 #include "io/file_manager.hpp"
 #include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
@@ -31,23 +32,12 @@
 #include <pthread.h>
 #include <stdexcept>
 #include <algorithm>
-#include <cerrno>
 #include <map>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits>
 #include <math.h>
-
-#ifdef ENABLE_SOUND
-#  ifdef __APPLE__
-#    include <OpenAL/al.h>
-#    include <OpenAL/alc.h>
-#  else
-#    include <AL/al.h>
-#    include <AL/alc.h>
-#  endif
-#endif
 
 // Define this if the profiler should also collect data of the sfx manager
 #undef ENABLE_PROFILING_FOR_SFX_MANAGER
@@ -196,7 +186,7 @@ SFXManager::~SFXManager()
 void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
 
     SFXCommand *sfx_command = new SFXCommand(command, sfx);
@@ -215,7 +205,7 @@ void SFXManager::queue(SFXCommands command,  SFXBase *sfx)
 void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
 
     SFXCommand *sfx_command = new SFXCommand(command, sfx, f);
@@ -234,7 +224,7 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f)
 void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
 
     SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
@@ -247,7 +237,7 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p)
 void SFXManager::queue(SFXCommands command, SFXBase *sfx, const Vec3 &p, SFXBuffer* buffer)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
 
     SFXCommand *sfx_command = new SFXCommand(command, sfx, p);
@@ -269,7 +259,7 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f,
                        const Vec3 &p)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
 
     SFXCommand *sfx_command = new SFXCommand(command, sfx, f, p);
@@ -284,7 +274,7 @@ void SFXManager::queue(SFXCommands command, SFXBase *sfx, float f,
 void SFXManager::queue(SFXCommands command, MusicInformation *mi)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
 
     SFXCommand *sfx_command = new SFXCommand(command, mi);
@@ -300,7 +290,7 @@ void SFXManager::queue(SFXCommands command, MusicInformation *mi)
 void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
 
     SFXCommand *sfx_command = new SFXCommand(command, mi, f);
@@ -316,13 +306,13 @@ void SFXManager::queue(SFXCommands command, MusicInformation *mi, float f)
 void SFXManager::queueCommand(SFXCommand *command)
 {
 #ifdef ENABLE_SOUND
-    if (!UserConfigParams::m_enable_sound)
+    if (!UserConfigParams::m_enable_sound || STKProcess::getType() != PT_MAIN)
         return;
         
     m_sfx_commands.lock();
     if(World::getWorld() && 
-        m_sfx_commands.getData().size() > 20*race_manager->getNumberOfKarts()+20 &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
+        m_sfx_commands.getData().size() > 20*RaceManager::get()->getNumberOfKarts()+20 &&
+        RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
         if(command->m_command==SFX_POSITION || command->m_command==SFX_LOOP ||
            command->m_command==SFX_SPEED    || 
@@ -552,6 +542,8 @@ void SFXManager::toggleSound(const bool on)
  */
 bool SFXManager::sfxAllowed()
 {
+    if (STKProcess::getType() != PT_MAIN)
+        return false;
     if(!UserConfigParams::m_sfx || !m_initialized)
         return false;
     else
@@ -708,7 +700,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 {
     bool positional = false;
 
-    if (race_manager->getNumLocalPlayers() < 2)
+    if (RaceManager::get()->getNumLocalPlayers() < 2)
     {
         positional = buffer->isPositional();
     }
@@ -716,7 +708,7 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
     SFXBase* sfx = NULL;
     
 #ifdef ENABLE_SOUND
-    if (UserConfigParams::m_enable_sound)
+    if (UserConfigParams::m_enable_sound && STKProcess::getType() == PT_MAIN)
     {
         //assert( alIsBuffer(buffer->getBufferID()) ); crashes on server
         sfx = new SFXOpenAL(buffer, positional, buffer->getGain(), owns_buffer);

@@ -1,10 +1,12 @@
 bld*/
 build*/
 cmake_build*/
+xcode_build*/
 dependencies*/
 CMakeFiles/
 stk-editor/
 .vscode/
+tags.*
 
 .config/
 supertuxkart-64

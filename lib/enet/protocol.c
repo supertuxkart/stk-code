@@ -163,7 +163,10 @@ enet_protocol_remove_sent_unreliable_commands (ENetPeer * peer)
 {
     ENetOutgoingCommand * outgoingCommand;
 
-    while (! enet_list_empty (& peer -> sentUnreliableCommands))
+    if (enet_list_empty (& peer -> sentUnreliableCommands))
+      return;
+
+    do
     {
         outgoingCommand = (ENetOutgoingCommand *) enet_list_front (& peer -> sentUnreliableCommands);
         
@@ -182,7 +185,13 @@ enet_protocol_remove_sent_unreliable_commands (ENetPeer * peer)
         }
 
         enet_free (outgoingCommand);
-    }
+    } while (! enet_list_empty (& peer -> sentUnreliableCommands));
+
+    if (peer -> state == ENET_PEER_STATE_DISCONNECT_LATER &&
+        enet_list_empty (& peer -> outgoingReliableCommands) &&
+        enet_list_empty (& peer -> outgoingUnreliableCommands) &&
+        enet_list_empty (& peer -> sentReliableCommands))
+      enet_peer_disconnect (peer, peer -> eventData);
 }
 
 static ENetProtocolCommand
@@ -298,7 +307,7 @@ enet_protocol_handle_connect (ENetHost * host, ENetProtocolHeader * header, ENet
         }
         else 
         if (currentPeer -> state != ENET_PEER_STATE_CONNECTING &&
-            currentPeer -> address.host == host -> receivedAddress.host)
+            enet_ip_equal(currentPeer -> address.host, host -> receivedAddress.host))
         {
             if (currentPeer -> address.port == host -> receivedAddress.port &&
                 currentPeer -> connectID == command -> connect.connectID)
@@ -765,6 +774,10 @@ enet_protocol_handle_bandwidth_limit (ENetHost * host, ENetPeer * peer, const EN
     if (peer -> incomingBandwidth == 0 && host -> outgoingBandwidth == 0)
       peer -> windowSize = ENET_PROTOCOL_MAXIMUM_WINDOW_SIZE;
     else
+    if (peer -> incomingBandwidth == 0 || host -> outgoingBandwidth == 0)
+      peer -> windowSize = (ENET_MAX (peer -> incomingBandwidth, host -> outgoingBandwidth) /
+                             ENET_PEER_WINDOW_SIZE_SCALE) * ENET_PROTOCOL_MINIMUM_WINDOW_SIZE;
+    else
       peer -> windowSize = (ENET_MIN (peer -> incomingBandwidth, host -> outgoingBandwidth) /
                              ENET_PEER_WINDOW_SIZE_SCALE) * ENET_PROTOCOL_MINIMUM_WINDOW_SIZE;
 
@@ -1006,9 +1019,9 @@ enet_protocol_handle_incoming_commands (ENetHost * host, ENetEvent * event)
 
        if (peer -> state == ENET_PEER_STATE_DISCONNECTED ||
            peer -> state == ENET_PEER_STATE_ZOMBIE ||
-           ((host -> receivedAddress.host != peer -> address.host ||
+           ((enet_ip_not_equal(host -> receivedAddress.host, peer -> address.host) ||
              host -> receivedAddress.port != peer -> address.port) &&
-             peer -> address.host != ENET_HOST_BROADCAST) ||
+             peer -> address.host.p0 != ENET_HOST_BROADCAST) ||
            (peer -> outgoingPeerID < ENET_PROTOCOL_MAXIMUM_PEER_ID &&
             sessionID != peer -> incomingSessionID))
          return 0;
@@ -1191,7 +1204,9 @@ commandError:
 static int
 enet_protocol_receive_incoming_commands (ENetHost * host, ENetEvent * event)
 {
-    for (;;)
+    int packets;
+
+    for (packets = 0; packets < 256; ++ packets)
     {
        int receivedLength;
        ENetBuffer buffer;
@@ -1400,7 +1415,8 @@ enet_protocol_send_unreliable_outgoing_commands (ENetHost * host, ENetPeer * pee
     if (peer -> state == ENET_PEER_STATE_DISCONNECT_LATER && 
         enet_list_empty (& peer -> outgoingReliableCommands) &&
         enet_list_empty (& peer -> outgoingUnreliableCommands) && 
-        enet_list_empty (& peer -> sentReliableCommands))
+        enet_list_empty (& peer -> sentReliableCommands) &&
+        enet_list_empty (& peer -> sentUnreliableCommands))
       enet_peer_disconnect (peer, peer -> eventData);
 }
 
@@ -1484,7 +1500,7 @@ enet_protocol_send_reliable_outgoing_commands (ENetHost * host, ENetPeer * peer)
                ! (outgoingCommand -> reliableSequenceNumber % ENET_PEER_RELIABLE_WINDOW_SIZE) &&
                (channel -> reliableWindows [(reliableWindow + ENET_PEER_RELIABLE_WINDOWS - 1) % ENET_PEER_RELIABLE_WINDOWS] >= ENET_PEER_RELIABLE_WINDOW_SIZE ||
                  channel -> usedReliableWindows & ((((1 << ENET_PEER_FREE_RELIABLE_WINDOWS) - 1) << reliableWindow) | 
-                   (((1 << ENET_PEER_FREE_RELIABLE_WINDOWS) - 1) >> (ENET_PEER_RELIABLE_WINDOW_SIZE - reliableWindow)))))
+                   (((1 << ENET_PEER_FREE_RELIABLE_WINDOWS) - 1) >> (ENET_PEER_RELIABLE_WINDOWS - reliableWindow)))))
              windowWrap = 1;
           if (windowWrap)
           {

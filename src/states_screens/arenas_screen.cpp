@@ -64,7 +64,7 @@ void ArenasScreen::beforeAddingWidget()
 
     tabs->clearAllChildren();
 
-    bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    bool soccer_mode = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     const std::vector<std::string>& groups = track_manager->getAllArenaGroups(soccer_mode);
     const int group_amount = (int)groups.size();
 
@@ -95,14 +95,14 @@ void ArenasScreen::beforeAddingWidget()
         if (soccer_mode)
         {
             if(temp->isSoccer() && (temp->hasNavMesh() ||
-                race_manager->getNumLocalPlayers() > 1 ||
+                RaceManager::get()->getNumLocalPlayers() > 1 ||
                 UserConfigParams::m_artist_debug_mode))
                 num_of_arenas++;
         }
         else
         {
             if(temp->isArena() && (temp->hasNavMesh()  ||
-                race_manager->getNumLocalPlayers() > 1 ||
+                RaceManager::get()->getNumLocalPlayers() > 1 ||
                 UserConfigParams::m_artist_debug_mode))
                 num_of_arenas++;
         }
@@ -145,7 +145,7 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
             assert( tabs != NULL );
 
-            bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+            bool soccer_mode = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
 
             std::vector<int> curr_group;
             if (tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER) == ALL_ARENA_GROUPS_ID)
@@ -228,7 +228,7 @@ void ArenasScreen::buildTrackList()
     assert( tabs != NULL );
     const std::string curr_group_name = tabs->getSelectionIDString(0);
 
-    bool soccer_mode = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+    bool soccer_mode = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     bool arenas_have_navmesh = false;
 
     if (curr_group_name == ALL_ARENA_GROUPS_ID)
@@ -245,7 +245,7 @@ void ArenasScreen::buildTrackList()
 
                 if(!curr->isSoccer()                     ||
                   (!(curr->hasNavMesh()                  ||
-                  race_manager->getNumLocalPlayers() > 1 ||
+                  RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
                     if (curr->isSoccer())
@@ -260,7 +260,7 @@ void ArenasScreen::buildTrackList()
 
                 if(!curr->isArena()                      ||
                   (!(curr->hasNavMesh()                  ||
-                  race_manager->getNumLocalPlayers() > 1 ||
+                  RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
                     if (curr->isArena())
@@ -297,7 +297,7 @@ void ArenasScreen::buildTrackList()
 
                 if(!curr->isSoccer()                     ||
                   (!(curr->hasNavMesh()                  ||
-                  race_manager->getNumLocalPlayers() > 1 ||
+                  RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
                     if (curr->isSoccer())
@@ -312,7 +312,7 @@ void ArenasScreen::buildTrackList()
 
                 if(!curr->isArena()                      ||
                   (!(curr->hasNavMesh()                  ||
-                  race_manager->getNumLocalPlayers() > 1 ||
+                  RaceManager::get()->getNumLocalPlayers() > 1 ||
                   UserConfigParams::m_artist_debug_mode)))
                 {
                     if (curr->isArena())
@@ -333,7 +333,7 @@ void ArenasScreen::buildTrackList()
             }
         }
     }
-    if (arenas_have_navmesh || race_manager->getNumLocalPlayers() > 1 ||
+    if (arenas_have_navmesh || RaceManager::get()->getNumLocalPlayers() > 1 ||
         UserConfigParams::m_artist_debug_mode)
         w->addItem(_("Random Arena"), "random_track", "/gui/icons/track_random.png");
     w->updateItemDisplay();

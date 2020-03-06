@@ -69,13 +69,16 @@ public:
     virtual void reset(const Track &track) OVERRIDE;
 
     // ------------------------------------------------------------------------
-    bool getTeam() const                             { return m_first_goal; }
+    bool getTeam() const                               { return m_first_goal; }
     // ------------------------------------------------------------------------
     const Vec3& getPoint(PointLocation point) const
     {
         return (point == POINT_LAST ? m_p3 :
             (point == POINT_CENTER ? m_p2 : m_p1));
     }
+    // ------------------------------------------------------------------------
+    virtual CheckStructure* clone() OVERRIDE
+                                               { return new CheckGoal(*this); }
 };   // CheckGoal
 
 #endif

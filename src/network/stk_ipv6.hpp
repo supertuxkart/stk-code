@@ -21,20 +21,16 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-int isIPV6();
-void setIPV6(int val);
-void stkInitialize();
-void getIPV6FromMappedAddress(const ENetAddress* ea, struct sockaddr_in6* in6);
-void getMappedFromIPV6(const struct sockaddr_in6* in6, ENetAddress* ea);
-void addMappedAddress(const ENetAddress* ea, const struct sockaddr_in6* in6);
+int isIPv6Socket();
+void setIPv6Socket(int val);
 int getaddrinfo_compat(const char* hostname, const char* servname,
                        const struct addrinfo* hints, struct addrinfo** res);
+int64_t upperIPv6(const char* ipv6);
 int insideIPv6CIDR(const char* ipv6_cidr, const char* ipv6_in);
 #ifdef __cplusplus
 }
 #endif
-std::string getIPV6ReadableFromMappedAddress(const ENetAddress* ea);
 std::string getIPV6ReadableFromIn6(const struct sockaddr_in6* in);
 bool sameIPV6(const struct sockaddr_in6* in_1,
               const struct sockaddr_in6* in_2);
-void removeDisconnectedMappedAddress();
+bool isIPv4MappedAddress(const struct sockaddr_in6* in6);

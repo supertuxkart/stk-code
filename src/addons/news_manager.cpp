@@ -204,7 +204,8 @@ void* NewsManager::downloadNews(void *obj)
         xml = new XMLNode(xml_file);
         me->checkRedirect(xml);
         me->updateNews(xml, xml_file);
-        addons_manager->init(xml, me->m_force_refresh);
+        if (addons_manager)
+            addons_manager->init(xml, me->m_force_refresh);
         delete xml;
     }
 

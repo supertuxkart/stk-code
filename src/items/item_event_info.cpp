@@ -19,6 +19,7 @@
 #include "items/item_event_info.hpp"
 
 #include "network/network_config.hpp"
+#include "network/network_string.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/stk_host.hpp"

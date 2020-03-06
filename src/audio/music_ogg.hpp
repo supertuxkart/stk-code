@@ -34,6 +34,7 @@
 #endif
 
 #ifdef __APPLE__
+#  define OPENAL_DEPRECATED
 #  include <OpenAL/al.h>
 #else
 #  include <AL/al.h>

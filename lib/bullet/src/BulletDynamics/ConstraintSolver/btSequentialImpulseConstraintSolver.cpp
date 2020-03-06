@@ -34,7 +34,7 @@ subject to the following restrictions:
 #include "LinearMath/btAlignedObjectArray.h"
 #include <string.h> //for memset
 
-int		gNumSplitImpulseRecoveries = 0;
+//int		gNumSplitImpulseRecoveries = 0;
 
 btSequentialImpulseConstraintSolver::btSequentialImpulseConstraintSolver()
 :m_btSeed2(0)
@@ -181,7 +181,7 @@ void	btSequentialImpulseConstraintSolver::resolveSplitPenetrationImpulseCacheFri
 {
 		if (c.m_rhsPenetration)
         {
-			gNumSplitImpulseRecoveries++;
+			//gNumSplitImpulseRecoveries++;
 			btScalar deltaImpulse = c.m_rhsPenetration-btScalar(c.m_appliedPushImpulse)*c.m_cfm;
 			const btScalar deltaVel1Dotn	=	c.m_contactNormal.dot(body1.internalGetPushVelocity()) 	+ c.m_relpos1CrossNormal.dot(body1.internalGetTurnVelocity());
 			const btScalar deltaVel2Dotn	=	-c.m_contactNormal.dot(body2.internalGetPushVelocity()) + c.m_relpos2CrossNormal.dot(body2.internalGetTurnVelocity());
@@ -209,7 +209,7 @@ void	btSequentialImpulseConstraintSolver::resolveSplitPenetrationImpulseCacheFri
 	if (!c.m_rhsPenetration)
 		return;
 
-	gNumSplitImpulseRecoveries++;
+	//gNumSplitImpulseRecoveries++;
 
 	__m128 cpAppliedImp = _mm_set1_ps(c.m_appliedPushImpulse);
 	__m128	lowerLimit1 = _mm_set1_ps(c.m_lowerLimit);

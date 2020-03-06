@@ -20,7 +20,6 @@
 #define SERVER_LOBBY_HPP
 
 #include "network/protocols/lobby_protocol.hpp"
-#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/time.hpp"
 
@@ -39,9 +38,11 @@
 #endif
 
 class BareNetworkString;
+class NetworkItemManager;
 class NetworkString;
 class NetworkPlayerProfile;
 class STKPeer;
+class SocketAddress;
 
 namespace Online
 {
@@ -91,6 +92,8 @@ private:
 
     bool m_ip_geolocation_table_exists;
 
+    bool m_ipv6_geolocation_table_exists;
+
     uint64_t m_last_poll_db_time;
 
     void pollDatabase();
@@ -100,7 +103,9 @@ private:
 
     void checkTableExists(const std::string& table, bool& result);
 
-    std::string ip2Country(const TransportAddress& addr) const;
+    std::string ip2Country(const SocketAddress& addr) const;
+
+    std::string ipv62Country(const SocketAddress& addr) const;
 #endif
     void initDatabase();
 
@@ -123,7 +128,13 @@ private:
      * (disconnected). */
     std::weak_ptr<STKPeer> m_server_owner;
 
+    /** AI peer which holds the list of reserved AI for dedicated server. */
     std::weak_ptr<STKPeer> m_ai_peer;
+
+    /** AI profiles for all-in-one graphical client server, this will be a
+     *  fixed count thorough the live time of server, which its value is
+     *  configured in NetworkConfig. */
+    std::set<std::shared_ptr<NetworkPlayerProfile> > m_ai_profiles;
 
     std::atomic<uint32_t> m_server_owner_id;
 
@@ -146,8 +157,6 @@ private:
     /** Keeps track of the server state. */
     std::atomic_bool m_server_has_loaded_world;
 
-    bool m_has_created_server_id_file;
-
     bool m_registered_for_once_only;
 
     bool m_save_server_config;
@@ -156,15 +165,10 @@ private:
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
-    /** It indicates if this server is unregistered with the stk server. */
-    std::weak_ptr<Online::Request> m_server_unregistered;
-
-    std::weak_ptr<Online::Request> m_server_recovering;
+    std::weak_ptr<Online::Request> m_server_registering;
 
     /** Timeout counter for various state. */
     std::atomic<int64_t> m_timeout;
-
-    TransportAddress m_server_address;
 
     std::mutex m_keys_mutex;
 
@@ -203,6 +207,8 @@ private:
 
     std::atomic<uint32_t> m_server_id_online;
 
+    std::atomic<uint32_t> m_client_server_host_id;
+
     std::atomic<int> m_difficulty;
 
     std::atomic<int> m_game_mode;
@@ -211,7 +217,7 @@ private:
 
     std::atomic<uint64_t> m_last_success_poll_time;
 
-    uint64_t m_server_started_at, m_server_delay;
+    uint64_t m_last_unsuccess_poll_time, m_server_started_at, m_server_delay;
 
     // Default game settings if no one has ever vote, and save inside here for
     // final vote (for live join)
@@ -238,14 +244,14 @@ private:
     // Track(s) votes
     void handlePlayerVote(Event *event);
     void playerFinishedResult(Event *event);
-    bool registerServer(bool now);
+    void registerServer();
     void finishedLoadingWorldClient(Event *event);
     void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
     void changeTeam(Event* event);
     void handleChat(Event* event);
-    void unregisterServer(bool now);
-    void createServerIdFile();
+    void unregisterServer(bool now,
+        std::weak_ptr<ServerLobby> sl = std::weak_ptr<ServerLobby>());
     void updatePlayerList(bool update_when_reset_server = false);
     void updateServerOwner();
     void handleServerConfiguration(Event* event);
@@ -373,10 +379,14 @@ public:
     int getDifficulty() const                   { return m_difficulty.load(); }
     int getGameMode() const                      { return m_game_mode.load(); }
     int getLobbyPlayers() const              { return m_lobby_players.load(); }
-    void saveInitialItems();
-    void saveIPBanTable(const TransportAddress& addr);
+    void saveInitialItems(std::shared_ptr<NetworkItemManager> nim);
+    void saveIPBanTable(const SocketAddress& addr);
     void listBanTable();
     void initServerStatsTable();
+    bool isAIProfile(const std::shared_ptr<NetworkPlayerProfile>& npp) const
+                     { return m_ai_profiles.find(npp) != m_ai_profiles.end(); }
+    uint32_t getServerIdOnline() const           { return m_server_id_online; }
+    void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
 };   // class ServerLobby
 
 #endif // SERVER_LOBBY_HPP

@@ -38,6 +38,9 @@ public:
     virtual     ~NetworkAIController();
     virtual void update(int ticks) OVERRIDE;
     virtual void reset() OVERRIDE;
+    // ------------------------------------------------------------------------
+    virtual bool isLocalPlayerController() const OVERRIDE;
+    // ------------------------------------------------------------------------
     static void setAIFrequency(int freq) { m_ai_frequency = freq; }
 };   // class NetworkAIController
 

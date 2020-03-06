@@ -25,7 +25,6 @@
 #include "font/regular_face.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
-#include "modes/profile_world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -47,7 +46,7 @@ FontManager::FontManager()
     m_ft_library = NULL;
     m_digit_face = NULL;
     m_shaping_dpi = 128;
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     checkFTError(FT_Init_FreeType(&m_ft_library), "loading freetype library");
@@ -64,7 +63,7 @@ FontManager::~FontManager()
     m_fonts.clear();
 
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     for (unsigned int i = 0; i < m_faces.size(); i++)
@@ -84,7 +83,7 @@ std::vector<FT_Face>
                  FontManager::loadTTF(const std::vector<std::string>& ttf_list)
 {
     std::vector <FT_Face> ret;
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return ret;
 
     for (const std::string& font : ttf_list)
@@ -547,7 +546,7 @@ void FontManager::initGlyphLayouts(const core::stringw& text,
                                    std::vector<irr::gui::GlyphLayout>& gls,
                                    std::vector<std::u32string>* line_data)
 {
-    if (ProfileWorld::isNoGraphics() || text.empty())
+    if (GUIEngine::isNoGraphics() || text.empty())
         return;
 
     if (line_data != NULL)
@@ -643,7 +642,7 @@ void FontManager::loadFonts()
         GUIEngine::getSkin()->getNormalTTF());
     std::vector<FT_Face> bold_ttf = normal_ttf;
     FT_Face color_emoji = NULL;
-    if (!ProfileWorld::isNoGraphics())
+    if (!GUIEngine::isNoGraphics())
     {
         assert(!normal_ttf.empty());
         color_emoji = loadColorEmoji();

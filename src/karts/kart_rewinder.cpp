@@ -130,9 +130,9 @@ void KartRewinder::computeError()
             false/*notify_of_elimination*/);
         setPosition(World::getWorld()->getCurrentNumKarts() + 1);
         finishedRace(World::getWorld()->getTime(), true/*from_server*/);
-        if (race_manager->supportsLiveJoining())
+        if (RaceManager::get()->supportsLiveJoining())
         {
-            RemoteKartInfo& rki = race_manager->getKartInfo(kartid);
+            RemoteKartInfo& rki = RaceManager::get()->getKartInfo(kartid);
             rki.makeReserved();
         }
     }
@@ -149,7 +149,8 @@ void KartRewinder::computeError()
             reset();
             // Final ticks come from server
             m_live_join_util = std::numeric_limits<int>::max();
-            getNode()->setVisible(false);
+            if (getNode())
+                getNode()->setVisible(false);
         }
     }
 }   // computeError

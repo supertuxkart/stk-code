@@ -29,7 +29,7 @@
 
 namespace Online { class XMLRequest; }
 class Server;
-class TransportAddress;
+class SocketAddress;
 class XMLNode;
 
 /**
@@ -43,7 +43,7 @@ private:
     std::vector<std::shared_ptr<Server> > m_servers;
     
     /** List of broadcast addresses to use. */
-    std::vector<TransportAddress> m_broadcast_address;
+    std::vector<SocketAddress> m_broadcast_address;
 
     std::atomic<int64_t> m_last_load_time;
 
@@ -62,9 +62,9 @@ private:
     void setLanServers(const std::map<irr::core::stringw, 
                                       std::shared_ptr<Server> >& servers);
                                       
-    void setDefaultBroadcastAddresses();
-    void addAllBroadcastAddresses(const TransportAddress &a, int len);
-    void updateBroadcastAddresses();
+    std::vector<SocketAddress> getDefaultBroadcastAddresses();
+    void addAllBroadcastAddresses(const SocketAddress &a, int len,
+                                  std::vector<SocketAddress>* result);
 public:
     // ------------------------------------------------------------------------
     // Singleton
@@ -80,7 +80,7 @@ public:
     // ------------------------------------------------------------------------
     bool listUpdated() const                         { return m_list_updated; }
     // ------------------------------------------------------------------------
-    const std::vector<TransportAddress>& getBroadcastAddresses();
+    std::vector<SocketAddress> getBroadcastAddresses(bool ipv6);
     // ------------------------------------------------------------------------
     void reset()
     {

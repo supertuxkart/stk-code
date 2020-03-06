@@ -261,6 +261,14 @@ namespace GUIEngine
       * \brief Add gui-related function before rendering GUI (from other thread)
       */
     void addGUIFunctionBeforeRendering(std::function<void()> func);
+
+#ifdef SERVER_ONLY
+    inline void disableGraphics() {}
+    constexpr bool isNoGraphics() { return true; }
+#else
+    void disableGraphics();
+    bool isNoGraphics();
+#endif
 }
 
 #endif

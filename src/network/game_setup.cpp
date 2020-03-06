@@ -31,6 +31,7 @@
 #include "race/race_manager.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 
 #include <algorithm>
@@ -75,13 +76,13 @@ void GameSetup::loadWorld()
     // goals / time limit and random item location
     assert(!m_tracks.empty());
     // Disable accidentally unlocking of a challenge
-    if (PlayerManager::getCurrentPlayer())
+    if (STKProcess::getType() == PT_MAIN && PlayerManager::getCurrentPlayer())
         PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
-    race_manager->setTimeTarget(0.0f);
-    if (race_manager->isSoccerMode() ||
-        race_manager->isBattleMode())
+    RaceManager::get()->setTimeTarget(0.0f);
+    if (RaceManager::get()->isSoccerMode() ||
+        RaceManager::get()->isBattleMode())
     {
-        const bool is_ctf = race_manager->getMinorMode() ==
+        const bool is_ctf = RaceManager::get()->getMinorMode() ==
             RaceManager::MINOR_MODE_CAPTURE_THE_FLAG;
         bool prev_val = UserConfigParams::m_random_arena_item;
         if (is_ctf)
@@ -89,27 +90,27 @@ void GameSetup::loadWorld()
         else
             UserConfigParams::m_random_arena_item = m_reverse;
 
-        race_manager->setReverseTrack(false);
-        if (race_manager->isSoccerMode())
+        RaceManager::get()->setReverseTrack(false);
+        if (RaceManager::get()->isSoccerMode())
         {
             if (isSoccerGoalTarget())
-                race_manager->setMaxGoal(m_laps);
+                RaceManager::get()->setMaxGoal(m_laps);
             else
-                race_manager->setTimeTarget((float)m_laps * 60.0f);
+                RaceManager::get()->setTimeTarget((float)m_laps * 60.0f);
         }
         else
         {
-            race_manager->setHitCaptureTime(m_hit_capture_limit,
+            RaceManager::get()->setHitCaptureTime(m_hit_capture_limit,
                 m_battle_time_limit);
         }
-        race_manager->startSingleRace(m_tracks.back(), -1,
+        RaceManager::get()->startSingleRace(m_tracks.back(), -1,
             false/*from_overworld*/);
         UserConfigParams::m_random_arena_item = prev_val;
     }
     else
     {
-        race_manager->setReverseTrack(m_reverse);
-        race_manager->startSingleRace(m_tracks.back(), m_laps,
+        RaceManager::get()->setReverseTrack(m_reverse);
+        RaceManager::get()->startSingleRace(m_tracks.back(), m_laps,
                                       false/*from_overworld*/);
     }
 }   // loadWorld
@@ -201,7 +202,7 @@ void GameSetup::sortPlayersForGame(
         std::mt19937 g(rd());
         std::shuffle(players.begin(), players.end(), g);
     }
-    if (!race_manager->teamEnabled() ||
+    if (!RaceManager::get()->teamEnabled() ||
         ServerConfig::m_team_choosing)
         return;
     for (unsigned i = 0; i < players.size(); i++)

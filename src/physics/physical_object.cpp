@@ -193,7 +193,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 // ----------------------------------------------------------------------------
 PhysicalObject::~PhysicalObject()
 {
-    Physics::getInstance()->removeBody(m_body);
+    Physics::get()->removeBody(m_body);
     delete m_body;
     delete m_motion_state;
 
@@ -591,7 +591,7 @@ void PhysicalObject::init(const PhysicalObject::Settings& settings)
         m_body->setActivationState(DISABLE_DEACTIVATION);
     }
 
-    Physics::getInstance()->addBody(m_body);
+    Physics::get()->addBody(m_body);
     m_body_added = true;
     if(m_triangle_mesh)
         m_triangle_mesh->setBody(m_body);
@@ -749,7 +749,7 @@ void PhysicalObject::removeBody()
 {
     if (m_body_added)
     {
-        Physics::getInstance()->removeBody(m_body);
+        Physics::get()->removeBody(m_body);
         m_body_added = false;
     }
 }   // Remove body
@@ -761,7 +761,7 @@ void PhysicalObject::addBody()
     if (!m_body_added)
     {
         m_body_added = true;
-        Physics::getInstance()->addBody(m_body);
+        Physics::get()->addBody(m_body);
     }
 }   // Add body
 
@@ -1018,3 +1018,108 @@ void PhysicalObject::joinToMainTrack()
     }
 
 }   // joinToMainTrack
+
+// ----------------------------------------------------------------------------
+void PhysicalObject::copyFromMainProcess(TrackObject* track_obj)
+{
+    m_no_server_state = false;
+    m_body_added = false;
+    m_object = track_obj;
+    if (m_triangle_mesh)
+    {
+        const TriangleMesh& old_tm = *m_triangle_mesh;
+        m_triangle_mesh = new TriangleMesh(/*can_be_transformed*/true);
+        m_triangle_mesh->copyFrom(old_tm);
+    }
+    // At the moment no bullet collision shape here has pointer in used in
+    // their member values, so we can use copy constructor directly
+    switch (m_body_type)
+    {
+    case MP_CONE_Y:
+    {
+        m_shape = new btConeShape(*static_cast<btConeShape*>(m_shape));
+        break;
+    }
+    case MP_CONE_X:
+    {
+        m_shape = new btConeShapeX(*static_cast<btConeShapeX*>(m_shape));
+        break;
+    }
+    case MP_CONE_Z:
+    {
+        m_shape = new btConeShapeZ(*static_cast<btConeShapeZ*>(m_shape));
+        break;
+    }
+    case MP_CYLINDER_Y:
+    {
+        m_shape = new btCylinderShape(*static_cast<btCylinderShape*>(m_shape));
+        break;
+    }
+    case MP_CYLINDER_X:
+    {
+        m_shape = new btCylinderShapeX(*static_cast<btCylinderShapeX*>(m_shape));
+        break;
+    }
+    case MP_CYLINDER_Z:
+    {
+        m_shape = new btCylinderShapeZ(*static_cast<btCylinderShapeZ*>(m_shape));
+        break;
+    }
+    case MP_SPHERE:
+    {
+        m_shape = new btSphereShape(*static_cast<btSphereShape*>(m_shape));
+        break;
+    }
+    case MP_EXACT:
+    {
+        assert(m_triangle_mesh);
+        m_triangle_mesh->createCollisionShape();
+        m_shape = &m_triangle_mesh->getCollisionShape();
+        break;
+    }
+    case MP_NONE:
+    default:
+        Log::warn("PhysicalObject", "Uninitialised moving shape");
+        // intended fall-through
+    case MP_BOX:
+    {
+        m_shape = new btBoxShape(*static_cast<btBoxShape*>(m_shape));
+        break;
+    }
+    }
+
+    m_motion_state = new btDefaultMotionState(m_init_pos);
+    btVector3 inertia(1,1,1);
+    if (m_body_type != MP_EXACT)
+        m_shape->calculateLocalInertia(m_mass, inertia);
+    else
+    {
+        if (m_mass == 0)
+            inertia.setValue(0, 0, 0);
+    }
+    btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
+                                                  m_shape, inertia);
+
+    btRigidBody* old_body = m_body;
+    if (m_triangle_mesh)
+        m_body = new TriangleMesh::RigidBodyTriangleMesh(m_triangle_mesh, info);
+    else
+        m_body = new btRigidBody(info);
+    m_user_pointer.set(this);
+    m_body->setUserPointer(&m_user_pointer);
+
+    m_body->setFriction(old_body->getFriction());
+    m_body->setRestitution(old_body->getRestitution());
+    m_body->setLinearFactor(old_body->getLinearFactor());
+    m_body->setAngularFactor(old_body->getAngularFactor());
+    m_body->setDamping(old_body->getLinearDamping(), old_body->getAngularDamping());
+
+    if (!m_is_dynamic)
+    {
+        m_body->setCollisionFlags(   m_body->getCollisionFlags()
+                                   | btCollisionObject::CF_KINEMATIC_OBJECT);
+        m_body->setActivationState(DISABLE_DEACTIVATION);
+    }
+    if (m_triangle_mesh)
+        m_triangle_mesh->setBody(m_body);
+}   // copyFromMainProcess

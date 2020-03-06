@@ -24,7 +24,6 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
-#include "modes/profile_world.hpp"
 #include "utils/synchronised.hpp"
 
 #include "GlyphLayout.h"
@@ -37,6 +36,10 @@ namespace MessageQueue
 // ============================================================================
 /** The label widget used to show the current message. */
 SkinWidgetContainer* g_container = NULL;
+SkinWidgetContainer* g_static_container = NULL;
+
+/** Stores the height of an static container to allow showing both. */
+int s_msg_raise = 0;
 
 // ============================================================================
 /** A base class for any messages. */
@@ -85,7 +88,7 @@ public:
 /** A small helper class to store and sort text messages to be displayed. */
 class TextMessage : public Message
 {
-private:
+protected:
     /** The type of the message. */
     MessageQueue::MessageType m_message_type;
 
@@ -98,10 +101,15 @@ private:
 
     /** Drawing rectangle of text layout. */
     core::recti m_text_rect;
+
+    /** A pointer to the Container for the Message */
+    SkinWidgetContainer* m_container;
+
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         Message(5.0f)
     {
+        m_container = g_container;
         m_message_type = mt;
         m_message      = message;
         assert(mt != MessageQueue::MT_PROGRESS);
@@ -181,6 +189,9 @@ public:
         m_area = irr::core::recti(x, y, x + total_width, y + dim.Height);
         m_text_rect = core::recti(x, y, x + left_icon_size + total_width,
             y + dim.Height);
+
+        if (m_container == g_static_container)
+            s_msg_raise = int(dim.Height) + font->getHeightPerLine() / 10;
     }
     // ------------------------------------------------------------------------
     /** Draw the message. */
@@ -192,10 +203,13 @@ public:
             return;
         }
         Message::draw(dt);
+        int pos_transform = 0;
+        if (m_container == g_container)
+            pos_transform = s_msg_raise;
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
-            irr_driver->getDevice()->getMovedHeight());
-        GUIEngine::getSkin()->drawMessage(g_container, m_area - raise,
+            irr_driver->getDevice()->getMovedHeight() + pos_transform);
+        GUIEngine::getSkin()->drawMessage(m_container, m_area - raise,
             m_render_type);
         GUIEngine::getFont()->draw(m_gls, m_text_rect - raise,
             GUIEngine::getSkin()->getColor("text::neutral"), true/*hcenter*/);
@@ -204,6 +218,39 @@ public:
     virtual void remove()                                      { delete this; }
 
 };   // class TextMessage
+
+class StaticTextMessage : public TextMessage
+{
+public:
+    StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
+        TextMessage(mt, message)
+    {
+        m_container = g_static_container;
+        m_message_type = mt;
+        m_message      = message;
+        assert(mt != MessageQueue::MT_PROGRESS);
+        if (mt == MessageQueue::MT_ACHIEVEMENT)
+            m_render_type = "achievement-message::neutral";
+        else if (mt == MessageQueue::MT_ERROR)
+            m_render_type = "error-message::neutral";
+        else if (mt == MessageQueue::MT_GENERIC)
+            m_render_type = "generic-message::neutral";
+        else
+            m_render_type = "friend-message::neutral";
+    }   // Message
+    // ------------------------------------------------------------------------
+    ~StaticTextMessage()
+    {
+    }
+    // ------------------------------------------------------------------------
+    /** Draw the message. */
+    virtual void draw(float dt)
+    {
+        TextMessage::draw(dt);
+        m_display_timer = 9999999.9f;
+    }
+    // ------------------------------------------------------------------------
+};
 
 // ============================================================================
 /** A function class to compare messages, required for priority_queue. */
@@ -223,6 +270,10 @@ public:
 /** List of all messages. */
 Synchronised<std::priority_queue<Message*, std::vector<Message*>,
                    CompareMessages> > g_all_messages;
+
+// ============================================================================
+/** The Storage for a Static Message */
+StaticTextMessage* g_static_message = NULL;
 
 // ============================================================================
 /** Add any message to the message queue.
@@ -313,14 +364,11 @@ ProgressBarMessage g_progress_bar_msg;
  *  position of the message. */
 void updatePosition()
 {
+    if (g_static_message != 0)
+        g_static_message->init();
     g_all_messages.lock();
-    bool empty = g_all_messages.getData().empty();
-    if (empty)
-    {
-        g_all_messages.unlock();
-        return;
-    }
-    g_all_messages.getData().top()->init();
+    if (!g_all_messages.getData().empty())
+        g_all_messages.getData().top()->init();
     g_all_messages.unlock();
 }   // updatePosition
 
@@ -332,12 +380,29 @@ void updatePosition()
 void add(MessageType mt, const irr::core::stringw &message)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
     Message *m = new TextMessage(mt, message);
     privateAdd(m);
 #endif
 }   // add
+
+// ----------------------------------------------------------------------------
+/** Adds a Text message which has to be discarded or overridden manually.
+ *  It is only possible to show one static Message at a time!
+ *  \param mt The MessageType of the message.
+ *  \param message The actual message.
+ */
+void addStatic(MessageType mt, const irr::core::stringw &message)
+{
+#ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+    delete g_static_message;
+    g_static_message = NULL;
+    g_static_message = new StaticTextMessage(mt, message);
+#endif
+}   // addStatic
 
 // ----------------------------------------------------------------------------
 /** Update function called from the GUIEngine to handle displaying of the
@@ -349,27 +414,32 @@ void add(MessageType mt, const irr::core::stringw &message)
 void update(float dt)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     if (!g_container)
-        g_container = new SkinWidgetContainer();
-
-    g_all_messages.lock();
-    bool empty = g_all_messages.getData().empty();
-    if (empty)
     {
-        g_all_messages.unlock();
-        return;
+        g_container = new SkinWidgetContainer();
+    }
+    if (!g_static_container)
+    {
+        g_static_container = new SkinWidgetContainer();
     }
 
-    Message* current = g_all_messages.getData().top();
-    current->draw(dt);
+    if (g_static_message != 0)
+        g_static_message->draw(dt);
 
-    if (current->canBeRemoved())
+    g_all_messages.lock();
+    if (!g_all_messages.getData().empty())
     {
-        g_all_messages.getData().pop();
-        current->remove();
+        Message* current = g_all_messages.getData().top();
+        current->draw(dt);
+
+        if (current->canBeRemoved())
+        {
+            g_all_messages.getData().pop();
+            current->remove();
+        }
     }
     g_all_messages.unlock();
 #endif
@@ -385,7 +455,7 @@ void update(float dt)
 void showProgressBar(int progress, const core::stringw& msg)
 {
 #ifndef SERVER_ONLY
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         return;
 
     g_progress_bar_msg.setProgress(progress, msg);
@@ -393,19 +463,51 @@ void showProgressBar(int progress, const core::stringw& msg)
 }   // showProgressBar
 
 // ----------------------------------------------------------------------------
+/** Remove the static Message from display.
+ */
+void discardStatic()
+{
+#ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
+    delete g_static_message;
+    g_static_message = NULL;
+    s_msg_raise = 0;
+#endif
+}    // discardStatic
+
+// ----------------------------------------------------------------------------
 /** Clear all message, called when destroying the GUIEngine.
  */
 void clear()
 {
 #ifndef SERVER_ONLY
+    delete g_static_message;
+    g_static_message = NULL;
     g_all_messages.lock();
     while (!g_all_messages.getData().empty())
     {
         Message* msg = g_all_messages.getData().top();
-        delete msg;
         g_all_messages.getData().pop();
+        delete msg;
     }
     g_all_messages.unlock();
+#endif
+}
+
+// ----------------------------------------------------------------------------
+/** Reset global variables (for clear starting in android).
+ */
+void resetGlobalVariables()
+{
+#ifndef SERVER_ONLY
+    g_container = NULL;
+    g_static_container = NULL;
+    g_static_message = NULL;
+    s_msg_raise = 0;
+    while (!g_all_messages.getData().empty())
+        g_all_messages.getData().pop();
 #endif
 }
 

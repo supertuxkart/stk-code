@@ -19,6 +19,7 @@
 #include "network/network_config.hpp"
 #include "network/network_player_profile.hpp"
 #include "network/server_config.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
 #include "network/protocols/server_lobby.hpp"
@@ -146,7 +147,7 @@ void mainLoop(STKHost* host)
                 // ATM use permanently ban
                 auto sl = LobbyProtocol::get<ServerLobby>();
                 // We don't support banning IPv6 address atm
-                if (sl && peer->getIPV6Address().empty())
+                if (sl && !peer->getAddress().isIPv6())
                     sl->saveIPBanTable(peer->getAddress());
             }
             else
@@ -160,7 +161,7 @@ void mainLoop(STKHost* host)
             for (unsigned int i = 0; i < peers.size(); i++)
             {
                 std::cout << peers[i]->getHostId() << ": " <<
-                    peers[i]->getRealAddress() <<  " " <<
+                    peers[i]->getAddress().toString() <<  " " <<
                     peers[i]->getUserVersion() << std::endl;
             }
         }

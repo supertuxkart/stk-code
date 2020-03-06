@@ -62,6 +62,13 @@ AnimationBase::AnimationBase(Ipo *ipo)
 }   // AnimationBase(Ipo)
 
 // ----------------------------------------------------------------------------
+AnimationBase::~AnimationBase()
+{
+    for (Ipo* ipo : m_all_ipos)
+        delete ipo;
+}   // ~AnimationBase
+
+// ----------------------------------------------------------------------------
 void AnimationBase::calculateAnimationDuration()
 {
     m_animation_duration = -1.0f;
@@ -81,7 +88,7 @@ void AnimationBase::calculateAnimationDuration()
 void AnimationBase::setInitialTransform(const Vec3 &xyz,
                                         const Vec3 &hpr)
 {
-    for_var_in(Ipo*, curr, m_all_ipos)
+    for (Ipo* curr : m_all_ipos)
     {
         curr->setInitialTransform(xyz, hpr);
     }
@@ -93,7 +100,7 @@ void AnimationBase::setInitialTransform(const Vec3 &xyz,
 void AnimationBase::reset()
 {
     m_current_time = 0;
-    for_var_in(Ipo*, curr, m_all_ipos)
+    for (Ipo* curr : m_all_ipos)
     {
         curr->reset();
     }
@@ -115,7 +122,7 @@ void AnimationBase::update(float dt, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
 
     assert(!std::isnan(m_current_time));
 
-    for_var_in (Ipo*, curr, m_all_ipos)
+    for (Ipo* curr : m_all_ipos)
     {
         curr->update(m_current_time, xyz, hpr, scale);
     }
@@ -135,7 +142,7 @@ void AnimationBase::getAt(float time, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
     // Don't do anything if the animation is disabled
     if (!m_playing) return;
 
-    for_var_in(Ipo*, curr, m_all_ipos)
+    for (Ipo* curr : m_all_ipos)
     {
         curr->update(time, xyz, hpr, scale);
     }
@@ -148,7 +155,7 @@ void AnimationBase::getAt(float time, Vec3 *xyz, Vec3 *hpr, Vec3 *scale)
  */
 void AnimationBase::getDerivativeAt(float time, Vec3 *xyz)
 {
-    for_var_in(Ipo*, curr, m_all_ipos)
+    for (Ipo* curr : m_all_ipos)
     {
         curr->getDerivative(time, xyz);
     }

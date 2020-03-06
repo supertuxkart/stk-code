@@ -26,6 +26,7 @@
 #include "guiengine/abstract_top_level_container.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/skin.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/ptr_vector.hpp"
@@ -293,6 +294,18 @@ void LayoutManager::readCoords(Widget* self)
         else if (texture_h > -1)                 self->m_absolute_h = texture_h;
         else if (label_h > -1)                   self->m_absolute_h = label_h;
     }
+
+    if (self->getType() != WTYPE_RIBBON) // Ribbons have their own handling
+    {
+        // Set vertical inner padding
+        self->m_absolute_h += self->m_absolute_h * SkinConfig::getVerticalInnerPadding(self->getType(), self);
+//        self->m_relative_h += self->m_relative_h * SkinConfig::getVerticalInnerPadding(self->getType(), self);
+
+        // Set horizontal inner padding
+        self->m_absolute_w += self->m_absolute_w * SkinConfig::getHorizontalInnerPadding(self->getType(), self);
+//        self->m_relative_w += self->m_relative_w * SkinConfig::getHorizontalInnerPadding(self->getType(), self);
+    }
+
 }
 
 // ----------------------------------------------------------------------------

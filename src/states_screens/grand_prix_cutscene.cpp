@@ -36,7 +36,7 @@ typedef GUIEngine::ButtonWidget Button;
 /** A Button to save the GP if it was a random GP */
 void GrandPrixCutscene::saveGPButton()
 {
-    if (race_manager->getGrandPrix().getId() != GrandPrixData::getRandomGPID())
+    if (RaceManager::get()->getGrandPrix().getId() != GrandPrixData::getRandomGPID())
         getWidget<Button>("save")->setVisible(false);
 }   // saveGPButton
 
@@ -50,7 +50,7 @@ void GrandPrixCutscene::setNewGPWithName(const irr::core::stringw& name)
 {
     // create a new GP with the correct filename and a unique id
     GrandPrixData* gp = grand_prix_manager->createNewGP(name);
-    const GrandPrixData current_gp = race_manager->getGrandPrix();
+    const GrandPrixData current_gp = RaceManager::get()->getGrandPrix();
     std::vector<std::string> tracks  = current_gp.getTrackNames();
     std::vector<int>         laps    = current_gp.getLaps();
     std::vector<bool>        reverse = current_gp.getReverse();

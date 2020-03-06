@@ -4,7 +4,7 @@
 First of all, you can compile STK with `-DSERVER_ONLY=ON` which will produce a GUI-less STK binary optimized for size and memory usage, useful for situation like in VPS.
 The dependencies for RHEL/CentOS 7 are installed with:
 ```bash
-yum install wget; cd /tmp; wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-11.noarch.rpm; rpm -Uvh epel-release*rpm
+yum install wget; cd /tmp; wget https://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm; rpm -Uvh epel-release*rpm
 yum install gcc-c++ cmake openssl-devel libcurl-devel zlib-devel enet
 ```
 ### Hosting WAN (public internet) server
@@ -28,9 +28,9 @@ The current server configuration xml looks like this:
 <server-config version="6" >
 
     <!-- Name of server, encode in XML if you want to use unicode characters. -->
-    <server-name value="stk server" />
+    <server-name value="STK Server" />
 
-    <!-- "Port used in server, if you specify 0, it will use the server port specified in stk_config.xml. If you wish to use a random port, set random-server-port="1" in user config. STK will automatically switch to a random port if the port you specify fails to be bound." -->
+    <!-- Port used in server, if you specify 0, it will use the server port specified in stk_config.xml. If you wish to use a random port, set random-server-port to '1' in user config. STK will automatically switch to a random port if the port you specify fails to be bound. -->
     <server-port value="0" />
 
     <!-- Game mode in server, 0 is normal race (grand prix), 1 is time trial (grand prix), 3 is normal race, 4 time trial, 6 is soccer, 7 is free-for-all and 8 is capture the flag. Notice: grand prix server doesn't allow for players to join and wait for ongoing game. -->
@@ -51,7 +51,7 @@ The current server configuration xml looks like this:
     <!-- Enable network console, which can do for example kickban. -->
     <enable-console value="false" />
 
-    <!-- Maximum number of players on the server, setting this to a value higher than 8 can cause performance degradation. -->
+    <!-- Maximum number of players on the server, setting this to a value greater than 8 can cause performance degradation. -->
     <server-max-players value="8" />
 
     <!-- Password for private server, leave empty for a public server. -->
@@ -69,20 +69,20 @@ The current server configuration xml looks like this:
     <!-- Allow players to vote for which track to play. If this value is set to false, the server will randomly pick the next track to play. -->
     <track-voting value="true" />
 
-    <!-- Timeout in seconds for selecting karts and (or) voting for tracks in server, you may want to use a lower value if you have track-voting off. -->
+    <!-- Timeout in seconds for selecting karts and (or) voting tracks in server, you may want to use a lower value if you have track-voting off. -->
     <voting-timeout value="30" />
 
-    <!-- Timeout in seconds for validation of clients in wan, currently stk will use the stk-addons server to share AES key between the client and server. -->
+    <!-- Timeout in seconds for validation of clients in wan, currently STK will use the stk-addons server to share AES key between the client and server. -->
     <validation-timeout value="20" />
 
     <!-- By default WAN server will always validate player and LAN will not, disable it to allow non-validated player in WAN. -->
     <validating-player value="true" />
 
-    <!-- Disable it to turn off all stun related code in server, it allows saving server resource if your server is not behind a firewall. -->
+    <!-- Disable it to turn off all stun related code in server, it allows for saving of server resources if your server is not behind a firewall. -->
     <firewalled-server value="true" />
 
-    <!-- Enable to allow IPv6 connection if you have a public IPv6 address. STK currently uses dual-stack mode which requires server to have both IPv4 and IPv6 and listen to same port, firewalled-server will be disabled so you need to make sure this server has port-forwarding configured properly if needed. -->
-    <ipv6-server value="false" />
+    <!-- Enable to allow IPv6 connection if you have a public IPv6 address. STK currently uses dual-stack mode which requires server to have both IPv4 and IPv6 and listen to same port. If STK detects your server has no public IPv6 address or port differs between IPv4 and IPv6 then it will use IPv4 only socket. For system which doesn't support dual-stack socket (like OpenBSD) you may fail to be connected by IPv4 clients. -->
+    <ipv6-server value="true" />
 
     <!-- No server owner in lobby which can control the starting of game or kick any players. -->
     <owner-less value="false" />
@@ -108,7 +108,7 @@ The current server configuration xml looks like this:
     <!-- If strict-players is on, no duplicated online id or split screen players are allowed, which can prevent someone using more than 1 network AI with this server. -->
     <strict-players value="false" />
 
-    <!-- Server will submit ranking to stk addons server for linear race games, you require permission for that. validating-player, auto-end, strict-player and owner-less will be turned on. -->
+    <!-- Server will submit ranking to stk-addons server for linear race games, you require permission for that. validating-player, auto-end, strict-player and owner-less will be turned on. -->
     <ranked value="false" />
 
     <!-- If true, the server owner can config the difficulty and game mode in the GUI of lobby. This option cannot be used with owner-less or grand prix server, and will be automatically turned on if the server was created using the in-game GUI. The changed difficulty and game mode will not be saved in this config file. -->
@@ -159,13 +159,13 @@ The current server configuration xml looks like this:
     <!-- Use sql database for handling server stats and maintenance, STK needs to be compiled with sqlite3 supported. -->
     <sql-management value="false" />
 
-    <!-- Database filename for sqlite to use, it can be shared for all servers created in this machine, and stk will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
+    <!-- Database filename for sqlite to use, it can be shared for all servers created in this machine, and STK will create specific table for each server. You need to create the database yourself first, see NETWORKING.md for details -->
     <database-file value="stkservers.db" />
 
     <!-- Specified in millisecond for maximum time waiting in sqlite3_busy_handler. You may need a higher value if your database is shared by many servers or having a slow hard disk. -->
     <database-timeout value="1000" />
 
-    <!-- IPv4 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) which allows live kicking peer by inserting record to database. -->
+    <!-- IPv4 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) whichallows live kicking peer by inserting record to database. -->
     <ip-ban-table value="ip_ban" />
 
     <!-- IPv6 ban list table name, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. STK can auto kick active peer from ban list (update per minute) which allows live kicking peer by inserting record to database. -->
@@ -182,6 +182,9 @@ The current server configuration xml looks like this:
 
     <!-- IP geolocation table, you only need this table if you want to geolocate IP from non-stk-addons connection, as all validated players connecting from stk-addons will provide the location info, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
     <ip-geolocation-table value="ip_mapping" />
+
+    <!-- IPv6 geolocation table, you only need this table if you want to geolocate IP from non-stk-addons connection, as all validated players connecting from stk-addons will provide the location info, you need to create the table first, see NETWORKING.md for details, empty to disable. This table can be shared for all servers if you use the same name. -->
+    <ipv6-geolocation-table value="ipv6_mapping" />
 
     <!-- If true this server will auto add / remove AI connected with network-ai=x, which will kick N - 1 bot(s) where N is the number of human players. Only use this for non-GP racing server. -->
     <ai-handling value="false" />
@@ -234,7 +237,7 @@ Currently STK uses sqlite (if building with sqlite3 on) for server management wi
 1. Server statistics
 2. IP / online ID ban list
 3. Player reports
-4. IPv4 geolocation
+4. IPv4 and IPv6 geolocation
 
 You need to create a database in sqlite first, run `sqlite3 stkservers.db` in the folder where (all) your server_config.xml(s) located.
 
@@ -341,6 +344,15 @@ CREATE TABLE ip_mapping
     longitude REAL NOT NULL, -- Longitude of this IP range
     country_code TEXT NOT NULL -- 2-letter country code
 ) WITHOUT ROWID;
+
+CREATE TABLE ipv6_mapping
+(
+    ip_start INTEGER UNSIGNED NOT NULL PRIMARY KEY UNIQUE, -- IP decimal (upper 64bit) start
+    ip_end INTEGER UNSIGNED NOT NULL UNIQUE, -- IP decimal (upper 64bit) end
+    latitude REAL NOT NULL, -- Latitude of this IP range
+    longitude REAL NOT NULL, -- Longitude of this IP range
+    country_code TEXT NOT NULL -- 2-letter country code
+)
 ```
 
 For initialization of `ip_mapping` table, check [this script](tools/generate-ip-mappings.py).

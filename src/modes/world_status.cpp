@@ -24,21 +24,24 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "karts/abstract_kart.hpp"
-#include "modes/profile_world.hpp"
+#include "modes/world.hpp"
 #include "network/network_config.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "network/rewind_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "tracks/track.hpp"
+#include "utils/stk_process.hpp"
 
 #include <irrlicht.h>
 
 //-----------------------------------------------------------------------------
-WorldStatus::WorldStatus()
+WorldStatus::WorldStatus() : m_process_type(STKProcess::getType())
 {
-    main_loop->setFrameBeforeLoadingWorld();
+    if (m_process_type == PT_MAIN)
+        main_loop->setFrameBeforeLoadingWorld();
     m_clock_mode        = CLOCK_CHRONO;
     m_phase             = SETUP_PHASE;
 
@@ -54,10 +57,14 @@ WorldStatus::WorldStatus()
     m_play_ready_set_go_sounds = true;
     m_play_racestart_sounds = true;
     m_live_join_world = false;
-    IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped())
-        device->getTimer()->start();
+    if (m_process_type == PT_MAIN)
+    {
+        IrrlichtDevice *device = irr_driver->getDevice();
+
+        if (device->getTimer()->isStopped())
+            device->getTimer()->start();
+    }
 }   // WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -94,13 +101,16 @@ void WorldStatus::reset(bool restart)
     // Just in case that the game is reset during the intro phase
     m_track_intro_sound->stop();
 
-    IrrlichtDevice *device = irr_driver->getDevice();
+    if (m_process_type == PT_MAIN)
+    {
+        IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped())
-        device->getTimer()->start();
+        if (device->getTimer()->isStopped())
+            device->getTimer()->start();
 
-    // Set the right music
-    Track::getCurrentTrack()->startMusic();
+        // Set the right music
+        Track::getCurrentTrack()->startMusic();
+    }
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -111,10 +121,14 @@ WorldStatus::~WorldStatus()
     m_prestart_sound->deleteSFX();
     m_start_sound->deleteSFX();
     m_track_intro_sound->deleteSFX();
-    IrrlichtDevice *device = irr_driver->getDevice();
 
-    if (device->getTimer()->isStopped())
-        device->getTimer()->start();
+    if (m_process_type == PT_MAIN)
+    {
+        IrrlichtDevice *device = irr_driver->getDevice();
+
+        if (device->getTimer()->isStopped())
+            device->getTimer()->start();
+    }
 }   // ~WorldStatus
 
 //-----------------------------------------------------------------------------
@@ -207,7 +221,7 @@ void WorldStatus::updateTime(int ticks)
                 m_track_intro_sound->play();
             }
 
-            if (Weather::getInstance())
+            if (m_process_type == PT_MAIN && Weather::getInstance())
             {
                 Weather::getInstance()->playSound();
             }
@@ -218,9 +232,9 @@ void WorldStatus::updateTime(int ticks)
 
             if (UserConfigParams::m_artist_debug_mode &&
                 !NetworkConfig::get()->isNetworking() &&
-                race_manager->getNumberOfKarts() -
-                race_manager->getNumSpareTireKarts() == 1 &&
-                race_manager->getTrackName() != "tutorial")
+                RaceManager::get()->getNumberOfKarts() -
+                RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                RaceManager::get()->getTrackName() != "tutorial")
             {
                 m_auxiliary_ticks += 6;
             }
@@ -317,9 +331,9 @@ void WorldStatus::updateTime(int ticks)
             // ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode     &&
                 !NetworkConfig::get()->isNetworking()     &&
-                race_manager->getNumberOfKarts() -
-                race_manager->getNumSpareTireKarts() == 1 &&
-                race_manager->getTrackName() != "tutorial")
+                RaceManager::get()->getNumberOfKarts() -
+                RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                RaceManager::get()->getTrackName() != "tutorial")
             {
                 m_auxiliary_ticks += 6;
             }
@@ -342,9 +356,9 @@ void WorldStatus::updateTime(int ticks)
                 m_start_music_ticks =
                     UserConfigParams::m_artist_debug_mode &&
                     !NetworkConfig::get()->isNetworking()     &&
-                    race_manager->getNumberOfKarts() -
-                    race_manager->getNumSpareTireKarts() == 1 &&
-                    race_manager->getTrackName() != "tutorial" ?
+                    RaceManager::get()->getNumberOfKarts() -
+                    RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                    RaceManager::get()->getTrackName() != "tutorial" ?
                     stk_config->time2Ticks(0.2f) :
                     stk_config->time2Ticks(1.0f);
                 // how long to display the 'music' message
@@ -358,9 +372,9 @@ void WorldStatus::updateTime(int ticks)
             // skip the ready/set/go counter faster
             if (UserConfigParams::m_artist_debug_mode &&
                 !NetworkConfig::get()->isNetworking() &&
-                race_manager->getNumberOfKarts() -
-                race_manager->getNumSpareTireKarts() == 1 &&
-                race_manager->getTrackName() != "tutorial")
+                RaceManager::get()->getNumberOfKarts() -
+                RaceManager::get()->getNumSpareTireKarts() == 1 &&
+                RaceManager::get()->getTrackName() != "tutorial")
             {
                 m_auxiliary_ticks += 6;
             }
@@ -378,7 +392,7 @@ void WorldStatus::updateTime(int ticks)
                     music_manager->startMusic();
                 }
                 // no graphics mode goes race phase now
-                if (ProfileWorld::isNoGraphics())
+                if (GUIEngine::isNoGraphics())
                 {
                     m_race_ticks = -1;
                     m_phase = RACE_PHASE;
@@ -437,7 +451,7 @@ void WorldStatus::updateTime(int ticks)
     switch (m_clock_mode)
     {
         case CLOCK_CHRONO:
-            if (!device->getTimer()->isStopped())
+            if (m_process_type == PT_CHILD || !device->getTimer()->isStopped())
             {
                 m_time_ticks++;
                 m_time  = stk_config->ticks2Time(m_time_ticks);
@@ -451,12 +465,12 @@ void WorldStatus::updateTime(int ticks)
                 m_time_ticks = 0;
                 m_time = 0.0f;
                 // For rescue animation playing (if any) in result screen
-                if (!device->getTimer()->isStopped())
+                if (m_process_type == PT_CHILD || !device->getTimer()->isStopped())
                     m_count_up_ticks++;
                 break;
             }
 
-            if (!device->getTimer()->isStopped())
+            if (m_process_type == PT_CHILD || !device->getTimer()->isStopped())
             {
                 m_time_ticks--;
                 m_time = stk_config->ticks2Time(m_time_ticks);
@@ -503,9 +517,9 @@ void WorldStatus::setTicks(int ticks)
 void WorldStatus::setTicksForRewind(int ticks)
 {
     m_count_up_ticks = ticks;
-    if (race_manager->hasTimeTarget())
+    if (RaceManager::get()->hasTimeTarget())
     {
-        m_time_ticks = stk_config->time2Ticks(race_manager->getTimeTarget()) -
+        m_time_ticks = stk_config->time2Ticks(RaceManager::get()->getTimeTarget()) -
             m_count_up_ticks;
     }
     else
@@ -523,6 +537,10 @@ void WorldStatus::pause(Phase phase)
 
     m_previous_phase = m_phase;
     m_phase          = phase;
+
+    if (m_process_type != PT_MAIN)
+        return;
+
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (!device->getTimer()->isStopped() &&
@@ -539,6 +557,10 @@ void WorldStatus::unpause()
     // Set m_previous_phase so that we can use an assert
     // in pause to detect incorrect pause/unpause sequences.
     m_previous_phase = UNDEFINED_PHASE;
+
+    if (m_process_type != PT_MAIN)
+        return;
+
     IrrlichtDevice *device = irr_driver->getDevice();
 
     if (device->getTimer()->isStopped() &&

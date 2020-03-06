@@ -155,9 +155,9 @@ void History::Save()
     fprintf(fd, "STK-version:      %s\n",   STK_VERSION);
     fprintf(fd, "History-version:  %d\n",   1);
     fprintf(fd, "numkarts:         %d\n",   num_karts);
-    fprintf(fd, "numplayers:       %d\n", race_manager->getNumPlayers());
-    fprintf(fd, "difficulty:       %d\n", race_manager->getDifficulty());
-    fprintf(fd, "reverse: %c\n", race_manager->getReverseTrack() ? 'y' : 'n');
+    fprintf(fd, "numplayers:       %d\n", RaceManager::get()->getNumPlayers());
+    fprintf(fd, "difficulty:       %d\n", RaceManager::get()->getDifficulty());
+    fprintf(fd, "reverse: %c\n", RaceManager::get()->getReverseTrack() ? 'y' : 'n');
 
     fprintf(fd, "track: %s\n", Track::getCurrentTrack()->getIdent().c_str());
 
@@ -239,32 +239,32 @@ void History::Load()
     unsigned int num_karts;
     if(sscanf(s, "numkarts: %u", &num_karts)!=1)
         Log::fatal("History", "No number of karts found in history file.");
-    race_manager->setNumKarts(num_karts);
+    RaceManager::get()->setNumKarts(num_karts);
 
     fgets(s, 1023, fd);
     if(sscanf(s, "numplayers: %d",&n)!=1)
         Log::fatal("History", "No number of players found in history file.");
-    race_manager->setNumPlayers(n);
+    RaceManager::get()->setNumPlayers(n);
 
     fgets(s, 1023, fd);
     if(sscanf(s, "difficulty: %d",&n)!=1)
         Log::fatal("History", "No difficulty found in history file.");
-    race_manager->setDifficulty((RaceManager::Difficulty)n);
+    RaceManager::get()->setDifficulty((RaceManager::Difficulty)n);
 
 
     fgets(s, 1023, fd);
     char r;
     if (sscanf(s, "reverse: %c", &r) != 1)
         Log::fatal("History", "Could not read reverse information: '%s'", s);
-    race_manager->setReverseTrack(r == 'y');
+    RaceManager::get()->setReverseTrack(r == 'y');
 
     fgets(s, 1023, fd);
     if(sscanf(s, "track: %1023s",s1)!=1)
         Log::warn("History", "Track not found in history file.");
-    race_manager->setTrack(s1);
+    RaceManager::get()->setTrack(s1);
     // This value doesn't really matter, but should be defined, otherwise
     // the racing phase can switch to 'ending'
-    race_manager->setNumLaps(100);
+    RaceManager::get()->setNumLaps(100);
 
     for(unsigned int i=0; i<num_karts; i++)
     {
@@ -272,9 +272,9 @@ void History::Load()
         if(sscanf(s, "model %d: %1023s",&n, s1) != 2)
             Log::fatal("History", "No model information for kart %d found.", i);
         m_kart_ident.push_back(s1);
-        if(i<race_manager->getNumPlayers() && !m_online_history_replay)
+        if(i<RaceManager::get()->getNumPlayers() && !m_online_history_replay)
         {
-            race_manager->setPlayerKart(i, s1);
+            RaceManager::get()->setPlayerKart(i, s1);
         }
     }   // for i<nKarts
     // FIXME: The model information is currently ignored

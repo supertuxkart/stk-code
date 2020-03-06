@@ -20,13 +20,13 @@
 #define CONNECT_TO_SERVER_HPP
 
 #include "network/protocol.hpp"
-#include "network/transport_address.hpp"
 #include "utils/cpp2011.hpp"
 #include <atomic>
 #include <memory>
 #include <string>
 
 #include "irrString.h"
+#include <enet/enet.h>
 
 namespace Online
 {
@@ -53,21 +53,20 @@ private:
     std::atomic<ConnectState> m_state;
 
     void getClientServerInfo();
-    void registerWithSTKServer();
+    bool registerWithSTKServer();
     bool tryConnect(int timeout, int retry, bool another_port = false,
                     bool ipv6 = false);
-    static TransportAddress m_server_address;
+    static ENetAddress m_server_address;
     static int interceptCallback(ENetHost* host, ENetEvent* event);
     static int m_retry_count;
     static bool m_done_intecept;
+    bool detectPort();
 public:
-    static std::weak_ptr<Online::Request> m_previous_unjoin;
              ConnectToServer(std::shared_ptr<Server> server);
     virtual ~ConnectToServer();
     virtual void setup() OVERRIDE;
     virtual void asynchronousUpdate() OVERRIDE;
     virtual void update(int ticks) OVERRIDE;
-
 };   // class ConnectToServer
 
 #endif // CONNECT_TO_SERVER_HPP

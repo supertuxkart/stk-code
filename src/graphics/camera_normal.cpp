@@ -19,6 +19,7 @@
 
 #include "graphics/camera_normal.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "input/device_manager.hpp"
@@ -350,7 +351,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
             m_camera->setPosition(wanted_position.toIrrVector());
         m_camera->setTarget(wanted_target.toIrrVector());
 
-        if (race_manager->getNumLocalPlayers() < 2)
+        if (RaceManager::get()->getNumLocalPlayers() < 2)
         {
             SFXManager::get()->positionListener(m_camera->getPosition(),
                                       wanted_target - m_camera->getPosition(),

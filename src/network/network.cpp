@@ -23,7 +23,8 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
-#include "network/transport_address.hpp"
+#include "network/socket_address.hpp"
+#include "network/stk_ipv6.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
@@ -62,20 +63,43 @@ Network::Network(int peer_count, int channel_limit,
                  uint32_t max_outgoing_bandwidth,
                  ENetAddress* address, bool change_port_if_bound)
 {
+    m_port = 0;
     m_host = enet_host_create(address, peer_count, channel_limit, 0, 0);
-    if (m_host)
-        return;
-    if (change_port_if_bound)
+    if (!m_host && change_port_if_bound)
     {
         Log::warn("Network", "%d port is in used, use another port",
             address->port);
-        ENetAddress new_addr;
+        ENetAddress new_addr = {};
         new_addr.host = address->host;
         // Any port
         new_addr.port = 0;
         m_host = enet_host_create(&new_addr, peer_count, channel_limit, 0, 0);
         if (!m_host)
             Log::fatal("Network", "Failed to create socket with any port.");
+    }
+    if (m_host && isIPv6Socket())
+    {
+        struct sockaddr_in6 sin6;
+        socklen_t len = sizeof(sin6);
+        if (getsockname(m_host->socket, (struct sockaddr*)&sin6, &len) == -1)
+        {
+            Log::error("STKHost", "Error while using getsockname().");
+            m_port = 0;
+        }
+        else
+            m_port = ntohs(sin6.sin6_port);
+    }
+    else if (m_host)
+    {
+        struct sockaddr_in sin;
+        socklen_t len = sizeof(sin);
+        if (getsockname(m_host->socket, (struct sockaddr*)&sin, &len) == -1)
+        {
+            Log::error("STKHost", "Error while using getsockname().");
+            m_port = 0;
+        }
+        else
+            m_port = ntohs(sin.sin_port);
     }
 }   // Network
 
@@ -92,10 +116,9 @@ Network::~Network()
 }   // ~Network
 
 // ----------------------------------------------------------------------------
-ENetPeer *Network::connectTo(const TransportAddress &address)
+ENetPeer* Network::connectTo(const ENetAddress &address)
 {
-    const ENetAddress enet_address = address.toEnetAddress();
-    return enet_host_connect(m_host, &enet_address, EVENT_CHANNEL_COUNT, 0);
+    return enet_host_connect(m_host, &address, EVENT_CHANNEL_COUNT, 0);
 }   // connectTo
 
 // ----------------------------------------------------------------------------
@@ -105,18 +128,10 @@ ENetPeer *Network::connectTo(const TransportAddress &address)
  *  \param dst : Destination of the packet.
  */
 void Network::sendRawPacket(const BareNetworkString &buffer,
-                            const TransportAddress& dst)
+                            const SocketAddress& dst)
 {
-    struct sockaddr_in to;
-    int to_len = sizeof(to);
-    memset(&to,0,to_len);
-
-    to.sin_family = AF_INET;
-    to.sin_port = htons(dst.getPort());
-    to.sin_addr.s_addr = htonl(dst.getIP());
-
     sendto(m_host->socket, buffer.getData(), buffer.size(), 0,
-           (sockaddr*)&to, to_len);
+        dst.getSockaddr(), dst.getSocklen());
     if (m_connection_debug)
     {
         Log::verbose("Network", "Raw packet sent to %s",
@@ -143,16 +158,16 @@ void Network::sendRawPacket(const BareNetworkString &buffer,
  *                  milliseconds. -1 means eternal tries.
  *  \return Length of the received data, or -1 if no data was received.
  */
-int Network::receiveRawPacket(char *buffer, int buf_len, 
-                              TransportAddress *sender, int max_tries)
+int Network::receiveRawPacket(char *buffer, int buf_len,
+                              SocketAddress *sender, int max_tries)
 {
     memset(buffer, 0, buf_len);
 
-    struct sockaddr_in addr;
+    struct sockaddr_storage addr = {};
     socklen_t from_len = sizeof(addr);
 
     int len = recvfrom(m_host->socket, buffer, buf_len, 0,
-                       (struct sockaddr*)(&addr), &from_len    );
+                       (struct sockaddr*)(&addr), &from_len);
 
     int count = 0;
     // wait to receive the message because enet sockets are non-blocking
@@ -160,7 +175,7 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
     {
         count++;
         StkTime::sleep(1); // wait 1 millisecond between two checks
-        len = recvfrom(m_host->socket, buffer, buf_len, 0, 
+        len = recvfrom(m_host->socket, buffer, buf_len, 0,
                        (struct sockaddr*)(&addr), &from_len);
     }
 
@@ -169,11 +184,22 @@ int Network::receiveRawPacket(char *buffer, int buf_len,
         return -1;
 
     Network::logPacket(BareNetworkString(buffer, len), true);
-    sender->setIP(ntohl((uint32_t)(addr.sin_addr.s_addr)) );
-    sender->setPort( ntohs(addr.sin_port) );
-    if (addr.sin_family == AF_INET && m_connection_debug)
+    switch (addr.ss_family)
     {
-        Log::verbose("Network", "IPv4 Address of the sender was %s",
+        case AF_INET:
+            sender->setSockAddrIn(AF_INET, (sockaddr*)(&addr),
+                sizeof(sockaddr_in));
+            break;
+        case AF_INET6:
+            sender->setSockAddrIn(AF_INET6, (sockaddr*)(&addr),
+                sizeof(sockaddr_in6));
+            break;
+        default:
+            break;
+    }
+    if (m_connection_debug)
+    {
+        Log::verbose("Network", "Address of the sender was %s",
             sender->toString().c_str());
     }
     return len;

@@ -100,7 +100,7 @@ void CTFFlag::update(int ticks)
         return;
 
     m_ticks_since_off_base += ticks;
-    if (m_ticks_since_off_base > race_manager->getFlagReturnTicks())
+    if (m_ticks_since_off_base > RaceManager::get()->getFlagReturnTicks())
     {
         resetToBase();
     }

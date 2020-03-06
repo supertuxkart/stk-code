@@ -37,6 +37,7 @@ private:
 
     MainMenuScreen();
 
+    void startTutorial();
 public:
     virtual void onUpdate(float delta) OVERRIDE;
 

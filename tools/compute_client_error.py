@@ -4,21 +4,21 @@ import math
 import sys
 
 def usage():
-    print "Usage:"
-    print "compute_client_error.py -f time,x1[,x2,x3....] server-data client-data"
-    print "The files are expected to contain space separated fields. The"
-    print "-f options specifies first the column in which the world time"
-    print "is, followed by the list of columns to be compared."
-    print "It computes for each data point in the client file the closest"
-    print "the two data points with the closest time stamp in the server"
-    print "and then interpolates the server position based on the client"
-    print "time between these positions. The difference between the"
-    print "intepolated position"
-    print
-    print "Example:"
-    print "compute_client_error.py-multi -f 6,16,17,18 debug.server debug.client"
-    print "   to compute the differences between client and server for the"
-    print "   fields 16,17,18 (which atm is the velocity)"
+    print("Usage:")
+    print("compute_client_error.py -f time,x1[,x2,x3....] server-data client-data")
+    print("The files are expected to contain space separated fields. The")
+    print("-f options specifies first the column in which the world time")
+    print("is, followed by the list of columns to be compared.")
+    print("It computes for each data point in the client file the closest")
+    print("the two data points with the closest time stamp in the server")
+    print("and then interpolates the server position based on the client")
+    print("time between these positions. The difference between the")
+    print("intepolated position")
+    print()
+    print("Example:")
+    print("compute_client_error.py-multi -f 6,16,17,18 debug.server debug.client")
+    print("   to compute the differences between client and server for the")
+    print("   fields 16,17,18 (which atm is the velocity)")
     sys.exit()
 
 # -----------------------------------------------------------------------------
@@ -69,14 +69,14 @@ def computeDifferences(server, client):
             interp.append(x_i)
             error = error + (x[i]-x_i)**2
         error = math.sqrt(error)
-        print time, error
+        print(time, error)
         if (error < min): min=error
         if (error > max): max=error
         count += 1
         sum += error
 
-    print "sum %f count %d min %f average %f max %f" \
-        % (sum, count, min, sum/count, max)
+    print("sum %f count %d min %f average %f max %f" \
+        % (sum, count, min, sum/count, max))
 # -----------------------------------------------------------------------------
 
 if __name__=="__main__":

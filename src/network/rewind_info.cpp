@@ -89,7 +89,7 @@ void RewindInfoState::restore()
         {
             // For now we only need to get missing rewinder from
             // projectile_manager
-            r = projectile_manager->addRewinderFromNetworkState(name);
+            r = ProjectileManager::get()->addRewinderFromNetworkState(name);
         }
         if (!r)
         {

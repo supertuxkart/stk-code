@@ -347,7 +347,7 @@ void	btQuantizedBvh::reportAabbOverlappingNodex(btNodeOverlapCallback* nodeCallb
 }
 
 
-int maxIterations = 0;
+//int maxIterations = 0;
 
 
 void	btQuantizedBvh::walkStacklessTree(btNodeOverlapCallback* nodeCallback,const btVector3& aabbMin,const btVector3& aabbMax) const
@@ -388,8 +388,8 @@ void	btQuantizedBvh::walkStacklessTree(btNodeOverlapCallback* nodeCallback,const
 			curIndex += escapeIndex;
 		}
 	}
-	if (maxIterations < walkIterations)
-		maxIterations = walkIterations;
+	//if (maxIterations < walkIterations)
+	//	maxIterations = walkIterations;
 
 }
 
@@ -531,8 +531,8 @@ void	btQuantizedBvh::walkStacklessTreeAgainstRay(btNodeOverlapCallback* nodeCall
 			curIndex += escapeIndex;
 		}
 	}
-	if (maxIterations < walkIterations)
-		maxIterations = walkIterations;
+	//if (maxIterations < walkIterations)
+	//	maxIterations = walkIterations;
 
 }
 
@@ -659,8 +659,8 @@ void	btQuantizedBvh::walkStacklessQuantizedTreeAgainstRay(btNodeOverlapCallback*
 			curIndex += escapeIndex;
 		}
 	}
-	if (maxIterations < walkIterations)
-		maxIterations = walkIterations;
+	//if (maxIterations < walkIterations)
+	//	maxIterations = walkIterations;
 
 }
 
@@ -724,8 +724,8 @@ void	btQuantizedBvh::walkStacklessQuantizedTree(btNodeOverlapCallback* nodeCallb
 			curIndex += escapeIndex;
 		}
 	}
-	if (maxIterations < walkIterations)
-		maxIterations = walkIterations;
+	//if (maxIterations < walkIterations)
+	//	maxIterations = walkIterations;
 
 }
 

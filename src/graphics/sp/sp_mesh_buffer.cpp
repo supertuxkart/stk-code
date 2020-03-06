@@ -68,7 +68,7 @@ void SPMeshBuffer::initDrawMaterial()
 {
 #ifndef SERVER_ONLY
     Material* m = std::get<2>(m_stk_material[0]);
-    if (race_manager->getReverseTrack() && m->getMirrorAxisInReverse() != ' ')
+    if (RaceManager::get()->getReverseTrack() && m->getMirrorAxisInReverse() != ' ')
     {
         for (unsigned i = 0; i < getVertexCount(); i++)
         {

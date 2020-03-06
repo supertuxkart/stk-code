@@ -27,6 +27,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/message_queue.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -40,7 +41,6 @@
 #include "modes/follow_the_leader.hpp"
 #include "modes/free_for_all.hpp"
 #include "modes/overworld.hpp"
-#include "modes/profile_world.hpp"
 #include "modes/standard_race.hpp"
 #include "modes/tutorial_world.hpp"
 #include "modes/world.hpp"
@@ -49,7 +49,6 @@
 #include "network/protocol_manager.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
-#include "network/race_event_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "scriptengine/property_animator.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
@@ -60,11 +59,41 @@
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-RaceManager* race_manager= NULL;
+//=============================================================================================
+RaceManager* g_race_manager[PT_COUNT];
+//---------------------------------------------------------------------------------------------
+RaceManager* RaceManager::get()
+{
+    ProcessType type = STKProcess::getType();
+    return g_race_manager[type];
+}   // get
 
+//---------------------------------------------------------------------------------------------
+void RaceManager::create()
+{
+    ProcessType type = STKProcess::getType();
+    g_race_manager[type] = new RaceManager();
+}   // create
+
+//---------------------------------------------------------------------------------------------
+void RaceManager::destroy()
+{
+    ProcessType type = STKProcess::getType();
+    delete g_race_manager[type];
+    g_race_manager[type] = NULL;
+}   // destroy
+
+//---------------------------------------------------------------------------------------------
+void RaceManager::clear()
+{
+    memset(g_race_manager, 0, sizeof(g_race_manager));
+}   // clear
+
+//---------------------------------------------------------------------------------------------
 /** Constructs the race manager.
  */
 RaceManager::RaceManager()
@@ -345,7 +374,7 @@ void RaceManager::startNew(bool from_overworld)
         m_num_laps      = m_grand_prix.getLaps();
         m_reverse_track = m_grand_prix.getReverse();
 
-        if (!RaceEventManager::getInstance<RaceEventManager>()->isRunning())
+        if (!NetworkConfig::get()->isNetworking())
         {
             // We look if Player 1 has a saved version of this GP.
             m_saved_gp = SavedGrandPrix::getSavedGP(
@@ -478,17 +507,20 @@ void RaceManager::startNew(bool from_overworld)
  */
 void RaceManager::startNextRace()
 {
-
+    ProcessType type = STKProcess::getType();
     main_loop->renderGUI(0);
     // Uncomment to debug audio leaks
     // sfx_manager->dump();
 
-    IrrlichtDevice* device = irr_driver->getDevice();
-    GUIEngine::clearLoadingTips();
-    GUIEngine::renderLoading(true/*clearIcons*/, false/*launching*/, false/*update_tips*/);
-    device->getVideoDriver()->endScene();
-    device->getVideoDriver()->beginScene(true, true,
-                                         video::SColor(255,100,101,140));
+    if (type == PT_MAIN)
+    {
+        IrrlichtDevice* device = irr_driver->getDevice();
+        GUIEngine::clearLoadingTips();
+        GUIEngine::renderLoading(true/*clearIcons*/, false/*launching*/, false/*update_tips*/);
+        device->getVideoDriver()->endScene();
+        device->getVideoDriver()->beginScene(true, true,
+                                            video::SColor(255,100,101,140));
+    }
 
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
@@ -601,10 +633,10 @@ void RaceManager::startNextRace()
 
     if (NetworkConfig::get()->isNetworking())
     {
-        for (unsigned i = 0; i < race_manager->getNumPlayers(); i++)
+        for (unsigned i = 0; i < getNumPlayers(); i++)
         {
             // Eliminate all reserved players in the begining
-            const RemoteKartInfo& rki = race_manager->getKartInfo(i);
+            const RemoteKartInfo& rki = getKartInfo(i);
             if (rki.isReserved())
             {
                 AbstractKart* k = World::getWorld()->getKart(i);
@@ -618,7 +650,8 @@ void RaceManager::startNextRace()
         }
     }
 
-    irr_driver->onLoadWorld();
+    if (type == PT_MAIN)
+        irr_driver->onLoadWorld();
     main_loop->renderGUI(8100);
 
     // Save the current score and set last time to zero. This is necessary
@@ -641,15 +674,16 @@ void RaceManager::startNextRace()
  */
 void RaceManager::next()
 {
-    PropertyAnimator::get()->clear();
+    if (STKProcess::getType() == PT_MAIN)
+        PropertyAnimator::get()->clear();
     World::deleteWorld();
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
     m_track_number++;
     if(m_track_number<(int)m_tracks.size())
     {
-        if( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
-            !RaceEventManager::getInstance()->isRunning() )
+        if (m_major_mode == MAJOR_MODE_GRAND_PRIX &&
+            !NetworkConfig::get()->isNetworking())
         {
             // Saving GP state
             saveGP();
@@ -746,7 +780,7 @@ void RaceManager::computeGPRanks()
     PtrVector<computeGPRanksData::SortData> sort_data;
 
     // Ignore the first kart if it's a follow-the-leader race.
-    int start=(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);
+    int start=(getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER);
     if (start)
     {
         // fill values for leader
@@ -805,12 +839,15 @@ void RaceManager::exitRace(bool delete_world)
 {
     // Only display the grand prix result screen if all tracks
     // were finished, and not when a race is aborted.
+    MessageQueue::discardStatic();
+    ProcessType type = STKProcess::getType();
+
     if ( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
          m_track_number==(int)m_tracks.size()   )
     {
         PlayerManager::getCurrentPlayer()->grandPrixFinished();
-        if( m_major_mode==MAJOR_MODE_GRAND_PRIX &&
-            !RaceEventManager::getInstance()->isRunning() )
+        if (m_major_mode == MAJOR_MODE_GRAND_PRIX &&
+            !NetworkConfig::get()->isNetworking())
         {
             if(m_saved_gp != NULL)
                 m_saved_gp->remove();
@@ -859,20 +896,21 @@ void RaceManager::exitRace(bool delete_world)
 
         if (delete_world)
         {
-            PropertyAnimator::get()->clear();
+            if (type == PT_MAIN)
+                PropertyAnimator::get()->clear();
             World::deleteWorld();
         }
         delete_world = false;
 
         StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
+        setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        setNumKarts(0);
+        setNumPlayers(0);
 
         if (some_human_player_well_ranked)
         {
-            race_manager->startSingleRace("gpwin", 999,
-                                  race_manager->raceWasStartedFromOverworld());
+            startSingleRace("gpwin", 999,
+                                  raceWasStartedFromOverworld());
             GrandPrixWin* scene = GrandPrixWin::getInstance();
             scene->push();
             scene->setKarts(winners);
@@ -880,8 +918,8 @@ void RaceManager::exitRace(bool delete_world)
         }
         else
         {
-            race_manager->startSingleRace("gplose", 999,
-                                  race_manager->raceWasStartedFromOverworld());
+            startSingleRace("gplose", 999,
+                                  raceWasStartedFromOverworld());
             GrandPrixLose* scene = GrandPrixLose::getInstance();
             scene->push();
 
@@ -902,7 +940,8 @@ void RaceManager::exitRace(bool delete_world)
 
     if (delete_world)
     {
-        PropertyAnimator::get()->clear();
+        if (type == PT_MAIN)
+            PropertyAnimator::get()->clear();
         World::deleteWorld();
     }
 
@@ -971,7 +1010,7 @@ void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
 {
     StateManager::get()->enterGameState();
     setGrandPrix(gp);
-    race_manager->setupPlayerKartInfo();
+    setupPlayerKartInfo();
     m_continue_saved_gp = continue_saved_gp;
 
     setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
@@ -1020,8 +1059,8 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     setCoinTarget( 0 ); // Might still be set from a previous challenge
 
     // if not in a network world, setup player karts
-    if (!RaceEventManager::getInstance<RaceEventManager>()->isRunning())
-        race_manager->setupPlayerKartInfo(); // do this setup player kart
+    if (!NetworkConfig::get()->isNetworking())
+        setupPlayerKartInfo(); // do this setup player kart
 
     startNew(from_overworld);
 }   // startSingleRace

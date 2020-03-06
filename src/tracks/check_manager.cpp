@@ -33,8 +33,6 @@
 #include "tracks/drive_graph.hpp"
 #include "utils/log.hpp"
 
-CheckManager *CheckManager::m_check_manager = NULL;
-
 /** Loads all check structure informaiton from the specified xml file.
  */
 void CheckManager::load(const XMLNode &node)
@@ -106,7 +104,6 @@ CheckManager::~CheckManager()
     {
         delete m_all_checks[i];
     }
-    m_check_manager = NULL;
 }   // ~CheckManager
 
 // ----------------------------------------------------------------------------

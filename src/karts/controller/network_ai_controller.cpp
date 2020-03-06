@@ -18,6 +18,7 @@
 
 #include "karts/controller/network_ai_controller.hpp"
 #include "graphics/camera.hpp"
+#include "guiengine/engine.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/skidding_ai.hpp"
@@ -36,7 +37,10 @@ NetworkAIController::NetworkAIController(AbstractKart *kart,
 {
     m_ai_controller = ai;
     m_ai_controls = new KartControl;
-    Camera::createCamera(kart, local_player_id);
+    // We only need camera for real AI instance for debugging view
+    if (!GUIEngine::isNoGraphics() &&
+        NetworkConfig::get()->isNetworkAIInstance())
+        Camera::createCamera(kart, local_player_id);
     ai->setControls(m_ai_controls);
 }   // NetworkAIController
 
@@ -46,6 +50,12 @@ NetworkAIController::~NetworkAIController()
     delete m_ai_controller;
     delete m_ai_controls;
 }   // ~NetworkAIController
+
+// ----------------------------------------------------------------------------
+bool NetworkAIController::isLocalPlayerController() const
+{
+    return NetworkConfig::get()->isNetworkAIInstance();
+}   // isLocalPlayerController
 
 // ----------------------------------------------------------------------------
 void NetworkAIController::update(int ticks)

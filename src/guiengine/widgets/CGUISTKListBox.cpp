@@ -409,7 +409,7 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
         case EET_LOG_TEXT_EVENT:
         case EET_USER_EVENT:
         case EET_JOYSTICK_INPUT_EVENT:
-        case EGUIET_FORCE_32_BIT:
+        case EEVENT_TYPE::EGUIET_FORCE_32_BIT:
             break;
         default:
             break;
@@ -443,7 +443,7 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
         event.GUIEvent.Caller = this;
         event.GUIEvent.Element = 0;
         
-#if !defined(ANDROID)
+#if !defined(MOBILE_STK)
         if (Selected != oldSelected /*|| now < selectTime + 500*/)
             event.GUIEvent.EventType = EGET_LISTBOX_CHANGED;
         else

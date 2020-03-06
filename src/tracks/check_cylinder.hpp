@@ -65,6 +65,15 @@ public:
     // -------------------------------------------------------------------------
     /** Returns the square of the radius of this sphere. */
     float getRadius2() const { return m_radius2; }
+    // ------------------------------------------------------------------------
+    virtual CheckStructure* clone()
+    {
+        CheckCylinder* cc = new CheckCylinder(*this);
+        // Drop unneeded stuff ( trigger function is not supported in server,
+        // no scripting atm)
+        cc->m_triggering_function = nullptr;
+        return cc;
+    }
 };   // CheckCylinder
 
 #endif

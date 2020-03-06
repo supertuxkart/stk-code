@@ -79,7 +79,7 @@ void BattleAI::findClosestKart(bool consider_difficulty, bool find_sta)
     const int end = m_world->getNumKarts();
 
     for (int start_id =
-        find_sta ? end - race_manager->getNumSpareTireKarts() : 0;
+        find_sta ? end - RaceManager::get()->getNumSpareTireKarts() : 0;
         start_id < end; start_id++)
     {
         const AbstractKart* kart = m_world->getKart(start_id);

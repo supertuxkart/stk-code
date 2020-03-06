@@ -73,13 +73,10 @@ private:
         int m_level;
     };
     static Synchronised<std::vector<struct LineInfo> > m_line_buffer;
-    
+
     /** <0 if no buffered logging is to be used, otherwise this is
      ** the maximum number of lines the buffer should hold. */
     static size_t m_buffer_size;
-
-    /** An optional prefix to be printed. */
-    static std::string m_prefix;
 
     static void setTerminalColor(LogLevel level);
     static void resetTerminalColor();
@@ -152,7 +149,8 @@ public:
     }   // disableColor
     // ------------------------------------------------------------------------
     /** Sets a prefix to be printed before each line. To disable the prefix,
-     *  set it to "". */
-    static void setPrefix(const std::string &prefix) { m_prefix = prefix; }
+     *  set it to "", max length of prefix is 10, if larger than that the
+     *  remaining characters are ignored. */
+    static void setPrefix(const char* prefix);
 };   // Log
 #endif

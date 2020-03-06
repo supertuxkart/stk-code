@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "network/network_config.hpp"
 #include "utils/file_utils.hpp"
+#include "utils/tls.hpp"
 
 #include <cstdio>
 #include <ctime>
@@ -28,6 +29,10 @@
 
 #ifdef ANDROID
 #  include <android/log.h>
+#endif
+
+#ifdef IOS_STK
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceiOS.h"
 #endif
 
 #ifdef WIN32
@@ -38,10 +43,21 @@
 Log::LogLevel Log::m_min_log_level = Log::LL_VERBOSE;
 bool          Log::m_no_colors     = false;
 FILE*         Log::m_file_stdout   = NULL;
-std::string   Log::m_prefix        = "";
 size_t        Log::m_buffer_size = 1;
 bool          Log::m_console_log = true;
 Synchronised<std::vector<struct Log::LineInfo> > Log::m_line_buffer;
+thread_local  char g_prefix[11] = {};
+
+// ----------------------------------------------------------------------------
+void Log::setPrefix(const char* prefix)
+{
+    size_t len = strlen(prefix);
+    if (len > 10)
+        len = 10;
+    if (len != 0)
+        memcpy(g_prefix, prefix, len);
+    g_prefix[len] = 0;
+}   // setPrefix
 
 // ----------------------------------------------------------------------------
 /** Selects background/foreground colors for the message depending on
@@ -151,23 +167,26 @@ void Log::printMessage(int level, const char *component, const char *format,
     int index = 0;
     int remaining = MAX_LENGTH;
 
-    if (!m_prefix.empty())
+    if (strlen(g_prefix) != 0)
     {
-        index += snprintf(line+index, remaining, "%s ", m_prefix.c_str());
+        index += snprintf(line+index, remaining, "%s ", g_prefix);
         remaining = MAX_LENGTH - index > 0 ? MAX_LENGTH - index : 0;
     }
 
-#ifndef ANDROID
+#ifdef MOBILE_STK
+    // Mobile STK already has timestamp logging in console
+    std::string server_prefix = "Server";
+#else
+    std::string server_prefix = StkTime::getLogTime();
+#endif
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->isServer())
     {
-        std::time_t result = std::time(nullptr);
         index += snprintf (line + index, remaining,
-            "%.24s [%s] %s: ", std::asctime(std::localtime(&result)),
+            "%s [%s] %s: ", server_prefix.c_str(),
             names[level], component);
     }
     else
-#endif
     {
         index += snprintf (line + index, remaining,
             "[%s] %s: ", names[level], component);
@@ -243,6 +262,8 @@ void Log::writeLine(const char *line, int level)
             default:         alp = ANDROID_LOG_FATAL;
             }
             __android_log_print(alp, "SuperTuxKart", "%s", line);
+#elif defined(IOS_STK)
+            CIrrDeviceiOS::debugPrint(line);
 #else
             printf("%s", line);
 #endif

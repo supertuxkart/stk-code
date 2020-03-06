@@ -25,19 +25,22 @@
 #include "network/event.hpp"
 #include "network/network_config.hpp"
 #include "network/game_setup.hpp"
+#include "network/network.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/rewind_info.hpp"
 #include "network/rewind_manager.hpp"
+#include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "tracks/track.hpp"
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 #include "main_loop.hpp"
 
 // ============================================================================
-std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol;
+std::weak_ptr<GameProtocol> GameProtocol::m_game_protocol[PT_COUNT];
 // ============================================================================
 std::shared_ptr<GameProtocol> GameProtocol::createInstance()
 {
@@ -47,7 +50,8 @@ std::shared_ptr<GameProtocol> GameProtocol::createInstance()
         return NULL;
     }
     auto gm = std::make_shared<GameProtocol>();
-    m_game_protocol = gm;
+    ProcessType pt = STKProcess::getType();
+    m_game_protocol[pt] = gm;
     return gm;
 }   // createInstance
 
@@ -56,6 +60,8 @@ std::shared_ptr<GameProtocol> GameProtocol::createInstance()
 GameProtocol::GameProtocol()
             : Protocol(PROTOCOL_CONTROLLER_EVENTS)
 {
+    m_network_item_manager = static_cast<NetworkItemManager*>
+        (Track::getCurrentTrack()->getItemManager());
     m_data_to_send = getNetworkString();
 }   // GameProtocol
 
@@ -205,7 +211,7 @@ void GameProtocol::handleControllerAction(Event *event)
             !peer->availableKartID(kart_id))
         {
             Log::warn("GameProtocol", "Wrong kart id %d from %s.",
-                kart_id, peer->getRealAddress().c_str());
+                kart_id, peer->getAddress().toString().c_str());
             return;
         }
 
@@ -269,8 +275,7 @@ void GameProtocol::handleItemEventConfirmation(Event *event)
 {
     assert(NetworkConfig::get()->isServer());
     int ticks = event->data().getTime();
-    NetworkItemManager::get()->setItemConfirmationTime(event->getPeerSP(),
-        ticks);
+    m_network_item_manager->setItemConfirmationTime(event->getPeerSP(), ticks);
 }   // handleItemEventConfirmation
 
 // ----------------------------------------------------------------------------

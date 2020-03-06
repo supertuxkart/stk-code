@@ -21,6 +21,9 @@
 
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "guiengine/engine.hpp"
+#include "guiengine/message_queue.hpp"
+#include "guiengine/screen_keyboard.hpp"
 #include "graphics/render_info.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -33,14 +36,19 @@
 #include "network/protocols/game_events_protocol.hpp"
 #include "network/race_event_manager.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/race_result_gui.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/translation.hpp"
 
-std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby;
+std::weak_ptr<LobbyProtocol> LobbyProtocol::m_lobby[PT_COUNT];
 
 LobbyProtocol::LobbyProtocol()
-                 : Protocol(PROTOCOL_LOBBY_ROOM)
+             : Protocol(PROTOCOL_LOBBY_ROOM),
+               m_process_type(STKProcess::getType())
 {
     resetGameStartedProgress();
     m_game_setup = new GameSetup();
@@ -50,8 +58,7 @@ LobbyProtocol::LobbyProtocol()
 // ----------------------------------------------------------------------------
 LobbyProtocol::~LobbyProtocol()
 {
-    if (RaceEventManager::getInstance())
-        RaceEventManager::getInstance()->stop();
+    RaceEventManager::destroy();
     delete m_game_setup;
     joinStartGameThread();
 }   // ~LobbyProtocol
@@ -71,14 +78,18 @@ void LobbyProtocol::loadWorld()
     // ---------------------
     // This creates the network world.
     auto gep = std::make_shared<GameEventsProtocol>();
-    RaceEventManager::getInstance<RaceEventManager>()->start(gep);
+    if (!RaceEventManager::get())
+        RaceEventManager::create();
+    RaceEventManager::get()->start(gep);
 
     // Make sure that if there is only a single local player this player can
     // use all input devices.
-    StateManager::ActivePlayer *ap = race_manager->getNumLocalPlayers()>1
+    StateManager::ActivePlayer *ap = RaceManager::get()->getNumLocalPlayers()>1
                                    ? NULL
                                    : StateManager::get()->getActivePlayer(0);
-    input_manager->getDeviceManager()->setSinglePlayer(ap);
+    // We only need to use input manager in main process
+    if (m_process_type == PT_MAIN)
+        input_manager->getDeviceManager()->setSinglePlayer(ap);
 
     // Load the actual world.
     m_game_setup->loadWorld();
@@ -94,11 +105,17 @@ void LobbyProtocol::configRemoteKart(
     int local_player_size) const
 {
     // The number of karts includes the AI karts, which are not supported atm
-    race_manager->setNumKarts((int)players.size());
+    RaceManager::get()->setNumKarts((int)players.size());
 
     // Set number of global and local players.
-    race_manager->setNumPlayers((int)players.size(), local_player_size);
+    RaceManager::get()->setNumPlayers((int)players.size(), local_player_size);
 
+    int local_player_count = -1;
+    if (NetworkConfig::get()->isClient())
+    {
+        local_player_count =
+            (int)NetworkConfig::get()->getNetworkPlayers().size();
+    }
     // Create the kart information for the race manager:
     // -------------------------------------------------
     for (unsigned int i = 0; i < players.size(); i++)
@@ -110,7 +127,10 @@ void LobbyProtocol::configRemoteKart(
         // on the server, and all non-local players on a client (the local
         // karts are created in the ClientLobby).
         int local_player_id = profile->getLocalPlayerId();
-        if (!is_local)
+
+        // local_player_id >= local_player_count for fixed AI defined in create
+        // server screen
+        if (!is_local || local_player_id >= local_player_count)
         {
             // No device or player profile is needed for remote kart.
             local_player_id =
@@ -130,15 +150,15 @@ void LobbyProtocol::configRemoteKart(
         rki.setDefaultKartColor(profile->getDefaultKartColor());
         rki.setHandicap(profile->getHandicap());
         rki.setOnlineId(profile->getOnlineId());
-        if (race_manager->teamEnabled())
+        if (RaceManager::get()->teamEnabled())
             rki.setKartTeam(profile->getTeam());
         rki.setCountryCode(profile->getCountryCode());
         rki.setNetworkPlayerProfile(profile);
         // Inform the race manager about the data for this kart.
-        race_manager->setPlayerKart(i, rki);
+        RaceManager::get()->setPlayerKart(i, rki);
     }   // for i in players
     // Clean all previous AI if exists in offline game
-    race_manager->computeRandomKartList();
+    RaceManager::get()->computeRandomKartList();
     Log::info("LobbyProtocol", "Player configuration ready.");
 }   // configRemoteKart
 
@@ -242,3 +262,40 @@ Track* LobbyProtocol::getPlayingTrack() const
     ul.unlock();
     return track_manager->getTrack(track_ident);
 }   // getPlayingTrack
+
+//-----------------------------------------------------------------------------
+void LobbyProtocol::exitGameState()
+{
+    bool create_gp_msg = false;
+    if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        RaceManager::get()->getTrackNumber() == RaceManager::get()->getNumOfTracks() - 1)
+    {
+        create_gp_msg = true;
+    }
+
+    RaceManager::get()->clearNetworkGrandPrixResult();
+    RaceManager::get()->exitRace();
+    RaceManager::get()->setAIKartOverride("");
+
+    if (GUIEngine::isNoGraphics())
+    {
+        // No screen is ever created when no graphics is on
+        StateManager::get()->enterMenuState();
+        return;
+    }
+
+    GUIEngine::ModalDialog::dismiss();
+    GUIEngine::ScreenKeyboard::dismiss();
+    RaceResultGUI::getInstance()->cleanupGPProgress();
+    if (create_gp_msg)
+    {
+        core::stringw msg = _("Network grand prix has been finished.");
+        MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, msg);
+    }
+
+    if (GUIEngine::getCurrentScreen() != NetworkingLobby::getInstance())
+    {
+        StateManager::get()->resetAndSetStack(
+            NetworkConfig::get()->getResetScreens(true/*lobby*/).data());
+    }
+}   // exitGameState

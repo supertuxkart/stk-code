@@ -333,20 +333,18 @@ void loadServerLobbyFromConfig()
     if (m_high_ping_workaround)
         m_kick_high_ping_players = false;
     auto modes = getLocalGameModeFromConfig();
-    race_manager->setMinorMode(modes.first);
-    race_manager->setMajorMode(modes.second);
+    RaceManager::get()->setMinorMode(modes.first);
+    RaceManager::get()->setMajorMode(modes.second);
     unsigned difficulty = m_server_difficulty;
-    race_manager->setDifficulty(RaceManager::Difficulty(difficulty));
+    RaceManager::get()->setDifficulty(RaceManager::Difficulty(difficulty));
 
-    if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL &&
+    if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL &&
         m_server_max_players > 10)
         m_server_max_players = 10;
 
     if (m_ipv6_server)
     {
-#ifdef ENABLE_IPV6
-        m_firewalled_server = false;
-#else
+#ifndef ENABLE_IPV6
         Log::warn("ServerConfig", "IPv6 support not compiled.");
 #endif
     }
@@ -370,10 +368,10 @@ void loadServerLobbyFromConfig()
         m_server_configurable = false;
 
     const bool is_soccer =
-        race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
     const bool is_gp =
-        race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
-    const bool is_battle = race_manager->isBattleMode();
+        RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
+    const bool is_battle = RaceManager::get()->isBattleMode();
 
     std::shared_ptr<LobbyProtocol> server_lobby;
     server_lobby = STKHost::create();

@@ -132,8 +132,8 @@ void GPInfoScreen::beforeAddingWidget()
         SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP(
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
             m_gp.getId(),
-            race_manager->getMinorMode(),
-            race_manager->getNumLocalPlayers());
+            RaceManager::get()->getMinorMode(),
+            RaceManager::get()->getNumLocalPlayers());
             
         int tracks = (int)m_gp.getTrackNames().size();
         bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0 &&
@@ -226,19 +226,19 @@ void GPInfoScreen::init()
 
     // Number of AIs
     // -------------
-    const bool has_AI = race_manager->hasAI();
+    const bool has_AI = RaceManager::get()->hasAI();
     m_ai_kart_spinner->setVisible(has_AI);
     getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
 
     if (has_AI)
     {
-        const int local_players = race_manager->getNumLocalPlayers();
+        const int local_players = RaceManager::get()->getNumLocalPlayers();
         int min_ai = 0;
         int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
             [RaceManager::MAJOR_MODE_GRAND_PRIX]) - local_players;
 
         // A ftl reace needs at least three karts to make any sense
-        if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        if (RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
         {
             min_ai = std::max(0, 3 - local_players);
         }
@@ -317,21 +317,21 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         else if (button == "start")
         {
             // Normal GP: start GP
-            const int local_players = race_manager->getNumLocalPlayers();
-            const bool has_AI = race_manager->hasAI();
+            const int local_players = RaceManager::get()->getNumLocalPlayers();
+            const bool has_AI = RaceManager::get()->hasAI();
             const int num_ai = has_AI ? m_ai_kart_spinner->getValue() : 0;
             
-            race_manager->setNumKarts(local_players + num_ai);
+            RaceManager::get()->setNumKarts(local_players + num_ai);
             UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = local_players + num_ai;
             
             m_gp.changeReverse(getReverse());
-            race_manager->startGP(m_gp, false, false);
+            RaceManager::get()->startGP(m_gp, false, false);
         }
         else if (button == "continue")
         {
             // Normal GP: continue a saved GP
             m_gp.changeReverse(getReverse());
-            race_manager->startGP(m_gp, false, true);
+            RaceManager::get()->startGP(m_gp, false, true);
         }
     }   // name=="buttons"
     else if (name=="group-spinner")
@@ -358,8 +358,8 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     else if (name=="ai-spinner")
     {
         const int num_ai = m_ai_kart_spinner->getValue();
-        race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
-        UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = race_manager->getNumLocalPlayers() + num_ai;
+        RaceManager::get()->setNumKarts( RaceManager::get()->getNumLocalPlayers() + num_ai );
+        UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = RaceManager::get()->getNumLocalPlayers() + num_ai;
     }
     else if(name=="back")
     {

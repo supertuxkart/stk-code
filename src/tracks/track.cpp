@@ -59,8 +59,8 @@
 #include "main_loop.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/easter_egg_hunt.hpp"
-#include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
+#include "network/protocols/game_protocol.hpp"
 #include "network/protocols/server_lobby.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/physics.hpp"
@@ -70,6 +70,7 @@
 #include "tracks/arena_graph.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
+#include "tracks/check_structure.hpp"
 #include "tracks/drive_graph.hpp"
 #include "tracks/drive_node.hpp"
 #include "tracks/model_definition_loader.hpp"
@@ -99,7 +100,7 @@ using namespace irr;
 
 const float Track::NOHIT               = -99999.9f;
 bool        Track::m_dont_load_navmesh = false;
-Track      *Track::m_current_track = NULL;
+std::atomic<Track*> Track::m_current_track[PT_COUNT];
 
 // ----------------------------------------------------------------------------
 Track::Track(const std::string &filename)
@@ -165,6 +166,7 @@ Track::Track(const std::string &filename)
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
     m_render_target         = NULL;
+    m_check_manager         = NULL;
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
     m_force_disable_fog     = false;
@@ -290,8 +292,8 @@ void Track::removeCachedData()
 void Track::reset()
 {
     m_ambient_color = m_default_ambient_color;
-    CheckManager::get()->reset(*this);
-    ItemManager::get()->reset();
+    m_check_manager->reset(*this);
+    m_item_manager->reset();
     m_track_object_manager->reset();
     m_startup_run = false;
 }   // reset
@@ -314,11 +316,11 @@ void Track::cleanup()
     file_manager->popModelSearchPath();
 
     Graph::destroy();
-    ItemManager::destroy();
+    m_item_manager = nullptr;
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
         {
             CPUParticleManager::getInstance()->cleanMaterialMap();
         }
@@ -346,9 +348,8 @@ void Track::cleanup()
     }
     m_static_physics_only_nodes.clear();
 
-    m_all_emitters.clearAndDeleteAll();
-
-    CheckManager::destroy();
+    delete m_check_manager;
+    m_check_manager = NULL;
 
     delete m_track_object_manager;
     m_track_object_manager = NULL;
@@ -505,7 +506,7 @@ void Track::cleanup()
     m_meta_library.clear();
     Scripting::ScriptEngine::getInstance()->cleanupCache();
 
-    m_current_track = NULL;
+    m_current_track[PT_MAIN] = NULL;
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -734,13 +735,13 @@ void Track::loadArenaGraph(const XMLNode &node)
 {
     // Determine if rotate minimap is needed for soccer mode (for blue team)
     // Only need to test local player
-    if (race_manager->isSoccerMode())
+    if (RaceManager::get()->isSoccerMode())
     {
-        const unsigned pk = race_manager->getNumPlayers();
+        const unsigned pk = RaceManager::get()->getNumPlayers();
         for (unsigned i = 0; i < pk; i++)
         {
-            if (!race_manager->getKartInfo(i).isNetworkPlayer() &&
-                race_manager->getKartInfo(i).getKartTeam() ==
+            if (!RaceManager::get()->getKartInfo(i).isNetworkPlayer() &&
+                RaceManager::get()->getKartInfo(i).getKartTeam() ==
                 KART_TEAM_BLUE)
             {
                 m_minimap_invert_x_z = true;
@@ -810,7 +811,7 @@ void Track::loadDriveGraph(unsigned int mode_id, const bool reverse)
     {
         Log::warn("track", "No graph nodes defined for track '%s'\n",
                 m_filename.c_str());
-        if (race_manager->getNumberOfKarts() > 1)
+        if (RaceManager::get()->getNumberOfKarts() > 1)
         {
             Log::fatal("track", "I can handle the lack of driveline in single"
                 "kart mode, but not with AIs\n");
@@ -1154,6 +1155,9 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 void Track::loadMinimap()
 {
 #ifndef SERVER_ONLY
+    if (GUIEngine::isNoGraphics())
+        return;
+
     //Create the minimap resizing it as necessary.
     core::dimension2du mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
 
@@ -1219,7 +1223,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 #ifdef SERVER_ONLY
     if (false)
 #else
-    if (m_version < 7 && !CVS->isGLSL() && !ProfileWorld::isNoGraphics())
+    if (m_version < 7 && !CVS->isGLSL() && !GUIEngine::isNoGraphics())
 #endif
     {
         // The mesh as returned does not have all mesh buffers with the same
@@ -1277,7 +1281,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     // could be relaxed to fix this, it is not certain how the physics
     // will handle items that are out of the AABB
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
-    Physics::getInstance()->init(m_aabb_min, m_aabb_max);
+    Physics::get()->init(m_aabb_min, m_aabb_max);
 
     ModelDefinitionLoader lodLoader(this);
 
@@ -1479,7 +1483,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
 
     // Free the tangent (track mesh) after converting to physics
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
         tangent_mesh->freeMeshVertexBuffer();
 
     if (m_track_mesh == NULL)
@@ -1498,7 +1502,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 // ----------------------------------------------------------------------------
 void Track::freeCachedMeshVertexBuffer()
 {
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
     {
         for (unsigned i = 0; i < m_all_cached_meshes.size(); i++)
             m_all_cached_meshes[i]->freeMeshVertexBuffer();
@@ -1605,7 +1609,7 @@ void Track::updateGraphics(float dt)
     {
         m_animated_textures[i]->update(dt);
     }
-    ItemManager::get()->updateGraphics(dt);
+    m_item_manager->updateGraphics(dt);
 
 }   // updateGraphics
 
@@ -1615,14 +1619,22 @@ void Track::updateGraphics(float dt)
  */
 void Track::update(int ticks)
 {
-    if (!m_startup_run) // first time running update = good point to run startup script
+    ProcessType type = STKProcess::getType();
+    if (type == PT_MAIN && !m_startup_run) // first time running update = good point to run startup script
     {
         Scripting::ScriptEngine::getInstance()->runFunction(false, "void onStart()");
         m_startup_run = true;
+        // After onStart all track objects will be hidden as needed
+        // we only copy track objects with physical body which affects network
+        if (LobbyProtocol::getByType<LobbyProtocol>(PT_CHILD))
+        {
+            Track* child_track = clone();
+            m_current_track[PT_CHILD] = child_track;
+        }
     }
     float dt = stk_config->ticks2Time(ticks);
-    CheckManager::get()->update(dt);
-    ItemManager::get()->update(ticks);
+    m_check_manager->update(dt);
+    m_item_manager->update(ticks);
 
     // TODO: enable onUpdate scripts if we ever find a compelling use for them
     //Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
@@ -1776,7 +1788,7 @@ static void recursiveUpdatePhysics(std::vector<TrackObject*>& tos)
  */
 void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 {
-    assert(!m_current_track);
+    assert(m_current_track[PT_MAIN].load() == NULL);
 
     // Use m_filename to also get the path, not only the identifier
     STKTexManager::getInstance()
@@ -1786,7 +1798,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         reverse_track = false;
     }
     main_loop->renderGUI(3000);
-    CheckManager::create();
+    m_check_manager = new CheckManager();
     assert(m_all_cached_meshes.size()==0);
     if(UserConfigParams::logMemory())
     {
@@ -1871,14 +1883,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         throw std::runtime_error(msg.str());
     }
 
-    m_current_track = this;
+    m_current_track[PT_MAIN] = this;
+    m_current_track[PT_CHILD] = NULL;
 
     // Load the graph only now: this function is called from world, after
     // the race gui was created. The race gui is needed since it stores
     // the information about the size of the texture to render the mini
     // map to.
     // Load the un-raycasted flag position first (for minimap)
-    if (m_is_ctf && race_manager->isCTFMode())
+    if (m_is_ctf && RaceManager::get()->isCTFMode())
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -1903,13 +1916,17 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     main_loop->renderGUI(3340);
 
     if (NetworkConfig::get()->isNetworking())
-        NetworkItemManager::create();
+    {
+        auto nim = std::make_shared<NetworkItemManager>();
+        nim->rewinderAdd();
+        m_item_manager = nim;
+    }
     else
     {
         // Seed random engine locally
         uint32_t seed = (uint32_t)StkTime::getTimeSinceEpoch();
         ItemManager::updateRandomSeed(seed);
-        ItemManager::create();
+        m_item_manager = std::make_shared<ItemManager>();
         powerup_manager->setRandomSeed(seed);
     }
     main_loop->renderGUI(3360);
@@ -1932,14 +1949,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
-        if (race_manager->isFollowMode())
+        if (RaceManager::get()->isFollowMode())
         {
             // In a FTL race the non-leader karts are placed at the end of the
             // field, so we need all start positions.
             m_start_transforms.resize(stk_config->m_max_karts);
         }
         else
-            m_start_transforms.resize(race_manager->getNumberOfKarts());
+            m_start_transforms.resize(RaceManager::get()->getNumberOfKarts());
         DriveGraph::get()->setDefaultStartPositions(&m_start_transforms,
                                                    karts_per_row,
                                                    forwards_distance,
@@ -1966,7 +1983,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     main_loop->renderGUI(3500);
 
 #ifndef SERVER_ONLY
-    if (!ProfileWorld::isNoGraphics() && CVS->isGLSL() && m_use_fog)
+    if (!GUIEngine::isNoGraphics() && CVS->isGLSL() && m_use_fog)
     {
         glBindBuffer(GL_UNIFORM_BUFFER, SP::sp_fog_ubo);
         glBufferSubData(GL_UNIFORM_BUFFER, 0, 4, &m_fog_start);
@@ -2177,7 +2194,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     freeCachedMeshVertexBuffer();
 
     const bool arena_random_item_created =
-        ItemManager::get()->randomItemsForArena(m_start_transforms);
+        m_item_manager->randomItemsForArena(m_start_transforms);
 
     if (!arena_random_item_created)
     {
@@ -2195,7 +2212,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     main_loop->renderGUI(5700);
 
-    if (m_is_ctf && race_manager->isCTFMode())
+    if (m_is_ctf && RaceManager::get()->isCTFMode())
     {
         for (unsigned int i=0; i<root->getNumNodes(); i++)
         {
@@ -2211,7 +2228,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     main_loop->renderGUI(5800);
 
     if (auto sl = LobbyProtocol::get<ServerLobby>())
-        sl->saveInitialItems();
+    {
+        sl->saveInitialItems(
+            std::dynamic_pointer_cast<NetworkItemManager>(m_item_manager));
+    }
 
     main_loop->renderGUI(5900);
 
@@ -2220,8 +2240,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
-    if (CheckManager::get()->getCheckStructureCount()==0  &&
-        !race_manager->isBattleMode() && !m_is_cutscene)
+    if (m_check_manager->getCheckStructureCount()==0  &&
+        !RaceManager::get()->isBattleMode() && !m_is_cutscene)
     {
         Log::warn("track", "No check lines found in track '%s'.",
                   m_ident.c_str());
@@ -2280,7 +2300,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
     unsigned int start_position_counter = 0;
 
     unsigned int node_count = root->getNumNodes();
-    const bool is_mode_ctf = m_is_ctf && race_manager->isCTFMode();
+    const bool is_mode_ctf = m_is_ctf && RaceManager::get()->isCTFMode();
 
     // We keep track of the complexity of the scene (amount of objects loaded, etc)
     irr_driver->addSceneComplexity(node_count);
@@ -2340,7 +2360,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
         }
         else if (name == "checks")
         {
-            CheckManager::get()->load(*node);
+            m_check_manager->load(*node);
         }
         else if (name == "particle-emitter")
         {
@@ -2620,7 +2640,7 @@ void Track::itemCommand(const XMLNode *node)
 {
     const std::string &name = node->getName();
 
-    const bool is_mode_ctf = m_is_ctf && race_manager->isCTFMode();
+    const bool is_mode_ctf = m_is_ctf && RaceManager::get()->isCTFMode();
     bool ctf = false;
     node->get("ctf", &ctf);
     if ((is_mode_ctf && !ctf) || (!is_mode_ctf && ctf))
@@ -2647,7 +2667,7 @@ void Track::itemCommand(const XMLNode *node)
         return;
 
     // Only do easter eggs in easter egg mode.
-    if(!(race_manager->isEggHuntMode()) && type==Item::ITEM_EASTER_EGG)
+    if(!(RaceManager::get()->isEggHuntMode()) && type==Item::ITEM_EASTER_EGG)
     {
         Log::warn("track",
                   "Found easter egg in non-easter-egg mode - ignored.\n");
@@ -2702,7 +2722,7 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    ItemManager::get()->placeItem(type, drop ? hit_point : loc, normal);
+    m_item_manager->placeItem(type, drop ? hit_point : loc, normal);
 }   // itemCommand
 
 // ----------------------------------------------------------------------------
@@ -2853,3 +2873,103 @@ void Track::uploadNodeVertexBuffer(scene::ISceneNode *node)
     }
 #endif
 }   // uploadNodeVertexBuffer
+
+//-----------------------------------------------------------------------------
+void Track::copyFromMainProcess()
+{
+    // Clear all unneeded objects copied in main process track
+    m_physical_object_uid = 0;
+    m_animated_textures.clear();
+    m_animated_textures.shrink_to_fit();
+    m_all_nodes.clear();
+    m_all_nodes.shrink_to_fit();
+    m_static_physics_only_nodes.clear();
+    m_static_physics_only_nodes.shrink_to_fit();
+    m_object_physics_only_nodes.clear();
+    m_object_physics_only_nodes.shrink_to_fit();
+    m_sun = NULL;
+    m_all_cached_meshes.clear();
+    m_all_cached_meshes.shrink_to_fit();
+    m_detached_cached_meshes.clear();
+    m_detached_cached_meshes.shrink_to_fit();
+    m_sky_textures.clear();
+    m_sky_textures.shrink_to_fit();
+    m_spherical_harmonics_textures.clear();
+    m_spherical_harmonics_textures.shrink_to_fit();
+    m_meta_library.clear();
+    m_meta_library.shrink_to_fit();
+
+    // Clone the needed object now in main process
+    Track* main_track = m_current_track[PT_MAIN];
+    CheckManager* main_cm = main_track->m_check_manager;
+    m_check_manager = new CheckManager();
+    for (unsigned i = 0; i < main_cm->getCheckStructureCount(); i++)
+    {
+        CheckStructure* cs = main_cm->getCheckStructure(i);
+        m_check_manager->add(cs->clone());
+    }
+
+    TrackObjectManager* main_tom = m_track_object_manager;
+    m_track_object_manager = new TrackObjectManager();
+    for (auto* to : main_tom->getObjects().m_contents_vector)
+    {
+        TrackObject* clone = to->cloneToChild();
+        if (clone)
+            m_track_object_manager->insertObject(clone);
+    }
+
+    m_track_mesh = new TriangleMesh(/*can_be_transformed*/false);
+    m_gfx_effect_mesh = new TriangleMesh(/*can_be_transformed*/false);
+    m_track_mesh->copyFrom(*main_track->m_track_mesh);
+    m_gfx_effect_mesh->copyFrom(*main_track->m_gfx_effect_mesh);
+
+    // At the moment we only use network for child track
+    auto nim = std::make_shared<NetworkItemManager>();
+    for (unsigned i = 0; i < m_item_manager->getNumberOfItems(); i++)
+    {
+        ItemState* it = m_item_manager->getItem(i);
+        nim->insertItem(new Item(it->getType(), it->getXYZ(), it->getNormal(),
+            NULL/*mesh*/, NULL/*lowres_mesh*/, NULL/*owner*/));
+    }
+    m_item_manager = nim;
+}   // copyFromMainProcess
+
+//-----------------------------------------------------------------------------
+void Track::initChildTrack()
+{
+    // This will be called in child process after main one copied to it
+    assert(STKProcess::getType() == PT_CHILD);
+    // Add in child process for rewind manager
+    std::dynamic_pointer_cast<NetworkItemManager>
+        (m_item_manager)->rewinderAdd();
+
+    // We call physics init in child process too
+    Physics::get()->init(m_aabb_min, m_aabb_max);
+    m_track_mesh->createPhysicalBody(m_friction);
+    m_gfx_effect_mesh->createCollisionShape();
+
+    // All child track objects are only cloned if they have physical objects
+    for (auto* to : m_track_object_manager->getObjects().m_contents_vector)
+        to->getPhysicalObject()->addBody();
+    m_track_object_manager->init();
+
+    if (auto sl = LobbyProtocol::get<ServerLobby>())
+    {
+        sl->saveInitialItems(
+            std::dynamic_pointer_cast<NetworkItemManager>(m_item_manager));
+    }
+}   // initChildTrack
+
+//-----------------------------------------------------------------------------
+void Track::cleanChildTrack()
+{
+    assert(STKProcess::getType() == PT_CHILD);
+    Track* child_track = m_current_track[PT_CHILD];
+    child_track->m_item_manager = nullptr;
+    delete child_track->m_check_manager;
+    delete child_track->m_track_object_manager;
+    delete child_track->m_track_mesh;
+    delete child_track->m_gfx_effect_mesh;
+    delete child_track;
+    m_current_track[PT_CHILD] = NULL;
+}   // cleanChildTrack

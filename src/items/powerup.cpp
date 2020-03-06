@@ -217,7 +217,7 @@ void Powerup::adjustSound()
     m_sound_use->setPosition(m_kart->getXYZ());
     // in multiplayer mode, sounds are NOT positional (because we have multiple listeners)
     // so the sounds of all AIs are constantly heard. So reduce volume of sounds.
-    if (race_manager->getNumLocalPlayers() > 1)
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
         // player karts played at full volume; AI karts much dimmer
 
@@ -228,7 +228,7 @@ void Powerup::adjustSound()
         else
         {
             m_sound_use->setVolume( 
-                     std::min(0.5f, 1.0f / race_manager->getNumberOfKarts()) );
+                     std::min(0.5f, 1.0f / RaceManager::get()->getNumberOfKarts()) );
         }
     }
 }   // adjustSound
@@ -253,7 +253,7 @@ void Powerup::use()
         m_kart->getController()->canGetAchievements()    )
     {
         PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED, 1);
-        if (race_manager->isLinearRaceMode())
+        if (RaceManager::get()->isLinearRaceMode())
             PlayerManager::increaseAchievement(AchievementsStatus::POWERUP_USED_1RACE, 1);
     }
 
@@ -271,6 +271,7 @@ void Powerup::use()
 
     m_number--;
     World *world = World::getWorld();
+    ItemManager* im = Track::getCurrentTrack()->getItemManager();
     switch (m_type)
     {
     case PowerupManager::POWERUP_ZIPPER:
@@ -278,7 +279,7 @@ void Powerup::use()
         break ;
     case PowerupManager::POWERUP_SWITCH:
         {
-            ItemManager::get()->switchItems();
+            im->switchItems();
             if (!has_played_sound)
             {
                 m_sound_use->setPosition(m_kart->getXYZ());
@@ -297,7 +298,7 @@ void Powerup::use()
             Powerup::adjustSound();
             m_sound_use->play();
         }
-        projectile_manager->newProjectile(m_kart, m_type);
+        ProjectileManager::get()->newProjectile(m_kart, m_type);
         break ;
 
     case PowerupManager::POWERUP_SWATTER:
@@ -310,8 +311,7 @@ void Powerup::use()
         // use the bubble gum the traditional way, if the kart is looking back
         if (m_kart->getControls().getLookBack())
         {
-            Item *new_item = 
-                ItemManager::get()->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
+            Item *new_item = im->dropNewItem(Item::ITEM_BUBBLEGUM, m_kart);
 
             // E.g. ground not found in raycast.
             if(!new_item) return;

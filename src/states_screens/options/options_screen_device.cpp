@@ -24,6 +24,7 @@
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
@@ -31,6 +32,7 @@
 #include "input/gamepad_device.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
 #include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
@@ -636,6 +638,22 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
         }
 
         input_manager->getDeviceManager()->save();
+    }
+    else if (name == "rename_config")
+    {
+        core::stringw instruction =
+            _("Enter new configuration name, leave empty to revert default value.");
+        DeviceConfig *the_config = m_config; //Can't give variable m_config directly
+
+        new GeneralTextFieldDialog(instruction, [] (const irr::core::stringw& text) {},
+            [the_config] (GUIEngine::LabelWidget* lw,
+                GUIEngine::TextBoxWidget* tb)->bool
+            {
+                core::stringw info = tb->getText();
+                the_config->setConfigName(info);
+                input_manager->getDeviceManager()->save();
+                return true;
+            });
     }
 
 }   // eventCallback

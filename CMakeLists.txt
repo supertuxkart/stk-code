@@ -49,7 +49,6 @@ if (IOS)
     ADD_DEFINITIONS(-DIOS_STK)
     set(CMAKE_XCODE_ATTRIBUTE_TARGETED_DEVICE_FAMILY "1,2")
     option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
-    find_library(RESOLV_LIBRARY NAMES resolv libresolv)
 endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
@@ -80,7 +79,17 @@ endif()
 
 if(UNIX AND NOT APPLE)
     option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
+    option(USE_TSAN   "Build with Thread sanitizer" OFF)
     option(USE_LIBBFD "Use libbfd for crash reporting and leak check" OFF)
+endif()
+
+if(USE_ASAN)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+endif()
+if(USE_TSAN)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=thread -fno-omit-frame-pointer")
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -133,7 +142,10 @@ endif()
 
 if(USE_GLES2)
     add_definitions(-DUSE_GLES2)
-    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_ -DNO_IRR_COMPILE_WITH_OPENGL_)
+    if (NOT IOS)
+        add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
+    endif()
+    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
 endif()
 
 if(SERVER_ONLY)
@@ -159,6 +171,16 @@ endif()
 # Build the Bullet physics library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
+
+if(WIN32)
+    set(LIBRESOLV_LIBRARY)
+else()
+    if (NOT CMAKE_SYSTEM_NAME MATCHES "BSD")
+        find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
+    else()
+        set(LIBRESOLV_LIBRARY)
+    endif()
+endif()
 
 # Find system ENet library or build it if missing
 if((UNIX AND NOT APPLE) AND USE_SYSTEM_ENET AND NOT USE_IPV6)
@@ -512,14 +534,15 @@ else()
 
     # Build the final executable
     if (IOS)
-        file(GLOB IOS_ASSETS_FILES ${IOS_ASSETS} ${IOS_LAUNCHSCREEN})
+        file(GLOB IOS_ASSETS_FILES ${IOS_ASSETS} ${IOS_LAUNCHSCREEN} ${IOS_IMAGES_XCASSETS})
         set_source_files_properties(${IOS_ASSETS_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
         add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS} ${IOS_ASSETS_FILES})
         set_target_properties(supertuxkart PROPERTIES
             MACOSX_BUNDLE_INFO_PLIST ${PROJECT_SOURCE_DIR}/data/SuperTuxKart-Info-iOS.plist
             XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET 9.0
             XCODE_ATTRIBUTE_INSTALL_PATH /Applications
-            XCODE_ATTRIBUTE_SKIP_INSTALL No)
+            XCODE_ATTRIBUTE_SKIP_INSTALL No
+            XCODE_ATTRIBUTE_ASSETCATALOG_COMPILER_APPICON_NAME "AppIcon")
     else()
         add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS})
     endif()
@@ -591,6 +614,7 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
+    ${LIBRESOLV_LIBRARY}
     mcpp
     )
 
@@ -608,11 +632,7 @@ if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
         target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
     elseif (IOS)
-        target_link_libraries(supertuxkart "-framework OpenGLES
-                                            -framework UIKit
-                                            -framework CoreMotion
-                                            -framework Foundation
-                                            -framework GLKit ${RESOLV_LIBRARY}")
+        target_link_libraries(supertuxkart "-framework OpenGLES -framework UIKit -framework CoreMotion -framework Foundation -framework GLKit")
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
@@ -632,10 +652,15 @@ endif()
 if(UNIX AND NOT APPLE)
     if(USE_LIBBFD)
         target_link_libraries(supertuxkart ${LIBBFD_LIBRARIES})
+        if (CMAKE_SYSTEM_NAME MATCHES "BSD")
+            target_link_libraries(supertuxkart  execinfo)
+        endif()
     endif()
     if(USE_ASAN)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
         target_link_libraries(supertuxkart "-fsanitize=address")
+    endif()
+    if(USE_TSAN)
+        target_link_libraries(supertuxkart "-fsanitize=thread")
     endif()
 endif()
 
@@ -678,7 +703,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(MINGW)
-    target_link_libraries(supertuxkart -ldxguid -ldinput8)
+    target_link_libraries(supertuxkart -ldxguid -ldinput8 -ldnsapi)
     if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
         target_link_libraries(supertuxkart -mwindows)
     endif()

@@ -48,12 +48,12 @@ DemoWorld::DemoWorld()
     setPhase(SETUP_PHASE);
     m_abort = false;
     ProfileWorld::setProfileModeLaps(m_num_laps);
-    race_manager->setReverseTrack(false);
-    race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
-    race_manager->setDifficulty(RaceManager::DIFFICULTY_HARD);
-    race_manager->setNumKarts(m_default_num_karts);
-    race_manager->setNumPlayers(1);
-    race_manager->setPlayerKart(0, UserConfigParams::m_default_kart);
+    RaceManager::get()->setReverseTrack(false);
+    RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
+    RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD);
+    RaceManager::get()->setNumKarts(m_default_num_karts);
+    RaceManager::get()->setNumPlayers(1);
+    RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
 
 }   // DemoWorld
 
@@ -84,7 +84,7 @@ bool DemoWorld::isRaceOver()
     if(m_abort) return true;
 
     // Now it must be laps based profiling:
-    return race_manager->getFinishedKarts()==getNumKarts();
+    return RaceManager::get()->getFinishedKarts()==getNumKarts();
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     }
 
     StateManager::get()->enterGameState();
-    race_manager->setNumPlayers(1);
+    RaceManager::get()->setNumPlayers(1);
     InputDevice *device;
 
     // Use keyboard 0 by default in --no-start-screen
@@ -154,10 +154,10 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
 
     m_do_demo = true;
-    race_manager->setNumKarts(m_default_num_karts);
-    race_manager->setPlayerKart(0, "tux");
-    race_manager->setupPlayerKartInfo();
-    race_manager->startSingleRace(m_demo_tracks[0], m_num_laps, false);
+    RaceManager::get()->setNumKarts(m_default_num_karts);
+    RaceManager::get()->setPlayerKart(0, "tux");
+    RaceManager::get()->setupPlayerKartInfo();
+    RaceManager::get()->startSingleRace(m_demo_tracks[0], m_num_laps, false);
     m_demo_tracks.push_back(m_demo_tracks[0]);
     m_demo_tracks.erase(m_demo_tracks.begin());
 

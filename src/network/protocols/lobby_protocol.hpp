@@ -20,6 +20,7 @@
 #define LOBBY_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
+#include "utils/stk_process.hpp"
 
 class GameSetup;
 class NetworkPlayerProfile;
@@ -97,10 +98,12 @@ public:
         BLR_NONE = 0,
         BLR_NO_GAME_FOR_LIVE_JOIN = 1,
         BLR_NO_PLACE_FOR_LIVE_JOIN = 2,
-        BLR_ONE_PLAYER_IN_RANKED_MATCH = 3
+        BLR_ONE_PLAYER_IN_RANKED_MATCH = 3,
+        BLR_SERVER_ONWER_QUITED_THE_GAME = 4
     };
 
 protected:
+    const ProcessType m_process_type;
     /** Vote from each peer. The host id is used as a key. Note that
      *  host ids can be non-consecutive, so we cannot use std::vector. */
     std::map<uint32_t, PeerVote> m_peers_votes;
@@ -113,7 +116,7 @@ protected:
 
     std::thread m_start_game_thread;
 
-    static std::weak_ptr<LobbyProtocol> m_lobby;
+    static std::weak_ptr<LobbyProtocol> m_lobby[PT_COUNT];
 
     /** Estimated current started game remaining time,
      *  uint32_t max if not available. */
@@ -149,15 +152,18 @@ protected:
     // ------------------------------------------------------------------------
     void addLiveJoiningKart(int kart_id, const RemoteKartInfo& rki,
                             int live_join_util_ticks) const;
+    // ------------------------------------------------------------------------
+    void exitGameState();
 public:
 
     /** Creates either a client or server lobby protocol as a singleton. */
     template<typename Singleton, typename... Types>
         static std::shared_ptr<Singleton> create(Types ...args)
     {
-        assert(m_lobby.expired());
+        ProcessType pt = STKProcess::getType();
+        assert(m_lobby[pt].expired());
         auto ret = std::make_shared<Singleton>(args...);
-        m_lobby = ret;
+        m_lobby[pt] = ret;
         return std::dynamic_pointer_cast<Singleton>(ret);
     }   // create
 
@@ -165,7 +171,21 @@ public:
     /** Returns the singleton client or server lobby protocol. */
     template<class T> static std::shared_ptr<T> get()
     {
-        if (std::shared_ptr<LobbyProtocol> lp = m_lobby.lock())
+        ProcessType pt = STKProcess::getType();
+        if (std::shared_ptr<LobbyProtocol> lp = m_lobby[pt].lock())
+        {
+            std::shared_ptr<T> new_type = std::dynamic_pointer_cast<T>(lp);
+            if (new_type)
+                return new_type;
+        }
+        return nullptr;
+    }   // get
+
+    // ------------------------------------------------------------------------
+    /** Returns specific singleton client or server lobby protocol. */
+    template<class T> static std::shared_ptr<T> getByType(ProcessType pt)
+    {
+        if (std::shared_ptr<LobbyProtocol> lp = m_lobby[pt].lock())
         {
             std::shared_ptr<T> new_type = std::dynamic_pointer_cast<T>(lp);
             if (new_type)

@@ -111,6 +111,12 @@ namespace GUIEngine
         void resetAndSetStack(Screen* screens[]);
 
         /**
+         * \brief Used in no graphics STK to enter menu screen (when server is
+         * idle state)
+         */
+        void enterMenuState() { setGameState(MENU); }
+
+        /**
           * \brief call to make the state manager enter game mode.
           * Causes the menu stack to be cleared; all widgets shown on screen
           * are removed

@@ -112,14 +112,14 @@ void TrackInfoScreen::loadedFromFile()
 
 void TrackInfoScreen::beforeAddingWidget()
 {
-    m_is_soccer = race_manager->isSoccerMode();
-    m_show_ffa_spinner = race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
-                        || race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
+    m_is_soccer = RaceManager::get()->isSoccerMode();
+    m_show_ffa_spinner = RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
+                        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL;
 
     m_target_type_div->setCollapsed(!m_is_soccer && !m_show_ffa_spinner, this);
 
     // show 'Number of blue team AI karts' if soccer
-    m_ai_blue_div->setCollapsed(!(race_manager->isSoccerMode()), this);
+    m_ai_blue_div->setCollapsed(!(RaceManager::get()->isSoccerMode()), this);
 } // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -137,9 +137,9 @@ void TrackInfoScreen::init()
     m_record_this_race = false;
 
     const int max_arena_players = m_track->getMaxArenaPlayers();
-    const int local_players     = race_manager->getNumLocalPlayers();
-    const bool has_laps         = race_manager->modeHasLaps();
-    const bool has_highscores   = race_manager->modeHasHighscores();
+    const int local_players     = RaceManager::get()->getNumLocalPlayers();
+    const bool has_laps         = RaceManager::get()->modeHasLaps();
+    const bool has_highscores   = RaceManager::get()->modeHasHighscores();
 
     getWidget<LabelWidget>("name")->setText(m_track->getName(), false);
 
@@ -185,11 +185,11 @@ void TrackInfoScreen::init()
     // Number of AIs
     // -------------
     const bool has_AI =
-        (   race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
-         || race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
+        (   RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES
+         || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL
          || m_is_soccer ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
-         race_manager->hasAI());
+         RaceManager::get()->hasAI());
 
     m_ai_kart_spinner->setVisible(has_AI);
     m_ai_kart_label->setVisible(has_AI);
@@ -200,7 +200,7 @@ void TrackInfoScreen::init()
 
         // Set the default number of AIs
         int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
-            [race_manager->getMinorMode()]) - local_players;
+            [RaceManager::get()->getMinorMode()]) - local_players;
 
         // Avoid negative numbers (which can happen if e.g. the number of karts
         // in a previous race was lower than the number of players now.
@@ -208,10 +208,10 @@ void TrackInfoScreen::init()
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
 
-        race_manager->setNumKarts(num_ai + local_players);
+        RaceManager::get()->setNumKarts(num_ai + local_players);
 
         // Set the max karts supported based on the selected battle arena
-        if( race_manager->isBattleMode() || m_is_soccer)
+        if( RaceManager::get()->isBattleMode() || m_is_soccer)
         {
             m_ai_kart_spinner->setMax(max_arena_players - local_players);
             m_ai_blue_spinner->setMax(max_arena_players - local_players);
@@ -220,7 +220,7 @@ void TrackInfoScreen::init()
             m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
 
         // A ftl race needs at least three karts to make any sense
-        if(race_manager->isFollowMode())
+        if(RaceManager::get()->isFollowMode())
         {
             m_ai_kart_spinner->setMin(std::max(0, 3 - local_players));
         }
@@ -228,7 +228,7 @@ void TrackInfoScreen::init()
         // AI against the player. Soccer is handled in setSoccerWidgets
         else if(   local_players == 1
                 && !UserConfigParams::m_artist_debug_mode
-                && race_manager->isBattleMode())
+                && RaceManager::get()->isBattleMode())
         {
             m_ai_kart_spinner->setMin(1);
         }
@@ -239,7 +239,7 @@ void TrackInfoScreen::init()
         }
     }   // has_AI
     else
-        race_manager->setNumKarts(local_players);
+        RaceManager::get()->setNumKarts(local_players);
 
     // Soccer options
     // -------------
@@ -275,7 +275,7 @@ void TrackInfoScreen::init()
         else
             m_target_value_spinner->setMin(1);
         m_target_value_spinner->setValue(m_track->getActualNumberOfLap());
-        race_manager->setNumLaps(m_target_value_spinner->getValue());
+        RaceManager::get()->setNumLaps(m_target_value_spinner->getValue());
 
         m_target_value_label->setText(_("Number of laps"), false);
     }
@@ -283,7 +283,7 @@ void TrackInfoScreen::init()
     // Reverse track or random item in arena
     // -------------
     const bool reverse_available =     m_track->reverseAvailable()
-                                   && !(race_manager->isEggHuntMode());
+                                   && !(RaceManager::get()->isEggHuntMode());
     const bool random_item = m_track->hasNavMesh();
 
     m_option->setVisible(reverse_available || random_item);
@@ -300,7 +300,7 @@ void TrackInfoScreen::init()
     }
 
     if (reverse_available)
-        m_option->setState(race_manager->getReverseTrack());
+        m_option->setState(RaceManager::get()->getReverseTrack());
     else if (random_item)
         m_option->setState(UserConfigParams::m_random_arena_item);
     else
@@ -308,10 +308,10 @@ void TrackInfoScreen::init()
 
     // Record race or not
     // -------------
-    const bool record_available = (race_manager->isTimeTrialMode() || race_manager->isEggHuntMode());
+    const bool record_available = (RaceManager::get()->isTimeTrialMode() || RaceManager::get()->isEggHuntMode());
     m_record_race->setVisible(record_available);
     getWidget<LabelWidget>("record-race-text")->setVisible(record_available);
-    if (race_manager->isRecordingRace())
+    if (RaceManager::get()->isRecordingRace())
     {
         // isRecordingRace() is true when it's pre-set by ghost replay selection
         // which force record this race
@@ -320,9 +320,9 @@ void TrackInfoScreen::init()
         m_record_race->setActive(false);
         m_ai_kart_spinner->setValue(0);
         m_ai_kart_spinner->setActive(false);
-        race_manager->setNumKarts(race_manager->getNumLocalPlayers());
+        RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers());
         
-        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
+        UserConfigParams::m_num_karts_per_gamemode[RaceManager::get()->getMinorMode()] = RaceManager::get()->getNumLocalPlayers();
     }
     else if (record_available)
     {
@@ -377,7 +377,7 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
     if (has_AI)
     {
         const int max_arena_players = m_track->getMaxArenaPlayers();
-        const int local_players     = race_manager->getNumLocalPlayers();
+        const int local_players     = RaceManager::get()->getNumLocalPlayers();
         // Set up the spinners for the number of red and blue AIs
         m_ai_blue_spinner->setVisible(true);
         m_ai_blue_label->setVisible(true);
@@ -391,7 +391,7 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
     
         for (int i = 0; i < local_players; i++)
         {
-            KartTeam team = race_manager->getKartInfo(i).getKartTeam();
+            KartTeam team = RaceManager::get()->getKartInfo(i).getKartTeam();
             // Happens in profiling mode
             if (team == KART_TEAM_NONE)
                 num_blue_players++; // No team will be set to blue
@@ -477,26 +477,26 @@ void TrackInfoScreen::unloaded()
 // ----------------------------------------------------------------------------
 void TrackInfoScreen::updateHighScores()
 {
-    if (!race_manager->modeHasHighscores())
+    if (!RaceManager::get()->modeHasHighscores())
         return;
 
-    std::string game_mode_ident = RaceManager::getIdentOf( race_manager->getMinorMode() );
+    std::string game_mode_ident = RaceManager::getIdentOf( RaceManager::get()->getMinorMode() );
     const Highscores::HighscoreType type = "HST_" + game_mode_ident;
 
     Highscores* highscores =
         highscore_manager->getHighscores(type,
-                                         race_manager->getNumberOfKarts(),
-                                         race_manager->getDifficulty(),
+                                         RaceManager::get()->getNumberOfKarts(),
+                                         RaceManager::get()->getDifficulty(),
                                          m_track->getIdent(),
-                                         race_manager->getNumLaps(),
-                                         race_manager->getReverseTrack()  );
+                                         RaceManager::get()->getNumLaps(),
+                                         RaceManager::get()->getReverseTrack()  );
     const int amount = highscores->getNumberEntries();
 
     std::string kart_name;
     core::stringw name;
     float time;
 
-    int time_precision = race_manager->currentModeTimePrecision();
+    int time_precision = RaceManager::get()->currentModeTimePrecision();
 
     m_highscore_entries->clear();
     
@@ -547,10 +547,10 @@ void TrackInfoScreen::updateHighScores()
 
 void TrackInfoScreen::onEnterPressedInternal()
 {
-    race_manager->setRecordRace(m_record_this_race);
+    RaceManager::get()->setRecordRace(m_record_this_race);
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
-    const int num_laps = race_manager->modeHasLaps() ? m_target_value_spinner->getValue()
+    const int num_laps = RaceManager::get()->modeHasLaps() ? m_target_value_spinner->getValue()
                                                      : -1;
     const bool option_state = m_option == NULL ? false
                                                : m_option->getState();
@@ -561,17 +561,17 @@ void TrackInfoScreen::onEnterPressedInternal()
     if(m_track->hasNavMesh())
         UserConfigParams::m_random_arena_item = option_state;
     else
-        race_manager->setReverseTrack(option_state);
+        RaceManager::get()->setReverseTrack(option_state);
 
     // Avoid invaild Ai karts number during switching game modes
     const int max_arena_players = m_track->getMaxArenaPlayers();
-    const int local_players = race_manager->getNumLocalPlayers();
+    const int local_players = RaceManager::get()->getNumLocalPlayers();
     const bool has_AI =
-        (race_manager->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
-         race_manager->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-         race_manager->isSoccerMode() ?
+        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES ||
+         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+         RaceManager::get()->isSoccerMode() ?
          m_track->hasNavMesh() && (max_arena_players - local_players) > 0 :
-         race_manager->hasAI());
+         RaceManager::get()->hasAI());
 
     int num_ai = 0;
     if (has_AI)
@@ -589,34 +589,34 @@ void TrackInfoScreen::onEnterPressedInternal()
 
     if (enable_ffa)
     {
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
-        race_manager->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
+        RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_FREE_FOR_ALL);
+        RaceManager::get()->setHitCaptureTime(0, static_cast<float>(selected_target_value) * 60);
     }
 
     if (m_is_soccer)
     {
         if (selected_target_type == 0)
-            race_manager->setTimeTarget(static_cast<float>(selected_target_value) * 60);
+            RaceManager::get()->setTimeTarget(static_cast<float>(selected_target_value) * 60);
         else
-            race_manager->setMaxGoal(selected_target_value);
+            RaceManager::get()->setMaxGoal(selected_target_value);
     }
 
     if (UserConfigParams::m_num_karts_per_gamemode
-        [race_manager->getMinorMode()] != unsigned(local_players + num_ai))
+        [RaceManager::get()->getMinorMode()] != unsigned(local_players + num_ai))
     {
-        UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = local_players + num_ai;
+        UserConfigParams::m_num_karts_per_gamemode[RaceManager::get()->getMinorMode()] = local_players + num_ai;
     }
 
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
-    race_manager->setNumKarts(num_ai + local_players);
+    RaceManager::get()->setNumKarts(num_ai + local_players);
     if (m_is_soccer)
     {
-        race_manager->setNumRedAI(m_ai_kart_spinner->getValue());
-        race_manager->setNumBlueAI(m_ai_blue_spinner->getValue());
+        RaceManager::get()->setNumRedAI(m_ai_kart_spinner->getValue());
+        RaceManager::get()->setNumBlueAI(m_ai_blue_spinner->getValue());
     }
-    race_manager->startSingleRace(m_track->getIdent(), num_laps, false);
+    RaceManager::get()->startSingleRace(m_track->getIdent(), num_laps, false);
 }   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
@@ -674,9 +674,9 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
-            assert(race_manager->modeHasLaps());
+            assert(RaceManager::get()->modeHasLaps());
             const int num_laps = m_target_value_spinner->getValue();
-            race_manager->setNumLaps(num_laps);
+            RaceManager::get()->setNumLaps(num_laps);
             UserConfigParams::m_num_laps = num_laps;
             updateHighScores();
         }
@@ -689,7 +689,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
-            race_manager->setReverseTrack(m_option->getState());
+            RaceManager::get()->setReverseTrack(m_option->getState());
             // Makes sure the highscores get swapped when clicking the 'reverse'
             // checkbox.
             updateHighScores();
@@ -704,8 +704,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         m_ai_kart_spinner->setActive(!record);
         if (record)
         {
-            race_manager->setNumKarts(race_manager->getNumLocalPlayers());
-            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers();
+            RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers());
+            UserConfigParams::m_num_karts_per_gamemode[RaceManager::get()->getMinorMode()] = RaceManager::get()->getNumLocalPlayers();
         }
     }
     else if (name=="ai-spinner")
@@ -717,8 +717,8 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
         else // Other modes
         {
             const int num_ai = m_ai_kart_spinner->getValue();
-            race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
-            UserConfigParams::m_num_karts_per_gamemode[race_manager->getMinorMode()] = race_manager->getNumLocalPlayers() + num_ai;
+            RaceManager::get()->setNumKarts( RaceManager::get()->getNumLocalPlayers() + num_ai );
+            UserConfigParams::m_num_karts_per_gamemode[RaceManager::get()->getMinorMode()] = RaceManager::get()->getNumLocalPlayers() + num_ai;
             updateHighScores();
         }
     }
@@ -731,7 +731,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
 void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
 {
     const int max_arena_players = m_track->getMaxArenaPlayers();
-    const int local_players = race_manager->getNumLocalPlayers();
+    const int local_players = RaceManager::get()->getNumLocalPlayers();
     const int num_ai = max_arena_players - local_players;
 
     // Reduce the value of the other spinner if going over the max total num of AI
@@ -746,9 +746,9 @@ void TrackInfoScreen::soccerSpinnerUpdate(bool blue_spinner)
     KartTeam all_team = KART_TEAM_NONE;
     unsigned num_red = 0;
     unsigned num_blue = 0;
-    for (unsigned i = 0; i < race_manager->getNumLocalPlayers(); i++)
+    for (unsigned i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
     {
-        race_manager->getKartInfo(i).getKartTeam() == KART_TEAM_RED ?
+        RaceManager::get()->getKartInfo(i).getKartTeam() == KART_TEAM_RED ?
             num_red++ : num_blue++;
     }
     if (num_red == 0)

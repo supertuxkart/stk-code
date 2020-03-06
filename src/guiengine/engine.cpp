@@ -687,6 +687,7 @@ namespace GUIEngine
 #include "tips/tips_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/translation.hpp"
 
 #include <algorithm>
@@ -755,6 +756,7 @@ namespace GUIEngine
 
     std::vector<MenuMessage> gui_messages;
 
+    bool g_is_no_graphics[PT_COUNT];
     // ------------------------------------------------------------------------
     void showMessage(const core::stringw& message, const float time)
     {
@@ -1047,9 +1049,12 @@ namespace GUIEngine
         g_loaded_screens.m_contents_vector.clear();
         g_current_screen = NULL;
         gui_messages.clear();
+        MessageQueue::resetGlobalVariables();
 #ifdef ANDROID
         m_gui_functions.clear();
 #endif
+        g_is_no_graphics[PT_MAIN] = false;
+        g_is_no_graphics[PT_CHILD] = false;
     }   // resetGlobalVariables
 
     // -----------------------------------------------------------------------
@@ -1458,7 +1463,7 @@ namespace GUIEngine
         // This will avoid no response in windows, also allow showing loading
         // icon in apple device, because apple device only update render
         // buffer if you poll the mainloop
-        if (!ProfileWorld::isNoGraphics())
+        if (!GUIEngine::isNoGraphics())
         {
             g_device->setEventReceiver(NULL);
             g_device->run();
@@ -1548,4 +1553,19 @@ namespace GUIEngine
 
         return screen->getWidget(id);
     }   // getWidget
+
+#ifndef SERVER_ONLY
+    // -----------------------------------------------------------------------
+    void disableGraphics()
+    {
+        g_is_no_graphics[STKProcess::getType()] = true;
+    }   // disableGraphics
+
+    // -----------------------------------------------------------------------
+    bool isNoGraphics()
+    {
+        return g_is_no_graphics[STKProcess::getType()];
+    }   // isNoGraphics
+#endif
+
 }   // namespace GUIEngine

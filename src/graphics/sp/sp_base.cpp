@@ -42,8 +42,8 @@
 #include "graphics/sp/sp_texture.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
+#include "guiengine/engine.hpp"
 #include "tracks/track.hpp"
-#include "modes/profile_world.hpp"
 #include "utils/log.hpp"
 #include "utils/helpers.hpp"
 #include "utils/profiler.hpp"
@@ -411,7 +411,7 @@ void loadShaders()
 // ----------------------------------------------------------------------------
 void resetEmptyFogColor()
 {
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
     {
         return;
     }
@@ -425,7 +425,7 @@ void resetEmptyFogColor()
 // ----------------------------------------------------------------------------
 void init()
 {
-    if (ProfileWorld::isNoGraphics())
+    if (GUIEngine::isNoGraphics())
     {
         return;
     }

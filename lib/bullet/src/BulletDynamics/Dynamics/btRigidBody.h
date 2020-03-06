@@ -90,7 +90,7 @@ class btRigidBody  : public btCollisionObject
 
 	int				m_rigidbodyFlags;
 
-	int				m_debugBodyId;
+	//int				m_debugBodyId;
 
 
 protected:
@@ -464,16 +464,16 @@ public:
 			return false;
 
 		//disable deactivation
-		if (gDisableDeactivation || (gDeactivationTime == btScalar(0.)))
-			return false;
+		//if (gDisableDeactivation || (gDeactivationTime == btScalar(0.)))
+		//	return false;
 
 		if ( (getActivationState() == ISLAND_SLEEPING) || (getActivationState() == WANTS_DEACTIVATION))
 			return true;
 
-		if (m_deactivationTime> gDeactivationTime)
-		{
-			return true;
-		}
+		//if (m_deactivationTime> gDeactivationTime)
+		//{
+		//	return true;
+		//}
 		return false;
 	}
 
