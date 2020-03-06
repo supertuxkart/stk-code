@@ -594,4 +594,10 @@ export ANDROID_HOME="$SDK_PATH"
           -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
           $GRADLE_BUILD_TYPE
 
+if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
+./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
+          -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
+          "bundleRelease"
+fi
+
 check_error
