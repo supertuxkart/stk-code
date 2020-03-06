@@ -104,7 +104,7 @@ DownloadAssets::DownloadAssets()
 
     // I18N: In download assets dialog
     core::stringw msg = _("SuperTuxKart will download full assets "
-        "(including all tracks, high quality textures and music) for better "
+        "(including high quality textures and music) for better "
         "gaming experience, this will use your mobile data if you don't have "
         "a wifi connection.");
     getWidget<BubbleWidget>("description")->setText(msg);
