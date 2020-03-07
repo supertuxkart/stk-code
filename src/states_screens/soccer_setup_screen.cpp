@@ -286,7 +286,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     
 
     ButtonWidget* bt_continue = getWidget<ButtonWidget>("continue");
-    BubbleWidget* bubble = getWidget<BubbleWidget>("lblLeftRight");
+    BubbleWidget* bubble = getWidget<BubbleWidget>("choose_team");
 
     switch (action)
     {

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-01 01:17+0800\n"
+"POT-Creation-Date: 2020-03-07 11:52+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2229,11 +2229,11 @@ msgid "Kart color"
 msgstr ""
 
 #. I18N: ./data/tips.xml
-msgid "The GUI skin can be changed in the UI options."
+msgid "The UI skin can be changed in the UI options."
 msgstr ""
 
 #. I18N: ./data/tips.xml
-msgid "An UI option allows to see other karts' powerups."
+msgid "You can see other karts' powerups by enabling it in the UI options."
 msgstr ""
 
 #. I18N: ./data/tips.xml
@@ -2241,7 +2241,7 @@ msgid "The font size can be changed in the UI options."
 msgstr ""
 
 #. I18N: ./data/tips.xml
-msgid "The help menu has many useful informations."
+msgid "The help menu has lots of useful information."
 msgstr ""
 
 #. I18N: ./data/tips.xml
@@ -2304,13 +2304,13 @@ msgstr ""
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
-"ball, cake or plunger."
+"ball, cake, or plunger."
 msgstr ""
 
 #. I18N: ./data/tips.xml
 msgid ""
-"Try to avoid crashing into other karts unless you want to throw them off the "
-"track."
+"Try to avoid crashing into other the backs of other karts, as it will slow "
+"you down."
 msgstr ""
 
 #. I18N: ./data/tips.xml
@@ -3682,7 +3682,7 @@ msgid "Only 1 player remaining, returning to lobby."
 msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:1193
-msgid "Server owner quited the game."
+msgid "Server owner quit the game"
 msgstr ""
 
 #. I18N: Show when player join red team of the started game in
@@ -4431,9 +4431,9 @@ msgstr ""
 #. I18N: In download assets dialog
 #: src/states_screens/dialogs/download_assets.cpp:106
 msgid ""
-"SuperTuxKart will download full assets (including all tracks, high quality "
-"textures and music) for better gaming experience, this will use your mobile "
-"data if you don't have a wifi connection."
+"SuperTuxKart will download full assets (including high quality textures and "
+"music) for better gaming experience, this will use your mobile data if you "
+"don't have a wifi connection."
 msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
@@ -5822,6 +5822,11 @@ msgstr ""
 
 #: src/states_screens/race_setup_screen.cpp:137
 msgid "Race against ghost karts and try to beat them!"
+msgstr ""
+
+#. I18N: In soccer setup screen
+#: src/states_screens/soccer_setup_screen.cpp:118
+msgid "Press red or blue soccer icon to change team"
 msgstr ""
 
 #. I18N: when showing who is the author of track '%s'
