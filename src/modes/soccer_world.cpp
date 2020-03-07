@@ -306,7 +306,6 @@ void SoccerWorld::init()
 
     m_bgd->init(m_ball->getPhysicalObject()->getRadius());
 
-    m_scores.reserve((int) m_karts.size());
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -357,8 +356,6 @@ void SoccerWorld::reset(bool restart)
     if (UserConfigParams::m_arena_ai_stats)
         getKart(8)->flyUp();
 
-    for (unsigned int i = 0; i < m_karts.size(); i++)
-      m_scores[(int)i] = 0;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -406,16 +403,6 @@ void SoccerWorld::update(int ticks)
 
     WorldWithRank::update(ticks);
     WorldWithRank::updateTrack(ticks);
-
-    int len = m_karts.size();
-    std::vector< std::pair<int,int> > best_scores;
-    best_scores.reserve(len);
-    for (int i = 0; i < len; i++)
-      best_scores.push_back( std::make_pair(m_scores[i], i) );
-    std::sort(best_scores.begin(), best_scores.end());
-    int pos = len;
-    for (int i = 0; pos > 0; i++)
-      setKartPosition(best_scores[i].second, pos--);
 
     if (isGoalPhase())
     {
@@ -487,7 +474,6 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         {
             m_karts[m_ball_hitter]->getKartModel()
                 ->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
-            m_scores[(int) m_ball_hitter] += 1;
         }
 
         else if (!sd.m_correct_goal)

@@ -841,6 +841,27 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
     world->getKartsDisplayInfo(&m_kart_display_infos);
 
+    if (minor_mode==RaceManager::MINOR_MODE_SOCCER) {
+      SoccerWorld* soccer = dynamic_cast<SoccerWorld*>(world);
+      Camera* cam = Camera::getActiveCamera();
+      AbstractKart* target_kart = cam->getKart();
+      World::KartList karts = world->getKarts();
+      // sort kart position by teams
+      std::vector< std::pair<int,int> > ordering;
+      ordering.reserve(karts.size());
+      for (unsigned int i = 0; i < karts.size(); i++) {
+        const AbstractKart *kart = karts[i].get();
+        if (kart == NULL) continue;
+        KartTeam team = soccer->getKartTeam(kart->getWorldKartId());
+        KartTeam cur_team = soccer->getKartTeam(target_kart->getWorldKartId());
+        ordering.push_back( std::make_pair((team == cur_team) ? (1000 + i) : i, i) );
+      }
+      std::sort(ordering.begin(), ordering.end());
+      for (unsigned int i = 0; i < karts.size(); i++){
+        world->setKartPosition(ordering[i].second, i+1);
+      }
+    }
+
     for(int position = 1; position <= (int)kart_amount ; position++)
     {
         AbstractKart *kart = world->getKartAtPosition(position);
@@ -1037,9 +1058,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
     {
         KartTeam team = soccer->getKartTeam((int)kart_id);
         std::string flag_color = "blue";
-        if (team == KART_TEAM_RED) {
-            flag_color = "red";
-        }
+        if (team == KART_TEAM_RED) flag_color = "red";
         video::ITexture* flag =
             irr_driver->getTexture(FileManager::GUI_ICON, flag_color + "_flag.png");
         const core::rect<s32> rect(core::position2d<s32>(0, 0),
