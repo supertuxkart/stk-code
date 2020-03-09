@@ -176,16 +176,16 @@ int btPersistentManifold::addManifoldPoint(const btManifoldPoint& newPoint)
 #else
 		insertIndex = 0;
 #endif
+		if (insertIndex < 0 || insertIndex >= MANIFOLD_CACHE_SIZE)
+			insertIndex = 0;
 		clearUserCache(m_pointCache[insertIndex]);
-		
-	} else
+	}
+	else
 	{
 		m_cachedPoints++;
-
-		
+		if (insertIndex < 0 || insertIndex >= MANIFOLD_CACHE_SIZE)
+			insertIndex = 0;
 	}
-	if (insertIndex<0)
-		insertIndex=0;
 
 	btAssert(m_pointCache[insertIndex].m_userPersistentData==0);
 	m_pointCache[insertIndex] = newPoint;
