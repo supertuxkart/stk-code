@@ -336,7 +336,7 @@ private:
         std::vector<std::shared_ptr<NetworkPlayerProfile> >& players) const;
     std::vector<std::shared_ptr<NetworkPlayerProfile> > getLivePlayers() const;
     void setPlayerKarts(const NetworkString& ns, STKPeer* peer) const;
-    bool handleAssets(const NetworkString& ns, STKPeer* peer) const;
+    bool handleAssets(const NetworkString& ns, STKPeer* peer);
     void handleServerCommand(Event* event, std::shared_ptr<STKPeer> peer) const;
     void liveJoinRequest(Event* event);
     void rejectLiveJoin(STKPeer* peer, BackLobbyReason blr);
@@ -354,6 +354,7 @@ private:
     void writeDisconnectInfoTable(STKPeer* peer);
     void writePlayerReport(Event* event);
     bool supportsAI();
+    void updateAddons();
 public:
              ServerLobby();
     virtual ~ServerLobby();
