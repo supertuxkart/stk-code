@@ -211,6 +211,9 @@ void StateManager::escapePressed()
 
 void StateManager::onGameStateChange(GameState new_state)
 {
+    if (GUIEngine::isNoGraphics())
+        return;
+
     if (new_state == GAME)
     {
         if (RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_OVERWORLD)
@@ -239,6 +242,9 @@ void StateManager::onGameStateChange(GameState new_state)
 
 void StateManager::onTopMostScreenChanged()
 {
+    if (GUIEngine::isNoGraphics())
+        return;
+
     if (m_game_mode == MENU && GUIEngine::getCurrentScreen() != NULL)
     {
         if (GUIEngine::getCurrentScreen()->getMusic() != NULL && music_manager)
