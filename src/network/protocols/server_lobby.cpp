@@ -2017,6 +2017,10 @@ void ServerLobby::update(int ticks)
             {
                 if (w && w->getKart(i)->hasFinishedRace())
                     continue;
+                // Don't kick in game GUI server host so he can idle in game
+                if (m_process_type == PT_CHILD &&
+                    peer->getHostId() == m_client_server_host_id.load())
+                    continue;
                 Log::info("ServerLobby", "%s %s has been idle for more than"
                     " %d seconds, kick.",
                     peer->getAddress().toString().c_str(),
