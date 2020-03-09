@@ -195,40 +195,7 @@ ServerLobby::ServerLobby() : LobbyProtocol()
         if (!t->isAddon())
             m_official_kts.second.insert(t->getIdent());
     }
-
-    std::set<std::string> total_addons;
-    for (unsigned i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
-    {
-        const KartProperties* kp =
-            kart_properties_manager->getKartById(i);
-        if (kp->isAddon())
-            total_addons.insert(kp->getIdent());
-    }
-    for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
-    {
-        const Track* track = track_manager->getTrack(i);
-        if (track->isAddon())
-            total_addons.insert(track->getIdent());
-    }
-
-    for (auto& addon : total_addons)
-    {
-        const KartProperties* kp = kart_properties_manager->getKart(addon);
-        if (kp && kp->isAddon())
-        {
-            m_addon_kts.first.insert(kp->getIdent());
-            continue;
-        }
-        Track* t = track_manager->getTrack(addon);
-        if (!t || !t->isAddon() || t->isInternal())
-            continue;
-        if (t->isArena())
-            m_addon_arenas.insert(t->getIdent());
-        else if (t->isSoccer())
-            m_addon_soccers.insert(t->getIdent());
-        else
-            m_addon_kts.second.insert(t->getIdent());
-    }
+    updateAddons();
 
     m_rs_state.store(RS_NONE);
     m_last_success_poll_time.store(StkTime::getMonoTimeMs() + 30000);
@@ -565,6 +532,57 @@ void ServerLobby::writeDisconnectInfoTable(STKPeer* peer)
     easySQLQuery(query);
 #endif
 }   // writeDisconnectInfoTable
+
+//-----------------------------------------------------------------------------
+void ServerLobby::updateAddons()
+{
+    m_addon_kts.first.clear();
+    m_addon_kts.second.clear();
+    m_addon_arenas.clear();
+    m_addon_soccers.clear();
+
+    std::set<std::string> total_addons;
+    for (unsigned i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* kp =
+            kart_properties_manager->getKartById(i);
+        if (kp->isAddon())
+            total_addons.insert(kp->getIdent());
+    }
+    for (unsigned i = 0; i < track_manager->getNumberOfTracks(); i++)
+    {
+        const Track* track = track_manager->getTrack(i);
+        if (track->isAddon())
+            total_addons.insert(track->getIdent());
+    }
+
+    for (auto& addon : total_addons)
+    {
+        const KartProperties* kp = kart_properties_manager->getKart(addon);
+        if (kp && kp->isAddon())
+        {
+            m_addon_kts.first.insert(kp->getIdent());
+            continue;
+        }
+        Track* t = track_manager->getTrack(addon);
+        if (!t || !t->isAddon() || t->isInternal())
+            continue;
+        if (t->isArena())
+            m_addon_arenas.insert(t->getIdent());
+        else if (t->isSoccer())
+            m_addon_soccers.insert(t->getIdent());
+        else
+            m_addon_kts.second.insert(t->getIdent());
+    }
+
+    auto all_k = kart_properties_manager->getAllAvailableKarts();
+    if (all_k.size() >= 65536)
+        all_k.resize(65535);
+    if (ServerConfig::m_live_players)
+        m_available_kts.first = m_official_kts.first;
+    else
+        m_available_kts.first = { all_k.begin(), all_k.end() };
+}   // updateAddons
 
 //-----------------------------------------------------------------------------
 /** Called whenever server is reset or game mode is changed.
@@ -3124,7 +3142,7 @@ void ServerLobby::saveIPBanTable(const SocketAddress& addr)
 }   // saveIPBanTable
 
 //-----------------------------------------------------------------------------
-bool ServerLobby::handleAssets(const NetworkString& ns, STKPeer* peer) const
+bool ServerLobby::handleAssets(const NetworkString& ns, STKPeer* peer)
 {
     std::set<std::string> client_karts, client_tracks;
     const unsigned kart_num = ns.getUInt16();
@@ -3246,6 +3264,14 @@ bool ServerLobby::handleAssets(const NetworkString& ns, STKPeer* peer) const
     // disconnects later in lobby it won't affect current players
     peer->setAvailableKartsTracks(client_karts, client_tracks);
     peer->setAddonsScores(addons_scores);
+
+    if (m_process_type == PT_CHILD &&
+        peer->getHostId() == m_client_server_host_id.load())
+    {
+        // Update child process addons list too so player can choose later
+        updateAddons();
+        updateTracksForMode();
+    }
     return true;
 }   // handleAssets
 
