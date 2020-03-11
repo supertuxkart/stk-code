@@ -48,6 +48,7 @@
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IBillboardSceneNode.h>
@@ -290,6 +291,10 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
 
 void TrackObjectPresentationLibraryNode::update(float dt)
 {
+    // Child process currently has no scripting engine
+    if (STKProcess::getType() == PT_CHILD)
+        return;
+
     if (!m_start_executed)
     {
         m_start_executed = true;
@@ -1138,7 +1143,8 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(
 // ----------------------------------------------------------------------------
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached(int kart_id)
 {
-    if (m_reenable_timeout > StkTime::getMonoTimeMs())
+    if (m_reenable_timeout > StkTime::getMonoTimeMs() ||
+        STKProcess::getType() == PT_CHILD)
     {
         return;
     }
