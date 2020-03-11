@@ -315,7 +315,7 @@ if [ ! -f "$DIRNAME/obj/libpng.stamp" ]; then
             -DHOST=$HOST                                                  \
             -DZLIB_LIBRARY="$DIRNAME/obj/zlib/libz.a"                     \
             -DZLIB_INCLUDE_DIR="$DIRNAME/obj/zlib/"                       \
-            -DPNG_TESTS=0 &&
+            -DPNG_TESTS=0 -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/libpng.stamp"
@@ -379,7 +379,7 @@ if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
 
     cd "$DIRNAME/obj/freetype"
-    ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a" \
+    ZLIB_CFLAGS="-fpic -I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a" \
     LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a" \
     HARFBUZZ_CFLAGS="-I$DIRNAME/obj/harfbuzz/src/" HARFBUZZ_LIBS="$DIRNAME/obj/harfbuzz/src/.libs/libharfbuzz.a" \
     ./configure --host=$HOST --enable-shared=no
@@ -461,6 +461,7 @@ if [ ! -f "$DIRNAME/obj/libogg.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/libogg/"* "$DIRNAME/obj/libogg"
 
     cd "$DIRNAME/obj/libogg"
+    CPPFLAGS="-fpic $CPPFLAGS" \
     ./configure --host=$HOST &&
     make $@
     check_error
@@ -474,7 +475,7 @@ if [ ! -f "$DIRNAME/obj/libvorbis.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/libvorbis/"* "$DIRNAME/obj/libvorbis"
 
     cd "$DIRNAME/obj/libvorbis"
-    CPPFLAGS="-I$DIRNAME/obj/libogg/include $CPPFLAGS" \
+    CPPFLAGS="-fpic -I$DIRNAME/obj/libogg/include $CPPFLAGS" \
     LDFLAGS="-L$DIRNAME/obj/libogg/src/.libs -lm $LDFLAGS" \
     ./configure --host=$HOST &&
     sed -i '/#define size_t/d' config.h
