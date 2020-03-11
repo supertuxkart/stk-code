@@ -207,6 +207,8 @@ void Physics::update(int ticks)
     // other object. So only a flag is set in the flyables, the actual
     // clean up is then done later in the projectile manager.
     std::vector<CollisionPair>::iterator p;
+    // Child process currently has no scripting engine
+    bool is_child = STKProcess::getType() == PT_CHILD;
     for(p=m_all_collisions.begin(); p!=m_all_collisions.end(); ++p)
     {
         // Kart-kart collision
@@ -217,15 +219,18 @@ void Physics::update(int ticks)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
-            Scripting::ScriptEngine* script_engine =
-                                            Scripting::ScriptEngine::getInstance();
-            int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
-            int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
-            script_engine->runFunction(false, "void onKartKartCollision(int, int)",
-                [=](asIScriptContext* ctx) {
-                    ctx->SetArgDWord(0, kartid1);
-                    ctx->SetArgDWord(1, kartid2);
-                });
+            if (!is_child)
+            {
+                Scripting::ScriptEngine* script_engine =
+                                                Scripting::ScriptEngine::getInstance();
+                int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
+                int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
+                script_engine->runFunction(false, "void onKartKartCollision(int, int)",
+                    [=](asIScriptContext* ctx) {
+                        ctx->SetArgDWord(0, kartid1);
+                        ctx->SetArgDWord(1, kartid2);
+                    });
+            }
             continue;
         }  // if kart-kart collision
 
@@ -233,7 +238,6 @@ void Physics::update(int ticks)
         {
             // Kart hits physical object
             // -------------------------
-            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
             int kartId = kart->getWorldKartId();
             PhysicalObject* obj = p->getUserPointer(0)->getPointerPhysicalObject();
@@ -248,8 +252,9 @@ void Physics::update(int ticks)
                 lib_id = library->getID();
             lib_id_ptr = &lib_id;
 
-            if (scripting_function.size() > 0)
+            if (!is_child && scripting_function.size() > 0)
             {
+                Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
                 script_engine->runFunction(true, "void " + scripting_function + "(int, const string, const string)",
                     [&](asIScriptContext* ctx) {
                         ctx->SetArgDWord(0, kartId);
@@ -336,13 +341,13 @@ void Physics::update(int ticks)
         {
             // Projectile hits physical object
             // -------------------------------
-            Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
             Flyable* flyable = p->getUserPointer(0)->getPointerFlyable();
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
             std::string obj_id = obj->getID();
             std::string scripting_function = obj->getOnItemCollisionFunction();
-            if (scripting_function.size() > 0)
+            if (!is_child && scripting_function.size() > 0)
             {
+                Scripting::ScriptEngine* script_engine = Scripting::ScriptEngine::getInstance();
                 script_engine->runFunction(true, "void " + scripting_function + "(int, int, const string)",
                         [&](asIScriptContext* ctx) {
                         ctx->SetArgDWord(0, (int)flyable->getType());
