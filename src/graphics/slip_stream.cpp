@@ -625,7 +625,20 @@ void SlipStream::update(int ticks)
     // Low level AIs and ghost karts should not do any slipstreaming.
     if (m_kart->getController()->disableSlipstreamBonus()
         || m_kart->isGhostKart())
+    {
+#ifndef SERVER_ONLY
+        if (!GUIEngine::isNoGraphics() && CVS->isGLSL())
+        {
+            if (m_node && m_node->isVisible())
+                m_node->setVisible(false);
+            if (m_node_fast && m_node_fast->isVisible())
+                m_node_fast->setVisible(false);
+            if (m_bonus_node && m_bonus_node->isVisible())
+                m_bonus_node->setVisible(false);
+        }
+#endif
         return;
+    }
 
     //there is no slipstreaming at low speed
     //and the quad may do weird things if going in reverse
