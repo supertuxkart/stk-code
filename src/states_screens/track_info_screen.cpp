@@ -400,15 +400,14 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
         }
 
         const int max_num_ai = max_arena_players - local_players;
-        // Make sure each team has at least 1 ai if only all players join same team
-        bool reset_ai = ((num_blue_players == 0 || num_red_players == 0) &&
-            ((UserConfigParams::m_soccer_red_ai_num == 0 && UserConfigParams::m_soccer_blue_ai_num != 0) ||
-            (UserConfigParams::m_soccer_blue_ai_num == 0 && UserConfigParams::m_soccer_red_ai_num != 0)));
+        // Make sure each team has at least 1 (ai + player)
+        bool reuse_ai = ((num_blue_players + UserConfigParams::m_soccer_blue_ai_num) > 0) &&
+                        ((num_red_players  + UserConfigParams::m_soccer_red_ai_num ) > 0) &&
+                        ((UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num) < max_num_ai);
 
         // Try the saved values.
         // If they can't be used, use default balanced values
-        if (UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num > max_num_ai ||
-            reset_ai)
+        if (!reuse_ai)
         {
             const int additional_blue = num_red_players - num_blue_players;
             int num_blue_ai = (max_num_ai - additional_blue) / 2 + additional_blue;
