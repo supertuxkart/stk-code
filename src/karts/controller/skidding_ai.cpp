@@ -325,18 +325,18 @@ void SkiddingAI::update(int ticks)
     // Get information that is needed by more than 1 of the handling funcs
     computeNearestKarts();
 
-    int num_ai = m_world->getNumKarts() - RaceManager::get()->getNumPlayers();
-    int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
-    // Karts with boosted AI get a better speed cap value
-    if (m_kart->getBoostAI())
-        position_among_ai = 1;
-
-    float speed_cap = m_ai_properties->getSpeedCap(m_distance_to_player,
-                                                   position_among_ai,
-                                                   num_ai);
-
-    m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
-                        speed_cap, /*fade_in_time*/0);
+    if (!m_enabled_network_ai)
+    {
+        int num_ai = m_world->getNumKarts() - RaceManager::get()->getNumPlayers();
+        int position_among_ai = m_kart->getPosition() - m_num_players_ahead;
+        // Karts with boosted AI get a better speed cap value
+        if (m_kart->getBoostAI())
+            position_among_ai = 1;
+        float speed_cap = m_ai_properties->getSpeedCap(m_distance_to_player,
+            position_among_ai, num_ai);
+        m_kart->setSlowdown(MaxSpeed::MS_DECREASE_AI,
+            speed_cap, /*fade_in_time*/0);
+    }
 
     //Detect if we are going to crash with the track and/or kart
     checkCrashes(m_kart->getXYZ());
@@ -1903,6 +1903,12 @@ void SkiddingAI::computeNearestKarts()
     float own_overall_distance = m_world->getOverallDistance(m_kart->getWorldKartId());
     m_num_players_ahead = 0;
 
+    if (m_enabled_network_ai)
+    {
+        // Use maximum distance to player for network ai
+        m_distance_to_player = 9999999.9f;
+        return;
+    }
     unsigned int n = ProfileWorld::isProfileMode() ? 0 : RaceManager::get()->getNumPlayers();
 
     std::vector<float> overall_distance;
