@@ -33,6 +33,7 @@
 #  include <winsock2.h>
 #endif
 
+#include <atomic>
 #include <curl/curl.h>
 #include <memory>
 #include <queue>
@@ -103,6 +104,9 @@ namespace Online
             /** Signal an abort in case that a download is still happening. */
             Synchronised<bool>        m_abort;
 
+            /** Signal an pause before STK goes into background in iOS. */
+            std::atomic_bool m_paused;
+
             /** The polling interval while a game is running. */
             float m_game_polling_interval;
 
@@ -160,6 +164,8 @@ namespace Online
             void stopNetworkThread();
 
             bool getAbort() { return m_abort.getAtomic(); }
+            bool getPaused() { return m_paused.load(); }
+            void setPaused(bool val) { m_paused.store(val); }
             void update(float dt);
 
             // ----------------------------------------------------------------
