@@ -190,6 +190,7 @@ void Camera::setupCamera()
  */
 void Camera::setMode(Mode mode)
 {
+    if (mode == m_mode) return;
     // If we switch from reverse view, move the camera immediately to the
     // correct position.
     if( (m_mode==CM_REVERSE && mode==CM_NORMAL) || 
@@ -204,6 +205,7 @@ void Camera::setMode(Mode mode)
         m_camera->setTarget(target_position.toIrrVector());
     }
 
+    m_previous_mode = m_mode;
     m_mode = mode;
 }   // setMode
 
@@ -213,6 +215,14 @@ void Camera::setMode(Mode mode)
 Camera::Mode Camera::getMode()
 {
     return m_mode;
+}   // getMode
+
+// ----------------------------------------------------------------------------
+/** Returns the last kwown mode of the camera.
+ */
+Camera::Mode Camera::getPreviousMode()
+{
+    return m_previous_mode;
 }   // getMode
 
 //-----------------------------------------------------------------------------
