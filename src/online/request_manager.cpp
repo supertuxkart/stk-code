@@ -69,6 +69,7 @@ namespace Online
      */
     RequestManager::RequestManager()
     {
+        m_paused.store(false);
         m_menu_polling_interval = 60;  // Default polling: every 60 seconds.
         m_game_polling_interval = 60;  // same for game polling
         m_time_since_poll       = m_menu_polling_interval;
@@ -210,6 +211,10 @@ namespace Online
                 pthread_cond_wait(&me->m_cond_request, me->m_request_queue.getMutex());
                 empty = me->m_request_queue.getData().empty();
             }
+            // We pause the request manager thread when going into background in iOS
+            // So this will only be evaluated a while
+            if (me->m_paused.load())
+                StkTime::sleep(1);
             me->m_current_request = me->m_request_queue.getData().top();
             me->m_request_queue.getData().pop();
 

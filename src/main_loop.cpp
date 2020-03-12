@@ -137,6 +137,7 @@ float MainLoop::getLimitedDt()
                 PlayerManager::get()->save();
                 if (addons_manager->hasDownloadedIcons())
                     addons_manager->saveInstalled();
+                Online::RequestManager::get()->setPaused(true);
             }
             dev->run();
             win_active = dev->isWindowActive();
@@ -151,6 +152,7 @@ float MainLoop::getLimitedDt()
                 // back to phone, because the smooth timer is paused
                 if (World::getWorld() && RewindManager::isEnabled())
                     RewindManager::get()->resetSmoothNetworkBody();
+                Online::RequestManager::get()->setPaused(false);
             }
         }
     }
