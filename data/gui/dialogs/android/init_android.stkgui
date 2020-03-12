@@ -8,7 +8,7 @@
             <spacer height="7%" width="10"/>
 
             <ribbon id="control_type" proportion="1" width="100%" align="center">
-                <icon-button id="accelerometer" width="64" height="128"
+                <icon-button id="accelerometer" width="128" height="128"
                         icon="gui/icons/android/accelerator_icon.png" I18N="Control type" text="Accelerometer"/>
                 <icon-button id="gyroscope" width="128" height="128"
                         icon="gui/icons/android/gyroscope_icon.png" I18N="Control type" text="Gyroscope"/>
