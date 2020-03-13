@@ -19,6 +19,12 @@ import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import java.util.Set;
+
+import org.minidns.hla.DnssecResolverApi;
+import org.minidns.hla.ResolverResult;
+import org.minidns.record.TXT;
+
 public class SuperTuxKartActivity extends NativeActivity
 {
     private STKEditText m_stk_edittext;
@@ -217,5 +223,25 @@ public class SuperTuxKartActivity extends NativeActivity
                     selection_end);
             }
         });
+    }
+    // ------------------------------------------------------------------------
+    public String[] getDNSTxtRecords(String domain)
+    {
+        try
+        {
+            ResolverResult<TXT> txts =
+                DnssecResolverApi.INSTANCE.resolve(domain, TXT.class);
+            Set<TXT> ans = txts.getAnswers();
+            String[] result = new String[ans.size()];
+            int i = 0;
+            for (TXT t : ans)
+                result[i++] = t.getText();
+            return result;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return new String[0];
+        }
     }
 }
