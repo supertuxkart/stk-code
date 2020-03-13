@@ -64,6 +64,7 @@ public:
         CM_CLOSEUP,           //!< Closer to kart
         CM_REVERSE,           //!< Looking backwards
         CM_LEADER_MODE,       //!< for deleted player karts in follow the leader
+        CM_SPECTATOR_SOCCER,  //!< for spectator (in soccer mode)
         CM_SIMPLE_REPLAY,
         CM_FALLING
     };   // Mode
@@ -77,6 +78,7 @@ private:
 
     /** Camera's mode. */
     Mode            m_mode;
+    Mode            m_previous_mode;
 
     /** The type of the camera. */
     CameraType      m_type;
@@ -173,6 +175,7 @@ public:
 
     void setMode(Mode mode);    /** Set the camera to the given mode */
     Mode getMode();
+    Mode getPreviousMode();
     void setKart(AbstractKart *new_kart);
     virtual void setInitialTransform();
     virtual void activate(bool alsoActivateInIrrlicht=true);

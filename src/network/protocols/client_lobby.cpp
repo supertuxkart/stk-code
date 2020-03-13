@@ -1441,9 +1441,17 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     if (action == PA_LOOK_BACK)
     {
         if (cam->getMode() == Camera::CM_REVERSE)
-            cam->setMode(Camera::CM_NORMAL);
+            cam->setMode(cam->getPreviousMode());
         else
             cam->setMode(Camera::CM_REVERSE);
+        return;
+    }
+    if (action == PA_ACCEL)
+    {
+        if (cam->getMode() == Camera::CM_SPECTATOR_SOCCER)
+            cam->setMode(cam->getPreviousMode());
+        else 
+            cam->setMode(Camera::CM_SPECTATOR_SOCCER);
         return;
     }
 
@@ -1513,11 +1521,12 @@ void ClientLobby::addSpectateHelperMessage() const
     core::stringw left = dc->getBindingAsString(PA_STEER_LEFT);
     core::stringw right = dc->getBindingAsString(PA_STEER_RIGHT);
     core::stringw back = dc->getBindingAsString(PA_LOOK_BACK);
+    core::stringw accel = dc->getBindingAsString(PA_ACCEL);
 
     // I18N: Message shown in game to tell the player it's possible to change
     // the camera target in spectate mode of network
-    core::stringw msg = _("Press <%s> or <%s> to change the targeted player "
-        "or <%s> for the camera position.", left, right, back);
+    core::stringw msg = _("Press <%s> or <%s> to change the targeted player, "
+        "<%s> or <%s> for the camera position.", left, right, back, accel);
     MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 }   // addSpectateHelperMessage
 
