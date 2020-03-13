@@ -42,6 +42,12 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#include "graphics/irr_driver.hpp"
+#include "utils/utf8/unchecked.h"
+#endif
+
 #ifdef WIN32
 #  include <windns.h>
 #  include <ws2tcpip.h>
@@ -512,6 +518,119 @@ bool ConnectToServer::registerWithSTKServer()
     }
 }   // registerWithSTKServer
 
+#ifdef ANDROID
+auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
+{
+    std::vector<std::string> result;
+    CIrrDeviceAndroid* dev =
+        dynamic_cast<CIrrDeviceAndroid*>(irr_driver->getDevice());
+    if (!dev)
+        return result;
+    android_app* android = dev->getAndroid();
+    if (!android)
+        return result;
+
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+
+    jint status = android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+
+        status = android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+    if (status != JNI_OK)
+    {
+        Log::error("ConnectToServer",
+            "Cannot attach current thread in getDNSTxtRecords.");
+        return result;
+    }
+
+    jobject native_activity = android->activity->clazz;
+    jclass class_native_activity = env->GetObjectClass(native_activity);
+
+    if (class_native_activity == NULL)
+    {
+        Log::error("ConnectToServer",
+            "getDNSTxtRecords unable to find object class.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return result;
+    }
+
+    jmethodID method_id = env->GetMethodID(class_native_activity,
+        "getDNSTxtRecords", "(Ljava/lang/String;)[Ljava/lang/String;");
+
+    if (method_id == NULL)
+    {
+        Log::error("ConnectToServer",
+            "getDNSTxtRecords unable to find method id.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return result;
+    }
+
+    std::vector<uint16_t> jstr_data;
+    utf8::unchecked::utf32to16(
+        name.c_str(), name.c_str() + name.size(), std::back_inserter(jstr_data));
+    jstring text =
+        env->NewString((const jchar*)jstr_data.data(), jstr_data.size());
+    if (text == NULL)
+    {
+        Log::error("ConnectToServer",
+            "Failed to create text for domain name.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return result;
+    }
+
+    jobjectArray arr =
+        (jobjectArray)env->CallObjectMethod(native_activity, method_id, text);
+    if (arr == NULL)
+    {
+        Log::error("ConnectToServer", "No array is created.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return result;
+    }
+    int len = env->GetArrayLength(arr);
+    for (int i = 0; i < len; i++)
+    {
+        jstring jstr = (jstring)(env->GetObjectArrayElement(arr, i));
+        if (!jstr)
+            continue;
+        const uint16_t* utf16_text =
+            (const uint16_t*)env->GetStringChars(jstr, NULL);
+        if (utf16_text == NULL)
+            continue;
+        const size_t str_len = env->GetStringLength(jstr);
+        std::string tmp;
+        utf8::unchecked::utf16to8(
+            utf16_text, utf16_text + str_len, std::back_inserter(tmp));
+        result.push_back(tmp);
+        env->ReleaseStringChars(jstr, utf16_text);
+    }
+    if (was_detached)
+    {
+        android->activity->vm->DetachCurrentThread();
+    }
+    return result;
+};
+#endif
+
 // ----------------------------------------------------------------------------
 bool ConnectToServer::detectPort()
 {
@@ -541,7 +660,7 @@ bool ConnectToServer::detectPort()
         }
         return 0;
     };
-#ifdef WIN32
+#if defined(WIN32)
     PDNS_RECORD dns_record = NULL;
     DnsQuery(m_server->getName().c_str(), DNS_TYPE_TEXT,
         DNS_QUERY_STANDARD, NULL, &dns_record, NULL);
@@ -564,6 +683,14 @@ bool ConnectToServer::detectPort()
                 break;
         }
         DnsRecordListFree(dns_record, DnsFreeRecordListDeep);
+    }
+#elif defined(ANDROID)
+    std::vector<std::string> txt_records = get_txt_record(m_server->getName());
+    for (auto& txt_record : txt_records)
+    {
+        port_from_dns = get_port(txt_record);
+        if (port_from_dns != 0)
+            break;
     }
 #else
     unsigned char response[512] = {};
