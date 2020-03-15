@@ -266,10 +266,10 @@ STKHost::STKHost(bool server)
     ENetAddress addr = {};
     if (server)
     {
-        setIPv6Socket(ServerConfig::m_ipv6_server ? 1 : 0);
+        setIPv6Socket(ServerConfig::m_ipv6_connection ? 1 : 0);
 #ifdef ENABLE_IPV6
         if (NetworkConfig::get()->getIPType() == NetworkConfig::IP_V4 &&
-            ServerConfig::m_ipv6_server)
+            ServerConfig::m_ipv6_connection)
         {
             Log::warn("STKHost", "Disable IPv6 socket due to missing IPv6.");
             setIPv6Socket(0);
