@@ -635,13 +635,26 @@ void STKHost::getIPFromStun(int socket, const std::string& stun_address,
  */
 void STKHost::setPublicAddress(short family)
 {
+    auto& stunv4_map = UserConfigParams::m_stun_servers_v4;
+    for (auto& s : NetworkConfig::getStunList(true/*ipv4*/))
+    {
+        if (stunv4_map.find(s) == stunv4_map.end())
+            stunv4_map[s] = 0;
+    }
+
+    auto& stunv6_map = UserConfigParams::m_stun_servers;
+    for (auto& s : NetworkConfig::getStunList(false/*ipv4*/))
+    {
+        if (stunv6_map.find(s) == stunv6_map.end())
+            stunv6_map[s] = 0;
+    }
+
     auto& stun_map = family == AF_INET ? UserConfigParams::m_stun_servers_v4 :
         UserConfigParams::m_stun_servers;
     std::vector<std::pair<std::string, uint32_t> > untried_server;
     for (auto& p : stun_map)
         untried_server.push_back(p);
 
-    assert(untried_server.size() > 2);
     // Randomly use stun servers of the low ping from top-half of the list
     std::sort(untried_server.begin(), untried_server.end(),
         [] (const std::pair<std::string, uint32_t>& a,
@@ -651,8 +664,16 @@ void STKHost::setPublicAddress(short family)
         });
     std::random_device rd;
     std::mt19937 g(rd());
-    std::shuffle(untried_server.begin() + (untried_server.size() / 2),
-        untried_server.end(), g);
+    if (untried_server.size() > 2)
+    {
+        std::shuffle(untried_server.begin() + (untried_server.size() / 2),
+            untried_server.end(), g);
+    }
+    else
+    {
+        Log::warn("STKHost", "Failed to get enough stun servers using SRV"
+            " record.");
+    }
 
     while (!untried_server.empty() && !ProtocolManager::lock()->isExiting())
     {
@@ -698,7 +719,13 @@ void STKHost::setPublicAddress(short family)
             untried_server.clear();
         }
         else
+        {
+            // Erase from user config in stun, if it's provide by SRV records
+            // from STK then it will be re-added next time, and STK team will
+            // remove it if it stops working
+            stun_map.erase(untried_server.back().first);
             untried_server.pop_back();
+        }
     }
 }   // setPublicAddress
 

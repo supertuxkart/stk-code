@@ -496,6 +496,12 @@ void STKConfig::getAllData(const XMLNode * root)
         urls->get("assets-download", &m_assets_download_url);
     }
 
+    if (const XMLNode *urls = root->getNode("stun"))
+    {
+        urls->get("ipv4", &m_stun_ipv4);
+        urls->get("ipv6", &m_stun_ipv6);
+    }
+
     if (const XMLNode *fonts_list = root->getNode("fonts-list"))
     {
         fonts_list->get("normal-ttf", &m_normal_ttf);

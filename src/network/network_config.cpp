@@ -35,13 +35,27 @@
 #include "states_screens/online/online_profile_servers.hpp"
 #include "states_screens/online/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/time.hpp"
+#include "utils/utf8/unchecked.h"
 
 #ifdef WIN32
-#  include <winsock2.h>
+#  include <windns.h>
 #  include <ws2tcpip.h>
+#ifndef __MINGW32__
+#  pragma comment(lib, "dnsapi.lib")
+#endif
 #else
+#  include <arpa/nameser.h>
+#  include <arpa/nameser_compat.h>
 #  include <netdb.h>
+#  include <netinet/in.h>
+#  include <resolv.h>
+#endif
+
+#ifdef ANDROID
+#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
+#include "graphics/irr_driver.hpp"
 #endif
 
 NetworkConfig *NetworkConfig::m_network_config[PT_COUNT];
@@ -221,11 +235,28 @@ void NetworkConfig::detectIPType()
     auto ipv6 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
     setIPv6Socket(0);
 
-    auto ipv4_it = UserConfigParams::m_stun_servers_v4.begin();
-    int adv = StkTime::getMonoTimeMs() % UserConfigParams::m_stun_servers_v4.size();
+    auto& stunv4_map = UserConfigParams::m_stun_servers_v4;
+    for (auto& s : getStunList(true/*ipv4*/))
+    {
+        if (stunv4_map.find(s) == stunv4_map.end())
+            stunv4_map[s] = 0;
+    }
+    if (stunv4_map.empty())
+        return;
+    auto ipv4_it = stunv4_map.begin();
+    int adv = StkTime::getMonoTimeMs() % stunv4_map.size();
     std::advance(ipv4_it, adv);
-    auto ipv6_it = UserConfigParams::m_stun_servers.begin();
-    adv = StkTime::getMonoTimeMs() % UserConfigParams::m_stun_servers.size();
+
+    auto& stunv6_map = UserConfigParams::m_stun_servers;
+    for (auto& s : getStunList(false/*ipv4*/))
+    {
+        if (stunv6_map.find(s) == stunv6_map.end())
+            stunv6_map[s] = 0;
+    }
+    if (stunv6_map.empty())
+        return;
+    auto ipv6_it = stunv6_map.begin();
+    adv = StkTime::getMonoTimeMs() % stunv6_map.size();
     std::advance(ipv6_it, adv);
 
     SocketAddress::g_ignore_error_message = true;
@@ -343,3 +374,206 @@ void NetworkConfig::detectIPType()
     m_ip_type = IP_V4;
 #endif
 }   // detectIPType
+
+// ----------------------------------------------------------------------------
+void NetworkConfig::fillStunList(std::vector<std::string>& l,
+                                 const std::string& dns)
+{
+#if defined(WIN32)
+    PDNS_RECORD dns_record = NULL;
+    DnsQuery(StringUtils::utf8ToWide(dns).c_str(), DNS_TYPE_SRV,
+        DNS_QUERY_STANDARD, NULL, &dns_record, NULL);
+    if (dns_record)
+    {
+        for (PDNS_RECORD curr = dns_record; curr; curr = curr->pNext)
+        {
+            if (curr->wType == DNS_TYPE_SRV)
+            {
+                l.push_back(
+                    StringUtils::wideToUtf8(curr->Data.SRV.pNameTarget) +
+                    ":" + StringUtils::toString(curr->Data.SRV.wPort));
+            }
+        }
+        DnsRecordListFree(dns_record, DnsFreeRecordListDeep);
+    }
+
+#elif defined(ANDROID)
+    CIrrDeviceAndroid* dev =
+        dynamic_cast<CIrrDeviceAndroid*>(irr_driver->getDevice());
+    if (!dev)
+        return;
+    android_app* android = dev->getAndroid();
+    if (!android)
+        return;
+
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+
+    jint status = android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+
+        status = android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+    if (status != JNI_OK)
+    {
+        Log::error("NetworkConfig",
+            "Cannot attach current thread in getDNSSrvRecords.");
+        return;
+    }
+
+    jobject native_activity = android->activity->clazz;
+    jclass class_native_activity = env->GetObjectClass(native_activity);
+
+    if (class_native_activity == NULL)
+    {
+        Log::error("NetworkConfig",
+            "getDNSSrvRecords unable to find object class.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return;
+    }
+
+    jmethodID method_id = env->GetMethodID(class_native_activity,
+        "getDNSSrvRecords", "(Ljava/lang/String;)[Ljava/lang/String;");
+
+    if (method_id == NULL)
+    {
+        Log::error("NetworkConfig",
+            "getDNSSrvRecords unable to find method id.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return;
+    }
+
+    std::vector<uint16_t> jstr_data;
+    utf8::unchecked::utf8to16(
+        dns.c_str(), dns.c_str() + dns.size(), std::back_inserter(jstr_data));
+    jstring text =
+        env->NewString((const jchar*)jstr_data.data(), jstr_data.size());
+    if (text == NULL)
+    {
+        Log::error("NetworkConfig",
+            "Failed to create text for domain name.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return;
+    }
+
+    jobjectArray arr =
+        (jobjectArray)env->CallObjectMethod(native_activity, method_id, text);
+    if (arr == NULL)
+    {
+        Log::error("NetworkConfig", "No array is created.");
+        if (was_detached)
+        {
+            android->activity->vm->DetachCurrentThread();
+        }
+        return;
+    }
+    int len = env->GetArrayLength(arr);
+    for (int i = 0; i < len; i++)
+    {
+        jstring jstr = (jstring)(env->GetObjectArrayElement(arr, i));
+        if (!jstr)
+            continue;
+        const uint16_t* utf16_text =
+            (const uint16_t*)env->GetStringChars(jstr, NULL);
+        if (utf16_text == NULL)
+            continue;
+        const size_t str_len = env->GetStringLength(jstr);
+        std::string tmp;
+        utf8::unchecked::utf16to8(
+            utf16_text, utf16_text + str_len, std::back_inserter(tmp));
+        l.push_back(tmp);
+        env->ReleaseStringChars(jstr, utf16_text);
+    }
+    if (was_detached)
+    {
+        android->activity->vm->DetachCurrentThread();
+    }
+
+#else
+#define SRV_PORT (RRFIXEDSZ+4)
+#define SRV_SERVER (RRFIXEDSZ+6)
+#define SRV_FIXEDSZ (RRFIXEDSZ+6)
+
+    unsigned char response[512] = {};
+    int response_len = res_query(dns.c_str(), C_IN, T_SRV, response, 512);
+    if (response_len > 0)
+    {
+        HEADER* header = (HEADER*)response;
+        unsigned char* start = response + NS_HFIXEDSZ;
+
+        if ((header->tc) || (response_len < NS_HFIXEDSZ))
+            return;
+
+        if (header->rcode >= 1 && header->rcode <= 5)
+            return;
+
+        int ancount = ntohs(header->ancount);
+        int qdcount = ntohs(header->qdcount);
+        if (ancount == 0)
+            return;
+
+        if (ancount > NS_PACKETSZ)
+            return;
+
+        for (int count = qdcount; count > 0; count--)
+        {
+            int str_len = dn_skipname(start, response + response_len);
+            start += str_len + NS_QFIXEDSZ;
+        }
+
+        std::vector<unsigned char*> srv;
+        for (int count = ancount; count > 0; count--)
+        {
+            int str_len = dn_skipname(start, response + response_len);
+            start += str_len;
+            srv.push_back(start);
+            start += SRV_FIXEDSZ;
+            start += dn_skipname(start, response + response_len);
+        }
+
+        for (unsigned i = 0; i < srv.size(); i++)
+        {
+            char server_name[512] = {};
+            if (ns_name_ntop(srv[i] + SRV_SERVER, server_name, 512) < 0)
+                continue;
+            uint16_t port = ns_get16(srv[i] + SRV_PORT);
+            l.push_back(std::string(server_name) + ":" +
+                StringUtils::toString(port));
+        }
+    }
+#endif
+}   // fillStunList
+
+// ----------------------------------------------------------------------------
+const std::vector<std::string>& NetworkConfig::getStunList(bool ipv4)
+{
+    static std::vector<std::string> ipv4_list;
+    static std::vector<std::string> ipv6_list;
+    if (ipv4)
+    {
+        if (ipv4_list.empty())
+            NetworkConfig::fillStunList(ipv4_list, stk_config->m_stun_ipv4);
+        return ipv4_list;
+    }
+    else
+    {
+        if (ipv6_list.empty())
+            NetworkConfig::fillStunList(ipv6_list, stk_config->m_stun_ipv6);
+        return ipv6_list;
+    }
+}   // getStunList
