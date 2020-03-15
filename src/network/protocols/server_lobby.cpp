@@ -309,7 +309,7 @@ void ServerLobby::initServerStatsTable()
     oss << "CREATE TABLE IF NOT EXISTS " << table_name << " (\n"
         "    host_id INTEGER UNSIGNED NOT NULL PRIMARY KEY, -- Unique host id in STKHost of each connection session for a STKPeer\n"
         "    ip INTEGER UNSIGNED NOT NULL, -- IP decimal of host\n";
-    if (ServerConfig::m_ipv6_server)
+    if (ServerConfig::m_ipv6_connection)
         oss << "    ipv6 TEXT NOT NULL DEFAULT '', -- IPv6 (if exists) in string of host\n";
     oss << "    port INTEGER UNSIGNED NOT NULL, -- Port of host\n"
         "    online_id INTEGER UNSIGNED NOT NULL, -- Online if of the host (0 for offline account)\n"
@@ -370,7 +370,7 @@ void ServerLobby::initServerStatsTable()
     oss << "CREATE VIEW IF NOT EXISTS " << full_stats_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
-    if (ServerConfig::m_ipv6_server)
+    if (ServerConfig::m_ipv6_connection)
         oss << "    ipv6,";
     oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version, os,\n"
@@ -393,7 +393,7 @@ void ServerLobby::initServerStatsTable()
     oss << "CREATE VIEW IF NOT EXISTS " << current_players_view_name << " AS\n"
         << "    SELECT host_id, ip,\n"
         << "    ((ip >> 24) & 255) ||'.'|| ((ip >> 16) & 255) ||'.'|| ((ip >>  8) & 255) ||'.'|| ((ip ) & 255) AS ip_readable,\n";
-    if (ServerConfig::m_ipv6_server)
+    if (ServerConfig::m_ipv6_connection)
         oss << "    ipv6,";
     oss << "    port, online_id, username, player_num,\n"
         << "    " << m_server_stats_table << ".country_code AS country_code, country_flag, country_name, version, os,\n"
@@ -431,7 +431,7 @@ void ServerLobby::initServerStatsTable()
     {
         oss << "CREATE VIEW IF NOT EXISTS " << player_stats_view_name << " AS\n"
             << "    SELECT a.online_id, a.username, a.ip, a.ip_readable,\n";
-        if (ServerConfig::m_ipv6_server)
+        if (ServerConfig::m_ipv6_connection)
             oss << "    a.ipv6,";
         oss << "    a.port, a.player_num,\n"
             << "    a.country_code, a.country_flag, a.country_name, a.version, a.os, a.ping, a.packet_loss,\n"
@@ -1248,7 +1248,7 @@ void ServerLobby::writePlayerReport(Event* event)
     auto reporting_npp = reporting_peer->getPlayerProfiles()[0];
 
     std::string query;
-    if (ServerConfig::m_ipv6_server)
+    if (ServerConfig::m_ipv6_connection)
     {
         query = StringUtils::insertValues(
             "INSERT INTO %s "
@@ -3618,7 +3618,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     if (m_server_stats_table.empty() || peer->isAIPeer())
         return;
     std::string query;
-    if (ServerConfig::m_ipv6_server && peer->getAddress().isIPv6())
+    if (ServerConfig::m_ipv6_connection && peer->getAddress().isIPv6())
     {
         query = StringUtils::insertValues(
             "INSERT INTO %s "

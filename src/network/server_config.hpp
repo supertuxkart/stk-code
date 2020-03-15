@@ -183,8 +183,8 @@ namespace ServerConfig
         "it allows for saving of server resources if your server is not "
         "behind a firewall."));
 
-    SERVER_CFG_PREFIX BoolServerConfigParam m_ipv6_server
-        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "ipv6-server",
+    SERVER_CFG_PREFIX BoolServerConfigParam m_ipv6_connection
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "ipv6-connection",
         "Enable to allow IPv6 connection if you have a public IPv6 address. "
         "STK currently uses dual-stack mode which requires server to have both "
         "IPv4 and IPv6 and listen to same port. If STK detects your server "

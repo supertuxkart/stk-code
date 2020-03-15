@@ -342,7 +342,7 @@ void loadServerLobbyFromConfig()
         m_server_max_players > 10)
         m_server_max_players = 10;
 
-    if (m_ipv6_server)
+    if (m_ipv6_connection)
     {
 #ifndef ENABLE_IPV6
         Log::warn("ServerConfig", "IPv6 support not compiled.");

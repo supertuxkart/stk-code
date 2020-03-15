@@ -82,7 +82,7 @@ The current server configuration xml looks like this:
     <firewalled-server value="true" />
 
     <!-- Enable to allow IPv6 connection if you have a public IPv6 address. STK currently uses dual-stack mode which requires server to have both IPv4 and IPv6 and listen to same port. If STK detects your server has no public IPv6 address or port differs between IPv4 and IPv6 then it will use IPv4 only socket. For system which doesn't support dual-stack socket (like OpenBSD) you may fail to be connected by IPv4 clients. -->
-    <ipv6-server value="true" />
+    <ipv6-connection value="true" />
 
     <!-- No server owner in lobby which can control the starting of game or kick any players. -->
     <owner-less value="false" />
