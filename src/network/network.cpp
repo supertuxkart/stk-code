@@ -63,6 +63,7 @@ Network::Network(int peer_count, int channel_limit,
                  uint32_t max_outgoing_bandwidth,
                  ENetAddress* address, bool change_port_if_bound)
 {
+    m_ipv6_socket = false;
     m_port = 0;
     m_host = enet_host_create(address, peer_count, channel_limit, 0, 0);
     if (!m_host && change_port_if_bound)
@@ -77,29 +78,30 @@ Network::Network(int peer_count, int channel_limit,
         if (!m_host)
             Log::fatal("Network", "Failed to create socket with any port.");
     }
-    if (m_host && isIPv6Socket())
+    if (m_host)
     {
-        struct sockaddr_in6 sin6;
-        socklen_t len = sizeof(sin6);
-        if (getsockname(m_host->socket, (struct sockaddr*)&sin6, &len) == -1)
+        struct sockaddr_storage ss;
+        memset(&ss, 0, sizeof (struct sockaddr_storage));
+        socklen_t len = sizeof(ss);
+        if (getsockname(m_host->socket, (struct sockaddr*)&ss, &len) == -1)
         {
             Log::error("STKHost", "Error while using getsockname().");
             m_port = 0;
         }
         else
-            m_port = ntohs(sin6.sin6_port);
-    }
-    else if (m_host)
-    {
-        struct sockaddr_in sin;
-        socklen_t len = sizeof(sin);
-        if (getsockname(m_host->socket, (struct sockaddr*)&sin, &len) == -1)
         {
-            Log::error("STKHost", "Error while using getsockname().");
-            m_port = 0;
+            m_ipv6_socket = ss.ss_family == AF_INET6;
+            if (m_ipv6_socket)
+            {
+                sockaddr_in6* sin6 = (sockaddr_in6*)&ss;
+                m_port = ntohs(sin6->sin6_port);
+            }
+            else
+            {
+                sockaddr_in* sin = (sockaddr_in*)&ss;
+                m_port = ntohs(sin->sin_port);
+            }
         }
-        else
-            m_port = ntohs(sin.sin_port);
     }
 }   // Network
 

@@ -231,12 +231,13 @@ void ConnectToServer::asynchronousUpdate()
 
             // Auto enable IPv6 socket in client with NAT64, then we convert
             // the IPv4 address to NAT64 one in GOT_SERVER_ADDRESS
-            if (m_server->useIPV6Connection() ||
-                NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64)
+            bool ipv6_socket = m_server->useIPV6Connection() ||
+                NetworkConfig::get()->getIPType() == NetworkConfig::IP_V6_NAT64;
+            if (STKHost::get()->getNetwork()->isIPv6Socket() != ipv6_socket)
             {
                 // Free the bound socket first
                 delete STKHost::get()->getNetwork();
-                setIPv6Socket(1);
+                setIPv6Socket(ipv6_socket ? 1 : 0);
                 ENetAddress addr = {};
                 addr.port = NetworkConfig::get()->getClientPort();
                 auto new_network = new Network(/*peer_count*/1,

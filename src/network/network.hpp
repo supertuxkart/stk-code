@@ -50,6 +50,7 @@ private:
 
     uint16_t m_port;
 
+    bool m_ipv6_socket;
     /** Where to log packets. If NULL for FILE* logging is disabled. */
     static Synchronised<FILE*> m_log_file;
 
@@ -77,6 +78,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the ENet host object. */
     ENetHost* getENetHost() { return m_host; }
+    // ------------------------------------------------------------------------
+    bool isIPv6Socket() { return m_ipv6_socket; }
 };   // class Network
 
 #endif // HEADER_ENET_SOCKET_HPP
