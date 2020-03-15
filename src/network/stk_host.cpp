@@ -1077,11 +1077,12 @@ void STKHost::mainLoop(ProcessType pt)
                     (event.peer, this, ++m_next_unique_host_id);
                 std::unique_lock<std::mutex> lock(m_peers_mutex);
                 m_peers[event.peer] = stk_peer;
+                size_t new_peer_count = m_peers.size();
                 lock.unlock();
                 stk_event = new Event(&event, stk_peer);
                 Log::info("STKHost", "%s has just connected. There are "
                     "now %u peers.", stk_peer->getAddress().toString().c_str(),
-                    getPeerCount());
+                    new_peer_count);
                 // Client always trust the server
                 if (!is_server)
                     stk_peer->setValidated(true);
@@ -1100,21 +1101,25 @@ void STKHost::mainLoop(ProcessType pt)
                 // Use the previous stk peer so protocol can see the network
                 // profile and handle it for disconnection
                 std::string addr;
+                std::lock_guard<std::mutex> lock(m_peers_mutex);
+                size_t new_peer_count = m_peers.size();
                 if (m_peers.find(event.peer) != m_peers.end())
                 {
                     std::shared_ptr<STKPeer>& peer = m_peers.at(event.peer);
                     addr = peer->getAddress().toString();
                     stk_event = new Event(&event, peer);
-                    std::lock_guard<std::mutex> lock(m_peers_mutex);
                     m_peers.erase(event.peer);
+                    new_peer_count = m_peers.size();
                 }
                 Log::info("STKHost", "%s has just disconnected. There are "
-                    "now %u peers.", addr.c_str(), getPeerCount());
+                    "now %u peers.", addr.c_str(), new_peer_count);
             }   // ENET_EVENT_TYPE_DISCONNECT
 
+            std::unique_lock<std::mutex> lock(m_peers_mutex);
             if (!stk_event && m_peers.find(event.peer) != m_peers.end())
             {
-                auto& peer = m_peers.at(event.peer);
+                std::shared_ptr<STKPeer> peer = m_peers.at(event.peer);
+                lock.unlock();
                 if (isPingPacket(event.packet->data, event.packet->dataLength))
                 {
                     if (!is_server)
