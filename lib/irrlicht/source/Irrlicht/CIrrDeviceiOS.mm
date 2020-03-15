@@ -559,6 +559,8 @@ namespace irr
                 ev.AccelerometerEvent.Z = motionManager.accelerometerData.acceleration.z * 9.81;
                 if (m_upside_down)
                     ev.AccelerometerEvent.Y = -ev.AccelerometerEvent.Y;
+                if (ev.AccelerometerEvent.X < 0.0)
+                    ev.AccelerometerEvent.X *= -1.0;
                 postEventFromUser(ev);
             }
 
