@@ -138,7 +138,7 @@ void NetworkingLobby::loadedFromFile()
     m_spectate_texture = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "screen_other.png"));
     video::ITexture* icon_6 = irr_driver->getTexture
-        (file_manager->getAsset(FileManager::GUI_ICON, "android/robot.png"));
+        (file_manager->getAsset(FileManager::GUI_ICON, "robot.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);
