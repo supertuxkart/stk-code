@@ -110,6 +110,8 @@ public:
     void saveCompleteState(BareNetworkString* buffer) const;
     // ------------------------------------------------------------------------
     void restoreCompleteState(const BareNetworkString& buffer);
+    // ------------------------------------------------------------------------
+    void initServer();
 
 };   // NetworkItemManager
 
