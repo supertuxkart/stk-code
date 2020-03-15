@@ -180,6 +180,11 @@
         password-reset="https://online.supertuxkart.net/password-reset.php"
         assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
 
+  <!-- STK will use dns query of the SRV records with these domains to get the list of
+       stun servers to use for IPv4 and IPv6. -->
+  <stun ipv4="_stunv4._udp.supertuxkart.net"
+        ipv6="_stunv6._udp.supertuxkart.net"/>
+
   <!-- Skidmark data: maximum number of skid marks, and
        time for skidmarks to fade out. Maximum number will over
        current number of karts, so the more karts, the less

@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.minidns.hla.DnssecResolverApi;
 import org.minidns.hla.ResolverResult;
+import org.minidns.record.SRV;
 import org.minidns.record.TXT;
 
 public class SuperTuxKartActivity extends NativeActivity
@@ -236,6 +237,26 @@ public class SuperTuxKartActivity extends NativeActivity
             int i = 0;
             for (TXT t : ans)
                 result[i++] = t.getText();
+            return result;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return new String[0];
+        }
+    }
+    // ------------------------------------------------------------------------
+    public String[] getDNSSrvRecords(String domain)
+    {
+        try
+        {
+            ResolverResult<SRV> srvs =
+                DnssecResolverApi.INSTANCE.resolve(domain, SRV.class);
+            Set<SRV> ans = srvs.getAnswers();
+            String[] result = new String[ans.size()];
+            int i = 0;
+            for (SRV s : ans)
+                result[i++] = s.target.toString() + ":" + s.port;
             return result;
         }
         catch (Exception e)

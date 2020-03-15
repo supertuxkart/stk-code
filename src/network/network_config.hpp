@@ -120,6 +120,10 @@ private:
      *  addresses they use the same prefix for each initIPTest. */
     std::string m_nat64_prefix;
     std::array<uint32_t, 8> m_nat64_prefix_data;
+    // ------------------------------------------------------------------------
+    static void fillStunList(std::vector<std::string>& l,
+                             const std::string& dns);
+
 public:
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
@@ -294,6 +298,8 @@ public:
     void setNumFixedAI(unsigned num)                  { m_num_fixed_ai = num; }
     // ------------------------------------------------------------------------
     unsigned getNumFixedAI() const                   { return m_num_fixed_ai; }
+    // ------------------------------------------------------------------------
+    static const std::vector<std::string>& getStunList(bool ipv4);
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG
