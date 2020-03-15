@@ -62,12 +62,14 @@ void OptionsScreenInput::loadedFromFile()
     video::ITexture* icon2 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,"keyboard_off.png"   ));
     video::ITexture* icon3 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,"gamepad.png"    ));
     video::ITexture* icon4 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,"gamepad_off.png"));
+    video::ITexture* icon5 = irr_driver->getTexture( file_manager->getAsset(FileManager::GUI_ICON,"tablet.png"    ));
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv() );
     m_icon_bank->addTextureAsSprite(icon1);
     m_icon_bank->addTextureAsSprite(icon2);
     m_icon_bank->addTextureAsSprite(icon3);
     m_icon_bank->addTextureAsSprite(icon4);
+    m_icon_bank->addTextureAsSprite(icon5);
 
     // scale icons depending on font height
     const float scale = GUIEngine::getFontHeight() / 72.0f;
@@ -169,7 +171,7 @@ void OptionsScreenInput::buildDeviceList()
     if (touch_device != NULL)
     {
         devices->addItem("touch_device", (core::stringw("   ") + 
-                                                _("Touch Device")).c_str(), 2);
+                                                _("Touch Device")).c_str(), 4);
     }
 }   // buildDeviceList
 
