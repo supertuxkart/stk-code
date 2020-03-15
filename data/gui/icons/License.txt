@@ -49,6 +49,8 @@ lap_flag.png, modified by Alayan, original by Alina Oleynik from The Noun Projec
 
 Android robot.png is licensed under the terms of the Creative Commons Attribution license
 
+tablet.png is licensed under public domain
+
 ====
 
 Glass Skin by Auria, under CC-BY-SA 3+
