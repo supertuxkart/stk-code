@@ -405,6 +405,7 @@ public:
 
     float getCameraDistance() const;
     float getCameraForwardUpAngle() const;
+    bool getCameraForwardSmoothing() const;
     float getCameraBackwardUpAngle() const;
 
     float getJumpAnimationTime() const;

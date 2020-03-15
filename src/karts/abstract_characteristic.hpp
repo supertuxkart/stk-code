@@ -114,6 +114,7 @@ public:
         // Camera
         CAMERA_DISTANCE,
         CAMERA_FORWARD_UP_ANGLE,
+        CAMERA_FORWARD_SMOOTHING,
         CAMERA_BACKWARD_UP_ANGLE,
 
         // Jump
@@ -298,6 +299,7 @@ public:
 
     float getCameraDistance() const;
     float getCameraForwardUpAngle() const;
+    bool getCameraForwardSmoothing() const;
     float getCameraBackwardUpAngle() const;
 
     float getJumpAnimationTime() const;

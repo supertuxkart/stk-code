@@ -77,7 +77,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
  *  \param dt Delta time, 
  *  \param if false, the camera instantly moves to the endpoint, or else it smoothly moves
  */
-void CameraNormal::moveCamera(float dt, bool smooth)
+void CameraNormal::moveCamera(float dt, bool smooth, float cam_angle, float distance)
 {
     if(!m_kart) return;
 
@@ -108,11 +108,16 @@ void CameraNormal::moveCamera(float dt, bool smooth)
 
     // distance of camera from kart in x and z plane
     float camera_distance = -1.25f - 2.5f * ratio;
-    if (camera_distance > -2.0f) camera_distance = -2.0f; // don't get too close to the kart
+    float min_distance = (distance * 2.0f);
+    if (distance > 0) camera_distance += distance + 1; // note that distance < 0
+    if (camera_distance > min_distance) camera_distance = min_distance; // don't get too close to the kart
+
+    float tan_up = 0;
+    if (cam_angle > 0) tan_up = tanf(cam_angle) * distance;
 
     // Defines how far camera should be from player kart.
     Vec3 wanted_camera_offset(camera_distance * sinf(skid_angle / 2),
-        (0.85f + ratio / 2.5f),
+        (0.85f + ratio / 2.5f) - tan_up,
         camera_distance * cosf(skid_angle / 2));
 
     float delta = 1;
@@ -172,7 +177,7 @@ void CameraNormal::moveCamera(float dt, bool smooth)
 //-----------------------------------------------------------------------------
 void CameraNormal::snapToPosition()
 {
-    moveCamera(1.0f, false);
+    moveCamera(1.0f, false, 0, 0);
 }   // snapToPosition
 
 //-----------------------------------------------------------------------------
@@ -203,7 +208,7 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering;
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
-            *smoothing           = true;
+            *smoothing           = kp->getCameraForwardSmoothing();
             *cam_roll_angle      = 0.0f;
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
             {
@@ -369,7 +374,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     if (smoothing)
     {
-        moveCamera(dt, true);
+        moveCamera(dt, true, cam_angle, distance);
     }
     else
     {
