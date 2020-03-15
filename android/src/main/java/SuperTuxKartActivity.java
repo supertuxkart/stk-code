@@ -7,6 +7,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
@@ -80,7 +81,7 @@ public class SuperTuxKartActivity extends NativeActivity
             @Override
             public void afterTextChanged(Editable edit)
             {
-                if (m_stk_edittext != null)
+                if (!isHardwareKeyboardConnected() && m_stk_edittext != null)
                     m_stk_edittext.updateSTKEditBox();
             }
         });
@@ -146,7 +147,7 @@ public class SuperTuxKartActivity extends NativeActivity
         // Called when user change cursor / select all text in native android
         // keyboard
         boolean ret = super.dispatchKeyEvent(event);
-        if (m_stk_edittext != null)
+        if (!isHardwareKeyboardConnected() && m_stk_edittext != null)
             m_stk_edittext.updateSTKEditBox();
         return ret;
     }
@@ -264,5 +265,11 @@ public class SuperTuxKartActivity extends NativeActivity
             e.printStackTrace();
             return new String[0];
         }
+    }
+    // ------------------------------------------------------------------------
+    public boolean isHardwareKeyboardConnected()
+    {
+        return getResources().getConfiguration()
+            .keyboard == Configuration.KEYBOARD_QWERTY;
     }
 }

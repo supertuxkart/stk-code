@@ -1727,11 +1727,61 @@ bool CIrrDeviceAndroid::isGyroscopeAvailable()
 
 bool CIrrDeviceAndroid::hasHardwareKeyboard() const
 {
-    // This can happen when hosting server in android
     if (!Android)
-        return true;
-    int32_t keyboard = AConfiguration_getKeyboard(Android->config);
-    return (keyboard == ACONFIGURATION_KEYBOARD_QWERTY);
+        return false;
+
+    bool was_detached = false;
+    JNIEnv* env = NULL;
+
+    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
+    if (status == JNI_EDETACHED)
+    {
+        JavaVMAttachArgs args;
+        args.version = JNI_VERSION_1_6;
+        args.name = "NativeThread";
+        args.group = NULL;
+
+        status = Android->activity->vm->AttachCurrentThread(&env, &args);
+        was_detached = true;
+    }
+    if (status != JNI_OK)
+    {
+        os::Printer::log("Cannot attach current thread in isHardwareKeyboardConnected.", ELL_DEBUG);
+        return false;
+    }
+
+    jobject native_activity = Android->activity->clazz;
+    jclass class_native_activity = env->GetObjectClass(native_activity);
+
+    if (class_native_activity == NULL)
+    {
+        os::Printer::log("isHardwareKeyboardConnected unable to find object class.", ELL_ERROR);
+        if (was_detached)
+        {
+            Android->activity->vm->DetachCurrentThread();
+        }
+        return false;
+    }
+
+    jmethodID method_id = env->GetMethodID(class_native_activity, "isHardwareKeyboardConnected", "()Z");
+
+    if (method_id == NULL)
+    {
+        os::Printer::log("isHardwareKeyboardConnected unable to find method id.", ELL_ERROR);
+        if (was_detached)
+        {
+            Android->activity->vm->DetachCurrentThread();
+        }
+        return false;
+    }
+
+    bool ret = env->CallBooleanMethod(native_activity, method_id);
+    if (was_detached)
+    {
+        Android->activity->vm->DetachCurrentThread();
+    }
+
+    return ret;
 }
 
 } // end namespace irr
