@@ -2942,6 +2942,8 @@ void Track::initChildTrack()
     // Add in child process for rewind manager
     std::dynamic_pointer_cast<NetworkItemManager>
         (m_item_manager)->rewinderAdd();
+    std::dynamic_pointer_cast<NetworkItemManager>
+        (m_item_manager)->initServer();
 
     // We call physics init in child process too
     Physics::get()->init(m_aabb_min, m_aabb_max);

@@ -41,7 +41,14 @@ NetworkItemManager::NetworkItemManager()
 {
     m_confirmed_switch_ticks = -1;
     m_last_confirmed_item_ticks.clear();
+    initServer();
+}   // NetworkItemManager
 
+//-----------------------------------------------------------------------------
+/** If this is a server, initializing the peers in game
+*/
+void NetworkItemManager::initServer()
+{
     if (NetworkConfig::get()->isServer())
     {
         auto peers = STKHost::get()->getPeers();
@@ -52,8 +59,7 @@ NetworkItemManager::NetworkItemManager()
             m_last_confirmed_item_ticks[p] = 0;
         }
     }
-
-}   // NetworkItemManager
+}   // initServer
 
 //-----------------------------------------------------------------------------
 /** Destructor. Cleans up all items and meshes stored.
