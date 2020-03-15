@@ -180,11 +180,13 @@
             Distance between kart and camera.
             forward-up-angle: Angle between camera and plane of kart (pitch)
                 when the camera is pointing forward
+            forward-smoothing: if true, use smoothing (forward-up-angle become relative to speed) when pointing forward
             backward-up-angle: Angle between camera and plane of kart (pitch)
                 when the camera is pointing backwards. This is usually
                 larger than the forward-up-angle, since the kart itself
                 otherwise obstricts too much of the view. -->
-        <camera distance="1.0" forward-up-angle="15"
+        <camera distance="1.0"
+                forward-up-angle="0" forward-smoothing="true"
                 backward-up-angle="5" />
 
         <!-- Jump animation

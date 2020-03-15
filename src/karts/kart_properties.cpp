@@ -785,6 +785,11 @@ float KartProperties::getCameraForwardUpAngle() const
     return m_cached_characteristic->getCameraForwardUpAngle();
 }  // getCameraForwardUpAngle
 
+bool KartProperties::getCameraForwardSmoothing() const
+{
+    return m_cached_characteristic->getCameraForwardSmoothing();
+}  // getCameraForwardSmoothing
+
 // ----------------------------------------------------------------------------
 float KartProperties::getCameraBackwardUpAngle() const
 {

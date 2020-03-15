@@ -111,6 +111,8 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case CAMERA_FORWARD_UP_ANGLE:
         return TYPE_FLOAT;
+    case CAMERA_FORWARD_SMOOTHING:
+        return TYPE_BOOL;
     case CAMERA_BACKWARD_UP_ANGLE:
         return TYPE_FLOAT;
     case JUMP_ANIMATION_TIME:
@@ -862,6 +864,18 @@ float AbstractCharacteristic::getCameraForwardUpAngle() const
                     getName(CAMERA_FORWARD_UP_ANGLE).c_str());
     return result;
 }  // getCameraForwardUpAngle
+
+// ----------------------------------------------------------------------------
+bool AbstractCharacteristic::getCameraForwardSmoothing() const
+{
+    bool result;
+    bool is_set = false;
+    process(CAMERA_FORWARD_SMOOTHING, &result, &is_set);
+    if (!is_set)
+        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
+                    getName(CAMERA_FORWARD_SMOOTHING).c_str());
+    return result;
+}  // getCameraForwardSmoothing (advanced option)
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getCameraBackwardUpAngle() const

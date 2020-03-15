@@ -51,7 +51,7 @@ private:
 
     Vec3            m_camera_offset;
 
-    void moveCamera(float dt, bool smooth);
+    void moveCamera(float dt, bool smooth, float cam_angle, float distance);
     void handleEndCamera(float dt);
     void getCameraSettings(float *above_kart, float *cam_angle,
                            float *side_way, float *distance,
