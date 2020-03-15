@@ -17,6 +17,7 @@
 
 #include "states_screens/options/options_screen_input.hpp"
 
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/screen.hpp"
@@ -201,6 +202,21 @@ void OptionsScreenInput::init()
     // Disable adding keyboard configurations
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
     getWidget<ButtonWidget>("add_device")->setActive(!in_game);
+
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
+        irr_driver->getDevice()->supportsTouchDevice()) ||
+        UserConfigParams::m_multitouch_active > 1;
+    if (multitouch_enabled)
+    {
+        // I18N: In the input configuration screen, help for touch device
+        getWidget("help1")->setText(_("Tap on a device to configure it"));
+        getWidget("help2")->setVisible(false);
+    }
+    else
+    {
+        getWidget("help1")->setText(_("Press enter or double-click on a device to configure it"));
+        getWidget("help2")->setVisible(true);
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
