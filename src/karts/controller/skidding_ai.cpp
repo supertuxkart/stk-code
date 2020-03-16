@@ -1246,7 +1246,7 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
     case PowerupManager::POWERUP_PARACHUTE:
         {
         // Wait one second more than a previous parachute
-        if(m_time_since_last_shot > stk_config->ticks2Time(m_kart->getKartProperties()->getParachuteDurationOther()) + 1.0f)
+        if(m_time_since_last_shot > m_kart->getKartProperties()->getParachuteDurationOther() + 1.0f)
             m_controls->setFire(true);
         break;
         }// POWERUP_PARACHUTE

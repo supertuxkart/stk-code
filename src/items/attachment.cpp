@@ -354,7 +354,9 @@ void Attachment::hitBanana(ItemState *item_state)
         {
         case ATTACH_PARACHUTE:
         {
-            set(ATTACH_PARACHUTE, kp->getParachuteDuration() + leftover_ticks);
+            int parachute_ticks = stk_config->time2Ticks(
+                kp->getParachuteDuration()) + leftover_ticks;
+            set(ATTACH_PARACHUTE, parachute_ticks);
             int initial_speed_round = (int)(m_kart->getSpeed() * 100.0f);
             initial_speed_round =
                 irr::core::clamp(initial_speed_round, -32768, 32767);

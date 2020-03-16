@@ -916,7 +916,7 @@ void SlipStream::updateSpeedIncrease()
         const KartProperties* kp = m_kart->getKartProperties();
         float speed_increase = kp->getSlipstreamMaxSpeedIncrease();
         float add_power = kp->getSlipstreamAddPower();
-        int fade_out = kp->getSlipstreamFadeOutTicks();
+        int fade_out = stk_config->time2Ticks(kp->getSlipstreamFadeOutTime());
         m_kart->instantSpeedIncrease(
             MaxSpeed::MS_INCREASE_SLIPSTREAM, speed_increase,
             speed_increase, add_power, m_speed_increase_duration, fade_out);

@@ -1150,9 +1150,9 @@ void Kart::collectedItem(ItemState *item_state)
             ((World::getWorld()->getTicksSinceStart() / 10) % 2 == 0) ?
             true : false;
         m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
-                                 m_kart_properties->getBubblegumSpeedFraction() ,
-                                 m_kart_properties->getBubblegumFadeInTicks(),
-                                 m_bubblegum_ticks);
+            m_kart_properties->getBubblegumSpeedFraction() ,
+            stk_config->time2Ticks(m_kart_properties->getBubblegumFadeInTime()),
+            m_bubblegum_ticks);
         if (!RewindManager::get()->isRewinding())
             getNextEmitter()->play(getXYZ(), m_goo_sound);
 
