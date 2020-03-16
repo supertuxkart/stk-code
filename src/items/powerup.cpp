@@ -449,7 +449,7 @@ void Powerup::use()
 
                     kart->getAttachment()
                         ->set(Attachment::ATTACH_PARACHUTE,
-                              int(kp->getParachuteDurationOther()*rank_mult) );
+                              stk_config->time2Ticks(kp->getParachuteDurationOther()*rank_mult) );
 
                     if(kart->getController()->isLocalPlayerController())
                         player_kart = kart;

@@ -182,7 +182,8 @@ void addAttachment(Attachment::AttachmentType type)
         else if (type == Attachment::ATTACH_PARACHUTE)
         {
             kart->getAttachment()
-                ->set(type, kart->getKartProperties()->getParachuteDuration() );
+                ->set(type, stk_config->time2Ticks(
+                kart->getKartProperties()->getParachuteDuration()));
         }
         else if (type == Attachment::ATTACH_BOMB)
         {
