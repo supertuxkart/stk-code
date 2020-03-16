@@ -30,11 +30,11 @@ import sys
 characteristics = """Suspension: stiffness, rest, travel, expSpringResponse(bool), maxForce
 Stability: rollInfluence, chassisLinearDamping, chassisAngularDamping, downwardImpulseFactor, trackConnectionAccel, angularFactor(std::vector<float>/floatVector), smoothFlyingImpulse
 Turn: radius(InterpolationArray), timeResetSteer, timeFullSteer(InterpolationArray)
-Engine: power, maxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
+Engine: power, maxSpeed, genericMaxSpeed, brakeFactor, brakeTimeIncrease, maxSpeedReverseRatio
 Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)
 Mass
 Wheels: dampingRelaxation, dampingCompression
-Camera: distance, forwardUpAngle, backwardUpAngle
+Camera: distance, forwardUpAngle, forwardSmoothing(bool), backwardUpAngle
 Jump: animationTime
 Lean: max, speed
 Anvil: duration, weight, speedFactor
@@ -47,7 +47,7 @@ Plunger: bandMaxLength, bandForce, bandDuration, bandSpeedIncrease, bandFadeOutT
 Startup: time(std::vector<float>/floatVector), boost(std::vector<float>/floatVector)
 Rescue: duration, vertOffset, height
 Explosion: duration, radius, invulnerabilityTime
-Nitro: duration, engineForce, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
+Nitro: duration, engineForce, engineMult, consumption, smallContainer, bigContainer, maxSpeedIncrease, fadeOutTime, max
 Slipstream: durationFactor, baseSpeed, length, width, innerFactor, minCollectTime, maxCollectTime, addPower, minSpeed, maxSpeedIncrease, fadeOutTime
 Skid: increase, decrease, max, timeTillMax, visual, visualTime, revertVisualTime, minSpeed, timeTillBonus(std::vector<float>/floatVector), bonusSpeed(std::vector<float>/floatVector), bonusTime(std::vector<float>/floatVector), bonusForce(std::vector<float>/floatVector), physicalJumpTime, graphicalJumpTime, postSkidRotateFactor, reduceTurnMin, reduceTurnMax, enabled(bool)"""
 

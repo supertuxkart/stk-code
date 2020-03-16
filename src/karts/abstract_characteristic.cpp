@@ -331,6 +331,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "ENGINE_POWER";
     case ENGINE_MAX_SPEED:
         return "ENGINE_MAX_SPEED";
+    case ENGINE_GENERIC_MAX_SPEED:
+        return "ENGINE_GENERIC_MAX_SPEED";
     case ENGINE_BRAKE_FACTOR:
         return "ENGINE_BRAKE_FACTOR";
     case ENGINE_BRAKE_TIME_INCREASE:
@@ -351,6 +353,8 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "CAMERA_DISTANCE";
     case CAMERA_FORWARD_UP_ANGLE:
         return "CAMERA_FORWARD_UP_ANGLE";
+    case CAMERA_FORWARD_SMOOTHING:
+        return "CAMERA_FORWARD_SMOOTHING";
     case CAMERA_BACKWARD_UP_ANGLE:
         return "CAMERA_BACKWARD_UP_ANGLE";
     case JUMP_ANIMATION_TIME:
@@ -515,8 +519,6 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "SKID_REDUCE_TURN_MAX";
     case SKID_ENABLED:
         return "SKID_ENABLED";
-    case ENGINE_GENERIC_MAX_SPEED:
-        return "ENGINE_GENERIC_MAX_SPEED";
 
     /* <characteristics-end getName> */
     }   // switch (type)
@@ -875,7 +877,7 @@ bool AbstractCharacteristic::getCameraForwardSmoothing() const
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
                     getName(CAMERA_FORWARD_SMOOTHING).c_str());
     return result;
-}  // getCameraForwardSmoothing (advanced option)
+}  // getCameraForwardSmoothing
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getCameraBackwardUpAngle() const
@@ -974,7 +976,7 @@ float AbstractCharacteristic::getParachuteFriction() const
 }  // getParachuteFriction
 
 // ----------------------------------------------------------------------------
-int AbstractCharacteristic::getParachuteDuration() const
+float AbstractCharacteristic::getParachuteDuration() const
 {
     float result;
     bool is_set = false;
@@ -982,11 +984,11 @@ int AbstractCharacteristic::getParachuteDuration() const
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
                     getName(PARACHUTE_DURATION).c_str());
-    return stk_config->time2Ticks(result);
+    return result;
 }  // getParachuteDuration
 
 // ----------------------------------------------------------------------------
-int AbstractCharacteristic::getParachuteDurationOther() const
+float AbstractCharacteristic::getParachuteDurationOther() const
 {
     float result;
     bool is_set = false;
@@ -994,7 +996,7 @@ int AbstractCharacteristic::getParachuteDurationOther() const
     if (!is_set)
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
                     getName(PARACHUTE_DURATION_OTHER).c_str());
-    return stk_config->time2Ticks(result);
+    return result;
 }  // getParachuteDurationOther
 
 // ----------------------------------------------------------------------------
@@ -1595,7 +1597,7 @@ float AbstractCharacteristic::getSlipstreamMaxCollectTime() const
         Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
                     getName(SLIPSTREAM_MAX_COLLECT_TIME).c_str());
     return result;
-}  // getSlipstreamMaxCollecTime
+}  // getSlipstreamMaxCollectTime
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getSlipstreamAddPower() const
