@@ -1395,7 +1395,7 @@ namespace GUIEngine
         }
         const int texture_w = loading->getSize().Width;
         const int texture_h = loading->getSize().Height;
-        const int stretched_size = getTitleFontHeight() * 1.5f;
+        const int stretched_size = getTitleFontHeight() * 2.5f;
 
         core::dimension2d<u32> frame_size =
             GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -1408,9 +1408,9 @@ namespace GUIEngine
 
         const core::rect< s32 > dest_area =
             core::rect< s32 >(screen_w/2 - stretched_size/2,
-                              screen_h/2 - stretched_size/2,
+                              screen_h/2 - stretched_size/2 - getTitleFontHeight()/2,
                               screen_w/2 + stretched_size/2,
-                              screen_h/2 + stretched_size/2);
+                              screen_h/2 + stretched_size/2 - getTitleFontHeight()/2);
 
         const core::rect< s32 > source_area =
             core::rect< s32 >(0, 0, texture_w, texture_h);
@@ -1423,7 +1423,7 @@ namespace GUIEngine
         // the Material2D
         irr_driver->getVideoDriver()->enableMaterial2D();
         g_title_font->draw(_("Loading"),
-                           core::rect< s32 >( 0, screen_h/2 + stretched_size/2,
+                           core::rect< s32 >( 0, screen_h/2 + stretched_size/2 - getTitleFontHeight()/2,
                                               screen_w, screen_h ),
                            SColor(255,255,255,255),
                            true/* center h */, false /* center v */ );
