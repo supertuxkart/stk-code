@@ -757,11 +757,7 @@ void RaceGUIBase::drawGlobalReadySetGo()
 void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
 #ifndef SERVER_ONLY
-    // For now, don't draw player icons when in soccer mode
     const RaceManager::MinorRaceModeType  minor_mode = RaceManager::get()->getMinorMode();
-    if(minor_mode == RaceManager::MINOR_MODE_SOCCER)
-        return;
-
     int x_base = 10;
     if (irr_driver->getDevice()->getLeftPadding() > 0)
         x_base += irr_driver->getDevice()->getLeftPadding();
@@ -866,7 +862,8 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         if (minor_mode==RaceManager::MINOR_MODE_3_STRIKES ||
             minor_mode==RaceManager::MINOR_MODE_FREE_FOR_ALL ||
             minor_mode==RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
-            minor_mode==RaceManager::MINOR_MODE_EASTER_EGG)
+            minor_mode==RaceManager::MINOR_MODE_EASTER_EGG ||
+            minor_mode==RaceManager::MINOR_MODE_SOCCER)
         {
             x = x_base;
             y = previous_y+ICON_PLAYER_WIDTH+2;
