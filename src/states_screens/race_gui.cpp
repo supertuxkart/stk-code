@@ -585,8 +585,10 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     } \
 }
 
+    // ty = Vec3(0, size, 0).rotate(cam_direction, angle * DEGREE_TO_RAD); \
+
 #define DRAWCENTEREDSEMIARROW(size, color, angle){ \
-    ty = Vec3(0, size, 0).rotate(cam_direction, angle * DEGREE_TO_RAD); \
+    ty = Vec3(0, (((radar_circle_size/2)>size) ? ((radar_circle_size/2)-(size)):0.1), 0).rotate(cam_direction, angle * DEGREE_TO_RAD); \
     r2 = radar_circle_pos + ty; \
     tx = ty.rotate(cam_direction, 140 * DEGREE_TO_RAD); \
     ty = ty.rotate(cam_direction, -140 * DEGREE_TO_RAD); \
@@ -834,11 +836,10 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
          DRAWLINE( tx, ty, ball_line_color2);
 
       }
-      DRAWCIRCLE((TOLOG(25)*radar_circle_size), radar_circle_color_muted, 36); 
-      DRAWCIRCLE((TOLOG(10)*radar_circle_size), radar_circle_color_muted, 36); 
-      DRAWCIRCLE((TOLOG(7)*radar_circle_size), radar_circle_color_muted, 36); 
-      DRAWCIRCLE((TOLOG(5)*radar_circle_size), radar_circle_color_muted, 36); 
-      DRAWCIRCLE((TOLOG(3)*radar_circle_size), radar_circle_color_muted, 36); 
+      /* 
+       * DRAWCIRCLE((TOLOG(25)*radar_circle_size), radar_circle_color_muted, 36); 
+       * DRAWCIRCLE((TOLOG(5)*radar_circle_size), radar_circle_color_muted, 36); 
+       */
       distance = DISTANCELOG(ball_pos, cur_kart_pos);
       if (distance < 0.5) tx = (ball_pos_delta-cur_kart_pos).normalize();
       else tx = (ball_pos - cur_kart_pos).normalize();
@@ -895,12 +896,6 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
         bool is_flag_in_base=true;
         bool is_red_holder=false;
         bool is_blue_holder=false;
-
-        DRAWCIRCLE((TOLOG(25)*radar_circle_size), radar_circle_color_muted, 36); 
-        DRAWCIRCLE((TOLOG(10)*radar_circle_size), radar_circle_color_muted, 36); 
-        DRAWCIRCLE((TOLOG(7)*radar_circle_size), radar_circle_color_muted, 36); 
-        DRAWCIRCLE((TOLOG(5)*radar_circle_size), radar_circle_color_muted, 36); 
-        DRAWCIRCLE((TOLOG(3)*radar_circle_size), radar_circle_color_muted, 36); 
 
         /* if the flag is hold draw an arrow to the base */
         if (cur_team == KART_TEAM_BLUE && (ctf_world->getRedHolder()  != -1)){

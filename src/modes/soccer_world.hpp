@@ -144,7 +144,7 @@ public:
         OVERRIDE;
     virtual bool useFastMusicNearEnd() const OVERRIDE { return false; }
     virtual void getKartsDisplayInfo(
-               std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE {}
+               std::vector<RaceGUIBase::KartIconDisplayInfo> *info) OVERRIDE;
 
     virtual bool raceHasLaps() OVERRIDE { return false; }
 

@@ -190,6 +190,9 @@ protected:
     /** The frame around player karts in the mini map. */
     video::ITexture* m_icons_frame;
 
+    /** The frame around player karts in the kart list. */
+    video::ITexture* m_icons_kart_list;
+
     /** Texture for the lap icon*/
     video::ITexture* m_lap_flag;
     

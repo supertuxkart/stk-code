@@ -355,7 +355,6 @@ void SoccerWorld::reset(bool restart)
     // ie make this kart less likely to affect gaming result
     if (UserConfigParams::m_arena_ai_stats)
         getKart(8)->flyUp();
-
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -404,9 +403,15 @@ void SoccerWorld::update(int ticks)
     WorldWithRank::update(ticks);
     WorldWithRank::updateTrack(ticks);
 
-    if (isGoalPhase())
+    std::vector<int> red_id, blue_id;
+    for (unsigned int i = 0; i < m_karts.size(); i++)
     {
-        for (unsigned int i = 0; i < m_karts.size(); i++)
+        if (getKartTeam(i) == KART_TEAM_RED)
+            red_id.push_back(i);
+        else
+            blue_id.push_back(i);
+
+        if (isGoalPhase())
         {
             auto& kart = m_karts[i];
             if (kart->isEliminated())
@@ -422,18 +427,26 @@ void SoccerWorld::update(int ticks)
             kart->getBody()->proceedToTransform(m_goal_transforms[i]);
             kart->setTrans(m_goal_transforms[i]);
         }
-        if (m_ticks_back_to_own_goal - getTicksSinceStart() == 1 &&
-            !isRaceOver())
-        {
-            // Reset all karts and ball
-            resetKartsToSelfGoals();
-            if (UserConfigParams::m_arena_ai_stats)
-                getKart(8)->flyUp();
-        }
     }
+    if (isGoalPhase() &&
+        m_ticks_back_to_own_goal - getTicksSinceStart() == 1 && !isRaceOver())
+    {
+        // Reset all karts and ball
+        resetKartsToSelfGoals();
+        if (UserConfigParams::m_arena_ai_stats)
+            getKart(8)->flyUp();
+    }
+
     if (UserConfigParams::m_arena_ai_stats)
         m_frame_count++;
-
+    // We only use kart position for spliting team in race gui drawing
+    beginSetKartPositions();
+    int pos = 1;
+    for (int id : red_id)
+        setKartPosition(id, pos++);
+    for (int id : blue_id)
+        setKartPosition(id, pos++);
+    endSetKartPositions();
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -1059,3 +1072,31 @@ Vec3 SoccerWorld::getBallAimPosition(KartTeam team, bool reverse) const
 {
     return m_bgd->getAimPosition(team, reverse);
 }   // getBallAimPosition
+
+// ----------------------------------------------------------------------------
+/** Returns the data to display in the race gui.
+ */
+void SoccerWorld::getKartsDisplayInfo(
+                           std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
+{
+    const unsigned int kart_amount = getNumKarts();
+    for (unsigned int i = 0; i < kart_amount ; i++)
+    {
+        RaceGUIBase::KartIconDisplayInfo& rank_info = (*info)[i];
+        rank_info.lap = -1;
+        rank_info.m_outlined_font = true;
+        rank_info.m_color = getKartTeam(i) == KART_TEAM_RED ?
+            video::SColor(255, 255, 0, 0) : video::SColor(255, 0, 0, 255);
+        rank_info.m_text = getKart(i)->getController()->getName();
+        if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
+        {
+            const core::stringw& flag = StringUtils::getCountryFlag(
+                RaceManager::get()->getKartInfo(i).getCountryCode());
+            if (!flag.empty())
+            {
+                rank_info.m_text += L" ";
+                rank_info.m_text += flag;
+            }
+        }
+    }
+}   // getKartsDisplayInfo
