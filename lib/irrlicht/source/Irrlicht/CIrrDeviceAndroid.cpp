@@ -62,6 +62,8 @@ void CIrrDeviceAndroid::onCreate()
     IsStarted = false;
 }
 
+JNIEnv* CIrrDeviceAndroid::m_jni_env = NULL;
+
 //! constructor
 CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     : CIrrDeviceStub(param),
@@ -81,6 +83,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
     m_screen_height = 0;
     m_moved_height = 0;
     m_moved_height_func = NULL;
+    m_jni_env = NULL;
 
     createKeyMap();
 
@@ -96,6 +99,22 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 
     if (Android != NULL)
     {
+        jint status = Android->activity->vm->GetEnv((void**)&m_jni_env, JNI_VERSION_1_6);
+        if (status == JNI_EDETACHED)
+        {
+            JavaVMAttachArgs args;
+            args.version = JNI_VERSION_1_6;
+            args.name = "NativeThread";
+            args.group = NULL;
+
+            status = Android->activity->vm->AttachCurrentThread(&m_jni_env, &args);
+        }
+        if (status != JNI_OK)
+        {
+            os::Printer::log("Failed to attach jni thread.", ELL_DEBUG);
+            return;
+        }
+
         Android->userData = this;
         Android->onAppCmd = handleAndroidCommand;
         Android->onAppCmdDirect = NULL;
@@ -159,6 +178,7 @@ CIrrDeviceAndroid::~CIrrDeviceAndroid()
         Android->userData = NULL;
         Android->onAppCmd = NULL;
         Android->onInputEvent = NULL;
+        Android->activity->vm->DetachCurrentThread();
     }
 }
 
@@ -1159,28 +1179,6 @@ wchar_t CIrrDeviceAndroid::getKeyChar(SEvent& event)
 
 wchar_t CIrrDeviceAndroid::getUnicodeChar(AInputEvent* event)
 {
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-    
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-    
-        status = Android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot get unicode character.", ELL_DEBUG);
-        return 0;
-    }
-
     jlong down_time = AKeyEvent_getDownTime(event);
     jlong event_time = AKeyEvent_getEventTime(event);
     jint action = AKeyEvent_getAction(event);
@@ -1192,24 +1190,19 @@ wchar_t CIrrDeviceAndroid::getUnicodeChar(AInputEvent* event)
     jint flags = AKeyEvent_getFlags(event);
     jint source = AInputEvent_getSource(event);
 
-    jclass key_event = env->FindClass("android/view/KeyEvent");
-    jmethodID key_event_constructor = env->GetMethodID(key_event, "<init>", 
+    jclass key_event = m_jni_env->FindClass("android/view/KeyEvent");
+    jmethodID key_event_constructor = m_jni_env->GetMethodID(key_event, "<init>",
                                                        "(JJIIIIIIII)V");
                                                        
-    jobject key_event_obj = env->NewObject(key_event, key_event_constructor, 
+    jobject key_event_obj = m_jni_env->NewObject(key_event, key_event_constructor,
                                            down_time, event_time, action, code, 
                                            repeat, meta_state, device_id, 
                                            scan_code, flags, source);
 
-    jmethodID get_unicode = env->GetMethodID(key_event, "getUnicodeChar", "(I)I");
+    jmethodID get_unicode = m_jni_env->GetMethodID(key_event, "getUnicodeChar", "(I)I");
     
-    wchar_t unicode_char = env->CallIntMethod(key_event_obj, get_unicode, 
+    wchar_t unicode_char = m_jni_env->CallIntMethod(key_event_obj, get_unicode,
                                               meta_state);
-
-    if (was_detached)
-    {
-        Android->activity->vm->DetachCurrentThread();
-    }
 
     return unicode_char;
 }
@@ -1219,57 +1212,24 @@ void CIrrDeviceAndroid::openURL(const std::string& url)
     if (!Android)
         return;
 
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-
-        status = Android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot attach current thread in openURL.", ELL_DEBUG);
-        return;
-    }
-
     jobject native_activity = Android->activity->clazz;
-    jclass class_native_activity = env->GetObjectClass(native_activity);
+    jclass class_native_activity = m_jni_env->GetObjectClass(native_activity);
 
     if (class_native_activity == NULL)
     {
         os::Printer::log("openURL unable to find object class.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return;
     }
 
-    jmethodID method_id = env->GetMethodID(class_native_activity, "openURL", "(Ljava/lang/String;)V");
+    jmethodID method_id = m_jni_env->GetMethodID(class_native_activity, "openURL", "(Ljava/lang/String;)V");
 
     if (method_id == NULL)
     {
         os::Printer::log("openURL unable to find method id.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return;
     }
-    jstring url_jstring = env->NewStringUTF(url.c_str());
-    env->CallVoidMethod(native_activity, method_id, url_jstring);
-
-    if (was_detached)
-    {
-        Android->activity->vm->DetachCurrentThread();
-    }
+    jstring url_jstring = m_jni_env->NewStringUTF(url.c_str());
+    m_jni_env->CallVoidMethod(native_activity, method_id, url_jstring);
 }
 
 void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show, s32 type)
@@ -1277,63 +1237,31 @@ void CIrrDeviceAndroid::toggleOnScreenKeyboard(bool show, s32 type)
     if (!Android)
         return;
 
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-
-        status = Android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot attach current thread in showKeyboard.", ELL_DEBUG);
-        return;
-    }
-
     jobject native_activity = Android->activity->clazz;
-    jclass class_native_activity = env->GetObjectClass(native_activity);
+    jclass class_native_activity = m_jni_env->GetObjectClass(native_activity);
 
     if (class_native_activity == NULL)
     {
         os::Printer::log("showKeyboard unable to find object class.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return;
     }
 
     jmethodID method_id = NULL;
     if (show)
-        method_id = env->GetMethodID(class_native_activity, "showKeyboard", "(I)V");
+        method_id = m_jni_env->GetMethodID(class_native_activity, "showKeyboard", "(I)V");
     else
-        method_id = env->GetMethodID(class_native_activity, "hideKeyboard", "(Z)V");
+        method_id = m_jni_env->GetMethodID(class_native_activity, "hideKeyboard", "(Z)V");
 
     if (method_id == NULL)
     {
         os::Printer::log("showKeyboard unable to find method id.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return;
     }
 
     if (show)
-        env->CallVoidMethod(native_activity, method_id, (jint)type);
+        m_jni_env->CallVoidMethod(native_activity, method_id, (jint)type);
     else
-        env->CallVoidMethod(native_activity, method_id, (jboolean)(type != 0));
-    if (was_detached)
-    {
-        Android->activity->vm->DetachCurrentThread();
-    }
+        m_jni_env->CallVoidMethod(native_activity, method_id, (jboolean)(type != 0));
 }
 
 void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end, int type)
@@ -1341,47 +1269,19 @@ void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text,
     if (!Android)
         return;
 
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-
-        status = Android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot attach current thread in fromSTKEditBox.", ELL_DEBUG);
-        return;
-    }
-
     jobject native_activity = Android->activity->clazz;
-    jclass class_native_activity = env->GetObjectClass(native_activity);
+    jclass class_native_activity = m_jni_env->GetObjectClass(native_activity);
 
     if (class_native_activity == NULL)
     {
         os::Printer::log("fromSTKEditBox unable to find object class.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return;
     }
 
-    jmethodID method_id = env->GetMethodID(class_native_activity, "fromSTKEditBox", "(ILjava/lang/String;III)V");
+    jmethodID method_id = m_jni_env->GetMethodID(class_native_activity, "fromSTKEditBox", "(ILjava/lang/String;III)V");
     if (method_id == NULL)
     {
         os::Printer::log("fromSTKEditBox unable to find method id.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return;
     }
 
@@ -1416,157 +1316,104 @@ void CIrrDeviceAndroid::fromSTKEditBox(int widget_id, const core::stringw& text,
     if (selection_end < (int)mappings.size())
         selection_end = mappings[selection_end];
 
-    jstring jstring_text = env->NewString((const jchar*)utf16.data(), utf16.size());
+    jstring jstring_text = m_jni_env->NewString((const jchar*)utf16.data(), utf16.size());
 
-    env->CallVoidMethod(native_activity, method_id, (jint)widget_id, jstring_text, (jint)selection_start, (jint)selection_end, (jint)type);
-    if (was_detached)
-    {
-        Android->activity->vm->DetachCurrentThread();
-    }
+    m_jni_env->CallVoidMethod(native_activity, method_id, (jint)widget_id, jstring_text, (jint)selection_start, (jint)selection_end, (jint)type);
 }
 
 int CIrrDeviceAndroid::getRotation()
 {
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-    
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-    
-        status = Android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot find rotation.", ELL_DEBUG);
-        return 0;
-    }
-
     jobject activity_obj = Android->activity->clazz;
 
-    jclass activity = env->GetObjectClass(activity_obj);
-    jclass context = env->FindClass("android/content/Context");
-    jclass window_manager = env->FindClass("android/view/WindowManager");
-    jclass display = env->FindClass("android/view/Display");
+    jclass activity = m_jni_env->GetObjectClass(activity_obj);
+    jclass context = m_jni_env->FindClass("android/content/Context");
+    jclass window_manager = m_jni_env->FindClass("android/view/WindowManager");
+    jclass display = m_jni_env->FindClass("android/view/Display");
 
-    jmethodID get_system_service = env->GetMethodID(activity, "getSystemService", 
+    jmethodID get_system_service = m_jni_env->GetMethodID(activity, "getSystemService",
                                             "(Ljava/lang/String;)Ljava/lang/Object;");
-    jmethodID get_default_display = env->GetMethodID(window_manager, 
+    jmethodID get_default_display = m_jni_env->GetMethodID(window_manager,
                                                    "getDefaultDisplay", 
                                                    "()Landroid/view/Display;");
-    jmethodID get_rotation = env->GetMethodID(display, "getRotation", "()I");
+    jmethodID get_rotation = m_jni_env->GetMethodID(display, "getRotation", "()I");
 
-    jfieldID window_service = env->GetStaticFieldID(context, "WINDOW_SERVICE", 
+    jfieldID window_service = m_jni_env->GetStaticFieldID(context, "WINDOW_SERVICE",
                                                         "Ljava/lang/String;");
 
-    jobject window_service_obj = env->GetStaticObjectField(context, window_service);
+    jobject window_service_obj = m_jni_env->GetStaticObjectField(context, window_service);
 
-    jobject window_manager_obj = env->CallObjectMethod(activity_obj, get_system_service, 
+    jobject window_manager_obj = m_jni_env->CallObjectMethod(activity_obj, get_system_service,
                                                    window_service_obj);
 
-    jobject display_obj = env->CallObjectMethod(window_manager_obj, get_default_display);
+    jobject display_obj = m_jni_env->CallObjectMethod(window_manager_obj, get_default_display);
     
-    int rotation = env->CallIntMethod(display_obj, get_rotation);
+    int rotation = m_jni_env->CallIntMethod(display_obj, get_rotation);
 
-    if (was_detached)
-    {
-        Android->activity->vm->DetachCurrentThread();
-    }
-    
     return rotation;
 }
 
 void CIrrDeviceAndroid::readApplicationInfo(ANativeActivity* activity)
 {
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-    
-    jint status = activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-    
-        status = activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot get application info.", ELL_DEBUG);
-        return;
-    }
-    
     jobject activity_obj = activity->clazz;
-    jclass activity_class = env->GetObjectClass(activity_obj);
+    jclass activity_class = m_jni_env->GetObjectClass(activity_obj);
 
-    jmethodID get_package_manager = env->GetMethodID(activity_class, 
+    jmethodID get_package_manager = m_jni_env->GetMethodID(activity_class,
                                        "getPackageManager", 
                                        "()Landroid/content/pm/PackageManager;");
-    jobject package_manager_obj = env->CallObjectMethod(activity_obj, 
+    jobject package_manager_obj = m_jni_env->CallObjectMethod(activity_obj,
                                                         get_package_manager);
 
-    jmethodID get_intent = env->GetMethodID(activity_class, "getIntent", 
+    jmethodID get_intent = m_jni_env->GetMethodID(activity_class, "getIntent",
                                             "()Landroid/content/Intent;");
                                             
-    jobject intent_obj = env->CallObjectMethod(activity_obj, get_intent);
-    jclass intent = env->FindClass("android/content/Intent");
+    jobject intent_obj = m_jni_env->CallObjectMethod(activity_obj, get_intent);
+    jclass intent = m_jni_env->FindClass("android/content/Intent");
     
-    jmethodID get_component = env->GetMethodID(intent, "getComponent", 
+    jmethodID get_component = m_jni_env->GetMethodID(intent, "getComponent",
                                            "()Landroid/content/ComponentName;");
 
-    jobject component_name = env->CallObjectMethod(intent_obj, get_component);
+    jobject component_name = m_jni_env->CallObjectMethod(intent_obj, get_component);
 
-    jclass package_manager = env->FindClass("android/content/pm/PackageManager");
+    jclass package_manager = m_jni_env->FindClass("android/content/pm/PackageManager");
 
-    jfieldID get_meta_data_field = env->GetStaticFieldID(package_manager, 
+    jfieldID get_meta_data_field = m_jni_env->GetStaticFieldID(package_manager,
                                                          "GET_META_DATA", "I");
-    jint get_meta_data = env->GetStaticIntField(package_manager, 
+    jint get_meta_data = m_jni_env->GetStaticIntField(package_manager,
                                                 get_meta_data_field);
 
-    jmethodID get_activity_info = env->GetMethodID(package_manager, 
+    jmethodID get_activity_info = m_jni_env->GetMethodID(package_manager,
                                            "getActivityInfo", 
                                            "(Landroid/content/ComponentName;I)"
                                            "Landroid/content/pm/ActivityInfo;");
          
-    jobject activity_info_obj = env->CallObjectMethod(package_manager_obj, 
+    jobject activity_info_obj = m_jni_env->CallObjectMethod(package_manager_obj,
                                                       get_activity_info, 
                                                       component_name, 
                                                       get_meta_data);
-    jclass activity_info = env->FindClass("android/content/pm/ActivityInfo");
+    jclass activity_info = m_jni_env->FindClass("android/content/pm/ActivityInfo");
     
-    jfieldID application_info_field = env->GetFieldID(activity_info, 
+    jfieldID application_info_field = m_jni_env->GetFieldID(activity_info,
                                         "applicationInfo", 
                                         "Landroid/content/pm/ApplicationInfo;");
-    jobject application_info_obj = env->GetObjectField(activity_info_obj, 
+    jobject application_info_obj = m_jni_env->GetObjectField(activity_info_obj,
                                                        application_info_field);
-    jclass application_info = env->FindClass("android/content/pm/ApplicationInfo");
+    jclass application_info = m_jni_env->FindClass("android/content/pm/ApplicationInfo");
     
-    jfieldID native_library_dir_field = env->GetFieldID(application_info, 
+    jfieldID native_library_dir_field = m_jni_env->GetFieldID(application_info,
                                                         "nativeLibraryDir", 
                                                         "Ljava/lang/String;");
-    jstring native_library_dir_str = (jstring)env->GetObjectField(
+    jstring native_library_dir_str = (jstring)m_jni_env->GetObjectField(
                                                       application_info_obj, 
                                                       native_library_dir_field);
-    const char* native_library_dir = env->GetStringUTFChars(
+    const char* native_library_dir = m_jni_env->GetStringUTFChars(
                                                          native_library_dir_str, 
                                                          NULL);
     
-    jfieldID data_dir_field = env->GetFieldID(application_info, "dataDir", 
+    jfieldID data_dir_field = m_jni_env->GetFieldID(application_info, "dataDir",
                                              "Ljava/lang/String;");
-    jstring data_dir_str = (jstring)env->GetObjectField(application_info_obj, 
+    jstring data_dir_str = (jstring)m_jni_env->GetObjectField(application_info_obj,
                                                         data_dir_field);
-    const char* data_dir = env->GetStringUTFChars(data_dir_str, NULL);
+    const char* data_dir = m_jni_env->GetStringUTFChars(data_dir_str, NULL);
 
     if (native_library_dir != NULL)
     {
@@ -1579,11 +1426,6 @@ void CIrrDeviceAndroid::readApplicationInfo(ANativeActivity* activity)
     }
     
     ApplicationInfo.initialized = true;
-    
-    if (was_detached)
-    {
-        activity->vm->DetachCurrentThread();
-    }
 }
 
 const AndroidApplicationInfo& CIrrDeviceAndroid::getApplicationInfo(
@@ -1730,58 +1572,23 @@ bool CIrrDeviceAndroid::hasHardwareKeyboard() const
     if (!Android)
         return false;
 
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-
-    jint status = Android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-
-        status = Android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-    if (status != JNI_OK)
-    {
-        os::Printer::log("Cannot attach current thread in isHardwareKeyboardConnected.", ELL_DEBUG);
-        return false;
-    }
-
     jobject native_activity = Android->activity->clazz;
-    jclass class_native_activity = env->GetObjectClass(native_activity);
+    jclass class_native_activity = m_jni_env->GetObjectClass(native_activity);
 
     if (class_native_activity == NULL)
     {
         os::Printer::log("isHardwareKeyboardConnected unable to find object class.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return false;
     }
 
-    jmethodID method_id = env->GetMethodID(class_native_activity, "isHardwareKeyboardConnected", "()Z");
+    jmethodID method_id = m_jni_env->GetMethodID(class_native_activity, "isHardwareKeyboardConnected", "()Z");
 
     if (method_id == NULL)
     {
         os::Printer::log("isHardwareKeyboardConnected unable to find method id.", ELL_ERROR);
-        if (was_detached)
-        {
-            Android->activity->vm->DetachCurrentThread();
-        }
         return false;
     }
-
-    bool ret = env->CallBooleanMethod(native_activity, method_id);
-    if (was_detached)
-    {
-        Android->activity->vm->DetachCurrentThread();
-    }
-
-    return ret;
+    return m_jni_env->CallBooleanMethod(native_activity, method_id);
 }
 
 } // end namespace irr

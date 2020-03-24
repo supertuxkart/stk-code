@@ -93,6 +93,7 @@ namespace irr
         void openURL(const std::string& url);
         android_app* getAndroid() const { return Android; }
     private:
+        static JNIEnv* m_jni_env;
         s32 m_moved_height;
         u32 m_screen_height;
         HeightFunc m_moved_height_func;
