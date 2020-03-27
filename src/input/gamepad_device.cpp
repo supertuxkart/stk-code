@@ -187,7 +187,8 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
     }
 
     bool success = false;
-    if(m_prev_axis_directions.size() == 0) return false; // device not open
+    if (type == Input::IT_STICKMOTION &&
+        m_prev_axis_directions.size() == 0) return false; // device not open
 
     if (type == Input::IT_STICKMOTION)
     {
