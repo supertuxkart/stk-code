@@ -155,10 +155,7 @@ private:
 
     /** Filename of the wheel models. */
     std::string m_wheel_filename[4];
-    /** An additional Y offset added to the y position of the graphical
-     *  chassis. Useful for karts that don't have enough space for suspension
-     *  compression. */
-    float       m_graphical_y_offset;
+
     /** Wheel base of the kart. */
     float       m_wheel_base;
 
