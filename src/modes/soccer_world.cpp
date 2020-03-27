@@ -442,6 +442,8 @@ void SoccerWorld::update(int ticks)
     // We only use kart position for spliting team in race gui drawing
     beginSetKartPositions();
     int pos = 1;
+    if (!Track::getCurrentTrack()->getMinimapInvert())
+        std::swap(red_id, blue_id);
     for (int id : red_id)
         setKartPosition(id, pos++);
     for (int id : blue_id)
