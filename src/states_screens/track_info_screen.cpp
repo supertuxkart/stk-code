@@ -159,17 +159,12 @@ void TrackInfoScreen::init()
     // ---- Track screenshot
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
 
-    // images are saved squared, but must be stretched to 4:
-
-    // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
-    screenshot->m_properties[PROP_ICON] = "gui/icons/main_help.png";
-
     ITexture* image = STKTexManager::getInstance()
         ->getTexture(m_track->getScreenshotFile(),
         "While loading screenshot for track '%s':", m_track->getFilename());
     if(!image)
     {
-        image = STKTexManager::getInstance()->getTexture("main_help.png",
+        image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon("gui/icons/track_unknown.png"),
             "While loading screenshot for track '%s':", m_track->getFilename());
     }
     if (image != NULL)
