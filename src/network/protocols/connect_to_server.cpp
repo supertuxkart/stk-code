@@ -106,8 +106,15 @@ void ConnectToServer::setup()
     if (NetworkConfig::get()->isLAN())
     {
         m_state = GOT_SERVER_ADDRESS;
-        if (m_server->useIPV6Connection())
-            setIPv6Socket(1);
+        // For graphical client server the IPv6 socket is handled by server
+        // process
+        if (!STKHost::get()->isClientServer())
+        {
+            if (m_server->useIPV6Connection())
+                setIPv6Socket(1);
+            else
+                setIPv6Socket(0);
+        }
     }
     else
         m_state = SET_PUBLIC_ADDRESS;
