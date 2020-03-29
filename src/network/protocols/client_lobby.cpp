@@ -1440,10 +1440,10 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
 
     if (action == PA_LOOK_BACK)
     {
-        if (cam->getMode() == Camera::CM_REVERSE)
-            cam->setMode(cam->getPreviousMode());
-        else
+        if (cam->getMode() == Camera::CM_NORMAL)
             cam->setMode(Camera::CM_REVERSE);
+        else
+            cam->setMode(Camera::CM_NORMAL);
         return;
     }
     if (action == PA_ACCEL)
