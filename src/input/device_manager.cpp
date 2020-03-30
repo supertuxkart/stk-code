@@ -494,10 +494,13 @@ bool DeviceManager::translateInput( Input::InputType type,
             // that should be mapped to select
             if(!device && m_map_fire_to_select)
             {
+                PlayerAction fire_action = PA_BEFORE_FIRST;
                 device = mapKeyboardInput(button_id, InputManager::INGAME, player,
-                                          action);
-                if(device && *action == PA_FIRE)
+                                          &fire_action);
+                if (device && fire_action == PA_FIRE)
                     *action = PA_MENU_SELECT;
+                else
+                    device = NULL;
             }
             break;
         case Input::IT_STICKBUTTON:
@@ -506,10 +509,13 @@ bool DeviceManager::translateInput( Input::InputType type,
                                      mode, player, action);
             if(!device && m_map_fire_to_select)
             {
+                PlayerAction fire_action = PA_BEFORE_FIRST;
                 device = mapGamepadInput(type, device_id, button_id, axis_dir, value,
-                                         InputManager::INGAME, player, action);
-                if(device && *action == PA_FIRE)
+                                         InputManager::INGAME, player, &fire_action);
+                if (device && fire_action == PA_FIRE)
                     *action = PA_MENU_SELECT;
+                else
+                    device = NULL;
             }
             break;
         default:
