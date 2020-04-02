@@ -32,7 +32,7 @@
                 <spacer height="2%" width="10"/>                
 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="8%" height="100%" icon="gui/icons/anchor_icon.png" alt_icon="models/anchor-icon.png"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/anchor-icon.png"/>
                     <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
@@ -40,7 +40,7 @@
                 </div>
                 
                 <div width="100%" proportion="2" layout="horizontal-row">
-                    <icon align="center" width="8%" height="100%" icon="gui/icons/parachute_icon.png" alt_icon="models/parachute-icon.png"/>
+                    <icon align="center" width="8%" height="100%" icon="gui/icons/parachute-icon.png"/>
                     <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
