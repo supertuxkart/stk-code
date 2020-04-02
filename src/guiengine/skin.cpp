@@ -2416,14 +2416,14 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & ZIPPER_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(FileManager::MODEL,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "zipper_collect.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
     if (widget->m_badges & ANCHOR_BADGE)
     {
         float max_icon_size = 0.43f;
-        video::ITexture* texture = irr_driver->getTexture(FileManager::MODEL,
+        video::ITexture* texture = irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "anchor-icon.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }

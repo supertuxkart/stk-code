@@ -23,6 +23,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
 
 AttachmentManager *attachment_manager = 0;
@@ -93,7 +94,8 @@ void AttachmentManager::loadModels()
         if(iat[i].icon_file)
         {
             std::string full_icon_path     =
-                file_manager->getAsset(FileManager::MODEL, iat[i].icon_file);
+                GUIEngine::getSkin()->getThemedIcon(std::string("gui/icons/")
+                                                    + iat[i].icon_file);
             m_all_icons[iat[i].attachment] =
                 material_manager->getMaterial(full_icon_path,
                                               /* full_path */     true,
