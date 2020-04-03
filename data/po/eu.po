@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 11:52+0800\n"
-"PO-Revision-Date: 2020-03-07 03:58+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-03-15 15:56+0800\n"
+"PO-Revision-Date: 2020-03-29 12:55+0000\n"
+"Last-Translator: Osoitz <oelkoro@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/supertuxkart/supertuxkart/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -2062,6 +2062,7 @@ msgstr "Desinstalatu jolasaren baliabide guztiak"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
+#: src/states_screens/options/options_screen_input.cpp:217
 msgid "Press enter or double-click on a device to configure it"
 msgstr "Sakatu enter edo klik bikoitza gailu gainean konfiguratzeko"
 
@@ -2244,7 +2245,7 @@ msgstr "Kart kolorea"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
-msgstr ""
+msgstr "Interfazearen azala interfazearen aukeretan aldatu daiteke."
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
@@ -2256,7 +2257,7 @@ msgstr "Letraren tamaina interfazearen aukeretan aldatu daiteke."
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has lots of useful information."
-msgstr ""
+msgstr "Laguntza menuak informazio erabilgarri mordoa du"
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
@@ -3471,7 +3472,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Zure driver grafikoa oso zaharra dela ematen du. Egiaztatu eguneraketarik eskuragarri duzun. SuperTuxKart jolasak %s edo berriagoa onartzen duen driver bat aholkatzen du. Jolasa agian ibiliko da, baina grafiko makalagoekin."
 
-#: src/main_loop.cpp:433 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:435 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Denboraz kanpo zerbitzari konexioa"
 
@@ -3573,7 +3574,7 @@ msgid "Bad network connection is detected."
 msgstr "Sare konexio txarra antzeman da."
 
 #: src/network/protocols/client_lobby.cpp:419
-#: src/network/protocols/server_lobby.cpp:3544
+#: src/network/protocols/server_lobby.cpp:3574
 msgid "Bot"
 msgstr "Bot-a"
 
@@ -3700,7 +3701,7 @@ msgstr "Jokalari bat besterik ez da geratzen, itxaron gelara itzultzen."
 
 #: src/network/protocols/client_lobby.cpp:1193
 msgid "Server owner quit the game"
-msgstr ""
+msgstr "Zerbitzariaren jabea partidatik atera da"
 
 #. I18N: Show when player join red team of the started game in
 #. network
@@ -3724,30 +3725,30 @@ msgstr "%s partidara elkartu da."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1519
+#: src/network/protocols/client_lobby.cpp:1528
 #, c-format
 msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
-msgstr "Sakatu <%s> edo <%s> jokalari xedea aldatzeko edo <%s> kameraren posiziorako."
+"Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
+"camera position."
+msgstr ""
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1535
+#: src/network/protocols/client_lobby.cpp:1544
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%s salatuta."
 
-#: src/network/protocols/connect_to_server.cpp:71
+#: src/network/protocols/connect_to_server.cpp:77
 msgid "No quick play server available."
 msgstr "Ez dago joko azkar zerbitzaririk erabilgarri."
 
-#: src/network/protocols/connect_to_server.cpp:363
+#: src/network/protocols/connect_to_server.cpp:370
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Ezin konektatu %s zerbitzarira."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:652
+#: src/network/protocols/connect_to_server.cpp:780
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Ezin izan da%s zerbitzariaren ataka zenbakia antzeman."
@@ -5320,14 +5321,14 @@ msgstr "Elementuaren ausazko kokapena"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:451
+#: src/states_screens/track_info_screen.cpp:450
 msgid "Number of goals to win"
 msgstr "Gol kopurua irabazteko"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:446
+#: src/states_screens/track_info_screen.cpp:445
 msgid "Maximum time (min.)"
 msgstr "Gehienezko denbora (min.)"
 
@@ -5495,18 +5496,23 @@ msgstr "Instalatu jolasaren baliabide guztiak"
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Ziur jolasaren baliabide guztiak desinstalatu nahi dituzula?"
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:107
 msgid "Gamepad"
 msgstr "Agintea"
 
-#: src/states_screens/options/options_screen_input.cpp:121
+#: src/states_screens/options/options_screen_input.cpp:124
 #, c-format
 msgid "Keyboard %i"
 msgstr "Teklatua %i"
 
-#: src/states_screens/options/options_screen_input.cpp:172
+#: src/states_screens/options/options_screen_input.cpp:175
 msgid "Touch Device"
 msgstr "Ukimen-gailua"
+
+#. I18N: In the input configuration screen, help for touch device
+#: src/states_screens/options/options_screen_input.cpp:212
+msgid "Tap on a device to configure it"
+msgstr "Sakatu gailu batean hau konfiguratzeko"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5914,7 +5920,7 @@ msgid "Number of red team AI karts"
 msgstr "Talde gorriaren AA kart kopurua"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:531
+#: src/states_screens/track_info_screen.cpp:530
 msgid "(Empty)"
 msgstr "(Hutsik)"
 

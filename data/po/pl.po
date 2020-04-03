@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 11:52+0800\n"
-"PO-Revision-Date: 2020-03-07 03:58+0000\n"
+"POT-Creation-Date: 2020-03-15 15:56+0800\n"
+"PO-Revision-Date: 2020-03-15 07:58+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Polish (http://www.transifex.com/supertuxkart/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -2058,6 +2058,7 @@ msgstr "Odinstaluj pełne zasoby gry"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
+#: src/states_screens/options/options_screen_input.cpp:217
 msgid "Press enter or double-click on a device to configure it"
 msgstr "Naciśnij enter lub kliknij dwukrotnie na urządzeniu, aby je skonfigurować"
 
@@ -3469,7 +3470,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Sterownik karty graficznej wygląda na bardzo stary. Sprawdź czy jest dostępna aktualizacja. SuperTuxKart działa najlepiej ze sterownikiem wspierającym co najmniej %s. Gra powinna wciąż działać, ale w trybie z ograniczoną grafiką."
 
-#: src/main_loop.cpp:433 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:435 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Upłynął limit czasu połączenia z serwerem."
 
@@ -3573,7 +3574,7 @@ msgid "Bad network connection is detected."
 msgstr "Wykryto złe połączenie."
 
 #: src/network/protocols/client_lobby.cpp:419
-#: src/network/protocols/server_lobby.cpp:3544
+#: src/network/protocols/server_lobby.cpp:3574
 msgid "Bot"
 msgstr "Bot"
 
@@ -3724,30 +3725,30 @@ msgstr "%s dołączył do gry."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1519
+#: src/network/protocols/client_lobby.cpp:1528
 #, c-format
 msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
-msgstr "Naciśnij <%s> lub <%s> aby zmienić obserwowanego gracza, lub <%s> aby zmienić kamerę."
+"Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
+"camera position."
+msgstr ""
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1535
+#: src/network/protocols/client_lobby.cpp:1544
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Pomyślnie zgłoszono %s."
 
-#: src/network/protocols/connect_to_server.cpp:71
+#: src/network/protocols/connect_to_server.cpp:77
 msgid "No quick play server available."
 msgstr "Nie ma dostępnych serwerów szybkiej gry."
 
-#: src/network/protocols/connect_to_server.cpp:363
+#: src/network/protocols/connect_to_server.cpp:370
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nie można się połączyć z serwerem %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:652
+#: src/network/protocols/connect_to_server.cpp:780
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr ""
@@ -5332,14 +5333,14 @@ msgstr "Losowe rozmieszczenie przedmiotów"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:451
+#: src/states_screens/track_info_screen.cpp:450
 msgid "Number of goals to win"
 msgstr "Liczba bramek, aby wygrać"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:446
+#: src/states_screens/track_info_screen.cpp:445
 msgid "Maximum time (min.)"
 msgstr "Maksymalny czas (min.)"
 
@@ -5507,18 +5508,23 @@ msgstr "Zainstaluj pełne zasoby gry"
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Na pewno chcesz odinstalować pełne zasoby gry?"
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:107
 msgid "Gamepad"
 msgstr "Gamepad"
 
-#: src/states_screens/options/options_screen_input.cpp:121
+#: src/states_screens/options/options_screen_input.cpp:124
 #, c-format
 msgid "Keyboard %i"
 msgstr "Klawiatura %i"
 
-#: src/states_screens/options/options_screen_input.cpp:172
+#: src/states_screens/options/options_screen_input.cpp:175
 msgid "Touch Device"
 msgstr "Urządzenie dotykowe"
+
+#. I18N: In the input configuration screen, help for touch device
+#: src/states_screens/options/options_screen_input.cpp:212
+msgid "Tap on a device to configure it"
+msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5926,7 +5932,7 @@ msgid "Number of red team AI karts"
 msgstr "Komputery w czerwonej drużynie"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:531
+#: src/states_screens/track_info_screen.cpp:530
 msgid "(Empty)"
 msgstr "(Pusty)"
 

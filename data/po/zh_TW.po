@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 11:52+0800\n"
-"PO-Revision-Date: 2020-03-08 03:36+0000\n"
+"POT-Creation-Date: 2020-03-15 15:56+0800\n"
+"PO-Revision-Date: 2020-03-16 02:36+0000\n"
 "Last-Translator: 黃柏諺 <s8321414@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/supertuxkart/supertuxkart/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
@@ -2063,6 +2063,7 @@ msgstr "解除安裝完整遊戲資源"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
+#: src/states_screens/options/options_screen_input.cpp:217
 msgid "Press enter or double-click on a device to configure it"
 msgstr "按 Enter 或對裝置雙擊以設定該裝置"
 
@@ -3471,7 +3472,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "您的顯示卡驅動程式似乎很老舊了。請檢查是否有更新。SuperTuxKart 建議支援 %s 或更新的驅動程式。遊戲仍然可以執行，但會使用較低畫質的模式。"
 
-#: src/main_loop.cpp:433 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:435 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "伺服器連線逾時。"
 
@@ -3572,7 +3573,7 @@ msgid "Bad network connection is detected."
 msgstr "偵測到不穩定的網路連線。"
 
 #: src/network/protocols/client_lobby.cpp:419
-#: src/network/protocols/server_lobby.cpp:3544
+#: src/network/protocols/server_lobby.cpp:3574
 msgid "Bot"
 msgstr "機器人"
 
@@ -3723,30 +3724,30 @@ msgstr "%s 已加入遊戲。"
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1519
+#: src/network/protocols/client_lobby.cpp:1528
 #, c-format
 msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
-msgstr "按 <%s> 或 <%s> 以變更目標玩家或 <%s> 以變更攝影機位置。"
+"Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
+"camera position."
+msgstr "按下 <%s> 或 <%s> 以變更目標玩家，<%s> 或 <%s> 變更攝影機位置。"
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1535
+#: src/network/protocols/client_lobby.cpp:1544
 #, c-format
 msgid "Successfully reported %s."
 msgstr "已成功回報 %s。"
 
-#: src/network/protocols/connect_to_server.cpp:71
+#: src/network/protocols/connect_to_server.cpp:77
 msgid "No quick play server available."
 msgstr "無可用的快速遊玩伺服器。"
 
-#: src/network/protocols/connect_to_server.cpp:363
+#: src/network/protocols/connect_to_server.cpp:370
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "無法連線到伺服器 %s。"
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:652
+#: src/network/protocols/connect_to_server.cpp:780
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "偵測伺服器 %s 的連接埠號失敗。"
@@ -5313,14 +5314,14 @@ msgstr "隨機物品位置"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:451
+#: src/states_screens/track_info_screen.cpp:450
 msgid "Number of goals to win"
 msgstr "獲勝的得分數量"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:446
+#: src/states_screens/track_info_screen.cpp:445
 msgid "Maximum time (min.)"
 msgstr "最大時間（分鐘）"
 
@@ -5488,18 +5489,23 @@ msgstr "安裝完整遊戲資源"
 msgid "Are you sure to uninstall full game assets?"
 msgstr "您確定要解除安裝完整遊戲資源嗎？"
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:107
 msgid "Gamepad"
 msgstr "Gamepad"
 
-#: src/states_screens/options/options_screen_input.cpp:121
+#: src/states_screens/options/options_screen_input.cpp:124
 #, c-format
 msgid "Keyboard %i"
 msgstr "鍵盤 %i"
 
-#: src/states_screens/options/options_screen_input.cpp:172
+#: src/states_screens/options/options_screen_input.cpp:175
 msgid "Touch Device"
 msgstr "觸控裝置"
+
+#. I18N: In the input configuration screen, help for touch device
+#: src/states_screens/options/options_screen_input.cpp:212
+msgid "Tap on a device to configure it"
+msgstr "點擊裝置以設定"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5907,7 +5913,7 @@ msgid "Number of red team AI karts"
 msgstr "紅隊的電腦玩家數量"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:531
+#: src/states_screens/track_info_screen.cpp:530
 msgid "(Empty)"
 msgstr "（無）"
 

@@ -6,13 +6,14 @@
 # Jaakoppi Horila <supermariojaska5@gmail.com>, 2018-2019
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2015-2020
 # Kristian Laakkonen, 2018-2019
+# Oi Suomi On! <oisuomion@protonmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 11:52+0800\n"
-"PO-Revision-Date: 2020-03-07 13:31+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
+"POT-Creation-Date: 2020-03-15 15:56+0800\n"
+"PO-Revision-Date: 2020-03-16 10:16+0000\n"
+"Last-Translator: Oi Suomi On! <oisuomion@protonmail.com>\n"
 "Language-Team: Finnish (http://www.transifex.com/supertuxkart/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1505,7 +1506,7 @@ msgstr "Enimmäisnopeus - mitä korkeampi, sitä kovempaa auto kulkee. Erityisen
 msgid ""
 "Nitro efficiency - The higher it is, the more speed you get from a can of "
 "nitro. A lighter kart will have higher nitro efficiency."
-msgstr ""
+msgstr "Nitron tehokkuus - mitä korkeampi se on, sitä enemmän vauhtia saat nitropurkista. Nitrotehokkuus on kevyemmällä ajokilla korkeampi.  "
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1563,7 +1564,7 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr ""
+msgstr "Kun syöttölaitteiden asetukset on tehty, valitse kuvake 'moninpeli jaetulla ruudulla' päävalikosta. Jokainen pelaaja painaa peliohjaimensa tai näppäimistönsä ampumisnäppäintä liittyäkseen peliin, ja käyttäen ohjausnäppäimiä valitakseen ajokkinsa. Peli jatkuu kun jokainen on valinnut ajokkinsa. On huomioitavaa että hiirtä ei voida käyttää tähän tarkoitukseen."
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -2056,6 +2057,7 @@ msgstr "Poista koko pelin resurssit"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
+#: src/states_screens/options/options_screen_input.cpp:217
 msgid "Press enter or double-click on a device to configure it"
 msgstr "Kaksoisnapsauta laitetta tai paina enter sen kohdalla säätääksesi asetuksia"
 
@@ -2242,7 +2244,7 @@ msgstr "Käyttöliittymän teemaa on mahdollista vaihtaa käyttöliittymän aset
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
-msgstr ""
+msgstr "Näet muiden ajokkien lisävoimistukset kytkemällä tuon ominaisuuden käyttöliittymäasetuksissa päälle."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
@@ -2287,11 +2289,11 @@ msgstr "Kärpäslätkällä voi poistaa pommeja ja laskuvarjoja."
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "Et voi pysäyttää kääntöä sivuliirron aikana. Ajokin hyvä suuntima liirron alkaessa on ratkaisevaa."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "Saat lähdölle lisäpotkun jos aloitat kaasuttamisen \"valmiit\" aikana."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
@@ -2313,17 +2315,17 @@ msgstr "Ole varovainen muiden autojen läheisyydessä, ne saattavat hyökätä k
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake, or plunger."
-msgstr ""
+msgstr "Koripalloja voidaan tuhota käytettäessä tarkkaa taaksepäinlaukausta keilapallolla, kakulla tai imukupilla."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other the backs of other karts, as it will slow "
 "you down."
-msgstr ""
+msgstr "Koeta välttää törmäämästä muiden ajokkien perään, se hidastaa sinua."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
-msgstr ""
+msgstr "Voit käyttää keilapalloja työntääksesi ja estääksesi pallon."
 
 #. I18N: ./data/tips.xml
 msgid "In soccer, always work as a team for good results."
@@ -2333,15 +2335,15 @@ msgstr "Jalkapallossa työskentele aina joukkueena parhaan tuloksen takaamiseksi
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr ""
+msgstr "Mikäli et osu palloon ja kanssakilpailija lähestyy, koeta iskeä lisävoimistuksen avulla tai liiku tukoksi heidän reitilleen."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
-msgstr ""
+msgstr "Hyvä asemanvaihdanta (niin hyökätessä kuin puolustaessakin) on ratkaisevaa."
 
 #. I18N: ./data/tips.xml
 msgid "Make sure to store at least 2 big cans worth of nitro."
-msgstr ""
+msgstr "Varmista että varastoit vähintään 2 isoa nitropurkkia."
 
 #. I18N: ./data/tips.xml
 msgid "Never use the three bowling balls all at the same time."
@@ -2655,7 +2657,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "Speedrun-pikapeluutila on kytketty pois. Se voidaan kytkeä päälle vain jos peliä ei ole suljettu tarinatilan käynnistämisen jälkeen."
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
@@ -3465,7 +3467,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Näytönohjaimesi ajuri vaikuttaa olevan erittäin vanha. Tarkista onko sille saatavilla päivitystä. SuperTuxKart suosittelee ajuria, joka tarjoaa %s-tuen tai uudemmalle. Kaikesta huolimatta peli luultavasti toimii, mutta matalassa grafiikkatilassa."
 
-#: src/main_loop.cpp:433 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:435 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Palvelinyhteys aikakatkaistiin."
 
@@ -3567,7 +3569,7 @@ msgid "Bad network connection is detected."
 msgstr "Verkkoyhteydessä havaittiin ongelmia."
 
 #: src/network/protocols/client_lobby.cpp:419
-#: src/network/protocols/server_lobby.cpp:3544
+#: src/network/protocols/server_lobby.cpp:3574
 msgid "Bot"
 msgstr "Botti"
 
@@ -3718,30 +3720,30 @@ msgstr "%s liittyi peliin."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1519
+#: src/network/protocols/client_lobby.cpp:1528
 #, c-format
 msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
-msgstr "Paina <%s> tai <%s> vaihtaaksesi kohdistettua pelaajaa ja <%s> vaihtaaksesi kameran sijaintia."
+"Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
+"camera position."
+msgstr "Paina <%s> tai <%s> vaihtaaksesi kohdepelaajaa, <%s> tai <%s> valitaksesi kamera-asennon."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1535
+#: src/network/protocols/client_lobby.cpp:1544
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Pelaajasta %s ilmoitettiin onnistuneesti."
 
-#: src/network/protocols/connect_to_server.cpp:71
+#: src/network/protocols/connect_to_server.cpp:77
 msgid "No quick play server available."
 msgstr "Ei pikapelipalvelinta saatavilla."
 
-#: src/network/protocols/connect_to_server.cpp:363
+#: src/network/protocols/connect_to_server.cpp:370
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Ei voida yhdistää palvelimeen %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:652
+#: src/network/protocols/connect_to_server.cpp:780
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Palvelimen %s porttinumeron havaitseminen epäonnistui."
@@ -5194,7 +5196,7 @@ msgstr "Verkossa ei voi pelata ilman internetyhteyttä. Jos haluat ladata lisäo
 
 #: src/states_screens/online/online_screen.cpp:238
 msgid "Enter the server address optionally followed by : and then port."
-msgstr ""
+msgstr "Syötä vaihtoehtoisesti palvelimen osoite seuraten merkillä : ja portti sen jälkeen."
 
 #: src/states_screens/online/online_screen.cpp:250
 #, c-format
@@ -5314,14 +5316,14 @@ msgstr "Satunnainen esineiden sijainti"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:451
+#: src/states_screens/track_info_screen.cpp:450
 msgid "Number of goals to win"
 msgstr "Voittoon tarvittavien maalien määrä"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:446
+#: src/states_screens/track_info_screen.cpp:445
 msgid "Maximum time (min.)"
 msgstr "Enimmäisaika (min)"
 
@@ -5469,7 +5471,7 @@ msgstr "Haluatko varmasti poistaa nämä asetukset?"
 
 #: src/states_screens/options/options_screen_device.cpp:645
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr ""
+msgstr "Syötä asetuksille uusi nimi, jätä tyhjäksi palataksesi vakioarvoihin."
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -5489,18 +5491,23 @@ msgstr "Asenna koko pelin resurssit"
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Haluatko varmasti poistaa koko pelin resurssit?"
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:107
 msgid "Gamepad"
 msgstr "Peliohjain"
 
-#: src/states_screens/options/options_screen_input.cpp:121
+#: src/states_screens/options/options_screen_input.cpp:124
 #, c-format
 msgid "Keyboard %i"
 msgstr "Näppäimistö %i"
 
-#: src/states_screens/options/options_screen_input.cpp:172
+#: src/states_screens/options/options_screen_input.cpp:175
 msgid "Touch Device"
 msgstr "Kosketuslaite"
+
+#. I18N: In the input configuration screen, help for touch device
+#: src/states_screens/options/options_screen_input.cpp:212
+msgid "Tap on a device to configure it"
+msgstr "Napauta laitetta säätääksesi sen asetuksia"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5559,7 +5566,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "Speedrun-pikapeluutila voidaan kytkeä päälle vain jos peliä ei ole suljettu tarinatilan käynnistämisen jälkeen.\n\nPelin sulkeminen ennen tarinatilan loppuun saattamista mitätöi ajastimen.\n\nKäyttääksesi speedrun-pikapeluutilaa, ota käyttöön uusi profiili."
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:217
@@ -5908,7 +5915,7 @@ msgid "Number of red team AI karts"
 msgstr "Punaisen joukkueen tietokoneen ohjaamien autojen määrä"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:531
+#: src/states_screens/track_info_screen.cpp:530
 msgid "(Empty)"
 msgstr "(Tyhjä)"
 
@@ -5959,19 +5966,19 @@ msgstr "Kiihdytä painamalla <%s>, ohjaa näppäimillä <%s> ja <%s>."
 msgid ""
 "Accelerate by touching the upper part of the wheel, and steer by moving left"
 " or right."
-msgstr ""
+msgstr "Kosketa ratin yläosaa kaasuttaaksesi, ja ohjaa liikuttaen vasemmalle tai oikealle."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:22
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "Liikuta kaasutinta ylöspäin kaasuttaaksesi, ja ohjaa kallistelemalla laitettasi."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:27
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr ""
+msgstr "Liikuta kaasutinta ylöspäin kaasuttaaksesi, ja ohjaa kiertämällä laitettasi."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
@@ -5983,7 +5990,7 @@ msgstr "Kerää lahjapaketteja. Näppäimellä <%s> voit ampua paketteja pois."
 msgid ""
 "Collect gift boxes, and fire by pressing the bowling icon to blow away these"
 " boxes!"
-msgstr ""
+msgstr "Kerää lahjalaatikoita, ja paina keilauskuvaketta ampuaksesi nuo laatikot taivaan tuuliin!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:78
 #, c-format
@@ -5996,7 +6003,7 @@ msgstr "Paina <%s> katsoaksesi taakse.\nAmmu painamalla <%s>, ammu taaksepäin p
 msgid ""
 "Press the mirror icon to look behind.\n"
 "Fire the weapon behind by holding the mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Paina peilikuvaketta katsoaksesi taakse.\nAmmu aseella taaksepäin painaen peilikuvaketta pitkään ja sitten sipaisemalla keilauskuvaketta! "
 
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #, c-format
@@ -6025,13 +6032,13 @@ msgstr "Hups! Kun olet pulassa, paina linnun kuvaketta tullaksesi pelastetuksi."
 msgid ""
 "Accelerate and press the <%s> key while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Kaasuta ja paina <%s> näppäintä samalla kun käännyt liirtämään.\nLyhytaikainen liirto auttaa sinua kääntymään nopeammin tehdäksesi tiukkoja käännöksiä. "
 
 #: ../stk-assets/tracks/tutorial/scripting.as:145
 msgid ""
 "Accelerate and press the skid icon while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Kaasuta ja paina liirtokuvaketta liirtoon kääntyessäsi.\nLyhytaikainen liirto auttaa sinua kääntymään nopeammin tehdäksesi tiukkoja käännöksiä."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:156
 msgid ""

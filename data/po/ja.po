@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 11:52+0800\n"
-"PO-Revision-Date: 2020-03-13 13:27+0000\n"
+"POT-Creation-Date: 2020-03-15 15:56+0800\n"
+"PO-Revision-Date: 2020-03-31 18:57+0000\n"
 "Last-Translator: Ubuntu Jackson <robert.pettersson.asa@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -802,12 +802,12 @@ msgstr "ハンディキャップ"
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Press the 'All players ready' button after the player list is ready."
-msgstr "プレイヤーリストの準備ができたら、「プレイヤーの準備がいい」というボタンを押してください"
+msgstr "全てのプレイヤーが揃ったら、「準備完了」ボタンを押してください。"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "All players ready"
-msgstr "プレイヤーの準備がいい"
+msgstr "準備完了"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -827,7 +827,7 @@ msgstr "フレンドを追加"
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 msgid "Decline"
-msgstr "断る"
+msgstr "拒否"
 
 #. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
 #. I18N: In the vote dialog
@@ -857,7 +857,7 @@ msgstr "メニューにもどる"
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
 msgid "Press fully and release..."
-msgstr "しっかり押さえて、放して..."
+msgstr "しっかり押しこんでから放してください。"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -867,7 +867,7 @@ msgstr "Escキーに割り当てる"
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
 msgid "Assign nothing"
-msgstr "何も割り当てていない状態に戻す"
+msgstr "何も割り当てていないままにする"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -878,7 +878,7 @@ msgstr "Escキーでキャンセル"
 #. I18N: Race paused button
 #: src/states_screens/race_result_gui.cpp:276
 msgid "Setup New Race"
-msgstr "新しいレース選択"
+msgstr "新しいレースを設定"
 
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/race_setup.stkgui
@@ -903,7 +903,7 @@ msgstr "続ける"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 msgid "SuperTuxKart Addons"
-msgstr "アドオン"
+msgstr "SuperTuxKart アドオン"
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
@@ -915,7 +915,7 @@ msgstr "アップデート済み"
 #. I18N: In addons screen, in the filtering bar, to enable a filter that will
 #. show only items with good rating
 msgid "Rating >="
-msgstr "評点 >="
+msgstr "評価 >="
 
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In the addons screen
@@ -1074,12 +1074,12 @@ msgstr "リプレイと比較する"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr "同じ難易度のリプレイのみ表示"
+msgstr "現在の難易度のリプレイのみ表示"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current version"
-msgstr "同じバーションのリプレイのみ表示"
+msgstr "現在のバーションのリプレイのみ表示"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1115,7 +1115,7 @@ msgstr "保存したグランプリを続ける"
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Title in grand prix editor screen
 msgid "Grand Prix editor"
-msgstr "グランプリエ編集"
+msgstr "グランプリエディター"
 
 #. I18N: ./data/gui/screens/grand_prix_editor.stkgui
 #. I18N: Menu item
@@ -1262,7 +1262,7 @@ msgstr "チュートリアルを開始"
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid "Collect blue gift boxes, they will give you powerups."
-msgstr "青い箱を集めよう、中に武器や色んなパワーアップが入ってますよ。"
+msgstr "青い箱を集めよう、中に武器や色んなパワーアップは入ってますよ。"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1276,7 +1276,7 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr "ニトロを集めて適切なボタンを押すとスピードブーストができます。\n画面の右下にある計器で現在のニトロレベル見ることができます。"
+msgstr "ニトロを集めてニトロボタンを押すとスピードアップします。\n画面の右下にあるメーターで現在のニトロの量を見ることができます。\nニトロボタンは操作設定で表示されるものにならってます。"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1292,14 +1292,14 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr "特別なボタンを押すとドリフトができます。連続で小さなジャンプみたいなドリフトを使って小回りできます。黄色くきらきらするまでドリフトボタンを押すと加速します、赤くまではなおさらです。ドリフトする間曲がるのを辞められないのでしっかり方向を決めておきましょう。"
+msgstr "ドリフトボタンを押すとドリフトが出来ます。小刻みにドリフトをすることで小回りもできます。ドリフトを続けて黄色い火花が出る時に放すと、スピードアップします。赤い火花が出るまでするとさらに強くスピードアップします。ドリフト中に常に曲がっている状態なので方向をうまく決めてからドリフトしましょう。"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "You can get a startup boost by pressing the accelerate button at 'Set!', "
 "before the race's start."
-msgstr "レースが始まる直前「よーい」の時に加速ボタンを長押しするとスタートアップブーストができます。"
+msgstr "レースが始まる直前「よーい」の時に加速ボタンを長押しするとスタートアップブーストをします。"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: in the help screen
@@ -1314,7 +1314,7 @@ msgstr "スーパータックスカートは複数のゲームモードを提供
 #. I18N: In the help menu
 msgid ""
 "Regular Race: All blows allowed, so collect powerups and use them smartly!"
-msgstr "普段レース：パワーアップは全部許可されるのでうまく使おう！"
+msgstr "普段レース：パワーアップは全部許可されてるのでうまく使いましょう！"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1327,7 +1327,7 @@ msgid ""
 "Follow the leader: Run for second place, as the last kart will be "
 "disqualified every time the counter hits zero. Beware: going in front of the"
 " leader will get you eliminated too!"
-msgstr "リーダーに続け：カウントダウンが0になるごとに最下位のカートは失格になるので、2位を保つようにしよう。ただ、リーダーの前に進む場合も失格になるのでご注意ください。"
+msgstr "リーダーに続け：カウントダウンが0になるごとに最下位のカートは失格になるので、2位を保つようにしましょう。リーダーまで通り過ぎるのも失格と見なされるのでご注意ください。"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1337,7 +1337,7 @@ msgid ""
 "player who hits others the most will win in a given hit or time limit. In "
 "Capture The Flag, your team needs to bring the flag of the other team to "
 "your own flag base, as long as your flag is not captured by the other team."
-msgstr "バトルモードは3種類ある：3ストライクバトルでは、相手のライフを全部失わせるまでアイテムで攻撃しよう。フリーフォーオールでは、時間が切れるまで相手を最も攻撃できるプレイヤーが勝つ。「旗を取れ」では自分チームの旗が相手チームに取られていない限り、相手のチームの旗を自分チームの基地に持っていくのが目的です。"
+msgstr "バトルモードは3種類ある：3ストライクバトルでは、相手がライフを全部失くすまでアイテムで攻撃しよう。フリーフォーオールでは、時間が切れるまで相手を最も攻撃できるプレイヤーが勝つ。「旗を取れ」では自分チームの旗が相手チームに取られていない限り、相手のチームの旗を自分チームの基地に持っていくのが目的です。"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1374,7 +1374,7 @@ msgstr "勝利するのに回収できるパワーアップがあります："
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr "風船ガム - ライバルの攻撃から身を守る楯にもなるし、後ろを向いたまま使うと足止めガムとして落とすことが出来ます。"
+msgstr "風船ガム - 身を守るために使うことが出来、後ろを向いたまま使うと足止めガムとして落とすことも出来ます。"
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1568,7 +1568,7 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr "入力デバイスの設定が終わったら、メインメニューでスプリットスクリーンマルチプレイヤーを選択してください。各プレイヤーはゲームパッドやキーボードの「ファイヤー」キーを押すことでゲームに参加し、入力デバイスを使ってカートを選択することができます。各プレイヤーはカートを選択したらゲームが始まります。各プレイヤーはカートを選択したらゲームが続きます。マウスで操作できないのを注意してください。"
+msgstr "入力デバイスの設定が終わったら、メインメニューでスプリットスクリーンマルチプレイヤーを選択してください。各プレイヤーはゲームパッドやキーボードの「ファイヤー」キーを押すことでゲームに参加し、入力デバイスを使ってカートを選択することができます。各プレイヤーはカートを選択したらゲームが始まります。各プレイヤーはカートを選択したらゲームが続きます。マウスで操作できないので注意してください。"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -2046,7 +2046,7 @@ msgstr "オンラインゲーム中チャットを可能にする"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Miscellaneous options"
-msgstr "雑多な設定"
+msgstr "いろいろな設定"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2061,6 +2061,7 @@ msgstr "フルゲームアセットをアンインストール"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
+#: src/states_screens/options/options_screen_input.cpp:217
 msgid "Press enter or double-click on a device to configure it"
 msgstr "選択項目を Enter またはダブルクリックするとキー設定を行います"
 
@@ -2167,7 +2168,7 @@ msgstr "ゲームモードを選択"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Use left/right to choose your team and press fire"
-msgstr "左/右を使ってチームを選んでください"
+msgstr "左と右を使ってチームを選んでください"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -3469,7 +3470,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "グラフィックスドライバーは非常に古いようだ。アップデートは入手可能かご覧ください。スーパータックスカートは %s やよりましなドライバーがお勧めです。ゲームは多分動作するが、グラフィックスレベルを減らすモードに制限される。"
 
-#: src/main_loop.cpp:433 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:435 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "サーバーへの接続がタイムアウトしました。"
 
@@ -3570,7 +3571,7 @@ msgid "Bad network connection is detected."
 msgstr "悪いネット接続が発見されました。"
 
 #: src/network/protocols/client_lobby.cpp:419
-#: src/network/protocols/server_lobby.cpp:3544
+#: src/network/protocols/server_lobby.cpp:3574
 msgid "Bot"
 msgstr "ボット"
 
@@ -3721,30 +3722,30 @@ msgstr "%sがゲームに参加しました。"
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1519
+#: src/network/protocols/client_lobby.cpp:1528
 #, c-format
 msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
-msgstr "<%s> や <%s> で注目のプレイヤーを切り替えり、<%s>を長押しして後ろを見ることが出来ます。 "
+"Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
+"camera position."
+msgstr "<%s> や <%s> で注目のプレイヤーを切り替え、 <%s> や <%s>でカメラの位置を変えることが出来ます。 "
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1535
+#: src/network/protocols/client_lobby.cpp:1544
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%sの通報が成功しました。"
 
-#: src/network/protocols/connect_to_server.cpp:71
+#: src/network/protocols/connect_to_server.cpp:77
 msgid "No quick play server available."
 msgstr "クイックプレイサーバーは入手可能ではありません。"
 
-#: src/network/protocols/connect_to_server.cpp:363
+#: src/network/protocols/connect_to_server.cpp:370
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "%sというサーバーに接続できません"
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:652
+#: src/network/protocols/connect_to_server.cpp:780
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "%sのサーバーのポート番号を見つけることが出来ませんでした。"
@@ -5191,7 +5192,7 @@ msgstr "ネットアクセスがないとオンラインで遊ぶのが不可能
 
 #: src/states_screens/online/online_screen.cpp:238
 msgid "Enter the server address optionally followed by : and then port."
-msgstr ""
+msgstr " サーバーアドレスを書き込んで、（：は任意）ポートしてください。"
 
 #: src/states_screens/online/online_screen.cpp:250
 #, c-format
@@ -5311,14 +5312,14 @@ msgstr "アイテムの位置を適当にする"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:451
+#: src/states_screens/track_info_screen.cpp:450
 msgid "Number of goals to win"
 msgstr "ゴールの勝ち数"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:446
+#: src/states_screens/track_info_screen.cpp:445
 msgid "Maximum time (min.)"
 msgstr ""
 
@@ -5466,7 +5467,7 @@ msgstr "このコンフィグを本当に削除しますか?"
 
 #: src/states_screens/options/options_screen_device.cpp:645
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr ""
+msgstr "新しいコンフィグレーション名を書き込んでください。空のままにすると初期値に戻ります。"
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -5486,18 +5487,23 @@ msgstr "フルゲームアセットをインストール"
 msgid "Are you sure to uninstall full game assets?"
 msgstr "ゲームアセットをアンインストールしてもいいですか？"
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:107
 msgid "Gamepad"
 msgstr "ゲームパッド"
 
-#: src/states_screens/options/options_screen_input.cpp:121
+#: src/states_screens/options/options_screen_input.cpp:124
 #, c-format
 msgid "Keyboard %i"
 msgstr "キーボード %i"
 
-#: src/states_screens/options/options_screen_input.cpp:172
+#: src/states_screens/options/options_screen_input.cpp:175
 msgid "Touch Device"
 msgstr "タッチデバイス"
+
+#. I18N: In the input configuration screen, help for touch device
+#: src/states_screens/options/options_screen_input.cpp:212
+msgid "Tap on a device to configure it"
+msgstr "デバイスの設定を変更するにはボタンを押してください。"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5579,7 +5585,7 @@ msgstr "Vsyncはグラフィックに新しいフレームを提供させます�
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:226
 msgid "Full: one frame per monitor refresh"
-msgstr ""
+msgstr "フル：モニターリーフレッシュごとに一つのフレーム"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:228
@@ -5885,7 +5891,7 @@ msgstr "ゴーストカートと競争して、記録を破ってみてくださ
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118
 msgid "Press red or blue soccer icon to change team"
-msgstr ""
+msgstr "チームを代えるには青や赤のサッカーアイコンを押してください。"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
@@ -5905,7 +5911,7 @@ msgid "Number of red team AI karts"
 msgstr "赤いチームのAIカートの数:"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:531
+#: src/states_screens/track_info_screen.cpp:530
 msgid "(Empty)"
 msgstr "(まだ記録がありません)"
 
@@ -5950,7 +5956,7 @@ msgstr "このチャレンジに必要な\nポイントが足りません。\n�
 #: ../stk-assets/tracks/tutorial/scripting.as:8
 #, c-format
 msgid "Accelerate with <%s>, and steer with <%s> and <%s>."
-msgstr ""
+msgstr "<%s>で加速、<%s>と<%s>で操作してください。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:17
 msgid ""
@@ -5962,38 +5968,38 @@ msgstr "車輪の上の部分を触って加速し、左と右へまげて操る
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "アクセルを上に動かすことで加速し、デバイスを傾けることで操作してください。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:27
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr ""
+msgstr "アクセルを上に動かすことで加速し、デバイスを回転させることで操作してください。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
 msgid ""
 "Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!"
-msgstr ""
+msgstr "プレゼントボックスを拾って、<%s>木箱を武器で当たってぶっ飛ばそう！"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:67
 msgid ""
 "Collect gift boxes, and fire by pressing the bowling icon to blow away these"
 " boxes!"
-msgstr ""
+msgstr "プレセデックスを拾って、ボーリングアイコンを押して木箱をぶっ飛ばそう！"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:78
 #, c-format
 msgid ""
 "Press <%s> to look behind.\n"
 "Fire the weapon with <%s> while pressing <%s> to fire behind!"
-msgstr ""
+msgstr "後ろを除くには<%s>を押してください\n後ろへ攻撃するには<%s>と<%s>を同時押ししてください！"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:88
 msgid ""
 "Press the mirror icon to look behind.\n"
 "Fire the weapon behind by holding the mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "後ろを見るには鏡アイコンをおしてください。\n鏡アイコンを押したままボーリングアイコンをスワイプして、アイテムを発射してください。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #, c-format
@@ -6002,7 +6008,7 @@ msgstr "<%s> を押してニトロを使おう！"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:104
 msgid "Use the nitro you collected by pressing the nitro icon"
-msgstr ""
+msgstr "回収したニトロをニトロアイコンを押して使ってください"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:112
 msgid "Collect nitro bottles (we will use them after the curve)."
@@ -6011,7 +6017,7 @@ msgstr "ニトロボトルを集めよう！(カーブしたあとに使って�
 #: ../stk-assets/tracks/tutorial/scripting.as:121
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
-msgstr ""
+msgstr "おーっと！困った時<%s>を押すと、鳥が救助してあげます。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:127
 msgid "Oops! When you're in trouble, press the bird icon to be rescued."
@@ -6022,19 +6028,19 @@ msgstr "おっとっと！困ったときは、鳥のアイコンを押して助
 msgid ""
 "Accelerate and press the <%s> key while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "加速して、<%s> ドリフトになるまで押してください。\n少しの間ドリフトすることで、狭いカーブで曲がるのが楽になります。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:145
 msgid ""
 "Accelerate and press the skid icon while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "曲がりながらドリフトアイコンを押すとドリフトすることが出来ます\n少しの間ドリフトすることで、狭いカーブで曲がるのが楽になります。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:156
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr ""
+msgstr "数秒ドリフトしたら、報酬としてボーナススピードアップを得ることができます。"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:164
 msgid "You are now ready to race. Good luck!"
