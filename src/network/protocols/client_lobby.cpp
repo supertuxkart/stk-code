@@ -1464,6 +1464,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     bool sort_kart_for_position =
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
         RaceManager::get()->modeHasLaps();
     if (sort_kart_for_position)
     {
