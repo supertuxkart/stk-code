@@ -1435,7 +1435,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     // Copied from EventHandler::processGUIAction
     const bool pressed_down = value > Input::MAX_VALUE * 2 / 3;
 
-    if (!pressed_down && type == Input::IT_STICKMOTION)
+    if (!pressed_down)
         return;
 
     if (action == PA_PAUSE_RACE)
