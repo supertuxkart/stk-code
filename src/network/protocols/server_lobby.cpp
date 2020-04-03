@@ -3575,7 +3575,7 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
 #endif
             if (i > 0)
                 name += core::stringw(" ") + StringUtils::toWString(i);
-            m_ai_profiles.insert(std::make_shared<NetworkPlayerProfile>
+            m_ai_profiles.push_back(std::make_shared<NetworkPlayerProfile>
                 (peer, name, peer->getHostId(), 0.0f, 0, HANDICAP_NONE,
                 player_count + i, KART_TEAM_NONE, ""));
         }
