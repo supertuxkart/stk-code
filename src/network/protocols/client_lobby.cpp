@@ -1438,6 +1438,11 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     if (!pressed_down && type == Input::IT_STICKMOTION)
         return;
 
+    if (action == PA_PAUSE_RACE)
+    {
+        StateManager::get()->escapePressed();
+        return;
+    }
     if (action == PA_LOOK_BACK)
     {
         if (cam->getMode() == Camera::CM_NORMAL)
