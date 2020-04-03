@@ -29,6 +29,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "items/bowling.hpp"
@@ -453,6 +454,7 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
 {
     std::string icon_file("");
     node.get("icon", &icon_file);
+    icon_file = GUIEngine::getSkin()->getThemedIcon("gui/icons/" + icon_file);
 
 #ifdef DEBUG
     if (icon_file.size() == 0)
@@ -464,7 +466,7 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
 #endif
 
     m_all_icons[type] = material_manager->getMaterial(icon_file,
-                                  /* full_path */     false,
+                                  /* full_path */     true,
                                   /*make_permanent */ true);
 
 
