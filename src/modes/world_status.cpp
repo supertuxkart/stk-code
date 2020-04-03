@@ -77,7 +77,9 @@ void WorldStatus::reset(bool restart)
     m_auxiliary_ticks = 0;
     m_count_up_ticks  = 0;
     m_start_music_ticks = -1;
-    m_race_ticks = -1;
+    // how long to display the 'music' message
+    m_race_ticks =
+        stk_config->time2Ticks(stk_config->m_music_credit_time);
     m_live_join_ticks = -1;
     m_engines_started = false;
     
@@ -361,9 +363,6 @@ void WorldStatus::updateTime(int ticks)
                     RaceManager::get()->getTrackName() != "tutorial" ?
                     stk_config->time2Ticks(0.2f) :
                     stk_config->time2Ticks(1.0f);
-                // how long to display the 'music' message
-                m_race_ticks =
-                    stk_config->time2Ticks(stk_config->m_music_credit_time);
             }
 
             m_auxiliary_ticks++;
