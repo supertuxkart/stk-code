@@ -40,7 +40,7 @@
 #  include <windows.h>
 #endif
 
-#if defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)
+#if (defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)) || defined(__NetBSD__)
 #  include <pthread.h>
 #endif
 
@@ -96,6 +96,8 @@ namespace VS
 #endif
 #elif defined(__FreeBSD__)
         pthread_set_name_np(pthread_self(), name);
+#elif defined(__NetBSD__)
+        pthread_setname_np(pthread_self(), "%s", const_cast<char *>(name));
 #endif
     }   // setThreadName
 #endif
