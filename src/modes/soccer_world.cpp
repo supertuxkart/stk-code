@@ -355,6 +355,25 @@ void SoccerWorld::reset(bool restart)
     // ie make this kart less likely to affect gaming result
     if (UserConfigParams::m_arena_ai_stats)
         getKart(8)->flyUp();
+
+    // Team will remain unchanged even with live join
+    std::vector<int> red_id, blue_id;
+    for (unsigned int i = 0; i < m_karts.size(); i++)
+    {
+        if (getKartTeam(i) == KART_TEAM_RED)
+            red_id.push_back(i);
+        else
+            blue_id.push_back(i);
+    }
+
+    m_team_icon_draw_id.resize(getNumKarts());
+    if (!Track::getCurrentTrack()->getMinimapInvert())
+        std::swap(red_id, blue_id);
+    int pos = 0;
+    for (int id : red_id)
+        m_team_icon_draw_id[pos++] = id;
+    for (int id : blue_id)
+        m_team_icon_draw_id[pos++] = id;
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -403,15 +422,9 @@ void SoccerWorld::update(int ticks)
     WorldWithRank::update(ticks);
     WorldWithRank::updateTrack(ticks);
 
-    std::vector<int> red_id, blue_id;
-    for (unsigned int i = 0; i < m_karts.size(); i++)
+    if (isGoalPhase())
     {
-        if (getKartTeam(i) == KART_TEAM_RED)
-            red_id.push_back(i);
-        else
-            blue_id.push_back(i);
-
-        if (isGoalPhase())
+        for (unsigned int i = 0; i < m_karts.size(); i++)
         {
             auto& kart = m_karts[i];
             if (kart->isEliminated())
@@ -427,28 +440,35 @@ void SoccerWorld::update(int ticks)
             kart->getBody()->proceedToTransform(m_goal_transforms[i]);
             kart->setTrans(m_goal_transforms[i]);
         }
+        if (m_ticks_back_to_own_goal - getTicksSinceStart() == 1 &&
+            !isRaceOver())
+        {
+            // Reset all karts and ball
+            resetKartsToSelfGoals();
+            if (UserConfigParams::m_arena_ai_stats)
+                getKart(8)->flyUp();
+        }
     }
-    if (isGoalPhase() &&
-        m_ticks_back_to_own_goal - getTicksSinceStart() == 1 && !isRaceOver())
-    {
-        // Reset all karts and ball
-        resetKartsToSelfGoals();
-        if (UserConfigParams::m_arena_ai_stats)
-            getKart(8)->flyUp();
-    }
-
     if (UserConfigParams::m_arena_ai_stats)
         m_frame_count++;
-    // We only use kart position for spliting team in race gui drawing
-    beginSetKartPositions();
+
+    // FIXME before next release always update soccer kart position to fix
+    // powerup random number
+    /*beginSetKartPositions();
     int pos = 1;
-    if (!Track::getCurrentTrack()->getMinimapInvert())
-        std::swap(red_id, blue_id);
-    for (int id : red_id)
-        setKartPosition(id, pos++);
-    for (int id : blue_id)
-        setKartPosition(id, pos++);
-    endSetKartPositions();
+    for (unsigned i = 0; i < getNumKarts(); i++)
+    {
+        if (getKart(i)->isEliminated())
+            continue;
+        setKartPosition(i, pos++);
+    }
+    for (unsigned i = 0; i < getNumKarts(); i++)
+    {
+        if (!getKart(i)->isEliminated())
+            continue;
+        setKartPosition(i, pos++);
+    }
+    endSetKartPositions();*/
 }   // update
 
 //-----------------------------------------------------------------------------

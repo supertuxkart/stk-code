@@ -83,6 +83,10 @@ public:
                                   unsigned int position);
     void          endSetKartPositions();
     AbstractKart* getKartAtPosition(unsigned int p) const;
+    /** Returns the kart at which position (start from 1) to draw race icon
+     *  \param p Position of the kart. */
+    virtual AbstractKart* getKartAtDrawingPosition(unsigned int p) const
+                                               { return getKartAtPosition(p); }
     virtual int   getScoreForPosition(int p);
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE;
     // ------------------------------------------------------------------------

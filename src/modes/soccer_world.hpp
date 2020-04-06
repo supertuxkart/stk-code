@@ -106,6 +106,8 @@ private:
 
     float m_ball_heading;
 
+    std::vector<int> m_team_icon_draw_id;
+
     std::vector<btTransform> m_goal_transforms;
     /** Function to update the location the ball on the polygon map */
     void updateBallPosition(int ticks);
@@ -244,6 +246,9 @@ public:
         int diff = m_ticks_back_to_own_goal - getTicksSinceStart();
         return diff > 0 && diff < stk_config->time2Ticks(3.0f);
     }
+    // ------------------------------------------------------------------------
+    AbstractKart* getKartAtDrawingPosition(unsigned int p) const OVERRIDE
+                                { return getKart(m_team_icon_draw_id[p - 1]); }
 };   // SoccerWorld
 
 

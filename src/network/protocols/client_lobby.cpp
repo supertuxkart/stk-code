@@ -66,6 +66,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 
 // ============================================================================
@@ -1460,30 +1461,20 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
         return;
     }
 
-    World::KartList karts = World::getWorld()->getKarts();
-    bool sort_kart_for_position =
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
-        RaceManager::get()->modeHasLaps();
-    if (sort_kart_for_position)
-    {
-        std::sort(karts.begin(), karts.end(), []
-            (const std::shared_ptr<AbstractKart>& a,
-            const std::shared_ptr<AbstractKart>& b)->bool
-        {
-            return a->getPosition() < b->getPosition();
-        });
-    }
+    WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+    if (!wwr)
+        return;
+    std::vector<AbstractKart*> karts;
+    for (unsigned i = 0; i < wwr->getNumKarts(); i++)
+        karts.push_back(wwr->getKartAtDrawingPosition(i + 1));
 
     const int num_karts = (int)karts.size();
     int current_idx = -1;
     if (cam->getKart())
     {
-        if (sort_kart_for_position)
-            current_idx = cam->getKart()->getPosition() - 1;
-        else
-            current_idx = cam->getKart()->getWorldKartId();
+        auto it = std::find(karts.begin(), karts.end(), cam->getKart());
+        if (it != karts.end())
+            current_idx = (int)std::distance(karts.begin(), it);
     }
     if (current_idx < 0 || current_idx >= num_karts)
         return;
@@ -1506,7 +1497,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
 
         if (!karts[current_idx]->isEliminated())
         {
-            cam->setKart(karts[current_idx].get());
+            cam->setKart(karts[current_idx]);
             break;
         }
     }
