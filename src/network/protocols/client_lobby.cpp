@@ -66,6 +66,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <algorithm>
 #include <cstdlib>
 
 // ============================================================================
@@ -1435,9 +1436,14 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     // Copied from EventHandler::processGUIAction
     const bool pressed_down = value > Input::MAX_VALUE * 2 / 3;
 
-    if (!pressed_down && type == Input::IT_STICKMOTION)
+    if (!pressed_down)
         return;
 
+    if (action == PA_PAUSE_RACE)
+    {
+        StateManager::get()->escapePressed();
+        return;
+    }
     if (action == PA_LOOK_BACK)
     {
         if (cam->getMode() == Camera::CM_NORMAL)
@@ -1455,29 +1461,20 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
         return;
     }
 
-    World::KartList karts = World::getWorld()->getKarts();
-    bool sort_kart_for_position =
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG ||
-        RaceManager::get()->modeHasLaps();
-    if (sort_kart_for_position)
-    {
-        std::sort(karts.begin(), karts.end(), []
-            (const std::shared_ptr<AbstractKart>& a,
-            const std::shared_ptr<AbstractKart>& b)->bool
-        {
-            return a->getPosition() < b->getPosition();
-        });
-    }
+    WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+    if (!wwr)
+        return;
+    std::vector<AbstractKart*> karts;
+    for (unsigned i = 0; i < wwr->getNumKarts(); i++)
+        karts.push_back(wwr->getKartAtDrawingPosition(i + 1));
 
     const int num_karts = (int)karts.size();
     int current_idx = -1;
     if (cam->getKart())
     {
-        if (sort_kart_for_position)
-            current_idx = cam->getKart()->getPosition() - 1;
-        else
-            current_idx = cam->getKart()->getWorldKartId();
+        auto it = std::find(karts.begin(), karts.end(), cam->getKart());
+        if (it != karts.end())
+            current_idx = (int)std::distance(karts.begin(), it);
     }
     if (current_idx < 0 || current_idx >= num_karts)
         return;
@@ -1500,7 +1497,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
 
         if (!karts[current_idx]->isEliminated())
         {
-            cam->setKart(karts[current_idx].get());
+            cam->setKart(karts[current_idx]);
             break;
         }
     }

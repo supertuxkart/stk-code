@@ -422,6 +422,8 @@
             char *path = NULL;
 #if defined(__linux__)
             path = realpath("/proc/self/exe", NULL);
+#elif defined(__NetBSD__)
+            path = realpath("/proc/curproc/exe", NULL);
 #elif defined(__APPLE__)
             path = (char*)malloc(PATH_MAX+1);
             uint32_t len = PATH_MAX;

@@ -25,6 +25,7 @@
 
 #include "irrString.h"
 
+#include <algorithm>
 #include <array>
 #include <atomic>
 #include <functional>
@@ -134,7 +135,7 @@ private:
     /** AI profiles for all-in-one graphical client server, this will be a
      *  fixed count thorough the live time of server, which its value is
      *  configured in NetworkConfig. */
-    std::set<std::shared_ptr<NetworkPlayerProfile> > m_ai_profiles;
+    std::vector<std::shared_ptr<NetworkPlayerProfile> > m_ai_profiles;
 
     std::atomic<uint32_t> m_server_owner_id;
 
@@ -385,7 +386,10 @@ public:
     void listBanTable();
     void initServerStatsTable();
     bool isAIProfile(const std::shared_ptr<NetworkPlayerProfile>& npp) const
-                     { return m_ai_profiles.find(npp) != m_ai_profiles.end(); }
+    {
+        return std::find(m_ai_profiles.begin(), m_ai_profiles.end(), npp) !=
+            m_ai_profiles.end();
+    }
     uint32_t getServerIdOnline() const           { return m_server_id_online; }
     void setClientServerHostId(uint32_t id)   { m_client_server_host_id = id; }
 };   // class ServerLobby

@@ -848,7 +848,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 
     for(int position = 1; position <= (int)kart_amount ; position++)
     {
-        AbstractKart *kart = world->getKartAtPosition(position);
+        AbstractKart *kart = world->getKartAtDrawingPosition(position);
 
         if (kart->getPosition() == -1)//if position is not set
         {

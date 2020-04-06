@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 11:52+0800\n"
-"PO-Revision-Date: 2020-03-07 03:58+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-03-15 15:56+0800\n"
+"PO-Revision-Date: 2020-03-27 16:38+0000\n"
+"Last-Translator: ToMáš Marný\n"
 "Language-Team: Czech (http://www.transifex.com/supertuxkart/supertuxkart/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1565,7 +1565,7 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr ""
+msgstr "Pokud jsou vstupní zařízení nastavena, vyberte ikonu „Hra více hráčů“ v hlavní nabídce. Každý hráč může stisknout klávesu „Střelba“ svého gamepadu nebo klávesnice, aby se připojil ke hře, a pomocí svého vstupního zařízení vybrat svou motokáru. Hra pokračuje, když si každý vybral svou motokáru. Pro tuto operaci nelze použít myš."
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1829,7 +1829,7 @@ msgstr "Zobrazit soukromé servery"
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Use IPv6 connection"
-msgstr ""
+msgstr "Použít připojení IPv6"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -2008,7 +2008,7 @@ msgstr "Zpět k seznamu zařízení"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 msgid "Rename Configuration"
-msgstr ""
+msgstr "Přejmenovat konfiguraci"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2058,6 +2058,7 @@ msgstr "Odinstalovat všechny herní prvky"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
+#: src/states_screens/options/options_screen_input.cpp:217
 msgid "Press enter or double-click on a device to configure it"
 msgstr "Stiskněte enter nebo poklepejte na zařízení, které chcete nastavit"
 
@@ -2240,11 +2241,11 @@ msgstr "Barva motokáry"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
-msgstr ""
+msgstr "Motiv vzhledu uživatelského rozhraní lze změnit v možnostech uživatelského rozhraní."
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
-msgstr ""
+msgstr "Můžete vidět bonusy ostatních motokár, pokud je povolíte v možnostech uživatelského rozhraní."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
@@ -2252,7 +2253,7 @@ msgstr "Velikost písma lze změnit v možnostech uživatelského rozhraní."
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has lots of useful information."
-msgstr ""
+msgstr "Nabídka nápovědy obsahuje spoustu užitečných informací."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
@@ -2315,31 +2316,31 @@ msgstr "Buďte opatrní, když jste blízko k jiným motokárám, mohou vás nap
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake, or plunger."
-msgstr ""
+msgstr "Basketbalové míče lze zničit pomocí přesných zpětných výstřelů bowlingovou koulí, dortem nebo zvonem."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other the backs of other karts, as it will slow "
 "you down."
-msgstr ""
+msgstr "Pokuste se zabránit nárazu do zad jiných motokár, protože vás to zpomalí."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
-msgstr ""
+msgstr "Můžete použít bowlingové koule k odtlačení a blokování míče."
 
 #. I18N: ./data/tips.xml
 msgid "In soccer, always work as a team for good results."
-msgstr ""
+msgstr "Ve fotbale vždy pracujte jako tým, abyste dosáhli dobrých výsledků."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr ""
+msgstr "Pokud vám chybí míč a soupeř se blíží, zkuste ho zasáhnout pomocí bonusů nebo zablokujte jeho cestu."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
-msgstr ""
+msgstr "Dobrá rotace pozic (útok a obrana) je nezbytná."
 
 #. I18N: ./data/tips.xml
 msgid "Make sure to store at least 2 big cans worth of nitro."
@@ -2347,7 +2348,7 @@ msgstr ""
 
 #. I18N: ./data/tips.xml
 msgid "Never use the three bowling balls all at the same time."
-msgstr ""
+msgstr "Nikdy nepoužívejte všechny tři bowlingové koule najednou."
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2509,7 +2510,7 @@ msgstr "Fotbalový stadion Las Dunas"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the Lighthouse"
-msgstr ""
+msgstr "Kolem majáku"
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
@@ -2529,7 +2530,7 @@ msgstr "Dýňový park"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge Mansion"
-msgstr ""
+msgstr "Zámek Ravenbridge"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
@@ -2549,7 +2550,7 @@ msgstr "Sněžný vrchol"
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer Field"
-msgstr ""
+msgstr "Fotbalové hřiště"
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
@@ -3469,7 +3470,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Váš grafický ovladač se zdá být velmi starý. Zkontrolujte, zda je k dispozici aktualizace. SuperTuxKart doporučuje ovladač podporující %s nebo lepší. Hra pravděpodobně ještě poběží, ale v redukovaném grafickém režimu."
 
-#: src/main_loop.cpp:433 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:435 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Časový limit připojení k serveru vypršel."
 
@@ -3573,7 +3574,7 @@ msgid "Bad network connection is detected."
 msgstr "Bylo zjištěno špatné připojení k síti."
 
 #: src/network/protocols/client_lobby.cpp:419
-#: src/network/protocols/server_lobby.cpp:3544
+#: src/network/protocols/server_lobby.cpp:3574
 msgid "Bot"
 msgstr ""
 
@@ -3700,7 +3701,7 @@ msgstr "Zbývá pouze 1 hráč, návrat do čekárny."
 
 #: src/network/protocols/client_lobby.cpp:1193
 msgid "Server owner quit the game"
-msgstr ""
+msgstr "Vlastník serveru ukončil hru"
 
 #. I18N: Show when player join red team of the started game in
 #. network
@@ -3724,33 +3725,33 @@ msgstr "%s se připojil ke hře."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1519
+#: src/network/protocols/client_lobby.cpp:1528
 #, c-format
 msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
-msgstr "Stiskněte <%s> nebo <%s> pro změnu zaměřeného hráče nebo <%s> pro polohu kamery."
+"Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
+"camera position."
+msgstr "Stiskněte <%s> nebo <%s> pro změnu zaměřeného hráče, <%s> nebo <%s> pro polohu kamery."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1535
+#: src/network/protocols/client_lobby.cpp:1544
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%s úspěšně nahlášen."
 
-#: src/network/protocols/connect_to_server.cpp:71
+#: src/network/protocols/connect_to_server.cpp:77
 msgid "No quick play server available."
 msgstr "Není k dispozici žádný server rychlé hry."
 
-#: src/network/protocols/connect_to_server.cpp:363
+#: src/network/protocols/connect_to_server.cpp:370
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nelze se připojit k serveru %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:652
+#: src/network/protocols/connect_to_server.cpp:780
 #, c-format
 msgid "Failed to detect port number for server %s."
-msgstr ""
+msgstr "Nepodařilo se zjistit číslo portu pro server %s."
 
 #: src/network/protocols/lobby_protocol.cpp:292
 msgid "Network grand prix has been finished."
@@ -4507,7 +4508,7 @@ msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
-msgstr ""
+msgstr "SuperTuxKart stáhne veškeré herní prvky (včetně vysoce kvalitních textur a hudby) pro váš lepší herní zážitek. Pokud nemáte připojení Wi-Fi, použijí se k tomu vaše mobilní data."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -5300,12 +5301,12 @@ msgstr "Není známo"
 #. I18N: Message shown to user if no IPv4 detected by STK
 #: src/states_screens/online/server_selection.cpp:312
 msgid "No IPv4 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "Nebyla detekována žádná IPv4, možná se nebudete moci připojit k žádným serverům."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
 #: src/states_screens/online/server_selection.cpp:314
 msgid "No IPv6 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "Nebyla detekována žádná IPv6, možná se nebudete moci připojit k žádným serverům."
 
 #: src/states_screens/online/server_selection.cpp:414
 msgid "No server is available."
@@ -5332,14 +5333,14 @@ msgstr "Náhodně rozmístěné položky"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:451
+#: src/states_screens/track_info_screen.cpp:450
 msgid "Number of goals to win"
 msgstr "Počet splněných cílů do vítězství"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:446
+#: src/states_screens/track_info_screen.cpp:445
 msgid "Maximum time (min.)"
 msgstr "Maximální doba (min.)"
 
@@ -5487,7 +5488,7 @@ msgstr "Opravdu chcete trvale smazat toto nastavení?"
 
 #: src/states_screens/options/options_screen_device.cpp:645
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr ""
+msgstr "Zadejte nový název konfigurace, ponechte prázdné, pokud chcete vrátit výchozí hodnotu."
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -5507,18 +5508,23 @@ msgstr "Nainstalovat plné herní prvky"
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Opravdu chcete odinstalovat veškeré herní prvky?"
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:107
 msgid "Gamepad"
 msgstr "Gamepad"
 
-#: src/states_screens/options/options_screen_input.cpp:121
+#: src/states_screens/options/options_screen_input.cpp:124
 #, c-format
 msgid "Keyboard %i"
 msgstr "Klávesnice %i"
 
-#: src/states_screens/options/options_screen_input.cpp:172
+#: src/states_screens/options/options_screen_input.cpp:175
 msgid "Touch Device"
 msgstr "Dotykové zařízení"
+
+#. I18N: In the input configuration screen, help for touch device
+#: src/states_screens/options/options_screen_input.cpp:212
+msgid "Tap on a device to configure it"
+msgstr "Klepnutím na zařízení jej nakonfigurujte"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5906,7 +5912,7 @@ msgstr "Závoďte proti motokárám duchů a pokuste se je porazit!"
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118
 msgid "Press red or blue soccer icon to change team"
-msgstr ""
+msgstr "Stisknutím červené nebo modré fotbalové ikony změníte tým"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
@@ -5926,7 +5932,7 @@ msgid "Number of red team AI karts"
 msgstr "Počet počítačem ovládaných motokár červeného týmu"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:531
+#: src/states_screens/track_info_screen.cpp:530
 msgid "(Empty)"
 msgstr "(Prázdné)"
 

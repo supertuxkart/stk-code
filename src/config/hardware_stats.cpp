@@ -314,6 +314,9 @@ void reportHardwareStats()
 #elif defined(__FreeBSD__)
     json.add("os_freebsd", 1);
     json.add("os_unix", 1);
+#elif defined(__NetBSD__)
+    json.add("os_netbsd", 1);
+    json.add("os_unix", 1);
 #else
     json.add("os_linux", 0);
     json.add("os_unix", 0);

@@ -71,6 +71,9 @@ std::string SeparateProcess::getCurrentExecutableLocation()
         return file_manager->getFileSystem()->getAbsolutePath(path).c_str();
     }
     return "";
+#elif defined(__NetBSD__)
+    return file_manager->getFileSystem()->getAbsolutePath("/proc/curproc/exe")
+        .c_str();
 #else
     // Assume Linux
     return file_manager->getFileSystem()->getAbsolutePath("/proc/self/exe")

@@ -5,14 +5,15 @@
 # Translators:
 # fedik <fedikw@gmail.com>, 2015-2017,2019
 # Max Lyashuk <m_lyashuk@ukr.net>, 2015-2016
+# Sergey Sergey <regensv@gmail.com>, 2020
 # Yaroslav Serhieiev <noomorph@gmail.com>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-07 11:52+0800\n"
-"PO-Revision-Date: 2020-03-07 03:58+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-03-15 15:56+0800\n"
+"PO-Revision-Date: 2020-03-27 22:52+0000\n"
+"Last-Translator: Sergey Sergey <regensv@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/supertuxkart/supertuxkart/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -34,7 +35,7 @@ msgstr "Страйк!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
-msgstr "Вцілити 10 супротивників кулею для боулінгу."
+msgstr "Вцілити 10 картів кулею для боулінгу."
 
 #. I18N: ./data/achievements.xml
 msgid "Arch Enemy"
@@ -792,7 +793,7 @@ msgstr "Ім’я"
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Handicap"
-msgstr ""
+msgstr "Гандикап"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -935,7 +936,7 @@ msgstr "Арени"
 #. I18N: In addons screen, above the list of addons to be installed
 #: src/states_screens/addons_screen.cpp:136
 msgid "Installed"
-msgstr ""
+msgstr "Встановлено"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -1827,7 +1828,7 @@ msgstr "Показати приватні сервер(и)"
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Use IPv6 connection"
-msgstr ""
+msgstr "Використовувати з'єднання IPv6"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -1901,7 +1902,7 @@ msgstr "Аудіо"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: Section in the settings menu
 msgid "Interface"
-msgstr ""
+msgstr "Інтерфейс"
 
 #. I18N: ./data/gui/screens/options_audio.stkgui
 #. I18N: Section in the settings menu
@@ -2056,6 +2057,7 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
+#: src/states_screens/options/options_screen_input.cpp:217
 msgid "Press enter or double-click on a device to configure it"
 msgstr "Натисніть Enter або ж двічі клацніть на пристрій для його налаштування."
 
@@ -2119,7 +2121,7 @@ msgstr "Рівень графічних ефектів"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Blur Effects Level"
-msgstr ""
+msgstr "Рівень ефектів розмиття"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2250,7 +2252,7 @@ msgstr ""
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has lots of useful information."
-msgstr ""
+msgstr "Меню допомоги містить безліч корисної інформації."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
@@ -2259,7 +2261,7 @@ msgstr ""
 #. I18N: ./data/tips.xml
 msgid ""
 "You can visit https://supertuxkart.net/ for more information about the game."
-msgstr ""
+msgstr "Ви можете відвідати https://supertuxkart.net/ щоб дізнатися більше про гру."
 
 #. I18N: ./data/tips.xml
 msgid "Short nitro boosts are more efficient."
@@ -2523,7 +2525,7 @@ msgstr "Математичний клас Олівера"
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
-msgstr ""
+msgstr "Гарбузовий парк"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge Mansion"
@@ -2547,7 +2549,7 @@ msgstr "Засніжена вершина"
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer Field"
-msgstr ""
+msgstr "Футбольне поле"
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
@@ -3467,7 +3469,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr ""
 
-#: src/main_loop.cpp:433 src/network/protocols/client_lobby.cpp:101
+#: src/main_loop.cpp:435 src/network/protocols/client_lobby.cpp:101
 msgid "Server connection timed out."
 msgstr "Час з'єднання з сервером закінчився."
 
@@ -3571,7 +3573,7 @@ msgid "Bad network connection is detected."
 msgstr "Виявлено поганий зв'язок з мережею."
 
 #: src/network/protocols/client_lobby.cpp:419
-#: src/network/protocols/server_lobby.cpp:3544
+#: src/network/protocols/server_lobby.cpp:3574
 msgid "Bot"
 msgstr ""
 
@@ -3698,7 +3700,7 @@ msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:1193
 msgid "Server owner quit the game"
-msgstr ""
+msgstr "Власник серверу покинув гру"
 
 #. I18N: Show when player join red team of the started game in
 #. network
@@ -3722,30 +3724,30 @@ msgstr "%s приєднався до гри."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1519
+#: src/network/protocols/client_lobby.cpp:1528
 #, c-format
 msgid ""
-"Press <%s> or <%s> to change the targeted player or <%s> for the camera "
-"position."
+"Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
+"camera position."
 msgstr ""
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1535
+#: src/network/protocols/client_lobby.cpp:1544
 #, c-format
 msgid "Successfully reported %s."
 msgstr ""
 
-#: src/network/protocols/connect_to_server.cpp:71
+#: src/network/protocols/connect_to_server.cpp:77
 msgid "No quick play server available."
 msgstr ""
 
-#: src/network/protocols/connect_to_server.cpp:363
+#: src/network/protocols/connect_to_server.cpp:370
 #, c-format
 msgid "Cannot connect to server %s."
-msgstr ""
+msgstr "Неможливо з'єднатися з сервером %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:652
+#: src/network/protocols/connect_to_server.cpp:780
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr ""
@@ -3898,7 +3900,7 @@ msgstr "Дата оновлення"
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
 msgid "Not installed"
-msgstr ""
+msgstr "Не встановлено"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
 #: src/states_screens/addons_screen.cpp:319
@@ -4764,7 +4766,7 @@ msgstr "Пристрій вводу вже існує"
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:147
 #: src/states_screens/online/online_screen.cpp:233
 msgid "No player available for connecting to server."
-msgstr ""
+msgstr "Немає доступних гравців для підключення до сервера."
 
 #. I18N: In the user info dialog
 #: src/states_screens/dialogs/user_info_dialog.cpp:56
@@ -4896,7 +4898,7 @@ msgstr ""
 #: src/states_screens/feature_unlocked.cpp:310
 #, c-format
 msgid "You unlocked %s!"
-msgstr ""
+msgstr "Ви розблокували %s!"
 
 #: src/states_screens/feature_unlocked.cpp:629
 msgid "Challenge Completed"
@@ -5330,14 +5332,14 @@ msgstr "Випадкове розташування"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:451
+#: src/states_screens/track_info_screen.cpp:450
 msgid "Number of goals to win"
 msgstr "Кількість голів для перемоги"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:259
-#: src/states_screens/track_info_screen.cpp:446
+#: src/states_screens/track_info_screen.cpp:445
 msgid "Maximum time (min.)"
 msgstr "Максимальний час (хв.)"
 
@@ -5406,7 +5408,7 @@ msgstr "Прискорення"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:274
 msgid "Brake / Reverse"
-msgstr ""
+msgstr "Гальмо / Назад"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:277
@@ -5505,18 +5507,23 @@ msgstr ""
 msgid "Are you sure to uninstall full game assets?"
 msgstr ""
 
-#: src/states_screens/options/options_screen_input.cpp:104
+#: src/states_screens/options/options_screen_input.cpp:107
 msgid "Gamepad"
 msgstr "Джойстик"
 
-#: src/states_screens/options/options_screen_input.cpp:121
+#: src/states_screens/options/options_screen_input.cpp:124
 #, c-format
 msgid "Keyboard %i"
 msgstr "Клавіатура %i"
 
-#: src/states_screens/options/options_screen_input.cpp:172
+#: src/states_screens/options/options_screen_input.cpp:175
 msgid "Touch Device"
 msgstr "Сенсорний пристрій"
+
+#. I18N: In the input configuration screen, help for touch device
+#: src/states_screens/options/options_screen_input.cpp:212
+msgid "Tap on a device to configure it"
+msgstr ""
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5924,7 +5931,7 @@ msgid "Number of red team AI karts"
 msgstr ""
 
 #. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:531
+#: src/states_screens/track_info_screen.cpp:530
 msgid "(Empty)"
 msgstr "(Пусто)"
 
