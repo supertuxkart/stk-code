@@ -771,7 +771,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             else if (player == NULL)
             {
                 // New player is joining
-                if (action == PA_FIRE || action == PA_MENU_SELECT)
+                if (value != 0 && (action == PA_FIRE || action == PA_MENU_SELECT))
                 {
                     InputDevice *device = NULL;
                     if (type == Input::IT_KEYBOARD)
