@@ -143,7 +143,7 @@ void NetworkPlayerDialog::beforeAddingWidgets()
             //I18N: In the network player dialog
             m_handicap_widget->setText(_("Disable handicap"));
         }
-        m_handicap_widget->setImage(irr_driver->getTexture(FileManager::MODEL,
+        m_handicap_widget->setImage(irr_driver->getTexture(FileManager::GUI_ICON,
             "anchor-icon.png"));
     }
     else
