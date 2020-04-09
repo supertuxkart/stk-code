@@ -1774,7 +1774,7 @@ void Kart::update(int ticks)
 
         if (!GUIEngine::isNoGraphics() && !has_animation_before)
         {
-            HitEffect *effect =  new Explosion(getSmoothedXYZ(), "jump",
+            HitEffect *effect =  new Explosion(getXYZ(), "jump",
                                               "jump_explosion.xml");
             ProjectileManager::get()->addHitEffect(effect);
         }
