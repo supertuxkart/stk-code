@@ -257,7 +257,7 @@ void TracksScreen::beforeAddingWidget()
                 (file_manager->getAsset(FileManager::GUI_ICON,
                 "track_random.png")), 2);
             m_vote_list->addColumn(irr_driver->getTexture
-                (file_manager->getAsset(FileManager::MODEL,
+                (file_manager->getAsset(FileManager::GUI_ICON,
                 "swap-icon.png")), 1);
         }
         else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
@@ -290,7 +290,7 @@ void TracksScreen::beforeAddingWidget()
                     "loading.png")), 1);
             }
             m_vote_list->addColumn(irr_driver->getTexture
-                (file_manager->getAsset(FileManager::MODEL,
+                (file_manager->getAsset(FileManager::GUI_ICON,
                 "swap-icon.png")), 1);
         }
         else
