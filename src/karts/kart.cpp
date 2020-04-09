@@ -1154,7 +1154,7 @@ void Kart::collectedItem(ItemState *item_state)
             stk_config->time2Ticks(m_kart_properties->getBubblegumFadeInTime()),
             m_bubblegum_ticks);
         if (!RewindManager::get()->isRewinding())
-            getNextEmitter()->play(getXYZ(), m_goo_sound);
+            getNextEmitter()->play(getSmoothedTrans().getOrigin(), m_goo_sound);
 
         // Play appropriate custom character sound
         playCustomSFX(SFXManager::CUSTOM_GOO);
@@ -1774,7 +1774,7 @@ void Kart::update(int ticks)
 
         if (!GUIEngine::isNoGraphics() && !has_animation_before)
         {
-            HitEffect *effect =  new Explosion(getXYZ(), "jump",
+            HitEffect *effect =  new Explosion(getSmoothedTrans().getOrigin(), "jump",
                                               "jump_explosion.xml");
             ProjectileManager::get()->addHitEffect(effect);
         }
@@ -1999,7 +1999,7 @@ void Kart::handleMaterialSFX()
         (m_terrain_sound->getStatus()==SFXBase::SFX_PLAYING ||
          m_terrain_sound->getStatus()==SFXBase::SFX_PAUSED)    )
     {
-        m_terrain_sound->setPosition(getXYZ());
+        m_terrain_sound->setPosition(getSmoothedTrans().getOrigin());
         if(material)
             material->setSFXSpeed(m_terrain_sound, m_speed, m_schedule_pause);
     }
@@ -2479,14 +2479,14 @@ void Kart::playCrashSFX(const Material* m, AbstractKart *k)
             // it's not already playing.
             if (isShielded() || (k != NULL && k->isShielded()))
             {
-                crash_sound_emitter->play(getXYZ(), m_boing_sound);
+                crash_sound_emitter->play(getSmoothedTrans().getOrigin(), m_boing_sound);
             }
             else
             {
                 int idx = rand() % CRASH_SOUND_COUNT;
 
                 SFXBuffer* buffer = m_crash_sounds[idx];
-                crash_sound_emitter->play(getXYZ(), buffer);
+                crash_sound_emitter->play(getSmoothedTrans().getOrigin(), buffer);
             }
         }    // if lin_vel > 0.555
     }   // if m_bounce_back_ticks == 0
@@ -2501,7 +2501,7 @@ void Kart::beep()
     if (!playCustomSFX(SFXManager::CUSTOM_HORN) &&
         !RewindManager::get()->isRewinding())
     {
-        getNextEmitter()->play(getXYZ(), m_horn_sound);
+        getNextEmitter()->play(getSmoothedTrans().getOrigin(), m_horn_sound);
     }
 
 } // beep
@@ -2607,7 +2607,7 @@ void Kart::updatePhysics(int ticks)
        !m_skidding->isJumping()                                              )
     {
         if(m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING && !isWheeless())
-            m_skid_sound->play(getXYZ());
+            m_skid_sound->play(getSmoothedTrans().getOrigin());
     }
     else if(m_skid_sound->getStatus()==SFXBase::SFX_PLAYING)
     {
@@ -2673,13 +2673,13 @@ void Kart::updateEngineSFX(float dt)
         float gears = 3.0f * fmod(fc, 0.333334f);
         assert(!std::isnan(f));
         m_last_factor_engine_sound = (0.9f*f + gears) * 0.35f;
-        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
+        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getSmoothedTrans().getOrigin());
     }
     else
       {
         // When flying, reduce progressively the sound engine (since we can't accelerate)
         m_last_factor_engine_sound *= (1.0f-0.1f*dt);
-        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getXYZ());
+        m_engine_sound->setSpeedPosition(0.6f + m_last_factor_engine_sound, getSmoothedTrans().getOrigin());
         if (m_speed < 0.1f) m_last_factor_engine_sound = 0.0f;
       }
 }   // updateEngineSFX
@@ -3220,8 +3220,8 @@ void Kart::updateGraphics(float dt)
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());
-    m_skid_sound->setPosition(getXYZ());
-    m_nitro_sound->setPosition(getXYZ());
+    m_skid_sound->setPosition(getSmoothedTrans().getOrigin());
+    m_nitro_sound->setPosition(getSmoothedTrans().getOrigin());
 
     m_attachment->updateGraphics(dt);
 
@@ -3409,7 +3409,7 @@ const Vec3& Kart::getRecentPreviousXYZ() const
 void Kart::playSound(SFXBuffer* buffer)
 {
     if (!RewindManager::get()->isRewinding())
-        getNextEmitter()->play(getXYZ(), buffer);
+        getNextEmitter()->play(getSmoothedTrans().getOrigin(), buffer);
 }   // playSound
 
 // ------------------------------------------------------------------------
