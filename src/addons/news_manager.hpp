@@ -21,6 +21,7 @@
 #ifndef SERVER_ONLY
 
 #include <string>
+#include <thread>
 #include <vector>
 
 
@@ -100,11 +101,13 @@ private:
     /** True when all .xml files should be re-downloaded. */
     bool m_force_refresh;
 
+    std::thread m_download_thread;
+
     void          checkRedirect(const XMLNode *xml);
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
     bool          conditionFulfilled(const std::string &cond);
-    static void*  downloadNews(void *obj);
+    void  downloadNews();
     NewsManager();
     ~NewsManager();
 
@@ -145,9 +148,12 @@ public:
     /** Clears the error message. */
     void          clearErrorMessage() {m_error_message.setAtomic(""); }
     // ------------------------------------------------------------------------
+    void joinDownloadThreadIfExit()
+    {
+        if (CanBeDeleted::canBeDeletedNow() && m_download_thread.joinable())
+            m_download_thread.join();
+    }
 };   // NewsManager
-
-extern NewsManager *news_manager;
 
 #endif
 #endif

@@ -183,6 +183,8 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 {
 #ifndef SERVER_ONLY
+    NewsManager::get()->joinDownloadThreadIfExit();
+
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
