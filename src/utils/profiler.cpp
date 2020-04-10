@@ -28,6 +28,7 @@
 #include "io/file_manager.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/tls.hpp"
 #include "utils/vs.hpp"
 
 #include <algorithm>
@@ -97,46 +98,36 @@ Profiler::~Profiler()
 {
 }   // ~Profiler
 
+thread_local int g_thread_id = -1;
+const int MAX_THREADS = 10;
 //-----------------------------------------------------------------------------
 /** It is split from the constructor so that it can be avoided allocating
  *  unnecessary memory when the profiler is never used (for example in no
  *  graphics). */
 void Profiler::init()
 {
-    const int MAX_THREADS = 10;
     m_all_threads_data.resize(MAX_THREADS);
-    m_thread_mapping.resize(MAX_THREADS);
 
     // Add this thread to the thread mapping
-    m_thread_mapping[0] = pthread_self();
+    g_thread_id = 0;
     m_gpu_times.resize(Q_LAST * m_max_frames);
 }   // init
 
 //-----------------------------------------------------------------------------
 /** Returns a unique index for a thread. If the calling thread is not yet in
- *  the mapping, it will assign a new unique id to this thread. This function
- *  is NOT thread-safe and must be called from a properly protected code
- *  section. */
+ *  the mapping, it will assign a new unique id to this thread. */
 int Profiler::getThreadID()
 {
-    pthread_t thread = pthread_self();
-    int i = 0;
-    while(i < m_threads_used)
+    if (g_thread_id == -1)
     {
-        if (memcmp( &m_thread_mapping[i],
-                    &thread,
-                    sizeof(thread)) ==0 )
+        if (m_threads_used >= MAX_THREADS)
         {
-            return i;
+            g_thread_id = MAX_THREADS - 1;
+            return g_thread_id;
         }
-        i++;
-    }   // for i <m_threads_used
-
-    assert(m_threads_used < (int)m_thread_mapping.size());
-    m_thread_mapping[m_threads_used] = thread;
-    m_threads_used++;
-
-    return m_threads_used - 1;
+        g_thread_id = m_threads_used.fetch_add(1);
+    }
+    return g_thread_id;
 }   // getThreadID
 
 //-----------------------------------------------------------------------------
