@@ -26,7 +26,9 @@
 
 extern "C"
 {
+#ifndef InetPtopN
    WINSOCK_API_LINKAGE  INT WSAAPI inet_pton(INT Family, PCSTR pszAddrString, PVOID pAddrBuf);
+#endif
 }
 
 #else
