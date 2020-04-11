@@ -20,8 +20,9 @@
 #define HEADER_CAN_BE_DELETED
 
 #include "utils/log.hpp"
-#include "utils/synchronised.hpp"
 #include "utils/time.hpp"
+
+#include <atomic>
 
 /** A simple class that a adds a function to wait with a timeout for a
  *  class to be ready to be deleted. It is used for objects with their
@@ -36,25 +37,29 @@
 class CanBeDeleted
 {
 private:
-    Synchronised<bool> m_can_be_deleted;
+    std::atomic_bool m_can_be_deleted;
 public:
     /** Set this instance to be not ready to be deleted. */
-    CanBeDeleted() { m_can_be_deleted.setAtomic(false); }
+    CanBeDeleted() { m_can_be_deleted.store(false); }
     // ------------------------------------------------------------------------
     /** Sets this instance to be ready to be deleted. */
-    void setCanBeDeleted() {m_can_be_deleted.setAtomic(true); }
+    void setCanBeDeleted() { m_can_be_deleted.store(true); }
+    // ------------------------------------------------------------------------
+    void resetCanBeDeleted() { m_can_be_deleted.store(false); }
+    // ------------------------------------------------------------------------
+    bool canBeDeletedNow() { return m_can_be_deleted.load(); }
     // ------------------------------------------------------------------------
     /** Waits at most t seconds for this class to be ready to be deleted.
      *  \return true if the class is ready, false in case of a time out.
      */
     bool waitForReadyToDeleted(float waiting_time)
     {
-        if (m_can_be_deleted.getAtomic()) return true;
+        if (m_can_be_deleted.load()) return true;
         double start = StkTime::getRealTime();
         Log::verbose("Thread", "Start waiting %lf", start);
         while(1)
         {
-            if(m_can_be_deleted.getAtomic())
+            if(m_can_be_deleted.load())
             {
                 Log::verbose("Thread",
                          "Waited %lf seconds for thread to become deleteable.",

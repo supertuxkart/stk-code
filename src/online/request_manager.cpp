@@ -25,6 +25,7 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/vs.hpp"
 
+#include <functional>
 #include <iostream>
 #include <stdio.h>
 #include <memory.h>
@@ -74,18 +75,13 @@ namespace Online
         m_game_polling_interval = 60;  // same for game polling
         m_time_since_poll       = m_menu_polling_interval;
         curl_global_init(CURL_GLOBAL_DEFAULT);
-        pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
     }   // RequestManager
 
     // ------------------------------------------------------------------------
     RequestManager::~RequestManager()
     {
-        m_thread_id.lock();
-        pthread_join(*m_thread_id.getData(), NULL);
-        delete m_thread_id.getData();
-        m_thread_id.unlock();
-        pthread_cond_destroy(&m_cond_request);
+        m_thread.join();
         curl_global_cleanup();
     }   // ~RequestManager
 
@@ -101,24 +97,7 @@ namespace Online
      */
     void RequestManager::startNetworkThread()
     {
-        pthread_attr_t  attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
-        m_thread_id.setAtomic(new pthread_t());
-        int error = pthread_create(m_thread_id.getData(), &attr,
-                                   &RequestManager::mainLoop, this);
-        if (error)
-        {
-            m_thread_id.lock();
-            delete m_thread_id.getData();
-            m_thread_id.unlock();
-            m_thread_id.setAtomic(0);
-            Log::error("HTTP Manager", "Could not create thread, error=%d.",
-                       errno);
-        }
-        pthread_attr_destroy(&attr);
-
+        m_thread = std::thread(std::bind(mainLoop, this));
         // In case that login id was not saved (or first start of stk),
         // current player would not be defined at this stage.
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
@@ -181,7 +160,7 @@ namespace Online
         m_request_queue.getData().push(request);
 
         // Wake up the network http thread
-        pthread_cond_signal(&m_cond_request);
+        m_condition_variable.notify_one();
         m_request_queue.unlock();
     }   // addRequest
 
@@ -191,13 +170,13 @@ namespace Online
      *  of packages to download, it will wait for commands to be issued.
      *  \param obj: A pointer to this object, passed on by pthread_create
      */
-    void *RequestManager::mainLoop(void *obj)
+    void RequestManager::mainLoop(void *obj)
     {
         VS::setThreadName("RequestManager");
         RequestManager *me = (RequestManager*) obj;
 
         me->m_current_request = nullptr;
-        me->m_request_queue.lock();
+        std::unique_lock<std::mutex> ul = me->m_request_queue.acquireMutex();
         while (me->m_request_queue.getData().empty() ||
                me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
         {
@@ -208,7 +187,7 @@ namespace Online
             // (pthread_cond_wait man page)!
             while (empty)
             {
-                pthread_cond_wait(&me->m_cond_request, me->m_request_queue.getMutex());
+                me->m_condition_variable.wait(ul);
                 empty = me->m_request_queue.getData().empty();
             }
             // We pause the request manager thread when going into background in iOS
@@ -223,14 +202,14 @@ namespace Online
                 break;
             }
 
-            me->m_request_queue.unlock();
+            ul.unlock();
             me->m_current_request->execute();
             // This test is necessary in case that execute() was aborted
             // (otherwise the assert in addResult will be triggered).
             if (!me->getAbort())
                 me->addResult(me->m_current_request);
             me->m_current_request = nullptr;
-            me->m_request_queue.lock();
+            ul = me->m_request_queue.acquireMutex();
         } // while handle all requests
 
         // Signal that the request manager can now be deleted.
@@ -243,10 +222,6 @@ namespace Online
         {
             me->m_request_queue.getData().pop();
         }
-        me->m_request_queue.unlock();
-        pthread_exit(NULL);
-
-        return 0;
     }   // mainLoop
 
     // ------------------------------------------------------------------------

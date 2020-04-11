@@ -170,11 +170,6 @@ void MainMenuScreen::init()
     r->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     DemoWorld::resetIdleTime();
 
-#if _IRR_MATERIAL_MAX_TEXTURES_ < 8
-    getWidget<IconButtonWidget>("logo")->setImage("gui/icons/logo_broken.png",
-        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
-#endif
-
 #ifdef IOS_STK
     // iOS app doesn't like quit button in UI
     Widget* quit = getWidget("quit");
@@ -188,6 +183,8 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 {
 #ifndef SERVER_ONLY
+    NewsManager::get()->joinDownloadThreadIfExit();
+
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {

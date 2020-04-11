@@ -31,6 +31,7 @@
 #include "utils/translation.hpp"
 #include "utils/vs.hpp"
 
+#include <functional>
 #include <iostream>
 
 using namespace Online;
@@ -56,6 +57,15 @@ NewsManager::NewsManager() : m_news(std::vector<NewsMessage>())
 // ---------------------------------------------------------------------------
 NewsManager::~NewsManager()
 {
+    // If the download thread doesn't finish on time we detach the thread to
+    // avoid exception
+    if (m_download_thread.joinable())
+    {
+        if (!CanBeDeleted::canBeDeletedNow())
+            m_download_thread.detach();
+        else
+            m_download_thread.join();
+    }
 }   // ~NewsManager
 
 // ---------------------------------------------------------------------------
@@ -68,6 +78,9 @@ NewsManager::~NewsManager()
  */
 void NewsManager::init(bool force_refresh)
 {
+    if (m_download_thread.joinable())
+        return;
+
     m_force_refresh = force_refresh;
 
     // The rest (which potentially involves downloading m_news_filename) is handled
@@ -76,34 +89,21 @@ void NewsManager::init(bool force_refresh)
     // thread anyway (and the addons menu is disabled as a result).
     if(UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED)
     {
-        pthread_attr_t  attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        pthread_t thread_id;
-        int error = pthread_create(&thread_id, &attr,
-            &NewsManager::downloadNews, this);
-        if (error)
-        {
-            Log::warn("news", "Could not create thread, error=%d", error);
-            // In this case just execute the downloading code with this thread
-            downloadNews(this);
-        }
-        pthread_attr_destroy(&attr);
+        CanBeDeleted::resetCanBeDeleted();
+        m_download_thread = std::thread(std::bind(
+            &NewsManager::downloadNews, this));
     }
-
 }   //init
 
 // ---------------------------------------------------------------------------
 /** This function submits request which will download the m_news_filename file
  *  if necessary. It is running in its own thread, so we can use blocking
  *  download calls without blocking the GUI.
- *  \param obj This is 'this' object, passed on during pthread creation.
  */
-void* NewsManager::downloadNews(void *obj)
+void NewsManager::downloadNews()
 {
     VS::setThreadName("downloadNews");
-    NewsManager *me = (NewsManager*)obj;
-    me->clearErrorMessage();
+    clearErrorMessage();
 
     std::string xml_file = file_manager->getAddonsFile(m_news_filename);
     // Prevent downloading when .part file created, which is already downloaded
@@ -118,7 +118,7 @@ void* NewsManager::downloadNews(void *obj)
                       UserConfigParams::m_news_last_updated
                           +UserConfigParams::m_news_frequency
                         < StkTime::getTimeSinceEpoch()          ||
-                      me->m_force_refresh                       ||
+                      m_force_refresh                       ||
                       !news_exists                                    )
          && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED
          && !file_manager->fileExists(xml_file_part);
@@ -181,7 +181,7 @@ void* NewsManager::downloadNews(void *obj)
                 const char *const curl_error = download_req->getDownloadErrorMessage();
                 error_message = StringUtils::insertValues(error_message, curl_error);
                 addons_manager->setErrorState();
-                me->setErrorMessage(error_message);
+                setErrorMessage(error_message);
                 Log::error("news", core::stringc(error_message).c_str());
             }   // hadDownloadError
         }   // hadDownloadError
@@ -202,19 +202,17 @@ void* NewsManager::downloadNews(void *obj)
     if(file_manager->fileExists(xml_file))
     {
         xml = new XMLNode(xml_file);
-        me->checkRedirect(xml);
-        me->updateNews(xml, xml_file);
+        checkRedirect(xml);
+        updateNews(xml, xml_file);
         if (addons_manager)
-            addons_manager->init(xml, me->m_force_refresh);
+            addons_manager->init(xml, m_force_refresh);
         delete xml;
     }
 
     // We can't finish stk (esp. delete the file manager) before
     // this part of the code is reached (since otherwise the file
     // manager might be access after it was deleted).
-    me->setCanBeDeleted();
-    pthread_exit(NULL);
-    return 0;  // prevent warning
+    CanBeDeleted::setCanBeDeleted();
 }   // downloadNews
 
 // ---------------------------------------------------------------------------

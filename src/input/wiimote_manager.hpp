@@ -25,9 +25,9 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/cpp2011.hpp"
 
-#include "IEventReceiver.h"
+#include <thread>
 
-#include <pthread.h>
+#include "IEventReceiver.h"
 
 #define MAX_WIIMOTES  4
 
@@ -57,7 +57,7 @@ private:
 #define WIIMOTE_THREADING
 #ifdef WIIMOTE_THREADING
     /** Wiimote state update thread */
-    pthread_t       m_thread;
+    std::thread     m_thread;
 
     /** Shut the update thread? */
     bool            m_shut;
@@ -68,7 +68,6 @@ private:
 
     /** Wiimotes update thread */
     void threadFunc();
-    static void* threadFuncWrapper(void* data);
     void            setWiimoteBindings(GamepadConfig* gamepad_config);
 
 public:

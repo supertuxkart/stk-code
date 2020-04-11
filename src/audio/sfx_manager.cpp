@@ -29,10 +29,11 @@
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
-#include <pthread.h>
 #include <stdexcept>
 #include <algorithm>
 #include <map>
+
+#include <functional>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,28 +92,9 @@ SFXManager::SFXManager()
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
-        pthread_cond_init(&m_cond_request, NULL);
-    
-        pthread_attr_t  attr;
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-    
-        m_thread_id.setAtomic(new pthread_t());
         // The thread is created even if there atm sfx are disabled
         // (since the user might enable it later).
-        int error = pthread_create(m_thread_id.getData(), &attr,
-                                   &SFXManager::mainLoop, this);
-        if (error)
-        {
-            m_thread_id.lock();
-            delete m_thread_id.getData();
-            m_thread_id.unlock();
-            m_thread_id.setAtomic(0);
-            Log::error("SFXManager", "Could not create thread, error=%d.",
-                       errno);
-        }
-        pthread_attr_destroy(&attr);
-    
+        m_thread = std::thread(std::bind(mainLoop, this));
         setMasterSFXVolume( UserConfigParams::m_sfx_volume );
         m_sfx_commands.lock();
         m_sfx_commands.getData().clear();
@@ -129,11 +111,7 @@ SFXManager::~SFXManager()
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
-        m_thread_id.lock();
-        pthread_join(*m_thread_id.getData(), NULL);
-        delete m_thread_id.getData();
-        m_thread_id.unlock();
-        pthread_cond_destroy(&m_cond_request);
+        m_thread.join();
     }
 #endif
 
@@ -346,7 +324,7 @@ void SFXManager::stopThread()
     {
         queue(SFX_EXIT);
         // Make sure the thread wakes up.
-        pthread_cond_signal(&m_cond_request);
+        m_condition_variable.notify_one();
     }
     else
 #endif
@@ -361,16 +339,16 @@ void SFXManager::stopThread()
  *  in order to avoid rendering delays.
  *  \param obj A pointer to the SFX singleton.
  */
-void* SFXManager::mainLoop(void *obj)
+void SFXManager::mainLoop(void *obj)
 {
 #ifdef ENABLE_SOUND
     if (!UserConfigParams::m_enable_sound)
-        return NULL;
+        return;
         
     VS::setThreadName("SFXManager");
     SFXManager *me = (SFXManager*)obj;
 
-    me->m_sfx_commands.lock();
+    std::unique_lock<std::mutex> ul = me->m_sfx_commands.acquireMutex();
 
     // Wait till we have an empty sfx in the queue
     while (me->m_sfx_commands.getData().empty() ||
@@ -384,7 +362,7 @@ void* SFXManager::mainLoop(void *obj)
         // (pthread_cond_wait man page)!
         while (empty)
         {
-            pthread_cond_wait(&me->m_cond_request, me->m_sfx_commands.getMutex());
+            me->m_condition_variable.wait(ul);
             empty = me->m_sfx_commands.getData().empty();
         }
         SFXCommand *current = me->m_sfx_commands.getData().front();
@@ -395,7 +373,7 @@ void* SFXManager::mainLoop(void *obj)
             delete current;
             break;
         }
-        me->m_sfx_commands.unlock();
+        ul.unlock();
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("Execute", 0, 255, 0);
         switch (current->m_command)
@@ -473,7 +451,7 @@ void* SFXManager::mainLoop(void *obj)
             t = StkTime::getMonoTimeMs() - t;
             me->queue(SFX_UPDATE, (SFXBase*)NULL, float(t / 1000.0));
         }
-        me->m_sfx_commands.lock();
+        ul = me->m_sfx_commands.acquireMutex();
         PROFILER_POP_CPU_MARKER();
     }   // while
 
@@ -488,9 +466,8 @@ void* SFXManager::mainLoop(void *obj)
         delete me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
     }
-    me->m_sfx_commands.unlock();
 #endif
-    return NULL;
+    return;
 }   // mainLoop
 
 //----------------------------------------------------------------------------
@@ -812,7 +789,7 @@ void SFXManager::update()
 
     queue(SFX_UPDATE, (SFXBase*)NULL);
     // Wake up the sfx thread to handle all queued up audio commands.
-    pthread_cond_signal(&m_cond_request);
+    m_condition_variable.notify_one();
 #endif
 }   // update
 
@@ -1088,7 +1065,7 @@ SFXBase* SFXManager::quickSound(const std::string &sound_type)
 #ifdef ENABLE_SOUND
     if (!sfxAllowed()) return NULL;
 
-    MutexLockerHelper lock(m_quick_sounds);
+    std::unique_lock<std::mutex> ul = m_quick_sounds.acquireMutex();
     std::map<std::string, SFXBase*>::iterator sound = 
                                      m_quick_sounds.getData().find(sound_type);
 

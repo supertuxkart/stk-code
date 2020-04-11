@@ -34,6 +34,8 @@
 
 #include "wiiuse.h"
 
+#include <functional>
+
 WiimoteManager*  wiimote_manager;
 
 
@@ -203,7 +205,7 @@ void WiimoteManager::launchDetection(int timeout)
     // Launch the update thread
 #ifdef WIIMOTE_THREADING
     m_shut = false;
-    pthread_create(&m_thread, NULL, &threadFuncWrapper, this);
+    m_thread = std::thread(std::bind(&WiimoteManager::threadFunc, this));
 #endif
 }   // launchDetection
 
@@ -263,7 +265,7 @@ void WiimoteManager::cleanup()
         // Shut the update thread
 #ifdef WIIMOTE_THREADING
         m_shut = true;
-        pthread_join(m_thread, NULL);
+        m_thread.join();
 #endif
         // Cleanup WiiUse
         wiiuse_cleanup(m_all_wiimote_handles, MAX_WIIMOTES);
@@ -311,6 +313,7 @@ void WiimoteManager::enableAccelerometer(bool state)
 void WiimoteManager::threadFunc()
 {
 #ifdef WIIMOTE_THREADING
+    VS::setThreadName("WiimoteManager");
     while(!m_shut)
 #endif
     {
@@ -365,18 +368,6 @@ void WiimoteManager::threadFunc()
         StkTime::sleep(1);  // 'cause come on, the whole CPU is not ours :)
     } // end while
 }   // threadFunc
-
-// ----------------------------------------------------------------------------
-/** This is the start function of a separate thread used to poll the wiimotes.
- *  It receives the wiimote manager as parameter when the thread is created.
- *  \param data Pointer to the wiimote manager.
- */
-void* WiimoteManager::threadFuncWrapper(void *data)
-{
-    VS::setThreadName("WiimoteManager");
-    ((WiimoteManager*)data)->threadFunc();
-    return NULL;
-}   // threadFuncWrapper
 
 // ----------------------------------------------------------------------------
 /** Shows a simple popup menu asking the user to connect all wiimotes.

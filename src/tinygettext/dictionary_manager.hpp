@@ -42,8 +42,8 @@ private:
   typedef std::map<Language, Dictionary*> Dictionaries;
   Dictionaries dictionaries;
 
-  typedef std::vector<std::string> SearchPath;
-  SearchPath search_path;
+  typedef std::vector<std::string> Search_Path;
+  Search_Path search_path;
 
   std::string charset;
   bool        use_fuzzy;

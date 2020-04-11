@@ -503,6 +503,8 @@ void AddonsScreen::setLastSelected()
 void AddonsScreen::onUpdate(float dt)
 {
 #ifndef SERVER_ONLY
+    NewsManager::get()->joinDownloadThreadIfExit();
+
     if (m_reloading)
     {
         if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)

@@ -23,11 +23,6 @@ using namespace irr;
 
 #include <algorithm>
 #include <limits>
-
-// #include "BulletCollision/CollisionShapes/btCompoundShape.h"
-// #include "BulletCollision/CollisionShapes/btConvexPolyhedron.h"
-// #include "physics/btKart.hpp"
-
 #include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
@@ -599,6 +594,7 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     float w = target_kart->getKartWidth();
     tx = quatRotate(target_kart->getVisualRotation(), Vec3(0,0,l/2));
     Vec3 cur_kart_front_pos = cur_kart_pos + tx;
+    Vec3 cur_kart_direction = tx.normalize();
     tx = quatRotate(target_kart->getVisualRotation(), Vec3(-w/2,0,l/2));
     Vec3 cur_kart_front_pos_left = cur_kart_pos + tx;
     tx = quatRotate(target_kart->getVisualRotation(), Vec3(w/2,0,l/2));
@@ -636,6 +632,7 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
       r2 = r1; \
     } \
 }
+
 #define DRAWSEMIGROUNDCIRCLE(o, size, color, target){ \
     ty = (target-o).normalize() * size; \
     ty = ty.rotate(p, -30 * DEGREE_TO_RAD); \
@@ -843,7 +840,7 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
       }
 
       distance = DISTANCELOG(ball_pos, cur_kart_pos);
-      p = Vec3(0, 1, 0);
+      p = Vec3(0, -1, 0);
       DRAWSEMIGROUNDCIRCLE(cur_kart_pos, 2.5, ball_line_color, ball_pos);
       DRAWSEMIGROUNDCIRCLE(cur_kart_pos, 2.4, ball_line_color, ball_pos);
       DRAWSEMIGROUNDCIRCLE(cur_kart_pos, 2.3, ball_line_color, ball_pos);
@@ -861,6 +858,7 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
           tx = (ball_pos_delta-cur_kart_pos).normalize();
       } else tx = (ball_pos - cur_kart_pos).normalize();
 
+      DRAWGROUNDCIRCLE(cur_kart_pos, 1.8, radar_circle_color, 36);
 
       distance = (distance*(radar_circle_size/2));
       GETANGLE(v, tx); 
@@ -1040,6 +1038,13 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
       }
     }
 
+#define DRAWTICKAROUNDGROUNDCIRCLE(angle, color, p1, p2) \
+    ty = cur_kart_direction; \
+    ty = ty.rotate(p, angle); \
+    r1 = cur_kart_pos + (ty*p1); \
+    r2 = cur_kart_pos + (ty*p2); \
+    DRAWLINE(r1, r2, color);
+
 #define DRAWTICKAROUNDRADAR(angle, color, p1, p2) \
     ty = Vec3(0, 1, 0); \
     ty = ty.rotate(cam_direction, angle); \
@@ -1062,6 +1067,27 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     angle+=2*angletri;\
     r1 = ty.rotate(cam_direction, angle); \
     ty = radar_circle_pos + (r1*p1); \
+    DRAWLINE(ty, th, color);\
+    DRAWLINE(ty, tx, color);\
+    r1 = ty + r2;\
+    r2 = tx + r2;\
+    DRAWLINE(r1, r2, color);
+
+#define DRAW_GROUND_ARROW(angle, angletri, color, p1, p2, d) \
+    ty = cur_kart_direction; \
+    r1 = ty.rotate(p, angle); \
+    tx = cur_kart_pos + (r1*(p1+2*d)); \
+    th = cur_kart_pos + (r1*p2); \
+    DRAWLINE(tx, th, color);\
+    r1 = cur_kart_pos + (r1*p1); \
+    r2 = (tx - r1) ; \
+    angle-=angletri;\
+    r1 = ty.rotate(p, angle); \
+    tx = cur_kart_pos + (r1*p1); \
+    DRAWLINE(tx, th, color); \
+    angle+=2*angletri;\
+    r1 = ty.rotate(p, angle); \
+    ty = cur_kart_pos + (r1*p1); \
     DRAWLINE(ty, th, color);\
     DRAWLINE(ty, tx, color);\
     r1 = ty + r2;\
@@ -1121,14 +1147,18 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
 
     angle=4*DEGREE_TO_RAD;
     float angle2=1.5*DEGREE_TO_RAD;
+    p = Vec3(0, -1, 0);
 
     for (int n=0; n<nb_arrows ; n++) {
       if (radar_arrows[n].type == 1) {
         DRAW_RADAR_ARROW(radar_arrows[n].angle, angle, radar_arrows[n].arrow_color, radar_incircle_low_radius, radar_circle_radius, radar_arrows[n].distance);
+        DRAW_GROUND_ARROW(radar_arrows[n].angle, angle, radar_arrows[n].arrow_color, 1.8, 2, radar_arrows[n].distance);
       } else if (radar_arrows[n].type == 2) {
         DRAWTICKAROUNDRADAR(radar_arrows[n].angle, radar_arrows[n].arrow_color, radar_circle_radius, (radar_circle_radius + radar_arrows[n].distance));
+        DRAWTICKAROUNDGROUNDCIRCLE(radar_arrows[n].angle, radar_arrows[n].arrow_color, 2, (radar_circle_radius + radar_arrows[n].distance));
       } else if (radar_arrows[n].type == 0){
         DRAW_RADAR_ARROW(radar_arrows[n].angle, angle2, radar_arrows[n].arrow_color, radar_incircle_low_radius, radar_incircle_zero_radius, radar_arrows[n].distance);
+        DRAW_GROUND_ARROW(radar_arrows[n].angle, angle2, radar_arrows[n].arrow_color, 1.8, 2, radar_arrows[n].distance);
       }
     }
 

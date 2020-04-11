@@ -21,9 +21,9 @@
 #include "utils/synchronised.hpp"
 
 #include <irrlicht.h>
-#include <pthread.h>
 
 #include <assert.h>
+#include <atomic>
 #include <iostream>
 #include <list>
 #include <map>
@@ -224,14 +224,11 @@ private:
      *  is the thread id. */
     std::vector< ThreadData> m_all_threads_data;
 
-    /** A mapping of thread_t pointers to a unique integer (starting from 0).*/
-    std::vector<pthread_t> m_thread_mapping;
-
     /** Buffer for the GPU times (in ms). */
     std::vector<int> m_gpu_times;
 
-    /** Counts the threads used, i.e. registered in m_thread_mapping. */
-    int m_threads_used;
+    /** Counts the threads used. */
+    std::atomic<int> m_threads_used;
 
     /** Index of the current frame in the buffer. */
     int m_current_frame;

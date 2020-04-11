@@ -120,7 +120,7 @@ DictionaryManager::get_dictionary(const Language& language)
 
     dictionaries[language] = dict;
 
-    for (SearchPath::reverse_iterator p = search_path.rbegin(); p != search_path.rend(); ++p)
+    for (Search_Path::reverse_iterator p = search_path.rbegin(); p != search_path.rend(); ++p)
     {
       std::vector<std::string> files = filesystem->open_directory(*p);
 
@@ -191,7 +191,7 @@ DictionaryManager::get_languages()
 {
   std::set<Language> languages;
 
-  for (SearchPath::iterator p = search_path.begin(); p != search_path.end(); ++p)
+  for (Search_Path::iterator p = search_path.begin(); p != search_path.end(); ++p)
   {
     std::vector<std::string> files = filesystem->open_directory(*p);
 

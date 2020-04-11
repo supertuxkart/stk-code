@@ -34,10 +34,11 @@
 #endif
 
 #include <atomic>
+#include <condition_variable>
 #include <curl/curl.h>
 #include <memory>
 #include <queue>
-#include <pthread.h>
+#include <thread>
 
 namespace Online
 {
@@ -99,7 +100,7 @@ namespace Online
             std::shared_ptr<Online::Request> m_current_request;
 
             /** A conditional variable to wake up the main loop. */
-            pthread_cond_t            m_cond_request;
+            std::condition_variable   m_condition_variable;
 
             /** Signal an abort in case that a download is still happening. */
             Synchronised<bool>        m_abort;
@@ -114,7 +115,7 @@ namespace Online
             float m_menu_polling_interval;
 
             /** Thread id of the thread running in this object. */
-            Synchronised<pthread_t *> m_thread_id;
+            std::thread m_thread;
 
             /** The list of pointers to all requests that still need to be
              *  handled. */
@@ -133,7 +134,7 @@ namespace Online
             void addResult(std::shared_ptr<Online::Request> request);
             void handleResultQueue();
 
-            static void *mainLoop(void *obj);
+            static void mainLoop(void *obj);
 
             RequestManager(); //const std::string &url
             ~RequestManager();
