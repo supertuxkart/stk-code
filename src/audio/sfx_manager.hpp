@@ -25,8 +25,11 @@
 #include "utils/synchronised.hpp"
 #include "utils/vec3.hpp"
 
+#include <condition_variable>
 #include <map>
 #include <string>
+#include <thread>
+
 #include <vector>
 
 #ifdef ENABLE_SOUND
@@ -219,18 +222,18 @@ private:
     float                     m_master_gain;
 
     /** Thread id of the thread running in this object. */
-    Synchronised<pthread_t *> m_thread_id;
+    std::thread               m_thread;
 
     uint64_t                  m_last_update_time;
 
     /** A conditional variable to wake up the main loop. */
-    pthread_cond_t            m_cond_request;
+    std::condition_variable   m_condition_variable;
 
     void                      loadSfx();
                              SFXManager();
     virtual                 ~SFXManager();
 
-    static void* mainLoop(void *obj);
+    static void mainLoop(void *obj);
     void deleteSFX(SFXBase *sfx);
     void queueCommand(SFXCommand *command);
     void reallyPositionListenerNow();

@@ -41,11 +41,9 @@
 #  include <sys/socket.h>
 #endif
 
-
-#include <pthread.h>
 #include <signal.h>
 
-Synchronised<FILE*>Network::m_log_file = NULL;
+Synchronised<FILE*>Network::m_log_file;
 bool Network::m_connection_debug = false;
 
 // ============================================================================

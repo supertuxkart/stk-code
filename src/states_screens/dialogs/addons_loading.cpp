@@ -18,8 +18,6 @@
 
 #include "states_screens/dialogs/addons_loading.hpp"
 
-#include <pthread.h>
-
 #include "addons/addons_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
