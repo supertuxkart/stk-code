@@ -24,6 +24,10 @@ using namespace irr;
 #include <algorithm>
 #include <limits>
 
+// #include "BulletCollision/CollisionShapes/btCompoundShape.h"
+// #include "BulletCollision/CollisionShapes/btConvexPolyhedron.h"
+// #include "physics/btKart.hpp"
+
 #include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
@@ -558,6 +562,24 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*>(world);
     World::KartList karts = world->getKarts();
 
+
+    video::SColor blue_color = video::SColor(255, 0, 0, 200);
+    video::SColor red_color = video::SColor(255, 200, 0, 0);
+    video::SColor ok_color = video::SColor(255, 0, 255, 0);
+    video::SColor kart_line_color = video::SColor(220, 73, 73, 0);
+    video::SColor target_align_color = video::SColor(255, 0, 255, 0);
+    video::SColor radar_arrow_color = video::SColor(255,0,0,0);
+    video::SColor radar_circle_color = video::SColor(220,255,255,255);
+    video::SColor radar_highlight_color = video::SColor(240,255,255,255);
+    video::SColor radar_pointer_color = video::SColor(255,255,255,255);
+    video::SColor radar_inside_color = video::SColor(220, 73, 73, 73);
+    video::SColor radar_inside_color2 = radar_inside_color;
+    video::SColor color = radar_inside_color;
+
+#define DRAWLINE(a, b, color) draw3DLine( a.toIrrVector(), b.toIrrVector(), color);
+
+    btTransform trans = target_kart->getTrans();
+
     std::vector<RadarArrow> radar_arrows;
 
     Vec3 tx;
@@ -569,23 +591,62 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     Vec3 d;
     Vec3 to_target;
 
-#define DRAWLINE(a, b, color) draw3DLine( a.toIrrVector(), b.toIrrVector(), color);
+
+    Vec3 kart_velocity;
+    Vec3 cur_kart_velocity = target_kart->getBody()->getLinearVelocity();
+    Vec3 cur_kart_pos = target_kart->getSmoothedXYZ();
+    float l = target_kart->getKartLength();
+    float w = target_kart->getKartWidth();
+    tx = quatRotate(target_kart->getVisualRotation(), Vec3(0,0,l/2));
+    Vec3 cur_kart_front_pos = cur_kart_pos + tx;
+    tx = quatRotate(target_kart->getVisualRotation(), Vec3(-w/2,0,l/2));
+    Vec3 cur_kart_front_pos_left = cur_kart_pos + tx;
+    tx = quatRotate(target_kart->getVisualRotation(), Vec3(w/2,0,l/2));
+    Vec3 cur_kart_front_pos_right = cur_kart_pos + tx;
+    tx = quatRotate(target_kart->getVisualRotation(), Vec3(-w/2,0,-l/2));
+    Vec3 cur_kart_bottom_pos_left = cur_kart_pos + tx;
+    tx = quatRotate(target_kart->getVisualRotation(), Vec3(w/2,0,-l/2));
+    Vec3 cur_kart_bottom_pos_right = cur_kart_pos + tx;
+
+    DRAWLINE(cur_kart_front_pos_left, cur_kart_front_pos_right,  ok_color);
+    DRAWLINE(cur_kart_front_pos_left, cur_kart_bottom_pos_left,  ok_color);
+    DRAWLINE(cur_kart_front_pos_right, cur_kart_bottom_pos_right,  ok_color);
+    DRAWLINE(cur_kart_bottom_pos_left, cur_kart_bottom_pos_right,  ok_color);
 
 #define SETPLAN(h) \
     p = Vec3(-(h.getZ()), h.getY(), h.getX()).normalize();
 
-#define DRAWCIRCLE(size, color, definition){ \
+#define DRAWFRONTCIRCLE(o, size, color, definition){ \
     ty = Vec3(0, size, 0); \
-    r2 = radar_circle_pos + ty; \
+    r2 = o + ty; \
     for (int i=0; i<definition; i++) { \
-      ty = ty.rotate(cam_direction, (360/definition) * DEGREE_TO_RAD); \
-      r1 = radar_circle_pos + ty; \
+      ty = ty.rotate(p, (360/definition) * DEGREE_TO_RAD); \
+      r1 = o + ty; \
       DRAWLINE(r1, r2, color); \
       r2 = r1; \
     } \
 }
-
-    // ty = Vec3(0, size, 0).rotate(cam_direction, angle * DEGREE_TO_RAD); \
+#define DRAWGROUNDCIRCLE(o, size, color, definition){ \
+    ty = Vec3(size, 0, 0); \
+    r2 = o + ty; \
+    for (int i=0; i<definition; i++) { \
+      ty = ty.rotate(p, (360/definition) * DEGREE_TO_RAD); \
+      r1 = o + ty; \
+      DRAWLINE(r1, r2, color); \
+      r2 = r1; \
+    } \
+}
+#define DRAWSEMIGROUNDCIRCLE(o, size, color, target){ \
+    ty = (target-o).normalize() * size; \
+    ty = ty.rotate(p, -30 * DEGREE_TO_RAD); \
+    r2 = o + ty; \
+    for (int i=0; i<6; i++) { \
+      ty = ty.rotate(p, 10 * DEGREE_TO_RAD); \
+      r1 = o + ty; \
+      DRAWLINE(r1, r2, color); \
+      r2 = r1; \
+    } \
+}
 
 #define DRAWCENTEREDSEMIARROW(size, color, angle){ \
     ty = Vec3(0, (((radar_circle_size/2)>size) ? ((radar_circle_size/2)-(size)):0.1), 0).rotate(cam_direction, angle * DEGREE_TO_RAD); \
@@ -607,15 +668,6 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
 #define DRAWCENTEREDARROW2(size, color, angle)\
   DRAWCENTEREDARROW(size, color, angle); \
   DRAWCENTEREDSEMIARROW(size + 0.01, color, angle);
-
-#define DRAWCIRCLE2(size, color, definition) \
-  DRAWCIRCLE(size, color, definition); \
-  DRAWCIRCLE(size + 0.01, color, definition);
-
-#define DRAWCIRCLE3(size, color, definition) \
-  DRAWCIRCLE(size, color, definition); \
-  DRAWCIRCLE(size + 0.01, color, definition); \
-  DRAWCIRCLE(size + 0.02, color, definition);
 
 
 #define DRAWSQUARE(a, color, rect_size) \
@@ -642,14 +694,8 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     deg_angle = 360.0f+(angle*RAD_TO_DEGREE);
 
 
-    Vec3 kart_velocity;
-    Vec3 cur_kart_velocity = target_kart->getBody()->getLinearVelocity();
-    Vec3 cur_kart_pos = target_kart->getSmoothedXYZ();
-    Vec3 cur_kart_axis = quatRotate(target_kart->getVisualRotation(), Vec3(0,0,1));
-    Vec3 cur_kart_front_pos = cur_kart_pos + cur_kart_axis;
 
     const bool backwards = (target_kart->getControls()).getLookBack();
-    btTransform trans = target_kart->getTrans();
     // get heading=trans.getBasis*(0,0,1) ... so save the multiplication:
     Vec3 direction(trans.getBasis().getColumn(2));
     direction = direction.normalize();
@@ -670,23 +716,8 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
     float tick_angle;
     float distance = 0;
 
-    video::SColor blue_color = video::SColor(255, 0, 0, 200);
-    video::SColor red_color = video::SColor(255, 200, 0, 0);
-    video::SColor ok_color = video::SColor(255, 0, 255, 0);
-    video::SColor kart_line_color = video::SColor(220, 73, 73, 0);
-    video::SColor target_align_color = video::SColor(255, 0, 255, 0);
-    video::SColor kart_tunnel_color = video::SColor(220, 109, 109, 109);
-    video::SColor radar_arrow_color = video::SColor(255,0,0,0);
-    video::SColor radar_circle_color = video::SColor(220,255,255,255);
-    video::SColor radar_circle_color_muted = video::SColor(100,255,255,255);
-    video::SColor radar_highlight_color = video::SColor(240,255,255,255);
-    video::SColor radar_pointer_color = video::SColor(255,255,255,255);
-    video::SColor radar_inside_color = video::SColor(220, 73, 73, 73);
-    video::SColor radar_inside_color2 = radar_inside_color;
-    video::SColor color = radar_inside_color;
-
     KartTeam cur_team = world->getKartTeam(target_kart->getWorldKartId());
-    KartTeam other_team = (cur_team == KART_TEAM_BLUE ? KART_TEAM_RED: KART_TEAM_BLUE);
+    // KartTeam other_team = (cur_team == KART_TEAM_BLUE ? KART_TEAM_RED: KART_TEAM_BLUE);
 
 #define TOLOG(a) ((std::log10(a+1) / 2) - 0.2)
 #define DISTANCELOG(a,b) (TOLOG(DISTANCE(a, b)))
@@ -731,45 +762,14 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
       video::SColor(220, 255-distance, 120+(distance/2), distance);
 
     Vec3 cur_kart_pos1 = cur_kart_pos + cur_kart_velocity/4;
-    if (cur_kart_velocity.length() > 1){
+    int speed = cur_kart_velocity.length();
+    if (speed > 2){
       GETANGLE(v, cur_kart_velocity);
       angle *= (backwards ? -8 : 8);
       deg_angle *= (backwards ? -8 : 8);
-      distance = TOLOG(cur_kart_velocity.length());
+      distance = TOLOG(speed);
       radar_arrows.push_back({angle, 2, kart_line_color, distance, 10, radar_highlight_color, deg_angle});
     }
-    // tick_angle = angle * 2;
-    // Vec3 rotate_axis = Vec3(0,1,0);
-    /* 
-     * ty = cur_kart_velocity.rotate(rotate_axis, tick_angle); \
-     * Vec3 cur_kart_pos2 = cur_kart_pos1 + ty/8;
-     * tick_angle = angle * 4;
-     * ty = cur_kart_velocity.rotate(rotate_axis, tick_angle); \
-     * Vec3 cur_kart_pos3 = cur_kart_pos2 + ty/4;
-     * tick_angle = angle * 8;
-     * ty = cur_kart_velocity.rotate(rotate_axis, tick_angle); \
-     * Vec3 cur_kart_pos4 = cur_kart_pos3 + ty/2;
-     * tick_angle = angle * 16;
-     * ty = cur_kart_velocity.rotate(rotate_axis, tick_angle); \
-     * Vec3 cur_kart_pos5 = cur_kart_pos4 + ty;
-     */
-
-    // draw a vector representing the axis of the kart
-    // DRAWLINE( cur_kart_front_pos, r1, kart_line_color);
-
-    /* draw player kart trajectory */
-    /* 
-     * DRAWLINE( cur_kart_pos1, cur_kart_pos2, kart_line_color);
-     * DRAWLINE( cur_kart_pos2, cur_kart_pos3, kart_line_color);
-     * DRAWLINE( cur_kart_pos3, cur_kart_pos4, kart_line_color);
-     * DRAWLINE( cur_kart_pos4, cur_kart_pos5, kart_line_color);
-     * SETPLAN(v);
-     * DRAWSQUARE( cur_kart_pos1, kart_tunnel_color, 0.05f);
-     * DRAWSQUARE( cur_kart_pos2, kart_tunnel_color, 0.05f);
-     * DRAWSQUARE( cur_kart_pos3, kart_tunnel_color, 0.05f);
-     * DRAWSQUARE( cur_kart_pos4, kart_tunnel_color, 0.05f);
-     * DRAWSQUARE( cur_kart_pos5, kart_tunnel_color, 0.05f);
-     */
 
     PowerupManager::PowerupType powerup_type = PowerupManager::POWERUP_NOTHING;
     if (target_kart->getNumPowerup() > 0){
@@ -841,13 +841,27 @@ void RaceGUI::drawRadar(const AbstractKart* target_kart)
          DRAWLINE( tx, ty, ball_line_color2);
 
       }
-      /* 
-       * DRAWCIRCLE((TOLOG(25)*radar_circle_size), radar_circle_color_muted, 36); 
-       * DRAWCIRCLE((TOLOG(5)*radar_circle_size), radar_circle_color_muted, 36); 
-       */
+
       distance = DISTANCELOG(ball_pos, cur_kart_pos);
-      if (distance < 0.5) tx = (ball_pos_delta-cur_kart_pos).normalize();
-      else tx = (ball_pos - cur_kart_pos).normalize();
+      p = Vec3(0, 1, 0);
+      DRAWSEMIGROUNDCIRCLE(cur_kart_pos, 2.5, ball_line_color, ball_pos);
+      DRAWSEMIGROUNDCIRCLE(cur_kart_pos, 2.4, ball_line_color, ball_pos);
+      DRAWSEMIGROUNDCIRCLE(cur_kart_pos, 2.3, ball_line_color, ball_pos);
+      DRAWSEMIGROUNDCIRCLE(cur_kart_pos, 2.2, ball_line_color, ball_pos);
+      if (distance < 0.5) {
+          if ( distance <0.3) {
+              video::SColor ground_circle_color = video::SColor(255-(distance*1000),0,0,0);
+              DRAWGROUNDCIRCLE(cur_kart_pos, 4.02, ground_circle_color, 36);
+          }
+          if (speed<25){
+              video::SColor ground_circle_color = video::SColor(speed>1?(255-(std::log10(speed)*182)):255,0,0,0);
+              if ( distance <0.2) DRAWGROUNDCIRCLE(cur_kart_pos, 2, ground_circle_color, 36);
+              DRAWGROUNDCIRCLE(cur_kart_pos, 4, ground_circle_color, 36);
+          }
+          tx = (ball_pos_delta-cur_kart_pos).normalize();
+      } else tx = (ball_pos - cur_kart_pos).normalize();
+
+
       distance = (distance*(radar_circle_size/2));
       GETANGLE(v, tx); 
       DRAWCENTEREDARROW2(distance, color, deg_angle); 
