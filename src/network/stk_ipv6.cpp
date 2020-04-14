@@ -178,8 +178,8 @@ stk_inet_pton6(const char *src, void *dest)
         * Since some memmove()'s erroneously fail to handle
         * overlapping regions, we'll do the shift by hand.
         */
-        const ssize_t n = tp - colonp;
-        ssize_t i;
+        const size_t n = tp - colonp;
+        size_t i;
 
         if(tp == endp)
             return (0);
