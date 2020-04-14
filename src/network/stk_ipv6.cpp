@@ -44,6 +44,7 @@
 #include "network/network_config.hpp"
 #include <array>
 #include <string>
+#include <stddef.h>
 
 // ============================================================================
 // For Windows XP support
@@ -178,8 +179,8 @@ stk_inet_pton6(const char *src, void *dest)
         * Since some memmove()'s erroneously fail to handle
         * overlapping regions, we'll do the shift by hand.
         */
-        const size_t n = tp - colonp;
-        size_t i;
+        const ptrdiff_t n = tp - colonp;
+        ptrdiff_t i;
 
         if(tp == endp)
             return (0);
