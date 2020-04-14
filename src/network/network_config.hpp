@@ -59,6 +59,10 @@ private:
     /** The singleton instance. */
     static NetworkConfig *m_network_config[PT_COUNT];
 
+    static bool m_system_ipv4;
+
+    static bool m_system_ipv6;
+
     enum NetworkType : int
     {
         NETWORK_NONE, NETWORK_WAN, NETWORK_LAN
@@ -125,6 +129,8 @@ private:
                              const std::string& dns);
 
 public:
+    static void initSystemIP();
+    // ------------------------------------------------------------------------
     /** Singleton get, which creates this object if necessary. */
     static NetworkConfig *get()
     {

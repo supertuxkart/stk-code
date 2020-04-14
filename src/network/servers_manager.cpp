@@ -164,6 +164,13 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
             NetworkConfig::get()->setIPType(UserConfigParams::m_ipv6_lan ?
                 NetworkConfig::IP_DUAL_STACK : NetworkConfig::IP_V4);
             Network *broadcast = new Network(1, 1, 0, 0, &addr);
+            if (!broadcast->getENetHost())
+            {
+                setIPv6Socket(0);
+                m_success = true;
+                delete broadcast;
+                return;
+            }
             const std::vector<SocketAddress> &all_bcast =
                 ServersManager::get()->getBroadcastAddresses(
                 UserConfigParams::m_ipv6_lan);

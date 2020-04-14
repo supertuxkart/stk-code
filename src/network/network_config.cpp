@@ -59,6 +59,48 @@
 #endif
 
 NetworkConfig *NetworkConfig::m_network_config[PT_COUNT];
+bool NetworkConfig::m_system_ipv4 = false;
+bool NetworkConfig::m_system_ipv6 = false;
+
+/** Initialize detection of system IPv4 or IPv6 support. */
+void NetworkConfig::initSystemIP()
+{
+    // It calls WSAStartup in enet, for the rest new Network function we don't
+    // need this because request manager runs curl_global_init which will do
+    // WSAStartup too
+    if (enet_initialize() != 0)
+    {
+        Log::error("NetworkConfig", "Could not initialize enet.");
+        return;
+    }
+    ENetAddress eaddr = {};
+    setIPv6Socket(0);
+    auto ipv4 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
+    setIPv6Socket(1);
+    auto ipv6 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
+    setIPv6Socket(0);
+    if (ipv4 && ipv4->getENetHost())
+        m_system_ipv4 = true;
+    if (ipv6 && ipv6->getENetHost())
+        m_system_ipv6 = true;
+    // If any 1 of them is missing set default network setting accordingly
+    if (!m_system_ipv4)
+    {
+        Log::warn("NetworkConfig", "System doesn't support IPv4");
+        if (m_system_ipv6)
+        {
+            UserConfigParams::m_ipv6_lan = true;
+            ServerConfig::m_ipv6_connection = true;
+        }
+    }
+    else if (!m_system_ipv6)
+    {
+        Log::warn("NetworkConfig", "System doesn't support IPv6");
+        UserConfigParams::m_ipv6_lan = false;
+        ServerConfig::m_ipv6_connection = false;
+    }
+    enet_deinitialize();
+}   // initSystemIP
 
 /** \class NetworkConfig
  *  This class is the interface between STK and the online code, particularly
@@ -224,6 +266,16 @@ void NetworkConfig::detectIPType()
         return;
     }
 #ifdef ENABLE_IPV6
+    if (!m_system_ipv4 || !m_system_ipv6)
+    {
+        // Don't test connection if only IPv4 or IPv6 system support
+        if (m_system_ipv4)
+            m_ip_type.store(IP_V4);
+        else if (m_system_ipv6)
+            m_ip_type.store(IP_V6);
+        return;
+    }
+
     ENetAddress eaddr = {};
     // We don't need to result of stun, just to check if the socket can be
     // used in ipv4 or ipv6
@@ -234,6 +286,10 @@ void NetworkConfig::detectIPType()
     setIPv6Socket(1);
     auto ipv6 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
     setIPv6Socket(0);
+
+    // This should only happen if system doesn't support all socket types
+    if (!ipv4->getENetHost() || !ipv6->getENetHost())
+        return;
 
     auto& stunv4_map = UserConfigParams::m_stun_servers_v4;
     for (auto& s : getStunList(true/*ipv4*/))
