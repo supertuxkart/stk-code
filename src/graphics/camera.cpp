@@ -223,7 +223,25 @@ Camera::Mode Camera::getMode()
 Camera::Mode Camera::getPreviousMode()
 {
     return m_previous_mode;
-}   // getMode
+}   // getPreviousMode
+
+// ----------------------------------------------------------------------------
+/** Returns true if camera is a spectator camera
+ */
+bool Camera::isSpectatorMode()
+{
+    return ((m_mode == CM_SPECTATOR_TOP_VIEW) || (m_mode == CM_SPECTATOR_SOCCER));
+}   // isSpectatorMode
+
+// ----------------------------------------------------------------------------
+/** Switch to next spectator mode  (a -> soccer -> top view -> a)
+ */
+void Camera::setNextSpectatorMode()
+{
+    if (m_mode == CM_SPECTATOR_SOCCER) m_mode = CM_SPECTATOR_TOP_VIEW;
+    else if (m_mode == CM_SPECTATOR_TOP_VIEW) m_mode = m_previous_mode;
+    else setMode(CM_SPECTATOR_SOCCER);
+}   // setNextSpectatorMode
 
 //-----------------------------------------------------------------------------
 /** Reset is called when a new race starts. Make sure that the camera

@@ -271,9 +271,19 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_SPECTATOR_SOCCER:
         {
             *above_kart = 0.0f;
-            *cam_angle  = 40*DEGREE_TO_RAD;
+            *cam_angle  = UserConfigParams::m_spectator_camera_angle*DEGREE_TO_RAD;
             *sideway    = 0;
-            *distance   = -6.75f*m_distance;
+            *distance   = -UserConfigParams::m_spectator_camera_distance;
+            *smoothing  = true;
+            *cam_roll_angle = 0.0f;
+            break;
+        }
+    case CM_SPECTATOR_TOP_VIEW:
+        {
+            *above_kart = 0.0f;
+            *cam_angle  = 0;
+            *sideway    = 0;
+            *distance   = UserConfigParams::m_spectator_camera_distance;
             *smoothing  = true;
             *cam_roll_angle = 0.0f;
             break;
@@ -344,18 +354,32 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     float tan_up = tanf(cam_angle);
 
-    if (getMode() == CM_SPECTATOR_SOCCER)
+    switch(getMode())
     {
-        SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*> (World::getWorld());
-        if (soccer_world)
+    case CM_SPECTATOR_SOCCER:
         {
-            Vec3 ball_pos = soccer_world->getBallPosition();
-            Vec3 to_target=(ball_pos-wanted_target);
-            wanted_position = wanted_target + Vec3(0,  fabsf(distance)*tan_up+above_kart, 0) + (to_target.normalize() * distance);
+            SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*> (World::getWorld());
+            if (soccer_world)
+            {
+                Vec3 ball_pos = soccer_world->getBallPosition();
+                Vec3 to_target=(ball_pos-wanted_target);
+                wanted_position = wanted_target + Vec3(0,  fabsf(distance)*tan_up+above_kart, 0) + (to_target.normalize() * distance);
+                m_camera->setPosition(wanted_position.toIrrVector());
+                m_camera->setTarget(wanted_target.toIrrVector());
+                return;
+            }
+            break;
+        }
+    case CM_SPECTATOR_TOP_VIEW:
+        {
+            SoccerWorld *soccer_world = dynamic_cast<SoccerWorld*> (World::getWorld());
+            if (soccer_world) wanted_target = soccer_world->getBallPosition();
+            wanted_position = wanted_target + Vec3(0,  distance+above_kart, 0);
             m_camera->setPosition(wanted_position.toIrrVector());
             m_camera->setTarget(wanted_target.toIrrVector());
             return;
         }
+    default: break;
     }
 
     Vec3 relative_position(side_way,

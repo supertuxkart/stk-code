@@ -1454,10 +1454,7 @@ void ClientLobby::changeSpectateTarget(PlayerAction action, int value,
     }
     if (action == PA_ACCEL)
     {
-        if (cam->getMode() == Camera::CM_SPECTATOR_SOCCER)
-            cam->setMode(cam->getPreviousMode());
-        else 
-            cam->setMode(Camera::CM_SPECTATOR_SOCCER);
+        cam->setNextSpectatorMode();
         return;
     }
 

@@ -357,8 +357,10 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     core::vector2df scaling = camera->getScaling();
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
-    
-    drawPlungerInFace(camera, dt);
+
+    bool isSpectatorCam = Camera::getActiveCamera()->isSpectatorMode();
+
+    if (!isSpectatorCam) drawPlungerInFace(camera, dt);
 
     if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width)
     {
@@ -373,10 +375,13 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
+    if (!isSpectatorCam) 
     {
-        drawPowerupIcons(kart, viewport, scaling);
-        drawSpeedEnergyRank(kart, viewport, scaling, dt);
+        if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
+        {
+            drawPowerupIcons(kart, viewport, scaling);
+            drawSpeedEnergyRank(kart, viewport, scaling, dt);
+        }
     }
 
     if (!m_is_tutorial)

@@ -964,6 +964,18 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(0, "minimap_display",
                       "Minimap: 0 bottom-left, 1 middle-right, 2 hidden, 3 center"));
 
+    // ---- Settings for spectator camera
+    PARAM_PREFIX GroupUserConfigParam       m_spectator
+            PARAM_DEFAULT( GroupUserConfigParam("Spectator",
+                                          "Everything related to spectator mode.") );
+
+    PARAM_PREFIX FloatUserConfigParam        m_spectator_camera_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(6.75, "camera-distance", &m_spectator,
+                                                  "Distance between kart and camera.") );
+    PARAM_PREFIX FloatUserConfigParam        m_spectator_camera_angle
+            PARAM_DEFAULT(  FloatUserConfigParam(40.0, "camera-angle", &m_spectator,
+                                                  "Angle between ground, kart and camera.") );
+
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap
             PARAM_DEFAULT( GroupUserConfigParam("Handicap",
