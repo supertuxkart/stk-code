@@ -101,7 +101,9 @@ namespace Scripting
         std::string script_file = FileUtils::getPortableReadingPath(script_path);
         if (!file_manager->fileExists(script_file))
         {
+#ifndef SERVER_ONLY
             Log::debug("Scripting", "File does not exist : %s", script_path.c_str());
+#endif
             return "";
         }
 
@@ -364,10 +366,12 @@ namespace Scripting
 
             if (module == NULL)
             {
+#ifndef SERVER_ONLY
                 if (warn_if_not_found)
                     Log::warn("Scripting", "Scripting function was not found : %s (module not found)", function_name.c_str());
                 else
                     Log::debug("Scripting", "Scripting function was not found : %s (module not found)", function_name.c_str());
+#endif
                 m_functions_cache[function_name] = NULL; // remember that this function is unavailable
                 return;
             }
@@ -376,10 +380,12 @@ namespace Scripting
             
             if (func == NULL)
             {
+#ifndef SERVER_ONLY
                 if (warn_if_not_found)
                     Log::warn("Scripting", "Scripting function was not found : %s", function_name.c_str());
                 else
                     Log::debug("Scripting", "Scripting function was not found : %s", function_name.c_str());
+#endif
                 m_functions_cache[function_name] = NULL; // remember that this function is unavailable
                 return;
             }
