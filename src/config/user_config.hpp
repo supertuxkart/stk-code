@@ -976,6 +976,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  FloatUserConfigParam(40.0, "camera-angle", &m_spectator,
                                                   "Angle between ground, kart and camera.") );
 
+    // ---- Special settings for soccer mode
+    PARAM_PREFIX BoolUserConfigParam       m_reverse_look_use_soccer_cam
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
+                            "Use ball camera in soccer mode, instead of reverse") );
+
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap
             PARAM_DEFAULT( GroupUserConfigParam("Handicap",

@@ -354,7 +354,10 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     float tan_up = tanf(cam_angle);
 
-    switch(getMode())
+    Camera::Mode mode = getMode();
+    if (UserConfigParams::m_reverse_look_use_soccer_cam && getMode() == CM_REVERSE) mode=CM_SPECTATOR_SOCCER;
+
+    switch(mode)
     {
     case CM_SPECTATOR_SOCCER:
         {
@@ -363,7 +366,7 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
             {
                 Vec3 ball_pos = soccer_world->getBallPosition();
                 Vec3 to_target=(ball_pos-wanted_target);
-                wanted_position = wanted_target + Vec3(0,  fabsf(distance)*tan_up+above_kart, 0) + (to_target.normalize() * distance);
+                wanted_position = wanted_target + Vec3(0,  fabsf(distance)*tan_up+above_kart, 0) + (to_target.normalize() * distance * (getMode() == CM_REVERSE ? -1:1));
                 m_camera->setPosition(wanted_position.toIrrVector());
                 m_camera->setTarget(wanted_target.toIrrVector());
                 return;
