@@ -55,6 +55,12 @@ export SUPERTUXKART_DATADIR="$DIRNAME"
 # A path for STK assets
 export SUPERTUXKART_ASSETS_DIR="$DIRNAME/data/"
 
+# A path to config template for additional options
+export CONFIG_FILE="$DIRNAME/config_template.xml"
+
+# A path to server config template for additional options
+export SERVER_CONFIG="$DIRNAME/server_config_template.xml"
+
 # A path for configuration files
 export HOME="/tmp/stk-server/.config"
 
@@ -64,14 +70,14 @@ export STDOUT_DIR="/tmp/stk-server/"
 ### Daemon mode ###
 
 # How often the script should check if servers are alive
-export SLEEP_TIME=60
+export SLEEP_TIME=300
 
 # How many times the script should try to recreate servers
-export MAX_CREATION_RETRIES=50
+export MAX_CREATION_RETRIES=100
 
 # Determines if the script should parse stdout.log files to see if servers are 
 # alive. Set it to 0 to disable.
-export CHECK_SERVERS=1
+export CHECK_SERVERS=0
 
 # A path to the application that can be used to show GUI messages when error 
 # ocurred, server crashed etc. Atm. it will only work with xmessage/gxmessage. 
@@ -114,20 +120,78 @@ run_servers()
     echo "Info: Run servers"
 
     "$CMD" --ranked                            \
+           --owner-less                        \
+           --disable-polling                   \
            --max-players=8                     \
            --min-players=2                     \
-           --difficulty=2                      \
+           --difficulty=3                      \
            --mode=0                            \
            --port=2760                         \
-           --wan-server="$SERVER_NAME"         \
+           --wan-server="$SERVER_NAME Ranked"  \
            --stdout="$DATETIME-normal.log"     \
            --stdout-dir="$STDOUT_DIR"          \
            --no-console-log                    \
+           --no-firewalled-server              \
            --log=0                               &> /dev/null &
 
     sleep 5
 
-    "$CMD" --owner-less                       \
+    #~ "$CMD" --no-ranked                        \
+           #~ --owner-less                       \
+           #~ --disable-polling                  \
+           #~ --max-players=8                    \
+           #~ --min-players=2                    \
+           #~ --difficulty=2                     \
+           #~ --mode=3                           \
+           #~ --soccer-goals                     \
+           #~ --port=2761                        \
+           #~ --wan-server="$SERVER_NAME Soccer" \
+           #~ --stdout="$DATETIME-soccer.log"    \
+           #~ --stdout-dir="$STDOUT_DIR"         \
+           #~ --no-console-log                   \
+           #~ --no-firewalled-server             \
+           #~ --log=0                              &> /dev/null &
+
+    #~ sleep 5
+
+    #~ "$CMD" --no-ranked                        \
+           #~ --owner-less                       \
+           #~ --disable-polling                  \
+           #~ --max-players=8                    \
+           #~ --min-players=2                    \
+           #~ --difficulty=2                     \
+           #~ --mode=2                           \
+           #~ --battle-mode=0                    \
+           #~ --port=2762                        \
+           #~ --wan-server="$SERVER_NAME FFA"    \
+           #~ --stdout="$DATETIME-ffa.log"       \
+           #~ --stdout-dir="$STDOUT_DIR"         \
+           #~ --no-console-log                   \
+           #~ --no-firewalled-server             \
+           #~ --log=0                              &> /dev/null &
+
+    #~ sleep 5
+
+    #~ "$CMD" --no-ranked                        \
+           #~ --owner-less                       \
+           #~ --disable-polling                  \
+           #~ --max-players=8                    \
+           #~ --min-players=2                    \
+           #~ --difficulty=2                     \
+           #~ --mode=2                           \
+           #~ --battle-mode=1                    \
+           #~ --port=2763                        \
+           #~ --wan-server="$SERVER_NAME CTF"    \
+           #~ --stdout="$DATETIME-ctf.log"       \
+           #~ --stdout-dir="$STDOUT_DIR"         \
+           #~ --no-console-log                   \
+           #~ --no-firewalled-server             \
+           #~ --log=0                              &> /dev/null &
+
+    #~ sleep 5
+    
+    "$CMD" --no-ranked                        \
+           --no-owner-less                    \
            --disable-polling                  \
            --max-players=8                    \
            --min-players=2                    \
@@ -135,26 +199,29 @@ run_servers()
            --mode=3                           \
            --soccer-goals                     \
            --port=2761                        \
-           --wan-server="$SERVER_NAME Soccer" \
-           --stdout="$DATETIME-soccer.log"    \
+           --wan-server="$SERVER_NAME Custom" \
+           --stdout="$DATETIME-custom.log"    \
            --stdout-dir="$STDOUT_DIR"         \
            --no-console-log                   \
+           --no-firewalled-server             \
            --log=0                              &> /dev/null &
 
     sleep 5
 
-    "$CMD" --owner-less                       \
-           --disable-polling                  \
-           --max-players=8                    \
-           --min-players=2                    \
-           --difficulty=2                     \
-           --mode=2                           \
-           --battle-mode=1                    \
-           --port=2762                        \
-           --wan-server="$SERVER_NAME CTF"    \
-           --stdout="$DATETIME-ctf.log"       \
-           --stdout-dir="$STDOUT_DIR"         \
-           --no-console-log                   \
+    "$CMD" --no-ranked                          \
+           --no-owner-less                      \
+           --disable-polling                    \
+           --max-players=8                      \
+           --min-players=2                      \
+           --difficulty=2                       \
+           --mode=2                             \
+           --battle-mode=1                      \
+           --port=2762                          \
+           --wan-server="$SERVER_NAME Custom 2" \
+           --stdout="$DATETIME-custom2.log"     \
+           --stdout-dir="$STDOUT_DIR"           \
+           --no-console-log                     \
+           --no-firewalled-server               \
            --log=0                              &> /dev/null &
 
     sleep 5
@@ -175,6 +242,9 @@ init_servers()
            --log=0                         &> /dev/null
 
     sleep 5
+
+    find "$HOME/.config/supertuxkart" -mindepth 1 -maxdepth 1 -type d -exec cp "$CONFIG_FILE" "{}/config.xml" \;
+    find "$HOME/.config/supertuxkart" -mindepth 1 -maxdepth 1 -type d -exec cp "$SERVER_CONFIG" "{}/server_config.xml" \;
 }
 
 stop_servers()
