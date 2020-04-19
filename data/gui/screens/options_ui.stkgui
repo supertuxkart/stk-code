@@ -53,6 +53,17 @@
 
                 <spacer width="5" height="2%"/>
 
+                <div layout="horizontal-row" width="100%" height="fit">
+                    <div layout="vertical-row" width="10f" height="fit">
+                        <spinner id="splitscreen_method" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the ui settings" text="Multiplayer splits" align="left"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
                 <div width="100%" height="fit" layout="horizontal-row">
                     <div layout="vertical-row" width="10f" height="fit">
                         <gauge id="font_size" width="100%" align="center" />
@@ -68,14 +79,6 @@
                     <checkbox id="showfps"/>
                     <spacer width="1%" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Display FPS" word_wrap="true"/>
-                </div>
-
-                <spacer width="5" height="2%"/>
-
-                <div layout="horizontal-row" width="100%" height="fit">
-                    <checkbox id="split_screen_horizontally"/>
-                    <spacer width="1%" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Multiplayer splits screen horizontally" word_wrap="true"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
