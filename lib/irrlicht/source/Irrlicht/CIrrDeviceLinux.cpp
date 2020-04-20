@@ -66,6 +66,8 @@ extern bool GLContextDebugBit;
 #define XRANDR_ROTATION_LEFT    (1 << 1)
 #define XRANDR_ROTATION_RIGHT   (1 << 3)
 
+#include <unistd.h>
+
 namespace irr
 {
 	namespace video

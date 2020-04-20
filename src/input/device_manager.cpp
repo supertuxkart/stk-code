@@ -58,8 +58,6 @@ DeviceManager::~DeviceManager()
 // -----------------------------------------------------------------------------
 bool DeviceManager::initialize()
 {
-    GamepadConfig *gamepadConfig = NULL;
-    GamePadDevice *gamepadDevice = NULL;
     m_map_fire_to_select         = false;
     bool created                 = false;
 
@@ -109,65 +107,6 @@ bool DeviceManager::initialize()
     {
         m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(n)));
     }
-
-    if(UserConfigParams::logMisc())
-        Log::info("Device manager","Initializing gamepad support.");
-
-    irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
-
-    int num_gamepads = m_irrlicht_gamepads.size();
-    if(UserConfigParams::logMisc())
-    {
-        Log::info("Device manager","Irrlicht reports %d gamepads are attached to the system.",
-               num_gamepads);
-    }
-
-    // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
-    for (int id = 0; id < num_gamepads; id++)
-    {
-        core::stringc name = m_irrlicht_gamepads[id].Name;
-
-        // Some systems report a disk accelerometer as a gamepad, skip that
-        if (name.find("LIS3LV02DL") != -1) continue;
-        if (name == "applesmc") continue;
-        if (name.find("VirtualBox") == 0) continue;
-
-        if(m_irrlicht_gamepads[id].HasGenericName)
-        {
-            // On Windows all gamepads are given the same name ('microsoft
-            // pc-joystick driver'). Irrlicht now tries to get a better name
-            // from the registry, but in case this should fail we still have
-            // all gamepads with the same name shown in the GUI. This makes
-            // configuration totally useless, so append an ID to the name.
-            name = name + " " + StringUtils::toString(id).c_str();
-        }
-
-        if (UserConfigParams::logMisc())
-        {
-            Log::info("Device manager","#%d: %s detected...", id, name.c_str());
-        }
-
-        // Returns true if new configuration was created
-        if (getConfigForGamepad(id, name.c_str(), &gamepadConfig) == true)
-        {
-            if(UserConfigParams::logMisc())
-               Log::info("Device manager","creating new configuration.");
-            created = true;
-        }
-        else
-        {
-            if(UserConfigParams::logMisc())
-                Log::info("Device manager","using existing configuration.");
-        }
-
-        gamepadConfig->setPlugged();
-        gamepadDevice = new GamePadDevice(id,
-                                          name.c_str(),
-                                          m_irrlicht_gamepads[id].Axes,
-                                          m_irrlicht_gamepads[id].Buttons,
-                                          gamepadConfig );
-        addGamepad(gamepadDevice);
-    } // end for
 
     if ((UserConfigParams::m_multitouch_active == 1 && 
         irr_driver->getDevice()->supportsTouchDevice()) ||
@@ -268,20 +207,9 @@ bool DeviceManager::getConfigForGamepad(const int irr_id,
     // If we can't find an appropriate configuration then create one.
     if (!found)
     {
-        if(irr_id < (int)(m_irrlicht_gamepads.size()))
-        {
-            *config = new GamepadConfig( name,
-                                         m_irrlicht_gamepads[irr_id].Axes,
-                                         m_irrlicht_gamepads[irr_id].Buttons );
-        }
-#ifdef ENABLE_WIIUSE
-        else    // Wiimotes have a higher ID and do not refer to m_irrlicht_gamepads
-        {
-            // The Wiimote manager will set number of buttons and axis
-            *config = new GamepadConfig(name.c_str());
-        }
-#endif
-
+        // The Wiimote manager and SDL controller will set number of buttons and
+        // axes
+        *config = new GamepadConfig(name.c_str());
         // Add new config to list
         m_gamepad_configs.push_back(*config);
         configCreated = true;

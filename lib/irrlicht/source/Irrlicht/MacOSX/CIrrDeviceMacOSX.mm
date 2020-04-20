@@ -31,19 +31,6 @@
 #import <time.h>
 #import "AppDelegate.h"
 
-#if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
-
-#include <IOKit/IOKitLib.h>
-#include <IOKit/IOCFPlugIn.h>
-#ifdef MACOS_10_0_4
-#include <IOKit/hidsystem/IOHIDUsageTables.h>
-#else
-/* The header was moved here in Mac OS X 10.1 */
-#include <Kernel/IOKit/hidsystem/IOHIDUsageTables.h>
-#endif
-#include <IOKit/hid/IOHIDLib.h>
-#include <IOKit/hid/IOHIDKeys.h>
-
 // only OSX 10.5 seems to not need these defines...
 #if !defined(__MAC_10_5) || defined(__MAC_10_6)
 // Contents from Events.h from Carbon/HIToolbox but we need it with Cocoa too
@@ -184,6 +171,19 @@ enum {
 	kVK_UpArrow		= 0x7E
 };
 #endif
+
+#if defined _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
+
+#include <IOKit/IOKitLib.h>
+#include <IOKit/IOCFPlugIn.h>
+#ifdef MACOS_10_0_4
+#include <IOKit/hidsystem/IOHIDUsageTables.h>
+#else
+/* The header was moved here in Mac OS X 10.1 */
+#include <Kernel/IOKit/hidsystem/IOHIDUsageTables.h>
+#endif
+#include <IOKit/hid/IOHIDLib.h>
+#include <IOKit/hid/IOHIDKeys.h>
 
 struct JoystickComponent
 {

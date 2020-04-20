@@ -29,6 +29,7 @@
 
 InputDevice::InputDevice()
 {
+    m_connected     = true;
     m_player        = NULL;
     m_configuration = NULL;
 }   // InputDevice

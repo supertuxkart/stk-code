@@ -145,6 +145,14 @@ public:
     bool isPlugged() const { return m_plugged > 0; }
 
     // ------------------------------------------------------------------------
+    /** Decrease ref counter. */
+    void unPlugged()
+    {
+        m_plugged--;
+        assert(m_plugged >= 0);
+    }
+
+    // ------------------------------------------------------------------------
     /** Returns the number of devices using this configuration. */
     int getNumberOfDevices() const { return m_plugged;     }
 

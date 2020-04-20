@@ -26,12 +26,13 @@ To build SuperTuxKart from source, you'll need to install the following packages
 * libpng (libpng-devel)
 * zlib (zlib-devel)
 * jpeg (libjpeg-turbo-devel)
+* SDL2 (libsdl2-devel)
 
 Fedora command:
 
 ```bash
 sudo dnf install @development-tools angelscript-devel \ 
-bluez-libs-devel cmake desktop-file-utils  \
+bluez-libs-devel cmake desktop-file-utils SDL2-devel \
 freealut-devel freeglut-devel freetype-devel fribidi-devel \
 gcc-c++ git-core libXrandr-devel libcurl-devel libjpeg-turbo-devel \ 
 libpng-devel libsquish-devel libtool libvorbis-devel mesa-libEGL-devel \ 
@@ -44,7 +45,7 @@ Mageia 6 command:
 
 ```bash
 su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel harfbuzz-devel \
-fribidi-devel libjpeg-turbo-devel libogg-devel openal-soft-devel \
+fribidi-devel libjpeg-turbo-devel libogg-devel openal-soft-devel SDL2-devel \
 libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
 mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
 ```
@@ -52,7 +53,7 @@ mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
 openSUSE command:
 
 ```bash
-sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel \
+sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel libSDL2-devel \
 freetype-devel harfbuzz-devel fribidi-devel libogg-devel openal-soft-devel libpng-devel \
 libvorbis-devel libXrandr-devel pkgconf zlib-devel enet-devel glew-devel \
 libjpeg-devel bluez-devel freetype2-devel glu-devel
@@ -61,7 +62,7 @@ libjpeg-devel bluez-devel freetype2-devel glu-devel
 Ubuntu command:
 
 ```bash
-sudo apt-get install build-essential cmake libbluetooth-dev \
+sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-devel \
 libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev \
 libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
 libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev

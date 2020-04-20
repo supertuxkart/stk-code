@@ -47,6 +47,9 @@ enum DeviceType
 class InputDevice: public NoCopy
 {
 protected:
+    /** For SDL controller it's set false when it's unplugged. */
+    bool m_connected;
+
     /** Device type (keyboard, gamepad). */
     DeviceType m_type;
 
@@ -107,6 +110,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the name of this device. */
     const std::string& getName() const { return m_name; }
+    // ------------------------------------------------------------------------
+    void setConnected(bool val) { m_connected = val; }
+    // ------------------------------------------------------------------------
+    bool isConnected() const { return m_connected; }
 };   // class InputDevice
 
 #endif

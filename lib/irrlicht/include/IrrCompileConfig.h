@@ -129,11 +129,7 @@
 #endif
 
 //! Define _IRR_COMPILE_WITH_JOYSTICK_SUPPORT_ if you want joystick events.
-#define _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
-#ifdef NO_IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 #undef _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
-#endif
-
 
 //! Maximum number of texture an SMaterial can have, up to 8 are supported by Irrlicht.
 #define _IRR_MATERIAL_MAX_TEXTURES_ 8

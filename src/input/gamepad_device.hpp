@@ -73,6 +73,7 @@ public:
     int getIrrIndex() const { return m_irr_index; }
 
     // ------------------------------------------------------------------------
+    void setIrrIndex(int i ) { m_irr_index = i; }
 
 };   // class GamepadDevice
 
