@@ -71,9 +71,6 @@ private:
     */
     int m_mouse_val_x, m_mouse_val_y;
 
-    void   dispatchInput(Input::InputType, int deviceID, int btnID,
-                         Input::AxisDirection direction, int value,
-                         bool shift_mask = false);
     void   handleStaticAction(int id0, int value);
     void   inputSensing(Input::InputType type, int deviceID, int btnID,
                         Input::AxisDirection axisDirection,  int value);
@@ -117,6 +114,10 @@ public:
      *  re-plugging later with the same ID. */
     size_t getGamepadCount() const { return m_sdl_controller.size(); }
 #endif
+
+    void   dispatchInput(Input::InputType, int deviceID, int btnID,
+                         Input::AxisDirection direction, int value,
+                         bool shift_mask = false);
 };
 
 extern InputManager *input_manager;

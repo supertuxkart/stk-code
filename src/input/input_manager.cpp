@@ -133,6 +133,8 @@ void InputManager::update(float dt)
             case SDL_JOYAXISMOTION:
             {
                 auto& controller = m_sdl_controller.at(event.jaxis.which);
+                if (m_mode == INPUT_SENSE_GAMEPAD)
+                    controller->handleAxisInputSense(event);
                 if (controller->handleAxis(event))
                     input(controller->getEvent());
                 break;

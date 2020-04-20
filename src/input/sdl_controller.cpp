@@ -33,6 +33,8 @@ SDLController::SDLController(int device_id)
 {
     m_irr_event = {};
     m_irr_event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
+    memset(m_prev_axes, 0,
+        irr::SEvent::SJoystickEvent::NUMBER_OF_AXES * sizeof(int16_t));
     m_game_controller = NULL;
     m_joystick = NULL;
     m_id = -1;
@@ -128,6 +130,9 @@ SDLController::SDLController(int device_id)
         m_hats = 0;
     else
         m_buttons += m_hats * 4;
+    // Save previous axes values for input sensing
+    for (int i = 0; i < m_axes; i++)
+        m_prev_axes[i] = SDL_JoystickGetAxis(m_joystick, i);
 
     DeviceManager* dm = input_manager->getDeviceManager();
     GamepadConfig* cfg = NULL;
@@ -176,5 +181,20 @@ SDLController::~SDLController()
     m_gamepad->setIrrIndex(-1);
     m_gamepad->setConnected(false);
 }   // ~SDLController
+
+// ----------------------------------------------------------------------------
+/** SDL only sends event when axis moves, so we need to send previously saved
+ *  event for correct input sensing. */
+void SDLController::handleAxisInputSense(const SDL_Event& event)
+{
+    int axis_idx = event.jaxis.axis;
+    if (axis_idx > m_axes)
+        return;
+    if (event.jaxis.value == m_prev_axes[axis_idx])
+        return;
+    input_manager->dispatchInput(Input::IT_STICKMOTION,
+        m_irr_event.JoystickEvent.Joystick, axis_idx, Input::AD_NEUTRAL,
+        m_prev_axes[axis_idx]);
+}   // handleAxisInputSense
 
 #endif

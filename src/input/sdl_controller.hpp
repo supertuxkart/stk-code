@@ -44,6 +44,8 @@ private:
     SDL_JoystickID m_id;
 
     irr::SEvent m_irr_event;
+
+    int16_t m_prev_axes[irr::SEvent::SJoystickEvent::NUMBER_OF_AXES];
 public:
     // ------------------------------------------------------------------------
     SDLController(int device_id);
@@ -54,12 +56,16 @@ public:
     // ------------------------------------------------------------------------
     SDL_JoystickID getInstanceID() const                       { return m_id; }
     // ------------------------------------------------------------------------
+    void handleAxisInputSense(const SDL_Event& event);
+    // ------------------------------------------------------------------------
     bool handleAxis(const SDL_Event& event)
     {
-        if (event.jaxis.axis > m_axes)
+        int axis_idx = event.jaxis.axis;
+        if (axis_idx > m_axes)
             return false;
-        m_irr_event.JoystickEvent.Axis[event.jaxis.axis] = event.jaxis.value;
-        uint32_t value = 1 << event.jaxis.axis;
+        m_irr_event.JoystickEvent.Axis[axis_idx] = event.jaxis.value;
+        m_prev_axes[axis_idx] = event.jaxis.value;
+        uint32_t value = 1 << axis_idx;
         m_irr_event.JoystickEvent.AxisChanged = value;
         return true;
     }   // handleAxis
