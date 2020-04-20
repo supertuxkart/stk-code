@@ -567,6 +567,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             sensed_input.m_device_id      = deviceID;
             sensed_input.m_button_id      = button;
             sensed_input.m_character      = deviceID;
+            sensed_input.m_axis_direction = Input::AD_NEUTRAL;
             OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             return;
         }
