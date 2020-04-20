@@ -235,8 +235,11 @@ void OptionsScreenInput::rebuildDeviceList()
     ListWidget* devices = this->getWidget<ListWidget>("devices");
     assert( devices != NULL );
 
+    int id = devices->getSelectionID();
     devices->clear();
     buildDeviceList();
+    if (id < devices->getItemCount())
+        devices->setSelectionID(id);
 }   // rebuildDeviceList
 
 // -----------------------------------------------------------------------------
@@ -348,10 +351,6 @@ void OptionsScreenInput::filterInput(Input::InputType type,
         if (gamepad != NULL && gamepad->getConfiguration() != NULL)
         {
             //printf("'%s'\n", gamepad->getConfiguration()->getName().c_str());
-
-            ListWidget* devices = this->getWidget<ListWidget>("devices");
-            assert(devices != NULL);
-
             std::string internal_name;
             const int gpad_config_count = input_manager->getDeviceManager()->getGamePadConfigAmount();
             for (int i = 0; i < gpad_config_count; i++)
@@ -368,10 +367,7 @@ void OptionsScreenInput::filterInput(Input::InputType type,
             }
 
             if (internal_name.size() > 0 && abs(value) > Input::MAX_VALUE/2)
-            {
-                devices->markItemRed(internal_name.c_str());
                 m_highlights[internal_name] = 0.25f;
-            }
         }
     }
 }
@@ -380,21 +376,21 @@ void OptionsScreenInput::filterInput(Input::InputType type,
 
 void OptionsScreenInput::onUpdate(float dt)
 {
+    rebuildDeviceList();
     std::map<std::string, float>::iterator it;
+    ListWidget* devices = this->getWidget<ListWidget>("devices");
+    assert(devices != NULL);
     for (it = m_highlights.begin(); it != m_highlights.end();)
     {
         it->second -= dt;
         if (it->second < 0.0f)
         {
-            ListWidget* devices = this->getWidget<ListWidget>("devices");
-            assert(devices != NULL);
-
             devices->markItemRed(it->first.c_str(), false);
-
             m_highlights.erase(it++);
         }
         else
         {
+            devices->markItemRed(it->first.c_str(), true);
             it++;
         }
     }
