@@ -1584,6 +1584,9 @@ bool KartSelectionScreen::useContinueButton() const
 {
     if (m_multiplayer)
         return false;
+    if (irr_driver->getDevice()->hasHardwareKeyboard() ||
+        input_manager->getGamepadCount() > 0)
+        return false;
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||
         UserConfigParams::m_multitouch_active > 1;
