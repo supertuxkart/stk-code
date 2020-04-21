@@ -2,6 +2,9 @@ package org.supertuxkart.stk_dbg;
 
 import org.supertuxkart.stk_dbg.STKEditText;
 
+import org.libsdl.app.SDLControllerManager;
+import org.libsdl.app.HIDDeviceManager;
+
 import android.app.NativeActivity;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -16,6 +19,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -30,9 +35,13 @@ import org.minidns.record.TXT;
 public class SuperTuxKartActivity extends NativeActivity
 {
     private STKEditText m_stk_edittext;
+    private static Context m_context;
+    private static HIDDeviceManager m_hid_device_manager;
 
     // ------------------------------------------------------------------------
     private native void saveKeyboardHeight(int height);
+    // ------------------------------------------------------------------------
+    private native void startSTK();
     // ------------------------------------------------------------------------
     private void hideKeyboardNative(final boolean clear_text)
     {
@@ -95,6 +104,7 @@ public class SuperTuxKartActivity extends NativeActivity
     {
         super.onCreate(instance);
         System.loadLibrary("main");
+        m_context = this;
         m_stk_edittext = null;
 
         final View root = getWindow().getDecorView().findViewById(
@@ -124,6 +134,12 @@ public class SuperTuxKartActivity extends NativeActivity
                         hideNavBar(decor_view);
                 }
             });
+        SDLControllerManager.nativeSetupJNI();
+        SDLControllerManager.initialize();
+        m_hid_device_manager = HIDDeviceManager.acquire(this);
+        // We only start stk main thread after JNI_OnLoad (for initializing the
+        // java environment)
+        startSTK();
     }
     // ------------------------------------------------------------------------
     @Override
@@ -131,7 +147,29 @@ public class SuperTuxKartActivity extends NativeActivity
     {
         super.onPause();
         hideKeyboardNative(false/*clear_text*/);
+        if (m_hid_device_manager != null)
+            m_hid_device_manager.setFrozen(true);
     }
+    // ------------------------------------------------------------------------
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        if (m_hid_device_manager != null)
+            m_hid_device_manager.setFrozen(false);
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    protected void onDestroy()
+    {
+        if (m_hid_device_manager != null)
+        {
+            HIDDeviceManager.release(m_hid_device_manager);
+            m_hid_device_manager = null;
+        }
+        super.onDestroy();
+    }
+
     // ------------------------------------------------------------------------
     @Override
     public void onWindowFocusChanged(boolean has_focus)
@@ -144,12 +182,45 @@ public class SuperTuxKartActivity extends NativeActivity
     @Override
     public boolean dispatchKeyEvent(KeyEvent event)
     {
+        int device_id = event.getDeviceId();
+        int source = event.getSource();
+
+        // Dispatch the different events depending on where they come from
+        // Some SOURCE_JOYSTICK, SOURCE_DPAD or SOURCE_GAMEPAD are also SOURCE_KEYBOARD
+        // So, we try to process them as JOYSTICK/DPAD/GAMEPAD events first, if that fails we try them as KEYBOARD
+        //
+        // Furthermore, it's possible a game controller has SOURCE_KEYBOARD and
+        // SOURCE_JOYSTICK, while its key events arrive from the keyboard source
+        // So, retrieve the device itself and check all of its sources
+        if (SDLControllerManager.isDeviceSDLJoystick(device_id))
+        {
+            // Note that we process events with specific key codes here
+            if (event.getAction() == KeyEvent.ACTION_DOWN)
+            {
+                if (SDLControllerManager.onNativePadDown(device_id, event.getKeyCode()) == 0)
+                    return true;
+            }
+            else if (event.getAction() == KeyEvent.ACTION_UP)
+            {
+                if (SDLControllerManager.onNativePadUp(device_id, event.getKeyCode()) == 0)
+                    return true;
+            }
+        }
+
         // Called when user change cursor / select all text in native android
         // keyboard
         boolean ret = super.dispatchKeyEvent(event);
         if (!isHardwareKeyboardConnected() && m_stk_edittext != null)
             m_stk_edittext.updateSTKEditBox();
         return ret;
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    public boolean dispatchGenericMotionEvent(MotionEvent ev)
+    {
+        if (SDLControllerManager.useGenericMotionListener(ev))
+            return true;
+        return super.dispatchGenericMotionEvent(ev);
     }
     // ------------------------------------------------------------------------
     public void showKeyboard(final int type)
@@ -272,4 +343,6 @@ public class SuperTuxKartActivity extends NativeActivity
         return getResources().getConfiguration()
             .keyboard == Configuration.KEYBOARD_QWERTY;
     }
+    // ------------------------------------------------------------------------
+    public static Context getContext()                    { return m_context; }
 }

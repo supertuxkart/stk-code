@@ -146,7 +146,6 @@ namespace irr
 
         s32 handleTouch(AInputEvent* androidEvent);
         s32 handleKeyboard(AInputEvent* androidEvent);
-        s32 handleGamepad(AInputEvent* androidEvent);
     };
 
 } // end namespace irr

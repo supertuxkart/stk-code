@@ -18,6 +18,8 @@
 #include "MobileCursorControl.h"
 #include "../../../../src/utils/utf8/unchecked.h"
 
+#include <SDL.h>
+
 // Call when android keyboard is opened or close, and save its height for
 // moving screen
 std::atomic<int> g_keyboard_height(0);
@@ -99,22 +101,7 @@ CIrrDeviceAndroid::CIrrDeviceAndroid(const SIrrlichtCreationParameters& param)
 
     if (Android != NULL)
     {
-        jint status = Android->activity->vm->GetEnv((void**)&m_jni_env, JNI_VERSION_1_6);
-        if (status == JNI_EDETACHED)
-        {
-            JavaVMAttachArgs args;
-            args.version = JNI_VERSION_1_6;
-            args.name = "NativeThread";
-            args.group = NULL;
-
-            status = Android->activity->vm->AttachCurrentThread(&m_jni_env, &args);
-        }
-        if (status != JNI_OK)
-        {
-            os::Printer::log("Failed to attach jni thread.", ELL_DEBUG);
-            return;
-        }
-
+        m_jni_env = (JNIEnv*)SDL_AndroidGetJNIEnv();
         Android->userData = this;
         Android->onAppCmd = handleAndroidCommand;
         Android->onAppCmdDirect = NULL;
@@ -178,7 +165,6 @@ CIrrDeviceAndroid::~CIrrDeviceAndroid()
         Android->userData = NULL;
         Android->onAppCmd = NULL;
         Android->onInputEvent = NULL;
-        Android->activity->vm->DetachCurrentThread();
     }
 }
 
@@ -529,35 +515,31 @@ s32 CIrrDeviceAndroid::handleInput(android_app* app, AInputEvent* androidEvent)
 {
     CIrrDeviceAndroid* device = (CIrrDeviceAndroid*)app->userData;
     assert(device != NULL);
-    
-    s32 status = 0;
-    
+
+    // SDL will handle it
     int32_t source = AInputEvent_getSource(androidEvent);
-    int32_t type = AInputEvent_getType(androidEvent);
-    
     if (source == AINPUT_SOURCE_GAMEPAD ||
         source == AINPUT_SOURCE_JOYSTICK ||
         source == AINPUT_SOURCE_DPAD)
+        return 0;
+
+    s32 status = 0;
+    int32_t type = AInputEvent_getType(androidEvent);
+
+    switch (type)
     {
-        status = device->handleGamepad(androidEvent);
+    case AINPUT_EVENT_TYPE_MOTION:
+    {
+        status = device->handleTouch(androidEvent);
+        break;
     }
-    else
+    case AINPUT_EVENT_TYPE_KEY:
     {
-        switch (type)
-        {
-        case AINPUT_EVENT_TYPE_MOTION:
-        {
-            status = device->handleTouch(androidEvent);
-            break;
-        }
-        case AINPUT_EVENT_TYPE_KEY:
-        {
-            status = device->handleKeyboard(androidEvent);
-            break;
-        }
-        default:
-            break;
-        }
+        status = device->handleKeyboard(androidEvent);
+        break;
+    }
+    default:
+        break;
     }
 
     return status;
@@ -744,144 +726,6 @@ s32 CIrrDeviceAndroid::handleKeyboard(AInputEvent* androidEvent)
         postEventFromUser(event);
     }
 
-    return status;
-}
-
-s32 CIrrDeviceAndroid::handleGamepad(AInputEvent* androidEvent)
-{
-    s32 status = 0;
-    
-    int32_t type = AInputEvent_getType(androidEvent);
-    
-    switch (type)
-    {
-    case AINPUT_EVENT_TYPE_MOTION:
-    {
-        float axis_x = AMotionEvent_getAxisValue(androidEvent, 
-                                                 AMOTION_EVENT_AXIS_HAT_X, 0);
-
-        if (axis_x == 0)
-        {
-            axis_x = AMotionEvent_getAxisValue(androidEvent, 
-                                               AMOTION_EVENT_AXIS_X, 0);
-        }
-        
-        if (axis_x == 0)
-        {
-            axis_x = AMotionEvent_getAxisValue(androidEvent, 
-                                               AMOTION_EVENT_AXIS_Z, 0);
-        }
-
-        float axis_y = AMotionEvent_getAxisValue(androidEvent, 
-                                                 AMOTION_EVENT_AXIS_HAT_Y, 0);
-                                                 
-        if (axis_y == 0)
-        {
-            axis_y = AMotionEvent_getAxisValue(androidEvent, 
-                                               AMOTION_EVENT_AXIS_Y, 0);
-        }
-        
-        if (axis_y == 0)
-        {
-            axis_y = AMotionEvent_getAxisValue(androidEvent, 
-                                               AMOTION_EVENT_AXIS_RZ, 0);
-        }
-                                                 
-        SEvent event;
-        event.EventType = EET_KEY_INPUT_EVENT;
-        event.KeyInput.Char = 0;
-        event.KeyInput.Shift = false;
-        event.KeyInput.Control = false;
-        event.KeyInput.SystemKeyCode = 0;
-        
-        float deadzone = 0.3f;
-        
-        axis_x = axis_x > deadzone || axis_x < -deadzone ? axis_x : 0;
-        axis_y = axis_y > deadzone || axis_y < -deadzone ? axis_y : 0;
-        
-        if (axis_x != GamepadAxisX)
-        {
-            if (GamepadAxisX != 0)
-            {
-                event.KeyInput.PressedDown = false;
-                event.KeyInput.Key = GamepadAxisX < 0 ? IRR_KEY_BUTTON_LEFT
-                                                      : IRR_KEY_BUTTON_RIGHT;
-                postEventFromUser(event);
-            }
-            
-            if (axis_x != 0)
-            {
-                event.KeyInput.PressedDown = true;
-                event.KeyInput.Key = axis_x < 0 ? IRR_KEY_BUTTON_LEFT 
-                                                : IRR_KEY_BUTTON_RIGHT;
-                postEventFromUser(event);
-            }
-            
-            GamepadAxisX = axis_x;
-        }
-        
-        if (axis_y != GamepadAxisY)
-        {
-            if (GamepadAxisY != 0)
-            {
-                event.KeyInput.PressedDown = false;
-                event.KeyInput.Key = GamepadAxisY < 0 ? IRR_KEY_BUTTON_UP
-                                                      : IRR_KEY_BUTTON_DOWN;
-                postEventFromUser(event);
-            }
-            
-            if (axis_y != 0)
-            {
-                event.KeyInput.PressedDown = true;
-                event.KeyInput.Key = axis_y < 0 ? IRR_KEY_BUTTON_UP 
-                                                : IRR_KEY_BUTTON_DOWN;
-                postEventFromUser(event);
-            }
-            
-            GamepadAxisY = axis_y;
-        }
-        
-        status = 1;
-
-        break;
-    }
-    case AINPUT_EVENT_TYPE_KEY:
-    {
-        bool ignore = false;
-        
-        int32_t keyCode = AKeyEvent_getKeyCode(androidEvent);
-        int32_t keyAction = AKeyEvent_getAction(androidEvent);
-        int32_t keyRepeat = AKeyEvent_getRepeatCount(androidEvent);
-        int32_t scanCode = AKeyEvent_getScanCode(androidEvent);
-        
-        if (keyRepeat == 0)
-        {
-            bool ignore_event = false;
-            
-            SEvent event;
-            event.EventType = EET_KEY_INPUT_EVENT;
-            event.KeyInput.Char = 0;
-            event.KeyInput.PressedDown = (keyAction == AKEY_EVENT_ACTION_DOWN);
-            event.KeyInput.Shift = false;
-            event.KeyInput.Control = false;
-            event.KeyInput.SystemKeyCode = (u32)keyCode;
-            event.KeyInput.Key = KeyMap[keyCode];
-            
-            if (event.KeyInput.Key == 0)
-            {
-                event.KeyInput.Key = (EKEY_CODE)((int)IRR_KEY_CODES_COUNT + scanCode);
-            }
-            
-            postEventFromUser(event);
-        }
-        
-        status = 1;
-        break;
-    }
-    default:
-        break;
-    }
-    
     return status;
 }
 

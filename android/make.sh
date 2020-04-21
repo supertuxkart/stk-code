@@ -559,6 +559,20 @@ sed -i "s/versionName=\".*\"/versionName=\"$PROJECT_VERSION\"/g" \
 sed -i "s/versionCode=\".*\"/versionCode=\"$PROJECT_CODE\"/g" \
        "$DIRNAME/AndroidManifest.xml"
 
+cp -f "$DIRNAME/../lib/sdl2/android-project/app/src/main/java/org/libsdl/app/HIDDevice.java" \
+       "$DIRNAME/src/main/java/"
+cp -f "$DIRNAME/../lib/sdl2/android-project/app/src/main/java/org/libsdl/app/HIDDeviceBLESteamController.java" \
+       "$DIRNAME/src/main/java/"
+cp -f "$DIRNAME/../lib/sdl2/android-project/app/src/main/java/org/libsdl/app/HIDDeviceManager.java" \
+       "$DIRNAME/src/main/java/"
+cp -f "$DIRNAME/../lib/sdl2/android-project/app/src/main/java/org/libsdl/app/HIDDeviceUSB.java" \
+       "$DIRNAME/src/main/java/"
+cp -f "$DIRNAME/../lib/sdl2/android-project/app/src/main/java/org/libsdl/app/SDLControllerManager.java" \
+       "$DIRNAME/src/main/java/"
+
+sed -i "s/import org.supertuxkart.*.SuperTuxKartActivity;/import $PACKAGE_NAME.SuperTuxKartActivity;/g" \
+       "$DIRNAME/src/main/java/SDLControllerManager.java"
+
 cp "banner.png" "$DIRNAME/res/drawable/banner.png"
 cp "$APP_ICON" "$DIRNAME/res/drawable/icon.png"
 convert -scale 48x48 "$APP_ICON" "$DIRNAME/res/drawable-mdpi/icon.png"
