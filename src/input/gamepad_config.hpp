@@ -27,9 +27,12 @@
 
 #include <iosfwd>
 #include <irrString.h>
+#include <map>
 #include <string>
+#include <tuple>
 
 using namespace irr;
+class SDLController;
 
 /** \brief specialisation of DeviceConfig for gamepad type devices
  *  \ingroup config
@@ -40,6 +43,9 @@ class GamepadConfig : public DeviceConfig
 private:
     /** Number of axis this device has. */
     int m_axis_count;
+
+    /** Number of hat this device has. */
+    int m_hat_count;
 
     /** Number of buttons this device has. */
     int m_button_count;
@@ -55,11 +61,10 @@ private:
      *  values close to 0 the joystick will react less sensitive. */
     bool m_desensitize;
 
-    /** A type to keep track if the gamepad has been identified (which is
-     *  used to display better button names and better defaults). */
-    enum {GP_UNIDENTIFIED, GP_XBOX360, GP_XBOX_ORIGINAL} m_type;
+    std::map<std::tuple<int, Input::AxisDirection>, int> m_sdl_mapping;
 
-    void detectType();
+    bool getMappingTuple(const std::string& rhs,
+                         std::tuple<int, Input::AxisDirection>& t);
 public:
 
              GamepadConfig           ();
@@ -108,7 +113,11 @@ public:
     virtual bool isGamePadAndroid()  const OVERRIDE { return false; }
     // ------------------------------------------------------------------------
     virtual bool isKeyboard() const OVERRIDE { return false; }
-
+    // ------------------------------------------------------------------------
+    void initSDLController(const std::string& mapping, int buttons, int axes,
+                           int hats);
+    // ------------------------------------------------------------------------
+    void initSDLMapping();
 };   // class GamepadConfig
 
 #endif

@@ -357,5 +357,25 @@ bool DeviceConfig::load(const XMLNode *config)
     return !error;
 }   // load
 
-// ---------------------------------------------------------------------------
+
+//-----------------------------------------------------------------------------
+bool DeviceConfig::hasBindingFor(const int button_id) const
+{
+    for (int n=0; n<PA_COUNT; n++)
+    {
+        if (m_bindings[n].getId() == button_id) return true;
+    }
+    return false;
+}   // hasBindingFor
+
+//-----------------------------------------------------------------------------
+bool DeviceConfig::hasBindingFor(const int button_id, PlayerAction from,
+                                 PlayerAction to) const
+{
+    for (int n=from; n<=to; n++)
+    {
+        if (m_bindings[n].getId() == button_id) return true;
+    }
+    return false;
+}   // hasBindingFor
 

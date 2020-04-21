@@ -130,6 +130,8 @@ public:
         m_irr_event.JoystickEvent.AxisChanged = 0;
         return true;
     }   // handleButton
+    // ------------------------------------------------------------------------
+    SDL_GameController* getGameController() const { return m_game_controller; }
 };
 
 #endif

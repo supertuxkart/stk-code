@@ -145,8 +145,17 @@ SDLController::SDLController(int device_id)
         created = true;
     }
 
-    cfg->setNumberOfButtons(m_buttons);
-    cfg->setNumberOfAxis(m_axes);
+    std::string mapping_string;
+    if (m_game_controller)
+    {
+        char* mapping = SDL_GameControllerMapping(m_game_controller);
+        if (mapping)
+        {
+            mapping_string = mapping;
+            SDL_free(mapping);
+        }
+    }
+    cfg->initSDLController(mapping_string, m_buttons, m_axes, m_hats);
     cfg->setPlugged();
     for (int i = 0; i < dm->getGamePadAmount(); i++)
     {
