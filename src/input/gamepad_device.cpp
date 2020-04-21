@@ -156,7 +156,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
     // time-full-steer to be used to adjust actual steering values.
     // To prevent this delay for analog gamesticks, make sure that
     // 32767/-32768 are never used.
-    if(m_configuration->isAnalog())
+    if(m_configuration->isAnalog(type, id))
     {
         if(*value==32767)
             *value = 32766;

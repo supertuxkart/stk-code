@@ -67,7 +67,6 @@ GamepadConfig::GamepadConfig( const std::string &name,
     m_button_count = button_count;
     m_hat_count    = 0;
     m_deadzone     = 4096;
-    m_is_analog    = true;
     m_desensitize  = false;
     setDefaultBinds();
 }   // GamepadConfig
@@ -80,7 +79,6 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
     m_button_count = 0;
     m_hat_count    = 0;
     m_deadzone     = 4096;
-    m_is_analog    = true;
     m_desensitize  = false;
     setDefaultBinds();
 }   // GamepadConfig
@@ -93,7 +91,6 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
 bool GamepadConfig::load(const XMLNode *config)
 {
     config->get("deadzone",     &m_deadzone    );
-    config->get("analog",       &m_is_analog   );
     config->get("desensitize",  &m_desensitize );
     bool ok = DeviceConfig::load(config);
 
@@ -115,9 +112,7 @@ void GamepadConfig::save (std::ofstream& stream)
 {
     stream << "<gamepad name =\"" << getName()
            << "\" deadzone=\""    << m_deadzone
-           << "\" desensitize=\"" << m_desensitize
-           << "\" analog=\""      << m_is_analog<<"\"\n";
-    stream << "         ";
+           << "\" desensitize=\"" << m_desensitize << "\" ";
     DeviceConfig::save(stream);
     stream << "</gamepad>\n\n";
 }   // save
@@ -433,6 +428,19 @@ void GamepadConfig::initSDLController(const std::string& mapping, int buttons,
             }
         }
     }
+
+    // Save axes mapped to digital buttons
+    for (int i = 0; i < axes; i++)
+    {
+        auto a1 = m_sdl_mapping.find(std::make_tuple(i, Input::AD_POSITIVE));
+        auto a2 = m_sdl_mapping.find(std::make_tuple(i, Input::AD_NEGATIVE));
+        if (a1 != m_sdl_mapping.end() && a2 != m_sdl_mapping.end())
+        {
+            if (a1->second < SDL_CONTROLLER_BUTTON_MAX &&
+                a2->second < SDL_CONTROLLER_BUTTON_MAX)
+                m_digital_axes.insert(i);
+        }
+    }
 #endif
 }   // initSDLController
 
@@ -577,3 +585,12 @@ fallback:
     setBinding(PA_PAUSE_RACE, Input::IT_STICKBUTTON, 1);
 #endif
 }   // initSDLMapping
+
+// ----------------------------------------------------------------------------
+bool GamepadConfig::isAnalog(Input::InputType type, int id) const
+{
+    if (type == Input::IT_STICKBUTTON)
+        return false;
+    // If axis is mapped to button type, than it's digital too
+    return m_digital_axes.find(id) == m_digital_axes.end();
+}   // isAnalog

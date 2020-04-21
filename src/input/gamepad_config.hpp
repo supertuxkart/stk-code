@@ -28,6 +28,8 @@
 #include <iosfwd>
 #include <irrString.h>
 #include <map>
+#include <set>
+#include <string>
 #include <string>
 #include <tuple>
 
@@ -53,15 +55,13 @@ private:
     /** Deadzone of this gamepad. */
     int m_deadzone;
 
-    /** If this device has analog axis, steering etc. must be set immediately
-     *  from the input values, not having a delayed time (time-full-steer). */
-    bool m_is_analog;
-
     /** If set to true, map any analog axis from x in [0,1] to x^x --> at
      *  values close to 0 the joystick will react less sensitive. */
     bool m_desensitize;
 
     std::map<std::tuple<int, Input::AxisDirection>, int> m_sdl_mapping;
+
+    std::set<int> m_digital_axes;
 
     bool getMappingTuple(const std::string& rhs,
                          std::tuple<int, Input::AxisDirection>& t);
@@ -83,7 +83,7 @@ public:
     virtual bool load(const XMLNode *config) OVERRIDE;
     // ------------------------------------------------------------------------
     /** Returns if this device uses analog axes. */
-    virtual bool isAnalog() const OVERRIDE { return m_is_analog; }
+    virtual bool isAnalog(Input::InputType type, int id) const OVERRIDE;
 
     // ------------------------------------------------------------------------
     /** Returns true if this device should desensitize its input at values

@@ -107,7 +107,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this device has analog axis, so that steering values
      *  will not be affected by time-full-steer delays. */
-    virtual bool isAnalog() const { return false;}
+    virtual bool isAnalog(Input::InputType type, int id) const { return false;}
     // ------------------------------------------------------------------------
     /** Returns true if this device should desensitize its input at values
      *  close to 0 (to avoid 'oversteering'). */
