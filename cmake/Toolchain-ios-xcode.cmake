@@ -7,7 +7,7 @@
 # You can also use -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=xxxxxxxxxx to specify team
 
 # Increase every upload to App store
-SET(IOS_BUILD_VERSION 10)
+SET(IOS_BUILD_VERSION 13)
 
 # Get SDK path
 execute_process(COMMAND xcodebuild -version -sdk iphoneos Path
@@ -56,6 +56,8 @@ set(CURL_INCLUDE_DIR ${DEPS_PATH}/ios_arm64/dependencies/include CACHE STRING ""
 set(OPENSSL_CRYPTO_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libcrypto.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libcrypto.a CACHE STRING "")
 set(OPENSSL_INCLUDE_DIR ${DEPS_PATH}/ios_arm64/dependencies/include CACHE STRING "")
 set(LIBRESOLV_LIBRARY ${CMAKE_OSX_SYSROOT_IOS}/usr/lib/libresolv.tbd;${CMAKE_OSX_SYSROOT_SIMULATOR}/usr/lib/libresolv.tbd CACHE STRING "")
+set(SDL2_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libSDL2.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libSDL2.a CACHE STRING "")
+set(SDL2_INCLUDEDIR ${DEPS_PATH}/ios_arm64/dependencies/include CACHE STRING "")
 
 # Standard config
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
@@ -91,6 +93,10 @@ set(CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG "-compatibility_version ")
 set(CMAKE_C_OSX_CURRENT_VERSION_FLAG "-current_version ")
 set(CMAKE_CXX_OSX_COMPATIBILITY_VERSION_FLAG "${CMAKE_C_OSX_COMPATIBILITY_VERSION_FLAG}")
 set(CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
+
+# For archive
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fembed-bitcode")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fembed-bitcode")
 
 # Fixed variables in iOS STK
 set(CMAKE_XCODE_ATTRIBUTE_ENABLE_BITCODE YES CACHE INTERNAL "")
