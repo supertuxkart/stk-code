@@ -79,6 +79,18 @@ SDLController::SDLController(int device_id)
         throw std::runtime_error("missing name for joystick");
     }
     std::string name = name_cstr;
+#ifdef WIN32
+    // SDL added #number to xinput controller which is its user id, we remove
+    // it manually to allow hotplugging to get the same config each time
+    // user id ranges from 0-3
+    // From GetXInputName(const Uint8 userid, BYTE SubType) in
+    // SDL_xinputjoystick.c
+    if ((name.size() > 7 &&
+        name.compare(0, 7, "XInput ") == 0 && name[name.size() - 2] == '#') ||
+        (name.size() > 16 &&
+        name.compare(0, 16, "X360 Controller ") == 0 && name[name.size() - 2] == '#'))
+        name.erase(name.length() - 3);
+#endif
 
     m_buttons = SDL_JoystickNumButtons(m_joystick);
     if (m_buttons < 0)
