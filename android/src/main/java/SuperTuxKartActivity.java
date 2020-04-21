@@ -219,6 +219,10 @@ public class SuperTuxKartActivity extends NativeActivity
         int action = event.getAction();
         int device_id = event.getDeviceId();
         int source = event.getSource();
+        int meta_state = event.getMetaState();
+        int scan_code = event.getScanCode();
+        // KeyCharacterMap.COMBINING_ACCENT is not handled at the moment
+        int unichar = event.getUnicodeChar(meta_state);
 
         // Dispatch the different events depending on where they come from
         // Some SOURCE_JOYSTICK, SOURCE_DPAD or SOURCE_GAMEPAD are also SOURCE_KEYBOARD
@@ -232,19 +236,17 @@ public class SuperTuxKartActivity extends NativeActivity
             // Note that we process events with specific key codes here
             if (action == KeyEvent.ACTION_DOWN)
             {
-                if (SDLControllerManager.onNativePadDown(device_id, key_code) == 0)
+                if (SDLControllerManager.onNativePadDown(device_id, key_code, meta_state, scan_code, unichar) == 0)
                     return true;
             }
             else if (action == KeyEvent.ACTION_UP)
             {
-                if (SDLControllerManager.onNativePadUp(device_id, key_code) == 0)
+                if (SDLControllerManager.onNativePadUp(device_id, key_code, meta_state, scan_code, unichar) == 0)
                     return true;
             }
         }
 
         int repeat_count = event.getRepeatCount();
-        int meta_state = event.getMetaState();
-        int scan_code = event.getScanCode();
         // User pressed back button
         if (key_code == KeyEvent.KEYCODE_BACK &&
             action == KeyEvent.ACTION_DOWN)
@@ -287,8 +289,6 @@ public class SuperTuxKartActivity extends NativeActivity
             if (has_hardware_keyboard &&
                 m_stk_edittext != null && m_stk_edittext.isFocused())
                 m_stk_edittext.beforeHideKeyboard(/*clear_text*/true);
-            // KeyCharacterMap.COMBINING_ACCENT is not handled at the moment
-            int unichar = event.getUnicodeChar(meta_state);
             addKey(key_code, action, meta_state, scan_code, unichar);
             // We use only java to handle key for hardware keyboard
             return true;

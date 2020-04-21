@@ -52,11 +52,7 @@ ANDROID_ADD_TOUCH_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
     g_events.push_back(event);
 }
 
-#define ADD_KEY_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_addKey(JNIEnv* env, jobject this_obj, jint key_code, jint action, jint meta_state, jint scan_code, jint unichar)
-#define ANDROID_ADD_KEY_CALLBACK(PKG_NAME) ADD_KEY_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_ADD_KEY_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+extern "C" void stkAddKeyEvent(int key_code, int action, int meta_state, int scan_code, int unichar)
 {
     irr::SEvent event;
     event.EventType = irr::EET_KEY_INPUT_EVENT;
@@ -93,6 +89,14 @@ ANDROID_ADD_KEY_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
     g_events.push_back(event);
 }
 
+#define ADD_KEY_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_addKey(JNIEnv* env, jobject this_obj, jint key_code, jint action, jint meta_state, jint scan_code, jint unichar)
+#define ANDROID_ADD_KEY_CALLBACK(PKG_NAME) ADD_KEY_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_ADD_KEY_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    stkAddKeyEvent(key_code, action, meta_state, scan_code, unichar);
+}
 
 namespace irr
 {
