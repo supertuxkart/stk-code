@@ -137,14 +137,16 @@ void InputManager::update(float dt)
                 auto& controller = m_sdl_controller.at(event.jaxis.which);
                 if (m_mode == INPUT_SENSE_GAMEPAD)
                     controller->handleAxisInputSense(event);
-                if (controller->handleAxis(event))
+                if (controller->handleAxis(event) &&
+                    !UserConfigParams::m_gamepad_visualisation)
                     input(controller->getEvent());
                 break;
             }
             case SDL_JOYHATMOTION:
             {
                 auto& controller = m_sdl_controller.at(event.jhat.which);
-                if (controller->handleHat(event))
+                if (controller->handleHat(event) &&
+                    !UserConfigParams::m_gamepad_visualisation)
                     input(controller->getEvent());
                 break;
             }
@@ -152,7 +154,8 @@ void InputManager::update(float dt)
             case SDL_JOYBUTTONDOWN:
             {
                 auto& controller = m_sdl_controller.at(event.jbutton.which);
-                if (controller->handleButton(event))
+                if (controller->handleButton(event) &&
+                    !UserConfigParams::m_gamepad_visualisation)
                     input(controller->getEvent());
                 break;
             }
@@ -173,6 +176,15 @@ void InputManager::update(float dt)
         if(m_timer < 0) m_timer_in_use = false;
     }
 }
+
+//-----------------------------------------------------------------------------
+#ifndef SERVER_ONLY
+const irr::SEvent& InputManager::getEventForGamePad(unsigned i) const
+{
+    auto it = m_sdl_controller.begin();
+    return std::next(it, i)->second->getEvent();
+}
+#endif
 
 //-----------------------------------------------------------------------------
 /** Destructor. Frees all data structures.

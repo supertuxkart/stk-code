@@ -113,6 +113,8 @@ public:
      *  disconnected gamepad will not be removed from device manager to allow
      *  re-plugging later with the same ID. */
     size_t getGamepadCount() const { return m_sdl_controller.size(); }
+    /** Returns irrlicht joystick for gamepad visualization. */
+    const irr::SEvent& getEventForGamePad(unsigned i) const;
 #endif
 
     void   dispatchInput(Input::InputType, int deviceID, int btnID,
