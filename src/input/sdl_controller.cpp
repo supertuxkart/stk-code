@@ -156,6 +156,8 @@ SDLController::SDLController(int device_id)
         }
     }
     cfg->initSDLController(mapping_string, m_buttons, m_axes, m_hats);
+    if (created)
+        cfg->initSDLMapping();
     cfg->setPlugged();
     for (int i = 0; i < dm->getGamePadAmount(); i++)
     {

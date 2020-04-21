@@ -19,6 +19,9 @@
 
 #include "input/gamepad_config.hpp"
 
+#ifdef ANDROID
+#include "graphics/irr_driver.hpp"
+#endif
 #include "io/xml_node.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
@@ -125,21 +128,21 @@ void GamepadConfig::setDefaultBinds ()
 {
     setBinding(PA_STEER_LEFT,   Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
     setBinding(PA_STEER_RIGHT,  Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
-    setBinding(PA_ACCEL,        Input::IT_STICKBUTTON, 0, Input::AD_NEGATIVE);
-    setBinding(PA_BRAKE,        Input::IT_STICKBUTTON, 3, Input::AD_POSITIVE);
-    setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 1);
-    setBinding(PA_NITRO,        Input::IT_STICKBUTTON, 4);
-    setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 5);
-    setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 8);
-    setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 6);
-    setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 9);
+    setBinding(PA_ACCEL,        Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
+    setBinding(PA_BRAKE,        Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
+    setBinding(PA_FIRE,         Input::IT_STICKBUTTON, 0);
+    setBinding(PA_NITRO,        Input::IT_STICKBUTTON, 1);
+    setBinding(PA_DRIFT,        Input::IT_STICKBUTTON, 2);
+    setBinding(PA_RESCUE,       Input::IT_STICKBUTTON, 3);
+    setBinding(PA_LOOK_BACK,    Input::IT_STICKBUTTON, 4);
+    setBinding(PA_PAUSE_RACE,   Input::IT_STICKBUTTON, 5);
 
     setBinding(PA_MENU_UP,      Input::IT_STICKMOTION, 1, Input::AD_NEGATIVE);
     setBinding(PA_MENU_DOWN,    Input::IT_STICKMOTION, 1, Input::AD_POSITIVE);
     setBinding(PA_MENU_LEFT,    Input::IT_STICKMOTION, 0, Input::AD_NEGATIVE);
     setBinding(PA_MENU_RIGHT,   Input::IT_STICKMOTION, 0, Input::AD_POSITIVE);
-    setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 0);
-    setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 3);
+    setBinding(PA_MENU_SELECT,  Input::IT_STICKBUTTON, 6);
+    setBinding(PA_MENU_CANCEL,  Input::IT_STICKBUTTON, 7);
 }   // setDefaultBinds
 
 //------------------------------------------------------------------------------
@@ -434,6 +437,143 @@ void GamepadConfig::initSDLController(const std::string& mapping, int buttons,
 }   // initSDLController
 
 // ----------------------------------------------------------------------------
+void GamepadConfig::setBindingFromTuple(const PlayerAction action,
+                                      std::tuple<int, Input::AxisDirection>& t)
+{
+#ifndef SERVER_ONLY
+    int id = std::get<0>(t);
+    Input::AxisDirection ad = std::get<1>(t);
+    Input::InputType type = ad ==
+        Input::AD_NEUTRAL ? Input::IT_STICKBUTTON : Input::IT_STICKMOTION;
+    setBinding(action, type, id, ad);
+#endif
+}   // setBindingFromTuple
+
+// ----------------------------------------------------------------------------
 void GamepadConfig::initSDLMapping()
 {
+#ifndef SERVER_ONLY
+    if (m_sdl_mapping.empty())
+        return;
+    std::map<int, std::tuple<int, Input::AxisDirection> > actions_map;
+    for (auto& p : m_sdl_mapping)
+        actions_map[p.second] = p.first;
+
+    bool has_direction = false;
+    // Some old gamepad map axes to DPad, handle it too
+    bool use_axes_direction = false;
+    if (actions_map.find(SDL_CONTROLLER_AXIS_LEFTX_RIGHT) != actions_map.end() &&
+        actions_map.find(SDL_CONTROLLER_AXIS_LEFTX_LEFT) != actions_map.end() &&
+        actions_map.find(SDL_CONTROLLER_AXIS_LEFTY_DOWN) != actions_map.end() &&
+        actions_map.find(SDL_CONTROLLER_AXIS_LEFTY_UP) != actions_map.end())
+    {
+        has_direction = true;
+        use_axes_direction = true;
+    }
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_UP) != actions_map.end() &&
+        actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_DOWN) != actions_map.end() &&
+        actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_LEFT) != actions_map.end() &&
+        actions_map.find(SDL_CONTROLLER_BUTTON_DPAD_RIGHT) != actions_map.end())
+    {
+        has_direction = true;
+    }
+    if (!has_direction)
+        return;
+#ifdef ANDROID
+    // For android tv we default to dpad if it has direction pad, because it
+    // cannot rebind control using touchscreen, and dpad direction seems more
+    // reliable
+    if (!irr_driver->getDevice()->supportsTouchDevice() && has_direction)
+        use_axes_direction = false;
+#endif
+    if (use_axes_direction)
+    {
+        setBindingFromTuple(PA_STEER_LEFT, actions_map.at(SDL_CONTROLLER_AXIS_LEFTX_LEFT));
+        setBindingFromTuple(PA_STEER_RIGHT, actions_map.at(SDL_CONTROLLER_AXIS_LEFTX_RIGHT));
+        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_AXIS_LEFTY_UP));
+        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_AXIS_LEFTY_DOWN));
+        setBindingFromTuple(PA_MENU_UP, actions_map.at(SDL_CONTROLLER_AXIS_LEFTY_UP));
+        setBindingFromTuple(PA_MENU_DOWN, actions_map.at(SDL_CONTROLLER_AXIS_LEFTY_DOWN));
+        setBindingFromTuple(PA_MENU_LEFT, actions_map.at(SDL_CONTROLLER_AXIS_LEFTX_LEFT));
+        setBindingFromTuple(PA_MENU_RIGHT, actions_map.at(SDL_CONTROLLER_AXIS_LEFTX_RIGHT));
+    }
+    else
+    {
+        setBindingFromTuple(PA_STEER_LEFT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+        setBindingFromTuple(PA_STEER_RIGHT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_UP));
+        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+        setBindingFromTuple(PA_MENU_UP, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_UP));
+        setBindingFromTuple(PA_MENU_DOWN, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_DOWN));
+        setBindingFromTuple(PA_MENU_LEFT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_LEFT));
+        setBindingFromTuple(PA_MENU_RIGHT, actions_map.at(SDL_CONTROLLER_BUTTON_DPAD_RIGHT));
+    }
+    // Goto fallback if not all required bindings are found
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_A) == actions_map.end())
+        goto fallback;
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_B) == actions_map.end())
+        goto fallback;
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_X) == actions_map.end())
+        goto fallback;
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_Y) == actions_map.end())
+        goto fallback;
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_BACK) == actions_map.end())
+        goto fallback;
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_START) == actions_map.end())
+        goto fallback;
+    setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+    setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_A));
+    setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_X));
+    setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
+    setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
+    setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+    setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+    setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+    return;
+
+fallback:
+    // Bind at least select and cancel so the player can at least toggle menu
+    // without any binding in the beginning
+    // This usually happens for android auto-detect controller mapping
+    setBinding(PA_FIRE, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+    setBinding(PA_NITRO, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+    setBinding(PA_DRIFT, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+    setBinding(PA_LOOK_BACK, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+    setBinding(PA_RESCUE, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+    setBinding(PA_PAUSE_RACE, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+    setBinding(PA_MENU_SELECT, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+    setBinding(PA_MENU_CANCEL, Input::IT_NONE, 0, Input::AD_NEUTRAL);
+
+    actions_map.clear();
+    for (auto& p : m_sdl_mapping)
+    {
+        if (p.second >= SDL_CONTROLLER_BUTTON_MAX)
+            continue;
+        actions_map[p.second] = p.first;
+    }
+    auto it = actions_map.begin();
+    if (it != actions_map.end())
+    {
+        // Prefer start and back button if exist
+        auto start_bind = actions_map.find(SDL_CONTROLLER_BUTTON_START);
+        if (start_bind != actions_map.end())
+            it = start_bind;
+        setBindingFromTuple(PA_MENU_SELECT, it->second);
+        actions_map.erase(it);
+        it = actions_map.begin();
+        if (it != actions_map.end())
+        {
+            auto back_bind = actions_map.find(SDL_CONTROLLER_BUTTON_BACK);
+            if (back_bind != actions_map.end())
+                it = back_bind;
+            setBindingFromTuple(PA_MENU_CANCEL, it->second);
+            setBindingFromTuple(PA_PAUSE_RACE, it->second);
+        }
+        return;
+    }
+    // Last fallback, bind without mapping
+    setBinding(PA_MENU_SELECT, Input::IT_STICKBUTTON, 0);
+    setBinding(PA_MENU_CANCEL, Input::IT_STICKBUTTON, 1);
+    setBinding(PA_PAUSE_RACE, Input::IT_STICKBUTTON, 1);
+#endif
 }   // initSDLMapping

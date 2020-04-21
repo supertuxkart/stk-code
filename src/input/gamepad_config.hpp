@@ -65,6 +65,8 @@ private:
 
     bool getMappingTuple(const std::string& rhs,
                          std::tuple<int, Input::AxisDirection>& t);
+    void setBindingFromTuple(const PlayerAction action,
+                             std::tuple<int, Input::AxisDirection>& t);
 public:
 
              GamepadConfig           ();
