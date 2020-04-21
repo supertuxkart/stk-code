@@ -34,6 +34,29 @@ import org.minidns.record.TXT;
 
 public class SuperTuxKartActivity extends NativeActivity
 {
+    // Same as irrlicht
+    enum TouchInputEvent
+    {
+        ETIE_PRESSED_DOWN,
+        ETIE_LEFT_UP,
+        ETIE_MOVED,
+        ETIE_COUNT
+    }
+
+    class TouchEventData
+    {
+        public TouchInputEvent event_type;
+        public int x;
+        public int y;
+        TouchEventData()
+        {
+            event_type = TouchInputEvent.ETIE_PRESSED_DOWN;
+            x = 0;
+            y = 0;
+        }
+    };
+
+    private TouchEventData[] m_touch_event_data;
     private STKEditText m_stk_edittext;
     private static Context m_context;
     private static HIDDeviceManager m_hid_device_manager;
@@ -42,6 +65,11 @@ public class SuperTuxKartActivity extends NativeActivity
     private native void saveKeyboardHeight(int height);
     // ------------------------------------------------------------------------
     private native void startSTK();
+    // ------------------------------------------------------------------------
+    private native static void addKey(int key_code, int action, int meta_state,
+                                      int scan_code, int unichar);
+    // ------------------------------------------------------------------------
+    private native static void addTouch(int id, int x, int y, int event_type);
     // ------------------------------------------------------------------------
     private void hideKeyboardNative(final boolean clear_text)
     {
@@ -103,7 +131,12 @@ public class SuperTuxKartActivity extends NativeActivity
     public void onCreate(Bundle instance)
     {
         super.onCreate(instance);
+        // We don't use native activity input event queue
+        getWindow().takeInputQueue(null);
         System.loadLibrary("main");
+        m_touch_event_data = new TouchEventData[32];
+        for (int i = 0; i < 32; i++)
+            m_touch_event_data[i] = new TouchEventData();
         m_context = this;
         m_stk_edittext = null;
 
@@ -182,6 +215,8 @@ public class SuperTuxKartActivity extends NativeActivity
     @Override
     public boolean dispatchKeyEvent(KeyEvent event)
     {
+        int key_code = event.getKeyCode();
+        int action = event.getAction();
         int device_id = event.getDeviceId();
         int source = event.getSource();
 
@@ -195,24 +230,71 @@ public class SuperTuxKartActivity extends NativeActivity
         if (SDLControllerManager.isDeviceSDLJoystick(device_id))
         {
             // Note that we process events with specific key codes here
-            if (event.getAction() == KeyEvent.ACTION_DOWN)
+            if (action == KeyEvent.ACTION_DOWN)
             {
-                if (SDLControllerManager.onNativePadDown(device_id, event.getKeyCode()) == 0)
+                if (SDLControllerManager.onNativePadDown(device_id, key_code) == 0)
                     return true;
             }
-            else if (event.getAction() == KeyEvent.ACTION_UP)
+            else if (action == KeyEvent.ACTION_UP)
             {
-                if (SDLControllerManager.onNativePadUp(device_id, event.getKeyCode()) == 0)
+                if (SDLControllerManager.onNativePadUp(device_id, key_code) == 0)
                     return true;
             }
+        }
+
+        int repeat_count = event.getRepeatCount();
+        int meta_state = event.getMetaState();
+        int scan_code = event.getScanCode();
+        // User pressed back button
+        if (key_code == KeyEvent.KEYCODE_BACK &&
+            action == KeyEvent.ACTION_DOWN)
+        {
+            // Avoid repeating the event which leads to some strange behaviour
+            // For ACTION_UP it's always zero
+            if (repeat_count == 0)
+                addKey(key_code, action, meta_state, scan_code, 0);
+            return true;
+        }
+
+        boolean has_hardware_keyboard = isHardwareKeyboardConnected();
+        // Allow hacker keyboard (one of the native android keyboard)
+        // to close itself when pressing the esc button
+        if (key_code == KeyEvent.KEYCODE_ESCAPE &&
+            action == KeyEvent.ACTION_DOWN && !has_hardware_keyboard &&
+            m_stk_edittext != null && m_stk_edittext.isFocused())
+        {
+            hideKeyboardNative(/*clear_text*/false);
+            return true;
         }
 
         // Called when user change cursor / select all text in native android
         // keyboard
         boolean ret = super.dispatchKeyEvent(event);
-        if (!isHardwareKeyboardConnected() && m_stk_edittext != null)
+        if (!has_hardware_keyboard && m_stk_edittext != null)
             m_stk_edittext.updateSTKEditBox();
-        return ret;
+
+        // Allow sending navigation key event found in native android keyboard
+        // so user can using up or down to toggle multiple textfield
+        boolean send_navigation = key_code == KeyEvent.KEYCODE_DPAD_UP ||
+            key_code == KeyEvent.KEYCODE_DPAD_DOWN ||
+            key_code == KeyEvent.KEYCODE_DPAD_LEFT ||
+            key_code == KeyEvent.KEYCODE_DPAD_RIGHT;
+        // We don't send navigation event if it's consumed by input method
+        send_navigation = send_navigation && !ret;
+
+        if (has_hardware_keyboard || send_navigation)
+        {
+            if (has_hardware_keyboard &&
+                m_stk_edittext != null && m_stk_edittext.isFocused())
+                m_stk_edittext.beforeHideKeyboard(/*clear_text*/true);
+            // KeyCharacterMap.COMBINING_ACCENT is not handled at the moment
+            int unichar = event.getUnicodeChar(meta_state);
+            addKey(key_code, action, meta_state, scan_code, unichar);
+            // We use only java to handle key for hardware keyboard
+            return true;
+        }
+        else
+            return ret;
     }
     // ------------------------------------------------------------------------
     @Override
@@ -221,6 +303,68 @@ public class SuperTuxKartActivity extends NativeActivity
         if (SDLControllerManager.useGenericMotionListener(ev))
             return true;
         return super.dispatchGenericMotionEvent(ev);
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev)
+    {
+        boolean ret = super.dispatchTouchEvent(ev);
+        if (!ret)
+        {
+            TouchInputEvent event_type;
+            int action = ev.getAction();
+            switch (action & MotionEvent.ACTION_MASK)
+            {
+            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_POINTER_DOWN:
+                event_type = TouchInputEvent.ETIE_PRESSED_DOWN;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                event_type = TouchInputEvent.ETIE_MOVED;
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_POINTER_UP:
+            case MotionEvent.ACTION_CANCEL:
+                event_type = TouchInputEvent.ETIE_LEFT_UP;
+                break;
+            default:
+                return false;
+            }
+
+            int count = 1;
+            int idx = (action & MotionEvent.ACTION_POINTER_INDEX_MASK) >>
+                MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+
+            // Process all touches for move action.
+            if (event_type == TouchInputEvent.ETIE_MOVED)
+            {
+                count = ev.getPointerCount();
+                idx = 0;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                int id = ev.getPointerId(i + idx);
+                int x = (int)ev.getX(i + idx);
+                int y = (int)ev.getY(i + idx);
+
+                if (id >= 32)
+                    continue;
+
+                // Don't send move event when nothing changed
+                if (m_touch_event_data[id].event_type == event_type &&
+                    m_touch_event_data[id].x == x &&
+                    m_touch_event_data[id].y == y)
+                    continue;
+
+                m_touch_event_data[id].event_type = event_type;
+                m_touch_event_data[id].x = x;
+                m_touch_event_data[id].y = y;
+                addTouch(id, x, y, event_type.ordinal());
+            }
+            return true;
+        }
+        return false;
     }
     // ------------------------------------------------------------------------
     public void showKeyboard(final int type)

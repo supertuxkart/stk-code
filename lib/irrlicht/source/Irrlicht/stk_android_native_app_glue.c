@@ -432,9 +432,13 @@ static void onInputQueueDestroyed(ANativeActivity* activity, AInputQueue* queue)
     android_app_set_input(app, NULL);
 }
 
+// Defined in CIrrDeviceAndroid, we call it in android main thread so after activity
+// starts keymap is visible to all threads
+extern void createKeyMap();
 void ANativeActivity_onCreate(ANativeActivity* activity,
         void* savedState, size_t savedStateSize) {
     LOGV("Creating: %p\n", activity);
+    createKeyMap();
     activity->callbacks->onDestroy = onDestroy;
     activity->callbacks->onStart = onStart;
     activity->callbacks->onResume = onResume;
