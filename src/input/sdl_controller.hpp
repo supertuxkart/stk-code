@@ -46,6 +46,9 @@ private:
     irr::SEvent m_irr_event;
 
     int16_t m_prev_axes[irr::SEvent::SJoystickEvent::NUMBER_OF_AXES];
+#ifdef ANDROID
+    void handleDirectScanCode(const SDL_Event& event);
+#endif
 public:
     // ------------------------------------------------------------------------
     SDLController(int device_id);
@@ -120,7 +123,12 @@ public:
     bool handleButton(const SDL_Event& event)
     {
         if (event.jbutton.button > m_buttons)
+        {
+#ifdef ANDROID
+            handleDirectScanCode(event);
+#endif
             return false;
+        }
         bool pressed = event.jbutton.state == SDL_PRESSED;
         uint32_t value = 1 << event.jbutton.button;
         if (pressed)

@@ -208,4 +208,17 @@ void SDLController::handleAxisInputSense(const SDL_Event& event)
         m_prev_axes[axis_idx]);
 }   // handleAxisInputSense
 
+// ----------------------------------------------------------------------------
+#ifdef ANDROID
+void SDLController::handleDirectScanCode(const SDL_Event& event)
+{
+    // Android STK has custom changes in SDL2 to allow gamepad with unknown
+    // button to use scan code directly
+    input_manager->dispatchInput(Input::IT_STICKBUTTON,
+        m_irr_event.JoystickEvent.Joystick, event.jbutton.button,
+        Input::AD_POSITIVE,
+        event.jbutton.state == SDL_PRESSED ? Input::MAX_VALUE : 0);
+}   // handleDirectScanCode
+#endif
+
 #endif

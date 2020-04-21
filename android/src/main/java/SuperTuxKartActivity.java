@@ -223,6 +223,7 @@ public class SuperTuxKartActivity extends NativeActivity
         int scan_code = event.getScanCode();
         // KeyCharacterMap.COMBINING_ACCENT is not handled at the moment
         int unichar = event.getUnicodeChar(meta_state);
+        int repeat_count = event.getRepeatCount();
 
         // Dispatch the different events depending on where they come from
         // Some SOURCE_JOYSTICK, SOURCE_DPAD or SOURCE_GAMEPAD are also SOURCE_KEYBOARD
@@ -236,7 +237,7 @@ public class SuperTuxKartActivity extends NativeActivity
             // Note that we process events with specific key codes here
             if (action == KeyEvent.ACTION_DOWN)
             {
-                if (SDLControllerManager.onNativePadDown(device_id, key_code, meta_state, scan_code, unichar) == 0)
+                if (SDLControllerManager.onNativePadDown(device_id, key_code, meta_state, scan_code, unichar, repeat_count) == 0)
                     return true;
             }
             else if (action == KeyEvent.ACTION_UP)
@@ -246,7 +247,6 @@ public class SuperTuxKartActivity extends NativeActivity
             }
         }
 
-        int repeat_count = event.getRepeatCount();
         // User pressed back button
         if (key_code == KeyEvent.KEYCODE_BACK &&
             action == KeyEvent.ACTION_DOWN)
