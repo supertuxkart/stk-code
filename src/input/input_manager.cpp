@@ -928,7 +928,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else
         {
             // reset timer when released
-            if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
+            if (abs(value) == 0 && type == Input::IT_STICKMOTION)
             {
                 m_timer_in_use = false;
                 m_timer = 0;
@@ -961,7 +961,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             // menu input
             if (!m_timer_in_use)
             {
-                if (abs(value) > Input::MAX_VALUE*2/3)
+                if (type == Input::IT_STICKMOTION &&
+                    abs(value) > Input::MAX_VALUE * 2 / 3)
                 {
                     m_timer_in_use = true;
                     m_timer = 0.25;
