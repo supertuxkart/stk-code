@@ -1089,6 +1089,12 @@ bool handleStaticAction(int key)
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         return true;
     }
+    else if (key == IRR_KEY_F7)
+    {
+        bool prev_val = UserConfigParams::m_soccer_player_list;
+        UserConfigParams::m_soccer_player_list = !prev_val;
+        return true;
+    }
     // TODO: create more keyboard shortcuts
 
     return false;

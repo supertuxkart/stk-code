@@ -764,6 +764,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
 #ifndef SERVER_ONLY
     const RaceManager::MinorRaceModeType  minor_mode = RaceManager::get()->getMinorMode();
+    if (!UserConfigParams::m_soccer_player_list &&
+        minor_mode == RaceManager::MINOR_MODE_SOCCER)
+        return;
+
     int x_base = 10;
     if (irr_driver->getDevice()->getLeftPadding() > 0)
         x_base += irr_driver->getDevice()->getLeftPadding();

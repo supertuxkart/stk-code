@@ -1101,6 +1101,8 @@ Vec3 SoccerWorld::getBallAimPosition(KartTeam team, bool reverse) const
 void SoccerWorld::getKartsDisplayInfo(
                            std::vector<RaceGUIBase::KartIconDisplayInfo> *info)
 {
+    if (!UserConfigParams::m_soccer_player_list)
+        return;
     const unsigned int kart_amount = getNumKarts();
     for (unsigned int i = 0; i < kart_amount ; i++)
     {
