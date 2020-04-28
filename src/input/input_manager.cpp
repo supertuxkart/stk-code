@@ -882,6 +882,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         KartSelectionScreen::getRunningInstance()->joinPlayer(device, NULL/*player profile*/);
                     }
                 }
+                else if (value != 0 && (action == PA_MENU_CANCEL))
+                {
+                    StateManager::get()->escapePressed();
+                }
                 return; // we're done here, ignore devices that aren't
                         // associated with players
             }
