@@ -68,6 +68,11 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
+        if (!AnimatedMesh)
+        {
+            m_texture_string.clear();
+            return 0;
+        }
         SP::SPMesh* spm = toSPM(static_cast<scene::CSkinnedMesh*>
             (AnimatedMesh->getMesh(m_straight_frame)));
         m_texture_string.clear();
