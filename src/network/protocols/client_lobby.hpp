@@ -186,6 +186,7 @@ public:
     void handleClientCommand(const std::string& cmd);
     void updateAssetsToServer();
     ClientState getCurrentState() const { return m_state.load(); }
+    std::shared_ptr<Server> getJoinedServer() const { return m_server; }
 };
 
 #endif // CLIENT_LOBBY_HPP

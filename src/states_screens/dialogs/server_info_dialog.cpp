@@ -63,18 +63,19 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     assert(m_join_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     if (m_server->isPasswordProtected())
     {
         m_password = getWidget<TextBoxWidget>("password");
         m_password->setPasswordBox(true, L'*');
         assert(m_password != NULL);
+        m_password->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else
     {
         Widget* password_box = getWidget("password-box");
         password_box->setCollapsed(true); // FIXME Doesn't reuse free space for other widgets
+        m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 
     core::stringw difficulty = RaceManager::get()->getDifficultyName(
