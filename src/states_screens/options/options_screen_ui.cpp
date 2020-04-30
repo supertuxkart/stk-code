@@ -143,6 +143,18 @@ void OptionsScreenUI::loadedFromFile()
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
         font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     }
+    font_size->setValueUpdatedCallback([this](SpinnerWidget* spinner)
+    {
+        // Add a special value updated callback so font size is updated when
+        // it's pressed instead of release to prevent multiple event
+        bool right = spinner->isButtonSelected(true/*right*/);
+        UserConfigParams::m_font_size = spinner->getValue();
+        m_reload_option = std::unique_ptr<ReloadOption>(new ReloadOption);
+        m_reload_option->m_reload_font = true;
+        m_reload_option->m_reload_skin = false;
+        m_reload_option->m_focus_name = "font_size";
+        m_reload_option->m_focus_right = right;
+    });
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -357,45 +369,15 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         const core::stringw selectedSkin = skinSelector->getStringValue();
         bool right = skinSelector->isButtonSelected(true/*right*/);
         UserConfigParams::m_skin_file = m_skins[selectedSkin];
-        irr_driver->unsetMaxTextureSize();
-        bool prev_icon_theme = GUIEngine::getSkin()->hasIconTheme();
         bool prev_font = GUIEngine::getSkin()->hasFont();
+        irr_driver->unsetMaxTextureSize();
         GUIEngine::reloadSkin();
-        if (GUIEngine::getSkin()->hasIconTheme() != prev_icon_theme ||
-            prev_font != GUIEngine::getSkin()->hasFont())
-        {
-            if (prev_font != GUIEngine::getSkin()->hasFont())
-            {
-                GUIEngine::clear();
-                GUIEngine::cleanUp();
-            }
-
-            GUIEngine::clearScreenCache();
-
-            if (prev_font != GUIEngine::getSkin()->hasFont())
-            {
-                delete font_manager;
-                font_manager = new FontManager();
-                font_manager->loadFonts();
-                GUIEngine::init(irr_driver->getDevice(), irr_driver->getVideoDriver(),
-                    StateManager::get(), false/*loading*/);
-            }
-
-            Screen* screen_list[] =
-                {
-                    MainMenuScreen::getInstance(),
-                    OptionsScreenUI::getInstance(),
-                    nullptr
-                };
-            GUIEngine::switchToScreen(MainMenuScreen::getInstance());
-            StateManager::get()->resetAndSetStack(screen_list);
-            // Need to use new widget pointer
-            skinSelector =
-                OptionsScreenUI::getInstance()->getWidget<GUIEngine::SpinnerWidget>("skinchoice");
-            skinSelector->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-            skinSelector->setSelectedButton(right);
-        }
-        irr_driver->setMaxTextureSize();
+        // Reload GUIEngine will clear widgets so we don't do that in eventCallback
+        m_reload_option = std::unique_ptr<ReloadOption>(new ReloadOption);
+        m_reload_option->m_reload_font = prev_font != GUIEngine::getSkin()->hasFont();
+        m_reload_option->m_reload_skin = true;
+        m_reload_option->m_focus_name = "skinchoice";
+        m_reload_option->m_focus_right = right;
     }
     else if (name == "minimap")
     {
@@ -409,27 +391,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( font_size != NULL );
         bool right = font_size->isButtonSelected(true/*right*/);
         UserConfigParams::m_font_size = font_size->getValue();
-        GUIEngine::clear();
-        GUIEngine::cleanUp();
-        GUIEngine::clearScreenCache();
-        delete font_manager;
-        font_manager = new FontManager();
-        font_manager->loadFonts();
-        GUIEngine::init(irr_driver->getDevice(), irr_driver->getVideoDriver(),
-            StateManager::get(), false/*loading*/);
-        Screen* screen_list[] =
-            {
-                MainMenuScreen::getInstance(),
-                OptionsScreenUI::getInstance(),
-                nullptr
-            };
-        GUIEngine::switchToScreen(MainMenuScreen::getInstance());
-        StateManager::get()->resetAndSetStack(screen_list);
-        // Need to use new widget pointer
-        font_size =
-            OptionsScreenUI::getInstance()->getWidget<GUIEngine::SpinnerWidget>("font_size");
-        font_size->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-        font_size->setSelectedButton(right);
+        // Reload GUIEngine will clear widgets so we don't do that in eventCallback
+        m_reload_option = std::unique_ptr<ReloadOption>(new ReloadOption);
+        m_reload_option->m_reload_font = true;
+        m_reload_option->m_reload_skin = false;
+        m_reload_option->m_focus_name = "font_size";
+        m_reload_option->m_focus_right = right;
     }
     else if (name == "splitscreen_method")
     {
@@ -491,6 +458,62 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     }
 #endif
 }   // eventCallback
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenUI::onUpdate(float delta)
+{
+    if (m_reload_option)
+        reloadGUIEngine();
+}   // onUpdate
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenUI::reloadGUIEngine()
+{
+    bool reload_font = m_reload_option->m_reload_font;
+    bool reload_skin = m_reload_option->m_reload_skin;
+    std::string focus_name = m_reload_option->m_focus_name;
+    bool focus_right = m_reload_option->m_focus_right;
+
+    if (reload_skin || reload_font)
+    {
+        if (reload_font)
+        {
+            GUIEngine::clear();
+            GUIEngine::cleanUp();
+        }
+
+        GUIEngine::clearScreenCache();
+
+        if (reload_font)
+        {
+            delete font_manager;
+            font_manager = new FontManager();
+            font_manager->loadFonts();
+            GUIEngine::init(irr_driver->getDevice(), irr_driver->getVideoDriver(),
+                StateManager::get(), false/*loading*/);
+        }
+
+        Screen* screen_list[] =
+            {
+                MainMenuScreen::getInstance(),
+                OptionsScreenUI::getInstance(),
+                nullptr
+            };
+        GUIEngine::switchToScreen(MainMenuScreen::getInstance());
+        StateManager::get()->resetAndSetStack(screen_list);
+        GUIEngine::SpinnerWidget* spinner = OptionsScreenUI::getInstance()
+            ->getWidget<GUIEngine::SpinnerWidget>(focus_name.c_str());
+        spinner->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        spinner->setSelectedButton(focus_right);
+    }
+    if (reload_skin)
+    {
+        irr_driver->setMaxTextureSize();
+    }
+    OptionsScreenUI::getInstance()->m_reload_option = nullptr;
+}   // reloadGUIEngine
 
 // -----------------------------------------------------------------------------
 

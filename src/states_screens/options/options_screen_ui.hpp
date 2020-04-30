@@ -19,6 +19,7 @@
 #ifndef __HEADER_OPTIONS_SCREEN_UI_HPP__
 #define __HEADER_OPTIONS_SCREEN_UI_HPP__
 
+#include <memory>
 #include <string>
 
 #include "guiengine/screen.hpp"
@@ -33,6 +34,14 @@ struct Input;
   */
 class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenUI>
 {
+    struct ReloadOption
+    {
+        bool m_reload_font;
+        bool m_reload_skin;
+        std::string m_focus_name;
+        bool m_focus_right;
+    };
+    std::unique_ptr<ReloadOption> m_reload_option;
     OptionsScreenUI();
     bool m_inited;
 
@@ -56,6 +65,10 @@ public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded() OVERRIDE;
+
+    virtual void onUpdate(float delta) OVERRIDE;
+
+    void reloadGUIEngine();
 };
 
 #endif
