@@ -62,7 +62,7 @@ libjpeg-devel bluez-devel freetype2-devel glu-devel
 Ubuntu command:
 
 ```bash
-sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-devel \
+sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-dev \
 libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev \
 libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
 libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
