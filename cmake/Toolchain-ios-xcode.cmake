@@ -57,7 +57,7 @@ set(OPENSSL_CRYPTO_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libcrypto.a;$
 set(OPENSSL_INCLUDE_DIR ${DEPS_PATH}/ios_arm64/dependencies/include CACHE STRING "")
 set(LIBRESOLV_LIBRARY ${CMAKE_OSX_SYSROOT_IOS}/usr/lib/libresolv.tbd;${CMAKE_OSX_SYSROOT_SIMULATOR}/usr/lib/libresolv.tbd CACHE STRING "")
 set(SDL2_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libSDL2.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libSDL2.a CACHE STRING "")
-set(SDL2_INCLUDEDIR ${DEPS_PATH}/ios_arm64/dependencies/include CACHE STRING "")
+set(SDL2_INCLUDEDIR ${DEPS_PATH}/ios_arm64/dependencies/include/SDL2 CACHE STRING "")
 
 # Standard config
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
