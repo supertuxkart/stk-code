@@ -28,14 +28,63 @@
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
 #include <IGUIButton.h>
-#include <IGUIStaticText.h>
 #include <IGUIImage.h>
+
+#include "../../../lib/irrlicht/source/Irrlicht/CGUIButton.h"
+
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
 // -----------------------------------------------------------------------------
+
+class SpinnerIrrElement : public CGUIButton
+{
+private:
+    bool m_pressed_moving;
+
+    SpinnerWidget* m_spinner;
+public:
+    SpinnerIrrElement(const core::rect<s32>& rectangle, IGUIElement* parent,
+                      s32 id, SpinnerWidget* spinner)
+    : CGUIButton(GUIEngine::getGUIEnv(), parent ?
+                 parent : dynamic_cast<IGUIElement*>(GUIEngine::getGUIEnv()),
+                 id, rectangle)
+    {
+        m_pressed_moving = false;
+        m_spinner = spinner;
+        setText(L"");
+        // Parent or GUI environment grabbed it
+        drop();
+    }
+    virtual bool OnEvent(const SEvent& event)
+    {
+        bool ret = CGUIButton::OnEvent(event);
+        if (ret && event.EventType == EET_MOUSE_INPUT_EVENT)
+        {
+            if (!m_spinner->isActivated())
+                return ret;
+            if (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN)
+                m_pressed_moving = true;
+            else if (event.MouseInput.Event == EMIE_LMOUSE_LEFT_UP)
+            {
+                m_pressed_moving = false;
+                // clearSelected so SpinnerWidget::activateSelectedButton
+                // is not called in transmitEvent
+                m_spinner->clearSelected();
+            }
+            if (m_pressed_moving &&
+                (event.MouseInput.Event == EMIE_LMOUSE_PRESSED_DOWN ||
+                event.MouseInput.Event == EMIE_MOUSE_MOVED))
+            {
+                m_spinner->onPressed(event.MouseInput.X, event.MouseInput.Y);
+                m_spinner->doValueUpdatedCallback();
+            }
+        }
+        return ret;
+    }
+};
 
 SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
 {
@@ -49,6 +98,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_spinner_widget_player_id=-1;
     m_min = 0;
     m_max = 999;
+    m_left_selected = false;
     m_right_selected = false;
 }
 
@@ -107,7 +157,7 @@ void SpinnerWidget::add()
     }
 
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
-    IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, widgetID, L"");
+    IGUIButton * btn = new SpinnerIrrElement(widget_size, m_parent, widgetID, this);
     m_element = btn;
 
     m_element->setTabOrder( m_element->getID() );
@@ -252,13 +302,11 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
     // if widget is deactivated, do nothing
     if (m_deactivated) return EVENT_BLOCK;
 
-
-    // if right arrow is selected, select left arrow
-    if (m_right_selected)
-        setSelectedButton(/* right*/ false);
-    // if left arrow is selected, let navigation move to next widget
-    else
+    // if left arrow is selected, let event handler move to next widget
+    if (m_left_selected)
         return EVENT_BLOCK;
+    else
+        setSelectedButton(/* right*/ false);
 
     return EVENT_BLOCK_BUT_HANDLED;
 } // leftPressed
@@ -276,7 +324,7 @@ void SpinnerWidget::activateSelectedButton()
             setValue(m_min);
         }
     }
-    else // left button active
+    else if (m_left_selected)
     {
         if (m_value-1 >= m_min)
         {
@@ -302,11 +350,13 @@ EventPropagation SpinnerWidget::transmitEvent(Widget* w,
 
     if (originator == "left")
     {
+        m_left_selected = true;
         m_right_selected = false;
         activateSelectedButton();
     }
     else if (originator == "right")
     {
+        m_left_selected = false;
         m_right_selected = true;
         activateSelectedButton();
     }
@@ -455,18 +505,16 @@ void SpinnerWidget::setCustomText(const core::stringw& text)
 
 // -----------------------------------------------------------------------------
 
-EventPropagation SpinnerWidget::onClick()
+void SpinnerWidget::onPressed(int x, int y)
 {
     if (m_children[1].m_deactivated || 
         m_children[1].m_properties[PROP_ID] != "spinnerbody"  || 
         !isGauge()) 
     { 
-        return EVENT_LET; 
+        return;
     }
 
-    const core::position2di mouse_position
-        = irr_driver->getDevice()->getCursorControl()->getPosition();
-
+    core::position2di mouse_position(x, y);
     core::recti body_rect 
         = m_children[1].getIrrlichtElement()->getAbsolutePosition();
 
@@ -485,8 +533,6 @@ EventPropagation SpinnerWidget::onClick()
 
         setValue(new_value);
     }
-    
-    return EVENT_LET;
 }
 
 // -----------------------------------------------------------------------------

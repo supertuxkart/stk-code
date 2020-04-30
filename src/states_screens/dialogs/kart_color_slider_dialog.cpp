@@ -67,6 +67,11 @@ KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
         m_model_view->getModelViewRenderInfo()->setHue(0.0f);
     }
     m_toggle_slider->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    m_color_slider->setValueUpdatedCallback([this](SpinnerWidget* spinner)
+    {
+        m_model_view->getModelViewRenderInfo()->setHue(
+            float(spinner->getValue()) / 100.0f);
+    });
 }   // KartColorSliderDialog
 
 // ----------------------------------------------------------------------------

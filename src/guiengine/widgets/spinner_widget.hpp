@@ -21,6 +21,7 @@
 #define HEADER_SPINNER_HPP
 
 #include <irrString.h>
+#include <functional>
 namespace irr
 {
     namespace video { class ITexture; }
@@ -52,7 +53,7 @@ namespace GUIEngine
         };
         
     protected:
-        
+        std::function<void(SpinnerWidget* spinner)> m_value_updated_callback;
         ISpinnerConfirmListener* m_listener;
         
         int m_value, m_min, m_max;
@@ -76,7 +77,10 @@ namespace GUIEngine
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
 
-        /** \brief Whether the right or left arrow is the currently selected one  */
+        /** \brief Whether the left arrow is the currently selected one  */
+        bool m_left_selected;
+
+        /** \brief Whether the right arrow is the currently selected one  */
         bool m_right_selected;
 
         /** \brief Keeps track of the custom text in spinner (a text which isn't related to a value)
@@ -94,9 +98,6 @@ namespace GUIEngine
         
         /** \brief implementing method from base class Widget */
         virtual EventPropagation leftPressed(const int playerID);
-
-        /** \brief implementing method from base class Widget */
-        virtual EventPropagation onClick();
         
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
@@ -128,8 +129,32 @@ namespace GUIEngine
         void unsetUseBackgroundColor()              {m_use_background_color=false;       }
 
         void activateSelectedButton();
-        void setSelectedButton(bool right)          {m_right_selected = right;           }
-        bool isRightButtonSelected()                {return m_right_selected;            }
+        void setSelectedButton(bool right)
+        {
+            if (right)
+            {
+                m_left_selected = false;
+                m_right_selected = true;
+            }
+            else
+            {
+                m_left_selected = true;
+                m_right_selected = false;
+            }
+        }
+        void clearSelected()
+        {
+            m_left_selected = false;
+            m_right_selected = false;
+        }
+        bool isButtonSelected(bool right)
+        {
+            if (right && m_right_selected)
+                return true;
+            else if (!right && m_left_selected)
+                return true;
+            return false;
+        }
 
 
 
@@ -217,6 +242,17 @@ namespace GUIEngine
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
         const core::stringw& getCustomText() const { return m_custom_text; }
+        void onPressed(int x, int y);
+        void doValueUpdatedCallback()
+        {
+            if (m_value_updated_callback)
+                m_value_updated_callback(this);
+        }
+        void setValueUpdatedCallback(
+            std::function<void(SpinnerWidget* spinner)> callback)
+        {
+            m_value_updated_callback = callback;
+        }
     };
 
 }

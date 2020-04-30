@@ -355,7 +355,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         assert( skinSelector != NULL );
 
         const core::stringw selectedSkin = skinSelector->getStringValue();
-        bool right = skinSelector->isRightButtonSelected();
+        bool right = skinSelector->isButtonSelected(true/*right*/);
         UserConfigParams::m_skin_file = m_skins[selectedSkin];
         irr_driver->unsetMaxTextureSize();
         bool prev_icon_theme = GUIEngine::getSkin()->hasIconTheme();
@@ -407,7 +407,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         GUIEngine::SpinnerWidget* font_size = getWidget<GUIEngine::SpinnerWidget>("font_size");
         assert( font_size != NULL );
-        bool right = font_size->isRightButtonSelected();
+        bool right = font_size->isButtonSelected(true/*right*/);
         UserConfigParams::m_font_size = font_size->getValue();
         GUIEngine::clear();
         GUIEngine::cleanUp();
