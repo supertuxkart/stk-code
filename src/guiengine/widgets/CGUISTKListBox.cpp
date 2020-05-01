@@ -5,6 +5,7 @@
 
 #include "guiengine/widgets/CGUISTKListBox.hpp"
 
+#include "font/font_drawer.hpp"
 #include "graphics/2dutils.hpp"
 #include "IGUISkin.h"
 #include "IGUIEnvironment.h"
@@ -467,6 +468,7 @@ void CGUISTKListBox::updateAbsolutePosition()
 //! draws the element and its children
 void CGUISTKListBox::draw()
 {
+#ifndef SERVER_ONLY
     if (!IsVisible)
         return;
 
@@ -505,19 +507,18 @@ void CGUISTKListBox::draw()
 
     bool hl = (HighlightWhenNotFocused || Environment->hasFocus(this) || Environment->hasFocus(ScrollBar));
 
+    FontDrawer::startBatching();
     for (s32 i=0; i<(s32)Items.size(); ++i)
     {
         if (frameRect.LowerRightCorner.Y >= AbsoluteRect.UpperLeftCorner.Y &&
             frameRect.UpperLeftCorner.Y <= AbsoluteRect.LowerRightCorner.Y)
         {
-#ifndef SERVER_ONLY
             if (m_alternating_darkness && i % 2 != 0)
             {
                 video::SColor color(0);
                 color.setAlpha(30);
                 GL32_draw2DRectangle(color, frameRect, &clientClip);
             }
-#endif
             if (i == Selected && hl)
                 skin->draw2DRectangle(this, skin->getColor(EGDC_HIGH_LIGHT), frameRect, &clientClip);
 
@@ -614,7 +615,8 @@ void CGUISTKListBox::draw()
         frameRect.UpperLeftCorner.Y += ItemHeight;
         frameRect.LowerRightCorner.Y += ItemHeight;
     }
-
+    FontDrawer::endBatching();
+#endif
     IGUIElement::draw();
 }
 

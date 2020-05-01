@@ -9,6 +9,7 @@
 #include "IVideoDriver.h"
 #include "ITexture.h"
 #include <cassert>
+#include "font/font_drawer.hpp"
 #include "graphics/2dutils.hpp"
 
 namespace irr
@@ -202,7 +203,7 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
                   ? Sprites[index].Frames.size()-1 : f;
     }
 
-    const video::ITexture* tex =
+    video::ITexture* tex =
         Textures[Sprites[index].Frames[frame].textureNumber];
     if (!tex)
         return;
@@ -242,8 +243,20 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
                       const video::SColor  *const colors=0,
                       bool useAlphaChannelOfTexture=false)=0
      */
-    draw2DImage(tex, dest, r /* source rect */, clip,
-                        NULL /* colors */, true);
+    if (FontDrawer::isBatching())
+    {
+        // FontDrawing is batching when stk list box widget is drawing text,
+        // so we combine the images to them to make it faster (for example in
+        // server list when there are all green tick icons)
+        FontDrawer::addGlyph(tex, core::rect<f32>(dest.UpperLeftCorner.X,
+            dest.UpperLeftCorner.Y, dest.LowerRightCorner.X,
+            dest.LowerRightCorner.Y), r, clip, video::SColor(-1));
+    }
+    else
+    {
+        draw2DImage(tex, dest, r /* source rect */, clip, NULL /* colors */,
+            true);
+    }
 #endif
 }   // draw2DSprite
 

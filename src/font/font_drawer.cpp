@@ -57,6 +57,27 @@ public:
 std::unique_ptr<core::rect<s32> > g_clip;
 // ============================================================================
 std::map<video::ITexture*, std::vector<uint8_t> > g_glyphs;
+// ============================================================================
+bool g_batching = false;
+// ----------------------------------------------------------------------------
+void FontDrawer::startBatching()
+{
+    g_batching = true;
+}   // startBatching
+
+// ----------------------------------------------------------------------------
+bool FontDrawer::isBatching()
+{
+    return g_batching;
+}   // isBatching
+
+// ----------------------------------------------------------------------------
+void FontDrawer::endBatching()
+{
+    g_batching = false;
+    draw();
+}   // endBatching
+
 // ----------------------------------------------------------------------------
 void FontDrawer::addGlyph(video::ITexture* texture,
                           const core::rect<float>& dest_rect,
@@ -119,6 +140,9 @@ void FontDrawer::addGlyph(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void FontDrawer::draw()
 {
+    if (g_batching || g_glyphs.empty())
+        return;
+
     if (g_clip && !g_clip->isValid())
     {
         for (auto it = g_glyphs.begin(); it != g_glyphs.end();)

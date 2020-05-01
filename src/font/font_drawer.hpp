@@ -32,6 +32,12 @@ using namespace irr;
 namespace FontDrawer
 {
     // ------------------------------------------------------------------------
+    void startBatching();
+    // ------------------------------------------------------------------------
+    bool isBatching();
+    // ------------------------------------------------------------------------
+    void endBatching();
+    // ------------------------------------------------------------------------
     void addGlyph(video::ITexture* texture,
                   const core::rect<float>& dest_rect,
                   const core::rect<s32>& source_rect,
