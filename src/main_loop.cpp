@@ -438,7 +438,10 @@ void MainLoop::run()
             bool was_lan = NetworkConfig::get()->isLAN();
             std::shared_ptr<Server> rejoin_server;
             if (auto cl = LobbyProtocol::get<ClientLobby>())
-                rejoin_server = cl->getJoinedServer();
+            {
+                if (cl->getJoinedServer()->reconnectWhenQuitLobby())
+                    rejoin_server = cl->getJoinedServer();
+            }
             bool exist_host = STKHost::existHost();
             core::stringw msg = _("Server connection timed out.");
 
