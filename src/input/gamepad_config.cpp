@@ -157,9 +157,9 @@ core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
         // I18N: name of buttons on gamepads
         _("Start"), // SDL_CONTROLLER_BUTTON_START
         // I18N: name of buttons on gamepads
-        _("Left stick"), // SDL_CONTROLLER_BUTTON_LEFTSTICK
+        _("Left thumbstick press"), // SDL_CONTROLLER_BUTTON_LEFTSTICK
         // I18N: name of buttons on gamepads
-        _("Right stick"), // SDL_CONTROLLER_BUTTON_RIGHTSTICK
+        _("Right thumbstick press"), // SDL_CONTROLLER_BUTTON_RIGHTSTICK
         // I18N: name of buttons on gamepads
         _("Left shoulder"), // SDL_CONTROLLER_BUTTON_LEFTSHOULDER
         // I18N: name of buttons on gamepads
