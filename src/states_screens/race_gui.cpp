@@ -447,8 +447,6 @@ void RaceGUI::drawGlobalTimer()
     }
 
     gui::ScalableFont* font = (use_digit_font ? GUIEngine::getHighresDigitFont() : GUIEngine::getFont());
-    if (use_digit_font)
-        font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
     font->setBlackBorder(true);
     font->draw(sw, pos, time_color, false, false, NULL,
@@ -514,7 +512,6 @@ void RaceGUI::drawLiveDifference()
                         irr_driver->getActualScreenSize().Height*11/100);
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    font->setShadow(video::SColor(255, 128, 0, 0));
     font->setScale(1.0f);
     font->setBlackBorder(true);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
@@ -917,7 +914,6 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     
     int font_height = font->getDimension(L"X").Height;
     font->setScale((float)meter_height / font_height * 0.4f * scale);
-    font->setShadow(video::SColor(255, 128, 0, 0));
     std::ostringstream oss;
     oss << rank; // the current font has no . :(   << ".";
 
