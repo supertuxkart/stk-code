@@ -529,14 +529,33 @@ void GamepadConfig::initSDLMapping()
         goto fallback;
     if (actions_map.find(SDL_CONTROLLER_BUTTON_START) == actions_map.end())
         goto fallback;
-    setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
-    setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_A));
-    setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_X));
-    setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
-    setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
-    setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
-    setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_B));
-    setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+    // If shoulder buttons are found change acceleration handling because some
+    // stick may not handle acceleration and steering good together
+    if (actions_map.find(SDL_CONTROLLER_BUTTON_LEFTSHOULDER) != actions_map.end() &&
+        actions_map.find(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) != actions_map.end())
+    {
+        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
+        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_BUTTON_X));
+        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
+        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_A));
+        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
+        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_A));
+        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+    }
+    else
+    {
+        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_A));
+        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_X));
+        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
+        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
+        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+    }
     return;
 
 fallback:
