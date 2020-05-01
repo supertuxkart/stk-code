@@ -27,6 +27,7 @@ using namespace irr;
 #include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
+#include "font/font_drawer.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/2dutils.hpp"
 #ifndef SERVER_ONLY
@@ -305,6 +306,7 @@ void RaceGUI::renderGlobal(float dt)
     if(!world->isRacePhase()) return;
 
     //drawGlobalTimer checks if it should display in the current phase/mode
+    FontDrawer::startBatching();
     drawGlobalTimer();
 
     if (!m_is_tutorial)
@@ -338,6 +340,7 @@ void RaceGUI::renderGlobal(float dt)
             drawGlobalPlayerIcons(0);
         }
     }
+    FontDrawer::endBatching();
 #endif
 }   // renderGlobal
 
@@ -348,6 +351,7 @@ void RaceGUI::renderGlobal(float dt)
  */
 void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 {
+#ifndef SERVER_ONLY
     if (!m_enabled) return;
 
     RaceGUIBase::renderPlayerView(camera, dt);
@@ -375,6 +379,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if(!World::getWorld()->isRacePhase()) return;
 
+    FontDrawer::startBatching();
     if (!isSpectatorCam) 
     {
         if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
@@ -386,6 +391,8 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
+    FontDrawer::endBatching();
+#endif
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
