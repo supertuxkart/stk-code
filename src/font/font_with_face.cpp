@@ -20,6 +20,7 @@
 
 #include "config/user_config.hpp"
 #include "font/face_ttf.hpp"
+#include "font/font_drawer.hpp"
 #include "font/font_manager.hpp"
 #include "font/font_settings.hpp"
 #include "graphics/2dutils.hpp"
@@ -880,9 +881,9 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
                 for (int y_delta = -thickness; y_delta <= thickness; y_delta++)
                 {
                     if (x_delta == 0 || y_delta == 0) continue;
-                    draw2DImage(texture, dest + core::position2d<float>
+                    FontDrawer::addGlyph(texture, dest + core::position2d<float>
                         (float(x_delta), float(y_delta)), source, clip,
-                        border_color, true);
+                        border_color);
                 }
             }
         }
@@ -898,11 +899,8 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
     top.setAlpha(color.getAlpha());
     bottom.setAlpha(color.getAlpha());
 
-    std::array<video::SColor, 4> title_colors;
-    if (CVS->isGLSL())
-        title_colors = { { top, bottom, top, bottom } };
-    else
-        title_colors = { { bottom, top, top, bottom } };
+    std::array<video::SColor, 4> title_colors =
+        { { bottom, top , bottom, top } };
 
     video::SColor text_marked = GUIEngine::getSkin()->getColor(
         "text_field::background_marked");
@@ -946,8 +944,8 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             }
             else
             {
-                draw2DImage(texture, dest, source, clip,
-                    is_colored ? white.data() : title_colors.data(), true);
+                FontDrawer::addGlyph(texture, dest, source, clip,
+                    is_colored ? white.data() : title_colors.data());
             }
         }
         else
@@ -961,11 +959,13 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             }
             else
             {
-                draw2DImage(texture, dest, source, clip,
-                    is_colored ? video::SColor(-1) : color, true);
+                FontDrawer::addGlyph(texture, dest, source, clip,
+                    is_colored ? video::SColor(-1) : color);
             }
         }
     }
+    FontDrawer::draw();
+
     for (unsigned i = 0; i < gld_offsets.size(); i += 2)
     {
         if (df_used == gui::GLD_MARKED)

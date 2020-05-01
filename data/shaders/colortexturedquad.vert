@@ -15,14 +15,14 @@ in vec4 Color;
 #endif
 
 out vec2 uv;
-out vec4 col;
+out vec4 color;
 
 void main()
 {
     float s = sin(rotation);
     float c = cos(rotation);
     mat2 m = mat2(c, -s, s, c);
-    col = Color.zyxw;
+    color = Color.zyxw;
     uv = Texcoord * texsize + texcenter;
     gl_Position = vec4(m * Position * size + center, 0., 1.);
 }
