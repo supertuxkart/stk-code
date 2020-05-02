@@ -1,6 +1,6 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2010-2015 SuperTuxKart-Team
+//  Copyright (C) 2010-2020 SuperTuxKart-Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -551,10 +551,10 @@ void GamepadConfig::initSDLMapping()
         setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_A));
         setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_X));
         setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
-        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
-        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
-        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_B));
-        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+        setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
+        setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_A));
+        setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_B));
     }
     return;
 
