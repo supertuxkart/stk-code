@@ -14,3 +14,4 @@ StartupNotify=false
 Type=Application
 Categories=Game;ArcadeGame;
 Keywords=tux;game;race;
+PrefersNonDefaultGPU=true
