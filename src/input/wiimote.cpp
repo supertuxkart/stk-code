@@ -68,8 +68,8 @@ void Wiimote::resetIrrEvent()
     event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
     for(int i=0 ; i < irr::SEvent::SJoystickEvent::NUMBER_OF_AXES ; i++)
         event.JoystickEvent.Axis[i] = 0;
+    event.JoystickEvent.AxisChanged = 1;
     event.JoystickEvent.Joystick = getIrrId();
-    event.JoystickEvent.POV = 65535;
     event.JoystickEvent.ButtonStates = 0;
 }   // resetIrrEvent
 

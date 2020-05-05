@@ -20,6 +20,8 @@
 #ifndef HEADER_INPUT_MANAGER_HPP
 #define HEADER_INPUT_MANAGER_HPP
 
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
 #include <set>
@@ -29,6 +31,7 @@
 #include "utils/no_copy.hpp"
 
 class DeviceManager;
+class SDLController;
 
 /**
   * \brief Class to handle input.
@@ -68,12 +71,14 @@ private:
     */
     int m_mouse_val_x, m_mouse_val_y;
 
-    void   dispatchInput(Input::InputType, int deviceID, int btnID,
-                         Input::AxisDirection direction, int value,
-                         bool shift_mask = false);
     void   handleStaticAction(int id0, int value);
     void   inputSensing(Input::InputType type, int deviceID, int btnID,
                         Input::AxisDirection axisDirection,  int value);
+
+#ifndef SERVER_ONLY
+    std::map<int, std::unique_ptr<SDLController> > m_sdl_controller;
+#endif
+
 public:
            InputManager();
           ~InputManager();
@@ -101,6 +106,20 @@ public:
     /** Returns the ID of the player that plays with the keyboard,
      *  or -1 if none. */
     int    getPlayerKeyboardID() const;
+#ifdef SERVER_ONLY
+    size_t getGamepadCount() const { return 0; }
+#else
+    /** Returns number of active connected gamepad (with SDL), notice the
+     *  disconnected gamepad will not be removed from device manager to allow
+     *  re-plugging later with the same ID. */
+    size_t getGamepadCount() const { return m_sdl_controller.size(); }
+    /** Returns irrlicht joystick for gamepad visualization. */
+    const irr::SEvent& getEventForGamePad(unsigned i) const;
+#endif
+
+    void   dispatchInput(Input::InputType, int deviceID, int btnID,
+                         Input::AxisDirection direction, int value,
+                         bool shift_mask = false);
 };
 
 extern InputManager *input_manager;

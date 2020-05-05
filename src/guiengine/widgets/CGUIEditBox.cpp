@@ -189,7 +189,6 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
     PasswordChar(U'*'), HAlign(EGUIA_UPPERLEFT), VAlign(EGUIA_CENTER),
     CurrentTextRect(0,0,1,1), FrameRect(rectangle)
 {
-    m_from_android_edittext = false;
     m_composing_start = 0;
     m_composing_end = 0;
     m_type = (GUIEngine::TextBoxType)0;
@@ -244,14 +243,6 @@ CGUIEditBox::~CGUIEditBox()
     }
 #elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
     DestroyCaret();
-#endif
-#ifdef ANDROID
-    if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
-    {
-        CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
-                                                       irr_driver->getDevice());
-        dl->setTextInputEnabled(false);
-    }
 #endif
     if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
         GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
@@ -347,9 +338,6 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #ifndef SERVER_ONLY
     if (isEnabled())
     {
-        // Ignore key input if we only fromAndroidEditText
-        if (m_from_android_edittext && event.EventType == EET_KEY_INPUT_EVENT)
-            return true;
         switch(event.EventType)
         {
         case EET_GUI_EVENT:
@@ -370,15 +358,6 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
                 DestroyCaret();
 #endif
-#ifdef ANDROID
-                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
-                {
-                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
-                                                       irr_driver->getDevice());
-                    dl->setTextInputEnabled(false);
-                }
-#endif
-                m_from_android_edittext = false;
                 m_composing_start = 0;
                 m_composing_end = 0;
                 m_composing_text.clear();
@@ -396,29 +375,17 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #endif
                 calculateScrollPos();
 #ifdef ANDROID
-                if (irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
-                {
-                    CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
-                                                       irr_driver->getDevice());
-                    dl->setTextInputEnabled(true);
-                }
-
                 if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
                     GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
                     irr_driver->getDevice()->getType() == irr::EIDT_ANDROID)
                 {
                     // If user toggle with hacker keyboard with arrows, keep
                     // using only text from STKEditTex
-                    m_from_android_edittext = true;
                     CIrrDeviceAndroid* dl = dynamic_cast<CIrrDeviceAndroid*>(
                                                        irr_driver->getDevice());
                     dl->fromSTKEditBox(getID(), Text, m_mark_begin, m_mark_end, m_type);
                 }
-                else
 #endif
-                {
-                    m_from_android_edittext = false;
-                }
                 m_composing_text.clear();
             }
             break;
@@ -1523,8 +1490,6 @@ void CGUIEditBox::fromAndroidEditText(const std::u32string& text, int start,
                                       int end, int composing_start,
                                       int composing_end)
 {
-    // When focus of this element is lost, this will be set to false again
-    m_from_android_edittext = true;
     // Prevent invalid start or end
     if ((unsigned)end > text.size())
     {

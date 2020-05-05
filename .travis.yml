@@ -7,11 +7,14 @@ sudo: false
 language: cpp
 os:
   - linux
+#  - osx
 compiler:
   - gcc
   - clang
 
 matrix:
+#  include:
+#    - osx_image: xcode11.3
   fast_finish: true
 
 env:
@@ -36,6 +39,7 @@ addons:
     - libogg-dev
     - libopenal-dev
     - libpng-dev
+    - libsdl2-dev
     - libvorbis-dev
     - libxrandr-dev
     - mesa-common-dev

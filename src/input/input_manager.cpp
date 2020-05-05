@@ -31,6 +31,7 @@
 #include "input/input.hpp"
 #include "input/keyboard_device.hpp"
 #include "input/multitouch_device.hpp"
+#include "input/sdl_controller.hpp"
 #include "input/wiimote_manager.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/abstract_kart.hpp"
@@ -62,6 +63,9 @@
 #include <sstream>
 #include <algorithm>
 
+#ifndef SERVER_ONLY
+#include <SDL.h>
+#endif
 
 InputManager *input_manager;
 
@@ -83,7 +87,16 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_timer_in_use = false;
     m_master_player_only = false;
     m_timer = 0;
-
+#ifndef SERVER_ONLY
+    SDL_SetMainReady();
+    SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
+    SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+    if (SDL_Init(SDL_INIT_GAMECONTROLLER) != 0)
+    {
+        Log::error("InputManager", "Unable to initialize SDL: %s",
+            SDL_GetError());
+    }
+#endif
 }
 // -----------------------------------------------------------------------------
 void InputManager::update(float dt)
@@ -91,6 +104,70 @@ void InputManager::update(float dt)
 #ifdef ENABLE_WIIUSE
     if (wiimote_manager)
         wiimote_manager->update();
+#endif
+
+#ifndef SERVER_ONLY
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+    {
+        try
+        {
+            switch (event.type)
+            {
+            case SDL_QUIT:
+            {
+                exit(-1);
+                break;
+            }
+            case SDL_JOYDEVICEADDED:
+            {
+                std::unique_ptr<SDLController> c(
+                    new SDLController(event.jdevice.which));
+                SDL_JoystickID id = c->getInstanceID();
+                m_sdl_controller[id] = std::move(c);
+                break;
+            }
+            case SDL_JOYDEVICEREMOVED:
+            {
+                m_sdl_controller.erase(event.jdevice.which);
+                break;
+            }
+            case SDL_JOYAXISMOTION:
+            {
+                auto& controller = m_sdl_controller.at(event.jaxis.which);
+                if (m_mode == INPUT_SENSE_GAMEPAD)
+                    controller->handleAxisInputSense(event);
+                if (controller->handleAxis(event) &&
+                    !UserConfigParams::m_gamepad_visualisation)
+                    input(controller->getEvent());
+                break;
+            }
+            case SDL_JOYHATMOTION:
+            {
+                auto& controller = m_sdl_controller.at(event.jhat.which);
+                if (controller->handleHat(event) &&
+                    !UserConfigParams::m_gamepad_visualisation)
+                    input(controller->getEvent());
+                break;
+            }
+            case SDL_JOYBUTTONUP:
+            case SDL_JOYBUTTONDOWN:
+            {
+                auto& controller = m_sdl_controller.at(event.jbutton.which);
+                if (controller->handleButton(event) &&
+                    !UserConfigParams::m_gamepad_visualisation)
+                    input(controller->getEvent());
+                break;
+            }
+            default:
+                break;
+            }
+        }
+        catch (std::exception& e)
+        {
+            Log::error("SDLController", "%s", e.what());
+        }
+    }
 #endif
 
     if(m_timer_in_use)
@@ -101,10 +178,24 @@ void InputManager::update(float dt)
 }
 
 //-----------------------------------------------------------------------------
+#ifndef SERVER_ONLY
+const irr::SEvent& InputManager::getEventForGamePad(unsigned i) const
+{
+    auto it = m_sdl_controller.begin();
+    return std::next(it, i)->second->getEvent();
+}
+#endif
+
+//-----------------------------------------------------------------------------
 /** Destructor. Frees all data structures.
  */
 InputManager::~InputManager()
 {
+#ifndef SERVER_ONLY
+    m_sdl_controller.clear();
+    SDL_Quit();
+#endif
+
     delete m_device_manager;
 }   // ~InputManager
 
@@ -490,6 +581,7 @@ void InputManager::inputSensing(Input::InputType type, int deviceID,
             sensed_input.m_device_id      = deviceID;
             sensed_input.m_button_id      = button;
             sensed_input.m_character      = deviceID;
+            sensed_input.m_axis_direction = Input::AD_NEUTRAL;
             OptionsScreenDevice::getInstance()->gotSensedInput(sensed_input);
             return;
         }
@@ -790,6 +882,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                         KartSelectionScreen::getRunningInstance()->joinPlayer(device, NULL/*player profile*/);
                     }
                 }
+                else if (value != 0 && (action == PA_MENU_CANCEL))
+                {
+                    StateManager::get()->escapePressed();
+                }
                 return; // we're done here, ignore devices that aren't
                         // associated with players
             }
@@ -836,7 +932,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         else
         {
             // reset timer when released
-            if (abs(value) == 0 &&  type == Input::IT_STICKBUTTON)
+            if (abs(value) == 0 && type == Input::IT_STICKMOTION)
             {
                 m_timer_in_use = false;
                 m_timer = 0;
@@ -869,7 +965,8 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             // menu input
             if (!m_timer_in_use)
             {
-                if (abs(value) > Input::MAX_VALUE*2/3)
+                if (type == Input::IT_STICKMOTION &&
+                    abs(value) > Input::MAX_VALUE * 2 / 3)
                 {
                     m_timer_in_use = true;
                     m_timer = 0.25;
@@ -952,11 +1049,11 @@ EventPropagation InputManager::input(const SEvent& event)
     const float ORIENTATION_MULTIPLIER = 10.0f;
     if (event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
-        // Axes - FIXME, instead of checking all of them, ask the bindings
-        // which ones to poll
         for (int axis_id=0; axis_id<SEvent::SJoystickEvent::NUMBER_OF_AXES ;
               axis_id++)
         {
+            if (!event.JoystickEvent.IsAxisChanged(axis_id))
+                continue;
             int value = event.JoystickEvent.Axis[axis_id];
 
             if (UserConfigParams::m_gamepad_debug)
@@ -968,26 +1065,6 @@ EventPropagation InputManager::input(const SEvent& event)
 
             dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
                           axis_id, Input::AD_NEUTRAL, value);
-        }
-
-        if (event.JoystickEvent.POV == 65535)
-        {
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
-                          Input::HAT_H_ID, Input::AD_NEUTRAL, 0);
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
-                          Input::HAT_V_ID, Input::AD_NEUTRAL, 0);
-        }
-        else
-        {
-            // *0.017453925f is to convert degrees to radians
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
-                          Input::HAT_H_ID, Input::AD_NEUTRAL,
-                          (int)(cosf(event.JoystickEvent.POV*0.017453925f/100.0f)
-                                *Input::MAX_VALUE));
-            dispatchInput(Input::IT_STICKMOTION, event.JoystickEvent.Joystick,
-                          Input::HAT_V_ID, Input::AD_NEUTRAL,
-                          (int)(sinf(event.JoystickEvent.POV*0.017453925f/100.0f)
-                                *Input::MAX_VALUE));
         }
 
         GamePadDevice* gp =

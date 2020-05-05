@@ -487,10 +487,6 @@ struct SEvent
 			NUMBER_OF_AXES = 32
 		};
 
-		/** A bitmap of button states.  You can use IsButtonPressed() to
-		 ( check the state of each button from 0 to (NUMBER_OF_BUTTONS - 1) */
-		u32 ButtonStates;
-
 		/** For AXIS_X, AXIS_Y, AXIS_Z, AXIS_R, AXIS_U and AXIS_V
 		 * Values are in the range -32768 to 32767, with 0 representing
 		 * the center position.  You will receive the raw value from the
@@ -501,17 +497,28 @@ struct SEvent
 		 */
 		s16 Axis[NUMBER_OF_AXES];
 
-		/** The POV represents the angle of the POV hat in degrees * 100,
-		 * from 0 to 35,900.  A value of 65535 indicates that the POV hat
-		 * is centered (or not present).
-		 * This value is only supported on Windows.  On Linux, the POV hat
-		 * will be sent as 2 axes instead. */
-		u16 POV;
+		//! The ID of the joystick which generated this event.
+		/** This is an internal Irrlicht index; it does not map directly
+		 * to any particular hardware joystick. */
+		u32 AxisChanged;
+
+		/** A bitmap of button states.  You can use IsButtonPressed() to
+		 ( check the state of each button from 0 to (NUMBER_OF_BUTTONS - 1) */
+		u32 ButtonStates;
 
 		//! The ID of the joystick which generated this event.
 		/** This is an internal Irrlicht index; it does not map directly
 		 * to any particular hardware joystick. */
-		u8 Joystick;
+		u32 Joystick;
+
+		//! A helper function to check if a button is pressed.
+		bool IsAxisChanged(u32 axis) const
+		{
+			if(axis >= (u32)NUMBER_OF_AXES)
+				return false;
+
+			return (AxisChanged & (1 << axis)) ? true : false;
+		}
 
 		//! A helper function to check if a button is pressed.
 		bool IsButtonPressed(u32 button) const

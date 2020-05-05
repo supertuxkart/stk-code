@@ -39,6 +39,7 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
     const XMLNode& xml = *server_info.getNode("server-info");
     m_address.reset(new SocketAddress());
 
+    m_reconnect_when_quit_lobby = false;
     m_ipv6_connection = false;
     m_name = "";
     m_server_id = 0;

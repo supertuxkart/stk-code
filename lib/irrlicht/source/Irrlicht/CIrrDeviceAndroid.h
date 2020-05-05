@@ -72,7 +72,6 @@ namespace irr
         virtual bool deactivateGyroscope();
         virtual bool isGyroscopeActive();
         virtual bool isGyroscopeAvailable();
-        virtual void setTextInputEnabled(bool enabled) {TextInputEnabled = enabled;}
         void fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end, int type);
         virtual void toggleOnScreenKeyboard(bool show, s32 type = 0);
         virtual bool supportsTouchDevice() const { return HasTouchDevice; }
@@ -104,31 +103,18 @@ namespace irr
         const ASensor* Gyroscope;
         bool AccelerometerActive;
         bool GyroscopeActive;
-        bool TextInputEnabled;
         static AndroidApplicationInfo ApplicationInfo;
 
         static bool IsPaused;
         static bool IsFocused;
         static bool IsStarted;
         
-        struct TouchEventData
-        {
-            int x;
-            int y;
-            ETOUCH_INPUT_EVENT event;
-            
-            TouchEventData() : x(0), y(0), event(ETIE_COUNT) {};
-        };
-        
-        TouchEventData TouchEventsData[32];
         bool HasTouchDevice;
         float GamepadAxisX;
         float GamepadAxisY;
         DeviceOrientation DefaultOrientation;
 
         video::SExposedVideoData ExposedVideoData;
-
-        std::map<int, EKEY_CODE> KeyMap;
         
         void printConfig();
         void createDriver();
@@ -142,11 +128,6 @@ namespace irr
         video::SExposedVideoData& getExposedVideoData();
         
         static void handleAndroidCommand(android_app* app, int32_t cmd);
-        static s32 handleInput(android_app* app, AInputEvent* event);
-
-        s32 handleTouch(AInputEvent* androidEvent);
-        s32 handleKeyboard(AInputEvent* androidEvent);
-        s32 handleGamepad(AInputEvent* androidEvent);
     };
 
 } // end namespace irr

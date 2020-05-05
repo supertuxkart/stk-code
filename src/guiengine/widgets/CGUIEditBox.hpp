@@ -180,10 +180,6 @@ namespace GUIEngine
         s32 m_composing_start;
         s32 m_composing_end;
 
-        /* If true, this editbox will copy text and selection only from
-         * android edittext, and process only mouse event. */
-        bool m_from_android_edittext;
-
         /* UTF32 string for shaping and editing to avoid wchar_t issue in
          * windows */
         std::u32string m_edit_text;

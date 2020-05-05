@@ -683,7 +683,10 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     {
         HeadlightObject& obj = m_headlight_objects[i];
         std::string full_name = kart_properties.getKartDir() + obj.getFilename();
-        obj.setModel(irr_driver->getMesh(full_name));
+        scene::IMesh* mesh = irr_driver->getMesh(full_name);
+        if (!mesh)
+            continue;
+        obj.setModel(mesh);
 #ifndef SERVER_ONLY
         SP::uploadSPM(obj.getModel());
 #endif

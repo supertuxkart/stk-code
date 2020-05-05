@@ -39,14 +39,18 @@
 #include "modes/profile_world.hpp"
 #include "network/network_config.hpp"
 #include "network/network_timer_synchronizer.hpp"
+#include "network/protocols/client_lobby.hpp"
 #include "network/protocols/game_protocol.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/race_event_manager.hpp"
 #include "network/rewind_manager.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "online/request_manager.hpp"
 #include "race/history.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/dialogs/server_info_dialog.hpp"
+#include "states_screens/online/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -431,6 +435,13 @@ void MainLoop::run()
         if ((STKHost::existHost() && STKHost::get()->requestedShutdown()) ||
             m_request_abort)
         {
+            bool was_lan = NetworkConfig::get()->isLAN();
+            std::shared_ptr<Server> rejoin_server;
+            if (auto cl = LobbyProtocol::get<ClientLobby>())
+            {
+                if (cl->getJoinedServer()->reconnectWhenQuitLobby())
+                    rejoin_server = cl->getJoinedServer();
+            }
             bool exist_host = STKHost::existHost();
             core::stringw msg = _("Server connection timed out.");
 
@@ -481,7 +492,19 @@ void MainLoop::run()
                         NetworkConfig::get()->getResetScreens().data());
                     MessageQueue::add(MessageQueue::MT_ERROR, msg);
                 }
-                NetworkConfig::get()->unsetNetworking();
+                if (rejoin_server)
+                {
+                    if (was_lan)
+                        NetworkConfig::get()->setIsLAN();
+                    else
+                        NetworkConfig::get()->setIsWAN();
+                    NetworkConfig::get()->setIsServer(false);
+                    ServerSelection::getInstance()->push();
+                    rejoin_server->setReconnectWhenQuitLobby(false);
+                    new ServerInfoDialog(rejoin_server);
+                }
+                else
+                    NetworkConfig::get()->unsetNetworking();
             }
 
             if (m_request_abort)

@@ -61,13 +61,13 @@ AddDeviceDialog::AddDeviceDialog() : ModalDialog(0.90f, 0.80f)
     core::rect<s32> text_area( 15, 15, m_area.getWidth()-15, y_bottom-15 );
 
     core::stringw msg =
-        _("To add a new Gamepad/Joystick device, simply start SuperTuxKart "
-          "with it connected and it will appear in the list.\n\nTo add a "
+        _("New gamepads and joysticks will automatically appear in the list "
+          "when you connect them to this device.\n\nTo add a "
           "keyboard config, you can use the button below, HOWEVER please "
           "note that most keyboards only support a limited amount of "
           "simultaneous keypresses and are thus inappropriate for multiplayer "
-          "gameplay. (You can, however, connect multiple keyboards to the "
-          "computer. Remember that everyone still needs different keybindings "
+          "gameplay. (You can, however, connect multiple keyboards to this "
+          "device. Remember that everyone still needs different keybindings "
           "in this case.)");
     IGUIStaticText* b =
         GUIEngine::getGUIEnv()->addStaticText(msg,

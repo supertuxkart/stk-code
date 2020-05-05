@@ -39,7 +39,7 @@
                     I18N="Race paused button" text="Help" word_wrap="true"/>
 
             <icon-button id="exit" width="128" height="128" icon="gui/icons/main_quit.png"
-                         I18N="Race paused button" text="Exit Race" word_wrap="true"/>
+                         I18N="Race paused button" text="Quit Server" word_wrap="true"/>
 
         </buttonbar>
 

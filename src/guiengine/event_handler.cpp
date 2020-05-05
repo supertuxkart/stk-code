@@ -328,7 +328,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
 
     const bool pressedDown = value > Input::MAX_VALUE*2/3;
 
-    if (!pressedDown && type == Input::IT_STICKMOTION) return;
+    if (!pressedDown) return;
 
     switch (action)
     {

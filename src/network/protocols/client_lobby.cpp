@@ -925,6 +925,7 @@ void ClientLobby::connectionRefused(Event* event)
         break;
     }
     case RR_INCORRECT_PASSWORD:
+        m_server->setReconnectWhenQuitLobby(true);
         STKHost::get()->setErrorMessage(
             _("Connection refused: Server password is incorrect."));
         break;

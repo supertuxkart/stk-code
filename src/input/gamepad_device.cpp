@@ -40,29 +40,12 @@ GamePadDevice::GamePadDevice(const int irr_index, const std::string &name,
         config->setNumberOfButtons(button_count);
     }
 
-    // HAT/POV buttons will be reported as additional axis with the values
-    // HAT_V_ID > HAT_H_ID. So increase the number of axis to be large
-    // enough to handle HAT_V/H_ID as axis number.
-    assert(Input::HAT_V_ID > Input::HAT_H_ID);
-    int adj_axis_count = axis_count > Input::HAT_V_ID ? axis_count 
-                                                      : Input::HAT_V_ID+1;
-
-    if(m_configuration->getNumberOfAxes()<adj_axis_count)
-    {
-        config->setNumberOfAxis(adj_axis_count);
-    }
-    m_prev_axis_directions.resize(adj_axis_count);
-    m_prev_axis_value.resize(adj_axis_count);
-    m_axis_ok.resize(adj_axis_count);
+    m_prev_axis_directions.resize(axis_count);
     m_irr_index             = irr_index;
     m_name                  = name;
 
     for (int i = 0; i < axis_count; i++)
-    {
         m_prev_axis_directions[i] = Input::AD_NEUTRAL;
-        m_prev_axis_value[i] = -1;
-        m_axis_ok[i] = false;
-    }
 
     m_button_pressed.resize(button_count);
     for(int n=0; n<button_count; n++)
@@ -167,7 +150,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
     // time-full-steer to be used to adjust actual steering values.
     // To prevent this delay for analog gamesticks, make sure that
     // 32767/-32768 are never used.
-    if(m_configuration->isAnalog())
+    if(m_configuration->isAnalog(type, id))
     {
         if(*value==32767)
             *value = 32766;
@@ -215,20 +198,6 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
         if     (*value > 0) m_prev_axis_directions[id] = Input::AD_POSITIVE;
         else if(*value < 0) m_prev_axis_directions[id] = Input::AD_NEGATIVE;
 
-        if (!m_axis_ok[id])
-        {
-            if (m_prev_axis_value[id] == -1)
-            {
-                // first value we get from this axis
-                m_prev_axis_value[id] = *value;
-            }
-            else if (m_prev_axis_value[id] != *value)
-            {
-                // second different value we get from this axis, consider it OK
-                m_axis_ok[id] = true;
-            }
-        }
-
         int dz = static_cast<GamepadConfig*>(m_configuration)->getDeadzone();
         // check if within deadzone
         if(*value > -dz && *value < dz && getPlayer())
@@ -255,9 +224,6 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
 
             return false;
         }
-
-        // If axis did not send proper values yet, ignore it.
-        if (!m_axis_ok[id]) return false;
     }
 
 

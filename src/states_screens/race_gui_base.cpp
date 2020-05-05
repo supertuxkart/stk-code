@@ -626,7 +626,9 @@ void RaceGUIBase::drawGlobalMusicDescription()
     const MusicInformation* mi = music_manager->getCurrentMusic();
     if (!mi) return;
 
-    core::stringw thetext = core::stringw(L"\"") + mi->getTitle() + L"\"";
+    core::stringw title = translations->w_gettext(mi->getTitle().c_str());
+    // I18N: string used to show the song title (e.g. "Sunny Song")
+    core::stringw thetext = _("\"%s\"", title);
 
     core::dimension2d< u32 > textSize = font->getDimension(thetext.c_str());
     int textWidth = textSize.Width;
@@ -764,6 +766,10 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
 {
 #ifndef SERVER_ONLY
     const RaceManager::MinorRaceModeType  minor_mode = RaceManager::get()->getMinorMode();
+    if (!UserConfigParams::m_soccer_player_list &&
+        minor_mode == RaceManager::MINOR_MODE_SOCCER)
+        return;
+
     int x_base = 10;
     if (irr_driver->getDevice()->getLeftPadding() > 0)
         x_base += irr_driver->getDevice()->getLeftPadding();

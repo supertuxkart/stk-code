@@ -5,7 +5,7 @@ import codecs
 f = open('./data/po/gui_strings.h', 'w')
 f.write( codecs.BOM_UTF8 )
 
-def traverse(file, node, isChallenge, isGP, isKart, isTrack, isAchievements, level=0):
+def traverse(file, node, isChallenge, isGP, isKart, isTrack, isAchievements, isMusic, level=0):
   
     for e in node.childNodes:
         if e.localName == None:
@@ -16,7 +16,12 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, isAchievements, lev
         comment = None
         if e.hasAttribute("I18N"):
            comment = e.getAttribute("I18N")
-        
+           
+        if isMusic and e.hasAttribute("title") and len(e.getAttribute("title")) > 0:
+            line = ""
+            line += "//I18N: Music title from " + file + "\n_(\"" + e.getAttribute("title") + "\");\n\n"
+            f.write( line.encode( "utf-8" ) )  
+
         if e.localName == "subtitle" and e.hasAttribute("text") and len(e.getAttribute("text")) > 0:
                #print "Label=", e.getAttribute("name"), " Comment=", comment
                line = ""
@@ -61,7 +66,7 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, isAchievements, lev
 
         # don't recurse in children nodes for karts, they can contain sounds, etc. that should not be translated
         if not isKart:
-            traverse(file, e, isChallenge, isGP, isKart, isTrack, isAchievements, level+1)
+            traverse(file, e, isChallenge, isGP, isKart, isTrack, isAchievements, isMusic, level+1)
       
 filenames = sys.argv[1:]
 for file in filenames:
@@ -72,7 +77,8 @@ for file in filenames:
     isKart = False
     isTrack = False
     isAchievements = False
-    
+    isMusic = False
+
     if file.endswith(".challenge"):
         isChallenge = True
     if file.endswith(".grandprix"):
@@ -83,7 +89,9 @@ for file in filenames:
         isTrack = True
     if file.endswith("achievements.xml"):
         isAchievements = True
-        
+    if file.endswith(".music"):
+        isMusic = True
+
     try:
         doc = xml.dom.minidom.parse(file)
     except Exception as ex:
@@ -91,5 +99,5 @@ for file in filenames:
         print("/!\\ Expat doesn't like ", file, "! Error=", type(ex), " (", ex.args, ")")
         print("============================================")
 
-    traverse(file, doc, isChallenge, isGP, isKart, isTrack, isAchievements)
+    traverse(file, doc, isChallenge, isGP, isKart, isTrack, isAchievements, isMusic)
     

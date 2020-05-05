@@ -55,7 +55,9 @@ bool Binding::load(const XMLNode *action)
         return false;
     }
     m_type = (Input::InputType)n;
-
+    // Default settings for button
+    m_range = Input::AR_HALF;
+    m_dir = Input::AD_NEUTRAL;
     m_character = 0;
     // XMLNode only supports stringw, not wchar_t*
     core::stringw s;

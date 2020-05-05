@@ -296,6 +296,19 @@ if(NOT SERVER_ONLY)
     endif()
 endif()
 
+if (NOT SERVER_ONLY)
+    # SDL2
+    find_library(SDL2_LIBRARY NAMES SDL2 libSDL2)
+    find_path(SDL2_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL2 include/SDL2 include PATHS)
+    if (NOT SDL2_LIBRARY OR NOT SDL2_INCLUDEDIR)
+        message(FATAL_ERROR "SDL2 not found. "
+            "SDL2 is required to handle gamepad in SuperTuxKart.")
+    else()
+        include_directories("${SDL2_INCLUDEDIR}")
+        MESSAGE(STATUS "Use system SDL2: ${SDL2_LIBRARY}")
+    endif()
+endif()
+
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -404,7 +417,6 @@ if (NOT SERVER_ONLY)
         include_directories("${RAQM_INCLUDEDIR}")
         MESSAGE(STATUS "Use system libraqm: ${RAQM_LIBRARY}")
     endif()
-
 endif()
 
 # OpenGL
@@ -642,7 +654,7 @@ if(NOT SERVER_ONLY)
     if(NOT USE_GLES2)
         target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
     elseif (IOS)
-        target_link_libraries(supertuxkart "-framework OpenGLES -framework UIKit -framework CoreMotion -framework Foundation -framework GLKit")
+        target_link_libraries(supertuxkart "-framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework CoreMotion -framework Foundation -framework GLKit")
     else()
         target_link_libraries(supertuxkart GLESv2)
     endif()
@@ -656,6 +668,7 @@ if(NOT SERVER_ONLY)
         ${FRIBIDI_LIBRARIES}
         ${FREETYPE_LIBRARIES}
         ${HARFBUZZ_LIBRARY}
+        ${SDL2_LIBRARY}
         graphics_utils)
 endif()
 
@@ -713,7 +726,7 @@ if(MSVC OR MINGW)
 endif()
 
 if(MINGW)
-    target_link_libraries(supertuxkart -ldxguid -ldinput8 -ldnsapi)
+    target_link_libraries(supertuxkart -ldxguid -ldnsapi)
     if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
         target_link_libraries(supertuxkart -mwindows)
     endif()

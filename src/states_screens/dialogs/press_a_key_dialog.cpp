@@ -39,6 +39,12 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h, const bool isKeyb
         // I18N: In press a key dialog, tell user to press a key to bind configuration
         title->setText(_("Press any key..."));
     }
+    else
+    {
+        // Gamepad configuration, rename cancel to just cancel and hide assign esc button
+        getWidget("cancel")->setText(_("Cancel"));
+        getWidget("assignEsc")->setVisible(false);
+    }
 }
 
 // ------------------------------------------------------------------------------------------------------

@@ -240,7 +240,7 @@ static void* android_app_entry(void* param) {
 // --------------------------------------------------------------------
 // Native activity interaction (called from main thread)
 // --------------------------------------------------------------------
-
+struct android_app* g_android_app;
 static struct android_app* android_app_create(ANativeActivity* activity,
         void* savedState, size_t savedStateSize) {
     struct android_app* android_app = (struct android_app*)malloc(sizeof(struct android_app));
@@ -263,19 +263,7 @@ static struct android_app* android_app_create(ANativeActivity* activity,
     }
     android_app->msgread = msgpipe[0];
     android_app->msgwrite = msgpipe[1];
-
-    pthread_attr_t attr; 
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-    pthread_create(&android_app->thread, &attr, android_app_entry, android_app);
-
-    // Wait for thread to start.
-    pthread_mutex_lock(&android_app->mutex);
-    while (!android_app->running) {
-        pthread_cond_wait(&android_app->cond, &android_app->mutex);
-    }
-    pthread_mutex_unlock(&android_app->mutex);
-
+    g_android_app = android_app;
     return android_app;
 }
 
@@ -444,9 +432,13 @@ static void onInputQueueDestroyed(ANativeActivity* activity, AInputQueue* queue)
     android_app_set_input(app, NULL);
 }
 
+// Defined in CIrrDeviceAndroid, we call it in android main thread so after activity
+// starts keymap is visible to all threads
+extern void createKeyMap();
 void ANativeActivity_onCreate(ANativeActivity* activity,
         void* savedState, size_t savedStateSize) {
     LOGV("Creating: %p\n", activity);
+    createKeyMap();
     activity->callbacks->onDestroy = onDestroy;
     activity->callbacks->onStart = onStart;
     activity->callbacks->onResume = onResume;
@@ -462,4 +454,26 @@ void ANativeActivity_onCreate(ANativeActivity* activity,
     activity->callbacks->onInputQueueDestroyed = onInputQueueDestroyed;
 
     activity->instance = android_app_create(activity, savedState, savedStateSize);
+}
+
+#define MAKE_ANDROID_START_STK_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_startSTK(JNIEnv* env, jobject this_obj)
+#define ANDROID_START_STK_CALLBACK(PKG_NAME) MAKE_ANDROID_START_STK_CALLBACK(PKG_NAME)
+
+ANDROID_START_STK_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    // This will be called after ANativeActivity_onCreate and loadLibrary
+    // (so SDL java environment is ready in JNI_OnLoad)
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    pthread_create(&g_android_app->thread, &attr, android_app_entry, g_android_app);
+    pthread_attr_destroy(&attr);
+
+    // Wait for thread to start.
+    pthread_mutex_lock(&g_android_app->mutex);
+    while (!g_android_app->running)
+    {
+        pthread_cond_wait(&g_android_app->cond, &g_android_app->mutex);
+    }
+    pthread_mutex_unlock(&g_android_app->mutex);
 }

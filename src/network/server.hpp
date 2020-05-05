@@ -100,6 +100,8 @@ protected:
 
     bool m_ipv6_connection;
 
+    bool m_reconnect_when_quit_lobby;
+
     std::vector<std::tuple<
         /*rank*/int, core::stringw, /*scores*/double, /*playing time*/float
         > > m_players;
@@ -199,6 +201,11 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual void saveServer() const {}
+    // ------------------------------------------------------------------------
+    bool reconnectWhenQuitLobby() const { return m_reconnect_when_quit_lobby; }
+    // ------------------------------------------------------------------------
+    void setReconnectWhenQuitLobby(bool val)
+                                         { m_reconnect_when_quit_lobby = val; }
 };   // Server
 
 class UserDefinedServer : public Server

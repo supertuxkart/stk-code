@@ -477,6 +477,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam          m_karts_powerup_gui
             PARAM_DEFAULT(  BoolUserConfigParam(false, "karts-powerup-gui",
             &m_race_setup_group, "Show other karts' held powerups in race gui.") );
+    PARAM_PREFIX BoolUserConfigParam          m_soccer_player_list
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-player-list",
+            &m_race_setup_group, "Show player list icon in soccer mode.") );
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group

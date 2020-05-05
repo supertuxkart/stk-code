@@ -45,13 +45,6 @@ void draw2DImage(const irr::video::ITexture* texture,
                  bool useAlphaChannelOfTexture);
 
 void draw2DImage(const irr::video::ITexture* texture,
-                 const irr::core::rect<float>& destRect,
-                 const irr::core::rect<irr::s32>& sourceRect,
-                 const irr::core::rect<irr::s32>* clipRect,
-                 const irr::video::SColor &color,
-                 bool useAlphaChannelOfTexture);
-
-void draw2DImage(const irr::video::ITexture* texture,
                  const irr::core::rect<irr::s32>& destRect,
                  const irr::core::rect<irr::s32>& sourceRect,
                  const irr::core::rect<irr::s32>* clipRect,
@@ -64,13 +57,6 @@ void draw2DImageCustomAlpha(const irr::video::ITexture* texture,
                  const irr::core::rect<irr::s32>& sourceRect,
                  const irr::core::rect<irr::s32>* clipRect,
                  float rotation, float custom_alpha);
-
-void draw2DImage(const irr::video::ITexture* texture,
-                 const irr::core::rect<float>& destRect,
-                 const irr::core::rect<irr::s32>& sourceRect,
-                 const irr::core::rect<irr::s32>* clipRect,
-                 const irr::video::SColor* const colors,
-                 bool useAlphaChannelOfTexture, bool draw_translucently = false);
 
 void draw2DVertexPrimitiveList(irr::video::ITexture *t, const void* vertices,
                   irr::u32 vertexCount, const void* indexList,

@@ -58,7 +58,7 @@
                         <spinner id="splitscreen_method" width="100%" align="center" />
                     </div>
                     <div layout="vertical-row" proportion="1" height="100%">
-                        <label height="100%" I18N="In the ui settings" text="Multiplayer splits" align="left"/>
+                        <label height="100%" I18N="In the ui settings" text="Splitscreen Multiplayer layout" align="left"/>
                     </div>
                 </div>
 

@@ -36,19 +36,6 @@ class GamePadDevice : public InputDevice
 
     std::vector<Input::AxisDirection> m_prev_axis_directions;
 
-    /** used to determine if an axis is valid; an axis is considered valid
-      * when at least 2 different values are read from this axis (if an axis
-      * keeps on sending the exact same value continuously, chances are that
-      * it's not meant by the user - for instance some gamepads have hats or
-      * analog switches that get reported as axis, we even had a report that
-      * on linux some hard disks may be reported as gamepads with
-      * uninteresting axis values)
-      */
-    std::vector<int> m_prev_axis_value;
-
-    /** \see m_prev_axis_value */
-    std::vector<bool> m_axis_ok;
-
     /** Irrlicht index of this gamepad. */
     int                   m_irr_index;
 
@@ -73,6 +60,7 @@ public:
     int getIrrIndex() const { return m_irr_index; }
 
     // ------------------------------------------------------------------------
+    void setIrrIndex(int i ) { m_irr_index = i; }
 
 };   // class GamepadDevice
 

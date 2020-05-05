@@ -64,6 +64,8 @@ android/libs
 android/obj
 android/res
 android/.gradle
+android/src/main/java/HID*
+android/src/main/java/SDL*
 android-*
 *.apk
 *.keystore
@@ -77,6 +79,6 @@ lib/openal
 lib/openssl
 lib/fribidi
 lib/harfbuzz
+lib/sdl2
 
 .DS_Store
-supertuxkart/

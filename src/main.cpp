@@ -274,58 +274,18 @@ void runUnitTests();
 
 void gamepadVisualisation()
 {
+#ifndef SERVER_ONLY
 
-    core::array<SJoystickInfo>          irrlicht_gamepads;
-    irr_driver->getDevice()->activateJoysticks(irrlicht_gamepads);
-
-
-    struct Gamepad
-    {
-        s16   m_axis[SEvent::SJoystickEvent::NUMBER_OF_AXES];
-        bool  m_button_state[SEvent::SJoystickEvent::NUMBER_OF_BUTTONS];
-    };
-
+    input_manager = new InputManager();
     #define GAMEPAD_COUNT 8 // const won't work
 
     class EventReceiver : public IEventReceiver
     {
     public:
-        Gamepad m_gamepads[GAMEPAD_COUNT];
-
-        EventReceiver()
-        {
-            for (int n=0; n<GAMEPAD_COUNT; n++)
-            {
-                Gamepad& g = m_gamepads[n];
-                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES; i++)
-                    g.m_axis[i] = 0;
-                for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS; i++)
-                    g.m_button_state[i] = false;
-            }
-        }
-
         virtual bool OnEvent (const irr::SEvent &event)
         {
             switch (event.EventType)
             {
-                case EET_JOYSTICK_INPUT_EVENT :
-                {
-                    const SEvent::SJoystickEvent& evt = event.JoystickEvent;
-                    if (evt.Joystick >= GAMEPAD_COUNT) return true;
-
-                    Gamepad& g = m_gamepads[evt.Joystick];
-                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_AXES;i++)
-                    {
-                        g.m_axis[i] = evt.Axis[i];
-                    }
-                    for (int i=0; i<SEvent::SJoystickEvent::NUMBER_OF_BUTTONS;
-                         i++)
-                    {
-                        g.m_button_state[i] = evt.IsButtonPressed(i);
-                    }
-                    break;
-                }
-
                 case EET_KEY_INPUT_EVENT:
                 {
                     const SEvent::SKeyInput& evt = event.KeyInput;
@@ -357,14 +317,17 @@ void gamepadVisualisation()
     {
         if (!irr_driver->getDevice()->run()) break;
 
+        input_manager->update(0);
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
         const core::dimension2du size = driver ->getCurrentRenderTargetSize();
 
         driver->beginScene(true, true, video::SColor(255,0,0,0));
 
-        for (int n=0; n<GAMEPAD_COUNT; n++)
+        for (unsigned n = 0; n < input_manager->getGamepadCount(); n++)
         {
-            Gamepad& g = events->m_gamepads[n];
+            if (n >= GAMEPAD_COUNT)
+                break;
+            const irr::SEvent& g = input_manager->getEventForGamePad(n);
 
             const int MARGIN = 10;
             const int x = (n & 1 ? size.Width/2 + MARGIN : MARGIN );
@@ -384,7 +347,7 @@ void gamepadVisualisation()
                 core::position2di pos(btn_x + b*BTN_SIZE, btn_y);
                 core::dimension2di size(BTN_SIZE, BTN_SIZE);
 
-                if (g.m_button_state[b])
+                if (g.JoystickEvent.IsButtonPressed(b))
                 {
                     driver->draw2DRectangle (video::SColor(255,255,0,0),
                                              core::recti(pos, size));
@@ -401,13 +364,13 @@ void gamepadVisualisation()
 
             for (int a=0; a<SEvent::SJoystickEvent::NUMBER_OF_AXES; a++)
             {
-                const float rate = g.m_axis[a] / 32767.0f;
+                const float rate = g.JoystickEvent.Axis[a] / 32767.0f;
 
                 core::position2di pos(axis_x, axis_y + a*axis_h);
                 core::dimension2di size(axis_w, axis_h);
 
                 // Assume a default deadzone value of 4096
-                const bool deadzone = (abs(g.m_axis[a]) < 4096);
+                const bool deadzone = (abs(g.JoystickEvent.Axis[a]) < 4096);
 
                 core::recti fillbar(core::position2di(axis_x + axis_w/2,
                                                       axis_y + a*axis_h),
@@ -423,6 +386,7 @@ void gamepadVisualisation()
 
         driver->endScene();
     }
+#endif
 }   // gamepadVisualisation
 
 // ============================================================================

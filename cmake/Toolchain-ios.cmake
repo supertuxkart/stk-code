@@ -20,6 +20,7 @@ SET(CMAKE_FIND_ROOT_PATH ${PROJECT_SOURCE_DIR}/dependencies-ios ${CCTOOLS_PREFIX
 set(FREETYPE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/dependencies-ios/include/freetype2)
 set(CURL_LIBRARY "${PROJECT_SOURCE_DIR}/dependencies-ios/lib/libcurl.a;${PROJECT_SOURCE_DIR}/dependencies-ios/lib/libssl.a")
 set(PNG_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-ios/lib/libpng16.a)
+set(SDL2_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-ios/lib/libSDL2.a)
 
 # adjust the default behaviour of the FIND_XXX() commands:
 # search headers and libraries in the target environment, search
