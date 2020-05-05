@@ -21,6 +21,7 @@
 #include "audio/sfx_manager.hpp"
 #include "addons/addon.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/central_settings.hpp"
@@ -354,6 +355,7 @@ void KartProperties::combineCharacteristics(HandicapLevel handicap)
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getDifficultyCharacteristic(RaceManager::get()->getDifficultyAsString(
             RaceManager::get()->getDifficulty())));
+    // FIXME add get user characteristics
 
     // Try to get the kart type
     const AbstractCharacteristic *characteristic = kart_properties_manager->
@@ -776,25 +778,29 @@ float KartProperties::getWheelsDampingCompression() const
 // ----------------------------------------------------------------------------
 float KartProperties::getCameraDistance() const
 {
-    return m_cached_characteristic->getCameraDistance();
+    return UserConfigParams::m_camera_distance;
+    // return m_cached_characteristic->getCameraDistance();
 }  // getCameraDistance
 
 // ----------------------------------------------------------------------------
 float KartProperties::getCameraForwardUpAngle() const
 {
-    return m_cached_characteristic->getCameraForwardUpAngle();
+    return UserConfigParams::m_camera_forward_up_angle;
+    // return m_cached_characteristic->getCameraForwardUpAngle();
 }  // getCameraForwardUpAngle
 
 // ----------------------------------------------------------------------------
 bool KartProperties::getCameraForwardSmoothing() const
 {
-    return m_cached_characteristic->getCameraForwardSmoothing();
+    return UserConfigParams::m_camera_forward_smoothing;
+    // return m_cached_characteristic->getCameraForwardSmoothing();
 }  // getCameraForwardSmoothing
 
 // ----------------------------------------------------------------------------
 float KartProperties::getCameraBackwardUpAngle() const
 {
-    return m_cached_characteristic->getCameraBackwardUpAngle();
+    return UserConfigParams::m_camera_backward_up_angle;
+    // return m_cached_characteristic->getCameraBackwardUpAngle();
 }  // getCameraBackwardUpAngle
 
 // ----------------------------------------------------------------------------

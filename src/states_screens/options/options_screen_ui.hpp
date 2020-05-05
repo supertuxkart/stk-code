@@ -25,6 +25,15 @@
 
 namespace GUIEngine { class Widget; }
 
+struct CameraPreset
+{
+    int fov;
+    float distance;
+    float angle;
+    bool smoothing;
+    float backward_angle;
+};
+
 struct Input;
 
 /**
@@ -35,6 +44,8 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 {
     OptionsScreenUI();
     bool m_inited;
+
+    std::vector<CameraPreset> m_camera_presets;
 
     std::map<core::stringw, std::string> m_skins;
 
@@ -56,6 +67,8 @@ public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded() OVERRIDE;
+
+    void         updateCameraPresetSpinner();
 };
 
 #endif
