@@ -11,10 +11,8 @@ CPP_FILE_LIST="`find ./src                 \
 XML_FILE_LIST="`find ./data                        \
                      ../stk-assets/tracks          \
                      ../stk-assets/karts           \
-                     ../stk-assets/music           \
                      ../supertuxkart-assets/tracks \
                      ../supertuxkart-assets/karts  \
-                     ../supertuxkart-assets/music  \
                      -name 'achievements.xml' -or  \
                      -name 'tips.xml' -or  \
                      -name 'kart.xml' -or          \
@@ -22,7 +20,6 @@ XML_FILE_LIST="`find ./data                        \
                      -name 'scene.xml' -or         \
                      -name '*.challenge' -or       \
                      -name '*.grandprix' -or       \
-                     -name '*.music' -or       \
                      -name '*.stkgui' | sort -n    \
               `"
 ANGELSCRIPT_FILE_LIST="`find ./data                        \
