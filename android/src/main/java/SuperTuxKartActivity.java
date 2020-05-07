@@ -71,6 +71,8 @@ public class SuperTuxKartActivity extends NativeActivity
     // ------------------------------------------------------------------------
     private native static void addTouch(int id, int x, int y, int event_type);
     // ------------------------------------------------------------------------
+    private native static void addDNSSrvRecords(String name, int weight);
+    // ------------------------------------------------------------------------
     private void hideKeyboardNative(final boolean clear_text)
     {
         if (m_stk_edittext == null)
@@ -462,23 +464,19 @@ public class SuperTuxKartActivity extends NativeActivity
         }
     }
     // ------------------------------------------------------------------------
-    public String[] getDNSSrvRecords(String domain)
+    public void getDNSSrvRecords(String domain)
     {
         try
         {
             ResolverResult<SRV> srvs =
                 DnssecResolverApi.INSTANCE.resolve(domain, SRV.class);
             Set<SRV> ans = srvs.getAnswers();
-            String[] result = new String[ans.size()];
-            int i = 0;
             for (SRV s : ans)
-                result[i++] = s.target.toString() + ":" + s.port;
-            return result;
+                addDNSSrvRecords(s.target.toString() + ":" + s.port, s.weight);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            return new String[0];
         }
     }
     // ------------------------------------------------------------------------

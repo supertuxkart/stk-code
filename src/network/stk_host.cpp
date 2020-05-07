@@ -638,15 +638,19 @@ void STKHost::setPublicAddress(short family)
     auto& stunv4_map = UserConfigParams::m_stun_servers_v4;
     for (auto& s : NetworkConfig::getStunList(true/*ipv4*/))
     {
-        if (stunv4_map.find(s) == stunv4_map.end())
-            stunv4_map[s] = 0;
+        if (s.second == 0)
+            stunv4_map.erase(s.first);
+        else if (stunv4_map.find(s.first) == stunv4_map.end())
+            stunv4_map[s.first] = 0;
     }
 
     auto& stunv6_map = UserConfigParams::m_stun_servers;
     for (auto& s : NetworkConfig::getStunList(false/*ipv4*/))
     {
-        if (stunv6_map.find(s) == stunv6_map.end())
-            stunv6_map[s] = 0;
+        if (s.second == 0)
+            stunv6_map.erase(s.first);
+        else if (stunv6_map.find(s.first) == stunv6_map.end())
+            stunv6_map[s.first] = 0;
     }
 
     auto& stun_map = family == AF_INET ? UserConfigParams::m_stun_servers_v4 :
