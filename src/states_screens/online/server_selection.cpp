@@ -204,7 +204,7 @@ void ServerSelection::init()
 void ServerSelection::loadList()
 {
     m_server_list_widget->clear();
-    std::sort(m_servers.begin(), m_servers.end(), [this]
+    std::stable_sort(m_servers.begin(), m_servers.end(), [this]
         (const std::shared_ptr<Server> a,
          const std::shared_ptr<Server> b)->bool
         {
