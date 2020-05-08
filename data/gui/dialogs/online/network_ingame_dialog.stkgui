@@ -4,9 +4,11 @@
         <div x="1%" width="98%" height="fit" layout="horizontal-row">
             <textbox id="chat" proportion="1"/>
             <spacer width="2%" height="10"/>
-            <button id="send" width="10%" height="fit" align="center" text=""/>
+            <button id="team" width="7%" height="fit" align="center" text=""/>
+            <spacer id="team_space" width="1%" height="10"/>
+            <button id="send" width="7%" height="fit" align="center" text=""/>
             <spacer width="1%" height="10"/>
-            <button id="emoji" width="10%" height="fit" align="center" text=""/>
+            <button id="emoji" width="7%" height="fit" align="center" text=""/>
         </div>
 
         <spacer width="20" height="2%" />

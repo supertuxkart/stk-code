@@ -27,6 +27,7 @@ namespace GUIEngine
     class RibbonWidget;
     class TextBoxWidget;
 }
+enum KartTeam : int8_t;
 
 /**
  * \brief Dialog shown when the race is paused
@@ -36,6 +37,7 @@ class RacePausedDialog : public GUIEngine::ModalDialog,
                          public GUIEngine::ITextBoxWidgetListener
 {
 private:
+    KartTeam m_target_team;
     bool m_self_destroy;
     bool m_from_overworld;
     int m_touch_controls;
@@ -43,6 +45,7 @@ private:
     GUIEngine::TextBoxWidget* m_text_box;
 
     virtual void onTextUpdated() OVERRIDE {}
+    void handleChat(const irr::core::stringw& text);
     virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE;
     
     void updateTouchDeviceIcon();

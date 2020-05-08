@@ -26,11 +26,14 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/emoji_keyboard.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/layout_manager.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/CGUIEditBox.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "io/file_manager.hpp"
+#include "karts/controller/controller.hpp"
+#include "karts/kart.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -58,6 +61,7 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                                    const float percentHeight) :
     ModalDialog(percentWidth, percentHeight)
 {
+    m_target_team = KART_TEAM_NONE;
     m_self_destroy = false;
     m_from_overworld = false;
 
@@ -201,7 +205,13 @@ GUIEngine::EventPropagation
 
     if (eventSource == "send" && m_text_box)
     {
-        onEnterPressed(m_text_box->getText());
+        m_target_team = KART_TEAM_NONE;
+        handleChat(m_text_box->getText());
+        return GUIEngine::EVENT_BLOCK;
+    }
+    if (eventSource == "team" && m_text_box)
+    {
+        handleChat(m_text_box->getText());
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "emoji" && m_text_box &&
@@ -385,7 +395,44 @@ void RacePausedDialog::beforeAddingWidgets()
             choice_ribbon->setItemVisible(index, false);
     }
     if (NetworkConfig::get()->isNetworking())
+    {
+        int id = 0;
+        for (auto& kart : World::getWorld()->getKarts())
+        {
+            if (!World::getWorld()->hasTeam())
+                break;
+            // Handle only 1st local player even splitscreen
+            if (kart->getController()->isLocalPlayerController())
+            {
+                m_target_team =
+                    RaceManager::get()->getKartInfo(id).getKartTeam();
+                break;
+            }
+            id++;
+        }
+        if (m_target_team == KART_TEAM_RED)
+        {
+            getWidget("team")->setVisible(true);
+            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "7%";
+            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "1%";
+            getWidget("team")->setText(StringUtils::utf32ToWide({0x1f7e5}));
+        }
+        else if (m_target_team == KART_TEAM_BLUE)
+        {
+            getWidget("team")->setVisible(true);
+            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "7%";
+            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "1%";
+            getWidget("team")->setText(StringUtils::utf32ToWide({0x1f7e6}));
+        }
+        else
+        {
+            getWidget("team")->m_properties[GUIEngine::PROP_WIDTH] = "0%";
+            getWidget("team_space")->m_properties[GUIEngine::PROP_WIDTH] = "0%";
+            getWidget("team")->setVisible(false);
+        }
+        LayoutManager::calculateLayout(m_widgets, this);
         m_text_box = getWidget<TextBoxWidget>("chat");
+    }
     else
         m_text_box = NULL;
         
@@ -420,7 +467,7 @@ void RacePausedDialog::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-bool RacePausedDialog::onEnterPressed(const irr::core::stringw& text)
+void RacePausedDialog::handleChat(const irr::core::stringw& text)
 {
     if (auto cl = LobbyProtocol::get<ClientLobby>())
     {
@@ -432,13 +479,22 @@ bool RacePausedDialog::onEnterPressed(const irr::core::stringw& text)
                 cl->handleClientCommand(cmd.erase(0, 1));
             }
             else
-                cl->sendChat(text);
+                cl->sendChat(text, m_target_team);
         }
     }
     m_self_destroy = true;
+}   // onEnterPressed
+
+// ----------------------------------------------------------------------------
+bool RacePausedDialog::onEnterPressed(const irr::core::stringw& text)
+{
+    // Assume enter for non team chat
+    m_target_team = KART_TEAM_NONE;
+    handleChat(text);
     return true;
 }   // onEnterPressed
 
+// ----------------------------------------------------------------------------
 void RacePausedDialog::updateTouchDeviceIcon()
 {
     GUIEngine::RibbonWidget* backbtn_ribbon =
@@ -469,4 +525,4 @@ void RacePausedDialog::updateTouchDeviceIcon()
     default:
         break;
     }
-}
+}   // updateTouchDeviceIcon

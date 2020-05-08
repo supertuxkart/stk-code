@@ -609,7 +609,7 @@ bool NetworkingLobby::onEnterPressed(const irr::core::stringw& text)
                 cl->handleClientCommand(cmd.erase(0, 1));
             }
             else
-                cl->sendChat(text);
+                cl->sendChat(text, KART_TEAM_NONE);
         }
     }
     return true;

@@ -1393,7 +1393,7 @@ void ClientLobby::startLiveJoinKartSelection()
 }   // startLiveJoinKartSelection
 
 // ----------------------------------------------------------------------------
-void ClientLobby::sendChat(irr::core::stringw text)
+void ClientLobby::sendChat(irr::core::stringw text, KartTeam team)
 {
     text = text.trim().removeChars(L"\n\r");
     if (text.size() > 0)
@@ -1409,6 +1409,9 @@ void ClientLobby::sendChat(irr::core::stringw text)
         else
             name = player->getName();
         chat->encodeString16(name + L": " + text, 1000/*max_len*/);
+
+        if (team != KART_TEAM_NONE)
+            chat->addUInt8(team);
 
         STKHost::get()->sendToServer(chat, true);
         delete chat;
