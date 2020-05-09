@@ -48,8 +48,6 @@
 #  include <net/if.h>
 #endif
 
-const int64_t SERVER_REFRESH_INTERVAL = 5000;
-
 static ServersManager* g_manager_singleton(NULL);
 
 // ============================================================================
@@ -71,7 +69,6 @@ void ServersManager::deallocate()
 // ----------------------------------------------------------------------------
 ServersManager::ServersManager()
 {
-    reset();
 }   // ServersManager
 
 // ----------------------------------------------------------------------------
@@ -83,7 +80,7 @@ ServersManager::~ServersManager()
 /** Returns a WAN update-list-of-servers request. It queries the
  *  STK server for an up-to-date list of servers.
  */
-std::shared_ptr<Online::XMLRequest> ServersManager::getWANRefreshRequest() const
+std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest() const
 {
     // ========================================================================
     /** A small local class that triggers an update of the ServersManager
@@ -91,14 +88,17 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getWANRefreshRequest() const
     class WANRefreshRequest : public Online::XMLRequest
     {
     private:
+        std::weak_ptr<ServerList> m_server_list;
         // Run the ip detect in separate thread, so it can be done parallel
         // with the wan server request (which takes few seconds too)
         std::thread m_ip_detect_thread;
     public:
-        WANRefreshRequest() : Online::XMLRequest(/*priority*/100)
+        WANRefreshRequest(std::shared_ptr<ServerList> server_list)
+        : Online::XMLRequest(/*priority*/100)
         {
             m_ip_detect_thread = std::thread(std::bind(
                 &NetworkConfig::detectIPType, NetworkConfig::get()));
+            m_server_list = server_list;
         }
         ~WANRefreshRequest()
         {
@@ -111,16 +111,55 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getWANRefreshRequest() const
             Online::XMLRequest::afterOperation();
             if (m_ip_detect_thread.joinable())
                 m_ip_detect_thread.join();
-            ServersManager::get()->setWanServers(isSuccess(), getXMLData());
+
+            auto server_list = m_server_list.lock();
+            if (!server_list)
+                return;
+
+            if (!isSuccess())
+            {
+                Log::error("ServersManager", "Could not refresh server list");
+                server_list->m_list_updated = true;
+                return;
+            }
+
+            const XMLNode *servers_xml = getXMLData()->getNode("servers");
+            for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
+            {
+                const XMLNode* s = servers_xml->getNode(i);
+                assert(s);
+                const XMLNode* si = s->getNode("server-info");
+                assert(si);
+                int version = 0;
+                si->get("version", &version);
+                assert(version != 0);
+                if (version < stk_config->m_max_server_version ||
+                    version > stk_config->m_max_server_version)
+                {
+                    Log::verbose("ServersManager", "Skipping a server");
+                    continue;
+                }
+                std::shared_ptr<Server> ser = std::make_shared<Server>(*s);
+                if (ser->getAddress().isUnset() &&
+                    NetworkConfig::get()->getIPType() == NetworkConfig::IP_V4)
+                {
+                    Log::verbose("ServersManager",
+                        "Skipping an IPv6 only server");
+                    continue;
+                }
+                server_list->m_servers.emplace_back(ser);
+            }
+            server_list->m_list_updated = true;
         }   // afterOperation
         // --------------------------------------------------------------------
     };   // RefreshRequest
     // ========================================================================
 
-    auto request = std::make_shared<WANRefreshRequest>();
+    auto server_list = std::make_shared<ServerList>();
+    auto request = std::make_shared<WANRefreshRequest>(server_list);
     request->setApiURL(Online::API::SERVER_PATH, "get-all");
-
-    return request;
+    Online::RequestManager::get()->addRequest(request);
+    return server_list;
 }   // getWANRefreshRequest
 
 // ----------------------------------------------------------------------------
@@ -128,7 +167,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getWANRefreshRequest() const
  *  to find LAN servers, and waits for a certain amount of time fr 
  *  answers.
  */
-std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
+std::shared_ptr<ServerList> ServersManager::getLANRefreshRequest() const
 {
     /** A simple class that uses LAN broadcasts to find local servers.
      *  It is based on XML request, but actually does not use any of the
@@ -137,10 +176,17 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
      */
     class LANRefreshRequest : public Online::XMLRequest
     {
+    private:
+        std::weak_ptr<ServerList> m_server_list;
     public:
 
         /** High priority for this request. */
-        LANRefreshRequest() : XMLRequest(/*priority*/100) {m_success = false;}
+        LANRefreshRequest(std::shared_ptr<ServerList> server_list)
+            : XMLRequest(/*priority*/100)
+        {
+            m_success = false;
+            m_server_list = server_list;
+        }
         // --------------------------------------------------------------------
         virtual ~LANRefreshRequest() {}
         // --------------------------------------------------------------------
@@ -159,6 +205,10 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
         // --------------------------------------------------------------------
         virtual void operation() OVERRIDE
         {
+            auto server_list = m_server_list.lock();
+            if (!server_list)
+                return;
+
             ENetAddress addr = {};
             setIPv6Socket(UserConfigParams::m_ipv6_lan ? 1 : 0);
             NetworkConfig::get()->setIPType(UserConfigParams::m_ipv6_lan ?
@@ -169,6 +219,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
                 setIPv6Socket(0);
                 m_success = true;
                 delete broadcast;
+                server_list->m_list_updated = true;
                 return;
             }
             const std::vector<SocketAddress> &all_bcast =
@@ -189,9 +240,7 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
             // any local servers.
             uint64_t start_time = StkTime::getMonoTimeMs();
             const uint64_t DURATION = 1000;
-            const auto& servers = ServersManager::get()->getServers();
-            int cur_server_id = (int)servers.size();
-            assert(cur_server_id == 0);
+            int cur_server_id = 0;
             // Use a map with the server name as key to automatically remove
             // duplicated answers from a server (since we potentially do
             // multiple broadcasts). We can not use the sender ip address,
@@ -246,9 +295,11 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
                 }   // if received_data
             }    // while still waiting
             setIPv6Socket(0);
-            m_success = true;
-            ServersManager::get()->setLanServers(servers_now);
             delete broadcast;
+            m_success = true;
+            for (auto& i : servers_now)
+                server_list->m_servers.emplace_back(i.second);
+            server_list->m_list_updated = true;
         }   // operation
         // --------------------------------------------------------------------
         /** This function is necessary, otherwise the XML- and HTTP-Request
@@ -258,94 +309,12 @@ std::shared_ptr<Online::XMLRequest> ServersManager::getLANRefreshRequest() const
     };   // LANRefreshRequest
     // ========================================================================
 
-    return std::make_shared<LANRefreshRequest>();
+    auto server_list = std::make_shared<ServerList>();
+    auto request = std::make_shared<LANRefreshRequest>(server_list);
+    Online::RequestManager::get()->addRequest(request);
+    return server_list;
 
 }   // getLANRefreshRequest
-
-// ----------------------------------------------------------------------------
-/** Takes a mapping of server name to server data (to avoid having the same 
- *  server listed more than once since the client will be doing multiple
- *  broadcasts to find a server), and converts this into a list of servers.
- *  \param servers Mapping of server name to Server object.
- */
-void ServersManager::setLanServers(const std::map<irr::core::stringw,
-                                                  std::shared_ptr<Server> >& servers)
-{
-    m_servers.clear();
-    for (auto i : servers) m_servers.emplace_back(i.second);
-    m_last_load_time.store(StkTime::getMonoTimeMs());
-    m_list_updated = true;
-
-}
-// ----------------------------------------------------------------------------
-/** Factory function to create either a LAN or a WAN update-of-server
- *  requests. The current list of servers is also cleared.
- */
-bool ServersManager::refresh(bool full_refresh)
-{
-    if ((int64_t)StkTime::getMonoTimeMs() - m_last_load_time.load()
-        < SERVER_REFRESH_INTERVAL)
-    {
-        // Avoid too frequent refreshing
-        return false;
-    }
-
-    cleanUpServers();
-    m_list_updated = false;
-
-    if (NetworkConfig::get()->isWAN())
-    {
-        Online::RequestManager::get()->addRequest(getWANRefreshRequest());
-    }
-    else
-    {
-        Online::RequestManager::get()->addRequest(getLANRefreshRequest());
-    }
-    return true;
-}   // refresh
-
-// ----------------------------------------------------------------------------
-/** Callback from the refresh request for wan servers.
- *  \param success If the refresh was successful.
- *  \param input The XML data describing the server.
- */
-void ServersManager::setWanServers(bool success, const XMLNode* input)
-{
-    if (!success)
-    {
-        Log::error("Server Manager", "Could not refresh server list");
-        m_list_updated = true;
-        return;
-    }
-
-    const XMLNode *servers_xml = input->getNode("servers");
-    for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
-    {
-        const XMLNode* s = servers_xml->getNode(i);
-        assert(s);
-        const XMLNode* si = s->getNode("server-info");
-        assert(si);
-        int version = 0;
-        si->get("version", &version);
-        assert(version != 0);
-        if (version < stk_config->m_max_server_version ||
-            version > stk_config->m_max_server_version)
-        {
-            Log::verbose("ServersManager", "Skipping a server");
-            continue;
-        }
-        std::shared_ptr<Server> ser = std::make_shared<Server>(*s);
-        if (ser->getAddress().isUnset() &&
-            NetworkConfig::get()->getIPType() == NetworkConfig::IP_V4)
-        {
-            Log::verbose("ServersManager", "Skipping an IPv6 only server");
-            continue;
-        }
-        m_servers.emplace_back(ser);
-    }
-    m_last_load_time.store(StkTime::getMonoTimeMs());
-    m_list_updated = true;
-}   // refresh
 
 // ----------------------------------------------------------------------------
 /** Sets a list of default broadcast addresses which is used in case no valid

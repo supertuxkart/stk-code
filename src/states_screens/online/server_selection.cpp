@@ -67,26 +67,30 @@ ServerSelection::~ServerSelection()
 void ServerSelection::tearDown()
 {
     m_servers.clear();
-    ServersManager::get()->cleanUpServers();
     m_server_list_widget->clear();
+    m_server_list = nullptr;
 }   // tearDown
 
 // ----------------------------------------------------------------------------
 /** Requests the servers manager to update its list of servers, and disables
  *  the 'refresh' button (till the refresh was finished).
  */
-void ServerSelection::refresh(bool full_refresh)
+void ServerSelection::refresh()
 {
     // If the request was created (i.e. no error, and not re-requested within
     // 5 seconds), clear the list and display the waiting message:
-    if (ServersManager::get()->refresh(full_refresh))
-    {
-        m_ip_warning_shown = false;
-        m_server_list_widget->clear();
-        m_reload_widget->setActive(false);
-        m_refreshing_server = true;
-        m_refresh_timer = 0.0f;
-    }
+    if ((int64_t)StkTime::getMonoTimeMs() - m_last_load_time < 5000)
+        return;
+
+    m_ip_warning_shown = false;
+    m_server_list_widget->clear();
+    m_reload_widget->setActive(false);
+    m_refreshing_server = true;
+    m_refresh_timer = 0.0f;
+    m_last_load_time = StkTime::getMonoTimeMs();
+    m_server_list = NetworkConfig::get()->isWAN() ?
+        ServersManager::get()->getWANRefreshRequest() :
+        ServersManager::get()->getLANRefreshRequest();
 }   // refresh
 
 // ----------------------------------------------------------------------------
@@ -137,6 +141,7 @@ void ServerSelection::beforeAddingWidget()
 void ServerSelection::init()
 {
     Screen::init();
+    m_last_load_time = -5000;
 
 #ifndef ENABLE_IPV6
     m_ipv6->setState(false);
@@ -190,9 +195,7 @@ void ServerSelection::init()
     
     m_server_list_widget->setIcons(m_icon_bank, row_height);
     m_sort_desc = false;
-    /** Triggers the loading of the server list in the servers manager. */
-    ServersManager::get()->reset();
-    refresh(true);
+    refresh();
     m_ipv6_only_without_nat64 = false;
     m_ip_warning_shown = false;
 }   // init
@@ -318,7 +321,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
     }
     else if (name == "reload")
     {
-        refresh(true);
+        refresh();
     }
     else if (name == "private_server" || name == "ipv6")
     {
@@ -334,7 +337,7 @@ void ServerSelection::eventCallback(GUIEngine::Widget* widget,
             m_ip_warning_shown = true;
             MessageQueue::add(MessageQueue::MT_ERROR, v4);
         }
-        copyFromServersManager();
+        copyFromServerList();
     }
     else if (name == m_server_list_widget->m_properties[GUIEngine::PROP_ID])
     {
@@ -372,14 +375,14 @@ void ServerSelection::onUpdate(float dt)
         sid->requestJoin();
     }
     
-    if (ServersManager::get()->getServers().empty() && !m_refreshing_server &&
+    if (m_server_list->m_list_updated && !m_refreshing_server &&
         !NetworkConfig::get()->isWAN())
     {
         m_refresh_timer += dt;
         
         if (m_refresh_timer > 10.0f)
         {
-            refresh(false);
+            refresh();
         }
     }
 
@@ -393,15 +396,15 @@ void ServerSelection::onUpdate(float dt)
 
     if (!m_refreshing_server) return;
 
-    if (ServersManager::get()->listUpdated())
+    if (m_server_list->m_list_updated)
     {
         m_refreshing_server = false;
-        if (!ServersManager::get()->getServers().empty())
+        if (!m_server_list->m_servers.empty())
         {
             int selection = m_server_list_widget->getSelectionID();
             std::string selection_str = m_server_list_widget
                 ->getSelectionInternalName();
-            copyFromServersManager();
+            copyFromServerList();
             // restore previous selection
             if (selection != -1 && selection_str != "loading")
                 m_server_list_widget->setSelectionID(selection);
@@ -425,9 +428,9 @@ void ServerSelection::onUpdate(float dt)
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
-void ServerSelection::copyFromServersManager()
+void ServerSelection::copyFromServerList()
 {
-    m_servers = ServersManager::get()->getServers();
+    m_servers = m_server_list->m_servers;
     if (m_servers.empty())
         return;
     m_servers.erase(std::remove_if(m_servers.begin(), m_servers.end(),
@@ -456,7 +459,7 @@ void ServerSelection::copyFromServersManager()
             }), m_servers.end());
     }
     loadList();
-}   // copyFromServersManager
+}   // copyFromServerList
 
 // ----------------------------------------------------------------------------
 void ServerSelection::unloaded()

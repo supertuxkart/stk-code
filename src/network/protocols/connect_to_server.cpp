@@ -182,19 +182,15 @@ void ConnectToServer::asynchronousUpdate()
         {
             if (!m_server)
             {
-                while (!ServersManager::get()->refresh(false))
+                auto server_list =
+                    ServersManager::get()->getWANRefreshRequest();
+                while (!server_list->m_list_updated)
                 {
                     if (ProtocolManager::lock()->isExiting())
                         return;
                     StkTime::sleep(1);
                 }
-                while (!ServersManager::get()->listUpdated())
-                {
-                    if (ProtocolManager::lock()->isExiting())
-                        return;
-                    StkTime::sleep(1);
-                }
-                auto servers = std::move(ServersManager::get()->getServers());
+                auto& servers = server_list->m_servers;
 
                 // Remove password protected servers
                 servers.erase(std::remove_if(servers.begin(), servers.end(), []

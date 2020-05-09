@@ -42,6 +42,7 @@ namespace irr
 }
 
 class Server;
+struct ServerList;
 
 /**
   * \brief ServerSelection
@@ -80,12 +81,14 @@ private:
     /** Load the servers into the main list.*/
     void loadList();
 
-    void copyFromServersManager();
+    void copyFromServerList();
 
-    void refresh(bool full_refresh);
+    void refresh();
 
     bool m_ipv6_only_without_nat64;
     bool m_ip_warning_shown;
+    int64_t m_last_load_time;
+    std::shared_ptr<ServerList> m_server_list;
 public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
@@ -110,7 +113,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
 
-    virtual void onTextUpdated() OVERRIDE         { copyFromServersManager(); }
+    virtual void onTextUpdated() OVERRIDE             { copyFromServerList(); }
 
     virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
                                                               { return false; }
