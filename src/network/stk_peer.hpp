@@ -85,6 +85,8 @@ protected:
 
     std::atomic_bool m_warned_for_high_ping;
 
+    std::atomic_bool m_always_spectate;
+
     /** Host id of this peer. */
     uint32_t m_host_id;
 
@@ -289,6 +291,11 @@ public:
     int getConsecutiveMessages() const       { return m_consecutive_messages; }
     // ------------------------------------------------------------------------
     const SocketAddress& getAddress() const { return *m_socket_address.get(); }
+    // ------------------------------------------------------------------------
+    void setAlwaysSpectate(bool val)          { m_always_spectate.store(val); }
+    // ------------------------------------------------------------------------
+    bool alwaysSpectate() const            { return m_always_spectate.load(); }
+
 };   // STKPeer
 
 #endif // STK_PEER_HPP

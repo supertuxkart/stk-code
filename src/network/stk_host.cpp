@@ -1528,13 +1528,21 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
 /** Get the players for starting a new game.
  *  \return A vector containing pointers on the players profiles. */
 std::vector<std::shared_ptr<NetworkPlayerProfile> >
-    STKHost::getPlayersForNewGame() const
+    STKHost::getPlayersForNewGame(bool* has_always_on_spectators) const
 {
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto& p : m_peers)
     {
         auto& stk_peer = p.second;
+        // Handle always spectate for peer
+        if (has_always_on_spectators && stk_peer->alwaysSpectate())
+        {
+            *has_always_on_spectators = true;
+            stk_peer->setWaitingForGame(false);
+            stk_peer->setSpectator(true);
+            continue;
+        }
         if (stk_peer->isWaitingForGame())
             continue;
         if (ServerConfig::m_ai_handling && stk_peer->isAIPeer())

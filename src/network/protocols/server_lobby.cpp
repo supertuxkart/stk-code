@@ -1547,7 +1547,9 @@ void ServerLobby::asynchronousUpdate()
             m_item_seed = (uint32_t)StkTime::getTimeSinceEpoch();
             ItemManager::updateRandomSeed(m_item_seed);
             m_game_setup->setRace(winner_vote);
-            auto players = STKHost::get()->getPlayersForNewGame();
+            bool has_always_on_spectators = false;
+            auto players = STKHost::get()
+                ->getPlayersForNewGame(&has_always_on_spectators);
             auto ai_instance = m_ai_peer.lock();
             if (supportsAI())
             {
@@ -1617,6 +1619,10 @@ void ServerLobby::asynchronousUpdate()
             resetPeersReady();
             m_state = LOAD_WORLD;
             sendMessageToPeers(load_world_message);
+            // updatePlayerList so the in lobby players (if any) can see always
+            // spectators join the game
+            if (has_always_on_spectators)
+                updatePlayerList();
             delete load_world_message;
         }
         break;
@@ -2427,13 +2433,37 @@ void ServerLobby::startSelection(const Event *event)
     // Remove karts / tracks from server that are not supported on all clients
     std::set<std::string> karts_erase, tracks_erase;
     auto peers = STKHost::get()->getPeers();
+    std::set<STKPeer*> always_spectate_peers;
+    bool has_peer_plays_game = false;
     for (auto peer : peers)
     {
         if (!peer->isValidated() || peer->isWaitingForGame())
             continue;
         peer->eraseServerKarts(m_available_kts.first, karts_erase);
         peer->eraseServerTracks(m_available_kts.second, tracks_erase);
+        if (peer->alwaysSpectate())
+            always_spectate_peers.insert(peer.get());
+        else if (!peer->isAIPeer())
+            has_peer_plays_game = true;
     }
+
+    // Disable always spectate peers if no players join the game
+    if (!has_peer_plays_game)
+    {
+        for (STKPeer* peer : always_spectate_peers)
+            peer->setAlwaysSpectate(false);
+        always_spectate_peers.clear();
+    }
+    else
+    {
+        // We make those always spectate peer waiting for game so it won't
+        // be able to vote, this will be reset in STKHost::getPlayersForNewGame
+        // This will also allow a correct number of in game players for max
+        // arena players handling
+        for (STKPeer* peer : always_spectate_peers)
+            peer->setWaitingForGame(true);
+    }
+
     for (const std::string& kart_erase : karts_erase)
     {
         m_available_kts.first.erase(kart_erase);
@@ -2589,6 +2619,19 @@ void ServerLobby::startSelection(const Event *event)
     delete ns;
 
     m_state = SELECTING;
+    if (!always_spectate_peers.empty())
+    {
+        NetworkString* back_lobby = getNetworkString(2);
+        back_lobby->setSynchronous(true);
+        back_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_SPECTATING_NEXT_GAME);
+        STKHost::get()->sendPacketToAllPeersWith(
+            [always_spectate_peers](STKPeer* peer) {
+            return always_spectate_peers.find(peer) !=
+            always_spectate_peers.end(); }, back_lobby, /*reliable*/true);
+        delete back_lobby;
+        updatePlayerList();
+    }
+
     if (!allowJoinedPlayersWaiting())
     {
         // Drop all pending players and keys if doesn't allow joinning-waiting
@@ -3721,6 +3764,12 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         !update_when_reset_server;
 
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
+    size_t all_profiles_size = all_profiles.size();
+    for (auto& profile : all_profiles)
+    {
+        if (profile->getPeer()->alwaysSpectate())
+            all_profiles_size--;
+    }
     // N - 1 AI
     auto ai_instance = m_ai_peer.lock();
     if (supportsAI())
@@ -3731,12 +3780,12 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             if (m_state.load() == WAITING_FOR_START_GAME ||
                 update_when_reset_server)
             {
-                if (all_profiles.size() > ai_profiles.size())
+                if (all_profiles_size > ai_profiles.size())
                     ai_profiles.clear();
-                else if (!all_profiles.empty())
+                else if (all_profiles_size != 0)
                 {
                     ai_profiles.resize(
-                        ai_profiles.size() - all_profiles.size() + 1);
+                        ai_profiles.size() - all_profiles_size + 1);
                 }
             }
             else
@@ -3774,7 +3823,9 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         uint8_t boolean_combine = 0;
         if (p && p->isWaitingForGame())
             boolean_combine |= 1;
-        if (p && p->isSpectator())
+        if (p && (p->isSpectator() ||
+            ((m_state.load() == WAITING_FOR_START_GAME ||
+            update_when_reset_server) && p->alwaysSpectate())))
             boolean_combine |= (1 << 1);
         if (p && m_server_owner_id.load() == p->getHostId())
             boolean_combine |= (1 << 2);
@@ -4413,7 +4464,8 @@ void ServerLobby::configPeersStartTime()
     for (auto p : m_peers_ready)
     {
         auto peer = p.first.lock();
-        if (!peer)
+        // Spectators don't send input so we don't need to delay for them
+        if (!peer || peer->alwaysSpectate())
             continue;
         if (peer->getAveragePing() > max_ping_from_peers)
         {
@@ -5267,7 +5319,7 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
 
 //-----------------------------------------------------------------------------
 void ServerLobby::handleServerCommand(Event* event,
-                                      std::shared_ptr<STKPeer> peer) const
+                                      std::shared_ptr<STKPeer> peer)
 {
     NetworkString& data = event->data();
     std::string language;
@@ -5277,7 +5329,54 @@ void ServerLobby::handleServerCommand(Event* event,
     auto argv = StringUtils::split(cmd, ' ');
     if (argv.size() == 0)
         return;
-    if (argv[0] == "listserveraddon")
+    if (argv[0] == "spectate")
+    {
+        if (m_game_setup->isGrandPrix() || !ServerConfig::m_live_players)
+        {
+            NetworkString* chat = getNetworkString();
+            chat->addUInt8(LE_CHAT);
+            chat->setSynchronous(true);
+            std::string msg = "Server doesn't support spectate";
+            chat->encodeString16(StringUtils::utf8ToWide(msg));
+            peer->sendPacket(chat, true/*reliable*/);
+            delete chat;
+            return;
+        }
+
+        if (argv.size() != 2 || (argv[1] != "0" && argv[1] != "1") ||
+            m_state.load() != WAITING_FOR_START_GAME)
+        {
+            NetworkString* chat = getNetworkString();
+            chat->addUInt8(LE_CHAT);
+            chat->setSynchronous(true);
+            std::string msg = "Usage: spectate [0 or 1], before game started";
+            chat->encodeString16(StringUtils::utf8ToWide(msg));
+            peer->sendPacket(chat, true/*reliable*/);
+            delete chat;
+            return;
+        }
+
+        if (argv[1] == "1")
+        {
+            if (m_process_type == PT_CHILD &&
+                peer->getHostId() == m_client_server_host_id.load())
+            {
+                NetworkString* chat = getNetworkString();
+                chat->addUInt8(LE_CHAT);
+                chat->setSynchronous(true);
+                std::string msg = "Graphical client server cannot spectate";
+                chat->encodeString16(StringUtils::utf8ToWide(msg));
+                peer->sendPacket(chat, true/*reliable*/);
+                delete chat;
+                return;
+            }
+            peer->setAlwaysSpectate(true);
+        }
+        else
+            peer->setAlwaysSpectate(false);
+        updatePlayerList();
+    }
+    else if (argv[0] == "listserveraddon")
     {
         NetworkString* chat = getNetworkString();
         chat->addUInt8(LE_CHAT);
