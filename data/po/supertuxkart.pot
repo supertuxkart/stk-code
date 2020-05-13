@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-05 10:41+0800\n"
+"POT-Creation-Date: 2020-05-13 10:43+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -166,7 +166,7 @@ msgstr ""
 #. I18N: Control type
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-#: src/states_screens/dialogs/race_paused_dialog.cpp:460
+#: src/states_screens/dialogs/race_paused_dialog.cpp:520
 msgid "Accelerometer"
 msgstr ""
 
@@ -180,13 +180,13 @@ msgstr ""
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:465
+#: src/states_screens/dialogs/race_paused_dialog.cpp:525
 msgid "Gyroscope"
 msgstr ""
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
-#: src/states_screens/dialogs/race_paused_dialog.cpp:455
+#: src/states_screens/dialogs/race_paused_dialog.cpp:515
 msgid "Steering wheel"
 msgstr ""
 
@@ -2422,124 +2422,6 @@ msgstr ""
 msgid "Xue"
 msgstr ""
 
-#. I18N: Music title from ../stk-assets/music/after_the_flames.music
-msgid "After The Flames"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/bay.music
-msgid "Bay"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/Boom_boom_boom.music
-msgid "Boom boom boom"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/celtic.music
-msgid "Scottish bagpipes"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/cocoa_river.music
-msgid "Cocoa River"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/demonhill.music
-msgid "Demon Hill"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/egypt.music
-msgid "Egypt"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/farm.music
-msgid "Golden Fields"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/garden.music
-msgid "Secret Garden"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/hacienda.music
-#. I18N: ../stk-assets/tracks/hacienda/track.xml
-msgid "Hacienda"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/kart_grand_prix.music
-msgid "Kart Grand Prix"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/klabauter_dance.music
-msgid "Klabauter Dance"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/landing_in_gran_paradiso.music
-msgid "Landing in gran paradiso"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/lava.music
-msgid "Lava"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/lose_theme.music
-msgid "Lose Theme"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/main_theme.music
-msgid "SuperTuxKart Theme"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/overworld.music
-msgid "Overworld"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/Penguin_Party.music
-msgid "Penguin Party"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/race_summary.music
-msgid "Race Summary"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/ravenbridge_mansion.music
-#. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
-msgid "Ravenbridge Mansion"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/SkyVibe-HighFrequency.music
-msgid "Sky Vibe - High Frequency"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/snowmountain.music
-msgid "Snow"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/Snowy.music
-msgid "Snowy"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/subsea.music
-msgid "Subsea"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/theGreatFair.music
-msgid "The Great Fair"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/valley.music
-msgid "Valley"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/West.music
-msgid "West"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/win_theme.music
-msgid "Win Theme"
-msgstr ""
-
-#. I18N: Music title from ../stk-assets/music/xeon.music
-msgid "xeon"
-msgstr ""
-
 #. I18N: ../stk-assets/tracks/abyss/track.xml
 msgid "Antediluvian Abyss"
 msgstr ""
@@ -2577,12 +2459,12 @@ msgstr ""
 msgid "Gran Paradiso Island"
 msgstr ""
 
-#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
-msgid "Icy Soccer Field"
+#. I18N: ../stk-assets/tracks/hacienda/track.xml
+msgid "Hacienda"
 msgstr ""
 
-#. I18N: Music title from ../stk-assets/tracks/introcutscene2/intro2.music
-msgid "Gran Batalla"
+#. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
+msgid "Icy Soccer Field"
 msgstr ""
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2638,6 +2520,10 @@ msgstr ""
 
 #. I18N: ../stk-assets/tracks/pumpkin_park/track.xml
 msgid "Pumpkin Park"
+msgstr ""
+
+#. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
+msgid "Ravenbridge Mansion"
 msgstr ""
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
@@ -3664,7 +3550,7 @@ msgid "Bad network connection is detected."
 msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3574
+#: src/network/protocols/server_lobby.cpp:3639
 msgid "Bot"
 msgstr ""
 
@@ -3775,47 +3661,52 @@ msgid "Failed to start the network game."
 msgstr ""
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1181
+#: src/network/protocols/client_lobby.cpp:1183
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr ""
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1185
+#: src/network/protocols/client_lobby.cpp:1187
 msgid "No remaining place in the arena - live join disabled."
 msgstr ""
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1189
+#: src/network/protocols/client_lobby.cpp:1191
 msgid "Only 1 player remaining, returning to lobby."
 msgstr ""
 
-#: src/network/protocols/client_lobby.cpp:1195
-msgid "Server owner quit the game"
+#: src/network/protocols/client_lobby.cpp:1197
+msgid "Server owner quit the game."
+msgstr ""
+
+#. I18N: Status shown to player when he will be spectating the next game
+#: src/network/protocols/client_lobby.cpp:1201
+msgid "You will be spectating the next game."
 msgstr ""
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1359
+#: src/network/protocols/client_lobby.cpp:1369
 #, c-format
 msgid "%s joined the red team."
 msgstr ""
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1365
+#: src/network/protocols/client_lobby.cpp:1375
 #, c-format
 msgid "%s joined the blue team."
 msgstr ""
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1371
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the game."
 msgstr ""
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1523
+#: src/network/protocols/client_lobby.cpp:1536
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3823,7 +3714,7 @@ msgid ""
 msgstr ""
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1539
+#: src/network/protocols/client_lobby.cpp:1552
 #, c-format
 msgid "Successfully reported %s."
 msgstr ""
@@ -3832,13 +3723,13 @@ msgstr ""
 msgid "No quick play server available."
 msgstr ""
 
-#: src/network/protocols/connect_to_server.cpp:377
+#: src/network/protocols/connect_to_server.cpp:373
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr ""
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:787
+#: src/network/protocols/connect_to_server.cpp:783
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr ""
@@ -4552,7 +4443,7 @@ msgstr ""
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
-#: src/states_screens/online/server_selection.cpp:123
+#: src/states_screens/online/server_selection.cpp:127
 msgctxt "column_name"
 msgid "Difficulty"
 msgstr ""
@@ -4667,7 +4558,7 @@ msgstr ""
 msgid "Press any key..."
 msgstr ""
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:109
+#: src/states_screens/dialogs/race_paused_dialog.cpp:115
 #: src/states_screens/online/networking_lobby.cpp:239
 #: src/states_screens/online/networking_lobby.cpp:824
 msgid "Chat is disabled, enable in options menu."
@@ -4953,7 +4844,7 @@ msgid "Track"
 msgstr ""
 
 #: src/states_screens/ghost_replay_selection.cpp:164
-#: src/states_screens/online/server_selection.cpp:122
+#: src/states_screens/online/server_selection.cpp:126
 msgctxt "column_name"
 msgid "Players"
 msgstr ""
@@ -5305,49 +5196,49 @@ msgstr ""
 msgid "Internet access is disabled, please enable it in the options"
 msgstr ""
 
-#: src/states_screens/online/server_selection.cpp:120
+#: src/states_screens/online/server_selection.cpp:124
 msgctxt "column_name"
 msgid "Name"
 msgstr ""
 
-#: src/states_screens/online/server_selection.cpp:121
+#: src/states_screens/online/server_selection.cpp:125
 msgctxt "column_name"
 msgid "Game mode"
 msgstr ""
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/online/server_selection.cpp:128
+#: src/states_screens/online/server_selection.cpp:132
 msgctxt "column_name"
 msgid "Owner"
 msgstr ""
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/online/server_selection.cpp:130
+#: src/states_screens/online/server_selection.cpp:134
 msgctxt "column_name"
 msgid "Distance (km)"
 msgstr ""
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:269
+#: src/states_screens/online/server_selection.cpp:272
 msgid "Unknown"
 msgstr ""
 
 #. I18N: Message shown to user if no IPv4 detected by STK
-#: src/states_screens/online/server_selection.cpp:312
+#: src/states_screens/online/server_selection.cpp:315
 msgid "No IPv4 detected, you may not be able to join any servers."
 msgstr ""
 
 #. I18N: Message shown to user if no IPv6 detected by STK
-#: src/states_screens/online/server_selection.cpp:314
+#: src/states_screens/online/server_selection.cpp:317
 msgid "No IPv6 detected, you may not be able to join any servers."
 msgstr ""
 
-#: src/states_screens/online/server_selection.cpp:414
+#: src/states_screens/online/server_selection.cpp:417
 msgid "No server is available."
 msgstr ""
 
-#: src/states_screens/online/server_selection.cpp:422
+#: src/states_screens/online/server_selection.cpp:425
 msgid "Fetching servers"
 msgstr ""
 
@@ -5810,26 +5701,26 @@ msgid "Waiting for the server"
 msgstr ""
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:631
+#: src/states_screens/race_gui_base.cpp:630
 #, c-format
 msgid "\"%s\""
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by "John Doe")
-#: src/states_screens/race_gui_base.cpp:641
+#: src/states_screens/race_gui_base.cpp:640
 msgid "by"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:749
+#: src/states_screens/race_gui_base.cpp:748
 msgid "Collect nitro!"
 msgstr ""
 
-#: src/states_screens/race_gui_base.cpp:751
+#: src/states_screens/race_gui_base.cpp:750
 msgid "Follow the leader!"
 msgstr ""
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:934
+#: src/states_screens/race_gui_base.cpp:933
 #, c-format
 msgid "Top %i"
 msgstr ""
