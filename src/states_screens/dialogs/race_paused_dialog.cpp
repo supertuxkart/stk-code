@@ -104,6 +104,8 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                 m_text_box->setActive(false);
                 getWidget("send")->setActive(false);
                 getWidget("emoji")->setActive(false);
+                if (m_target_team != KART_TEAM_NONE)
+                    getWidget("team")->setActive(false);
             }
         }
         else
@@ -113,6 +115,8 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
                 _("Chat is disabled, enable in options menu."));
             getWidget("send")->setVisible(false);
             getWidget("emoji")->setVisible(false);
+            if (m_target_team != KART_TEAM_NONE)
+                getWidget("team")->setVisible(false);
         }
     }
     else
