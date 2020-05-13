@@ -81,10 +81,12 @@ SocketAddress::SocketAddress(const ENetAddress& ea)
     }
     else
     {
+        m_family = AF_INET;
         setIP(htonl(ea.host.p0));
         setPort(ea.port);
     }
 #else
+    m_family = AF_INET;
     setIP(htonl(ea.host));
     setPort(ea.port);
 #endif
