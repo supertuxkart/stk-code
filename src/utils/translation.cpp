@@ -378,6 +378,16 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     if (language != "")
     {
+        auto ignore_country = [](const std::string& test_full_form)
+        {
+            // Use a country to test if the test_full_form is supported by
+            // localized name
+            auto it = m_localized_country_codes.find("HK");
+            if (it != m_localized_country_codes.end())
+                return it->second.find(test_full_form) == it->second.end();
+            return true;
+        };
+
         Log::verbose("translation", "Env var LANGUAGE = '%s'.",
                      language.c_str());
 
@@ -404,7 +414,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             m_current_language_name = l.get_name();
             m_current_language_name_code = l.get_language();
             m_current_language_tag = m_current_language_name_code;
-            if (!l.get_country().empty())
+            if (!l.get_country().empty() && !ignore_country(
+                m_current_language_name_code + "-" + l.get_country()))
             {
                 m_current_language_tag += "-";
                 m_current_language_tag += l.get_country();
@@ -431,7 +442,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 m_current_language_name = tgtLang.get_name();
                 m_current_language_name_code = tgtLang.get_language();
                 m_current_language_tag = m_current_language_name_code;
-                if (!tgtLang.get_country().empty())
+                if (!tgtLang.get_country().empty() && !ignore_country(
+                    m_current_language_name_code + "-" + tgtLang.get_country()))
                 {
                     m_current_language_tag += "-";
                     m_current_language_tag += tgtLang.get_country();
