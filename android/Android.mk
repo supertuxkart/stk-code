@@ -210,6 +210,8 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/sdl2/src/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/android/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/hidapi/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/virtual/*.c) \
+                      $(wildcard ../lib/sdl2/src/locale/android/*.c) \
+                      $(wildcard ../lib/sdl2/src/locale/*.c) \
                       $(wildcard ../lib/sdl2/src/loadso/dlopen/*.c) \
                       $(wildcard ../lib/sdl2/src/power/*.c) \
                       $(wildcard ../lib/sdl2/src/power/android/*.c) \
