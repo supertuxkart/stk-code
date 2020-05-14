@@ -206,6 +206,9 @@ static void process_cmd(struct android_app* app, struct android_poll_source* sou
     android_app_post_exec_cmd(app, cmd);
 }
 
+// From CIrrDeviceAndroid.h
+extern void IrrDeviceAndroid_onCreate();
+
 static void* android_app_entry(void* param) {
     struct android_app* android_app = (struct android_app*)param;
 
@@ -225,6 +228,9 @@ static void* android_app_entry(void* param) {
     ALooper_addFd(looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
             &android_app->cmdPollSource);
     android_app->looper = looper;
+
+    // Initialize global variables in android device before android_app->running
+    IrrDeviceAndroid_onCreate();
 
     pthread_mutex_lock(&android_app->mutex);
     android_app->running = 1;

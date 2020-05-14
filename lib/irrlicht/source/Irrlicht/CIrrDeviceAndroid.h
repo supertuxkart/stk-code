@@ -41,6 +41,9 @@ namespace irr
     class CIrrDeviceAndroid : public CIrrDeviceStub, video::IImagePresenter
     {
     public:
+        static bool IsPaused;
+        static bool IsFocused;
+        static bool IsStarted;
         //! constructor
         CIrrDeviceAndroid(const SIrrlichtCreationParameters& param);
 
@@ -105,10 +108,6 @@ namespace irr
         bool GyroscopeActive;
         static AndroidApplicationInfo ApplicationInfo;
 
-        static bool IsPaused;
-        static bool IsFocused;
-        static bool IsStarted;
-        
         bool HasTouchDevice;
         float GamepadAxisX;
         float GamepadAxisY;

@@ -186,10 +186,7 @@ void android_main(struct android_app* app)
         
     global_android_app = app;
     global_android_activity = app->activity;
-    
-    // Initialize global Android window state variables
-    CIrrDeviceAndroid::onCreate();
-    
+
     app_dummy();
     override_default_params_for_mobile();
 
