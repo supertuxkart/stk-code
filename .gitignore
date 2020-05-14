@@ -75,6 +75,9 @@ lib/freetype
 lib/ifaddrs
 lib/libogg
 lib/libvorbis
+lib/libpng
+lib/libjpeg
+lib/zlib
 lib/openal
 lib/openssl
 lib/fribidi

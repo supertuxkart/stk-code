@@ -9,14 +9,6 @@ if(NOT SERVER_ONLY)
                         "${ZLIB_INCLUDE_DIR}"
                         "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
 
-    if(MSVC)
-        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../zlib/") # For zconf.h on WIN32
-    endif()
-
-    if(MSVC)
-        include_directories("${CMAKE_CURRENT_BINARY_DIR}/../libpng/")
-    endif()
-
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
         include_directories(${OPENGL_INCLUDE_DIR})

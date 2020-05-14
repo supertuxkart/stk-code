@@ -13,6 +13,8 @@ SET(CMAKE_C_COMPILER "${HOST}-gcc")
 SET(CMAKE_CXX_COMPILER "${HOST}-g++")
 SET(CMAKE_RC_COMPILER "${HOST}-windres")
 
+set(CMAKE_SYSTEM_PROCESSOR ${ARCH})
+
 # here is the target environment located
 SET(CMAKE_FIND_ROOT_PATH $ENV{NDK_TOOLCHAIN_PATH})
 
