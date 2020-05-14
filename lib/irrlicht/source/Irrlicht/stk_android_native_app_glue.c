@@ -336,11 +336,19 @@ static void onStart(ANativeActivity* activity) {
     android_app_set_activity_state(app, APP_CMD_START);
 }
 
+// From SDL2 hid.cpp: request permission dialog in usbmanager call onPause which
+// blocks the stk thread (sdl thread too), so if this return true we use
+// android_app_write_cmd directly
+extern int isNonBlockingEnabled();
+
 static void onResume(ANativeActivity* activity) {
     LOGV("Resume: %p\n", activity);
     struct android_app* app = (struct android_app*)activity->instance;
     if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_RESUME);
-    android_app_set_activity_state(app, APP_CMD_RESUME);
+    if (isNonBlockingEnabled() == 1)
+        android_app_write_cmd(app, APP_CMD_RESUME);
+    else
+        android_app_set_activity_state(app, APP_CMD_RESUME);
 }
 
 static void* onSaveInstanceState(ANativeActivity* activity, size_t* outLen) {
@@ -372,7 +380,10 @@ static void onPause(ANativeActivity* activity) {
     LOGV("Pause: %p\n", activity);
     struct android_app* app = (struct android_app*)activity->instance;
     if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_PAUSE);
-    android_app_set_activity_state(app, APP_CMD_PAUSE);
+    if (isNonBlockingEnabled() == 1)
+        android_app_write_cmd(app, APP_CMD_PAUSE);
+    else
+        android_app_set_activity_state(app, APP_CMD_PAUSE);
 }
 
 static void onStop(ANativeActivity* activity) {
