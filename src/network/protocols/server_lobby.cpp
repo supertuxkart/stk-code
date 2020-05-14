@@ -2512,27 +2512,16 @@ void ServerLobby::startSelection(const Event *event)
                 it++;
         }
     }
-    // Default vote use only official tracks to prevent network AI cannot
-    // finish some bad wip / addons tracks
-    std::set<std::string> official_tracks = m_official_kts.second;
-    std::set<std::string>::iterator it = official_tracks.begin();
-    while (it != official_tracks.end())
+
+    if (m_available_kts.second.empty())
     {
-        if (m_available_kts.second.find(*it) == m_available_kts.second.end())
-        {
-            it = official_tracks.erase(it);
-        }
-        else
-            it++;
-    }
-    if (official_tracks.empty())
-    {
-        Log::error("ServerLobby", "No official tracks for playing!");
+        Log::error("ServerLobby", "No tracks for playing!");
         return;
     }
+
     RandomGenerator rg;
-    it = official_tracks.begin();
-    std::advance(it, rg.get((int)official_tracks.size()));
+    std::set<std::string>::iterator it = m_available_kts.second.begin();
+    std::advance(it, rg.get((int)m_available_kts.second.size()));
     m_default_vote->m_track_name = *it;
     switch (RaceManager::get()->getMinorMode())
     {
