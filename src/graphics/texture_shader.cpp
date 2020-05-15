@@ -251,10 +251,10 @@ GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
         return createBilinearClampedSampler();
     case ST_SEMI_TRILINEAR:
         return createSemiTrilinearSampler();
-#ifndef USE_GLES2
     case ST_TEXTURE_BUFFER:
+        if (CVS->getRenderer() != RENDERER_GL)
+            assert(false);
         return 0;
-#endif
     default:
         assert(false);
         return 0;

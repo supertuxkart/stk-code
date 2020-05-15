@@ -136,12 +136,10 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
     });
 
     std::ostringstream code;
-#if !defined(USE_GLES2)
-    code << "#version " << CVS->getGLSLVersion()<<"\n";
-#else
-    if (CVS->isGLSL())
+    if (CVS->getRenderer() == RENDERER_GL)
+        code << "#version " << CVS->getGLSLVersion()<<"\n";
+    else if (CVS->isGLSL())
         code << "#version 300 es\n";
-#endif
 
 #if !defined(USE_GLES2)
     // Some drivers report that the compute shaders extension is available,
@@ -162,9 +160,9 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
 
     if (CVS->isARBExplicitAttribLocationUsable())
     {
-#if !defined(USE_GLES2)
-        code << "#extension GL_ARB_explicit_attrib_location : enable\n";
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+            code << "#extension GL_ARB_explicit_attrib_location : enable\n";
+
         code << "#define Explicit_Attrib_Location_Usable\n";
     }
 
@@ -184,29 +182,32 @@ ShaderFilesManager::SharedShader ShaderFilesManager::loadShader
     if (CVS->isDeferredEnabled())
         code << "#define Advanced_Lighting_Enabled\n";
 
-#if !defined(USE_GLES2)
-    // shader compilation fails with some drivers if there is no precision
-    // qualifier
-    if (type == GL_FRAGMENT_SHADER)
-        code << "precision highp float;\n";
-#else
-    int range[2], precision;
-    glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range,
-        &precision);
-
-    if (precision > 0)
+    if (CVS->getRenderer() == RENDERER_GL)
     {
-        code << "precision highp float;\n";
-        code << "precision highp sampler2DArrayShadow;\n";
-        code << "precision highp sampler2DArray;\n";
+        // shader compilation fails with some drivers if there is no precision
+        // qualifier
+        if (type == GL_FRAGMENT_SHADER)
+            code << "precision highp float;\n";
     }
     else
     {
-        code << "precision mediump float;\n";
-        code << "precision mediump sampler2DArrayShadow;\n";
-        code << "precision mediump sampler2DArray;\n";
+        int range[2], precision;
+        glGetShaderPrecisionFormat(GL_FRAGMENT_SHADER, GL_HIGH_FLOAT, range,
+            &precision);
+
+        if (precision > 0)
+        {
+            code << "precision highp float;\n";
+            code << "precision highp sampler2DArrayShadow;\n";
+            code << "precision highp sampler2DArray;\n";
+        }
+        else
+        {
+            code << "precision mediump float;\n";
+            code << "precision mediump sampler2DArrayShadow;\n";
+            code << "precision mediump sampler2DArray;\n";
+        }
     }
-#endif
     code << "#define MAX_BONES " << stk_config->m_max_skinning_bones << "\n";
 
     code << getHeader();

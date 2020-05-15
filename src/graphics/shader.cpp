@@ -40,9 +40,8 @@ int ShaderBase::loadTFBProgram(const std::string &shader_name,
 {
     m_program = glCreateProgram();
     loadAndAttachShader(GL_VERTEX_SHADER, shader_name);
-#ifdef USE_GLES2
-    loadAndAttachShader(GL_FRAGMENT_SHADER, "white.frag");
-#endif
+    if (CVS->getRenderer() == RENDERER_GLES)
+        loadAndAttachShader(GL_FRAGMENT_SHADER, "white.frag");
 
     glTransformFeedbackVaryings(m_program, varying_count, varyings,
                                GL_INTERLEAVED_ATTRIBS);

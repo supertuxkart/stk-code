@@ -18,6 +18,7 @@
 #ifndef HEADER_SP_TEXTURE_HPP
 #define HEADER_SP_TEXTURE_HPP
 
+#include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "utils/log.hpp"
 #include "utils/no_copy.hpp"
@@ -80,22 +81,18 @@ private:
     void createTransparent()
     {
 #ifndef SERVER_ONLY
+        unsigned upload_format;
+        if (CVS->getRenderer() == RENDERER_GLES)
+            upload_format = GL_RGBA;
+        else
+            upload_format = GL_BGRA;
+
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
         static uint32_t data[4] = { 0, 0, 0, 0 };
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0,
-#ifdef USE_GLES2
-            GL_RGBA,
-#else
-            GL_BGRA,
-#endif
-            GL_UNSIGNED_BYTE, data);
+            upload_format, GL_UNSIGNED_BYTE, data);
         glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA, 1, 1, 0,
-#ifdef USE_GLES2
-            GL_RGBA,
-#else
-            GL_BGRA,
-#endif
-            GL_UNSIGNED_BYTE, data);
+            upload_format, GL_UNSIGNED_BYTE, data);
         glBindTexture(GL_TEXTURE_2D, 0);
         m_width.store(2);
         m_height.store(2);
@@ -105,22 +102,18 @@ private:
     void createWhite(bool private_init = true)
     {
 #ifndef SERVER_ONLY
+        unsigned upload_format;
+        if (CVS->getRenderer() == RENDERER_GLES)
+            upload_format = GL_RGBA;
+        else
+            upload_format = GL_BGRA;
+
         glBindTexture(GL_TEXTURE_2D, m_texture_name);
         static int32_t data[4] = { -1, -1, -1, -1 };
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0,
-#ifdef USE_GLES2
-            GL_RGBA,
-#else
-            GL_BGRA,
-#endif
-            GL_UNSIGNED_BYTE, data);
+            upload_format, GL_UNSIGNED_BYTE, data);
         glTexImage2D(GL_TEXTURE_2D, 1, GL_RGBA, 1, 1, 0,
-#ifdef USE_GLES2
-            GL_RGBA,
-#else
-            GL_BGRA,
-#endif
-            GL_UNSIGNED_BYTE, data);
+            upload_format, GL_UNSIGNED_BYTE, data);
         glBindTexture(GL_TEXTURE_2D, 0);
         if (private_init)
         {

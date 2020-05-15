@@ -18,6 +18,7 @@
 #ifndef HEADER_STK_TEXTURE_HPP
 #define HEADER_STK_TEXTURE_HPP
 
+#include "graphics/central_settings.hpp"
 #include "graphics/gl_headers.hpp"
 #include "utils/no_copy.hpp"
 
@@ -85,11 +86,11 @@ public:
     // ------------------------------------------------------------------------
     virtual video::E_DRIVER_TYPE getDriverType() const
     {
-#if defined(USE_GLES2)
-        return video::EDT_OGLES2;
-#else
-        return video::EDT_OPENGL;
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+            return video::EDT_OPENGL;
+        else if (CVS->getRenderer() == RENDERER_GLES)
+            return video::EDT_OGLES2;
+        return video::EDT_NULL;
     }
     // ------------------------------------------------------------------------
     virtual video::ECOLOR_FORMAT getColorFormat() const

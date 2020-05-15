@@ -2203,11 +2203,11 @@ int main(int argc, char *argv[])
                 #if !defined(MOBILE_STK)
                 if (UserConfigParams::m_old_driver_popup)
                 {
-                    #ifdef USE_GLES2
-                    irr::core::stringw version = "OpenGL ES 3.0";
-                    #else
-                    irr::core::stringw version = "OpenGL 3.3";
-                    #endif
+                    irr::core::stringw version;
+                    if (CVS->getRenderer() == RENDERER_GLES)
+                        version = "OpenGL ES 3.0";
+                    else
+                        version = "OpenGL 3.3";
                     MessageDialog *dialog = new MessageDialog(_(
                         "Your graphics driver appears to be very old. Please "
                         "check if an update is available. SuperTuxKart "

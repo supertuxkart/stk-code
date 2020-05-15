@@ -454,11 +454,11 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
-#if defined(USE_GLES2)
-            params.DriverType    = video::EDT_OGLES2;
-#else
-            params.DriverType    = video::EDT_OPENGL;
-#endif
+            if (CVS->getRenderer() == RENDERER_GLES)
+                params.DriverType    = video::EDT_OGLES2;
+            else
+                params.DriverType    = video::EDT_OPENGL;
+
 #if defined(ANDROID)
             params.PrivateData = (void*)global_android_app;
 #endif
@@ -509,11 +509,7 @@ void IrrDriver::initDevice()
         {
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
-#if defined(USE_GLES2)
-            m_device = createDevice(video::EDT_OGLES2,
-#else
-            m_device = createDevice(video::EDT_OPENGL,
-#endif
+            m_device = createDevice(params.DriverType,
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel

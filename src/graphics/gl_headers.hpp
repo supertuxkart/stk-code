@@ -71,16 +71,16 @@ extern "C" {
 #    include <GL/glext.h>
 #endif
 
-#if defined(USE_GLES2)
 #define GL_BGRA 0x80E1
 #define GL_BGR 0x80E0
+#ifndef GL_FRAMEBUFFER_COMPLETE_EXT
 #define GL_FRAMEBUFFER_COMPLETE_EXT GL_FRAMEBUFFER_COMPLETE
+#endif
 #ifndef GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT
 #define GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT 0x8C4F
 #endif
 #ifndef GL_COMPRESSED_RGBA_S3TC_DXT5_EXT
 #define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT  0x83F3
-#endif
 #endif
 
 #else

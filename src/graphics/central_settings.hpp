@@ -54,6 +54,7 @@ public:
     static bool m_supports_sp;
 
     void init();
+    int getRenderer() const;
     bool isGLSL() const;
     unsigned getGLSLVersion() const;
 
@@ -96,5 +97,10 @@ public:
 };
 
 extern CentralVideoSettings* CVS;
+
+enum Renderer {
+    RENDERER_GL,
+    RENDERER_GLES
+};
 
 #endif
