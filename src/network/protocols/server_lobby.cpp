@@ -3547,8 +3547,11 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     {
         core::stringw name;
         data.decodeStringW(&name);
+        // 30 to make it consistent with stk-addons max user name length
         if (name.empty())
             name = L"unnamed";
+        else if (name.size() > 30)
+            name = name.subString(0, 30);
         float default_kart_color = data.getFloat();
         HandicapLevel handicap = (HandicapLevel)data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>
