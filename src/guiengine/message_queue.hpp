@@ -49,7 +49,6 @@ namespace MessageQueue
     void updatePosition();
     void update(float dt);
     void discardStatic();
-    void clear();
     void resetGlobalVariables();
 };   // namespace GUIEngine
 #endif
