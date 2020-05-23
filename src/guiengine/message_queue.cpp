@@ -14,9 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-/**
-  \page addons Addons
-  */
 
 #include "guiengine/message_queue.hpp"
 
@@ -106,10 +103,13 @@ protected:
     /** A pointer to the Container for the Message */
     SkinWidgetContainer* m_container;
 
+    /** Font used to detect if re-initialization is needed */
+    gui::IGUIFont* m_font;
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         Message(5.0f, message)
     {
+        m_font = NULL;
         m_container = g_container;
         m_message_type = mt;
         assert(mt != MessageQueue::MT_PROGRESS);
@@ -138,11 +138,11 @@ public:
             GUIEngine::getSkin()->getBoxRenderParams(m_render_type);
         const unsigned width = irr_driver->getActualScreenSize().Width;
         const unsigned height = irr_driver->getActualScreenSize().Height;
-        gui::IGUIFont* font = GUIEngine::getFont();
-        font->initGlyphLayouts(m_message, m_gls);
+        m_font = GUIEngine::getFont();
+        m_font->initGlyphLayouts(m_message, m_gls);
         // Reserve space for 3 lines of text, it will occupy the circle
         const int max_width = width - (brp.m_left_border +
-            brp.m_right_border) - (font->getHeightPerLine() * 3);
+            brp.m_right_border) - (m_font->getHeightPerLine() * 3);
         if (max_width < 0)
         {
             m_display_timer = -1;
@@ -150,12 +150,12 @@ public:
         }
 
         gui::breakGlyphLayouts(m_gls, (float)max_width,
-            font->getInverseShaping(), font->getScale());
+            m_font->getInverseShaping(), m_font->getScale());
         core::dimension2du dim = gui::getGlyphLayoutsDimension(m_gls,
-            font->getHeightPerLine(), font->getInverseShaping(),
-            font->getScale());
+            m_font->getHeightPerLine(), m_font->getInverseShaping(),
+            m_font->getScale());
 
-        if ((int)dim.Height > font->getHeightPerLine() * 3)
+        if ((int)dim.Height > m_font->getHeightPerLine() * 3)
         {
             // Max 3 lines to prevent too long message from network chat
             int newline_count = 0;
@@ -166,7 +166,7 @@ public:
                     if (++newline_count >= 3)
                     {
                         m_gls.erase(m_gls.begin() + i, m_gls.end());
-                        dim.Height = font->getHeightPerLine() * 3;
+                        dim.Height = m_font->getHeightPerLine() * 3;
                         break;
                     }
                 }
@@ -177,7 +177,7 @@ public:
         int total_width = dim.Width + brp.m_left_border + brp.m_right_border +
             left_icon_size;
         int x = (width - total_width) / 2;
-        int y = height - int(dim.Height) - font->getHeightPerLine() / 2;
+        int y = height - int(dim.Height) - m_font->getHeightPerLine() / 2;
 
         if (x < 0 || y < 0)
         {
@@ -191,7 +191,7 @@ public:
             y + dim.Height);
 
         if (m_container == g_static_container)
-            s_msg_raise = int(dim.Height) + font->getHeightPerLine() / 10;
+            s_msg_raise = int(dim.Height) + m_font->getHeightPerLine() / 10;
     }
     // ------------------------------------------------------------------------
     /** Draw the message. */
@@ -203,6 +203,10 @@ public:
             return;
         }
         Message::draw(dt);
+        // This happen when GUIEngine is reset (when font size changed for
+        // example)
+        if (m_font != GUIEngine::getFont())
+            init();
         int pos_transform = 0;
         if (m_container == g_container)
             pos_transform = s_msg_raise;
@@ -345,10 +349,6 @@ void updatePosition()
 {
     if (g_static_message != 0)
         g_static_message->init();
-    g_all_messages.lock();
-    if (!g_all_messages.getData().empty())
-        g_all_messages.getData().top()->init();
-    g_all_messages.unlock();
 }   // updatePosition
 
 // ----------------------------------------------------------------------------
@@ -470,14 +470,6 @@ void clear()
 #ifndef SERVER_ONLY
     delete g_static_message;
     g_static_message = NULL;
-    g_all_messages.lock();
-    while (!g_all_messages.getData().empty())
-    {
-        Message* msg = g_all_messages.getData().top();
-        g_all_messages.getData().pop();
-        delete msg;
-    }
-    g_all_messages.unlock();
 #endif
 }
 
