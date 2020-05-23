@@ -46,11 +46,11 @@ int s_msg_raise = 0;
 class Message
 {
 protected:
-    /** The message. */
-    core::stringw m_message;
-
     /** If this < 0, remove this message from queue. */
     float m_display_timer;
+
+    /** The message. */
+    core::stringw m_message;
 
     /** The area which the message is drawn. */
     core::recti m_area;
@@ -60,7 +60,8 @@ private:
     bool m_inited;
 
 public:
-    Message(float timer) : m_display_timer(timer), m_inited(false) {}
+    Message(float timer, const core::stringw& msg) :
+    m_display_timer(timer), m_message(msg), m_inited(false) {}
     // ------------------------------------------------------------------------
     virtual ~Message() {}
     // ------------------------------------------------------------------------
@@ -107,11 +108,10 @@ protected:
 
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
-        Message(5.0f)
+        Message(5.0f, message)
     {
         m_container = g_container;
         m_message_type = mt;
-        m_message      = message;
         assert(mt != MessageQueue::MT_PROGRESS);
         if (mt == MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
@@ -149,8 +149,8 @@ public:
             return;
         }
 
-        gui::breakGlyphLayouts(m_gls, max_width, font->getInverseShaping(),
-            font->getScale());
+        gui::breakGlyphLayouts(m_gls, (float)max_width,
+            font->getInverseShaping(), font->getScale());
         core::dimension2du dim = gui::getGlyphLayoutsDimension(m_gls,
             font->getHeightPerLine(), font->getInverseShaping(),
             font->getScale());
@@ -227,7 +227,6 @@ public:
     {
         m_container = g_static_container;
         m_message_type = mt;
-        m_message      = message;
         assert(mt != MessageQueue::MT_PROGRESS);
         if (mt == MessageQueue::MT_ACHIEVEMENT)
             m_render_type = "achievement-message::neutral";
@@ -287,24 +286,22 @@ void privateAdd(Message* m)
 }   // privateAdd
 
 // ============================================================================
+/** Global progress bar percentage. */
+std::atomic<int> g_progress(-1);
+
+// ============================================================================
 /** A class which display a progress bar in game, only one can be displayed. */
 class ProgressBarMessage : public Message
 {
 private:
-    std::atomic_int_fast8_t m_progress_value;
-
-    bool m_showing;
-
     SkinWidgetContainer m_swc;
 public:
-    ProgressBarMessage() :
-               Message(9999999.9f)
+    ProgressBarMessage(const core::stringw& msg) :
+               Message(9999999.9f, msg)
     {
-        m_progress_value.store(0);
-        m_showing = false;
     }   // ProgressBarMessage
     // ------------------------------------------------------------------------
-    ~ProgressBarMessage() {}
+    ~ProgressBarMessage()                             { g_progress.store(-1); }
     // ------------------------------------------------------------------------
     /** Returns the type of the message.*/
     virtual MessageQueue::MessageType getMessageType() const
@@ -329,36 +326,18 @@ public:
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
             irr_driver->getDevice()->getMovedHeight());
         GUIEngine::getSkin()->drawProgressBarInScreen(&m_swc, m_area - raise,
-            (float)m_progress_value.load() / 100.0f);
+            (float)g_progress.load() / 100.0f);
         video::SColor color(255, 0, 0, 0);
         GUIEngine::getFont()->draw(m_message, m_area - raise, color, true,
             true);
-        if (m_progress_value.load() >= 100)
-        {
+        if (g_progress.load() >= 100)
             m_display_timer = -1.0f;
-            m_showing = false;
-        }
     }
     // ------------------------------------------------------------------------
-    void setProgress(int progress, const core::stringw& msg)
-    {
-        if (progress < 0)
-            return;
-        if (progress > 100)
-            progress = 100;
-        m_progress_value.store((int_fast8_t)progress);
-        if (!m_showing && progress == 0)
-        {
-            m_showing = true;
-            m_message = msg;
-            privateAdd(this);
-        }
-    }
+    virtual void remove()                                      { delete this; }
+
 };   // class ProgressBarMessage
 
-// ============================================================================
-/** One instance of progress bar. */
-ProgressBarMessage g_progress_bar_msg;
 // ============================================================================
 /** Called when the screen resolution is changed to compute the new
  *  position of the message. */
@@ -450,7 +429,7 @@ void update(float dt)
  *  bar will display in the game, the time the value of progress become 100,
  *  the progress bar will disappear. So make sure only 1 progress bar is being
  *  used each time.
- *  \param progress Progress from 0 to 100.
+ *  \param progress Progress from 0 to 100, -1 to reset
  */
 void showProgressBar(int progress, const core::stringw& msg)
 {
@@ -458,7 +437,13 @@ void showProgressBar(int progress, const core::stringw& msg)
     if (GUIEngine::isNoGraphics())
         return;
 
-    g_progress_bar_msg.setProgress(progress, msg);
+    if (g_progress.load() == -1 && progress >= 0)
+    {
+        g_progress.store(progress);
+        privateAdd(new ProgressBarMessage(msg));
+    }
+    else
+        g_progress.store(progress);
 #endif
 }   // showProgressBar
 
