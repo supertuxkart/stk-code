@@ -223,21 +223,12 @@ public:
 class StaticTextMessage : public TextMessage
 {
 public:
-    StaticTextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
+    StaticTextMessage(MessageQueue::MessageType mt,
+                      const core::stringw& message) :
         TextMessage(mt, message)
     {
         m_container = g_static_container.get();
-        m_message_type = mt;
-        assert(mt != MessageQueue::MT_PROGRESS);
-        if (mt == MessageQueue::MT_ACHIEVEMENT)
-            m_render_type = "achievement-message::neutral";
-        else if (mt == MessageQueue::MT_ERROR)
-            m_render_type = "error-message::neutral";
-        else if (mt == MessageQueue::MT_GENERIC)
-            m_render_type = "generic-message::neutral";
-        else
-            m_render_type = "friend-message::neutral";
-    }   // Message
+    }   // StaticTextMessage
     // ------------------------------------------------------------------------
     ~StaticTextMessage()
     {
