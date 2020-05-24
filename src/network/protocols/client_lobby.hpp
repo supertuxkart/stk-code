@@ -48,6 +48,7 @@ struct LobbyPlayer
     /* Icon used in networking lobby, see NetworkingLobby::loadedFromFile. */
     int m_icon_id;
     std::string m_country_code;
+    uint8_t m_os_type; // client OS type
     /* Icon id for spectator in NetworkingLobby::loadedFromFile is 5. */
     bool isSpectator() const { return m_icon_id == 5; }
     bool isAI() const { return m_icon_id == 6; }

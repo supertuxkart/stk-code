@@ -567,6 +567,11 @@ void NetworkingLobby::updatePlayerPings()
             name_with_ping += L" ";
             name_with_ping += flag;
         }
+        // Show a Mobile emoji for mobile OS
+        if (p.second.m_os_type > 10)
+        {
+            name_with_ping = StringUtils::utf32ToWide({0x1F4F1}) + name_with_ping;
+        }
         auto host_online_ids = StringUtils::splitToUInt(p.first, '_');
         if (host_online_ids.size() != 3)
             continue;
@@ -766,6 +771,11 @@ void NetworkingLobby::updatePlayers()
         {
             player_name += L" ";
             player_name += flag;
+        }
+        // Show a Mobile emoji for mobile OS
+        if (player.m_os_type > 10)
+        {
+            player_name = StringUtils::utf32ToWide({0x1F4F1}) + player_name;
         }
         m_player_list->addItem(internal_name, player_name,
             player.m_icon_id);
