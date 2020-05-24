@@ -825,7 +825,6 @@ void ClientLobby::updatePlayerList(Event* event)
             std::get<2>(local_players.at(local_id)) = lp.m_handicap;
         }
         data.decodeString(&lp.m_country_code);
-        lp.m_os_type = data.getUInt8(); // OS type
         m_lobby_players.push_back(lp);
     }
     STKHost::get()->setAuthorisedToControl(client_server_owner);

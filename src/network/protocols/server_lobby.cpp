@@ -3808,9 +3808,23 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         .addUInt8((uint8_t)all_profiles.size());
     for (auto profile : all_profiles)
     {
-        pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
-            .addUInt8(profile->getLocalPlayerId())
-            .encodeString(profile->getName());
+        // get OS information
+        auto version_os = StringUtils::extractVersionOS(profile->getPeer()->getUserVersion());
+        std::string os_type_str = version_os.second;
+        // if mobile OS
+        if (os_type_str == "iOS" || os_type_str == "Android")
+        { // Add a Mobile emoji for mobile OS
+            pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
+                .addUInt8(profile->getLocalPlayerId())
+                .encodeString(StringUtils::utf32ToWide({0x1F4F1}) + profile->getName());
+        }
+        else
+        {
+            pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
+                .addUInt8(profile->getLocalPlayerId())
+                .encodeString(profile->getName());
+        }
+
         std::shared_ptr<STKPeer> p = profile->getPeer();
         uint8_t boolean_combine = 0;
         if (p && p->isWaitingForGame())
@@ -3836,27 +3850,6 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             pl->addUInt8(KART_TEAM_NONE);
         pl->encodeString(profile->getCountryCode());
 
-        // send OS information
-        auto version_os = StringUtils::extractVersionOS(profile->getPeer()->getUserVersion());
-        std::string os_type_str = version_os.second;
-        uint8_t os_type = 0; // 0: unknown OS
-        // mobile OS > 10
-        if (os_type_str == "iOS")
-            os_type = 11;
-        else if (os_type_str == "Android")
-            os_type = 12;
-        // desktop OS from 1 to 10
-        else if (os_type_str == "Linux")
-            os_type = 1;
-        else if (os_type_str == "Windows")
-            os_type = 2;
-        else if (os_type_str == "Macintosh")
-            os_type = 3;
-        else if (os_type_str == "FreeBSD")
-            os_type = 4;
-        else
-            os_type = 0; // unknown OS
-        pl->addUInt8(os_type);
     }
 
     // Don't send this message to in-game players
