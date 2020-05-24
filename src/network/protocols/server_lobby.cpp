@@ -3849,7 +3849,6 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         else
             pl->addUInt8(KART_TEAM_NONE);
         pl->encodeString(profile->getCountryCode());
-
     }
 
     // Don't send this message to in-game players
