@@ -375,7 +375,7 @@ void ServerSelection::onUpdate(float dt)
         sid->requestJoin();
     }
     
-    if (m_server_list->m_list_updated && !m_refreshing_server &&
+    if (m_server_list && m_server_list->m_list_updated && !m_refreshing_server &&
         !NetworkConfig::get()->isWAN())
     {
         m_refresh_timer += dt;
@@ -396,7 +396,7 @@ void ServerSelection::onUpdate(float dt)
 
     if (!m_refreshing_server) return;
 
-    if (m_server_list->m_list_updated)
+    if (m_server_list && m_server_list->m_list_updated)
     {
         m_refreshing_server = false;
         if (!m_server_list->m_servers.empty())
@@ -430,6 +430,8 @@ void ServerSelection::onUpdate(float dt)
 // ----------------------------------------------------------------------------
 void ServerSelection::copyFromServerList()
 {
+    if (!m_server_list)
+        return;
     m_servers = m_server_list->m_servers;
     if (m_servers.empty())
         return;
