@@ -776,14 +776,25 @@ void ServerLobby::handleChat(Event* event)
 
     core::stringw message;
     event->data().decodeString16(&message, 360/*max_len*/);
+
+    KartTeam target_team = KART_TEAM_NONE;
+    if (event->data().size() > 0)
+        target_team = (KartTeam)event->data().getUInt8();
+
     if (message.size() > 0)
     {
+        // Red or blue square emoji
+        if (target_team == KART_TEAM_RED)
+            message = StringUtils::utf32ToWide({0x1f7e5, 0x20}) + message;
+        else if (target_team == KART_TEAM_BLUE)
+            message = StringUtils::utf32ToWide({0x1f7e6, 0x20}) + message;
+
         NetworkString* chat = getNetworkString();
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
         const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
         STKHost::get()->sendPacketToAllPeersWith(
-            [game_started, sender_in_game](STKPeer* p)
+            [game_started, sender_in_game, target_team](STKPeer* p)
             {
                 if (game_started)
                 {
@@ -791,6 +802,17 @@ void ServerLobby::handleChat(Event* event)
                         return false;
                     if (!p->isWaitingForGame() && sender_in_game)
                         return false;
+                    if (target_team != KART_TEAM_NONE)
+                    {
+                        if (p->isSpectator())
+                            return false;
+                        for (auto& player : p->getPlayerProfiles())
+                        {
+                            if (player->getTeam() == target_team)
+                                return true;
+                        }
+                        return false;
+                    }
                 }
                 return true;
             }, chat);
@@ -1525,7 +1547,9 @@ void ServerLobby::asynchronousUpdate()
             m_item_seed = (uint32_t)StkTime::getTimeSinceEpoch();
             ItemManager::updateRandomSeed(m_item_seed);
             m_game_setup->setRace(winner_vote);
-            auto players = STKHost::get()->getPlayersForNewGame();
+            bool has_always_on_spectators = false;
+            auto players = STKHost::get()
+                ->getPlayersForNewGame(&has_always_on_spectators);
             auto ai_instance = m_ai_peer.lock();
             if (supportsAI())
             {
@@ -1595,6 +1619,10 @@ void ServerLobby::asynchronousUpdate()
             resetPeersReady();
             m_state = LOAD_WORLD;
             sendMessageToPeers(load_world_message);
+            // updatePlayerList so the in lobby players (if any) can see always
+            // spectators join the game
+            if (has_always_on_spectators)
+                updatePlayerList();
             delete load_world_message;
         }
         break;
@@ -2405,13 +2433,37 @@ void ServerLobby::startSelection(const Event *event)
     // Remove karts / tracks from server that are not supported on all clients
     std::set<std::string> karts_erase, tracks_erase;
     auto peers = STKHost::get()->getPeers();
+    std::set<STKPeer*> always_spectate_peers;
+    bool has_peer_plays_game = false;
     for (auto peer : peers)
     {
         if (!peer->isValidated() || peer->isWaitingForGame())
             continue;
         peer->eraseServerKarts(m_available_kts.first, karts_erase);
         peer->eraseServerTracks(m_available_kts.second, tracks_erase);
+        if (peer->alwaysSpectate())
+            always_spectate_peers.insert(peer.get());
+        else if (!peer->isAIPeer())
+            has_peer_plays_game = true;
     }
+
+    // Disable always spectate peers if no players join the game
+    if (!has_peer_plays_game)
+    {
+        for (STKPeer* peer : always_spectate_peers)
+            peer->setAlwaysSpectate(false);
+        always_spectate_peers.clear();
+    }
+    else
+    {
+        // We make those always spectate peer waiting for game so it won't
+        // be able to vote, this will be reset in STKHost::getPlayersForNewGame
+        // This will also allow a correct number of in game players for max
+        // arena players handling
+        for (STKPeer* peer : always_spectate_peers)
+            peer->setWaitingForGame(true);
+    }
+
     for (const std::string& kart_erase : karts_erase)
     {
         m_available_kts.first.erase(kart_erase);
@@ -2460,27 +2512,16 @@ void ServerLobby::startSelection(const Event *event)
                 it++;
         }
     }
-    // Default vote use only official tracks to prevent network AI cannot
-    // finish some bad wip / addons tracks
-    std::set<std::string> official_tracks = m_official_kts.second;
-    std::set<std::string>::iterator it = official_tracks.begin();
-    while (it != official_tracks.end())
+
+    if (m_available_kts.second.empty())
     {
-        if (m_available_kts.second.find(*it) == m_available_kts.second.end())
-        {
-            it = official_tracks.erase(it);
-        }
-        else
-            it++;
-    }
-    if (official_tracks.empty())
-    {
-        Log::error("ServerLobby", "No official tracks for playing!");
+        Log::error("ServerLobby", "No tracks for playing!");
         return;
     }
+
     RandomGenerator rg;
-    it = official_tracks.begin();
-    std::advance(it, rg.get((int)official_tracks.size()));
+    std::set<std::string>::iterator it = m_available_kts.second.begin();
+    std::advance(it, rg.get((int)m_available_kts.second.size()));
     m_default_vote->m_track_name = *it;
     switch (RaceManager::get()->getMinorMode())
     {
@@ -2567,6 +2608,19 @@ void ServerLobby::startSelection(const Event *event)
     delete ns;
 
     m_state = SELECTING;
+    if (!always_spectate_peers.empty())
+    {
+        NetworkString* back_lobby = getNetworkString(2);
+        back_lobby->setSynchronous(true);
+        back_lobby->addUInt8(LE_BACK_LOBBY).addUInt8(BLR_SPECTATING_NEXT_GAME);
+        STKHost::get()->sendPacketToAllPeersWith(
+            [always_spectate_peers](STKPeer* peer) {
+            return always_spectate_peers.find(peer) !=
+            always_spectate_peers.end(); }, back_lobby, /*reliable*/true);
+        delete back_lobby;
+        updatePlayerList();
+    }
+
     if (!allowJoinedPlayersWaiting())
     {
         // Drop all pending players and keys if doesn't allow joinning-waiting
@@ -3493,8 +3547,11 @@ void ServerLobby::handleUnencryptedConnection(std::shared_ptr<STKPeer> peer,
     {
         core::stringw name;
         data.decodeStringW(&name);
+        // 30 to make it consistent with stk-addons max user name length
         if (name.empty())
             name = L"unnamed";
+        else if (name.size() > 30)
+            name = name.subString(0, 30);
         float default_kart_color = data.getFloat();
         HandicapLevel handicap = (HandicapLevel)data.getUInt8();
         auto player = std::make_shared<NetworkPlayerProfile>
@@ -3699,6 +3756,12 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         !update_when_reset_server;
 
     auto all_profiles = STKHost::get()->getAllPlayerProfiles();
+    size_t all_profiles_size = all_profiles.size();
+    for (auto& profile : all_profiles)
+    {
+        if (profile->getPeer()->alwaysSpectate())
+            all_profiles_size--;
+    }
     // N - 1 AI
     auto ai_instance = m_ai_peer.lock();
     if (supportsAI())
@@ -3709,12 +3772,12 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
             if (m_state.load() == WAITING_FOR_START_GAME ||
                 update_when_reset_server)
             {
-                if (all_profiles.size() > ai_profiles.size())
+                if (all_profiles_size > ai_profiles.size())
                     ai_profiles.clear();
-                else if (!all_profiles.empty())
+                else if (all_profiles_size != 0)
                 {
                     ai_profiles.resize(
-                        ai_profiles.size() - all_profiles.size() + 1);
+                        ai_profiles.size() - all_profiles_size + 1);
                 }
             }
             else
@@ -3745,14 +3808,30 @@ void ServerLobby::updatePlayerList(bool update_when_reset_server)
         .addUInt8((uint8_t)all_profiles.size());
     for (auto profile : all_profiles)
     {
-        pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
-            .addUInt8(profile->getLocalPlayerId())
-            .encodeString(profile->getName());
+        // get OS information
+        auto version_os = StringUtils::extractVersionOS(profile->getPeer()->getUserVersion());
+        std::string os_type_str = version_os.second;
+        // if mobile OS
+        if (os_type_str == "iOS" || os_type_str == "Android")
+        { // Add a Mobile emoji for mobile OS
+            pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
+                .addUInt8(profile->getLocalPlayerId())
+                .encodeString(StringUtils::utf32ToWide({0x1F4F1}) + profile->getName());
+        }
+        else
+        {
+            pl->addUInt32(profile->getHostId()).addUInt32(profile->getOnlineId())
+                .addUInt8(profile->getLocalPlayerId())
+                .encodeString(profile->getName());
+        }
+
         std::shared_ptr<STKPeer> p = profile->getPeer();
         uint8_t boolean_combine = 0;
         if (p && p->isWaitingForGame())
             boolean_combine |= 1;
-        if (p && p->isSpectator())
+        if (p && (p->isSpectator() ||
+            ((m_state.load() == WAITING_FOR_START_GAME ||
+            update_when_reset_server) && p->alwaysSpectate())))
             boolean_combine |= (1 << 1);
         if (p && m_server_owner_id.load() == p->getHostId())
             boolean_combine |= (1 << 2);
@@ -4391,7 +4470,8 @@ void ServerLobby::configPeersStartTime()
     for (auto p : m_peers_ready)
     {
         auto peer = p.first.lock();
-        if (!peer)
+        // Spectators don't send input so we don't need to delay for them
+        if (!peer || peer->alwaysSpectate())
             continue;
         if (peer->getAveragePing() > max_ping_from_peers)
         {
@@ -5245,7 +5325,7 @@ bool ServerLobby::checkPeersReady(bool ignore_ai_peer) const
 
 //-----------------------------------------------------------------------------
 void ServerLobby::handleServerCommand(Event* event,
-                                      std::shared_ptr<STKPeer> peer) const
+                                      std::shared_ptr<STKPeer> peer)
 {
     NetworkString& data = event->data();
     std::string language;
@@ -5255,7 +5335,54 @@ void ServerLobby::handleServerCommand(Event* event,
     auto argv = StringUtils::split(cmd, ' ');
     if (argv.size() == 0)
         return;
-    if (argv[0] == "listserveraddon")
+    if (argv[0] == "spectate")
+    {
+        if (m_game_setup->isGrandPrix() || !ServerConfig::m_live_players)
+        {
+            NetworkString* chat = getNetworkString();
+            chat->addUInt8(LE_CHAT);
+            chat->setSynchronous(true);
+            std::string msg = "Server doesn't support spectate";
+            chat->encodeString16(StringUtils::utf8ToWide(msg));
+            peer->sendPacket(chat, true/*reliable*/);
+            delete chat;
+            return;
+        }
+
+        if (argv.size() != 2 || (argv[1] != "0" && argv[1] != "1") ||
+            m_state.load() != WAITING_FOR_START_GAME)
+        {
+            NetworkString* chat = getNetworkString();
+            chat->addUInt8(LE_CHAT);
+            chat->setSynchronous(true);
+            std::string msg = "Usage: spectate [0 or 1], before game started";
+            chat->encodeString16(StringUtils::utf8ToWide(msg));
+            peer->sendPacket(chat, true/*reliable*/);
+            delete chat;
+            return;
+        }
+
+        if (argv[1] == "1")
+        {
+            if (m_process_type == PT_CHILD &&
+                peer->getHostId() == m_client_server_host_id.load())
+            {
+                NetworkString* chat = getNetworkString();
+                chat->addUInt8(LE_CHAT);
+                chat->setSynchronous(true);
+                std::string msg = "Graphical client server cannot spectate";
+                chat->encodeString16(StringUtils::utf8ToWide(msg));
+                peer->sendPacket(chat, true/*reliable*/);
+                delete chat;
+                return;
+            }
+            peer->setAlwaysSpectate(true);
+        }
+        else
+            peer->setAlwaysSpectate(false);
+        updatePlayerList();
+    }
+    else if (argv[0] == "listserveraddon")
     {
         NetworkString* chat = getNetworkString();
         chat->addUInt8(LE_CHAT);

@@ -1174,6 +1174,8 @@ void ClientLobby::backToLobby(Event *event)
 
     NetworkString &data = event->data();
     core::stringw msg;
+    MessageQueue::MessageType mt = MessageQueue::MT_ERROR;
+
     switch ((BackLobbyReason)data.getUInt8()) // the second byte
     {
     case BLR_NO_GAME_FOR_LIVE_JOIN:
@@ -1192,15 +1194,23 @@ void ClientLobby::backToLobby(Event *event)
         // I18N: Error message shown when all players will go back to lobby
         // when server owner quited the game
         if (!STKHost::get()->isClientServer())
-            msg = _("Server owner quit the game");
+            msg = _("Server owner quit the game.");
+        break;
+    case BLR_SPECTATING_NEXT_GAME:
+        // I18N: Status shown to player when he will be spectating the next game
+        msg = _("You will be spectating the next game.");
+        mt = MessageQueue::MT_GENERIC;
         break;
     default:
         break;
     }
     if (!msg.empty())
     {
-        SFXManager::get()->quickSound("anvil");
-        MessageQueue::add(MessageQueue::MT_ERROR, msg);
+        if (mt == MessageQueue::MT_GENERIC)
+            SFXManager::get()->quickSound("plopp");
+        else
+            SFXManager::get()->quickSound("anvil");
+        MessageQueue::add(mt, msg);
     }
 }   // backToLobby
 
@@ -1393,7 +1403,7 @@ void ClientLobby::startLiveJoinKartSelection()
 }   // startLiveJoinKartSelection
 
 // ----------------------------------------------------------------------------
-void ClientLobby::sendChat(irr::core::stringw text)
+void ClientLobby::sendChat(irr::core::stringw text, KartTeam team)
 {
     text = text.trim().removeChars(L"\n\r");
     if (text.size() > 0)
@@ -1409,6 +1419,9 @@ void ClientLobby::sendChat(irr::core::stringw text)
         else
             name = player->getName();
         chat->encodeString16(name + L": " + text, 1000/*max_len*/);
+
+        if (team != KART_TEAM_NONE)
+            chat->addUInt8(team);
 
         STKHost::get()->sendToServer(chat, true);
         delete chat;

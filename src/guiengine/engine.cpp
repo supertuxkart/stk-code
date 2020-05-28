@@ -838,7 +838,6 @@ namespace GUIEngine
         needsUpdate.clearWithoutDeleting();
 
         gui_messages.clear();
-        MessageQueue::clear();
     }   // clear
 
     // ------------------------------------------------------------------------

@@ -56,6 +56,29 @@
 #ifdef ANDROID
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #include "graphics/irr_driver.hpp"
+
+std::vector<std::pair<std::string, int> >* g_list = NULL;
+
+#define MAKE_ADD_DNS_SRV_RECORD_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_addDNSSrvRecords(JNIEnv* env, jobject this_obj, jstring name, jint weight)
+#define ANDROID_ADD_DNS_SRV_RECORD_CALLBACK(PKG_NAME) MAKE_ADD_DNS_SRV_RECORD_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_ADD_DNS_SRV_RECORD_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    if (!g_list || name == NULL)
+        return;
+    const uint16_t* utf16_text =
+        (const uint16_t*)env->GetStringChars(name, NULL);
+    if (utf16_text == NULL)
+        return;
+    const size_t str_len = env->GetStringLength(name);
+    std::string tmp;
+    utf8::unchecked::utf16to8(
+        utf16_text, utf16_text + str_len, std::back_inserter(tmp));
+    g_list->emplace_back(tmp, weight);
+    env->ReleaseStringChars(name, utf16_text);
+}
+
 #endif
 
 NetworkConfig *NetworkConfig::m_network_config[PT_COUNT];
@@ -294,8 +317,10 @@ void NetworkConfig::detectIPType()
     auto& stunv4_map = UserConfigParams::m_stun_servers_v4;
     for (auto& s : getStunList(true/*ipv4*/))
     {
-        if (stunv4_map.find(s) == stunv4_map.end())
-            stunv4_map[s] = 0;
+        if (s.second == 0)
+            stunv4_map.erase(s.first);
+        else if (stunv4_map.find(s.first) == stunv4_map.end())
+            stunv4_map[s.first] = 0;
     }
     if (stunv4_map.empty())
         return;
@@ -306,8 +331,10 @@ void NetworkConfig::detectIPType()
     auto& stunv6_map = UserConfigParams::m_stun_servers;
     for (auto& s : getStunList(false/*ipv4*/))
     {
-        if (stunv6_map.find(s) == stunv6_map.end())
-            stunv6_map[s] = 0;
+        if (s.second == 0)
+            stunv6_map.erase(s.first);
+        else if (stunv6_map.find(s.first) == stunv6_map.end())
+            stunv6_map[s.first] = 0;
     }
     if (stunv6_map.empty())
         return;
@@ -432,7 +459,7 @@ void NetworkConfig::detectIPType()
 }   // detectIPType
 
 // ----------------------------------------------------------------------------
-void NetworkConfig::fillStunList(std::vector<std::string>& l,
+void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
                                  const std::string& dns)
 {
 #if defined(WIN32)
@@ -445,9 +472,10 @@ void NetworkConfig::fillStunList(std::vector<std::string>& l,
         {
             if (curr->wType == DNS_TYPE_SRV)
             {
-                l.push_back(
+                l->emplace_back(
                     StringUtils::wideToUtf8(curr->Data.SRV.pNameTarget) +
-                    ":" + StringUtils::toString(curr->Data.SRV.wPort));
+                    ":" + StringUtils::toString(curr->Data.SRV.wPort),
+                    curr->Data.SRV.wWeight);
             }
         }
         DnsRecordListFree(dns_record, DnsFreeRecordListDeep);
@@ -498,7 +526,7 @@ void NetworkConfig::fillStunList(std::vector<std::string>& l,
     }
 
     jmethodID method_id = env->GetMethodID(class_native_activity,
-        "getDNSSrvRecords", "(Ljava/lang/String;)[Ljava/lang/String;");
+        "getDNSSrvRecords", "(Ljava/lang/String;)V");
 
     if (method_id == NULL)
     {
@@ -527,40 +555,16 @@ void NetworkConfig::fillStunList(std::vector<std::string>& l,
         return;
     }
 
-    jobjectArray arr =
-        (jobjectArray)env->CallObjectMethod(native_activity, method_id, text);
-    if (arr == NULL)
-    {
-        Log::error("NetworkConfig", "No array is created.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
-        return;
-    }
-    int len = env->GetArrayLength(arr);
-    for (int i = 0; i < len; i++)
-    {
-        jstring jstr = (jstring)(env->GetObjectArrayElement(arr, i));
-        if (!jstr)
-            continue;
-        const uint16_t* utf16_text =
-            (const uint16_t*)env->GetStringChars(jstr, NULL);
-        if (utf16_text == NULL)
-            continue;
-        const size_t str_len = env->GetStringLength(jstr);
-        std::string tmp;
-        utf8::unchecked::utf16to8(
-            utf16_text, utf16_text + str_len, std::back_inserter(tmp));
-        l.push_back(tmp);
-        env->ReleaseStringChars(jstr, utf16_text);
-    }
+    g_list = l;
+    env->CallVoidMethod(native_activity, method_id, text);
     if (was_detached)
     {
         android->activity->vm->DetachCurrentThread();
     }
+    g_list = NULL;
 
 #else
+#define SRV_WEIGHT (RRFIXEDSZ+2)
 #define SRV_PORT (RRFIXEDSZ+4)
 #define SRV_SERVER (RRFIXEDSZ+6)
 #define SRV_FIXEDSZ (RRFIXEDSZ+6)
@@ -608,28 +612,30 @@ void NetworkConfig::fillStunList(std::vector<std::string>& l,
             if (ns_name_ntop(srv[i] + SRV_SERVER, server_name, 512) < 0)
                 continue;
             uint16_t port = ns_get16(srv[i] + SRV_PORT);
-            l.push_back(std::string(server_name) + ":" +
-                StringUtils::toString(port));
+            uint16_t weight = ns_get16(srv[i] + SRV_WEIGHT);
+            l->emplace_back(std::string(server_name) + ":" +
+                StringUtils::toString(port), weight);
         }
     }
 #endif
 }   // fillStunList
 
 // ----------------------------------------------------------------------------
-const std::vector<std::string>& NetworkConfig::getStunList(bool ipv4)
+const std::vector<std::pair<std::string, int> >&
+                                          NetworkConfig::getStunList(bool ipv4)
 {
-    static std::vector<std::string> ipv4_list;
-    static std::vector<std::string> ipv6_list;
+    static std::vector<std::pair<std::string, int> > ipv4_list;
+    static std::vector<std::pair<std::string, int> > ipv6_list;
     if (ipv4)
     {
         if (ipv4_list.empty())
-            NetworkConfig::fillStunList(ipv4_list, stk_config->m_stun_ipv4);
+            NetworkConfig::fillStunList(&ipv4_list, stk_config->m_stun_ipv4);
         return ipv4_list;
     }
     else
     {
         if (ipv6_list.empty())
-            NetworkConfig::fillStunList(ipv6_list, stk_config->m_stun_ipv6);
+            NetworkConfig::fillStunList(&ipv6_list, stk_config->m_stun_ipv6);
         return ipv6_list;
     }
 }   // getStunList

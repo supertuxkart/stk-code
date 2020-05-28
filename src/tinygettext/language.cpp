@@ -258,6 +258,7 @@ static const LanguageSpec languages[] = {
   { "sv", "SE", 0, "Swedish (Sweden)"            },
   { "sv", "SV", 0, "Swedish (El Salvador)"       },
   { "sw", 0,    0, "Swahili"                     },
+  { "szl", 0,   0, "Silesian"                    },
   { "ta", 0,    0, "Tamil"                       },
   { "te", 0,    0, "Telugu"                      },
   { "tg", 0,    0, "Tajik"                       },

@@ -169,7 +169,7 @@ public:
     bool isSpectator() const
                      { return m_spectator && m_state.load() != RACE_FINISHED; }
     void startLiveJoinKartSelection();
-    void sendChat(irr::core::stringw text);
+    void sendChat(irr::core::stringw text, KartTeam team);
     const std::vector<LobbyPlayer>& getLobbyPlayers() const
                                                     { return m_lobby_players; }
     bool isServerLiveJoinable() const        { return m_server_live_joinable; }

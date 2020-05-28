@@ -594,8 +594,13 @@ void IrrDriver::initDevice()
 
 #ifdef ENABLE_RECORDER
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
-        [] (void* user_data) { MessageQueue::add
-        (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
+        [] (void* user_data)
+        {
+            // Make sure reset progress bar each time
+            MessageQueue::showProgressBar(-1, L"");
+            MessageQueue::add
+            (MessageQueue::MT_GENERIC, _("Video recording started."));
+        }, NULL);
     ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
         [](const char* s, void* user_data)
         { Log::error("openglrecorder", "%s", s); }, NULL);

@@ -638,15 +638,19 @@ void STKHost::setPublicAddress(short family)
     auto& stunv4_map = UserConfigParams::m_stun_servers_v4;
     for (auto& s : NetworkConfig::getStunList(true/*ipv4*/))
     {
-        if (stunv4_map.find(s) == stunv4_map.end())
-            stunv4_map[s] = 0;
+        if (s.second == 0)
+            stunv4_map.erase(s.first);
+        else if (stunv4_map.find(s.first) == stunv4_map.end())
+            stunv4_map[s.first] = 0;
     }
 
     auto& stunv6_map = UserConfigParams::m_stun_servers;
     for (auto& s : NetworkConfig::getStunList(false/*ipv4*/))
     {
-        if (stunv6_map.find(s) == stunv6_map.end())
-            stunv6_map[s] = 0;
+        if (s.second == 0)
+            stunv6_map.erase(s.first);
+        else if (stunv6_map.find(s.first) == stunv6_map.end())
+            stunv6_map[s.first] = 0;
     }
 
     auto& stun_map = family == AF_INET ? UserConfigParams::m_stun_servers_v4 :
@@ -1524,13 +1528,21 @@ std::pair<int, int> STKHost::getAllPlayersTeamInfo() const
 /** Get the players for starting a new game.
  *  \return A vector containing pointers on the players profiles. */
 std::vector<std::shared_ptr<NetworkPlayerProfile> >
-    STKHost::getPlayersForNewGame() const
+    STKHost::getPlayersForNewGame(bool* has_always_on_spectators) const
 {
     std::vector<std::shared_ptr<NetworkPlayerProfile> > players;
     std::lock_guard<std::mutex> lock(m_peers_mutex);
     for (auto& p : m_peers)
     {
         auto& stk_peer = p.second;
+        // Handle always spectate for peer
+        if (has_always_on_spectators && stk_peer->alwaysSpectate())
+        {
+            *has_always_on_spectators = true;
+            stk_peer->setWaitingForGame(false);
+            stk_peer->setSpectator(true);
+            continue;
+        }
         if (stk_peer->isWaitingForGame())
             continue;
         if (ServerConfig::m_ai_handling && stk_peer->isAIPeer())

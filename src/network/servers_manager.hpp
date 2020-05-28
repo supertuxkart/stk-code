@@ -36,28 +36,26 @@ class XMLNode;
  * \brief
  * \ingroup online
  */
+struct ServerList
+{
+    /** List of servers */
+    std::vector<std::shared_ptr<Server> > m_servers;
+    std::atomic_bool m_list_updated;
+    ServerList() { m_list_updated.store(false); }
+};
+
 class ServersManager
 {
 private:
-    /** List of servers */
-    std::vector<std::shared_ptr<Server> > m_servers;
-    
     /** List of broadcast addresses to use. */
     std::vector<SocketAddress> m_broadcast_address;
 
-    std::atomic<int64_t> m_last_load_time;
-
-    std::atomic_bool m_list_updated;
     // ------------------------------------------------------------------------
      ServersManager();
     // ------------------------------------------------------------------------
     ~ServersManager();
     // ------------------------------------------------------------------------
     void setWanServers(bool success, const XMLNode* input);
-    // ------------------------------------------------------------------------
-    std::shared_ptr<Online::XMLRequest> getWANRefreshRequest() const;
-    // ------------------------------------------------------------------------
-    std::shared_ptr<Online::XMLRequest> getLANRefreshRequest() const;
     // ------------------------------------------------------------------------
     void setLanServers(const std::map<irr::core::stringw, 
                                       std::shared_ptr<Server> >& servers);
@@ -72,20 +70,11 @@ public:
     // ------------------------------------------------------------------------
     static void deallocate();
     // ------------------------------------------------------------------------
-    void cleanUpServers()                                { m_servers.clear(); }
-    // ------------------------------------------------------------------------
-    bool refresh(bool full_refresh);
-    // ------------------------------------------------------------------------
-    std::vector<std::shared_ptr<Server> >& getServers()   { return m_servers; }
-    // ------------------------------------------------------------------------
-    bool listUpdated() const                         { return m_list_updated; }
-    // ------------------------------------------------------------------------
     std::vector<SocketAddress> getBroadcastAddresses(bool ipv6);
     // ------------------------------------------------------------------------
-    void reset()
-    {
-        m_last_load_time.store(-5000);
-        m_list_updated = false;
-    }
+    std::shared_ptr<ServerList> getWANRefreshRequest() const;
+    // ------------------------------------------------------------------------
+    std::shared_ptr<ServerList> getLANRefreshRequest() const;
+
 };   // class ServersManager
 #endif // HEADER_SERVERS_MANAGER_HPP

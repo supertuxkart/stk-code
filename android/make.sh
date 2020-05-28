@@ -297,7 +297,7 @@ if [ ! -f "$DIRNAME/obj/zlib.stamp" ]; then
 
     cd "$DIRNAME/obj/zlib"
     cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST -DCMAKE_C_FLAGS="-fpic" &&
+            -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/zlib.stamp"
@@ -312,9 +312,10 @@ if [ ! -f "$DIRNAME/obj/libpng.stamp" ]; then
 
     cd "$DIRNAME/obj/libpng"
     cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST                                                  \
+            -DHOST=$HOST -DARCH=$ARCH                                     \
             -DZLIB_LIBRARY="$DIRNAME/obj/zlib/libz.a"                     \
             -DZLIB_INCLUDE_DIR="$DIRNAME/obj/zlib/"                       \
+            -DM_LIBRARY="$DIRNAME/obj/sysroot/usr/lib/$HOST/libm.a"       \
             -DPNG_TESTS=0 -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
@@ -396,7 +397,7 @@ if [ ! -f "$DIRNAME/obj/openal.stamp" ]; then
 
     cd "$DIRNAME/obj/openal"
     cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST                                                  \
+            -DHOST=$HOST -DARCH=$ARCH                                     \
             -DALSOFT_UTILS=0                                              \
             -DALSOFT_EXAMPLES=0                                           \
             -DALSOFT_TESTS=0                                              \
@@ -440,18 +441,18 @@ if [ ! -f "$DIRNAME/obj/curl.stamp" ]; then
     touch "$DIRNAME/obj/curl.stamp"
 fi
 
-# Jpeglib
-if [ ! -f "$DIRNAME/obj/jpeglib.stamp" ]; then
-    echo "Compiling jpeglib"
-    mkdir -p "$DIRNAME/obj/jpeglib"
-    cp -a -f "$DIRNAME/../lib/jpeglib/"* "$DIRNAME/obj/jpeglib"
+# Libjpeg
+if [ ! -f "$DIRNAME/obj/libjpeg.stamp" ]; then
+    echo "Compiling libjpeg"
+    mkdir -p "$DIRNAME/obj/libjpeg"
+    cp -a -f "$DIRNAME/../lib/libjpeg/"* "$DIRNAME/obj/libjpeg"
 
-    cd "$DIRNAME/obj/jpeglib"
+    cd "$DIRNAME/obj/libjpeg"
     cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST -DCMAKE_C_FLAGS="-fpic" &&
+            -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
-    touch "$DIRNAME/obj/jpeglib.stamp"
+    touch "$DIRNAME/obj/libjpeg.stamp"
 fi
 
 # Libogg

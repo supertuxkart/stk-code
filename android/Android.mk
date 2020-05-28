@@ -52,8 +52,8 @@ include $(CLEAR_VARS)
 
 
 # JPEG
-LOCAL_MODULE := jpeglib
-LOCAL_SRC_FILES := obj/jpeglib/libjpeglib.a
+LOCAL_MODULE := libjpeg
+LOCAL_SRC_FILES := obj/libjpeg/libjpeg.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -180,13 +180,13 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)         
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
                       -I../src                           \
-                      -Iobj/jpeglib/                     \
+                      -Iobj/libjpeg/                     \
                       -Iobj/libpng/                      \
                       -Iobj/zlib/                        \
                       -I../lib/sdl2/include/             \
                       -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
 LOCAL_CPPFLAGS     := -std=gnu++0x
-LOCAL_STATIC_LIBRARIES := jpeglib png zlib
+LOCAL_STATIC_LIBRARIES := libjpeg png zlib
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -210,6 +210,8 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/sdl2/src/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/android/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/hidapi/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/virtual/*.c) \
+                      $(wildcard ../lib/sdl2/src/locale/android/*.c) \
+                      $(wildcard ../lib/sdl2/src/locale/*.c) \
                       $(wildcard ../lib/sdl2/src/loadso/dlopen/*.c) \
                       $(wildcard ../lib/sdl2/src/power/*.c) \
                       $(wildcard ../lib/sdl2/src/power/android/*.c) \
@@ -243,7 +245,7 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../src/*.cpp)     \
                       $(wildcard ../src/*/*.cpp)   \
                       $(wildcard ../src/*/*/*.cpp)
-LOCAL_LDLIBS       := -llog -landroid -lEGL -lGLESv1_CM -lGLESv3 -lOpenSLES -ldl
+LOCAL_LDLIBS       := -llog -landroid -lEGL -lGLESv1_CM -lGLESv3 -lOpenSLES -ldl -lm
 LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/bullet/src               \
                       -I../lib/libraqm                  \

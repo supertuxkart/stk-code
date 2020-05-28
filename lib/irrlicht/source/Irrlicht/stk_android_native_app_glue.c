@@ -206,6 +206,9 @@ static void process_cmd(struct android_app* app, struct android_poll_source* sou
     android_app_post_exec_cmd(app, cmd);
 }
 
+// From CIrrDeviceAndroid.h
+extern void IrrDeviceAndroid_onCreate();
+
 static void* android_app_entry(void* param) {
     struct android_app* android_app = (struct android_app*)param;
 
@@ -225,6 +228,9 @@ static void* android_app_entry(void* param) {
     ALooper_addFd(looper, android_app->msgread, LOOPER_ID_MAIN, ALOOPER_EVENT_INPUT, NULL,
             &android_app->cmdPollSource);
     android_app->looper = looper;
+
+    // Initialize global variables in android device before android_app->running
+    IrrDeviceAndroid_onCreate();
 
     pthread_mutex_lock(&android_app->mutex);
     android_app->running = 1;
@@ -336,11 +342,19 @@ static void onStart(ANativeActivity* activity) {
     android_app_set_activity_state(app, APP_CMD_START);
 }
 
+// From SDL2 hid.cpp: request permission dialog in usbmanager call onPause which
+// blocks the stk thread (sdl thread too), so if this return true we use
+// android_app_write_cmd directly
+extern int isNonBlockingEnabled();
+
 static void onResume(ANativeActivity* activity) {
     LOGV("Resume: %p\n", activity);
     struct android_app* app = (struct android_app*)activity->instance;
     if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_RESUME);
-    android_app_set_activity_state(app, APP_CMD_RESUME);
+    if (isNonBlockingEnabled() == 1)
+        android_app_write_cmd(app, APP_CMD_RESUME);
+    else
+        android_app_set_activity_state(app, APP_CMD_RESUME);
 }
 
 static void* onSaveInstanceState(ANativeActivity* activity, size_t* outLen) {
@@ -372,7 +386,10 @@ static void onPause(ANativeActivity* activity) {
     LOGV("Pause: %p\n", activity);
     struct android_app* app = (struct android_app*)activity->instance;
     if (app->onAppCmdDirect != NULL) app->onAppCmdDirect(activity, APP_CMD_PAUSE);
-    android_app_set_activity_state(app, APP_CMD_PAUSE);
+    if (isNonBlockingEnabled() == 1)
+        android_app_write_cmd(app, APP_CMD_PAUSE);
+    else
+        android_app_set_activity_state(app, APP_CMD_PAUSE);
 }
 
 static void onStop(ANativeActivity* activity) {
