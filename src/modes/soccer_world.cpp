@@ -23,6 +23,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "graphics/irr_driver.hpp"
+#include "guiengine/message_queue.hpp"
 #include "karts/abstract_kart_animation.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
@@ -43,6 +44,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
+#include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IMeshSceneNode.h>
@@ -627,6 +629,13 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     {
         m_blue_scorers.push_back(sd);
     }
+
+    core::stringw msg;
+    if (sd.m_correct_goal)
+        msg = _("%s scored a goal!", sd.m_player);
+    else
+        msg = _("Oops, %s made an own goal!", sd.m_player);
+    MessageQueue::add(MessageQueue::MT_GENERIC, msg);
 
     if (ticks_now >= ticks_back_to_own_goal && !isStartPhase())
     {
