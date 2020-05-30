@@ -517,6 +517,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
         }
 
+        if(sd.m_correct_goal)
+            Log::info("SoccerWorld", "[Goal] %ls scored a goal", sd.m_player.c_str());
+        else
+            Log::info("SoccerWorld", "[Goal] %ls made an own goal", sd.m_player.c_str());
+
         if (first_goal)
         {
             if (RaceManager::get()->hasTimeTarget())
