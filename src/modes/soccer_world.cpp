@@ -512,18 +512,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             m_karts[m_ball_hitter]->getKartModel()
                 ->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
         }
-
         else if (!sd.m_correct_goal)
         {
             m_karts[m_ball_hitter]->getKartModel()
                 ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
         }
-
-        // log the goal
-        if(sd.m_correct_goal)
-            Log::info("SoccerWorld", "[Goal] %ls scored a goal", sd.m_player.c_str());
-        else
-            Log::info("SoccerWorld", "[Goal] %ls made an own goal", sd.m_player.c_str());
 
 #ifndef SERVER_ONLY
         // show a message once a goal is made
