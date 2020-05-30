@@ -519,10 +519,21 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
                 ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
         }
 
+        // log the goal
         if(sd.m_correct_goal)
             Log::info("SoccerWorld", "[Goal] %ls scored a goal", sd.m_player.c_str());
         else
             Log::info("SoccerWorld", "[Goal] %ls made an own goal", sd.m_player.c_str());
+
+#ifndef SERVER_ONLY
+        // show a message once a goal is made
+        core::stringw msg;
+        if (sd.m_correct_goal)
+            msg = _("%s scored a goal!", sd.m_player);
+        else
+            msg = _("Oops, %s made an own goal!", sd.m_player);
+        MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+#endif
 
         if (first_goal)
         {
@@ -630,6 +641,7 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         m_blue_scorers.push_back(sd);
     }
 
+    // show a message once a goal is made
     core::stringw msg;
     if (sd.m_correct_goal)
         msg = _("%s scored a goal!", sd.m_player);
