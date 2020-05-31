@@ -39,13 +39,13 @@ RegistrationDialog::RegistrationDialog() :
     loadFromFile("online/registration_terms.stkgui");
     LabelWidget* terms_widget = getWidget<LabelWidget>("terms");
 
-    core::stringw terms = _(L"Please read the terms and conditions "
-        L"for SuperTuxKart at '%s'. You must agree "
-        L"to these terms in order to register an account for STK. "
-        L"If you have any questions or comments regarding these "
-        L"terms, one of the members of the development team would gladly "
-        L"assist you.",
-        L"http://terms.supertuxkart.net");
+    core::stringw terms = _("Please read the terms and conditions "
+        "for SuperTuxKart at '%s'. You must agree "
+        "to these terms in order to register an account for STK. "
+        "If you have any questions or comments regarding these "
+        "terms, one of the members of the development team would gladly "
+        "assist you.",
+        "https://supertuxkart.net/Terms");
     terms_widget->setText(terms, false);
 
    // showRegistrationTerms();
