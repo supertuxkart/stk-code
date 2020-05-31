@@ -637,6 +637,8 @@ if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     rm -rf "$STKCODE_DIR/$BUILD_DIR_64BIT-symbols"
     rm -rf "$STKEDITOR_DIR/$BUILD_DIR_32BIT"
     rm -rf "$STKEDITOR_DIR/$BUILD_DIR_64BIT"
+    rm -rf "$STKEDITOR_DIR/$BUILD_DIR_32BIT-symbols"
+    rm -rf "$STKEDITOR_DIR/$BUILD_DIR_64BIT-symbols"
     rm -rf "$STK_INSTALL_DIR"
     exit 0
 fi
