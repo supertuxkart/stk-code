@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-13 10:43+0800\n"
+"POT-Creation-Date: 2020-05-31 12:00+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2677,31 +2677,31 @@ msgid ""
 "created."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:598
+#: src/graphics/irr_driver.cpp:602
 msgid "Video recording started."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:604
+#: src/graphics/irr_driver.cpp:609
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:608
+#: src/graphics/irr_driver.cpp:613
 msgid "Encoding progress:"
 msgstr ""
 
-#: src/graphics/irr_driver.cpp:1862 src/graphics/irr_driver.cpp:1867
+#: src/graphics/irr_driver.cpp:1867 src/graphics/irr_driver.cpp:1872
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr ""
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1381 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1380 src/states_screens/race_result_gui.cpp:154
 #, c-format
 msgid "Tip: %s"
 msgstr ""
 
-#: src/guiengine/engine.cpp:1425
+#: src/guiengine/engine.cpp:1424
 msgid "Loading"
 msgstr ""
 
@@ -3516,6 +3516,16 @@ msgstr ""
 msgid "WRONG WAY!"
 msgstr ""
 
+#: src/modes/soccer_world.cpp:525 src/modes/soccer_world.cpp:640
+#, c-format
+msgid "%s scored a goal!"
+msgstr ""
+
+#: src/modes/soccer_world.cpp:527 src/modes/soccer_world.cpp:642
+#, c-format
+msgid "Oops, %s made an own goal!"
+msgstr ""
+
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
 msgid "%i spare tire kart has been spawned!"
@@ -3550,7 +3560,7 @@ msgid "Bad network connection is detected."
 msgstr ""
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3639
+#: src/network/protocols/server_lobby.cpp:3631
 msgid "Bot"
 msgstr ""
 
