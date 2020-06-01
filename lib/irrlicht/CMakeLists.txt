@@ -158,6 +158,7 @@ source/Irrlicht/CImage.cpp
 source/Irrlicht/CImageLoaderBMP.cpp
 source/Irrlicht/CImageLoaderJPG.cpp
 source/Irrlicht/CImageLoaderPNG.cpp
+source/Irrlicht/CImageLoaderSVG.cpp
 source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CImageWriterPNG.cpp
@@ -290,6 +291,7 @@ source/Irrlicht/CImage.h
 source/Irrlicht/CImageLoaderBMP.h
 source/Irrlicht/CImageLoaderJPG.h
 source/Irrlicht/CImageLoaderPNG.h
+source/Irrlicht/CImageLoaderSVG.h
 source/Irrlicht/CImageWriterBMP.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/CImageWriterPNG.h

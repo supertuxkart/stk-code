@@ -86,7 +86,7 @@ bool CImageLoaderPng::isALoadableFileFormat(io::IReadFile* file) const
 
 
 // load in the image data
-IImage* CImageLoaderPng::loadImage(io::IReadFile* file, bool skip_checking) const
+IImage* CImageLoaderPng::loadImage(io::IReadFile* file, bool skip_checking, float scale) const
 {
 #ifdef _IRR_COMPILE_WITH_LIBPNG_
 	if (!file)
