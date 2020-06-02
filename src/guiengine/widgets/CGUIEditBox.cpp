@@ -468,11 +468,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
 
                 std::u32string s = m_edit_text.substr(realmbgn, realmend - realmbgn);
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-                Operator->copyToClipboard(StringUtils::utf32ToWide(s).c_str());
-#else
                 Operator->copyToClipboard(StringUtils::utf32ToUtf8(s).c_str());
-#endif
             }
             break;
         case IRR_KEY_X:
@@ -484,11 +480,7 @@ bool CGUIEditBox::processKey(const SEvent& event)
 
                 // copy
                 std::u32string s = m_edit_text.substr(realmbgn, realmend - realmbgn);
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-                Operator->copyToClipboard(StringUtils::utf32ToWide(s).c_str());
-#else
                 Operator->copyToClipboard(StringUtils::utf32ToUtf8(s).c_str());
-#endif
 
                 if (isEnabled())
                 {
@@ -516,13 +508,10 @@ bool CGUIEditBox::processKey(const SEvent& event)
                 const s32 realmend = m_mark_begin < m_mark_end ? m_mark_end : m_mark_begin;
 
                 // add new character
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-                const std::u32string clipboard =
-                    StringUtils::wideToUtf32(Operator->getTextFromClipboard());
-#else
-                const std::u32string clipboard =
-                    StringUtils::utf8ToUtf32(Operator->getTextFromClipboard());
-#endif
+                char* clipboard_u8 = (char*)Operator->getTextFromClipboard();
+                std::u32string clipboard;
+                if (clipboard_u8)
+                    clipboard = StringUtils::utf8ToUtf32(clipboard_u8);
                 if (!clipboard.empty())
                 {
                     if (m_mark_begin == m_mark_end)
