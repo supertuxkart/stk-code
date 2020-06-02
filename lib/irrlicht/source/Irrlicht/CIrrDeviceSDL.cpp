@@ -363,6 +363,8 @@ void CIrrDeviceSDL::createDriver()
 
 // In input_manager.cpp
 extern "C" void handle_joystick(SDL_Event& event);
+// In CGUIEditBox.cpp
+extern "C" void handle_textinput(SDL_Event& event);
 //! runs the device. Returns false if device wants to be deleted
 bool CIrrDeviceSDL::run()
 {
@@ -527,6 +529,7 @@ bool CIrrDeviceSDL::run()
 
 		default:
 			handle_joystick(SDL_event);
+			handle_textinput(SDL_event);
 			break;
 		} // end switch
 

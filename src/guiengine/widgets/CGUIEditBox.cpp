@@ -32,8 +32,8 @@
 #include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceWin32.h"
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#include "SDL.h"
 #endif
 
 /*
@@ -177,6 +177,41 @@ _raqm_get_grapheme_break (hb_codepoint_t ch,
 };
 #endif
 
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+CGUIEditBox* g_editbox = NULL;
+extern "C" void handle_textinput(SDL_Event& event)
+{
+    if (g_editbox)
+        g_editbox->handleSDLEvent(event);
+}
+
+void CGUIEditBox::handleSDLEvent(SDL_Event& event)
+{
+    switch (event.type)
+    {
+    case SDL_TEXTINPUT:
+    {
+        m_composing_text.clear();
+        m_composing_start = 0;
+        m_composing_end = 0;
+        std::u32string text = StringUtils::utf8ToUtf32(event.text.text);
+        for (char32_t t : text)
+            inputChar(t);
+        break;
+    }
+    case SDL_TEXTEDITING:
+        m_composing_text = StringUtils::utf8ToUtf32(event.edit.text);
+        m_composing_start = m_cursor_pos;
+        m_composing_end = m_cursor_pos + m_composing_text.size();
+        // In linux these values don't seem to provide any more useful info
+        // It's always 0, event.edit.text.size()
+        //printf("Debug: %d, %d\n", event.edit.start, event.edit.length);
+        break;
+    }
+}
+
+#endif
+
 //! constructor
 CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
         IGUIEnvironment* environment, IGUIElement* parent, s32 id,
@@ -234,15 +269,9 @@ CGUIEditBox::~CGUIEditBox()
 #ifndef SERVER_ONLY
     if (Operator)
         Operator->drop();
-#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-    if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
-    {
-        CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
-                                                       irr_driver->getDevice());
-        dl->setIMEEnable(false);
-    }
-#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-    DestroyCaret();
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+    SDL_StopTextInput();
+    g_editbox = NULL;
 #endif
     if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
         GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
@@ -348,15 +377,9 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     MouseMarking = false;
                     setTextMarkers(0,0);
                 }
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-                if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
-                {
-                    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
-                                                       irr_driver->getDevice());
-                    dl->setIMEEnable(false);
-                }
-#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-                DestroyCaret();
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+                SDL_StopTextInput();
+                g_editbox = NULL;
 #endif
                 m_composing_start = 0;
                 m_composing_end = 0;
@@ -365,15 +388,18 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
                 m_mark_begin = m_mark_end = m_cursor_pos = getTextCount();
-#ifdef _IRR_COMPILE_WITH_X11_DEVICE_
-                if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
-                {
-                    CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
-                                                       irr_driver->getDevice());
-                    dl->setIMEEnable(true);
-                }
-#endif
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+#ifdef WIN32
+                // In windows we use caret to determine candidate box, which
+                // needs to calculate it first
                 calculateScrollPos();
+#endif
+                SDL_StartTextInput();
+                g_editbox = this;
+#endif
+#ifndef WIN32
+                calculateScrollPos();
+#endif
 #ifdef ANDROID
                 if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
                     GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
@@ -434,6 +460,13 @@ bool CGUIEditBox::processKey(const SEvent& event)
 #ifdef SERVER_ONLY
     return false;
 #else
+
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+    // Prevent double key events when the user is using IME
+    if (!m_composing_text.empty())
+        return false;
+#endif
+
     if (!event.KeyInput.PressedDown)
         return false;
 
@@ -1342,35 +1375,14 @@ void CGUIEditBox::calculateScrollPos()
 
     // todo: adjust scrollbar
     // calculate the position of input composition window
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-    m_ic_pos.X = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance;
-    // bug? The text is always drawn in the height of the center. SetTextAlignment() doesn't influence.
-    m_ic_pos.Y = AbsoluteRect.getCenter().Y + (Border ? 3 : 0);
-    if (irr_driver->getDevice()->getType() == irr::EIDT_X11)
-    {
-        CIrrDeviceLinux* dl = dynamic_cast<CIrrDeviceLinux*>(
-                                                       irr_driver->getDevice());
-        if (dl)
-        {
-            dl->setIMELocation(m_ic_pos);
-        }
-    }
-#elif defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_)
-    m_ic_pos.X = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance;
-    m_ic_pos.Y = CurrentTextRect.UpperLeftCorner.Y;
-
-    // We need a native windows api caret for ime language chooser
-    // positioning, we always hide it though and draw with our own
-    // opengl caret later
-    CIrrDeviceWin32* win = NULL;
-    if (irr_driver->getDevice()->getType() == irr::EIDT_WIN32)
-        win = dynamic_cast<CIrrDeviceWin32*>(irr_driver->getDevice());
-    if (!isVisible() || !win)
-        return;
-
-    CreateCaret(win->getHandle(), NULL, 1, GUIEngine::getFontHeight());
-    SetCaretPos(m_ic_pos.X, m_ic_pos.Y);
-    HideCaret(win->getHandle());
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+    SDL_Rect rect;
+    rect.x = CurrentTextRect.UpperLeftCorner.X + m_cursor_distance - 1;
+    rect.y = CurrentTextRect.UpperLeftCorner.Y;
+    rect.w = 1;
+    rect.h =
+        CurrentTextRect.LowerRightCorner.Y - CurrentTextRect.UpperLeftCorner.Y;
+    SDL_SetTextInputRect(&rect);
 #endif
 
 #endif   // SERVER_ONLY
