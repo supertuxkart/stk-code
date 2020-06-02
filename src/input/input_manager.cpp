@@ -734,6 +734,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                  Input::AxisDirection axisDirection, int value,
                                  bool shift_mask)
 {
+    // Updated in rendering from main loop
+    if (!irr_driver->getDevice()->getEventReceiver())
+        return;
+
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
         m_mode == INPUT_SENSE_GAMEPAD)
