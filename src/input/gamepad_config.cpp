@@ -34,7 +34,6 @@
 #ifndef SERVER_ONLY
 #include "input/sdl_controller.hpp"
 #include <array>
-#include <SDL.h>
 
 static_assert(SDL_CONTROLLER_BUTTON_MAX - 1 == SDL_CONTROLLER_BUTTON_DPAD_RIGHT, "non continous name");
 enum AxisWithDirection

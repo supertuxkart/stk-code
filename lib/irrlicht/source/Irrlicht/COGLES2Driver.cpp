@@ -33,6 +33,10 @@
 #include "CIrrDeviceWayland.h"
 #endif
 
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+#include "CIrrDeviceSDL.h"
+#endif
+
 namespace irr
 {
 namespace video
@@ -134,7 +138,6 @@ namespace video
 		m_device = device;
 	}
 #endif
-				  
 
 	//! destructor
 	COGLES2Driver::~COGLES2Driver()
@@ -156,7 +159,22 @@ namespace video
 #endif
 
 #endif
+
 	}
+
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
+				  io::IFileSystem* io, CIrrDeviceSDL* device)
+		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
+		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
+		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
+		RenderTargetTexture(0), CurrentRendertargetSize(0, 0),
+		ColorFormat(ECF_R8G8B8), Params(params)
+	{
+		genericDriverInit(params.WindowSize, params.Stencilbuffer);
+		m_device = device;
+	}
+#endif
 
 // -----------------------------------------------------------------------
 // METHODS
@@ -472,6 +490,8 @@ namespace video
 		}
 #elif defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
 		static_cast<CIrrDeviceiOS*>(m_device)->swapBuffers();
+#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+		SDL_GL_SwapWindow(static_cast<CIrrDeviceSDL*>(m_device)->getWindow());
 #endif
 
 		return true;
@@ -2908,6 +2928,22 @@ namespace video
 #endif // _IRR_COMPILE_WITH_OGLES2_
 	}
 #endif // _IRR_COMPILE_WITH_OSX_DEVICE_
+
+// -----------------------------------
+// SDL VERSION
+// -----------------------------------
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
+			io::IFileSystem* io, CIrrDeviceSDL* device)
+	{
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+		return new COGLES2Driver(params, io, device);
+#else
+		return 0;
+#endif // _IRR_COMPILE_WITH_OGLES2_
+	}
+
+#endif
 
 } // end namespace
 } // end namespace

@@ -1748,12 +1748,12 @@ void initRest()
     delete tmp_skin;
     GUIEngine::setSkin(NULL);
 
-    GUIEngine::init(device, driver, StateManager::get());
-
-    GUIEngine::renderLoading(true, true, false);
     input_manager = new InputManager();
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
+    // Input manager set first so it recieves SDL joystick event
+    GUIEngine::init(device, driver, StateManager::get());
+    GUIEngine::renderLoading(true, true, false);
 
     stk_config->initMusicFiles();
     // This only initialises the non-network part of the add-ons manager. The

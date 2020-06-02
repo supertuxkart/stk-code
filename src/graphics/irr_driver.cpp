@@ -1030,6 +1030,10 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
 
     font_manager = new FontManager();
     font_manager->loadFonts();
+
+    input_manager = new InputManager();
+    input_manager->setMode(InputManager::MENU);
+    // Input manager set first so it recieves SDL joystick event
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
 
@@ -1037,8 +1041,6 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     //material_manager->reInit();
     material_manager = new MaterialManager();
     material_manager->loadMaterial();
-    input_manager = new InputManager ();
-    input_manager->setMode(InputManager::MENU);
     powerup_manager = new PowerupManager();
     attachment_manager = new AttachmentManager();
 

@@ -13,7 +13,19 @@
 #include "irrTypes.h"
 #include "os.h"
 
-#if defined(_IRR_WINDOWS_API_)
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
+		#define GL_GLEXT_LEGACY 1
+		#define GLX_GLXEXT_LEGACY 1
+	#else
+		#define GL_GLEXT_PROTOTYPES 1
+		#define GLX_GLXEXT_PROTOTYPES 1
+	#endif
+	#define NO_SDL_GLEXT
+	#include <SDL_video.h>
+	#include <SDL_opengl.h>
+	#include "glext.h"
+#elif defined(_IRR_WINDOWS_API_)
 	// include windows headers for HWND
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
@@ -38,35 +50,6 @@
 	#include <OpenGL/gl.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
 		#include "glext.h"
-	#endif
-#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && !defined(_IRR_COMPILE_WITH_X11_DEVICE_)
-	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-		#define GL_GLEXT_LEGACY 1
-		#define GLX_GLXEXT_LEGACY 1
-	#else
-		#define GL_GLEXT_PROTOTYPES 1
-		#define GLX_GLXEXT_PROTOTYPES 1
-	#endif
-	#define NO_SDL_GLEXT
-	#include <SDL/SDL_video.h>
-	#include <SDL/SDL_opengl.h>
-        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
-	#include "glext.h"
-#else
-	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-		#define GL_GLEXT_LEGACY 1
-		#define GLX_GLXEXT_LEGACY 1
-	#else
-		#define GL_GLEXT_PROTOTYPES 1
-		#define GLX_GLXEXT_PROTOTYPES 1
-	#endif
-	#include <GL/gl.h>
-	#include <GL/glx.h>
-	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
-	#include <GL/glext.h>
-	#undef GLX_ARB_get_proc_address // avoid problems with local glxext.h
-	#include <GL/glxext.h>
 	#endif
 #endif
 
@@ -2388,7 +2371,7 @@ inline void COpenGLExtensionHandler::extGlProgramParameteri(GLhandleARB program,
 			pGlProgramParameteriEXT(program, pname, value);
 	}
 #elif defined(GL_ARB_geometry_shader4)
-	glProgramParameteriARB(program, pname, value);
+	glProgramParameteriARB((size_t)program, pname, value);
 #elif defined(GL_EXT_geometry_shader4)
     #ifdef __clang__
     glProgramParameteriEXT((long)program, pname, value);

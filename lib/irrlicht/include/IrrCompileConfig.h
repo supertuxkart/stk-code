@@ -56,7 +56,12 @@
 #if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #define _IRR_WINDOWS_
 #define _IRR_WINDOWS_API_
+#ifndef NO_IRR_COMPILE_WITH_SDL_DEVICE_
+#define _IRR_COMPILE_WITH_SDL_DEVICE_
+#undef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+#else
 #define _IRR_COMPILE_WITH_WINDOWS_DEVICE_
+#endif
 #endif
 
 
@@ -87,7 +92,12 @@
 #define _IRR_COMPILE_WITH_IOS_DEVICE_
 #define _IRR_COMPILE_WITH_OGLES2_
 #else
+#ifndef NO_IRR_COMPILE_WITH_SDL_DEVICE_
+#define _IRR_COMPILE_WITH_SDL_DEVICE_
+#undef _IRR_COMPILE_WITH_OSX_DEVICE_
+#else
 #define _IRR_COMPILE_WITH_OSX_DEVICE_
+#endif
 #endif
 #endif
 
@@ -107,24 +117,25 @@
 #define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
 
-#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-#define _IRR_COMPILE_WITH_EGL_
-#endif
-
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
 #define _IRR_LINUX_PLATFORM_
 #endif
 #define _IRR_POSIX_API_
+#ifndef NO_IRR_COMPILE_WITH_SDL_DEVICE_
+#define _IRR_COMPILE_WITH_SDL_DEVICE_
+#else
+// For server only STK
 #define _IRR_COMPILE_WITH_X11_DEVICE_
-//#define _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+#endif
 #endif
 
 #ifdef NO_IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #undef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #endif
 
-#ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
+
+#if defined(_IRR_COMPILE_WITH_OGLES2_) && !defined(_IRR_COMPILE_WITH_IOS_DEVICE_) && !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 #define _IRR_COMPILE_WITH_EGL_
 #endif
 

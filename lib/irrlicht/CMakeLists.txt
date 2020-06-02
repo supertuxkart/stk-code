@@ -27,7 +27,7 @@ if(NOT SERVER_ONLY)
         endif()
     endif()
 
-    if(NOT APPLE AND (USE_GLES2 OR ENABLE_WAYLAND_DEVICE))
+    if(NOT APPLE AND USE_GLES2)
         find_package(EGL)
         
         if(EGL_FOUND)
@@ -35,24 +35,10 @@ if(NOT SERVER_ONLY)
         else()
             if(USE_GLES2 AND NOT APPLE)
                 message(FATAL_ERROR "EGL not found.")
-            elseif(ENABLE_WAYLAND_DEVICE)
-                message(WARNING "EGL not found. Disable wayland support.")
-                set(ENABLE_WAYLAND_DEVICE OFF)
             endif()
         endif()
     endif()
 
-    if(ENABLE_WAYLAND_DEVICE)
-        find_package(Wayland)
-        
-        if(WAYLAND_FOUND AND NOT (WAYLAND_VERSION VERSION_LESS "1.14"))
-            include_directories(${WAYLAND_INCLUDE_DIR})
-            add_definitions(-D_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
-        else()
-            message(WARNING "Wayland not found. Disable wayland support.")
-            set(ENABLE_WAYLAND_DEVICE OFF)
-        endif()        
-    endif()
 else()
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                         "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
@@ -69,6 +55,7 @@ else()
     add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
     add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_SDL_DEVICE_)
 endif()
 
 if(APPLE AND NOT IOS)
@@ -87,14 +74,8 @@ if(WIN32)
     add_definitions(-D_IRR_STATIC_LIB_)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
-    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3 -fstrict-aliasing")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -O3 -fstrict-aliasing")
-    if(CMAKE_COMPILER_IS_GNUCC)
-        set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -fexpensive-optimizations")
-    endif()
-    if(CMAKE_COMPILER_IS_GNUCXX)
-        set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -fexpensive-optimizations")
-    endif()
+    set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -fstrict-aliasing")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -fstrict-aliasing")
 endif()
 
 if(USE_GLES2)
@@ -165,7 +146,6 @@ source/Irrlicht/CIrrDeviceAndroid.cpp
 source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
-source/Irrlicht/CIrrDeviceWayland.cpp
 source/Irrlicht/CIrrDeviceWin32.cpp
 source/Irrlicht/CLightSceneNode.cpp
 source/Irrlicht/CLimitReadFile.cpp
@@ -297,7 +277,6 @@ source/Irrlicht/CIrrDeviceAndroid.h
 source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CIrrDeviceSDL.h
 source/Irrlicht/CIrrDeviceStub.h
-source/Irrlicht/CIrrDeviceWayland.h
 source/Irrlicht/CIrrDeviceWin32.h
 source/Irrlicht/CLightSceneNode.h
 source/Irrlicht/CLimitReadFile.h
@@ -571,14 +550,6 @@ include/vector2d.h
 include/vector3d.h
 )
 
-if(NOT SERVER_ONLY AND ENABLE_WAYLAND_DEVICE)
-    set(IRRLICHT_SOURCES 
-        ${IRRLICHT_SOURCES}
-        source/Irrlicht/xdg_decoration_unstable_v1_protocol.c
-        source/Irrlicht/xdg_shell_protocol.c)
-endif()
-
-
 if(APPLE AND NOT IOS)
     set(IRRLICHT_SOURCES
         ${IRRLICHT_SOURCES}
@@ -620,13 +591,10 @@ if(NOT SERVER_ONLY)
         target_link_libraries(stkirrlicht ${X11_X11_LIB} ${X11_Xrandr_LIB})
     endif()
         
-    if(NOT APPLE AND (USE_GLES2 OR ENABLE_WAYLAND_DEVICE))
+    if(NOT APPLE AND USE_GLES2)
         target_link_libraries(stkirrlicht ${EGL_LIBRARY})
     endif()
     
-    if(ENABLE_WAYLAND_DEVICE)
-        target_link_libraries(stkirrlicht ${WAYLAND_LIBRARIES})
-    endif()
 endif()
 
 if(WIN32)

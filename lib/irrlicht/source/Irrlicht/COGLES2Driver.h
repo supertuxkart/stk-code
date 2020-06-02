@@ -18,6 +18,11 @@
 #include "CIrrDeviceWayland.h"
 #endif
 
+namespace irr
+{
+	class CIrrDeviceSDL;
+}
+
 #include "SIrrCreationParameters.h"
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
@@ -73,6 +78,10 @@ namespace video
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
 		COGLES2Driver(const SIrrlichtCreationParameters& params,
 					io::IFileSystem* io, CIrrDeviceMacOSX *device);
+#endif
+
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+		COGLES2Driver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceSDL* device);
 #endif
 
 #if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
