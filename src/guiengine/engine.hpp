@@ -258,6 +258,11 @@ namespace GUIEngine
     void reloadSkin();
 
     /**
+      * \brief call when screen size changed
+      */
+    void reloadForNewSize();
+
+    /**
       * \brief Add gui-related function before rendering GUI (from other thread)
       */
     void addGUIFunctionBeforeRendering(std::function<void()> func);

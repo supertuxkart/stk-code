@@ -1177,6 +1177,18 @@ namespace GUIEngine
     }   // reloadSkin
 
     // -----------------------------------------------------------------------
+    void reloadForNewSize()
+    {
+        g_skin->resetBackgroundImage();
+        Private::font_height = g_font->getDimension( L"X" ).Height;
+        Private::large_font_height = g_large_font->getDimension( L"X" ).Height;
+        Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
+        Private::title_font_height =
+            g_title_font->getDimension( L"X" ).Height;
+        StateManager::get()->onResize();
+    }   // reloadForNewSize
+
+    // -----------------------------------------------------------------------
     void addGUIFunctionBeforeRendering(std::function<void()> func)
     {
 #ifdef ANDROID

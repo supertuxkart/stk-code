@@ -295,7 +295,8 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     assert(!ModalDialog::isADialogActive());
     assert(!ScreenKeyboard::isActive());
 
-    if (m_game_mode != GAME) getCurrentScreen()->tearDown();
+    if (m_game_mode != GAME && getCurrentScreen())
+        getCurrentScreen()->tearDown();
     m_menu_stack.clear();
 
     for (int n=0; screens[n] != NULL; n++)
@@ -311,3 +312,21 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     onTopMostScreenChanged();
 }   // resetAndSetStack
 
+// ----------------------------------------------------------------------------
+
+void AbstractStateManager::onResize()
+{
+    // Happens in the first resize in main.cpp
+    if (m_menu_stack.empty())
+        return;
+
+    std::vector<std::function<Screen*()> > screen_function;
+    for (auto& p : m_menu_stack)
+        screen_function.push_back(p.second->getNewScreenPointer());
+    clearScreenCache();
+    std::vector<Screen*> new_screen;
+    for (auto& screen : screen_function)
+        new_screen.push_back(screen());
+    new_screen.push_back(NULL);
+    resetAndSetStack(new_screen.data());
+}   // onResize

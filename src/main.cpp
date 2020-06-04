@@ -2152,6 +2152,8 @@ int main(int argc, char *argv[])
 #ifndef SERVER_ONLY
         if (!GUIEngine::isNoGraphics())
         {
+            // The screen size may change after loading
+            irr_driver->handleWindowResize();
             // Some Android devices have only 320x240 and height >= 480 is bare
             // minimum to make the GUI working as expected.
             if (irr_driver->getActualScreenSize().Height < 480)
