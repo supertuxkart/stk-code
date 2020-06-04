@@ -192,6 +192,8 @@ void OptionsScreenVideo::loadedFromFile()
 
 void OptionsScreenVideo::init()
 {
+    if (StateManager::get()->getGameState() == GUIEngine::MENU)
+        GUIEngine::getDevice()->setResizable(true);
     Screen::init();
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     m_prev_img_quality = getImageQuality();
@@ -745,6 +747,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
+    if (StateManager::get()->getGameState() == GUIEngine::MENU)
+        GUIEngine::getDevice()->setResizable(false);
 #ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
         CVS->isGLSL())

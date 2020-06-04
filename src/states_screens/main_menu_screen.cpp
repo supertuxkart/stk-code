@@ -120,6 +120,7 @@ void MainMenuScreen::beforeAddingWidget()
 //
 void MainMenuScreen::init()
 {
+    GUIEngine::getDevice()->setResizable(true);
     Screen::init();
 
     m_user_id = getWidget<ButtonWidget>("user-id");
@@ -603,6 +604,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
 void MainMenuScreen::tearDown()
 {
+    GUIEngine::getDevice()->setResizable(false);
 }   // tearDown
 
 // ----------------------------------------------------------------------------
