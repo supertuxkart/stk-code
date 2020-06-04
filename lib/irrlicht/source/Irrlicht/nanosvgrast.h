@@ -39,7 +39,7 @@ typedef struct NSVGrasterizer NSVGrasterizer;
 	// Create rasterizer (can be used to render multiple images).
 	struct NSVGrasterizer* rast = nsvgCreateRasterizer();
 	// Allocate memory for image
-	unsigned char* img = malloc(w*h*4);
+	unsigned char* img = (unsigned char*) malloc(w*h*4);
 	// Rasterize
 	nsvgRasterize(rast, image, 0,0,1, img, w, h, w*4);
 */
@@ -77,7 +77,9 @@ void nsvgDeleteRasterizer(NSVGrasterizer*);
 */
 
 #define NSVG__SUBSAMPLES	5
+#ifndef NSVG__FIXSHIFT
 #define NSVG__FIXSHIFT		10
+#endif
 #define NSVG__FIX			(1 << NSVG__FIXSHIFT)
 #define NSVG__FIXMASK		(NSVG__FIX-1)
 #define NSVG__MEMPAGE_SIZE	1024
@@ -349,8 +351,8 @@ static void nsvg__flattenCubicBez(NSVGrasterizer* r,
 
 	dx = x4 - x1;
 	dy = y4 - y1;
-	d2 = nsvg__absf(((x2 - x4) * dy - (y2 - y4) * dx));
-	d3 = nsvg__absf(((x3 - x4) * dy - (y3 - y4) * dx));
+	d2 = nsvg__absf((x2 - x4) * dy - (y2 - y4) * dx);
+	d3 = nsvg__absf((x3 - x4) * dy - (y3 - y4) * dx);
 
 	if ((d2 + d3)*(d2 + d3) < r->tessTol * (dx*dx + dy*dy)) {
 		nsvg__addPathPoint(r, x4, y4, type);
@@ -978,10 +980,14 @@ static unsigned int nsvg__applyOpacity(unsigned int c, float u)
 	return nsvg__RGBA((unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a);
 }
 
+#if defined(_MSC_VER) && _MSC_VER < 1700
+#define nsvg__div255(x) ((x+1) * 257) >> 16
+#else
 static int nsvg__div255(int x)
 {
-    return ((x+1) * 257) >> 16;
+	return ((x+1) * 257) >> 16;
 }
+#endif
 
 static void nsvg__scanlineSolid(unsigned char* dst, int count, unsigned char* cover, int x, int y,
 								float tx, float ty, float scale, NSVGcachedPaint* cache)
@@ -1223,7 +1229,7 @@ static void nsvg__unpremultiplyAlpha(unsigned char* image, int w, int h, int str
 		for (x = 0; x < w; x++) {
 			int r = 0, g = 0, b = 0, a = row[3], n = 0;
 			if (a == 0) {
-				if (x-1 > 0 && row[-1] != 0) {
+				if (x > 1 && row[-1] != 0) {
 					r += row[-4];
 					g += row[-3];
 					b += row[-2];
@@ -1235,7 +1241,7 @@ static void nsvg__unpremultiplyAlpha(unsigned char* image, int w, int h, int str
 					b += row[6];
 					n++;
 				}
-				if (y-1 > 0 && row[-stride+3] != 0) {
+				if (y > 1 && row[-stride+3] != 0) {
 					r += row[-stride];
 					g += row[-stride+1];
 					b += row[-stride+2];
