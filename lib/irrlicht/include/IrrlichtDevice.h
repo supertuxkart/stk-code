@@ -318,6 +318,7 @@ namespace irr
 		virtual s32 getBottomPadding() { return 0; }
 		virtual s32 getLeftPadding() { return 0; }
 		virtual s32 getRightPadding() { return 0; }
+		virtual void setWindowMinimumSize(u32 width, u32 height) {}
 		//! Check if a driver type is supported by the engine.
 		/** Even if true is returned the driver may not be available
 		for a configuration requested when creating the device. */

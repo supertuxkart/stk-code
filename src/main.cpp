@@ -2168,7 +2168,10 @@ int main(int argc, char *argv[])
                 }
                 Log::warn("main", "Screen size is too small!");
             }
-            
+            else
+            {
+                irr_driver->getDevice()->setWindowMinimumSize(480, 480);
+            }
             #ifdef MOBILE_STK
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {

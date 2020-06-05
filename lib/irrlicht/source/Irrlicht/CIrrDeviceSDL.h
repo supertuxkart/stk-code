@@ -95,6 +95,8 @@ namespace irr
 		//! Get the current Gamma Value for the Display
 		virtual bool getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &brightness, f32 &contrast );
 
+		virtual void setWindowMinimumSize(u32 width, u32 height);
+
 		//! Get the device type
 		virtual E_DEVICE_TYPE getType() const
 		{

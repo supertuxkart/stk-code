@@ -726,6 +726,12 @@ bool CIrrDeviceSDL::getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &brightne
 	return false;
 }
 
+void CIrrDeviceSDL::setWindowMinimumSize(u32 width, u32 height)
+{
+	if (Window)
+		SDL_SetWindowMinimumSize(Window, width, height);
+}
+
 //! returns color format of the window.
 video::ECOLOR_FORMAT CIrrDeviceSDL::getColorFormat() const
 {
