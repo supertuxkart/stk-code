@@ -2,7 +2,8 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 // This file is modified by riso from CImageLoaderJPG.h
-// Using nanosvg as parser and rasterizer
+// nanosvg as parser and rasterizer for SVG files.
+// The nanosvg headers are based on those in SDL2_image-2.0.5
 
 #include "CImageLoaderSVG.h"
 
@@ -41,9 +42,24 @@ bool CImageLoaderSVG::isALoadableFileExtension(const io::path& filename) const
 //! returns true if the file maybe is able to be loaded by this class
 bool CImageLoaderSVG::isALoadableFileFormat(io::IReadFile* file) const
 {
-    // check IMG_isSVG
     // read first 4095 characters, check if can find "<svg"
-    // TODO
+    // this implementation refers IMG_isSVG() in SDL2_Image
+    long filesize = file->getSize();
+    long cropsize = filesize < 4095L ? filesize : 4095L;
+    char* data = new char[cropsize+1];
+
+    int readsize = file->read(data,cropsize);
+    data[cropsize] = '\0';
+    if( (long)readsize != cropsize) {
+        os::Printer::log("Couldn't read SVG image file", file->getFileName(), ELL_ERROR);
+        return 0;
+    }
+    // check if can find "<svg" in the file
+    if ( strstr(data, "<svg") )
+    {
+        return 1;
+    }
+
     return 0;
 }
 

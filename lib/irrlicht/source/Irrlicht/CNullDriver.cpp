@@ -1325,6 +1325,8 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file, video::IImageLoade
 				*loader = SurfaceLoader[i];
 				return 0;
 			}
+			// pass screen size to ImageLoaderSVG. For other formats (BMP,JPG,PNG), setScreenSize() does nothing
+			SurfaceLoader[i]->setScreenSize(getCurrentRenderTargetSize());
 			file->seek(0);
 			image = SurfaceLoader[i]->loadImage(file);
 			if (image)

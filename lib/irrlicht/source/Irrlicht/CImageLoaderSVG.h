@@ -2,7 +2,8 @@
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 // This file is modified by riso from CImageLoaderJPG.h
-// Using nanosvg as parser and rasterizer
+// nanosvg as parser and rasterizer for SVG files.
+// The nanosvg headers are based on those in SDL2_image-2.0.5
 
 #ifndef __C_IMAGE_LOADER_SVG_H_INCLUDED__
 #define __C_IMAGE_LOADER_SVG_H_INCLUDED__
