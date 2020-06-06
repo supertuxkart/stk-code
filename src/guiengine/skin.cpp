@@ -2899,7 +2899,11 @@ std::string Skin::getThemedIcon(const std::string& relative_path) const
         if (!SkinConfig::m_icon_theme ||
             relative_path2.find("gui/icons/") == std::string::npos)
         {
-            return file_manager->getAsset(relative_path2);
+            std::string tmp_path = file_manager->getAsset(relative_path2);
+            if (file_manager->fileExists(tmp_path))
+            {
+                return tmp_path;
+            }
         }
 
         if (relative_path2.find(SkinConfig::m_data_path) != std::string::npos &&
