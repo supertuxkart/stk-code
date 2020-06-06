@@ -11,6 +11,7 @@
 #include "CImage.h"
 #include "os.h"
 #include "irrString.h"
+#include "graphics/irr_driver.hpp"
 
 namespace irr
 {
@@ -42,7 +43,7 @@ bool CImageLoaderSVG::isALoadableFileFormat(io::IReadFile* file) const
 
 
 //! creates a surface from the file
-IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking, float scale) const
+IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) const
 {
     // check IMG_LoadSVG_RW
     struct NSVGimage *img = 0;
@@ -74,6 +75,11 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking, floa
         nsvgDelete( img );
         return 0;
     }
+
+    // determine scaling based on screen size
+    float screen_height = (float)irr_driver->getActualScreenSize().Height;
+    float desired_icon_size = 0.21*screen_height + 30.0f; // phenomenological
+    float scale = desired_icon_size/img->height;
 
     // create surface
     w = (int)(img->width*scale);
