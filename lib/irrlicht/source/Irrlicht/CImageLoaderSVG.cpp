@@ -11,7 +11,7 @@
 #include "CImage.h"
 #include "os.h"
 #include "irrString.h"
-#include "graphics/irr_driver.hpp"
+#include "CNullDriver.h"
 
 namespace irr
 {
@@ -22,6 +22,12 @@ namespace video
 //! constructor
 CImageLoaderSVG::CImageLoaderSVG()
 {
+}
+
+//! set the screen size
+void CImageLoaderSVG::setScreenSize(const core::dimension2d<u32> &screen_size)
+{
+    ScreenSize = screen_size;
 }
 
 //! returns true if the file maybe is able to be loaded by this class
@@ -77,7 +83,7 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) cons
     }
 
     // determine scaling based on screen size
-    float screen_height = (float)irr_driver->getActualScreenSize().Height;
+    float screen_height = ScreenSize.Height;
     float desired_icon_size = 0.21*screen_height + 30.0f; // phenomenological
     float scale = desired_icon_size/img->height;
 
@@ -105,7 +111,7 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) cons
 }
 
 
-//! creates a loader which is able to load windows bitmaps
+//! creates a loader which is able to load svg images
 IImageLoader* createImageLoaderSVG()
 {
     return new CImageLoaderSVG();
