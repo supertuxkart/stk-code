@@ -38,6 +38,7 @@
 #include "graphics/per_camera_node.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shader_files_manager.hpp"
@@ -1994,8 +1995,7 @@ void IrrDriver::handleWindowResize()
     {
         // Don't update when dialog is opened
         if (GUIEngine::ModalDialog::isADialogActive() ||
-            GUIEngine::ScreenKeyboard::isActive() ||
-            StateManager::get()->getGameState() != GUIEngine::MENU)
+            GUIEngine::ScreenKeyboard::isActive())
             return;
 
         m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
@@ -2333,12 +2333,25 @@ void IrrDriver::resetDebugModes()
 // ----------------------------------------------------------------------------
 void IrrDriver::resizeWindow()
 {
+#ifndef SERVER_ONLY
     // Reload fonts
     font_manager->getFont<BoldFace>()->init();
     font_manager->getFont<DigitFace>()->init();
     font_manager->getFont<RegularFace>()->init();
     // Reload GUIEngine
     GUIEngine::reloadForNewSize();
+    if (World::getWorld())
+    {
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+            Camera::getCamera(i)->setupCamera();
+        ShaderBasedRenderer* sbr = dynamic_cast<ShaderBasedRenderer*>(m_renderer);
+        if (sbr)
+        {
+            delete sbr->getRTTs();
+            // This will recreate the RTTs
+            sbr->onLoadWorld();
+        }
+    }
 
 #ifdef ENABLE_RECORDER
     ogrDestroy();
@@ -2359,5 +2372,6 @@ void IrrDriver::resizeWindow()
         Log::error("irr_driver",
             "RecorderConfig is invalid, use the default one.");
     }
+#endif
 #endif
 }

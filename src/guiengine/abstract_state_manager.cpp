@@ -320,6 +320,17 @@ void AbstractStateManager::onResize()
     if (m_menu_stack.empty())
         return;
 
+    // In game resizing
+    if (m_menu_stack[0].first == RACE_STATE_NAME)
+    {
+        if (m_menu_stack.size() == 1)
+        {
+            clearScreenCache();
+            m_menu_stack.emplace_back(RACE_STATE_NAME, (Screen*)NULL);
+        }
+        return;
+    }
+
     std::vector<std::function<Screen*()> > screen_function;
     for (auto& p : m_menu_stack)
         screen_function.push_back(p.second->getNewScreenPointer());
