@@ -104,10 +104,15 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) cons
         return 0;
     }
 
-    // determine scaling based on screen size
-    float screen_height = ScreenSize.Height;
-    float desired_icon_size = 0.21*screen_height + 30.0f; // phenomenological
-    float scale = desired_icon_size/img->height;
+    float scale =1.0f;
+    // only rescale the icons
+    if ( strstr(file->getFileName().c_str(),"gui/icons/") )
+    {
+        // determine scaling based on screen size
+        float screen_height = ScreenSize.Height;
+        float desired_icon_size = 0.21*screen_height + 30.0f; // phenomenological
+        scale = desired_icon_size/img->height;
+    }
 
     // create surface
     w = (int)(img->width*scale);
