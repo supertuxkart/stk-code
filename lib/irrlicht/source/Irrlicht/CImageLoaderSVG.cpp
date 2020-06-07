@@ -52,14 +52,17 @@ bool CImageLoaderSVG::isALoadableFileFormat(io::IReadFile* file) const
     data[cropsize] = '\0';
     if( (long)readsize != cropsize) {
         os::Printer::log("Couldn't read SVG image file", file->getFileName(), ELL_ERROR);
+        delete data;
         return 0;
     }
     // check if can find "<svg" in the file
     if ( strstr(data, "<svg") )
     {
+        delete data;
         return 1;
     }
 
+    delete data;
     return 0;
 }
 
@@ -81,6 +84,7 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) cons
     
     if( (long)readsize != filesize) {
         os::Printer::log("Couldn't read SVG image file", file->getFileName(), ELL_ERROR);
+        delete data;
         return 0;
     }
 
@@ -88,8 +92,10 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) cons
     img = nsvgParse(data, "px", 96);
     if ( !img ) {
         os::Printer::log("Couldn't parse SVG image", ELL_ERROR);
+        delete data;
         return 0;
     }
+    delete data;
 
     rasterizer = nsvgCreateRasterizer();
     if ( !rasterizer ) {
