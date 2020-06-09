@@ -40,7 +40,6 @@ using namespace irr::gui;
 CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
-    GUIEngine::getDevice()->setResizable(false);
     loadFromFile("custom_video_settings.stkgui");
     updateActivation();
 }
@@ -49,7 +48,6 @@ CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float 
 
 CustomVideoSettingsDialog::~CustomVideoSettingsDialog()
 {
-    GUIEngine::getDevice()->setResizable(true);
 }
 
 // -----------------------------------------------------------------------------

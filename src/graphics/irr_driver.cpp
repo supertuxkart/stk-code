@@ -1992,11 +1992,12 @@ void IrrDriver::doScreenShot()
 // ----------------------------------------------------------------------------
 void IrrDriver::handleWindowResize()
 {
+    bool dialog_exists = GUIEngine::ModalDialog::isADialogActive() ||
+            GUIEngine::ScreenKeyboard::isActive();
     if (m_actual_screen_size != m_video_driver->getCurrentRenderTargetSize())
     {
         // Don't update when dialog is opened
-        if (GUIEngine::ModalDialog::isADialogActive() ||
-            GUIEngine::ScreenKeyboard::isActive())
+        if (dialog_exists)
             return;
 
         m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
@@ -2004,6 +2005,11 @@ void IrrDriver::handleWindowResize()
         UserConfigParams::m_height = m_actual_screen_size.Height;
         resizeWindow();
     }
+    // In case reset by opening options in game
+    if (!dialog_exists &&
+        StateManager::get()->getGameState() == GUIEngine::GAME &&
+        !m_device->isResizable())
+        m_device->setResizable(true);
 }   // handleWindowResize
 
 // ----------------------------------------------------------------------------

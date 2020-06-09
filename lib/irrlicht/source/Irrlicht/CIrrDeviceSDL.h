@@ -71,6 +71,8 @@ namespace irr
 		//! Sets if the window should be resizable in windowed mode.
 		virtual void setResizable(bool resize=false);
 
+		virtual bool isResizable() const;
+
 		//! Minimizes the window.
 		virtual void minimizeWindow();
 
@@ -215,6 +217,7 @@ namespace irr
 
 		bool WindowHasFocus;
 		bool WindowMinimized;
+		bool Resizable;
 
 		struct SKeyMap
 		{

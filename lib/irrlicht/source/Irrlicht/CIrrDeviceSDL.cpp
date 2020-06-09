@@ -45,7 +45,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	Window(0), Context(0),
 	MouseX(0), MouseY(0), MouseButtonStates(0),
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
-	WindowHasFocus(false), WindowMinimized(false)
+	WindowHasFocus(false), WindowMinimized(false), Resizable(false)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceSDL");
@@ -637,7 +637,16 @@ void CIrrDeviceSDL::setResizable(bool resize)
 	if (CreationParams.Fullscreen)
 		return;
 	SDL_SetWindowResizable(Window, resize ? SDL_TRUE : SDL_FALSE);
+	Resizable = resize;
 #endif
+}
+
+
+bool CIrrDeviceSDL::isResizable() const
+{
+	if (CreationParams.Fullscreen)
+		return false;
+	return Resizable;
 }
 
 
