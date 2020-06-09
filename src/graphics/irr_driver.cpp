@@ -50,6 +50,7 @@
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
+#include "graphics/stk_text_billboard.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/sun.hpp"
@@ -2351,6 +2352,7 @@ void IrrDriver::resizeWindow()
             // This will recreate the RTTs
             sbr->onLoadWorld();
         }
+        STKTextBillboard::updateAllTextBillboards();
     }
 
 #ifdef ENABLE_RECORDER

@@ -93,6 +93,8 @@ void STKTextBillboard::updateAbsolutePosition()
 // ----------------------------------------------------------------------------
 void STKTextBillboard::init(const core::stringw& text, FontWithFace* face)
 {
+    m_face = face;
+    m_text = text;
     m_chars = new std::vector<STKTextBillboardChar>();
     core::dimension2du size = face->getDimension(text);
     face->drawText(text, core::rect<s32>(0, 0, size.Width, size.Height),
@@ -263,6 +265,8 @@ void STKTextBillboard::init(const core::stringw& text, FontWithFace* face)
 // ----------------------------------------------------------------------------
 void STKTextBillboard::initLegacy(const core::stringw& text, FontWithFace* face)
 {
+    m_face = face;
+    m_text = text;
     m_chars = new std::vector<STKTextBillboardChar>();
     core::dimension2du size = face->getDimension(text);
     face->drawText(text, core::rect<s32>(0, 0, size.Width, size.Height),
@@ -437,6 +441,35 @@ void STKTextBillboard::collectChar(video::ITexture* texture,
     m_chars->push_back(STKTextBillboardChar(texture, dest_rect, source_rect,
         colors));
 }   // collectChar
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::reload()
+{
+    clearBuffer();
+    if (CVS->isGLSL())
+        init(m_text, m_face);
+    else
+        initLegacy(m_text, m_face);
+}   // reload
+
+// ----------------------------------------------------------------------------
+static void updateTextBillboard(core::list<scene::ISceneNode*>& List)
+{
+    core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
+    for (; I != E; ++I)
+    {
+        if (STKTextBillboard* tb = dynamic_cast<STKTextBillboard*>(*I))
+            tb->reload();
+        updateTextBillboard((*I)->getChildren());
+    }
+}   // updateTextBillboard
+
+// ----------------------------------------------------------------------------
+void STKTextBillboard::updateAllTextBillboards()
+{
+    updateTextBillboard(
+        irr_driver->getSceneManager()->getRootSceneNode()->getChildren());
+}   // updateAllTextBillboards
 
 #endif   // !SERVER_ONLY
 

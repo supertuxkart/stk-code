@@ -25,6 +25,7 @@
 #include "font/regular_face.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_fps.hpp"
+#include "graphics/stk_text_billboard.hpp"
 #include "karts/explosion_animation.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/light.hpp"
@@ -477,6 +478,9 @@ bool handleContextMenuAction(s32 cmd_id)
         font_manager->getFont<BoldFace>()->reset();
         font_manager->getFont<DigitFace>()->reset();
         font_manager->getFont<RegularFace>()->reset();
+#ifndef SERVER_ONLY
+        STKTextBillboard::updateAllTextBillboards();
+#endif
         break;
     case DEBUG_FPS:
         UserConfigParams::m_display_fps =
