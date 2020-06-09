@@ -105,10 +105,7 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     m_active_challenge = NULL;
 
-    // Determine maximum length of the rank/lap text, in order to
-    // align those texts properly on the right side of the viewport.
-    gui::ScalableFont* font = GUIEngine::getFont();
-    m_trophy_points_width = font->getDimension(L"1000").Width;
+    initSize();
 
     m_lock           = irr_driver->getTexture(FileManager::GUI_ICON,"gui_lock.png");
     m_open_challenge = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
@@ -122,6 +119,17 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_icons[5] = m_trophy[3];
     m_icons[6] = m_locked_bonus;
 }   // RaceGUIOverworld
+
+// ----------------------------------------------------------------------------
+/** Called when loading the race gui or screen resized. */
+void RaceGUIOverworld::initSize()
+{
+    RaceGUIBase::initSize();
+    // Determine maximum length of the rank/lap text, in order to
+    // align those texts properly on the right side of the viewport.
+    gui::ScalableFont* font = GUIEngine::getFont();
+    m_trophy_points_width = font->getDimension(L"1000").Width;
+}   // initSize
 
 //-----------------------------------------------------------------------------
 RaceGUIOverworld::~RaceGUIOverworld()

@@ -71,29 +71,7 @@ RaceGUI::RaceGUI()
     if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
         m_enabled = false;
 
-    // Determine maximum length of the rank/lap text, in order to
-    // align those texts properly on the right side of the viewport.
-    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    core::dimension2du area = font->getDimension(L"99:99.999");
-    m_timer_width = area.Width;
-    m_font_height = area.Height;
-
-    area = font->getDimension(L"99.999");
-    m_small_precise_timer_width = area.Width;
-
-    area = font->getDimension(L"99:99.999");
-    m_big_precise_timer_width = area.Width;
-
-    area = font->getDimension(L"-");
-    m_negative_timer_additional_width = area.Width;
-
-    if (RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
-        RaceManager::get()->isBattleMode()     ||
-        RaceManager::get()->getNumLaps() > 9)
-        m_lap_width = font->getDimension(L"99/99").Width;
-    else
-        m_lap_width = font->getDimension(L"9/9").Width;
-
+    initSize();
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
@@ -124,6 +102,35 @@ RaceGUI::RaceGUI()
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
 }   // RaceGUI
+
+// ----------------------------------------------------------------------------
+/** Called when loading the race gui or screen resized. */
+void RaceGUI::initSize()
+{
+    RaceGUIBase::initSize();
+    // Determine maximum length of the rank/lap text, in order to
+    // align those texts properly on the right side of the viewport.
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    core::dimension2du area = font->getDimension(L"99:99.999");
+    m_timer_width = area.Width;
+    m_font_height = area.Height;
+
+    area = font->getDimension(L"99.999");
+    m_small_precise_timer_width = area.Width;
+
+    area = font->getDimension(L"99:99.999");
+    m_big_precise_timer_width = area.Width;
+
+    area = font->getDimension(L"-");
+    m_negative_timer_additional_width = area.Width;
+
+    if (RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
+        RaceManager::get()->isBattleMode()     ||
+        RaceManager::get()->getNumLaps() > 9)
+        m_lap_width = font->getDimension(L"99/99").Width;
+    else
+        m_lap_width = font->getDimension(L"9/9").Width;
+}   // initSize
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()

@@ -148,7 +148,7 @@ GUIEngine::EventPropagation MultitouchSettingsDialog::processEvent(
         
         if (World::getWorld() && World::getWorld()->getRaceGUI())
         {
-            World::getWorld()->getRaceGUI()->recreateMultitouchGUI();
+            World::getWorld()->getRaceGUI()->recreateGUI();
         }
 
         user_config->saveConfig();

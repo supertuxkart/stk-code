@@ -2353,6 +2353,7 @@ void IrrDriver::resizeWindow()
             sbr->onLoadWorld();
         }
         STKTextBillboard::updateAllTextBillboards();
+        World::getWorld()->getRaceGUI()->recreateGUI();
     }
 
 #ifdef ENABLE_RECORDER
