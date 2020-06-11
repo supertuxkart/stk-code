@@ -22,7 +22,7 @@
 #include "os.h"
 #include "IrrlichtDevice.h"
 
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
+#ifdef IOS_STK
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
 #else
@@ -44,20 +44,7 @@ namespace video
 	bool useCoreContext = true;
 
 //! constructor and init code
-#ifdef _IRR_COMPILE_WITH_IOS_DEVICE_
-	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
-				  io::IFileSystem* io, IrrlichtDevice* device, u32 default_fb)
-		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
-		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
-		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
-		RenderTargetTexture(0), CurrentRendertargetSize(0, 0),
-		ColorFormat(ECF_R8G8B8), Params(params), m_default_fb(default_fb)
-	{
-		m_device = device;
-		useCoreContext = !params.ForceLegacyDevice;
-		genericDriverInit(params.WindowSize, params.Stencilbuffer);
-	}
-#else
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
 			const SExposedVideoData& data, io::IFileSystem* io,
 			IrrlichtDevice* device)
@@ -164,7 +151,7 @@ namespace video
 
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 	COGLES2Driver::COGLES2Driver(const SIrrlichtCreationParameters& params,
-				  io::IFileSystem* io, CIrrDeviceSDL* device)
+				  io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb)
 		: CNullDriver(io, params.WindowSize), COGLES2ExtensionHandler(),
 		BridgeCalls(0), CurrentRenderMode(ERM_NONE), ResetRenderStates(true),
 		Transformation3DChanged(true), AntiAlias(params.AntiAlias),
@@ -173,6 +160,7 @@ namespace video
 	{
 		genericDriverInit(params.WindowSize, params.Stencilbuffer);
 		m_device = device;
+		m_default_fb = default_fb;
 	}
 #endif
 
@@ -488,8 +476,6 @@ namespace video
 			os::Printer::log("Could not swap buffers for OpenGL-ES2 driver.");
 			return false;
 		}
-#elif defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		static_cast<CIrrDeviceiOS*>(m_device)->swapBuffers();
 #elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 		SDL_GL_SwapWindow(static_cast<CIrrDeviceSDL*>(m_device)->getWindow());
 #endif
@@ -503,8 +489,10 @@ namespace video
 			const SExposedVideoData& videoData, core::rect<s32>* sourceRect)
 	{
 		CNullDriver::beginScene(backBuffer, zBuffer, color);
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		static_cast<CIrrDeviceiOS*>(m_device)->beginScene();
+#ifdef IOS_STK
+		CIrrDeviceSDL* sdl = static_cast<CIrrDeviceSDL*>(m_device);
+		const SDL_SysWMinfo& info = sdl->getWMInfo();
+		glBindRenderbuffer(GL_RENDERBUFFER, info.info.uikit.framebuffer);
 #endif
 
 		GLbitfield mask = 0;
@@ -2886,7 +2874,7 @@ namespace irr
 namespace video
 {
 
-#if !defined(_IRR_COMPILE_WITH_IOS_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
+#if !defined(_IRR_COMPILE_WITH_IOS_DEVICE_) && (defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_WINDOWS_DEVICE_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_))
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			video::SExposedVideoData& data, io::IFileSystem* io, IrrlichtDevice* device)
 	{
@@ -2934,10 +2922,10 @@ namespace video
 // -----------------------------------
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 	IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-			io::IFileSystem* io, CIrrDeviceSDL* device)
+			io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb)
 	{
 #ifdef _IRR_COMPILE_WITH_OGLES2_
-		return new COGLES2Driver(params, io, device);
+		return new COGLES2Driver(params, io, device, default_fb);
 #else
 		return 0;
 #endif // _IRR_COMPILE_WITH_OGLES2_

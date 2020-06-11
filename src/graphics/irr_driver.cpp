@@ -348,13 +348,11 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-#ifndef IOS_STK
-            // IOS returns the nativebounds in non uniform size
+
             if ((h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
                 (!(h==600 && w==800 && UserConfigParams::m_artist_debug_mode) &&
                 (!(h==720 && w==1280 && ALLOW_1280_X_720 == true))))
                 continue;
-#endif
 
             VideoMode mode(w, h);
             m_modes.push_back( mode );
@@ -582,6 +580,24 @@ void IrrDriver::initDevice()
         }
 
         CVS->init();
+    }
+#endif
+
+#ifdef IOS_STK
+    // After real device is created reload video mode list with native scale
+    video::IVideoModeList* modes = m_device->getVideoModeList();
+    if (UserConfigParams::m_fullscreen)
+    {
+        const core::dimension2d<u32> ssize = modes->getDesktopResolution();
+        if (ssize.Width < 1 || ssize.Height < 1)
+        {
+            Log::warn("irr_driver", "Unknown desktop resolution.");
+        }
+        UserConfigParams::m_width = ssize.Width;
+        UserConfigParams::m_height = ssize.Height;
+        m_modes.clear();
+        VideoMode mode(UserConfigParams::m_width, UserConfigParams::m_height);
+        m_modes.push_back(mode);
     }
 #endif
 

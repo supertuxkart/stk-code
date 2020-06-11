@@ -2396,7 +2396,13 @@ int main(int argc, char *argv[])
 
     delete file_manager;
 
+#ifdef IOS_STK
+    // App store may not like this, but this can happen if player uses keyboard to quit stk
+    exit(0);
+    return 0;
+#else
     return 0 ;
+#endif
 }   // main
 
 // ============================================================================

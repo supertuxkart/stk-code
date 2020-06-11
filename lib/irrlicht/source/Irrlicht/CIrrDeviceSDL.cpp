@@ -29,12 +29,13 @@ namespace irr
 		IVideoDriver* createOpenGLDriver(const SIrrlichtCreationParameters& params,
 			io::IFileSystem* io, CIrrDeviceSDL* device);
 		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
-			io::IFileSystem* io, CIrrDeviceSDL* device);
+			io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb);
 
 	} // end namespace video
 
 } // end namespace irr
 
+extern "C" void init_objc(SDL_SysWMinfo* info, float* ns, float* top, float* bottom, float* left, float* right);
 
 namespace irr
 {
@@ -42,9 +43,10 @@ namespace irr
 //! constructor
 CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
-	Window(0), Context(0),
+	Window(0), Context(0), NativeScale(1.0f),
 	MouseX(0), MouseY(0), MouseButtonStates(0),
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
+	TopPadding(0), BottomPadding(0), LeftPadding(0), RightPadding(0),
 	WindowHasFocus(false), WindowMinimized(false), Resizable(false)
 {
 	#ifdef _DEBUG
@@ -73,7 +75,15 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		{
 			SDL_VERSION(&Info.version);
 
-			SDL_GetWindowWMInfo(Window, &Info);
+			if (!SDL_GetWindowWMInfo(Window, &Info))
+				return;
+#ifdef IOS_STK
+			init_objc(&Info, &NativeScale, &TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
+			Width *= NativeScale;
+			Height *= NativeScale;
+			CreationParams.WindowSize.Width = Width;
+			CreationParams.WindowSize.Height = Height;
+#endif
 			core::stringc sdlversion = "SDL Version ";
 			sdlversion += Info.version.major;
 			sdlversion += ".";
@@ -163,6 +173,10 @@ bool CIrrDeviceSDL::createWindow()
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
 		CreationParams.DriverType == video::EDT_OGLES2)
 		flags |= SDL_WINDOW_OPENGL;
+
+#ifdef MOBILE_STK
+	flags |= SDL_WINDOW_BORDERLESS | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_MAXIMIZED;
+#endif
 
 	tryCreateOpenGLContext(flags);
 	if (!Window || !Context)
@@ -344,7 +358,11 @@ void CIrrDeviceSDL::createDriver()
 	case video::EDT_OGLES2:
 	{
 		#ifdef _IRR_COMPILE_WITH_OGLES2_
-		VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this);
+		u32 default_fb = 0;
+		#ifdef MOBILE_STK
+		default_fb = Info.info.uikit.framebuffer;
+		#endif
+		VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this, default_fb);
 		#else
 		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
 		#endif
@@ -501,29 +519,33 @@ bool CIrrDeviceSDL::run()
 			break;
 
 		case SDL_WINDOWEVENT:
-			if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED &&
-			((SDL_event.window.data1 != (int)Width) || (SDL_event.window.data2 != (int)Height)))
 			{
-				Width = SDL_event.window.data1;
-				Height = SDL_event.window.data2;
-				if (VideoDriver)
-					VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
-			}
-			else if (SDL_event.window.event == SDL_WINDOWEVENT_MINIMIZED)
-			{
-				WindowMinimized = true;
-			}
-			else if (SDL_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
-			{
-				WindowMinimized = false;
-			}
-			else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
-			{
-				WindowHasFocus = true;
-			}
-			else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
-			{
-				WindowHasFocus = false;
+				u32 new_width = SDL_event.window.data1 * NativeScale;
+				u32 new_height = SDL_event.window.data2 * NativeScale;
+				if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED &&
+					((new_width != Width) || (new_height != Height)))
+				{
+					Width = new_width;
+					Height = new_height;
+					if (VideoDriver)
+						VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
+				}
+				else if (SDL_event.window.event == SDL_WINDOWEVENT_MINIMIZED)
+				{
+					WindowMinimized = true;
+				}
+				else if (SDL_event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
+				{
+					WindowMinimized = false;
+				}
+				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
+				{
+					WindowHasFocus = true;
+				}
+				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
+				{
+					WindowHasFocus = false;
+				}
 			}
 			break;
 
@@ -613,14 +635,14 @@ video::IVideoModeList* CIrrDeviceSDL::getVideoModeList()
 		if (SDL_GetDesktopDisplayMode(0, &mode) == 0)
 		{
 			VideoModeList.setDesktop(SDL_BITSPERPIXEL(mode.format),
-				core::dimension2d<u32>(mode.w, mode.h));
+				core::dimension2d<u32>(mode.w * NativeScale, mode.h * NativeScale));
 		}
 
 		for (int i = 0; i < mode_count; i++)
 		{
 			if (SDL_GetDisplayMode(0, i, &mode) == 0)
 			{
-				VideoModeList.addMode(core::dimension2d<u32>(mode.w, mode.h),
+				VideoModeList.addMode(core::dimension2d<u32>(mode.w * NativeScale, mode.h * NativeScale),
 					SDL_BITSPERPIXEL(mode.format));
 			}
 		}

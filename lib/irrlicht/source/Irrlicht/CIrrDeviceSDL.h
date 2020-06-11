@@ -107,6 +107,28 @@ namespace irr
 
 		SDL_Window* getWindow() const { return Window; }
 
+		const SDL_SysWMinfo& getWMInfo() const { return Info; }
+
+		virtual s32 getTopPadding()
+		{
+			return TopPadding * NativeScale;
+		}
+
+		virtual s32 getBottomPadding()
+		{
+			return BottomPadding * NativeScale;
+		}
+
+		virtual s32 getLeftPadding()
+		{
+			return LeftPadding * NativeScale;
+		}
+
+		virtual s32 getRightPadding()
+		{
+			return RightPadding * NativeScale;
+		}
+
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl
 		{
@@ -210,10 +232,16 @@ namespace irr
 		SDL_Window* Window;
 		SDL_GLContext Context;
 
+		f32 NativeScale;
 		s32 MouseX, MouseY;
 		u32 MouseButtonStates;
 
 		u32 Width, Height;
+
+		f32 TopPadding;
+		f32 BottomPadding;
+		f32 LeftPadding;
+		f32 RightPadding;
 
 		bool WindowHasFocus;
 		bool WindowMinimized;
