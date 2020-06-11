@@ -1,6 +1,9 @@
 # run this script from the root directory to re-generate the .pot file
 #
 # ./data/po/update_pot.sh
+if [ -z "$PYTHON" ]; then
+  PYTHON="python"
+fi
 
 CPP_FILE_LIST="`find ./src                 \
                      -name '*.cpp' -or     \
@@ -40,7 +43,7 @@ echo "--------------------"
 echo $XML_FILE_LIST
 
 # XML Files
-python ./data/po/extract_strings_from_XML.py $XML_FILE_LIST
+eval '$PYTHON ./data/po/extract_strings_from_XML.py $XML_FILE_LIST'
 
 
 
