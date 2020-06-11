@@ -395,6 +395,20 @@ bool CIrrDeviceSDL::run()
 	{
 		switch ( SDL_event.type )
 		{
+		case SDL_FINGERMOTION:
+		case SDL_FINGERDOWN:
+		case SDL_FINGERUP:
+			irrevent.EventType = irr::EET_TOUCH_INPUT_EVENT;
+			irrevent.TouchInput.Event = SDL_event.type == SDL_FINGERMOTION ? irr::ETIE_MOVED :
+				SDL_event.type == SDL_FINGERDOWN ? irr::ETIE_PRESSED_DOWN : irr::ETIE_LEFT_UP;
+			irrevent.TouchInput.ID = getTouchId(SDL_event.tfinger.fingerId);
+			if (SDL_event.type == SDL_FINGERUP)
+				removeTouchId(SDL_event.tfinger.fingerId);
+			irrevent.TouchInput.X = SDL_event.tfinger.x * Width;
+			irrevent.TouchInput.Y = SDL_event.tfinger.y * Height;
+			postEventFromUser(irrevent);
+			break;
+
 		case SDL_MOUSEWHEEL:
 			if (SDL_event.wheel.x > 0 || SDL_event.wheel.x < 0)
 				break;
@@ -410,8 +424,8 @@ bool CIrrDeviceSDL::run()
 		case SDL_MOUSEMOTION:
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-			MouseX = irrevent.MouseInput.X = SDL_event.motion.x;
-			MouseY = irrevent.MouseInput.Y = SDL_event.motion.y;
+			MouseX = irrevent.MouseInput.X = SDL_event.motion.x * NativeScale;
+			MouseY = irrevent.MouseInput.Y = SDL_event.motion.y * NativeScale;
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
 
 			postEventFromUser(irrevent);
@@ -421,8 +435,8 @@ bool CIrrDeviceSDL::run()
 		case SDL_MOUSEBUTTONUP:
 
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-			irrevent.MouseInput.X = SDL_event.button.x;
-			irrevent.MouseInput.Y = SDL_event.button.y;
+			irrevent.MouseInput.X = SDL_event.button.x * NativeScale;
+			irrevent.MouseInput.Y = SDL_event.button.y * NativeScale;
 
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
 
@@ -928,6 +942,12 @@ void CIrrDeviceSDL::createKeyMap()
 	// some special keys missing
 
 	KeyMap.sort();
+}
+
+
+bool CIrrDeviceSDL::supportsTouchDevice() const
+{
+	return SDL_GetNumTouchDevices() > 0;
 }
 
 } // end namespace irr

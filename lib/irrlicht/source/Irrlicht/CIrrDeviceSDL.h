@@ -18,6 +18,8 @@
 
 #include <SDL.h>
 #include <SDL_syswm.h>
+#include <map>
+#include <set>
 
 namespace irr
 {
@@ -98,6 +100,8 @@ namespace irr
 		virtual bool getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &brightness, f32 &contrast );
 
 		virtual void setWindowMinimumSize(u32 width, u32 height);
+
+		virtual bool supportsTouchDevice() const;
 
 		//! Get the device type
 		virtual E_DEVICE_TYPE getType() const
@@ -237,6 +241,41 @@ namespace irr
 		u32 MouseButtonStates;
 
 		u32 Width, Height;
+		std::map<SDL_FingerID, size_t> TouchIDMap;
+
+		//! Get a unique touch id per touch, create one if it's a new touch
+		size_t getTouchId(SDL_FingerID touch)
+		{
+			auto it = TouchIDMap.find(touch);
+			if (it == TouchIDMap.end())
+			{
+				std::set<size_t> ids;
+				for (auto& p : TouchIDMap)
+					ids.insert(p.second);
+				size_t cur_id = 0;
+				while (true)
+				{
+					if (ids.find(cur_id) == ids.end())
+						break;
+					 cur_id++;
+				}
+				TouchIDMap[touch] = cur_id;
+				return cur_id;
+			}
+			return it->second;
+		}
+
+		//! Remove a unique touch id, free it for future usage
+		void removeTouchId(SDL_FingerID touch)
+		{
+			TouchIDMap.erase(touch);
+		}
+
+		//! Clear all unique touch ids, used when the app out focused
+		void clearAllTouchIds()
+		{
+			TouchIDMap.clear();
+		}
 
 		f32 TopPadding;
 		f32 BottomPadding;
