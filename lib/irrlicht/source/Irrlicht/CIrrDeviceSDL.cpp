@@ -950,6 +950,22 @@ bool CIrrDeviceSDL::supportsTouchDevice() const
 	return SDL_GetNumTouchDevices() > 0;
 }
 
+
+bool CIrrDeviceSDL::hasOnScreenKeyboard() const
+{
+	return SDL_HasScreenKeyboardSupport() == SDL_TRUE;
+}
+
+
+bool CIrrDeviceSDL::hasHardwareKeyboard() const
+{
+#ifdef MOBILE_STK
+	return SDL_HasHardwareKeyboardConnected() == SDL_TRUE;
+#else
+	return true;
+#endif
+}
+
 } // end namespace irr
 
 #endif // _IRR_COMPILE_WITH_SDL_DEVICE_

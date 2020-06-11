@@ -318,6 +318,7 @@ namespace irr
 		virtual s32 getBottomPadding() { return 0; }
 		virtual s32 getLeftPadding() { return 0; }
 		virtual s32 getRightPadding() { return 0; }
+		virtual f32 getNativeScale() const { return 1.0f; }
 		virtual void setWindowMinimumSize(u32 width, u32 height) {}
 		virtual bool isResizable() const { return false; }
 		//! Check if a driver type is supported by the engine.

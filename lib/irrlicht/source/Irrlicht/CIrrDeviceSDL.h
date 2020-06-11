@@ -133,6 +133,12 @@ namespace irr
 			return RightPadding * NativeScale;
 		}
 
+		virtual f32 getNativeScale() const { return NativeScale; }
+
+		virtual bool hasOnScreenKeyboard() const;
+
+		virtual bool hasHardwareKeyboard() const;
+
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl
 		{

@@ -273,9 +273,12 @@ CGUIEditBox::~CGUIEditBox()
     SDL_StopTextInput();
     g_editbox = NULL;
 #endif
+
+#ifdef ANDROID
     if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
         GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
         irr_driver->getDevice()->toggleOnScreenKeyboard(false);
+#endif
 
 #endif
 }
@@ -686,9 +689,11 @@ bool CGUIEditBox::processKey(const SEvent& event)
         break;
     case IRR_KEY_RETURN:
         {
+#ifdef ANDROID
             if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
                 GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
                 irr_driver->getDevice()->toggleOnScreenKeyboard(false);
+#endif
             sendGuiEvent( EGET_EDITBOX_ENTER );
         }
         break;
@@ -1156,9 +1161,11 @@ bool CGUIEditBox::processMouse(const SEvent& event)
             
             if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard())
             {
+#ifdef ANDROID
                 if (GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
                     irr_driver->getDevice()->toggleOnScreenKeyboard(true, m_type);
                 else
+#endif
                     openScreenKeyboard();
             }
 
@@ -1382,6 +1389,13 @@ void CGUIEditBox::calculateScrollPos()
     rect.w = 1;
     rect.h =
         CurrentTextRect.LowerRightCorner.Y - CurrentTextRect.UpperLeftCorner.Y;
+    float inverse_scale = 1.0f;
+    if (irr_driver->getDevice()->getNativeScale() > 0.0f)
+        inverse_scale = 1.0f / irr_driver->getDevice()->getNativeScale();
+    rect.x *= inverse_scale;
+    rect.y *= inverse_scale;
+    rect.w *= inverse_scale;
+    rect.h *= inverse_scale;
     SDL_SetTextInputRect(&rect);
 #endif
 
