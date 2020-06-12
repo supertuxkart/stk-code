@@ -47,7 +47,9 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	MouseX(0), MouseY(0), MouseButtonStates(0),
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
 	TopPadding(0), BottomPadding(0), LeftPadding(0), RightPadding(0),
-	WindowHasFocus(false), WindowMinimized(false), Resizable(false)
+	WindowHasFocus(false), WindowMinimized(false), Resizable(false),
+	AccelerometerIndex(-1), AccelerometerInstance(-1),
+	GyroscopeIndex(-1), GyroscopeInstance(-1)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceSDL");
@@ -58,7 +60,11 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// noparachute prevents SDL from catching fatal errors.
 	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
-	if (SDL_Init(SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER) < 0)
+	u32 init_flags = SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER;
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+	init_flags |= SDL_INIT_SENSOR;
+#endif
+	if (SDL_Init(init_flags) < 0)
 	{
 		os::Printer::log( "Unable to initialize SDL!", SDL_GetError());
 		Close = true;
@@ -93,6 +99,15 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 			Operator = new COSOperator(sdlversion);
 			os::Printer::log(sdlversion.c_str(), ELL_INFORMATION);
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+			for (int i = 0; i < SDL_NumSensors(); i++)
+			{
+				if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_ACCEL)
+					AccelerometerIndex = i;
+				else if (SDL_SensorGetDeviceType(i) == SDL_SENSOR_GYRO)
+					GyroscopeIndex = i;
+			}
+#endif
 		}
 		else
 			return;
@@ -123,6 +138,89 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		SDL_DestroyWindow(Window);
 	SDL_Quit();
 }
+
+
+bool CIrrDeviceSDL::activateAccelerometer(float updateInterval)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+	if (AccelerometerInstance == -1 && AccelerometerIndex != -1)
+	{
+		SDL_Sensor* accel = SDL_SensorOpen(AccelerometerIndex);
+		if (accel)
+			AccelerometerInstance = SDL_SensorGetInstanceID(accel);
+	}
+#endif
+	return AccelerometerInstance != -1;
+}
+
+
+bool CIrrDeviceSDL::deactivateAccelerometer()
+{
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+	if (AccelerometerInstance == -1)
+		return false;
+	SDL_Sensor* accel = SDL_SensorFromInstanceID(AccelerometerInstance);
+	if (!accel)
+		return false;
+	SDL_SensorClose(accel);
+	AccelerometerInstance = -1;
+#endif
+	return true;
+}
+
+
+bool CIrrDeviceSDL::isAccelerometerActive()
+{
+	return AccelerometerInstance != -1;
+}
+
+
+bool CIrrDeviceSDL::isAccelerometerAvailable()
+{
+	return AccelerometerIndex != -1;
+}
+
+
+bool CIrrDeviceSDL::activateGyroscope(float updateInterval)
+{
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+	if (GyroscopeInstance == -1 && GyroscopeIndex != -1)
+	{
+		SDL_Sensor* gyro = SDL_SensorOpen(GyroscopeIndex);
+		if (gyro)
+			GyroscopeInstance = SDL_SensorGetInstanceID(gyro);
+	}
+#endif
+	return GyroscopeInstance != -1;
+}
+
+
+bool CIrrDeviceSDL::deactivateGyroscope()
+{
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+	if (GyroscopeInstance == -1)
+		return false;
+	SDL_Sensor* gyro = SDL_SensorFromInstanceID(GyroscopeInstance);
+	if (!gyro)
+		return false;
+	SDL_SensorClose(gyro);
+	GyroscopeInstance = -1;
+#endif
+	return true;
+}
+
+
+bool CIrrDeviceSDL::isGyroscopeActive()
+{
+	return GyroscopeInstance != -1;
+}
+
+
+bool CIrrDeviceSDL::isGyroscopeAvailable()
+{
+	return GyroscopeIndex != -1;
+}
+
 
 bool versionCorrect(int major, int minor)
 {
@@ -395,6 +493,31 @@ bool CIrrDeviceSDL::run()
 	{
 		switch ( SDL_event.type )
 		{
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+		case SDL_SENSORUPDATE:
+			if (SDL_event.sensor.which == AccelerometerInstance)
+			{
+				irrevent.EventType = irr::EET_ACCELEROMETER_EVENT;
+				irrevent.AccelerometerEvent.X = SDL_event.sensor.data[0];
+				irrevent.AccelerometerEvent.Y = SDL_event.sensor.data[1];
+				irrevent.AccelerometerEvent.Z = SDL_event.sensor.data[2];
+				// Mobile STK specific
+				if (irrevent.AccelerometerEvent.X < 0.0)
+					irrevent.AccelerometerEvent.X *= -1.0;
+				if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE)
+					irrevent.AccelerometerEvent.Y *= -1.0;
+				postEventFromUser(irrevent);
+			}
+			else if (SDL_event.sensor.which == GyroscopeInstance)
+			{
+				irrevent.EventType = irr::EET_GYROSCOPE_EVENT;
+				irrevent.GyroscopeEvent.X = SDL_event.sensor.data[0];
+				irrevent.GyroscopeEvent.Y = SDL_event.sensor.data[1];
+				irrevent.GyroscopeEvent.Z = SDL_event.sensor.data[2];
+				postEventFromUser(irrevent);
+			}
+			break;
+#endif
 		case SDL_FINGERMOTION:
 		case SDL_FINGERDOWN:
 		case SDL_FINGERUP:

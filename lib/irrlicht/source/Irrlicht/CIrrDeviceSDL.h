@@ -139,6 +139,15 @@ namespace irr
 
 		virtual bool hasHardwareKeyboard() const;
 
+		virtual bool activateAccelerometer(float updateInterval);
+		virtual bool deactivateAccelerometer();
+		virtual bool isAccelerometerActive();
+		virtual bool isAccelerometerAvailable();
+		virtual bool activateGyroscope(float updateInterval);
+		virtual bool deactivateGyroscope();
+		virtual bool isGyroscopeActive();
+		virtual bool isGyroscopeAvailable();
+
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl
 		{
@@ -291,6 +300,11 @@ namespace irr
 		bool WindowHasFocus;
 		bool WindowMinimized;
 		bool Resizable;
+
+		s32 AccelerometerIndex;
+		s32 AccelerometerInstance;
+		s32 GyroscopeIndex;
+		s32 GyroscopeInstance;
 
 		struct SKeyMap
 		{
