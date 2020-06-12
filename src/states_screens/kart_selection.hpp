@@ -76,6 +76,10 @@ protected:
       */
     bool m_game_master_confirmed;
 
+    /** For mobile STK to handle the continue button */
+    bool m_has_external_keyboard;
+    bool m_has_external_gamepad;
+
     GUIEngine::PlayerKartWidget* m_removed_widget;
 
     /** Message shown in multiplayer mode */
