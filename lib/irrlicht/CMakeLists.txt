@@ -13,19 +13,6 @@ if(NOT SERVER_ONLY)
         find_package(OpenGL REQUIRED)
         include_directories(${OPENGL_INCLUDE_DIR})
     endif()
-        
-    if(UNIX AND NOT APPLE)
-        find_package(X11 REQUIRED)
-        include_directories(${X11_INCLUDE_DIR})
-        
-        if(NOT X11_FOUND)
-            message(FATAL_ERROR "X11 not found.")
-        endif()
-        
-        if(NOT X11_Xrandr_FOUND)
-            message(FATAL_ERROR "XRANDR not found.")
-        endif()
-    endif()
 
     if(NOT APPLE AND USE_GLES2)
         find_package(EGL)
@@ -580,23 +567,17 @@ if(IOS)
     set_source_files_properties(source/Irrlicht/CIrrDeviceiOS.mm PROPERTIES LANGUAGE C)
 endif()
 
-
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 
 target_link_libraries(stkirrlicht ${ZLIB_LIBRARY})
 
 if(NOT SERVER_ONLY)
     target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY})
-    if(UNIX AND NOT APPLE)
-        target_link_libraries(stkirrlicht ${X11_X11_LIB} ${X11_Xrandr_LIB})
-    endif()
-        
     if(NOT APPLE AND USE_GLES2)
         target_link_libraries(stkirrlicht ${EGL_LIBRARY})
     endif()
-    
 endif()
 
 if(WIN32)
-    target_link_libraries(stkirrlicht imm32 xinput9_1_0)
+    target_link_libraries(stkirrlicht imm32)
 endif()
