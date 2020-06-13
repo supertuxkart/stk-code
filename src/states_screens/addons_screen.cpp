@@ -158,6 +158,7 @@ void AddonsScreen::init()
     m_icon_height = GUIEngine::getFontHeight() * 2;
     // 128 is the height of the image file
     m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
+    m_icon_bank->setTargetIconSize(128,128);
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
 
     m_type = "kart";

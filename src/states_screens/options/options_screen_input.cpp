@@ -75,6 +75,7 @@ void OptionsScreenInput::loadedFromFile()
     // scale icons depending on font height
     const float scale = GUIEngine::getFontHeight() / 72.0f;
     m_icon_bank->setScale(scale);
+    m_icon_bank->setTargetIconSize(128, 128);
 }   // loadFromFile
 
 // -----------------------------------------------------------------------------
