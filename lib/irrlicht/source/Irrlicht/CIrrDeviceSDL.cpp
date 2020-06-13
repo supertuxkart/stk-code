@@ -242,6 +242,27 @@ bool versionCorrect(int major, int minor)
 #endif
 }
 
+
+// Used in OptionsScreenVideo for live updating vertical sync config
+extern "C" void update_swap_interval(int swap_interval)
+{
+#ifndef IOS_STK
+	// iOS always use vertical sync
+	if (swap_interval > 1)
+		swap_interval = 1;
+
+	// Try adaptive vsync first if support
+	if (swap_interval > 0)
+	{
+		int ret = SDL_GL_SetSwapInterval(-1);
+		if (ret == 0)
+			return;
+	}
+	SDL_GL_SetSwapInterval(swap_interval);
+#endif
+}
+
+
 bool CIrrDeviceSDL::createWindow()
 {
 	// Ignore alpha size here, this follow irr_driver.cpp:450
@@ -287,11 +308,7 @@ bool CIrrDeviceSDL::createWindow()
 		return false;
 	}
 
-	int swap_interval = CreationParams.SwapInterval;
-	if (swap_interval > 1)
-		swap_interval = 1;
-	SDL_GL_SetSwapInterval(swap_interval);
-
+	update_swap_interval(CreationParams.SwapInterval);
 	return true;
 }
 

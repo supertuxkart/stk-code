@@ -615,6 +615,7 @@ void OptionsScreenVideo::updateBlurTooltip()
 }   // updateBlurTooltip
 
 // --------------------------------------------------------------------------------------------
+extern "C" void update_swap_interval(int swap_interval);
 
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
@@ -726,6 +727,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
         assert( vsync != NULL );
         UserConfigParams::m_swap_interval = vsync->getValue();
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+        update_swap_interval(UserConfigParams::m_swap_interval);
+#endif
     }
     else if (name == "rememberWinpos")
     {
