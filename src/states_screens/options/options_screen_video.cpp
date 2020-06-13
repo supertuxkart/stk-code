@@ -214,6 +214,14 @@ void OptionsScreenVideo::init()
     assert( vsync != NULL );
 
     vsync->clearLabels();
+#ifdef IOS_STK
+    //I18N: In the video options, maximum frame per second
+    getWidget("vsync_label")->setText(_("Maximum FPS"));
+    vsync->addLabel("120");
+    vsync->addLabel("60");
+    vsync->addLabel("30");
+    vsync->setValue(UserConfigParams::m_swap_interval);
+#else
     vsync->addLabel(_("Disabled"));
     //I18N: In the video options, full vertical sync (usually 60fps)
     vsync->addLabel(_("Full"));
@@ -232,6 +240,7 @@ void OptionsScreenVideo::init()
     vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
 
     vsync->setTooltip(vsync_tooltip);
+#endif
 
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");

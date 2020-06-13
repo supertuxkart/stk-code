@@ -260,7 +260,8 @@ float MainLoop::getLimitedDt()
         // When in menus, reduce FPS much, it's not necessary to push to the
         // maximum for plain menus
 #ifdef IOS_STK
-        // For iOS devices seems that they has fps locked at 60 anyway
+        // For iOS devices most at locked at 60, for new iPad Pro supports 120
+        // which is currently m_max_fps
         const int max_fps =
             UserConfigParams::m_swap_interval == 2 ? 30 :
             UserConfigParams::m_swap_interval == 1 ? 60 :
