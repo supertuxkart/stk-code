@@ -58,6 +58,8 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
     m_percent_width   = percentWidth;
     m_percent_height  = percentHeight;
     m_irrlicht_window = NULL;
+    m_was_resizable   = GUIEngine::getDevice()->isResizable();
+    GUIEngine::getDevice()->setResizable(false);
 }   // ModalDialog
 
 // ----------------------------------------------------------------------------
@@ -175,6 +177,7 @@ ModalDialog::~ModalDialog()
     // to the deleted widgets will be gone, but some widgets
     // may want to perform additional cleanup at this time
     elementsWereDeleted();
+    GUIEngine::getDevice()->setResizable(m_was_resizable);
 }   // ~ModalDialog
 
 // ----------------------------------------------------------------------------

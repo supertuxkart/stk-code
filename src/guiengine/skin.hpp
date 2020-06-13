@@ -334,6 +334,7 @@ namespace GUIEngine
 
         ~Skin();
 
+        void resetBackgroundImage() { m_bg_image = NULL; }
         static video::SColor getColor(const std::string &name);
         void renderSections(PtrVector<Widget>* within_vector=NULL);
         void drawBgImage();

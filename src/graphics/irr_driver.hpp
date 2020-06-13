@@ -194,7 +194,8 @@ private:
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
 #endif
-
+    // ------------------------------------------------------------------------
+    void resizeWindow();
 public:
     void doScreenShot();    
 public:
@@ -534,6 +535,8 @@ public:
     // ------------------------------------------------------------------------
     u32 getDefaultFramebuffer() const
                             { return m_video_driver->getDefaultFramebuffer(); }
+    // ------------------------------------------------------------------------
+    void handleWindowResize();
 };   // IrrDriver
 
 extern IrrDriver *irr_driver;

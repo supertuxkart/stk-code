@@ -63,9 +63,8 @@ namespace irr
 
 RaceGUIBase::RaceGUIBase()
 {
+    initSize();
     m_ignore_unimportant_messages = false;
-    m_max_font_height       = GUIEngine::getFontHeight() + 10;
-    m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
     //I18N: as in "ready, set, go", shown at the beginning of the race
     m_string_ready          = _("Ready!");
     //I18N: as in "ready, set, go", shown at the beginning of the race
@@ -125,6 +124,14 @@ RaceGUIBase::RaceGUIBase()
     m_referee               = NULL;
     m_multitouch_gui        = NULL;
 }   // RaceGUIBase
+
+// ----------------------------------------------------------------------------
+/** Called when loading the race gui or screen resized. */
+void RaceGUIBase::initSize()
+{
+    m_max_font_height       = GUIEngine::getFontHeight() + 10;
+    m_small_font_max_height = GUIEngine::getSmallFontHeight() + 5;
+}   // initSize
 
 // ----------------------------------------------------------------------------
 /** This is a second initialisation call (after the constructor) for the race
@@ -198,18 +205,18 @@ RaceGUIBase::~RaceGUIBase()
 }   // ~RaceGUIBase
 
 //-----------------------------------------------------------------------------
-void RaceGUIBase::recreateMultitouchGUI()
+void RaceGUIBase::recreateGUI()
 {
-    if (!m_multitouch_gui)
-        return;
-        
-    m_multitouch_gui->recreate();
+    if (m_multitouch_gui)
+        m_multitouch_gui->recreate();
+
+    initSize();
     calculateMinimapSize();
     
     Track* track = Track::getCurrentTrack();
     assert(track != NULL);
     track->updateMiniMapScale();
-}  // recreateMultitouchGUI
+}  // recreateGUI
 
 //-----------------------------------------------------------------------------
 /** Creates the 2D vertices for a regular polygon. Adopted from Irrlicht.
@@ -530,7 +537,7 @@ void RaceGUIBase::update(float dt)
             cl->setSpectator(true);
             static bool msg_shown = false;
             if (getMultitouchGUI() != NULL)
-                recreateMultitouchGUI();
+                recreateGUI();
             else if (!msg_shown)
             {
                 msg_shown = true;

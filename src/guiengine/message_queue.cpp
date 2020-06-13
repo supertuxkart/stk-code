@@ -102,8 +102,9 @@ protected:
     /** A pointer to the Container for the Message */
     SkinWidgetContainer* m_container;
 
-    /** Font used to detect if re-initialization is needed */
+    /** Font and screen size used to detect if re-initialization is needed */
     gui::IGUIFont* m_font;
+    core::dimension2du m_screen_size;
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         Message(5.0f, message)
@@ -135,8 +136,9 @@ public:
     {
         const GUIEngine::BoxRenderParams &brp =
             GUIEngine::getSkin()->getBoxRenderParams(m_render_type);
-        const unsigned width = irr_driver->getActualScreenSize().Width;
-        const unsigned height = irr_driver->getActualScreenSize().Height;
+        m_screen_size = irr_driver->getActualScreenSize();
+        const unsigned width = m_screen_size.Width;
+        const unsigned height = m_screen_size.Height;
         m_font = GUIEngine::getFont();
         m_font->initGlyphLayouts(m_message, m_gls);
         // Reserve space for 3 lines of text, it will occupy the circle
@@ -204,7 +206,8 @@ public:
         Message::draw(dt);
         // This happen when GUIEngine is reset (when font size changed for
         // example)
-        if (m_font != GUIEngine::getFont())
+        if (m_font != GUIEngine::getFont() ||
+            m_screen_size != irr_driver->getActualScreenSize())
             init();
         int pos_transform = 0;
         if (m_container == g_container.get())

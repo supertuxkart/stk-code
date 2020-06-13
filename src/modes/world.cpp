@@ -127,6 +127,7 @@ World* World::m_world[PT_COUNT];
  */
 World::World() : WorldStatus()
 {
+    GUIEngine::getDevice()->setResizable(true);
     RewindManager::setEnable(NetworkConfig::get()->isNetworking());
 #ifdef DEBUG
     m_magic_number = 0xB01D6543;
@@ -601,6 +602,7 @@ Controller* World::loadAIController(AbstractKart* kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    GUIEngine::getDevice()->setResizable(false);
     if (m_process_type == PT_MAIN)
         material_manager->unloadAllTextures();
 

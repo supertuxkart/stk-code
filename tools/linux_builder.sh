@@ -125,15 +125,16 @@ export SCHROOT_64BIT_NAME="chroot-xenial64"
 export STKCODE_DIR="$DIRNAME/.."
 export STKASSETS_DIR="$STKCODE_DIR/../supertuxkart-assets"
 export OPENGLRECORDER_DIR="$STKCODE_DIR/../libopenglrecorder"
+export STKEDITOR_DIR="$STKCODE_DIR/../supertuxkart-editor"
 
 export BLACKLIST_LIBS="ld-linux libbsd.so libc.so libdl.so libdrm libexpat \
                        libGL libgl libm.so libmvec.so libpthread libresolv \
                        librt.so libX libxcb libxshm"
 
+export BUILD_DIR_32BIT="build-linux-32bit"
+export BUILD_DIR_64BIT="build-linux-64bit"
 export DEPENDENCIES_DIR_32BIT="$STKCODE_DIR/dependencies-linux-32bit"
 export DEPENDENCIES_DIR_64BIT="$STKCODE_DIR/dependencies-linux-64bit"
-export STK_BUILD_DIR_32BIT="$STKCODE_DIR/build-linux-32bit"
-export STK_BUILD_DIR_64BIT="$STKCODE_DIR/build-linux-64bit"
 export STK_INSTALL_DIR="$STKCODE_DIR/build-linux-install"
 
 ########################################################
@@ -186,7 +187,7 @@ build_stk()
     fi
     
     export DEPENDENCIES_DIR="$1"
-    export STK_BUILD_DIR="$2"
+    export BUILD_DIR="$2"
     export STK_CMAKE_FLAGS="$3"
     export INSTALL_DIR="$DEPENDENCIES_DIR/dependencies"
     export INSTALL_LIB_DIR="$INSTALL_DIR/lib"
@@ -499,14 +500,25 @@ build_stk()
     fi
 
     # Supertuxkart
-    mkdir -p "$STK_BUILD_DIR"
-    cd "$STK_BUILD_DIR"
+    mkdir -p "$STKCODE_DIR/$BUILD_DIR"
+    cd "$STKCODE_DIR/$BUILD_DIR"
     cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
              -DUSE_SYSTEM_ANGELSCRIPT=0 \
              -DUSE_SYSTEM_ENET=0 \
              -DUSE_SYSTEM_GLEW=0 \
              -DUSE_SYSTEM_WIIUSE=0 \
              -DENABLE_WAYLAND_DEVICE=0 \
+             -DCMAKE_DISABLE_FIND_PACKAGE_Fontconfig=1 \
+             $STK_CMAKE_FLAGS &&
+    make -j$THREADS_NUMBER
+    check_error
+    
+    # Stk editor
+    mkdir -p "$STKEDITOR_DIR/$BUILD_DIR"
+    cd "$STKEDITOR_DIR/$BUILD_DIR"
+    cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+             -DSTATIC_ZLIB=1 \
+             -DSTATIC_PHYSFS=1 \
              -DCMAKE_DISABLE_FIND_PACKAGE_Fontconfig=1 \
              $STK_CMAKE_FLAGS &&
     make -j$THREADS_NUMBER
@@ -520,15 +532,16 @@ copy_libraries()
     fi
     
     export DEPENDENCIES_DIR=$1
-    export STK_BUILD_DIR=$2
+    export BUILD_DIR=$2
     export LIB_INSTALL_DIR=$3
     
-    if [ -z "$DEPENDENCIES_DIR" ] || [ -z "$STK_BUILD_DIR" ] || [ -z "$LIB_INSTALL_DIR" ]; then
+    if [ -z "$DEPENDENCIES_DIR" ] || [ -z "$BUILD_DIR" ] || [ -z "$LIB_INSTALL_DIR" ]; then
         return
     fi
     
     LIBRARIES_LIST=`LD_LIBRARY_PATH="$DEPENDENCIES_DIR/dependencies/lib" \
-                    ldd "$STK_BUILD_DIR/bin/supertuxkart" | cut -d">" -f2 | cut -d"(" -f1 | grep "\.so"`
+                    ldd "$STKCODE_DIR/$BUILD_DIR/bin/supertuxkart" | \
+                    cut -d">" -f2 | cut -d"(" -f1 | grep "\.so"`
 
     for FILE in $LIBRARIES_LIST; do 
         BLACKLISTED=0
@@ -564,18 +577,38 @@ test_package()
         exit 1
     fi
     
+    if [ `objdump -a "$PACKAGE_DIR/bin/supertuxkart-editor" | grep -c "elf32-i386"` -eq 0 ]; then
+        echo "Error: bin/supertuxkart-editor is not 32-bit"
+        exit 1
+    fi
+
     if [ `objdump -a "$PACKAGE_DIR/bin-64/supertuxkart" | grep -c "elf64-x86-64"` -eq 0 ]; then
         echo "Error: bin-64/supertuxkart is not 64-bit"
         exit 1
     fi
     
+    if [ `objdump -a "$PACKAGE_DIR/bin-64/supertuxkart-editor" | grep -c "elf64-x86-64"` -eq 0 ]; then
+        echo "Error: bin-64/supertuxkart-editor is not 64-bit"
+        exit 1
+    fi
+
     if [ `LD_LIBRARY_PATH="$PACKAGE_DIR/lib" ldd "$PACKAGE_DIR/bin/supertuxkart" | grep -c "not found"` -gt 0 ]; then
         echo "Error: bin/supertuxkart has some missing libraries"
         exit 1
     fi
     
+    if [ `ldd "$PACKAGE_DIR/bin/supertuxkart-editor" | grep -c "not found"` -gt 0 ]; then
+        echo "Error: bin/supertuxkart-editor has some missing libraries"
+        exit 1
+    fi
+
     if [ `LD_LIBRARY_PATH="$PACKAGE_DIR/lib-64" ldd "$PACKAGE_DIR/bin-64/supertuxkart" | grep -c "not found"` -gt 0 ]; then
         echo "Error: bin-64/supertuxkart has some missing libraries"
+        exit 1
+    fi
+    
+    if [ `ldd "$PACKAGE_DIR/bin-64/supertuxkart-editor" | grep -c "not found"` -gt 0 ]; then
+        echo "Error: bin-64/supertuxkart-editor has some missing libraries"
         exit 1
     fi
     
@@ -598,10 +631,14 @@ test_package()
 if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     rm -rf "$DEPENDENCIES_DIR_32BIT"
     rm -rf "$DEPENDENCIES_DIR_64BIT"
-    rm -rf "$STK_BUILD_DIR_32BIT"
-    rm -rf "$STK_BUILD_DIR_64BIT"
-    rm -rf "$STK_BUILD_DIR_32BIT-symbols"
-    rm -rf "$STK_BUILD_DIR_64BIT-symbols"
+    rm -rf "$STKCODE_DIR/$BUILD_DIR_32BIT"
+    rm -rf "$STKCODE_DIR/$BUILD_DIR_64BIT"
+    rm -rf "$STKCODE_DIR/$BUILD_DIR_32BIT-symbols"
+    rm -rf "$STKCODE_DIR/$BUILD_DIR_64BIT-symbols"
+    rm -rf "$STKEDITOR_DIR/$BUILD_DIR_32BIT"
+    rm -rf "$STKEDITOR_DIR/$BUILD_DIR_64BIT"
+    rm -rf "$STKEDITOR_DIR/$BUILD_DIR_32BIT-symbols"
+    rm -rf "$STKEDITOR_DIR/$BUILD_DIR_64BIT-symbols"
     rm -rf "$STK_INSTALL_DIR"
     exit 0
 fi
@@ -621,36 +658,36 @@ fi
 # Building STK
 echo "Building 32-bit version..."
 
-schroot -c $SCHROOT_32BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_32BIT" "$STK_BUILD_DIR_32BIT"
+schroot -c $SCHROOT_32BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_32BIT" "$BUILD_DIR_32BIT"
 
-if [ ! -f "$STK_BUILD_DIR_32BIT/bin/supertuxkart" ]; then
+if [ ! -f "$STKCODE_DIR/$BUILD_DIR_32BIT/bin/supertuxkart" ]; then
     echo "Couldn't build 32-bit version."
     exit 1
 fi
 
 echo "Building 64-bit version..."
 
-schroot -c $SCHROOT_64BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_64BIT" "$STK_BUILD_DIR_64BIT"
+schroot -c $SCHROOT_64BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_64BIT" "$BUILD_DIR_64BIT"
 
-if [ ! -f "$STK_BUILD_DIR_64BIT/bin/supertuxkart" ]; then
+if [ ! -f "$STKCODE_DIR/$BUILD_DIR_64BIT/bin/supertuxkart" ]; then
     echo "Couldn't build 64-bit version."
     exit 1
 fi
 
 echo "Building 32-bit version with symbols..."
 
-schroot -c $SCHROOT_32BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_32BIT" "$STK_BUILD_DIR_32BIT-symbols" "-DDEBUG_SYMBOLS=1"
+schroot -c $SCHROOT_32BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_32BIT" "$BUILD_DIR_32BIT-symbols" "-DDEBUG_SYMBOLS=1"
 
-if [ ! -f "$STK_BUILD_DIR_32BIT/bin/supertuxkart" ]; then
+if [ ! -f "$STKCODE_DIR/$BUILD_DIR_32BIT/bin/supertuxkart" ]; then
     echo "Couldn't build 32-bit version with symbols."
     exit 1
 fi
 
 echo "Building 64-bit version with symbols..."
 
-schroot -c $SCHROOT_64BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_64BIT" "$STK_BUILD_DIR_64BIT-symbols" "-DDEBUG_SYMBOLS=1"
+schroot -c $SCHROOT_64BIT_NAME -- "$0" build_stk "$DEPENDENCIES_DIR_64BIT" "$BUILD_DIR_64BIT-symbols" "-DDEBUG_SYMBOLS=1"
 
-if [ ! -f "$STK_BUILD_DIR_64BIT/bin/supertuxkart" ]; then
+if [ ! -f "$STKCODE_DIR/$BUILD_DIR_64BIT/bin/supertuxkart" ]; then
     echo "Couldn't build 64-bit version with symbols."
     exit 1
 fi
@@ -667,8 +704,8 @@ mkdir -p "$STK_PACKAGE_DIR/bin-64"
 mkdir -p "$STK_PACKAGE_DIR/lib"
 mkdir -p "$STK_PACKAGE_DIR/lib-64"
 
-schroot -c $SCHROOT_32BIT_NAME -- "$0" copy_libraries "$DEPENDENCIES_DIR_32BIT" "$STK_BUILD_DIR_32BIT" "$STK_PACKAGE_DIR/lib"
-schroot -c $SCHROOT_64BIT_NAME -- "$0" copy_libraries "$DEPENDENCIES_DIR_64BIT" "$STK_BUILD_DIR_64BIT" "$STK_PACKAGE_DIR/lib-64"
+schroot -c $SCHROOT_32BIT_NAME -- "$0" copy_libraries "$DEPENDENCIES_DIR_32BIT" "$BUILD_DIR_32BIT" "$STK_PACKAGE_DIR/lib"
+schroot -c $SCHROOT_64BIT_NAME -- "$0" copy_libraries "$DEPENDENCIES_DIR_64BIT" "$BUILD_DIR_64BIT" "$STK_PACKAGE_DIR/lib-64"
 
 find "$STK_PACKAGE_DIR/lib" -type f -exec strip -s {} \;
 find "$STK_PACKAGE_DIR/lib-64" -type f -exec strip -s {} \;
@@ -680,11 +717,15 @@ mv "$STK_PACKAGE_DIR/lib-64/libstdc++.so.6" "$STK_PACKAGE_DIR/lib-64/libstdc++.s
 
 write_run_game_sh "$STK_PACKAGE_DIR"
 
-cp "$STK_BUILD_DIR_32BIT-symbols/bin/supertuxkart" "$STK_INSTALL_DIR/SuperTuxKart-$VERSION-linux32-symbols"
-cp "$STK_BUILD_DIR_64BIT-symbols/bin/supertuxkart" "$STK_INSTALL_DIR/SuperTuxKart-$VERSION-linux64-symbols"
+cp "$STKCODE_DIR/$BUILD_DIR_32BIT-symbols/bin/supertuxkart" "$STK_INSTALL_DIR/supertuxkart-$STK_VERSION-linux32-symbols"
+cp "$STKCODE_DIR/$BUILD_DIR_64BIT-symbols/bin/supertuxkart" "$STK_INSTALL_DIR/supertuxkart-$STK_VERSION-linux64-symbols"
+cp "$STKEDITOR_DIR/$BUILD_DIR_32BIT-symbols/bin/supertuxkart-editor" "$STK_INSTALL_DIR/supertuxkart-editor-$STK_VERSION-linux32-symbols"
+cp "$STKEDITOR_DIR/$BUILD_DIR_64BIT-symbols/bin/supertuxkart-editor" "$STK_INSTALL_DIR/supertuxkart-editor-$STK_VERSION-linux64-symbols"
 
-cp -a "$STK_BUILD_DIR_32BIT/bin/supertuxkart" "$STK_PACKAGE_DIR/bin/"
-cp -a "$STK_BUILD_DIR_64BIT/bin/supertuxkart" "$STK_PACKAGE_DIR/bin-64/"
+cp -a "$STKCODE_DIR/$BUILD_DIR_32BIT/bin/supertuxkart" "$STK_PACKAGE_DIR/bin/"
+cp -a "$STKCODE_DIR/$BUILD_DIR_64BIT/bin/supertuxkart" "$STK_PACKAGE_DIR/bin-64/"
+cp -a "$STKEDITOR_DIR/$BUILD_DIR_32BIT/bin/supertuxkart-editor" "$STK_PACKAGE_DIR/bin/"
+cp -a "$STKEDITOR_DIR/$BUILD_DIR_64BIT/bin/supertuxkart-editor" "$STK_PACKAGE_DIR/bin-64/"
 
 cp -a "$STKCODE_DIR/data/." "$STK_PACKAGE_DIR/data"
 cp -a "$STKASSETS_DIR/editor" "$STK_PACKAGE_DIR/data/"

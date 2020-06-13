@@ -39,9 +39,10 @@ using namespace irr;
 #include "guiengine/event_handler.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
-#include "utils/leak_check.hpp"
+#include <functional>
 
 /**
  * \ingroup guiengine
@@ -58,7 +59,6 @@ namespace GUIEngine
     {
     protected:
         static SCREEN* singleton;
-
     public:
 
         ~ScreenSingleton()
@@ -71,12 +71,14 @@ namespace GUIEngine
             if (singleton == NULL)
             {
                 singleton = new SCREEN();
+                std::function<SCREEN*()> new_screen_function = []()
+                    { return ScreenSingleton::getInstance(); };
+                singleton->setScreenPointerFunction(new_screen_function);
                 GUIEngine::addScreenToList(singleton);
             }
 
             return singleton;
         }
-
     };
     template <typename SCREEN> SCREEN*
         ScreenSingleton<SCREEN>::singleton = nullptr;
@@ -118,6 +120,8 @@ namespace GUIEngine
          */
         bool m_update_in_background;
 
+        /** For runtime screen reloading without template */
+        std::function<Screen*()> m_screen_func;
     protected:
         bool m_throttle_FPS;
 
@@ -137,6 +141,12 @@ namespace GUIEngine
                                        PtrVector<Widget>& append_to,
                                        irr::gui::IGUIElement* parent = NULL);
 
+        /** Save the function before GUIEngine::clearScreenCache, call it after
+         * to get the new screen instance pointer
+         */
+        std::function<Screen*()> getNewScreenPointer() const { return m_screen_func; }
+
+        void setScreenPointerFunction(const std::function<Screen*()>& f) { m_screen_func = f; }
 
         Screen(bool pause_race=true);
 

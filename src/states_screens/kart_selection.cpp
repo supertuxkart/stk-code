@@ -268,6 +268,8 @@ void KartSelectionScreen::loadedFromFile()
 
 void KartSelectionScreen::beforeAddingWidget()
 {
+    m_has_external_keyboard = irr_driver->getDevice()->hasHardwareKeyboard();
+    m_has_external_gamepad = input_manager->getGamepadCount() > 0;
     if (useContinueButton())
     {
         getWidget("kartlist")->m_properties[GUIEngine::PROP_WIDTH] = "85%";
@@ -1008,8 +1010,7 @@ void KartSelectionScreen::addMultiplayerMessage()
     {
         m_multiplayer_message = new BubbleWidget();
         m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
-        if (!irr_driver->getDevice()->hasHardwareKeyboard() &&
-            input_manager->getGamepadCount() == 0)
+        if (!m_has_external_keyboard && !m_has_external_gamepad)
         {
             m_multiplayer_message->setText(_("Connect a keyboard or "
                 "gamepad to play splitscreen multiplayer"));
@@ -1593,8 +1594,7 @@ bool KartSelectionScreen::useContinueButton() const
 {
     if (m_multiplayer)
         return false;
-    if (irr_driver->getDevice()->hasHardwareKeyboard() ||
-        input_manager->getGamepadCount() > 0)
+    if (m_has_external_keyboard || m_has_external_gamepad)
         return false;
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||

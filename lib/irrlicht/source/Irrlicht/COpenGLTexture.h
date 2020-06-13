@@ -29,8 +29,8 @@
 	#include <OpenGL/gl.h>
 #elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 	#define NO_SDL_GLEXT
-	#include <SDL/SDL_video.h>
-	#include <SDL/SDL_opengl.h>
+	#include <SDL_video.h>
+	#include <SDL_opengl.h>
 #else
 	#if defined(_IRR_OSX_PLATFORM_)
 		#include <OpenGL/gl.h>
