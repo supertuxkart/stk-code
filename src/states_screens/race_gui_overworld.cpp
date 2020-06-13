@@ -533,9 +533,20 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                      irr_driver->getActualScreenSize().Width,
                                      irr_driver->getActualScreenSize().Height);
-                GUIEngine::getOutlineFont()->draw(_("Press fire to start the tutorial"), pos2,
-                                           GUIEngine::getSkin()->getColor("font::normal"),
-                                           true, true /* vcenter */, NULL);
+                if (m_multitouch_gui)
+                {
+                    // I18N: Shown when multitouch GUI exists
+                    // and press the podium (2, 1, 3 like) icon instead of fire button
+                    GUIEngine::getOutlineFont()->draw(_("Press podium icon to start tutorial"), pos2,
+                                               GUIEngine::getSkin()->getColor("font::normal"),
+                                               true, true /* vcenter */, NULL);
+                }
+                else
+                {
+                    GUIEngine::getOutlineFont()->draw(_("Press fire to start the tutorial"), pos2,
+                                               GUIEngine::getSkin()->getColor("font::normal"),
+                                               true, true /* vcenter */, NULL);
+                }
                 continue;
             }
 
@@ -604,9 +615,20 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                  irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                  irr_driver->getActualScreenSize().Width,
                                  irr_driver->getActualScreenSize().Height);
-            font->draw(_("Press fire to start the challenge"), pos2,
-                        GUIEngine::getSkin()->getColor("font::normal"),
-                        true, true /* vcenter */, NULL);
+            if (m_multitouch_gui)
+            {
+                // I18N: Shown when multitouch GUI exists
+                // and press the podium (2, 1, 3 like) icon instead of fire button
+                font->draw(_("Press podium icon to start the challenge"), pos2,
+                            GUIEngine::getSkin()->getColor("font::normal"),
+                            true, true /* vcenter */, NULL);
+            }
+            else
+            {
+                font->draw(_("Press fire to start the challenge"), pos2,
+                            GUIEngine::getSkin()->getColor("font::normal"),
+                            true, true /* vcenter */, NULL);
+            }
             font->setBlackBorder(false);
         }
     }
