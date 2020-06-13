@@ -139,6 +139,7 @@ namespace irr
 
 		virtual bool hasHardwareKeyboard() const;
 
+
 		virtual bool activateAccelerometer(float updateInterval);
 		virtual bool deactivateAccelerometer();
 		virtual bool isAccelerometerActive();
@@ -147,6 +148,8 @@ namespace irr
 		virtual bool deactivateGyroscope();
 		virtual bool isGyroscopeActive();
 		virtual bool isGyroscopeAvailable();
+
+		virtual void resetPaused() { clearAllTouchIds(); }
 
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl

@@ -34,6 +34,8 @@ private:
 
     std::atomic_bool m_request_abort;
 
+    std::atomic_bool m_paused;
+
     /** True if the frame rate should be throttled. */
     bool m_throttle_fps;
 
@@ -73,6 +75,10 @@ public:
         m_ticks_adjustment.getData() += ticks;
         m_ticks_adjustment.unlock();
     }
+    // ------------------------------------------------------------------------
+    void setPaused(bool val)                           { m_paused.store(val); }
+    // ------------------------------------------------------------------------
+    bool isPaused() const                           { return m_paused.load(); }
 };   // MainLoop
 
 extern MainLoop* main_loop;

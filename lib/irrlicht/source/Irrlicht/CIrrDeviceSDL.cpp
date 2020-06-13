@@ -36,6 +36,7 @@ namespace irr
 } // end namespace irr
 
 extern "C" void init_objc(SDL_SysWMinfo* info, float* ns, float* top, float* bottom, float* left, float* right);
+extern "C" int handle_app_event(void* userdata, SDL_Event* event);
 
 namespace irr
 {
@@ -121,6 +122,9 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 	if (VideoDriver)
 		createGUIAndScene();
+#ifdef MOBILE_STK
+	SDL_SetEventFilter(handle_app_event, NULL);
+#endif
 }
 
 
