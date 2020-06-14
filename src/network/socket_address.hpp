@@ -46,10 +46,7 @@
 class SocketAddress
 {
 private:
-    // We need to have a biggest size to hold all type of sockaddr
-    static_assert(sizeof(sockaddr_in6) > sizeof(sockaddr_in),
-        "Invalid sockaddr size");
-    std::array<char, sizeof(sockaddr_in6)> m_sockaddr;
+    std::array<char, sizeof(sockaddr_storage)> m_sockaddr;
 
     short m_family;
 public:
