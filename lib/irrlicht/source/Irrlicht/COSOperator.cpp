@@ -11,7 +11,7 @@
 #else
 #include <string.h>
 #include <unistd.h>
-#if !defined(_IRR_SOLARIS_PLATFORM_) && !defined(__CYGWIN__)
+#if !defined(_IRR_SOLARIS_PLATFORM_) && !defined(__CYGWIN__) && !defined(__HAIKU__)
 #include <sys/param.h>
 #include <sys/types.h>
 #if defined(ANDROID) || (defined(__linux__) && !defined(__GLIBC__))

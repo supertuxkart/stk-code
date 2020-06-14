@@ -22,6 +22,7 @@
 //! _IRR_WINDOWS_CE_PLATFORM_ for Windows CE
 //! _IRR_WINDOWS_API_ for Windows or XBox
 //! _IRR_LINUX_PLATFORM_ for Linux (it is defined here if no other os is defined)
+//! _IRR_HAIKU_PLATFORM_ for Haiku
 //! _IRR_SOLARIS_PLATFORM_ for Solaris
 //! _IRR_OSX_PLATFORM_ for Apple systems running OSX
 //! _IRR_IOS_PLATFORM_ for Apple devices running iOS
@@ -88,6 +89,15 @@
 #endif
 #endif
 
+#if defined(HAIKU)
+#define _IRR_HAIKU_PLATFORM_
+#endif
+
+#if defined(_IRR_HAIKU_PLATFORM_)
+#define _IRR_COMPILE_WITH_SDL_DEVICE_
+#define _IRR_COMPILE_WITH_OPENGL_
+#endif
+
 #if defined(ANDROID)
 #define _IRR_ANDROID_PLATFORM_
 #define _IRR_POSIX_API_
@@ -99,7 +109,7 @@
 #define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
 
-#if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_)
+#if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_) && !defined(_IRR_HAIKU_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
 #define _IRR_LINUX_PLATFORM_
 #endif
