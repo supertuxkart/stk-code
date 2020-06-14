@@ -1388,6 +1388,8 @@ namespace StringUtils
         uagent += (std::string)" (Macintosh)";
 #elif defined(__FreeBSD__)
         uagent += (std::string)" (FreeBSD)";
+#elif defined(__HAIKU__)
+        uagent += (std::string)" (Haiku)";
 #elif defined(ANDROID)
         uagent += (std::string)" (Android)";
 #elif defined(linux)
