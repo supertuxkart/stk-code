@@ -129,11 +129,9 @@ source/Irrlicht/CImageLoaderPNG.cpp
 source/Irrlicht/CImageWriterBMP.cpp
 source/Irrlicht/CImageWriterJPG.cpp
 source/Irrlicht/CImageWriterPNG.cpp
-source/Irrlicht/CIrrDeviceAndroid.cpp
-source/Irrlicht/CIrrDeviceLinux.cpp
 source/Irrlicht/CIrrDeviceSDL.cpp
+source/Irrlicht/CIrrDeviceServer.cpp
 source/Irrlicht/CIrrDeviceStub.cpp
-source/Irrlicht/CIrrDeviceWin32.cpp
 source/Irrlicht/CLightSceneNode.cpp
 source/Irrlicht/CLimitReadFile.cpp
 source/Irrlicht/CLogger.cpp
@@ -260,11 +258,9 @@ source/Irrlicht/CImageLoaderPNG.h
 source/Irrlicht/CImageWriterBMP.h
 source/Irrlicht/CImageWriterJPG.h
 source/Irrlicht/CImageWriterPNG.h
-source/Irrlicht/CIrrDeviceAndroid.h
-source/Irrlicht/CIrrDeviceLinux.h
 source/Irrlicht/CIrrDeviceSDL.h
+source/Irrlicht/CIrrDeviceServer.h
 source/Irrlicht/CIrrDeviceStub.h
-source/Irrlicht/CIrrDeviceWin32.h
 source/Irrlicht/CLightSceneNode.h
 source/Irrlicht/CLimitReadFile.h
 source/Irrlicht/CLogger.h
@@ -537,26 +533,6 @@ include/vector2d.h
 include/vector3d.h
 )
 
-if(APPLE AND NOT IOS)
-    set(IRRLICHT_SOURCES
-        ${IRRLICHT_SOURCES}
-        source/Irrlicht/MacOSX/AppDelegate.mm
-        source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
-        source/Irrlicht/MacOSX/OSXClipboard.mm)
-
-    #list(APPEND CMAKE_C_SOURCE_FILE_EXTENSIONS mm)
-    #set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS cpp)
-
-    set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
-    set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES LANGUAGE C)
-
-    set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
-    set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES LANGUAGE C)
-
-    set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3 -fno-rtti")
-    set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
-endif()
-
 if(IOS)
     set(IRRLICHT_SOURCES
         ${IRRLICHT_SOURCES}
@@ -579,5 +555,5 @@ if(NOT SERVER_ONLY)
 endif()
 
 if(WIN32)
-    target_link_libraries(stkirrlicht imm32)
+    target_link_libraries(stkirrlicht)
 endif()

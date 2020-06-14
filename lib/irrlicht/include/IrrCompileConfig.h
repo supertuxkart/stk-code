@@ -45,10 +45,12 @@
 
 //! Uncomment this line to compile with the SDL device
 //#define _IRR_COMPILE_WITH_SDL_DEVICE_
-#ifdef NO_IRR_COMPILE_WITH_SDL_DEVICE_
+// Always use SDL2 in STK unless server only compilation
+#if defined(NO_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(ANDROID)
 #undef _IRR_COMPILE_WITH_SDL_DEVICE_
+#else
+#define _IRR_COMPILE_WITH_SDL_DEVICE_
 #endif
-
 
 //! WIN32 for Windows32
 //! WIN64 for Windows64
@@ -56,12 +58,6 @@
 #if defined(_WIN32) || defined(_WIN64) || defined(WIN32) || defined(WIN64)
 #define _IRR_WINDOWS_
 #define _IRR_WINDOWS_API_
-#ifndef NO_IRR_COMPILE_WITH_SDL_DEVICE_
-#define _IRR_COMPILE_WITH_SDL_DEVICE_
-#undef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-#else
-#define _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-#endif
 #endif
 
 
@@ -74,10 +70,6 @@
     #undef _IRR_WINDOWS_
     #define _IRR_XBOX_PLATFORM_
     #define _IRR_WINDOWS_API_
-    //#define _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-    #undef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
-    //#define _IRR_COMPILE_WITH_SDL_DEVICE_
-
     #include <xtl.h>
 #endif
 
@@ -93,18 +85,7 @@
 #define _IRR_COMPILE_WITH_SDL_DEVICE_
 #define _IRR_COMPILE_WITH_OGLES2_
 #else
-#ifndef NO_IRR_COMPILE_WITH_SDL_DEVICE_
-#define _IRR_COMPILE_WITH_SDL_DEVICE_
-#undef _IRR_COMPILE_WITH_OSX_DEVICE_
-#else
-#define _IRR_COMPILE_WITH_OSX_DEVICE_
 #endif
-#endif
-#endif
-
-// Disable macOS/OSX device
-#ifdef NO_IRR_COMPILE_WITH_OSX_DEVICE_
-#undef _IRR_COMPILE_WITH_OSX_DEVICE_
 #endif
 
 #if defined(ANDROID)
@@ -123,12 +104,6 @@
 #define _IRR_LINUX_PLATFORM_
 #endif
 #define _IRR_POSIX_API_
-#ifndef NO_IRR_COMPILE_WITH_SDL_DEVICE_
-#define _IRR_COMPILE_WITH_SDL_DEVICE_
-#else
-// For server only STK
-#define _IRR_COMPILE_WITH_X11_DEVICE_
-#endif
 #endif
 
 #ifdef NO_IRR_COMPILE_WITH_WAYLAND_DEVICE_
