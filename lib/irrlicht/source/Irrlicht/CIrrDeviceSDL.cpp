@@ -478,7 +478,7 @@ void CIrrDeviceSDL::createDriver()
 	{
 		#ifdef _IRR_COMPILE_WITH_OGLES2_
 		u32 default_fb = 0;
-		#ifdef MOBILE_STK
+		#ifdef IOS_STK
 		default_fb = Info.info.uikit.framebuffer;
 		#endif
 		VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this, default_fb);
@@ -796,6 +796,12 @@ video::IVideoModeList* CIrrDeviceSDL::getVideoModeList()
 				core::dimension2d<u32>(mode.w * NativeScale, mode.h * NativeScale));
 		}
 
+#ifdef MOBILE_STK
+	// SDL2 will return w,h and h,w for mobile STK, as we only use landscape
+	// so we just use desktop resolution for now
+	VideoModeList.addMode(core::dimension2d<u32>(mode.w * NativeScale, mode.h * NativeScale),
+		SDL_BITSPERPIXEL(mode.format));
+#else
 		for (int i = 0; i < mode_count; i++)
 		{
 			if (SDL_GetDisplayMode(0, i, &mode) == 0)
@@ -804,6 +810,7 @@ video::IVideoModeList* CIrrDeviceSDL::getVideoModeList()
 					SDL_BITSPERPIXEL(mode.format));
 			}
 		}
+#endif
 	}
 
 	return &VideoModeList;
