@@ -480,6 +480,15 @@ void IrrDriver::initDevice()
             params.HandleSRGB    = false;
             params.ShadersPath   = (file_manager->getShadersDir() +
                                                            "irrlicht/").c_str();
+            // Set window to remembered position
+            if (  !UserConfigParams::m_fullscreen
+                && UserConfigParams::m_remember_window_location
+                && UserConfigParams::m_window_x >= 0
+                && UserConfigParams::m_window_y >= 0            )
+            {
+                params.WindowPosition.X = UserConfigParams::m_window_x;
+                params.WindowPosition.Y = UserConfigParams::m_window_y;
+            }
 
             /*
             switch ((int)UserConfigParams::m_antialiasing)
@@ -739,16 +748,6 @@ void IrrDriver::initDevice()
         // does not set the 'enable mipmap' flag.
         m_scene_manager->getParameters()
             ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
-
-        // Set window to remembered position
-        if (  !UserConfigParams::m_fullscreen
-            && UserConfigParams::m_remember_window_location
-            && UserConfigParams::m_window_x >= 0
-            && UserConfigParams::m_window_y >= 0            )
-        {
-            moveWindow(UserConfigParams::m_window_x,
-                       UserConfigParams::m_window_y);
-        } // If reinstating window location
     } // If showing graphics
 
     // Initialize material2D

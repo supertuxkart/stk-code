@@ -344,8 +344,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -367,8 +367,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -389,8 +389,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -411,8 +411,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -445,8 +445,8 @@ legacy:
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
