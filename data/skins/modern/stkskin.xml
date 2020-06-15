@@ -313,9 +313,11 @@ all types of ttf.
 <color type="emphasis_text" state="neutral" r="0" g="0" b="180" />
 <color type="emphasis_text" state="focused" r="0" g="0" b="160" />
 
-<!-- Color used for blue items in list (e.g. player team color in networking) -->
+<!-- Color used for red/blue items in list (e.g. player team color in networking) -->
 <color type="list_blue" state="neutral" r="0" g="0" b="255" />
 <color type="list_blue" state="focused" r="0" g="0" b="255" />
+<color type="list_red" state="neutral" r="255" g="0" b="0" />
+<color type="list_red" state="focused" r="255" g="0" b="0" />
 
 <!-- Color used to fade out background when a dialog is shown -->
 <color type="dialog_background" state="neutral" a="120" r="0" g="0" b="0" />

@@ -456,8 +456,8 @@ void ListWidget::markItemRed(const int id, bool red)
 
     if (red)
     {
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,255,0,0) );
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,0,0) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("list_red::neutral"));
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("list_red::focused"));
     }
     else
     {
