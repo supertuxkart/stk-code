@@ -51,6 +51,7 @@
 
                     <spacer width="5" height="3%"/>
                     
+                    <!--
                     <div layout="horizontal-row" width="100%" height="fit">
                         <checkbox id="enable-hw-report"/>
                         <spacer width="1%" height="100%" />
@@ -59,6 +60,7 @@
                     </div>
 
                     <spacer width="5" height="3%"/>
+                    -->
 
                     <div layout="horizontal-row" width="100%" height="fit">
                         <checkbox id="enable-lobby-chat"/>

@@ -185,13 +185,14 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         if (!internet->getState())
             UserConfigParams::m_internet_status = RequestManager::IPERM_NOT_ALLOWED;
     }
-    else if (name=="enable-hw-report")
+    /*else if (name=="enable-hw-report")
     {
         CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
         UserConfigParams::m_hw_report_enable = stats->getState();
         if(stats->getState())
             HardwareStats::reportHardwareStats();
     }
+    */
     else if (name=="enable-lobby-chat")
     {
         CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
@@ -244,14 +245,14 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
 
 void OptionsScreenGeneral::setInternetCheckboxes(bool activate)
 {
-    CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
+    //CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-hw-report");
     CheckBoxWidget* chat = getWidget<CheckBoxWidget>("enable-lobby-chat");
     CheckBoxWidget* race_chat = getWidget<CheckBoxWidget>("enable-race-chat");
 
     if (activate)
     {
-        stats->setActive(true);
-        stats->setState(UserConfigParams::m_hw_report_enable);
+        //stats->setActive(true);
+        //stats->setState(UserConfigParams::m_hw_report_enable);
         chat->setActive(true);
         chat->setState(UserConfigParams::m_lobby_chat);
         race_chat->setActive(UserConfigParams::m_lobby_chat);
@@ -263,15 +264,15 @@ void OptionsScreenGeneral::setInternetCheckboxes(bool activate)
     else
     {
         chat->setActive(false);
-        stats->setActive(false);
+        //stats->setActive(false);
         race_chat->setActive(false);
 #ifdef MOBILE_STK
         getWidget("assets_settings")->setActive(false);
 #endif
         // Disable this, so that the user has to re-check this if
         // enabled later (for GDPR compliance).
-        UserConfigParams::m_hw_report_enable = false;
-        stats->setState(false);
+        //UserConfigParams::m_hw_report_enable = false;
+        //stats->setState(false);
     }
 } // setInternetCheckboxes
 
