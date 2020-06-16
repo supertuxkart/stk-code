@@ -137,8 +137,7 @@ namespace irr
 
 		virtual bool hasOnScreenKeyboard() const;
 
-		virtual bool hasHardwareKeyboard() const;
-
+		virtual u32 getOnScreenKeyboardHeight() const;
 
 		virtual bool activateAccelerometer(float updateInterval);
 		virtual bool deactivateAccelerometer();

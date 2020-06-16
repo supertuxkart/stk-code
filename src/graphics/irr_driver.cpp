@@ -780,6 +780,7 @@ void IrrDriver::initDevice()
     m_device->registerGetMovedHeightFunction([]
         (const IrrlichtDevice* device)->int
         {
+#ifdef ANDROID
             int screen_keyboard_height =
                 device->getOnScreenKeyboardHeight();
             int screen_height = device->getScreenHeight();
@@ -803,6 +804,9 @@ void IrrDriver::initDevice()
                 return screen_keyboard_height;
             }
             return screen_keyboard_height - element_height;
+#else
+            return 0;
+#endif
         });
 }   // initDevice
 

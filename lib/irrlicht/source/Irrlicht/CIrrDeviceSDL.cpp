@@ -1108,12 +1108,12 @@ bool CIrrDeviceSDL::hasOnScreenKeyboard() const
 }
 
 
-bool CIrrDeviceSDL::hasHardwareKeyboard() const
+u32 CIrrDeviceSDL::getOnScreenKeyboardHeight() const
 {
 #ifdef MOBILE_STK
-	return SDL_HasHardwareKeyboardConnected() == SDL_TRUE;
+	return SDL_GetScreenKeyboardHeight() * NativeScale;
 #else
-	return true;
+	return 0;
 #endif
 }
 
