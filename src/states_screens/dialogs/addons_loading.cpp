@@ -55,9 +55,13 @@ AddonsLoading::AddonsLoading(const std::string &id)
 {
     
     m_icon_shown       = false;
+#ifdef SERVER_ONLY
+    m_icon_downloaded  = std::make_shared<bool>(false);
+#else
     m_icon_downloaded  = std::make_shared<bool>(m_addon.iconReady());
     if (*m_icon_downloaded == false)
         addons_manager->downloadIconForAddon(id, m_icon_downloaded);
+#endif
     loadFromFile("addons_loading.stkgui");
 
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
