@@ -100,30 +100,20 @@ void OptionsScreenInput::buildDeviceList()
         kbname << "keyboard" << i;
         const std::string internal_name = kbname.str();
         
-        if (config->isGamePadAndroid())
+        const int icon = (config->isEnabled() ? 0 : 1);
+
+        //Display the configName instead of default name if it exists
+        if (!config->getConfigName().empty())
         {
             // since irrLicht's list widget has the nasty tendency to put the
             // icons very close to the text, I'm adding spaces to compensate.
-            devices->addItem(internal_name, (core::stringw("   ") + 
-                             _("Gamepad")).c_str(), 2 /* icon */);
+            devices->addItem(internal_name, (core::stringw("   ") +
+                config->getConfigName()), icon);
         }
         else
         {
-            const int icon = (config->isEnabled() ? 0 : 1);
-
-            //Display the configName instead of default name if it exists
-            if (!config->getConfigName().empty())
-            {
-                // since irrLicht's list widget has the nasty tendency to put the
-                // icons very close to the text, I'm adding spaces to compensate.
-                devices->addItem(internal_name, (core::stringw("   ") + 
-                    config->getConfigName()), icon);
-            }
-            else
-            {
-                devices->addItem(internal_name, (core::stringw("   ") + 
-                                _("Keyboard %i", i)).c_str(), icon);   
-            }
+            devices->addItem(internal_name, (core::stringw("   ") +
+                            _("Keyboard %i", i)).c_str(), icon);
         }
     }
 
