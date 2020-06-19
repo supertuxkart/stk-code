@@ -890,6 +890,9 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     ModelViewWidget* w3 = m_kart_widgets[widget_id].m_model_view;
     assert( w3 != NULL );
 
+    // set the color of the name label
+    m_kart_widgets[widget_id].m_kart_name->setColor(GUIEngine::getSkin()->getColor("text::neutral"));
+
     if (selection == RANDOM_KART_ID)
     {
         // Random kart
