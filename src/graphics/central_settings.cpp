@@ -74,7 +74,7 @@ void CentralVideoSettings::init()
         Log::info("IrrDriver", "OpenGL version string: %s", version);
 
         if (strstr(vendor, "NVIDIA"))
-            glGetIntegerv(0x9048, &m_gl_mem);
+            glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &m_gl_mem);
 
         if (m_gl_mem > 0)
             Log::info("IrrDriver", "OpenGL total memory: %d", m_gl_mem/1024);
