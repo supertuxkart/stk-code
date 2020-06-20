@@ -26,7 +26,7 @@ private:
     /** Supports GLSL */
     bool                  m_glsl;
 
-    int m_gl_major_version, m_gl_minor_version;
+    int m_gl_major_version, m_gl_minor_version, m_gl_mem;
     bool hasBufferStorage;
     bool hasComputeShaders;
     bool hasArraysOfArrays;
