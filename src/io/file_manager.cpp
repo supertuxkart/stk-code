@@ -221,6 +221,8 @@ FileManager::FileManager()
     m_stk_assets_download_dir += "/Library/Application Support/SuperTuxKart/stk-assets/";
 #elif defined (ANDROID)
     m_stk_assets_download_dir += "/stk-assets/";
+#else
+#error You must set m_stk_assets_download_dir to appropriate place for your platform
 #endif
 
 #else
