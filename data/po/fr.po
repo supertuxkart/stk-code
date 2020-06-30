@@ -630,7 +630,7 @@ msgstr "Tu vas bientôt recevoir un courriel avec les instructions pour changer 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
-"able to reset your password."messagerie
+"able to reset your password."
 msgstr "Saisis le nom et l’adresse de que tu as fournis lors de l’inscription pour réinitialiser ton mot de passe."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
@@ -3833,7 +3833,7 @@ msgstr "Tu as une nouvelle demande d'amitié !"
 msgid ""
 "Unable to connect to the server. Check your internet connection or try again"
 " later."
-msgstr "Impossible de se connecter au serveur. Vérifies que tu es bien connecté à Internet ou réessaies plus tard."
+msgstr "Impossible de se connecter au serveur. Vérifie que tu es bien connecté à Internet ou réessaie plus tard."
 
 #: src/race/highscore_manager.cpp:102
 msgid ""
@@ -3927,7 +3927,7 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "Désolé, une erreur s’est produite lors de la connexion au site web des extensions. Assures-toi d’être connecté à Internet et vérifie que SuperTuxKart n’est pas bloqué par un parefeu."
+msgstr "Désolé, une erreur s’est produite lors de la connexion au site web des extensions. Assure-toi d’être connecté à Internet et vérifie que SuperTuxKart n’est pas bloqué par un parefeu."
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -3948,7 +3948,7 @@ msgstr "standard"
 #: src/states_screens/kart_selection.cpp:1568
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
-msgstr "Verrouillé : remportes des défis pour y accéder !"
+msgstr "Verrouillé : remporte des défis pour y accéder !"
 
 #: src/states_screens/arenas_screen.cpp:338
 msgid "Random Arena"
@@ -5001,7 +5001,7 @@ msgstr "Verrouillé"
 
 #: src/states_screens/kart_selection.cpp:1015
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
-msgstr "Branches un clavier ou une manette pour jouer en écran partagé multijoueurs"
+msgstr "Branche un clavier ou une manette pour jouer en écran partagé multijoueurs"
 
 #: src/states_screens/kart_selection.cpp:1020
 #: src/states_screens/online/networking_lobby.cpp:513
