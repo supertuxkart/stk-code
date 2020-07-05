@@ -326,6 +326,7 @@ namespace irr
 		};
 
 		core::array<SKeyMap> KeyMap;
+		std::map<SDL_Scancode, irr::EKEY_CODE> ScanCodeMap;
 		SDL_SysWMinfo Info;
 		void tryCreateOpenGLContext(u32 flags);
 	};
