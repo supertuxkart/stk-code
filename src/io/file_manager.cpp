@@ -914,7 +914,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 #if defined(WIN32)
     bool error = _wmkdir(StringUtils::utf8ToWide(path).c_str()) != 0;
 #else
-    bool error = mkdir(path.c_str(), 0755) != 0;
+    bool error = mkdir(path.c_str(), 0777) != 0;
 #endif
     return !error;
 }   // checkAndCreateDirectory
