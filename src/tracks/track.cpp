@@ -1177,6 +1177,9 @@ void Track::updateMiniMapScale()
         return;
 
     core::dimension2du mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
+    // Happens in race result gui
+    if (mini_map_size.Width == 0 || mini_map_size.Height == 0)
+        return;
     core::dimension2du mini_map_texture_size = m_render_target->getTextureSize();
 
     if(mini_map_texture_size.Width)
