@@ -267,7 +267,8 @@ public:
     void removeReferee();
     
     RaceGUIMultitouch* getMultitouchGUI() {return m_multitouch_gui;}
-    void recreateMultitouchGUI();
+    void recreateGUI();
+    virtual void initSize();
 
 };   // RaceGUIBase
 

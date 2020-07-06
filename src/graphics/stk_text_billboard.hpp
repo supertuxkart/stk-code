@@ -83,6 +83,10 @@ private:
 
     core::aabbox3df m_bbox;
 
+    FontWithFace* m_face;
+
+    core::stringw m_text;
+
     // ------------------------------------------------------------------------
     float getDefaultScale(FontWithFace* face);
 public:
@@ -94,6 +98,11 @@ public:
                      const core::vector3df& scale = core::vector3df(1, 1, 1));
     // ------------------------------------------------------------------------
     ~STKTextBillboard()
+    {
+        clearBuffer();
+    }
+    // ------------------------------------------------------------------------
+    void clearBuffer()
     {
 #ifndef SERVER_ONLY
         if (m_instanced_array != 0)
@@ -111,8 +120,11 @@ public:
             p.second->drop();
         }
         m_gl_mb.clear();
+        m_gl_tbs.clear();
 #endif
     }
+    // ------------------------------------------------------------------------
+    void reload();
     // ------------------------------------------------------------------------
     virtual void collectChar(video::ITexture* texture,
                              const core::rect<float>& dest_rect,
@@ -160,6 +172,8 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
     }
+    // ------------------------------------------------------------------------
+    static void updateAllTextBillboards();
 };
 
 #endif

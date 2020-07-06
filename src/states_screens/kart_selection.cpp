@@ -24,6 +24,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/render_info.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
@@ -367,7 +368,9 @@ void KartSelectionScreen::init()
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
-
+    // Only allow keyboard and gamepad to choose kart without continue button in
+    // multitouch GUI, so mouse (touch) clicking can be used as previewing karts
+    w->setEventCallbackActive(Input::IT_MOUSEBUTTON, !useContinueButton());
 
     KartHoverListener* karthoverListener = new KartHoverListener(this);
     w->registerHoverListener(karthoverListener);
@@ -426,6 +429,10 @@ void KartSelectionScreen::init()
         {
             // Add multiplayer message
             addMultiplayerMessage();
+#ifdef MOBILE_STK
+            MessageQueue::addStatic(MessageQueue::MT_GENERIC,
+                _("Connect a keyboard or gamepad to play splitscreen multiplayer"));
+#endif
         }
     }
 }   // init
@@ -434,6 +441,10 @@ void KartSelectionScreen::init()
 
 void KartSelectionScreen::tearDown()
 {
+#ifdef MOBILE_STK
+    if (m_multiplayer)
+        MessageQueue::discardStatic();
+#endif
     // Reset the 'map fire to select' option of the device manager
     input_manager->getDeviceManager()->mapFireToSelect(false);
 
@@ -468,6 +479,10 @@ void KartSelectionScreen::unloaded()
 // Return true if event was handled successfully
 bool KartSelectionScreen::joinPlayer(InputDevice* device, PlayerProfile* p)
 {
+#ifdef MOBILE_STK
+    if (m_multiplayer)
+        MessageQueue::discardStatic();
+#endif
     bool first_player = m_kart_widgets.size() == 0;
 
     if (UserConfigParams::logGUI())
@@ -875,6 +890,9 @@ void KartSelectionScreen::updateKartWidgetModel(int widget_id,
     ModelViewWidget* w3 = m_kart_widgets[widget_id].m_model_view;
     assert( w3 != NULL );
 
+    // set the color of the name label
+    m_kart_widgets[widget_id].m_kart_name->setColor(GUIEngine::getSkin()->getColor("text::neutral"));
+
     if (selection == RANDOM_KART_ID)
     {
         // Random kart
@@ -1008,17 +1026,8 @@ void KartSelectionScreen::addMultiplayerMessage()
     {
         m_multiplayer_message = new BubbleWidget();
         m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
-        if (!irr_driver->getDevice()->hasHardwareKeyboard() &&
-            input_manager->getGamepadCount() == 0)
-        {
-            m_multiplayer_message->setText(_("Connect a keyboard or "
-                "gamepad to play splitscreen multiplayer"));
-        }
-        else
-        {
-            m_multiplayer_message->setText(_("Everyone:\n"
-                "Press the 'Select' button to join the game"));
-        }
+        m_multiplayer_message->setText(_("Everyone:\n"
+            "Press the 'Select' button to join the game"));
         m_multiplayer_message->m_x = message_x;
         m_multiplayer_message->m_y = (int) (fullarea->m_y + fullarea->m_h * 0.3f);
         m_multiplayer_message->m_w = (int) (splitWidth * 0.6f);
@@ -1129,14 +1138,12 @@ void KartSelectionScreen::eventCallback(Widget* widget,
     }
     else if (name == "karts")
     {
-        if (!useContinueButton() &&
-            m_kart_widgets.size() > unsigned(player_id))
+        if (m_kart_widgets.size() > unsigned(player_id))
             playerConfirm(player_id);
     }
     else if (name == "continue")
     {
-        if (useContinueButton() &&
-            m_kart_widgets.size() > unsigned(player_id))
+        if (m_kart_widgets.size() > unsigned(player_id))
             playerConfirm(player_id);
     }
     else if (name == "back")
@@ -1591,15 +1598,16 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
 // ----------------------------------------------------------------------------
 bool KartSelectionScreen::useContinueButton() const
 {
+#ifdef MOBILE_STK
     if (m_multiplayer)
-        return false;
-    if (irr_driver->getDevice()->hasHardwareKeyboard() ||
-        input_manager->getGamepadCount() > 0)
         return false;
     bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
         irr_driver->getDevice()->supportsTouchDevice()) ||
         UserConfigParams::m_multitouch_active > 1;
     return multitouch_enabled;
+#else
+    return false;
+#endif
 }   // useContinueButton
 
 #if 0

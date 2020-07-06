@@ -812,6 +812,10 @@ namespace UserConfigParams
 
     PARAM_PREFIX GroupUserConfigParam  m_network_group
         PARAM_DEFAULT(GroupUserConfigParam("Network", "Network Settings"));
+    PARAM_PREFIX BoolUserConfigParam m_enable_network_splitscreen
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable-network-splitscreen",
+        &m_network_group, "The default value of enable splitscreen checkbox "
+        "in online screen."));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
         PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
         &m_network_group, "If all network packets should be logged"));

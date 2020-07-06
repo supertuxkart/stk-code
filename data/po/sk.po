@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-13 10:43+0800\n"
-"PO-Revision-Date: 2020-05-13 07:32+0000\n"
+"POT-Creation-Date: 2020-06-13 16:16+0800\n"
+"PO-Revision-Date: 2020-06-13 11:12+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Slovak (http://www.transifex.com/supertuxkart/supertuxkart/language/sk/)\n"
 "MIME-Version: 1.0\n"
@@ -159,7 +159,7 @@ msgstr "Odinštalovať"
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:154
+#: src/input/gamepad_config.cpp:153
 #: src/states_screens/dialogs/addons_loading.cpp:291
 msgid "Back"
 msgstr "Späť"
@@ -963,7 +963,7 @@ msgstr "Štandardné"
 #: src/states_screens/arenas_screen.cpp:82
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:337
-#: src/states_screens/kart_selection.cpp:316
+#: src/states_screens/kart_selection.cpp:318
 #: src/states_screens/tracks_and_gp_screen.cpp:152
 msgid "Add-Ons"
 msgstr "Doplnky"
@@ -982,7 +982,7 @@ msgstr "Doplnky"
 #: src/states_screens/edit_track_screen.cpp:146
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
-#: src/states_screens/kart_selection.cpp:308
+#: src/states_screens/kart_selection.cpp:310
 #: src/states_screens/online/tracks_screen.cpp:354
 #: src/states_screens/tracks_and_gp_screen.cpp:142
 msgid "All"
@@ -1607,7 +1607,7 @@ msgstr "Doplnky"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:521
+#: src/states_screens/race_gui_overworld.cpp:529
 msgid "Tutorial"
 msgstr "Tutoriál"
 
@@ -1977,8 +1977,8 @@ msgstr "Hudba"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:528
-#: src/states_screens/options/options_screen_video.cpp:601
+#: src/states_screens/options/options_screen_video.cpp:539
+#: src/states_screens/options/options_screen_video.cpp:612
 msgid "Enabled"
 msgstr "Zapnuté"
 
@@ -2057,7 +2057,7 @@ msgstr "Povoliť znevýhodnenie jednotlivých hráčov"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
+#: src/states_screens/options/options_screen_general.cpp:110
 msgid "Uninstall full game assets"
 msgstr ""
 
@@ -2688,31 +2688,31 @@ msgid ""
 "created."
 msgstr "Váš konfiguračný súbor bol príliš starý, takže bol zmazaný a vytvorí sa nový."
 
-#: src/graphics/irr_driver.cpp:598
+#: src/graphics/irr_driver.cpp:625
 msgid "Video recording started."
 msgstr "Začalo nahrávanie videa."
 
-#: src/graphics/irr_driver.cpp:604
+#: src/graphics/irr_driver.cpp:632
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video uložené do „%s“."
 
-#: src/graphics/irr_driver.cpp:608
+#: src/graphics/irr_driver.cpp:636
 msgid "Encoding progress:"
 msgstr "Priebeh kódovania:"
 
-#: src/graphics/irr_driver.cpp:1862 src/graphics/irr_driver.cpp:1867
+#: src/graphics/irr_driver.cpp:1892 src/graphics/irr_driver.cpp:1897
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1381 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1392 src/states_screens/race_result_gui.cpp:154
 #, c-format
 msgid "Tip: %s"
 msgstr ""
 
-#: src/guiengine/engine.cpp:1425
+#: src/guiengine/engine.cpp:1436
 msgid "Loading"
 msgstr "Načítava sa"
 
@@ -3269,111 +3269,111 @@ msgid "Mode"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:156
+#: src/input/gamepad_config.cpp:155
 msgid "Guide"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:158
+#: src/input/gamepad_config.cpp:157
 msgid "Start"
 msgstr "Start"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:160
+#: src/input/gamepad_config.cpp:159
 msgid "Left thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:162
+#: src/input/gamepad_config.cpp:161
 msgid "Right thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:164
+#: src/input/gamepad_config.cpp:163
 msgid "Left shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:166
+#: src/input/gamepad_config.cpp:165
 msgid "Right shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:168
+#: src/input/gamepad_config.cpp:167
 msgid "DPad up"
 msgstr "Smer. ovl. nahor"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:170
+#: src/input/gamepad_config.cpp:169
 msgid "DPad down"
 msgstr "Smer. ovl. nadol"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:172
+#: src/input/gamepad_config.cpp:171
 msgid "DPad left"
 msgstr "Smer. ovl. doľava"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:174
+#: src/input/gamepad_config.cpp:173
 msgid "DPad right"
 msgstr "Smer. ovl. doprava"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:178
+#: src/input/gamepad_config.cpp:177
 msgid "Left thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:180
+#: src/input/gamepad_config.cpp:179
 msgid "Left thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:182
+#: src/input/gamepad_config.cpp:181
 msgid "Left thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:184
+#: src/input/gamepad_config.cpp:183
 msgid "Left thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:186
+#: src/input/gamepad_config.cpp:185
 msgid "Right thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:188
+#: src/input/gamepad_config.cpp:187
 msgid "Right thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:190
+#: src/input/gamepad_config.cpp:189
 msgid "Right thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:192
+#: src/input/gamepad_config.cpp:191
 msgid "Right thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:194
+#: src/input/gamepad_config.cpp:193
 msgid "Left trigger"
 msgstr "Ľavá spúšť"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:196
+#: src/input/gamepad_config.cpp:195
 msgid "Right trigger"
 msgstr "Pravá spúšť"
 
-#: src/input/input_manager.cpp:958
+#: src/input/input_manager.cpp:980
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Ignoruje sa '%s'. Mali ste vstúpiť do hry skôr!"
 
-#: src/input/input_manager.cpp:995
+#: src/input/input_manager.cpp:1017
 msgid "Only the Game Master may act at this point!"
 msgstr "V tejto chvíli môže vykonávať činnosť iba vlastník hry!"
 
@@ -3447,16 +3447,16 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart sa môže pripájať na server s cieľom sťahovať doplnky a upozorňovať vás na aktualizácie. Okrem toho zbierame anonymné údaje o hardvéri, ktoré nám pomáhajú pri vývoji STK. Prosím, prečítajte si našu politiku ochrany osobných údajov na stránke http://privacy.supertuxkart.net. Chcete túto funkciu povoliť? (Ak toto nastavenie budete neskôr chcieť zmeniť, prejdite do ponuky „Možnosti“, na kartu „Všeobecné“ a upravte možnosti „Pripájať sa na internet“ a „Posielať anonymné údaje o hardvéri“.)"
 
-#: src/main.cpp:2162
+#: src/main.cpp:2164
 msgid "Your screen resolution is too low to run STK."
 msgstr "Rozlíšenie vašej obrazovky je príliš nízke na spustenie STK."
 
-#: src/main.cpp:2194
+#: src/main.cpp:2199
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Verzia ovládača grafickej karty je príliš stará. Prosím, nainštalujte najnovší ovládač grafickej karty."
 
-#: src/main.cpp:2212
+#: src/main.cpp:2217
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3464,7 +3464,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Zdá sa, že máte príliš starý ovládač grafickej karty. Skontrolujte, či nie je dostupná aktualizácia. SuperTuxKart odporúča ovládač s podporou aspoň %s. Hra bude pravdepodobne fungovať, ale s redukovanou grafikou."
 
-#: src/main_loop.cpp:446 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:450 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "Časový limit pripojenia na server vypršal."
 
@@ -3532,6 +3532,16 @@ msgstr "Nové najrýchlejšie kolo"
 msgid "WRONG WAY!"
 msgstr "ZLÁ CESTA!"
 
+#: src/modes/soccer_world.cpp:525 src/modes/soccer_world.cpp:640
+#, c-format
+msgid "%s scored a goal!"
+msgstr ""
+
+#: src/modes/soccer_world.cpp:527 src/modes/soccer_world.cpp:642
+#, c-format
+msgid "Oops, %s made an own goal!"
+msgstr ""
+
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
 msgid "%i spare tire kart has been spawned!"
@@ -3541,11 +3551,11 @@ msgstr[1] "Vznikli %i motokáry s náhradnými pneumatikami!"
 msgstr[2] "Vzniklo %i motokár s náhradnými pneumatikami!"
 msgstr[3] "Vzniklo %i motokár s náhradnými pneumatikami!"
 
-#: src/modes/world.cpp:1364
+#: src/modes/world.cpp:1366
 msgid "You have been eliminated!"
 msgstr "Boli ste vyradený(á)!"
 
-#: src/modes/world.cpp:1371
+#: src/modes/world.cpp:1373
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' bol(a) vyradený(á)."
@@ -3568,7 +3578,7 @@ msgid "Bad network connection is detected."
 msgstr "Zistila sa nízka kvalita sieťového pripojenia."
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3639
+#: src/network/protocols/server_lobby.cpp:3631
 msgid "Bot"
 msgstr ""
 
@@ -3914,7 +3924,7 @@ msgid "Please wait while addons are updated"
 msgstr "Počkajte, prosím, kým sa aktualizujú doplnky"
 
 #: src/states_screens/addons_screen.cpp:520
-#: src/states_screens/main_menu_screen.cpp:622
+#: src/states_screens/main_menu_screen.cpp:624
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3927,7 +3937,7 @@ msgstr "Ľutujeme, vyskytla sa chyba pri pripájaní na stránku s doplnkami. Pr
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:314
+#: src/states_screens/kart_selection.cpp:316
 #: src/states_screens/tracks_and_gp_screen.cpp:150
 msgid "standard"
 msgstr "štandardné"
@@ -3936,8 +3946,8 @@ msgstr "štandardné"
 #: src/states_screens/arenas_screen.cpp:326
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:915
-#: src/states_screens/kart_selection.cpp:1567
+#: src/states_screens/kart_selection.cpp:917
+#: src/states_screens/kart_selection.cpp:1568
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Uzamknuté: ak chcete získať prístup k ďalším, vyriešte aktívne výzvy!"
@@ -4462,15 +4472,15 @@ msgstr "Rozlíšenia menšie ako 1024x768 alebo 1280x720 nie sú podporované. N
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:193
-#: src/states_screens/options/options_screen_video.cpp:215
-#: src/states_screens/options/options_screen_video.cpp:531
-#: src/states_screens/options/options_screen_video.cpp:602
+#: src/states_screens/options/options_screen_video.cpp:225
+#: src/states_screens/options/options_screen_video.cpp:542
+#: src/states_screens/options/options_screen_video.cpp:613
 msgid "Disabled"
 msgstr "Zakázané"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:533
+#: src/states_screens/options/options_screen_video.cpp:544
 msgid "Important only"
 msgstr "Iba dôležité"
 
@@ -4480,7 +4490,7 @@ msgstr "Iba dôležité"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:540
+#: src/states_screens/options/options_screen_video.cpp:551
 msgid "Low"
 msgstr "Nízka"
 
@@ -4490,14 +4500,14 @@ msgstr "Nízka"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:543
+#: src/states_screens/options/options_screen_video.cpp:554
 msgid "High"
 msgstr "Vysoká"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:537
+#: src/states_screens/options/options_screen_video.cpp:548
 msgid "Very Low"
 msgstr "Veľmi nízka"
 
@@ -4984,54 +4994,54 @@ msgstr "Vyhrali ste grand prix!"
 msgid "You completed the Grand Prix!"
 msgstr "Dokončili ste grand prix!"
 
-#: src/states_screens/kart_selection.cpp:891
-#: src/states_screens/kart_selection.cpp:1585
+#: src/states_screens/kart_selection.cpp:893
+#: src/states_screens/kart_selection.cpp:1586
 msgid "Random Kart"
 msgstr "Náhodná motokára"
 
-#: src/states_screens/kart_selection.cpp:910
+#: src/states_screens/kart_selection.cpp:912
 msgid "Locked"
 msgstr "Uzamknuté"
 
-#: src/states_screens/kart_selection.cpp:1014
+#: src/states_screens/kart_selection.cpp:1015
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:1019
+#: src/states_screens/kart_selection.cpp:1020
 #: src/states_screens/online/networking_lobby.cpp:513
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Všetci:\nStlačte tlačidlo 'Vybrať' pre pridanie sa k hre"
 
-#: src/states_screens/main_menu_screen.cpp:256
+#: src/states_screens/main_menu_screen.cpp:257
 msgid "Would you like to play the tutorial of the game?"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:559
+#: src/states_screens/main_menu_screen.cpp:560
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Bez prístupu k internetu nemožno hrať online. Ak chcete hrať online, prejdite do ponuky Možnosti a začiarknite políčko „Pripájať sa na internet“."
 
-#: src/states_screens/main_menu_screen.cpp:574
+#: src/states_screens/main_menu_screen.cpp:575
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Bez prístupu k internetu nemožno sťahovať doplnky. Ak chcete sťahovať doplnky, prejdite do ponuky „Možnosti“ a začiarknite políčko „Pripájať sa na internet“."
 
-#: src/states_screens/main_menu_screen.cpp:582
+#: src/states_screens/main_menu_screen.cpp:583
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "Bez prístupu k internetu nemožno sťahovať doplnky. Ak chcete sťahovať doplnky, prejdite do ponuky „Možnosti“ a začiarknite políčko „Pripájať sa na internet“.\n\nMôžete však vymazať doplnky, ktoré už sú stiahnuté."
 
-#: src/states_screens/main_menu_screen.cpp:617
+#: src/states_screens/main_menu_screen.cpp:619
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Modul „Doplnky“ je momentálne vypnutý v ponuke Možnosti"
 
-#: src/states_screens/main_menu_screen.cpp:629
+#: src/states_screens/main_menu_screen.cpp:631
 msgid "Please wait while the add-ons are loading"
 msgstr "Počkajte, prosím, kým sa načítajú doplnky"
 
@@ -5495,7 +5505,7 @@ msgstr ""
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:98
+#: src/states_screens/options/options_screen_general.cpp:100
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
@@ -5503,11 +5513,11 @@ msgstr "V režime viacerých hráčov si na obrazovke výberu motokáry\nmôžu 
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
-#: src/states_screens/options/options_screen_general.cpp:114
+#: src/states_screens/options/options_screen_general.cpp:116
 msgid "Install full game assets"
 msgstr ""
 
-#: src/states_screens/options/options_screen_general.cpp:232
+#: src/states_screens/options/options_screen_general.cpp:234
 msgid "Are you sure to uninstall full game assets?"
 msgstr ""
 
@@ -5598,122 +5608,127 @@ msgid ""
 "To use the speedrun mode, please use a new profile."
 msgstr ""
 
+#. I18N: In the video options, maximum frame per second
+#: src/states_screens/options/options_screen_video.cpp:219
+msgid "Maximum FPS"
+msgstr ""
+
 #. I18N: In the video options, full vertical sync (usually 60fps)
-#: src/states_screens/options/options_screen_video.cpp:217
+#: src/states_screens/options/options_screen_video.cpp:227
 msgid "Full"
 msgstr ""
 
 #. I18N: In the video options, half vertical sync (usually 30fps)
-#: src/states_screens/options/options_screen_video.cpp:219
+#: src/states_screens/options/options_screen_video.cpp:229
 msgid "Half"
 msgstr ""
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
-#: src/states_screens/options/options_screen_video.cpp:223
+#: src/states_screens/options/options_screen_video.cpp:233
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
 msgstr ""
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:226
+#: src/states_screens/options/options_screen_video.cpp:236
 msgid "Full: one frame per monitor refresh"
 msgstr ""
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:228
+#: src/states_screens/options/options_screen_video.cpp:238
 msgid "Half: one frame every two monitor refreshes"
 msgstr ""
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:230
+#: src/states_screens/options/options_screen_video.cpp:240
 msgid "Vsync will not work if your drivers don't support it."
 msgstr ""
 
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:479
-#: src/states_screens/options/options_screen_video.cpp:511
+#: src/states_screens/options/options_screen_video.cpp:490
+#: src/states_screens/options/options_screen_video.cpp:522
 msgid "Custom"
 msgstr "Vlastná"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:546
+#: src/states_screens/options/options_screen_video.cpp:557
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Časticové efekty: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:552
+#: src/states_screens/options/options_screen_video.cpp:563
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Animácia postáv: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:555
+#: src/states_screens/options/options_screen_video.cpp:566
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Dynamické osvetlenie: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:558
+#: src/states_screens/options/options_screen_video.cpp:569
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Rozptyl svetla: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:561
+#: src/states_screens/options/options_screen_video.cpp:572
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Antialiasing: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:564
+#: src/states_screens/options/options_screen_video.cpp:575
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Zatienenie okolím: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:568
+#: src/states_screens/options/options_screen_video.cpp:579
 #, c-format
 msgid "Shadows: %s"
 msgstr "Tiene: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:570
+#: src/states_screens/options/options_screen_video.cpp:581
 #, c-format
 msgid "Shadows: %i"
 msgstr "Tiene: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:573
+#: src/states_screens/options/options_screen_video.cpp:584
 #, c-format
 msgid "Bloom: %s"
 msgstr "Bloom (rozptýlené svetlo): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:577
+#: src/states_screens/options/options_screen_video.cpp:588
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Žiara (obrysy): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:581
+#: src/states_screens/options/options_screen_video.cpp:592
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Svetelné lúče: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:586
+#: src/states_screens/options/options_screen_video.cpp:597
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Kvalita vykresľovaného obrazu: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:605
+#: src/states_screens/options/options_screen_video.cpp:616
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Pohybové rozmazanie: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:609
+#: src/states_screens/options/options_screen_video.cpp:620
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Hĺbka ostrosti: %s"
@@ -5747,72 +5762,84 @@ msgid "Do you really want to delete player '%s'?"
 msgstr "Naozaj chcete odstrániť hráča „%s“?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:70
+#: src/states_screens/race_gui_base.cpp:69
 msgid "Ready!"
 msgstr "Pripraviť sa!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:72
+#: src/states_screens/race_gui_base.cpp:71
 msgid "Set!"
 msgstr "Pozor!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:74
+#: src/states_screens/race_gui_base.cpp:73
 msgid "Go!"
 msgstr "Štart!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:76
+#: src/states_screens/race_gui_base.cpp:75
 msgid "GOAL!"
 msgstr "GÓL!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:79
+#: src/states_screens/race_gui_base.cpp:78
 #: src/states_screens/race_result_gui.cpp:318
 msgid "Waiting for others"
 msgstr "Čaká sa na ostatných"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:81
+#: src/states_screens/race_gui_base.cpp:80
 msgid "Waiting for the server"
 msgstr "Čaká sa na server"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:630
+#: src/states_screens/race_gui_base.cpp:637
 #, c-format
 msgid "\"%s\""
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:640
+#: src/states_screens/race_gui_base.cpp:647
 msgid "by"
 msgstr "od"
 
-#: src/states_screens/race_gui_base.cpp:748
+#: src/states_screens/race_gui_base.cpp:755
 msgid "Collect nitro!"
 msgstr "Zbierajte nitro!"
 
-#: src/states_screens/race_gui_base.cpp:750
+#: src/states_screens/race_gui_base.cpp:757
 msgid "Follow the leader!"
 msgstr "Nasledujte vodcu!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:933
+#: src/states_screens/race_gui_base.cpp:940
 #, c-format
 msgid "Top %i"
 msgstr "Najlepších %i"
 
-#: src/states_screens/race_gui.cpp:435
+#: src/states_screens/race_gui.cpp:442
 msgid "Challenge Failed"
 msgstr "Výzva neúspešná"
 
-#: src/states_screens/race_gui_overworld.cpp:528
+#. I18N: Shown when multitouch GUI exists
+#. and press the podium (2, 1, 3 like) icon instead of fire button
+#: src/states_screens/race_gui_overworld.cpp:540
+msgid "Press podium icon to start tutorial"
+msgstr ""
+
+#: src/states_screens/race_gui_overworld.cpp:546
 msgid "Press fire to start the tutorial"
 msgstr "Stlačením tlačidla streľby začnete výuku"
 
-#: src/states_screens/race_gui_overworld.cpp:599
+#. I18N: Shown when multitouch GUI exists
+#. and press the podium (2, 1, 3 like) icon instead of fire button
+#: src/states_screens/race_gui_overworld.cpp:622
+msgid "Press podium icon to start the challenge"
+msgstr ""
+
+#: src/states_screens/race_gui_overworld.cpp:628
 msgid "Press fire to start the challenge"
 msgstr "Výzvu začnete stlačením tlačidla na útok"
 

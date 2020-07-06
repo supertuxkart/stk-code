@@ -87,7 +87,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_timer_in_use = false;
     m_master_player_only = false;
     m_timer = 0;
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
     SDL_SetMainReady();
     SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
     SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
@@ -98,6 +98,81 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     }
 #endif
 }
+
+// -----------------------------------------------------------------------------
+#ifndef SERVER_ONLY
+// For CIrrDeviceSDL
+extern "C" void handle_joystick(SDL_Event& event)
+{
+    if (input_manager)
+        input_manager->handleJoystick(event);
+}   // handle_joystick
+
+// -----------------------------------------------------------------------------
+void InputManager::handleJoystick(SDL_Event& event)
+{
+    try
+    {
+        switch (event.type)
+        {
+#if !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+        case SDL_QUIT:
+        {
+            exit(-1);
+            break;
+        }
+#endif
+        case SDL_JOYDEVICEADDED:
+        {
+            std::unique_ptr<SDLController> c(
+                new SDLController(event.jdevice.which));
+            SDL_JoystickID id = c->getInstanceID();
+            m_sdl_controller[id] = std::move(c);
+            break;
+        }
+        case SDL_JOYDEVICEREMOVED:
+        {
+            m_sdl_controller.erase(event.jdevice.which);
+            break;
+        }
+        case SDL_JOYAXISMOTION:
+        {
+            auto& controller = m_sdl_controller.at(event.jaxis.which);
+            if (m_mode == INPUT_SENSE_GAMEPAD)
+                controller->handleAxisInputSense(event);
+            if (controller->handleAxis(event) &&
+                !UserConfigParams::m_gamepad_visualisation)
+                input(controller->getEvent());
+            break;
+        }
+        case SDL_JOYHATMOTION:
+        {
+            auto& controller = m_sdl_controller.at(event.jhat.which);
+            if (controller->handleHat(event) &&
+                !UserConfigParams::m_gamepad_visualisation)
+                input(controller->getEvent());
+            break;
+        }
+        case SDL_JOYBUTTONUP:
+        case SDL_JOYBUTTONDOWN:
+        {
+            auto& controller = m_sdl_controller.at(event.jbutton.which);
+            if (controller->handleButton(event) &&
+                !UserConfigParams::m_gamepad_visualisation)
+                input(controller->getEvent());
+            break;
+        }
+        default:
+            break;
+        }
+    }
+    catch (std::exception& e)
+    {
+        Log::error("SDLController", "%s", e.what());
+    }
+}   // handleJoystick
+#endif
+
 // -----------------------------------------------------------------------------
 void InputManager::update(float dt)
 {
@@ -106,68 +181,10 @@ void InputManager::update(float dt)
         wiimote_manager->update();
 #endif
 
-#ifndef SERVER_ONLY
+#if !defined(SERVER_ONLY) && !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
     SDL_Event event;
     while (SDL_PollEvent(&event))
-    {
-        try
-        {
-            switch (event.type)
-            {
-            case SDL_QUIT:
-            {
-                exit(-1);
-                break;
-            }
-            case SDL_JOYDEVICEADDED:
-            {
-                std::unique_ptr<SDLController> c(
-                    new SDLController(event.jdevice.which));
-                SDL_JoystickID id = c->getInstanceID();
-                m_sdl_controller[id] = std::move(c);
-                break;
-            }
-            case SDL_JOYDEVICEREMOVED:
-            {
-                m_sdl_controller.erase(event.jdevice.which);
-                break;
-            }
-            case SDL_JOYAXISMOTION:
-            {
-                auto& controller = m_sdl_controller.at(event.jaxis.which);
-                if (m_mode == INPUT_SENSE_GAMEPAD)
-                    controller->handleAxisInputSense(event);
-                if (controller->handleAxis(event) &&
-                    !UserConfigParams::m_gamepad_visualisation)
-                    input(controller->getEvent());
-                break;
-            }
-            case SDL_JOYHATMOTION:
-            {
-                auto& controller = m_sdl_controller.at(event.jhat.which);
-                if (controller->handleHat(event) &&
-                    !UserConfigParams::m_gamepad_visualisation)
-                    input(controller->getEvent());
-                break;
-            }
-            case SDL_JOYBUTTONUP:
-            case SDL_JOYBUTTONDOWN:
-            {
-                auto& controller = m_sdl_controller.at(event.jbutton.which);
-                if (controller->handleButton(event) &&
-                    !UserConfigParams::m_gamepad_visualisation)
-                    input(controller->getEvent());
-                break;
-            }
-            default:
-                break;
-            }
-        }
-        catch (std::exception& e)
-        {
-            Log::error("SDLController", "%s", e.what());
-        }
-    }
+        handleJoystick(event);
 #endif
 
     if(m_timer_in_use)
@@ -193,10 +210,11 @@ InputManager::~InputManager()
 {
 #ifndef SERVER_ONLY
     m_sdl_controller.clear();
+#endif
+    delete m_device_manager;
+#if !defined(SERVER_ONLY) && !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
     SDL_Quit();
 #endif
-
-    delete m_device_manager;
 }   // ~InputManager
 
 //-----------------------------------------------------------------------------
@@ -716,6 +734,10 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
                                  Input::AxisDirection axisDirection, int value,
                                  bool shift_mask)
 {
+    // Updated in rendering from main loop
+    if (!irr_driver->getDevice()->getEventReceiver())
+        return;
+
     // Act different in input sensing mode.
     if (m_mode == INPUT_SENSE_KEYBOARD ||
         m_mode == INPUT_SENSE_GAMEPAD)

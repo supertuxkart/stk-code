@@ -16,8 +16,10 @@
 #include "IImagePresenter.h"
 #include "ICursorControl.h"
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
+#include <SDL.h>
+#include <SDL_syswm.h>
+#include <map>
+#include <set>
 
 namespace irr
 {
@@ -71,6 +73,8 @@ namespace irr
 		//! Sets if the window should be resizable in windowed mode.
 		virtual void setResizable(bool resize=false);
 
+		virtual bool isResizable() const;
+
 		//! Minimizes the window.
 		virtual void minimizeWindow();
 
@@ -95,11 +99,56 @@ namespace irr
 		//! Get the current Gamma Value for the Display
 		virtual bool getGammaRamp( f32 &red, f32 &green, f32 &blue, f32 &brightness, f32 &contrast );
 
+		virtual void setWindowMinimumSize(u32 width, u32 height);
+
+		virtual bool supportsTouchDevice() const;
+
 		//! Get the device type
 		virtual E_DEVICE_TYPE getType() const
 		{
 				return EIDT_SDL;
 		}
+
+		SDL_Window* getWindow() const { return Window; }
+
+		const SDL_SysWMinfo& getWMInfo() const { return Info; }
+
+		virtual s32 getTopPadding()
+		{
+			return TopPadding * NativeScale;
+		}
+
+		virtual s32 getBottomPadding()
+		{
+			return BottomPadding * NativeScale;
+		}
+
+		virtual s32 getLeftPadding()
+		{
+			return LeftPadding * NativeScale;
+		}
+
+		virtual s32 getRightPadding()
+		{
+			return RightPadding * NativeScale;
+		}
+
+		virtual f32 getNativeScale() const { return NativeScale; }
+
+		virtual bool hasOnScreenKeyboard() const;
+
+		virtual u32 getOnScreenKeyboardHeight() const;
+
+		virtual bool activateAccelerometer(float updateInterval);
+		virtual bool deactivateAccelerometer();
+		virtual bool isAccelerometerActive();
+		virtual bool isAccelerometerAvailable();
+		virtual bool activateGyroscope(float updateInterval);
+		virtual bool deactivateGyroscope();
+		virtual bool isGyroscopeActive();
+		virtual bool isGyroscopeAvailable();
+
+		virtual void resetPaused() { clearAllTouchIds(); }
 
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl
@@ -148,7 +197,7 @@ namespace irr
 			//! Sets the new position of the cursor.
 			virtual void setPosition(s32 x, s32 y)
 			{
-				SDL_WarpMouse( x, y );
+				SDL_WarpMouseGlobal( x, y );
 			}
 
 			//! Returns the current position of the mouse cursor.
@@ -201,20 +250,63 @@ namespace irr
 
 		void createKeyMap();
 
-		SDL_Surface* Screen;
-		int SDL_Flags;
-#if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
-		core::array<SDL_Joystick*> Joysticks;
-#endif
+		SDL_Window* Window;
+		SDL_GLContext Context;
 
+		f32 NativeScale;
 		s32 MouseX, MouseY;
 		u32 MouseButtonStates;
 
 		u32 Width, Height;
+		std::map<SDL_FingerID, size_t> TouchIDMap;
 
-		bool Resizable;
+		//! Get a unique touch id per touch, create one if it's a new touch
+		size_t getTouchId(SDL_FingerID touch)
+		{
+			auto it = TouchIDMap.find(touch);
+			if (it == TouchIDMap.end())
+			{
+				std::set<size_t> ids;
+				for (auto& p : TouchIDMap)
+					ids.insert(p.second);
+				size_t cur_id = 0;
+				while (true)
+				{
+					if (ids.find(cur_id) == ids.end())
+						break;
+					 cur_id++;
+				}
+				TouchIDMap[touch] = cur_id;
+				return cur_id;
+			}
+			return it->second;
+		}
+
+		//! Remove a unique touch id, free it for future usage
+		void removeTouchId(SDL_FingerID touch)
+		{
+			TouchIDMap.erase(touch);
+		}
+
+		//! Clear all unique touch ids, used when the app out focused
+		void clearAllTouchIds()
+		{
+			TouchIDMap.clear();
+		}
+
+		f32 TopPadding;
+		f32 BottomPadding;
+		f32 LeftPadding;
+		f32 RightPadding;
+
 		bool WindowHasFocus;
 		bool WindowMinimized;
+		bool Resizable;
+
+		s32 AccelerometerIndex;
+		s32 AccelerometerInstance;
+		s32 GyroscopeIndex;
+		s32 GyroscopeInstance;
 
 		struct SKeyMap
 		{
@@ -234,7 +326,9 @@ namespace irr
 		};
 
 		core::array<SKeyMap> KeyMap;
+		std::map<SDL_Scancode, irr::EKEY_CODE> ScanCodeMap;
 		SDL_SysWMinfo Info;
+		void tryCreateOpenGLContext(u32 flags);
 	};
 
 } // end namespace irr

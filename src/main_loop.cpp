@@ -78,8 +78,8 @@ LRESULT CALLBACK separateProcessProc(_In_ HWND hwnd, _In_ UINT uMsg,
 
 // ----------------------------------------------------------------------------
 MainLoop::MainLoop(unsigned parent_pid, bool download_assets)
-        : m_abort(false), m_request_abort(false), m_ticks_adjustment(0), 
-          m_parent_pid(parent_pid)
+        : m_abort(false), m_request_abort(false), m_paused(false),
+          m_ticks_adjustment(0), m_parent_pid(parent_pid)
 {
     m_curr_time       = 0;
     m_prev_time       = 0;
@@ -121,45 +121,48 @@ float MainLoop::getLimitedDt()
     m_prev_time = m_curr_time;
 
 #ifdef IOS_STK
-    IrrlichtDevice* dev = irr_driver->getDevice();
-    if (dev)
+    if (m_paused.load())
     {
-        // When ios apps entering background it should not run any
+        // When iOS apps entering background it should not run any
         // opengl command from apple document, so we stop here
-        bool win_active = dev->isWindowActive();
-        bool has_focus = dev->isWindowFocused();
-        bool first_out_focus = !has_focus;
-        while (!has_focus || !win_active)
+        if (music_manager)
+            music_manager->pauseMusic();
+        if (SFXManager::get())
+            SFXManager::get()->pauseAll();
+        PlayerManager::get()->save();
+        if (addons_manager->hasDownloadedIcons())
+            addons_manager->saveInstalled();
+        Online::RequestManager::get()->setPaused(true);
+        IrrlichtDevice* dev = irr_driver->getDevice();
+        if (dev)
+            dev->resetPaused();
+
+        while (true)
         {
-            if (first_out_focus)
+            // iOS will pause this thread completely when fully in background
+            IrrlichtDevice* dev = irr_driver->getDevice();
+            bool quit = false;
+            if (dev)
+                quit = !dev->run();
+            if (quit || !m_paused.load())
             {
-                first_out_focus = false;
-                if (music_manager)
-                    music_manager->pauseMusic();
-                if (SFXManager::get())
-                    SFXManager::get()->pauseAll();
-                PlayerManager::get()->save();
-                if (addons_manager->hasDownloadedIcons())
-                    addons_manager->saveInstalled();
-                Online::RequestManager::get()->setPaused(true);
-            }
-            dev->run();
-            win_active = dev->isWindowActive();
-            has_focus = dev->isWindowFocused();
-            if (has_focus && win_active)
-            {
-                if (music_manager)
-                    music_manager->resumeMusic();
-                if (SFXManager::get())
-                    SFXManager::get()->resumeAll();
-                // Improve rubber banding effects of rewinders when going
-                // back to phone, because the smooth timer is paused
-                if (World::getWorld() && RewindManager::isEnabled())
-                    RewindManager::get()->resetSmoothNetworkBody();
-                Online::RequestManager::get()->setPaused(false);
+                if (quit)
+                    return 1.0f/60.0f;
+                dev->resetUnpaused();
+                break;
             }
         }
+        if (music_manager)
+            music_manager->resumeMusic();
+        if (SFXManager::get())
+            SFXManager::get()->resumeAll();
+        // Improve rubber banding effects of rewinders when going
+        // back to phone, because the smooth timer is paused
+        if (World::getWorld() && RewindManager::isEnabled())
+            RewindManager::get()->resetSmoothNetworkBody();
+        Online::RequestManager::get()->setPaused(false);
     }
+
 #endif
     float dt = 0;
 
@@ -257,7 +260,8 @@ float MainLoop::getLimitedDt()
         // When in menus, reduce FPS much, it's not necessary to push to the
         // maximum for plain menus
 #ifdef IOS_STK
-        // For iOS devices seems that they has fps locked at 60 anyway
+        // For iOS devices most at locked at 60, for new iPad Pro supports 120
+        // which is currently m_max_fps
         const int max_fps =
             UserConfigParams::m_swap_interval == 2 ? 30 :
             UserConfigParams::m_swap_interval == 1 ? 60 :
@@ -724,3 +728,24 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 #endif
 }   // renderGUI
 /* EOF */
+
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#include "SDL_events.h"
+extern "C" int handle_app_event(void* userdata, SDL_Event* event)
+{
+    if (!main_loop)
+        return 1;
+    switch (event->type)
+    {
+    case SDL_APP_WILLENTERBACKGROUND:
+        main_loop->setPaused(true);
+        break;
+    case SDL_APP_DIDENTERFOREGROUND:
+        main_loop->setPaused(false);
+        break;
+    default:
+        break;
+    }
+    return 1;
+}
+#endif

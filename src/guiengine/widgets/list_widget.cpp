@@ -315,8 +315,8 @@ void ListWidget::renameCell(const int row_index, const int col_index,
 
     list->setCell(row_index, col_index, newName.c_str(), icon);
 
-    list->setItemOverrideColor( row_index, EGUI_LBC_TEXT          , video::SColor(255,0,0,0) );
-    list->setItemOverrideColor( row_index, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,255,255) );
+    list->setItemOverrideColor( row_index, EGUI_LBC_TEXT          , GUIEngine::getSkin()->getColor("text::neutral") );
+    list->setItemOverrideColor( row_index, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("text::focused") );
 }
 
 // -----------------------------------------------------------------------------
@@ -456,8 +456,8 @@ void ListWidget::markItemRed(const int id, bool red)
 
     if (red)
     {
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           video::SColor(255,255,0,0) );
-        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, video::SColor(255,255,0,0) );
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT,           GUIEngine::getSkin()->getColor("list_red::neutral"));
+        irritem->setItemOverrideColor( id, EGUI_LBC_TEXT_HIGHLIGHT, GUIEngine::getSkin()->getColor("list_red::focused"));
     }
     else
     {

@@ -45,6 +45,8 @@ public:
 	virtual IImage* loadImage(io::IReadFile* file, bool skip_checking = false) const = 0;
 	virtual core::dimension2du getImageSize(io::IReadFile* file) const { return core::dimension2du(0, 0); }
 	virtual bool supportThreadedLoading() const { return false; }
+
+	virtual void setScreenSize(const core::dimension2d<u32> &screen_size) {};
 };
 
 

@@ -11,106 +11,38 @@
 #
 # The build environment can be created using debootstrap:
 #
-#   debootstrap --arch i386 --components=main,restricted,universe,multiverse \
-#               xenial ./chroot-xenial32 http://archive.ubuntu.com/ubuntu/
+#   debootstrap --arch i386 --components=main \
+#               jessie ./chroot-jessie32 http://ftp.debian.org/debian
 #
-#   debootstrap --arch amd64 --components=main,restricted,universe,multiverse \
-#               xenial ./chroot-xenial64 http://archive.ubuntu.com/ubuntu/
+#   debootstrap --arch amd64 --components=main \
+#               jessie ./chroot-jessie64 http://ftp.debian.org/debian
 #
 #
 # Here is example configuration for schroot:
-# /etc/schroot/chroot.d/chroot-xenial32.conf
+# /etc/schroot/chroot.d/chroot-jessie32.conf
 #
-#   [chroot-xenial32]
-#   description=Ubuntu Xenial
+#   [chroot-jessie32]
+#   description=Debian Jessie
 #   personality=linux32
-#   directory=/path/to/chroot-xenial32
+#   directory=/path/to/chroot-jessie32
 #   root-users=deve
 #   type=directory
 #   users=deve
 #
 #
-# /etc/schroot/chroot.d/chroot-xenial64.conf
+# /etc/schroot/chroot.d/chroot-jessie64.conf
 #
-#   [chroot-xenial64]
-#   description=Ubuntu Xenial 64-bit
+#   [chroot-jessie64]
+#   description=Debian Jessie 64-bit
 #   #personality=linux32
-#   directory=/path/to/chroot-xenial64
+#   directory=/path/to/chroot-jessie64
 #   root-users=deve
 #   type=directory
 #   users=deve
 #
 #
-# And some packages that may be useful (esp. build tools, sdl2 and openal 
-# dependencies)
-#
-#   autoconf automake autopoint autotools-dev binutils bsdmainutils
-#   build-essential cmake cmake-data cpp cpp-5 debhelper dh-autoreconf
-#   dh-strip-nondeterminism diffstat docbook docbook-to-man docbook-xml 
-#   docbook-xsl doxygen dpkg-dev fontconfig fontconfig-config fonts-dejavu-core 
-#   g++ g++-5 gcc gcc-5 gettext gettext-base graphviz groff-base icu-devtools 
-#   intltool-debian libalut-dev libalut0 libarchive-zip-perl libarchive13 
-#   libasan2 libasn1-8-heimdal libasound2 libasound2-data libasound2-dev 
-#   libasprintf0v5 libasyncns0 libatomic1 libbluetooth-dev libbluetooth3 
-#   libboost-filesystem1.58.0 libboost-system1.58.0 libbz2-dev libc-dev-bin 
-#   libc6-dev libcaca-dev libcaca0 libcairo2 libcc1-0 libcdt5 libcgraph6 
-#   libcilkrts5 libclang1-3.6 libcroco3 libcurl3 libcurl3-gnutls 
-#   libcurl4-gnutls-dev libdatrie1 libdbus-1-3 libdbus-1-dev libdpkg-perl 
-#   libdrm-amdgpu1 libdrm-dev libdrm-intel1 libdrm-nouveau2 libdrm-radeon1 
-#   libdrm2 libedit2 libegl1-mesa libegl1-mesa-dev libelf1 libenet-dev libenet7 
-#   libexpat1-dev libffi-dev libfile-stripnondeterminism-perl libflac8 
-#   libfontconfig1 libfreetype6 libfribidi-dev libgbm1 libgcc-5-dev libgd3 
-#   libgdbm3 libgl1-mesa-dev libgl1-mesa-dri libgl1-mesa-glx libglapi-mesa 
-#   libgles2-mesa libgles2-mesa-dev libglib2.0-0 libglib2.0-bin libglib2.0-data 
-#   libglib2.0-dev libglu1-mesa libglu1-mesa-dev libgomp1 libgraphite2-3 
-#   libgssapi-krb5-2 libgssapi3-heimdal libgvc6 libgvpr2 libharfbuzz0b 
-#   libhcrypto4-heimdal libheimbase1-heimdal libheimntlm0-heimdal 
-#   libhx509-5-heimdal libice-dev libice6 libicu-dev libicu55 libisl15 libitm1 
-#   libjack-dev libjack0 libjbig-dev libjbig0 libjpeg-dev libjpeg-turbo8 
-#   libjpeg-turbo8-dev libjpeg8 libjpeg8-dev libjsoncpp1 libk5crypto3 
-#   libkeyutils1 libkrb5-26-heimdal libkrb5-3 libkrb5support0 libldap-2.4-2 
-#   libllvm3.6v5 libllvm3.8 libltdl7 liblzma-dev liblzo2-2 libmirclient-dev 
-#   libmirclient9 libmircommon-dev libmircommon5 libmircookie-dev libmircookie2 
-#   libmirprotobuf3 libmpc3 libmpfr4 libmpx0 libobjc-5-dev libobjc4 libogg-dev 
-#   libogg0 libopenal-data libopenal-dev libopenal1 libpango-1.0-0 
-#   libpangocairo-1.0-0 libpangoft2-1.0-0 libpathplan4 libpciaccess0 libpcre16-3
-#   libpcre3-dev libpcre32-3 libpcrecpp0v5 libperl5.22 libpipeline1 
-#   libpixman-1-0 libpng12-dev libportaudio2 libportaudiocpp0 libprotobuf-dev 
-#   libprotobuf-lite9v5 libprotobuf9v5 libpthread-stubs0-dev libpulse-dev 
-#   libpulse-mainloop-glib0 libpulse0 libpython-stdlib libpython2.7-minimal 
-#   libpython2.7-stdlib libquadmath0 libreadline-dev libreadline6-dev 
-#   libroken18-heimdal librtmp1 libsasl2-2 libsasl2-modules-db libsdl-image1.2 
-#   libsdl-image1.2-dev libsdl-ttf2.0-0 libsdl-ttf2.0-dev libsdl1.2-dev 
-#   libsdl1.2debian libsigsegv2 libslang2-dev libsm-dev libsm6 libsndfile1 
-#   libsndio-dev libsndio6.1 libsp1c2 libstdc++-5-dev libtcl8.6 libthai-data 
-#   libthai0 libtiff5 libtiff5-dev libtiffxx5 libtimedate-perl libtinfo-dev 
-#   libtool libubsan0 libudev-dev libunistring0 libvorbis-dev libvorbis0a 
-#   libvorbisenc2 libvorbisfile3 libvpx-dev libvpx3 libwayland-client0 
-#   libwayland-cursor0 libwayland-dev libwayland-egl1-mesa libwayland-server0 
-#   libwebp-dev libwebp5 libwebpdemux1 libwebpmux1 libwind0-heimdal libwrap0 
-#   libx11-6 libx11-data libx11-dev libx11-xcb-dev libx11-xcb1 libxau-dev 
-#   libxau6 libxaw7 libxcb-dri2-0 libxcb-dri2-0-dev libxcb-dri3-0 
-#   libxcb-dri3-dev libxcb-glx0 libxcb-glx0-dev libxcb-present-dev 
-#   libxcb-present0 libxcb-randr0 libxcb-randr0-dev libxcb-render0 
-#   libxcb-render0-dev libxcb-shape0 libxcb-shape0-dev libxcb-shm0 
-#   libxcb-sync-dev libxcb-sync1 libxcb-xfixes0 libxcb-xfixes0-dev libxcb1 
-#   libxcb1-dev libxcursor-dev libxcursor1 libxdamage-dev libxdamage1 
-#   libxdmcp-dev libxdmcp6 libxext-dev libxext6 libxfixes-dev libxfixes3
-#   libxi-dev libxi6 libxinerama-dev libxinerama1 libxkbcommon-dev libxkbcommon0
-#   libxml2-dev libxml2-utils libxml2 libxmu6 libxpm4 libxrandr-dev libxrandr2 
-#   libxrender-dev libxrender1 libxshmfence-dev libxshmfence1 libxslt1.1 
-#   libxss-dev libxss1 libxt-dev libxt6 libxv-dev libxv1 libxxf86vm-dev 
-#   libxxf86vm1 linux-libc-dev m4 make man-db mesa-common-dev meson ninja-build 
-#   patch perl perl-modules-5.22 php-cli php-common php7.0-cli php7.0-common 
-#   php7.0-json php7.0-opcache php7.0-readline pkg-config po-debconf 
-#   portaudio19-dev psmisc python python-minimal python2.7 python2.7-minimal 
-#   quilt sgml-base sgml-data sp tcl8.6 tcl8.6-dev uuid-dev x11-common 
-#   x11proto-core-dev x11proto-damage-dev x11proto-dri2-dev x11proto-fixes-dev 
-#   x11proto-gl-dev x11proto-input-dev x11proto-kb-dev x11proto-randr-dev 
-#   x11proto-render-dev x11proto-scrnsaver-dev x11proto-video-dev 
-#   x11proto-xext-dev x11proto-xf86vidmode-dev x11proto-xinerama-dev 
-#   xml-core xmlto xorg-sgml-doctools xsltproc xtrans-dev xz-utils yasm 
-#   zlib1g-dev
+# Packages that are needed to compile all STK dependencies have to be installed
+# manually inside both chroot directories.
       
 
 export DIRNAME="$(dirname "$(readlink -f "$0")")"
@@ -119,8 +51,8 @@ export DIRNAME="$(dirname "$(readlink -f "$0")")"
 
 export STK_VERSION="git20200530"
 export THREADS_NUMBER=`nproc`
-export SCHROOT_32BIT_NAME="chroot-xenial32"
-export SCHROOT_64BIT_NAME="chroot-xenial64"
+export SCHROOT_32BIT_NAME="chroot-jessie32"
+export SCHROOT_64BIT_NAME="chroot-jessie64"
 
 export STKCODE_DIR="$DIRNAME/.."
 export STKASSETS_DIR="$STKCODE_DIR/../supertuxkart-assets"
@@ -224,10 +156,9 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/libpng/"* "$DEPENDENCIES_DIR/libpng"
     
         cd "$DEPENDENCIES_DIR/libpng"
-        cmake . -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-                -DZLIB_LIBRARY="$INSTALL_LIB_DIR/libz.so" \
-                -DZLIB_INCLUDE_DIR="$INSTALL_INCLUDE_DIR" \
-                -DPNG_TESTS=0 &&
+        CPPFLAGS="-I$INSTALL_INCLUDE_DIR" \
+        LDFLAGS="-L$INSTALL_LIB_DIR"          \
+        ./configure --prefix="$INSTALL_DIR" &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -348,7 +279,8 @@ build_stk()
                     --without-libidn \
                     --without-libidn2 \
                     --without-libpsl \
-                    --without-librtmp &&
+                    --without-librtmp \
+                    --without-libssh2 &&
         make -j$THREADS_NUMBER && \
         make install
         check_error
@@ -408,7 +340,7 @@ build_stk()
     
         cd "$DEPENDENCIES_DIR/wayland"
         ./autogen.sh
-        ./configure --prefix="$INSTALL_DIR" &&
+        ./configure --prefix="$INSTALL_DIR" --disable-documentation &&
         make -j$THREADS_NUMBER &&
         make install
         check_error

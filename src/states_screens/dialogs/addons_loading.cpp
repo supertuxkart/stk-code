@@ -55,7 +55,13 @@ AddonsLoading::AddonsLoading(const std::string &id)
 {
     
     m_icon_shown       = false;
-
+#ifdef SERVER_ONLY
+    m_icon_downloaded  = std::make_shared<bool>(false);
+#else
+    m_icon_downloaded  = std::make_shared<bool>(m_addon.iconReady());
+    if (*m_icon_downloaded == false)
+        addons_manager->downloadIconForAddon(id, m_icon_downloaded);
+#endif
     loadFromFile("addons_loading.stkgui");
 
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
@@ -297,7 +303,7 @@ void AddonsLoading::onUpdate(float delta)
     }   // if(m_progress->isVisible())
 
     // See if the icon is loaded (but not yet displayed)
-    if(!m_icon_shown && m_addon.iconReady())
+    if (!m_icon_shown && *m_icon_downloaded == true)
     {
         const std::string icon = "icons/"+m_addon.getIconBasename();
         m_icon->setImage( file_manager->getAddonsFile(icon).c_str(),

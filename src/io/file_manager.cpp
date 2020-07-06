@@ -221,6 +221,8 @@ FileManager::FileManager()
     m_stk_assets_download_dir += "/Library/Application Support/SuperTuxKart/stk-assets/";
 #elif defined (ANDROID)
     m_stk_assets_download_dir += "/stk-assets/";
+#else
+#error You must set m_stk_assets_download_dir to appropriate place for your platform
 #endif
 
 #else
@@ -787,10 +789,14 @@ std::string FileManager::getAsset(FileManager::AssetType type,
 {
     if (type == GUI_ICON && GUIEngine::getSkin()->hasIconTheme())
     {
-        const std::string test_path = GUIEngine::getSkin()->getDataPath() +
-            "data/gui/icons/" + name;
-        if (fileExists(test_path))
-            return test_path;
+        // remove the extension to check both .svg and .png
+        const std::string test_path = StringUtils::removeExtension
+            (GUIEngine::getSkin()->getDataPath() + "data/gui/icons/" + name);
+        // first check if there is an SVG version
+        if (fileExists(test_path + ".svg"))
+            return test_path + ".svg";
+        else if (fileExists(test_path + ".png"))
+            return test_path + ".png";
         else
             return m_subdir_name[type] + name;
     }
@@ -908,7 +914,7 @@ bool FileManager::checkAndCreateDirectory(const std::string &path)
 #if defined(WIN32)
     bool error = _wmkdir(StringUtils::utf8ToWide(path).c_str()) != 0;
 #else
-    bool error = mkdir(path.c_str(), 0755) != 0;
+    bool error = mkdir(path.c_str(), 0777) != 0;
 #endif
     return !error;
 }   // checkAndCreateDirectory

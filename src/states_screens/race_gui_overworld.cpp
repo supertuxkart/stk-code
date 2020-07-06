@@ -105,10 +105,7 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     m_active_challenge = NULL;
 
-    // Determine maximum length of the rank/lap text, in order to
-    // align those texts properly on the right side of the viewport.
-    gui::ScalableFont* font = GUIEngine::getFont();
-    m_trophy_points_width = font->getDimension(L"1000").Width;
+    initSize();
 
     m_lock           = irr_driver->getTexture(FileManager::GUI_ICON,"gui_lock.png");
     m_open_challenge = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
@@ -122,6 +119,17 @@ RaceGUIOverworld::RaceGUIOverworld()
     m_icons[5] = m_trophy[3];
     m_icons[6] = m_locked_bonus;
 }   // RaceGUIOverworld
+
+// ----------------------------------------------------------------------------
+/** Called when loading the race gui or screen resized. */
+void RaceGUIOverworld::initSize()
+{
+    RaceGUIBase::initSize();
+    // Determine maximum length of the rank/lap text, in order to
+    // align those texts properly on the right side of the viewport.
+    gui::ScalableFont* font = GUIEngine::getFont();
+    m_trophy_points_width = font->getDimension(L"1000").Width;
+}   // initSize
 
 //-----------------------------------------------------------------------------
 RaceGUIOverworld::~RaceGUIOverworld()
@@ -525,9 +533,20 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                      irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                      irr_driver->getActualScreenSize().Width,
                                      irr_driver->getActualScreenSize().Height);
-                GUIEngine::getOutlineFont()->draw(_("Press fire to start the tutorial"), pos2,
-                                           GUIEngine::getSkin()->getColor("font::normal"),
-                                           true, true /* vcenter */, NULL);
+                if (m_multitouch_gui)
+                {
+                    // I18N: Shown when multitouch GUI exists
+                    // and press the podium (2, 1, 3 like) icon instead of fire button
+                    GUIEngine::getOutlineFont()->draw(_("Press podium icon to start tutorial"), pos2,
+                                               GUIEngine::getSkin()->getColor("font::normal"),
+                                               true, true /* vcenter */, NULL);
+                }
+                else
+                {
+                    GUIEngine::getOutlineFont()->draw(_("Press fire to start the tutorial"), pos2,
+                                               GUIEngine::getSkin()->getColor("font::normal"),
+                                               true, true /* vcenter */, NULL);
+                }
                 continue;
             }
 
@@ -596,9 +615,20 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                  irr_driver->getActualScreenSize().Height - GUIEngine::getFontHeight()*2,
                                  irr_driver->getActualScreenSize().Width,
                                  irr_driver->getActualScreenSize().Height);
-            font->draw(_("Press fire to start the challenge"), pos2,
-                        GUIEngine::getSkin()->getColor("font::normal"),
-                        true, true /* vcenter */, NULL);
+            if (m_multitouch_gui)
+            {
+                // I18N: Shown when multitouch GUI exists
+                // and press the podium (2, 1, 3 like) icon instead of fire button
+                font->draw(_("Press podium icon to start the challenge"), pos2,
+                            GUIEngine::getSkin()->getColor("font::normal"),
+                            true, true /* vcenter */, NULL);
+            }
+            else
+            {
+                font->draw(_("Press fire to start the challenge"), pos2,
+                            GUIEngine::getSkin()->getColor("font::normal"),
+                            true, true /* vcenter */, NULL);
+            }
             font->setBlackBorder(false);
         }
     }

@@ -33,6 +33,7 @@ void CentralVideoSettings::init()
 {
     m_gl_major_version = 2;
     m_gl_minor_version = 1;
+    m_gl_mem = 0;
 
     // Parse extensions
     hasBufferStorage = false;
@@ -64,10 +65,19 @@ void CentralVideoSettings::init()
     {
         glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
         glGetIntegerv(GL_MINOR_VERSION, &m_gl_minor_version);
+        const char *vendor = (const char *)glGetString(GL_VENDOR);
+        const char *renderer = (const char *)glGetString(GL_RENDERER);
+        const char *version = (const char *)glGetString(GL_VERSION);
         Log::info("IrrDriver", "OpenGL version: %d.%d", m_gl_major_version, m_gl_minor_version);
-        Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
-        Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
-        Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
+        Log::info("IrrDriver", "OpenGL vendor: %s", vendor);
+        Log::info("IrrDriver", "OpenGL renderer: %s", renderer);
+        Log::info("IrrDriver", "OpenGL version string: %s", version);
+
+        if (strstr(vendor, "NVIDIA"))
+            glGetIntegerv(GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX, &m_gl_mem);
+
+        if (m_gl_mem > 0)
+            Log::info("IrrDriver", "OpenGL total memory: %d", m_gl_mem/1024);
     }
 #if !defined(USE_GLES2)
     m_glsl = (m_gl_major_version > 3 || (m_gl_major_version == 3 && m_gl_minor_version >= 1))

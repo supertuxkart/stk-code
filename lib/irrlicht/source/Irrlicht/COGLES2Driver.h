@@ -18,6 +18,11 @@
 #include "CIrrDeviceWayland.h"
 #endif
 
+namespace irr
+{
+	class CIrrDeviceSDL;
+}
+
 #include "SIrrCreationParameters.h"
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
@@ -59,7 +64,7 @@ namespace video
 		friend class COGLES2Texture;
 
 	public:
-#if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
 		COGLES2Driver(const SIrrlichtCreationParameters& params,
 					const SExposedVideoData& data,
 					io::IFileSystem* io, IrrlichtDevice* device);
@@ -75,9 +80,9 @@ namespace video
 					io::IFileSystem* io, CIrrDeviceMacOSX *device);
 #endif
 
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
-		COGLES2Driver(const SIrrlichtCreationParameters& params, io::IFileSystem* io,
-					IrrlichtDevice* device, u32 default_fb);
+#ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
+		COGLES2Driver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb);
+
 		virtual u32 getDefaultFramebuffer() const { return m_default_fb; }
 #endif
 
@@ -473,7 +478,7 @@ namespace video
 		ContextManagerEGL* EglContext;
 		bool EglContextExternal;
 #endif
-#if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
 		u32 m_default_fb;
 #endif
 #ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_

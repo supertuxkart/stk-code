@@ -91,5 +91,9 @@ extern "C" {
 
 #endif   // server only
 
+#ifndef GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX
+#define GL_GPU_MEM_INFO_TOTAL_AVAILABLE_MEM_NVX 0x9048
+#endif
+
 #endif
 

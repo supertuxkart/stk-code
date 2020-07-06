@@ -27,6 +27,11 @@
 #include <atomic>
 #include <memory>
 
+// Can be removed later when android STK uses SDL2
+#ifdef IOS_STK
+#include "SDL_keyboard.h"
+#endif
+
 using namespace GUIEngine;
 
 namespace MessageQueue
@@ -102,8 +107,9 @@ protected:
     /** A pointer to the Container for the Message */
     SkinWidgetContainer* m_container;
 
-    /** Font used to detect if re-initialization is needed */
+    /** Font and screen size used to detect if re-initialization is needed */
     gui::IGUIFont* m_font;
+    core::dimension2du m_screen_size;
 public:
     TextMessage(MessageQueue::MessageType mt, const core::stringw &message) :
         Message(5.0f, message)
@@ -135,8 +141,9 @@ public:
     {
         const GUIEngine::BoxRenderParams &brp =
             GUIEngine::getSkin()->getBoxRenderParams(m_render_type);
-        const unsigned width = irr_driver->getActualScreenSize().Width;
-        const unsigned height = irr_driver->getActualScreenSize().Height;
+        m_screen_size = irr_driver->getActualScreenSize();
+        const unsigned width = m_screen_size.Width;
+        const unsigned height = m_screen_size.Height;
         m_font = GUIEngine::getFont();
         m_font->initGlyphLayouts(m_message, m_gls);
         // Reserve space for 3 lines of text, it will occupy the circle
@@ -204,14 +211,22 @@ public:
         Message::draw(dt);
         // This happen when GUIEngine is reset (when font size changed for
         // example)
-        if (m_font != GUIEngine::getFont())
+        if (m_font != GUIEngine::getFont() ||
+            m_screen_size != irr_driver->getActualScreenSize())
             init();
         int pos_transform = 0;
         if (m_container == g_container.get())
             pos_transform = s_msg_raise;
+        int moved_height = 0;
+#ifdef ANDROID
+        moved_height = irr_driver->getDevice()->getMovedHeight();
+#elif defined(IOS_STK)
+        moved_height = SDL_GetMovedHeightByScreenKeyboard() *
+            irr_driver->getDevice()->getNativeScale();
+#endif
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
-            irr_driver->getDevice()->getMovedHeight() + pos_transform);
+            moved_height + pos_transform);
         GUIEngine::getSkin()->drawMessage(m_container, m_area - raise,
             m_render_type);
         GUIEngine::getFont()->draw(m_gls, m_text_rect - raise,
@@ -314,9 +329,16 @@ public:
     {
         Message::draw(dt);
         m_display_timer = 9999999.9f;
+        int moved_height = 0;
+#ifdef ANDROID
+        moved_height = irr_driver->getDevice()->getMovedHeight();
+#elif defined(IOS_STK)
+        moved_height = SDL_GetMovedHeightByScreenKeyboard() *
+            irr_driver->getDevice()->getNativeScale();
+#endif
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
-            irr_driver->getDevice()->getMovedHeight());
+            moved_height);
         GUIEngine::getSkin()->drawProgressBarInScreen(&m_swc, m_area - raise,
             (float)g_progress.load() / 100.0f);
         video::SColor color(255, 0, 0, 0);

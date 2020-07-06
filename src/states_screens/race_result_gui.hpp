@@ -220,7 +220,7 @@ public:
 
     /** Should not be called anymore.  */
     const core::dimension2du getMiniMapSize() const OVERRIDE
-                  { assert(false); return core::dimension2du(0, 0); }
+                  { return core::dimension2du(0, 0); }
 
     /** No kart specific view needs to be rendered in the result gui. */
     virtual void renderPlayerView(const Camera *camera, float dt) OVERRIDE {}

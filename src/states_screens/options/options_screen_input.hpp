@@ -35,6 +35,7 @@ struct Input;
   */
 class OptionsScreenInput : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenInput>
 {
+    size_t m_gamepad_count;
     OptionsScreenInput();
 
     void updateInputButtons(DeviceConfig* config);

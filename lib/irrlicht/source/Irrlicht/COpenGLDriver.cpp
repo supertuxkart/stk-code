@@ -20,7 +20,7 @@ extern bool GLContextDebugBit;
 #include "IrrlichtDevice.h"
 
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
-#include <SDL/SDL.h>
+#include "CIrrDeviceSDL.h"
 #endif
 
 #ifdef _IRR_COMPILE_WITH_OSX_DEVICE_
@@ -1014,7 +1014,7 @@ bool COpenGLDriver::endScene()
 #ifdef _IRR_COMPILE_WITH_SDL_DEVICE_
 	if (DeviceType == EIDT_SDL)
 	{
-		SDL_GL_SwapBuffers();
+		SDL_GL_SwapWindow(SDLDevice->getWindow());
 		return true;
 	}
 #endif

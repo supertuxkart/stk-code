@@ -158,6 +158,7 @@ void AddonsScreen::init()
     m_icon_height = GUIEngine::getFontHeight() * 2;
     // 128 is the height of the image file
     m_icon_bank->setScale((float)GUIEngine::getFontHeight() / 72.0f);
+    m_icon_bank->setTargetIconSize(128,128);
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
 
     m_type = "kart";
@@ -290,8 +291,10 @@ void AddonsScreen::loadList()
 
         core::stringw s;
         if (addon->getDesigner().size()==0)
+        {
             s = (addon->getName()+L"\t" +
                     core::stringc(addon->getDateAsString().c_str())).c_str();
+        }
 
        //FIXME I'd like to move this to CGUISTKListBox.cpp
 

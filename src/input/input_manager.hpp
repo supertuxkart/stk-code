@@ -30,6 +30,10 @@
 #include "input/input.hpp"
 #include "utils/no_copy.hpp"
 
+#ifndef SERVER_ONLY
+#include <SDL_events.h>
+#endif
+
 class DeviceManager;
 class SDLController;
 
@@ -115,6 +119,8 @@ public:
     size_t getGamepadCount() const { return m_sdl_controller.size(); }
     /** Returns irrlicht joystick for gamepad visualization. */
     const irr::SEvent& getEventForGamePad(unsigned i) const;
+
+    void   handleJoystick(SDL_Event& event);
 #endif
 
     void   dispatchInput(Input::InputType, int deviceID, int btnID,

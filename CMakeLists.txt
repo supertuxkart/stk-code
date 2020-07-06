@@ -59,8 +59,6 @@ if (IOS)
 endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
-    option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
-    
     if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
        (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
         option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
@@ -179,14 +177,12 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-if(WIN32)
+if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD")
     set(LIBRESOLV_LIBRARY)
+elseif (HAIKU)
+    find_library(LIBRESOLV_LIBRARY NAMES network socket)
 else()
-    if (NOT CMAKE_SYSTEM_NAME MATCHES "BSD")
-        find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
-    else()
-        set(LIBRESOLV_LIBRARY)
-    endif()
+   find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
 endif()
 
 # Find system ENet library or build it if missing
@@ -319,7 +315,7 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
 # of the added include directory.
 if(USE_WIIUSE)
     # Find system WiiUse library or build it if missing
-    if((UNIX AND NOT APPLE) AND USE_SYSTEM_WIIUSE)
+    if((UNIX AND NOT (APPLE OR HAIKU)) AND USE_SYSTEM_WIIUSE)
         find_package(WiiUse)
     endif()
 

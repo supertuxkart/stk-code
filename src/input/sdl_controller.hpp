@@ -20,7 +20,9 @@
 
 #ifndef SERVER_ONLY
 
-#include <SDL.h>
+#include <SDL_events.h>
+#include <SDL_gamecontroller.h>
+#include <SDL_joystick.h>
 #include <IEventReceiver.h>
 #include <bitset>
 #include "utils/types.hpp"
