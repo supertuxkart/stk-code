@@ -775,33 +775,6 @@ float KartProperties::getWheelsDampingCompression() const
     return m_cached_characteristic->getWheelsDampingCompression();
 }  // getWheelsDampingCompression
 
-// ----------------------------------------------------------------------------
-float KartProperties::getCameraDistance() const
-{
-    return UserConfigParams::m_camera_distance;
-    // return m_cached_characteristic->getCameraDistance();
-}  // getCameraDistance
-
-// ----------------------------------------------------------------------------
-float KartProperties::getCameraForwardUpAngle() const
-{
-    return UserConfigParams::m_camera_forward_up_angle;
-    // return m_cached_characteristic->getCameraForwardUpAngle();
-}  // getCameraForwardUpAngle
-
-// ----------------------------------------------------------------------------
-bool KartProperties::getCameraForwardSmoothing() const
-{
-    return UserConfigParams::m_camera_forward_smoothing;
-    // return m_cached_characteristic->getCameraForwardSmoothing();
-}  // getCameraForwardSmoothing
-
-// ----------------------------------------------------------------------------
-float KartProperties::getCameraBackwardUpAngle() const
-{
-    return UserConfigParams::m_camera_backward_up_angle;
-    // return m_cached_characteristic->getCameraBackwardUpAngle();
-}  // getCameraBackwardUpAngle
 
 // ----------------------------------------------------------------------------
 float KartProperties::getJumpAnimationTime() const

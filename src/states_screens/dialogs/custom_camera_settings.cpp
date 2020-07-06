@@ -40,6 +40,7 @@ using namespace irr::gui;
 CustomCameraSettingsDialog::CustomCameraSettingsDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
+    m_self_destroy = false;
     loadFromFile("custom_camera_settings.stkgui");
     getWidget<SpinnerWidget>("fov")->setValue(UserConfigParams::m_camera_fov);
     getWidget<SpinnerWidget>("camera_distance")->setFloatValue(UserConfigParams::m_camera_distance);
@@ -87,8 +88,8 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
         UserConfigParams::m_camera_forward_smoothing = getWidget<CheckBoxWidget>("camera_smoothing")->getState();
         UserConfigParams::m_camera_backward_up_angle = getWidget<SpinnerWidget>("backward_camera_angle")->getValue();
         UserConfigParams::m_reverse_look_use_soccer_cam = getWidget<CheckBoxWidget>("use_soccer_camera")->getState();
-        ModalDialog::dismiss();
         OptionsScreenUI::getInstance()->updateCameraPresetSpinner();
+        m_self_destroy = true;
         return GUIEngine::EVENT_BLOCK;
     }
 #endif

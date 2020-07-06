@@ -27,6 +27,8 @@
  */
 class CustomCameraSettingsDialog : public GUIEngine::ModalDialog
 {
+private:
+    bool m_self_destroy;
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -39,6 +41,22 @@ public:
     void updateActivation();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+
+    virtual bool onEscapePressed()
+    {
+        m_self_destroy = true;
+        return false;
+    }
+
+    virtual void onUpdate(float dt)
+    {
+        // It's unsafe to delete from inside the event handler so we do it here
+        if (m_self_destroy)
+        {
+            ModalDialog::dismiss();
+            return;
+        }
+    }
     
 };
 
