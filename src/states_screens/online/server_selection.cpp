@@ -245,7 +245,15 @@ void ServerSelection::loadList()
         if (t)
             icon = track_manager->getTrackIndexByIdent(t->getIdent()) + 2;
         core::stringw num_players;
-        num_players.append(StringUtils::toWString(server->getCurrentPlayers()));
+        int np = static_cast<int>(server->getPlayers().size()); // number of real players
+        int nc = server->getCurrentPlayers(); // number of current players (includes AI)
+        num_players.append(StringUtils::toWString(np));
+        // if there is AI player: use the format player+ai/max
+        if (nc-np > 0)
+        {
+            num_players.append("+");
+            num_players.append(StringUtils::toWString(nc-np));
+        }
         num_players.append("/");
         num_players.append(StringUtils::toWString(server->getMaxPlayers()));
         std::vector<GUIEngine::ListWidget::ListCell> row;
