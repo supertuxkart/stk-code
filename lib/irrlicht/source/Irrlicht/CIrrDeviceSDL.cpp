@@ -1092,6 +1092,7 @@ void CIrrDeviceSDL::createKeyMap()
 	KeyMap.push_back(SKeyMap(SDLK_RCTRL,  IRR_KEY_RCONTROL));
 	KeyMap.push_back(SKeyMap(SDLK_LALT,  IRR_KEY_LMENU));
 	KeyMap.push_back(SKeyMap(SDLK_RALT,  IRR_KEY_RMENU));
+	KeyMap.push_back(SKeyMap(SDLK_MENU,  IRR_KEY_MENU));
 
 	KeyMap.push_back(SKeyMap(SDLK_PLUS,   IRR_KEY_PLUS));
 	KeyMap.push_back(SKeyMap(SDLK_COMMA,  IRR_KEY_COMMA));
@@ -1213,6 +1214,7 @@ void CIrrDeviceSDL::createKeyMap()
 	ScanCodeMap[SDL_SCANCODE_RALT] = IRR_KEY_RMENU;
 	ScanCodeMap[SDL_SCANCODE_RGUI] = IRR_KEY_RWIN;
 	ScanCodeMap[SDL_SCANCODE_MODE] = IRR_KEY_BUTTON_MODE;
+	ScanCodeMap[SDL_SCANCODE_MENU] = IRR_KEY_MENU;
 }
 
 
