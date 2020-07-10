@@ -44,7 +44,7 @@
                 <div proportion="1" height="fit" layout="horizontal-row" >
                     <checkbox id="camera_smoothing"/>
                     <spacer width="1%" height="100%" />
-                    <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Smoothing"/>
+                    <label height="100%" text_align="left" I18N="In the ui/camera screen" text="Smooth camera"/>
                 </div>
             </div>
 
