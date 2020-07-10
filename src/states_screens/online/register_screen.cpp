@@ -53,6 +53,7 @@ RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 // -----------------------------------------------------------------------------
 void RegisterScreen::init()
 {
+    getWidget<TextBoxWidget>("username")->setText(L"");
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
     m_info_widget->setDefaultColor();
