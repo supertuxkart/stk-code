@@ -20,7 +20,6 @@
 
 #include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
-#include "karts/kart_properties.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/drive_graph.hpp"
 

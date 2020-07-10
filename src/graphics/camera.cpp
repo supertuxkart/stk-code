@@ -31,7 +31,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
-#include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"

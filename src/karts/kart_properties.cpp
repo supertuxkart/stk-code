@@ -21,7 +21,6 @@
 #include "audio/sfx_manager.hpp"
 #include "addons/addon.hpp"
 #include "audio/sfx_manager.hpp"
-#include "config/user_config.hpp"
 #include "config/stk_config.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/central_settings.hpp"
@@ -355,7 +354,6 @@ void KartProperties::combineCharacteristics(HandicapLevel handicap)
     m_combined_characteristic->addCharacteristic(kart_properties_manager->
         getDifficultyCharacteristic(RaceManager::get()->getDifficultyAsString(
             RaceManager::get()->getDifficulty())));
-    // FIXME add get user characteristics
 
     // Try to get the kart type
     const AbstractCharacteristic *characteristic = kart_properties_manager->
@@ -774,7 +772,6 @@ float KartProperties::getWheelsDampingCompression() const
 {
     return m_cached_characteristic->getWheelsDampingCompression();
 }  // getWheelsDampingCompression
-
 
 // ----------------------------------------------------------------------------
 float KartProperties::getJumpAnimationTime() const

@@ -291,11 +291,6 @@ public:
     float getWheelsDampingRelaxation() const;
     float getWheelsDampingCompression() const;
 
-    float getCameraDistance() const;
-    float getCameraForwardUpAngle() const;
-    bool getCameraForwardSmoothing() const;
-    float getCameraBackwardUpAngle() const;
-
     float getJumpAnimationTime() const;
 
     float getLeanMax() const;

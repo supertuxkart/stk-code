@@ -827,7 +827,6 @@ float AbstractCharacteristic::getWheelsDampingCompression() const
     return result;
 }  // getWheelsDampingCompression
 
-
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getJumpAnimationTime() const
 {

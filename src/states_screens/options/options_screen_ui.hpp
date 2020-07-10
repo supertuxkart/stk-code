@@ -58,6 +58,7 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
 
     std::map<core::stringw, std::string> m_skins;
 
+    void updateCamera();
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenUI>;
 

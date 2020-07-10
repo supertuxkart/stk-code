@@ -365,18 +365,18 @@ void OptionsScreenUI::init()
     updateCameraPresetSpinner();
 }   // init
 
-void updateCamera()
+void OptionsScreenUI::updateCamera()
 {
-  bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
-  if (in_game)
-  {
-    (Camera::getActiveCamera()->getCameraSceneNode())->setFOV(DEGREE_TO_RAD * UserConfigParams::m_camera_fov);
-    CameraNormal *camera = dynamic_cast<CameraNormal*>(Camera::getActiveCamera());
-    if (camera)
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    if (in_game)
     {
-       camera->setDistanceToKart(UserConfigParams::m_camera_distance);
+        (Camera::getActiveCamera()->getCameraSceneNode())->setFOV(DEGREE_TO_RAD * UserConfigParams::m_camera_fov);
+        CameraNormal *camera = dynamic_cast<CameraNormal*>(Camera::getActiveCamera());
+        if (camera)
+        {
+            camera->setDistanceToKart(UserConfigParams::m_camera_distance);
+        }
     }
-  }
 }
 
 void OptionsScreenUI::updateCameraPresetSpinner()
