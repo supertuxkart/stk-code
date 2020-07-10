@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Balázs Meskó <mesko.balazs@fsf.hu>, 2019
+# Balázs Meskó <meskobalazs@mailbox.org>, 2019
 # Balázs Úr, 2019
 # Balázs Úr, 2019-2020
 # Balázs Úr, 2018-2019
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-13 10:43+0800\n"
-"PO-Revision-Date: 2020-05-13 16:55+0000\n"
-"Last-Translator: Balázs Úr\n"
+"POT-Creation-Date: 2020-06-13 16:16+0800\n"
+"PO-Revision-Date: 2020-06-13 11:12+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -161,7 +161,7 @@ msgstr "Eltávolítás"
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:154
+#: src/input/gamepad_config.cpp:153
 #: src/states_screens/dialogs/addons_loading.cpp:291
 msgid "Back"
 msgstr "Vissza"
@@ -965,7 +965,7 @@ msgstr "Szabványos"
 #: src/states_screens/arenas_screen.cpp:82
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:337
-#: src/states_screens/kart_selection.cpp:316
+#: src/states_screens/kart_selection.cpp:318
 #: src/states_screens/tracks_and_gp_screen.cpp:152
 msgid "Add-Ons"
 msgstr "Bővítmények"
@@ -984,7 +984,7 @@ msgstr "Bővítmények"
 #: src/states_screens/edit_track_screen.cpp:146
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
-#: src/states_screens/kart_selection.cpp:308
+#: src/states_screens/kart_selection.cpp:310
 #: src/states_screens/online/tracks_screen.cpp:354
 #: src/states_screens/tracks_and_gp_screen.cpp:142
 msgid "All"
@@ -1609,7 +1609,7 @@ msgstr "Kiegészítők"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
-#: src/states_screens/race_gui_overworld.cpp:521
+#: src/states_screens/race_gui_overworld.cpp:529
 msgid "Tutorial"
 msgstr "Ismertető"
 
@@ -1979,8 +1979,8 @@ msgstr "Zene"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:528
-#: src/states_screens/options/options_screen_video.cpp:601
+#: src/states_screens/options/options_screen_video.cpp:539
+#: src/states_screens/options/options_screen_video.cpp:612
 msgid "Enabled"
 msgstr "Engedélyezve"
 
@@ -2059,7 +2059,7 @@ msgstr "Játékosonkénti hátrányok engedélyezése"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:108
+#: src/states_screens/options/options_screen_general.cpp:110
 msgid "Uninstall full game assets"
 msgstr "Teljes játékelemek eltávolítása"
 
@@ -2690,31 +2690,31 @@ msgid ""
 "created."
 msgstr "A beállítófájlod túl régi volt, ezért törölve lett, és egy új került létrehozásra."
 
-#: src/graphics/irr_driver.cpp:598
+#: src/graphics/irr_driver.cpp:625
 msgid "Video recording started."
 msgstr "Videórögzítés elindítva."
 
-#: src/graphics/irr_driver.cpp:604
+#: src/graphics/irr_driver.cpp:632
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Videó elmentve ide: „%s”"
 
-#: src/graphics/irr_driver.cpp:608
+#: src/graphics/irr_driver.cpp:636
 msgid "Encoding progress:"
 msgstr "Kódolási folyamat:"
 
-#: src/graphics/irr_driver.cpp:1862 src/graphics/irr_driver.cpp:1867
+#: src/graphics/irr_driver.cpp:1892 src/graphics/irr_driver.cpp:1897
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1381 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1392 src/states_screens/race_result_gui.cpp:154
 #, c-format
 msgid "Tip: %s"
 msgstr "Tipp: %s"
 
-#: src/guiengine/engine.cpp:1425
+#: src/guiengine/engine.cpp:1436
 msgid "Loading"
 msgstr "Betöltés"
 
@@ -3271,111 +3271,111 @@ msgid "Mode"
 msgstr "Mód"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:156
+#: src/input/gamepad_config.cpp:155
 msgid "Guide"
 msgstr "Útmutató"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:158
+#: src/input/gamepad_config.cpp:157
 msgid "Start"
 msgstr "Indítás"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:160
+#: src/input/gamepad_config.cpp:159
 msgid "Left thumbstick press"
 msgstr "Bal botkormány nyomás"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:162
+#: src/input/gamepad_config.cpp:161
 msgid "Right thumbstick press"
 msgstr "Jobb botkormány nyomás"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:164
+#: src/input/gamepad_config.cpp:163
 msgid "Left shoulder"
 msgstr "Bal vállgomb"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:166
+#: src/input/gamepad_config.cpp:165
 msgid "Right shoulder"
 msgstr "Jobb vállgomb"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:168
+#: src/input/gamepad_config.cpp:167
 msgid "DPad up"
 msgstr "DPad fel"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:170
+#: src/input/gamepad_config.cpp:169
 msgid "DPad down"
 msgstr "DPad le"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:172
+#: src/input/gamepad_config.cpp:171
 msgid "DPad left"
 msgstr "DPad bal"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:174
+#: src/input/gamepad_config.cpp:173
 msgid "DPad right"
 msgstr "DPad jobb"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:178
+#: src/input/gamepad_config.cpp:177
 msgid "Left thumbstick right"
 msgstr "Bal botkormány jobbra"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:180
+#: src/input/gamepad_config.cpp:179
 msgid "Left thumbstick left"
 msgstr "Bal botkormány balra"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:182
+#: src/input/gamepad_config.cpp:181
 msgid "Left thumbstick down"
 msgstr "Bal botkormány le"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:184
+#: src/input/gamepad_config.cpp:183
 msgid "Left thumbstick up"
 msgstr "Bal botkormány fel"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:186
+#: src/input/gamepad_config.cpp:185
 msgid "Right thumbstick right"
 msgstr "Jobb botkormány jobbra"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:188
+#: src/input/gamepad_config.cpp:187
 msgid "Right thumbstick left"
 msgstr "Jobb botkormány balra"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:190
+#: src/input/gamepad_config.cpp:189
 msgid "Right thumbstick down"
 msgstr "Jobb botkormány le"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:192
+#: src/input/gamepad_config.cpp:191
 msgid "Right thumbstick up"
 msgstr "Jobb botkormány fel"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:194
+#: src/input/gamepad_config.cpp:193
 msgid "Left trigger"
 msgstr "Bal aktiváló"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:196
+#: src/input/gamepad_config.cpp:195
 msgid "Right trigger"
 msgstr "Jobb aktiváló"
 
-#: src/input/input_manager.cpp:958
+#: src/input/input_manager.cpp:980
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "„%s” mellőzése: korábban kellett csatlakoznod a játékhoz!"
 
-#: src/input/input_manager.cpp:995
+#: src/input/input_manager.cpp:1017
 msgid "Only the Game Master may act at this point!"
 msgstr "Csak a játékmester cselekedhet ezen a helyen!"
 
@@ -3447,16 +3447,16 @@ msgid ""
 "statistics\")."
 msgstr "A SuperTuxKart csatlakozhat egy kiszolgálóhoz kiegészítők letöltéséhez, és a értesít a frissítésekről. Névtelen hardverstatisztikákat is gyűjtünk az STK fejlesztésének segítségére. Olvasd el az adatvédelmi irányelveinket a http://privacy.supertuxkart.net angol nyelvű oldalon. Szeretnéd ezt a szolgáltatást engedélyezni? (Ezen beállítás későbbi megváltoztatásához menj a beállításokhoz, válaszd az „Általános” lapot, és szerkeszd a „Csatlakozás az Internethez” és a „Névtelen hardverstatisztikák küldése” beállításokat)."
 
-#: src/main.cpp:2162
+#: src/main.cpp:2164
 msgid "Your screen resolution is too low to run STK."
 msgstr "A képernyőfelbontásod túl alacsony az STK futtatásához."
 
-#: src/main.cpp:2194
+#: src/main.cpp:2199
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Az illesztőprogramod verziója túl régi. Kérlek telepítsd a legfrissebb videokártya illesztőprogramokat."
 
-#: src/main.cpp:2212
+#: src/main.cpp:2217
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3464,7 +3464,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "A grafikus illesztőprogramod nagyon réginek tűnik. Nézd meg, hogy van-e elérhető frissítés. A SuperTuxKart olyan illesztőprogramot javasol, amely %s vagy jobb támogatással rendelkezik. A játék valószínűleg még futni fog, de csak csökkentett grafikus módban."
 
-#: src/main_loop.cpp:446 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:450 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "A kiszolgáló-kapcsolat túllépte az időkorlátot."
 
@@ -3532,6 +3532,16 @@ msgstr "Új leggyorsabb kör"
 msgid "WRONG WAY!"
 msgstr "ROSSZ IRÁNY!"
 
+#: src/modes/soccer_world.cpp:525 src/modes/soccer_world.cpp:640
+#, c-format
+msgid "%s scored a goal!"
+msgstr ""
+
+#: src/modes/soccer_world.cpp:527 src/modes/soccer_world.cpp:642
+#, c-format
+msgid "Oops, %s made an own goal!"
+msgstr ""
+
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
 msgid "%i spare tire kart has been spawned!"
@@ -3539,11 +3549,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i pótkerék gokart jelent meg!"
 msgstr[1] "%i pótkerék gokart jelent meg!"
 
-#: src/modes/world.cpp:1364
+#: src/modes/world.cpp:1366
 msgid "You have been eliminated!"
 msgstr "Kizártak a versenyből!"
 
-#: src/modes/world.cpp:1371
+#: src/modes/world.cpp:1373
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "„%s” kizárva."
@@ -3566,7 +3576,7 @@ msgid "Bad network connection is detected."
 msgstr "Rossz hálózati kapcsolat észlelhető."
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3639
+#: src/network/protocols/server_lobby.cpp:3631
 msgid "Bot"
 msgstr "Robot"
 
@@ -3908,7 +3918,7 @@ msgid "Please wait while addons are updated"
 msgstr "Kérlek várj, amíg a kiegészítők frissítésre kerülnek"
 
 #: src/states_screens/addons_screen.cpp:520
-#: src/states_screens/main_menu_screen.cpp:622
+#: src/states_screens/main_menu_screen.cpp:624
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3921,7 +3931,7 @@ msgstr "Sajnos egy hiba történt a kiegészítők oldalának elérése közben.
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:314
+#: src/states_screens/kart_selection.cpp:316
 #: src/states_screens/tracks_and_gp_screen.cpp:150
 msgid "standard"
 msgstr "szabványos"
@@ -3930,8 +3940,8 @@ msgstr "szabványos"
 #: src/states_screens/arenas_screen.cpp:326
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:915
-#: src/states_screens/kart_selection.cpp:1567
+#: src/states_screens/kart_selection.cpp:917
+#: src/states_screens/kart_selection.cpp:1568
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Zárolt: teljesítsd az aktív kihívásokat, hogy a többihez is hozzáférj!"
@@ -4452,15 +4462,15 @@ msgstr "Az 1024×768 vagy 1280×720 képpontnál kisebb felbontások nem támoga
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:193
-#: src/states_screens/options/options_screen_video.cpp:215
-#: src/states_screens/options/options_screen_video.cpp:531
-#: src/states_screens/options/options_screen_video.cpp:602
+#: src/states_screens/options/options_screen_video.cpp:225
+#: src/states_screens/options/options_screen_video.cpp:542
+#: src/states_screens/options/options_screen_video.cpp:613
 msgid "Disabled"
 msgstr "Letiltva"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:533
+#: src/states_screens/options/options_screen_video.cpp:544
 msgid "Important only"
 msgstr "Csak fontosak"
 
@@ -4470,7 +4480,7 @@ msgstr "Csak fontosak"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:540
+#: src/states_screens/options/options_screen_video.cpp:551
 msgid "Low"
 msgstr "Alacsony"
 
@@ -4480,14 +4490,14 @@ msgstr "Alacsony"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:543
+#: src/states_screens/options/options_screen_video.cpp:554
 msgid "High"
 msgstr "Magas"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:537
+#: src/states_screens/options/options_screen_video.cpp:548
 msgid "Very Low"
 msgstr "Nagyon alacsony"
 
@@ -4974,54 +4984,54 @@ msgstr "Megnyerted a nagydíjat!"
 msgid "You completed the Grand Prix!"
 msgstr "Teljesítetted a nagydíjat!"
 
-#: src/states_screens/kart_selection.cpp:891
-#: src/states_screens/kart_selection.cpp:1585
+#: src/states_screens/kart_selection.cpp:893
+#: src/states_screens/kart_selection.cpp:1586
 msgid "Random Kart"
 msgstr "Véletlen gokart"
 
-#: src/states_screens/kart_selection.cpp:910
+#: src/states_screens/kart_selection.cpp:912
 msgid "Locked"
 msgstr "Zárolt"
 
-#: src/states_screens/kart_selection.cpp:1014
+#: src/states_screens/kart_selection.cpp:1015
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr "Osztott képernyős többszemélyes játékhoz csatlakoztass egy billentyűzetet vagy játékvezérlőt"
 
-#: src/states_screens/kart_selection.cpp:1019
+#: src/states_screens/kart_selection.cpp:1020
 #: src/states_screens/online/networking_lobby.cpp:513
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Mindenki:\nNyomd meg a „kiválasztás\" gombot a csatlakozáshoz"
 
-#: src/states_screens/main_menu_screen.cpp:256
+#: src/states_screens/main_menu_screen.cpp:257
 msgid "Would you like to play the tutorial of the game?"
 msgstr "Szeretnél játszani a játék ismertetőjével?"
 
-#: src/states_screens/main_menu_screen.cpp:559
+#: src/states_screens/main_menu_screen.cpp:560
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Nem játszhatsz az interneten internet-hozzáférés nélkül. Ha az interneten szeretnél játszani, akkor menj a beállítások menübe, és jelöld be a „Kapcsolódás az internethez” négyzetet."
 
-#: src/states_screens/main_menu_screen.cpp:574
+#: src/states_screens/main_menu_screen.cpp:575
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Nem tölthetsz le kiegészítőket internet-hozzáférés nélkül. Ha kiegészítőket szeretnél letölteni, akkor menj a beállítások menübe, és jelöld be a „Kapcsolódás az internethez” négyzetet."
 
-#: src/states_screens/main_menu_screen.cpp:582
+#: src/states_screens/main_menu_screen.cpp:583
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "Nem tölthetsz le kiegészítőket internet-hozzáférés nélkül. Ha kiegészítőket szeretnél letölteni, akkor menj a beállítások menübe, és jelöld be a „Kapcsolódás az internethez” négyzetet.\n\nAzonban törölheted a már letöltött kiegészítőket."
 
-#: src/states_screens/main_menu_screen.cpp:617
+#: src/states_screens/main_menu_screen.cpp:619
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "A kiegészítők modul jelenleg le van tiltva a beállítások képernyőn"
 
-#: src/states_screens/main_menu_screen.cpp:629
+#: src/states_screens/main_menu_screen.cpp:631
 msgid "Please wait while the add-ons are loading"
 msgstr "Kérlek várj, amíg a kiegészítők betöltődnek"
 
@@ -5481,7 +5491,7 @@ msgstr "Add meg az új beállítás nevét, vagy hagyd üresen az alapértelmeze
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:98
+#: src/states_screens/options/options_screen_general.cpp:100
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
@@ -5489,11 +5499,11 @@ msgstr "Többszemélyes módban a játékosok választhatnak hátránnyal\nindul
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
-#: src/states_screens/options/options_screen_general.cpp:114
+#: src/states_screens/options/options_screen_general.cpp:116
 msgid "Install full game assets"
 msgstr "Teljes játékelemek telepítése"
 
-#: src/states_screens/options/options_screen_general.cpp:232
+#: src/states_screens/options/options_screen_general.cpp:234
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Biztosan eltávolítod a teljes játékelemeket?"
 
@@ -5584,122 +5594,127 @@ msgid ""
 "To use the speedrun mode, please use a new profile."
 msgstr "A gyors végigjátszás módot csak akkor lehet engedélyezni, ha a játék nem lett bezárva a történet mód indítása óta.\n\nA játék bezárása a történet mód befejezése előtt érvényteleníti az időmérőt.\n\nA gyors végigjátszás mód használatához használj új profilt."
 
+#. I18N: In the video options, maximum frame per second
+#: src/states_screens/options/options_screen_video.cpp:219
+msgid "Maximum FPS"
+msgstr ""
+
 #. I18N: In the video options, full vertical sync (usually 60fps)
-#: src/states_screens/options/options_screen_video.cpp:217
+#: src/states_screens/options/options_screen_video.cpp:227
 msgid "Full"
 msgstr "Teljes"
 
 #. I18N: In the video options, half vertical sync (usually 30fps)
-#: src/states_screens/options/options_screen_video.cpp:219
+#: src/states_screens/options/options_screen_video.cpp:229
 msgid "Half"
 msgstr "Fél"
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
-#: src/states_screens/options/options_screen_video.cpp:223
+#: src/states_screens/options/options_screen_video.cpp:233
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
 msgstr "A vsync arra kényszeríti a grafikus kártyát, hogy csak akkor\nadjon új képkockát, ha a monitor kész megjeleníteni azt."
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:226
+#: src/states_screens/options/options_screen_video.cpp:236
 msgid "Full: one frame per monitor refresh"
 msgstr "Teljes: egy képkocka monitorfrissítésenként"
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:228
+#: src/states_screens/options/options_screen_video.cpp:238
 msgid "Half: one frame every two monitor refreshes"
 msgstr "Fél: egy képkocka minden második monitorfrissítésnél"
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:230
+#: src/states_screens/options/options_screen_video.cpp:240
 msgid "Vsync will not work if your drivers don't support it."
 msgstr "A vsync nem fog működni, ha az illesztőprogramok nem támogatják."
 
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:479
-#: src/states_screens/options/options_screen_video.cpp:511
+#: src/states_screens/options/options_screen_video.cpp:490
+#: src/states_screens/options/options_screen_video.cpp:522
 msgid "Custom"
 msgstr "Egyéni"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:546
+#: src/states_screens/options/options_screen_video.cpp:557
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Részecske hatások: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:552
+#: src/states_screens/options/options_screen_video.cpp:563
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Animált karakterek: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:555
+#: src/states_screens/options/options_screen_video.cpp:566
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Dinamikus fények: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:558
+#: src/states_screens/options/options_screen_video.cpp:569
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Fény szóródás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:561
+#: src/states_screens/options/options_screen_video.cpp:572
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Élsimítás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:564
+#: src/states_screens/options/options_screen_video.cpp:575
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Környezeti árnyékolás: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:568
+#: src/states_screens/options/options_screen_video.cpp:579
 #, c-format
 msgid "Shadows: %s"
 msgstr "Árnyékok: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:570
+#: src/states_screens/options/options_screen_video.cpp:581
 #, c-format
 msgid "Shadows: %i"
 msgstr "Árnyékok: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:573
+#: src/states_screens/options/options_screen_video.cpp:584
 #, c-format
 msgid "Bloom: %s"
 msgstr "Ragyogás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:577
+#: src/states_screens/options/options_screen_video.cpp:588
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Ragyogás (körvonalak): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:581
+#: src/states_screens/options/options_screen_video.cpp:592
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Fénysugarak (napsugarak): %s"
 
-#: src/states_screens/options/options_screen_video.cpp:586
+#: src/states_screens/options/options_screen_video.cpp:597
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Megjelenített képminőség: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:605
+#: src/states_screens/options/options_screen_video.cpp:616
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Elmosás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:609
+#: src/states_screens/options/options_screen_video.cpp:620
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Mélységélesség: %s"
@@ -5733,72 +5748,84 @@ msgid "Do you really want to delete player '%s'?"
 msgstr "Valóban törölni szeretnéd „%s” játékost?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:70
+#: src/states_screens/race_gui_base.cpp:69
 msgid "Ready!"
 msgstr "Vigyázz!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:72
+#: src/states_screens/race_gui_base.cpp:71
 msgid "Set!"
 msgstr "Kész!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:74
+#: src/states_screens/race_gui_base.cpp:73
 msgid "Go!"
 msgstr "Rajt!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:76
+#: src/states_screens/race_gui_base.cpp:75
 msgid "GOAL!"
 msgstr "GÓL!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:79
+#: src/states_screens/race_gui_base.cpp:78
 #: src/states_screens/race_result_gui.cpp:318
 msgid "Waiting for others"
 msgstr "Várakozás a többiekre"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:81
+#: src/states_screens/race_gui_base.cpp:80
 msgid "Waiting for the server"
 msgstr "Várakozás a kiszolgálóra"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:630
+#: src/states_screens/race_gui_base.cpp:637
 #, c-format
 msgid "\"%s\""
 msgstr "„%s”"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:640
+#: src/states_screens/race_gui_base.cpp:647
 msgid "by"
 msgstr "szerző:"
 
-#: src/states_screens/race_gui_base.cpp:748
+#: src/states_screens/race_gui_base.cpp:755
 msgid "Collect nitro!"
 msgstr "Gyűjts nitrót!"
 
-#: src/states_screens/race_gui_base.cpp:750
+#: src/states_screens/race_gui_base.cpp:757
 msgid "Follow the leader!"
 msgstr "Kövesd a vezért!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:933
+#: src/states_screens/race_gui_base.cpp:940
 #, c-format
 msgid "Top %i"
 msgstr "Legjobb %i"
 
-#: src/states_screens/race_gui.cpp:435
+#: src/states_screens/race_gui.cpp:442
 msgid "Challenge Failed"
 msgstr "Kihívás sikertelen"
 
-#: src/states_screens/race_gui_overworld.cpp:528
+#. I18N: Shown when multitouch GUI exists
+#. and press the podium (2, 1, 3 like) icon instead of fire button
+#: src/states_screens/race_gui_overworld.cpp:540
+msgid "Press podium icon to start tutorial"
+msgstr ""
+
+#: src/states_screens/race_gui_overworld.cpp:546
 msgid "Press fire to start the tutorial"
 msgstr "Nyomd meg a tüzelés gombot az ismertető indításához"
 
-#: src/states_screens/race_gui_overworld.cpp:599
+#. I18N: Shown when multitouch GUI exists
+#. and press the podium (2, 1, 3 like) icon instead of fire button
+#: src/states_screens/race_gui_overworld.cpp:622
+msgid "Press podium icon to start the challenge"
+msgstr ""
+
+#: src/states_screens/race_gui_overworld.cpp:628
 msgid "Press fire to start the challenge"
 msgstr "Nyomd meg a tüzelést a kihívás indításához"
 

@@ -397,18 +397,6 @@ void XmlCharacteristic::load(const XMLNode *node)
             &m_values[WHEELS_DAMPING_COMPRESSION]);
     }
 
-    if (const XMLNode *sub_node = node->getNode("camera"))
-    {
-        sub_node->get("distance",
-            &m_values[CAMERA_DISTANCE]);
-        sub_node->get("forward-up-angle",
-            &m_values[CAMERA_FORWARD_UP_ANGLE]);
-        sub_node->get("forward-smoothing",
-            &m_values[CAMERA_FORWARD_SMOOTHING]);
-        sub_node->get("backward-up-angle",
-            &m_values[CAMERA_BACKWARD_UP_ANGLE]);
-    }
-
     if (const XMLNode *sub_node = node->getNode("jump"))
     {
         sub_node->get("animation-time",

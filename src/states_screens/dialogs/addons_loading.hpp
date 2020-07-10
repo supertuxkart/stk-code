@@ -52,6 +52,7 @@ private:
     /** True if the icon is being displayed. */
     bool m_icon_shown;
 
+    std::shared_ptr<bool> m_icon_downloaded;
     /** A pointer to the download request, which gives access
      *  to the progress of a download. */
     std::shared_ptr<Online::HTTPRequest> m_download_request;

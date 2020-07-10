@@ -27,6 +27,11 @@
 #include <atomic>
 #include <memory>
 
+// Can be removed later when android STK uses SDL2
+#ifdef IOS_STK
+#include "SDL_keyboard.h"
+#endif
+
 using namespace GUIEngine;
 
 namespace MessageQueue
@@ -212,9 +217,16 @@ public:
         int pos_transform = 0;
         if (m_container == g_container.get())
             pos_transform = s_msg_raise;
+        int moved_height = 0;
+#ifdef ANDROID
+        moved_height = irr_driver->getDevice()->getMovedHeight();
+#elif defined(IOS_STK)
+        moved_height = SDL_GetMovedHeightByScreenKeyboard() *
+            irr_driver->getDevice()->getNativeScale();
+#endif
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
-            irr_driver->getDevice()->getMovedHeight() + pos_transform);
+            moved_height + pos_transform);
         GUIEngine::getSkin()->drawMessage(m_container, m_area - raise,
             m_render_type);
         GUIEngine::getFont()->draw(m_gls, m_text_rect - raise,
@@ -317,9 +329,16 @@ public:
     {
         Message::draw(dt);
         m_display_timer = 9999999.9f;
+        int moved_height = 0;
+#ifdef ANDROID
+        moved_height = irr_driver->getDevice()->getMovedHeight();
+#elif defined(IOS_STK)
+        moved_height = SDL_GetMovedHeightByScreenKeyboard() *
+            irr_driver->getDevice()->getNativeScale();
+#endif
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
-            irr_driver->getDevice()->getMovedHeight());
+            moved_height);
         GUIEngine::getSkin()->drawProgressBarInScreen(&m_swc, m_area - raise,
             (float)g_progress.load() / 100.0f);
         video::SColor color(255, 0, 0, 0);

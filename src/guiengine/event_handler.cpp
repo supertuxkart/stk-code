@@ -380,7 +380,7 @@ void EventHandler::processGUIAction(const PlayerAction action,
                 if (w == NULL) break;
 
                 // FIXME : consider returned value?
-                onWidgetActivated( w, playerID );
+                onWidgetActivated(w, playerID, type);
             }
             break;
         default:
@@ -780,7 +780,7 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 
 // -----------------------------------------------------------------------------
 
-EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
+EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID, Input::InputType type)
 {
     if (w->onActivationInput(playerID) == EVENT_BLOCK)
         return EVENT_BLOCK;
@@ -831,7 +831,8 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
          parent event handler says so */
         if (parent->transmitEvent(w, w->m_properties[PROP_ID], playerID) == EVENT_LET)
         {
-            sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
+            if (parent->isEventCallbackActive(type))
+                sendEventToUser(parent, parent->m_properties[PROP_ID], playerID);
         }
     }
     else
@@ -841,7 +842,8 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
         if (w->transmitEvent(w, id, playerID) == EVENT_LET)
         {
             assert(w->ok());
-            sendEventToUser(w, id, playerID);
+            if (w->isEventCallbackActive(type))
+                sendEventToUser(w, id, playerID);
         }
     }
 
@@ -881,7 +883,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 
                 // These events are only triggered by mouse (or so I hope)
                 // The player that owns the mouser receives "game master" priviledges
-                return onWidgetActivated(w, PLAYER_ID_GAME_MASTER);
+                return onWidgetActivated(w, PLAYER_ID_GAME_MASTER, Input::IT_MOUSEBUTTON);
 
                 // These events are only triggered by keyboard/mouse (or so I hope...)
                 //const int playerID = input_manager->getPlayerKeyboardID();

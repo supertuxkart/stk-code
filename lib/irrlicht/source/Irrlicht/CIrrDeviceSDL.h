@@ -137,8 +137,7 @@ namespace irr
 
 		virtual bool hasOnScreenKeyboard() const;
 
-		virtual bool hasHardwareKeyboard() const;
-
+		virtual u32 getOnScreenKeyboardHeight() const;
 
 		virtual bool activateAccelerometer(float updateInterval);
 		virtual bool deactivateAccelerometer();
@@ -327,6 +326,7 @@ namespace irr
 		};
 
 		core::array<SKeyMap> KeyMap;
+		std::map<SDL_Scancode, irr::EKEY_CODE> ScanCodeMap;
 		SDL_SysWMinfo Info;
 		void tryCreateOpenGLContext(u32 flags);
 	};

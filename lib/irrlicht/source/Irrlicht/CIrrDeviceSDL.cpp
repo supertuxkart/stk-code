@@ -344,8 +344,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -367,8 +367,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -389,8 +389,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -411,8 +411,8 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -445,8 +445,8 @@ legacy:
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
-	Window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED, CreationParams.WindowSize.Width,
+	Window = SDL_CreateWindow("", CreationParams.WindowPosition.X,
+		CreationParams.WindowPosition.Y, CreationParams.WindowSize.Width,
 		CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
@@ -478,7 +478,7 @@ void CIrrDeviceSDL::createDriver()
 	{
 		#ifdef _IRR_COMPILE_WITH_OGLES2_
 		u32 default_fb = 0;
-		#ifdef MOBILE_STK
+		#ifdef IOS_STK
 		default_fb = Info.info.uikit.framebuffer;
 		#endif
 		VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this, default_fb);
@@ -658,7 +658,15 @@ bool CIrrDeviceSDL::run()
 
 				EKEY_CODE key;
 				if (idx == -1)
-					key = (EKEY_CODE)0;
+				{
+					// Fallback to use scancode directly if not found, happens in
+					// belarusian keyboard layout for example
+					auto it = ScanCodeMap.find(SDL_event.key.keysym.scancode);
+					if (it != ScanCodeMap.end())
+						key = it->second;
+					else
+						key = (EKEY_CODE)0;
+				}
 				else
 					key = (EKEY_CODE)KeyMap[idx].Win32Key;
 
@@ -796,6 +804,12 @@ video::IVideoModeList* CIrrDeviceSDL::getVideoModeList()
 				core::dimension2d<u32>(mode.w * NativeScale, mode.h * NativeScale));
 		}
 
+#ifdef MOBILE_STK
+	// SDL2 will return w,h and h,w for mobile STK, as we only use landscape
+	// so we just use desktop resolution for now
+	VideoModeList.addMode(core::dimension2d<u32>(mode.w * NativeScale, mode.h * NativeScale),
+		SDL_BITSPERPIXEL(mode.format));
+#else
 		for (int i = 0; i < mode_count; i++)
 		{
 			if (SDL_GetDisplayMode(0, i, &mode) == 0)
@@ -804,6 +818,7 @@ video::IVideoModeList* CIrrDeviceSDL::getVideoModeList()
 					SDL_BITSPERPIXEL(mode.format));
 			}
 		}
+#endif
 	}
 
 	return &VideoModeList;
@@ -1077,15 +1092,129 @@ void CIrrDeviceSDL::createKeyMap()
 	KeyMap.push_back(SKeyMap(SDLK_RCTRL,  IRR_KEY_RCONTROL));
 	KeyMap.push_back(SKeyMap(SDLK_LALT,  IRR_KEY_LMENU));
 	KeyMap.push_back(SKeyMap(SDLK_RALT,  IRR_KEY_RMENU));
+	KeyMap.push_back(SKeyMap(SDLK_MENU,  IRR_KEY_MENU));
 
 	KeyMap.push_back(SKeyMap(SDLK_PLUS,   IRR_KEY_PLUS));
 	KeyMap.push_back(SKeyMap(SDLK_COMMA,  IRR_KEY_COMMA));
 	KeyMap.push_back(SKeyMap(SDLK_MINUS,  IRR_KEY_MINUS));
 	KeyMap.push_back(SKeyMap(SDLK_PERIOD, IRR_KEY_PERIOD));
 
+	KeyMap.push_back(SKeyMap(SDLK_EQUALS, IRR_KEY_PLUS));
+	KeyMap.push_back(SKeyMap(SDLK_LEFTBRACKET, IRR_KEY_OEM_4));
+	KeyMap.push_back(SKeyMap(SDLK_RIGHTBRACKET, IRR_KEY_OEM_6));
+	KeyMap.push_back(SKeyMap(SDLK_BACKSLASH, IRR_KEY_OEM_5));
+	KeyMap.push_back(SKeyMap(SDLK_SEMICOLON, IRR_KEY_OEM_1));
+	KeyMap.push_back(SKeyMap(SDLK_SLASH, IRR_KEY_OEM_2));
+	KeyMap.push_back(SKeyMap(SDLK_MODE, IRR_KEY_BUTTON_MODE));
+
 	// some special keys missing
 
 	KeyMap.sort();
+
+	ScanCodeMap[SDL_SCANCODE_A] = IRR_KEY_A;
+	ScanCodeMap[SDL_SCANCODE_B] = IRR_KEY_B;
+	ScanCodeMap[SDL_SCANCODE_C] = IRR_KEY_C;
+	ScanCodeMap[SDL_SCANCODE_D] = IRR_KEY_D;
+	ScanCodeMap[SDL_SCANCODE_E] = IRR_KEY_E;
+	ScanCodeMap[SDL_SCANCODE_F] = IRR_KEY_F;
+	ScanCodeMap[SDL_SCANCODE_G] = IRR_KEY_G;
+	ScanCodeMap[SDL_SCANCODE_H] = IRR_KEY_H;
+	ScanCodeMap[SDL_SCANCODE_I] = IRR_KEY_I;
+	ScanCodeMap[SDL_SCANCODE_J] = IRR_KEY_J;
+	ScanCodeMap[SDL_SCANCODE_K] = IRR_KEY_K;
+	ScanCodeMap[SDL_SCANCODE_L] = IRR_KEY_L;
+	ScanCodeMap[SDL_SCANCODE_M] = IRR_KEY_M;
+	ScanCodeMap[SDL_SCANCODE_N] = IRR_KEY_N;
+	ScanCodeMap[SDL_SCANCODE_O] = IRR_KEY_O;
+	ScanCodeMap[SDL_SCANCODE_P] = IRR_KEY_P;
+	ScanCodeMap[SDL_SCANCODE_Q] = IRR_KEY_Q;
+	ScanCodeMap[SDL_SCANCODE_R] = IRR_KEY_R;
+	ScanCodeMap[SDL_SCANCODE_S] = IRR_KEY_S;
+	ScanCodeMap[SDL_SCANCODE_T] = IRR_KEY_T;
+	ScanCodeMap[SDL_SCANCODE_U] = IRR_KEY_U;
+	ScanCodeMap[SDL_SCANCODE_V] = IRR_KEY_V;
+	ScanCodeMap[SDL_SCANCODE_W] = IRR_KEY_W;
+	ScanCodeMap[SDL_SCANCODE_X] = IRR_KEY_X;
+	ScanCodeMap[SDL_SCANCODE_Y] = IRR_KEY_Y;
+	ScanCodeMap[SDL_SCANCODE_Z] = IRR_KEY_Z;
+	ScanCodeMap[SDL_SCANCODE_1] = IRR_KEY_1;
+	ScanCodeMap[SDL_SCANCODE_2] = IRR_KEY_2;
+	ScanCodeMap[SDL_SCANCODE_3] = IRR_KEY_3;
+	ScanCodeMap[SDL_SCANCODE_4] = IRR_KEY_4;
+	ScanCodeMap[SDL_SCANCODE_5] = IRR_KEY_5;
+	ScanCodeMap[SDL_SCANCODE_6] = IRR_KEY_6;
+	ScanCodeMap[SDL_SCANCODE_7] = IRR_KEY_7;
+	ScanCodeMap[SDL_SCANCODE_8] = IRR_KEY_8;
+	ScanCodeMap[SDL_SCANCODE_9] = IRR_KEY_9;
+	ScanCodeMap[SDL_SCANCODE_0] = IRR_KEY_0;
+	ScanCodeMap[SDL_SCANCODE_RETURN] = IRR_KEY_RETURN;
+	ScanCodeMap[SDL_SCANCODE_ESCAPE] = IRR_KEY_ESCAPE;
+	ScanCodeMap[SDL_SCANCODE_BACKSPACE] = IRR_KEY_BACK;
+	ScanCodeMap[SDL_SCANCODE_TAB] = IRR_KEY_TAB;
+	ScanCodeMap[SDL_SCANCODE_SPACE] = IRR_KEY_SPACE;
+	ScanCodeMap[SDL_SCANCODE_MINUS] = IRR_KEY_MINUS;
+	ScanCodeMap[SDL_SCANCODE_EQUALS] = IRR_KEY_PLUS;
+	ScanCodeMap[SDL_SCANCODE_LEFTBRACKET] = IRR_KEY_OEM_4;
+	ScanCodeMap[SDL_SCANCODE_RIGHTBRACKET] = IRR_KEY_OEM_6;
+	ScanCodeMap[SDL_SCANCODE_BACKSLASH] = IRR_KEY_OEM_5;
+	ScanCodeMap[SDL_SCANCODE_SEMICOLON] = IRR_KEY_OEM_1;
+	ScanCodeMap[SDL_SCANCODE_APOSTROPHE] = IRR_KEY_OEM_7;
+	ScanCodeMap[SDL_SCANCODE_GRAVE] = IRR_KEY_OEM_3;
+	ScanCodeMap[SDL_SCANCODE_COMMA] = IRR_KEY_COMMA;
+	ScanCodeMap[SDL_SCANCODE_PERIOD] = IRR_KEY_PERIOD;
+	ScanCodeMap[SDL_SCANCODE_SLASH] = IRR_KEY_OEM_2;
+	ScanCodeMap[SDL_SCANCODE_CAPSLOCK] = IRR_KEY_CAPITAL;
+	ScanCodeMap[SDL_SCANCODE_F1] = IRR_KEY_F1;
+	ScanCodeMap[SDL_SCANCODE_F2] = IRR_KEY_F2;
+	ScanCodeMap[SDL_SCANCODE_F3] = IRR_KEY_F3;
+	ScanCodeMap[SDL_SCANCODE_F4] = IRR_KEY_F4;
+	ScanCodeMap[SDL_SCANCODE_F5] = IRR_KEY_F5;
+	ScanCodeMap[SDL_SCANCODE_F6] = IRR_KEY_F6;
+	ScanCodeMap[SDL_SCANCODE_F7] = IRR_KEY_F7;
+	ScanCodeMap[SDL_SCANCODE_F8] = IRR_KEY_F8;
+	ScanCodeMap[SDL_SCANCODE_F9] = IRR_KEY_F9;
+	ScanCodeMap[SDL_SCANCODE_F10] = IRR_KEY_F10;
+	ScanCodeMap[SDL_SCANCODE_F11] = IRR_KEY_F11;
+	ScanCodeMap[SDL_SCANCODE_F12] = IRR_KEY_F12;
+	ScanCodeMap[SDL_SCANCODE_PRINTSCREEN] = IRR_KEY_PRINT;
+	ScanCodeMap[SDL_SCANCODE_SCROLLLOCK] = IRR_KEY_SCROLL;
+	ScanCodeMap[SDL_SCANCODE_PAUSE] = IRR_KEY_PAUSE;
+	ScanCodeMap[SDL_SCANCODE_INSERT] = IRR_KEY_INSERT;
+	ScanCodeMap[SDL_SCANCODE_HOME] = IRR_KEY_HOME;
+	ScanCodeMap[SDL_SCANCODE_PAGEUP] = IRR_KEY_PRIOR;
+	ScanCodeMap[SDL_SCANCODE_DELETE] = IRR_KEY_DELETE;
+	ScanCodeMap[SDL_SCANCODE_END] = IRR_KEY_END;
+	ScanCodeMap[SDL_SCANCODE_PAGEDOWN] = IRR_KEY_NEXT;
+	ScanCodeMap[SDL_SCANCODE_RIGHT] = IRR_KEY_RIGHT;
+	ScanCodeMap[SDL_SCANCODE_LEFT] = IRR_KEY_LEFT;
+	ScanCodeMap[SDL_SCANCODE_DOWN] = IRR_KEY_DOWN;
+	ScanCodeMap[SDL_SCANCODE_UP] = IRR_KEY_UP;
+	ScanCodeMap[SDL_SCANCODE_NUMLOCKCLEAR] = IRR_KEY_NUMLOCK;
+	ScanCodeMap[SDL_SCANCODE_KP_DIVIDE] = IRR_KEY_DIVIDE;
+	ScanCodeMap[SDL_SCANCODE_KP_MULTIPLY] = IRR_KEY_MULTIPLY;
+	ScanCodeMap[SDL_SCANCODE_KP_MINUS] = IRR_KEY_MINUS;
+	ScanCodeMap[SDL_SCANCODE_KP_PLUS] = IRR_KEY_PLUS;
+	ScanCodeMap[SDL_SCANCODE_KP_ENTER] = IRR_KEY_RETURN;
+	ScanCodeMap[SDL_SCANCODE_KP_1] = IRR_KEY_NUMPAD1;
+	ScanCodeMap[SDL_SCANCODE_KP_2] = IRR_KEY_NUMPAD2;
+	ScanCodeMap[SDL_SCANCODE_KP_3] = IRR_KEY_NUMPAD3;
+	ScanCodeMap[SDL_SCANCODE_KP_4] = IRR_KEY_NUMPAD4;
+	ScanCodeMap[SDL_SCANCODE_KP_5] = IRR_KEY_NUMPAD5;
+	ScanCodeMap[SDL_SCANCODE_KP_6] = IRR_KEY_NUMPAD6;
+	ScanCodeMap[SDL_SCANCODE_KP_7] = IRR_KEY_NUMPAD7;
+	ScanCodeMap[SDL_SCANCODE_KP_8] = IRR_KEY_NUMPAD8;
+	ScanCodeMap[SDL_SCANCODE_KP_9] = IRR_KEY_NUMPAD9;
+	ScanCodeMap[SDL_SCANCODE_KP_0] = IRR_KEY_NUMPAD0;
+	ScanCodeMap[SDL_SCANCODE_LCTRL] = IRR_KEY_LCONTROL;
+	ScanCodeMap[SDL_SCANCODE_LSHIFT] = IRR_KEY_LSHIFT;
+	ScanCodeMap[SDL_SCANCODE_LALT] = IRR_KEY_LMENU;
+	ScanCodeMap[SDL_SCANCODE_LGUI] = IRR_KEY_LWIN;
+	ScanCodeMap[SDL_SCANCODE_RCTRL] = IRR_KEY_RCONTROL;
+	ScanCodeMap[SDL_SCANCODE_RSHIFT] = IRR_KEY_RSHIFT;
+	ScanCodeMap[SDL_SCANCODE_RALT] = IRR_KEY_RMENU;
+	ScanCodeMap[SDL_SCANCODE_RGUI] = IRR_KEY_RWIN;
+	ScanCodeMap[SDL_SCANCODE_MODE] = IRR_KEY_BUTTON_MODE;
+	ScanCodeMap[SDL_SCANCODE_MENU] = IRR_KEY_MENU;
 }
 
 
@@ -1101,12 +1230,12 @@ bool CIrrDeviceSDL::hasOnScreenKeyboard() const
 }
 
 
-bool CIrrDeviceSDL::hasHardwareKeyboard() const
+u32 CIrrDeviceSDL::getOnScreenKeyboardHeight() const
 {
 #ifdef MOBILE_STK
-	return SDL_HasHardwareKeyboardConnected() == SDL_TRUE;
+	return SDL_GetScreenKeyboardHeight() * NativeScale;
 #else
-	return true;
+	return 0;
 #endif
 }
 

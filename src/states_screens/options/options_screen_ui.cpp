@@ -20,10 +20,13 @@
 #include "addons/news_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "graphics/camera.hpp"
+#include "graphics/camera_normal.hpp"
 #include "challenges/story_mode_timer.hpp"
 #include "config/hardware_stats.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "config/stk_config.hpp"
 #include "font/bold_face.hpp"
 #include "font/font_manager.hpp"
 #include "font/regular_face.hpp"
@@ -41,6 +44,7 @@
 #include "online/request_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/dialogs/custom_camera_settings.hpp"
 #include "states_screens/options/options_screen_audio.hpp"
 #include "states_screens/options/options_screen_general.hpp"
 #include "states_screens/options/options_screen_input.hpp"
@@ -143,6 +147,9 @@ void OptionsScreenUI::loadedFromFile()
         font_size->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
         font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     }
+
+    updateCameraPresetSpinner();
+
     font_size->setValueUpdatedCallback([this](SpinnerWidget* spinner)
     {
         // Add a special value updated callback so font size is updated when
@@ -155,6 +162,7 @@ void OptionsScreenUI::loadedFromFile()
         m_reload_option->m_focus_name = "font_size";
         m_reload_option->m_focus_right = right;
     });
+
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -328,7 +336,80 @@ void OptionsScreenUI::init()
         GUIEngine::reloadSkin();
         irr_driver->setMaxTextureSize();
     }
+
+    // Camera presets
+    m_camera_presets.push_back // Standard
+    ({
+        80 /* fov */, 1.0f /* distance */, 0.0f  /* angle */, true /* smoothing */, 5.0f /* backward angle */,
+    });
+
+    m_camera_presets.push_back // Drone chase
+    ({
+        100 /* fov */, 2.6f /* distance */, 33.0f  /* angle */, false /* smoothing */, 10.0f /* backward angle */,
+    });
+
+    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
+    assert( camera_preset != NULL );
+
+    camera_preset->m_properties[PROP_WRAP_AROUND] = "true";
+    camera_preset->clearLabels();
+    //I18N: custom camera setting
+    camera_preset->addLabel( core::stringw(_("Custom")));
+    //I18N: In the UI options,litscreen_method in the race UI
+    camera_preset->addLabel( core::stringw(_("Standard")));
+    //I18N: In the UI options, splitscreen_method position in the race UI
+    camera_preset->addLabel( core::stringw(_("Drone chase")));
+    camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
+    camera_preset->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+
+    updateCameraPresetSpinner();
 }   // init
+
+void OptionsScreenUI::updateCamera()
+{
+    bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
+    if (in_game)
+    {
+        (Camera::getActiveCamera()->getCameraSceneNode())->setFOV(DEGREE_TO_RAD * UserConfigParams::m_camera_fov);
+        CameraNormal *camera = dynamic_cast<CameraNormal*>(Camera::getActiveCamera());
+        if (camera)
+        {
+            camera->setDistanceToKart(UserConfigParams::m_camera_distance);
+        }
+    }
+}
+
+void OptionsScreenUI::updateCameraPresetSpinner()
+{
+    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
+    assert( camera_preset != NULL );
+
+#define FLOAT_EPSILON 0.001
+
+    bool found = false;
+    unsigned int i = 0;
+    for (; i < m_camera_presets.size(); i++)
+    {
+        if (m_camera_presets[i].fov == UserConfigParams::m_camera_fov &&
+            m_camera_presets[i].smoothing == UserConfigParams::m_camera_forward_smoothing &&
+            fabs(m_camera_presets[i].distance - UserConfigParams::m_camera_distance) < FLOAT_EPSILON &&
+            fabs(m_camera_presets[i].angle - UserConfigParams::m_camera_forward_up_angle) < FLOAT_EPSILON &&
+            fabs(m_camera_presets[i].backward_angle - UserConfigParams::m_camera_backward_up_angle) < FLOAT_EPSILON)
+        {
+            camera_preset->setValue(i + 1);
+            found = true;
+            break;
+        }
+    }
+
+    if (!found)
+    {
+        camera_preset->setValue(0);
+        camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = std::to_string(0);
+    }
+    updateCamera();
+
+} // updateCameraPresetSpinner
 
 // -----------------------------------------------------------------------------
 
@@ -455,6 +536,24 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             }
         }
         UserConfigParams::m_speedrun_mode = speedrun_timer->getState();
+    }
+    else if (name == "camera_preset")
+    {
+        GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
+        assert( camera_preset != NULL );
+        unsigned int i = camera_preset->getValue();
+        if (i != 0) {
+            UserConfigParams::m_camera_fov = m_camera_presets[i-1].fov;
+            UserConfigParams::m_camera_distance = m_camera_presets[i-1].distance;
+            UserConfigParams::m_camera_forward_up_angle = m_camera_presets[i-1].angle;
+            UserConfigParams::m_camera_forward_smoothing = m_camera_presets[i-1].smoothing;
+            UserConfigParams::m_camera_backward_up_angle = m_camera_presets[i-1].backward_angle;
+        }
+        updateCamera();
+    }
+    else if(name == "custom_camera")
+    {
+        new CustomCameraSettingsDialog(0.8f, 0.9f);
     }
 #endif
 }   // eventCallback

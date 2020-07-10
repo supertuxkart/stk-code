@@ -348,12 +348,13 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-
+#ifndef MOBILE_STK
+            // Mobile STK reports only 1 desktop (phone) resolution at native scale
             if ((h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
                 (!(h==600 && w==800 && UserConfigParams::m_artist_debug_mode) &&
                 (!(h==720 && w==1280 && ALLOW_1280_X_720 == true))))
                 continue;
-
+#endif
             VideoMode mode(w, h);
             m_modes.push_back( mode );
         }   // if depth >=24
@@ -479,6 +480,15 @@ void IrrDriver::initDevice()
             params.HandleSRGB    = false;
             params.ShadersPath   = (file_manager->getShadersDir() +
                                                            "irrlicht/").c_str();
+            // Set window to remembered position
+            if (  !UserConfigParams::m_fullscreen
+                && UserConfigParams::m_remember_window_location
+                && UserConfigParams::m_window_x >= 0
+                && UserConfigParams::m_window_y >= 0            )
+            {
+                params.WindowPosition.X = UserConfigParams::m_window_x;
+                params.WindowPosition.Y = UserConfigParams::m_window_y;
+            }
 
             /*
             switch ((int)UserConfigParams::m_antialiasing)
@@ -738,16 +748,6 @@ void IrrDriver::initDevice()
         // does not set the 'enable mipmap' flag.
         m_scene_manager->getParameters()
             ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
-
-        // Set window to remembered position
-        if (  !UserConfigParams::m_fullscreen
-            && UserConfigParams::m_remember_window_location
-            && UserConfigParams::m_window_x >= 0
-            && UserConfigParams::m_window_y >= 0            )
-        {
-            moveWindow(UserConfigParams::m_window_x,
-                       UserConfigParams::m_window_y);
-        } // If reinstating window location
     } // If showing graphics
 
     // Initialize material2D
@@ -780,6 +780,7 @@ void IrrDriver::initDevice()
     m_device->registerGetMovedHeightFunction([]
         (const IrrlichtDevice* device)->int
         {
+#ifdef ANDROID
             int screen_keyboard_height =
                 device->getOnScreenKeyboardHeight();
             int screen_height = device->getScreenHeight();
@@ -803,6 +804,9 @@ void IrrDriver::initDevice()
                 return screen_keyboard_height;
             }
             return screen_keyboard_height - element_height;
+#else
+            return 0;
+#endif
         });
 }   // initDevice
 

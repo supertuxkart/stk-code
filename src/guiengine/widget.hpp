@@ -25,6 +25,7 @@ namespace irr
 {
     namespace gui { class IGUIElement; }
 }
+#include <bitset>
 #include <map>
 
 #include "guiengine/event_handler.hpp"
@@ -139,6 +140,10 @@ namespace GUIEngine
     {
     protected:
         unsigned int m_magic_number;
+
+        // Used to limit event callback on this widget based on input type
+        // At the moment used for continue button in kart selection
+        std::bitset<Input::IT_LAST + 1> m_active_event_callback;
 
         // FIXME: find better ways than hackish "friend"?
         friend class EventHandler;
@@ -339,6 +344,16 @@ namespace GUIEngine
 
         Widget(WidgetType type, bool reserve_id = false);
         virtual ~Widget();
+
+        /**
+          * Allow (or not) an event callback for this widget based on input type.
+          */
+        virtual void setEventCallbackActive(Input::InputType type, bool active);
+
+        /**
+          * Return if there should be an event callback for this widget based on input type.
+          */
+        virtual bool isEventCallbackActive(Input::InputType type) const;
 
         /**
           * Set the irrlicht widget to be used as parent of this widget next time Widget::add()

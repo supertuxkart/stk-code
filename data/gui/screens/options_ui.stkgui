@@ -75,6 +75,21 @@
 
                 <spacer width="5" height="2%"/>
 
+                <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <div layout="vertical-row" width="10f" height="fit">
+                        <spinner id="camera_preset" width="100%" align="center" />
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%">
+                        <label height="100%" I18N="In the ui settings" text="Camera" align="left"/>
+                    </div>
+                    <div layout="vertical-row" proportion="1" height="100%" id="outer_box" >
+                        <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
+                    </div>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
                 <div layout="horizontal-row" width="100%" height="fit">
                     <checkbox id="showfps"/>
                     <spacer width="1%" height="100%" />
@@ -90,7 +105,6 @@
                 </div>
 
                 <spacer width="5" height="2%"/>
-
 
                 <div layout="horizontal-row" width="100%" height="fit">
                     <checkbox id="story-mode-timer"/>

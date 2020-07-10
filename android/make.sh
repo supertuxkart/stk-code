@@ -223,7 +223,7 @@ if [ -z "$BUILD_TOOLS_VER" ]; then
     BUILD_TOOLS_DIRS=`ls -1 "$SDK_PATH/build-tools" | sort -V -r`
    
     for DIR in $BUILD_TOOLS_DIRS; do
-        if [ "$DIR" = `echo $DIR | sed 's/[^0-9,.]//g'` ]; then
+        if [ "$DIR" = "`echo $DIR | sed 's/[^0-9,.]//g'`" ]; then
             BUILD_TOOLS_VER="$DIR"
             break
         fi

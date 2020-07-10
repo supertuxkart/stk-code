@@ -98,8 +98,18 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_spinner_widget_player_id=-1;
     m_min = 0;
     m_max = 999;
+    m_step = 1.0;
     m_left_selected = false;
     m_right_selected = false;
+}
+
+// -----------------------------------------------------------------------------
+void SpinnerWidget::setRange(int min, int max, float step)
+{
+    clearLabels();
+    setStep(step);
+    setMin(min/step);
+    setMax(max/step);
 }
 
 // -----------------------------------------------------------------------------
@@ -421,7 +431,17 @@ void SpinnerWidget::setValue(const int new_value)
     }
     else if (m_children.size() > 0)
     {
-        m_children[1].m_element->setText( stringw(m_value).c_str() );
+        if (m_step == 1.0)
+        {
+            m_children[1].m_element->setText( stringw(m_value).c_str() );
+        }
+        else
+        {
+            std::wstringstream ws;
+            ws << (m_value*m_step);
+            std::wstring text = ws.str();
+            m_children[1].m_element->setText( text.c_str() );
+        }
     }
 }
 

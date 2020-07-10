@@ -291,8 +291,10 @@ void AddonsScreen::loadList()
 
         core::stringw s;
         if (addon->getDesigner().size()==0)
+        {
             s = (addon->getName()+L"\t" +
                     core::stringc(addon->getDateAsString().c_str())).c_str();
+        }
 
        //FIXME I'd like to move this to CGUISTKListBox.cpp
 

@@ -290,8 +290,16 @@ void AddonsManager::initAddons(const XMLNode *xml)
     }
     m_addons_list.unlock();
 
-    if (UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED)
-        downloadIcons();
+    for (unsigned int i = 0; i < m_addons_list.getData().size(); i++)
+    {
+        Addon& addon = m_addons_list.getData()[i];
+        const std::string& icon = addon.getIconBasename();
+        const std::string& icon_full =
+            file_manager->getAddonsFile("icons/" + icon);
+        if (!addon.iconNeedsUpdate() && file_manager->fileExists(icon_full))
+            addon.setIconReady();
+    }   // for i < m_addons_list.size()
+
     m_state.setAtomic(STATE_READY);
 }   // initAddons
 
@@ -362,57 +370,59 @@ void AddonsManager::checkInstalledAddons()
 }   // checkInstalledAddons
 
 // ----------------------------------------------------------------------------
-/** Download all necessary icons (i.e. icons that are either missing or have
- *  been updated since they were downloaded).
- */
-void AddonsManager::downloadIcons()
+/** Download icon for specific addon */
+void AddonsManager::downloadIconForAddon(const std::string& addon_id,
+                                         std::weak_ptr<bool> result)
 {
-    for(unsigned int i=0; i<m_addons_list.getData().size(); i++)
+    Addon* addon = getAddon(addon_id);
+    if (!addon)
+        return;
+    const std::string &icon = addon->getIconBasename();
+    const std::string &icon_full =
+        file_manager->getAddonsFile("icons/" + icon);
+    if (addon->iconNeedsUpdate() ||
+        !file_manager->fileExists(icon_full))
     {
-        Addon &addon            = m_addons_list.getData()[i];
-        const std::string &icon = addon.getIconBasename();
-        const std::string &icon_full
-                                = file_manager->getAddonsFile("icons/"+icon);
-        if(addon.iconNeedsUpdate() ||
-            !file_manager->fileExists(icon_full))
+        const std::string& url = addon->getIconURL();
+        const std::string& icon = addon->getIconBasename();
+        if (icon.empty())
         {
-            const std::string &url  = addon.getIconURL();
-            const std::string &icon = addon.getIconBasename();
-            if(icon=="")
+            if (UserConfigParams::logAddons())
             {
-                if(UserConfigParams::logAddons())
-                    Log::error("addons", "No icon or image specified for '%s'.",
-                                addon.getId().c_str());
-                continue;
+                Log::error("addons", "No icon or image specified for '%s'.",
+                    addon->getId().c_str());
             }
-
-            // A simple class that will notify the addon via a callback
-            class IconRequest : public Online::HTTPRequest
-            {
-                Addon *m_addon;  // stores this addon object
-                void callback()
-                {
-                    m_addon->setIconReady();
-                    if (!hadDownloadError())
-                        addons_manager->m_downloaded_icons = true;
-                }   // callback
-            public:
-                IconRequest(const std::string &filename,
-                            const std::string &url,
-                            Addon *addon     ) : HTTPRequest(filename,/*priority*/1)
-                {
-                    m_addon = addon;  setURL(url);
-                }   // IconRequest
-            };
-            auto r = std::make_shared<IconRequest>("icons/"+icon, url, &addon);
-            r->queue();
+            return;
         }
-        else
-            m_addons_list.getData()[i].setIconReady();
-    }   // for i<m_addons_list.size()
-
-    return;
-}   // downloadIcons
+        // A simple class that will notify the addon via a callback
+        class IconRequest : public Online::HTTPRequest
+        {
+            std::weak_ptr<bool> m_result;
+            Addon* m_addon;  // stores this addon object
+            void callback()
+            {
+                m_addon->setIconReady();
+                if (std::shared_ptr<bool> result = m_result.lock())
+                    *result = true;
+                if (!hadDownloadError())
+                    addons_manager->m_downloaded_icons = true;
+            }   // callback
+        public:
+            IconRequest(const std::string& filename,
+                        const std::string& url,
+                        Addon* addon, std::weak_ptr<bool> result)
+                : HTTPRequest(filename,/*priority*/1)
+            {
+                m_addon = addon;
+                m_result = result;
+                setURL(url);
+            }   // IconRequest
+        };
+        auto r =
+            std::make_shared<IconRequest>("icons/"+icon, url, addon, result);
+        r->queue();
+    }
+}   // downloadIconForAddon
 
 // ----------------------------------------------------------------------------
 /** Loads the installed addons from .../addons/addons_installed.xml.

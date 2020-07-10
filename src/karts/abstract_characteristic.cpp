@@ -107,14 +107,6 @@ AbstractCharacteristic::ValueType AbstractCharacteristic::getType(
         return TYPE_FLOAT;
     case WHEELS_DAMPING_COMPRESSION:
         return TYPE_FLOAT;
-    case CAMERA_DISTANCE:
-        return TYPE_FLOAT;
-    case CAMERA_FORWARD_UP_ANGLE:
-        return TYPE_FLOAT;
-    case CAMERA_FORWARD_SMOOTHING:
-        return TYPE_BOOL;
-    case CAMERA_BACKWARD_UP_ANGLE:
-        return TYPE_FLOAT;
     case JUMP_ANIMATION_TIME:
         return TYPE_FLOAT;
     case LEAN_MAX:
@@ -349,14 +341,6 @@ std::string AbstractCharacteristic::getName(CharacteristicType type)
         return "WHEELS_DAMPING_RELAXATION";
     case WHEELS_DAMPING_COMPRESSION:
         return "WHEELS_DAMPING_COMPRESSION";
-    case CAMERA_DISTANCE:
-        return "CAMERA_DISTANCE";
-    case CAMERA_FORWARD_UP_ANGLE:
-        return "CAMERA_FORWARD_UP_ANGLE";
-    case CAMERA_FORWARD_SMOOTHING:
-        return "CAMERA_FORWARD_SMOOTHING";
-    case CAMERA_BACKWARD_UP_ANGLE:
-        return "CAMERA_BACKWARD_UP_ANGLE";
     case JUMP_ANIMATION_TIME:
         return "JUMP_ANIMATION_TIME";
     case LEAN_MAX:
@@ -842,54 +826,6 @@ float AbstractCharacteristic::getWheelsDampingCompression() const
                     getName(WHEELS_DAMPING_COMPRESSION).c_str());
     return result;
 }  // getWheelsDampingCompression
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getCameraDistance() const
-{
-    float result;
-    bool is_set = false;
-    process(CAMERA_DISTANCE, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(CAMERA_DISTANCE).c_str());
-    return result;
-}  // getCameraDistance
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getCameraForwardUpAngle() const
-{
-    float result;
-    bool is_set = false;
-    process(CAMERA_FORWARD_UP_ANGLE, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(CAMERA_FORWARD_UP_ANGLE).c_str());
-    return result;
-}  // getCameraForwardUpAngle
-
-// ----------------------------------------------------------------------------
-bool AbstractCharacteristic::getCameraForwardSmoothing() const
-{
-    bool result;
-    bool is_set = false;
-    process(CAMERA_FORWARD_SMOOTHING, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(CAMERA_FORWARD_SMOOTHING).c_str());
-    return result;
-}  // getCameraForwardSmoothing
-
-// ----------------------------------------------------------------------------
-float AbstractCharacteristic::getCameraBackwardUpAngle() const
-{
-    float result;
-    bool is_set = false;
-    process(CAMERA_BACKWARD_UP_ANGLE, &result, &is_set);
-    if (!is_set)
-        Log::fatal("AbstractCharacteristic", "Can't get characteristic %s",
-                    getName(CAMERA_BACKWARD_UP_ANGLE).c_str());
-    return result;
-}  // getCameraBackwardUpAngle
 
 // ----------------------------------------------------------------------------
 float AbstractCharacteristic::getJumpAnimationTime() const

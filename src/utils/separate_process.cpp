@@ -48,6 +48,10 @@
 #include "io/assets_android.hpp"
 #endif
 
+#ifdef __HAIKU__
+#include <kernel/image.h>
+#endif
+
 // ----------------------------------------------------------------------------
 std::string SeparateProcess::getCurrentExecutableLocation()
 {
@@ -74,6 +78,22 @@ std::string SeparateProcess::getCurrentExecutableLocation()
 #elif defined(__NetBSD__)
     return file_manager->getFileSystem()->getAbsolutePath("/proc/curproc/exe")
         .c_str();
+#elif defined(__HAIKU__)
+    image_info ii;
+    int32_t g = 0;
+
+    while (get_next_image_info(0, &g, &ii) == B_OK)
+    {
+	    if (ii.type == B_APP_IMAGE)
+		    break;
+    }
+
+    if (ii.type != B_APP_IMAGE)
+    {
+	    return "";
+    }
+
+    return file_manager->getFileSystem()->getAbsolutePath(ii.name).c_str();
 #else
     // Assume Linux
     return file_manager->getFileSystem()->getAbsolutePath("/proc/self/exe")

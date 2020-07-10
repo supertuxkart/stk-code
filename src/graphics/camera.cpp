@@ -31,7 +31,6 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
-#include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 #include "race/race_manager.hpp"
@@ -175,9 +174,15 @@ void Camera::setupCamera()
         float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() , 
         float(irr_driver->getActualScreenSize().Height) / m_viewport.getHeight());
 
-    m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
-        [RaceManager::get()->getNumLocalPlayers() > 0 ?
-        RaceManager::get()->getNumLocalPlayers() - 1 : 0];
+    if (RaceManager::get()->getNumLocalPlayers() > 0)
+    {
+        m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
+          [RaceManager::get()->getNumLocalPlayers() - 1];
+    }
+    else
+    {
+        m_fov = DEGREE_TO_RAD * UserConfigParams::m_camera_fov;
+    }
 
     m_camera->setFOV(m_fov);
     m_camera->setAspectRatio(m_aspect);
