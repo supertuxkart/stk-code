@@ -430,6 +430,11 @@ namespace ServerConfig
         "network-ai=x, which will kick N - 1 bot(s) where N is the number "
         "of human players. Only use this for non-GP racing server."));
 
+    SERVER_CFG_PREFIX BoolServerConfigParam m_ai_anywhere
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ai-anywhere",
+        "If true this server will allow AI instance to be connected from "
+        "anywhere. (other than LAN network only)"));
+
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */
     static const uint32_t m_server_version = 6;
