@@ -57,6 +57,7 @@ namespace GUIEngine
         ISpinnerConfirmListener* m_listener;
         
         int m_value, m_min, m_max;
+        float m_step;
         
         int m_spinner_widget_player_id;
         bool m_use_background_color;
@@ -156,9 +157,6 @@ namespace GUIEngine
             return false;
         }
 
-
-
-
         void setListener(ISpinnerConfirmListener* listener) { m_listener = listener; }
 
         /** \brief implement method from base class Widget */
@@ -169,6 +167,12 @@ namespace GUIEngine
          * \param new_value  the new value that will be become the current value of this spinner.
          */
         void setValue(const int new_value);
+
+        /**
+         * \brief            sets the float value of the spinner
+         * \param new_value  the new value that will be become the current value of this spinner.
+         */
+        void setFloatValue(const float new_value) { setValue(int(round(new_value/m_step))); }
         
         /**
           * \brief        sets the current value of the spinner
@@ -187,6 +191,12 @@ namespace GUIEngine
          * \return the current value of the spinner, in a int form
          */
         int  getValue() const { return m_value; }
+
+        /**
+         * \brief retrieve the current value of the spinner
+         * \return the current value of the spinner, in a float form
+         */
+        float getFloatValue() const { return m_value*m_step; }
         
         /**
           * \brief retrieve the current value of the spinner
@@ -205,6 +215,18 @@ namespace GUIEngine
             return m_labels[id];
         }
 
+        /**
+          * \return the step value of the spinner
+          */
+        // --------------------------------------------------------------------
+        /** Returns the step value. */
+        float  getStep()  const { return m_step; }
+        // --------------------------------------------------------------------
+        /** \brief Sets the maximum value for a spinner.
+         *  If the current value is larger than the new maximum, the current
+         *  value is set to the new maximum. */
+        void setStep(float n) { m_step = n; }
+        // --------------------------------------------------------------------
         /**
           * \return the maximum value the spinner can take
           */
@@ -242,6 +264,11 @@ namespace GUIEngine
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
         const core::stringw& getCustomText() const { return m_custom_text; }
+
+        /* Set a spinner with numeric values min <= i <= max, with a precision of defined by step */
+        void setRange(int min, int max, float step);
+        void setRange(int min, int max) { setRange(min, max, 1.0); }
+
         void onPressed(int x, int y);
         void doValueUpdatedCallback()
         {
@@ -253,6 +280,7 @@ namespace GUIEngine
         {
             m_value_updated_callback = callback;
         }
+
     };
 
 }

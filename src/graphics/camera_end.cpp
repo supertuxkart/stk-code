@@ -18,6 +18,7 @@
 
 #include "graphics/camera_end.hpp"
 
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "race/race_manager.hpp"
@@ -133,7 +134,7 @@ void CameraEnd::update(float dt)
         }
     case EndCameraInformation::EC_AHEAD_OF_KART:
         {
-            float cam_angle = m_kart->getKartProperties()->getCameraBackwardUpAngle()
+            float cam_angle = UserConfigParams::m_camera_backward_up_angle
                             * DEGREE_TO_RAD;
 
             positionCamera(dt, /*above_kart*/0.75f,

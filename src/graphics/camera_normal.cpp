@@ -46,7 +46,7 @@ CameraNormal::CameraNormal(Camera::CameraType type,  int camera_index,
                            AbstractKart* kart) 
             : Camera(type, camera_index, kart), m_camera_offset(0, 0, -15.0f)
 {
-    m_distance = kart ? kart->getKartProperties()->getCameraDistance() : 1000.0f;
+    m_distance = kart ? UserConfigParams::m_camera_distance : 1000.0f;
     m_ambient_light = Track::getCurrentTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
@@ -192,15 +192,13 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
                                      float *sideway, float *distance,
                                      bool *smoothing, float *cam_roll_angle)
 {
-    const KartProperties *kp = m_kart->getKartProperties();
-
     switch(getMode())
     {
     case CM_NORMAL:
     case CM_FALLING:
         {
             *above_kart = 0.75f;
-            *cam_angle = kp->getCameraForwardUpAngle() * DEGREE_TO_RAD;
+            *cam_angle = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
             *distance = -m_distance;
             float steering = m_kart->getSteerPercent()
                            * (1.0f + (m_kart->getSkidding()->getSkidFactor()
@@ -208,7 +206,7 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
             // quadratically to dampen small variations (but keep sign)
             float dampened_steer = fabsf(steering) * steering;
             *sideway             = -m_rotation_range*dampened_steer*0.5f;
-            *smoothing           = kp->getCameraForwardSmoothing();
+            *smoothing           = UserConfigParams::m_camera_forward_smoothing;
             *cam_roll_angle      = 0.0f;
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
             {
@@ -223,7 +221,7 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_REVERSE: // Same as CM_NORMAL except it looks backwards
         {
             *above_kart = 0.75f;
-            *cam_angle  = kp->getCameraBackwardUpAngle() * DEGREE_TO_RAD;
+            *cam_angle  = UserConfigParams::m_camera_backward_up_angle * DEGREE_TO_RAD;
             *sideway    = 0;
             *distance   = 2.0f*m_distance;
             *smoothing  = false;
