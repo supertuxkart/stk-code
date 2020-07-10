@@ -20,9 +20,12 @@
             </box>
         </div>
 
-        <header width="8%" I18N="In the track and grand prix selection screen" text="All Tracks"
-                align="center" text_align="center" />
-        <spacer width="100%" height="1%" />
+        <spacer width="100%" height="1%"/>
+        <div width="100%" proportion="1" layout="horizontal-row" >
+            <header width="30%" I18N="In the track and grand prix selection screen" text="All Tracks"
+                    align="center" text_align="center" />
+            <textbox width="60%" id="search"/>
+        </div>
 
         <box proportion="8" width="100%" layout="vertical-row" padding="1">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
