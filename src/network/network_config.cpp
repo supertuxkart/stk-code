@@ -563,7 +563,7 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
     }
     g_list = NULL;
 
-#else
+#elif !defined(__CYGWIN__)
 #define SRV_WEIGHT (RRFIXEDSZ+2)
 #define SRV_PORT (RRFIXEDSZ+4)
 #define SRV_SERVER (RRFIXEDSZ+6)

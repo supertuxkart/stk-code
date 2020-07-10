@@ -696,7 +696,7 @@ bool ConnectToServer::detectPort()
         if (port_from_dns != 0)
             break;
     }
-#else
+#elif !defined(__CYGWIN__)
     unsigned char response[512] = {};
     const std::string& utf8name = StringUtils::wideToUtf8(m_server->getName());
     int response_len = res_query(utf8name.c_str(), C_IN, T_TXT, response, 512);
