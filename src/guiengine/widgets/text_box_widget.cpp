@@ -74,6 +74,12 @@ public:
         return handled;
     }
 
+    virtual void inputChar(char32_t c)
+    {
+        CGUIEditBox::inputChar(c);
+        handleTextUpdated();
+    }
+
     virtual bool OnEvent(const SEvent& event)
     {
         bool out = CGUIEditBox::OnEvent(event);
