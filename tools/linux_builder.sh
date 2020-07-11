@@ -49,7 +49,7 @@ export DIRNAME="$(dirname "$(readlink -f "$0")")"
 
 ######################## CONFIG ########################
 
-export STK_VERSION="git20200530"
+export STK_VERSION="git20200711"
 export THREADS_NUMBER=`nproc`
 export SCHROOT_32BIT_NAME="chroot-jessie32"
 export SCHROOT_64BIT_NAME="chroot-jessie64"
@@ -68,6 +68,9 @@ export BUILD_DIR_64BIT="build-linux-64bit"
 export DEPENDENCIES_DIR_32BIT="$STKCODE_DIR/dependencies-linux-32bit"
 export DEPENDENCIES_DIR_64BIT="$STKCODE_DIR/dependencies-linux-64bit"
 export STK_INSTALL_DIR="$STKCODE_DIR/build-linux-install"
+
+# Use it if you build STK with Debian Jessie
+export ENABLE_JESSIE_HACKS=1
 
 ########################################################
 
@@ -235,13 +238,18 @@ build_stk()
         echo "Compiling openal"
         mkdir -p "$DEPENDENCIES_DIR/openal"
         cp -a -f "$DEPENDENCIES_DIR/../lib/openal/"* "$DEPENDENCIES_DIR/openal"
+        
+        if [ "$ENABLE_JESSIE_HACKS" -gt 0 ]; then
+            JESSIE_HACK="-DHAVE_LIBATOMIC=0"
+        fi
     
         cd "$DEPENDENCIES_DIR/openal"
         cmake . -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-                -DALSOFT_UTILS=0            \
-                -DALSOFT_EXAMPLES=0         \
-                -DALSOFT_TESTS=0            \
-                -DALSOFT_BACKEND_SNDIO=0 &&
+                -DALSOFT_UTILS=0         \
+                -DALSOFT_EXAMPLES=0      \
+                -DALSOFT_TESTS=0         \
+                -DALSOFT_BACKEND_SNDIO=0 \
+                $JESSIE_HACK &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -629,6 +637,10 @@ fi
 echo "Prepare package..."
 
 STK_PACKAGE_DIR="$STK_INSTALL_DIR/SuperTuxKart-$STK_VERSION-linux"
+
+if [ -f "$STK_PACKAGE_DIR" ]; then
+    rm -rf "$STK_PACKAGE_DIR"
+fi
 
 mkdir -p "$STK_PACKAGE_DIR"
 mkdir -p "$STK_PACKAGE_DIR/bin"
