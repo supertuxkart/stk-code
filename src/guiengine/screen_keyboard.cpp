@@ -167,7 +167,12 @@ void ScreenKeyboard::init()
             y = margin;
         }
     }
-    
+#ifdef ANDROID
+    // This will allow emoji keyboard opening together with android screen
+    // keyboard
+    y += irr_driver->getDevice()->getMovedHeight();
+#endif
+
     m_area = core::rect<s32>(x, y, x + w, y + h);
 
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true);
