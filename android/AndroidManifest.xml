@@ -10,7 +10,7 @@
                  android:banner="@drawable/banner"
                  android:hasCode="true"
                  android:isGame="true"
-                 android:theme="@android:style/Theme.DeviceDefault.NoActionBar.TranslucentDecor"
+                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
                  android:hardwareAccelerated="true"
                  android:resizeableActivity="false">
 
@@ -19,10 +19,6 @@
                   android:launchMode="singleTask"
                   android:configChanges="fontScale|keyboard|keyboardHidden|layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|uiMode"
                   android:screenOrientation="sensorLandscape">
-
-            <!-- Tell NativeActivity the name of or .so -->
-            <meta-data android:name="android.app.lib_name"
-                       android:value="main" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

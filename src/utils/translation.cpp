@@ -45,12 +45,8 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
-#ifdef ANDROID
-#include "main_android.hpp"
-#endif
-
-#ifdef IOS_STK
-#include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceiOS.h"
+#ifdef MOBILE_STK
+#include "SDL_locale.h"
 #endif
 
 // set to 1 to debug i18n
@@ -325,13 +321,29 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             language = p_lang;
         else
         {
-#ifdef IOS_STK
-            language = irr::CIrrDeviceiOS::getSystemLanguageCode();
-            if (language.find("zh-Hans") != std::string::npos)
-                language = "zh_CN";
-            else if (language.find("zh-Hant") != std::string::npos)
-                language = "zh_TW";
-            language = StringUtils::findAndReplace(language, "-", "_");
+#ifdef MOBILE_STK
+            SDL_Locale* locale = SDL_GetPreferredLocales();
+            if (locale)
+            {
+                // First locale only
+                for (int l = 0; locale[l].language != NULL; l++)
+                {
+                    language = locale[l].language;
+                    if (locale[l].country != NULL)
+                    {
+                        language += "-";
+                        language += locale[l].country;
+                    }
+                    // iOS specific
+                    if (language.find("zh-Hans") != std::string::npos)
+                        language = "zh_CN";
+                    else if (language.find("zh-Hant") != std::string::npos)
+                        language = "zh_TW";
+                    language = StringUtils::findAndReplace(language, "-", "_");
+                    break;
+                }
+                SDL_free(locale);
+            }
 #elif defined(WIN32)
             // Thanks to the frogatto developer for this code snippet:
             char c[1024];
@@ -348,29 +360,6 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                              "GetLocaleInfo tryname returns '%s'.", c);
                 if(c[0]) language += std::string("_")+c;
             }   // if c[0]
-            
-#elif defined(ANDROID)
-            if (global_android_app)
-            {
-                char p_language[3] = {};
-                AConfiguration_getLanguage(global_android_app->config, 
-                                           p_language);
-                std::string s_language(p_language);
-                if (!s_language.empty())
-                {
-                    language += s_language;
-
-                    char p_country[3] = {};
-                    AConfiguration_getCountry(global_android_app->config, 
-                                              p_country);
-                    std::string s_country(p_country);
-                    if (!s_country.empty())
-                    {
-                        language += "_";
-                        language += s_country;
-                    }
-                }
-            }
 #endif
         }   // neither LANGUAGE nor LANG defined
 

@@ -27,12 +27,6 @@
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 
-#ifdef ANDROID
-#include <android/asset_manager.h>
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-extern struct android_app* global_android_app;
-#endif
-
 // ----------------------------------------------------------------------------
 bool ExtractMobileAssets::hasFullAssets()
 {

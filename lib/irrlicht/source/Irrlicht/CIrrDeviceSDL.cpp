@@ -122,7 +122,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 	if (VideoDriver)
 		createGUIAndScene();
-#ifdef MOBILE_STK
+#ifdef IOS_STK
 	SDL_SetEventFilter(handle_app_event, NULL);
 #endif
 }
@@ -502,6 +502,9 @@ void CIrrDeviceSDL::createDriver()
 extern "C" void handle_joystick(SDL_Event& event);
 // In CGUIEditBox.cpp
 extern "C" void handle_textinput(SDL_Event& event);
+// In main_loop.cpp
+extern "C" void pause_mainloop();
+extern "C" void resume_mainloop();
 //! runs the device. Returns false if device wants to be deleted
 bool CIrrDeviceSDL::run()
 {
@@ -514,6 +517,14 @@ bool CIrrDeviceSDL::run()
 	{
 		switch ( SDL_event.type )
 		{
+#if defined(MOBILE_STK) && !defined(IOS_STK)
+		case SDL_APP_WILLENTERBACKGROUND:
+			pause_mainloop();
+			break;
+		case SDL_APP_DIDENTERFOREGROUND:
+			resume_mainloop();
+			break;
+#endif
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 		case SDL_SENSORUPDATE:
 			if (SDL_event.sensor.which == AccelerometerInstance)
@@ -525,8 +536,13 @@ bool CIrrDeviceSDL::run()
 				// Mobile STK specific
 				if (irrevent.AccelerometerEvent.X < 0.0)
 					irrevent.AccelerometerEvent.X *= -1.0;
+#ifdef IOS_STK
 				if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE)
 					irrevent.AccelerometerEvent.Y *= -1.0;
+#else
+				if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
+					irrevent.AccelerometerEvent.Y *= -1.0;
+#endif
 				postEventFromUser(irrevent);
 			}
 			else if (SDL_event.sensor.which == GyroscopeInstance)
@@ -1098,6 +1114,7 @@ void CIrrDeviceSDL::createKeyMap()
 	KeyMap.push_back(SKeyMap(SDLK_COMMA,  IRR_KEY_COMMA));
 	KeyMap.push_back(SKeyMap(SDLK_MINUS,  IRR_KEY_MINUS));
 	KeyMap.push_back(SKeyMap(SDLK_PERIOD, IRR_KEY_PERIOD));
+	KeyMap.push_back(SKeyMap(SDLK_AC_BACK, IRR_KEY_ESCAPE));
 
 	KeyMap.push_back(SKeyMap(SDLK_EQUALS, IRR_KEY_PLUS));
 	KeyMap.push_back(SKeyMap(SDLK_LEFTBRACKET, IRR_KEY_OEM_4));

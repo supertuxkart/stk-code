@@ -43,8 +43,8 @@
 #include "utils/translation.hpp"
 
 #ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#include "graphics/irr_driver.hpp"
+#include <jni.h>
+#include "SDL_system.h"
 #include "utils/utf8/unchecked.h"
 #endif
 
@@ -526,46 +526,30 @@ bool ConnectToServer::registerWithSTKServer()
 auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
 {
     std::vector<std::string> result;
-    CIrrDeviceAndroid* dev =
-        dynamic_cast<CIrrDeviceAndroid*>(irr_driver->getDevice());
-    if (!dev)
-        return result;
-    android_app* android = dev->getAndroid();
-    if (!android)
-        return result;
-
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-
-    jint status = android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-
-        status = android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-    if (status != JNI_OK)
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    if (env == NULL)
     {
         Log::error("ConnectToServer",
-            "Cannot attach current thread in getDNSTxtRecords.");
+            "getDNSSrvRecords unable to SDL_AndroidGetJNIEnv.");
         return result;
     }
 
-    jobject native_activity = android->activity->clazz;
+    jobject native_activity = (jobject)SDL_AndroidGetActivity();
+
+    if (native_activity == NULL)
+    {
+        Log::error("ConnectToServer",
+            "getDNSSrvRecords unable to SDL_AndroidGetActivity.");
+        return result;
+    }
+
     jclass class_native_activity = env->GetObjectClass(native_activity);
 
     if (class_native_activity == NULL)
     {
         Log::error("ConnectToServer",
             "getDNSTxtRecords unable to find object class.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(native_activity);
         return result;
     }
 
@@ -576,10 +560,8 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
     {
         Log::error("ConnectToServer",
             "getDNSTxtRecords unable to find method id.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return result;
     }
 
@@ -592,10 +574,8 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
     {
         Log::error("ConnectToServer",
             "Failed to create text for domain name.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return result;
     }
 
@@ -604,10 +584,9 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
     if (arr == NULL)
     {
         Log::error("ConnectToServer", "No array is created.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(text);
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return result;
     }
     int len = env->GetArrayLength(arr);
@@ -619,18 +598,22 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
         const uint16_t* utf16_text =
             (const uint16_t*)env->GetStringChars(jstr, NULL);
         if (utf16_text == NULL)
+        {
+            env->DeleteLocalRef(jstr);
             continue;
+        }
         const size_t str_len = env->GetStringLength(jstr);
         std::string tmp;
         utf8::unchecked::utf16to8(
             utf16_text, utf16_text + str_len, std::back_inserter(tmp));
         result.push_back(tmp);
         env->ReleaseStringChars(jstr, utf16_text);
+        env->DeleteLocalRef(jstr);
     }
-    if (was_detached)
-    {
-        android->activity->vm->DetachCurrentThread();
-    }
+    env->DeleteLocalRef(arr);
+    env->DeleteLocalRef(text);
+    env->DeleteLocalRef(class_native_activity);
+    env->DeleteLocalRef(native_activity);
     return result;
 };
 #endif

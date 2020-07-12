@@ -47,7 +47,7 @@
 //! Uncomment this line to compile with the SDL device
 //#define _IRR_COMPILE_WITH_SDL_DEVICE_
 // Always use SDL2 in STK unless server only compilation
-#if defined(NO_IRR_COMPILE_WITH_SDL_DEVICE_) || defined(ANDROID)
+#if defined(NO_IRR_COMPILE_WITH_SDL_DEVICE_)
 #undef _IRR_COMPILE_WITH_SDL_DEVICE_
 #else
 #define _IRR_COMPILE_WITH_SDL_DEVICE_
@@ -104,9 +104,8 @@
 #endif
 
 #if defined(_IRR_ANDROID_PLATFORM_)
-#define _IRR_COMPILE_WITH_ANDROID_DEVICE_
+#define _IRR_COMPILE_WITH_SDL_DEVICE_
 #define _IRR_COMPILE_WITH_OGLES2_
-#define _IRR_COMPILE_ANDROID_ASSET_READER_
 #endif
 
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_) && !defined(_IRR_HAIKU_PLATFORM_)

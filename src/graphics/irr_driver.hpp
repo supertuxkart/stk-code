@@ -45,10 +45,6 @@
 #include <string>
 #include <vector>
 
-#ifdef ANDROID
-#include "main_android.hpp"
-#endif
-
 
 namespace SP
 {

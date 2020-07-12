@@ -17,9 +17,6 @@
 
 #include "guiengine/event_handler.hpp"
 
-#ifdef ANDROID
-#include "addons/addons_manager.hpp"
-#endif
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
@@ -48,10 +45,6 @@
 #include <IGUIListBox.h>
 
 #include <iostream>
-
-#ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/stk_android_native_app_glue.h"
-#endif
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
@@ -169,51 +162,6 @@ bool EventHandler::OnEvent (const SEvent &event)
     {
         return onGUIEvent(event) == EVENT_BLOCK;
     }
-#ifdef ANDROID    
-    else if (event.EventType == EET_SYSTEM_EVENT &&
-             event.SystemEvent.EventType == ESET_ANDROID_CMD)
-    {
-        int cmd = event.SystemEvent.AndroidCmd.Cmd;
-        
-        IrrlichtDevice* device = irr_driver->getDevice();
-        assert(device != NULL);
-        
-        if (cmd == APP_CMD_PAUSE || cmd == APP_CMD_LOST_FOCUS)
-        {
-            // Make sure that pause/unpause is executed only once
-            if (device->isWindowMinimized() == device->isWindowFocused())
-            {
-                if (music_manager)
-                    music_manager->pauseMusic();
-                if (SFXManager::get())
-                    SFXManager::get()->pauseAll();
-                PlayerManager::get()->save();
-                if (addons_manager->hasDownloadedIcons())
-                    addons_manager->saveInstalled();
-            }
-        }
-        else if (cmd == APP_CMD_RESUME || cmd == APP_CMD_GAINED_FOCUS)
-        {
-            if (device->isWindowActive())
-            {
-                if (music_manager)
-                    music_manager->resumeMusic();
-                if (SFXManager::get())
-                    SFXManager::get()->resumeAll();
-                // Improve rubber banding effects of rewinders when going
-                // back to phone, because the smooth timer is paused
-                if (World::getWorld() && RewindManager::isEnabled())
-                    RewindManager::get()->resetSmoothNetworkBody();
-            }
-        }
-        else if (cmd == APP_CMD_LOW_MEMORY)
-        {
-            Log::warn("EventHandler", "Low memory event received");
-        }
-
-        return false;
-    }
-#endif
     else if (GUIEngine::getStateManager()->getGameState() != GUIEngine::GAME &&
              event.EventType != EET_KEY_INPUT_EVENT && event.EventType != EET_JOYSTICK_INPUT_EVENT &&
              event.EventType != EET_LOG_TEXT_EVENT)

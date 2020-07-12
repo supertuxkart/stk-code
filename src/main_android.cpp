@@ -23,21 +23,24 @@
 #include "utils/string_utils.hpp"
 
 #ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#endif
+#include "SDL_system.h"
+#include <jni.h>
 
-extern int main(int argc, char *argv[]);
+extern int android_main(int argc, char *argv[]);
 
-#ifdef ANDROID
-struct android_app* global_android_app = NULL;
-ANativeActivity* global_android_activity = NULL;
-
-extern "C"
+void override_default_params_for_mobile();
+extern "C" int SDL_main(int argc, char *argv[])
 {
-void set_global_android_activity(ANativeActivity* activity)
-{
-    global_android_activity = activity;
-}
+    override_default_params_for_mobile();
+    int result = android_main(argc, argv);
+    // TODO: Irrlicht device is properly waiting for destroy event, but
+    // some global variables are not initialized/cleared in functions and thus
+    // its state is remembered when the window is restored. We will use exit
+    // call to make sure that all variables are cleared until a proper fix will
+    // be done.
+    fflush(NULL);
+    _exit(0);
+    return 0;
 }
 #endif
 
@@ -64,22 +67,42 @@ void override_default_params_for_mobile()
 
 #ifdef ANDROID
     // Set multitouch device scale depending on actual screen size
-    int32_t screen_size = AConfiguration_getScreenSize(global_android_app->config);
-    
+    const int SCREENLAYOUT_SIZE_SMALL = 1;
+    const int SCREENLAYOUT_SIZE_NORMAL = 2;
+    const int SCREENLAYOUT_SIZE_LARGE = 3;
+    const int SCREENLAYOUT_SIZE_XLARGE = 4;
+    int32_t screen_size = 0;
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    assert(env);
+    jobject activity = (jobject)SDL_AndroidGetActivity();
+    if (activity != NULL)
+    {
+        jclass clazz = env->GetObjectClass(activity);
+        if (clazz != NULL)
+        {
+            jmethodID method_id = env->GetMethodID(clazz, "getScreenSize",
+                "()I");
+            if (method_id != NULL)
+                screen_size = env->CallIntMethod(activity, method_id);
+            env->DeleteLocalRef(clazz);
+        }
+        env->DeleteLocalRef(activity);
+    }
+
     switch (screen_size)
     {
-    case ACONFIGURATION_SCREENSIZE_SMALL:
-    case ACONFIGURATION_SCREENSIZE_NORMAL:
+    case SCREENLAYOUT_SIZE_SMALL:
+    case SCREENLAYOUT_SIZE_NORMAL:
         UserConfigParams::m_multitouch_scale.setDefaultValue(1.3f);
         UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.1f);
         UserConfigParams::m_font_size = 5.0f;
         break;
-    case ACONFIGURATION_SCREENSIZE_LARGE:
+    case SCREENLAYOUT_SIZE_LARGE:
         UserConfigParams::m_multitouch_scale.setDefaultValue(1.2f);
         UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.15f);
         UserConfigParams::m_font_size = 5.0f;
         break;
-    case ACONFIGURATION_SCREENSIZE_XLARGE:
+    case SCREENLAYOUT_SIZE_XLARGE:
         UserConfigParams::m_multitouch_scale.setDefaultValue(1.1f);
         UserConfigParams::m_multitouch_sensitivity_x.setDefaultValue(0.2f);
         UserConfigParams::m_font_size = 4.0f;
@@ -177,31 +200,6 @@ void getConfigForDevice(const char* dev)
     }
 }
 
-#endif
-
-#ifdef ANDROID
-void android_main(struct android_app* app) 
-{
-    Log::info("AndroidMain", "Loading application...");
-        
-    global_android_app = app;
-    global_android_activity = app->activity;
-
-    app_dummy();
-    override_default_params_for_mobile();
-
-    main(0, {});
-
-    Log::info("AndroidMain", "Closing STK...");
-    
-    // TODO: Irrlicht device is properly waiting for destroy event, but
-    // some global variables are not initialized/cleared in functions and thus 
-    // its state is remembered when the window is restored. We will use exit
-    // call to make sure that all variables are cleared until a proper fix will 
-    // be done.
-    fflush(NULL);
-    _exit(0);
-}
 #endif
 
 #endif

@@ -529,13 +529,8 @@ bool ScreenKeyboard::shouldUseScreenKeyboard()
     bool always_use_screen_keyboard =
         UserConfigParams::m_screen_keyboard == 2;
 
-    // Enable if no hardware keyboard
     if (UserConfigParams::m_screen_keyboard == 1)
-    {
-        if (irr_driver->getDevice()->hasHardwareKeyboard())
-            return false;
         return true;
-    }
 
     return always_use_screen_keyboard;
 }

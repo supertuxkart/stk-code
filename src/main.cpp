@@ -1924,7 +1924,9 @@ void main_abort()
 #endif
 
 // ----------------------------------------------------------------------------
-#ifdef IOS_STK
+#if defined(ANDROID)
+int android_main(int argc, char *argv[])
+#elif defined(IOS_STK)
 int ios_main(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
@@ -2175,18 +2177,12 @@ int main(int argc, char *argv[])
             #ifdef MOBILE_STK
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {
-                #ifdef ANDROID
-                int32_t touch = AConfiguration_getTouchscreen(
-                                                    global_android_app->config);
-                if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
+                if (irr_driver->getDevice()->supportsTouchDevice())
                 {
-                #endif
                     InitAndroidDialog* init_android = new InitAndroidDialog(
                                                                     0.6f, 0.6f);
                     GUIEngine::DialogQueue::get()->pushDialog(init_android);
-                #ifdef ANDROID
                 }
-                #endif
             }
             #endif
 

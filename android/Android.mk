@@ -175,8 +175,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
-LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)         \
-                      ../lib/irrlicht/source/Irrlicht/stk_android_native_app_glue.c
+LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
                       -I../src                           \
@@ -184,6 +183,7 @@ LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -Iobj/libpng/                      \
                       -Iobj/zlib/                        \
                       -I../lib/sdl2/include/             \
+                      -DMOBILE_STK                       \
                       -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
 LOCAL_CPPFLAGS     := -std=gnu++0x
 LOCAL_STATIC_LIBRARIES := libjpeg png zlib

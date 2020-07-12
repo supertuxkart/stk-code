@@ -168,9 +168,7 @@ IrrDriver::IrrDriver()
     p.SwapInterval  = 0;
     p.EventReceiver = NULL;
     p.FileSystem    = file_manager->getFileSystem();
-#ifdef ANDROID
-    p.PrivateData   = (void*)global_android_app;
-#endif
+    p.PrivateData   = NULL;
 
     m_device = createDeviceEx(p);
 
@@ -465,9 +463,7 @@ void IrrDriver::initDevice()
 #else
             params.DriverType    = video::EDT_OPENGL;
 #endif
-#if defined(ANDROID)
-            params.PrivateData = (void*)global_android_app;
-#endif
+            params.PrivateData   = NULL;
             params.Stencilbuffer = false;
             params.Bits          = bits;
             params.EventReceiver = this;
@@ -776,38 +772,6 @@ void IrrDriver::initDevice()
 
     if (GUIEngine::isNoGraphics())
         return;
-
-    m_device->registerGetMovedHeightFunction([]
-        (const IrrlichtDevice* device)->int
-        {
-#ifdef ANDROID
-            int screen_keyboard_height =
-                device->getOnScreenKeyboardHeight();
-            int screen_height = device->getScreenHeight();
-            if (screen_keyboard_height == 0 || screen_height == 0)
-                return 0;
-
-            GUIEngine::Widget* w = GUIEngine::getFocusForPlayer(0);
-            if (!w)
-                return 0;
-
-            core::rect<s32> pos =
-                w->getIrrlichtElement()->getAbsolutePosition();
-            // Add 10% margin
-            int element_height = (int)device->getScreenHeight() -
-                pos.LowerRightCorner.Y - int(screen_height * 0.01f);
-            if (element_height > screen_keyboard_height)
-                return 0;
-            else if (element_height < 0)
-            {
-                // For buttons near the edge of the bottom of screen
-                return screen_keyboard_height;
-            }
-            return screen_keyboard_height - element_height;
-#else
-            return 0;
-#endif
-        });
 }   // initDevice
 
 // ----------------------------------------------------------------------------

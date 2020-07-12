@@ -26,10 +26,9 @@
 #include <fstream>
 
 #ifdef ANDROID
-#include <android/asset_manager.h>
+#include <SDL_system.h>
 #include <sys/statfs.h> 
 
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -51,9 +50,6 @@ void AssetsAndroid::init()
 #ifdef ANDROID
     if (m_file_manager == NULL)
         return;
-        
-    if (!global_android_app)
-        return;
 
     bool needs_extract_data = false;
     const std::string version = std::string("supertuxkart.") + STK_VERSION;
@@ -63,19 +59,19 @@ void AssetsAndroid::init()
 
     if (getenv("SUPERTUXKART_DATADIR"))
         paths.push_back(getenv("SUPERTUXKART_DATADIR"));
-        
-    if (global_android_app->activity->externalDataPath)
+
+    if (SDL_AndroidGetExternalStoragePath() != NULL)
     {
-        m_file_manager->checkAndCreateDirectoryP(
-                                global_android_app->activity->externalDataPath);
-        paths.push_back(global_android_app->activity->externalDataPath);
+        std::string external_storage_path = SDL_AndroidGetExternalStoragePath();
+        m_file_manager->checkAndCreateDirectoryP(external_storage_path);
+        paths.push_back(external_storage_path);
     }
 
-    if (global_android_app->activity->internalDataPath)
+    if (SDL_AndroidGetInternalStoragePath() != NULL)
     {
-        m_file_manager->checkAndCreateDirectoryP(
-                                global_android_app->activity->internalDataPath);
-        paths.push_back(global_android_app->activity->internalDataPath);
+        std::string internal_storage_path = SDL_AndroidGetInternalStoragePath();
+        m_file_manager->checkAndCreateDirectoryP(internal_storage_path);
+        paths.push_back(internal_storage_path);
     }
 
     if (getenv("EXTERNAL_STORAGE"))
@@ -229,11 +225,10 @@ void AssetsAndroid::init()
     // Extract data directory from apk if it's needed
     if (needs_extract_data)
     {
-        m_progress_bar = new ProgressBarAndroid();
-        m_progress_bar->draw(0.01f);
-        
         if (hasAssets())
         {
+            m_progress_bar = new ProgressBarAndroid();
+            m_progress_bar->draw(0.01f);
             removeData();
             extractData();
             
@@ -242,10 +237,8 @@ void AssetsAndroid::init()
                 Log::fatal("AssetsAndroid", "Fatal error: Assets were not "
                            "extracted properly");
             }
+            delete m_progress_bar;
         }
-        
-        delete m_progress_bar;
-
     }
 
 #endif
@@ -258,7 +251,7 @@ void AssetsAndroid::init()
 void AssetsAndroid::extractData()
 {
 #ifdef ANDROID
-    const std::string dirs_list = "directories.txt";
+    const std::string dirs_list = "files.txt";
 
     bool success = true;
 
@@ -267,7 +260,7 @@ void AssetsAndroid::extractData()
 
     // Extract base directory first, so that we will be able to open the file
     // with dir names
-    success = extractDir("");
+    success = extractFile("files.txt");
 
     if (!success)
     {
@@ -301,13 +294,13 @@ void AssetsAndroid::extractData()
 
             while (!file.eof())
             {
-                std::string dir_name;
-                getline(file, dir_name);
+                std::string file_name;
+                getline(file, file_name);
 
-                if (dir_name.length() == 0 || dir_name.at(0) == '#')
+                if (file_name.length() == 0 || file_name.at(0) == '#')
                     continue;
 
-                success = extractDir(dir_name);
+                success = extractFile(file_name);
 
                 assert(lines_count > 0);
                 float pos = 0.01f + (float)(current_line) / lines_count * 0.99f;
@@ -341,122 +334,83 @@ void AssetsAndroid::extractData()
 }
 
 //-----------------------------------------------------------------------------
-/** A function that extracts selected directory from apk file
+/** A function that extracts selected file or directory from apk file
  *  \param dir_name Directory to extract from assets
  *  \return True if successfully extracted
  */
-bool AssetsAndroid::extractDir(std::string dir_name)
+bool AssetsAndroid::extractFile(std::string filename)
 {
 #ifdef ANDROID
-    if (!global_android_app)
-        return false;
-        
-    AAssetManager* amgr = global_android_app->activity->assetManager;
+    bool creating_dir = !filename.empty() && filename.back() == '/';
+    if (creating_dir)
+        Log::info("AssetsAndroid", "Creating %s directory", filename.c_str());
+    else
+        Log::info("AssetsAndroid", "Extracting %s file", filename.c_str());
 
-    Log::info("AssetsAndroid", "Extracting %s directory",
-              dir_name.length() > 0 ? dir_name.c_str() : "main");
-
-    std::string output_dir = dir_name;
+    std::string output_file = filename;
 
     if (m_stk_dir.length() > 0)
     {
-        output_dir = m_stk_dir + "/" + dir_name;
+        output_file = m_stk_dir + "/" + filename;
     }
 
-    AAssetDir* asset_dir = AAssetManager_openDir(amgr, dir_name.c_str());
-
-    if (asset_dir == NULL)
+    if (creating_dir)
     {
-        Log::warn("AssetsAndroid", "Couldn't get asset dir: %s",
-                  dir_name.c_str());
+        bool dir_created = m_file_manager->checkAndCreateDirectoryP(output_file);
+        if (!dir_created)
+        {
+            Log::warn("AssetsAndroid", "Couldn't create %s directory",
+                output_file.c_str());
+            return false;
+        }
         return true;
     }
 
-    bool dir_created = m_file_manager->checkAndCreateDirectory(output_dir);
-    
-    if (!dir_created)
+    SDL_RWops* asset = SDL_RWFromFile(filename.c_str(), "rb");
+    if (asset == NULL)
     {
-        dir_created = m_file_manager->checkAndCreateDirectoryP(output_dir);
-    }
-    
-    if (!dir_created)
-    {
-        Log::warn("AssetsAndroid", "Couldn't create %s directory",
-                  output_dir.c_str());
-        return false;
+        Log::warn("AssetsAndroid", "Couldn't get asset: %s",
+            filename.c_str());
+        return true;
     }
 
     const int buf_size = 65536;
     char* buf = new char[buf_size]();
-    bool extraction_failed = false;
 
-    while (!extraction_failed)
+    std::fstream out_file(output_file.c_str(), std::ios::out | std::ios::binary);
+
+    if (!out_file.good())
     {
-        const char* filename = AAssetDir_getNextFileName(asset_dir);
-
-        // Check if finished
-        if (filename == NULL)
-            break;
-
-        if (strlen(filename) == 0)
-            continue;
-
-        std::string file_path = std::string(filename);
-
-        if (dir_name.length() > 0)
-        {
-            file_path = dir_name + "/" + std::string(filename);
-        }
-
-        AAsset* asset = AAssetManager_open(amgr, file_path.c_str(),
-                                           AASSET_MODE_STREAMING);
-
-        if (asset == NULL)
-        {
-            Log::warn("AssetsAndroid", "Asset is null: %s", filename);
-            continue;
-        }
-
-        std::string output_path = output_dir + "/" + std::string(filename);
-        std::fstream out_file(output_path, std::ios::out | std::ios::binary);
-
-        if (!out_file.good())
-        {
-            extraction_failed = true;
-            Log::error("AssetsAndroid", "Couldn't create a file: %s", filename);
-            AAsset_close(asset);
-            break;
-        }
-
-        int nb_read = 0;
-        while ((nb_read = AAsset_read(asset, buf, buf_size)) > 0)
-        {
-            out_file.write(buf, nb_read);
-
-            if (out_file.fail())
-            {
-                extraction_failed = true;
-                break;
-            }
-        }
-
-        out_file.close();
-
-        if (out_file.fail() || extraction_failed)
-        {
-            extraction_failed = true;
-            Log::error("AssetsAndroid", "Extraction failed for file: %s",
-                      filename);
-        }
-
-        AAsset_close(asset);
+        Log::error("AssetsAndroid", "Couldn't create a file: %s",
+            output_file.c_str());
+        SDL_RWclose(asset);
+        return false;
     }
 
+    size_t nb_read = 0;
+    while ((nb_read = SDL_RWread(asset, buf, 1, buf_size)) > 0)
+    {
+        out_file.write(buf, nb_read);
+        if (out_file.fail())
+        {
+            delete[] buf;
+            SDL_RWclose(asset);
+            return false;
+        }
+    }
+
+    out_file.close();
     delete[] buf;
+    SDL_RWclose(asset);
 
-    AAssetDir_close(asset_dir);
+    if (out_file.fail())
+    {
+        Log::error("AssetsAndroid", "Extraction failed for file: %s",
+            filename.c_str());
+        return false;
+    }
 
-    return !extraction_failed;
+    return true;
 #endif
 
     return false;
@@ -543,10 +497,7 @@ void AssetsAndroid::removeData()
 bool AssetsAndroid::hasAssets()
 {
 #ifdef ANDROID
-    AAssetManager* amgr = global_android_app->activity->assetManager;
-    
-    AAsset* asset = AAssetManager_open(amgr, "has_assets.txt",
-                                       AASSET_MODE_STREAMING);
+    SDL_RWops* asset = SDL_RWFromFile("has_assets.txt", "r");
 
     if (asset == NULL)
     {
@@ -555,7 +506,7 @@ bool AssetsAndroid::hasAssets()
     }
 
     Log::info("AssetsAndroid", "Package has assets");
-    AAsset_close(asset);
+    SDL_RWclose(asset);
     return true;
 #endif
 
@@ -658,15 +609,10 @@ std::string AssetsAndroid::getDataPath()
     if (access(data_path.c_str(), R_OK) != 0)
     {
         Log::warn("AssetsAndroid", "Cannot use standard data dir");
-        
-        if (global_android_activity)
-        {
-            AndroidApplicationInfo application_info = 
-                CIrrDeviceAndroid::getApplicationInfo(global_android_activity);
-            
-            data_path = application_info.data_dir;
-        }
-        
+
+        if (SDL_AndroidGetInternalStoragePath() != NULL)
+            data_path = SDL_AndroidGetInternalStoragePath();
+
         if (access(data_path.c_str(), R_OK) != 0)
         {
             data_path = "";
@@ -674,34 +620,6 @@ std::string AssetsAndroid::getDataPath()
     }
     
     return data_path;
-#endif
-
-    return "";
-}
-
-//-----------------------------------------------------------------------------
-/** Get a path for internal lib directory
- *  \return Path for internal lib directory or empty string when failed
- */
-std::string AssetsAndroid::getLibPath()
-{
-#ifdef ANDROID
-    std::string lib_path;
-    
-    if (global_android_activity)
-    {
-        AndroidApplicationInfo application_info = 
-            CIrrDeviceAndroid::getApplicationInfo(global_android_activity);
-    
-        lib_path = application_info.native_lib_dir;
-    }
-
-    if (access(lib_path.c_str(), R_OK) != 0)
-    {
-        lib_path = "";
-    }
-
-    return lib_path;
 #endif
 
     return "";

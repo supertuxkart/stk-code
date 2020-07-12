@@ -26,7 +26,7 @@
 #include "utils/types.hpp"
 
 #ifdef ANDROID
-#include "main_android.hpp"
+#include "SDL_system.h"
 #endif
 
 #include <algorithm>
@@ -145,7 +145,7 @@ public:
 #ifdef ANDROID
         // Android version should be enough to disable certain features on this
         // platform
-        int version = AConfiguration_getSdkVersion(global_android_app->config);
+        int version = SDL_GetAndroidSDKVersion();
         
         if (version > 0)
         {

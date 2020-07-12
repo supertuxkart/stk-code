@@ -668,11 +668,15 @@ if [ $RUN_OPTIMIZE_SCRIPT -gt 0 ]; then
 fi
 
 
-# Generate directories list
-echo "Generate directories list"
-find "$OUTPUT_PATH"/* -type d | sort > "$OUTPUT_PATH/directories.txt"
-sed -i s/".\/$OUTPUT_PATH\/"// "$OUTPUT_PATH/directories.txt"
-sed -i s/"$OUTPUT_PATH\/"// "$OUTPUT_PATH/directories.txt"
+# Generate files list
+echo "Generate files list"
+find "$OUTPUT_PATH"/* -type d| sort > tmp1.txt
+sed -i 's/$/\//' tmp1.txt
+find "$OUTPUT_PATH"/* -type f| sort > tmp2.txt
+cat tmp1.txt tmp2.txt | sort > "$OUTPUT_PATH/files.txt"
+rm tmp1.txt tmp2.txt
+sed -i s/".\/$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
+sed -i s/"$OUTPUT_PATH\/"// "$OUTPUT_PATH/files.txt"
 
 # A file that can be used to check if apk has assets
 echo "has_assets" > "$OUTPUT_PATH/has_assets.txt"

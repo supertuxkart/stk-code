@@ -1,5 +1,6 @@
 package org.supertuxkart.stk_dbg;
 
+import org.libsdl.app.SDLActivity;
 import org.supertuxkart.stk_dbg.STKInputConnection;
 
 import android.content.Context;
@@ -37,6 +38,8 @@ public class STKEditText extends EditText
     // ------------------------------------------------------------------------
     private native static void handleActionNext(int widget_id);
     // ------------------------------------------------------------------------
+    private native static void handleLeftRight(boolean left, int widget_id);
+    // ------------------------------------------------------------------------
     public STKEditText(Context context)
     {
         super(context);
@@ -59,6 +62,61 @@ public class STKEditText extends EditText
                     // STK will handle the closing of the screen keyboard
                     return true;
                 }
+                return false;
+            }
+        });
+        setOnKeyListener(new EditText.OnKeyListener()
+        {
+        @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event)
+            {
+                // Up or down pressed, leave focus
+                if (keyCode == KeyEvent.KEYCODE_DPAD_UP ||
+                    keyCode == KeyEvent.KEYCODE_DPAD_DOWN)
+                {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN)
+                    {
+                        beforeHideKeyboard(true/*clear_text*/);
+                        SDLActivity.onNativeKeyDown(keyCode);
+                        SDLActivity.onNativeKeyUp(keyCode);
+                    }
+                    return true;
+                }
+                // For left or right let STK decides
+                else if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT &&
+                    getSelectionStart() == 0)
+                {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN)
+                    {
+                        beforeHideKeyboard(true/*clear_text*/);
+                        handleLeftRight(true, m_stk_widget_id);
+                    }
+                    else
+                        updateSTKEditBox();
+                    return true;
+                }
+                else if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT &&
+                    getSelectionEnd() == getText().length())
+                {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN)
+                    {
+                        beforeHideKeyboard(true/*clear_text*/);
+                        handleLeftRight(false, m_stk_widget_id);
+                    }
+                    else
+                        updateSTKEditBox();
+                    return true;
+                }
+                else if (keyCode == KeyEvent.KEYCODE_ENTER)
+                {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN)
+                        handleActionNext(m_stk_widget_id);
+                    return true;
+                }
+
+                // Requires for hardware key like "Ctrl-a" so it will select
+                // all text in stk edit box
+                updateSTKEditBox();
                 return false;
             }
         });
@@ -88,7 +146,8 @@ public class STKEditText extends EditText
     {
         // Always remove the focus on STKEdit when pressing back button in
         // phone, which hideSoftInputFromWindow is called by java itself
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK &&
+            event.getAction() == KeyEvent.ACTION_UP)
             beforeHideKeyboard(false/*clear_text*/);
         return false;
     }
@@ -134,6 +193,7 @@ public class STKEditText extends EditText
             }
             clearFocus();
             setVisibility(View.GONE);
+            SDLActivity.reFocusAfterSTKEditText();
         }
         catch (Exception e)
         {

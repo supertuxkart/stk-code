@@ -19,7 +19,7 @@
 
 #include "main_loop.hpp"
 
-#ifdef IOS_STK
+#ifdef MOBILE_STK
 #include "addons/addons_manager.hpp"
 #endif
 #include "audio/music_manager.hpp"
@@ -111,6 +111,45 @@ MainLoop::~MainLoop()
 {
 }   // ~MainLoop
 
+#ifdef MOBILE_STK
+//-----------------------------------------------------------------------------
+extern "C" void pause_mainloop()
+{
+    if (!main_loop)
+        return;
+    if (music_manager)
+        music_manager->pauseMusic();
+    if (SFXManager::get())
+        SFXManager::get()->pauseAll();
+    PlayerManager::get()->save();
+    if (addons_manager->hasDownloadedIcons())
+        addons_manager->saveInstalled();
+    Online::RequestManager::get()->setPaused(true);
+    IrrlichtDevice* dev = irr_driver->getDevice();
+    if (dev)
+        dev->resetPaused();
+}  // pause_mainloop
+
+//-----------------------------------------------------------------------------
+extern "C" void resume_mainloop()
+{
+    if (!main_loop)
+        return;
+    IrrlichtDevice* dev = irr_driver->getDevice();
+    if (dev)
+        dev->resetUnpaused();
+    if (music_manager)
+        music_manager->resumeMusic();
+    if (SFXManager::get())
+        SFXManager::get()->resumeAll();
+    // Improve rubber banding effects of rewinders when going
+    // back to phone, because the smooth timer is paused
+    if (World::getWorld() && RewindManager::isEnabled())
+        RewindManager::get()->resetSmoothNetworkBody();
+    Online::RequestManager::get()->setPaused(false);
+}  // resume_mainloop
+#endif
+
 //-----------------------------------------------------------------------------
 /** Returns the current dt, which guarantees a limited frame rate. If dt is
  *  too low (the frame rate too high), the process will sleep to reach the
@@ -125,18 +164,7 @@ float MainLoop::getLimitedDt()
     {
         // When iOS apps entering background it should not run any
         // opengl command from apple document, so we stop here
-        if (music_manager)
-            music_manager->pauseMusic();
-        if (SFXManager::get())
-            SFXManager::get()->pauseAll();
-        PlayerManager::get()->save();
-        if (addons_manager->hasDownloadedIcons())
-            addons_manager->saveInstalled();
-        Online::RequestManager::get()->setPaused(true);
-        IrrlichtDevice* dev = irr_driver->getDevice();
-        if (dev)
-            dev->resetPaused();
-
+        pause_mainloop();
         while (true)
         {
             // iOS will pause this thread completely when fully in background
@@ -148,21 +176,11 @@ float MainLoop::getLimitedDt()
             {
                 if (quit)
                     return 1.0f/60.0f;
-                dev->resetUnpaused();
                 break;
             }
         }
-        if (music_manager)
-            music_manager->resumeMusic();
-        if (SFXManager::get())
-            SFXManager::get()->resumeAll();
-        // Improve rubber banding effects of rewinders when going
-        // back to phone, because the smooth timer is paused
-        if (World::getWorld() && RewindManager::isEnabled())
-            RewindManager::get()->resetSmoothNetworkBody();
-        Online::RequestManager::get()->setPaused(false);
+        resume_mainloop();
     }
-
 #endif
     float dt = 0;
 
@@ -729,7 +747,9 @@ void MainLoop::renderGUI(int phase, int loop_index, int loop_size)
 }   // renderGUI
 /* EOF */
 
-#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#ifdef IOS_STK
+// For iOS STK we need to make sure no rendering command is executed after pause
+// so we need a handle_app_event callback
 #include "SDL_events.h"
 extern "C" int handle_app_event(void* userdata, SDL_Event* event)
 {

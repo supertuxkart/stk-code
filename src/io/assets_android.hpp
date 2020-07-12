@@ -31,7 +31,7 @@ private:
     std::string m_stk_dir;
 
     void extractData();
-    bool extractDir(std::string dir_name);
+    bool extractFile(std::string file_name);
     void removeData();
     bool hasAssets();
     void touchFile(std::string path);
@@ -44,7 +44,6 @@ public:
 
     void init();
     static std::string getDataPath();
-    static std::string getLibPath();
 };
 
 

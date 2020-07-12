@@ -147,9 +147,8 @@ void ProgressBarAndroid::init()
     params.Bits          = 32;
     params.Fullscreen    = UserConfigParams::m_fullscreen;
     params.WindowSize    = core::dimension2du(640, 480);
-#if defined(ANDROID)
-    params.PrivateData = (void*)global_android_app;
-#endif
+    params.PrivateData   = NULL;
+
 
     m_device = createDeviceEx(params);
 
