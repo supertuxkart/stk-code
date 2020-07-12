@@ -1491,6 +1491,11 @@ namespace GUIEngine
             //pause the timer during loading
             story_mode_timer->pauseTimer(true);
         }
+        else
+        {
+            // The screen size may change when loading
+            irr_driver->handleWindowResize();
+        }
 #endif
     } // renderLoading
 

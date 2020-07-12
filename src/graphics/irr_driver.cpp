@@ -1978,7 +1978,19 @@ void IrrDriver::handleWindowResize()
 {
     bool dialog_exists = GUIEngine::ModalDialog::isADialogActive() ||
             GUIEngine::ScreenKeyboard::isActive();
-    if (m_actual_screen_size != m_video_driver->getCurrentRenderTargetSize())
+
+    // This will allow main menu auto resize if missed a resize event
+    core::dimension2du current_screen_size =
+        m_video_driver->getCurrentRenderTargetSize();
+    GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
+    if (screen && screen->isResizable())
+    {
+        current_screen_size.Width = screen->getWidth();
+        current_screen_size.Height = screen->getHeight();
+    }
+
+    if (m_actual_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
+        current_screen_size != m_video_driver->getCurrentRenderTargetSize())
     {
         // Don't update when dialog is opened
         if (dialog_exists)

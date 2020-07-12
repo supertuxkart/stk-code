@@ -74,6 +74,7 @@ using namespace Online;
 
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
+    m_resizable = true;
 }   // MainMenuScreen
 
 // ----------------------------------------------------------------------------

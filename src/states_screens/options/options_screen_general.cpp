@@ -64,6 +64,7 @@ using namespace Online;
 
 OptionsScreenGeneral::OptionsScreenGeneral() : Screen("options_general.stkgui")
 {
+    m_resizable = true;
     m_inited = false;
 }   // OptionsScreenVideo
 

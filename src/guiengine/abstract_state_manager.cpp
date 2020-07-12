@@ -331,14 +331,11 @@ void AbstractStateManager::onResize()
         return;
     }
 
-    const std::string& last_menu = m_menu_stack.back().first;
     // For some window manager it sends resize event when STK is not focus
     // even if the screen is not resizable, prevent it from resizing if wrong
     // screen
-    // Hardcoded list of menu allowed to be resized for now
-    if (last_menu != "main_menu.stkgui" &&
-        last_menu != "options_general.stkgui" &&
-        last_menu != "options_video.stkgui")
+    if (!m_menu_stack.back().second ||
+        !m_menu_stack.back().second->isResizable())
         return;
 
     std::vector<std::function<Screen*()> > screen_function;

@@ -163,6 +163,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
                                            m_prev_adv_pipline(false),
                                            m_prev_img_quality(-1)
 {
+    m_resizable = true;
     m_inited = false;
     initPresets();
 }   // OptionsScreenVideo
