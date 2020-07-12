@@ -225,8 +225,8 @@ void OptionsScreenVideo::init()
     vsync->addLabel(_("Disabled"));
     //I18N: In the video options, full vertical sync (usually 60fps)
     vsync->addLabel(_("Full"));
-    //I18N: In the video options, half vertical sync (usually 30fps)
-    vsync->addLabel(_("Half"));
+    if (UserConfigParams::m_swap_interval > 1)
+        UserConfigParams::m_swap_interval = 1;
     vsync->setValue(UserConfigParams::m_swap_interval);
 
     //I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
@@ -234,8 +234,6 @@ void OptionsScreenVideo::init()
 
     //I18N: in graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Full: one frame per monitor refresh");
-    //I18N: in graphical options.
-    vsync_tooltip = vsync_tooltip + L"\n" + _("Half: one frame every two monitor refreshes");
     //I18N: in graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
 

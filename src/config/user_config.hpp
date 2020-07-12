@@ -902,7 +902,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_swap_interval
             PARAM_DEFAULT( IntUserConfigParam(0, "swap_interval",
                            &m_graphics_quality,
-                           "Swap interval for vsync: 0 = disabled, 1 = full, 2 = half") );
+                           "Swap interval for vsync: 0 = disabled, 1 = full") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "motionblur_enabled", &m_graphics_quality,
