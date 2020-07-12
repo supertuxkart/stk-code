@@ -298,7 +298,10 @@ void CGUIStaticText::setText(const core::stringw& text)
 void CGUIStaticText::updateAbsolutePosition()
 {
 	IGUIElement::updateAbsolutePosition();
-	breakText();
+	// If use glyph layouts only there is no way at the moment to re-break the
+	// text
+	if (!m_use_glyph_layouts_only)
+		breakText();
 }
 
 

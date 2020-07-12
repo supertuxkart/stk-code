@@ -529,18 +529,30 @@ bool CIrrDeviceSDL::run()
 		case SDL_SENSORUPDATE:
 			if (SDL_event.sensor.which == AccelerometerInstance)
 			{
+				SDL_DisplayOrientation o = SDL_GetDisplayOrientation(0);
 				irrevent.EventType = irr::EET_ACCELEROMETER_EVENT;
-				irrevent.AccelerometerEvent.X = SDL_event.sensor.data[0];
-				irrevent.AccelerometerEvent.Y = SDL_event.sensor.data[1];
+				if (o == SDL_ORIENTATION_LANDSCAPE ||
+					o == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
+				{
+					irrevent.AccelerometerEvent.X = SDL_event.sensor.data[0];
+					irrevent.AccelerometerEvent.Y = SDL_event.sensor.data[1];
+				}
+				else
+				{
+					// For android multi-window mode vertically
+					irrevent.AccelerometerEvent.X = -SDL_event.sensor.data[1];
+					irrevent.AccelerometerEvent.Y = -SDL_event.sensor.data[0];
+				}
 				irrevent.AccelerometerEvent.Z = SDL_event.sensor.data[2];
 				// Mobile STK specific
 				if (irrevent.AccelerometerEvent.X < 0.0)
 					irrevent.AccelerometerEvent.X *= -1.0;
 #ifdef IOS_STK
-				if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE)
+				if (o == SDL_ORIENTATION_LANDSCAPE)
 					irrevent.AccelerometerEvent.Y *= -1.0;
 #else
-				if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
+				if (o == SDL_ORIENTATION_LANDSCAPE_FLIPPED ||
+					o == SDL_ORIENTATION_PORTRAIT_FLIPPED)
 					irrevent.AccelerometerEvent.Y *= -1.0;
 #endif
 				postEventFromUser(irrevent);
