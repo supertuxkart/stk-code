@@ -42,8 +42,6 @@ namespace irr
 	*/
 	class IrrlichtDevice : public virtual IReferenceCounted
 	{
-	protected:
-		typedef s32 (*HeightFunc)(const IrrlichtDevice*);
 	public:
 
 		//! Runs the device.
@@ -299,8 +297,6 @@ namespace irr
 		virtual u32 getScreenHeight() const = 0;
 		virtual u32 getOnScreenKeyboardHeight() const = 0;
 		virtual s32 getMovedHeight() const = 0;
-		virtual void toggleOnScreenKeyboard(bool show, s32 type = 0) = 0;
-		virtual void registerGetMovedHeightFunction(HeightFunc) = 0;
 
 		virtual bool activateAccelerometer(float updateInterval) { return false; }
 		virtual bool deactivateAccelerometer() { return false; }

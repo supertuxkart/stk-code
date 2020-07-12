@@ -139,6 +139,8 @@ namespace irr
 
 		virtual u32 getOnScreenKeyboardHeight() const;
 
+		virtual s32 getMovedHeight() const;
+
 		virtual bool activateAccelerometer(float updateInterval);
 		virtual bool deactivateAccelerometer();
 		virtual bool isAccelerometerActive();

@@ -1247,10 +1247,26 @@ bool CIrrDeviceSDL::hasOnScreenKeyboard() const
 }
 
 
+extern "C" int Android_getMovedHeight();
+s32 CIrrDeviceSDL::getMovedHeight() const
+{
+#if defined(IOS_STK)
+	return SDL_GetMovedHeightByScreenKeyboard() * NativeScale;
+#elif defined(ANDROID)
+	return Android_getMovedHeight();
+#else
+	return 0;
+#endif
+}
+
+
+extern "C" int Android_getKeyboardHeight();
 u32 CIrrDeviceSDL::getOnScreenKeyboardHeight() const
 {
-#ifdef MOBILE_STK
+#if defined(IOS_STK)
 	return SDL_GetScreenKeyboardHeight() * NativeScale;
+#elif defined(ANDROID)
+	return Android_getKeyboardHeight();
 #else
 	return 0;
 #endif

@@ -217,13 +217,7 @@ public:
         int pos_transform = 0;
         if (m_container == g_container.get())
             pos_transform = s_msg_raise;
-        int moved_height = 0;
-#ifdef ANDROID
-        moved_height = irr_driver->getDevice()->getMovedHeight();
-#elif defined(IOS_STK)
-        moved_height = SDL_GetMovedHeightByScreenKeyboard() *
-            irr_driver->getDevice()->getNativeScale();
-#endif
+        int moved_height = irr_driver->getDevice()->getMovedHeight();
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
             moved_height + pos_transform);
@@ -329,13 +323,7 @@ public:
     {
         Message::draw(dt);
         m_display_timer = 9999999.9f;
-        int moved_height = 0;
-#ifdef ANDROID
-        moved_height = irr_driver->getDevice()->getMovedHeight();
-#elif defined(IOS_STK)
-        moved_height = SDL_GetMovedHeightByScreenKeyboard() *
-            irr_driver->getDevice()->getNativeScale();
-#endif
+        int moved_height = irr_driver->getDevice()->getMovedHeight();
         core::position2di raise = core::position2di(0,
             irr_driver->getDevice()->getOnScreenKeyboardHeight() -
             moved_height);

@@ -17,9 +17,15 @@ using namespace irr;
 // Call when android keyboard is opened or close, and save its height for
 // moving screen
 std::atomic<int> g_keyboard_height(0);
+std::atomic<int> g_moved_height(0);
 extern "C" int Android_getKeyboardHeight()
 {
     return g_keyboard_height.load();
+}
+
+extern "C" int Android_getMovedHeight()
+{
+    return g_moved_height.load();
 }
 
 #define MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveKeyboardHeight(JNIEnv* env, jobject this_obj, jint height)
@@ -29,6 +35,15 @@ extern "C"
 ANDROID_SAVE_KBD_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 {
     g_keyboard_height.store((int)height);
+}
+
+#define MAKE_ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveMovedHeight(JNIEnv* env, jobject this_obj, jint height)
+#define ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    g_moved_height.store((int)height);
 }
 
 bool Android_isHardwareKeyboardConnected()

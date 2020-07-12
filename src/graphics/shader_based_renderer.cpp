@@ -802,15 +802,10 @@ void ShaderBasedRenderer::render(float dt, bool is_loading)
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GUI));
         PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
         // Either render the gui, or the global elements of the race gui.
-        glViewport(0, irr_driver->getDevice()->getMovedHeight(),
-            irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
         GUIEngine::render(dt, is_loading);
 
         if (irr_driver->getRenderNetworkDebug() && !is_loading)
             irr_driver->renderNetworkDebug();
-        glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
         PROFILER_POP_CPU_MARKER();
     }
 

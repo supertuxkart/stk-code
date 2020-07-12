@@ -36,6 +36,8 @@ public class SuperTuxKartActivity extends SDLActivity
     // ------------------------------------------------------------------------
     private native void saveKeyboardHeight(int height);
     // ------------------------------------------------------------------------
+    private native void saveMovedHeight(int height);
+    // ------------------------------------------------------------------------
     private native static void addDNSSrvRecords(String name, int weight);
     // ------------------------------------------------------------------------
     private void hideKeyboardNative(final boolean clear_text)
@@ -106,6 +108,7 @@ public class SuperTuxKartActivity extends SDLActivity
                     int margin = screen_height - m_bottom_y;
                     if (keyboard_height > margin)
                         moved_height = -keyboard_height + margin;
+                    saveMovedHeight(-moved_height);
                     SDLActivity.moveView(moved_height);
                 }
             });

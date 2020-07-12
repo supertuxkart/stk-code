@@ -2032,7 +2032,6 @@ void IrrDriver::update(float dt, bool is_loading)
 #endif
     World *world = World::getWorld();
 
-    int moved_height = irr_driver->getDevice()->getMovedHeight();
     if (world)
     {
 #ifndef SERVER_ONLY
@@ -2041,11 +2040,7 @@ void IrrDriver::update(float dt, bool is_loading)
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
-            glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
-                irr_driver->getActualScreenSize().Height);
             GUIEngine::render(dt, is_loading);
-            glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-                irr_driver->getActualScreenSize().Height);
         }
 
         if (!is_loading && Physics::get())
@@ -2064,15 +2059,11 @@ void IrrDriver::update(float dt, bool is_loading)
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
-        glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
         GUIEngine::render(dt, is_loading);
         if (m_render_nw_debug && !is_loading)
         {
             renderNetworkDebug();
         }
-        glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
         m_video_driver->endScene();
 #endif
     }
