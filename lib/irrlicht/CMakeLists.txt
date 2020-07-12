@@ -13,19 +13,6 @@ if(NOT SERVER_ONLY)
         find_package(OpenGL REQUIRED)
         include_directories(${OPENGL_INCLUDE_DIR})
     endif()
-
-    if(NOT APPLE AND USE_GLES2)
-        find_package(EGL)
-        
-        if(EGL_FOUND)
-            include_directories(${EGL_INCLUDE_DIR})
-        else()
-            if(USE_GLES2 AND NOT APPLE)
-                message(FATAL_ERROR "EGL not found.")
-            endif()
-        endif()
-    endif()
-
 else()
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                         "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
@@ -83,7 +70,6 @@ source/Irrlicht/CAttributes.cpp
 source/Irrlicht/CBillboardSceneNode.cpp
 source/Irrlicht/CBoneSceneNode.cpp
 source/Irrlicht/CCameraSceneNode.cpp
-source/Irrlicht/CContextEGL.cpp
 source/Irrlicht/CColorConverter.cpp
 source/Irrlicht/CCubeSceneNode.cpp
 source/Irrlicht/CDefaultGUIElementFactory.cpp
@@ -213,7 +199,6 @@ source/Irrlicht/CBillboardSceneNode.h
 source/Irrlicht/CBlit.h
 source/Irrlicht/CBoneSceneNode.h
 source/Irrlicht/CCameraSceneNode.h
-source/Irrlicht/CContextEGL.h
 source/Irrlicht/CColorConverter.h
 source/Irrlicht/CCubeSceneNode.h
 source/Irrlicht/CDefaultGUIElementFactory.h
@@ -551,9 +536,6 @@ target_link_libraries(stkirrlicht ${ZLIB_LIBRARY})
 
 if(NOT SERVER_ONLY)
     target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY})
-    if(NOT APPLE AND USE_GLES2)
-        target_link_libraries(stkirrlicht ${EGL_LIBRARY})
-    endif()
 endif()
 
 if(WIN32)

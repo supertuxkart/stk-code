@@ -41,6 +41,7 @@
 
 #if defined(USE_GLES2)
 #ifndef __APPLE__
+#include <SDL_video.h>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #endif
@@ -195,7 +196,7 @@ void initGL()
     }
 #else
 #ifdef ARB_DEBUG_OUTPUT
-    glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)eglGetProcAddress("glDebugMessageCallbackKHR");
+    glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKKHRPROC)SDL_GL_GetProcAddress("glDebugMessageCallbackKHR");
 #endif
 #endif
 
@@ -210,9 +211,9 @@ void initGL()
 #ifndef IOS_STK
 #ifdef USE_GLES2
         glDebugMessageControl = (void(GL_APIENTRY*)(GLenum, GLenum, GLenum, GLsizei,
-            const GLuint*, GLboolean))eglGetProcAddress("glDebugMessageControlKHR");
+            const GLuint*, GLboolean))SDL_GL_GetProcAddress("glDebugMessageControlKHR");
         glDebugMessageInsert = (void(GL_APIENTRY*)(GLenum, GLenum, GLuint, GLenum,
-            GLsizei, const char*))eglGetProcAddress("glDebugMessageInsertKHR");
+            GLsizei, const char*))SDL_GL_GetProcAddress("glDebugMessageInsertKHR");
         assert(glDebugMessageControl && glDebugMessageInsert);
 #endif
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
