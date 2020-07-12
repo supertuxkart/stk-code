@@ -116,7 +116,20 @@ void CreateServerScreen::init()
     assert(gamemode != NULL);
     gamemode->setSelection(m_prev_mode, PLAYER_ID_GAME_MASTER);
     updateMoreOption(m_prev_mode);
+#ifdef MOBILE_STK
+    m_name_widget->setFocusable(true);
+#endif
 }   // init
+
+// ----------------------------------------------------------------------------
+void CreateServerScreen::beforeAddingWidget()
+{
+#ifdef MOBILE_STK
+    // This will prevent name text box being focused first which make screen
+    // keyboard always open
+    m_name_widget->setFocusable(false);
+#endif
+}   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
 /** Event callback which starts the server creation process.
