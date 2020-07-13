@@ -2,9 +2,13 @@ package org.supertuxkart.stk_dbg;
 
 import org.supertuxkart.stk_dbg.STKEditText;
 import org.libsdl.app.SDLActivity;
+import org.libsdl.app.SDL;
 
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -12,15 +16,26 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Process;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Display;
+import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.util.DisplayMetrics;
 
 import java.util.Set;
 
@@ -31,6 +46,8 @@ import org.minidns.record.TXT;
 
 public class SuperTuxKartActivity extends SDLActivity
 {
+    private AlertDialog m_progress_dialog;
+    private ProgressBar m_progress_bar;
     private STKEditText m_stk_edittext;
     private int m_bottom_y;
     // ------------------------------------------------------------------------
@@ -39,6 +56,60 @@ public class SuperTuxKartActivity extends SDLActivity
     private native void saveMovedHeight(int height);
     // ------------------------------------------------------------------------
     private native static void addDNSSrvRecords(String name, int weight);
+    // ------------------------------------------------------------------------
+    private void showExtractProgressPrivate()
+    {
+        WindowManager wm =
+            (WindowManager)getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics display_metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(display_metrics);
+        int padding = display_metrics.widthPixels / 64;
+
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.setPadding(padding, padding, padding, padding);
+        ll.setGravity(Gravity.CENTER);
+
+        LinearLayout.LayoutParams ll_param = new LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT);
+        ll_param.gravity = Gravity.CENTER;
+        TextView tv = new TextView(this);
+        tv.setText("Extracting game data...");
+        tv.setLayoutParams(ll_param);
+
+        ll_param = new LinearLayout.LayoutParams(
+            display_metrics.widthPixels,
+            LinearLayout.LayoutParams.WRAP_CONTENT);
+        ll_param.gravity = Gravity.CENTER;
+        ll.setLayoutParams(ll_param);
+
+        m_progress_bar = new ProgressBar(this, null,
+            android.R.attr.progressBarStyleHorizontal);
+        m_progress_bar.setIndeterminate(false);
+        m_progress_bar.setPadding(0, padding, 0, padding);
+        m_progress_bar.setLayoutParams(ll_param);
+        ll.addView(tv);
+        ll.addView(m_progress_bar);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setCancelable(false);
+        builder.setView(ll);
+
+        m_progress_dialog = builder.create();
+        m_progress_dialog.show();
+        Window window = m_progress_dialog.getWindow();
+        if (window != null)
+        {
+            WindowManager.LayoutParams layout_params =
+                new WindowManager.LayoutParams();
+            layout_params.copyFrom(
+                m_progress_dialog.getWindow().getAttributes());
+            layout_params.width = WindowManager.LayoutParams.MATCH_PARENT;
+            layout_params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+            m_progress_dialog.getWindow().setAttributes(layout_params);
+        }
+    }
     // ------------------------------------------------------------------------
     private void hideKeyboardNative(final boolean clear_text)
     {
@@ -90,6 +161,8 @@ public class SuperTuxKartActivity extends SDLActivity
     public void onCreate(Bundle instance)
     {
         super.onCreate(instance);
+        m_progress_dialog = null;
+        m_progress_bar = null;
         m_bottom_y = 0;
         final View root = getWindow().getDecorView().findViewById(
             android.R.id.content);
@@ -251,5 +324,58 @@ public class SuperTuxKartActivity extends SDLActivity
     {
         return getResources().getConfiguration().screenLayout &
             Configuration.SCREENLAYOUT_SIZE_MASK;
+    }
+    // ------------------------------------------------------------------------
+    public void showExtractProgress(final int progress)
+    {
+        runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (progress == -1)
+                {
+                    if (m_progress_dialog != null)
+                    {
+                        m_progress_dialog.dismiss();
+                        m_progress_dialog = null;
+                        m_progress_bar = null;
+                    }
+                    AlertDialog.Builder error =
+                        new AlertDialog.Builder(SDL.getContext());
+                    error.setMessage("Check remaining device space or " +
+                        "reinstall SuperTuxKart.");
+                    error.setTitle("Extract game data error");
+                    error.setPositiveButton("Exit",
+                        new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialog,
+                                                int id)
+                            {
+                                android.os.Process.killProcess(
+                                    android.os.Process.myPid());
+                            }
+                        });
+                    error.setCancelable(false);
+                    error.create().show();
+                    return;
+                }
+                if (progress == 0 && m_progress_dialog == null)
+                    showExtractProgressPrivate();
+                else if (progress == 100 && m_progress_dialog != null)
+                {
+                    m_progress_dialog.dismiss();
+                    m_progress_dialog = null;
+                    m_progress_bar = null;
+                }
+                else if (m_progress_bar != null &&
+                    m_progress_bar.getProgress() != progress)
+                {
+                    m_progress_bar.setProgress(progress);
+                }
+            }
+        });
+
     }
 }

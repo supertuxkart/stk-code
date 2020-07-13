@@ -21,13 +21,11 @@
 #include <string>
 
 class FileManager;
-class ProgressBarAndroid;
 
 class AssetsAndroid
 {
 private:
     FileManager* m_file_manager;
-    ProgressBarAndroid* m_progress_bar;
     std::string m_stk_dir;
 
     void extractData();
@@ -37,7 +35,7 @@ private:
     void touchFile(std::string path);
     bool isWritable(std::string path);
     std::string getPreferredPath(const std::vector<std::string>& paths);
-
+    void setProgressBar(int progress);
 public:
     AssetsAndroid(FileManager* file_manager);
     ~AssetsAndroid() {};

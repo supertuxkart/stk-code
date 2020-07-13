@@ -19,7 +19,6 @@
 #include "io/assets_android.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
-#include "utils/progress_bar_android.hpp"
 
 #include <cassert>
 #include <cstdlib>
@@ -28,7 +27,7 @@
 #ifdef ANDROID
 #include <SDL_system.h>
 #include <sys/statfs.h> 
-
+#include <jni.h>
 #endif
 
 //-----------------------------------------------------------------------------
@@ -37,7 +36,6 @@
 AssetsAndroid::AssetsAndroid(FileManager* file_manager)
 {
     m_file_manager = file_manager;
-    m_progress_bar = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -227,17 +225,20 @@ void AssetsAndroid::init()
     {
         if (hasAssets())
         {
-            m_progress_bar = new ProgressBarAndroid();
-            m_progress_bar->draw(0.01f);
+            setProgressBar(0);
             removeData();
             extractData();
-            
+
             if (!m_file_manager->fileExists(m_stk_dir + "/.extracted"))
             {
-                Log::fatal("AssetsAndroid", "Fatal error: Assets were not "
+                Log::error("AssetsAndroid", "Fatal error: Assets were not "
                            "extracted properly");
+                setProgressBar(-1);
+                // setProgressBar(-1) will show the error dialog and the
+                // android ui thread will exit stk
+                while (true)
+                    StkTime::sleep(1);
             }
-            delete m_progress_bar;
         }
     }
 
@@ -304,13 +305,8 @@ void AssetsAndroid::extractData()
 
                 assert(lines_count > 0);
                 float pos = 0.01f + (float)(current_line) / lines_count * 0.99f;
-                m_progress_bar->draw(pos);
+                setProgressBar(pos * 100.0f);
                 current_line++;
-
-                if (m_progress_bar->closeEventReceived())
-                {
-                    success = false;
-                }
 
                 if (!success)
                     break;
@@ -329,7 +325,58 @@ void AssetsAndroid::extractData()
     if (success)
     {
         touchFile(m_stk_dir + "/.extracted");
+        // Dismiss android dialog
+        setProgressBar(100);
     }
+#endif
+}
+
+//-----------------------------------------------------------------------------
+/** A function set progress bar using java JNI
+ *  \param progress progress 0-100
+ */
+void AssetsAndroid::setProgressBar(int progress)
+{
+#ifdef ANDROID
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    if (env == NULL)
+    {
+        Log::error("AssetsAndroid",
+            "setProgressBar unable to SDL_AndroidGetJNIEnv.");
+        return;
+    }
+
+    jobject native_activity = (jobject)SDL_AndroidGetActivity();
+    if (native_activity == NULL)
+    {
+        Log::error("AssetsAndroid",
+            "setProgressBar unable to SDL_AndroidGetActivity.");
+        return;
+    }
+
+    jclass class_native_activity = env->GetObjectClass(native_activity);
+    if (class_native_activity == NULL)
+    {
+        Log::error("AssetsAndroid",
+            "setProgressBar unable to find object class.");
+        env->DeleteLocalRef(native_activity);
+        return;
+    }
+
+    jmethodID method_id = env->GetMethodID(class_native_activity,
+        "showExtractProgress", "(I)V");
+    if (method_id == NULL)
+    {
+        Log::error("AssetsAndroid",
+            "setProgressBar unable to find method id.");
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
+        return;
+    }
+
+    env->CallVoidMethod(native_activity, method_id, progress);
+    env->DeleteLocalRef(class_native_activity);
+    env->DeleteLocalRef(native_activity);
 #endif
 }
 
