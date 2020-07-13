@@ -524,7 +524,8 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             msg = _("%s scored a goal!", sd.m_player);
         else
             msg = _("Oops, %s made an own goal!", sd.m_player);
-        m_race_gui->addMessage(msg, NULL, 3.0f);
+        if (m_race_gui)
+            m_race_gui->addMessage(msg, NULL, 3.0f);
 #endif
 
         if (first_goal)
@@ -646,8 +647,12 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
         msg = _("%s scored a goal!", sd.m_player);
     else
         msg = _("Oops, %s made an own goal!", sd.m_player);
-    m_race_gui->addMessage(msg, NULL,
-        stk_config->ticks2Time(ticks_back_to_own_goal - ticks_now));
+    float time = stk_config->ticks2Time(ticks_back_to_own_goal - ticks_now);
+    // May happen if this message is added when spectate started
+    if (time > 3.0f)
+        time = 3.0f;
+    if (m_race_gui)
+        m_race_gui->addMessage(msg, NULL, time);
 
     m_ticks_back_to_own_goal = ticks_back_to_own_goal;
     for (unsigned i = 0; i < m_karts.size(); i++)
