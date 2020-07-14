@@ -531,13 +531,7 @@ bool ScreenKeyboard::onEscapePressed()
  */
 bool ScreenKeyboard::shouldUseScreenKeyboard()
 {
-    bool always_use_screen_keyboard =
-        UserConfigParams::m_screen_keyboard == 2;
-
-    if (UserConfigParams::m_screen_keyboard == 1)
-        return true;
-
-    return always_use_screen_keyboard;
+    return UserConfigParams::m_screen_keyboard == 1;
 }
 
 // ----------------------------------------------------------------------------
