@@ -160,6 +160,11 @@
 #  include <signal.h>
 #  include <unistd.h>
 #endif
+
+#ifdef ANDROID
+#include <SDL_system.h>
+#endif
+
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -2175,7 +2180,13 @@ int main(int argc, char *argv[])
             #ifdef MOBILE_STK
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {
-                if (irr_driver->getDevice()->supportsTouchDevice())
+                bool android_tv = false;
+#ifdef ANDROID
+                // For some android tv sdl returns a touch screen device even it
+                // doesn't have
+                android_tv = SDL_IsAndroidTV();
+#endif
+                if (!android_tv && irr_driver->getDevice()->supportsTouchDevice())
                 {
                     InitAndroidDialog* init_android = new InitAndroidDialog(
                                                                     0.6f, 0.6f);

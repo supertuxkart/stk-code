@@ -69,7 +69,12 @@ void override_default_params_for_mobile()
 #ifdef ANDROID
     // For usage in StringUtils::getUserAgentString
     if (SDL_IsAndroidTV())
+    {
+        // For some android tv sdl returns a touch screen device even it doesn't
+        // have
+        UserConfigParams::m_multitouch_draw_gui = false;
         g_android_main_user_agent = " (AndroidTV)";
+    }
     else if (SDL_IsChromebook())
         g_android_main_user_agent = " (Linux)";
     else
