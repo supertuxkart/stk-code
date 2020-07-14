@@ -29,6 +29,8 @@
 #include <cstdlib>
 
 #ifdef ANDROID
+#include <SDL_system.h>
+extern bool Android_isHardwareKeyboardConnected();
 extern void Android_toggleOnScreenKeyboard(bool show, int type, int y);
 extern void Android_fromSTKEditBox(int widget_id, const core::stringw& text, int selection_start, int selection_end, int type);
 #endif
@@ -382,6 +384,15 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
 #if !defined(ANDROID) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
                 SDL_StopTextInput();
                 g_editbox = NULL;
+#endif
+#ifdef ANDROID
+            // If using non touchscreen input in android dismiss text input
+            // if out focus because it cannot use emoji keyboard at the same
+            // time
+            if (GUIEngine::ScreenKeyboard::shouldUseScreenKeyboard() &&
+                GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard() &&
+                (Android_isHardwareKeyboardConnected() || SDL_IsAndroidTV()))
+                Android_toggleOnScreenKeyboard(false, 0, 0);
 #endif
                 m_composing_start = 0;
                 m_composing_end = 0;
