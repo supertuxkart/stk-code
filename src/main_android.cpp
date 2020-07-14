@@ -25,6 +25,7 @@
 #ifdef ANDROID
 #include "SDL_system.h"
 #include <jni.h>
+std::string g_android_main_user_agent;
 
 extern int android_main(int argc, char *argv[]);
 
@@ -66,6 +67,14 @@ void override_default_params_for_mobile()
 #endif
 
 #ifdef ANDROID
+    // For usage in StringUtils::getUserAgentString
+    if (SDL_IsAndroidTV())
+        g_android_main_user_agent = " (AndroidTV)";
+    else if (SDL_IsChromebook())
+        g_android_main_user_agent = " (Linux)";
+    else
+        g_android_main_user_agent = " (Android)";
+
     // Set multitouch device scale depending on actual screen size
     const int SCREENLAYOUT_SIZE_SMALL = 1;
     const int SCREENLAYOUT_SIZE_NORMAL = 2;

@@ -39,6 +39,8 @@
 #include <cwchar>
 #include <exception>
 
+extern std::string g_android_main_user_agent;
+
 namespace StringUtils
 {
     bool hasSuffix(const std::string& lhs, const std::string &rhs)
@@ -1391,7 +1393,7 @@ namespace StringUtils
 #elif defined(__HAIKU__)
         uagent += (std::string)" (Haiku)";
 #elif defined(ANDROID)
-        uagent += (std::string)" (Android)";
+        uagent += g_android_main_user_agent;
 #elif defined(linux)
         uagent += (std::string)" (Linux)";
 #else
