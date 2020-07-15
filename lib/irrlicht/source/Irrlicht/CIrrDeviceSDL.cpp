@@ -61,7 +61,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// noparachute prevents SDL from catching fatal errors.
 	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
-	u32 init_flags = SDL_INIT_TIMER| SDL_INIT_VIDEO| SDL_INIT_GAMECONTROLLER;
+	u32 init_flags = SDL_INIT_TIMER | SDL_INIT_VIDEO;
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	init_flags |= SDL_INIT_SENSOR;
 #endif

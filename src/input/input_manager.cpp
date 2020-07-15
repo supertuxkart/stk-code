@@ -87,6 +87,38 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_timer_in_use = false;
     m_master_player_only = false;
     m_timer = 0;
+#ifndef SERVER_ONLY
+    SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+#endif
+}
+
+// -----------------------------------------------------------------------------
+void InputManager::addJoystick()
+{
+#ifndef SERVER_ONLY
+    // When irrlicht device is reinitialized the joystick added event may be
+    // lost, we look for them and add it back
+    for (int i = 0; i < SDL_NumJoysticks(); i++)
+    {
+        try
+        {
+            SDL_Joystick* joystick = SDL_JoystickOpen(i);
+            if (!joystick)
+                continue;
+            SDL_JoystickID id = SDL_JoystickInstanceID(joystick);
+            if (m_sdl_controller.find(id) != m_sdl_controller.end())
+                continue;
+            std::unique_ptr<SDLController> c(
+                new SDLController(i));
+            id = c->getInstanceID();
+            m_sdl_controller[id] = std::move(c);
+        }
+        catch (std::exception& e)
+        {
+            Log::error("SDLController", "%s", e.what());
+        }
+    }
+#endif
 }
 
 // -----------------------------------------------------------------------------

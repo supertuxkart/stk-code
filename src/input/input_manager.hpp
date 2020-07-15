@@ -126,6 +126,7 @@ public:
     void   dispatchInput(Input::InputType, int deviceID, int btnID,
                          Input::AxisDirection direction, int value,
                          bool shift_mask = false);
+    void   addJoystick();
 };
 
 extern InputManager *input_manager;
