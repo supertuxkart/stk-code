@@ -525,7 +525,11 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
         else
             msg = _("Oops, %s made an own goal!", sd.m_player);
         if (m_race_gui)
-            m_race_gui->addMessage(msg, NULL, 3.0f);
+        {
+            m_race_gui->addMessage(msg, NULL, 3.0f,
+                video::SColor(255, 255, 0, 255), /*important*/true,
+                /*big_font*/false, /*outline*/true);
+        }
 #endif
 
         if (first_goal)
@@ -652,7 +656,11 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     if (time > 3.0f)
         time = 3.0f;
     if (m_race_gui)
-        m_race_gui->addMessage(msg, NULL, time);
+    {
+        m_race_gui->addMessage(msg, NULL, time,
+            video::SColor(255, 255, 0, 255), /*important*/true,
+            /*big_font*/false, /*outline*/true);
+    }
 
     m_ticks_back_to_own_goal = ticks_back_to_own_goal;
     for (unsigned i = 0; i < m_karts.size(); i++)
