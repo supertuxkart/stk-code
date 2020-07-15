@@ -500,8 +500,6 @@ void CIrrDeviceSDL::createDriver()
 
 // In input_manager.cpp
 extern "C" void handle_joystick(SDL_Event& event);
-// In CGUIEditBox.cpp
-extern "C" void handle_textinput(SDL_Event& event);
 // In main_loop.cpp
 extern "C" void pause_mainloop();
 extern "C" void resume_mainloop();
@@ -742,10 +740,34 @@ bool CIrrDeviceSDL::run()
 				}
 			}
 			break;
-
+		case SDL_TEXTEDITING:
+			{
+				irrevent.EventType = irr::EET_SDL_TEXT_EVENT;
+				irrevent.SDLTextEvent.Type = SDL_event.type;
+				const size_t size = sizeof(irrevent.SDLTextEvent.Text);
+				const size_t other_size = sizeof(SDL_event.edit.text);
+				static_assert(sizeof(size) == sizeof(other_size), "Wrong size");
+				memcpy(irrevent.SDLTextEvent.Text, SDL_event.edit.text, size);
+				irrevent.SDLTextEvent.Start = SDL_event.edit.start;
+				irrevent.SDLTextEvent.Length = SDL_event.edit.length;
+				postEventFromUser(irrevent);
+			}
+			break;
+		case SDL_TEXTINPUT:
+			{
+				irrevent.EventType = irr::EET_SDL_TEXT_EVENT;
+				irrevent.SDLTextEvent.Type = SDL_event.type;
+				const size_t size = sizeof(irrevent.SDLTextEvent.Text);
+				const size_t other_size = sizeof(SDL_event.text.text);
+				static_assert(sizeof(size) == sizeof(other_size), "Wrong size");
+				memcpy(irrevent.SDLTextEvent.Text, SDL_event.text.text, size);
+				irrevent.SDLTextEvent.Start = 0;
+				irrevent.SDLTextEvent.Length = 0;
+				postEventFromUser(irrevent);
+			}
+			break;
 		default:
 			handle_joystick(SDL_event);
-			handle_textinput(SDL_event);
 			break;
 		} // end switch
 

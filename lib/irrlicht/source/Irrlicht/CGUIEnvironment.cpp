@@ -553,6 +553,7 @@ bool CGUIEnvironment::postEventFromUser(const SEvent& event)
 
 		break;
 	case EET_KEY_INPUT_EVENT:
+	case EET_SDL_TEXT_EVENT:
 		{
 			if (Focus && Focus->OnEvent(event))
 				return true;
