@@ -109,6 +109,7 @@ public:
     /** Calling this will make sure that the focus is set on the 'cancel' or
      * 'no'. */
     void setFocusCancel() {m_focus_on_cancel = true; }
+    virtual void init() OVERRIDE;
 };
 
 

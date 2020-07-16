@@ -123,23 +123,17 @@ void MessageDialog::loadedFromFile()
 
         IconButtonWidget* cancelbtn = getWidget<IconButtonWidget>("confirm");
         cancelbtn->setText(_("OK"));
-        cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else if (m_type == MessageDialog::MESSAGE_DIALOG_YESNO)
     {
         IconButtonWidget* cancelbtn = getWidget<IconButtonWidget>("cancel");
         cancelbtn->setText(_("No"));
-        if(m_focus_on_cancel)
-            cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
     else if (m_type == MessageDialog::MESSAGE_DIALOG_OK_CANCEL)
     {
         // In case of a OK_CANCEL dialog, change the text from 'Yes' to 'Ok'
         IconButtonWidget* yesbtn = getWidget<IconButtonWidget>("confirm");
         yesbtn->setText(_("OK"));
-        IconButtonWidget* cancelbtn = getWidget<IconButtonWidget>("cancel");
-        if (m_focus_on_cancel)
-            cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     }
 }
 
@@ -191,3 +185,14 @@ void MessageDialog::onUpdate(float dt)
 {
     if (m_listener != NULL) m_listener->onDialogUpdate(dt);
 }
+
+
+// -----------------------------------------------------------------------------
+void MessageDialog::init()
+{
+    if (m_focus_on_cancel)
+    {
+        RibbonWidget* ribbon = getWidget<RibbonWidget>("buttons");
+        ribbon->select("cancel", PLAYER_ID_GAME_MASTER);
+    }
+}   // init
