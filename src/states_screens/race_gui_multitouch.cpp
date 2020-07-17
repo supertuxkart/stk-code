@@ -548,9 +548,11 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                                     (int)(button->x + button->width/2),
                                     (int)(button->y + button->height/2));
                 font->setScale(UserConfigParams::m_multitouch_scale);
-                font->draw(core::stringw(L"+"), pos,
+                font->setBlackBorder(true);
+                font->draw(core::stringw(kart->getPowerup()->getNum()), pos,
                            video::SColor(255, 255, 255, 255));
                 font->setScale(1.0f);
+                font->setBlackBorder(false);
             }
         }
     }
