@@ -383,6 +383,8 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
             }
             else if (event.GUIEvent.EventType == EGET_ELEMENT_FOCUSED)
             {
+                // Required for correct screen keyboard position in the beginning
+                FrameRect = AbsoluteRect;
                 m_mark_begin = m_mark_end = m_cursor_pos = getTextCount();
 #ifdef ANDROID
                 calculateScrollPos();
