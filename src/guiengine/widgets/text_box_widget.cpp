@@ -372,6 +372,11 @@ ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
                 }
                 return;
             }
+            else
+            {
+                // Required for some general text field dialog
+                eb->sendGuiEvent(EGET_EDITBOX_ENTER);
+            }
 
             // As it's action "next", check if below widget is a text box, if
             // so focus it and keep the screen keyboard, so user can keep
