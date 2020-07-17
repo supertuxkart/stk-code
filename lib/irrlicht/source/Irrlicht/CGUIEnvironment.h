@@ -256,6 +256,7 @@ public:
 	//! reads an element
 	virtual void readGUIElement(io::IXMLReader* reader, IGUIElement* node);
 
+	virtual void removeHovered(IGUIElement* element);
 private:
 
 	IGUIElement* getNextElement(bool reverse=false, bool group=false);

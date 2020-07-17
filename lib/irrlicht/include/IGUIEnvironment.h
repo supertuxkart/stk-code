@@ -610,6 +610,8 @@ public:
 
 	//! reads an element
 	virtual void readGUIElement(io::IXMLReader* reader, IGUIElement* node) =0;
+
+	virtual void removeHovered(IGUIElement* element) = 0;
 };
 
 

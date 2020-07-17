@@ -242,7 +242,8 @@ CGUIEditBox::~CGUIEditBox()
         GUIEngine::ScreenKeyboard::hasSystemScreenKeyboard())
         Android_toggleOnScreenKeyboard(false, 0, 0);
 #elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
-    SDL_StopTextInput();
+    if (SDL_IsTextInputActive())
+        SDL_StopTextInput();
 #endif
 
 #endif
@@ -366,7 +367,8 @@ bool CGUIEditBox::OnEvent(const SEvent& event)
                     setTextMarkers(0,0);
                 }
 #if !defined(ANDROID) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
-                SDL_StopTextInput();
+                if (SDL_IsTextInputActive())
+                    SDL_StopTextInput();
 #endif
 #ifdef ANDROID
             // If using non touchscreen input in android dismiss text input

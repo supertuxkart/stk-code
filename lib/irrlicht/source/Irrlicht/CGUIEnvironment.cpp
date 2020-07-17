@@ -1617,6 +1617,21 @@ IGUIElement* CGUIEnvironment::getNextElement(bool reverse, bool group)
 }
 
 
+void CGUIEnvironment::removeHovered(IGUIElement* element)
+{
+	if (Hovered && Hovered == element)
+	{
+		Hovered->drop();
+		Hovered = NULL;
+		if (HoveredNoSubelement)
+		{
+			HoveredNoSubelement->drop();
+			HoveredNoSubelement = NULL;
+		}
+	}
+}
+
+
 //! creates an GUI Environment
 IGUIEnvironment* createGUIEnvironment(io::IFileSystem* fs,
 					video::IVideoDriver* Driver,
