@@ -186,6 +186,10 @@ ServerLobby::ServerLobby() : LobbyProtocol()
     for (int kart : all_k)
     {
         const KartProperties* kp = kart_properties_manager->getKartById(kart);
+        // Some distro put kart itself, ignore it online for the rest of stk
+        // user
+        if (kp->getIdent() == "geeko")
+            continue;
         if (!kp->isAddon())
             m_official_kts.first.insert(kp->getIdent());
     }
