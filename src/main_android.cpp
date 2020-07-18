@@ -76,7 +76,7 @@ void override_default_params_for_mobile()
         g_android_main_user_agent = " (AndroidTV)";
     }
     else if (SDL_IsChromebook())
-        g_android_main_user_agent = " (Linux)";
+        g_android_main_user_agent = " (ChromeOS)";
     else
         g_android_main_user_agent = " (Android)";
 
