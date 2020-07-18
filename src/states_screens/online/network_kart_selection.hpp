@@ -61,7 +61,13 @@ private:
 
     // ------------------------------------------------------------------------
     virtual bool isIgnored(const std::string& ident) const OVERRIDE
-           { return m_available_karts.find(ident) == m_available_karts.end(); }
+    {
+        // Online addon kart use tux for hitbox in server so we can allow any
+        // addon kart graphically
+        if (ident.find("addon_") != std::string::npos)
+            return false;
+        return m_available_karts.find(ident) == m_available_karts.end();
+    }
     // ------------------------------------------------------------------------
     void updateProgressBarText();
     // ------------------------------------------------------------------------

@@ -143,12 +143,6 @@ void loadServerConfigXML(const XMLNode* root, bool default_config)
             "A new file will be created.", g_server_config_path.c_str());
         if (root)
             delete root;
-        if (default_config)
-        {
-            // Below option will have different default value when writing
-            // to server_config.xml in config directory
-            m_live_players = false;
-        }
         writeServerConfigToDisk();
         return;
     }

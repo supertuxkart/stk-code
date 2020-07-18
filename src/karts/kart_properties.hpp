@@ -214,6 +214,7 @@ public:
          ~KartProperties    ();
     void  copyForPlayer     (const KartProperties *source,
                              HandicapLevel h = HANDICAP_NONE);
+    void  adjustForOnlineAddonKart(const KartProperties* source);
     void  copyFrom          (const KartProperties *source);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);

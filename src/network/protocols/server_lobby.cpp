@@ -578,10 +578,7 @@ void ServerLobby::updateAddons()
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     if (all_k.size() >= 65536)
         all_k.resize(65535);
-    if (ServerConfig::m_live_players)
-        m_available_kts.first = m_official_kts.first;
-    else
-        m_available_kts.first = { all_k.begin(), all_k.end() };
+    m_available_kts.first = m_official_kts.first;
 }   // updateAddons
 
 //-----------------------------------------------------------------------------
@@ -699,10 +696,7 @@ void ServerLobby::setup()
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     if (all_k.size() >= 65536)
         all_k.resize(65535);
-    if (ServerConfig::m_live_players)
-        m_available_kts.first = m_official_kts.first;
-    else
-        m_available_kts.first = { all_k.begin(), all_k.end() };
+    m_available_kts.first = m_official_kts.first;
     updateTracksForMode();
 
     m_server_has_loaded_world.store(false);
@@ -5114,9 +5108,16 @@ void ServerLobby::setPlayerKarts(const NetworkString& ns, STKPeer* peer) const
     {
         std::string kart;
         ns.decodeString(&kart);
-        if (m_available_kts.first.find(kart) == m_available_kts.first.end())
+        if (kart.find("randomkart") != std::string::npos ||
+            (kart.find("addon_") == std::string::npos &&
+            m_available_kts.first.find(kart) == m_available_kts.first.end()))
         {
-            continue;
+            RandomGenerator rg;
+            std::set<std::string>::iterator it =
+                m_available_kts.first.begin();
+            std::advance(it,
+                rg.get((int)m_available_kts.first.size()));
+            peer->getPlayerProfiles()[i]->setKartName(*it);
         }
         else
         {

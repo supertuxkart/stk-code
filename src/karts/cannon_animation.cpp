@@ -144,7 +144,7 @@ void CannonAnimation::init(Ipo *ipo, const Vec3 &start_left,
     Vec3 direction = my_start_right - my_start_left;
     direction.normalize();
 
-    float kw = m_kart ? m_kart->getKartModel()->getWidth()
+    float kw = m_kart ? m_kart->getKartWidth()
                       : m_flyable->getExtend().getX();
     Vec3 adj_start_left = my_start_left + (0.5f*kw) * direction;
     Vec3 adj_start_right = my_start_right - (0.5f*kw) * direction;

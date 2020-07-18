@@ -41,7 +41,7 @@
                     <spacer width="3%" height="100%"/>
                     <bubble proportion="1" height="100%"
                             I18N="In the help menu"
-                            text="Once in a server, a race will begin once its owner (symbolized with the crown) decides so. Official servers may auto-start races only when there are enough players. Then, you can choose your kart and vote for the next track to race on. An addon kart or track is allowed only if it exists on all joined players and the server."/>
+                            text="Once in a server, a race will begin once its owner (symbolized with the crown) decides so. Official servers may auto-start races only when there are enough players. Then, you can choose your kart and vote for the next track to race on. An addon track is allowed only if it exists on all joined players and the server."/>
                 </div>
 
                 <label align="center" I18N="In the help menu" text="... or on the same device:"/>

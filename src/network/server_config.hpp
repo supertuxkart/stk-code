@@ -259,12 +259,11 @@ namespace ServerConfig
         "mode will not be saved in this config file."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_live_players
-        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "live-players",
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "live-spectate",
         "If true, players can live join or spectate the in-progress game. "
         "Currently live joining is only available if the current game mode "
-        "used in server is FFA, CTF or soccer, also no addon karts will be "
-        "available for players to choose, and official-karts-threshold will "
-        "be made 1.0."));
+        "used in server is FFA, CTF or soccer, also official-karts-threshold "
+        "will be made 1.0."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timeout",
