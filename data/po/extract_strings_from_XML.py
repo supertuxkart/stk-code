@@ -50,7 +50,10 @@ def traverse(file, node, isChallenge, isGP, isKart, isTrack, isAchievements, lev
                
                f.write( line.encode( "utf-8" ) )
         else:
-           if e.hasAttribute("text") and len(e.getAttribute("text")) > 0:
+           if e.nodeName == "string" and e.hasAttribute("name") and e.getAttribute("name").startswith("po_") and e.firstChild is not None:
+               line = "//I18N: In Android UI, " + e.getAttribute("name") + "\n_(\"" + e.firstChild.nodeValue  + "\")\n\n"
+               f.write( line.encode( "utf-8" ) )
+           elif e.hasAttribute("text") and len(e.getAttribute("text")) > 0:
                # print "Label=", e.getAttribute("text"), " Comment=", comment
                line = ""
                if comment == None:

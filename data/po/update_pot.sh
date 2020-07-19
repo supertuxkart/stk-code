@@ -16,6 +16,7 @@ XML_FILE_LIST="`find ./data                        \
                      ../stk-assets/karts           \
                      ../supertuxkart-assets/tracks \
                      ../supertuxkart-assets/karts  \
+                     ./android/res/values          \
                      -name 'achievements.xml' -or  \
                      -name 'tips.xml' -or  \
                      -name 'kart.xml' -or          \
@@ -23,6 +24,7 @@ XML_FILE_LIST="`find ./data                        \
                      -name 'scene.xml' -or         \
                      -name '*.challenge' -or       \
                      -name '*.grandprix' -or       \
+                     -name 'strings.xml' -or       \
                      -name '*.stkgui' | sort -n    \
               `"
 ANGELSCRIPT_FILE_LIST="`find ./data                        \
