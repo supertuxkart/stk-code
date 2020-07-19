@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-13 16:16+0800\n"
-"PO-Revision-Date: 2020-06-13 18:42+0000\n"
+"POT-Creation-Date: 2020-07-19 08:19+0800\n"
+"PO-Revision-Date: 2020-07-19 02:47+0000\n"
 "Last-Translator: Serdar Sağlam <teknomobil@msn.com>\n"
 "Language-Team: Turkish (http://www.transifex.com/supertuxkart/supertuxkart/language/tr/)\n"
 "MIME-Version: 1.0\n"
@@ -21,6 +21,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. I18N: In Android UI, po_extract_game_data
+msgid "Extracting game data..."
+msgstr "Oyun verileri ayıklanıyor..."
+
+#. I18N: In Android UI, po_extract_error
+msgid "Game data extraction error"
+msgstr "Oyun verisi ayıklama hatası"
+
+#. I18N: In Android UI, po_extract_error_msg
+msgid "Check remaining device space or reinstall SuperTuxKart."
+msgstr "Cihazda kalan alanını kontrol edin veya SuperTuxKart'ı yeniden kurun."
+
+#. I18N: In Android UI, po_quit
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+msgid "Quit"
+msgstr "Çık"
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
@@ -158,8 +176,8 @@ msgstr "Kaldır"
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:153
-#: src/states_screens/dialogs/addons_loading.cpp:291
+#: src/input/gamepad_config.cpp:150
+#: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr "Geri"
 
@@ -201,6 +219,7 @@ msgstr "Daha sonra dokunmatik cihaz ayarlarında değiştirebilirsiniz."
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
 msgid "Apply"
@@ -319,9 +338,9 @@ msgstr "Evet"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
-#: src/states_screens/dialogs/addons_loading.cpp:207
+#: src/states_screens/dialogs/addons_loading.cpp:213
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:45
-#: src/states_screens/online/register_screen.cpp:131
+#: src/states_screens/online/register_screen.cpp:132
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "İptal"
@@ -331,6 +350,45 @@ msgstr "İptal"
 #. resoluton
 msgid "Keep this resolution"
 msgstr "Bu çözünürlüğü sakla"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+msgid "Camera Settings"
+msgstr "Kamera Ayarları"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera settings
+msgid "Player camera"
+msgstr "Oyuncu kamerası"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "FOV"
+msgstr "FOV"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Distance"
+msgstr "Mesafe"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Angle"
+msgstr "Açı"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Smooth camera"
+msgstr "Pürüzsüz kamera"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera settings
+msgid "Backward camera"
+msgstr "Geriye sarım kamerası"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Follow ball in soccer mode"
+msgstr "Futbol kipinde topu takip et"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -435,7 +493,7 @@ msgstr "* Ayarları uygulamak için oyunu yeniden başlatın"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/message_dialog.cpp:125
-#: src/states_screens/dialogs/message_dialog.cpp:139
+#: src/states_screens/dialogs/message_dialog.cpp:136
 msgid "OK"
 msgstr "Tamam"
 
@@ -734,7 +792,7 @@ msgstr "Oyun kipi"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1188
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
 msgid "Normal Race"
 msgstr "Normal Yarış"
 
@@ -743,7 +801,7 @@ msgstr "Normal Yarış"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1190
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1190
 msgid "Time Trial"
 msgstr "Zamana Karşı"
 
@@ -760,7 +818,7 @@ msgstr "Savaş"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1202
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
 msgid "Soccer"
 msgstr "Futbol"
 
@@ -947,7 +1005,9 @@ msgstr "Kurulmuş"
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
+#. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
+#: src/states_screens/options/options_screen_ui.cpp:359
 msgid "Standard"
 msgstr "Standart"
 
@@ -962,7 +1022,7 @@ msgstr "Standart"
 #: src/states_screens/arenas_screen.cpp:82
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:337
-#: src/states_screens/kart_selection.cpp:318
+#: src/states_screens/kart_selection.cpp:317
 #: src/states_screens/tracks_and_gp_screen.cpp:152
 msgid "Add-Ons"
 msgstr "Eklentiler"
@@ -981,7 +1041,7 @@ msgstr "Eklentiler"
 #: src/states_screens/edit_track_screen.cpp:146
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
-#: src/states_screens/kart_selection.cpp:310
+#: src/states_screens/kart_selection.cpp:309
 #: src/states_screens/online/tracks_screen.cpp:354
 #: src/states_screens/tracks_and_gp_screen.cpp:142
 msgid "All"
@@ -1542,9 +1602,9 @@ msgid ""
 "Once in a server, a race will begin once its owner (symbolized with the "
 "crown) decides so. Official servers may auto-start races only when there are"
 " enough players. Then, you can choose your kart and vote for the next track "
-"to race on. An addon kart or track is allowed only if it exists on all "
-"joined players and the server."
-msgstr "Bir sunucuya girdikten sonra, sahibi (taç ile sembolize edilmiş) karar verdiğinde yarış başlayacaktır. Resmi sunucular, yalnızca yeterince oyuncu olduğunda yarışları otomatik olarak başlatabilir. Ardından, aracınızı seçip bir sonraki yarışa katılabilirsiniz. Bir eklenti araç veya yola, yalnızca tüm katılan oyuncular ve sunucuda mevcutsa izin verilir."
+"to race on. An addon track is allowed only if it exists on all joined "
+"players and the server."
+msgstr "Bir sunucuya girdikten sonra, sahibi (taç ile belirtilir) karar verdikten sonra bir yarış başlayacaktır. Resmi sunucular yarışları yalnızca yeterli oyuncu olduğunda otomatik olarak başlatabilir. Ardından aracınızı seçebilir ve yarışacak bir sonraki bölüme oy verebilirsiniz. Bir eklenti bölümüne, yalnızca katılan tüm oynatıcılarda ve sunucuda varsa izin verilir."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1628,11 +1688,6 @@ msgstr "Grand Prix Düzenleyicisi"
 msgid "About"
 msgstr "Hakkında"
 
-#. I18N: ./data/gui/screens/main_menu.stkgui
-#. I18N: In the main screen
-msgid "Quit"
-msgstr "Çık"
-
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Server Creation"
@@ -1680,20 +1735,20 @@ msgstr "Sunucu Oluştur"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:196
+#: src/states_screens/online/networking_lobby.cpp:197
 msgid "Lobby"
 msgstr "Lobi"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:182
+#: src/states_screens/online/networking_lobby.cpp:183
 msgid "Start race"
 msgstr "Yarışı başlat"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:190
+#: src/states_screens/online/networking_lobby.cpp:191
 msgid "Configuration"
 msgstr "Yapılandırma"
 
@@ -1976,8 +2031,8 @@ msgstr "Müzik"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:539
-#: src/states_screens/options/options_screen_video.cpp:612
+#: src/states_screens/options/options_screen_video.cpp:538
+#: src/states_screens/options/options_screen_video.cpp:611
 msgid "Enabled"
 msgstr "Etkin"
 
@@ -1999,8 +2054,8 @@ msgstr "Yapılandırmayı Sil"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:123
-#: src/states_screens/options/options_screen_device.cpp:636
+#: src/states_screens/options/options_screen_device.cpp:116
+#: src/states_screens/options/options_screen_device.cpp:628
 msgid "Disable Configuration"
 msgstr "Yapılandırma Devre Dışı"
 
@@ -2031,11 +2086,6 @@ msgstr "İnternete bağlan"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
-msgid "Send anonymous hardware statistics"
-msgstr "İsimsiz donanım istatistiklerini gönder"
-
-#. I18N: ./data/gui/screens/options_general.stkgui
-#. I18N: In the general settings
 msgid "Enable chatting online"
 msgstr "Çevrimiçi sohbeti etkinleştir"
 
@@ -2056,13 +2106,13 @@ msgstr "Oyuncu başına handikapları etkinleştir"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:110
+#: src/states_screens/options/options_screen_general.cpp:111
 msgid "Uninstall full game assets"
 msgstr "Tüm oyun varlıklarını kaldır"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
-#: src/states_screens/options/options_screen_input.cpp:217
+#: src/states_screens/options/options_screen_input.cpp:210
 msgid "Press enter or double-click on a device to configure it"
 msgstr "Bir aygıtı yapılandırmak için üstündeyken enter tuşuna basın veya iki kere tıklayın"
 
@@ -2100,6 +2150,16 @@ msgstr "Yazı boyutu"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
+msgid "Camera"
+msgstr "Kamera"
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Custom..."
+msgstr "Özel..."
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
 msgid "Display FPS"
 msgstr "FPS Göster"
 
@@ -2130,8 +2190,8 @@ msgstr "Bulanıklık Efekt Seviyesi"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
-msgid "Vertical Sync (requires restart)"
-msgstr "Dikey Eşitleme (yeniden başlatma gerektirir)"
+msgid "Vertical Sync"
+msgstr "Dikey Eşitleyici"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2194,7 +2254,7 @@ msgstr "Tur sayısı"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#: src/states_screens/online/create_server_screen.cpp:172
+#: src/states_screens/online/create_server_screen.cpp:185
 #: src/states_screens/track_info_screen.cpp:194
 msgid "Number of AI karts"
 msgstr "Yapay zeka araç sayısı"
@@ -2594,7 +2654,7 @@ msgstr "SuperTuxKart eklenti sunucusuna bağlanamadı."
 msgid "Error downloading news: '%s'."
 msgstr "Haber indirme hatası: '%s'."
 
-#: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:262
+#: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:256
 msgid "Normal Race (Grand Prix)"
 msgstr "Normal Yarış (Grand Prix)"
 
@@ -2655,7 +2715,7 @@ msgid "New kart '%s' now available"
 msgstr "Yeni araç '%s' şimdi uygun"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:292
+#: src/states_screens/options/options_screen_ui.cpp:300
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2687,20 +2747,20 @@ msgid ""
 "created."
 msgstr "Yapılandırma dosyanız çok eskiydi, bu yüzden silindi ve yeni bir tane oluşturulacak."
 
-#: src/graphics/irr_driver.cpp:625
+#: src/graphics/irr_driver.cpp:631
 msgid "Video recording started."
 msgstr "Video kaydı başladı."
 
-#: src/graphics/irr_driver.cpp:632
+#: src/graphics/irr_driver.cpp:638
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video kaydedildi \"%s\"."
 
-#: src/graphics/irr_driver.cpp:636
+#: src/graphics/irr_driver.cpp:642
 msgid "Encoding progress:"
 msgstr "Kodlama ilerlemesi:"
 
-#: src/graphics/irr_driver.cpp:1892 src/graphics/irr_driver.cpp:1897
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "Fps: %d/%d/%d - %d Ktris, Ping: %dms"
@@ -2925,31 +2985,31 @@ msgid "Home"
 msgstr "Home"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:163 src/input/gamepad_android_config.cpp:58
+#: src/input/binding.cpp:163
 msgctxt "input_key"
 msgid "Left"
 msgstr "Sol"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:165 src/input/gamepad_android_config.cpp:64
+#: src/input/binding.cpp:165
 msgctxt "input_key"
 msgid "Up"
 msgstr "Yukarı"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:167 src/input/gamepad_android_config.cpp:61
+#: src/input/binding.cpp:167
 msgctxt "input_key"
 msgid "Right"
 msgstr "Sağ"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:169 src/input/gamepad_android_config.cpp:67
+#: src/input/binding.cpp:169
 msgctxt "input_key"
 msgid "Down"
 msgstr "Aşağı"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:171 src/input/gamepad_android_config.cpp:109
+#: src/input/binding.cpp:171
 msgctxt "input_key"
 msgid "Select"
 msgstr "Select"
@@ -3247,132 +3307,112 @@ msgstr "Lütfen tuş bağlantılarınızı yeniden yapılandırın."
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "Girdi yapılandırma dosyanız STK'nın bu sürümüyle uyumlu değil."
 
-#: src/input/gamepad_android_config.cpp:100
-msgctxt "input_key"
-msgid "Thumb Left"
-msgstr "Sol Başparmak"
-
-#: src/input/gamepad_android_config.cpp:103
-msgctxt "input_key"
-msgid "Thumb Right"
-msgstr "Sağ Başparmak"
-
-#: src/input/gamepad_android_config.cpp:106
-msgctxt "input_key"
-msgid "Start"
-msgstr "Başlat"
-
-#: src/input/gamepad_android_config.cpp:112
-msgctxt "input_key"
-msgid "Mode"
-msgstr "Kip"
-
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:155
+#: src/input/gamepad_config.cpp:152
 msgid "Guide"
 msgstr "Rehber"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:157
+#: src/input/gamepad_config.cpp:154
 msgid "Start"
 msgstr "Başlat"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:159
+#: src/input/gamepad_config.cpp:156
 msgid "Left thumbstick press"
 msgstr "Sol başparmak çubuğu bas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:161
+#: src/input/gamepad_config.cpp:158
 msgid "Right thumbstick press"
 msgstr "Sağ başparmak çubuğu bas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:163
+#: src/input/gamepad_config.cpp:160
 msgid "Left shoulder"
 msgstr "Sol omuz"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:165
+#: src/input/gamepad_config.cpp:162
 msgid "Right shoulder"
 msgstr "Sağ omuz"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:167
+#: src/input/gamepad_config.cpp:164
 msgid "DPad up"
 msgstr "Yukarı haraket tuşu"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:169
+#: src/input/gamepad_config.cpp:166
 msgid "DPad down"
 msgstr "Aşşağı haraket tuşu"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:171
+#: src/input/gamepad_config.cpp:168
 msgid "DPad left"
 msgstr "Sol haraket tuşu"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:173
+#: src/input/gamepad_config.cpp:170
 msgid "DPad right"
 msgstr "Sağ haraket tuşu"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:177
+#: src/input/gamepad_config.cpp:174
 msgid "Left thumbstick right"
 msgstr "Sol başparmak çubuğu sağ"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:179
+#: src/input/gamepad_config.cpp:176
 msgid "Left thumbstick left"
 msgstr "Sol başparmak çubuğu sol"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:181
+#: src/input/gamepad_config.cpp:178
 msgid "Left thumbstick down"
 msgstr "Sol başparmak çubuğu aşağı"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:183
+#: src/input/gamepad_config.cpp:180
 msgid "Left thumbstick up"
 msgstr "Sol başparmak çubuğu yukarı"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:185
+#: src/input/gamepad_config.cpp:182
 msgid "Right thumbstick right"
 msgstr "Sağ başparmak çubuğu sağ"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:187
+#: src/input/gamepad_config.cpp:184
 msgid "Right thumbstick left"
 msgstr "Sağ başparmak çubuğu sol"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:189
+#: src/input/gamepad_config.cpp:186
 msgid "Right thumbstick down"
 msgstr "Sağ başparmak çubuğu aşağı"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:191
+#: src/input/gamepad_config.cpp:188
 msgid "Right thumbstick up"
 msgstr "Sağ başparmak çubuğu yukarı"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:193
+#: src/input/gamepad_config.cpp:190
 msgid "Left trigger"
 msgstr "Sol tetik"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:195
+#: src/input/gamepad_config.cpp:192
 msgid "Right trigger"
 msgstr "Sağ tetik"
 
-#: src/input/input_manager.cpp:980
+#: src/input/input_manager.cpp:986
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "'%s' Yok sayılıyor. Oynamak için daha önce katılmanız gerekiyordu!"
 
-#: src/input/input_manager.cpp:1017
+#: src/input/input_manager.cpp:1023
 msgid "Only the Game Master may act at this point!"
 msgstr "Yalnızca oyun ustaları burada hareket edebilir!"
 
@@ -3433,7 +3473,7 @@ msgstr "Yarışı tamamladınız!"
 msgid "%s left the game."
 msgstr "%s oyundan ayrıldı."
 
-#: src/main.cpp:1883
+#: src/main.cpp:1888
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3444,16 +3484,16 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart, eklentileri indirmek ve güncellemeleri size bildirmek için bir sunucuya bağlanabilir. STK'nın gelişimine yardımcı olmak için anonim donanım istatistikleri de topluyoruz. Lütfen gizlilik politikamızı http://privacy.supertuxkart.net adresinden okuyun. Bu özelliğin etkinleştirilmesini ister misiniz? (Bu ayarı daha sonra değiştirmek için, seçeneklere gidin, 'Genel' sekmesini seçin ve \"İnternete bağlan\" ve \"İsimsiz donanım istatistikleri istatistiklerini gönder\" i düzenleyin)."
 
-#: src/main.cpp:2164
+#: src/main.cpp:2169
 msgid "Your screen resolution is too low to run STK."
 msgstr "STK'yı çalıştırmak için ekran çözünürlüğü çok düşük."
 
-#: src/main.cpp:2199
+#: src/main.cpp:2204
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Sürücünüz çok eski. Lütfen enson ekran sürücülerini yükleyin."
 
-#: src/main.cpp:2217
+#: src/main.cpp:2222
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3461,7 +3501,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Grafik sürücünüz çok eski görünüyor. Lütfen bir güncelleme olup olmadığını kontrol edin. SuperTuxKart %s veya daha iyisini destekleyen bir sürücü önerir. Oyun muhtemelen hala çalışır, ancak düşük grafik kipinde."
 
-#: src/main_loop.cpp:450 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:468 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "Sunucu bağlantısı zaman aşımına uğradı."
 
@@ -3529,12 +3569,12 @@ msgstr "Yeni en hızlı tur"
 msgid "WRONG WAY!"
 msgstr "YANLIŞ YÖN!"
 
-#: src/modes/soccer_world.cpp:525 src/modes/soccer_world.cpp:640
+#: src/modes/soccer_world.cpp:524 src/modes/soccer_world.cpp:651
 #, c-format
 msgid "%s scored a goal!"
 msgstr "%s bir gol attı!"
 
-#: src/modes/soccer_world.cpp:527 src/modes/soccer_world.cpp:642
+#: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
 #, c-format
 msgid "Oops, %s made an own goal!"
 msgstr "Yuhhh, %s kendi kalesine gol attı!"
@@ -3546,11 +3586,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i% s yedek lastik kartı üretildi! "
 msgstr[1] "%i yedek lastik kartı üretildi!"
 
-#: src/modes/world.cpp:1366
+#: src/modes/world.cpp:1369
 msgid "You have been eliminated!"
 msgstr "Elendiniz!"
 
-#: src/modes/world.cpp:1373
+#: src/modes/world.cpp:1376
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' yok edildi."
@@ -3573,7 +3613,7 @@ msgid "Bad network connection is detected."
 msgstr "Kötü ağ bağlantısı tespit edildi."
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3631
+#: src/network/protocols/server_lobby.cpp:3629
 msgid "Bot"
 msgstr "Bot"
 
@@ -3620,7 +3660,7 @@ msgstr "Oyun kipi: %s"
 #. I18N: In the create server screen for soccer server
 #: src/network/protocols/client_lobby.cpp:719
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
-#: src/states_screens/online/create_server_screen.cpp:229
+#: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:366
 msgid "Time limit"
 msgstr "Zamana karşı"
@@ -3628,7 +3668,7 @@ msgstr "Zamana karşı"
 #. I18N: In the create server screen for soccer server
 #: src/network/protocols/client_lobby.cpp:720
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
-#: src/states_screens/online/create_server_screen.cpp:231
+#: src/states_screens/online/create_server_screen.cpp:244
 #: src/states_screens/track_info_screen.cpp:367
 msgid "Goals limit"
 msgstr "Gol sınırı"
@@ -3752,7 +3792,7 @@ msgid "Cannot connect to server %s."
 msgstr "Sunucuya bağlanamıyor %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:783
+#: src/network/protocols/connect_to_server.cpp:766
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Sunucu için port numarası algılanamadı %s"
@@ -3761,24 +3801,24 @@ msgstr "Sunucu için port numarası algılanamadı %s"
 msgid "Network grand prix has been finished."
 msgstr "Ağ grand prix'i bitirdi."
 
-#: src/network/server_config.cpp:264
+#: src/network/server_config.cpp:258
 msgid "Time Trial (Grand Prix)"
 msgstr "Zamana Karşı (Grand Prix)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1196
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1196
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
-#: src/states_screens/online/create_server_screen.cpp:213
+#: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
 msgid "Free-For-All"
 msgstr "Herkes Tek"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1198
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1198
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
-#: src/states_screens/online/create_server_screen.cpp:215
+#: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
 msgstr "Bayrağı Yakala"
 
@@ -3904,18 +3944,18 @@ msgid "Not installed"
 msgstr "Kurulu değil"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:319
+#: src/states_screens/addons_screen.cpp:322
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s, %s tarafından"
 
-#: src/states_screens/addons_screen.cpp:440
+#: src/states_screens/addons_screen.cpp:443
 msgid "Please wait while addons are updated"
 msgstr "Eklentiler güncelleninceye kadar bekleyin"
 
-#: src/states_screens/addons_screen.cpp:520
-#: src/states_screens/main_menu_screen.cpp:624
+#: src/states_screens/addons_screen.cpp:523
+#: src/states_screens/main_menu_screen.cpp:620
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3928,7 +3968,7 @@ msgstr "Üzgünüz, eklendi web sitesine erişilirken bir hata oluştu. Internet
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:316
+#: src/states_screens/kart_selection.cpp:315
 #: src/states_screens/tracks_and_gp_screen.cpp:150
 msgid "standard"
 msgstr "standart"
@@ -3937,8 +3977,8 @@ msgstr "standart"
 #: src/states_screens/arenas_screen.cpp:326
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:917
-#: src/states_screens/kart_selection.cpp:1568
+#: src/states_screens/kart_selection.cpp:935
+#: src/states_screens/kart_selection.cpp:1576
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Kilitli : Daha fazlasına erişmek için aktif meydan okumaları hallet"
@@ -4241,7 +4281,7 @@ msgstr "Muz toplayıcı"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:283
+#: src/states_screens/options/options_screen_device.cpp:275
 msgid "Skidding"
 msgstr "Savrulma"
 
@@ -4361,45 +4401,45 @@ msgstr "Wiimote Ekle"
 msgid "Add Keyboard Configuration"
 msgstr "Klavye Yapılandırması Ekle"
 
-#: src/states_screens/dialogs/addons_loading.cpp:111
+#: src/states_screens/dialogs/addons_loading.cpp:117
 msgid "Update"
 msgstr "Güncelle"
 
-#: src/states_screens/dialogs/addons_loading.cpp:123
+#: src/states_screens/dialogs/addons_loading.cpp:129
 #, c-format
 msgid "Version: %d"
 msgstr "Sürüm: %d"
 
-#: src/states_screens/dialogs/addons_loading.cpp:154
+#: src/states_screens/dialogs/addons_loading.cpp:160
 msgid "featured"
 msgstr "öne çıkan"
 
 #. I18N: File size of game assets or addons downloading
-#: src/states_screens/dialogs/addons_loading.cpp:174
+#: src/states_screens/dialogs/addons_loading.cpp:180
 #: src/states_screens/dialogs/addons_pack.cpp:173
 #: src/states_screens/dialogs/download_assets.cpp:102
 #, c-format
 msgid "Size: %s"
 msgstr "Boyut:%s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:286
+#: src/states_screens/dialogs/addons_loading.cpp:292
 #: src/states_screens/dialogs/addons_pack.cpp:185
 #: src/states_screens/dialogs/download_assets.cpp:180
 msgid "Sorry, downloading the add-on failed"
 msgstr "Üzgünüz, eklenti indirme başarısız"
 
-#: src/states_screens/dialogs/addons_loading.cpp:362
+#: src/states_screens/dialogs/addons_loading.cpp:368
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "'%s' eklentisini yüklerken hata."
 
-#: src/states_screens/dialogs/addons_loading.cpp:373
-#: src/states_screens/dialogs/addons_loading.cpp:422
+#: src/states_screens/dialogs/addons_loading.cpp:379
+#: src/states_screens/dialogs/addons_loading.cpp:428
 #: src/states_screens/dialogs/download_assets.cpp:245
 msgid "Try again"
 msgstr "Tekrar dene"
 
-#: src/states_screens/dialogs/addons_loading.cpp:411
+#: src/states_screens/dialogs/addons_loading.cpp:417
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "'%s' eklentisini kaldırırken hata."
@@ -4418,12 +4458,12 @@ msgid "Current password invalid."
 msgstr "Mevcut parola geçersiz."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:323
+#: src/states_screens/online/register_screen.cpp:324
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Parola 8 ile 30 karakter arasında olmalıdır!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:307
+#: src/states_screens/online/register_screen.cpp:308
 msgid "Passwords don't match!"
 msgstr "Parolalar uyuşmuyor!"
 
@@ -4433,7 +4473,7 @@ msgstr "Parola başarıyla değiştirildi."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:388
+#: src/states_screens/online/register_screen.cpp:389
 msgid "Validating info"
 msgstr "Bilgi doğrulanıyor"
 
@@ -4458,16 +4498,16 @@ msgstr "1024x768 veya 1280x720'den küçük çözünürlükler desteklenmez. Kul
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/online/create_server_screen.cpp:193
-#: src/states_screens/options/options_screen_video.cpp:225
-#: src/states_screens/options/options_screen_video.cpp:542
-#: src/states_screens/options/options_screen_video.cpp:613
+#: src/states_screens/online/create_server_screen.cpp:206
+#: src/states_screens/options/options_screen_video.cpp:226
+#: src/states_screens/options/options_screen_video.cpp:541
+#: src/states_screens/options/options_screen_video.cpp:612
 msgid "Disabled"
 msgstr "Devre Dışı"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:544
+#: src/states_screens/options/options_screen_video.cpp:543
 msgid "Important only"
 msgstr "Sadece önemli"
 
@@ -4477,7 +4517,7 @@ msgstr "Sadece önemli"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:551
+#: src/states_screens/options/options_screen_video.cpp:550
 msgid "Low"
 msgstr "Düşük"
 
@@ -4487,14 +4527,14 @@ msgstr "Düşük"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:554
+#: src/states_screens/options/options_screen_video.cpp:553
 msgid "High"
 msgstr "Yüksek"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:548
+#: src/states_screens/options/options_screen_video.cpp:547
 msgid "Very Low"
 msgstr "Çok Düşük"
 
@@ -4550,7 +4590,7 @@ msgid "Version"
 msgstr "Sürüm"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/dialogs/message_dialog.cpp:131
+#: src/states_screens/dialogs/message_dialog.cpp:130
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
 msgid "No"
@@ -4630,8 +4670,8 @@ msgid "Press any key..."
 msgstr "herhangi bir tuşa bas..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
-#: src/states_screens/online/networking_lobby.cpp:239
-#: src/states_screens/online/networking_lobby.cpp:824
+#: src/states_screens/online/networking_lobby.cpp:240
+#: src/states_screens/online/networking_lobby.cpp:825
 msgid "Chat is disabled, enable in options menu."
 msgstr "Sohbet devre dışı, seçenekler menüsünden etkinleştirin."
 
@@ -4710,13 +4750,13 @@ msgstr "Yapay Zeka Araç Sayısı: %i"
 
 #. I18N: In the create server screen, show various battle mode available
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:158
-#: src/states_screens/online/create_server_screen.cpp:209
+#: src/states_screens/online/create_server_screen.cpp:222
 msgid "Battle mode"
 msgstr "Savaş kipi"
 
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
-#: src/states_screens/online/create_server_screen.cpp:225
+#: src/states_screens/online/create_server_screen.cpp:238
 #: src/states_screens/track_info_screen.cpp:354
 msgid "Soccer game type"
 msgstr "Futbol oyunu türü"
@@ -4761,7 +4801,7 @@ msgid "Input device already exists."
 msgstr "Giriş cihazı zaten var."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:147
-#: src/states_screens/online/online_screen.cpp:233
+#: src/states_screens/online/online_screen.cpp:234
 msgid "No player available for connecting to server."
 msgstr "Sunucuya bağlanmak için uygun oyuncu yok."
 
@@ -4828,7 +4868,7 @@ msgstr "Başarı oylaması"
 
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:606
-#: src/states_screens/tracks_and_gp_screen.cpp:287
+#: src/states_screens/tracks_and_gp_screen.cpp:296
 msgid "Random Track"
 msgstr "Rastgele Yol"
 
@@ -4981,54 +5021,54 @@ msgstr "Grand Prix'i kazandınız!"
 msgid "You completed the Grand Prix!"
 msgstr "Grand Prix'i tamamladınız!"
 
-#: src/states_screens/kart_selection.cpp:893
-#: src/states_screens/kart_selection.cpp:1586
-msgid "Random Kart"
-msgstr "Rastgele Araç"
-
-#: src/states_screens/kart_selection.cpp:912
-msgid "Locked"
-msgstr "Kilitli"
-
-#: src/states_screens/kart_selection.cpp:1015
+#: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr "Bölünmüş çok oyunculu oyun oynamak için bir klavye veya oyun kolu bağla"
 
-#: src/states_screens/kart_selection.cpp:1020
-#: src/states_screens/online/networking_lobby.cpp:513
+#: src/states_screens/kart_selection.cpp:911
+#: src/states_screens/kart_selection.cpp:1594
+msgid "Random Kart"
+msgstr "Rastgele Araç"
+
+#: src/states_screens/kart_selection.cpp:930
+msgid "Locked"
+msgstr "Kilitli"
+
+#: src/states_screens/kart_selection.cpp:1031
+#: src/states_screens/online/networking_lobby.cpp:514
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "Herkes:\nOyuna katılmak için 'Seç' düğmesine basın"
 
-#: src/states_screens/main_menu_screen.cpp:257
+#: src/states_screens/main_menu_screen.cpp:258
 msgid "Would you like to play the tutorial of the game?"
 msgstr "Oyun öğreticisini oynamak ister misiniz?"
 
-#: src/states_screens/main_menu_screen.cpp:560
+#: src/states_screens/main_menu_screen.cpp:556
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "İnternet erişimi olmadan çevrimiçi oynayamazsınız. Çevrimiçi oynamak için seçenekler menüsüne gidin ve \"İnternete bağlan\" seçeneğini işaretleyin."
 
-#: src/states_screens/main_menu_screen.cpp:575
+#: src/states_screens/main_menu_screen.cpp:571
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "İnternet bağlantısı olmadan eklentileri indiremezsiniz. Eklentileri indirmek istiyorsanız, seçenekler menüsüne gidin ve \"İnternete bağlan\" seçeneğini işaretleyin."
 
-#: src/states_screens/main_menu_screen.cpp:583
+#: src/states_screens/main_menu_screen.cpp:579
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "İnternet bağlantısı olmadan eklentileri indiremezsiniz. Eklentileri indirmek istiyorsanız, seçenekler menüsüne gidin ve \"İnternete bağlan\" seçeneğini işaretleyin.\n\nAncak önceden indirilmiş eklentileri silebilirsiniz."
 
-#: src/states_screens/main_menu_screen.cpp:619
+#: src/states_screens/main_menu_screen.cpp:615
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Eklentiler modülü şuan Ayarlar ekranından devre dışı bırakılmış"
 
-#: src/states_screens/main_menu_screen.cpp:631
+#: src/states_screens/main_menu_screen.cpp:627
 msgid "Please wait while the add-ons are loading"
 msgstr "Eklentiler yükleninceye kadar bekleyin"
 
@@ -5042,37 +5082,37 @@ msgid "%s's server"
 msgstr "%s'in sunucusu"
 
 #. I18N: In the create server screen
-#: src/states_screens/online/create_server_screen.cpp:191
+#: src/states_screens/online/create_server_screen.cpp:204
 msgid "No. of grand prix track(s)"
 msgstr "Grand prix pistlerinin sayısı"
 
-#: src/states_screens/online/create_server_screen.cpp:274
+#: src/states_screens/online/create_server_screen.cpp:287
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "İsim 4 ile 30 karakter arasında olmalıdır!"
 
-#: src/states_screens/online/create_server_screen.cpp:291
+#: src/states_screens/online/create_server_screen.cpp:304
 msgid "Incorrect characters in password!"
 msgstr "Parola içinde yanlış karakterler var!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:185
+#: src/states_screens/online/networking_lobby.cpp:186
 msgid "Ready"
 msgstr "Hazır"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:188
+#: src/states_screens/online/networking_lobby.cpp:189
 msgid "Live join"
 msgstr "Canlı katılım"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:193
+#: src/states_screens/online/networking_lobby.cpp:194
 msgid "Spectate"
 msgstr "Seyret"
 
-#: src/states_screens/online/networking_lobby.cpp:331
+#: src/states_screens/online/networking_lobby.cpp:332
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Lobi (ping: %dms)"
@@ -5080,7 +5120,7 @@ msgstr "Lobi (ping: %dms)"
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:377
+#: src/states_screens/online/networking_lobby.cpp:378
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -5088,7 +5128,7 @@ msgstr "Lütfen mevcut oyunun (%s) sonunu bekleyin, kalan tahmini süre: %s."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:385
+#: src/states_screens/online/networking_lobby.cpp:386
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "Lütfen mevcut oyunun sona ermesini bekleyin, kalan tahmini süre: %s."
@@ -5096,31 +5136,31 @@ msgstr "Lütfen mevcut oyunun sona ermesini bekleyin, kalan tahmini süre: %s."
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:397
+#: src/states_screens/online/networking_lobby.cpp:398
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr "Lütfen mevcut oyunun (%s) sonunu bekleyin, tahmini ilerleme: %%s"
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:406
+#: src/states_screens/online/networking_lobby.cpp:407
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "Lütfen mevcut oyunun sona ermesini bekleyin, tahmini ilerleme: %%d"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:414
+#: src/states_screens/online/networking_lobby.cpp:415
 msgid "Please wait for the current game's end."
 msgstr "Lütfen mevcut oyunun bitmesini bekleyin."
 
 #. I18N: In the networking lobby,
 #. tell user the command to install addon now
-#: src/states_screens/online/networking_lobby.cpp:428
+#: src/states_screens/online/networking_lobby.cpp:429
 #, c-format
 msgid "Send %s in chat box to install addon now."
 msgstr "Eklentiyi yüklemek için %s sohbet kutusuna gönderin."
 
-#: src/states_screens/online/networking_lobby.cpp:482
+#: src/states_screens/online/networking_lobby.cpp:483
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5129,7 +5169,7 @@ msgstr[1] "%d'den fazla oyuncu varsa oyun başlayacaktır."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:496
+#: src/states_screens/online/networking_lobby.cpp:497
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5138,12 +5178,12 @@ msgid_plural ""
 msgstr[0] "%d saniye sonra veya herkes 'hazır' düğmesine bastıktan sonra başlayacak."
 msgstr[1] "%d saniye sonra veya herkes 'hazır' düğmesine bastıktan sonra başlayacak."
 
-#: src/states_screens/online/networking_lobby.cpp:533
+#: src/states_screens/online/networking_lobby.cpp:534
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Sunucuya bağlanıyor %s"
 
-#: src/states_screens/online/networking_lobby.cpp:538
+#: src/states_screens/online/networking_lobby.cpp:539
 msgid "Finding a quick play server"
 msgstr "Hızlıca bir oyun sunucusu bul"
 
@@ -5195,23 +5235,23 @@ msgid "Offline"
 msgstr "Çevrimdışı"
 
 #. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online/online_screen.cpp:200
+#: src/states_screens/online/online_screen.cpp:201
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "Global ağda oynamak için giriş yapmalısınız. Yukarıdaki kullanıcı adınızı tıklayın."
 
-#: src/states_screens/online/online_screen.cpp:210
+#: src/states_screens/online/online_screen.cpp:211
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr "İnternet bağlantısı olmadan çevrimiçi oynayamazsınız. Eğer çevrimiçi oynamak istiyorsanız, seçeneklere gidip, 'Kullanıcı Arayüzü' sekmesini seçin, ve \"İnternete bağlan\" seçeneğini düzenleyin."
 
-#: src/states_screens/online/online_screen.cpp:238
+#: src/states_screens/online/online_screen.cpp:239
 msgid "Enter the server address optionally followed by : and then port."
 msgstr "Sunucu adresini isteğe bağlı olarak girin ve ardından: port girin."
 
-#: src/states_screens/online/online_screen.cpp:250
+#: src/states_screens/online/online_screen.cpp:251
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "Geçersiz sunucu adresi: %s."
@@ -5221,48 +5261,48 @@ msgstr "Geçersiz sunucu adresi: %s."
 msgid "Searching"
 msgstr "Aranıyor"
 
-#: src/states_screens/online/register_screen.cpp:132
+#: src/states_screens/online/register_screen.cpp:133
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "Oyundan çık"
 
-#: src/states_screens/online/register_screen.cpp:245
-#: src/states_screens/online/register_screen.cpp:252
+#: src/states_screens/online/register_screen.cpp:246
+#: src/states_screens/online/register_screen.cpp:253
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "'%s' oyuncusu oluşturulamadı."
 
-#: src/states_screens/online/register_screen.cpp:269
+#: src/states_screens/online/register_screen.cpp:270
 msgid "User name cannot be empty."
 msgstr "Kullanıcı adı boş olamaz."
 
-#: src/states_screens/online/register_screen.cpp:311
+#: src/states_screens/online/register_screen.cpp:312
 msgid "Emails don't match!"
 msgstr "E-postalar uyuşmuyor!"
 
-#: src/states_screens/online/register_screen.cpp:315
+#: src/states_screens/online/register_screen.cpp:316
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "Çevrimiçi kullanıcı adı 3 ile 30 karakter arasında olmalıdır!"
 
-#: src/states_screens/online/register_screen.cpp:319
+#: src/states_screens/online/register_screen.cpp:320
 msgid "Online username must not start with a number!"
 msgstr "Çevrimiçi kullanıcı adı bir sayı ile başlayamaz!"
 
-#: src/states_screens/online/register_screen.cpp:327
+#: src/states_screens/online/register_screen.cpp:328
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "Eposta 5 ile 254 karakter uzunluğunda olmalıdır."
 
-#: src/states_screens/online/register_screen.cpp:333
+#: src/states_screens/online/register_screen.cpp:334
 msgid "Email is invalid!"
 msgstr "Eposta geçersiz!"
 
-#: src/states_screens/online/register_screen.cpp:396
+#: src/states_screens/online/register_screen.cpp:397
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Hesap etkinleştirme ile ilgili daha fazla talimat içeren bir e-posta alacaksınız. Lütfen sabırlı olun ve gereksiz klasörünü kontrol ettiğinizden emin olun."
 
-#: src/states_screens/online/register_screen.cpp:435
+#: src/states_screens/online/register_screen.cpp:436
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "İnternet erişimi devre dışı, lütfen seçeneklerden aktif edin"
 
@@ -5347,7 +5387,7 @@ msgid "Drive in reverse"
 msgstr "Tersten sür"
 
 #: src/states_screens/online/tracks_screen.cpp:592
-#: src/states_screens/tracks_and_gp_screen.cpp:273
+#: src/states_screens/tracks_and_gp_screen.cpp:282
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Kilitli: daha fazlasına erişmek için aktif zorlukları çöz!"
 
@@ -5360,117 +5400,117 @@ msgid "Key binding"
 msgstr "Anahtar bağlama"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:108
-#: src/states_screens/options/options_screen_device.cpp:631
+#: src/states_screens/options/options_screen_device.cpp:101
+#: src/states_screens/options/options_screen_device.cpp:623
 msgid "Disable Device"
 msgstr "Aygıtı Devre Dışı Bırak"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:110
-#: src/states_screens/options/options_screen_device.cpp:632
+#: src/states_screens/options/options_screen_device.cpp:103
+#: src/states_screens/options/options_screen_device.cpp:624
 msgid "Enable Device"
 msgstr "Aygıtı Aktifleştir"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:125
-#: src/states_screens/options/options_screen_device.cpp:637
+#: src/states_screens/options/options_screen_device.cpp:118
+#: src/states_screens/options/options_screen_device.cpp:629
 msgid "Enable Configuration"
 msgstr "Yapılandırmayı Etkinleştir"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:175
+#: src/states_screens/options/options_screen_device.cpp:167
 msgid "Game Keys"
 msgstr "Oyun Tuşları"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:189
+#: src/states_screens/options/options_screen_device.cpp:181
 msgid "Menu Keys"
 msgstr "Menü Tuşları"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:265
+#: src/states_screens/options/options_screen_device.cpp:257
 msgid "Steer Left"
 msgstr "Sol Yap"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:268
+#: src/states_screens/options/options_screen_device.cpp:260
 msgid "Steer Right"
 msgstr "Sağ Yap"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:271
+#: src/states_screens/options/options_screen_device.cpp:263
 msgid "Accelerate"
 msgstr "Hızlandırıcı"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:274
+#: src/states_screens/options/options_screen_device.cpp:266
 msgid "Brake / Reverse"
 msgstr "Fren / Geri"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:277
+#: src/states_screens/options/options_screen_device.cpp:269
 msgid "Fire"
 msgstr "Ateş"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:280
+#: src/states_screens/options/options_screen_device.cpp:272
 msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:286
+#: src/states_screens/options/options_screen_device.cpp:278
 msgid "Look Back"
 msgstr "Arkaya Bak"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:289
+#: src/states_screens/options/options_screen_device.cpp:281
 msgid "Rescue"
 msgstr "Kurtarma"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:292
+#: src/states_screens/options/options_screen_device.cpp:284
 msgid "Pause Game"
 msgstr "Oyunu Duraklat"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:297
+#: src/states_screens/options/options_screen_device.cpp:289
 msgid "Up"
 msgstr "Yukarı"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:300
+#: src/states_screens/options/options_screen_device.cpp:292
 msgid "Down"
 msgstr "Aşağı"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:303
+#: src/states_screens/options/options_screen_device.cpp:295
 msgid "Left"
 msgstr "Sol"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:306
+#: src/states_screens/options/options_screen_device.cpp:298
 msgid "Right"
 msgstr "Sağ"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:309
+#: src/states_screens/options/options_screen_device.cpp:301
 msgid "Select"
 msgstr "Seç"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:312
+#: src/states_screens/options/options_screen_device.cpp:304
 msgid "Cancel/Back"
 msgstr "İptal / Geri"
 
-#: src/states_screens/options/options_screen_device.cpp:407
+#: src/states_screens/options/options_screen_device.cpp:399
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Bir mavi öge, başka bir yapılandırmayla çakışma demektir."
 
-#: src/states_screens/options/options_screen_device.cpp:412
+#: src/states_screens/options/options_screen_device.cpp:404
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Bir kırmızı öge, geçerli yapılandırmayle çakışma demektir."
 
-#: src/states_screens/options/options_screen_device.cpp:518
+#: src/states_screens/options/options_screen_device.cpp:510
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5478,17 +5518,17 @@ msgid ""
 msgstr "Uyarı: 'Shift' önerilen bir anahtar değildir. 'Shift' tuşuna basıldığında, büyük harflerden farklı bir karakter içeren tüm tuşlar çalışmayı durduracaktır."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:617
+#: src/states_screens/options/options_screen_device.cpp:609
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Bu yapılandırmayı kalıcı olarak silmek istediğinizden emin misiniz?"
 
-#: src/states_screens/options/options_screen_device.cpp:645
+#: src/states_screens/options/options_screen_device.cpp:637
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "Yeni yapılandırma adını girin, varsayılan değeri geri döndürmek için boş bırakın."
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:100
+#: src/states_screens/options/options_screen_general.cpp:101
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
@@ -5496,29 +5536,25 @@ msgstr "Çok oyunculu kipte, oyuncular handikap seçimi yapabilir\naraç seçim 
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
-#: src/states_screens/options/options_screen_general.cpp:116
+#: src/states_screens/options/options_screen_general.cpp:117
 msgid "Install full game assets"
 msgstr "Tüm oyun varlıklarını kur"
 
-#: src/states_screens/options/options_screen_general.cpp:234
+#: src/states_screens/options/options_screen_general.cpp:236
 msgid "Are you sure to uninstall full game assets?"
 msgstr "Oyun varlıklarının tümü kaldırılacak emin misiniz?"
 
-#: src/states_screens/options/options_screen_input.cpp:107
-msgid "Gamepad"
-msgstr "Oyun Kolu"
-
-#: src/states_screens/options/options_screen_input.cpp:124
+#: src/states_screens/options/options_screen_input.cpp:117
 #, c-format
 msgid "Keyboard %i"
 msgstr "Klavye %i"
 
-#: src/states_screens/options/options_screen_input.cpp:175
+#: src/states_screens/options/options_screen_input.cpp:168
 msgid "Touch Device"
 msgstr "Dokunmatik Cihaz"
 
 #. I18N: In the input configuration screen, help for touch device
-#: src/states_screens/options/options_screen_input.cpp:212
+#: src/states_screens/options/options_screen_input.cpp:205
 msgid "Tap on a device to configure it"
 msgstr "Yapılandırmak için bir cihaza hafifçe vurun"
 
@@ -5528,61 +5564,74 @@ msgid "System Language"
 msgstr "Sistem Dili"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:87
+#: src/states_screens/options/options_screen_ui.cpp:91
 msgid "In the bottom-left"
 msgstr "Sol altta"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:89
+#: src/states_screens/options/options_screen_ui.cpp:93
 msgid "On the right side"
 msgstr "Sağ tarafta"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:91
+#: src/states_screens/options/options_screen_ui.cpp:95
 msgid "Hidden"
 msgstr "Gizli"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:93
+#: src/states_screens/options/options_screen_ui.cpp:97
 msgid "Centered"
 msgstr "Ortalanmış"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:111
+#: src/states_screens/options/options_screen_ui.cpp:115
 msgid "Vertical"
 msgstr "Dikey"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:113
+#: src/states_screens/options/options_screen_ui.cpp:117
 msgid "Horizontal"
 msgstr "Yatay"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:124
+#: src/states_screens/options/options_screen_ui.cpp:128
 msgid "Very small"
 msgstr "Çok küçük"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:126
+#: src/states_screens/options/options_screen_ui.cpp:130
 msgid "Small"
 msgstr "Küçük"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:128
+#: src/states_screens/options/options_screen_ui.cpp:132
 msgid "Medium"
 msgstr "Orta"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:130
+#: src/states_screens/options/options_screen_ui.cpp:134
 msgid "Large"
 msgstr "Büyük"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:132
+#: src/states_screens/options/options_screen_ui.cpp:136
 msgid "Very large"
 msgstr "Çok büyük"
 
-#: src/states_screens/options/options_screen_ui.cpp:448
+#. I18N: custom camera setting
+#. I18N: custom video settings
+#: src/states_screens/options/options_screen_ui.cpp:357
+#: src/states_screens/options/options_screen_video.cpp:489
+#: src/states_screens/options/options_screen_video.cpp:521
+msgid "Custom"
+msgstr "Kişisel"
+
+#. I18N: In the UI options, splitscreen_method position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:361
+msgid "Drone chase"
+msgstr "Drone kovalamaca"
+
+#: src/states_screens/options/options_screen_ui.cpp:529
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5592,126 +5641,110 @@ msgid ""
 msgstr "Hızlı koşu kipi, yalnızca hikaye kipinin başlamasından bu yana oyun kapatılmadıysa etkinleştirilebilir.\n\nOyunun hikaye kipi tamamlanmasından önce kapatılması zamanlayıcıyı geçersiz kılar.\n\nHızlı koşu kipini kullanmak için lütfen yeni bir profil kullanın."
 
 #. I18N: In the video options, maximum frame per second
-#: src/states_screens/options/options_screen_video.cpp:219
+#: src/states_screens/options/options_screen_video.cpp:220
 msgid "Maximum FPS"
 msgstr "Azami FPS"
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
-#: src/states_screens/options/options_screen_video.cpp:227
+#: src/states_screens/options/options_screen_video.cpp:228
 msgid "Full"
 msgstr "Tam"
 
-#. I18N: In the video options, half vertical sync (usually 30fps)
-#: src/states_screens/options/options_screen_video.cpp:229
-msgid "Half"
-msgstr "Yarım"
-
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
-#: src/states_screens/options/options_screen_video.cpp:233
+#: src/states_screens/options/options_screen_video.cpp:234
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
 msgstr "Vsync, grafik kartını yeni bir çerçeve sağlamaya zorlar\nyalnızca ekran görüntülemeye hazır olduğunda."
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:236
+#: src/states_screens/options/options_screen_video.cpp:237
 msgid "Full: one frame per monitor refresh"
 msgstr "Tam: monitör yenileme başına bir kare"
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:238
-msgid "Half: one frame every two monitor refreshes"
-msgstr "Yarım: her iki monitörde bir kare yenilenir"
-
-#. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:240
+#: src/states_screens/options/options_screen_video.cpp:239
 msgid "Vsync will not work if your drivers don't support it."
 msgstr "Sürücüler desteklemiyorsa Vsync çalışmaz."
 
-#. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:490
-#: src/states_screens/options/options_screen_video.cpp:522
-msgid "Custom"
-msgstr "Kişisel"
-
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:557
+#: src/states_screens/options/options_screen_video.cpp:556
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Parçacık Efektleri: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:563
+#: src/states_screens/options/options_screen_video.cpp:562
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Animasyonlu Karakterler: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:566
+#: src/states_screens/options/options_screen_video.cpp:565
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Dinamik Işıklar: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:569
+#: src/states_screens/options/options_screen_video.cpp:568
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Işık saçılması: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:572
+#: src/states_screens/options/options_screen_video.cpp:571
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Kenar yumuşatma: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:575
+#: src/states_screens/options/options_screen_video.cpp:574
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Çevresel Perdeleme: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:579
+#: src/states_screens/options/options_screen_video.cpp:578
 #, c-format
 msgid "Shadows: %s"
 msgstr "Gölgeler: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:581
+#: src/states_screens/options/options_screen_video.cpp:580
 #, c-format
 msgid "Shadows: %i"
 msgstr "Gölgeler: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:584
+#: src/states_screens/options/options_screen_video.cpp:583
 #, c-format
 msgid "Bloom: %s"
 msgstr "Tazelenme: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:588
+#: src/states_screens/options/options_screen_video.cpp:587
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Parıltı (ana hatlar): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:592
+#: src/states_screens/options/options_screen_video.cpp:591
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Işık mili (Işınlar): %s"
 
-#: src/states_screens/options/options_screen_video.cpp:597
+#: src/states_screens/options/options_screen_video.cpp:596
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "İşlenmiş resim kalitesi: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:616
+#: src/states_screens/options/options_screen_video.cpp:615
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Hareket bulanıklığı: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:620
+#: src/states_screens/options/options_screen_video.cpp:619
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Alan derinliği: %s"
@@ -5970,16 +6003,16 @@ msgstr "(Boş)"
 msgid "all"
 msgstr "tümü"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:199
+#: src/states_screens/tracks_and_gp_screen.cpp:203
 msgid "Locked!"
 msgstr "Kilitli!"
 
-#: src/utils/string_utils.cpp:1409
+#: src/utils/string_utils.cpp:1413
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/utils/string_utils.cpp:1416 src/utils/string_utils.cpp:1420
+#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"

@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-13 16:16+0800\n"
-"PO-Revision-Date: 2020-06-13 11:12+0000\n"
+"POT-Creation-Date: 2020-07-19 08:19+0800\n"
+"PO-Revision-Date: 2020-07-19 00:30+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Korean (http://www.transifex.com/supertuxkart/supertuxkart/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -20,6 +20,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: ko\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#. I18N: In Android UI, po_extract_game_data
+msgid "Extracting game data..."
+msgstr ""
+
+#. I18N: In Android UI, po_extract_error
+msgid "Game data extraction error"
+msgstr ""
+
+#. I18N: In Android UI, po_extract_error_msg
+msgid "Check remaining device space or reinstall SuperTuxKart."
+msgstr ""
+
+#. I18N: In Android UI, po_quit
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+msgid "Quit"
+msgstr "종료"
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
@@ -157,8 +175,8 @@ msgstr "제거"
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:153
-#: src/states_screens/dialogs/addons_loading.cpp:291
+#: src/input/gamepad_config.cpp:150
+#: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr "뒤로"
 
@@ -200,6 +218,7 @@ msgstr "당신은 이를 나중에 터치 장치 설정에서 바꿀 수 있습�
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
 msgid "Apply"
@@ -318,9 +337,9 @@ msgstr "예"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
-#: src/states_screens/dialogs/addons_loading.cpp:207
+#: src/states_screens/dialogs/addons_loading.cpp:213
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:45
-#: src/states_screens/online/register_screen.cpp:131
+#: src/states_screens/online/register_screen.cpp:132
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "취소"
@@ -330,6 +349,45 @@ msgstr "취소"
 #. resoluton
 msgid "Keep this resolution"
 msgstr "해상도 유지"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+msgid "Camera Settings"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera settings
+msgid "Player camera"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "FOV"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Distance"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Angle"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Smooth camera"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera settings
+msgid "Backward camera"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Follow ball in soccer mode"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -434,7 +492,7 @@ msgstr "* 새로운 설정을 적용하려면 슈턱카를 다시 시작하세�
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/message_dialog.cpp:125
-#: src/states_screens/dialogs/message_dialog.cpp:139
+#: src/states_screens/dialogs/message_dialog.cpp:136
 msgid "OK"
 msgstr "확인"
 
@@ -733,7 +791,7 @@ msgstr "게임 모드"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:266 src/race/race_manager.cpp:1188
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
 msgid "Normal Race"
 msgstr "일반 경주"
 
@@ -742,7 +800,7 @@ msgstr "일반 경주"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1190
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1190
 msgid "Time Trial"
 msgstr "타임 트라이얼"
 
@@ -759,7 +817,7 @@ msgstr "배틀"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1202
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
 msgid "Soccer"
 msgstr "축구"
 
@@ -946,7 +1004,9 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
+#. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
+#: src/states_screens/options/options_screen_ui.cpp:359
 msgid "Standard"
 msgstr "표준"
 
@@ -961,7 +1021,7 @@ msgstr "표준"
 #: src/states_screens/arenas_screen.cpp:82
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:337
-#: src/states_screens/kart_selection.cpp:318
+#: src/states_screens/kart_selection.cpp:317
 #: src/states_screens/tracks_and_gp_screen.cpp:152
 msgid "Add-Ons"
 msgstr "부가 기능"
@@ -980,7 +1040,7 @@ msgstr "부가 기능"
 #: src/states_screens/edit_track_screen.cpp:146
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
-#: src/states_screens/kart_selection.cpp:310
+#: src/states_screens/kart_selection.cpp:309
 #: src/states_screens/online/tracks_screen.cpp:354
 #: src/states_screens/tracks_and_gp_screen.cpp:142
 msgid "All"
@@ -1541,9 +1601,9 @@ msgid ""
 "Once in a server, a race will begin once its owner (symbolized with the "
 "crown) decides so. Official servers may auto-start races only when there are"
 " enough players. Then, you can choose your kart and vote for the next track "
-"to race on. An addon kart or track is allowed only if it exists on all "
-"joined players and the server."
-msgstr "서버에 들어가면, 경주는 서버의 소유자(왕관으로 상징)가 결정하면 시작될 것입니다. 공식 서버들은 충분한 플레이어가 있을 때에만 경주를 자동으로 시작할 수 있습니다. 다음으로, 당신은 당신의 카트를 선택하고 경주할 다음 트랙을 투표할 수 있습니다. 부가 기능 카트 또는 트랙은 참가한 모든 플레이어와 서버에 존재하는 경우에만 허용됩니다."
+"to race on. An addon track is allowed only if it exists on all joined "
+"players and the server."
+msgstr ""
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1627,11 +1687,6 @@ msgstr "그랑프리 편집기"
 msgid "About"
 msgstr "정보"
 
-#. I18N: ./data/gui/screens/main_menu.stkgui
-#. I18N: In the main screen
-msgid "Quit"
-msgstr "종료"
-
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Server Creation"
@@ -1679,20 +1734,20 @@ msgstr "서버 만들기"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:196
+#: src/states_screens/online/networking_lobby.cpp:197
 msgid "Lobby"
 msgstr "대기실"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:182
+#: src/states_screens/online/networking_lobby.cpp:183
 msgid "Start race"
 msgstr "경주 시작"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:190
+#: src/states_screens/online/networking_lobby.cpp:191
 msgid "Configuration"
 msgstr "구성"
 
@@ -1975,8 +2030,8 @@ msgstr "음악"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:539
-#: src/states_screens/options/options_screen_video.cpp:612
+#: src/states_screens/options/options_screen_video.cpp:538
+#: src/states_screens/options/options_screen_video.cpp:611
 msgid "Enabled"
 msgstr "활성화"
 
@@ -1998,8 +2053,8 @@ msgstr "구성 삭제"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:123
-#: src/states_screens/options/options_screen_device.cpp:636
+#: src/states_screens/options/options_screen_device.cpp:116
+#: src/states_screens/options/options_screen_device.cpp:628
 msgid "Disable Configuration"
 msgstr "구성 비활성화"
 
@@ -2030,11 +2085,6 @@ msgstr "인터넷에 연결"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
-msgid "Send anonymous hardware statistics"
-msgstr "익명 하드웨어 통계 보내기"
-
-#. I18N: ./data/gui/screens/options_general.stkgui
-#. I18N: In the general settings
 msgid "Enable chatting online"
 msgstr ""
 
@@ -2055,13 +2105,13 @@ msgstr "플레이어마다 핸디캡을 활성화"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: For mobile version for STK, uninstall the downloaded assets
-#: src/states_screens/options/options_screen_general.cpp:110
+#: src/states_screens/options/options_screen_general.cpp:111
 msgid "Uninstall full game assets"
 msgstr "전체 게임 자산을 제거"
 
 #. I18N: ./data/gui/screens/options_input.stkgui
 #. I18N: In the input configuration screen
-#: src/states_screens/options/options_screen_input.cpp:217
+#: src/states_screens/options/options_screen_input.cpp:210
 msgid "Press enter or double-click on a device to configure it"
 msgstr "구성하려는 장치에 Enter를 누르거나 더블 클릭하세요"
 
@@ -2099,6 +2149,16 @@ msgstr "글자 크기"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
+msgid "Camera"
+msgstr ""
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Custom..."
+msgstr ""
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
 msgid "Display FPS"
 msgstr "FPS 표시"
 
@@ -2129,8 +2189,8 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
-msgid "Vertical Sync (requires restart)"
-msgstr "수직 동기화 (다시 시작 필요)"
+msgid "Vertical Sync"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2193,7 +2253,7 @@ msgstr "바퀴 수"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
-#: src/states_screens/online/create_server_screen.cpp:172
+#: src/states_screens/online/create_server_screen.cpp:185
 #: src/states_screens/track_info_screen.cpp:194
 msgid "Number of AI karts"
 msgstr "AI 카트 수"
@@ -2593,7 +2653,7 @@ msgstr "슈퍼턱스카트 부가 기능 서버에 연결하는 데 실패했습
 msgid "Error downloading news: '%s'."
 msgstr "새 소식을 받는 중 오류가 발생했습니다: '%s'."
 
-#: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:262
+#: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:256
 msgid "Normal Race (Grand Prix)"
 msgstr "일반 경주 (그랑프리)"
 
@@ -2654,7 +2714,7 @@ msgid "New kart '%s' now available"
 msgstr "새 카트 '%s'는 이제 사용할 수 있습니다"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:292
+#: src/states_screens/options/options_screen_ui.cpp:300
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2686,20 +2746,20 @@ msgid ""
 "created."
 msgstr "당신의 구성 파일이 너무 오래되어서, 이는 삭제되었고 새로운 구성이 만들어질 것입니다."
 
-#: src/graphics/irr_driver.cpp:625
+#: src/graphics/irr_driver.cpp:631
 msgid "Video recording started."
 msgstr "동영상 녹화가 시작되었습니다."
 
-#: src/graphics/irr_driver.cpp:632
+#: src/graphics/irr_driver.cpp:638
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "동영상이 \"%s\"에 저장되었습니다."
 
-#: src/graphics/irr_driver.cpp:636
+#: src/graphics/irr_driver.cpp:642
 msgid "Encoding progress:"
 msgstr "인코딩 진행 상황:"
 
-#: src/graphics/irr_driver.cpp:1892 src/graphics/irr_driver.cpp:1897
+#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, 핑: %dms"
@@ -2924,31 +2984,31 @@ msgid "Home"
 msgstr "Home"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:163 src/input/gamepad_android_config.cpp:58
+#: src/input/binding.cpp:163
 msgctxt "input_key"
 msgid "Left"
 msgstr "왼쪽"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:165 src/input/gamepad_android_config.cpp:64
+#: src/input/binding.cpp:165
 msgctxt "input_key"
 msgid "Up"
 msgstr "위"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:167 src/input/gamepad_android_config.cpp:61
+#: src/input/binding.cpp:167
 msgctxt "input_key"
 msgid "Right"
 msgstr "오른쪽"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:169 src/input/gamepad_android_config.cpp:67
+#: src/input/binding.cpp:169
 msgctxt "input_key"
 msgid "Down"
 msgstr "아래"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:171 src/input/gamepad_android_config.cpp:109
+#: src/input/binding.cpp:171
 msgctxt "input_key"
 msgid "Select"
 msgstr "Select"
@@ -3246,132 +3306,112 @@ msgstr "당딘의 키 할당을 다시 구성해주세요."
 msgid "Your input config file is not compatible with this version of STK."
 msgstr "당신의 입력 구성 파일은 슈턱카의 이 버전과 호환되지 않습니다."
 
-#: src/input/gamepad_android_config.cpp:100
-msgctxt "input_key"
-msgid "Thumb Left"
-msgstr "엄지 왼쪽"
-
-#: src/input/gamepad_android_config.cpp:103
-msgctxt "input_key"
-msgid "Thumb Right"
-msgstr "엄지 오른쪽"
-
-#: src/input/gamepad_android_config.cpp:106
-msgctxt "input_key"
-msgid "Start"
-msgstr "시작"
-
-#: src/input/gamepad_android_config.cpp:112
-msgctxt "input_key"
-msgid "Mode"
-msgstr "모드"
-
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:155
+#: src/input/gamepad_config.cpp:152
 msgid "Guide"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:157
+#: src/input/gamepad_config.cpp:154
 msgid "Start"
 msgstr "시작"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:159
+#: src/input/gamepad_config.cpp:156
 msgid "Left thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:161
+#: src/input/gamepad_config.cpp:158
 msgid "Right thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:163
+#: src/input/gamepad_config.cpp:160
 msgid "Left shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:165
+#: src/input/gamepad_config.cpp:162
 msgid "Right shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:167
+#: src/input/gamepad_config.cpp:164
 msgid "DPad up"
 msgstr "십자패드 위"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:169
+#: src/input/gamepad_config.cpp:166
 msgid "DPad down"
 msgstr "십자패드 아래"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:171
+#: src/input/gamepad_config.cpp:168
 msgid "DPad left"
 msgstr "십자패드 왼쪽"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:173
+#: src/input/gamepad_config.cpp:170
 msgid "DPad right"
 msgstr "십자패드 오른쪽"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:177
+#: src/input/gamepad_config.cpp:174
 msgid "Left thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:179
+#: src/input/gamepad_config.cpp:176
 msgid "Left thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:181
+#: src/input/gamepad_config.cpp:178
 msgid "Left thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:183
+#: src/input/gamepad_config.cpp:180
 msgid "Left thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:185
+#: src/input/gamepad_config.cpp:182
 msgid "Right thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:187
+#: src/input/gamepad_config.cpp:184
 msgid "Right thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:189
+#: src/input/gamepad_config.cpp:186
 msgid "Right thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:191
+#: src/input/gamepad_config.cpp:188
 msgid "Right thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:193
+#: src/input/gamepad_config.cpp:190
 msgid "Left trigger"
 msgstr "왼쪽 트리거"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:195
+#: src/input/gamepad_config.cpp:192
 msgid "Right trigger"
 msgstr "오른쪽 트리거"
 
-#: src/input/input_manager.cpp:980
+#: src/input/input_manager.cpp:986
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "'%s' 무시 중. 당신이 플레이하기 위해서는 더 일찍 참가해야 했습니다!"
 
-#: src/input/input_manager.cpp:1017
+#: src/input/input_manager.cpp:1023
 msgid "Only the Game Master may act at this point!"
 msgstr "게임 마스터만이 이 시점에서 행동할 수 있습니다!"
 
@@ -3431,7 +3471,7 @@ msgstr "당신은 경주를 마쳤습니다!"
 msgid "%s left the game."
 msgstr "%s가 게임에서 떠났습니다."
 
-#: src/main.cpp:1883
+#: src/main.cpp:1888
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3442,16 +3482,16 @@ msgid ""
 "statistics\")."
 msgstr "슈퍼턱스카트는 부가 기능을 다운로드하고 당신에게 업데이트를 알려주기 위해 서버에 연결할 수 있습니다. 우리는 또한 슈턱카의 개발에 도움을 받기 위해 익명으로 하드웨어 통계를 수집합니다. http://privacy.supertuxkart.net 에서 우리의 개인정보 처리방침을 읽어주세요. 이 기능을 활성화하기를 원하십니까? (나중에 이 설정을 변경하려면, 옵션으로 가서, '일반' 탭을 선택하고, \"인터넷에 연결\" 및 \"익명 하드웨어 통계 보내기\"를 편집하세요.)"
 
-#: src/main.cpp:2164
+#: src/main.cpp:2169
 msgid "Your screen resolution is too low to run STK."
 msgstr "당신의 화면 해상도는 슈턱카를 실행하기에 너무 낮습니다."
 
-#: src/main.cpp:2199
+#: src/main.cpp:2204
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "당신의 드라이버 버전이 너무 오래되었습니다. 최신 비디오 드라이버를 설치해주세요."
 
-#: src/main.cpp:2217
+#: src/main.cpp:2222
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3459,7 +3499,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "당신의 그래픽 드라이버가 매우 오래된 듯 합니다. 업데이트가 사용 가능한지 확인해주세요. 슈퍼턱스카드는 지원하는 드라이버 %s 이상을 권장합니다. 게임은 여전히 실행될 가능성이 있지만, 감소된 그래픽 모드로 실행될 것입니다."
 
-#: src/main_loop.cpp:450 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:468 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "서버 연결이 시간 초과되었습니다."
 
@@ -3527,12 +3567,12 @@ msgstr "새 최단 바퀴"
 msgid "WRONG WAY!"
 msgstr "잘못된 길입니다!"
 
-#: src/modes/soccer_world.cpp:525 src/modes/soccer_world.cpp:640
+#: src/modes/soccer_world.cpp:524 src/modes/soccer_world.cpp:651
 #, c-format
 msgid "%s scored a goal!"
 msgstr ""
 
-#: src/modes/soccer_world.cpp:527 src/modes/soccer_world.cpp:642
+#: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
 #, c-format
 msgid "Oops, %s made an own goal!"
 msgstr ""
@@ -3543,11 +3583,11 @@ msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i의 스페어 타이어 카트가 산란되었습니다!"
 
-#: src/modes/world.cpp:1366
+#: src/modes/world.cpp:1369
 msgid "You have been eliminated!"
 msgstr "당신은 탈락했습니다!"
 
-#: src/modes/world.cpp:1373
+#: src/modes/world.cpp:1376
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s'이(가) 탈락했습니다."
@@ -3570,7 +3610,7 @@ msgid "Bad network connection is detected."
 msgstr "잘못된 네트워크 연결이 감지되었습니다."
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3631
+#: src/network/protocols/server_lobby.cpp:3629
 msgid "Bot"
 msgstr ""
 
@@ -3617,7 +3657,7 @@ msgstr "게임 모드: %s"
 #. I18N: In the create server screen for soccer server
 #: src/network/protocols/client_lobby.cpp:719
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
-#: src/states_screens/online/create_server_screen.cpp:229
+#: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:366
 msgid "Time limit"
 msgstr "시간 제한"
@@ -3625,7 +3665,7 @@ msgstr "시간 제한"
 #. I18N: In the create server screen for soccer server
 #: src/network/protocols/client_lobby.cpp:720
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
-#: src/states_screens/online/create_server_screen.cpp:231
+#: src/states_screens/online/create_server_screen.cpp:244
 #: src/states_screens/track_info_screen.cpp:367
 msgid "Goals limit"
 msgstr "목표 제한"
@@ -3749,7 +3789,7 @@ msgid "Cannot connect to server %s."
 msgstr "서버 %s에 연결할 수 없습니다."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:783
+#: src/network/protocols/connect_to_server.cpp:766
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr ""
@@ -3758,24 +3798,24 @@ msgstr ""
 msgid "Network grand prix has been finished."
 msgstr "네트워크 그랑프리가 마쳐져 있습니다."
 
-#: src/network/server_config.cpp:264
+#: src/network/server_config.cpp:258
 msgid "Time Trial (Grand Prix)"
 msgstr "타임 트라이얼 (그랑프리)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:274 src/race/race_manager.cpp:1196
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1196
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
-#: src/states_screens/online/create_server_screen.cpp:213
+#: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
 msgid "Free-For-All"
 msgstr "누구나 자유롭게"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:276 src/race/race_manager.cpp:1198
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1198
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
-#: src/states_screens/online/create_server_screen.cpp:215
+#: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
 msgstr "깃발 잡기"
 
@@ -3899,18 +3939,18 @@ msgid "Not installed"
 msgstr ""
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:319
+#: src/states_screens/addons_screen.cpp:322
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s 기여: %s"
 
-#: src/states_screens/addons_screen.cpp:440
+#: src/states_screens/addons_screen.cpp:443
 msgid "Please wait while addons are updated"
 msgstr "부가 기능이 업데이트되는 동안 기다려 주세요"
 
-#: src/states_screens/addons_screen.cpp:520
-#: src/states_screens/main_menu_screen.cpp:624
+#: src/states_screens/addons_screen.cpp:523
+#: src/states_screens/main_menu_screen.cpp:620
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -3923,7 +3963,7 @@ msgstr "죄송하지만, 부가 기능 웹사이트에 연결하는 동안 오�
 #. I18N: track group name
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:143
-#: src/states_screens/kart_selection.cpp:316
+#: src/states_screens/kart_selection.cpp:315
 #: src/states_screens/tracks_and_gp_screen.cpp:150
 msgid "standard"
 msgstr "표준"
@@ -3932,8 +3972,8 @@ msgstr "표준"
 #: src/states_screens/arenas_screen.cpp:326
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:917
-#: src/states_screens/kart_selection.cpp:1568
+#: src/states_screens/kart_selection.cpp:935
+#: src/states_screens/kart_selection.cpp:1576
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "잠김 : 이전 도전들을 풀어서 더 많은 접근을 얻으세요!"
@@ -4235,7 +4275,7 @@ msgstr "모은 바나나"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:283
+#: src/states_screens/options/options_screen_device.cpp:275
 msgid "Skidding"
 msgstr "스키드하기"
 
@@ -4355,45 +4395,45 @@ msgstr "Wii 리모컨 추가"
 msgid "Add Keyboard Configuration"
 msgstr "키보드 구성 추가"
 
-#: src/states_screens/dialogs/addons_loading.cpp:111
+#: src/states_screens/dialogs/addons_loading.cpp:117
 msgid "Update"
 msgstr "업데이트"
 
-#: src/states_screens/dialogs/addons_loading.cpp:123
+#: src/states_screens/dialogs/addons_loading.cpp:129
 #, c-format
 msgid "Version: %d"
 msgstr "버전: %d"
 
-#: src/states_screens/dialogs/addons_loading.cpp:154
+#: src/states_screens/dialogs/addons_loading.cpp:160
 msgid "featured"
 msgstr "추천"
 
 #. I18N: File size of game assets or addons downloading
-#: src/states_screens/dialogs/addons_loading.cpp:174
+#: src/states_screens/dialogs/addons_loading.cpp:180
 #: src/states_screens/dialogs/addons_pack.cpp:173
 #: src/states_screens/dialogs/download_assets.cpp:102
 #, c-format
 msgid "Size: %s"
 msgstr "크기: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:286
+#: src/states_screens/dialogs/addons_loading.cpp:292
 #: src/states_screens/dialogs/addons_pack.cpp:185
 #: src/states_screens/dialogs/download_assets.cpp:180
 msgid "Sorry, downloading the add-on failed"
 msgstr "죄송하지만, 부가 기능을 다운로드하는 데 실패했습니다"
 
-#: src/states_screens/dialogs/addons_loading.cpp:362
+#: src/states_screens/dialogs/addons_loading.cpp:368
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "부가 기능 '%s'를 설치하는 데 문제가 있습니다."
 
-#: src/states_screens/dialogs/addons_loading.cpp:373
-#: src/states_screens/dialogs/addons_loading.cpp:422
+#: src/states_screens/dialogs/addons_loading.cpp:379
+#: src/states_screens/dialogs/addons_loading.cpp:428
 #: src/states_screens/dialogs/download_assets.cpp:245
 msgid "Try again"
 msgstr "다시 시도하세요"
 
-#: src/states_screens/dialogs/addons_loading.cpp:411
+#: src/states_screens/dialogs/addons_loading.cpp:417
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "부가 기능 '%s'를 제거하는 데 문제가 있습니다."
@@ -4412,12 +4452,12 @@ msgid "Current password invalid."
 msgstr "현재 비밀번호가 올바르지 않습니다."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:323
+#: src/states_screens/online/register_screen.cpp:324
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "비밀번호의 길이는 8자부터 30자까지 사이여야 합니다!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:307
+#: src/states_screens/online/register_screen.cpp:308
 msgid "Passwords don't match!"
 msgstr "비밀번호가 일치하지 않습니다!"
 
@@ -4427,7 +4467,7 @@ msgstr "비밀번호가 성공적으로 변경되었습니다."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:388
+#: src/states_screens/online/register_screen.cpp:389
 msgid "Validating info"
 msgstr "정보 검증 중"
 
@@ -4451,16 +4491,16 @@ msgstr "1024x768 또는 1280x720보다 작은 해장도는 지원되지 않습�
 #: src/states_screens/dialogs/custom_video_settings.cpp:64
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
-#: src/states_screens/online/create_server_screen.cpp:193
-#: src/states_screens/options/options_screen_video.cpp:225
-#: src/states_screens/options/options_screen_video.cpp:542
-#: src/states_screens/options/options_screen_video.cpp:613
+#: src/states_screens/online/create_server_screen.cpp:206
+#: src/states_screens/options/options_screen_video.cpp:226
+#: src/states_screens/options/options_screen_video.cpp:541
+#: src/states_screens/options/options_screen_video.cpp:612
 msgid "Disabled"
 msgstr "비활성화"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:544
+#: src/states_screens/options/options_screen_video.cpp:543
 msgid "Important only"
 msgstr "중요"
 
@@ -4470,7 +4510,7 @@ msgstr "중요"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:551
+#: src/states_screens/options/options_screen_video.cpp:550
 msgid "Low"
 msgstr "낮음"
 
@@ -4480,14 +4520,14 @@ msgstr "낮음"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:554
+#: src/states_screens/options/options_screen_video.cpp:553
 msgid "High"
 msgstr "높음"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:548
+#: src/states_screens/options/options_screen_video.cpp:547
 msgid "Very Low"
 msgstr "매우 낮음"
 
@@ -4543,7 +4583,7 @@ msgid "Version"
 msgstr "버전"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/dialogs/message_dialog.cpp:131
+#: src/states_screens/dialogs/message_dialog.cpp:130
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
 msgid "No"
@@ -4623,8 +4663,8 @@ msgid "Press any key..."
 msgstr ""
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
-#: src/states_screens/online/networking_lobby.cpp:239
-#: src/states_screens/online/networking_lobby.cpp:824
+#: src/states_screens/online/networking_lobby.cpp:240
+#: src/states_screens/online/networking_lobby.cpp:825
 msgid "Chat is disabled, enable in options menu."
 msgstr "채팅이 비활성화되어 있습니다, 옵션 메뉴에서 활성화하세요."
 
@@ -4703,13 +4743,13 @@ msgstr "AI 카트 수: %i"
 
 #. I18N: In the create server screen, show various battle mode available
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:158
-#: src/states_screens/online/create_server_screen.cpp:209
+#: src/states_screens/online/create_server_screen.cpp:222
 msgid "Battle mode"
 msgstr "배틀 모드"
 
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
-#: src/states_screens/online/create_server_screen.cpp:225
+#: src/states_screens/online/create_server_screen.cpp:238
 #: src/states_screens/track_info_screen.cpp:354
 msgid "Soccer game type"
 msgstr "축구 게임 유형"
@@ -4754,7 +4794,7 @@ msgid "Input device already exists."
 msgstr "입력 장치가 이미 존재합니다."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:147
-#: src/states_screens/online/online_screen.cpp:233
+#: src/states_screens/online/online_screen.cpp:234
 msgid "No player available for connecting to server."
 msgstr "서버에 연결 중인 사용 가능한 플레이어가 없습니다."
 
@@ -4821,7 +4861,7 @@ msgstr "투표 수행 중"
 
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:606
-#: src/states_screens/tracks_and_gp_screen.cpp:287
+#: src/states_screens/tracks_and_gp_screen.cpp:296
 msgid "Random Track"
 msgstr "랜덤 트랙"
 
@@ -4974,54 +5014,54 @@ msgstr "당신은 그랑프리에서 이겼습니다!"
 msgid "You completed the Grand Prix!"
 msgstr "당신은 그랑프리를 완료했습니다!"
 
-#: src/states_screens/kart_selection.cpp:893
-#: src/states_screens/kart_selection.cpp:1586
-msgid "Random Kart"
-msgstr "랜덤 카트"
-
-#: src/states_screens/kart_selection.cpp:912
-msgid "Locked"
-msgstr "잠김"
-
-#: src/states_screens/kart_selection.cpp:1015
+#: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:1020
-#: src/states_screens/online/networking_lobby.cpp:513
+#: src/states_screens/kart_selection.cpp:911
+#: src/states_screens/kart_selection.cpp:1594
+msgid "Random Kart"
+msgstr "랜덤 카트"
+
+#: src/states_screens/kart_selection.cpp:930
+msgid "Locked"
+msgstr "잠김"
+
+#: src/states_screens/kart_selection.cpp:1031
+#: src/states_screens/online/networking_lobby.cpp:514
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
 msgstr "모두:\n게임에 참가하려면 '선택' 버튼을 누르세요"
 
-#: src/states_screens/main_menu_screen.cpp:257
+#: src/states_screens/main_menu_screen.cpp:258
 msgid "Would you like to play the tutorial of the game?"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:560
+#: src/states_screens/main_menu_screen.cpp:556
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "당신은 인터넷 접속 없이 온라인으로 플레이할 수 없습니다. 온라인으로 플레이하려면, 옵션 메뉴에 가서, \"인터넷에 연결\"을 선택하세요."
 
-#: src/states_screens/main_menu_screen.cpp:575
+#: src/states_screens/main_menu_screen.cpp:571
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "당신은 인터넷 접속 없이 부가 기능을 다운로드할 수 없습니다. 부가 기능을 다운로드하려면, 옵션 메뉴에 가서, \"인터넷에 연결\"을 선택하세요."
 
-#: src/states_screens/main_menu_screen.cpp:583
+#: src/states_screens/main_menu_screen.cpp:579
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "당신은 인터넷 접속 없이 부가 기능을 다운로드할 수 없습니다. 부가 기능을 다운로드하려면, 옵션 메뉴에 가서, \"인터넷에 연결\"을 선택하세요.\n\n당신은 하지만 이미 다운로드된 부가 기능은 삭제할 수 있습니다."
 
-#: src/states_screens/main_menu_screen.cpp:619
+#: src/states_screens/main_menu_screen.cpp:615
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "부가 기능 모듈이 현재 옵션 화면에서 비활성화되어 있습니다"
 
-#: src/states_screens/main_menu_screen.cpp:631
+#: src/states_screens/main_menu_screen.cpp:627
 msgid "Please wait while the add-ons are loading"
 msgstr "부가 기능을 불러오는 동안 기다려 주세요"
 
@@ -5035,37 +5075,37 @@ msgid "%s's server"
 msgstr "%s의 서버"
 
 #. I18N: In the create server screen
-#: src/states_screens/online/create_server_screen.cpp:191
+#: src/states_screens/online/create_server_screen.cpp:204
 msgid "No. of grand prix track(s)"
 msgstr "그랑프리 트랙 수"
 
-#: src/states_screens/online/create_server_screen.cpp:274
+#: src/states_screens/online/create_server_screen.cpp:287
 msgid "Name has to be between 4 and 30 characters long!"
 msgstr "이름의 길이는 4자부터 30자까지 사이여야 합니다!"
 
-#: src/states_screens/online/create_server_screen.cpp:291
+#: src/states_screens/online/create_server_screen.cpp:304
 msgid "Incorrect characters in password!"
 msgstr "비밀번호에 잘못된 문자가 있습니다!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:185
+#: src/states_screens/online/networking_lobby.cpp:186
 msgid "Ready"
 msgstr "준비"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:188
+#: src/states_screens/online/networking_lobby.cpp:189
 msgid "Live join"
 msgstr "실시간 참가"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:193
+#: src/states_screens/online/networking_lobby.cpp:194
 msgid "Spectate"
 msgstr "관람"
 
-#: src/states_screens/online/networking_lobby.cpp:331
+#: src/states_screens/online/networking_lobby.cpp:332
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "대기실 (핑: %dms)"
@@ -5073,7 +5113,7 @@ msgstr "대기실 (핑: %dms)"
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:377
+#: src/states_screens/online/networking_lobby.cpp:378
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -5081,7 +5121,7 @@ msgstr "현재 게임(%s)이 끝날 때까지 기다려 주세요, 예상 남은
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:385
+#: src/states_screens/online/networking_lobby.cpp:386
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "현재 게임이 끝날 때까지 기다려 주세요, 예상 남은 시간: %s."
@@ -5089,31 +5129,31 @@ msgstr "현재 게임이 끝날 때까지 기다려 주세요, 예상 남은 시
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:397
+#: src/states_screens/online/networking_lobby.cpp:398
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr "현재 게임(%s)이 끝날 때까지 기다려 주세요, 예상 진행 상황: %s%."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:406
+#: src/states_screens/online/networking_lobby.cpp:407
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "현재 게임이 끝날 때까지 기다려 주세요, 예상 진행 상황: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:414
+#: src/states_screens/online/networking_lobby.cpp:415
 msgid "Please wait for the current game's end."
 msgstr "현재 게임이 끝날 때까지 기다려 주세요."
 
 #. I18N: In the networking lobby,
 #. tell user the command to install addon now
-#: src/states_screens/online/networking_lobby.cpp:428
+#: src/states_screens/online/networking_lobby.cpp:429
 #, c-format
 msgid "Send %s in chat box to install addon now."
 msgstr ""
 
-#: src/states_screens/online/networking_lobby.cpp:482
+#: src/states_screens/online/networking_lobby.cpp:483
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5121,7 +5161,7 @@ msgstr[0] "게임은 플레이어 %d명 이상이면 시작될 것입니다."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:496
+#: src/states_screens/online/networking_lobby.cpp:497
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5129,12 +5169,12 @@ msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
 msgstr[0] "%d초 뒤에, 또는 모두가 '준비' 버튼을 눌러 놓고 있으면 시작합니다."
 
-#: src/states_screens/online/networking_lobby.cpp:533
+#: src/states_screens/online/networking_lobby.cpp:534
 #, c-format
 msgid "Connecting to server %s"
 msgstr "서버 %s에 연결 중"
 
-#: src/states_screens/online/networking_lobby.cpp:538
+#: src/states_screens/online/networking_lobby.cpp:539
 msgid "Finding a quick play server"
 msgstr "빠른 플레이 서버를 찾는 중"
 
@@ -5186,23 +5226,23 @@ msgid "Offline"
 msgstr "오프라인"
 
 #. I18N: Shown to players when he is not is not logged in
-#: src/states_screens/online/online_screen.cpp:200
+#: src/states_screens/online/online_screen.cpp:201
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
 msgstr "당신은 전세계 네트워킹을 플레이하려면 로그인해야 합니다. 위의 당신의 사용자 이름을 클릭하세요."
 
-#: src/states_screens/online/online_screen.cpp:210
+#: src/states_screens/online/online_screen.cpp:211
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
 msgstr "당신은 인터넷 접속 없이 온라인으로 플레이할 수 없습니다. 온라인으로 플레이하려면, 옵션에 가서, '사용자 인터페이스' 탭을 선택하고, \"인터넷에 연결\"을 편집하세요."
 
-#: src/states_screens/online/online_screen.cpp:238
+#: src/states_screens/online/online_screen.cpp:239
 msgid "Enter the server address optionally followed by : and then port."
 msgstr ""
 
-#: src/states_screens/online/online_screen.cpp:250
+#: src/states_screens/online/online_screen.cpp:251
 #, c-format
 msgid "Invalid server address: %s."
 msgstr "잘못된 서버 주소: %s입니다."
@@ -5212,48 +5252,48 @@ msgstr "잘못된 서버 주소: %s입니다."
 msgid "Searching"
 msgstr "검색 중"
 
-#: src/states_screens/online/register_screen.cpp:132
+#: src/states_screens/online/register_screen.cpp:133
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "게임 끝내기"
 
-#: src/states_screens/online/register_screen.cpp:245
-#: src/states_screens/online/register_screen.cpp:252
+#: src/states_screens/online/register_screen.cpp:246
+#: src/states_screens/online/register_screen.cpp:253
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "플레이어 '%s'를 만들 수 없습니다."
 
-#: src/states_screens/online/register_screen.cpp:269
+#: src/states_screens/online/register_screen.cpp:270
 msgid "User name cannot be empty."
 msgstr "사용자 이름은 비울 수 없습니다."
 
-#: src/states_screens/online/register_screen.cpp:311
+#: src/states_screens/online/register_screen.cpp:312
 msgid "Emails don't match!"
 msgstr "이메일이 일치하지 않습니다!"
 
-#: src/states_screens/online/register_screen.cpp:315
+#: src/states_screens/online/register_screen.cpp:316
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "온라인 사용자 이름은 3자부터 30자까지 사이여야 합니다!"
 
-#: src/states_screens/online/register_screen.cpp:319
+#: src/states_screens/online/register_screen.cpp:320
 msgid "Online username must not start with a number!"
 msgstr "온라인 사용자 이름은 숫자로 시작해서는 안됩니다!"
 
-#: src/states_screens/online/register_screen.cpp:327
+#: src/states_screens/online/register_screen.cpp:328
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "이메일의 길이는 5자부터 254자까지 사이여야 합니다!"
 
-#: src/states_screens/online/register_screen.cpp:333
+#: src/states_screens/online/register_screen.cpp:334
 msgid "Email is invalid!"
 msgstr "이메일이 올바르지 않습니다!"
 
-#: src/states_screens/online/register_screen.cpp:396
+#: src/states_screens/online/register_screen.cpp:397
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "당신은 당신의 계정 활성화에 관한 추가 지침이 있는 이메일을 받을 것입니다. 참을성을 갖고 당신의 스팸 폴더를 확인해주세요."
 
-#: src/states_screens/online/register_screen.cpp:435
+#: src/states_screens/online/register_screen.cpp:436
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "인터넷 접속이 비활성화되어 있습니다, 옵션에서 이를 활성화해주세요"
 
@@ -5338,7 +5378,7 @@ msgid "Drive in reverse"
 msgstr "역방향으로 주행"
 
 #: src/states_screens/online/tracks_screen.cpp:592
-#: src/states_screens/tracks_and_gp_screen.cpp:273
+#: src/states_screens/tracks_and_gp_screen.cpp:282
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "잠김: 이전 도전들을 풀어서 더 많은 접근을 얻으세요!"
 
@@ -5351,117 +5391,117 @@ msgid "Key binding"
 msgstr "키 할당"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:108
-#: src/states_screens/options/options_screen_device.cpp:631
+#: src/states_screens/options/options_screen_device.cpp:101
+#: src/states_screens/options/options_screen_device.cpp:623
 msgid "Disable Device"
 msgstr "장치 비활성화"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:110
-#: src/states_screens/options/options_screen_device.cpp:632
+#: src/states_screens/options/options_screen_device.cpp:103
+#: src/states_screens/options/options_screen_device.cpp:624
 msgid "Enable Device"
 msgstr "장치 활성화"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:125
-#: src/states_screens/options/options_screen_device.cpp:637
+#: src/states_screens/options/options_screen_device.cpp:118
+#: src/states_screens/options/options_screen_device.cpp:629
 msgid "Enable Configuration"
 msgstr "구성 활성화"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:175
+#: src/states_screens/options/options_screen_device.cpp:167
 msgid "Game Keys"
 msgstr "게임 키"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:189
+#: src/states_screens/options/options_screen_device.cpp:181
 msgid "Menu Keys"
 msgstr "메뉴 키"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:265
+#: src/states_screens/options/options_screen_device.cpp:257
 msgid "Steer Left"
 msgstr "좌회전"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:268
+#: src/states_screens/options/options_screen_device.cpp:260
 msgid "Steer Right"
 msgstr "우회전"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:271
+#: src/states_screens/options/options_screen_device.cpp:263
 msgid "Accelerate"
 msgstr "가속"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:274
+#: src/states_screens/options/options_screen_device.cpp:266
 msgid "Brake / Reverse"
 msgstr ""
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:277
+#: src/states_screens/options/options_screen_device.cpp:269
 msgid "Fire"
 msgstr "발사"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:280
+#: src/states_screens/options/options_screen_device.cpp:272
 msgid "Nitro"
 msgstr "니트로"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:286
+#: src/states_screens/options/options_screen_device.cpp:278
 msgid "Look Back"
 msgstr "뒤를 돌아보기"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:289
+#: src/states_screens/options/options_screen_device.cpp:281
 msgid "Rescue"
 msgstr "구출"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:292
+#: src/states_screens/options/options_screen_device.cpp:284
 msgid "Pause Game"
 msgstr "게임 일시 정지"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:297
+#: src/states_screens/options/options_screen_device.cpp:289
 msgid "Up"
 msgstr "위"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:300
+#: src/states_screens/options/options_screen_device.cpp:292
 msgid "Down"
 msgstr "아래"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:303
+#: src/states_screens/options/options_screen_device.cpp:295
 msgid "Left"
 msgstr "왼쪽"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:306
+#: src/states_screens/options/options_screen_device.cpp:298
 msgid "Right"
 msgstr "오른쪽"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:309
+#: src/states_screens/options/options_screen_device.cpp:301
 msgid "Select"
 msgstr "선택"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:312
+#: src/states_screens/options/options_screen_device.cpp:304
 msgid "Cancel/Back"
 msgstr "취소/뒤로"
 
-#: src/states_screens/options/options_screen_device.cpp:407
+#: src/states_screens/options/options_screen_device.cpp:399
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* 파란색 항목은 다른 구성과의 충돌을 뜻합니다"
 
-#: src/states_screens/options/options_screen_device.cpp:412
+#: src/states_screens/options/options_screen_device.cpp:404
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* 빨간색 항목은 현재 구성과의 충돌을 뜻합니다"
 
-#: src/states_screens/options/options_screen_device.cpp:518
+#: src/states_screens/options/options_screen_device.cpp:510
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5469,17 +5509,17 @@ msgid ""
 msgstr "경고: 'Shift'는 권장하지 않는 키입니다. 'Shift'가 눌러져 있을 때, 대소문자가 다른 문자가 포함된 모든 키는 작동을 멈출 것입니다."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:617
+#: src/states_screens/options/options_screen_device.cpp:609
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "이 구성을 영구적으로 삭제하시겠습니까?"
 
-#: src/states_screens/options/options_screen_device.cpp:645
+#: src/states_screens/options/options_screen_device.cpp:637
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr ""
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
-#: src/states_screens/options/options_screen_general.cpp:100
+#: src/states_screens/options/options_screen_general.cpp:101
 msgid ""
 "In multiplayer mode, players can select handicapped\n"
 "(more difficult) profiles on the kart selection screen"
@@ -5487,29 +5527,25 @@ msgstr "멀티플레이어 모드에서, 플레이어는 핸디캡이 적용된\
 
 #. I18N: For mobile version for STK, install the full game assets which
 #. will download from stk server
-#: src/states_screens/options/options_screen_general.cpp:116
+#: src/states_screens/options/options_screen_general.cpp:117
 msgid "Install full game assets"
 msgstr "전체 게임 자산을 설치"
 
-#: src/states_screens/options/options_screen_general.cpp:234
+#: src/states_screens/options/options_screen_general.cpp:236
 msgid "Are you sure to uninstall full game assets?"
 msgstr "정말로 전체 게임 자산을 제거하시겠습니까?"
 
-#: src/states_screens/options/options_screen_input.cpp:107
-msgid "Gamepad"
-msgstr "게임패드"
-
-#: src/states_screens/options/options_screen_input.cpp:124
+#: src/states_screens/options/options_screen_input.cpp:117
 #, c-format
 msgid "Keyboard %i"
 msgstr "키보드 %i"
 
-#: src/states_screens/options/options_screen_input.cpp:175
+#: src/states_screens/options/options_screen_input.cpp:168
 msgid "Touch Device"
 msgstr "터치 장치"
 
 #. I18N: In the input configuration screen, help for touch device
-#: src/states_screens/options/options_screen_input.cpp:212
+#: src/states_screens/options/options_screen_input.cpp:205
 msgid "Tap on a device to configure it"
 msgstr ""
 
@@ -5519,61 +5555,74 @@ msgid "System Language"
 msgstr "시스템 언어"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:87
+#: src/states_screens/options/options_screen_ui.cpp:91
 msgid "In the bottom-left"
 msgstr "하단 왼쪽에"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:89
+#: src/states_screens/options/options_screen_ui.cpp:93
 msgid "On the right side"
 msgstr "오른쪽에서"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:91
+#: src/states_screens/options/options_screen_ui.cpp:95
 msgid "Hidden"
 msgstr "숨겨짐"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:93
+#: src/states_screens/options/options_screen_ui.cpp:97
 msgid "Centered"
 msgstr ""
 
 #. I18N: In the UI options, splitscreen_method in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:111
+#: src/states_screens/options/options_screen_ui.cpp:115
 msgid "Vertical"
 msgstr ""
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:113
+#: src/states_screens/options/options_screen_ui.cpp:117
 msgid "Horizontal"
 msgstr ""
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:124
+#: src/states_screens/options/options_screen_ui.cpp:128
 msgid "Very small"
 msgstr "매우 작게"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:126
+#: src/states_screens/options/options_screen_ui.cpp:130
 msgid "Small"
 msgstr "작게"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:128
+#: src/states_screens/options/options_screen_ui.cpp:132
 msgid "Medium"
 msgstr "중간"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:130
+#: src/states_screens/options/options_screen_ui.cpp:134
 msgid "Large"
 msgstr "크게"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:132
+#: src/states_screens/options/options_screen_ui.cpp:136
 msgid "Very large"
 msgstr "매우 크게"
 
-#: src/states_screens/options/options_screen_ui.cpp:448
+#. I18N: custom camera setting
+#. I18N: custom video settings
+#: src/states_screens/options/options_screen_ui.cpp:357
+#: src/states_screens/options/options_screen_video.cpp:489
+#: src/states_screens/options/options_screen_video.cpp:521
+msgid "Custom"
+msgstr "사용자 설정"
+
+#. I18N: In the UI options, splitscreen_method position in the race UI
+#: src/states_screens/options/options_screen_ui.cpp:361
+msgid "Drone chase"
+msgstr ""
+
+#: src/states_screens/options/options_screen_ui.cpp:529
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5583,126 +5632,110 @@ msgid ""
 msgstr ""
 
 #. I18N: In the video options, maximum frame per second
-#: src/states_screens/options/options_screen_video.cpp:219
+#: src/states_screens/options/options_screen_video.cpp:220
 msgid "Maximum FPS"
 msgstr ""
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
-#: src/states_screens/options/options_screen_video.cpp:227
+#: src/states_screens/options/options_screen_video.cpp:228
 msgid "Full"
-msgstr ""
-
-#. I18N: In the video options, half vertical sync (usually 30fps)
-#: src/states_screens/options/options_screen_video.cpp:229
-msgid "Half"
 msgstr ""
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
-#: src/states_screens/options/options_screen_video.cpp:233
+#: src/states_screens/options/options_screen_video.cpp:234
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
 msgstr ""
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:236
+#: src/states_screens/options/options_screen_video.cpp:237
 msgid "Full: one frame per monitor refresh"
 msgstr ""
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:238
-msgid "Half: one frame every two monitor refreshes"
-msgstr ""
-
-#. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:240
+#: src/states_screens/options/options_screen_video.cpp:239
 msgid "Vsync will not work if your drivers don't support it."
 msgstr ""
 
-#. I18N: custom video settings
-#: src/states_screens/options/options_screen_video.cpp:490
-#: src/states_screens/options/options_screen_video.cpp:522
-msgid "Custom"
-msgstr "사용자 설정"
-
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:557
+#: src/states_screens/options/options_screen_video.cpp:556
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "입자 효과: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:563
+#: src/states_screens/options/options_screen_video.cpp:562
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "움직이는 캐릭터: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:566
+#: src/states_screens/options/options_screen_video.cpp:565
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "동적 광원: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:569
+#: src/states_screens/options/options_screen_video.cpp:568
 #, c-format
 msgid "Light scattering: %s"
 msgstr "광산란: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:572
+#: src/states_screens/options/options_screen_video.cpp:571
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "앤티 앨리어싱: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:575
+#: src/states_screens/options/options_screen_video.cpp:574
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "주변 폐색: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:579
+#: src/states_screens/options/options_screen_video.cpp:578
 #, c-format
 msgid "Shadows: %s"
 msgstr "그림자: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:581
+#: src/states_screens/options/options_screen_video.cpp:580
 #, c-format
 msgid "Shadows: %i"
 msgstr "그림자: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:584
+#: src/states_screens/options/options_screen_video.cpp:583
 #, c-format
 msgid "Bloom: %s"
 msgstr "섬광: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:588
+#: src/states_screens/options/options_screen_video.cpp:587
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "광선 (외곽선): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:592
+#: src/states_screens/options/options_screen_video.cpp:591
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "라이트 섀프트 (신의 살빛): %s"
 
-#: src/states_screens/options/options_screen_video.cpp:597
+#: src/states_screens/options/options_screen_video.cpp:596
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "렌더링된 이미지 품질: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:616
+#: src/states_screens/options/options_screen_video.cpp:615
 #, c-format
 msgid "Motion blur: %s"
 msgstr "모션 블러: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:620
+#: src/states_screens/options/options_screen_video.cpp:619
 #, c-format
 msgid "Depth of field: %s"
 msgstr "피사계 심도: %s"
@@ -5961,16 +5994,16 @@ msgstr "(비어 있음)"
 msgid "all"
 msgstr "모두"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:199
+#: src/states_screens/tracks_and_gp_screen.cpp:203
 msgid "Locked!"
 msgstr "잠겼습니다!"
 
-#: src/utils/string_utils.cpp:1409
+#: src/utils/string_utils.cpp:1413
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/utils/string_utils.cpp:1416 src/utils/string_utils.cpp:1420
+#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
