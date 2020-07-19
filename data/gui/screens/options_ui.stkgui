@@ -32,60 +32,39 @@
 
                 <!-- ************ SKIN CHOICE ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <div layout="vertical-row" width="10f" height="fit">
-                        <spinner id="skinchoice" width="100%" align="center" />
-                    </div>
-                    <div layout="vertical-row" proportion="1" height="100%">
-                        <label height="100%" I18N="In the ui settings" text="Skin" align="left"/>
-                    </div>
+                    <spinner id="skinchoice" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Skin" align="left"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <div layout="vertical-row" width="10f" height="fit">
-                        <spinner id="minimap" width="100%" align="center" />
-                    </div>
-                    <div layout="vertical-row" proportion="1" height="100%">
-                        <label height="100%" I18N="In the ui settings" text="Minimap" align="left"/>
-                    </div>
+                    <spinner id="minimap" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Minimap" align="left"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
-                    <div layout="vertical-row" width="10f" height="fit">
-                        <spinner id="splitscreen_method" width="100%" align="center" />
-                    </div>
-                    <div layout="vertical-row" proportion="1" height="100%">
-                        <label height="100%" I18N="In the ui settings" text="Splitscreen Multiplayer layout" align="left"/>
-                    </div>
+                    <spinner id="splitscreen_method" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Splitscreen Multiplayer layout" align="left"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <div layout="vertical-row" width="10f" height="fit">
-                        <gauge id="font_size" width="100%" align="center" />
-                    </div>
-                    <div layout="vertical-row" proportion="1" height="100%">
-                        <label height="100%" I18N="In the ui settings" text="Font size" align="left"/>
-                    </div>
+                    <gauge id="font_size" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Font size" align="left"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
-                    <div layout="vertical-row" width="10f" height="fit">
-                        <spinner id="camera_preset" width="100%" align="center" />
-                    </div>
-                    <div layout="vertical-row" proportion="1" height="100%">
-                        <label height="100%" I18N="In the ui settings" text="Camera" align="left"/>
-                    </div>
-                    <div layout="vertical-row" proportion="1" height="100%" id="outer_box" >
-                        <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
-                    </div>
+                    <spinner id="camera_preset" width="10f" align="center" />
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Camera" align="left"/>
+                    <spacer width="2%" height="100%" />
+                    <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
