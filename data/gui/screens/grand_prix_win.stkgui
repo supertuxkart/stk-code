@@ -2,9 +2,9 @@
 <stkgui>
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
         <spacer proportion="1"/>
-        <button id="save"     width="450" align="center" text="Save Grand Prix"/>
+        <button id="save"     width="10f" align="center" text="Save Grand Prix"/>
         <spacer height="20"/>
-        <button id="continue" width="450" align="center" text="Continue"/>
+        <button id="continue" width="10f" align="center" text="Continue"/>
     </div>
 </stkgui>
 
