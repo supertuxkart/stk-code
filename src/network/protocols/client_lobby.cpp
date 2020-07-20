@@ -764,6 +764,7 @@ void ClientLobby::handleServerInfo(Event* event)
     if (!GUIEngine::isNoGraphics())
         NetworkingLobby::getInstance()->toggleServerConfigButton(server_config);
     m_server_live_joinable = data.getUInt8() == 1;
+    NetworkConfig::get()->setTuxHitboxAddon(m_server_live_joinable);
 }   // handleServerInfo
 
 //-----------------------------------------------------------------------------

@@ -234,7 +234,7 @@ namespace ServerConfig
     SERVER_CFG_PREFIX BoolServerConfigParam m_team_choosing
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "team-choosing",
         "Enable team choosing in lobby in team game (soccer and CTF). "
-        "If owner-less is enabled and live-players is not enabled, than this "
+        "If owner-less is enabled and live-spectate is not enabled, than this "
         "option is always disabled."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_strict_players
@@ -263,7 +263,8 @@ namespace ServerConfig
         "If true, players can live join or spectate the in-progress game. "
         "Currently live joining is only available if the current game mode "
         "used in server is FFA, CTF or soccer, also official-karts-threshold "
-        "will be made 1.0."));
+        "will be made 1.0. If false addon karts will use their original "
+        "hitbox other than tux, all players having it restriction applies."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timeout",
@@ -307,12 +308,12 @@ namespace ServerConfig
     SERVER_CFG_PREFIX IntServerConfigParam m_max_ping
         SERVER_CFG_DEFAULT(IntServerConfigParam(300, "max-ping",
         "Maximum ping allowed for a player (in ms), it's recommended to use "
-        "default value if live-players is on."));
+        "default value if live-spectate is on."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_jitter_tolerance
         SERVER_CFG_DEFAULT(IntServerConfigParam(100, "jitter-tolerance",
         "Tolerance of jitter in network allowed (in ms), it's recommended to "
-        "use default value if live-players is on."));
+        "use default value if live-spectate is on."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_kick_high_ping_players
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false,

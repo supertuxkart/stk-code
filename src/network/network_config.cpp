@@ -153,6 +153,7 @@ NetworkConfig::NetworkConfig()
     m_state_frequency = 10;
     m_nat64_prefix_data.fill(-1);
     m_num_fixed_ai = 0;
+    m_tux_hitbox_addon = false;
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------

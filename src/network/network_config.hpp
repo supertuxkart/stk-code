@@ -92,6 +92,9 @@ private:
      *  AI. (usually used together with ai-handling in server config) */
     bool m_network_ai_instance;
 
+    /** When live join is disabled addon kart will use their real hitbox */
+    bool m_tux_hitbox_addon;
+
     /** No. of fixed AI in all-in-one graphical client server, the player
      *  connecting with 127.* or ::1/128 will be in charged of controlling the
      *  AI. */
@@ -308,6 +311,10 @@ public:
     // ------------------------------------------------------------------------
     static const std::vector<std::pair<std::string, int> >&
                                                         getStunList(bool ipv4);
+    // ------------------------------------------------------------------------
+    void setTuxHitboxAddon(bool val)              { m_tux_hitbox_addon = val; }
+    // ------------------------------------------------------------------------
+    bool useTuxHitboxAddon() const               { return m_tux_hitbox_addon; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

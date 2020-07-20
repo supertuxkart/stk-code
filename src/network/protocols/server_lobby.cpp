@@ -582,7 +582,10 @@ void ServerLobby::updateAddons()
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     if (all_k.size() >= 65536)
         all_k.resize(65535);
-    m_available_kts.first = m_official_kts.first;
+    if (ServerConfig::m_live_players)
+        m_available_kts.first = m_official_kts.first;
+    else
+        m_available_kts.first = { all_k.begin(), all_k.end() };
 }   // updateAddons
 
 //-----------------------------------------------------------------------------
@@ -700,7 +703,11 @@ void ServerLobby::setup()
     auto all_k = kart_properties_manager->getAllAvailableKarts();
     if (all_k.size() >= 65536)
         all_k.resize(65535);
-    m_available_kts.first = m_official_kts.first;
+    if (ServerConfig::m_live_players)
+        m_available_kts.first = m_official_kts.first;
+    else
+        m_available_kts.first = { all_k.begin(), all_k.end() };
+    NetworkConfig::get()->setTuxHitboxAddon(ServerConfig::m_live_players);
     updateTracksForMode();
 
     m_server_has_loaded_world.store(false);
