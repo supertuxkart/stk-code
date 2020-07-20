@@ -11,7 +11,8 @@
 ; You will then need to make an icon, you can use:
 ; http://tools.dynamicdrive.com/favicon/ to convert a png to an icon.
 ; Once you have made an icon put it in the supertuxkart dir and call it
-; icon.ico. You will need to do the same for install.ico nd uninstall.ico
+; supertuxkart.ico. You will need to do the same for
+; supertuxkart-install.ico and supertuxkart-uninstall.ico
 ; Once there done then all you need to do is compile with NSIS.
 
 ;--------------------------------
@@ -63,8 +64,8 @@
   BrandingText "${APPNAMEANDVERSION} Installer"
 
   ;Set the icon
-  !define MUI_ICON "install.ico"
-  !define MUI_UNICON "uninstall.ico"
+  !define MUI_ICON "supertuxkart-install.ico"
+  !define MUI_UNICON "supertuxkart-uninstall.ico"
   !define MUI_HEADERIMAGE	
   !define MUI_WELCOMEFINISHPAGE_BITMAP "stk_installer.bmp"
   !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
@@ -225,8 +226,8 @@ Section "Install" SecMain
     ;Create shortcuts
     SetShellVarContext all
     CreateDirectory "$SMPROGRAMS\$STARTMENU_FOLDER"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall ${APPNAMEANDVERSION}.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\uninstall.ico"
-    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\${APPNAMEANDVERSION}.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\icon.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\Uninstall ${APPNAMEANDVERSION}.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\supertuxkart-uninstall.ico"
+    CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\${APPNAMEANDVERSION}.lnk" "$INSTDIR\supertuxkart.exe" "" "$INSTDIR\supertuxkart.ico"
     !ifdef EDITOR_PATH
       CreateShortCut "$SMPROGRAMS\$STARTMENU_FOLDER\supertuxkart-editor (beta).lnk" "$INSTDIR\supertuxkart-editor.exe" "" "$INSTDIR\supertuxkart-editor.ico"
     !endif
@@ -240,7 +241,7 @@ Section "Install" SecMain
                  "DisplayName" "${APPNAMEANDVERSION} - ${DESCRIPTION}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "Publisher" "${APPNAME}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
-  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayIcon" "$\"$INSTDIR\icon.ico$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayIcon" "$\"$INSTDIR\supertuxkart.ico$\""
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "HelpLink" "$\"${HELPURL}$\""
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLUpdateInfo" "$\"${UPDATEURL}$\""
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLInfoAbout" "$\"${ABOUTURL}$\""
@@ -278,8 +279,7 @@ Section "Uninstall" redist
   RMDir /r /REBOOTOK $INSTDIR\prerequisites
 
   DELETE /REBOOTOK "$INSTDIR\glew32.dll"
-  DELETE /REBOOTOK "$INSTDIR\install.ico"
-  DELETE /REBOOTOK "$INSTDIR\icon.ico"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart-install.ico"
   DELETE /REBOOTOK "$INSTDIR\Irrlicht.dll"
   DELETE /REBOOTOK "$INSTDIR\libcurl.dll"
   DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
@@ -298,7 +298,7 @@ Section "Uninstall" redist
   DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.exe"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.ico"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.pdb"
-  DELETE /REBOOTOK "$INSTDIR\uninstall.ico"
+  DELETE /REBOOTOK "$INSTDIR\supertuxkart-uninstall.ico"
   DELETE /REBOOTOK "$INSTDIR\libvorbis.dll"
   DELETE /REBOOTOK "$INSTDIR\libvorbisenc.dll"
   DELETE /REBOOTOK "$INSTDIR\libvorbisfile.dll"
