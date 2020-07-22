@@ -5,7 +5,7 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.1.1
+## SuperTuxKart 1.2
 
 ### Networking
 * Add support for IPv6 LAN server, by Benau
@@ -16,11 +16,14 @@ For similar reasons, and because some features are vastly more complex than othe
 * Add team chat for team games, by Benau
 * Show a message once a goal is made in soccer, by riso
 * Add camera settings in option screen, by luffah
+* More spectator camera in online spectate, by luffah
 * Always show times in ms, by Fouks
 
 ### General
 * Use SDL2 for window creation which allows better gamepad support, by Benau
 * Haiku support, by AlwaysLivid
+* Resizable window in game, by Benau
+* Make addon icons downloading on demand, by Benau
 
 ### Mobile
 * Improved tutorial, by CodedOre
