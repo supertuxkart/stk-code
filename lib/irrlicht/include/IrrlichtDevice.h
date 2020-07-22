@@ -314,7 +314,8 @@ namespace irr
 		virtual s32 getBottomPadding() { return 0; }
 		virtual s32 getLeftPadding() { return 0; }
 		virtual s32 getRightPadding() { return 0; }
-		virtual f32 getNativeScale() const { return 1.0f; }
+		virtual f32 getNativeScaleX() const { return 1.0f; }
+		virtual f32 getNativeScaleY() const { return 1.0f; }
 		virtual void setWindowMinimumSize(u32 width, u32 height) {}
 		virtual void resetPaused() {}
 		virtual void resetUnpaused() {}

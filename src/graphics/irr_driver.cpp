@@ -589,24 +589,6 @@ void IrrDriver::initDevice()
     }
 #endif
 
-#ifdef IOS_STK
-    // After real device is created reload video mode list with native scale
-    video::IVideoModeList* modes = m_device->getVideoModeList();
-    if (UserConfigParams::m_fullscreen)
-    {
-        const core::dimension2d<u32> ssize = modes->getDesktopResolution();
-        if (ssize.Width < 1 || ssize.Height < 1)
-        {
-            Log::warn("irr_driver", "Unknown desktop resolution.");
-        }
-        UserConfigParams::m_width = ssize.Width;
-        UserConfigParams::m_height = ssize.Height;
-        m_modes.clear();
-        VideoMode mode(UserConfigParams::m_width, UserConfigParams::m_height);
-        m_modes.push_back(mode);
-    }
-#endif
-
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();

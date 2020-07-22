@@ -1382,13 +1382,12 @@ void CGUIEditBox::calculateScrollPos()
     rect.w = 1;
     rect.h =
         CurrentTextRect.LowerRightCorner.Y - CurrentTextRect.UpperLeftCorner.Y;
-    float inverse_scale = 1.0f;
-    if (irr_driver->getDevice()->getNativeScale() > 0.0f)
-        inverse_scale = 1.0f / irr_driver->getDevice()->getNativeScale();
-    rect.x *= inverse_scale;
-    rect.y *= inverse_scale;
-    rect.w *= inverse_scale;
-    rect.h *= inverse_scale;
+    float inverse_scale_x = 1.0f / irr_driver->getDevice()->getNativeScaleX();
+    float inverse_scale_y = 1.0f / irr_driver->getDevice()->getNativeScaleY();
+    rect.x *= inverse_scale_x;
+    rect.y *= inverse_scale_y;
+    rect.w *= inverse_scale_x;
+    rect.h *= inverse_scale_y;
     SDL_SetTextInputRect(&rect);
 #endif
 

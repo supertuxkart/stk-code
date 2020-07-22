@@ -35,9 +35,8 @@ void irr::CIrrDeviceiOS::debugPrint(const char* line)
     NSLog(@"%@", ns);
 }
 
-extern "C" void init_objc(SDL_SysWMinfo* info, float* ns, float* top, float* bottom, float* left, float* right)
+extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right)
 {
-    *ns = info->info.uikit.window.screen.nativeScale;
     if (@available(iOS 11.0, *))
     {
         *top = info->info.uikit.window.safeAreaInsets.top,

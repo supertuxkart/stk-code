@@ -106,7 +106,7 @@ namespace irr
 		//! Get the device type
 		virtual E_DEVICE_TYPE getType() const
 		{
-				return EIDT_SDL;
+			return EIDT_SDL;
 		}
 
 		SDL_Window* getWindow() const { return Window; }
@@ -115,25 +115,26 @@ namespace irr
 
 		virtual s32 getTopPadding()
 		{
-			return TopPadding * NativeScale;
+			return TopPadding * getNativeScaleY();
 		}
 
 		virtual s32 getBottomPadding()
 		{
-			return BottomPadding * NativeScale;
+			return BottomPadding * getNativeScaleY();
 		}
 
 		virtual s32 getLeftPadding()
 		{
-			return LeftPadding * NativeScale;
+			return LeftPadding * getNativeScaleX();
 		}
 
 		virtual s32 getRightPadding()
 		{
-			return RightPadding * NativeScale;
+			return RightPadding * getNativeScaleX();
 		}
 
-		virtual f32 getNativeScale() const { return NativeScale; }
+		virtual f32 getNativeScaleX() const;
+		virtual f32 getNativeScaleY() const;
 
 		virtual bool hasOnScreenKeyboard() const;
 
@@ -255,7 +256,6 @@ namespace irr
 		SDL_Window* Window;
 		SDL_GLContext Context;
 
-		f32 NativeScale;
 		s32 MouseX, MouseY;
 		u32 MouseButtonStates;
 
