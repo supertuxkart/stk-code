@@ -29,11 +29,11 @@
 
   ; Version information
   ; TOOD get these from the source code directly
-  !define VERSION_MAJOR 0
-  !define VERSION_MINOR 10
+  !define VERSION_MAJOR 1
+  !define VERSION_MINOR 2
   !define VERSION_REVISION 0
   ; Empty means stable, could be -git, -rc1
-  !define VERSION_BUILD "-git"
+  !define VERSION_BUILD ""
 
   ;Name and file
   !define APPNAME "SuperTuxKart"
@@ -284,7 +284,10 @@ Section "Uninstall" redist
   DELETE /REBOOTOK "$INSTDIR\libvorbis-0.dll"
   DELETE /REBOOTOK "$INSTDIR\libvorbisenc-2.dll"
   DELETE /REBOOTOK "$INSTDIR\libvorbisfile-3.dll"
+  DELETE /REBOOTOK "$INSTDIR\libvpx.dll"
   DELETE /REBOOTOK "$INSTDIR\OpenAL32.dll"
+  DELETE /REBOOTOK "$INSTDIR\SDL2.dll"
+  DELETE /REBOOTOK "$INSTDIR\SDL2.pdb"
   DELETE /REBOOTOK "$INSTDIR\physfs.dll"
   DELETE /REBOOTOK "$INSTDIR\ssleay32.dll"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.exe"
