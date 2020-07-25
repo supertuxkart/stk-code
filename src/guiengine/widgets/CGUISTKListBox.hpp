@@ -171,6 +171,7 @@ namespace irr
             virtual void setDrawBackground(bool draw);
 
             void setAlternatingDarkness(bool val) { m_alternating_darkness = val; }
+            gui::IGUIScrollBar* getScrollBar() const { return ScrollBar; }
     private:
 
             void recalculateItemHeight();

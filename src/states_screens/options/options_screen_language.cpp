@@ -155,6 +155,9 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
     else if (name == "language")
     {
         ListWidget* list_widget = getWidget<ListWidget>("language");
+        irr::gui::CGUISTKListBox* box =
+            list_widget->getIrrlichtElement<irr::gui::CGUISTKListBox>();
+        int old_pos = box->getScrollBar()->getPos();
         std::string selection = list_widget->getSelectionInternalName();
 
         delete translations;
@@ -190,6 +193,11 @@ void OptionsScreenLanguage::eventCallback(Widget* widget, const std::string& nam
         user_config->saveConfig();
 
         OptionsScreenLanguage::getInstance()->push();
+        // Menu is deleted so we need a new screen instance
+        OptionsScreenLanguage* os = OptionsScreenLanguage::getInstance();
+        list_widget = os->getWidget<ListWidget>("language");
+        box = list_widget->getIrrlichtElement<irr::gui::CGUISTKListBox>();
+        box->getScrollBar()->setPos(old_pos);
         // Update tips for new translation
         TipsManager::destroy();
         TipsManager::create();
