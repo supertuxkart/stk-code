@@ -121,8 +121,6 @@ void RegisterScreen::init()
     onDialogClose();
     makeEntryFieldsVisible();
 
-    local_username->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    
     // The behaviour of the screen is slightly different at startup, i.e.
     // when it is the first screen: cancel will exit the game, and in
     // this case no 'back' error should be shown.
