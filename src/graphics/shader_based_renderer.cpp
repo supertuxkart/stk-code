@@ -592,6 +592,7 @@ void ShaderBasedRenderer::renderPostProcessing(Camera * const camera,
 // ----------------------------------------------------------------------------
 ShaderBasedRenderer::ShaderBasedRenderer()
 {
+    m_dump_rtt              = false;
     m_rtts                  = NULL;
     m_skybox                = NULL;
     m_spherical_harmonics   = new SphericalHarmonics(irr_driver->getAmbientLight().toSColor());
@@ -871,6 +872,49 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
     glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);
+    if (m_dump_rtt)
+    {
+        m_dump_rtt = false;
+#ifndef USE_GLES2
+        const unsigned width = m_rtts->getWidth();
+        const unsigned height = m_rtts->getHeight();
+        uint8_t* pixels = new uint8_t[width * height * 4]();
+        GLint tmp_texture;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmp_texture);
+        glBindTexture(GL_TEXTURE_2D, m_rtts->getRenderTarget(RTT_COLOR));
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+        const int pitch = width * 4;
+        uint8_t* fbi = pixels;
+        uint8_t* p2 = fbi + (height - 1) * pitch;
+        uint8_t* tmp_buf = new uint8_t[pitch];
+        for (unsigned i = 0; i < height; i += 2)
+        {
+            memcpy(tmp_buf, fbi, pitch);
+            memcpy(fbi, p2, pitch);
+            memcpy(p2, tmp_buf, pitch);
+            fbi += pitch;
+            p2 -= pitch;
+        }
+        if (CVS->isDeferredEnabled())
+        {
+            for (unsigned int i = 0; i < width * height; i++)
+            {
+                pixels[i * 4] = SP::linearToSrgb(pixels[i * 4] / 255.f);
+                pixels[i * 4 + 1] = SP::linearToSrgb(pixels[i * 4 + 1] / 255.f);
+                pixels[i * 4 + 2] = SP::linearToSrgb(pixels[i * 4 + 2] / 255.f);
+                pixels[i * 4 + 3] = SP::linearToSrgb(pixels[i * 4 + 3] / 255.f);
+            }
+        }
+        delete [] tmp_buf;
+        glBindTexture(GL_TEXTURE_2D, tmp_texture);
+        core::dimension2d<u32> size(width, height);
+        video::IImage* image = irr_driver->getVideoDriver()
+            ->createImageFromData(video::ECF_A8R8G8B8, size, pixels,
+            true/*ownForeignMemory*/);
+        irr_driver->getVideoDriver()->writeImageToFile(image, "rtt.png");
+        image->drop();
+#endif
+    }
 
 } //renderToTexture
 

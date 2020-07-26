@@ -136,6 +136,12 @@ GLuint g_skinning_buf;
 // ----------------------------------------------------------------------------
 unsigned g_skinning_size;
 // ----------------------------------------------------------------------------
+ShaderBasedRenderer* getRenderer()
+{
+    return g_stk_sbr;
+}   // getRenderer
+
+// ----------------------------------------------------------------------------
 void displaceUniformAssigner(SP::SPUniformAssigner* ua)
 {
     static std::array<float, 4> g_direction = {{ 0, 0, 0, 0 }};

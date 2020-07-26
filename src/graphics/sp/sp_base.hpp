@@ -208,7 +208,8 @@ inline uint8_t linearToSrgb(float color_linear)
     }
     return uint8_t(irr::core::clamp(int(color_linear * 255.0f), 0, 255));
 }
-
+// ----------------------------------------------------------------------------
+ShaderBasedRenderer* getRenderer();
 }
 
 
