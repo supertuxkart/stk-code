@@ -1448,6 +1448,9 @@ void RaceResultGUI::displayCTFResults()
                 video::SColor(255, 255, 0, 0) : color), true, false);
             irr::video::ITexture* scorer_icon = NULL;
             const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
+            // For addon kart online
+            if (!kp)
+                kp = kart_properties_manager->getKart("tux");
             if (kp)
                 scorer_icon = kp->getIconMaterial()->getTexture();
             if (scorer_icon)
@@ -1506,6 +1509,9 @@ void RaceResultGUI::displayCTFResults()
                 video::SColor(255, 255, 0, 0) : color), true, false);
             irr::video::ITexture* scorer_icon = NULL;
             const KartProperties* kp = kart_properties_manager->getKart(scorers.at(i).m_kart);
+            // For addon kart online
+            if (!kp)
+                kp = kart_properties_manager->getKart("tux");
             if (kp)
                 scorer_icon = kp->getIconMaterial()->getTexture();
             if (scorer_icon)
