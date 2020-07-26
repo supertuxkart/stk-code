@@ -655,7 +655,7 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
     // May happen if this message is added when spectate started
     if (time > 3.0f)
         time = 3.0f;
-    if (m_race_gui)
+    if (m_race_gui && !isStartPhase())
     {
         m_race_gui->addMessage(msg, NULL, time,
             video::SColor(255, 255, 0, 255), /*important*/true,
