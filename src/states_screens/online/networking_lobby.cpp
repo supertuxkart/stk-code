@@ -48,6 +48,7 @@
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "network/network_timer_synchronizer.hpp"
+#include "states_screens/dialogs/addons_pack.hpp"
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/dialogs/network_player_dialog.hpp"
 #include "states_screens/dialogs/server_configuration_dialog.hpp"
@@ -85,7 +86,7 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_send_button = NULL;
     m_icon_bank = NULL;
     m_reload_server_info = false;
-    m_displayed_addon_install_cmd = false;
+    m_addon_install = NULL;
 
     // Allows one to update chat and counter even if dialog window is opened
     setUpdateInBackground(true);
@@ -139,6 +140,8 @@ void NetworkingLobby::loadedFromFile()
         (file_manager->getAsset(FileManager::GUI_ICON, "screen_other.png"));
     video::ITexture* icon_6 = irr_driver->getTexture
         (file_manager->getAsset(FileManager::GUI_ICON, "robot.png"));
+    m_addon_texture = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "package-update.png"));
     m_icon_bank->addTextureAsSprite(icon_1);
     m_icon_bank->addTextureAsSprite(icon_2);
     m_icon_bank->addTextureAsSprite(icon_3);
@@ -173,7 +176,7 @@ void NetworkingLobby::init()
     m_allow_change_team = false;
     m_has_auto_start_in_server = false;
     m_client_live_joinable = false;
-    m_displayed_addon_install_cmd = false;
+    m_addon_install = NULL;
     m_ping_update_timer = 0;
     m_start_timeout = std::numeric_limits<float>::max();
     m_cur_starting_timer = std::numeric_limits<int64_t>::max();
@@ -192,6 +195,7 @@ void NetworkingLobby::init()
     //I18N: Spectate is displayed in networking lobby to allow players
     //to join the current started in-progress game
     m_spectate_text = _("Spectate");
+    m_install_addon_text = _("Install addon");
 
     //I18N: In the networking lobby
     m_header->setText(_("Lobby"), false);
@@ -297,6 +301,7 @@ void NetworkingLobby::updateServerInfos()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::onUpdate(float delta)
 {
+    m_addon_install = NULL;
     if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
 
@@ -415,22 +420,6 @@ void NetworkingLobby::onUpdate(float delta)
             msg = _("Please wait for the current game's end.");
         }
 
-#ifndef SERVER_ONLY
-        Addon* addon = addons_manager->getAddon(
-            Addon::createAddonId(missing_addon_track_id));
-        if (addon &&
-            !m_displayed_addon_install_cmd)
-        {
-            m_displayed_addon_install_cmd = true;
-            core::stringw cmd = L"/installaddon ";
-            cmd += missing_addon_track_id.c_str();
-            //I18N: In the networking lobby,
-            //tell user the command to install addon now
-            core::stringw info = _("Send %s in chat box to install addon now.", cmd);
-            addMoreServerInfo(info);
-        }
-#endif
-
         // You can live join or spectator if u have the current play track
         // and network timer is synchronized, and no game protocols exist
         bool no_gep = !RaceEventManager::get() ||
@@ -447,6 +436,21 @@ void NetworkingLobby::onUpdate(float delta)
 
         m_timeout_message->setText(msg, false);
         m_cur_starting_timer = std::numeric_limits<int64_t>::max();
+#ifndef SERVER_ONLY
+        if (!GUIEngine::ModalDialog::isADialogActive() &&
+            !ScreenKeyboard::isActive())
+        {
+            m_addon_install = addons_manager->getAddon(
+                Addon::createAddonId(missing_addon_track_id));
+            if (m_addon_install)
+            {
+                m_config_button->setLabel(m_install_addon_text);
+                m_config_button->setImage(m_addon_texture);
+                m_config_button->setVisible(true);
+                return;
+            }
+        }
+#endif
 
         if (m_client_live_joinable)
         {
@@ -674,6 +678,13 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == m_config_button->m_properties[PROP_ID])
     {
+#ifndef SERVER_ONLY
+        if (m_addon_install)
+        {
+            AddonsPack::install(m_addon_install->getDirName());
+            return;
+        }
+#endif
         auto cl = LobbyProtocol::get<ClientLobby>();
         if (m_client_live_joinable && cl)
         {
