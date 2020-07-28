@@ -174,7 +174,7 @@ void Camera::setupCamera()
         float(irr_driver->getActualScreenSize().Width) / m_viewport.getWidth() , 
         float(irr_driver->getActualScreenSize().Height) / m_viewport.getHeight());
 
-    if (RaceManager::get()->getNumLocalPlayers() > 0)
+    if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
         m_fov = DEGREE_TO_RAD * stk_config->m_camera_fov
           [RaceManager::get()->getNumLocalPlayers() - 1];
