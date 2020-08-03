@@ -26,6 +26,7 @@
 #include "states_screens/state_manager.hpp"
 
 #include <assert.h>
+#include <irrString.h>
 #include <vector>
 
 
@@ -197,6 +198,9 @@ private:
     void displayCTFResults();
     void displaySoccerResults();
     void displayScreenShots();
+
+    void printLine(core::stringw text, video::SColor color, int x, int y);
+    void printSmallLine(core::stringw text, video::SColor color, int x, int y);
 
     int  getFontHeight () const;
 
