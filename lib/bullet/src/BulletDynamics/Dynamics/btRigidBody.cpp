@@ -22,8 +22,7 @@ subject to the following restrictions:
 #include "LinearMath/btSerializer.h"
 
 //'temporarily' global variables
-// Need to disable completely for STK with multiple physics instance
-//btScalar	gDeactivationTime = btScalar(2.);
+btScalar	gDeactivationTime = btScalar(2.);
 //bool	gDisableDeactivation = false;
 //static int uniqueId = 0;
 
@@ -82,7 +81,7 @@ void	btRigidBody::setupRigidBody(const btRigidBody::btRigidBodyConstructionInfo&
 	m_restitution = constructionInfo.m_restitution;
 
 	setCollisionShape( constructionInfo.m_collisionShape );
-//	m_debugBodyId = uniqueId++;
+	//m_debugBodyId = uniqueId++;
 	btAssert(constructionInfo.m_mass>=0);
 	setMassProps(constructionInfo.m_mass, constructionInfo.m_localInertia);
 	updateInertiaTensor();
