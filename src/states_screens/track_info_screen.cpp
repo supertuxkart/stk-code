@@ -398,7 +398,7 @@ void TrackInfoScreen::setSoccerWidgets(bool has_AI)
         // Make sure each team has at least 1 (ai + player)
         bool reuse_ai = ((num_blue_players + UserConfigParams::m_soccer_blue_ai_num) > 0) &&
                         ((num_red_players  + UserConfigParams::m_soccer_red_ai_num ) > 0) &&
-                        ((UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num) < max_num_ai);
+                        ((UserConfigParams::m_soccer_red_ai_num + UserConfigParams::m_soccer_blue_ai_num) <= max_num_ai);
 
         // Try the saved values.
         // If they can't be used, use default balanced values
