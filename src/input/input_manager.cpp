@@ -90,7 +90,11 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_master_player_only = false;
     m_timer = 0;
 #ifndef SERVER_ONLY
-    SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
+    if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0)
+    {
+        Log::error("InputManager", "Failed to init SDL game controller: %s",
+            SDL_GetError());
+    }
 #endif
 }
 
