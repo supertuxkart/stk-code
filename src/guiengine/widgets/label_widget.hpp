@@ -34,9 +34,23 @@ namespace GUIEngine
       */
     class LabelWidget : public Widget
     {
-        bool               m_bright;
-        bool               m_has_color;
+    public:
+        
+        enum LabelType
+        {
+            NORMAL,
+            BRIGHT,
+            TITLE,
+            SMALL_TITLE,
+            TINY_TITLE,
+            COUNT
+        };
+        
+    private:
+        
+        LabelType         m_type;
         irr::video::SColor m_color;
+        bool               m_has_color;
 
         /** Scroll speed in characters/seconds (0 if no scrolling). */
         float              m_scroll_speed;
@@ -52,11 +66,9 @@ namespace GUIEngine
         LEAK_CHECK()
         
         /** Constructs the label widget. Parameter:
-          * \param title  True if the special title font should be used.
-          * \param bright True if a bright color should be used
-          * \note \c title and \c bright are mutually exclusive
+          * \param type the text type of the label
           */
-        LabelWidget(bool title=false, bool bright=false);
+        LabelWidget(LabelType type = NORMAL);
         
         virtual ~LabelWidget() {}
         

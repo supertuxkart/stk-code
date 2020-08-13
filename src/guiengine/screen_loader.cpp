@@ -143,7 +143,7 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                 }
                 else if (wcscmp(L"bright", xml->getNodeName()) == 0)
                 {
-                    append_to.push_back(new LabelWidget(false, true));
+                    append_to.push_back(new LabelWidget(LabelWidget::BRIGHT));
                 }
                 else if (wcscmp(L"bubble", xml->getNodeName()) == 0)
                 {
@@ -151,7 +151,15 @@ void Screen::parseScreenFileDiv(irr::io::IXMLReader* xml, PtrVector<Widget>& app
                 }
                 else if (wcscmp(L"header", xml->getNodeName()) == 0)
                 {
-                    append_to.push_back(new LabelWidget(true));
+                    append_to.push_back(new LabelWidget(LabelWidget::TITLE));
+                }
+                else if (wcscmp(L"small-header", xml->getNodeName()) == 0)
+                {
+                    append_to.push_back(new LabelWidget(LabelWidget::SMALL_TITLE));
+                }
+                else if (wcscmp(L"tiny-header", xml->getNodeName()) == 0)
+                {
+                    append_to.push_back(new LabelWidget(LabelWidget::TINY_TITLE));
                 }
                 else if (wcscmp(L"spacer", xml->getNodeName()) == 0)
                 {
