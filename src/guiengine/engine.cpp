@@ -710,6 +710,8 @@ namespace GUIEngine
         ScalableFont *g_outline_font;
         ScalableFont *g_large_font;
         ScalableFont *g_title_font;
+        ScalableFont* g_small_title_font;
+        ScalableFont* g_tiny_title_font;
         ScalableFont *g_small_font;
         ScalableFont *g_digit_font;
 
@@ -723,6 +725,8 @@ namespace GUIEngine
         int large_font_height;
         int small_font_height;
         int title_font_height;
+        int small_title_font_height;
+        int tiny_title_font_height;
 #ifdef ANDROID
         std::mutex m_gui_functions_mutex;
         std::vector<std::function<void()> > m_gui_functions;
@@ -806,6 +810,16 @@ namespace GUIEngine
     int getTitleFontHeight()
     {
         return Private::title_font_height;
+    }   // getTitleFontHeight
+        // ------------------------------------------------------------------------
+    int getSmallTitleFontHeight()
+    {
+        return Private::small_title_font_height;
+    }   // getTitleFontHeight
+        // ------------------------------------------------------------------------
+    int getTinyTitleFontHeight()
+    {
+        return Private::tiny_title_font_height;
     }   // getTitleFontHeight
 
 
@@ -1001,6 +1015,18 @@ namespace GUIEngine
             g_title_font->drop();
             g_title_font = NULL;
         }
+        if (g_small_title_font)
+        {
+            //delete g_small_title_font;
+            g_small_title_font->drop();
+            g_small_title_font = NULL;
+        }
+        if (g_tiny_title_font)
+        {
+            //delete g_tiny_title_font;
+            g_tiny_title_font->drop();
+            g_tiny_title_font = NULL;
+        }
         if (g_small_font)
         {
             //delete g_small_font;
@@ -1129,8 +1155,18 @@ namespace GUIEngine
 
         ScalableFont* sfont2 = new ScalableFont(bold);
         g_title_font = sfont2;
+        ScalableFont* sfont3 = new ScalableFont(bold);
+        sfont3->setScale(0.8f);
+        g_small_title_font = sfont3;
+        ScalableFont* sfont4 = new ScalableFont(bold);
+        sfont4->setScale(0.6f);
+        g_tiny_title_font = sfont4;
         Private::title_font_height =
             g_title_font->getDimension( L"X" ).Height;
+        Private::small_title_font_height =
+            g_small_title_font->getDimension( L"X" ).Height;
+        Private::tiny_title_font_height =
+            g_tiny_title_font->getDimension( L"X" ).Height;
 
         if (g_font != NULL) g_skin->setFont(g_font);
 
@@ -1185,6 +1221,10 @@ namespace GUIEngine
         Private::small_font_height = g_small_font->getDimension( L"X" ).Height;
         Private::title_font_height =
             g_title_font->getDimension( L"X" ).Height;
+        Private::small_title_font_height =
+            g_small_title_font->getDimension( L"X" ).Height;
+        Private::tiny_title_font_height =
+            g_tiny_title_font->getDimension( L"X" ).Height;
         StateManager::get()->onResize();
     }   // reloadForNewSize
 

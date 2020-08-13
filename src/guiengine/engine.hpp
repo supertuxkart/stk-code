@@ -89,6 +89,8 @@ namespace GUIEngine
         extern irr::gui::ScalableFont* g_outline_font;
         extern irr::gui::ScalableFont* g_large_font;
         extern irr::gui::ScalableFont* g_title_font;
+        extern irr::gui::ScalableFont* g_small_title_font;
+        extern irr::gui::ScalableFont* g_tiny_title_font;
         extern irr::gui::ScalableFont* g_digit_font;
 
         extern irr::IrrlichtDevice* g_device;
@@ -159,6 +161,16 @@ namespace GUIEngine
       * \return the "title" font (it's bigger and orange, useful for headers/captions)
       */
     inline irr::gui::ScalableFont*    getTitleFont()     { return Private::g_title_font;     }
+    
+    /**
+      * \return the "small title" font (it's bigger and orange, useful for sub headers/captions)
+      */
+    inline irr::gui::ScalableFont*    getSmallTitleFont() { return Private::g_small_title_font; }
+    
+    /**
+      * \return the "tiny title" font (it's bigger and orange, useful for sub headers/captions)
+      */
+    inline irr::gui::ScalableFont*    getTinyTitleFont() { return Private::g_tiny_title_font; }
 
     /**
       * \return the currently shown screen, or NULL if none
