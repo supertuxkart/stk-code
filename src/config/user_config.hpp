@@ -786,12 +786,9 @@ namespace UserConfigParams
         "The stun servers that will be used to know the public address "
         "(ipv4 only) with port", {{ "stun-server", "address", "ping" }},
             {
-                 { "stunv4.1.supertuxkart.net:3478", 0u },
-                 { "stunv4.2.supertuxkart.net:19302", 0u },
-                 { "stunv4.3.supertuxkart.net:19302", 0u },
-                 { "stunv4.4.supertuxkart.net:19302", 0u },
-                 { "stunv4.5.supertuxkart.net:19302", 0u },
-                 { "stunv4.6.supertuxkart.net:19302", 0u }
+                 { "stunv4.linuxreviews.org:3478", 0u },
+                 { "stunv4.7.supertuxkart.net:3478", 0u },
+                 { "stunv4.8.supertuxkart.net:3478", 0u }
              }
          ));
 
@@ -800,7 +797,7 @@ namespace UserConfigParams
         "The stun servers that will be used to know the public address "
         "(including ipv6) with port", {{ "stun-server", "address", "ping" }},
             {
-                 { "stun.stunprotocol.org:3478", 0u },
+                 { "stunv6.linuxreviews.org:3478", 0u },
                  { "stun.l.google.com:19302", 0u },
                  { "stun1.l.google.com:19302", 0u },
                  { "stun2.l.google.com:19302", 0u },
