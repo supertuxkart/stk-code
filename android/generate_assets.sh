@@ -45,7 +45,15 @@ export ASSETS_DIRS="library models music sfx textures"
 
 export CONVERT_TO_JPG_BLACKLIST="data/models/traffic_light.png"
 
-export BLACKLIST_FILES="data/music/cocoa_river_fast.ogg2"
+export BLACKLIST_FILES="data/supertuxkart.icns \
+                        data/supertuxkart_1024.png \
+                        data/supertuxkart_128.png \
+                        data/supertuxkart_16.png \
+                        data/supertuxkart_256.png \
+                        data/supertuxkart_32.png \
+                        data/supertuxkart_48.png \
+                        data/supertuxkart_512.png \
+                        data/supertuxkart_64.png"
 
 ################################################################################
 
