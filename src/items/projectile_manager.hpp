@@ -93,6 +93,8 @@ public:
     std::shared_ptr<Flyable> newProjectile(AbstractKart *kart,
                                            PowerupManager::PowerupType type);
     // ------------------------------------------------------------------------
+    std::vector<Vec3> getBasketballPositions();
+    // ------------------------------------------------------------------------
     void addByUID(const std::string& uid, std::shared_ptr<Flyable> f)
                                              { m_active_projectiles[uid] = f; }
     // ------------------------------------------------------------------------

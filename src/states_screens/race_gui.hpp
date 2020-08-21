@@ -99,6 +99,7 @@ private:
     irr::video::ITexture *m_blue_flag;
     irr::video::ITexture *m_soccer_ball;
     irr::video::ITexture *m_heart_icon;
+    irr::video::ITexture *m_basket_ball_icon;
     /** Texture for the hit limit icon*/
     irr::video::ITexture* m_champion;
 
