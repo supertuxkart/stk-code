@@ -41,6 +41,7 @@ using namespace irr;
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/powerup_manager.hpp"
+#include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/spare_tire_ai.hpp"
@@ -100,6 +101,7 @@ RaceGUI::RaceGUI()
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
+    m_basket_ball_icon = irr_driver->getTexture(FileManager::GUI_ICON, "rubber_ball-icon.png");
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
 }   // RaceGUI
 
@@ -672,7 +674,7 @@ void RaceGUI::drawGlobalMiniMap()
 
         bool has_teams = (ctf_world || soccer_world);
         
-        // Highlight the player icons with some backgorund image.
+        // Highlight the player icons with some background image.
         if ((has_teams || is_local) && m_icons_frame != NULL)
         {
             video::SColor color = kart->getKartProperties()->getColor();
@@ -721,6 +723,26 @@ void RaceGUI::drawGlobalMiniMap()
 
     }   // for i<getNumKarts
 
+    // Draw the basket-ball icons on the minimap
+    std::vector<Vec3> basketballs = ProjectileManager::get()->getBasketballPositions();
+    for(unsigned int i = 0; i != basketballs.size(); i++)
+    {
+        Vec3 draw_at;
+        track->mapPoint2MiniMap(basketballs[i], &draw_at);
+
+        video::ITexture* icon = m_basket_ball_icon;
+
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
+        int marker_half_size = m_minimap_player_size / 2;
+        core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
+                                 lower_y   -(int)(draw_at.getY()+marker_half_size),
+                                 m_map_left+(int)(draw_at.getX()+marker_half_size),
+                                 lower_y   -(int)(draw_at.getY()-marker_half_size));
+
+        draw2DImage(icon, position, source, NULL, NULL, true);
+    }
+
+    // Draw the soccer ball icon
     if (soccer_world)
     {
         Vec3 draw_at;
