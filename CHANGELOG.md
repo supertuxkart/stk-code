@@ -7,21 +7,23 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 1.2
 
-[Changelog fully done up to 29/03/20. Modern skin to be renamed]
+[Changelog fully done up to 03/07/20. Modern skin to be renamed]
 
 ### Networking
 * Add support for IPv6 LAN servers, by Benau
 * Auto-detect client IPv4 and IPv6 support, by Benau
 * Improved server creation speed and performance, by Benau
-* Allow any addon karts online using tux hitbox if live join enabled, by Benau
+* Allow to use any addon karts online, on servers with live join enabled, by Benau. The kart shows as Tux for other players and has Tux's hitbox.
 
 ### General
+* Use SDL2 for window creation, allowing better gamepad support, by Benau
 * Add support for in-race messages in scripting, by CodedOre
 * Improved tutorial with free-flow racing (no more text interrupts), by CodedOre
-* Use SDL2 for window creation which allows better gamepad support, by Benau
 * Haiku support, by AlwaysLivid
-* Resizable window in game, by Benau
-* Make addon icons downloading on demand, by Benau
+* Make the game's window resizable in-game, by Benau
+* Download addon icons on-demand to speed-up the addons list loading, by Benau
+* Allow theming of icons, by QwertyChouskie
+* Many many bugfixes and enhancements
 
 ### Mobile
 * Mobile STK indication in lobby, by riso
@@ -36,11 +38,11 @@ For similar reasons, and because some features are vastly more complex than othe
 * Modern skin, by QwertyChouskie
 * Allow to rename control configurations, by GuillaumeBft
 * New tips for soccer mode
-* Always show race end times in ms, by Fouks
+* Always show the race end times in ms, by Fouks
 * SVG icons support, by riso
 #### In-race UI
 * Introduce camera settings in the options screen, by luffah
-* More spectator cameras in online spectate, by luffah
+* More spectator cameras in online spectating, by luffah
 * Add team chat for team games, by Benau
 * Show the kart orientation on the soccer minimap, by riso
 * Show a message once a goal is made in soccer, by riso
