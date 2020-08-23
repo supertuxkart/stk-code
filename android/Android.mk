@@ -171,6 +171,16 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
+# SheenBidi
+LOCAL_MODULE       := sheenbidi
+LOCAL_PATH         := .
+LOCAL_CPP_FEATURES += rtti
+LOCAL_SRC_FILES    := $(wildcard ../lib/sheenbidi/Source/*.c)
+LOCAL_CFLAGS       := -I../lib/sheenbidi/Headers
+include $(BUILD_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
 # Irrlicht
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
@@ -249,6 +259,7 @@ LOCAL_LDLIBS       := -llog -landroid -lGLESv1_CM -lGLESv3 -lOpenSLES -ldl -lm
 LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/bullet/src               \
                       -I../lib/libraqm                  \
+                      -I../lib/sheenbidi/Headers        \
                       -I../lib/enet/include             \
                       -I../lib/ifaddrs                  \
                       -I../lib/irrlicht/include         \
@@ -279,7 +290,8 @@ LOCAL_CPPFLAGS     := -std=gnu++0x
 
 LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript mcpp SDL2 \
                           vorbisfile vorbis ogg openal curl libssl libcrypto \
-                          c++_static raqm fribidi harfbuzz freetype graphics_utils
+                          c++_static raqm fribidi sheenbidi harfbuzz freetype \
+                          graphics_utils
 
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)

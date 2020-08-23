@@ -372,6 +372,11 @@ endif()
 
 # Text handling in STK (We use freetype, harfbuzz, fribidi and libraqm for i18n text handling)
 if (NOT SERVER_ONLY)
+    # SheenBidi
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/sheenbidi")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/sheenbidi/Headers")
+    SET(SHEENBIDI_LIBRARY sheenbidi)
+
     # Freetype
     find_package(Freetype)
     if(FREETYPE_FOUND)
@@ -665,6 +670,7 @@ if(NOT SERVER_ONLY)
         ${FREETYPE_LIBRARIES}
         ${HARFBUZZ_LIBRARY}
         ${SDL2_LIBRARY}
+        ${SHEENBIDI_LIBRARY}
         graphics_utils)
 endif()
 
