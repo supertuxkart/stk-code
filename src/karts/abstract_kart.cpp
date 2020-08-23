@@ -19,6 +19,7 @@
 
 #include "karts/abstract_kart.hpp"
 
+#include "config/user_config.hpp"
 #include "items/attachment.hpp"
 #include "items/powerup.hpp"
 #include "karts/abstract_kart_animation.hpp"
@@ -85,7 +86,8 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
     {
         // For addon kart in network we use the same hitbox (tux) so anyone
         // can use any addon karts with different graphical kart model
-        kp_addon = kp;
+        if (!UserConfigParams::m_addon_tux_online)
+            kp_addon = kp;
         kp = kart_properties_manager->getKart(std::string("tux"));
     }
     if (kp == NULL)

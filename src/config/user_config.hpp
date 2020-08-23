@@ -480,6 +480,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam          m_soccer_player_list
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-player-list",
             &m_race_setup_group, "Show player list icon in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam          m_addon_tux_online
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "addon-tux-online",
+            &m_race_setup_group, "Always show online addon karts as tux when live join is on.") );
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
