@@ -322,21 +322,6 @@ if [ ! -f "$DIRNAME/obj/libpng.stamp" ]; then
     touch "$DIRNAME/obj/libpng.stamp"
 fi
 
-# Fribidi
-if [ ! -f "$DIRNAME/obj/fribidi.stamp" ]; then
-    echo "Compiling fribidi"
-    mkdir -p "$DIRNAME/obj/fribidi"
-    cp -a -f "$DIRNAME/../lib/fribidi/"* "$DIRNAME/obj/fribidi"
-
-    cd "$DIRNAME/obj/fribidi"
-    ./configure --host=$HOST --enable-static=yes &&
-    make $@
-    check_error
-    mkdir -p "$DIRNAME/obj/fribidi/include/fribidi"
-    cp $DIRNAME/obj/fribidi/lib/*.h "$DIRNAME/obj/fribidi/include/fribidi"
-    touch "$DIRNAME/obj/fribidi.stamp"
-fi
-
 # Freetype bootstrap
 if [ ! -f "$DIRNAME/obj/freetype_bootstrap.stamp" ]; then
     echo "Compiling freetype"

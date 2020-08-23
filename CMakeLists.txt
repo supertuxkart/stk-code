@@ -44,7 +44,6 @@ CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
 
 if(APPLE AND NOT IOS)
     list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)
-    include_directories(/usr/local/opt/fribidi/include/)
     include_directories(/usr/local/opt/openssl@1.1/include/)
     include_directories(/usr/local/opt/openssl@1.1/include/openssl/)
     include_directories(/usr/local/opt/freetype/include/freetype2/)
@@ -370,7 +369,7 @@ if(NOT SERVER_ONLY)
     add_definitions(-DENABLE_SOUND)
 endif()
 
-# Text handling in STK (We use freetype, harfbuzz, fribidi and libraqm for i18n text handling)
+# Text handling in STK (We use freetype, harfbuzz and SheenBidifor i18n text handling)
 if (NOT SERVER_ONLY)
     # SheenBidi
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/sheenbidi")
@@ -395,28 +394,6 @@ if (NOT SERVER_ONLY)
     else()
         include_directories("${HARFBUZZ_INCLUDEDIR}")
         MESSAGE(STATUS "Use system harfbuzz: ${HARFBUZZ_LIBRARY}")
-    endif()
-
-    # Fribidi
-    find_package(Fribidi)
-    if(FRIBIDI_FOUND)
-        include_directories(${FRIBIDI_INCLUDE_DIRS})
-    else()
-        message(FATAL_ERROR "Fribidi not found. "
-            "Fribidi is required to display characters in SuperTuxKart.")
-    endif()
-
-    # Libraqm
-    find_library(RAQM_LIBRARY NAMES raqm libraqm)
-    find_path(RAQM_INCLUDEDIR NAMES raqm.h PATHS)
-    if (NOT RAQM_LIBRARY OR NOT RAQM_INCLUDEDIR)
-        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libraqm")
-        include_directories("${PROJECT_SOURCE_DIR}/lib/libraqm")
-        SET(RAQM_LIBRARY raqm)
-        message(STATUS "System libraqm not found, use the bundled one.")
-    else()
-        include_directories("${RAQM_INCLUDEDIR}")
-        MESSAGE(STATUS "Use system libraqm: ${RAQM_LIBRARY}")
     endif()
 endif()
 
@@ -665,8 +642,6 @@ if(NOT SERVER_ONLY)
         ${JPEG_LIBRARIES}
         ${OGGVORBIS_LIBRARIES}
         ${OPENAL_LIBRARY}
-        ${RAQM_LIBRARY}
-        ${FRIBIDI_LIBRARIES}
         ${FREETYPE_LIBRARIES}
         ${HARFBUZZ_LIBRARY}
         ${SDL2_LIBRARY}

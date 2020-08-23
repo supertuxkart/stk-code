@@ -168,20 +168,6 @@ build_stk()
         touch "$DEPENDENCIES_DIR/libpng.stamp"
     fi
     
-    # Fribidi
-    if [ ! -f "$DEPENDENCIES_DIR/fribidi.stamp" ]; then
-        echo "Compiling fribidi"
-        mkdir -p "$DEPENDENCIES_DIR/fribidi"
-        cp -a -f "$DEPENDENCIES_DIR/../lib/fribidi/"* "$DEPENDENCIES_DIR/fribidi"
-    
-        cd "$DEPENDENCIES_DIR/fribidi"
-        ./configure --prefix="$INSTALL_DIR" &&
-        make -j$THREADS_NUMBER &&
-        make install
-        check_error
-        touch "$DEPENDENCIES_DIR/fribidi.stamp"
-    fi
-    
     # Freetype bootstrap
     if [ ! -f "$DEPENDENCIES_DIR/freetype_bootstrap.stamp" ]; then
         echo "Compiling freetype"
