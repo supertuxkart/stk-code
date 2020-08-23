@@ -35,6 +35,7 @@
 
 #ifndef SERVER_ONLY
 #include <ft2build.h>
+#include <harfbuzz/hb.h>
 #include FT_FREETYPE_H
 
 #include "irrString.h"
@@ -78,6 +79,9 @@ private:
     // ------------------------------------------------------------------------
     std::vector<FT_Face> loadTTF(const std::vector<std::string>& ttf_list);
 
+    hb_buffer_t* m_hb_buffer;
+
+    std::vector<hb_font_t*> m_hb_fonts;
 #endif
 
     /** Map type for each \ref FontWithFace with a index, save getting time in

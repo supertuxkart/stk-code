@@ -30,9 +30,11 @@
 #include "utils/translation.hpp"
 
 #ifndef SERVER_ONLY
-#include <fribidi/fribidi.h>
-#include <harfbuzz/hb.h>
-#include <raqm.h>
+#include <harfbuzz/hb-ft.h>
+extern "C"
+{
+    #include <SheenBidi.h>
+}
 #endif
 
 FontManager *font_manager = NULL;
@@ -46,9 +48,11 @@ FontManager::FontManager()
     m_ft_library = NULL;
     m_digit_face = NULL;
     m_shaping_dpi = 128;
+    m_hb_buffer = NULL;
     if (GUIEngine::isNoGraphics())
         return;
 
+    m_hb_buffer = hb_buffer_create();
     checkFTError(FT_Init_FreeType(&m_ft_library), "loading freetype library");
 #endif
 }   // FontManager
@@ -66,6 +70,9 @@ FontManager::~FontManager()
     if (GUIEngine::isNoGraphics())
         return;
 
+    hb_buffer_destroy(m_hb_buffer);
+    for (hb_font_t* font : m_hb_fonts)
+        hb_font_destroy(font);
     for (unsigned int i = 0; i < m_faces.size(); i++)
         checkFTError(FT_Done_Face(m_faces[i]), "removing faces for shaping");
     if (m_digit_face != NULL)
@@ -253,60 +260,37 @@ namespace LineBreakingRules
     }   // insertBreakMark
 }   // namespace LineBreakingRules
 
-// ============================================================================
-namespace RTLRules
-{
-    //-------------------------------------------------------------------------
-    void insertRTLMark(const std::u32string& str, std::vector<bool>& line,
-                       std::vector<bool>& char_bool)
-    {
-        // Check if first character has strong RTL, then consider this line is
-        // RTL
-        std::vector<FriBidiCharType> types;
-        std::vector<FriBidiLevel> levels;
-        types.resize(str.size(), 0);
-        levels.resize(str.size(), 0);
-        FriBidiParType par_type = FRIBIDI_PAR_ON;
-        const FriBidiChar* fribidi_str = (const FriBidiChar*)str.c_str();
-        fribidi_get_bidi_types(fribidi_str, str.size(), types.data());
-#if FRIBIDI_MAJOR_VERSION >= 1
-        std::vector<FriBidiBracketType> btypes;
-        btypes.resize(str.size(), 0);
-        fribidi_get_bracket_types(fribidi_str, str.size(), types.data(),
-            btypes.data());
-        int max_level = fribidi_get_par_embedding_levels_ex(types.data(),
-            btypes.data(), str.size(), &par_type, levels.data());
-#else
-        int max_level = fribidi_get_par_embedding_levels(types.data(),
-            str.size(), &par_type, levels.data());
-#endif
-        (void)max_level;
-        bool cur_rtl = par_type == FRIBIDI_PAR_RTL;
-        if (cur_rtl)
-        {
-            for (unsigned i = 0; i < line.size(); i++)
-                line[i] = true;
-        }
-        int cur_level = levels[0];
-        for (unsigned i = 0; i < char_bool.size(); i++)
-        {
-            if (levels[i] != cur_level)
-            {
-                cur_rtl = !cur_rtl;
-                cur_level = levels[i];
-            }
-            char_bool[i] = cur_rtl;
-        }
-    }   // insertRTLMark
-}   // namespace RTLRules
-
 // ----------------------------------------------------------------------------
 /* Turn text into glyph layout for rendering by libraqm. */
 void FontManager::shape(const std::u32string& text,
                         std::vector<irr::gui::GlyphLayout>& gls,
                         std::vector<std::u32string>* line_data)
-
 {
+    // Helper struct
+    struct ShapeGlyph
+    {
+        unsigned int index;
+        int x_advance;
+        int y_advance;
+        int x_offset;
+        int y_offset;
+        uint32_t cluster;
+        FT_Face ftface;
+    };
+    auto fill_shape_glyph = [](std::vector<ShapeGlyph>& shape_glyphs,
+        hb_buffer_t* hb_buffer, int offset, FT_Face ftface)
+    {
+        size_t len = hb_buffer_get_length(hb_buffer);
+        hb_glyph_info_t* info = hb_buffer_get_glyph_infos(hb_buffer, NULL);
+        hb_glyph_position_t* position =
+            hb_buffer_get_glyph_positions(hb_buffer, NULL);
+        for (size_t i = 0; i < len; i++)
+        {
+            shape_glyphs.push_back({info[i].codepoint, position[i].x_advance,
+                position[i].y_advance, position[i].x_offset,
+                position[i].y_offset, info[i].cluster + offset, ftface});
+        }
+    };
     // m_faces can be empty in null device
     if (text.empty() || m_faces.empty())
         return;
@@ -319,6 +303,7 @@ void FontManager::shape(const std::u32string& text,
 
     for (unsigned l = 0; l < lines.size(); l++)
     {
+        std::vector<ShapeGlyph> glyphs;
         if (l != 0)
         {
             gui::GlyphLayout gl = { 0 };
@@ -336,110 +321,185 @@ void FontManager::shape(const std::u32string& text,
             continue;
         }
 
-        raqm_t* rq = raqm_create();
-        if (!rq)
-        {
-            Log::error("FontManager", "Failed to raqm_create.");
-            gls.clear();
-            if (line_data)
-                line_data->clear();
-            return;
-        }
+        SBCodepointSequence codepoint_sequence;
+        codepoint_sequence.stringEncoding = SBStringEncodingUTF32;
+        codepoint_sequence.stringBuffer = (void*)str.c_str();
+        codepoint_sequence.stringLength = str.size();
 
-        const int length = (int)str.size();
-        const uint32_t* string_array = (const uint32_t*)str.c_str();
+        // Extract the first bidirectional paragraph
+        SBAlgorithmRef bidi_algorithm = SBAlgorithmCreate(&codepoint_sequence);
+        SBParagraphRef first_paragraph = SBAlgorithmCreateParagraph(bidi_algorithm,
+            0, (int32_t)-1, SBLevelDefaultLTR);
+        SBUInteger paragraph_length = SBParagraphGetLength(first_paragraph);
 
-        if (!raqm_set_text(rq, string_array, length))
-        {
-            Log::error("FontManager", "Failed to raqm_set_text.");
-            raqm_destroy(rq);
-            gls.clear();
-            if (line_data)
-                line_data->clear();
-            return;
-        }
+        // Create a line consisting of whole paragraph and get its runs
+        SBLineRef paragraph_line = SBParagraphCreateLine(first_paragraph, 0,
+            paragraph_length);
+        SBUInteger run_count = SBLineGetRunCount(paragraph_line);
+        const SBRun* run_array = SBLineGetRunsPtr(paragraph_line);
 
-        FT_Face prev_face = NULL;
-        for (int i = 0; i < length; i++)
+        std::vector<bool> rtl_line, rtl_char;
+        rtl_line.resize(str.size(), false);
+        rtl_char.resize(str.size(), false);
+        for (SBUInteger run = 0; run < run_count; run++)
         {
-            FT_Face cur_face = m_faces.front();
-            bool override_face = false;
-            if (prev_face != NULL && i != 0)
+            FT_Face prev_face = NULL;
+            std::vector<std::pair<FT_Face, SBInteger> > face_for_shape;
+            SBInteger run_length = run_array[run].length;
+            hb_buffer_flags_t hb_buffer_flags = static_cast<hb_buffer_flags_t>(
+                HB_BUFFER_FLAG_BOT | HB_BUFFER_FLAG_EOT);
+            hb_direction_t direction = run_array[run].level % 2 == 0 ?
+                HB_DIRECTION_LTR : HB_DIRECTION_RTL;
+            for (SBInteger l = 0; l < run_length; l++)
             {
-                hb_script_t prev_script = hb_unicode_script(
-                    hb_unicode_funcs_get_default(), str[i - 1]);
-                hb_script_t cur_script = hb_unicode_script(
-                    hb_unicode_funcs_get_default(), str[i]);
-                if (cur_script == HB_SCRIPT_INHERITED ||
-                    (prev_script == HB_SCRIPT_ARABIC &&
-                    // Those exists in the default arabic font
-                    (str[i] == U'.' || str[i] == U'!' || str[i] == U':')))
+                SBInteger i = l + run_array[run].offset;
+                rtl_char[i] = direction == HB_DIRECTION_RTL;
+                // Use the first character in line to determine paragraph
+                // direction
+                if (i == 0 && direction == HB_DIRECTION_RTL)
+                    std::fill(rtl_line.begin(), rtl_line.end(), true);
+                FT_Face cur_face = m_faces.front();
+                bool override_face = false;
+                if (prev_face != NULL && i != 0)
                 {
-                    // For inherited script (like punctation with arabic or
-                    // join marks), try to use the previous face so it is not
-                    // hb_shape separately
-                    cur_face = prev_face;
-                    override_face = true;
-                }
-            }
-            FT_Face emoji_face = m_faces.size() > 1 ? m_faces[1] : NULL;
-            if (m_has_color_emoji && !override_face &&
-                length > 1 && i < length - 1 &&
-                emoji_face != NULL && str[i + 1] == 0xfe0f)
-            {
-                // Rule for variation selector-16 (emoji presentation)
-                // It is used in for example Keycap Digit One
-                // (U+31, U+FE0F, U+20E3)
-                cur_face = emoji_face;
-                override_face = true;
-            }
-            if (!override_face)
-            {
-                for (unsigned j = 0; j < m_faces.size(); j++)
-                {
-                    unsigned glyph_index =
-                        FT_Get_Char_Index(m_faces[j], str[i]);
-                    if (glyph_index > 0)
+                    hb_script_t prev_script = hb_unicode_script(
+                        hb_unicode_funcs_get_default(), str[i - 1]);
+                    hb_script_t cur_script = hb_unicode_script(
+                        hb_unicode_funcs_get_default(), str[i]);
+                    if (cur_script == HB_SCRIPT_INHERITED ||
+                        (prev_script == HB_SCRIPT_ARABIC &&
+                        // Those exists in the default arabic font
+                        (str[i] == U'.' || str[i] == U'!' || str[i] == U':')))
                     {
-                        cur_face = m_faces[j];
-                        break;
+                        // For inherited script (like punctation with arabic or
+                        // join marks), try to use the previous face so it is
+                        // not hb_shape separately
+                        cur_face = prev_face;
+                        override_face = true;
                     }
                 }
+                FT_Face emoji_face = m_faces.size() > 1 ? m_faces[1] : NULL;
+                if (m_has_color_emoji && !override_face &&
+                    run_length > 1 &&
+                    i < (SBInteger)(run_length + run_array[run].offset - 1) &&
+                    emoji_face != NULL && str[i + 1] == 0xfe0f)
+                {
+                    // Rule for variation selector-16 (emoji presentation)
+                    // It is used in for example Keycap Digit One
+                    // (U+31, U+FE0F, U+20E3)
+                    cur_face = emoji_face;
+                    override_face = true;
+                }
+                if (!override_face)
+                {
+                    for (unsigned j = 0; j < m_faces.size(); j++)
+                    {
+                        unsigned glyph_index =
+                            FT_Get_Char_Index(m_faces[j], str[i]);
+                        if (glyph_index > 0)
+                        {
+                            cur_face = m_faces[j];
+                            break;
+                        }
+                    }
+                }
+                prev_face = cur_face;
+                if (!FT_HAS_COLOR(cur_face) ||
+                    (FT_HAS_COLOR(cur_face) && cur_face->num_fixed_sizes == 0))
+                {
+                    // Handle color emoji with CPAL / COLR tables
+                    // (num_fixed_sizes == 0)
+                    checkFTError(FT_Set_Pixel_Sizes(cur_face, 0,
+                        m_shaping_dpi), "setting DPI");
+                }
+                face_for_shape.emplace_back(cur_face, i);
             }
-            prev_face = cur_face;
-            if (!FT_HAS_COLOR(cur_face) ||
-                (FT_HAS_COLOR(cur_face) && cur_face->num_fixed_sizes == 0))
-            {
-                // Handle color emoji with CPAL / COLR tables
-                // (num_fixed_sizes == 0)
-                checkFTError(FT_Set_Pixel_Sizes(cur_face, 0,
-                    m_shaping_dpi), "setting DPI");
-            }
-            if (!raqm_set_freetype_face_range(rq, cur_face, i, 1))
-            {
-                Log::error("FontManager",
-                    "Failed to raqm_set_freetype_face_range.");
-                raqm_destroy(rq);
-                gls.clear();
-                if (line_data)
-                    line_data->clear();
-                return;
-            }
-        }
+            if (face_for_shape.empty())
+                continue;
 
-        if (raqm_layout(rq))
+            // Compare if different hb_font should be used in this run
+            auto shape_compare = face_for_shape.front();
+            auto it = face_for_shape.begin();
+
+            // Depend on direction push front or back in this vector
+            std::vector<ShapeGlyph> run_glyphs;
+            while (it != face_for_shape.end())
+            {
+                const std::pair<FT_Face, SBInteger>& cur_compare = *it;
+                if (cur_compare.first != shape_compare.first)
+                {
+                    hb_buffer_reset(m_hb_buffer);
+                    int offset = shape_compare.second;
+                    int length = cur_compare.second - offset;
+                    FT_Face ft_face = shape_compare.first;
+                    hb_buffer_add_utf32(m_hb_buffer,
+                        (uint32_t*)(str.c_str() + offset), length, 0, -1);
+                    hb_buffer_guess_segment_properties(m_hb_buffer);
+                    hb_buffer_set_direction(m_hb_buffer, direction);
+                    hb_buffer_set_flags(m_hb_buffer, hb_buffer_flags);
+                    hb_shape(
+                        m_hb_fonts[m_ft_faces_to_index[ft_face]],
+                        m_hb_buffer, NULL, 0);
+                    std::vector<ShapeGlyph> shaped_glyphs;
+                    fill_shape_glyph(shaped_glyphs, m_hb_buffer, offset,
+                        ft_face);
+                    if (direction == HB_DIRECTION_LTR)
+                    {
+                        run_glyphs.insert(run_glyphs.end(),
+                            shaped_glyphs.begin(), shaped_glyphs.end());
+                    }
+                    else
+                    {
+                        run_glyphs.insert(run_glyphs.begin(),
+                            shaped_glyphs.begin(), shaped_glyphs.end());
+                    }
+                    shape_compare = cur_compare;
+                    it = face_for_shape.erase(face_for_shape.begin(), it);
+                    continue;
+                }
+                it++;
+            }
+            // Remaining pair if they use the same face
+            if (!face_for_shape.empty())
+            {
+                hb_buffer_reset(m_hb_buffer);
+                int offset = face_for_shape.front().second;
+                int length = face_for_shape.back().second - offset + 1;
+                FT_Face ft_face = face_for_shape.front().first;
+                hb_buffer_add_utf32(m_hb_buffer,
+                    (uint32_t*)(str.c_str() + offset), length, 0, -1);
+                hb_buffer_guess_segment_properties(m_hb_buffer);
+                hb_buffer_set_direction(m_hb_buffer, direction);
+                hb_buffer_set_flags(m_hb_buffer, hb_buffer_flags);
+                hb_shape(m_hb_fonts[m_ft_faces_to_index[ft_face]],
+                    m_hb_buffer, NULL, 0);
+                std::vector<ShapeGlyph> shaped_glyphs;
+                fill_shape_glyph(shaped_glyphs, m_hb_buffer, offset, ft_face);
+                if (direction == HB_DIRECTION_LTR)
+                {
+                    run_glyphs.insert(run_glyphs.end(),
+                        shaped_glyphs.begin(), shaped_glyphs.end());
+                }
+                else
+                {
+                    run_glyphs.insert(run_glyphs.begin(),
+                        shaped_glyphs.begin(), shaped_glyphs.end());
+                }
+            }
+            glyphs.insert(glyphs.end(), run_glyphs.begin(), run_glyphs.end());
+        }
+        SBLineRelease(paragraph_line);
+        SBParagraphRelease(first_paragraph);
+        SBAlgorithmRelease(bidi_algorithm);
+
+        if (!glyphs.empty())
         {
             std::vector<gui::GlyphLayout> cur_line;
-            std::vector<bool> rtl_line, rtl_char, breakable;
-            rtl_line.resize(str.size(), false);
-            rtl_char.resize(str.size(), false);
+            std::vector<bool> breakable;
             breakable.resize(str.size(), false);
             LineBreakingRules::insertBreakMark(str, breakable);
             translations->insertThaiBreakMark(str, breakable);
-            RTLRules::insertRTLMark(str, rtl_line, rtl_char);
-            size_t count = 0;
-            raqm_glyph_t* glyphs = raqm_get_glyphs(rq, &count);
-            for (unsigned idx = 0; idx < (unsigned)count; idx++)
+            for (unsigned idx = 0; idx < glyphs.size(); idx++)
             {
                 gui::GlyphLayout gl = { 0 };
                 gl.index = glyphs[idx].index;
@@ -502,18 +562,8 @@ void FontManager::shape(const std::u32string& text,
                     gl.flags |= gui::GLF_BREAKABLE;
             }
             gls.insert(gls.end(), cur_line.begin(), cur_line.end());
-            raqm_destroy(rq);
             if (line_data)
                 line_data->push_back(str);
-        }
-        else
-        {
-            Log::error("FontManager", "Failed to raqm_layout.");
-            raqm_destroy(rq);
-            gls.clear();
-            if (line_data)
-                line_data->clear();
-            return;
         }
     }
 }   // shape
@@ -682,6 +732,16 @@ void FontManager::loadFonts()
         m_shaping_dpi = regular->getDPI();
         // Update inverse shaping from m_shaping_dpi
         regular->setDPI();
+    }
+    for (FT_Face face : normal_ttf)
+    {
+        if (!FT_HAS_COLOR(face) ||
+            (FT_HAS_COLOR(face) && face->num_fixed_sizes == 0))
+        {
+            checkFTError(FT_Set_Pixel_Sizes(face, 0, m_shaping_dpi),
+                "setting DPI");
+        }
+        m_hb_fonts.push_back(hb_ft_font_create(face, NULL));
     }
 #endif
 

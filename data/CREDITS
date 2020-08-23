@@ -228,13 +228,12 @@ Software used
 Software used
 - ogg
 - vorbis
-- fribidi
+- SheenBidi
 - blender
 - wiiuse
 - harfbuzz
 
 Software used
-- libraqm
 - sqlite
 - openssl
 - mcpp
