@@ -615,7 +615,7 @@ target_link_libraries(supertuxkart
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${LIBRESOLV_LIBRARY}
-    mcpp
+    ${MCPP_LIBRARY}
     )
 
 if (USE_SQLITE3)
