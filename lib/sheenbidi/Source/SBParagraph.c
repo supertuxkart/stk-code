@@ -17,6 +17,7 @@
 #include <SBConfig.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "BidiChain.h"
 #include "BidiTypeLookup.h"
@@ -54,6 +55,7 @@ static ParagraphContextRef CreateParagraphContext(const SBBidiType *types, SBLev
     const SBUInteger offsetTypes   = offsetLinks + sizeLinks;
 
     SBUInt8 *memory = (SBUInt8 *)malloc(sizeMemory);
+    memset(memory, 0, sizeMemory);
     ParagraphContextRef context = (ParagraphContextRef)(memory + offsetContext);
     BidiLink *fixedLinks = (BidiLink *)(memory + offsetLinks);
     SBBidiType *fixedTypes = (SBBidiType *)(memory + offsetTypes);
