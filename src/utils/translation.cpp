@@ -329,6 +329,13 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 for (int l = 0; locale[l].language != NULL; l++)
                 {
                     language = locale[l].language;
+                    // Convert deprecated language code
+                    if (language == "iw")
+                        language = "he";
+                    else if (language == "in")
+                        language = "id";
+                    else if (language == "ji")
+                        language = "yi";
                     if (locale[l].country != NULL)
                     {
                         language += "-";
