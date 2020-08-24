@@ -341,6 +341,21 @@ int XMLNode::get(const std::string &attribute, int64_t *value) const
     return 1;
 }   // get(int64_t)
 
+// ----------------------------------------------------------------------------
+int XMLNode::get(const std::string &attribute, uint64_t *value) const
+{
+    std::string s;
+    if(!get(attribute, &s)) return 0;
+
+    if (!StringUtils::parseString<uint64_t>(s, value))
+    {
+        Log::warn("[XMLNode]", "WARNING: Expected int but found '%s' for attribute '%s' of node '%s' in file %s",
+                    s.c_str(), attribute.c_str(), m_name.c_str(), m_file_name.c_str());
+        return 0;
+    }
+
+    return 1;
+}   // get(uint64_t)
 
 // ----------------------------------------------------------------------------
 int XMLNode::get(const std::string &attribute, uint16_t *value) const
