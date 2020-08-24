@@ -163,7 +163,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     if (m_localized_country_codes.empty())
     {
-        const std::string file_name = file_manager->getAsset("country_names.csv");
+        const std::string file_name = file_manager->getAsset("country_names.tsv");
         try
         {
             std::ifstream in(FileUtils::getPortableReadingPath(file_name));
@@ -178,7 +178,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 std::string line;
                 while (!StringUtils::safeGetline(in, line).eof())
                 {
-                    std::vector<std::string> lists = StringUtils::split(line, ';');
+                    std::vector<std::string> lists = StringUtils::split(line, '\t');
                     if (lists.size() < 2)
                     {
                         Log::error("translation", "Invaild list.");
