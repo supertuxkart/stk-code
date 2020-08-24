@@ -17,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-19 08:19+0800\n"
-"PO-Revision-Date: 2020-07-19 00:30+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-07-29 01:02+0800\n"
+"PO-Revision-Date: 2020-07-31 07:53+0000\n"
+"Last-Translator: Giorgos Kardamis <kardamisgiorgos@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/supertuxkart/supertuxkart/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -29,15 +29,15 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "Εξαγωγή δεδομένων παιχνιδιού..."
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "Σφάλμα εξαγωγής δεδομένων παιχνιδιού"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr ""
+msgstr "Ελέγξτε τον αποθηκευτικό χώρο της συσκευής ή επανεγκατέστησε το SuperTuxKart."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -345,7 +345,7 @@ msgstr "Ναι"
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
 #: src/states_screens/dialogs/addons_loading.cpp:213
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:45
-#: src/states_screens/online/register_screen.cpp:132
+#: src/states_screens/online/register_screen.cpp:130
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "Άκυρο"
@@ -358,37 +358,37 @@ msgstr "Κράτα αυτή την ανάλυση"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
-msgstr ""
+msgstr "Ρυθμίσεις Κάμερας"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr ""
+msgstr "Κάμερα Παίχτη"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "FOV"
-msgstr ""
+msgstr "Πεδίο Ορατότητας"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr ""
+msgstr "Απόσταση"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Angle"
-msgstr ""
+msgstr "Γωνία"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Smooth camera"
-msgstr ""
+msgstr "Ομαλή Κάμερα"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
-msgstr ""
+msgstr "Πίσω Κάμερα"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -1740,20 +1740,20 @@ msgstr "Δημιουργία server"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:197
+#: src/states_screens/online/networking_lobby.cpp:201
 msgid "Lobby"
 msgstr "Δωμάτιο αναμονής"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:183
+#: src/states_screens/online/networking_lobby.cpp:186
 msgid "Start race"
 msgstr "Εκκίνιση αγώνα"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:191
+#: src/states_screens/online/networking_lobby.cpp:194
 msgid "Configuration"
 msgstr "Ρυθμίσεις server"
 
@@ -2156,7 +2156,7 @@ msgstr "Μεγέθος Γραμμάτων"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "Κάμερα"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2171,7 +2171,7 @@ msgstr "Εμφάνιση των FPS"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Show other karts' held powerups"
-msgstr ""
+msgstr "Εμφάνισε τις  δυνάμεις που έχουν τα άλλα κάρτ."
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2752,20 +2752,20 @@ msgid ""
 "created."
 msgstr "Το αρχείο διαμόρφωσης ήταν πολύ παλιό, έτσι διαγράφηκε και ένα νέο θα δημιουργηθεί."
 
-#: src/graphics/irr_driver.cpp:631
+#: src/graphics/irr_driver.cpp:613
 msgid "Video recording started."
 msgstr "Άρχισε η εγγραφή βίντεο."
 
-#: src/graphics/irr_driver.cpp:638
+#: src/graphics/irr_driver.cpp:620
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Το βίντεο αποθηκεύτηκε στο \"%s\"."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:624
 msgid "Encoding progress:"
 msgstr "Πρόοδος κωδικοποίησης:"
 
-#: src/graphics/irr_driver.cpp:1863 src/graphics/irr_driver.cpp:1868
+#: src/graphics/irr_driver.cpp:1845 src/graphics/irr_driver.cpp:1850
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
@@ -2802,10 +2802,10 @@ msgstr "Αποδοτικότητα Nitro"
 #: src/guiengine/widgets/player_kart_widget.cpp:758
 #: src/karts/controller/local_player_controller.cpp:446
 #: src/karts/controller/player_controller.cpp:413
-#: src/network/protocols/client_lobby.cpp:816
+#: src/network/protocols/client_lobby.cpp:817
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
 #: src/states_screens/race_result_gui.cpp:1421
-#: src/states_screens/race_result_gui.cpp:1479
+#: src/states_screens/race_result_gui.cpp:1482
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (μειονέκτημα)"
@@ -3412,12 +3412,12 @@ msgstr "Αριστερή σκανδάλη"
 msgid "Right trigger"
 msgstr "Δεξιά σκανδάλη"
 
-#: src/input/input_manager.cpp:986
+#: src/input/input_manager.cpp:985
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Αγνόηση '%s'. Έπρεπε να συνδεθείς νωρίτερα για να παίξεις!"
 
-#: src/input/input_manager.cpp:1023
+#: src/input/input_manager.cpp:1022
 msgid "Only the Game Master may act at this point!"
 msgstr "Μόνο ο υπεύθυνος του παιχνιδιού μπορεί να δράσει σε αυτό το σημείο!"
 
@@ -3473,7 +3473,7 @@ msgid "You finished the race!"
 msgstr "Ολοκλήρωσες τον αγώνα!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1114
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1115
 #, c-format
 msgid "%s left the game."
 msgstr "%s έφυγε απο το παινχίδι."
@@ -3613,12 +3613,12 @@ msgid "You were kicked: Ping too high."
 msgstr "Σας διωξάνε: Το Ping είναι πολύ υψήλο."
 
 #: src/network/protocols/client_lobby.cpp:255
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:857
 msgid "Bad network connection is detected."
 msgstr "Ανιχνεύθηκε κακή σύνδεση στο internet. "
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3629
+#: src/network/protocols/server_lobby.cpp:3636
 msgid "Bot"
 msgstr "Ρόμποτ"
 
@@ -3644,7 +3644,7 @@ msgstr "Όνομα server: %s"
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:688
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
-#: src/states_screens/race_result_gui.cpp:1779
+#: src/states_screens/race_result_gui.cpp:1785
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Δυσκολία: %s"
@@ -3691,90 +3691,90 @@ msgstr "Πρόοδος Πρωταθλήματος: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:848
+#: src/network/protocols/client_lobby.cpp:849
 msgid "All players joined red or blue team."
 msgstr "Όλοι οι παίκτες μπήκανε στην κόκκινη ή την μπλε ομάδα."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:868
+#: src/network/protocols/client_lobby.cpp:869
 msgid "You are now the owner of server."
 msgstr "Είσαι πλέον ο ιδιοκτήτης του server."
 
-#: src/network/protocols/client_lobby.cpp:911
+#: src/network/protocols/client_lobby.cpp:912
 msgid "Connection refused: Server is busy."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι απασχολημένος"
 
-#: src/network/protocols/client_lobby.cpp:916
+#: src/network/protocols/client_lobby.cpp:917
 msgid "Connection refused: You are banned from the server."
 msgstr "Η σύνδεση απορρίφθηκε: Σε έχουν μπλοκάρει σε αυτόν τον server."
 
-#: src/network/protocols/client_lobby.cpp:930
+#: src/network/protocols/client_lobby.cpp:931
 msgid "Connection refused: Server password is incorrect."
 msgstr "Η σύνδεση απορρίφθηκε: Ο κωδικός του server είναι λάθος."
 
-#: src/network/protocols/client_lobby.cpp:934
+#: src/network/protocols/client_lobby.cpp:935
 msgid "Connection refused: Game data is incompatible."
 msgstr "Η σύνδεση απορρίφθηκε: Τα δεδομένα του παιχνιδιού δεν ταιριάζουν."
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:939
 msgid "Connection refused: Server is full."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι γεμάτος."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:943
 msgid "Connection refused: Invalid player connecting."
 msgstr "Η σύνδεση απορρίφθηκε: Ο παίκτης που συνδέεται δεν είναι έγκυρος."
 
-#: src/network/protocols/client_lobby.cpp:970
+#: src/network/protocols/client_lobby.cpp:971
 msgid "Failed to start the network game."
 msgstr "Απέτυχε η συνδέση."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1183
+#: src/network/protocols/client_lobby.cpp:1184
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Το παιχνίδι εχει τελειώσει, εσύ δεν μπορείς να μπεις κατα την διαρκεια του παιχνιδίου ή να παρακουλουθής οποίονδηποτε."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1187
+#: src/network/protocols/client_lobby.cpp:1188
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Κανένας δεν περιμένει μέσα στον χόρο της αρένας - Συνδέση κατα την διαρκεία του παιχνιδιού είναι απενεργοποιημένη."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1192
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Μόνο 1 παίκτης περιμένει, για να επιστρέψει το Δωμάτιο αναμονής."
 
-#: src/network/protocols/client_lobby.cpp:1197
+#: src/network/protocols/client_lobby.cpp:1198
 msgid "Server owner quit the game."
 msgstr "Ο ιδιοκτήτης του διακομιστή έφυγε από το παιχνίδι"
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1201
+#: src/network/protocols/client_lobby.cpp:1202
 msgid "You will be spectating the next game."
 msgstr "Θα παρακολουθείτε το επόμενο παιχνίδι."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1369
+#: src/network/protocols/client_lobby.cpp:1370
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s μπήκε στην κόκκινη ομάδα."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1375
+#: src/network/protocols/client_lobby.cpp:1376
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s μπήκε στην μπλε ομάδα."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1381
+#: src/network/protocols/client_lobby.cpp:1382
 #, c-format
 msgid "%s joined the game."
 msgstr "%s μπήκε στον παιχνίδι."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1536
+#: src/network/protocols/client_lobby.cpp:1537
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3782,7 +3782,7 @@ msgid ""
 msgstr "Πατήστε <%s> ή <%s> για να αλλάξεις το στοχευμένο παίκτη, <%s> ή <%s> για την θέση της κάμερας."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1552
+#: src/network/protocols/client_lobby.cpp:1553
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Πετύχε το παράπονο %s."
@@ -3982,8 +3982,8 @@ msgstr "Βασικές"
 #: src/states_screens/arenas_screen.cpp:326
 #: src/states_screens/easter_egg_screen.cpp:225
 #: src/states_screens/easter_egg_screen.cpp:256
-#: src/states_screens/kart_selection.cpp:935
-#: src/states_screens/kart_selection.cpp:1576
+#: src/states_screens/kart_selection.cpp:936
+#: src/states_screens/kart_selection.cpp:1577
 #: src/states_screens/race_setup_screen.cpp:100
 msgid "Locked : solve active challenges to gain access to more!"
 msgstr "Κλειδωμένο: λύσε ενεργές προκλήσεις για να κερδίσεις πρόσβαση σε περισσότερες!"
@@ -4463,12 +4463,12 @@ msgid "Current password invalid."
 msgstr "Ο τρέχων κωδικός είναι λάθος."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:324
+#: src/states_screens/online/register_screen.cpp:322
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Ο κωδικός πρέπει να είναι μεταξύ 8 και 30 χαρακτήρες!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:308
+#: src/states_screens/online/register_screen.cpp:306
 msgid "Passwords don't match!"
 msgstr "Οι κωδικοί δεν ταιριάζουν!"
 
@@ -4478,7 +4478,7 @@ msgstr "Ο κωδικός σας άλλαξε με επιτυχία."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:389
+#: src/states_screens/online/register_screen.cpp:387
 msgid "Validating info"
 msgstr "Επικύρωση πληροφοριών"
 
@@ -4675,8 +4675,8 @@ msgid "Press any key..."
 msgstr "Πάτα οποιόδηποτε πλήκτρο..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
-#: src/states_screens/online/networking_lobby.cpp:240
-#: src/states_screens/online/networking_lobby.cpp:825
+#: src/states_screens/online/networking_lobby.cpp:244
+#: src/states_screens/online/networking_lobby.cpp:832
 msgid "Chat is disabled, enable in options menu."
 msgstr "Η συζήτηση είναι απενεργοποιημένη, ενεργοποίησέ την στις ρυθμίσεις."
 
@@ -4718,7 +4718,7 @@ msgstr "Αγώνας με replay φάντασμα"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1769
+#: src/states_screens/race_result_gui.cpp:1775
 #, c-format
 msgid "Laps: %i"
 msgstr "Γύροι: %i"
@@ -5030,17 +5030,17 @@ msgstr "Ολοκλήρωσες το Πρωτάθλημα!"
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr ""
 
-#: src/states_screens/kart_selection.cpp:911
-#: src/states_screens/kart_selection.cpp:1594
+#: src/states_screens/kart_selection.cpp:912
+#: src/states_screens/kart_selection.cpp:1595
 msgid "Random Kart"
 msgstr "Τυχαίο Kart"
 
-#: src/states_screens/kart_selection.cpp:930
+#: src/states_screens/kart_selection.cpp:931
 msgid "Locked"
 msgstr "Κλειδωμένο"
 
-#: src/states_screens/kart_selection.cpp:1031
-#: src/states_screens/online/networking_lobby.cpp:514
+#: src/states_screens/kart_selection.cpp:1032
+#: src/states_screens/online/networking_lobby.cpp:515
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5101,23 +5101,27 @@ msgstr "Άκυροι χαρακτήρες στον κωδικό!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:186
+#: src/states_screens/online/networking_lobby.cpp:189
 msgid "Ready"
 msgstr "Έτοιμος"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:189
+#: src/states_screens/online/networking_lobby.cpp:192
 msgid "Live join"
 msgstr "Σύνδεση κατα την διάρκεια του παιχνιδιού"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:194
+#: src/states_screens/online/networking_lobby.cpp:197
 msgid "Spectate"
 msgstr "Παρακολούθηση"
 
-#: src/states_screens/online/networking_lobby.cpp:332
+#: src/states_screens/online/networking_lobby.cpp:198
+msgid "Install addon"
+msgstr ""
+
+#: src/states_screens/online/networking_lobby.cpp:337
 #, c-format
 msgid "Lobby (ping: %dms)"
 msgstr "Δωμάτιο Αναμονής (ping: %dms)"
@@ -5125,7 +5129,7 @@ msgstr "Δωμάτιο Αναμονής (ping: %dms)"
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:378
+#: src/states_screens/online/networking_lobby.cpp:383
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -5133,7 +5137,7 @@ msgstr "Παρακαλώ περίμενετε για το τρέχων παιχ�
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:386
+#: src/states_screens/online/networking_lobby.cpp:391
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι, εκτμιση του χρόνου που απομένει: %s."
@@ -5141,31 +5145,24 @@ msgstr "Παρακαλώ περιμένετε για να τελειώσει τ�
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:398
+#: src/states_screens/online/networking_lobby.cpp:403
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr "Παρακαλώ περιμένετε για το τρέχων παιχνίδι (%s) τέλος, υπολογίστε την πρόoδο: %s%. "
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:407
+#: src/states_screens/online/networking_lobby.cpp:412
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι, Εκτίμηση πρόοδου: %d%"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:415
+#: src/states_screens/online/networking_lobby.cpp:420
 msgid "Please wait for the current game's end."
 msgstr "Παρακαλώ περιμένετε για να τελειώσει το τρέχων παιχνίδι. "
 
-#. I18N: In the networking lobby,
-#. tell user the command to install addon now
-#: src/states_screens/online/networking_lobby.cpp:429
-#, c-format
-msgid "Send %s in chat box to install addon now."
-msgstr ""
-
-#: src/states_screens/online/networking_lobby.cpp:483
+#: src/states_screens/online/networking_lobby.cpp:484
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5174,7 +5171,7 @@ msgstr[1] "Το παιχνίδι θα ξεκινήσει όταν οι παίκ�
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:497
+#: src/states_screens/online/networking_lobby.cpp:498
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5183,12 +5180,12 @@ msgid_plural ""
 msgstr[0] "Θα Ξεκινήσει μετά από %d δευτερόλεπτα, ή άμα όλοι έχουν πατίσει το κουμπί 'Έτοιμος'."
 msgstr[1] "Θα Ξεκινήσει μετά από %d δευτερόλεπτα, ή άμα όλοι έχουν πατίσει το κουμπί 'Έτοιμος'."
 
-#: src/states_screens/online/networking_lobby.cpp:534
+#: src/states_screens/online/networking_lobby.cpp:535
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Σύνδεση στον server %s"
 
-#: src/states_screens/online/networking_lobby.cpp:539
+#: src/states_screens/online/networking_lobby.cpp:540
 msgid "Finding a quick play server"
 msgstr "Αναζήτηση server για γρήγορο παιχνίδι"
 
@@ -5266,48 +5263,48 @@ msgstr "Λάθος διεύθυνση server: %s."
 msgid "Searching"
 msgstr "Γίνεται αναζήτηση"
 
-#: src/states_screens/online/register_screen.cpp:133
+#: src/states_screens/online/register_screen.cpp:131
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "Έξοδος παιχνιδιού"
 
-#: src/states_screens/online/register_screen.cpp:246
-#: src/states_screens/online/register_screen.cpp:253
+#: src/states_screens/online/register_screen.cpp:244
+#: src/states_screens/online/register_screen.cpp:251
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "Αδυναμία δημιουργίας παίκτη '%s'."
 
-#: src/states_screens/online/register_screen.cpp:270
+#: src/states_screens/online/register_screen.cpp:268
 msgid "User name cannot be empty."
 msgstr "Το όνομα χρήστη δεν μπορεί να είναι άδειο."
 
-#: src/states_screens/online/register_screen.cpp:312
+#: src/states_screens/online/register_screen.cpp:310
 msgid "Emails don't match!"
 msgstr "Τα email δεν ταιριάζουν!"
 
-#: src/states_screens/online/register_screen.cpp:316
+#: src/states_screens/online/register_screen.cpp:314
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "Το online όνομα χρήστη πρέπει να είναι μεταξύ 3 και 30 χαρακτήρων!"
 
-#: src/states_screens/online/register_screen.cpp:320
+#: src/states_screens/online/register_screen.cpp:318
 msgid "Online username must not start with a number!"
 msgstr "Το online όνομα χρήστη δεν πρέπει να ξεκινάει με έναν αριθμό!"
 
-#: src/states_screens/online/register_screen.cpp:328
+#: src/states_screens/online/register_screen.cpp:326
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "Το email πρέπει να είναι μεταξύ 5 και 254 χαρακτήρες!"
 
-#: src/states_screens/online/register_screen.cpp:334
+#: src/states_screens/online/register_screen.cpp:332
 msgid "Email is invalid!"
 msgstr "Το email είναι άκυρο!"
 
-#: src/states_screens/online/register_screen.cpp:397
+#: src/states_screens/online/register_screen.cpp:395
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Θα λάβετε ένα email με περαιτέρω οδηγίες για το πώς να ενεργοποιήσετε τον λογαριασμό σας. Παρακαλώ να είστε υπομονετικοί και να είστε σίγουροι οτι ελέγξατε τον φάκελο spam."
 
-#: src/states_screens/online/register_screen.cpp:436
+#: src/states_screens/online/register_screen.cpp:434
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Η πρόσβαση στο internet είναι απενεργοποιημένη, παρακαλώ ενεργοποιήστε την στις Ρυθμίσεις"
 
@@ -5918,31 +5915,31 @@ msgstr "Αποκλείστηκε"
 
 #. I18N: indicates a player that scored in their own goal in result screen
 #: src/states_screens/race_result_gui.cpp:1427
-#: src/states_screens/race_result_gui.cpp:1485
+#: src/states_screens/race_result_gui.cpp:1488
 msgid "(Own Goal)"
 msgstr "(Αυτογκόλ)"
 
-#: src/states_screens/race_result_gui.cpp:1560
+#: src/states_screens/race_result_gui.cpp:1566
 #, c-format
 msgid "Track %i/%i"
 msgstr "Πίστα %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1644
+#: src/states_screens/race_result_gui.cpp:1650
 msgid "Grand Prix progress:"
 msgstr "Πρόοδος του Πρωταθλήματος:"
 
-#: src/states_screens/race_result_gui.cpp:1690
+#: src/states_screens/race_result_gui.cpp:1696
 msgid "Highscores"
 msgstr "Υψηλές βαθμολογίες"
 
-#: src/states_screens/race_result_gui.cpp:1793
+#: src/states_screens/race_result_gui.cpp:1799
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Χρόνος καλύτερου γύρου: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1807
+#: src/states_screens/race_result_gui.cpp:1813
 #, c-format
 msgid "by %s"
 msgstr "Από τον %s"
