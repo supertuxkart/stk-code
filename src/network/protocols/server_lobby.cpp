@@ -3066,8 +3066,11 @@ void ServerLobby::computeNewRankings()
         // Update the maximum (reliable floor) score. At min RD, it is equal to the raw score.
         // TODO : make the public-facing score and rankings based on a reliable floor score ?
         double reliable_score = m_scores.at(id) - 3*new_rating_deviations[i] + 3*MIN_RATING_DEVIATION;
-        if (reliable_score > m_max_scores.at(id))
-            m_max_scores.at(id) = m_scores.at(id) - 3*new_rating_deviations[i] + 3*MIN_RATING_DEVIATION;
+        if (reliable_score > m_reliable_scores.at(id))
+            m_reliable_scores.at(id) = m_scores.at(id) - 3*new_rating_deviations[i] + 3*MIN_RATING_DEVIATION;
+
+        if (m_scores.at(id) > m_max_scores.at(id))
+            m_max_scores.at(id) = m_scores.at(id);
     }
 
     // Used to display rating change at the end of a race
@@ -3276,6 +3279,7 @@ void ServerLobby::clearDisconnectedRankedPlayer()
             m_scores.erase(id);
             m_max_scores.erase(id);
             m_num_ranked_races.erase(id);
+            m_reliable_scores.erase(id);
             m_rating_deviations.erase(id);
             m_num_ranked_disconnects.erase(id);
             it = m_ranked_players.erase(it);
@@ -4483,8 +4487,9 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
 
     // Default result
     double score = 4000.0;
-    double max_score = 1300.0;
+    double max_score = 4000.0;
     unsigned num_races = 0;
+    double reliable_score = 1300.0;
     double rating_deviation = 1000.0;
     uint64_t disconnection = 0;
     if (result->get("success", &rec_success))
@@ -4494,6 +4499,7 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
             result->get("scores", &score);
             result->get("max-scores", &max_score);
             result->get("num-races-done", &num_races);
+            result->get("reliable-scores", &reliable_score);
             result->get("rating-deviation", &rating_deviation);
             result->get("disconnection", &disconnection);
         }
@@ -4526,6 +4532,7 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
     m_scores[id] = score;
     m_max_scores[id] = max_score;
     m_num_ranked_races[id] = num_races;
+    m_reliable_scores[id] = reliable_score;
     m_rating_deviations[id] = rating_deviation;
     m_num_ranked_disconnects[id] = disconnection;
 }   // getRankingForPlayer
@@ -4543,7 +4550,8 @@ void ServerLobby::submitRankingsToAddons()
     public:
         SubmitRankingRequest(uint32_t online_id, double scores,
                              double max_scores, unsigned num_races,
-                             double rating_deviation, uint64_t disconnection,
+                             double reliable_scores, double rating_deviation,
+                             uint64_t disconnection,
                              const std::string& country_code)
             : XMLRequest(Online::RequestManager::HTTP_MAX_PRIORITY)
         {
@@ -4551,6 +4559,7 @@ void ServerLobby::submitRankingsToAddons()
             addParameter("scores", scores);
             addParameter("max-scores", max_scores);
             addParameter("num-races-done", num_races);
+            addParameter("reliable-scores", reliable_scores);
             addParameter("rating-deviation", rating_deviation);
             addParameter("disconnection", disconnection);
             addParameter("country-code", country_code);
@@ -4574,8 +4583,8 @@ void ServerLobby::submitRankingsToAddons()
         const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
         auto request = std::make_shared<SubmitRankingRequest>
             (id, m_scores.at(id), m_max_scores.at(id),
-            m_num_ranked_races.at(id), m_rating_deviations.at(id),
-            m_num_ranked_disconnects.at(id),
+            m_num_ranked_races.at(id), m_reliable_scores.at(id),
+            m_rating_deviations.at(id), m_num_ranked_disconnects.at(id),
             RaceManager::get()->getKartInfo(i).getCountryCode());
         NetworkConfig::get()->setUserDetails(request, "submit-ranking");
         Log::info("ServerLobby", "Submiting ranking for %s (%d) : %lf, %lf %d",

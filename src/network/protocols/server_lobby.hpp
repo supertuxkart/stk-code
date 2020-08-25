@@ -199,10 +199,13 @@ private:
     /** The rating uncertainty for each current player */
     std::map<uint32_t, double> m_rating_deviations;
 
+    /** The maximum scores obtained for each current player */
+    std::map<uint32_t, double> m_max_scores;
+
     /** The maximum reliable ranking scores achieved for each current player.
         This is not the same as the maximum raw ranking points,
         because a very high rating with very high RD is most likely lucky. */
-    std::map<uint32_t, double> m_max_scores;
+    std::map<uint32_t, double> m_reliable_scores;
 
     /** Number of disconnects in the previous 64 ranked races for each current players */
     std::map<uint32_t, uint64_t> m_num_ranked_disconnects; // TODO Initialized to 0 for a new player on 1st connection to a ranked server
