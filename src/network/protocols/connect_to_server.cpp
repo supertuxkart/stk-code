@@ -74,7 +74,6 @@ bool ConnectToServer::m_done_intecept = false;
 ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
-    m_quick_play_err_msg = _("No quick play server available.");
     m_server_address = {};
     if (server)
         m_server = server;
@@ -220,7 +219,7 @@ void ConnectToServer::asynchronousUpdate()
                 else
                 {
                     // Shutdown STKHost (go back to online menu too)
-                    STKHost::get()->setErrorMessage(m_quick_play_err_msg);
+                    STKHost::get()->setErrorMessage(_("No quick play server available."));
                     STKHost::get()->requestShutdown();
                     m_state = EXITING;
                     return;
@@ -369,8 +368,14 @@ void ConnectToServer::update(int ticks)
             if (STKHost::get()->getPeerCount() == 0)
             {
                 // Shutdown STKHost (go back to online menu too)
-                STKHost::get()->setErrorMessage(
-                    _("Cannot connect to server %s.", m_server->getName()));
+                core::stringw err =
+                    _("Cannot connect to server %s.", m_server->getName());
+                if (!m_error_msg.empty())
+                {
+                    err += L"\n";
+                    err += m_error_msg;
+                }
+                STKHost::get()->setErrorMessage(err);
                 STKHost::get()->requestShutdown();
             }
             requestTerminate();
@@ -515,9 +520,9 @@ bool ConnectToServer::registerWithSTKServer()
     }
     else
     {
-        irr::core::stringc error(request->getInfo().c_str());
+        m_error_msg = request->getInfo();
         Log::error("ConnectToServer", "Failed to register client address: %s",
-            error.c_str());
+            StringUtils::wideToUtf8(m_error_msg).c_str());
         return false;
     }
 }   // registerWithSTKServer
