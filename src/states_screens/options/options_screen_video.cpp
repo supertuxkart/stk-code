@@ -487,12 +487,11 @@ void OptionsScreenVideo::updateGfxSlider()
     {
         //I18N: custom video settings
         gfx->setCustomText( _("Custom") );
-
-        // Enable the blur slider if the modern renderer is used
-        getWidget<GUIEngine::SpinnerWidget>("blur_level")->
-            setActive(UserConfigParams::m_dynamic_lights);
     }
 
+    // Enable the blur slider if the modern renderer is used
+    getWidget<GUIEngine::SpinnerWidget>("blur_level")->
+        setActive(UserConfigParams::m_dynamic_lights);
     updateTooltip();
 } // updateGfxSlider
 
