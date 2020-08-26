@@ -2456,7 +2456,7 @@ void ServerLobby::startSelection(const Event *event)
     if (!has_peer_plays_game)
     {
         for (STKPeer* peer : always_spectate_peers)
-            peer->setAlwaysSpectate(false);
+            peer->setAlwaysSpectate(ASM_NONE);
         always_spectate_peers.clear();
     }
     else
@@ -2469,6 +2469,40 @@ void ServerLobby::startSelection(const Event *event)
             peer->setWaitingForGame(true);
     }
 
+    unsigned max_player = 0;
+    STKHost::get()->updatePlayers(&max_player);
+
+    if (max_player > 10 && (RaceManager::get()->isBattleMode() ||
+        RaceManager::get()->isSoccerMode()))
+    {
+        // Set late coming player to spectate if too many players in battle or
+        // soccer
+        std::sort(peers.begin(), peers.end(),
+            [](const std::shared_ptr<STKPeer>& a,
+            const std::shared_ptr<STKPeer>& b)
+            { return a->getHostId() > b->getHostId(); });
+        int remove_player = max_player - 10;
+        for (unsigned i = 0; i < peers.size(); i++)
+        {
+            auto& peer = peers[i];
+            if (!peer->isValidated() || peer->isWaitingForGame())
+                continue;
+            peer->setAlwaysSpectate(ASM_FULL);
+            peer->setWaitingForGame(true);
+            always_spectate_peers.insert(peer.get());
+            remove_player -= (int)peer->getPlayerProfiles().size();
+            if (remove_player <= 0)
+                break;
+            // In case something goes wrong (all players need spectate)
+            if (i == peers.size() - 1)
+            {
+                Log::error("ServerLobby", "Too many players and cannot set "
+                    "spectate for late coming players!");
+                return;
+            }
+        }
+    }
+
     for (const std::string& kart_erase : karts_erase)
     {
         m_available_kts.first.erase(kart_erase);
@@ -2478,7 +2512,7 @@ void ServerLobby::startSelection(const Event *event)
         m_available_kts.second.erase(track_erase);
     }
 
-    unsigned max_player = 0;
+    max_player = 0;
     STKHost::get()->updatePlayers(&max_player);
     if (auto ai = m_ai_peer.lock())
     {
@@ -4684,6 +4718,7 @@ void ServerLobby::addWaitingPlayersToGame()
         if (!peer || !peer->isValidated())
             continue;
 
+        peer->resetAlwaysSpectateFull();
         peer->setWaitingForGame(false);
         peer->setSpectator(false);
         if (m_peers_ready.find(peer) == m_peers_ready.end())
@@ -5522,10 +5557,10 @@ void ServerLobby::handleServerCommand(Event* event,
                 delete chat;
                 return;
             }
-            peer->setAlwaysSpectate(true);
+            peer->setAlwaysSpectate(ASM_COMMAND);
         }
         else
-            peer->setAlwaysSpectate(false);
+            peer->setAlwaysSpectate(ASM_NONE);
         updatePlayerList();
     }
     else if (argv[0] == "listserveraddon")
