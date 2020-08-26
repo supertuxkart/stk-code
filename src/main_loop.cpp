@@ -654,6 +654,10 @@ void MainLoop::run()
                 }
             }   // for i < num_steps
 
+            // Do it after all pending rewinding is done
+            if (World::getWorld() && RewindManager::isEnabled())
+                 RewindManager::get()->handleResetSmoothNetworkBody();
+
             // Handle controller the last to avoid slow PC sending actions too 
             // late
             if (!GUIEngine::isNoGraphics())

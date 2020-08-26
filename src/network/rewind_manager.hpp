@@ -115,6 +115,8 @@ private:
 
     std::vector<RewindInfoEventFunction*> m_pending_rief;
 
+    bool m_schedule_reset_network_body;
+
     RewindManager();
    ~RewindManager();
     // ------------------------------------------------------------------------
@@ -209,7 +211,10 @@ public:
         return ticks != 0 && a >= 0 && a % m_state_frequency == 0;
     }
     // ------------------------------------------------------------------------
-    void resetSmoothNetworkBody();
+    void resetSmoothNetworkBody()     { m_schedule_reset_network_body = true; }
+    // ------------------------------------------------------------------------
+    void handleResetSmoothNetworkBody();
+
 };   // RewindManager
 
 
