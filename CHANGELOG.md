@@ -5,18 +5,19 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
-## SuperTuxKart 1.2
-
-[Changelog fully done up to 03/07/20. Modern skin to be renamed]
+## SuperTuxKart 1.2 (27. August 2020)
 
 ### Networking
 * Add support for IPv6 LAN servers, by Benau
 * Auto-detect client IPv4 and IPv6 support, by Benau
 * Improved server creation speed and performance, by Benau
-* Allow to use any addon karts online, on servers with live join enabled, by Benau. The kart shows as Tux for other players and has Tux's hitbox.
+* Allow to use any addon karts online, on servers with live join enabled, by Benau. The kart has Tux's hitbox.
+* Prevent undefined behaviour on battle/soccer servers with an excessive player limit, by Benau
+* Use an improved rating formula for ranked play, by Alayan
 
 ### General
 * Use SDL2 for window creation, allowing better gamepad support, by Benau
+* Replace Fribidi by SheeBidi for RTL support, and remove the dependency to libraqm, by Benau
 * Add support for in-race messages in scripting, by CodedOre
 * Improved tutorial with free-flow racing (no more text interrupts), by CodedOre
 * Haiku support, by AlwaysLivid
@@ -26,23 +27,26 @@ For similar reasons, and because some features are vastly more complex than othe
 * Many many bugfixes and enhancements
 
 ### Mobile
-* Mobile STK indication in lobby, by riso
+* Many minor bugfixes and compatibility enhancements
 #### Android
 * Use the android app bundle, allowing all tracks to be included, by Benau
-* Use java code for extracting game data screen, by Benau
+* Use the native progress indicator during game data extraction, by Benau
 #### iOS
 * Allow server creation in-game by using only one process for client and server, by Benau
 
 ### User Interface
 * Introduce element padding for skins, by QwertyChouskie
-* Modern skin, by QwertyChouskie
+* New Cartoon skin, by LCP (art) and QwertyChouskie (code)
 * Allow to rename control configurations, by GuillaumeBft
-* New tips for soccer mode
+* Unthrottled keyboard navigations in menus, by Benau
+* Show mobile players as such in server lobbies, using an emoji icon, by riso
 * Always show the race end times in ms, by Fouks
 * SVG icons support, by riso
+* New tips for soccer mode
 #### In-race UI
 * Introduce camera settings in the options screen, by luffah
 * More spectator cameras in online spectating, by luffah
+* Add a minimap indicator for basketballs, by Alayan
 * Add team chat for team games, by Benau
 * Show the kart orientation on the soccer minimap, by riso
 * Show a message once a goal is made in soccer, by riso
