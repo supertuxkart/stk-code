@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-Modern skin by LCP and QwertyChouskie, released under CC-BY-SA 4.0+
+Cartoon skin by LCP and QwertyChouskie, released under CC-BY-SA 4.0+
 
 To make your own skin, I suggest simply duplicating this file and modifying it as needed.
 There are two types of images : some will be simply stretched as a whole, others will
@@ -63,7 +63,7 @@ when the border that intersect at this corner are enabled.
 When there is a common="y" with image tag, the image will be loaded only from data/skins/common in stk-code.
 -->
 
-<skin name="Modern" author="LCP and QwertyChouskie">
+<skin name="Cartoon" author="LCP and QwertyChouskie">
 
 <!--
 Here you can configure advanced theming rules for this skin
