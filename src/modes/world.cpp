@@ -350,6 +350,8 @@ void World::reset(bool restart)
     // when the race result gui was being shown. In this case restore the
     // race gui (note that the race result gui is cached and so never really
     // destroyed).
+    bool reset_streak = restart && !m_saved_race_gui;
+
     if(m_saved_race_gui)
     {
         m_race_gui       = m_saved_race_gui;
@@ -388,7 +390,7 @@ void World::reset(bool restart)
             {
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED);
             }
-            if (restart)
+            if (reset_streak)
                 PlayerManager::onRaceEnd(true /* previous race aborted */);
         }
     }
