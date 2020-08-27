@@ -1006,6 +1006,18 @@ bool CIrrDeviceSDL::getWindowPosition(int* x, int* y)
 }
 
 
+//! Get DPI of current display.
+bool CIrrDeviceSDL::getDisplayDPI(float* ddpi, float* hdpi, float* vdpi)
+{
+	if (Window)
+	{
+        SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(Window), ddpi, hdpi, vdpi);
+		return true;
+	}
+	return false;
+}
+
+
 //! returns if window is active. if not, nothing need to be drawn
 bool CIrrDeviceSDL::isWindowActive() const
 {

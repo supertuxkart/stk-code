@@ -248,6 +248,10 @@ namespace irr
 		/** \return true if success */
 		virtual bool getWindowPosition(int* x, int* y) = 0;
 
+		//! Get DPI of current display.
+		/** \return true if success */
+		virtual bool getDisplayDPI(float* ddpi, float* hdpi, float* vdpi) = 0;
+
 
 		//! Activate any joysticks, and generate events for them.
 		/** Irrlicht contains support for joysticks, but does not generate joystick events by default,
