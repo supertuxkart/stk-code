@@ -2899,12 +2899,14 @@ void ServerLobby::computeNewRankings()
     if (!RaceManager::get()->modeHasLaps())
         return;
 
-    std::vector<double> scores_change;
-    std::vector<double> new_scores;
+    std::vector<double> raw_scores_change;
+    std::vector<double> new_raw_scores;
+    std::vector<double> prev_raw_scores;
     std::vector<double> prev_scores;
     std::vector<double> new_rating_deviations;
     std::vector<double> prev_rating_deviations;
-    std::vector<uint64_t> prev_disconnects;
+    std::vector<uint64_t> prev_disconnects; //bitflag
+    std::vector<int>    disconnects;
 
     World* w = World::getWorld();
     assert(w);
@@ -2926,9 +2928,11 @@ void ServerLobby::computeNewRankings()
     for (unsigned i = 0; i < player_count; i++)
     {
         const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
-        double prev_score = m_scores.at(id);
-        new_scores.push_back(prev_score);
-        prev_scores.push_back(prev_score);
+        double prev_raw_score = m_raw_scores.at(id);
+        new_raw_scores.push_back(prev_raw_score);
+        prev_raw_scores.push_back(prev_raw_score);
+
+        prev_scores.push_back(m_scores.at(id));
 
         double prev_deviation = m_rating_deviations.at(id);
         new_rating_deviations.push_back(prev_deviation);
@@ -2952,6 +2956,10 @@ void ServerLobby::computeNewRankings()
 
         if (w->getKart(i)->isEliminated())
             m_num_ranked_disconnects.at(id)++;
+
+        // std::popcount is C++20 only
+        std::bitset<64> b(m_num_ranked_disconnects.at(id));
+        disconnects.push_back(b.count());
     }
 
     // In this loop, considering the race as a set
@@ -2963,11 +2971,11 @@ void ServerLobby::computeNewRankings()
     // II - Rating deviation changes
     for (unsigned i = 0; i < player_count; i++)
     {
-        scores_change.push_back(0.0);
+        raw_scores_change.push_back(0.0);
 
-        double player1_scores = new_scores[i];
+        double player1_raw_scores = new_raw_scores[i];
         if (w->getKart(i)->getHandicap())
-            player1_scores -= HANDICAP_OFFSET;
+            player1_raw_scores -= HANDICAP_OFFSET;
 
         // If the player has quitted before the race end,
         // the time value will be incorrect, but it will not be used
@@ -2976,8 +2984,10 @@ void ServerLobby::computeNewRankings()
 
         // On a disconnect, increase RD once,
         // no matter how many opponents
-        if (w->getKart(i)->isEliminated())
-            new_rating_deviations[i] = prev_rating_deviations[i] + 20.0;
+        if (w->getKart(i)->isEliminated() && disconnects[i] >= 3)
+            new_rating_deviations[i] =  prev_rating_deviations[i]
+                                      + BASE_RD_PER_DISCONNECT
+                                      + VAR_RD_PER_DISCONNECT * (disconnects[i] - 3);
 
         // Loop over all opponents
         for (unsigned j = 0; j < player_count; j++)
@@ -2994,9 +3004,9 @@ void ServerLobby::computeNewRankings()
             double diff, result, expected_result, ranking_importance, max_time;
             diff = result = expected_result = ranking_importance = max_time = 0.0;
 
-            double player2_scores = new_scores[j];
+            double player2_raw_scores = new_raw_scores[j];
             if (w->getKart(j)->getHandicap())
-                player2_scores -= HANDICAP_OFFSET;
+                player2_raw_scores -= HANDICAP_OFFSET;
 
             double player2_time = RaceManager::get()->getKartRaceTime(j);
             double player2_rd = prev_rating_deviations[j];
@@ -3006,7 +3016,7 @@ void ServerLobby::computeNewRankings()
             // compared to existing estimates.
 
             bool handicap_used = w->getKart(i)->getHandicap() || w->getKart(j)->getHandicap();
-            double accuracy = computeDataAccuracy(player1_rd, player2_rd, player1_scores, player2_scores, handicap_used);
+            double accuracy = computeDataAccuracy(player1_rd, player2_rd, player1_raw_scores, player2_raw_scores, player_count, handicap_used);
 
             // Now that we've computed the reliability value,
             // we can proceed with computing the points gained or lost
@@ -3017,32 +3027,28 @@ void ServerLobby::computeNewRankings()
 
             if (w->getKart(i)->isEliminated())
             {
+                // Recurring disconnects are punished through
+                // increased RD and higher RD floor,
+                // not through higher raw score loss
                 result = 0.0;
-                player1_time = player2_time; // for getTimeSpread
-
-                // Bigger penalty for recurring disconnects
-                double disconnect_penalty = computeDisconnectPenalty(j);
-                max_time =   ((1 - disconnect_penalty) * player2_time * 1.2)
-                           + (disconnect_penalty       * MAX_SCALING_TIME);
+                player1_time = player2_time * 1.2; // for getTimeSpread
             }
             else if (w->getKart(j)->isEliminated())
             {
                 result = 1.0;
-                player2_time = player1_time;
-                double disconnect_penalty = computeDisconnectPenalty(j);
-                max_time =   ((1 - disconnect_penalty) * player2_time * 1.2)
-                           + (disconnect_penalty       * MAX_SCALING_TIME);
+                player2_time = player1_time * 1.2;
             }
             else
             {
                 result = computeH2HResult(player1_time, player2_time);
-                max_time = std::min(std::max(player1_time, player2_time), MAX_SCALING_TIME);
             }
+
+            max_time = std::min(MAX_SCALING_TIME, std::max(player1_time, player2_time));
 
             ranking_importance = accuracy * mode_factor * scalingValueForTime(max_time);
 
             // Compute the expected result using an ELO-like function
-            diff = player2_scores - player1_scores;
+            diff = player2_raw_scores - player1_raw_scores;
 
             expected_result = 1.0/ (1.0 + std::pow(10.0,
                 diff / (  BASE_RANKING_POINTS / 2.0
@@ -3050,7 +3056,7 @@ void ServerLobby::computeNewRankings()
                         * getTimeSpread(std::min(player1_time, player2_time)))));
 
             // Compute the ranking change
-            scores_change[i] += ranking_importance * (result - expected_result);
+            raw_scores_change[i] += ranking_importance * (result - expected_result);
 
             // We now update the rating deviation. The change
             // depends on the current RD, on the result's accuracy,
@@ -3090,19 +3096,24 @@ void ServerLobby::computeNewRankings()
     // Don't merge it in the main loop as new_scores value are used there
     for (unsigned i = 0; i < player_count; i++)
     {
-        new_scores[i] += scores_change[i];
+        new_raw_scores[i] += raw_scores_change[i];
         const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
-        m_scores.at(id) =  new_scores[i];
+        m_raw_scores.at(id) = new_raw_scores[i];
+
         // Ensure RD doesn't go below the RD floor.
-        new_rating_deviations[i] = std::max(new_rating_deviations[i], MIN_RATING_DEVIATION);
+        // The minimum RD is increased in case of repeated disconnects
+        double disconnects_floor = 0;
+        if (disconnects[i] >= 3)
+        {
+            int n = disconnects[i] - 3;
+            disconnects_floor =   (disconnects[i]-2) * BASE_RD_PER_DISCONNECT
+                                + VAR_RD_PER_DISCONNECT * (n * (n+1)) / 2;
+        }
+        new_rating_deviations[i] = std::max(new_rating_deviations[i], MIN_RATING_DEVIATION + disconnects_floor);
         m_rating_deviations.at(id) = new_rating_deviations[i];
 
-        // Update the maximum (reliable floor) score. At min RD, it is equal to the raw score.
-        // TODO : make the public-facing score and rankings based on a reliable floor score ?
-        double reliable_score = m_scores.at(id) - 3*new_rating_deviations[i] + 3*MIN_RATING_DEVIATION;
-        if (reliable_score > m_reliable_scores.at(id))
-            m_reliable_scores.at(id) = m_scores.at(id) - 3*new_rating_deviations[i] + 3*MIN_RATING_DEVIATION;
-
+        // Update the main public rating. At min RD, it is equal to the raw score.
+        m_scores.at(id) = m_raw_scores.at(id) - 3*new_rating_deviations[i] + 3*MIN_RATING_DEVIATION;
         if (m_scores.at(id) > m_max_scores.at(id))
             m_max_scores.at(id) = m_scores.at(id);
     }
@@ -3185,23 +3196,6 @@ double ServerLobby::computeH2HResult(double player1_time, double player2_time)
 }   // computeH2HResult
 
 //-----------------------------------------------------------------------------
-/** Computes the disconnect penalty
- */
-double ServerLobby::computeDisconnectPenalty(int player_number)
-{
-    const uint32_t id = RaceManager::get()->getKartInfo(player_number).getOnlineId();
-    // std::popcount is C++20 only
-    std::bitset<64> b(m_num_ranked_disconnects.at(id));
-    int disconnects = b.count();
-    double disconnect_penalty = (disconnects <= 2) ? 0.0 :
-                                (disconnects >= 8) ? 1.0 :
-                                (disconnects - 2) / 6.0;
-
-    return disconnect_penalty;
-}   // computeDisconnectPenalty
-
-
-//-----------------------------------------------------------------------------
 /** Computes a relative factor indicating how much informative value
  *  the new race result gives us.
  *
@@ -3229,11 +3223,15 @@ double ServerLobby::computeDisconnectPenalty(int player_number)
  *  of a race is roughly proportional to the likelihood of the weaker player winning.
  *  We cap the effect so that losing to a much weaker player still costs rating points.
  *
+ *  In a race with many players, a single event can have a significant impact on the
+ *  results of all the H2H. To avoid races with high players count having too strong
+ *  rating swings, we apply a modifier scaling down accuracy.
+ *
  *  Finally, while handicap is allowed in ranked races and a rating offset is applied
  *  to keep expected results realistic (without incentivizing playing handicap-only),
  *  the results of such races are much less reliable.
  */
-double ServerLobby::computeDataAccuracy(double player1_rd, double player2_rd, double player1_scores, double player2_scores, bool handicap_used)
+double ServerLobby::computeDataAccuracy(double player1_rd, double player2_rd, double player1_scores, double player2_scores, int player_count, bool handicap_used)
 {
     double accuracy = player1_rd / (sqrt(player2_rd) * sqrt(MIN_RATING_DEVIATION));
 
@@ -3255,9 +3253,14 @@ double ServerLobby::computeDataAccuracy(double player1_rd, double player2_rd, do
         accuracy *= expected_result;
     }
 
+    // Reduce the importance of single h2h in a race with many players.
+    // The overall impact of a race with more players is still always bigger.
+    double player_count_modifier = 2.0 / sqrt((double) player_count);
+    accuracy *= player_count_modifier;
+
     // Races with handicap are unreliable for ranking
     if (handicap_used)
-        accuracy *= 0.3;
+        accuracy *= 0.25;
 
     return accuracy;
 }
@@ -3313,7 +3316,7 @@ void ServerLobby::clearDisconnectedRankedPlayer()
             m_scores.erase(id);
             m_max_scores.erase(id);
             m_num_ranked_races.erase(id);
-            m_reliable_scores.erase(id);
+            m_raw_scores.erase(id);
             m_rating_deviations.erase(id);
             m_num_ranked_disconnects.erase(id);
             it = m_ranked_players.erase(it);
@@ -4520,12 +4523,12 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
     std::string rec_success;
 
     // Default result
-    double score = 4000.0;
-    double max_score = 4000.0;
+    double raw_score = BASE_RANKING_POINTS;
+    double score     = BASE_RANKING_POINTS - 3*BASE_RATING_DEVIATION + 3*MIN_RATING_DEVIATION;
+    double max_score = BASE_RANKING_POINTS - 3*BASE_RATING_DEVIATION + 3*MIN_RATING_DEVIATION;
     unsigned num_races = 0;
-    double reliable_score = 1300.0;
-    double rating_deviation = 1000.0;
-    uint64_t disconnection = 0;
+    double rating_deviation = BASE_RATING_DEVIATION;
+    uint64_t disconnects = 0;
     if (result->get("success", &rec_success))
     {
         if (rec_success == "yes")
@@ -4533,9 +4536,9 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
             result->get("scores", &score);
             result->get("max-scores", &max_score);
             result->get("num-races-done", &num_races);
-            result->get("reliable-scores", &reliable_score);
+            result->get("raw-scores", &raw_score);
             result->get("rating-deviation", &rating_deviation);
-            result->get("disconnection", &disconnection);
+            result->get("disconnects", &disconnects);
         }
         else
         {
@@ -4566,9 +4569,9 @@ void ServerLobby::getRankingForPlayer(std::shared_ptr<NetworkPlayerProfile> p)
     m_scores[id] = score;
     m_max_scores[id] = max_score;
     m_num_ranked_races[id] = num_races;
-    m_reliable_scores[id] = reliable_score;
+    m_raw_scores[id] = raw_score;
     m_rating_deviations[id] = rating_deviation;
-    m_num_ranked_disconnects[id] = disconnection;
+    m_num_ranked_disconnects[id] = disconnects;
 }   // getRankingForPlayer
 
 //-----------------------------------------------------------------------------
@@ -4584,8 +4587,8 @@ void ServerLobby::submitRankingsToAddons()
     public:
         SubmitRankingRequest(uint32_t online_id, double scores,
                              double max_scores, unsigned num_races,
-                             double reliable_scores, double rating_deviation,
-                             uint64_t disconnection,
+                             double raw_scores, double rating_deviation,
+                             uint64_t disconnects,
                              const std::string& country_code)
             : XMLRequest(Online::RequestManager::HTTP_MAX_PRIORITY)
         {
@@ -4593,9 +4596,9 @@ void ServerLobby::submitRankingsToAddons()
             addParameter("scores", scores);
             addParameter("max-scores", max_scores);
             addParameter("num-races-done", num_races);
-            addParameter("reliable-scores", reliable_scores);
+            addParameter("raw-scores", raw_scores);
             addParameter("rating-deviation", rating_deviation);
-            addParameter("disconnection", disconnection);
+            addParameter("disconnects", disconnects);
             addParameter("country-code", country_code);
         }
         virtual void afterOperation()
@@ -4617,7 +4620,7 @@ void ServerLobby::submitRankingsToAddons()
         const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
         auto request = std::make_shared<SubmitRankingRequest>
             (id, m_scores.at(id), m_max_scores.at(id),
-            m_num_ranked_races.at(id), m_reliable_scores.at(id),
+            m_num_ranked_races.at(id), m_raw_scores.at(id),
             m_rating_deviations.at(id), m_num_ranked_disconnects.at(id),
             RaceManager::get()->getKartInfo(i).getCountryCode());
         NetworkConfig::get()->setUserDetails(request, "submit-ranking");
