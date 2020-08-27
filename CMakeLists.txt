@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.4)
 
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "git")
+set(PROJECT_VERSION "1.2")
 
 if (MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(LLVM_MINGW TRUE)
