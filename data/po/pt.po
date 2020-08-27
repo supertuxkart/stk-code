@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Benau, 2018-2019
+# Benau, 2018-2020
 # Bruno Ramalhete <bram.512@gmail.com>, 2015
 # Crystal Da Eevee <rutmaria3333@hotmail.com>, 2019-2020
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-29 01:02+0800\n"
-"PO-Revision-Date: 2020-07-28 17:52+0000\n"
+"PO-Revision-Date: 2020-08-27 17:31+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Portuguese (http://www.transifex.com/supertuxkart/supertuxkart/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -5117,7 +5117,7 @@ msgstr "Assistir ao jogo"
 
 #: src/states_screens/online/networking_lobby.cpp:198
 msgid "Install addon"
-msgstr ""
+msgstr "Instalar addon"
 
 #: src/states_screens/online/networking_lobby.cpp:337
 #, c-format
