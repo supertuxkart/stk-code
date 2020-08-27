@@ -332,7 +332,7 @@ if [ ! -f "$DIRNAME/obj/freetype_bootstrap.stamp" ]; then
     ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a"\
     LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a"\
     ./configure --host=$HOST --enable-shared=no \
-                --without-harfbuzz &&
+                --without-harfbuzz --without-brotli &&
     make $@
     check_error
     # We need to rebuild freetype after harfbuzz is compiled
@@ -368,7 +368,7 @@ if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
     ZLIB_CFLAGS="-fpic -I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a" \
     LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a" \
     HARFBUZZ_CFLAGS="-I$DIRNAME/obj/harfbuzz/src/" HARFBUZZ_LIBS="$DIRNAME/obj/harfbuzz/src/.libs/libharfbuzz.a" \
-    ./configure --host=$HOST --enable-shared=no
+    ./configure --host=$HOST --enable-shared=no --without-brotli
     make $@
     check_error
     touch "$DIRNAME/obj/freetype.stamp"
