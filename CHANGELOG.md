@@ -53,7 +53,9 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ### Tracks and modeling
 #### Karts
-* New version of Pidgin by Crystal
+* New version of Kiki, by Typhon306 and McRavenINDo
+* Improved karts, by Crystal
+    * Pidgin, Puffy
 
 ## SuperTuxKart 1.1 (4. January 2020)
 
