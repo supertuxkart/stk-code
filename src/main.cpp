@@ -163,6 +163,7 @@
 
 #ifdef ANDROID
 #include <SDL_system.h>
+#include <jni.h>
 #endif
 
 #include <stdexcept>
@@ -1759,6 +1760,25 @@ void initRest()
     // Input manager set first so it recieves SDL joystick event
     GUIEngine::init(device, driver, StateManager::get());
     GUIEngine::renderLoading(true, true, false);
+
+#ifdef ANDROID
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    assert(env);
+    jobject activity = (jobject)SDL_AndroidGetActivity();
+    if (activity != NULL)
+    {
+        jclass clazz = env->GetObjectClass(activity);
+        if (clazz != NULL)
+        {
+            jmethodID method_id = env->GetMethodID(clazz, "hideSplashScreen",
+                "()V");
+            if (method_id != NULL)
+                env->CallVoidMethod(activity, method_id);
+            env->DeleteLocalRef(clazz);
+        }
+        env->DeleteLocalRef(activity);
+    }
+#endif
 
     stk_config->initMusicFiles();
     // This only initialises the non-network part of the add-ons manager. The

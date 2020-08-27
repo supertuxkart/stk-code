@@ -4,6 +4,8 @@ import org.supertuxkart.stk_dbg.STKEditText;
 import org.libsdl.app.SDLActivity;
 import org.libsdl.app.SDL;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ActivityNotFoundException;
@@ -11,11 +13,18 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Process;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,6 +32,7 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.ViewGroup.MarginLayoutParams;
@@ -32,11 +42,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.util.DisplayMetrics;
 
+import java.io.InputStream;
 import java.util.Set;
 
 import org.minidns.hla.DnssecResolverApi;
@@ -48,6 +60,7 @@ public class SuperTuxKartActivity extends SDLActivity
 {
     private AlertDialog m_progress_dialog;
     private ProgressBar m_progress_bar;
+    private ImageView m_splash_screen;
     private STKEditText m_stk_edittext;
     private int m_bottom_y;
     // ------------------------------------------------------------------------
@@ -164,6 +177,7 @@ public class SuperTuxKartActivity extends SDLActivity
         super.onCreate(instance);
         m_progress_dialog = null;
         m_progress_bar = null;
+        m_splash_screen = null;
         m_bottom_y = 0;
         final View root = getWindow().getDecorView().findViewById(
             android.R.id.content);
@@ -186,6 +200,56 @@ public class SuperTuxKartActivity extends SDLActivity
                     SDLActivity.moveView(moved_height);
                 }
             });
+
+        InputStream istr = null;
+        try
+        {
+            LinearLayout ll = new LinearLayout(this);
+            LinearLayout.LayoutParams ll_param = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
+            ll.setLayoutParams(ll_param);
+
+            WindowManager wm =
+                (WindowManager)getSystemService(Context.WINDOW_SERVICE);
+            DisplayMetrics display_metrics = new DisplayMetrics();
+            wm.getDefaultDisplay().getMetrics(display_metrics);
+            Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+            int w = display_metrics.widthPixels;
+            int h = display_metrics.heightPixels;
+            Bitmap scaled = Bitmap.createBitmap(w, h, conf);
+
+            Canvas canvas = new Canvas(scaled);
+            istr = getAssets().open("data/gui/icons/logo.png");
+            Bitmap logo = BitmapFactory.decodeStream(istr);
+            Rect src = new Rect(0, 0, logo.getWidth(), logo.getHeight());
+            // STK logo is a square
+            int target_size = w;
+            if (target_size > h)
+                target_size = h;
+            target_size /= 2;
+            Rect dest = new Rect(w / 2 - target_size / 2,
+                h / 2 - target_size / 2,
+                w / 2 - target_size / 2 + target_size,
+                h / 2 - target_size / 2 + target_size);
+            canvas.drawBitmap(logo, src, dest, null);
+
+            m_splash_screen = new ImageView(this);
+            m_splash_screen.setBackgroundColor(Color.argb(255, 168, 168, 168));
+            m_splash_screen.setImageDrawable(new BitmapDrawable(getResources(),
+                scaled));
+            addContentView(m_splash_screen, ll_param);
+        }
+        catch (Exception e) {}
+        finally
+        {
+            try
+            {
+                if (istr != null)
+                    istr.close();
+            }
+            catch(Exception e) {}
+        }
     }
     // ------------------------------------------------------------------------
     @Override
@@ -377,5 +441,26 @@ public class SuperTuxKartActivity extends SDLActivity
             }
         });
 
+    }
+    // ------------------------------------------------------------------------
+    public void hideSplashScreen()
+    {
+        if (m_splash_screen != null)
+        {
+            m_splash_screen.animate().setDuration(200).alpha(0).setListener(
+            new AnimatorListenerAdapter()
+            {
+                @Override
+                public void onAnimationEnd(Animator animation)
+                {
+                    if (m_splash_screen.getParent() instanceof ViewGroup)
+                    {
+                        ViewGroup view = (ViewGroup)m_splash_screen.getParent();
+                        view.removeView(m_splash_screen);
+                        m_splash_screen = null;
+                    }
+                }
+            });
+        }
     }
 }

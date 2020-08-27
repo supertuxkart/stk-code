@@ -31,6 +31,7 @@ For similar reasons, and because some features are vastly more complex than othe
 #### Android
 * Use the android app bundle, allowing all tracks to be included, by Benau
 * Use the native progress indicator during game data extraction, by Benau
+* Add a launch splash screen, by Benau
 #### iOS
 * Allow server creation in-game by using only one process for client and server, by Benau
 

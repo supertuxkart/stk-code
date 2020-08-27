@@ -10,7 +10,7 @@
                  android:banner="@drawable/banner"
                  android:hasCode="true"
                  android:isGame="true"
-                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                 android:theme="@style/Theme.STKSplashScreen"
                  android:hardwareAccelerated="true"
                  android:resizeableActivity="true">
 
