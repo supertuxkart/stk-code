@@ -90,6 +90,9 @@ namespace irr
 		//! Get current window position.
 		virtual bool getWindowPosition(int* x, int* y);
 
+		//! Get DPI of current display.
+		virtual bool getDisplayDPI(float* ddpi, float* hdpi, float* vdpi);
+
 		//! Activate any joysticks, and generate events for them.
 		virtual bool activateJoysticks(core::array<SJoystickInfo> & joystickInfo);
 

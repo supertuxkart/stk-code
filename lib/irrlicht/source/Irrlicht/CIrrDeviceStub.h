@@ -113,6 +113,9 @@ namespace irr
 		//! Checks if the window is running in fullscreen mode.
 		virtual bool isFullscreen() const;
 
+        //! Gets the DPI of the display currently used
+        virtual bool getDisplayDPI(float* ddpi, float* hdpi, float* vdpi) {return false;}
+
 		//! get color format of the current window
 		virtual video::ECOLOR_FORMAT getColorFormat() const;
 
