@@ -28,6 +28,25 @@ android
     compileSdkVersion compile_sdk_version.toInteger()
     buildToolsVersion build_tools_ver
 
+    signingConfigs
+    {
+        release
+        {
+            storeFile file(keystore)
+            storePassword storepass
+            keyAlias alias
+            keyPassword storepass
+        }
+    }
+
+    buildTypes
+    {
+        release
+        {
+            signingConfig signingConfigs.release
+        }
+    }
+
     sourceSets
     {
         main

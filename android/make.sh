@@ -218,6 +218,29 @@ if [ ! -d "$SDK_PATH" ]; then
     exit
 fi
 
+# Check if we have key for signing in release build
+if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
+    if [ -z "$STK_KEYSTORE" ]; then
+        echo "Error: STK_KEYSTORE variable is empty."
+        exit
+    fi
+
+    if [ ! -f "$STK_KEYSTORE" ]; then
+        echo "Error: Couldn't find $STK_KEYSTORE file."
+        exit
+    fi
+
+    if [ -z "$STK_STOREPASS" ]; then
+        echo "Error: STK_STOREPASS variable is empty"
+        exit
+    fi
+
+    if [ -z "$STK_ALIAS" ]; then
+        echo "Error: STK_ALIAS variable is empty."
+        exit
+    fi
+fi
+
 # Find newest build-tools version
 if [ -z "$BUILD_TOOLS_VER" ]; then
     BUILD_TOOLS_DIRS=`ls -1 "$SDK_PATH/build-tools" | sort -V -r`
@@ -681,11 +704,17 @@ fi
 export ANDROID_HOME="$SDK_PATH"
 ./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
           -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
+          -Pstorepass="$STK_STOREPASS"               \
+          -Pkeystore="$STK_KEYSTORE"                 \
+          -Palias="$STK_ALIAS"                       \
           $GRADLE_BUILD_TYPE
 
 if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
 ./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
           -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
+          -Pstorepass="$STK_STOREPASS"               \
+          -Pkeystore="$STK_KEYSTORE"                 \
+          -Palias="$STK_ALIAS"                       \
           "bundleRelease"
 fi
 
