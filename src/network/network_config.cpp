@@ -587,7 +587,7 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
         for (unsigned i = 0; i < srv.size(); i++)
         {
             char server_name[512] = {};
-            if (ns_name_ntop(srv[i] + SRV_SERVER, server_name, 512) < 0)
+            if (ns_name_uncompress(response, response + response_len, srv[i] + SRV_SERVER, server_name, 512) < 0)
                 continue;
             uint16_t port = ns_get16(srv[i] + SRV_PORT);
             uint16_t weight = ns_get16(srv[i] + SRV_WEIGHT);
