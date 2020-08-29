@@ -12,7 +12,7 @@
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
 	#include <GL/gl.h>
-	#include "glext.h"
+	#include <GL/glext.h>
 #else
 #if defined(_IRR_OPENGL_USE_EXTPOINTER_)
 	#define GL_GLEXT_LEGACY 1
@@ -26,7 +26,7 @@
 	#include <GL/gl.h>
 #endif
 #if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-	#include "glext.h"
+	#include <GL/glext.h>
 #endif
 #endif
 

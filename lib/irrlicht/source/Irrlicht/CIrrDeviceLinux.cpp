@@ -35,7 +35,7 @@ extern bool GLContextDebugBit;
 #include <GL/gl.h>
 #ifdef _IRR_OPENGL_USE_EXTPOINTER_
 #define GLX_GLXEXT_PROTOTYPES
-#include "glxext.h"
+#include <GL/glxext.h>
 #endif
 #endif
 

@@ -24,7 +24,7 @@
 	#define NO_SDL_GLEXT
 	#include <SDL_video.h>
 	#include <SDL_opengl.h>
-	#include "glext.h"
+	#include <GL/glext.h>
 #elif defined(_IRR_WINDOWS_API_)
 	// include windows headers for HWND
 	#define WIN32_LEAN_AND_MEAN
@@ -34,7 +34,7 @@
 	#endif
 	#include <GL/gl.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-		#include "glext.h"
+		#include <GL/glext.h>
 	#endif
 	#include "wglext.h"
 
@@ -49,7 +49,7 @@
 	#endif
 	#include <OpenGL/gl.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-		#include "glext.h"
+		#include <GL/glext.h>
 	#endif
 #endif
 
