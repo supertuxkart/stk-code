@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-07-29 01:02+0800\n"
-"PO-Revision-Date: 2020-08-23 18:54+0000\n"
+"PO-Revision-Date: 2020-08-24 22:39+0000\n"
 "Last-Translator: Omer I.S.\n"
 "Language-Team: Hebrew (http://www.transifex.com/supertuxkart/supertuxkart/language/he/)\n"
 "MIME-Version: 1.0\n"
@@ -2381,7 +2381,7 @@ msgstr "כפתור (מקש) החילוץ יעיל מאוד."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr "יש להיזהר כאשר קרובים אל עגלות אחרות, הן אולי יתקפו אותך!"
+msgstr "יש להיזהר כאשר קרובים אל עגלות אחרות, הן עלולות לתקוף אותך!"
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2552,12 +2552,12 @@ msgstr "מה יש, ילדי פרחים קטנטנים? מנהיגכם הדגול
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "אה כן, הבנת, הוא בטירה שלי כעת ויוגש לארוחת ערב..."
+msgstr "אה כן, תבינו, הוא כעת בטירה שלי ויוגש לארוחת ערב..."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "But I'm a fair creature, so I'll make you a deal."
-msgstr "אבל יצור הוגן הנני, אז אעשה אתכם עסקה."
+msgstr "אך יצור הוגן הנני, אז אעשה אתכם עסקה."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml

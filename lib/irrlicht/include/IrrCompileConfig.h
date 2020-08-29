@@ -111,11 +111,6 @@
 #if !defined(_IRR_WINDOWS_API_) && !defined(_IRR_OSX_PLATFORM_) && !defined(_IRR_ANDROID_PLATFORM_) && !defined(_IRR_HAIKU_PLATFORM_)
 #ifndef _IRR_SOLARIS_PLATFORM_
 #define _IRR_LINUX_PLATFORM_
-#include <endian.h>
-#if __BYTE_ORDER == __BIG_ENDIAN
-#define __BIG_ENDIAN__
-#endif
-
 #endif
 #define _IRR_POSIX_API_
 #endif
@@ -461,6 +456,13 @@ precision will be lower but speed higher. currently X86 only
 #ifndef _IRR_WINDOWS_API_
     #undef _IRR_WCHAR_FILESYSTEM
 #endif
+
+
+#include <endian.h>
+ #if __BYTE_ORDER == __BIG_ENDIAN
+  #define __BIG_ENDIAN__
+ #endif
+
 
 #if defined(__sparc__) || defined(__sun__)
 #define __BIG_ENDIAN__

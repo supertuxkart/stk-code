@@ -22,6 +22,13 @@ code (which should address security concerns relating to embedding Irrlicht).
 If interested, a more thorough discussion on this topic can be reviewed on
 debian-devel-games, in this thread [13] (starting with [14]).
 
+Additional embedded copies of libraries are angelscript, bullet, enet,
+graphics_utils and wiiuse.
+bullet and enet are available in Debian, but STK requires heavily patched
+versions. It would be possible to use the system enet, but this prevents
+support for IPv6 (upstream enet does not yet have IPv6 support and is
+hesistant with merging patches).
+
 [1] http://sourceforge.net/support/tracker.php?aid=3454889
 [2] http://sourceforge.net/apps/trac/supertuxkart/ticket/689
 [3] http://forum.freegamedev.net/viewtopic.php?f=17&t=3906

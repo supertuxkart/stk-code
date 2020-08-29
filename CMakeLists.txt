@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.4)
 
 # root CMakeLists for the SuperTuxKart project
 project(SuperTuxKart)
-set(PROJECT_VERSION "git")
+set(PROJECT_VERSION "1.2")
 
 if (MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   set(LLVM_MINGW TRUE)
@@ -159,9 +159,8 @@ endif()
 
 if(UNIX OR MINGW)
     if(DEBUG_SYMBOLS)
-#        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-	SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -g")
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pthread  -g")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
     endif()
 endif()
 
@@ -617,11 +616,20 @@ target_link_libraries(supertuxkart
     ${CURL_LIBRARIES}
     ${LIBRESOLV_LIBRARY}
     ${MCPP_LIBRARY}
-    X11
-    z
-    png
-    jpeg
-    bz2
+
+         ${SQUISH_LIBRARY}
+         ${JPEG_LIBRARIES}
+         ${OGGVORBIS_LIBRARIES}
+        X11
+        z
+        png
+        jpeg
+        bz2
+         ${OPENAL_LIBRARY}
+         ${RAQM_LIBRARY}
+         ${FRIBIDI_LIBRARIES}
+
+
 
     )
 

@@ -1,25 +1,25 @@
 #!/usr/bin/make -f
 
-ifeq ($(findstring parallel=,$(DEB_BUILD_OPTIONS)),)
-	export DEB_BUILD_OPTIONS+=parallel=$(shell getconf _NPROCESSORS_ONLN)
-endif
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
 export DEB_LDFLAGS_MAINT_APPEND=-lGLU
-
-DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
 
 %:
 	dh $@ --buildsystem=cmake
 
 override_dh_auto_clean:
 	# Remove embedded libraries used by embedded Irrlicht
+	rm -rf lib/glew/
+	rm -rf lib/mcpp/
 	rm -rf lib/jpeglib/
-	rm -rf lib/zlib/
 	rm -rf lib/libpng/
-	
+	rm -rf lib/libraqm/
+	rm -rf lib/libsquish/
+	rm -rf lib/zlib/
+
 	dh_auto_clean
 
-override_dh_auto_configure:	
+override_dh_auto_configure:
 	# libbluetooth-dev is only available on linux, hence build with
 	# wiimote input device support only on linux
 	# TODO: remove -DBUILD_RECORDER=0 once libopenglrecorder is packaged
@@ -27,37 +27,39 @@ override_dh_auto_configure:
 	dh_auto_configure -- -DCMAKE_BUILD_TYPE="STKRelease" \
 	                     -DSTK_INSTALL_BINARY_DIR="games" \
 	                     -DSTK_INSTALL_DATA_DIR="share/games/supertuxkart" \
+	                     -DUSE_CRYPTO_OPENSSL=OFF \
 	                     -DBUILD_RECORDER=0; \
 	else \
 	dh_auto_configure -- -DCMAKE_BUILD_TYPE="STKRelease" \
 	                     -DSTK_INSTALL_BINARY_DIR="games" \
 	                     -DSTK_INSTALL_DATA_DIR="share/games/supertuxkart" \
 	                     -DUSE_WIIUSE=OFF \
+	                     -DUSE_CRYPTO_OPENSSL=OFF \
 	                     -DBUILD_RECORDER=0; \
 	fi
 
-override_dh_auto_build:
-	# Generate manual page	 
-	docbook-to-man debian/supertuxkart.sgml > debian/supertuxkart.6
-	
-	dh_auto_build
-
 override_dh_install:
 	# Licenses are all documented in debian/copyright
-	find $(CURDIR)/debian/tmp \( -iname "LICENSE" -o -iname "License.txt" \
-	-o -iname "license2.txt" -o -iname "licence2.txt" -o -iname \
-	"License.Debian.txt" -o -iname "Music_license.rtf" \) -delete
-	
-	# cmake installs some unneeded autotools-related files as well
-	find $(CURDIR)/debian/tmp \( -iname "Makefile.am" -o -iname \
-	"Makefile.in" \) -delete
-	
-	# Remove unneeded (developer) scripts in data directory
-	find $(CURDIR)/debian/tmp \( -iname "run_me.sh" -o -iname \
-	"optimize_data.sh" -o -iname "check.sh" -o -iname \
-	"pull_from_transifex.sh" \) -delete
-	
-	dh_install --list-missing -Xgitignore -Xgitattributes
+	find $(CURDIR)/debian/tmp \( \
+	 -iname "LICENSE" \
+	 -o -iname "License.txt" \
+	 -o -iname "licence2.txt" \
+	 -o -iname "Music_license.rtf" \
+	 -o -iname "licenses.txt" \
+	 -o -name "SIL Open Font License.txt" \
+	\) -delete
+
+	# Remove unneeded (developer) scripts and other files in data directory
+	find $(CURDIR)/debian/tmp/usr/share/games/supertuxkart/data \( \
+	 -name "optimize_data.sh" \
+	 -o -name "pull_from_transifex.sh" \
+	 -o -name "supertuxkart.appdata.xml" \
+	 -o -name "supertuxkart.desktop" \
+	 -o -name "*.icns" \
+	 -o -name "*.plist" \
+	 \) -delete
+
+	dh_install -Xgitignore -Xgitattributes
 
 override_dh_strip:
-	dh_strip --dbg-package=supertuxkart-dbg
+	dh_strip --dbgsym-migration='supertuxkart-dbg (<< 1.0-1~)'

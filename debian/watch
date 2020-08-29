@@ -1,3 +1,5 @@
-version=3
-opts=dversionmangle=s/\+dfsg\d+$//g \
-http://sf.net/supertuxkart/supertuxkart-([\d\.]*)-src\.(?:tar\.(?:gz|bz2|xz))
+version=4
+opts="dversionmangle=auto, \
+      uversionmangle=s/-rc/~rc/, \
+      repacksuffix=+ds" \
+https://sf.net/supertuxkart/supertuxkart-@ANY_VERSION@-src@ARCHIVE_EXT@

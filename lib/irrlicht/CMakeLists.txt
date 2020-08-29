@@ -3,11 +3,7 @@ if(NOT SERVER_ONLY)
     find_package(PNG REQUIRED)
     find_package(JPEG REQUIRED)
     find_package(ZLIB REQUIRED)
-    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
-                        "${JPEG_INCLUDE_DIR}"
-                        "${PNG_INCLUDE_DIRS}"
-                        "${ZLIB_INCLUDE_DIR}"
-                        "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/" "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
 
     if(NOT USE_GLES2)
         find_package(OpenGL REQUIRED)
@@ -532,10 +528,10 @@ endif()
 
 add_library(stkirrlicht STATIC ${IRRLICHT_SOURCES})
 
-target_link_libraries(stkirrlicht ${ZLIB_LIBRARY})
+target_link_libraries(stkirrlicht z)
 
 if(NOT SERVER_ONLY)
-    target_link_libraries(stkirrlicht ${PNG_LIBRARY} ${JPEG_LIBRARY})
+    target_link_libraries(stkirrlicht png jpeg)
 endif()
 
 if(WIN32)

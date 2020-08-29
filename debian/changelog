@@ -1,9 +1,110 @@
 supertuxkart (1.2-1) UNRELEASED; urgency=medium
 
-  * New Build
-  * 
+  * rebuild
 
- -- CyberVitexus <vitex@exiv.jinonice.czf>  Sat, 29 Aug 2020 07:27:44 +0200
+ -- CyberVitexus <vitex@exiv.jinonice.czf>  Sat, 29 Aug 2020 18:37:53 +0200
+
+supertuxkart (1.1+ds-1) unstable; urgency=medium
+
+  * Team upload.
+  * Update d/watch to version 4 and add repacksuffix.
+  * Re-add embedded copy/fork of enet.
+  * Enable IPv6 support.
+  * Drop sources of files from missing-sources that are no longer shipped.
+
+ -- Reiner Herrmann <reiner@reiner-h.de>  Sun, 12 Jan 2020 13:37:31 +0100
+
+supertuxkart (1.1-1) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Reiner Herrmann ]
+  * New upstream release. (Closes: #948222)
+    - refresh patches and drop applied ones
+  * Link against system mcpp and raqm and drop embedded copies
+  * Keep IPv6 disabled, as it would require the embedded copy of enet.
+  * Bump Standards-Version to 4.4.1.
+  * Update descriptions
+    - drop article at beginning
+    - don't use first person
+  * Update debhelper compat to 12.
+    - drop --list-missing from dh_install
+  * Update font dependencies/symlinks/copyright.
+  * Build-depend on sqlite3.
+  * Install upstream manpage instead of outdated packaged one.
+  * Exclude a header from orig tarball that is only used in iOS client.
+  * Update copyrights.
+  * Drop very old version restrictions.
+  * Drop autotools-related files from d/clean and d/rules.
+
+  [ QwertyChouskie ]
+  * Add Harfbuzz build dependency.
+  * Disable openssl, so cmake will continue building with nettle.
+  * Cleanup files in d/clean.
+
+ -- Reiner Herrmann <reiner@reiner-h.de>  Tue, 07 Jan 2020 01:18:14 +0100
+
+supertuxkart (1.0-5) unstable; urgency=medium
+
+  * Team upload.
+  * Move the atomic check down so that the target is known.
+
+ -- Reiner Herrmann <reiner@reiner-h.de>  Sun, 08 Sep 2019 22:14:48 +0200
+
+supertuxkart (1.0-4) unstable; urgency=medium
+
+  * Team upload.
+  * Fix test program that checks for atomic support, by using an
+    8 byte type instead of int.
+
+ -- Reiner Herrmann <reiner@reiner-h.de>  Sun, 08 Sep 2019 12:11:32 +0200
+
+supertuxkart (1.0-3) unstable; urgency=medium
+
+  * Team upload.
+  * Enable Wayland support.
+    - build-depend on libwayland-dev and libxkbcommon-dev
+  * Link against libatomic on architectures where it is required.
+    (Closes: #934799)
+
+ -- Reiner Herrmann <reiner@reiner-h.de>  Sat, 07 Sep 2019 13:13:25 +0200
+
+supertuxkart (1.0-2) unstable; urgency=medium
+
+  * Team upload.
+  * Upload to unstable.
+  * Declare compliance with Debian Policy 4.4.0.
+
+ -- Markus Koschany <apo@debian.org>  Sat, 13 Jul 2019 00:51:33 +0200
+
+supertuxkart (1.0-1) experimental; urgency=medium
+
+  * Team upload.
+
+  [ Reiner Herrmann ]
+  * New upstream release.
+  * Refresh patches and drop obsolete ones.
+  * Link against additional system libraries: glew, enet, squish.
+  * Update installation path of appdata.
+  * Update removed/ignored files during installation.
+  * Convert -dbg to automatically generated -dbgsym package.
+  * Enable all hardening options.
+  * Drop obsolete check for parallel builds.
+  * Fix spelling errors found by lintian.
+  * Mark -data as Multi-Arch foreign.
+  * Declare that d/rules does not require root.
+  * Add upstream metadata.
+  * Convert d/copyright to copyright format 1.0 and update it.
+
+  [ QwertyChouskie ]
+  * Update d/control:
+    - Removed SDL deps left over from the pre-0.7 days.
+    - Added nettle dependency
+    - Added deps for GLES build (1.0 automatically builds with GLES
+      on ARM systems)
+    - Update description to match supertuxkart.appdata.xml
+
+ -- Reiner Herrmann <reiner@reiner-h.de>  Sun, 09 Jun 2019 22:28:11 +0200
 
 supertuxkart (0.9.3-2) unstable; urgency=medium
 
@@ -323,7 +424,7 @@ supertuxkart (0.6.1a+dfsg2-2) unstable; urgency=low
   [ Christoph Egger ]
   * Fix get-orig-source rule
   * Fix watchfile
-  * Unversion depends on plib (Closes: #516925) 
+  * Unversion depends on plib (Closes: #516925)
 
  -- Christoph Egger <debian@christoph-egger.org>  Tue, 24 Feb 2009 15:31:32 +0100
 
@@ -338,10 +439,10 @@ supertuxkart (0.6.1a+dfsg1-1) unstable; urgency=low
   [ Peter De Wachter ]
   * Added patch to check for SDL errors and to allow the game to run on
     low-end hardware (closes: #501116), (LP: #203144); Applied Upstream
-    
+
   [ Christoph Egger ]
   * New Upstream Release (Closes: #512994), (LP: #319990)
-    * Fix incorrect recreation of items 
+    * Fix incorrect recreation of items
     * Correct Issue when restarting follow-the-leader game
     * Fix build with GCC 4.4 (Closes: #505671)
     * Drop all patches (now upstream)
@@ -376,7 +477,7 @@ supertuxkart (0.5-1.1) unstable; urgency=high
 supertuxkart (0.5-1) unstable; urgency=low
 
   * New upstream release (Closes: #484326)
-    * Upstream no longer ships .desktop file 
+    * Upstream no longer ships .desktop file
       So no need to remove it in rules
   * Bumping Standards Version to 3.8.0
     * Adding debian/README.source
@@ -492,4 +593,3 @@ supertuxkart (0.0.0.1-1) unstable; urgency=low
   * Initial release Closes: #366199
 
  -- Gonéri Le Bouder <goneri@rulezlan.org>  Sat,  6 May 2006 02:15:26 +0000
-
