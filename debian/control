@@ -1,0 +1,106 @@
+Source: supertuxkart
+Section: games
+Priority: optional
+Maintainer: Debian Games Team <pkg-games-devel@lists.alioth.debian.org>
+Uploaders:
+ Sam Hocevar <sho@debian.org>,
+ Vincent Cheng <vcheng@debian.org>
+Build-Depends:
+ cmake (>= 2.8.1),
+ debhelper (>= 11),
+ docbook-to-man,
+ libalut-dev,
+ libbluetooth-dev [linux-any],
+ libbz2-dev,
+ libcurl4-gnutls-dev | libcurl4-dev,
+ libenet-dev (>= 1.3.1),
+ libfreetype6-dev,
+ libfribidi-dev,
+ libjpeg-dev,
+ libopenal-dev,
+ libpng-dev,
+ libsdl-image1.2-dev,
+ libsdl-ttf2.0-dev,
+ libvorbis-dev,
+ libxrandr-dev,
+ libxxf86vm-dev,
+ mesa-common-dev,
+ zlib1g-dev
+Standards-Version: 4.3.0
+Vcs-Git: https://salsa.debian.org/games-team/supertuxkart.git
+Vcs-Browser: https://salsa.debian.org/games-team/supertuxkart
+Homepage: https://supertuxkart.net
+
+Package: supertuxkart
+Architecture: any
+Depends:
+ supertuxkart-data (= ${source:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends}
+Description: 3D kart racing game
+ SuperTuxKart is a free 3D kart racing game, with a focus on having fun over
+ realism. You can play with up to 4 friends on one PC, racing against each
+ other or just trying to beat the computer; single-player mode is also
+ available.
+ .
+ See the great lighthouse or drive through the sand and visit the pyramids.
+ Race underground or in space, watching the stars pass by. Or rest under the
+ palm trees on the beach, watching the other karts overtake you. But don't eat
+ the bananas! Watch for bowling balls, plungers, bubble gum and cakes thrown by
+ your opponents.
+ .
+ You can do a single race against other karts, compete in one of several Grand
+ Prix, try to beat the high score in time trials on your own, play battle mode
+ against your friends, and more!
+
+Package: supertuxkart-data
+Architecture: all
+Depends:
+ fonts-cantarell,
+ fonts-freefont-ttf,
+ fonts-noto-hinted,
+ ${misc:Depends}
+Suggests:
+ supertuxkart
+Description: 3D kart racing game (data)
+ SuperTuxKart is a free 3D kart racing game, with a focus on having fun over
+ realism. You can play with up to 4 friends on one PC, racing against each
+ other or just trying to beat the computer; single-player mode is also
+ available.
+ .
+ See the great lighthouse or drive through the sand and visit the pyramids.
+ Race underground or in space, watching the stars pass by. Or rest under the
+ palm trees on the beach, watching the other karts overtake you. But don't eat
+ the bananas! Watch for bowling balls, plungers, bubble gum and cakes thrown by
+ your opponents.
+ .
+ You can do a single race against other karts, compete in one of several Grand
+ Prix, try to beat the high score in time trials on your own, play battle mode
+ against your friends, and more!
+ .
+ This package contains data files for the game supertuxkart.
+
+Package: supertuxkart-dbg
+Section: debug
+Architecture: any
+Depends:
+ supertuxkart (= ${binary:Version}),
+ ${misc:Depends},
+ ${shlibs:Depends}
+Description: 3D kart racing game (debug)
+ SuperTuxKart is a free 3D kart racing game, with a focus on having fun over
+ realism. You can play with up to 4 friends on one PC, racing against each
+ other or just trying to beat the computer; single-player mode is also
+ available.
+ .
+ See the great lighthouse or drive through the sand and visit the pyramids.
+ Race underground or in space, watching the stars pass by. Or rest under the
+ palm trees on the beach, watching the other karts overtake you. But don't eat
+ the bananas! Watch for bowling balls, plungers, bubble gum and cakes thrown by
+ your opponents.
+ .
+ You can do a single race against other karts, compete in one of several Grand
+ Prix, try to beat the high score in time trials on your own, play battle mode
+ against your friends, and more!
+ .
+ This package contains debugging symbols for the game supertuxkart.

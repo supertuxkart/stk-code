@@ -1,0 +1,494 @@
+supertuxkart (1.2) UNRELEASED; urgency=medium
+
+  * New Build
+
+ -- CyberVitexus <vitex@exiv.jinonice.czf>  Sat, 29 Aug 2020 07:27:44 +0200
+
+supertuxkart (0.9.3-2) unstable; urgency=medium
+
+  * Team upload.
+  * Drop deprecated menu file and debian/supertuxkart.xpm icon.
+  * Switch to compat level 11.
+  * Declare compliance with Debian Policy 4.3.0.
+  * Use canonical VCS URI and move the package to salsa.debian.org.
+  * Add glew.patch to fix FTBFS with Debian's latest version of glew.
+    Thanks to Adrian Bunk for the report. (Closes: #915453)
+
+ -- Markus Koschany <apo@debian.org>  Sat, 29 Dec 2018 20:30:46 +0100
+
+supertuxkart (0.9.3-1) unstable; urgency=medium
+
+  * New upstream release.
+    - Fix segfault in MusicInformation::isPlaying. (Closes: #873670)
+    - Fix credits for Boom-boom-boom song. (Closes: #848001)
+    - Remove obsolete patches: replace-fonts-ubuntu-with-cantarell.patch,
+      update_boom_boom_boom_license.patch, fix_angelscript_ftbfs.patch,
+      irrlicht/link-against-needed-libs.diff.
+    - Refresh remaining patches.
+  * Add new font dependencies for supertuxkart-data: fonts-freefont-ttf,
+    fonts-noto-hinted,
+  * Bump Standards version to 4.1.2.
+    - Change priority of debug package from extra to optional.
+
+ -- Vincent Cheng <vcheng@debian.org>  Sun, 17 Dec 2017 20:16:38 -0800
+
+supertuxkart (0.9.2+dfsg-2) unstable; urgency=medium
+
+  * Fix FTBFS on arm64, mips/mips64/mipsel, ppc64el, s390x. (Closes: #830748)
+    - Add debian/patches/fix_angelscript_ftbfs.patch.
+  * Remove non-free Ubuntu Font Family fonts, replaced with Cantarell.
+    (Closes: #830751)
+    - Add new dependency on fonts-cantarell.
+    - Add debian/patches/replace-fonts-ubuntu-with-cantarell.patch to replace
+      references to Ubuntu Font Family fonts.
+  * Clarify licensing for Boom_boom_boom.ogg and add source mod files to
+    tarball. (Closes: #832062)
+    - Add debian/patches/update_boom_boom_boom_license.patch.
+
+ -- Vincent Cheng <vcheng@debian.org>  Sat, 03 Dec 2016 17:17:52 -0800
+
+supertuxkart (0.9.2-1) unstable; urgency=medium
+
+  * New upstream release.
+    - Fix FTBFS with gcc 6. (Closes: #811724)
+    - Drop patches fix_angelscript_build_on_non-x86_arches.patch and
+      srgb_workaround.patch; applied upstream.
+    - Refresh remaining patches.
+  * Add build-depends on libfreetype6-dev.
+  * Update Homepage field in d/control.
+  * Bump Standards version to 3.9.8, no changes required.
+
+ -- Vincent Cheng <vcheng@debian.org>  Thu, 07 Jul 2016 23:40:10 -0700
+
+supertuxkart (0.9.1-3) unstable; urgency=medium
+
+  * Add srgb_workaround.patch to provide workaround for darker screens on
+    Intel GPUs with mesa >= 10.6. (Closes: #808857) More info upstream at:
+    https://github.com/supertuxkart/stk-code/issues/2190
+
+ -- Vincent Cheng <vcheng@debian.org>  Wed, 23 Dec 2015 13:07:40 -0800
+
+supertuxkart (0.9.1-2) unstable; urgency=medium
+
+  * Fix fix_angelscript_build_on_non-x86_arches.patch to fix FTBFS on armhf.
+    (Closes: #808716)
+
+ -- Vincent Cheng <vcheng@debian.org>  Tue, 22 Dec 2015 21:29:36 -0800
+
+supertuxkart (0.9.1-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #808355)
+    - Drop support_windowed_mode_when_xrandr_not_available.patch, applied
+      upstream; refresh remaining patches.
+  * Remove debian/menu file as per tech-ctte decision in #741573.
+
+ -- Vincent Cheng <vcheng@debian.org>  Mon, 21 Dec 2015 13:51:09 -0800
+
+supertuxkart (0.9-5) unstable; urgency=medium
+
+  * Add patch to fix crash when xrandr is not available. (Closes: #793457)
+
+ -- Vincent Cheng <vcheng@debian.org>  Sat, 25 Jul 2015 17:57:15 -0700
+
+supertuxkart (0.9-4) unstable; urgency=medium
+
+  * Update fix_angelscript_build_on_non-x86_arches.patch again to fix FTBFS
+    on armel.
+
+ -- Vincent Cheng <vcheng@debian.org>  Wed, 03 Jun 2015 20:26:12 -0700
+
+supertuxkart (0.9-3) unstable; urgency=medium
+
+  * Update fix_angelscript_build_on_non-x86_arches.patch to fix FTBFS on
+    armel. Thanks again to James Cowgill for the patch!
+
+ -- Vincent Cheng <vcheng@debian.org>  Mon, 01 Jun 2015 21:39:01 -0700
+
+supertuxkart (0.9-2) unstable; urgency=medium
+
+  * Add fix_angelscript_build_on_non-x86_arches.patch to fix FTBFS on a few
+    non-x86 arches (arm*, ppc64el, s390x). Thanks to James Cowgill for the
+    patch!
+  * Install upstream appdata. Thanks to Marcus Lundblad for the patch!
+    (Closes: #785516)
+  * Drop build-depends on libglew-dev; add lintian override for embedded glew.
+
+ -- Vincent Cheng <vcheng@debian.org>  Sun, 17 May 2015 21:50:45 -0700
+
+supertuxkart (0.9-1) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Vincent Cheng ]
+  * New upstream release.
+    - Drop fix_desktop_file.patch, applied upstream.
+    - Rename build_against_system_enet.patch to
+      build_against_system_enet_and_glew.patch, and build against system glew.
+    - Refresh remaining patches.
+  * Add build-depends on libxrandr-dev, libglew-dev.
+  * Update my email address.
+  * Bump Standards version to 3.9.6, no changes required.
+
+  [ Christoph Egger ]
+  * remove myself from uploaders
+
+ -- Vincent Cheng <vcheng@debian.org>  Wed, 13 May 2015 00:32:20 -0700
+
+supertuxkart (0.8.1-2) unstable; urgency=medium
+
+  * Disable support for wiimote input devices on !linux (since
+    libbluetooth-dev is only built on linux archs).
+  * Restrict build-dep libbluetooth-dev to linux-any.
+
+ -- Vincent Cheng <Vincentc1208@gmail.com>  Fri, 20 Dec 2013 14:58:35 -0800
+
+supertuxkart (0.8.1-1) unstable; urgency=low
+
+  * Team upload
+
+  [ Alexander Reichle-Schmehl ]
+  * Removed myself from uploaders.
+
+  [ Gianfranco Costamagna ]
+  * New upstream release, patch refresh
+  * Bumped std-version to 3.9.5, no changes required
+  * Added libbluetooth-dev
+  * Added lib/irrlicht/lib/Linux/libIrrlicht.a
+    to debian/clean target
+  * Moved images from xpm to png, since upstream has changed them
+
+  [ Vincent Cheng ]
+  * Run wrap-and-sort -sa
+  * Re-added xpm icon for debian/menu.
+  * Fix lintian error embedded-library (libjpeg, libpng, zlib).
+
+ -- Vincent Cheng <Vincentc1208@gmail.com>  Thu, 19 Dec 2013 23:18:54 -0800
+
+supertuxkart (0.8-2) unstable; urgency=low
+
+  * Upload to unstable.
+  * Add override for outdated-autotools-helper-file (cmake is used instead).
+  * Fix lintian warning vcs-field-not-canonical.
+
+ -- Vincent Cheng <Vincentc1208@gmail.com>  Sun, 05 May 2013 19:26:37 -0700
+
+supertuxkart (0.8-1) experimental; urgency=low
+
+  * New upstream release.
+    - Use embedded/forked copy of irrlicht; refer to debian/README.source for
+      details. Also import patches used in Debian's irrlicht source package.
+    - Remove build-depends on libirrlicht-dev.
+    - Add build-depends on zlib1g-dev, libbz2-dev, libpng-dev, libjpeg-dev,
+      mesa-common-dev.
+    - Remove backport_cmake.patch and build_with_irrlicht_1.8.patch; applied
+      upstream.
+    - Refresh remaining patches.
+  * Bump Standards version to 3.9.4, no changes required.
+
+ -- Vincent Cheng <Vincentc1208@gmail.com>  Fri, 28 Dec 2012 22:45:14 -0800
+
+supertuxkart (0.7.3-2+exp1) experimental; urgency=low
+
+  * Upload to experimental.
+  * Build with irrlicht 1.8.
+    - This should fix segfaults related to irrlicht 1.7.3 in supertuxkart,
+      commonly triggered through the use of power-ups during races.
+      (Closes: #677609; LP: #1011180, LP: #1048284, LP: #1049398, LP: #1061436,
+      LP: #1064019, LP: #1069871)
+    - This also fixes incorrect rendering of Suzanne's kart. (Closes: #679837)
+    - Update build-depends on libirrlicht-dev (>= 1.8).
+    - Drop patch debian/patches/build_with_irrlicht_1.7.3.patch and add
+      debian/patches/build_with_irrlicht_1.8.patch.
+  * Add new package supertuxkart-dbg containing debugging symbols.
+
+ -- Vincent Cheng <Vincentc1208@gmail.com>  Fri, 16 Nov 2012 08:22:15 -0800
+
+supertuxkart (0.7.3-2) unstable; urgency=low
+
+  * Switch buildsystem to cmake (upstream has deprecated their autotools
+    build system).
+    - Drop build-depends on autotools-dev, automake, dh-autoreconf.
+    - Add build-depends on cmake (>= 2.8.1).
+    - Refresh debian/patches/build_against_system_enet.patch.
+    - Add debian/patches/backport_cmake.patch to backport fixes to STK's
+      CMake build system (and to make it easier to build against system enet).
+  * Install hi-res icon and use it in STK's desktop menu entry. (LP: #937976)
+  * Enable parallel building.
+
+ -- Vincent Cheng <Vincentc1208@gmail.com>  Thu, 31 May 2012 17:23:37 -0700
+
+supertuxkart (0.7.3-1) unstable; urgency=low
+
+  * Team upload.
+
+  [ Alexander Reichle-Schmehl ]
+  * New upstream release (Closes: #634019, LP: #871630)
+  * Fix watchfile to ignore release candidates
+  * Refresh patches/build-against-system-enet.patch
+  * Drop patches/enet1.3.patch (Applied upstream)
+
+  [ Vincent Cheng ]
+  * Add myself to Uploaders.
+  * Add debian/patches/build_with_irrlicht_1.7.3.patch to enable build with
+    latest stable version of irrlicht rather than an unreleased SVN revision.
+  * Bump versioned dependency on libirrlicht-dev to (>= 1.7.3).
+  * Update debian/rules to dh 7 "rules.tiny" style.
+  * Add build-depends on dh-autoreconf and use autoreconf sequence in
+    debian/rules.
+  * Add build-depends on libcurl4-gnutls-dev | libcurl4-dev, libfribidi-dev,
+    libxxf86vm-dev.
+  * Add missing DEP-3 headers to patches.
+  * Source tarball is now DFSG-clean.
+    - Remove unneeded get-orig-source target in debian/rules.
+    - Remove unneeded get-orig-source.sh and README.source.
+  * Remove unneeded *.xpm icons in debian/.
+  * Remove unused lintian-overrides file.
+  * Remove unneeded debian/supertuxkart.desktop menu file (use menu file in
+    data/supertuxkart_desktop.template instead).
+    - Add debian/patches/fix_desktop_file.patch to add Debian/Ubuntu-specific
+      changes to menu file (and forward patch upstream). (Closes: #667640;
+      LP: #709987)
+  * "Modernize" package description, as suggested by an upstream dev.
+    (LP: #774345); remove reference to GotM. (Closes: #531637)
+  * Bump dh compat level from 7 to 9.
+  * Bump standards version from 3.8.3 to 3.9.3 (no changes needed).
+
+ -- Vincent Cheng <Vincentc1208@gmail.com>  Fri, 04 May 2012 18:36:07 -0700
+
+supertuxkart (0.7+dfsg1-2) unstable; urgency=low
+
+  * drop 3DGraphics from desktop file (LP: #532065)
+  * Apply patch by Ansgar Burchardt to build against enet 1.3 (Closes:
+    #617783)
+
+ -- Christoph Egger <christoph@debian.org>  Thu, 17 Mar 2011 21:08:17 +0100
+
+supertuxkart (0.7+dfsg1-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Christoph Egger <christoph@debian.org>  Thu, 24 Feb 2011 22:36:25 +0100
+
+supertuxkart (0.6.2+dfsg1-2) unstable; urgency=low
+
+  * Change my E-Mail Address
+  * Kill some whitespaces at the end of lines
+  * Explicitly link against libGLU (Closes: #556477) taking the patch from
+    Ubuntu
+  * Remove KiBi from Uploaders on his request
+  * Build against system libenet, makes stk build on GNU/kFreeBSD and is
+    the right thing anyway
+  * Add misc:Depends to -data package
+  * Bump standards version from 3.8.3 to .4 (no changes needed)
+
+ -- Christoph Egger <christoph@debian.org>  Wed, 10 Mar 2010 23:51:14 +0100
+
+supertuxkart (0.6.2+dfsg1-1) unstable; urgency=low
+
+  * New Upstream Release
+    * Only Bugfixes and minor improvements
+    * Drop rubber.patch again as it was taken from 0.6.2 branch
+      and is part of this release
+    * Use replacement artwork from 0.6.1a
+  * Silence horn.wav (Closes: #515332)
+  * Bump Standards Version to 3.8.3 (No changes needed)
+  * Bump debhelper compat to 7 for dh_prep
+  * Update our copy of supertuxkart.desktop from upstreams,
+    our changes will get pushed upstream as well.
+  * Cleaning debian/rules a bit more
+
+ -- Christoph Egger <debian@christoph-egger.org>  Sat, 22 Aug 2009 12:45:50 +0200
+
+supertuxkart (0.6.1a+dfsg2-3) unstable; urgency=low
+
+  * Move config.* out of the diff (Closes: #538617)
+  * Clean up rules
+  * lintian override for invalid spellchecker in binary
+  * Bump standards Version without any changes
+  * Reorder Categories in the desktop file (Closes: #443412) (LP: #329265)
+  * Add rubber.patch so supertuxkart won't segfault in RubberBand::hit anymore.
+    (Closes: #539964)
+
+ -- Christoph Egger <debian@christoph-egger.org>  Mon, 03 Aug 2009 22:26:02 +0200
+
+supertuxkart (0.6.1a+dfsg2-2) unstable; urgency=low
+
+  [ Alexander Reichle-Schmehl ]
+  * Adapt debian/control to my new name
+
+  [ Cyril Brulebois ]
+  * Update my mail address
+
+  [ Christoph Egger ]
+  * Fix get-orig-source rule
+  * Fix watchfile
+  * Unversion depends on plib (Closes: #516925) 
+
+ -- Christoph Egger <debian@christoph-egger.org>  Tue, 24 Feb 2009 15:31:32 +0100
+
+supertuxkart (0.6.1a+dfsg2-1) unstable; urgency=low
+
+  * Now use the correct tarball (was the old 0.5 by accident)
+
+ -- Christoph Egger <debian@christoph-egger.org>  Sun, 22 Feb 2009 13:32:47 +0100
+
+supertuxkart (0.6.1a+dfsg1-1) unstable; urgency=low
+
+  [ Peter De Wachter ]
+  * Added patch to check for SDL errors and to allow the game to run on
+    low-end hardware (closes: #501116), (LP: #203144); Applied Upstream
+    
+  [ Christoph Egger ]
+  * New Upstream Release (Closes: #512994), (LP: #319990)
+    * Fix incorrect recreation of items 
+    * Correct Issue when restarting follow-the-leader game
+    * Fix build with GCC 4.4 (Closes: #505671)
+    * Drop all patches (now upstream)
+  * Use $(QUILT_STAMPFN) insted of direct patch target for quilt make-snippet
+  * Wrap Uploaders, Build-Depends
+  * get-orig-source target
+  * mangle watchfile correctly
+
+  [ Stefan Potyra ]
+  * debian/supertuxcart.sgml: fix dhusername entity.
+
+ -- Christoph Egger <debian@christoph-egger.org>  Wed, 18 Feb 2009 18:13:28 +0100
+
+supertuxkart (0.5+dfsg1-1) unstable; urgency=medium
+
+  * urgency medium due to RC fix
+  * Replacing nonfree stuff (Closes: #514416)
+  * Improving debian/copyright
+  * Update my Email address
+
+ -- Christoph Egger <debian@christoph-egger.org>  Sun, 08 Feb 2009 19:38:27 +0100
+
+supertuxkart (0.5-1.1) unstable; urgency=high
+
+  * Non-maintainer upload.
+  * DEB_BUILD_OPTIONS=noopt debian/rules now sets CXXFLAGS (closes: #490045)
+  * Tighten up build-dep on plib1.8.4-dev (closes: #490052 as a side-effect)
+  * urgency=high to fix RC bug in testing
+
+ -- Vincent Fourmond <fourmond@debian.org>  Mon, 21 Jul 2008 00:34:36 +0200
+
+supertuxkart (0.5-1) unstable; urgency=low
+
+  * New upstream release (Closes: #484326)
+    * Upstream no longer ships .desktop file 
+      So no need to remove it in rules
+  * Bumping Standards Version to 3.8.0
+    * Adding debian/README.source
+  * Adding myself to Uploaders
+  * Fixing multiplayer bug (First player gets
+    playerkart with best ranking after first map
+    in grandprix
+  * bug1996464.patch (from upstream bugtracker)
+
+ -- Christoph Egger <Christoph.Egger@gmx.de>  Thu, 19 Jun 2008 18:58:49 +0200
+
+supertuxkart (0.4-1) unstable; urgency=low
+
+  * New upstream release (Closes: #470552).
+  * 10_fix_FTBFS_with_gcc-4.3.diff:
+    + Patch for gcc-4.3 FTBFS is no longer needed (Closes: #455187).
+
+ -- Sam Hocevar (Debian packages) <sam+deb@zoy.org>  Tue, 11 Mar 2008 22:52:53 +0000
+
+supertuxkart (0.3-3) UNRELEASED; urgency=low
+
+  * Introduce quilt patch system.
+  * Fix FTBFS with gcc-4.3 (missing headers) by adding the following
+    patch (Closes: #455187):
+     + 10_fix_FTBFS_with_gcc-4.3.diff.
+  * Remove obsolete “Encoding” key from debian/supertuxkart.desktop.
+  * Add myself to the Uploaders.
+  * Add two tiny items to debian/TODO.
+
+ -- Cyril Brulebois <cyril.brulebois@enst-bretagne.fr>  Fri, 29 Feb 2008 01:03:20 +0100
+
+supertuxkart (0.3-2) unstable; urgency=low
+
+  [ Barry deFreese ]
+  * Add watch file
+  * Add Homepage field to control
+  * Remove XS- from VCS fields
+
+  [ Gonéri Le Bouder ]
+  * fix spelling error in the description, thanks Philippe Cloutier
+    and  Filipus Klutier (Closes: #441419)
+
+  [ Jon Dowland ]
+  * add Homepage: control field to source stanza
+
+  [ Alexander Schmehl ]
+  * adding libvorbis-dev to build-depends, appearantly supertuxkart supports
+    ogg vorbis; thanks to Lucas Nussbaum for detecting via build daemon from
+    hell
+  * removing Homepage: semie-headers from package descriptions
+  * reformating long description to not be longer than 80 columns
+  * debian/copyright refering to /usr/share/common-licenses/GPL-2 instead of
+    GPL
+  * Bumping standards version to 3.7.3: No changes needed
+
+ -- Alexander Schmehl <tolimar@debian.org>  Tue, 29 Jan 2008 22:15:13 +0100
+
+supertuxkart (0.3-1) unstable; urgency=low
+
+  [ Gonéri Le Bouder ]
+  * New upstream release
+   - updated copyright file
+   - new b-deps: libopenal-dev, libalut-dev, libmikmod2-dev
+  * install the desktop file (Closes: 406873)
+  * do not ignore the make distclean return anymore
+  * versionned dependency against plib >= 1.8.4-8 because of #436917
+
+  [ Sam Hocevar ]
+  * debian/control:
+    + Remove leading “a”s from short descriptions.
+    + Use ${source:Version} to make package binNMUable.
+    + Added XS-Vcs-Svn field.
+
+  [ Jon Dowland ]
+  * update menu section to "Games/Action" for menu policy transition.
+    Thanks Linas Žvirblis.
+
+  [ Cyril Brulebois ]
+  * Added XS-Vcs-Browser fields in the control file.
+
+ -- Gonéri Le Bouder <goneri@rulezlan.org>  Thu,  9 Aug 2007 12:07:57 +0200
+
+supertuxkart (0.2-1) unstable; urgency=low
+
+  [ Gonéri Le Bouder ]
+  * new upstream release candidate
+   + Closes: #388021
+   + remove supertuxkart.sh
+   + add supertuxkart(|-data).install
+   + clean up
+   + remove deps on ${shlibs:Depends}, ${misc:Depends} for supertuxkart-data
+  * fix French comment was tagged de_DE
+  * fix not-binnmuable-any-depends-all
+  * fix FTBFS on 64bit arch
+   + Closes: #370810
+
+  [ Eddy Petrişor ]
+  * added Romanian translation to desktop file
+
+ -- Gonéri Le Bouder <goneri@rulezlan.org>  Fri,  8 Sep 2006 22:59:25 +0200
+
+supertuxkart (0.0.0.1-2) unstable; urgency=low
+
+  * supertuxkart-data architecture fixed to all
+  * fix circular dependency
+  * better description for supertuxkart-data
+    Closes: #370673
+
+ -- Gonéri Le Bouder <goneri@rulezlan.org>  Tue,  6 Jun 2006 13:09:38 +0200
+
+supertuxkart (0.0.0.1-1) unstable; urgency=low
+
+  * Initial release Closes: #366199
+
+ -- Gonéri Le Bouder <goneri@rulezlan.org>  Sat,  6 May 2006 02:15:26 +0000
+

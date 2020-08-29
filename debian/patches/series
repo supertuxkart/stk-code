@@ -1,0 +1,8 @@
+build_against_system_enet.patch
+link_against_system_libs.patch
+remove_irrlicht_embedded_libs.patch
+# Irrlicht patches taken directly from irrlicht source package in Debian
+irrlicht/arch-support.diff
+irrlicht/use-system-libs.diff
+irrlicht/fix-hurd-ftbfs.diff
+glew.patch

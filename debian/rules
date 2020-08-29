@@ -1,0 +1,63 @@
+#!/usr/bin/make -f
+
+ifeq ($(findstring parallel=,$(DEB_BUILD_OPTIONS)),)
+	export DEB_BUILD_OPTIONS+=parallel=$(shell getconf _NPROCESSORS_ONLN)
+endif
+
+export DEB_LDFLAGS_MAINT_APPEND=-lGLU
+
+DEB_HOST_ARCH_OS ?= $(shell dpkg-architecture -qDEB_HOST_ARCH_OS)
+
+%:
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_clean:
+	# Remove embedded libraries used by embedded Irrlicht
+	rm -rf lib/jpeglib/
+	rm -rf lib/zlib/
+	rm -rf lib/libpng/
+	
+	dh_auto_clean
+
+override_dh_auto_configure:	
+	# libbluetooth-dev is only available on linux, hence build with
+	# wiimote input device support only on linux
+	# TODO: remove -DBUILD_RECORDER=0 once libopenglrecorder is packaged
+	if [ $(DEB_HOST_ARCH_OS) = linux ]; then \
+	dh_auto_configure -- -DCMAKE_BUILD_TYPE="STKRelease" \
+	                     -DSTK_INSTALL_BINARY_DIR="games" \
+	                     -DSTK_INSTALL_DATA_DIR="share/games/supertuxkart" \
+	                     -DBUILD_RECORDER=0; \
+	else \
+	dh_auto_configure -- -DCMAKE_BUILD_TYPE="STKRelease" \
+	                     -DSTK_INSTALL_BINARY_DIR="games" \
+	                     -DSTK_INSTALL_DATA_DIR="share/games/supertuxkart" \
+	                     -DUSE_WIIUSE=OFF \
+	                     -DBUILD_RECORDER=0; \
+	fi
+
+override_dh_auto_build:
+	# Generate manual page	 
+	docbook-to-man debian/supertuxkart.sgml > debian/supertuxkart.6
+	
+	dh_auto_build
+
+override_dh_install:
+	# Licenses are all documented in debian/copyright
+	find $(CURDIR)/debian/tmp \( -iname "LICENSE" -o -iname "License.txt" \
+	-o -iname "license2.txt" -o -iname "licence2.txt" -o -iname \
+	"License.Debian.txt" -o -iname "Music_license.rtf" \) -delete
+	
+	# cmake installs some unneeded autotools-related files as well
+	find $(CURDIR)/debian/tmp \( -iname "Makefile.am" -o -iname \
+	"Makefile.in" \) -delete
+	
+	# Remove unneeded (developer) scripts in data directory
+	find $(CURDIR)/debian/tmp \( -iname "run_me.sh" -o -iname \
+	"optimize_data.sh" -o -iname "check.sh" -o -iname \
+	"pull_from_transifex.sh" \) -delete
+	
+	dh_install --list-missing -Xgitignore -Xgitattributes
+
+override_dh_strip:
+	dh_strip --dbg-package=supertuxkart-dbg

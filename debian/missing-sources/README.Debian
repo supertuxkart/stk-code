@@ -1,0 +1,10 @@
+This directory contains source mod files for the following audio track:
+
+ data/music/Boom_boom_boom.ogg
+
+These source files were retrieved with:
+
+$ svn checkout http://svn.code.sf.net/p/supertuxkart/code/media/trunk/music/mods
+
+Refer to https://bugs.debian.org/832062 for more details.
+

@@ -1,0 +1,40 @@
+As of SuperTuxKart version 0.8, upstream developers have embedded a forked copy
+of Irrlicht into STK, which is now being used by this Debian package (as of
+0.8-1, when build-depends on libirrlicht-dev was dropped). Rationale is as
+follows:
+
+ - Upstream STK devs have made modifications to Irrlicht that they deem
+   necessary for STK, which upstream Irrlicht has rejected [1]. Furthermore,
+   in the future, STK devs plan on making more intrusive changes to Irrlicht,
+   which may break the API [2]; more detailed explanation at [3].
+ - Past attempts to use Debian's version of Irrlicht in STK has been extremely
+   troublesome due to upstream STK's usage of unreleased svn revisions of
+   Irrlicht (e.g. Irrlicht r3843 for STK 0.7.3). Although I have tried to
+   patch STK to use a system copy of Irrlicht in the past [4], this has caused
+   a number of rendering bugs (e.g. [5]) and a large number of semi-random
+   segfaults (e.g. [6][7][8][9][10][11][12]...), and is simply infeasible now
+   that upstream STK devs plan on making more intrusive changes to Irrlicht.
+
+Note that the embedded copy of Irrlicht is built with Debian's zlib/bzip2/
+libpng/libjpeg/glext instead of the embedded copies within the Irrlicht source
+code (which should address security concerns relating to embedding Irrlicht).
+
+If interested, a more thorough discussion on this topic can be reviewed on
+debian-devel-games, in this thread [13] (starting with [14]).
+
+[1] http://sourceforge.net/support/tracker.php?aid=3454889
+[2] http://sourceforge.net/apps/trac/supertuxkart/ticket/689
+[3] http://forum.freegamedev.net/viewtopic.php?f=17&t=3906
+[4] http://sourceforge.net/apps/trac/supertuxkart/ticket/628
+[5] http://bugs.debian.org/679837
+[6] http://bugs.debian.org/677609
+[7] https://bugs.launchpad.net/bugs/1011180
+[8] https://bugs.launchpad.net/bugs/1048284
+[9] https://bugs.launchpad.net/bugs/1049398
+[10] https://bugs.launchpad.net/bugs/1061436
+[11] https://bugs.launchpad.net/bugs/1064019
+[12] https://bugs.launchpad.net/bugs/1069871
+[13] http://lists.debian.org/debian-devel-games/2012/12/threads.html#00006
+[14] http://lists.debian.org/debian-devel-games/2012/12/msg00006.html
+
+ -- Vincent Cheng <vcheng@debian.org>  Fri, 28 Dec 2012 22:45:14 -0800

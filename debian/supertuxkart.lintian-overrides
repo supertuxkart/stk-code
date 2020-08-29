@@ -1,0 +1,2 @@
+# http://sourceforge.net/p/glew/patches/40/
+supertuxkart: embedded-library usr/games/supertuxkart: glew

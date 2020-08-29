@@ -1,0 +1,220 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>Goneri</firstname>">
+  <!ENTITY dhsurname   "<surname>Le Bouder</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>May 7, 2006</date>">
+  <!ENTITY dhsection   "<manvolnum>6</manvolnum>">
+  <!ENTITY dhemail     "<email>&lt;goneri@rulezlan.org&gt;</email>">
+  <!ENTITY dhusername  "Gonéri Le Bouder">
+  <!ENTITY dhucpackage "<refentrytitle>SUPERTUXKART</refentrytitle>">
+  <!ENTITY dhpackage   "supertuxkart">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2006</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>&dhpackage;</refname>
+
+    <refpurpose>A Kart Game Featuring Tux and Friends</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>&dhpackage;</command>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+<!--
+  <refsect1>
+    <title>DESCRIPTION</title>
+  </refsect1>
+-->
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <para>This program accepts some optional parameters.</para>
+
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>-N --no-start-screen</option>
+        </term>
+        <listitem>
+          <para>Quick race</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-t --track</option>
+        </term>
+        <listitem>
+          <para>Start at track NAME (see --list-tracks)</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-l --list-tracks</option>
+        </term>
+        <listitem>
+          <para>Show available tracks.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-k --numkarts</option>
+        </term>
+        <listitem>
+          <para>Number of karts on the racetrack</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--kart NAME</option>
+        </term>
+        <listitem>
+          <para>Use kart number NAME</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--list-karts</option>
+        </term>
+        <listitem>
+          <para>Show available karts.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--laps n</option>
+        </term>
+        <listitem>
+          <para>Define number of laps to n</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--players n</option>
+        </term>
+        <listitem>
+          <para>Define number of players to between 1 and 4.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--reverse</option>
+        </term>
+        <listitem>
+          <para>Enable reverse mode</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>--mirror</option>
+        </term>
+        <listitem>
+          <para>Enable mirror mode (when supported)</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-f --fullscreen</option>
+        </term>
+        <listitem>
+          <para>Fullscreen display.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-w --windowed</option>
+        </term>
+        <listitem>
+          <para>Windowed display. (default)</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-s --screensize WIDTHxHEIGHT</option>
+        </term>
+        <listitem>
+          <para>Set the screen size (e.g. 320x200)</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <option>-v --version</option>
+        </term>
+        <listitem>
+          <para>Show version</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+
+  <refsect1>
+    <title>FILES</title>
+    <variablelist>
+      <varlistentry>
+        <term><filename>$(HOME)/.supertuxkart/</filename></term>
+        <listitem>
+          <para>Configuration directory.
+          </para>
+        </listitem>
+      </varlistentry> 
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>AUTHOR</title>
+    <para>This manual page was written by &dhusername; &dhemail; for
+      the &debian; system (but may be used by others).  Permission is
+      granted to copy, distribute and/or modify this document under
+      the terms of the &gnu; General Public License, Version 2 any 
+	  later version published by the Free Software Foundation.
+    </para>
+    <para>
+      On Debian systems, the complete text of the GNU General Public
+      License can be found in /usr/share/common-licenses/GPL.
+    </para>
+
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->
+
+
