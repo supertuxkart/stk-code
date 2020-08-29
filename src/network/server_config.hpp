@@ -191,7 +191,8 @@ namespace ServerConfig
         "has no public IPv6 address or port differs between IPv4 and IPv6 "
         "then it will use IPv4 only socket. For system which doesn't support "
         "dual-stack socket (like OpenBSD) you may fail to be connected by "
-        "IPv4 clients."));
+        "IPv4 clients. You can override the detection in config.xml at "
+        "supertuxkart config-0.10 folder, with default-ip-type option."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_owner_less
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "owner-less",
