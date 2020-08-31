@@ -552,6 +552,7 @@ extern "C" void handle_joystick(SDL_Event& event);
 // In main_loop.cpp
 extern "C" void pause_mainloop();
 extern "C" void resume_mainloop();
+extern "C" void reset_network_body();
 //! runs the device. Returns false if device wants to be deleted
 bool CIrrDeviceSDL::run()
 {
@@ -770,6 +771,7 @@ bool CIrrDeviceSDL::run()
 					Height = new_height;
 					if (VideoDriver)
 						VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
+					reset_network_body();
 				}
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_MINIMIZED)
 				{
@@ -782,10 +784,16 @@ bool CIrrDeviceSDL::run()
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED)
 				{
 					WindowHasFocus = true;
+					reset_network_body();
 				}
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_FOCUS_LOST)
 				{
 					WindowHasFocus = false;
+				}
+				else if (SDL_event.window.event == SDL_WINDOWEVENT_MOVED)
+				{
+					// In windows the rendering is paused when window is moving
+					reset_network_body();
 				}
 			}
 			break;

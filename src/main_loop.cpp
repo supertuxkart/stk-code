@@ -151,6 +151,15 @@ extern "C" void resume_mainloop()
 #endif
 
 //-----------------------------------------------------------------------------
+extern "C" void reset_network_body()
+{
+    // In windows the rendering is paused when out focus, which pauses the
+    // smooth timer
+    if (World::getWorld() && RewindManager::isEnabled())
+        RewindManager::get()->resetSmoothNetworkBody();
+}  // reset_network_body
+
+//-----------------------------------------------------------------------------
 /** Returns the current dt, which guarantees a limited frame rate. If dt is
  *  too low (the frame rate too high), the process will sleep to reach the
  *  maximum frame rate.
