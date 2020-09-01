@@ -353,7 +353,7 @@ if(USE_SYSTEM_ANGELSCRIPT)
     endif()
 else()
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+    include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/angelscript/include")
     set(Angelscript_LIBRARIES angelscript)
 endif()
 
