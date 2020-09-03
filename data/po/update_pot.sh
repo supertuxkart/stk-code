@@ -70,6 +70,44 @@ xgettext  -j  -d supertuxkart --keyword="translate" --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot $ANGELSCRIPT_FILE_LIST \
                                --package-name=supertuxkart --language=c++
 
+STK_DESKTOP_FILE_P1="[Desktop Entry]"
+# Split it to avoid SuperTuxKart being translated
+STK_DESKTOP_FILE_P2="Name=SuperTuxKart
+Icon=supertuxkart"
+STK_DESKTOP_FILE_P3="#I18N: Generic name in desktop file entry, used in linux
+GenericName=A kart racing game
+Exec=supertuxkart
+Terminal=false
+StartupNotify=false
+Type=Application
+Categories=Game;ArcadeGame;
+#I18N: Keywords in desktop entry, translators please keep it separated with semicolons
+Keywords=tux;game;race;
+PrefersNonDefaultGPU=true"
+
+echo "${STK_DESKTOP_FILE_P1}" > supertuxkart.desktop
+echo "${STK_DESKTOP_FILE_P3}" >> supertuxkart.desktop
+
+# Desktop entry
+xgettext -j -d supertuxkart --add-comments="I18N:" \
+                            -p ./data/po -o supertuxkart.pot \
+                            --package-name=supertuxkart supertuxkart.desktop
+
+echo "${STK_DESKTOP_FILE_P1}" > supertuxkart.desktop
+echo "${STK_DESKTOP_FILE_P2}" >> supertuxkart.desktop
+echo "${STK_DESKTOP_FILE_P3}" >> supertuxkart.desktop
+
+for PO in $(ls data/po/*.po); do
+    LANG=$(basename $PO .po)
+    if [ "$LANG" = "en" ]; then
+        continue
+    fi
+    printf "$LANG " >> data/po/LINGUAS
+done
+
+msgfmt --desktop -d data/po --template supertuxkart.desktop -o data/supertuxkart.desktop
+rm -f ./supertuxkart.desktop
+rm -f ./data/po/LINGUAS
 
 echo "    Done"
 echo "---------------------------"
