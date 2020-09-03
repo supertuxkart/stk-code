@@ -87,8 +87,13 @@ void ChildLoop::run()
         NetworkConfig::get()->setIsLAN();
     else
     {
-        NetworkConfig::get()->setIPType(NetworkConfig::IP_V4);
-        NetworkConfig::get()->detectIPType();
+        if (UserConfigParams::m_default_ip_type == NetworkConfig::IP_NONE)
+        {
+            NetworkConfig::get()->setIPType(NetworkConfig::IP_V4);
+            NetworkConfig::get()->queueIPDetection();
+        }
+        // Longer timeout for server creation
+        NetworkConfig::get()->getIPDetectionResult(4000);
         NetworkConfig::getByType(PT_MAIN)->setIPType(
             NetworkConfig::get()->getIPType());
         NetworkConfig::get()->setIsWAN();

@@ -785,7 +785,7 @@ namespace UserConfigParams
     // These stk domains have only a record to each ipv6 stun below,
     // so we can use this to know ipv4 address of nat64 gateway (if any)
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers_v4
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv4",
+        PARAM_DEFAULT(StringToUIntUserConfigParam("ipv4-stun-servers",
         "The stun servers that will be used to know the public address "
         "(ipv4 only) with port", {{ "stun-server", "address", "ping" }},
             {
@@ -796,16 +796,13 @@ namespace UserConfigParams
          ));
 
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv6",
+        PARAM_DEFAULT(StringToUIntUserConfigParam("ipv6-stun-servers",
         "The stun servers that will be used to know the public address "
         "(including ipv6) with port", {{ "stun-server", "address", "ping" }},
             {
-                 { "stunv6.linuxreviews.org:3478", 0u },
-                 { "stun.l.google.com:19302", 0u },
-                 { "stun1.l.google.com:19302", 0u },
-                 { "stun2.l.google.com:19302", 0u },
-                 { "stun3.l.google.com:19302", 0u },
-                 { "stun4.l.google.com:19302", 0u }
+                 { "stun.linuxreviews.org:3478", 0u },
+                 { "stun.supertuxkart.net:3478", 0u },
+                 { "stun.stunprotocol.org:3478", 0u }
              }
          ));
 

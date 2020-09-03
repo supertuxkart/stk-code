@@ -149,11 +149,17 @@ public:
         return m_network_config[type];
     }   // get
     // ------------------------------------------------------------------------
+    static void clearDetectIPThread(bool quit_stk);
+    // ------------------------------------------------------------------------
+    static void queueIPDetection();
+    // ------------------------------------------------------------------------
     static void destroy()
     {
         ProcessType type = STKProcess::getType();
         delete m_network_config[type];   // It's ok to delete NULL
         m_network_config[type] = NULL;
+        if (type == PT_MAIN)
+            clearDetectIPThread(true/*quit_stk*/);
     }   // destroy
     // ------------------------------------------------------------------------
     static void clear()
@@ -292,7 +298,7 @@ public:
     const std::set<std::string>& getServerCapabilities() const
                                               { return m_server_capabilities; }
     // ------------------------------------------------------------------------
-    void detectIPType();
+    void getIPDetectionResult(uint64_t timeout);
     // ------------------------------------------------------------------------
     IPType getIPType() const                       { return m_ip_type.load(); }
     // ------------------------------------------------------------------------

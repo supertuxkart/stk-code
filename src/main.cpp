@@ -1400,8 +1400,13 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
                 Online::RequestManager::m_disable_polling = true;
                 // For server we assume it is an IPv4 one, because if it fails
                 // to detect the server won't start at all
-                NetworkConfig::get()->setIPType(NetworkConfig::IP_V4);
-                NetworkConfig::get()->detectIPType();
+                if (UserConfigParams::m_default_ip_type == NetworkConfig::IP_NONE)
+                {
+                    NetworkConfig::get()->setIPType(NetworkConfig::IP_V4);
+                    NetworkConfig::get()->queueIPDetection();
+                }
+                // Longer timeout for server creation
+                NetworkConfig::get()->getIPDetectionResult(4000);
                 NetworkConfig::get()->setIsWAN();
                 NetworkConfig::get()->setIsPublicServer();
                 ServerConfig::loadServerLobbyFromConfig();
