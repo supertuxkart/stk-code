@@ -17,6 +17,8 @@
 
 #include "states_screens/edit_track_screen.hpp"
 
+#include "graphics/stk_tex_manager.hpp"
+
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -36,7 +38,7 @@ const char* EditTrackScreen::ALL_TRACKS_GROUP_ID = "all";
 
 // -----------------------------------------------------------------------------
 EditTrackScreen::EditTrackScreen()
-    : Screen("edit_track.stkgui"), m_track_group(ALL_TRACKS_GROUP_ID),
+    : Screen("edit_track.stkgui"), m_track_group("standard"),
     m_track(NULL), m_laps(0), m_reverse(false), m_result(false)
 {
 
@@ -89,47 +91,10 @@ void EditTrackScreen::loadedFromFile()
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
     tracks_widget->setMaxLabelLength(MAX_LABEL_LENGTH);
-}
 
-// -----------------------------------------------------------------------------
-void EditTrackScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name,
-    const int playerID)
-{
-    if (name == "ok")
-    {
-        m_result = true;
-        StateManager::get()->popMenu();
-    }
-    else if (name == "cancel")
-    {
-        m_result = false;
-        StateManager::get()->popMenu();
-    }
-    else if (name == "tracks")
-    {
-        DynamicRibbonWidget* tracks = getWidget<DynamicRibbonWidget>("tracks");
-        assert(tracks != NULL);
-        selectTrack(tracks->getSelectionIDString(PLAYER_ID_GAME_MASTER));
-    }
-    else if (name == "trackgroups")
-    {
-        RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
-        assert(tabs != NULL);
-        m_track_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        loadTrackList();
-    }
-    else if (name == "laps")
-    {
-        SpinnerWidget* laps = getWidget<SpinnerWidget>("laps");
-        assert(laps != NULL);
-        m_laps = laps->getValue();
-    }
-    else if (name == "reverse")
-    {
-        CheckBoxWidget* reverse = getWidget<CheckBoxWidget>("reverse");
-        assert(reverse != NULL);
-        m_reverse = reverse->getState();
-    }
+    m_screenshot = getWidget<IconButtonWidget>("screenshot");
+    m_screenshot->setFocusable(false);
+    m_screenshot->m_tab_stop = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -171,6 +136,47 @@ void EditTrackScreen::init()
         selectTrack("");
     else
         selectTrack(m_track->getIdent());
+}
+
+// -----------------------------------------------------------------------------
+void EditTrackScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name,
+    const int playerID)
+{
+    if (name == "ok")
+    {
+        m_result = true;
+        StateManager::get()->popMenu();
+    }
+    else if (name == "cancel")
+    {
+        m_result = false;
+        StateManager::get()->popMenu();
+    }
+    else if (name == "tracks")
+    {
+        DynamicRibbonWidget* tracks = getWidget<DynamicRibbonWidget>("tracks");
+        assert(tracks != NULL);
+        selectTrack(tracks->getSelectionIDString(PLAYER_ID_GAME_MASTER));
+    }
+    else if (name == "trackgroups")
+    {
+        RibbonWidget* tabs = getWidget<RibbonWidget>("trackgroups");
+        assert(tabs != NULL);
+        m_track_group = tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        loadTrackList();
+    }
+    else if (name == "laps")
+    {
+        SpinnerWidget* laps = getWidget<SpinnerWidget>("laps");
+        assert(laps != NULL);
+        m_laps = laps->getValue();
+    }
+    else if (name == "reverse")
+    {
+        CheckBoxWidget* reverse = getWidget<CheckBoxWidget>("reverse");
+        assert(reverse != NULL);
+        m_reverse = reverse->getState();
+    }
 }
 
 // -----------------------------------------------------------------------------
@@ -223,10 +229,24 @@ void EditTrackScreen::selectTrack(const std::string& id)
         tracks->setSelection(m_track->getIdent(), PLAYER_ID_GAME_MASTER, true);
         selected_track->setText(m_track->getName(), true);
 
-        laps->setValue(m_laps);
+        laps->setValue(m_track->getDefaultNumberOfLaps());
 
         reverse->setVisible(m_track->reverseAvailable());
         label_reverse->setVisible(m_track->reverseAvailable());
+
+        // Display the track's preview picture in a box,
+        // so that the current selection remains obvious even
+        // if the player doesn't notice the track name in title
+        irr::video::ITexture* image = STKTexManager::getInstance()
+            ->getTexture(m_track->getScreenshotFile(),
+            "While loading screenshot for track '%s':", m_track->getFilename());
+        if(!image)
+        {
+            image = STKTexManager::getInstance()->getTexture(GUIEngine::getSkin()->getThemedIcon("gui/icons/track_unknown.png"),
+                "While loading screenshot for track '%s':", m_track->getFilename());
+        }
+        if (image != NULL)
+            m_screenshot->setImage(image);
     }
     else
     {

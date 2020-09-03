@@ -19,7 +19,7 @@
 #define HEADER_EDIT_TRACK_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
-
+#include "guiengine/widgets.hpp"
 
 namespace GUIEngine { class Widget; }
 
@@ -50,6 +50,8 @@ class EditTrackScreen :
     unsigned int        m_laps;
     bool                m_reverse;
     bool                m_result;
+
+    GUIEngine::IconButtonWidget* m_screenshot;
 
 public:
 
