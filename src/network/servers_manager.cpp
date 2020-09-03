@@ -108,6 +108,8 @@ std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest() const
             uint64_t timeout = StkTime::getMonoTimeMs() - m_creation_time;
             if (timeout > 2000)
                 timeout = 0;
+            else
+                timeout = 2000 - timeout;
             NetworkConfig::get()->getIPDetectionResult(timeout);
             auto server_list = m_server_list.lock();
             if (!server_list)
