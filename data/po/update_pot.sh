@@ -74,8 +74,9 @@ STK_DESKTOP_FILE_P1="[Desktop Entry]"
 # Split it to avoid SuperTuxKart being translated
 STK_DESKTOP_FILE_P2="Name=SuperTuxKart
 Icon=supertuxkart"
-STK_DESKTOP_FILE_P3="#I18N: Generic name in desktop file entry, used in linux
-GenericName=A kart racing game
+STK_DESKTOP_FILE_P3="#I18N: Generic name in desktop file entry, \
+summary in AppData and short description in Google Play
+GenericName=A 3D open-source kart racing game
 Exec=supertuxkart
 Terminal=false
 StartupNotify=false
@@ -88,15 +89,96 @@ PrefersNonDefaultGPU=true"
 echo "${STK_DESKTOP_FILE_P1}" > supertuxkart.desktop
 echo "${STK_DESKTOP_FILE_P3}" >> supertuxkart.desktop
 
-# Desktop entry
+STK_APPDATA_P1="Karts. Nitro. Action! SuperTuxKart is a 3D open-source arcade racer \
+with a variety of characters, tracks, and modes to play. \
+Our aim is to create a game that is more fun than realistic, \
+and provide an enjoyable experience for all ages."
+STK_APPDATA_P2="Discover the mystery of an underwater world, \
+or drive through the jungles of Val Verde and visit the famous Cocoa Temple. \
+Race underground or in a spaceship, through a rural farmland or a strange alien planet. \
+Or rest under the palm trees on the beach, watching the other karts overtake you. \
+But don't eat the bananas! Watch for bowling balls, plungers, bubble gum, \
+and cakes thrown by your opponents."
+STK_APPDATA_P3="You can do a single race against other karts, \
+compete in one of several Grand Prix, \
+try to beat the high score in time trials on your own, \
+play battle mode against the computer or your friends, \
+and more! For a greater challenge, race online against players from all over the world \
+and prove your racing process!"
+# Used in google play only for now
+STK_APPDATA_P4="This game is free and without ads."
+
+STK_APPDATA_FILE_1="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<component type=\"desktop\">
+  <id>supertuxkart.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0+</project_license>"
+# Split it to avoid SuperTuxKart being translated
+STK_APPDATA_FILE_2="  <name>SuperTuxKart</name>"
+STK_APPDATA_FILE_3="  <summary>A 3D open-source kart racing game</summary>
+  <description>
+    <p>
+      "${STK_APPDATA_P1}"
+    </p>
+    <p>
+      "${STK_APPDATA_P2}"
+    </p>
+    <p>
+      "${STK_APPDATA_P3}"
+    </p>"
+STK_APPDATA_FILE_4="    <p>
+      "${STK_APPDATA_P4}"
+    </p>"
+STK_APPDATA_FILE_5="  </description>
+  <screenshots>
+    <screenshot type=\"default\">
+      <image>https://supertuxkart.net/images/8/83/Supertuxkart-0.9.2-screenshot-3.jpg</image>
+      <caption>Normal Race</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://supertuxkart.net/images/1/1f/Supertuxkart-0.9.2-screenshot-1.jpg</image>
+      <caption>Battle</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://supertuxkart.net/images/2/2a/Supertuxkart-0.9.2-screenshot-2.jpg</image>
+      <caption>Soccer</caption>
+    </screenshot>
+  </screenshots>
+  <developer_name>SuperTuxKart Team</developer_name>
+  <update_contact>supertuxkart-devel@lists.sourceforge.net</update_contact>
+  <url type=\"homepage\">https://supertuxkart.net</url>
+  <url type=\"bugtracker\">https://github.com/supertuxkart/stk-code/issues</url>
+  <url type=\"donation\">https://supertuxkart.net/Donate</url>
+  <url type=\"help\">https://supertuxkart.net/Community</url>
+  <url type=\"translate\">https://supertuxkart.net/Translating_STK</url>
+  <content_rating type=\"oars-1.1\">
+    <content_attribute id=\"violence-cartoon\">mild</content_attribute>
+    <content_attribute id=\"social-chat\">intense</content_attribute>
+  </content_rating>
+</component>"
+
+echo "${STK_APPDATA_FILE_1}" > supertuxkart.appdata.xml
+echo "${STK_APPDATA_FILE_3}" >> supertuxkart.appdata.xml
+echo "${STK_APPDATA_FILE_4}" >> supertuxkart.appdata.xml
+echo "${STK_APPDATA_FILE_5}" >> supertuxkart.appdata.xml
+
+# Desktop and AppData entry
 xgettext -j -d supertuxkart --add-comments="I18N:" \
                             -p ./data/po -o supertuxkart.pot \
-                            --package-name=supertuxkart supertuxkart.desktop
+                            --package-name=supertuxkart supertuxkart.desktop supertuxkart.appdata.xml
 
 echo "${STK_DESKTOP_FILE_P1}" > supertuxkart.desktop
 echo "${STK_DESKTOP_FILE_P2}" >> supertuxkart.desktop
 echo "${STK_DESKTOP_FILE_P3}" >> supertuxkart.desktop
 
+echo "${STK_APPDATA_FILE_1}" > supertuxkart.appdata.xml
+echo "${STK_APPDATA_FILE_2}" >> supertuxkart.appdata.xml
+echo "${STK_APPDATA_FILE_3}" >> supertuxkart.appdata.xml
+# Skip google play message
+echo "${STK_APPDATA_FILE_5}" >> supertuxkart.appdata.xml
+
+# Manually copy zh_TW to zh_HK for fallback
+cp data/po/zh_TW.po data/po/zh_HK.po
 for PO in $(ls data/po/*.po); do
     LANG=$(basename $PO .po)
     if [ "$LANG" = "en" ]; then
@@ -106,8 +188,11 @@ for PO in $(ls data/po/*.po); do
 done
 
 msgfmt --desktop -d data/po --template supertuxkart.desktop -o data/supertuxkart.desktop
+msgfmt --xml -d data/po --template supertuxkart.appdata.xml -o data/supertuxkart.appdata.xml
 rm -f ./supertuxkart.desktop
+rm -f ./supertuxkart.appdata.xml
 rm -f ./data/po/LINGUAS
+rm -f ./data/po/zh_HK.po
 
 echo "    Done"
 echo "---------------------------"
