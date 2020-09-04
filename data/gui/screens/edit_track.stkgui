@@ -39,7 +39,7 @@
                         <label id="laps_label" text_align="left"
                             I18N="In the edit track screen" text="Number of laps:" />
                         <spacer width="0.2f" />
-                        <spinner id="laps"width="200" min_value="1"
+                        <spinner id="laps" width="200" min_value="1"
                             max_value="99" wrap_around="false" />
                     </div>
 
