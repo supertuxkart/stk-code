@@ -70,13 +70,14 @@ xgettext  -j  -d supertuxkart --keyword="translate" --add-comments="I18N:" \
                                -p ./data/po -o supertuxkart.pot $ANGELSCRIPT_FILE_LIST \
                                --package-name=supertuxkart --language=c++
 
+STK_DESCRIPTION="A 3D open-source kart racing game"
 STK_DESKTOP_FILE_P1="[Desktop Entry]"
 # Split it to avoid SuperTuxKart being translated
 STK_DESKTOP_FILE_P2="Name=SuperTuxKart
 Icon=supertuxkart"
 STK_DESKTOP_FILE_P3="#I18N: Generic name in desktop file entry, \
 summary in AppData and short description in Google Play
-GenericName=A 3D open-source kart racing game
+GenericName=$STK_DESCRIPTION
 Exec=supertuxkart
 Terminal=false
 StartupNotify=false
@@ -179,12 +180,34 @@ echo "${STK_APPDATA_FILE_5}" >> supertuxkart.appdata.xml
 
 # Manually copy zh_TW to zh_HK for fallback
 cp data/po/zh_TW.po data/po/zh_HK.po
+rm -rf ./google_play_msg
+
+function translate_str()
+{
+    # Remove newline in msgid of po file first
+    echo $(sed ':a;N;$!ba;s/\"\n\"//g' "$2" \
+        | grep -A 1 -e "msgid \"$1\"" | sed -n 's/msgstr "\(.*\)"/\1/p')
+}
+
 for PO in $(ls data/po/*.po); do
-    LANG=$(basename $PO .po)
-    if [ "$LANG" = "en" ]; then
+    CUR_LANG=$(basename $PO .po)
+    if [ "$CUR_LANG" = "en" ]; then
         continue
     fi
-    printf "$LANG " >> data/po/LINGUAS
+    printf "$CUR_LANG " >> data/po/LINGUAS
+    if [ "$1" != "--generate-google-play-msg" ]; then
+        continue
+    fi
+    DESC=$(translate_str "$STK_DESCRIPTION" "$PO")
+    P1=$(translate_str "$STK_APPDATA_P1" "$PO")
+    P2=$(translate_str "$STK_APPDATA_P2" "$PO")
+    P3=$(translate_str "$STK_APPDATA_P3" "$PO")
+    P4=$(translate_str "$STK_APPDATA_P4" "$PO")
+    if [ -n "$DESC" ] && [ -n "$P1" ] && [ -n "$P2" ] && [ -n "$P3" ] && [ -n "$P4" ]; then
+        mkdir -p ./google_play_msg/$CUR_LANG
+        printf "$DESC" > google_play_msg/$CUR_LANG/short.txt
+        printf "$P1\n\n$P2\n\n$P3\n\n$P4" > google_play_msg/$CUR_LANG/full.txt
+    fi
 done
 
 msgfmt --desktop -d data/po --template supertuxkart.desktop -o data/supertuxkart.desktop
