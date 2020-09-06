@@ -108,6 +108,12 @@ and more! For a greater challenge, race online against players from all over the
 and prove your racing process!"
 # Used in google play only for now
 STK_APPDATA_P4="This game is free and without ads."
+# Used in google play beta only for now
+STK_APPDATA_P5="This is an unstable version of SuperTuxKart that contains latest improvements. \
+It is released mainly for testing, to make stable STK as good as possible."
+STK_APPDATA_P6="This version can be installed in parallel with the stable version on the device."
+STK_APPDATA_P7="If you need more stability, consider using the stable version: %s"
+STK_STABLE_URL="https://play.google.com/store/apps/details?id=org.supertuxkart.stk"
 
 STK_APPDATA_FILE_1="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <component type=\"desktop\">
@@ -128,7 +134,16 @@ STK_APPDATA_FILE_3="  <summary>A 3D open-source kart racing game</summary>
       "${STK_APPDATA_P3}"
     </p>"
 STK_APPDATA_FILE_4="    <p>
-      "${STK_APPDATA_P4}"
+      $STK_APPDATA_P4
+    </p>
+    <p>
+      $STK_APPDATA_P5
+    </p>
+    <p>
+      $STK_APPDATA_P6
+    </p>
+    <p>
+      $STK_APPDATA_P7
     </p>"
 STK_APPDATA_FILE_5="  </description>
   <screenshots>
@@ -203,10 +218,16 @@ for PO in $(ls data/po/*.po); do
     P2=$(translate_str "$STK_APPDATA_P2" "$PO")
     P3=$(translate_str "$STK_APPDATA_P3" "$PO")
     P4=$(translate_str "$STK_APPDATA_P4" "$PO")
-    if [ -n "$DESC" ] && [ -n "$P1" ] && [ -n "$P2" ] && [ -n "$P3" ] && [ -n "$P4" ]; then
+    P5=$(translate_str "$STK_APPDATA_P5" "$PO")
+    P6=$(translate_str "$STK_APPDATA_P6" "$PO")
+    P7=$(translate_str "$STK_APPDATA_P7" "$PO")
+    if [ -n "$DESC" ] && [ -n "$P1" ] && [ -n "$P2" ] && [ -n "$P3" ] && \
+        [ -n "$P4" ] && [ -n "$P5" ] && [ -n "$P6" ] && [ -n "$P7" ]; then
         mkdir -p ./google_play_msg/$CUR_LANG
+        P7=$(sed "s|%s|$STK_STABLE_URL|g" <<< $P7)
         printf "$DESC" > google_play_msg/$CUR_LANG/short.txt
         printf "$P1\n\n$P2\n\n$P3\n\n$P4" > google_play_msg/$CUR_LANG/full.txt
+        printf "$P1\n\n$P2\n\n$P3\n\n$P4\n\n---\n\n$P5\n\n$P6\n\n$P7" > google_play_msg/$CUR_LANG/full_beta.txt
     fi
 done
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-04 21:53+0800\n"
+"POT-Creation-Date: 2020-09-07 00:44+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -785,7 +785,7 @@ msgstr ""
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
-#: supertuxkart.appdata.xml:24
+#: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr ""
 
@@ -802,7 +802,7 @@ msgstr ""
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
-#: src/states_screens/race_setup_screen.cpp:112 supertuxkart.appdata.xml:28
+#: src/states_screens/race_setup_screen.cpp:112 supertuxkart.appdata.xml:37
 msgid "Battle"
 msgstr ""
 
@@ -812,7 +812,7 @@ msgstr ""
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
-#: supertuxkart.appdata.xml:32
+#: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr ""
 
@@ -6105,6 +6105,23 @@ msgstr ""
 msgid "This game is free and without ads."
 msgstr ""
 
-#: supertuxkart.appdata.xml:35
+#: supertuxkart.appdata.xml:20
+msgid ""
+"This is an unstable version of SuperTuxKart that contains latest "
+"improvements. It is released mainly for testing, to make stable STK as good "
+"as possible."
+msgstr ""
+
+#: supertuxkart.appdata.xml:23
+msgid ""
+"This version can be installed in parallel with the stable version on the "
+"device."
+msgstr ""
+
+#: supertuxkart.appdata.xml:26
+msgid "If you need more stability, consider using the stable version: %s"
+msgstr ""
+
+#: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
 msgstr ""
