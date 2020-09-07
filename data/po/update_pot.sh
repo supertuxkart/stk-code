@@ -171,12 +171,15 @@ STK_APPDATA_FILE_5="  </description>
     <content_attribute id=\"violence-cartoon\">mild</content_attribute>
     <content_attribute id=\"social-chat\">intense</content_attribute>
   </content_rating>
+  <languages>"
+STK_APPDATA_FILE_6="  </languages>
 </component>"
 
 echo "${STK_APPDATA_FILE_1}" > supertuxkart.appdata.xml
 echo "${STK_APPDATA_FILE_3}" >> supertuxkart.appdata.xml
 echo "${STK_APPDATA_FILE_4}" >> supertuxkart.appdata.xml
 echo "${STK_APPDATA_FILE_5}" >> supertuxkart.appdata.xml
+echo "${STK_APPDATA_FILE_6}" >> supertuxkart.appdata.xml
 
 # Desktop and AppData entry
 xgettext -j -d supertuxkart --add-comments="I18N:" \
@@ -208,6 +211,21 @@ for PO in $(ls data/po/*.po); do
     CUR_LANG=$(basename $PO .po)
     if [ "$CUR_LANG" != "en" ]; then
         printf "$CUR_LANG " >> data/po/LINGUAS
+        PO_NO_FALLBACK=$PO
+        if [ "$CUR_LANG" = "fr_CA" ]; then
+            PO_NO_FALLBACK="data/po/fr.po"
+        fi
+        TOTAL_STR=$(sed ':a;N;$!ba;s/\"\n\"//g' $PO_NO_FALLBACK | grep "msgid \"" | wc -l)
+        UNTRANSLATED_STR=$(sed ':a;N;$!ba;s/\"\n\"//g' $PO_NO_FALLBACK | grep "msgstr \"\"" | wc -l)
+        TRANSLATED_STR=$(expr $TOTAL_STR - $UNTRANSLATED_STR)
+        PERCENTAGE=$(python -c "print(int($TRANSLATED_STR / $TOTAL_STR * 100.0))")
+        if [ "$PERCENTAGE" = "0" ]; then
+            continue
+        elif [ "$PERCENTAGE" != "100" ]; then
+            printf "    <lang percentage=\"$PERCENTAGE\">$CUR_LANG</lang>" >> supertuxkart.appdata.xml
+        else
+            printf "    <lang>$CUR_LANG</lang>" >> supertuxkart.appdata.xml
+        fi
     fi
     if [ "$1" != "--generate-google-play-msg" ]; then
         continue
@@ -229,6 +247,7 @@ for PO in $(ls data/po/*.po); do
         printf "$P1\n\n$P2\n\n$P3\n\n$P4\n\n---\n\n$P5\n\n$P6\n\n$P7" > google_play_msg/$CUR_LANG/full_beta.txt
     fi
 done
+echo "${STK_APPDATA_FILE_6}" >> supertuxkart.appdata.xml
 
 msgfmt --desktop -d data/po --template supertuxkart.desktop -o data/supertuxkart.desktop
 msgfmt --xml -d data/po --template supertuxkart.appdata.xml -o data/supertuxkart.appdata.xml
