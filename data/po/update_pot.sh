@@ -206,10 +206,9 @@ function translate_str()
 
 for PO in $(ls data/po/*.po); do
     CUR_LANG=$(basename $PO .po)
-    if [ "$CUR_LANG" = "en" ]; then
-        continue
+    if [ "$CUR_LANG" != "en" ]; then
+        printf "$CUR_LANG " >> data/po/LINGUAS
     fi
-    printf "$CUR_LANG " >> data/po/LINGUAS
     if [ "$1" != "--generate-google-play-msg" ]; then
         continue
     fi
