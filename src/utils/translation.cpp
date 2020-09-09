@@ -62,6 +62,7 @@ Translations* translations = NULL;
 
 #ifndef SERVER_ONLY
 #include "tinygettext/file_system.hpp"
+#include "tinygettext/log.hpp"
 
 std::map<std::string, std::string> Translations::m_localized_name;
 std::map<std::string, std::map<std::string, irr::core::stringw> >
@@ -78,7 +79,6 @@ constexpr bool isThaiCP(char32_t c)
 // ============================================================================
 
 const bool REMOVE_BOM = false;
-using namespace tinygettext;
 /** The list of available languages; this is global so that it is cached (and remains
     even if the translations object is deleted and re-created) */
 typedef std::vector<std::string> LanguageList;
@@ -115,7 +115,14 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
           FileUtils::getPortableReadingPath(filename)));
     }
     };
-    m_dictionary_manager.set_filesystem(std::unique_ptr<FileSystem>(
+    // Hide log info because it warns about untranslated message
+    tinygettext::Log::set_log_info_callback([](const std::string& str) {});
+    tinygettext::Log::set_log_warning_callback([](const std::string& str)
+        { Log::warn("tinygettext", "%s", str.c_str()); });
+    tinygettext::Log::set_log_error_callback([](const std::string& str)
+        { Log::error("tinygettext", "%s", str.c_str()); });
+
+    m_dictionary_manager.set_filesystem(std::unique_ptr<tinygettext::FileSystem>(
         new StkFileSystem()));
 
     m_dictionary_manager.add_directory(
@@ -123,12 +130,12 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     if (g_language_list.size() == 0)
     {
-        std::set<Language> languages = m_dictionary_manager.get_languages();      
+        std::set<tinygettext::Language> languages = m_dictionary_manager.get_languages();
 
         // English is always there but may be not found on file system
         g_language_list.push_back("en");
 
-        for (const Language& language : languages)
+        for (const tinygettext::Language& language : languages)
         {
             if (language.str() == "en")
                 continue;
@@ -416,11 +423,11 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         if (language.find(":") != std::string::npos)
         {
             std::vector<std::string> langs = StringUtils::split(language, ':');
-            Language l;
+            tinygettext::Language l;
 
             for (unsigned int curr=0; curr<langs.size(); curr++)
             {
-                l = Language::from_env(langs[curr]);
+                l = tinygettext::Language::from_env(langs[curr]);
                 if (l)
                 {
                     Log::verbose("translation", "Language '%s'.",
@@ -446,7 +453,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         }
         else
         {
-            const Language& tgtLang = Language::from_env(language);
+            const tinygettext::Language& tgtLang = tinygettext::Language::from_env(language);
             if (!tgtLang)
             {
                 Log::warn("Translation", "Unsupported language '%s'", language.c_str());
