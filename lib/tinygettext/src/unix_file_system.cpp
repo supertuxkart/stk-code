@@ -21,7 +21,9 @@
 
 #include <sys/types.h>
 #include <fstream>
+#ifndef _WIN32
 #include <dirent.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -34,6 +36,9 @@ UnixFileSystem::UnixFileSystem()
 std::vector<std::string>
 UnixFileSystem::open_directory(const std::string& pathname)
 {
+#ifdef _WIN32
+    return std::vector<std::string>();
+#else
   DIR* dir = opendir(pathname.c_str());
   if (!dir)
   {
@@ -53,6 +58,7 @@ UnixFileSystem::open_directory(const std::string& pathname)
 
     return files;
   }
+#endif
 }
 
 std::unique_ptr<std::istream>

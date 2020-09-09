@@ -61,6 +61,8 @@ Translations* translations = NULL;
 #endif
 
 #ifndef SERVER_ONLY
+#include "tinygettext/file_system.hpp"
+
 std::map<std::string, std::string> Translations::m_localized_name;
 std::map<std::string, std::map<std::string, irr::core::stringw> >
     Translations::m_localized_country_codes;
@@ -95,6 +97,27 @@ const LanguageList* Translations::getLanguageList() const
 Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
 #ifndef SERVER_ONLY
+    class StkFileSystem : public tinygettext::FileSystem
+    {
+    public:
+    std::vector<std::string> open_directory(const std::string& pathname)
+    {
+        std::set<std::string> result;
+        file_manager->listFiles(result, pathname);
+        std::vector<std::string> files;
+        for(const std::string& file : result)
+            files.push_back(file);
+        return files;
+    }
+    std::unique_ptr<std::istream> open_file(const std::string& filename)
+    {
+        return std::unique_ptr<std::istream>(new std::ifstream(
+          FileUtils::getPortableReadingPath(filename)));
+    }
+    };
+    m_dictionary_manager.set_filesystem(std::unique_ptr<FileSystem>(
+        new StkFileSystem()));
+
     m_dictionary_manager.add_directory(
                         file_manager->getAsset(FileManager::TRANSLATION,""));
 
