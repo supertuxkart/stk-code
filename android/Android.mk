@@ -162,7 +162,7 @@ LOCAL_MODULE       := tinygettext
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/tinygettext/src/*.cpp)
-LOCAL_CFLAGS       := -I../lib/tinygettext/include
+LOCAL_CFLAGS       := -I../lib/tinygettext/include -DDISABLE_ICONV
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -267,6 +267,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -DENABLE_IPV6    \
                       -DENABLE_CRYPTO_OPENSSL           \
                       -DNDEBUG         \
+                      -DDISABLE_ICONV  \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
                       -DANDROID_APP_DIR_NAME=\"$(APP_DIR_NAME)\"    \
                       -DSUPERTUXKART_VERSION=\"$(PROJECT_VERSION)\" \

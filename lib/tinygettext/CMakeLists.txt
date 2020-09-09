@@ -47,6 +47,9 @@ endif(COMMAND cmake_policy)
 ## Reveal library type choice to users
 option(BUILD_SHARED_LIBS "Produce dynamic library instead of static archive" OFF)
 
+# STK addition: disable libiconv
+option(USE_ICONV "Use libiconv" OFF)
+if (USE_ICONV)
 ## Add iconv to include directories
 
 find_package(ICONV REQUIRED)
@@ -74,6 +77,9 @@ if(HAVE_ICONV_CONST)
 else(HAVE_ICONV_CONST)
   remove_definitions(-DHAVE_ICONV_CONST)
 endif(HAVE_ICONV_CONST)
+else()
+add_definitions(-DDISABLE_ICONV)
+endif()
 
 ## TinyGetText library compilation
 

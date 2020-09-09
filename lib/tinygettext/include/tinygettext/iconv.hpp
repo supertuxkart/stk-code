@@ -22,7 +22,9 @@
 
 #include <string>
 
-#ifdef HAVE_SDL
+#ifdef DISABLE_ICONV
+#  define tinygettext_iconv_t int
+#elif defined(HAVE_SDL)
 #  include "SDL.h"
 
 #  define tinygettext_ICONV_CONST const

@@ -50,13 +50,16 @@ IConv::IConv(const std::string& from_charset_, const std::string& to_charset_)
 
 IConv::~IConv()
 {
+#ifndef DISABLE_ICONV
   if (cd)
     tinygettext_iconv_close(cd);
+#endif
 }
 
 void
 IConv::set_charsets(const std::string& from_charset_, const std::string& to_charset_)
 {
+#ifndef DISABLE_ICONV
   if (cd)
     tinygettext_iconv_close(cd);
 
@@ -93,12 +96,16 @@ IConv::set_charsets(const std::string& from_charset_, const std::string& to_char
       }
     }
   }
+#endif
 }
 
 /// Convert a string from encoding to another.
 std::string
 IConv::convert(const std::string& text)
 {
+#ifdef DISABLE_ICONV
+  return text;
+#else
   if (!cd)
   {
     return text;
@@ -143,6 +150,7 @@ IConv::convert(const std::string& text)
 
     return result;
   }
+#endif
 }
 
 } // namespace tinygettext
