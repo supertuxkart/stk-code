@@ -563,7 +563,7 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
 
 // ----------------------------------------------------------------------------
 #ifndef SERVER_ONLY
-std::set<wchar_t> Translations::getCurrentAllChar()
+std::set<unsigned int> Translations::getCurrentAllChar()
 {
     return m_dictionary->get_all_used_chars();
 }   // getCurrentAllChar

@@ -21,6 +21,7 @@
 
 #include "tinygettext/log_stream.hpp"
 #include "tinygettext/dictionary.hpp"
+#include "../../../src/utils/utf8/unchecked.h"
 
 namespace tinygettext {
 
@@ -240,6 +241,42 @@ Dictionary::add_translation(const std::string& msgctxt, const std::string& msgid
     vec[0] = msgstr;
   }
 }
+
+std::set<unsigned int> Dictionary::get_all_used_chars()
+{
+    std::set<unsigned int> used_chars;
+    for (Entries::const_iterator i = entries.begin(); i != entries.end(); ++i)
+    {
+        const std::vector<std::string>& msgstrs = i->second;
+        for (unsigned int k = 0; k < msgstrs.size(); ++k)
+        {
+            std::vector<unsigned int> strings;
+            utf8::unchecked::utf8to32(msgstrs[k].c_str(), msgstrs[k].c_str() + msgstrs[k].size(),
+                back_inserter(strings));
+            for (unsigned int j = 0; j < strings.size(); ++j)
+                used_chars.insert(strings[j]);
+        }
+    }
+
+    for (CtxtEntries::const_iterator i = ctxt_entries.begin(); i != ctxt_entries.end(); ++i)
+    {
+        for (Entries::const_iterator j = i->second.begin(); j != i->second.end(); ++j)
+        {
+            const std::vector<std::string>& msgstrs = j->second;
+            for (unsigned int k = 0; k < msgstrs.size(); ++k)
+            {
+                std::vector<unsigned int> strings;
+                utf8::unchecked::utf8to32(msgstrs[k].c_str(), msgstrs[k].c_str() + msgstrs[k].size(),
+                    back_inserter(strings));
+                for (unsigned int l = 0; l < strings.size(); ++l)
+                    used_chars.insert(strings[l]);
+            }
+        }
+    }
+    return used_chars;
+}
+
+
 
 } // namespace tinygettext
 

@@ -792,10 +792,10 @@ void FontManager::unitTesting()
 #endif
         translations = new Translations();
         Log::setLogLevel(cur_log_level);
-        std::set<wchar_t> used_chars = translations->getCurrentAllChar();
+        std::set<unsigned int> used_chars = translations->getCurrentAllChar();
         // First FontWithFace is RegularFace
         FaceTTF* ttf = m_fonts.front()->getFaceTTF();
-        for (const wchar_t& c : used_chars)
+        for (const unsigned int& c : used_chars)
         {
             // Skip non-printing characters
             if (c < 32) continue;

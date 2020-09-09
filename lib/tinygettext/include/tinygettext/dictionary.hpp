@@ -20,6 +20,7 @@
 #ifndef HEADER_TINYGETTEXT_DICTIONARY_HPP
 #define HEADER_TINYGETTEXT_DICTIONARY_HPP
 
+#include <set>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -127,6 +128,8 @@ public:
     return func;
   }
 
+  /** Get unique characters (in utf32) used in current dictionary, useful to get for missing characters in font file. */
+  std::set<unsigned int> get_all_used_chars();
 private:
   Dictionary(const Dictionary&) = delete;
   Dictionary& operator=(const Dictionary&) = delete;

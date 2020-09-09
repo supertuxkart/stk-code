@@ -71,7 +71,7 @@ public:
 #ifndef SERVER_ONLY
     const std::vector<std::string>* getLanguageList() const;
 
-    std::set<wchar_t>        getCurrentAllChar();
+    std::set<unsigned int>   getCurrentAllChar();
 
     std::string              getCurrentLanguageName();
 
