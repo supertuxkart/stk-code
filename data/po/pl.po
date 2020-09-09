@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 01:02+0800\n"
-"PO-Revision-Date: 2020-08-03 11:08+0000\n"
-"Last-Translator: Deve <deveee@gmail.com>\n"
+"POT-Creation-Date: 2020-09-07 00:44+0800\n"
+"PO-Revision-Date: 2020-09-06 16:46+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Polish (http://www.transifex.com/supertuxkart/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -793,6 +793,7 @@ msgstr "Styl gry"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "Zwykły wyścig"
 
@@ -809,7 +810,7 @@ msgstr "Czasówka"
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
-#: src/states_screens/race_setup_screen.cpp:112
+#: src/states_screens/race_setup_screen.cpp:112 supertuxkart.appdata.xml:37
 msgid "Battle"
 msgstr "Bitwa"
 
@@ -819,6 +820,7 @@ msgstr "Bitwa"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "Piłka Nożna"
 
@@ -1007,7 +1009,7 @@ msgstr "Zainstalowany"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 msgid "Standard"
 msgstr "Standardowe"
 
@@ -1038,7 +1040,7 @@ msgstr "Dodatki"
 #: src/states_screens/addons_screen.cpp:135
 #: src/states_screens/arenas_screen.cpp:74
 #: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:146
+#: src/states_screens/edit_track_screen.cpp:111
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:309
@@ -2031,8 +2033,8 @@ msgstr "Muzyka"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:538
-#: src/states_screens/options/options_screen_video.cpp:611
+#: src/states_screens/options/options_screen_video.cpp:537
+#: src/states_screens/options/options_screen_video.cpp:610
 msgid "Enabled"
 msgstr "Włączone"
 
@@ -2715,7 +2717,7 @@ msgid "New kart '%s' now available"
 msgstr "Nowy gracz '%s' już dostępny"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:300
+#: src/states_screens/options/options_screen_ui.cpp:301
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2766,12 +2768,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1392 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:154
 #, c-format
 msgid "Tip: %s"
 msgstr "Wskazówka: %s"
 
-#: src/guiengine/engine.cpp:1436
+#: src/guiengine/engine.cpp:1476
 msgid "Loading"
 msgstr "Ładowanie"
 
@@ -3407,12 +3409,12 @@ msgstr "Lewy spust"
 msgid "Right trigger"
 msgstr "Prawy spust"
 
-#: src/input/input_manager.cpp:985
+#: src/input/input_manager.cpp:989
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Ignorowanie '%s'. Powinieneś/powinnaś dołączyć wcześniej go gry!"
 
-#: src/input/input_manager.cpp:1022
+#: src/input/input_manager.cpp:1026
 msgid "Only the Game Master may act at this point!"
 msgstr "Tylko Mistrz Gry może działać w tym miejscu!"
 
@@ -3475,7 +3477,7 @@ msgstr "Ukończyłeś wyścig!"
 msgid "%s left the game."
 msgstr "%s opuścił grę."
 
-#: src/main.cpp:1888
+#: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3486,16 +3488,16 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart może łączyć się z serwerem w celu pobrania dodatków oraz powiadamiania o aktualizacjach. Zbieramy również anonimowe statystyki, które pomagają w rozwoju gry. Zapoznaj się z naszą polityką prywatności na http://privacy.supertuxkart.net. Czy chcesz włączyć tą opcję? Aby zmienić to ustawienie później, edytuj pola \"Połącz się z siecią\" oraz \"Wysyłaj anonimowe dane o sprzęcie\" w zakładce \"Ogólne\"."
 
-#: src/main.cpp:2169
+#: src/main.cpp:2194
 msgid "Your screen resolution is too low to run STK."
 msgstr "Twoja rozdzielczość ekranu jest zbyt niska, aby uruchomić grę."
 
-#: src/main.cpp:2204
+#: src/main.cpp:2229
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Twój sterownik karty graficznej jest przestarzały. Zainstaluj najnowszą wersję."
 
-#: src/main.cpp:2222
+#: src/main.cpp:2247
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3503,7 +3505,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Sterownik karty graficznej wygląda na bardzo stary. Sprawdź czy jest dostępna aktualizacja. SuperTuxKart działa najlepiej ze sterownikiem wspierającym co najmniej %s. Gra powinna wciąż działać, ale w trybie z ograniczoną grafiką."
 
-#: src/main_loop.cpp:468 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "Upłynął limit czasu połączenia z serwerem."
 
@@ -3590,11 +3592,11 @@ msgstr[1] "%i zapasowe koła zostały utworzone!"
 msgstr[2] "%i zapasowych kół zostało utworzonych!"
 msgstr[3] "%i zapasowych kół zostało utworzonych!"
 
-#: src/modes/world.cpp:1369
+#: src/modes/world.cpp:1371
 msgid "You have been eliminated!"
 msgstr "Zostałeś wyeliminowany!"
 
-#: src/modes/world.cpp:1376
+#: src/modes/world.cpp:1378
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' został wyeliminowany."
@@ -3617,7 +3619,7 @@ msgid "Bad network connection is detected."
 msgstr "Wykryto złe połączenie."
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3636
+#: src/network/protocols/server_lobby.cpp:3792
 msgid "Bot"
 msgstr "Bot"
 
@@ -3786,17 +3788,17 @@ msgstr "Naciśnij <%s> lub <%s> aby zmienić obserwowanego gracza, <%s> lub <%s>
 msgid "Successfully reported %s."
 msgstr "Pomyślnie zgłoszono %s."
 
-#: src/network/protocols/connect_to_server.cpp:77
+#: src/network/protocols/connect_to_server.cpp:222
 msgid "No quick play server available."
 msgstr "Nie ma dostępnych serwerów szybkiej gry."
 
-#: src/network/protocols/connect_to_server.cpp:373
+#: src/network/protocols/connect_to_server.cpp:372
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nie można się połączyć z serwerem %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:766
+#: src/network/protocols/connect_to_server.cpp:771
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Nie udało się wykryć numeru portu serwera %s."
@@ -4512,14 +4514,14 @@ msgstr "Rozdzielczości mniejsze niż 1024x768 lub 1280x720 nie są wspierane. N
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:206
 #: src/states_screens/options/options_screen_video.cpp:226
-#: src/states_screens/options/options_screen_video.cpp:541
-#: src/states_screens/options/options_screen_video.cpp:612
+#: src/states_screens/options/options_screen_video.cpp:540
+#: src/states_screens/options/options_screen_video.cpp:611
 msgid "Disabled"
 msgstr "Wyłączone"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:543
+#: src/states_screens/options/options_screen_video.cpp:542
 msgid "Important only"
 msgstr "Tylko ważne"
 
@@ -4529,7 +4531,7 @@ msgstr "Tylko ważne"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:550
+#: src/states_screens/options/options_screen_video.cpp:549
 msgid "Low"
 msgstr "Niskie"
 
@@ -4539,14 +4541,14 @@ msgstr "Niskie"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:553
+#: src/states_screens/options/options_screen_video.cpp:552
 msgid "High"
 msgstr "Wysokie"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:547
+#: src/states_screens/options/options_screen_video.cpp:546
 msgid "Very Low"
 msgstr "Bardzo niskie"
 
@@ -4683,7 +4685,7 @@ msgstr "Naciśnij dowolny klawisz..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
 #: src/states_screens/online/networking_lobby.cpp:244
-#: src/states_screens/online/networking_lobby.cpp:832
+#: src/states_screens/online/networking_lobby.cpp:836
 msgid "Chat is disabled, enable in options menu."
 msgstr "Czat jest wyłączony, możesz go włączyć w opcjach."
 
@@ -4917,7 +4919,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Wystąpił błąd podczas próby zapisu Grand Prix"
 
-#: src/states_screens/edit_track_screen.cpp:234
+#: src/states_screens/edit_track_screen.cpp:254
 msgid "Select a track"
 msgstr "Wybierz trasę"
 
@@ -5047,7 +5049,7 @@ msgid "Locked"
 msgstr "Zablokowane"
 
 #: src/states_screens/kart_selection.cpp:1032
-#: src/states_screens/online/networking_lobby.cpp:515
+#: src/states_screens/online/networking_lobby.cpp:518
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5169,7 +5171,7 @@ msgstr "Proszę czekać do zakończenia aktualnej gry, szacowany postęp: %d%."
 msgid "Please wait for the current game's end."
 msgstr "Proszę czekać do zakończenia aktualnej gry."
 
-#: src/states_screens/online/networking_lobby.cpp:484
+#: src/states_screens/online/networking_lobby.cpp:487
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5180,7 +5182,7 @@ msgstr[3] "Gra rozpocznie się gdy dołączy więcej niż %d graczy."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:498
+#: src/states_screens/online/networking_lobby.cpp:501
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5191,12 +5193,12 @@ msgstr[1] "Rozpoczęcie po %d sekundach, lub gdy wszyscy wcisną przycisk \"Goto
 msgstr[2] "Rozpoczęcie po %d sekundach, lub gdy wszyscy wcisną przycisk \"Gotowy\"."
 msgstr[3] "Rozpoczęcie po %d sekundach, lub gdy wszyscy wcisną przycisk \"Gotowy\"."
 
-#: src/states_screens/online/networking_lobby.cpp:535
+#: src/states_screens/online/networking_lobby.cpp:538
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Łączenie z serwerem %s"
 
-#: src/states_screens/online/networking_lobby.cpp:540
+#: src/states_screens/online/networking_lobby.cpp:543
 msgid "Finding a quick play server"
 msgstr "Znajdowanie serwera dla szybkiej gry."
 
@@ -5577,74 +5579,74 @@ msgid "System Language"
 msgstr "Język Systemu"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:91
+#: src/states_screens/options/options_screen_ui.cpp:92
 msgid "In the bottom-left"
 msgstr "Na dole po lewej"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:93
+#: src/states_screens/options/options_screen_ui.cpp:94
 msgid "On the right side"
 msgstr "Po prawej"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:95
+#: src/states_screens/options/options_screen_ui.cpp:96
 msgid "Hidden"
 msgstr "Ukryty"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:97
+#: src/states_screens/options/options_screen_ui.cpp:98
 msgid "Centered"
 msgstr "Na środku"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:115
+#: src/states_screens/options/options_screen_ui.cpp:116
 msgid "Vertical"
 msgstr "Pionowo"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:117
+#: src/states_screens/options/options_screen_ui.cpp:118
 msgid "Horizontal"
 msgstr "Poziomo"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:128
+#: src/states_screens/options/options_screen_ui.cpp:129
 msgid "Very small"
 msgstr "Bardzo mały"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:130
+#: src/states_screens/options/options_screen_ui.cpp:131
 msgid "Small"
 msgstr "Mały"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:132
+#: src/states_screens/options/options_screen_ui.cpp:133
 msgid "Medium"
 msgstr "Średni"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:134
+#: src/states_screens/options/options_screen_ui.cpp:135
 msgid "Large"
 msgstr "Duży"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:136
+#: src/states_screens/options/options_screen_ui.cpp:137
 msgid "Very large"
 msgstr "Bardzo duży"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:357
+#: src/states_screens/options/options_screen_ui.cpp:358
 #: src/states_screens/options/options_screen_video.cpp:489
-#: src/states_screens/options/options_screen_video.cpp:521
+#: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Niestandardowe"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Drone chase"
 msgstr "Widok z góry"
 
-#: src/states_screens/options/options_screen_ui.cpp:529
+#: src/states_screens/options/options_screen_ui.cpp:530
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5682,82 +5684,82 @@ msgid "Vsync will not work if your drivers don't support it."
 msgstr "Synchronizacja pionowa nie będzie działać, jeśli \nnie jest obsługiwana przez sterownik."
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:556
+#: src/states_screens/options/options_screen_video.cpp:555
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Efekty cząsteczkowe: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:562
+#: src/states_screens/options/options_screen_video.cpp:561
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Animowane postacie: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:565
+#: src/states_screens/options/options_screen_video.cpp:564
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Dynamiczne oświetlenie: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:568
+#: src/states_screens/options/options_screen_video.cpp:567
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Rozpraszanie światła: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:571
+#: src/states_screens/options/options_screen_video.cpp:570
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Wygładzanie krawędzi: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:574
+#: src/states_screens/options/options_screen_video.cpp:573
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Cieniowanie powierzchni: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:578
+#: src/states_screens/options/options_screen_video.cpp:577
 #, c-format
 msgid "Shadows: %s"
 msgstr "Cienie: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:580
+#: src/states_screens/options/options_screen_video.cpp:579
 #, c-format
 msgid "Shadows: %i"
 msgstr "Cienie: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:583
+#: src/states_screens/options/options_screen_video.cpp:582
 #, c-format
 msgid "Bloom: %s"
 msgstr "Poświata: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:587
+#: src/states_screens/options/options_screen_video.cpp:586
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Poświata (kontury): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:591
+#: src/states_screens/options/options_screen_video.cpp:590
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Promienie światła: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:596
+#: src/states_screens/options/options_screen_video.cpp:595
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Jakość obrazu: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:615
+#: src/states_screens/options/options_screen_video.cpp:614
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Rozmycie ruchu: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:619
+#: src/states_screens/options/options_screen_video.cpp:618
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Głębia ostrości: %s"
@@ -5848,7 +5850,7 @@ msgstr "Śledź Lidera!"
 msgid "Top %i"
 msgstr "Top %i"
 
-#: src/states_screens/race_gui.cpp:442
+#: src/states_screens/race_gui.cpp:444
 msgid "Challenge Failed"
 msgstr "Wyzwanie nie powiodło się"
 
@@ -6141,3 +6143,67 @@ msgstr "Zauważ, że jeśli uda Ci się ślizgać przez kilka sekund, otrzymasz 
 #: ../stk-assets/tracks/tutorial/scripting.as:164
 msgid "You are now ready to race. Good luck!"
 msgstr "Jesteś gotowy do wyścigu. Powodzenia!"
+
+#. I18N: Generic name in desktop file entry, summary in AppData and short
+#. description in Google Play
+#: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
+msgid "A 3D open-source kart racing game"
+msgstr ""
+
+#. I18N: Keywords in desktop entry, translators please keep it separated with
+#. semicolons
+#: supertuxkart.desktop:11
+msgid "tux;game;race;"
+msgstr ""
+
+#: supertuxkart.appdata.xml:8
+msgid ""
+"Karts. Nitro. Action! SuperTuxKart is a 3D open-source arcade racer with a "
+"variety of characters, tracks, and modes to play. Our aim is to create a "
+"game that is more fun than realistic, and provide an enjoyable experience "
+"for all ages."
+msgstr ""
+
+#: supertuxkart.appdata.xml:11
+msgid ""
+"Discover the mystery of an underwater world, or drive through the jungles of"
+" Val Verde and visit the famous Cocoa Temple. Race underground or in a "
+"spaceship, through a rural farmland or a strange alien planet. Or rest under"
+" the palm trees on the beach, watching the other karts overtake you. But "
+"don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
+"cakes thrown by your opponents."
+msgstr ""
+
+#: supertuxkart.appdata.xml:14
+msgid ""
+"You can do a single race against other karts, compete in one of several "
+"Grand Prix, try to beat the high score in time trials on your own, play "
+"battle mode against the computer or your friends, and more! For a greater "
+"challenge, race online against players from all over the world and prove "
+"your racing process!"
+msgstr ""
+
+#: supertuxkart.appdata.xml:17
+msgid "This game is free and without ads."
+msgstr ""
+
+#: supertuxkart.appdata.xml:20
+msgid ""
+"This is an unstable version of SuperTuxKart that contains latest "
+"improvements. It is released mainly for testing, to make stable STK as good "
+"as possible."
+msgstr ""
+
+#: supertuxkart.appdata.xml:23
+msgid ""
+"This version can be installed in parallel with the stable version on the "
+"device."
+msgstr ""
+
+#: supertuxkart.appdata.xml:26
+msgid "If you need more stability, consider using the stable version: %s"
+msgstr ""
+
+#: supertuxkart.appdata.xml:44
+msgid "SuperTuxKart Team"
+msgstr ""

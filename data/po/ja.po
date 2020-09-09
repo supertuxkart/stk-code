@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 01:02+0800\n"
-"PO-Revision-Date: 2020-08-08 14:50+0000\n"
-"Last-Translator: Ubuntu Jackson <santenichiyonitchigo@gmail.com>\n"
+"POT-Creation-Date: 2020-09-07 00:44+0800\n"
+"PO-Revision-Date: 2020-09-06 16:46+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -797,6 +797,7 @@ msgstr "ゲームモード"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "普段レース"
 
@@ -813,7 +814,7 @@ msgstr "タイムトライアル"
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
-#: src/states_screens/race_setup_screen.cpp:112
+#: src/states_screens/race_setup_screen.cpp:112 supertuxkart.appdata.xml:37
 msgid "Battle"
 msgstr "バトル"
 
@@ -823,6 +824,7 @@ msgstr "バトル"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "サッカー"
 
@@ -1011,7 +1013,7 @@ msgstr "インストール済み"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 msgid "Standard"
 msgstr "標準"
 
@@ -1042,7 +1044,7 @@ msgstr "アドオン"
 #: src/states_screens/addons_screen.cpp:135
 #: src/states_screens/arenas_screen.cpp:74
 #: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:146
+#: src/states_screens/edit_track_screen.cpp:111
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:309
@@ -2035,8 +2037,8 @@ msgstr "BGM"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:538
-#: src/states_screens/options/options_screen_video.cpp:611
+#: src/states_screens/options/options_screen_video.cpp:537
+#: src/states_screens/options/options_screen_video.cpp:610
 msgid "Enabled"
 msgstr "有効"
 
@@ -2719,7 +2721,7 @@ msgid "New kart '%s' now available"
 msgstr "新しいカート '%s' がアンロックされました"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:300
+#: src/states_screens/options/options_screen_ui.cpp:301
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2770,12 +2772,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr ""
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1392 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:154
 #, c-format
 msgid "Tip: %s"
 msgstr "ヒント： %s"
 
-#: src/guiengine/engine.cpp:1436
+#: src/guiengine/engine.cpp:1476
 msgid "Loading"
 msgstr "読み込み中"
 
@@ -3411,12 +3413,12 @@ msgstr ""
 msgid "Right trigger"
 msgstr ""
 
-#: src/input/input_manager.cpp:985
+#: src/input/input_manager.cpp:989
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "'%s'.を無視する。プレイするにはもっと早く参加しないといけません。"
 
-#: src/input/input_manager.cpp:1022
+#: src/input/input_manager.cpp:1026
 msgid "Only the Game Master may act at this point!"
 msgstr "この操作はゲームマスターのみ行えます!!"
 
@@ -3476,7 +3478,7 @@ msgstr "フィニッシュ！"
 msgid "%s left the game."
 msgstr "%sがゲームから抜けました。"
 
-#: src/main.cpp:1888
+#: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3487,16 +3489,16 @@ msgid ""
 "statistics\")."
 msgstr "SuperTuxKart はアドオンのダウンロードやアップデートの通報のためにサーバーへ接続します。また、ゲームをより楽しく改良するため、プレイヤーのプレイ環境についての情報を匿名で収集います。\n個人情報に関する方針については http://privacy.supertuxkart.net をご覧ください。これらの機能を有効にしますか？（この設定は、設定画面で「General」のタブにある「ネットに接続」と「匿名のHW統計情報を返送する」で変更できます。"
 
-#: src/main.cpp:2169
+#: src/main.cpp:2194
 msgid "Your screen resolution is too low to run STK."
 msgstr "画面解像度が低すぎるため、STKは実行できません。"
 
-#: src/main.cpp:2204
+#: src/main.cpp:2229
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "最新のビデオドライバーを使用してください。"
 
-#: src/main.cpp:2222
+#: src/main.cpp:2247
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3504,7 +3506,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "グラフィックスドライバーは非常に古いようです。アップデートは入手可能かご確認ください。スーパータックスカートは %s 以上の性能のあるドライバーがお勧めです。ゲームは恐らく実行できますが、グラフィックスレベルが低くなってしまいます。"
 
-#: src/main_loop.cpp:468 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "サーバーへの接続がタイムアウトしました。"
 
@@ -3588,11 +3590,11 @@ msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%iスペアタイヤカートが現れた！"
 
-#: src/modes/world.cpp:1369
+#: src/modes/world.cpp:1371
 msgid "You have been eliminated!"
 msgstr "キミは失格になった!"
 
-#: src/modes/world.cpp:1376
+#: src/modes/world.cpp:1378
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' は失格になった。"
@@ -3615,7 +3617,7 @@ msgid "Bad network connection is detected."
 msgstr "悪いネット接続が発見されました。"
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3636
+#: src/network/protocols/server_lobby.cpp:3792
 msgid "Bot"
 msgstr "ボット"
 
@@ -3784,17 +3786,17 @@ msgstr "<%s> や <%s> で注目のプレイヤーを切り替え、 <%s> や <%s
 msgid "Successfully reported %s."
 msgstr "%sの通報が成功しました。"
 
-#: src/network/protocols/connect_to_server.cpp:77
+#: src/network/protocols/connect_to_server.cpp:222
 msgid "No quick play server available."
 msgstr "クイックプレイサーバーは入手可能ではありません。"
 
-#: src/network/protocols/connect_to_server.cpp:373
+#: src/network/protocols/connect_to_server.cpp:372
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "%sというサーバーに接続できません"
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:766
+#: src/network/protocols/connect_to_server.cpp:771
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "%sのサーバーのポート番号を見つけることが出来ませんでした。"
@@ -4498,14 +4500,14 @@ msgstr "1024x768 or 1280x720より小さい解像度は支援されていませ�
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:206
 #: src/states_screens/options/options_screen_video.cpp:226
-#: src/states_screens/options/options_screen_video.cpp:541
-#: src/states_screens/options/options_screen_video.cpp:612
+#: src/states_screens/options/options_screen_video.cpp:540
+#: src/states_screens/options/options_screen_video.cpp:611
 msgid "Disabled"
 msgstr "無効"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:543
+#: src/states_screens/options/options_screen_video.cpp:542
 msgid "Important only"
 msgstr "大体だけ"
 
@@ -4515,7 +4517,7 @@ msgstr "大体だけ"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:550
+#: src/states_screens/options/options_screen_video.cpp:549
 msgid "Low"
 msgstr "低い"
 
@@ -4525,14 +4527,14 @@ msgstr "低い"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:553
+#: src/states_screens/options/options_screen_video.cpp:552
 msgid "High"
 msgstr "高い"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:547
+#: src/states_screens/options/options_screen_video.cpp:546
 msgid "Very Low"
 msgstr "非常に低い"
 
@@ -4669,7 +4671,7 @@ msgstr "どれかキーを押してください..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
 #: src/states_screens/online/networking_lobby.cpp:244
-#: src/states_screens/online/networking_lobby.cpp:832
+#: src/states_screens/online/networking_lobby.cpp:836
 msgid "Chat is disabled, enable in options menu."
 msgstr "チャットは無効です、設定メニューで有効にしてください"
 
@@ -4903,7 +4905,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "グランプリを保存しようとした時にエラーが発生しました。"
 
-#: src/states_screens/edit_track_screen.cpp:234
+#: src/states_screens/edit_track_screen.cpp:254
 msgid "Select a track"
 msgstr "コースを選択"
 
@@ -5033,7 +5035,7 @@ msgid "Locked"
 msgstr "未解禁"
 
 #: src/states_screens/kart_selection.cpp:1032
-#: src/states_screens/online/networking_lobby.cpp:515
+#: src/states_screens/online/networking_lobby.cpp:518
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5155,7 +5157,7 @@ msgstr "現在のゲームが終わるまでお待ちください。進行度の
 msgid "Please wait for the current game's end."
 msgstr "今のゲームが終わるのをお待ちください。"
 
-#: src/states_screens/online/networking_lobby.cpp:484
+#: src/states_screens/online/networking_lobby.cpp:487
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5163,7 +5165,7 @@ msgstr[0] "%d人以上のプレイヤーがいたらゲームをスタートす�
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:498
+#: src/states_screens/online/networking_lobby.cpp:501
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5171,12 +5173,12 @@ msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
 msgstr[0] "%dが経過するか、みんなは準備がいいボタンを押すとレースがスタートする。"
 
-#: src/states_screens/online/networking_lobby.cpp:535
+#: src/states_screens/online/networking_lobby.cpp:538
 #, c-format
 msgid "Connecting to server %s"
 msgstr "%sというサーバーに接続中"
 
-#: src/states_screens/online/networking_lobby.cpp:540
+#: src/states_screens/online/networking_lobby.cpp:543
 msgid "Finding a quick play server"
 msgstr "クイックプレイサーバーを探しています..."
 
@@ -5557,74 +5559,74 @@ msgid "System Language"
 msgstr "システムの言語"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:91
+#: src/states_screens/options/options_screen_ui.cpp:92
 msgid "In the bottom-left"
 msgstr "左下に"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:93
+#: src/states_screens/options/options_screen_ui.cpp:94
 msgid "On the right side"
 msgstr "右側"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:95
+#: src/states_screens/options/options_screen_ui.cpp:96
 msgid "Hidden"
 msgstr "非表示"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:97
+#: src/states_screens/options/options_screen_ui.cpp:98
 msgid "Centered"
 msgstr "中央"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:115
+#: src/states_screens/options/options_screen_ui.cpp:116
 msgid "Vertical"
 msgstr "縦"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:117
+#: src/states_screens/options/options_screen_ui.cpp:118
 msgid "Horizontal"
 msgstr "横"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:128
+#: src/states_screens/options/options_screen_ui.cpp:129
 msgid "Very small"
 msgstr "極小"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:130
+#: src/states_screens/options/options_screen_ui.cpp:131
 msgid "Small"
 msgstr "小"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:132
+#: src/states_screens/options/options_screen_ui.cpp:133
 msgid "Medium"
 msgstr "中"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:134
+#: src/states_screens/options/options_screen_ui.cpp:135
 msgid "Large"
 msgstr "大"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:136
+#: src/states_screens/options/options_screen_ui.cpp:137
 msgid "Very large"
 msgstr "特大"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:357
+#: src/states_screens/options/options_screen_ui.cpp:358
 #: src/states_screens/options/options_screen_video.cpp:489
-#: src/states_screens/options/options_screen_video.cpp:521
+#: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "カスタム"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Drone chase"
 msgstr "ドローン・チェース"
 
-#: src/states_screens/options/options_screen_ui.cpp:529
+#: src/states_screens/options/options_screen_ui.cpp:530
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5662,82 +5664,82 @@ msgid "Vsync will not work if your drivers don't support it."
 msgstr "Vsyncはドライバーにサポートされてないと有効にできません。"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:556
+#: src/states_screens/options/options_screen_video.cpp:555
 #, c-format
 msgid "Particles Effects: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:562
+#: src/states_screens/options/options_screen_video.cpp:561
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "キャラのアニメーション：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:565
+#: src/states_screens/options/options_screen_video.cpp:564
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "ダイナミック・ライト： %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:568
+#: src/states_screens/options/options_screen_video.cpp:567
 #, c-format
 msgid "Light scattering: %s"
 msgstr "光の拡散：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:571
+#: src/states_screens/options/options_screen_video.cpp:570
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "アンチエリアシング; %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:574
+#: src/states_screens/options/options_screen_video.cpp:573
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:578
+#: src/states_screens/options/options_screen_video.cpp:577
 #, c-format
 msgid "Shadows: %s"
 msgstr "影: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:580
+#: src/states_screens/options/options_screen_video.cpp:579
 #, c-format
 msgid "Shadows: %i"
 msgstr "影: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:583
+#: src/states_screens/options/options_screen_video.cpp:582
 #, c-format
 msgid "Bloom: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:587
+#: src/states_screens/options/options_screen_video.cpp:586
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:591
+#: src/states_screens/options/options_screen_video.cpp:590
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:596
+#: src/states_screens/options/options_screen_video.cpp:595
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "レンダリング品質：%s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:615
+#: src/states_screens/options/options_screen_video.cpp:614
 #, c-format
 msgid "Motion blur: %s"
 msgstr "モーションブラー: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:619
+#: src/states_screens/options/options_screen_video.cpp:618
 #, c-format
 msgid "Depth of field: %s"
 msgstr ""
@@ -5828,7 +5830,7 @@ msgstr "リーダーに続け!"
 msgid "Top %i"
 msgstr "上位 %i 人"
 
-#: src/states_screens/race_gui.cpp:442
+#: src/states_screens/race_gui.cpp:444
 msgid "Challenge Failed"
 msgstr "チャレンジ失敗"
 
@@ -6121,3 +6123,67 @@ msgstr "数秒ドリフトしたら、報酬としてボーナススピードア
 #: ../stk-assets/tracks/tutorial/scripting.as:164
 msgid "You are now ready to race. Good luck!"
 msgstr "レースの用意が出来ている。頑張ろう！"
+
+#. I18N: Generic name in desktop file entry, summary in AppData and short
+#. description in Google Play
+#: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
+msgid "A 3D open-source kart racing game"
+msgstr ""
+
+#. I18N: Keywords in desktop entry, translators please keep it separated with
+#. semicolons
+#: supertuxkart.desktop:11
+msgid "tux;game;race;"
+msgstr ""
+
+#: supertuxkart.appdata.xml:8
+msgid ""
+"Karts. Nitro. Action! SuperTuxKart is a 3D open-source arcade racer with a "
+"variety of characters, tracks, and modes to play. Our aim is to create a "
+"game that is more fun than realistic, and provide an enjoyable experience "
+"for all ages."
+msgstr ""
+
+#: supertuxkart.appdata.xml:11
+msgid ""
+"Discover the mystery of an underwater world, or drive through the jungles of"
+" Val Verde and visit the famous Cocoa Temple. Race underground or in a "
+"spaceship, through a rural farmland or a strange alien planet. Or rest under"
+" the palm trees on the beach, watching the other karts overtake you. But "
+"don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
+"cakes thrown by your opponents."
+msgstr ""
+
+#: supertuxkart.appdata.xml:14
+msgid ""
+"You can do a single race against other karts, compete in one of several "
+"Grand Prix, try to beat the high score in time trials on your own, play "
+"battle mode against the computer or your friends, and more! For a greater "
+"challenge, race online against players from all over the world and prove "
+"your racing process!"
+msgstr ""
+
+#: supertuxkart.appdata.xml:17
+msgid "This game is free and without ads."
+msgstr ""
+
+#: supertuxkart.appdata.xml:20
+msgid ""
+"This is an unstable version of SuperTuxKart that contains latest "
+"improvements. It is released mainly for testing, to make stable STK as good "
+"as possible."
+msgstr ""
+
+#: supertuxkart.appdata.xml:23
+msgid ""
+"This version can be installed in parallel with the stable version on the "
+"device."
+msgstr ""
+
+#: supertuxkart.appdata.xml:26
+msgid "If you need more stability, consider using the stable version: %s"
+msgstr ""
+
+#: supertuxkart.appdata.xml:44
+msgid "SuperTuxKart Team"
+msgstr ""

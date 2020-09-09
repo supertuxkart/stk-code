@@ -15,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 01:02+0800\n"
-"PO-Revision-Date: 2020-07-28 17:52+0000\n"
+"POT-Creation-Date: 2020-09-07 00:44+0800\n"
+"PO-Revision-Date: 2020-09-06 16:46+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
@@ -27,15 +27,15 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "Játékadatok kibontása…"
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "Játékadat-kibontási hiba"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr ""
+msgstr "Nézd meg az eszköz fennmaradó lemezterületét, vagy telepítsd újra a SuperTuxKart programot."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -356,12 +356,12 @@ msgstr "Felbontás megtartása"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
-msgstr ""
+msgstr "Kamerabeállítások"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr ""
+msgstr "Játékos kamerája"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -371,27 +371,27 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr ""
+msgstr "Távolság"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Angle"
-msgstr ""
+msgstr "Szög"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Smooth camera"
-msgstr ""
+msgstr "Sima kamera"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
-msgstr ""
+msgstr "Fordított kamera"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "Labda követése foci módban"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -796,6 +796,7 @@ msgstr "Játékmód"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "Normál verseny"
 
@@ -812,7 +813,7 @@ msgstr "Időfutam"
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
-#: src/states_screens/race_setup_screen.cpp:112
+#: src/states_screens/race_setup_screen.cpp:112 supertuxkart.appdata.xml:37
 msgid "Battle"
 msgstr "Csata"
 
@@ -822,6 +823,7 @@ msgstr "Csata"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "Foci"
 
@@ -1010,7 +1012,7 @@ msgstr "Telepítve"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 msgid "Standard"
 msgstr "Szabványos"
 
@@ -1041,7 +1043,7 @@ msgstr "Bővítmények"
 #: src/states_screens/addons_screen.cpp:135
 #: src/states_screens/arenas_screen.cpp:74
 #: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:146
+#: src/states_screens/edit_track_screen.cpp:111
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:309
@@ -1607,7 +1609,7 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr ""
+msgstr "Egy kiszolgálón egy verseny akkor fog elkezdődni, amikor a (koronával jelzett) tulajdonosa úgy dönt. A hivatalos kiszolgálók csak akkor indíthatják el automatikusan a versenyeket, amikor elegendő játékos van. Ezután választhatod ki a gokartot, és szavazhatsz a következő pályára a versenyzéshez. Kiegészítő pálya csak akkor engedélyezett, ha az létezik az összes csatlakozott játékosnál és a kiszolgálón is."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -2034,8 +2036,8 @@ msgstr "Zene"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:538
-#: src/states_screens/options/options_screen_video.cpp:611
+#: src/states_screens/options/options_screen_video.cpp:537
+#: src/states_screens/options/options_screen_video.cpp:610
 msgid "Enabled"
 msgstr "Engedélyezve"
 
@@ -2154,12 +2156,12 @@ msgstr "Betűméret"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "Kamera"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr ""
+msgstr "Egyéni…"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2194,7 +2196,7 @@ msgstr "Elmosási hatások szintje"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync"
-msgstr ""
+msgstr "Függőleges szinkronizáció"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2718,7 +2720,7 @@ msgid "New kart '%s' now available"
 msgstr "Az új „%s” gokart mostantól elérhető"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:300
+#: src/states_screens/options/options_screen_ui.cpp:301
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2769,12 +2771,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1392 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:154
 #, c-format
 msgid "Tip: %s"
 msgstr "Tipp: %s"
 
-#: src/guiengine/engine.cpp:1436
+#: src/guiengine/engine.cpp:1476
 msgid "Loading"
 msgstr "Betöltés"
 
@@ -3410,12 +3412,12 @@ msgstr "Bal aktiváló"
 msgid "Right trigger"
 msgstr "Jobb aktiváló"
 
-#: src/input/input_manager.cpp:985
+#: src/input/input_manager.cpp:989
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "„%s” mellőzése: korábban kellett csatlakoznod a játékhoz!"
 
-#: src/input/input_manager.cpp:1022
+#: src/input/input_manager.cpp:1026
 msgid "Only the Game Master may act at this point!"
 msgstr "Csak a játékmester cselekedhet ezen a helyen!"
 
@@ -3476,7 +3478,7 @@ msgstr "Befejezted a versenyt!"
 msgid "%s left the game."
 msgstr "%s kilépett a játékból."
 
-#: src/main.cpp:1888
+#: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3487,16 +3489,16 @@ msgid ""
 "statistics\")."
 msgstr "A SuperTuxKart csatlakozhat egy kiszolgálóhoz kiegészítők letöltéséhez, és a értesít a frissítésekről. Névtelen hardverstatisztikákat is gyűjtünk az STK fejlesztésének segítségére. Olvasd el az adatvédelmi irányelveinket a http://privacy.supertuxkart.net angol nyelvű oldalon. Szeretnéd ezt a szolgáltatást engedélyezni? (Ezen beállítás későbbi megváltoztatásához menj a beállításokhoz, válaszd az „Általános” lapot, és szerkeszd a „Csatlakozás az Internethez” és a „Névtelen hardverstatisztikák küldése” beállításokat)."
 
-#: src/main.cpp:2169
+#: src/main.cpp:2194
 msgid "Your screen resolution is too low to run STK."
 msgstr "A képernyőfelbontásod túl alacsony az STK futtatásához."
 
-#: src/main.cpp:2204
+#: src/main.cpp:2229
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Az illesztőprogramod verziója túl régi. Kérlek telepítsd a legfrissebb videokártya illesztőprogramokat."
 
-#: src/main.cpp:2222
+#: src/main.cpp:2247
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3504,7 +3506,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "A grafikus illesztőprogramod nagyon réginek tűnik. Nézd meg, hogy van-e elérhető frissítés. A SuperTuxKart olyan illesztőprogramot javasol, amely %s vagy jobb támogatással rendelkezik. A játék valószínűleg még futni fog, de csak csökkentett grafikus módban."
 
-#: src/main_loop.cpp:468 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "A kiszolgáló-kapcsolat túllépte az időkorlátot."
 
@@ -3575,12 +3577,12 @@ msgstr "ROSSZ IRÁNY!"
 #: src/modes/soccer_world.cpp:524 src/modes/soccer_world.cpp:651
 #, c-format
 msgid "%s scored a goal!"
-msgstr ""
+msgstr "%s gólt lőtt!"
 
 #: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
 #, c-format
 msgid "Oops, %s made an own goal!"
-msgstr ""
+msgstr "Hoppá, %s öngólt lőtt!"
 
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
@@ -3589,11 +3591,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i pótkerék gokart jelent meg!"
 msgstr[1] "%i pótkerék gokart jelent meg!"
 
-#: src/modes/world.cpp:1369
+#: src/modes/world.cpp:1371
 msgid "You have been eliminated!"
 msgstr "Kizártak a versenyből!"
 
-#: src/modes/world.cpp:1376
+#: src/modes/world.cpp:1378
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "„%s” kizárva."
@@ -3616,7 +3618,7 @@ msgid "Bad network connection is detected."
 msgstr "Rossz hálózati kapcsolat észlelhető."
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3636
+#: src/network/protocols/server_lobby.cpp:3792
 msgid "Bot"
 msgstr "Robot"
 
@@ -3785,17 +3787,17 @@ msgstr "Nyomd meg a(z) <%s> vagy <%s> gombot a célba vett játékos módosítá
 msgid "Successfully reported %s."
 msgstr "%s sikeresen jelentve."
 
-#: src/network/protocols/connect_to_server.cpp:77
+#: src/network/protocols/connect_to_server.cpp:222
 msgid "No quick play server available."
 msgstr "Nem érhető el gyors játékú kiszolgáló."
 
-#: src/network/protocols/connect_to_server.cpp:373
+#: src/network/protocols/connect_to_server.cpp:372
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nem lehet kapcsolódni a kiszolgálóhoz: %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:766
+#: src/network/protocols/connect_to_server.cpp:771
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Nem sikerült felismerni a(z) %s kiszolgáló portszámát."
@@ -4503,14 +4505,14 @@ msgstr "Az 1024×768 vagy 1280×720 képpontnál kisebb felbontások nem támoga
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:206
 #: src/states_screens/options/options_screen_video.cpp:226
-#: src/states_screens/options/options_screen_video.cpp:541
-#: src/states_screens/options/options_screen_video.cpp:612
+#: src/states_screens/options/options_screen_video.cpp:540
+#: src/states_screens/options/options_screen_video.cpp:611
 msgid "Disabled"
 msgstr "Letiltva"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:543
+#: src/states_screens/options/options_screen_video.cpp:542
 msgid "Important only"
 msgstr "Csak fontosak"
 
@@ -4520,7 +4522,7 @@ msgstr "Csak fontosak"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:550
+#: src/states_screens/options/options_screen_video.cpp:549
 msgid "Low"
 msgstr "Alacsony"
 
@@ -4530,14 +4532,14 @@ msgstr "Alacsony"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:553
+#: src/states_screens/options/options_screen_video.cpp:552
 msgid "High"
 msgstr "Magas"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:547
+#: src/states_screens/options/options_screen_video.cpp:546
 msgid "Very Low"
 msgstr "Nagyon alacsony"
 
@@ -4674,7 +4676,7 @@ msgstr "Nyomj meg egy billentyűt…"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
 #: src/states_screens/online/networking_lobby.cpp:244
-#: src/states_screens/online/networking_lobby.cpp:832
+#: src/states_screens/online/networking_lobby.cpp:836
 msgid "Chat is disabled, enable in options menu."
 msgstr "A csevegés le van tiltva, engedélyezd a beállítások menüben."
 
@@ -4908,7 +4910,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Hiba történt a nagydíj mentésének kísérlete közben."
 
-#: src/states_screens/edit_track_screen.cpp:234
+#: src/states_screens/edit_track_screen.cpp:254
 msgid "Select a track"
 msgstr "Válassz egy pályát"
 
@@ -5038,7 +5040,7 @@ msgid "Locked"
 msgstr "Zárolt"
 
 #: src/states_screens/kart_selection.cpp:1032
-#: src/states_screens/online/networking_lobby.cpp:515
+#: src/states_screens/online/networking_lobby.cpp:518
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5117,7 +5119,7 @@ msgstr "Megfigyelés"
 
 #: src/states_screens/online/networking_lobby.cpp:198
 msgid "Install addon"
-msgstr ""
+msgstr "Kiegészítő telepítése"
 
 #: src/states_screens/online/networking_lobby.cpp:337
 #, c-format
@@ -5160,7 +5162,7 @@ msgstr "Várj a jelenlegi játék befejezésére. A becsült állapot: %d%. "
 msgid "Please wait for the current game's end."
 msgstr "Várj a jelenlegi játék befejezésére."
 
-#: src/states_screens/online/networking_lobby.cpp:484
+#: src/states_screens/online/networking_lobby.cpp:487
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5169,7 +5171,7 @@ msgstr[1] "A játék akkor indul, ha több mint %d játékos van."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:498
+#: src/states_screens/online/networking_lobby.cpp:501
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5178,12 +5180,12 @@ msgid_plural ""
 msgstr[0] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
 msgstr[1] "Indítás %d másodperc múlva, vagy amikor mindenki megnyomta a „Kész” gombot."
 
-#: src/states_screens/online/networking_lobby.cpp:535
+#: src/states_screens/online/networking_lobby.cpp:538
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Kapcsolódás a kiszolgálóhoz: %s"
 
-#: src/states_screens/online/networking_lobby.cpp:540
+#: src/states_screens/online/networking_lobby.cpp:543
 msgid "Finding a quick play server"
 msgstr "Gyors játékú kiszolgáló keresése"
 
@@ -5564,74 +5566,74 @@ msgid "System Language"
 msgstr "Rendszer nyelve"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:91
+#: src/states_screens/options/options_screen_ui.cpp:92
 msgid "In the bottom-left"
 msgstr "Bal alul"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:93
+#: src/states_screens/options/options_screen_ui.cpp:94
 msgid "On the right side"
 msgstr "A jobb oldalon"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:95
+#: src/states_screens/options/options_screen_ui.cpp:96
 msgid "Hidden"
 msgstr "Rejtett"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:97
+#: src/states_screens/options/options_screen_ui.cpp:98
 msgid "Centered"
 msgstr "Középre igazított"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:115
+#: src/states_screens/options/options_screen_ui.cpp:116
 msgid "Vertical"
 msgstr "Függőleges"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:117
+#: src/states_screens/options/options_screen_ui.cpp:118
 msgid "Horizontal"
 msgstr "Vízszintes"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:128
+#: src/states_screens/options/options_screen_ui.cpp:129
 msgid "Very small"
 msgstr "Nagyon kicsi"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:130
+#: src/states_screens/options/options_screen_ui.cpp:131
 msgid "Small"
 msgstr "Kicsi"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:132
+#: src/states_screens/options/options_screen_ui.cpp:133
 msgid "Medium"
 msgstr "Közepes"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:134
+#: src/states_screens/options/options_screen_ui.cpp:135
 msgid "Large"
 msgstr "Nagy"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:136
+#: src/states_screens/options/options_screen_ui.cpp:137
 msgid "Very large"
 msgstr "Nagyon nagy"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:357
+#: src/states_screens/options/options_screen_ui.cpp:358
 #: src/states_screens/options/options_screen_video.cpp:489
-#: src/states_screens/options/options_screen_video.cpp:521
+#: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Egyéni"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Drone chase"
 msgstr ""
 
-#: src/states_screens/options/options_screen_ui.cpp:529
+#: src/states_screens/options/options_screen_ui.cpp:530
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5669,82 +5671,82 @@ msgid "Vsync will not work if your drivers don't support it."
 msgstr "A vsync nem fog működni, ha az illesztőprogramok nem támogatják."
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:556
+#: src/states_screens/options/options_screen_video.cpp:555
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Részecske hatások: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:562
+#: src/states_screens/options/options_screen_video.cpp:561
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Animált karakterek: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:565
+#: src/states_screens/options/options_screen_video.cpp:564
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Dinamikus fények: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:568
+#: src/states_screens/options/options_screen_video.cpp:567
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Fény szóródás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:571
+#: src/states_screens/options/options_screen_video.cpp:570
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Élsimítás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:574
+#: src/states_screens/options/options_screen_video.cpp:573
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Környezeti árnyékolás: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:578
+#: src/states_screens/options/options_screen_video.cpp:577
 #, c-format
 msgid "Shadows: %s"
 msgstr "Árnyékok: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:580
+#: src/states_screens/options/options_screen_video.cpp:579
 #, c-format
 msgid "Shadows: %i"
 msgstr "Árnyékok: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:583
+#: src/states_screens/options/options_screen_video.cpp:582
 #, c-format
 msgid "Bloom: %s"
 msgstr "Ragyogás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:587
+#: src/states_screens/options/options_screen_video.cpp:586
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Ragyogás (körvonalak): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:591
+#: src/states_screens/options/options_screen_video.cpp:590
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Fénysugarak (napsugarak): %s"
 
-#: src/states_screens/options/options_screen_video.cpp:596
+#: src/states_screens/options/options_screen_video.cpp:595
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Megjelenített képminőség: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:615
+#: src/states_screens/options/options_screen_video.cpp:614
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Elmosás: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:619
+#: src/states_screens/options/options_screen_video.cpp:618
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Mélységélesség: %s"
@@ -5835,7 +5837,7 @@ msgstr "Kövesd a vezért!"
 msgid "Top %i"
 msgstr "Legjobb %i"
 
-#: src/states_screens/race_gui.cpp:442
+#: src/states_screens/race_gui.cpp:444
 msgid "Challenge Failed"
 msgstr "Kihívás sikertelen"
 
@@ -6128,3 +6130,67 @@ msgstr "Ne feledd, hogy ha sikerül farolni néhány másodpercig, akkor egy bó
 #: ../stk-assets/tracks/tutorial/scripting.as:164
 msgid "You are now ready to race. Good luck!"
 msgstr "Most már készen állsz a versenyzésre. Sok szerencsét!"
+
+#. I18N: Generic name in desktop file entry, summary in AppData and short
+#. description in Google Play
+#: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
+msgid "A 3D open-source kart racing game"
+msgstr ""
+
+#. I18N: Keywords in desktop entry, translators please keep it separated with
+#. semicolons
+#: supertuxkart.desktop:11
+msgid "tux;game;race;"
+msgstr ""
+
+#: supertuxkart.appdata.xml:8
+msgid ""
+"Karts. Nitro. Action! SuperTuxKart is a 3D open-source arcade racer with a "
+"variety of characters, tracks, and modes to play. Our aim is to create a "
+"game that is more fun than realistic, and provide an enjoyable experience "
+"for all ages."
+msgstr ""
+
+#: supertuxkart.appdata.xml:11
+msgid ""
+"Discover the mystery of an underwater world, or drive through the jungles of"
+" Val Verde and visit the famous Cocoa Temple. Race underground or in a "
+"spaceship, through a rural farmland or a strange alien planet. Or rest under"
+" the palm trees on the beach, watching the other karts overtake you. But "
+"don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
+"cakes thrown by your opponents."
+msgstr ""
+
+#: supertuxkart.appdata.xml:14
+msgid ""
+"You can do a single race against other karts, compete in one of several "
+"Grand Prix, try to beat the high score in time trials on your own, play "
+"battle mode against the computer or your friends, and more! For a greater "
+"challenge, race online against players from all over the world and prove "
+"your racing process!"
+msgstr ""
+
+#: supertuxkart.appdata.xml:17
+msgid "This game is free and without ads."
+msgstr ""
+
+#: supertuxkart.appdata.xml:20
+msgid ""
+"This is an unstable version of SuperTuxKart that contains latest "
+"improvements. It is released mainly for testing, to make stable STK as good "
+"as possible."
+msgstr ""
+
+#: supertuxkart.appdata.xml:23
+msgid ""
+"This version can be installed in parallel with the stable version on the "
+"device."
+msgstr ""
+
+#: supertuxkart.appdata.xml:26
+msgid "If you need more stability, consider using the stable version: %s"
+msgstr ""
+
+#: supertuxkart.appdata.xml:44
+msgid "SuperTuxKart Team"
+msgstr ""

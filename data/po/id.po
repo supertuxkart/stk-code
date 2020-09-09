@@ -5,6 +5,7 @@
 # Translators:
 # Christian Elbrianno Yoga, 2017
 # Christian Elbrianno Yoga, 2017
+# Christian Elbrianno Yoga, 2017
 # Dito Kurnia Pratama <ditokpl@gmail.com>, 2019
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Icho Yulian Chandra <icho.yulian@gmail.com>, 2016
@@ -15,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-29 01:02+0800\n"
-"PO-Revision-Date: 2020-07-28 17:52+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-09-07 00:44+0800\n"
+"PO-Revision-Date: 2020-09-07 19:47+0000\n"
+"Last-Translator: Triyan W. Nugroho <triyan.wn@gmail.com>\n"
 "Language-Team: Indonesian (http://www.transifex.com/supertuxkart/supertuxkart/language/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -27,15 +28,15 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "Mengekstrak data permainan..."
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "Terjadi kesalahan saat mengekstrak data permainan"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr ""
+msgstr "Periksa sisa ruang pada perangkat atau pasang ulang SuperTuxKart."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -49,7 +50,7 @@ msgstr "Christoffel Columbus"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
-msgstr "Mainkan semua sirkuit resmi setidaknya satu kali."
+msgstr "Mainkan semua lintasan resmi setidaknya satu kali."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
@@ -73,11 +74,11 @@ msgstr "Pelari Maraton"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr "Selesaikan sebuah balapan dengan setidaknya dua kali jumlah lap jalur itu."
+msgstr "Selesaikan sebuah balapan dengan setidaknya dua kali jumlah lap lintasan itu."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
-msgstr "Selip-gaji"
+msgstr "Selip-berturut"
 
 #. I18N: ./data/achievements.xml
 msgid "Skid 5 times in a single lap."
@@ -95,11 +96,11 @@ msgstr "Menang melawan setidaknya 3 AI di balapan normal, ujian waktu, dan ikuti
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
-msgstr "Kekuatan Cinta."
+msgstr "Kekuatan Cinta"
 
 #. I18N: ./data/achievements.xml
 msgid "Use 10 or more powerups in a race."
-msgstr "Gunakan 10 kekuatan atau lebih di sebuah balapan. "
+msgstr "Gunakan 10 kekuatan atau lebih di sebuah balapan."
 
 #. I18N: ./data/achievements.xml
 msgid "Unstoppable"
@@ -121,7 +122,7 @@ msgstr "Mengumpulkan setidaknya 5 pisang dalam satu balapan."
 
 #. I18N: ./data/achievements.xml
 msgid "It's secret"
-msgstr "Rahasia"
+msgstr "Ini rahasia"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
@@ -153,7 +154,7 @@ msgstr "Arena Bermain Pinguin"
 
 #. I18N: ./data/grandprix/2_offthebeatentrack.grandprix
 msgid "Off the Beaten Track"
-msgstr "Terpencil"
+msgstr "Lintasan Terpencil"
 
 #. I18N: ./data/grandprix/3_tothemoonandback.grandprix
 msgid "To the Moon and Back"
@@ -166,7 +167,7 @@ msgstr "Di Ujung Dunia"
 #. I18N: ./data/gui/dialogs/addons_loading.stkgui
 #. I18N: Add-on screen action
 msgid "Install"
-msgstr "Instal"
+msgstr "Pasang"
 
 #. I18N: ./data/gui/dialogs/addons_loading.stkgui
 #. I18N: Add-on screen action
@@ -356,42 +357,42 @@ msgstr "Tetap pada resolusi ini"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
-msgstr ""
+msgstr "Pengaturan Kamera"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr ""
+msgstr "Kamera pemain"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "FOV"
-msgstr ""
+msgstr "FOV"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr ""
+msgstr "Jarak"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Angle"
-msgstr ""
+msgstr "Sudut"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Smooth camera"
-msgstr ""
+msgstr "Kamera halus"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
-msgstr ""
+msgstr "Kamera mundur"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "Ikuti bola di mode sepakbola"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -460,7 +461,7 @@ msgstr "Karakter animasi"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Texture compression"
-msgstr "Kompresi tekstur."
+msgstr "Kompresi tekstur"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -679,13 +680,13 @@ msgstr "Pemulihan Akun"
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr "Anda akan menerima surel dengan instruksi lebih lanjut untuk mereset kata kunci. Mohon menunggu dan periksa juga folder sampah/spam di kotak masuk anda."
+msgstr "Kamu akan menerima surel dengan instruksi lebih lanjut untuk mereset kata kunci. Mohon menunggu dan periksa juga folder sampah/spam di kotak masuk."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 msgid ""
 "Fill in the username and email address you supplied at registration to be "
 "able to reset your password."
-msgstr "Masukkan nama pengguna dan alamat surel yang anda berikan saat mendaftar untuk bisa mereset kata kunci anda."
+msgstr "Masukkan nama pengguna dan alamat surel yang kamu berikan saat mendaftar untuk bisa mereset kata kuncimu."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
@@ -713,7 +714,7 @@ msgstr "Persyaratan dan Persetujuan"
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
 msgid "I agree to the above terms and am 13 years or older. "
-msgstr "Saya setuju akan persyaratan di atas dan umur saya 13 tahun atau lebih."
+msgstr "Saya setuju akan persyaratan di atas dan umur saya 13 tahun atau lebih. "
 
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
 #. I18N: In the registration dialog
@@ -796,6 +797,7 @@ msgstr "Mode permainan"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "Balapan Biasa"
 
@@ -812,7 +814,7 @@ msgstr "Ujian Waktu"
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
-#: src/states_screens/race_setup_screen.cpp:112
+#: src/states_screens/race_setup_screen.cpp:112 supertuxkart.appdata.xml:37
 msgid "Battle"
 msgstr "Bertempur"
 
@@ -822,6 +824,7 @@ msgstr "Bertempur"
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
 #: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "Sepak Bola"
 
@@ -1010,7 +1013,7 @@ msgstr "Terpasang"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 msgid "Standard"
 msgstr "Standar"
 
@@ -1041,7 +1044,7 @@ msgstr "Add-On"
 #: src/states_screens/addons_screen.cpp:135
 #: src/states_screens/arenas_screen.cpp:74
 #: src/states_screens/easter_egg_screen.cpp:137
-#: src/states_screens/edit_track_screen.cpp:146
+#: src/states_screens/edit_track_screen.cpp:111
 #: src/states_screens/gp_info_screen.cpp:74
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:309
@@ -1168,7 +1171,7 @@ msgstr "Balik"
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Track group"
-msgstr "Kelompok sirkuit"
+msgstr "Kelompok lintasan"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1356,7 +1359,7 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr "Kamu bisa melakukan selip dengan menekan sebuah tombol khusus. Selip  jarak pendek akan membantu kamu melakukan belokan tajam, sedangkan selip jarak menengah akan memberimu tambahan dorongan, dan selip jarak jauh akan memberimu lebih banyak dorongan. Kamu tidak bisa berhenti berbelok sambil selip, jadi arahkan kart dengan hati-hati sebelum melakukan selip!"
+msgstr "Kamu bisa melakukan selip dengan menekan sebuah tombol khusus. Selip jarak pendek akan membantu kamu melakukan belokan tajam, sedangkan selip jarak menengah akan memberimu tambahan dorongan, dan selip jarak jauh akan memberimu lebih banyak dorongan. Kamu tidak bisa berhenti berbelok sambil selip, jadi arahkan kart dengan hati-hati sebelum melakukan selip!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1411,7 +1414,7 @@ msgstr "Sepakbola: Gunakan kart untuk mendorong bola ke gawang."
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Egg hunt: Explore tracks to find all hidden eggs."
-msgstr "Berburu Telur: Eksplorasi jalur untuk menemukan semua telur tersembunyi."
+msgstr "Berburu Telur: Jelajahi lintasan untuk menemukan semua telur tersembunyi."
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1427,7 +1430,7 @@ msgid ""
 "instead of playing a single race, you play many in a row. The better you "
 "rank, the more points you get. In the end, the player with the most points "
 "wins the cup."
-msgstr "* Beberapa mode permainan ini juga bisa dimainkan dengan gaya Grand Prix: Kamu tidak bermain balapan tunggal, melainkan memainkan beberapa balapan berurutan. Semakin baik peringkatmu, semakin banyak poin yang kamu dapatkan. Di akhir permainan, pemain dengan poin terbanyak memenangkan piala. "
+msgstr "* Beberapa mode permainan ini juga bisa dimainkan dengan gaya Grand Prix: Kamu tidak bermain balapan tunggal, melainkan memainkan beberapa balapan berurutan. Semakin baik peringkatmu, semakin banyak poin yang kamu dapatkan. Di akhir permainan, pemain dengan poin terbanyak memenangkan piala."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 #. I18N: In the help menu
@@ -1530,7 +1533,7 @@ msgid ""
 "When you complete a challenge, you get a cup. Each cup is worth several "
 "points. The higher the difficulty you completed the challenge in, the better"
 " the cup and the more points it is worth."
-msgstr "Ketika kamu menyelesaikan sebuah tantangan, kamu akan mendapatkan sebuah piala. Setiap piala bernilai beberapa poin. Semakin tinggi tingkat kesulitan yang kamu selesaikan pada tantangan itu, semakin bagus pialanya dan nilai poinnya semakin tinggi. "
+msgstr "Ketika kamu menyelesaikan sebuah tantangan, kamu akan mendapatkan sebuah piala. Setiap piala bernilai beberapa poin. Semakin tinggi tingkat kesulitan yang kamu selesaikan pada tantangan itu, semakin bagus pialanya dan nilai poinnya semakin tinggi."
 
 #. I18N: ./data/gui/screens/help5.stkgui
 #. I18N: In the help menu
@@ -1543,7 +1546,7 @@ msgstr "Ketika kamu mendapatkan jumlah poin yang ditampilkan di bawah ikon ini, 
 msgid ""
 "Not all karts drive the same! They belong to classes with several "
 "differences:"
-msgstr "Tidak semua kart sama! Kart tersedia untuk golongan tertentu dengan beberapa perbedaan: "
+msgstr "Tidak semua kart sama! Kart tersedia untuk golongan tertentu dengan beberapa perbedaan:"
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1559,7 +1562,7 @@ msgid ""
 "Acceleration - especially useful at start, after an accident, or in tracks "
 "with a lot of sharp curves. The lighter the kart, the faster it accelerates,"
 " especially at low speeds."
-msgstr "Akselerasi - khususnya berguna saat mulai, setelah kecelakaan, atau di jalur dengan banyak tikungan tajam. Semakin ringan kart, semakin cepat berakselerasi, khususnya pada kecepatan rendah."
+msgstr "Akselerasi - khususnya berguna saat mulai, setelah kecelakaan, atau di lintasan dengan banyak tikungan tajam. Semakin ringan kart, semakin cepat berakselerasi, khususnya pada kecepatan rendah."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1567,7 +1570,7 @@ msgid ""
 "Max speed - the higher it is, the faster the kart can go. Especially useful "
 "in tracks with straight lines and gentle curves. Heavier karts have a higher"
 " top speed."
-msgstr "Kecepatan maksimum - semakin tinggi, semakin cepat kart. Khususnya berguna pada jalur lurus dan sedikit belokan. Kart yang lebih berat memiliki kecepatan maksimum yang lebih tinggi."
+msgstr "Kecepatan maksimum - semakin tinggi, semakin cepat kart. Khususnya berguna pada lintasan lurus dan sedikit belokan. Kart yang lebih berat memiliki kecepatan maksimum yang lebih tinggi."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1607,7 +1610,7 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr ""
+msgstr "Setelah berada di server, balapan akan dimulai jika pemiliknya (disimbolkan dengan mahkota) memutuskan untuk memulai. Server resmi bisa memulai balapan secara otomatis hanya jika ada cukup pemain. Kemudian, kamu bisa memilih kart dan memilih lintasan berikutnya. Lintasan tambahan diperbolehkan hanya jika tersedia di semua pemain yang bergabung dan di server."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1639,7 +1642,7 @@ msgstr "Jika perangkat masukan telah dikonfigurasi, pilih ikon 'Multi-pemain Bag
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 msgid "Choose a Kart"
-msgstr "Pilih Kart Anda"
+msgstr "Pilih Kart"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
@@ -1704,7 +1707,7 @@ msgstr "Nama server"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
 msgid "Max. number of players"
-msgstr "Jumlah pemain maks."
+msgstr "Jumlah pemain maksimum"
 
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -1877,7 +1880,7 @@ msgid ""
 "You can play without creating an online account by selecting an offline "
 "account. Though then you can not connect to friends, vote for addons etc. "
 "Please read our privacy statement at http://privacy.supertuxkart.net"
-msgstr "Anda dapat bermain tanpa akun daring dengan memilih akun luring. Meski dengan begitu, anda tidak dapat terhubung dengan teman, memilih add-on, dll. Mohon baca pernyataan privasi di http://privacy.supertuxkart.net"
+msgstr "Kamu dapat bermain tanpa akun daring dengan memilih akun luring. Meski dengan begitu, kamu tidak dapat terhubung dengan teman, memilih add-on, dll. Mohon baca pernyataan privasi di http://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 msgid "Server Selection"
@@ -2034,8 +2037,8 @@ msgstr "Musik"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:538
-#: src/states_screens/options/options_screen_video.cpp:611
+#: src/states_screens/options/options_screen_video.cpp:537
+#: src/states_screens/options/options_screen_video.cpp:610
 msgid "Enabled"
 msgstr "Diaktifkan"
 
@@ -2085,7 +2088,7 @@ msgstr "Selalu tampilkan kotak masuk"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Connect to the Internet"
-msgstr "Sambung ke Internet."
+msgstr "Sambung ke Internet"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2154,12 +2157,12 @@ msgstr "Ukuran fonta"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "Kamera"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr ""
+msgstr "Suai..."
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2194,12 +2197,12 @@ msgstr "Tingkat Efek Buram"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync"
-msgstr ""
+msgstr "Sinkronisasi Vertikal"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Pengaturan kustom"
+msgstr "Pengaturan kustom..."
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2548,7 +2551,7 @@ msgstr "Ada apa, pecundang? Pemimpinmu GNU mu hilang?"
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "Oh ya, lihat, dia di kastil saya sekarang dan akan disajikan untuk makan malam ..."
+msgstr "Oh ya, lihat, dia ada di kastilku sekarang dan akan disajikan untuk makan malam ..."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2558,7 +2561,7 @@ msgstr "Tapi aku makhluk adil, jadi aku beri kau kesepakatan."
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "If you can beat me at racing, I will free the old codger."
-msgstr "Kalau kau bisa mengalahkanku, Aku akan membebaskan si tua itu"
+msgstr "Kalau kau bisa mengalahkanku, Aku akan membebaskan si tua itu."
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2718,7 +2721,7 @@ msgid "New kart '%s' now available"
 msgstr "Kart baru '%s' sekarang tersedia"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:300
+#: src/states_screens/options/options_screen_ui.cpp:301
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2742,7 +2745,7 @@ msgstr "Tamu %d"
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "Berkas konfigurasi anda tidak beraturan, jadi berkas tersebut dihapus dan akan dibuat lagi yang baru."
+msgstr "Berkas konfigurasimu tidak beraturan, jadi berkas tersebut dihapus dan akan dibuat lagi yang baru."
 
 #: src/config/user_config.cpp:700
 msgid ""
@@ -2769,12 +2772,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1392 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:154
 #, c-format
 msgid "Tip: %s"
 msgstr "Tip: %s"
 
-#: src/guiengine/engine.cpp:1436
+#: src/guiengine/engine.cpp:1476
 msgid "Loading"
 msgstr "Sedang memuat"
 
@@ -3308,7 +3311,7 @@ msgstr "Mohon konfigurasi ulang setelan tombol."
 
 #: src/input/device_manager.cpp:495
 msgid "Your input config file is not compatible with this version of STK."
-msgstr "Berkas konfigurasi anda tidak cocok dengan STK versi ini."
+msgstr "Berkas konfigurasimu tidak cocok dengan STK versi ini."
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:152
@@ -3410,12 +3413,12 @@ msgstr "Pemicu kiri"
 msgid "Right trigger"
 msgstr "Pemicu kanan"
 
-#: src/input/input_manager.cpp:985
+#: src/input/input_manager.cpp:989
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Mengabaikan '%s'. Kamu harus bergabung lebih awal untuk ikut main!"
 
-#: src/input/input_manager.cpp:1022
+#: src/input/input_manager.cpp:1026
 msgid "Only the Game Master may act at this point!"
 msgstr "Hanya Master Permainan yang boleh melakukan ini!"
 
@@ -3463,11 +3466,11 @@ msgstr "Kamu terlalu pelan!"
 
 #: src/karts/kart.cpp:1020
 msgid "You won the race!"
-msgstr "Anda berhasil memenangkan balapan!"
+msgstr "Kamu berhasil memenangkan balapan!"
 
 #: src/karts/kart.cpp:1021
 msgid "You finished the race!"
-msgstr "Anda berhasil menyelesaikan balapan ini!"
+msgstr "Kamu berhasil menyelesaikan balapan ini!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1115
@@ -3475,7 +3478,7 @@ msgstr "Anda berhasil menyelesaikan balapan ini!"
 msgid "%s left the game."
 msgstr "%smeninggalkan permainan."
 
-#: src/main.cpp:1888
+#: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. We also collect anonymous hardware statistics to help with the "
@@ -3484,18 +3487,18 @@ msgid ""
 "(To change this setting at a later time, go to options, select tab "
 "'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
 "statistics\")."
-msgstr "SuperTuxKart bisa terhubung ke sebuah server untuk mengunduh add-on dan menginformasikan pembaruan. Kami juga mengumpulkan statistik perangkat keras secara anonim untuk membantu pengembangan STK. Baca kebijakan privasi kami di http://privacy.supertuxkart.net. Apakah kamu ingin mengaktifkan fitur ini? (Untuk mengubah pengaturan ini, buka menu Pengaturan, pilih tab 'Umum', dan ubah \"Hubungkan ke Internet\" dan \"Kirim statistik perangkat keras anonim\"). "
+msgstr "SuperTuxKart bisa terhubung ke sebuah server untuk mengunduh add-on dan menginformasikan pembaruan. Kami juga mengumpulkan statistik perangkat keras secara anonim untuk membantu pengembangan STK. Baca kebijakan privasi kami di http://privacy.supertuxkart.net. Apakah kamu ingin mengaktifkan fitur ini? (Untuk mengubah pengaturan ini, buka menu Pengaturan, pilih tab 'Umum', dan ubah \"Hubungkan ke Internet\" dan \"Kirim statistik perangkat keras anonim\")."
 
-#: src/main.cpp:2169
+#: src/main.cpp:2194
 msgid "Your screen resolution is too low to run STK."
 msgstr "Resolusi layarmu terlalu kecil untuk menjalankan STK."
 
-#: src/main.cpp:2204
+#: src/main.cpp:2229
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Versi drivermu sudah terlalu lama. Silahkan pasang driver video terbaru."
 
-#: src/main.cpp:2222
+#: src/main.cpp:2247
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3503,7 +3506,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Versi driver grafik yang kamu gunakan sudah sangat tua. Silakan periksa apakah ada pembaruan yang tersedia. SuperTuxKart merekomendasikan driver yang mendukung %s atau lebih baik. Aplikasi ini akan tetap bisa dijalankan, tetapi dalam mode grafis yang minimal."
 
-#: src/main_loop.cpp:468 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:102
 msgid "Server connection timed out."
 msgstr "Waktu habis saat menghubungi server."
 
@@ -3587,11 +3590,11 @@ msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%iban cadangan telah dikeluarkan!"
 
-#: src/modes/world.cpp:1369
+#: src/modes/world.cpp:1371
 msgid "You have been eliminated!"
-msgstr "Anda telah tereliminasi!"
+msgstr "Kamu telah tereliminasi!"
 
-#: src/modes/world.cpp:1376
+#: src/modes/world.cpp:1378
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' telah tereliminasi."
@@ -3614,7 +3617,7 @@ msgid "Bad network connection is detected."
 msgstr "Koneksi jaringan yang jelek terdeteksi."
 
 #: src/network/protocols/client_lobby.cpp:420
-#: src/network/protocols/server_lobby.cpp:3636
+#: src/network/protocols/server_lobby.cpp:3792
 msgid "Bot"
 msgstr "Bot"
 
@@ -3760,7 +3763,7 @@ msgstr "%sbergabung dengan tim merah."
 #: src/network/protocols/client_lobby.cpp:1376
 #, c-format
 msgid "%s joined the blue team."
-msgstr "%sbergabung dengan tim biru. "
+msgstr "%s bergabung dengan tim biru."
 
 #. I18N: Show when player join the started game in network
 #: src/network/protocols/client_lobby.cpp:1382
@@ -3783,17 +3786,17 @@ msgstr "Tekan <%s> atau <%s> untuk mengubah pemain yang dituju, <%s> atau <%s> u
 msgid "Successfully reported %s."
 msgstr "Berhasil melaporkan %s."
 
-#: src/network/protocols/connect_to_server.cpp:77
+#: src/network/protocols/connect_to_server.cpp:222
 msgid "No quick play server available."
 msgstr "Tidak ada server bermain cepat yang tersedia."
 
-#: src/network/protocols/connect_to_server.cpp:373
+#: src/network/protocols/connect_to_server.cpp:372
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Tidak dapat terhubung ke server %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:766
+#: src/network/protocols/connect_to_server.cpp:771
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Gagal mendeteksi nomor port untuk server %s."
@@ -3935,7 +3938,7 @@ msgstr "Nama Add-on"
 
 #: src/states_screens/addons_screen.cpp:108
 msgid "Updated date"
-msgstr "Tanggal Perbaruan"
+msgstr "Tanggal Pembaruan"
 
 #. I18N: Addon not installed for fillter
 #: src/states_screens/addons_screen.cpp:138
@@ -3959,7 +3962,7 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "Maaf, terjadi kesalahan saat mencoba menghubungi situs web add-ons. Pastikan anda terhubung ke internet dan pastikan SuperTuxKart tidak terhalang firewall."
+msgstr "Maaf, terjadi kesalahan saat mencoba menghubungi situs web add-ons. Pastikan kamu terhubung ke internet dan pastikan SuperTuxKart tidak terhalang firewall"
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -3970,7 +3973,7 @@ msgstr "Maaf, terjadi kesalahan saat mencoba menghubungi situs web add-ons. Past
 #: src/states_screens/kart_selection.cpp:315
 #: src/states_screens/tracks_and_gp_screen.cpp:150
 msgid "standard"
-msgstr "Standar"
+msgstr "standar"
 
 #: src/states_screens/arenas_screen.cpp:274
 #: src/states_screens/arenas_screen.cpp:326
@@ -3994,7 +3997,7 @@ msgstr[0] "Arena %d tidak tersedia untuk mode pemain tunggal."
 
 #: src/states_screens/credits.cpp:186
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\n  Arief Setiadi Wibowo https://launchpad.net/~q-thrynx\n  Aziz Rahmad https://launchpad.net/~azayrahmad\n  Dawid Gan https://launchpad.net/~deveee\n  Ega Zulfikar https://launchpad.net/~ega-bulb\n  Icho Y. Chandra https://launchpad.net/~project-zero\n  Muhammad Radifar https://launchpad.net/~m-radifar05\n  STK-team https://launchpad.net/~stk"
+msgstr "Arief Setiadi Wibowo https://launchpad.net/~q-thrynx\nAziz Rahmad https://launchpad.net/~azayrahmad\nDawid Gan https://launchpad.net/~deveee\nEga Zulfikar https://launchpad.net/~ega-bulb\nIcho Y. Chandra https://launchpad.net/~project-zero\nMuhammad Radifar https://launchpad.net/~m-radifar05\nSTK-team https://launchpad.net/~stk\nTriyan W. Nugroho <triyan.wn@gmail.com>, 2020."
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4237,7 +4240,7 @@ msgstr "Kekuatan yang digunakan"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:254
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:262
 msgid " (1 race)"
-msgstr "(1 balapan)"
+msgstr " (1 balapan)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4281,13 +4284,13 @@ msgstr "Pisang yang dikumpulkan"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
 #: src/states_screens/options/options_screen_device.cpp:275
 msgid "Skidding"
-msgstr "Ngepot"
+msgstr "Selip"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:269
 msgid " (1 lap)"
-msgstr "(1 lap)"
+msgstr " (1 lap)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4309,7 +4312,7 @@ msgstr "Balapan yang dimainkan"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:294
 msgid " (maximum on one official track)"
-msgstr "(maksimum satu lintasan resmi)"
+msgstr " (maksimum satu lintasan resmi)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4380,7 +4383,7 @@ msgstr "Berburu telur yang diselesaikan"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:319
 msgid " (official tracks matching the goal)"
-msgstr "(jalur resmi yang sesuai dengan tujuan)"
+msgstr " (lintasan resmi yang sesuai dengan tujuan)"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -4410,7 +4413,7 @@ msgstr "Versi: %d"
 
 #: src/states_screens/dialogs/addons_loading.cpp:160
 msgid "featured"
-msgstr "Terfavorit"
+msgstr "unggulan"
 
 #. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:180
@@ -4429,7 +4432,7 @@ msgstr "Maaf, pengunduhan add-on gagal"
 #: src/states_screens/dialogs/addons_loading.cpp:368
 #, c-format
 msgid "Problems installing the addon '%s'."
-msgstr "Ada masalah saat menginstal addon '%s'."
+msgstr "Ada masalah saat memasang addon '%s'."
 
 #: src/states_screens/dialogs/addons_loading.cpp:379
 #: src/states_screens/dialogs/addons_loading.cpp:428
@@ -4497,14 +4500,14 @@ msgstr "Resolusi lebih kecil dari 1024x768 atau 1280x720 tidak didukung. Beberap
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:206
 #: src/states_screens/options/options_screen_video.cpp:226
-#: src/states_screens/options/options_screen_video.cpp:541
-#: src/states_screens/options/options_screen_video.cpp:612
+#: src/states_screens/options/options_screen_video.cpp:540
+#: src/states_screens/options/options_screen_video.cpp:611
 msgid "Disabled"
 msgstr "Tidak diaktifkan"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:543
+#: src/states_screens/options/options_screen_video.cpp:542
 msgid "Important only"
 msgstr "Hanya yang penting"
 
@@ -4514,7 +4517,7 @@ msgstr "Hanya yang penting"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:550
+#: src/states_screens/options/options_screen_video.cpp:549
 msgid "Low"
 msgstr "Rendah"
 
@@ -4524,14 +4527,14 @@ msgstr "Rendah"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:553
+#: src/states_screens/options/options_screen_video.cpp:552
 msgid "High"
 msgstr "Tinggi"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:547
+#: src/states_screens/options/options_screen_video.cpp:546
 msgid "Very Low"
 msgstr "Sangat Rendah"
 
@@ -4668,7 +4671,7 @@ msgstr "Tekan sembarang tombol..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
 #: src/states_screens/online/networking_lobby.cpp:244
-#: src/states_screens/online/networking_lobby.cpp:832
+#: src/states_screens/online/networking_lobby.cpp:836
 msgid "Chat is disabled, enable in options menu."
 msgstr "Obrolan dinonaktifkan, aktifkan di menu pengaturan."
 
@@ -4853,7 +4856,7 @@ msgstr "Kamu bisa menggunakan peringkat sebelumnya dengan klik bintang di bawah.
 msgid ""
 "You have not yet voted for this addon. Select your desired rating by "
 "clicking the stars beneath"
-msgstr "Kamu belum memberi peringkat untuk add-on ini. Pilih peringkat yang kamu inginkan dengan menekan bintang di bawah."
+msgstr "Kamu belum memberi peringkat untuk add-on ini. Pilih peringkat yang kamu inginkan dengan menekan bintang di bawah"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:227
 msgid "Vote successful! You can now close the window."
@@ -4902,7 +4905,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Terjadi kesalahan saat menyimpan grand prix."
 
-#: src/states_screens/edit_track_screen.cpp:234
+#: src/states_screens/edit_track_screen.cpp:254
 msgid "Select a track"
 msgstr "Pilih lintasan"
 
@@ -4940,11 +4943,11 @@ msgstr "Tantangan Selesai"
 
 #: src/states_screens/feature_unlocked.cpp:668
 msgid "You unlocked track %0"
-msgstr "Anda membuka sirkuit %0"
+msgstr "Kamu telah membuka lintasan %0"
 
 #: src/states_screens/feature_unlocked.cpp:714
 msgid "You unlocked grand prix %0"
-msgstr "Anda membuka grand prix %0"
+msgstr "Kamu telah membuka grand prix %0"
 
 #: src/states_screens/ghost_replay_selection.cpp:153
 msgctxt "column_name"
@@ -5016,7 +5019,7 @@ msgstr "Kamu memenangkan Grand Prix!"
 
 #: src/states_screens/grand_prix_win.cpp:322
 msgid "You completed the Grand Prix!"
-msgstr "Anda menyelesaikan Grand Prix ini!"
+msgstr "Kamu telah menyelesaikan Grand Prix ini!"
 
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
@@ -5032,7 +5035,7 @@ msgid "Locked"
 msgstr "Dikunci"
 
 #: src/states_screens/kart_selection.cpp:1032
-#: src/states_screens/online/networking_lobby.cpp:515
+#: src/states_screens/online/networking_lobby.cpp:518
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5111,7 +5114,7 @@ msgstr "Menonton"
 
 #: src/states_screens/online/networking_lobby.cpp:198
 msgid "Install addon"
-msgstr ""
+msgstr "Pasang add-on"
 
 #: src/states_screens/online/networking_lobby.cpp:337
 #, c-format
@@ -5154,7 +5157,7 @@ msgstr "Silakan menunggu sampai permainan saat ini selesai, perkiraan kemajuan: 
 msgid "Please wait for the current game's end."
 msgstr "Silakan menunggu sampai permainan saat ini selesai."
 
-#: src/states_screens/online/networking_lobby.cpp:484
+#: src/states_screens/online/networking_lobby.cpp:487
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5162,7 +5165,7 @@ msgstr[0] "Permainan akan dimulai jika sudah ada lebih dari %d pemain."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:498
+#: src/states_screens/online/networking_lobby.cpp:501
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5170,12 +5173,12 @@ msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
 msgstr[0] "Memulai setelah %d detik, atau jika semua pemain telah menekan tombol 'Siap'."
 
-#: src/states_screens/online/networking_lobby.cpp:535
+#: src/states_screens/online/networking_lobby.cpp:538
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Menghubungi server %s"
 
-#: src/states_screens/online/networking_lobby.cpp:540
+#: src/states_screens/online/networking_lobby.cpp:543
 msgid "Finding a quick play server"
 msgstr "Menemukan server bermain cepat"
 
@@ -5282,7 +5285,7 @@ msgstr "Nama pengguna daring tidak boleh dimulai dengan angka!"
 
 #: src/states_screens/online/register_screen.cpp:326
 msgid "Email has to be between 5 and 254 characters long!"
-msgstr "Panjang email harus diantara 5 sampai 254 karakter."
+msgstr "Panjang email harus diantara 5 sampai 254 karakter!"
 
 #: src/states_screens/online/register_screen.cpp:332
 msgid "Email is invalid!"
@@ -5512,7 +5515,7 @@ msgstr "Peringatan: Tombol 'Shift' tidak direkomendasikan. Saat 'Shift' ditekan,
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options/options_screen_device.cpp:609
 msgid "Are you sure you want to permanently delete this configuration?"
-msgstr "Apakah anda yakin ingin menghapus konfigurasi ini secara permanen?"
+msgstr "Apakah kamu yakin ingin menghapus konfigurasi ini secara permanen?"
 
 #: src/states_screens/options/options_screen_device.cpp:637
 msgid "Enter new configuration name, leave empty to revert default value."
@@ -5556,74 +5559,74 @@ msgid "System Language"
 msgstr "Bahasa yang Digunakan"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:91
+#: src/states_screens/options/options_screen_ui.cpp:92
 msgid "In the bottom-left"
 msgstr "Pada kiri bawah"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:93
+#: src/states_screens/options/options_screen_ui.cpp:94
 msgid "On the right side"
 msgstr "Pada bagian kanan"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:95
+#: src/states_screens/options/options_screen_ui.cpp:96
 msgid "Hidden"
 msgstr "Tersembunyi"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:97
+#: src/states_screens/options/options_screen_ui.cpp:98
 msgid "Centered"
 msgstr "Ditengahkan"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:115
+#: src/states_screens/options/options_screen_ui.cpp:116
 msgid "Vertical"
 msgstr "Vertikal"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:117
+#: src/states_screens/options/options_screen_ui.cpp:118
 msgid "Horizontal"
 msgstr "Horisontal"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:128
+#: src/states_screens/options/options_screen_ui.cpp:129
 msgid "Very small"
 msgstr "Sangat kecil"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:130
+#: src/states_screens/options/options_screen_ui.cpp:131
 msgid "Small"
 msgstr "Kecil"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:132
+#: src/states_screens/options/options_screen_ui.cpp:133
 msgid "Medium"
 msgstr "Sedang"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:134
+#: src/states_screens/options/options_screen_ui.cpp:135
 msgid "Large"
 msgstr "Besar"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:136
+#: src/states_screens/options/options_screen_ui.cpp:137
 msgid "Very large"
 msgstr "Sangat besar"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:357
+#: src/states_screens/options/options_screen_ui.cpp:358
 #: src/states_screens/options/options_screen_video.cpp:489
-#: src/states_screens/options/options_screen_video.cpp:521
+#: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Kustomisasi"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Drone chase"
-msgstr ""
+msgstr "Kejar drone"
 
-#: src/states_screens/options/options_screen_ui.cpp:529
+#: src/states_screens/options/options_screen_ui.cpp:530
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5661,82 +5664,82 @@ msgid "Vsync will not work if your drivers don't support it."
 msgstr "Vsync tidak akan bekerja jika driver tidak mendukungnya."
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:556
+#: src/states_screens/options/options_screen_video.cpp:555
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Efek Partikel: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:562
+#: src/states_screens/options/options_screen_video.cpp:561
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Karakter Animasi: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:565
+#: src/states_screens/options/options_screen_video.cpp:564
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Cahaya dinamik: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:568
+#: src/states_screens/options/options_screen_video.cpp:567
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Penyebaran cahaya: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:571
+#: src/states_screens/options/options_screen_video.cpp:570
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Anti-alias: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:574
+#: src/states_screens/options/options_screen_video.cpp:573
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Oklusi ambien: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:578
+#: src/states_screens/options/options_screen_video.cpp:577
 #, c-format
 msgid "Shadows: %s"
 msgstr "Bayangan: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:580
+#: src/states_screens/options/options_screen_video.cpp:579
 #, c-format
 msgid "Shadows: %i"
 msgstr "Bayangan: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:583
+#: src/states_screens/options/options_screen_video.cpp:582
 #, c-format
 msgid "Bloom: %s"
 msgstr "Bloom: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:587
+#: src/states_screens/options/options_screen_video.cpp:586
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Glow (outlines): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:591
+#: src/states_screens/options/options_screen_video.cpp:590
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Light shaft (God rays): %s"
 
-#: src/states_screens/options/options_screen_video.cpp:596
+#: src/states_screens/options/options_screen_video.cpp:595
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Kualitas gambar render: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:615
+#: src/states_screens/options/options_screen_video.cpp:614
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Buramkan gerakan: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:619
+#: src/states_screens/options/options_screen_video.cpp:618
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Kedalaman lapangan: %s"
@@ -5827,7 +5830,7 @@ msgstr "Ikuti pemimpin!"
 msgid "Top %i"
 msgstr "%i besar"
 
-#: src/states_screens/race_gui.cpp:442
+#: src/states_screens/race_gui.cpp:444
 msgid "Challenge Failed"
 msgstr "Tantangan Gagal"
 
@@ -5881,7 +5884,7 @@ msgstr "Kembali ke menu"
 
 #: src/states_screens/race_result_gui.cpp:444
 msgid "Do you really want to abort the Grand Prix?"
-msgstr "Apakah anda yakin untuk membatalkan Gand prix?"
+msgstr "Apakah kamu yakin untuk membatalkan Gand prix?"
 
 #: src/states_screens/race_result_gui.cpp:541
 #: src/states_screens/race_result_gui.cpp:1350
@@ -5912,7 +5915,7 @@ msgstr "(Gol Bunuh Diri)"
 #: src/states_screens/race_result_gui.cpp:1566
 #, c-format
 msgid "Track %i/%i"
-msgstr "Putaran %i/%i"
+msgstr "Lintasan %i/%i"
 
 #: src/states_screens/race_result_gui.cpp:1650
 msgid "Grand Prix progress:"
@@ -5957,7 +5960,7 @@ msgstr "Dorong bola ke dalam gawang lawan untuk membuat gol."
 
 #: src/states_screens/race_setup_screen.cpp:129
 msgid "Explore tracks to find all hidden eggs"
-msgstr "Eksplorasi jalur untuk menemukan semua telur tersembunyi"
+msgstr "Jelajahi lintasan untuk menemukan semua telur tersembunyi"
 
 #: src/states_screens/race_setup_screen.cpp:137
 msgid "Race against ghost karts and try to beat them!"
@@ -6079,7 +6082,7 @@ msgstr "Tekan ikon cermin untuk melihat ke belakang.\nTembakkan senjata ke belak
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #, c-format
 msgid "Use the nitro you collected by pressing <%s>!"
-msgstr "Gunakan nitro yang anda kumpulkan dengan menekan <%s>!"
+msgstr "Gunakan nitro yang kamu kumpulkan dengan menekan <%s>!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:104
 msgid "Use the nitro you collected by pressing the nitro icon"
@@ -6115,8 +6118,72 @@ msgstr "Tancap gas dan tekan ikon selip saat berbelok untuk melakukan selip.\nSe
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr "Kalau kamu berhasil ngesot untuk beberapa detik, kamu akan mendapat bonus tambahan kecepatan sebagai hadiah."
+msgstr "Kalau kamu berhasil selip selama beberapa detik, kamu akan mendapat bonus tambahan kecepatan sebagai hadiah!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:164
 msgid "You are now ready to race. Good luck!"
-msgstr "Kini anda siap untuk balapan. Semoga beruntung!"
+msgstr "Kini kamu siap untuk balapan. Semoga beruntung!"
+
+#. I18N: Generic name in desktop file entry, summary in AppData and short
+#. description in Google Play
+#: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
+msgid "A 3D open-source kart racing game"
+msgstr "Sebuah permainan balap kart 3D sumber-terbuka"
+
+#. I18N: Keywords in desktop entry, translators please keep it separated with
+#. semicolons
+#: supertuxkart.desktop:11
+msgid "tux;game;race;"
+msgstr "tux;permainan;balapan;"
+
+#: supertuxkart.appdata.xml:8
+msgid ""
+"Karts. Nitro. Action! SuperTuxKart is a 3D open-source arcade racer with a "
+"variety of characters, tracks, and modes to play. Our aim is to create a "
+"game that is more fun than realistic, and provide an enjoyable experience "
+"for all ages."
+msgstr "Kart. Nitro. Mulai! SuperTuxKart adalah sebuah permainan balap 3D sumber-terbuka dengan sejumlah karakter, lintasan, dan mode untuk dimainkan. Target kami adalah membuat sebuah permainan yang lebih mengarah ke kesenangan daripada realistis, dan memberikan pengalaman yang mengasyikkan untuk semua umur."
+
+#: supertuxkart.appdata.xml:11
+msgid ""
+"Discover the mystery of an underwater world, or drive through the jungles of"
+" Val Verde and visit the famous Cocoa Temple. Race underground or in a "
+"spaceship, through a rural farmland or a strange alien planet. Or rest under"
+" the palm trees on the beach, watching the other karts overtake you. But "
+"don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
+"cakes thrown by your opponents."
+msgstr "Temukan misteri dunia bawah air, atau berkendara melewati hutan Val Verde dan kunjungi Kuil Cocoa yang terkenal. Balapan di bawah tanah atau di pesawat luar angkasa, melewati lahan pertanian di pedesaan atau planet alien yang asing. Atau beristirahat di bawah pohon palem di pantai, menonton kart yang lain menyalipmu. Tapi jangan makan pisangnya! Saksikan bola bowling, penyedot WC, permen karet, dan kue yang dilemparkan oleh musuh-musuhmu."
+
+#: supertuxkart.appdata.xml:14
+msgid ""
+"You can do a single race against other karts, compete in one of several "
+"Grand Prix, try to beat the high score in time trials on your own, play "
+"battle mode against the computer or your friends, and more! For a greater "
+"challenge, race online against players from all over the world and prove "
+"your racing process!"
+msgstr "Kamu bisa melakukan balapan tunggal melawan kart yang lain, berkompetisi di salah satu Grand Prix, mencoba mengalahkan nilai tertinggimu sendiri di balapan waktu, bermain dalam mode pertempuran melawan komputer atau teman-temanmu, dan lebih banyak lagi! Untuk tantangan yang lebih, ikuti balapan daring melawan para pemain dari seluruh dunia dan buktikan kemampuan balapmu!"
+
+#: supertuxkart.appdata.xml:17
+msgid "This game is free and without ads."
+msgstr "Permainan ini gratis dan bebas iklan."
+
+#: supertuxkart.appdata.xml:20
+msgid ""
+"This is an unstable version of SuperTuxKart that contains latest "
+"improvements. It is released mainly for testing, to make stable STK as good "
+"as possible."
+msgstr "Ini adalah versi tak stabil dari SuperTuxKart yang berisi pengembangan terbaru. Versi ini dirilis terutama untuk pengujian, untuk membuat STK versi stabil menjadi sebaik mungkin."
+
+#: supertuxkart.appdata.xml:23
+msgid ""
+"This version can be installed in parallel with the stable version on the "
+"device."
+msgstr "Versi ini dapat dipasang secara paralel dengan versi stabil di perangkat ini."
+
+#: supertuxkart.appdata.xml:26
+msgid "If you need more stability, consider using the stable version: %s"
+msgstr "Jika kamu membutuhkan stabilitas, sebaiknya gunakan versi stabil: %s"
+
+#: supertuxkart.appdata.xml:44
+msgid "SuperTuxKart Team"
+msgstr "Tim SuperTuxKart"
