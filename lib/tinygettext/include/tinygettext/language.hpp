@@ -1,26 +1,27 @@
-//  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2006-2015 Ingo Ruhnke <grumbel@gmx.de>
+// tinygettext - A gettext replacement that works directly on .po files
+// Copyright (c) 2006 Ingo Ruhnke <grumbel@gmail.com>
 //
-//  This program is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU General Public License
-//  as published by the Free Software Foundation; either version 2
-//  of the License, or (at your option) any later version.
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
 //
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
 //
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgement in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
 
 #ifndef HEADER_TINYGETTEXT_LANGUAGE_HPP
 #define HEADER_TINYGETTEXT_LANGUAGE_HPP
 
-#ifndef SERVER_ONLY
-
 #include <string>
+#include <unordered_map>
 
 namespace tinygettext {
 
@@ -49,7 +50,7 @@ public:
   /** Create a language from an environment variable style string (e.g de_DE.UTF-8@modifier) */
   static Language from_env(const std::string& env);
 
-  /** Compares two Languages, returns 0 on mismatch and a score
+  /** Compares two Languages, returns 0 on missmatch and a score
       between 1 and 9 on match, the higher the score the better the
       match */
   static int match(const Language& lhs, const Language& rhs);
@@ -57,7 +58,7 @@ public:
   /** Create an undefined Language object */
   Language();
 
-  operator bool() const { return language_spec!=NULL; }
+  explicit operator bool() const { return language_spec != NULL; }
 
   /** Returns the language code (i.e. de, en, fr) */
   std::string get_language() const;
@@ -76,20 +77,27 @@ public:
       variable: {language}_{country}@{modifier} */
   std::string str() const;
 
-  bool operator==(const Language& rhs);
-  bool operator!=(const Language& rhs);
+  bool operator==(const Language& rhs) const;
+  bool operator!=(const Language& rhs) const;
 
   friend bool operator<(const Language& lhs, const Language& rhs);
+  friend struct Language_hash;
 };
 
 inline bool operator<(const Language& lhs, const Language& rhs) {
   return lhs.language_spec < rhs.language_spec;
 }
 
+struct Language_hash
+{
+  size_t operator()(const Language& v) const
+  {
+    return reinterpret_cast<size_t>(v.language_spec);
+  }
+};
+
 } // namespace tinygettext
 
 #endif
 
 /* EOF */
-
-#endif

@@ -261,6 +261,8 @@ endif()
 if(NOT SERVER_ONLY)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/tinygettext")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/tinygettext/include")
 endif()
 
 # Libmcpp
@@ -646,7 +648,8 @@ if(NOT SERVER_ONLY)
         ${HARFBUZZ_LIBRARY}
         ${SDL2_LIBRARY}
         ${SHEENBIDI_LIBRARY}
-        graphics_utils)
+        graphics_utils
+        tinygettext)
 endif()
 
 if(UNIX AND NOT APPLE)

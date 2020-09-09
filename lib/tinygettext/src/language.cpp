@@ -1,28 +1,26 @@
-//  tinygettext - A gettext replacement that works directly on .po files
-//  Copyright (C) 2006-2015 Ingo Ruhnke <grumbel@gmx.de>
+// tinygettext - A gettext replacement that works directly on .po files
+// Copyright (c) 2006 Ingo Ruhnke <grumbel@gmail.com>
 //
-//  This program is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU General Public License
-//  as published by the Free Software Foundation; either version 2
-//  of the License, or (at your option) any later version.
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
 //
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
 //
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+// 1. The origin of this software must not be misrepresented; you must not
+//    claim that you wrote the original software. If you use this software
+//    in a product, an acknowledgement in the product documentation would be
+//    appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//    misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
 
-#ifndef SERVER_ONLY
+#include "tinygettext/language.hpp"
 
-#include "language.hpp"
-
-#include "utils/string_utils.hpp"
-
-#include <map>
 #include <assert.h>
+#include <unordered_map>
 #include <vector>
 #include <algorithm>
 
@@ -76,6 +74,7 @@ static const LanguageSpec languages[] = {
   { "ca", "ES", 0, "Catalan (Spain)"             },
   { "ca", 0,    "valencia", "Catalan (valencia)" },
   { "ca", 0,    0, "Catalan"                     },
+  { "cmn", 0,    0, "Mandarin"                   },
   { "co", 0,    0, "Corsican"                    },
   { "cs", 0,    0, "Czech"                       },
   { "cs", "CZ", 0, "Czech (Czech Republic)"      },
@@ -166,7 +165,6 @@ static const LanguageSpec languages[] = {
   { "iu", 0,    0, "Inuktitut"                   },
   { "ja", 0,    0, "Japanese"                    },
   { "ja", "JP", 0, "Japanese (Japan)"            },
-  { "jbo",0,    0, "Lojban"                      },
   { "ka", 0,    0, "Georgian"                    },
   { "kk", 0,    0, "Kazakh"                      },
   { "kl", 0,    0, "Kalaallisut"                 },
@@ -175,7 +173,6 @@ static const LanguageSpec languages[] = {
   { "kn", 0,    0, "Kannada"                     },
   { "ko", 0,    0, "Korean"                      },
   { "ko", "KR", 0, "Korean (Korea)"              },
-  { "krl",0,    0, "Karelian"                    },
   { "ku", 0,    0, "Kurdish"                     },
   { "kw", 0,    0, "Cornish"                     },
   { "ky", 0,    0, "Kirghiz"                     },
@@ -185,13 +182,13 @@ static const LanguageSpec languages[] = {
   { "lt", "LT", 0, "Lithuanian (Lithuania)"      },
   { "lv", 0,    0, "Latvian"                     },
   { "lv", "LV", 0, "Latvian (Latvia)"            },
+  { "jbo", 0,    0, "Lojban"                     },
   { "mg", 0,    0, "Malagasy"                    },
   { "mi", 0,    0, "Maori"                       },
   { "mk", 0,    0, "Macedonian"                  },
   { "mk", "MK", 0, "Macedonian (Macedonia)"      },
   { "ml", 0,    0, "Malayalam"                   },
   { "mn", 0,    0, "Mongolian"                   },
-  { "mn", "MN", 0, "Mongolian (Mongolia)"        },
   { "mr", 0,    0, "Marathi"                     },
   { "ms", 0,    0, "Malay"                       },
   { "ms", "MY", 0, "Malay (Malaysia)"            },
@@ -206,19 +203,16 @@ static const LanguageSpec languages[] = {
   { "nl", "NL", 0, "Dutch (Netherlands)"         },
   { "nn", 0,    0, "Norwegian Nynorsk"           },
   { "nn", "NO", 0, "Norwegian Nynorsk (Norway)"  },
-  // DEPRECATED
-  //{ "no", 0,    0, "Norwegian"                   },
-  //{ "no", "NO", 0, "Norwegian (Norway)"          },
-  //{ "no", "NY", 0, "Norwegian (NY)"              },
+  { "no", 0,    0, "Norwegian"                   },
+  { "no", "NO", 0, "Norwegian (Norway)"          },
+  { "no", "NY", 0, "Norwegian (NY)"              },
   { "nr", 0,    0, "Ndebele, South"              },
   { "oc", 0,    0, "Occitan post 1500"           },
   { "om", 0,    0, "Oromo"                       },
   { "or", 0,    0, "Oriya"                       },
-  { "os", 0,    0, "Ossetian"                    },
   { "pa", 0,    0, "Punjabi"                     },
   { "pl", 0,    0, "Polish"                      },
   { "pl", "PL", 0, "Polish (Poland)"             },
-  { "pms",0,    0, "Piedmontese"                 },
   { "ps", 0,    0, "Pashto"                      },
   { "pt", 0,    0, "Portuguese"                  },
   { "pt", "BR", 0, "Portuguese (Brazil)"         },
@@ -231,8 +225,6 @@ static const LanguageSpec languages[] = {
   { "ru", "RU", 0, "Russian (Russia"             },
   { "rw", 0,    0, "Kinyarwanda"                 },
   { "sa", 0,    0, "Sanskrit"                    },
-  { "sc", 0,    0, "Sardinian"                   },
-  { "sco",0,    0, "Scots"                       },
   { "sd", 0,    0, "Sindhi"                      },
   { "se", 0,    0, "Sami"                        },
   { "se", "NO", 0, "Sami (Norway)"               },
@@ -258,7 +250,6 @@ static const LanguageSpec languages[] = {
   { "sv", "SE", 0, "Swedish (Sweden)"            },
   { "sv", "SV", 0, "Swedish (El Salvador)"       },
   { "sw", 0,    0, "Swahili"                     },
-  { "szl", 0,   0, "Silesian"                    },
   { "ta", 0,    0, "Tamil"                       },
   { "te", 0,    0, "Telugu"                      },
   { "tg", 0,    0, "Tajik"                       },
@@ -295,10 +286,12 @@ static const LanguageSpec languages[] = {
 };
 //*}
 
+namespace {
+
 std::string
 resolve_language_alias(const std::string& name)
 {
-  typedef std::map<std::string, std::string> Aliases;
+  typedef std::unordered_map<std::string, std::string> Aliases;
   static Aliases language_aliases;
   if (language_aliases.empty())
   {
@@ -373,10 +366,13 @@ resolve_language_alias(const std::string& name)
   }
 }
 
+} // namespace
+
 Language
 Language::from_spec(const std::string& language, const std::string& country, const std::string& modifier)
 {
-  static std::map<std::string, std::vector<const LanguageSpec*> > language_map;
+  typedef std::unordered_map<std::string, std::vector<const LanguageSpec*> > LanguageSpecMap;
+  static LanguageSpecMap language_map;
 
   if (language_map.empty())
   { // Init language_map
@@ -384,7 +380,7 @@ Language::from_spec(const std::string& language, const std::string& country, con
       language_map[languages[i].language].push_back(&languages[i]);
   }
 
-  std::map<std::string, std::vector<const LanguageSpec*> >::iterator i = language_map.find(language);
+  LanguageSpecMap::iterator i = language_map.find(language);
   if (i != language_map.end())
   {
     std::vector<const LanguageSpec*>& lst = i->second;
@@ -441,9 +437,7 @@ Language::from_env(const std::string& env)
 
   if (ln != std::string::npos && ln+1 < env.size()) // _
   {
-    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos) 
-                            ? std::string::npos : std::min(dt, at) - (ln+1));
-    country = StringUtils::toUpperCase(country);
+    country = env.substr(ln+1, (std::min(dt, at) == std::string::npos) ? std::string::npos : std::min(dt, at) - (ln+1));
   }
 
   if (dt != std::string::npos && dt+1 < env.size()) // .
@@ -568,13 +562,13 @@ Language::str() const
 }
 
 bool
-Language::operator==(const Language& rhs)
+Language::operator==(const Language& rhs) const
 {
   return language_spec == rhs.language_spec;
 }
 
 bool
-Language::operator!=(const Language& rhs)
+Language::operator!=(const Language& rhs) const
 {
   return language_spec != rhs.language_spec;
 }
@@ -582,5 +576,3 @@ Language::operator!=(const Language& rhs)
 } // namespace tinygettext
 
 /* EOF */
-
-#endif

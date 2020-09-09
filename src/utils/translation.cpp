@@ -402,7 +402,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 {
                     Log::verbose("translation", "Language '%s'.",
                                  l.get_name().c_str());
-                    m_dictionary = m_dictionary_manager.get_dictionary(l);
+                    m_dictionary = &m_dictionary_manager.get_dictionary(l);
                     break;
                 }
             }
@@ -418,7 +418,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             }
             if (!l)
             {
-                m_dictionary = m_dictionary_manager.get_dictionary();
+                m_dictionary = &m_dictionary_manager.get_dictionary();
             }
         }
         else
@@ -431,7 +431,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 m_current_language_name = "Default language";
                 m_current_language_name_code = "en";
                 m_current_language_tag = "en";
-                m_dictionary = m_dictionary_manager.get_dictionary();
+                m_dictionary = &m_dictionary_manager.get_dictionary();
             }
             else
             {
@@ -445,7 +445,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                     m_current_language_tag += tgtLang.get_country();
                 }
                 Log::verbose("translation", "Language '%s'.", m_current_language_name.c_str());
-                m_dictionary = m_dictionary_manager.get_dictionary(tgtLang);
+                m_dictionary = &m_dictionary_manager.get_dictionary(tgtLang);
             }
         }
     }
@@ -454,7 +454,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         m_current_language_name = "Default language";
         m_current_language_name_code = "en";
         m_current_language_tag = m_current_language_name_code;
-        m_dictionary = m_dictionary_manager.get_dictionary();
+        m_dictionary = &m_dictionary_manager.get_dictionary();
     }
 
 #endif
@@ -497,8 +497,8 @@ irr::core::stringw Translations::w_gettext(const char* original, const char* con
 #endif
 
     const std::string& original_t = (context == NULL ?
-                                     m_dictionary.translate(original) :
-                                     m_dictionary.translate_ctxt(context, original));
+                                     m_dictionary->translate(original) :
+                                     m_dictionary->translate_ctxt(context, original));
     // print
     //for (int n=0;; n+=4)
     const irr::core::stringw wide = StringUtils::utf8ToWide(original_t);
@@ -545,8 +545,8 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
 #else
 
     const std::string& res = (context == NULL ?
-                              m_dictionary.translate_plural(singular, plural, num) :
-                              m_dictionary.translate_ctxt_plural(context, singular, plural, num));
+                              m_dictionary->translate_plural(singular, plural, num) :
+                              m_dictionary->translate_ctxt_plural(context, singular, plural, num));
 
     const irr::core::stringw wide = StringUtils::utf8ToWide(res);
     const wchar_t* out_ptr = wide.c_str();
@@ -565,7 +565,7 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
 #ifndef SERVER_ONLY
 std::set<wchar_t> Translations::getCurrentAllChar()
 {
-    return m_dictionary.get_all_used_chars();
+    return m_dictionary->get_all_used_chars();
 }   // getCurrentAllChar
 
 // ----------------------------------------------------------------------------
