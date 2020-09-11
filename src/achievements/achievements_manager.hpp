@@ -42,6 +42,10 @@ private:
     /** Pointer to the single instance. */
     static AchievementsManager* m_achievements_manager;
 
+#ifdef GAMERZILLA
+    int m_game_id;
+#endif
+
     std::map<uint32_t, AchievementInfo *> m_achievements_info;
 
     AchievementsManager      ();
@@ -69,6 +73,10 @@ public:
         m_achievements_manager = NULL;
     }   // destroy
     // ========================================================================
+
+#ifdef GAMERZILLA
+    int getGameID() const { return m_game_id; }
+#endif
 
     AchievementInfo* getAchievementInfo(uint32_t id) const;
     AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);

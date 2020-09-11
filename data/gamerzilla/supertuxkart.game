@@ -1,0 +1,92 @@
+{
+	"shortname": "supertuxkart",
+	"name": "SuperTuxKart",
+	"image": "supertuxkart.png",
+	"version": "1",
+	"trophy": [
+		{
+			"trophy_name": "Christoffel Columbus",
+			"trophy_desc": "Play every official track at least once.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Strike!",
+			"trophy_desc": "Hit 10 karts with a bowling-ball.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Arch Enemy",
+			"trophy_desc": "Hit the same kart at least 5 times in one race.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Marathoner",
+			"trophy_desc": "Finish a race with at least twice the track's default lap number.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Skid-row",
+			"trophy_desc": "Skid 5 times in a single lap.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Gold driver",
+			"trophy_desc": "Win against at least 3 AIs in normal race, time-trial, and follow the leader.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Powerup Love",
+			"trophy_desc": "Use 10 or more powerups in a race.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Unstoppable",
+			"trophy_desc": "Win 5 single races in a row against at least 3 AIs. Beware, restarting a race counts as a loss.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Banana Lover",
+			"trophy_desc": "Collect at least 5 bananas in one race.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "It's secret",
+			"trophy_desc": "Really ... a secret.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Mosquito Hunter",
+			"trophy_desc": "Take your opponents for mosquitos! With the swatter, squash them at least 5 times in a race.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		},
+		{
+			"trophy_name": "Beyond Luck",
+			"trophy_desc": "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. Beware, restarting a race counts as a loss.",
+			"max_progress": "0",
+			"trueimage": "achievement1.png",
+			"falseimage": "achievement0.png"
+		}
+	]
+}

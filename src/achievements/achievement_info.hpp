@@ -93,6 +93,7 @@ public:
     uint32_t           getID()          const { return m_id; }
     irr::core::stringw getDescription() const;
     irr::core::stringw getName()        const;
+    std::string        getRawName()     const { return m_name; }
     bool               isSecret()       const { return m_is_secret; }
 
     // This function should not be called if copy already has children
