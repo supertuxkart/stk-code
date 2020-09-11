@@ -664,3 +664,10 @@ int ListWidget::getItemID(const std::string &internalName) const
     assert(list != NULL);
     return list->getRowByInternalName(internalName);
 }
+
+// -----------------------------------------------------------------------------
+void ListWidget::setActive(bool active)
+{
+    Widget::setActive(active);
+    getIrrlichtElement<CGUISTKListBox>()->setDisactivated(!active);
+}
