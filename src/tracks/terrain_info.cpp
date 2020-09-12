@@ -49,7 +49,7 @@ TerrainInfo::TerrainInfo(const Vec3 &pos)
 
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
- *  \param Position from which to start the rayast from.
+ *  \param Position from which to start the raycast from.
  */
 void TerrainInfo::update(const Vec3 &from)
 {
