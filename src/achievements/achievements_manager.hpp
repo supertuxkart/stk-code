@@ -20,6 +20,7 @@
 #define HEADER_ACHIEVEMENTS_MANAGER_HPP
 
 #include "achievements/achievements_status.hpp"
+#include "achievements/web_achievements_status.hpp"
 
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
@@ -42,11 +43,8 @@ private:
     /** Pointer to the single instance. */
     static AchievementsManager* m_achievements_manager;
 
-#ifdef GAMERZILLA
-    int m_game_id;
-#endif
-
     std::map<uint32_t, AchievementInfo *> m_achievements_info;
+    WebAchievementsStatus *m_web;
 
     AchievementsManager      ();
     ~AchievementsManager     ();
@@ -74,18 +72,15 @@ public:
     }   // destroy
     // ========================================================================
 
-#ifdef GAMERZILLA
-    int getGameID() const { return m_game_id; }
-#endif
-
     AchievementInfo* getAchievementInfo(uint32_t id) const;
-    AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);
+    AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL, bool updateWeb = false);
     // ------------------------------------------------------------------------
     const std::map<uint32_t, AchievementInfo *> & getAllInfo()
     {
         return m_achievements_info;
     }  // getAllInfo
 
+    WebAchievementsStatus* getWebAchievementStatus() { return m_web; }
 };   // class AchievementsManager
 
 #endif

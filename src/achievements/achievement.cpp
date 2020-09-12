@@ -33,10 +33,6 @@
 
 #include <stdlib.h>
 
-#ifdef GAMERZILLA
-#include "gamerzilla.h"
-#endif
-
 /** Constructur, initialises this object with the data from the
  *  corresponding AchievementInfo.
  */
@@ -400,11 +396,8 @@ void Achievement::onCompletion()
         request->addParameter("achievementid", getID());
         request->queue();
     }
-#ifdef GAMERZILLA
     if (PlayerManager::getCurrentPlayer()->getUniqueID() == 1)
     {
-        int game_id = AchievementsManager::get()->getGameID();
-        GamerzillaSetTrophy(game_id, m_achievement_info->getRawName().c_str());
+        AchievementsManager::get()->getWebAchievementStatus()->achieved(m_achievement_info);
     }
-#endif
 }   // onCompletion

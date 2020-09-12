@@ -32,10 +32,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-#ifdef GAMERZILLA
-#include "gamerzilla.h"
-#endif
-
 AchievementsManager* AchievementsManager::m_achievements_manager = NULL;
 
 // ----------------------------------------------------------------------------
@@ -44,10 +40,6 @@ AchievementsManager* AchievementsManager::m_achievements_manager = NULL;
  */
 AchievementsManager::AchievementsManager()
 {
-#ifdef GAMERZILLA
-    GamerzillaStart(false, (file_manager->getUserConfigDir() + "gamerzilla/").c_str());
-    m_game_id = GamerzillaSetGameFromFile(file_manager->getAsset("gamerzilla/supertuxkart.game").c_str(), file_manager->getAsset("gamerzilla/").c_str());
-#endif
     const std::string file_name = file_manager->getAsset("achievements.xml");
     const XMLNode *root = file_manager->createXMLTree(file_name);
     unsigned int num_nodes = root->getNumNodes();
@@ -62,19 +54,18 @@ AchievementsManager::AchievementsManager()
                    "Multiple achievements with the same id!");
 
     delete root;
+    m_web = new WebAchievementsStatus();
 }   // AchievementsManager
 
 // ----------------------------------------------------------------------------
 AchievementsManager::~AchievementsManager()
 {
-#ifdef GAMERZILLA
-    GamerzillaQuit();
-#endif
     std::map<uint32_t, AchievementInfo *>::iterator it;
     for ( it = m_achievements_info.begin(); it != m_achievements_info.end(); ++it ) {
         delete it->second;
     }
     m_achievements_info.clear();
+    delete m_web;
 }   // ~AchievementsManager
 
 // ----------------------------------------------------------------------------
@@ -83,7 +74,7 @@ AchievementsManager::~AchievementsManager()
  *  \param node The XML of saved data, or NULL if no saved data exists.
  */
 AchievementsStatus*
-             AchievementsManager::createAchievementsStatus(const XMLNode *node)
+             AchievementsManager::createAchievementsStatus(const XMLNode *node, bool updateWeb)
 {
     AchievementsStatus *status = new AchievementsStatus();
 
@@ -101,6 +92,8 @@ AchievementsStatus*
 
     if (node)
         status->load(node);
+    if (updateWeb)
+        m_web->updateAchievementsProgress(status);
 
     return status;
 }   // createAchievementStatus

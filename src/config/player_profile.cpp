@@ -29,10 +29,6 @@
 #include "online/online_player_profile.hpp"
 #include "utils/string_utils.hpp"
 
-#ifdef GAMERZILLA
-#include "gamerzilla.h"
-#endif
-
 //------------------------------------------------------------------------------
 /** Constructor to create a new player that didn't exist before.
  *  \param name Name of the player.
@@ -126,21 +122,7 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
                   unlock_manager->createStoryModeStatus(xml_story_mode);
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
-                          ->createAchievementsStatus(xml_achievements);
-#ifdef GAMERZILLA
-    if (m_unique_id == 1)
-    {
-        int game_id = AchievementsManager::get()->getGameID();
-        std::map<uint32_t, Achievement *> &a = m_achievements_status->getAllAchievements();
-        for (auto &current : a)
-        {
-            if (current.second->isAchieved())
-            {
-                GamerzillaSetTrophy(game_id, current.second->getInfo()->getRawName().c_str());
-            }
-        }
-    }
-#endif
+                          ->createAchievementsStatus(xml_achievements, m_unique_id == 1);
     // Fix up any potentially missing icons.
     addIcon();
 }   // initRemainingData
