@@ -20,7 +20,9 @@
 #ifndef HEADER_WEB_ACHIEVEMENTS_STATUS_HPP
 #define HEADER_WEB_ACHIEVEMENTS_STATUS_HPP
 
-class AchievementInfo;
+#include "achievements/achievement_info.hpp"
+#include <map>
+
 class AchievementsStatus;
 
 // ============================================================================
@@ -37,7 +39,7 @@ private:
 #endif
 public:
 
-             WebAchievementsStatus();
+             WebAchievementsStatus(int version, std::map<uint32_t, AchievementInfo *> &info);
     virtual ~WebAchievementsStatus();
     
     void updateAchievementsProgress(AchievementsStatus *status);

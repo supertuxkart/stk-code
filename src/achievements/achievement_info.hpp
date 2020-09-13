@@ -94,6 +94,7 @@ public:
     irr::core::stringw getDescription() const;
     irr::core::stringw getName()        const;
     std::string        getRawName()     const { return m_name; }
+    std::string        getRawDescription() const { return m_description; }
     bool               isSecret()       const { return m_is_secret; }
 
     // This function should not be called if copy already has children

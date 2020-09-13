@@ -32,11 +32,26 @@
 /** Constructur, initialises this object with the data from the
  *  corresponding AchievementInfo.
  */
-WebAchievementsStatus::WebAchievementsStatus()
+WebAchievementsStatus::WebAchievementsStatus(int version, std::map<uint32_t, AchievementInfo *> &info)
 {
 #ifdef GAMERZILLA
     GamerzillaStart(false, (file_manager->getUserConfigDir() + "gamerzilla/").c_str());
-    m_game_id = GamerzillaSetGameFromFile(file_manager->getAsset("gamerzilla/supertuxkart.game").c_str(), file_manager->getAsset("gamerzilla/").c_str());
+    Gamerzilla g;
+    std::string path = file_manager->getAsset("gamerzilla/");
+    std::string main_image = path + "supertuxkart.png";
+    std::string true_image = path + "achievement1.png";
+    std::string false_image = path + "achievement0.png";
+    GamerzillaInitGame(&g);
+    g.version = version;
+    g.short_name = strdup("supertuxkart");
+    g.name = strdup("SuperTuxKart");
+    g.image = strdup(main_image.c_str());
+    for (auto const &i : info)
+    {
+        GamerzillaGameAddTrophy(&g, i.second->getRawName().c_str(), i.second->getRawDescription().c_str(), 0, true_image.c_str(), false_image.c_str());
+    }
+    m_game_id = GamerzillaSetGame(&g);
+    GamerzillaClearGame(&g);
 #endif
 }   // WebAchievementStatus
 

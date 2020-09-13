@@ -43,6 +43,8 @@ AchievementsManager::AchievementsManager()
     const std::string file_name = file_manager->getAsset("achievements.xml");
     const XMLNode *root = file_manager->createXMLTree(file_name);
     unsigned int num_nodes = root->getNumNodes();
+    uint32_t version = 1;
+    root->get("version", &version);
     for (unsigned int i = 0; i < num_nodes; i++)
     {
         const XMLNode *node = root->getNode(i);
@@ -54,7 +56,7 @@ AchievementsManager::AchievementsManager()
                    "Multiple achievements with the same id!");
 
     delete root;
-    m_web = new WebAchievementsStatus();
+    m_web = new WebAchievementsStatus(version, m_achievements_info);
 }   // AchievementsManager
 
 // ----------------------------------------------------------------------------

@@ -137,7 +137,7 @@
         egg-hunt-started-all
         egg-hunt-finished-all    
         -->
-<achievements>
+<achievements version="1">
     <achievement id="1" name="Christoffel Columbus" description="Play every official track at least once." >
         <goal type="race-finished-all" value="1"/>
     </achievement>
