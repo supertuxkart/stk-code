@@ -174,8 +174,8 @@ namespace irr
             gui::IGUIScrollBar* getScrollBar() const { return ScrollBar; }
             void setDisactivated(bool val)
             {
-                m_disactivated = val;
-                if (m_disactivated)
+                m_deactivated = val;
+                if (m_deactivated)
                     Selected = -1;
             }
     private:
@@ -206,7 +206,7 @@ namespace irr
             bool AutoScroll;
             bool HighlightWhenNotFocused;
             bool m_alternating_darkness;
-            bool m_disactivated;
+            bool m_deactivated;
     };
 
 
