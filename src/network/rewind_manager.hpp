@@ -147,6 +147,12 @@ public:
     /** Returns if rewinding is enabled or not. */
     static bool isEnabled() { return m_enable_rewind_manager; }
     // ------------------------------------------------------------------------
+    static bool exists()
+    {
+        ProcessType pt = STKProcess::getType();
+        return m_rewind_manager[pt] != NULL;
+    }   // exists
+    // ------------------------------------------------------------------------
     /** Returns the singleton. This function will not automatically create
      *  the singleton. */
     static RewindManager *get()

@@ -155,7 +155,7 @@ extern "C" void reset_network_body()
 {
     // In windows the rendering is paused when out focus, which pauses the
     // smooth timer
-    if (World::getWorld() && RewindManager::isEnabled())
+    if (World::getWorld() && RewindManager::exists())
         RewindManager::get()->resetSmoothNetworkBody();
 }  // reset_network_body
 
