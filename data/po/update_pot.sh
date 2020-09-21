@@ -105,7 +105,7 @@ compete in one of several Grand Prix, \
 try to beat the high score in time trials on your own, \
 play battle mode against the computer or your friends, \
 and more! For a greater challenge, race online against players from all over the world \
-and prove your racing process!"
+and prove your racing skills!"
 # Used in google play only for now
 STK_APPDATA_P4="This game is free and without ads."
 # Used in google play beta only for now
