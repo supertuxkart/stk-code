@@ -27,7 +27,6 @@
             <spacer width="2%" height="100%"/>
 
             <box width="78%" height="100%" layout="vertical-row">
-                <spacer width="5" height="1%"/>
                 <label width="100%" I18N="In the video settings" text="Graphics"/>
 
                 <spacer width="5" height="1%"/>
@@ -88,29 +87,29 @@
 
                 <spacer width="5" height="1%"/>
 
-                <div width="75%" height="fit" layout="horizontal-row" >
-                    <spacer width="5%" height="100%" />
-                    <checkbox id="fullscreen"/>
-                    <spacer width="1%" height="100%" />
-                    <label id="fullscreenText" height="100%" I18N="In the video settings" text="Fullscreen"/>
+                <div layout="horizontal-row" width="100%" height="fit">
+                    <div proportion="2" height="fit" layout="horizontal-row" >
+                        <spacer width="5%" height="100%" />
+                        <checkbox id="fullscreen"/>
+                        <spacer width="2%" height="100%" />
+                        <label id="fullscreenText" height="100%" I18N="In the video settings" text="Fullscreen"/>
+                    </div>
+
+                    <div proportion="3" layout="horizontal-row" height="fit">
+                        <spacer width="5%" height="100%" />
+                        <checkbox id="rememberWinpos"/>
+                        <spacer width="2%" height="100%" />
+                        <label id="rememberWinposText" height="100%" I18N="In the video settings" text="Remember window location"/>
+                    </div>
                 </div>
 
-                <div width="75%" layout="horizontal-row" height="fit">
-                    <spacer width="5%" height="100%" />
-                    <checkbox id="rememberWinpos"/>
-                    <spacer width="1%" height="100%" />
-                    <label id="rememberWinposText" height="100%" I18N="In the video settings" text="Remember window location"/>
-                </div>
-
-                <spacer width="5" height="1%"/>
+                <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <spacer width="5%" height="100%" />
                     <button id="apply_resolution"
                         I18N="In the video settings" text="Apply new resolution" />
                 </div>
-
-                <spacer width="5" height="1%"/>
 
             </box>
         </div>
