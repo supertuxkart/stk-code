@@ -112,8 +112,6 @@ public:
     // ------------------------------------------------------------------------
     virtual bool isGamePad()  const OVERRIDE { return true; }
     // ------------------------------------------------------------------------
-    virtual bool isGamePadAndroid()  const OVERRIDE { return false; }
-    // ------------------------------------------------------------------------
     virtual bool isKeyboard() const OVERRIDE { return false; }
     // ------------------------------------------------------------------------
     void initSDLController(const std::string& mapping, int buttons, int axes,

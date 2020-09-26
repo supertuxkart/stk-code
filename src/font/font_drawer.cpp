@@ -169,8 +169,7 @@ void FontDrawer::draw()
         const core::dimension2d<u32>& render_target_size =
             irr_driver->getActualScreenSize();
         glScissor(g_clip->UpperLeftCorner.X,
-            (s32)render_target_size.Height - g_clip->LowerRightCorner.Y +
-            irr_driver->getDevice()->getMovedHeight(),
+            (s32)render_target_size.Height - g_clip->LowerRightCorner.Y,
             g_clip->getWidth(), g_clip->getHeight());
     }
     else

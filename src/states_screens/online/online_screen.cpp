@@ -68,7 +68,7 @@ void OnlineScreen::loadedFromFile()
 {
     m_enable_splitscreen = getWidget<CheckBoxWidget>("enable-splitscreen");
     assert(m_enable_splitscreen);
-    m_enable_splitscreen->setState(false);
+    m_enable_splitscreen->setState(UserConfigParams::m_enable_network_splitscreen);
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -178,6 +178,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             // Let lobby add the players
             NetworkConfig::get()->cleanNetworkPlayers();
         }
+        UserConfigParams::m_enable_network_splitscreen = splitscreen->getState();
         return;
     }
 

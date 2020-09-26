@@ -64,6 +64,7 @@ RaceGUIMultitouch::RaceGUIMultitouch(RaceGUIBase* race_gui)
     m_gui_action_tex = NULL;
     m_up_tex = NULL;
     m_down_tex = NULL;
+    m_screen_tex = NULL;
 
     m_device = input_manager->getDeviceManager()->getMultitouchDevice();
 
@@ -157,6 +158,7 @@ void RaceGUIMultitouch::init()
     m_gui_action_tex = irr_driver->getTexture(FileManager::GUI_ICON,"challenge.png");
     m_up_tex = irr_driver->getTexture(FileManager::GUI_ICON, "up.png");
     m_down_tex = irr_driver->getTexture(FileManager::GUI_ICON, "down.png");
+    m_screen_tex = irr_driver->getTexture(FileManager::GUI_ICON, "screen_other.png");
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
@@ -310,7 +312,10 @@ void RaceGUIMultitouch::createSpectatorGUI()
     m_device->addButton(BUTTON_CUSTOM,
                     int(margin * 3 + btn_size * 2), int(h - margin - btn_size),
                     int(btn_size), int(btn_size), onCustomButtonPress);
-    
+
+    m_device->addButton(BUTTON_CUSTOM,
+                    int(margin * 4 + btn_size * 3), int(h - margin - btn_size),
+                    int(btn_size), int(btn_size), onCustomButtonPress);
 } // createSpectatorGUI
 
 //-----------------------------------------------------------------------------
@@ -339,6 +344,10 @@ void RaceGUIMultitouch::onCustomButtonPress(unsigned int button_id,
         break;
     case 3:
         cl->changeSpectateTarget(PA_LOOK_BACK, Input::MAX_VALUE,
+                                 Input::IT_KEYBOARD);
+        break;
+    case 4:
+        cl->changeSpectateTarget(PA_ACCEL, Input::MAX_VALUE,
                                  Input::IT_KEYBOARD);
         break;
     }
@@ -496,6 +505,10 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                 {
                     btn_texture = m_wing_mirror_tex;
                 }
+                else if (button->id == 4)
+                {
+                    btn_texture = m_screen_tex;
+                }
                 break;
             default:
                 break;
@@ -535,9 +548,11 @@ void RaceGUIMultitouch::draw(const AbstractKart* kart,
                                     (int)(button->x + button->width/2),
                                     (int)(button->y + button->height/2));
                 font->setScale(UserConfigParams::m_multitouch_scale);
-                font->draw(core::stringw(L"+"), pos,
+                font->setBlackBorder(true);
+                font->draw(core::stringw(kart->getPowerup()->getNum()), pos,
                            video::SColor(255, 255, 255, 255));
                 font->setScale(1.0f);
+                font->setBlackBorder(false);
             }
         }
     }

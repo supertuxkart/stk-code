@@ -111,12 +111,6 @@ public:
         WHEELS_DAMPING_RELAXATION,
         WHEELS_DAMPING_COMPRESSION,
 
-        // Camera
-        CAMERA_DISTANCE,
-        CAMERA_FORWARD_UP_ANGLE,
-        CAMERA_FORWARD_SMOOTHING,
-        CAMERA_BACKWARD_UP_ANGLE,
-
         // Jump
         JUMP_ANIMATION_TIME,
 
@@ -296,11 +290,6 @@ public:
 
     float getWheelsDampingRelaxation() const;
     float getWheelsDampingCompression() const;
-
-    float getCameraDistance() const;
-    float getCameraForwardUpAngle() const;
-    bool getCameraForwardSmoothing() const;
-    float getCameraBackwardUpAngle() const;
 
     float getJumpAnimationTime() const;
 

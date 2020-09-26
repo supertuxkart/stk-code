@@ -42,8 +42,6 @@ namespace irr
 	*/
 	class IrrlichtDevice : public virtual IReferenceCounted
 	{
-	protected:
-		typedef s32 (*HeightFunc)(const IrrlichtDevice*);
 	public:
 
 		//! Runs the device.
@@ -299,8 +297,6 @@ namespace irr
 		virtual u32 getScreenHeight() const = 0;
 		virtual u32 getOnScreenKeyboardHeight() const = 0;
 		virtual s32 getMovedHeight() const = 0;
-		virtual void toggleOnScreenKeyboard(bool show, s32 type = 0) = 0;
-		virtual void registerGetMovedHeightFunction(HeightFunc) = 0;
 
 		virtual bool activateAccelerometer(float updateInterval) { return false; }
 		virtual bool deactivateAccelerometer() { return false; }
@@ -318,6 +314,12 @@ namespace irr
 		virtual s32 getBottomPadding() { return 0; }
 		virtual s32 getLeftPadding() { return 0; }
 		virtual s32 getRightPadding() { return 0; }
+		virtual f32 getNativeScaleX() const { return 1.0f; }
+		virtual f32 getNativeScaleY() const { return 1.0f; }
+		virtual void setWindowMinimumSize(u32 width, u32 height) {}
+		virtual void resetPaused() {}
+		virtual void resetUnpaused() {}
+		virtual bool isResizable() const { return false; }
 		//! Check if a driver type is supported by the engine.
 		/** Even if true is returned the driver may not be available
 		for a configuration requested when creating the device. */

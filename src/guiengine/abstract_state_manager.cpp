@@ -295,7 +295,8 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     assert(!ModalDialog::isADialogActive());
     assert(!ScreenKeyboard::isActive());
 
-    if (m_game_mode != GAME) getCurrentScreen()->tearDown();
+    if (m_game_mode != GAME && getCurrentScreen())
+        getCurrentScreen()->tearDown();
     m_menu_stack.clear();
 
     for (int n=0; screens[n] != NULL; n++)
@@ -311,3 +312,39 @@ void AbstractStateManager::resetAndSetStack(Screen* screens[])
     onTopMostScreenChanged();
 }   // resetAndSetStack
 
+// ----------------------------------------------------------------------------
+
+void AbstractStateManager::onResize()
+{
+    // Happens in the first resize in main.cpp
+    if (m_menu_stack.empty())
+        return;
+
+    // In game resizing
+    if (m_menu_stack[0].first == RACE_STATE_NAME)
+    {
+        if (m_menu_stack.size() == 1)
+        {
+            clearScreenCache();
+            m_menu_stack.emplace_back(RACE_STATE_NAME, (Screen*)NULL);
+        }
+        return;
+    }
+
+    // For some window manager it sends resize event when STK is not focus
+    // even if the screen is not resizable, prevent it from resizing if wrong
+    // screen
+    if (!m_menu_stack.back().second ||
+        !m_menu_stack.back().second->isResizable())
+        return;
+
+    std::vector<std::function<Screen*()> > screen_function;
+    for (auto& p : m_menu_stack)
+        screen_function.push_back(p.second->getNewScreenPointer());
+    clearScreenCache();
+    std::vector<Screen*> new_screen;
+    for (auto& screen : screen_function)
+        new_screen.push_back(screen());
+    new_screen.push_back(NULL);
+    resetAndSetStack(new_screen.data());
+}   // onResize

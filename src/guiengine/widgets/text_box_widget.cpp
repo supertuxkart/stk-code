@@ -74,6 +74,12 @@ public:
         return handled;
     }
 
+    virtual void inputChar(char32_t c)
+    {
+        CGUIEditBox::inputChar(c);
+        handleTextUpdated();
+    }
+
     virtual bool OnEvent(const SEvent& event)
     {
         bool out = CGUIEditBox::OnEvent(event);
@@ -193,6 +199,9 @@ void TextBoxWidget::unfocused(const int playerID, Widget* new_focus)
 
 void TextBoxWidget::elementRemoved()
 {
+    // If text box is destroyed without moving mouse out of its focus, the
+    // reference will be kept so we clear it manually
+    GUIEngine::getGUIEnv()->removeHovered(m_element);
     // normally at this point normal widgets have been deleted by irrlicht already.
     // but this is a custom widget and the gui env does not appear to want to
     // manage it. so we free it manually
@@ -330,6 +339,9 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
         });
 }
 
+extern void Android_toggleOnScreenKeyboard(bool show, int type, int y);
+extern bool Android_isHardwareKeyboardConnected();
+
 #define MAKE_HANDLE_ACTION_NEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleActionNext(JNIEnv* env, jobject this_obj, jint widget_id)
 #define ANDROID_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME) MAKE_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME)
 
@@ -346,13 +358,24 @@ ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
             if (!eb)
                 return;
 
+            bool has_hardware_keyboard = Android_isHardwareKeyboardConnected();
             // First test for onEnterPressed, if true then close keyboard
             if (eb->handleEnterPressed())
             {
-                // Clear text like onEnterPressed callback
-                GUIEngine::getDevice()->toggleOnScreenKeyboard(false,
-                    1/*clear_text*/);
+                // If hardware keyboard connected don't out focus stk edittext
+                if (has_hardware_keyboard)
+                    tb->setText(L"");
+                else
+                {
+                    // Clear text like onEnterPressed callback
+                    Android_toggleOnScreenKeyboard(false, 1/*clear_text*/, 0/*y*/);
+                }
                 return;
+            }
+            else
+            {
+                // Required for some general text field dialog
+                eb->sendGuiEvent(EGET_EDITBOX_ENTER);
             }
 
             // As it's action "next", check if below widget is a text box, if
@@ -371,7 +394,7 @@ ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
             {
                 closest_tb->setFocusForPlayer(0);
             }
-            else
+            else if (!has_hardware_keyboard)
             {
                 // Post an enter event and close the keyboard
                 SEvent enter_event;
@@ -382,8 +405,34 @@ ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
                 GUIEngine::getDevice()->postEventFromUser(enter_event);
                 enter_event.KeyInput.PressedDown = false;
                 GUIEngine::getDevice()->postEventFromUser(enter_event);
-                GUIEngine::getDevice()->toggleOnScreenKeyboard(false);
+                Android_toggleOnScreenKeyboard(false, 1/*clear_text*/, 0/*y*/);
             }
         });
 }
+
+
+#define MAKE_HANDLE_LEFT_RIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleLeftRight(JNIEnv* env, jobject this_obj, jboolean left, jint widget_id)
+#define ANDROID_HANDLE_LEFT_RIGHT_CALLBACK(PKG_NAME) MAKE_HANDLE_LEFT_RIGHT_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_HANDLE_LEFT_RIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    GUIEngine::addGUIFunctionBeforeRendering([left, widget_id]()
+        {
+            // Handle left, right pressed in android edit box, out focus it if
+            // no widget found
+            TextBoxWidget* tb =
+                dynamic_cast<TextBoxWidget*>(getFocusForPlayer(0));
+            if (!tb || (int)widget_id != tb->getID())
+                return;
+            int id = GUIEngine::EventHandler::get()->findIDClosestWidget(
+                left ? NAV_LEFT: NAV_RIGHT, 0, tb, true/*ignore_disabled*/);
+            Widget* next_widget = GUIEngine::getWidget(id);
+            if (next_widget)
+                next_widget->setFocusForPlayer(0);
+            else
+                tb->unsetFocusForPlayer(0);
+        });
+}
+
 #endif

@@ -13,18 +13,18 @@ import csv
 import os
 import sys
 
-CSV_FILE = '../data/country_names.csv'
+TSV_FILE = '../data/country_names.tsv'
 # Use another name in the country_code header if you want countries names in different language
 READABLE_NAME = 'en'
 # ord("🇦") - ord("A")
 FLAG_OFFSET = 127397
 
-if not os.path.exists(CSV_FILE):
-    print("File = {} does not exist.".format(CSV_FILE))
+if not os.path.exists(TSV_FILE):
+    print("File = {} does not exist.".format(TSV_FILE))
     sys.exit(1)
 
-with open(CSV_FILE, 'r') as csvfile:
-    country = csv.DictReader(csvfile, delimiter=';', quotechar='"')
+with open(TSV_FILE, 'r') as tsvfile:
+    country = csv.DictReader(tsvfile, delimiter='\t', quotechar='"')
     # Skip header
     next(country)
     for row in country:

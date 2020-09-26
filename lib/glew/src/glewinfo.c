@@ -16373,7 +16373,7 @@ int main (int argc, char** argv)
 #elif defined(GLEW_EGL)
 #elif defined(_WIN32)
   fprintf(f, "Reporting capabilities of pixelformat %d\n", params.pixelformat);
-#elif !defined(__APPLE__) || defined(GLEW_APPLE_GLX)
+#elif !defined(__APPLE__)  && !defined(__HAIKU__) || defined(GLEW_APPLE_GLX)
   fprintf(f, "Reporting capabilities of display %s, visual 0x%x\n",
     params.display == NULL ? getenv("DISPLAY") : params.display, params.visual);
 #endif

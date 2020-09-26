@@ -53,6 +53,7 @@ RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 // -----------------------------------------------------------------------------
 void RegisterScreen::init()
 {
+    getWidget<TextBoxWidget>("username")->setText(L"");
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
     m_info_widget->setDefaultColor();
@@ -120,8 +121,6 @@ void RegisterScreen::init()
     onDialogClose();
     makeEntryFieldsVisible();
 
-    local_username->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    
     // The behaviour of the screen is slightly different at startup, i.e.
     // when it is the first screen: cancel will exit the game, and in
     // this case no 'back' error should be shown.

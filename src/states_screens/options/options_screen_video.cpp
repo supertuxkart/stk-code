@@ -163,6 +163,7 @@ OptionsScreenVideo::OptionsScreenVideo() : Screen("options_video.stkgui"),
                                            m_prev_adv_pipline(false),
                                            m_prev_img_quality(-1)
 {
+    m_resizable = true;
     m_inited = false;
     initPresets();
 }   // OptionsScreenVideo
@@ -192,6 +193,8 @@ void OptionsScreenVideo::loadedFromFile()
 
 void OptionsScreenVideo::init()
 {
+    GUIEngine::getDevice()->setResizable(
+        StateManager::get()->getGameState() == GUIEngine::MENU);
     Screen::init();
     m_prev_adv_pipline = UserConfigParams::m_dynamic_lights;
     m_prev_img_quality = getImageQuality();
@@ -212,11 +215,19 @@ void OptionsScreenVideo::init()
     assert( vsync != NULL );
 
     vsync->clearLabels();
+#ifdef IOS_STK
+    //I18N: In the video options, maximum frame per second
+    getWidget("vsync_label")->setText(_("Maximum FPS"));
+    vsync->addLabel("120");
+    vsync->addLabel("60");
+    vsync->addLabel("30");
+    vsync->setValue(UserConfigParams::m_swap_interval);
+#else
     vsync->addLabel(_("Disabled"));
     //I18N: In the video options, full vertical sync (usually 60fps)
     vsync->addLabel(_("Full"));
-    //I18N: In the video options, half vertical sync (usually 30fps)
-    vsync->addLabel(_("Half"));
+    if (UserConfigParams::m_swap_interval > 1)
+        UserConfigParams::m_swap_interval = 1;
     vsync->setValue(UserConfigParams::m_swap_interval);
 
     //I18N: in graphical options. The \n is a newline character, place it where appropriate, two can be used if required.
@@ -225,11 +236,10 @@ void OptionsScreenVideo::init()
     //I18N: in graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Full: one frame per monitor refresh");
     //I18N: in graphical options.
-    vsync_tooltip = vsync_tooltip + L"\n" + _("Half: one frame every two monitor refreshes");
-    //I18N: in graphical options.
     vsync_tooltip = vsync_tooltip + L"\n" + _("Vsync will not work if your drivers don't support it.");
 
     vsync->setTooltip(vsync_tooltip);
+#endif
 
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
@@ -477,12 +487,11 @@ void OptionsScreenVideo::updateGfxSlider()
     {
         //I18N: custom video settings
         gfx->setCustomText( _("Custom") );
-
-        // Enable the blur slider if the modern renderer is used
-        getWidget<GUIEngine::SpinnerWidget>("blur_level")->
-            setActive(UserConfigParams::m_dynamic_lights);
     }
 
+    // Enable the blur slider if the modern renderer is used
+    getWidget<GUIEngine::SpinnerWidget>("blur_level")->
+        setActive(UserConfigParams::m_dynamic_lights);
     updateTooltip();
 } // updateGfxSlider
 
@@ -613,6 +622,7 @@ void OptionsScreenVideo::updateBlurTooltip()
 }   // updateBlurTooltip
 
 // --------------------------------------------------------------------------------------------
+extern "C" void update_swap_interval(int swap_interval);
 
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
@@ -724,6 +734,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         GUIEngine::SpinnerWidget* vsync = getWidget<GUIEngine::SpinnerWidget>("vsync");
         assert( vsync != NULL );
         UserConfigParams::m_swap_interval = vsync->getValue();
+#if !defined(SERVER_ONLY) && defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+        update_swap_interval(UserConfigParams::m_swap_interval);
+#endif
     }
     else if (name == "rememberWinpos")
     {
@@ -745,6 +758,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
+    GUIEngine::getDevice()->setResizable(false);
 #ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
         CVS->isGLSL())

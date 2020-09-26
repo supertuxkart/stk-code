@@ -28,6 +28,7 @@
 #include "network/socket_address.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_ipv6.hpp"
+#include "network/stun_detection.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
@@ -38,6 +39,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/utf8/unchecked.h"
+
+#include <fcntl.h>
 
 #ifdef WIN32
 #  include <windns.h>
@@ -54,8 +57,8 @@
 #endif
 
 #ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#include "graphics/irr_driver.hpp"
+#include <jni.h>
+#include "SDL_system.h"
 
 std::vector<std::pair<std::string, int> >* g_list = NULL;
 
@@ -153,6 +156,7 @@ NetworkConfig::NetworkConfig()
     m_state_frequency = 10;
     m_nat64_prefix_data.fill(-1);
     m_num_fixed_ai = 0;
+    m_tux_hitbox_addon = false;
 }   // NetworkConfig
 
 // ----------------------------------------------------------------------------
@@ -276,44 +280,55 @@ bool NetworkConfig::roundValuesNow() const
 }   // roundValuesNow
 
 // ----------------------------------------------------------------------------
+#ifdef ENABLE_IPV6
+std::vector<std::unique_ptr<StunDetection> > g_ipv4_detection;
+std::vector<std::unique_ptr<StunDetection> > g_ipv6_detection;
+#endif
+
+void NetworkConfig::clearDetectIPThread(bool quit_stk)
+{
+#ifdef ENABLE_IPV6
+    if (!quit_stk)
+    {
+        auto it = g_ipv4_detection.begin();
+        while (it != g_ipv4_detection.end())
+        {
+            if ((*it)->isConnecting())
+            {
+                it++;
+                continue;
+            }
+            it = g_ipv4_detection.erase(it);
+        }
+        it = g_ipv6_detection.begin();
+        while (it != g_ipv6_detection.end())
+        {
+            if ((*it)->isConnecting())
+            {
+                it++;
+                continue;
+            }
+            it = g_ipv6_detection.erase(it);
+        }
+    }
+    else
+    {
+        g_ipv4_detection.clear();
+        g_ipv6_detection.clear();
+    }
+#endif
+}   // clearDetectIPThread
+
+// ----------------------------------------------------------------------------
 /** Use stun servers to detect current ip type.
  */
-void NetworkConfig::detectIPType()
+void NetworkConfig::queueIPDetection()
 {
-    if (UserConfigParams::m_default_ip_type != IP_NONE)
-    {
-        int ip_type = UserConfigParams::m_default_ip_type;
-        m_nat64_prefix.clear();
-        m_nat64_prefix_data.fill(-1);
-        m_ip_type.store((IPType)ip_type);
+    if (UserConfigParams::m_default_ip_type != IP_NONE ||
+        !m_system_ipv4 || !m_system_ipv6)
         return;
-    }
+
 #ifdef ENABLE_IPV6
-    if (!m_system_ipv4 || !m_system_ipv6)
-    {
-        // Don't test connection if only IPv4 or IPv6 system support
-        if (m_system_ipv4)
-            m_ip_type.store(IP_V4);
-        else if (m_system_ipv6)
-            m_ip_type.store(IP_V6);
-        return;
-    }
-
-    ENetAddress eaddr = {};
-    // We don't need to result of stun, just to check if the socket can be
-    // used in ipv4 or ipv6
-    uint8_t stun_tansaction_id[16] = {};
-    BareNetworkString s = STKHost::getStunRequest(stun_tansaction_id);
-    setIPv6Socket(0);
-    auto ipv4 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
-    setIPv6Socket(1);
-    auto ipv6 = std::unique_ptr<Network>(new Network(1, 1, 0, 0, &eaddr));
-    setIPv6Socket(0);
-
-    // This should only happen if system doesn't support all socket types
-    if (!ipv4->getENetHost() || !ipv6->getENetHost())
-        return;
-
     auto& stunv4_map = UserConfigParams::m_stun_servers_v4;
     for (auto& s : getStunList(true/*ipv4*/))
     {
@@ -343,46 +358,59 @@ void NetworkConfig::detectIPType()
     std::advance(ipv6_it, adv);
 
     SocketAddress::g_ignore_error_message = true;
-    SocketAddress stun_v4(ipv4_it->first, 0/*port specified in addr*/,
-        AF_INET);
-    bool sent_ipv4 = false;
-    if (!stun_v4.isUnset() && stun_v4.getFamily() == AF_INET)
-    {
-        sendto(ipv4->getENetHost()->socket, s.getData(), s.size(), 0,
-            stun_v4.getSockaddr(), stun_v4.getSocklen());
-        sent_ipv4 = true;
-    }
-
-    SocketAddress stun_v6(ipv6_it->first, 0/*port specified in addr*/,
-        AF_INET6);
-    bool sent_ipv6 = false;
-    if (!stun_v6.isUnset() && stun_v6.getFamily() == AF_INET6)
-    {
-        sendto(ipv6->getENetHost()->socket, s.getData(), s.size(), 0,
-            stun_v6.getSockaddr(), stun_v6.getSocklen());
-        sent_ipv6 = true;
-    }
+    std::unique_ptr<StunDetection> ipv4_detect(
+        new StunDetection(ipv4_it->first, true/*ipv4*/));
+    std::unique_ptr<StunDetection> ipv6_detect(
+        new StunDetection(ipv6_it->first, false/*ipv4*/));
     SocketAddress::g_ignore_error_message = false;
+    Log::debug("NetworkConfig", "Using TCP stun IPv4: %s, IPv6: %s",
+        ipv4_it->first.c_str(), ipv6_it->first.c_str());
+    g_ipv4_detection.emplace_back(std::move(ipv4_detect));
+    g_ipv6_detection.emplace_back(std::move(ipv6_detect));
+#endif
+}   // queueIPDetection
 
+// ----------------------------------------------------------------------------
+/** Use stun servers to detect current ip type.
+ */
+void NetworkConfig::getIPDetectionResult(uint64_t timeout)
+{
+    if (UserConfigParams::m_default_ip_type != IP_NONE)
+    {
+        int ip_type = UserConfigParams::m_default_ip_type;
+        m_nat64_prefix.clear();
+        m_nat64_prefix_data.fill(-1);
+        m_ip_type.store((IPType)ip_type);
+        return;
+    }
+#ifdef ENABLE_IPV6
     bool has_ipv4 = false;
     bool has_ipv6 = false;
-
-    ENetSocketSet socket_set;
-    ENET_SOCKETSET_EMPTY(socket_set);
-    ENET_SOCKETSET_ADD(socket_set, ipv4->getENetHost()->socket);
-    if (sent_ipv4)
+    if (!m_system_ipv4 || !m_system_ipv6)
     {
-        // 1.5 second timeout
-        has_ipv4 = enet_socketset_select(
-            ipv4->getENetHost()->socket, &socket_set, NULL, 1500) > 0;
+        has_ipv4 = m_system_ipv4;
+        has_ipv6 = m_system_ipv6;
+        goto end;
     }
 
-    ENET_SOCKETSET_EMPTY(socket_set);
-    ENET_SOCKETSET_ADD(socket_set, ipv6->getENetHost()->socket);
-    if (sent_ipv6 && enet_socketset_select(
-        ipv6->getENetHost()->socket, &socket_set, NULL, 1500) > 0)
+    if (g_ipv4_detection.empty() || g_ipv6_detection.empty())
+        goto end;
+
+    timeout += StkTime::getMonoTimeMs();
+    do
     {
-        has_ipv6 = true;
+        has_ipv4 = g_ipv4_detection.back()->connectionSucceeded();
+        has_ipv6 = g_ipv6_detection.back()->connectionSucceeded();
+        // Exit early if socket closed
+        if (g_ipv4_detection.back()->socketClosed() &&
+            g_ipv6_detection.back()->socketClosed())
+            break;
+    } while (timeout > StkTime::getMonoTimeMs());
+    clearDetectIPThread(false/*quit_stk*/);
+
+end:
+    if (has_ipv6)
+    {
         // For non dual stack IPv6 we try to get a NAT64 prefix to connect
         // to IPv4 only servers
         if (!has_ipv4)
@@ -456,7 +484,7 @@ void NetworkConfig::detectIPType()
 #else
     m_ip_type = IP_V4;
 #endif
-}   // detectIPType
+}   // getIPDetectionResult
 
 // ----------------------------------------------------------------------------
 void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
@@ -482,46 +510,28 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
     }
 
 #elif defined(ANDROID)
-    CIrrDeviceAndroid* dev =
-        dynamic_cast<CIrrDeviceAndroid*>(irr_driver->getDevice());
-    if (!dev)
-        return;
-    android_app* android = dev->getAndroid();
-    if (!android)
-        return;
-
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-
-    jint status = android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-
-        status = android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-    if (status != JNI_OK)
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    if (env == NULL)
     {
         Log::error("NetworkConfig",
-            "Cannot attach current thread in getDNSSrvRecords.");
+            "getDNSSrvRecords unable to SDL_AndroidGetJNIEnv.");
         return;
     }
 
-    jobject native_activity = android->activity->clazz;
-    jclass class_native_activity = env->GetObjectClass(native_activity);
+    jobject native_activity = (jobject)SDL_AndroidGetActivity();
+    if (native_activity == NULL)
+    {
+        Log::error("NetworkConfig",
+            "getDNSSrvRecords unable to SDL_AndroidGetActivity.");
+        return;
+    }
 
+    jclass class_native_activity = env->GetObjectClass(native_activity);
     if (class_native_activity == NULL)
     {
         Log::error("NetworkConfig",
             "getDNSSrvRecords unable to find object class.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(native_activity);
         return;
     }
 
@@ -532,10 +542,8 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
     {
         Log::error("NetworkConfig",
             "getDNSSrvRecords unable to find method id.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return;
     }
 
@@ -548,22 +556,19 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
     {
         Log::error("NetworkConfig",
             "Failed to create text for domain name.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return;
     }
 
     g_list = l;
     env->CallVoidMethod(native_activity, method_id, text);
-    if (was_detached)
-    {
-        android->activity->vm->DetachCurrentThread();
-    }
+    env->DeleteLocalRef(text);
+    env->DeleteLocalRef(class_native_activity);
+    env->DeleteLocalRef(native_activity);
     g_list = NULL;
 
-#else
+#elif !defined(__CYGWIN__)
 #define SRV_WEIGHT (RRFIXEDSZ+2)
 #define SRV_PORT (RRFIXEDSZ+4)
 #define SRV_SERVER (RRFIXEDSZ+6)
@@ -609,7 +614,7 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
         for (unsigned i = 0; i < srv.size(); i++)
         {
             char server_name[512] = {};
-            if (ns_name_ntop(srv[i] + SRV_SERVER, server_name, 512) < 0)
+            if (ns_name_uncompress(response, response + response_len, srv[i] + SRV_SERVER, server_name, 512) < 0)
                 continue;
             uint16_t port = ns_get16(srv[i] + SRV_PORT);
             uint16_t weight = ns_get16(srv[i] + SRV_WEIGHT);

@@ -301,7 +301,7 @@ namespace GUIEngine
 
         void setSortable(bool sortable) { m_sortable = sortable; }
         void focusHeader(const NavigationDirection nav);
-
+        virtual void setActive(bool active=true);
     };
 }
 

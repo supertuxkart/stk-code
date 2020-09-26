@@ -59,6 +59,9 @@ Screen::Screen(const char* file, bool pause_race)
     m_loaded         = false;
     m_pause_race     = pause_race;
     m_update_in_background = false;
+    m_width = irr_driver->getActualScreenSize().Width;
+    m_height = irr_driver->getActualScreenSize().Height;
+    m_resizable = false;
 }   // Screen
 
 // -----------------------------------------------------------------------------
@@ -235,20 +238,4 @@ void Screen::manualRemoveWidget(Widget* w)
 #pragma mark -
 #pragma mark Getters
 #endif
-
-// -----------------------------------------------------------------------------
-/** \brief Implementing method from AbstractTopLevelContainer */
-int Screen::getWidth()
-{
-    return irr_driver->getActualScreenSize().Width;
-}
-
-// -----------------------------------------------------------------------------
-/** \brief Implementing method from AbstractTopLevelContainer */
-int Screen::getHeight()
-{
-    return irr_driver->getActualScreenSize().Height;
-}
-
-// -----------------------------------------------------------------------------
 

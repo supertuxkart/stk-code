@@ -43,8 +43,8 @@
 #include "utils/translation.hpp"
 
 #ifdef ANDROID
-#include "../../../lib/irrlicht/source/Irrlicht/CIrrDeviceAndroid.h"
-#include "graphics/irr_driver.hpp"
+#include <jni.h>
+#include "SDL_system.h"
 #include "utils/utf8/unchecked.h"
 #endif
 
@@ -74,7 +74,6 @@ bool ConnectToServer::m_done_intecept = false;
 ConnectToServer::ConnectToServer(std::shared_ptr<Server> server)
                : Protocol(PROTOCOL_CONNECTION)
 {
-    m_quick_play_err_msg = _("No quick play server available.");
     m_server_address = {};
     if (server)
         m_server = server;
@@ -220,7 +219,7 @@ void ConnectToServer::asynchronousUpdate()
                 else
                 {
                     // Shutdown STKHost (go back to online menu too)
-                    STKHost::get()->setErrorMessage(m_quick_play_err_msg);
+                    STKHost::get()->setErrorMessage(_("No quick play server available."));
                     STKHost::get()->requestShutdown();
                     m_state = EXITING;
                     return;
@@ -369,8 +368,14 @@ void ConnectToServer::update(int ticks)
             if (STKHost::get()->getPeerCount() == 0)
             {
                 // Shutdown STKHost (go back to online menu too)
-                STKHost::get()->setErrorMessage(
-                    _("Cannot connect to server %s.", m_server->getName()));
+                core::stringw err =
+                    _("Cannot connect to server %s.", m_server->getName());
+                if (!m_error_msg.empty())
+                {
+                    err += L"\n";
+                    err += m_error_msg;
+                }
+                STKHost::get()->setErrorMessage(err);
                 STKHost::get()->requestShutdown();
             }
             requestTerminate();
@@ -515,9 +520,9 @@ bool ConnectToServer::registerWithSTKServer()
     }
     else
     {
-        irr::core::stringc error(request->getInfo().c_str());
+        m_error_msg = request->getInfo();
         Log::error("ConnectToServer", "Failed to register client address: %s",
-            error.c_str());
+            StringUtils::wideToUtf8(m_error_msg).c_str());
         return false;
     }
 }   // registerWithSTKServer
@@ -526,46 +531,30 @@ bool ConnectToServer::registerWithSTKServer()
 auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
 {
     std::vector<std::string> result;
-    CIrrDeviceAndroid* dev =
-        dynamic_cast<CIrrDeviceAndroid*>(irr_driver->getDevice());
-    if (!dev)
-        return result;
-    android_app* android = dev->getAndroid();
-    if (!android)
-        return result;
-
-    bool was_detached = false;
-    JNIEnv* env = NULL;
-
-    jint status = android->activity->vm->GetEnv((void**)&env, JNI_VERSION_1_6);
-    if (status == JNI_EDETACHED)
-    {
-        JavaVMAttachArgs args;
-        args.version = JNI_VERSION_1_6;
-        args.name = "NativeThread";
-        args.group = NULL;
-
-        status = android->activity->vm->AttachCurrentThread(&env, &args);
-        was_detached = true;
-    }
-    if (status != JNI_OK)
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    if (env == NULL)
     {
         Log::error("ConnectToServer",
-            "Cannot attach current thread in getDNSTxtRecords.");
+            "getDNSSrvRecords unable to SDL_AndroidGetJNIEnv.");
         return result;
     }
 
-    jobject native_activity = android->activity->clazz;
+    jobject native_activity = (jobject)SDL_AndroidGetActivity();
+
+    if (native_activity == NULL)
+    {
+        Log::error("ConnectToServer",
+            "getDNSSrvRecords unable to SDL_AndroidGetActivity.");
+        return result;
+    }
+
     jclass class_native_activity = env->GetObjectClass(native_activity);
 
     if (class_native_activity == NULL)
     {
         Log::error("ConnectToServer",
             "getDNSTxtRecords unable to find object class.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(native_activity);
         return result;
     }
 
@@ -576,10 +565,8 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
     {
         Log::error("ConnectToServer",
             "getDNSTxtRecords unable to find method id.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return result;
     }
 
@@ -592,10 +579,8 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
     {
         Log::error("ConnectToServer",
             "Failed to create text for domain name.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return result;
     }
 
@@ -604,10 +589,9 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
     if (arr == NULL)
     {
         Log::error("ConnectToServer", "No array is created.");
-        if (was_detached)
-        {
-            android->activity->vm->DetachCurrentThread();
-        }
+        env->DeleteLocalRef(text);
+        env->DeleteLocalRef(class_native_activity);
+        env->DeleteLocalRef(native_activity);
         return result;
     }
     int len = env->GetArrayLength(arr);
@@ -619,18 +603,22 @@ auto get_txt_record = [](const core::stringw& name)->std::vector<std::string>
         const uint16_t* utf16_text =
             (const uint16_t*)env->GetStringChars(jstr, NULL);
         if (utf16_text == NULL)
+        {
+            env->DeleteLocalRef(jstr);
             continue;
+        }
         const size_t str_len = env->GetStringLength(jstr);
         std::string tmp;
         utf8::unchecked::utf16to8(
             utf16_text, utf16_text + str_len, std::back_inserter(tmp));
         result.push_back(tmp);
         env->ReleaseStringChars(jstr, utf16_text);
+        env->DeleteLocalRef(jstr);
     }
-    if (was_detached)
-    {
-        android->activity->vm->DetachCurrentThread();
-    }
+    env->DeleteLocalRef(arr);
+    env->DeleteLocalRef(text);
+    env->DeleteLocalRef(class_native_activity);
+    env->DeleteLocalRef(native_activity);
     return result;
 };
 #endif
@@ -696,7 +684,7 @@ bool ConnectToServer::detectPort()
         if (port_from_dns != 0)
             break;
     }
-#else
+#elif !defined(__CYGWIN__)
     unsigned char response[512] = {};
     const std::string& utf8name = StringUtils::wideToUtf8(m_server->getName());
     int response_len = res_query(utf8name.c_str(), C_IN, T_TXT, response, 512);

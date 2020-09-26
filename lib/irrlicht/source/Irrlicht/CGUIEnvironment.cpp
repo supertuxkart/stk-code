@@ -553,6 +553,7 @@ bool CGUIEnvironment::postEventFromUser(const SEvent& event)
 
 		break;
 	case EET_KEY_INPUT_EVENT:
+	case EET_SDL_TEXT_EVENT:
 		{
 			if (Focus && Focus->OnEvent(event))
 				return true;
@@ -1613,6 +1614,21 @@ IGUIElement* CGUIEnvironment::getNextElement(bool reverse, bool group)
 		return this; // no group found? root group
 	else
 		return 0;
+}
+
+
+void CGUIEnvironment::removeHovered(IGUIElement* element)
+{
+	if (Hovered && Hovered == element)
+	{
+		Hovered->drop();
+		Hovered = NULL;
+		if (HoveredNoSubelement)
+		{
+			HoveredNoSubelement->drop();
+			HoveredNoSubelement = NULL;
+		}
+	}
 }
 
 

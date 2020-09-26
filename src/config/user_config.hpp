@@ -480,6 +480,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam          m_soccer_player_list
             PARAM_DEFAULT(  BoolUserConfigParam(false, "soccer-player-list",
             &m_race_setup_group, "Show player list icon in soccer mode.") );
+    PARAM_PREFIX BoolUserConfigParam          m_addon_tux_online
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "addon-tux-online",
+            &m_race_setup_group, "Always show online addon karts as tux when live join is on.") );
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
@@ -563,10 +566,9 @@ namespace UserConfigParams
             "multitouch interface."));
 
     PARAM_PREFIX IntUserConfigParam         m_screen_keyboard
-            PARAM_DEFAULT( IntUserConfigParam(1, "screen_keyboard_mode",
+            PARAM_DEFAULT( IntUserConfigParam(0, "screen_keyboard_status",
             &m_multitouch_group,
-            "Screen keyboard mode: 0 = disabled, 1 = enabled if no hardware "
-            "keyboard, 2 = always enabled") );
+            "STK screen keyboard status: 0 = disabled, 1 = enabled") );
 
     // ---- GP start order
     PARAM_PREFIX GroupUserConfigParam        m_gp_start_order
@@ -783,35 +785,33 @@ namespace UserConfigParams
     // These stk domains have only a record to each ipv6 stun below,
     // so we can use this to know ipv4 address of nat64 gateway (if any)
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers_v4
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv4",
+        PARAM_DEFAULT(StringToUIntUserConfigParam("ipv4-stun-servers",
         "The stun servers that will be used to know the public address "
         "(ipv4 only) with port", {{ "stun-server", "address", "ping" }},
             {
-                 { "stunv4.1.supertuxkart.net:3478", 0u },
-                 { "stunv4.2.supertuxkart.net:19302", 0u },
-                 { "stunv4.3.supertuxkart.net:19302", 0u },
-                 { "stunv4.4.supertuxkart.net:19302", 0u },
-                 { "stunv4.5.supertuxkart.net:19302", 0u },
-                 { "stunv4.6.supertuxkart.net:19302", 0u }
+                 { "stunv4.linuxreviews.org:3478", 0u },
+                 { "stunv4.7.supertuxkart.net:3478", 0u },
+                 { "stunv4.8.supertuxkart.net:3478", 0u }
              }
          ));
 
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers
-        PARAM_DEFAULT(StringToUIntUserConfigParam("stun-servers-ipv6",
+        PARAM_DEFAULT(StringToUIntUserConfigParam("ipv6-stun-servers",
         "The stun servers that will be used to know the public address "
         "(including ipv6) with port", {{ "stun-server", "address", "ping" }},
             {
-                 { "stun.stunprotocol.org:3478", 0u },
-                 { "stun.l.google.com:19302", 0u },
-                 { "stun1.l.google.com:19302", 0u },
-                 { "stun2.l.google.com:19302", 0u },
-                 { "stun3.l.google.com:19302", 0u },
-                 { "stun4.l.google.com:19302", 0u }
+                 { "stun.linuxreviews.org:3478", 0u },
+                 { "stun.supertuxkart.net:3478", 0u },
+                 { "stun.stunprotocol.org:3478", 0u }
              }
          ));
 
     PARAM_PREFIX GroupUserConfigParam  m_network_group
         PARAM_DEFAULT(GroupUserConfigParam("Network", "Network Settings"));
+    PARAM_PREFIX BoolUserConfigParam m_enable_network_splitscreen
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable-network-splitscreen",
+        &m_network_group, "The default value of enable splitscreen checkbox "
+        "in online screen."));
     PARAM_PREFIX BoolUserConfigParam m_log_packets
         PARAM_DEFAULT(BoolUserConfigParam(false, "log-network-packets",
         &m_network_group, "If all network packets should be logged"));
@@ -898,7 +898,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_swap_interval
             PARAM_DEFAULT( IntUserConfigParam(0, "swap_interval",
                            &m_graphics_quality,
-                           "Swap interval for vsync: 0 = disabled, 1 = full, 2 = half") );
+                           "Swap interval for vsync: 0 = disabled, 1 = full") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "motionblur_enabled", &m_graphics_quality,
@@ -933,6 +933,38 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(false, "crashed") );
 
     // ---- Camera
+    PARAM_PREFIX GroupUserConfigParam        m_camera_normal
+            PARAM_DEFAULT( GroupUserConfigParam(
+                        "camera-normal",
+                        "Camera settings for player.") );
+
+    PARAM_PREFIX FloatUserConfigParam         m_camera_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "distance",
+            &m_camera_normal,
+            "Distance between kart and camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_camera_forward_up_angle
+            PARAM_DEFAULT(  FloatUserConfigParam(0, "forward-up-angle",
+            &m_camera_normal,
+            "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_camera_forward_smoothing
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+            &m_camera_normal,
+            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_camera_backward_up_angle
+            PARAM_DEFAULT(  FloatUserConfigParam(5, "backward-up-angle",
+            &m_camera_normal,
+            "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
+
+    PARAM_PREFIX IntUserConfigParam         m_camera_fov
+            PARAM_DEFAULT(  IntUserConfigParam(80, "fov",
+            &m_camera_normal,
+            "Focal distance (single player)"));
+
+
+    // camera in artist mode
     PARAM_PREFIX GroupUserConfigParam        m_camera
             PARAM_DEFAULT( GroupUserConfigParam("camera",
                                                 "(Debug) camera settings.") );

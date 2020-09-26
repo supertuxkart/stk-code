@@ -44,7 +44,7 @@ STKPeer::STKPeer(ENetPeer *enet_peer, STKHost* host, uint32_t host_id)
     m_host_id             = host_id;
     m_connected_time      = StkTime::getMonoTimeMs();
     m_validated.store(false);
-    m_always_spectate.store(false);
+    m_always_spectate.store(ASM_NONE);
     m_average_ping.store(0);
     m_packet_loss.store(0);
     m_waiting_for_game.store(true);

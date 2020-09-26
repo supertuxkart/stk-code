@@ -23,6 +23,7 @@
 
 #include <string>
 #include <map>
+#include <memory>
 #include <vector>
 
 #include "addons/addon.hpp"
@@ -60,7 +61,6 @@ private:
     bool m_downloaded_icons;
 
     void  loadInstalledAddons();
-    void  downloadIcons();
 
 public:
                  AddonsManager();
@@ -74,6 +74,8 @@ public:
     bool         uninstall(const Addon &addon);
     void         reInit();
     bool         anyAddonsInstalled() const;
+    void         downloadIconForAddon(const std::string& addon_id,
+                                      std::weak_ptr<bool> result);
     // ------------------------------------------------------------------------
     /** Returns true if the list of online addons has been downloaded. This is
      *  used to grey out the 'addons' entry till a network connections could be

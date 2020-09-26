@@ -55,6 +55,9 @@ using namespace GUIEngine;
 
 Widget::Widget(WidgetType type, bool reserve_id)
 {
+    // Accept all input by default
+    m_active_event_callback.flip();
+    m_active_event_callback[Input::IT_NONE] = false;
     m_magic_number = 0xCAFEC001;
 
     m_x  = -1;
@@ -118,6 +121,18 @@ Widget::~Widget()
     }
 
     m_magic_number = 0xDEADBEEF;
+}
+
+// -----------------------------------------------------------------------------
+void Widget::setEventCallbackActive(Input::InputType type, bool active)
+{
+    m_active_event_callback[type] = active;
+}
+
+// -----------------------------------------------------------------------------
+bool Widget::isEventCallbackActive(Input::InputType type) const
+{
+    return m_active_event_callback[type];
 }
 
 // -----------------------------------------------------------------------------

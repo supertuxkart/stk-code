@@ -39,9 +39,10 @@ using namespace irr;
 #include "guiengine/event_handler.hpp"
 #include "guiengine/widget.hpp"
 #include "input/input.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/ptr_vector.hpp"
 
-#include "utils/leak_check.hpp"
+#include <functional>
 
 /**
  * \ingroup guiengine
@@ -58,7 +59,6 @@ namespace GUIEngine
     {
     protected:
         static SCREEN* singleton;
-
     public:
 
         ~ScreenSingleton()
@@ -71,12 +71,14 @@ namespace GUIEngine
             if (singleton == NULL)
             {
                 singleton = new SCREEN();
+                std::function<SCREEN*()> new_screen_function = []()
+                    { return ScreenSingleton::getInstance(); };
+                singleton->setScreenPointerFunction(new_screen_function);
                 GUIEngine::addScreenToList(singleton);
             }
 
             return singleton;
         }
-
     };
     template <typename SCREEN> SCREEN*
         ScreenSingleton<SCREEN>::singleton = nullptr;
@@ -93,34 +95,40 @@ namespace GUIEngine
      */
     class Screen : public AbstractTopLevelContainer
     {
+protected:
+        /** True if this screen is resizable
+         */
+        bool m_resizable;
+
+        bool m_throttle_FPS;
     private:
         /** True if the race (if it is running) should be paused when this
          *  screen is shown. The RaceResultGUI uses this to leave the race
          *  running while it is being shown. */
         bool m_pause_race;
 
-        friend class Skin;
-
         bool m_loaded;
-
-        std::string m_filename;
 
         /** Will be called to determine if the 3D scene must be rendered when
          *  at this screen.
          */
         bool m_render_3d;
 
-        /** to catch errors as early as possible, for debugging purposes only */
-        unsigned int m_magic_number;
-
         /** When set to true it updates the screen even if modal dialog is 
          *  opened
          */
         bool m_update_in_background;
 
-    protected:
-        bool m_throttle_FPS;
+        /** to catch errors as early as possible, for debugging purposes only */
+        unsigned int m_magic_number;
 
+        unsigned m_width, m_height;
+
+        friend class Skin;
+
+        std::string m_filename;
+        /** For runtime screen reloading without template */
+        std::function<Screen*()> m_screen_func;
     public:
 
         LEAK_CHECK()
@@ -137,6 +145,12 @@ namespace GUIEngine
                                        PtrVector<Widget>& append_to,
                                        irr::gui::IGUIElement* parent = NULL);
 
+        /** Save the function before GUIEngine::clearScreenCache, call it after
+         * to get the new screen instance pointer
+         */
+        std::function<Screen*()> getNewScreenPointer() const { return m_screen_func; }
+
+        void setScreenPointerFunction(const std::function<Screen*()>& f) { m_screen_func = f; }
 
         Screen(bool pause_race=true);
 
@@ -289,10 +303,11 @@ namespace GUIEngine
          */
         virtual MusicInformation* getInGameMenuMusic() const { return NULL; }
 
-        virtual int getWidth();
+        virtual int getWidth() { return m_width; }
 
-        virtual int getHeight();
+        virtual int getHeight() { return m_height; }
 
+        virtual bool isResizable() const { return m_resizable; }
         /**
          * \brief Override this if you need to be notified of player actions
          *        in subclasses.

@@ -49,7 +49,7 @@ class Translations
 private:
 #ifndef SERVER_ONLY
     tinygettext::DictionaryManager m_dictionary_manager;
-    tinygettext::Dictionary        m_dictionary;
+    tinygettext::Dictionary*       m_dictionary;
 
     static std::map<std::string, std::string> m_localized_name;
     static std::map<std::string, std::map<std::string, irr::core::stringw> > m_localized_country_codes;
@@ -71,7 +71,7 @@ public:
 #ifndef SERVER_ONLY
     const std::vector<std::string>* getLanguageList() const;
 
-    std::set<wchar_t>        getCurrentAllChar();
+    std::set<unsigned int>   getCurrentAllChar();
 
     std::string              getCurrentLanguageName();
 

@@ -2888,22 +2888,37 @@ bool Skin::hasFont() const
  * icon. */
 std::string Skin::getThemedIcon(const std::string& relative_path) const
 {
-    if (!SkinConfig::m_icon_theme ||
-        relative_path.find("gui/icons/") == std::string::npos)
+    // First check if an svg icon is available
+    const std::vector<std::string> ext {".svg", ".png"};
+    // get the path without extension
+    const std::string path_no_extension = StringUtils::removeExtension(relative_path);
+    // loop the file extensions: svg first
+    for(auto s : ext)
     {
-        return file_manager->getAsset(relative_path);
-    }
+        std::string relative_path2 = path_no_extension + s;
+        if (!SkinConfig::m_icon_theme ||
+            relative_path2.find("gui/icons/") == std::string::npos)
+        {
+            std::string tmp_path = file_manager->getAsset(relative_path2);
+            if (file_manager->fileExists(tmp_path))
+            {
+                return tmp_path;
+            }
+        }
 
-    if (relative_path.find(SkinConfig::m_data_path) != std::string::npos &&
-        file_manager->fileExists(relative_path))
-    {
-        // Absolute path given
-        return relative_path;
-    }
+        if (relative_path2.find(SkinConfig::m_data_path) != std::string::npos &&
+            file_manager->fileExists(relative_path2))
+        {
+            // Absolute path given
+            return relative_path2;
+        }
 
-    std::string test_path = SkinConfig::m_data_path + "data/" + relative_path;
-    if (file_manager->fileExists(test_path))
-        return test_path;
-    else
-        return file_manager->getAsset(relative_path);
+        std::string test_path = SkinConfig::m_data_path + "data/" + relative_path2;
+        if (file_manager->fileExists(test_path))
+        {
+            return test_path;
+        }
+    }
+    // if nothing found, return the bundled one
+    return file_manager->getAsset(relative_path);
 }   // getThemedIcon

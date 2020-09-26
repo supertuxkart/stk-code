@@ -61,6 +61,13 @@ enum AddonScore : int
     AS_TOTAL = 4,
 };   // AddonScore
 
+enum AlwaysSpectateMode : uint8_t
+{
+    ASM_NONE = 0, //!< Default, not spectating at all
+    ASM_COMMAND = 1, //!< Set by player through command
+    ASM_FULL = 2, //!< Set by server because too many players joined
+};   // AlwaysSpectateMode
+
 /*! \class STKPeer
  *  \brief Represents a peer.
  *  This class is used to interface the ENetPeer structure.
@@ -85,7 +92,7 @@ protected:
 
     std::atomic_bool m_warned_for_high_ping;
 
-    std::atomic_bool m_always_spectate;
+    std::atomic<uint8_t> m_always_spectate;
 
     /** Host id of this peer. */
     uint32_t m_host_id;
@@ -292,10 +299,17 @@ public:
     // ------------------------------------------------------------------------
     const SocketAddress& getAddress() const { return *m_socket_address.get(); }
     // ------------------------------------------------------------------------
-    void setAlwaysSpectate(bool val)          { m_always_spectate.store(val); }
+    void setAlwaysSpectate(AlwaysSpectateMode mode)
+                                             { m_always_spectate.store(mode); }
     // ------------------------------------------------------------------------
-    bool alwaysSpectate() const            { return m_always_spectate.load(); }
-
+    bool alwaysSpectate() const
+                               { return m_always_spectate.load() != ASM_NONE; }
+    // ------------------------------------------------------------------------
+    void resetAlwaysSpectateFull()
+    {
+        if (m_always_spectate.load() == ASM_FULL)
+            m_always_spectate.store(ASM_NONE);
+    }
 };   // STKPeer
 
 #endif // STK_PEER_HPP

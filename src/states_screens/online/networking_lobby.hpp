@@ -25,6 +25,7 @@
 #include <memory>
 #include <utility>
 
+class Addon;
 class InputDevice;
 class Server;
 enum KartTeam : int8_t;
@@ -74,7 +75,7 @@ private:
     int m_server_info_height;
 
     core::stringw m_start_text, m_ready_text, m_live_join_text,
-        m_configuration_text, m_spectate_text;
+        m_configuration_text, m_spectate_text, m_install_addon_text;
 
     float m_start_timeout;
     int64_t m_cur_starting_timer;
@@ -82,10 +83,12 @@ private:
 
     bool m_allow_change_team, m_has_auto_start_in_server,
         m_server_configurable, m_client_live_joinable,
-        m_reload_server_info, m_displayed_addon_install_cmd;
+        m_reload_server_info;
 
+    Addon* m_addon_install;
     video::ITexture* m_config_texture;
     video::ITexture* m_spectate_texture;
+    video::ITexture* m_addon_texture;
 
     GUIEngine::IconButtonWidget* m_back_widget;
     GUIEngine::LabelWidget* m_header;

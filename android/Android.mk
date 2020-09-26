@@ -72,13 +72,6 @@ include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
-# Fribidi
-LOCAL_MODULE       := fribidi
-LOCAL_SRC_FILES    := obj/fribidi/lib/.libs/libfribidi.a
-include $(PREBUILT_STATIC_LIBRARY)
-include $(CLEAR_VARS)
-
-
 # Freetype
 LOCAL_MODULE := freetype
 LOCAL_SRC_FILES := obj/freetype/objs/.libs/libfreetype.a
@@ -90,23 +83,6 @@ include $(CLEAR_VARS)
 LOCAL_MODULE       := harfbuzz
 LOCAL_SRC_FILES    := obj/harfbuzz/src/.libs/libharfbuzz.a
 include $(PREBUILT_STATIC_LIBRARY)
-include $(CLEAR_VARS)
-
-
-# Raqm
-LOCAL_MODULE       := raqm
-LOCAL_PATH         := .
-LOCAL_CPP_FEATURES += rtti
-LOCAL_SRC_FILES    := $(wildcard ../lib/libraqm/*.c)
-LOCAL_CFLAGS       := -Iobj/fribidi/include             \
-                      -Iobj/freetype/include            \
-                      -Iobj/harfbuzz/include            \
-                      -DHAVE_DECL_HB_BUFFER_FLAG_REMOVE_DEFAULT_IGNORABLES \
-                      -DHAVE_HB_BUFFER_SET_INVISIBLE_GLYPH \
-                      -DHAVE_HB_FT_FONT_CREATE_REFERENCED \
-                      -DHAVE_HB_FT_FONT_SET_LOAD_FLAGS \
-                      -std=c99
-include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
@@ -171,12 +147,31 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
+# SheenBidi
+LOCAL_MODULE       := sheenbidi
+LOCAL_PATH         := .
+LOCAL_CPP_FEATURES += rtti
+LOCAL_SRC_FILES    := $(wildcard ../lib/sheenbidi/Source/*.c)
+LOCAL_CFLAGS       := -I../lib/sheenbidi/Headers
+include $(BUILD_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
+# tinygettext
+LOCAL_MODULE       := tinygettext
+LOCAL_PATH         := .
+LOCAL_CPP_FEATURES += rtti exceptions
+LOCAL_SRC_FILES    := $(wildcard ../lib/tinygettext/src/*.cpp)
+LOCAL_CFLAGS       := -I../lib/tinygettext/include -DDISABLE_ICONV
+include $(BUILD_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
 # Irrlicht
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
-LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)         \
-                      ../lib/irrlicht/source/Irrlicht/stk_android_native_app_glue.c
+LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
                       -I../src                           \
@@ -184,6 +179,7 @@ LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -Iobj/libpng/                      \
                       -Iobj/zlib/                        \
                       -I../lib/sdl2/include/             \
+                      -DMOBILE_STK                       \
                       -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
 LOCAL_CPPFLAGS     := -std=gnu++0x
 LOCAL_STATIC_LIBRARIES := libjpeg png zlib
@@ -245,10 +241,10 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../src/*.cpp)     \
                       $(wildcard ../src/*/*.cpp)   \
                       $(wildcard ../src/*/*/*.cpp)
-LOCAL_LDLIBS       := -llog -landroid -lEGL -lGLESv1_CM -lGLESv3 -lOpenSLES -ldl -lm
+LOCAL_LDLIBS       := -llog -landroid -lGLESv1_CM -lGLESv3 -lOpenSLES -ldl -lm
 LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/bullet/src               \
-                      -I../lib/libraqm                  \
+                      -I../lib/sheenbidi/Headers        \
                       -I../lib/enet/include             \
                       -I../lib/ifaddrs                  \
                       -I../lib/irrlicht/include         \
@@ -256,9 +252,9 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/graphics_utils           \
                       -I../lib/mcpp                     \
                       -I../lib/sdl2/include             \
+                      -I../lib/tinygettext/include      \
                       -I../src                          \
                       -Iobj/curl/include                \
-                      -Iobj/fribidi/include             \
                       -Iobj/freetype/include            \
                       -Iobj/harfbuzz/include            \
                       -Iobj/libogg/include              \
@@ -271,6 +267,7 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -DENABLE_IPV6    \
                       -DENABLE_CRYPTO_OPENSSL           \
                       -DNDEBUG         \
+                      -DDISABLE_ICONV  \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
                       -DANDROID_APP_DIR_NAME=\"$(APP_DIR_NAME)\"    \
                       -DSUPERTUXKART_VERSION=\"$(PROJECT_VERSION)\" \
@@ -279,7 +276,8 @@ LOCAL_CPPFLAGS     := -std=gnu++0x
 
 LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript mcpp SDL2 \
                           vorbisfile vorbis ogg openal curl libssl libcrypto \
-                          c++_static raqm fribidi harfbuzz freetype graphics_utils
+                          c++_static sheenbidi harfbuzz freetype \
+                          tinygettext graphics_utils
 
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)

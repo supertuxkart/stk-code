@@ -70,7 +70,7 @@ namespace GUIEngine
         bool m_accept_events;
         
         EventPropagation onGUIEvent(const irr::SEvent& event);
-        EventPropagation onWidgetActivated(Widget* w, const int playerID);
+        EventPropagation onWidgetActivated(Widget* w, const int playerID, Input::InputType type);
         void sendNavigationEvent(const NavigationDirection nav, const int playerID);
         void navigate(const NavigationDirection nav, const int playerID);
 

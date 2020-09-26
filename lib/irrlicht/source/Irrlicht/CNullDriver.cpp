@@ -58,6 +58,9 @@ IImageLoader* createImageLoaderPPM();
 //! creates a loader which is able to load rgb images
 IImageLoader* createImageLoaderRGB();
 
+//! creates a loader which is able to load svg images
+IImageLoader* createImageLoaderSVG();
+
 
 //! creates a writer which is able to save bmp images
 IImageWriter* createImageWriterBMP();
@@ -131,6 +134,8 @@ CNullDriver::CNullDriver(io::IFileSystem* io, const core::dimension2d<u32>& scre
 #ifdef _IRR_COMPILE_WITH_BMP_LOADER_
 	SurfaceLoader.push_back(video::createImageLoaderBMP());
 #endif
+SurfaceLoader.push_back(video::createImageLoaderSVG());
+
 #ifdef _IRR_COMPILE_WITH_JPG_WRITER_
 	SurfaceWriter.push_back(video::createImageWriterJPG());
 #endif
@@ -1298,6 +1303,8 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file, video::IImageLoade
 				*loader = SurfaceLoader[i];
 				return 0;
 			}
+			// pass screen size to ImageLoaderSVG. For other formats (BMP,JPG,PNG), setScreenSize() does nothing
+			SurfaceLoader[i]->setScreenSize(getCurrentRenderTargetSize());
 			// reset file position which might have changed due to previous loadImage calls
 			file->seek(0);
 			image = SurfaceLoader[i]->loadImage(file);
@@ -1318,6 +1325,8 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file, video::IImageLoade
 				*loader = SurfaceLoader[i];
 				return 0;
 			}
+			// pass screen size to ImageLoaderSVG. For other formats (BMP,JPG,PNG), setScreenSize() does nothing
+			SurfaceLoader[i]->setScreenSize(getCurrentRenderTargetSize());
 			file->seek(0);
 			image = SurfaceLoader[i]->loadImage(file);
 			if (image)

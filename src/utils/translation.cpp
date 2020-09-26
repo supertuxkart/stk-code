@@ -45,12 +45,8 @@
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
-#ifdef ANDROID
-#include "main_android.hpp"
-#endif
-
-#ifdef IOS_STK
-#include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceiOS.h"
+#ifdef MOBILE_STK
+#include "SDL_locale.h"
 #endif
 
 // set to 1 to debug i18n
@@ -65,6 +61,9 @@ Translations* translations = NULL;
 #endif
 
 #ifndef SERVER_ONLY
+#include "tinygettext/file_system.hpp"
+#include "tinygettext/log.hpp"
+
 std::map<std::string, std::string> Translations::m_localized_name;
 std::map<std::string, std::map<std::string, irr::core::stringw> >
     Translations::m_localized_country_codes;
@@ -80,7 +79,6 @@ constexpr bool isThaiCP(char32_t c)
 // ============================================================================
 
 const bool REMOVE_BOM = false;
-using namespace tinygettext;
 /** The list of available languages; this is global so that it is cached (and remains
     even if the translations object is deleted and re-created) */
 typedef std::vector<std::string> LanguageList;
@@ -99,17 +97,45 @@ const LanguageList* Translations::getLanguageList() const
 Translations::Translations() //: m_dictionary_manager("UTF-16")
 {
 #ifndef SERVER_ONLY
+    class StkFileSystem : public tinygettext::FileSystem
+    {
+    public:
+    std::vector<std::string> open_directory(const std::string& pathname)
+    {
+        std::set<std::string> result;
+        file_manager->listFiles(result, pathname);
+        std::vector<std::string> files;
+        for(const std::string& file : result)
+            files.push_back(file);
+        return files;
+    }
+    std::unique_ptr<std::istream> open_file(const std::string& filename)
+    {
+        return std::unique_ptr<std::istream>(new std::ifstream(
+          FileUtils::getPortableReadingPath(filename)));
+    }
+    };
+    // Hide log info because it warns about untranslated message
+    tinygettext::Log::set_log_info_callback([](const std::string& str) {});
+    tinygettext::Log::set_log_warning_callback([](const std::string& str)
+        { Log::warn("tinygettext", "%s", str.c_str()); });
+    tinygettext::Log::set_log_error_callback([](const std::string& str)
+        { Log::error("tinygettext", "%s", str.c_str()); });
+
+    m_dictionary_manager.set_filesystem(std::unique_ptr<tinygettext::FileSystem>(
+        new StkFileSystem()));
+
     m_dictionary_manager.add_directory(
                         file_manager->getAsset(FileManager::TRANSLATION,""));
 
     if (g_language_list.size() == 0)
     {
-        std::set<Language> languages = m_dictionary_manager.get_languages();      
+        std::set<tinygettext::Language> languages = m_dictionary_manager.get_languages();
 
         // English is always there but may be not found on file system
         g_language_list.push_back("en");
 
-        for (const Language& language : languages)
+        for (const tinygettext::Language& language : languages)
         {
             if (language.str() == "en")
                 continue;
@@ -167,7 +193,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     if (m_localized_country_codes.empty())
     {
-        const std::string file_name = file_manager->getAsset("country_names.csv");
+        const std::string file_name = file_manager->getAsset("country_names.tsv");
         try
         {
             std::ifstream in(FileUtils::getPortableReadingPath(file_name));
@@ -182,7 +208,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 std::string line;
                 while (!StringUtils::safeGetline(in, line).eof())
                 {
-                    std::vector<std::string> lists = StringUtils::split(line, ';');
+                    std::vector<std::string> lists = StringUtils::split(line, '\t');
                     if (lists.size() < 2)
                     {
                         Log::error("translation", "Invaild list.");
@@ -325,13 +351,36 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             language = p_lang;
         else
         {
-#ifdef IOS_STK
-            language = irr::CIrrDeviceiOS::getSystemLanguageCode();
-            if (language.find("zh-Hans") != std::string::npos)
-                language = "zh_CN";
-            else if (language.find("zh-Hant") != std::string::npos)
-                language = "zh_TW";
-            language = StringUtils::findAndReplace(language, "-", "_");
+#ifdef MOBILE_STK
+            SDL_Locale* locale = SDL_GetPreferredLocales();
+            if (locale)
+            {
+                // First locale only
+                for (int l = 0; locale[l].language != NULL; l++)
+                {
+                    language = locale[l].language;
+                    // Convert deprecated language code
+                    if (language == "iw")
+                        language = "he";
+                    else if (language == "in")
+                        language = "id";
+                    else if (language == "ji")
+                        language = "yi";
+                    if (locale[l].country != NULL)
+                    {
+                        language += "-";
+                        language += locale[l].country;
+                    }
+                    // iOS specific
+                    if (language.find("zh-Hans") != std::string::npos)
+                        language = "zh_CN";
+                    else if (language.find("zh-Hant") != std::string::npos)
+                        language = "zh_TW";
+                    language = StringUtils::findAndReplace(language, "-", "_");
+                    break;
+                }
+                SDL_free(locale);
+            }
 #elif defined(WIN32)
             // Thanks to the frogatto developer for this code snippet:
             char c[1024];
@@ -348,29 +397,6 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                              "GetLocaleInfo tryname returns '%s'.", c);
                 if(c[0]) language += std::string("_")+c;
             }   // if c[0]
-            
-#elif defined(ANDROID)
-            if (global_android_app)
-            {
-                char p_language[3] = {};
-                AConfiguration_getLanguage(global_android_app->config, 
-                                           p_language);
-                std::string s_language(p_language);
-                if (!s_language.empty())
-                {
-                    language += s_language;
-
-                    char p_country[3] = {};
-                    AConfiguration_getCountry(global_android_app->config, 
-                                              p_country);
-                    std::string s_country(p_country);
-                    if (!s_country.empty())
-                    {
-                        language += "_";
-                        language += s_country;
-                    }
-                }
-            }
 #endif
         }   // neither LANGUAGE nor LANG defined
 
@@ -397,16 +423,16 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         if (language.find(":") != std::string::npos)
         {
             std::vector<std::string> langs = StringUtils::split(language, ':');
-            Language l;
+            tinygettext::Language l;
 
             for (unsigned int curr=0; curr<langs.size(); curr++)
             {
-                l = Language::from_env(langs[curr]);
+                l = tinygettext::Language::from_env(langs[curr]);
                 if (l)
                 {
                     Log::verbose("translation", "Language '%s'.",
                                  l.get_name().c_str());
-                    m_dictionary = m_dictionary_manager.get_dictionary(l);
+                    m_dictionary = &m_dictionary_manager.get_dictionary(l);
                     break;
                 }
             }
@@ -422,12 +448,12 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             }
             if (!l)
             {
-                m_dictionary = m_dictionary_manager.get_dictionary();
+                m_dictionary = &m_dictionary_manager.get_dictionary();
             }
         }
         else
         {
-            const Language& tgtLang = Language::from_env(language);
+            const tinygettext::Language& tgtLang = tinygettext::Language::from_env(language);
             if (!tgtLang)
             {
                 Log::warn("Translation", "Unsupported language '%s'", language.c_str());
@@ -435,7 +461,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 m_current_language_name = "Default language";
                 m_current_language_name_code = "en";
                 m_current_language_tag = "en";
-                m_dictionary = m_dictionary_manager.get_dictionary();
+                m_dictionary = &m_dictionary_manager.get_dictionary();
             }
             else
             {
@@ -449,7 +475,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                     m_current_language_tag += tgtLang.get_country();
                 }
                 Log::verbose("translation", "Language '%s'.", m_current_language_name.c_str());
-                m_dictionary = m_dictionary_manager.get_dictionary(tgtLang);
+                m_dictionary = &m_dictionary_manager.get_dictionary(tgtLang);
             }
         }
     }
@@ -458,7 +484,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         m_current_language_name = "Default language";
         m_current_language_name_code = "en";
         m_current_language_tag = m_current_language_name_code;
-        m_dictionary = m_dictionary_manager.get_dictionary();
+        m_dictionary = &m_dictionary_manager.get_dictionary();
     }
 
 #endif
@@ -501,8 +527,8 @@ irr::core::stringw Translations::w_gettext(const char* original, const char* con
 #endif
 
     const std::string& original_t = (context == NULL ?
-                                     m_dictionary.translate(original) :
-                                     m_dictionary.translate_ctxt(context, original));
+                                     m_dictionary->translate(original) :
+                                     m_dictionary->translate_ctxt(context, original));
     // print
     //for (int n=0;; n+=4)
     const irr::core::stringw wide = StringUtils::utf8ToWide(original_t);
@@ -549,8 +575,8 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
 #else
 
     const std::string& res = (context == NULL ?
-                              m_dictionary.translate_plural(singular, plural, num) :
-                              m_dictionary.translate_ctxt_plural(context, singular, plural, num));
+                              m_dictionary->translate_plural(singular, plural, num) :
+                              m_dictionary->translate_ctxt_plural(context, singular, plural, num));
 
     const irr::core::stringw wide = StringUtils::utf8ToWide(res);
     const wchar_t* out_ptr = wide.c_str();
@@ -567,9 +593,9 @@ irr::core::stringw Translations::w_ngettext(const char* singular, const char* pl
 
 // ----------------------------------------------------------------------------
 #ifndef SERVER_ONLY
-std::set<wchar_t> Translations::getCurrentAllChar()
+std::set<unsigned int> Translations::getCurrentAllChar()
 {
-    return m_dictionary.get_all_used_chars();
+    return m_dictionary->get_all_used_chars();
 }   // getCurrentAllChar
 
 // ----------------------------------------------------------------------------

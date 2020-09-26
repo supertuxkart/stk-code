@@ -79,6 +79,7 @@ public:
     int get(const std::string &attribute, uint16_t *value) const;
     int get(const std::string &attribute, uint32_t *value) const;
     int get(const std::string &attribute, int64_t  *value) const;
+    int get(const std::string &attribute, uint64_t  *value) const;
     int get(const std::string &attribute, float *value) const;
     int get(const std::string &attribute, double *value) const;
     int get(const std::string &attribute, bool *value) const;

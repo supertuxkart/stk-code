@@ -39,18 +39,6 @@ public:
 #else
 	virtual const c8* getTextFromClipboard() const = 0;
 #endif
-
-	//! Get the processor speed in megahertz
-	/** \param MHz The integer variable to store the speed in.
-	\return True if successful, false if not */
-	virtual bool getProcessorSpeedMHz(u32* MHz) const = 0;
-
-	//! Get the total and available system RAM
-	/** \param Total: will contain the total system memory
-	\param Avail: will contain the available memory
-	\return True if successful, false if not */
-	virtual bool getSystemMemory(u32* Total, u32* Avail) const = 0;
-
 };
 
 } // end namespace

@@ -40,7 +40,7 @@ class ConnectToServer : public Protocol
 private:
     std::shared_ptr<Server> m_server;
 
-    irr::core::stringw m_quick_play_err_msg;
+    irr::core::stringw m_error_msg;
 
     /** State for finite state machine. */
     enum ConnectState : unsigned int

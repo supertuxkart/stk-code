@@ -60,7 +60,7 @@ namespace GUIEngine
 
         float m_percent_width, m_percent_height;
         bool m_init;
-
+        bool m_was_resizable;
     protected:
         irr::gui::IGUIWindow* m_irrlicht_window;
         irr::core::rect< irr::s32 > m_area;

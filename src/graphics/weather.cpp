@@ -74,7 +74,8 @@ void Weather::update(float dt)
     {
         startLightning();
 
-        if (m_thunder_sound)
+        if (m_thunder_sound &&
+            World::getWorld()->getPhase() != WorldStatus::IN_GAME_MENU_PHASE)
         {
             m_thunder_sound->play();
         }

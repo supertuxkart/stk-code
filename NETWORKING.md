@@ -12,6 +12,8 @@ You are required to have an stk online account first, go [here](https://online.s
 
 It is recommended you have a saved user in your computer to allow hosting multiple servers simultaneously with the same account, if you have a fresh STK installation, first run:
 
+If you intend to keep your server always on (24x7) you are required to implement port forward / direct connection with NAT penetration in your network, we will regularly remove any servers not following this rule.
+
 `supertuxkart --init-user --login=your_registered_name --password=your_password`
 
 After that you should see `Done saving user, leaving` in terminal if it successfully logged in.
@@ -81,7 +83,7 @@ The current server configuration xml looks like this:
     <!-- Disable it to turn off all stun related code in server, it allows for saving of server resources if your server is not behind a firewall. -->
     <firewalled-server value="true" />
 
-    <!-- Enable to allow IPv6 connection if you have a public IPv6 address. STK currently uses dual-stack mode which requires server to have both IPv4 and IPv6 and listen to same port. If STK detects your server has no public IPv6 address or port differs between IPv4 and IPv6 then it will use IPv4 only socket. For system which doesn't support dual-stack socket (like OpenBSD) you may fail to be connected by IPv4 clients. -->
+    <!-- Enable to allow IPv6 connection if you have a public IPv6 address. STK currently uses dual-stack mode which requires server to have both IPv4 and IPv6 and listen to same port. If STK detects your server has no public IPv6 address or port differs between IPv4 and IPv6 then it will use IPv4 only socket. For system which doesn't support dual-stack socket (like OpenBSD) you may fail to be connected by IPv4 clients. You can override the detection in config.xml at supertuxkart config-0.10 folder, with default-ip-type option. -->
     <ipv6-connection value="true" />
 
     <!-- No server owner in lobby which can control the starting of game or kick any players. -->
@@ -102,7 +104,7 @@ The current server configuration xml looks like this:
     <!-- Automatically end linear race game after 1st player finished for some time (currently his finished time * 0.25 + 15.0). -->
     <auto-end value="false" />
 
-    <!-- Enable team choosing in lobby in team game (soccer and CTF). If owner-less is enabled and live-players is not enabled, than this option is always disabled. -->
+    <!-- Enable team choosing in lobby in team game (soccer and CTF). If owner-less is enabled and live-spectate is not enabled, than this option is always disabled. -->
     <team-choosing value="true" />
 
     <!-- If strict-players is on, no duplicated online id or split screen players are allowed, which can prevent someone using more than 1 network AI with this server. -->
@@ -114,8 +116,8 @@ The current server configuration xml looks like this:
     <!-- If true, the server owner can config the difficulty and game mode in the GUI of lobby. This option cannot be used with owner-less or grand prix server, and will be automatically turned on if the server was created using the in-game GUI. The changed difficulty and game mode will not be saved in this config file. -->
     <server-configurable value="false" />
 
-    <!-- If true, players can live join or spectate the in-progress game. Currently live joining is only available if the current game mode used in server is FFA, CTF or soccer, also no addon karts will be available for players to choose, and official-karts-threshold will be made 1.0. -->
-    <live-players value="true" />
+    <!-- If true, players can live join or spectate the in-progress game. Currently live joining is only available if the current game mode used in server is FFA, CTF or soccer, also official-karts-threshold will be made 1.0. If false addon karts will use their original hitbox other than tux, all players having it restriction applies. -->
+    <live-spectate value="true" />
 
     <!-- Time in seconds when a flag is dropped a by player in CTF returning to its own base. -->
     <flag-return-timeout value="20" />
@@ -138,10 +140,10 @@ The current server configuration xml looks like this:
     <!-- Value used by server to automatically estimate each game time. For races, it decides the lap of each race in network game, if more than 0.0f, the number of lap of each track vote in linear race will be determined by max(1.0f, auto-game-time-ratio * default lap of that track). For soccer if more than 0.0f, for time limit game it will be auto-game-time-ratio * soccer-time-limit in UserConfig, for goal limit game it will be auto-game-time-ratio * numgoals in UserConfig, -1 to disable for all. -->
     <auto-game-time-ratio value="-1" />
 
-    <!-- Maximum ping allowed for a player (in ms), it's recommended to use default value if live-players is on. -->
+    <!-- Maximum ping allowed for a player (in ms), it's recommended to use default value if live-spectate is on. -->
     <max-ping value="300" />
 
-    <!-- Tolerance of jitter in network allowed (in ms), it's recommended to use default value if live-players is on. -->
+    <!-- Tolerance of jitter in network allowed (in ms), it's recommended to use default value if live-spectate is on. -->
     <jitter-tolerance value="100" />
 
     <!-- Kick players whose ping is above max-ping. -->
@@ -189,6 +191,9 @@ The current server configuration xml looks like this:
     <!-- If true this server will auto add / remove AI connected with network-ai=x, which will kick N - 1 bot(s) where N is the number of human players. Only use this for non-GP racing server. -->
     <ai-handling value="false" />
 
+    <!-- If true this server will allow AI instance to be connected from anywhere. (other than LAN network only) -->
+    <ai-anywhere value="false" />
+
 </server-config>
 
 ```
@@ -207,7 +212,9 @@ Everything is basically the same as WAN one, except you don't need an stk online
 
 `supertuxkart --server-config=your_config.xml --lan-server=your_server_name --network-console`
 
-In LAN network it is required that the server and server discovery port is connectable by clients directly, no NAT penetration will be done in LAN.
+For LAN server it is required that the server and server discovery port is connectable by clients directly, no NAT penetration will be done in LAN.
+
+LAN server can be connected too by typing your server public address (with port) in ```Enter server address``` dialog without relying on stk-addons.
 
 ------
 After the first time configuration, you can just start the server with the command:

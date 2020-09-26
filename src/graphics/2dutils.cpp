@@ -285,8 +285,7 @@ void draw2DImage(const video::ITexture* texture,
         const core::dimension2d<u32>& render_target_size =
                            irr_driver->getActualScreenSize();
         glScissor(clip_rect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
 
@@ -397,8 +396,7 @@ void draw2DImage(const video::ITexture* texture,
         const core::dimension2d<u32>& render_target_size =
                             irr_driver->getActualScreenSize();
         glScissor(clip_rect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  (s32)render_target_size.Height - clip_rect->LowerRightCorner.Y,
                   clip_rect->getWidth(), clip_rect->getHeight());
     }
     if (colors)
@@ -449,8 +447,7 @@ void draw2DImageCustomAlpha(const irr::video::ITexture* texture,
         const core::dimension2d<u32>& render_target_size =
                             irr_driver->getActualScreenSize();
         glScissor(clipRect->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clipRect->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  (s32)render_target_size.Height - clipRect->LowerRightCorner.Y,
                   clipRect->getWidth(), clipRect->getHeight());
     }
 
@@ -562,8 +559,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
         const core::dimension2d<u32>& render_target_size = 
                                             irr_driver->getActualScreenSize();
         glScissor(clip->UpperLeftCorner.X,
-                  (s32)render_target_size.Height - clip->LowerRightCorner.Y +
-                  irr_driver->getDevice()->getMovedHeight(),
+                  (s32)render_target_size.Height - clip->LowerRightCorner.Y,
                   clip->getWidth(), clip->getHeight());
     }
 

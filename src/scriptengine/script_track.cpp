@@ -179,6 +179,15 @@ namespace Scripting
         {
             return RaceManager::get()->getReverseTrack();
         }
+        
+        /**
+          * Gets the difficulty setting for this race.
+          * @return A Difficulty enum as defined in race_manager.hpp, implicitly casted to an int
+          */
+        int getDifficulty()
+        {
+            return RaceManager::get()->getDifficulty();
+        }
 
         int getMajorRaceMode()
         {
@@ -570,6 +579,10 @@ namespace Scripting
                                                
             r = engine->RegisterGlobalFunction("bool isReverse()", 
                                                mp ? WRAP_FN(isTrackReverse) : asFUNCTION(isTrackReverse), 
+                                               call_conv); assert(r >= 0);
+            
+            r = engine->RegisterGlobalFunction("int getDifficulty()", 
+                                               mp ? WRAP_FN(getDifficulty) : asFUNCTION(getDifficulty), 
                                                call_conv); assert(r >= 0);
                                                
             r = engine->RegisterGlobalFunction("int getMajorRaceMode()", 

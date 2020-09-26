@@ -19,7 +19,7 @@
 #include "network/rewind_manager.hpp"
 
 #include "graphics/irr_driver.hpp"
-#include "modes/world.hpp"
+#include "modes/soccer_world.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/game_protocol.hpp"
@@ -30,6 +30,7 @@
 #include "race/history.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
@@ -82,6 +83,7 @@ RewindManager::~RewindManager()
  */
 void RewindManager::reset()
 {
+    m_schedule_reset_network_body = false;
     m_is_rewinding = false;
     m_not_rewound_ticks.store(0);
     m_overall_state_size = 0;
@@ -423,15 +425,24 @@ void RewindManager::mergeRewindInfoEventFunction()
 /** Reset all smooth network body of rewinders so the rubber band effect of
  *  moveable does not exist during firstly live join.
  */
-void RewindManager::resetSmoothNetworkBody()
+void RewindManager::handleResetSmoothNetworkBody()
 {
-    for (auto& p : m_all_rewinder)
+    if (m_schedule_reset_network_body)
     {
-        if (auto r = p.second.lock())
+        m_schedule_reset_network_body = false;
+        for (auto& p : m_all_rewinder)
         {
-            auto snb = std::dynamic_pointer_cast<SmoothNetworkBody>(r);
-            if (snb)
-                snb->reset();
+            if (auto r = p.second.lock())
+            {
+                auto snb = std::dynamic_pointer_cast<SmoothNetworkBody>(r);
+                if (snb)
+                    snb->reset();
+            }
         }
+        // Make sure soccer ball is enabled after resuming
+        // This happens when paused during goal
+        SoccerWorld* sw = dynamic_cast<SoccerWorld*>(World::getWorld());
+        if (sw)
+            sw->getBall()->setEnabled(true);
     }
-}   // resetSmoothNetworkBody
+}   // handleResetSmoothNetworkBody

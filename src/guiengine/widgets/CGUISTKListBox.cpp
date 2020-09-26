@@ -59,6 +59,7 @@ CGUISTKListBox::CGUISTKListBox(IGUIEnvironment* environment, IGUIElement* parent
     setTabOrder(-1);
 
     updateAbsolutePosition();
+    m_deactivated = false;
 }
 
 
@@ -298,6 +299,8 @@ bool CGUISTKListBox::OnEvent(const SEvent& event)
                 if (Selected<0)
                     Selected = 0;
 
+                if (m_deactivated)
+                    Selected = -1;
                 recalculateScrollPos();
 
                 // post the news
@@ -427,7 +430,7 @@ void CGUISTKListBox::selectNew(s32 ypos, bool onlyHover)
     s32 oldSelected = Selected;
 
     Selected = getItemAt(AbsoluteRect.UpperLeftCorner.X, ypos);
-    if (Selected == -1 || Items.empty())
+    if (Selected == -1 || Items.empty() || m_deactivated)
     {
         Selected = -1;
         return;

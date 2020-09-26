@@ -34,7 +34,6 @@ Engine: power, maxSpeed, genericMaxSpeed, brakeFactor, brakeTimeIncrease, maxSpe
 Gear: switchRatio(std::vector<float>/floatVector), powerIncrease(std::vector<float>/floatVector)
 Mass
 Wheels: dampingRelaxation, dampingCompression
-Camera: distance, forwardUpAngle, forwardSmoothing(bool), backwardUpAngle
 Jump: animationTime
 Lean: max, speed
 Anvil: duration, weight, speedFactor

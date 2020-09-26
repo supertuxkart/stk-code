@@ -467,7 +467,9 @@ void PowerupManager::loadPowerup(PowerupType type, const XMLNode &node)
 
     m_all_icons[type] = material_manager->getMaterial(icon_file,
                                   /* full_path */     true,
-                                  /*make_permanent */ true);
+                                  /*make_permanent */ true,
+                                  /*complain_if_not_found*/ true,
+                                  /*strip_path*/ false);
 
 
     assert(m_all_icons[type] != NULL);

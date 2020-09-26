@@ -191,7 +191,8 @@ namespace ServerConfig
         "has no public IPv6 address or port differs between IPv4 and IPv6 "
         "then it will use IPv4 only socket. For system which doesn't support "
         "dual-stack socket (like OpenBSD) you may fail to be connected by "
-        "IPv4 clients."));
+        "IPv4 clients. You can override the detection in config.xml at "
+        "supertuxkart config-0.10 folder, with default-ip-type option."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_owner_less
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "owner-less",
@@ -234,7 +235,7 @@ namespace ServerConfig
     SERVER_CFG_PREFIX BoolServerConfigParam m_team_choosing
         SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "team-choosing",
         "Enable team choosing in lobby in team game (soccer and CTF). "
-        "If owner-less is enabled and live-players is not enabled, than this "
+        "If owner-less is enabled and live-spectate is not enabled, than this "
         "option is always disabled."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_strict_players
@@ -259,12 +260,12 @@ namespace ServerConfig
         "mode will not be saved in this config file."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_live_players
-        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "live-players",
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(true, "live-spectate",
         "If true, players can live join or spectate the in-progress game. "
         "Currently live joining is only available if the current game mode "
-        "used in server is FFA, CTF or soccer, also no addon karts will be "
-        "available for players to choose, and official-karts-threshold will "
-        "be made 1.0."));
+        "used in server is FFA, CTF or soccer, also official-karts-threshold "
+        "will be made 1.0. If false addon karts will use their original "
+        "hitbox other than tux, all players having it restriction applies."));
 
     SERVER_CFG_PREFIX FloatServerConfigParam m_flag_return_timeout
         SERVER_CFG_DEFAULT(FloatServerConfigParam(20.0f, "flag-return-timeout",
@@ -308,12 +309,12 @@ namespace ServerConfig
     SERVER_CFG_PREFIX IntServerConfigParam m_max_ping
         SERVER_CFG_DEFAULT(IntServerConfigParam(300, "max-ping",
         "Maximum ping allowed for a player (in ms), it's recommended to use "
-        "default value if live-players is on."));
+        "default value if live-spectate is on."));
 
     SERVER_CFG_PREFIX IntServerConfigParam m_jitter_tolerance
         SERVER_CFG_DEFAULT(IntServerConfigParam(100, "jitter-tolerance",
         "Tolerance of jitter in network allowed (in ms), it's recommended to "
-        "use default value if live-players is on."));
+        "use default value if live-spectate is on."));
 
     SERVER_CFG_PREFIX BoolServerConfigParam m_kick_high_ping_players
         SERVER_CFG_DEFAULT(BoolServerConfigParam(false,
@@ -429,6 +430,11 @@ namespace ServerConfig
         "If true this server will auto add / remove AI connected with "
         "network-ai=x, which will kick N - 1 bot(s) where N is the number "
         "of human players. Only use this for non-GP racing server."));
+
+    SERVER_CFG_PREFIX BoolServerConfigParam m_ai_anywhere
+        SERVER_CFG_DEFAULT(BoolServerConfigParam(false, "ai-anywhere",
+        "If true this server will allow AI instance to be connected from "
+        "anywhere. (other than LAN network only)"));
 
     // ========================================================================
     /** Server version, will be advanced if there are protocol changes. */

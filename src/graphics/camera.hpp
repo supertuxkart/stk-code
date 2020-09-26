@@ -116,8 +116,6 @@ private:
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
 
-    void setupCamera();
-
 protected:
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
@@ -230,6 +228,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returs the absolute position of the camera. */
     Vec3 getXYZ() { return Vec3(m_camera->getPosition()); }
+    // ------------------------------------------------------------------------
+    void setupCamera();
 };   // class Camera
 
 #endif

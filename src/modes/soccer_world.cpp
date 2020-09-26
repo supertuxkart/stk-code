@@ -43,6 +43,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track_sector.hpp"
 #include "utils/constants.hpp"
+#include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
 #include <IMeshSceneNode.h>
@@ -510,12 +511,26 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             m_karts[m_ball_hitter]->getKartModel()
                 ->setAnimation(KartModel::AF_WIN_START, true/* play_non_loop*/);
         }
-
         else if (!sd.m_correct_goal)
         {
             m_karts[m_ball_hitter]->getKartModel()
                 ->setAnimation(KartModel::AF_LOSE_START, true/* play_non_loop*/);
         }
+
+#ifndef SERVER_ONLY
+        // show a message once a goal is made
+        core::stringw msg;
+        if (sd.m_correct_goal)
+            msg = _("%s scored a goal!", sd.m_player);
+        else
+            msg = _("Oops, %s made an own goal!", sd.m_player);
+        if (m_race_gui)
+        {
+            m_race_gui->addMessage(msg, NULL, 3.0f,
+                video::SColor(255, 255, 0, 255), /*important*/true,
+                /*big_font*/false, /*outline*/true);
+        }
+#endif
 
         if (first_goal)
         {
@@ -629,6 +644,24 @@ void SoccerWorld::handlePlayerGoalFromServer(const NetworkString& ns)
             "%d when goal", ticks_back_to_own_goal, ticks_now);
         return;
     }
+
+    // show a message once a goal is made
+    core::stringw msg;
+    if (sd.m_correct_goal)
+        msg = _("%s scored a goal!", sd.m_player);
+    else
+        msg = _("Oops, %s made an own goal!", sd.m_player);
+    float time = stk_config->ticks2Time(ticks_back_to_own_goal - ticks_now);
+    // May happen if this message is added when spectate started
+    if (time > 3.0f)
+        time = 3.0f;
+    if (m_race_gui && !isStartPhase())
+    {
+        m_race_gui->addMessage(msg, NULL, time,
+            video::SColor(255, 255, 0, 255), /*important*/true,
+            /*big_font*/false, /*outline*/true);
+    }
+
     m_ticks_back_to_own_goal = ticks_back_to_own_goal;
     for (unsigned i = 0; i < m_karts.size(); i++)
     {

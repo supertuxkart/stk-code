@@ -74,6 +74,7 @@ using namespace Online;
 
 MainMenuScreen::MainMenuScreen() : Screen("main_menu.stkgui")
 {
+    m_resizable = true;
 }   // MainMenuScreen
 
 // ----------------------------------------------------------------------------
@@ -120,6 +121,7 @@ void MainMenuScreen::beforeAddingWidget()
 //
 void MainMenuScreen::init()
 {
+    GUIEngine::getDevice()->setResizable(true);
     Screen::init();
 
     m_user_id = getWidget<ButtonWidget>("user-id");
@@ -488,12 +490,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "quit")
     {
-#ifdef ANDROID
-        GUIEngine::EventHandler::get()->setAcceptEvents(false);
-        ANativeActivity_finish(global_android_app->activity);
-#else
         StateManager::get()->popMenu();
-#endif
         return;
     }
     else if (selection == "about")
@@ -603,6 +600,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
 void MainMenuScreen::tearDown()
 {
+    GUIEngine::getDevice()->setResizable(false);
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -636,11 +634,5 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 
 bool MainMenuScreen::onEscapePressed()
 {
-#ifdef ANDROID
-    GUIEngine::EventHandler::get()->setAcceptEvents(false);
-    ANativeActivity_finish(global_android_app->activity);
-    return false;
-#endif
-
     return true;
 }   // onEscapePressed

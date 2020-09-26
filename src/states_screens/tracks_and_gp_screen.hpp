@@ -19,6 +19,7 @@
 #define HEADER_TRACKS_AND_GP_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include <deque>
 
 namespace GUIEngine { class Widget; }
@@ -28,11 +29,13 @@ namespace GUIEngine { class Widget; }
   * \ingroup states_screens
   */
 class TracksAndGPScreen : public GUIEngine::Screen,
-                          public GUIEngine::ScreenSingleton<TracksAndGPScreen>
+                          public GUIEngine::ScreenSingleton<TracksAndGPScreen>,
+                          public GUIEngine::ITextBoxWidgetListener
 {
     friend class GUIEngine::ScreenSingleton<TracksAndGPScreen>;
 
 private:
+    GUIEngine::TextBoxWidget* m_search_box;
 
     TracksAndGPScreen() : Screen("tracks_and_gp.stkgui") {}
 
@@ -57,6 +60,13 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void beforeAddingWidget() OVERRIDE;
 
+    /** Rebuild the list of tracks based on search text */
+    virtual void onTextUpdated() OVERRIDE
+    {
+        buildTrackList();
+        // After buildTrackList the m_search_box may be unfocused
+        m_search_box->focused(0);
+    }
 
     void setFocusOnTrack(const std::string& trackName);
     void setFocusOnGP(const std::string& gpName);

@@ -20,7 +20,10 @@
 #include "challenges/story_mode_timer.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "font/bold_face.hpp"
+#include "font/digit_face.hpp"
 #include "font/font_manager.hpp"
+#include "font/regular_face.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/camera.hpp"
@@ -35,6 +38,7 @@
 #include "graphics/per_camera_node.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/rtts.hpp"
 #include "graphics/shader.hpp"
 #include "graphics/shader_based_renderer.hpp"
 #include "graphics/shader_files_manager.hpp"
@@ -46,6 +50,7 @@
 #include "graphics/sp/sp_mesh_node.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
+#include "graphics/stk_text_billboard.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/stk_texture.hpp"
 #include "graphics/sun.hpp"
@@ -54,6 +59,8 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
+#include "guiengine/screen_keyboard.hpp"
+#include "guiengine/skin.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
 #include "items/powerup_manager.hpp"
@@ -161,9 +168,7 @@ IrrDriver::IrrDriver()
     p.SwapInterval  = 0;
     p.EventReceiver = NULL;
     p.FileSystem    = file_manager->getFileSystem();
-#ifdef ANDROID
-    p.PrivateData   = (void*)global_android_app;
-#endif
+    p.PrivateData   = NULL;
 
     m_device = createDeviceEx(p);
 
@@ -341,14 +346,13 @@ void IrrDriver::createListOfVideoModes()
         {
             const int w = modes->getVideoModeResolution(i).Width;
             const int h = modes->getVideoModeResolution(i).Height;
-#ifndef IOS_STK
-            // IOS returns the nativebounds in non uniform size
+#ifndef MOBILE_STK
+            // Mobile STK reports only 1 desktop (phone) resolution at native scale
             if ((h < MIN_SUPPORTED_HEIGHT || w < MIN_SUPPORTED_WIDTH) &&
                 (!(h==600 && w==800 && UserConfigParams::m_artist_debug_mode) &&
                 (!(h==720 && w==1280 && ALLOW_1280_X_720 == true))))
                 continue;
 #endif
-
             VideoMode mode(w, h);
             m_modes.push_back( mode );
         }   // if depth >=24
@@ -459,9 +463,7 @@ void IrrDriver::initDevice()
             else
                 params.DriverType    = video::EDT_OPENGL;
 
-#if defined(ANDROID)
-            params.PrivateData = (void*)global_android_app;
-#endif
+            params.PrivateData   = NULL;
             params.Stencilbuffer = false;
             params.Bits          = bits;
             params.EventReceiver = this;
@@ -474,6 +476,15 @@ void IrrDriver::initDevice()
             params.HandleSRGB    = false;
             params.ShadersPath   = (file_manager->getShadersDir() +
                                                            "irrlicht/").c_str();
+            // Set window to remembered position
+            if (  !UserConfigParams::m_fullscreen
+                && UserConfigParams::m_remember_window_location
+                && UserConfigParams::m_window_x >= 0
+                && UserConfigParams::m_window_y >= 0            )
+            {
+                params.WindowPosition.X = UserConfigParams::m_window_x;
+                params.WindowPosition.Y = UserConfigParams::m_window_y;
+            }
 
             /*
             switch ((int)UserConfigParams::m_antialiasing)
@@ -590,8 +601,13 @@ void IrrDriver::initDevice()
 
 #ifdef ENABLE_RECORDER
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,
-        [] (void* user_data) { MessageQueue::add
-        (MessageQueue::MT_GENERIC, _("Video recording started.")); }, NULL);
+        [] (void* user_data)
+        {
+            // Make sure reset progress bar each time
+            MessageQueue::showProgressBar(-1, L"");
+            MessageQueue::add
+            (MessageQueue::MT_GENERIC, _("Video recording started."));
+        }, NULL);
     ogrRegStringCallback(OGR_CBT_ERROR_RECORDING,
         [](const char* s, void* user_data)
         { Log::error("openglrecorder", "%s", s); }, NULL);
@@ -706,16 +722,6 @@ void IrrDriver::initDevice()
         // does not set the 'enable mipmap' flag.
         m_scene_manager->getParameters()
             ->setAttribute(scene::B3D_LOADER_IGNORE_MIPMAP_FLAG, true);
-
-        // Set window to remembered position
-        if (  !UserConfigParams::m_fullscreen
-            && UserConfigParams::m_remember_window_location
-            && UserConfigParams::m_window_x >= 0
-            && UserConfigParams::m_window_y >= 0            )
-        {
-            moveWindow(UserConfigParams::m_window_x,
-                       UserConfigParams::m_window_y);
-        } // If reinstating window location
     } // If showing graphics
 
     // Initialize material2D
@@ -744,34 +750,6 @@ void IrrDriver::initDevice()
 
     if (GUIEngine::isNoGraphics())
         return;
-
-    m_device->registerGetMovedHeightFunction([]
-        (const IrrlichtDevice* device)->int
-        {
-            int screen_keyboard_height =
-                device->getOnScreenKeyboardHeight();
-            int screen_height = device->getScreenHeight();
-            if (screen_keyboard_height == 0 || screen_height == 0)
-                return 0;
-
-            GUIEngine::Widget* w = GUIEngine::getFocusForPlayer(0);
-            if (!w)
-                return 0;
-
-            core::rect<s32> pos =
-                w->getIrrlichtElement()->getAbsolutePosition();
-            // Add 10% margin
-            int element_height = (int)device->getScreenHeight() -
-                pos.LowerRightCorner.Y - int(screen_height * 0.01f);
-            if (element_height > screen_keyboard_height)
-                return 0;
-            else if (element_height < 0)
-            {
-                // For buttons near the edge of the bottom of screen
-                return screen_keyboard_height;
-            }
-            return screen_keyboard_height - element_height;
-        });
 }   // initDevice
 
 // ----------------------------------------------------------------------------
@@ -1021,15 +999,20 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
 
     font_manager = new FontManager();
     font_manager->loadFonts();
+
+    input_manager = new InputManager();
+    input_manager->setMode(InputManager::MENU);
+    // Input manager set first so it recieves SDL joystick event
     // Re-init GUI engine
     GUIEngine::init(m_device, m_video_driver, StateManager::get());
+    // If not recreate device we need to add the previous joystick manually
+    if (!recreate_device)
+        input_manager->addJoystick();
 
     setMaxTextureSize();
     //material_manager->reInit();
     material_manager = new MaterialManager();
     material_manager->loadMaterial();
-    input_manager = new InputManager ();
-    input_manager->setMode(InputManager::MENU);
     powerup_manager = new PowerupManager();
     attachment_manager = new AttachmentManager();
 
@@ -1972,6 +1955,41 @@ void IrrDriver::doScreenShot()
 }   // doScreenShot
 
 // ----------------------------------------------------------------------------
+void IrrDriver::handleWindowResize()
+{
+    bool dialog_exists = GUIEngine::ModalDialog::isADialogActive() ||
+            GUIEngine::ScreenKeyboard::isActive();
+
+    // This will allow main menu auto resize if missed a resize event
+    core::dimension2du current_screen_size =
+        m_video_driver->getCurrentRenderTargetSize();
+    GUIEngine::Screen* screen = GUIEngine::getCurrentScreen();
+    if (screen && screen->isResizable())
+    {
+        current_screen_size.Width = screen->getWidth();
+        current_screen_size.Height = screen->getHeight();
+    }
+
+    if (m_actual_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
+        current_screen_size != m_video_driver->getCurrentRenderTargetSize())
+    {
+        // Don't update when dialog is opened
+        if (dialog_exists)
+            return;
+
+        m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
+        UserConfigParams::m_width = m_actual_screen_size.Width;
+        UserConfigParams::m_height = m_actual_screen_size.Height;
+        resizeWindow();
+    }
+    // In case reset by opening options in game
+    if (!dialog_exists &&
+        StateManager::get()->getGameState() == GUIEngine::GAME &&
+        !m_device->isResizable())
+        m_device->setResizable(true);
+}   // handleWindowResize
+
+// ----------------------------------------------------------------------------
 /** Update, called once per frame.
  *  \param dt Time since last update
  *  \param is_loading True if the rendering is called during loading of world,
@@ -1979,17 +1997,22 @@ void IrrDriver::doScreenShot()
  */
 void IrrDriver::update(float dt, bool is_loading)
 {
+    bool show_dialog_yes = m_resolution_changing == RES_CHANGE_YES;
+    bool show_dialog_warn = m_resolution_changing == RES_CHANGE_YES_WARN;
     // If the resolution should be switched, do it now. This will delete the
     // old device and create a new one.
     if (m_resolution_changing!=RES_CHANGE_NONE)
     {
         applyResolutionSettings(m_resolution_changing != RES_CHANGE_SAME);
-        if(m_resolution_changing==RES_CHANGE_YES)
-            new ConfirmResolutionDialog(false);
-        else if(m_resolution_changing==RES_CHANGE_YES_WARN)
-            new ConfirmResolutionDialog(true);
         m_resolution_changing = RES_CHANGE_NONE;
     }
+
+    handleWindowResize();
+
+    if (show_dialog_yes)
+        new ConfirmResolutionDialog(false);
+    else if (show_dialog_warn)
+        new ConfirmResolutionDialog(true);
 
     m_wind->update();
 
@@ -2002,7 +2025,6 @@ void IrrDriver::update(float dt, bool is_loading)
 #endif
     World *world = World::getWorld();
 
-    int moved_height = irr_driver->getDevice()->getMovedHeight();
     if (world)
     {
 #ifndef SERVER_ONLY
@@ -2011,11 +2033,7 @@ void IrrDriver::update(float dt, bool is_loading)
         GUIEngine::Screen* current_screen = GUIEngine::getCurrentScreen();
         if (current_screen != NULL && current_screen->needs3D())
         {
-            glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
-                irr_driver->getActualScreenSize().Height);
             GUIEngine::render(dt, is_loading);
-            glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-                irr_driver->getActualScreenSize().Height);
         }
 
         if (!is_loading && Physics::get())
@@ -2034,15 +2052,11 @@ void IrrDriver::update(float dt, bool is_loading)
         m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
-        glViewport(0, moved_height, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
         GUIEngine::render(dt, is_loading);
         if (m_render_nw_debug && !is_loading)
         {
             renderNetworkDebug();
         }
-        glViewport(0, 0, irr_driver->getActualScreenSize().Width,
-            irr_driver->getActualScreenSize().Height);
         m_video_driver->endScene();
 #endif
     }
@@ -2288,5 +2302,53 @@ void IrrDriver::resetDebugModes()
     m_boundingboxesviz = false;
 #ifndef SERVER_ONLY
     SP::sp_debug_view = false;
+#endif
+}
+
+// ----------------------------------------------------------------------------
+void IrrDriver::resizeWindow()
+{
+#ifndef SERVER_ONLY
+    // Reload fonts
+    font_manager->getFont<BoldFace>()->init();
+    font_manager->getFont<DigitFace>()->init();
+    font_manager->getFont<RegularFace>()->init();
+    // Reload GUIEngine
+    GUIEngine::reloadForNewSize();
+    if (World::getWorld())
+    {
+        for(unsigned int i=0; i<Camera::getNumCameras(); i++)
+            Camera::getCamera(i)->setupCamera();
+        ShaderBasedRenderer* sbr = dynamic_cast<ShaderBasedRenderer*>(m_renderer);
+        if (sbr)
+        {
+            delete sbr->getRTTs();
+            // This will recreate the RTTs
+            sbr->onLoadWorld();
+        }
+        STKTextBillboard::updateAllTextBillboards();
+        World::getWorld()->getRaceGUI()->recreateGUI();
+    }
+
+#ifdef ENABLE_RECORDER
+    ogrDestroy();
+    RecorderConfig cfg;
+    cfg.m_triple_buffering = 1;
+    cfg.m_record_audio = 1;
+    cfg.m_width = m_actual_screen_size.Width;
+    cfg.m_height = m_actual_screen_size.Height;
+    int vf = UserConfigParams::m_video_format;
+    cfg.m_video_format = (VideoFormat)vf;
+    cfg.m_audio_format = OGR_AF_VORBIS;
+    cfg.m_audio_bitrate = UserConfigParams::m_audio_bitrate;
+    cfg.m_video_bitrate = UserConfigParams::m_video_bitrate;
+    cfg.m_record_fps = UserConfigParams::m_record_fps;
+    cfg.m_record_jpg_quality = UserConfigParams::m_recorder_jpg_quality;
+    if (ogrInitConfig(&cfg) == 0)
+    {
+        Log::error("irr_driver",
+            "RecorderConfig is invalid, use the default one.");
+    }
+#endif
 #endif
 }

@@ -55,6 +55,7 @@ private:
     video::ITexture* m_gui_action_tex;
     video::ITexture* m_up_tex;
     video::ITexture* m_down_tex;
+    video::ITexture* m_screen_tex;
 
     void init();
     void createRaceGUI();

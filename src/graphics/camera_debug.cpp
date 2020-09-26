@@ -20,11 +20,11 @@
 #include "graphics/camera_debug.hpp"
 
 #include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_model.hpp"
-#include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
 
@@ -55,8 +55,6 @@ CameraDebug::~CameraDebug()
 void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
                                     float *sideway, float *distance    )
 {
-    const KartProperties *kp = getKart()->getKartProperties();
-
     // Set some default values
     float steering = m_kart->getSteerPercent()
                    * (1.0f + (m_kart->getSkidding()->getSkidFactor()
@@ -78,7 +76,7 @@ void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
     case CM_DEBUG_SIDE_OF_KART:
     case CM_DEBUG_TOP_OF_KART:
         *above_kart    = 0.75f;
-        *cam_angle     = kp->getCameraForwardUpAngle() * DEGREE_TO_RAD;
+        *cam_angle     = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
         *distance      = -m_distance;
         break;
     }   // switch 

@@ -167,6 +167,10 @@ void TracksAndGPScreen::init()
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
+    m_search_box = getWidget<TextBoxWidget>("search");
+    m_search_box->clearListeners();
+    m_search_box->addListener(this);
+
     // Reset GP list everytime (accounts for locking changes, etc.)
     gps_widget->clearItems();
     gps_widget->setMaxLabelLength(30);
@@ -254,6 +258,11 @@ void TracksAndGPScreen::buildTrackList()
         Track* curr = track_manager->getTrack(n);
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
             && !curr->hasEasterEggs())
+            continue;
+        core::stringw search_text = m_search_box->getText();
+        search_text.make_lower();
+        if (!search_text.empty() &&
+            curr->getName().make_lower().find(search_text.c_str()) == -1)
             continue;
         if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
         if (curr_group_name != ALL_TRACK_GROUPS_ID &&

@@ -75,6 +75,8 @@ void OptionsScreenInput::loadedFromFile()
     // scale icons depending on font height
     const float scale = GUIEngine::getFontHeight() / 72.0f;
     m_icon_bank->setScale(scale);
+    m_icon_bank->setTargetIconSize(128, 128);
+    m_gamepad_count = 0;
 }   // loadFromFile
 
 // -----------------------------------------------------------------------------
@@ -99,34 +101,25 @@ void OptionsScreenInput::buildDeviceList()
         kbname << "keyboard" << i;
         const std::string internal_name = kbname.str();
         
-        if (config->isGamePadAndroid())
+        const int icon = (config->isEnabled() ? 0 : 1);
+
+        //Display the configName instead of default name if it exists
+        if (!config->getConfigName().empty())
         {
             // since irrLicht's list widget has the nasty tendency to put the
             // icons very close to the text, I'm adding spaces to compensate.
-            devices->addItem(internal_name, (core::stringw("   ") + 
-                             _("Gamepad")).c_str(), 2 /* icon */);
+            devices->addItem(internal_name, (core::stringw("   ") +
+                config->getConfigName()), icon);
         }
         else
         {
-            const int icon = (config->isEnabled() ? 0 : 1);
-
-            //Display the configName instead of default name if it exists
-            if (!config->getConfigName().empty())
-            {
-                // since irrLicht's list widget has the nasty tendency to put the
-                // icons very close to the text, I'm adding spaces to compensate.
-                devices->addItem(internal_name, (core::stringw("   ") + 
-                    config->getConfigName()), icon);
-            }
-            else
-            {
-                devices->addItem(internal_name, (core::stringw("   ") + 
-                                _("Keyboard %i", i)).c_str(), icon);   
-            }
+            devices->addItem(internal_name, (core::stringw("   ") +
+                            _("Keyboard %i", i)).c_str(), icon);
         }
     }
 
     const int gpad_config_count = device_manager->getGamePadConfigAmount();
+    m_gamepad_count = input_manager->getGamepadCount();
 
     for (int i = 0; i < gpad_config_count; i++)
     {
@@ -376,7 +369,13 @@ void OptionsScreenInput::filterInput(Input::InputType type,
 
 void OptionsScreenInput::onUpdate(float dt)
 {
-    rebuildDeviceList();
+    // Only rebuild device list when there is difference in gamepad count
+    // This allow the list to be scrolled (keyboard config can only be add or
+    // remove in new screen
+    size_t gamepad_count = input_manager->getGamepadCount();
+    if (gamepad_count != m_gamepad_count)
+        rebuildDeviceList();
+
     std::map<std::string, float>::iterator it;
     ListWidget* devices = this->getWidget<ListWidget>("devices");
     assert(devices != NULL);

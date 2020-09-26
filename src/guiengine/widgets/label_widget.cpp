@@ -35,14 +35,13 @@ using namespace irr;
 
 // ----------------------------------------------------------------------------
 
-LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
+LabelWidget::LabelWidget(LabelType type) : Widget(WTYPE_LABEL)
 {
-    m_title_font   = title;
+    m_type   = type;
     m_scroll_speed = 0;
     m_scroll_offset = 0;
-    m_bright = bright;
 
-    if (m_bright)
+    if (m_type == BRIGHT)
     {
         m_has_color = true;
         m_color = Skin::getColor("brighttext::neutral");
@@ -93,10 +92,20 @@ void LabelWidget::add()
         irrwidget->setOverrideColor(m_color);
     }
 
-    if (m_title_font)
+    if (m_type == TITLE)
     {
         irrwidget->setOverrideColor( video::SColor(255,255,255,255) );
         irrwidget->setOverrideFont( GUIEngine::getTitleFont() );
+    }
+    else if (m_type == SMALL_TITLE)
+    {
+        irrwidget->setOverrideColor( video::SColor(255,255,255,255) );
+        irrwidget->setOverrideFont( GUIEngine::getSmallTitleFont() );
+    }
+    else if (m_type == TINY_TITLE)
+    {
+        irrwidget->setOverrideColor( video::SColor(255,255,255,255) );
+        irrwidget->setOverrideFont( GUIEngine::getTinyTitleFont() );
     }
     //irrwidget->setBackgroundColor( video::SColor(255,255,0,0) );
     //irrwidget->setDrawBackground(true);
@@ -122,8 +131,15 @@ void LabelWidget::setText(const core::stringw& text, bool expandIfNeeded)
     if (expandIfNeeded)
     {
         assert(m_element != NULL);
-        const int fwidth = (m_title_font ? GUIEngine::getTitleFont() : GUIEngine::getFont())
-            ->getDimension(text.c_str()).Width;
+        int fwidth;
+        if(m_type == TITLE)
+            fwidth = GUIEngine::getTitleFont()->getDimension(text.c_str()).Width;
+        else if(m_type == SMALL_TITLE)
+            fwidth = GUIEngine::getSmallTitleFont()->getDimension(text.c_str()).Width;
+        else if(m_type == TINY_TITLE)
+            fwidth = GUIEngine::getTinyTitleFont()->getDimension(text.c_str()).Width;
+        else 
+            fwidth = GUIEngine::getFont()->getDimension(text.c_str()).Width;
         core::rect<s32> rect = m_element->getRelativePosition();
 
         if (rect.getWidth() < fwidth)
@@ -189,7 +205,7 @@ void LabelWidget::setErrorColor()
 
 void LabelWidget::setDefaultColor()
 {
-    if (m_bright)
+    if (m_type == BRIGHT)
     {
         setColor(Skin::getColor("brighttext::neutral"));
     }

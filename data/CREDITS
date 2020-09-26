@@ -62,12 +62,14 @@ Add-ons website
 
 = Additional Programming =
 
-Signifcant bug fixes & misc. contributions for 1.0 and 1.1
+Significant bug fixes & misc. contributions for 1.0 and 1.1
 - Ben Krajancic
 - QwertyChouskie
 - Dumaosen
+- Luffah
 - Mrxx99
 - Pelya
+- Riso
 
 
 = Visual art =
@@ -89,7 +91,7 @@ Karts
 - Minibjorn : Puffy
 - Cheleb : Nolok, Pidgin
 - Néd J. Édoire : Wilber, Hexley
-- Benau : Kiki
+- Typhon306 and McRavenINDo : Kiki
 
 Karts
 - Cédric Archambault : Suzanne
@@ -226,13 +228,12 @@ Software used
 Software used
 - ogg
 - vorbis
-- fribidi
+- SheenBidi
 - blender
 - wiiuse
 - harfbuzz
 
 Software used
-- libraqm
 - sqlite
 - openssl
 - mcpp
@@ -312,6 +313,11 @@ Original Tuxkart
 
 
 = Donations =
+
+Donations
+- ANTON KARMANOV, Matthew Boyd, Michal Jusyk, Nicholas Masters
+- Nicolay Chichota, S Tsekhmistro, Matias Baglivo, Don K Finney
+- Y M MOYSIADIS, TOLSTOV OLEG, Cory Rash, ARTEM BELOUSOV
 
 Donations
 - Максим Мурин, John Clark, Wing On Cheung, Jan

@@ -88,52 +88,44 @@ void OptionsScreenDevice::init()
     ButtonWidget* delete_button = getWidget<ButtonWidget>("delete");
     ButtonWidget* disable_toggle = getWidget<ButtonWidget>("disable_toggle");
 
-    if (m_config->isGamePadAndroid())
+    core::stringw label;
+
+    if (!m_config->isKeyboard())
     {
+        // Only allow to enable or disable a gamepad,
+        // as it is only in the list when connected
         delete_button->setActive(false);
-        disable_toggle->setActive(false);
+
+        label = (m_config->isEnabled()
+                ? //I18N: button to disable a gamepad configuration
+                    _("Disable Device")
+                : //I18N: button to enable a gamepad configuration
+                    _("Enable Device"));
     }
     else
     {
-        core::stringw label;
+        // Don't allow deleting or disabling the last enabled config
+        bool enable = (input_manager->getDeviceManager()
+                            ->getActiveKeyboardAmount() > 1 ||
+                        !m_config->isEnabled());
+        delete_button->setActive(enable);
+        disable_toggle->setActive(enable);
 
-        if (!m_config->isKeyboard())
-        {
-            // Only allow to enable or disable a gamepad,
-            // as it is only in the list when connected
-            delete_button->setActive(false);
-
-            label = (m_config->isEnabled()
-                    ? //I18N: button to disable a gamepad configuration
-                        _("Disable Device")
-                    : //I18N: button to enable a gamepad configuration
-                        _("Enable Device"));
-        }
-        else
-        {
-            // Don't allow deleting or disabling the last enabled config
-            bool enable = (input_manager->getDeviceManager()
-                                ->getActiveKeyboardAmount() > 1 ||
-                           !m_config->isEnabled());
-            delete_button->setActive(enable);
-            disable_toggle->setActive(enable);
-
-            label = (m_config->isEnabled()
-                    ? //I18N: button to disable a keyboard configuration
-                        _("Disable Configuration")
-                    : //I18N: button to enable a keyboard configuration
-                        _("Enable Configuration"));
-        }
-
-        // Make sure button is wide enough as the text is being changed away
-        // from the original value
-        core::dimension2d<u32> size =
-            GUIEngine::getFont()->getDimension(label.c_str());
-        const int needed = size.Width + disable_toggle->getWidthNeededAroundLabel();
-        if (disable_toggle->m_w < needed) disable_toggle->m_w = needed;
-
-        disable_toggle->setLabel(label);
+        label = (m_config->isEnabled()
+                ? //I18N: button to disable a keyboard configuration
+                    _("Disable Configuration")
+                : //I18N: button to enable a keyboard configuration
+                    _("Enable Configuration"));
     }
+
+    // Make sure button is wide enough as the text is being changed away
+    // from the original value
+    core::dimension2d<u32> size =
+        GUIEngine::getFont()->getDimension(label.c_str());
+    const int needed = size.Width + disable_toggle->getWidthNeededAroundLabel();
+    if (disable_toggle->m_w < needed) disable_toggle->m_w = needed;
+
+    disable_toggle->setLabel(label);
 
     // Make the three buttons the same length, not strictly needed but will
     // look nicer...
@@ -162,8 +154,8 @@ void OptionsScreenDevice::init()
     delete_button->moveIrrlichtElement();
     disable_toggle->moveIrrlichtElement();
 
-    LabelWidget* label = getWidget<LabelWidget>("title");
-    label->setText( m_config->getName().c_str(), false );
+    LabelWidget* label_widget = getWidget<LabelWidget>("title");
+    label_widget->setText( m_config->getName().c_str(), false );
 
     // ---- create list skeleton (right number of items, right internal names)
     //      their actualy contents will be adapted as needed after

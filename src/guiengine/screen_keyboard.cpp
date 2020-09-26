@@ -167,7 +167,12 @@ void ScreenKeyboard::init()
             y = margin;
         }
     }
-    
+#ifdef ANDROID
+    // This will allow emoji keyboard opening together with android screen
+    // keyboard
+    y += irr_driver->getDevice()->getMovedHeight();
+#endif
+
     m_area = core::rect<s32>(x, y, x + w, y + h);
 
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true);
@@ -526,18 +531,7 @@ bool ScreenKeyboard::onEscapePressed()
  */
 bool ScreenKeyboard::shouldUseScreenKeyboard()
 {
-    bool always_use_screen_keyboard =
-        UserConfigParams::m_screen_keyboard == 2;
-
-    // Enable if no hardware keyboard
-    if (UserConfigParams::m_screen_keyboard == 1)
-    {
-        if (irr_driver->getDevice()->hasHardwareKeyboard())
-            return false;
-        return true;
-    }
-
-    return always_use_screen_keyboard;
+    return UserConfigParams::m_screen_keyboard == 1;
 }
 
 // ----------------------------------------------------------------------------

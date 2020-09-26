@@ -127,6 +127,8 @@ World* World::m_world[PT_COUNT];
  */
 World::World() : WorldStatus()
 {
+    if (m_process_type == PT_MAIN)
+        GUIEngine::getDevice()->setResizable(true);
     RewindManager::setEnable(NetworkConfig::get()->isNetworking());
 #ifdef DEBUG
     m_magic_number = 0xB01D6543;
@@ -348,6 +350,8 @@ void World::reset(bool restart)
     // when the race result gui was being shown. In this case restore the
     // race gui (note that the race result gui is cached and so never really
     // destroyed).
+    bool reset_streak = restart && !m_saved_race_gui;
+
     if(m_saved_race_gui)
     {
         m_race_gui       = m_saved_race_gui;
@@ -386,7 +390,7 @@ void World::reset(bool restart)
             {
                 PlayerManager::trackEvent(RaceManager::get()->getTrackName(), AchievementsStatus::TR_EGG_HUNT_STARTED);
             }
-            if (restart)
+            if (reset_streak)
                 PlayerManager::onRaceEnd(true /* previous race aborted */);
         }
     }
@@ -602,7 +606,10 @@ Controller* World::loadAIController(AbstractKart* kart)
 World::~World()
 {
     if (m_process_type == PT_MAIN)
+    {
+        GUIEngine::getDevice()->setResizable(false);
         material_manager->unloadAllTextures();
+    }
 
     RewindManager::destroy();
 

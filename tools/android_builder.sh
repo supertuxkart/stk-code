@@ -9,11 +9,11 @@
 # STK for your own use, then use android/make.sh script instead.
 
 export BUILD_TYPE=Beta
-export PROJECT_VERSION=git20181001
-export PROJECT_CODE=48
-export STOREPASS="xxx"
-export KEYSTORE="/path/to/stk.keystore"
-export ALIAS="alias"
+export PROJECT_VERSION=git20200827
+export PROJECT_CODE=192
+export STK_STOREPASS="xxx"
+export STK_KEYSTORE="/path/to/stk.keystore"
+export STK_ALIAS="alias"
 
 
 check_error()
@@ -105,7 +105,7 @@ generate_assets()
     ASSETS_PATHS="../android-output/assets-lq/data" \
     ./generate_assets.sh
 
-    if [ ! -f "./assets/directories.txt" ]; then
+    if [ ! -f "./assets/files.txt" ]; then
         echo "Error: Couldn't generate assets"
         return
     fi
@@ -113,6 +113,8 @@ generate_assets()
     if [ -f "./assets/data/supertuxkart.git" ]; then
         mv "./assets/data/supertuxkart.git" \
            "./assets/data/supertuxkart.$PROJECT_VERSION"
+        sed -i "s/data\/supertuxkart.git/data\/supertuxkart.$PROJECT_VERSION/g" \
+           "./assets/files.txt"
     fi
 
     cd -
@@ -143,7 +145,7 @@ generate_full_assets()
     OUTPUT_PATH="assets-hq" \
     ./generate_assets.sh
 
-    if [ ! -f "./assets-hq/directories.txt" ]; then
+    if [ ! -f "./assets-hq/files.txt" ]; then
         echo "Error: Couldn't generate full assets"
         return
     fi
@@ -183,7 +185,7 @@ generate_lq_assets()
     OUTPUT_PATH="assets-lq" \
     ./generate_assets.sh
 
-    if [ ! -f "./assets-lq/directories.txt" ]; then
+    if [ ! -f "./assets-lq/files.txt" ]; then
         echo "Error: Couldn't generate lq assets"
         return
     fi
@@ -217,38 +219,28 @@ build_package()
     export COMPILE_ARCH=$ARCH1
 
     cd ./android-$ARCH1
-    ./make.sh -j5
+    ./make.sh -j $(($(nproc) + 1))
     cd -
 
-    if [ ! -f ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release-unsigned.apk ]; then
+    if [ ! -f ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release.apk ]; then
         echo "Error: Couldn't build apk for architecture $ARCH1"
         return
     fi
 
-    cp ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release-unsigned.apk \
-       ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1-unaligned.apk
+    if [ ! -f ./android-$ARCH1/build/outputs/bundle/release/android-$ARCH1.aab ]; then
+        echo "Error: Couldn't build app bundle for architecture $ARCH1"
+        return
+    fi
+
+    cp ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release.apk \
+       ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1.apk
+
+    cp ./android-$ARCH1/build/outputs/bundle/release/android-$ARCH1.aab \
+       ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1.aab
 
     cp ./android-$ARCH1/obj/local/$ARCH2/libmain.so \
        ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1-libmain.so
 
-    cd ./android-output
-
-    jarsigner -sigalg SHA1withRSA -digestalg SHA1                 \
-              -keystore "$KEYSTORE"                               \
-              -storepass "$STOREPASS"                             \
-              SuperTuxKart-$PROJECT_VERSION-$ARCH1-unaligned.apk  \
-              "$ALIAS"
-
-    check_error
-
-    zipalign -f 4 SuperTuxKart-$PROJECT_VERSION-$ARCH1-unaligned.apk \
-                  SuperTuxKart-$PROJECT_VERSION-$ARCH1.apk
-
-    check_error
-
-    rm SuperTuxKart-$PROJECT_VERSION-$ARCH1-unaligned.apk
-
-    cd -
 }
 
 

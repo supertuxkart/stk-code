@@ -84,6 +84,8 @@ public:
     /** Sets the ambient light for this camera. */
     void setAmbientLight(const video::SColor &color) { m_ambient_light=color; }
     // ------------------------------------------------------------------------
+    void setDistanceToKart(float distance) { m_distance = distance; }
+    // ------------------------------------------------------------------------
     float getDistanceToKart() const { return m_distance; }
     // ------------------------------------------------------------------------
     /** Returns the current ambient light. */

@@ -470,10 +470,10 @@ public:
 		if ( (getActivationState() == ISLAND_SLEEPING) || (getActivationState() == WANTS_DEACTIVATION))
 			return true;
 
-		//if (m_deactivationTime> gDeactivationTime)
-		//{
-		//	return true;
-		//}
+		if (m_deactivationTime> gDeactivationTime)
+		{
+			return true;
+		}
 		return false;
 	}
 

@@ -5,52 +5,70 @@
         <header id="selected_track" height="8%" width="80%"
             I18N="No neeed to translate this, it will be overwritten by the track name"
             text="" align="center" text_align="center" />
-        <spacer height="1%" />
 
-        <spacer height="2%" />
+        <spacer height="3%" />
 
         <!-- Track selection -->
         <box proportion="3" width="100%" layout="vertical-row">
             <ribbon_grid id="tracks" proportion="1" width="100%" square_items="true"
-                label_location="each" align="center" max_rows="2" child_width="160"
+                label_location="each" align="center" max_rows="3" child_width="160"
                 child_height="120"/>
         </box>
 
         <!-- Populated dynamically at runtime -->
         <tabs width="100%" height="1f" id="trackgroups"> </tabs>
 
-        <spacer height="10%" />
+        <spacer height="3%" />
 
-        <!-- Laps and reverse -->
+
         <div width="100%" height="fit" layout="horizontal-row" align="center">
+            <!-- Selected track preview picture -->
+            <spacer width="2%" />
 
-            <spacer proportion="1" />
+            <icon-button width="12%" height="100%" id="screenshot" custom_ratio="1.33333"/>
 
-            <label id="laps_label" text_align="left"
-                I18N="In the edit track screen" text="Number of laps:" />
-            <spacer width="20" />
-            <spinner id="laps" proportion="1" width="100" min_value="1"
-                max_value="99" wrap_around="false" />
+            <spacer width="3%" />
 
-            <spacer proportion="1" />
+            <div width="80%" height="fit" layout="vertical-row" align="center">
+                <!-- Laps selection and ok button -->
+                <div width="100%" height="fit" layout="horizontal-row">
 
-            <label id="reverse_label" text_align="left"
-                I18N="In the edit track screen" text="Reverse:" />
-            <spacer width="20" />
-            <checkbox id="reverse" />
+                    <spacer width="5%" />
 
-            <spacer proportion="1" />
-        </div>
+                    <div width="60%" height="fit" layout="horizontal-row">
+                        <label id="laps_label" text_align="left"
+                            I18N="In the edit track screen" text="Number of laps:" />
+                        <spacer width="0.2f" />
+                        <spinner id="laps" width="200" min_value="1"
+                            max_value="99" wrap_around="false" />
+                    </div>
 
-        <spacer height="5%" />
+                    <spacer width="10%" />
 
-        <!-- Dialog buttons -->
-        <div width="100%" height="fit" layout="horizontal-row">
-            <spacer proportion="2" />
-            <button id="ok" text="OK" proportion="1" />
-            <spacer proportion="1" />
-            <button id="cancel" text="Cancel" proportion="1" />
-            <spacer proportion="2" />
+                    <button id="ok" text="OK" width="25%" />
+                </div>
+
+                <spacer height="2%" />
+
+                <!-- Reverse selection and cancel button -->
+                <div width="100%" height="fit" layout="horizontal-row">
+
+                    <spacer width="5%" />
+
+                    <div width="60%" height="fit" layout="horizontal-row">
+                        <label id="reverse_label" text_align="left"
+                            I18N="In the edit track screen" text="Reverse:" />
+                        <spacer width="0.2f" />
+                        <checkbox id="reverse" />
+                    </div>
+
+                    <spacer width="10%" />
+
+                    <button id="cancel" text="Cancel" width="25%" />
+                </div>
+            </div>
+
+            <spacer width="3%" />
         </div>
 
         <spacer height="2%" />

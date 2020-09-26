@@ -91,27 +91,26 @@ std::shared_ptr<ServerList> ServersManager::getWANRefreshRequest() const
         std::weak_ptr<ServerList> m_server_list;
         // Run the ip detect in separate thread, so it can be done parallel
         // with the wan server request (which takes few seconds too)
-        std::thread m_ip_detect_thread;
+        uint64_t m_creation_time;
     public:
         WANRefreshRequest(std::shared_ptr<ServerList> server_list)
         : Online::XMLRequest(/*priority*/100)
         {
-            m_ip_detect_thread = std::thread(std::bind(
-                &NetworkConfig::detectIPType, NetworkConfig::get()));
+            NetworkConfig::queueIPDetection();
+            m_creation_time = StkTime::getMonoTimeMs();
             m_server_list = server_list;
-        }
-        ~WANRefreshRequest()
-        {
-            if (m_ip_detect_thread.joinable())
-                m_ip_detect_thread.join();
         }
         // --------------------------------------------------------------------
         virtual void afterOperation() OVERRIDE
         {
             Online::XMLRequest::afterOperation();
-            if (m_ip_detect_thread.joinable())
-                m_ip_detect_thread.join();
-
+            // Wait at most 2 seconds for ip detection
+            uint64_t timeout = StkTime::getMonoTimeMs() - m_creation_time;
+            if (timeout > 2000)
+                timeout = 0;
+            else
+                timeout = 2000 - timeout;
+            NetworkConfig::get()->getIPDetectionResult(timeout);
             auto server_list = m_server_list.lock();
             if (!server_list)
                 return;

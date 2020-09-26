@@ -171,6 +171,13 @@ namespace irr
             virtual void setDrawBackground(bool draw);
 
             void setAlternatingDarkness(bool val) { m_alternating_darkness = val; }
+            gui::IGUIScrollBar* getScrollBar() const { return ScrollBar; }
+            void setDisactivated(bool val)
+            {
+                m_deactivated = val;
+                if (m_deactivated)
+                    Selected = -1;
+            }
     private:
 
             void recalculateItemHeight();
@@ -199,6 +206,7 @@ namespace irr
             bool AutoScroll;
             bool HighlightWhenNotFocused;
             bool m_alternating_darkness;
+            bool m_deactivated;
     };
 
 

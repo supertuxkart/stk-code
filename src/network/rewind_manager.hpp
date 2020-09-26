@@ -115,6 +115,8 @@ private:
 
     std::vector<RewindInfoEventFunction*> m_pending_rief;
 
+    bool m_schedule_reset_network_body;
+
     RewindManager();
    ~RewindManager();
     // ------------------------------------------------------------------------
@@ -144,6 +146,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if rewinding is enabled or not. */
     static bool isEnabled() { return m_enable_rewind_manager; }
+    // ------------------------------------------------------------------------
+    static bool exists()
+    {
+        ProcessType pt = STKProcess::getType();
+        return m_rewind_manager[pt] != NULL;
+    }   // exists
     // ------------------------------------------------------------------------
     /** Returns the singleton. This function will not automatically create
      *  the singleton. */
@@ -209,7 +217,10 @@ public:
         return ticks != 0 && a >= 0 && a % m_state_frequency == 0;
     }
     // ------------------------------------------------------------------------
-    void resetSmoothNetworkBody();
+    void resetSmoothNetworkBody()     { m_schedule_reset_network_body = true; }
+    // ------------------------------------------------------------------------
+    void handleResetSmoothNetworkBody();
+
 };   // RewindManager
 
 

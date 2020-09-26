@@ -160,6 +160,12 @@
 #  include <signal.h>
 #  include <unistd.h>
 #endif
+
+#ifdef ANDROID
+#include <SDL_system.h>
+#include <jni.h>
+#endif
+
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -1394,8 +1400,13 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
                 Online::RequestManager::m_disable_polling = true;
                 // For server we assume it is an IPv4 one, because if it fails
                 // to detect the server won't start at all
-                NetworkConfig::get()->setIPType(NetworkConfig::IP_V4);
-                NetworkConfig::get()->detectIPType();
+                if (UserConfigParams::m_default_ip_type == NetworkConfig::IP_NONE)
+                {
+                    NetworkConfig::get()->setIPType(NetworkConfig::IP_V4);
+                    NetworkConfig::get()->queueIPDetection();
+                }
+                // Longer timeout for server creation
+                NetworkConfig::get()->getIPDetectionResult(4000);
                 NetworkConfig::get()->setIsWAN();
                 NetworkConfig::get()->setIsPublicServer();
                 ServerConfig::loadServerLobbyFromConfig();
@@ -1748,12 +1759,31 @@ void initRest()
     delete tmp_skin;
     GUIEngine::setSkin(NULL);
 
-    GUIEngine::init(device, driver, StateManager::get());
-
-    GUIEngine::renderLoading(true, true, false);
     input_manager = new InputManager();
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
+    // Input manager set first so it recieves SDL joystick event
+    GUIEngine::init(device, driver, StateManager::get());
+    GUIEngine::renderLoading(true, true, false);
+
+#ifdef ANDROID
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    assert(env);
+    jobject activity = (jobject)SDL_AndroidGetActivity();
+    if (activity != NULL)
+    {
+        jclass clazz = env->GetObjectClass(activity);
+        if (clazz != NULL)
+        {
+            jmethodID method_id = env->GetMethodID(clazz, "hideSplashScreen",
+                "()V");
+            if (method_id != NULL)
+                env->CallVoidMethod(activity, method_id);
+            env->DeleteLocalRef(clazz);
+        }
+        env->DeleteLocalRef(activity);
+    }
+#endif
 
     stk_config->initMusicFiles();
     // This only initialises the non-network part of the add-ons manager. The
@@ -1924,7 +1954,9 @@ void main_abort()
 #endif
 
 // ----------------------------------------------------------------------------
-#ifdef IOS_STK
+#if defined(ANDROID)
+int android_main(int argc, char *argv[])
+#elif defined(IOS_STK)
 int ios_main(int argc, char *argv[])
 #else
 int main(int argc, char *argv[])
@@ -2166,22 +2198,25 @@ int main(int argc, char *argv[])
                 }
                 Log::warn("main", "Screen size is too small!");
             }
-            
+            else
+            {
+                irr_driver->getDevice()->setWindowMinimumSize(480, 480);
+            }
             #ifdef MOBILE_STK
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_UNDEFINED)
             {
-                #ifdef ANDROID
-                int32_t touch = AConfiguration_getTouchscreen(
-                                                    global_android_app->config);
-                if (touch != ACONFIGURATION_TOUCHSCREEN_NOTOUCH)
+                bool android_tv = false;
+#ifdef ANDROID
+                // For some android tv sdl returns a touch screen device even it
+                // doesn't have
+                android_tv = SDL_IsAndroidTV();
+#endif
+                if (!android_tv && irr_driver->getDevice()->supportsTouchDevice())
                 {
-                #endif
                     InitAndroidDialog* init_android = new InitAndroidDialog(
                                                                     0.6f, 0.6f);
                     GUIEngine::DialogQueue::get()->pushDialog(init_android);
-                #ifdef ANDROID
                 }
-                #endif
             }
             #endif
 
@@ -2391,7 +2426,13 @@ int main(int argc, char *argv[])
 
     delete file_manager;
 
+#ifdef IOS_STK
+    // App store may not like this, but this can happen if player uses keyboard to quit stk
+    exit(0);
+    return 0;
+#else
     return 0 ;
+#endif
 }   // main
 
 // ============================================================================

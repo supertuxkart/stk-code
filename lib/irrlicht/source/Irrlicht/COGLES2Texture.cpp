@@ -20,7 +20,7 @@
 
 #include "irrString.h"
 
-#if !defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
+#ifndef IOS_STK
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 #include <EGL/egl.h>

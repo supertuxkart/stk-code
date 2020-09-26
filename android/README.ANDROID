@@ -127,18 +127,10 @@ Before compilation you have to set:
 
     export BUILD_TYPE=release
 
+It's also needed to set STK_STOREPASS, STK_KEYSTORE and STK_ALIAS environment
+variables, so that the apk files can be signed.
+
 and then you make standard compilation with:
 
     ./generate_assets.sh
-    ./make.sh -j5
-    
-
-The compiled apk is unsigned, so you have to sign it with your key. To sign it,
-you have to run:
-
-    jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore \
-        my-release-key.keystore SuperTuxKart-release-unsigned.apk alias_name
-        
-and then:
-
-    zipalign -v 4 SuperTuxKart-release-unsigned.apk SuperTuxKart-release.apk
+    ./make.sh -j $(($(nproc) + 1))

@@ -219,8 +219,7 @@ bool ProjectileManager::projectileIsClose(const AbstractKart * const kart,
                                          float radius)
 {
     float r2 = radius * radius;
-    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end();
-        i++)
+    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end(); i++)
     {
         if (!i->second->hasServerState())
             continue;
@@ -244,8 +243,7 @@ int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
 {
     float r2 = radius * radius;
     int projectile_count = 0;
-    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end();
-         i++)
+    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end(); i++)
     {
         if (!i->second->hasServerState())
             continue;
@@ -264,6 +262,20 @@ int ProjectileManager::getNearbyProjectileCount(const AbstractKart * const kart,
     return projectile_count;
 }   // getNearbyProjectileCount
 
+// -----------------------------------------------------------------------------
+std::vector<Vec3> ProjectileManager::getBasketballPositions()
+{
+    std::vector<Vec3> positions;
+    for (auto i = m_active_projectiles.begin(); i != m_active_projectiles.end(); i++)
+    {
+        if (!i->second->hasServerState())
+            continue;
+        if (i->second->getType() == PowerupManager::POWERUP_RUBBERBALL)
+            positions.emplace_back(i->second->getXYZ());
+    } // loop over projectiles
+
+    return positions;
+} // getBasketballPositions
 // -----------------------------------------------------------------------------
 std::string ProjectileManager::getUniqueIdentity(AbstractKart* kart,
                                                  PowerupManager::PowerupType t)

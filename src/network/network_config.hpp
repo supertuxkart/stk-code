@@ -92,6 +92,9 @@ private:
      *  AI. (usually used together with ai-handling in server config) */
     bool m_network_ai_instance;
 
+    /** When live join is disabled addon kart will use their real hitbox */
+    bool m_tux_hitbox_addon;
+
     /** No. of fixed AI in all-in-one graphical client server, the player
      *  connecting with 127.* or ::1/128 will be in charged of controlling the
      *  AI. */
@@ -146,11 +149,17 @@ public:
         return m_network_config[type];
     }   // get
     // ------------------------------------------------------------------------
+    static void clearDetectIPThread(bool quit_stk);
+    // ------------------------------------------------------------------------
+    static void queueIPDetection();
+    // ------------------------------------------------------------------------
     static void destroy()
     {
         ProcessType type = STKProcess::getType();
         delete m_network_config[type];   // It's ok to delete NULL
         m_network_config[type] = NULL;
+        if (type == PT_MAIN)
+            clearDetectIPThread(true/*quit_stk*/);
     }   // destroy
     // ------------------------------------------------------------------------
     static void clear()
@@ -289,7 +298,7 @@ public:
     const std::set<std::string>& getServerCapabilities() const
                                               { return m_server_capabilities; }
     // ------------------------------------------------------------------------
-    void detectIPType();
+    void getIPDetectionResult(uint64_t timeout);
     // ------------------------------------------------------------------------
     IPType getIPType() const                       { return m_ip_type.load(); }
     // ------------------------------------------------------------------------
@@ -308,6 +317,10 @@ public:
     // ------------------------------------------------------------------------
     static const std::vector<std::pair<std::string, int> >&
                                                         getStunList(bool ipv4);
+    // ------------------------------------------------------------------------
+    void setTuxHitboxAddon(bool val)              { m_tux_hitbox_addon = val; }
+    // ------------------------------------------------------------------------
+    bool useTuxHitboxAddon() const               { return m_tux_hitbox_addon; }
 };   // class NetworkConfig
 
 #endif // HEADER_NETWORK_CONFIG

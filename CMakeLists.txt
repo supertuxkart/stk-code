@@ -44,7 +44,6 @@ CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
 
 if(APPLE AND NOT IOS)
     list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)
-    include_directories(/usr/local/opt/fribidi/include/)
     include_directories(/usr/local/opt/openssl@1.1/include/)
     include_directories(/usr/local/opt/openssl@1.1/include/openssl/)
     include_directories(/usr/local/opt/freetype/include/freetype2/)
@@ -59,8 +58,6 @@ if (IOS)
 endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
-    option(ENABLE_WAYLAND_DEVICE "Enable Wayland device for linux build" ON)
-    
     if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
        (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
         option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
@@ -179,14 +176,12 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-if(WIN32)
+if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD")
     set(LIBRESOLV_LIBRARY)
+elseif (HAIKU)
+    find_library(LIBRESOLV_LIBRARY NAMES network socket)
 else()
-    if (NOT CMAKE_SYSTEM_NAME MATCHES "BSD")
-        find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
-    else()
-        set(LIBRESOLV_LIBRARY)
-    endif()
+   find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
 endif()
 
 # Find system ENet library or build it if missing
@@ -266,6 +261,8 @@ endif()
 if(NOT SERVER_ONLY)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
     include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/tinygettext")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/tinygettext/include")
 endif()
 
 # Libmcpp
@@ -319,7 +316,7 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
 # of the added include directory.
 if(USE_WIIUSE)
     # Find system WiiUse library or build it if missing
-    if((UNIX AND NOT APPLE) AND USE_SYSTEM_WIIUSE)
+    if((UNIX AND NOT (APPLE OR HAIKU)) AND USE_SYSTEM_WIIUSE)
         find_package(WiiUse)
     endif()
 
@@ -358,7 +355,7 @@ if(USE_SYSTEM_ANGELSCRIPT)
     endif()
 else()
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-    include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+    include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/angelscript/include")
     set(Angelscript_LIBRARIES angelscript)
 endif()
 
@@ -374,8 +371,13 @@ if(NOT SERVER_ONLY)
     add_definitions(-DENABLE_SOUND)
 endif()
 
-# Text handling in STK (We use freetype, harfbuzz, fribidi and libraqm for i18n text handling)
+# Text handling in STK (We use freetype, harfbuzz and SheenBidifor i18n text handling)
 if (NOT SERVER_ONLY)
+    # SheenBidi
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/sheenbidi")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/sheenbidi/Headers")
+    SET(SHEENBIDI_LIBRARY sheenbidi)
+
     # Freetype
     find_package(Freetype)
     if(FREETYPE_FOUND)
@@ -394,28 +396,6 @@ if (NOT SERVER_ONLY)
     else()
         include_directories("${HARFBUZZ_INCLUDEDIR}")
         MESSAGE(STATUS "Use system harfbuzz: ${HARFBUZZ_LIBRARY}")
-    endif()
-
-    # Fribidi
-    find_package(Fribidi)
-    if(FRIBIDI_FOUND)
-        include_directories(${FRIBIDI_INCLUDE_DIRS})
-    else()
-        message(FATAL_ERROR "Fribidi not found. "
-            "Fribidi is required to display characters in SuperTuxKart.")
-    endif()
-
-    # Libraqm
-    find_library(RAQM_LIBRARY NAMES raqm libraqm)
-    find_path(RAQM_INCLUDEDIR NAMES raqm.h PATHS)
-    if (NOT RAQM_LIBRARY OR NOT RAQM_INCLUDEDIR)
-        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/libraqm")
-        include_directories("${PROJECT_SOURCE_DIR}/lib/libraqm")
-        SET(RAQM_LIBRARY raqm)
-        message(STATUS "System libraqm not found, use the bundled one.")
-    else()
-        include_directories("${RAQM_INCLUDEDIR}")
-        MESSAGE(STATUS "Use system libraqm: ${RAQM_LIBRARY}")
     endif()
 endif()
 
@@ -637,7 +617,7 @@ target_link_libraries(supertuxkart
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
     ${LIBRESOLV_LIBRARY}
-    mcpp
+    ${MCPP_LIBRARY}
     )
 
 if (USE_SQLITE3)
@@ -664,12 +644,12 @@ if(NOT SERVER_ONLY)
         ${JPEG_LIBRARIES}
         ${OGGVORBIS_LIBRARIES}
         ${OPENAL_LIBRARY}
-        ${RAQM_LIBRARY}
-        ${FRIBIDI_LIBRARIES}
         ${FREETYPE_LIBRARIES}
         ${HARFBUZZ_LIBRARY}
         ${SDL2_LIBRARY}
-        graphics_utils)
+        ${SHEENBIDI_LIBRARY}
+        graphics_utils
+        tinygettext)
 endif()
 
 if(UNIX AND NOT APPLE)
@@ -792,9 +772,15 @@ if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
 install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
+install(FILES data/supertuxkart_16.png DESTINATION share/icons/hicolor/16x16/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_48.png DESTINATION share/icons/hicolor/48x48/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_64.png DESTINATION share/icons/hicolor/64x64/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/apps RENAME supertuxkart.png)
-install(FILES data/supertuxkart_48.png DESTINATION share/pixmaps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_256.png DESTINATION share/icons/hicolor/256x256/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_512.png DESTINATION share/icons/hicolor/512x512/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_1024.png DESTINATION share/icons/hicolor/1024x1024/apps RENAME supertuxkart.png)
+install(FILES data/supertuxkart_512.png DESTINATION share/pixmaps RENAME supertuxkart.png)
 install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
 
 if(MINGW)

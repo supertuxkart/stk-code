@@ -40,6 +40,7 @@ class PostProcessing;
 class ShaderBasedRenderer: public AbstractRenderer
 {
 private:
+    bool                        m_dump_rtt;
     RTT                        *m_rtts;
     Skybox                     *m_skybox;
     SphericalHarmonics         *m_spherical_harmonics;
@@ -112,6 +113,7 @@ public:
     RTT* getRTTs() { return m_rtts; }
     ShadowMatrices* getShadowMatrices() { return &m_shadow_matrices; }
     PostProcessing* getPostProcessing() { return m_post_processing.get(); }
+    void dumpRTT() { m_dump_rtt = true; }
     void createPostProcessing() OVERRIDE;
 
 };

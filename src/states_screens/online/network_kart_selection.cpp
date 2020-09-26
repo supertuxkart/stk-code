@@ -196,3 +196,14 @@ void NetworkKartSelectionScreen::updateProgressBarText()
         m_timer->setText(message);
     }
 }   // updateProgressBarText
+
+// ----------------------------------------------------------------------------
+bool NetworkKartSelectionScreen::isIgnored(const std::string& ident) const
+{
+    // Online addon kart use tux for hitbox in server so we can allow any
+    // addon kart graphically, if live join is disabled
+    if (NetworkConfig::get()->useTuxHitboxAddon() &&
+        ident.find("addon_") != std::string::npos)
+        return false;
+    return m_available_karts.find(ident) == m_available_karts.end();
+}   // isIgnored

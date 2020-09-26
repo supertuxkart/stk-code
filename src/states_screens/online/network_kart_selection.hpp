@@ -60,8 +60,7 @@ private:
     std::set<std::string> m_available_karts;
 
     // ------------------------------------------------------------------------
-    virtual bool isIgnored(const std::string& ident) const OVERRIDE
-           { return m_available_karts.find(ident) == m_available_karts.end(); }
+    virtual bool isIgnored(const std::string& ident) const OVERRIDE;
     // ------------------------------------------------------------------------
     void updateProgressBarText();
     // ------------------------------------------------------------------------

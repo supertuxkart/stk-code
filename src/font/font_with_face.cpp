@@ -82,6 +82,7 @@ FontWithFace::~FontWithFace()
  */
 void FontWithFace::init()
 {
+    m_glyph_max_height = 0;
     setDPI();
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())

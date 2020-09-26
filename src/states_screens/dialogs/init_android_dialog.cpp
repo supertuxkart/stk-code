@@ -97,6 +97,7 @@ void InitAndroidDialog::beforeAddingWidgets()
     }
 
     updateValues();
+    getWidget("close")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
 
 // -----------------------------------------------------------------------------
