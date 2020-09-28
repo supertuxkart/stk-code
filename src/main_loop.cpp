@@ -296,10 +296,8 @@ float MainLoop::getLimitedDt()
 #else
         const int max_fps = (irr_driver->isRecording() &&
                              UserConfigParams::m_limit_game_fps )
-                          ? UserConfigParams::m_record_fps 
-                          : ( StateManager::get()->throttleFPS() 
-                              ? 60 
-                              : UserConfigParams::m_max_fps     );
+                           ? UserConfigParams::m_record_fps 
+                           : UserConfigParams::m_max_fps;
 #endif
         const int current_fps = (int)(1000.0f / dt);
         if (!m_throttle_fps || current_fps <= max_fps ||

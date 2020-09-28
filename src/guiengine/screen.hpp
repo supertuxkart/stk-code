@@ -99,8 +99,6 @@ protected:
         /** True if this screen is resizable
          */
         bool m_resizable;
-
-        bool m_throttle_FPS;
     private:
         /** True if the race (if it is running) should be paused when this
          *  screen is shown. The RaceResultGUI uses this to leave the race
@@ -164,8 +162,6 @@ protected:
 
         /** \return whether this screen is currently loaded */
         bool isLoaded() const { return m_loaded; }
-
-        bool throttleFPS() const { return m_throttle_FPS; }
 
         void addWidgets();
 
@@ -350,7 +346,6 @@ protected:
         CutsceneScreen(const char* name) : Screen(name, false)
         {
             setNeeds3D(true);
-            m_throttle_FPS = false;
         }
 
         virtual void onCutsceneEnd() = 0;

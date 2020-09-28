@@ -153,23 +153,6 @@ void StateManager::resetActivePlayers()
 
 // ----------------------------------------------------------------------------
 
-#if 0
-#pragma mark -
-#pragma mark misc stuff
-#endif
-
-bool StateManager::throttleFPS()
-{
-#ifndef SERVER_ONLY
-    return m_game_mode != GUIEngine::GAME && GUIEngine::getCurrentScreen() &&
-        GUIEngine::getCurrentScreen()->throttleFPS();
-#else
-    return true;
-#endif
-}   // throttleFPS
-
-// ----------------------------------------------------------------------------
-
 void StateManager::escapePressed()
 {
     // in input sensing mode

@@ -54,7 +54,6 @@ Screen::Screen(const char* file, bool pause_race)
     m_magic_number   = 0xCAFEC001;
 
     m_filename       = file;
-    m_throttle_FPS   = true;
     m_render_3d      = false;
     m_loaded         = false;
     m_pause_race     = pause_race;

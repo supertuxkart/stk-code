@@ -188,13 +188,6 @@ public:
     unsigned int activePlayerCount();
     void resetActivePlayers();
 
-    /** \return whether to reduce FPS at the moment
-      * \note   this can be useful to avoid being too CPU/GPU intensive in
-      *         parts of the game that don't require high framerates, like
-      *         menus
-      */
-    bool throttleFPS();
-
     /** \brief implementing callback from base class AbstractStateManager */
     void escapePressed();
 
