@@ -148,6 +148,7 @@ RescueAnimation::~RescueAnimation()
 {
     m_kart->getBody()->setLinearVelocity(btVector3(0, 0, 0));
     m_kart->getBody()->setAngularVelocity(btVector3(0, 0, 0));
+    m_kart->setInvulnerableTicks(stk_config->time2Ticks(2));
     if (m_referee && m_kart->getNode())
     {
         m_kart->getNode()->removeChild(m_referee->getSceneNode());
