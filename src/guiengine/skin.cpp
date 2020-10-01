@@ -2897,7 +2897,8 @@ std::string Skin::getThemedIcon(const std::string& relative_path) const
     {
         std::string relative_path2 = path_no_extension + s;
         if (!SkinConfig::m_icon_theme ||
-            relative_path2.find("gui/icons/") == std::string::npos)
+            (relative_path2.find("karts/") == std::string::npos &&
+             relative_path2.find("gui/icons/") == std::string::npos))
         {
             std::string tmp_path = file_manager->getAsset(relative_path2);
             if (file_manager->fileExists(tmp_path))

@@ -265,7 +265,16 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // addShared makes sure that these textures/material infos stay in memory
     material_manager->addSharedMaterial(materials_file);
 
-    m_icon_file = m_root+m_icon_file;
+    // load the kart icon file
+    if(Addon::isAddon(filename))
+    {   // load the icon directly if addon karts
+        m_icon_file = m_root+m_icon_file;
+    }
+    else
+    {   // check the skin folder for icons first if official karts
+        m_icon_file = GUIEngine::getSkin()->getThemedIcon(std::string("karts/")
+                                                          +m_ident+"/"+m_icon_file);
+    }
 
     // Make permanent is important, since otherwise icons can get deleted
     // (e.g. when freeing temp. materials from a track, the last icon
@@ -277,8 +286,17 @@ void KartProperties::load(const std::string &filename, const std::string &node)
                                                     /*strip_path*/false);
     if (m_minimap_icon_file!="")
     {
-        m_minimap_icon = STKTexManager::getInstance()
-            ->getTexture(m_root+m_minimap_icon_file);
+        // check if there is an icon in the skin folder first
+        if(Addon::isAddon(filename))
+        {
+            m_minimap_icon_file = m_root+m_minimap_icon_file;
+        }
+        else
+        {
+            m_minimap_icon_file = GUIEngine::getSkin()->getThemedIcon(std::string("karts/")
+                                                                      +m_ident+"/"+m_minimap_icon_file);
+        }
+        m_minimap_icon = STKTexManager::getInstance()->getTexture(m_minimap_icon_file);
     }
     else
         m_minimap_icon = NULL;
