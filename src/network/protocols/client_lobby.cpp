@@ -823,7 +823,11 @@ void ClientLobby::updatePlayerList(Event* event)
         {
             lp.m_user_name = _("%s (handicapped)", lp.m_user_name);
         }
-        lp.m_kart_team = (KartTeam)data.getUInt8();
+        KartTeam team = (KartTeam)data.getUInt8();
+        if (is_spectator)
+            lp.m_kart_team = KART_TEAM_NONE;
+        else
+            lp.m_kart_team = team;
         // No handicap for AI peer
         if (!ai && lp.m_host_id == STKHost::get()->getMyHostId())
         {
