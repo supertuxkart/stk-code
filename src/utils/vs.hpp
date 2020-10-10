@@ -44,7 +44,7 @@
 #  include <pthread.h>
 #endif
 
-#if defined(__FreeBSD__)
+#if defined(__FreeBSD__) || defined(__DragonFly__)
 #  include <pthread.h>
 #  include <pthread_np.h>
 #endif
@@ -98,7 +98,7 @@ namespace VS
 #if __GLIBC__ > 2 || __GLIBC_MINOR__ > 11
         pthread_setname_np(pthread_self(), name);
 #endif
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
         pthread_set_name_np(pthread_self(), name);
 #elif defined(__NetBSD__)
         pthread_setname_np(pthread_self(), "%s", const_cast<char *>(name));

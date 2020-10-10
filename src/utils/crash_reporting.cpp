@@ -346,7 +346,7 @@
     #include <mach-o/dyld.h>
     #endif
 
-    #if defined(__FreeBSD__)
+    #if defined(__FreeBSD__) || defined(__DragonFly__)
     #include <sys/sysctl.h>
     #endif
 
@@ -432,7 +432,7 @@
                 return;
             }
             path[len] = 0;
-#elif defined(__FreeBSD__)
+#elif defined(__FreeBSD__) || defined(__DragonFly__)
             int mib[4] = {CTL_KERN, KERN_PROC, KERN_PROC_PATHNAME, -1};
             size_t len = PATH_MAX;
             path = (char*)malloc(PATH_MAX+1);

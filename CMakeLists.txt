@@ -176,12 +176,12 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD")
+if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD" OR CMAKE_SYSTEM_NAME MATCHES "DragonFly")
     set(LIBRESOLV_LIBRARY)
 elseif (HAIKU)
     find_library(LIBRESOLV_LIBRARY NAMES network socket)
 else()
-   find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
+    find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
 endif()
 
 # Find system ENet library or build it if missing
