@@ -68,7 +68,7 @@ Camera* Camera::createCamera(AbstractKart* kart, const int index)
 // ----------------------------------------------------------------------------
 /** Creates a camera of the specified type, but does not add it to the list
  *  of all cameras. This is a helper function for other static functions.
- *  \paran index Index this camera has in the list of all cameras.
+ *  \param index Index this camera has in the list of all cameras.
  *  \param type The camera type of the camera to create.
  *  \param kart To which kart the camera is attached (NULL if a free camera).
  */
