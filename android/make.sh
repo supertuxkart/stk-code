@@ -239,6 +239,10 @@ if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
         echo "Error: STK_ALIAS variable is empty."
         exit
     fi
+else
+    STK_KEYSTORE="empty"
+    STK_STOREPASS="empty"
+    STK_ALIAS="empty"
 fi
 
 # Find newest build-tools version
@@ -555,14 +559,15 @@ echo "    <string name=\"$PO_EXTRACT_ERROR_MSG\">$PO_EXTRACT_ERROR_MSG_STR</stri
 echo "    <string name=\"$PO_QUIT\">$PO_QUIT_STR</string>" >> "$STRINGS_FILE"
 echo "</resources>"                                     >> "$STRINGS_FILE"
 
-function translate_str()
+translate_str()
 {
     echo $(grep -A 1 -e "msgid \"$1\"" "$2" \
         | sed -n 's/msgstr "\(.*\)"/\1/p' | sed "s/'/\\\'/g")
 }
 
-find "$DIRNAME/assets/data/po" -type f -name '*.po' -print0 |
-while IFS= read -r -d '' PO; do
+create_translation()
+{
+    PO="$1"
     CUR_LANG=$(basename -- "$PO" | cut -f 1 -d '.')
     # Skip english po file
     if [ "$CUR_LANG" = "en" ]; then
@@ -609,7 +614,9 @@ while IFS= read -r -d '' PO; do
         fi
         echo "</resources>"                                     >> "$TRANSLATION"
     fi
-done
+}
+
+find "$DIRNAME/assets/data/po" -type f -name '*.po' | while read f; do create_translation "$f"; done
 
 ADAPTIVE_ICON_FILE="$DIRNAME/res/drawable-anydpi-v26/icon.xml"
 
