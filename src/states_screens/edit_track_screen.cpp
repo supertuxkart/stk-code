@@ -229,7 +229,8 @@ void EditTrackScreen::selectTrack(const std::string& id)
         tracks->setSelection(m_track->getIdent(), PLAYER_ID_GAME_MASTER, true);
         selected_track->setText(m_track->getName(), true);
 
-        laps->setValue(m_track->getDefaultNumberOfLaps());
+        m_laps = m_track->getDefaultNumberOfLaps();
+        laps->setValue(m_laps);
 
         reverse->setVisible(m_track->reverseAvailable());
         label_reverse->setVisible(m_track->reverseAvailable());
