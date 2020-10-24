@@ -223,7 +223,7 @@ Camera::Mode Camera::getMode()
 }   // getMode
 
 // ----------------------------------------------------------------------------
-/** Returns the last kwown mode of the camera.
+/** Returns the last known mode of the camera.
  */
 Camera::Mode Camera::getPreviousMode()
 {
@@ -262,7 +262,7 @@ void Camera::reset()
 }   // reset
 
 //-----------------------------------------------------------------------------
-/** Saves the current kart position as initial starting position for the
+/** Saves the current kart position as the initial starting position for the
  *  camera.
  */
 void Camera::setInitialTransform()
