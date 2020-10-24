@@ -1911,13 +1911,12 @@ void askForInternetPermission()
 
     MessageDialog *dialog =
     new MessageDialog(_("SuperTuxKart may connect to a server "
-        "to download add-ons and notify you of updates. We also collect "
-        "anonymous hardware statistics to help with the development of STK. "
-        "Please read our privacy policy at http://privacy.supertuxkart.net. "
+        "to download add-ons and notify you of updates. "
+        "Please read our privacy policy at https://supertuxkart.net/Privacy. "
         "Would you like this feature to be enabled? (To change this setting "
         "at a later time, go to options, select tab "
         "'General', and edit \"Connect to the "
-        "Internet\" and \"Send anonymous HW statistics\")."),
+        "Internet\")."),
         MessageDialog::MESSAGE_DIALOG_YESNO,
         new ConfirmServer(), true, true, 0.85f, 0.85f);
 
