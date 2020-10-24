@@ -41,7 +41,7 @@ class AbstractKart;
 
 /**
   * \brief This is the base class for all cameras. It also includes some
-  *  static functios to keep track of all cameras (e.g. a static function to
+  *  static functions to keep track of all cameras (e.g. a static function to
   *  create a camera, get a camera with a specified index).
   * \ingroup graphics
   */
