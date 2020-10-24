@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-07 00:44+0800\n"
-"PO-Revision-Date: 2020-09-06 16:46+0000\n"
+"POT-Creation-Date: 2020-09-21 09:33+0800\n"
+"PO-Revision-Date: 2020-09-21 01:34+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Greek (http://www.transifex.com/supertuxkart/supertuxkart/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -1014,7 +1014,7 @@ msgstr "Εγκατεστημένο"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:360
+#: src/states_screens/options/options_screen_ui.cpp:361
 msgid "Standard"
 msgstr "Βασικές"
 
@@ -2397,7 +2397,7 @@ msgstr "Προσπαθήστε να αποφεύγετε την σύγκρουσ
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
-msgstr ""
+msgstr "Μπορείτε να χρησιμοποιήσετε  μπάλα του μπόουλινγκ για να σπρωξέται και να μπλοκάρεται την μπάλα."
 
 #. I18N: ./data/tips.xml
 msgid "In soccer, always work as a team for good results."
@@ -2449,7 +2449,7 @@ msgstr "Gavroche"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr "Gnu"
+msgstr ""
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
@@ -2722,7 +2722,7 @@ msgid "New kart '%s' now available"
 msgstr "Είναι διαθέσιμο το νέο kart '%s'"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:301
+#: src/states_screens/options/options_screen_ui.cpp:302
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2804,7 +2804,7 @@ msgstr "Αποδοτικότητα Nitro"
 #: src/guiengine/widgets/player_kart_widget.cpp:758
 #: src/karts/controller/local_player_controller.cpp:446
 #: src/karts/controller/player_controller.cpp:413
-#: src/network/protocols/client_lobby.cpp:817
+#: src/network/protocols/client_lobby.cpp:824
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
 #: src/states_screens/race_result_gui.cpp:1421
 #: src/states_screens/race_result_gui.cpp:1482
@@ -3475,7 +3475,7 @@ msgid "You finished the race!"
 msgstr "Ολοκλήρωσες τον αγώνα!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1115
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
 #, c-format
 msgid "%s left the game."
 msgstr "%s έφυγε απο το παινχίδι."
@@ -3508,7 +3508,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Το πρόγραμμα οδήγησης γραφικών φαίνεται να είναι πολύ παλιό. Ελέγξτε εάν υπάρχη διαθέσιμη ενημέρωση. Το SuperTuxKart συνιστά ένα πρόγραμμα οδήγησης που υποστηρίζει %s ή καλύτερο. Το παιχνίδι θα συνεχίσει να τρέχει, αλλά σε λειτουργία μειωμένα γραφικά."
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:102
+#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Η σύνδεση στον server δεν αποκρίνεται."
 
@@ -3602,49 +3602,49 @@ msgstr "Αποκλείστικες!"
 msgid "'%s' has been eliminated."
 msgstr "Ο «%s» αποκλείστηκε."
 
-#: src/network/protocols/client_lobby.cpp:103
+#: src/network/protocols/client_lobby.cpp:110
 msgid "Server has been shut down."
 msgstr "Ο Server έχει κλείσει."
 
-#: src/network/protocols/client_lobby.cpp:104
+#: src/network/protocols/client_lobby.cpp:111
 msgid "You were kicked from the server."
 msgstr "Σας διώξανε από τον server."
 
-#: src/network/protocols/client_lobby.cpp:106
+#: src/network/protocols/client_lobby.cpp:113
 msgid "You were kicked: Ping too high."
 msgstr "Σας διωξάνε: Το Ping είναι πολύ υψήλο."
 
-#: src/network/protocols/client_lobby.cpp:255
-#: src/network/protocols/client_lobby.cpp:857
+#: src/network/protocols/client_lobby.cpp:262
+#: src/network/protocols/client_lobby.cpp:864
 msgid "Bad network connection is detected."
 msgstr "Ανιχνεύθηκε κακή σύνδεση στο internet. "
 
-#: src/network/protocols/client_lobby.cpp:420
+#: src/network/protocols/client_lobby.cpp:427
 #: src/network/protocols/server_lobby.cpp:3792
 msgid "Bot"
 msgstr "Ρόμποτ"
 
-#: src/network/protocols/client_lobby.cpp:590
+#: src/network/protocols/client_lobby.cpp:597
 #, c-format
 msgid "%s disconnected."
 msgstr "%s Αποσυνδέθηκε"
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:621
+#: src/network/protocols/client_lobby.cpp:628
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "Πατήστε ένα όνομα παίκτη απο την λίστα για τις ρυθμισείς και πληροφορίες κατάταξης."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:680
+#: src/network/protocols/client_lobby.cpp:687
 #, c-format
 msgid "Server name: %s"
 msgstr "Όνομα server: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:688
+#: src/network/protocols/client_lobby.cpp:695
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
 #: src/states_screens/race_result_gui.cpp:1785
 #, c-format
@@ -3652,20 +3652,20 @@ msgid "Difficulty: %s"
 msgstr "Δυσκολία: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:693
+#: src/network/protocols/client_lobby.cpp:700
 #, c-format
 msgid "Max players: %d"
 msgstr "Μέγιστος αριθμός παίκτων: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:706
+#: src/network/protocols/client_lobby.cpp:713
 #: src/states_screens/dialogs/server_info_dialog.cpp:88
 #, c-format
 msgid "Game mode: %s"
 msgstr "Κατηγορία παιχνιδιού: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:719
+#: src/network/protocols/client_lobby.cpp:726
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:366
@@ -3673,7 +3673,7 @@ msgid "Time limit"
 msgstr "Όριο χρόνου"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:720
+#: src/network/protocols/client_lobby.cpp:727
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
 #: src/states_screens/track_info_screen.cpp:367
@@ -3681,102 +3681,102 @@ msgid "Goals limit"
 msgstr "Όριο Γκολ"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:724
+#: src/network/protocols/client_lobby.cpp:731
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Κατηγορία παιχνιδιού ποδοσφαίρου: %s"
 
-#: src/network/protocols/client_lobby.cpp:734
+#: src/network/protocols/client_lobby.cpp:741
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Πρόοδος Πρωταθλήματος: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:849
+#: src/network/protocols/client_lobby.cpp:856
 msgid "All players joined red or blue team."
 msgstr "Όλοι οι παίκτες μπήκανε στην κόκκινη ή την μπλε ομάδα."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:869
+#: src/network/protocols/client_lobby.cpp:876
 msgid "You are now the owner of server."
 msgstr "Είσαι πλέον ο ιδιοκτήτης του server."
 
-#: src/network/protocols/client_lobby.cpp:912
+#: src/network/protocols/client_lobby.cpp:919
 msgid "Connection refused: Server is busy."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι απασχολημένος"
 
-#: src/network/protocols/client_lobby.cpp:917
+#: src/network/protocols/client_lobby.cpp:924
 msgid "Connection refused: You are banned from the server."
 msgstr "Η σύνδεση απορρίφθηκε: Σε έχουν μπλοκάρει σε αυτόν τον server."
 
-#: src/network/protocols/client_lobby.cpp:931
+#: src/network/protocols/client_lobby.cpp:938
 msgid "Connection refused: Server password is incorrect."
 msgstr "Η σύνδεση απορρίφθηκε: Ο κωδικός του server είναι λάθος."
 
-#: src/network/protocols/client_lobby.cpp:935
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Game data is incompatible."
 msgstr "Η σύνδεση απορρίφθηκε: Τα δεδομένα του παιχνιδιού δεν ταιριάζουν."
 
-#: src/network/protocols/client_lobby.cpp:939
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Server is full."
 msgstr "Η σύνδεση απορρίφθηκε: Ο Server είναι γεμάτος."
 
-#: src/network/protocols/client_lobby.cpp:943
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Invalid player connecting."
 msgstr "Η σύνδεση απορρίφθηκε: Ο παίκτης που συνδέεται δεν είναι έγκυρος."
 
-#: src/network/protocols/client_lobby.cpp:971
+#: src/network/protocols/client_lobby.cpp:978
 msgid "Failed to start the network game."
 msgstr "Απέτυχε η συνδέση."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1184
+#: src/network/protocols/client_lobby.cpp:1191
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Το παιχνίδι εχει τελειώσει, εσύ δεν μπορείς να μπεις κατα την διαρκεια του παιχνιδίου ή να παρακουλουθής οποίονδηποτε."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1188
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Κανένας δεν περιμένει μέσα στον χόρο της αρένας - Συνδέση κατα την διαρκεία του παιχνιδιού είναι απενεργοποιημένη."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1192
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Μόνο 1 παίκτης περιμένει, για να επιστρέψει το Δωμάτιο αναμονής."
 
-#: src/network/protocols/client_lobby.cpp:1198
+#: src/network/protocols/client_lobby.cpp:1205
 msgid "Server owner quit the game."
 msgstr "Ο ιδιοκτήτης του διακομιστή έφυγε από το παιχνίδι"
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1202
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "You will be spectating the next game."
 msgstr "Θα παρακολουθείτε το επόμενο παιχνίδι."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1370
+#: src/network/protocols/client_lobby.cpp:1377
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s μπήκε στην κόκκινη ομάδα."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1376
+#: src/network/protocols/client_lobby.cpp:1383
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s μπήκε στην μπλε ομάδα."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1382
+#: src/network/protocols/client_lobby.cpp:1389
 #, c-format
 msgid "%s joined the game."
 msgstr "%s μπήκε στον παιχνίδι."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1537
+#: src/network/protocols/client_lobby.cpp:1580
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3784,7 +3784,7 @@ msgid ""
 msgstr "Πατήστε <%s> ή <%s> για να αλλάξεις το στοχευμένο παίκτη, <%s> ή <%s> για την θέση της κάμερας."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1553
+#: src/network/protocols/client_lobby.cpp:1596
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Πετύχε το παράπονο %s."
@@ -5121,7 +5121,7 @@ msgstr "Παρακολούθηση"
 
 #: src/states_screens/online/networking_lobby.cpp:198
 msgid "Install addon"
-msgstr ""
+msgstr "Εγκαταστήστε το πρόσθετο"
 
 #: src/states_screens/online/networking_lobby.cpp:337
 #, c-format
@@ -5568,74 +5568,74 @@ msgid "System Language"
 msgstr "Γλώσσα συστήματος"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:92
+#: src/states_screens/options/options_screen_ui.cpp:93
 msgid "In the bottom-left"
 msgstr "Κάτω-αριστερά"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:94
+#: src/states_screens/options/options_screen_ui.cpp:95
 msgid "On the right side"
 msgstr "Στην δεξιά πλευρά"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:96
+#: src/states_screens/options/options_screen_ui.cpp:97
 msgid "Hidden"
 msgstr "Κριμμένο"
 
 #. I18N: In the UI options, minimap position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:98
+#: src/states_screens/options/options_screen_ui.cpp:99
 msgid "Centered"
 msgstr "Κεντρικά"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:116
+#: src/states_screens/options/options_screen_ui.cpp:117
 msgid "Vertical"
 msgstr "Κάθετο"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:118
+#: src/states_screens/options/options_screen_ui.cpp:119
 msgid "Horizontal"
 msgstr "Οριζόντιο"
 
 #. I18N: In the UI options, Very small font size
-#: src/states_screens/options/options_screen_ui.cpp:129
+#: src/states_screens/options/options_screen_ui.cpp:130
 msgid "Very small"
 msgstr "Μικροσκοπικό"
 
 #. I18N: In the UI options, Small font size
-#: src/states_screens/options/options_screen_ui.cpp:131
+#: src/states_screens/options/options_screen_ui.cpp:132
 msgid "Small"
 msgstr "Μικρό"
 
 #. I18N: In the UI options, Medium font size
-#: src/states_screens/options/options_screen_ui.cpp:133
+#: src/states_screens/options/options_screen_ui.cpp:134
 msgid "Medium"
 msgstr "Μεσαίο"
 
 #. I18N: In the UI options, Large font size
-#: src/states_screens/options/options_screen_ui.cpp:135
+#: src/states_screens/options/options_screen_ui.cpp:136
 msgid "Large"
 msgstr "Μεγάλο"
 
 #. I18N: In the UI options, Very large font size
-#: src/states_screens/options/options_screen_ui.cpp:137
+#: src/states_screens/options/options_screen_ui.cpp:138
 msgid "Very large"
 msgstr "Τεράστιο"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:358
+#: src/states_screens/options/options_screen_ui.cpp:359
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Προσαρμογή"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:362
+#: src/states_screens/options/options_screen_ui.cpp:363
 msgid "Drone chase"
-msgstr ""
+msgstr "Καταδίωξη Drone"
 
-#: src/states_screens/options/options_screen_ui.cpp:530
+#: src/states_screens/options/options_screen_ui.cpp:533
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -6137,7 +6137,7 @@ msgstr "Τώρα είσαι έτοιμος για αγώνα. Καλή τύχη!
 #. description in Google Play
 #: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
 msgid "A 3D open-source kart racing game"
-msgstr ""
+msgstr "Ενα 3D ανοιχτού κώδικα παιχνίδι  αγώνων με κάρτ "
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
@@ -6169,12 +6169,12 @@ msgid ""
 "Grand Prix, try to beat the high score in time trials on your own, play "
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, race online against players from all over the world and prove "
-"your racing process!"
+"your racing skills!"
 msgstr ""
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."
-msgstr ""
+msgstr "Αυτό το παιχνίδι ειναι δωρεάν χωρίς διαφημίσεις."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
@@ -6187,12 +6187,12 @@ msgstr ""
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr ""
+msgstr "Αυτή η έκδοση μπορεί να εγκατασταθεί παράλληλα με την σταθέρη έκδοση στην συσκευή."
 
 #: supertuxkart.appdata.xml:26
 msgid "If you need more stability, consider using the stable version: %s"
-msgstr ""
+msgstr "Αν χρειάζεστε περισσότερη σταθερότητα,σκεφτείτε να χρησιμοποιήσεται την σταθερή έκδοση:%s"
 
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
-msgstr ""
+msgstr "Ομάδα SuperTuxKart"
