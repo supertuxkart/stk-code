@@ -742,6 +742,19 @@ if(MINGW)
 endif()
 
 
+# Find LibGamerzilla library or build it if missing
+if (NOT APPLE)
+    include(FindPkgConfig)
+    pkg_search_module(GAMERZILLA OPTIONAL gamerzilla)
+
+    if (GAMERZILLA_LIBRARIES)
+        message(STATUS "Gamerzilla found")
+        include_directories(${GAMERZILLA_INCLUDE_DIRS})
+        target_link_libraries(supertuxkart ${GAMERZILLA_LIBRARIES})
+        add_definitions(-DGAMERZILLA)
+    endif()
+endif()
+
 # ==== Checking if data folder exists ====
 if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
   message( FATAL_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/data folder doesn't exist" )

@@ -122,7 +122,7 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
                   unlock_manager->createStoryModeStatus(xml_story_mode);
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
-                          ->createAchievementsStatus(xml_achievements);
+                          ->createAchievementsStatus(xml_achievements, m_unique_id == 1);
     // Fix up any potentially missing icons.
     addIcon();
 }   // initRemainingData

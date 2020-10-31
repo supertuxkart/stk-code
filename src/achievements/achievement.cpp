@@ -396,4 +396,8 @@ void Achievement::onCompletion()
         request->addParameter("achievementid", getID());
         request->queue();
     }
+    if (PlayerManager::getCurrentPlayer()->getUniqueID() == 1)
+    {
+        AchievementsManager::get()->getWebAchievementStatus()->achieved(m_achievement_info);
+    }
 }   // onCompletion

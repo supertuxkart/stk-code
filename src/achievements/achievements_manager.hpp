@@ -20,6 +20,7 @@
 #define HEADER_ACHIEVEMENTS_MANAGER_HPP
 
 #include "achievements/achievements_status.hpp"
+#include "achievements/web_achievements_status.hpp"
 
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
@@ -43,6 +44,7 @@ private:
     static AchievementsManager* m_achievements_manager;
 
     std::map<uint32_t, AchievementInfo *> m_achievements_info;
+    WebAchievementsStatus *m_web;
 
     AchievementsManager      ();
     ~AchievementsManager     ();
@@ -71,13 +73,14 @@ public:
     // ========================================================================
 
     AchievementInfo* getAchievementInfo(uint32_t id) const;
-    AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);
+    AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL, bool updateWeb = false);
     // ------------------------------------------------------------------------
     const std::map<uint32_t, AchievementInfo *> & getAllInfo()
     {
         return m_achievements_info;
     }  // getAllInfo
 
+    WebAchievementsStatus* getWebAchievementStatus() { return m_web; }
 };   // class AchievementsManager
 
 #endif
