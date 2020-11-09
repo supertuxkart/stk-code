@@ -102,6 +102,7 @@ enum DebugMenuCommand
     DEBUG_FPS,
     DEBUG_SAVE_REPLAY,
     DEBUG_SAVE_HISTORY,
+    DEBUG_POWERUP_ANVIL,
     DEBUG_POWERUP_BOWLING,
     DEBUG_POWERUP_BUBBLEGUM,
     DEBUG_POWERUP_CAKE,
@@ -112,10 +113,14 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
     DEBUG_POWERUP_NITRO,
+    DEBUG_POWERUP_NOTHING,
     DEBUG_ATTACHMENT_PARACHUTE,
     DEBUG_ATTACHMENT_BOMB,
     DEBUG_ATTACHMENT_ANVIL,
+    DEBUG_ATTACHMENT_SQUASH,
+    DEBUG_ATTACHMENT_PLUNGER,
     DEBUG_ATTACHMENT_EXPLOSION,
+    DEBUG_ATTACHMENT_NOTHING,
     DEBUG_GUI_TOGGLE,
     DEBUG_GUI_HIDE_KARTS,
     DEBUG_GUI_CAM_FREE,
@@ -139,6 +144,8 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_EIGHT,
     DEBUG_VIEW_KART_NINE,
     DEBUG_VIEW_KART_TEN,
+    DEBUG_VIEW_KART_ELEVEN,
+    DEBUG_VIEW_KART_TWELVE,
     DEBUG_VIEW_KART_NEXT,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
@@ -162,7 +169,11 @@ void addPowerup(PowerupManager::PowerupType powerup)
     for(unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
     {
         AbstractKart* kart = world->getLocalPlayerKart(i);
-        kart->setPowerup(powerup, 10000);
+
+        if (powerup == PowerupManager::POWERUP_NOTHING)
+        {kart->setPowerup(powerup, 0);}
+        else
+        {kart->setPowerup(powerup, 10000);}
     }
 }   // addPowerup
 
@@ -196,6 +207,11 @@ void addAttachment(Attachment::AttachmentType type)
         {
             kart->getAttachment()
                 ->set(type, stk_config->time2Ticks(stk_config->m_bomb_time) );
+        }
+        else if (type == Attachment::ATTACH_NOTHING)
+        {
+            kart->getAttachment()
+                ->reset();
         }
     }
 
@@ -498,6 +514,9 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_SAVE_HISTORY:
         history->Save();
         break;
+    case DEBUG_POWERUP_ANVIL:
+        addPowerup(PowerupManager::POWERUP_ANVIL);
+        break;
     case DEBUG_POWERUP_BOWLING:
         addPowerup(PowerupManager::POWERUP_BOWLING);
         break;
@@ -537,6 +556,9 @@ bool handleContextMenuAction(s32 cmd_id)
         }
         break;
     }
+    case DEBUG_POWERUP_NOTHING:
+        addPowerup(PowerupManager::POWERUP_NOTHING);
+        break;
     case DEBUG_ATTACHMENT_ANVIL:
         addAttachment(Attachment::ATTACH_ANVIL);
         break;
@@ -546,12 +568,30 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_ATTACHMENT_PARACHUTE:
         addAttachment(Attachment::ATTACH_PARACHUTE);
         break;
+     case DEBUG_ATTACHMENT_SQUASH:
+        for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
+        {
+            AbstractKart* kart = world->getLocalPlayerKart(i);
+            const KartProperties *kp = kart->getKartProperties();
+            kart->setSquash(kp->getSwatterSquashDuration(), kp->getSwatterSquashSlowdown());
+        }
+        break;
+    case DEBUG_ATTACHMENT_PLUNGER:
+        for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
+        {
+            AbstractKart* kart = world->getLocalPlayerKart(i);
+            kart->blockViewWithPlunger();
+        }
+        break;
     case DEBUG_ATTACHMENT_EXPLOSION:
         for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
             AbstractKart* kart = world->getLocalPlayerKart(i);
             ExplosionAnimation::create(kart, kart->getXYZ(), true);
         }
+        break;
+    case DEBUG_ATTACHMENT_NOTHING:
+        addAttachment(Attachment::ATTACH_NOTHING);
         break;
     case DEBUG_GUI_TOGGLE:
     {
@@ -687,6 +727,12 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_VIEW_KART_TEN:
         changeCameraTarget(10);
+        break;
+    case DEBUG_VIEW_KART_ELEVEN:
+        changeCameraTarget(11);
+        break;
+    case DEBUG_VIEW_KART_TWELVE:
+        changeCameraTarget(12);
         break;
     case DEBUG_VIEW_KART_NEXT:
     {
@@ -940,6 +986,7 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Items >",-1,true,true);
             sub = mnu->getSubMenu(1);
+            sub->addItem(L"Anvil", DEBUG_POWERUP_ANVIL );
             sub->addItem(L"Basketball", DEBUG_POWERUP_RUBBERBALL );
             sub->addItem(L"Bowling", DEBUG_POWERUP_BOWLING );
             sub->addItem(L"Bubblegum", DEBUG_POWERUP_BUBBLEGUM );
@@ -950,13 +997,17 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Switch", DEBUG_POWERUP_SWITCH );
             sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
+            sub->addItem(L"Clear", DEBUG_POWERUP_NOTHING );
 
             mnu->addItem(L"Attachments >",-1,true, true);
             sub = mnu->getSubMenu(2);
             sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
+            sub->addItem(L"Flatten", DEBUG_ATTACHMENT_SQUASH);
+            sub->addItem(L"Plunger", DEBUG_ATTACHMENT_PLUNGER);
             sub->addItem(L"Explosion", DEBUG_ATTACHMENT_EXPLOSION);
+            sub->addItem(L"Clear", DEBUG_ATTACHMENT_NOTHING);
 
             mnu->addItem(L"GUI >",-1,true, true);
             sub = mnu->getSubMenu(3);
@@ -1001,6 +1052,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
             sub->addItem(L"To kart nine", DEBUG_VIEW_KART_NINE);
             sub->addItem(L"To kart ten", DEBUG_VIEW_KART_TEN);
+            sub->addItem(L"To kart eleven", DEBUG_VIEW_KART_ELEVEN);
+            sub->addItem(L"To kart twelve", DEBUG_VIEW_KART_TWELVE);
             sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
 
             mnu->addItem(L"Font >",-1,true, true);
