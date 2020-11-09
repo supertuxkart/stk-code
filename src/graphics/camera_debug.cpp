@@ -74,6 +74,8 @@ void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
         *distance   = -m_kart->getKartModel()->getLength()-1.0f;
         break;
     case CM_DEBUG_SIDE_OF_KART:
+    case CM_DEBUG_INV_SIDE_OF_KART:
+    case CM_DEBUG_FRONT_OF_KART:
     case CM_DEBUG_TOP_OF_KART:
         *above_kart    = 0.75f;
         *cam_angle     = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
