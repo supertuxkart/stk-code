@@ -1088,6 +1088,32 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
         }
     }
 
+    // Draw speed in numbers, above the graphical speedometer (does not use special digit font)
+    core::recti posM, posI;
+
+    posM.UpperLeftCorner = core::vector2di(int(offset.X + 0.0f*meter_width),
+                                          int(offset.Y - 1.32f*meter_height));
+    posM.LowerRightCorner = core::vector2di(int(offset.X + meter_width),
+                                           int(offset.Y - 1.3f*meter_height));
+    posI.UpperLeftCorner = core::vector2di(int(offset.X + 0.0f*meter_width),
+                                          int(offset.Y - 1.17f*meter_height));
+    posI.LowerRightCorner = core::vector2di(int(offset.X + meter_width),
+                                           int(offset.Y - 1.15f*meter_height));
+
+    gui::ScalableFont* font = GUIEngine::getFont();
+
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+
+    char speedM[256], speedI[256];
+    // There is no setting to change units, so display both metric (on top) and imperial units (on bottom)
+    sprintf(speedM, "%.1fm/s %.1fkm/h", speed, speed*3.6);
+    sprintf(speedI, "%.1fft/s %.1fmph", speed*3.2808, speed*2.2369);
+
+    font->setBlackBorder(true);
+    font->draw(core::stringw(speedM).c_str(), posM, color);
+    font->draw(core::stringw(speedI).c_str(), posI, color);
+    font->setBlackBorder(false);
+
     unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
                                                      speed_ratio, meter_width, meter_height, offset);
 
