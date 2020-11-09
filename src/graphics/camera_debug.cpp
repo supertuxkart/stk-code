@@ -122,6 +122,22 @@ void CameraDebug::update(float dt)
         m_camera->setTarget(xyz);
         m_camera->setPosition(offset.toIrrVector());
     }
+    else if (m_default_debug_Type==CM_DEBUG_INV_SIDE_OF_KART)
+    {
+        core::vector3df xyz = m_kart->getSmoothedXYZ().toIrrVector();
+        Vec3 offset(-3, 0, 0);
+        offset = m_kart->getSmoothedTrans()(offset);
+        m_camera->setTarget(xyz);
+        m_camera->setPosition(offset.toIrrVector());
+    }
+    else if (m_default_debug_Type==CM_DEBUG_FRONT_OF_KART)
+    {
+        core::vector3df xyz = m_kart->getSmoothedXYZ().toIrrVector();
+        Vec3 offset(0, 1, 2);
+        offset = m_kart->getSmoothedTrans()(offset);
+        m_camera->setTarget(xyz);
+        m_camera->setPosition(offset.toIrrVector());
+    }
     // If an explosion is happening, stop moving the camera,
     // but keep it target on the kart.
     else if (dynamic_cast<ExplosionAnimation*>(m_kart->getKartAnimation()))

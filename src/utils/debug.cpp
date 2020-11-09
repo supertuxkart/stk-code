@@ -123,6 +123,8 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_WHEEL,
     DEBUG_GUI_CAM_BEHIND_KART,
     DEBUG_GUI_CAM_SIDE_OF_KART,
+    DEBUG_GUI_CAM_INV_SIDE_OF_KART,
+    DEBUG_GUI_CAM_FRONT_OF_KART,
     DEBUG_GUI_CAM_NORMAL,
     DEBUG_GUI_CAM_SMOOTH,
     DEBUG_GUI_CAM_ATTACH,
@@ -135,6 +137,8 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_SIX,
     DEBUG_VIEW_KART_SEVEN,
     DEBUG_VIEW_KART_EIGHT,
+    DEBUG_VIEW_KART_NINE,
+    DEBUG_VIEW_KART_TEN,
     DEBUG_VIEW_KART_NEXT,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
@@ -169,9 +173,11 @@ void addAttachment(Attachment::AttachmentType type)
     if (world == NULL) return;
     for (unsigned int i = 0; i < world->getNumKarts(); i++)
     {
-        AbstractKart *kart = world->getKart(i);
-        if (!kart->getController()->isLocalPlayerController())
-            continue;
+        AbstractKart *kart = world->getLocalPlayerKart(i);
+        if (kart == NULL)
+           continue;
+        //if (!kart->getController()->isLocalPlayerController())
+        //    continue;
         if (type == Attachment::ATTACH_ANVIL)
         {
             kart->getAttachment()
@@ -587,6 +593,18 @@ bool handleContextMenuAction(s32 cmd_id)
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
+    case DEBUG_GUI_CAM_INV_SIDE_OF_KART:
+        CameraDebug::setDebugType(CameraDebug::CM_DEBUG_INV_SIDE_OF_KART);
+        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        break;
+    case DEBUG_GUI_CAM_FRONT_OF_KART:
+        CameraDebug::setDebugType(CameraDebug::CM_DEBUG_FRONT_OF_KART);
+        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        break;
     case DEBUG_GUI_CAM_FREE:
     {
         Camera *camera = Camera::getActiveCamera();
@@ -663,6 +681,12 @@ bool handleContextMenuAction(s32 cmd_id)
         break;
     case DEBUG_VIEW_KART_EIGHT:
         changeCameraTarget(8);
+        break;
+    case DEBUG_VIEW_KART_NINE:
+        changeCameraTarget(9);
+        break;
+    case DEBUG_VIEW_KART_TEN:
+        changeCameraTarget(10);
         break;
     case DEBUG_VIEW_KART_NEXT:
     {
@@ -942,6 +966,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Behind wheel view", DEBUG_GUI_CAM_WHEEL);
             sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
             sub->addItem(L"Side of kart view", DEBUG_GUI_CAM_SIDE_OF_KART);
+            sub->addItem(L"Inverse side of kart view", DEBUG_GUI_CAM_INV_SIDE_OF_KART);
+            sub->addItem(L"Front of kart view", DEBUG_GUI_CAM_FRONT_OF_KART);
             sub->addItem(L"First person view (Ctrl + F1)", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view (Ctrl + F2)", DEBUG_GUI_CAM_NORMAL);
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
@@ -973,6 +999,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
             sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
             sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
+            sub->addItem(L"To kart nine", DEBUG_VIEW_KART_NINE);
+            sub->addItem(L"To kart ten", DEBUG_VIEW_KART_TEN);
             sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
 
             mnu->addItem(L"Font >",-1,true, true);

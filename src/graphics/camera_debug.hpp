@@ -38,6 +38,8 @@ public:
         CM_DEBUG_GROUND,        //!< Camera at ground level, wheel debugging
         CM_DEBUG_BEHIND_KART,   //!< Camera straight behind kart
         CM_DEBUG_SIDE_OF_KART,  //!< Camera to the right of the kart
+        CM_DEBUG_INV_SIDE_OF_KART,  //!< Camera to the left of the kart
+        CM_DEBUG_FRONT_OF_KART,  //!< Camera to the front of the kart
     };   // CameraDebugType
 
 private:
