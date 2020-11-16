@@ -1251,6 +1251,22 @@ void SkiddingAI::handleItems(const float dt, const Vec3 *aim_point, int last_nod
         break;
         }// POWERUP_PARACHUTE
 
+    case PowerupManager::POWERUP_ANVIL:
+        // Wait one second more than a previous anvil
+        if(m_time_since_last_shot < m_kart->getKartProperties()->getAnvilDuration() + 1.0f) break;
+
+        if(RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            m_controls->setFire(m_world->getTime()<1.0f &&
+                                m_kart->getPosition()>2    );
+        }
+        else
+        {
+            m_controls->setFire(m_time_since_last_shot > 3.0f &&
+                                m_kart->getPosition()>1          );
+        }
+        break;   // POWERUP_ANVIL
+
     case PowerupManager::POWERUP_SWATTER:
         {
              // if the kart has a shield, do not break it by using a swatter.
