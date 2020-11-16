@@ -389,7 +389,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     if(!World::getWorld()->isRacePhase()) return;
 
     FontDrawer::startBatching();
-    if (!isSpectatorCam) 
+    if (Camera::getActiveCamera()->getMode() != Camera::CM_SPECTATOR_TOP_VIEW)
     {
         if (m_multitouch_gui == NULL || m_multitouch_gui->isSpectatorMode())
         {
