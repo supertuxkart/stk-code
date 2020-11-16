@@ -44,6 +44,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/rescue_animation.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
@@ -148,6 +149,8 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_TWELVE,
     DEBUG_VIEW_KART_NEXT,
     DEBUG_HIDE_KARTS,
+    DEBUG_RESCUE_KART,
+    DEBUG_PAUSE,
     DEBUG_THROTTLE_FPS,
     DEBUG_VISUAL_VALUES,
     DEBUG_PRINT_START_POS,
@@ -609,6 +612,16 @@ bool handleContextMenuAction(s32 cmd_id)
                 kart->getNode()->setVisible(false);
         }
         break;
+    case DEBUG_RESCUE_KART:
+        for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
+        {
+            AbstractKart* kart = world->getLocalPlayerKart(i);
+            RescueAnimation::create(kart);
+        }
+        break;
+    case DEBUG_PAUSE:
+        world->escapePressed();
+        break;
     case DEBUG_GUI_CAM_TOP:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
         Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
@@ -1042,6 +1055,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Change camera target >",-1,true, true);
             sub = mnu->getSubMenu(5);
             sub->addItem(L"To previous kart (Ctrl + F5)", DEBUG_VIEW_KART_PREVIOUS);
+            sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
             sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
             sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
             sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
@@ -1054,7 +1068,6 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart ten", DEBUG_VIEW_KART_TEN);
             sub->addItem(L"To kart eleven", DEBUG_VIEW_KART_ELEVEN);
             sub->addItem(L"To kart twelve", DEBUG_VIEW_KART_TWELVE);
-            sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
 
             mnu->addItem(L"Font >",-1,true, true);
             sub = mnu->getSubMenu(6);
@@ -1071,6 +1084,11 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Toggle bitangents visualization", DEBUG_SP_BITANGENTS_VIZ);
             sub->addItem(L"Toggle wireframe visualization", DEBUG_SP_WIREFRAME_VIZ);
             sub->addItem(L"Toggle triangle normals visualization", DEBUG_SP_TN_VIZ);
+
+            mnu->addItem(L"Keypress actions >",-1,true, true);
+            sub = mnu->getSubMenu(8);
+            sub->addItem(L"Rescue", DEBUG_RESCUE_KART);
+            sub->addItem(L"Pause", DEBUG_PAUSE);
 
             mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
