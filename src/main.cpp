@@ -1487,6 +1487,11 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         RaceManager::get()->setNumKarts((int)l.size());
     }   // --aiNP
 
+    if(CommandLine::has("--reverse"))
+    {
+        RaceManager::get()->setReverseTrack(true);
+    }
+
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
         RaceManager::get()->setTrack(s);
