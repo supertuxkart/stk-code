@@ -17,9 +17,9 @@
 
         <tabs id="race_mode" height="6%" width="98%" align="center">
             <icon-button id="tab_time_trial" width="128" height="128" icon="gui/icons/mode_tt.png"
-                         I18N="In the ghost replay selection screen" text="Time trial"/>
+                         I18N="In the ghost replay selection screen" text="Time Trial"/>
             <icon-button id="tab_egg_hunt" width="128" height="128" icon="gui/icons/mode_easter.png"
-                         I18N="In the ghost replay selection screen" text="Egg hunt"/>
+                         I18N="In the ghost replay selection screen" text="Egg Hunt"/>
         </tabs>
 
         <spacer width="100%" height="2%" />
