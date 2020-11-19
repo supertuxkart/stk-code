@@ -310,6 +310,7 @@ void OptionsScreenUI::init()
     }
     speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
 
+    getWidget<CheckBoxWidget>("follow_ball_backward_camera")->setState(UserConfigParams::m_reverse_look_use_soccer_cam);
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const std::string& user_skin = UserConfigParams::m_skin_file;
@@ -406,9 +407,12 @@ void OptionsScreenUI::updateCameraPresetSpinner()
 
     if (!found)
     {
+        getWidget("custom_camera")->setActive(true);
         camera_preset->setValue(0);
         camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = std::to_string(0);
     }
+    else
+        getWidget("custom_camera")->setActive(false);
     updateCamera();
 
 } // updateCameraPresetSpinner
@@ -546,14 +550,29 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
         assert( camera_preset != NULL );
         unsigned int i = camera_preset->getValue();
-        if (i != 0) {
+        if (i != 0)
+        {
             UserConfigParams::m_camera_fov = m_camera_presets[i-1].fov;
             UserConfigParams::m_camera_distance = m_camera_presets[i-1].distance;
             UserConfigParams::m_camera_forward_up_angle = m_camera_presets[i-1].angle;
             UserConfigParams::m_camera_forward_smoothing = m_camera_presets[i-1].smoothing;
             UserConfigParams::m_camera_backward_up_angle = m_camera_presets[i-1].backward_angle;
+            getWidget("custom_camera")->setActive(false);
+        }
+        else
+        {
+            UserConfigParams::m_camera_fov = UserConfigParams::m_saved_camera_fov;
+            UserConfigParams::m_camera_distance = UserConfigParams::m_saved_camera_distance;
+            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_saved_camera_forward_up_angle;
+            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_saved_camera_forward_smoothing;
+            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_saved_camera_backward_up_angle;
+            getWidget("custom_camera")->setActive(true);
         }
         updateCamera();
+    }
+    else if (name == "follow_ball_backward_camera")
+    {
+        UserConfigParams::m_reverse_look_use_soccer_cam = getWidget<CheckBoxWidget>("follow_ball_backward_camera")->getState();
     }
     else if(name == "custom_camera")
     {

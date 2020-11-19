@@ -33,28 +33,28 @@
                 <!-- ************ SKIN CHOICE ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spinner id="skinchoice" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Skin" align="left"/>
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Skin"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spinner id="minimap" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Minimap" align="left"/>
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Minimap"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
                     <spinner id="splitscreen_method" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Splitscreen Multiplayer layout" align="left"/>
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Splitscreen Multiplayer layout"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
 
                 <div width="100%" height="fit" layout="horizontal-row">
                     <gauge id="font_size" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Font size" align="left"/>
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Font size"/>
                 </div>
 
                 <spacer width="5" height="2%"/>
@@ -62,9 +62,17 @@
                 <!-- ************ GRAPHICAL EFFECTS SETTINGS ************ -->
                 <div width="100%" height="fit" layout="horizontal-row">
                     <spinner id="camera_preset" width="10f" align="center" />
-                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Camera" align="left"/>
+                    <label height="100%" x="0" y="0" I18N="In the ui settings" text="Camera"/>
                     <spacer width="2%" height="100%" />
                     <button id="custom_camera" text="Custom..." I18N="In the ui settings" align="center"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
+                <div layout="horizontal-row" width="100%" height="fit">
+                    <checkbox id="follow_ball_backward_camera"/>
+                    <spacer width="1%" height="100%" />
+                    <label height="100%" I18N="In the ui settings" text="Follow ball in soccer mode for backward camera" word_wrap="true"/>
                 </div>
 
                 <spacer width="5" height="2%"/>

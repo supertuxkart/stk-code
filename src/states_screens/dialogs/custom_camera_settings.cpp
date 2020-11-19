@@ -42,12 +42,6 @@ CustomCameraSettingsDialog::CustomCameraSettingsDialog(const float w, const floa
 {
     m_self_destroy = false;
     loadFromFile("custom_camera_settings.stkgui");
-    getWidget<SpinnerWidget>("fov")->setValue(UserConfigParams::m_camera_fov);
-    getWidget<SpinnerWidget>("camera_distance")->setFloatValue(UserConfigParams::m_camera_distance);
-    getWidget<SpinnerWidget>("camera_angle")->setValue(UserConfigParams::m_camera_forward_up_angle);
-    getWidget<CheckBoxWidget>("camera_smoothing")->setState(UserConfigParams::m_camera_forward_smoothing);
-    getWidget<SpinnerWidget>("backward_camera_angle")->setValue(UserConfigParams::m_camera_backward_up_angle);
-//    updateActivation();
 }
 
 // -----------------------------------------------------------------------------
@@ -63,15 +57,14 @@ void CustomCameraSettingsDialog::beforeAddingWidgets()
 {
 #ifndef SERVER_ONLY
     getWidget<SpinnerWidget>("fov")->setRange(75, 115);
-    getWidget<SpinnerWidget>("fov")->setValue(UserConfigParams::m_camera_fov);
+    getWidget<SpinnerWidget>("fov")->setValue(UserConfigParams::m_saved_camera_fov);
     getWidget<SpinnerWidget>("camera_distance")->setRange(0 , 20, 0.1);
-    getWidget<SpinnerWidget>("camera_distance")->setFloatValue(UserConfigParams::m_camera_distance);
+    getWidget<SpinnerWidget>("camera_distance")->setFloatValue(UserConfigParams::m_saved_camera_distance);
     getWidget<SpinnerWidget>("camera_angle")->setRange(0 , 45);
-    getWidget<SpinnerWidget>("camera_angle")->setValue(UserConfigParams::m_camera_forward_up_angle);
-    getWidget<CheckBoxWidget>("camera_smoothing")->setState(UserConfigParams::m_camera_forward_smoothing);
+    getWidget<SpinnerWidget>("camera_angle")->setValue(UserConfigParams::m_saved_camera_forward_up_angle);
+    getWidget<CheckBoxWidget>("camera_smoothing")->setState(UserConfigParams::m_saved_camera_forward_smoothing);
     getWidget<SpinnerWidget>("backward_camera_angle")->setRange(0 , 45);
-    getWidget<SpinnerWidget>("backward_camera_angle")->setValue(UserConfigParams::m_camera_backward_up_angle);
-    getWidget<CheckBoxWidget>("use_soccer_camera")->setState(UserConfigParams::m_reverse_look_use_soccer_cam);
+    getWidget<SpinnerWidget>("backward_camera_angle")->setValue(UserConfigParams::m_saved_camera_backward_up_angle);
 #endif
 }
 
@@ -87,7 +80,11 @@ GUIEngine::EventPropagation CustomCameraSettingsDialog::processEvent(const std::
         UserConfigParams::m_camera_forward_up_angle = getWidget<SpinnerWidget>("camera_angle")->getValue();
         UserConfigParams::m_camera_forward_smoothing = getWidget<CheckBoxWidget>("camera_smoothing")->getState();
         UserConfigParams::m_camera_backward_up_angle = getWidget<SpinnerWidget>("backward_camera_angle")->getValue();
-        UserConfigParams::m_reverse_look_use_soccer_cam = getWidget<CheckBoxWidget>("use_soccer_camera")->getState();
+        UserConfigParams::m_saved_camera_fov = UserConfigParams::m_camera_fov;
+        UserConfigParams::m_saved_camera_distance = UserConfigParams::m_camera_distance;
+        UserConfigParams::m_saved_camera_forward_up_angle = UserConfigParams::m_camera_forward_up_angle;
+        UserConfigParams::m_saved_camera_forward_smoothing = UserConfigParams::m_camera_forward_smoothing;
+        UserConfigParams::m_saved_camera_backward_up_angle = UserConfigParams::m_camera_backward_up_angle;
         OptionsScreenUI::getInstance()->updateCameraPresetSpinner();
         m_self_destroy = true;
         return GUIEngine::EVENT_BLOCK;
