@@ -208,6 +208,8 @@ void MainMenuScreen::onUpdate(float delta)
         {
             addons_icon->setActive(true);
             addons_icon->resetAllBadges();
+            if (addons_manager->hasNewAddons())
+                addons_icon->setBadge(DOWN_BADGE);
         }
         // maybe add a new badge when not allowed to access the net
     }

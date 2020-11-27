@@ -59,6 +59,7 @@ AddonsManager* addons_manager = 0;
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
                                  m_state(STATE_INIT)
 {
+    m_has_new_addons = false;
     m_downloaded_icons = false;
     // Clean .part file which may be left behind
     std::string addons_part = file_manager->getAddonsFile("addons.xml.part");
@@ -96,6 +97,7 @@ AddonsManager::~AddonsManager()
 void AddonsManager::init(const XMLNode *xml,
                          bool force_refresh)
 {
+    m_has_new_addons = false;
     std::string    addon_list_url("");
     StkTime::TimeType mtime(0);
     const XMLNode *include = xml->getNode("include");
@@ -125,6 +127,7 @@ void AddonsManager::init(const XMLNode *xml,
        && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED
        && !file_manager->fileExists(filename_part);
 
+    int timestamp_check = -1;
     if (download)
     {
         Log::info("addons", "Downloading updated addons.xml.");
@@ -137,6 +140,7 @@ void AddonsManager::init(const XMLNode *xml,
                        download_request->getDownloadErrorMessage());
             return;
         }
+        timestamp_check = UserConfigParams::m_addons_last_updated;
         UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
     }
     else
@@ -153,7 +157,7 @@ void AddonsManager::init(const XMLNode *xml,
     }
     if (!xml_addons)
         return;
-    addons_manager->initAddons(xml_addons);   // will free xml_addons
+    addons_manager->initAddons(xml_addons, timestamp_check);   // will free xml_addons
     if(UserConfigParams::logAddons())
         Log::info("addons", "Addons manager list downloaded.");
 }   // init
@@ -165,8 +169,9 @@ void AddonsManager::init(const XMLNode *xml,
  *  without blocking the GUI. This function will update the state variable.
  *  \param xml The xml tree of addons.xml with information about all available
  *         addons.
+ *  \param timestamp_check To determine m_has_new_addons.
  */
-void AddonsManager::initAddons(const XMLNode *xml)
+void AddonsManager::initAddons(const XMLNode *xml, int timestamp_check)
 {
     m_addons_list.lock();
     // Clear the list in case that a reinit is being done.
@@ -185,6 +190,8 @@ void AddonsManager::initAddons(const XMLNode *xml)
             node->getName()=="arena"                                 )
         {
             Addon addon(*node);
+            if (timestamp_check != -1 && addon.getDate() > timestamp_check)
+                m_has_new_addons = true;
             int index = getAddonIndex(addon.getId());
 
             int stk_version=0;

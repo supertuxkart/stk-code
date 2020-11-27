@@ -78,7 +78,9 @@ namespace GUIEngine
         /** A zipper badge to indicate that this player receives a boost */
         ZIPPER_BADGE   = 128,
         /** A anchor badge to indicate that this player receives a handicap */
-        ANCHOR_BADGE   = 256
+        ANCHOR_BADGE   = 256,
+        /** A down arrow badge to indicate new addons for downloading */
+        DOWN_BADGE   = 512
     };
 
 
