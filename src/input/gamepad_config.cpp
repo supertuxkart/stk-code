@@ -32,8 +32,7 @@
 #include "input/sdl_controller.hpp"
 #include <array>
 
-static_assert(SDL_CONTROLLER_BUTTON_MAX - 1 == SDL_CONTROLLER_BUTTON_DPAD_RIGHT, "non continous name");
-enum AxisWithDirection
+enum AxisWithDirection : unsigned
 {
     SDL_CONTROLLER_AXIS_LEFTX_RIGHT = SDL_CONTROLLER_BUTTON_MAX,
     SDL_CONTROLLER_AXIS_LEFTX_LEFT,
@@ -140,56 +139,56 @@ void GamepadConfig::setDefaultBinds ()
 core::stringw GamepadConfig::getBindingAsString(const PlayerAction action) const
 {
 #ifndef SERVER_ONLY
-    std::array<core::stringw, SDL_CONTROLLER_AXIS_WITH_DIRECTION_AND_BUTTON_MAX> readable =
+    std::map<unsigned, core::stringw> readable =
     {{
-        "A", // SDL_CONTROLLER_BUTTON_A
-        "B", // SDL_CONTROLLER_BUTTON_B
-        "X", // SDL_CONTROLLER_BUTTON_X
-        "Y", // SDL_CONTROLLER_BUTTON_Y
+        { SDL_CONTROLLER_BUTTON_A, "A" },
+        { SDL_CONTROLLER_BUTTON_B, "B" },
+        { SDL_CONTROLLER_BUTTON_X, "X" },
+        { SDL_CONTROLLER_BUTTON_Y, "Y" },
         // I18N: name of buttons on gamepads
-        _("Back"), // SDL_CONTROLLER_BUTTON_BACK
+        { SDL_CONTROLLER_BUTTON_BACK, _("Back") },
         // I18N: name of buttons on gamepads
-        _("Guide"), // SDL_CONTROLLER_BUTTON_GUIDE
+        { SDL_CONTROLLER_BUTTON_GUIDE, _("Guide") },
         // I18N: name of buttons on gamepads
-        _("Start"), // SDL_CONTROLLER_BUTTON_START
+        { SDL_CONTROLLER_BUTTON_START, _("Start") },
         // I18N: name of buttons on gamepads
-        _("Left thumbstick press"), // SDL_CONTROLLER_BUTTON_LEFTSTICK
+        { SDL_CONTROLLER_BUTTON_LEFTSTICK, _("Left thumbstick press") },
         // I18N: name of buttons on gamepads
-        _("Right thumbstick press"), // SDL_CONTROLLER_BUTTON_RIGHTSTICK
+        { SDL_CONTROLLER_BUTTON_RIGHTSTICK, _("Right thumbstick press") },
         // I18N: name of buttons on gamepads
-        _("Left shoulder"), // SDL_CONTROLLER_BUTTON_LEFTSHOULDER
+        { SDL_CONTROLLER_BUTTON_LEFTSHOULDER, _("Left shoulder") },
         // I18N: name of buttons on gamepads
-        _("Right shoulder"), // SDL_CONTROLLER_BUTTON_RIGHTSHOULDER
+        { SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, _("Right shoulder") },
         // I18N: name of buttons on gamepads
-        _("DPad up"), // SDL_CONTROLLER_BUTTON_DPAD_UP
+        { SDL_CONTROLLER_BUTTON_DPAD_UP, _("DPad up") },
         // I18N: name of buttons on gamepads
-        _("DPad down"), // SDL_CONTROLLER_BUTTON_DPAD_DOWN
+        { SDL_CONTROLLER_BUTTON_DPAD_DOWN, _("DPad down") },
         // I18N: name of buttons on gamepads
-        _("DPad left"), // SDL_CONTROLLER_BUTTON_DPAD_LEFT
+        { SDL_CONTROLLER_BUTTON_DPAD_LEFT, _("DPad left") },
         // I18N: name of buttons on gamepads
-        _("DPad right"), // SDL_CONTROLLER_BUTTON_DPAD_RIGHT
+        { SDL_CONTROLLER_BUTTON_DPAD_RIGHT, _("DPad right") },
 
         // Below are extensions after SDL2 header SDL_CONTROLLER_BUTTON_MAX
         // I18N: name of buttons on gamepads
-        _("Left thumbstick right"), // SDL_CONTROLLER_AXIS_LEFTX_RIGHT
+        { SDL_CONTROLLER_AXIS_LEFTX_RIGHT, _("Left thumbstick right") },
         // I18N: name of buttons on gamepads
-        _("Left thumbstick left"), // SDL_CONTROLLER_AXIS_LEFTX_LEFT
+        { SDL_CONTROLLER_AXIS_LEFTX_LEFT, _("Left thumbstick left") },
         // I18N: name of buttons on gamepads
-        _("Left thumbstick down"), // SDL_CONTROLLER_AXIS_LEFTY_DOWN
+        { SDL_CONTROLLER_AXIS_LEFTY_DOWN, _("Left thumbstick down") },
         // I18N: name of buttons on gamepads
-        _("Left thumbstick up"), // SDL_CONTROLLER_AXIS_LEFTY_UP
+        { SDL_CONTROLLER_AXIS_LEFTY_UP, _("Left thumbstick up") },
         // I18N: name of buttons on gamepads
-        _("Right thumbstick right"), // SDL_CONTROLLER_AXIS_RIGHTX_RIGHT
+        { SDL_CONTROLLER_AXIS_RIGHTX_RIGHT, _("Right thumbstick right") },
         // I18N: name of buttons on gamepads
-        _("Right thumbstick left"), // SDL_CONTROLLER_AXIS_RIGHTX_LEFT
+        { SDL_CONTROLLER_AXIS_RIGHTX_LEFT, _("Right thumbstick left") },
         // I18N: name of buttons on gamepads
-        _("Right thumbstick down"), // SDL_CONTROLLER_AXIS_RIGHTY_DOWN
+        { SDL_CONTROLLER_AXIS_RIGHTY_DOWN, _("Right thumbstick down") },
         // I18N: name of buttons on gamepads
-        _("Right thumbstick up"), // SDL_CONTROLLER_AXIS_RIGHTY_UP
+        { SDL_CONTROLLER_AXIS_RIGHTY_UP, _("Right thumbstick up") },
         // I18N: name of buttons on gamepads
-        _("Left trigger"), // SDL_CONTROLLER_AXIS_TRIGGERLEFT_UP
+        { SDL_CONTROLLER_AXIS_TRIGGERLEFT_UP, _("Left trigger") },
         // I18N: name of buttons on gamepads
-        _("Right trigger") // SDL_CONTROLLER_AXIS_TRIGGERRIGHT_UP
+        { SDL_CONTROLLER_AXIS_TRIGGERRIGHT_UP, _("Right trigger") }
     }};
 
     const Binding &b = getBinding(action);
