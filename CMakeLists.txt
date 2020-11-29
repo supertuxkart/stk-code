@@ -41,6 +41,7 @@ CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of t
     "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN" OFF)
+option(USE_GAMEMODE "Support for Feral's gamemode" OFF)
 
 if(APPLE AND NOT IOS)
     list(APPEND CMAKE_PREFIX_PATH /usr/local/opt)
@@ -752,6 +753,16 @@ if (NOT APPLE)
         include_directories(${GAMERZILLA_INCLUDE_DIRS})
         target_link_libraries(supertuxkart ${GAMERZILLA_LIBRARIES})
         add_definitions(-DGAMERZILLA)
+    endif()
+endif()
+
+# gamemode support
+if (USE_GAMEMODE)
+    include(FindPkgConfig)
+    pkg_search_module(GAMEMODE OPTIONAL libgamemodeauto)
+    if (GAMEMODE_LIBRARIES)
+        message(STATUS "gamemode found")
+        target_link_libraries(supertuxkart ${GAMEMODE_LIBRARIES})
     endif()
 endif()
 
