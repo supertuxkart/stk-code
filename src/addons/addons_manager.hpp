@@ -69,7 +69,7 @@ public:
                  AddonsManager();
                 ~AddonsManager();
     void         init(const XMLNode *xml, bool force_refresh);
-    void         initAddons(const XMLNode *xml, int timestamp_check = -1);
+    void         initAddons(const XMLNode *xml);
     void         checkInstalledAddons();
     Addon* getAddon(const std::string &id);
     int          getAddonIndex(const std::string &id) const;

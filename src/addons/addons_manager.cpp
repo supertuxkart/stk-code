@@ -127,7 +127,6 @@ void AddonsManager::init(const XMLNode *xml,
        && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED
        && !file_manager->fileExists(filename_part);
 
-    int timestamp_check = -1;
     if (download)
     {
         Log::info("addons", "Downloading updated addons.xml.");
@@ -140,7 +139,6 @@ void AddonsManager::init(const XMLNode *xml,
                        download_request->getDownloadErrorMessage());
             return;
         }
-        timestamp_check = UserConfigParams::m_addons_last_updated;
         UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
     }
     else
@@ -157,7 +155,7 @@ void AddonsManager::init(const XMLNode *xml,
     }
     if (!xml_addons)
         return;
-    addons_manager->initAddons(xml_addons, timestamp_check);   // will free xml_addons
+    addons_manager->initAddons(xml_addons);   // will free xml_addons
     if(UserConfigParams::logAddons())
         Log::info("addons", "Addons manager list downloaded.");
 }   // init
@@ -169,9 +167,8 @@ void AddonsManager::init(const XMLNode *xml,
  *  without blocking the GUI. This function will update the state variable.
  *  \param xml The xml tree of addons.xml with information about all available
  *         addons.
- *  \param timestamp_check To determine m_has_new_addons.
  */
-void AddonsManager::initAddons(const XMLNode *xml, int timestamp_check)
+void AddonsManager::initAddons(const XMLNode *xml)
 {
     m_addons_list.lock();
     // Clear the list in case that a reinit is being done.
@@ -190,8 +187,12 @@ void AddonsManager::initAddons(const XMLNode *xml, int timestamp_check)
             node->getName()=="arena"                                 )
         {
             Addon addon(*node);
-            if (timestamp_check != -1 && addon.getDate() > timestamp_check)
+            if (addon.testStatus(Addon::AS_APPROVED) &&
+                addon.getDate() > UserConfigParams::m_latest_addon_time)
+            {
                 m_has_new_addons = true;
+                UserConfigParams::m_latest_addon_time = addon.getDate();
+            }
             int index = getAddonIndex(addon.getId());
 
             int stk_version=0;

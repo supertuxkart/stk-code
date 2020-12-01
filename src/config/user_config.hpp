@@ -1138,6 +1138,11 @@ namespace UserConfigParams
                                                 &m_addon_group,
                                         "Time addon-list was updated last.") );
 
+    PARAM_PREFIX TimeUserConfigParam        m_latest_addon_time
+            PARAM_DEFAULT(  TimeUserConfigParam(0, "latest_addon_time",
+                                                &m_addon_group,
+                                        "Latest approved addon time.") );
+
     PARAM_PREFIX StringUserConfigParam      m_language
             PARAM_DEFAULT( StringUserConfigParam("system", "language",
                         "Which language to use (language code or 'system')") );
