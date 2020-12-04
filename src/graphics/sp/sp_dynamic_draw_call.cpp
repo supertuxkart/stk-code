@@ -121,23 +121,23 @@ SPDynamicDrawCall::SPDynamicDrawCall(scene::E_PRIMITIVE_TYPE pt,
     // Origin
     glEnableVertexAttribArray(8);
     glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, 44, (void*)0);
-    glVertexAttribDivisorARB(8, 1);
+    glVertexAttribDivisor(8, 1);
     // Rotation (quaternion in 4 32bit floats)
     glEnableVertexAttribArray(9);
     glVertexAttribPointer(9, 4, GL_FLOAT, GL_FALSE, 44, (void*)12);
-    glVertexAttribDivisorARB(9, 1);
+    glVertexAttribDivisor(9, 1);
     // Scale (3 half floats and .w unused)
     glEnableVertexAttribArray(10);
     glVertexAttribPointer(10, 4, GL_HALF_FLOAT, GL_FALSE, 44, (void*)28);
-    glVertexAttribDivisorARB(10, 1);
+    glVertexAttribDivisor(10, 1);
     // Texture translation
     glEnableVertexAttribArray(11);
     glVertexAttribPointer(11, 2, GL_SHORT, GL_TRUE, 44, (void*)36);
-    glVertexAttribDivisorARB(11, 1);
+    glVertexAttribDivisor(11, 1);
     // Misc data (skinning offset and hue change)
     glEnableVertexAttribArray(12);
     glVertexAttribIPointer(12, 2, GL_SHORT, 44, (void*)40);
-    glVertexAttribDivisorARB(12, 1);
+    glVertexAttribDivisor(12, 1);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif

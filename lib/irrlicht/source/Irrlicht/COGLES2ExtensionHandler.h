@@ -10,6 +10,11 @@
 #include "IrrCompileConfig.h"
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
+
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#include "glad/gl.h"
+#else
+
 #ifdef IOS_STK
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
@@ -20,6 +25,8 @@ typedef char GLchar;
 #if defined(_IRR_OGLES2_USE_EXTPOINTER_)
 #include "gles2-ext.h"
 #endif
+#endif
+
 #endif
 #include "os.h"
 #include "EDriverFeatures.h"

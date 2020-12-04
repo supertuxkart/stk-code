@@ -12,7 +12,9 @@
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
 
-#ifdef IOS_STK
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+#include "glad/gl.h"
+#elif defined (IOS_STK)
 #include <OpenGLES/ES2/gl.h>
 #else
 #include <GLES2/gl2.h>

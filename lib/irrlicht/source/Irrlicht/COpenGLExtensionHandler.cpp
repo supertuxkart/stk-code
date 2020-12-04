@@ -116,7 +116,15 @@ void COpenGLExtensionHandler::dump() const
 void COpenGLExtensionHandler::dumpFramebufferFormats() const
 {
 #ifdef _IRR_WINDOWS_API_
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+	typedef HDC (APIENTRY * wglGetCurrentDC_func)();
+	wglGetCurrentDC_func wglGetCurrentDC_ptr = NULL;
+	wglGetCurrentDC_ptr = (wglGetCurrentDC_func)SDL_GL_GetProcAddress("wglGetCurrentDC");
+	HDC hdc=wglGetCurrentDC_ptr();
+#else
 	HDC hdc=wglGetCurrentDC();
+#endif
+
 	core::stringc wglExtensions;
 #ifdef WGL_ARB_extensions_string
 	PFNWGLGETEXTENSIONSSTRINGARBPROC irrGetExtensionsString = (PFNWGLGETEXTENSIONSSTRINGARBPROC)wglGetProcAddress("wglGetExtensionsStringARB");
@@ -382,11 +390,11 @@ void COpenGLExtensionHandler::initExtensions(bool stencilBuffer, bool useCoreCon
 	StencilBuffer=stencilBuffer;
 
 #ifdef _IRR_OPENGL_USE_EXTPOINTER_
-#ifdef _IRR_WINDOWS_API_
-	#define IRR_OGL_LOAD_EXTENSION(x) wglGetProcAddress(reinterpret_cast<const char*>(x))
-#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && !defined(_IRR_COMPILE_WITH_X11_DEVICE_)
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && !defined(_IRR_COMPILE_WITH_X11_DEVICE_)
 	#define IRR_OGL_LOAD_EXTENSION(x) SDL_GL_GetProcAddress(reinterpret_cast<const char*>(x))
-#else
+#elif defined (_IRR_WINDOWS_API_)
+	#define IRR_OGL_LOAD_EXTENSION(x) wglGetProcAddress(reinterpret_cast<const char*>(x))
+
 	// Accessing the correct function is quite complex
 	// All libraries should support the ARB version, however
 	// since GLX 1.4 the non-ARB version is the official one

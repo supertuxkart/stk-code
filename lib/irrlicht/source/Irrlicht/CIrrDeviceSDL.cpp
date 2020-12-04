@@ -20,6 +20,7 @@
 #include "COpenGLExtensionHandler.h"
 
 #include "guiengine/engine.hpp"
+#include "glad/gl.h"
 
 extern bool GLContextDebugBit;
 
@@ -391,7 +392,8 @@ start:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-		if (Context && versionCorrect(3, 0)) return;
+		if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			versionCorrect(3, 0)) return;
 	}
 
 #else
@@ -416,7 +418,8 @@ start:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-		if (Context && versionCorrect(4, 3)) return;
+		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			versionCorrect(4, 3)) return;
 	}
 
 	if (Context)
@@ -440,7 +443,8 @@ start:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-		if (Context && versionCorrect(3, 3)) return;
+		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			versionCorrect(3, 3)) return;
 	}
 
 	if (Context)
@@ -464,7 +468,8 @@ start:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-		if (Context && versionCorrect(3, 1)) return;
+		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			versionCorrect(3, 1)) return;
 	}
 #endif
 
@@ -500,7 +505,11 @@ legacy:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-		if (Context) return;
+#ifdef _IRR_COMPILE_WITH_OGLES2_
+		if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
+#else
+		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
+#endif
 	}
 
 	if (CreationParams.Doublebuffer)

@@ -30,7 +30,6 @@ option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SYSTEM_ENET "Use system ENet instead of the built-in version, when available." ON)
 option(USE_IPV6 "Allow create or connect to game server with IPv6 address, system enet will not be used." ON)
-option(USE_SYSTEM_GLEW "Use system GLEW instead of the built-in version, when available." ON)
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
@@ -203,32 +202,9 @@ else()
 endif()
 
 # Find system GLEW library or build it if missing
-if (APPLE AND NOT IOS)
-    find_library(GLEW_LIBRARY NAMES glew libglew libGLEW)
-    find_path(GLEW_INCLUDEDIR NAMES GL/glew.h glew.h PATHS)
-    if (NOT GLEW_LIBRARY OR NOT GLEW_INCLUDEDIR)
-        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-        include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/glew/include")
-        set(GLEW_LIBRARIES "glew")
-    else()
-        set(GLEW_LIBRARIES ${GLEW_LIBRARY})
-        include_directories(${GLEW_INCLUDEDIR})
-        MESSAGE(STATUS "Use system GLEW: ${GLEW_LIBRARIES}")
-    endif()
-elseif(NOT USE_GLES2 AND NOT SERVER_ONLY)
-    add_definitions(-DGLEW_NO_GLU)
-    if((UNIX AND NOT APPLE) AND USE_SYSTEM_GLEW)
-        pkg_check_modules(GLEW glew>=2.1)
-    endif()
-
-    if(GLEW_FOUND)
-        include_directories(${GLEW_INCLUDE_DIRS})
-    else()
-        # Fallback to built-in version silently
-        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/glew")
-        include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/glew/include")
-        set(GLEW_LIBRARIES "glew")
-    endif()
+if(NOT SERVER_ONLY)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_engine")
+    include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/graphics_engine/include")
 endif()
 
 if (NOT SERVER_ONLY)
@@ -403,12 +379,6 @@ if (NOT SERVER_ONLY)
         include_directories("${HARFBUZZ_INCLUDEDIR}")
         MESSAGE(STATUS "Use system harfbuzz: ${HARFBUZZ_LIBRARY}")
     endif()
-endif()
-
-# OpenGL
-if(NOT USE_GLES2 AND NOT SERVER_ONLY)
-    find_package(OpenGL REQUIRED)
-    include_directories(${OPENGL_INCLUDE_DIR})
 endif()
 
 if(USE_LIBBFD)
@@ -637,12 +607,8 @@ else()
 endif()
 
 if(NOT SERVER_ONLY)
-    if(NOT USE_GLES2)
-        target_link_libraries(supertuxkart ${OPENGL_gl_LIBRARY} ${GLEW_LIBRARIES})
-    elseif (IOS)
+    if (IOS)
         target_link_libraries(supertuxkart "-framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework CoreMotion -framework Foundation -framework GLKit")
-    else()
-        target_link_libraries(supertuxkart GLESv2)
     endif()
 
     target_link_libraries(supertuxkart
@@ -655,6 +621,7 @@ if(NOT SERVER_ONLY)
         ${SDL2_LIBRARY}
         ${SHEENBIDI_LIBRARY}
         graphics_utils
+        graphics_engine
         tinygettext)
 endif()
 

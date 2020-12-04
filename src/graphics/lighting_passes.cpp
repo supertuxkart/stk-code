@@ -101,10 +101,10 @@ public:
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
-        glVertexAttribDivisorARB(attrib_Position, 1);
-        glVertexAttribDivisorARB(attrib_Energy, 1);
-        glVertexAttribDivisorARB(attrib_Color, 1);
-        glVertexAttribDivisorARB(attrib_Radius, 1);
+        glVertexAttribDivisor(attrib_Position, 1);
+        glVertexAttribDivisor(attrib_Energy, 1);
+        glVertexAttribDivisor(attrib_Color, 1);
+        glVertexAttribDivisor(attrib_Radius, 1);
     }   // PointLightShader
     ~PointLightShader()
     {
@@ -156,10 +156,10 @@ public:
                               sizeof(LightBaseClass::PointLightInfo),
                               (GLvoid*)(7 * sizeof(float)));
 
-        glVertexAttribDivisorARB(attrib_Position, 1);
-        glVertexAttribDivisorARB(attrib_Energy, 1);
-        glVertexAttribDivisorARB(attrib_Color, 1);
-        glVertexAttribDivisorARB(attrib_Radius, 1);
+        glVertexAttribDivisor(attrib_Position, 1);
+        glVertexAttribDivisor(attrib_Energy, 1);
+        glVertexAttribDivisor(attrib_Color, 1);
+        glVertexAttribDivisor(attrib_Radius, 1);
     }   // PointLightScatterShader
     ~PointLightScatterShader()
     {

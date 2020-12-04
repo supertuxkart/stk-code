@@ -110,15 +110,15 @@ CPUParticleManager::GLParticle::GLParticle(bool flips)
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
-    glVertexAttribDivisorARB(0, 1);
+    glVertexAttribDivisor(0, 1);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, 20,
         (void*)12);
-    glVertexAttribDivisorARB(1, 1);
+    glVertexAttribDivisor(1, 1);
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 2, GL_HALF_FLOAT, GL_FALSE, 20,
         (void*)16);
-    glVertexAttribDivisorARB(2, 1);
+    glVertexAttribDivisor(2, 1);
     glBindBuffer(GL_ARRAY_BUFFER, m_particle_quad);
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, 16, 0);
@@ -129,7 +129,7 @@ CPUParticleManager::GLParticle::GLParticle(bool flips)
         glBindBuffer(GL_ARRAY_BUFFER, STKParticle::getFlipsBuffer());
         glEnableVertexAttribArray(6);
         glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 4, 0);
-        glVertexAttribDivisorARB(6, 1);
+        glVertexAttribDivisor(6, 1);
     }
     glBindVertexArray(0);
 }   // GLParticle

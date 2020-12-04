@@ -13,17 +13,21 @@
 #else
 	#define GL_GLEXT_PROTOTYPES 1
 #endif
+
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+	#include "glad/gl.h"
 #ifdef _IRR_WINDOWS_API_
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+#endif
+
+#elif _IRR_WINDOWS_API_
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
 	#include <GL/gl.h>
 #elif defined(_IRR_OSX_PLATFORM_)
 	#define GL_SILENCE_DEPRECATION
 	#include <OpenGL/gl.h>
-#elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
-	#define NO_SDL_GLEXT
-	#include <SDL_video.h>
-	#include <SDL_opengl.h>
 #else
 	#include <GL/gl.h>
 #endif

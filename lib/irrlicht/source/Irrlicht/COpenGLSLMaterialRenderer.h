@@ -8,6 +8,14 @@
 #include "IrrCompileConfig.h"
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 
+#if defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+	#include "glad/gl.h"
+#ifdef _IRR_WINDOWS_API_
+	#define WIN32_LEAN_AND_MEAN
+	#include <windows.h>
+#endif
+#else
+
 #ifdef _IRR_WINDOWS_API_
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
@@ -28,6 +36,8 @@
 #if defined(_IRR_OPENGL_USE_EXTPOINTER_)
 	#include "glext.h"
 #endif
+#endif
+
 #endif
 
 

@@ -8,11 +8,6 @@ if(NOT SERVER_ONLY)
                         "${PNG_INCLUDE_DIRS}"
                         "${ZLIB_INCLUDE_DIR}"
                         "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
-
-    if(NOT USE_GLES2)
-        find_package(OpenGL REQUIRED)
-        include_directories(${OPENGL_INCLUDE_DIR})
-    endif()
 else()
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                         "${CMAKE_CURRENT_SOURCE_DIR}/../../src")

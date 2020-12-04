@@ -22,13 +22,6 @@
 #include "os.h"
 #include "IrrlichtDevice.h"
 
-#ifdef IOS_STK
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES2/glext.h>
-#else
-#include <GLES2/gl2.h>
-#endif
-
 #ifdef _IRR_COMPILE_WITH_WAYLAND_DEVICE_
 #include "CIrrDeviceWayland.h"
 #endif

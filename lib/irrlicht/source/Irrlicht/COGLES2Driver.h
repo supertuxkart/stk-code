@@ -27,6 +27,8 @@ namespace irr
 
 #ifdef _IRR_COMPILE_WITH_OGLES2_
 
+#if !defined(_IRR_COMPILE_WITH_SDL_DEVICE_)
+
 #if defined(_IRR_COMPILE_WITH_IOS_DEVICE_)
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
@@ -35,14 +37,16 @@ namespace irr
 #include "stk_android_native_app_glue.h"
 #endif
 
+#ifdef _MSC_VER
+#pragma comment(lib, "libGLESv2.lib")
+#endif
+
+#endif
+
 #include "CNullDriver.h"
 #include "IMaterialRendererServices.h"
 #include "EDriverFeatures.h"
 #include "fast_atof.h"
-
-#ifdef _MSC_VER
-#pragma comment(lib, "libGLESv2.lib")
-#endif
 #include "COGLES2ExtensionHandler.h"
 
 class ContextManagerEGL;
