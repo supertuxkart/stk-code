@@ -20,8 +20,8 @@ export NDK_CPPFLAGS="-O3 -g"
 export NDK_ABI_ARMV7=armeabi-v7a
 export ARCH_ARMV7=arm
 export HOST_ARMV7=arm-linux-androideabi
-export NDK_PLATFORM_ARMV7=android-19
-export MIN_SDK_VERSION_ARMV7=19
+export NDK_PLATFORM_ARMV7=android-16
+export MIN_SDK_VERSION_ARMV7=16
 export TARGET_SDK_VERSION_ARMV7=29
 export COMPILE_SDK_VERSION_ARMV7=29
 
@@ -36,8 +36,8 @@ export COMPILE_SDK_VERSION_AARCH64=29
 export NDK_ABI_X86=x86
 export ARCH_X86=x86
 export HOST_X86=i686-linux-android
-export NDK_PLATFORM_X86=android-19
-export MIN_SDK_VERSION_X86=19
+export NDK_PLATFORM_X86=android-16
+export MIN_SDK_VERSION_X86=16
 export TARGET_SDK_VERSION_X86=29
 export COMPILE_SDK_VERSION_X86=29
 
@@ -314,6 +314,13 @@ if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     echo $COMPILE_ARCH > "$DIRNAME/obj/compile_arch"
 fi
 
+# Last ndk supporting android 14 is 17c which has gcc-4.9, and most
+# dependencies require clang to build
+if [ -f "$DIRNAME/obj/bin/$HOST-gcc-4.9" ]; then
+    cp "$DIRNAME/obj/bin/clang" "$DIRNAME/obj/bin/$HOST-gcc"
+    cp "$DIRNAME/obj/bin/clang++" "$DIRNAME/obj/bin/$HOST-g++"
+fi
+
 echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
 
 # Zlib
@@ -338,11 +345,16 @@ if [ ! -f "$DIRNAME/obj/libpng.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/libpng/"* "$DIRNAME/obj/libpng"
 
     cd "$DIRNAME/obj/libpng"
+    MLIBRARY="$DIRNAME/obj/sysroot/usr/lib/$HOST/libm.a"
+    # For ndk 17c
+    if [ ! -f "$MLIBRARY" ]; then
+        MLIBRARY="$DIRNAME/obj/sysroot/usr/lib/libm.a"
+    fi
     cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
             -DHOST=$HOST -DARCH=$ARCH                                     \
             -DZLIB_LIBRARY="$DIRNAME/obj/zlib/libz.a"                     \
             -DZLIB_INCLUDE_DIR="$DIRNAME/obj/zlib/"                       \
-            -DM_LIBRARY="$DIRNAME/obj/sysroot/usr/lib/$HOST/libm.a"       \
+            -DM_LIBRARY="$MLIBRARY"                                       \
             -DPNG_TESTS=0 -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
@@ -359,7 +371,7 @@ if [ ! -f "$DIRNAME/obj/freetype_bootstrap.stamp" ]; then
     ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a"\
     LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a"\
     ./configure --host=$HOST --enable-shared=no \
-                --without-harfbuzz --without-brotli &&
+                --without-harfbuzz --without-brotli --without-bzip2 &&
     make $@
     check_error
     # We need to rebuild freetype after harfbuzz is compiled
@@ -395,7 +407,7 @@ if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
     ZLIB_CFLAGS="-fpic -I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a" \
     LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a" \
     HARFBUZZ_CFLAGS="-I$DIRNAME/obj/harfbuzz/src/" HARFBUZZ_LIBS="$DIRNAME/obj/harfbuzz/src/.libs/libharfbuzz.a" \
-    ./configure --host=$HOST --enable-shared=no --without-brotli
+    ./configure --host=$HOST --enable-shared=no --without-brotli --without-bzip2
     make $@
     check_error
     touch "$DIRNAME/obj/freetype.stamp"
