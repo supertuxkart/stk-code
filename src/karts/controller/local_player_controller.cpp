@@ -208,7 +208,18 @@ bool LocalPlayerController::action(PlayerAction action, int value,
                 m_steer_val_l, m_steer_val_r);
         }
     }
-    return PlayerController::action(action, value, /*dry_run*/false);
+    bool ret = PlayerController::action(action, value, /*dry_run*/false);
+
+    if (UserConfigParams::m_controller_autoaccel)
+    {
+      if (((action == PA_BRAKE || action == PA_ACCEL) && value == 0))
+      {
+        ret = LocalPlayerController::action(PA_ACCEL, 65535.0f, false);
+        action = PA_ACCEL;
+      }
+    }
+
+    return ret;
 }   // action
 
 //-----------------------------------------------------------------------------

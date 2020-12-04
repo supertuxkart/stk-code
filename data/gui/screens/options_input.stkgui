@@ -44,6 +44,15 @@
 
                 <label id="help2" I18N="In the input configuration screen" text="* Which config to use will be inferred from which 'Select' key is pressed to join the game."
                        proportion="2" word_wrap="true"/>
+
+                <div layout="horizontal-row" width="100%" height="fit">
+                  <checkbox id="controller_autoaccel"/>
+                  <spacer width="1%" height="100%" />
+                  <label height="100%" I18N="In the input configuration screen" text="Add a chewing-gum under the accelerator pedal" word_wrap="true"/>
+                </div>
+
+                <spacer width="5" height="2%"/>
+
             </box>
         </div>
     </div>

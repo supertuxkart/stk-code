@@ -22,6 +22,7 @@
 #include "guiengine/CGUISpriteBank.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -210,6 +211,9 @@ void OptionsScreenInput::init()
         getWidget("help1")->setText(_("Press enter or double-click on a device to configure it"));
         getWidget("help2")->setVisible(true);
     }
+
+    getWidget<CheckBoxWidget>("controller_autoaccel")->setState(UserConfigParams::m_controller_autoaccel);
+
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -318,6 +322,10 @@ void OptionsScreenInput::eventCallback(Widget* widget, const std::string& name, 
         {
             Log::error("OptionsScreenInput", "Cannot read internal input device ID: %s", selection.c_str());
         }
+    }
+    else if (name == "controller_autoaccel")
+    {
+        UserConfigParams::m_controller_autoaccel = getWidget<CheckBoxWidget>("controller_autoaccel")->getState();
     }
 
 }   // eventCallback

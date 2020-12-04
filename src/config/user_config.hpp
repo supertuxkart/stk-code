@@ -1063,6 +1063,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
                             "Use ball camera in soccer mode, instead of reverse") );
 
+    // ---- Auto accelerate once you pressed to accel key
+    PARAM_PREFIX BoolUserConfigParam       m_controller_autoaccel
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "controller-autoaccel",
+                            "Add a chewing-gum under the accelerator pedal") );
+
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap
             PARAM_DEFAULT( GroupUserConfigParam("Handicap",
