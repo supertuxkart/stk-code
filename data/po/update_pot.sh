@@ -204,7 +204,7 @@ function translate_str()
 {
     # Remove newline in msgid of po file first
     echo $(sed ':a;N;$!ba;s/\"\n\"//g' "$2" \
-        | grep -A 1 -e "msgid \"$1\"" | sed -n 's/msgstr "\(.*\)"/\1/p')
+        | grep -A 1 -e "msgid \"$1\"" | tail -n +2 | cut -c 9- |sed 's/.$//')
 }
 
 for PO in $(ls data/po/*.po); do
