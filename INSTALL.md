@@ -13,13 +13,11 @@ svn co https://svn.code.sf.net/p/supertuxkart/code/stk-assets stk-assets
 
 To build SuperTuxKart from source, you'll need to install the following packages:
 
-* OpenGL (mesa)
 * OpenAL (recommended: openal-soft-devel)
 * Ogg (libogg-dev)
 * Vorbis (libvorbis-dev)
 * Freetype (libfreetype6-dev)
 * Harfbuzz (libharfbuzz-dev)
-* Fribidi (libfribidi-dev)
 * libcurl (libcurl-devel)
 * libbluetooth (bluez-devel)
 * openssl (openssl-dev)
@@ -31,13 +29,13 @@ To build SuperTuxKart from source, you'll need to install the following packages
 Fedora command:
 
 ```bash
-sudo dnf install @development-tools angelscript-devel \ 
+sudo dnf install @development-tools angelscript-devel \
 bluez-libs-devel cmake desktop-file-utils SDL2-devel \
-freealut-devel freeglut-devel freetype-devel fribidi-devel \
-gcc-c++ git-core libXrandr-devel libcurl-devel libjpeg-turbo-devel \ 
-libpng-devel libsquish-devel libtool libvorbis-devel mesa-libEGL-devel \ 
-mesa-libGLES-devel openal-soft-devel openssl-devel libcurl-devel harfbuzz-devel \ 
-fribidi-devel mesa-libGL-devel libogg-devel libGLEW openssl-devel pkgconf \
+freealut-devel freetype-devel \
+gcc-c++ git-core libcurl-devel libjpeg-turbo-devel \
+libpng-devel libsquish-devel libtool libvorbis-devel \
+openal-soft-devel openssl-devel libcurl-devel harfbuzz-devel \
+libogg-devel openssl-devel pkgconf \
 wiiuse-devel zlib-devel
 ```
 
@@ -45,27 +43,27 @@ Mageia 6 command:
 
 ```bash
 su -c 'urpmi gcc-c++ cmake openssl-devel libcurl-devel freetype-devel harfbuzz-devel \
-fribidi-devel libjpeg-turbo-devel libogg-devel openal-soft-devel SDL2-devel \
+libjpeg-turbo-devel libogg-devel openal-soft-devel SDL2-devel \
 libpng-devel libvorbis-devel nettle-devel zlib-devel git subversion \
-mesa-comon-devel libxrandr-devel libbluez-devel libfreetype6-devel'
+libbluez-devel libfreetype6-devel
 ```
 
 openSUSE command:
 
 ```bash
 sudo zypper install gcc-c++ cmake openssl-devel libcurl-devel libSDL2-devel \
-freetype-devel harfbuzz-devel fribidi-devel libogg-devel openal-soft-devel libpng-devel \
-libvorbis-devel libXrandr-devel pkgconf zlib-devel enet-devel glew-devel \
-libjpeg-devel bluez-devel freetype2-devel glu-devel
+freetype-devel harfbuzz-devel libogg-devel openal-soft-devel libpng-devel \
+libvorbis-devel pkgconf zlib-devel enet-devel \
+libjpeg-devel bluez-devel freetype2-devel
 ```
 
 Ubuntu command:
 
 ```bash
 sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-dev \
-libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev libfribidi-dev \
-libgl1-mesa-dev libglew-dev libjpeg-dev libogg-dev libopenal-dev libpng-dev \
-libssl-dev libvorbis-dev libxrandr-dev libx11-dev nettle-dev pkg-config zlib1g-dev
+libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev \
+libjpeg-dev libogg-dev libopenal-dev libpng-dev \
+libssl-dev libvorbis-dev nettle-dev pkg-config zlib1g-dev
 ```
 
 ### In-game recorder
@@ -209,20 +207,7 @@ If you have never built anything before, you have create `/usr/local/include/` f
 sudo mkdir -p /usr/local/include/
 ```
 
-Symlink the `include`-folder of OpenGL framework to `/usr/local/include/GL` (Unix programs have an easier time finding it this way):
-
-```bash
-sudo ln -s /System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/ /usr/local/include/GL
-```
-
-On OS X 10.9.5, you might need the following workaround:
-
-```bash
-sudo ln -s `xcrun --show-sdk-path`/usr/include/ /usr/include
-sudo ln -s `xcrun --show-sdk-path`/System/Library/Frameworks/OpenGL.framework/Headers/ /usr/local/include/OpenGL
-```
-
-The first link is required in order to find libcurl, the second to find opengl.
+The first link is required in order to find libcurl.
 
 ### STK 0.10 or later (or latest git)
 
@@ -239,7 +224,7 @@ Build STK
 ```bash
 mkdir cmake_build
 cd cmake_build
-CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/glew/:/usr/local/opt/fribidi/ cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/
+CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/ cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/
 make
 ```
 

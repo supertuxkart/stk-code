@@ -431,7 +431,6 @@ build_stk()
     cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
              -DUSE_SYSTEM_ANGELSCRIPT=0 \
              -DUSE_SYSTEM_ENET=0 \
-             -DUSE_SYSTEM_GLEW=0 \
              -DUSE_SYSTEM_WIIUSE=0 \
              -DENABLE_WAYLAND_DEVICE=0 \
              -DCMAKE_DISABLE_FIND_PACKAGE_Fontconfig=1 \

@@ -47,8 +47,6 @@ set(OGGVORBIS_VORBISENC_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libvorbi
 set(OGGVORBIS_VORBISENC_INCLUDE_DIR ${DEPS_PATH}/ios_arm64/dependencies/include/vorbis CACHE STRING "")
 set(HARFBUZZ_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libharfbuzz.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libharfbuzz.a CACHE STRING "")
 set(HARFBUZZ_INCLUDEDIR ${DEPS_PATH}/ios_arm64/dependencies/include CACHE STRING "")
-set(FRIBIDI_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libfribidi.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libfribidi.a CACHE STRING "")
-set(FRIBIDI_INCLUDE_DIR ${DEPS_PATH}/ios_arm64/dependencies/include CACHE STRING "")
 set(FREETYPE_LIBRARY ${DEPS_PATH}/ios_arm64/dependencies/lib/libfreetype.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libfreetype.a CACHE STRING "")
 set(FREETYPE_INCLUDE_DIRS ${DEPS_PATH}/ios_arm64/dependencies/include/freetype2 CACHE STRING "")
 set(CURL_LIBRARY "${DEPS_PATH}/ios_arm64/dependencies/lib/libcurl.a;${DEPS_PATH}/ios_arm64/dependencies/lib/libssl.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libcurl.a;${DEPS_PATH}/ios_simulator64/dependencies/lib/libssl.a" CACHE STRING "")

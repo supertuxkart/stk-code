@@ -33,16 +33,12 @@ addons:
     - libcurl4-gnutls-dev
     - libfreetype6-dev
     - libharfbuzz-dev
-    - libfribidi-dev
-    - libgl1-mesa-dev
     - libjpeg-dev
     - libogg-dev
     - libopenal-dev
     - libpng-dev
     - libsdl2-dev
     - libvorbis-dev
-    - libxrandr-dev
-    - mesa-common-dev
     - pkg-config
     - zlib1g-dev
 
@@ -50,11 +46,11 @@ before_script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update && brew bundle; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo mkdir -p /usr/local/include/; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then sudo ln -s /System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/ /usr/local/include/GL; fi
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/glew/:/usr/local/opt/fribidi/:/usr/local/opt/harfbuzz/; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/harfbuzz/; fi
 
 script:
   - mkdir "build"
   - cd "build"
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DUSE_SYSTEM_GLEW=1 -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
   - if [[ "$TRAVIS_OS_NAME" != "osx" ]]; then cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off; fi
   - make VERBOSE=1 -j3

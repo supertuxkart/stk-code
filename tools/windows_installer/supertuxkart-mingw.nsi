@@ -272,7 +272,6 @@ Section "Uninstall" redist
   DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
   DELETE /REBOOTOK "$INSTDIR\License.txt"
   DELETE /REBOOTOK "$INSTDIR\libfreetype-6.dll"
-  DELETE /REBOOTOK "$INSTDIR\libfribidi-0.dll"
   DELETE /REBOOTOK "$INSTDIR\libharfbuzz-0.dll"
   DELETE /REBOOTOK "$INSTDIR\libharfbuzz-subset-0.dll"
   DELETE /REBOOTOK "$INSTDIR\libidn-11.dll"

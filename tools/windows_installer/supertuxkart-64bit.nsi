@@ -283,7 +283,6 @@ Section "Uninstall" redist
   DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
   DELETE /REBOOTOK "$INSTDIR\License.txt"
   DELETE /REBOOTOK "$INSTDIR\libfreetype.dll"
-  DELETE /REBOOTOK "$INSTDIR\libfribidi-0.dll"
   DELETE /REBOOTOK "$INSTDIR\libogg-0.dll"
   DELETE /REBOOTOK "$INSTDIR\OpenAL32.dll"
   DELETE /REBOOTOK "$INSTDIR\physfs.dll"

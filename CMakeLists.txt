@@ -201,7 +201,6 @@ else()
     set(ENET_LIBRARIES "enet")
 endif()
 
-# Find system GLEW library or build it if missing
 if(NOT SERVER_ONLY)
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_engine")
     include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/graphics_engine/include")

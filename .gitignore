@@ -80,7 +80,6 @@ lib/libjpeg
 lib/zlib
 lib/openal
 lib/openssl
-lib/fribidi
 lib/harfbuzz
 lib/sdl2
 

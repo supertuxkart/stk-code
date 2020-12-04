@@ -277,7 +277,6 @@ Section "Uninstall" redist
   RMDir /r /REBOOTOK $INSTDIR\data
   RMDir /r /REBOOTOK $INSTDIR\prerequisites
 
-  DELETE /REBOOTOK "$INSTDIR\glew32.dll"
   DELETE /REBOOTOK "$INSTDIR\install.ico"
   DELETE /REBOOTOK "$INSTDIR\icon.ico"
   DELETE /REBOOTOK "$INSTDIR\Irrlicht.dll"
