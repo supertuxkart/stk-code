@@ -816,7 +816,7 @@ IFileList* CFileSystem::createFileList(const io::path& directory)
 		#ifdef _IRR_WINDOWS_API_
 		#if !defined ( _WIN32_WCE )
 
-		r = new CFileList(Path, true, false);
+		r = new CFileList(Path, false, false);
 
 
 		intptr_t hFile;
