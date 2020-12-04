@@ -16,9 +16,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 09:33+0800\n"
-"PO-Revision-Date: 2020-09-21 01:34+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"PO-Revision-Date: 2020-11-22 12:53+0000\n"
+"Last-Translator: Osoitz <oelkoro@gmail.com>\n"
 "Language-Team: Basque (http://www.transifex.com/supertuxkart/supertuxkart/language/eu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -387,11 +387,6 @@ msgstr "Kamera leuna"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
-msgstr ""
-
-#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
-#. I18N: In the ui/camera screen
-msgid "Follow ball in soccer mode"
 msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -803,6 +798,8 @@ msgstr "Lasterketa normala"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1013,7 +1010,7 @@ msgstr "Instalatuta"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Standard"
 msgstr "Arrunta"
 
@@ -1120,12 +1117,9 @@ msgstr "Mamu errepikapen aukera"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Time trial"
-msgstr "Ordulariaren kontra"
-
-#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
-#. I18N: In the ghost replay selection screen
-msgid "Egg hunt"
+#. I18N: Game mode
+#: src/race/race_manager.cpp:1200
+msgid "Egg Hunt"
 msgstr "Arrautza ehiza"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
@@ -1615,7 +1609,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "... or on the same device:"
-msgstr ""
+msgstr "... edo gailu berean:"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -2157,11 +2151,16 @@ msgstr "Letraren tamaina"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "Kamera"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
+msgstr "Pertsonalizatua..."
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Follow ball in soccer mode for backward camera"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
@@ -2197,7 +2196,7 @@ msgstr "Lausotze efektuen maila"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync"
-msgstr ""
+msgstr "Sinkronizazio bertikala"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -3316,7 +3315,7 @@ msgstr "Zure sarrera konfigurazio fitxategia ez da bateragarria STK bertsio hone
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:152
 msgid "Guide"
-msgstr ""
+msgstr "Gida"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:154
@@ -3474,7 +3473,7 @@ msgid "You finished the race!"
 msgstr "Lasterketa amaitu duzu!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
 #, c-format
 msgid "%s left the game."
 msgstr "%s(e)k partida utzi du."
@@ -3482,24 +3481,22 @@ msgstr "%s(e)k partida utzi du."
 #: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
-msgstr "SuperTuxkart zerbitzari batera konektatu daiteke gehigarriak deskargatzeko eta eguneraketen berri emateko. Hardwareari buruzko estatistika anonimoak ere jasotzen ditugu STK-ren garapenean laguntzeko.\nIrakurri gure pribatutasun politika hemen: http://privacy.supertuxkart.net\nEzaugarri hau gaitu nahi duzu? (Ezarpen hau gero aldatzeko, joan aukeretara, 'Orokorra' fitxa eta aldatu 'Konektatu Internetera' eta 'Bidali Hardware estatistika anonimoak')."
+"updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
+" Would you like this feature to be enabled? (To change this setting at a "
+"later time, go to options, select tab 'General', and edit \"Connect to the "
+"Internet\")."
+msgstr ""
 
-#: src/main.cpp:2194
+#: src/main.cpp:2193
 msgid "Your screen resolution is too low to run STK."
 msgstr "Zure pantaila bereizmena txikiegia da STK exekutatzeko."
 
-#: src/main.cpp:2229
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Zure kontrolatzailearen bertsioa zaharregia da. Mesedez instalatu bideo kontrolatzaile berrienak."
 
-#: src/main.cpp:2247
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3507,7 +3504,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Zure driver grafikoa oso zaharra dela ematen du. Egiaztatu eguneraketarik eskuragarri duzun. SuperTuxKart jolasak %s edo berriagoa onartzen duen driver bat aholkatzen du. Jolasa agian ibiliko da, baina grafiko makalagoekin."
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Denboraz kanpo zerbitzari konexioa"
 
@@ -3578,12 +3575,12 @@ msgstr "ALDERANTZIZKO BIDEA!"
 #: src/modes/soccer_world.cpp:524 src/modes/soccer_world.cpp:651
 #, c-format
 msgid "%s scored a goal!"
-msgstr ""
+msgstr "%s(e)k gola sartu du!"
 
 #: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
 #, c-format
 msgid "Oops, %s made an own goal!"
-msgstr ""
+msgstr "Ene, %s(e)k gola bere atean sartu du!"
 
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
@@ -3614,7 +3611,7 @@ msgid "You were kicked: Ping too high."
 msgstr "Kanporatu zaituzte: Ping altuegia."
 
 #: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:864
+#: src/network/protocols/client_lobby.cpp:868
 msgid "Bad network connection is detected."
 msgstr "Sare konexio txarra antzeman da."
 
@@ -3692,90 +3689,90 @@ msgstr "Txapelketaren egoera: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:860
 msgid "All players joined red or blue team."
 msgstr "Jokalari guztiak talde gorrira edo urdinera elkartu dira."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:876
+#: src/network/protocols/client_lobby.cpp:880
 msgid "You are now the owner of server."
 msgstr "Orain zerbitzariaren jabea zara."
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Server is busy."
 msgstr "Konexio ukatua: Zerbitzaria okupatua."
 
-#: src/network/protocols/client_lobby.cpp:924
+#: src/network/protocols/client_lobby.cpp:928
 msgid "Connection refused: You are banned from the server."
 msgstr "Konexio ukatua: Zerbitzaritik kanporatua izan zara."
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Server password is incorrect."
 msgstr "Konexio ukatua: Zerbitzari pasahitza ez zuzena."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Game data is incompatible."
 msgstr "Konexio ukatua: Joko datuak ez konpatibleak."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Server is full."
 msgstr "Konexio ukatua: Zerbitzaria beteta."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:954
 msgid "Connection refused: Invalid player connecting."
 msgstr "Konexio ukatua: Jokalari baliogabea konektatzen."
 
-#: src/network/protocols/client_lobby.cpp:978
+#: src/network/protocols/client_lobby.cpp:982
 msgid "Failed to start the network game."
 msgstr "Ezin izan da sareko partida hasi."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Partida amaitu da, ezin duzu jada zuzenean elkartu edo behatu."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Ez dago tokirik borroka-zelaian. Zuzeneko elkartzea desgaitu da."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1203
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Jokalari bat besterik ez da geratzen, itxaron gelara itzultzen."
 
-#: src/network/protocols/client_lobby.cpp:1205
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
-msgstr ""
+msgstr "Zerbitzariaren jabeak partida utzi du."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
-msgstr ""
+msgstr "Hurrengo partidan ikusle izango zara."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1377
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s talde gorrira elkartu da."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1383
+#: src/network/protocols/client_lobby.cpp:1387
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s talde urdinera elkartu da."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1389
+#: src/network/protocols/client_lobby.cpp:1393
 #, c-format
 msgid "%s joined the game."
 msgstr "%s partidara elkartu da."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1580
+#: src/network/protocols/client_lobby.cpp:1584
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3783,7 +3780,7 @@ msgid ""
 msgstr ""
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1596
+#: src/network/protocols/client_lobby.cpp:1600
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%s salatuta."
@@ -3890,11 +3887,6 @@ msgstr "Jarraitu liderra"
 msgid "3 Strikes Battle"
 msgstr "3 joaldietara borroka jokoa"
 
-#. I18N: Game mode
-#: src/race/race_manager.cpp:1200
-msgid "Egg Hunt"
-msgstr "Arrautza ehiza"
-
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
 msgstr "Osatugabeko errepikapena, fitxategia ez da gordeko."
@@ -4000,7 +3992,7 @@ msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "Jokalari bakarreko borroka-zelai %d ez dago erabilgarri."
 msgstr[1] "Jokalari bakarreko %d borroka-zelai ez daude erabilgarri."
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Launchpad Contributions:\n  Amy Smile Kerkhof https://launchpad.net/~amy\n  Ander Elortondo https://launchpad.net/~ander-elor\n  Asier Iturralde Sarasola https://launchpad.net/~asier-iturralde\n  Jan Mees https://launchpad.net/~jmees001\n  Mikel Iturbe Urretxa https://launchpad.net/~mik-iturbe\n  STK-team https://launchpad.net/~stk"
 
@@ -4911,7 +4903,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Errore bat gertatu da zure txapelketa gordetzen saiatzean."
 
-#: src/states_screens/edit_track_screen.cpp:254
+#: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
 msgstr "Hautatu zirkuitua"
 
@@ -5589,12 +5581,12 @@ msgstr "Zentratua"
 #. I18N: In the UI options, splitscreen_method in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:117
 msgid "Vertical"
-msgstr ""
+msgstr "Bertikala"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:119
 msgid "Horizontal"
-msgstr ""
+msgstr "Horizontala"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:130
@@ -5623,18 +5615,18 @@ msgstr "Oso handia"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Pertsonalizatua"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:363
+#: src/states_screens/options/options_screen_ui.cpp:364
 msgid "Drone chase"
 msgstr ""
 
-#: src/states_screens/options/options_screen_ui.cpp:533
+#: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5816,7 +5808,7 @@ msgstr "Zerbitzairiari itxaroten"
 #: src/states_screens/race_gui_base.cpp:637
 #, c-format
 msgid "\"%s\""
-msgstr ""
+msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
@@ -6010,12 +6002,12 @@ msgstr "guztiak"
 msgid "Locked!"
 msgstr "Giltzatuta!"
 
-#: src/utils/string_utils.cpp:1413
+#: src/utils/string_utils.cpp:1415
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
+#: src/utils/string_utils.cpp:1422 src/utils/string_utils.cpp:1426
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
@@ -6136,7 +6128,7 @@ msgstr "Lasterketa hasteko prest zaude. Zorte on!"
 #. description in Google Play
 #: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
 msgid "A 3D open-source kart racing game"
-msgstr ""
+msgstr "Kart lasterketetako 3D jolas librea"
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
@@ -6173,7 +6165,7 @@ msgstr ""
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."
-msgstr ""
+msgstr "Jolas hau doakoa da eta iragarkirik gabekoa."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
@@ -6186,12 +6178,12 @@ msgstr ""
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr ""
+msgstr "Bertsio hau bertsio egonkorrarekin batera instalatu da gailuan."
 
 #: supertuxkart.appdata.xml:26
 msgid "If you need more stability, consider using the stable version: %s"
-msgstr ""
+msgstr "Egonkortasun gehiago behar baduzu, erabili bertsio egonkorra: %s"
 
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
-msgstr ""
+msgstr "SuperTuxKart taldea"

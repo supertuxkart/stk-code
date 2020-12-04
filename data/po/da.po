@@ -5,16 +5,16 @@
 # Translators:
 # Benau, 2018
 # Joe Hansen <joedalton2@yahoo.dk>, 2009,2015
-# Lars Lyngby <larslyngby@hotmail.com>, 2019
+# Lars Lyngby <larslyngby@hotmail.com>, 2019-2020
 # scootergrisen, 2015-2020
 # Søren Dyhr <siadyhr@gmail.com>, 2015-2016
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 09:33+0800\n"
-"PO-Revision-Date: 2020-09-21 20:43+0000\n"
-"Last-Translator: scootergrisen\n"
+"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"PO-Revision-Date: 2020-11-19 06:30+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Danish (http://www.transifex.com/supertuxkart/supertuxkart/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -384,11 +384,6 @@ msgstr "Flydende kamerabevægelse"
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
 msgstr "Bagudkamera"
-
-#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
-#. I18N: In the ui/camera screen
-msgid "Follow ball in soccer mode"
-msgstr "Følg bolden i fodboldstilstand"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -799,6 +794,8 @@ msgstr "Normalt løb"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1009,7 +1006,7 @@ msgstr "Installeret"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Standard"
 msgstr "Standard"
 
@@ -1116,12 +1113,9 @@ msgstr "Valg af spøgelsesgengivelse"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Time trial"
-msgstr "Tidskørsel"
-
-#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
-#. I18N: In the ghost replay selection screen
-msgid "Egg hunt"
+#. I18N: Game mode
+#: src/race/race_manager.cpp:1200
+msgid "Egg Hunt"
 msgstr "Æggejagt"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
@@ -2159,6 +2153,11 @@ msgstr "Kamera"
 #. I18N: In the ui settings
 msgid "Custom..."
 msgstr "Tilpas ..."
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Follow ball in soccer mode for backward camera"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -3470,7 +3469,7 @@ msgid "You finished the race!"
 msgstr "Du fuldførte løbet!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
 #, c-format
 msgid "%s left the game."
 msgstr "%s forlod spillet."
@@ -3478,24 +3477,22 @@ msgstr "%s forlod spillet."
 #: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
-msgstr "SuperTuxKart kan forbinde til en server for at hente udvidelser og informere om opdateringer. Vi samler også anonym hardwarestatistik som hjælp til udvikling af STK. Læs venligst vores privatlivspolitik på http://privacy.supertuxkart.net. Vil du aktivere funktionen? (Du kan også ændre det senere i indstillinger i fanebladet \"Generelt\" ved at ændre \"Opret forbindelse til internettet\" og \"Send anonym hardwarestatistik\")."
+"updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
+" Would you like this feature to be enabled? (To change this setting at a "
+"later time, go to options, select tab 'General', and edit \"Connect to the "
+"Internet\")."
+msgstr "SuperTuxKart kan åbne en forbindelse til en server for at hente tilføjelser og for at kunne informere dig om opdateringer. Læs venligst vores politik for private oplysninger på https://supertuxkart.net/Privacy. Ønsker du muligheden slået til? (for at ændre det på et senere tidspunkt gå til Indstillinger, Generelt, Tilret \"Opret forbindelse til Internettet\")."
 
-#: src/main.cpp:2194
+#: src/main.cpp:2193
 msgid "Your screen resolution is too low to run STK."
 msgstr "Din skærmopløsning er for lav til STK."
 
-#: src/main.cpp:2229
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Din driverversion er for gammel. Installer venligst de seneste videodrivere."
 
-#: src/main.cpp:2247
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3503,7 +3500,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Din grafikkortdriver ser ud til at være meget gammel. Tjek venligst om der findes en opdatering. SuperTuxKart anbefaler en driver, som understøtter %s eller bedre. Spillet kan sandsynligvis køre - men med en dårligere grafiktilstand."
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Serverforbindelsen fik timeout."
 
@@ -3610,7 +3607,7 @@ msgid "You were kicked: Ping too high."
 msgstr "Du blev sparket: Ping for høj."
 
 #: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:864
+#: src/network/protocols/client_lobby.cpp:868
 msgid "Bad network connection is detected."
 msgstr "Dårlig netforbindelse registreret."
 
@@ -3688,90 +3685,90 @@ msgstr "Grandprixforløb: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:860
 msgid "All players joined red or blue team."
 msgstr "Alle spillere deltager på rødt eller blåt hold."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:876
+#: src/network/protocols/client_lobby.cpp:880
 msgid "You are now the owner of server."
 msgstr "Du er nu ejer af serveren."
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Server is busy."
 msgstr "Forbindelse nægtet: Serveren er optaget."
 
-#: src/network/protocols/client_lobby.cpp:924
+#: src/network/protocols/client_lobby.cpp:928
 msgid "Connection refused: You are banned from the server."
 msgstr "Forbindelse nægtet: Du er udelukket fra serveren."
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Server password is incorrect."
 msgstr "Forbindelse nægtet: Adgangskoden til serveren er forkert."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Game data is incompatible."
 msgstr "Forbindelse nægtet: Spildata er ikke kompatible."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Server is full."
 msgstr "Forbindelse nægtet: Serveren er fuld."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:954
 msgid "Connection refused: Invalid player connecting."
 msgstr "Forbindelse nægtet: Ugyldig spiller opretter forbindelse."
 
-#: src/network/protocols/client_lobby.cpp:978
+#: src/network/protocols/client_lobby.cpp:982
 msgid "Failed to start the network game."
 msgstr "Kunne ikke starte netværksspillet."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Løbet er slut. Du kan ikke længere live-deltage eller se med."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Ingen tilbageværende plads i arenaen - live-deltag er deaktiveret."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1203
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Kun 1 spiller tilbage. Vender tilbage til lobbyen."
 
-#: src/network/protocols/client_lobby.cpp:1205
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
 msgstr "Serverens ejer forlod spillet."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
 msgstr "Du ser med i det næste spil."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1377
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s deltager på det røde hold."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1383
+#: src/network/protocols/client_lobby.cpp:1387
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s deltager på det blå hold."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1389
+#: src/network/protocols/client_lobby.cpp:1393
 #, c-format
 msgid "%s joined the game."
 msgstr "%s deltager i løbet."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1580
+#: src/network/protocols/client_lobby.cpp:1584
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3779,7 +3776,7 @@ msgid ""
 msgstr "Tryk på <%s> eller <%s> for at skifte den valgte spiller, <%s> eller  <%s> for at skifte kameraets placering."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1596
+#: src/network/protocols/client_lobby.cpp:1600
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%s blev rapporteret."
@@ -3886,11 +3883,6 @@ msgstr "Følg lederen"
 msgid "3 Strikes Battle"
 msgstr "3-slags-kamp"
 
-#. I18N: Game mode
-#: src/race/race_manager.cpp:1200
-msgid "Egg Hunt"
-msgstr "Æggejagt"
-
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
 msgstr "Ufuldstændig gengivelsesfil vil ikke blive gemt."
@@ -3996,7 +3988,7 @@ msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d utilgængelig arena i enkeltspiller."
 msgstr[1] "%d utilgængelige arenaer i enkeltspiller."
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Launchpad Contributions:\n  1001sd https://launchpad.net/~siadyhr\n  Aputsiaĸ Niels Janussen https://launchpad.net/~aj\n  Auria https://launchpad.net/~auria-mg\n  J https://launchpad.net/~rumbukken\n  Marcus Møller https://launchpad.net/~marcusmoller\n  STK-team https://launchpad.net/~stk\n  Lars Lyngby https://launchpad.net/~larslyngby\n\nscootergrisen"
 
@@ -4907,7 +4899,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Der opstod en fejl under forsøget på at gemme dit grandprix."
 
-#: src/states_screens/edit_track_screen.cpp:254
+#: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
 msgstr "Vælg bane"
 
@@ -5051,20 +5043,20 @@ msgstr "Vil du spille introduktionen til spillet?"
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
-msgstr "Du kan ikke spille online uden internetadgang. Hvis du vil spille online så gå ind i indstillingsmenuen og tilvælg \"Opret forbindelse til internettet\"."
+msgstr "Du kan ikke spille online uden internetadgang. Hvis du vil spille online så gå ind i indstillingsmenuen og tilvælg \"Opret forbindelse til Internettet\"."
 
 #: src/states_screens/main_menu_screen.cpp:571
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
-msgstr "Du kan ikke downloade udvidelser uden internetadgang. Hvis du vil downloade udvidelser så gå ind i indstillingsmenuen og tilvælg \"Opret forbindelse til internettet\"."
+msgstr "Du kan ikke downloade udvidelser uden internetadgang. Hvis du vil downloade udvidelser så gå ind i indstillingsmenuen og tilvælg \"Opret forbindelse til Internettet\"."
 
 #: src/states_screens/main_menu_screen.cpp:579
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr "Du kan ikke downloade udvidelser uden internetadgang. Hvis du vil downloade udvidelser så gå ind i indstillingsmenuen og tilvælg \"Opret forbindelse til internettet\".\n\nDu kan dog slette udvidelser, som allerede er downloadet."
+msgstr "Du kan ikke downloade udvidelser uden internetadgang. Hvis du vil downloade udvidelser så gå ind i indstillingsmenuen og tilvælg \"Opret forbindelse til Internettet\".\n\nDu kan dog slette udvidelser, som allerede er downloadet."
 
 #: src/states_screens/main_menu_screen.cpp:615
 msgid "The add-ons module is currently disabled in the Options screen"
@@ -5244,7 +5236,7 @@ msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
-msgstr "Du kan ikke spille online uden internetadgang. Hvis du vil spille online, skal du gå til indstillinger, vælge fanebladet \"Brugerflade\" og tilvælge \"Opret forbindelse til internettet\"."
+msgstr "Du kan ikke spille online uden internetadgang. Hvis du vil spille online, skal du gå til indstillinger, vælge fanebladet \"Brugerflade\" og tilvælge \"Opret forbindelse til Internettet\"."
 
 #: src/states_screens/online/online_screen.cpp:239
 msgid "Enter the server address optionally followed by : and then port."
@@ -5619,18 +5611,18 @@ msgstr "Meget stor"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Tilpasset"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:363
+#: src/states_screens/options/options_screen_ui.cpp:364
 msgid "Drone chase"
 msgstr "Droneforfølgelse"
 
-#: src/states_screens/options/options_screen_ui.cpp:533
+#: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -6006,12 +5998,12 @@ msgstr "alle"
 msgid "Locked!"
 msgstr "Låst!"
 
-#: src/utils/string_utils.cpp:1413
+#: src/utils/string_utils.cpp:1415
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
+#: src/utils/string_utils.cpp:1422 src/utils/string_utils.cpp:1426
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"

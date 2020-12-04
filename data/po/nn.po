@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 09:33+0800\n"
-"PO-Revision-Date: 2020-09-21 01:34+0000\n"
+"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"PO-Revision-Date: 2020-11-19 06:30+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/supertuxkart/supertuxkart/language/nn/)\n"
 "MIME-Version: 1.0\n"
@@ -379,11 +379,6 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
-msgstr ""
-
-#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
-#. I18N: In the ui/camera screen
-msgid "Follow ball in soccer mode"
 msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -795,6 +790,8 @@ msgstr "Vanleg løp"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1005,7 +1002,7 @@ msgstr "Installert"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Standard"
 msgstr "Standard"
 
@@ -1112,12 +1109,9 @@ msgstr "Val for skuggeopptak"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Time trial"
-msgstr "Tidsløp"
-
-#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
-#. I18N: In the ghost replay selection screen
-msgid "Egg hunt"
+#. I18N: Game mode
+#: src/race/race_manager.cpp:1200
+msgid "Egg Hunt"
 msgstr "Eggejakt"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
@@ -2154,6 +2148,11 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
+msgstr ""
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Follow ball in soccer mode for backward camera"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
@@ -3466,7 +3465,7 @@ msgid "You finished the race!"
 msgstr "Du fullførte løpet!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
 #, c-format
 msgid "%s left the game."
 msgstr "%s forlét spelet."
@@ -3474,24 +3473,22 @@ msgstr "%s forlét spelet."
 #: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
-msgstr "SuperTuxKart kan kopla til ein tenar for å lasta ned speltillegg og varsla deg om oppdateringar. Me samlar òg inn anonym maskinvarestatistikk til hjelp i utviklinga av spelet. Les meir om personvern på http://privacy.supertuxkart.net/. Ønskjer du å bruka denne funksjonaliteten? (For å endra dette seinare kan du gå til innstillingsvindauget, velja fana «Generelt» og kryssa av for «Kopla til Internett» og «Send anonym maskinvareinfo».)"
+"updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
+" Would you like this feature to be enabled? (To change this setting at a "
+"later time, go to options, select tab 'General', and edit \"Connect to the "
+"Internet\")."
+msgstr ""
 
-#: src/main.cpp:2194
+#: src/main.cpp:2193
 msgid "Your screen resolution is too low to run STK."
 msgstr "Skjermoppløysinga di er for låg til at du kan køyra STK."
 
-#: src/main.cpp:2229
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Skjermkortdrivaren din er for gammal, og du må oppgradera han."
 
-#: src/main.cpp:2247
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3499,7 +3496,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Skjermkortdrivaren din er veldig gammal. Sjå om det har komme ei drivaroppdatering. SuperTuxKart verkar best med ein drivar som støttar %s eller høgare. Spelet vil framleis køyra, men med redusert grafikkvalitet."
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Tidsavbrot på sambandet til tenaren."
 
@@ -3606,7 +3603,7 @@ msgid "You were kicked: Ping too high."
 msgstr "Du vart sparka ut: For høge ping-verdiar."
 
 #: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:864
+#: src/network/protocols/client_lobby.cpp:868
 msgid "Bad network connection is detected."
 msgstr "Oppdaga dårleg nettverkssamband."
 
@@ -3684,90 +3681,90 @@ msgstr "Turneringsframgang: %d/%d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:860
 msgid "All players joined red or blue team."
 msgstr "Alle spelarane er på same lag."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:876
+#: src/network/protocols/client_lobby.cpp:880
 msgid "You are now the owner of server."
 msgstr "Du er no eigar av tenaren."
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Server is busy."
 msgstr "Nekta tilkopling: Tenaren er oppteken."
 
-#: src/network/protocols/client_lobby.cpp:924
+#: src/network/protocols/client_lobby.cpp:928
 msgid "Connection refused: You are banned from the server."
 msgstr "Nekta tilkopling: Du er utestengd frå tenaren."
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Server password is incorrect."
 msgstr "Nekta tilkopling: Feil passord til tenaren."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Game data is incompatible."
 msgstr "Nekta tilkopling: Speldataa er ikkje kompatible."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Server is full."
 msgstr "Nekta tilkopling: Tenaren er full."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:954
 msgid "Connection refused: Invalid player connecting."
 msgstr "Nekta tilkopling: Ugyldig spelar prøvde å kopla seg til."
 
-#: src/network/protocols/client_lobby.cpp:978
+#: src/network/protocols/client_lobby.cpp:982
 msgid "Failed to start the network game."
 msgstr "Klarte ikkje starta nettverksspelet."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Løpet er ferdig, så du kan ikkje lenger delta eller vera tilskodar."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Kan ikkje delta, då det ikkje er fleire ledige plassar i arenaen."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1203
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Berre 1 spelar att. Går tilbake til lobbyen."
 
-#: src/network/protocols/client_lobby.cpp:1205
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
 msgstr "Tenareigaren avslutta spelet."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
 msgstr "Du vert tilskodar til neste løp."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1377
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s vart med på det raude laget."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1383
+#: src/network/protocols/client_lobby.cpp:1387
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s vart med på det blå laget."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1389
+#: src/network/protocols/client_lobby.cpp:1393
 #, c-format
 msgid "%s joined the game."
 msgstr "%s vart med."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1580
+#: src/network/protocols/client_lobby.cpp:1584
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3775,7 +3772,7 @@ msgid ""
 msgstr "Trykk <%s> eller <%s> for å byta målspelar og <%s> eller <%s> for å byta kameraplassering."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1596
+#: src/network/protocols/client_lobby.cpp:1600
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Spelaren %s er no rapportert."
@@ -3882,11 +3879,6 @@ msgstr "Følg leiaren"
 msgid "3 Strikes Battle"
 msgstr "Tre liv"
 
-#. I18N: Game mode
-#: src/race/race_manager.cpp:1200
-msgid "Egg Hunt"
-msgstr "Eggejakt"
-
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
 msgstr "Ufullstendig skuggeopptaksfil vert ikkje lagra."
@@ -3992,7 +3984,7 @@ msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d arena ikkje tilgjengeleg i éinspelarmodus."
 msgstr[1] "%d arenaar ikkje tilgjengelege i éinspelarmodus."
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Karl Ove Hufthammer"
 
@@ -4903,7 +4895,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "Det oppstod ein feil ved lagringa av turneringa."
 
-#: src/states_screens/edit_track_screen.cpp:254
+#: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
 msgstr "Vel bane"
 
@@ -5615,18 +5607,18 @@ msgstr "Veldig stor"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Tilpassa"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:363
+#: src/states_screens/options/options_screen_ui.cpp:364
 msgid "Drone chase"
 msgstr ""
 
-#: src/states_screens/options/options_screen_ui.cpp:533
+#: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -6002,12 +5994,12 @@ msgstr "alle"
 msgid "Locked!"
 msgstr "Låst!"
 
-#: src/utils/string_utils.cpp:1413
+#: src/utils/string_utils.cpp:1415
 #, c-format
 msgid "%s MB"
 msgstr "%s MiB"
 
-#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
+#: src/utils/string_utils.cpp:1422 src/utils/string_utils.cpp:1426
 #, c-format
 msgid "%s KB"
 msgstr "%s KiB"

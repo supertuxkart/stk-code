@@ -6,14 +6,15 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2010
 # Myeongjin <aranet100@gmail.com>, 2019
 # Roland Kim <dyn4micwork@gmail.com>, 2015
+# sooyeon73 <sooy8951@gmail.com>, 2020
 # YieJun Choi <rosyres@daum.net>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 09:33+0800\n"
-"PO-Revision-Date: 2020-09-21 01:34+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"PO-Revision-Date: 2020-12-02 13:07+0000\n"
+"Last-Translator: sooyeon73 <sooy8951@gmail.com>\n"
 "Language-Team: Korean (http://www.transifex.com/supertuxkart/supertuxkart/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,15 +24,15 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "게임 데이터 불러오는중..."
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "게임 데이터를 불러올 수 없습니다."
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr ""
+msgstr "남은 저장공간을 확인하거나 SperTuxKart를 다시 설치하세요."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -362,12 +363,12 @@ msgstr "1인칭 카메라"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "FOV"
-msgstr ""
+msgstr "FOV"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr ""
+msgstr "거리"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -383,11 +384,6 @@ msgstr "부드러운 카메라"
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
 msgstr "3인칭 카메라"
-
-#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
-#. I18N: In the ui/camera screen
-msgid "Follow ball in soccer mode"
-msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -798,6 +794,8 @@ msgstr "일반 경주"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1000,7 +998,7 @@ msgstr "아레나"
 #. I18N: In addons screen, above the list of addons to be installed
 #: src/states_screens/addons_screen.cpp:136
 msgid "Installed"
-msgstr ""
+msgstr "설치됨"
 
 #. I18N: ./data/gui/screens/arenas.stkgui
 #. I18N: track group
@@ -1008,7 +1006,7 @@ msgstr ""
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Standard"
 msgstr "표준"
 
@@ -1115,12 +1113,9 @@ msgstr "고스트 리플레이 선택"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Time trial"
-msgstr "타임 트라이얼"
-
-#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
-#. I18N: In the ghost replay selection screen
-msgid "Egg hunt"
+#. I18N: Game mode
+#: src/race/race_manager.cpp:1200
+msgid "Egg Hunt"
 msgstr "달걀 사냥"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
@@ -1572,7 +1567,7 @@ msgstr "최고 속도 - 속도가 높을수록, 카트가 더 빨리 갈 수 있
 msgid ""
 "Nitro efficiency - The higher it is, the more speed you get from a can of "
 "nitro. A lighter kart will have higher nitro efficiency."
-msgstr ""
+msgstr "니트로 효율 - 높을수록 니트로 캔에서 더 속도가 빨라집니다. 카트가 가벼울수록 니트로 효율이 높아집니다."
 
 #. I18N: ./data/gui/screens/help6.stkgui
 #. I18N: In the help menu
@@ -1605,12 +1600,12 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr ""
+msgstr "서버에 있는 경우, (왕관으로 표현된) 주인이 경주 시작을 결정할 수 있습니다. 공식 서버는 플레이어가 충분하다면 경주가 자동으로 시작될 수 있습니다. 시작되면 카트를 선택하고 다음 트랙을 투표하여 경주를 진행할 수 있습니다.  부가 기능 트랙은 가입된 모든 플레이어와 서버에 존재하는 경우에만 허용됩니다."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "... or on the same device:"
-msgstr ""
+msgstr "...또는 같은 기기에 있으면:"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1630,7 +1625,7 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr ""
+msgstr "입력 장치가 구성되면 메인 메뉴에서 '분할화면 멀티플레이어'아이콘을 선택합니다. 각 플레이어는 게임패드 또는 키보드의 '파이어'키를 눌러 게임에 참여할 수 있으며 입력 장치를 사용하여 카트를 선택할 수 있습니다. 모든 사람이 자신의 카트를 선택하면 게임은 계속 진행됩니다. 마우스는 사용할 수 없습니다."
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -2068,7 +2063,7 @@ msgstr "장치 목록으로 돌아가기"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 msgid "Rename Configuration"
-msgstr ""
+msgstr "구성 이름 변경"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2088,7 +2083,7 @@ msgstr "인터넷에 연결"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Enable chatting online"
-msgstr ""
+msgstr "온라인 채팅 가능"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2142,7 +2137,7 @@ msgstr "미니맵"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Splitscreen Multiplayer layout"
-msgstr ""
+msgstr "분할화면 멀티플레이어 레이아웃"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2157,7 +2152,12 @@ msgstr "카메라"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr ""
+msgstr "개인설정..."
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Follow ball in soccer mode for backward camera"
+msgstr "축구 모드에서 배경카메라가 축구공을 따라가기"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2167,17 +2167,17 @@ msgstr "FPS 표시"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Show other karts' held powerups"
-msgstr ""
+msgstr "다른 카트들의 파워업 표시"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the story mode timer"
-msgstr ""
+msgstr "스토리 모드 타이머 사용 가능"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Enable the speedrun timer"
-msgstr ""
+msgstr "스피드런 타이머 사용 가능"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2187,12 +2187,12 @@ msgstr "그래픽 효과 레벨"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Blur Effects Level"
-msgstr ""
+msgstr "흐림 효과 레벨"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync"
-msgstr ""
+msgstr "수직 동기화"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2263,7 +2263,7 @@ msgstr "AI 카트 수"
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Number of blue team AI karts"
-msgstr ""
+msgstr "파란팀 AI 카트 개수"
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
@@ -2306,120 +2306,120 @@ msgstr "카트 색"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
-msgstr ""
+msgstr "UI 스킨은 UI옵션에서 변경할 수 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
-msgstr ""
+msgstr "UI 설정에서 활성화하면 다른 카트들의 파워업을 볼 수 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
-msgstr ""
+msgstr "UI 설정에서 글씨 크기를 바꿀 수 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has lots of useful information."
-msgstr ""
+msgstr "도움말에 유용한 정보들이 많이 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr ""
+msgstr "싱글플레이에서 녹화된 타임트레일을 도전하거나 볼 수 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can visit https://supertuxkart.net/ for more information about the game."
-msgstr ""
+msgstr "이 게임에 대한 더 많은 정보를 알고싶다면 https://supertuxkart.net/ 이 사이트를 방문하세요."
 
 #. I18N: ./data/tips.xml
 msgid "Short nitro boosts are more efficient."
-msgstr ""
+msgstr "짧은 니트로 부스트가 효율적입니다."
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr ""
+msgstr "지퍼는 안전할 때만 사용하세요. 긴 직선이 좋습니다."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't use multiple zippers quickly in row, instead, wait until the speed "
 "boost wears off."
-msgstr ""
+msgstr "지퍼 여러개를 연속으로 빨리 사용하지 말고, 스피트 부스트가 사라질 때까지 기다리세요."
 
 #. I18N: ./data/tips.xml
 msgid "Skidding makes you much faster, do it whenever safe."
-msgstr ""
+msgstr "미끄러지면 더 빠릅니다, 안전할 때 하세요."
 
 #. I18N: ./data/tips.xml
 msgid "The swatter can be used to remove bombs or parachutes."
-msgstr ""
+msgstr "찰싹은 폭탄이나 낙하산을 제거하는 데 사용할 수 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr ""
+msgstr "미끄러지는동안 멈출 수 없습니다. 스키드 스타트에서 카트 방향을 잡는게 중요합니다."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
-msgstr ""
+msgstr "\"준비\" 중에 가속을 시작하면 시작 부스트를 받습니다."
 
 #. I18N: ./data/tips.xml
 msgid "Braking allows to get rid of parachutes quicker."
-msgstr ""
+msgstr "제동하면 낙하산이 더 빨리 떨어집니다."
 
 #. I18N: ./data/tips.xml
 msgid "First and foremost, focus on where your kart is going."
-msgstr ""
+msgstr "무엇보다도,  카트가 어디로 가고 있는지 집중하세요."
 
 #. I18N: ./data/tips.xml
 msgid "The rescue key (button) is very useful."
-msgstr ""
+msgstr "구출 키(버튼)은 매우 유용합니다."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr ""
+msgstr "다른 카트가 종료할 때, 부딪힐 수 있으니 주의하세요."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake, or plunger."
-msgstr ""
+msgstr "농구는 볼링공, 케이크 또는 플런저로 정확한 후진을 사용하여 파괴될 수 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other the backs of other karts, as it will slow "
 "you down."
-msgstr ""
+msgstr "다른 카트 뒤에 부딪히면, 느려집니다."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
-msgstr ""
+msgstr "볼링공을 사용하여 공을 밀거나 막을 수 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid "In soccer, always work as a team for good results."
-msgstr ""
+msgstr "축구에서, 팀을 위하면 항상 좋은 결과가 있습니다."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr ""
+msgstr "공을 놓치고 상대가 다가온다면, 파워업으로 때리거나 상대의 길을 막습니다."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
-msgstr ""
+msgstr "포지션(공격과 수비)의 좋은 순환은 필수이다."
 
 #. I18N: ./data/tips.xml
 msgid "Make sure to store at least 2 big cans worth of nitro."
-msgstr ""
+msgstr "적어도 니트로 큰 캔 2개는 저장해두세요."
 
 #. I18N: ./data/tips.xml
 msgid "Never use the three bowling balls all at the same time."
-msgstr ""
+msgstr "3개의 볼링공 전부를 한번에 사용하지 마세요."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't get in the way of a teammate carrying the ball, though you can try to "
 "hit opponents attempting to stop them from scoring."
-msgstr ""
+msgstr "팀 동료가 공을 들고가면 방해하지 마세요, 상대의 득점을 막기 위해 상대를 때릴 수 있습니다."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2443,7 +2443,7 @@ msgstr "가브로슈"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr ""
+msgstr "Gnu"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
@@ -2575,7 +2575,7 @@ msgstr "라스두나스 축구 경기장"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the Lighthouse"
-msgstr ""
+msgstr "등대 주변"
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
@@ -2595,7 +2595,7 @@ msgstr "호박 공원"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge Mansion"
-msgstr ""
+msgstr "레이븐브릿지 대저택"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
@@ -2723,7 +2723,7 @@ msgid ""
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "스피드런 모드가 비활성화되었습니다. 스토리 모드 시작 후 게임이 종료되지 않을 때 활성화할 수 있습니다.\n\n스토리 모드 완료 전에 게임을 닫으면 타이머가 무효화됩니다.\n\n스피드런 모드를 사용하려면 새로운 프로필을 사용하세요."
 
 #. I18N: Name of first guest player (without number)
 #: src/config/player_manager.cpp:392
@@ -3311,7 +3311,7 @@ msgstr "당신의 입력 구성 파일은 슈턱카의 이 버전과 호환되�
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:152
 msgid "Guide"
-msgstr ""
+msgstr "가이드"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:154
@@ -3321,22 +3321,22 @@ msgstr "시작"
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:156
 msgid "Left thumbstick press"
-msgstr ""
+msgstr "왼쪽 엄지스틱을 누르세요"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:158
 msgid "Right thumbstick press"
-msgstr ""
+msgstr "오른쪽 엄지스틱을 누르세요"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:160
 msgid "Left shoulder"
-msgstr ""
+msgstr "왼쪽 어깨"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:162
 msgid "Right shoulder"
-msgstr ""
+msgstr "오른쪽 어깨"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:164
@@ -3361,42 +3361,42 @@ msgstr "십자패드 오른쪽"
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:174
 msgid "Left thumbstick right"
-msgstr ""
+msgstr "왼쪽 엄지스틱 오른쪽"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:176
 msgid "Left thumbstick left"
-msgstr ""
+msgstr "왼쪽 엄지스틱 왼쪽"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:178
 msgid "Left thumbstick down"
-msgstr ""
+msgstr "왼쪽 엄지스틱 아래"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:180
 msgid "Left thumbstick up"
-msgstr ""
+msgstr "왼쪽 엄지스틱 위"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:182
 msgid "Right thumbstick right"
-msgstr ""
+msgstr "오른쪽 엄지스틱 오른쪽"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:184
 msgid "Right thumbstick left"
-msgstr ""
+msgstr "오른쪽 엄지스틱 왼쪽"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:186
 msgid "Right thumbstick down"
-msgstr ""
+msgstr "오른쪽 엄지스틱 아래"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:188
 msgid "Right thumbstick up"
-msgstr ""
+msgstr "오른쪽 엄지스틱 위"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:190
@@ -3468,7 +3468,7 @@ msgid "You finished the race!"
 msgstr "경주를 마쳤습니다!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
 #, c-format
 msgid "%s left the game."
 msgstr "%s가 게임에서 떠났습니다."
@@ -3476,24 +3476,22 @@ msgstr "%s가 게임에서 떠났습니다."
 #: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
-msgstr "슈퍼턱스카트는 부가 기능을 다운로드하고 당신에게 업데이트를 알려주기 위해 서버에 연결할 수 있습니다. 우리는 또한 슈턱카의 개발에 도움을 받기 위해 익명으로 하드웨어 통계를 수집합니다. http://privacy.supertuxkart.net 에서 우리의 개인정보 처리방침을 읽어주세요. 이 기능을 활성화하기를 원하십니까? (나중에 이 설정을 변경하려면, 옵션으로 가서, '일반' 탭을 선택하고, \"인터넷에 연결\" 및 \"익명 하드웨어 통계 보내기\"를 편집하세요.)"
+"updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
+" Would you like this feature to be enabled? (To change this setting at a "
+"later time, go to options, select tab 'General', and edit \"Connect to the "
+"Internet\")."
+msgstr "슈퍼턱스카트는 부가 기능을 다운로드하고 사용자에게 업데이트를 알리기 위해 서버에 연결할 수 있습니다. 개인 정보 보호 정책은  https://supertuxkart.net/Privacy 에서 읽어주세요. 이 기능을 활성화시키겠습니까? (나중에 변경하려면, 설정에서 '일반'을 선택하고 \"인터넷에 연결\"을 수정하세요.)"
 
-#: src/main.cpp:2194
+#: src/main.cpp:2193
 msgid "Your screen resolution is too low to run STK."
 msgstr "당신의 화면 해상도는 게임를 실행하기에 너무 낮습니다."
 
-#: src/main.cpp:2229
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "당신의 드라이버 버전이 너무 오래되었습니다. 최신 비디오 드라이버를 설치해주세요."
 
-#: src/main.cpp:2247
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3501,7 +3499,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "당신의 그래픽 드라이버가 매우 오래된 듯 합니다. 업데이트가 사용 가능한지 확인해주세요. 슈퍼턱스카드는 지원하는 드라이버 %s 이상을 권장합니다. 게임은 여전히 실행될 가능성이 있지만, 감소된 그래픽 모드로 실행될 것입니다."
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "서버 연결이 시간이 초과되었습니다."
 
@@ -3572,12 +3570,12 @@ msgstr "잘못된 길입니다!"
 #: src/modes/soccer_world.cpp:524 src/modes/soccer_world.cpp:651
 #, c-format
 msgid "%s scored a goal!"
-msgstr ""
+msgstr "%s 득점!"
 
 #: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
 #, c-format
 msgid "Oops, %s made an own goal!"
-msgstr ""
+msgstr "이런, %s 자살골!"
 
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
@@ -3607,14 +3605,14 @@ msgid "You were kicked: Ping too high."
 msgstr "당신은 추방되었습니다: 핑이 너무 높습니다."
 
 #: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:864
+#: src/network/protocols/client_lobby.cpp:868
 msgid "Bad network connection is detected."
 msgstr "잘못된 네트워크 연결이 감지되었습니다."
 
 #: src/network/protocols/client_lobby.cpp:427
 #: src/network/protocols/server_lobby.cpp:3792
 msgid "Bot"
-msgstr ""
+msgstr "봇"
 
 #: src/network/protocols/client_lobby.cpp:597
 #, c-format
@@ -3685,98 +3683,98 @@ msgstr "그랑프리 진행 상황: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:860
 msgid "All players joined red or blue team."
 msgstr "모든 플레이어가 레드 또는 블루 팀에 참가되었습니다."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:876
+#: src/network/protocols/client_lobby.cpp:880
 msgid "You are now the owner of server."
 msgstr "당신은 이제 서버의 소유자가 되었습니다."
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Server is busy."
 msgstr "연결 거부됨: 서버가 바쁩니다."
 
-#: src/network/protocols/client_lobby.cpp:924
+#: src/network/protocols/client_lobby.cpp:928
 msgid "Connection refused: You are banned from the server."
 msgstr "연결 거부됨: 당신은 서버에서 차단되어 있습니다."
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Server password is incorrect."
 msgstr "연결 거부됨: 서버 비밀번호가 잘못되었습니다."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Game data is incompatible."
 msgstr "연결 거부됨: 게임 데이터가 호환되지 않습니다."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Server is full."
 msgstr "연결 거부됨: 서버가 가득 찼습니다."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:954
 msgid "Connection refused: Invalid player connecting."
 msgstr "연결 거부됨: 잘못된 플레이어를 연결 중입니다."
 
-#: src/network/protocols/client_lobby.cpp:978
+#: src/network/protocols/client_lobby.cpp:982
 msgid "Failed to start the network game."
 msgstr "네트워크 게임을 시작하는데 실패했습니다."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "게임이 끝났습니다, 당신은 더 이상 실시간 참가나 관람할 수 없습니다."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "No remaining place in the arena - live join disabled."
 msgstr "아레나에 남아 있는 장소가 없습니다 - 실시간 참가가 비활성화되었습니다."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1203
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "플레이어 1명만이 남아 있어, 대기실로 돌아갑니다."
 
-#: src/network/protocols/client_lobby.cpp:1205
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
-msgstr ""
+msgstr "서버 주인이 게임을 나갔습니다."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
-msgstr ""
+msgstr "다음 게임을 관전할 수 있습니다."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1377
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s가 레드 팀에 참가되었습니다."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1383
+#: src/network/protocols/client_lobby.cpp:1387
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s가 블루 팀에 참가되었습니다."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1389
+#: src/network/protocols/client_lobby.cpp:1393
 #, c-format
 msgid "%s joined the game."
 msgstr "%s가 게임에 참가되었습니다."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1580
+#: src/network/protocols/client_lobby.cpp:1584
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
 "camera position."
-msgstr ""
+msgstr "대상 플레이어를 변경하려면 <%s>또는<%s>을 누르세요, 카메라 위치를 변경하려면<%s>또는<%s>을 누르세요."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1596
+#: src/network/protocols/client_lobby.cpp:1600
 #, c-format
 msgid "Successfully reported %s."
 msgstr "성공적으로 %s를 신고했습니다."
@@ -3794,7 +3792,7 @@ msgstr "서버 %s에 연결할 수 없습니다."
 #: src/network/protocols/connect_to_server.cpp:771
 #, c-format
 msgid "Failed to detect port number for server %s."
-msgstr ""
+msgstr "%s서버 포트 번호를 찾을 수 없습니다."
 
 #: src/network/protocols/lobby_protocol.cpp:292
 msgid "Network grand prix has been finished."
@@ -3880,11 +3878,6 @@ msgstr "대장 꼬리잡기"
 #: src/race/race_manager.cpp:1194 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr "3 스트라이크 배틀"
-
-#. I18N: Game mode
-#: src/race/race_manager.cpp:1200
-msgid "Egg Hunt"
-msgstr "달걀 사냥"
 
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
@@ -3990,7 +3983,7 @@ msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "아레나 %d곳이 싱글 플레이어에서 사용할 수 없습니다."
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Myeongjin - 아라\nRoland Kim - Dynamicw0rk\nLaunchpad Contributions:\n  JJ https://launchpad.net/~jjemin1\n  Tae-Wong SEO https://launchpad.net/~seotaewong40"
 
@@ -4385,7 +4378,7 @@ msgid ""
 "New gamepads and joysticks will automatically appear in the list when you connect them to this device.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to this device. Remember that everyone still needs different keybindings in this case.)"
-msgstr ""
+msgstr "새 게임패드와 조이스틱을 연결하면 목록에 자동으로 나타납니다.\n\n키보드 구성을 추가하려면 아래 버튼을 사용할 수 있지만, 대부분 기보드는 동시 키 누르기가 제한되어 지원하므로 멀티플레이어 게임에 적합하지 않습니다. (그러나 여러개의 키보드를 연결할 수 있습니다. 이 경우에 모든 사용자는 다른 키 바인딩이 필요합니다.)"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:87
@@ -4539,7 +4532,7 @@ msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
-msgstr ""
+msgstr "슈퍼턱스카트는 더 나은 게임 경험을 위해 전체 자산(고품질 텍스처 및 음악 포함)을 다운로드할 것이고, 와이파이가 연결되지 않은 경우 모바일 데이터를 사용할것 입니다."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4900,7 +4893,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "당신의 그랑프리를 저장하려고 하는 동안 오류가 발생했습니다."
 
-#: src/states_screens/edit_track_screen.cpp:254
+#: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
 msgstr "트랙 선택"
 
@@ -5018,7 +5011,7 @@ msgstr "그랑프리를 완료했습니다!"
 
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
-msgstr ""
+msgstr "분할화면 멀티플레이어를 하려면 키보드나 게임패드를 연결하세요."
 
 #: src/states_screens/kart_selection.cpp:912
 #: src/states_screens/kart_selection.cpp:1595
@@ -5239,7 +5232,7 @@ msgstr "당신은 인터넷 접속 없이 온라인으로 플레이할 수 없�
 
 #: src/states_screens/online/online_screen.cpp:239
 msgid "Enter the server address optionally followed by : and then port."
-msgstr ""
+msgstr "선택적으로 서버 주소를 입력하고 :를 입력한 다음 포트를 입력하세요."
 
 #: src/states_screens/online/online_screen.cpp:251
 #, c-format
@@ -5327,12 +5320,12 @@ msgstr "알 수 없음"
 #. I18N: Message shown to user if no IPv4 detected by STK
 #: src/states_screens/online/server_selection.cpp:315
 msgid "No IPv4 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "IPv4가 발견되지 않아, 서버에 참여할 수 없을 수 있습니다."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
 #: src/states_screens/online/server_selection.cpp:317
 msgid "No IPv6 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "IPv6가 발견되지 않아, 서버에 참여할 수 없을 수 있습니다."
 
 #: src/states_screens/online/server_selection.cpp:417
 msgid "No server is available."
@@ -5435,7 +5428,7 @@ msgstr "가속"
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:266
 msgid "Brake / Reverse"
-msgstr ""
+msgstr "브레이크 / 역방향"
 
 #. I18N: Key binding name
 #: src/states_screens/options/options_screen_device.cpp:269
@@ -5514,7 +5507,7 @@ msgstr "이 구성을 영구적으로 삭제하시겠습니까?"
 
 #: src/states_screens/options/options_screen_device.cpp:637
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr ""
+msgstr "새로운 구성 이름을 입력하고, 기본값으로 돌아가려면 비워두세요."
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -5546,7 +5539,7 @@ msgstr "터치 장치"
 #. I18N: In the input configuration screen, help for touch device
 #: src/states_screens/options/options_screen_input.cpp:205
 msgid "Tap on a device to configure it"
-msgstr ""
+msgstr "그것을 구성하려면 Tap을 누르세요"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5571,17 +5564,17 @@ msgstr "숨겨짐"
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:99
 msgid "Centered"
-msgstr ""
+msgstr "중간"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:117
 msgid "Vertical"
-msgstr ""
+msgstr "수직"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:119
 msgid "Horizontal"
-msgstr ""
+msgstr "수평"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:130
@@ -5610,35 +5603,35 @@ msgstr "매우 크게"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "사용자 설정"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:363
+#: src/states_screens/options/options_screen_ui.cpp:364
 msgid "Drone chase"
-msgstr ""
+msgstr "드론 추격"
 
-#: src/states_screens/options/options_screen_ui.cpp:533
+#: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
 "Closing the game before the story mode's completion invalidates the timer.\n"
 "\n"
 "To use the speedrun mode, please use a new profile."
-msgstr ""
+msgstr "스토리 모드 시작 후 게임이 종료되지 않아야 스피드런 모드를 활성화할 수 있습니다.\n\n스토리 모드가 완료되기 전 게임을 닫으면 타이머가 무효화됩니다.\n\n스피드런 모드를 사용하려면 새로운 프로필을 사용하세요."
 
 #. I18N: In the video options, maximum frame per second
 #: src/states_screens/options/options_screen_video.cpp:220
 msgid "Maximum FPS"
-msgstr ""
+msgstr "최대 FPS"
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:228
 msgid "Full"
-msgstr ""
+msgstr "가득"
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
@@ -5646,17 +5639,17 @@ msgstr ""
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
-msgstr ""
+msgstr "Vsync는 그래픽 카드가 새로운 프레임을 제공해야만 합니다.\n모니터가 표시할 준비가 된 경우에만 사용할 수 있습니다."
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:237
 msgid "Full: one frame per monitor refresh"
-msgstr ""
+msgstr "가득: 모니터 리프레쉬 당 하나의 프레임"
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:239
 msgid "Vsync will not work if your drivers don't support it."
-msgstr ""
+msgstr "만약 드라이버가 Vsync를 지원하지 않으면 동작하지 않습니다."
 
 #. I18N: in graphical options
 #: src/states_screens/options/options_screen_video.cpp:555
@@ -5803,7 +5796,7 @@ msgstr "서버를 위해 기다리는 중"
 #: src/states_screens/race_gui_base.cpp:637
 #, c-format
 msgid "\"%s\""
-msgstr ""
+msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
@@ -5833,7 +5826,7 @@ msgstr "도전 실패"
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:540
 msgid "Press podium icon to start tutorial"
-msgstr ""
+msgstr "튜토리얼을 시작하려면 시상대 아이콘을 누르세요."
 
 #: src/states_screens/race_gui_overworld.cpp:546
 msgid "Press fire to start the tutorial"
@@ -5843,7 +5836,7 @@ msgstr "튜토리얼을 시작하려면 발사를 누르세요"
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:622
 msgid "Press podium icon to start the challenge"
-msgstr ""
+msgstr "도전을 시작하려면 시상대 아이콘을 누르세요."
 
 #: src/states_screens/race_gui_overworld.cpp:628
 msgid "Press fire to start the challenge"
@@ -5964,7 +5957,7 @@ msgstr "고스트 카트와 경주하고 그들을 이겨보세요!"
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118
 msgid "Press red or blue soccer icon to change team"
-msgstr ""
+msgstr "팀을 바꾸려면 빨강 또는 파랑 축구 아이콘을 누르세요."
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
@@ -5981,7 +5974,7 @@ msgstr "지원되는 최대 플레이어: %d"
 
 #: src/states_screens/track_info_screen.cpp:380
 msgid "Number of red team AI karts"
-msgstr ""
+msgstr "빨간팀 AI 카트 개수"
 
 #. I18N: for empty highscores entries
 #: src/states_screens/track_info_screen.cpp:525
@@ -5997,12 +5990,12 @@ msgstr "모두"
 msgid "Locked!"
 msgstr "잠겼습니다!"
 
-#: src/utils/string_utils.cpp:1413
+#: src/utils/string_utils.cpp:1415
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
+#: src/utils/string_utils.cpp:1422 src/utils/string_utils.cpp:1426
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
@@ -6035,19 +6028,19 @@ msgstr "<%s>로 가속하고, <%s> 및 <%s>으로 회전하세요."
 msgid ""
 "Accelerate by touching the upper part of the wheel, and steer by moving left"
 " or right."
-msgstr ""
+msgstr "휠 위쪽을 터치하면 가속이 되고, 왼쪽 또는 오른쪽으로 이동하며 조종합니다."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:22
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by tilting your "
 "device."
-msgstr ""
+msgstr "가속 페달을 위로 올리면 가속이 되고, 장치를 기울이면 조종됩니다."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:27
 msgid ""
 "Accelerate by moving the accelerator upwards, and steer by rotating your "
 "device."
-msgstr ""
+msgstr "가속 페달을 위로 올리면 가속되고 장치를 돌려 조종합니다."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:59
 #, c-format
@@ -6059,20 +6052,20 @@ msgstr "선물 상자를 모으고, 이러한 상자들을 날려버리려면 <%
 msgid ""
 "Collect gift boxes, and fire by pressing the bowling icon to blow away these"
 " boxes!"
-msgstr ""
+msgstr "선물 상자를 모으고, 볼링 아이콘을 눌러 상자들을 날려버리세요!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:78
 #, c-format
 msgid ""
 "Press <%s> to look behind.\n"
 "Fire the weapon with <%s> while pressing <%s> to fire behind!"
-msgstr ""
+msgstr "뒤를 돌아보려면 <%s>를 누르세요.\n뒤에서 발사하려면 <%s>를 누르면서 <%s>로 무기를 발사하세요."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:88
 msgid ""
 "Press the mirror icon to look behind.\n"
 "Fire the weapon behind by holding the mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "뒤를 보려면 거울 아이콘을 누르세요.\n거울 아이콘을 잡고 볼링 아이콘을 향해 휘두르면서 뒤에서 무기를 발사하세요!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #, c-format
@@ -6081,7 +6074,7 @@ msgstr "<%s>를 눌러 당신이 모은 니트로를 사용하세요!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:104
 msgid "Use the nitro you collected by pressing the nitro icon"
-msgstr ""
+msgstr "니트로 아이콘을 눌러 당신이 모은 니트로를 사용하세요."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:112
 msgid "Collect nitro bottles (we will use them after the curve)."
@@ -6094,20 +6087,20 @@ msgstr "으악! 당신이 곤란할 때, <%s>를 누르면 구출됩니다."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:127
 msgid "Oops! When you're in trouble, press the bird icon to be rescued."
-msgstr ""
+msgstr "이런! 당신이 곤란할 때 새 아이콘을 누르면 구조됩니다."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:137
 #, c-format
 msgid ""
 "Accelerate and press the <%s> key while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "미끄러져 돌면서 <%s>키를 눌러 가속합니다.\n짧은 시간동안 스키드하면 급회전하기 위해 더 빠르게 회전할 수 있습니다."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:145
 msgid ""
 "Accelerate and press the skid icon while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "미끄러져 돌면서 스키드 아이콘을 눌러 가속합니다.\n짧은 시간동안 스키드하면 급회전하기 위해 더 빠르게 회전할 수 있습니다."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:156
 msgid ""
@@ -6123,13 +6116,13 @@ msgstr "이제 경주할 준비가 되었습니다. 행운을 빌어요!"
 #. description in Google Play
 #: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
 msgid "A 3D open-source kart racing game"
-msgstr ""
+msgstr "3D 오픈소스 카트 경주 게임"
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
 #: supertuxkart.desktop:11
 msgid "tux;game;race;"
-msgstr ""
+msgstr "턱스;게임;경주"
 
 #: supertuxkart.appdata.xml:8
 msgid ""
@@ -6137,7 +6130,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr ""
+msgstr "카트. 니트로. 액션! 슈퍼턱스카트는 다양한 캐릭터, 트랙, 플레이모드를 가진 3D아케이드 경주입니다. 우리의 목표는 현실보다 재밌는 게임을 개발하고, 모든 연령대에 재밌는 경험을 제공하는 것입니다."
 
 #: supertuxkart.appdata.xml:11
 msgid ""
@@ -6147,7 +6140,7 @@ msgid ""
 " the palm trees on the beach, watching the other karts overtake you. But "
 "don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
 "cakes thrown by your opponents."
-msgstr ""
+msgstr "수중 세계의 신비를 발견하거나, Val Verde의 정글을 지나 유명한 코코아 사원을 방문하세요. 땅속이나 우주선에서, 시골 농지나 낯선 외계 행성을 통해 경주합니다. 또는 해변의 야자수나무 아래에서 다른 카트들이 여러분을 추월하는 것을 지켜보며 쉬세요. 바나나는 먹지 마세요! 상대가 던진 볼링공, 플런저, 풍선껌, 케이크를 조심하세요."
 
 #: supertuxkart.appdata.xml:14
 msgid ""
@@ -6156,29 +6149,29 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, race online against players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "당신은 다른 카트들과 경주 를 할 수 있고, 몇몇 그랑프리 대회에서 경쟁할 수 있고, 혼자서 타임트레일에서 높은 기록을 이기려고 도전할 수 있고, 컴퓨터나 친구와 배틀 모드를 할 수 있습니다! 더 큰 도전을 위해, 전 세계의 선수들과 온라인으로 경주하고 여러분의 레이싱 기술을 증명하세요!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."
-msgstr ""
+msgstr "이 게임은 무료이며 광고가 없습니다."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
 "This is an unstable version of SuperTuxKart that contains latest "
 "improvements. It is released mainly for testing, to make stable STK as good "
 "as possible."
-msgstr ""
+msgstr "이것은 최신 개선 사항이 포함된 슈퍼턱스카트의 불안정한 버전입니다. 주로 테스트용으로 출시되어 안정적인 게임을 최대한 잘 만들기 위해 출시되었습니다."
 
 #: supertuxkart.appdata.xml:23
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr ""
+msgstr "이 버전은 장치의 안정적인 버전과 같이 설치할 수 있습니다."
 
 #: supertuxkart.appdata.xml:26
 msgid "If you need more stability, consider using the stable version: %s"
-msgstr ""
+msgstr "만약 더 안정적인걸 원한다면, 안정된 버전: %s을 사용해보세요."
 
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
-msgstr ""
+msgstr "슈퍼턱스카트 팀"

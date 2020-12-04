@@ -14,12 +14,15 @@
   <summary xml:lang="pt_BR">Um jogo de corrida de kart 3D de código aberto</summary>
   <summary xml:lang="pl">Trójwymiarowe wyścigi gokartów open-source</summary>
   <summary xml:lang="nl">Een open source 3D kartracespel</summary>
+  <summary xml:lang="ko">3D 오픈소스 카트 경주 게임</summary>
+  <summary xml:lang="ja">オープンソースな3Dレーシングカートゲームです</summary>
   <summary xml:lang="it">Un gioco open-source 3D di corse su kart</summary>
   <summary xml:lang="id">Sebuah permainan balap kart 3D sumber-terbuka</summary>
   <summary xml:lang="hu">Egy 3D-s, nyílt forráskódú gokartverseny játék</summary>
-  <summary xml:lang="he">משחק מרוצי עגלות בתלת ממד ובקוד פתוח</summary>
+  <summary xml:lang="he">משחק תחרויות קארטינג תלת־ממדי בקוד פתוח</summary>
   <summary xml:lang="fr">Un jeu libre de course de karts en 3D</summary>
   <summary xml:lang="fi">Avoimen lähdekoodin kolmiulotteinen kilpa-ajopeli</summary>
+  <summary xml:lang="eu">Kart lasterketetako 3D jolas librea</summary>
   <summary xml:lang="es">Un juego de carreras de karts en 3D de código abierto.</summary>
   <summary xml:lang="el">Ενα 3D ανοιχτού κώδικα παιχνίδι  αγώνων με κάρτ </summary>
   <summary xml:lang="de">Ein quelloffenes 3D-Kart-Rennspiel</summary>
@@ -41,9 +44,10 @@
     <p xml:lang="pt_BR">Karts. Nitro. Ação! SuperTuxKart é um jogo de corrida 3D de código aberto com uma variedade de personagens, pistas e modos de jogo. Nosso objetivo é criar um jogo que seja mais divertido do que realista, e providenciar uma experiência agradável para todas as idades.</p>
     <p xml:lang="pl">Gokarty. Nitro. Akcja! SuperTuxKart to trójwymiarowa zręcznościowa gra wyścigowa open-source z wieloma postaciami, trasami i trybami gry. Naszym celem jest stworzenie gry, która będzie bardziej zabawna niż realistyczna i zapewni przyjemne wrażenia dla wszystkich grup wiekowych.</p>
     <p xml:lang="nl">Karts. Turbogas. Actie! SuperTuxKart is een open source 3D-racespel met verschillende personages, parcours en spelmodi. Ons doel is om een spel te maken dat leuk is en niet per se heel realistisch. Een spel wat iedereen, ongeacht de leeftijd, met plezier kan spelen.</p>
+    <p xml:lang="ko">카트. 니트로. 액션! 슈퍼턱스카트는 다양한 캐릭터, 트랙, 플레이모드를 가진 3D아케이드 경주입니다. 우리의 목표는 현실보다 재밌는 게임을 개발하고, 모든 연령대에 재밌는 경험을 제공하는 것입니다.</p>
     <p xml:lang="it">Kart. Nitro. Azione! SuperTuxKart è un gioco open-source 3D di corsa con vari personaggi, piste e modalità giocabili. Il nostro obbiettivo è quello di creare un gioco che sia più divertente che realistico e che fornisca una piacevole esperienza per qualunque età.</p>
     <p xml:lang="id">Kart. Nitro. Mulai! SuperTuxKart adalah sebuah permainan balap 3D sumber-terbuka dengan sejumlah karakter, lintasan, dan mode untuk dimainkan. Target kami adalah membuat sebuah permainan yang lebih mengarah ke kesenangan daripada realistis, dan memberikan pengalaman yang mengasyikkan untuk semua umur.</p>
-    <p xml:lang="he">עגלות. ניטרו. אקשן! SuperTuxKart הינו משחק ארקייד מרוצים בתלת ממד ובקוד פתוח עם מגוון דמויות, מסלולים, ומצבים למשחק. מטרתנו היא ליצור משחק שהוא מהנה יותר מהמציאות, ולספק חוויה שניתן ליהנות ממנה בכל הגילים.</p>
+    <p xml:lang="he">מכוניות. ניטרו. אקשן! SuperTuxKart הוא משחק ארקייד של תחרויות מרוץ בתלת־ממד ובקוד פתוח עם מגוון דמויות, מסלולים, ומצבים למשחק. מטרתנו היא ליצור משחק אשר מהנה יותר מהמציאות, ולספק חוויה שניתן ליהנות ממנה בכל הגילים.</p>
     <p xml:lang="fr">Karts. Nitro. Action! SuperTuxKart est un jeu de course arcade en 3D avec une variété de personnages, pistes et modes de jeu. Notre objectif est de créer un jeu orienté vers le divertissement plutôt que le réalisme et d'offrir une expérience agréable pour les joueurs de tous ages.</p>
     <p xml:lang="es">Karts. Nitro. ¡Acción! SuperTuxKart es un juego de carreras 3D de código abierto con una gran variedad de personajes, circuitos y formas de jugar. Nuestro objectivo es crear un juego que sea más divertido que realista, y proporcionar una experiencia agradable para todas las edades.</p>
     <p xml:lang="de">Karts. Nitro. Action! SuperTuxKart ist ein quelloffenes 3D-Arcade-Rennspiel mit einer Vielzahl von Charakteren, Strecken und Spielmodi. Unser Ziel ist es, ein Spiel zu schaffen, das mehr Spaß macht als realistisch ist, und eine unterhaltsame Erfahrung für alle Altersgruppen bietet.</p>
@@ -64,6 +68,7 @@
     <p xml:lang="pt_BR">Descubra os mistérios de um mundo subaquático, ou dirija pelas selvas de Val Verde e visite o famoso Templo do Cacau. Corra pelo subsolo ou em uma nave espacial, através de uma fazenda rural ou um estranho planeta alienígena. Ou descanse sob as palmeiras da praia, vendo os outros karts ultrapassarem você. Mas não coma as bananas! Preste atenção nas bolas de boliche, desentupidores, chicletes e bolos lançados pelos seus oponentes.</p>
     <p xml:lang="pl">Odkryj tajemnicę podwodnego świata lub przejedź przez dżungle Val Verde i odwiedź słynną Świątynię Kakao. Ścigaj się jadąc pod ziemią lub na statku kosmicznym, przez wiejskie pola uprawne, lub na dziwnej obcej planecie. Albo odpocznij pod palmami na plaży, obserwując, jak inne gokarty Cię wyprzedzają. Ale nie jedz bananów! Uważaj na kule do kręgli, odtykaczki, gumę balonową i ciastka rzucane przez przeciwników.</p>
     <p xml:lang="nl">Ontdek het mysterie van een onderwaterwereld of rijd door de jungles van Val Verde en bezoek de bekende Cacaovulkaan. Race ondergronds, door een ruimteschip, over een boerenerf of een vreemde planeet, of rust uit onder de palmbomen terwijl de andere karts je inhalen. Pas wel op voor de bananen, en ook voor de bowlingballen, ploppers, kauwgom en taarten die je tegenstanders naar je gooien.</p>
+    <p xml:lang="ko">수중 세계의 신비를 발견하거나, Val Verde의 정글을 지나 유명한 코코아 사원을 방문하세요. 땅속이나 우주선에서, 시골 농지나 낯선 외계 행성을 통해 경주합니다. 또는 해변의 야자수나무 아래에서 다른 카트들이 여러분을 추월하는 것을 지켜보며 쉬세요. 바나나는 먹지 마세요! 상대가 던진 볼링공, 플런저, 풍선껌, 케이크를 조심하세요.</p>
     <p xml:lang="it">Scopri il mistero di un mondo sottomarino o guida tra le giungle di Val Verde e visita il famoso Tempio del Cacao. Gareggia sottoterra o in una nave spaziale, attraverso una fattoria rurale o uno strano pianeta alieno. Puoi pure riposare sotto le palme della spiaggia, guardando gli altri kart sorpassarti. Ma non mangiare le banane! Attento alle palle da bowling, stulalavandini, gomme da masticare e dolci lanciati dagli avversari.</p>
     <p xml:lang="id">Temukan misteri dunia bawah air, atau berkendara melewati hutan Val Verde dan kunjungi Kuil Cocoa yang terkenal. Balapan di bawah tanah atau di pesawat luar angkasa, melewati lahan pertanian di pedesaan atau planet alien yang asing. Atau beristirahat di bawah pohon palem di pantai, menonton kart yang lain menyalipmu. Tapi jangan makan pisangnya! Saksikan bola bowling, penyedot WC, permen karet, dan kue yang dilemparkan oleh musuh-musuhmu.</p>
     <p xml:lang="fr">Découvrez les mystères d'un monde sous-marin, ou parcourez les jungles de Val Verde pour y visiter le célèbre Temple Cacao. Faites la course sous terre ou dans un vaisseau spatial, dans des terres agricoles rurales ou sur une étrange planète extra-terrestre. Ou reposez-vous sur la plage, sous les palmiers, en regardant les autres karts vous dépasser. Mais ne mangez pas les bananes! Faites attention aux boules de bowling, ventouses, gommes et gâteaux lancés par les autres compétiteurs.</p>
@@ -86,12 +91,15 @@
     <p xml:lang="pt_BR">Você pode participar de corridas únicas com outros karts, competir em vários campeonatos, tentar bater a pontuação mais alta em corridas contra o relógio, jogar em arenas de batalha contra bots ou seus amigos, e muito mais! Se você quer um desafio maior, corra online contra outros jogadores de todo o mundo e mostre suas habilidades nas corridas!</p>
     <p xml:lang="pl">Możesz zagrać pojedynczy wyścig przeciwko innym gokartom, ukończyć jedno z kilku Grand Prix, spróbować pobić swój rekord w trybie czasówki, zagrać w trybie bitwy przeciwko komputerowi lub swoim znajomym i wiele więcej! Dla większych wyzwań graj online przeciwko graczom z całego świata i pokaż swoje umiejętności!</p>
     <p xml:lang="nl">Je kunt een wedstrijd organiseren tegen andere karts, meedoen aan één van de vele toernooien, de topscores verbeteren in tijdraces, tegen elkaar vechten (zowel tegen de computer als je vrienden) en nog veel meer! Zoek je nóg meer uitdaging? Race dan online tegen personen van over heel de wereld en laat zien hoe goed je bent!</p>
+    <p xml:lang="ko">당신은 다른 카트들과 경주 를 할 수 있고, 몇몇 그랑프리 대회에서 경쟁할 수 있고, 혼자서 타임트레일에서 높은 기록을 이기려고 도전할 수 있고, 컴퓨터나 친구와 배틀 모드를 할 수 있습니다! 더 큰 도전을 위해, 전 세계의 선수들과 온라인으로 경주하고 여러분의 레이싱 기술을 증명하세요!</p>
     <p xml:lang="it">Puoi giocare una gara singola contro altri kart, competere nei Gran Premi, provare a battere i tempi migliori nelle prove a tempo da solo, combattere nella modalità Battaglia contro i computer o con i tuoi amici e tanto altro! Per una sfida maggiore, puoi gareggiare online contro altri giocatori da tutto il mondo e dimostrare le tue capacità in gara!</p>
+    <p xml:lang="id">Kamu bisa melakukan balapan tunggal melawan kart yang lain, berkompetisi di salah satu Grand Prix, mencoba mengalahkan nilai tertinggimu sendiri di balapan waktu, bermain dalam mode pertempuran melawan komputer atau teman-temanmu, dan lebih banyak lagi! Untuk mendapatkan lebih banyak tantangan, ikuti balapan daring melawan para pemain dari seluruh dunia dan buktikan kemampuan balapmu!</p>
     <p xml:lang="fr">Vous pouvez faire des courses individuelles contre d'autres karts, compétitionner dans un des Grand Prix, essayer de vaincre un des meilleurs temps au contre-la-montre, faire la bataille contre l'ordinateur ou contre vos amis, et plus! Pour un défi supplémentaire, faites la course en ligne pour affronter des joueurs du monde entier et prouver vos talents de conducteur!</p>
-    <p xml:lang="es">Puedes correr una sola carrera contra otros karts, competir en uno o varios campeonatos, intentar superar las puntuaciones máximas en tus propias carreras contrarreloj, jugar en modo batalla contra el ordenador o tus amigos, ¡y más! Para un mayor desafío, compite en línea contra jugadores de todo el mundo y demuestra tus habilidades como piloto.</p>
+    <p xml:lang="es">Puedes correr una sola carrera contra otros karts, competir en uno o varios campeonatos, intentar superar las puntuaciones máximas en tus propias carreras contrarreloj, jugar en modo batalla contra el ordenador o tus amigos, ¡y más! Para un mayor desafío, ¡compite en línea contra jugadores de todo el mundo y demuestra tus habilidades como piloto!</p>
     <p xml:lang="de">Du kannst einzelne Rennen gegen andere Karts fahren, an einem der vielen verschiedenen Grand Prix teilnehmen, versuchen, die besten Zeiten in Zeitrennen zu schlagen, im Kampf-Modus gegen den Computer oder deine Freunde spielen, und vieles mehr! Für eine größere Herausforderung trete online gegen Spieler aus aller Welt an und beweise deine Fahrkünste!</p>
     <p xml:lang="da">Du kan køre enkeltløb mod andre karts, dyste i grandprix, prøve at slå topresultatetet i tidskørsel alene, spille kamptilstand mod computeren eller dine venner mm.! For at få en større udfordring kan du køre mod spillere verden over online og vise hvor god du er!</p>
     <p xml:lang="cs">Můžete si spustit samostatný závod proti jiným motokárám, zúčastnit se jedné z několika Velkých cen, pokusit se překonat vysoké skóre v závodu na čas, hrát v režimu bitvy proti počítači nebo svým přátelům a další! Pro ještě větší výzvu závoďte on-line proti hráčům z celého světa a prokažte své závodní schopnosti!</p>
+    <p xml:lang="ca">Pots córrer una sola cursa contra altres karts, competir en un o varis grans premis, intentar superar les puntuacions màximes en les teves pròpies curses contra rellotge, jugar en mode batalla contra l'ordinador o els teus amics, i més! Per a un desafiament encara més gran, competeix en línia contra jugadors de tot el món i demostra les teves habilitats al volant!</p>
     <p xml:lang="bg">Можеш да изиграеш единично състезание срещу други колички, да се съревноваваш в някой от турнирите за Голямата награда, да се опиташ да победиш най-доброто време сам, да играеш бойния режим срещу компютъра или приятелите си, и още! Ако имаш нужда от по-голямо предизвикателство, можеш да се състезаваш срещу други играчи от целия свят и да им докажеш, че си най-добрият!</p>
     <p xml:lang="be">Вы можаце праехаць адзіночную гонку супраць іншых картаў, прыняць удзел у некалькіх Гран-Пры, паспрабаваць пабіць лепшыя рэзультаты у гонках на час, правесці бітву супраць кампутара або сяброў, ды ня толькі! Для большага выпрабавання, ганяйцеся у сетцы супраць гульцоў з усяго свету і пакажыце, на што вы здольныя!</p>
   </description>
@@ -270,12 +278,16 @@
   <developer_name xml:lang="pt_BR">Equipe SuperTuxKart</developer_name>
   <developer_name xml:lang="pl">SuperTuxKart Team</developer_name>
   <developer_name xml:lang="nl">Het SuperTuxKart-team</developer_name>
+  <developer_name xml:lang="lt">SuperTuxKart komanda</developer_name>
+  <developer_name xml:lang="ko">슈퍼턱스카트 팀</developer_name>
+  <developer_name xml:lang="ja">SuperTuxKartチーム</developer_name>
   <developer_name xml:lang="it">Il team di SuperTuxKart</developer_name>
   <developer_name xml:lang="id">Tim SuperTuxKart</developer_name>
   <developer_name xml:lang="hu">A SuperTuxKart csapat</developer_name>
   <developer_name xml:lang="he">צוות SuperTuxKart</developer_name>
   <developer_name xml:lang="fr">L'équipe SuperTuxKart</developer_name>
   <developer_name xml:lang="fi">SuperTuxKart-tiimi</developer_name>
+  <developer_name xml:lang="eu">SuperTuxKart taldea</developer_name>
   <developer_name xml:lang="es">El equipo de SuperTuxKart.</developer_name>
   <developer_name xml:lang="eo">SuperTuxKart Teamo</developer_name>
   <developer_name xml:lang="el">Ομάδα SuperTuxKart</developer_name>
@@ -301,62 +313,62 @@
     <lang>bg</lang>
     <lang percentage="73">br</lang>
     <lang percentage="75">bs</lang>
-    <lang percentage="99">ca</lang>
+    <lang>ca</lang>
     <lang percentage="98">cs</lang>
-    <lang>da</lang>
+    <lang percentage="99">da</lang>
     <lang>de</lang>
-    <lang percentage="94">el</lang>
+    <lang percentage="96">el</lang>
     <lang percentage="62">eo</lang>
     <lang>es</lang>
     <lang percentage="27">et</lang>
-    <lang percentage="94">eu</lang>
+    <lang percentage="96">eu</lang>
     <lang percentage="2">fa</lang>
     <lang percentage="99">fi</lang>
-    <lang>fr_CA</lang>
-    <lang>fr</lang>
+    <lang percentage="99">fr_CA</lang>
+    <lang percentage="99">fr</lang>
     <lang percentage="22">ga</lang>
     <lang percentage="91">gd</lang>
     <lang percentage="55">gl</lang>
     <lang percentage="91">he</lang>
     <lang percentage="30">hr</lang>
     <lang percentage="99">hu</lang>
-    <lang percentage="99">id</lang>
+    <lang>id</lang>
     <lang percentage="2">is</lang>
-    <lang>it</lang>
+    <lang percentage="99">it</lang>
     <lang percentage="94">ja</lang>
     <lang percentage="11">jbo</lang>
-    <lang percentage="89">ko</lang>
+    <lang>ko</lang>
     <lang percentage="56">krl</lang>
     <lang percentage="46">kw</lang>
     <lang percentage="16">ky</lang>
     <lang percentage="54">la</lang>
-    <lang percentage="63">lt</lang>
+    <lang percentage="65">lt</lang>
     <lang percentage="42">lv</lang>
     <lang percentage="59">nb</lang>
     <lang>nl</lang>
     <lang percentage="97">nn</lang>
     <lang percentage="31">oc</lang>
     <lang percentage="2">os</lang>
-    <lang>pl</lang>
+    <lang percentage="99">pl</lang>
     <lang>pt_BR</lang>
-    <lang>pt</lang>
+    <lang percentage="99">pt</lang>
     <lang percentage="27">ro</lang>
     <lang>ru</lang>
     <lang percentage="1">sco</lang>
     <lang percentage="1">sc</lang>
-    <lang percentage="84">sk</lang>
-    <lang percentage="66">sl</lang>
+    <lang percentage="83">sk</lang>
+    <lang percentage="65">sl</lang>
     <lang percentage="3">sq</lang>
     <lang percentage="93">sr</lang>
     <lang percentage="65">sv</lang>
     <lang percentage="86">sw</lang>
     <lang percentage="97">szl</lang>
-    <lang percentage="72">th</lang>
+    <lang percentage="71">th</lang>
     <lang>tr</lang>
     <lang percentage="56">tt</lang>
     <lang percentage="81">uk</lang>
     <lang percentage="21">vi</lang>
-    <lang>zh_CN</lang>
+    <lang percentage="99">zh_CN</lang>
     <lang>zh_HK</lang>
     <lang>zh_TW</lang>
   </languages>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"POT-Creation-Date: 2020-12-04 13:50+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -171,7 +171,7 @@ msgstr ""
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:150
+#: src/input/gamepad_config.cpp:149
 #: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr ""
@@ -2636,7 +2636,7 @@ msgstr ""
 msgid "Completed achievement \"%s\"."
 msgstr ""
 
-#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:343
+#: src/addons/addons_manager.cpp:111 src/addons/news_manager.cpp:343
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr ""
 
@@ -3297,102 +3297,102 @@ msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:152
+#: src/input/gamepad_config.cpp:151
 msgid "Guide"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:154
+#: src/input/gamepad_config.cpp:153
 msgid "Start"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:156
+#: src/input/gamepad_config.cpp:155
 msgid "Left thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:158
+#: src/input/gamepad_config.cpp:157
 msgid "Right thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:160
+#: src/input/gamepad_config.cpp:159
 msgid "Left shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:162
+#: src/input/gamepad_config.cpp:161
 msgid "Right shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:164
+#: src/input/gamepad_config.cpp:163
 msgid "DPad up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:166
+#: src/input/gamepad_config.cpp:165
 msgid "DPad down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:168
+#: src/input/gamepad_config.cpp:167
 msgid "DPad left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:170
+#: src/input/gamepad_config.cpp:169
 msgid "DPad right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:174
+#: src/input/gamepad_config.cpp:173
 msgid "Left thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:176
+#: src/input/gamepad_config.cpp:175
 msgid "Left thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:178
+#: src/input/gamepad_config.cpp:177
 msgid "Left thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:180
+#: src/input/gamepad_config.cpp:179
 msgid "Left thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:182
+#: src/input/gamepad_config.cpp:181
 msgid "Right thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:184
+#: src/input/gamepad_config.cpp:183
 msgid "Right thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:186
+#: src/input/gamepad_config.cpp:185
 msgid "Right thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:188
+#: src/input/gamepad_config.cpp:187
 msgid "Right thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:190
+#: src/input/gamepad_config.cpp:189
 msgid "Left trigger"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:192
+#: src/input/gamepad_config.cpp:191
 msgid "Right trigger"
 msgstr ""
 
@@ -3937,7 +3937,7 @@ msgid "Please wait while addons are updated"
 msgstr ""
 
 #: src/states_screens/addons_screen.cpp:523
-#: src/states_screens/main_menu_screen.cpp:620
+#: src/states_screens/main_menu_screen.cpp:622
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you "
 "are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -4975,23 +4975,23 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:258
+#: src/states_screens/main_menu_screen.cpp:260
 msgid "Would you like to play the tutorial of the game?"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:556
+#: src/states_screens/main_menu_screen.cpp:558
 msgid ""
 "You can not play online without internet access. If you want to play online, "
 "go in the options menu, and check \"Connect to the Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/main_menu_screen.cpp:573
 msgid ""
 "You can not download addons without internet access. If you want to download "
 "addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:579
+#: src/states_screens/main_menu_screen.cpp:581
 msgid ""
 "You can not download addons without internet access. If you want to download "
 "addons, go in the options menu, and check \"Connect to the Internet\".\n"
@@ -4999,11 +4999,11 @@ msgid ""
 "You can however delete already downloaded addons."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:615
+#: src/states_screens/main_menu_screen.cpp:617
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:627
+#: src/states_screens/main_menu_screen.cpp:629
 msgid "Please wait while the add-ons are loading"
 msgstr ""
 

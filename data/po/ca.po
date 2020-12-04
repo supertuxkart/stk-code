@@ -10,9 +10,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 09:33+0800\n"
-"PO-Revision-Date: 2020-09-21 01:34+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"PO-Revision-Date: 2020-11-22 09:16+0000\n"
+"Last-Translator: Marc Coll Carrillo <marc.coll.carrillo@gmail.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/supertuxkart/supertuxkart/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -382,11 +382,6 @@ msgstr "Càmera suau"
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
 msgstr "Càmera del darrere"
-
-#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
-#. I18N: In the ui/camera screen
-msgid "Follow ball in soccer mode"
-msgstr "Segueix la pilota en mode futbol"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -797,6 +792,8 @@ msgstr "Cursa normal"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1007,7 +1004,7 @@ msgstr "Instal·lat"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Standard"
 msgstr "Estàndard"
 
@@ -1114,12 +1111,9 @@ msgstr "Selecció de la repetició fantasma"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Time trial"
-msgstr "Contra rellotge"
-
-#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
-#. I18N: In the ghost replay selection screen
-msgid "Egg hunt"
+#. I18N: Game mode
+#: src/race/race_manager.cpp:1200
+msgid "Egg Hunt"
 msgstr "A la recerca dels ous perduts"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
@@ -2082,7 +2076,7 @@ msgstr "Mostra sempre la pantalla d'inici de sessió"
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
 msgid "Connect to the Internet"
-msgstr "Connectat a Internet"
+msgstr "Connectar-se a Internet"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2157,6 +2151,11 @@ msgstr "Càmera"
 #. I18N: In the ui settings
 msgid "Custom..."
 msgstr "A mida..."
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Follow ball in soccer mode for backward camera"
+msgstr "Segueix la pilota en mode futbol amb la càmera al revés"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2442,7 +2441,7 @@ msgstr "Gavroche"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr ""
+msgstr "Gnu"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
@@ -3468,7 +3467,7 @@ msgid "You finished the race!"
 msgstr "Has acabat la cursa!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
 #, c-format
 msgid "%s left the game."
 msgstr "%s ha abandonat la partida."
@@ -3476,24 +3475,22 @@ msgstr "%s ha abandonat la partida."
 #: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
-msgstr "El SuperTuxKart pot connectar-se a un servidor per descarregar complements i notificar-te actualitzacions. També recollim estadístiques anònimes de maquinari per ajudar en el desenvolupament del STK. Llegeix la nostra política de privacitat a http://privacy.supertuxkart.net. T'agradaria habilitar aquesta característica? (Per canviar aquest paràmetre més endavant, vés a les opcions, selecciona la pestanya \"General\", i edita els paràmetres \"Connectat a Internet\" i \"Envia estadístiques anònimes del maquinari\")."
+"updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
+" Would you like this feature to be enabled? (To change this setting at a "
+"later time, go to options, select tab 'General', and edit \"Connect to the "
+"Internet\")."
+msgstr "El SuperTuxKart pot connectar-se a un servidor per descarregar complements i notificar-te sobre actualitzacions. Llegeix la nostra política de privacitat a https://supertuxkart.net/Privacy. T'agradaria habilitar aquesta característica? (Per canviar aquest paràmetre més endavant, vés a les opcions, selecciona la pestanya \"General\", i edita els paràmetres \"Connectar-se a Internet\")."
 
-#: src/main.cpp:2194
+#: src/main.cpp:2193
 msgid "Your screen resolution is too low to run STK."
 msgstr "La resolució de la teva pantalla és massa baixa per executar el STK."
 
-#: src/main.cpp:2229
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "La versió del teu controlador és massa antiga. Si us plau, instal·la la darrera versió."
 
-#: src/main.cpp:2247
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3501,7 +3498,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "El treu controlador gràfic sembla ser molt antic. Si us plau, comprova si hia una actualització disponible. SuperTuxKart recomana un controlador que admeti %s o millor. El joc probablement funcioni, però en un mode gràfic reduit."
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "La connexió amb el servidor ha excedit el temps d'espera."
 
@@ -3608,7 +3605,7 @@ msgid "You were kicked: Ping too high."
 msgstr "T'han expulsat. El teu ping era massa alt."
 
 #: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:864
+#: src/network/protocols/client_lobby.cpp:868
 msgid "Bad network connection is detected."
 msgstr "S'ha detectat una mala connexió de xarxa."
 
@@ -3686,90 +3683,90 @@ msgstr "Progrés del campionat: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:860
 msgid "All players joined red or blue team."
 msgstr "Tots els jugadors s'han unit a l'equip blau o al vermell."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:876
+#: src/network/protocols/client_lobby.cpp:880
 msgid "You are now the owner of server."
 msgstr "Ara ets el propietari del servidor."
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Server is busy."
 msgstr "Connexió rebutjada. El servidor està ocupat."
 
-#: src/network/protocols/client_lobby.cpp:924
+#: src/network/protocols/client_lobby.cpp:928
 msgid "Connection refused: You are banned from the server."
 msgstr "Connexió rebutjada. T'han expulsat del servidor."
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Server password is incorrect."
 msgstr "Connexió rebutjada. La contrasenya del servidor no és correcta."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Game data is incompatible."
 msgstr "Connexió rebutjada. Les dades del joc són incompatibles."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Server is full."
 msgstr "Connexió rebutjada. El servidor està ple."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:954
 msgid "Connection refused: Invalid player connecting."
 msgstr "Connexió rebutjada. S'està connectant un jugador invàlid."
 
-#: src/network/protocols/client_lobby.cpp:978
+#: src/network/protocols/client_lobby.cpp:982
 msgid "Failed to start the network game."
 msgstr "No s'ha pogut iniciar la partida en xarxa."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "La partida s'ha acabat, ja no t'hi pots unir en directe ni observar-la."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "No remaining place in the arena - live join disabled."
 msgstr "No queda lloc a l'arena - unir-se en directe es troba deshabilitat."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1203
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Només queda un jugador, tornant al rebedor."
 
-#: src/network/protocols/client_lobby.cpp:1205
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
 msgstr "El propietari del servidor ha abandonat la partida."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
 msgstr "Estaràs observant la propera partida."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1377
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s s'ha unit a l'equip vermell."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1383
+#: src/network/protocols/client_lobby.cpp:1387
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s s'ha unit a l'equip blau."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1389
+#: src/network/protocols/client_lobby.cpp:1393
 #, c-format
 msgid "%s joined the game."
 msgstr "%s s'ha unit a la partida."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1580
+#: src/network/protocols/client_lobby.cpp:1584
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3777,7 +3774,7 @@ msgid ""
 msgstr "Prem <%s> o <%s> per canviar de jugador, <%s> o <%s> per canviar la posició de la càmera."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1596
+#: src/network/protocols/client_lobby.cpp:1600
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%s ha estat reportat."
@@ -3884,11 +3881,6 @@ msgstr "Segueix al líder"
 msgid "3 Strikes Battle"
 msgstr "Batalla a 3 cops"
 
-#. I18N: Game mode
-#: src/race/race_manager.cpp:1200
-msgid "Egg Hunt"
-msgstr "A la recerca dels ous perduts"
-
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
 msgstr "El fitxer incomplet de repetició no es desarà."
@@ -3994,7 +3986,7 @@ msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d arena no disponible amb un sol jugador."
 msgstr[1] "%d arenes no disponibles amb un sol jugador."
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Launchpad Contributions:\n  Aljullu https://launchpad.net/~aljullu\n  Dawid Gan https://launchpad.net/~deveee\n  Marc Coll Carrillo https://launchpad.net/~marc-coll-carrillo\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  VPablo https://launchpad.net/~villumar"
 
@@ -4905,7 +4897,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "S'ha produït un error mentre s'intentava desar el teu campionat."
 
-#: src/states_screens/edit_track_screen.cpp:254
+#: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
 msgstr "Selecciona un circuit"
 
@@ -5049,20 +5041,20 @@ msgstr "Vols jugar al tutorial del joc?"
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
-msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia, vés al menú d'opcions i selecciona \"Connectat a Internet\"."
+msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia, vés al menú d'opcions i selecciona \"Connectar-se a Internet\"."
 
 #: src/states_screens/main_menu_screen.cpp:571
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
-msgstr "No pots descarregar complements sense accés a Internet. Si vols descarregar complements, vés al menú d'opcions i selecciona \"Connectat a Internet\"."
+msgstr "No pots descarregar complements sense accés a Internet. Si vols descarregar complements, vés al menú d'opcions i selecciona \"Connectar-se a Internet\"."
 
 #: src/states_screens/main_menu_screen.cpp:579
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
-msgstr "No pots descarregar complements sense accés a Internet. Si vols descarregar complements, vés al menú d'opcions i selecciona \"Connectat a Internet\".\n\nPerò sí que pots eliminar complements ja descarregats."
+msgstr "No pots descarregar complements sense accés a Internet. Si vols descarregar complements, vés al menú d'opcions i selecciona \"Connectar-se a Internet\".\n\nPerò sí que pots eliminar complements ja descarregats."
 
 #: src/states_screens/main_menu_screen.cpp:615
 msgid "The add-ons module is currently disabled in the Options screen"
@@ -5242,7 +5234,7 @@ msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go to options, select  tab 'User Interface', and edit \"Connect to the "
 "Internet\"."
-msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia, vés a les opcions, selecciona la pestanya \"Interfície d'usuari\", i edita el paràmetre \"Connectat a Internet\"."
+msgstr "No pots jugar en línia sense accés a Internet. Si vols jugar en línia, vés a les opcions, selecciona la pestanya \"Interfície d'usuari\", i edita el paràmetre \"Connectar-se a Internet\"."
 
 #: src/states_screens/online/online_screen.cpp:239
 msgid "Enter the server address optionally followed by : and then port."
@@ -5617,18 +5609,18 @@ msgstr "Molt gran"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "A mida"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:363
+#: src/states_screens/options/options_screen_ui.cpp:364
 msgid "Drone chase"
 msgstr "Seguiment de dron"
 
-#: src/states_screens/options/options_screen_ui.cpp:533
+#: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -6004,12 +5996,12 @@ msgstr "Tots"
 msgid "Locked!"
 msgstr "Bloquejat!"
 
-#: src/utils/string_utils.cpp:1413
+#: src/utils/string_utils.cpp:1415
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
+#: src/utils/string_utils.cpp:1422 src/utils/string_utils.cpp:1426
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
@@ -6163,7 +6155,7 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, race online against players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "Pots córrer una sola cursa contra altres karts, competir en un o varis grans premis, intentar superar les puntuacions màximes en les teves pròpies curses contra rellotge, jugar en mode batalla contra l'ordinador o els teus amics, i més! Per a un desafiament encara més gran, competeix en línia contra jugadors de tot el món i demostra les teves habilitats al volant!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."

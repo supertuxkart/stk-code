@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 09:33+0800\n"
-"PO-Revision-Date: 2020-09-21 05:19+0000\n"
+"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"PO-Revision-Date: 2020-11-19 08:46+0000\n"
 "Last-Translator: Andrei Stepanov <adem4ik@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/supertuxkart/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -389,11 +389,6 @@ msgstr "Плавная камера"
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
 msgstr "Задняя камера"
-
-#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
-#. I18N: In the ui/camera screen
-msgid "Follow ball in soccer mode"
-msgstr "Следовать за мячом в режиме футбола"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -804,6 +799,8 @@ msgstr "Обычная гонка"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1014,7 +1011,7 @@ msgstr "Установлено"
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Standard"
 msgstr "Стандартные"
 
@@ -1121,12 +1118,9 @@ msgstr "Выбор повтора с призраком"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Time trial"
-msgstr "Гонка на время"
-
-#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
-#. I18N: In the ghost replay selection screen
-msgid "Egg hunt"
+#. I18N: Game mode
+#: src/race/race_manager.cpp:1200
+msgid "Egg Hunt"
 msgstr "Охота за яйцами"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
@@ -2164,6 +2158,11 @@ msgstr "Камера"
 #. I18N: In the ui settings
 msgid "Custom..."
 msgstr "Пользовательская…"
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Follow ball in soccer mode for backward camera"
+msgstr "Следовать за мячом в режиме футбола камерой заднего вида"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -3477,7 +3476,7 @@ msgid "You finished the race!"
 msgstr "Вы завершили гонку!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
 #, c-format
 msgid "%s left the game."
 msgstr "%s покинул(а) игру."
@@ -3485,24 +3484,22 @@ msgstr "%s покинул(а) игру."
 #: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
-msgstr "SuperTuxKart может подключаться к серверу для загрузки дополнений и уведомлять вас об обновлениях. Мы также собираем анонимную информацию о вашем ПК для улучшения STK. Пожалуйста, прочтите нашу политику конфиденциальности на http://privacy.supertuxkart.net. Вам нужна такая возможность? (Для изменения перейдите в «Настройки» -> «Основные» -> «Подключаться к интернету» -> «Отправлять анонимную статистику об оборудовании»)."
+"updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
+" Would you like this feature to be enabled? (To change this setting at a "
+"later time, go to options, select tab 'General', and edit \"Connect to the "
+"Internet\")."
+msgstr "SuperTuxKart может подключаться к серверу для загрузки дополнений и уведомлять вас об обновлениях.  Пожалуйста, прочтите нашу политику конфиденциальности на https://supertuxkart.net/Privacy. Вам нужна такая возможность? (Для изменения этой настройки перейдите в «Настройки» -> «Основные» -> «Подключаться к интернету»)."
 
-#: src/main.cpp:2194
+#: src/main.cpp:2193
 msgid "Your screen resolution is too low to run STK."
 msgstr "Разрешение вашего монитора слишком низкое для запуска игры."
 
-#: src/main.cpp:2229
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "У вас старый видеодрайвер. Пожалуйста, обновите его."
 
-#: src/main.cpp:2247
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3510,7 +3507,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "У вас устаревший драйвер видео. Пожалуйста, проверьте доступные обновления. SuperTuxKart рекомендует драйвер поддерживающий %s и выше. Игра скорее всего запустится, но в режиме упрощённой графики."
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Истекло время ожидания соединения с сервером."
 
@@ -3619,7 +3616,7 @@ msgid "You were kicked: Ping too high."
 msgstr "Вас выкинуло: слишком высокий пинг."
 
 #: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:864
+#: src/network/protocols/client_lobby.cpp:868
 msgid "Bad network connection is detected."
 msgstr "Обнаружено плохое соединение с сетью."
 
@@ -3697,90 +3694,90 @@ msgstr "Прохождение Гран-при: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:860
 msgid "All players joined red or blue team."
 msgstr "Все игроки присоединились к красной или синей командам."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:876
+#: src/network/protocols/client_lobby.cpp:880
 msgid "You are now the owner of server."
 msgstr "Вы теперь владелец сервера."
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Server is busy."
 msgstr "Соединение отклонено: сервер занят."
 
-#: src/network/protocols/client_lobby.cpp:924
+#: src/network/protocols/client_lobby.cpp:928
 msgid "Connection refused: You are banned from the server."
 msgstr "Соединение отклонено: вы заблокированы на сервере."
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Server password is incorrect."
 msgstr "Соединение отклонено: неверный пароль сервера."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Game data is incompatible."
 msgstr "Соединение отклонено: несовместимые игровые данные."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Server is full."
 msgstr "Соединение отклонено: сервер переполнен."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:954
 msgid "Connection refused: Invalid player connecting."
 msgstr "Соединение отклонено: подключение недопустимого игрока."
 
-#: src/network/protocols/client_lobby.cpp:978
+#: src/network/protocols/client_lobby.cpp:982
 msgid "Failed to start the network game."
 msgstr "Не удалось начать сетевую игру."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Игра закончилась, вы больше не можете подключиться или наблюдать."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Не осталось места в арене — подключение отклонено."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1203
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Всего 1 игрок остался, возврат в лобби"
 
-#: src/network/protocols/client_lobby.cpp:1205
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
 msgstr "Владелец сервера покинул игру."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
 msgstr "Вы будете наблюдать в следующей игре."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1377
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s присоединился к красной команде."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1383
+#: src/network/protocols/client_lobby.cpp:1387
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s присоединился к синей команде."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1389
+#: src/network/protocols/client_lobby.cpp:1393
 #, c-format
 msgid "%s joined the game."
 msgstr "%s присоединился к игре."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1580
+#: src/network/protocols/client_lobby.cpp:1584
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3788,7 +3785,7 @@ msgid ""
 msgstr "Нажмите «%s» или «%s» для смены наблюдаемого игрока, «%s» или «%s» — для смены позиции камеры."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1596
+#: src/network/protocols/client_lobby.cpp:1600
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Жалоба на %s успешно отправлена."
@@ -3899,11 +3896,6 @@ msgstr "Преследование лидера"
 msgid "3 Strikes Battle"
 msgstr "Битва трёх ударов"
 
-#. I18N: Game mode
-#: src/race/race_manager.cpp:1200
-msgid "Egg Hunt"
-msgstr "Охота за яйцами"
-
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
 msgstr "Незаконченный повтор не будет сохранён."
@@ -4011,7 +4003,7 @@ msgstr[1] "%d арен недоступно в одиночном режиме."
 msgstr[2] "%d арен недоступно в одиночном режиме."
 msgstr[3] "%d арены недоступны в одиночном режиме."
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "Участники Launchpad:\n  AleXoundOS https://launchpad.net/~alexoundos\n  Alexander 'FONTER' Zinin https://launchpad.net/~spore-09\n  Andrey Olykainen https://launchpad.net/~andrey.olykainen\n  Denis Deryabin https://launchpad.net/~denis2010der\n  Dmitriy Koshel https://launchpad.net/~gaim4a\n  Dmitry https://launchpad.net/~dmitry-ashkadov\n  Dmitry Dubrov https://launchpad.net/~dimprogpro\n  Helen Antonova https://launchpad.net/~vigonett\n  Igor Shtompel https://launchpad.net/~i.shtompel\n  Kirill Babeev https://launchpad.net/~kirill-babeev\n  KroArtem https://launchpad.net/~kroartem\n  Maxim Kalinin https://launchpad.net/~kalinin-maxim\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  adem https://launchpad.net/~adem4ik\n  pingvin https://launchpad.net/~penguin-tux\n  Дмитрий https://launchpad.net/~starwars32\n  Олег https://launchpad.net/~laoltomsk\n  Jay ZDLin https://launchpad.net/~black-buddha666"
 
@@ -4924,7 +4916,7 @@ msgstr "%s (+)"
 msgid "An error occurred while trying to save your grand prix."
 msgstr "При сохранении вашего Гран-при возникла ошибка."
 
-#: src/states_screens/edit_track_screen.cpp:254
+#: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
 msgstr "Выберите трассу"
 
@@ -5640,18 +5632,18 @@ msgstr "Самый большой"
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr "Свои"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:363
+#: src/states_screens/options/options_screen_ui.cpp:364
 msgid "Drone chase"
 msgstr "Следование за дроном"
 
-#: src/states_screens/options/options_screen_ui.cpp:533
+#: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -6027,12 +6019,12 @@ msgstr "все"
 msgid "Locked!"
 msgstr "Заблокировано!"
 
-#: src/utils/string_utils.cpp:1413
+#: src/utils/string_utils.cpp:1415
 #, c-format
 msgid "%s MB"
 msgstr "%s МБ"
 
-#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
+#: src/utils/string_utils.cpp:1422 src/utils/string_utils.cpp:1426
 #, c-format
 msgid "%s KB"
 msgstr "%s КБ"

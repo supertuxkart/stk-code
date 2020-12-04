@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-09-21 09:33+0800\n"
-"PO-Revision-Date: 2020-09-21 01:34+0000\n"
+"POT-Creation-Date: 2020-11-19 14:27+0800\n"
+"PO-Revision-Date: 2020-11-19 06:30+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Thai (http://www.transifex.com/supertuxkart/supertuxkart/language/th/)\n"
 "MIME-Version: 1.0\n"
@@ -383,11 +383,6 @@ msgstr "ความราบรื่นของกล้อง"
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
 msgstr "กล้องด้านหลัง"
-
-#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
-#. I18N: In the ui/camera screen
-msgid "Follow ball in soccer mode"
-msgstr "ตามบอลในโหมดฟุตบอล\n "
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -798,6 +793,8 @@ msgstr "แข่งขันแบบปกติ"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
+#. I18N: In the ghost replay selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1008,7 +1005,7 @@ msgstr "การติดตั้ง\n "
 #. I18N: track group
 #. I18N: In the UI options,litscreen_method in the race UI
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:361
+#: src/states_screens/options/options_screen_ui.cpp:362
 msgid "Standard"
 msgstr "มาตรฐาน"
 
@@ -1115,13 +1112,10 @@ msgstr "เลือกโกสรีเพลย์"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
-msgid "Time trial"
-msgstr "ทำเวลา"
-
-#. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
-#. I18N: In the ghost replay selection screen
-msgid "Egg hunt"
-msgstr "เก็บไข่"
+#. I18N: Game mode
+#: src/race/race_manager.cpp:1200
+msgid "Egg Hunt"
+msgstr "ล่าไข่\n "
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -2158,6 +2152,11 @@ msgstr "กล้อง"
 #. I18N: In the ui settings
 msgid "Custom..."
 msgstr "กำหนดเอง...\n "
+
+#. I18N: ./data/gui/screens/options_ui.stkgui
+#. I18N: In the ui settings
+msgid "Follow ball in soccer mode for backward camera"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -3468,7 +3467,7 @@ msgid "You finished the race!"
 msgstr "คุณแข่งขันสำเร็จ!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1122
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
 #, c-format
 msgid "%s left the game."
 msgstr ""
@@ -3476,24 +3475,22 @@ msgstr ""
 #: src/main.cpp:1913
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
-"updates. We also collect anonymous hardware statistics to help with the "
-"development of STK. Please read our privacy policy at "
-"http://privacy.supertuxkart.net. Would you like this feature to be enabled? "
-"(To change this setting at a later time, go to options, select tab "
-"'General', and edit \"Connect to the Internet\" and \"Send anonymous HW "
-"statistics\")."
-msgstr "SuperTuxKart อาจเชื่อมต่อกับเซิร์ฟเวอร์เพื่อดาวน์โหลดส่วนเสริมและแจ้งให้คุณทราบถึงการปรับปรุง.\nนอกจากนี้เรายังรวบรวมข้อมูลฮาร์ดแวร์ที่ไม่ระบุตัวตรเพื่อช่วยในการพัฒนา STK โปรดอ่านนโยบายความเป็นส่วนตัวของเราที่ http://privacy.supertuxkart.net คุณต้องการเปิดใช้งานฟีเจอร์นี้หรือไม่? (หากต้องการเปลี่ยนการตั้งค่านี้ในภายหลังให้ไปที่ตัวเลือกเลือกแท็บ 'ทั่วไป' และแก้ไข \"เชื่อมต่อกับอินเทอร์เน็ต\" และ \"ส่งสถิติ HW ที่ไม่ระบุตัวตน\") "
+"updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
+" Would you like this feature to be enabled? (To change this setting at a "
+"later time, go to options, select tab 'General', and edit \"Connect to the "
+"Internet\")."
+msgstr ""
 
-#: src/main.cpp:2194
+#: src/main.cpp:2193
 msgid "Your screen resolution is too low to run STK."
 msgstr "ความละเอียดของหน้าจอต่ำในการรัน STK."
 
-#: src/main.cpp:2229
+#: src/main.cpp:2228
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "ไดร์เวอร์การ์ดจอเก่ามาก.โปรดติดตั้งเวอร์ชั่นใหม่."
 
-#: src/main.cpp:2247
+#: src/main.cpp:2246
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3501,7 +3498,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "ไดรเวอร์กราฟิกของคุณดูเหมือนจะเก่ามาก. โปรดตรวจสอบว่ามีการอัพเดตหรือไม่. SuperTuxKart แนะนำไดรเวอร์ที่รองรับ %s หรือดีกว่า เกมดังกล่าวจะยังคงทำงาน แต่อยู่ในโหมดลดกราฟิก"
 
-#: src/main_loop.cpp:477 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "การเชื่อมต่อเซิร์ฟเวอร์หมดเวลา\n "
 
@@ -3607,7 +3604,7 @@ msgid "You were kicked: Ping too high."
 msgstr "คุณถูกเตะ: ปิงสูงเกินไป\n "
 
 #: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:864
+#: src/network/protocols/client_lobby.cpp:868
 msgid "Bad network connection is detected."
 msgstr "ตรวจพบการเชื่อมต่อเครือข่ายไม่ดี\n "
 
@@ -3685,90 +3682,90 @@ msgstr ""
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:856
+#: src/network/protocols/client_lobby.cpp:860
 msgid "All players joined red or blue team."
 msgstr "ผู้เล่นทั้งหมดเข้าทีมแดงหรือทีมฟ้า"
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:876
+#: src/network/protocols/client_lobby.cpp:880
 msgid "You are now the owner of server."
 msgstr "ตอนนี้คุณเป็นเจ้าของเซิร์ฟเวอร์"
 
-#: src/network/protocols/client_lobby.cpp:919
+#: src/network/protocols/client_lobby.cpp:923
 msgid "Connection refused: Server is busy."
 msgstr "การเชื่อมต่อถูกปฏิเสธ: เซิร์ฟเวอร์ไม่ว่าง"
 
-#: src/network/protocols/client_lobby.cpp:924
+#: src/network/protocols/client_lobby.cpp:928
 msgid "Connection refused: You are banned from the server."
 msgstr "การเชื่อมต่อถูกปฏิเสธ: คุณถูกแบนจากเซิร์ฟเวอร์"
 
-#: src/network/protocols/client_lobby.cpp:938
+#: src/network/protocols/client_lobby.cpp:942
 msgid "Connection refused: Server password is incorrect."
 msgstr "การเชื่อมต่อถูกปฏิเสธ: รหัสผ่านเซิร์ฟเวอร์ไม่ถูกต้อง"
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:946
 msgid "Connection refused: Game data is incompatible."
 msgstr "การเชื่อมต่อถูกปฏิเสธ: ข้อมูลเกมเข้ากันไม่ได้"
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:950
 msgid "Connection refused: Server is full."
 msgstr "การเชื่อมต่อถูกปฏิเสธ: เซิร์ฟเวอร์เต็ม"
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:954
 msgid "Connection refused: Invalid player connecting."
 msgstr "การเชื่อมต่อถูกปฏิเสธ: การเชื่อมต่อผู้เล่นไม่ถูกต้อง"
 
-#: src/network/protocols/client_lobby.cpp:978
+#: src/network/protocols/client_lobby.cpp:982
 msgid "Failed to start the network game."
 msgstr "ไม่สามารถเริ่มเกมในเครือข่าย"
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1191
+#: src/network/protocols/client_lobby.cpp:1195
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "เกมดังกล่าวสิ้นสุดลงคุณจะไม่สามารถเข้าร่วมหรือชมภาพสดได้อีกต่อไป"
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1199
 msgid "No remaining place in the arena - live join disabled."
 msgstr "ไม่มีสถานที่ที่เหลืออยู่ในสนามรบ- ปิดการเข้าร่วมแบบสด"
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1203
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "เหลือผู้เล่นเพียง 1 คนกลับไปที่ห้องโถง"
 
-#: src/network/protocols/client_lobby.cpp:1205
+#: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
 msgstr "เจ้าของเซิร์ฟเวอร์ออกจากเกม"
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
 msgstr "คุณจะได้ชมเกมถัดไป"
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1377
+#: src/network/protocols/client_lobby.cpp:1381
 #, c-format
 msgid "%s joined the red team."
 msgstr "%sเข้าร่วมทีมสีแดง"
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1383
+#: src/network/protocols/client_lobby.cpp:1387
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%sเข้าร่วมทีมสีน้ำเงิน"
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1389
+#: src/network/protocols/client_lobby.cpp:1393
 #, c-format
 msgid "%s joined the game."
 msgstr "%sเข้าร่วมเกม"
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1580
+#: src/network/protocols/client_lobby.cpp:1584
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3776,7 +3773,7 @@ msgid ""
 msgstr ""
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1596
+#: src/network/protocols/client_lobby.cpp:1600
 #, c-format
 msgid "Successfully reported %s."
 msgstr "รายงานสำเร็จแล้ว %s"
@@ -3880,11 +3877,6 @@ msgstr "ตามผู้นำ\n "
 #: src/race/race_manager.cpp:1194 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr ""
-
-#. I18N: Game mode
-#: src/race/race_manager.cpp:1200
-msgid "Egg Hunt"
-msgstr "ล่าไข่\n "
 
 #: src/replay/replay_recorder.cpp:360
 msgid "Incomplete replay file will not be saved."
@@ -3990,7 +3982,7 @@ msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%dสนามรบไม่พร้อมใช้งานในผู้เล่นคนเดียว"
 
-#: src/states_screens/credits.cpp:186
+#: src/states_screens/credits.cpp:184
 msgid "translator-credits"
 msgstr "เครดิตผู้แปล"
 
@@ -4900,7 +4892,7 @@ msgstr ""
 msgid "An error occurred while trying to save your grand prix."
 msgstr ""
 
-#: src/states_screens/edit_track_screen.cpp:254
+#: src/states_screens/edit_track_screen.cpp:255
 msgid "Select a track"
 msgstr "เลือกสนามแข่ง"
 
@@ -5610,18 +5602,18 @@ msgstr ""
 
 #. I18N: custom camera setting
 #. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:359
+#: src/states_screens/options/options_screen_ui.cpp:360
 #: src/states_screens/options/options_screen_video.cpp:489
 #: src/states_screens/options/options_screen_video.cpp:520
 msgid "Custom"
 msgstr ""
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:363
+#: src/states_screens/options/options_screen_ui.cpp:364
 msgid "Drone chase"
 msgstr ""
 
-#: src/states_screens/options/options_screen_ui.cpp:533
+#: src/states_screens/options/options_screen_ui.cpp:537
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5997,12 +5989,12 @@ msgstr "ทั้งหมด"
 msgid "Locked!"
 msgstr "ล๊อก!"
 
-#: src/utils/string_utils.cpp:1413
+#: src/utils/string_utils.cpp:1415
 #, c-format
 msgid "%s MB"
 msgstr "%s MB"
 
-#: src/utils/string_utils.cpp:1420 src/utils/string_utils.cpp:1424
+#: src/utils/string_utils.cpp:1422 src/utils/string_utils.cpp:1426
 #, c-format
 msgid "%s KB"
 msgstr "%s KB"
