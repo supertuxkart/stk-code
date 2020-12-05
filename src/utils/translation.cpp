@@ -262,8 +262,10 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
                 while (!StringUtils::safeGetline(in, line).eof())
                 {
                     const std::u32string& u32line = StringUtils::utf8ToUtf32(line);
+                    if (u32line.empty())
+                        continue;
                     char32_t thai = u32line[0];
-                    if (u32line.empty() || !isThaiCP(thai))
+                    if (!isThaiCP(thai))
                         continue;
                     if (g_thai_dict.find(thai) == g_thai_dict.end())
                     {
