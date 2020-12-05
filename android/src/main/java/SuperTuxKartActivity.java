@@ -309,22 +309,6 @@ public class SuperTuxKartActivity extends SDLActivity
     }
     // ------------------------------------------------------------------------
     /* Called by STK in JNI. */
-    public void openURL(final String url)
-    {
-        try
-        {
-            Uri uri = Uri.parse(url);
-            Intent i = new Intent(Intent.ACTION_VIEW, uri);
-            if (i.resolveActivity(getPackageManager()) != null)
-                startActivity(i);
-        }
-        catch (ActivityNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    // ------------------------------------------------------------------------
-    /* Called by STK in JNI. */
     public void fromSTKEditBox(final int widget_id, final String text,
                                final int selection_start,
                                final int selection_end, final int type)

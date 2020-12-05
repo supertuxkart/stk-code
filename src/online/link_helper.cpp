@@ -24,8 +24,7 @@
 #endif
 
 #ifdef ANDROID
-#include <jni.h>
-#include "SDL_system.h"
+#include "SDL_misc.h"
 #endif
 
 #ifdef IOS_STK
@@ -48,45 +47,7 @@ namespace Online
     void LinkHelper::openURL (std::string url)
     {
 #if defined(ANDROID)
-        JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
-        if (env == NULL)
-        {
-            Log::error("LinkHelper",
-                "openURL unable to SDL_AndroidGetJNIEnv.");
-            return;
-        }
-
-        jobject native_activity = (jobject)SDL_AndroidGetActivity();
-        if (native_activity == NULL)
-        {
-            Log::error("LinkHelper",
-                "openURL unable to SDL_AndroidGetActivity.");
-            return;
-        }
-
-        jclass class_native_activity = env->GetObjectClass(native_activity);
-
-        if (class_native_activity == NULL)
-        {
-            Log::error("LinkHelper", "openURL unable to find object class.");
-            env->DeleteLocalRef(native_activity);
-            return;
-        }
-
-        jmethodID method_id = env->GetMethodID(class_native_activity, "openURL", "(Ljava/lang/String;)V");
-
-        if (method_id == NULL)
-        {
-            Log::error("LinkHelper", "openURL unable to find method id.");
-            env->DeleteLocalRef(class_native_activity);
-            env->DeleteLocalRef(native_activity);
-            return;
-        }
-        jstring url_jstring = env->NewStringUTF(url.c_str());
-        env->CallVoidMethod(native_activity, method_id, url_jstring);
-        env->DeleteLocalRef(url_jstring);
-        env->DeleteLocalRef(class_native_activity);
-        env->DeleteLocalRef(native_activity);
+        SDL_OpenURL(url.c_str());
 #elif defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #elif defined(IOS_STK)
