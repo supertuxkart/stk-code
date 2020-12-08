@@ -266,7 +266,7 @@ EventPropagation TextBoxWidget::leftPressed (const int playerID)
     #error
 #endif
 
-#define MAKE_EDITTEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_editText2STKEditbox(JNIEnv* env, jobject this_obj, jint widget_id, jstring text, jint start, jint end, jint composing_start, jint composing_end)
+#define MAKE_EDITTEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_editText2STKEditbox(JNIEnv* env, jclass cls, jint widget_id, jstring text, jint start, jint end, jint composing_start, jint composing_end)
 #define ANDROID_EDITTEXT_CALLBACK(PKG_NAME) MAKE_EDITTEXT_CALLBACK(PKG_NAME)
 
 extern "C"
@@ -342,7 +342,7 @@ ANDROID_EDITTEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 extern void Android_toggleOnScreenKeyboard(bool show, int type, int y);
 extern bool Android_isHardwareKeyboardConnected();
 
-#define MAKE_HANDLE_ACTION_NEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleActionNext(JNIEnv* env, jobject this_obj, jint widget_id)
+#define MAKE_HANDLE_ACTION_NEXT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleActionNext(JNIEnv* env, jclass cls, jint widget_id)
 #define ANDROID_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME) MAKE_HANDLE_ACTION_NEXT_CALLBACK(PKG_NAME)
 
 extern "C"
@@ -411,7 +411,7 @@ ANDROID_HANDLE_ACTION_NEXT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 }
 
 
-#define MAKE_HANDLE_LEFT_RIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleLeftRight(JNIEnv* env, jobject this_obj, jboolean left, jint widget_id)
+#define MAKE_HANDLE_LEFT_RIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_STKEditText_handleLeftRight(JNIEnv* env, jclass cls, jboolean left, jint widget_id)
 #define ANDROID_HANDLE_LEFT_RIGHT_CALLBACK(PKG_NAME) MAKE_HANDLE_LEFT_RIGHT_CALLBACK(PKG_NAME)
 
 extern "C"

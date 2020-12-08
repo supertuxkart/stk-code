@@ -62,7 +62,7 @@
 
 std::vector<std::pair<std::string, int> >* g_list = NULL;
 
-#define MAKE_ADD_DNS_SRV_RECORD_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_addDNSSrvRecords(JNIEnv* env, jobject this_obj, jstring name, jint weight)
+#define MAKE_ADD_DNS_SRV_RECORD_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_addDNSSrvRecords(JNIEnv* env, jclass cls, jstring name, jint weight)
 #define ANDROID_ADD_DNS_SRV_RECORD_CALLBACK(PKG_NAME) MAKE_ADD_DNS_SRV_RECORD_CALLBACK(PKG_NAME)
 
 extern "C"
