@@ -533,6 +533,11 @@ namespace UserConfigParams
             &m_multitouch_group,
             "Draw steering wheel on right side.") );
 
+    PARAM_PREFIX BoolUserConfigParam         m_multitouch_auto_acceleration
+            PARAM_DEFAULT( BoolUserConfigParam(false, "multitouch_auto_acceleration",
+            &m_multitouch_group,
+            "Auto acceleration for multitouch controls.") );
+
     PARAM_PREFIX IntUserConfigParam         m_multitouch_controls
             PARAM_DEFAULT( IntUserConfigParam(0, "multitouch_controls",
             &m_multitouch_group,

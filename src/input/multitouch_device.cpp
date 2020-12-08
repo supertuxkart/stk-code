@@ -494,9 +494,11 @@ void MultitouchDevice::updateAxisY(float value)
     else
     {
         m_controller->action(PA_BRAKE, 0);
-        m_controller->action(PA_ACCEL, 0);
+        m_controller->action(PA_ACCEL,
+            UserConfigParams::m_multitouch_controls == 1 &&
+            UserConfigParams::m_multitouch_auto_acceleration ? Input::MAX_VALUE : 0);
     }
-    
+
 }
 
 // ----------------------------------------------------------------------------

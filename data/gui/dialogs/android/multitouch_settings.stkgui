@@ -32,6 +32,14 @@
         </div>
 
         <div width="75%" layout="horizontal-row" proportion="1">
+            <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Auto acceleration"/>
+            <div proportion="1" align="center" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="10" />
+                <checkbox id="auto_acceleration"/>
+            </div>
+        </div>
+
+        <div width="75%" layout="horizontal-row" proportion="1">
             <label proportion="1" align="center" text_align="right" I18N="In the multitouch settings screen" text="Accelerometer"/>
             <div proportion="1" align="center" height="fit" layout="horizontal-row" >
                 <spacer width="40" height="10" />

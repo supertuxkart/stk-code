@@ -2,7 +2,7 @@
 <stkgui>
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-        <box width="100%" height="80%" padding="10" layout="vertical-row">
+        <box width="100%" height="75%" padding="10" layout="vertical-row">
             <bright width="100%" text="Select a type of control that you prefer" align="center" text_align="left" word_wrap="true"/>
 
             <spacer height="7%" width="10"/>
@@ -16,12 +16,19 @@
                         icon="gui/icons/android/steering_wheel.png" I18N="Control type" text="Steering wheel"/>
             </ribbon>
 
-            <spacer height="12%" width="10"/>
+            <spacer height="6%" width="10"/>
+
+            <div width="100%" height="16%" align="center" layout="horizontal-row">
+                <label align="center" text_align="left" text="Auto acceleration"/>
+                <spacer width="10"/>
+                <checkbox width="7%" height="100%" id="auto_acceleration"/>
+            </div>
 
             <label width="100%" text="You can change it later in touch device settings." text_align="left" word_wrap="true"/>
+
         </box>
 
-        <spacer height="7%" width="10"/>
+        <spacer height="6%" width="10"/>
 
         <button id="close" text="Apply" align="center"/>
  

@@ -105,8 +105,25 @@ void InitAndroidDialog::beforeAddingWidgets()
 GUIEngine::EventPropagation InitAndroidDialog::processEvent(
                                                 const std::string& eventSource)
 {
-    if (eventSource == "close")
-    {  
+    if (eventSource == "control_type")
+    {
+        RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
+        assert(control_type != NULL);
+
+        const std::string& selected = control_type->getSelectionIDString(
+                                                        PLAYER_ID_GAME_MASTER);
+        if (selected == "steering_wheel")
+        {
+            getWidget<CheckBoxWidget>("auto_acceleration")->setActive(true);
+        }
+        else
+        {
+            getWidget<CheckBoxWidget>("auto_acceleration")->setState(false);
+            getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
+        }
+    }
+    else if (eventSource == "close")
+    {
         RibbonWidget* control_type = getWidget<RibbonWidget>("control_type");
         assert(control_type != NULL);
         
@@ -121,14 +138,17 @@ GUIEngine::EventPropagation InitAndroidDialog::processEvent(
         if (selected == "steering_wheel")
         {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
+            UserConfigParams::m_multitouch_auto_acceleration = getWidget<CheckBoxWidget>("auto_acceleration")->getState();
         }
         else if (selected == "accelerometer")
         {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_ACCELEROMETER;
+            UserConfigParams::m_multitouch_auto_acceleration = false;
         }
         else if (selected == "gyroscope")
         {
             UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_GYROSCOPE;
+            UserConfigParams::m_multitouch_auto_acceleration = false;
         }
         
         user_config->saveConfig();
@@ -151,17 +171,20 @@ void InitAndroidDialog::updateValues()
     {
         int id = control_type->findItemNamed("accelerometer");
         control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
+        getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
     }
     else if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)
     {
         int id = control_type->findItemNamed("gyroscope");
         control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
+        getWidget<CheckBoxWidget>("auto_acceleration")->setActive(false);
     }
     else
     {
         int id = control_type->findItemNamed("steering_wheel");
         control_type->setSelection(id, PLAYER_ID_GAME_MASTER);
     }
+    getWidget<CheckBoxWidget>("auto_acceleration")->setState(false);
 }
 
 // -----------------------------------------------------------------------------
