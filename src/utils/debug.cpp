@@ -766,7 +766,7 @@ bool handleContextMenuAction(s32 cmd_id)
         for (unsigned int i = 0; i<world->getNumKarts(); i++)
         {
             AbstractKart *kart = world->getKart(i);
-            Log::warn(kart->getIdent().c_str(),
+            Log::info(kart->getIdent().c_str(),
                 "<start position=\"%d\" x=\"%f\" y=\"%f\" z=\"%f\" h=\"%f\"/>",
                 i, kart->getXYZ().getX(), kart->getXYZ().getY(),
                 kart->getXYZ().getZ(), kart->getHeading()*RAD_TO_DEGREE
@@ -1029,8 +1029,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Top view", DEBUG_GUI_CAM_TOP);
             sub->addItem(L"Behind wheel view", DEBUG_GUI_CAM_WHEEL);
             sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
-            sub->addItem(L"Side of kart view", DEBUG_GUI_CAM_SIDE_OF_KART);
-            sub->addItem(L"Inverse side of kart view", DEBUG_GUI_CAM_INV_SIDE_OF_KART);
+            sub->addItem(L"Right side of kart view", DEBUG_GUI_CAM_SIDE_OF_KART);
+            sub->addItem(L"Left side of kart view", DEBUG_GUI_CAM_INV_SIDE_OF_KART);
             sub->addItem(L"Front of kart view", DEBUG_GUI_CAM_FRONT_OF_KART);
             sub->addItem(L"First person view (Ctrl + F1)", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view (Ctrl + F2)", DEBUG_GUI_CAM_NORMAL);
