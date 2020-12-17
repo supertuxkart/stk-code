@@ -82,6 +82,8 @@ MusicInformation::MusicInformation(const XMLNode *root,
     m_fast_music        = NULL;
     m_normal_loop_start = 0.0f;
     m_fast_loop_start   = 0.0f;
+    m_normal_loop_end   = -1.0f;
+    m_fast_loop_end     = -1.0f;
     m_enable_fast       = false;
     m_music_waiting     = false;
     m_faster_time       = 1.0f;
@@ -103,7 +105,9 @@ MusicInformation::MusicInformation(const XMLNode *root,
     root->get("fast",            &m_enable_fast      );
     root->get("fast-filename",   &m_fast_filename    );
     root->get("loop-start",      &m_normal_loop_start);
+    root->get("loop-end",        &m_normal_loop_end  );
     root->get("fast-loop-start", &m_fast_loop_start  );
+    root->get("fast-loop-end",   &m_fast_loop_end    );
 
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
@@ -175,7 +179,7 @@ void MusicInformation::startMusic()
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
-        m_normal_music = new MusicOggStream(m_normal_loop_start);
+        m_normal_music = new MusicOggStream(m_normal_loop_start, m_normal_loop_end);
     }
     else
 #endif
@@ -214,7 +218,7 @@ void MusicInformation::startMusic()
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
-        m_fast_music = new MusicOggStream(m_fast_loop_start);
+        m_fast_music = new MusicOggStream(m_fast_loop_start, m_fast_loop_end);
     }
     else
 #endif
