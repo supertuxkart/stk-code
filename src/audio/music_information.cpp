@@ -53,12 +53,11 @@ MusicInformation *MusicInformation::create(const std::string &filename)
     }
     std::string s;
     if(!root->get("title",    &s) ||
-       !root->get("composer", &s) ||
        !root->get("file",     &s)    )
 
     {
         Log::error("MusicInformation",
-                    "One of 'title', 'composer' or 'file' attribute "
+                    "One of 'title' or 'file' attribute "
                     "is missing in the music XML file '%s'!\n",
                     filename.c_str());
         delete root;
@@ -92,11 +91,12 @@ MusicInformation::MusicInformation(const XMLNode *root,
 
     // Otherwise read config file
     // --------------------------
-    std::string s;
-    root->get("title",           &s                  );
-    m_title = StringUtils::xmlDecode(s);
-    root->get("composer",        &s                  );
-    m_composer = StringUtils::xmlDecode(s);
+    std::string title_raw;
+    std::string composer_raw;
+    root->get("title",           &title_raw          );
+    m_title = StringUtils::xmlDecode(title_raw);
+    root->get("composer",        &composer_raw       );
+    m_composer = StringUtils::xmlDecode(composer_raw);
     root->get("file",            &m_normal_filename  );
     root->get("gain",            &m_gain             );
     root->get("tracks",          &m_all_tracks       );
