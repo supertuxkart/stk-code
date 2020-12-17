@@ -286,10 +286,8 @@ void MusicOggStream::update()
 
         active = streamIntoBuffer(buffer);
         float cur_time = (float)ov_time_tell(&m_oggStream);
-        Log::info("MusicOgg", "Current time in music: %f | Target time: %f", cur_time, m_loop_end);
         if(!active || (m_loop_end > 0 && (m_loop_end - cur_time) < 1e-3))
         {
-            Log::info("MusicOgg", "Restarting music to %f", m_loop_start);
             // No more data, or reached loop end. Seek to loop start (causes the sound to loop)
             ov_time_seek(&m_oggStream, m_loop_start);
             active = streamIntoBuffer(buffer);//now there really should be data
