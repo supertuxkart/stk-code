@@ -151,8 +151,20 @@
            solver-split-impulse-threshold="-0.00001"
            solver-mode=""/>
 
-  <!-- The title and default musics. -->
-  <music title="main_theme.music" default="kart_grand_prix.music"/>
+  <!-- Various replaceable music tracks that play during certain events.
+       title: Plays on the main menu.
+       default: Plays if a track's music was not found.
+       race-win: Plays when a player finishes in 1st place.
+       race-neutral: Plays when a player finishes anywhere in the top half
+       of the total karts but 1st place.
+       race-lose: Plays when a player finishes in the bottom half of the
+       total karts.
+       -->
+  <music title="main_theme.music"
+         default="kart_grand_prix.music"
+         race-win="race_win_theme.music"
+         race-neutral="race_summary.music"
+         race-lose="lose_theme.music"/>
 
   <!--  Replay related values, mostly concerned with saving less data
         and using interpolation instead.

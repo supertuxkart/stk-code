@@ -24,6 +24,7 @@
 #include "challenges/story_mode_timer.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/2dutils.hpp"
 #include "graphics/material.hpp"
@@ -95,29 +96,57 @@ void RaceResultGUI::init()
     music_manager->stopMusic();
 
     bool human_win = true;
+    bool has_human_players = false;
+    bool in_first_place = false;
     unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
     for (unsigned int kart_id = 0; kart_id < num_karts; kart_id++)
     {
         const AbstractKart *kart = World::getWorld()->getKart(kart_id);
         if (kart->getController()->isLocalPlayerController())
+        {
+            has_human_players = true;
             human_win = human_win && kart->getRaceResult();
+
+            if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            {in_first_place = kart->getPosition() <= 2;}
+            else
+            {in_first_place = kart->getPosition() == 1;}
+        }
     }
 
     m_finish_sound = SFXManager::get()->quickSound(
         human_win ? "race_finish_victory" : "race_finish");
 
-    //std::string path = (human_win ? Different result music too later
-    //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music") :
-    //    file_manager->getAsset(FileManager::MUSIC, "race_summary.music"));
-    std::string path = file_manager->getAsset(FileManager::MUSIC, "race_summary.music");
-    m_race_over_music = music_manager->getMusicInformation(path);
+    // Play different result music based on player kart positions.
+    if (has_human_players)
+        if (human_win)
+        {
+            if (in_first_place)
+            // At least one player kart is in 1st place.
+            {m_race_over_music = stk_config->m_race_win_music;}
+            else
+            // All player karts finished in winning positions, but none in 1st place.
+            {m_race_over_music = stk_config->m_race_neutral_music;}
+        }
+        else
+        // No player karts finished in winning positions.
+        {m_race_over_music = stk_config->m_race_lose_music;}
+    else
+    // For races with only AI karts and no human players.
+    {m_race_over_music = stk_config->m_race_neutral_music;}
 
     if (!m_finish_sound)
     {
         // If there is no finish sound (because sfx are disabled), start
         // the race over music here (since the race over music is only started
         // when the finish sound has been played).
-        music_manager->startMusic(m_race_over_music);
+        try
+        {music_manager->startMusic(m_race_over_music);}
+        catch (std::exception& e)
+        {
+            Log::error("RaceResultGUI", "Exception caught when "
+                "trying to load music: %s", e.what());
+        }
     }
 
     // Calculate how many track screenshots can fit into the "result-table" widget
@@ -231,7 +260,7 @@ void RaceResultGUI::enableAllButtons()
         left->setImage("gui/icons/green_check.png");
         left->setVisible(true);
 
-        if (RaceManager::get()->getTrackNumber() + 1 < RaceManager::get()->getNumOfTracks()) 
+        if (RaceManager::get()->getTrackNumber() + 1 < RaceManager::get()->getNumOfTracks())
         {
             right->setLabel(_("Abort Grand Prix"));
             right->setImage("gui/icons/race_giveup.png");
@@ -301,7 +330,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         m_end_track++;
         displayScreenShots();
     }
-    
+
     if(name == "operations")
     {
         const std::string& action =
@@ -391,7 +420,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                     std::vector<std::string> parts;
                     parts.push_back("endcutscene");
                     ((CutsceneWorld*)World::getWorld())->setParts(parts);
-                    
+
                     CutSceneGeneral* scene = CutSceneGeneral::getInstance();
                     scene->push();
                 }
@@ -956,7 +985,7 @@ void RaceResultGUI::displayCTFResults()
             }
         }
     }   // onUpdate
-    
+
     //-----------------------------------------------------------------------------
     /** Called once a frame, this now triggers the rendering of the actual
      *  race result gui.
