@@ -22,6 +22,7 @@
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/lod_node.hpp"
@@ -237,7 +238,7 @@ void GrandPrixLose::setKarts(std::vector<std::pair<std::string, float> > ident_a
 
 MusicInformation* GrandPrixLose::getInGameMenuMusic() const
 {
-    MusicInformation* mi = music_manager->getMusicInformation("lose_theme.music");
+    MusicInformation* mi = stk_config->m_gp_lose_music;
     return mi;
 }
 

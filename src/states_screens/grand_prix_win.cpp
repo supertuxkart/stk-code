@@ -22,6 +22,7 @@
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/stk_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/render_info.hpp"
@@ -424,7 +425,7 @@ void GrandPrixWin::setKarts(const std::pair<std::string, float> idents_arg[3])
 
 MusicInformation* GrandPrixWin::getInGameMenuMusic() const
 {
-    MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
+    MusicInformation* mi = stk_config->m_gp_win_music;
     return mi;
 }
 

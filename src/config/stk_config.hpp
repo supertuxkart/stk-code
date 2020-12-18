@@ -178,6 +178,15 @@ public:
       * the total karts.*/
     MusicInformation *m_race_lose_music;
 
+    /** Filename of the grand prix win music to play.*/
+    MusicInformation *m_gp_win_music;
+
+    /** Filename of the grand prix lose music to play.*/
+    MusicInformation *m_gp_lose_music;
+
+    /** Filename of the feature unlock music to play.*/
+    MusicInformation *m_unlock_music;
+
     /** Maximum number of transform events of a replay. */
     int m_replay_max_frames;
 
@@ -266,6 +275,9 @@ private:
     std::string m_race_win_music_file;
     std::string m_race_neutral_music_file;
     std::string m_race_lose_music_file;
+    std::string m_gp_win_music_file;
+    std::string m_gp_lose_music_file;
+    std::string m_unlock_music_file;
 
 public:
     STKConfig();

@@ -159,12 +159,19 @@
        of the total karts but 1st place.
        race-lose: Plays when a player finishes in the bottom half of the
        total karts.
+       gp-win: Plays when a player finishes a grand prix in one of the top
+       three positions.
+       gp-lose: Plays when a player fails a grand prix.
+       unlock: Plays when a kart, track, or other content is unlocked.
        -->
   <music title="main_theme.music"
          default="kart_grand_prix.music"
          race-win="race_win_theme.music"
          race-neutral="race_summary.music"
-         race-lose="lose_theme.music"/>
+         race-lose="lose_theme.music"
+         gp-win="win_theme.music"
+         gp-lose="lose_theme.music"
+         unlock="win_theme.music"/>
 
   <!--  Replay related values, mostly concerned with saving less data
         and using interpolation instead.

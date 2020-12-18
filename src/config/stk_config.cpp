@@ -45,6 +45,9 @@ STKConfig::STKConfig()
     m_race_win_music          = NULL;
     m_race_neutral_music      = NULL;
     m_race_lose_music         = NULL;
+    m_gp_win_music            = NULL;
+    m_gp_lose_music           = NULL;
+    m_unlock_music            = NULL;
     m_default_kart_properties = new KartProperties();
 }   // STKConfig
 //-----------------------------------------------------------------------------
@@ -64,6 +67,15 @@ STKConfig::~STKConfig()
 
     if (m_race_lose_music)
         delete m_race_lose_music;
+
+    if (m_gp_win_music)
+        delete m_gp_win_music;
+
+    if (m_gp_lose_music)
+        delete m_gp_lose_music;
+
+    if (m_unlock_music)
+        delete m_unlock_music;
 
     if (m_default_kart_properties)
         delete m_default_kart_properties;
@@ -231,6 +243,9 @@ void STKConfig::init_defaults()
     m_race_win_music             = NULL;
     m_race_neutral_music         = NULL;
     m_race_lose_music            = NULL;
+    m_gp_win_music               = NULL;
+    m_gp_lose_music              = NULL;
+    m_unlock_music               = NULL;
     m_solver_split_impulse       = false;
     m_smooth_normals             = false;
     m_same_powerup_mode          = POWERUP_MODE_ONLY_IF_SAME;
@@ -427,6 +442,18 @@ void STKConfig::getAllData(const XMLNode * root)
         music_node->get("race-lose", &m_race_lose_music_file);
         assert(m_race_lose_music_file.size() > 0);
         m_race_lose_music_file = file_manager->getAsset(FileManager::MUSIC, m_race_lose_music_file);
+
+        music_node->get("gp-win", &m_gp_win_music_file);
+        assert(m_gp_win_music_file.size() > 0);
+        m_gp_win_music_file = file_manager->getAsset(FileManager::MUSIC, m_gp_win_music_file);
+
+        music_node->get("gp-lose", &m_gp_lose_music_file);
+        assert(m_gp_lose_music_file.size() > 0);
+        m_gp_lose_music_file = file_manager->getAsset(FileManager::MUSIC, m_gp_lose_music_file);
+
+        music_node->get("unlock", &m_unlock_music_file);
+        assert(m_unlock_music_file.size() > 0);
+        m_unlock_music_file = file_manager->getAsset(FileManager::MUSIC, m_unlock_music_file);
     }
 
     if(const XMLNode *skidmarks_node = root->getNode("skid-marks"))
@@ -639,6 +666,27 @@ void STKConfig::initMusicFiles()
     {
         Log::error("StkConfig", "Cannot load race lose music: %s.",
             m_race_lose_music_file.c_str());
+    }
+
+    m_gp_win_music = MusicInformation::create(m_gp_win_music_file);
+    if (!m_gp_win_music)
+    {
+        Log::error("StkConfig", "Cannot load grand prix win music: %s.",
+            m_gp_win_music_file.c_str());
+    }
+
+    m_gp_lose_music = MusicInformation::create(m_gp_lose_music_file);
+    if (!m_gp_lose_music)
+    {
+        Log::error("StkConfig", "Cannot load grand prix lose music: %s.",
+            m_gp_lose_music_file.c_str());
+    }
+
+    m_unlock_music = MusicInformation::create(m_unlock_music_file);
+    if (!m_unlock_music)
+    {
+        Log::error("StkConfig", "Cannot load unlock music: %s.",
+            m_unlock_music_file.c_str());
     }
 }   // initMusicFiles
 
