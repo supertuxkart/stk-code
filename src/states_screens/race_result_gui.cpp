@@ -332,21 +332,25 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     const std::string& name, const int playerID)
 {
     int n_tracks = RaceManager::get()->getGrandPrix().getNumberOfTracks();
-    if (name == "up_button" && n_tracks > m_max_tracks && m_start_track > 0)
+    if (name == "up_button")
     {
-        m_start_track--;
-        m_end_track--;
-        displayScreenShots();
+        if (n_tracks > m_max_tracks && m_start_track > 0)
+        {
+            m_start_track--;
+            m_end_track--;
+            displayScreenShots();
+        }
     }
-    else if (name == "down_button" && n_tracks > m_max_tracks &&
-        m_start_track < (n_tracks - m_max_tracks))
+    else if (name == "down_button")
     {
-        m_start_track++;
-        m_end_track++;
-        displayScreenShots();
+        if (n_tracks > m_max_tracks && m_start_track < (n_tracks - m_max_tracks))
+        {
+            m_start_track++;
+            m_end_track++;
+            displayScreenShots();
+        }
     }
-
-    if(name == "operations")
+    else if (name == "operations")
     {
         const std::string& action =
             getWidget<GUIEngine::RibbonWidget>("operations")->getSelectionIDString(PLAYER_ID_GAME_MASTER);
