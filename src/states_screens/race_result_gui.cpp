@@ -108,9 +108,14 @@ void RaceResultGUI::init()
             human_win = human_win && kart->getRaceResult();
 
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
-            {in_first_place = kart->getPosition() <= 2;}
+            {
+                // It's possible the winning kart can get ahead of the leader.
+                in_first_place = kart->getPosition() <= 2;
+            }
             else
-            {in_first_place = kart->getPosition() == 1;}
+            {
+                in_first_place = kart->getPosition() == 1;
+            }
         }
     }
 
@@ -119,21 +124,31 @@ void RaceResultGUI::init()
 
     // Play different result music based on player kart positions.
     if (has_human_players)
+    {
         if (human_win)
         {
             if (in_first_place)
-            // At least one player kart is in 1st place.
-            {m_race_over_music = stk_config->m_race_win_music;}
+            {
+                // At least one player kart is in 1st place.
+                m_race_over_music = stk_config->m_race_win_music;
+            }
             else
-            // All player karts finished in winning positions, but none in 1st place.
-            {m_race_over_music = stk_config->m_race_neutral_music;}
+            {
+                // All player karts finished in winning positions, but none in 1st place.
+                m_race_over_music = stk_config->m_race_neutral_music;
+            }
         }
         else
-        // No player karts finished in winning positions.
-        {m_race_over_music = stk_config->m_race_lose_music;}
+        {
+            // No player karts finished in winning positions.
+            m_race_over_music = stk_config->m_race_lose_music;
+        }
+    }
     else
-    // For races with only AI karts and no human players.
-    {m_race_over_music = stk_config->m_race_neutral_music;}
+    {
+        // For races with only AI karts and no human players.
+        m_race_over_music = stk_config->m_race_neutral_music;
+    }
 
     if (!m_finish_sound)
     {
