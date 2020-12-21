@@ -164,8 +164,28 @@ public:
     /** Filename of the title music to play.*/
     MusicInformation *m_title_music;
 
-    /** Filename of the music that is played when the track's music was not found */
+    /** Filename of the music that is played when the track's music was not found.*/
     MusicInformation *m_default_music;
+
+    /** Filename of the music to play when a player finishes in 1st place.*/
+    MusicInformation *m_race_win_music;
+
+    /** Filename of the music to play when a player finishes anywhere in the top half
+     *  of the total karts but 1st place, rounded down.*/
+    MusicInformation *m_race_neutral_music;
+
+    /** Filename of the music to play when a player finishes in the bottom half of
+      * the total karts.*/
+    MusicInformation *m_race_lose_music;
+
+    /** Filename of the grand prix win music to play.*/
+    MusicInformation *m_gp_win_music;
+
+    /** Filename of the grand prix lose music to play.*/
+    MusicInformation *m_gp_lose_music;
+
+    /** Filename of the feature unlock music to play.*/
+    MusicInformation *m_unlock_music;
 
     /** Maximum number of transform events of a replay. */
     int m_replay_max_frames;
@@ -252,6 +272,13 @@ private:
 
     std::string m_title_music_file;
     std::string m_default_music_file;
+    std::string m_race_win_music_file;
+    std::string m_race_neutral_music_file;
+    std::string m_race_lose_music_file;
+    std::string m_gp_win_music_file;
+    std::string m_gp_lose_music_file;
+    std::string m_unlock_music_file;
+
 public:
     STKConfig();
     ~STKConfig();

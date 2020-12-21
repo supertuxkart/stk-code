@@ -24,6 +24,7 @@
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/sp/sp_base.hpp"
@@ -759,6 +760,6 @@ void FeatureUnlockedCutScene::eventCallback(GUIEngine::Widget* widget,
 
 MusicInformation* FeatureUnlockedCutScene::getInGameMenuMusic() const
 {
-    MusicInformation* mi = music_manager->getMusicInformation("win_theme.music");
+    MusicInformation* mi = stk_config->m_unlock_music;
     return mi;
 }

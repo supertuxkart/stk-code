@@ -53,12 +53,11 @@ MusicInformation *MusicInformation::create(const std::string &filename)
     }
     std::string s;
     if(!root->get("title",    &s) ||
-       !root->get("composer", &s) ||
        !root->get("file",     &s)    )
 
     {
         Log::error("MusicInformation",
-                    "One of 'title', 'composer' or 'file' attribute "
+                    "One of 'title' or 'file' attribute "
                     "is missing in the music XML file '%s'!\n",
                     filename.c_str());
         delete root;
@@ -83,6 +82,8 @@ MusicInformation::MusicInformation(const XMLNode *root,
     m_fast_music        = NULL;
     m_normal_loop_start = 0.0f;
     m_fast_loop_start   = 0.0f;
+    m_normal_loop_end   = -1.0f;
+    m_fast_loop_end     = -1.0f;
     m_enable_fast       = false;
     m_music_waiting     = false;
     m_faster_time       = 1.0f;
@@ -92,18 +93,21 @@ MusicInformation::MusicInformation(const XMLNode *root,
 
     // Otherwise read config file
     // --------------------------
-    std::string s;
-    root->get("title",           &s                  );
-    m_title = StringUtils::xmlDecode(s);
-    root->get("composer",        &s                  );
-    m_composer = StringUtils::xmlDecode(s);
+    std::string title_raw;
+    std::string composer_raw;
+    root->get("title",           &title_raw          );
+    m_title = StringUtils::xmlDecode(title_raw);
+    root->get("composer",        &composer_raw       );
+    m_composer = StringUtils::xmlDecode(composer_raw);
     root->get("file",            &m_normal_filename  );
     root->get("gain",            &m_gain             );
     root->get("tracks",          &m_all_tracks       );
     root->get("fast",            &m_enable_fast      );
     root->get("fast-filename",   &m_fast_filename    );
     root->get("loop-start",      &m_normal_loop_start);
+    root->get("loop-end",        &m_normal_loop_end  );
     root->get("fast-loop-start", &m_fast_loop_start  );
+    root->get("fast-loop-end",   &m_fast_loop_end    );
 
     // Get the path from the filename and add it to the ogg filename
     std::string path  = StringUtils::getPath(filename);
@@ -175,7 +179,7 @@ void MusicInformation::startMusic()
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
-        m_normal_music = new MusicOggStream(m_normal_loop_start);
+        m_normal_music = new MusicOggStream(m_normal_loop_start, m_normal_loop_end);
     }
     else
 #endif
@@ -214,7 +218,7 @@ void MusicInformation::startMusic()
 #ifdef ENABLE_SOUND
     if (UserConfigParams::m_enable_sound)
     {
-        m_fast_music = new MusicOggStream(m_fast_loop_start);
+        m_fast_music = new MusicOggStream(m_fast_loop_start, m_fast_loop_end);
     }
     else
 #endif

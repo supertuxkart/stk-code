@@ -28,7 +28,7 @@
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
 
-MusicOggStream::MusicOggStream(float loop_start)
+MusicOggStream::MusicOggStream(float loop_start, float loop_end)
 {
     //m_oggStream= NULL;
     m_soundBuffers[0] = m_soundBuffers[1]= 0;
@@ -36,6 +36,7 @@ MusicOggStream::MusicOggStream(float loop_start)
     m_pausedMusic     = true;
     m_playing.store(false);
     m_loop_start      = loop_start;
+    m_loop_end        = loop_end;
 }   // MusicOggStream
 
 //-----------------------------------------------------------------------------
@@ -284,9 +285,10 @@ void MusicOggStream::update()
         if(!check("alSourceUnqueueBuffers")) return;
 
         active = streamIntoBuffer(buffer);
-        if(!active)
+        float cur_time = (float)ov_time_tell(&m_oggStream);
+        if(!active || (m_loop_end > 0 && (m_loop_end - cur_time) < 1e-3))
         {
-            // no more data. Seek to loop start (causes the sound to loop)
+            // No more data, or reached loop end. Seek to loop start (causes the sound to loop)
             ov_time_seek(&m_oggStream, m_loop_start);
             active = streamIntoBuffer(buffer);//now there really should be data
         }

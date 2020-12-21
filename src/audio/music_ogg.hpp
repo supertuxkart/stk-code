@@ -50,7 +50,7 @@
 class MusicOggStream : public Music
 {
 public:
-    MusicOggStream(float loop_start);
+    MusicOggStream(float loop_start, float loop_end);
     virtual ~MusicOggStream();
 
     virtual void update();
@@ -75,6 +75,7 @@ private:
     bool streamIntoBuffer(ALuint buffer);
 
     float           m_loop_start;
+    float           m_loop_end;
     std::string     m_fileName;
     FILE*           m_oggFile;
     OggVorbis_File  m_oggStream;
