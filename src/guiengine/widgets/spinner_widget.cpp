@@ -507,7 +507,7 @@ void SpinnerWidget::setActive(bool active)
         // Save it temporary because setValue(which is uses for update in
         // this case) overwrites it
         core::stringw custom_text = m_custom_text;
-        setText(L"-");
+        //setText(L"-");
         setValue(getValue()); // Update the display
         m_custom_text = custom_text;
     }

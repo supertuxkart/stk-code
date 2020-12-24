@@ -5,7 +5,7 @@
         <spacer width="100%" height="3%"/>
         <div width="100%" height="91%" layout="vertical-row" >
 
-            <label width="100%" I18N="In the ui/camera settings" text="Player camera"/>
+            <label id="camera_name" width="100%" I18N="In the ui/camera settings" text="Player camera"/>
             <spacer width="5" height="1%"/>
 
             <div width="100%" height="fit" layout="horizontal-row">
