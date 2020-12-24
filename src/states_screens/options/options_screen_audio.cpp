@@ -83,6 +83,11 @@ void OptionsScreenAudio::init()
     sfx->setState( UserConfigParams::m_sfx );
     music->setState( UserConfigParams::m_music );
 
+    if(!UserConfigParams::m_sfx)
+        getWidget<SpinnerWidget>("sfx_volume")->setActive(false);
+    if(!UserConfigParams::m_music)
+        getWidget<SpinnerWidget>("music_volume")->setActive(false);
+
 }   // init
 
 // -----------------------------------------------------------------------------
