@@ -968,7 +968,88 @@ namespace UserConfigParams
             &m_camera_normal,
             "Focal distance (single player)"));
 
-    // ---- Saved custom camera settings
+    PARAM_PREFIX BoolUserConfigParam       m_reverse_look_use_soccer_cam
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
+                            "Use ball camera in soccer mode, instead of reverse") );
+
+    // ---- The present camera (default: Standard)
+    PARAM_PREFIX IntUserConfigParam       m_camera_present
+            PARAM_DEFAULT(  IntUserConfigParam(1, "camera-present",
+                            "The current used camera. 0=Custom; 1=Standard; 2=Drone chase") );
+
+    // ---- Standard camera settings
+    PARAM_PREFIX GroupUserConfigParam        m_standard_camera_settings
+            PARAM_DEFAULT( GroupUserConfigParam(
+                        "standard-camera-settings",
+                        "Standard camera settings for player.") );
+
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(1.0, "distance",
+            &m_standard_camera_settings,
+            "Distance between kart and camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_forward_up_angle
+            PARAM_DEFAULT(  FloatUserConfigParam(0, "forward-up-angle",
+            &m_standard_camera_settings,
+            "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_standard_camera_forward_smoothing
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
+            &m_standard_camera_settings,
+            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_backward_up_angle
+            PARAM_DEFAULT(  FloatUserConfigParam(5, "backward-up-angle",
+            &m_standard_camera_settings,
+            "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
+
+    PARAM_PREFIX IntUserConfigParam         m_standard_camera_fov
+            PARAM_DEFAULT(  IntUserConfigParam(80, "fov",
+            &m_standard_camera_settings,
+            "Focal distance (single player)"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_standard_reverse_look_use_soccer_cam
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
+            &m_standard_camera_settings,
+            "Use ball camera in soccer mode, instead of reverse"));
+
+    // ---- Drone chase camera settings
+    PARAM_PREFIX GroupUserConfigParam        m_drone_camera_settings
+            PARAM_DEFAULT( GroupUserConfigParam(
+                        "drone-camera-settings",
+                        "Drone chase camera settings for player.") );
+
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(2.6, "distance",
+            &m_drone_camera_settings,
+            "Distance between kart and camera"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_forward_up_angle
+            PARAM_DEFAULT(  FloatUserConfigParam(33, "forward-up-angle",
+            &m_drone_camera_settings,
+            "Angle between camera and plane of kart (pitch) when the camera is pointing forward"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_drone_camera_forward_smoothing
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "forward-smoothing",
+            &m_drone_camera_settings,
+            "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_backward_up_angle
+            PARAM_DEFAULT(  FloatUserConfigParam(10, "backward-up-angle",
+            &m_drone_camera_settings,
+            "Angle between camera and plane of kart (pitch) when the camera is pointing backwards. This is usually larger than the forward-up-angle, since the kart itself otherwise obstricts too much of the view"));
+
+    PARAM_PREFIX IntUserConfigParam         m_drone_camera_fov
+            PARAM_DEFAULT(  IntUserConfigParam(100, "fov",
+            &m_drone_camera_settings,
+            "Focal distance (single player)"));
+
+    PARAM_PREFIX BoolUserConfigParam         m_drone_reverse_look_use_soccer_cam
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
+            &m_drone_camera_settings,
+            "Use ball camera in soccer mode, instead of reverse"));
+
+    // ---- Custom camera settings
     PARAM_PREFIX GroupUserConfigParam        m_saved_camera_settings
             PARAM_DEFAULT( GroupUserConfigParam(
                         "saved-camera-settings",
@@ -999,6 +1080,10 @@ namespace UserConfigParams
             &m_saved_camera_settings,
             "Focal distance (single player)"));
 
+    PARAM_PREFIX BoolUserConfigParam         m_saved_reverse_look_use_soccer_cam
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
+            &m_saved_camera_settings,
+            "Use ball camera in soccer mode, instead of reverse"));
 
     // camera in artist mode
     PARAM_PREFIX GroupUserConfigParam        m_camera
@@ -1062,11 +1147,6 @@ namespace UserConfigParams
     PARAM_PREFIX FloatUserConfigParam        m_spectator_camera_angle
             PARAM_DEFAULT(  FloatUserConfigParam(40.0, "camera-angle", &m_spectator,
                                                   "Angle between ground, kart and camera.") );
-
-    // ---- Special settings for soccer mode
-    PARAM_PREFIX BoolUserConfigParam       m_reverse_look_use_soccer_cam
-            PARAM_DEFAULT(  BoolUserConfigParam(false, "reverse-look-use-soccer-cam",
-                            "Use ball camera in soccer mode, instead of reverse") );
 
     // ---- Handicap
     PARAM_PREFIX GroupUserConfigParam       m_handicap

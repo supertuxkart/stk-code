@@ -310,7 +310,6 @@ void OptionsScreenUI::init()
     }
     speedrun_timer->setState( UserConfigParams::m_speedrun_mode );
 
-    getWidget<CheckBoxWidget>("follow_ball_backward_camera")->setState(UserConfigParams::m_reverse_look_use_soccer_cam);
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const std::string& user_skin = UserConfigParams::m_skin_file;
@@ -340,30 +339,20 @@ void OptionsScreenUI::init()
         irr_driver->setMaxTextureSize();
     }
 
-    // Camera presets
-    m_camera_presets.push_back // Standard
-    ({
-        80 /* fov */, 1.0f /* distance */, 0.0f  /* angle */, true /* smoothing */, 5.0f /* backward angle */,
-    });
-
-    m_camera_presets.push_back // Drone chase
-    ({
-        100 /* fov */, 2.6f /* distance */, 33.0f  /* angle */, false /* smoothing */, 10.0f /* backward angle */,
-    });
-
     GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
     assert( camera_preset != NULL );
 
     camera_preset->m_properties[PROP_WRAP_AROUND] = "true";
     camera_preset->clearLabels();
-    //I18N: custom camera setting
+    //I18N: In the UI options, Camera setting: Custom
     camera_preset->addLabel( core::stringw(_("Custom")));
-    //I18N: In the UI options,litscreen_method in the race UI
+    //I18N: In the UI options, Camera setting: Standard
     camera_preset->addLabel( core::stringw(_("Standard")));
-    //I18N: In the UI options, splitscreen_method position in the race UI
+    //I18N: In the UI options, Camera setting: Drone chase
     camera_preset->addLabel( core::stringw(_("Drone chase")));
     camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
     camera_preset->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
+    camera_preset->setValue(UserConfigParams::m_camera_present); // use the saved camera
 
     updateCameraPresetSpinner();
 }   // init
@@ -384,37 +373,7 @@ void OptionsScreenUI::updateCamera()
 
 void OptionsScreenUI::updateCameraPresetSpinner()
 {
-    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
-    assert( camera_preset != NULL );
-
-#define FLOAT_EPSILON 0.001
-
-    bool found = false;
-    unsigned int i = 0;
-    for (; i < m_camera_presets.size(); i++)
-    {
-        if (m_camera_presets[i].fov == UserConfigParams::m_camera_fov &&
-            m_camera_presets[i].smoothing == UserConfigParams::m_camera_forward_smoothing &&
-            fabs(m_camera_presets[i].distance - UserConfigParams::m_camera_distance) < FLOAT_EPSILON &&
-            fabs(m_camera_presets[i].angle - UserConfigParams::m_camera_forward_up_angle) < FLOAT_EPSILON &&
-            fabs(m_camera_presets[i].backward_angle - UserConfigParams::m_camera_backward_up_angle) < FLOAT_EPSILON)
-        {
-            camera_preset->setValue(i + 1);
-            found = true;
-            break;
-        }
-    }
-
-    if (!found)
-    {
-        getWidget("custom_camera")->setActive(true);
-        camera_preset->setValue(0);
-        camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = std::to_string(0);
-    }
-    else
-        getWidget("custom_camera")->setActive(false);
     updateCamera();
-
 } // updateCameraPresetSpinner
 
 // -----------------------------------------------------------------------------
@@ -550,29 +509,35 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
         assert( camera_preset != NULL );
         unsigned int i = camera_preset->getValue();
-        if (i != 0)
+        UserConfigParams::m_camera_present = i;
+        if (i == 1) //Standard
         {
-            UserConfigParams::m_camera_fov = m_camera_presets[i-1].fov;
-            UserConfigParams::m_camera_distance = m_camera_presets[i-1].distance;
-            UserConfigParams::m_camera_forward_up_angle = m_camera_presets[i-1].angle;
-            UserConfigParams::m_camera_forward_smoothing = m_camera_presets[i-1].smoothing;
-            UserConfigParams::m_camera_backward_up_angle = m_camera_presets[i-1].backward_angle;
-            getWidget("custom_camera")->setActive(false);
+            UserConfigParams::m_camera_fov = UserConfigParams::m_standard_camera_fov;
+            UserConfigParams::m_camera_distance = UserConfigParams::m_standard_camera_distance;
+            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_standard_camera_forward_up_angle;
+            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_standard_camera_forward_smoothing;
+            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_standard_camera_backward_up_angle;
+            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_standard_reverse_look_use_soccer_cam;
         }
-        else
+        else if (i == 2) //Drone chase
+        {
+            UserConfigParams::m_camera_fov = UserConfigParams::m_drone_camera_fov;
+            UserConfigParams::m_camera_distance = UserConfigParams::m_drone_camera_distance;
+            UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_drone_camera_forward_up_angle;
+            UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_drone_camera_forward_smoothing;
+            UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_drone_camera_backward_up_angle;
+            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_drone_reverse_look_use_soccer_cam;
+        }
+        else //Custom
         {
             UserConfigParams::m_camera_fov = UserConfigParams::m_saved_camera_fov;
             UserConfigParams::m_camera_distance = UserConfigParams::m_saved_camera_distance;
             UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_saved_camera_forward_up_angle;
             UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_saved_camera_forward_smoothing;
             UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_saved_camera_backward_up_angle;
-            getWidget("custom_camera")->setActive(true);
+            UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_saved_reverse_look_use_soccer_cam;
         }
         updateCamera();
-    }
-    else if (name == "follow_ball_backward_camera")
-    {
-        UserConfigParams::m_reverse_look_use_soccer_cam = getWidget<CheckBoxWidget>("follow_ball_backward_camera")->getState();
     }
     else if(name == "custom_camera")
     {

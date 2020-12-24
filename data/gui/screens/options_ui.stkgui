@@ -70,14 +70,6 @@
                 <spacer width="5" height="2%"/>
 
                 <div layout="horizontal-row" width="100%" height="fit">
-                    <checkbox id="follow_ball_backward_camera"/>
-                    <spacer width="1%" height="100%" />
-                    <label height="100%" I18N="In the ui settings" text="Follow ball in soccer mode for backward camera" word_wrap="true"/>
-                </div>
-
-                <spacer width="5" height="2%"/>
-
-                <div layout="horizontal-row" width="100%" height="fit">
                     <checkbox id="showfps"/>
                     <spacer width="1%" height="100%" />
                     <label height="100%" I18N="In the ui settings" text="Display FPS" word_wrap="true"/>
