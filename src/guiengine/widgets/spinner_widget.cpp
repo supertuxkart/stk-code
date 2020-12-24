@@ -417,7 +417,7 @@ void SpinnerWidget::setValue(const int new_value)
         std::string imagefile = file_manager->searchTexture(s);
         ((IGUIImage*)(m_children[1].m_element))->setImage(irr_driver->getTexture(imagefile));
     }
-    else if (m_labels.size() > 0 && m_children.size() > 0 && !m_deactivated)
+    else if (m_labels.size() > 0 && m_children.size() > 0)
     {
         assert(new_value >= 0);
         assert(new_value < (int)m_labels.size());
@@ -501,15 +501,6 @@ void SpinnerWidget::setActive(bool active)
         {
             setCustomText(m_custom_text);
         }
-    }
-    else
-    {
-        // Save it temporary because setValue(which is uses for update in
-        // this case) overwrites it
-        core::stringw custom_text = m_custom_text;
-        //setText(L"-");
-        setValue(getValue()); // Update the display
-        m_custom_text = custom_text;
     }
 }   // setActive
 
