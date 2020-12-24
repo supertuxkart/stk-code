@@ -44,7 +44,7 @@
 #  include <pthread.h>
 #endif
 
-#if defined(__FreeBSD__) || defined(__DragonFly__)
+#if defined(__FreeBSD__) || defined(__DragonFly__) || defined(__OpenBSD__)
 #  include <pthread.h>
 #  include <pthread_np.h>
 #endif
@@ -102,6 +102,8 @@ namespace VS
         pthread_set_name_np(pthread_self(), name);
 #elif defined(__NetBSD__)
         pthread_setname_np(pthread_self(), "%s", const_cast<char *>(name));
+#elif defined(__OpenBSD__)
+        pthread_set_name_np(pthread_self(), const_cast<char *>(name));
 #elif defined(__HAIKU__)
         rename_thread(find_thread(nullptr), name);
 #endif
