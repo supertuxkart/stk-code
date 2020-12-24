@@ -75,9 +75,17 @@
                 </div>
             </div>
 
-            <spacer width="100%" height="2%"/>
-            <button id="close" text="Apply" align="center"/>
-            <spacer width="100%" height="1%"/>
+            <spacer height="4%" width="100%" />
+
+            <div layout="horizontal-row" width="100%" proportion="1">
+                <spacer width="25%" height="100%" />
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <button id="close" text="Apply" align="center"/>
+                </div>
+                <div layout="horizontal-row" proportion="1" height="fit">
+                    <button id="reset" text="Reset" align="center"/>
+                </div>
+            </div>
         </div>
     </div>
 </stkgui>
