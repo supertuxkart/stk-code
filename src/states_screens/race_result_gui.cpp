@@ -681,8 +681,8 @@ void RaceResultGUI::displayCTFResults()
         source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
         irr::u32 offset_x =
             (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-        dest_rect = core::recti(current_x - offset_x - 30, current_y,
-            current_x - offset_x, current_y + 30);
+        dest_rect = core::recti(current_x - offset_x - font->getDimension(L"0").Height, current_y,
+            current_x - offset_x, current_y + font->getDimension(L"0").Height);
         draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
     }
 
@@ -729,8 +729,8 @@ void RaceResultGUI::displayCTFResults()
         source_rect = core::recti(core::vector2di(0, 0), kart_icon->getSize());
         irr::u32 offset_x = (irr::u32)
             (font->getDimension(result_text.c_str()).Width / 1.5f);
-        dest_rect = core::recti(current_x - offset_x - 30, current_y,
-            current_x - offset_x, current_y + 30);
+        dest_rect = core::recti(current_x - offset_x - font->getDimension(L"0").Height, current_y,
+            current_x - offset_x, current_y + font->getDimension(L"0").Height);
         draw2DImage(kart_icon, dest_rect, source_rect, NULL, NULL, true);
     }
 #endif
@@ -1505,7 +1505,8 @@ void RaceResultGUI::displayCTFResults()
             {
                 source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
                 irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-                core::recti r = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
+                core::recti r = core::recti(current_x - offset_x - font->getDimension(L"0").Height, current_y,
+                    current_x - offset_x, current_y + font->getDimension(L"0").Height);
                 draw2DImage(scorer_icon, r, source_rect,
                     NULL, NULL, true);
             }
@@ -1566,7 +1567,8 @@ void RaceResultGUI::displayCTFResults()
             {
                 source_rect = core::recti(core::vector2di(0, 0), scorer_icon->getSize());
                 irr::u32 offset_x = (irr::u32)(font->getDimension(result_text.c_str()).Width / 1.5f);
-                core::recti r = core::recti(current_x - offset_x - 30, current_y, current_x - offset_x, current_y + 30);
+                core::recti r = core::recti(current_x - offset_x - font->getDimension(L"0").Height, current_y,
+                    current_x - offset_x, current_y + font->getDimension(L"0").Height);
                 draw2DImage(scorer_icon, r, source_rect,
                     NULL, NULL, true);
             }
