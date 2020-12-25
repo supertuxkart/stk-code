@@ -150,6 +150,20 @@ void OptionsScreenUI::loadedFromFile()
         font_size->m_properties[GUIEngine::PROP_MAX_VALUE] = "5";
     }
 
+    // Setup camera spinner
+    GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
+    assert( camera_preset != NULL );
+
+    camera_preset->m_properties[PROP_WRAP_AROUND] = "true";
+    camera_preset->clearLabels();
+    //I18N: In the UI options, Camera setting: Custom
+    camera_preset->addLabel( core::stringw(_("Custom")));
+    //I18N: In the UI options, Camera setting: Standard
+    camera_preset->addLabel( core::stringw(_("Standard")));
+    //I18N: In the UI options, Camera setting: Drone chase
+    camera_preset->addLabel( core::stringw(_("Drone chase")));
+    camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
+    camera_preset->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
     updateCameraPresetSpinner();
 
     font_size->setValueUpdatedCallback([this](SpinnerWidget* spinner)
@@ -339,21 +353,11 @@ void OptionsScreenUI::init()
         irr_driver->setMaxTextureSize();
     }
 
+    // --- select the right camera in the spinner
     GUIEngine::SpinnerWidget* camera_preset = getWidget<GUIEngine::SpinnerWidget>("camera_preset");
     assert( camera_preset != NULL );
 
-    camera_preset->m_properties[PROP_WRAP_AROUND] = "true";
-    camera_preset->clearLabels();
-    //I18N: In the UI options, Camera setting: Custom
-    camera_preset->addLabel( core::stringw(_("Custom")));
-    //I18N: In the UI options, Camera setting: Standard
-    camera_preset->addLabel( core::stringw(_("Standard")));
-    //I18N: In the UI options, Camera setting: Drone chase
-    camera_preset->addLabel( core::stringw(_("Drone chase")));
-    camera_preset->m_properties[GUIEngine::PROP_MIN_VALUE] = "1";
-    camera_preset->m_properties[GUIEngine::PROP_MAX_VALUE] = "2";
     camera_preset->setValue(UserConfigParams::m_camera_present); // use the saved camera
-
     updateCameraPresetSpinner();
 }   // init
 
