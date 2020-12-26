@@ -168,7 +168,7 @@ void KartColorSliderDialog::toggleSlider()
     if (m_toggle_slider->getValue() == 1)
     {
         m_color_slider->setActive(true);
-        m_color_slider->setValue(100);
+        m_color_slider->setValue(int(m_player_profile->getDefaultKartColor() * 100.0f));
         m_model_view->getModelViewRenderInfo()->setHue(1.0f);
     }
     else
