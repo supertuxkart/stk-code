@@ -1295,9 +1295,9 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         core::dimension2du d;
         if (score_limit != -1)
         {
-             d = font->getDimension(
+            d = font->getDimension(
                 (StringUtils::toWString(red_score) + L"-"
-                + StringUtils::toWString(blue_score) + L"     "
+                + StringUtils::toWString(blue_score) + L"00" // space between score and score limit (=width of two 0)
                 + StringUtils::toWString(score_limit)).c_str());
             pos.UpperLeftCorner.X -= d.Width / 2;
             int icon_width = irr_driver->getActualScreenSize().Height/19;
@@ -1324,8 +1324,11 @@ void RaceGUI::drawLap(const AbstractKart* kart,
         pos += core::position2di(d.Width, 0);
         if (score_limit != -1)
         {
-            text = L"     ";
-            text += StringUtils::toWString(score_limit);
+            text = L"00";
+            d = font->getDimension(text.c_str());
+            pos += core::position2di(d.Width, 0);
+            // skip the space equal to the width of two zeros, then draw the score limit
+            text = StringUtils::toWString(score_limit);
             font->draw(text, pos, video::SColor(255, 255, 255, 255));
         }
         font->setBlackBorder(false);
