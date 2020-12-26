@@ -575,6 +575,7 @@ void RaceResultGUI::displayCTFResults()
     video::SColor color = video::SColor(255, 255, 255, 255);
     video::SColor red_color = video::SColor(255, 255, 0, 0);
     gui::IGUIFont* font = GUIEngine::getTitleFont();
+    int team_icon_height = font->getDimension(L"A").Height;
     int current_x = UserConfigParams::m_width / 2;
     RowInfo *ri = &(m_all_row_infos[0]);
     int current_y = (int)ri->m_y_pos;
@@ -605,27 +606,29 @@ void RaceResultGUI::displayCTFResults()
     irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON,
         "blue_flag.png");
 
+    int team_icon_width = team_icon_height * (red_icon->getSize().Width / red_icon->getSize().Height);
     core::recti source_rect(core::vector2di(0, 0), red_icon->getSize());
+    current_x -= team_icon_width/2;
     core::recti dest_rect(current_x, current_y,
-        current_x + red_icon->getSize().Width / 2,
-        current_y + red_icon->getSize().Height / 2);
+        current_x + team_icon_width,
+        current_y + team_icon_height);
     draw2DImage(red_icon, dest_rect, source_rect,
         NULL, NULL, true);
-    current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+    current_x += UserConfigParams::m_width / 2;
     dest_rect = core::recti(current_x, current_y,
-        current_x + red_icon->getSize().Width / 2,
-        current_y + red_icon->getSize().Height / 2);
+        current_x + team_icon_width,
+        current_y + team_icon_height);
     draw2DImage(blue_icon, dest_rect, source_rect,
         NULL, NULL, true);
 
     result_text = StringUtils::toWString(blue_score);
     rect = font->getDimension(result_text.c_str());
-    current_x += red_icon->getSize().Width / 4;
-    current_y += red_icon->getSize().Height / 2 + rect.Height / 4;
+    current_x += team_icon_width / 2;
+    current_y += team_icon_height + rect.Height / 4;
     pos = core::rect<s32>(current_x, current_y, current_x, current_y);
     font->draw(result_text.c_str(), pos, color, true, false);
 
-    current_x -= UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+    current_x -= UserConfigParams::m_width / 2;
     result_text = StringUtils::toWString(red_score);
     pos = core::rect<s32>(current_x, current_y, current_x, current_y);
     font->draw(result_text.c_str(), pos, color, true, false);
@@ -688,7 +691,7 @@ void RaceResultGUI::displayCTFResults()
 
     // The blue team player scores:
     current_y = prev_y;
-    current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+    current_x += UserConfigParams::m_width / 2;
     for (unsigned int i = 0; i < num_karts; i++)
     {
         AbstractKart* kart = ctf->getKartAtPosition(i + 1);
@@ -1383,6 +1386,7 @@ void RaceResultGUI::displayCTFResults()
         core::stringw result_text;
         static video::SColor color = video::SColor(255, 255, 255, 255);
         gui::IGUIFont* font = GUIEngine::getTitleFont();
+        int team_icon_height = font->getDimension(L"A").Height * 1.5f; // the size of team icon
         int current_x = UserConfigParams::m_width / 2;
         RowInfo *ri = &(m_all_row_infos[0]);
         int current_y = (int)ri->m_y_pos;
@@ -1419,25 +1423,27 @@ void RaceResultGUI::displayCTFResults()
         irr::video::ITexture* blue_icon = irr_driver->getTexture(FileManager::GUI_ICON,
             "soccer_ball_blue.png");
 
+        int team_icon_width = team_icon_height * (red_icon->getSize().Width / red_icon->getSize().Height);
         core::recti source_rect(core::vector2di(0, 0), red_icon->getSize());
-        core::recti dest_rect(current_x, current_y, current_x + red_icon->getSize().Width / 2,
-            current_y + red_icon->getSize().Height / 2);
+        current_x -= team_icon_width/2;
+        core::recti dest_rect(current_x, current_y, current_x + team_icon_width,
+            current_y + team_icon_height);
         draw2DImage(red_icon, dest_rect, source_rect,
             NULL, NULL, true);
-        current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
-        dest_rect = core::recti(current_x, current_y, current_x + red_icon->getSize().Width / 2,
-            current_y + red_icon->getSize().Height / 2);
+        current_x += UserConfigParams::m_width / 2;
+        dest_rect = core::recti(current_x, current_y, current_x + team_icon_width,
+            current_y + team_icon_height);
         draw2DImage(blue_icon, dest_rect, source_rect,
             NULL, NULL, true);
 
         result_text = StringUtils::toWString(blue_score);
         rect = font->getDimension(result_text.c_str());
-        current_x += red_icon->getSize().Width / 4;
-        current_y += red_icon->getSize().Height / 2 + rect.Height / 4;
+        current_x += team_icon_height / 2;
+        current_y += team_icon_height + rect.Height / 4;
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(result_text.c_str(), pos, color, true, false);
 
-        current_x -= UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+        current_x -= UserConfigParams::m_width / 2;
         result_text = StringUtils::toWString(red_score);
         pos = core::rect<s32>(current_x, current_y, current_x, current_y);
         font->draw(result_text.c_str(), pos, color, true, false);
@@ -1514,7 +1520,7 @@ void RaceResultGUI::displayCTFResults()
 
         //The blue scorers:
         current_y = prev_y;
-        current_x += UserConfigParams::m_width / 2 - red_icon->getSize().Width / 2;
+        current_x += UserConfigParams::m_width / 2;
         scorers = sw->getScorers(KART_TEAM_BLUE);
 
         while (scorers.size() > 10)
