@@ -597,7 +597,7 @@ void SphericalHarmonics::setAmbientLight(const video::SColor &ambient)
     unsigned sh_h = 16;
     unsigned ambr, ambg, ambb;
 
-    ambr = ambient.getBlue();
+    ambr = ambient.getRed();
     ambg = ambient.getGreen();
     ambb = ambient.getBlue();
 
