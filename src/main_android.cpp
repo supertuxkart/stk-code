@@ -168,6 +168,12 @@ void override_default_params_for_mobile()
         Log::info("MainAndroid", "Render scale: %f", 
                   (float)UserConfigParams::m_scale_rtts_factor);
     }
+    
+    // Enable advanced lighting for android >= 8
+    if (SDL_GetAndroidSDKVersion() >= 26)
+    {
+        UserConfigParams::m_dynamic_lights = true;
+    }
 #endif
 
     // Enable screen keyboard
