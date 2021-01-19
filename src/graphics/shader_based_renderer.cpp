@@ -626,55 +626,6 @@ void ShaderBasedRenderer::onLoadWorld()
     unsigned int width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X;
     unsigned int height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
 
-	float ddpi = 0.f;
-    float hdpi = 0.f;
-    float vdpi = 0.f;
-
-    if (!UserConfigParams::m_scale_rtts_custom) // Calculate scale factor
-    {
-        if (!irr_driver->getDevice()->getDisplayDPI(&ddpi, &hdpi, &vdpi))
-        {
-            Log::warn("Renderer", "Failed to get display DPI, falling back to 100% render scaling.");
-            UserConfigParams::m_scale_rtts_factor = 1.0f;
-        }
-        else
-        {
-            switch (UserConfigParams::m_scale_rtts_mode)
-            {
-                case 0: // Max Performance
-                    UserConfigParams::m_scale_rtts_factor = 72.f / ddpi;
-                    break;
-                case 1: // Performance
-                    UserConfigParams::m_scale_rtts_factor = 96.f / ddpi;
-                    break;
-                case 2: // Balanced
-                    UserConfigParams::m_scale_rtts_factor = 120.f / ddpi;
-                    break;
-                case 3: // Quality
-                    UserConfigParams::m_scale_rtts_factor = 160.f / ddpi;
-                    break;
-                case 4: // High Quality
-                    UserConfigParams::m_scale_rtts_factor = 210.f / ddpi;
-                    break;
-                case 5: // Always Full
-                    UserConfigParams::m_scale_rtts_factor = 1.0f;
-                    break;
-            }
-            
-            // Round to nearest 5%
-            UserConfigParams::m_scale_rtts_factor = (float)((((int)(UserConfigParams::m_scale_rtts_factor*100.f)+2)/5)*5) / 100.f;
-
-            // Round up to 100% if at 90% or more; also make sure scale is at least 30%
-            if (UserConfigParams::m_scale_rtts_factor >= 0.9f)
-                UserConfigParams::m_scale_rtts_factor = 1.0f;
-            if (UserConfigParams::m_scale_rtts_factor < 0.3f)
-                UserConfigParams::m_scale_rtts_factor = 0.3f;
-
-            Log::info("Renderer", "Display DPI: %f", ddpi);
-            Log::info("Renderer", "Render scale: %f", (float)UserConfigParams::m_scale_rtts_factor);
-        }
-    }
-
     RTT* rtts = new RTT(width, height, CVS->isDeferredEnabled() ?
                         UserConfigParams::m_scale_rtts_factor : 1.0f,
                         !CVS->isDeferredEnabled());

@@ -278,10 +278,6 @@ void OptionsScreenVideo::init()
     scale_rtts->addLabel(_("95%%"));
     scale_rtts->addLabel(_("100%%"));
 
-    CheckBoxWidget* scale_rtts_custom = getWidget<CheckBoxWidget>("scale_rtts_custom");
-    assert( scale_rtts_custom != NULL );
-    scale_rtts_custom->setState( UserConfigParams::m_scale_rtts_custom );
-
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
     assert(res != NULL);
@@ -448,8 +444,8 @@ void OptionsScreenVideo::init()
     applyBtn->setActive(!in_game);
     gfx->setActive(!in_game);
     getWidget<ButtonWidget>("custom")->setActive(!in_game);
-    getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game);
-    getWidget<CheckBoxWidget>("scale_rtts_custom")->setActive(!in_game);
+    if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
+        getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game);
     
 #if defined(MOBILE_STK)
     applyBtn->setVisible(false);
@@ -539,8 +535,6 @@ void OptionsScreenVideo::updateGfxSlider()
     // Same with Render resolution slider
     getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
         setActive(UserConfigParams::m_dynamic_lights);
-    getWidget<GUIEngine::CheckBoxWidget>("scale_rtts_custom")->
-        setActive(UserConfigParams::m_dynamic_lights);
 
     updateTooltip();
 } // updateGfxSlider
@@ -581,53 +575,21 @@ void OptionsScreenVideo::updateScaleRTTsSlider()
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts");
     assert( scale_rtts_level != NULL );
 
-    if (UserConfigParams::m_scale_rtts_custom)
+    bool found = false;
+    for (unsigned int l = 0; l < m_scale_rtts_custom_presets.size(); l++)
     {
-        scale_rtts_level->clearLabels();
-        scale_rtts_level->addLabel(_("30%%"));
-        scale_rtts_level->addLabel(_("35%%"));
-        scale_rtts_level->addLabel(_("40%%"));
-        scale_rtts_level->addLabel(_("45%%"));
-        scale_rtts_level->addLabel(_("50%%"));
-        scale_rtts_level->addLabel(_("55%%"));
-        scale_rtts_level->addLabel(_("60%%"));
-        scale_rtts_level->addLabel(_("65%%"));
-        scale_rtts_level->addLabel(_("70%%"));
-        scale_rtts_level->addLabel(_("75%%"));
-        scale_rtts_level->addLabel(_("80%%"));
-        scale_rtts_level->addLabel(_("85%%"));
-        scale_rtts_level->addLabel(_("90%%"));
-        scale_rtts_level->addLabel(_("95%%"));
-        scale_rtts_level->addLabel(_("100%%"));
-
-        bool found = false;
-        for (unsigned int l = 0; l < m_scale_rtts_custom_presets.size(); l++)
+        if (m_scale_rtts_custom_presets[l].value == UserConfigParams::m_scale_rtts_factor)
         {
-            if (m_scale_rtts_custom_presets[l].value == UserConfigParams::m_scale_rtts_factor)
-            {
-                scale_rtts_level->setValue(l);
-                found = true;
-                break;
-            }
-        }
-
-        if (!found)
-        {
-            //I18N: custom video settings
-            scale_rtts_level->setCustomText( _("Custom") );
+            scale_rtts_level->setValue(l);
+            found = true;
+            break;
         }
     }
-    else
-    {
-        scale_rtts_level->clearLabels();
-        scale_rtts_level->addLabel(_("Max Performance"));
-        scale_rtts_level->addLabel(_("Performance"));
-        scale_rtts_level->addLabel(_("Balanced"));
-        scale_rtts_level->addLabel(_("Quality"));
-        scale_rtts_level->addLabel(_("High Quality"));
-        scale_rtts_level->addLabel(_("Always Full"));
 
-        scale_rtts_level->setValue(UserConfigParams::m_scale_rtts_mode);
+    if (!found)
+    {
+        //I18N: custom video settings
+        scale_rtts_level->setCustomText( _("Custom") );
     }
 } // updateScaleRTTsSlider
 
@@ -809,8 +771,6 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         // Same with Render resolution slider
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
             setActive(UserConfigParams::m_dynamic_lights);
-        getWidget<GUIEngine::CheckBoxWidget>("scale_rtts_custom")->
-            setActive(UserConfigParams::m_dynamic_lights);
 
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
@@ -859,21 +819,9 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         assert( scale_rtts_level != NULL );
 
         const int level = scale_rtts_level->getValue();
+        assert(level < (int)m_scale_rtts_custom_presets.size());
 
-        if (UserConfigParams::m_scale_rtts_custom)
-            UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
-        else
-            UserConfigParams::m_scale_rtts_mode = level;
-
-        updateScaleRTTsSlider();
-    }
-    else if (name == "scale_rtts_custom")
-    {
-        GUIEngine::CheckBoxWidget* scale_rtts_custom =
-            getWidget<GUIEngine::CheckBoxWidget>("scale_rtts_custom");
-        assert( scale_rtts_custom != NULL );
-
-        UserConfigParams::m_scale_rtts_custom = scale_rtts_custom->getState();
+        UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
 
         updateScaleRTTsSlider();
     }

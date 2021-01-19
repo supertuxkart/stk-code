@@ -674,14 +674,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_old_driver_popup
         PARAM_DEFAULT(BoolUserConfigParam(true, "old_driver_popup",
         &m_video_group, "Determines if popup message about too old drivers should be displayed."));
-    PARAM_PREFIX IntUserConfigParam         m_scale_rtts_mode
-        PARAM_DEFAULT(IntUserConfigParam(5, "scale_rtts_mode",
-        &m_video_group, "Allows one to increase performance by setting lower RTTs "
-                        "resolution. 0 = Max performance, 1 = Performance, "
-                        "2 = Balanced, 3 = Quality, 4 = High Quality, 5 = Always Full"));
-    PARAM_PREFIX BoolUserConfigParam        m_scale_rtts_custom
-        PARAM_DEFAULT(BoolUserConfigParam(false, "scale_rtts_custom",
-        &m_video_group, "Determines if custom value for RTTs resolution is used."));
     PARAM_PREFIX FloatUserConfigParam       m_scale_rtts_factor
         PARAM_DEFAULT(FloatUserConfigParam(1.0f, "scale_rtts_factor",
         &m_video_group, "Custom value for RTTs resolution. "

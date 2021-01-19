@@ -53,11 +53,6 @@ struct ScaleRttsCustomPreset
     float value;
 };
 
-struct ScaleRttsAutoPreset
-{
-    int preset;
-};
-
 struct Resolution
 {
     int width; 
@@ -101,7 +96,6 @@ private:
     std::vector<GFXPreset> m_presets;
     std::vector<BlurPreset> m_blur_presets;
     std::vector<ScaleRttsCustomPreset> m_scale_rtts_custom_presets;
-    std::vector<ScaleRttsAutoPreset>   m_scale_rtts_auto_presets;
     std::vector<Resolution> m_resolutions;
 
     void updateTooltip();

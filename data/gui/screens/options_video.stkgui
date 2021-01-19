@@ -52,12 +52,6 @@
                     <div layout="vertical-row" proportion="1" height="100%">
                         <label id="scale_rtts_label" height="100%" I18N="In the video settings" text="Render resolution" align="left"/>
                     </div>
-                    <div proportion="1" layout="horizontal-row" height="fit">
-                        <spacer width="5%" height="100%" />
-                        <checkbox id="scale_rtts_custom"/>
-                        <spacer width="2%" height="100%" />
-                        <label id="scale_rtts_custom_label" height="100%" I18N="In the video settings" text="Custom"/>
-                    </div>
                 </div>
 
                 <spacer width="5" height="1%"/>
