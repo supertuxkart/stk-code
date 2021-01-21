@@ -55,16 +55,17 @@ void override_default_params_for_mobile()
     UserConfigParams::m_max_texture_size = 256;
     UserConfigParams::m_high_definition_textures = false;
     
-    // Disable advanced lighting by default to make the game playable
-    UserConfigParams::m_dynamic_lights = false;
+    // Enable advanced lighting only for android >= 8
+    UserConfigParams::m_dynamic_lights = (SDL_GetAndroidSDKVersion() >= 26);
+    
+    // Disable light scattering for better performance
+    UserConfigParams::m_light_scatter = false;
 
     // Enable multitouch race GUI
     UserConfigParams::m_multitouch_draw_gui = true;
 
-#ifdef IOS_STK
     // Default 30 fps for battery saving
     UserConfigParams::m_swap_interval = 2;
-#endif
 
 #ifdef ANDROID
     // For usage in StringUtils::getUserAgentString
@@ -167,12 +168,6 @@ void override_default_params_for_mobile()
         Log::info("MainAndroid", "Display DPI: %i", ddpi);
         Log::info("MainAndroid", "Render scale: %f", 
                   (float)UserConfigParams::m_scale_rtts_factor);
-    }
-    
-    // Enable advanced lighting for android >= 8
-    if (SDL_GetAndroidSDKVersion() >= 26)
-    {
-        UserConfigParams::m_dynamic_lights = true;
     }
 #endif
 
