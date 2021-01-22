@@ -57,7 +57,7 @@ libvorbis-devel pkgconf zlib-devel enet-devel \
 libjpeg-devel bluez-devel freetype2-devel
 ```
 
-Ubuntu command:
+Debian-based Distributions command:
 
 ```bash
 sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-dev \
