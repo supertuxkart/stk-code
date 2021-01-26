@@ -124,6 +124,10 @@ extern "C" void pause_mainloop()
     PlayerManager::get()->save();
     if (addons_manager->hasDownloadedIcons())
         addons_manager->saveInstalled();
+    // Make sure the new addon arrow is gone when stk is killed in background
+    // user_config saves the latest addon time
+    if (addons_manager->hasNewAddons())
+        user_config->saveConfig();
     Online::RequestManager::get()->setPaused(true);
     IrrlichtDevice* dev = irr_driver->getDevice();
     if (dev)
