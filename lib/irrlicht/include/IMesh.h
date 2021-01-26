@@ -22,6 +22,8 @@ namespace scene
 	*/
 	class IMesh : public virtual IReferenceCounted
 	{
+	private:
+		core::vector3df m_min, m_max;
 	public:
 
 		//! Get the amount of mesh buffers.
@@ -70,6 +72,13 @@ namespace scene
 		/** This is used in server without graphics to free all mesh vertex buffer if
 		possible, for example: kart, attachment and power model (because they are not used in physics). */
 		virtual void freeMeshVertexBuffer() {}
+
+		/** Avoid rounding error for kart size when reskin happening with vertex weights. */
+		virtual void setMinMax(const core::vector3df& min, const core::vector3df& max) { m_min = min; m_max = max; }
+
+		virtual const core::vector3df& getMin() const { return m_min; }
+
+		virtual const core::vector3df& getMax() const { return m_max; }
 	};
 
 } // end namespace scene

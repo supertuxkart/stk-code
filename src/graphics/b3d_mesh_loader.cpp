@@ -6,6 +6,7 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
@@ -65,6 +66,15 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
         AnimatedMesh = 0;
     }
 
+    // Set the min max with straight frame (used by kart_model)
+    Vec3 min, max;
+    if (AnimatedMesh)
+    {
+        MeshTools::minMax3D(static_cast<scene::CSkinnedMesh*>
+            (AnimatedMesh->getMesh(m_straight_frame)), &min, &max);
+        AnimatedMesh->setMinMax(min.toIrrVector(), max.toIrrVector());
+    }
+
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
@@ -76,6 +86,7 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
         SP::SPMesh* spm = toSPM(static_cast<scene::CSkinnedMesh*>
             (AnimatedMesh->getMesh(m_straight_frame)));
         m_texture_string.clear();
+        spm->setMinMax(min.toIrrVector(), max.toIrrVector());
         return spm;
     }
 #endif

@@ -21,6 +21,7 @@
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/mini_glm.hpp"
@@ -224,6 +225,12 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
         }
         size_num--;
     }
+
+    // Calculate before finalize as spm has pre-computed straight frame
+    Vec3 min, max;
+    MeshTools::minMax3D(m_mesh, &min, &max);
+    m_mesh->setMinMax(min.toIrrVector(), max.toIrrVector());
+
     if (header == "SPMA")
     {
         createAnimationData(f);

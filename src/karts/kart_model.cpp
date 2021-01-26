@@ -441,8 +441,8 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models, bool human_playe
         if(!m_wheel_model[i]) continue;
         m_wheel_node[i] = irr_driver->addMesh(m_wheel_model[i], "wheel",
                           node, getRenderInfo());
-        Vec3 wheel_min, wheel_max;
-        MeshTools::minMax3D(m_wheel_model[i], &wheel_min, &wheel_max);
+        Vec3 wheel_min = m_wheel_model[i]->getMin();
+        Vec3 wheel_max = m_wheel_model[i]->getMax();
         m_wheel_graphics_radius[i] = 0.5f*(wheel_max.getY() - wheel_min.getY());
 
         m_wheel_node[i]->grab();
@@ -583,10 +583,8 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
 
-    Vec3 kart_min, kart_max;
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
-                        &kart_min, &kart_max);
-
+    Vec3 kart_min = m_mesh->getMin();
+    Vec3 kart_max = m_mesh->getMax();
 #ifndef SERVER_ONLY
     // Test if kart model support colorization
     if (CVS->isGLSL())
@@ -667,9 +665,9 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         irr_driver->grabAllTextures(obj.m_model);
 
         // Update min/max, speed weight can be scaled
-        Vec3 obj_min, obj_max;
         scene::IMesh* mesh = obj.m_model->getMesh(0);
-        MeshTools::minMax3D(mesh, &obj_min, &obj_max);
+        Vec3 obj_min = mesh->getMin();
+        Vec3 obj_max = mesh->getMax();
         core::vector3df transformed_min, transformed_max;
         obj.m_location.transformVect(transformed_min, obj_min.toIrrVector());
         obj.m_location.transformVect(transformed_max, obj_max.toIrrVector());
