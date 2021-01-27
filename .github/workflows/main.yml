@@ -1,0 +1,105 @@
+#  Copyright (C) 2020-2021 Jacob Burroughs <maths22@gmail.com>
+#                2020-2021 A. Semphris <semphris@protonmail.com>
+#
+#  Released under the Creative Commons Zero (CC0) license, available at:
+#    Legal code: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+#    Information: https://creativecommons.org/share-your-work/public-domain/cc0/
+
+
+
+# Note: Parts of this code were taken from the SuperTux project.
+#         ~ Semphris (responsible for transfering and adapting the file)
+
+name: main
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request: {}
+
+jobs:
+  build:
+
+    strategy:
+      fail-fast: true
+      matrix:
+        # TODO: re-add 'macos-latest' as an option here. MacOS has been
+        #  temporarily disabled because the CI can't install harfbuzz correctly.
+        os: [ubuntu-latest]
+        compiler: [gcc, clang]
+        build_type: [Debug, Release]
+        server_only: [ON, OFF]
+        exclude:
+          - os: macos-latest
+            compiler: gcc
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Fetch the whole tree so git describe works
+          fetch-depth: 0
+          submodules: true
+      - name: Install linux dependencies
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          sudo apt-get update 
+          sudo apt install -y build-essential cmake libbluetooth-dev libcurl4-gnutls-dev \
+          libfreetype6-dev libharfbuzz-dev libjpeg-dev libogg-dev libopenal-dev \
+          libpng-dev libsdl2-dev libvorbis-dev pkg-config zlib1g-dev
+      - name: Install macos dependencies
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          brew update && brew bundle
+          # Something funky happens with freetype if mono is left
+          sudo mv /Library/Frameworks/Mono.framework /Library/Frameworks/Mono.framework-disabled
+          sudo mkdir -p /usr/local/include/
+          sudo ln -s /System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/ /usr/local/include/GL;
+          export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/harfbuzz/
+      - name: Set compiler (gcc)
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc' }}
+        run: |
+          echo "CXX=g++-8" >> $GITHUB_ENV
+          echo "CC=gcc-8" >> $GITHUB_ENV
+      - name: Set compiler (clang)
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'clang' }}
+        run: |
+          echo "CXX=clang++-6.0" >> $GITHUB_ENV
+          echo "CC=clang-6.0" >> $GITHUB_ENV
+      - name: Set compiler (macos)
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          # This ensures for now we use clang11
+          # Clang12 runs into a bunch of fun with `include location '/usr/local/include' is unsafe for cross-compilation`
+          # that we don't care about for now
+          echo "CXX=clang++" >> $GITHUB_ENV
+          echo "CC=clang" >> $GITHUB_ENV
+      - name: Configure bulid (linux)
+        if: ${{ matrix.os != 'macos-latest' }}
+        env:
+          BUILD_TYPE: ${{ matrix.build_type }}
+          SERVER_ONLY: ${{ matrix.server_only }}
+        run: |
+          cmake --version
+          $CXX --version
+          mkdir "build"
+          cd "build"
+          cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off;
+      - name: Configure bulid (macos)
+        if: ${{ matrix.os == 'macos-latest' }}
+        env:
+          BUILD_TYPE: ${{ matrix.build_type }}
+          SERVER_ONLY: ${{ matrix.server_only }}
+        run: |
+          cmake --version
+          $CXX --version
+          mkdir "build"
+          cd "build"
+          /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off;
+      - name: Build and install
+        working-directory: build
+        run: |
+          make -j3 VERBOSE=1
+          make install DESTDIR="/tmp/stk" VERBOSE=1
