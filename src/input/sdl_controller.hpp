@@ -49,6 +49,8 @@ private:
     irr::SEvent m_irr_event;
 
     int16_t m_prev_axes[irr::SEvent::SJoystickEvent::NUMBER_OF_AXES];
+
+    uint64_t m_last_power_level_time;
 #ifdef ANDROID
     void handleDirectScanCode(const SDL_Event& event);
 #endif
@@ -148,6 +150,8 @@ public:
     }   // handleButton
     // ------------------------------------------------------------------------
     SDL_GameController* getGameController() const { return m_game_controller; }
+    // ------------------------------------------------------------------------
+    void checkPowerLevel();
 };
 
 #endif

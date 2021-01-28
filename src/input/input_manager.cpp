@@ -207,6 +207,10 @@ void InputManager::update(float dt)
         m_timer -= dt;
         if(m_timer < 0) m_timer_in_use = false;
     }
+#ifndef SERVER_ONLY
+    for (auto& controller : m_sdl_controller)
+        controller.second->checkPowerLevel();
+#endif
 }
 
 //-----------------------------------------------------------------------------

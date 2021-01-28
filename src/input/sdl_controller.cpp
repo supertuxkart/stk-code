@@ -18,12 +18,17 @@
 #ifndef SERVER_ONLY
 
 #include "input/sdl_controller.hpp"
+#include "guiengine/message_queue.hpp"
 #include "input/device_config.hpp"
 #include "input/device_manager.hpp"
 #include "input/gamepad_device.hpp"
 #include "input/input_manager.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
+#include <SDL_version.h>
 #include <stdexcept>
 #include <string>
 
@@ -31,6 +36,7 @@
 SDLController::SDLController(int device_id)
              : m_gamepad(NULL)
 {
+    m_last_power_level_time = StkTime::getMonoTimeMs();
     m_irr_event = {};
     m_irr_event.EventType = irr::EET_JOYSTICK_INPUT_EVENT;
     memset(m_prev_axes, 0,
@@ -219,6 +225,27 @@ void SDLController::handleAxisInputSense(const SDL_Event& event)
         m_irr_event.JoystickEvent.Joystick, axis_idx, Input::AD_NEUTRAL,
         m_prev_axes[axis_idx]);
 }   // handleAxisInputSense
+
+// ----------------------------------------------------------------------------
+void SDLController::checkPowerLevel()
+{
+#if SDL_VERSION_ATLEAST(2, 0, 4)
+    const uint64_t time_now = StkTime::getMonoTimeMs();
+    if (time_now > m_last_power_level_time + 60000)
+    {
+        m_last_power_level_time = time_now;
+        SDL_JoystickPowerLevel pl = SDL_JoystickCurrentPowerLevel(m_joystick);
+        if (pl == SDL_JOYSTICK_POWER_EMPTY || pl == SDL_JOYSTICK_POWER_LOW)
+        {
+            core::stringw msg =
+                _("%s has low battery level.", SDL_JoystickName(m_joystick));
+            MessageQueue::add(MessageQueue::MT_ERROR, msg);
+            // Check 5 min later
+            m_last_power_level_time += 240000;
+        }
+    }
+#endif
+}   // checkPowerLevel
 
 // ----------------------------------------------------------------------------
 #ifdef ANDROID
