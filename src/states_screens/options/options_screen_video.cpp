@@ -262,21 +262,21 @@ void OptionsScreenVideo::init()
     assert( scale_rtts != NULL );
 
     scale_rtts->clearLabels();
-    scale_rtts->addLabel(_("30%%"));
-    scale_rtts->addLabel(_("35%%"));
-    scale_rtts->addLabel(_("40%%"));
-    scale_rtts->addLabel(_("45%%"));
-    scale_rtts->addLabel(_("50%%"));
-    scale_rtts->addLabel(_("55%%"));
-    scale_rtts->addLabel(_("60%%"));
-    scale_rtts->addLabel(_("65%%"));
-    scale_rtts->addLabel(_("70%%"));
-    scale_rtts->addLabel(_("75%%"));
-    scale_rtts->addLabel(_("80%%"));
-    scale_rtts->addLabel(_("85%%"));
-    scale_rtts->addLabel(_("90%%"));
-    scale_rtts->addLabel(_("95%%"));
-    scale_rtts->addLabel(_("100%%"));
+    scale_rtts->addLabel("30%");
+    scale_rtts->addLabel("35%");
+    scale_rtts->addLabel("40%");
+    scale_rtts->addLabel("45%");
+    scale_rtts->addLabel("50%");
+    scale_rtts->addLabel("55%");
+    scale_rtts->addLabel("60%");
+    scale_rtts->addLabel("65%");
+    scale_rtts->addLabel("70%");
+    scale_rtts->addLabel("75%");
+    scale_rtts->addLabel("80%");
+    scale_rtts->addLabel("85%");
+    scale_rtts->addLabel("90%");
+    scale_rtts->addLabel("95%");
+    scale_rtts->addLabel("100%");
 
     // ---- video modes
     DynamicRibbonWidget* res = getWidget<DynamicRibbonWidget>("resolutions");
