@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-19 14:27+0800\n"
-"PO-Revision-Date: 2020-11-19 06:30+0000\n"
+"POT-Creation-Date: 2021-01-28 11:08+0800\n"
+"PO-Revision-Date: 2021-01-28 03:34+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Sardinian (http://www.transifex.com/supertuxkart/supertuxkart/language/sc/)\n"
 "MIME-Version: 1.0\n"
@@ -172,7 +172,7 @@ msgstr ""
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:150
+#: src/input/gamepad_config.cpp:149
 #: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr ""
@@ -207,6 +207,12 @@ msgstr ""
 #. I18N: Control type
 #: src/states_screens/dialogs/race_paused_dialog.cpp:515
 msgid "Steering wheel"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/android/init_android.stkgui
+#. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Auto acceleration"
 msgstr ""
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
@@ -379,6 +385,15 @@ msgstr ""
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Follow ball in soccer mode"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+msgid "Reset"
 msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -925,7 +940,7 @@ msgstr ""
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:276
+#: src/states_screens/race_result_gui.cpp:320
 msgid "Setup New Race"
 msgstr ""
 
@@ -949,9 +964,9 @@ msgstr ""
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:193
-#: src/states_screens/race_result_gui.cpp:222
-#: src/states_screens/race_result_gui.cpp:230
+#: src/states_screens/race_result_gui.cpp:237
+#: src/states_screens/race_result_gui.cpp:266
+#: src/states_screens/race_result_gui.cpp:274
 msgid "Continue"
 msgstr "Sighi"
 
@@ -1000,9 +1015,10 @@ msgstr ""
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
-#. I18N: In the UI options,litscreen_method in the race UI
+#. I18N: In the UI options, Camera setting: Standard
+#: src/states_screens/dialogs/custom_camera_settings.cpp:66
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:362
+#: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
 msgstr ""
 
@@ -2023,8 +2039,8 @@ msgstr ""
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:537
-#: src/states_screens/options/options_screen_video.cpp:610
+#: src/states_screens/options/options_screen_video.cpp:607
+#: src/states_screens/options/options_screen_video.cpp:680
 msgid "Enabled"
 msgstr ""
 
@@ -2152,11 +2168,6 @@ msgstr ""
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
-msgid "Follow ball in soccer mode for backward camera"
-msgstr ""
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
 msgid "Display FPS"
 msgstr ""
 
@@ -2178,6 +2189,11 @@ msgstr ""
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Graphical Effects Level"
+msgstr ""
+
+#. I18N: ./data/gui/screens/options_video.stkgui
+#. I18N: In the video settings
+msgid "Render resolution"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_video.stkgui
@@ -2466,11 +2482,11 @@ msgid "Puffy"
 msgstr ""
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
-msgid "Sara the Racer"
+msgid "Pepper"
 msgstr ""
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
-msgid "Sara the Wizard"
+msgid "Sara"
 msgstr ""
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
@@ -2642,7 +2658,7 @@ msgstr ""
 msgid "Completed achievement \"%s\"."
 msgstr ""
 
-#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:343
+#: src/addons/addons_manager.cpp:111 src/addons/news_manager.cpp:343
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr ""
 
@@ -2712,7 +2728,7 @@ msgid "New kart '%s' now available"
 msgstr ""
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:302
+#: src/states_screens/options/options_screen_ui.cpp:316
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2763,7 +2779,7 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr ""
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:198
 #, c-format
 msgid "Tip: %s"
 msgstr ""
@@ -2796,8 +2812,8 @@ msgstr ""
 #: src/karts/controller/player_controller.cpp:413
 #: src/network/protocols/client_lobby.cpp:824
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1421
-#: src/states_screens/race_result_gui.cpp:1482
+#: src/states_screens/race_result_gui.cpp:1475
+#: src/states_screens/race_result_gui.cpp:1537
 #, c-format
 msgid "%s (handicapped)"
 msgstr ""
@@ -3305,102 +3321,102 @@ msgid "Your input config file is not compatible with this version of STK."
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:152
+#: src/input/gamepad_config.cpp:151
 msgid "Guide"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:154
+#: src/input/gamepad_config.cpp:153
 msgid "Start"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:156
+#: src/input/gamepad_config.cpp:155
 msgid "Left thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:158
+#: src/input/gamepad_config.cpp:157
 msgid "Right thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:160
+#: src/input/gamepad_config.cpp:159
 msgid "Left shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:162
+#: src/input/gamepad_config.cpp:161
 msgid "Right shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:164
+#: src/input/gamepad_config.cpp:163
 msgid "DPad up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:166
+#: src/input/gamepad_config.cpp:165
 msgid "DPad down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:168
+#: src/input/gamepad_config.cpp:167
 msgid "DPad left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:170
+#: src/input/gamepad_config.cpp:169
 msgid "DPad right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:174
+#: src/input/gamepad_config.cpp:173
 msgid "Left thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:176
+#: src/input/gamepad_config.cpp:175
 msgid "Left thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:178
+#: src/input/gamepad_config.cpp:177
 msgid "Left thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:180
+#: src/input/gamepad_config.cpp:179
 msgid "Left thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:182
+#: src/input/gamepad_config.cpp:181
 msgid "Right thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:184
+#: src/input/gamepad_config.cpp:183
 msgid "Right thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:186
+#: src/input/gamepad_config.cpp:185
 msgid "Right thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:188
+#: src/input/gamepad_config.cpp:187
 msgid "Right thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:190
+#: src/input/gamepad_config.cpp:189
 msgid "Left trigger"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:192
+#: src/input/gamepad_config.cpp:191
 msgid "Right trigger"
 msgstr ""
 
@@ -3461,7 +3477,8 @@ msgid "You won the race!"
 msgstr ""
 
 #: src/karts/kart.cpp:1021
-msgid "You finished the race!"
+#, c-format
+msgid "You finished the race in rank %d!"
 msgstr ""
 
 #. I18N: Message shown in game to tell player left the game in network
@@ -3470,7 +3487,7 @@ msgstr ""
 msgid "%s left the game."
 msgstr ""
 
-#: src/main.cpp:1913
+#: src/main.cpp:1918
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3479,16 +3496,16 @@ msgid ""
 "Internet\")."
 msgstr ""
 
-#: src/main.cpp:2193
+#: src/main.cpp:2198
 msgid "Your screen resolution is too low to run STK."
 msgstr ""
 
-#: src/main.cpp:2228
+#: src/main.cpp:2233
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr ""
 
-#: src/main.cpp:2246
+#: src/main.cpp:2251
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3496,7 +3513,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr ""
 
-#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:479 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr ""
 
@@ -3634,7 +3651,7 @@ msgstr ""
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:695
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
-#: src/states_screens/race_result_gui.cpp:1785
+#: src/states_screens/race_result_gui.cpp:1841
 #, c-format
 msgid "Difficulty: %s"
 msgstr ""
@@ -3945,7 +3962,7 @@ msgid "Please wait while addons are updated"
 msgstr ""
 
 #: src/states_screens/addons_screen.cpp:523
-#: src/states_screens/main_menu_screen.cpp:620
+#: src/states_screens/main_menu_screen.cpp:622
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -4482,6 +4499,22 @@ msgid ""
 " the UI may not work correctly."
 msgstr ""
 
+#. I18N: In the UI options, Camera setting: Drone chase
+#: src/states_screens/dialogs/custom_camera_settings.cpp:81
+#: src/states_screens/options/options_screen_ui.cpp:164
+msgid "Drone chase"
+msgstr ""
+
+#. I18N: In the UI options, Camera setting: Custom
+#. I18N: custom video settings
+#: src/states_screens/dialogs/custom_camera_settings.cpp:96
+#: src/states_screens/options/options_screen_ui.cpp:160
+#: src/states_screens/options/options_screen_video.cpp:529
+#: src/states_screens/options/options_screen_video.cpp:564
+#: src/states_screens/options/options_screen_video.cpp:592
+msgid "Custom"
+msgstr ""
+
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
@@ -4489,15 +4522,15 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:206
-#: src/states_screens/options/options_screen_video.cpp:226
-#: src/states_screens/options/options_screen_video.cpp:540
-#: src/states_screens/options/options_screen_video.cpp:611
+#: src/states_screens/options/options_screen_video.cpp:242
+#: src/states_screens/options/options_screen_video.cpp:610
+#: src/states_screens/options/options_screen_video.cpp:681
 msgid "Disabled"
 msgstr ""
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:542
+#: src/states_screens/options/options_screen_video.cpp:612
 msgid "Important only"
 msgstr ""
 
@@ -4507,7 +4540,7 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:549
+#: src/states_screens/options/options_screen_video.cpp:619
 msgid "Low"
 msgstr ""
 
@@ -4517,14 +4550,14 @@ msgstr ""
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:552
+#: src/states_screens/options/options_screen_video.cpp:622
 msgid "High"
 msgstr ""
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:546
+#: src/states_screens/options/options_screen_video.cpp:616
 msgid "Very Low"
 msgstr ""
 
@@ -4703,7 +4736,7 @@ msgstr ""
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1775
+#: src/states_screens/race_result_gui.cpp:1831
 #, c-format
 msgid "Laps: %i"
 msgstr ""
@@ -4899,43 +4932,43 @@ msgstr ""
 msgid "Select a track"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:249
+#: src/states_screens/feature_unlocked.cpp:250
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:255
+#: src/states_screens/feature_unlocked.cpp:256
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:261
+#: src/states_screens/feature_unlocked.cpp:262
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:267
+#: src/states_screens/feature_unlocked.cpp:268
 #, c-format
 msgid ""
 "You completed the SuperTux challenge! Points earned on this level: %i/%i"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:310
+#: src/states_screens/feature_unlocked.cpp:311
 #, c-format
 msgid "You unlocked %s!"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:629
+#: src/states_screens/feature_unlocked.cpp:630
 msgid "Challenge Completed"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:668
+#: src/states_screens/feature_unlocked.cpp:669
 msgid "You unlocked track %0"
 msgstr ""
 
-#: src/states_screens/feature_unlocked.cpp:714
+#: src/states_screens/feature_unlocked.cpp:715
 msgid "You unlocked grand prix %0"
 msgstr ""
 
@@ -4994,20 +5027,20 @@ msgid "Name is too long."
 msgstr ""
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:156
+#: src/states_screens/grand_prix_lose.cpp:157
 msgid "Better luck next time!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:165
-#: src/states_screens/race_result_gui.cpp:212
+#: src/states_screens/grand_prix_win.cpp:166
+#: src/states_screens/race_result_gui.cpp:256
 msgid "You completed a challenge!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:321
+#: src/states_screens/grand_prix_win.cpp:322
 msgid "You won the Grand Prix!"
 msgstr ""
 
-#: src/states_screens/grand_prix_win.cpp:322
+#: src/states_screens/grand_prix_win.cpp:323
 msgid "You completed the Grand Prix!"
 msgstr ""
 
@@ -5031,34 +5064,34 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:258
+#: src/states_screens/main_menu_screen.cpp:260
 msgid "Would you like to play the tutorial of the game?"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:556
+#: src/states_screens/main_menu_screen.cpp:558
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/main_menu_screen.cpp:573
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:579
+#: src/states_screens/main_menu_screen.cpp:581
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:615
+#: src/states_screens/main_menu_screen.cpp:617
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr ""
 
-#: src/states_screens/main_menu_screen.cpp:627
+#: src/states_screens/main_menu_screen.cpp:629
 msgid "Please wait while the add-ons are loading"
 msgstr ""
 
@@ -5605,20 +5638,7 @@ msgstr ""
 msgid "Very large"
 msgstr ""
 
-#. I18N: custom camera setting
-#. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:360
-#: src/states_screens/options/options_screen_video.cpp:489
-#: src/states_screens/options/options_screen_video.cpp:520
-msgid "Custom"
-msgstr ""
-
-#. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:364
-msgid "Drone chase"
-msgstr ""
-
-#: src/states_screens/options/options_screen_ui.cpp:537
+#: src/states_screens/options/options_screen_ui.cpp:500
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5628,110 +5648,110 @@ msgid ""
 msgstr ""
 
 #. I18N: In the video options, maximum frame per second
-#: src/states_screens/options/options_screen_video.cpp:220
+#: src/states_screens/options/options_screen_video.cpp:236
 msgid "Maximum FPS"
 msgstr ""
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
-#: src/states_screens/options/options_screen_video.cpp:228
+#: src/states_screens/options/options_screen_video.cpp:244
 msgid "Full"
 msgstr ""
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
-#: src/states_screens/options/options_screen_video.cpp:234
+#: src/states_screens/options/options_screen_video.cpp:250
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
 msgstr ""
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:237
+#: src/states_screens/options/options_screen_video.cpp:253
 msgid "Full: one frame per monitor refresh"
 msgstr ""
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:239
+#: src/states_screens/options/options_screen_video.cpp:255
 msgid "Vsync will not work if your drivers don't support it."
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:555
+#: src/states_screens/options/options_screen_video.cpp:625
 #, c-format
 msgid "Particles Effects: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:561
+#: src/states_screens/options/options_screen_video.cpp:631
 #, c-format
 msgid "Animated Characters: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:564
+#: src/states_screens/options/options_screen_video.cpp:634
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:567
+#: src/states_screens/options/options_screen_video.cpp:637
 #, c-format
 msgid "Light scattering: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:570
+#: src/states_screens/options/options_screen_video.cpp:640
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:573
+#: src/states_screens/options/options_screen_video.cpp:643
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:577
+#: src/states_screens/options/options_screen_video.cpp:647
 #, c-format
 msgid "Shadows: %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:579
+#: src/states_screens/options/options_screen_video.cpp:649
 #, c-format
 msgid "Shadows: %i"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:582
+#: src/states_screens/options/options_screen_video.cpp:652
 #, c-format
 msgid "Bloom: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:586
+#: src/states_screens/options/options_screen_video.cpp:656
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:590
+#: src/states_screens/options/options_screen_video.cpp:660
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr ""
 
-#: src/states_screens/options/options_screen_video.cpp:595
+#: src/states_screens/options/options_screen_video.cpp:665
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:614
+#: src/states_screens/options/options_screen_video.cpp:684
 #, c-format
 msgid "Motion blur: %s"
 msgstr ""
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:618
+#: src/states_screens/options/options_screen_video.cpp:688
 #, c-format
 msgid "Depth of field: %s"
 msgstr ""
@@ -5787,7 +5807,7 @@ msgstr ""
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:78
-#: src/states_screens/race_result_gui.cpp:318
+#: src/states_screens/race_result_gui.cpp:366
 msgid "Waiting for others"
 msgstr ""
 
@@ -5846,85 +5866,85 @@ msgstr ""
 msgid "Press fire to start the challenge"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:198
+#: src/states_screens/race_result_gui.cpp:242
 msgid "Quit the server"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:213
+#: src/states_screens/race_result_gui.cpp:257
 msgid "You completed challenges!"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:236
+#: src/states_screens/race_result_gui.cpp:280
 msgid "Abort Grand Prix"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:256
+#: src/states_screens/race_result_gui.cpp:300
 msgid "Restart"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:263
+#: src/states_screens/race_result_gui.cpp:307
 msgid "Back to challenge selection"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:271
+#: src/states_screens/race_result_gui.cpp:315
 msgid "Race against the new ghost replay"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:279
+#: src/states_screens/race_result_gui.cpp:323
 msgid "Back to the menu"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:444
+#: src/states_screens/race_result_gui.cpp:492
 msgid "Do you really want to abort the Grand Prix?"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:541
-#: src/states_screens/race_result_gui.cpp:1350
+#: src/states_screens/race_result_gui.cpp:590
+#: src/states_screens/race_result_gui.cpp:1402
 msgid "Red Team Wins"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:543
-#: src/states_screens/race_result_gui.cpp:1354
+#: src/states_screens/race_result_gui.cpp:592
+#: src/states_screens/race_result_gui.cpp:1406
 msgid "Blue Team Wins"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:545
-#: src/states_screens/race_result_gui.cpp:1359
+#: src/states_screens/race_result_gui.cpp:594
+#: src/states_screens/race_result_gui.cpp:1411
 msgid "It's a draw"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:776
-#: src/states_screens/race_result_gui.cpp:1204
+#: src/states_screens/race_result_gui.cpp:827
+#: src/states_screens/race_result_gui.cpp:1255
 msgid "Eliminated"
 msgstr ""
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1427
-#: src/states_screens/race_result_gui.cpp:1488
+#: src/states_screens/race_result_gui.cpp:1481
+#: src/states_screens/race_result_gui.cpp:1543
 msgid "(Own Goal)"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1566
+#: src/states_screens/race_result_gui.cpp:1622
 #, c-format
 msgid "Track %i/%i"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1650
+#: src/states_screens/race_result_gui.cpp:1706
 msgid "Grand Prix progress:"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1696
+#: src/states_screens/race_result_gui.cpp:1752
 msgid "Highscores"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1799
+#: src/states_screens/race_result_gui.cpp:1855
 #, c-format
 msgid "Best lap time: %s"
 msgstr ""
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1813
+#: src/states_screens/race_result_gui.cpp:1869
 #, c-format
 msgid "by %s"
 msgstr ""

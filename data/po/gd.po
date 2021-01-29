@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-11-19 14:27+0800\n"
-"PO-Revision-Date: 2020-11-19 06:30+0000\n"
+"POT-Creation-Date: 2021-01-28 11:08+0800\n"
+"PO-Revision-Date: 2021-01-28 03:34+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/supertuxkart/supertuxkart/language/gd/)\n"
 "MIME-Version: 1.0\n"
@@ -23,15 +23,15 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "Ag às-tharraing dàta a’ gheama…"
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "Mearachd le às-tharraing dàta a’ gheama"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr ""
+msgstr "Dèan cinnteach gum foghainn an rùm air an uidheam no ath-stàlaich SuperTuxKart."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -175,7 +175,7 @@ msgstr "Dì-stàlaich"
 #. I18N: Ghost replay info action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:150
+#: src/input/gamepad_config.cpp:149
 #: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr "Air ais"
@@ -211,6 +211,12 @@ msgstr "Gìorosgop"
 #: src/states_screens/dialogs/race_paused_dialog.cpp:515
 msgid "Steering wheel"
 msgstr "Cuibhle stiùiridh"
+
+#. I18N: ./data/gui/dialogs/android/init_android.stkgui
+#. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
+#. I18N: In the multitouch settings screen
+msgid "Auto acceleration"
+msgstr "Luathachadh fèin-obrachail"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
@@ -352,36 +358,45 @@ msgstr "Cùm an dùmhlachd-bhreacaidh seo"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
-msgstr ""
+msgstr "Roghainnean a’ chamara"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr ""
+msgstr "Camara a’ chluicheadair"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "FOV"
-msgstr ""
+msgstr "Raon seallaidh"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr ""
+msgstr "Astar"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Angle"
-msgstr ""
+msgstr "Ceàrn"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Smooth camera"
-msgstr ""
+msgstr "Camara rèidh"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
+msgstr "Camara air ais"
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+msgid "Follow ball in soccer mode"
+msgstr ""
+
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+msgid "Reset"
 msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -640,7 +655,7 @@ msgstr "Cobhair"
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
 msgid "Quit Server"
-msgstr ""
+msgstr "Fàg am frithealaiche"
 
 #. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
 #. I18N: User info dialog
@@ -928,7 +943,7 @@ msgstr "Brùth air ESC gus sgur dheth"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:276
+#: src/states_screens/race_result_gui.cpp:320
 msgid "Setup New Race"
 msgstr "Suidhich rèis ùr"
 
@@ -952,9 +967,9 @@ msgstr "Suidhich rèis"
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:193
-#: src/states_screens/race_result_gui.cpp:222
-#: src/states_screens/race_result_gui.cpp:230
+#: src/states_screens/race_result_gui.cpp:237
+#: src/states_screens/race_result_gui.cpp:266
+#: src/states_screens/race_result_gui.cpp:274
 msgid "Continue"
 msgstr "Lean air adhart"
 
@@ -1003,9 +1018,10 @@ msgstr "Air a stàladh"
 #. I18N: track group
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
-#. I18N: In the UI options,litscreen_method in the race UI
+#. I18N: In the UI options, Camera setting: Standard
+#: src/states_screens/dialogs/custom_camera_settings.cpp:66
 #: src/states_screens/grand_prix_editor_screen.cpp:335
-#: src/states_screens/options/options_screen_ui.cpp:362
+#: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
 msgstr "Coitcheann"
 
@@ -1599,12 +1615,12 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr ""
+msgstr "Nuair a bhios tu am broinn frithealaiche, tòisichidh an rèis nuair a chuireas an sealbhadair (agus crùn air/oirre) sin roimhe. Chan fhaod frithealaichean oifigeil tòiseachadh air rèis gu fèin-obrachail ach nuair a bhios cluicheadairean gu leòr ann. ’S urrainn dhut an cart agad a thaghadh agus bhòtadh airson na h-ath-shlighe an uairsin. Cha bhi slighe tuilleadain ceadaichte ach nuair a bhios e aig a h-uile cluicheadair agus aig an fhrithealaiche."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "... or on the same device:"
-msgstr ""
+msgstr "… no air an aon uidheam:"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1883,7 +1899,7 @@ msgstr "Seall frithealaichean prìobhaideach"
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
 #. I18N: In the server selection screen
 msgid "Use IPv6 connection"
-msgstr ""
+msgstr "Cleachd ceangal IPv6"
 
 #. I18N: ./data/gui/screens/online/user_search.stkgui
 msgid "User search"
@@ -2026,8 +2042,8 @@ msgstr "Ceòl"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:66
-#: src/states_screens/options/options_screen_video.cpp:537
-#: src/states_screens/options/options_screen_video.cpp:610
+#: src/states_screens/options/options_screen_video.cpp:607
+#: src/states_screens/options/options_screen_video.cpp:680
 msgid "Enabled"
 msgstr "An comas"
 
@@ -2062,7 +2078,7 @@ msgstr "Till dha liosta nan uidheam"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 msgid "Rename Configuration"
-msgstr ""
+msgstr "Cuir ainm ùr air an rèiteachadh"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2136,7 +2152,7 @@ msgstr "Meanbh-mhapa"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Splitscreen Multiplayer layout"
-msgstr ""
+msgstr "Co-dhealbhachd na sgrìn sgoilte"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2146,17 +2162,12 @@ msgstr "Meud a’ chrutha-chlò"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "Camara"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr ""
-
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Follow ball in soccer mode for backward camera"
-msgstr ""
+msgstr "Gnàthaichte…"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2185,13 +2196,18 @@ msgstr "Ìre nan èifeachdan grafaigeachd"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
+msgid "Render resolution"
+msgstr ""
+
+#. I18N: ./data/gui/screens/options_video.stkgui
+#. I18N: In the video settings
 msgid "Blur Effects Level"
 msgstr "Ìre nan èifeachdan sgleòtha"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync"
-msgstr ""
+msgstr "Co-shioncronachadh inghearach"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2305,11 +2321,11 @@ msgstr "Dath a’ chairt"
 
 #. I18N: ./data/tips.xml
 msgid "The UI skin can be changed in the UI options."
-msgstr ""
+msgstr "’S urrainn dhut craiceann na h-eadar-aghaidh atharrachadh ann an roghainnean na h-eadar-aghaidh."
 
 #. I18N: ./data/tips.xml
 msgid "You can see other karts' powerups by enabling it in the UI options."
-msgstr ""
+msgstr "Chì thu cumhachdan nan cartaichean eile nuair a chuireas tu seo air ann an roghainnean na h-eadar-aghaidh."
 
 #. I18N: ./data/tips.xml
 msgid "The font size can be changed in the UI options."
@@ -2317,7 +2333,7 @@ msgstr "’S urrainn dhut meud a’ chrutha-chlò atharrachadh ann an roghainnea
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has lots of useful information."
-msgstr ""
+msgstr "Tha iomadh fiosrachadh feumail ann an clàr-taice na cobharach."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
@@ -2380,45 +2396,45 @@ msgstr "Thoir an aire nuair a bhios tu faisg air cartaichean eile, ’s dòcha g
 msgid ""
 "Basketballs can be destroyed using precise backward shots with a bowling "
 "ball, cake, or plunger."
-msgstr ""
+msgstr "’S urrainn dhut ball-basgaid a mhilleadh le losgadh bàla bobhlaireachd, cèic no loinid dhan chùlaibh gu pongail."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Try to avoid crashing into other the backs of other karts, as it will slow "
 "you down."
-msgstr ""
+msgstr "Feuch nach buail thu ri cùlaibh cairt eile on a chuireas sin maille ort."
 
 #. I18N: ./data/tips.xml
 msgid "You can use bowling balls to push and block the ball."
-msgstr ""
+msgstr "’S urrainn dhut bàla bobhlaireachd a chleachdadh airson brùthadh is bacadh a’ bhàla."
 
 #. I18N: ./data/tips.xml
 msgid "In soccer, always work as a team for good results."
-msgstr ""
+msgstr "Sa mhodh buill-choise, cluich mar sgioba airson toradh as fheàrr."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr ""
+msgstr "Ma chailleas tu am bàla no ma tha co-fharpaisich a’ teannadh ort, feuch am buail thu orra le cumhachd no gum bac thu an slighe."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
-msgstr ""
+msgstr "Tha deagh chuairteachadh nan suidheachaidhean (ionnsaigh is dìon) cudromach."
 
 #. I18N: ./data/tips.xml
 msgid "Make sure to store at least 2 big cans worth of nitro."
-msgstr ""
+msgstr "Dèan cinnteach gun cùm thu stòras de 2 chana naidhtreo mòr."
 
 #. I18N: ./data/tips.xml
 msgid "Never use the three bowling balls all at the same time."
-msgstr ""
+msgstr "Na cleachd trì bàlaichean bobhlaireachd air an aon àm."
 
 #. I18N: ./data/tips.xml
 msgid ""
 "Don't get in the way of a teammate carrying the ball, though you can try to "
 "hit opponents attempting to stop them from scoring."
-msgstr ""
+msgstr "Na rach an rathad co cuideachd nuair a bhios am bàla aig an sgioba agad ach feuch gum buail thu air co-fharpaisich feuch nach cuir iad tadhal."
 
 #. I18N: ../stk-assets/karts/adiumy/kart.xml
 msgid "Adiumy"
@@ -2442,7 +2458,7 @@ msgstr "Gavroche"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr ""
+msgstr "Gnu"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
@@ -2469,12 +2485,12 @@ msgid "Puffy"
 msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
-msgid "Sara the Racer"
-msgstr "An rèisear Sara"
+msgid "Pepper"
+msgstr "Pepper"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
-msgid "Sara the Wizard"
-msgstr "A’ bhan-draoidh Sara"
+msgid "Sara"
+msgstr "Sara"
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -2535,7 +2551,7 @@ msgstr "Hacienda"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
-msgstr "Raon ball-coise reòite"
+msgstr "Raon buill-coise reòite"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2574,7 +2590,7 @@ msgstr "Raon buill-choise Las Dunas"
 
 #. I18N: ../stk-assets/tracks/lighthouse/track.xml
 msgid "Around the Lighthouse"
-msgstr ""
+msgstr "Timcheall air an taigh-sholais"
 
 #. I18N: ../stk-assets/tracks/mines/track.xml
 msgid "Old Mine"
@@ -2594,7 +2610,7 @@ msgstr "Pàirc na peapaige"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge Mansion"
-msgstr ""
+msgstr "Taigh Drochaid nam Fitheach"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
@@ -2614,7 +2630,7 @@ msgstr "Sgurr an t-sneachda"
 
 #. I18N: ../stk-assets/tracks/soccer_field/track.xml
 msgid "Soccer Field"
-msgstr ""
+msgstr "Raon buill-coise"
 
 #. I18N: ../stk-assets/tracks/stadium/track.xml
 msgid "The Stadium"
@@ -2645,7 +2661,7 @@ msgstr "Lios Zen"
 msgid "Completed achievement \"%s\"."
 msgstr "Choilean thu “%s”."
 
-#: src/addons/addons_manager.cpp:109 src/addons/news_manager.cpp:343
+#: src/addons/addons_manager.cpp:111 src/addons/news_manager.cpp:343
 msgid "Failed to connect to the SuperTuxKart add-ons server."
 msgstr "Cha deach leinn ceangal ri frithealaiche tuilleadan SuperTuxKart."
 
@@ -2715,7 +2731,7 @@ msgid "New kart '%s' now available"
 msgstr "Tha cart ùr “%s” ri fhaighinn a-nis"
 
 #: src/challenges/story_mode_timer.cpp:281
-#: src/states_screens/options/options_screen_ui.cpp:302
+#: src/states_screens/options/options_screen_ui.cpp:316
 msgid ""
 "Speedrun mode disabled. It can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -2766,7 +2782,7 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTriantain, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:154
+#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:198
 #, c-format
 msgid "Tip: %s"
 msgstr "Gliocas: %s"
@@ -2799,8 +2815,8 @@ msgstr "Èifeachdachd naidhtreo"
 #: src/karts/controller/player_controller.cpp:413
 #: src/network/protocols/client_lobby.cpp:824
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1421
-#: src/states_screens/race_result_gui.cpp:1482
+#: src/states_screens/race_result_gui.cpp:1475
+#: src/states_screens/race_result_gui.cpp:1537
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (ana-cothrom air)"
@@ -3308,102 +3324,102 @@ msgid "Your input config file is not compatible with this version of STK."
 msgstr "Chan eil am faidhle rèiteachaidh ion-chuir agad co-chòrdail ris an tionndadh seo de STK."
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:152
+#: src/input/gamepad_config.cpp:151
 msgid "Guide"
-msgstr ""
+msgstr "Treòraiche"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:154
+#: src/input/gamepad_config.cpp:153
 msgid "Start"
 msgstr "Tòisich"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:156
+#: src/input/gamepad_config.cpp:155
 msgid "Left thumbstick press"
-msgstr ""
+msgstr "Brùth air bata-òrdaige clì"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:158
+#: src/input/gamepad_config.cpp:157
 msgid "Right thumbstick press"
-msgstr ""
+msgstr "Brùth air bata-òrdaige deas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:160
+#: src/input/gamepad_config.cpp:159
 msgid "Left shoulder"
-msgstr ""
+msgstr "Gualann chlì"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:162
+#: src/input/gamepad_config.cpp:161
 msgid "Right shoulder"
-msgstr ""
+msgstr "Gualann deas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:164
+#: src/input/gamepad_config.cpp:163
 msgid "DPad up"
 msgstr "DPad suas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:166
+#: src/input/gamepad_config.cpp:165
 msgid "DPad down"
 msgstr "DPad sìos"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:168
+#: src/input/gamepad_config.cpp:167
 msgid "DPad left"
 msgstr "DPad gu clì"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:170
+#: src/input/gamepad_config.cpp:169
 msgid "DPad right"
 msgstr "DPad gu deas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:174
+#: src/input/gamepad_config.cpp:173
 msgid "Left thumbstick right"
-msgstr ""
+msgstr "Bata-òrdaige clì gu deas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:176
+#: src/input/gamepad_config.cpp:175
 msgid "Left thumbstick left"
-msgstr ""
+msgstr "Bata-òrdaige clì gu clì"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:178
+#: src/input/gamepad_config.cpp:177
 msgid "Left thumbstick down"
-msgstr ""
+msgstr "Bata-òrdaige clì sìos"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:180
+#: src/input/gamepad_config.cpp:179
 msgid "Left thumbstick up"
-msgstr ""
+msgstr "Bata-òrdaige clì suas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:182
+#: src/input/gamepad_config.cpp:181
 msgid "Right thumbstick right"
-msgstr ""
+msgstr "Bata-òrdaige deas gu deas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:184
+#: src/input/gamepad_config.cpp:183
 msgid "Right thumbstick left"
-msgstr ""
+msgstr "Bata-òrdaige deas gu clì"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:186
+#: src/input/gamepad_config.cpp:185
 msgid "Right thumbstick down"
-msgstr ""
+msgstr "Bata-òrdaige deas sìos"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:188
+#: src/input/gamepad_config.cpp:187
 msgid "Right thumbstick up"
-msgstr ""
+msgstr "Bata-òrdaige deas suas"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:190
+#: src/input/gamepad_config.cpp:189
 msgid "Left trigger"
 msgstr "Trigear clì"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:192
+#: src/input/gamepad_config.cpp:191
 msgid "Right trigger"
 msgstr "Trigear deas"
 
@@ -3466,8 +3482,9 @@ msgid "You won the race!"
 msgstr "Bhuannaich thu an rèis!"
 
 #: src/karts/kart.cpp:1021
-msgid "You finished the race!"
-msgstr "Choilean thu an rèis!"
+#, c-format
+msgid "You finished the race in rank %d!"
+msgstr ""
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
@@ -3475,25 +3492,25 @@ msgstr "Choilean thu an rèis!"
 msgid "%s left the game."
 msgstr "Dh’fhàg %s an geama."
 
-#: src/main.cpp:1913
+#: src/main.cpp:1918
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr ""
+msgstr "Dh’fhaoidte gun ceangail SuperTuxKart ri frithealaiche gus tuilleadain a luchdadh a-nuas is naidheachdan mu ùrachaidhean a thoirt dhut. Leugh a’ phoileasaidh phrìobhaideachd againn air https://supertuxkart.net/Privacy.  A bheil thu airson an roghainn seo a chur an comas? (Gus an roghainn seo atharrachadh uair sam bith, rach gu “Roghainnean”, tagh an taba “Coitcheann” agus deasaich “Ceangail ris an eadar-lìon”)."
 
-#: src/main.cpp:2193
+#: src/main.cpp:2198
 msgid "Your screen resolution is too low to run STK."
 msgstr "Tha dùmhlachd-bhreacaidh na sgìn agad ro ìosal gus STK a ruith."
 
-#: src/main.cpp:2228
+#: src/main.cpp:2233
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Tha tionndadh an draibheir agad ro shean. Feuch an stàlaich thu na draibhearan video as ùire."
 
-#: src/main.cpp:2246
+#: src/main.cpp:2251
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3501,7 +3518,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Tha coltas gu bheil draibhear na grafaigeachd agad glè shean. An doir thu sùil feuch a bheil ùrachadh ri fhaighinn? Tha SuperTuxKart a’ moladh draibhear a chuireas taic ri %s no tionndadh nas ùire dheth. Tha sinn an dùil gun obraich an geama ann am modh grafaigeachd ìslichte fhathast co-dhiù."
 
-#: src/main_loop.cpp:475 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:479 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Dh’fhalbh an ùine air a’ cheangal dhan fhrithealaiche."
 
@@ -3572,12 +3589,12 @@ msgstr "RATHAD CEÀRR!"
 #: src/modes/soccer_world.cpp:524 src/modes/soccer_world.cpp:651
 #, c-format
 msgid "%s scored a goal!"
-msgstr ""
+msgstr "Chuir %s tadhal!"
 
 #: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
 #, c-format
 msgid "Oops, %s made an own goal!"
-msgstr ""
+msgstr "Ìoc, chuir %s fèin-tadhal!"
 
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
@@ -3641,7 +3658,7 @@ msgstr "Ainm an fhrithealaiche: %s"
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:695
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
-#: src/states_screens/race_result_gui.cpp:1785
+#: src/states_screens/race_result_gui.cpp:1841
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Duilgheas: %s"
@@ -3742,12 +3759,12 @@ msgstr "Chan eil ach 1 chluicheadair air fhàgail, a’ tilleadh dhan lobaidh."
 
 #: src/network/protocols/client_lobby.cpp:1209
 msgid "Server owner quit the game."
-msgstr ""
+msgstr "Dh’fhàg sealbhadair an fhrithealaiche an geama."
 
 #. I18N: Status shown to player when he will be spectating the next game
 #: src/network/protocols/client_lobby.cpp:1213
 msgid "You will be spectating the next game."
-msgstr ""
+msgstr "Bidh thu ’nad amharc san ath-gheama."
 
 #. I18N: Show when player join red team of the started game in
 #. network
@@ -3776,7 +3793,7 @@ msgstr "Thàinig %s a-steach dhan geama."
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
 "camera position."
-msgstr ""
+msgstr "Brùth air <%s> or <%s> a dh’atharrachadh an cluicheadair-amais no air <%s> no <%s> airson ionad a’ chamara."
 
 #. I18N: Tell player he has successfully report this named player
 #: src/network/protocols/client_lobby.cpp:1600
@@ -3797,7 +3814,7 @@ msgstr "Cha ghabh ceangal ri frithealaiche %s."
 #: src/network/protocols/connect_to_server.cpp:771
 #, c-format
 msgid "Failed to detect port number for server %s."
-msgstr ""
+msgstr "Cha deach leinn mothachadh do dh’àireamh a’ phuirt airson frithealaiche %s."
 
 #: src/network/protocols/lobby_protocol.cpp:292
 msgid "Network grand prix has been finished."
@@ -3956,7 +3973,7 @@ msgid "Please wait while addons are updated"
 msgstr "Fuirich ort fhad ’s a thèid tuilleadain ùrachadh"
 
 #: src/states_screens/addons_screen.cpp:523
-#: src/states_screens/main_menu_screen.cpp:620
+#: src/states_screens/main_menu_screen.cpp:622
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -4356,7 +4373,7 @@ msgstr "Rèisean leis nas motha a chuairtean na a’ bhun-roghainn"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:286
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:311
 msgid "Races with at least twice as much as the default lap number"
-msgstr "Rèisean le co-dhiù a dhà uimhir de chuairtean-amais an traca"
+msgstr "Rèisean le co-dhiù a dhà uimhir de chuairtean-amais na slighe"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4392,7 +4409,7 @@ msgid ""
 "New gamepads and joysticks will automatically appear in the list when you connect them to this device.\n"
 "\n"
 "To add a keyboard config, you can use the button below, HOWEVER please note that most keyboards only support a limited amount of simultaneous keypresses and are thus inappropriate for multiplayer gameplay. (You can, however, connect multiple keyboards to this device. Remember that everyone still needs different keybindings in this case.)"
-msgstr ""
+msgstr "Nochdaidh padaichean-geama is bioranan-smachd ùra air an liosta gu fèin-obrachail nuair a cheanglas tu ris an uidheam seo iad\n\nGus rèiteachadh meur-chlàir a chur ris, faodaidh tu am putan gu h-ìosal a chleachdadh. Co-dhiù, thoir an AIRE nach cuir a’ mhòrchuid dhe na meur-chlàran taic ach ri àireamh cuingichte de bhrùthadh air iuchraichean aig an aon àm is mar sin chan eil iad freagarrach airson geama ioma-chluicheadair. (Co-dhiù, ’s urrainn dhut iomadh meur-chlàr a cheangal ris an uidheam seo. Cum ’nad aire gum bu feum air nasgadh iuchraichean eadar-dhealaichte aig gach cluicheadair fhathast.)"
 
 #. I18N: In the 'add new input device' dialog
 #: src/states_screens/dialogs/add_device_dialog.cpp:87
@@ -4497,6 +4514,22 @@ msgid ""
 " the UI may not work correctly."
 msgstr "Cha chuir sinn taic ri dùmhlachd-bhreacaidh nas lugha na 1024x768 no 1280x720. Dh’fhaoidte nach bi coltas mar bu chòir air an eadar-aghaidh."
 
+#. I18N: In the UI options, Camera setting: Drone chase
+#: src/states_screens/dialogs/custom_camera_settings.cpp:81
+#: src/states_screens/options/options_screen_ui.cpp:164
+msgid "Drone chase"
+msgstr "Sealg dròin"
+
+#. I18N: In the UI options, Camera setting: Custom
+#. I18N: custom video settings
+#: src/states_screens/dialogs/custom_camera_settings.cpp:96
+#: src/states_screens/options/options_screen_ui.cpp:160
+#: src/states_screens/options/options_screen_video.cpp:529
+#: src/states_screens/options/options_screen_video.cpp:564
+#: src/states_screens/options/options_screen_video.cpp:592
+msgid "Custom"
+msgstr "Gnàthaichte"
+
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
@@ -4504,15 +4537,15 @@ msgstr "Cha chuir sinn taic ri dùmhlachd-bhreacaidh nas lugha na 1024x768 no 12
 #: src/states_screens/dialogs/custom_video_settings.cpp:71
 #: src/states_screens/dialogs/custom_video_settings.cpp:87
 #: src/states_screens/online/create_server_screen.cpp:206
-#: src/states_screens/options/options_screen_video.cpp:226
-#: src/states_screens/options/options_screen_video.cpp:540
-#: src/states_screens/options/options_screen_video.cpp:611
+#: src/states_screens/options/options_screen_video.cpp:242
+#: src/states_screens/options/options_screen_video.cpp:610
+#: src/states_screens/options/options_screen_video.cpp:681
 msgid "Disabled"
 msgstr "À comas"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:65
-#: src/states_screens/options/options_screen_video.cpp:542
+#: src/states_screens/options/options_screen_video.cpp:612
 msgid "Important only"
 msgstr "Beòthachaidhean cudromach"
 
@@ -4522,7 +4555,7 @@ msgstr "Beòthachaidhean cudromach"
 #: src/states_screens/dialogs/custom_video_settings.cpp:73
 #: src/states_screens/dialogs/custom_video_settings.cpp:82
 #: src/states_screens/dialogs/custom_video_settings.cpp:88
-#: src/states_screens/options/options_screen_video.cpp:549
+#: src/states_screens/options/options_screen_video.cpp:619
 msgid "Low"
 msgstr "Ìosal"
 
@@ -4532,14 +4565,14 @@ msgstr "Ìosal"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
-#: src/states_screens/options/options_screen_video.cpp:552
+#: src/states_screens/options/options_screen_video.cpp:622
 msgid "High"
 msgstr "Àrd"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:81
-#: src/states_screens/options/options_screen_video.cpp:546
+#: src/states_screens/options/options_screen_video.cpp:616
 msgid "Very Low"
 msgstr "Glè ìosal"
 
@@ -4549,7 +4582,7 @@ msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
-msgstr ""
+msgstr "Luchdaichidh SuperTuxKart a-nuas na maoin uile (a’ gabhail a-staigh innich le càileachd àrd ’s ceòl) airson geamaireachd as snasaile cleachdaidh seo an dàta mobile agad mur eil ceangal WiFi agad."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4718,7 +4751,7 @@ msgstr "Rèis ath-chluiche thaibhsean"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1775
+#: src/states_screens/race_result_gui.cpp:1831
 #, c-format
 msgid "Laps: %i"
 msgstr "Cuairtean: %i"
@@ -4914,43 +4947,43 @@ msgstr "Thachair mearachd a’ feuchainn ris a’ Ghrand Prix agad a shàbhaladh
 msgid "Select a track"
 msgstr "Tagh slighe"
 
-#: src/states_screens/feature_unlocked.cpp:249
+#: src/states_screens/feature_unlocked.cpp:250
 #, c-format
 msgid "You completed the easy challenge! Points earned on this level: %i/%i"
 msgstr "Choilean thu an dùbhlan furasta! Seo na puingean a bhuannaich thu air an leibheil seo: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:255
+#: src/states_screens/feature_unlocked.cpp:256
 #, c-format
 msgid ""
 "You completed the intermediate challenge! Points earned on this level: %i/%i"
 msgstr "Choilean thu an dùbhlan meadhanach! Seo na puingean a bhuannaich thu air an leibheil seo: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:261
+#: src/states_screens/feature_unlocked.cpp:262
 #, c-format
 msgid ""
 "You completed the difficult challenge! Points earned on this level: %i/%i"
 msgstr "Choilean thu an dùbhlan doirbh! Seo na puingean a bhuannaich thu air an leibheil seo: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:267
+#: src/states_screens/feature_unlocked.cpp:268
 #, c-format
 msgid ""
 "You completed the SuperTux challenge! Points earned on this level: %i/%i"
 msgstr "Choilean thu an dùbhlan SuperTux! Seo na puingean a bhuannaich thu air an leibheil seo: %i/%i"
 
-#: src/states_screens/feature_unlocked.cpp:310
+#: src/states_screens/feature_unlocked.cpp:311
 #, c-format
 msgid "You unlocked %s!"
 msgstr "Thug thu a’ ghlas far %s!"
 
-#: src/states_screens/feature_unlocked.cpp:629
+#: src/states_screens/feature_unlocked.cpp:630
 msgid "Challenge Completed"
 msgstr "Dùbhlan air a choileanadh"
 
-#: src/states_screens/feature_unlocked.cpp:668
+#: src/states_screens/feature_unlocked.cpp:669
 msgid "You unlocked track %0"
 msgstr "Neo-ghlais thu slighe: %0"
 
-#: src/states_screens/feature_unlocked.cpp:714
+#: src/states_screens/feature_unlocked.cpp:715
 msgid "You unlocked grand prix %0"
 msgstr "Neo-ghlais thu grand prix: %0"
 
@@ -5009,26 +5042,26 @@ msgid "Name is too long."
 msgstr "Tha an t-ainm ro fhada."
 
 #. I18N: when failing a GP
-#: src/states_screens/grand_prix_lose.cpp:156
+#: src/states_screens/grand_prix_lose.cpp:157
 msgid "Better luck next time!"
 msgstr "Gun tèid nas fhearr leat an ath thuras!"
 
-#: src/states_screens/grand_prix_win.cpp:165
-#: src/states_screens/race_result_gui.cpp:212
+#: src/states_screens/grand_prix_win.cpp:166
+#: src/states_screens/race_result_gui.cpp:256
 msgid "You completed a challenge!"
 msgstr "Choilean thu dùbhlan!"
 
-#: src/states_screens/grand_prix_win.cpp:321
+#: src/states_screens/grand_prix_win.cpp:322
 msgid "You won the Grand Prix!"
 msgstr "Bhuannaich thu an Grand Prix!"
 
-#: src/states_screens/grand_prix_win.cpp:322
+#: src/states_screens/grand_prix_win.cpp:323
 msgid "You completed the Grand Prix!"
 msgstr "Choilean thu an Grand Prix!"
 
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
-msgstr ""
+msgstr "Ceangail meur-chlàr no pada-geama ris airson modh ioma-chluicheadair le sgrìn sgoilte"
 
 #: src/states_screens/kart_selection.cpp:912
 #: src/states_screens/kart_selection.cpp:1595
@@ -5046,34 +5079,34 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr "A h-uile duine:\nBrùth air a’ phutan “Tagh” gus pàirt a ghabhail sa gheama"
 
-#: src/states_screens/main_menu_screen.cpp:258
+#: src/states_screens/main_menu_screen.cpp:260
 msgid "Would you like to play the tutorial of the game?"
-msgstr ""
+msgstr "Am bu toigh leat oideachadh a’ gheama a chluiche?"
 
-#: src/states_screens/main_menu_screen.cpp:556
+#: src/states_screens/main_menu_screen.cpp:558
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Chan urrainn dhut cluich air loidhne gun inntrigeadh gun eadar-lìon. Ma tha thu airson cluich air loidhne, rach gu clàr-taice nan roghainnean is cuir cromag ri “Ceangail ris an eadar-lìon”."
 
-#: src/states_screens/main_menu_screen.cpp:571
+#: src/states_screens/main_menu_screen.cpp:573
 msgid ""
 "You can not download addons without internet access. If you want to download"
 " addons, go in the options menu, and check \"Connect to the Internet\"."
 msgstr "Chan urrainn dhut tuilleadan a luchdadh a-nuas gun inntrigeadh gun eadar-lìon. Ma tha thu airson tuilleadain a luchdadh a-nuas, rach gu clàr-taice nan roghainnean is cuir cromag ri “Ceangail ris an eadar-lìon”."
 
-#: src/states_screens/main_menu_screen.cpp:579
+#: src/states_screens/main_menu_screen.cpp:581
 msgid ""
 "You can not download addons without internet access. If you want to download addons, go in the options menu, and check \"Connect to the Internet\".\n"
 "\n"
 "You can however delete already downloaded addons."
 msgstr "Chan urrainn dhut tuilleadan a luchdadh a-nuas gun inntrigeadh gun eadar-lìon. Ma tha thu airson tuilleadain a luchdadh a-nuas, rach gu clàr-taice nan roghainnean is cuir cromag ri “Ceangail ris an eadar-lìon”. Gidheadh, ’s urrainn dhut tuilleadain a luchdaich thu a-nuas cheana a sguabadh às."
 
-#: src/states_screens/main_menu_screen.cpp:615
+#: src/states_screens/main_menu_screen.cpp:617
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Chaidh mòideil nan tuilleadan a chur à comas ann an sgrìn nan roghainnean"
 
-#: src/states_screens/main_menu_screen.cpp:627
+#: src/states_screens/main_menu_screen.cpp:629
 msgid "Please wait while the add-ons are loading"
 msgstr "Fuirich ort fhad ’s a tha tuilleadain ’gan luchdadh"
 
@@ -5119,7 +5152,7 @@ msgstr "Amhairc"
 
 #: src/states_screens/online/networking_lobby.cpp:198
 msgid "Install addon"
-msgstr ""
+msgstr "Stàlaich tuilleadan"
 
 #: src/states_screens/online/networking_lobby.cpp:337
 #, c-format
@@ -5343,12 +5376,12 @@ msgstr "Chan eil fhios"
 #. I18N: Message shown to user if no IPv4 detected by STK
 #: src/states_screens/online/server_selection.cpp:315
 msgid "No IPv4 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "Cha do mhothaich sinn do IPv4, dh’fhaoidte nach urrainn dhut ceangal ri frithealaichean."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
 #: src/states_screens/online/server_selection.cpp:317
 msgid "No IPv6 detected, you may not be able to join any servers."
-msgstr ""
+msgstr "Cha do mhothaich sinn do IPv6, dh’fhaoidte nach urrainn dhut ceangal ri frithealaichean."
 
 #: src/states_screens/online/server_selection.cpp:417
 msgid "No server is available."
@@ -5530,7 +5563,7 @@ msgstr "A bheil thu cinnteach gu bheil thu airson sguabadh às dhan rèiteachadh
 
 #: src/states_screens/options/options_screen_device.cpp:637
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr ""
+msgstr "Cuir a-steach ainm air an rèiteachadh ùr no fàg bàn e airson tilleadh dhan luach tùsail."
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -5562,7 +5595,7 @@ msgstr "Uidheam suathaidh"
 #. I18N: In the input configuration screen, help for touch device
 #: src/states_screens/options/options_screen_input.cpp:205
 msgid "Tap on a device to configure it"
-msgstr ""
+msgstr "Thoir gnogag air uidheam gus a rèiteachadh"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5592,12 +5625,12 @@ msgstr "Meadhanaichte"
 #. I18N: In the UI options, splitscreen_method in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:117
 msgid "Vertical"
-msgstr ""
+msgstr "Inghearach"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:119
 msgid "Horizontal"
-msgstr ""
+msgstr "Còmhnard"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:130
@@ -5624,20 +5657,7 @@ msgstr "Mòr"
 msgid "Very large"
 msgstr "Glè mhòr"
 
-#. I18N: custom camera setting
-#. I18N: custom video settings
-#: src/states_screens/options/options_screen_ui.cpp:360
-#: src/states_screens/options/options_screen_video.cpp:489
-#: src/states_screens/options/options_screen_video.cpp:520
-msgid "Custom"
-msgstr "Gnàthaichte"
-
-#. I18N: In the UI options, splitscreen_method position in the race UI
-#: src/states_screens/options/options_screen_ui.cpp:364
-msgid "Drone chase"
-msgstr ""
-
-#: src/states_screens/options/options_screen_ui.cpp:537
+#: src/states_screens/options/options_screen_ui.cpp:500
 msgid ""
 "Speedrun mode can only be enabled if the game has not been closed since the launch of the story mode.\n"
 "\n"
@@ -5647,110 +5667,110 @@ msgid ""
 msgstr "Cha ghabh modh an ruith luaith a chur an comas ach mura deach an geama a dhùnadh on àm a chaidh am modh sgeulachd a thòiseachadh.\n\nCha bhi an tìmear dligheach tuilleadh ma dhùineas tu an geama mus deach am modh sgeulachd a choileanadh.\n\nAirson modh an ruith luaith a chleachdadh, tagh pròifil ùr."
 
 #. I18N: In the video options, maximum frame per second
-#: src/states_screens/options/options_screen_video.cpp:220
+#: src/states_screens/options/options_screen_video.cpp:236
 msgid "Maximum FPS"
-msgstr ""
+msgstr "FPS as motha"
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
-#: src/states_screens/options/options_screen_video.cpp:228
+#: src/states_screens/options/options_screen_video.cpp:244
 msgid "Full"
 msgstr "Slàn"
 
 #. I18N: in graphical options. The \n is a newline character, place it where
 #. appropriate, two can be used if required.
-#: src/states_screens/options/options_screen_video.cpp:234
+#: src/states_screens/options/options_screen_video.cpp:250
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
 msgstr "Sparraidh Sioncronachadh-V air a’ chairt grafaigeachd gun nach solar i frèam ùr\nach nuair a bhios am monatair deis gus a thaisbeanadh."
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:237
+#: src/states_screens/options/options_screen_video.cpp:253
 msgid "Full: one frame per monitor refresh"
 msgstr "Slàn: seall frèam le gach ath-nuadhachadh a’ mhonatair"
 
 #. I18N: in graphical options.
-#: src/states_screens/options/options_screen_video.cpp:239
+#: src/states_screens/options/options_screen_video.cpp:255
 msgid "Vsync will not work if your drivers don't support it."
 msgstr "Chan obraich Sioncronachadh-V mura cuir na draibhearan agad taic ris."
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:555
+#: src/states_screens/options/options_screen_video.cpp:625
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "Èifeachdan mìre: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:561
+#: src/states_screens/options/options_screen_video.cpp:631
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "Pearsachan beòthaichte: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:564
+#: src/states_screens/options/options_screen_video.cpp:634
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "Solasan innsgineach: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:567
+#: src/states_screens/options/options_screen_video.cpp:637
 #, c-format
 msgid "Light scattering: %s"
 msgstr "Sgapadh an t-soillseachaidh: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:570
+#: src/states_screens/options/options_screen_video.cpp:640
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "Anti-aliasing: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:573
+#: src/states_screens/options/options_screen_video.cpp:643
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "Ambient occlusion: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:577
+#: src/states_screens/options/options_screen_video.cpp:647
 #, c-format
 msgid "Shadows: %s"
 msgstr "Sgàilean: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:579
+#: src/states_screens/options/options_screen_video.cpp:649
 #, c-format
 msgid "Shadows: %i"
 msgstr "Sgàilean: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:582
+#: src/states_screens/options/options_screen_video.cpp:652
 #, c-format
 msgid "Bloom: %s"
 msgstr "Bloom: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:586
+#: src/states_screens/options/options_screen_video.cpp:656
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "Riomball (oir-loidhnichean): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:590
+#: src/states_screens/options/options_screen_video.cpp:660
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "Cas-chairbe (gathan dhè): %s"
 
-#: src/states_screens/options/options_screen_video.cpp:595
+#: src/states_screens/options/options_screen_video.cpp:665
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "Càileachd reandaraidh nan dealbhan: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:614
+#: src/states_screens/options/options_screen_video.cpp:684
 #, c-format
 msgid "Motion blur: %s"
 msgstr "Sgleò gluasaid: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:618
+#: src/states_screens/options/options_screen_video.cpp:688
 #, c-format
 msgid "Depth of field: %s"
 msgstr "Doimhne an raoin: %s"
@@ -5806,7 +5826,7 @@ msgstr "TADHAL!"
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:78
-#: src/states_screens/race_result_gui.cpp:318
+#: src/states_screens/race_result_gui.cpp:366
 msgid "Waiting for others"
 msgstr "A’ feitheamh air càch"
 
@@ -5819,7 +5839,7 @@ msgstr "A’ feitheamh air an fhrithealaiche"
 #: src/states_screens/race_gui_base.cpp:637
 #, c-format
 msgid "\"%s\""
-msgstr ""
+msgstr "“%s”"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
@@ -5849,7 +5869,7 @@ msgstr "Cha deach an dùbhlan leat"
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:540
 msgid "Press podium icon to start tutorial"
-msgstr ""
+msgstr "Brùth air ìomhaigheag an àrd-ùrlair airson an t-oideachadh a chluich"
 
 #: src/states_screens/race_gui_overworld.cpp:546
 msgid "Press fire to start the tutorial"
@@ -5859,91 +5879,91 @@ msgstr "Briog air “loisg” gus an t-oideachadh a thòiseachadh"
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:622
 msgid "Press podium icon to start the challenge"
-msgstr ""
+msgstr "Brùth air ìomhaigheag an àrd-ùrlair airson an dùbhlan a chluich"
 
 #: src/states_screens/race_gui_overworld.cpp:628
 msgid "Press fire to start the challenge"
 msgstr "Brùth air loisg gus an dùbhlan a thòiseachadh"
 
-#: src/states_screens/race_result_gui.cpp:198
+#: src/states_screens/race_result_gui.cpp:242
 msgid "Quit the server"
 msgstr "Fàg am frithealaiche"
 
-#: src/states_screens/race_result_gui.cpp:213
+#: src/states_screens/race_result_gui.cpp:257
 msgid "You completed challenges!"
 msgstr "Choilean thu dùbhlain!"
 
-#: src/states_screens/race_result_gui.cpp:236
+#: src/states_screens/race_result_gui.cpp:280
 msgid "Abort Grand Prix"
 msgstr "Sguir dhen Grand Prix"
 
-#: src/states_screens/race_result_gui.cpp:256
+#: src/states_screens/race_result_gui.cpp:300
 msgid "Restart"
 msgstr "Ath-thòisich"
 
-#: src/states_screens/race_result_gui.cpp:263
+#: src/states_screens/race_result_gui.cpp:307
 msgid "Back to challenge selection"
 msgstr "Till dha thaghadh nan dùbhlan"
 
-#: src/states_screens/race_result_gui.cpp:271
+#: src/states_screens/race_result_gui.cpp:315
 msgid "Race against the new ghost replay"
 msgstr "Dèan rèis an aghaidh ath-chluiche taibhse ùr"
 
-#: src/states_screens/race_result_gui.cpp:279
+#: src/states_screens/race_result_gui.cpp:323
 msgid "Back to the menu"
 msgstr "Till dhan chlàr-taice"
 
-#: src/states_screens/race_result_gui.cpp:444
+#: src/states_screens/race_result_gui.cpp:492
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "A bheil thu cinnteach gu bheil thu airson sgur dhen Grand Prix?"
 
-#: src/states_screens/race_result_gui.cpp:541
-#: src/states_screens/race_result_gui.cpp:1350
+#: src/states_screens/race_result_gui.cpp:590
+#: src/states_screens/race_result_gui.cpp:1402
 msgid "Red Team Wins"
 msgstr "Bhuannaich an sgioba dearg"
 
-#: src/states_screens/race_result_gui.cpp:543
-#: src/states_screens/race_result_gui.cpp:1354
+#: src/states_screens/race_result_gui.cpp:592
+#: src/states_screens/race_result_gui.cpp:1406
 msgid "Blue Team Wins"
 msgstr "Bhuannaich an sgioba gorm"
 
-#: src/states_screens/race_result_gui.cpp:545
-#: src/states_screens/race_result_gui.cpp:1359
+#: src/states_screens/race_result_gui.cpp:594
+#: src/states_screens/race_result_gui.cpp:1411
 msgid "It's a draw"
 msgstr "Geama co-ionnan"
 
-#: src/states_screens/race_result_gui.cpp:776
-#: src/states_screens/race_result_gui.cpp:1204
+#: src/states_screens/race_result_gui.cpp:827
+#: src/states_screens/race_result_gui.cpp:1255
 msgid "Eliminated"
 msgstr "Air a ruaig"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1427
-#: src/states_screens/race_result_gui.cpp:1488
+#: src/states_screens/race_result_gui.cpp:1481
+#: src/states_screens/race_result_gui.cpp:1543
 msgid "(Own Goal)"
 msgstr "(fèin-tadhal)"
 
-#: src/states_screens/race_result_gui.cpp:1566
+#: src/states_screens/race_result_gui.cpp:1622
 #, c-format
 msgid "Track %i/%i"
 msgstr "Slighe %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1650
+#: src/states_screens/race_result_gui.cpp:1706
 msgid "Grand Prix progress:"
 msgstr "Adhartas a’ Grand Prix:"
 
-#: src/states_screens/race_result_gui.cpp:1696
+#: src/states_screens/race_result_gui.cpp:1752
 msgid "Highscores"
 msgstr "Sgòran àrda"
 
-#: src/states_screens/race_result_gui.cpp:1799
+#: src/states_screens/race_result_gui.cpp:1855
 #, c-format
 msgid "Best lap time: %s"
 msgstr "A’ chuairt as fhearr: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1813
+#: src/states_screens/race_result_gui.cpp:1869
 #, c-format
 msgid "by %s"
 msgstr "le %s"
@@ -5980,7 +6000,7 @@ msgstr "Dèan rèis an aghaidh cartaichean taibhse agus feuch an dèan thu a’ 
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118
 msgid "Press red or blue soccer icon to change team"
-msgstr ""
+msgstr "Brùth air ìomhaigheag dhearg no ghrom a’ bhuill-choise airson dol dhan sgioba eile"
 
 #. I18N: when showing who is the author of track '%s'
 #. I18N: (place %s where the name of the author should appear)
@@ -6082,13 +6102,13 @@ msgstr "Tog bogsaichean tìodhlaic is loisg an t-arm le brùthadh air ìomhaighe
 msgid ""
 "Press <%s> to look behind.\n"
 "Fire the weapon with <%s> while pressing <%s> to fire behind!"
-msgstr ""
+msgstr "Brùth air <%s> gus coimhead air do chùlaibh.\nLoisg an t-arm le <%s> fhad ’s a tha thu a’ brùthadh <%s> gus losgadh gun chùlaibh!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:88
 msgid ""
 "Press the mirror icon to look behind.\n"
 "Fire the weapon behind by holding the mirror icon and then swiping to the bowling icon!"
-msgstr ""
+msgstr "Brùth air ìomhaigheag an sgàthain airson coimhead air ais.\nLoisg an t-arm an comhair a chùil le brùthadh air ìomhaigheag an sgàthain ’s a’ grad-shlaighdeadh gu ìomhaigheag a’ bhobhlaidh!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:98
 #, c-format
@@ -6117,13 +6137,13 @@ msgstr "Oich! Nuair a bhios tu ann an staing, brùth air ìomhaigheag an eòin g
 msgid ""
 "Accelerate and press the <%s> key while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Luathaich is brùth air an iuchair <%s> gus sleamhnachadh.\nMa nì thu sleamhnachadh greiseag, tionndaidhidh tu nas luaithe ann an lùban casa."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:145
 msgid ""
 "Accelerate and press the skid icon while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr ""
+msgstr "Luathaich is brùth air ìomhaigheag an sleamhnachaidh gus sleamhnachadh.\nMa nì thu sleamhnachadh greiseag, tionndaidhidh tu nas luaithe ann an lùban casa."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:156
 msgid ""
@@ -6139,13 +6159,13 @@ msgstr "Tha thu ullamh gus rèis a dhraibheadh a-nis. Guma math a thèid leat!"
 #. description in Google Play
 #: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
 msgid "A 3D open-source kart racing game"
-msgstr ""
+msgstr "Geama rèisidh chartaichean 3D le bun-tùs fosgailte"
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
 #: supertuxkart.desktop:11
 msgid "tux;game;race;"
-msgstr ""
+msgstr "tux;game;race;geama;rèis;rèiseadh;"
 
 #: supertuxkart.appdata.xml:8
 msgid ""
@@ -6153,7 +6173,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr ""
+msgstr "Cartaichean. Naidhtreo. Steall ort! ’S e geama rèisidh 3D le bun-tùs fosgailte a th’ ann an SuperTxKart le pailteas phearsachan, slighean is modhan cluiche. Tha sinn ag amas geama a chruthachadh a tha spòrsail seach fìor-riochdail ’s a bhios tlachdmhor do chluicheadairean de gach aois."
 
 #: supertuxkart.appdata.xml:11
 msgid ""
@@ -6163,7 +6183,7 @@ msgid ""
 " the palm trees on the beach, watching the other karts overtake you. But "
 "don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
 "cakes thrown by your opponents."
-msgstr ""
+msgstr "Fidir mìorbhailean saoghail fon uisge no draibh tro dhlùth-choille Val Verde is tadhail air Teampall Còco cliùiteach. Dèan rèis fon talamh no ann an soitheach-fànais, air tuathanas no planaid neònach. No gabh air do shocair fo chraoibhan-pailm air an tràigh, a’ coimhead air na cartaichean eile a’ dol seachad ort. Ach na ith na bananathan! Thuir an aire air na bàlaichean bobhlaireachd, loinidean, deòghlain, is cèicichean a thilgeas na co-fharpaisich."
 
 #: supertuxkart.appdata.xml:14
 msgid ""
@@ -6172,29 +6192,29 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, race online against players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "’S urrainn dhut aon rèis a-mhàin a dhèanamh an aghaidh chartaichean eile, feuchainn ri iomadh Grand Prix, feuchainn am bi thu nas luaithe na càch ann an geama an aghaidh na h-ùine agad fhèin, cluich ann am modh còmhraige an aghaidh a’ choimpiutair no do charaidean is mòran a bharrachd! Airson dùbhlan nas motha, cluich air loidhne an aghaidh daoine o fheadh an t-saoghail is dearbh na sgilean rèisidh agad!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."
-msgstr ""
+msgstr "Tha an geama seo saor ’s an-asgaidh ’s gun sanasachd."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
 "This is an unstable version of SuperTuxKart that contains latest "
 "improvements. It is released mainly for testing, to make stable STK as good "
 "as possible."
-msgstr ""
+msgstr "Seo tionndadh neo-sheasmhach de SuperTuxKart aig a bheil na leasachaidhean as ùire. Sgaoilidh sinn e ach an gabh a chur fo dheuchainn ach am bi an tionndadh seasmhach de SuperTuxKart cho math ’s a ghabhas an uairsin."
 
 #: supertuxkart.appdata.xml:23
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr ""
+msgstr "’S urrainn dhut an dà chuid an tionndadh seo ’s an tionndadh seasmhach a stàladh air an uidheam aig an aon àm."
 
 #: supertuxkart.appdata.xml:26
 msgid "If you need more stability, consider using the stable version: %s"
-msgstr ""
+msgstr "Nam bu toigh leat tionndadh nas seasmhaiche dheth, beachdaich air an tionndadh seasmhach: %s"
 
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
-msgstr ""
+msgstr "Sgioba SuperTuxKart"
