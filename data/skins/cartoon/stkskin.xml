@@ -84,7 +84,7 @@ all types of ttf.
           color_emoji_ttf="www.ttf"/>
 -->
 <advanced icon_theme="y"
-          normal_ttf="Inter-UI-Black.ttf NotoSansThai-Black.ttf NotoSansHebrew-Black.ttf NotoSansArabicUI-Black.ttf" />
+          normal_ttf="Inter-UI-Black.ttf NotoSansThai-Black.ttf NotoSansHebrew-Black.ttf NotoSansArabicUI-Black.ttf NotoSansMalayalam-Bold.ttf" />
 
 <!--  Stateless -->
 <element type="background" image="background.jpg" />
