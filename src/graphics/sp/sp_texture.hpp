@@ -150,7 +150,7 @@ private:
                               const std::string& cache_location);
     // ------------------------------------------------------------------------
     std::vector<std::pair<core::dimension2du, unsigned> >
-                       compressTexture(std::shared_ptr<video::IImage> texture);
+                      compressTexture(std::shared_ptr<video::IImage>& texture);
     // ------------------------------------------------------------------------
     bool useTextureCache(const std::string& full_path, std::string* cache_loc);
     // ------------------------------------------------------------------------

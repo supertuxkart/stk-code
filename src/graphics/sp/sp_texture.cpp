@@ -47,7 +47,7 @@ extern "C"
 #include <numeric>
 
 #if !defined(MOBILE_STK)
-static const uint8_t CACHE_VERSION = 1;
+static const uint8_t CACHE_VERSION = 2;
 #endif
 
 namespace SP
@@ -762,7 +762,7 @@ void SPTexture::squishCompressImage(uint8_t* rgba, int width, int height,
 
 // ----------------------------------------------------------------------------
 std::vector<std::pair<core::dimension2du, unsigned> >
-               SPTexture::compressTexture(std::shared_ptr<video::IImage> image)
+               SPTexture::compressTexture(std::shared_ptr<video::IImage>& image)
 {
     std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes;
 
@@ -782,54 +782,43 @@ std::vector<std::pair<core::dimension2du, unsigned> >
     }
 
     const unsigned tc_flag = squish::kDxt5 | stk_config->m_tc_quality;
-    const unsigned compressed_size = squish::GetStorageRequirements(
-        mipmap_sizes[0].first.Width, mipmap_sizes[0].first.Height,
-        tc_flag);
-    mipmap_sizes[0].second = compressed_size;
-    uint8_t* tmp = new uint8_t[image->getDimension().getArea() * 4]();
-    uint8_t* ptr_loc = tmp + compressed_size;
+    for (auto& size : mipmap_sizes)
+    {
+        size.second = squish::GetStorageRequirements(
+            size.first.Width, size.first.Height, tc_flag);
+    }
+    const unsigned total_size = std::accumulate(mipmap_sizes.begin(),
+        mipmap_sizes.end(), 0,
+        [] (const unsigned int previous, const std::pair
+        <core::dimension2du, unsigned>& cur_sizes)
+       { return previous + cur_sizes.second; });
+    video::IImage* c = irr_driver->getVideoDriver()->
+        createImage(video::ECF_A8R8G8B8,core::dimension2du(total_size / 4, 1));
+    assert(c->getReferenceCount() == 1);
+    std::shared_ptr<video::IImage> compressed(c);
 
-    generateHQMipmap(image->lock(), mipmap_sizes, ptr_loc);
+    uint8_t* mips = new uint8_t[image->getDimension().getArea() * 4]();
+    uint8_t* mips_loc = mips;
+    uint8_t* compressed_loc = (uint8_t*)compressed->lock();
     squishCompressImage((uint8_t*)image->lock(),
         mipmap_sizes[0].first.Width, mipmap_sizes[0].first.Height,
-        mipmap_sizes[0].first.Width * 4, tmp, tc_flag);
-    memcpy(image->lock(), tmp, image->getDimension().getArea() * 4);
+        mipmap_sizes[0].first.Width * 4, compressed->lock(), tc_flag);
 
     // Now compress mipmap
-    ptr_loc = (uint8_t*)image->lock();
-    ptr_loc += compressed_size;
+    generateHQMipmap(image->lock(), mipmap_sizes, mips);
+    compressed_loc += mipmap_sizes[0].second;
     for (unsigned mip = 1; mip < mipmap_sizes.size(); mip++)
     {
-        mipmap_sizes[mip].second = squish::GetStorageRequirements(
+        squishCompressImage(mips_loc,
             mipmap_sizes[mip].first.Width, mipmap_sizes[mip].first.Height,
-            tc_flag);
-        squishCompressImage(ptr_loc,
-            mipmap_sizes[mip].first.Width, mipmap_sizes[mip].first.Height,
-            mipmap_sizes[mip].first.Width * 4, tmp, tc_flag);
-        memcpy(ptr_loc, tmp, mipmap_sizes[mip].second);
-        ptr_loc += mipmap_sizes[mip].first.Width *
+            mipmap_sizes[mip].first.Width * 4, compressed_loc, tc_flag);
+        mips_loc += mipmap_sizes[mip].first.Width *
             mipmap_sizes[mip].first.Height * 4;
-    }
-    delete [] tmp;
-
-    if (mipmap_sizes.size() < 3)
-    {
-        return mipmap_sizes;
-    }
-    ptr_loc = (uint8_t*)image->lock();
-    ptr_loc = ptr_loc + compressed_size + mipmap_sizes[1].second;
-    uint8_t* in_memory = (uint8_t*)image->lock() + compressed_size +
-        (mipmap_sizes[1].first.Height * mipmap_sizes[1].first.Width * 4);
-
-    // Adjust for saving the cache
-    for (unsigned mip = 2; mip < mipmap_sizes.size(); mip++)
-    {
-        memcpy(ptr_loc, in_memory, mipmap_sizes[mip].second);
-        ptr_loc += mipmap_sizes[mip].second;
-        in_memory += mipmap_sizes[mip].first.Height *
-            mipmap_sizes[mip].first.Width * 4;
+        compressed_loc += mipmap_sizes[mip].second;
     }
 
+    delete [] mips;
+    image.swap(compressed);
 #endif
     return mipmap_sizes;
 }
