@@ -68,21 +68,21 @@ using namespace irr;
 RaceGUI::RaceGUI()
 {
     m_enabled = true;
-    
+
     if (UserConfigParams::m_artist_debug_mode && UserConfigParams::m_hide_gui)
         m_enabled = false;
 
     initSize();
-    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 && 
+    bool multitouch_enabled = (UserConfigParams::m_multitouch_active == 1 &&
                                irr_driver->getDevice()->supportsTouchDevice()) ||
                                UserConfigParams::m_multitouch_active > 1;
-    
+
     if (multitouch_enabled && UserConfigParams::m_multitouch_draw_gui &&
         RaceManager::get()->getNumLocalPlayers() == 1)
     {
         m_multitouch_gui = new RaceGUIMultitouch(this);
     }
-    
+
     calculateMinimapSize();
 
     m_is_tutorial = (RaceManager::get()->getTrackName() == "tutorial");
@@ -192,29 +192,29 @@ void RaceGUI::calculateMinimapSize()
     }
 
     // Originally m_map_height was 100, and we take 480 as minimum res
-    float scaling = std::min(irr_driver->getFrameSize().Height,  
+    float scaling = std::min(irr_driver->getFrameSize().Height,
                              irr_driver->getFrameSize().Width) / 480.0f;
     const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
     const float top_margin = 3.5f * m_font_height;
-    
+
     // Check if we have enough space for minimap when touch steering is enabled
     if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
     {
-        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height - 
+        const float map_bottom = (float)(irr_driver->getActualScreenSize().Height -
                                          m_multitouch_gui->getHeight());
-        
+
         if ((map_size + 20.0f) * scaling > map_bottom - top_margin)
         {
             scaling = (map_bottom - top_margin) / (map_size + 20.0f);
         }
-        
-        // Use some reasonable minimum scale, because minimap size can be 
+
+        // Use some reasonable minimum scale, because minimap size can be
         // changed during the race
         scaling = std::max(scaling,
-                           irr_driver->getActualScreenSize().Height * 0.15f / 
+                           irr_driver->getActualScreenSize().Height * 0.15f /
                            (map_size + 20.0f));
     }
-    
+
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
     m_minimap_ai_size       = (int)( stk_config->m_minimap_ai_icon     * scaling);
@@ -225,9 +225,9 @@ void RaceGUI::calculateMinimapSize()
     if ((UserConfigParams::m_minimap_display == 1 && /*map on the right side*/
        RaceManager::get()->getNumLocalPlayers() == 1) || m_multitouch_gui)
     {
-        m_map_left          = (int)(irr_driver->getActualScreenSize().Width - 
+        m_map_left          = (int)(irr_driver->getActualScreenSize().Width -
                                                         m_map_width - 10.0f*scaling);
-        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 - 
+        m_map_bottom        = (int)(3*irr_driver->getActualScreenSize().Height/4 -
                                                         m_map_height);
     }
     else if ((UserConfigParams::m_minimap_display == 3 && /*map on the center of the screen*/
@@ -259,9 +259,9 @@ void RaceGUI::calculateMinimapSize()
     }
     else if (m_multitouch_gui != NULL  && !m_multitouch_gui->isSpectatorMode())
     {
-        m_map_left = (int)((irr_driver->getActualScreenSize().Width - 
+        m_map_left = (int)((irr_driver->getActualScreenSize().Width -
                                                         m_map_width) * 0.95f);
-        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height - 
+        m_map_bottom = (int)(irr_driver->getActualScreenSize().Height -
                                                     top_margin - m_map_height);
     }
 }  // calculateMinimapSize
@@ -364,7 +364,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     if (!m_enabled) return;
 
     RaceGUIBase::renderPlayerView(camera, dt);
-    
+
     const core::recti &viewport = camera->getViewport();
 
     core::vector2df scaling = camera->getScaling();
@@ -383,7 +383,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     {
         scaling *= float(viewport.getWidth()) / 800.0f; // scale race GUI along screen size
     }
-    
+
     drawAllMessages(kart, viewport, scaling);
 
     if(!World::getWorld()->isRacePhase()) return;
@@ -495,7 +495,7 @@ void RaceGUI::drawLiveDifference()
     float live_difference = linearworld->getLiveTimeDifference();
 
     int timer_width = m_small_precise_timer_width;
-    
+
     // 59.9995 is the smallest number of seconds that could get rounded to 1 minute
     // when rounding at the closest ms
     if (fabsf(live_difference) >= 59.9995f)
@@ -544,11 +544,11 @@ void RaceGUI::drawGlobalMiniMap()
     //TODO : exception for some game modes ? Another option "Hidden in race, shown in battle ?"
     if (UserConfigParams::m_minimap_display == 2) /*map hidden*/
         return;
-    
+
     if (m_multitouch_gui != NULL && !m_multitouch_gui->isSpectatorMode())
     {
         float max_scale = 1.3f;
-                                                      
+
         if (UserConfigParams::m_multitouch_scale > max_scale)
             return;
     }
@@ -646,7 +646,7 @@ void RaceGUI::drawGlobalMiniMap()
             dynamic_cast<const SpareTireAI*>(kart->getController());
 
         // don't draw eliminated kart
-        if (kart->isEliminated() && !(sta && sta->isMoving())) 
+        if (kart->isEliminated() && !(sta && sta->isMoving()))
             continue;
         if (!kart->isVisible())
             continue;
@@ -673,16 +673,16 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
 
         bool has_teams = (ctf_world || soccer_world);
-        
+
         // Highlight the player icons with some background image.
         if ((has_teams || is_local) && m_icons_frame != NULL)
         {
             video::SColor color = kart->getKartProperties()->getColor();
-            
+
             if (has_teams)
             {
                 KartTeam team = world->getKartTeam(kart->getWorldKartId());
-                
+
                 if (team == KART_TEAM_RED)
                 {
                     color = video::SColor(255, 200, 0, 0);
@@ -692,7 +692,7 @@ void RaceGUI::drawGlobalMiniMap()
                     color = video::SColor(255, 0, 0, 200);
                 }
             }
-                                  
+
             video::SColor colors[4] = {color, color, color, color};
 
             const core::rect<s32> rect(core::position2d<s32>(0,0),
@@ -801,7 +801,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     // They are calculated from gauge_full.png
     // They are further than the nitrometer farther position because
     // the lines between them would otherwise cut through the outside circle.
-    
+
     const int vertices_count = 9;
 
     core::vector2df position[vertices_count];
@@ -869,7 +869,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
         video::S3DVertex vertices[vertices_count];
 
-        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
+        unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      coin_target, gauge_width, gauge_height, offset);
 
         drawMeterTexture(m_gauge_goal, vertices, count);
@@ -947,7 +947,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
-    
+
     int font_height = font->getDimension(L"X").Height;
     font->setScale((float)meter_height / font_height * 0.4f * scale);
     std::ostringstream oss;
@@ -966,7 +966,8 @@ void RaceGUI::drawRank(const AbstractKart *kart,
 }   // drawRank
 
 //-----------------------------------------------------------------------------
-/** Draws the speedometer, the display of available nitro, and
+/** Draws the speedometer, the display of available nitro,
+ *  a digital speedometer (above the regular one, if enabled), and
  *  the rank of the kart (inside the speedometer).
  *  \param kart The kart for which to show the data.
  *  \param viewport The viewport to use.
@@ -1088,33 +1089,75 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
         }
     }
 
-    // Draw speed in numbers, above the graphical speedometer (does not use special digit font)
-    core::recti posM, posI;
+    // Draw speed in numbers, above the graphical speedometer, if enabled
+    if ((UserConfigParams::m_units > 0))
+    {
+        gui::ScalableFont* font = GUIEngine::getFont();
+        static video::SColor color = video::SColor(255, 255, 255, 255);
+        font->setBlackBorder(true);
 
-    posM.UpperLeftCorner = core::vector2di(int(offset.X + 0.0f*meter_width),
-                                          int(offset.Y - 1.32f*meter_height));
-    posM.LowerRightCorner = core::vector2di(int(offset.X + meter_width),
-                                           int(offset.Y - 1.3f*meter_height));
-    posI.UpperLeftCorner = core::vector2di(int(offset.X + 0.0f*meter_width),
-                                          int(offset.Y - 1.17f*meter_height));
-    posI.LowerRightCorner = core::vector2di(int(offset.X + meter_width),
-                                           int(offset.Y - 1.15f*meter_height));
+        std::ostringstream speedOSS;
+        speedOSS.setf(std::ios::fixed);
+        speedOSS.precision(1);
 
-    gui::ScalableFont* font = GUIEngine::getFont();
+        float speedKM = speed * 3.6; // Speed in kilometers per hour
+        float speedFT = speed * 3.2808; // Speed in feet per second
+        float speedMI = speed * 2.2369; // Speed in miles per hour
 
-    static video::SColor color = video::SColor(255, 255, 255, 255);
+        if ((UserConfigParams::m_units >= 1) && (UserConfigParams::m_units <= 2))
+        {
+            core::recti digiPos;
+            digiPos.UpperLeftCorner = core::vector2di(int(offset.X + 0.0f*meter_width),
+                                                  int(offset.Y - 1.17f*meter_height));
+            digiPos.LowerRightCorner = core::vector2di(int(offset.X + meter_width),
+                                                   int(offset.Y - 1.15f*meter_height));
 
-    char speedM[256], speedI[256];
-    // There is no setting to change units, so display both metric (on top) and imperial units (on bottom)
-    sprintf(speedM, "%.1fm/s %.1fkm/h", speed, speed*3.6);
-    sprintf(speedI, "%.1fft/s %.1fmph", speed*3.2808, speed*2.2369);
+            if (UserConfigParams::m_units == 1) // Metric only
+            {
+                speedOSS << speed << "m/s | " << speedKM << "km/h";
+            }
+            else if (UserConfigParams::m_units == 2) // Imperial only
+            {
+                speedOSS << speedFT << "ft/s | " << speedMI << "mph";
+            }
 
-    font->setBlackBorder(true);
-    font->draw(core::stringw(speedM).c_str(), posM, color);
-    font->draw(core::stringw(speedI).c_str(), posI, color);
-    font->setBlackBorder(false);
+            font->draw(speedOSS.str().c_str(), digiPos, color);
+        }
+        else if ((UserConfigParams::m_units >= 3) && (UserConfigParams::m_units <= 4))
+        {
+            core::recti digiPosT, digiPosB;
+            digiPosT.UpperLeftCorner = core::vector2di(int(offset.X + 0.0f*meter_width),
+                                                  int(offset.Y - 1.32f*meter_height));
+            digiPosT.LowerRightCorner = core::vector2di(int(offset.X + meter_width),
+                                                   int(offset.Y - 1.3f*meter_height));
+            digiPosB.UpperLeftCorner = core::vector2di(int(offset.X + 0.0f*meter_width),
+                                                  int(offset.Y - 1.17f*meter_height));
+            digiPosB.LowerRightCorner = core::vector2di(int(offset.X + meter_width),
+                                                   int(offset.Y - 1.15f*meter_height));
 
-    unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count, 
+            std::ostringstream speed2OSS;
+            speed2OSS.setf(std::ios::fixed);
+            speed2OSS.precision(1);
+
+            if (UserConfigParams::m_units == 3) // Both (Metric on top)
+            {
+                speedOSS << speed << "m/s | " << speedKM << "km/h";
+                speed2OSS << speedFT << "ft/s | " << speedMI << "mph";
+            }
+            else if (UserConfigParams::m_units == 4) // Both (Imperial on top)
+            {
+                speedOSS << speedFT << "ft/s | " << speedMI << "mph";
+                speed2OSS << speed << "m/s | " << speedKM << "km/h";
+            }
+
+            font->draw(speedOSS.str().c_str(), digiPosT, color);
+            font->draw(speed2OSS.str().c_str(), digiPosB, color);
+        }
+
+        font->setBlackBorder(false);
+    }
+
+    unsigned int count = computeVerticesForMeter(position, threshold, vertices, vertices_count,
                                                      speed_ratio, meter_width, meter_height, offset);
 
 
@@ -1177,7 +1220,7 @@ void RaceGUI::drawMeterTexture(video::ITexture *meter_texture, video::S3DVertex 
  *  If the measure is between the first and second thresholds, the function will create a quad ABCw,
  *  with w varying in the same way than v.
  *  If the measure exceds the higher threshold, the function will return the poly ABCDE.
- *  
+ *
  *  \param position The relative positions of the vertices.
  *  \param threshold The thresholds at which the variable point switch from a segment to the next.
  *                   The size of this array should be smaller by two than the position array.
@@ -1261,7 +1304,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     World *world = World::getWorld();
 
     core::recti pos;
-    
+
     pos.UpperLeftCorner.Y = viewport.UpperLeftCorner.Y + m_font_height;
 
     // If the time display in the top right is in this viewport,
@@ -1269,7 +1312,7 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     // displayed under the time.
     if (viewport.UpperLeftCorner.Y == 0 &&
         viewport.LowerRightCorner.X == (int)(irr_driver->getActualScreenSize().Width) &&
-        !RaceManager::get()->getIfEmptyScreenSpaceExists()) 
+        !RaceManager::get()->getIfEmptyScreenSpaceExists())
     {
         pos.UpperLeftCorner.Y = irr_driver->getActualScreenSize().Height*12/100;
     }
