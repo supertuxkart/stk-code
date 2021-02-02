@@ -2218,7 +2218,7 @@ int main(int argc, char *argv[])
                 if (!android_tv && irr_driver->getDevice()->supportsTouchDevice())
                 {
                     InitAndroidDialog* init_android = new InitAndroidDialog(
-                                                                    0.6f, 0.6f);
+                                                                    0.8f, 0.8f);
                     GUIEngine::DialogQueue::get()->pushDialog(init_android);
                 }
             }
