@@ -29,6 +29,7 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/referee.hpp"
+#include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -573,7 +574,7 @@ void RaceGUIBase::renderPlayerView(const Camera *camera, float dt)
     const AbstractKart* kart = camera->getKart();
     if(!kart) return;
     
-    if (m_multitouch_gui != NULL)
+    if (m_multitouch_gui != NULL && !GUIEngine::ModalDialog::isADialogActive())
     {
         m_multitouch_gui->draw(kart, viewport, scaling);
     }

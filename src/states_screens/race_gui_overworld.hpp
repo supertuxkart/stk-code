@@ -105,7 +105,6 @@ private:
 
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
-    void drawTrophyPoints      ();
 
 public:
 
@@ -128,7 +127,7 @@ public:
                        { return core::dimension2du(m_map_width, m_map_height); }
     virtual void calculateMinimapSize();
     virtual void initSize();
-
+    void drawTrophyPoints();
 };   // RaceGUI
 
 #endif

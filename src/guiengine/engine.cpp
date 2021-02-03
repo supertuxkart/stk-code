@@ -683,7 +683,7 @@ namespace GUIEngine
 #include "modes/demo_world.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
-#include "states_screens/race_gui_base.hpp"
+#include "states_screens/race_gui_overworld.hpp"
 #include "tips/tips_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
@@ -1335,6 +1335,13 @@ namespace GUIEngine
             if (rg != NULL) rg->renderGlobal(elapsed_time);
         }
 
+        if (gamestate == GAME && ModalDialog::isADialogActive() && World::getWorld())
+        {
+            // Show trophy points when paused
+            RaceGUIOverworld* rgo = dynamic_cast<RaceGUIOverworld*>(World::getWorld()->getRaceGUI());
+            if (rgo && rgo->getMultitouchGUI())
+                rgo->drawTrophyPoints();
+        }
         if (gamestate != GAME || is_loading)
         {
             Screen* screen = getCurrentScreen();

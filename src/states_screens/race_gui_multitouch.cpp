@@ -34,7 +34,6 @@ using namespace irr;
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
-#include "modes/world.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "states_screens/race_gui_base.hpp"
 
