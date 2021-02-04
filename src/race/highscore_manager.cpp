@@ -203,3 +203,48 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType &hig
     m_all_scores.push_back(highscores);
     return highscores;
 }   // getHighscores
+
+// -----------------------------------------------------------------------------
+/*
+ * Deletes a specific high score entry by index.
+ */
+void HighscoreManager::deleteHighscores(int i)
+{
+    m_all_scores.erase(m_all_scores.begin() + i);
+}   // deleteHighscores
+
+// -----------------------------------------------------------------------------
+/*
+ * Deletes all high scores entries.
+ */
+void HighscoreManager::clearHighscores()
+{
+    m_all_scores.clear();
+}   // clearHighscores
+
+// -----------------------------------------------------------------------------
+/*
+ * Returns whether there are no high scores entries recorded or not.
+ */
+bool HighscoreManager::highscoresEmpty()
+{
+    return m_all_scores.empty();
+}   // highscoresEmpty
+
+// -----------------------------------------------------------------------------
+/*
+ * Returns a specific high score entry by index.
+ */
+Highscores* HighscoreManager::getHighscoresAt(int i)
+{
+    return m_all_scores.at(i);
+}   // countHighscores
+
+// -----------------------------------------------------------------------------
+/*
+ * Returns the number of high scores entries.
+ */
+int HighscoreManager::highscoresSize()
+{
+    return m_all_scores.size();
+}   // highscoresSize

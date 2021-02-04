@@ -42,12 +42,12 @@ private:
     std::string m_filename;
     bool        m_can_write;
 
-    void loadHighscores();
     void setFilename();
 
 public:
                 HighscoreManager();
                ~HighscoreManager();
+    void loadHighscores();
     void        saveHighscores();
     Highscores *getHighscores(const Highscores::HighscoreType &highscore_type,
                               int num_karts,
@@ -55,6 +55,11 @@ public:
                               const std::string &trackName,
                               const int number_of_laps,
                               const bool reverse);
+    void deleteHighscores(int i);
+    void clearHighscores();
+    bool highscoresEmpty();
+    Highscores* getHighscoresAt(int i);
+    int highscoresSize();
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

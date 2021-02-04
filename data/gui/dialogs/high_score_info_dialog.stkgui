@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="1%" y="4%" width="98%" height="92%" layout="vertical-row">
+
+        <div width="100%" height="55%" layout="vertical-row">
+            <div width="100%" height="15%" align="center" layout="vertical-row" >
+                <label id="name" width="100%" text_align="center" I18N="High score info action" text="= Top 5 High Scores ="/>
+            </div>
+            <!-- This is filled in programmatically -->
+            <box width="100%" height="85%" align="center" layout="vertical-row" padding="1">
+                <list id="high_score_entries" x="0" y="0" width="100%" height="100%"/>
+            </box>
+        </div>
+
+        <div width="100%" height="45%" layout="horizontal-row">
+            <div width="40%" height="100%" layout="vertical-row">
+                <spacer width="10" height="5%"/>
+                <icon-button proportion="1" width="100%" height="100%" id="track_screenshot" custom_ratio="1.33333"/>
+            </div>
+
+            <div width="60%" height="50%" layout="vertical-row">
+                <spacer width="5" height="45%"/>
+                <div width="95%" height="100%" align="center">
+                    <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
+                        <icon-button id="remove" width="128" height="128"
+                                     icon="gui/icons/remove.png"
+                                     I18N="High score info action" text="Remove" word_wrap="true" />
+                        <icon-button id="remove-all" width="128" height="128"
+                                     icon="gui/icons/bomb_icon.png"
+                                     I18N="High score info action" text="Remove all" word_wrap="true" />
+                        <icon-button id="back" width="128" height="128"
+                                     icon="gui/icons/back.png"
+                                     I18N="High score info action" text="Back" word_wrap="true" />
+                    </buttonbar>
+                </div>
+                <spacer width="10" height="10%"/>
+            </div>
+        </div>
+
+    </div>
+</stkgui>

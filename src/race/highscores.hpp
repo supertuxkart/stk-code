@@ -30,7 +30,7 @@ class XMLNode;
 class UTFWriter;
 
 /**
- *  Represents one highscore entry, i.e. the (atm up to three) highscores
+ *  Represents one highscore entry, i.e. the (atm up to five) highscores
  *  for a particular setting (track, #karts, difficulty etc).
  * \ingroup race
  */
@@ -39,7 +39,6 @@ class Highscores
 public:
     typedef std::string HighscoreType;
 
-private:
     enum {HIGHSCORE_LEN = 5};       // It's a top 5 list
     std::string         m_track;
     HighscoreType       m_highscore_type;
@@ -50,7 +49,7 @@ private:
     std::string         m_kart_name[HIGHSCORE_LEN];
     irr::core::stringw  m_name[HIGHSCORE_LEN];
     float               m_time[HIGHSCORE_LEN];
-public:
+
     /** Creates a new entry
       */
     Highscores (const Highscores::HighscoreType &highscore_type,

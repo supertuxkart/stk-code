@@ -57,6 +57,8 @@
                              I18N="In the main screen" text="Achievements" label_location="hover"/>
                 <icon-button id="gpEditor" width="64" height="64" icon="gui/icons/gpeditor.png"
                              I18N="In the main screen" text="Grand Prix Editor" label_location="hover"/>
+                <icon-button id="highscores" width="64" height="64" icon="gui/icons/crown.png"
+                             I18N="In the main screen" text="High Scores" label_location="hover"/>
                 <icon-button id="about" width="64" height="64" icon="gui/icons/main_about.png"
                              I18N="In the main screen" text="About" label_location="hover"/>
                 <icon-button id="quit" width="64" height="64" icon="gui/icons/main_quit.png"
