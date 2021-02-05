@@ -119,12 +119,14 @@ s32 SPMesh::getJointIDWithArm(const c8* name, unsigned* arm_id) const
 }   // getJointIDWithArm
 
 // ----------------------------------------------------------------------------
-void SPMesh::getSkinningMatrices(f32 frame, std::array<float, 16>* dest)
+void SPMesh::getSkinningMatrices(f32 frame, std::array<float, 16>* dest,
+                                 float frame_interpolating, float rate)
 {
     unsigned accumulated_joints = 0;
     for (unsigned i = 0; i < m_all_armatures.size(); i++)
     {
-        m_all_armatures[i].getPose(frame, &dest[accumulated_joints]);
+        m_all_armatures[i].getPose(frame, &dest[accumulated_joints],
+            frame_interpolating, rate);
         accumulated_joints += m_all_armatures[i].m_joint_used;
     }
 

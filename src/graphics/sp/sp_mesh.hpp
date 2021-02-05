@@ -152,7 +152,8 @@ public:
     // ------------------------------------------------------------------------
     std::vector<Armature>& getArmatures() { return m_all_armatures; }
     // ------------------------------------------------------------------------
-    void getSkinningMatrices(f32 frame, std::array<float, 16>* dest);
+    void getSkinningMatrices(f32 frame, std::array<float, 16>* dest,
+                        float frame_interpolating = -1.0f, float rate = -1.0f);
     // ------------------------------------------------------------------------
     s32 getJointIDWithArm(const c8* name, unsigned* arm_id) const;
     // ------------------------------------------------------------------------

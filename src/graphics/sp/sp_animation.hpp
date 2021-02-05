@@ -71,7 +71,7 @@ struct Armature
 
     std::vector<core::matrix4> m_joint_matrices;
 
-    std::vector<core::matrix4> m_interpolated_matrices;
+    std::vector<LocRotScale> m_interpolated_matrices;
 
     std::vector<std::pair<core::matrix4, bool> > m_world_matrices;
 
@@ -140,9 +140,27 @@ struct Armature
     }
     // ------------------------------------------------------------------------
     /* Because matrix4 in windows is not 64 bytes */
-    void getPose(float frame, std::array<float, 16>* dest)
+    void getPose(float frame, std::array<float, 16>* dest,
+                 float frame_interpolating = -1.0f, float rate = -1.0f)
     {
         getInterpolatedMatrices(frame);
+        if (frame_interpolating != -1.0f && rate != -1.0f)
+        {
+            auto copied = m_interpolated_matrices;
+            getInterpolatedMatrices(frame_interpolating);
+            for (unsigned i = 0; i < m_interpolated_matrices.size(); i++)
+            {
+                m_interpolated_matrices[i].m_loc =
+                    copied[i].m_loc.getInterpolated(
+                    m_interpolated_matrices[i].m_loc, rate);
+                m_interpolated_matrices[i].m_rot =
+                    m_interpolated_matrices[i].m_rot.slerp(
+                    m_interpolated_matrices[i].m_rot, copied[i].m_rot, rate);
+                m_interpolated_matrices[i].m_scale =
+                    copied[i].m_scale.getInterpolated(
+                    m_interpolated_matrices[i].m_scale, rate);
+            }
+        }
         for (auto& p : m_world_matrices)
         {
             p.second = false;
@@ -178,8 +196,8 @@ struct Armature
             {
                 m_interpolated_matrices[i] =
                     frame >= float(m_frame_pose_matrices.back().first) ?
-                    m_frame_pose_matrices.back().second[i].toMatrix() :
-                    m_frame_pose_matrices.front().second[i].toMatrix();
+                    m_frame_pose_matrices.back().second[i] :
+                    m_frame_pose_matrices.front().second[i];
             }
             return;
         }
@@ -215,14 +233,14 @@ struct Armature
             interpolated.m_scale =
                 m_frame_pose_matrices[frame_2].second[i].m_scale.getInterpolated
                 (m_frame_pose_matrices[frame_1].second[i].m_scale, interpolation);
-            m_interpolated_matrices[i] = interpolated.toMatrix();
+            m_interpolated_matrices[i] = interpolated;
         }
     }
     // ------------------------------------------------------------------------
-    core::matrix4 getWorldMatrix(const std::vector<core::matrix4>& matrix,
+    core::matrix4 getWorldMatrix(const std::vector<LocRotScale>& lrs,
                                  unsigned id)
     {
-        core::matrix4 mat = matrix[id];
+        core::matrix4 mat = lrs[id].toMatrix();
         int parent_id = m_parent_infos[id];
         if (parent_id == -1)
         {
@@ -232,7 +250,7 @@ struct Armature
         if (!m_world_matrices[parent_id].second)
         {
             m_world_matrices[parent_id] = std::make_pair
-                (getWorldMatrix(matrix, parent_id), true);
+                (getWorldMatrix(lrs, parent_id), true);
         }
         m_world_matrices[id] =
             std::make_pair(m_world_matrices[parent_id].first * mat, true);

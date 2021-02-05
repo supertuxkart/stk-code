@@ -61,7 +61,8 @@ void CAnimatedMeshSceneNode::setCurrentFrame(f32 frame)
 	// if you pass an out of range value, we just clamp it
 	CurrentFrameNr = core::clamp ( frame, (f32)StartFrame, (f32)EndFrame );
 
-	beginTransition(); //transit to this frame if enabled
+	// STK calls setCurrentFrame each frame for steering animation
+	//beginTransition(); //transit to this frame if enabled
 }
 
 
@@ -82,6 +83,7 @@ void CAnimatedMeshSceneNode::buildFrameNr(u32 timeMs)
 		{
 			Transiting=0.f;
 			TransitingBlend=0.f;
+			setTransitionTime(0.f);
 		}
 	}
 
@@ -189,6 +191,8 @@ IMesh * CAnimatedMeshSceneNode::getMeshForCurrentFrame()
 #ifndef _IRR_COMPILE_WITH_SKINNED_MESH_SUPPORT_
 		return 0;
 #else
+		if (Transiting != 0.0f)
+			animateJoints(false);
 
 		// As multiple scene nodes may be sharing the same skinned mesh, we have to
 		// re-animate it every frame to ensure that this node gets the mesh that it needs.
@@ -804,9 +808,12 @@ void CAnimatedMeshSceneNode::setTransitionTime(f32 time)
 		return;
 	TransitionTime = ttime;
 	if (ttime != 0)
+	{
 		setJointMode(EJUOR_CONTROL);
+		beginTransition();
+	}
 	else
-		setJointMode(EJUOR_NONE);
+		setJointMode(EJUOR_READ);
 }
 
 

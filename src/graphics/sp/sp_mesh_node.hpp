@@ -52,6 +52,8 @@ private:
 
     bool m_is_in_shadowpass;
 
+    float m_saved_transition_frame;
+
     std::vector<std::array<float, 16> > m_skinning_matrices;
 
     video::SColorf m_glow_color;
@@ -167,6 +169,8 @@ public:
         assert(mb_id < m_texture_matrices.size());
         m_texture_matrices[mb_id] = tm;
     }
+    // ------------------------------------------------------------------------
+    virtual void setTransitionTime(f32 Time);
 };
 
 }

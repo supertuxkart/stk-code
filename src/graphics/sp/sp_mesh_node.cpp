@@ -48,6 +48,7 @@ SPMeshNode::SPMeshNode(IAnimatedMesh* mesh, ISceneNode* parent,
     m_first_render_info = render_info;
     m_animated = false;
     m_skinning_offset = -32768;
+    m_saved_transition_frame = -1.0f;
     m_is_in_shadowpass = true;
 }   // SPMeshNode
 
@@ -83,6 +84,7 @@ void SPMeshNode::setMesh(irr::scene::IAnimatedMesh* mesh)
 {
     m_glow_color = video::SColorf(0.0f, 0.0f, 0.0f);
     m_skinning_offset = -32768;
+    m_saved_transition_frame = -1.0f;
     m_animated = false;
     m_mesh = static_cast<SPMesh*>(mesh);
     CAnimatedMeshSceneNode::setMesh(mesh);
@@ -167,7 +169,8 @@ IMesh* SPMeshNode::getMeshForCurrentFrame()
     {
         return m_mesh;
     }
-    m_mesh->getSkinningMatrices(getFrameNr(), m_skinning_matrices.data());
+    m_mesh->getSkinningMatrices(getFrameNr(), m_skinning_matrices.data(),
+        m_saved_transition_frame, TransitingBlend);
     updateAbsolutePosition();
 
     for (Armature& arm : m_mesh->getArmatures())
@@ -210,5 +213,23 @@ SPShader* SPMeshNode::getShader(unsigned mesh_buffer_id) const
 #endif
     return NULL;
 }   // getShader
+
+// ----------------------------------------------------------------------------
+void SPMeshNode::setTransitionTime(f32 Time)
+{
+    if (Time == 0.0f)
+    {
+        TransitingBlend = TransitionTime = Transiting = 0;
+        m_saved_transition_frame = -1.0;
+    }
+    else
+    {
+        const u32 ttime = (u32)core::floor32(Time * 1000.0f);
+        TransitionTime = ttime;
+        Transiting = core::reciprocal((f32)TransitionTime);
+        TransitingBlend = 0.0f;
+        m_saved_transition_frame = getFrameNr();
+    }
+}   // setTransitionTime
 
 }
