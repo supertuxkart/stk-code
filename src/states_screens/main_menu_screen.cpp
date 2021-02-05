@@ -277,12 +277,11 @@ void MainMenuScreen::startTutorial()
     RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
     RaceManager::get()->setReverseTrack(false);
 
-    // Use keyboard 0 by default (FIXME: let player choose?)
-    InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
+    // Use the last used device
+    InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
 
-    // Create player and associate player with keyboard
-    StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
-        device);
+    // Create player and associate player with device
+    StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(), device);
 
     if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
     {
@@ -292,8 +291,7 @@ void MainMenuScreen::startTutorial()
     }
     RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
 
-    // ASSIGN should make sure that only input from assigned devices
-    // is read.
+    // ASSIGN should make sure that only input from assigned devices is read
     input_manager->getDeviceManager()->setAssignMode(ASSIGN);
     input_manager->getDeviceManager()
         ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
