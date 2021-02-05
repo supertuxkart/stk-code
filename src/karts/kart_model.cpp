@@ -131,7 +131,6 @@ KartModel::KartModel(bool is_master)
         m_animation_frame[i]=-1;
     m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
-    m_play_non_loop     = false;
     m_support_colorization = false;
 }   // KartModel
 
@@ -152,10 +151,12 @@ void KartModel::loadInfo(const XMLNode &node)
         animation_node->get("start-winning-loop",
                                               &m_animation_frame[AF_WIN_LOOP_START] );
         animation_node->get("end-winning",    &m_animation_frame[AF_WIN_END]   );
+        animation_node->get("end-winning-straight", &m_animation_frame[AF_WIN_END_STRAIGHT]  );
         animation_node->get("start-losing",   &m_animation_frame[AF_LOSE_START]);
         animation_node->get("start-losing-loop",
                                              &m_animation_frame[AF_LOSE_LOOP_START]);
         animation_node->get("end-losing",     &m_animation_frame[AF_LOSE_END]  );
+        animation_node->get("end-losing-straight", &m_animation_frame[AF_LOSE_END_STRAIGHT]  );
         animation_node->get("start-explosion",&m_animation_frame[AF_LOSE_START]);
         animation_node->get("end-explosion",  &m_animation_frame[AF_LOSE_END]  );
         animation_node->get("start-jump",     &m_animation_frame[AF_JUMP_START]);
@@ -914,9 +915,41 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
         transition = true;
     }
 
-    m_play_non_loop = play_non_loop;
     m_current_animation = type;
-    if(m_current_animation==AF_DEFAULT)
+    if ((type == AF_WIN_START || type == AF_LOSE_START) &&
+        m_animation_frame[type] > -1 && play_non_loop)
+    {
+        // Special handling for soccer goal animation
+        class SmoothTransition : public IAnimationEndCallBack
+        {
+            KartModel* m_kart_model;
+            bool m_transition;
+        public:
+            SmoothTransition(KartModel* km, bool transition) :
+                m_kart_model(km), m_transition(transition) {}
+            virtual void OnAnimationEnd(IAnimatedMeshSceneNode* node)
+            {
+                if (m_transition)
+                    m_kart_model->m_animated_node->setTransitionTime(0.2f);
+                m_kart_model->setAnimation(AF_DEFAULT);
+            }
+        };
+        AnimationFrameType end = (AnimationFrameType)(type + 2);
+        if (m_animation_frame [end] == -1)
+            end = (AnimationFrameType)((int)end - 1);
+        AnimationFrameType to_straight = (AnimationFrameType)(type + 3);
+        bool has_to_straight = m_animation_frame[to_straight] > -1;
+        if (has_to_straight)
+            end = to_straight;
+        m_animated_node->setAnimationSpeed(m_animation_speed);
+        m_animated_node->setFrameLoop(m_animation_frame[type],
+            m_animation_frame[end]);
+        m_animated_node->setLoopMode(false);
+        SmoothTransition* st = new SmoothTransition(this, !has_to_straight);
+        m_animated_node->setAnimationEndCallback(st);
+        st->drop();
+    }
+    else if (m_current_animation==AF_DEFAULT)
     {
         m_animated_node->setLoopMode(false);
         // setTransitionTime before setFrameLoop so the node will save the last
@@ -1175,12 +1208,6 @@ void KartModel::update(float dt, float distance, float steer, float speed,
 
     // If animations are disabled, stop here
     if (m_animated_node == NULL) return;
-
-    if (m_play_non_loop && m_animated_node->getLoopMode() == true)
-    {
-        m_play_non_loop = false;
-        this->setAnimation(AF_DEFAULT);
-    }
 
     // Check if the end animation is being played, if so, don't
     // play steering animation.

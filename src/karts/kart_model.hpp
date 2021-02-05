@@ -176,6 +176,7 @@ public:
             AF_LOSE_START,         // Begin losing animation
             AF_LOSE_LOOP_START,    // Begin of the losing loop
             AF_LOSE_END,           // End losing animation
+            AF_LOSE_END_STRAIGHT,  // End losing animation to straight frame
             AF_BEGIN_EXPLOSION,    // Begin explosion animation
             AF_END_EXPLOSION,      // End explosion animation
             AF_JUMP_START,         // Begin of jump
@@ -184,6 +185,7 @@ public:
             AF_WIN_START,          // Begin of win animation
             AF_WIN_LOOP_START,     // Begin of win loop animation
             AF_WIN_END,            // End of win animation
+            AF_WIN_END_STRAIGHT,   // End of win animation to straight frame
             AF_SELECTION_START,    // Start frame in kart selection screen
             AF_SELECTION_END,      // End frame in kart selection screen
             AF_BACK_LEFT,          // Going back left
@@ -288,11 +290,6 @@ private:
      *  is mainly used for debugging, e.g. the master copies might not have
      *  anything attached to it etc. */
     bool  m_is_master;
-
-    /** True if the animation played is non-loop, which will reset to
-     *  AF_DEFAULT after first loop ends. Mainly used in soccer mode for
-     *  animation playing after scored. */
-    bool  m_play_non_loop;
 
     void  loadWheelInfo(const XMLNode &node,
                         const std::string &wheel_name, int index);
