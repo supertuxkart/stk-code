@@ -3,6 +3,7 @@
     <div x="1%" y="0" width="98%" layout="horizontal-row" height="9%">
         <icon-button id="back" height="100%" icon_align="left" icon="gui/icons/back.png"/>
         <spacer proportion="1" height="1"/>
+        <icon-button id="remove-all" y="4%" height="90%" icon_align="right" icon="gui/icons/bomb_icon.png"/>
         <icon-button id="reload" y="5%" height="90%" icon_align="right" icon="gui/icons/restart.png"/>
     </div>
 

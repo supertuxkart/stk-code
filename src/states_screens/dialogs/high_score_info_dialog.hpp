@@ -38,19 +38,25 @@ private:
     Highscores* m_hs;
 
     GUIEngine::RibbonWidget*      m_action_widget;
-    GUIEngine::IconButtonWidget*  m_back_widget;
+    GUIEngine::IconButtonWidget*  m_start_widget;
     GUIEngine::IconButtonWidget*  m_remove_widget;
-    GUIEngine::IconButtonWidget*  m_remove_all_widget;
+    GUIEngine::IconButtonWidget*  m_back_widget;
 
     GUIEngine::LabelWidget*       m_high_score_label;
-    GUIEngine::ListWidget*        m_high_score_entries;
+    GUIEngine::LabelWidget*       m_track_name_label;
+    GUIEngine::LabelWidget*       m_num_karts_label;
+    GUIEngine::LabelWidget*       m_difficulty_label;
+    GUIEngine::LabelWidget*       m_reverse_label;
+    GUIEngine::LabelWidget*       m_num_laps_label;
+
+    GUIEngine::ListWidget*        m_high_score_list;
     GUIEngine::IconButtonWidget*  m_track_screenshot_widget;
 
     void updateHighscoreEntries();
     //void refreshMainScreen();
 
 public:
-    HighScoreInfoDialog(Highscores* highscore);
+    HighScoreInfoDialog(Highscores* highscore, bool is_linear);
     ~HighScoreInfoDialog();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);

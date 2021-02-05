@@ -19,8 +19,11 @@
 #include "states_screens/dialogs/high_score_info_dialog.hpp"
 
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "race/highscores.hpp"
@@ -37,7 +40,7 @@ using namespace GUIEngine;
 using namespace irr::core;
 
 // -----------------------------------------------------------------------------
-HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore)
+HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear)
                       : ModalDialog(0.75f,0.75f)
 {
     m_self_destroy         = false;
@@ -68,28 +71,51 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore)
 
     // TODO : small refinement, add the possibility to tab stops for lists
     //        to make this unselectable by keyboard/mouse
-    m_high_score_entries = getWidget<GUIEngine::ListWidget>("high_score_entries");
-    assert(m_high_score_entries != NULL);
+    m_high_score_list = getWidget<GUIEngine::ListWidget>("high_score_list");
+    assert(m_high_score_list != NULL);
 
     /* Used to display kart icons for the entries */
     irr::gui::STKModifiedSpriteBank *icon_bank = HighScoreSelection::getInstance()->getIconBank();
     int icon_height = GUIEngine::getFontHeight() * 3 / 2;
-                                                    
+
     icon_bank->setScale(icon_height/128.0f);
     icon_bank->setTargetIconSize(128, 128);
-    m_high_score_entries->setIcons(icon_bank, (int)icon_height);
+    m_high_score_list->setIcons(icon_bank, (int)icon_height);
 
     updateHighscoreEntries();
 
+    //Setup static text labels
     m_high_score_label = getWidget<LabelWidget>("name");
+    m_high_score_label->setText(_("Top %d High Scores", m_hs->HIGHSCORE_LEN), true);
+    m_track_name_label = getWidget<LabelWidget>("track-name");
+    m_track_name_label->setText(_("Track: %s",
+                                track_manager->getTrack(m_hs->m_track)->getName()), true);
+    m_difficulty_label = getWidget<LabelWidget>("difficulty");
+    m_difficulty_label->setText(_("Difficulty: %s", RaceManager::get()->
+                                getDifficultyName((RaceManager::Difficulty)
+                                m_hs->m_difficulty)), true);
+    m_num_karts_label = getWidget<LabelWidget>("num-karts");
+    m_reverse_label = getWidget<LabelWidget>("reverse");
+    m_num_laps_label = getWidget<LabelWidget>("num-laps");
 
-    m_back_widget = getWidget<IconButtonWidget>("back");
+    if (is_linear)
+    {
+        m_num_karts_label->setVisible(true);
+        m_num_karts_label->setText(_("Number of karts: %d", m_hs->m_number_of_karts), true);
 
-    // Remove is enabled only when a non-empty entry is selected
-    m_remove_widget = getWidget<IconButtonWidget>("remove");
-    m_remove_widget->setVisible(false);
+        m_num_laps_label->setVisible(true);
+        m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
 
-    m_remove_all_widget = getWidget<IconButtonWidget>("remove-all");
+        stringw is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
+        m_reverse_label->setVisible(true);
+        m_reverse_label->setText(_("Reverse: %s", is_reverse), true);
+    }
+    else
+    {
+        m_num_karts_label->setVisible(false);
+        m_num_laps_label->setVisible(false);
+        m_reverse_label->setVisible(false);
+    }
 
     m_action_widget = getWidget<RibbonWidget>("actions");
 
@@ -104,7 +130,7 @@ HighScoreInfoDialog::~HighScoreInfoDialog()
 // -----------------------------------------------------------------------------
 void HighScoreInfoDialog::updateHighscoreEntries()
 {
-    m_high_score_entries->clear();
+    m_high_score_list->clear();
 
     const int amount = m_hs->getNumberEntries();
 
@@ -148,13 +174,11 @@ void HighScoreInfoDialog::updateHighscoreEntries()
         if (icon == -1)
         {
             icon = HighScoreSelection::getInstance()->getUnknownKartIcon();
-            //Log::warn("HighScoreInfoDialog", "Kart not found, using default icon.");
         }
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
-
         row.push_back(GUIEngine::ListWidget::ListCell(line.c_str(), icon, 5, false));
-        m_high_score_entries->addItem(StringUtils::toString(n), row);
+        m_high_score_list->addItem(StringUtils::toString(n), row);
     }
 } // updateHighscoreEntries
 
@@ -162,36 +186,59 @@ void HighScoreInfoDialog::updateHighscoreEntries()
 GUIEngine::EventPropagation
     HighScoreInfoDialog::processEvent(const std::string& event_source)
 {
-    if (event_source == "high_score_entries")
-    {
-        m_remove_widget->setVisible(true);
-    }
-
     if (event_source == "actions")
     {
         const std::string& selection =
                 m_action_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if(selection == "remove")
+        if (selection == "start")
         {
-            // First set values for comparison
-            //m_compare_replay_uid = m_rd.m_replay_uid;
+            // Use the last used device
+            InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
 
-            //m_compare_ghost = true;
+            // Create player and associate player with device
+            StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(), device);
 
-            //refreshMainScreen();
+            RaceManager::get()->setMinorMode(HighScoreSelection::getInstance()->getActiveMode());
 
-            // Now quit the dialog
-            //m_self_destroy = true;
+            bool reverse = m_hs->m_reverse;
+            std::string track_name = m_hs->m_track;
+            int laps = m_hs->m_number_of_laps;
+
+            RaceManager::get()->setDifficulty((RaceManager::Difficulty) m_hs->m_difficulty);
+
+            RaceManager::get()->setNumKarts(m_hs->m_number_of_karts);
+            RaceManager::get()->setNumPlayers(1);
+
+            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+            {
+                Log::warn("HighScoreInfoDialog", "Cannot find kart '%s', will revert to default",
+                    UserConfigParams::m_default_kart.c_str());
+                UserConfigParams::m_default_kart.revertToDefaults();
+            }
+            RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
+
+            // Disable accidentally unlocking of a challenge
+            PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
+
+            RaceManager::get()->setReverseTrack(reverse);
+
+            // ASSIGN should make sure that only input from assigned devices is read
+            input_manager->getDeviceManager()->setAssignMode(ASSIGN);
+            input_manager->getDeviceManager()
+                ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
+
+            ModalDialog::dismiss();
+
+            RaceManager::get()->startSingleRace(track_name, laps, false);
             return GUIEngine::EVENT_BLOCK;
         }
-        else if(selection == "remove-all")
+        else if (selection == "remove")
         {
-            //std::string fn = m_rd.m_filename;
-            //ModalDialog::dismiss();
+            ModalDialog::dismiss();
 
-            //dynamic_cast<HighScoreSelection*>(GUIEngine::getCurrentScreen())
-            //    ->onDeleteReplay(fn);
+            dynamic_cast<HighScoreSelection*>(GUIEngine::getCurrentScreen())
+                ->onDeleteHighscores();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "back")

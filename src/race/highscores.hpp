@@ -18,6 +18,7 @@
 
 #ifndef HEADER_HIGHSCORES_HPP
 #define HEADER_HIGHSCORES_HPP
+#include <array>
 #include <string>
 #include <vector>
 #include <map>
@@ -25,6 +26,8 @@
 #include "race/race_manager.hpp"
 
 #include <irrString.h>
+
+using namespace irr::core;
 
 class XMLNode;
 class UTFWriter;
@@ -46,9 +49,10 @@ public:
     int                 m_difficulty;
     int                 m_number_of_laps;
     bool                m_reverse;
-    std::string         m_kart_name[HIGHSCORE_LEN];
-    irr::core::stringw  m_name[HIGHSCORE_LEN];
-    float               m_time[HIGHSCORE_LEN];
+
+    std::array<std::string, HIGHSCORE_LEN> m_kart_name;
+    std::array<stringw, HIGHSCORE_LEN>     m_name;
+    std::array<float, HIGHSCORE_LEN>       m_time;
 
     /** Creates a new entry
       */

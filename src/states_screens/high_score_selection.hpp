@@ -43,22 +43,10 @@ private:
     ~HighScoreSelection();
 
     GUIEngine::ListWidget*     m_high_scores_list_widget;
-    GUIEngine::CheckBoxWidget* m_high_scores_difficulty_toggle_widget;
-    //GUIEngine::CheckBoxWidget* m_high_scores_multiplayer_toggle_widget;
-    //GUIEngine::CheckBoxWidget* m_best_times_toggle_widget;
-    //GUIEngine::CheckBoxWidget* m_compare_toggle_widget;
     GUIEngine::RibbonWidget*   m_mode_tabs;
-    //RaceManager::Difficulty    m_cur_difficulty;
-    //std::string                m_file_to_be_deleted;
-    //std::vector<unsigned int>  m_best_times_index;
-    //bool                       m_same_difficulty;
-    //bool                       m_best_times;
-    //bool                       m_is_comparing;
     bool                       m_active_mode_is_linear;
     RaceManager::MinorRaceModeType m_active_mode;
-    // The index id of a replay file can change with sorting, etc.
-    // Using the UID guarantees exact matchess
-    //uint64_t                   m_high_scores_to_compare_uid;
+    int                         m_selected_index;
 
     irr::gui::STKModifiedSpriteBank *m_icon_bank;
 
@@ -74,15 +62,14 @@ public:
 
     int  getUnknownKartIcon() { return m_icon_unknown_kart; }
 
-    //void setCompareReplayUid(uint64_t uid) { m_high_scores_to_compare_uid = uid; }
-    //void setCompare(bool compare) { m_is_comparing = compare; }
-
     void refresh(bool forced_update = true, bool update_columns = false);
 
     /** Load the addons into the main list.*/
     void loadList();
 
-    //void onDeleteReplay(std::string& filename);
+    void onDeleteHighscores();
+
+    void onClearHighscores();
 
     const RaceManager::MinorRaceModeType getActiveMode() { return m_active_mode; }
 
@@ -106,10 +93,8 @@ public:
     
     virtual void unloaded() OVERRIDE;
 
-    //virtual bool onEscapePressed() OVERRIDE;
-
     /** \brief Implement IConfirmDialogListener callback */
-    //virtual void onConfirm() OVERRIDE;
+    virtual void onConfirm() OVERRIDE;
 
 };   // HighScoreSelection
 
