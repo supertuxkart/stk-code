@@ -907,11 +907,22 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
     // if animations disabled, give up
     if (m_animated_node == NULL) return;
 
+    bool transition = false;
+    if (m_current_animation == AF_JUMP_START && type == AF_DEFAULT)
+    {
+        // For seamless transition back to AF_DEFAULT
+        transition = true;
+    }
+
     m_play_non_loop = play_non_loop;
     m_current_animation = type;
     if(m_current_animation==AF_DEFAULT)
     {
         m_animated_node->setLoopMode(false);
+        // setTransitionTime before setFrameLoop so the node will save the last
+        // frame
+        if (transition)
+            m_animated_node->setTransitionTime(0.2f);
         const bool support_backpedal =
             m_animation_frame[AF_BACK_STRAIGHT] > -1 &&
             m_animation_frame[AF_BACK_LEFT] > -1 &&
@@ -935,6 +946,7 @@ void KartModel::setAnimation(AnimationFrameType type, bool play_non_loop)
         }
         m_animated_node->setAnimationEndCallback(NULL);
         m_animated_node->setAnimationSpeed(0);
+        m_animated_node->setCurrentFrame(m_animation_frame[AF_STRAIGHT]);
     }
     else if(m_animation_frame[type]>-1)
     {
