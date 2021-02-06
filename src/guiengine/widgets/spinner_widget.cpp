@@ -104,7 +104,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
 }
 
 // -----------------------------------------------------------------------------
-void SpinnerWidget::setRange(int min, int max, float step)
+void SpinnerWidget::setRange(float min, float max, float step)
 {
     clearLabels();
     setStep(step);

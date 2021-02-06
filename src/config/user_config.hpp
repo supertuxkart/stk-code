@@ -958,6 +958,11 @@ namespace UserConfigParams
             &m_camera_normal,
             "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
 
+    PARAM_PREFIX FloatUserConfigParam         m_camera_backward_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
+            &m_camera_normal,
+            "Distance between kart and camera (reverse)"));
+
     PARAM_PREFIX FloatUserConfigParam         m_camera_backward_up_angle
             PARAM_DEFAULT(  FloatUserConfigParam(5, "backward-up-angle",
             &m_camera_normal,
@@ -998,6 +1003,11 @@ namespace UserConfigParams
             &m_standard_camera_settings,
             "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
 
+    PARAM_PREFIX FloatUserConfigParam         m_standard_camera_backward_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
+            &m_standard_camera_settings,
+            "Distance between kart and camera (reverse)"));
+
     PARAM_PREFIX FloatUserConfigParam         m_standard_camera_backward_up_angle
             PARAM_DEFAULT(  FloatUserConfigParam(5, "backward-up-angle",
             &m_standard_camera_settings,
@@ -1034,6 +1044,11 @@ namespace UserConfigParams
             &m_drone_camera_settings,
             "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
 
+    PARAM_PREFIX FloatUserConfigParam         m_drone_camera_backward_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
+            &m_drone_camera_settings,
+            "Distance between kart and camera (reverse)"));
+
     PARAM_PREFIX FloatUserConfigParam         m_drone_camera_backward_up_angle
             PARAM_DEFAULT(  FloatUserConfigParam(10, "backward-up-angle",
             &m_drone_camera_settings,
@@ -1069,6 +1084,11 @@ namespace UserConfigParams
             PARAM_DEFAULT(  BoolUserConfigParam(true, "forward-smoothing",
             &m_saved_camera_settings,
             "if true, use smoothing (forward-up-angle become relative to speed) when pointing forward"));
+
+    PARAM_PREFIX FloatUserConfigParam         m_saved_camera_backward_distance
+            PARAM_DEFAULT(  FloatUserConfigParam(2.0, "backward-distance",
+            &m_saved_camera_settings,
+            "Distance between kart and camera (reverse)"));
 
     PARAM_PREFIX FloatUserConfigParam         m_saved_camera_backward_up_angle
             PARAM_DEFAULT(  FloatUserConfigParam(5, "backward-up-angle",

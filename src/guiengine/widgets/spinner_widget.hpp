@@ -266,7 +266,7 @@ namespace GUIEngine
         const core::stringw& getCustomText() const { return m_custom_text; }
 
         /* Set a spinner with numeric values min <= i <= max, with a precision of defined by step */
-        void setRange(int min, int max, float step);
+        void setRange(float min, float max, float step);
         void setRange(int min, int max) { setRange(min, max, 1.0); }
 
         void onPressed(int x, int y);

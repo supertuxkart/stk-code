@@ -223,7 +223,7 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
             *above_kart = 0.75f;
             *cam_angle  = UserConfigParams::m_camera_backward_up_angle * DEGREE_TO_RAD;
             *sideway    = 0;
-            *distance   = 2.0f*m_distance;
+            *distance   = UserConfigParams::m_camera_backward_distance;
             *smoothing  = false;
             *cam_roll_angle = 0.0f;
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)

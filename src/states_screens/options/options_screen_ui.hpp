@@ -26,17 +26,6 @@
 
 namespace GUIEngine { class Widget; }
 
-struct CameraPreset
-{
-    int fov;
-    float distance;
-    float angle;
-    bool smoothing;
-    float backward_angle;
-};
-
-struct Input;
-
 /**
   * \brief Graphics options screen
   * \ingroup states_screens
@@ -53,8 +42,6 @@ class OptionsScreenUI : public GUIEngine::Screen, public GUIEngine::ScreenSingle
     std::unique_ptr<ReloadOption> m_reload_option;
     OptionsScreenUI();
     bool m_inited;
-
-    std::vector<CameraPreset> m_camera_presets;
 
     std::map<core::stringw, std::string> m_skins;
 

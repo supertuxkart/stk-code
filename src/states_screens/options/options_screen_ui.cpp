@@ -520,6 +520,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_camera_distance = UserConfigParams::m_standard_camera_distance;
             UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_standard_camera_forward_up_angle;
             UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_standard_camera_forward_smoothing;
+            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_standard_camera_backward_distance;
             UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_standard_camera_backward_up_angle;
             UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_standard_reverse_look_use_soccer_cam;
         }
@@ -529,6 +530,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_camera_distance = UserConfigParams::m_drone_camera_distance;
             UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_drone_camera_forward_up_angle;
             UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_drone_camera_forward_smoothing;
+            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_drone_camera_backward_distance;
             UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_drone_camera_backward_up_angle;
             UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_drone_reverse_look_use_soccer_cam;
         }
@@ -538,6 +540,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
             UserConfigParams::m_camera_distance = UserConfigParams::m_saved_camera_distance;
             UserConfigParams::m_camera_forward_up_angle = UserConfigParams::m_saved_camera_forward_up_angle;
             UserConfigParams::m_camera_forward_smoothing = UserConfigParams::m_saved_camera_forward_smoothing;
+            UserConfigParams::m_camera_backward_distance = UserConfigParams::m_saved_camera_backward_distance;
             UserConfigParams::m_camera_backward_up_angle = UserConfigParams::m_saved_camera_backward_up_angle;
             UserConfigParams::m_reverse_look_use_soccer_cam = UserConfigParams::m_saved_reverse_look_use_soccer_cam;
         }

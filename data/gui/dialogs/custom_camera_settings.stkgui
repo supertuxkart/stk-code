@@ -55,6 +55,15 @@
 
             <spacer height="2%" width="100%" />
 
+            <div width="100%" height="fit" layout="horizontal-row">
+                <spacer width="3%" height="100%" />
+                <div proportion="1" height="fit" layout="horizontal-row" >
+                    <label width="20%" height="100%" text_align="left" I18N="In the ui/camera screen" text="Distance"/>
+                    <gauge id="backward_camera_distance" proportion="1"/>
+                </div>
+            </div>
+            <spacer height="2%" width="100%" />
+
 
             <div width="100%" height="fit" layout="horizontal-row">
                 <spacer width="3%" height="100%" />
