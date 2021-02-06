@@ -798,8 +798,11 @@ void ServerLobby::handleChat(Event* event)
         chat->setSynchronous(true);
         chat->addUInt8(LE_CHAT).encodeString16(message);
         const bool game_started = m_state.load() != WAITING_FOR_START_GAME;
+        core::stringw sender_name =
+            event->getPeer()->getPlayerProfiles()[0]->getName();
         STKHost::get()->sendPacketToAllPeersWith(
-            [game_started, sender_in_game, target_team](STKPeer* p)
+            [game_started, sender_in_game, target_team, sender_name, this]
+            (STKPeer* p)
             {
                 if (game_started)
                 {
@@ -817,6 +820,15 @@ void ServerLobby::handleChat(Event* event)
                                 return true;
                         }
                         return false;
+                    }
+                }
+                for (auto& peer : m_peers_muted_players)
+                {
+                    if (auto peer_sp = peer.first.lock())
+                    {
+                        if (peer_sp.get() == p &&
+                            peer.second.find(sender_name) != peer.second.end())
+                            return false;
                     }
                 }
                 return true;
@@ -1354,6 +1366,15 @@ void ServerLobby::asynchronousUpdate()
         resetVotingTime();
         resetServer();
         m_rs_state.store(RS_NONE);
+    }
+
+    for (auto it = m_peers_muted_players.begin();
+        it != m_peers_muted_players.end();)
+    {
+        if (it->first.expired())
+            it = m_peers_muted_players.erase(it);
+        else
+            it++;
     }
 
 #ifdef ENABLE_SQLITE3
@@ -5804,6 +5825,109 @@ void ServerLobby::handleServerCommand(Event* event,
                 chat->encodeString16(StringUtils::utf8ToWide(std::string
                     ("Server has no addon ") + argv[1]));
             }
+        }
+        peer->sendPacket(chat, true/*reliable*/);
+        delete chat;
+    }
+    else if (argv[0] == "mute")
+    {
+        std::shared_ptr<STKPeer> player_peer;
+        std::string result_msg;
+        core::stringw player_name;
+        NetworkString* result = NULL;
+
+        if (argv.size() != 2 || argv[1].empty())
+            goto mute_error;
+
+        player_name = StringUtils::utf8ToWide(argv[1]);
+        player_peer = STKHost::get()->findPeerByName(player_name);
+
+        if (!player_peer || player_peer == peer)
+            goto mute_error;
+
+        m_peers_muted_players[peer].insert(player_name);
+        result = getNetworkString();
+        result->addUInt8(LE_CHAT);
+        result->setSynchronous(true);
+        result_msg = "Muted player ";
+        result_msg += argv[1];
+        result->encodeString16(StringUtils::utf8ToWide(result_msg));
+        peer->sendPacket(result, true/*reliable*/);
+        delete result;
+        return;
+
+mute_error:
+        NetworkString* error = getNetworkString();
+        error->addUInt8(LE_CHAT);
+        error->setSynchronous(true);
+        std::string msg = "Usage: /mute player_name (not including yourself)";
+        error->encodeString16(StringUtils::utf8ToWide(msg));
+        peer->sendPacket(error, true/*reliable*/);
+        delete error;
+    }
+    else if (argv[0] == "unmute")
+    {
+        std::shared_ptr<STKPeer> player_peer;
+        std::string result_msg;
+        core::stringw player_name;
+        NetworkString* result = NULL;
+
+        if (argv.size() != 2 || argv[1].empty())
+            goto unmute_error;
+
+        player_name = StringUtils::utf8ToWide(argv[1]);
+        for (auto it = m_peers_muted_players[peer].begin();
+            it != m_peers_muted_players[peer].end();)
+        {
+            if (*it == player_name)
+            {
+                it = m_peers_muted_players[peer].erase(it);
+                goto unmute_found;
+            }
+            else
+            {
+                it++;
+            }
+        }
+        goto unmute_error;
+
+unmute_found:
+        result = getNetworkString();
+        result->addUInt8(LE_CHAT);
+        result->setSynchronous(true);
+        result_msg = "Unmuted player ";
+        result_msg += argv[1];
+        result->encodeString16(StringUtils::utf8ToWide(result_msg));
+        peer->sendPacket(result, true/*reliable*/);
+        delete result;
+        return;
+
+unmute_error:
+        NetworkString* error = getNetworkString();
+        error->addUInt8(LE_CHAT);
+        error->setSynchronous(true);
+        std::string msg = "Usage: /unmute player_name";
+        error->encodeString16(StringUtils::utf8ToWide(msg));
+        peer->sendPacket(error, true/*reliable*/);
+        delete error;
+    }
+    else if (argv[0] == "listmute")
+    {
+        NetworkString* chat = getNetworkString();
+        chat->addUInt8(LE_CHAT);
+        chat->setSynchronous(true);
+        core::stringw total;
+        for (auto& name : m_peers_muted_players[peer])
+        {
+            total += name;
+            total += " ";
+        }
+        if (total.empty())
+            chat->encodeString16("No player has been muted by you");
+        else
+        {
+            total += "muted";
+            chat->encodeString16(total);
         }
         peer->sendPacket(chat, true/*reliable*/);
         delete chat;

@@ -166,6 +166,9 @@ private:
     std::map<std::weak_ptr<STKPeer>, bool,
         std::owner_less<std::weak_ptr<STKPeer> > > m_peers_ready;
 
+    std::map<std::weak_ptr<STKPeer>, std::set<irr::core::stringw>,
+        std::owner_less<std::weak_ptr<STKPeer> > > m_peers_muted_players;
+
     std::weak_ptr<Online::Request> m_server_registering;
 
     /** Timeout counter for various state. */
