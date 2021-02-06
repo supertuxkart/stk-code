@@ -375,7 +375,8 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
 
     if (!isSpectatorCam) drawPlungerInFace(camera, dt);
 
-    if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width)
+    if (viewport.getWidth() != (int)irr_driver->getActualScreenSize().Width &&
+        viewport.getHeight() != (int)irr_driver->getActualScreenSize().Height)
     {
         scaling *= float(viewport.getWidth()) / float(irr_driver->getActualScreenSize().Width); // scale race GUI along screen size
     }
