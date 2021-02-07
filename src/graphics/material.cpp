@@ -218,16 +218,7 @@ Material::Material(const XMLNode *node, bool deprecated)
         }
         if (node->get("compositing", &s))
         {
-            if (s == "test")
-            {
-                m_shader_name = "alphatest";
-            }
-            else if (s == "additive")
-            {
-                m_shader_name = "additive";
-            }
-            else if (s != "none")
-                Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
+            Log::warn("material", "compositing property is deprecated and removed. Please use shaders now");
         }
 
         s = "";
