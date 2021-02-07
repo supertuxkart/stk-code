@@ -246,7 +246,7 @@ private:
 
     /** The type of sky to be used for the track. */
     enum {SKY_NONE, SKY_BOX,
-          SKY_DOME, SKY_COLOR}          m_sky_type;
+          SKY_COLOR}          m_sky_type;
 
     /** sky rotation speed */
     float m_sky_dx, m_sky_dy;

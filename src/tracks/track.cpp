@@ -954,7 +954,6 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
              mesh = ((scene::IAnimatedMeshSceneNode*)node)->getMesh();
              break;
         case scene::ESNT_SKY_BOX :
-        case scene::ESNT_SKY_DOME:
         case scene::ESNT_PARTICLE_SYSTEM :
         case scene::ESNT_TEXT:
             // These are non-physical
@@ -2093,30 +2092,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // --------------------------
     irr_driver->suppressSkyBox();
 #ifndef SERVER_ONLY
-    if(!CVS->isGLSL() && m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
-    {
-        scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
-                                                         m_sky_hori_segments,
-                                                         m_sky_vert_segments,
-                                                         m_sky_texture_percent,
-                                                         m_sky_sphere_percent);
-        for(unsigned int i=0; i<node->getMaterialCount(); i++)
-        {
-            main_loop->renderGUI(5350, i, node->getMaterialCount());
-
-            video::SMaterial &irrMaterial=node->getMaterial(i);
-            for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-            {
-                video::ITexture* t=irrMaterial.getTexture(j);
-                if(!t) continue;
-                core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
-                m_animated_textures.push_back(new MovingTexture(m, m_sky_dx, m_sky_dy));
-            }   // for j<MATERIAL_MAX_TEXTURES
-        }   // for i<getMaterialCount
-
-        m_all_nodes.push_back(node);
-    }
-    else if(m_sky_type==SKY_BOX && m_sky_textures.size() == 6)
+    if(m_sky_type==SKY_BOX && m_sky_textures.size() == 6)
     {
         //if (m_spherical_harmonics_textures.size() > 0)
             m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_spherical_harmonics_textures));
@@ -2449,34 +2425,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path,
  */
 void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 {
-    if(xml_node.getName()=="sky-dome")
-    {
-        m_sky_type            = SKY_DOME;
-        m_sky_vert_segments   = 16;
-        m_sky_hori_segments   = 16;
-        m_sky_sphere_percent  = 1.0f;
-        m_sky_texture_percent = 1.0f;
-        std::string s;
-        xml_node.get("texture",          &s                   );
-        video::ITexture *t = irr_driver->getTexture(s);
-        if (t != NULL)
-        {
-            t->grab();
-            m_sky_textures.push_back(t);
-            xml_node.get("vertical",        &m_sky_vert_segments  );
-            xml_node.get("horizontal",      &m_sky_hori_segments  );
-            xml_node.get("sphere-percent",  &m_sky_sphere_percent );
-            xml_node.get("texture-percent", &m_sky_texture_percent);
-            xml_node.get("speed-x", &m_sky_dx );
-            xml_node.get("speed-y", &m_sky_dy);
-        }
-        else
-        {
-            Log::error("track", "Sky-dome texture '%s' not found - ignored.",
-                        s.c_str());
-        }
-    }   // if sky-dome
-    else if(xml_node.getName()=="sky-box")
+    if(xml_node.getName()=="sky-box")
     {
         std::string s;
         xml_node.get("texture", &s);
