@@ -204,15 +204,6 @@ Material::Material(const XMLNode *node, bool deprecated)
         }
 
         b = false;
-        node->get("transparency", &b);
-        if (b)
-        {
-            m_shader_name = "alphatest";
-        }
-
-        //node->get("lightmap", &m_lightmap);
-
-        b = false;
         node->get("alpha", &b);
         if (b)
         {
