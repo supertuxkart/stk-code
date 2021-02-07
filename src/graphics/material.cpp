@@ -195,30 +195,28 @@ Material::Material(const XMLNode *node, bool deprecated)
     if (!node->get("shader", &s))
     {
         // BACKWARS COMPATIBILITY, EVENTUALLY REMOVE
-
         bool b = false;
-        node->get("additive", &b);
-        if (b)
+        if (node->get("additive", &b))
         {
-            m_shader_name = "alphablend";
+            Log::warn("material", "'additive=' property is deprecated and removed. Please use shaders now");
         }
-
         b = false;
-        node->get("alpha", &b);
-        if (b)
+        if (node->get("alpha", &b))
         {
-            m_shader_name = "alphablend";
+            Log::warn("material", "'alpha=' property is deprecated and removed. Please use shaders now");
         }
-
         b = true;
-        node->get("light", &b);
-        if (!b)
+        if (node->get("light", &b))
         {
-            m_shader_name = "unlit";
+            Log::warn("material", "'light=' property is deprecated and removed. Please use shaders now");
         }
         if (node->get("compositing", &s))
         {
-            Log::warn("material", "compositing property is deprecated and removed. Please use shaders now");
+            Log::warn("material", "'compositing=' property is deprecated and removed. Please use shaders now");
+        }
+        if (node->get("transparency", &s))
+        {
+            Log::warn("material", "'transparency=' property is deprecated and removed. Please use shaders now");
         }
 
         s = "";
