@@ -218,21 +218,13 @@ Material::Material(const XMLNode *node, bool deprecated)
         }
         if (node->get("compositing", &s))
         {
-            if (s == "blend")
-            {
-                m_shader_name = "alphablend";
-            }
-            else if (s == "test")
+            if (s == "test")
             {
                 m_shader_name = "alphatest";
             }
             else if (s == "additive")
             {
                 m_shader_name = "additive";
-            }
-            else if (s == "coverage")
-            {
-                m_shader_name = "alphatest";
             }
             else if (s != "none")
                 Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
