@@ -35,13 +35,4 @@ void main() {
 
     Diff = vec4(NdotL * Diffuse * sun_color, 1.);
     Spec = vec4(NdotL * Specular * sun_color, 1.);
-
-/*	if (hasclouds == 1)
-	{
-		vec2 cloudcoord = (xpos.xz * 0.00833333) + wind;
-		float cloud = texture(cloudtex, cloudcoord).x;
-		//float cloud = step(0.5, cloudcoord.x) * step(0.5, cloudcoord.y);
-
-		outcol *= cloud;
-	}*/
 }

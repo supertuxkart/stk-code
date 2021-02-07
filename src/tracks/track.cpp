@@ -151,7 +151,6 @@ Track::Track(const std::string &filename)
     m_bloom_threshold       = 0.75f;
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
     m_color_outlevel        = core::vector2df(0.0, 255.0);
-    m_clouds                = false;
     m_godrays               = false;
     m_displacement_speed    = 1.0f;
     m_physical_object_uid   = 0;
@@ -565,7 +564,6 @@ void Track::loadTrackInfo()
     root->get("reverse",               &m_reverse_available);
     root->get("default-number-of-laps",&m_default_number_of_laps);
     root->get("push-back",             &m_enable_push_back);
-    root->get("clouds",                &m_clouds);
     root->get("bloom",                 &m_bloom);
     root->get("bloom-threshold",       &m_bloom_threshold);
     root->get("shadows",               &m_shadows);

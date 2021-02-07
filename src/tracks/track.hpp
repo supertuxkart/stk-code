@@ -359,8 +359,6 @@ private:
     float                   m_minimap_x_scale;
     float                   m_minimap_y_scale;
 
-    bool m_clouds;
-
     bool m_bloom;
     float m_bloom_threshold;
 
@@ -669,9 +667,6 @@ public:
 
     // ------------------------------------------------------------------------
     const std::vector<Subtitle>& getSubtitles() const { return m_subtitles; }
-
-    // ------------------------------------------------------------------------
-    bool hasClouds() const { return m_clouds; }
 
     // ------------------------------------------------------------------------
     bool hasBloom() const { return m_bloom; }
