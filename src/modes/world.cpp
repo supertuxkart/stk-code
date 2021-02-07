@@ -1313,6 +1313,9 @@ void World::updateHighscores(int* best_highscore_rank)
                 *best_highscore_rank = highscore_rank;
             }
 
+            Highscores::setSortOrder(Highscores::SO_DEFAULT);
+            highscore_manager->sortHighscores(false);
+
             highscore_manager->saveHighscores();
         }
     } // next position

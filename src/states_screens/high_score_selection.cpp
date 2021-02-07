@@ -79,7 +79,7 @@ void HighScoreSelection::refresh(bool forced_update, bool update_columns)
         }
         highscore_manager->loadHighscores();
     }
-    //defaultSort();
+    defaultSort();
 
     loadList();
 
@@ -100,6 +100,7 @@ void HighScoreSelection::loadedFromFile()
     m_high_scores_list_widget->setColumnListener(this);
 
     m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
+    m_action_widget = getWidget<GUIEngine::RibbonWidget>("actions");
     m_active_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_active_mode_is_linear = true;
 
@@ -127,11 +128,11 @@ void HighScoreSelection::loadedFromFile()
  */
 void HighScoreSelection::beforeAddingWidget()
 {
-    m_high_scores_list_widget->addColumn(_C("column_name", "Track"), 8 );
+    m_high_scores_list_widget->addColumn(_C("column_name", "Track"), 7);
     m_high_scores_list_widget->addColumn(_C("column_name", "Difficulty"), 4);
     if (m_active_mode_is_linear)
     {
-        m_high_scores_list_widget->addColumn(_C("column_name", "Number of karts"), 3);
+        m_high_scores_list_widget->addColumn(_C("column_name", "Number of karts"), 4);
         m_high_scores_list_widget->addColumn(_C("column_name", "Laps"), 3);
         m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
     }
@@ -187,7 +188,7 @@ void HighScoreSelection::loadList()
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
         //The third argument should match the numbers used in beforeAddingWidget
-        row.push_back(GUIEngine::ListWidget::ListCell(track->getName() , -1, 8));
+        row.push_back(GUIEngine::ListWidget::ListCell(track->getName() , -1, 7));
 
         bool display_lock = false;
         if ((RaceManager::Difficulty)hs->m_difficulty == RaceManager::DIFFICULTY_BEST &&
@@ -201,7 +202,7 @@ void HighScoreSelection::loadList()
         if (m_active_mode_is_linear)
         {
             row.push_back(GUIEngine::ListWidget::ListCell
-                (StringUtils::toWString(hs->m_number_of_karts), -1, 3, true));
+                (StringUtils::toWString(hs->m_number_of_karts), -1, 4, true));
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(hs->m_number_of_laps), -1, 3, true));
             row.push_back(GUIEngine::ListWidget::ListCell
@@ -219,14 +220,6 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
     if (name == "back")
     {
         StateManager::get()->escapePressed();
-    }
-    else if (name == "remove-all")
-    {
-        onClearHighscores();
-    }
-    else if (name == "reload")
-    {
-        refresh();
     }
     else if (name == m_high_scores_list_widget->m_properties[GUIEngine::PROP_ID])
     {
@@ -261,7 +254,16 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
             m_active_mode = RaceManager::MINOR_MODE_EASTER_EGG;
 
         m_active_mode_is_linear = RaceManager::get()->isLinearRaceMode(m_active_mode);
-        refresh(/*reload replay files*/ false, /* update columns */ true);
+        refresh(/*keep high score list*/ false, /* update columns */ true);
+    }
+    else if (name == "actions")
+    {
+        std::string selection = m_action_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+        if (selection == "remove-all")
+            onClearHighscores();
+        else if (selection == "reload")
+            refresh(/*reload high score list*/ true, /* update columns */ true);
     }
 }   // eventCallback
 
@@ -291,7 +293,12 @@ void HighScoreSelection::onConfirm()
     {
         highscore_manager->deleteHighscores(m_selected_index);
     }
+    defaultSort();
+
     highscore_manager->saveHighscores();
+
+    // Restore the previously used sort direction
+    highscore_manager->sortHighscores(m_reverse_sort);
 
     ModalDialog::dismiss();
     HighScoreSelection::getInstance()->refresh();
@@ -304,7 +311,6 @@ void HighScoreSelection::onConfirm()
 
 void HighScoreSelection::onColumnClicked(int column_id, bool sort_desc, bool sort_default)
 {
-    /*
     // Begin by resorting the list to default
     defaultSort();
 
@@ -314,59 +320,32 @@ void HighScoreSelection::onColumnClicked(int column_id, bool sort_desc, bool sor
         return;
     }
 
-    int diff_difficulty = m_same_difficulty ? 1 : 0;
-    int diff_linear = m_active_mode_is_linear ? 0 : 1;
-    //int diff_multiplayer = m_multiplayer ? 0 : 1;
-
-    if (column_id >= 1)
-        column_id += diff_linear;
-
-    if (column_id >= 2)
-        column_id += diff_difficulty;
-
-    if (column_id >= 3)
-        column_id += diff_linear;
-
-    //if (column_id >= 7)
-    //    column_id += diff_multiplayer;
-
     if (column_id == 0)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
+        Highscores::setSortOrder(Highscores::SO_TRACK);
     else if (column_id == 1)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
+        Highscores::setSortOrder(Highscores::SO_KART_NUM);
     else if (column_id == 2)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_DIFF);
+        Highscores::setSortOrder(Highscores::SO_DIFF);
     else if (column_id == 3)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
+        Highscores::setSortOrder(Highscores::SO_LAPS);
     else if (column_id == 4)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
-    else if (column_id == 5)
-        return; // no sorting by kart icon (yet ?)
-    else if (column_id == 6)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_USER);
-    else if (column_id == 7)
-        ReplayPlay::setSortOrder(ReplayPlay::SO_KART_NUM);
+        Highscores::setSortOrder(Highscores::SO_REV);
     else
         assert(0);
 
-    ReplayPlay::get()->sortReplay(sort_desc);
-    */
+    m_reverse_sort = sort_desc;
+    highscore_manager->sortHighscores(sort_desc);
+
     loadList();
 }   // onColumnClicked
 
 // ----------------------------------------------------------------------------
 /** Apply the default sorting to the high score list
  */
-/*
+
 void HighScoreSelection::defaultSort()
 {
-    ReplayPlay::setSortOrder(ReplayPlay::SO_TIME);
-    //ReplayPlay::get()->sortReplay(false);
-    //ReplayPlay::setSortOrder(ReplayPlay::SO_LAPS);
-    //ReplayPlay::get()->sortReplay(false);
-    //ReplayPlay::setSortOrder(ReplayPlay::SO_REV);
-    //ReplayPlay::get()->sortReplay(false);
-    //ReplayPlay::setSortOrder(ReplayPlay::SO_TRACK);
-    //ReplayPlay::get()->sortReplay(false);
-//}   // defaultSort
-*/
+    m_reverse_sort = false;
+    Highscores::setSortOrder(Highscores::SO_DEFAULT);
+    highscore_manager->sortHighscores(false);
+}   // defaultSort

@@ -26,6 +26,8 @@
 #include <stdexcept>
 #include <fstream>
 
+Highscores::SortOrder Highscores::m_sort_order = Highscores::SO_DEFAULT;
+
 // -----------------------------------------------------------------------------
 Highscores::Highscores(const HighscoreType &highscore_type,
                        int num_karts,

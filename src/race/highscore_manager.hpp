@@ -42,24 +42,40 @@ private:
     std::string m_filename;
     bool        m_can_write;
 
-    void setFilename();
+    void        setFilename();
 
 public:
                 HighscoreManager();
                ~HighscoreManager();
-    void loadHighscores();
+    // ------------------------------------------------------------------------
+    void        loadHighscores();
+    // ------------------------------------------------------------------------
     void        saveHighscores();
+    // ------------------------------------------------------------------------
     Highscores *getHighscores(const Highscores::HighscoreType &highscore_type,
                               int num_karts,
                               const RaceManager::Difficulty difficulty,
                               const std::string &trackName,
                               const int number_of_laps,
                               const bool reverse);
-    void deleteHighscores(int i);
-    void clearHighscores();
-    bool highscoresEmpty();
-    Highscores* getHighscoresAt(int i);
-    int highscoresSize();
+    // ------------------------------------------------------------------------
+    void deleteHighscores(int i)        { m_all_scores.erase
+                                        (m_all_scores.begin() + i); }
+    // ------------------------------------------------------------------------
+    void clearHighscores()              { m_all_scores.clear(); }
+    // ------------------------------------------------------------------------
+    bool highscoresEmpty()              { return m_all_scores.empty(); }
+    // ------------------------------------------------------------------------
+    Highscores* getHighscoresAt(int i)  { return m_all_scores.at(i); }
+    // ------------------------------------------------------------------------
+    int highscoresSize()                { return m_all_scores.size(); }
+    // ------------------------------------------------------------------------
+    void sortHighscores(bool reverse)
+    {
+        (reverse ? std::stable_sort(m_all_scores.rbegin(),
+            m_all_scores.rend()) : std::stable_sort(m_all_scores.begin(),
+            m_all_scores.end()));
+    }
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;
