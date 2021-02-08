@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
-# Karl Ove Hufthammer <karl@huftis.org>, 2011,2015-2016,2018-2020
+# Karl Ove Hufthammer <karl@huftis.org>, 2011,2015-2016,2018-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-28 11:08+0800\n"
-"PO-Revision-Date: 2021-01-28 03:34+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-02-06 09:59+0800\n"
+"PO-Revision-Date: 2021-02-07 15:20+0000\n"
+"Last-Translator: Karl Ove Hufthammer <karl@huftis.org>\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/supertuxkart/supertuxkart/language/nn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,15 +20,15 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr ""
+msgstr "Pakkar ut speldata …"
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
-msgstr ""
+msgstr "Feil ved utpakking av speldata"
 
 #. I18N: In Android UI, po_extract_error_msg
 msgid "Check remaining device space or reinstall SuperTuxKart."
-msgstr ""
+msgstr "Sjå til at du har nok ledig diskplass, eventuelt installer SuperTuxKart på nytt."
 
 #. I18N: In Android UI, po_quit
 #. I18N: ./data/gui/screens/main_menu.stkgui
@@ -213,7 +213,7 @@ msgstr "Ratt"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Auto acceleration"
-msgstr ""
+msgstr "Autoakselerasjon"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
@@ -355,46 +355,46 @@ msgstr "Behald oppløysinga"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
-msgstr ""
+msgstr "Kameraoppsett"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr ""
+msgstr "Spelarkamera"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "FOV"
-msgstr ""
+msgstr "Synsfelt"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Distance"
-msgstr ""
+msgstr "Avstand"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Angle"
-msgstr ""
+msgstr "Vinkel"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Smooth camera"
-msgstr ""
+msgstr "Jamn kamerarørsle"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Backward camera"
-msgstr ""
+msgstr "Baklengskamera"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "Følg ballen i fotballmodus"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Reset"
-msgstr ""
+msgstr "Tilbakestill"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -1016,7 +1016,7 @@ msgstr "Installert"
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
 #. I18N: In the UI options, Camera setting: Standard
-#: src/states_screens/dialogs/custom_camera_settings.cpp:66
+#: src/states_screens/dialogs/custom_camera_settings.cpp:67
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 #: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
@@ -1612,7 +1612,7 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr ""
+msgstr "Når du er inne på ein tenar, startar eit løp når eigaren (merkt med ei krone) vel å starta det. Offisielle tenarar kan starta løp automatisk når det er komme mange nok spelarar. Du kan så velja køyretøy og stemma på kva bane de skal spela. Tilleggsbaner kan brukast berre viss dei er installerte både hos alle spelarane og på tenaren."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -2159,12 +2159,12 @@ msgstr "Skriftstorleik"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Camera"
-msgstr ""
+msgstr "Kamera"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr ""
+msgstr "Tilpassa …"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2194,7 +2194,7 @@ msgstr "Grafiske effektar"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr ""
+msgstr "Oppteiknings­oppløysing"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2204,7 +2204,7 @@ msgstr "Sløringseffektar"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Vertical Sync"
-msgstr ""
+msgstr "Vertikal synkronisering"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2455,7 +2455,7 @@ msgstr "Gavroche"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
-msgstr ""
+msgstr "Gnu"
 
 #. I18N: ../stk-assets/karts/hexley/kart.xml
 msgid "Hexley"
@@ -2483,11 +2483,11 @@ msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Pepper"
-msgstr ""
+msgstr "Pepar"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara"
-msgstr ""
+msgstr "Sara"
 
 #. I18N: ../stk-assets/karts/suzanne/kart.xml
 msgid "Suzanne"
@@ -2779,12 +2779,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d – %d kilotrekantar – ping: %d ms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:198
+#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:198
 #, c-format
 msgid "Tip: %s"
 msgstr "Tips: %s"
 
-#: src/guiengine/engine.cpp:1476
+#: src/guiengine/engine.cpp:1483
 msgid "Loading"
 msgstr "Lastar"
 
@@ -3420,14 +3420,19 @@ msgstr "Venstre triggerknapp"
 msgid "Right trigger"
 msgstr "Høgre triggerknapp"
 
-#: src/input/input_manager.cpp:989
+#: src/input/input_manager.cpp:993
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "«%s» kom ikkje med. Du må melda deg på tidlegare om du vil verta med!"
 
-#: src/input/input_manager.cpp:1026
+#: src/input/input_manager.cpp:1030
 msgid "Only the Game Master may act at this point!"
 msgstr "Berre spelleiaren kan gjera noko no!"
+
+#: src/input/sdl_controller.cpp:241
+#, c-format
+msgid "%s has low battery level."
+msgstr "%s har lite batteri att."
 
 #: src/input/wiimote_manager.cpp:379
 msgid ""
@@ -3479,7 +3484,7 @@ msgstr "Du vann løpet!"
 #: src/karts/kart.cpp:1021
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "Du fullførte løpet med %d poeng!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
@@ -3494,7 +3499,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr ""
+msgstr "SuperTuxKart kan kopla til ein tenar for å lasta ned speltillegg og varsla deg om oppdateringar. Les meir om personvern på https://supertuxkart.net/Privacy. Ønskjer du å bruka denne funksjonaliteten? (For å endra dette seinare kan du gå til innstillingsvindauget, velja fana «Generelt» og kryssa av for «Kopla til Internett».)"
 
 #: src/main.cpp:2198
 msgid "Your screen resolution is too low to run STK."
@@ -4500,14 +4505,14 @@ msgid ""
 msgstr "Skjermoppløysingar lågare enn 1024 × 768 og 1280 × 720 er ikkje offisielt støtta. Delar av spelet kan sjå feil ut."
 
 #. I18N: In the UI options, Camera setting: Drone chase
-#: src/states_screens/dialogs/custom_camera_settings.cpp:81
+#: src/states_screens/dialogs/custom_camera_settings.cpp:84
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
-msgstr ""
+msgstr "Dronefølgje"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
-#: src/states_screens/dialogs/custom_camera_settings.cpp:96
+#: src/states_screens/dialogs/custom_camera_settings.cpp:101
 #: src/states_screens/options/options_screen_ui.cpp:160
 #: src/states_screens/options/options_screen_video.cpp:529
 #: src/states_screens/options/options_screen_video.cpp:564
@@ -5137,7 +5142,7 @@ msgstr "Tilskodar"
 
 #: src/states_screens/online/networking_lobby.cpp:198
 msgid "Install addon"
-msgstr ""
+msgstr "Installer tillegg"
 
 #: src/states_screens/online/networking_lobby.cpp:337
 #, c-format
@@ -5258,7 +5263,7 @@ msgstr "Fråkopla"
 #: src/states_screens/online/online_screen.cpp:201
 msgid ""
 "You must be logged in to play Global networking. Click your username above."
-msgstr "Du må vera logga før du kan spela over Internett. Trykk på brukarnamnet ditt ovanfor."
+msgstr "Du må vera logga inn før du kan spela over Internett. Trykk på brukarnamnet ditt ovanfor."
 
 #: src/states_screens/online/online_screen.cpp:211
 msgid ""
@@ -5528,7 +5533,7 @@ msgstr "* Eit blått element tyder at det er ein konflikt med eit anna oppsett"
 
 #: src/states_screens/options/options_screen_device.cpp:404
 msgid "* A red item means a conflict in the current configuration"
-msgstr "* Eit raudt element tyder at det er ein konflikt med det gjeldande oppsettet"
+msgstr "* Raud tekst tyder at det er ein konflikt i oppsettet"
 
 #: src/states_screens/options/options_screen_device.cpp:510
 msgid ""
@@ -5650,7 +5655,7 @@ msgstr "«Speedrun»-modus kan berre slåast på dersom spelet ikkje har blitt l
 #. I18N: In the video options, maximum frame per second
 #: src/states_screens/options/options_screen_video.cpp:236
 msgid "Maximum FPS"
-msgstr ""
+msgstr "Maksgrense for bilete per sekund"
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:244
@@ -5785,64 +5790,64 @@ msgid "Do you really want to delete player '%s'?"
 msgstr "Er du sikker på at du vil sletta spelaren «%s»?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:69
+#: src/states_screens/race_gui_base.cpp:70
 msgid "Ready!"
 msgstr "Klar"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:72
 msgid "Set!"
 msgstr "Ferdig"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:73
+#: src/states_screens/race_gui_base.cpp:74
 msgid "Go!"
 msgstr "Køyr!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:75
+#: src/states_screens/race_gui_base.cpp:76
 msgid "GOAL!"
 msgstr "MÅL!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:78
+#: src/states_screens/race_gui_base.cpp:79
 #: src/states_screens/race_result_gui.cpp:366
 msgid "Waiting for others"
 msgstr "Ventar på andre"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:80
+#: src/states_screens/race_gui_base.cpp:81
 msgid "Waiting for the server"
 msgstr "Ventar på tenaren"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:637
+#: src/states_screens/race_gui_base.cpp:638
 #, c-format
 msgid "\"%s\""
 msgstr "«%s»"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:647
+#: src/states_screens/race_gui_base.cpp:648
 msgid "by"
 msgstr "av"
 
-#: src/states_screens/race_gui_base.cpp:755
+#: src/states_screens/race_gui_base.cpp:756
 msgid "Collect nitro!"
 msgstr "Samla nitro!"
 
-#: src/states_screens/race_gui_base.cpp:757
+#: src/states_screens/race_gui_base.cpp:758
 msgid "Follow the leader!"
 msgstr "Følg leiaren!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:940
+#: src/states_screens/race_gui_base.cpp:941
 #, c-format
 msgid "Top %i"
 msgstr "%i beste"
 
-#: src/states_screens/race_gui.cpp:444
+#: src/states_screens/race_gui.cpp:445
 msgid "Challenge Failed"
 msgstr "Klarte ikkje utfordringa"
 
@@ -5850,7 +5855,7 @@ msgstr "Klarte ikkje utfordringa"
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:540
 msgid "Press podium icon to start tutorial"
-msgstr ""
+msgstr "Trykk på podiet for å starta opplæringsbana"
 
 #: src/states_screens/race_gui_overworld.cpp:546
 msgid "Press fire to start the tutorial"
@@ -5860,7 +5865,7 @@ msgstr "Trykk skyt for å starta opplæringsbana"
 #. and press the podium (2, 1, 3 like) icon instead of fire button
 #: src/states_screens/race_gui_overworld.cpp:622
 msgid "Press podium icon to start the challenge"
-msgstr ""
+msgstr "Trykk på podiet for å starta utfordringa"
 
 #: src/states_screens/race_gui_overworld.cpp:628
 msgid "Press fire to start the challenge"
@@ -6140,13 +6145,13 @@ msgstr "Du er no klar til å køyra ekte løp. Lukke til!"
 #. description in Google Play
 #: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
 msgid "A 3D open-source kart racing game"
-msgstr ""
+msgstr "Eit racerspel i 3D med open kjeldekode"
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
 #: supertuxkart.desktop:11
 msgid "tux;game;race;"
-msgstr ""
+msgstr "tux;spel;billøp;racerspel;"
 
 #: supertuxkart.appdata.xml:8
 msgid ""
@@ -6154,7 +6159,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr ""
+msgstr "Racerkøyretøy – nitroar – action! SuperTuxKart eit racerspel i 3D, med open kjeldekode og mange ulike køyretøy, baner og spel­modusar. Målet er eit spel med meir vekt på underhaldning enn på realisme – eit som gjev mykje moro for folk i alle aldrar."
 
 #: supertuxkart.appdata.xml:11
 msgid ""
@@ -6164,7 +6169,7 @@ msgid ""
 " the palm trees on the beach, watching the other karts overtake you. But "
 "don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
 "cakes thrown by your opponents."
-msgstr ""
+msgstr "Utforsk ei mystisk undervass­verd eller naviger deg gjennom jungelen i Val Verde, der du finn det legendariske Kakaotempelet. Kappkøyr under jorda, på ein romstasjon, på ein bondegard eller på ein framand planet. Eller korfor ikkje berre slappa av under palmetrea på stranda mens du ser motstandarane susa forbi deg. Men for all del ikkje et bananane! Pass deg òg for bowlingkuler, sugekoppar, tyggisar og kaker som motstandarane dine kastar mot deg."
 
 #: supertuxkart.appdata.xml:14
 msgid ""
@@ -6173,29 +6178,29 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, race online against players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "Du kan blant anna konkurrera mot vennar eller datamaskina i enkeltløp, ulike turneringar og kampmodus, eller prøva å slå gamle tidsrekordar! Og ønskjer du ei større utfordring, kan du prøva deg mot spelarar frå heile verda via nettet!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."
-msgstr ""
+msgstr "Spelet er gratis og heilt utan reklame."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
 "This is an unstable version of SuperTuxKart that contains latest "
 "improvements. It is released mainly for testing, to make stable STK as good "
 "as possible."
-msgstr ""
+msgstr "Dette er ein ustabil testversjon av SuperTuxKart med dei nyaste forbetringane. Han er hovudsakleg meint for testing, slik at den endelege versjonen vert så god som mogleg."
 
 #: supertuxkart.appdata.xml:23
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr ""
+msgstr "Denne versjonen kan installerast parallelt med den stabile versjonen på denne eininga."
 
 #: supertuxkart.appdata.xml:26
 msgid "If you need more stability, consider using the stable version: %s"
-msgstr ""
+msgstr "Viss du vil vera sikra ei meir stabil spel­oppleving, bør du bruka den stabile versjonen: %s"
 
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
-msgstr ""
+msgstr "SuperTuxKart-utviklarlaget"

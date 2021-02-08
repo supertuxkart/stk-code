@@ -4,8 +4,8 @@
 # 
 # Translators:
 # Benau, 2018
-# Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2020
-# Tagomago <tagomago@disroot.org>, 2020
+# Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2021
+# Tagomago <tagomago@disroot.org>, 2020-2021
 # Verónica Clémençon, 2017
 # William Beltrán <wbeltranc@gmail.com>, 2016
 # William Beltrán <wbeltranc@gmail.com>, 2017
@@ -13,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-28 11:08+0800\n"
-"PO-Revision-Date: 2021-01-28 03:34+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-02-06 09:59+0800\n"
+"PO-Revision-Date: 2021-02-07 09:20+0000\n"
+"Last-Translator: Tagomago <tagomago@disroot.org>\n"
 "Language-Team: Spanish (http://www.transifex.com/supertuxkart/supertuxkart/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -395,11 +395,11 @@ msgstr "Cámara trasera"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "Sigue la pelota en modo fútbol"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Reset"
-msgstr ""
+msgstr "Reiniciar"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -1021,7 +1021,7 @@ msgstr "Instalado"
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
 #. I18N: In the UI options, Camera setting: Standard
-#: src/states_screens/dialogs/custom_camera_settings.cpp:66
+#: src/states_screens/dialogs/custom_camera_settings.cpp:67
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 #: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
@@ -2199,7 +2199,7 @@ msgstr "Nivel de efectos gráficos"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr ""
+msgstr "Resolución del renderizado"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2784,12 +2784,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:198
+#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:198
 #, c-format
 msgid "Tip: %s"
 msgstr "Consejo: %s"
 
-#: src/guiengine/engine.cpp:1476
+#: src/guiengine/engine.cpp:1483
 msgid "Loading"
 msgstr "Cargando"
 
@@ -3425,14 +3425,19 @@ msgstr "Gatillo izquierdo"
 msgid "Right trigger"
 msgstr "Gatillo derecho"
 
-#: src/input/input_manager.cpp:989
+#: src/input/input_manager.cpp:993
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Ignorando a '%s'. ¡Tenías que haberte unido antes para jugar!"
 
-#: src/input/input_manager.cpp:1026
+#: src/input/input_manager.cpp:1030
 msgid "Only the Game Master may act at this point!"
 msgstr "¡Sólo el creador de la partida puede actuar en este punto!"
+
+#: src/input/sdl_controller.cpp:241
+#, c-format
+msgid "%s has low battery level."
+msgstr "%s tiene bajo el nivel de batería."
 
 #: src/input/wiimote_manager.cpp:379
 msgid ""
@@ -3484,7 +3489,7 @@ msgstr "¡Has ganado la carrera!"
 #: src/karts/kart.cpp:1021
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "¡Has finalizado la carrera en %dª posición!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
@@ -4505,14 +4510,14 @@ msgid ""
 msgstr "Las resoluciones más pequeñas de 1024x768 o 1280x720 no están soportadas. Algunas partes de la interfaz pueden no funcionar correctamente."
 
 #. I18N: In the UI options, Camera setting: Drone chase
-#: src/states_screens/dialogs/custom_camera_settings.cpp:81
+#: src/states_screens/dialogs/custom_camera_settings.cpp:84
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
 msgstr "Seguimiento de dron"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
-#: src/states_screens/dialogs/custom_camera_settings.cpp:96
+#: src/states_screens/dialogs/custom_camera_settings.cpp:101
 #: src/states_screens/options/options_screen_ui.cpp:160
 #: src/states_screens/options/options_screen_video.cpp:529
 #: src/states_screens/options/options_screen_video.cpp:564
@@ -5790,64 +5795,64 @@ msgid "Do you really want to delete player '%s'?"
 msgstr "¿Realmente quieres eliminar al jugador '%s'?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:69
+#: src/states_screens/race_gui_base.cpp:70
 msgid "Ready!"
 msgstr "¡Preparados!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:72
 msgid "Set!"
 msgstr "¡Listos!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:73
+#: src/states_screens/race_gui_base.cpp:74
 msgid "Go!"
 msgstr "¡Ya!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:75
+#: src/states_screens/race_gui_base.cpp:76
 msgid "GOAL!"
 msgstr "¡GOL!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:78
+#: src/states_screens/race_gui_base.cpp:79
 #: src/states_screens/race_result_gui.cpp:366
 msgid "Waiting for others"
 msgstr "Esperando a los demás"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:80
+#: src/states_screens/race_gui_base.cpp:81
 msgid "Waiting for the server"
 msgstr "Esperando al servidor"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:637
+#: src/states_screens/race_gui_base.cpp:638
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:647
+#: src/states_screens/race_gui_base.cpp:648
 msgid "by"
 msgstr "por"
 
-#: src/states_screens/race_gui_base.cpp:755
+#: src/states_screens/race_gui_base.cpp:756
 msgid "Collect nitro!"
 msgstr "Recoge nitro!"
 
-#: src/states_screens/race_gui_base.cpp:757
+#: src/states_screens/race_gui_base.cpp:758
 msgid "Follow the leader!"
 msgstr "Sigue al líder!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:940
+#: src/states_screens/race_gui_base.cpp:941
 #, c-format
 msgid "Top %i"
 msgstr "Top %i"
 
-#: src/states_screens/race_gui.cpp:444
+#: src/states_screens/race_gui.cpp:445
 msgid "Challenge Failed"
 msgstr "Reto no superado"
 

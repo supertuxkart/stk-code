@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-28 11:08+0800\n"
-"PO-Revision-Date: 2021-01-28 03:34+0000\n"
+"POT-Creation-Date: 2021-02-06 09:59+0800\n"
+"PO-Revision-Date: 2021-02-06 02:01+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Swahili (http://www.transifex.com/supertuxkart/supertuxkart/language/sw/)\n"
 "MIME-Version: 1.0\n"
@@ -1016,7 +1016,7 @@ msgstr ""
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
 #. I18N: In the UI options, Camera setting: Standard
-#: src/states_screens/dialogs/custom_camera_settings.cpp:66
+#: src/states_screens/dialogs/custom_camera_settings.cpp:67
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 #: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
@@ -2779,12 +2779,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "Picha inaonyeshwa kwa nukta: %d/%d/%d - %d KTris, muda wa kuamkia seva: %dsehemu elfu ya nukta"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1432 src/states_screens/race_result_gui.cpp:198
+#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:198
 #, c-format
 msgid "Tip: %s"
 msgstr ""
 
-#: src/guiengine/engine.cpp:1476
+#: src/guiengine/engine.cpp:1483
 msgid "Loading"
 msgstr "Inapakiwa"
 
@@ -3420,14 +3420,19 @@ msgstr "Uchochezi wa kushoto"
 msgid "Right trigger"
 msgstr "Uchochezi wa kulia"
 
-#: src/input/input_manager.cpp:989
+#: src/input/input_manager.cpp:993
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "'%s' anapuuzwa. Kucheza, ni hitaji uingia mapema! "
 
-#: src/input/input_manager.cpp:1026
+#: src/input/input_manager.cpp:1030
 msgid "Only the Game Master may act at this point!"
 msgstr "Sasa, ni Mkuu wa Mchezo pekee anaweza kufanya kitu!"
+
+#: src/input/sdl_controller.cpp:241
+#, c-format
+msgid "%s has low battery level."
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:379
 msgid ""
@@ -4500,14 +4505,14 @@ msgid ""
 msgstr "Mwonekano kasoro 1024x768 ama 1280x720 haijaungwa mkono. Labda kiolesura cha mtumiaji haifanyi kazi sawa sawa."
 
 #. I18N: In the UI options, Camera setting: Drone chase
-#: src/states_screens/dialogs/custom_camera_settings.cpp:81
+#: src/states_screens/dialogs/custom_camera_settings.cpp:84
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
 msgstr ""
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
-#: src/states_screens/dialogs/custom_camera_settings.cpp:96
+#: src/states_screens/dialogs/custom_camera_settings.cpp:101
 #: src/states_screens/options/options_screen_ui.cpp:160
 #: src/states_screens/options/options_screen_video.cpp:529
 #: src/states_screens/options/options_screen_video.cpp:564
@@ -5785,64 +5790,64 @@ msgid "Do you really want to delete player '%s'?"
 msgstr "Ni kweli una taka kutoa mchezaji '1%s'?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:69
+#: src/states_screens/race_gui_base.cpp:70
 msgid "Ready!"
 msgstr "Tayarisha!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:72
 msgid "Set!"
 msgstr "Uko tayari!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:73
+#: src/states_screens/race_gui_base.cpp:74
 msgid "Go!"
 msgstr "Enda!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:75
+#: src/states_screens/race_gui_base.cpp:76
 msgid "GOAL!"
 msgstr "GOLI!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:78
+#: src/states_screens/race_gui_base.cpp:79
 #: src/states_screens/race_result_gui.cpp:366
 msgid "Waiting for others"
 msgstr "Ngojea wengine"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:80
+#: src/states_screens/race_gui_base.cpp:81
 msgid "Waiting for the server"
 msgstr "Ngojea seva"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:637
+#: src/states_screens/race_gui_base.cpp:638
 #, c-format
 msgid "\"%s\""
 msgstr ""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:647
+#: src/states_screens/race_gui_base.cpp:648
 msgid "by"
 msgstr "kwa"
 
-#: src/states_screens/race_gui_base.cpp:755
+#: src/states_screens/race_gui_base.cpp:756
 msgid "Collect nitro!"
 msgstr "Changa nitro!"
 
-#: src/states_screens/race_gui_base.cpp:757
+#: src/states_screens/race_gui_base.cpp:758
 msgid "Follow the leader!"
 msgstr "Fuata Mwongozi!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:940
+#: src/states_screens/race_gui_base.cpp:941
 #, c-format
 msgid "Top %i"
 msgstr "Bora %i"
 
-#: src/states_screens/race_gui.cpp:444
+#: src/states_screens/race_gui.cpp:445
 msgid "Challenge Failed"
 msgstr "Uilshindwa Kwa Changamoto"
 
