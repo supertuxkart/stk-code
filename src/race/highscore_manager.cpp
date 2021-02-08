@@ -44,7 +44,10 @@ HighscoreManager::HighscoreManager()
 HighscoreManager::~HighscoreManager()
 {
     saveHighscores();
-    m_all_scores.clear();
+    for(type_all_scores::iterator i  = m_all_scores.begin();
+                                  i != m_all_scores.end();  i++)
+        delete *i;
+
 }   // ~HighscoreManager
 
 // -----------------------------------------------------------------------------

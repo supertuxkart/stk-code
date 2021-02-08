@@ -73,8 +73,9 @@ public:
     void sortHighscores(bool reverse)
     {
         (reverse ? std::stable_sort(m_all_scores.rbegin(),
-            m_all_scores.rend()) : std::stable_sort(m_all_scores.begin(),
-            m_all_scores.end()));
+            m_all_scores.rend(), Highscores::compare) :
+            std::stable_sort(m_all_scores.begin(),
+            m_all_scores.end(), Highscores::compare));
     }
 };   // HighscoreManager
 

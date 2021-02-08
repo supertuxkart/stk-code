@@ -323,9 +323,9 @@ void HighScoreSelection::onColumnClicked(int column_id, bool sort_desc, bool sor
     if (column_id == 0)
         Highscores::setSortOrder(Highscores::SO_TRACK);
     else if (column_id == 1)
-        Highscores::setSortOrder(Highscores::SO_KART_NUM);
-    else if (column_id == 2)
         Highscores::setSortOrder(Highscores::SO_DIFF);
+    else if (column_id == 2)
+        Highscores::setSortOrder(Highscores::SO_KART_NUM);
     else if (column_id == 3)
         Highscores::setSortOrder(Highscores::SO_LAPS);
     else if (column_id == 4)

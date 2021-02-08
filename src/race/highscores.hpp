@@ -24,8 +24,6 @@
 #include <map>
 
 #include "race/race_manager.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_manager.hpp"
 
 #include "irrString.h"
 
@@ -71,31 +69,9 @@ private:
     static SortOrder m_sort_order;
 
 public:
+    bool operator < (const Highscores& hi) const;
 
-    bool operator < (const Highscores& hi) const
-    {
-        switch (m_sort_order)
-        {
-            case SO_TRACK:
-                return track_manager->getTrack(m_track)->getSortName()
-                < track_manager->getTrack(hi.m_track)->getSortName();
-                break;
-            case SO_KART_NUM:
-                return m_number_of_karts < hi.m_number_of_karts;
-                break;
-            case SO_DIFF:
-                return m_difficulty < hi.m_difficulty;
-                break;
-            case SO_LAPS:
-                return m_number_of_laps < hi.m_number_of_laps;
-                break;
-            case SO_REV:
-                return m_reverse < hi.m_reverse;
-                break;
-        }   // switch
-        return true;
-    }   // operator <
-
+    static bool compare(Highscores* a, Highscores* b) { return (*a < *b); }
     /** Creates a new entry
       */
     Highscores (const Highscores::HighscoreType &highscore_type,

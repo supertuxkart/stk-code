@@ -21,6 +21,8 @@
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
 #include <stdexcept>
@@ -234,3 +236,29 @@ void Highscores::getEntry(int number, std::string &kart_name,
 }   // getEntry
 
 // -----------------------------------------------------------------------------
+bool Highscores::operator < (const Highscores& hi) const
+{
+    switch (m_sort_order)
+    {
+        case SO_TRACK:
+        {
+            Track* a = track_manager->getTrack(m_track);
+            Track* b = track_manager->getTrack(hi.m_track);
+            std::wstring sort_name_a, sort_name_b;
+            if (a)
+                sort_name_a = a->getSortName().c_str();
+            if (b)
+                sort_name_b = b->getSortName().c_str();
+            return sort_name_a > sort_name_b;
+        }
+        case SO_KART_NUM:
+            return m_number_of_karts < hi.m_number_of_karts;
+        case SO_DIFF:
+            return m_difficulty < hi.m_difficulty;
+        case SO_LAPS:
+            return m_number_of_laps < hi.m_number_of_laps;
+        case SO_REV:
+            return m_reverse < hi.m_reverse;
+    }   // switch
+    return true;
+}   // operator <
