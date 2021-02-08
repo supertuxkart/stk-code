@@ -545,7 +545,7 @@ void cmdLineHelp()
     "       --aiNP=a,b,...     Use the karts a, b, ... for the AI, no additional player kart.\n"
     "       --laps=N           Define number of laps to N.\n"
     "       --mode=N           N=0 Normal, N=1 Time trial, N=2 Battle, N=3 Soccer,\n"
-    "                          N=4 Follow The Leader. In configure server use --battle-mode=n\n"
+    "                          N=4 Follow The Leader, N=5 Capture The Flag. In configure server use --battle-mode=n\n"
     "                          for battle server and --soccer-timed / goals for soccer server\n"
     "                          to control verbosely, see below:\n"
     "       --difficulty=N     N=0 Beginner, N=1 Intermediate, N=2 Expert, N=3 SuperTux.\n"
@@ -553,6 +553,8 @@ void cmdLineHelp()
     "                          1 is Capture The Flag.\n"
     "       --soccer-timed     Use time limit mode in network soccer game.\n"
     "       --soccer-goals     Use goals limit mode in network soccer game.\n"
+    "       --capture-limit    Specify capture limit for CTF.\n"
+    "       --time-limit       Specify time limit for current game mode.\n"
     "       --reverse          Play track in reverse (if allowed)\n"
     "  -f,  --fullscreen       Use fullscreen display.\n"
     "  -w,  --windowed         Use windowed display (default).\n"
@@ -1136,6 +1138,12 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
             RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
             break;
         }
+        case 5:
+        {
+            ServerConfig::m_server_mode = 8;
+            RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_CAPTURE_THE_FLAG);
+            break;
+        }
         default:
             Log::warn("main", "Invalid race mode '%d' - ignored.", n);
         }
@@ -1428,6 +1436,16 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         NetworkConfig::get()->setAutoConnect(true);
     }
 
+    if (CommandLine::has("--capture-limit", &n))
+    {
+        RaceManager::get()->setHitCaptureTime(n, 0.0f);
+    }
+
+    if (CommandLine::has("--time-limit", &n))
+    {
+        RaceManager::get()->setTimeTarget(n);
+    }
+
     // Race parameters
     if(CommandLine::has("--kartsize-debug"))
     {
@@ -1502,6 +1520,14 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
         if (!t)
         {
             Log::warn("main", "Can't find track named '%s'.", s.c_str());
+        }
+        else if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        {
+            // CTF has no ai support atm
+            const std::vector<std::string> l;
+            RaceManager::get()->setDefaultAIKartList(l);
+            // Add 1 for the player kart
+            RaceManager::get()->setNumKarts(1);
         }
         else if (t->isArena())
         {

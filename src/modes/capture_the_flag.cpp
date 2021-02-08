@@ -477,6 +477,14 @@ bool CaptureTheFlag::isRaceOver()
         NetworkConfig::get()->isClient())
         return false;
 
+    if (RaceManager::get()->getHitCaptureLimit() == 0)
+    {
+        // Prevent infinitive game
+        if (!RaceManager::get()->hasTimeTarget())
+            return true;
+        return m_count_down_reached_zero;
+    }
+
     if ((m_count_down_reached_zero && RaceManager::get()->hasTimeTarget()) ||
         (m_red_scores >= RaceManager::get()->getHitCaptureLimit() ||
         m_blue_scores >= RaceManager::get()->getHitCaptureLimit()))
