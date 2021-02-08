@@ -81,8 +81,6 @@ ISceneNode* CDefaultSceneNodeFactory::addSceneNode(ESCENE_NODE_TYPE type, IScene
 							4, ETPS_17, 0, true);
 	case ESNT_SKY_BOX:
 		return Manager->addSkyBoxSceneNode(0,0,0,0,0,0, parent);
-	case ESNT_SKY_DOME:
-		return Manager->addSkyDomeSceneNode(0, 16, 8, 0.9f, 2.0f, 1000.0f, parent);
 	case ESNT_SHADOW_VOLUME:
 		return 0;
 	case ESNT_OCTREE:

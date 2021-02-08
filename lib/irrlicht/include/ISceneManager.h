@@ -741,29 +741,6 @@ namespace scene
 			video::ITexture* left, video::ITexture* right, video::ITexture* front,
 			video::ITexture* back, ISceneNode* parent = 0, s32 id=-1) = 0;
 
-		//! Adds a skydome scene node to the scene graph.
-		/** A skydome is a large (half-) sphere with a panoramic texture
-		on the inside and is drawn around the camera position.
-		\param texture: Texture for the dome.
-		\param horiRes: Number of vertices of a horizontal layer of the sphere.
-		\param vertRes: Number of vertices of a vertical layer of the sphere.
-		\param texturePercentage: How much of the height of the
-		texture is used. Should be between 0 and 1.
-		\param spherePercentage: How much of the sphere is drawn.
-		Value should be between 0 and 2, where 1 is an exact
-		half-sphere and 2 is a full sphere.
-		\param radius The Radius of the sphere
-		\param parent: Parent scene node of the dome. A dome usually has no parent,
-		so this should be null. Note: If a parent is set, the dome will not
-		change how it is drawn.
-		\param id: An id of the node. This id can be used to identify the node.
-		\return Pointer to the sky dome if successful, otherwise NULL.
-		This pointer should not be dropped. See IReferenceCounted::drop() for more information. */
-		virtual ISceneNode* addSkyDomeSceneNode(video::ITexture* texture,
-			u32 horiRes=16, u32 vertRes=8,
-			f32 texturePercentage=0.9, f32 spherePercentage=2.0,f32 radius = 1000.f,
-			ISceneNode* parent=0, s32 id=-1) = 0;
-
 		//! Adds a particle system scene node to the scene graph.
 		/** \param withDefaultEmitter: Creates a default working point emitter
 		which emitts some particles. Set this to true to see a particle system

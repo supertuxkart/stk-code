@@ -249,9 +249,6 @@ public:
                                        scene::ISceneNode* parent=NULL);
     scene::IParticleSystemSceneNode
                          *addParticleNode(bool default_emitter=true);
-    scene::ISceneNode    *addSkyDome(video::ITexture *texture, int hori_res,
-                                     int vert_res, float texture_percent,
-                                     float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names,
                                     const std::vector<video::ITexture*> &spherical_harmonics_textures);
     void suppressSkyBox();

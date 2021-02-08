@@ -1,10 +1,8 @@
 <?xml version="1.0"?>
 <materials>
- 
-  <material name="speedback.png"    compositing="test" clampU="Y" clampV="Y" light="N" ignore="Y"/>
-  <material name="speedfore.png"    compositing="test" clampU="Y" clampV="Y" light="N" ignore="Y"/>
-  <material name="notes.png"             compositing="test" light="N" ignore="Y"/>
-  <material name="soccer_player_red.png"             compositing="blend" light="N" ignore="Y"/>
-  <material name="soccer_player_blue.png"             compositing="blend" light="N" ignore="Y"/>
-
+  <material name="speedback.png"              shader="alphatest"  clampU="Y" clampV="Y" ignore="Y"/>
+  <material name="speedfore.png"              shader="alphatest"  clampU="Y" clampV="Y" ignore="Y"/>
+  <material name="notes.png"                  shader="alphatest"  ignore="Y"/>
+  <material name="soccer_player_red.png"      shader="alphablend" ignore="Y"/>
+  <material name="soccer_player_blue.png"     shader="alphablend" ignore="Y"/>
 </materials>

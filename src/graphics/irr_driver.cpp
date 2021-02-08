@@ -1543,30 +1543,6 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
 }   // addAnimatedMesh
 
 // ----------------------------------------------------------------------------
-/** Adds a sky dome. Documentation from irrlicht:
- *  A skydome is a large (half-) sphere with a panoramic texture on the inside
- *  and is drawn around the camera position.
- *  \param texture: Texture for the dome.
- *  \param horiRes: Number of vertices of a horizontal layer of the sphere.
- *  \param vertRes: Number of vertices of a vertical layer of the sphere.
- *  \param texturePercentage: How much of the height of the texture is used.
- *         Should be between 0 and 1.
- *  \param spherePercentage: How much of the sphere is drawn. Value should be
- *          between 0 and 2, where 1 is an exact half-sphere and 2 is a full
- *          sphere.
- */
-scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
-                                         int hori_res, int vert_res,
-                                         float texture_percent,
-                                         float sphere_percent)
-{
-    Log::error("skybox", "Using deprecated SkyDome");
-    return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
-                                                texture_percent,
-                                                sphere_percent);
-}   // addSkyDome
-
-// ----------------------------------------------------------------------------
 /** Adds a skybox using. Irrlicht documentation:
  *  A skybox is a big cube with 6 textures on it and is drawn around the camera
  *  position.

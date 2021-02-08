@@ -195,56 +195,28 @@ Material::Material(const XMLNode *node, bool deprecated)
     if (!node->get("shader", &s))
     {
         // BACKWARS COMPATIBILITY, EVENTUALLY REMOVE
-
         bool b = false;
-        node->get("additive", &b);
-        if (b)
+        if (node->get("additive", &b))
         {
-            m_shader_name = "alphablend";
+            Log::warn("material", "'additive=' property is deprecated and removed. Please use shaders now");
         }
-
         b = false;
-        node->get("transparency", &b);
-        if (b)
+        if (node->get("alpha", &b))
         {
-            m_shader_name = "alphatest";
+            Log::warn("material", "'alpha=' property is deprecated and removed. Please use shaders now");
         }
-
-        //node->get("lightmap", &m_lightmap);
-
-        b = false;
-        node->get("alpha", &b);
-        if (b)
-        {
-            m_shader_name = "alphablend";
-        }
-
         b = true;
-        node->get("light", &b);
-        if (!b)
+        if (node->get("light", &b))
         {
-            m_shader_name = "unlit";
+            Log::warn("material", "'light=' property is deprecated and removed. Please use shaders now");
         }
         if (node->get("compositing", &s))
         {
-            if (s == "blend")
-            {
-                m_shader_name = "alphablend";
-            }
-            else if (s == "test")
-            {
-                m_shader_name = "alphatest";
-            }
-            else if (s == "additive")
-            {
-                m_shader_name = "additive";
-            }
-            else if (s == "coverage")
-            {
-                m_shader_name = "alphatest";
-            }
-            else if (s != "none")
-                Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
+            Log::warn("material", "'compositing=' property is deprecated and removed. Please use shaders now");
+        }
+        if (node->get("transparency", &s))
+        {
+            Log::warn("material", "'transparency=' property is deprecated and removed. Please use shaders now");
         }
 
         s = "";
