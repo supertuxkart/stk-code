@@ -56,16 +56,20 @@ void override_default_params_for_mobile()
     UserConfigParams::m_high_definition_textures = false;
     
     // Enable advanced lighting only for android >= 8
+#ifdef ANDROID
     UserConfigParams::m_dynamic_lights = (SDL_GetAndroidSDKVersion() >= 26);
-    
+#endif
+
     // Disable light scattering for better performance
     UserConfigParams::m_light_scatter = false;
 
     // Enable multitouch race GUI
     UserConfigParams::m_multitouch_draw_gui = true;
 
-    // Default 30 fps for battery saving
+#ifdef IOS_STK
+    // Default 30 fps for battery saving (only used in iOS)
     UserConfigParams::m_swap_interval = 2;
+#endif
 
 #ifdef ANDROID
     // For usage in StringUtils::getUserAgentString
