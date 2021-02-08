@@ -86,9 +86,7 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
 
-    m_timer_in_use = false;
     m_master_player_only = false;
-    m_timer = 0;
 #ifndef SERVER_ONLY
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0)
     {
@@ -153,6 +151,8 @@ void InputManager::handleJoystick(SDL_Event& event)
         }
         case SDL_JOYDEVICEREMOVED:
         {
+            m_gamepads_timer.erase(
+                m_sdl_controller.at(event.jdevice.which)->getInstanceID());
             m_sdl_controller.erase(event.jdevice.which);
             break;
         }
@@ -202,11 +202,15 @@ void InputManager::update(float dt)
         wiimote_manager->update();
 #endif
 
-    if(m_timer_in_use)
+    for (auto it = m_gamepads_timer.begin(); it != m_gamepads_timer.end();)
     {
-        m_timer -= dt;
-        if(m_timer < 0) m_timer_in_use = false;
+        it->second -= dt;
+        if (it->second < 0)
+            it = m_gamepads_timer.erase(it);
+        else
+            it++;
     }
+
 #ifndef SERVER_ONLY
     for (auto& controller : m_sdl_controller)
         controller.second->checkPowerLevel();
@@ -968,10 +972,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         {
             // reset timer when released
             if (abs(value) == 0 && type == Input::IT_STICKMOTION)
-            {
-                m_timer_in_use = false;
-                m_timer = 0;
-            }
+                m_gamepads_timer.erase(deviceID);
 
             // When in master-only mode, we can safely assume that players
             // are set up, contrarly to early menus where we accept every
@@ -998,13 +999,12 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
             }
 
             // menu input
-            if (!m_timer_in_use)
+            if (m_gamepads_timer.find(deviceID) == m_gamepads_timer.end())
             {
                 if (type == Input::IT_STICKMOTION &&
                     abs(value) > Input::MAX_VALUE * 2 / 3)
                 {
-                    m_timer_in_use = true;
-                    m_timer = 0.25;
+                    m_gamepads_timer[deviceID] = 0.25f;
                 }
 
                 if (is_nw_spectator)
