@@ -63,6 +63,7 @@
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "main_loop.hpp"
 
 #include <string>
 
@@ -636,5 +637,19 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 
 bool MainMenuScreen::onEscapePressed()
 {
-    return true;
+    class ConfirmClose :
+          public MessageDialog::IConfirmDialogListener
+    {
+    public:
+        virtual void onConfirm()
+        {
+            GUIEngine::ModalDialog::dismiss();
+            main_loop->abort();
+        }   // onConfirm
+    };   // ConfirmClose
+
+    new MessageDialog(_("Are you sure to quit STK?"),
+        MessageDialog::MESSAGE_DIALOG_YESNO, new ConfirmClose(),
+        true/*delete_listener*/);
+    return false;
 }   // onEscapePressed
