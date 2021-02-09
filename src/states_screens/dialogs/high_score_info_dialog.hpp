@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_GHOST_REPLAY_INFO_DIALOG_HPP
-#define HEADER_GHOST_REPLAY_INFO_DIALOG_HPP
+#ifndef HEADER_HIGH_SCORE_INFO_DIALOG_HPP
+#define HEADER_HIGH_SCORE_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
