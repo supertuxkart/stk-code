@@ -28,6 +28,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -50,6 +51,8 @@ KartColorSliderDialog::KartColorSliderDialog(PlayerProfile* pp)
     m_toggle_slider->clearLabels();
     m_toggle_slider->addLabel(original_color);
     m_toggle_slider->addLabel(choose_color);
+
+    m_buttons_widget = getWidget<RibbonWidget>("buttons");
 
     if (m_player_profile->getDefaultKartColor() != 0.0f)
     {
@@ -111,26 +114,8 @@ void KartColorSliderDialog::beforeAddingWidgets()
     model_location.setScale(core::vector3df(scale, scale, scale));
 
     // Add the kart model (including wheels and speed weight objects)
-    const bool has_win_anime =
-        (((kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ||
-        kart_model.getFrame(KartModel::AF_WIN_START) > -1) &&
-        kart_model.getFrame(KartModel::AF_WIN_END) > -1) ||
-        (kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 &&
-        kart_model.getFrame(KartModel::AF_SELECTION_END) > -1));
     m_model_view->addModel(kart_model.getModel(), model_location,
-        has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_START) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_START) :
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) > -1 ?
-        kart_model.getFrame(KartModel::AF_WIN_LOOP_START) :
-        kart_model.getFrame(KartModel::AF_WIN_START) :
-        kart_model.getBaseFrame(),
-        has_win_anime ?
-        kart_model.getFrame(KartModel::AF_SELECTION_END) > -1 ?
-        kart_model.getFrame(KartModel::AF_SELECTION_END) :
-        kart_model.getFrame(KartModel::AF_WIN_END) :
-        kart_model.getBaseFrame(),
-        kart_model.getAnimationSpeed());
+                           kart_model.getBaseFrame(), kart_model.getBaseFrame());
 
     model_location.setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     for (unsigned i = 0; i < 4; i++)
@@ -191,14 +176,25 @@ GUIEngine::EventPropagation
         m_model_view->getModelViewRenderInfo()->setHue(float(
             m_color_slider->getValue()) / 100.0f);
     }
-    else if (eventSource == "close")
+    else if (eventSource == "buttons")
     {
-        float color = 0.0f;
-        if (m_toggle_slider->getValue() == 1)
-            color = float(m_color_slider->getValue()) / 100.0f;
-        m_player_profile->setDefaultKartColor(color);
-        ModalDialog::dismiss();
-        return GUIEngine::EVENT_BLOCK;
+        const std::string& selection = m_buttons_widget->
+                                    getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+        if (selection == "apply")
+        {
+            float color = 0.0f;
+            if (m_toggle_slider->getValue() == 1)
+                color = float(m_color_slider->getValue()) / 100.0f;
+            m_player_profile->setDefaultKartColor(color);
+            ModalDialog::dismiss();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "cancel")
+        {
+            ModalDialog::dismiss();
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
