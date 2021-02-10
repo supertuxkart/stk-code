@@ -86,15 +86,14 @@
 
             <spacer height="4%" width="100%" />
 
-            <div layout="horizontal-row" width="100%" proportion="1">
-                <spacer width="25%" height="100%" />
-                <div layout="horizontal-row" proportion="1" height="fit">
-                    <button id="close" text="Apply" align="center"/>
-                </div>
-                <div layout="horizontal-row" proportion="1" height="fit">
-                    <button id="reset" text="Reset" align="center"/>
-                </div>
-            </div>
+            <buttonbar id="buttons" height="20%" width="40%" align="center">
+                <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
+                    I18N="In the ui/camera screen" text="Apply" align="center"/>
+                <icon-button id="reset" width="128" height="128" icon="gui/icons/restart.png"
+                    I18N="In the ui/camera screen" text="Reset" align="center"/>
+                <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
+                    I18N="In the ui/camera screen" text="Cancel" align="center"/>
+            </buttonbar>
         </div>
     </div>
 </stkgui>

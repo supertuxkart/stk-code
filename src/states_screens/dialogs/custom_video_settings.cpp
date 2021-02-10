@@ -19,8 +19,10 @@
 
 #include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/options/options_screen_video.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
@@ -116,70 +118,81 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
 GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::string& eventSource)
 {
 #ifndef SERVER_ONLY
-    if (eventSource == "close")
+    if (eventSource == "buttons")
     {
-        bool advanced_pipeline = getWidget<CheckBoxWidget>("dynamiclight")->getState();
-        UserConfigParams::m_dynamic_lights = advanced_pipeline;
+        const std::string& selection = getWidget<RibbonWidget>("buttons")->
+                                    getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        UserConfigParams::m_dof =
-            advanced_pipeline && getWidget<CheckBoxWidget>("dof")->getState();
-
-        UserConfigParams::m_motionblur      =
-            advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
-
-        if (advanced_pipeline)
+        if (selection == "apply")
         {
-            UserConfigParams::m_shadows_resolution =
-                getWidget<SpinnerWidget>("shadows")->getValue() * 512;
+            bool advanced_pipeline = getWidget<CheckBoxWidget>("dynamiclight")->getState();
+            UserConfigParams::m_dynamic_lights = advanced_pipeline;
+
+            UserConfigParams::m_dof =
+                advanced_pipeline && getWidget<CheckBoxWidget>("dof")->getState();
+
+            UserConfigParams::m_motionblur      =
+                advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
+
+            if (advanced_pipeline)
+            {
+                UserConfigParams::m_shadows_resolution =
+                    getWidget<SpinnerWidget>("shadows")->getValue() * 512;
+            }
+            else
+            {
+                UserConfigParams::m_shadows_resolution = 0;
+            }
+
+            UserConfigParams::m_mlaa =
+                advanced_pipeline && getWidget<CheckBoxWidget>("mlaa")->getState();
+
+            UserConfigParams::m_ssao =
+                advanced_pipeline && getWidget<CheckBoxWidget>("ssao")->getState();
+
+            UserConfigParams::m_light_shaft =
+                advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
+
+            UserConfigParams::m_degraded_IBL =
+                !advanced_pipeline || !getWidget<CheckBoxWidget>("ibl")->getState();
+
+            UserConfigParams::m_glow =
+                advanced_pipeline && getWidget<CheckBoxWidget>("glow")->getState();
+
+            UserConfigParams::m_bloom =
+                advanced_pipeline && getWidget<CheckBoxWidget>("bloom")->getState();
+
+            UserConfigParams::m_light_scatter =
+                advanced_pipeline && getWidget<CheckBoxWidget>("lightscattering")->getState();
+
+            UserConfigParams::m_texture_compression =
+                getWidget<CheckBoxWidget>("texture_compression")->getState();
+
+            UserConfigParams::m_particles_effects =
+                getWidget<SpinnerWidget>("particles_effects")->getValue();
+
+            UserConfigParams::m_animated_characters =
+                getWidget<CheckBoxWidget>("animated_characters")->getState();
+
+            const int val =
+                getWidget<SpinnerWidget>("geometry_detail")->getValue();
+            UserConfigParams::m_geometry_level = val == 2 ? 0 : val == 0 ? 2 : 1;
+
+            OptionsScreenVideo::setImageQuality(getWidget<SpinnerWidget>
+                ("image_quality")->getValue());
+
+            user_config->saveConfig();
+
+            ModalDialog::dismiss();
+            OptionsScreenVideo::getInstance()->updateGfxSlider();
+            OptionsScreenVideo::getInstance()->updateBlurSlider();
+            return GUIEngine::EVENT_BLOCK;
         }
-        else
+        else if (selection == "cancel")
         {
-            UserConfigParams::m_shadows_resolution = 0;
+            ModalDialog::dismiss();
+            return GUIEngine::EVENT_BLOCK;
         }
-
-        UserConfigParams::m_mlaa =
-            advanced_pipeline && getWidget<CheckBoxWidget>("mlaa")->getState();
-
-        UserConfigParams::m_ssao =
-            advanced_pipeline && getWidget<CheckBoxWidget>("ssao")->getState();
-
-        UserConfigParams::m_light_shaft =
-            advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
-
-        UserConfigParams::m_degraded_IBL =
-            !advanced_pipeline || !getWidget<CheckBoxWidget>("ibl")->getState();
-
-        UserConfigParams::m_glow =
-            advanced_pipeline && getWidget<CheckBoxWidget>("glow")->getState();
-
-        UserConfigParams::m_bloom =
-            advanced_pipeline && getWidget<CheckBoxWidget>("bloom")->getState();
-
-        UserConfigParams::m_light_scatter =
-            advanced_pipeline && getWidget<CheckBoxWidget>("lightscattering")->getState();
-
-        UserConfigParams::m_texture_compression =
-            getWidget<CheckBoxWidget>("texture_compression")->getState();
-
-        UserConfigParams::m_particles_effects =
-            getWidget<SpinnerWidget>("particles_effects")->getValue();
-
-        UserConfigParams::m_animated_characters =
-            getWidget<CheckBoxWidget>("animated_characters")->getState();
-
-        const int val =
-            getWidget<SpinnerWidget>("geometry_detail")->getValue();
-        UserConfigParams::m_geometry_level = val == 2 ? 0 : val == 0 ? 2 : 1;
-
-        OptionsScreenVideo::setImageQuality(getWidget<SpinnerWidget>
-            ("image_quality")->getValue());
-
-        user_config->saveConfig();
-
-        ModalDialog::dismiss();
-        OptionsScreenVideo::getInstance()->updateGfxSlider();
-        OptionsScreenVideo::getInstance()->updateBlurSlider();
-        return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "dynamiclight")
     {
