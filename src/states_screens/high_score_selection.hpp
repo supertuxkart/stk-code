@@ -43,7 +43,6 @@ private:
     ~HighScoreSelection();
 
     GUIEngine::ListWidget*     m_high_scores_list_widget;
-    GUIEngine::RibbonWidget*   m_action_widget;
     GUIEngine::RibbonWidget*   m_mode_tabs;
     bool                       m_active_mode_is_linear;
     bool                       m_reverse_sort;

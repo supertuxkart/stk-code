@@ -62,7 +62,15 @@ public:
     void deleteHighscores(int i)        { m_all_scores.erase
                                         (m_all_scores.begin() + i); }
     // ------------------------------------------------------------------------
-    void clearHighscores()              { m_all_scores.clear(); }
+    void clearHighscores()
+    {
+        for(type_all_scores::iterator i  = m_all_scores.begin();
+                                  i != m_all_scores.end();  i++)
+        {
+            delete *i;
+        }
+        m_all_scores.clear();
+    }
     // ------------------------------------------------------------------------
     bool highscoresEmpty()              { return m_all_scores.empty(); }
     // ------------------------------------------------------------------------

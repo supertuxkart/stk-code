@@ -53,7 +53,6 @@ private:
     GUIEngine::IconButtonWidget*  m_track_screenshot_widget;
 
     void updateHighscoreEntries();
-    //void refreshMainScreen();
 
 public:
     HighScoreInfoDialog(Highscores* highscore, bool is_linear);

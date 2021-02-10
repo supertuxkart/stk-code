@@ -100,7 +100,6 @@ void HighScoreSelection::loadedFromFile()
     m_high_scores_list_widget->setColumnListener(this);
 
     m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
-    m_action_widget = getWidget<GUIEngine::RibbonWidget>("actions");
     m_active_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
     m_active_mode_is_linear = true;
 
@@ -221,6 +220,10 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
     {
         StateManager::get()->escapePressed();
     }
+    else if (name == "remove-all")
+    {
+        onClearHighscores();
+    }
     else if (name == m_high_scores_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         m_selected_index = -1;
@@ -255,15 +258,6 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
 
         m_active_mode_is_linear = RaceManager::get()->isLinearRaceMode(m_active_mode);
         refresh(/*keep high score list*/ false, /* update columns */ true);
-    }
-    else if (name == "actions")
-    {
-        std::string selection = m_action_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-        if (selection == "remove-all")
-            onClearHighscores();
-        else if (selection == "reload")
-            refresh(/*reload high score list*/ true, /* update columns */ true);
     }
 }   // eventCallback
 

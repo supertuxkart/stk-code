@@ -268,14 +268,3 @@ void HighScoreInfoDialog::onUpdate(float dt)
         return;
     }
 }   // onUpdate
-/*
-void HighScoreInfoDialog::refreshMainScreen()
-{
-    HighScoreSelection::getInstance()->setCompare(m_compare_ghost);
-    HighScoreSelection::getInstance()->setCompareReplayUid(m_compare_replay_uid);
-
-    // Refresh the list to have only compatible replays
-    dynamic_cast<HighScoreSelection*>(GUIEngine::getCurrentScreen())
-        ->refresh();
-}
-*/
