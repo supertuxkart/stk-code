@@ -57,9 +57,9 @@ Highscores::Highscores(const XMLNode &node)
 {
     m_track           = "";
     m_highscore_type  = "HST_UNDEFINED";
-    m_number_of_karts = -1;
+    m_number_of_karts = 0;
     m_difficulty      = -1;
-    m_number_of_laps  = -1;
+    m_number_of_laps  = 0;
     m_reverse         = false;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)

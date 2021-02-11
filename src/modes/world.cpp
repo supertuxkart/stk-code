@@ -285,9 +285,9 @@ void World::init()
     if (Camera::getNumCameras() == 0)
     {
         auto cl = LobbyProtocol::get<ClientLobby>();
-        if ( (NetworkConfig::get()->isServer() && 
-              !GUIEngine::isNoGraphics()       ) ||
-            RaceManager::get()->isWatchingReplay()        ||
+        if ((NetworkConfig::get()->isServer() &&
+            !GUIEngine::isNoGraphics()) ||
+            RaceManager::get()->isWatchingReplay() ||
             (cl && cl->isSpectator()))
         {
             // In case that the server is running with gui, watching replay or
@@ -581,8 +581,8 @@ Controller* World::loadAIController(AbstractKart* kart)
     {
         case 0:
             // If requested, start the test ai
-            if( (AIBaseController::getTestAI()!=0                       ) && 
-                ( (kart->getWorldKartId()+1) % AIBaseController::getTestAI() )==0)
+            if((AIBaseController::getTestAI()!=0) &&
+               ((kart->getWorldKartId()+1) % AIBaseController::getTestAI()) == 0)
                 controller = new TestAI(kart);
             else
                 controller = new SkiddingAI(kart);
@@ -748,11 +748,18 @@ void World::terminateRace()
         }
     }   // i<kart_amount
 
-    // Update highscores, and retrieve the best highscore if relevant
-    // to show it in the GUI
+    /** Only update high scores when these conditions are met:
+     *  * The race is not over a network
+     *  * There is at least 1 real kart in play
+     *  * The number of laps is at least 1
+     *
+     *  If they are met, retrieve the best highscore if relevant
+     *  to show it in the GUI
+     */
     int best_highscore_rank = -1;
     std::string highscore_who = "";
-    if (!isNetworkWorld())
+    if (!isNetworkWorld() && RaceManager::get()->getNumNonGhostKarts() > 0 &&
+        RaceManager::get()->getNumLaps() > 0)
     {
         updateHighscores(&best_highscore_rank);
     }
@@ -870,7 +877,7 @@ void World::resetAllKarts()
             (*i)->getMaterial() && (*i)->getMaterial()->hasGravity() ?
             (*i)->getNormal() * -g : Vec3(0, -g, 0));
     }
-    for(int i=0; i<stk_config->getPhysicsFPS(); i++) 
+    for(int i=0; i<stk_config->getPhysicsFPS(); i++)
         Physics::get()->update(1);
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
@@ -1168,7 +1175,7 @@ void World::update(int ticks)
     PROFILER_PUSH_CPU_MARKER("World::update (Kart::upate)", 0x40, 0x7F, 0x00);
 
     // Update all the karts. This in turn will also update the controller,
-    // which causes all AI steering commands set. So in the following 
+    // which causes all AI steering commands set. So in the following
     // physics update the new steering is taken into account.
     const int kart_amount = (int)m_karts.size();
     for (int i = 0 ; i < kart_amount; ++i)
@@ -1289,10 +1296,10 @@ void World::updateHighscores(int* best_highscore_rank)
 
         // Only record times for local player karts and only if
         // they finished the race
-        if(!m_karts[index[pos]]->getController()->isLocalPlayerController())
+        if (!m_karts[index[pos]]->getController()->isLocalPlayerController() ||
+            !m_karts[index[pos]]->hasFinishedRace() ||
+            m_karts[index[pos]]->isEliminated())
             continue;
-        if (!m_karts[index[pos]]->hasFinishedRace()) continue;
-        if (m_karts[index[pos]]->isEliminated()) continue;
 
         assert(index[pos] < m_karts.size());
         Kart *k = (Kart*)m_karts[index[pos]].get();
@@ -1621,7 +1628,7 @@ void World::setAITeam()
 {
     m_red_ai  = RaceManager::get()->getNumberOfRedAIKarts();
     m_blue_ai = RaceManager::get()->getNumberOfBlueAIKarts();
-    
+
     for (int i = 0; i < (int)RaceManager::get()->getNumLocalPlayers(); i++)
     {
         KartTeam team = RaceManager::get()->getKartInfo(i).getKartTeam();
