@@ -27,6 +27,7 @@ namespace GUIEngine
 {
     class CheckBoxWidget;
     class ModelViewWidget;
+    class RibbonWidget;
     class SpinnerWidget;
 }
 
@@ -43,6 +44,8 @@ private:
     GUIEngine::ModelViewWidget* m_model_view;
 
     GUIEngine::SpinnerWidget* m_color_slider;
+
+    GUIEngine::RibbonWidget* m_buttons_widget;
 
     void toggleSlider();
 public:

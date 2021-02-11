@@ -171,8 +171,13 @@
 
         <label text="* Restart STK to apply new settings" width="100%" text_align="center" I18N="Video settings"/>
 
-        <spacer proportion="1"/>
+        <spacer height="4" width="10"/>
 
-        <button id="close" text="Apply" align="center"/>
+        <buttonbar id="buttons" height="15%" width="30%" align="center">
+            <icon-button id="apply" width="128" height="128" icon="gui/icons/green_check.png"
+                I18N="Video settings" text="Apply" align="center"/>
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
+                I18N="Video settings" text="Cancel" align="center"/>
+        </buttonbar>
     </div>
 </stkgui>

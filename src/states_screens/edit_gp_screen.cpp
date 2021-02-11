@@ -372,3 +372,20 @@ void EditGPScreen::enableButtons()
     edit_button->setActive(m_selected >= 0);
     remove_button->setActive(m_selected >= 0);
 }   // enableButtons
+
+bool EditGPScreen::onEscapePressed()
+{
+    if (m_modified)
+    {
+        m_action = "back";
+        new MessageDialog(
+            _("Do you want to save your changes?"),
+            MessageDialog::MESSAGE_DIALOG_CONFIRM,
+            this, false);
+    }
+    else
+    {
+        back();
+    }
+    return false;
+}
