@@ -22,8 +22,6 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
 #include "race/highscores.hpp"
-#include "race/highscore_manager.hpp"
-
 
 /** \brief Dialog that allows a user to manage a high score
  * \ingroup states_screens
