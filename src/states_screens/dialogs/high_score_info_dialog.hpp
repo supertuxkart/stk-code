@@ -36,9 +36,6 @@ private:
     Highscores* m_hs;
 
     GUIEngine::RibbonWidget*      m_action_widget;
-    GUIEngine::IconButtonWidget*  m_start_widget;
-    GUIEngine::IconButtonWidget*  m_remove_widget;
-    GUIEngine::IconButtonWidget*  m_back_widget;
 
     GUIEngine::LabelWidget*       m_high_score_label;
     GUIEngine::LabelWidget*       m_track_name_label;
@@ -57,9 +54,6 @@ public:
     ~HighScoreInfoDialog();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-
-    virtual bool onEscapePressed();
-    virtual void onUpdate(float dt);
 };   // class HighScoreInfoDialog
 
 #endif

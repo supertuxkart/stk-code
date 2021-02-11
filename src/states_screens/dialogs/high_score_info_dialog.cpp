@@ -43,8 +43,6 @@ using namespace irr::core;
 HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear)
                       : ModalDialog(0.75f,0.75f)
 {
-    m_self_destroy         = false;
-
     m_hs = highscore;
 
     loadFromFile("high_score_info_dialog.stkgui");
@@ -243,28 +241,9 @@ GUIEngine::EventPropagation
         }
         else if (selection == "back")
         {
-            m_self_destroy = true;
+            ModalDialog::dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
-
-// -----------------------------------------------------------------------------
-bool HighScoreInfoDialog::onEscapePressed()
-{
-    if (m_back_widget->isActivated())
-        m_self_destroy = true;
-    return false;
-}   // onEscapePressed
-
-// -----------------------------------------------------------------------------
-void HighScoreInfoDialog::onUpdate(float dt)
-{
-    if (m_self_destroy)
-    {
-        ModalDialog::clearWindow();
-        ModalDialog::dismiss();
-        return;
-    }
-}   // onUpdate
