@@ -120,8 +120,7 @@ struct Armature
         }
         if (!non_parent_bone)
         {
-            Log::fatal("SPMeshLoader::Armature", "Non-parent bone missing in"
-                "armature");
+            Log::fatal("SPMeshLoader::Armature", "Non-parent bone missing in armature");
         }
         unsigned frame_size = 0;
         spm->read(&frame_size, 2);
