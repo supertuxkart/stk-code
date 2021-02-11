@@ -752,6 +752,7 @@ void World::terminateRace()
      *  * The race is not over a network
      *  * There is at least 1 real kart in play
      *  * The number of laps is at least 1
+     *  * The command line parameter --no-high-scores has not been passed
      *
      *  If they are met, retrieve the best highscore if relevant
      *  to show it in the GUI
@@ -759,7 +760,8 @@ void World::terminateRace()
     int best_highscore_rank = -1;
     std::string highscore_who = "";
     if (!isNetworkWorld() && RaceManager::get()->getNumNonGhostKarts() > 0 &&
-        RaceManager::get()->getNumLaps() > 0)
+        RaceManager::get()->getNumLaps() > 0 &&
+        !(UserConfigParams::m_no_high_scores))
     {
         updateHighscores(&best_highscore_rank);
     }

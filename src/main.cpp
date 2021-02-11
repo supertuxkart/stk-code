@@ -937,6 +937,8 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (CommandLine::has("--unit-testing"))
         UserConfigParams::m_unit_testing = true;
+    if (CommandLine::has("--no-high-scores"))
+        UserConfigParams::m_no_high_scores=true;
     if (CommandLine::has("--gamepad-debug"))
         UserConfigParams::m_gamepad_debug=true;
     if (CommandLine::has("--keyboard-debug"))
