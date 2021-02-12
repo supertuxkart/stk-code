@@ -71,7 +71,7 @@ private:
 public:
     bool operator < (const Highscores& hi) const;
 
-    static bool compare(Highscores* a, Highscores* b) { return (*a < *b); }
+    static bool compare(const std::unique_ptr<Highscores>& a, const std::unique_ptr<Highscores>& b) { return (*a < *b); }
     /** Creates a new entry
       */
     Highscores (const Highscores::HighscoreType &highscore_type,

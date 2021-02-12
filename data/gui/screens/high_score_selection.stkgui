@@ -17,7 +17,7 @@
 
         <tabs id="race_mode" height="6%" width="98%" align="center">
             <icon-button id="tab_normal_race" width="128" height="128" icon="gui/icons/mode_normal.png"
-                         I18N="In the high score selection screen" text="Regular Race"/>
+                         I18N="In the high score selection screen" text="Normal Race"/>
             <icon-button id="tab_time_trial" width="128" height="128" icon="gui/icons/mode_tt.png"
                          I18N="In the high score selection screen" text="Time Trial"/>
             <icon-button id="tab_egg_hunt" width="128" height="128" icon="gui/icons/mode_easter.png"
