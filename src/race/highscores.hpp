@@ -18,28 +18,41 @@
 
 #ifndef HEADER_HIGHSCORES_HPP
 #define HEADER_HIGHSCORES_HPP
+#include <array>
 #include <string>
 #include <vector>
 #include <map>
 
 #include "race/race_manager.hpp"
 
-#include <irrString.h>
+#include "irrString.h"
+
+using namespace irr::core;
 
 class XMLNode;
 class UTFWriter;
 
 /**
- *  Represents one highscore entry, i.e. the (atm up to three) highscores
+ *  Represents one highscore entry, i.e. the (atm up to five) highscores
  *  for a particular setting (track, #karts, difficulty etc).
  * \ingroup race
  */
 class Highscores
 {
 public:
+    /** Order of sort for Highscores */
+    enum SortOrder
+    {
+        SO_DEFAULT,
+        SO_TRACK = SO_DEFAULT,  // Sorted by internal track name
+        SO_KART_NUM,            // Sorted by amount of karts used
+        SO_DIFF,                // Sorted by difficulty level
+        SO_LAPS,                // Sorted by number of laps
+        SO_REV                  // Sorted by if using reverse mode
+    };
+
     typedef std::string HighscoreType;
 
-private:
     enum {HIGHSCORE_LEN = 5};       // It's a top 5 list
     std::string         m_track;
     HighscoreType       m_highscore_type;
@@ -47,10 +60,18 @@ private:
     int                 m_difficulty;
     int                 m_number_of_laps;
     bool                m_reverse;
-    std::string         m_kart_name[HIGHSCORE_LEN];
-    irr::core::stringw  m_name[HIGHSCORE_LEN];
-    float               m_time[HIGHSCORE_LEN];
+
+private:
+    std::array<std::string, HIGHSCORE_LEN> m_kart_name;
+    std::array<stringw, HIGHSCORE_LEN>     m_name;
+    std::array<float, HIGHSCORE_LEN>       m_time;
+
+    static SortOrder m_sort_order;
+
 public:
+    bool operator < (const Highscores& hi) const;
+
+    static bool compare(const std::unique_ptr<Highscores>& a, const std::unique_ptr<Highscores>& b) { return (*a < *b); }
     /** Creates a new entry
       */
     Highscores (const Highscores::HighscoreType &highscore_type,
@@ -60,18 +81,25 @@ public:
     /** Creates an entry from a file
      */
     Highscores (const XMLNode &node);
-
+    // ------------------------------------------------------------------------
     void readEntry (const XMLNode &node);
+    // ------------------------------------------------------------------------
     void writeEntry(UTFWriter &writer);
+    // ------------------------------------------------------------------------
     int  matches   (const HighscoreType &highscore_type, int num_karts,
                     const RaceManager::Difficulty &difficulty,
                     const std::string &track, const int number_of_laps,
                     const bool reverse);
+    // ------------------------------------------------------------------------
     int  addData   (const std::string& kart_name,
                     const irr::core::stringw& name, const float time);
+    // ------------------------------------------------------------------------
     int  getNumberEntries() const;
+    // ------------------------------------------------------------------------
     void getEntry  (int number, std::string &kart_name,
                     irr::core::stringw &name, float *const time) const;
+    // ------------------------------------------------------------------------
+    static void setSortOrder(SortOrder so)  { m_sort_order = so; }
 };  // Highscores
 
 #endif

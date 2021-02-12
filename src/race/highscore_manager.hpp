@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "race/highscores.hpp"
 
@@ -36,25 +37,46 @@ class HighscoreManager
 public:
 private:
     static const unsigned int CURRENT_HSCORE_FILE_VERSION;
-    typedef std::vector<Highscores*> type_all_scores;
-    type_all_scores m_all_scores;
+    std::vector<std::unique_ptr<Highscores> > m_all_scores;
 
     std::string m_filename;
     bool        m_can_write;
 
-    void loadHighscores();
-    void setFilename();
+    void        setFilename();
 
 public:
                 HighscoreManager();
                ~HighscoreManager();
+    // ------------------------------------------------------------------------
+    void        loadHighscores();
+    // ------------------------------------------------------------------------
     void        saveHighscores();
+    // ------------------------------------------------------------------------
     Highscores *getHighscores(const Highscores::HighscoreType &highscore_type,
                               int num_karts,
                               const RaceManager::Difficulty difficulty,
                               const std::string &trackName,
                               const int number_of_laps,
                               const bool reverse);
+    // ------------------------------------------------------------------------
+    void deleteHighscores(int i)        { m_all_scores.erase
+                                        (m_all_scores.begin() + i); }
+    // ------------------------------------------------------------------------
+    void clearHighscores()                     { m_all_scores.clear(); }
+    // ------------------------------------------------------------------------
+    bool highscoresEmpty()              { return m_all_scores.empty(); }
+    // ------------------------------------------------------------------------
+    Highscores* getHighscoresAt(int i)  { return m_all_scores.at(i).get(); }
+    // ------------------------------------------------------------------------
+    int highscoresSize()                { return m_all_scores.size(); }
+    // ------------------------------------------------------------------------
+    void sortHighscores(bool reverse)
+    {
+        (reverse ? std::stable_sort(m_all_scores.rbegin(),
+            m_all_scores.rend(), Highscores::compare) :
+            std::stable_sort(m_all_scores.begin(),
+            m_all_scores.end(), Highscores::compare));
+    }
 };   // HighscoreManager
 
 extern HighscoreManager* highscore_manager;

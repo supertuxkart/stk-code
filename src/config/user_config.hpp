@@ -724,6 +724,9 @@ namespace UserConfigParams
         &m_recording_group, "Specify the fps of recording video"));
 
     // ---- Debug - not saved to config file
+    /** If high scores will not be saved. For repeated testing on tracks. */
+    PARAM_PREFIX bool m_no_high_scores PARAM_DEFAULT(false);
+
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_unit_testing PARAM_DEFAULT(false);
 
@@ -736,7 +739,7 @@ namespace UserConfigParams
     /** Wiimote debugging. */
     PARAM_PREFIX bool m_wiimote_debug PARAM_DEFAULT( false );
 
-    /** Debug gamepads  by visualising their values. */
+    /** Debug gamepads by visualising their values. */
     PARAM_PREFIX bool m_gamepad_visualisation PARAM_DEFAULT( false );
 
     /** If material debugging (printing terrain specific slowdown)

@@ -44,9 +44,8 @@ HighscoreManager::HighscoreManager()
 HighscoreManager::~HighscoreManager()
 {
     saveHighscores();
-    for(type_all_scores::iterator i  = m_all_scores.begin();
-                                  i != m_all_scores.end();  i++)
-        delete *i;
+    clearHighscores();
+
 }   // ~HighscoreManager
 
 // -----------------------------------------------------------------------------
@@ -124,7 +123,7 @@ void HighscoreManager::loadHighscores()
                 Log::error("Highscore Manager", "Invalid highscore entry will be skipped : %s\n", e.what());
                 continue;
             }
-            m_all_scores.push_back(highscores);
+            m_all_scores.push_back(std::unique_ptr<Highscores>(highscores));
         }   // next entry
 
         if(UserConfigParams::logMisc())
@@ -186,20 +185,19 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType &hig
     Highscores *highscores = 0;
 
     // See if we already have a record for this type
-    for(type_all_scores::iterator i  = m_all_scores.begin();
-                                  i != m_all_scores.end();  i++)
+    for (auto& hs : m_all_scores)
     {
-        if((*i)->matches(highscore_type, num_karts, difficulty, trackName,
+        if (hs->matches(highscore_type, num_karts, difficulty, trackName,
                          number_of_laps, reverse) )
         {
             // we found one entry for this kind of race, return it
-            return (*i);
+            return hs.get();
         }
     }   // for i in m_all_scores
 
     // we don't have an entry for such a race currently. Create one.
     highscores = new Highscores(highscore_type, num_karts, difficulty,
                                 trackName, number_of_laps, reverse);
-    m_all_scores.push_back(highscores);
+    m_all_scores.push_back(std::unique_ptr<Highscores>(highscores));
     return highscores;
 }   // getHighscores

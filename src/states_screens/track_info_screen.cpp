@@ -329,6 +329,7 @@ void TrackInfoScreen::init()
         m_ai_kart_spinner->setActive(true);
 
     // ---- High Scores
+    m_highscore_label->setText(_("High Scores"), false);
     m_highscore_label->setVisible(has_highscores);
 
     if (has_highscores)

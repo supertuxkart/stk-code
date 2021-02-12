@@ -21,10 +21,14 @@
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 
 #include <stdexcept>
 #include <fstream>
+
+Highscores::SortOrder Highscores::m_sort_order = Highscores::SO_DEFAULT;
 
 // -----------------------------------------------------------------------------
 Highscores::Highscores(const HighscoreType &highscore_type,
@@ -53,9 +57,9 @@ Highscores::Highscores(const XMLNode &node)
 {
     m_track           = "";
     m_highscore_type  = "HST_UNDEFINED";
-    m_number_of_karts = -1;
+    m_number_of_karts = 0;
     m_difficulty      = -1;
-    m_number_of_laps  = -1;
+    m_number_of_laps  = 0;
     m_reverse         = false;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -232,3 +236,29 @@ void Highscores::getEntry(int number, std::string &kart_name,
 }   // getEntry
 
 // -----------------------------------------------------------------------------
+bool Highscores::operator < (const Highscores& hi) const
+{
+    switch (m_sort_order)
+    {
+        case SO_TRACK:
+        {
+            Track* a = track_manager->getTrack(m_track);
+            Track* b = track_manager->getTrack(hi.m_track);
+            std::wstring sort_name_a, sort_name_b;
+            if (a)
+                sort_name_a = a->getSortName().c_str();
+            if (b)
+                sort_name_b = b->getSortName().c_str();
+            return sort_name_a > sort_name_b;
+        }
+        case SO_KART_NUM:
+            return m_number_of_karts < hi.m_number_of_karts;
+        case SO_DIFF:
+            return m_difficulty < hi.m_difficulty;
+        case SO_LAPS:
+            return m_number_of_laps < hi.m_number_of_laps;
+        case SO_REV:
+            return m_reverse < hi.m_reverse;
+    }   // switch
+    return true;
+}   // operator <

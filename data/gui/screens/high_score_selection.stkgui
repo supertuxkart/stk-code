@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="1%" y="0" width="98%" layout="horizontal-row" height="9%">
+        <icon-button id="back" height="100%" icon_align="left" icon="gui/icons/back.png"/>
+        <spacer proportion="1" height="1"/>
+        <icon-button id="remove-all" y="5%" height="90%" icon_align="right" icon="gui/icons/bomb_icon.png"/>
+    </div>
+
+    <div x="0%" y="1%" width="100%" height="98%" layout="vertical-row" >
+        <header width="80%" height="8%" align="center" text_align="center" I18N="In the high score selection screen" text="High Score Selection"/>
+        <spacer width="100%" height="1%"/>
+
+        <!-- This is filled in programmatically -->
+        <box proportion="1" width="98%" align="center" layout="vertical-row" padding="6">
+            <list id="high_scores_list" x="0" y="0" width="100%" height="100%" alternate_bg="true"/>
+        </box>
+
+        <tabs id="race_mode" height="6%" width="98%" align="center">
+            <icon-button id="tab_normal_race" width="128" height="128" icon="gui/icons/mode_normal.png"
+                         I18N="In the high score selection screen" text="Normal Race"/>
+            <icon-button id="tab_time_trial" width="128" height="128" icon="gui/icons/mode_tt.png"
+                         I18N="In the high score selection screen" text="Time Trial"/>
+            <icon-button id="tab_egg_hunt" width="128" height="128" icon="gui/icons/mode_easter.png"
+                         I18N="In the high score selection screen" text="Egg Hunt"/>
+        </tabs>
+
+        <spacer width="100%" height="2%" />
+<!--
+        <div width="98%" align="center" layout="horizontal-row" height="fit">
+            <div width="60%" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="best_times_toggle" text_align="left"/>
+                <spacer width="2%" height="fit"/>
+                <label height="100%" text_align="left" I18N="In the high score selection screen" text="Only show the best times"/>
+            </div>
+            <div width="40%" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="compare_toggle" text_align="left"/>
+                <spacer width="2%" height="fit"/>
+                <label height="100%" id="compare-toggle-text" text_align="left" I18N="In the high score selection screen" text="Compare high scores"/>
+            </div>
+        </div>
+
+        <div width="98%" align="center" layout="horizontal-row" height="fit">
+            <div width="60%" height="fit" layout="horizontal-row" >
+                <checkbox width="fit" id="high_scores_difficulty_toggle" text_align="left"/>
+                <spacer width="2%" height="fit"/>
+                <label height="100%" text_align="left" I18N="In the high score selection screen" text="Only show high scores matching the current difficulty"/>
+            </div>
+        </div>
+-->
+    </div>
+</stkgui>
