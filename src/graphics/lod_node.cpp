@@ -50,6 +50,7 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_forced_lod = -1;
     m_last_tick = 0;
+    m_area = 0;
 }
 
 LODNode::~LODNode()
@@ -249,8 +250,44 @@ void LODNode::OnRegisterSceneNode()
     scene::ISceneNode::OnRegisterSceneNode();
 }
 
+
+void LODNode::autoComputeLevel(float scale)
+{
+    m_area *= scale;
+
+    // Amount of details based on user's input
+    float agressivity = 1.0;
+    if(UserConfigParams::m_geometry_level == 0) agressivity = 1.25;
+    if(UserConfigParams::m_geometry_level == 1) agressivity = 1.0;
+    if(UserConfigParams::m_geometry_level == 2) agressivity = 0.75;
+
+    // First we try to estimate how far away we need to draw
+    float max_draw = 0.0;
+    max_draw = sqrtf((0.5 * m_area + 10) * 200) - 10;
+    // If the draw distance is too big we artificially reduce it
+    if(max_draw > 250)
+    {
+        max_draw = 250 + (max_draw * 0.06);
+    }
+
+    max_draw *= agressivity;
+
+    int step = (int) (max_draw * max_draw) / m_detail.size();
+
+    // Then we recompute the level of detail culling distance
+    int biais = m_detail.size();
+    for(int i = 0; i < m_detail.size(); i++)
+    {
+        m_detail[i] = ((step / biais) * (i + 1));
+        biais--;
+    }
+}
+
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
 {
+    Box = node->getBoundingBox();
+    m_area = Box.getArea();
+
     // samuncle suggested to put a slight randomisation in LOD
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
     // The last level should not be randomized because after that the object disappears,

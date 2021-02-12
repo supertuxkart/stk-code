@@ -62,6 +62,9 @@ private:
      *  m_forced_lod is >=0, only this level is be used. */
     int m_forced_lod;
 
+    // Area of the bounding box (for autoLOD computation)
+    float m_area;
+
     enum PreviousVisibility
     {
         FIRST_PASS,
@@ -103,6 +106,11 @@ public:
       * \param reparent If true, node will be removed from its current parent first
       */
     void add(int level, scene::ISceneNode* node, bool reparent);
+
+    /**
+      * This method can be used to automatically compute LoD level
+      */
+    void autoComputeLevel(float scale);
 
     void forceLevelOfDetail(int n);
 
