@@ -651,7 +651,7 @@ bool MainMenuScreen::onEscapePressed()
         }   // onConfirm
     };   // ConfirmClose
 
-    new MessageDialog(_("Are you sure to quit STK?"),
+    new MessageDialog(_("Are you sure you want to quit STK?"),
         MessageDialog::MESSAGE_DIALOG_YESNO, new ConfirmClose(),
         true/*delete_listener*/);
     return false;
