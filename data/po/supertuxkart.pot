@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: supertuxkart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-12 12:46+0800\n"
+"POT-Creation-Date: 2021-02-16 09:26+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3455,12 +3455,12 @@ msgstr ""
 msgid "Right trigger"
 msgstr ""
 
-#: src/input/input_manager.cpp:994
+#: src/input/input_manager.cpp:995
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr ""
 
-#: src/input/input_manager.cpp:1030
+#: src/input/input_manager.cpp:1031
 msgid "Only the Game Master may act at this point!"
 msgstr ""
 
@@ -5141,7 +5141,7 @@ msgid "Please wait while the add-ons are loading"
 msgstr ""
 
 #: src/states_screens/main_menu_screen.cpp:654
-msgid "Are you sure to quit STK?"
+msgid "Are you sure you want to quit STK?"
 msgstr ""
 
 #: src/states_screens/online/create_server_screen.cpp:96
