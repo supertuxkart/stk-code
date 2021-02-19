@@ -1405,7 +1405,7 @@ void ServerLobby::asynchronousUpdate()
         Log::warn("ServerLobby", "Trying auto server recovery.");
         // For auto server recovery wait 3 seconds for next try
         m_last_unsuccess_poll_time = StkTime::getMonoTimeMs() + 3000;
-        registerServer();
+        registerServer(false/*first_time*/);
     }
 
     switch (m_state.load())
@@ -1454,7 +1454,7 @@ void ServerLobby::asynchronousUpdate()
         // this thread, because there is no need for the protocol manager
         // to react to any requests before the server is registered.
         if (m_server_registering.expired() && m_server_id_online.load() == 0)
-            registerServer();
+            registerServer(true/*first_time*/);
 
         if (m_server_registering.expired())
         {
@@ -1466,11 +1466,6 @@ void ServerLobby::asynchronousUpdate()
                 if (allowJoinedPlayersWaiting())
                     m_registered_for_once_only = true;
                 m_state = WAITING_FOR_START_GAME;
-            }
-            else
-            {
-                // Exit now if failed to register to stk addons
-                m_state = ERROR_LEAVE;
             }
         }
         break;
@@ -2255,13 +2250,14 @@ void ServerLobby::update(int ticks)
  *  ProtocolManager thread). The information about this client is added
  *  to the table 'server'.
  */
-void ServerLobby::registerServer()
+void ServerLobby::registerServer(bool first_time)
 {
     // ========================================================================
     class RegisterServerRequest : public Online::XMLRequest
     {
     private:
         std::weak_ptr<ServerLobby> m_server_lobby;
+        bool m_first_time;
     protected:
         virtual void afterOperation()
         {
@@ -2297,15 +2293,18 @@ void ServerLobby::registerServer()
             }
             Log::error("ServerLobby", "%s",
                 StringUtils::wideToUtf8(getInfo()).c_str());
+            // Exit now if failed to register to stk addons for first time
+            if (m_first_time)
+                sl->m_state.store(ERROR_LEAVE);
         }
     public:
-        RegisterServerRequest(std::shared_ptr<ServerLobby> sl)
+        RegisterServerRequest(std::shared_ptr<ServerLobby> sl, bool first_time)
         : XMLRequest(Online::RequestManager::HTTP_MAX_PRIORITY),
-        m_server_lobby(sl) {}
+        m_server_lobby(sl), m_first_time(first_time) {}
     };   // RegisterServerRequest
 
     auto request = std::make_shared<RegisterServerRequest>(
-        std::dynamic_pointer_cast<ServerLobby>(shared_from_this()));
+        std::dynamic_pointer_cast<ServerLobby>(shared_from_this()), first_time);
     NetworkConfig::get()->setServerDetails(request, "create");
     const SocketAddress& addr = STKHost::get()->getPublicAddress();
     request->addParameter("address",      addr.getIP()        );

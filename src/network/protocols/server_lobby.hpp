@@ -263,7 +263,7 @@ private:
     // Track(s) votes
     void handlePlayerVote(Event *event);
     void playerFinishedResult(Event *event);
-    void registerServer();
+    void registerServer(bool first_time);
     void finishedLoadingWorldClient(Event *event);
     void finishedLoadingLiveJoinClient(Event *event);
     void kickHost(Event* event);
