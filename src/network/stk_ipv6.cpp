@@ -34,7 +34,9 @@
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#ifndef __SWITCH__
 #include <err.h>
+#endif
 #include <netdb.h>
 #include <sys/socket.h>
 #include <sys/types.h>

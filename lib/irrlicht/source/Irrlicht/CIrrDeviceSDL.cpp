@@ -100,8 +100,11 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		{
 			SDL_VERSION(&Info.version);
 
+      // Switch doesn't support GetWindowWMInfo
+#ifndef __SWITCH__
 			if (!SDL_GetWindowWMInfo(Window, &Info))
 				return;
+#endif
 #ifdef IOS_STK
 			init_objc(&Info, &TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
 #endif
@@ -127,7 +130,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		else
 			return;
 	}
-#ifndef ANDROID
+#if !defined(ANDROID) && !defined(__SWITCH__)
 	else if (!GUIEngine::isNoGraphics())
 	{
 		// Get highdpi native scale using renderer so it will work with any
@@ -410,6 +413,7 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+
 	Window = SDL_CreateWindow("",
 		(float)CreationParams.WindowPosition.X / g_native_scale_x,
 		(float)CreationParams.WindowPosition.Y / g_native_scale_y,

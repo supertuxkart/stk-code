@@ -55,11 +55,15 @@
 #  pragma comment(lib, "dnsapi.lib")
 #endif
 #else
+#ifndef __SWITCH__
 #  include <arpa/nameser.h>
 #  include <arpa/nameser_compat.h>
+#endif
 #  include <netdb.h>
 #  include <netinet/in.h>
+#ifndef __SWITCH__
 #  include <resolv.h>
+#endif
 #endif
 
 #include <algorithm>
@@ -684,6 +688,8 @@ bool ConnectToServer::detectPort()
         if (port_from_dns != 0)
             break;
     }
+#elif defined(__SWITCH__)
+    // TODO: Unclear how to use libnx in this case
 #elif !defined(__CYGWIN__)
     unsigned char response[512] = {};
     const std::string& utf8name = StringUtils::wideToUtf8(m_server->getName());

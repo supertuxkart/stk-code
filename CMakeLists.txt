@@ -25,6 +25,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
+option(USE_SWITCH "Build targetting switch" OFF)
+
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
@@ -33,13 +35,14 @@ option(USE_IPV6 "Allow create or connect to game server with IPv6 address, syste
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
-option(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." ON)
+CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." ON
+    "NOT USE_SWITCH" OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
 CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of the built-in version, when available." ON
     "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
-    "NOT SERVER_ONLY;NOT CYGWIN" OFF)
+    "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH" OFF)
 
 if(APPLE AND NOT IOS)
     if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
@@ -185,7 +188,7 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD" OR CMAKE_SYSTEM_NAME MATCHES "DragonFly")
+if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD" OR CMAKE_SYSTEM_NAME MATCHES "DragonFly" OR USE_SWITCH)
     set(LIBRESOLV_LIBRARY)
 elseif (HAIKU)
     find_library(LIBRESOLV_LIBRARY NAMES network socket)
@@ -350,7 +353,7 @@ else()
     set(Angelscript_LIBRARIES angelscript)
 endif()
 
-if(NOT SERVER_ONLY)
+if((NOT SERVER_ONLY) AND (NOT USE_SWITCH))
     # OpenAL
     find_package(OpenAL REQUIRED)
     include_directories(${OPENAL_INCLUDE_DIR})
@@ -370,7 +373,13 @@ if (NOT SERVER_ONLY)
     SET(SHEENBIDI_LIBRARY sheenbidi)
 
     # Freetype
-    find_package(Freetype)
+    if (USE_SWITCH)
+        SET(FREETYPE_INCLUDE_DIRS /opt/devkitpro/portlibs/switch/include/freetype2)
+        SET(FREETYPE_LIBRARY freetype)
+        SET(FREETYPE_FOUND YES)
+    else()
+        find_package(Freetype)
+    endif()
     if(FREETYPE_FOUND)
         include_directories(${FREETYPE_INCLUDE_DIRS})
     else()
@@ -569,7 +578,7 @@ else()
     find_path(NETTLE_INCLUDE_DIRS nettle/version.h)
     find_library(NETTLE_LIBRARY NAMES nettle libnettle)
 
-    if (NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL)
+    if ((NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL) AND NOT USE_SWITCH)
         set(USE_CRYPTO_OPENSSL ON)
         find_package(OpenSSL REQUIRED)
 
@@ -578,13 +587,15 @@ else()
             message(FATAL_ERROR "OpenSSL version found (${OPENSSL_VERSION}) is less then the minimum required (${OPENSSL_MINIMUM_VERSION}), aborting.")
         endif()
         include_directories(${OpenSSL_INCLUDE_DIRS})
-    else()
+    elseif(NOT USE_SWITCH)
         set(USE_CRYPTO_OPENSSL OFF)
         include_directories(${NETTLE_INCLUDE_DIRS})
     endif()
 endif()
 
-if (USE_CRYPTO_OPENSSL)
+if (USE_SWITCH)
+    add_definitions(-DENABLE_CRYPTO_LIBNX)
+elseif (USE_CRYPTO_OPENSSL)
     message(STATUS "OpenSSL will be used for cryptography in STK.")
     add_definitions(-DENABLE_CRYPTO_OPENSSL)
 else()
@@ -605,13 +616,23 @@ target_link_libraries(supertuxkart
     ${MCPP_LIBRARY}
     )
 
+if (USE_SWITCH)
+  include(cmake/FindEGL.cmake)
+  find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
+  find_library(NXD_LIBRARY NAMES nxd libnxd REQUIRED)
+  find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
+  find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+  message("USE SWITCH ${NX_LIBRARY}")
+  target_link_libraries(supertuxkart ${NX_LIBRARY} -lz -lfreetype -lSDL2 -lpng -lbz2 -lharfbuzz ${EGL_LIBRARY} ${DRM_LIBRARY} ${GLAPI_LIBRARY} ${NX_LIBRARY})
+endif()
+
 if (USE_SQLITE3)
     target_link_libraries(supertuxkart ${SQLITE3_LIBRARY})
 endif()
 
 if (USE_CRYPTO_OPENSSL)
     target_link_libraries(supertuxkart ${OPENSSL_CRYPTO_LIBRARY})
-else()
+elseif(NOT USE_SWITCH)
     target_link_libraries(supertuxkart ${NETTLE_LIBRARY})
 endif()
 

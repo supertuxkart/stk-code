@@ -161,9 +161,17 @@ IrrDriver::IrrDriver()
     m_resolution_changing = RES_CHANGE_NONE;
 
     struct irr::SIrrlichtCreationParameters p;
+#ifdef __SWITCH__
+    // Switch doesn't like multiple window create/closes, so we hardcode it
+    // Aforementioned chicken and egg problem isn't an issue because switch's SDL only supports two resolutions
+    p.DriverType    = video::EDT_OPENGL;
+    p.Bits          = 24U;
+    p.WindowSize    = core::dimension2d<u32>(1280,720);
+#else
     p.DriverType    = video::EDT_NULL;
-    p.WindowSize    = core::dimension2d<u32>(640,480);
     p.Bits          = 16U;
+    p.WindowSize    = core::dimension2d<u32>(640,480);
+#endif
     p.Fullscreen    = false;
     p.SwapInterval  = 0;
     p.EventReceiver = NULL;
@@ -366,6 +374,7 @@ void IrrDriver::initDevice()
 {
     SIrrlichtCreationParameters params;
 
+#ifndef __SWITCH__
     // If --no-graphics option was used, the null device can still be used.
     if (!GUIEngine::isNoGraphics())
     {
@@ -452,7 +461,11 @@ void IrrDriver::initDevice()
             UserConfigParams::m_gamepad_visualisation);
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
+#ifdef __SWITCH__
+        int bits=24;
+#else
         for (int bits=32; bits>15; bits -=8)
+#endif
         {
             if(UserConfigParams::logMisc())
                 Log::verbose("irr_driver", "Trying to create device with "
@@ -509,8 +522,12 @@ void IrrDriver::initDevice()
             */
             m_device = createDeviceEx(params);
 
+#ifdef __SWITCH__
+            assert(m_device != NULL);
+#else
             if(m_device)
                 break;
+#endif
         }   // for bits=32, 24, 16
 
 
@@ -541,6 +558,7 @@ void IrrDriver::initDevice()
             }
         }
     }
+#endif // __SWITCH__
 
     if(!m_device)
     {

@@ -21,6 +21,8 @@
 
 #ifdef ENABLE_CRYPTO_OPENSSL
 #include "network/crypto_openssl.hpp"
+#elif defined(ENABLE_CRYPTO_LIBNX)
+#include "network/crypto_libnx.hpp"
 #else
 #include "network/crypto_nettle.hpp"
 #endif

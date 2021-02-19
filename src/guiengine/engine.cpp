@@ -1550,6 +1550,7 @@ namespace GUIEngine
 
     void addLoadingIcon(irr::video::ITexture* icon)
     {
+        Log::info("Engine::addLoadingIcon", "Adding a new loading icon!");
         if (icon != NULL)
         {
             g_loading_icons.push_back(icon);

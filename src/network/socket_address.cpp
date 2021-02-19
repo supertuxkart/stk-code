@@ -26,7 +26,21 @@
 #  define _WIN32_WINNT 0x600
 #  include <iphlpapi.h>
 #else
+#ifndef __SWITCH__
 #  include <ifaddrs.h>
+#else
+extern "C" {
+  #define u64 uint64_t
+  #define u32 uint32_t
+  #define s64 int64_t
+  #define s32 int32_t
+  #include <switch/services/nifm.h>
+  #undef u64
+  #undef u32
+  #undef s32
+  #undef s64
+}
+#endif
 #  include <sys/ioctl.h>
 #  include <net/if.h>
 #  include <string.h>
@@ -302,7 +316,19 @@ bool SocketAddress::isPublicAddressLocalhost() const
         return false;
     if (isLoopback())
         return true;
-#ifndef WIN32
+#ifdef __SWITCH__
+    if (m_family == AF_INET) {
+      uint32_t currentIp = 0;
+      // TODO: libnx linking
+      nifmGetCurrentIpAddress(&currentIp);
+      // Unsure how Result works so this is the best I have
+      if(currentIp) {
+        // Gosh I hope this works
+        return htonl(currentIp) == getIP();
+      }
+    }
+    return false;
+#elif !defined(WIN32)
     struct ifaddrs *addresses, *p;
 
     if (getifaddrs(&addresses) == -1)

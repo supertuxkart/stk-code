@@ -170,13 +170,20 @@ FileManager::FileManager()
     }
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
+
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
         root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/data/" ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
-    else if(fileExists("data/", version))
-        root_dir = "data/" ;
+#ifdef __SWITCH__
+    else if(fileExists("sdmc:/stk-data/", version))
+        root_dir = "sdmc:/stk-data/";
+    else if(fileExists("romfs:/data/", version))
+        root_dir = "romfs:/data/";
+#endif
+    else if(fileExists("./data/", version))
+        root_dir = "./data/" ;
     else if(fileExists("../data/", version))
         root_dir = "../data/" ;
     else if(fileExists("../../data/", version))

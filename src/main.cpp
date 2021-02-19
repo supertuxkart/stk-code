@@ -166,6 +166,20 @@
 #include <jni.h>
 #endif
 
+#ifdef __SWITCH__
+extern "C" {
+  #include <sys/iosupport.h>
+  #include <switch/kernel/svc.h>
+  #include <switch/runtime/nxlink.h>
+  #include <switch/services/ssl.h>
+  #include <switch/runtime/devices/socket.h>
+}
+
+#include <dirent.h>
+#include <errno.h>
+#include <sys/types.h>
+#endif
+
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -707,6 +721,9 @@ int handleCmdLineOutputModifier()
     int n;
     if(CommandLine::has("--log", &n))
         Log::setLogLevel(n);
+#ifdef __SWITCH__
+    Log::setLogLevel(0);
+#endif
     if (CommandLine::has("--logbuffer", &n))
         Log::setBufferSize(n);
 
@@ -746,6 +763,9 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
+#ifdef __SWITCH__
+    UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
+#endif
     if(CommandLine::has("--online"))
         History::m_online_history_replay = true;
 #if !(defined(SERVER_ONLY) || defined(ANDROID))
@@ -1793,6 +1813,9 @@ void initRest()
     GUIEngine::setSkin(NULL);
 
     input_manager = new InputManager();
+#ifdef __SWITCH__
+    input_manager->addJoystick();
+#endif
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
     // Input manager set first so it recieves SDL joystick event
@@ -1985,6 +2008,13 @@ void main_abort()
 }
 #endif
 
+#ifdef __SWITCH__
+ssize_t dotab_stdout_fn(struct _reent *r,void *fd,const char *ptr, size_t len) {
+  svcOutputDebugString(ptr, len);
+  return len;
+}
+#endif
+
 // ----------------------------------------------------------------------------
 #if defined(ANDROID)
 int android_main(int argc, char *argv[])
@@ -1994,6 +2024,22 @@ int ios_main(int argc, char *argv[])
 int main(int argc, char *argv[])
 #endif
 {
+#ifdef __SWITCH__
+    constexpr devoptab_t dotab_stdout = {
+        .name    = "con",
+        .write_r = dotab_stdout_fn,
+    };
+
+    devoptab_list[STD_OUT] = &dotab_stdout;
+    devoptab_list[STD_ERR] = &dotab_stdout;
+
+    // Crashes on Reujinx
+#ifdef SWITCH_NETWORK_DEBUG
+    socketInitializeDefault();
+    nxlinkStdio();
+#endif
+#endif
+  
     clearGlobalVariables();
     CommandLine::init(argc, argv);
 
@@ -2130,28 +2176,43 @@ int main(int argc, char *argv[])
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "difficulty_easy.png"  ) );
         handleXmasMode();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "difficulty_medium.png"  ) );
         handleEasterEarMode();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "difficulty_best.png"  ) );
 
         // Needs the kart and track directories to load potential challenges
         // in those dirs, so it can only be created after reading tracks
         // and karts.
         unlock_manager = new UnlockManager();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "heart.png"  ) );
         AchievementsManager::create();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "gpeditor.png"  ) );
 
         // Reading the rest of the player data needs the unlock manager to
         // initialise the game slots of all players and the AchievementsManager
         // to initialise the AchievementsStatus, so it is done only now.
         PlayerManager::get()->initRemainingData();
 
+        Log::info("main", "Got to gui_lock!");
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
         ProjectileManager::get()->loadData();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "red_mark.png"  ) );
 
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
         file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "package.png"  ) );
         const std::string materials_file =
             file_manager->getAsset(FileManager::MODEL,"materials.xml");
         if(materials_file!="")
@@ -2162,9 +2223,15 @@ int main(int argc, char *argv[])
             // permanent icon materials, which would (with the current
             // implementation) make the temporary materials permanent anyway.
             material_manager->addSharedMaterial(materials_file);
+            GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "speedfore.png"  ) );
         }
         Referee::init();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "ghost_plus.png"  ) );
         powerup_manager->loadPowerupsModels();
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
+                                                          "green_check.png"  ) );
         ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,

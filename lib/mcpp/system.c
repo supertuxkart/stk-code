@@ -54,6 +54,9 @@
 #endif
 
 #include    "sys/types.h"
+#ifdef __SWITCH__
+#define readlink(path,buf,length) 0
+#endif
 #include    "sys/stat.h"                        /* For stat()       */
 #if     ! defined( S_ISREG)
 #define S_ISREG( mode)  (mode & S_IFREG)
