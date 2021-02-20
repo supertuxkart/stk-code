@@ -353,7 +353,7 @@ else()
     set(Angelscript_LIBRARIES angelscript)
 endif()
 
-if((NOT SERVER_ONLY) AND (NOT USE_SWITCH))
+if(NOT SERVER_ONLY)
     # OpenAL
     find_package(OpenAL REQUIRED)
     include_directories(${OPENAL_INCLUDE_DIR})
@@ -622,8 +622,7 @@ if (USE_SWITCH)
   find_library(NXD_LIBRARY NAMES nxd libnxd REQUIRED)
   find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
   find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
-  message("USE SWITCH ${NX_LIBRARY}")
-  target_link_libraries(supertuxkart ${NX_LIBRARY} -lz -lfreetype -lSDL2 -lpng -lbz2 -lharfbuzz ${EGL_LIBRARY} ${DRM_LIBRARY} ${GLAPI_LIBRARY} ${NX_LIBRARY})
+  target_link_libraries(supertuxkart ${NX_LIBRARY} -lz -lfreetype -lSDL2 -lpng -lbz2 -lharfbuzz -logg -lvorbis -lopenal ${EGL_LIBRARY} ${DRM_LIBRARY} ${GLAPI_LIBRARY} ${NX_LIBRARY})
 endif()
 
 if (USE_SQLITE3)
