@@ -22,7 +22,7 @@
 #ifdef ENABLE_CRYPTO_OPENSSL
 #include "network/crypto_openssl.hpp"
 #else
-#include "network/crypto_nettle.hpp"
+#include "network/crypto_mbedtls.hpp"
 #endif
 
 #endif // HEADER_CRYPTO_HPP

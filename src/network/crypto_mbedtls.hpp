@@ -16,16 +16,17 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef ENABLE_CRYPTO_NETTLE
+#ifdef ENABLE_CRYPTO_MBEDTLS
 
-#ifndef HEADER_CRYPTO_NETTLE_HPP
-#define HEADER_CRYPTO_NETTLE_HPP
+#ifndef HEADER_CRYPTO_MBEDTLS_HPP
+#define HEADER_CRYPTO_MBEDTLS_HPP
 
 #include "utils/log.hpp"
 
 #include <enet/enet.h>
-#include <nettle/gcm.h>
-#include <nettle/yarrow.h>
+#include <mbedtls/ctr_drbg.h>
+#include <mbedtls/entropy.h>
+#include <mbedtls/gcm.h>
 
 #include <algorithm>
 #include <array>
@@ -50,38 +51,9 @@ private:
 
     uint32_t m_packet_counter;
 
-    struct gcm_aes128_ctx m_aes_encrypt_context, m_aes_decrypt_context;
+    mbedtls_gcm_context m_aes_encrypt_context, m_aes_decrypt_context;
 
     std::mutex m_crypto_mutex;
-
-    // ------------------------------------------------------------------------
-    static size_t calcDecodeLength(const std::string& input)
-    {
-        // Calculates the length of a decoded string
-        size_t padding = 0;
-        const size_t len = input.size();
-        if (input[len - 1] == '=' && input[len - 2] == '=')
-        {
-            // last two chars are =
-            padding = 2;
-        }
-        else if (input[len - 1] == '=')
-        {
-            // last char is =
-            padding = 1;
-        }
-        return (len * 3) / 4 - padding;
-    }   // calcDecodeLength
-    // ------------------------------------------------------------------------
-    void handleAuthentication(const uint8_t* tag,
-                              const std::array<uint8_t, 4>& tag_after)
-    {
-        for (unsigned i = 0; i < tag_after.size(); i++)
-        {
-            if (tag[i] != tag_after[i])
-                throw std::runtime_error("Failed authentication.");
-        }
-    }
 
 public:
     // ------------------------------------------------------------------------
@@ -103,16 +75,24 @@ public:
     // ------------------------------------------------------------------------
     static void initClientAES()
     {
-        struct yarrow256_ctx ctx;
-        yarrow256_init(&ctx, 0, NULL);
+        mbedtls_entropy_context entropy;
+        mbedtls_entropy_init(&entropy);
+        mbedtls_ctr_drbg_context ctr_drbg;
+        mbedtls_ctr_drbg_init(&ctr_drbg);
         std::random_device rd;
         std::mt19937 g(rd());
-        std::array<uint8_t, YARROW256_SEED_FILE_SIZE> seed;
-        for (unsigned i = 0; i < YARROW256_SEED_FILE_SIZE; i++)
+        std::array<uint8_t, 28> seed, key_iv;
+        for (unsigned i = 0; i < 28; i++)
             seed[i] = (uint8_t)(g() % 255);
-        yarrow256_seed(&ctx, YARROW256_SEED_FILE_SIZE, seed.data());
-        std::array<uint8_t, 28> key_iv;
-        yarrow256_random(&ctx, key_iv.size(), key_iv.data());
+        key_iv = seed;
+        if (mbedtls_ctr_drbg_seed(&ctr_drbg, mbedtls_entropy_func,
+            &entropy, seed.data(), seed.size()) == 0)
+        {
+            // If failed use the seed in the beginning
+            if (mbedtls_ctr_drbg_random((void*)&ctr_drbg, key_iv.data(),
+                key_iv.size()) != 0)
+                key_iv = seed;
+        }
         m_client_key = base64({ key_iv.begin(), key_iv.begin() + 16 });
         m_client_iv = base64({ key_iv.begin() + 16, key_iv.end() });
     }
@@ -134,10 +114,16 @@ public:
         assert(iv.size() == 12);
         std::copy_n(iv.begin(), 12, m_iv.begin());
         m_packet_counter = 0;
-        gcm_aes128_set_key(&m_aes_encrypt_context, key.data());
-        gcm_aes128_set_iv(&m_aes_encrypt_context, 12, iv.data());
-        gcm_aes128_set_key(&m_aes_decrypt_context, key.data());
-        gcm_aes128_set_iv(&m_aes_decrypt_context, 12, iv.data());
+        mbedtls_gcm_setkey(&m_aes_encrypt_context, MBEDTLS_CIPHER_ID_AES,
+            key.data(), key.size() * 8);
+        mbedtls_gcm_setkey(&m_aes_decrypt_context, MBEDTLS_CIPHER_ID_AES,
+            key.data(), key.size() * 8);
+    }
+    // ------------------------------------------------------------------------
+    ~Crypto()
+    {
+        mbedtls_gcm_free(&m_aes_encrypt_context);
+        mbedtls_gcm_free(&m_aes_decrypt_context);
     }
     // ------------------------------------------------------------------------
     bool encryptConnectionRequest(BareNetworkString& ns);
@@ -150,6 +136,6 @@ public:
 
 };
 
-#endif // HEADER_CRYPTO_NETTLE_HPP
+#endif // HEADER_CRYPTO_MBEDTLS_HPP
 
 #endif
