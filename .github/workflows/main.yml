@@ -49,7 +49,7 @@ jobs:
           sudo apt-get update 
           sudo apt install -y build-essential cmake libbluetooth-dev libcurl4-gnutls-dev \
           libfreetype6-dev libharfbuzz-dev libjpeg-dev libogg-dev libopenal-dev \
-          libpng-dev libsdl2-dev libvorbis-dev pkg-config zlib1g-dev
+          libpng-dev libsdl2-dev libvorbis-dev pkg-config zlib1g-dev clang
       - name: Install macos dependencies
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
@@ -62,13 +62,13 @@ jobs:
       - name: Set compiler (gcc)
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc' }}
         run: |
-          echo "CXX=g++-8" >> $GITHUB_ENV
-          echo "CC=gcc-8" >> $GITHUB_ENV
+          echo "CXX=g++" >> $GITHUB_ENV
+          echo "CC=gcc" >> $GITHUB_ENV
       - name: Set compiler (clang)
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'clang' }}
         run: |
-          echo "CXX=clang++-6.0" >> $GITHUB_ENV
-          echo "CC=clang-6.0" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+          echo "CC=clang" >> $GITHUB_ENV
       - name: Set compiler (macos)
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
