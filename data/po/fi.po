@@ -6,14 +6,14 @@
 # Jaakoppi Horila <supermariojaska5@gmail.com>, 2018-2019
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2015-2021
 # Kristian Laakkonen, 2018-2019
-# Oi Suomi On! <oisuomion@protonmail.com>, 2020
+# Oi Suomi On! <oisuomion@protonmail.com>, 2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-06 09:59+0800\n"
-"PO-Revision-Date: 2021-02-06 02:01+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-02-16 09:26+0800\n"
+"PO-Revision-Date: 2021-02-17 07:57+0000\n"
+"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/supertuxkart/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -173,6 +173,8 @@ msgstr "Poista asennus"
 #. I18N: Add-on screen action
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:149
@@ -225,8 +227,11 @@ msgstr "Voit vaihtaa sen myöhemmin kosketuslaitteen asetuksista."
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
+#. I18N: Video settings
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
 msgid "Apply"
 msgstr "Toteuta"
 
@@ -311,8 +316,10 @@ msgstr "Palauta oletukset"
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
+#: src/states_screens/high_score_selection.cpp:208
 msgid "Yes"
 msgstr "Kyllä"
 
@@ -321,8 +328,14 @@ msgstr "Kyllä"
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+#. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
+#. I18N: Video settings
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
+#. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
@@ -396,8 +409,9 @@ msgid "Follow ball in soccer mode"
 msgstr "Seuraa palloa jalkapallotilassa"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
 msgid "Reset"
-msgstr ""
+msgstr "Nollaus"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -525,8 +539,12 @@ msgstr "Vertaa toiseen haamuun"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -540,6 +558,8 @@ msgstr "Vertaa haamua"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #. I18N: ./data/gui/screens/edit_gp.stkgui
@@ -798,6 +818,8 @@ msgstr "Pelimuoto"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -810,6 +832,8 @@ msgstr "Normaali kilpailu"
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -998,6 +1022,8 @@ msgstr "Autot"
 #. I18N: In the addons screen
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Tracks"
 msgstr "Radat"
 
@@ -1019,7 +1045,7 @@ msgstr "Asennettu"
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
 #. I18N: In the UI options, Camera setting: Standard
-#: src/states_screens/dialogs/custom_camera_settings.cpp:67
+#: src/states_screens/dialogs/custom_camera_settings.cpp:69
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 #: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
@@ -1128,6 +1154,8 @@ msgstr "Haamu-uusinnan valinta"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1200
 msgid "Egg Hunt"
@@ -1165,20 +1193,28 @@ msgstr "Nauhoita haamu-uusinta"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "AI karts"
 msgstr "Tietokonevastustajat"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Reverse"
 msgstr "Käänteinen suunta"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Track group"
 msgstr "Rataryhmä"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 #: src/states_screens/gp_info_screen.cpp:145
 msgid "Continue saved GP"
@@ -1615,7 +1651,7 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr ""
+msgstr "Kun olet palvelimella, kisa alkaa sen omistajan (merkitty kruunulla) päättäessä niin. Virallisilla palvelimilla kisa voi alkaa automaattisesti vain kun kasassa on tarpeeksi pelaajia. Sen jälkeen, voit valita ajokkisi ja äänestää seuraavaa rataa. Lisärata sallitaan vain mikäli se on olemassa kaikille pelaajille sekä palvelimella."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1641,6 +1677,11 @@ msgid ""
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
 msgstr "Kun syöttölaitteiden asetukset on tehty, valitse kuvake 'moninpeli jaetulla ruudulla' päävalikosta. Jokainen pelaaja painaa peliohjaimensa tai näppäimistönsä ampumisnäppäintä liittyäkseen peliin, ja käyttäen ohjausnäppäimiä valitakseen ajokkinsa. Peli jatkuu kun jokainen on valinnut ajokkinsa. On huomioitavaa että hiirtä ei voida käyttää tähän tarkoitukseen."
+
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
+msgid "High Score Selection"
+msgstr "Huippupisteiden valinta"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1680,6 +1721,12 @@ msgstr "Lisäosat"
 #: src/states_screens/race_gui_overworld.cpp:529
 msgid "Tutorial"
 msgstr "Opaskierros"
+
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+#: src/states_screens/track_info_screen.cpp:332
+msgid "High Scores"
+msgstr "Huippupisteet"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2041,7 +2088,7 @@ msgstr "Musiikki"
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:66
+#: src/states_screens/dialogs/custom_video_settings.cpp:68
 #: src/states_screens/options/options_screen_video.cpp:607
 #: src/states_screens/options/options_screen_video.cpp:680
 msgid "Enabled"
@@ -2197,7 +2244,7 @@ msgstr "Graafisten tehosteiden taso"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr ""
+msgstr "Hahmonnuksen tarkkuus"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2256,10 +2303,6 @@ msgstr "Punainen joukkue"
 #. I18N: In soccer setup screen
 msgid "Blue Team"
 msgstr "Sininen joukkue"
-
-#. I18N: ./data/gui/screens/track_info.stkgui
-msgid "= Highscores ="
-msgstr "= Ennätykset ="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -2486,7 +2529,7 @@ msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Pepper"
-msgstr ""
+msgstr "Paprika"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara"
@@ -2776,7 +2819,7 @@ msgstr "Video tallennettu sijaintiin \"%s\"."
 msgid "Encoding progress:"
 msgstr "Pakkauksen edistyminen:"
 
-#: src/graphics/irr_driver.cpp:1845 src/graphics/irr_driver.cpp:1850
+#: src/graphics/irr_driver.cpp:1821 src/graphics/irr_driver.cpp:1826
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %d ms"
@@ -3423,19 +3466,19 @@ msgstr "L2-painike"
 msgid "Right trigger"
 msgstr "R2-painike"
 
-#: src/input/input_manager.cpp:993
+#: src/input/input_manager.cpp:995
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Jätetään '%s' huomiotta. Sinun olisi tullut liittyä aiemmin pelataksesi!"
 
-#: src/input/input_manager.cpp:1030
+#: src/input/input_manager.cpp:1031
 msgid "Only the Game Master may act at this point!"
 msgstr "Vain pelin johtaja voi tehdä muutoksia tässä vaiheessa!"
 
 #: src/input/sdl_controller.cpp:241
 #, c-format
 msgid "%s has low battery level."
-msgstr ""
+msgstr "%s alhainen virtataso."
 
 #: src/input/wiimote_manager.cpp:379
 msgid ""
@@ -3487,7 +3530,7 @@ msgstr "Voitit kilpailun!"
 #: src/karts/kart.cpp:1021
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "Kisa päättyi osaltasi sijoitukseen %d!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
@@ -3495,25 +3538,25 @@ msgstr ""
 msgid "%s left the game."
 msgstr "%s poistui pelistä."
 
-#: src/main.cpp:1918
+#: src/main.cpp:1946
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr ""
+msgstr "SuperTuxKart voi yhdistää palvelimelle ladatakseen lisäosia sekä ilmoittaakseen sinulle päivityksistä. Lue yksityisyyskäytäntömme osoitteessa https://supertuxkart.net/Privacy. Haluatko että tämä kyseinen ominaisuus kytketään päälle? (Muuttaaksesi tätä asetusta myöhemmin, mene asetuksiin, valitse välilehti 'Yleistä', ja muokkaa \"Yhdistä internetiin\") "
 
-#: src/main.cpp:2198
+#: src/main.cpp:2226
 msgid "Your screen resolution is too low to run STK."
 msgstr "Näyttösi resoluutio on liian matala STK:n pelaamista varten."
 
-#: src/main.cpp:2233
+#: src/main.cpp:2261
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Ajuriversiosi on liian vanha. Asenna näytönohjaimen uusin ajuri."
 
-#: src/main.cpp:2251
+#: src/main.cpp:2279
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3606,11 +3649,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i vararengasauto lisätty!"
 msgstr[1] "%i vararengasautoa lisätty!"
 
-#: src/modes/world.cpp:1371
+#: src/modes/world.cpp:1383
 msgid "You have been eliminated!"
 msgstr "Sinut poistettiin kisasta!"
 
-#: src/modes/world.cpp:1378
+#: src/modes/world.cpp:1390
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "%s on poistettu."
@@ -3633,7 +3676,7 @@ msgid "Bad network connection is detected."
 msgstr "Verkkoyhteydessä havaittiin ongelmia."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3792
+#: src/network/protocols/server_lobby.cpp:3813
 msgid "Bot"
 msgstr "Botti"
 
@@ -3658,6 +3701,7 @@ msgstr "Palvelimen nimi: %s"
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:695
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:92
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
 #: src/states_screens/race_result_gui.cpp:1841
 #, c-format
@@ -3681,7 +3725,7 @@ msgstr "Pelitila: %s"
 #: src/network/protocols/client_lobby.cpp:726
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
-#: src/states_screens/track_info_screen.cpp:366
+#: src/states_screens/track_info_screen.cpp:367
 msgid "Time limit"
 msgstr "Aikaraja"
 
@@ -3689,7 +3733,7 @@ msgstr "Aikaraja"
 #: src/network/protocols/client_lobby.cpp:727
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
-#: src/states_screens/track_info_screen.cpp:367
+#: src/states_screens/track_info_screen.cpp:368
 msgid "Goals limit"
 msgstr "Maaliraja"
 
@@ -3888,11 +3932,11 @@ msgid ""
 " later."
 msgstr "Palvelimeen yhdistäminen epäonnistui. Tarkista internetyhteyden tila tai yritä myöhemmin uudelleen."
 
-#: src/race/highscore_manager.cpp:102
+#: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "Ennätystiedosto oli liian vanha.\nEnnätykset on nyt nollattu."
+msgstr "Huippupisteiden tiedosto oli liian vanha.\nKaikki huippupisteet on nyt nollattu."
 
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1192
@@ -3970,7 +4014,7 @@ msgid "Please wait while addons are updated"
 msgstr "Odota, lisäosia päivitetään"
 
 #: src/states_screens/addons_screen.cpp:523
-#: src/states_screens/main_menu_screen.cpp:622
+#: src/states_screens/main_menu_screen.cpp:626
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -4508,14 +4552,14 @@ msgid ""
 msgstr "Vain 1024x768 ja 1280x720 ja sitä suuremmat näyttötarkuudet ovat tuettuja. Jotkin osat käyttöliittymästä eivät välttämättä toimi kunnolla."
 
 #. I18N: In the UI options, Camera setting: Drone chase
-#: src/states_screens/dialogs/custom_camera_settings.cpp:84
+#: src/states_screens/dialogs/custom_camera_settings.cpp:86
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
 msgstr "Lennokkijahti"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
-#: src/states_screens/dialogs/custom_camera_settings.cpp:101
+#: src/states_screens/dialogs/custom_camera_settings.cpp:103
 #: src/states_screens/options/options_screen_ui.cpp:160
 #: src/states_screens/options/options_screen_video.cpp:529
 #: src/states_screens/options/options_screen_video.cpp:564
@@ -4526,9 +4570,9 @@ msgstr "Oma"
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/dialogs/custom_video_settings.cpp:71
-#: src/states_screens/dialogs/custom_video_settings.cpp:87
+#: src/states_screens/dialogs/custom_video_settings.cpp:66
+#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:89
 #: src/states_screens/online/create_server_screen.cpp:206
 #: src/states_screens/options/options_screen_video.cpp:242
 #: src/states_screens/options/options_screen_video.cpp:610
@@ -4537,7 +4581,7 @@ msgid "Disabled"
 msgstr "Ei käytössä"
 
 #. I18N: if only important particles effects is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:65
+#: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options/options_screen_video.cpp:612
 msgid "Important only"
 msgstr "Vain tärkeä"
@@ -4545,9 +4589,9 @@ msgstr "Vain tärkeä"
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
-#: src/states_screens/dialogs/custom_video_settings.cpp:73
-#: src/states_screens/dialogs/custom_video_settings.cpp:82
-#: src/states_screens/dialogs/custom_video_settings.cpp:88
+#: src/states_screens/dialogs/custom_video_settings.cpp:75
+#: src/states_screens/dialogs/custom_video_settings.cpp:84
+#: src/states_screens/dialogs/custom_video_settings.cpp:90
 #: src/states_screens/options/options_screen_video.cpp:619
 msgid "Low"
 msgstr "Matala"
@@ -4555,16 +4599,16 @@ msgstr "Matala"
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
-#: src/states_screens/dialogs/custom_video_settings.cpp:83
-#: src/states_screens/dialogs/custom_video_settings.cpp:89
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
+#: src/states_screens/dialogs/custom_video_settings.cpp:85
+#: src/states_screens/dialogs/custom_video_settings.cpp:91
 #: src/states_screens/options/options_screen_video.cpp:622
 msgid "High"
 msgstr "Korkea"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:81
+#: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/options/options_screen_video.cpp:616
 msgid "Very Low"
 msgstr "Erittäin matala"
@@ -4579,12 +4623,14 @@ msgstr "SuperTuxKart lataa kaikki resurssit (mukaan lukien korkeatasoiset tekstu
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
+#: src/states_screens/high_score_selection.cpp:136
 msgctxt "column_name"
 msgid "Reverse"
 msgstr "Käänteinen"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
+#: src/states_screens/high_score_selection.cpp:131
 #: src/states_screens/online/server_selection.cpp:127
 msgctxt "column_name"
 msgid "Difficulty"
@@ -4592,6 +4638,7 @@ msgstr "Vaikeustaso"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
+#: src/states_screens/high_score_selection.cpp:135
 msgctxt "column_name"
 msgid "Laps"
 msgstr "Kierrokset"
@@ -4621,19 +4668,52 @@ msgid "Version"
 msgstr "Versio"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
 #: src/states_screens/dialogs/message_dialog.cpp:130
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
+#: src/states_screens/high_score_selection.cpp:208
 msgid "No"
 msgstr "Ei"
 
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:87
+#, c-format
+msgid "Top %d High Scores"
+msgstr "Huippupisteiden %d parasta"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:89
+#, c-format
+msgid "Track: %s"
+msgstr "Rata: %s"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:102
+#, c-format
+msgid "Number of karts: %d"
+msgstr "Autojen määrä: %d"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:105
+#, c-format
+msgid "Laps: %d"
+msgstr "Kierroksia: %d"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:109
+#, c-format
+msgid "Reverse: %s"
+msgstr "Käänteinen: %s"
+
+#. I18N: for empty highscores entries
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:169
+#: src/states_screens/track_info_screen.cpp:526
+msgid "(Empty)"
+msgstr "(Tyhjä)"
+
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:46
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
 msgid "Use original color"
 msgstr "Käytä alkuperäistä väriä"
 
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:48
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:49
 msgid "Pick a color from slider"
 msgstr "Valitse väri säätimestä"
 
@@ -4788,7 +4868,7 @@ msgstr "Taistelutila"
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:238
-#: src/states_screens/track_info_screen.cpp:354
+#: src/states_screens/track_info_screen.cpp:355
 msgid "Soccer game type"
 msgstr "Jalkapallopelin tyyppi"
 
@@ -4911,6 +4991,7 @@ msgid "Are you sure you want to remove '%s'?"
 msgstr "Poistetaanko varmasti '%s'?"
 
 #: src/states_screens/edit_gp_screen.cpp:134
+#: src/states_screens/edit_gp_screen.cpp:382
 msgid "Do you want to save your changes?"
 msgstr "Haluatko tallentaa muutoksesi?"
 
@@ -4981,6 +5062,7 @@ msgid "You unlocked grand prix %0"
 msgstr "Avasit %0 -Grand Prix'n lukituksen"
 
 #: src/states_screens/ghost_replay_selection.cpp:153
+#: src/states_screens/high_score_selection.cpp:130
 msgctxt "column_name"
 msgid "Track"
 msgstr "Rata"
@@ -5052,6 +5134,19 @@ msgstr "Voitit Grand Prix'in!"
 msgid "You completed the Grand Prix!"
 msgstr "Läpäisit Grand Prix'n!"
 
+#: src/states_screens/high_score_selection.cpp:134
+msgctxt "column_name"
+msgid "Number of karts"
+msgstr "Autojen määrä"
+
+#: src/states_screens/high_score_selection.cpp:267
+msgid "Are you sure you want to remove this high score entry?"
+msgstr "Haluatko varmasti poistaa tämän tietueen huippupisteistä?"
+
+#: src/states_screens/high_score_selection.cpp:275
+msgid "Are you sure you want to remove all of your high scores?"
+msgstr "Haluatko varmasti poistaa kaikki huippupisteesi?"
+
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr "Yhdistä näppäimistö tai peliohjain pelataksesi moninpeliä jaetulla näytöllä"
@@ -5072,7 +5167,7 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr "Kaikki:\nPainakaa valintapainiketta liittyäksenne peliin"
 
-#: src/states_screens/main_menu_screen.cpp:260
+#: src/states_screens/main_menu_screen.cpp:262
 msgid "Would you like to play the tutorial of the game?"
 msgstr "Haluatko pelata pelin opaskierroksen?"
 
@@ -5095,13 +5190,17 @@ msgid ""
 "You can however delete already downloaded addons."
 msgstr "Et voi ladata lisäosia ilman pääsyä internetiin. Jos haluat ladata lisäosia, mene Asetukset-valikkoon ja rastita \"Yhdistä internetiin\".\n\nVoit kuitenkin poistaa jo ladattuja lisäosia."
 
-#: src/states_screens/main_menu_screen.cpp:617
+#: src/states_screens/main_menu_screen.cpp:621
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Lisäosamoduuli ei ole tällä hetkellä käytössä Asetukset-valikossa"
 
-#: src/states_screens/main_menu_screen.cpp:629
+#: src/states_screens/main_menu_screen.cpp:633
 msgid "Please wait while the add-ons are loading"
 msgstr "Odota, lisäosia ladataan"
+
+#: src/states_screens/main_menu_screen.cpp:654
+msgid "Are you sure you want to quit STK?"
+msgstr "Haluatko varmasti lopettaa STK:n?"
 
 #: src/states_screens/online/create_server_screen.cpp:96
 msgid "Create LAN Server"
@@ -5397,14 +5496,14 @@ msgstr "Satunnainen esineiden sijainti"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:445
+#: src/states_screens/track_info_screen.cpp:446
 msgid "Number of goals to win"
 msgstr "Voittoon tarvittavien maalien määrä"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:254
-#: src/states_screens/track_info_screen.cpp:440
+#: src/states_screens/track_info_screen.cpp:441
 msgid "Maximum time (min.)"
 msgstr "Enimmäisaika (min)"
 
@@ -5943,7 +6042,7 @@ msgstr "Grand Prix'n tilanne:"
 
 #: src/states_screens/race_result_gui.cpp:1752
 msgid "Highscores"
-msgstr "Ennätykset"
+msgstr "Huippupisteet"
 
 #: src/states_screens/race_result_gui.cpp:1855
 #, c-format
@@ -6004,14 +6103,9 @@ msgstr "Radan tekijä: %s"
 msgid "Max players supported: %d"
 msgstr "Enimmäispelaajien tuettu määrä: %d"
 
-#: src/states_screens/track_info_screen.cpp:380
+#: src/states_screens/track_info_screen.cpp:381
 msgid "Number of red team AI karts"
 msgstr "Punaisen joukkueen tietokoneen ohjaamien autojen määrä"
-
-#. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:525
-msgid "(Empty)"
-msgstr "(Tyhjä)"
 
 #. I18N: track group name
 #: src/states_screens/tracks_and_gp_screen.cpp:148
@@ -6162,7 +6256,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr ""
+msgstr "Ajokit. Nitrot. Toimintaa! SuperTuxKart on 3D avoimen lähdekoodin kolikkopelityylinen kilvanajopeli jossa on kirjava valikoima erilaisia hahmoja, ratoja, ja pelityyppejä. Tavoitteenamme on luoda peli joka on enemmänkin hauska kuin todenmukainen, sekä tarjota nautittava pelikokemus kaikenikäisille."
 
 #: supertuxkart.appdata.xml:11
 msgid ""
@@ -6172,7 +6266,7 @@ msgid ""
 " the palm trees on the beach, watching the other karts overtake you. But "
 "don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
 "cakes thrown by your opponents."
-msgstr ""
+msgstr "Löydä vedenalaisen maailman mysteeri, tai aja läpi Val Verden viidakkojen ja vieraile kuuluisassa Kaakaotemppelissä. Kisaa maan alla tai avaruusaluksessa, läpi maaseudun viljelysmaan tai oudolla muukalaisplaneetalla. Huilaa rannalla palmupuiden katveessa, katsellen kun muut ajokit ohittavat sinut. Mutta älä syö banaaneja! Varo keilapalloja, imukuppeja, purukumia, ja kakkuja joita kanssakisaajat viskelevät."
 
 #: supertuxkart.appdata.xml:14
 msgid ""
@@ -6181,7 +6275,7 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, race online against players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "Voit suorittaa yksittäisiä kisoja muita ajokkeja vastaan, ottaa mittaa jossakin lukuisista Grand Prix -osakilpailuista, pyrkiä rikkomaan aikaennätyksiä yksin, pelata taistelumuotoista kahakkaa tietokonetta tai ystäviäsi vastaan, sekä niin paljon muutakin! Jos mielit isompien haasteiden pariin, aja kilpaa maailmanlaajuisessa verkossa jossa on pelaajia kaikkialta maailmasta ja todista ajotaitosi!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."
