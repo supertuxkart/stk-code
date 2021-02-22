@@ -19,6 +19,7 @@
 
 #include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
@@ -388,10 +389,6 @@ void OptionsScreenDevice::updateInputButtons()
 
         }   // if existing key
     }   // for action <= PA_LAST_MENU_ACTION;
-    
-
-    GUIEngine::Widget* conflict_label =
-        getWidget<GUIEngine::LabelWidget>("conflict");
 
     core::stringw warning;
     if (conflicts_between)
@@ -402,7 +399,8 @@ void OptionsScreenDevice::updateInputButtons()
     }
     if (conflicts_inside)
         warning += _("* A red item means a conflict in the current configuration");
-    conflict_label->setText(warning);
+    if (!warning.empty())
+        MessageQueue::add(MessageQueue::MT_ERROR, warning);
 
 }   // updateInputButtons
 
