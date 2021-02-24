@@ -1008,7 +1008,7 @@ void STKHost::mainLoop(ProcessType pt)
             // Enet will reuse a disconnected peer so we check here to avoid
             // sending to wrong peer
             if (peer->state != ENET_PEER_STATE_CONNECTED ||
-#ifdef ENABLE_IPV6
+#if defined(ENABLE_IPV6) || defined(__SWITCH__)
                 (enet_ip_not_equal(ea_peer_now.host, ea.host) &&
                 ea_peer_now.port != ea.port))
 #else

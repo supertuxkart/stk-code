@@ -101,7 +101,11 @@ SocketAddress::SocketAddress(const ENetAddress& ea)
     }
 #else
     m_family = AF_INET;
+#ifdef __SWITCH__
+    setIP(htonl(ea.host.p0));
+#else
     setIP(htonl(ea.host));
+#endif
     setPort(ea.port);
 #endif
 }   // SocketAddress(const ENetAddress&)
@@ -150,6 +154,7 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
         else
             port_str = StringUtils::toString(port_number);
     }
+#ifdef ENABLE_IPV6
     else if (str[0] == '[')
     {
         // Handle [IPv6 address]:port format
@@ -165,6 +170,13 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
         else
             port_str = StringUtils::toString(port_number);
     }
+#else
+    // Ignore ipv6, otherwise we end up querying for them which can be slow
+    else if (colon_pos != std::string::npos) {
+      Log::debug("SocketAddress", "Ignoring ipv6 address: %s", str.c_str());
+      return;
+    }
+#endif
     else
     {
         addr_str = str;
@@ -741,7 +753,7 @@ ENetAddress SocketAddress::toENetAddress() const
 {
     ENetAddress ea = {};
     uint32_t ip = getIP();
-#ifdef ENABLE_IPV6
+#if defined(ENABLE_IPV6) || defined(__SWITCH__)
     if (isIPv6Socket())
     {
         struct sockaddr_in6* in6 = (struct sockaddr_in6*)m_sockaddr.data();

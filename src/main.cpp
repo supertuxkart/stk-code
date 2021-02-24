@@ -1864,6 +1864,7 @@ void initRest()
     // achievement managers to be created, which can only be created later).
     PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
+    sleep(10);
 #ifndef SERVER_ONLY
     if (!GUIEngine::isNoGraphics())
         NewsManager::get();   // this will create the news manager
@@ -2033,9 +2034,26 @@ int main(int argc, char *argv[])
     devoptab_list[STD_OUT] = &dotab_stdout;
     devoptab_list[STD_ERR] = &dotab_stdout;
 
+    // Up number of maximum concurrent sockets, otherwise we can fail while loading with nxlink
+    const SocketInitConfig socketConfig = {
+        .bsdsockets_version = 1,
+        .tcp_tx_buf_size        = 0x8000,
+        .tcp_rx_buf_size        = 0x10000,
+        .tcp_tx_buf_max_size    = 0x40000,
+        .tcp_rx_buf_max_size    = 0x40000,
+
+        .udp_tx_buf_size = 0x2400,
+        .udp_rx_buf_size = 0xA500,
+
+        .sb_efficiency = 4,
+        .num_bsd_sessions = 16,
+        .bsd_service_type = BsdServiceType_User,
+    };
+
+    socketInitialize(&socketConfig);
     // Crashes on Reujinx
-#ifdef SWITCH_NETWORK_DEBUG
-    socketInitializeDefault();
+    #define DEBUG_NXLINK
+#ifdef DEBUG_NXLINK
     nxlinkStdio();
 #endif
 #endif

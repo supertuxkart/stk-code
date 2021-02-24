@@ -24,7 +24,7 @@
 #elif defined(ENABLE_CRYPTO_LIBNX)
 #include "network/crypto_libnx.hpp"
 #else
-#include "network/crypto_nettle.hpp"
+#include "network/crypto_mbedtls.hpp"
 #endif
 
 #endif // HEADER_CRYPTO_HPP

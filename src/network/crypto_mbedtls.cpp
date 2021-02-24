@@ -16,66 +16,48 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifdef ENABLE_CRYPTO_NETTLE
+#ifdef ENABLE_CRYPTO_MBEDTLS
 
-#include "network/crypto_nettle.hpp"
+#include "network/crypto_mbedtls.hpp"
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 
-#include <nettle/base64.h>
-#include <nettle/sha.h>
-#include <nettle/version.h>
-
-#if NETTLE_VERSION_MAJOR > 3 || \
-    (NETTLE_VERSION_MAJOR == 3 && NETTLE_VERSION_MINOR > 3)
-typedef const char* NETTLE_CONST_CHAR;
-typedef char* NETTLE_CHAR;
-#else
-typedef const uint8_t* NETTLE_CONST_CHAR;
-typedef uint8_t* NETTLE_CHAR;
-#endif
+#include <mbedtls/base64.h>
+#include <mbedtls/sha256.h>
+#include <cstring>
 
 // ============================================================================
 std::string Crypto::base64(const std::vector<uint8_t>& input)
 {
+    size_t required_size = 0;
+    mbedtls_base64_encode(NULL, 0, &required_size, &input[0], input.size());
     std::string result;
-    const size_t char_size = ((input.size() + 3 - 1) / 3) * 4;
-    result.resize(char_size, (char)0);
-    base64_encode_raw((NETTLE_CHAR)&result[0], input.size(), input.data());
+    result.resize(required_size, (char)0);
+    mbedtls_base64_encode((unsigned char*)&result[0], required_size,
+        &required_size, &input[0], input.size());
+    // mbedtls_base64_encode includes the null terminator for required size
+    result.resize(strlen(result.c_str()));
     return result;
 }   // base64
 
 // ============================================================================
 std::vector<uint8_t> Crypto::decode64(std::string input)
 {
-    size_t decode_len = calcDecodeLength(input);
-    std::vector<uint8_t> result(decode_len, 0);
-    struct base64_decode_ctx ctx;
-    base64_decode_init(&ctx);
-    size_t decode_len_by_nettle;
-#ifdef DEBUG
-    int ret = base64_decode_update(&ctx, &decode_len_by_nettle, result.data(),
-        input.size(), (NETTLE_CONST_CHAR)input.c_str());
-    assert(ret == 1);
-    ret = base64_decode_final(&ctx);
-    assert(ret == 1);
-    assert(decode_len_by_nettle == decode_len);
-#else
-    base64_decode_update(&ctx, &decode_len_by_nettle, result.data(),
-        input.size(), (NETTLE_CONST_CHAR)input.c_str());
-    base64_decode_final(&ctx);
-#endif
+    size_t required_size = 0;
+    mbedtls_base64_decode(NULL, 0, &required_size, (unsigned char*)&input[0],
+        input.size());
+    std::vector<uint8_t> result(required_size, 0);
+    mbedtls_base64_decode(result.data(), required_size,
+        &required_size, (unsigned char*)&input[0], input.size());
     return result;
 }   // decode64
 
 // ============================================================================
 std::array<uint8_t, 32> Crypto::sha256(const std::string& input)
 {
-    std::array<uint8_t, SHA256_DIGEST_SIZE> result;
-    struct sha256_ctx hash;
-    sha256_init(&hash);
-    sha256_update(&hash, input.size(), (const uint8_t*)input.c_str());
-    sha256_digest(&hash, SHA256_DIGEST_SIZE, result.data());
+    std::array<uint8_t, 32> result;
+    mbedtls_sha256_ret((unsigned char*)&input[0], input.size(),
+        result.data(), 0/*not 224*/);
     return result;
 }   // sha256
 
@@ -86,9 +68,12 @@ std::string Crypto::m_client_iv;
 bool Crypto::encryptConnectionRequest(BareNetworkString& ns)
 {
     std::vector<uint8_t> cipher(ns.m_buffer.size() + 4, 0);
-    gcm_aes128_encrypt(&m_aes_encrypt_context, ns.m_buffer.size(),
-        cipher.data() + 4, ns.m_buffer.data());
-    gcm_aes128_digest(&m_aes_encrypt_context, 4, cipher.data());
+    if (mbedtls_gcm_crypt_and_tag(&m_aes_encrypt_context, MBEDTLS_GCM_ENCRYPT,
+        ns.m_buffer.size(), m_iv.data(), m_iv.size(), NULL, 0,
+        ns.m_buffer.data(), cipher.data() + 4, 4, cipher.data()) != 0)
+    {
+        return false;
+    }
     std::swap(ns.m_buffer, cipher);
     return true;
 }   // encryptConnectionRequest
@@ -98,13 +83,12 @@ bool Crypto::decryptConnectionRequest(BareNetworkString& ns)
 {
     std::vector<uint8_t> pt(ns.m_buffer.size() - 4, 0);
     uint8_t* tag = ns.m_buffer.data();
-    std::array<uint8_t, 4> tag_after = {};
-
-    gcm_aes128_decrypt(&m_aes_decrypt_context, ns.m_buffer.size() - 4,
-        pt.data(), ns.m_buffer.data() + 4);
-    gcm_aes128_digest(&m_aes_decrypt_context, 4, tag_after.data());
-    handleAuthentication(tag, tag_after);
-
+    if (mbedtls_gcm_auth_decrypt(&m_aes_decrypt_context, pt.size(),
+        m_iv.data(), m_iv.size(), NULL, 0, tag, 4, ns.m_buffer.data() + 4,
+        pt.data()) != 0)
+    {
+        throw std::runtime_error("Failed authentication.");
+    }
     std::swap(ns.m_buffer, pt);
     return true;
 }   // decryptConnectionRequest
@@ -140,11 +124,13 @@ ENetPacket* Crypto::encryptSend(BareNetworkString& ns, bool reliable)
     }
 
     uint8_t* packet_start = p->data + 8;
-
-    gcm_aes128_set_iv(&m_aes_encrypt_context, 12, iv.data());
-    gcm_aes128_encrypt(&m_aes_encrypt_context, ns.m_buffer.size(),
-        packet_start, ns.m_buffer.data());
-    gcm_aes128_digest(&m_aes_encrypt_context, 4, p->data + 4);
+    if (mbedtls_gcm_crypt_and_tag(&m_aes_encrypt_context, MBEDTLS_GCM_ENCRYPT,
+        ns.m_buffer.size(), iv.data(), iv.size(), NULL, 0, ns.m_buffer.data(),
+        packet_start, 4, p->data + 4) != 0)
+    {
+        enet_packet_destroy(p);
+        return NULL;
+    }
     ul.unlock();
 
     p->data[0] = (val >> 24) & 0xff;
@@ -168,13 +154,11 @@ NetworkString* Crypto::decryptRecieve(ENetPacket* p)
 
     uint8_t* packet_start = p->data + 8;
     uint8_t* tag = p->data + 4;
-    std::array<uint8_t, 4> tag_after = {};
-
-    gcm_aes128_set_iv(&m_aes_decrypt_context, 12, iv.data());
-    gcm_aes128_decrypt(&m_aes_decrypt_context, clen, ns->m_buffer.data(),
-        packet_start);
-    gcm_aes128_digest(&m_aes_decrypt_context, 4, tag_after.data());
-    handleAuthentication(tag, tag_after);
+    if (mbedtls_gcm_auth_decrypt(&m_aes_decrypt_context, clen, iv.data(),
+        iv.size(), NULL, 0, tag, 4, packet_start, ns->m_buffer.data()) != 0)
+    {
+        throw std::runtime_error("Failed authentication.");
+    }
 
     NetworkString* result = ns.get();
     ns.release();

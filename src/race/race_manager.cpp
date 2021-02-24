@@ -625,11 +625,13 @@ void RaceManager::startNextRace()
     // will fail and the results will be incorrect). Also in init() functions
     // can be called that use World::getWorld().
     World::getWorld()->init();
+    printf("Init world\n");
     main_loop->renderGUI(8000);
     // Now initialise all values that need to be reset from race to race
     // Calling this here reduces code duplication in init and restartRace()
     // functions.
     World::getWorld()->reset();
+    printf("Reset\n");
 
     if (NetworkConfig::get()->isNetworking())
     {
@@ -650,9 +652,11 @@ void RaceManager::startNextRace()
         }
     }
 
+    printf("ok!\n");
     if (type == PT_MAIN)
         irr_driver->onLoadWorld();
     main_loop->renderGUI(8100);
+    printf("Loaded world\n");
 
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:

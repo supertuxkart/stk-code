@@ -31,11 +31,12 @@ option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
 option(USE_SYSTEM_ENET "Use system ENet instead of the built-in version, when available." ON)
-option(USE_IPV6 "Allow create or connect to game server with IPv6 address, system enet will not be used." ON)
+CMAKE_DEPENDENT_OPTION(USE_IPV6 "Allow create or connect to game server with IPv6 address, system enet will not be used." ON
+  "NOT USE_SWITCH" OFF)
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
-CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of Nettle for cryptography in STK." ON
+CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of MbedTLS for cryptography in STK." ON
     "NOT USE_SWITCH" OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
     "NOT SERVER_ONLY;NOT APPLE" OFF)
@@ -560,7 +561,7 @@ if (NOT NO_LIBATOMIC_NEEDED)
     target_link_libraries(supertuxkart atomic)
 endif()
 
-# CURL and OpenSSL or Nettle
+# CURL and OpenSSL or MbedTLS
 # 1.0.1d for compatible AES GCM handling
 SET(OPENSSL_MINIMUM_VERSION "1.0.1d")
 if (MSVC OR LLVM_MINGW)
@@ -575,10 +576,10 @@ else()
     find_package(CURL REQUIRED)
     include_directories(${CURL_INCLUDE_DIRS})
 
-    find_path(NETTLE_INCLUDE_DIRS nettle/version.h)
-    find_library(NETTLE_LIBRARY NAMES nettle libnettle)
+    find_path(MBEDTLS_INCLUDE_DIRS mbedtls/version.h)
+    find_library(MBEDCRYPTO_LIBRARY NAMES mbedcrypto libmbedcrypto)
 
-    if ((NOT NETTLE_INCLUDE_DIRS OR NOT NETTLE_LIBRARY OR USE_CRYPTO_OPENSSL) AND NOT USE_SWITCH)
+    if (NOT MBEDCRYPTO_LIBRARY OR NOT MBEDTLS_INCLUDE_DIRS OR USE_CRYPTO_OPENSSL)
         set(USE_CRYPTO_OPENSSL ON)
         find_package(OpenSSL REQUIRED)
 
@@ -589,18 +590,16 @@ else()
         include_directories(${OpenSSL_INCLUDE_DIRS})
     elseif(NOT USE_SWITCH)
         set(USE_CRYPTO_OPENSSL OFF)
-        include_directories(${NETTLE_INCLUDE_DIRS})
+        include_directories(${MBEDTLS_INCLUDE_DIRS})
     endif()
 endif()
 
-if (USE_SWITCH)
-    add_definitions(-DENABLE_CRYPTO_LIBNX)
-elseif (USE_CRYPTO_OPENSSL)
+if (USE_CRYPTO_OPENSSL)
     message(STATUS "OpenSSL will be used for cryptography in STK.")
     add_definitions(-DENABLE_CRYPTO_OPENSSL)
 else()
-    message(STATUS "Nettle will be used for cryptography in STK.")
-    add_definitions(-DENABLE_CRYPTO_NETTLE)
+    message(STATUS "MbedTLS will be used for cryptography in STK.")
+    add_definitions(-DENABLE_CRYPTO_MBEDTLS)
 endif()
 
 # Common library dependencies
@@ -631,8 +630,8 @@ endif()
 
 if (USE_CRYPTO_OPENSSL)
     target_link_libraries(supertuxkart ${OPENSSL_CRYPTO_LIBRARY})
-elseif(NOT USE_SWITCH)
-    target_link_libraries(supertuxkart ${NETTLE_LIBRARY})
+else()
+    target_link_libraries(supertuxkart ${MBEDCRYPTO_LIBRARY})
 endif()
 
 if(NOT SERVER_ONLY)
