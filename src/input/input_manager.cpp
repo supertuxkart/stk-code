@@ -94,6 +94,10 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
         Log::error("InputManager", "Failed to init SDL game controller: %s",
             SDL_GetError());
     }
+#ifdef __SWITCH__
+    // Otherwise we report 'B' as 'A' (like Xbox controller)
+    SDL_SetHint(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS, "0");
+#endif
 #endif
 }
 

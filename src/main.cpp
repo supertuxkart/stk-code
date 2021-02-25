@@ -167,6 +167,7 @@
 #endif
 
 #ifdef __SWITCH__
+#define DEBUG_NXLINK
 extern "C" {
   #include <sys/iosupport.h>
   #include <switch/kernel/svc.h>
@@ -174,6 +175,7 @@ extern "C" {
   #include <switch/runtime/diag.h>
   #include <switch/services/ssl.h>
 #define Event libnx_Event
+  #include <switch/services/set.h>
   #include <switch/runtime/pad.h>
 #undef Event
   #include <switch/runtime/devices/socket.h>
@@ -2065,6 +2067,8 @@ int main(int argc, char *argv[])
     };
 
     socketInitialize(&socketConfig);
+
+    setInitialize();
     // Crashes on Reujinx
 #ifdef DEBUG_NXLINK
     nxlinkStdio();

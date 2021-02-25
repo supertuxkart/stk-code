@@ -97,7 +97,8 @@ CMountPointReader::CMountPointReader(IFileSystem * parent, const io::path& basen
 
   if(!Parent->changeWorkingDirectoryTo(basename)) {
 #ifdef __SWITCH__
-    perror("Why couldn't we change working directory?\n");
+    printf("Failed changing directory to %s\n", basename.c_str());
+    perror("Why couldn't we change working directory?");
 #endif
   }
 	buildDirectory();

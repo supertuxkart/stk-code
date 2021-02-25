@@ -49,6 +49,20 @@
 #include "SDL_locale.h"
 #endif
 
+#ifdef __SWITCH__
+extern "C" {
+  #define u64 uint64_t
+  #define u32 uint32_t
+  #define s64 int64_t
+  #define s32 int32_t
+  #include <switch/services/set.h>
+  #undef u64
+  #undef u32
+  #undef s64
+  #undef s32
+}
+#endif
+
 // set to 1 to debug i18n
 #define TRANSLATE_VERBOSE 0
 // Define TEST_BIDI to force right-to-left style for all languages
@@ -353,7 +367,13 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             language = p_lang;
         else
         {
-#ifdef MOBILE_STK
+#ifdef __SWITCH__
+            uint64_t languageStr = 0;
+            if(!setGetLanguageCode(&languageStr)) {
+                language = (char*)&languageStr;
+                language = StringUtils::findAndReplace(language, "-", "_");
+            }
+#elif defined(MOBILE_STK)
             SDL_Locale* locale = SDL_GetPreferredLocales();
             if (locale)
             {
