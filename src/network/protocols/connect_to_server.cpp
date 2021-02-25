@@ -345,7 +345,6 @@ void ConnectToServer::asynchronousUpdate()
 // ----------------------------------------------------------------------------
 void ConnectToServer::update(int ticks)
 {
-  printf("Connect to server update()...\n");
     switch(m_state.load())
     {
         case GOT_SERVER_ADDRESS:
@@ -366,13 +365,9 @@ void ConnectToServer::update(int ticks)
                 // Let main thread create ClientLobby for better
                 // synchronization with GUI
                 NetworkConfig::get()->clearActivePlayersForClient();
-                printf("Opening ClientLobby! (start listening?)\n");
                 auto cl = LobbyProtocol::create<ClientLobby>(m_server);
-                printf("Created\n");
                 STKHost::get()->startListening();
-                printf("Listened\n");
                 cl->requestStart();
-                printf("Request start'd\n");
             }
             if (STKHost::get()->getPeerCount() == 0)
             {
@@ -387,16 +382,13 @@ void ConnectToServer::update(int ticks)
                 STKHost::get()->setErrorMessage(err);
                 STKHost::get()->requestShutdown();
             }
-            printf("Terminate??\n");
             requestTerminate();
-            printf("Terimnated\n");
             m_state = EXITING;
             break;
         }
         default:
             break;
     }
-    printf("Got done updating!\n");
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -485,11 +477,8 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
                 STKHost::get()->initClientNetwork(event, nw);
                 m_state = DONE;
                 return true;
-            } else {
-              printf("Got an event type: %d\n", event.type);
             }
         }
-        printf("Res type was: %d\n", res);
         // Reset old peer in case server address differs due to intercept
         enet_peer_reset(p);
     }

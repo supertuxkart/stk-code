@@ -171,7 +171,11 @@ extern "C" {
   #include <sys/iosupport.h>
   #include <switch/kernel/svc.h>
   #include <switch/runtime/nxlink.h>
+  #include <switch/runtime/diag.h>
   #include <switch/services/ssl.h>
+#define Event libnx_Event
+  #include <switch/runtime/pad.h>
+#undef Event
   #include <switch/runtime/devices/socket.h>
 }
 
@@ -721,9 +725,6 @@ int handleCmdLineOutputModifier()
     int n;
     if(CommandLine::has("--log", &n))
         Log::setLogLevel(n);
-#ifdef __SWITCH__
-    Log::setLogLevel(0);
-#endif
     if (CommandLine::has("--logbuffer", &n))
         Log::setBufferSize(n);
 
@@ -763,9 +764,6 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
     if(CommandLine::has("--debug=all") )
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-#ifdef __SWITCH__
-    UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-#endif
     if(CommandLine::has("--online"))
         History::m_online_history_replay = true;
 #if !(defined(SERVER_ONLY) || defined(ANDROID))
@@ -2014,6 +2012,22 @@ ssize_t dotab_stdout_fn(struct _reent *r,void *fd,const char *ptr, size_t len) {
   svcOutputDebugString(ptr, len);
   return len;
 }
+
+void debugLoop() {
+  padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+
+  PadState pad;
+  padInitializeDefault(&pad);
+
+  while(1) {
+    padUpdate(&pad);
+    uint64_t down = padGetButtons(&pad);
+    if(down & HidNpadButton_Up) {
+      diagAbortWithResult(0);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+  }
+}
 #endif
 
 // ----------------------------------------------------------------------------
@@ -2052,9 +2066,9 @@ int main(int argc, char *argv[])
 
     socketInitialize(&socketConfig);
     // Crashes on Reujinx
-    #define DEBUG_NXLINK
 #ifdef DEBUG_NXLINK
     nxlinkStdio();
+    std::thread debugThread = std::thread(debugLoop);
 #endif
 #endif
   
@@ -2194,43 +2208,29 @@ int main(int argc, char *argv[])
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "difficulty_easy.png"  ) );
         handleXmasMode();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "difficulty_medium.png"  ) );
         handleEasterEarMode();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "difficulty_best.png"  ) );
 
         // Needs the kart and track directories to load potential challenges
         // in those dirs, so it can only be created after reading tracks
         // and karts.
         unlock_manager = new UnlockManager();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "heart.png"  ) );
+
         AchievementsManager::create();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "gpeditor.png"  ) );
 
         // Reading the rest of the player data needs the unlock manager to
         // initialise the game slots of all players and the AchievementsManager
         // to initialise the AchievementsStatus, so it is done only now.
         PlayerManager::get()->initRemainingData();
 
-        Log::info("main", "Got to gui_lock!");
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "gui_lock.png"  ) );
         ProjectileManager::get()->loadData();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "red_mark.png"  ) );
 
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
         file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""), "models");
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "package.png"  ) );
         const std::string materials_file =
             file_manager->getAsset(FileManager::MODEL,"materials.xml");
         if(materials_file!="")
@@ -2241,15 +2241,9 @@ int main(int argc, char *argv[])
             // permanent icon materials, which would (with the current
             // implementation) make the temporary materials permanent anyway.
             material_manager->addSharedMaterial(materials_file);
-            GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "speedfore.png"  ) );
         }
         Referee::init();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "ghost_plus.png"  ) );
         powerup_manager->loadPowerupsModels();
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
-                                                          "green_check.png"  ) );
         ItemManager::loadDefaultItemMeshes();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
