@@ -19,8 +19,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-06 09:59+0800\n"
-"PO-Revision-Date: 2021-02-06 08:23+0000\n"
+"POT-Creation-Date: 2021-02-16 09:26+0800\n"
+"PO-Revision-Date: 2021-02-16 17:51+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan.nyberg.karl@gmail.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/supertuxkart/supertuxkart/language/sv/)\n"
 "MIME-Version: 1.0\n"
@@ -181,6 +181,8 @@ msgstr "Avinstallera"
 #. I18N: Add-on screen action
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:149
@@ -233,8 +235,11 @@ msgstr "Du kan ändra det senare i tryckdonets inställningar."
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
+#. I18N: Video settings
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
 msgid "Apply"
 msgstr "Tillämpa"
 
@@ -319,8 +324,10 @@ msgstr "Återställ standardvärden"
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
+#: src/states_screens/high_score_selection.cpp:208
 msgid "Yes"
 msgstr "Ja"
 
@@ -329,8 +336,14 @@ msgstr "Ja"
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+#. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
+#. I18N: Video settings
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
+#. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
@@ -404,6 +417,7 @@ msgid "Follow ball in soccer mode"
 msgstr "Följ bollen i fotbollsläge"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
 msgid "Reset"
 msgstr "Återställ"
 
@@ -533,8 +547,12 @@ msgstr "Jämför med ett annat spöke"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -548,6 +566,8 @@ msgstr "Jämför spöke"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #. I18N: ./data/gui/screens/edit_gp.stkgui
@@ -806,6 +826,8 @@ msgstr "Spelläge"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -818,6 +840,8 @@ msgstr "Normal tävling"
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1006,6 +1030,8 @@ msgstr "Karter"
 #. I18N: In the addons screen
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Tracks"
 msgstr "Banor"
 
@@ -1027,7 +1053,7 @@ msgstr "Installerad"
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
 #. I18N: In the UI options, Camera setting: Standard
-#: src/states_screens/dialogs/custom_camera_settings.cpp:67
+#: src/states_screens/dialogs/custom_camera_settings.cpp:69
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 #: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
@@ -1136,6 +1162,8 @@ msgstr "Urval av spökerepris"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1200
 msgid "Egg Hunt"
@@ -1173,20 +1201,28 @@ msgstr "Spela in en spökrepris"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "AI karts"
 msgstr "Datorstyrda karter"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Reverse"
 msgstr "Bakåt"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Track group"
 msgstr "Bangrupp"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 #: src/states_screens/gp_info_screen.cpp:145
 msgid "Continue saved GP"
@@ -1650,6 +1686,11 @@ msgid ""
 "may not be used for this operation."
 msgstr "När inmatningsenheter är konfigurerade väljer du ikonen \"Delad skärm flerspelarläge\" i huvudmenyn. Varje spelare kan trycka på \"avfyra\"-knappen på sin handkontroll eller sitt tangentbord för att gå med i spelet och använda sin inmatningsenhet för att välja sin kart. Spelet fortsätter när alla valt sin kart. Observera att musen kanske inte används för den här åtgärden."
 
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
+msgid "High Score Selection"
+msgstr "Val av höga poäng"
+
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
@@ -1688,6 +1729,12 @@ msgstr "Tillägg"
 #: src/states_screens/race_gui_overworld.cpp:529
 msgid "Tutorial"
 msgstr "Handledning"
+
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+#: src/states_screens/track_info_screen.cpp:332
+msgid "High Scores"
+msgstr "Höga poäng"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2049,7 +2096,7 @@ msgstr "Musik"
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:66
+#: src/states_screens/dialogs/custom_video_settings.cpp:68
 #: src/states_screens/options/options_screen_video.cpp:607
 #: src/states_screens/options/options_screen_video.cpp:680
 msgid "Enabled"
@@ -2264,10 +2311,6 @@ msgstr "Röda laget"
 #. I18N: In soccer setup screen
 msgid "Blue Team"
 msgstr "Blåa laget"
-
-#. I18N: ./data/gui/screens/track_info.stkgui
-msgid "= Highscores ="
-msgstr "= Topplista ="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -2784,7 +2827,7 @@ msgstr "Video sparad i \"%s\"."
 msgid "Encoding progress:"
 msgstr "Kodningsframsteg:"
 
-#: src/graphics/irr_driver.cpp:1845 src/graphics/irr_driver.cpp:1850
+#: src/graphics/irr_driver.cpp:1821 src/graphics/irr_driver.cpp:1826
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
@@ -3431,12 +3474,12 @@ msgstr "Vänster trigger"
 msgid "Right trigger"
 msgstr "Höger trigger"
 
-#: src/input/input_manager.cpp:993
+#: src/input/input_manager.cpp:995
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "Ignorerar \"%s\", du måste hoppa in tidigare för att spela!"
 
-#: src/input/input_manager.cpp:1030
+#: src/input/input_manager.cpp:1031
 msgid "Only the Game Master may act at this point!"
 msgstr "Endast spelägaren kan agera just nu!"
 
@@ -3503,7 +3546,7 @@ msgstr "Du avslutade loppet i rang %d!"
 msgid "%s left the game."
 msgstr "%s lämnade spelet."
 
-#: src/main.cpp:1918
+#: src/main.cpp:1946
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3512,16 +3555,16 @@ msgid ""
 "Internet\")."
 msgstr "SuperTuxKart kan ansluta till en server för att hämta tillägg och meddela dig om uppdateringar. Vänligen läs vår integritetspolicy på https://supertuxkart.net/Privacy. Vill du att den här funktionen ska aktiveras? (För att ändra denna inställning vid ett senare tillfälle, gå till alternativ, välj fliken \"Allmänt\" och redigera \"Anslut till Internet\")."
 
-#: src/main.cpp:2198
+#: src/main.cpp:2226
 msgid "Your screen resolution is too low to run STK."
 msgstr "Din skärmupplösning är för låg för att köra STK."
 
-#: src/main.cpp:2233
+#: src/main.cpp:2261
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Drivrutinerna är för gammal. Vänligen installera de senaste grafikdrivrutinerna."
 
-#: src/main.cpp:2251
+#: src/main.cpp:2279
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3614,11 +3657,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i reservdäckkart har uppstått!"
 msgstr[1] "%i reservdäckkarter har uppstått!"
 
-#: src/modes/world.cpp:1371
+#: src/modes/world.cpp:1383
 msgid "You have been eliminated!"
 msgstr "Du har blivit eliminerad!"
 
-#: src/modes/world.cpp:1378
+#: src/modes/world.cpp:1390
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "\"%s\" har eliminerats."
@@ -3641,7 +3684,7 @@ msgid "Bad network connection is detected."
 msgstr "Dålig nätverksanslutning upptäcktes."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3792
+#: src/network/protocols/server_lobby.cpp:3813
 msgid "Bot"
 msgstr "Bot"
 
@@ -3666,6 +3709,7 @@ msgstr "Servernamn: %s"
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:695
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:92
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
 #: src/states_screens/race_result_gui.cpp:1841
 #, c-format
@@ -3689,7 +3733,7 @@ msgstr "Spelläge: %s"
 #: src/network/protocols/client_lobby.cpp:726
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
-#: src/states_screens/track_info_screen.cpp:366
+#: src/states_screens/track_info_screen.cpp:367
 msgid "Time limit"
 msgstr "Tidsgräns"
 
@@ -3697,7 +3741,7 @@ msgstr "Tidsgräns"
 #: src/network/protocols/client_lobby.cpp:727
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
-#: src/states_screens/track_info_screen.cpp:367
+#: src/states_screens/track_info_screen.cpp:368
 msgid "Goals limit"
 msgstr "Målgräns"
 
@@ -3896,7 +3940,7 @@ msgid ""
 " later."
 msgstr "Kan inte ansluta till servern. Kontrollera din internetanslutning eller försök igen senare."
 
-#: src/race/highscore_manager.cpp:102
+#: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
@@ -3978,7 +4022,7 @@ msgid "Please wait while addons are updated"
 msgstr "Vänligen vänta medan tillägg uppdateras"
 
 #: src/states_screens/addons_screen.cpp:523
-#: src/states_screens/main_menu_screen.cpp:622
+#: src/states_screens/main_menu_screen.cpp:626
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -4516,14 +4560,14 @@ msgid ""
 msgstr "Upplösningar som är mindre än 1024x768 eller 1280x720 stöds inte. Vissa delar av användargränssnittet kanske inte fungerar korrekt."
 
 #. I18N: In the UI options, Camera setting: Drone chase
-#: src/states_screens/dialogs/custom_camera_settings.cpp:84
+#: src/states_screens/dialogs/custom_camera_settings.cpp:86
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
 msgstr "Dronejakt"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
-#: src/states_screens/dialogs/custom_camera_settings.cpp:101
+#: src/states_screens/dialogs/custom_camera_settings.cpp:103
 #: src/states_screens/options/options_screen_ui.cpp:160
 #: src/states_screens/options/options_screen_video.cpp:529
 #: src/states_screens/options/options_screen_video.cpp:564
@@ -4534,9 +4578,9 @@ msgstr "Anpassad"
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/dialogs/custom_video_settings.cpp:71
-#: src/states_screens/dialogs/custom_video_settings.cpp:87
+#: src/states_screens/dialogs/custom_video_settings.cpp:66
+#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:89
 #: src/states_screens/online/create_server_screen.cpp:206
 #: src/states_screens/options/options_screen_video.cpp:242
 #: src/states_screens/options/options_screen_video.cpp:610
@@ -4545,7 +4589,7 @@ msgid "Disabled"
 msgstr "Inaktiverad"
 
 #. I18N: if only important particles effects is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:65
+#: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options/options_screen_video.cpp:612
 msgid "Important only"
 msgstr "Endast viktig"
@@ -4553,9 +4597,9 @@ msgstr "Endast viktig"
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
-#: src/states_screens/dialogs/custom_video_settings.cpp:73
-#: src/states_screens/dialogs/custom_video_settings.cpp:82
-#: src/states_screens/dialogs/custom_video_settings.cpp:88
+#: src/states_screens/dialogs/custom_video_settings.cpp:75
+#: src/states_screens/dialogs/custom_video_settings.cpp:84
+#: src/states_screens/dialogs/custom_video_settings.cpp:90
 #: src/states_screens/options/options_screen_video.cpp:619
 msgid "Low"
 msgstr "Låg"
@@ -4563,16 +4607,16 @@ msgstr "Låg"
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
-#: src/states_screens/dialogs/custom_video_settings.cpp:83
-#: src/states_screens/dialogs/custom_video_settings.cpp:89
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
+#: src/states_screens/dialogs/custom_video_settings.cpp:85
+#: src/states_screens/dialogs/custom_video_settings.cpp:91
 #: src/states_screens/options/options_screen_video.cpp:622
 msgid "High"
 msgstr "Hög"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:81
+#: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/options/options_screen_video.cpp:616
 msgid "Very Low"
 msgstr "Väldigt låg"
@@ -4587,12 +4631,14 @@ msgstr "SuperTuxKart hämtar hela tillgångar (inklusive högkvalitativa texture
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
+#: src/states_screens/high_score_selection.cpp:136
 msgctxt "column_name"
 msgid "Reverse"
 msgstr "Backa"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
+#: src/states_screens/high_score_selection.cpp:131
 #: src/states_screens/online/server_selection.cpp:127
 msgctxt "column_name"
 msgid "Difficulty"
@@ -4600,6 +4646,7 @@ msgstr "Svårighet"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
+#: src/states_screens/high_score_selection.cpp:135
 msgctxt "column_name"
 msgid "Laps"
 msgstr "Varv"
@@ -4629,19 +4676,52 @@ msgid "Version"
 msgstr "Version"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
 #: src/states_screens/dialogs/message_dialog.cpp:130
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
+#: src/states_screens/high_score_selection.cpp:208
 msgid "No"
 msgstr "Nej"
 
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:87
+#, c-format
+msgid "Top %d High Scores"
+msgstr "Topp %d höga poäng"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:89
+#, c-format
+msgid "Track: %s"
+msgstr "Bana: %s"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:102
+#, c-format
+msgid "Number of karts: %d"
+msgstr "Antal karter: %d"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:105
+#, c-format
+msgid "Laps: %d"
+msgstr "Varv: %d"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:109
+#, c-format
+msgid "Reverse: %s"
+msgstr "Omvänd: %s"
+
+#. I18N: for empty highscores entries
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:169
+#: src/states_screens/track_info_screen.cpp:526
+msgid "(Empty)"
+msgstr "(Tom)"
+
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:46
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
 msgid "Use original color"
 msgstr "Använd originalfärg"
 
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:48
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:49
 msgid "Pick a color from slider"
 msgstr "Välj en färg från reglaget"
 
@@ -4796,7 +4876,7 @@ msgstr "Stridsläge"
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:238
-#: src/states_screens/track_info_screen.cpp:354
+#: src/states_screens/track_info_screen.cpp:355
 msgid "Soccer game type"
 msgstr "Typ av fotbollsspel"
 
@@ -4919,6 +4999,7 @@ msgid "Are you sure you want to remove '%s'?"
 msgstr "Är du säker att du vill ta bort \"%s\"?"
 
 #: src/states_screens/edit_gp_screen.cpp:134
+#: src/states_screens/edit_gp_screen.cpp:382
 msgid "Do you want to save your changes?"
 msgstr "Vill du spara dina ändringar?"
 
@@ -4989,6 +5070,7 @@ msgid "You unlocked grand prix %0"
 msgstr "Du låste upp grand prix %0"
 
 #: src/states_screens/ghost_replay_selection.cpp:153
+#: src/states_screens/high_score_selection.cpp:130
 msgctxt "column_name"
 msgid "Track"
 msgstr "Bana"
@@ -5060,6 +5142,19 @@ msgstr "Du vann Grand Prix!"
 msgid "You completed the Grand Prix!"
 msgstr "Du har slutfört Grand Prix-tävlingen!"
 
+#: src/states_screens/high_score_selection.cpp:134
+msgctxt "column_name"
+msgid "Number of karts"
+msgstr "Antal karter"
+
+#: src/states_screens/high_score_selection.cpp:267
+msgid "Are you sure you want to remove this high score entry?"
+msgstr "Är du säker på att du vill ta bort denna höga poäng posten?"
+
+#: src/states_screens/high_score_selection.cpp:275
+msgid "Are you sure you want to remove all of your high scores?"
+msgstr "Är du säker på att du vill ta bort alla dina höga poäng?"
+
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr "Anslut ett tangentbord eller en handkontroll för att spela flerspelarläge med delad skärm"
@@ -5080,7 +5175,7 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr "Alla:\nTryck på knappen \"Välj\" för att delta i spelet"
 
-#: src/states_screens/main_menu_screen.cpp:260
+#: src/states_screens/main_menu_screen.cpp:262
 msgid "Would you like to play the tutorial of the game?"
 msgstr "Vill du spela spelets handledning?"
 
@@ -5103,13 +5198,17 @@ msgid ""
 "You can however delete already downloaded addons."
 msgstr "Du kan inte hämta tillägg utan internetåtkomst. Om du vill hämta tillägg, gå till alternativmenyn och markera \"Anslut till Internet\".\n\nDu kan dock ta bort redan hämtade tillägg."
 
-#: src/states_screens/main_menu_screen.cpp:617
+#: src/states_screens/main_menu_screen.cpp:621
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Tilläggsmodulen är för närvarande inaktiverad på skärmen Alternativ"
 
-#: src/states_screens/main_menu_screen.cpp:629
+#: src/states_screens/main_menu_screen.cpp:633
 msgid "Please wait while the add-ons are loading"
 msgstr "Vänligen vänta medan tilläggen läses in"
+
+#: src/states_screens/main_menu_screen.cpp:654
+msgid "Are you sure you want to quit STK?"
+msgstr "Är du säker på att du vill avsluta STK?"
 
 #: src/states_screens/online/create_server_screen.cpp:96
 msgid "Create LAN Server"
@@ -5405,14 +5504,14 @@ msgstr "Slumpad placering av prylar"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:445
+#: src/states_screens/track_info_screen.cpp:446
 msgid "Number of goals to win"
 msgstr "Antal mål för att vinna"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:254
-#: src/states_screens/track_info_screen.cpp:440
+#: src/states_screens/track_info_screen.cpp:441
 msgid "Maximum time (min.)"
 msgstr "Maximal tid (min.)"
 
@@ -6012,14 +6111,9 @@ msgstr "Bana av %s"
 msgid "Max players supported: %d"
 msgstr "Max antal spelare som stöds: %d"
 
-#: src/states_screens/track_info_screen.cpp:380
+#: src/states_screens/track_info_screen.cpp:381
 msgid "Number of red team AI karts"
 msgstr "Antal datorstyrda karter i rött team"
-
-#. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:525
-msgid "(Empty)"
-msgstr "(Tom)"
 
 #. I18N: track group name
 #: src/states_screens/tracks_and_gp_screen.cpp:148

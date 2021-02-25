@@ -28,8 +28,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-06 09:59+0800\n"
-"PO-Revision-Date: 2021-02-06 08:06+0000\n"
+"POT-Creation-Date: 2021-02-16 09:26+0800\n"
+"PO-Revision-Date: 2021-02-19 08:28+0000\n"
 "Last-Translator: FabianF <lukas.hostinger@gmail.com>\n"
 "Language-Team: German (http://www.transifex.com/supertuxkart/supertuxkart/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -190,6 +190,8 @@ msgstr "Deinstallieren"
 #. I18N: Add-on screen action
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:149
@@ -242,8 +244,11 @@ msgstr "Du kannst es später in den Geräteeinstellungen ändern."
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
+#. I18N: Video settings
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
 msgid "Apply"
 msgstr "Übernehmen"
 
@@ -328,8 +333,10 @@ msgstr "Standardeinstellungen wiederherstellen"
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
+#: src/states_screens/high_score_selection.cpp:208
 msgid "Yes"
 msgstr "Ja"
 
@@ -338,8 +345,14 @@ msgstr "Ja"
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
+#. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
+#. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
+#. I18N: Video settings
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
+#. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
+#. I18N: In the kart color slider dialog
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 #. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
@@ -413,6 +426,7 @@ msgid "Follow ball in soccer mode"
 msgstr "Folge Ball in Fußball-Modus"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
+#. I18N: In the ui/camera screen
 msgid "Reset"
 msgstr "Zurücksetzen"
 
@@ -542,8 +556,12 @@ msgstr "Mit anderem Geist vergleichen"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -557,6 +575,8 @@ msgstr "Geist vergleichen"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
+#. I18N: ./data/gui/dialogs/high_score_info_dialog.stkgui
+#. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
 #. I18N: User info dialog
 #. I18N: ./data/gui/screens/edit_gp.stkgui
@@ -815,6 +835,8 @@ msgstr "Spielmodus"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: Multiplayer game mode
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -827,6 +849,8 @@ msgstr "Normales Rennen"
 #. I18N: Multiplayer game mode
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
@@ -1015,6 +1039,8 @@ msgstr "Karts"
 #. I18N: In the addons screen
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Tracks"
 msgstr "Strecken"
 
@@ -1036,7 +1062,7 @@ msgstr "Installiert"
 #. I18N: ./data/gui/screens/easter_egg.stkgui
 #. I18N: track group
 #. I18N: In the UI options, Camera setting: Standard
-#: src/states_screens/dialogs/custom_camera_settings.cpp:67
+#: src/states_screens/dialogs/custom_camera_settings.cpp:69
 #: src/states_screens/grand_prix_editor_screen.cpp:335
 #: src/states_screens/options/options_screen_ui.cpp:162
 msgid "Standard"
@@ -1145,6 +1171,8 @@ msgstr "Geisterwiederholungsauswahl"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
 #. I18N: Game mode
 #: src/race/race_manager.cpp:1200
 msgid "Egg Hunt"
@@ -1182,20 +1210,28 @@ msgstr "Eine Geisterwiederholung aufzeichnen"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "AI karts"
 msgstr "KI-Karts"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Reverse"
 msgstr "Rückwärts"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
+#. I18N: In the grand prix info screen
 msgid "Track group"
 msgstr "Streckengruppe"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
+#. I18N: In the grand prix info screen
+#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 #: src/states_screens/gp_info_screen.cpp:145
 msgid "Continue saved GP"
@@ -1659,6 +1695,11 @@ msgid ""
 "may not be used for this operation."
 msgstr "Sobald die Eingabegeräte konfiguriert sind, wähle im Hauptmenü das „Splitscreen-Mehrspieler“-Symbol aus. Jeder Spieler kann die „Schießen“-Taste seines Gamepads oder seiner Tastatur drücken, um dem Spiel beizutreten und das gewählte Eingabegerät benutzen, um sein Kart auszuwählen. Das Spiel wird fortgesetzt, sobald jeder ein Kart ausgewählt hat. Beachte, dass die Maus dafür nicht verwendet werden kann."
 
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
+msgid "High Score Selection"
+msgstr "Rekordzeit-Auswahl"
+
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
@@ -1697,6 +1738,12 @@ msgstr "Add-ons"
 #: src/states_screens/race_gui_overworld.cpp:529
 msgid "Tutorial"
 msgstr "Tutorial"
+
+#. I18N: ./data/gui/screens/main_menu.stkgui
+#. I18N: In the main screen
+#: src/states_screens/track_info_screen.cpp:332
+msgid "High Scores"
+msgstr "Beste Zeiten"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2058,7 +2105,7 @@ msgstr "Musik"
 #. I18N: In the audio options screen
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:66
+#: src/states_screens/dialogs/custom_video_settings.cpp:68
 #: src/states_screens/options/options_screen_video.cpp:607
 #: src/states_screens/options/options_screen_video.cpp:680
 msgid "Enabled"
@@ -2273,10 +2320,6 @@ msgstr "Rotes Team"
 #. I18N: In soccer setup screen
 msgid "Blue Team"
 msgstr "Blaues Team"
-
-#. I18N: ./data/gui/screens/track_info.stkgui
-msgid "= Highscores ="
-msgstr "= Bestenliste ="
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -2793,7 +2836,7 @@ msgstr "Video in „%s“ gespeichert."
 msgid "Encoding progress:"
 msgstr "Kodierungsfortschritt:"
 
-#: src/graphics/irr_driver.cpp:1845 src/graphics/irr_driver.cpp:1850
+#: src/graphics/irr_driver.cpp:1821 src/graphics/irr_driver.cpp:1826
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d – %d Tsd. Dreiecke, Ping: %d ms"
@@ -3440,12 +3483,12 @@ msgstr "Linker Trigger"
 msgid "Right trigger"
 msgstr "Rechter Trigger"
 
-#: src/input/input_manager.cpp:993
+#: src/input/input_manager.cpp:995
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "„%s“ wird ignoriert. Du hättest früher teilnehmen müssen, um mitzuspielen!"
 
-#: src/input/input_manager.cpp:1030
+#: src/input/input_manager.cpp:1031
 msgid "Only the Game Master may act at this point!"
 msgstr "Nur der Spielleiter kann hier Änderungen vornehmen!"
 
@@ -3512,7 +3555,7 @@ msgstr "Du hast das Rennen auf dem %d. Platz beendet!"
 msgid "%s left the game."
 msgstr "%s verließ das Spiel."
 
-#: src/main.cpp:1918
+#: src/main.cpp:1946
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3521,16 +3564,16 @@ msgid ""
 "Internet\")."
 msgstr "SuperTuxKart kann sich mit einem Server verbinden, um Add-ons herunterzuladen und dich über Aktualisierungen zu informieren. Bitte lies unsere Datenschutzerklärung unter https://supertuxkart.net/Privacy. Möchtest du diese Funktion aktivieren? (Um diese Einstellung später zu ändern, gehe zu den Optionen, wähle die Registerkarte \"Allgemein\" und ändere \"Mit dem Internet verbinden\")."
 
-#: src/main.cpp:2198
+#: src/main.cpp:2226
 msgid "Your screen resolution is too low to run STK."
 msgstr "Deine Bildschirmauflösung ist zu klein für STK."
 
-#: src/main.cpp:2233
+#: src/main.cpp:2261
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Dein Treiber ist zu alt. Bitte installiere die neuste Version des Grafiktreibers."
 
-#: src/main.cpp:2251
+#: src/main.cpp:2279
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3623,11 +3666,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i Ersatzreifenkart ist aufgetaucht!"
 msgstr[1] "%i Ersatzreifenkarts sind aufgetaucht!"
 
-#: src/modes/world.cpp:1371
+#: src/modes/world.cpp:1383
 msgid "You have been eliminated!"
 msgstr "Du bist ausgeschieden!"
 
-#: src/modes/world.cpp:1378
+#: src/modes/world.cpp:1390
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "%s ist ausgeschieden."
@@ -3650,7 +3693,7 @@ msgid "Bad network connection is detected."
 msgstr "Schlechte Netzwerkverbindung wurde erkannt."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3792
+#: src/network/protocols/server_lobby.cpp:3813
 msgid "Bot"
 msgstr "Bot"
 
@@ -3675,6 +3718,7 @@ msgstr "Servername: %s"
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:695
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:92
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
 #: src/states_screens/race_result_gui.cpp:1841
 #, c-format
@@ -3698,7 +3742,7 @@ msgstr "Spielmodus: %s"
 #: src/network/protocols/client_lobby.cpp:726
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
-#: src/states_screens/track_info_screen.cpp:366
+#: src/states_screens/track_info_screen.cpp:367
 msgid "Time limit"
 msgstr "Zeitlimit"
 
@@ -3706,7 +3750,7 @@ msgstr "Zeitlimit"
 #: src/network/protocols/client_lobby.cpp:727
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
-#: src/states_screens/track_info_screen.cpp:367
+#: src/states_screens/track_info_screen.cpp:368
 msgid "Goals limit"
 msgstr "Torlimit"
 
@@ -3905,7 +3949,7 @@ msgid ""
 " later."
 msgstr "Es konnte keine Verbindung zum Server aufgebaut werden. Überprüfe deine Internetverbindung oder versuch es später noch einmal."
 
-#: src/race/highscore_manager.cpp:102
+#: src/race/highscore_manager.cpp:101
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
@@ -3987,7 +4031,7 @@ msgid "Please wait while addons are updated"
 msgstr "Bitte warte, während die Add-ons aktualisiert werden"
 
 #: src/states_screens/addons_screen.cpp:523
-#: src/states_screens/main_menu_screen.cpp:622
+#: src/states_screens/main_menu_screen.cpp:626
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
@@ -4525,14 +4569,14 @@ msgid ""
 msgstr "Auflösungen, die kleiner als 1024×768 oder 1280×720 sind, werden nicht unterstützt. Einige Teile der Benutzeroberfläche könnten nicht richtig funktionieren."
 
 #. I18N: In the UI options, Camera setting: Drone chase
-#: src/states_screens/dialogs/custom_camera_settings.cpp:84
+#: src/states_screens/dialogs/custom_camera_settings.cpp:86
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
 msgstr "Drohnenjagd"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
-#: src/states_screens/dialogs/custom_camera_settings.cpp:101
+#: src/states_screens/dialogs/custom_camera_settings.cpp:103
 #: src/states_screens/options/options_screen_ui.cpp:160
 #: src/states_screens/options/options_screen_video.cpp:529
 #: src/states_screens/options/options_screen_video.cpp:564
@@ -4543,9 +4587,9 @@ msgstr "Benutzerdefiniert"
 #. I18N: Geometry level disabled : lowest level, no details
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is disabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:64
-#: src/states_screens/dialogs/custom_video_settings.cpp:71
-#: src/states_screens/dialogs/custom_video_settings.cpp:87
+#: src/states_screens/dialogs/custom_video_settings.cpp:66
+#: src/states_screens/dialogs/custom_video_settings.cpp:73
+#: src/states_screens/dialogs/custom_video_settings.cpp:89
 #: src/states_screens/online/create_server_screen.cpp:206
 #: src/states_screens/options/options_screen_video.cpp:242
 #: src/states_screens/options/options_screen_video.cpp:610
@@ -4554,7 +4598,7 @@ msgid "Disabled"
 msgstr "Deaktiviert"
 
 #. I18N: if only important particles effects is enabled
-#: src/states_screens/dialogs/custom_video_settings.cpp:65
+#: src/states_screens/dialogs/custom_video_settings.cpp:67
 #: src/states_screens/options/options_screen_video.cpp:612
 msgid "Important only"
 msgstr "Nur Wichtige"
@@ -4562,9 +4606,9 @@ msgstr "Nur Wichtige"
 #. I18N: Geometry level low : few details are displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is low
-#: src/states_screens/dialogs/custom_video_settings.cpp:73
-#: src/states_screens/dialogs/custom_video_settings.cpp:82
-#: src/states_screens/dialogs/custom_video_settings.cpp:88
+#: src/states_screens/dialogs/custom_video_settings.cpp:75
+#: src/states_screens/dialogs/custom_video_settings.cpp:84
+#: src/states_screens/dialogs/custom_video_settings.cpp:90
 #: src/states_screens/options/options_screen_video.cpp:619
 msgid "Low"
 msgstr "Niedrig"
@@ -4572,16 +4616,16 @@ msgstr "Niedrig"
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is high
-#: src/states_screens/dialogs/custom_video_settings.cpp:75
-#: src/states_screens/dialogs/custom_video_settings.cpp:83
-#: src/states_screens/dialogs/custom_video_settings.cpp:89
+#: src/states_screens/dialogs/custom_video_settings.cpp:77
+#: src/states_screens/dialogs/custom_video_settings.cpp:85
+#: src/states_screens/dialogs/custom_video_settings.cpp:91
 #: src/states_screens/options/options_screen_video.cpp:622
 msgid "High"
 msgstr "Hoch"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
-#: src/states_screens/dialogs/custom_video_settings.cpp:81
+#: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/options/options_screen_video.cpp:616
 msgid "Very Low"
 msgstr "Sehr niedrig"
@@ -4596,12 +4640,14 @@ msgstr "SuperTuxKart wird vollständige Spieldaten (mit allen Strecken, hochqual
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
+#: src/states_screens/high_score_selection.cpp:136
 msgctxt "column_name"
 msgid "Reverse"
 msgstr "Rückwärts"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
+#: src/states_screens/high_score_selection.cpp:131
 #: src/states_screens/online/server_selection.cpp:127
 msgctxt "column_name"
 msgid "Difficulty"
@@ -4609,6 +4655,7 @@ msgstr "Schwierigkeit"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
+#: src/states_screens/high_score_selection.cpp:135
 msgctxt "column_name"
 msgid "Laps"
 msgstr "Runden"
@@ -4638,19 +4685,52 @@ msgid "Version"
 msgstr "Version"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
 #: src/states_screens/dialogs/message_dialog.cpp:130
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
+#: src/states_screens/high_score_selection.cpp:208
 msgid "No"
 msgstr "Nein"
 
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:87
+#, c-format
+msgid "Top %d High Scores"
+msgstr "Beste %d Zeiten "
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:89
+#, c-format
+msgid "Track: %s"
+msgstr "Strecke: %s"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:102
+#, c-format
+msgid "Number of karts: %d"
+msgstr "Anzahl der Karts: %d"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:105
+#, c-format
+msgid "Laps: %d"
+msgstr "Runden: %d"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:109
+#, c-format
+msgid "Reverse: %s"
+msgstr "Rückwärts: %s"
+
+#. I18N: for empty highscores entries
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:169
+#: src/states_screens/track_info_screen.cpp:526
+msgid "(Empty)"
+msgstr "(Leer)"
+
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:46
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:47
 msgid "Use original color"
 msgstr "Originalfarbe benutzen"
 
 #. I18N: In kart color choosing dialog
-#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:48
+#: src/states_screens/dialogs/kart_color_slider_dialog.cpp:49
 msgid "Pick a color from slider"
 msgstr "Eine Farbe vom Schieberegler wählen"
 
@@ -4805,7 +4885,7 @@ msgstr "Kampfmodus"
 #. I18N: In the create server screen
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:171
 #: src/states_screens/online/create_server_screen.cpp:238
-#: src/states_screens/track_info_screen.cpp:354
+#: src/states_screens/track_info_screen.cpp:355
 msgid "Soccer game type"
 msgstr "Fußballspieltyp"
 
@@ -4928,6 +5008,7 @@ msgid "Are you sure you want to remove '%s'?"
 msgstr "Bist du sicher, dass du %s entfernen möchtest?"
 
 #: src/states_screens/edit_gp_screen.cpp:134
+#: src/states_screens/edit_gp_screen.cpp:382
 msgid "Do you want to save your changes?"
 msgstr "Möchtest du deine Änderungen speichern?"
 
@@ -4998,6 +5079,7 @@ msgid "You unlocked grand prix %0"
 msgstr "Du hast den Grand Prix „%0“ freigeschaltet"
 
 #: src/states_screens/ghost_replay_selection.cpp:153
+#: src/states_screens/high_score_selection.cpp:130
 msgctxt "column_name"
 msgid "Track"
 msgstr "Strecke"
@@ -5069,6 +5151,19 @@ msgstr "Du hast den Grand Prix gewonnen!"
 msgid "You completed the Grand Prix!"
 msgstr "Du hast den Grand Prix beendet!"
 
+#: src/states_screens/high_score_selection.cpp:134
+msgctxt "column_name"
+msgid "Number of karts"
+msgstr "Anzahl der Karts"
+
+#: src/states_screens/high_score_selection.cpp:267
+msgid "Are you sure you want to remove this high score entry?"
+msgstr "Bist du sicher, dass du diesen Rekordzeit-Eintrag löschen möchtest?"
+
+#: src/states_screens/high_score_selection.cpp:275
+msgid "Are you sure you want to remove all of your high scores?"
+msgstr "Bist du sicher, dass du alle Rekordzeiten löschen willst?"
+
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
 msgstr "Verbinde eine Tastatur oder ein Gamepad, um Splitscreen-Mehrspieler zu spielen."
@@ -5089,7 +5184,7 @@ msgid ""
 "Press the 'Select' button to join the game"
 msgstr "An alle:\nDrückt jetzt den „Auswählen“-Knopf, um dem Spiel beizutreten"
 
-#: src/states_screens/main_menu_screen.cpp:260
+#: src/states_screens/main_menu_screen.cpp:262
 msgid "Would you like to play the tutorial of the game?"
 msgstr "Möchtest du das Tutorial des Spiels machen?"
 
@@ -5112,13 +5207,17 @@ msgid ""
 "You can however delete already downloaded addons."
 msgstr "Du kannst ohne Internetzugang keine Add-ons herunterladen. Wenn du Add-ons herunterladen möchtest, gehe ins Einstellungsmenü und kreuze „Mit dem Internet verbinden“ an.\n\nDu kannst jedoch bereits heruntergeladene Add-ons löschen."
 
-#: src/states_screens/main_menu_screen.cpp:617
+#: src/states_screens/main_menu_screen.cpp:621
 msgid "The add-ons module is currently disabled in the Options screen"
 msgstr "Das Add-ons-Modul ist derzeit in den Einstellungen deaktiviert"
 
-#: src/states_screens/main_menu_screen.cpp:629
+#: src/states_screens/main_menu_screen.cpp:633
 msgid "Please wait while the add-ons are loading"
 msgstr "Bitte warte, bis die Add-ons geladen sind"
+
+#: src/states_screens/main_menu_screen.cpp:654
+msgid "Are you sure you want to quit STK?"
+msgstr "Möchtest du STK wirklich beenden?"
 
 #: src/states_screens/online/create_server_screen.cpp:96
 msgid "Create LAN Server"
@@ -5414,14 +5513,14 @@ msgstr "Zufällige Gegenstandspositionen"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:479
-#: src/states_screens/track_info_screen.cpp:445
+#: src/states_screens/track_info_screen.cpp:446
 msgid "Number of goals to win"
 msgstr "Anzahl der Tore bis zum Sieg"
 
 #. I18N: In track screen
 #: src/states_screens/online/tracks_screen.cpp:487
 #: src/states_screens/track_info_screen.cpp:254
-#: src/states_screens/track_info_screen.cpp:440
+#: src/states_screens/track_info_screen.cpp:441
 msgid "Maximum time (min.)"
 msgstr "Maximale Dauer (min)"
 
@@ -6021,14 +6120,9 @@ msgstr "Strecke von %s"
 msgid "Max players supported: %d"
 msgstr "Maximal unterstützte Spieler: %d"
 
-#: src/states_screens/track_info_screen.cpp:380
+#: src/states_screens/track_info_screen.cpp:381
 msgid "Number of red team AI karts"
 msgstr "Anzahl der roten KI-Karts"
-
-#. I18N: for empty highscores entries
-#: src/states_screens/track_info_screen.cpp:525
-msgid "(Empty)"
-msgstr "(Leer)"
 
 #. I18N: track group name
 #: src/states_screens/tracks_and_gp_screen.cpp:148
@@ -6165,7 +6259,7 @@ msgstr "Du bist jetzt bereit für Rennen. Viel Glück!"
 #. description in Google Play
 #: supertuxkart.desktop:4 supertuxkart.appdata.xml:6
 msgid "A 3D open-source kart racing game"
-msgstr "Ein quelloffenes 3D-Kart-Rennspiel"
+msgstr "Ein Open-Source 3D-Kart-Rennspiel"
 
 #. I18N: Keywords in desktop entry, translators please keep it separated with
 #. semicolons
@@ -6179,7 +6273,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr "Karts. Nitro. Action! SuperTuxKart ist ein quelloffenes 3D-Arcade-Rennspiel mit einer Vielzahl von Charakteren, Strecken und Spielmodi. Unser Ziel ist es, ein Spiel zu schaffen, das mehr Spaß macht als realistisch ist, und eine unterhaltsame Erfahrung für alle Altersgruppen bietet."
+msgstr "Karts. Nitro. Action! SuperTuxKart ist ein Open-Source 3D-Arcade-Rennspiel mit einer Vielzahl von Charakteren, Strecken und Spielmodi. Unser Ziel ist es, ein Spiel zu schaffen, das mehr Spaß macht als realistisch ist, und eine unterhaltsame Erfahrung für alle Altersgruppen bietet."
 
 #: supertuxkart.appdata.xml:11
 msgid ""
