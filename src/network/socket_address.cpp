@@ -172,7 +172,8 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
     }
 #else
     // Ignore ipv6, otherwise we end up querying for them which can be slow
-    else if (colon_pos != std::string::npos) {
+    else if (colon_pos != std::string::npos)
+    {
       Log::debug("SocketAddress", "Ignoring ipv6 address: %s", str.c_str());
       return;
     }
@@ -329,15 +330,14 @@ bool SocketAddress::isPublicAddressLocalhost() const
     if (isLoopback())
         return true;
 #ifdef __SWITCH__
-    if (m_family == AF_INET) {
-      uint32_t currentIp = 0;
-      // TODO: libnx linking
-      nifmGetCurrentIpAddress(&currentIp);
-      // Unsure how Result works so this is the best I have
-      if(currentIp) {
-        // Gosh I hope this works
-        return htonl(currentIp) == getIP();
-      }
+    if (m_family == AF_INET)
+    {
+        uint32_t currentIp = 0;
+        // TODO: libnx linking
+        nifmGetCurrentIpAddress(&currentIp);
+        // Unsure how Result works so this is the best I have
+        if(currentIp)
+            return htonl(currentIp) == getIP();
     }
     return false;
 #elif !defined(WIN32)

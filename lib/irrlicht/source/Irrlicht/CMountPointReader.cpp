@@ -95,7 +95,8 @@ CMountPointReader::CMountPointReader(IFileSystem * parent, const io::path& basen
 
 	const io::path& work = Parent->getWorkingDirectory();
 
-  if(!Parent->changeWorkingDirectoryTo(basename)) {
+  if(!Parent->changeWorkingDirectoryTo(basename))
+  {
 #ifdef __SWITCH__
     printf("Failed changing directory to %s\n", basename.c_str());
     perror("Why couldn't we change working directory?");
@@ -128,9 +129,12 @@ void CMountPointReader::buildDirectory()
     // Real hardware gets sdmc: into the path somehow
     auto sdmc = "sdmc:";
     auto romfs = "romfs:";
-    if (full.find(sdmc, 0) == 0) {
+    if (full.find(sdmc, 0) == 0)
+    {
       full = full.subString(5, full.size() - 5);
-    } else if (full.find(romfs, 0) == 0) {
+    }
+    else if (full.find(romfs, 0) == 0)
+    {
       full = full.subString(6, full.size() - 6);
     }
 #endif

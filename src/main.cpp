@@ -1864,7 +1864,6 @@ void initRest()
     // achievement managers to be created, which can only be created later).
     PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
-    sleep(10);
 #ifndef SERVER_ONLY
     if (!GUIEngine::isNoGraphics())
         NewsManager::get();   // this will create the news manager
@@ -2010,25 +2009,29 @@ void main_abort()
 #endif
 
 #ifdef __SWITCH__
-ssize_t dotab_stdout_fn(struct _reent *r,void *fd,const char *ptr, size_t len) {
-  svcOutputDebugString(ptr, len);
-  return len;
+ssize_t dotab_stdout_fn(struct _reent *r,void *fd,const char *ptr, size_t len)
+{
+    svcOutputDebugString(ptr, len);
+    return len;
 }
 
-void debugLoop() {
-  padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+void debugLoop()
+{
+    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
 
-  PadState pad;
-  padInitializeDefault(&pad);
+    PadState pad;
+    padInitializeDefault(&pad);
 
-  while(1) {
-    padUpdate(&pad);
-    uint64_t down = padGetButtons(&pad);
-    if(down & HidNpadButton_Up) {
-      diagAbortWithResult(0);
+    while(1)
+    {
+        padUpdate(&pad);
+        uint64_t down = padGetButtons(&pad);
+        if(down & HidNpadButton_Up)
+        {
+            diagAbortWithResult(0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-  }
 }
 #endif
 
@@ -2066,8 +2069,10 @@ int main(int argc, char *argv[])
         .bsd_service_type = BsdServiceType_User,
     };
 
+    // Initialize socket, needed for networking and nxlink stdio
     socketInitialize(&socketConfig);
 
+    // Initialize settings, needed to grab language
     setInitialize();
     // Crashes on Reujinx
 #ifdef DEBUG_NXLINK
@@ -2219,7 +2224,6 @@ int main(int argc, char *argv[])
         // in those dirs, so it can only be created after reading tracks
         // and karts.
         unlock_manager = new UnlockManager();
-
         AchievementsManager::create();
 
         // Reading the rest of the player data needs the unlock manager to

@@ -369,7 +369,8 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
         {
 #ifdef __SWITCH__
             uint64_t languageStr = 0;
-            if(!setGetLanguageCode(&languageStr)) {
+            if(!setGetLanguageCode(&languageStr))
+            {
                 language = (char*)&languageStr;
                 language = StringUtils::findAndReplace(language, "-", "_");
             }

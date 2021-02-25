@@ -118,18 +118,18 @@ void RegisterScreen::init()
         AccountUid uid;
         // It's possible the user is using an app that doesn't need a user selection
         // We try the last opened user as well
-        if(!accountInitialize(AccountServiceType_Application)) {
-            if(!accountGetPreselectedUser(&uid) || !accountGetLastOpenedUser(&uid)) {
+        if(!accountInitialize(AccountServiceType_Application))
+            if(!accountGetPreselectedUser(&uid) || !accountGetLastOpenedUser(&uid))
+            {
                 AccountProfile profile;
-                if(!accountGetProfile(&profile, uid)) {
+                if(!accountGetProfile(&profile, uid))
+                {
                     AccountProfileBase profileBase;
-                    if(!accountProfileGet(&profile, NULL, &profileBase)) {
+                    if(!accountProfileGet(&profile, NULL, &profileBase))
                         username = profileBase.nickname;
-                    }
                     accountProfileClose(&profile);
                 }
             }
-        }
 #else
         if (getenv("USER") != NULL)          // Linux, Macs
             username = getenv("USER");

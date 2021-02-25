@@ -959,7 +959,8 @@ bool CFileSystem::existFile(const io::path& filename) const
 		return (_waccess(StringUtils::utf8ToWide(filename.c_str()).c_str(), F_OK) != -1);
 	#else
 #ifdef __SWITCH__
-    if(filename.size() == 0) {
+    if(filename.size() == 0)
+    {
       return false;
     }
 #endif

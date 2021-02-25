@@ -416,7 +416,6 @@ start:
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-
 	Window = SDL_CreateWindow("",
 		(float)CreationParams.WindowPosition.X / g_native_scale_x,
 		(float)CreationParams.WindowPosition.Y / g_native_scale_y,

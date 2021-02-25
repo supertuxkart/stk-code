@@ -31,7 +31,6 @@
 
 #ifndef SERVER_ONLY
 #include <harfbuzz/hb-ft.h>
-
 extern "C"
 {
     #include <SheenBidi.h>
