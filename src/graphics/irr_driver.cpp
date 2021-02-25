@@ -1781,12 +1781,17 @@ void IrrDriver::displayFPS()
     uint32_t ping = 0;
     if (STKHost::existHost())
         ping = STKHost::get()->getClientPingToServer();
+
+    core::stringw fps_string;
     if (no_trust)
     {
         no_trust--;
 
         static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-        font->drawQuick(StringUtils::insertValues (L"FPS: ... Ping: %dms", ping),
+        fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", "-", "-",
+            "-", SP::sp_solid_poly_count / 1000, ping);
+
+        font->drawQuick(fps_string,
             core::rect< s32 >(100,0,400,50), fpsColor, false);
         return;
     }
@@ -1801,8 +1806,6 @@ void IrrDriver::displayFPS()
     if (max < fps) max = fps;
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
-
-    core::stringw fps_string;
 
     if ((UserConfigParams::m_artist_debug_mode)&&(CVS->isGLSL()))
     {
