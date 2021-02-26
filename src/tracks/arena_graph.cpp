@@ -329,6 +329,9 @@ void ArenaGraph::loadGoalNodes(const XMLNode *node)
                 // Find all the nodes which connect the two points of
                 // goal, notice: only work if it's a straight line
                 first = getNextNode(first, last);
+                // Happens when broken navmesh with separated nodes
+                if (first == Graph::UNKNOWN_SECTOR)
+                    break;
                 first_goal ? m_blue_node.insert(first) :
                     m_red_node.insert(first);
             }
