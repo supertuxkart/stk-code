@@ -23,6 +23,7 @@ Than you can just run:
 `supertuxkart --server-config=your_config.xml --network-console`
 
 It will create that xml configuration file if not found in current directory, you can type `quit` in terminal, than you can edit that file for further configuration as required.
+` --network-console` should not be used if you run supertuxkart server later with systemd service, see issue [#4299](https://github.com/supertuxkart/stk-code/issues/4299).
 
 The current server configuration xml looks like this:
 ```xml
