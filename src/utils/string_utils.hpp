@@ -54,6 +54,8 @@ namespace StringUtils
     irr::core::stringw loadingDots(const irr::core::stringw& s);
     std::string                     toUpperCase(const std::string&);
     std::string                     toLowerCase(const std::string&);
+    const char*                     toUpperCase(const char*);
+    const char*                     toLowerCase(const char*);
     std::vector<std::string>        split(const std::string& s, char c,
                                           bool keepSplitChar=false);
     std::vector<std::u32string>     split(const std::u32string& s, char32_t c,

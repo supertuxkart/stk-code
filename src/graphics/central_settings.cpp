@@ -306,13 +306,12 @@ void CentralVideoSettings::init()
     }
 }
 
-int CentralVideoSettings::getRenderer() const
+Renderer CentralVideoSettings::getRenderer() const
 {
-#if defined(USE_GLES2)
-    return RENDERER_GLES;
-#else
-    return RENDERER_GL;
-#endif
+    if (renderer == RENDERER_UNSET)
+        Log::error("Renderer", "Attempted to query renderer before renderer selected!");
+
+    return renderer;
 }
 
 unsigned CentralVideoSettings::getGLSLVersion() const

@@ -20,6 +20,13 @@
 
 #include <string>
 
+enum Renderer {
+    RENDERER_UNSET,
+    RENDERER_GL,
+    RENDERER_GLES,
+    RENDERER_VULKAN
+};
+
 class CentralVideoSettings
 {
 private:
@@ -27,6 +34,7 @@ private:
     bool                  m_glsl;
 
     int m_gl_major_version, m_gl_minor_version, m_gl_mem;
+    Renderer renderer = RENDERER_UNSET;
     bool hasBufferStorage;
     bool hasComputeShaders;
     bool hasArraysOfArrays;
@@ -54,7 +62,8 @@ public:
     static bool m_supports_sp;
 
     void init();
-    int getRenderer() const;
+    Renderer getRenderer() const;
+    void setRenderer(Renderer selected_renderer) { renderer = selected_renderer; }
     bool isGLSL() const;
     unsigned getGLSLVersion() const;
 
@@ -97,10 +106,5 @@ public:
 };
 
 extern CentralVideoSettings* CVS;
-
-enum Renderer {
-    RENDERER_GL,
-    RENDERER_GLES
-};
 
 #endif

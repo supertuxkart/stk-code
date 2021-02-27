@@ -134,6 +134,14 @@ namespace StringUtils
     }   // toUpperCase
 
     //-------------------------------------------------------------------------
+    /** C string version of above
+     */
+    const char* toUpperCase(const char* str)
+    {
+        return toUpperCase(std::string(str)).c_str();
+    }   // toUpperCase
+
+    //-------------------------------------------------------------------------
     /** Returns a string converted to lower case.
      */
     std::string toLowerCase(const std::string& str)
@@ -141,6 +149,14 @@ namespace StringUtils
         std::string name = str;
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
         return name;
+    }   // toLowerCase
+
+    //-------------------------------------------------------------------------
+    /** C string version of above
+     */
+    const char* toLowerCase(const char* str)
+    {
+        return toLowerCase(std::string(str)).c_str();
     }   // toLowerCase
 
     //-------------------------------------------------------------------------

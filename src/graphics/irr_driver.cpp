@@ -366,6 +366,26 @@ void IrrDriver::initDevice()
 {
     SIrrlichtCreationParameters params;
 
+#ifndef SERVER_ONLY
+    // Select driver to use.  Default to the compile-time switch,
+    // but allow selecting manually via env var for debugging.
+    if (std::getenv("SUPERTUXKART_RENDERER") != NULL &&
+            strcmp(StringUtils::toLowerCase(std::getenv("SUPERTUXKART_RENDERER")), "gles") == 0)
+        CVS->setRenderer(RENDERER_GLES);
+    else if (std::getenv("SUPERTUXKART_RENDERER") != NULL &&
+            strcmp(StringUtils::toLowerCase(std::getenv("SUPERTUXKART_RENDERER")), "gl") == 0)
+        CVS->setRenderer(RENDERER_GL);
+    else if (std::getenv("SUPERTUXKART_RENDERER") != NULL &&
+            strcmp(StringUtils::toLowerCase(std::getenv("SUPERTUXKART_RENDERER")), "vulkan") == 0)
+        Log::fatal("Renderer", "Vulkan not implemented in this version of SuperTuxKart!  Check for any available application updates.");
+    else
+#if defined(USE_GLES2)
+        CVS->setRenderer(RENDERER_GLES);
+#else
+        CVS->setRenderer(RENDERER_GL);
+#endif
+#endif
+
     // If --no-graphics option was used, the null device can still be used.
     if (!GUIEngine::isNoGraphics())
     {
