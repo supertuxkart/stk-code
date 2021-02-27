@@ -221,8 +221,10 @@ private:
     /** Master gain value, taken from the user config value. */
     float                     m_master_gain;
 
+#ifndef __SWITCH__
     /** Thread id of the thread running in this object. */
     std::thread               m_thread;
+#endif
 
     uint64_t                  m_last_update_time;
 

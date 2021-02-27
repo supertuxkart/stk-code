@@ -94,7 +94,9 @@ SFXManager::SFXManager()
     {
         // The thread is created even if there atm sfx are disabled
         // (since the user might enable it later).
+#ifndef __SWITCH__
         m_thread = std::thread(std::bind(mainLoop, this));
+#endif
         setMasterSFXVolume( UserConfigParams::m_sfx_volume );
         m_sfx_commands.lock();
         m_sfx_commands.getData().clear();
@@ -108,7 +110,7 @@ SFXManager::SFXManager()
  */
 SFXManager::~SFXManager()
 {
-#ifdef ENABLE_SOUND
+#if defined(ENABLE_SOUND) && !defined(__SWITCH__)
     if (UserConfigParams::m_enable_sound)
     {
         m_thread.join();
@@ -345,14 +347,25 @@ void SFXManager::mainLoop(void *obj)
     if (!UserConfigParams::m_enable_sound)
         return;
         
+#ifndef __SWITCH__
     VS::setThreadName("SFXManager");
+#endif
     SFXManager *me = (SFXManager*)obj;
 
     std::unique_lock<std::mutex> ul = me->m_sfx_commands.acquireMutex();
 
+#ifdef __SWITCH__
+    int iterCount = 0;
+#endif
     // Wait till we have an empty sfx in the queue
-    while (me->m_sfx_commands.getData().empty() ||
-           me->m_sfx_commands.getData().front()->m_command!=SFX_EXIT)
+    while (
+#ifdef __SWITCH__
+           // Don't spend too much time working on audio
+           ++iterCount != 30 && !me->m_sfx_commands.getData().empty()
+#else
+           me->m_sfx_commands.getData().empty() || me->m_sfx_commands.getData().front()->m_command!=SFX_EXIT
+#endif
+    )
     {
         PROFILER_PUSH_CPU_MARKER("Wait", 255, 0, 0);
         bool empty = me->m_sfx_commands.getData().empty();
@@ -360,18 +373,24 @@ void SFXManager::mainLoop(void *obj)
         // Wait in cond_wait for a request to arrive. The 'while' is necessary
         // since "spurious wakeups from the pthread_cond_wait ... may occur"
         // (pthread_cond_wait man page)!
+#ifndef __SWITCH__
         while (empty)
         {
             me->m_condition_variable.wait(ul);
             empty = me->m_sfx_commands.getData().empty();
         }
+#endif
         SFXCommand *current = me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
 
         if (current->m_command == SFX_EXIT)
         {
             delete current;
+#ifdef __SWITCH__
+            return;
+#else
             break;
+#endif
         }
         ul.unlock();
         PROFILER_POP_CPU_MARKER();
@@ -460,13 +479,15 @@ void SFXManager::mainLoop(void *obj)
     // need to keep the user waiting for STK to exit.
     me->setCanBeDeleted();
 
+#ifndef __SWITCH__
     // Clean up memory to avoid leak detection
     while(!me->m_sfx_commands.getData().empty())
     {
         delete me->m_sfx_commands.getData().front();
         me->m_sfx_commands.getData().erase(me->m_sfx_commands.getData().begin());
     }
-#endif
+#endif // __SWITCH__
+#endif // ENABLE_SOUD
     return;
 }   // mainLoop
 
@@ -790,6 +811,10 @@ void SFXManager::update()
     queue(SFX_UPDATE, (SFXBase*)NULL);
     // Wake up the sfx thread to handle all queued up audio commands.
     m_condition_variable.notify_one();
+
+#ifdef __SWITCH__
+    mainLoop(this);
+#endif
 #endif
 }   // update
 
