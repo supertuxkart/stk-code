@@ -22,6 +22,8 @@ namespace irr
 namespace video
 {
 
+bool useCoreContext;
+
 //! creates a loader which is able to load windows bitmaps
 IImageLoader* createImageLoaderBMP();
 

@@ -345,6 +345,39 @@ s32 COGLES2MaterialRenderer::getPixelShaderConstantID(const c8* name)
 	return -1;
 }
 
+bool COGLES2MaterialRenderer::setPixelShaderConstant(const c8* name, const f32* floats, int count)
+{
+	os::Printer::log("Called dummy function that exists to allow both GL and GLES to compile", ELL_WARNING);
+	return false;
+}
+
+bool COGLES2MaterialRenderer::setPixelShaderConstant(const c8* name, const bool* bools, int count)
+{
+	os::Printer::log("Called dummy function that exists to allow both GL and GLES to compile", ELL_WARNING);
+	return false;
+}
+
+bool COGLES2MaterialRenderer::setPixelShaderConstant(const c8* name, const s32* ints, int count)
+{
+	os::Printer::log("Called dummy function that exists to allow both GL and GLES to compile", ELL_WARNING);
+	return false;
+}
+
+bool COGLES2MaterialRenderer::setVertexShaderConstant(const c8* name, const f32* floats, int count)
+{
+	return setPixelShaderConstant(name, floats, count);
+}
+
+bool COGLES2MaterialRenderer::setVertexShaderConstant(const c8* name, const bool* bools, int count)
+{
+	return setPixelShaderConstant(name, bools, count);
+}
+
+bool COGLES2MaterialRenderer::setVertexShaderConstant(const c8* name, const s32* ints, int count)
+{
+	return setPixelShaderConstant(name, ints, count);
+}
+
 void COGLES2MaterialRenderer::setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
 {
 	os::Printer::log("Cannot set constant, please use high level shader call instead.", ELL_WARNING);

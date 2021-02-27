@@ -38,10 +38,8 @@ public:
 		const SMaterial& lastMaterial,
 		bool resetAllRenderstates) = 0;
 	
-	#ifdef _IRR_COMPILE_WITH_OGLES2_	
 	//! Return an index constant for the vertex shader based on a name.
 	virtual s32 getVertexShaderConstantID(const c8* name) = 0;
-	#endif
 
 	//! Sets a constant for the vertex shader based on a name.
 	/** This can be used if you used a high level shader language like GLSL
@@ -68,23 +66,13 @@ public:
 	\param count Amount of floats in array.
 	\return True if successful.
 	*/
-	#ifdef _IRR_COMPILE_WITH_OGLES2_
 	virtual bool setVertexShaderConstant(s32 index, const f32* floats, int count) = 0;
-	#else
-	virtual bool setVertexShaderConstant(const c8* name, const f32* floats, int count) = 0;
-	#endif
 
 	//! Bool interface for the above.
-	#ifndef _IRR_COMPILE_WITH_OGLES2_
 	virtual bool setVertexShaderConstant(const c8* name, const bool* bools, int count) = 0;
-	#endif
 
 	//! Int interface for the above.
-	#ifdef _IRR_COMPILE_WITH_OGLES2_
 	virtual bool setVertexShaderConstant(s32 index, const s32* ints, int count) = 0;
-	#else
-	virtual bool setVertexShaderConstant(const c8* name, const s32* ints, int count) = 0;
-	#endif
 
 	//! Sets a vertex shader constant.
 	/** Can be used if you created a shader using pixel/vertex shader
@@ -94,10 +82,8 @@ public:
 	\param constantAmount: Amount of registers to be set. One register consists of 4 floats. */
 	virtual void setVertexShaderConstant(const f32* data, s32 startRegister, s32 constantAmount=1) = 0;
 	
-	#ifdef _IRR_COMPILE_WITH_OGLES2_
-	//! Return an index constant for the pixel shader based on a name.
+	//#ifdef _IRR_COMPILE_WITH_OGLES2_
 	virtual s32 getPixelShaderConstantID(const c8* name) = 0;
-	#endif
 
 	//! Sets a constant for the pixel shader based on a name.
 	/** This can be used if you used a high level shader language like GLSL
@@ -107,23 +93,13 @@ public:
 	\param floats Pointer to array of floats
 	\param count Amount of floats in array.
 	\return True if successful. */
-	#ifdef _IRR_COMPILE_WITH_OGLES2_
 	virtual bool setPixelShaderConstant(s32 index, const f32* floats, int count) = 0;
-	#else
-	virtual bool setPixelShaderConstant(const c8* name, const f32* floats, int count) = 0;
-	#endif
 
 	//! Bool interface for the above.
-	#ifndef _IRR_COMPILE_WITH_OGLES2_
 	virtual bool setPixelShaderConstant(const c8* name, const bool* bools, int count) = 0;
-	#endif
 
 	//! Int interface for the above.
-	#ifdef _IRR_COMPILE_WITH_OGLES2_
 	virtual bool setPixelShaderConstant(s32 index, const s32* ints, int count) = 0;
-	#else
-	virtual bool setPixelShaderConstant(const c8* name, const s32* ints, int count) = 0;
-	#endif
 
 	//! Sets a pixel shader constant.
 	/** Can be used if you created a shader using pixel/vertex shader
@@ -133,7 +109,6 @@ public:
 	\param constantAmount Amount of registers to be set. One register consists of 4 floats. */
 	virtual void setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount=1) = 0;
 	
-	#ifdef _IRR_COMPILE_WITH_OGLES2_
 	//! \deprecated. This method may be removed by Irrlicht 2.0
 	_IRR_DEPRECATED_ bool setVertexShaderConstant(const c8* name, const f32* floats, int count)
 	{
@@ -157,7 +132,6 @@ public:
 	{
 		return setPixelShaderConstant(getPixelShaderConstantID(name), ints, count);
 	}
-	#endif
 
 	//! Get pointer to the IVideoDriver interface
 	/** \return Pointer to the IVideoDriver interface */

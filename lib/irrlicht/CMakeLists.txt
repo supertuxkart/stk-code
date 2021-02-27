@@ -47,11 +47,8 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pipe -fstrict-aliasing")
 endif()
 
-if(USE_GLES2)
-    if (NOT IOS)
-        add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
-    endif()
-    add_definitions(-DNO_IRR_COMPILE_WITH_OPENGL_)
+if (NOT IOS)
+    add_definitions(-D_IRR_COMPILE_WITH_OGLES2_)
 endif()
 
 if(CYGWIN)

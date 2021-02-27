@@ -494,6 +494,21 @@ void COpenGLSLMaterialRenderer::setBasicRenderStates(const SMaterial& material,
 	Driver->setBasicRenderStates(material, lastMaterial, resetAllRenderstates);
 }
 
+s32 COpenGLSLMaterialRenderer::getVertexShaderConstantID(const c8* name)
+{
+	return getPixelShaderConstantID(name);
+}
+
+s32 COpenGLSLMaterialRenderer::getPixelShaderConstantID(const c8* name)
+{
+	for (u32 i = 0; i < UniformInfo.size(); ++i)
+	{
+		if (UniformInfo[i].name == name)
+			return i;
+	}
+
+	return -1;
+}
 
 bool COpenGLSLMaterialRenderer::setVertexShaderConstant(const c8* name, const f32* floats, int count)
 {
@@ -687,6 +702,28 @@ bool COpenGLSLMaterialRenderer::setPixelShaderConstant(const c8* name, const s32
 void COpenGLSLMaterialRenderer::setPixelShaderConstant(const f32* data, s32 startRegister, s32 constantAmount)
 {
 	os::Printer::log("Cannot set constant, use high level shader call.", ELL_WARNING);
+}
+
+bool COpenGLSLMaterialRenderer::setVertexShaderConstant(s32 index, const f32* floats, int count)
+{
+	return setPixelShaderConstant(index, floats, count);
+}
+
+bool COpenGLSLMaterialRenderer::setVertexShaderConstant(s32 index, const s32* ints, int count)
+{
+	return setPixelShaderConstant(index, ints, count);
+}
+
+bool COpenGLSLMaterialRenderer::setPixelShaderConstant(s32 index, const f32* floats, int count)
+{
+	os::Printer::log("Called dummy function that exists to allow both GL and GLES to compile", ELL_WARNING);
+	return false;
+}
+
+bool COpenGLSLMaterialRenderer::setPixelShaderConstant(s32 index, const s32* ints, int count)
+{
+	os::Printer::log("Called dummy function that exists to allow both GL and GLES to compile", ELL_WARNING);
+	return false;
 }
 
 IVideoDriver* COpenGLSLMaterialRenderer::getVideoDriver()

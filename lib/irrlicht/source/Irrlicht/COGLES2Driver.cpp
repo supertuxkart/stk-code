@@ -34,7 +34,7 @@ namespace irr
 {
 namespace video
 {
-	bool useCoreContext = true;
+	extern bool useCoreContext;
 
 //! constructor and init code
 #if defined(_IRR_COMPILE_WITH_X11_DEVICE_) || defined(_IRR_WINDOWS_API_) || defined(_IRR_COMPILE_WITH_ANDROID_DEVICE_)
@@ -2294,6 +2294,46 @@ namespace video
 		os::Printer::log("Error: Please call services->setPixelShaderConstant(), not VideoDriver->setPixelShaderConstant().");
 		return false;
 	}
+
+    //! Sets a constant for the vertex shader based on a name.
+    bool COGLES2Driver::setVertexShaderConstant(const c8* name, const f32* floats, int count)
+    {
+	    //pass this along, as in GLSL the same routine is used for both vertex and fragment shaders
+	    return setPixelShaderConstant(name, floats, count);
+    }
+
+    //! Bool interface for the above.
+    bool COGLES2Driver::setVertexShaderConstant(const c8* name, const bool* bools, int count)
+    {
+	    return setPixelShaderConstant(name, bools, count);
+    }
+
+    //! Int interface for the above.
+    bool COGLES2Driver::setVertexShaderConstant(const c8* name, const s32* ints, int count)
+    {
+	    return setPixelShaderConstant(name, ints, count);
+    }
+
+    //! Sets a constant for the pixel shader based on a name.
+    bool COGLES2Driver::setPixelShaderConstant(const c8* name, const f32* floats, int count)
+    {
+	    os::Printer::log("Error: Please call services->setPixelShaderConstant(), not VideoDriver->setPixelShaderConstant().");
+	    return false;
+    }
+
+    //! Bool interface for the above.
+    bool COGLES2Driver::setPixelShaderConstant(const c8* name, const bool* bools, int count)
+    {
+	    os::Printer::log("Error: Please call services->setPixelShaderConstant(), not VideoDriver->setPixelShaderConstant().");
+	    return false;
+    }
+
+    //! Int interface for the above.
+    bool COGLES2Driver::setPixelShaderConstant(const c8* name, const s32* ints, int count)
+    {
+	    os::Printer::log("Error: Please call services->setPixelShaderConstant(), not VideoDriver->setPixelShaderConstant().");
+	    return false;
+    }
 
 
 	//! Adds a new material renderer to the VideoDriver, using pixel and/or

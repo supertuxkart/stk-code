@@ -266,11 +266,11 @@ bool CIrrDeviceSDL::isGyroscopeAvailable()
 }
 
 
-bool versionCorrect(int major, int minor)
+bool versionCorrect(int major, int minor, int driverType)
 {
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-	return true;
-#else
+    if (driverType == video::EDT_OGLES2)
+        return true;
+
 	int created_major = 2;
 	int created_minor = 0;
 	glGetIntegerv(GL_MAJOR_VERSION, &created_major);
@@ -279,7 +279,6 @@ bool versionCorrect(int major, int minor)
 		(created_major == major && created_minor >= minor))
 		return true;
 	return false;
-#endif
 }
 
 
@@ -370,7 +369,6 @@ start:
 	if (CreationParams.ForceLegacyDevice)
 		goto legacy;
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
 	if (Context)
 	{
 		SDL_GL_DeleteContext(Context);
@@ -382,96 +380,88 @@ start:
 		Window = NULL;
 	}
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
-	if (Window)
-	{
-		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
-			versionCorrect(3, 0)) return;
-	}
+    if (CreationParams.DriverType == video::EDT_OGLES2)
+    {
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+	    Window = SDL_CreateWindow("",
+		    (float)CreationParams.WindowPosition.X / g_native_scale_x,
+		    (float)CreationParams.WindowPosition.Y / g_native_scale_y,
+		    (float)CreationParams.WindowSize.Width / g_native_scale_x,
+		    (float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+	    if (Window)
+	    {
+		    Context = SDL_GL_CreateContext(Window);
+		    if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			    versionCorrect(3, 0, CreationParams.DriverType)) return;
+	    }
+    }
+    else
+    {
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	    Window = SDL_CreateWindow("",
+		    (float)CreationParams.WindowPosition.X / g_native_scale_x,
+		    (float)CreationParams.WindowPosition.Y / g_native_scale_y,
+		    (float)CreationParams.WindowSize.Width / g_native_scale_x,
+		    (float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+	    if (Window)
+	    {
+		    Context = SDL_GL_CreateContext(Window);
+		    if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			    versionCorrect(4, 3, CreationParams.DriverType)) return;
+	    }
 
-#else
-	if (Context)
-	{
-		SDL_GL_DeleteContext(Context);
-		Context = NULL;
-	}
-	if (Window)
-	{
-		SDL_DestroyWindow(Window);
-		Window = NULL;
-	}
+	    if (Context)
+	    {
+		    SDL_GL_DeleteContext(Context);
+		    Context = NULL;
+	    }
+	    if (Window)
+	    {
+		    SDL_DestroyWindow(Window);
+		    Window = NULL;
+	    }
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
-	if (Window)
-	{
-		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
-			versionCorrect(4, 3)) return;
-	}
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+	    Window = SDL_CreateWindow("",
+		    (float)CreationParams.WindowPosition.X / g_native_scale_x,
+		    (float)CreationParams.WindowPosition.Y / g_native_scale_y,
+		    (float)CreationParams.WindowSize.Width / g_native_scale_x,
+		    (float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+	    if (Window)
+	    {
+		    Context = SDL_GL_CreateContext(Window);
+		    if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			    versionCorrect(3, 3, CreationParams.DriverType)) return;
+	    }
 
-	if (Context)
-	{
-		SDL_GL_DeleteContext(Context);
-		Context = NULL;
-	}
-	if (Window)
-	{
-		SDL_DestroyWindow(Window);
-		Window = NULL;
-	}
+	    if (Context)
+	    {
+		    SDL_GL_DeleteContext(Context);
+		    Context = NULL;
+	    }
+	    if (Window)
+	    {
+		    SDL_DestroyWindow(Window);
+		    Window = NULL;
+	    }
 
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
-	if (Window)
-	{
-		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
-			versionCorrect(3, 3)) return;
-	}
-
-	if (Context)
-	{
-		SDL_GL_DeleteContext(Context);
-		Context = NULL;
-	}
-	if (Window)
-	{
-		SDL_DestroyWindow(Window);
-		Window = NULL;
-	}
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
-	if (Window)
-	{
-		Context = SDL_GL_CreateContext(Window);
-		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
-			versionCorrect(3, 1)) return;
-	}
-#endif
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+	    Window = SDL_CreateWindow("",
+		    (float)CreationParams.WindowPosition.X / g_native_scale_x,
+		    (float)CreationParams.WindowPosition.Y / g_native_scale_y,
+		    (float)CreationParams.WindowSize.Width / g_native_scale_x,
+		    (float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+	    if (Window)
+	    {
+		    Context = SDL_GL_CreateContext(Window);
+		    if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0 &&
+			    versionCorrect(3, 1, CreationParams.DriverType)) return;
+	    }
+    }
 
 legacy:
 	irr::video::useCoreContext = false;
@@ -486,17 +476,19 @@ legacy:
 		Window = NULL;
 	}
 
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-#else
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-#endif
-	if (CreationParams.DriverType == video::EDT_OGLES2)
+    if (CreationParams.DriverType == video::EDT_OGLES2)
+    {
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-	else
+    }
+    else
+    {
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
+    }
+
 	Window = SDL_CreateWindow("",
 		(float)CreationParams.WindowPosition.X / g_native_scale_x,
 		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
@@ -505,11 +497,18 @@ legacy:
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
-#ifdef _IRR_COMPILE_WITH_OGLES2_
-		if (Context && gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
-#else
+
+		if (Context && 
+		    (
+		        CreationParams.DriverType == video::EDT_OGLES2 &&
+		        gladLoadGLES2((GLADloadfunc)SDL_GL_GetProcAddress) != 0
+		    ) || (
+		        CreationParams.DriverType == video::EDT_OPENGL &&
+		        gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0
+            )
+		   ) return;
+
 		if (Context && gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress) != 0) return;
-#endif
 	}
 
 	if (CreationParams.Doublebuffer)
