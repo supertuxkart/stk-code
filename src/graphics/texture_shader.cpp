@@ -41,16 +41,14 @@ GLuint TextureShaderBase::m_all_texture_types[] =
 { /* ST_NEAREST_FILTERED               */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_ANISOTROPIC_FILTERED */ GL_TEXTURE_2D,
   /* ST_TRILINEAR_CUBEMAP              */ GL_TEXTURE_CUBE_MAP,
-  /* ST_BILINEAR_FILTERED              */ GL_TEXTURE_2D ,
+  /* ST_BILINEAR_FILTERED              */ GL_TEXTURE_2D,
   /* ST_SHADOW_SAMPLER                 */ GL_TEXTURE_2D_ARRAY,
   /* ST_TRILINEAR_CLAMPED_ARRAY2D      */ GL_TEXTURE_2D_ARRAY,
   /* ST_VOLUME_LINEAR_FILTERED         */ GL_TEXTURE_3D,
   /* ST_NEARED_CLAMPED_FILTERED        */ GL_TEXTURE_2D,
   /* ST_BILINEAR_CLAMPED_FILTERED      */ GL_TEXTURE_2D,
-  /* ST_SEMI_TRILINEAR                 */ GL_TEXTURE_2D
-#ifndef USE_GLES2
-  /* ST_TEXTURE_BUFFER                */, GL_TEXTURE_BUFFER
-#endif
+  /* ST_SEMI_TRILINEAR                 */ GL_TEXTURE_2D,
+  /* ST_TEXTURE_BUFFER                 */ GL_TEXTURE_BUFFER
 
 };
 
@@ -123,10 +121,11 @@ void TextureShaderBase::bindTextureNearestClamped(GLuint texture_unit,
 // ----------------------------------------------------------------------------
 void TextureShaderBase::bindTextureBuffer(GLuint texture_unit, GLuint tex_id)
 {
-#ifndef USE_GLES2
-    glActiveTexture(GL_TEXTURE0 + texture_unit);
-    glBindTexture(GL_TEXTURE_BUFFER, tex_id);
-#endif
+    if (CVS->getRenderer() == RENDERER_GL)
+    {
+        glActiveTexture(GL_TEXTURE0 + texture_unit);
+        glBindTexture(GL_TEXTURE_BUFFER, tex_id);
+    }
 }   // bindTextureBuffer
 
 // ----------------------------------------------------------------------------
@@ -251,10 +250,10 @@ GLuint TextureShaderBase::createSamplers(SamplerTypeNew sampler_type)
         return createBilinearClampedSampler();
     case ST_SEMI_TRILINEAR:
         return createSemiTrilinearSampler();
-#ifndef USE_GLES2
     case ST_TEXTURE_BUFFER:
+        if (CVS->getRenderer() != RENDERER_GL)
+            assert(false);
         return 0;
-#endif
     default:
         assert(false);
         return 0;

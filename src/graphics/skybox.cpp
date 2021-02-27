@@ -56,21 +56,22 @@ public:
     }   // bindVertexArray
 };   // SkyboxShader
 
-#if !defined(USE_GLES2)
 class SpecularIBLGenerator : public TextureShader<SpecularIBLGenerator, 2,
                                                   core::matrix4, float >
 {
 public:
     SpecularIBLGenerator()
     {
-        loadProgram(OBJECT, GL_VERTEX_SHADER,   "screenquad.vert",
-                            GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
-        assignUniforms("PermutationMatrix", "ViewportSize");
-        assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP,
-                           1, "samples", ST_TEXTURE_BUFFER);
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            loadProgram(OBJECT, GL_VERTEX_SHADER,   "screenquad.vert",
+                                GL_FRAGMENT_SHADER, "importance_sampling_specular.frag");
+            assignUniforms("PermutationMatrix", "ViewportSize");
+            assignSamplerNames(0, "tex", ST_TRILINEAR_CUBEMAP,
+                               1, "samples", ST_TEXTURE_BUFFER);
+        }
     }
 };   // SpecularIBLGenerator
-#endif
 
 namespace {
     // ----------------------------------------------------------------------------
@@ -183,12 +184,14 @@ void Skybox::generateCubeMapFromTextures()
 
         GLint format = GL_RGBA;
         GLint internal_format = needs_srgb_format ? GL_SRGB8_ALPHA8 : GL_RGBA8;
-#if !defined(USE_GLES2)
-        if (CVS->isTextureCompressionEnabled())
-            internal_format = needs_srgb_format ? GL_COMPRESSED_SRGB_ALPHA
-                                                : GL_COMPRESSED_RGBA;
-        format = GL_BGRA;
-#endif
+
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            if (CVS->isTextureCompressionEnabled())
+                internal_format = needs_srgb_format ? GL_COMPRESSED_SRGB_ALPHA
+                                                    : GL_COMPRESSED_RGBA;
+            format = GL_BGRA;
+        }
 
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0,
                      internal_format, size, size, 0, format,
@@ -208,99 +211,98 @@ void Skybox::generateSpecularCubemap()
     unsigned int cubemap_size = 256;
     for (int i = 0; i < 6; i++)
     {
-#if !defined(USE_GLES2)
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F,
-                     cubemap_size, cubemap_size, 0, GL_BGRA, GL_FLOAT, 0);
-#else
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
-                     cubemap_size, cubemap_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA16F,
+                         cubemap_size, cubemap_size, 0, GL_BGRA, GL_FLOAT, 0);
+        else
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA8,
+                         cubemap_size, cubemap_size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
     }
     glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
     if (!CVS->isDeferredEnabled() || !CVS->isARBTextureBufferObjectUsable())
         return;
 
-#if !defined(USE_GLES2)
-
-    GLuint fbo;
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glViewport(0, 0, cubemap_size, cubemap_size);
-    GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
-    glDrawBuffers(1, bufs);
-    SpecularIBLGenerator::getInstance()->use();
-
-    glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
-
-    core::matrix4 M[6] = {
-        getPermutationMatrix(2, -1., 1, -1., 0, 1.),
-        getPermutationMatrix(2, 1., 1, -1., 0, -1.),
-        getPermutationMatrix(0, 1., 2, 1., 1, 1.),
-        getPermutationMatrix(0, 1., 2, -1., 1, -1.),
-        getPermutationMatrix(0, 1., 1, -1., 2, 1.),
-        getPermutationMatrix(0, -1., 1, -1., 2, -1.),
-    };
-
-    for (unsigned level = 0; level < 8; level++)
+    if (CVS->getRenderer() == RENDERER_GL)
     {
-        // Blinn Phong can be approximated by Phong with 4x the specular
-        // coefficient
-        // See http://seblagarde.wordpress.com/2012/03/29/relationship-between-phong-and-blinn-lighting-model/
-        // NOTE : Removed because it makes too sharp reflexion
-        float roughness = (8 - level) * pow(2.f, 10.f) / 8.f;
-        float viewportSize = float(1 << (8 - level));
+        GLuint fbo;
+        glGenFramebuffers(1, &fbo);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+        glViewport(0, 0, cubemap_size, cubemap_size);
+        GLenum bufs[] = { GL_COLOR_ATTACHMENT0 };
+        glDrawBuffers(1, bufs);
+        SpecularIBLGenerator::getInstance()->use();
 
-        float *tmp = new float[2048];
-        for (unsigned i = 0; i < 1024; i++)
+        glDisable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_CULL_FACE);
+
+        core::matrix4 M[6] = {
+            getPermutationMatrix(2, -1., 1, -1., 0, 1.),
+            getPermutationMatrix(2, 1., 1, -1., 0, -1.),
+            getPermutationMatrix(0, 1., 2, 1., 1, 1.),
+            getPermutationMatrix(0, 1., 2, -1., 1, -1.),
+            getPermutationMatrix(0, 1., 1, -1., 2, 1.),
+            getPermutationMatrix(0, -1., 1, -1., 2, -1.),
+        };
+
+        for (unsigned level = 0; level < 8; level++)
         {
-            std::pair<float, float> sample =
-                getImportanceSamplingPhong(getHammersleySequence(i, 1024),
-                                        roughness);
-            tmp[2 * i] = sample.first;
-            tmp[2 * i + 1] = sample.second;
+            // Blinn Phong can be approximated by Phong with 4x the specular
+            // coefficient
+            // See http://seblagarde.wordpress.com/2012/03/29/relationship-between-phong-and-blinn-lighting-model/
+            // NOTE : Removed because it makes too sharp reflexion
+            float roughness = (8 - level) * pow(2.f, 10.f) / 8.f;
+            float viewportSize = float(1 << (8 - level));
+
+            float *tmp = new float[2048];
+            for (unsigned i = 0; i < 1024; i++)
+            {
+                std::pair<float, float> sample =
+                    getImportanceSamplingPhong(getHammersleySequence(i, 1024),
+                                            roughness);
+                tmp[2 * i] = sample.first;
+                tmp[2 * i + 1] = sample.second;
+            }
+
+            glBindVertexArray(0);
+            GLuint sample_texture, sample_buffer;
+            glGenBuffers(1, &sample_buffer);
+            glBindBuffer(GL_TEXTURE_BUFFER, sample_buffer);
+            glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp,
+                         GL_STATIC_DRAW);
+            glGenTextures(1, &sample_texture);
+            glBindTexture(GL_TEXTURE_BUFFER, sample_texture);
+            glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sample_buffer);
+            glBindTexture(GL_TEXTURE_BUFFER, 0);
+            glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
+
+            for (unsigned face = 0; face < 6; face++)
+            {
+
+                glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                                       GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
+                                       m_specular_probe, level);
+                assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+
+                SpecularIBLGenerator::getInstance()
+                    ->setTextureUnits(m_cube_map, sample_texture);
+                SpecularIBLGenerator::getInstance()->setUniforms(M[face],
+                                                                 viewportSize);
+
+                glDrawArrays(GL_TRIANGLES, 0, 3);
+            }
+            glBindBuffer(GL_TEXTURE_BUFFER, 0);
+            glBindTexture(GL_TEXTURE_BUFFER, 0);
+
+            delete[] tmp;
+            glDeleteTextures(1, &sample_texture);
+            glDeleteBuffers(1, &sample_buffer);
         }
-
-        glBindVertexArray(0);
-        GLuint sample_texture, sample_buffer;
-        glGenBuffers(1, &sample_buffer);
-        glBindBuffer(GL_TEXTURE_BUFFER, sample_buffer);
-        glBufferData(GL_TEXTURE_BUFFER, 2048 * sizeof(float), tmp,
-                     GL_STATIC_DRAW);
-        glGenTextures(1, &sample_texture);
-        glBindTexture(GL_TEXTURE_BUFFER, sample_texture);
-        glTexBuffer(GL_TEXTURE_BUFFER, GL_RG32F, sample_buffer);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-        glBindVertexArray(SharedGPUObjects::getFullScreenQuadVAO());
-
-        for (unsigned face = 0; face < 6; face++)
-        {
-
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                                   GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-                                   m_specular_probe, level);
-            assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
-
-            SpecularIBLGenerator::getInstance()
-                ->setTextureUnits(m_cube_map, sample_texture);
-            SpecularIBLGenerator::getInstance()->setUniforms(M[face],
-                                                             viewportSize);
-
-            glDrawArrays(GL_TRIANGLES, 0, 3);
-        }
-        glBindBuffer(GL_TEXTURE_BUFFER, 0);
-        glBindTexture(GL_TEXTURE_BUFFER, 0);
-
-        delete[] tmp;
-        glDeleteTextures(1, &sample_texture);
-        glDeleteBuffers(1, &sample_buffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
+        glDeleteFramebuffers(1, &fbo);
+        glActiveTexture(GL_TEXTURE0);
     }
-    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getDefaultFramebuffer());
-    glDeleteFramebuffers(1, &fbo);
-    glActiveTexture(GL_TEXTURE0);
-#endif
 }   // generateSpecularCubemap
 
 
@@ -319,9 +321,8 @@ Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
 {
     m_skybox_textures = skybox_textures;
 
-#if !defined(USE_GLES2)
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-#endif
+    if (CVS->getRenderer() == RENDERER_GL)
+        glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     if (!skybox_textures.empty())
     {

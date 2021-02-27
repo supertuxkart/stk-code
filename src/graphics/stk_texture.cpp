@@ -135,12 +135,10 @@ void STKTexture::reload(bool no_upload, uint8_t* preload_data,
         GL_SRGB8_ALPHA8 : GL_RGBA8;
 
     // GLES 2.0 specs doesn't allow GL_RGBA8 internal format
-#if defined(USE_GLES2)
-    if (!CVS->isGLSL())
+    if (CVS->getRenderer() == RENDERER_GLES && !CVS->isGLSL())
     {
         internal_format = GL_RGBA;
     }
-#endif
 
     formatConversion(data, &format, w, h);
 
@@ -194,8 +192,7 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
                                   unsigned int w, unsigned int h) const
 {
 #ifndef SERVER_ONLY
-#if defined(USE_GLES2)
-    if (!m_single_channel)
+    if (CVS->getRenderer() == RENDERER_GLES && !m_single_channel)
     {
         if (format)
             *format = GL_RGBA;
@@ -206,7 +203,7 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
             data[i * 4 + 2] = tmp_val;
         }
     }
-#endif
+
     if (isPremulAlpha() && !m_single_channel)
     {
         for (unsigned int i = 0; i < w * h; i++)
@@ -324,12 +321,13 @@ void STKTexture::applyMask(video::IImage* orig_img)
 //-----------------------------------------------------------------------------
 bool STKTexture::hasMipMaps() const
 {
-#if defined(USE_GLES2)
-    return true;
-#elif defined(SERVER_ONLY)
+#if defined(SERVER_ONLY)
     return false;
 #else
-    return CVS->getGLSLVersion() >= 130;
+    if (CVS->getRenderer() == RENDERER_GLES)
+        return true;
+    else
+        return CVS->getGLSLVersion() >= 130;
 #endif   // !SERVER_ONLY
 }   // hasMipMaps
 
@@ -339,14 +337,17 @@ void* STKTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
     if (m_texture_image)
         return m_texture_image->lock();
 
-#if !(defined(SERVER_ONLY) || defined(USE_GLES2))
-    uint8_t* pixels = new uint8_t[m_size.Width * m_size.Height * 4]();
-    GLint tmp_texture;
-    glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmp_texture);
-    glBindTexture(GL_TEXTURE_2D, m_texture_name);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
-    glBindTexture(GL_TEXTURE_2D, tmp_texture);
-    return pixels;
+#if !defined(SERVER_ONLY)
+    if (CVS->getRenderer() == RENDERER_GL)
+    {
+        uint8_t* pixels = new uint8_t[m_size.Width * m_size.Height * 4]();
+        GLint tmp_texture;
+        glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmp_texture);
+        glBindTexture(GL_TEXTURE_2D, m_texture_name);
+        glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+        glBindTexture(GL_TEXTURE_2D, tmp_texture);
+        return pixels;
+    }
 #endif   // !SERVER_ONLY
     return NULL;
 }   // lock

@@ -365,7 +365,10 @@ const video::ITexture* IconButtonWidget::getTexture()
 // -----------------------------------------------------------------------------
 video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
 {
-#if !defined(SERVER_ONLY) && !defined(USE_GLES2)
+#if !defined(SERVER_ONLY)
+    if (CVS->getRenderer() == RENDERER_GLES)
+        return texture;
+
     STKTexture* stk_tex = static_cast<STKTexture*>(texture);
     // Compressed texture can't be turned into greyscale
     if (stk_tex->isMeshTexture() && CVS->isTextureCompressionEnabled())

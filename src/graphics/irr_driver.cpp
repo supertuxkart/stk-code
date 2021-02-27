@@ -457,11 +457,11 @@ void IrrDriver::initDevice()
             if(UserConfigParams::logMisc())
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
-
-#if defined(USE_GLES2)
-            params.DriverType    = video::EDT_OGLES2;
-#else
-            params.DriverType    = video::EDT_OPENGL;
+#ifndef SERVER_ONLY
+            if (CVS->getRenderer() == RENDERER_GLES)
+                params.DriverType    = video::EDT_OGLES2;
+            else
+                params.DriverType    = video::EDT_OPENGL;
 #endif
             params.PrivateData   = NULL;
             params.Stencilbuffer = false;
@@ -520,11 +520,7 @@ void IrrDriver::initDevice()
         {
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
-#if defined(USE_GLES2)
-            m_device = createDevice(video::EDT_OGLES2,
-#else
-            m_device = createDevice(video::EDT_OPENGL,
-#endif
+            m_device = createDevice(params.DriverType,
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel
@@ -645,24 +641,27 @@ void IrrDriver::initDevice()
         (int x, int y, int w, int h, unsigned int f, unsigned int t, void* d)
         { glReadPixels(x, y, w, h, f, t, d); });
 
-#ifndef USE_GLES2
-    ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
-        [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
-        [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
-        { glBufferData(t, s, d, u); },
-        [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
-        [](unsigned int t, unsigned int a) { return glMapBuffer(t, a); },
-        [](unsigned int t) { return glUnmapBuffer(t); });
-#else
-    ogrRegPBOFunctionsRange([](int n, unsigned int* b) { glGenBuffers(n, b); },
-        [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
-        [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
-        { glBufferData(t, s, d, u); },
-        [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
-        [](unsigned int t, ptrdiff_t o, ptrdiff_t l, unsigned int a) 
-        { return glMapBufferRange(t, o, l, a); },
-        [](unsigned int t) { return glUnmapBuffer(t); });
-#endif
+    if (CVS->getRenderer() == RENDERER_GL)
+    {
+        ogrRegPBOFunctions([](int n, unsigned int* b) { glGenBuffers(n, b); },
+            [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
+            [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
+            { glBufferData(t, s, d, u); },
+            [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
+            [](unsigned int t, unsigned int a) { return glMapBuffer(t, a); },
+            [](unsigned int t) { return glUnmapBuffer(t); });
+    }
+    else // GLES
+    {
+        ogrRegPBOFunctionsRange([](int n, unsigned int* b) { glGenBuffers(n, b); },
+            [](unsigned int t, unsigned int b) { glBindBuffer(t, b); },
+            [](unsigned int t, ptrdiff_t s, const void* d, unsigned int u)
+            { glBufferData(t, s, d, u); },
+            [](int n, const unsigned int* b) { glDeleteBuffers(n, b); },
+            [](unsigned int t, ptrdiff_t o, ptrdiff_t l, unsigned int a) 
+            { return glMapBufferRange(t, o, l, a); },
+            [](unsigned int t) { return glUnmapBuffer(t); });
+    }
 
 #endif
 

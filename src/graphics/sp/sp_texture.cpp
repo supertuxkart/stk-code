@@ -79,12 +79,11 @@ SPTexture::SPTexture(const std::string& path, Material* m, bool undo_srgb,
             (int)UserConfigParams::m_max_texture_size);
     }
     
-#ifdef USE_GLES2
-    if (m_undo_srgb && !CVS->isEXTTextureCompressionS3TCSRGBUsable())
+    if (CVS->getRenderer() == RENDERER_GLES && m_undo_srgb &&
+            !CVS->isEXTTextureCompressionS3TCSRGBUsable())
     {
         cache_subdir += "-linear";
     }
-#endif
 
     m_cache_directory = file_manager->getCachedTexturesDir() +
         cache_subdir + "/" + container_id;
@@ -201,17 +200,14 @@ std::shared_ptr<video::IImage> SPTexture::getTextureImage() const
     {
         const bool use_tex_compress = CVS->isTextureCompressionEnabled() &&
             !m_cache_directory.empty();
-#ifndef USE_GLES2
-        if (use_tex_compress)
+
+        if (CVS->getRenderer() == RENDERER_GLES || use_tex_compress)
         {
-#endif
             // to RGBA for libsquish or for gles it's always true
             uint8_t tmp_val = data[i * 4];
             data[i * 4] = data[i * 4 + 2];
             data[i * 4 + 2] = tmp_val;
-#ifndef USE_GLES2
         }
-#endif
 
         bool force_undo_srgb = use_tex_compress && 
                                   !CVS->isEXTTextureCompressionS3TCSRGBUsable();
@@ -266,11 +262,12 @@ bool SPTexture::texImage2d(std::shared_ptr<video::IImage> texture,
 #ifndef SERVER_ONLY
     if (texture)
     {
-#ifdef USE_GLES2
-        unsigned upload_format = GL_RGBA;
-#else
-        unsigned upload_format = GL_BGRA;
-#endif
+        unsigned upload_format;
+        if (CVS->getRenderer() == RENDERER_GLES)
+            upload_format = GL_RGBA;
+        else
+            upload_format = GL_BGRA;
+
         glDeleteTextures(1, &m_texture_name);
         glGenTextures(1, &m_texture_name);
         glBindTexture(GL_TEXTURE_2D, m_texture_name);

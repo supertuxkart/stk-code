@@ -83,13 +83,14 @@ public:
     GLuint m_dest_tu;
     ComputeShadowBlurVShader()
     {
-#if !defined(USE_GLES2)
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowV.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowV.comp");
+            m_dest_tu = 1;
+            assignUniforms("pixel", "weights");
+            assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
+            assignTextureUnit(m_dest_tu, "dest");
+        }
     }   // ComputeShadowBlurVShader
 
 };   // ComputeShadowBlurVShader
@@ -137,7 +138,6 @@ public:
     }   // render
 };   // Gaussian3VBlurShader
 
-#if !defined(USE_GLES2)
 // ============================================================================
 class ComputeGaussian6VBlurShader : public TextureShader<ComputeGaussian6VBlurShader, 1,
                                                   core::vector2df,
@@ -147,11 +147,14 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian6VBlurShader()
     {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6v.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_BILINEAR_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6v.comp");
+            m_dest_tu = 1;
+            assignUniforms("pixel", "weights");
+            assignSamplerNames(0, "source", ST_BILINEAR_CLAMPED_FILTERED);
+            assignTextureUnit(m_dest_tu, "dest");
+        }
     }   // ComputeGaussian6VBlurShader
 };   // ComputeGaussian6VBlurShader
 
@@ -164,11 +167,14 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian6HBlurShader()
     {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6h.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source",  ST_BILINEAR_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            loadProgram(OBJECT, GL_COMPUTE_SHADER, "gaussian6h.comp");
+            m_dest_tu = 1;
+            assignUniforms("pixel", "weights");
+            assignSamplerNames(0, "source",  ST_BILINEAR_CLAMPED_FILTERED);
+            assignTextureUnit(m_dest_tu, "dest");
+        }
     }   // ComputeGaussian6HBlurShader
 };   // ComputeGaussian6HBlurShader
 
@@ -181,14 +187,16 @@ public:
     GLuint m_dest_tu;
     ComputeShadowBlurHShader()
     {
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
-        m_dest_tu = 1;
-        assignUniforms("pixel", "weights");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            loadProgram(OBJECT, GL_COMPUTE_SHADER, "blurshadowH.comp");
+            m_dest_tu = 1;
+            assignUniforms("pixel", "weights");
+            assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED);
+            assignTextureUnit(m_dest_tu, "dest");
+        }
     }   // ComputeShadowBlurHShader
 };   // ComputeShadowBlurHShader
-#endif
 
 // ============================================================================
 class Gaussian6HBlurShader : public TextureShader<Gaussian6HBlurShader, 1,
@@ -246,30 +254,32 @@ public:
     GLuint m_dest_tu;
     ComputeGaussian17TapHShader()
     {
-#if !defined(USE_GLES2)
-        loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
-        m_dest_tu = 2;
-        assignUniforms("pixel");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
-                           1, "depth", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            loadProgram(OBJECT,  GL_COMPUTE_SHADER, "bilateralH.comp");
+            m_dest_tu = 2;
+            assignUniforms("pixel");
+            assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
+                               1, "depth", ST_NEARED_CLAMPED_FILTERED);
+            assignTextureUnit(m_dest_tu, "dest");
+        }
     }   // ComputeGaussian17TapHShader
     // ------------------------------------------------------------------------
     void render(const FrameBuffer &fb, const FrameBuffer &auxiliary,
                 const FrameBuffer &linear_depth,
                 int width, int height)
     {
-#if !defined(USE_GLES2)
-        use();
-        glBindSampler(m_dest_tu, 0);
-        setTextureUnits(fb.getRTT()[0],
-                        linear_depth.getRTT()[0]);
-        glBindImageTexture(m_dest_tu, auxiliary.getRTT()[0], 0, false,
-                           0, GL_WRITE_ONLY, GL_R16F);
-        setUniforms(core::vector2df(1.0f/width, 1.0f/height));
-        glDispatchCompute((int)width / 8 + 1, (int)height / 8 + 1, 1);
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            use();
+            glBindSampler(m_dest_tu, 0);
+            setTextureUnits(fb.getRTT()[0],
+                            linear_depth.getRTT()[0]);
+            glBindImageTexture(m_dest_tu, auxiliary.getRTT()[0], 0, false,
+                               0, GL_WRITE_ONLY, GL_R16F);
+            setUniforms(core::vector2df(1.0f/width, 1.0f/height));
+            glDispatchCompute((int)width / 8 + 1, (int)height / 8 + 1, 1);
+        }
     }   // render
 };   // ComputeGaussian17TapHShader
 
@@ -308,32 +318,33 @@ public:
 
     ComputeGaussian17TapVShader()
     {
-#if !defined(USE_GLES2)
-        loadProgram(OBJECT, GL_COMPUTE_SHADER, "bilateralV.comp");
-        m_dest_tu = 2;
-        assignUniforms("pixel");
-        assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
-                           1, "depth", ST_NEARED_CLAMPED_FILTERED);
-        assignTextureUnit(m_dest_tu, "dest");
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            loadProgram(OBJECT, GL_COMPUTE_SHADER, "bilateralV.comp");
+            m_dest_tu = 2;
+            assignUniforms("pixel");
+            assignSamplerNames(0, "source", ST_NEARED_CLAMPED_FILTERED,
+                               1, "depth", ST_NEARED_CLAMPED_FILTERED);
+            assignTextureUnit(m_dest_tu, "dest");
+        }
     }   // ComputeGaussian17TapVShader
     // ------------------------------------------------------------------------
     void render(const FrameBuffer &auxiliary, const FrameBuffer &fb,
                 const FrameBuffer &linear_depth,
                 int width, int height)
     {
-#if !defined(USE_GLES2)
-
-        use();
-        glBindSampler(m_dest_tu, 0);
-        setTextureUnits(auxiliary.getRTT()[0],
-                        linear_depth.getRTT()[0]);
-        glBindImageTexture(m_dest_tu, fb.getRTT()[0], 0, false, 0,
-                           GL_WRITE_ONLY, GL_R16F);
-        setUniforms(core::vector2df(1.0f/width, 1.0f/height));
-        glDispatchCompute((int)fb.getWidth()  / 8 + 1,
-                          (int)fb.getHeight() / 8 + 1, 1);
-#endif
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            use();
+            glBindSampler(m_dest_tu, 0);
+            setTextureUnits(auxiliary.getRTT()[0],
+                            linear_depth.getRTT()[0]);
+            glBindImageTexture(m_dest_tu, fb.getRTT()[0], 0, false, 0,
+                               GL_WRITE_ONLY, GL_R16F);
+            setUniforms(core::vector2df(1.0f/width, 1.0f/height));
+            glDispatchCompute((int)fb.getWidth()  / 8 + 1,
+                              (int)fb.getHeight() / 8 + 1, 1);
+        }
     }   // render
 };   // ComputeGaussian17TapVShader
 
@@ -874,8 +885,7 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
         Gaussian6HBlurShader::getInstance()->render(auxiliary, in_fbo.getWidth(),
                                                    in_fbo.getHeight(), sigma_h);
     }
-#if !defined(USE_GLES2)
-    else
+    else if (CVS->getRenderer() == RENDERER_GL)
     {
         const std::vector<float> &weightsV = getGaussianWeight(sigma_v, 7);
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -907,7 +917,6 @@ void PostProcessing::renderGaussian6Blur(const FrameBuffer &in_fbo,
                           (int)in_fbo.getHeight() / 8 + 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     }
-#endif
 
 }   // renderGaussian6Blur
 
@@ -937,10 +946,8 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
     assert(in_fbo.getWidth() == auxiliary.getWidth() &&
            in_fbo.getHeight() == auxiliary.getHeight());
            
-#if !defined(USE_GLES2)
-    if (CVS->supportsComputeShadersFiltering())
+    if (CVS->getRenderer() == RENDERER_GL && CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_FRAMEBUFFER_BARRIER_BIT);
-#endif
 
     {
         if (!CVS->supportsComputeShadersFiltering())
@@ -960,12 +967,10 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
                                                                in_fbo.getHeight());
         }
     }
-    
-#if !defined(USE_GLES2)
-    if (CVS->supportsComputeShadersFiltering())
+
+    if (CVS->getRenderer() == RENDERER_GL && CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-#endif
-        
+
     {
         if (!CVS->supportsComputeShadersFiltering())
         {
@@ -984,11 +989,9 @@ void PostProcessing::renderGaussian17TapBlur(const FrameBuffer &in_fbo,
                                                                in_fbo.getHeight());
         }
     }
-    
-#if !defined(USE_GLES2)
-    if (CVS->supportsComputeShadersFiltering())
+
+    if (CVS->getRenderer() == RENDERER_GL && CVS->supportsComputeShadersFiltering())
         glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
-#endif
 }   // renderGaussian17TapBlur
 
 // ----------------------------------------------------------------------------

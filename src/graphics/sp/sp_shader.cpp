@@ -46,10 +46,8 @@ SPShader::SPShader(const std::string& name,
 #ifndef SERVER_ONLY
     if (CVS->isARBTextureBufferObjectUsable())
     {
-#ifndef USE_GLES2
         m_prefilled_names["skinning_tex"] = std::make_pair<unsigned, 
                                             SamplerType>(0, ST_TEXTURE_BUFFER);
-#endif
     }
     else
     {
@@ -136,15 +134,19 @@ void SPShader::addAllTextures(RenderPass rp)
         }
         const unsigned i = (unsigned)m_prefilled_samplers[rp].size();
         glUniform1i(loc, i);
-#ifdef USE_GLES2
-        m_prefilled_samplers[rp].emplace_back(i, p.first, p.second.second,
-            p.first == "tex_array" ? GL_TEXTURE_2D_ARRAY : GL_TEXTURE_2D);
-#else
-        m_prefilled_samplers[rp].emplace_back(i, p.first, p.second.second,
-            p.second.second == ST_TEXTURE_BUFFER ?
-            GL_TEXTURE_BUFFER :
-            p.first == "tex_array" ? GL_TEXTURE_2D_ARRAY : GL_TEXTURE_2D);
-#endif
+
+        if (CVS->getRenderer() == RENDERER_GL)
+        {
+            m_prefilled_samplers[rp].emplace_back(i, p.first, p.second.second,
+                p.second.second == ST_TEXTURE_BUFFER ?
+                GL_TEXTURE_BUFFER :
+                p.first == "tex_array" ? GL_TEXTURE_2D_ARRAY : GL_TEXTURE_2D);
+        }
+        else // GLES
+        {
+            m_prefilled_samplers[rp].emplace_back(i, p.first, p.second.second,
+                p.first == "tex_array" ? GL_TEXTURE_2D_ARRAY : GL_TEXTURE_2D);
+        }
     }
 
     // Add tex_layer_0-5 if exists in shader, sampler is always ST_TRILINEAR,

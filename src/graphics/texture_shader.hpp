@@ -43,12 +43,8 @@ enum SamplerTypeNew
     ST_NEARED_CLAMPED_FILTERED,
     ST_BILINEAR_CLAMPED_FILTERED,
     ST_SEMI_TRILINEAR,
-#ifdef USE_GLES2
-    ST_MAX = ST_SEMI_TRILINEAR
-#else
     ST_TEXTURE_BUFFER,
     ST_MAX = ST_TEXTURE_BUFFER
-#endif
 };   // SamplerTypeNew
 
 // ============================================================================
@@ -222,10 +218,9 @@ public:
     template<int N, typename... HandlesId>
     void setTextureHandlesImpl(uint64_t handle, HandlesId... args)
     {
-#if !defined(USE_GLES2)
-        if (handle)
+        if (CVS->getRenderer() == RENDERER_GL && handle)
             glUniformHandleui64ARB(m_texture_location[N], handle);
-#endif
+
         setTextureHandlesImpl<N + 1>(args...);
     }   // setTextureHandlesImpl
 

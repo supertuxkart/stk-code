@@ -246,8 +246,8 @@ void SPMeshBuffer::recreateVAO(unsigned i)
         glGenBuffers(1, &m_ins_array[i]);
     }
     glBindBuffer(GL_ARRAY_BUFFER, m_ins_array[i]);
-#ifndef USE_GLES2
-    if (CVS->isARBBufferStorageUsable())
+
+    if (CVS->getRenderer() == RENDERER_GL && CVS->isARBBufferStorageUsable())
     {
         glBufferStorage(GL_ARRAY_BUFFER, m_gl_instance_size[i] * 44, NULL,
             GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
@@ -256,7 +256,6 @@ void SPMeshBuffer::recreateVAO(unsigned i)
             GL_MAP_WRITE_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT);
     }
     else
-#endif
     {
         glBufferData(GL_ARRAY_BUFFER, m_gl_instance_size[i] * 44, NULL,
             GL_DYNAMIC_DRAW);

@@ -39,13 +39,8 @@
 #endif
 #endif
 
-#if defined(USE_GLES2)
 #ifndef __APPLE__
 #include <SDL_video.h>
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
-#endif
-
 #endif
 
 static bool is_gl_init = false;
@@ -139,12 +134,9 @@ debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei le
 }
 #endif
 
-#ifdef USE_GLES2
-
 #define GL_DEBUG_SOURCE_APPLICATION 0x824A
 #define GL_DEBUG_TYPE_MARKER 0x8268
 #define GL_DEBUG_SEVERITY_NOTIFICATION 0x826B
-#endif
 
 void initGL()
 {
@@ -260,8 +252,7 @@ void draw3DLine(const core::vector3df& start,
 
 bool hasGLExtension(const char* extension) 
 {
-#if !defined(USE_GLES2)
-    if (glGetStringi != NULL)
+    if (CVS->getRenderer() == RENDERER_GL && glGetStringi != NULL)
     {
         GLint numExtensions = 0;
         glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
@@ -276,7 +267,6 @@ bool hasGLExtension(const char* extension)
         }
     }
     else
-#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         static std::vector<std::string> all_extensions;
@@ -302,8 +292,8 @@ bool hasGLExtension(const char* extension)
 const std::string getGLExtensions()
 {
     std::string result;
-#if !defined(USE_GLES2)
-    if (glGetStringi != NULL)
+
+    if (CVS->getRenderer() == RENDERER_GL && glGetStringi != NULL)
     {
         GLint num_extensions = 0;
         glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
@@ -316,7 +306,6 @@ const std::string getGLExtensions()
         }
     }
     else
-#endif
     {
         const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
         result = extensions;
@@ -712,14 +701,12 @@ bool checkGLError()
     case GL_OUT_OF_MEMORY:
         Log::warn("GLWrap", "glGetError: GL_OUT_OF_MEMORY");
         break;
-#if !defined(USE_GLES2)
     case GL_STACK_UNDERFLOW:
         Log::warn("GLWrap", "glGetError: GL_STACK_UNDERFLOW");
         break;
     case GL_STACK_OVERFLOW:
         Log::warn("GLWrap", "glGetError: GL_STACK_OVERFLOW");
         break;
-#endif
     default:
         Log::warn("GLWrap", "glGetError: %i", (int)err);
         break;

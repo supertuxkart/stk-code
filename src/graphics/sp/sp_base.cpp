@@ -259,9 +259,8 @@ void resizeSkinning(unsigned number)
             tmp_buf(stk_config->m_max_skinning_bones);
         g_joint_ptr = tmp_buf.data();
     }
-    else
+    else if (CVS->getRenderer() == RENDERER_GL)
     {
-#ifndef USE_GLES2
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
         if (CVS->isARBBufferStorageUsable())
         {
@@ -284,7 +283,6 @@ void resizeSkinning(unsigned number)
         glBindTexture(GL_TEXTURE_BUFFER, g_skinning_tex);
         glTexBuffer(GL_TEXTURE_BUFFER, GL_RGBA32F, g_skinning_buf);
         glBindTexture(GL_TEXTURE_BUFFER, 0);
-#endif
     }
 
 }   // resizeSkinning
@@ -310,9 +308,8 @@ void initSkinning()
                   " (max bones) * 16 RGBA float texture",
                   stk_config->m_max_skinning_bones);
     }
-    else
+    else if (CVS->getRenderer() == RENDERER_GL)
     {
-#ifndef USE_GLES2
         glGetIntegerv(GL_MAX_TEXTURE_BUFFER_SIZE, &max_size);
         if (stk_config->m_max_skinning_bones << 6 > (unsigned)max_size)
         {
@@ -322,7 +319,6 @@ void initSkinning()
         }
         Log::info("SharedGPUObjects", "Hardware Skinning enabled, method: TBO, "
                   "max bones: %u", stk_config->m_max_skinning_bones);
-#endif
     }
 
 
@@ -330,12 +326,12 @@ void initSkinning()
     // All buffer / skinning texture start with 2 bones for power of 2 increase
     const irr::core::matrix4 m;
     glGenTextures(1, &g_skinning_tex);
-#ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable())
+
+    if (CVS->getRenderer() == RENDERER_GL && CVS->isARBTextureBufferObjectUsable())
     {
         glGenBuffers(1, &g_skinning_buf);
     }
-#endif
+
     resizeSkinning(stk_config->m_max_skinning_bones);
 
     sp_prefilled_tex[0] = g_skinning_tex;
@@ -386,8 +382,7 @@ void loadShaders()
         // ====================================================================
         // Normal visualizer
         // ====================================================================
-#ifndef USE_GLES2
-        if (CVS->isARBGeometryShadersUsable())
+        if (CVS->getRenderer() == RENDERER_GL && CVS->isARBGeometryShadersUsable())
         {
             sps = std::make_shared<SPShader>
                 ("sp_normal_visualizer", [](SPShader* shader)
@@ -407,7 +402,6 @@ void loadShaders()
             SPShaderManager::get()->addSPShader(sps->getName(), sps);
             g_normal_visualizer = sps.get();
         }
-#endif
     }
 
     SPShaderManager::get()->setOfficialShaders();
@@ -598,16 +592,17 @@ void destroy()
     g_normal_visualizer = NULL;
     SPTextureManager::destroy();
 
-#ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
-        CVS->isARBBufferStorageUsable())
+    if (CVS->getRenderer() == RENDERER_GL)
     {
-        glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
-        glUnmapBuffer(GL_TEXTURE_BUFFER);
-        glBindBuffer(GL_TEXTURE_BUFFER, 0);
+        if (CVS->isARBTextureBufferObjectUsable() && 
+            CVS->isARBBufferStorageUsable())
+        {
+            glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
+            glUnmapBuffer(GL_TEXTURE_BUFFER);
+            glBindBuffer(GL_TEXTURE_BUFFER, 0);
+        }
+        glDeleteBuffers(1, &g_skinning_buf);
     }
-    glDeleteBuffers(1, &g_skinning_buf);
-#endif
     glDeleteTextures(1, &g_skinning_tex);
 
     for (unsigned i = 0; i < MAX_PLAYER_COUNT; i++)
@@ -1178,8 +1173,9 @@ void uploadSkinningMatrices()
     }
 
     unsigned buffer_offset = 0;
-#ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+
+    if (CVS->getRenderer() == RENDERER_GL &&
+        CVS->isARBTextureBufferObjectUsable() && 
         !CVS->isARBBufferStorageUsable())
     {
         glBindBuffer(GL_TEXTURE_BUFFER, g_skinning_buf);
@@ -1188,7 +1184,6 @@ void uploadSkinningMatrices()
             GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT |
             GL_MAP_INVALIDATE_RANGE_BIT);
     }
-#endif
 
     for (unsigned i = 0; i < g_skinning_mesh.size(); i++)
     {
@@ -1205,15 +1200,14 @@ void uploadSkinningMatrices()
             GL_FLOAT, g_joint_ptr);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-    
-#ifndef USE_GLES2
-    if (CVS->isARBTextureBufferObjectUsable() && 
+
+    if (CVS->getRenderer() == RENDERER_GL &&
+        CVS->isARBTextureBufferObjectUsable() && 
         !CVS->isARBBufferStorageUsable())
     {
         glUnmapBuffer(GL_TEXTURE_BUFFER);
         glBindBuffer(GL_TEXTURE_BUFFER, 0);
     }
-#endif
 }
 
 // ----------------------------------------------------------------------------
