@@ -39,7 +39,7 @@ option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of MbedTLS for cryptography in STK." ON
     "NOT USE_SWITCH" OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
-    "NOT SERVER_ONLY;NOT APPLE" OFF)
+    "NOT SERVER_ONLY;NOT APPLE;NOT USE_SWITCH" OFF)
 CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of the built-in version, when available." ON
     "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
@@ -618,10 +618,24 @@ target_link_libraries(supertuxkart
 if (USE_SWITCH)
   include(cmake/FindEGL.cmake)
   find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
-  find_library(NXD_LIBRARY NAMES nxd libnxd REQUIRED)
   find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
   find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
-  target_link_libraries(supertuxkart ${NX_LIBRARY} -lz -lfreetype -lSDL2 -lpng -lbz2 -lharfbuzz -logg -lvorbis -lopenal ${EGL_LIBRARY} ${DRM_LIBRARY} ${GLAPI_LIBRARY} ${NX_LIBRARY})
+  target_link_libraries(supertuxkart
+    ${NX_LIBRARY}
+    -lz
+    -lfreetype
+    -lSDL2
+    -lpng
+    -lbz2
+    -lharfbuzz
+    -logg
+    -lvorbis
+    -lopenal
+    ${EGL_LIBRARY}
+    ${DRM_LIBRARY}
+    ${GLAPI_LIBRARY}
+    ${NX_LIBRARY}
+  )
 endif()
 
 if (USE_SQLITE3)
