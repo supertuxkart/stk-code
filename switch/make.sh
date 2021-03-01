@@ -54,6 +54,7 @@ if [ ! -d "${STK_DIR}/lib/harfbuzz/cmake_build" ]; then
   cd "${STK_DIR}/lib/harfbuzz/cmake_build"
   cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
     -DUSE_SWITCH=ON -DCMAKE_INSTALL_PREFIX="${PORTLIBS_PREFIX}"  \
+    -DHB_HAVE_FREETYPE=ON \
     ../
   
   make -j$(nproc)
@@ -105,7 +106,7 @@ mv bin/stk.nro sdcard/switch/stk.nro
 echo "Compressing"
 
 # Zip up actual release:
-cd scard
+cd sdcard
 ZIP_PATH="${STK_DIR}/cmake_build/bin/SuperTuxKart-Switch-${PROJECT_VERSION}.zip"
 zip -r "${ZIP_PATH}" .
 
