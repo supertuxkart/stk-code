@@ -333,7 +333,6 @@ bool SocketAddress::isPublicAddressLocalhost() const
     if (m_family == AF_INET)
     {
         uint32_t currentIp = 0;
-        // TODO: libnx linking
         nifmGetCurrentIpAddress(&currentIp);
         // Unsure how Result works so this is the best I have
         if(currentIp)
