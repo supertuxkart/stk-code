@@ -83,7 +83,7 @@ using GUIEngine::EVENT_BLOCK;
 InputManager::InputManager() : m_mode(BOOTSTRAP),
                                m_mouse_val_x(-1), m_mouse_val_y(-1)
 {
-    Log::info("InputManager", "We're initialising InputManager!");
+    Log::info("InputManager", "Initialising InputManager!");
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
 
@@ -105,7 +105,6 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 void InputManager::addJoystick()
 {
 #ifndef SERVER_ONLY
-    Log::info("InputManager", "Adding joysticks!");
     // When irrlicht device is reinitialized the joystick added event may be
     // lost, we look for them and add it back
     for (int i = 0; i < SDL_NumJoysticks(); i++)
