@@ -83,7 +83,7 @@ using GUIEngine::EVENT_BLOCK;
 InputManager::InputManager() : m_mode(BOOTSTRAP),
                                m_mouse_val_x(-1), m_mouse_val_y(-1)
 {
-    Log::info("InputManager", "Initialising InputManager!");
+    Log::debug("InputManager", "Initialising InputManager!");
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
 
