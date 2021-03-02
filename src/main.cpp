@@ -167,7 +167,6 @@
 #endif
 
 #ifdef __SWITCH__
-#define DEBUG_NXLINK
 extern "C" {
   #include <sys/iosupport.h>
   #include <switch/kernel/svc.h>
