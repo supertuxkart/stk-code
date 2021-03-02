@@ -112,10 +112,10 @@ public:
     {
         assert(key.size() == 16);
         assert(iv.size() == 12);
-        mbedtls_gcm_init(&m_aes_encrypt_context);
-        mbedtls_gcm_init(&m_aes_decrypt_context);
         std::copy_n(iv.begin(), 12, m_iv.begin());
         m_packet_counter = 0;
+        mbedtls_gcm_init(&m_aes_encrypt_context);
+        mbedtls_gcm_init(&m_aes_decrypt_context);
         mbedtls_gcm_setkey(&m_aes_encrypt_context, MBEDTLS_CIPHER_ID_AES,
             key.data(), key.size() * 8);
         mbedtls_gcm_setkey(&m_aes_decrypt_context, MBEDTLS_CIPHER_ID_AES,
