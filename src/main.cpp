@@ -2544,6 +2544,12 @@ int main(int argc, char *argv[])
 
     delete file_manager;
 
+#ifdef __SWITCH__
+    // De-initialize stuff!
+    setExit();
+    socketExit();
+#endif
+
 #ifdef IOS_STK
     // App store may not like this, but this can happen if player uses keyboard to quit stk
     exit(0);

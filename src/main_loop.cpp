@@ -61,6 +61,22 @@
 #include <unistd.h>
 #endif
 
+#ifdef __SWITCH__
+extern "C" {
+#define Event libnx_Event
+#define u64 uint64_t
+#define u32 uint32_t
+#define s64 int64_t
+#define s32 int32_t
+#include <switch/services/applet.h>
+#undef Event
+#undef u64
+#undef u32
+#undef s64
+#undef s32
+}
+#endif
+
 MainLoop* main_loop = 0;
 
 #ifdef WIN32
@@ -427,6 +443,13 @@ void MainLoop::run()
 
     while (!m_abort)
     {
+#ifdef __SWITCH__
+      // This feeds us messages (like when the Switch sleeps or requests an exit)
+      m_abort = !appletMainLoop();
+      if(m_abort) {
+        Log::info("MainLoop", "Aborting main loop because Switch told us to!");
+      }
+#endif
 #ifdef WIN32
         if (parent != 0 && parent != INVALID_HANDLE_VALUE)
         {
