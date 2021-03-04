@@ -44,7 +44,9 @@
 #  define _WIN32_WINNT 0x600
 #  include <iphlpapi.h>
 #else
+#ifndef __SWITCH__
 #  include <ifaddrs.h>
+#endif
 #  include <net/if.h>
 #endif
 
@@ -388,7 +390,9 @@ void ServersManager::addAllBroadcastAddresses(const SocketAddress &a, int len,
 std::vector<SocketAddress> ServersManager::getBroadcastAddresses(bool ipv6)
 {
     std::vector<SocketAddress> result;
-#ifndef WIN32
+#ifdef __SWITCH__
+    return result;
+#elif !defined(WIN32)
     struct ifaddrs *addresses, *p;
 
     if (getifaddrs(&addresses) == -1)

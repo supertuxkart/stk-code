@@ -37,7 +37,9 @@
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
+#ifndef __SWITCH__
 #  include <ifaddrs.h>
+#endif
 #  include <sys/socket.h>
 #endif
 

@@ -359,7 +359,7 @@ void OptionsScreenVideo::init()
             }
         } // next found resolution
 
-#ifndef MOBILE_STK
+#if !defined(MOBILE_STK) && !defined(__SWITCH__)
         // Add default resolutions that were not found by irrlicht
         if (!found_1024_768)
         {
@@ -447,7 +447,7 @@ void OptionsScreenVideo::init()
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game);
     
-#if defined(MOBILE_STK)
+#if defined(MOBILE_STK) || defined(__SWITCH__)
     applyBtn->setVisible(false);
     full->setVisible(false);
     getWidget<LabelWidget>("fullscreenText")->setVisible(false);

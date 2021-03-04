@@ -587,7 +587,7 @@ bool CFileSystem::changeWorkingDirectoryTo(const io::path& newDirectory)
 
 io::path CFileSystem::getAbsolutePath(const io::path& filename) const
 {
-#if defined(_IRR_WINDOWS_CE_PLATFORM_)
+#if defined(_IRR_WINDOWS_CE_PLATFORM_) || defined(__SWITCH__)
 	return filename;
 #elif defined(_IRR_WINDOWS_API_)
 	wchar_t *p=0;
@@ -958,6 +958,12 @@ bool CFileSystem::existFile(const io::path& filename) const
 	#if defined(_IRR_WINDOWS_API_)
 		return (_waccess(StringUtils::utf8ToWide(filename.c_str()).c_str(), F_OK) != -1);
 	#else
+#ifdef __SWITCH__
+	if(filename.size() == 0)
+	{
+		return false;
+	}
+#endif
 		return (access(filename.c_str(), F_OK) != -1);
 	#endif
 #else

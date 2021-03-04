@@ -83,6 +83,7 @@ using GUIEngine::EVENT_BLOCK;
 InputManager::InputManager() : m_mode(BOOTSTRAP),
                                m_mouse_val_x(-1), m_mouse_val_y(-1)
 {
+    Log::debug("InputManager", "Initialising InputManager!");
     m_device_manager = new DeviceManager();
     m_device_manager->initialize();
 
@@ -93,6 +94,10 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
         Log::error("InputManager", "Failed to init SDL game controller: %s",
             SDL_GetError());
     }
+#ifdef __SWITCH__
+    // Otherwise we report 'B' as 'A' (like Xbox controller)
+    SDL_SetHint(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS, "0");
+#endif
 #endif
 }
 
@@ -119,7 +124,7 @@ void InputManager::addJoystick()
         }
         catch (std::exception& e)
         {
-            Log::error("SDLController", "%s", e.what());
+            Log::error("SDLController", "Error in addJoystick %s", e.what());
         }
     }
 #endif
@@ -189,7 +194,7 @@ void InputManager::handleJoystick(SDL_Event& event)
     }
     catch (std::exception& e)
     {
-        Log::error("SDLController", "%s", e.what());
+        Log::error("SDLController", "Error in handleJoystick() %s", e.what());
     }
 }   // handleJoystick
 #endif

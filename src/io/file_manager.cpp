@@ -175,8 +175,14 @@ FileManager::FileManager()
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
-    else if(fileExists("data/", version))
-        root_dir = "data/" ;
+#ifdef __SWITCH__
+    else if(fileExists("sdmc:/stk-data/", version))
+        root_dir = "sdmc:/stk-data/";
+    else if(fileExists("romfs:/data/", version))
+        root_dir = "romfs:/data/";
+#endif
+    else if(fileExists("./data/", version))
+        root_dir = "./data/" ;
     else if(fileExists("../data/", version))
         root_dir = "../data/" ;
     else if(fileExists("../../data/", version))
