@@ -175,6 +175,7 @@ extern "C" {
   #include <switch/services/ssl.h>
 #define Event libnx_Event
   #include <switch/services/set.h>
+  #include <switch/services/applet.h>
   #include <switch/services/nifm.h>
   #include <switch/runtime/pad.h>
 #undef Event
@@ -2076,6 +2077,9 @@ int main(int argc, char *argv[])
     // Needed to get ip address
     nifmInitialize(NifmServiceType_User);
 
+    // Boost CPU while loading:
+    appletSetCpuBoostMode(ApmCpuBoostMode_FastLoad);
+
     // Crashes on Reujinx
 #ifdef DEBUG_NXLINK
     nxlinkStdio();
@@ -2492,6 +2496,11 @@ int main(int argc, char *argv[])
             RaceManager::get()->setupPlayerKartInfo();
             RaceManager::get()->startNew(false);
         }
+
+#ifdef __SWITCH__
+        // Game loaded, bring CPU / GPU clock back to normal
+        appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
+#endif
 
         main_loop->run();
 

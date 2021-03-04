@@ -63,6 +63,22 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#ifdef __SWITCH__
+extern "C" {
+  #define u64 uint64_t
+  #define u32 uint32_t
+  #define s64 int64_t
+  #define s32 int32_t
+  #define Event libnx_Event
+  #include <switch/services/applet.h>
+  #undef Event
+  #undef u64
+  #undef u32
+  #undef s64
+  #undef s32
+}
+#endif
+
 //=============================================================================================
 RaceManager* g_race_manager[PT_COUNT];
 //---------------------------------------------------------------------------------------------
@@ -507,6 +523,10 @@ void RaceManager::startNew(bool from_overworld)
  */
 void RaceManager::startNextRace()
 {
+#ifdef __SWITCH__
+    // Throttles GPU while boosting CPU
+    appletSetCpuBoostMode(ApmCpuBoostMode_FastLoad);
+#endif
     ProcessType type = STKProcess::getType();
     main_loop->renderGUI(0);
     // Uncomment to debug audio leaks
@@ -665,6 +685,9 @@ void RaceManager::startNextRace()
         m_kart_status[i].m_last_time  = 0;
     }
     main_loop->renderGUI(8200);
+#ifdef __SWITCH__
+    appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
+#endif
 }   // startNextRace
 
 //---------------------------------------------------------------------------------------------
