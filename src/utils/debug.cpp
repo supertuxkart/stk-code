@@ -145,9 +145,8 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_EIGHT,
     DEBUG_VIEW_KART_NINE,
     DEBUG_VIEW_KART_TEN,
-    DEBUG_VIEW_KART_ELEVEN,
-    DEBUG_VIEW_KART_TWELVE,
     DEBUG_VIEW_KART_NEXT,
+    DEBUG_VIEW_KART_SLIDER,
     DEBUG_HIDE_KARTS,
     DEBUG_RESCUE_KART,
     DEBUG_PAUSE,
@@ -744,12 +743,6 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_VIEW_KART_TEN:
         changeCameraTarget(10);
         break;
-    case DEBUG_VIEW_KART_ELEVEN:
-        changeCameraTarget(11);
-        break;
-    case DEBUG_VIEW_KART_TWELVE:
-        changeCameraTarget(12);
-        break;
     case DEBUG_VIEW_KART_NEXT:
     {
         if (kart_num == World::getWorld()->getNumKarts() - 1)
@@ -762,6 +755,27 @@ bool handleContextMenuAction(s32 cmd_id)
         }
         Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
         break;
+    }
+    case DEBUG_VIEW_KART_SLIDER:
+    {
+        if (!world) return false;
+        DebugSliderDialog *dsd = new DebugSliderDialog();
+        dsd->changeLabel("Red", "Kart number");
+        dsd->setSliderHook("red_slider", 0, World::getWorld()->getNumKarts() - 1,
+            [](){ return Camera::getActiveCamera()->getKart()->getWorldKartId(); },
+            [](int new_kart_num){Camera::getActiveCamera()->
+            setKart(World::getWorld()->getKart(new_kart_num)); }
+        );
+        dsd->changeLabel("Green", "[None]");
+        dsd->toggleSlider("green_slider", false);
+        dsd->changeLabel("Blue", "[None]");
+        dsd->toggleSlider("blue_slider", false);
+        dsd->changeLabel("SSAO radius", "[None]");
+        dsd->toggleSlider("ssao_radius", false);
+        dsd->changeLabel("SSAO k", "[None]");
+        dsd->toggleSlider("ssao_k", false);
+        dsd->changeLabel("SSAO Sigma", "[None]");
+        dsd->toggleSlider("ssao_sigma", false);
     }
 
     case DEBUG_PRINT_START_POS:
@@ -1058,20 +1072,19 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Change camera target >",-1,true, true);
             sub = mnu->getSubMenu(5);
+            sub->addItem(L"Pick kart from slider", DEBUG_VIEW_KART_SLIDER);
             sub->addItem(L"To previous kart (Ctrl + F5)", DEBUG_VIEW_KART_PREVIOUS);
             sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
-            sub->addItem(L"To kart one", DEBUG_VIEW_KART_ONE);
-            sub->addItem(L"To kart two", DEBUG_VIEW_KART_TWO);
-            sub->addItem(L"To kart three", DEBUG_VIEW_KART_THREE);
-            sub->addItem(L"To kart four", DEBUG_VIEW_KART_FOUR);
-            sub->addItem(L"To kart five", DEBUG_VIEW_KART_FIVE);
-            sub->addItem(L"To kart six", DEBUG_VIEW_KART_SIX);
-            sub->addItem(L"To kart seven", DEBUG_VIEW_KART_SEVEN);
-            sub->addItem(L"To kart eight", DEBUG_VIEW_KART_EIGHT);
-            sub->addItem(L"To kart nine", DEBUG_VIEW_KART_NINE);
-            sub->addItem(L"To kart ten", DEBUG_VIEW_KART_TEN);
-            sub->addItem(L"To kart eleven", DEBUG_VIEW_KART_ELEVEN);
-            sub->addItem(L"To kart twelve", DEBUG_VIEW_KART_TWELVE);
+            sub->addItem(L"To kart 1", DEBUG_VIEW_KART_ONE);
+            sub->addItem(L"To kart 2", DEBUG_VIEW_KART_TWO);
+            sub->addItem(L"To kart 3", DEBUG_VIEW_KART_THREE);
+            sub->addItem(L"To kart 4", DEBUG_VIEW_KART_FOUR);
+            sub->addItem(L"To kart 5", DEBUG_VIEW_KART_FIVE);
+            sub->addItem(L"To kart 6", DEBUG_VIEW_KART_SIX);
+            sub->addItem(L"To kart 7", DEBUG_VIEW_KART_SEVEN);
+            sub->addItem(L"To kart 8", DEBUG_VIEW_KART_EIGHT);
+            sub->addItem(L"To kart 9", DEBUG_VIEW_KART_NINE);
+            sub->addItem(L"To kart 10", DEBUG_VIEW_KART_TEN);
 
             mnu->addItem(L"Font >",-1,true, true);
             sub = mnu->getSubMenu(6);
