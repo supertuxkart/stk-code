@@ -422,7 +422,8 @@ std::vector<SocketAddress> ServersManager::getBroadcastAddresses(bool ipv6)
     }
     else
     {
-      Log::warn("ServersManager", "Failed to get broadcast address! Error 0x%x", resultCode);
+        Log::warn("ServersManager", "Failed to get broadcast address! Error 0x%x", resultCode);
+        result = getDefaultBroadcastAddresses();
     }
     return result;
 #elif !defined(WIN32)
