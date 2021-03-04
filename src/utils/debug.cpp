@@ -870,6 +870,7 @@ bool handleContextMenuAction(s32 cmd_id)
             [](int v){        findNearestLight()->setRadius(float(v)); }
         );
         dsd->changeLabel("SSAO Sigma", "[None]");
+        dsd->toggleSlider("ssao_sigma", false);
         break;
     }
     case DEBUG_SCRIPT_CONSOLE:
