@@ -446,8 +446,9 @@ void MainLoop::run()
 #ifdef __SWITCH__
       // This feeds us messages (like when the Switch sleeps or requests an exit)
       m_abort = !appletMainLoop();
-      if(m_abort) {
-        Log::info("MainLoop", "Aborting main loop because Switch told us to!");
+      if (m_abort)
+      {
+          Log::info("MainLoop", "Aborting main loop because Switch told us to!");
       }
 #endif
 #ifdef WIN32
