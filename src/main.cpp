@@ -175,6 +175,7 @@ extern "C" {
   #include <switch/services/ssl.h>
 #define Event libnx_Event
   #include <switch/services/set.h>
+  #include <switch/services/nifm.h>
   #include <switch/runtime/pad.h>
 #undef Event
   #include <switch/runtime/devices/socket.h>
@@ -2070,9 +2071,11 @@ int main(int argc, char *argv[])
 
     // Initialize socket, needed for networking and nxlink stdio
     socketInitialize(&socketConfig);
-
     // Initialize settings, needed to grab language
     setInitialize();
+    // Needed to get ip address
+    nifmInitialize(NifmServiceType_User);
+
     // Crashes on Reujinx
 #ifdef DEBUG_NXLINK
     nxlinkStdio();
@@ -2548,6 +2551,7 @@ int main(int argc, char *argv[])
     // De-initialize stuff!
     setExit();
     socketExit();
+    nifmExit();
 #endif
 
 #ifdef IOS_STK
