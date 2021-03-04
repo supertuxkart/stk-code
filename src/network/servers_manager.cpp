@@ -46,6 +46,20 @@
 #else
 #ifndef __SWITCH__
 #  include <ifaddrs.h>
+#else
+extern "C" {
+  #define u64 uint64_t
+  #define u32 uint32_t
+  #define s64 int64_t
+  #define s32 int32_t
+  #define Event libnx_Event
+  #include <switch/services/nifm.h>
+  #undef Event
+  #undef u64
+  #undef u32
+  #undef s32
+  #undef s64
+}
 #endif
 #  include <net/if.h>
 #endif
@@ -391,6 +405,25 @@ std::vector<SocketAddress> ServersManager::getBroadcastAddresses(bool ipv6)
 {
     std::vector<SocketAddress> result;
 #ifdef __SWITCH__
+    uint32_t addr;
+    uint32_t u;
+
+    Result resultCode = nifmGetCurrentIpConfigInfo(&addr, &u, NULL, NULL, NULL);
+
+    if(R_SUCCEEDED(resultCode))
+    {
+        u = htonl(u);
+        // Convert mask to #bits:  SWAT algorithm
+        u = u - ((u >> 1) & 0x55555555);
+        u = (u & 0x33333333) + ((u >> 2) & 0x33333333);
+        u = (((u + (u >> 4)) & 0x0F0F0F0F) * 0x01010101) >> 24;
+        SocketAddress saddr(htonl(addr));
+        addAllBroadcastAddresses(saddr, u, &result);
+    }
+    else
+    {
+      Log::warn("ServersManager", "Failed to get broadcast address! Error 0x%x", resultCode);
+    }
     return result;
 #elif !defined(WIN32)
     struct ifaddrs *addresses, *p;

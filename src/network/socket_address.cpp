@@ -333,9 +333,11 @@ bool SocketAddress::isPublicAddressLocalhost() const
     if (m_family == AF_INET)
     {
         uint32_t currentIp = 0;
-        nifmGetCurrentIpAddress(&currentIp);
-        // Unsure how Result works so this is the best I have
-        if(currentIp)
+        if(R_FAILED(nifmGetCurrentIpAddress(&currentIp)))
+        {
+          Log::warn("SocketAddress", "Failed to get current address!");
+        }
+        else if(currentIp)
             return htonl(currentIp) == getIP();
     }
     return false;
