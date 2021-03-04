@@ -1762,14 +1762,18 @@ video::SColorf IrrDriver::getAmbientLight() const
 void IrrDriver::displayFPS()
 {
 #ifndef SERVER_ONLY
-    gui::IGUIFont* font = GUIEngine::getSmallFont();
+    gui::ScalableFont* font = GUIEngine::getSmallFont();
+    font->setScale(0.7f);
     core::rect<s32> position;
 
     const int fheight = font->getHeightPerLine();
+    const int rwidth = irr_driver->getActualScreenSize().Width / 6;
+    const int swidth = irr_driver->getActualScreenSize().Width / 3;
+
     if (UserConfigParams::m_artist_debug_mode)
-        position = core::rect<s32>(51, 0, 30*fheight+51, 2*fheight + fheight / 3);
+        position = core::rect<s32>(rwidth - 20, 0, int(rwidth * 4.25), 2 * fheight + (fheight / 5));
     else
-        position = core::rect<s32>(75, 0, 18*fheight+75 , fheight + fheight / 5);
+        position = core::rect<s32>(swidth, 0, swidth * 2, fheight + (fheight / 5));
     GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
@@ -1805,12 +1809,15 @@ void IrrDriver::displayFPS()
     {
         no_trust--;
 
-        static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
+        static video::SColor fpsColor = video::SColor(255, 255, 255, 255);
         fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", "-", "-",
             "-", SP::sp_solid_poly_count / 1000, ping);
 
-        font->drawQuick(fps_string,
-            core::rect< s32 >(100,0,400,50), fpsColor, false);
+        font->setBlackBorder(true);
+        font->setThinBorder(true);
+        font->drawQuick(fps_string, position, fpsColor, false);
+        font->setThinBorder(false);
+        font->setBlackBorder(false);
         return;
     }
 
@@ -1828,9 +1835,8 @@ void IrrDriver::displayFPS()
     if ((UserConfigParams::m_artist_debug_mode)&&(CVS->isGLSL()))
     {
         fps_string = StringUtils::insertValues
-                    (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
-                      "%d Shadows - LightDist : %d\nComplexity %d, Total skinning joints: %d, "
-                      "Ping: %dms",
+                    (L"FPS: %d/%d/%d - PolyCount: %d Solid, %d Shadows - LightDist: %d\n"
+                      "Complexity %d, Total skinning joints: %d, Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
                     SP::sp_shadow_poly_count, m_last_light_bucket_distance, irr_driver->getSceneComplexity(),
                     m_skinning_joint, ping);
@@ -1849,9 +1855,14 @@ void IrrDriver::displayFPS()
         }
     }
 
-    static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
+    static video::SColor fpsColor = video::SColor(255, 255, 255, 255);
 
-    font->drawQuick( fps_string.c_str(), position, fpsColor, false );
+    font->setBlackBorder(true);
+    font->setThinBorder(true);
+    font->drawQuick(fps_string.c_str(), position, fpsColor, false);
+    font->setThinBorder(false);
+    font->setBlackBorder(false);
+
 #endif
 }   // updateFPS
 
