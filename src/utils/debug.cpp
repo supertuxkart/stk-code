@@ -629,10 +629,13 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->getDevice()->getCursorControl()->setVisible(true);
         break;
     case DEBUG_GUI_CAM_WHEEL:
-        CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
-        Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        if (!(World::getWorld()->getKart(kart_num)->isGhostKart()))
+        {
+            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
+            Camera::changeCamera(0, Camera::CM_TYPE_DEBUG);
+            Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+            irr_driver->getDevice()->getCursorControl()->setVisible(true);
+        }
         break;
     case DEBUG_GUI_CAM_BEHIND_KART:
         CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
