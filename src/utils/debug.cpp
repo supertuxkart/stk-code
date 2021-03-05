@@ -194,7 +194,7 @@ void addAttachment(Attachment::AttachmentType type)
         if (type == Attachment::ATTACH_ANVIL)
         {
             kart->getAttachment()
-                ->set(type, 
+                ->set(type,
                       stk_config->time2Ticks(kart->getKartProperties()
                                                  ->getAnvilDuration()) );
             kart->adjustSpeed(kart->getKartProperties()->getAnvilSpeedFactor());
@@ -985,7 +985,7 @@ bool onEvent(const SEvent &event)
         if (GUIEngine::ModalDialog::isADialogActive() ||
             GUIEngine::ScreenKeyboard::isActive())
             return true;
-            
+
         // Create the menu (only one menu at a time)
         #ifdef MOBILE_STK
         int x = 10 * irr_driver->getActualScreenSize().Height / 480;
@@ -1152,15 +1152,16 @@ bool onEvent(const SEvent &event)
             return false;
         }
     }
-    
+
     // continue event handling if menu is not opened
-    return !g_debug_menu_visible;    
+    return !g_debug_menu_visible;
 }   // onEvent
 
 // ----------------------------------------------------------------------------
 
-bool handleStaticAction(int key)
+void handleStaticAction(int key, int value, bool control_pressed)
 {
+    World* world = World::getWorld();
     Camera* camera = Camera::getActiveCamera();
     unsigned int kart_num = 0;
     if (camera != NULL && camera->getKart() != NULL)
@@ -1168,56 +1169,189 @@ bool handleStaticAction(int key)
         kart_num = camera->getKart()->getWorldKartId();
     }
 
-    if (key == IRR_KEY_F1)
+    if (control_pressed)
     {
-        handleContextMenuAction(DEBUG_GUI_CAM_FREE);
-    }
-    else if (key == IRR_KEY_F2)
-    {
-        handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
-    }
-    else if (key == IRR_KEY_F3)
-    {
+        switch (key)
+        {
+            case IRR_KEY_F1:
+            {
+                handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
+                break;
+            }
+            case IRR_KEY_F2:
+            {
+                handleContextMenuAction(DEBUG_GUI_CAM_TOP);
+                break;
+            }
+            case IRR_KEY_F3:
+            {
+                handleContextMenuAction(DEBUG_GUI_CAM_SIDE_OF_KART);
+                break;
+            }
+            case IRR_KEY_F4:
+            {
+                handleContextMenuAction(DEBUG_GUI_CAM_INV_SIDE_OF_KART);
+                break;
+            }
+            case IRR_KEY_F5:
+            {
+                handleContextMenuAction(DEBUG_GUI_CAM_FREE);
+                break;
+            }
+            case IRR_KEY_F6:
+            {
 #ifndef SERVER_ONLY
-        SP::SPTextureManager::get()->reloadTexture("");
+                SP::SPTextureManager::get()->reloadTexture("");
 #endif
-        return true;
+                break;
+            }
+            case IRR_KEY_F7:
+            {
+                if (kart_num == 0)
+                {
+                    kart_num += World::getWorld()->getNumKarts() - 1;
+                }
+                else
+                {
+                    kart_num--;
+                }
+                Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+                break;
+            }
+            case IRR_KEY_F8:
+            {
+                if (kart_num == World::getWorld()->getNumKarts() - 1)
+                {
+                    kart_num = 0;
+                }
+                else
+                {
+                     kart_num++;
+                }
+                Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
+                break;
+            }
+            case IRR_KEY_F9:
+            {
+                if (value)
+                {
+                    UserConfigParams::m_soccer_player_list =
+                    !UserConfigParams::m_soccer_player_list;
+                }
+                break;
+            }
+            default : break;
+        }
     }
-    else if (key == IRR_KEY_F5)
+    switch (key)
     {
-        if (kart_num == 0)
+        // Flying up and down
+        case IRR_KEY_I:
         {
-            kart_num += World::getWorld()->getNumKarts() - 1;
-        }
-        else
-        {
-            kart_num--;
-        }
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        return true;
-    }
-    else if (key == IRR_KEY_F6)
-    {
-        if (kart_num == World::getWorld()->getNumKarts() - 1)
-        {
-            kart_num = 0;
-        }
-        else
-        {
-             kart_num++;
-        }
-        Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
-        return true;
-    }
-    else if (key == IRR_KEY_F7)
-    {
-        bool prev_val = UserConfigParams::m_soccer_player_list;
-        UserConfigParams::m_soccer_player_list = !prev_val;
-        return true;
-    }
-    // TODO: create more keyboard shortcuts
+            AbstractKart* kart = world->getLocalPlayerKart(0);
+            if (kart == NULL) break;
 
-    return false;
+            kart->flyUp();
+            break;
+        }
+        case IRR_KEY_K:
+        {
+            AbstractKart* kart = world->getLocalPlayerKart(0);
+            if (kart == NULL) break;
+
+            kart->flyDown();
+            break;
+        }
+        // Moving the first person camera
+        case IRR_KEY_W:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Z = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
+            break;
+        }
+        case IRR_KEY_S:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Z = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
+            break;
+        }
+        case IRR_KEY_D:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.X = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
+            break;
+        }
+        case IRR_KEY_A:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.X = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
+            break;
+        }
+        case IRR_KEY_E:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Y = value ? cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
+            break;
+        }
+        case IRR_KEY_Q:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
+            {
+                core::vector3df vel(cam->getLinearVelocity());
+                vel.Y = value ? -cam->getMaximumVelocity() : 0;
+                cam->setLinearVelocity(vel);
+            }
+            break;
+        }
+        // Rotating the first person camera
+        case IRR_KEY_R:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam )
+            {
+                cam->setAngularVelocity(value ?
+                    UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
+            }
+            break;
+        }
+        case IRR_KEY_F:
+        {
+            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
+            if (cam)
+            {
+                cam->setAngularVelocity(value ?
+                    -UserConfigParams::m_fpscam_max_angular_velocity : 0);
+            }
+            break;
+        }
+        default : break;
+    }
 }
 
 // ----------------------------------------------------------------------------
