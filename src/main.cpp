@@ -166,6 +166,26 @@
 #include <jni.h>
 #endif
 
+#ifdef __SWITCH__
+extern "C" {
+  #include <sys/iosupport.h>
+  #include <switch/kernel/svc.h>
+  #include <switch/runtime/nxlink.h>
+  #include <switch/runtime/diag.h>
+  #include <switch/services/ssl.h>
+#define Event libnx_Event
+  #include <switch/services/set.h>
+  #include <switch/services/nifm.h>
+  #include <switch/runtime/pad.h>
+#undef Event
+  #include <switch/runtime/devices/socket.h>
+}
+
+#include <dirent.h>
+#include <errno.h>
+#include <sys/types.h>
+#endif
+
 #include <stdexcept>
 #include <cstdio>
 #include <string>
@@ -1793,6 +1813,9 @@ void initRest()
     GUIEngine::setSkin(NULL);
 
     input_manager = new InputManager();
+#ifdef __SWITCH__
+    input_manager->addJoystick();
+#endif
     // Get into menu mode initially.
     input_manager->setMode(InputManager::MENU);
     // Input manager set first so it recieves SDL joystick event
@@ -1985,6 +2008,33 @@ void main_abort()
 }
 #endif
 
+#ifdef __SWITCH__
+ssize_t dotab_stdout_fn(struct _reent *r,void *fd,const char *ptr, size_t len)
+{
+    svcOutputDebugString(ptr, len);
+    return len;
+}
+
+void debugLoop()
+{
+    padConfigureInput(1, HidNpadStyleSet_NpadStandard);
+
+    PadState pad;
+    padInitializeDefault(&pad);
+
+    while(1)
+    {
+        padUpdate(&pad);
+        uint64_t down = padGetButtons(&pad);
+        if(down & HidNpadButton_Up)
+        {
+            diagAbortWithResult(0);
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+}
+#endif
+
 // ----------------------------------------------------------------------------
 #if defined(ANDROID)
 int android_main(int argc, char *argv[])
@@ -1994,6 +2044,45 @@ int ios_main(int argc, char *argv[])
 int main(int argc, char *argv[])
 #endif
 {
+#ifdef __SWITCH__
+    constexpr devoptab_t dotab_stdout = {
+        .name    = "con",
+        .write_r = dotab_stdout_fn,
+    };
+
+    devoptab_list[STD_OUT] = &dotab_stdout;
+    devoptab_list[STD_ERR] = &dotab_stdout;
+
+    // Up number of maximum concurrent sockets, otherwise we can fail while loading with nxlink
+    const SocketInitConfig socketConfig = {
+        .bsdsockets_version = 1,
+        .tcp_tx_buf_size        = 0x8000,
+        .tcp_rx_buf_size        = 0x10000,
+        .tcp_tx_buf_max_size    = 0x40000,
+        .tcp_rx_buf_max_size    = 0x40000,
+
+        .udp_tx_buf_size = 0x2400,
+        .udp_rx_buf_size = 0xA500,
+
+        .sb_efficiency = 4,
+        .num_bsd_sessions = 16,
+        .bsd_service_type = BsdServiceType_User,
+    };
+
+    // Initialize socket, needed for networking and nxlink stdio
+    socketInitialize(&socketConfig);
+    // Initialize settings, needed to grab language
+    setInitialize();
+    // Needed to get ip address
+    nifmInitialize(NifmServiceType_User);
+
+    // Crashes on Reujinx
+#ifdef DEBUG_NXLINK
+    nxlinkStdio();
+    std::thread debugThread = std::thread(debugLoop);
+#endif
+#endif
+  
     clearGlobalVariables();
     CommandLine::init(argc, argv);
 
@@ -2457,6 +2546,13 @@ int main(int argc, char *argv[])
 #endif
 
     delete file_manager;
+
+#ifdef __SWITCH__
+    // De-initialize stuff!
+    setExit();
+    socketExit();
+    nifmExit();
+#endif
 
 #ifdef IOS_STK
     // App store may not like this, but this can happen if player uses keyboard to quit stk

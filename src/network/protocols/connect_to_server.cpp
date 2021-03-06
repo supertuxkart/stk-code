@@ -55,11 +55,15 @@
 #  pragma comment(lib, "dnsapi.lib")
 #endif
 #else
+#ifndef __SWITCH__
 #  include <arpa/nameser.h>
 #  include <arpa/nameser_compat.h>
+#endif
 #  include <netdb.h>
 #  include <netinet/in.h>
+#ifndef __SWITCH__
 #  include <resolv.h>
+#endif
 #endif
 
 #include <algorithm>
@@ -405,7 +409,7 @@ int ConnectToServer::interceptCallback(ENetHost* host, ENetEvent* event)
         host->receivedData[8] == '-' && host->receivedData[9] == 's' &&
         host->receivedData[10] == 't' && host->receivedData[11] == 'k')
     {
-#ifdef ENABLE_IPV6
+#if defined(ENABLE_IPV6) || defined(__SWITCH__)
         if (enet_ip_not_equal(host->receivedAddress.host, m_server_address.host) ||
 #else
         if (host->receivedAddress.host != m_server_address.host ||
@@ -462,7 +466,8 @@ bool ConnectToServer::tryConnect(int timeout, int retry, bool another_port,
         Log::info("ConnectToServer", "Trying connecting to %s from port %d, "
             "retry remain: %d", connecting_address.c_str(),
             nw->getPort(), m_retry_count);
-        while (enet_host_service(nw->getENetHost(), &event, timeout) != 0)
+        int res;
+        while ((res = enet_host_service(nw->getENetHost(), &event, timeout)) != 0)
         {
             if (event.type == ENET_EVENT_TYPE_CONNECT)
             {
@@ -684,6 +689,8 @@ bool ConnectToServer::detectPort()
         if (port_from_dns != 0)
             break;
     }
+#elif defined(__SWITCH__)
+    // TODO: Unclear how to use libnx in this case
 #elif !defined(__CYGWIN__)
     unsigned char response[512] = {};
     const std::string& utf8name = StringUtils::wideToUtf8(m_server->getName());

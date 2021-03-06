@@ -49,11 +49,15 @@
 #  pragma comment(lib, "dnsapi.lib")
 #endif
 #else
+#ifndef __SWITCH__
 #  include <arpa/nameser.h>
 #  include <arpa/nameser_compat.h>
+#endif
 #  include <netdb.h>
 #  include <netinet/in.h>
+#ifndef __SWITCH__
 #  include <resolv.h>
+#endif
 #endif
 
 #ifdef ANDROID
@@ -567,7 +571,9 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
     env->DeleteLocalRef(class_native_activity);
     env->DeleteLocalRef(native_activity);
     g_list = NULL;
-
+#elif defined(__SWITCH__)
+    // TODO: Unclear how to get SRV records from libnx...
+    return;
 #elif !defined(__CYGWIN__)
 #define SRV_WEIGHT (RRFIXEDSZ+2)
 #define SRV_PORT (RRFIXEDSZ+4)

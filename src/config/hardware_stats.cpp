@@ -38,7 +38,9 @@
 #include <string>
 #ifndef WIN32
 #  include <sys/param.h>    // To get BSD macro
-#  include <sys/utsname.h>
+#  ifndef __SWITCH__
+#      include <sys/utsname.h>
+#  endif
 #endif
 #if defined(__APPLE__) || defined(BSD)
 #  include <sys/sysctl.h>

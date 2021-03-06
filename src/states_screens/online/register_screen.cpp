@@ -36,6 +36,20 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+#ifdef __SWITCH__
+extern "C" {
+  #define u64 uint64_t
+  #define u32 uint32_t
+  #define s64 int64_t
+  #define s32 int32_t
+  #include <switch/services/acc.h>
+  #undef u64
+  #undef u32
+  #undef s64
+  #undef s32
+}
+#endif
+
 using namespace GUIEngine;
 using namespace Online;
 using namespace irr;
@@ -100,6 +114,25 @@ void RegisterScreen::init()
         DWORD length = GetEnvironmentVariable(L"USERNAME", env.data(), 32767);
         if (length != 0)
             username = env.data();
+#elif defined(__SWITCH__)
+        AccountUid uid;
+        // It's possible the user is using an app that doesn't need a user selection
+        // We try the last opened user as well
+        if(R_SUCCEEDED(accountInitialize(AccountServiceType_Application)))
+        {
+            if(R_SUCCEEDED(accountGetPreselectedUser(&uid)) || R_SUCCEEDED(accountGetLastOpenedUser(&uid)))
+            {
+                AccountProfile profile;
+                if(R_SUCCEEDED(accountGetProfile(&profile, uid)))
+                {
+                    AccountProfileBase profileBase;
+                    if(R_SUCCEEDED(accountProfileGet(&profile, NULL, &profileBase)))
+                        username = profileBase.nickname;
+                    accountProfileClose(&profile);
+                }
+            }
+            accountExit();
+        }
 #else
         if (getenv("USER") != NULL)          // Linux, Macs
             username = getenv("USER");

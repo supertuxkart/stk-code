@@ -26,7 +26,21 @@
 #  define _WIN32_WINNT 0x600
 #  include <iphlpapi.h>
 #else
+#ifndef __SWITCH__
 #  include <ifaddrs.h>
+#else
+extern "C" {
+  #define u64 uint64_t
+  #define u32 uint32_t
+  #define s64 int64_t
+  #define s32 int32_t
+  #include <switch/services/nifm.h>
+  #undef u64
+  #undef u32
+  #undef s32
+  #undef s64
+}
+#endif
 #  include <sys/ioctl.h>
 #  include <net/if.h>
 #  include <string.h>
@@ -87,7 +101,11 @@ SocketAddress::SocketAddress(const ENetAddress& ea)
     }
 #else
     m_family = AF_INET;
+#ifdef __SWITCH__
+    setIP(htonl(ea.host.p0));
+#else
     setIP(htonl(ea.host));
+#endif
     setPort(ea.port);
 #endif
 }   // SocketAddress(const ENetAddress&)
@@ -136,6 +154,7 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
         else
             port_str = StringUtils::toString(port_number);
     }
+#ifdef ENABLE_IPV6
     else if (str[0] == '[')
     {
         // Handle [IPv6 address]:port format
@@ -151,6 +170,14 @@ void SocketAddress::init(const std::string& str, uint16_t port_number,
         else
             port_str = StringUtils::toString(port_number);
     }
+#else
+    // Ignore ipv6, otherwise we end up querying for them which can be slow
+    else if (colon_pos != std::string::npos)
+    {
+      Log::debug("SocketAddress", "Ignoring ipv6 address: %s", str.c_str());
+      return;
+    }
+#endif
     else
     {
         addr_str = str;
@@ -302,7 +329,19 @@ bool SocketAddress::isPublicAddressLocalhost() const
         return false;
     if (isLoopback())
         return true;
-#ifndef WIN32
+#ifdef __SWITCH__
+    if (m_family == AF_INET)
+    {
+        uint32_t currentIp = 0;
+        if(R_FAILED(nifmGetCurrentIpAddress(&currentIp)))
+        {
+          Log::warn("SocketAddress", "Failed to get current address!");
+        }
+        else if(currentIp)
+            return htonl(currentIp) == getIP();
+    }
+    return false;
+#elif !defined(WIN32)
     struct ifaddrs *addresses, *p;
 
     if (getifaddrs(&addresses) == -1)
@@ -715,7 +754,7 @@ ENetAddress SocketAddress::toENetAddress() const
 {
     ENetAddress ea = {};
     uint32_t ip = getIP();
-#ifdef ENABLE_IPV6
+#if defined(ENABLE_IPV6) || defined(__SWITCH__)
     if (isIPv6Socket())
     {
         struct sockaddr_in6* in6 = (struct sockaddr_in6*)m_sockaddr.data();
