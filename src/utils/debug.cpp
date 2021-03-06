@@ -39,6 +39,7 @@
 #include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
+#include "items/powerup.hpp"
 #include "items/powerup_manager.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"
@@ -80,14 +81,15 @@ static bool g_debug_menu_visible = false;
 // Commands for the debug menu
 enum DebugMenuCommand
 {
-    //! graphics commands
     DEBUG_GRAPHICS_RELOAD_SHADERS,
+    DEBUG_GRAPHICS_RELOAD_TEXTURES,
     DEBUG_GRAPHICS_RESET,
     DEBUG_GRAPHICS_SSAO_VIZ,
     DEBUG_GRAPHICS_SHADOW_VIZ,
     DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ,
     DEBUG_GRAPHICS_BULLET_1,
     DEBUG_GRAPHICS_BULLET_2,
+    DEBUG_RENDER_NW_DEBUG,
     DEBUG_PROFILER,
     DEBUG_PROFILER_WRITE_REPORT,
     DEBUG_FONT_DUMP_GLYPH_PAGE,
@@ -103,6 +105,7 @@ enum DebugMenuCommand
     DEBUG_FPS,
     DEBUG_SAVE_REPLAY,
     DEBUG_SAVE_HISTORY,
+    DEBUG_SAVE_SCREENSHOT,
     DEBUG_POWERUP_ANVIL,
     DEBUG_POWERUP_BOWLING,
     DEBUG_POWERUP_BUBBLEGUM,
@@ -115,6 +118,8 @@ enum DebugMenuCommand
     DEBUG_POWERUP_ZIPPER,
     DEBUG_POWERUP_NITRO,
     DEBUG_POWERUP_NOTHING,
+    DEBUG_NITRO_CLEAR,
+    DEBUG_POWERUP_SLIDER,
     DEBUG_ATTACHMENT_PARACHUTE,
     DEBUG_ATTACHMENT_BOMB,
     DEBUG_ATTACHMENT_ANVIL,
@@ -157,27 +162,36 @@ enum DebugMenuCommand
     DEBUG_SCRIPT_CONSOLE,
     DEBUG_RUN_CUTSCENE,
     DEBUG_TEXTURE_CONSOLE,
-    DEBUG_RENDER_NW_DEBUG,
     DEBUG_START_RECORDING,
     DEBUG_STOP_RECORDING
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
 /** Add powerup selected from debug menu for all player karts */
-void addPowerup(PowerupManager::PowerupType powerup)
+void addPowerup(PowerupManager::PowerupType powerup, int amount)
 {
     World* world = World::getWorld();
     if (!world) return;
     for(unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
     {
         AbstractKart* kart = world->getLocalPlayerKart(i);
-
-        if (powerup == PowerupManager::POWERUP_NOTHING)
-        {kart->setPowerup(powerup, 0);}
-        else
-        {kart->setPowerup(powerup, 10000);}
+        kart->setPowerup(powerup, amount);
     }
 }   // addPowerup
+
+// ----------------------------------------------------------------------------
+void setNitro(int amount)
+{
+    World* world = World::getWorld();
+    if (!world) return;
+    const unsigned int num_local_players =
+        RaceManager::get()->getNumLocalPlayers();
+    for (unsigned int i = 0; i < num_local_players; i++)
+    {
+        AbstractKart* kart = world->getLocalPlayerKart(i);
+        kart->setEnergy(amount);
+    }
+}   // setNitro
 
 // ----------------------------------------------------------------------------
 void addAttachment(Attachment::AttachmentType type)
@@ -216,7 +230,6 @@ void addAttachment(Attachment::AttachmentType type)
                 ->reset();
         }
     }
-
 }   // addAttachment
 
 // ----------------------------------------------------------------------------
@@ -233,7 +246,6 @@ void changeCameraTarget(u32 num)
         cam->setMode(Camera::CM_NORMAL);
         cam->setKart(kart);
     }
-
 }   // changeCameraTarget
 
 // -----------------------------------------------------------------------------
@@ -267,7 +279,6 @@ LightNode* findNearestLight()
             nearest_dist = cam_pos.getDistanceFrom(light_pos);
         }
     }
-
     return nearest;
 }
 
@@ -304,6 +315,11 @@ bool handleContextMenuAction(s32 cmd_id)
         ShaderBase::killShaders();
         ShaderFilesManager::getInstance()->removeAllShaderFiles();
         SP::SPShaderManager::get()->initAll();
+#endif
+        break;
+    case DEBUG_GRAPHICS_RELOAD_TEXTURES:
+#ifndef SERVER_ONLY
+        SP::SPTextureManager::get()->reloadTexture("");
 #endif
         break;
     case DEBUG_GRAPHICS_RESET:
@@ -517,50 +533,73 @@ bool handleContextMenuAction(s32 cmd_id)
         history->Save();
         break;
     case DEBUG_POWERUP_ANVIL:
-        addPowerup(PowerupManager::POWERUP_ANVIL);
+        addPowerup(PowerupManager::POWERUP_ANVIL, 255);
         break;
     case DEBUG_POWERUP_BOWLING:
-        addPowerup(PowerupManager::POWERUP_BOWLING);
+        addPowerup(PowerupManager::POWERUP_BOWLING, 255);
         break;
     case DEBUG_POWERUP_BUBBLEGUM:
-        addPowerup(PowerupManager::POWERUP_BUBBLEGUM);
+        addPowerup(PowerupManager::POWERUP_BUBBLEGUM, 255);
         break;
     case DEBUG_POWERUP_CAKE:
-        addPowerup(PowerupManager::POWERUP_CAKE);
+        addPowerup(PowerupManager::POWERUP_CAKE, 255);
         break;
     case DEBUG_POWERUP_PARACHUTE:
-        addPowerup(PowerupManager::POWERUP_PARACHUTE);
+        addPowerup(PowerupManager::POWERUP_PARACHUTE, 255);
         break;
     case DEBUG_POWERUP_PLUNGER:
-        addPowerup(PowerupManager::POWERUP_PLUNGER);
+        addPowerup(PowerupManager::POWERUP_PLUNGER, 255);
         break;
     case DEBUG_POWERUP_RUBBERBALL:
-        addPowerup(PowerupManager::POWERUP_RUBBERBALL);
+        addPowerup(PowerupManager::POWERUP_RUBBERBALL, 255);
         break;
     case DEBUG_POWERUP_SWATTER:
-        addPowerup(PowerupManager::POWERUP_SWATTER);
+        addPowerup(PowerupManager::POWERUP_SWATTER, 255);
         break;
     case DEBUG_POWERUP_SWITCH:
-        addPowerup(PowerupManager::POWERUP_SWITCH);
+        addPowerup(PowerupManager::POWERUP_SWITCH, 255);
         break;
     case DEBUG_POWERUP_ZIPPER:
-        addPowerup(PowerupManager::POWERUP_ZIPPER);
+        addPowerup(PowerupManager::POWERUP_ZIPPER, 255);
         break;
     case DEBUG_POWERUP_NITRO:
     {
-        if (!world) return false;
-        const unsigned int num_local_players =
-            RaceManager::get()->getNumLocalPlayers();
-        for (unsigned int i = 0; i < num_local_players; i++)
-        {
-            AbstractKart* kart = world->getLocalPlayerKart(i);
-            kart->setEnergy(100.0f);
-        }
+        setNitro(100.0f);
         break;
     }
     case DEBUG_POWERUP_NOTHING:
-        addPowerup(PowerupManager::POWERUP_NOTHING);
+        addPowerup(PowerupManager::POWERUP_NOTHING, 0);
         break;
+    case DEBUG_NITRO_CLEAR:
+    {
+        setNitro(0.0f);
+        break;
+    }
+    case DEBUG_POWERUP_SLIDER:
+    {
+        if (!world) return false;
+        DebugSliderDialog *dsd = new DebugSliderDialog();
+        dsd->changeLabel("Red", "Powerup count");
+        dsd->setSliderHook("red_slider", 0, 255,
+            [](){ return Camera::getActiveCamera()->getKart()->getNumPowerup(); },
+            [](int new_pw_amt){Camera::getActiveCamera()->getKart()->
+               getPowerup()->setNum(new_pw_amt); }
+        );
+        dsd->changeLabel("Green", "Nitro amount");
+        dsd->setSliderHook("green_slider", 0, 100,
+            [](){ return Camera::getActiveCamera()->getKart()->getEnergy(); },
+            [](float new_nit_amt){Camera::getActiveCamera()->getKart()->setEnergy(new_nit_amt); }
+        );
+        dsd->changeLabel("Blue", "[None]");
+        dsd->toggleSlider("blue_slider", false);
+        dsd->changeLabel("SSAO radius", "[None]");
+        dsd->toggleSlider("ssao_radius", false);
+        dsd->changeLabel("SSAO k", "[None]");
+        dsd->toggleSlider("ssao_k", false);
+        dsd->changeLabel("SSAO Sigma", "[None]");
+        dsd->toggleSlider("ssao_sigma", false);
+        break;
+    }
     case DEBUG_ATTACHMENT_ANVIL:
         addAttachment(Attachment::ATTACH_ANVIL);
         break;
@@ -612,6 +651,7 @@ bool handleContextMenuAction(s32 cmd_id)
         }
         break;
     case DEBUG_RESCUE_KART:
+        if (!world) return false;
         for (unsigned int i = 0; i < RaceManager::get()->getNumLocalPlayers(); i++)
         {
             AbstractKart* kart = world->getLocalPlayerKart(i);
@@ -619,6 +659,7 @@ bool handleContextMenuAction(s32 cmd_id)
         }
         break;
     case DEBUG_PAUSE:
+        if (!world) return false;
         world->escapePressed();
         break;
     case DEBUG_GUI_CAM_TOP:
@@ -776,6 +817,7 @@ bool handleContextMenuAction(s32 cmd_id)
         dsd->toggleSlider("ssao_k", false);
         dsd->changeLabel("SSAO Sigma", "[None]");
         dsd->toggleSlider("ssao_sigma", false);
+        break;
     }
 
     case DEBUG_PRINT_START_POS:
@@ -962,13 +1004,16 @@ bool handleContextMenuAction(s32 cmd_id)
         case DEBUG_RENDER_NW_DEBUG:
             irr_driver->toggleRenderNetworkDebug();
         break;
+        case DEBUG_SAVE_SCREENSHOT:
+            irr_driver->requestScreenshot();
+        break;
         case DEBUG_START_RECORDING:
             irr_driver->setRecording(true);
         break;
         case DEBUG_STOP_RECORDING:
             irr_driver->setRecording(false);
         break;
-    }   // switch
+    }
     return false;
 }
 
@@ -992,31 +1037,151 @@ bool onEvent(const SEvent &event)
         int y = 30 * irr_driver->getActualScreenSize().Height / 480;
         if (event.MouseInput.X < x && event.MouseInput.Y < y &&
         #else
-        if (event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN &&
+        if ((event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN ||
+             event.MouseInput.Event == EMIE_MMOUSE_PRESSED_DOWN) &&
         #endif
             !g_debug_menu_visible)
         {
             irr_driver->getDevice()->getCursorControl()->setVisible(true);
 
             // root menu
+            const int mwidth = 400;
+            const int mheight = 600;
+
+            // Adapt the position boundaries of the debug menu based on the
+            // current screen and font sizes
+            int boundx, boundy;
+            float scalex, scaley;
+            switch (int(UserConfigParams::m_font_size))
+            {
+                case 0: // Extremely small font
+                {
+                    scalex = 9.0;
+                    scaley = 2.62;
+                    break;
+                }
+                case 1: // Very small font
+                {
+                    scalex = 7.0;
+                    scaley = 2.1;
+                    break;
+                }
+                case 2: // Small font
+                {
+                    scalex = 5.5;
+                    scaley = 1.7;
+                    break;
+                }
+                case 3: // Medium font
+                {
+                    scalex = 5.0;
+                    scaley = 1.5;
+                    break;
+                }
+                case 4: // Large font
+                {
+                    scalex = 4.5;
+                    scaley = 1.31;
+                    break;
+                }
+                case 5: // Very large font
+                {
+                    scalex = 4.0;
+                    scaley = 1.14;
+                    break;
+                }
+                case 6: // Extremely large font
+                {
+                    scalex = 3.5;
+                    scaley = 1.01;
+                    break;
+                }
+                default: // Medium font
+                {
+                    scalex = 5.0;
+                    scaley = 1.5;
+                    break;
+                }
+            }
+
+            boundx = irr_driver->getActualScreenSize().Width -
+            int(irr_driver->getActualScreenSize().Width / scalex);
+            boundy = irr_driver->getActualScreenSize().Height -
+            int(irr_driver->getActualScreenSize().Height / scaley);
+
             gui::IGUIEnvironment* guienv = irr_driver->getGUI();
-            core::rect<s32> r(100, 50, 150, 500);
-            IGUIContextMenu* mnu = guienv->addContextMenu(r, NULL);
+            core::rect<s32> position;
+            if (event.MouseInput.X > boundx && event.MouseInput.Y > boundy)
+            {
+                position = core::rect<s32>(boundx, boundy, mwidth, mheight);
+            }
+            else if (event.MouseInput.X > boundx)
+            {
+                position = core::rect<s32>(boundx, event.MouseInput.Y, mwidth, mheight);
+            }
+            else if (event.MouseInput.Y > boundy)
+            {
+                position = core::rect<s32>(event.MouseInput.X, boundy, mwidth, mheight);
+            }
+            else
+            {
+                position = core::rect<s32>(event.MouseInput.X, event.MouseInput.Y, mwidth, mheight);
+            }
+            IGUIContextMenu* mnu = guienv->addContextMenu(position, NULL);
+
             int graphicsMenuIndex = mnu->addItem(L"Graphics >",-1,true,true);
 
-            // graphics menu
             IGUIContextMenu* sub = mnu->getSubMenu(graphicsMenuIndex);
 
             sub->addItem(L"Reload shaders", DEBUG_GRAPHICS_RELOAD_SHADERS);
+            sub->addItem(L"Reload textures (Ctrl + F6)", DEBUG_GRAPHICS_RELOAD_TEXTURES);
+            sub->addSeparator();
             sub->addItem(L"SSAO viz", DEBUG_GRAPHICS_SSAO_VIZ);
             sub->addItem(L"Shadow viz", DEBUG_GRAPHICS_SHADOW_VIZ);
             sub->addItem(L"Bounding Boxes viz", DEBUG_GRAPHICS_BOUNDING_BOXES_VIZ);
             sub->addItem(L"Physics debug", DEBUG_GRAPHICS_BULLET_1);
             sub->addItem(L"Physics debug (no kart)", DEBUG_GRAPHICS_BULLET_2);
+            sub->addItem(L"Network debugging", DEBUG_RENDER_NW_DEBUG);
+            sub->addSeparator();
             sub->addItem(L"Reset debug views", DEBUG_GRAPHICS_RESET);
 
-            mnu->addItem(L"Items >",-1,true,true);
+            mnu->addItem(L"Set camera target >",-1,true, true);
             sub = mnu->getSubMenu(1);
+            sub->addItem(L"Pick kart from slider", DEBUG_VIEW_KART_SLIDER);
+            sub->addSeparator();
+            sub->addItem(L"To previous kart (Ctrl + F7)", DEBUG_VIEW_KART_PREVIOUS);
+            sub->addItem(L"To next kart (Ctrl + F8)", DEBUG_VIEW_KART_NEXT);
+            sub->addSeparator();
+            sub->addItem(L"To kart 1", DEBUG_VIEW_KART_ONE);
+            sub->addItem(L"To kart 2", DEBUG_VIEW_KART_TWO);
+            sub->addItem(L"To kart 3", DEBUG_VIEW_KART_THREE);
+            sub->addItem(L"To kart 4", DEBUG_VIEW_KART_FOUR);
+            sub->addItem(L"To kart 5", DEBUG_VIEW_KART_FIVE);
+            sub->addItem(L"To kart 6", DEBUG_VIEW_KART_SIX);
+            sub->addItem(L"To kart 7", DEBUG_VIEW_KART_SEVEN);
+            sub->addItem(L"To kart 8", DEBUG_VIEW_KART_EIGHT);
+            sub->addItem(L"To kart 9", DEBUG_VIEW_KART_NINE);
+            sub->addItem(L"To kart 10", DEBUG_VIEW_KART_TEN);
+
+            mnu->addItem(L"GUI >",-1,true, true);
+            sub = mnu->getSubMenu(2);
+            sub->addItem(L"Toggle GUI", DEBUG_GUI_TOGGLE);
+            sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
+            sub->addSeparator();
+            sub->addItem(L"Top view (Ctrl + F2)", DEBUG_GUI_CAM_TOP);
+            sub->addItem(L"Behind wheel view", DEBUG_GUI_CAM_WHEEL);
+            sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
+            sub->addItem(L"Right side of kart view (Ctrl + F3)", DEBUG_GUI_CAM_SIDE_OF_KART);
+            sub->addItem(L"Left side of kart view (Ctrl + F4)", DEBUG_GUI_CAM_INV_SIDE_OF_KART);
+            sub->addItem(L"Front of kart view", DEBUG_GUI_CAM_FRONT_OF_KART);
+            sub->addItem(L"First person view (Ctrl + F5)", DEBUG_GUI_CAM_FREE);
+            sub->addItem(L"Normal view (Ctrl + F1)", DEBUG_GUI_CAM_NORMAL);
+            sub->addSeparator();
+            sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
+            sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
+
+            mnu->addItem(L"Items >",-1,true,true);
+            sub = mnu->getSubMenu(3);
             sub->addItem(L"Anvil", DEBUG_POWERUP_ANVIL );
             sub->addItem(L"Basketball", DEBUG_POWERUP_RUBBERBALL );
             sub->addItem(L"Bowling", DEBUG_POWERUP_BOWLING );
@@ -1028,36 +1193,43 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Switch", DEBUG_POWERUP_SWITCH );
             sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
-            sub->addItem(L"Clear", DEBUG_POWERUP_NOTHING );
 
             mnu->addItem(L"Attachments >",-1,true, true);
-            sub = mnu->getSubMenu(2);
+            sub = mnu->getSubMenu(4);
             sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
             sub->addItem(L"Flatten", DEBUG_ATTACHMENT_SQUASH);
             sub->addItem(L"Plunger", DEBUG_ATTACHMENT_PLUNGER);
             sub->addItem(L"Explosion", DEBUG_ATTACHMENT_EXPLOSION);
-            sub->addItem(L"Clear", DEBUG_ATTACHMENT_NOTHING);
 
-            mnu->addItem(L"GUI >",-1,true, true);
-            sub = mnu->getSubMenu(3);
-            sub->addItem(L"Toggle GUI", DEBUG_GUI_TOGGLE);
-            sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
-            sub->addItem(L"Top view", DEBUG_GUI_CAM_TOP);
-            sub->addItem(L"Behind wheel view", DEBUG_GUI_CAM_WHEEL);
-            sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
-            sub->addItem(L"Right side of kart view", DEBUG_GUI_CAM_SIDE_OF_KART);
-            sub->addItem(L"Left side of kart view", DEBUG_GUI_CAM_INV_SIDE_OF_KART);
-            sub->addItem(L"Front of kart view", DEBUG_GUI_CAM_FRONT_OF_KART);
-            sub->addItem(L"First person view (Ctrl + F1)", DEBUG_GUI_CAM_FREE);
-            sub->addItem(L"Normal view (Ctrl + F2)", DEBUG_GUI_CAM_NORMAL);
-            sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
-            sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
+            mnu->addItem(L"Modify kart items >",-1,true, true);
+            sub = mnu->getSubMenu(5);
+            sub->addItem(L"Adjust with slider", DEBUG_POWERUP_SLIDER);
+            sub->addSeparator();
+            sub->addItem(L"Clear powerup", DEBUG_POWERUP_NOTHING );
+            sub->addItem(L"Clear nitro", DEBUG_NITRO_CLEAR );
+            sub->addItem(L"Clear attachment", DEBUG_ATTACHMENT_NOTHING);
+
+            mnu->addItem(L"SP debug >",-1,true, true);
+            sub = mnu->getSubMenu(6);
+            sub->addItem(L"Reset SP debug", DEBUG_SP_RESET);
+            sub->addItem(L"Toggle culling", DEBUG_SP_TOGGLE_CULLING);
+            sub->addItem(L"Draw world normal in texture", DEBUG_SP_WN_VIZ);
+            sub->addItem(L"Toggle normals visualization", DEBUG_SP_NORMALS_VIZ);
+            sub->addItem(L"Toggle tangents visualization", DEBUG_SP_TANGENTS_VIZ);
+            sub->addItem(L"Toggle bitangents visualization", DEBUG_SP_BITANGENTS_VIZ);
+            sub->addItem(L"Toggle wireframe visualization", DEBUG_SP_WIREFRAME_VIZ);
+            sub->addItem(L"Toggle triangle normals visualization", DEBUG_SP_TN_VIZ);
+
+            mnu->addItem(L"Keypress actions >",-1,true, true);
+            sub = mnu->getSubMenu(7);
+            sub->addItem(L"Rescue", DEBUG_RESCUE_KART);
+            sub->addItem(L"Pause", DEBUG_PAUSE);
 
             mnu->addItem(L"Recording >",-1,true, true);
-            sub = mnu->getSubMenu(4);
-                                                                                //
+            sub = mnu->getSubMenu(8);
+
 #ifdef ENABLE_RECORDER
             sub->addItem(L"Start recording", DEBUG_START_RECORDING);
             sub->addItem(L"Stop recording", DEBUG_STOP_RECORDING);
@@ -1070,59 +1242,41 @@ bool onEvent(const SEvent &event)
                           "distributions's package mantainer.");
 #endif
 
-            mnu->addItem(L"Change camera target >",-1,true, true);
-            sub = mnu->getSubMenu(5);
-            sub->addItem(L"Pick kart from slider", DEBUG_VIEW_KART_SLIDER);
-            sub->addItem(L"To previous kart (Ctrl + F5)", DEBUG_VIEW_KART_PREVIOUS);
-            sub->addItem(L"To next kart (Ctrl + F6)", DEBUG_VIEW_KART_NEXT);
-            sub->addItem(L"To kart 1", DEBUG_VIEW_KART_ONE);
-            sub->addItem(L"To kart 2", DEBUG_VIEW_KART_TWO);
-            sub->addItem(L"To kart 3", DEBUG_VIEW_KART_THREE);
-            sub->addItem(L"To kart 4", DEBUG_VIEW_KART_FOUR);
-            sub->addItem(L"To kart 5", DEBUG_VIEW_KART_FIVE);
-            sub->addItem(L"To kart 6", DEBUG_VIEW_KART_SIX);
-            sub->addItem(L"To kart 7", DEBUG_VIEW_KART_SEVEN);
-            sub->addItem(L"To kart 8", DEBUG_VIEW_KART_EIGHT);
-            sub->addItem(L"To kart 9", DEBUG_VIEW_KART_NINE);
-            sub->addItem(L"To kart 10", DEBUG_VIEW_KART_TEN);
+            mnu->addItem(L"Output >",-1,true, true);
+            sub = mnu->getSubMenu(9);
+            sub->addItem(L"Print kart positions", DEBUG_PRINT_START_POS);
+            sub->addSeparator();
+            sub->addItem(L"Save screenshot", DEBUG_SAVE_SCREENSHOT);
+            sub->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
+            sub->addItem(L"Save history", DEBUG_SAVE_HISTORY);
+            sub->addSeparator();
+            sub->addItem(L"Profiler", DEBUG_PROFILER);
+            if (UserConfigParams::m_profiler_enabled)
+            {
+                sub->addItem(L"Save profiler report", DEBUG_PROFILER_WRITE_REPORT);
+            }
+
+            mnu->addItem(L"Consoles >",-1,true, true);
+            sub = mnu->getSubMenu(10);
+            sub->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
+            sub->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
+            sub->addItem(L"Texture console", DEBUG_TEXTURE_CONSOLE);
 
             mnu->addItem(L"Font >",-1,true, true);
-            sub = mnu->getSubMenu(6);
+            sub = mnu->getSubMenu(11);
             sub->addItem(L"Dump glyph pages of fonts", DEBUG_FONT_DUMP_GLYPH_PAGE);
             sub->addItem(L"Reload all fonts", DEBUG_FONT_RELOAD);
 
-            mnu->addItem(L"SP debug >",-1,true, true);
-            sub = mnu->getSubMenu(7);
-            sub->addItem(L"Reset SP debug", DEBUG_SP_RESET);
-            sub->addItem(L"Toggle culling", DEBUG_SP_TOGGLE_CULLING);
-            sub->addItem(L"Draw world normal in texture", DEBUG_SP_WN_VIZ);
-            sub->addItem(L"Toggle normals visualization", DEBUG_SP_NORMALS_VIZ);
-            sub->addItem(L"Toggle tangents visualization", DEBUG_SP_TANGENTS_VIZ);
-            sub->addItem(L"Toggle bitangents visualization", DEBUG_SP_BITANGENTS_VIZ);
-            sub->addItem(L"Toggle wireframe visualization", DEBUG_SP_WIREFRAME_VIZ);
-            sub->addItem(L"Toggle triangle normals visualization", DEBUG_SP_TN_VIZ);
+            mnu->addItem(L"Lighting >",-1,true, true);
+            sub = mnu->getSubMenu(12);
+            sub->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
+            sub->addItem(L"Adjust lights", DEBUG_ADJUST_LIGHTS);
 
-            mnu->addItem(L"Keypress actions >",-1,true, true);
-            sub = mnu->getSubMenu(8);
-            sub->addItem(L"Rescue", DEBUG_RESCUE_KART);
-            sub->addItem(L"Pause", DEBUG_PAUSE);
+            mnu->addItem(L"FPS >",-1,true, true);
+            sub = mnu->getSubMenu(13);
+            sub->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
+            sub->addItem(L"Toggle FPS", DEBUG_FPS);
 
-            mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
-
-            mnu->addItem(L"Profiler", DEBUG_PROFILER);
-            if (UserConfigParams::m_profiler_enabled)
-                mnu->addItem(L"Save profiler report",
-                             DEBUG_PROFILER_WRITE_REPORT);
-            mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
-            mnu->addItem(L"Toggle FPS", DEBUG_FPS);
-            mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
-            mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
-            mnu->addItem(L"Print position", DEBUG_PRINT_START_POS);
-            mnu->addItem(L"Adjust Lights", DEBUG_ADJUST_LIGHTS);
-            mnu->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
-            mnu->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
-            mnu->addItem(L"Texture console", DEBUG_TEXTURE_CONSOLE);
-            mnu->addItem(L"Network debugging", DEBUG_RENDER_NW_DEBUG);
             g_debug_menu_visible = true;
             irr_driver->showPointer();
         }
@@ -1200,9 +1354,7 @@ void handleStaticAction(int key, int value, bool control_pressed)
             }
             case IRR_KEY_F6:
             {
-#ifndef SERVER_ONLY
-                SP::SPTextureManager::get()->reloadTexture("");
-#endif
+                handleContextMenuAction(DEBUG_GRAPHICS_RELOAD_TEXTURES);
                 break;
             }
             case IRR_KEY_F7:
