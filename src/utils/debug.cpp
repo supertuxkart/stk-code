@@ -58,7 +58,7 @@
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
-#include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
@@ -1034,13 +1034,27 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->setRecording(false);
         break;
     case DEBUG_HELP:
-        new MessageDialog(_("Debug keyboard shortcuts:\n"
-                            "* \n"
-                            "* \n"
-                            "* \n"
-                            "* \n"),
-                            MessageDialog::MESSAGE_DIALOG_OK,
-                            NULL, false, false, 0.6f, 0.7f);
+        new TutorialMessageDialog(_("Debug keyboard shortcuts (can conflict with user-defined shortcuts):\n"
+                            "* <~> - Show this help dialog | + <Ctrl> - Adjust lights | + <Shift> - Adjust visuals\n"
+                            "* <F1> - Anvil powerup | + <Ctrl> - Normal view | + <Shift> - Bomb attachment\n"
+                            "* <F2> - Basketball powerup | + <Ctrl> - First person view | + <Shift> - Anvil attachment\n"
+                            "* <F3> - Bowling ball powerup | + <Ctrl> - Top view | + <Shift> - Parachute attachment\n"
+                            "* <F4> - Bubblegum powerup | + <Ctrl> - Behind wheel view | + <Shift> - Flatten kart\n"
+                            "* <F5> - Cake powerup | + <Ctrl> - Behind kart view | + <Shift> - Send plunger to kart front\n"
+                            "* <F6> - Parachute powerup | + <Ctrl> - Right side of kart view | + <Shift> - Explode kart\n"
+                            "* <F7> - Plunger powerup | + <Ctrl> - Left side of kart view | + <Shift> - Scripting console\n"
+                            "* <F8> - Swatter powerup | + <Ctrl> - Front of kart view | + <Shift> - Texture console\n"
+                            "* <F9> - Switch powerup | + <Ctrl> - Kart number slider | + <Shift> - Run cutscene(s)\n"
+                            "* <F10> - Zipper powerup | + <Ctrl> - Powerup amount slider | + <Shift> - Toggle GUI\n"
+                            "* <F11> - Save replay | + <Ctrl> - Save history | + <Shift> - Dump RTT\n"
+                            "* <F12> - Show FPS | + <Ctrl> - Show other karts' powerups | + <Shift> - Show soccer player list\n"
+                            "* <Insert> - Overfilled nitro\n"
+                            "* <Delete> - Clear kart items\n"
+                            "* <Home> - First kart\n"
+                            "* <End> - Last kart\n"
+                            "* <Page Up> - Previous kart\n"
+                            "* <Page Down> - Next kart"
+                            ), true);
         break;
     }
     return false;
@@ -1176,7 +1190,7 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Set camera target >",-1,true, true);
             sub = mnu->getSubMenu(1);
-            sub->addItem(L"Pick kart from slider", DEBUG_VIEW_KART_SLIDER);
+            sub->addItem(L"Pick kart from slider (Ctrl + F9)", DEBUG_VIEW_KART_SLIDER);
             sub->addSeparator();
             sub->addItem(L"To previous kart (Page Up)", DEBUG_VIEW_KART_PREVIOUS);
             sub->addItem(L"To next kart (Page Down)", DEBUG_VIEW_KART_NEXT);
@@ -1235,7 +1249,7 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Modify kart items >",-1,true, true);
             sub = mnu->getSubMenu(5);
-            sub->addItem(L"Adjust with slider", DEBUG_POWERUP_SLIDER);
+            sub->addItem(L"Adjust with slider (Ctrl + F10)", DEBUG_POWERUP_SLIDER);
             sub->addSeparator();
             sub->addItem(L"Clear powerup (Delete)", DEBUG_POWERUP_NOTHING );
             sub->addItem(L"Clear nitro (Delete)", DEBUG_NITRO_CLEAR );
@@ -1300,15 +1314,15 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Lighting >",-1,true, true);
             sub = mnu->getSubMenu(12);
-            sub->addItem(L"Adjust values (Shift + `/~)", DEBUG_VISUAL_VALUES);
-            sub->addItem(L"Adjust lights (Ctrl + `/~)", DEBUG_ADJUST_LIGHTS);
+            sub->addItem(L"Adjust values (Shift + ~)", DEBUG_VISUAL_VALUES);
+            sub->addItem(L"Adjust lights (Ctrl + ~)", DEBUG_ADJUST_LIGHTS);
 
             mnu->addItem(L"FPS >",-1,true, true);
             sub = mnu->getSubMenu(13);
             sub->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             sub->addItem(L"Toggle FPS (F12)", DEBUG_FPS);
 
-            mnu->addItem(L"Debug keys (`/~)", DEBUG_HELP);
+            mnu->addItem(L"Debug keys (~)", DEBUG_HELP);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -1412,7 +1426,7 @@ void handleStaticAction(int key, int value, bool control_pressed, bool shift_pre
                 }
                 else if (shift_pressed)
                 {
-                   handleContextMenuAction(DEBUG_ATTACHMENT_PARACHUTE); 
+                   handleContextMenuAction(DEBUG_ATTACHMENT_PARACHUTE);
                 }
                 else
                 {
