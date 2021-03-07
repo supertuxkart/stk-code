@@ -12,6 +12,9 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/translation.hpp"
+#include "network/protocols/client_lobby.hpp"
+#include "network/protocols/lobby_protocol.hpp"
+#include "network/server.hpp"
 
 #include <locale>
 #include <codecvt>
@@ -35,13 +38,13 @@ RichPresence* g_rich_presence = nullptr;
 
 RichPresence* RichPresence::get() {
     if (g_rich_presence == nullptr)
-    {  
+    {
         g_rich_presence = new RichPresence();
     }
     return g_rich_presence;
 }
 
-RichPresence::RichPresence() : m_connected(false), m_ready(false), m_last(0) {
+RichPresence::RichPresence() : m_connected(false), m_ready(false), m_last(0), m_socket(-1), m_thread(nullptr) {
     doConnect();
 }
 RichPresence::~RichPresence() {
@@ -49,16 +52,29 @@ RichPresence::~RichPresence() {
 }
 
 void RichPresence::terminate() {
-    if (m_connected)
+#ifdef WIN32
+#define UNCLEAN m_socket != INVALID_HANDLE_VALUE
+#else
+#define UNCLEAN m_socket != -1
+#endif
+    if (m_connected || UNCLEAN)
     {
-        Log::info("RichPresence", "Terminating");
+        if (UNCLEAN && !m_connected)
+            Log::fatal("RichPresence", "RichPresence terminated uncleanly! Socket is %d", m_socket);
 #ifndef WIN32
         close(m_socket);
+        m_socket = -1;
 #else
         CloseHandle(m_socket);
+        m_socket = INVALID_HANDLE_VALUE;
 #endif
         m_connected = false;
         m_ready = false;
+    }
+    if(m_thread != nullptr && STKProcess::getType() == PT_MAIN)
+    {
+        m_thread->join();
+        m_thread = nullptr;
     }
 }
 
@@ -81,7 +97,7 @@ bool RichPresence::doConnect() {
     std::string basePath = "";
 #define TRY_ENV(path) env = std::getenv(path); \
     if (env != nullptr) \
-    { \
+    {\
         basePath = env; \
         goto completed; \
     }
@@ -107,14 +123,16 @@ bool RichPresence::doConnect() {
     }
 
     if (m_connected)
-    {  
+    {
         if (UserConfigParams::m_rich_presence_debug)
             Log::info("RichPresence", "Connection opened with Discord!");
-        std::thread(finishConnection, this).join();
+        m_thread = new std::thread(finishConnection, this);
         return true;
     }
     else
-    {  
+    {
+        // Force cleanup:
+        m_connected = true;
         terminate();
         return false;
     }
@@ -133,14 +151,16 @@ void RichPresence::readData() {
     {
         Log::error("RichPresence", "Couldn't read from pipe! Error %x", GetLastError());
         free(basePacket);
+        terminate();
         return;
     }
 #else
     int read = recv(m_socket, basePacket, baseLength, 0);
     if (read == -1)
-    {  
+    {
         if (UserConfigParams::m_rich_presence_debug)
             perror("Couldn't read data from socket!");
+        terminate();
         return;
     }
 #endif
@@ -155,10 +175,15 @@ void RichPresence::readData() {
     {
         Log::error("RichPresence", "Couldn't read from pipe! Error %x", GetLastError());
         free(packet);
+        terminate();
         return;
     }
 #else
     read = recv(m_socket, packet->data, packet->length, 0);
+    if (read == -1)
+    {
+        terminate();
+    }
 #endif
 
     packet->data[packet->length] = '\0';
@@ -193,7 +218,7 @@ bool RichPresence::tryConnect(std::string path) {
     memset(addr.sun_path, 0, sizeof(addr.sun_path));
     snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", path.c_str());
     if(connect(m_socket, (struct sockaddr *) &addr, sizeof(addr)) == -1)
-    { 
+    {
         // Something is probably wrong:
         if (errno != ENOENT && errno != ECONNREFUSED)
         {
@@ -223,8 +248,8 @@ bool RichPresence::tryConnect(std::string path) {
                 0, NULL);
 
             Log::warn("RichPresence", "Couldn't open file! %s Error: %ls", path.c_str(), errorText);
-            return false;
         }
+        return false;
     }
     m_connected = true;
 #endif
@@ -245,7 +270,7 @@ void RichPresence::handshake() {
 void RichPresence::sendData(int32_t op, std::string json) {
     // Handshake will make us ready:
     if (op != OP_HANDSHAKE && !m_ready)
-    {    
+    {
         Log::warn("RichPresence", "Tried sending data while not ready?");
         return;
     }
@@ -270,7 +295,7 @@ void RichPresence::sendData(int32_t op, std::string json) {
         if (errno != EPIPE)
             perror("Couldn't send data to Discord socket!");
         else
-        {  
+        {
             if (UserConfigParams::m_rich_presence_debug)
                 Log::debug("RichPresence", "Got an EPIPE, closing");
             // EPIPE, cleanup!
@@ -282,8 +307,9 @@ void RichPresence::sendData(int32_t op, std::string json) {
     WriteFile(m_socket, packet, length, &written, NULL);
     // TODO
     if(written != length)
-    { 
+    {
         Log::warn("RichPresence", "Amount written != data size!");
+        terminate();
     }
 #endif // AF_UNIX
 }
@@ -297,19 +323,17 @@ void RichPresence::update(bool force) {
     }
     time_t now = time(NULL);
     if ((now - m_last) < 10 && !force)
-    {  
+    {
         // Only update every 10s
         return;
     }
     // Retry connection:
     if (!m_connected)
-    {  
+    {
         doConnect();
     }
     if (!m_ready)
-    {  
-        if (m_connected)
-            Log::debug("RichPresence", "Connected but not ready! Waiting...");
+    {
         return;
     }
     if (UserConfigParams::m_rich_presence_debug)
@@ -342,7 +366,7 @@ void RichPresence::update(bool force) {
     // Discord takes the time when we started as unix timestamp
     uint64_t since = (now * 1000) - StkTime::getMonoTimeMs();
     if (world)
-    {  
+    {
       since += world->getStart();
     }
 
@@ -360,6 +384,14 @@ void RichPresence::update(bool force) {
         Track* track = track_manager->getTrack(trackId);
         if (track)
             trackName = convert.to_bytes(track->getName().c_str());
+        auto protocol = LobbyProtocol::get<ClientLobby>();
+        if (protocol != nullptr && protocol.get()->getJoinedServer() != nullptr)
+        {
+            trackName.append(" - ");
+            trackName.append(convert.to_bytes(
+                protocol.get()->getJoinedServer().get()->getName().c_str()
+            ));
+        }
     }
 
     activity->add("state", std::string(trackName.c_str()));
@@ -368,14 +400,14 @@ void RichPresence::update(bool force) {
 
     HardwareStats::Json *assets = new HardwareStats::Json();
     if (world)
-    {  
+    {
         Track* track = track_manager->getTrack(trackId);
-        assets->add("large_text", trackName);
+        assets->add("large_text", convert.to_bytes(track->getName().c_str()));
         assets->add("large_image", track->isAddon() ?
                     "addons" : "track_" + trackId);
         AbstractKart *abstractKart = world->getLocalPlayerKart(0);
         if (abstractKart)
-        {  
+        {
             const KartProperties* kart = abstractKart->getKartProperties();
             assets->add("small_image", kart->isAddon() ?
                         "addons" : "kart_" + abstractKart->getIdent());
@@ -415,9 +447,6 @@ void RichPresence::update(bool force) {
     base->finish();
 
     sendData(OP_DATA, base->toString());
-
-    // Good to flush the rest of the data...
-    readData();
 #endif
 }
 
