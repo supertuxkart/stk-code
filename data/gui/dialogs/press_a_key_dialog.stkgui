@@ -2,15 +2,19 @@
 <stkgui>
     <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
 
+        <spacer proportion="1" />
+
         <label id="title" width="100%" text_align="center" text="Press fully and release..." proportion="1" I18N="When changing input configurations" word_wrap="true"/>
 
-        <spacer height="4%" width="10" />
+        <spacer proportion="1" />
 
-        <button id="assignEsc" I18N="When configuring input" text="Assign to ESC key" align="center"/>
-        <spacer height="2%" width="10" />
-        <button id="assignNone"    I18N="When configuring input" text="Assign nothing" align="center"/>
-        <spacer height="2%" width="10" />
-        <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
-
+        <buttonbar id="buttons" height="45%" width="100%" align="center">
+            <icon-button id="assignEsc" width="128" height="128" icon="gui/icons/back.png"
+                I18N="When configuring input" text="Assign to ESC key" align="center"/>
+            <icon-button id="assignNone" width="128" height="128" icon="gui/icons/remove.png"
+                I18N="When configuring input" text="Assign nothing" align="center"/>
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
+                I18N="When configuring input" text="Cancel" align="center"/>
+        </buttonbar>
     </div>
 </stkgui>

@@ -17,8 +17,11 @@
 
 
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input.hpp"
 #include "input/input_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/options/options_screen_device.hpp"
 #include "utils/string_utils.hpp"
@@ -33,17 +36,18 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h, const bool isKeyb
         ModalDialog(w, h)
 {
     loadFromFile("press_a_key_dialog.stkgui");
+    Widget* title = getWidget("title");
     if(isKeyboardFlag)
     {
-        Widget* title = getWidget("title");
         // I18N: In press a key dialog, tell user to press a key to bind configuration
-        title->setText(_("Press any key..."));
+        title->setText(_("Press any key...\n(Press ESC to cancel)"));
     }
     else
     {
-        // Gamepad configuration, rename cancel to just cancel and hide assign esc button
-        getWidget("cancel")->setText(_("Cancel"));
-        getWidget("assignEsc")->setVisible(false);
+        // Gamepad configuration, rename title to omit keyboard buttons
+        // and hide assign esc button
+        title->setText(_("Press any key..."));
+        getWidget<IconButtonWidget>("assignEsc")->setVisible(false);
     }
 }
 
@@ -51,26 +55,31 @@ PressAKeyDialog::PressAKeyDialog(const float w, const float h, const bool isKeyb
 
 GUIEngine::EventPropagation PressAKeyDialog::processEvent(const std::string& eventSource)
 {
-    if (eventSource == "cancel")
+    if (eventSource == "buttons")
     {
-        input_manager->setMode(InputManager::MENU);
-        dismiss();
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if (eventSource == "assignNone")
-    {
-        Input simulatedInput;
-        OptionsScreenDevice::getInstance()->gotSensedInput(simulatedInput);
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if (eventSource == "assignEsc")
-    {
-        Input simulatedInput(Input::IT_KEYBOARD, 0 /* deviceID */, 
-                             IRR_KEY_ESCAPE);
-        OptionsScreenDevice::getInstance()->gotSensedInput(simulatedInput);
-        return GUIEngine::EVENT_BLOCK;
-    }
+        const std::string& selection = getWidget<RibbonWidget>("buttons")->
+                                    getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
+        if (selection == "assignEsc")
+        {
+            Input simulatedInput(Input::IT_KEYBOARD, 0 /* deviceID */,
+                             IRR_KEY_ESCAPE);
+            OptionsScreenDevice::getInstance()->gotSensedInput(simulatedInput);
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "assignNone")
+        {
+            Input simulatedInput;
+            OptionsScreenDevice::getInstance()->gotSensedInput(simulatedInput);
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "cancel")
+        {
+            input_manager->setMode(InputManager::MENU);
+            dismiss();
+            return GUIEngine::EVENT_BLOCK;
+        }
+    }
     return GUIEngine::EVENT_LET;
 }
 
