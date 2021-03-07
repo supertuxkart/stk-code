@@ -37,5 +37,6 @@ namespace RichPresenceNS {
         ~RichPresence();
         void update(bool force);
         static RichPresence* get();
+        static void destroy();
     };
 }

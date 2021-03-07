@@ -44,6 +44,13 @@ RichPresence* RichPresence::get() {
     return g_rich_presence;
 }
 
+void RichPresence::destroy() {
+    if (g_rich_presence != nullptr)
+    {
+        delete g_rich_presence;
+    }
+}
+
 RichPresence::RichPresence() : m_connected(false), m_ready(false), m_last(0), m_socket(-1), m_thread(nullptr) {
     doConnect();
 }
