@@ -11,6 +11,7 @@ out vec4 FragColor;
 void main(void)
 {
     float billboard_alpha = mix(1.0, texture(tex, tc).a, billboard);
+    vec4 color = texture(tex, tc);
 #if defined(Advanced_Lighting_Enabled)
     vec2 xy = gl_FragCoord.xy / u_screen;
     float FragZ = gl_FragCoord.z;
@@ -21,5 +22,6 @@ void main(void)
 #else
     float alpha = 1.0;
 #endif
-    FragColor = texture(tex, tc) * billboard_alpha * pc * alpha;
+    color = vec4(color.rgb * color.a, color.a);
+    FragColor = color * billboard_alpha * pc * alpha;
 }
