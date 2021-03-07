@@ -59,6 +59,7 @@ RichPresence::~RichPresence() {
 }
 
 void RichPresence::terminate() {
+#ifndef DISABLE_RPC
 #ifdef WIN32
 #define UNCLEAN m_socket != INVALID_HANDLE_VALUE
 #else
@@ -83,9 +84,11 @@ void RichPresence::terminate() {
         m_thread->join();
         m_thread = nullptr;
     }
+#endif // DISABLE_RPC
 }
 
 bool RichPresence::doConnect() {
+#ifndef DISABLE_RPC
     if (std::string(UserConfigParams::m_discord_client_id) == "-1")
         return false;
 #ifndef DISABLE_RPC
@@ -146,6 +149,7 @@ bool RichPresence::doConnect() {
 #else
     return false;
 #endif
+#endif // DISABLE_RPC
 }
 
 void RichPresence::readData() {
@@ -203,6 +207,7 @@ void RichPresence::readData() {
 }
 
 void RichPresence::finishConnection(RichPresence* self) {
+#ifndef DISABLE_RPC
     // We read all the data from the socket. We're clear now to handshake!
     self->handshake();
 
@@ -215,9 +220,11 @@ void RichPresence::finishConnection(RichPresence* self) {
 #endif
 
     self->m_ready = true;
+#endif
 }
 
 bool RichPresence::tryConnect(std::string path) {
+#ifndef DISABLE_RPC
 #if !defined(WIN32) && defined(AF_UNIX)
     struct sockaddr_un addr = {
         .sun_family = AF_UNIX
@@ -260,10 +267,12 @@ bool RichPresence::tryConnect(std::string path) {
     }
     m_connected = true;
 #endif
+#endif // DISABLE_RPC
     return m_connected;
 }
 
 void RichPresence::handshake() {
+#ifndef DISABLE_RPC
     if (UserConfigParams::m_rich_presence_debug)
         Log::debug("RichPresence", "Starting handshake...");
     HardwareStats::Json *json = new HardwareStats::Json();
@@ -272,9 +281,11 @@ void RichPresence::handshake() {
     json->finish();
     std::string data = json->toString();
     sendData(OP_HANDSHAKE, data);
+#endif
 }
 
 void RichPresence::sendData(int32_t op, std::string json) {
+#ifndef DISABLE_RPC
     // Handshake will make us ready:
     if (op != OP_HANDSHAKE && !m_ready)
     {
@@ -319,6 +330,7 @@ void RichPresence::sendData(int32_t op, std::string json) {
         terminate();
     }
 #endif // AF_UNIX
+#endif
 }
 
 void RichPresence::update(bool force) {
@@ -454,7 +466,7 @@ void RichPresence::update(bool force) {
     base->finish();
 
     sendData(OP_DATA, base->toString());
-#endif
+#endif // DISABLE_RPC
 }
 
 } // namespace
