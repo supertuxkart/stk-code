@@ -367,14 +367,16 @@ void RichPresence::update(bool force) {
     HardwareStats::Json *assets = new HardwareStats::Json();
     if (world)
     {  
-        assets->add("large_text",
-            convert.to_bytes(track_manager->getTrack(trackId)->getName().c_str()));
-        assets->add("large_image", "track_" + trackId);
+        Track* track = track_manager->getTrack(trackId);
+        assets->add("large_text", trackName);
+        assets->add("large_image", track->isAddon() ?
+                    "addons" : "track_" + trackId);
         AbstractKart *abstractKart = world->getLocalPlayerKart(0);
         if (abstractKart)
         {  
-            assets->add("small_image", "kart_" + abstractKart->getIdent());
             const KartProperties* kart = abstractKart->getKartProperties();
+            assets->add("small_image", kart->isAddon() ?
+                        "addons" : "kart_" + abstractKart->getIdent());
             std::string kartName = convert.to_bytes(kart->getName().c_str());
             assets->add("small_text", kartName + " (" + playerName + ")");
         }
