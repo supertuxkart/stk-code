@@ -109,7 +109,7 @@ bool RichPresence::doConnect() {
     }
     else
     {  
-        close(m_socket);
+        terminate();
         return false;
     }
 #else
@@ -119,10 +119,10 @@ bool RichPresence::doConnect() {
 
 void RichPresence::readData() {
 #ifndef __SWITCH__
-    ssize_t baseLength = sizeof(int32_t) * 2;
+    size_t baseLength = sizeof(int32_t) * 2;
     struct discordPacket* basePacket = (struct discordPacket*) malloc(baseLength);
 #ifdef WIN32
-    int read;
+    DWORD read;
     if (!ReadFile(m_socket, basePacket, baseLength, &read, NULL))
     {
         Log::error("RichPresence", "Couldn't read from pipe! Error %x", GetLastError());
@@ -199,17 +199,28 @@ bool RichPresence::tryConnect(std::string path) {
     m_connected = true;
 #elif defined(WIN32)
     // Windows
-    m_socket = CreateFileA(TEXT(path.c_str()), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+    m_socket = CreateFileA(path.c_str(), GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
     if (m_socket == INVALID_HANDLE_VALUE)
-    {  
-        return false;
+    {
+        DWORD error = GetLastError();
+        if (error != ERROR_FILE_NOT_FOUND)
+        {
+            LPSTR errorText = NULL;
+            FormatMessage(
+                FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                FORMAT_MESSAGE_FROM_SYSTEM |
+                FORMAT_MESSAGE_IGNORE_INSERTS,
+                NULL,
+                error,
+                MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                (LPTSTR)&errorText,
+                0, NULL);
+
+            Log::warn("RichPresence", "Couldn't open file! %s Error: %ls", path.c_str(), errorText);
+            return false;
+        }
     }
-    // Zero = fail
-    m_connected = ConnectNamedPipe(pipe) != 0;
-    if (!m_connected)
-    {  
-        CloseHandle(m_socket);
-    }
+    m_connected = true;
 #endif
     return m_connected;
 }
@@ -235,7 +246,7 @@ void RichPresence::sendData(int32_t op, std::string json) {
     if (UserConfigParams::m_rich_presence_debug)
         Log::debug("RichPresence", "=> %s", json.c_str());
     int32_t size = json.size();
-    ssize_t length = (sizeof(int32_t) * 2) + (size * sizeof(char));
+    size_t length = (sizeof(int32_t) * 2) + (size * sizeof(char));
     struct discordPacket* packet = (struct discordPacket*) malloc(
         length
     );
@@ -369,8 +380,8 @@ void RichPresence::update(bool force) {
         assets->add("large_text", "SuperTuxKart");
         assets->add("large_image", "logo");
         assets->add("small_text", playerName);
-        std::string filename = std::string(basename(player->getIconFilename().c_str()));
-        assets->add("small_image", "kart_" + filename);
+        // std::string filename = std::string(basename(player->getIconFilename().c_str()));
+        // assets->add("small_image", "kart_" + filename);
     }
     assets->finish();
     activity->add<std::string>("assets", assets->toString());
