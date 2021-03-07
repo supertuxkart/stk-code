@@ -16,7 +16,11 @@
 #include <locale>
 #include <codecvt>
 
-#if !defined(WIN32) && !defined(__SWITCH__)
+#if defined(__SWITCH__) || defined(MOBILE_STK)
+#define DISABLE_RPC
+#endif
+
+#if !defined(WIN32) && !defined(DISABLE_RPC)
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <fcntl.h>
@@ -59,7 +63,7 @@ void RichPresence::terminate() {
 }
 
 bool RichPresence::doConnect() {
-#ifndef __SWITCH__
+#ifndef DISABLE_RPC
     // Just in case we're retrying or something:
     terminate();
 #if !defined(WIN32) && defined(AF_UNIX)
@@ -118,7 +122,7 @@ bool RichPresence::doConnect() {
 }
 
 void RichPresence::readData() {
-#ifndef __SWITCH__
+#ifndef DISABLE_RPC
     size_t baseLength = sizeof(int32_t) * 2;
     struct discordPacket* basePacket = (struct discordPacket*) malloc(baseLength);
 #ifdef WIN32
@@ -283,7 +287,7 @@ void RichPresence::sendData(int32_t op, std::string json) {
 }
 
 void RichPresence::update(bool force) {
-#ifndef __SWITCH__
+#ifndef DISABLE_RPC
     if (STKProcess::getType() != PT_MAIN)
     {
         // Don't update on server thread
@@ -397,7 +401,7 @@ void RichPresence::update(bool force) {
     int pid = 0;
 #ifdef WIN32
     pid = _getpid();
-#elif !defined(__SWITCH__)
+#elif !defined(DISABLE_RPC)
     pid = getppid();
 #endif
     args->add<int>("pid", pid);
