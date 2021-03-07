@@ -120,23 +120,45 @@ bool RichPresence::doConnect() {
 void RichPresence::readData() {
 #ifndef __SWITCH__
     ssize_t baseLength = sizeof(int32_t) * 2;
-    struct discordPacket* packet = (struct discordPacket*) malloc(baseLength);
-    int read = recv(m_socket, packet, baseLength, MSG_PEEK);
+    struct discordPacket* basePacket = (struct discordPacket*) malloc(baseLength);
+#ifdef WIN32
+    int read;
+    if (!ReadFile(m_socket, basePacket, baseLength, &read, NULL))
+    {
+        Log::error("RichPresence", "Couldn't read from pipe! Error %x", GetLastError());
+        free(basePacket);
+        return;
+    }
+#else
+    int read = recv(m_socket, basePacket, baseLength, 0);
     if (read == -1)
     {  
         if (UserConfigParams::m_rich_presence_debug)
             perror("Couldn't read data from socket!");
         return;
     }
-    baseLength += packet->length;
-    free(packet);
+#endif
     // Add one char so we can printf easy
-    packet = (struct discordPacket*) malloc(baseLength + sizeof(char));
-    read = recv(m_socket, packet, baseLength, 0);
+    struct discordPacket* packet = (struct discordPacket*)
+        malloc(baseLength + basePacket->length + sizeof(char));
+    // Copy over length and opcode from base packet
+    memcpy(packet, basePacket, baseLength);
+    free(basePacket);
+#ifdef WIN32
+    if (!ReadFile(m_socket, packet->data, packet->length, &read, NULL))
+    {
+        Log::error("RichPresence", "Couldn't read from pipe! Error %x", GetLastError());
+        free(packet);
+        return;
+    }
+#else
+    read = recv(m_socket, packet->data, packet->length, 0);
+#endif
 
     packet->data[packet->length] = '\0';
     if (UserConfigParams::m_rich_presence_debug)
-        Log::debug("RichPresence", "<= (OP %d len=%d) %s is data (READ %d bytes)", packet->op, packet->length, packet->data, read);
+        Log::debug("RichPresence", "<= (OP %d len=%d) %s is data (READ %d bytes)",
+                   packet->op, packet->length, packet->data, read);
 
     free(packet);
 #endif
@@ -251,6 +273,11 @@ void RichPresence::sendData(int32_t op, std::string json) {
 
 void RichPresence::update(bool force) {
 #ifndef __SWITCH__
+    if (STKProcess::getType() != PT_MAIN)
+    {
+        // Don't update on server thread
+        return;
+    }
     time_t now = time(NULL);
     if ((now - m_last) < 10 && !force)
     {  
