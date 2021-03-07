@@ -1151,6 +1151,14 @@ namespace UserConfigParams
             PARAM_DEFAULT( StringUserConfigParam("all", "last_track_group",
                            "Last selected track group") );
 
+    PARAM_PREFIX StringUserConfigParam m_discord_client_id
+            PARAM_DEFAULT( StringUserConfigParam("817760324983324753", "discord_client_id",
+                           "Discord Client ID") );
+
+    PARAM_PREFIX BoolUserConfigParam m_rich_presence_debug
+            PARAM_DEFAULT( BoolUserConfigParam(false, "rich_presence_debug",
+                           "If debug logging should be enabled for rich presence") );
+
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_name",
                                                   "Name of the skin to use") );
