@@ -16,7 +16,7 @@
 #include <locale>
 #include <codecvt>
 
-#if defined(__SWITCH__) || defined(MOBILE_STK)
+#if defined(__SWITCH__) || defined(MOBILE_STK) || defined(SERVER_ONLY)
 #define DISABLE_RPC
 #endif
 
@@ -331,9 +331,9 @@ void RichPresence::update(bool force) {
     World* world = World::getWorld();
     RaceManager *raceManager = RaceManager::get();
     std::string trackId = raceManager->getTrackName();
-    std::string difficulty = raceManager->getDifficultyAsString(
+    std::string difficulty = convert.to_bytes(raceManager->getDifficultyName(
         raceManager->getDifficulty()
-    );
+    ).c_str());
     std::string minorModeName = convert.to_bytes(raceManager->getNameOf(
         raceManager->getMinorMode()
     ).c_str());
