@@ -68,8 +68,8 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY);
         RaceManager::get()->setReverseTrack(false);
 
-        // Use keyboard 0 by default (FIXME: let player choose?)
-        InputDevice* device = input_manager->getDeviceManager()->getKeyboard(0);
+        // Use the last used device
+        InputDevice* device = input_manager->getDeviceManager()->getLatestUsedDevice();
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
