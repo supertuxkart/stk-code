@@ -1153,7 +1153,7 @@ namespace UserConfigParams
 
     PARAM_PREFIX StringUserConfigParam m_discord_client_id
             PARAM_DEFAULT( StringUserConfigParam("817760324983324753", "discord_client_id",
-                           "Discord Client ID") );
+                           "Discord Client ID (Set to -1 to disable)") );
 
     PARAM_PREFIX BoolUserConfigParam m_rich_presence_debug
             PARAM_DEFAULT( BoolUserConfigParam(false, "rich_presence_debug",

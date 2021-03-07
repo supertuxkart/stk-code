@@ -63,6 +63,8 @@ void RichPresence::terminate() {
 }
 
 bool RichPresence::doConnect() {
+    if (std::string(UserConfigParams::m_discord_client_id) == "-1")
+        return false;
 #ifndef DISABLE_RPC
     // Just in case we're retrying or something:
     terminate();
