@@ -253,7 +253,7 @@ void InputManager::handleStaticAction(int key, int value)
     // When no players... a cutscene
     if (RaceManager::get() &&
         RaceManager::get()->getNumPlayers() == 0 && world != NULL && value > 0 &&
-        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN || 
+        (key == IRR_KEY_SPACE || key == IRR_KEY_RETURN ||
         key == IRR_KEY_BUTTON_A))
     {
         world->onFirePressed(NULL);
@@ -261,7 +261,7 @@ void InputManager::handleStaticAction(int key, int value)
 
     if (world != NULL && UserConfigParams::m_artist_debug_mode)
     {
-        Debug::handleStaticAction(key, value, control_is_pressed);
+        Debug::handleStaticAction(key, value, control_is_pressed, shift_is_pressed);
     }
 
     switch (key)
@@ -322,32 +322,28 @@ void InputManager::handleStaticAction(int key, int value)
             }
             break;
         }
-        case IRR_KEY_F10:
+        case IRR_KEY_F11:
         {
-            if(world && value)
+            if (value && world)
             {
-                if(control_is_pressed)
-                {
-                    ReplayRecorder::get()->save();
-                }
-                else
+                if (control_is_pressed)
                 {
                     history->Save();
                 }
-            }
-            break;
-        }
-        case IRR_KEY_F11:
-        {
-            if(value && shift_is_pressed)
-            {
-#ifndef SERVER_ONLY
-                ShaderBasedRenderer* sbr = SP::getRenderer();
-                if (sbr)
+                else if (shift_is_pressed)
                 {
-                    sbr->dumpRTT();
-                }
+#ifndef SERVER_ONLY
+                    ShaderBasedRenderer* sbr = SP::getRenderer();
+                    if (sbr)
+                    {
+                        sbr->dumpRTT();
+                    }
 #endif
+                }
+                else
+                {
+                    ReplayRecorder::get()->save();
+                }
             }
             break;
         }
@@ -355,7 +351,21 @@ void InputManager::handleStaticAction(int key, int value)
         {
             if (value)
             {
-                UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
+                if (control_is_pressed)
+                {
+                    UserConfigParams::m_karts_powerup_gui =
+                    !UserConfigParams::m_karts_powerup_gui;
+                }
+                else if (shift_is_pressed)
+                {
+                    UserConfigParams::m_soccer_player_list =
+                    !UserConfigParams::m_soccer_player_list;
+                }
+                else
+                {
+                    UserConfigParams::m_display_fps =
+                    !UserConfigParams::m_display_fps;
+                }
             }
             break;
         }
@@ -965,7 +975,7 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE ||
                     key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
@@ -998,7 +1008,7 @@ EventPropagation InputManager::input(const SEvent& event)
             // single letter). Same for spacebar. Same for letters.
             if (GUIEngine::isWithinATextBox())
             {
-                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE || 
+                if (key == IRR_KEY_BACK || key == IRR_KEY_SPACE ||
                     key == IRR_KEY_SHIFT)
                 {
                     return EVENT_LET;
@@ -1121,18 +1131,18 @@ EventPropagation InputManager::input(const SEvent& event)
         }
 
         // Simulate touch events if there is no real device
-        if (UserConfigParams::m_multitouch_active > 1 && 
+        if (UserConfigParams::m_multitouch_active > 1 &&
             !irr_driver->getDevice()->supportsTouchDevice())
         {
             MultitouchDevice* device = m_device_manager->getMultitouchDevice();
-    
+
             if (device != NULL && (type == EMIE_LMOUSE_PRESSED_DOWN ||
                 type == EMIE_LMOUSE_LEFT_UP || type == EMIE_MOUSE_MOVED))
             {
                 device->m_events[0].id = 0;
                 device->m_events[0].x = event.MouseInput.X;
                 device->m_events[0].y = event.MouseInput.Y;
-    
+
                 if (type == EMIE_LMOUSE_PRESSED_DOWN)
                 {
                     device->m_events[0].touched = true;
@@ -1141,7 +1151,7 @@ EventPropagation InputManager::input(const SEvent& event)
                 {
                     device->m_events[0].touched = false;
                 }
-    
+
                 m_device_manager->updateMultitouchDevice();
                 device->updateDeviceState(0);
             }
@@ -1167,7 +1177,7 @@ EventPropagation InputManager::input(const SEvent& event)
         if (device && device->isAccelerometerActive())
         {
             m_device_manager->updateMultitouchDevice();
-            
+
             float factor = UserConfigParams::m_multitouch_tilt_factor;
             factor = std::max(factor, 0.1f);
             if (UserConfigParams::m_multitouch_controls == MULTITOUCH_CONTROLS_GYROSCOPE)

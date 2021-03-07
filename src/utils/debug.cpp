@@ -25,6 +25,8 @@
 #include "font/regular_face.hpp"
 #include "graphics/camera_debug.hpp"
 #include "graphics/camera_fps.hpp"
+#include "graphics/shader_based_renderer.hpp"
+#include "graphics/sp/sp_base.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "karts/explosion_animation.hpp"
 #include "graphics/irr_driver.hpp"
@@ -56,11 +58,13 @@
 #include "scriptengine/script_engine.hpp"
 #include "states_screens/dialogs/debug_slider.hpp"
 #include "states_screens/dialogs/general_text_field_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
@@ -106,6 +110,7 @@ enum DebugMenuCommand
     DEBUG_SAVE_REPLAY,
     DEBUG_SAVE_HISTORY,
     DEBUG_SAVE_SCREENSHOT,
+    DEBUG_DUMP_RTT,
     DEBUG_POWERUP_ANVIL,
     DEBUG_POWERUP_BOWLING,
     DEBUG_POWERUP_BUBBLEGUM,
@@ -140,6 +145,7 @@ enum DebugMenuCommand
     DEBUG_GUI_CAM_SMOOTH,
     DEBUG_GUI_CAM_ATTACH,
     DEBUG_VIEW_KART_PREVIOUS,
+    DEBUG_VIEW_KART_NEXT,
     DEBUG_VIEW_KART_ONE,
     DEBUG_VIEW_KART_TWO,
     DEBUG_VIEW_KART_THREE,
@@ -149,8 +155,7 @@ enum DebugMenuCommand
     DEBUG_VIEW_KART_SEVEN,
     DEBUG_VIEW_KART_EIGHT,
     DEBUG_VIEW_KART_NINE,
-    DEBUG_VIEW_KART_TEN,
-    DEBUG_VIEW_KART_NEXT,
+    DEBUG_VIEW_KART_LAST,
     DEBUG_VIEW_KART_SLIDER,
     DEBUG_HIDE_KARTS,
     DEBUG_RESCUE_KART,
@@ -163,7 +168,8 @@ enum DebugMenuCommand
     DEBUG_RUN_CUTSCENE,
     DEBUG_TEXTURE_CONSOLE,
     DEBUG_START_RECORDING,
-    DEBUG_STOP_RECORDING
+    DEBUG_STOP_RECORDING,
+    DEBUG_HELP
 };   // DebugMenuCommand
 
 // -----------------------------------------------------------------------------
@@ -523,13 +529,14 @@ bool handleContextMenuAction(s32 cmd_id)
 #endif
         break;
     case DEBUG_FPS:
-        UserConfigParams::m_display_fps =
-            !UserConfigParams::m_display_fps;
+        UserConfigParams::m_display_fps = !UserConfigParams::m_display_fps;
         break;
     case DEBUG_SAVE_REPLAY:
+        if (!world) return false;
         ReplayRecorder::get()->save();
         break;
     case DEBUG_SAVE_HISTORY:
+        if (!world) return false;
         history->Save();
         break;
     case DEBUG_POWERUP_ANVIL:
@@ -781,8 +788,9 @@ bool handleContextMenuAction(s32 cmd_id)
     case DEBUG_VIEW_KART_NINE:
         changeCameraTarget(9);
         break;
-    case DEBUG_VIEW_KART_TEN:
-        changeCameraTarget(10);
+    case DEBUG_VIEW_KART_LAST:
+        if (!world) return false;
+        changeCameraTarget(World::getWorld()->getNumKarts());
         break;
     case DEBUG_VIEW_KART_NEXT:
     {
@@ -979,7 +987,7 @@ bool handleContextMenuAction(s32 cmd_id)
                 ((CutsceneWorld*)World::getWorld())->setParts(parts);
             });
         break;
-        case DEBUG_TEXTURE_CONSOLE:
+    case DEBUG_TEXTURE_CONSOLE:
         new GeneralTextFieldDialog(
             L"Enter the texture filename(s) (separate names by ;)"
             " to be reloaded (empty to reload all)\n"
@@ -1001,17 +1009,38 @@ bool handleContextMenuAction(s32 cmd_id)
                 return false;
             });
         break;
-        case DEBUG_RENDER_NW_DEBUG:
-            irr_driver->toggleRenderNetworkDebug();
+    case DEBUG_RENDER_NW_DEBUG:
+        irr_driver->toggleRenderNetworkDebug();
         break;
-        case DEBUG_SAVE_SCREENSHOT:
-            irr_driver->requestScreenshot();
+    case DEBUG_DUMP_RTT:
+    {
+        if (!world) return false;
+#ifndef SERVER_ONLY
+        ShaderBasedRenderer* sbr = SP::getRenderer();
+        if (sbr)
+        {
+            sbr->dumpRTT();
+        }
+#endif
         break;
-        case DEBUG_START_RECORDING:
-            irr_driver->setRecording(true);
+    }
+    case DEBUG_SAVE_SCREENSHOT:
+        irr_driver->requestScreenshot();
         break;
-        case DEBUG_STOP_RECORDING:
-            irr_driver->setRecording(false);
+    case DEBUG_START_RECORDING:
+        irr_driver->setRecording(true);
+        break;
+    case DEBUG_STOP_RECORDING:
+        irr_driver->setRecording(false);
+        break;
+    case DEBUG_HELP:
+        new MessageDialog(_("Debug keyboard shortcuts:\n"
+                            "* \n"
+                            "* \n"
+                            "* \n"
+                            "* \n"),
+                            MessageDialog::MESSAGE_DIALOG_OK,
+                            NULL, false, false, 0.6f, 0.7f);
         break;
     }
     return false;
@@ -1056,19 +1085,19 @@ bool onEvent(const SEvent &event)
             {
                 case 0: // Extremely small font
                 {
-                    scalex = 9.0;
+                    scalex = 8.5;
                     scaley = 2.62;
                     break;
                 }
                 case 1: // Very small font
                 {
-                    scalex = 7.0;
+                    scalex = 6.75;
                     scaley = 2.1;
                     break;
                 }
                 case 2: // Small font
                 {
-                    scalex = 5.5;
+                    scalex = 5.75;
                     scaley = 1.7;
                     break;
                 }
@@ -1092,7 +1121,7 @@ bool onEvent(const SEvent &event)
                 }
                 case 6: // Extremely large font
                 {
-                    scalex = 3.5;
+                    scalex = 3.6;
                     scaley = 1.01;
                     break;
                 }
@@ -1134,7 +1163,7 @@ bool onEvent(const SEvent &event)
             IGUIContextMenu* sub = mnu->getSubMenu(graphicsMenuIndex);
 
             sub->addItem(L"Reload shaders", DEBUG_GRAPHICS_RELOAD_SHADERS);
-            sub->addItem(L"Reload textures (Ctrl + F6)", DEBUG_GRAPHICS_RELOAD_TEXTURES);
+            sub->addItem(L"Reload textures", DEBUG_GRAPHICS_RELOAD_TEXTURES);
             sub->addSeparator();
             sub->addItem(L"SSAO viz", DEBUG_GRAPHICS_SSAO_VIZ);
             sub->addItem(L"Shadow viz", DEBUG_GRAPHICS_SHADOW_VIZ);
@@ -1149,10 +1178,10 @@ bool onEvent(const SEvent &event)
             sub = mnu->getSubMenu(1);
             sub->addItem(L"Pick kart from slider", DEBUG_VIEW_KART_SLIDER);
             sub->addSeparator();
-            sub->addItem(L"To previous kart (Ctrl + F7)", DEBUG_VIEW_KART_PREVIOUS);
-            sub->addItem(L"To next kart (Ctrl + F8)", DEBUG_VIEW_KART_NEXT);
+            sub->addItem(L"To previous kart (Page Up)", DEBUG_VIEW_KART_PREVIOUS);
+            sub->addItem(L"To next kart (Page Down)", DEBUG_VIEW_KART_NEXT);
             sub->addSeparator();
-            sub->addItem(L"To kart 1", DEBUG_VIEW_KART_ONE);
+            sub->addItem(L"To kart 1 (Home)", DEBUG_VIEW_KART_ONE);
             sub->addItem(L"To kart 2", DEBUG_VIEW_KART_TWO);
             sub->addItem(L"To kart 3", DEBUG_VIEW_KART_THREE);
             sub->addItem(L"To kart 4", DEBUG_VIEW_KART_FOUR);
@@ -1161,55 +1190,56 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"To kart 7", DEBUG_VIEW_KART_SEVEN);
             sub->addItem(L"To kart 8", DEBUG_VIEW_KART_EIGHT);
             sub->addItem(L"To kart 9", DEBUG_VIEW_KART_NINE);
-            sub->addItem(L"To kart 10", DEBUG_VIEW_KART_TEN);
+            sub->addItem(L"To last kart (End)", DEBUG_VIEW_KART_LAST);
 
             mnu->addItem(L"GUI >",-1,true, true);
             sub = mnu->getSubMenu(2);
-            sub->addItem(L"Toggle GUI", DEBUG_GUI_TOGGLE);
+            sub->addItem(L"Toggle GUI (Shift + F10)", DEBUG_GUI_TOGGLE);
             sub->addItem(L"Hide karts", DEBUG_GUI_HIDE_KARTS);
             sub->addSeparator();
-            sub->addItem(L"Top view (Ctrl + F2)", DEBUG_GUI_CAM_TOP);
-            sub->addItem(L"Behind wheel view", DEBUG_GUI_CAM_WHEEL);
-            sub->addItem(L"Behind kart view", DEBUG_GUI_CAM_BEHIND_KART);
-            sub->addItem(L"Right side of kart view (Ctrl + F3)", DEBUG_GUI_CAM_SIDE_OF_KART);
-            sub->addItem(L"Left side of kart view (Ctrl + F4)", DEBUG_GUI_CAM_INV_SIDE_OF_KART);
-            sub->addItem(L"Front of kart view", DEBUG_GUI_CAM_FRONT_OF_KART);
-            sub->addItem(L"First person view (Ctrl + F5)", DEBUG_GUI_CAM_FREE);
             sub->addItem(L"Normal view (Ctrl + F1)", DEBUG_GUI_CAM_NORMAL);
+            sub->addItem(L"First person view (Ctrl + F2)", DEBUG_GUI_CAM_FREE);
+            sub->addItem(L"Top view (Ctrl + F3)", DEBUG_GUI_CAM_TOP);
+            sub->addItem(L"Behind wheel view (Ctrl + F4)", DEBUG_GUI_CAM_WHEEL);
+            sub->addItem(L"Behind kart view (Ctrl + F5)", DEBUG_GUI_CAM_BEHIND_KART);
+            sub->addItem(L"Right side of kart view (Ctrl + F6)", DEBUG_GUI_CAM_SIDE_OF_KART);
+            sub->addItem(L"Left side of kart view (Ctrl + F7)", DEBUG_GUI_CAM_INV_SIDE_OF_KART);
+            sub->addItem(L"Front of kart view (Ctrl + F8)", DEBUG_GUI_CAM_FRONT_OF_KART);
+
             sub->addSeparator();
             sub->addItem(L"Toggle smooth camera", DEBUG_GUI_CAM_SMOOTH);
             sub->addItem(L"Attach fps camera to kart", DEBUG_GUI_CAM_ATTACH);
 
             mnu->addItem(L"Items >",-1,true,true);
             sub = mnu->getSubMenu(3);
-            sub->addItem(L"Anvil", DEBUG_POWERUP_ANVIL );
-            sub->addItem(L"Basketball", DEBUG_POWERUP_RUBBERBALL );
-            sub->addItem(L"Bowling", DEBUG_POWERUP_BOWLING );
-            sub->addItem(L"Bubblegum", DEBUG_POWERUP_BUBBLEGUM );
-            sub->addItem(L"Cake", DEBUG_POWERUP_CAKE );
-            sub->addItem(L"Parachute", DEBUG_POWERUP_PARACHUTE );
-            sub->addItem(L"Plunger", DEBUG_POWERUP_PLUNGER );
-            sub->addItem(L"Swatter", DEBUG_POWERUP_SWATTER );
-            sub->addItem(L"Switch", DEBUG_POWERUP_SWITCH );
-            sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
-            sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
+            sub->addItem(L"Anvil (F1)", DEBUG_POWERUP_ANVIL );
+            sub->addItem(L"Basketball (F2)", DEBUG_POWERUP_RUBBERBALL );
+            sub->addItem(L"Bowling (F3)", DEBUG_POWERUP_BOWLING );
+            sub->addItem(L"Bubblegum (F4)", DEBUG_POWERUP_BUBBLEGUM );
+            sub->addItem(L"Cake (F5)", DEBUG_POWERUP_CAKE );
+            sub->addItem(L"Parachute (F6)", DEBUG_POWERUP_PARACHUTE );
+            sub->addItem(L"Plunger (F7)", DEBUG_POWERUP_PLUNGER );
+            sub->addItem(L"Swatter (F8)", DEBUG_POWERUP_SWATTER );
+            sub->addItem(L"Switch (F9)", DEBUG_POWERUP_SWITCH );
+            sub->addItem(L"Zipper (F10)", DEBUG_POWERUP_ZIPPER );
+            sub->addItem(L"Nitro (Insert)", DEBUG_POWERUP_NITRO );
 
             mnu->addItem(L"Attachments >",-1,true, true);
             sub = mnu->getSubMenu(4);
-            sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
-            sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
-            sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
-            sub->addItem(L"Flatten", DEBUG_ATTACHMENT_SQUASH);
-            sub->addItem(L"Plunger", DEBUG_ATTACHMENT_PLUNGER);
-            sub->addItem(L"Explosion", DEBUG_ATTACHMENT_EXPLOSION);
+            sub->addItem(L"Bomb (Shift + F1)", DEBUG_ATTACHMENT_BOMB);
+            sub->addItem(L"Anvil (Shift + F2)", DEBUG_ATTACHMENT_ANVIL);
+            sub->addItem(L"Parachute (Shift + F3)", DEBUG_ATTACHMENT_PARACHUTE);
+            sub->addItem(L"Flatten (Shift + F4)", DEBUG_ATTACHMENT_SQUASH);
+            sub->addItem(L"Plunger (Shift + F5)", DEBUG_ATTACHMENT_PLUNGER);
+            sub->addItem(L"Explosion (Shift + F6)", DEBUG_ATTACHMENT_EXPLOSION);
 
             mnu->addItem(L"Modify kart items >",-1,true, true);
             sub = mnu->getSubMenu(5);
             sub->addItem(L"Adjust with slider", DEBUG_POWERUP_SLIDER);
             sub->addSeparator();
-            sub->addItem(L"Clear powerup", DEBUG_POWERUP_NOTHING );
-            sub->addItem(L"Clear nitro", DEBUG_NITRO_CLEAR );
-            sub->addItem(L"Clear attachment", DEBUG_ATTACHMENT_NOTHING);
+            sub->addItem(L"Clear powerup (Delete)", DEBUG_POWERUP_NOTHING );
+            sub->addItem(L"Clear nitro (Delete)", DEBUG_NITRO_CLEAR );
+            sub->addItem(L"Clear attachment (Delete)", DEBUG_ATTACHMENT_NOTHING);
 
             mnu->addItem(L"SP debug >",-1,true, true);
             sub = mnu->getSubMenu(6);
@@ -1227,12 +1257,27 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Rescue", DEBUG_RESCUE_KART);
             sub->addItem(L"Pause", DEBUG_PAUSE);
 
-            mnu->addItem(L"Recording >",-1,true, true);
+            mnu->addItem(L"Output >",-1,true, true);
             sub = mnu->getSubMenu(8);
+            sub->addItem(L"Print kart positions", DEBUG_PRINT_START_POS);
+            sub->addSeparator();
+            sub->addItem(L"Save screenshot (Print Screen)", DEBUG_SAVE_SCREENSHOT);
+            sub->addItem(L"Save replay (Ctrl + F11)", DEBUG_SAVE_REPLAY);
+            sub->addItem(L"Save history (F11)", DEBUG_SAVE_HISTORY);
+            sub->addItem(L"Dump RTT (Shift + F11)", DEBUG_DUMP_RTT);
+            sub->addSeparator();
+            sub->addItem(L"Profiler", DEBUG_PROFILER);
+            if (UserConfigParams::m_profiler_enabled)
+            {
+                sub->addItem(L"Save profiler report", DEBUG_PROFILER_WRITE_REPORT);
+            }
+
+            mnu->addItem(L"Recording >",-1,true, true);
+            sub = mnu->getSubMenu(9);
 
 #ifdef ENABLE_RECORDER
-            sub->addItem(L"Start recording", DEBUG_START_RECORDING);
-            sub->addItem(L"Stop recording", DEBUG_STOP_RECORDING);
+            sub->addItem(L"Start recording (Ctrl + Print Screen)", DEBUG_START_RECORDING);
+            sub->addItem(L"Stop recording (Ctrl + Print Screen)", DEBUG_STOP_RECORDING);
 #else
             sub->addItem(L"Recording unavailable, STK was compiled without\n"
                           "recording support.  Please re-compile STK with\n"
@@ -1242,25 +1287,11 @@ bool onEvent(const SEvent &event)
                           "distributions's package mantainer.");
 #endif
 
-            mnu->addItem(L"Output >",-1,true, true);
-            sub = mnu->getSubMenu(9);
-            sub->addItem(L"Print kart positions", DEBUG_PRINT_START_POS);
-            sub->addSeparator();
-            sub->addItem(L"Save screenshot", DEBUG_SAVE_SCREENSHOT);
-            sub->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
-            sub->addItem(L"Save history", DEBUG_SAVE_HISTORY);
-            sub->addSeparator();
-            sub->addItem(L"Profiler", DEBUG_PROFILER);
-            if (UserConfigParams::m_profiler_enabled)
-            {
-                sub->addItem(L"Save profiler report", DEBUG_PROFILER_WRITE_REPORT);
-            }
-
             mnu->addItem(L"Consoles >",-1,true, true);
             sub = mnu->getSubMenu(10);
-            sub->addItem(L"Scripting console", DEBUG_SCRIPT_CONSOLE);
-            sub->addItem(L"Run cutscene(s)", DEBUG_RUN_CUTSCENE);
-            sub->addItem(L"Texture console", DEBUG_TEXTURE_CONSOLE);
+            sub->addItem(L"Run cutscene(s) (Shift + F7)", DEBUG_RUN_CUTSCENE);
+            sub->addItem(L"Scripting console (Shift + F8)", DEBUG_SCRIPT_CONSOLE);
+            sub->addItem(L"Texture console (Shift + F9)", DEBUG_TEXTURE_CONSOLE);
 
             mnu->addItem(L"Font >",-1,true, true);
             sub = mnu->getSubMenu(11);
@@ -1269,13 +1300,15 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Lighting >",-1,true, true);
             sub = mnu->getSubMenu(12);
-            sub->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
-            sub->addItem(L"Adjust lights", DEBUG_ADJUST_LIGHTS);
+            sub->addItem(L"Adjust values (Shift + `/~)", DEBUG_VISUAL_VALUES);
+            sub->addItem(L"Adjust lights (Ctrl + `/~)", DEBUG_ADJUST_LIGHTS);
 
             mnu->addItem(L"FPS >",-1,true, true);
             sub = mnu->getSubMenu(13);
             sub->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
-            sub->addItem(L"Toggle FPS", DEBUG_FPS);
+            sub->addItem(L"Toggle FPS (F12)", DEBUG_FPS);
+
+            mnu->addItem(L"Debug keys (`/~)", DEBUG_HELP);
 
             g_debug_menu_visible = true;
             irr_driver->showPointer();
@@ -1313,88 +1346,228 @@ bool onEvent(const SEvent &event)
 
 // ----------------------------------------------------------------------------
 
-void handleStaticAction(int key, int value, bool control_pressed)
+void handleStaticAction(int key, int value, bool control_pressed, bool shift_pressed)
 {
     World* world = World::getWorld();
-    Camera* camera = Camera::getActiveCamera();
-    unsigned int kart_num = 0;
-    if (camera != NULL && camera->getKart() != NULL)
-    {
-        kart_num = camera->getKart()->getWorldKartId();
-    }
+    CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
 
-    if (control_pressed)
+    if (value)
     {
         switch (key)
         {
+            case IRR_KEY_OEM_3:
+            {
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_ADJUST_LIGHTS);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_VISUAL_VALUES);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_HELP);
+                }
+                break;
+            }
+            // Function key actions
             case IRR_KEY_F1:
             {
-                handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_CAM_NORMAL);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_ATTACHMENT_BOMB);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_ANVIL);
+                }
                 break;
             }
             case IRR_KEY_F2:
             {
-                handleContextMenuAction(DEBUG_GUI_CAM_TOP);
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_CAM_FREE);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_ATTACHMENT_ANVIL);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_RUBBERBALL);
+                }
                 break;
             }
             case IRR_KEY_F3:
             {
-                handleContextMenuAction(DEBUG_GUI_CAM_SIDE_OF_KART);
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_CAM_TOP);
+                }
+                else if (shift_pressed)
+                {
+                   handleContextMenuAction(DEBUG_ATTACHMENT_PARACHUTE); 
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_BOWLING);
+                }
                 break;
             }
             case IRR_KEY_F4:
             {
-                handleContextMenuAction(DEBUG_GUI_CAM_INV_SIDE_OF_KART);
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_CAM_WHEEL);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_ATTACHMENT_SQUASH);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_BUBBLEGUM);
+                }
                 break;
             }
             case IRR_KEY_F5:
             {
-                handleContextMenuAction(DEBUG_GUI_CAM_FREE);
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_CAM_BEHIND_KART);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_ATTACHMENT_PLUNGER);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_CAKE);
+                }
                 break;
             }
             case IRR_KEY_F6:
             {
-                handleContextMenuAction(DEBUG_GRAPHICS_RELOAD_TEXTURES);
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_CAM_SIDE_OF_KART);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_ATTACHMENT_EXPLOSION);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_PARACHUTE);
+                }
                 break;
             }
             case IRR_KEY_F7:
             {
-                if (kart_num == 0)
+                if (control_pressed)
                 {
-                    kart_num += World::getWorld()->getNumKarts() - 1;
+                    handleContextMenuAction(DEBUG_GUI_CAM_INV_SIDE_OF_KART);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_SCRIPT_CONSOLE);
                 }
                 else
                 {
-                    kart_num--;
+                    handleContextMenuAction(DEBUG_POWERUP_PLUNGER);
                 }
-                Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
                 break;
             }
             case IRR_KEY_F8:
             {
-                if (kart_num == World::getWorld()->getNumKarts() - 1)
+                if (control_pressed)
                 {
-                    kart_num = 0;
+                    handleContextMenuAction(DEBUG_GUI_CAM_FRONT_OF_KART);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_TEXTURE_CONSOLE);
                 }
                 else
                 {
-                     kart_num++;
+                    handleContextMenuAction(DEBUG_POWERUP_SWATTER);
                 }
-                Camera::getActiveCamera()->setKart(World::getWorld()->getKart(kart_num));
                 break;
             }
             case IRR_KEY_F9:
             {
-                if (value)
+                if (control_pressed)
                 {
-                    UserConfigParams::m_soccer_player_list =
-                    !UserConfigParams::m_soccer_player_list;
+                    handleContextMenuAction(DEBUG_VIEW_KART_SLIDER);
                 }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_RUN_CUTSCENE);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_SWITCH);
+                }
+                break;
+            }
+            case IRR_KEY_F10:
+            {
+                if (control_pressed)
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_SLIDER);
+                }
+                else if (shift_pressed)
+                {
+                    handleContextMenuAction(DEBUG_GUI_TOGGLE);
+                }
+                else
+                {
+                    handleContextMenuAction(DEBUG_POWERUP_ZIPPER);
+                }
+                break;
+            }
+            case IRR_KEY_INSERT:
+            {
+                handleContextMenuAction(DEBUG_POWERUP_NITRO);
+                break;
+            }
+            case IRR_KEY_DELETE:
+            {
+                handleContextMenuAction(DEBUG_POWERUP_NOTHING);
+                handleContextMenuAction(DEBUG_ATTACHMENT_NOTHING);
+                handleContextMenuAction(DEBUG_NITRO_CLEAR);
+                break;
+            }
+            case IRR_KEY_HOME:
+            {
+                handleContextMenuAction(DEBUG_VIEW_KART_ONE);
+                break;
+            }
+            case IRR_KEY_END:
+            {
+                handleContextMenuAction(DEBUG_VIEW_KART_LAST);
+                break;
+            }
+            case IRR_KEY_NEXT:
+            {
+                handleContextMenuAction(DEBUG_VIEW_KART_NEXT);
+                break;
+            }
+            case IRR_KEY_PRIOR:
+            {
+                handleContextMenuAction(DEBUG_VIEW_KART_PREVIOUS);
                 break;
             }
             default : break;
         }
     }
+
     switch (key)
     {
         // Flying up and down
@@ -1417,7 +1590,6 @@ void handleStaticAction(int key, int value, bool control_pressed)
         // Moving the first person camera
         case IRR_KEY_W:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
@@ -1428,7 +1600,6 @@ void handleStaticAction(int key, int value, bool control_pressed)
         }
         case IRR_KEY_S:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
@@ -1439,7 +1610,6 @@ void handleStaticAction(int key, int value, bool control_pressed)
         }
         case IRR_KEY_D:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
@@ -1450,7 +1620,6 @@ void handleStaticAction(int key, int value, bool control_pressed)
         }
         case IRR_KEY_A:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
@@ -1461,7 +1630,6 @@ void handleStaticAction(int key, int value, bool control_pressed)
         }
         case IRR_KEY_E:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
@@ -1472,7 +1640,6 @@ void handleStaticAction(int key, int value, bool control_pressed)
         }
         case IRR_KEY_Q:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (cam)
             {
                 core::vector3df vel(cam->getLinearVelocity());
@@ -1484,8 +1651,7 @@ void handleStaticAction(int key, int value, bool control_pressed)
         // Rotating the first person camera
         case IRR_KEY_R:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
-            if (cam )
+            if (cam)
             {
                 cam->setAngularVelocity(value ?
                     UserConfigParams::m_fpscam_max_angular_velocity : 0.0f);
@@ -1494,7 +1660,6 @@ void handleStaticAction(int key, int value, bool control_pressed)
         }
         case IRR_KEY_F:
         {
-            CameraFPS *cam = dynamic_cast<CameraFPS*>(Camera::getActiveCamera());
             if (cam)
             {
                 cam->setAngularVelocity(value ?
