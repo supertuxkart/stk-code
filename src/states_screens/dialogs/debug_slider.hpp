@@ -41,6 +41,7 @@ public:
     ~DebugSliderDialog() {};
     void setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S);
     void changeLabel(std::string id, std::string new_label);
+    void toggleSlider(std::string id, bool option);
 
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;

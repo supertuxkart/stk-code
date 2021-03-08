@@ -590,6 +590,10 @@ void cmdLineHelp()
                               "seconds.\n"
     "       --unlock-all       Permanently unlock all karts and tracks for testing.\n"
     "       --no-unlock-all    Disable unlock-all (i.e. base unlocking on player achievement).\n"
+    "       --xmas=n           Toggle Xmas/Christmas mode. n=0 Use current date, n=1, Always enable,\n"
+    "                          n=2, Always disable.\n"
+    "       --easter=n         Toggle Easter ears mode. n=0 Use current date, n=1, Always enable,\n"
+    "                          n=2, Always disable.\n"
     "       --no-graphics      Do not display the actual race.\n"
     "       --sp-shader-debug  Enables debug in sp shader, it will print all unavailable uniforms.\n"
     "       --demo-mode=t      Enables demo mode after t seconds of idle time in "
@@ -598,13 +602,7 @@ void cmdLineHelp()
     "                          spaces are allowed in the track names.\n"
     "       --demo-laps=n      Number of laps to use in a demo.\n"
     "       --demo-karts=n     Number of karts to use in a demo.\n"
-    // "       --history          Replay history file 'history.dat'.\n"
-    // "       --test-ai=n        Use the test-ai for every n-th AI kart.\n"
-    // "                          (so n=1 means all Ais will be the test ai)\n"
-    // "
-    // "    --disable-item-collection Disable item collection. Useful for\n"
-    // "                          debugging client/server item management.\n"
-    // "    --network-item-debugging Print item handling debug information.\n"
+    "       --history          Replay history file 'history.dat'.\n"
     "       --server-config=file Specify the server_config.xml for server hosting, it will create\n"
     "                            one if not found.\n"
     "       --network-console  Enable network console.\n"
@@ -646,6 +644,7 @@ void cmdLineHelp()
     "       --no-console-log   Does not write messages in the console but to\n"
     "                          stdout.log.\n"
     "  -h,  --help             Show this help.\n"
+    "       --help-debug       Show help for debugging options.\n"
     "       --log=N            Set the verbosity to a value between\n"
     "                          0 (Debug) and 5 (Only Fatal messages)\n"
     "       --logbuffer=N      Buffers up to N lines log lines before writing.\n"
@@ -687,6 +686,9 @@ void cmdLineHelp()
     "       --apitrace          This will disable buffer storage and\n"
     "                           writing gpu query strings to opengl, which\n"
     "                           can be seen later in apitrace.\n"
+#ifdef ENABLE_WIIUSE
+    "       --wii               Enable usage of Wii Remotes.\n"
+#endif
 #if defined(__linux__) || defined(__FreeBSD__)
     "\n"
     "Environment variables:\n"
@@ -702,6 +704,51 @@ void cmdLineHelp()
     );
 }   // cmdLineHelp
 
+void cmdDebugHelp()
+{
+    fprintf(stdout,
+    "Usage: %s [OPTIONS]\n\n"
+    "Run SuperTuxKart, a go-kart racing game that features "
+    "Tux and friends.\n\n"
+    "Debug options (some work only if artist debug mode is enabled):\n"
+    "       --debug=s                   s=all Log everything, s=addons Log addons management,\n"
+    "                                   s=gui Log GUI events, s=flyable Log flyables,\n"
+    "                                   s=memory Log memory usage, s=misc Log other events.\n"
+    "       --gamepad-visuals           Debug gamepads by visualising their values.\n"
+    "       --no-high-scores            Disable writing high scores.\n"
+    "       --unit-testing              Run unit tests and exit.\n"
+    "       --gamepad-debug             Enable verbose logging of gamepad button presses.\n"
+    "       --keyboard-debug            Enable verbose logging of keyboard key presses.\n"
+    "       --wiimote-debug             Enable verbose logging of Wii Remote button presses.\n"
+    "       --tutorial-debug            Enable verbose logging of the tutorial mode.\n"
+    "       --track-debug               Enable displaying the driveline in tracks.\n"
+    "       --check-debug               Enable displaying the checklines in tracks.\n"
+    "       --kartsize-debug            Enable verbose logging of kart dimensions\n"
+    "                                   and mesh buffer counts.\n"
+    "       --physics-debug             Enable verbose logging of the physics system.\n"
+    "       --material-debug            Enable verbose logging of terrain specific slowdowns.\n"
+    "       --ftl-debug                 Enable verbose logging in follow-the-leader mode.\n"
+    "       --slipstream-debug          Enable displaying of slipstreams more prominently.\n"
+    "       --rendering-debug           Enable displaying of ambient/diffuse/specularity\n"
+    "                                   in RGB & all anisotropic.\n"
+    "       --ai-debug                  Enable displaying of AI controllers as on-screen text.\n"
+    "                                   Makes it easier to distingush between different AI controllers.\n"
+    "       --fps-debug                 Enable verbose logging of the FPS counter on every frame.\n"
+    "       --rewind                    Enable the rewind manager.\n"
+    "       --battle-ai-stats           Enable verbose logging of AI karts in battle modes.\n"
+    "       --soccer-ai-stats           Enable verbose logging of AI karts in soccer mode.\n"
+    "       --test-ai=n                 Use the test-ai for every n-th AI kart.\n"
+    "                                   (so n=1 means all Ais will be the test ai)\n"
+    "       --disable-item-collection   Disable item collection. Useful for\n"
+    "                                   debugging client/server item management.\n"
+    "       --network-item-debugging    Print item handling debug information.\n"
+    "\n"
+    "You can visit SuperTuxKart's homepage at "
+    "https://supertuxkart.net\n\n",
+    CommandLine::getExecName().c_str()
+    );
+}   // cmdDebugHelp
+
 //=============================================================================
 /** For base options that modify the output (loglevel/color) or exit right
  * after being processed (version/help).
@@ -712,6 +759,13 @@ int handleCmdLineOutputModifier()
         CommandLine::has("-h"))
     {
         cmdLineHelp();
+        cleanUserConfig();
+        exit(0);
+    }
+
+    if (CommandLine::has("--help-debug"))
+    {
+        cmdDebugHelp();
         cleanUserConfig();
         exit(0);
     }
@@ -752,8 +806,7 @@ int handleCmdLineOutputModifier()
  */
 int handleCmdLinePreliminary()
 {
-   if(CommandLine::has("--gamepad-visualisation") ||   // only BE
-       CommandLine::has("--gamepad-visualization")    ) // both AE and BE
+    if(CommandLine::has("--gamepad-visuals"))
         UserConfigParams::m_gamepad_visualisation=true;
     if(CommandLine::has("--debug=memory"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MEMORY;
@@ -956,10 +1009,10 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     irr::core::stringw login, password;
 
-    if (CommandLine::has("--unit-testing"))
-        UserConfigParams::m_unit_testing = true;
     if (CommandLine::has("--no-high-scores"))
         UserConfigParams::m_no_high_scores=true;
+    if (CommandLine::has("--unit-testing"))
+        UserConfigParams::m_unit_testing = true;
     if (CommandLine::has("--gamepad-debug"))
         UserConfigParams::m_gamepad_debug=true;
     if (CommandLine::has("--keyboard-debug"))
@@ -1027,21 +1080,6 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        if (CommandLine::has("--camera-wheel-debug"))
-        {
-            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
-            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_GROUND);
-        }
-        if(CommandLine::has("--camera-debug"))
-        {
-            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
-            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_TOP_OF_KART);
-        }
-        if(CommandLine::has("--camera-kart-debug"))
-        {
-            Camera::setDefaultCameraType(Camera::CM_TYPE_DEBUG);
-            CameraDebug::setDebugType(CameraDebug::CM_DEBUG_BEHIND_KART);
-        }
         if(CommandLine::has("--physics-debug"))
             UserConfigParams::m_physics_debug=1;
         if(CommandLine::has("--check-debug"))

@@ -199,6 +199,18 @@ void Powerup::set(PowerupManager::PowerupType type, int n)
 }  // set
 
 //-----------------------------------------------------------------------------
+/** Sets the amount of the current collected item.
+ *  \param n Number of items.
+ */
+void Powerup::setNum(int n)
+{
+    // Limit to 255 (save space in network state saving)
+    if(n>255) n = 255;
+
+    m_number=n;
+}
+
+//-----------------------------------------------------------------------------
 /** Returns the icon for the currently collected powerup. Used in the
  *  race_gui to display the collected item.
  */

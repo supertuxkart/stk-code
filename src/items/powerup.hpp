@@ -54,7 +54,8 @@ private:
 public:
                     Powerup      (AbstractKart* kart_);
                    ~Powerup      ();
-    void            set          (PowerupManager::PowerupType _type, int n=1);
+    void            set          (PowerupManager::PowerupType _type, int n = 1);
+    void            setNum       (int n = 1);
     void            reset        ();
     Material*       getIcon      () const;
     void            adjustSound  ();
