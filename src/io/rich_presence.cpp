@@ -315,7 +315,11 @@ void RichPresence::sendData(int32_t op, std::string json) {
     // Note we aren't copying the NUL at the end
     memcpy(&packet->data, json.c_str(), json.size());
 #if !defined(WIN32) && defined(AF_UNIX)
-    if (send(m_socket, packet, length, 0) == -1)
+    int flags = 0;
+#ifdef MSG_NOSIGNAL
+    flags |= MSG_NOSIGNAL;
+#endif
+    if (send(m_socket, packet, length, flags) == -1)
     {
         if (errno != EPIPE)
             perror("Couldn't send data to Discord socket!");
