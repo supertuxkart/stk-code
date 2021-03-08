@@ -51,7 +51,13 @@ void RichPresence::destroy() {
     }
 }
 
-RichPresence::RichPresence() : m_connected(false), m_ready(false), m_last(0), m_socket(-1), m_thread(nullptr) {
+RichPresence::RichPresence() : m_connected(false), m_ready(false), m_last(0),
+#ifdef WIN32
+    m_socket(INVALID_HANDLE_VALUE),
+#else
+    m_socket(-1),
+#endif
+    m_thread(nullptr) {
     doConnect();
 }
 RichPresence::~RichPresence() {
