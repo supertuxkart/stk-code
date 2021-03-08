@@ -522,13 +522,22 @@ void GamepadConfig::initSDLMapping()
     if (actions_map.find(SDL_CONTROLLER_BUTTON_LEFTSHOULDER) != actions_map.end() &&
         actions_map.find(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER) != actions_map.end())
     {
+#ifdef __SWITCH__
+        setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_BUTTON_A));
+        setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
+        setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_X));
+        setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
+        // Split joycons will only have one minus button (left joycon)
+        setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_LEFTSTICK));
+#else
         setBindingFromTuple(PA_ACCEL, actions_map.at(SDL_CONTROLLER_BUTTON_Y));
         setBindingFromTuple(PA_BRAKE, actions_map.at(SDL_CONTROLLER_BUTTON_X));
         setBindingFromTuple(PA_FIRE, actions_map.at(SDL_CONTROLLER_BUTTON_B));
-        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
-        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
         setBindingFromTuple(PA_LOOK_BACK, actions_map.at(SDL_CONTROLLER_BUTTON_A));
         setBindingFromTuple(PA_RESCUE, actions_map.at(SDL_CONTROLLER_BUTTON_BACK));
+#endif
+        setBindingFromTuple(PA_NITRO, actions_map.at(SDL_CONTROLLER_BUTTON_LEFTSHOULDER));
+        setBindingFromTuple(PA_DRIFT, actions_map.at(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER));
         setBindingFromTuple(PA_PAUSE_RACE, actions_map.at(SDL_CONTROLLER_BUTTON_START));
         setBindingFromTuple(PA_MENU_SELECT, actions_map.at(SDL_CONTROLLER_BUTTON_A));
         setBindingFromTuple(PA_MENU_CANCEL, actions_map.at(SDL_CONTROLLER_BUTTON_B));
