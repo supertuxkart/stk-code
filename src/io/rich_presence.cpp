@@ -108,6 +108,11 @@ bool RichPresence::doConnect() {
             perror("Couldn't open a Unix socket!");
         return false;
     }
+#ifdef SO_NOSIGPIPE
+    const int set = 1;
+    setsockopt(m_socket, SOL_SOCKET, SO_NOSIGPIPE, &set, sizeof(set));
+#endif
+
     // Discord tries these env vars in order:
     char* env;
     std::string basePath = "";
@@ -310,11 +315,7 @@ void RichPresence::sendData(int32_t op, std::string json) {
     // Note we aren't copying the NUL at the end
     memcpy(&packet->data, json.c_str(), json.size());
 #if !defined(WIN32) && defined(AF_UNIX)
-    int flags = 0;
-#ifdef MSG_NOSIGNAL
-    flags |= MSG_NOSIGNAL;
-#endif
-    if (send(m_socket, packet, length, flags) == -1)
+    if (send(m_socket, packet, length, 0) == -1)
     {
         if (errno != EPIPE)
             perror("Couldn't send data to Discord socket!");
