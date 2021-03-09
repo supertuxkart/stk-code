@@ -106,9 +106,8 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
     m_master_player_only = false;
 #ifndef SERVER_ONLY
 #ifdef __SWITCH__
-    // Otherwise we report 'B' as 'A' (like Xbox controller)
-    SDL_SetHint(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS, "0");
     padConfigureInput(8, HidNpadStyleSet_NpadStandard);
+    // Otherwise we report 'B' as 'A' (like Xbox controller)
     SDL_SetHint(
         SDL_HINT_GAMECONTROLLERCONFIG,
         "53776974636820436F6E74726F6C6C65,Switch Controller,a:b0,b:b1,back:b11,dpdown:b15,dpleft:b12,dpright:b14,dpup:b13,leftshoulder:b6,leftstick:b4,lefttrigger:b8,leftx:a0,lefty:a1,rightshoulder:b7,rightstick:b5,righttrigger:b9,rightx:a2,righty:a3,start:b10,x:b2,y:b3,\n"
