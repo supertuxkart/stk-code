@@ -142,6 +142,10 @@ void CMountPointReader::buildDirectory()
 
 		if (full == "")
 			continue;
+#ifdef __SWITCH__
+		if (full.lastChar() == '.')
+			continue;
+#endif
 
 		if (!list->isDirectory(i))
 		{

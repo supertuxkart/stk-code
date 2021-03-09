@@ -587,7 +587,9 @@ bool CFileSystem::changeWorkingDirectoryTo(const io::path& newDirectory)
 
 io::path CFileSystem::getAbsolutePath(const io::path& filename) const
 {
-#if defined(_IRR_WINDOWS_CE_PLATFORM_) || defined(__SWITCH__)
+#ifdef __SWITCH__
+	return core::stringc(filename).replace(core::stringc("//"), core::stringc("/"));
+#elifif defined(_IRR_WINDOWS_CE_PLATFORM_)
 	return filename;
 #elif defined(_IRR_WINDOWS_API_)
 	wchar_t *p=0;
