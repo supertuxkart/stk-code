@@ -31,7 +31,7 @@ using namespace GUIEngine;
 // ------------------------------------------------------------------------------------------------------
 
 TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGame) :
-    ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM)
+    ModalDialog(0.85f, 0.95f, MODAL_DIALOG_LOCATION_CENTER)
 {
     m_stop_game = stopGame;
 
@@ -47,10 +47,8 @@ TutorialMessageDialog::TutorialMessageDialog(irr::core::stringw msg, bool stopGa
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );
 
-    ButtonWidget* cancelbtn = getWidget<ButtonWidget>("continue");
-    cancelbtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    
-    World::getWorld()->getKart(0)->getControls().reset();
+    ButtonWidget* continuebtn = getWidget<ButtonWidget>("continue");
+    continuebtn->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 }
 
 // ------------------------------------------------------------------------------------------------------

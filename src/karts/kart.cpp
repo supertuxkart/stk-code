@@ -175,12 +175,11 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_goo_sound = SFXManager::get()->getBuffer("goo");
     m_boing_sound = SFXManager::get()->getBuffer("boing");
 
-    m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
-    
+    m_engine_sound = NULL;
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i] = SFXManager::get()->createSoundSource("crash");
 
-    m_skid_sound    = SFXManager::get()->createSoundSource( "skid"  );
+    m_skid_sound = NULL;
     m_nitro_sound   = SFXManager::get()->createSoundSource( "nitro" );
     m_terrain_sound          = NULL;
     m_last_sound_material    = NULL;
@@ -196,29 +195,30 @@ void Kart::init(RaceManager::KartType type)
 {
     m_type = type;
 
+    loadData(type, UserConfigParams::m_animated_characters);
+    // m_skid_sound is loaded in loadData
+    initSound();
+    reset();
+}   // init
+
+// ----------------------------------------------------------------------------
+void Kart::initSound()
+{
     // In multiplayer mode, sounds are NOT positional
     if (RaceManager::get()->getNumLocalPlayers() > 1)
     {
         float factor = 1.0f / RaceManager::get()->getNumberOfKarts();
         // players have louder sounds than AIs
-        if (type == RaceManager::KT_PLAYER)
+        if (m_type == RaceManager::KT_PLAYER)
             factor = std::min(1.0f, RaceManager::get()->getNumLocalPlayers()/2.0f);
 
         for (int i = 0; i < EMITTER_COUNT; i++)
             m_emitters[i]->setVolume(factor);
-
-        m_skid_sound->setVolume(factor);
+        if (m_skid_sound)
+            m_skid_sound->setVolume(factor);
         m_nitro_sound->setVolume(factor);
     }   // if getNumLocalPlayers > 1
-
-    if(!m_engine_sound)
-    {
-        Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!");
-    }
-
-    loadData(type, UserConfigParams::m_animated_characters);
-    reset();
-}   // init
+}   // initSound
 
 // ----------------------------------------------------------------------------
 void Kart::changeKart(const std::string& new_ident,
@@ -230,6 +230,7 @@ void Kart::changeKart(const std::string& new_ident,
 
     scene::ISceneNode* old_node = m_node;
     loadData(m_type, UserConfigParams::m_animated_characters);
+    initSound();
     m_wheel_box = NULL;
 
     if (LocalPlayerController* lpc =
@@ -269,8 +270,10 @@ Kart::~Kart()
             SFXManager::get()->deleteSFX(m_custom_sounds[n]);
     }*/
 
-    m_engine_sound->deleteSFX();
-    m_skid_sound  ->deleteSFX();
+    if (m_engine_sound)
+        m_engine_sound->deleteSFX();
+    if (m_skid_sound)
+        m_skid_sound->deleteSFX();
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->deleteSFX();
@@ -2606,10 +2609,10 @@ void Kart::updatePhysics(int ticks)
           m_skidding->getSkidState() == Skidding::SKID_ACCUMULATE_RIGHT  ) &&
        !m_skidding->isJumping()                                              )
     {
-        if(m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING && !isWheeless())
+        if(m_skid_sound && m_skid_sound->getStatus()!=SFXBase::SFX_PLAYING)
             m_skid_sound->play(getSmoothedXYZ());
     }
-    else if(m_skid_sound->getStatus()==SFXBase::SFX_PLAYING)
+    else if(m_skid_sound && m_skid_sound->getStatus()==SFXBase::SFX_PLAYING)
     {
         m_skid_sound->stop();
     }
@@ -3010,6 +3013,23 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     if (!GUIEngine::isNoGraphics())
         m_stars_effect.reset(new Stars(this));
 
+    // Clear previous sound if exists when changeKart
+    if (m_engine_sound)
+        m_engine_sound->deleteSFX();
+    m_engine_sound = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
+    if (!m_engine_sound)
+        Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!");
+
+    if (m_skid_sound)
+    {
+        m_skid_sound->deleteSFX();
+        m_skid_sound = NULL;
+    }
+    if (!m_kart_properties->getSkidSound().empty())
+    {
+        m_skid_sound = SFXManager::get()->createSoundSource(
+            m_kart_properties->getSkidSound());
+    }
 }   // loadData
 
 // ----------------------------------------------------------------------------
@@ -3220,7 +3240,8 @@ void Kart::updateGraphics(float dt)
 
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i]->setPosition(getXYZ());
-    m_skid_sound->setPosition(getSmoothedXYZ());
+    if (m_skid_sound)
+        m_skid_sound->setPosition(getSmoothedXYZ());
     m_nitro_sound->setPosition(getSmoothedXYZ());
 
     m_attachment->updateGraphics(dt);

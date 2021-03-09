@@ -32,7 +32,7 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.4f, MODAL_DIALOG_LOCATION_BOTTOM)
+DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.45f, MODAL_DIALOG_LOCATION_BOTTOM)
 {
     m_fade_background = false;
 
@@ -56,6 +56,13 @@ void DebugSliderDialog::changeLabel(std::string id, std::string new_label)
 
 // ------------------------------------------------------------------------------------------------------
 
+void DebugSliderDialog::toggleSlider(std::string id, bool option)
+{
+    getWidget<SpinnerWidget>(id.c_str())->setActive(option);
+}
+
+// ------------------------------------------------------------------------------------------------------
+
 void DebugSliderDialog::onEnterPressedInternal()
 {
 }
@@ -64,6 +71,12 @@ void DebugSliderDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& eventSource)
 {
+    if (eventSource == "close")
+    {
+        ModalDialog::dismiss();
+        return GUIEngine::EVENT_BLOCK;
+    }
+
     if (Setters.find(eventSource) == Setters.end())
         return GUIEngine::EVENT_LET;
 

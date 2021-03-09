@@ -74,6 +74,8 @@ void CameraDebug::getCameraSettings(float *above_kart, float *cam_angle,
         *distance   = -m_kart->getKartModel()->getLength()-1.0f;
         break;
     case CM_DEBUG_SIDE_OF_KART:
+    case CM_DEBUG_INV_SIDE_OF_KART:
+    case CM_DEBUG_FRONT_OF_KART:
     case CM_DEBUG_TOP_OF_KART:
         *above_kart    = 0.75f;
         *cam_angle     = UserConfigParams::m_camera_forward_up_angle * DEGREE_TO_RAD;
@@ -118,6 +120,22 @@ void CameraDebug::update(float dt)
     {
         core::vector3df xyz = m_kart->getSmoothedXYZ().toIrrVector();
         Vec3 offset(3, 0, 0);
+        offset = m_kart->getSmoothedTrans()(offset);
+        m_camera->setTarget(xyz);
+        m_camera->setPosition(offset.toIrrVector());
+    }
+    else if (m_default_debug_Type==CM_DEBUG_INV_SIDE_OF_KART)
+    {
+        core::vector3df xyz = m_kart->getSmoothedXYZ().toIrrVector();
+        Vec3 offset(-3, 0, 0);
+        offset = m_kart->getSmoothedTrans()(offset);
+        m_camera->setTarget(xyz);
+        m_camera->setPosition(offset.toIrrVector());
+    }
+    else if (m_default_debug_Type==CM_DEBUG_FRONT_OF_KART)
+    {
+        core::vector3df xyz = m_kart->getSmoothedXYZ().toIrrVector();
+        Vec3 offset(0, 1, 2);
         offset = m_kart->getSmoothedTrans()(offset);
         m_camera->setTarget(xyz);
         m_camera->setPosition(offset.toIrrVector());

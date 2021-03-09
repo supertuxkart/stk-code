@@ -48,9 +48,36 @@ DemoWorld::DemoWorld()
     setPhase(SETUP_PHASE);
     m_abort = false;
     ProfileWorld::setProfileModeLaps(m_num_laps);
-    RaceManager::get()->setReverseTrack(false);
-    RaceManager::get()->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
-    RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD);
+
+    // Randomly select whether reverse mode is activated or not.
+    if (rand() % 2 == 0)
+        RaceManager::get()->setReverseTrack(true);
+    else
+        RaceManager::get()->setReverseTrack(false);
+
+    // Selects the user's current game mode setting (not all modes are supported)
+    switch (atoi(UserConfigParams::m_game_mode.toString().c_str()))
+    {
+        case 0: RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE); break;
+        case 1: RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL); break;
+        case 2: RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER); break;
+        default: RaceManager::get()->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE); break;
+    }
+    // Selects the user's current difficulty setting
+    switch (atoi(UserConfigParams::m_difficulty.toString().c_str()))
+    {
+        case 0: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_EASY); break;
+        case 1: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_MEDIUM); break;
+        case 2: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD); break;
+        case 3: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_BEST); break;
+        default: RaceManager::get()->setDifficulty(RaceManager::DIFFICULTY_HARD); break;
+    }
+
+    Log::info("[DemoWorld]", "Reverse mode state: %d", RaceManager::get()->getReverseTrack());
+    Log::info("[DemoWorld]", "Current game mode: %s", RaceManager::get()->getMinorModeName().c_str());
+    Log::info("[DemoWorld]", "Current difficulty: %s", RaceManager::get()->
+    getDifficultyAsString(RaceManager::get()->getDifficulty()).c_str());
+
     RaceManager::get()->setNumKarts(m_default_num_karts);
     RaceManager::get()->setNumPlayers(1);
     RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
@@ -155,7 +182,8 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
 
     m_do_demo = true;
     RaceManager::get()->setNumKarts(m_default_num_karts);
-    RaceManager::get()->setPlayerKart(0, "tux");
+    // Use the user's last selected kart
+    RaceManager::get()->setPlayerKart(0, UserConfigParams::m_default_kart);
     RaceManager::get()->setupPlayerKartInfo();
     RaceManager::get()->startSingleRace(m_demo_tracks[0], m_num_laps, false);
     m_demo_tracks.push_back(m_demo_tracks[0]);
