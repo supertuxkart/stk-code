@@ -590,7 +590,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
     // Abort demo mode if a key is pressed during the race in demo mode,
     // if a dialog is not active
     if(dynamic_cast<DemoWorld*>(World::getWorld()) &&
-       !GUIEngine::ModalDialog::isADialogActive())
+       !GUIEngine::ModalDialog::isADialogActive() && value)
     {
         RaceManager::get()->exitRace();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
