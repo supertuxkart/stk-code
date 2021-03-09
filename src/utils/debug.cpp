@@ -1068,19 +1068,27 @@ bool onEvent(const SEvent &event)
     if(!UserConfigParams::m_artist_debug_mode)
         return true;    // keep handling the events
 
-    if (event.EventType == EET_MOUSE_INPUT_EVENT)
+    if (event.EventType == EET_MOUSE_INPUT_EVENT || event.EventType == EET_TOUCH_INPUT_EVENT)
     {
         if (GUIEngine::ModalDialog::isADialogActive() ||
             GUIEngine::ScreenKeyboard::isActive())
             return true;
 
         // Create the menu (only one menu at a time)
-        #ifdef MOBILE_STK
+        #if defined(MOBILE_STK) || defined(__SWITCH__)
+        #ifdef __SWITCH__
+        int x = 100;
+        int y = 100;
+        #else
         int x = 10 * irr_driver->getActualScreenSize().Height / 480;
         int y = 30 * irr_driver->getActualScreenSize().Height / 480;
-        if (event.MouseInput.X < x && event.MouseInput.Y < y &&
-        #else
-        if ((event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN ||
+        #endif // __SWITCH__
+        if ( event.EventType == EET_MOUSE_INPUT_EVENT ?
+            (event.MouseInput.X < x && event.MouseInput.Y < y) :
+            (event.TouchInput.X < x && event.TouchInput.Y < y) &&
+        #else // MOBILE_STK
+        if ( event.EventType == EET_MOUSE_INPUT_EVENT &&
+            (event.MouseInput.Event == EMIE_RMOUSE_PRESSED_DOWN ||
              event.MouseInput.Event == EMIE_MMOUSE_PRESSED_DOWN) &&
         #endif
             !g_debug_menu_visible)
