@@ -449,6 +449,7 @@ public:
                       getInverseBoneMatrix(const std::string& bone_name) const;
     // ------------------------------------------------------------------------
     const std::string& getExhaustXML() const          { return m_exhaust_xml; }
-
+    // ------------------------------------------------------------------------
+    bool hasWheel() const              { return !m_wheel_filename[0].empty(); }
 };   // KartModel
 #endif

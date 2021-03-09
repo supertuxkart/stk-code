@@ -473,9 +473,36 @@ void KartProperties::getAllData(const XMLNode * root)
     //TODO: listed as an attribute in the xml file after wheel-radius
     //TODO: same goes for their rear equivalents
 
-
+    bool fallback_skid_sound = true;
     if(const XMLNode *sounds_node= root->getNode("sounds"))
     {
+        std::string custom_skid_sound;
+        // Newly exported kart: custom skid sound
+        if (const XMLNode* skid_node = sounds_node->getNode("skid"))
+        {
+            skid_node->get("name", &custom_skid_sound);
+            std::string full_path = m_root + custom_skid_sound;
+            if (file_manager->fileExists(full_path) &&
+                StringUtils::getExtension(custom_skid_sound) == "ogg")
+            {
+                m_skid_sound = m_ident + "_skid";
+                // Default values for skid sound option if not found
+                float rolloff = 0.5;
+                float max_dist = 300.0f;
+                float gain = 1.0;
+                skid_node->get("rolloff", &rolloff);
+                skid_node->get("max_dist", &max_dist);
+                skid_node->get("volume", &gain);
+                SFXManager::get()->addSingleSfx(m_skid_sound, full_path,
+                    true/*positional*/, rolloff, max_dist, gain);
+            }
+            else if (custom_skid_sound == "default")
+            {
+                // Default skid sound
+                m_skid_sound = "skid";
+            }
+            fallback_skid_sound = false;
+        }
         std::string s;
         sounds_node->get("engine", &s);
         if (s == "custom")
@@ -547,6 +574,13 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
+    // For fallback skid sound found in old exported kart, give skid sound for
+    // karts having wheel
+    if (fallback_skid_sound)
+    {
+        if (m_kart_model && m_kart_model->hasWheel())
+            m_skid_sound = "skid";
+    }
 }   // getAllData
 
 // ----------------------------------------------------------------------------

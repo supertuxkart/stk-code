@@ -170,6 +170,8 @@ private:
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
 
+    std::string m_skid_sound;
+
     // bullet physics data
     // -------------------
     float m_friction_slip;
@@ -294,6 +296,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the engine type (used to change sfx depending on kart size). */
     const std::string& getEngineSfxType    () const {return m_engine_sfx_type;}
+    // ------------------------------------------------------------------------
+    /** Returns the skid sound */
+    const std::string& getSkidSound    () const         {return m_skid_sound; }
 
     // Bullet physics get functions
     //-----------------------------
