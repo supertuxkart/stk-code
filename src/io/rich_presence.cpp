@@ -337,7 +337,8 @@ void RichPresence::sendData(int32_t op, std::string json) {
     // TODO
     if(written != length)
     {
-        Log::warn("RichPresence", "Amount written != data size!");
+        if (UserConfigParams::m_rich_presence_debug)
+            Log::debug("RichPresence", "Amount written != data size! Closing");
         terminate();
     }
 #endif // AF_UNIX
@@ -380,15 +381,20 @@ void RichPresence::update(bool force) {
 
     std::string playerName;
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
-       PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
+    if (player)
     {
-        playerName = convert.to_bytes(player->getLastOnlineName().c_str()) + "@stk";
+        if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST ||
+            PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
+        {
+            playerName = convert.to_bytes(player->getLastOnlineName().c_str()) + "@stk";
+        }
+        else
+        {
+            playerName = convert.to_bytes(player->getName().c_str());
+        }
     }
     else
-    {
-        playerName = convert.to_bytes(player->getName().c_str());
-    }
+        playerName = "Guest";
     World* world = World::getWorld();
     RaceManager *raceManager = RaceManager::get();
     std::string trackId = raceManager->getTrackName();
