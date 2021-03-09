@@ -167,6 +167,9 @@ IrrDriver::IrrDriver()
     p.DriverType    = video::EDT_OPENGL;
     p.Bits          = 24U;
     p.WindowSize    = core::dimension2d<u32>(1280,720);
+#ifdef FORCE_LEGACY
+    p.ForceLegacyDevice = true;
+#endif
 #else
     p.DriverType    = video::EDT_NULL;
     p.Bits          = 16U;
@@ -588,7 +591,8 @@ void IrrDriver::initDevice()
     }
 #endif
 
-#ifndef SERVER_ONLY
+    // Don't recreate on switch!
+#if !defined(SERVER_ONLY) && !defined(__SWITCH__)
     if (!GUIEngine::isNoGraphics() && recreate_device)
     {
         m_device->closeDevice();
