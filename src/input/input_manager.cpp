@@ -69,6 +69,22 @@
 #include <SDL.h>
 #endif
 
+#ifdef __SWITCH__
+extern "C" {
+#define Event libnx_Event
+#define u64 libnx_u64
+#define u32 libnx_u32
+#define s64 libnx_s64
+#define s32 libnx_s32
+#include <switch/runtime/pad.h>
+#undef u64
+#undef u32
+#undef s64
+#undef s32
+#undef Event
+}
+#endif
+
 InputManager *input_manager;
 
 using GUIEngine::EventPropagation;
@@ -89,16 +105,20 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
 
     m_master_player_only = false;
 #ifndef SERVER_ONLY
+#ifdef __SWITCH__
+    padConfigureInput(8, HidNpadStyleSet_NpadStandard);
+    // Otherwise we report 'B' as 'A' (like Xbox controller)
+    SDL_SetHint(
+        SDL_HINT_GAMECONTROLLERCONFIG,
+        "53776974636820436F6E74726F6C6C65,Switch Controller,a:b0,b:b1,back:b11,dpdown:b15,dpleft:b12,dpright:b14,dpup:b13,leftshoulder:b6,leftstick:b4,lefttrigger:b8,leftx:a0,lefty:a1,rightshoulder:b7,rightstick:b5,righttrigger:b9,rightx:a2,righty:a3,start:b10,x:b2,y:b3,\n"
+    );
+#endif // __SWITCH__
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) != 0)
     {
         Log::error("InputManager", "Failed to init SDL game controller: %s",
             SDL_GetError());
     }
-#ifdef __SWITCH__
-    // Otherwise we report 'B' as 'A' (like Xbox controller)
-    SDL_SetHint(SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS, "0");
-#endif
-#endif
+#endif // SERVER_ONLY
 }
 
 // -----------------------------------------------------------------------------
@@ -205,6 +225,9 @@ void InputManager::update(float dt)
 #ifdef ENABLE_WIIUSE
     if (wiimote_manager)
         wiimote_manager->update();
+#endif
+#ifdef __SWITCH__
+    hidSetNpadJoyHoldType(HidNpadJoyHoldType_Horizontal);
 #endif
 
     for (auto it = m_gamepads_timer.begin(); it != m_gamepads_timer.end();)
