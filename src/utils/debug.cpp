@@ -1303,9 +1303,9 @@ bool onEvent(const SEvent &event)
 
             mnu->addItem(L"Consoles >",-1,true, true);
             sub = mnu->getSubMenu(10);
-            sub->addItem(L"Run cutscene(s) (Shift + F7)", DEBUG_RUN_CUTSCENE);
-            sub->addItem(L"Scripting console (Shift + F8)", DEBUG_SCRIPT_CONSOLE);
-            sub->addItem(L"Texture console (Shift + F9)", DEBUG_TEXTURE_CONSOLE);
+            sub->addItem(L"Scripting console (Shift + F7)", DEBUG_SCRIPT_CONSOLE);
+            sub->addItem(L"Texture console (Shift + F8)", DEBUG_TEXTURE_CONSOLE);
+            sub->addItem(L"Run cutscene(s) (Shift + F9)", DEBUG_RUN_CUTSCENE);
 
             mnu->addItem(L"Font >",-1,true, true);
             sub = mnu->getSubMenu(11);
