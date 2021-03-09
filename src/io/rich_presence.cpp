@@ -88,6 +88,7 @@ void RichPresence::terminate() {
     if(m_thread != nullptr && STKProcess::getType() == PT_MAIN)
     {
         m_thread->join();
+        delete m_thread;
         m_thread = nullptr;
     }
 #endif // DISABLE_RPC
