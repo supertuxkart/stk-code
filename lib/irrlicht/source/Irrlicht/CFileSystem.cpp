@@ -600,7 +600,7 @@ io::path CFileSystem::getAbsolutePath(const io::path& filename) const
 {
 #ifdef __SWITCH__
 	return core::stringc(filename).replace(core::stringc("//"), core::stringc("/"));
-#elifif defined(_IRR_WINDOWS_CE_PLATFORM_)
+#elif defined(_IRR_WINDOWS_CE_PLATFORM_)
 	return filename;
 #elif defined(_IRR_WINDOWS_API_)
 	wchar_t *p=0;
