@@ -175,8 +175,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_goo_sound = SFXManager::get()->getBuffer("goo");
     m_boing_sound = SFXManager::get()->getBuffer("boing");
 
-    m_engine_sound  = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
-    
+    m_engine_sound = NULL;
     for (int i = 0; i < EMITTER_COUNT; i++)
         m_emitters[i] = SFXManager::get()->createSoundSource("crash");
 
@@ -195,9 +194,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 void Kart::init(RaceManager::KartType type)
 {
     m_type = type;
-
-    if (!m_engine_sound)
-        Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!");
 
     loadData(type, UserConfigParams::m_animated_characters);
     // m_skid_sound is loaded in loadData
@@ -274,7 +270,8 @@ Kart::~Kart()
             SFXManager::get()->deleteSFX(m_custom_sounds[n]);
     }*/
 
-    m_engine_sound->deleteSFX();
+    if (m_engine_sound)
+        m_engine_sound->deleteSFX();
     if (m_skid_sound)
         m_skid_sound->deleteSFX();
 
@@ -3016,7 +3013,13 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
     if (!GUIEngine::isNoGraphics())
         m_stars_effect.reset(new Stars(this));
 
-    // Clear previous skid sound if exists
+    // Clear previous sound if exists when changeKart
+    if (m_engine_sound)
+        m_engine_sound->deleteSFX();
+    m_engine_sound = SFXManager::get()->createSoundSource(m_kart_properties->getEngineSfxType());
+    if (!m_engine_sound)
+        Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!");
+
     if (m_skid_sound)
     {
         m_skid_sound->deleteSFX();
