@@ -286,12 +286,11 @@ void RichPresence::handshake() {
 #ifndef DISABLE_RPC
     if (UserConfigParams::m_rich_presence_debug)
         Log::debug("RichPresence", "Starting handshake...");
-    HardwareStats::Json *json = new HardwareStats::Json();
-    json->add<int>("v", 1);
-    json->add("client_id", std::string(UserConfigParams::m_discord_client_id));
-    json->finish();
-    std::string data = json->toString();
-    sendData(OP_HANDSHAKE, data);
+    HardwareStats::Json json;
+    json.add<int>("v", 1);
+    json.add("client_id", std::string(UserConfigParams::m_discord_client_id));
+    json.finish();
+    sendData(OP_HANDSHAKE, json.toString());
 #endif
 }
 
@@ -341,6 +340,7 @@ void RichPresence::sendData(int32_t op, std::string json) {
         terminate();
     }
 #endif // AF_UNIX
+    free(packet);
 #endif
 }
 
@@ -357,6 +357,12 @@ void RichPresence::update(bool force) {
         // Only update every 10s
         return;
     }
+    // Check more often if we're not ready
+    if (m_ready || !m_connected)
+    {
+        // Update timer
+        m_last = now;
+    }
     // Retry connection:
     if (!m_connected)
     {
@@ -368,8 +374,6 @@ void RichPresence::update(bool force) {
     }
     if (UserConfigParams::m_rich_presence_debug)
         Log::debug("RichPresence", "Updating status!");
-    // Update timer
-    m_last = now;
 
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
 
@@ -402,11 +406,11 @@ void RichPresence::update(bool force) {
 
     // {cmd:SET_ACTIVITY,args:{activity:{},pid:0},nonce:0}
 
-    HardwareStats::Json *base = new HardwareStats::Json();
-    base->add("cmd", "SET_ACTIVITY");
+    HardwareStats::Json base;
+    base.add("cmd", "SET_ACTIVITY");
 
-    HardwareStats::Json *args = new HardwareStats::Json();
-    HardwareStats::Json *activity = new HardwareStats::Json();
+    HardwareStats::Json args;
+    HardwareStats::Json activity;
 
     std::string trackName = convert.to_bytes(_("Getting ready to race").c_str());
     if (world)
@@ -414,69 +418,70 @@ void RichPresence::update(bool force) {
         Track* track = track_manager->getTrack(trackId);
         if (track)
             trackName = convert.to_bytes(track->getName().c_str());
-        auto protocol = LobbyProtocol::get<ClientLobby>();
-        if (protocol != nullptr && protocol.get()->getJoinedServer() != nullptr)
-        {
-            trackName.append(" - ");
-            trackName.append(convert.to_bytes(
-                protocol.get()->getJoinedServer().get()->getName().c_str()
-            ));
-        }
     }
 
-    activity->add("state", std::string(trackName.c_str()));
-    if (world)
-        activity->add("details", minorModeName + " (" + difficulty + ")");
+    auto protocol = LobbyProtocol::get<ClientLobby>();
+    if (protocol != nullptr && protocol.get()->getJoinedServer() != nullptr)
+    {
+        trackName.append(" - ");
+        trackName.append(convert.to_bytes(
+            protocol.get()->getJoinedServer().get()->getName().c_str()
+        ));
+    }
 
-    HardwareStats::Json *assets = new HardwareStats::Json();
+    activity.add("state", std::string(trackName.c_str()));
+    if (world)
+        activity.add("details", minorModeName + " (" + difficulty + ")");
+
+    HardwareStats::Json assets;
     if (world)
     {
         Track* track = track_manager->getTrack(trackId);
-        assets->add("large_text", convert.to_bytes(track->getName().c_str()));
-        assets->add("large_image", track->isAddon() ?
-                    "addons" : "track_" + trackId);
+        assets.add("large_text", convert.to_bytes(track->getName().c_str()));
+        assets.add("large_image", track->isAddon() ?
+                   "addons" : "track_" + trackId);
         AbstractKart *abstractKart = world->getLocalPlayerKart(0);
         if (abstractKart)
         {
             const KartProperties* kart = abstractKart->getKartProperties();
-            assets->add("small_image", kart->isAddon() ?
-                        "addons" : "kart_" + abstractKart->getIdent());
+            assets.add("small_image", kart->isAddon() ?
+                       "addons" : "kart_" + abstractKart->getIdent());
             std::string kartName = convert.to_bytes(kart->getName().c_str());
-            assets->add("small_text", kartName + " (" + playerName + ")");
+            assets.add("small_text", kartName + " (" + playerName + ")");
         }
     }
     else
     {
-        assets->add("large_text", "SuperTuxKart");
-        assets->add("large_image", "logo");
-        assets->add("small_text", playerName);
+        assets.add("large_text", "SuperTuxKart");
+        assets.add("large_image", "logo");
+        assets.add("small_text", playerName);
         // std::string filename = std::string(basename(player->getIconFilename().c_str()));
         // assets->add("small_image", "kart_" + filename);
     }
-    assets->finish();
-    activity->add<std::string>("assets", assets->toString());
+    assets.finish();
+    activity.add<std::string>("assets", assets.toString());
 
-    HardwareStats::Json *timestamps = new HardwareStats::Json();
-    timestamps->add<std::string>("start", std::to_string(since));
+    HardwareStats::Json timestamps;
+    timestamps.add<std::string>("start", std::to_string(since));
     
-    timestamps->finish();
-    activity->add<std::string>("timestamps", timestamps->toString());
+    timestamps.finish();
+    activity.add<std::string>("timestamps", timestamps.toString());
     
-    activity->finish();
-    args->add<std::string>("activity", activity->toString());
+    activity.finish();
+    args.add<std::string>("activity", activity.toString());
     int pid = 0;
 #ifdef WIN32
     pid = _getpid();
 #elif !defined(DISABLE_RPC)
     pid = getppid();
 #endif
-    args->add<int>("pid", pid);
-    args->finish();
-    base->add<int>("nonce", now);
-    base->add<std::string>("args", args->toString());
-    base->finish();
+    args.add<int>("pid", pid);
+    args.finish();
+    base.add<int>("nonce", now);
+    base.add<std::string>("args", args.toString());
+    base.finish();
 
-    sendData(OP_DATA, base->toString());
+    sendData(OP_DATA, base.toString());
 #endif // DISABLE_RPC
 }
 
