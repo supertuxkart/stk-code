@@ -38,7 +38,7 @@
 #include <irrlicht.h>
 
 //-----------------------------------------------------------------------------
-WorldStatus::WorldStatus() : m_process_type(STKProcess::getType())
+WorldStatus::WorldStatus() : m_process_type(STKProcess::getType()), m_started_at(StkTime::getMonoTimeMs())
 {
     if (m_process_type == PT_MAIN)
         main_loop->setFrameBeforeLoadingWorld();
@@ -72,6 +72,7 @@ WorldStatus::WorldStatus() : m_process_type(STKProcess::getType())
  */
 void WorldStatus::reset(bool restart)
 {
+    m_started_at      = StkTime::getMonoTimeMs();
     m_time            = 0.0f;
     m_time_ticks      = 0;
     m_auxiliary_ticks = 0;

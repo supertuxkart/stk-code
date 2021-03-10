@@ -111,6 +111,9 @@ private:
     /** The third sound to be played in ready, set, go. */
     SFXBase    *m_start_sound;
 
+    /** (Unix) time when we started */
+    uint64_t m_started_at;
+
     /** The clock mode: normal counting forwards, or countdown */ 
     ClockType       m_clock_mode;
 protected:
@@ -199,6 +202,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current race time. */
     float   getTime() const { return (float)m_time; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the start time. */
+    uint64_t   getStart() const { return m_started_at; }
 
     // ------------------------------------------------------------------------
     /** Returns the current race time in time ticks (i.e. based on the physics

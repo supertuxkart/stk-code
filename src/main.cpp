@@ -290,6 +290,7 @@ extern "C" {
 #include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "io/rich_presence.hpp"
 
 static void cleanSuperTuxKart();
 static void cleanUserConfig();
@@ -2572,6 +2573,8 @@ int main(int argc, char *argv[])
 
     cleanSuperTuxKart();
     NetworkConfig::destroy();
+
+    RichPresenceNS::RichPresence::destroy();
 
 #ifdef DEBUG
     MemoryLeaks::checkForLeaks();

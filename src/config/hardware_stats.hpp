@@ -42,6 +42,49 @@ namespace HardwareStats
             m_data ="{";
         }   // Constructor
 
+        const std::string sanitize(const std::string &value)
+        {
+          // Really confusing. Basically converts between utf8 and wide and irrlicht strings and std strings
+          std::wstring wide = StringUtils::utf8ToWide(value).c_str();
+          std::string normalized = StringUtils::wideToUtf8(sanitize(wide).c_str()).c_str();
+          return normalized;
+        }
+
+        const std::wstring sanitize(std::wstring value)
+        {
+            // A string is a sequence of Unicode code points wrapped with quotation marks (U+0022). All code points may
+            // be placed within the quotation marks except for the code points that must be escaped: quotation mark
+            // (U+0022), reverse solidus (U+005C), and the control characters U+0000 to U+001F. There are two-character
+            // escape sequence representations of some characters.
+  
+            wchar_t temp[7] = {0};
+            for(size_t i = 0; i < value.size(); ++i)
+            {
+                if (value[i] <= 0x1f)
+                {
+                    swprintf(temp, sizeof(temp) / sizeof(wchar_t), L"\\u%04x", value[i]);
+                    std::wstring suffix = value.substr(i + 1);
+                    value = value.substr(0, i);
+                    value.append(temp);
+                    value.append(suffix);
+                    i += 5; // \u0000 = 6 chars, but we're replacing one so 5
+                }
+                else if (value[i] == '"' || value[i] == '\\')
+                {  
+                    char escaped = value[i];
+                    std::wstring suffix = value.substr(i + 1);
+                    value = value.substr(0, i);
+                    value.push_back('\\');
+                    value.push_back(escaped);
+                    value.append(suffix);
+                    // Skip the added solidus
+                    ++i;
+                }
+            }
+
+            return value;
+        }
+
         // --------------------------------------------------------------------
         /** Adds a key-value pair to the json string. */
         template <typename C>
@@ -49,7 +92,7 @@ namespace HardwareStats
         {
             if(m_data.size()>1)   // more than '{'
                 m_data += ",";
-            m_data += "\""+key+"\":"+StringUtils::toString(value);
+            m_data += "\""+sanitize(key)+"\":"+StringUtils::toString(value);
         }   // add
         // --------------------------------------------------------------------
         /** Specialisation for adding string values. String values in
@@ -58,7 +101,7 @@ namespace HardwareStats
         {
             if(m_data.size()>1)   // more than '{'
                 m_data += ",";
-            m_data += "\""+key+"\":\""+StringUtils::toString(value)+"\"";
+            m_data += "\""+sanitize(key)+"\":\""+StringUtils::toString(sanitize(value))+"\"";
         }   // add
         // --------------------------------------------------------------------
         /** Specialisation for adding character pointers. String values in
@@ -67,7 +110,7 @@ namespace HardwareStats
         {
             if(m_data.size()>1)   // more than '{'
                 m_data += ",";
-            m_data += "\""+key+"\":\""+StringUtils::toString(s)+"\"";
+            m_data += "\""+sanitize(key)+"\":\""+StringUtils::toString(sanitize(s))+"\"";
         }   // add
         // --------------------------------------------------------------------
         void finish()

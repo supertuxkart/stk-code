@@ -62,6 +62,7 @@
 #include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "io/rich_presence.hpp"
 
 #ifdef __SWITCH__
 extern "C" {
@@ -688,6 +689,8 @@ void RaceManager::startNextRace()
 #ifdef __SWITCH__
     appletSetCpuBoostMode(ApmCpuBoostMode_Normal);
 #endif
+
+    RichPresenceNS::RichPresence::get()->update(true);
 }   // startNextRace
 
 //---------------------------------------------------------------------------------------------
@@ -970,6 +973,8 @@ void RaceManager::exitRace(bool delete_world)
 
     m_saved_gp = NULL;
     m_track_number = 0;
+
+    RichPresenceNS::RichPresence::get()->update(true);
 }   // exitRace
 
 //---------------------------------------------------------------------------------------------
