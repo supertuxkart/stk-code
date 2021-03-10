@@ -142,6 +142,7 @@ Material* MaterialManager::getMaterialSPM(std::string lay_one_tex_lc,
             }
         }   // for i
     }
+    Log::debug("MaterialManager", "Couldn't find cached SP material! Opening default %s!", original_layer_one.c_str());
     return getDefaultSPMaterial(def_shader_name,
         is_full_path ?
         original_layer_one : StringUtils::getBasename(original_layer_one),
