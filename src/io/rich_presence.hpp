@@ -3,18 +3,22 @@
 #endif
 #include <thread>
 
-namespace RichPresenceNS {
+namespace RichPresenceNS
+{
     // There are more, but we don't need to use them
-    enum OPCodes {
+    enum OPCodes
+    {
         OP_HANDSHAKE = 0,
         OP_DATA = 1,
     };
-    struct discordPacket {
+    struct discordPacket
+    {
         int32_t op;
         int32_t length;
         char data[];
     };
-    class RichPresence {
+    class RichPresence
+    {
     private:
         bool m_connected;
         bool m_ready;

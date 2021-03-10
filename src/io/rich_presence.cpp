@@ -33,10 +33,12 @@
 #include <namedpipeapi.h>
 #endif
 
-namespace RichPresenceNS {
+namespace RichPresenceNS
+{
 RichPresence* g_rich_presence = nullptr;
 
-RichPresence* RichPresence::get() {
+RichPresence* RichPresence::get()
+{
     if (g_rich_presence == nullptr)
     {
         g_rich_presence = new RichPresence();
@@ -44,7 +46,8 @@ RichPresence* RichPresence::get() {
     return g_rich_presence;
 }
 
-void RichPresence::destroy() {
+void RichPresence::destroy()
+{
     if (g_rich_presence != nullptr)
     {
         delete g_rich_presence;
@@ -57,14 +60,18 @@ RichPresence::RichPresence() : m_connected(false), m_ready(false), m_last(0),
 #else
     m_socket(-1),
 #endif
-    m_thread(nullptr) {
+    m_thread(nullptr)
+{
     doConnect();
 }
-RichPresence::~RichPresence() {
+
+RichPresence::~RichPresence()
+{
     terminate();
 }
 
-void RichPresence::terminate() {
+void RichPresence::terminate()
+{
 #ifndef DISABLE_RPC
 #ifdef WIN32
 #define UNCLEAN m_socket != INVALID_HANDLE_VALUE
@@ -94,7 +101,8 @@ void RichPresence::terminate() {
 #endif // DISABLE_RPC
 }
 
-bool RichPresence::doConnect() {
+bool RichPresence::doConnect()
+{
 #ifndef DISABLE_RPC
     if (std::string(UserConfigParams::m_discord_client_id) == "-1")
         return false;
@@ -164,7 +172,8 @@ bool RichPresence::doConnect() {
 #endif // DISABLE_RPC
 }
 
-void RichPresence::readData() {
+void RichPresence::readData()
+{
 #ifndef DISABLE_RPC
     size_t baseLength = sizeof(int32_t) * 2;
     struct discordPacket* basePacket = (struct discordPacket*) malloc(baseLength);
@@ -218,7 +227,8 @@ void RichPresence::readData() {
 #endif
 }
 
-void RichPresence::finishConnection(RichPresence* self) {
+void RichPresence::finishConnection(RichPresence* self)
+{
 #ifndef DISABLE_RPC
     // We read all the data from the socket. We're clear now to handshake!
     self->handshake();
@@ -235,10 +245,12 @@ void RichPresence::finishConnection(RichPresence* self) {
 #endif
 }
 
-bool RichPresence::tryConnect(std::string path) {
+bool RichPresence::tryConnect(std::string path)
+{
 #ifndef DISABLE_RPC
 #if !defined(WIN32) && defined(AF_UNIX)
-    struct sockaddr_un addr = {
+    struct sockaddr_un addr =
+    {
         .sun_family = AF_UNIX
     };
     memset(addr.sun_path, 0, sizeof(addr.sun_path));
@@ -248,7 +260,8 @@ bool RichPresence::tryConnect(std::string path) {
         // Something is probably wrong:
         if (errno != ENOENT && errno != ECONNREFUSED)
         {
-            perror("Couldn't open Discord socket!");
+            Log::error("RichPresence", "Couldn't read data from socket! %s",
+                strerror(errno));
         }
         return false;
     }
@@ -283,7 +296,8 @@ bool RichPresence::tryConnect(std::string path) {
     return m_connected;
 }
 
-void RichPresence::handshake() {
+void RichPresence::handshake()
+{
 #ifndef DISABLE_RPC
     if (UserConfigParams::m_rich_presence_debug)
         Log::debug("RichPresence", "Starting handshake...");
@@ -295,7 +309,8 @@ void RichPresence::handshake() {
 #endif
 }
 
-void RichPresence::sendData(int32_t op, std::string json) {
+void RichPresence::sendData(int32_t op, std::string json)
+{
 #ifndef DISABLE_RPC
     // Handshake will make us ready:
     if (op != OP_HANDSHAKE && !m_ready)
@@ -346,7 +361,8 @@ void RichPresence::sendData(int32_t op, std::string json) {
 #endif
 }
 
-void RichPresence::update(bool force) {
+void RichPresence::update(bool force)
+{
 #ifndef DISABLE_RPC
     if (STKProcess::getType() != PT_MAIN)
     {
@@ -408,7 +424,7 @@ void RichPresence::update(bool force) {
     uint64_t since = (now * 1000) - StkTime::getMonoTimeMs();
     if (world)
     {
-      since += world->getStart();
+        since += world->getStart();
     }
 
     // {cmd:SET_ACTIVITY,args:{activity:{},pid:0},nonce:0}
