@@ -169,6 +169,8 @@ bool RichPresence::doConnect()
 #else
     return false;
 #endif
+#else
+    return false;
 #endif // DISABLE_RPC
 }
 
