@@ -78,6 +78,12 @@ void RichPresence::terminate()
 #else
 #define UNCLEAN m_socket != -1
 #endif
+    if(m_thread != nullptr && STKProcess::getType() == PT_MAIN)
+    {
+        m_thread->join();
+        delete m_thread;
+        m_thread = nullptr;
+    }
     if (m_connected || UNCLEAN)
     {
         if (UNCLEAN && !m_connected)
@@ -91,12 +97,6 @@ void RichPresence::terminate()
 #endif
         m_connected = false;
         m_ready = false;
-    }
-    if(m_thread != nullptr && STKProcess::getType() == PT_MAIN)
-    {
-        m_thread->join();
-        delete m_thread;
-        m_thread = nullptr;
     }
 #endif // DISABLE_RPC
 }

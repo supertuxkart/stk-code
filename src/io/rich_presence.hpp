@@ -1,3 +1,4 @@
+#include <atomic>
 #ifdef WIN32
 #include <namedpipeapi.h>
 #endif
@@ -21,7 +22,7 @@ namespace RichPresenceNS
     {
     private:
         bool m_connected;
-        bool m_ready;
+        std::atomic_bool m_ready;
         time_t m_last;
 #ifdef WIN32
         HANDLE m_socket;
