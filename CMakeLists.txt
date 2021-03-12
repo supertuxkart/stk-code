@@ -44,6 +44,7 @@ CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of t
     "NOT SERVER_ONLY" OFF)
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH" OFF)
+CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
 
 if(APPLE AND NOT IOS)
     if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
@@ -189,12 +190,19 @@ endif()
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
 include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/bullet/src")
 
-if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD" OR CMAKE_SYSTEM_NAME MATCHES "DragonFly" OR USE_SWITCH)
-    set(LIBRESOLV_LIBRARY)
-elseif (HAIKU)
-    find_library(LIBRESOLV_LIBRARY NAMES network socket)
+# Build the DNS C library
+if(USE_DNS_C)
+    add_definitions(-DDNS_C)
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/dnsc")
+    include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/dnsc")
 else()
-    find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
+    if(WIN32 OR CMAKE_SYSTEM_NAME MATCHES "BSD" OR CMAKE_SYSTEM_NAME MATCHES "DragonFly" OR USE_SWITCH)
+        set(LIBRESOLV_LIBRARY)
+    elseif (HAIKU)
+        find_library(LIBRESOLV_LIBRARY NAMES network socket)
+    else()
+        find_library(LIBRESOLV_LIBRARY NAMES resolv libresolv)
+    endif()
 endif()
 
 # Find system ENet library or build it if missing
@@ -611,7 +619,6 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${Angelscript_LIBRARIES}
     ${CURL_LIBRARIES}
-    ${LIBRESOLV_LIBRARY}
     ${MCPP_LIBRARY}
     )
 
@@ -636,6 +643,12 @@ if (USE_SWITCH)
     ${GLAPI_LIBRARY}
     ${NX_LIBRARY}
   )
+endif()
+
+if (USE_DNS_C)
+    target_link_libraries(supertuxkart dnsc)
+else()
+    target_link_libraries(supertuxkart ${LIBRESOLV_LIBRARY})
 endif()
 
 if (USE_SQLITE3)
