@@ -17,7 +17,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-16 09:26+0800\n"
-"PO-Revision-Date: 2021-02-20 16:10+0000\n"
+"PO-Revision-Date: 2021-02-22 14:52+0000\n"
 "Last-Translator: خليل مراطلة <meratkha@gmail.com>\n"
 "Language-Team: Arabic (http://www.transifex.com/supertuxkart/supertuxkart/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -287,12 +287,12 @@ msgstr "جهاز مفعّل"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Inverted buttons"
-msgstr "أزرار مقلوبة"
+msgstr "الأزرار المقلوبة"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Buttons scale"
-msgstr "أزرار السُلّم"
+msgstr "مقياس الأزرار"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -302,7 +302,7 @@ msgstr "متقدم"
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
 msgid "Deadzone"
-msgstr "منطقة مقطوعة"
+msgstr "منطقة شديدة الخطورة"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
@@ -470,7 +470,7 @@ msgstr "غشاوة الحركة"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Image-based lighting"
-msgstr "الإضاءة قائمة على الصورة"
+msgstr "الإضاءة القائمة على الصورة"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -530,17 +530,17 @@ msgstr "حسنًا"
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Record the race for ghost replay"
-msgstr "سجّل السباق لشبح الإعادة"
+msgstr "سَجّل السباق لشبح الإعادة"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 msgid "Watch replay only"
-msgstr "شاهِد الإعادة وحسب"
+msgstr "شاهِد إعادة فقط"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
 msgid "Compare to another ghost"
-msgstr "قارِنه بشبح آخر"
+msgstr "قارن بشبح آخر"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
@@ -559,7 +559,7 @@ msgstr "ابدأ السباق"
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info screen action
 msgid "Compare ghost"
-msgstr "مقارنة الشبح"
+msgstr "قارن الشبح"
 
 #. I18N: ./data/gui/dialogs/ghost_replay_info_dialog.stkgui
 #. I18N: Ghost replay info action
@@ -703,7 +703,7 @@ msgstr "أنعِش"
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 #. I18N: In the recovery dialog
 msgid "Account Recovery"
-msgstr "استعِد الحساب"
+msgstr "استرجاع الحساب"
 
 #. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
 #. I18N: In the recovery dialog
@@ -756,7 +756,7 @@ msgstr "اقبل"
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
 msgid "Server Configuration"
-msgstr "إعدادات الخادم"
+msgstr "تكوين الخادم"
 
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
@@ -882,7 +882,7 @@ msgstr "انضمّ"
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "Add player"
-msgstr "اضف لاعبًا"
+msgstr "أضف لاعبًا"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -903,7 +903,7 @@ msgstr "اضغط على زر \"كل اللاعبين جاهزين\" بعد أن 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
 msgid "All players ready"
-msgstr "جميع اللاعبين جاهزون"
+msgstr "كل اللاعبين جاهزون"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -1179,7 +1179,7 @@ msgstr "قارن الإعادة"
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
 msgid "Only show replays matching the current difficulty"
-msgstr "الاقتصار على إظهار إعادات موافقة لمستوى الصعوبة الحالي "
+msgstr "إظهار الإعادة المطابقة للصعوبة الحالية فقط"
 
 #. I18N: ./data/gui/screens/ghost_replay_selection.stkgui
 #. I18N: In the ghost replay selection screen
@@ -1813,7 +1813,7 @@ msgstr "ابدأ السباق"
 #. I18N: In networking lobby to configuration server settings
 #: src/states_screens/online/networking_lobby.cpp:194
 msgid "Configuration"
-msgstr "الضبط"
+msgstr "التكوين"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
@@ -2120,7 +2120,7 @@ msgstr "احذف الضّبط"
 #: src/states_screens/options/options_screen_device.cpp:116
 #: src/states_screens/options/options_screen_device.cpp:628
 msgid "Disable Configuration"
-msgstr "تعطيل الإعداد"
+msgstr "تعطيل التكوين"
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
@@ -2130,7 +2130,7 @@ msgstr "ارجع إلى قائمة الأجهزة"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 msgid "Rename Configuration"
-msgstr "إعادة تسمية الإعداد"
+msgstr "إعادة تسمية التكوين"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2297,7 +2297,7 @@ msgstr "حدّد وضع لعب"
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
 msgid "Use left/right to choose your team and press fire"
-msgstr "استخدم اليسار/اليمين لاختيار فريقك واضغط \"الإطلاق\""
+msgstr "استخدم اليسار/اليمين لاختيار فريقك واضغط إطلاق النار"
 
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
@@ -2724,15 +2724,15 @@ msgstr "السباق العادي (الجائزة الكبرى)"
 
 #: src/challenges/challenge_data.cpp:305
 msgid "Time-Trial (Grand Prix)"
-msgstr "ضد الزمن (الجائزة الكبرى)"
+msgstr "ضد الوقت (الجائزة الكبرى)"
 
 #: src/challenges/challenge_data.cpp:310
 msgid "Time-Trial - beat the replay"
-msgstr "سباق مع الزمن - تغلب على الاعادة"
+msgstr "ضد الوقت - تغلب على الإعادة"
 
 #: src/challenges/challenge_data.cpp:312
 msgid "Time-Trial - nitro challenge"
-msgstr "سباق مع الزمن - تحدي النيترو"
+msgstr "ضد الوقت - تحدي النيترو"
 
 #: src/challenges/challenge_data.cpp:314
 msgid "Normal Race (single race)"
@@ -2740,7 +2740,7 @@ msgstr "سباق عادي (سباق فردي)"
 
 #: src/challenges/challenge_data.cpp:316
 msgid "Time-Trial (single race)"
-msgstr "ضدّ الوقت (سباق فردي)"
+msgstr "ضد الوقت (سباق فردي)"
 
 #: src/challenges/challenge_data.cpp:318
 msgid "Follow the Leader (single race)"
@@ -2907,13 +2907,13 @@ msgstr "زرّ الفأرة الأوسط"
 #: src/input/binding.cpp:114
 msgctxt "input_key"
 msgid "X1 Mouse Button"
-msgstr "س1 زر الفأرة"
+msgstr "زر الفأرة س1"
 
 #. I18N: input configuration screen: mouse button
 #: src/input/binding.cpp:116
 msgctxt "input_key"
 msgid "X2 Mouse Button"
-msgstr "س2 زر الفأرة"
+msgstr "زر الفأرة س2"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:118
@@ -2943,13 +2943,13 @@ msgstr "إعادة Return"
 #: src/input/binding.cpp:126
 msgctxt "input_key"
 msgid "Shift"
-msgstr "تحويل Shift"
+msgstr "تبديل Shift"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:128
 msgctxt "input_key"
 msgid "Control"
-msgstr "التحكم Ctrl"
+msgstr "تحكم Ctrl"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:130
@@ -2961,7 +2961,7 @@ msgstr "تبديل/القائمة Alt/Menu"
 #: src/input/binding.cpp:132
 msgctxt "input_key"
 msgid "Pause"
-msgstr "تَوَقُّف Pause"
+msgstr "توقف Pause"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:134
@@ -3238,13 +3238,13 @@ msgstr "قُفل التمرير Scroll Lock"
 #: src/input/binding.cpp:287
 msgctxt "input_key"
 msgid "Left Shift"
-msgstr "تحويل Shift الأيسر"
+msgstr "تبديل Shift الأيسر"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:289
 msgctxt "input_key"
 msgid "Right Shift"
-msgstr "تحويل Shift الأيمن"
+msgstr "تبديل Shift الأيمن"
 
 #. I18N: input configuration screen: keyboard key
 #: src/input/binding.cpp:291
@@ -3649,7 +3649,7 @@ msgstr "%s سجل هدف!"
 #: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
 #, c-format
 msgid "Oops, %s made an own goal!"
-msgstr "وَيْحي،%s سجَّلت هدفًا في مَرماك!"
+msgstr "آخ،%s سجَّلت هدفًا في مَرماك!"
 
 #: src/modes/three_strikes_battle.cpp:645
 #, c-format
@@ -4118,7 +4118,7 @@ msgstr "يجب أن يصل مجموع الأهداف الفرعية إلى ال�
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:276
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:301
 msgid "Races won"
-msgstr "السباقات الرابحة"
+msgstr "السباقات الفائزة"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4286,13 +4286,13 @@ msgstr "انتهت السباقات مع شبح الإعادة"
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:226
 msgid "Capture-the-Flag matches started"
-msgstr "بدأت مباريات التقاط العلم"
+msgstr "بدأت مباريات التقاط الراية"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:228
 msgid "Capture-the-Flag matches finished"
-msgstr "انتهت مباريات التقاط العلم"
+msgstr "انتهت مباريات التقاط الراية"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4623,7 +4623,7 @@ msgstr "المهم فقط"
 #: src/states_screens/dialogs/custom_video_settings.cpp:90
 #: src/states_screens/options/options_screen_video.cpp:619
 msgid "Low"
-msgstr "منخفظ"
+msgstr "منخفض"
 
 #. I18N: Geometry level high : everything is displayed
 #. I18N: in the graphical options tooltip;
@@ -4640,7 +4640,7 @@ msgstr "مرتفع"
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
 #: src/states_screens/options/options_screen_video.cpp:616
 msgid "Very Low"
-msgstr "منخفظ جدا"
+msgstr "منخفض جدا"
 
 #. I18N: In download assets dialog
 #: src/states_screens/dialogs/download_assets.cpp:106
@@ -4694,7 +4694,7 @@ msgstr "المستخدم"
 #: src/states_screens/ghost_replay_selection.cpp:166
 msgctxt "column_name"
 msgid "Version"
-msgstr "الاصدار"
+msgstr "الإصدار"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:107
@@ -5491,12 +5491,12 @@ msgstr "المالك"
 #: src/states_screens/online/server_selection.cpp:134
 msgctxt "column_name"
 msgid "Distance (km)"
-msgstr "مسافة (كم)"
+msgstr "المسافة (كم)"
 
 #. I18N: In server selection screen, unknown distance to server
 #: src/states_screens/online/server_selection.cpp:272
 msgid "Unknown"
-msgstr "غير معروف"
+msgstr "مجهول"
 
 #. I18N: Message shown to user if no IPv4 detected by STK
 #: src/states_screens/online/server_selection.cpp:315
@@ -5579,7 +5579,7 @@ msgstr "مكّن الجهاز"
 #: src/states_screens/options/options_screen_device.cpp:118
 #: src/states_screens/options/options_screen_device.cpp:629
 msgid "Enable Configuration"
-msgstr "تمكين الإعدادات"
+msgstr "تمكين التكوين"
 
 #. I18N: Key binding section
 #: src/states_screens/options/options_screen_device.cpp:167
@@ -5679,7 +5679,7 @@ msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
 " working."
-msgstr "تحذير: مفتاح التحول 'Shift' غير موصى به. عندما تضغط عليه، كل المفاتيح التي تحتوي حروفا تختلف عن حالتها الكبيرة ستتوقف عن العمل."
+msgstr "تحذير: مفتاح التبديل 'Shift' غير موصى به. عندما تضغط عليه، كل المفاتيح التي تحتوي حروفا تختلف عن حالتها الكبيرة ستتوقف عن العمل."
 
 #. I18N: shown before deleting an input configuration
 #: src/states_screens/options/options_screen_device.cpp:609
@@ -5688,7 +5688,7 @@ msgstr "أمتأكّد من حذف هذا الضّبط نهائيًّا؟"
 
 #: src/states_screens/options/options_screen_device.cpp:637
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr "أدخل اسم الإعداد الجديد، اتركه فارغًا للعودة إلى القيمة الافتراضية."
+msgstr "أدخل اسم التكوين الجديد، اتركه فارغًا للعودة إلى القيمة الافتراضية."
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -5720,7 +5720,7 @@ msgstr "أجهزة لمس"
 #. I18N: In the input configuration screen, help for touch device
 #: src/states_screens/options/options_screen_input.cpp:205
 msgid "Tap on a device to configure it"
-msgstr "اضغط على جهاز لإعداده"
+msgstr "اضغط على جهاز لتكوينه"
 
 #. I18N: in the language choice, to select the same language as the OS
 #: src/states_screens/options/options_screen_language.cpp:89
@@ -5926,7 +5926,7 @@ msgstr "لا يمكنك حذف اللاعب الوحيد."
 #: src/states_screens/options/user_screen.cpp:670
 #, c-format
 msgid "Do you really want to delete player '%s'?"
-msgstr "أتريد حقا حذف لاعب \"%s\"؟"
+msgstr "أتريد حقا حذف اللاعب \"%s\"؟"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:70

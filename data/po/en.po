@@ -6297,7 +6297,3 @@ msgstr "If you need more stability, consider using the stable version: %s"
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
 msgstr "SuperTuxKart Team"
-
-#: rich_presence.cpp:296
-msgid "Getting ready to race"
-msgstr "Getting ready to race"

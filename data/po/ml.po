@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2021-02-16 09:26+0800\n"
-"PO-Revision-Date: 2021-02-21 16:08+0000\n"
+"PO-Revision-Date: 2021-03-06 04:41+0000\n"
 "Last-Translator: Adithyan S S <AssG.Fight.Fairy@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/supertuxkart/supertuxkart/language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -1847,7 +1847,7 @@ msgstr "..."
 #. I18N: ./data/gui/screens/online/profile_achievements_tab.stkgui
 #. I18N: In the achievements screen
 msgid "Player rankings"
-msgstr "കളികാരുടെ സ്ഥാനമാനങ്ങൾ"
+msgstr "കളിക്കാരന്റെ സ്ഥാനമാനങ്ങൾ"
 
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: Section in the profile screen
@@ -2243,7 +2243,7 @@ msgstr "ഗ്രാഫിക്കൽ എഫക്ടുകൾ നിരക്�
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr "മിഴിവ് അവതരിപ്പിക്കുക"
+msgstr "മിഴിവ് അവതരിപ്പിക്കാം"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -4554,7 +4554,7 @@ msgstr "1024x768 അല്ലെങ്കിൽ 1280x720-നെക്കാൾ �
 #: src/states_screens/dialogs/custom_camera_settings.cpp:86
 #: src/states_screens/options/options_screen_ui.cpp:164
 msgid "Drone chase"
-msgstr "ഡ്രോൺ പിന്തുടരൽ"
+msgstr "ഡ്രോൺ ചേസ്"
 
 #. I18N: In the UI options, Camera setting: Custom
 #. I18N: custom video settings
