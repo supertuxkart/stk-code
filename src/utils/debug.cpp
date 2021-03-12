@@ -64,7 +64,6 @@
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
-#include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
@@ -1034,7 +1033,7 @@ bool handleContextMenuAction(s32 cmd_id)
         irr_driver->setRecording(false);
         break;
     case DEBUG_HELP:
-        new TutorialMessageDialog(_("Debug keyboard shortcuts (can conflict with user-defined shortcuts):\n"
+        new TutorialMessageDialog(L"Debug keyboard shortcuts (can conflict with user-defined shortcuts):\n"
                             "* <~> - Show this help dialog | + <Ctrl> - Adjust lights | + <Shift> - Adjust visuals\n"
                             "* <F1> - Anvil powerup | + <Ctrl> - Normal view | + <Shift> - Bomb attachment\n"
                             "* <F2> - Basketball powerup | + <Ctrl> - First person view | + <Shift> - Anvil attachment\n"
@@ -1054,7 +1053,7 @@ bool handleContextMenuAction(s32 cmd_id)
                             "* <End> - Last kart\n"
                             "* <Page Up> - Previous kart\n"
                             "* <Page Down> - Next kart"
-                            ), true);
+                            , true);
         break;
     }
     return false;
