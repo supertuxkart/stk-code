@@ -1228,7 +1228,7 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
         case MINOR_MODE_EASTER_EGG:     return _("Egg Hunt");
         //I18N: Game mode
         case MINOR_MODE_SOCCER:         return _("Soccer");
-        default: assert(false); return L"";
+        default: return L"";
     }
 }   // getNameOf
 
