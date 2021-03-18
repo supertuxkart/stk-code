@@ -10,6 +10,7 @@
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "utils/translation.hpp"
 #include "network/protocols/client_lobby.hpp"
@@ -468,7 +469,7 @@ void RichPresence::update(bool force)
         AbstractKart *abstractKart = world->getLocalPlayerKart(0);
         if (abstractKart)
         {
-            const KartProperties* kart = abstractKart->getKartProperties();
+            const KartProperties* kart = abstractKart->getKartModel()->getKartProperties();
             assets.add("small_image", protocol && protocol->isSpectator() ?
                        "spectate" : kart->isAddon() ?
                        "addons" : "kart_" + abstractKart->getIdent());

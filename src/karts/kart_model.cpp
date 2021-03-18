@@ -132,6 +132,7 @@ KartModel::KartModel(bool is_master)
     m_animation_speed   = 25;
     m_current_animation = AF_DEFAULT;
     m_support_colorization = false;
+    m_kart_properties = NULL;
 }   // KartModel
 
 // ----------------------------------------------------------------------------
@@ -324,6 +325,7 @@ KartModel* KartModel::makeCopy(std::shared_ptr<RenderInfo> ri)
     assert(m_is_master);
     assert(!m_render_info);
     assert(!m_animated_node);
+    assert(m_kart_properties);
     KartModel *km               = new KartModel(/*is master*/ false);
     km->m_kart_width            = m_kart_width;
     km->m_kart_length           = m_kart_length;
@@ -384,6 +386,7 @@ KartModel* KartModel::makeCopy(std::shared_ptr<RenderInfo> ri)
     for(unsigned int i=AF_BEGIN; i<=AF_END; i++)
         km->m_animation_frame[i] = m_animation_frame[i];
 
+    km->m_kart_properties = m_kart_properties;
     return km;
 }   // makeCopy
 
@@ -563,6 +566,7 @@ void HeadlightObject::setLight(scene::ISceneNode* parent,
 bool KartModel::loadModels(const KartProperties &kart_properties)
 {
     assert(m_is_master);
+    m_kart_properties = &kart_properties;
     std::string  full_path = kart_properties.getKartDir()+m_model_filename;
     // For b3d loader only
     if (m_animation_frame[AF_STRAIGHT] > -1)
