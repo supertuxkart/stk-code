@@ -469,10 +469,14 @@ void RichPresence::update(bool force)
         if (abstractKart)
         {
             const KartProperties* kart = abstractKart->getKartProperties();
-            assets.add("small_image", kart->isAddon() ?
+            assets.add("small_image", protocol && protocol->isSpectator() ?
+                       "spectate" : kart->isAddon() ?
                        "addons" : "kart_" + abstractKart->getIdent());
-            std::string kartName = convert.to_bytes(kart->getName().c_str());
-            assets.add("small_text", kartName + " (" + playerName + ")");
+            if (!protocol || !protocol->isSpectator())
+            {
+                std::string kartName = convert.to_bytes(kart->getName().c_str());
+                assets.add("small_text", kartName + " (" + playerName + ")");
+            }
         }
     }
     else
