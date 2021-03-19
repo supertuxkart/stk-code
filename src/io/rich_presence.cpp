@@ -531,8 +531,15 @@ void RichPresence::update(bool force)
                     auto existing = m_asset_cache.find(key);
                     if (existing == m_asset_cache.end())
                     {
-                        useAddon = m_assets.find(key) == std::string::npos;
-                        m_asset_cache.insert({key, useAddon});
+                        if (m_assets.size())
+                        {
+                            useAddon = m_assets.find(key) == std::string::npos;
+                            m_asset_cache.insert({key, useAddon});
+                        }
+                        else
+                        {
+                            useAddon = true;
+                        }
                     }
                     else
                     {
