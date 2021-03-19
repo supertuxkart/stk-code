@@ -16,6 +16,7 @@
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/server.hpp"
+#include "online/request_manager.hpp"
 
 #include <locale>
 #include <codecvt>
@@ -61,7 +62,10 @@ RichPresence::RichPresence() : m_connected(false), m_ready(false), m_last(0),
 #else
     m_socket(-1),
 #endif
-    m_thread(nullptr)
+    m_assets_request(nullptr),
+    m_thread(nullptr),
+    m_asset_cache(),
+    m_assets()
 {
     doConnect();
 }
@@ -364,6 +368,17 @@ void RichPresence::sendData(int32_t op, std::string json)
 #endif
 }
 
+void RichPresence::ensureCache()
+{
+    if (m_assets_request != nullptr ||
+        Online::RequestManager::get() == nullptr) return;
+    std::string url = "https://discord.com/api/v8/oauth2/applications/";
+    url.append(UserConfigParams::m_discord_client_id);
+    url.append("/assets");
+    m_assets_request = std::make_shared<AssetRequest>(url, &m_assets);
+    m_assets_request->queue();
+}
+
 void RichPresence::update(bool force)
 {
 #ifndef DISABLE_RPC
@@ -388,6 +403,11 @@ void RichPresence::update(bool force)
     if (!m_connected)
     {
         doConnect();
+    }
+    else
+    {
+        // Connected but not ready, ensure we have cache
+        ensureCache();
     }
     if (!m_ready)
     {
@@ -464,15 +484,62 @@ void RichPresence::update(bool force)
     {
         Track* track = track_manager->getTrack(trackId);
         assets.add("large_text", convert.to_bytes(track->getName().c_str()));
-        assets.add("large_image", track->isAddon() ?
+        bool useAddon = false;
+        if(track->isAddon())
+        {
+            std::string key = "\"track_";
+            key.append(track->getIdent());
+            key.append("\"");
+            auto existing = m_asset_cache.find(key);
+            if (existing == m_asset_cache.end())
+            {
+                useAddon = m_assets.find(key) == std::string::npos;
+                m_asset_cache.insert({key, useAddon});
+            }
+            else
+            {
+                useAddon = existing->second;
+            }
+            if (useAddon && UserConfigParams::m_rich_presence_debug)
+            {
+                Log::debug("RichPresence", "Couldn't find icon for track %s", key.c_str());
+            }
+        }
+        assets.add("large_image", useAddon ?
                    "addons" : "track_" + trackId);
         AbstractKart *abstractKart = world->getLocalPlayerKart(0);
         if (abstractKart)
         {
             const KartProperties* kart = abstractKart->getKartModel()->getKartProperties();
-            assets.add("small_image", protocol && protocol->isSpectator() ?
-                       "spectate" : kart->isAddon() ?
-                       "addons" : "kart_" + abstractKart->getIdent());
+            if (protocol && protocol->isSpectator())
+            {
+                assets.add("small_image", "spectate");
+            }
+            else
+            {
+                bool useAddon = false;
+                if(kart->isAddon())
+                {
+                    std::string key = "\"kart_";
+                    key.append(abstractKart->getIdent());
+                    key.append("\"");
+                    auto existing = m_asset_cache.find(key);
+                    if (existing == m_asset_cache.end())
+                    {
+                        useAddon = m_assets.find(key) == std::string::npos;
+                        m_asset_cache.insert({key, useAddon});
+                    }
+                    else
+                    {
+                        useAddon = existing->second;
+                    }
+                    if (useAddon && UserConfigParams::m_rich_presence_debug)
+                    {
+                        Log::debug("RichPresence", "Couldn't find icon for kart %s", key.c_str());
+                    }
+                }
+                assets.add("small_image", useAddon ? "addons" : "kart_" + abstractKart->getIdent());
+            }
             if (!protocol || !protocol->isSpectator())
             {
                 std::string kartName = convert.to_bytes(kart->getName().c_str());
@@ -493,10 +560,10 @@ void RichPresence::update(bool force)
 
     HardwareStats::Json timestamps;
     timestamps.add<std::string>("start", std::to_string(since));
-    
+
     timestamps.finish();
     activity.add<std::string>("timestamps", timestamps.toString());
-    
+
     activity.finish();
     args.add<std::string>("activity", activity.toString());
     int pid = 0;
