@@ -3,9 +3,11 @@
 #include <namedpipeapi.h>
 #endif
 #include <thread>
+#include <map>
 
 namespace RichPresenceNS
 {
+    class AssetRequest;
     // There are more, but we don't need to use them
     enum OPCodes
     {
@@ -29,13 +31,17 @@ namespace RichPresenceNS
 #else
         int m_socket;
 #endif
+        std::shared_ptr<AssetRequest> m_assets_request;
         std::thread* m_thread;
+        std::map<std::string, bool> m_asset_cache;
+        std::string m_assets;
         bool tryConnect(std::string path);
         bool doConnect();
         void terminate();
         void sendData(int32_t op, std::string json);
         void handshake();
         void readData();
+        void ensureCache();
         static void finishConnection(RichPresence* self);
     public:
         RichPresence();
