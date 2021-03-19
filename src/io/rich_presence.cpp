@@ -42,13 +42,11 @@ class AssetRequest : public Online::HTTPRequest {
 private:
     std::string* m_data;
     RichPresence* m_rpc;
-    virtual void afterOperation() OVERRIDE
-    {
-        Online::HTTPRequest::afterOperation();
-        m_data->append(Online::HTTPRequest::getData());
-    }
     virtual void callback() OVERRIDE
     {
+        if (UserConfigParams::m_rich_presence_debug)
+            Log::info("RichPresence", "Got asset list!");
+        m_data->append(Online::HTTPRequest::getData());
         // Updated asset list! Maybe using addon, so we update:
         m_rpc->update(true);
     }
@@ -519,8 +517,13 @@ void RichPresence::update(bool force)
                 auto existing = m_asset_cache.find(key);
                 if (existing == m_asset_cache.end())
                 {
-                    useAddon = m_assets.find(key) == std::string::npos;
-                    m_asset_cache.insert({key, useAddon});
+                    if (!m_assets.empty())
+                    {
+                        useAddon = m_assets.find(key) == std::string::npos;
+                        m_asset_cache.insert({key, useAddon});
+                    }
+                    else
+                        useAddon = true;
                 }
                 else
                 {
@@ -528,7 +531,7 @@ void RichPresence::update(bool force)
                 }
                 if (useAddon && UserConfigParams::m_rich_presence_debug)
                 {
-                    Log::debug("RichPresence", "Couldn't find icon for track %s", key.c_str());
+                    Log::info("RichPresence", "Couldn't find icon for track %s", key.c_str());
                 }
             }
             assets.add("large_image", useAddon ?
@@ -554,15 +557,13 @@ void RichPresence::update(bool force)
                     auto existing = m_asset_cache.find(key);
                     if (existing == m_asset_cache.end())
                     {
-                        if (m_assets.size())
+                        if (!m_assets.empty())
                         {
                             useAddon = m_assets.find(key) == std::string::npos;
                             m_asset_cache.insert({key, useAddon});
                         }
                         else
-                        {
                             useAddon = true;
-                        }
                     }
                     else
                     {
@@ -570,7 +571,7 @@ void RichPresence::update(bool force)
                     }
                     if (useAddon && UserConfigParams::m_rich_presence_debug)
                     {
-                        Log::debug("RichPresence", "Couldn't find icon for kart %s", key.c_str());
+                        Log::info("RichPresence", "Couldn't find icon for kart %s", key.c_str());
                     }
                 }
                 assets.add("small_image", useAddon ? "addons" : "kart_" + abstractKart->getIdent());
