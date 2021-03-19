@@ -459,9 +459,10 @@ void RichPresence::update(bool force)
     HardwareStats::Json activity;
 
     std::string trackName = convert.to_bytes(_("Getting ready to race").c_str());
+    Track* track;
     if (world)
     {
-        Track* track = track_manager->getTrack(trackId);
+        track = track_manager->getTrack(trackId);
         if (track)
             trackName = convert.to_bytes(track->getName().c_str());
     }
@@ -475,38 +476,42 @@ void RichPresence::update(bool force)
         ));
     }
 
-    activity.add("state", std::string(trackName.c_str()));
-    if (world)
-        activity.add("details", minorModeName + " (" + difficulty + ")");
-
     HardwareStats::Json assets;
-    if (world)
+    if (world && track)
     {
-        Track* track = track_manager->getTrack(trackId);
-        assets.add("large_text", convert.to_bytes(track->getName().c_str()));
         bool useAddon = false;
-        if(track->isAddon())
+        if (track->isInternal())
         {
-            std::string key = "\"track_";
-            key.append(track->getIdent());
-            key.append("\"");
-            auto existing = m_asset_cache.find(key);
-            if (existing == m_asset_cache.end())
-            {
-                useAddon = m_assets.find(key) == std::string::npos;
-                m_asset_cache.insert({key, useAddon});
-            }
-            else
-            {
-                useAddon = existing->second;
-            }
-            if (useAddon && UserConfigParams::m_rich_presence_debug)
-            {
-                Log::debug("RichPresence", "Couldn't find icon for track %s", key.c_str());
-            }
+            assets.add("large_image", "logo");
+            trackName = convert.to_bytes(_("Story Mode").c_str());
         }
-        assets.add("large_image", useAddon ?
-                   "addons" : "track_" + trackId);
+        else
+        {
+            activity.add("details", minorModeName + " (" + difficulty + ")");
+            if(track->isAddon())
+            {
+                std::string key = "\"track_";
+                key.append(track->getIdent());
+                key.append("\"");
+                auto existing = m_asset_cache.find(key);
+                if (existing == m_asset_cache.end())
+                {
+                    useAddon = m_assets.find(key) == std::string::npos;
+                    m_asset_cache.insert({key, useAddon});
+                }
+                else
+                {
+                    useAddon = existing->second;
+                }
+                if (useAddon && UserConfigParams::m_rich_presence_debug)
+                {
+                    Log::debug("RichPresence", "Couldn't find icon for track %s", key.c_str());
+                }
+            }
+            assets.add("large_image", useAddon ?
+                       "addons" : "track_" + trackId);
+        }
+        assets.add("large_text", trackName);
         AbstractKart *abstractKart = world->getLocalPlayerKart(0);
         if (abstractKart)
         {
@@ -555,6 +560,7 @@ void RichPresence::update(bool force)
         // std::string filename = std::string(basename(player->getIconFilename().c_str()));
         // assets->add("small_image", "kart_" + filename);
     }
+    activity.add("state", std::string(trackName.c_str()));
     assets.finish();
     activity.add<std::string>("assets", assets.toString());
 
