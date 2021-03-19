@@ -17,6 +17,7 @@
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/server.hpp"
 #include "online/request_manager.hpp"
+#include "online/http_request.hpp"
 
 #include <locale>
 #include <codecvt>
@@ -37,6 +38,28 @@
 
 namespace RichPresenceNS
 {
+class AssetRequest : public Online::HTTPRequest {
+private:
+    std::string* m_data;
+    RichPresence* m_rpc;
+    virtual void afterOperation() OVERRIDE
+    {
+        Online::HTTPRequest::afterOperation();
+        m_data->append(Online::HTTPRequest::getData());
+    }
+    virtual void callback() OVERRIDE
+    {
+        // Updated asset list! Maybe using addon, so we update:
+        m_rpc->update(true);
+    }
+public:
+    AssetRequest(const std::string& url, std::string* data, RichPresence* rpc) :
+        Online::HTTPRequest(0), m_data(data), m_rpc(rpc)
+    {
+        setURL(url);
+        setDownloadAssetsRequest(true);
+    }
+};
 RichPresence* g_rich_presence = nullptr;
 
 RichPresence* RichPresence::get()
@@ -375,7 +398,7 @@ void RichPresence::ensureCache()
     std::string url = "https://discord.com/api/v8/oauth2/applications/";
     url.append(UserConfigParams::m_discord_client_id);
     url.append("/assets");
-    m_assets_request = std::make_shared<AssetRequest>(url, &m_assets);
+    m_assets_request = std::make_shared<AssetRequest>(url, &m_assets, this);
     m_assets_request->queue();
 }
 

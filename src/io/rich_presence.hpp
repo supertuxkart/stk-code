@@ -4,26 +4,10 @@
 #endif
 #include <thread>
 #include <map>
-#include "online/http_request.hpp"
 
 namespace RichPresenceNS
 {
-    class AssetRequest : public Online::HTTPRequest {
-    private:
-        std::string* m_data;
-        virtual void afterOperation() OVERRIDE
-        {
-            Online::HTTPRequest::afterOperation();
-            m_data->append(Online::HTTPRequest::getData());
-        }
-    public:
-        AssetRequest(const std::string& url, std::string* data) : Online::HTTPRequest(0),
-                                                           m_data(data) {
-            setURL(url);
-            setDownloadAssetsRequest(true);
-        }
-    };
-
+    class AssetRequest;
     // There are more, but we don't need to use them
     enum OPCodes
     {
