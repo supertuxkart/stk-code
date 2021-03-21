@@ -12,15 +12,14 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
+#define STK_UTF8_GETTEXT 1
 #include "utils/translation.hpp"
+#undef STK_UTF8_GETTEXT
 #include "network/protocols/client_lobby.hpp"
 #include "network/protocols/lobby_protocol.hpp"
 #include "network/server.hpp"
 #include "online/request_manager.hpp"
 #include "online/http_request.hpp"
-
-#include <locale>
-#include <codecvt>
 
 #if defined(__SWITCH__) || defined(MOBILE_STK) || defined(SERVER_ONLY)
 #define DISABLE_RPC
@@ -437,8 +436,6 @@ void RichPresence::update(bool force)
     if (UserConfigParams::m_rich_presence_debug)
         Log::debug("RichPresence", "Updating status!");
 
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-
     std::string playerName;
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if (player)
@@ -446,11 +443,11 @@ void RichPresence::update(bool force)
         if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST ||
             PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
         {
-            playerName = convert.to_bytes(player->getLastOnlineName().c_str()) + "@stk";
+            playerName = StringUtils::wideToUtf8(player->getLastOnlineName()) + "@stk";
         }
         else
         {
-            playerName = convert.to_bytes(player->getName().c_str());
+            playerName = StringUtils::wideToUtf8(player->getName());
         }
     }
     else
@@ -458,12 +455,10 @@ void RichPresence::update(bool force)
     World* world = World::getWorld();
     RaceManager *raceManager = RaceManager::get();
     std::string trackId = raceManager->getTrackName();
-    std::string difficulty = convert.to_bytes(raceManager->getDifficultyName(
-        raceManager->getDifficulty()
-    ).c_str());
-    std::string minorModeName = convert.to_bytes(raceManager->getNameOf(
-        raceManager->getMinorMode()
-    ).c_str());
+    std::string difficulty = StringUtils::wideToUtf8(raceManager->getDifficultyName(
+        raceManager->getDifficulty()));
+    std::string minorModeName = StringUtils::wideToUtf8(raceManager->getNameOf(
+        raceManager->getMinorMode()));
     // Discord takes the time when we started as unix timestamp
     uint64_t since = (now * 1000) - StkTime::getMonoTimeMs();
     if (world)
@@ -479,22 +474,21 @@ void RichPresence::update(bool force)
     HardwareStats::Json args;
     HardwareStats::Json activity;
 
-    std::string trackName = convert.to_bytes(_("Getting ready to race").c_str());
+    std::string trackName = _("Getting ready to race");
     Track* track;
     if (world)
     {
         track = track_manager->getTrack(trackId);
         if (track)
-            trackName = convert.to_bytes(track->getName().c_str());
+            trackName = StringUtils::wideToUtf8(track->getName());
     }
 
     auto protocol = LobbyProtocol::get<ClientLobby>();
     if (protocol != nullptr && protocol.get()->getJoinedServer() != nullptr)
     {
         trackName.append(" - ");
-        trackName.append(convert.to_bytes(
-            protocol.get()->getJoinedServer().get()->getName().c_str()
-        ));
+        trackName.append(StringUtils::wideToUtf8(
+            protocol.get()->getJoinedServer().get()->getName()));
     }
 
     HardwareStats::Json assets;
@@ -504,7 +498,7 @@ void RichPresence::update(bool force)
         if (track->isInternal())
         {
             assets.add("large_image", "logo");
-            trackName = convert.to_bytes(_("Story Mode").c_str());
+            trackName = _("Story Mode");
         }
         else
         {
@@ -578,7 +572,7 @@ void RichPresence::update(bool force)
             }
             if (!protocol || !protocol->isSpectator())
             {
-                std::string kartName = convert.to_bytes(kart->getName().c_str());
+                std::string kartName = StringUtils::wideToUtf8(kart->getName());
                 assets.add("small_text", kartName + " (" + playerName + ")");
             }
         }
