@@ -29,6 +29,7 @@ import android.os.Process;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Display;
+import android.view.DisplayCutout;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.view.KeyEvent;
@@ -39,6 +40,7 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
 import android.widget.FrameLayout;
@@ -63,6 +65,12 @@ public class SuperTuxKartActivity extends SDLActivity
     private ImageView m_splash_screen;
     private STKEditText m_stk_edittext;
     private int m_bottom_y;
+    private float m_top_padding;
+    private float m_bottom_padding;
+    private float m_left_padding;
+    private float m_right_padding;
+    // ------------------------------------------------------------------------
+    private native static void handlePadding(boolean val);
     // ------------------------------------------------------------------------
     private native static void saveKeyboardHeight(int height);
     // ------------------------------------------------------------------------
@@ -179,6 +187,8 @@ public class SuperTuxKartActivity extends SDLActivity
         m_progress_bar = null;
         m_splash_screen = null;
         m_bottom_y = 0;
+        m_top_padding = m_bottom_padding = m_left_padding = m_right_padding =
+            0.0f;
         final View root = getWindow().getDecorView().findViewById(
             android.R.id.content);
         root.getViewTreeObserver().addOnGlobalLayoutListener(new
@@ -249,6 +259,11 @@ public class SuperTuxKartActivity extends SDLActivity
                     istr.close();
             }
             catch(Exception e) {}
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        {
+            getWindow().getAttributes().layoutInDisplayCutoutMode =
+                LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         }
     }
     // ------------------------------------------------------------------------
@@ -375,6 +390,14 @@ public class SuperTuxKartActivity extends SDLActivity
             Configuration.SCREENLAYOUT_SIZE_MASK;
     }
     // ------------------------------------------------------------------------
+    public float getTopPadding()                      { return m_top_padding; }
+    // ------------------------------------------------------------------------
+    public float getBottomPadding()                { return m_bottom_padding; }
+    // ------------------------------------------------------------------------
+    public float getLeftPadding()                    { return m_left_padding; }
+    // ------------------------------------------------------------------------
+    public float getRightPadding()                  { return m_right_padding; }
+    // ------------------------------------------------------------------------
     public void showExtractProgress(final int progress)
     {
         runOnUiThread(new Runnable()
@@ -447,4 +470,30 @@ public class SuperTuxKartActivity extends SDLActivity
             });
         }
     }
+    // ------------------------------------------------------------------------
+    @Override
+    public void onAttachedToWindow()
+    {
+        super.onAttachedToWindow();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        {
+            DisplayCutout dc = getWindow().getDecorView().getRootWindowInsets()
+                .getDisplayCutout();
+            if (dc != null)
+            {
+                m_top_padding = (float)dc.getBoundingRectTop().height();
+                m_bottom_padding = (float)dc.getBoundingRectBottom().height();
+                m_left_padding = (float)dc.getBoundingRectLeft().width();
+                m_right_padding = (float)dc.getBoundingRectRight().width();
+            }
+        }
+    }
+    // ------------------------------------------------------------------------
+    @Override
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode,
+                                         Configuration newConfig)
+    {
+        handlePadding(isInMultiWindowMode);
+    }
+
 }

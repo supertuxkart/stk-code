@@ -141,6 +141,7 @@ public:
 
 
 private:
+    int                   m_screen_orientation;
     std::vector<VideoMode> m_modes;
 
     void                  setupViewports();

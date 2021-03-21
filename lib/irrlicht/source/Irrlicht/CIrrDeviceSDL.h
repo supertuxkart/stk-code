@@ -116,25 +116,13 @@ namespace irr
 
 		const SDL_SysWMinfo& getWMInfo() const { return Info; }
 
-		virtual s32 getTopPadding()
-		{
-			return TopPadding * getNativeScaleY();
-		}
+		virtual s32 getTopPadding();
 
-		virtual s32 getBottomPadding()
-		{
-			return BottomPadding * getNativeScaleY();
-		}
+		virtual s32 getBottomPadding();
 
-		virtual s32 getLeftPadding()
-		{
-			return LeftPadding * getNativeScaleX();
-		}
+		virtual s32 getLeftPadding();
 
-		virtual s32 getRightPadding()
-		{
-			return RightPadding * getNativeScaleX();
-		}
+		virtual s32 getRightPadding();
 
 		virtual f32 getNativeScaleX() const;
 		virtual f32 getNativeScaleY() const;

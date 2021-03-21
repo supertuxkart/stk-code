@@ -88,6 +88,13 @@
 
 #include <irrlicht.h>
 
+#if !defined(SERVER_ONLY) && defined(ANDROID)
+#include <SDL.h>
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+#define ENABLE_SCREEN_ORIENTATION_HANDLING 1
+#endif
+#endif
+
 #ifdef ENABLE_RECORDER
 #include <chrono>
 #include <openglrecorder.h>
@@ -157,6 +164,7 @@ const bool ALLOW_1280_X_720    = true;
  */
 IrrDriver::IrrDriver()
 {
+    m_screen_orientation = -1;
     m_render_nw_debug = false;
     m_resolution_changing = RES_CHANGE_NONE;
 
@@ -773,7 +781,9 @@ void IrrDriver::initDevice()
         m_device->getCursorControl()->setVisible(true);
 #endif
     m_pointer_shown = true;
-
+#ifdef ENABLE_SCREEN_ORIENTATION_HANDLING
+    m_screen_orientation = (int)SDL_GetDisplayOrientation(0);
+#endif
     if (GUIEngine::isNoGraphics())
         return;
 }   // initDevice
@@ -1986,13 +1996,21 @@ void IrrDriver::handleWindowResize()
         current_screen_size.Height = screen->getHeight();
     }
 
+    bool screen_orientation_changed = false;
+    int new_orientation = -1;
+#ifdef ENABLE_SCREEN_ORIENTATION_HANDLING
+    new_orientation = (int)SDL_GetDisplayOrientation(0);
+    screen_orientation_changed = m_screen_orientation != new_orientation;
+#endif
     if (m_actual_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
-        current_screen_size != m_video_driver->getCurrentRenderTargetSize())
+        current_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
+        screen_orientation_changed)
     {
         // Don't update when dialog is opened
         if (dialog_exists)
             return;
 
+        m_screen_orientation = new_orientation;
         m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
         UserConfigParams::m_width = m_actual_screen_size.Width;
         UserConfigParams::m_height = m_actual_screen_size.Height;
