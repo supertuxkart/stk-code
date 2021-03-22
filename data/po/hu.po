@@ -5,7 +5,7 @@
 # Translators:
 # Balázs Meskó <meskobalazs@mailbox.org>, 2019
 # Balázs Úr, 2019
-# Balázs Úr, 2019-2020
+# Balázs Úr, 2019-2021
 # Balázs Úr, 2018-2019
 # Balázs Úr, 2016-2018
 # Bangó Máté <matepenpals@hotmail.com>, 2016
@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 09:26+0800\n"
-"PO-Revision-Date: 2021-02-16 04:15+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"PO-Revision-Date: 2021-03-19 00:21+0000\n"
+"Last-Translator: Balázs Úr\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -329,9 +329,6 @@ msgstr "Igen"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching
-#. resoluton
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -350,6 +347,8 @@ msgstr "Igen"
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
+#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
+#. I18N: When configuring input
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -361,8 +360,7 @@ msgstr "Igen"
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
 #: src/states_screens/dialogs/addons_loading.cpp:213
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:45
-#: src/states_screens/online/register_screen.cpp:130
+#: src/states_screens/online/register_screen.cpp:163
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "Mégse"
@@ -370,8 +368,18 @@ msgstr "Mégse"
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-msgid "Keep this resolution"
-msgstr "Felbontás megtartása"
+#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Accept"
+msgstr "Elfogadás"
+
+#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+msgid "Revert"
+msgstr "Visszaállítás"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -410,12 +418,12 @@ msgstr "Fordított kamera"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "Labda követése foci módban"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Reset"
-msgstr ""
+msgstr "Visszaállítás"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -505,6 +513,20 @@ msgstr "Geometria részletei"
 #. I18N: Video settings
 msgid "* Restart STK to apply new settings"
 msgstr "* STK újraindítása az új beállítások alkalmazásához"
+
+#. I18N: ./data/gui/dialogs/debug_slider.stkgui
+#. I18N: ./data/gui/dialogs/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
+#. I18N: Vote dialog
+msgid "Close"
+msgstr "Bezárás"
 
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
@@ -613,19 +635,6 @@ msgstr "Megerősítés"
 #. I18N: In the recovery dialog
 msgid "Submit"
 msgstr "Elküldés"
-
-#. I18N: ./data/gui/dialogs/online/change_password.stkgui
-#. I18N: In the change password dialog
-#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
-#. I18N: In the recovery dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
-#. I18N: Vote dialog
-msgid "Close"
-msgstr "Bezárás"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -745,13 +754,6 @@ msgstr "Felhasználási feltételek"
 msgid "I agree to the above terms and am 13 years or older. "
 msgstr "Elfogadom a fenti feltételeket és 13 éves vagy idősebb vagyok."
 
-#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
-#. I18N: In the registration dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-msgid "Accept"
-msgstr "Elfogadás"
-
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
 msgid "Server Configuration"
@@ -772,7 +774,7 @@ msgstr "Nehézség"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1213
+#: src/race/race_manager.cpp:1241
 msgid "Novice"
 msgstr "Kezdő"
 
@@ -784,7 +786,7 @@ msgstr "Kezdő"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1214
+#: src/race/race_manager.cpp:1242
 msgid "Intermediate"
 msgstr "Haladó"
 
@@ -796,7 +798,7 @@ msgstr "Haladó"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1215
+#: src/race/race_manager.cpp:1243
 msgid "Expert"
 msgstr "Nehéz"
 
@@ -808,7 +810,7 @@ msgstr "Nehéz"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1216
+#: src/race/race_manager.cpp:1244
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -827,7 +829,7 @@ msgstr "Játékmód"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1216
 #: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "Normál verseny"
@@ -841,7 +843,7 @@ msgstr "Normál verseny"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1190
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1218
 msgid "Time Trial"
 msgstr "Időfutam"
 
@@ -858,7 +860,7 @@ msgstr "Csata"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1230
 #: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "Foci"
@@ -963,11 +965,6 @@ msgstr "Hozzárendelés az ESC billentyűhöz"
 #. I18N: When configuring input
 msgid "Assign nothing"
 msgstr "Semmi hozzárendelése"
-
-#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
-#. I18N: When configuring input
-msgid "Press ESC to cancel"
-msgstr "Nyomd meg az ESC billentyűt a megszakításhoz"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1161,7 +1158,7 @@ msgstr "Szellemvisszajátszás kiválasztása"
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1200
+#: src/race/race_manager.cpp:1228
 msgid "Egg Hunt"
 msgstr "Tojásvadászat"
 
@@ -1685,7 +1682,7 @@ msgstr "Amikor a bemeneti eszközök beállításra kerültek, válaszd az „os
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 msgid "High Score Selection"
-msgstr ""
+msgstr "Legmagasabb pontszám kiválasztás"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1730,7 +1727,7 @@ msgstr "Ismertető"
 #. I18N: In the main screen
 #: src/states_screens/track_info_screen.cpp:332
 msgid "High Scores"
-msgstr ""
+msgstr "Legmagasabb pontszámok"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2116,8 +2113,8 @@ msgstr "Beállítás törlése"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:116
-#: src/states_screens/options/options_screen_device.cpp:628
+#: src/states_screens/options/options_screen_device.cpp:117
+#: src/states_screens/options/options_screen_device.cpp:626
 msgid "Disable Configuration"
 msgstr "Beállítás letiltása"
 
@@ -2248,7 +2245,7 @@ msgstr "Grafikai hatások szintje"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr ""
+msgstr "Megjelenítési felbontás"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2810,20 +2807,21 @@ msgid ""
 "created."
 msgstr "A beállítófájlod túl régi volt, ezért törölve lett, és egy új került létrehozásra."
 
-#: src/graphics/irr_driver.cpp:613
+#: src/graphics/irr_driver.cpp:635
 msgid "Video recording started."
 msgstr "Videórögzítés elindítva."
 
-#: src/graphics/irr_driver.cpp:620
+#: src/graphics/irr_driver.cpp:642
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Videó elmentve ide: „%s”"
 
-#: src/graphics/irr_driver.cpp:624
+#: src/graphics/irr_driver.cpp:646
 msgid "Encoding progress:"
 msgstr "Kódolási folyamat:"
 
-#: src/graphics/irr_driver.cpp:1821 src/graphics/irr_driver.cpp:1826
+#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1857
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
@@ -3470,19 +3468,19 @@ msgstr "Bal aktiváló"
 msgid "Right trigger"
 msgstr "Jobb aktiváló"
 
-#: src/input/input_manager.cpp:995
+#: src/input/input_manager.cpp:832
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "„%s” mellőzése: korábban kellett csatlakoznod a játékhoz!"
 
-#: src/input/input_manager.cpp:1031
+#: src/input/input_manager.cpp:868
 msgid "Only the Game Master may act at this point!"
 msgstr "Csak a játékmester cselekedhet ezen a helyen!"
 
 #: src/input/sdl_controller.cpp:241
 #, c-format
 msgid "%s has low battery level."
-msgstr ""
+msgstr "%s alacsony akkumulátorszinttel rendelkezik."
 
 #: src/input/wiimote_manager.cpp:379
 msgid ""
@@ -3507,6 +3505,10 @@ msgstr[1] "%d wiimote található"
 msgid "Could not detect any wiimote :/"
 msgstr "Nem sikerült felismerni egyetlen wiimote-ot sem :/"
 
+#: src/io/rich_presence.cpp:440
+msgid "Getting ready to race"
+msgstr "Felkészülés a versenyre"
+
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
 msgstr "Büntető idő!"
@@ -3523,18 +3525,18 @@ msgstr "Legfeljebb 3 életed lehet!"
 msgid "+1 life."
 msgstr "+1 élet."
 
-#: src/karts/kart.cpp:1019
+#: src/karts/kart.cpp:1022
 msgid "You were too slow!"
 msgstr "Túl lassú voltál!"
 
-#: src/karts/kart.cpp:1020
+#: src/karts/kart.cpp:1023
 msgid "You won the race!"
 msgstr "Megnyerted a versenyt!"
 
-#: src/karts/kart.cpp:1021
+#: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "%d. helyen fejezted be a versenyt!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
@@ -3542,7 +3544,7 @@ msgstr ""
 msgid "%s left the game."
 msgstr "%s kilépett a játékból."
 
-#: src/main.cpp:1946
+#: src/main.cpp:2009
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3551,16 +3553,16 @@ msgid ""
 "Internet\")."
 msgstr ""
 
-#: src/main.cpp:2226
+#: src/main.cpp:2358
 msgid "Your screen resolution is too low to run STK."
 msgstr "A képernyőfelbontásod túl alacsony az STK futtatásához."
 
-#: src/main.cpp:2261
+#: src/main.cpp:2393
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Az illesztőprogramod verziója túl régi. Kérlek telepítsd a legfrissebb videokártya illesztőprogramokat."
 
-#: src/main.cpp:2279
+#: src/main.cpp:2411
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3568,7 +3570,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "A grafikus illesztőprogramod nagyon réginek tűnik. Nézd meg, hogy van-e elérhető frissítés. A SuperTuxKart olyan illesztőprogramot javasol, amely %s vagy jobb támogatással rendelkezik. A játék valószínűleg még futni fog, de csak csökkentett grafikus módban."
 
-#: src/main_loop.cpp:479 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "A kiszolgáló-kapcsolat túllépte az időkorlátot."
 
@@ -3680,7 +3682,7 @@ msgid "Bad network connection is detected."
 msgstr "Rossz hálózati kapcsolat észlelhető."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3813
+#: src/network/protocols/server_lobby.cpp:3812
 msgid "Bot"
 msgstr "Robot"
 
@@ -3850,17 +3852,17 @@ msgstr "Nyomd meg a(z) <%s> vagy <%s> gombot a célba vett játékos módosítá
 msgid "Successfully reported %s."
 msgstr "%s sikeresen jelentve."
 
-#: src/network/protocols/connect_to_server.cpp:222
+#: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
 msgstr "Nem érhető el gyors játékú kiszolgáló."
 
-#: src/network/protocols/connect_to_server.cpp:372
+#: src/network/protocols/connect_to_server.cpp:380
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Nem lehet kapcsolódni a kiszolgálóhoz: %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:771
+#: src/network/protocols/connect_to_server.cpp:883
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Nem sikerült felismerni a(z) %s kiszolgáló portszámát."
@@ -3875,7 +3877,7 @@ msgstr "Időfutam (nagydíj)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1196
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1224
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
@@ -3884,7 +3886,7 @@ msgstr "Mindenki ellen"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1198
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1226
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
@@ -3943,12 +3945,12 @@ msgid ""
 msgstr "A ranglista fájl túl régi volt,\naz összes ranglista törölve lett."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1192
+#: src/race/race_manager.cpp:1220
 msgid "Follow the Leader"
 msgstr "Kövesd a vezért"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1194 src/states_screens/track_info_screen.cpp:250
+#: src/race/race_manager.cpp:1222 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr "3-csapásos csata"
 
@@ -4344,7 +4346,7 @@ msgstr "Összegyűjtött banánok"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:275
+#: src/states_screens/options/options_screen_device.cpp:276
 msgid "Skidding"
 msgstr "Farolás"
 
@@ -4521,12 +4523,12 @@ msgid "Current password invalid."
 msgstr "A jelenlegi jelszó érvénytelen."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:322
+#: src/states_screens/online/register_screen.cpp:355
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "A jelszónak 8 és 30 karakter közötti hosszúnak kell lennie!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:306
+#: src/states_screens/online/register_screen.cpp:339
 msgid "Passwords don't match!"
 msgstr "A jelszavak nem egyeznek!"
 
@@ -4536,20 +4538,20 @@ msgstr "A jelszó sikeresen megváltoztatva."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:387
+#: src/states_screens/online/register_screen.cpp:420
 msgid "Validating info"
 msgstr "Információk ellenőrzése"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:85
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:86
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
 msgstr[0] "Erősítsd meg a felbontást %i másodpercen belül"
 msgstr[1] "Erősítsd meg a felbontást %i másodpercen belül"
 
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:92
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:93
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
@@ -4683,27 +4685,27 @@ msgstr "Nem"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:87
 #, c-format
 msgid "Top %d High Scores"
-msgstr ""
+msgstr "Legjobb %d legmagasabb pontszám"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:89
 #, c-format
 msgid "Track: %s"
-msgstr ""
+msgstr "Pálya: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:102
 #, c-format
 msgid "Number of karts: %d"
-msgstr ""
+msgstr "Gokartok száma: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:105
 #, c-format
 msgid "Laps: %d"
-msgstr ""
+msgstr "Kör: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:109
 #, c-format
 msgid "Reverse: %s"
-msgstr ""
+msgstr "Fordított: %s"
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:169
@@ -4780,7 +4782,13 @@ msgid "Tell server administrator about this player (%s):"
 msgstr "Szólj a kiszolgáló rendszergazdájának erről a játékosról (%s):"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:40
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:43
+msgid ""
+"Press any key...\n"
+"(Press ESC to cancel)"
+msgstr "Nyomj meg egy billentyűt…\n(Nyomd meg az ESC billentyűt a megszakításhoz)"
+
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
 msgstr "Nyomj meg egy billentyűt…"
 
@@ -5141,15 +5149,15 @@ msgstr "Teljesítetted a nagydíjat!"
 #: src/states_screens/high_score_selection.cpp:134
 msgctxt "column_name"
 msgid "Number of karts"
-msgstr ""
+msgstr "Gokartok száma"
 
 #: src/states_screens/high_score_selection.cpp:267
 msgid "Are you sure you want to remove this high score entry?"
-msgstr ""
+msgstr "Biztosan el szeretnéd távolítani ezt a legmagasabb pontszám bejegyzést?"
 
 #: src/states_screens/high_score_selection.cpp:275
 msgid "Are you sure you want to remove all of your high scores?"
-msgstr ""
+msgstr "Biztosan el szeretnéd távolítani az összes legmagasabb pontszámod?"
 
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
@@ -5204,7 +5212,7 @@ msgstr "Kérlek várj, amíg a kiegészítők betöltődnek"
 
 #: src/states_screens/main_menu_screen.cpp:654
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "Biztosan ki szeretnél lépni az STK játékból?"
 
 #: src/states_screens/online/create_server_screen.cpp:96
 msgid "Create LAN Server"
@@ -5392,48 +5400,48 @@ msgstr "Érvénytelen kiszolgálócím: %s."
 msgid "Searching"
 msgstr "Keresés"
 
-#: src/states_screens/online/register_screen.cpp:131
+#: src/states_screens/online/register_screen.cpp:164
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "Kilépés a játékból"
 
-#: src/states_screens/online/register_screen.cpp:244
-#: src/states_screens/online/register_screen.cpp:251
+#: src/states_screens/online/register_screen.cpp:277
+#: src/states_screens/online/register_screen.cpp:284
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "Nem sikerült létrehozni a játékost: „%s”."
 
-#: src/states_screens/online/register_screen.cpp:268
+#: src/states_screens/online/register_screen.cpp:301
 msgid "User name cannot be empty."
 msgstr "A felhasználónév nem lehet üres."
 
-#: src/states_screens/online/register_screen.cpp:310
+#: src/states_screens/online/register_screen.cpp:343
 msgid "Emails don't match!"
 msgstr "Az e-mail címek nem egyeznek!"
 
-#: src/states_screens/online/register_screen.cpp:314
+#: src/states_screens/online/register_screen.cpp:347
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "Az internetes felhasználónévnek 4 és 30 karakter közötti hosszúnak kell lennie!"
 
-#: src/states_screens/online/register_screen.cpp:318
+#: src/states_screens/online/register_screen.cpp:351
 msgid "Online username must not start with a number!"
 msgstr "Az internetes felhasználónév nem kezdődhet számmal!"
 
-#: src/states_screens/online/register_screen.cpp:326
+#: src/states_screens/online/register_screen.cpp:359
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "Az e-mail címnek 5 és 254 karakter közötti hosszúnak kell lennie!"
 
-#: src/states_screens/online/register_screen.cpp:332
+#: src/states_screens/online/register_screen.cpp:365
 msgid "Email is invalid!"
 msgstr "Az e-mail cím érvénytelen!"
 
-#: src/states_screens/online/register_screen.cpp:395
+#: src/states_screens/online/register_screen.cpp:428
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Hamarosan e-mailt fogsz kapni a fiókaktiválással kapcsolatos további utasításokkal. Kérlek légy türelemmel, és ellenőrizd a spam mappát is."
 
-#: src/states_screens/online/register_screen.cpp:434
+#: src/states_screens/online/register_screen.cpp:467
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Az Internet-hozzáférés le van tiltva, kérlek engedélyezd a beállításokban"
 
@@ -5522,126 +5530,126 @@ msgstr "Fordítva vezetés"
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Zárolt: "
 
-#: src/states_screens/options/options_screen_device.cpp:73
+#: src/states_screens/options/options_screen_device.cpp:74
 msgid "Action"
 msgstr "Művelet"
 
-#: src/states_screens/options/options_screen_device.cpp:74
+#: src/states_screens/options/options_screen_device.cpp:75
 msgid "Key binding"
 msgstr "Billentyűparancs"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:101
-#: src/states_screens/options/options_screen_device.cpp:623
+#: src/states_screens/options/options_screen_device.cpp:102
+#: src/states_screens/options/options_screen_device.cpp:621
 msgid "Disable Device"
 msgstr "Eszköz letiltása"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:103
-#: src/states_screens/options/options_screen_device.cpp:624
+#: src/states_screens/options/options_screen_device.cpp:104
+#: src/states_screens/options/options_screen_device.cpp:622
 msgid "Enable Device"
 msgstr "Eszköz engedélyezése"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:118
-#: src/states_screens/options/options_screen_device.cpp:629
+#: src/states_screens/options/options_screen_device.cpp:119
+#: src/states_screens/options/options_screen_device.cpp:627
 msgid "Enable Configuration"
 msgstr "Beállítás engedélyezése"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:167
+#: src/states_screens/options/options_screen_device.cpp:168
 msgid "Game Keys"
 msgstr "Játék billentyűk"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:181
+#: src/states_screens/options/options_screen_device.cpp:182
 msgid "Menu Keys"
 msgstr "Menü billentyűk"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:257
+#: src/states_screens/options/options_screen_device.cpp:258
 msgid "Steer Left"
 msgstr "Balra fordulás"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:260
+#: src/states_screens/options/options_screen_device.cpp:261
 msgid "Steer Right"
 msgstr "Jobbra fordulás"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:263
+#: src/states_screens/options/options_screen_device.cpp:264
 msgid "Accelerate"
 msgstr "Gyorsítás"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:266
+#: src/states_screens/options/options_screen_device.cpp:267
 msgid "Brake / Reverse"
 msgstr "Fékezés / megfordítás"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:269
+#: src/states_screens/options/options_screen_device.cpp:270
 msgid "Fire"
 msgstr "Tüzelés"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:272
+#: src/states_screens/options/options_screen_device.cpp:273
 msgid "Nitro"
 msgstr "Nitró"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:278
+#: src/states_screens/options/options_screen_device.cpp:279
 msgid "Look Back"
 msgstr "Hátranézés"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:281
+#: src/states_screens/options/options_screen_device.cpp:282
 msgid "Rescue"
 msgstr "Kimentés"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:284
+#: src/states_screens/options/options_screen_device.cpp:285
 msgid "Pause Game"
 msgstr "Játék szüneteltetése"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:289
+#: src/states_screens/options/options_screen_device.cpp:290
 msgid "Up"
 msgstr "Fel"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:292
+#: src/states_screens/options/options_screen_device.cpp:293
 msgid "Down"
 msgstr "Le"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:295
+#: src/states_screens/options/options_screen_device.cpp:296
 msgid "Left"
 msgstr "Balra"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:298
+#: src/states_screens/options/options_screen_device.cpp:299
 msgid "Right"
 msgstr "Jobbra"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:301
+#: src/states_screens/options/options_screen_device.cpp:302
 msgid "Select"
 msgstr "Kiválasztás"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:304
+#: src/states_screens/options/options_screen_device.cpp:305
 msgid "Cancel/Back"
 msgstr "Mégse / vissza"
 
-#: src/states_screens/options/options_screen_device.cpp:399
+#: src/states_screens/options/options_screen_device.cpp:396
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* A kék elem ütközést jelent egy másik beállítással"
 
-#: src/states_screens/options/options_screen_device.cpp:404
+#: src/states_screens/options/options_screen_device.cpp:401
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* A piros elem ütközést jelent a jelenlegi beállításban"
 
-#: src/states_screens/options/options_screen_device.cpp:510
+#: src/states_screens/options/options_screen_device.cpp:508
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5649,11 +5657,11 @@ msgid ""
 msgstr "Figyelmeztetés: A „Shift” nem ajánlott billentyű. Amikor a „Shift” le van nyomva, akkor egyik olyan karaktert tartalmazó billentyű sem fog működni, amely eltérő nagybetűként."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:609
+#: src/states_screens/options/options_screen_device.cpp:607
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Biztosan véglegesen törölni szeretnéd ezt a beállítást?"
 
-#: src/states_screens/options/options_screen_device.cpp:637
+#: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "Add meg az új beállítás nevét, vagy hagyd üresen az alapértelmezett érték visszaállításához."
 

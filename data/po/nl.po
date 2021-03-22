@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 09:26+0800\n"
-"PO-Revision-Date: 2021-02-16 11:11+0000\n"
+"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"PO-Revision-Date: 2021-03-12 18:46+0000\n"
 "Last-Translator: Heimen Stoffels <vistausss@outlook.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/supertuxkart/supertuxkart/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -328,9 +328,6 @@ msgstr "Ja"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching
-#. resoluton
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -349,6 +346,8 @@ msgstr "Ja"
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
+#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
+#. I18N: When configuring input
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -360,8 +359,7 @@ msgstr "Ja"
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
 #: src/states_screens/dialogs/addons_loading.cpp:213
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:45
-#: src/states_screens/online/register_screen.cpp:130
+#: src/states_screens/online/register_screen.cpp:163
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "Annuleren"
@@ -369,8 +367,18 @@ msgstr "Annuleren"
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-msgid "Keep this resolution"
-msgstr "Deze resolutie behouden"
+#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Accept"
+msgstr "Accepteren"
+
+#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+msgid "Revert"
+msgstr "Terugdraaien"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -505,6 +513,20 @@ msgstr "Geometriedetails"
 msgid "* Restart STK to apply new settings"
 msgstr "* Herstart STK om nieuwe instellingen toe te passen"
 
+#. I18N: ./data/gui/dialogs/debug_slider.stkgui
+#. I18N: ./data/gui/dialogs/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
+#. I18N: Vote dialog
+msgid "Close"
+msgstr "Sluiten"
+
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
@@ -612,19 +634,6 @@ msgstr "Bevestigen"
 #. I18N: In the recovery dialog
 msgid "Submit"
 msgstr "Versturen"
-
-#. I18N: ./data/gui/dialogs/online/change_password.stkgui
-#. I18N: In the change password dialog
-#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
-#. I18N: In the recovery dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
-#. I18N: Vote dialog
-msgid "Close"
-msgstr "Sluiten"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -744,13 +753,6 @@ msgstr "Gebruiksvoorwaarden"
 msgid "I agree to the above terms and am 13 years or older. "
 msgstr "Ik stem in met bovenstaande voorwaarden en ben 13 jaar of ouder."
 
-#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
-#. I18N: In the registration dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-msgid "Accept"
-msgstr "Accepteren"
-
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
 msgid "Server Configuration"
@@ -771,7 +773,7 @@ msgstr "Moeilijkheidsgraad"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1213
+#: src/race/race_manager.cpp:1241
 msgid "Novice"
 msgstr "Beginner"
 
@@ -783,7 +785,7 @@ msgstr "Beginner"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1214
+#: src/race/race_manager.cpp:1242
 msgid "Intermediate"
 msgstr "Behendig"
 
@@ -795,7 +797,7 @@ msgstr "Behendig"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1215
+#: src/race/race_manager.cpp:1243
 msgid "Expert"
 msgstr "Deskundig"
 
@@ -807,7 +809,7 @@ msgstr "Deskundig"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1216
+#: src/race/race_manager.cpp:1244
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -826,7 +828,7 @@ msgstr "Spelvorm"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1216
 #: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "Normale race"
@@ -840,7 +842,7 @@ msgstr "Normale race"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1190
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1218
 msgid "Time Trial"
 msgstr "Tijdrit"
 
@@ -857,7 +859,7 @@ msgstr "Gevecht"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1230
 #: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "Voetbal"
@@ -962,11 +964,6 @@ msgstr "Esc-toets gebruiken"
 #. I18N: When configuring input
 msgid "Assign nothing"
 msgstr "Niets toewijzen"
-
-#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
-#. I18N: When configuring input
-msgid "Press ESC to cancel"
-msgstr "Druk op Esc om te annuleren"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1160,7 +1157,7 @@ msgstr "Kies een spookherhaling"
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1200
+#: src/race/race_manager.cpp:1228
 msgid "Egg Hunt"
 msgstr "Eieren zoeken"
 
@@ -2115,8 +2112,8 @@ msgstr "Instellingen verwijderen"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:116
-#: src/states_screens/options/options_screen_device.cpp:628
+#: src/states_screens/options/options_screen_device.cpp:117
+#: src/states_screens/options/options_screen_device.cpp:626
 msgid "Disable Configuration"
 msgstr "Instellingen uitschakelen"
 
@@ -2809,20 +2806,21 @@ msgid ""
 "created."
 msgstr "Je configuratiebestand was verouderd. Het is verwijderd en er wordt een nieuw bestand aangemaakt."
 
-#: src/graphics/irr_driver.cpp:613
+#: src/graphics/irr_driver.cpp:635
 msgid "Video recording started."
 msgstr "Video-opname gestart."
 
-#: src/graphics/irr_driver.cpp:620
+#: src/graphics/irr_driver.cpp:642
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "De video is opgeslagen in '%s'."
 
-#: src/graphics/irr_driver.cpp:624
+#: src/graphics/irr_driver.cpp:646
 msgid "Encoding progress:"
 msgstr "Omzetproces:"
 
-#: src/graphics/irr_driver.cpp:1821 src/graphics/irr_driver.cpp:1826
+#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1857
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
@@ -3469,12 +3467,12 @@ msgstr "Linkertrigger"
 msgid "Right trigger"
 msgstr "Rechtertrigger"
 
-#: src/input/input_manager.cpp:995
+#: src/input/input_manager.cpp:832
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "'%s' wordt genegeerd. Je had eerder moeten komen om te spelen!"
 
-#: src/input/input_manager.cpp:1031
+#: src/input/input_manager.cpp:868
 msgid "Only the Game Master may act at this point!"
 msgstr "Alleen de spelleider mag nu nog iets doen!"
 
@@ -3506,6 +3504,10 @@ msgstr[1] "%d wiimotes aangetroffen"
 msgid "Could not detect any wiimote :/"
 msgstr "Geen wiimote aangetroffen :/"
 
+#: src/io/rich_presence.cpp:440
+msgid "Getting ready to race"
+msgstr "Klaar voor de start?"
+
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
 msgstr "Straftijd!!"
@@ -3522,15 +3524,15 @@ msgstr "Je kunt maximaal 3 levens hebben!"
 msgid "+1 life."
 msgstr "+1 leven."
 
-#: src/karts/kart.cpp:1019
+#: src/karts/kart.cpp:1022
 msgid "You were too slow!"
 msgstr "Je was te langzaam!"
 
-#: src/karts/kart.cpp:1020
+#: src/karts/kart.cpp:1023
 msgid "You won the race!"
 msgstr "Je hebt de wedstrijd gewonnen!"
 
-#: src/karts/kart.cpp:1021
+#: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
 msgstr "Je bent geëindigd op plaats %d!"
@@ -3541,7 +3543,7 @@ msgstr "Je bent geëindigd op plaats %d!"
 msgid "%s left the game."
 msgstr "%s heeft de wedstrijd verlaten."
 
-#: src/main.cpp:1946
+#: src/main.cpp:2009
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3550,16 +3552,16 @@ msgid ""
 "Internet\")."
 msgstr "SuperTuxKart kan verbinding maken met het internet om add-ons te downloaden en updatemeldingen te tonen. Wij verzamelen ook geanonimiseerde gegevens over hardwareprestaties t.b.v. productverbetering. Lees onze privacyverklaring op https://supertuxkart.net/Privacy Wil je deze optie activeren? (Als je dit later wilt aanpassen, ga dan naar Instellingen -> Algemeen en pas 'Verbinden met het internet' aan.)"
 
-#: src/main.cpp:2226
+#: src/main.cpp:2358
 msgid "Your screen resolution is too low to run STK."
 msgstr "Je schermresolutie is te laag om STK te kunnen spelen."
 
-#: src/main.cpp:2261
+#: src/main.cpp:2393
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Je videostuurprogramma is verouderd. Installeer een recenter stuurprogramma."
 
-#: src/main.cpp:2279
+#: src/main.cpp:2411
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3567,7 +3569,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Je grafische stuurprogramma lijkt verouderd; controleer of er een update beschikbaar is. SuperTuxKart raadt je aan om een stuurprogramma te gebruiken met ondersteuning voor %s of hoger. Het spel draait waarschijnlijk nog wel, maar met lagere grafische instellingen."
 
-#: src/main_loop.cpp:479 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Serververbinding verbroken."
 
@@ -3679,7 +3681,7 @@ msgid "Bad network connection is detected."
 msgstr "Zwakke internetvebinding."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3813
+#: src/network/protocols/server_lobby.cpp:3812
 msgid "Bot"
 msgstr "Computer"
 
@@ -3849,17 +3851,17 @@ msgstr "Druk op <%s> of <%s> om een andere speler te kiezen, of op <%s> of <%s> 
 msgid "Successfully reported %s."
 msgstr "%s is gerapporteerd."
 
-#: src/network/protocols/connect_to_server.cpp:222
+#: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
 msgstr "Geen server beschikbaar voor snelle wedstrijden."
 
-#: src/network/protocols/connect_to_server.cpp:372
+#: src/network/protocols/connect_to_server.cpp:380
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Kan geen verbinding maken met %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:771
+#: src/network/protocols/connect_to_server.cpp:883
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Het detecteren van het poortnummer van '%s' is mislukt."
@@ -3874,7 +3876,7 @@ msgstr "Tijdrit (Grand Prix)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1196
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1224
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
@@ -3883,7 +3885,7 @@ msgstr "Vrijheid, blijheid"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1198
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1226
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
@@ -3942,12 +3944,12 @@ msgid ""
 msgstr "Het recordbestand was te oud;\nde records zijn verwijderd."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1192
+#: src/race/race_manager.cpp:1220
 msgid "Follow the Leader"
 msgstr "Zwaan-kleef-aan"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1194 src/states_screens/track_info_screen.cpp:250
+#: src/race/race_manager.cpp:1222 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr "Veldslag"
 
@@ -4343,7 +4345,7 @@ msgstr "Aantal verzamelde bananen"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:275
+#: src/states_screens/options/options_screen_device.cpp:276
 msgid "Skidding"
 msgstr "Slippen"
 
@@ -4520,12 +4522,12 @@ msgid "Current password invalid."
 msgstr "Het ingevoerde wachtwoord is onjuist."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:322
+#: src/states_screens/online/register_screen.cpp:355
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Het wachtwoord moet tussen de 8 en 30 tekens lang zijn!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:306
+#: src/states_screens/online/register_screen.cpp:339
 msgid "Passwords don't match!"
 msgstr "De wachtwoorden komen niet overeen!"
 
@@ -4535,20 +4537,20 @@ msgstr "Het wachtwoord is gewijzigd."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:387
+#: src/states_screens/online/register_screen.cpp:420
 msgid "Validating info"
 msgstr "Bezig met valideren..."
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:85
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:86
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
 msgstr[0] "Bevestig de schermresolutie binnen %i seconde"
 msgstr[1] "Bevestig de schermresolutie binnen %i seconden"
 
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:92
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:93
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
@@ -4779,7 +4781,13 @@ msgid "Tell server administrator about this player (%s):"
 msgstr "Meld deze speler (%s) aan de serverbeheerder"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:40
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:43
+msgid ""
+"Press any key...\n"
+"(Press ESC to cancel)"
+msgstr "Druk op een toets…\n(of Esc om te annuleren)"
+
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
 msgstr "Druk op een toets..."
 
@@ -5391,48 +5399,48 @@ msgstr "Ongeldig serveradres: %s."
 msgid "Searching"
 msgstr "Bezig met zoeken..."
 
-#: src/states_screens/online/register_screen.cpp:131
+#: src/states_screens/online/register_screen.cpp:164
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "Wedstrijd afbreken"
 
-#: src/states_screens/online/register_screen.cpp:244
-#: src/states_screens/online/register_screen.cpp:251
+#: src/states_screens/online/register_screen.cpp:277
+#: src/states_screens/online/register_screen.cpp:284
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "De speler '%s' kan niet worden aangemaakt."
 
-#: src/states_screens/online/register_screen.cpp:268
+#: src/states_screens/online/register_screen.cpp:301
 msgid "User name cannot be empty."
 msgstr "Voer een gebruikersnaam in."
 
-#: src/states_screens/online/register_screen.cpp:310
+#: src/states_screens/online/register_screen.cpp:343
 msgid "Emails don't match!"
 msgstr "De e-mailadressen komen niet overeen!"
 
-#: src/states_screens/online/register_screen.cpp:314
+#: src/states_screens/online/register_screen.cpp:347
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "Je online-gebruikersnaam moet tussen de 3 en 30 tekens lang zijn!"
 
-#: src/states_screens/online/register_screen.cpp:318
+#: src/states_screens/online/register_screen.cpp:351
 msgid "Online username must not start with a number!"
 msgstr "Je online-gebruikersnaam mag niet met een cijfer beginnen!"
 
-#: src/states_screens/online/register_screen.cpp:326
+#: src/states_screens/online/register_screen.cpp:359
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "Je e-mailadres moet tussen de 5 en 254 tekens lang zijn!"
 
-#: src/states_screens/online/register_screen.cpp:332
+#: src/states_screens/online/register_screen.cpp:365
 msgid "Email is invalid!"
 msgstr "Ongeldig e-mailadres!"
 
-#: src/states_screens/online/register_screen.cpp:395
+#: src/states_screens/online/register_screen.cpp:428
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Je ontvangt een e-mail met instructies m.b.t. het herstellen van je wachtwoord. Dit kan even duren. Controleer ook de spam-map."
 
-#: src/states_screens/online/register_screen.cpp:434
+#: src/states_screens/online/register_screen.cpp:467
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Internettoegang is uitgeschakeld. Schakel internettoegang in via de instellingen."
 
@@ -5521,126 +5529,126 @@ msgstr "Spookrijden"
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Op slot: ontgrendel het slot door uitdagingen te volbrengen!"
 
-#: src/states_screens/options/options_screen_device.cpp:73
+#: src/states_screens/options/options_screen_device.cpp:74
 msgid "Action"
 msgstr "Actie"
 
-#: src/states_screens/options/options_screen_device.cpp:74
+#: src/states_screens/options/options_screen_device.cpp:75
 msgid "Key binding"
 msgstr "Toetstoewijzing"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:101
-#: src/states_screens/options/options_screen_device.cpp:623
+#: src/states_screens/options/options_screen_device.cpp:102
+#: src/states_screens/options/options_screen_device.cpp:621
 msgid "Disable Device"
 msgstr "Apparaat uitschakelen"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:103
-#: src/states_screens/options/options_screen_device.cpp:624
+#: src/states_screens/options/options_screen_device.cpp:104
+#: src/states_screens/options/options_screen_device.cpp:622
 msgid "Enable Device"
 msgstr "Apparaat inschakelen"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:118
-#: src/states_screens/options/options_screen_device.cpp:629
+#: src/states_screens/options/options_screen_device.cpp:119
+#: src/states_screens/options/options_screen_device.cpp:627
 msgid "Enable Configuration"
 msgstr "Configuratie inschakelen"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:167
+#: src/states_screens/options/options_screen_device.cpp:168
 msgid "Game Keys"
 msgstr "Speltoetsen"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:181
+#: src/states_screens/options/options_screen_device.cpp:182
 msgid "Menu Keys"
 msgstr "Menutoetsen"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:257
+#: src/states_screens/options/options_screen_device.cpp:258
 msgid "Steer Left"
 msgstr "Naar links sturen"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:260
+#: src/states_screens/options/options_screen_device.cpp:261
 msgid "Steer Right"
 msgstr "Naar rechts sturen"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:263
+#: src/states_screens/options/options_screen_device.cpp:264
 msgid "Accelerate"
 msgstr "Versnellen"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:266
+#: src/states_screens/options/options_screen_device.cpp:267
 msgid "Brake / Reverse"
 msgstr "Rem/Achteruit"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:269
+#: src/states_screens/options/options_screen_device.cpp:270
 msgid "Fire"
 msgstr "Vuren"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:272
+#: src/states_screens/options/options_screen_device.cpp:273
 msgid "Nitro"
 msgstr "Turbo"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:278
+#: src/states_screens/options/options_screen_device.cpp:279
 msgid "Look Back"
 msgstr "Achterom kijken"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:281
+#: src/states_screens/options/options_screen_device.cpp:282
 msgid "Rescue"
 msgstr "Gered worden"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:284
+#: src/states_screens/options/options_screen_device.cpp:285
 msgid "Pause Game"
 msgstr "Wedstrijd pauzeren"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:289
+#: src/states_screens/options/options_screen_device.cpp:290
 msgid "Up"
 msgstr "Omhoog"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:292
+#: src/states_screens/options/options_screen_device.cpp:293
 msgid "Down"
 msgstr "Omlaag"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:295
+#: src/states_screens/options/options_screen_device.cpp:296
 msgid "Left"
 msgstr "Links"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:298
+#: src/states_screens/options/options_screen_device.cpp:299
 msgid "Right"
 msgstr "Rechts"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:301
+#: src/states_screens/options/options_screen_device.cpp:302
 msgid "Select"
 msgstr "Selecteren"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:304
+#: src/states_screens/options/options_screen_device.cpp:305
 msgid "Cancel/Back"
 msgstr "Annuleren/Terug"
 
-#: src/states_screens/options/options_screen_device.cpp:399
+#: src/states_screens/options/options_screen_device.cpp:396
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Blauwe items duiden een aan conflict met een andere configuratie"
 
-#: src/states_screens/options/options_screen_device.cpp:404
+#: src/states_screens/options/options_screen_device.cpp:401
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Rode items duiden een conflict aan in de huidige configuratie"
 
-#: src/states_screens/options/options_screen_device.cpp:510
+#: src/states_screens/options/options_screen_device.cpp:508
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5648,11 +5656,11 @@ msgid ""
 msgstr "LET OP: 'Shift' is een onhandige toets. Als 'Shift' ingedrukt is, werken andere toetsen niet meer omdat hoofdletters en kleine letters verschillend worden behandeld."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:609
+#: src/states_screens/options/options_screen_device.cpp:607
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Weet je zeker dat je deze configuratie permanent wilt verwijderen?"
 
-#: src/states_screens/options/options_screen_device.cpp:637
+#: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "Voer een nieuwe configuratienaam in. Laat leeg om de standaardnaam te gebruiken."
 

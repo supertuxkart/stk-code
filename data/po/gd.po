@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 09:26+0800\n"
-"PO-Revision-Date: 2021-02-25 19:13+0000\n"
-"Last-Translator: GunChleoc\n"
+"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"PO-Revision-Date: 2021-03-12 16:56+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Gaelic, Scottish (http://www.transifex.com/supertuxkart/supertuxkart/language/gd/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -325,9 +325,6 @@ msgstr "Tha"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching
-#. resoluton
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -346,6 +343,8 @@ msgstr "Tha"
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
+#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
+#. I18N: When configuring input
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -357,8 +356,7 @@ msgstr "Tha"
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
 #: src/states_screens/dialogs/addons_loading.cpp:213
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:45
-#: src/states_screens/online/register_screen.cpp:130
+#: src/states_screens/online/register_screen.cpp:163
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "Sguir dheth"
@@ -366,8 +364,18 @@ msgstr "Sguir dheth"
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-msgid "Keep this resolution"
-msgstr "Cùm an dùmhlachd-bhreacaidh seo"
+#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Accept"
+msgstr "Gabh ris"
+
+#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+msgid "Revert"
+msgstr ""
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -502,6 +510,20 @@ msgstr "Mion-tharraing a’ gheomatrais"
 msgid "* Restart STK to apply new settings"
 msgstr "* Tòisich STK às ùr gus na roghainnean ùra a chur an sàs"
 
+#. I18N: ./data/gui/dialogs/debug_slider.stkgui
+#. I18N: ./data/gui/dialogs/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
+#. I18N: Vote dialog
+msgid "Close"
+msgstr "Dùin"
+
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
@@ -609,19 +631,6 @@ msgstr "Dearbh"
 #. I18N: In the recovery dialog
 msgid "Submit"
 msgstr "Cuir a-null"
-
-#. I18N: ./data/gui/dialogs/online/change_password.stkgui
-#. I18N: In the change password dialog
-#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
-#. I18N: In the recovery dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
-#. I18N: Vote dialog
-msgid "Close"
-msgstr "Dùin"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -741,13 +750,6 @@ msgstr "Teirmichean ’s aontachadh"
 msgid "I agree to the above terms and am 13 years or older. "
 msgstr "Gabhaidh mi ris na teirmichean gu h-àrd ’s tha mi 13 bliadhna a dh’aois no nas aosta. "
 
-#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
-#. I18N: In the registration dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-msgid "Accept"
-msgstr "Gabh ris"
-
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
 msgid "Server Configuration"
@@ -768,7 +770,7 @@ msgstr "Duilgheas"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1213
+#: src/race/race_manager.cpp:1241
 msgid "Novice"
 msgstr "Foghlamaiche"
 
@@ -780,7 +782,7 @@ msgstr "Foghlamaiche"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1214
+#: src/race/race_manager.cpp:1242
 msgid "Intermediate"
 msgstr "Meadhanach"
 
@@ -792,7 +794,7 @@ msgstr "Meadhanach"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1215
+#: src/race/race_manager.cpp:1243
 msgid "Expert"
 msgstr "Eòlaiche"
 
@@ -804,7 +806,7 @@ msgstr "Eòlaiche"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1216
+#: src/race/race_manager.cpp:1244
 msgid "SuperTux"
 msgstr "SuperTux"
 
@@ -823,7 +825,7 @@ msgstr "Modh a’ gheama"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1216
 #: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "Rèis àbhaisteach"
@@ -837,7 +839,7 @@ msgstr "Rèis àbhaisteach"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1190
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1218
 msgid "Time Trial"
 msgstr "An aghaidh na h-ùine"
 
@@ -854,7 +856,7 @@ msgstr "Còmhrag"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1230
 #: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "Ball-coise"
@@ -959,11 +961,6 @@ msgstr "Ceangail ris an iuchair ESC"
 #. I18N: When configuring input
 msgid "Assign nothing"
 msgstr "Na sònraich dad dha"
-
-#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
-#. I18N: When configuring input
-msgid "Press ESC to cancel"
-msgstr "Brùth air ESC gus sgur dheth"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1157,7 +1154,7 @@ msgstr "Taghadh ath-chluichen thaibhsean"
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1200
+#: src/race/race_manager.cpp:1228
 msgid "Egg Hunt"
 msgstr "Lorg uighean"
 
@@ -2112,8 +2109,8 @@ msgstr "Sguab às an rèiteachadh"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:116
-#: src/states_screens/options/options_screen_device.cpp:628
+#: src/states_screens/options/options_screen_device.cpp:117
+#: src/states_screens/options/options_screen_device.cpp:626
 msgid "Disable Configuration"
 msgstr "Cuir an rèiteachadh à comas"
 
@@ -2806,20 +2803,21 @@ msgid ""
 "created."
 msgstr "Bha am faidhle rèiteachaidh agad ro shean, mar sin chaidh sguabadh às is thèid fear ùr a chruthachadh."
 
-#: src/graphics/irr_driver.cpp:613
+#: src/graphics/irr_driver.cpp:635
 msgid "Video recording started."
 msgstr "Thòisich clàradh a’ video."
 
-#: src/graphics/irr_driver.cpp:620
+#: src/graphics/irr_driver.cpp:642
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Chaidh a’ video a shàbhaladh an-seo: “%s”."
 
-#: src/graphics/irr_driver.cpp:624
+#: src/graphics/irr_driver.cpp:646
 msgid "Encoding progress:"
 msgstr "Adhartas a’ chòdachaidh:"
 
-#: src/graphics/irr_driver.cpp:1821 src/graphics/irr_driver.cpp:1826
+#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1857
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTriantain, Ping: %dms"
@@ -3466,12 +3464,12 @@ msgstr "Trigear clì"
 msgid "Right trigger"
 msgstr "Trigear deas"
 
-#: src/input/input_manager.cpp:995
+#: src/input/input_manager.cpp:832
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "A’ leigeil seachad “%s”. Feumaidh tu gabhail ann nas tràithe gus cluiche!"
 
-#: src/input/input_manager.cpp:1031
+#: src/input/input_manager.cpp:868
 msgid "Only the Game Master may act at this point!"
 msgstr "Chan fhaod ach maighstir a’ gheama atharraichean a dhèanamh an-dràsta!"
 
@@ -3505,6 +3503,10 @@ msgstr[3] "Chaidh %d wiimotes a lorg"
 msgid "Could not detect any wiimote :/"
 msgstr "Cha deach wiimote aithneachadh :/"
 
+#: src/io/rich_presence.cpp:440
+msgid "Getting ready to race"
+msgstr ""
+
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
 msgstr "Peanas ùine!"
@@ -3521,15 +3523,15 @@ msgstr "Chan urrainn dha barrachd air 3 beathannan a bhith agad!"
 msgid "+1 life."
 msgstr "+1 bheatha."
 
-#: src/karts/kart.cpp:1019
+#: src/karts/kart.cpp:1022
 msgid "You were too slow!"
 msgstr "Bha thu ro shlaodach!"
 
-#: src/karts/kart.cpp:1020
+#: src/karts/kart.cpp:1023
 msgid "You won the race!"
 msgstr "Bhuannaich thu an rèis!"
 
-#: src/karts/kart.cpp:1021
+#: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
 msgstr "Choilean thu an rèis leis an rang %d!"
@@ -3540,7 +3542,7 @@ msgstr "Choilean thu an rèis leis an rang %d!"
 msgid "%s left the game."
 msgstr "Dh’fhàg %s an geama."
 
-#: src/main.cpp:1946
+#: src/main.cpp:2009
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3549,16 +3551,16 @@ msgid ""
 "Internet\")."
 msgstr "Dh’fhaoidte gun ceangail SuperTuxKart ri frithealaiche gus tuilleadain a luchdadh a-nuas is naidheachdan mu ùrachaidhean a thoirt dhut. Leugh a’ phoileasaidh phrìobhaideachd againn air https://supertuxkart.net/Privacy.  A bheil thu airson an roghainn seo a chur an comas? (Gus an roghainn seo atharrachadh uair sam bith, rach gu “Roghainnean”, tagh an taba “Coitcheann” agus deasaich “Ceangail ris an eadar-lìon”)."
 
-#: src/main.cpp:2226
+#: src/main.cpp:2358
 msgid "Your screen resolution is too low to run STK."
 msgstr "Tha dùmhlachd-bhreacaidh na sgìn agad ro ìosal gus STK a ruith."
 
-#: src/main.cpp:2261
+#: src/main.cpp:2393
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Tha tionndadh an draibheir agad ro shean. Feuch an stàlaich thu na draibhearan video as ùire."
 
-#: src/main.cpp:2279
+#: src/main.cpp:2411
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3566,7 +3568,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "Tha coltas gu bheil draibhear na grafaigeachd agad glè shean. An doir thu sùil feuch a bheil ùrachadh ri fhaighinn? Tha SuperTuxKart a’ moladh draibhear a chuireas taic ri %s no tionndadh nas ùire dheth. Tha sinn an dùil gun obraich an geama ann am modh grafaigeachd ìslichte fhathast co-dhiù."
 
-#: src/main_loop.cpp:479 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "Dh’fhalbh an ùine air a’ cheangal dhan fhrithealaiche."
 
@@ -3680,7 +3682,7 @@ msgid "Bad network connection is detected."
 msgstr "Mhothaich sinn do dhroch-cheangal lìonraidh."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3813
+#: src/network/protocols/server_lobby.cpp:3812
 msgid "Bot"
 msgstr "Bot"
 
@@ -3850,17 +3852,17 @@ msgstr "Brùth air <%s> or <%s> a dh’atharrachadh an cluicheadair-amais no air
 msgid "Successfully reported %s."
 msgstr "Chaidh do gearan air %s a chlàradh."
 
-#: src/network/protocols/connect_to_server.cpp:222
+#: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
 msgstr "Chan eil frithealaiche airson cluiche luath ri fhaighinn."
 
-#: src/network/protocols/connect_to_server.cpp:372
+#: src/network/protocols/connect_to_server.cpp:380
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "Cha ghabh ceangal ri frithealaiche %s."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:771
+#: src/network/protocols/connect_to_server.cpp:883
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "Cha deach leinn mothachadh do dh’àireamh a’ phuirt airson frithealaiche %s."
@@ -3875,7 +3877,7 @@ msgstr "An aghaidh na h-ùine (Grand Prix)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1196
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1224
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
@@ -3884,7 +3886,7 @@ msgstr "An aghaidh càch a chèile"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1198
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1226
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
@@ -3947,12 +3949,12 @@ msgid ""
 msgstr "Bha faidhle nan sgòran àrda ro shean,\nchaidh na h-uile sgòr àrd a sguabadh às."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1192
+#: src/race/race_manager.cpp:1220
 msgid "Follow the Leader"
 msgstr "Lean air an toisiche"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1194 src/states_screens/track_info_screen.cpp:250
+#: src/race/race_manager.cpp:1222 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr "Còmhrag 3 buillean"
 
@@ -4350,7 +4352,7 @@ msgstr "Bananathan air an togail"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:275
+#: src/states_screens/options/options_screen_device.cpp:276
 msgid "Skidding"
 msgstr "Sleamhnachadh"
 
@@ -4527,12 +4529,12 @@ msgid "Current password invalid."
 msgstr "Tha am facal-faire làithreach mì-dhligheach."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:322
+#: src/states_screens/online/register_screen.cpp:355
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "Feumaidh am facal-faire a bhith eadar 8 is 30 caractar a dh’fhaid!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:306
+#: src/states_screens/online/register_screen.cpp:339
 msgid "Passwords don't match!"
 msgstr "Chan eil an dà fhacal-faire co-ionnann!"
 
@@ -4542,13 +4544,13 @@ msgstr "Chaidh am facal-faire atharrachadh."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:387
+#: src/states_screens/online/register_screen.cpp:420
 msgid "Validating info"
 msgstr "A’ dearbhadh an fhiosrachaidh"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:85
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:86
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
@@ -4557,7 +4559,7 @@ msgstr[1] "Dearbhaich dùmhlachd-bhreacaidh an ceann %i dhiog"
 msgstr[2] "Dearbhaich dùmhlachd-bhreacaidh an ceann %i diogan"
 msgstr[3] "Dearbhaich dùmhlachd-bhreacaidh an ceann %i diog"
 
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:92
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:93
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
@@ -4788,7 +4790,13 @@ msgid "Tell server administrator about this player (%s):"
 msgstr "Innis do rianaire an fhrithealaiche mun chluicheadair seo (%s):"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:40
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:43
+msgid ""
+"Press any key...\n"
+"(Press ESC to cancel)"
+msgstr ""
+
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
 msgstr "Brùth air iuchair sam bith…"
 
@@ -5404,48 +5412,48 @@ msgstr "Seòladh frithealaiche mì-dhligheach: %s."
 msgid "Searching"
 msgstr "’Ga lorg"
 
-#: src/states_screens/online/register_screen.cpp:131
+#: src/states_screens/online/register_screen.cpp:164
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "Fàg an geama"
 
-#: src/states_screens/online/register_screen.cpp:244
-#: src/states_screens/online/register_screen.cpp:251
+#: src/states_screens/online/register_screen.cpp:277
+#: src/states_screens/online/register_screen.cpp:284
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "Cha deach leinn an cluicheadair “%s” a chruthachadh."
 
-#: src/states_screens/online/register_screen.cpp:268
+#: src/states_screens/online/register_screen.cpp:301
 msgid "User name cannot be empty."
 msgstr "Chan fhaod ainm-cleachdaiche a bhith falamh."
 
-#: src/states_screens/online/register_screen.cpp:310
+#: src/states_screens/online/register_screen.cpp:343
 msgid "Emails don't match!"
 msgstr "Chan eil an dà phost-d co-ionnann!"
 
-#: src/states_screens/online/register_screen.cpp:314
+#: src/states_screens/online/register_screen.cpp:347
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "Feumaidh an t-ainm-cleachdaiche air loidhne a bhith eadar 3 is 30 caractar a dh’fhaid!"
 
-#: src/states_screens/online/register_screen.cpp:318
+#: src/states_screens/online/register_screen.cpp:351
 msgid "Online username must not start with a number!"
 msgstr "Chan fhaod ainm-cleachdaiche tòiseachadh le àireamh!"
 
-#: src/states_screens/online/register_screen.cpp:326
+#: src/states_screens/online/register_screen.cpp:359
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "Feumaidh am post-d a bhith eadar 4 is 254 caractar a dh’fhaid!"
 
-#: src/states_screens/online/register_screen.cpp:332
+#: src/states_screens/online/register_screen.cpp:365
 msgid "Email is invalid!"
 msgstr "Chan eil am post-d dligheach!"
 
-#: src/states_screens/online/register_screen.cpp:395
+#: src/states_screens/online/register_screen.cpp:428
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "Gheibh thu post-d le barrachd stiùiridhean a thaobh gnìomhachadh a’ chunntais agad. Bi foighidinneach is thoir sùil air a’ phasgan spama agad cuideachd."
 
-#: src/states_screens/online/register_screen.cpp:434
+#: src/states_screens/online/register_screen.cpp:467
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Tha an t-inntrigeadh dhan eadar-lìon à comas, cuir an comas e sna roghainnean"
 
@@ -5534,126 +5542,126 @@ msgstr "Rach an comhair contrarra"
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Glaiste: fuasgail dùbhlain gus faighinn a-steach dhan a bharrachd!"
 
-#: src/states_screens/options/options_screen_device.cpp:73
+#: src/states_screens/options/options_screen_device.cpp:74
 msgid "Action"
 msgstr "Gnìomh"
 
-#: src/states_screens/options/options_screen_device.cpp:74
+#: src/states_screens/options/options_screen_device.cpp:75
 msgid "Key binding"
 msgstr "Nasgadh nan iuchraichean"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:101
-#: src/states_screens/options/options_screen_device.cpp:623
+#: src/states_screens/options/options_screen_device.cpp:102
+#: src/states_screens/options/options_screen_device.cpp:621
 msgid "Disable Device"
 msgstr "Cuir an t-uidheam à comas"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:103
-#: src/states_screens/options/options_screen_device.cpp:624
+#: src/states_screens/options/options_screen_device.cpp:104
+#: src/states_screens/options/options_screen_device.cpp:622
 msgid "Enable Device"
 msgstr "Cuir uidheam an comas"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:118
-#: src/states_screens/options/options_screen_device.cpp:629
+#: src/states_screens/options/options_screen_device.cpp:119
+#: src/states_screens/options/options_screen_device.cpp:627
 msgid "Enable Configuration"
 msgstr "Cuir an rèiteachadh an comas"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:167
+#: src/states_screens/options/options_screen_device.cpp:168
 msgid "Game Keys"
 msgstr "Iuchraichean a’ gheama"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:181
+#: src/states_screens/options/options_screen_device.cpp:182
 msgid "Menu Keys"
 msgstr "Iuchraichean clàir-thaice"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:257
+#: src/states_screens/options/options_screen_device.cpp:258
 msgid "Steer Left"
 msgstr "Rach gu clì"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:260
+#: src/states_screens/options/options_screen_device.cpp:261
 msgid "Steer Right"
 msgstr "Rach gu deas"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:263
+#: src/states_screens/options/options_screen_device.cpp:264
 msgid "Accelerate"
 msgstr "Luathaich"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:266
+#: src/states_screens/options/options_screen_device.cpp:267
 msgid "Brake / Reverse"
 msgstr "Brèig / Comhair contrarra"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:269
+#: src/states_screens/options/options_screen_device.cpp:270
 msgid "Fire"
 msgstr "Loisg"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:272
+#: src/states_screens/options/options_screen_device.cpp:273
 msgid "Nitro"
 msgstr "Naidhtreo"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:278
+#: src/states_screens/options/options_screen_device.cpp:279
 msgid "Look Back"
 msgstr "Sùil air ais"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:281
+#: src/states_screens/options/options_screen_device.cpp:282
 msgid "Rescue"
 msgstr "Teasairg"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:284
+#: src/states_screens/options/options_screen_device.cpp:285
 msgid "Pause Game"
 msgstr "Gabh anail"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:289
+#: src/states_screens/options/options_screen_device.cpp:290
 msgid "Up"
 msgstr "Suas"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:292
+#: src/states_screens/options/options_screen_device.cpp:293
 msgid "Down"
 msgstr "Sìos"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:295
+#: src/states_screens/options/options_screen_device.cpp:296
 msgid "Left"
 msgstr "Clì"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:298
+#: src/states_screens/options/options_screen_device.cpp:299
 msgid "Right"
 msgstr "Deas"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:301
+#: src/states_screens/options/options_screen_device.cpp:302
 msgid "Select"
 msgstr "Tagh"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:304
+#: src/states_screens/options/options_screen_device.cpp:305
 msgid "Cancel/Back"
 msgstr "Sguir dheth/Till"
 
-#: src/states_screens/options/options_screen_device.cpp:399
+#: src/states_screens/options/options_screen_device.cpp:396
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Tha nì gorm a’ ciallachadh gu bheil còmhstri le rèiteachadh eile ann"
 
-#: src/states_screens/options/options_screen_device.cpp:404
+#: src/states_screens/options/options_screen_device.cpp:401
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Tha nì dearg a’ ciallachadh gu bheil còmhstri san rèiteachadh seo ann"
 
-#: src/states_screens/options/options_screen_device.cpp:510
+#: src/states_screens/options/options_screen_device.cpp:508
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5661,11 +5669,11 @@ msgid ""
 msgstr "Rabhadh: Cha mholamaid an iuchair “Shift”. Nuair a bhrùthas tu air, sguiridh a h-uile iuchair de bhith ag obrachadh aig a bheil caractar eadar-dhealaichte nuair a bhios e ’na litir mhòr."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:609
+#: src/states_screens/options/options_screen_device.cpp:607
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "A bheil thu cinnteach gu bheil thu airson sguabadh às dhan rèiteachadh seo gu bràth tuilleadh?"
 
-#: src/states_screens/options/options_screen_device.cpp:637
+#: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "Cuir a-steach ainm air an rèiteachadh ùr no fàg bàn e airson tilleadh dhan luach tùsail."
 

@@ -6,12 +6,13 @@
 # Adithyan S S <AssG.Fight.Fairy@gmail.com>, 2020
 # Adithyan S S <AssG.Fight.Fairy@gmail.com>, 2020
 # Adithyan S S <AssG.Fight.Fairy@gmail.com>, 2020-2021
+# Kevin 008, 2021
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-02-16 09:26+0800\n"
-"PO-Revision-Date: 2021-03-06 04:41+0000\n"
+"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"PO-Revision-Date: 2021-03-21 02:45+0000\n"
 "Last-Translator: Adithyan S S <AssG.Fight.Fairy@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/supertuxkart/supertuxkart/language/ml/)\n"
 "MIME-Version: 1.0\n"
@@ -324,9 +325,6 @@ msgstr "അതെ"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
-#. I18N: In the 'confirm resolution' dialog, that's shown when switching
-#. resoluton
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
@@ -345,6 +343,8 @@ msgstr "അതെ"
 #. I18N: In the server info dialog
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
+#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
+#. I18N: When configuring input
 #. I18N: ./data/gui/screens/edit_track.stkgui
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: In the server creation screen
@@ -356,8 +356,7 @@ msgstr "അതെ"
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
 #: src/states_screens/dialogs/addons_loading.cpp:213
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:45
-#: src/states_screens/online/register_screen.cpp:130
+#: src/states_screens/online/register_screen.cpp:163
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "റദ്ദാക്കുക"
@@ -365,8 +364,18 @@ msgstr "റദ്ദാക്കുക"
 #. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-msgid "Keep this resolution"
-msgstr "ഈ മിഴിവ് സൂക്ഷിക്കുക"
+#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
+#. I18N: In the registration dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+msgid "Accept"
+msgstr "സമ്മതം"
+
+#. I18N: ./data/gui/dialogs/confirm_resolution_dialog.stkgui
+#. I18N: In the 'confirm resolution' dialog, that's shown when switching
+#. resoluton
+msgid "Revert"
+msgstr "പൂർവ്വാവസ്ഥയിലാക്കുക"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -375,7 +384,7 @@ msgstr "ക്യാമറ ക്രമീകരണങ്ങൾ"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera settings
 msgid "Player camera"
-msgstr "കളിക്കാരുടെ ക്യാമറ"
+msgstr "കളിക്കാരന്റെ ക്യാമറ"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -501,6 +510,20 @@ msgstr "ജ്യാമിതിവിവരണം"
 msgid "* Restart STK to apply new settings"
 msgstr "* പുതിയ ക്രമീകരണങ്ങൾ പ്രാബല്യത്തിൽ വരുത്തുന്നതിന് STK പുനരാരംഭിക്കുക"
 
+#. I18N: ./data/gui/dialogs/debug_slider.stkgui
+#. I18N: ./data/gui/dialogs/online/change_password.stkgui
+#. I18N: In the change password dialog
+#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
+#. I18N: In the recovery dialog
+#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
+#. I18N: User info dialog
+#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
+#. I18N: Vote dialog
+msgid "Close"
+msgstr "അടയ്ക്കുക"
+
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
@@ -608,19 +631,6 @@ msgstr "ഉറപ്പിക്കുക"
 #. I18N: In the recovery dialog
 msgid "Submit"
 msgstr "സമർപ്പിക്കുക"
-
-#. I18N: ./data/gui/dialogs/online/change_password.stkgui
-#. I18N: In the change password dialog
-#. I18N: ./data/gui/dialogs/online/notification_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/recovery_info.stkgui
-#. I18N: In the recovery dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-#. I18N: ./data/gui/dialogs/online/vote_dialog.stkgui
-#. I18N: Vote dialog
-msgid "Close"
-msgstr "അടയ്ക്കുക"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
@@ -740,13 +750,6 @@ msgstr "നിബന്ധനകളും വ്യവസ്ഥയും"
 msgid "I agree to the above terms and am 13 years or older. "
 msgstr "മുകളിൽ കൊടുത്തിട്ടുള്ള നിബന്ധനകൾ ഞാൻ പാലിക്കുന്നുവെന്നും എനിക്ക് 13 വയസ്സോ അതിൽക്കൂടുതലോ പ്രായമാണ് ഉള്ളതെന്നും സാക്ഷ്യപ്പെടുത്തുന്നു."
 
-#. I18N: ./data/gui/dialogs/online/registration_terms.stkgui
-#. I18N: In the registration dialog
-#. I18N: ./data/gui/dialogs/online/user_info_dialog.stkgui
-#. I18N: User info dialog
-msgid "Accept"
-msgstr "സമ്മതം"
-
 #. I18N: ./data/gui/dialogs/online/server_configuration_dialog.stkgui
 #. I18N: In the server configuration screen
 msgid "Server Configuration"
@@ -767,7 +770,7 @@ msgstr "പ്രയാസം"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1213
+#: src/race/race_manager.cpp:1241
 msgid "Novice"
 msgstr "തുടക്കക്കാരൻ"
 
@@ -779,7 +782,7 @@ msgstr "തുടക്കക്കാരൻ"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1214
+#: src/race/race_manager.cpp:1242
 msgid "Intermediate"
 msgstr "അർധജ്ഞാനി"
 
@@ -791,7 +794,7 @@ msgstr "അർധജ്ഞാനി"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1215
+#: src/race/race_manager.cpp:1243
 msgid "Expert"
 msgstr "വിദ്വാൻ"
 
@@ -803,7 +806,7 @@ msgstr "വിദ്വാൻ"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1216
+#: src/race/race_manager.cpp:1244
 msgid "SuperTux"
 msgstr "സൂപ്പർടക്സ്"
 
@@ -822,7 +825,7 @@ msgstr "ഗെയിം മോഡ്"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1188
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1216
 #: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "സാധാരണ റേസ്"
@@ -836,7 +839,7 @@ msgstr "സാധാരണ റേസ്"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1190
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1218
 msgid "Time Trial"
 msgstr "ടൈം ട്രയൽ"
 
@@ -853,7 +856,7 @@ msgstr "യുദ്ധം"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1202
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1230
 #: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "സോക്കർ"
@@ -958,11 +961,6 @@ msgstr "ESC കീയിലേക്ക് നിയമിക്കുക"
 #. I18N: When configuring input
 msgid "Assign nothing"
 msgstr "ഒന്നും നിയമിക്കേണ്ട"
-
-#. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
-#. I18N: When configuring input
-msgid "Press ESC to cancel"
-msgstr "റദ്ദാക്കാൻ ESC അമർത്തുക"
 
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
@@ -1156,7 +1154,7 @@ msgstr "പ്രേത റീപ്ലേ തിരഞ്ഞെടുക്ക�
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1200
+#: src/race/race_manager.cpp:1228
 msgid "Egg Hunt"
 msgstr "മുട്ട വേട്ട"
 
@@ -1892,7 +1890,7 @@ msgstr "മാറ്റുക"
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Create User"
-msgstr "ഉപയോക്താവിനെ സൃഷ്ടിക്കുക"
+msgstr "ഉപയോക്താവിനെ സൃഷ്ടിക്കാം"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: Section in the register screen
@@ -2111,8 +2109,8 @@ msgstr "ക്രമീകരണം ഇല്ലാതാക്കുക"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:116
-#: src/states_screens/options/options_screen_device.cpp:628
+#: src/states_screens/options/options_screen_device.cpp:117
+#: src/states_screens/options/options_screen_device.cpp:626
 msgid "Disable Configuration"
 msgstr "ക്രമീകരണം നിർത്തലാക്കുക"
 
@@ -2392,7 +2390,7 @@ msgstr "ചെറിയ നൈട്രോ ബൂസ്റ്റുകളാണ�
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr "അപകടമില്ലാത്തപ്പോൾ മാത്രം സിപ്പറുകൾ ഉപയോഗിക്കുക. നീണ്ട നേർരേഖകളാണ് ഉത്തമം."
+msgstr "സുരക്ഷിതെമെന്ന് ഉറച്ചശേഷം മാത്രം സിപ്പറുകൾ ഉപയോഗിക്കുക. നീണ്ട നേർരേഖകളാണ് ഉത്തമം."
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2470,7 +2468,7 @@ msgstr "കുറഞ്ഞത് 2 വലിയ കാൻ വരുന്നത�
 
 #. I18N: ./data/tips.xml
 msgid "Never use the three bowling balls all at the same time."
-msgstr "ഒരിക്കലും മൂന്നു ബൗളിങ് ബോളുകളെല്ലാം ഒരേസമയം ഉപയോഗിക്കരുത്."
+msgstr "ഒരിക്കലും മൂന്നു ബൗളിംഗ് ബോളുകളെല്ലാം ഒരേസമയം ഉപയോഗിക്കരുത്."
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2496,7 +2494,7 @@ msgstr "ഇമ്യൂൾ"
 
 #. I18N: ../stk-assets/karts/gavroche/kart.xml
 msgid "Gavroche"
-msgstr "ഗാവ്റോഷെ"
+msgstr "ഗാവ്രോഷെ"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
@@ -2805,20 +2803,21 @@ msgid ""
 "created."
 msgstr "താങ്കളുടെ ക്രമീകരണ ഫയൽ തീരെ പഴയതായിരുന്നു, അതിനാലത് ഇല്ലാതാക്കി പുതിയൊരെണ്ണം സൃഷ്ടിച്ചിരിക്കുന്നു."
 
-#: src/graphics/irr_driver.cpp:613
+#: src/graphics/irr_driver.cpp:635
 msgid "Video recording started."
 msgstr "വീഡിയോ റെക്കോർഡിംഗ് ആരംഭിച്ചിരിക്കുന്നു"
 
-#: src/graphics/irr_driver.cpp:620
+#: src/graphics/irr_driver.cpp:642
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "വീഡിയോ \"%s\" -ൽ സൂക്ഷിച്ചിരിക്കുന്നു."
 
-#: src/graphics/irr_driver.cpp:624
+#: src/graphics/irr_driver.cpp:646
 msgid "Encoding progress:"
 msgstr "എൻകോഡിംഗ് പുരോഗതി:"
 
-#: src/graphics/irr_driver.cpp:1821 src/graphics/irr_driver.cpp:1826
+#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1857
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d കെട്രിസ്, പിങ്: %dms"
@@ -3465,12 +3464,12 @@ msgstr "ഇടതു ട്രിഗ്ഗർ"
 msgid "Right trigger"
 msgstr "വലതു ട്രിഗ്ഗർ"
 
-#: src/input/input_manager.cpp:995
+#: src/input/input_manager.cpp:832
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "'%s' അവഗണിക്കുന്നു. കളിക്കാൻ നിങ്ങൾ മുന്നേ ചേരണമായിരുന്നു!"
 
-#: src/input/input_manager.cpp:1031
+#: src/input/input_manager.cpp:868
 msgid "Only the Game Master may act at this point!"
 msgstr "ഗെയിം മാസ്റ്റർ മാത്രമേ ഈ സ്ഥിതിയിൽ പ്രവർത്തിക്കാവൂ."
 
@@ -3502,6 +3501,10 @@ msgstr[1] "%d വിമോട്ടുകൾ കണ്ടെത്തി."
 msgid "Could not detect any wiimote :/"
 msgstr "ഒരു വിമോട്ടും കണ്ടെത്താനായില്ല :/"
 
+#: src/io/rich_presence.cpp:440
+msgid "Getting ready to race"
+msgstr "റേസിനായി സജ്ജമാകുന്നു"
+
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
 msgstr "ശിക്ഷാ സമയം!!"
@@ -3518,15 +3521,15 @@ msgstr "നിങ്ങൾക്കു കൂടിയത് 3 ജീവനു�
 msgid "+1 life."
 msgstr "+1 ജീവൻ"
 
-#: src/karts/kart.cpp:1019
+#: src/karts/kart.cpp:1022
 msgid "You were too slow!"
 msgstr "നിങ്ങൾ തീരെ പതുക്കെയായിരുന്നു!"
 
-#: src/karts/kart.cpp:1020
+#: src/karts/kart.cpp:1023
 msgid "You won the race!"
 msgstr "നിങ്ങൾ റേസ് വിജയിച്ചിരിക്കുന്നു!"
 
-#: src/karts/kart.cpp:1021
+#: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
 msgstr "റാങ്ക് %d-ൽ നിങ്ങൾ റേസ് പൂർത്തീകരിച്ചു!"
@@ -3537,7 +3540,7 @@ msgstr "റാങ്ക് %d-ൽ നിങ്ങൾ റേസ് പൂർത�
 msgid "%s left the game."
 msgstr "%s ഗെയിം വിട്ടു"
 
-#: src/main.cpp:1946
+#: src/main.cpp:2009
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3546,16 +3549,16 @@ msgid ""
 "Internet\")."
 msgstr "സൂപ്പർടക്സ്കാർട്ട് ആഡ്-ഓണുകൾ ഡൗൺലോഡ് ചെയ്യുന്നതിനും പുതുമകളപ്പറ്റി താങ്കളെ അറിയിക്കുന്നതിനുമായി ഒരു സെർവറുമായി ബന്ധപ്പെട്ടേക്കാം. ദയവായി ഞങ്ങളുടെ സ്വകാര്യതാനയം https://supertuxkart.net/Privacy -ൽ വായിക്കുക. താങ്കൾ ഈ പ്രത്യേകത ലഭ്യമാക്കാൻ ആഗ്രഹിക്കുന്നുവോ? (ഈ ക്രമീകരണം പിൽക്കാലത്ത് മാറ്റുന്നതിനായി, ഐച്ഛികങ്ങളിലേക്കു പോകുക, 'സാധാരണം' ടാബ് തിരഞ്ഞെടുക്കുക, ശേഷം \"ഇന്റർനെറ്റുമായി ബന്ധപ്പെടുക\" തിരുത്തുക)."
 
-#: src/main.cpp:2226
+#: src/main.cpp:2358
 msgid "Your screen resolution is too low to run STK."
 msgstr "താങ്കളുടെ സ്ക്രീൻ മിഴിവ് STK പ്രവർത്തിക്കാൻ തീരെ കുറവാണ്."
 
-#: src/main.cpp:2261
+#: src/main.cpp:2393
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "താങ്കളുടെ ഡ്രൈവർ വേർഷൻ തീരെ പഴയതാണ്. ദയവായി ഏറ്റവുംപുതിയ വീഡിയോ ഡ്രൈവറുകൾ ഇൻസ്റ്റാൾ ചെയ്യുക."
 
-#: src/main.cpp:2279
+#: src/main.cpp:2411
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3563,7 +3566,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "താങ്കളുടെ ഗ്രാഫിക്സ് ഡ്രൈവർ വളരെ പഴയതായി കാണുന്നു. ദയവായി ഏതെങ്കിലും അപ്ഡേറ്റുകൾ ഉണ്ടോയെന്ന് പരിശോധിക്കുക. സൂപ്പർടക്സ്കാർട്ട് ശുപാർശ ചെയ്യുന്നത് %s-ഓ മികച്ചതോ പിന്തുണയ്ക്കുന്ന ഒരു ഡ്രൈവറാണ്. ഗെയിം ഇപ്പോഴും പ്രവർത്തിക്കാനാണ് സാധ്യത, ഒരു ലഘു-ഗ്രാഫിക്സ് മോഡിലാണെന്നുമാത്രം."
 
-#: src/main_loop.cpp:479 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:109
 msgid "Server connection timed out."
 msgstr "സെർവറുമായി ബന്ധപ്പെടൽ സമയം നീണ്ടു."
 
@@ -3675,7 +3678,7 @@ msgid "Bad network connection is detected."
 msgstr "മോശം നെറ്റ്‌വർക്ക് കണക്ഷൻ കണ്ടെത്തി."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3813
+#: src/network/protocols/server_lobby.cpp:3812
 msgid "Bot"
 msgstr "യന്ത്രം"
 
@@ -3845,17 +3848,17 @@ msgstr "ലക്ഷ്യംവച്ച കളിക്കാരനെ മാ�
 msgid "Successfully reported %s."
 msgstr "%s എന്നയാളെ വിജയകരമായി പരാതിപ്പെട്ടു."
 
-#: src/network/protocols/connect_to_server.cpp:222
+#: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
 msgstr "ഉടൻ കളിക്കാൻ ഒരു സെർവറും ലഭ്യമല്ല."
 
-#: src/network/protocols/connect_to_server.cpp:372
+#: src/network/protocols/connect_to_server.cpp:380
 #, c-format
 msgid "Cannot connect to server %s."
 msgstr "%s സെർവറുമായി ബന്ധപ്പെടാൻ സാധിച്ചില്ല."
 
 #. I18N: Show the failed detect port server name
-#: src/network/protocols/connect_to_server.cpp:771
+#: src/network/protocols/connect_to_server.cpp:883
 #, c-format
 msgid "Failed to detect port number for server %s."
 msgstr "%s സെർവറിന്റെ പോർട്ട് നമ്പർ കണ്ടുപിടിക്കൽ പരാജയപ്പെട്ടു."
@@ -3870,7 +3873,7 @@ msgstr "ടൈം ട്രയൽ (ഗ്രാന്റ് പ്രീ)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1196
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1224
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
@@ -3879,7 +3882,7 @@ msgstr "എല്ലാറ്റിനും-സ്വാതന്ത്ര്�
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1198
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1226
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
@@ -3938,12 +3941,12 @@ msgid ""
 msgstr "ഉയർന്ന സ്കോറുകളുടെ ഫയൽ തീരെ പഴയതായിരുന്നു,\nഎല്ലാ ഉയർന്ന സ്കോറുകളും മായ്ച്ചിരിക്കുന്നു."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1192
+#: src/race/race_manager.cpp:1220
 msgid "Follow the Leader"
 msgstr "നേതാവിനെ പിന്തുടരൂ"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1194 src/states_screens/track_info_screen.cpp:250
+#: src/race/race_manager.cpp:1222 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr "3 പ്രഹര യുദ്ധം"
 
@@ -4054,7 +4057,7 @@ msgstr[1] "%d മേഖലകൾ ഒറ്റയാളിൽ അലഭ്യമ�
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Malayalam\nAdithyan SS ആദിത്യൻ എസ് എസ് (aka Alphacelestius)\nLaunchpad: https://launchpad.net/~thestrawberryandkiwi-2\nGitHub: https://github.com/The-Legendary-Psycho\nInstagram: https://www.instagram.com/alphacelestius_activated925/"
+msgstr "Malayalam\nAdithyan SS ആദിത്യൻ എസ് എസ് (aka Alphacelestius)\nLaunchpad: https://launchpad.net/~thestrawberryandkiwi-2\nGitHub: https://github.com/The-Legendary-Psycho\nInstagram: @alphacelestius_activated925"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4339,7 +4342,7 @@ msgstr "ശേഖരിച്ച പഴത്തൊലികൾ"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:275
+#: src/states_screens/options/options_screen_device.cpp:276
 msgid "Skidding"
 msgstr "സ്കിഡിംഗ്"
 
@@ -4516,12 +4519,12 @@ msgid "Current password invalid."
 msgstr "ഇപ്പോഴത്തെ രഹസ്യവാക്ക് അസാധുവാണ്."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:322
+#: src/states_screens/online/register_screen.cpp:355
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "രഹസ്യവാക്ക് 8നും 30നും മദ്ധ്യേ പ്രതീകങ്ങൾ നീളുന്നതാകണം!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:306
+#: src/states_screens/online/register_screen.cpp:339
 msgid "Passwords don't match!"
 msgstr "രഹസ്യവാക്കുകൾ തമ്മിൽ യോജിക്കുന്നില്ല!"
 
@@ -4531,20 +4534,20 @@ msgstr "രഹസ്യവാക്ക് വിജയകരമായി മാ�
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:387
+#: src/states_screens/online/register_screen.cpp:420
 msgid "Validating info"
 msgstr "വിവരം സാധൂകരിക്കുന്നു"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:85
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:86
 #, c-format
 msgid "Confirm resolution within %i second"
 msgid_plural "Confirm resolution within %i seconds"
 msgstr[0] "%i  നിമിഷത്തിനകം മിഴിവ് തീർച്ചപ്പെടുത്തുക"
 msgstr[1] "%iനിമിഷങ്ങൾക്കകം മിഴിവ് തീർച്ചപ്പെടുത്തുക"
 
-#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:92
+#: src/states_screens/dialogs/confirm_resolution_dialog.cpp:93
 msgid ""
 "Resolutions smaller than 1024x768 or 1280x720 are unsupported. Some parts of"
 " the UI may not work correctly."
@@ -4775,7 +4778,13 @@ msgid "Tell server administrator about this player (%s):"
 msgstr "(%s) കളിക്കാരനെക്കുറിച്ച് സെർവർ അധികാരിയോടു പറയൂ:"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
-#: src/states_screens/dialogs/press_a_key_dialog.cpp:40
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:43
+msgid ""
+"Press any key...\n"
+"(Press ESC to cancel)"
+msgstr "ഏതെങ്കിലുമൊരു കീ അമർത്തൂ...\n(റദ്ദാക്കാൻ ESC അമർത്തുക)"
+
+#: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
 msgstr "ഏതെങ്കിലുമൊരു കീ അമർത്തൂ..."
 
@@ -4795,7 +4804,7 @@ msgstr "%s എന്നയാൾക്ക് ഇതുവരെ ഒരു സ്
 #: src/states_screens/dialogs/ranking_callback.hpp:56
 #, c-format
 msgid "%s is number %d in the rankings with a score of %f."
-msgstr "%s എന്നയാൾ %f സ്കോറോടെ %d സ്ഥാനത്താണ്."
+msgstr "%s എന്നയാൾ %d റാങ്കിലാണ്, %f സ്കോറോടൊപ്പം."
 
 #: src/states_screens/dialogs/recovery_dialog.cpp:120
 msgid "Username and/or email address invalid."
@@ -5387,48 +5396,48 @@ msgstr "അസാധുവായ സെർവർ വിലാസം: %s."
 msgid "Searching"
 msgstr "തിരയുന്നു"
 
-#: src/states_screens/online/register_screen.cpp:131
+#: src/states_screens/online/register_screen.cpp:164
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "ഗെയിം വിടുക"
 
-#: src/states_screens/online/register_screen.cpp:244
-#: src/states_screens/online/register_screen.cpp:251
+#: src/states_screens/online/register_screen.cpp:277
+#: src/states_screens/online/register_screen.cpp:284
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "'%s' കളിക്കാരനെ സൃഷ്ടിക്കാൻ സാധിച്ചില്ല."
 
-#: src/states_screens/online/register_screen.cpp:268
+#: src/states_screens/online/register_screen.cpp:301
 msgid "User name cannot be empty."
 msgstr "ഉപയോക്തൃനാമം ശൂന്യമാകരുത്."
 
-#: src/states_screens/online/register_screen.cpp:310
+#: src/states_screens/online/register_screen.cpp:343
 msgid "Emails don't match!"
 msgstr "ഇമെയിലുകൾ തമ്മിൽ യോജിക്കുന്നില്ല!"
 
-#: src/states_screens/online/register_screen.cpp:314
+#: src/states_screens/online/register_screen.cpp:347
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "ഓൺലൈൻ ഉപയോക്തൃനാമം 3നും 30നും മദ്ധ്യേ പ്രതീകങ്ങൾ നീളുന്നതാകണം!"
 
-#: src/states_screens/online/register_screen.cpp:318
+#: src/states_screens/online/register_screen.cpp:351
 msgid "Online username must not start with a number!"
 msgstr "ഓൺലൈൻ ഉപയോക്തൃനാമം ഒരു അക്കവുമായി ആരംഭിക്കരുത്!"
 
-#: src/states_screens/online/register_screen.cpp:326
+#: src/states_screens/online/register_screen.cpp:359
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "ഇമെയിൽ 5നും 254നും മദ്ധ്യേ പ്രതീകങ്ങൾ നീളുന്നതാകണം!"
 
-#: src/states_screens/online/register_screen.cpp:332
+#: src/states_screens/online/register_screen.cpp:365
 msgid "Email is invalid!"
 msgstr "ഇമെയിൽ അസാധുവാണ്!"
 
-#: src/states_screens/online/register_screen.cpp:395
+#: src/states_screens/online/register_screen.cpp:428
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "അക്കൗണ്ട് ത്വരിതപ്പെടുത്തലുമായി ബന്ധപ്പെട്ട് ഇനിയുള്ള നിർദ്ദേശങ്ങൾ അടങ്ങിയ ഒരു ഇമെയിൽ താങ്കൾക്ക് ലഭിക്കുന്നതായിരിക്കും. ദയവായി ക്ഷമയോടെ കാത്തിരിക്കുക. ഒപ്പം താങ്കളുടെ സ്പാം ഫോൾഡർ പരിശോധിച്ചെന്ന് ഉറപ്പാക്കുക."
 
-#: src/states_screens/online/register_screen.cpp:434
+#: src/states_screens/online/register_screen.cpp:467
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "ഇന്റർനെറ്റ് ലഭ്യത നിഷേധിച്ചിരിക്കുന്നു, ഐച്ഛികമെനുവിൽ ലഭ്യമാക്കുക."
 
@@ -5517,126 +5526,126 @@ msgstr "എതിർദിശയിൽ ഓടിക്കുക"
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "പൂട്ടിയിരിക്കുന്നു: കൂടുതൽ യോഗ്യതകൾ പ്രാപ്തമാക്കാൻ സജീവ വെല്ലുവിളികൾ പരിഹരിക്കൂ!"
 
-#: src/states_screens/options/options_screen_device.cpp:73
+#: src/states_screens/options/options_screen_device.cpp:74
 msgid "Action"
 msgstr "ആംഗ്യം"
 
-#: src/states_screens/options/options_screen_device.cpp:74
+#: src/states_screens/options/options_screen_device.cpp:75
 msgid "Key binding"
 msgstr "കീ അനുക്രമണം"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:101
-#: src/states_screens/options/options_screen_device.cpp:623
+#: src/states_screens/options/options_screen_device.cpp:102
+#: src/states_screens/options/options_screen_device.cpp:621
 msgid "Disable Device"
 msgstr "ഉപകരണം അലഭ്യമാക്കുക"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:103
-#: src/states_screens/options/options_screen_device.cpp:624
+#: src/states_screens/options/options_screen_device.cpp:104
+#: src/states_screens/options/options_screen_device.cpp:622
 msgid "Enable Device"
 msgstr "ഉപകരണം ലഭ്യമാക്കുക"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:118
-#: src/states_screens/options/options_screen_device.cpp:629
+#: src/states_screens/options/options_screen_device.cpp:119
+#: src/states_screens/options/options_screen_device.cpp:627
 msgid "Enable Configuration"
 msgstr "ക്രമീകരണം ലഭ്യമാക്കുക"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:167
+#: src/states_screens/options/options_screen_device.cpp:168
 msgid "Game Keys"
 msgstr "ഗെയിം കീകൾ"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:181
+#: src/states_screens/options/options_screen_device.cpp:182
 msgid "Menu Keys"
 msgstr "മെനു കീകൾ"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:257
+#: src/states_screens/options/options_screen_device.cpp:258
 msgid "Steer Left"
 msgstr "ഇടത്തോട്ടു തിരിക്കാം"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:260
+#: src/states_screens/options/options_screen_device.cpp:261
 msgid "Steer Right"
 msgstr "വലത്തോട്ടു തിരിക്കാം"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:263
+#: src/states_screens/options/options_screen_device.cpp:264
 msgid "Accelerate"
 msgstr "ത്വരിപ്പിക്കാം"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:266
+#: src/states_screens/options/options_screen_device.cpp:267
 msgid "Brake / Reverse"
 msgstr "ബ്രേക്ക് / എതിർദിശ"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:269
+#: src/states_screens/options/options_screen_device.cpp:270
 msgid "Fire"
 msgstr "ഫയർ"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:272
+#: src/states_screens/options/options_screen_device.cpp:273
 msgid "Nitro"
 msgstr "നൈട്രോ"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:278
+#: src/states_screens/options/options_screen_device.cpp:279
 msgid "Look Back"
 msgstr "തിരിഞ്ഞുനോക്കാം"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:281
+#: src/states_screens/options/options_screen_device.cpp:282
 msgid "Rescue"
 msgstr "രക്ഷ"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:284
+#: src/states_screens/options/options_screen_device.cpp:285
 msgid "Pause Game"
 msgstr "ഗെയിം നിർത്താം"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:289
+#: src/states_screens/options/options_screen_device.cpp:290
 msgid "Up"
 msgstr "മുന്നോട്ട്"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:292
+#: src/states_screens/options/options_screen_device.cpp:293
 msgid "Down"
 msgstr "താഴോട്ട്"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:295
+#: src/states_screens/options/options_screen_device.cpp:296
 msgid "Left"
 msgstr "ഇടത്"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:298
+#: src/states_screens/options/options_screen_device.cpp:299
 msgid "Right"
 msgstr "വലത്"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:301
+#: src/states_screens/options/options_screen_device.cpp:302
 msgid "Select"
 msgstr "തിരഞ്ഞെടുക്കാം"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:304
+#: src/states_screens/options/options_screen_device.cpp:305
 msgid "Cancel/Back"
 msgstr "റദ്ദാക്കുക/പിന്നോട്ട്"
 
-#: src/states_screens/options/options_screen_device.cpp:399
+#: src/states_screens/options/options_screen_device.cpp:396
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* നീലനിറം മറ്റൊരു ക്രമീകരണവുമായുള്ള ഒരു സംഘട്ടനം അർത്ഥമാക്കുന്നു"
 
-#: src/states_screens/options/options_screen_device.cpp:404
+#: src/states_screens/options/options_screen_device.cpp:401
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* ചുവപ്പുനിറം നിലവിലെ ക്രമീകരണവുമായുള്ള ഒരു സംഘട്ടനം അർത്ഥമാക്കുന്നു"
 
-#: src/states_screens/options/options_screen_device.cpp:510
+#: src/states_screens/options/options_screen_device.cpp:508
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5644,11 +5653,11 @@ msgid ""
 msgstr "മുന്നറിയിപ്പ്: 'ഷിഫ്റ്റ്' ശുപാർശചെയ്യപ്പെട്ട ഒരു കീ അല്ല. 'ഷിഫ്റ്റ്' താഴേക്കമർത്തുമ്പോൾ, ഉച്ചശ്രേണിയിൽ വ്യത്യാസം പ്രകടിപ്പിക്കുന്ന ഒരു പ്രതീകമുളള കീകളെല്ലാം പണിമുടക്കുന്നു."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:609
+#: src/states_screens/options/options_screen_device.cpp:607
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "നിങ്ങൾക്ക് ഈ ക്രമീകരണം എന്നെന്നേക്കുമായി ഇല്ലാക്കണമെന്ന് ഉറപ്പാണോ?"
 
-#: src/states_screens/options/options_screen_device.cpp:637
+#: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "പുതിയ ക്രമീകരണനാമം എഴുതുക, സ്വതേയുള്ള മൂല്യം നിലനിർത്താൻ ശൂന്യമായി ഇടുക."
 
@@ -5893,7 +5902,7 @@ msgstr "നിങ്ങൾക്ക് ശരിക്കും '%s' എന്�
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:70
 msgid "Ready!"
-msgstr "തയ്യാർ?"
+msgstr "തയ്യാർ!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:72
