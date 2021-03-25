@@ -37,13 +37,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt install unzip -y
-          wget https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
-          unzip stk-assets-full.zip -d stk-assets
+          wget -q https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
+          unzip -q stk-assets-full.zip -d stk-assets
           rm stk-assets-full.zip
       - name: Run build script
         run: |
           cd stk-code/switch
-          sudo PROJECT_VESION=$release_pre bash ./make.sh
+          sudo PROJECT_VESION=$release_tag bash ./make.sh
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
