@@ -14,7 +14,10 @@ else
 fi
 
 # Install deps. --needed means don't reinstall if already installed
-sudo $PACMAN -S --needed switch-dev \
+sudo $PACMAN -S --needed \
+  libnx devkit-env \
+  devkitA64 general-tools \
+  \
   devkitpro-pkgbuild-helpers \
   switch-curl switch-mbedtls \
   switch-freetype switch-libfribidi \

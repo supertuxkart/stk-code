@@ -1,0 +1,48 @@
+name: switch
+on:
+  push:
+    branches:
+      - master
+      - feature/gh-actions-switch
+    tags:
+      - '*'
+    pull_request: {]
+    workflow_dispatch:
+
+jobs:
+  build_switch:
+    name: Build Switch
+    runs-on: debian-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: "/stk-code"
+      - name: Checkout assets
+        run: |
+          sudo apt update
+          sudo apt install subversion git gdebi-core -y
+          svn co https://svn.code.sf.net/p/supertuxkart/code/stk-assets stk-assets
+      - name: Install debkitPro
+        run: |
+          wget https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb
+          sudo gdebi devkitpro-pacman.amd64.deb -n
+          pacman -Syu --noconfirm
+          # Make sure we have the $DEVKITPRO vars
+          pacman -S --noconfirm devkit-env
+          source /etc/profile.d/devkit-env.sh
+      - name: Run build script
+        run: |
+          cd stk-code/switch
+          sudo PROJECT_VESION=$release_pre bash ./make.sh
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "build/SuperTuxKart-${{ env.release_tag }}-switch.zip"
+          tag: ${{ env.release_name }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          allowUpdates: true
+          prerelease: ${{ env.release_pre }}
+
