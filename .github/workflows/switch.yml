@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          path: "/stk-code"
+          path: "./stk-code"
       - name: Checkout assets
         run: |
           sudo apt update
