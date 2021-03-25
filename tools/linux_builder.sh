@@ -53,6 +53,8 @@ export STK_VERSION="git`date +%Y%m%d`"
 export THREADS_NUMBER=`nproc`
 export SCHROOT_32BIT_NAME="chroot-jessie32"
 export SCHROOT_64BIT_NAME="chroot-jessie64"
+export SCHROOT_ARMV7_NAME="chroot-jessie-armhf"
+export SCHROOT_ARM64_NAME="chroot-stretch-arm64"
 
 export STKCODE_DIR="$DIRNAME/.."
 export STKASSETS_DIR="$STKCODE_DIR/../supertuxkart-assets"
@@ -61,7 +63,8 @@ export STKEDITOR_DIR="$STKCODE_DIR/../supertuxkart-editor"
 
 export BLACKLIST_LIBS="ld-linux libbsd.so libc.so libdl.so libdrm libexpat \
                        libGL libgl libm.so libmvec.so libpthread libresolv \
-                       librt.so libX libxcb libxshm"
+                       librt.so libX libxcb libxshm \
+                       libEGL libgbm libwayland libffi bcm_host libvc"
 
 export BUILD_DIR="build-linux"
 export DEPENDENCIES_DIR="$STKCODE_DIR/dependencies-linux"
@@ -578,7 +581,7 @@ create_package()
     find "$STK_PACKAGE_DIR/bin" -type f -exec chmod a+x {} \;
     chmod a+x "$STK_PACKAGE_DIR/run_game.sh"
     
-    test_package "$STK_PACKAGE_DIR" "$BINARY_ARCH"
+    schroot -c $SCHROOT_NAME -- "$0" test_package "$STK_PACKAGE_DIR" "$BINARY_ARCH"
     
     # Compress package
     
@@ -610,9 +613,18 @@ if [ ! -z "$1 " ] && [ "$1" = "copy_libraries" ]; then
     exit 0
 fi
 
+# Handle test_package command (internal only)
+if [ ! -z "$1 " ] && [ "$1" = "test_package" ]; then
+    test_package "$2" "$3"
+    exit 0
+fi
+
+
 # Building STK
 
 create_package "$SCHROOT_32BIT_NAME" "32bit" "elf32-i386"
 create_package "$SCHROOT_64BIT_NAME" "64bit" "elf64-x86-64"
+create_package "$SCHROOT_ARMV7_NAME" "armv7" "elf32-littlearm"
+create_package "$SCHROOT_ARM64_NAME" "arm64" "elf64-littleaarch64"
 
 echo "Success."
