@@ -12,7 +12,7 @@ on:
 jobs:
   build_switch:
     name: Build Switch
-    runs-on: debian-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
