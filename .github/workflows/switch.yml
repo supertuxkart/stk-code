@@ -36,20 +36,10 @@ jobs:
       - name: Grab assets
         run: |
           sudo apt update
-          sudo apt install gdebi-core -y
+          sudo apt install unzip -y
           wget https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
           unzip stk-assets-full.zip -d stk-assets
           rm stk-assets-full.zip
-      # - name: Install debkitPro
-      #   run: |
-      #     wget https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb
-      #     sudo apt install -y curl
-      #     curl https://downloads.devkitpro.org/packages/dkp-libs.db -vvv
-      #     sudo gdebi devkitpro-pacman.amd64.deb -n
-      #     pacman -Syu --noconfirm
-      #     # Make sure we have the $DEVKITPRO vars
-      #     pacman -S --noconfirm devkit-env
-      #     source /etc/profile.d/devkit-env.sh
       - name: Run build script
         run: |
           cd stk-code/switch
