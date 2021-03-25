@@ -26,13 +26,13 @@ jobs:
         with:
           fetch-depth: 1
           path: "./stk-code/lib/openal"
-          repository: "https://github.com/kcat/openal-soft"
+          repository: "kcat/openal-soft"
       - name: Checkout Harfbuzz
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
           path: "./stk-code/lib/harfbuzz"
-          repository: "https://github.com/harfbuzz/harfbuzz"
+          repository: "harfbuzz/harfbuzz"
       - name: Grab assets
         run: |
           sudo apt update
