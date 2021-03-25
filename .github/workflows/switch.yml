@@ -13,11 +13,26 @@ jobs:
   build_switch:
     name: Build Switch
     runs-on: ubuntu-latest
+    container:
+      image: 'devkitpro/devkitarm'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
+          fetch-depth: 1
           path: "./stk-code"
+      - name: Checkout OpenAL
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          path: "./stk-code/lib/openal"
+          repository: "https://github.com/kcat/openal-soft"
+      - name: Checkout Harfbuzz
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+          path: "./stk-code/lib/harfbuzz"
+          repository: "https://github.com/harfbuzz/harfbuzz"
       - name: Grab assets
         run: |
           sudo apt update
@@ -25,16 +40,16 @@ jobs:
           wget https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
           unzip stk-assets-full.zip -d stk-assets
           rm stk-assets-full.zip
-      - name: Install debkitPro
-        run: |
-          wget https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb
-          sudo apt install -y curl
-          curl https://downloads.devkitpro.org/packages/dkp-libs.db -vvv
-          sudo gdebi devkitpro-pacman.amd64.deb -n
-          pacman -Syu --noconfirm
-          # Make sure we have the $DEVKITPRO vars
-          pacman -S --noconfirm devkit-env
-          source /etc/profile.d/devkit-env.sh
+      # - name: Install debkitPro
+      #   run: |
+      #     wget https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb
+      #     sudo apt install -y curl
+      #     curl https://downloads.devkitpro.org/packages/dkp-libs.db -vvv
+      #     sudo gdebi devkitpro-pacman.amd64.deb -n
+      #     pacman -Syu --noconfirm
+      #     # Make sure we have the $DEVKITPRO vars
+      #     pacman -S --noconfirm devkit-env
+      #     source /etc/profile.d/devkit-env.sh
       - name: Run build script
         run: |
           cd stk-code/switch
