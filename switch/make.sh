@@ -5,7 +5,7 @@ OLD_PWD="$(pwd)"
 # Mac can prefix tool names with 'dkp-'
 echo "CI: ${CI}"
 if [ "$CIq" -eq "trueq" ]; then
-  PACMAN=echo (Simulated) pacman
+  PACMAN=echo "(Simulated) pacman"
 elif which dkp-pacman &>/dev/null; then
   PACMAN=dkp-pacman
 elif which pacman &>/dev/null; then
