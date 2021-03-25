@@ -28,6 +28,8 @@ jobs:
       - name: Install debkitPro
         run: |
           wget https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb
+          sudo apt install -y curl
+          curl https://downloads.devkitpro.org/packages/dkp-libs.db -vvv
           sudo gdebi devkitpro-pacman.amd64.deb -n
           pacman -Syu --noconfirm
           # Make sure we have the $DEVKITPRO vars
