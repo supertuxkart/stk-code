@@ -18,6 +18,7 @@ using namespace irr;
 // moving screen
 std::atomic<int> g_keyboard_height(0);
 std::atomic<int> g_moved_height(0);
+std::atomic<int> g_disable_padding(0);
 extern "C" int Android_getKeyboardHeight()
 {
     return g_keyboard_height.load();
@@ -26,6 +27,11 @@ extern "C" int Android_getKeyboardHeight()
 extern "C" int Android_getMovedHeight()
 {
     return g_moved_height.load();
+}
+
+extern "C" int Android_disablePadding()
+{
+    return g_disable_padding.load();
 }
 
 #define MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveKeyboardHeight(JNIEnv* env, jclass cls, jint height)
@@ -44,6 +50,65 @@ extern "C"
 ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 {
     g_moved_height.store((int)height);
+}
+
+#define MAKE_ANDROID_HANDLE_PADDING_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_handlePadding(JNIEnv* env, jclass cls, jboolean val)
+#define ANDROID_HANDLE_PADDING_CALLBACK(PKG_NAME) MAKE_ANDROID_HANDLE_PADDING_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_HANDLE_PADDING_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    g_disable_padding.store((int)val);
+}
+
+extern "C" void Android_initDisplayCutout(float* top, float* bottom,
+                                          float* left, float* right)
+{
+    JNIEnv* env = NULL;
+    jobject activity = NULL;
+    jclass class_native_activity = NULL;
+    jmethodID top_method = NULL;
+    jmethodID bottom_method = NULL;
+    jmethodID left_method = NULL;
+    jmethodID right_method = NULL;
+
+    env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    if (!env)
+        goto exit;
+
+    activity = (jobject)SDL_AndroidGetActivity();
+    if (!activity)
+        goto exit;
+
+    class_native_activity = env->GetObjectClass(activity);
+    if (class_native_activity == NULL)
+        goto exit;
+
+    top_method = env->GetMethodID(class_native_activity, "getTopPadding", "()F");
+    if (top_method == NULL)
+        goto exit;
+    *top = env->CallFloatMethod(activity, top_method);
+
+    bottom_method = env->GetMethodID(class_native_activity, "getBottomPadding", "()F");
+    if (bottom_method == NULL)
+        goto exit;
+    *bottom = env->CallFloatMethod(activity, bottom_method);
+
+    left_method = env->GetMethodID(class_native_activity, "getLeftPadding", "()F");
+    if (left_method == NULL)
+        goto exit;
+    *left = env->CallFloatMethod(activity, left_method);
+
+    right_method = env->GetMethodID(class_native_activity, "getRightPadding", "()F");
+    if (right_method == NULL)
+        goto exit;
+    *right = env->CallFloatMethod(activity, right_method);
+
+exit:
+    if (!env)
+        return;
+    env->DeleteLocalRef(class_native_activity);
+    env->DeleteLocalRef(activity);
 }
 
 bool Android_isHardwareKeyboardConnected()

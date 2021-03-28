@@ -31,12 +31,20 @@
 #include "tinygettext/tinygettext.hpp"
 #endif
 
-#  define _(String, ...)        (StringUtils::insertValues(translations->w_gettext(String), ##__VA_ARGS__))
+#ifdef STK_UTF8_GETTEXT
+#define STK_GETTEXT gettext
+#define STK_NGETTEXT ngettext
+#else
+#define STK_GETTEXT w_gettext
+#define STK_NGETTEXT w_ngettext
+#endif
+
+#  define _(String, ...)        (StringUtils::insertValues(translations->STK_GETTEXT(String), ##__VA_ARGS__))
 #undef _C
 #undef _P
-#  define _C(Ctx, String, ...)  (StringUtils::insertValues(translations->w_gettext(String, Ctx), ##__VA_ARGS__))
-#  define _P(Singular, Plural, Num, ...) (StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num), Num, ##__VA_ARGS__))
-#  define _CP(Ctx, Singular, Plural, Num, ...) (StringUtils::insertValues(translations->w_ngettext(Singular, Plural, Num, Ctx), Num, ##__VA_ARGS__))
+#  define _C(Ctx, String, ...)  (StringUtils::insertValues(translations->STK_GETTEXT(String, Ctx), ##__VA_ARGS__))
+#  define _P(Singular, Plural, Num, ...) (StringUtils::insertValues(translations->STK_NGETTEXT(Singular, Plural, Num), Num, ##__VA_ARGS__))
+#  define _CP(Ctx, Singular, Plural, Num, ...) (StringUtils::insertValues(translations->STK_NGETTEXT(Singular, Plural, Num, Ctx), Num, ##__VA_ARGS__))
 #  define gettext_noop(String)  (String)
 #  define N_(String)            (gettext_noop (String))
 // libintl defines its own fprintf, which doesn't work properly
@@ -64,9 +72,11 @@ public:
 
     irr::core::stringw w_gettext(const wchar_t* original, const char* context=NULL);
     irr::core::stringw w_gettext(const char* original, const char* context=NULL);
+    std::string gettext(const char* original, const char* context=NULL);
 
     irr::core::stringw w_ngettext(const wchar_t* singular, const wchar_t* plural, int num, const char* context=NULL);
     irr::core::stringw w_ngettext(const char* singular, const char* plural, int num, const char* context=NULL);
+    std::string ngettext(const char* singular, const char* plural, int num, const char* context=NULL);
 
 #ifndef SERVER_ONLY
     const std::vector<std::string>* getLanguageList() const;

@@ -26,23 +26,54 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        # TODO: re-add 'macos-latest' as an option here. MacOS has been
-        #  temporarily disabled because the CI can't install harfbuzz correctly.
-        os: [ubuntu-latest]
+        os: [ubuntu-latest, macos-latest]
         compiler: [gcc, clang]
         build_type: [Debug, Release]
         server_only: [ON, OFF]
         exclude:
           - os: macos-latest
             compiler: gcc
+          - os: macos-latest
+            build_type: Debug
 
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with:
-          # Fetch the whole tree so git describe works
-          fetch-depth: 0
+          fetch-depth: 1
           submodules: true
+      - name: Configure packaging name for git master branch
+        if: ${{ matrix.build_type == 'Release' && matrix.server_only == 'OFF' &&
+            github.ref == 'refs/heads/master' }}
+        run: |
+          echo "release_tag=git`date +%Y%m%d`" >> $GITHUB_ENV
+          echo "release_name=preview" >> $GITHUB_ENV
+      - name: Configure packaging name for tag
+        if: ${{ matrix.build_type == 'Release' && matrix.server_only == 'OFF' &&
+            startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
+          echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
+      - name: Configure packaging name for non-releasing branch
+        if: ${{ matrix.build_type != 'Release' || matrix.server_only != 'OFF' ||
+            !(github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/')) ||
+            github.repository_owner != 'supertuxkart' }}
+        run: |
+          echo "release_tag=" >> $GITHUB_ENV
+          echo "release_name=" >> $GITHUB_ENV
+      - name: Check for prerelease
+        if: ${{ github.ref == 'refs/heads/master' || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=true" >> $GITHUB_ENV
+      - name: Check for non-prerelease
+        if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref, 'rc') && !contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=false" >> $GITHUB_ENV
+      - name: Show packaging name
+        run : |
+          echo "${{ env.release_tag }}"
+          echo "${{ env.release_name }}"
+          echo "${{ env.release_pre }}"
       - name: Install linux dependencies
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -50,15 +81,23 @@ jobs:
           sudo apt install -y build-essential cmake libbluetooth-dev libcurl4-gnutls-dev \
           libfreetype6-dev libharfbuzz-dev libjpeg-dev libogg-dev libopenal-dev \
           libpng-dev libsdl2-dev libvorbis-dev pkg-config zlib1g-dev clang
+      - name: Install dylibbundler for packaging osx binary
+        if: ${{ env.release_tag != '' && matrix.os == 'macos-latest' && matrix.build_type == 'Release' && matrix.server_only == 'OFF' }}
+        run: |
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install dylibbundler
       - name: Install macos dependencies
         if: ${{ matrix.os == 'macos-latest' }}
         run: |
-          brew update && brew bundle
           # Something funky happens with freetype if mono is left
           sudo mv /Library/Frameworks/Mono.framework /Library/Frameworks/Mono.framework-disabled
-          sudo mkdir -p /usr/local/include/
-          sudo ln -s /System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/ /usr/local/include/GL;
-          export CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/:/usr/local/opt/openssl\@1.1/:/usr/local/opt/harfbuzz/
+          wget https://github.com/supertuxkart/dependencies/releases/download/latest/dependencies-mac.tar.xz
+          # Remove any existing installation to avoid conflict with bundled dependencies
+          rm -rf /usr/local/include/*
+          rm -rf /usr/local/opt/openssl@1.1/include
+          rm -rf /usr/local/opt/freetype
+          rm -rf /usr/local/opt/harfbuzz
+          tar xf dependencies-mac.tar.xz -C /usr/local
+          rm dependencies-mac.tar.xz
       - name: Set compiler (gcc)
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.compiler == 'gcc' }}
         run: |
@@ -98,9 +137,33 @@ jobs:
           $CXX --version
           mkdir "build"
           cd "build"
-          /usr/local/opt/cmake/bin/cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off;
+          CFLAGS="-mmacosx-version-min=10.9" CXXFLAGS="-mmacosx-version-min=10.9" LINKFLAGS="-mmacosx-version-min=10.9" LDFLAGS="-mmacosx-version-min=10.9" /usr/local/opt/cmake/bin/cmake .. -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DSERVER_ONLY=$SERVER_ONLY -DCHECK_ASSETS=off -DBUILD_RECORDER=off;
       - name: Build and install
         working-directory: build
         run: |
           make -j3 VERBOSE=1
           make install DESTDIR="/tmp/stk" VERBOSE=1
+      - name: Packaging (macos)
+        if: ${{ env.release_tag != '' && matrix.os == 'macos-latest' && matrix.build_type == 'Release' && matrix.server_only == 'OFF' }}
+        working-directory: build
+        run: |
+          /usr/local/opt/dylibbundler/bin/dylibbundler -od -b -x ./bin/SuperTuxKart.app/Contents/MacOS/supertuxkart -d ./bin/SuperTuxKart.app/Contents/libs/ -p @executable_path/../libs/
+          wget https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
+          unzip stk-assets-full.zip -d ../data
+          rm stk-assets-full.zip
+          cd bin
+          # Fix the name on case insensitive filesystem
+          mv supertuxkart.app stk.app
+          mv stk.app SuperTuxKart.app
+          zip -r ../SuperTuxKart-${{ env.release_tag }}-mac.zip .
+      - name: Create Release (macos)
+        if: ${{ env.release_tag != '' && matrix.os == 'macos-latest' && matrix.build_type == 'Release' && matrix.server_only == 'OFF' }}
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "build/SuperTuxKart-${{ env.release_tag }}-mac.zip"
+          tag: ${{ env.release_name }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          allowUpdates: true
+          prerelease: ${{ env.release_pre }}

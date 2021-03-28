@@ -461,7 +461,8 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "game_mode",
                             &m_race_setup_group,
                             "Game mode. 0=standard, 1=time trial, 2=follow "
-                            "the leader, 3=3 strikes") );
+                            "the leader, 3=3 strikes, 4=easter egg hunt, "
+                            "5=soccer, 6=ghost replay") );
     PARAM_PREFIX StringUserConfigParam m_default_kart
             PARAM_DEFAULT( StringUserConfigParam("tux", "kart",
                            "Kart to select by default (the last used kart)") );
@@ -727,13 +728,13 @@ namespace UserConfigParams
     /** If high scores will not be saved. For repeated testing on tracks. */
     PARAM_PREFIX bool m_no_high_scores PARAM_DEFAULT(false);
 
-    /** If gamepad debugging is enabled. */
+    /** If unit testing is enabled. */
     PARAM_PREFIX bool m_unit_testing PARAM_DEFAULT(false);
 
     /** If gamepad debugging is enabled. */
     PARAM_PREFIX bool m_gamepad_debug PARAM_DEFAULT( false );
 
-    /** If gamepad debugging is enabled. */
+    /** If keyboard debugging is enabled. */
     PARAM_PREFIX bool m_keyboard_debug PARAM_DEFAULT(false);
 
     /** Wiimote debugging. */
@@ -755,7 +756,7 @@ namespace UserConfigParams
     /** True if physics debugging should be enabled. */
     PARAM_PREFIX bool m_physics_debug PARAM_DEFAULT( false );
 
-    /** True if fps should be printed each frame. */
+    /** True if FPS should be printed each frame. */
     PARAM_PREFIX bool m_fps_debug PARAM_DEFAULT(false);
 
     /** True if arena (battle/soccer) ai profiling. */
@@ -1150,6 +1151,14 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam m_last_used_track_group
             PARAM_DEFAULT( StringUserConfigParam("all", "last_track_group",
                            "Last selected track group") );
+
+    PARAM_PREFIX StringUserConfigParam m_discord_client_id
+            PARAM_DEFAULT( StringUserConfigParam("817760324983324753", "discord_client_id",
+                           "Discord Client ID (Set to -1 to disable)") );
+
+    PARAM_PREFIX BoolUserConfigParam m_rich_presence_debug
+            PARAM_DEFAULT( BoolUserConfigParam(false, "rich_presence_debug",
+                           "If debug logging should be enabled for rich presence") );
 
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_name",

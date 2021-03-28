@@ -42,6 +42,9 @@
 
 #include <fcntl.h>
 
+#ifdef DNS_C
+#  include <dns.h>
+#else
 #ifdef WIN32
 #  include <windns.h>
 #  include <ws2tcpip.h>
@@ -57,6 +60,7 @@
 #  include <netinet/in.h>
 #ifndef __SWITCH__
 #  include <resolv.h>
+#endif
 #endif
 #endif
 
@@ -571,10 +575,104 @@ void NetworkConfig::fillStunList(std::vector<std::pair<std::string, int> >* l,
     env->DeleteLocalRef(class_native_activity);
     env->DeleteLocalRef(native_activity);
     g_list = NULL;
-#elif defined(__SWITCH__)
-    // TODO: Unclear how to get SRV records from libnx...
-    return;
-#elif !defined(__CYGWIN__)
+#elif defined(DNS_C)
+    int err = 0;
+    struct dns_socket* so = NULL;
+    struct dns_packet* ans = NULL;
+    struct dns_packet* quest = NULL;
+
+    dns_options options = {};
+    struct dns_rr_i rri = {};
+    struct dns_rr rr = {};
+    dns_resolv_conf* conf = dns_resconf_open(&err);
+    if (!conf)
+    {
+        Log::error("ConnectToServer", "Error dns_resconf_open: %s",
+            dns_strerror(err));
+        goto cleanup;
+    }
+    if ((err = dns_resconf_loadpath(conf, "/etc/resolv.conf")))
+    {
+        err = 0;
+        // Fallback name server
+        SocketAddress addr("8.8.8.8:53");
+        memcpy(&conf->nameserver[0], addr.getSockaddr(), addr.getSocklen());
+    }
+
+    so = dns_so_open((sockaddr*)&conf->iface, 0, &options, &err);
+    if (!so)
+    {
+        Log::error("ConnectToServer", "Error dns_so_open: %s",
+            dns_strerror(err));
+        goto cleanup;
+    }
+
+    quest = dns_p_make(512, &err);
+    if (err)
+    {
+        Log::error("ConnectToServer", "Error dns_p_make: %s",
+            dns_strerror(err));
+        goto cleanup;
+    }
+    if ((err = dns_p_push(quest, DNS_S_QD, dns.c_str(), dns.size(),
+        DNS_T_SRV, DNS_C_IN, 0, 0)))
+    {
+        Log::error("ConnectToServer", "Error dns_p_push: %s",
+            dns_strerror(err));
+        goto cleanup;
+    }
+
+    dns_header(quest)->rd = 1;
+    while (!(ans = dns_so_query(so, quest, (sockaddr*)&conf->nameserver[0],
+        &err)))
+    {
+        if (err == 0)
+        {
+            Log::error("ConnectToServer", "Error dns_so_query: %s",
+                dns_strerror(err));
+            goto cleanup;
+        }
+        if (dns_so_elapsed(so) > 10)
+        {
+            Log::error("ConnectToServer", "Timeout dns_so_query.");
+            goto cleanup;
+        }
+        dns_so_poll(so, 1);
+    }
+    if (!ans)
+    {
+        Log::error("ConnectToServer", "Timeout dns_so_query.");
+        goto cleanup;
+    }
+
+    rri.sort = dns_rr_i_packet;
+    err = 0;
+    while (dns_rr_grep(&rr, 1, &rri, ans, &err))
+    {
+        if (err != 0)
+        {
+            Log::error("ConnectToServer", "Error dns_rr_grep: %s",
+                dns_strerror(err));
+            goto cleanup;
+        }
+        if (rr.section != DNS_S_ANSWER)
+            continue;
+        dns_srv srv = {};
+        if (dns_srv_parse(&srv, &rr, ans) != 0)
+            goto cleanup;
+        std::string addr = srv.target;
+        if (!addr.empty() && addr.back() == '.')
+            addr.pop_back();
+        l->emplace_back(addr + ":" + StringUtils::toString(srv.port),
+            srv.weight);
+    }
+
+cleanup:
+    free(ans);
+    free(quest);
+    dns_so_close(so);
+    dns_resconf_close(conf);
+#else
 #define SRV_WEIGHT (RRFIXEDSZ+2)
 #define SRV_PORT (RRFIXEDSZ+4)
 #define SRV_SERVER (RRFIXEDSZ+6)

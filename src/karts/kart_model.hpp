@@ -323,6 +323,7 @@ private:
     /** Exhaust particle file (xml) for the kart, empty if disabled.  */
     std::string m_exhaust_xml;
 
+    const KartProperties* m_kart_properties;
     // ------------------------------------------------------------------------
     void initInverseBoneMatrices();
     // ------------------------------------------------------------------------
@@ -449,6 +450,10 @@ public:
                       getInverseBoneMatrix(const std::string& bone_name) const;
     // ------------------------------------------------------------------------
     const std::string& getExhaustXML() const          { return m_exhaust_xml; }
-
+    // ------------------------------------------------------------------------
+    bool hasWheel() const              { return !m_wheel_filename[0].empty(); }
+    // ------------------------------------------------------------------------
+    const KartProperties* getKartProperties() const
+                                                  { return m_kart_properties; }
 };   // KartModel
 #endif

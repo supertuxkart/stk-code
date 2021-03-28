@@ -139,6 +139,7 @@ namespace GUIEngine
         bool fadeBackground() const { return m_fade_background; }
 
         bool isMyIrrChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
+        virtual bool enableScreenPadding() const { return false; }
     };
 
 }

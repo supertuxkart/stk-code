@@ -40,6 +40,8 @@ namespace irr
 
 extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right);
 extern "C" int handle_app_event(void* userdata, SDL_Event* event);
+extern "C" void Android_initDisplayCutout(float* top, float* bottom, float* left, float* right);
+extern "C" int Android_disablePadding();
 
 namespace irr
 {
@@ -110,6 +112,9 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #endif
 #ifdef IOS_STK
 			init_objc(&Info, &TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
+#endif
+#ifdef ANDROID
+			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
 #endif
 			core::stringc sdlversion = "SDL Version ";
 			sdlversion += Info.version.major;
@@ -1402,6 +1407,59 @@ f32 CIrrDeviceSDL::getNativeScaleY() const
 {
 	return g_native_scale_y;
 }
+
+
+s32 CIrrDeviceSDL::getTopPadding()
+{
+#ifdef ANDROID
+	if (Android_disablePadding() != 0)
+		return 0;
+#endif
+	return TopPadding * getNativeScaleY();
+}
+
+
+s32 CIrrDeviceSDL::getBottomPadding()
+{
+#ifdef ANDROID
+	if (Android_disablePadding() != 0)
+		return 0;
+#endif
+	return BottomPadding * getNativeScaleY();
+}
+
+
+s32 CIrrDeviceSDL::getLeftPadding()
+{
+#ifdef ANDROID
+	if (Android_disablePadding() != 0)
+		return 0;
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+	if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
+		return RightPadding;
+#endif
+	return LeftPadding;
+#else
+	return LeftPadding * getNativeScaleX();
+#endif
+}
+
+
+s32 CIrrDeviceSDL::getRightPadding()
+{
+#ifdef ANDROID
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+	if (Android_disablePadding() != 0)
+		return 0;
+	if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
+		return LeftPadding;
+#endif
+	return RightPadding;
+#else
+	return RightPadding * getNativeScaleX();
+#endif
+}
+
 
 } // end namespace irr
 

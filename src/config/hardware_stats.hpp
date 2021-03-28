@@ -42,6 +42,38 @@ namespace HardwareStats
             m_data ="{";
         }   // Constructor
 
+        const std::string sanitize(std::string value)
+        {
+            // A string is a sequence of Unicode code points wrapped with quotation marks (U+0022). All code points may
+            // be placed within the quotation marks except for the code points that must be escaped: quotation mark
+            // (U+0022), reverse solidus (U+005C), and the control characters U+0000 to U+001F. There are two-character
+            // escape sequence representations of some characters.
+            char temp[7] = {0};
+            for (size_t i = 0; i < value.size(); i++)
+            {
+                uint8_t codepoint = value[i];
+                if (codepoint <= 0x1f)
+                {
+                    sprintf(temp, "\\u%04x", codepoint);
+                    std::string suffix = value.substr(i + 1);
+                    value = value.substr(0, i);
+                    value.append(temp);
+                    value.append(suffix);
+                    i += 5; // \u0000 = 6 chars, but we're replacing one so 5
+                }
+                else if (codepoint == '"' || codepoint == '\\')
+                {
+                    std::string suffix = value.substr(i + 1);
+                    value = value.substr(0, i);
+                    value.push_back('\\');
+                    value.push_back((char)codepoint);
+                    value.append(suffix);
+                    // Skip the added solidus
+                    i++;
+                }
+            }
+            return value;
+        }   // sanitize
         // --------------------------------------------------------------------
         /** Adds a key-value pair to the json string. */
         template <typename C>
@@ -49,7 +81,7 @@ namespace HardwareStats
         {
             if(m_data.size()>1)   // more than '{'
                 m_data += ",";
-            m_data += "\""+key+"\":"+StringUtils::toString(value);
+            m_data += "\""+sanitize(key)+"\":"+StringUtils::toString(value);
         }   // add
         // --------------------------------------------------------------------
         /** Specialisation for adding string values. String values in
@@ -58,7 +90,7 @@ namespace HardwareStats
         {
             if(m_data.size()>1)   // more than '{'
                 m_data += ",";
-            m_data += "\""+key+"\":\""+StringUtils::toString(value)+"\"";
+            m_data += "\""+sanitize(key)+"\":\""+sanitize(value)+"\"";
         }   // add
         // --------------------------------------------------------------------
         /** Specialisation for adding character pointers. String values in
@@ -67,7 +99,7 @@ namespace HardwareStats
         {
             if(m_data.size()>1)   // more than '{'
                 m_data += ",";
-            m_data += "\""+key+"\":\""+StringUtils::toString(s)+"\"";
+            m_data += "\""+sanitize(key)+"\":\""+sanitize(s)+"\"";
         }   // add
         // --------------------------------------------------------------------
         void finish()

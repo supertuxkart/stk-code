@@ -203,26 +203,6 @@ void STKTexture::formatConversion(uint8_t* data, unsigned int* format,
             data[i * 4 + 2] = tmp_val;
         }
     }
-
-    if (isPremulAlpha() && !m_single_channel)
-    {
-        for (unsigned int i = 0; i < w * h; i++)
-        {
-            float alpha = data[4 * i + 3];
-            if (alpha > 0.0f)
-            {
-                alpha /= 255.0f;
-
-                if (CVS->isDeferredEnabled())
-                {
-                    alpha = pow(alpha, 1.0f / 2.2f);
-                }
-            }
-            data[i * 4] = (uint8_t)(data[i * 4] * alpha);
-            data[i * 4 + 1] = (uint8_t)(data[i * 4 + 1] * alpha);
-            data[i * 4 + 2] = (uint8_t)(data[i * 4 + 2] * alpha);
-        }
-    }
 #endif   // !SERVER_ONLY
 }   // formatConversion
 

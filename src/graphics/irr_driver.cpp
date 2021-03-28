@@ -88,6 +88,13 @@
 
 #include <irrlicht.h>
 
+#if !defined(SERVER_ONLY) && defined(ANDROID)
+#include <SDL.h>
+#if SDL_VERSION_ATLEAST(2, 0, 9)
+#define ENABLE_SCREEN_ORIENTATION_HANDLING 1
+#endif
+#endif
+
 #ifdef ENABLE_RECORDER
 #include <chrono>
 #include <openglrecorder.h>
@@ -157,6 +164,7 @@ const bool ALLOW_1280_X_720    = true;
  */
 IrrDriver::IrrDriver()
 {
+    m_screen_orientation = -1;
     m_render_nw_debug = false;
     m_resolution_changing = RES_CHANGE_NONE;
 
@@ -167,6 +175,9 @@ IrrDriver::IrrDriver()
     p.DriverType    = video::EDT_OPENGL;
     p.Bits          = 24U;
     p.WindowSize    = core::dimension2d<u32>(1280,720);
+#ifdef FORCE_LEGACY
+    p.ForceLegacyDevice = true;
+#endif
 #else
     p.DriverType    = video::EDT_NULL;
     p.Bits          = 16U;
@@ -604,7 +615,8 @@ void IrrDriver::initDevice()
     }
 #endif
 
-#ifndef SERVER_ONLY
+    // Don't recreate on switch!
+#if !defined(SERVER_ONLY) && !defined(__SWITCH__)
     if (!GUIEngine::isNoGraphics() && recreate_device)
     {
         m_device->closeDevice();
@@ -788,7 +800,9 @@ void IrrDriver::initDevice()
         m_device->getCursorControl()->setVisible(true);
 #endif
     m_pointer_shown = true;
-
+#ifdef ENABLE_SCREEN_ORIENTATION_HANDLING
+    m_screen_orientation = (int)SDL_GetDisplayOrientation(0);
+#endif
     if (GUIEngine::isNoGraphics())
         return;
 }   // initDevice
@@ -1781,14 +1795,18 @@ video::SColorf IrrDriver::getAmbientLight() const
 void IrrDriver::displayFPS()
 {
 #ifndef SERVER_ONLY
-    gui::IGUIFont* font = GUIEngine::getSmallFont();
+    gui::ScalableFont* font = GUIEngine::getSmallFont();
+    font->setScale(0.7f);
     core::rect<s32> position;
 
     const int fheight = font->getHeightPerLine();
+    const int rwidth = irr_driver->getActualScreenSize().Width / 6;
+    const int swidth = irr_driver->getActualScreenSize().Width / 3;
+
     if (UserConfigParams::m_artist_debug_mode)
-        position = core::rect<s32>(51, 0, 30*fheight+51, 2*fheight + fheight / 3);
+        position = core::rect<s32>(rwidth - 20, 0, int(rwidth * 4.25), 2 * fheight + (fheight / 5));
     else
-        position = core::rect<s32>(75, 0, 18*fheight+75 , fheight + fheight / 5);
+        position = core::rect<s32>(swidth, 0, swidth * 2, fheight + (fheight / 5));
     GL32_draw2DRectangle(video::SColor(150, 96, 74, 196), position, NULL);
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
@@ -1824,12 +1842,15 @@ void IrrDriver::displayFPS()
     {
         no_trust--;
 
-        static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
+        static video::SColor fpsColor = video::SColor(255, 255, 255, 255);
         fps_string = _("FPS: %d/%d/%d - %d KTris, Ping: %dms", "-", "-",
             "-", SP::sp_solid_poly_count / 1000, ping);
 
-        font->drawQuick(fps_string,
-            core::rect< s32 >(100,0,400,50), fpsColor, false);
+        font->setBlackBorder(true);
+        font->setThinBorder(true);
+        font->drawQuick(fps_string, position, fpsColor, false);
+        font->setThinBorder(false);
+        font->setBlackBorder(false);
         return;
     }
 
@@ -1847,9 +1868,8 @@ void IrrDriver::displayFPS()
     if ((UserConfigParams::m_artist_debug_mode)&&(CVS->isGLSL()))
     {
         fps_string = StringUtils::insertValues
-                    (L"FPS: %d/%d/%d  - PolyCount: %d Solid, "
-                      "%d Shadows - LightDist : %d\nComplexity %d, Total skinning joints: %d, "
-                      "Ping: %dms",
+                    (L"FPS: %d/%d/%d - PolyCount: %d Solid, %d Shadows - LightDist: %d\n"
+                      "Complexity %d, Total skinning joints: %d, Ping: %dms",
                     min, fps, max, SP::sp_solid_poly_count,
                     SP::sp_shadow_poly_count, m_last_light_bucket_distance, irr_driver->getSceneComplexity(),
                     m_skinning_joint, ping);
@@ -1868,9 +1888,14 @@ void IrrDriver::displayFPS()
         }
     }
 
-    static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
+    static video::SColor fpsColor = video::SColor(255, 255, 255, 255);
 
-    font->drawQuick( fps_string.c_str(), position, fpsColor, false );
+    font->setBlackBorder(true);
+    font->setThinBorder(true);
+    font->drawQuick(fps_string.c_str(), position, fpsColor, false);
+    font->setThinBorder(false);
+    font->setBlackBorder(false);
+
 #endif
 }   // updateFPS
 
@@ -1990,13 +2015,21 @@ void IrrDriver::handleWindowResize()
         current_screen_size.Height = screen->getHeight();
     }
 
+    bool screen_orientation_changed = false;
+    int new_orientation = -1;
+#ifdef ENABLE_SCREEN_ORIENTATION_HANDLING
+    new_orientation = (int)SDL_GetDisplayOrientation(0);
+    screen_orientation_changed = m_screen_orientation != new_orientation;
+#endif
     if (m_actual_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
-        current_screen_size != m_video_driver->getCurrentRenderTargetSize())
+        current_screen_size != m_video_driver->getCurrentRenderTargetSize() ||
+        screen_orientation_changed)
     {
         // Don't update when dialog is opened
         if (dialog_exists)
             return;
 
+        m_screen_orientation = new_orientation;
         m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
         UserConfigParams::m_width = m_actual_screen_size.Width;
         UserConfigParams::m_height = m_actual_screen_size.Height;

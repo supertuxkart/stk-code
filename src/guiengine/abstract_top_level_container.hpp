@@ -105,6 +105,7 @@ namespace GUIEngine
                 void         elementsWereDeleted(PtrVector<Widget>* within_vector = NULL);
 
                 bool         isMyChild(Widget* widget) const;
+        virtual bool         enableScreenPadding() const { return true; }
     };   // AbstractTopLevelContainer
 
 }   // namespace GUIEngine

@@ -21,6 +21,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -31,7 +32,7 @@ using namespace irr::core;
 
 // ------------------------------------------------------------------------------------------------------
 
-ConfirmResolutionDialog::ConfirmResolutionDialog(bool unsupported_res) : ModalDialog(0.7f, 0.7f)
+ConfirmResolutionDialog::ConfirmResolutionDialog(bool unsupported_res) : ModalDialog(0.6f, 0.6f)
 {
     loadFromFile("confirm_resolution_dialog.stkgui");
     m_remaining_time = 10.99f;
@@ -101,19 +102,24 @@ void ConfirmResolutionDialog::updateMessage()
 
 GUIEngine::EventPropagation ConfirmResolutionDialog::processEvent(const std::string& eventSource)
 {
-
-    if (eventSource == "cancel")
+    if (eventSource == "buttons")
     {
-        ModalDialog::dismiss();
+        const std::string& selection =
+                getWidget<RibbonWidget>("buttons")->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        irr_driver->cancelResChange();
-        return GUIEngine::EVENT_BLOCK;
-    }
-    else if (eventSource == "accept")
-    {
-        ModalDialog::dismiss();
+        if (selection == "cancel")
+        {
+            ModalDialog::dismiss();
 
-        return GUIEngine::EVENT_BLOCK;
+            irr_driver->cancelResChange();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "accept")
+        {
+            ModalDialog::dismiss();
+
+            return GUIEngine::EVENT_BLOCK;
+        }
     }
 
     return GUIEngine::EVENT_LET;

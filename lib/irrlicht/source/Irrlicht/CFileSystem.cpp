@@ -543,7 +543,18 @@ const io::path& CFileSystem::getWorkingDirectory()
 				}
 				if (tmpPath)
 				{
+#ifdef __SWITCH__
+					io::path full = tmpPath;
+					auto sdmc = "sdmc:";
+					auto romfs = "romfs:";
+					if (full.find(sdmc, 0) == 0)
+						full = full.subString(5, full.size() - 5);
+					else if (full.find(romfs, 0) == 0)
+						full = full.subString(6, full.size() - 6);
+					WorkingDirectory[FILESYSTEM_NATIVE] = full.c_str();
+#else
 					WorkingDirectory[FILESYSTEM_NATIVE] = tmpPath;
+#endif
 					delete [] tmpPath;
 				}
 			#endif
@@ -587,7 +598,9 @@ bool CFileSystem::changeWorkingDirectoryTo(const io::path& newDirectory)
 
 io::path CFileSystem::getAbsolutePath(const io::path& filename) const
 {
-#if defined(_IRR_WINDOWS_CE_PLATFORM_) || defined(__SWITCH__)
+#ifdef __SWITCH__
+	return core::stringc(filename).replace(core::stringc("//"), core::stringc("/"));
+#elif defined(_IRR_WINDOWS_CE_PLATFORM_)
 	return filename;
 #elif defined(_IRR_WINDOWS_API_)
 	wchar_t *p=0;

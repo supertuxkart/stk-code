@@ -97,7 +97,12 @@ void ModalDialog::doInit()
     const core::dimension2d<u32>& frame_size =
         GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
-    const int w = (int)(frame_size.Width* m_percent_width);
+    int left_padding = irr_driver->getDevice()->getLeftPadding();
+    int right_padding = irr_driver->getDevice()->getRightPadding();
+    int total_padding = left_padding + right_padding;
+    int w = (int)(frame_size.Width* m_percent_width);
+    if (w > total_padding)
+        w -= total_padding;
     const int h = (int)(frame_size.Height* m_percent_height);
 
     assert(frame_size.Width > 0);

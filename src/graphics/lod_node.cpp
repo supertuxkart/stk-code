@@ -173,68 +173,6 @@ void LODNode::OnRegisterSceneNode()
 
     const u32 now = irr_driver->getDevice()->getTimer()->getTime();
 
-    // support an optional, mostly hard-coded fade-in/out effect for objects with a single level
-    if (m_nodes.size() == 1 && (m_nodes[0]->getType() == scene::ESNT_MESH ||
-                                m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH) &&
-        now > m_last_tick)
-    {
-        if (m_previous_visibility == WAS_HIDDEN && shown)
-        {
-            scene::IMesh* mesh;
-
-            if (m_nodes[0]->getType() == scene::ESNT_MESH)
-            {
-                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
-                mesh = node->getMesh();
-            }
-            else
-            {
-                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
-                scene::IAnimatedMeshSceneNode* node =
-                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
-                assert(node != NULL);
-                mesh = node->getMesh();
-            }
-        }
-        else if (m_previous_visibility == WAS_SHOWN && !shown)
-        {
-            scene::IMesh* mesh;
-
-            if (m_nodes[0]->getType() == scene::ESNT_MESH)
-            {
-                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
-                mesh = node->getMesh();
-            }
-            else
-            {
-                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
-                scene::IAnimatedMeshSceneNode* node =
-                    (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
-                assert(node != NULL);
-                mesh = node->getMesh();
-            }
-
-        }
-        else if (m_previous_visibility == FIRST_PASS && !shown)
-        {
-            scene::IMesh* mesh;
-
-            if (m_nodes[0]->getType() == scene::ESNT_MESH)
-            {
-                scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)(m_nodes[0]);
-                mesh = node->getMesh();
-            }
-            else
-            {
-                assert(m_nodes[0]->getType() == scene::ESNT_ANIMATED_MESH);
-                scene::IAnimatedMeshSceneNode* node =
-                (scene::IAnimatedMeshSceneNode*)(m_nodes[0]);
-                assert(node != NULL);
-                mesh = node->getMesh();
-            }
-        }
-    }
-
     m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
     m_last_tick = now;
 #ifndef SERVER_ONLY
@@ -276,7 +214,7 @@ void LODNode::autoComputeLevel(float scale)
 
     // Then we recompute the level of detail culling distance
     int biais = m_detail.size();
-    for(int i = 0; i < m_detail.size(); i++)
+    for(unsigned i = 0; i < m_detail.size(); i++)
     {
         m_detail[i] = ((step / biais) * (i + 1));
         biais--;

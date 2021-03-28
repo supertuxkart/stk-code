@@ -19,6 +19,7 @@
 #include "script_kart.hpp"
 
 #include "karts/kart.hpp"
+#include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "scriptvec3.hpp"
@@ -139,6 +140,15 @@ namespace Scripting
             return kart->getKartProperties()->getEngineMaxSpeed();
         }
 
+        /** Gets the maximum speed (velocity) a kart can reach */
+        void changeKart(int idKart, std::string* new_id)
+        {
+            AbstractKart* kart = World::getWorld()->getKart(idKart);
+            HandicapLevel hl = kart->getHandicap();
+            auto ri = kart->getKartModel()->getRenderInfo();
+            kart->changeKart(*new_id, hl, ri);
+        }
+
         /** @}*/
         /** @}*/
         
@@ -180,6 +190,10 @@ namespace Scripting
                                                
             r = engine->RegisterGlobalFunction("float getMaxSpeed(int id)", 
                                                mp ? WRAP_FN(getMaxSpeed) : asFUNCTION(getMaxSpeed), 
+                                               call_conv); assert(r >= 0);
+
+            r = engine->RegisterGlobalFunction("void changeKart(int id, string &in)",
+                                               mp ? WRAP_FN(changeKart) : asFUNCTION(changeKart),
                                                call_conv); assert(r >= 0);
         }
 

@@ -56,6 +56,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/time.hpp"
 #include "utils/translation.hpp"
+#include "io/rich_presence.hpp"
 
 #ifndef WIN32
 #include <unistd.h>
@@ -713,6 +714,8 @@ void MainLoop::run()
                     m_request_abort = true;
                 }
             }
+
+            RichPresenceNS::RichPresence::get()->update(false);
 
             if (auto gp = GameProtocol::lock())
             {
