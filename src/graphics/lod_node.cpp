@@ -230,9 +230,8 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     // I'm not convinced (Auria) but he's the artist pro, so I listen ;P
     // The last level should not be randomized because after that the object disappears,
     // and the location is disapparition needs to be deterministic
-    if (m_detail.size() > 0)
+    if (m_detail.size() > 0 && m_detail.back() < level * level)
     {
-        assert(m_detail.back()<level*level);
         m_detail[m_detail.size() - 1] += (int)(((rand()%1000)-500)/500.0f*(m_detail[m_detail.size() - 1]*0.2f));
     }
 
