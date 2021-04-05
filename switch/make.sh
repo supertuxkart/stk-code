@@ -66,12 +66,12 @@ if [ ! -d "${STK_DIR}/lib/harfbuzz/cmake_build" ]; then
   mkdir "${STK_DIR}/lib/harfbuzz/cmake_build"
   cd "${STK_DIR}/lib/harfbuzz/cmake_build"
   cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
-    -DUSE_SWITCH=ON -DCMAKE_INSTALL_PREFIX="${PORTLIBS_PREFIX}"  \
+    -DUSE_SWITCH=ON -DCMAKE_INSTALL_PREFIX="$(pwd)/install"  \
     -DHB_HAVE_FREETYPE=ON \
     ../
   
   make -j$(nproc)
-  sudo make install
+  make install
 fi
 
 if [ ! -d "${STK_DIR}/lib/openal/cmake_build" ]; then
@@ -83,11 +83,11 @@ if [ ! -d "${STK_DIR}/lib/openal/cmake_build" ]; then
     -DUSE_SWITCH=ON -DALSOFT_UTILS=OFF -DLIBTYPE=STATIC -DALSOFT_EXAMPLES=OFF \
     -DALSOFT_REQUIRE_SDL2=ON -DALSOFT_BACKEND_SDL2=ON \
     -DSDL2_INCLUDE_DIR="${PORTLIBS_PREFIX}/include" \
-    -DCMAKE_INSTALL_PREFIX="${PORTLIBS_PREFIX}"  \
+    -DCMAKE_INSTALL_PREFIX="$(pwd)/install"  \
     ../
 
   make -j$(nproc)
-  sudo make install
+  make install
 fi
 
 echo "Compiling STK"
@@ -97,6 +97,10 @@ cd "${STK_DIR}/cmake_build"
 
 cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
     -DUSE_SWITCH=ON \
+    -DOPENAL_LIBRARY_DIR="${STK_DIR}/lib/openal/cmake_build/install/lib" \
+    -DOPENAL_INCLUDE_DIR="${STK_DIR}/lib/openal/cmake_build/install/include" \
+    -DHARFBUZZ_LIBRARY_DIR="${STK_DIR}/lib/harfbuzz/cmake_build/install/lib" \
+    -DHARFBUZZ_INCLUDE_DIR="${STK_DIR}/lib/harfbuzz/cmake_build/install/include" \
     -DCMAKE_INSTALL_PREFIX=/  \
     ../
 
