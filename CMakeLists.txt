@@ -633,13 +633,12 @@ if (USE_SWITCH)
   target_link_libraries(supertuxkart
     ${NX_LIBRARY}
     ${ZLIB_LIBRARY}
-    ${FREETYPE_LIBRARY}
+    ${FREETYPE_LIBRARIES}
     ${SDL2_LIBRARY}
     ${PNG_LIBRARY}
     ${BZ2_LIBRARY}
     ${HARFBUZZ_LIBRARY}
-    ${OGG_LIBRARY}
-    ${VORBIS_LIBRARY}
+    ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${EGL_LIBRARY}
     ${DRM_LIBRARY}
