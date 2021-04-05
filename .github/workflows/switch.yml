@@ -43,7 +43,7 @@ jobs:
 
       # Env setup!
       - name: Configure packaging name for git master branch
-        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/feature/gh-actions-switch' }}
+        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feature/gh-actions-switch' }}
         run: |
           echo "release_tag=git`date +%Y%m%d`" >> $GITHUB_ENV
           echo "release_name=preview" >> $GITHUB_ENV
@@ -53,17 +53,17 @@ jobs:
           echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
           echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
       - name: Configure packaging name for non-releasing branch
-        if: ${{!(github.ref == 'refs/heads/master' || github.ref == 'refs/feature/gh-actions-switch' || startsWith(github.ref, 'refs/tags/')) ||
+        if: ${{!(github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feature/gh-actions-switch' || startsWith(github.ref, 'refs/tags/')) ||
                  github.repository_owner != 'supertuxkart' }}
         run: |
           echo "release_tag=" >> $GITHUB_ENV
           echo "release_name=" >> $GITHUB_ENV
       - name: Check for prerelease
-        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/feature/gh-actions-switch' || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
+        if: ${{ github.ref == 'refs/heads/master' || github.ref == 'refs/heads/feature/gh-actions-switch' || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
         run: |
           echo "release_pre=true" >> $GITHUB_ENV
       - name: Check for non-prerelease
-        if: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/feature/gh-actions-switch' && !contains(github.ref, 'rc') && !contains(github.ref, 'beta') }}
+        if: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/feature/gh-actions-switch' && !contains(github.ref, 'rc') && !contains(github.ref, 'beta') }}
         run: |
           echo "release_pre=false" >> $GITHUB_ENV
       - name: Show packaging name
