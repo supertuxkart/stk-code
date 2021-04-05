@@ -25,7 +25,7 @@ sudo $PACMAN -S --needed \
   devkitA64 \
   general-tools \
   \
-  $OPTIONAL
+  $OPTIONAL \
   switch-curl switch-mbedtls \
   switch-freetype switch-libfribidi \
   switch-libogg switch-libvorbis \
