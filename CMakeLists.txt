@@ -384,7 +384,7 @@ if (NOT SERVER_ONLY)
     # Freetype
     if (USE_SWITCH)
         SET(FREETYPE_INCLUDE_DIRS /opt/devkitpro/portlibs/switch/include/freetype2)
-        SET(FREETYPE_LIBRARY freetype)
+        find_library(FREETYPE_LIBRARIES freetype libfreetype REQUIRED)
         SET(FREETYPE_FOUND YES)
     else()
         find_package(Freetype)
