@@ -630,14 +630,12 @@ if (USE_SWITCH)
   find_library(ZLIB_LIBRARY NAMES z libz REQUIRED)
   find_library(PNG_LIBRARY NAMES png libpng REQUIRED)
   find_library(BZ2_LIBRARY NAMES bz2 libbz2 REQUIRED)
-  find_library(OGG_LIBRARY NAMES ogg libogg REQUIRED)
-  find_library(VORBIS_LIBRARY NAMES vorbis libvorbis REQUIRED)
   target_link_libraries(supertuxkart
     ${NX_LIBRARY}
     ${ZLIB_LIBRARY}
     ${FREETYPE_LIBRARIES}
-    ${OGG_LIBRARY}
-    ${VORBIS_LIBRARY}
+    -logg
+    -lvorbis
     ${SDL2_LIBRARY}
     ${PNG_LIBRARY}
     ${BZ2_LIBRARY}
