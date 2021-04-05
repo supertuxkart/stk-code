@@ -97,12 +97,10 @@ cd "${STK_DIR}/cmake_build"
 
 cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
     -DUSE_SWITCH=ON \
-    -DOPENAL_FOUND="1" \
     -DOPENAL_LIBRARY="${STK_DIR}/lib/openal/cmake_build/install/lib/libopenal.a" \
     -DOPENAL_INCLUDE_DIR="${STK_DIR}/lib/openal/cmake_build/install/include" \
-    -DHARFBUZZ_FOUND="1" \
     -DHARFBUZZ_LIBRARY="${STK_DIR}/lib/harfbuzz/cmake_build/install/lib/libharfbuzz.a" \
-    -DHARFBUZZ_INCLUDE_DIR="${STK_DIR}/lib/harfbuzz/cmake_build/install/include" \
+    -DHARFBUZZ_INCLUDEDIR="${STK_DIR}/lib/harfbuzz/cmake_build/install/include" \
     -DCMAKE_INSTALL_PREFIX=/  \
     ../
 
