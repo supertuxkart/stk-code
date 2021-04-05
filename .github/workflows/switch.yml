@@ -42,10 +42,9 @@ jobs:
           rm stk-assets-full.zip
       - name: Run build script
         run: |
-          source /etc/profile.d/devkit-env.sh
           cp -v stk-code/switch/pkgbuild-scripts/* "$DEVKITPRO/"
           cd stk-code/switch
-          sudo PROJECT_VESION=$release_tag bash ./make.sh
+          sudo PROJECT_VESION=$release_tag ./make.sh
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
