@@ -49,7 +49,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "build/SuperTuxKart-${{ env.release_tag }}-switch.zip"
+          artifacts: "stk-code/cmake_build/bin/SuperTuxKart-Switch-${{ env.release_tag }}.zip"
           tag: ${{ env.release_name }}
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
