@@ -36,7 +36,7 @@ jobs:
       - name: Grab assets
         run: |
           sudo apt update
-          sudo apt install unzip -y
+          sudo apt install unzip zip -y
           wget -q https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
           unzip -q stk-assets-full.zip -d stk-assets
           rm stk-assets-full.zip
