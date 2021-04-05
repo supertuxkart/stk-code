@@ -627,17 +627,20 @@ if (USE_SWITCH)
   find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
   find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
   find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+  find_library(ZLIB_LIBRARY NAMES z libz REQUIRED)
+  find_library(PNG_LIBRARY NAMES png libpng REQUIRED)
+  find_library(BZ2_LIBRARY NAMES bz2 libbz2 REQUIRED)
   target_link_libraries(supertuxkart
     ${NX_LIBRARY}
-    -lz
-    -lfreetype
-    -lSDL2
-    -lpng
-    -lbz2
-    -lharfbuzz
-    -logg
-    -lvorbis
-    -lopenal
+    ${ZLIB_LIBRARY}
+    ${FREETYPE_LIBRARY}
+    ${SDL2_LIBRARY}
+    ${PNG_LIBRARY}
+    ${BZ2_LIBRARY}
+    ${HARFBUZZ_LIBRARY}
+    ${OGG_LIBRARY}
+    ${VORBIS_LIBRARY}
+    ${OPENAL_LIBRARY}
     ${EGL_LIBRARY}
     ${DRM_LIBRARY}
     ${GLAPI_LIBRARY}
