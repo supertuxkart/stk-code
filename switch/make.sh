@@ -16,6 +16,9 @@ fi
 # GH Actions adds manually (hack!)
 OPTIONAL=""
 if [ ! -f "$DEVKITPRO/switch.cmake" ]; then
+  echo "pkgbuild-helpers not installed!"
+  ls "$DEVKITPRO/switch.cmake"
+  ls "$DEVKITPRO"
   OPTIONAL="devkitpro-pkgbuild-helpers"
 fi
 
