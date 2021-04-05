@@ -3,10 +3,7 @@
 OLD_PWD="$(pwd)"
 
 # Mac can prefix tool names with 'dkp-'
-echo "CI: ${CI}"
-if [[ "$CIq" == "trueq" ]]; then
-  PACMAN=echo "(Simulated) pacman"
-elif which dkp-pacman &>/dev/null; then
+if which dkp-pacman &>/dev/null; then
   PACMAN=dkp-pacman
 elif which pacman &>/dev/null; then
   PACMAN=pacman
@@ -18,8 +15,9 @@ fi
 
 # Install deps. --needed means don't reinstall if already installed
 sudo $PACMAN -S --needed \
-  libnx devkit-env \
-  devkitA64 general-tools \
+  devkit-env \
+  devkitA64 \
+  general-tools \
   \
   devkitpro-pkgbuild-helpers \
   switch-curl switch-mbedtls \

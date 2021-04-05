@@ -40,6 +40,9 @@ jobs:
           wget -q https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
           unzip -q stk-assets-full.zip -d stk-assets
           rm stk-assets-full.zip
+      - name: [Hack] Copy Cmake toolchain into /opt/devkitpro
+        run: |
+          cp -v stk-code/switch/pkgbuild-scripts/* "$DEVKITPRO/"
       - name: Run build script
         run: |
           cd stk-code/switch
