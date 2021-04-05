@@ -44,8 +44,7 @@ jobs:
         run: |
           cp -v stk-code/switch/pkgbuild-scripts/* "$DEVKITPRO/"
           cd stk-code/switch
-          export DEVKITPRO # Unclear why it wasn't already...
-          sudo PROJECT_VESION=$release_tag ./make.sh
+          PROJECT_VESION=$release_tag ./make.sh
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
