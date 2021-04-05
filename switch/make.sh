@@ -13,13 +13,19 @@ else
   exit 1
 fi
 
+# GH Actions adds manually (hack!)
+OPTIONAL=""
+if [ ! -f "$DEVKITPRO/switch.cmake" ]; then
+  OPTIONAL="devkitpro-pkgbuild-helpers"
+fi
+
 # Install deps. --needed means don't reinstall if already installed
 sudo $PACMAN -S --needed \
   devkit-env \
   devkitA64 \
   general-tools \
   \
-  devkitpro-pkgbuild-helpers \
+  $OPTIONAL
   switch-curl switch-mbedtls \
   switch-freetype switch-libfribidi \
   switch-libogg switch-libvorbis \
