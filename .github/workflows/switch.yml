@@ -70,6 +70,17 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
 
+      - name: Cache Primes
+        id: cache-primes
+        uses: actions/cache@v2
+        with:
+          path: |
+            stk-code/cmake_build
+            stk-code/lib/openal/cmake_build
+            stk-code/lib/harfbuzz/cmake_build
+          # Make sure PRs can't overwrite!
+          key: ${{ github.ref }}-switch-cmake-0
+
       - name: Run build script
         run: |
           cp -v stk-code/switch/pkgbuild-scripts/* "$DEVKITPRO/"
