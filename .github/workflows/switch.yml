@@ -70,8 +70,8 @@ jobs:
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
 
-      - name: Cache Primes
-        id: cache-primes
+      - name: Cache cmake_build
+        id: cache-switch-cmake
         uses: actions/cache@v2
         with:
           path: |
@@ -88,6 +88,7 @@ jobs:
           PROJECT_VERSION="${{ env.release_tag }}" ./make.sh
       - name: Create release
         uses: ncipollo/release-action@v1
+        if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "stk-code/cmake_build/bin/SuperTuxKart-Switch-${{ env.release_tag }}.zip"
