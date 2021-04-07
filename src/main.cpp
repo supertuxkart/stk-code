@@ -166,10 +166,6 @@
 #include <jni.h>
 #endif
 
-#ifdef __HAIKU__
-#include <kernel/scheduler.h>
-#endif
-
 #ifdef __SWITCH__
 extern "C" {
   #include <sys/iosupport.h>
@@ -2352,9 +2348,6 @@ int main(int argc, char *argv[])
 #ifndef SERVER_ONLY
         if (!GUIEngine::isNoGraphics())
         {
-#ifdef __HAIKU__
-            set_scheduler_mode(SCHEDULER_MODE_LOW_LATENCY);
-#endif
             // Some Android devices have only 320x240 and height >= 480 is bare
             // minimum to make the GUI working as expected.
             if (irr_driver->getActualScreenSize().Height < 480)
