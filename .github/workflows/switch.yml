@@ -52,7 +52,7 @@ jobs:
           echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
           echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
       - name: Configure packaging name for non-releasing branch
-        if: ${{github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/')}}
+        if: ${{(github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/')) || github.repository_owner != 'supertuxkart}}
         run: |
           echo "release_tag=" >> $GITHUB_ENV
           echo "release_name=" >> $GITHUB_ENV
@@ -91,7 +91,7 @@ jobs:
         if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "stk-code/cmake_build/bin/SuperTuxKart-Switch-${{ env.release_tag }}.zip"
+          artifacts: "stk-code/cmake_build/bin/SuperTuxKart-${{ env.release_tag }}-switch.zip"
           tag: ${{ env.release_tag }}
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true

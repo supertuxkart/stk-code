@@ -124,7 +124,7 @@ echo "Compressing"
 
 # Zip up actual release:
 cd sdcard
-ZIP_PATH="${STK_DIR}/cmake_build/bin/SuperTuxKart-Switch-${PROJECT_VERSION}.zip"
+ZIP_PATH="${STK_DIR}/cmake_build/bin/SuperTuxKart-${PROJECT_VERSION}-switch.zip"
 zip -r "${ZIP_PATH}" .
 
 # Recover old pwd
