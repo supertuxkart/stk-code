@@ -384,7 +384,7 @@ if (NOT SERVER_ONLY)
     # Freetype
     if (USE_SWITCH)
         SET(FREETYPE_INCLUDE_DIRS /opt/devkitpro/portlibs/switch/include/freetype2)
-        SET(FREETYPE_LIBRARY freetype)
+        find_library(FREETYPE_LIBRARIES freetype libfreetype REQUIRED)
         SET(FREETYPE_FOUND YES)
     else()
         find_package(Freetype)
@@ -627,17 +627,20 @@ if (USE_SWITCH)
   find_library(NX_LIBRARY NAMES nx libnx REQUIRED)
   find_library(DRM_LIBRARY NAMES drm_nouveau libdrm_nouveau REQUIRED)
   find_library(GLAPI_LIBRARY NAMES glapi libglapi REQUIRED)
+  find_library(ZLIB_LIBRARY NAMES z libz REQUIRED)
+  find_library(PNG_LIBRARY NAMES png libpng REQUIRED)
+  find_library(BZ2_LIBRARY NAMES bz2 libbz2 REQUIRED)
   target_link_libraries(supertuxkart
     ${NX_LIBRARY}
-    -lz
-    -lfreetype
-    -lSDL2
-    -lpng
-    -lbz2
-    -lharfbuzz
+    ${ZLIB_LIBRARY}
+    ${FREETYPE_LIBRARIES}
     -logg
     -lvorbis
-    -lopenal
+    ${SDL2_LIBRARY}
+    ${PNG_LIBRARY}
+    ${BZ2_LIBRARY}
+    ${HARFBUZZ_LIBRARY}
+    ${OPENAL_LIBRARY}
     ${EGL_LIBRARY}
     ${DRM_LIBRARY}
     ${GLAPI_LIBRARY}

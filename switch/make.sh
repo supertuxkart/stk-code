@@ -13,9 +13,22 @@ else
   exit 1
 fi
 
+# GH Actions adds manually (hack!)
+OPTIONAL=""
+if [ ! -f "$DEVKITPRO/switch.cmake" ]; then
+  echo "pkgbuild-helpers not installed!"
+  ls "$DEVKITPRO/switch.cmake"
+  ls "$DEVKITPRO"
+  OPTIONAL="devkitpro-pkgbuild-helpers"
+fi
+
 # Install deps. --needed means don't reinstall if already installed
-sudo $PACMAN -S --needed switch-dev \
-  devkitpro-pkgbuild-helpers \
+sudo $PACMAN -S --needed \
+  devkit-env \
+  devkitA64 \
+  general-tools \
+  \
+  $OPTIONAL \
   switch-curl switch-mbedtls \
   switch-freetype switch-libfribidi \
   switch-libogg switch-libvorbis \
@@ -53,12 +66,12 @@ if [ ! -d "${STK_DIR}/lib/harfbuzz/cmake_build" ]; then
   mkdir "${STK_DIR}/lib/harfbuzz/cmake_build"
   cd "${STK_DIR}/lib/harfbuzz/cmake_build"
   cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
-    -DUSE_SWITCH=ON -DCMAKE_INSTALL_PREFIX="${PORTLIBS_PREFIX}"  \
+    -DUSE_SWITCH=ON -DCMAKE_INSTALL_PREFIX="$(pwd)/install"  \
     -DHB_HAVE_FREETYPE=ON \
     ../
   
   make -j$(nproc)
-  sudo make install
+  make install
 fi
 
 if [ ! -d "${STK_DIR}/lib/openal/cmake_build" ]; then
@@ -70,22 +83,32 @@ if [ ! -d "${STK_DIR}/lib/openal/cmake_build" ]; then
     -DUSE_SWITCH=ON -DALSOFT_UTILS=OFF -DLIBTYPE=STATIC -DALSOFT_EXAMPLES=OFF \
     -DALSOFT_REQUIRE_SDL2=ON -DALSOFT_BACKEND_SDL2=ON \
     -DSDL2_INCLUDE_DIR="${PORTLIBS_PREFIX}/include" \
-    -DCMAKE_INSTALL_PREFIX="${PORTLIBS_PREFIX}"  \
+    -DCMAKE_INSTALL_PREFIX="$(pwd)/install"  \
     ../
 
   make -j$(nproc)
-  sudo make install
+  make install
 fi
 
 echo "Compiling STK"
 
-mkdir "${STK_DIR}/cmake_build"
+if [[ ! -d "${STK_DIR}/cmake_dir" ]]; then
+  mkdir "${STK_DIR}/cmake_build"
+else
+  ls "${STK_DIR}/cmake_build"
+fi
 cd "${STK_DIR}/cmake_build"
 
-cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
-    -DUSE_SWITCH=ON \
-    -DCMAKE_INSTALL_PREFIX=/  \
-    ../
+if [[ ! -f "${STK_DIR}/cmake_build/CMakeCache.txt" ]]; then
+  cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
+      -DUSE_SWITCH=ON \
+      -DOPENAL_LIBRARY="${STK_DIR}/lib/openal/cmake_build/install/lib/libopenal.a" \
+      -DOPENAL_INCLUDE_DIR="${STK_DIR}/lib/openal/cmake_build/install/include" \
+      -DHARFBUZZ_LIBRARY="${STK_DIR}/lib/harfbuzz/cmake_build/install/lib/libharfbuzz.a" \
+      -DHARFBUZZ_INCLUDEDIR="${STK_DIR}/lib/harfbuzz/cmake_build/install/include" \
+      -DCMAKE_INSTALL_PREFIX=/  \
+      ../
+fi
 
 make -j$(nproc)
 make install DESTDIR=./install
@@ -107,7 +130,7 @@ echo "Compressing"
 
 # Zip up actual release:
 cd sdcard
-ZIP_PATH="${STK_DIR}/cmake_build/bin/SuperTuxKart-Switch-${PROJECT_VERSION}.zip"
+ZIP_PATH="${STK_DIR}/cmake_build/bin/SuperTuxKart-${PROJECT_VERSION}-switch.zip"
 zip -r "${ZIP_PATH}" .
 
 # Recover old pwd
