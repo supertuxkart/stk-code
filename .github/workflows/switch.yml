@@ -92,7 +92,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "stk-code/cmake_build/bin/SuperTuxKart-${{ env.release_tag }}-switch.zip"
-          tag: ${{ env.release_tag }}
+          tag: ${{ env.release_name }}
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
           allowUpdates: true
