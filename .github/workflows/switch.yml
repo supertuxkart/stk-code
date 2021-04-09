@@ -17,7 +17,10 @@ jobs:
       image: 'devkitpro/devkita64'
     steps:
       - name: Install git
-        run: sudo apt update && sudo apt install -y git
+        run: |
+          sudo add-apt-repository ppa:git-core/ppa -y
+          sudo apt-get update
+          sudo apt-get install git -y
       - name: Checkout code
         uses: actions/checkout@v2
         with:
