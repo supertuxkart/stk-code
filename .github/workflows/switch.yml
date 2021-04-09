@@ -19,18 +19,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          # We need 0 so we get all commits for mtime!
+          fetch-depth: 0
           path: "./stk-code"
       - name: Checkout OpenAL
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 0
           path: "./stk-code/lib/openal"
           repository: "kcat/openal-soft"
       - name: Checkout Harfbuzz
         uses: actions/checkout@v2
         with:
-          fetch-depth: 1
+          fetch-depth: 0
           path: "./stk-code/lib/harfbuzz"
           repository: "harfbuzz/harfbuzz"
       - name: Grab assets
