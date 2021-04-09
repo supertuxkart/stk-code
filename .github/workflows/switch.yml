@@ -43,9 +43,9 @@ jobs:
       - name: Restore modified date
         run: |
           sudo apt install -y git-restore-mtime
-          git-restore-mtime --work-tree stk-code .
-          git-restore-mtime --work-tree stk-code/lib/openal .
-          git-restore-mtime --work-tree stk-code/lib/harfbuzz .
+          git restore-mtime --work-tree stk-code .
+          git restore-mtime --work-tree stk-code/lib/openal .
+          git restore-mtime --work-tree stk-code/lib/harfbuzz .
 
       # Env setup!
       - name: Configure packaging name for git master branch
