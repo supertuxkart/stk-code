@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - feature/gh-actions-switch
     tags:
       - '*'
   pull_request: {}
