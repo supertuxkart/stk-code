@@ -18,12 +18,9 @@ jobs:
     steps:
       - name: Install git
         run: |
+          echo "deb http://ftp.debian.org/debian stretch-backports main" | sudo tee /etc/apt/sources.list.d/stretch-backports.list
           sudo apt update
-          sudo apt install software-properties-common dirmngr -y
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A1715D88E1DF1F24
-          sudo add-apt-repository ppa:git-core/ppa -y
-          sudo apt update
-          sudo apt install git -y
+          sudo apt install -t stretch-backports git -y
       - name: Checkout code
         uses: actions/checkout@v2
         with:
