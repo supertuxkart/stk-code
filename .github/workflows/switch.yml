@@ -50,9 +50,6 @@ jobs:
         run: |
           sudo apt install -y git-restore-mtime
           cd stk-code
-          pwd
-          ls -la
-          ls -la .git
           git restore-mtime .
           cd lib/openal
           git restore-mtime .
@@ -100,6 +97,7 @@ jobs:
             stk-code/lib/harfbuzz/cmake_build
             !stk-code/cmake_build/install
             !stk-code/cmake_build/bin/*.zip
+            !stk-code/cmake_build/sdcard
           # Make sure PRs can't overwrite!
           key: ${{ github.ref }}-switch-cmake-0
 
