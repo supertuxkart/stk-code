@@ -18,9 +18,11 @@ jobs:
     steps:
       - name: Install git
         run: |
+          sudo apt update
+          sudo apt install software-properties-common -y
           sudo add-apt-repository ppa:git-core/ppa -y
-          sudo apt-get update
-          sudo apt-get install git -y
+          sudo apt update
+          sudo apt install git -y
       - name: Checkout code
         uses: actions/checkout@v2
         with:
