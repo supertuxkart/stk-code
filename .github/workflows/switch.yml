@@ -45,6 +45,9 @@ jobs:
         run: |
           sudo apt install -y git-restore-mtime
           cd stk-code
+          pwd
+          ls -la
+          ls -la .git
           git restore-mtime .
           cd lib/openal
           git restore-mtime .
