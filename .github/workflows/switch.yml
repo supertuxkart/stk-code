@@ -40,6 +40,12 @@ jobs:
           wget -q https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
           unzip -q stk-assets-full.zip -d stk-assets
           rm stk-assets-full.zip
+      - name: Restore modified date
+        run: |
+          sudo apt install -y git-restore-mtime
+          git-restore-mtime --work-tree stk-code .
+          git-restore-mtime --work-tree stk-code/lib/openal .
+          git-restore-mtime --work-tree stk-code/lib/harfbuzz .
 
       # Env setup!
       - name: Configure packaging name for git master branch
