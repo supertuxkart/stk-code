@@ -19,7 +19,7 @@ jobs:
       - name: Install git
         run: |
           sudo apt update
-          sudo apt install software-properties-common -y
+          sudo apt install software-properties-common dirmngr -y
           sudo add-apt-repository ppa:git-core/ppa -y
           sudo apt update
           sudo apt install git -y
