@@ -92,7 +92,7 @@ fi
 
 echo "Compiling STK"
 
-if [[ ! -d "${STK_DIR}/cmake_dir" ]]; then
+if [[ ! -d "${STK_DIR}/cmake_build" ]]; then
   mkdir "${STK_DIR}/cmake_build"
 else
   ls "${STK_DIR}/cmake_build"
