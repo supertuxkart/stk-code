@@ -17,8 +17,6 @@ fi
 OPTIONAL=""
 if [ ! -f "$DEVKITPRO/switch.cmake" ]; then
   echo "pkgbuild-helpers not installed!"
-  ls "$DEVKITPRO/switch.cmake"
-  ls "$DEVKITPRO"
   OPTIONAL="devkitpro-pkgbuild-helpers"
 fi
 
@@ -92,23 +90,19 @@ fi
 
 echo "Compiling STK"
 
-if [[ ! -d "${STK_DIR}/cmake_dir" ]]; then
+if [[ ! -d "${STK_DIR}/cmake_build" ]]; then
   mkdir "${STK_DIR}/cmake_build"
-else
-  ls "${STK_DIR}/cmake_build"
 fi
 cd "${STK_DIR}/cmake_build"
 
-if [[ ! -f "${STK_DIR}/cmake_build/CMakeCache.txt" ]]; then
-  cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
-      -DUSE_SWITCH=ON \
-      -DOPENAL_LIBRARY="${STK_DIR}/lib/openal/cmake_build/install/lib/libopenal.a" \
-      -DOPENAL_INCLUDE_DIR="${STK_DIR}/lib/openal/cmake_build/install/include" \
-      -DHARFBUZZ_LIBRARY="${STK_DIR}/lib/harfbuzz/cmake_build/install/lib/libharfbuzz.a" \
-      -DHARFBUZZ_INCLUDEDIR="${STK_DIR}/lib/harfbuzz/cmake_build/install/include" \
-      -DCMAKE_INSTALL_PREFIX=/  \
-      ../
-fi
+cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE="${DEVKITPRO}/switch.cmake" \
+    -DUSE_SWITCH=ON \
+    -DOPENAL_LIBRARY="${STK_DIR}/lib/openal/cmake_build/install/lib/libopenal.a" \
+    -DOPENAL_INCLUDE_DIR="${STK_DIR}/lib/openal/cmake_build/install/include" \
+    -DHARFBUZZ_LIBRARY="${STK_DIR}/lib/harfbuzz/cmake_build/install/lib/libharfbuzz.a" \
+    -DHARFBUZZ_INCLUDEDIR="${STK_DIR}/lib/harfbuzz/cmake_build/install/include" \
+    -DCMAKE_INSTALL_PREFIX=/  \
+    ../
 
 make -j$(nproc)
 make install DESTDIR=./install
@@ -131,6 +125,9 @@ echo "Compressing"
 # Zip up actual release:
 cd sdcard
 ZIP_PATH="${STK_DIR}/cmake_build/bin/SuperTuxKart-${PROJECT_VERSION}-switch.zip"
+if [[ -f "${ZIP_PATH}" ]]; then
+  rm "${ZIP_PATH}"
+fi
 zip -r "${ZIP_PATH}" .
 
 # Recover old pwd
