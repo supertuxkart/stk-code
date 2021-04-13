@@ -254,7 +254,7 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
     if (bits->buffer != NULL && !GUIEngine::isNoGraphics())
     {
         video::ITexture* tex = m_spritebank->getTexture(cur_tex);
-        glBindTexture(GL_TEXTURE_2D, tex->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, tex->getTextureHandler());
         if (bits->pixel_mode == FT_PIXEL_MODE_GRAY)
         {
             if (CVS->isARBTextureSwizzleUsable() && !useColorGlyphPage())

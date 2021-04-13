@@ -193,7 +193,7 @@ public:
 	const io::SNamedPath& getName() const { return NamedPath; }
 
 	//! return open gl texture name
-	virtual u32 getOpenGLTextureName() const = 0;
+	virtual u64 getTextureHandler() const = 0;
 
 	virtual u32 getTextureSize() const { return 0; }
 

@@ -318,7 +318,7 @@ void CPUParticleManager::drawAll()
             cur_mat->getShaderName() == "alphablend")
         {
             ParticleRenderer::getInstance()->setTextureUnits
-                (cur_mat->getTexture()->getOpenGLTextureName(),
+                (cur_mat->getTexture()->getTextureHandler(),
                 CVS->isDeferredEnabled() ?
                 irr_driver->getDepthStencilTexture() : 0);
             ParticleRenderer::getInstance()->setUniforms(flips, billboard);
@@ -326,7 +326,7 @@ void CPUParticleManager::drawAll()
         else
         {
             AlphaTestParticleRenderer::getInstance()->setTextureUnits
-                (cur_mat->getTexture()->getOpenGLTextureName());
+                (cur_mat->getTexture()->getTextureHandler());
             AlphaTestParticleRenderer::getInstance()->setUniforms(flips);
         }
         glBindVertexArray(m_gl_particles.at(p.second)->m_vao);

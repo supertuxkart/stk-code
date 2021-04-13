@@ -181,7 +181,7 @@ public:
     // ------------------------------------------------------------------------
     std::shared_ptr<video::IImage> getTextureImage() const;
     // ------------------------------------------------------------------------
-    GLuint getOpenGLTextureName() const              { return m_texture_name; }
+    GLuint getTextureHandler() const              { return m_texture_name; }
     // ------------------------------------------------------------------------
     bool initialized() const
                         { return m_width.load() != 0 && m_height.load() != 0; }

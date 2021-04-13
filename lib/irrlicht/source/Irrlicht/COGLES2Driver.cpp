@@ -2840,7 +2840,7 @@ namespace video
 				setActiveTexture(GL_TEXTURE0 + stage);
 
 				if(Driver->CurrentTexture[stage])
-					glBindTexture(GL_TEXTURE_2D, Driver->CurrentTexture[stage]->getOpenGLTextureName());
+					glBindTexture(GL_TEXTURE_2D, Driver->CurrentTexture[stage]->getTextureHandler());
 
 				Texture[stage] = Driver->CurrentTexture[stage];
 			}

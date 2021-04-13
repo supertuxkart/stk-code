@@ -1146,12 +1146,12 @@ void updateModelMatrix()
                         (material_id);
                     texture_names =
                         {{
-                            textures[0]->getOpenGLTextureName(),
-                            textures[1]->getOpenGLTextureName(),
-                            textures[2]->getOpenGLTextureName(),
-                            textures[3]->getOpenGLTextureName(),
-                            textures[4]->getOpenGLTextureName(),
-                            textures[5]->getOpenGLTextureName()
+                            textures[0]->getTextureHandler(),
+                            textures[1]->getTextureHandler(),
+                            textures[2]->getTextureHandler(),
+                            textures[3]->getTextureHandler(),
+                            textures[4]->getTextureHandler(),
+                            textures[5]->getTextureHandler()
                         }};
                 }
                 g_final_draw_calls[i][dc].second.emplace_back

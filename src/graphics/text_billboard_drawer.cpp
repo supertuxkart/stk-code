@@ -71,7 +71,7 @@ void drawAll()
     for (auto& p : g_tbs)
     {
         TBRenderer::getInstance()
-            ->setTextureUnits(p.first->getOpenGLTextureName());
+            ->setTextureUnits(p.first->getTextureHandler());
         for (auto* q : p.second)
         {
             q->draw(p.first);

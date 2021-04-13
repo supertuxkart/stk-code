@@ -83,9 +83,7 @@ public:
 	virtual u32 getPitch() const;
 
 	//! return open gl texture name
-	virtual u32 getOpenGLTextureName() const;
-
-	virtual u64 getHandle() { return 0; }
+	virtual u64 getTextureHandler() const;
 
 	//! return whether this texture has mipmaps
 	virtual bool hasMipMaps() const;

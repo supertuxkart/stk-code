@@ -383,7 +383,7 @@ public:
         setTextureUnits(render_target_bloom_128,
                         render_target_bloom_256,
                         render_target_bloom_512,
-						m_lens_dust_tex->getOpenGLTextureName());
+						m_lens_dust_tex->getTextureHandler());
         drawFullScreenEffect();
     }   // render
 };   // BloomBlendShader
@@ -690,7 +690,7 @@ public:
                 GLuint rtt_mlaa_tmp)
     {
         use();
-        setTextureUnits(rtt_mlaa_tmp, area_map->getOpenGLTextureName());
+        setTextureUnits(rtt_mlaa_tmp, area_map->getTextureHandler());
         drawFullScreenEffect(pixel_size);
 
     }   // render
@@ -750,7 +750,7 @@ PostProcessing::PostProcessing()
                          "AreaMap33", false);
     video::IImage* img = irr_driver->getVideoDriver()->createImageFromFile(areamap);
     m_areamap = new STKTexture(img, "AreaMap33");
-    if (m_areamap->getOpenGLTextureName() == 0)
+    if (m_areamap->getTextureHandler() == 0)
     {
         Log::fatal("postprocessing", "Failed to load the areamap");
         return;

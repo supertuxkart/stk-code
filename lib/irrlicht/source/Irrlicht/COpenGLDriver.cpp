@@ -2646,7 +2646,7 @@ bool COpenGLDriver::setActiveTexture(u32 stage, const video::ITexture* texture)
 
 		if (!useCoreContext)
 			glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, texture->getOpenGLTextureName());
+		glBindTexture(GL_TEXTURE_2D, texture->getTextureHandler());
 	}
 	return true;
 }
@@ -4536,7 +4536,7 @@ bool COpenGLDriver::setRenderTarget(const core::array<video::IRenderTarget>& tar
 				// attach texture to FrameBuffer Object on Color [i]
 				attachment = GL_COLOR_ATTACHMENT0_EXT+i;
 				if ((i != 0) && (targets[i].RenderTexture != RenderTargetTexture))
-					extGlFramebufferTexture2D(GL_FRAMEBUFFER_EXT, attachment, GL_TEXTURE_2D, static_cast<COpenGLTexture*>(targets[i].RenderTexture)->getOpenGLTextureName(), 0);
+					extGlFramebufferTexture2D(GL_FRAMEBUFFER_EXT, attachment, GL_TEXTURE_2D, static_cast<COpenGLTexture*>(targets[i].RenderTexture)->getTextureHandler(), 0);
 #endif
 				MRTs[i]=attachment;
 			}

@@ -235,7 +235,7 @@ void FontDrawer::draw()
             glEnableVertexAttribArray(3);
             glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*)12);
             FontDrawerShader::getInstance()->setTextureUnits(
-                glyph.first->getOpenGLTextureName());
+                glyph.first->getTextureHandler());
             glDrawElements(GL_TRIANGLES, idx_count,
                 indices_32.empty() ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, 0);
             glBindBuffer(GL_ARRAY_BUFFER, 0);

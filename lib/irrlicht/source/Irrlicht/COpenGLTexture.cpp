@@ -603,7 +603,7 @@ u32 COpenGLTexture::getPitch() const
 
 
 //! return open gl texture name
-GLuint COpenGLTexture::getOpenGLTextureName() const
+u64 COpenGLTexture::getTextureHandler() const
 {
 	return TextureName;
 }

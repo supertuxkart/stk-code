@@ -490,7 +490,7 @@ void SPShaderManager::addPrefilledTexturesToShader(SPShader* s,
             s->addCustomPrefilledTextures(std::get<3>(p)/*sampler_type*/,
                 GL_TEXTURE_2D, std::get<0>(p)/*name_in_shader*/, [pt]()->GLuint
                 {
-                    return pt->getOpenGLTextureName();
+                    return pt->getTextureHandler();
                 }, rp);
         }
     }

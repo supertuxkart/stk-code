@@ -101,7 +101,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void regenerateMipMapLevels(void* mipmap_data = NULL)            {}
     // ------------------------------------------------------------------------
-    virtual u32 getOpenGLTextureName() const         { return m_texture_name; }
+    virtual u64 getTextureHandler() const         { return m_texture_name; }
     // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------

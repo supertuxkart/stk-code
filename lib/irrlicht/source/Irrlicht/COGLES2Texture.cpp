@@ -429,7 +429,7 @@ u32 COGLES2Texture::getPitch() const
 
 
 //! return open gl texture name
-GLuint COGLES2Texture::getOpenGLTextureName() const
+u64 COGLES2Texture::getTextureHandler() const
 {
 	return TextureName;
 }

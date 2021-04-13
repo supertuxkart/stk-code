@@ -87,7 +87,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path,
     {
         new_texture = new STKTexture(full_path.empty() ? path : full_path,
             tc, no_upload);
-        if (new_texture->getOpenGLTextureName() == 0 && !no_upload)
+        if (new_texture->getTextureHandler() == 0 && !no_upload)
         {
             const char* name = new_texture->getName().getPtr();
             if (!m_texture_error_message.empty())

@@ -161,7 +161,7 @@ static void drawTexColoredQuad(const video::ITexture *texture,
     ColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(ColoredTextureRectShader::getInstance()->m_vao);
     ColoredTextureRectShader::getInstance()
-        ->setTextureUnits(texture->getOpenGLTextureName());
+        ->setTextureUnits(texture->getTextureHandler());
     ColoredTextureRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
                       core::vector2df(width, height),
@@ -292,7 +292,7 @@ void draw2DImage(const video::ITexture* texture,
     UniformColoredTextureRectShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
     UniformColoredTextureRectShader::getInstance()
-        ->setTextureUnits(texture->getOpenGLTextureName());
+        ->setTextureUnits(texture->getTextureHandler());
 
     UniformColoredTextureRectShader::getInstance()
         ->setUniforms(core::vector2df(center_pos_x, center_pos_y),
@@ -407,7 +407,7 @@ void draw2DImage(const video::ITexture* texture,
     }
     else
     {
-        drawTexQuad(texture->getOpenGLTextureName(), width, height,
+        drawTexQuad(texture->getTextureHandler(), width, height,
                     center_pos_x, center_pos_y, tex_center_pos_x,
                     tex_center_pos_y, tex_width, tex_height, rotation);
     }
@@ -454,7 +454,7 @@ void draw2DImageCustomAlpha(const irr::video::ITexture* texture,
     TextureRectCustomAlphaShader::getInstance()->use();
     glBindVertexArray(SharedGPUObjects::getUI_VAO());
 
-    TextureRectCustomAlphaShader::getInstance()->setTextureUnits(texture->getOpenGLTextureName());
+    TextureRectCustomAlphaShader::getInstance()->setTextureUnits(texture->getTextureHandler());
     TextureRectCustomAlphaShader::getInstance()->setUniforms(
                     core::vector2df(center_pos_x, center_pos_y),
                     core::vector2df(width, height),
@@ -506,7 +506,7 @@ void draw2DVertexPrimitiveList(video::ITexture *tex, const void* vertices,
     Primitive2DList::getInstance()->setUniforms(1.0f,
         core::vector2df(float(irr_driver->getActualScreenSize().Width),
         float(irr_driver->getActualScreenSize().Height)));
-    Primitive2DList::getInstance()->setTextureUnits(tex->getOpenGLTextureName());
+    Primitive2DList::getInstance()->setTextureUnits(tex->getTextureHandler());
     glDrawElements(GL_TRIANGLE_FAN, primitiveCount, GL_UNSIGNED_SHORT, 0);
 
     glDeleteVertexArrays(1, &tmpvao);
