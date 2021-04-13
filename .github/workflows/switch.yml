@@ -91,13 +91,18 @@ jobs:
         id: cache-switch-cmake
         uses: actions/cache@v2
         with:
+          # This is unnecessarily verbose and might break, but again ! seems broken
+          # See: https://github.com/Mstrodl/stk-code/runs/2333673736?check_suite_focus=true#step:16:34
           path: |
-            stk-code/cmake_build
+            stk-code/cmake_build/CMakeFiles
+            stk-code/cmake_build/Makefile
+            stk-code/cmake_build/lib
+            stk-code/cmake_build/bin/supertuxkart
+            stk-code/cmake_build/*.cmake
+            stk-code/cmake_build/*.txt
+
             stk-code/lib/openal/cmake_build
             stk-code/lib/harfbuzz/cmake_build
-            !stk-code/cmake_build/install
-            !stk-code/cmake_build/bin/*.zip
-            !stk-code/cmake_build/sdcard
           # Make sure PRs can't overwrite!
           key: ${{ github.ref }}-switch-cmake-0
 
