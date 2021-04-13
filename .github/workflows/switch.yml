@@ -103,6 +103,9 @@ jobs:
 
       - name: Run build script
         run: |
+          ls stk-code/cmake_build || echo no cmake_build
+          du -sh stk-code/cmake_build/* || echo no cmake_build
+          du -sh stk-code/cmake_build/bin/* || echo no cmake_build
           cp -v stk-code/switch/pkgbuild-scripts/* "$DEVKITPRO/"
           cd stk-code/switch
           PROJECT_VERSION="${{ env.release_tag }}" ./make.sh
