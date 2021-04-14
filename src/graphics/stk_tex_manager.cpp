@@ -20,6 +20,9 @@
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/stk_texture.hpp"
+#include "graphics/server_dummy_texture.hpp"
+#include "graphics/stk_texture.hpp"
+#include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/log.hpp"
@@ -33,7 +36,7 @@ STKTexManager::~STKTexManager()
 }   // ~STKTexManager
 
 // ----------------------------------------------------------------------------
-STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
+video::ITexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
                                                    std::string* full_path)
 {
     io::path relative_path = file_manager->searchTexture(filename).c_str();
@@ -70,7 +73,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path)
     if (ret != m_all_textures.end())
         return ret->second;
 
-    STKTexture* new_texture = NULL;
+    video::ITexture* new_texture = NULL;
     std::string full_path;
     if (path.find('/') == std::string::npos)
     {
@@ -81,7 +84,20 @@ video::ITexture* STKTexManager::getTexture(const std::string& path)
             return new_texture;
     }
 
-    new_texture = new STKTexture(full_path.empty() ? path : full_path, NULL);
+#ifdef SERVER_ONLY
+    new_texture =
+        new ServerDummyTexture(full_path.empty() ? path : full_path);
+#else
+    if (GUIEngine::isNoGraphics())
+    {
+        new_texture =
+            new ServerDummyTexture(full_path.empty() ? path : full_path);
+    }
+    else
+    {
+        new_texture =
+            new STKTexture(full_path.empty() ? path : full_path, NULL);
+    }
     if (new_texture->getTextureHandler() == 0)
     {
         const char* name = new_texture->getName().getPtr();
@@ -96,20 +112,21 @@ video::ITexture* STKTexManager::getTexture(const std::string& path)
         delete new_texture;
         return NULL;
     }
+#endif
 
     addTexture(new_texture);
     return new_texture;
 }   // getTexture
 
 // ----------------------------------------------------------------------------
-video::ITexture* STKTexManager::addTexture(STKTexture* texture)
+video::ITexture* STKTexManager::addTexture(video::ITexture* texture)
 {
     m_all_textures[texture->getName().getPtr()] = texture;
     return texture;
 }   // addTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::removeTexture(STKTexture* texture, bool remove_all)
+void STKTexManager::removeTexture(video::ITexture* texture, bool remove_all)
 {
 #ifdef DEBUG
     std::vector<std::string> undeleted_texture;

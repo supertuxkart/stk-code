@@ -59,14 +59,14 @@ struct TexConfig
 class STKTexManager : public Singleton<STKTexManager>, NoCopy
 {
 private:
-    std::unordered_map<std::string, STKTexture*> m_all_textures;
+    std::unordered_map<std::string, irr::video::ITexture*> m_all_textures;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
     std::string m_texture_error_message;
 
     // ------------------------------------------------------------------------
-    STKTexture* findTextureInFileSystem(const std::string& filename,
+    irr::video::ITexture* findTextureInFileSystem(const std::string& filename,
                                         std::string* full_path);
 public:
     // ------------------------------------------------------------------------
@@ -76,11 +76,11 @@ public:
     // ------------------------------------------------------------------------
     irr::video::ITexture* getTexture(const std::string& path);
     // ------------------------------------------------------------------------
-    irr::video::ITexture* addTexture(STKTexture* texture);
+    irr::video::ITexture* addTexture(irr::video::ITexture* texture);
     // ------------------------------------------------------------------------
     bool hasTexture(const std::string& path);
     // ------------------------------------------------------------------------
-    void removeTexture(STKTexture* texture, bool remove_all = false);
+    void removeTexture(irr::video::ITexture* texture, bool remove_all = false);
     // ------------------------------------------------------------------------
     int dumpTextureUsage();
     // ------------------------------------------------------------------------
