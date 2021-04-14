@@ -1637,33 +1637,19 @@ void IrrDriver::removeCameraSceneNode(scene::ICameraSceneNode *camera)
  *  getTexture() function.s
  *  \param type The FileManager::AssetType of the texture.
  *  \param filename File name of the texture to load.
- *  \param is_premul If the alpha values needd to be multiplied for
- *         all pixels.
- *  \param is_prediv If the alpha value needs to be divided into
- *         each pixel.
  */
 video::ITexture *IrrDriver::getTexture(FileManager::AssetType type,
-                                       const std::string &filename,
-                                       bool is_premul,
-                                       bool is_prediv,
-                                       bool complain_if_not_found)
+                                       const std::string &filename)
 {
     const std::string path = file_manager->getAsset(type, filename);
-    return getTexture(path, is_premul, is_prediv, complain_if_not_found);
+    return getTexture(path);
 }   // getTexture
 
 // ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object.
  *  \param filename File name of the texture to load.
- *  \param is_premul If the alpha values needd to be multiplied for
- *         all pixels.
- *  \param is_prediv If the alpha value needs to be divided into
- *         each pixel.
  */
-video::ITexture *IrrDriver::getTexture(const std::string &filename,
-                                       bool is_premul,
-                                       bool is_prediv,
-                                       bool complain_if_not_found)
+video::ITexture *IrrDriver::getTexture(const std::string &filename)
 {
     return STKTexManager::getInstance()->getTexture(filename);
 }   // getTexture

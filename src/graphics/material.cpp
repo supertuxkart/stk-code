@@ -500,9 +500,7 @@ void Material::install(bool srgb, bool premul_alpha)
     }
     else
     {
-        TexConfig tc(srgb, premul_alpha, srgb/*mesh_tex*/);
-        m_texture = STKTexManager::getInstance()
-            ->getTexture(m_sampler_path[0], &tc);
+        m_texture = STKTexManager::getInstance()->getTexture(m_sampler_path[0]);
     }
 
     if (m_texture == NULL) return;

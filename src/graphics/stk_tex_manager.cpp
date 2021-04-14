@@ -58,9 +58,7 @@ STKTexture* STKTexManager::findTextureInFileSystem(const std::string& filename,
 }   // findTextureInFileSystem
 
 // ----------------------------------------------------------------------------
-video::ITexture* STKTexManager::getTexture(const std::string& path,
-                                           TexConfig* tc, bool no_upload,
-                                           bool create_if_unfound)
+video::ITexture* STKTexManager::getTexture(const std::string& path)
 {
     if (path.empty())
     {
@@ -69,7 +67,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path,
     }
 
     auto ret = m_all_textures.find(path);
-    if (!no_upload && ret != m_all_textures.end())
+    if (ret != m_all_textures.end())
         return ret->second;
 
     STKTexture* new_texture = NULL;
@@ -79,32 +77,27 @@ video::ITexture* STKTexManager::getTexture(const std::string& path,
         new_texture = findTextureInFileSystem(path, &full_path);
         if (full_path.empty())
             return NULL;
-        if (!no_upload && new_texture)
+        if (new_texture)
             return new_texture;
     }
 
-    if (create_if_unfound)
+    new_texture = new STKTexture(full_path.empty() ? path : full_path, NULL);
+    if (new_texture->getTextureHandler() == 0)
     {
-        new_texture = new STKTexture(full_path.empty() ? path : full_path,
-            tc, no_upload);
-        if (new_texture->getTextureHandler() == 0 && !no_upload)
+        const char* name = new_texture->getName().getPtr();
+        if (!m_texture_error_message.empty())
         {
-            const char* name = new_texture->getName().getPtr();
-            if (!m_texture_error_message.empty())
-            {
-                Log::error("STKTexManager", "%s",
-                    m_texture_error_message.c_str());
-            }
-            Log::error("STKTexManager", "Texture %s not found or invalid.",
-                name);
-            m_all_textures[name] = NULL;
-            delete new_texture;
-            return NULL;
+            Log::error("STKTexManager", "%s",
+                m_texture_error_message.c_str());
         }
+        Log::error("STKTexManager", "Texture %s not found or invalid.",
+            name);
+        m_all_textures[name] = NULL;
+        delete new_texture;
+        return NULL;
     }
 
-    if (create_if_unfound && !no_upload)
-        addTexture(new_texture);
+    addTexture(new_texture);
     return new_texture;
 }   // getTexture
 
@@ -183,3 +176,29 @@ int STKTexManager::dumpTextureUsage()
     Log::info("STKTexManager", "Total %dMB", size);
     return size;
 }   // dumpTextureUsage
+
+// ----------------------------------------------------------------------------
+bool STKTexManager::hasTexture(const std::string& path)
+{
+    if (path.empty())
+    {
+        Log::error("STKTexManager", "Texture name is empty.");
+        return false;
+    }
+
+    auto ret = m_all_textures.find(path);
+    if (ret != m_all_textures.end())
+        return true;
+
+    video::ITexture* new_texture = NULL;
+    std::string full_path;
+    if (path.find('/') == std::string::npos)
+    {
+        new_texture = findTextureInFileSystem(path, &full_path);
+        if (full_path.empty())
+            return false;
+        if (new_texture)
+            return true;
+    }
+    return false;
+}   // hasTexture

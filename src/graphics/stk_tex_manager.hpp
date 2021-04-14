@@ -74,12 +74,11 @@ public:
     // ------------------------------------------------------------------------
     ~STKTexManager();
     // ------------------------------------------------------------------------
-    irr::video::ITexture* getTexture(const std::string& path,
-                                     TexConfig* tc = NULL,
-                                     bool no_upload = false,
-                                     bool create_if_unfound = true);
+    irr::video::ITexture* getTexture(const std::string& path);
     // ------------------------------------------------------------------------
     irr::video::ITexture* addTexture(STKTexture* texture);
+    // ------------------------------------------------------------------------
+    bool hasTexture(const std::string& path);
     // ------------------------------------------------------------------------
     void removeTexture(STKTexture* texture, bool remove_all = false);
     // ------------------------------------------------------------------------
