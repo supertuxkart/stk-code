@@ -253,9 +253,9 @@ private:
 
     /** A list of the textures for the sky to use. It contains one texture
      *  in case of a dome, and 6 textures for a box. */
-    std::vector<video::ITexture*> m_sky_textures;
+    std::vector<void*> m_sky_textures;
 
-    std::vector<video::ITexture*> m_spherical_harmonics_textures;
+    std::vector<void*> m_spherical_harmonics_textures;
 
     /** Used if m_sky_type is SKY_COLOR only */
     irr::video::SColor m_sky_color;
@@ -405,6 +405,7 @@ private:
     void handleSky(const XMLNode &root, const std::string &filename);
     void freeCachedMeshVertexBuffer();
     void copyFromMainProcess();
+    video::IImage* getSkyTexture(std::string path) const;
 public:
 
     /** Static function to get the current track. NULL if no current

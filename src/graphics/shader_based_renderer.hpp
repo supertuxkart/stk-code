@@ -87,8 +87,8 @@ public:
     void resetPostProcessing() OVERRIDE;
     void giveBoost(unsigned int cam_index) OVERRIDE;
 
-    void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
-                   const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) OVERRIDE;
+    void addSkyBox(const std::vector<irr::video::IImage*> &texture,
+                   const std::vector<irr::video::IImage*> &spherical_harmonics_textures);
     void removeSkyBox() OVERRIDE;
     const SHCoefficients* getSHCoefficients() const OVERRIDE;
     GLuint getRenderTargetTexture(TypeRTT which) const OVERRIDE;

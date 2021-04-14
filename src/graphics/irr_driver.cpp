@@ -95,6 +95,10 @@
 #endif
 #endif
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#endif
+
 #ifdef ENABLE_RECORDER
 #include <chrono>
 #include <openglrecorder.h>
@@ -622,6 +626,9 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
+#ifndef SERVER_ONLY
+    GE::init(m_video_driver);
+#endif
 
     B3DMeshLoader* b3dl = new B3DMeshLoader(m_scene_manager);
     m_scene_manager->addExternalMeshLoader(b3dl);
@@ -1588,12 +1595,6 @@ scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *
 scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &texture,
     const std::vector<video::ITexture*> &spherical_harmonics_textures)
 {
-#ifndef SERVER_ONLY
-    assert(texture.size() == 6);
-
-    m_renderer->addSkyBox(texture, spherical_harmonics_textures);
-
-#endif 
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);

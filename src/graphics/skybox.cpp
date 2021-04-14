@@ -147,8 +147,8 @@ void Skybox::generateCubeMapFromTextures()
     unsigned size = 0;
     for (unsigned i = 0; i < 6; i++)
     {
-        size = std::max(size, m_skybox_textures[i]->getSize().Width);
-        size = std::max(size, m_skybox_textures[i]->getSize().Height);
+        size = std::max(size, m_skybox_textures[i]->getDimension().Width);
+        size = std::max(size, m_skybox_textures[i]->getDimension().Height);
     }
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
@@ -158,9 +158,18 @@ void Skybox::generateCubeMapFromTextures()
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
-        video::IImage* img = static_cast<STKTexture*>
-            (m_skybox_textures[idx])->getTextureImage();
-        assert(img != NULL);
+        video::IImage* img = m_skybox_textures[idx];
+#if defined(USE_GLES2)
+        uint8_t* data = (uint8_t*)img->lock();
+        for (unsigned int j = 0; j <
+            img->getDimension().Width * img->getDimension().Height; j++)
+        {
+            uint8_t tmp_val = data[j * 4];
+            data[j * 4] = data[j * 4 + 2];
+            data[j * 4 + 2] = tmp_val;
+        }
+#endif
+
         img->copyToScaling(rgba[i], size, size);
 
         if (i == 2 || i == 3)
@@ -176,6 +185,7 @@ void Skybox::generateCubeMapFromTextures()
             }
             delete[] tmp;
         }
+        img->drop();
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, m_cube_map);
 
@@ -315,8 +325,9 @@ Out of legacy the sequence of textures maps to:
 - 6th texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Z
 *  \param skybox_textures sequence of 6 textures.
 */
-Skybox::Skybox(const std::vector<video::ITexture *> &skybox_textures)
+Skybox::Skybox(const std::vector<video::IImage *> &skybox_textures)
 {
+    m_cube_map = 0;
     m_skybox_textures = skybox_textures;
 
 #if !defined(USE_GLES2)
@@ -341,11 +352,10 @@ Skybox::~Skybox()
 // ----------------------------------------------------------------------------
 void Skybox::render(const scene::ICameraSceneNode *camera) const
 {
-    if (m_skybox_textures.empty())
+    if (m_cube_map == 0)
         return;
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
-    assert(m_skybox_textures.size() == 6);
 
     if (CVS->isDeferredEnabled())
     {

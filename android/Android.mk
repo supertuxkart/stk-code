@@ -141,7 +141,8 @@ include $(CLEAR_VARS)
 LOCAL_MODULE       := graphics_engine
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
-LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c)
+LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c) \
+                      $(wildcard ../lib/graphics_engine/src/*.cpp)
 LOCAL_CFLAGS       := -I../lib/graphics_engine/include
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)

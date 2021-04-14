@@ -66,8 +66,6 @@ public:
     virtual void resetPostProcessing() {}
     virtual void giveBoost(unsigned int cam_index) {}
 
-    virtual void addSkyBox(const std::vector<irr::video::ITexture*> &texture,
-                           const std::vector<irr::video::ITexture*> &spherical_harmonics_textures) {}
     virtual void removeSkyBox() {}
     
     //FIXME: these three methods should not appear in the public Renderer interface

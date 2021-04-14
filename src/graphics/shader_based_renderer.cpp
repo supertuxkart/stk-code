@@ -657,8 +657,8 @@ void ShaderBasedRenderer::giveBoost(unsigned int cam_index)
 }
 
 // ----------------------------------------------------------------------------
-void ShaderBasedRenderer::addSkyBox(const std::vector<video::ITexture*> &texture,
-                                    const std::vector<video::ITexture*> &spherical_harmonics_textures)
+void ShaderBasedRenderer::addSkyBox(const std::vector<video::IImage*> &texture,
+                                    const std::vector<video::IImage*> &spherical_harmonics_textures)
 {
     m_skybox = new Skybox(texture);
     if(spherical_harmonics_textures.size() == 6)

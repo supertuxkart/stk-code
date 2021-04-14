@@ -22,7 +22,6 @@
 #include "graphics/central_settings.hpp"
 #endif
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_texture.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm> 
@@ -514,7 +513,7 @@ printf( "#### SH ; Coeffs B ; %f %f %f %f %f %f %f %f\n", m_SH_coeff->blue_SH_co
 }   // projectSH
 
 // ----------------------------------------------------------------------------
-SphericalHarmonics::SphericalHarmonics(const std::vector<video::ITexture *> &spherical_harmonics_textures)
+SphericalHarmonics::SphericalHarmonics(const std::vector<video::IImage *> &spherical_harmonics_textures)
 {
     m_SH_coeff = new SHCoefficients;
     setTextures(spherical_harmonics_textures);
@@ -539,7 +538,7 @@ SphericalHarmonics::~SphericalHarmonics()
 
 
 /** Compute spherical harmonics coefficients from 6 textures */
-void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spherical_harmonics_textures)
+void SphericalHarmonics::setTextures(const std::vector<video::IImage *> &spherical_harmonics_textures)
 {
     assert(spherical_harmonics_textures.size() == 6);
     
@@ -551,8 +550,8 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
 
     for (unsigned i = 0; i < 6; i++)
     {
-        sh_w = std::max(sh_w, m_spherical_harmonics_textures[i]->getSize().Width);
-        sh_h = std::max(sh_h, m_spherical_harmonics_textures[i]->getSize().Height);
+        sh_w = std::max(sh_w, m_spherical_harmonics_textures[i]->getDimension().Width);
+        sh_h = std::max(sh_h, m_spherical_harmonics_textures[i]->getDimension().Height);
     }
 
     for (unsigned i = 0; i < 6; i++)
@@ -561,19 +560,8 @@ void SphericalHarmonics::setTextures(const std::vector<video::ITexture *> &spher
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
-        video::IImage* img = static_cast<STKTexture*>
-            (m_spherical_harmonics_textures[idx])->getTextureImage();
-        assert(img != NULL);
-        img->copyToScaling(sh_rgba[i], sh_w, sh_h);
-#if defined(USE_GLES2)
-        // Code here assume color format is BGRA
-        for (unsigned int j = 0; j < sh_w * sh_h; j++)
-        {
-            char tmp_val = sh_rgba[i][j * 4];
-            sh_rgba[i][j * 4] = sh_rgba[i][j * 4 + 2];
-            sh_rgba[i][j * 4 + 2] = tmp_val;
-        }
-#endif
+        m_spherical_harmonics_textures[idx]->copyToScaling(sh_rgba[i], sh_w, sh_h);
+        m_spherical_harmonics_textures[idx]->drop();
     } //for (unsigned i = 0; i < 6; i++)
 
     generateSphericalHarmonics(sh_rgba, sh_w);

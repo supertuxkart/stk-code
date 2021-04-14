@@ -28,8 +28,8 @@
 class Skybox
 {
 private:
-    /** The 6 skybox textures */
-    std::vector<irr::video::ITexture *> m_skybox_textures;
+    /** The 6 skybox images */
+    std::vector<irr::video::IImage *> m_skybox_textures;
     
     /** The skybox texture id */
     GLuint m_cube_map;
@@ -42,7 +42,7 @@ private:
     void generateSpecularCubemap ();
     
 public:
-    Skybox(const std::vector<irr::video::ITexture *> &skybox_textures);
+    Skybox(const std::vector<irr::video::IImage *> &skybox_textures);
     ~Skybox();
     
     void render(const irr::scene::ICameraSceneNode *camera) const;

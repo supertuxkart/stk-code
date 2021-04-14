@@ -40,6 +40,7 @@
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/render_target.hpp"
+#include "graphics/shader_based_renderer.hpp"
 #include "graphics/shader_files_manager.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/sp/sp_base.hpp"
@@ -94,6 +95,11 @@
 #include <stdexcept>
 #include <sstream>
 #include <wchar.h>
+
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#include <ge_texture.hpp>
+#endif
 
 using namespace irr;
 
@@ -412,19 +418,12 @@ void Track::cleanup()
 
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
     {
-        m_sky_textures[i]->drop();
-        if(m_sky_textures[i]->getReferenceCount()==1)
-            irr_driver->removeTexture(m_sky_textures[i]);
+        video::ITexture* tex = (video::ITexture*)m_sky_textures[i];
+        tex->drop();
+        if (tex->getReferenceCount() == 1)
+            irr_driver->removeTexture(tex);
     }
     m_sky_textures.clear();
-
-    for (unsigned int i = 0; i<m_spherical_harmonics_textures.size(); i++)
-    {
-        m_spherical_harmonics_textures[i]->drop();
-        if (m_spherical_harmonics_textures[i]->getReferenceCount() == 1)
-            irr_driver->removeTexture(m_spherical_harmonics_textures[i]);
-    }
-    m_spherical_harmonics_textures.clear();
 
     if(m_cache_track)
         material_manager->makeMaterialsPermanent();
@@ -2094,10 +2093,23 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 #ifndef SERVER_ONLY
     if(m_sky_type==SKY_BOX && m_sky_textures.size() == 6)
     {
-        //if (m_spherical_harmonics_textures.size() > 0)
-            m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_spherical_harmonics_textures));
-        //else
-        //    m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_sky_textures));
+        if (CVS->isGLSL())
+        {
+            std::vector<video::IImage*> sky;
+            for (void* t : m_sky_textures)
+                sky.push_back((video::IImage*)t);
+            std::vector<video::IImage*> sh;
+            for (void* t : m_spherical_harmonics_textures)
+                sh.push_back((video::IImage*)t);
+            SP::getRenderer()->addSkyBox(sky, sh);
+        }
+        else
+        {
+            std::vector<video::ITexture*> textures;
+            for (void* t : m_sky_textures)
+                textures.push_back((video::ITexture*)t);
+            m_all_nodes.push_back(irr_driver->addSkyBox(textures, {}));
+        }
     }
     else if(m_sky_type==SKY_COLOR)
     {
@@ -2253,15 +2265,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
     {
-        for (video::ITexture* t : m_sky_textures)
-        {
-            t->drop();
-        }
         m_sky_textures.clear();
-        for (video::ITexture* t : m_spherical_harmonics_textures)
-        {
-            t->drop();
-        }
         m_spherical_harmonics_textures.clear();
     }
 #endif   // !SERVER_ONLY
@@ -2430,27 +2434,28 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         std::string s;
         xml_node.get("texture", &s);
         std::vector<std::string> v = StringUtils::split(s, ' ');
-        for(unsigned int i=0; i<v.size(); i++)
+        for (unsigned int i = 0; i<v.size(); i++)
         {
-            video::ITexture* t = NULL;
+            void* obj = NULL;
 #ifndef SERVER_ONLY
             if (CVS->isGLSL())
             {
-                t = STKTexManager::getInstance()->getTexture(v[i],
-                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
+                video::IImage* img = getSkyTexture(v[i]);
+                obj = img;
             }
             else
 #endif   // !SERVER_ONLY
             {
-                t = irr_driver->getTexture(v[i]);
-            }
-            if (t)
-            {
-#ifndef SERVER_ONLY
-                if (!CVS->isGLSL())
-#endif   // !SERVER_ONLY
+                video::ITexture* t = irr_driver->getTexture(v[i]);
+                if (t)
+                {
                     t->grab();
-                m_sky_textures.push_back(t);
+                    obj = t;
+                }
+            }
+            if (obj)
+            {
+                m_sky_textures.push_back(obj);
             }
             else
             {
@@ -2458,6 +2463,7 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
                            v[i].c_str());
             }
         }   // for i<v.size()
+
         if(m_sky_textures.size()!=6)
         {
             Log::error("track",
@@ -2474,27 +2480,14 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         std::string sh_textures;
         xml_node.get("sh-texture", &sh_textures);
         v = StringUtils::split(sh_textures, ' ');
+
+#ifndef SERVER_ONLY
         for (unsigned int i = 0; i<v.size(); i++)
         {
-            video::ITexture* t = NULL;
-#ifndef SERVER_ONLY
-            if (CVS->isGLSL())
+            video::IImage* img = getSkyTexture(v[i]);
+            if (img)
             {
-                t = STKTexManager::getInstance()->getTexture(v[i],
-                    (TexConfig*)NULL/*tex_config*/, true/*no_upload*/);
-            }
-            else
-#endif   // !SERVER_ONLY
-            {
-                t = irr_driver->getTexture(v[i]);
-            }
-            if (t)
-            {
-#ifndef SERVER_ONLY
-                if (!CVS->isGLSL())
-#endif   // !SERVER_ONLY
-                    t->grab();
-                m_spherical_harmonics_textures.push_back(t);
+                m_spherical_harmonics_textures.push_back(img);
             }
             else
             {
@@ -2502,6 +2495,8 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
                     v[i].c_str());
             }
         }   // for i<v.size()
+#endif   // !SERVER_ONLY
+
     }
     else if (xml_node.getName() == "sky-color")
     {
@@ -2925,3 +2920,21 @@ void Track::cleanChildTrack()
     delete child_track;
     m_current_track[PT_CHILD] = NULL;
 }   // cleanChildTrack
+
+//-----------------------------------------------------------------------------
+video::IImage* Track::getSkyTexture(std::string path) const
+{
+#ifdef SERVER_ONLY
+    return NULL;
+#else
+    if (path.find('/') == std::string::npos)
+    {
+        io::path relative_path = file_manager->searchTexture(path).c_str();
+        if (relative_path.empty())
+            return NULL;
+        path = file_manager->getFileSystem()->getAbsolutePath(relative_path)
+            .c_str();
+    }
+    return GE::getResizedImage(path);
+#endif
+}   // getSkyTexture

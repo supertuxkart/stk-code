@@ -24,6 +24,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/graphics_restrictions.hpp"
 #include "guiengine/engine.hpp"
+#include <ge_main.hpp>
 
 bool CentralVideoSettings::m_supports_sp = true;
 
@@ -94,6 +95,9 @@ void CentralVideoSettings::init()
         std::string card((char*)(glGetString(GL_RENDERER)));
         std::string vendor((char*)(glGetString(GL_VENDOR)));
         GraphicsRestrictions::init(driver, card, vendor);
+        GE::getGEConfig()->m_disable_npot_texture =
+            GraphicsRestrictions::isDisabled(
+            GraphicsRestrictions::GR_NPOT_TEXTURES);
 
         if (GraphicsRestrictions::isDisabled(GraphicsRestrictions::GR_FORCE_LEGACY_DEVICE))
         {
