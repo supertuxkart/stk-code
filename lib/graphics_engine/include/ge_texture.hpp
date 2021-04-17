@@ -8,7 +8,8 @@
 
 namespace GE
 {
-irr::video::ITexture* createFontTexture(const std::string& name);
+irr::video::ITexture* createFontTexture(const std::string& name,
+                                        unsigned size, bool single_channel);
 irr::video::ITexture* createTexture(irr::video::IImage* img,
                                     const std::string& name);
 irr::video::IImage* getResizedImage(const std::string& path,

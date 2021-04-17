@@ -26,7 +26,6 @@
 #include "graphics/2dutils.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/skin.hpp"
@@ -35,6 +34,9 @@
 
 #include "GlyphLayout.h"
 #include <array>
+#ifndef SERVER_ONLY
+#include <ge_texture.hpp>
+#endif
 
 #include "../lib/irrlicht/source/Irrlicht/CGUISpriteBank.h"
 
@@ -70,7 +72,7 @@ FontWithFace::~FontWithFace()
     for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
     {
         STKTexManager::getInstance()->removeTexture(
-            static_cast<STKTexture*>(m_spritebank->getTexture(i)));
+            m_spritebank->getTexture(i));
     }
     m_spritebank->drop();
 
@@ -124,7 +126,7 @@ void FontWithFace::reset()
     for (unsigned int i = 0; i < m_spritebank->getTextureCount(); i++)
     {
         STKTexManager::getInstance()->removeTexture(
-            static_cast<STKTexture*>(m_spritebank->getTexture(i)));
+            m_spritebank->getTexture(i));
     }
     m_spritebank->clear();
     m_face_ttf->reset();
@@ -159,25 +161,15 @@ void FontWithFace::createNewGlyphPage()
 #ifndef SERVER_ONLY
     if (GUIEngine::isNoGraphics())
         return;
-
-    uint8_t* data = new uint8_t[getGlyphPageSize() * getGlyphPageSize() *
-    (CVS->isARBTextureSwizzleUsable() && !useColorGlyphPage() ? 1 : 4)]();
-#else
-    uint8_t* data = NULL;
-#endif
     m_current_height = 0;
     m_used_width = 0;
     m_used_height = 0;
-    STKTexture* stkt = new STKTexture(data, typeid(*this).name() +
+    video::ITexture* font_texture = GE::createFontTexture(typeid(*this).name() +
         StringUtils::toString(m_spritebank->getTextureCount()),
-        getGlyphPageSize(),
-#ifndef SERVER_ONLY
-        CVS->isARBTextureSwizzleUsable() && !useColorGlyphPage()
-#else
-        false
+        getGlyphPageSize(), !useColorGlyphPage());
+    m_spritebank->addTexture(STKTexManager::getInstance()->addTexture(
+        font_texture));
 #endif
-        );
-    m_spritebank->addTexture(STKTexManager::getInstance()->addTexture(stkt));
 }   // createNewGlyphPage
 
 // ----------------------------------------------------------------------------
@@ -406,6 +398,8 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
         core::dimension2d<u32> size = tex->getSize();
         video::ECOLOR_FORMAT col_format = tex->getColorFormat();
         void* data = tex->lock();
+        if (!data)
+            continue;
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(col_format, size, data,
             true/*ownForeignMemory*/);

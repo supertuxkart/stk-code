@@ -1,6 +1,9 @@
 #include "ge_gl_texture.hpp"
+#include "ge_gl_utils.hpp"
 #include "ge_main.hpp"
 #include "ge_texture.hpp"
+
+#include <vector>
 
 namespace GE
 {
@@ -27,6 +30,39 @@ GEGLTexture::GEGLTexture(video::IImage* img, const std::string& name)
     upload(data);
     img->unlock();
     img->drop();
+}   // GEGLTexture
+
+// ----------------------------------------------------------------------------
+GEGLTexture::GEGLTexture(const std::string& name, unsigned int size,
+                         bool single_channel)
+           : video::ITexture(name.c_str()), m_image_mani(nullptr),
+             m_single_channel(false), m_texture_name(0), m_texture_size(0),
+             m_driver_type(GE::getDriver()->getDriverType()),
+             m_disable_reload(true)
+{
+    glGenTextures(1, &m_texture_name);
+    m_orig_size.Width = size;
+    m_orig_size.Height = size;
+    m_size = m_orig_size;
+
+    bool texture_swizzle = false;
+    if (m_driver_type == video::EDT_OGLES2)
+    {
+        int gl_major_version = 0;
+        glGetIntegerv(GL_MAJOR_VERSION, &gl_major_version);
+        if (gl_major_version >=3)
+            texture_swizzle = true;
+        else
+            texture_swizzle = false;
+    }
+    else
+        texture_swizzle = GE::hasGLExtension("GL_ARB_texture_swizzle");
+
+    if (single_channel && texture_swizzle)
+        m_single_channel = true;
+    std::vector<uint8_t> data;
+    data.resize(size * size * (single_channel ? 1 : 4), 0);
+    upload(data.data());
 }   // GEGLTexture
 
 // ----------------------------------------------------------------------------
@@ -97,6 +133,8 @@ void* GEGLTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
     if (m_driver_type == video::EDT_OGLES2 || !glGetTexImage)
     {
         video::IImage* img = getResizedImage(NamedPath.getPtr());
+        if (!img)
+            return NULL;
         img->setDeleteMemory(false);
         void* data = img->lock();
         img->drop();

@@ -74,4 +74,18 @@ irr::video::ITexture* createTexture(video::IImage* img,
     }
 }   // createTexture
 
+// ----------------------------------------------------------------------------
+irr::video::ITexture* createFontTexture(const std::string& name,
+                                        unsigned size, bool single_channel)
+{
+    switch (GE::getDriver()->getDriverType())
+    {
+    case video::EDT_OPENGL:
+    case video::EDT_OGLES2:
+        return new GEGLTexture(name, size, single_channel);
+    default:
+        return NULL;
+    }
+}   // createFontTexture
+
 }

@@ -32,6 +32,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <ge_gl_utils.hpp>
 
 #ifdef DEBUG
 #if !defined(__APPLE__) && !defined(ANDROID)
@@ -157,7 +158,7 @@ void initGL()
         glDebugMessageCallback((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 
-    if (SP::sp_apitrace && hasGLExtension("GL_KHR_debug"))
+    if (SP::sp_apitrace && GE::hasGLExtension("GL_KHR_debug"))
     {
         if (glDebugMessageControl)
             glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, NULL, GL_TRUE);
@@ -257,43 +258,6 @@ void draw3DLine(const core::vector3df& start,
 
     glGetError();
 }
-
-bool hasGLExtension(const char* extension) 
-{
-#if !defined(USE_GLES2)
-    if (glGetStringi != NULL)
-    {
-        GLint numExtensions = 0;
-        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
-        for (GLint i = 0; i < numExtensions; i++)
-        {
-            const char* foundExtension =
-                (const char*) glGetStringi(GL_EXTENSIONS, i);
-            if (foundExtension && strcmp(foundExtension, extension) == 0)
-            {
-                return true;
-            }
-        }
-    }
-    else
-#endif
-    {
-        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
-        static std::vector<std::string> all_extensions;
-        if (all_extensions.empty())
-        {
-            all_extensions = StringUtils::split(std::string(extensions), ' ');
-        }
-        for (unsigned i = 0; i < all_extensions.size(); i++)
-        {
-            if (all_extensions[i] == extension)
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}   // hasGLExtension
 
 // ----------------------------------------------------------------------------
 /** Returns a space-separated list of all GL extensions. Used for hardware

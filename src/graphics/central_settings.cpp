@@ -25,7 +25,9 @@
 #include "graphics/graphics_restrictions.hpp"
 #include "guiengine/engine.hpp"
 #include <ge_main.hpp>
+#include <ge_gl_utils.hpp>
 
+using namespace GE;
 bool CentralVideoSettings::m_supports_sp = true;
 
 CentralVideoSettings *CVS = new CentralVideoSettings();

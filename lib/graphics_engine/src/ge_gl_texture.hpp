@@ -41,6 +41,9 @@ public:
     // ------------------------------------------------------------------------
     GEGLTexture(video::IImage* img, const std::string& name);
     // ------------------------------------------------------------------------
+    GEGLTexture(const std::string& name, unsigned int size,
+                bool single_channel);
+    // ------------------------------------------------------------------------
     virtual ~GEGLTexture();
     // ------------------------------------------------------------------------
     virtual void* lock(video::E_TEXTURE_LOCK_MODE mode =
