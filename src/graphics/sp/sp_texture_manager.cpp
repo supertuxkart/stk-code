@@ -36,6 +36,8 @@ SPTextureManager::SPTextureManager()
                   ((unsigned)std::thread::hardware_concurrency()),
                   m_gl_cmd_function_count(0)
 {
+    if (!CVS->isGLSL())
+        return;
     if (m_max_threaded_load_obj.load() == 0)
     {
         m_max_threaded_load_obj.store(2);

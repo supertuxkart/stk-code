@@ -37,6 +37,7 @@
 #include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/sp/sp_uniform_assigner.hpp"
+#include "graphics/stk_tex_manager.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen_keyboard.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -1002,6 +1003,8 @@ bool handleContextMenuAction(s32 cmd_id)
                     sptm->dumpAllTextures();
                     return false;
                 }
+                if (t.empty())
+                    STKTexManager::getInstance()->reloadAllTextures();
                 lw->setText(sptm->reloadTexture(t), true);
 #endif
                 // Don't close the dialog after each run
