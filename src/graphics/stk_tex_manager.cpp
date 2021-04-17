@@ -19,9 +19,7 @@
 #include "config/hardware_stats.hpp"
 #include "config/user_config.hpp"
 #include "graphics/central_settings.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/server_dummy_texture.hpp"
-#include "graphics/stk_texture.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -129,8 +127,9 @@ video::ITexture* STKTexManager::addTexture(video::ITexture* texture)
 }   // addTexture
 
 // ----------------------------------------------------------------------------
-void STKTexManager::removeTexture(video::ITexture* texture, bool remove_all)
+bool STKTexManager::removeTexture(video::ITexture* texture, bool remove_all)
 {
+    bool ret = false;
 #ifdef DEBUG
     std::vector<std::string> undeleted_texture;
 #endif
@@ -150,6 +149,7 @@ void STKTexManager::removeTexture(video::ITexture* texture, bool remove_all)
 #endif
             p->second->drop();
             p = m_all_textures.erase(p);
+            ret = true;
         }
         else
         {
@@ -157,12 +157,15 @@ void STKTexManager::removeTexture(video::ITexture* texture, bool remove_all)
         }
     }
 #ifdef DEBUG
-    if (!remove_all) return;
+    if (!remove_all) return ret;
     for (const std::string& s : undeleted_texture)
     {
         Log::error("STKTexManager", "%s undeleted!", s.c_str());
     }
 #endif
+    if (remove_all)
+        return true;
+    return ret;
 }   // removeTexture
 
 // ----------------------------------------------------------------------------

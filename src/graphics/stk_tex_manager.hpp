@@ -80,7 +80,7 @@ public:
     // ------------------------------------------------------------------------
     bool hasTexture(const std::string& path);
     // ------------------------------------------------------------------------
-    void removeTexture(irr::video::ITexture* texture, bool remove_all = false);
+    bool removeTexture(irr::video::ITexture* texture, bool remove_all = false);
     // ------------------------------------------------------------------------
     int dumpTextureUsage();
     // ------------------------------------------------------------------------

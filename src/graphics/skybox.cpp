@@ -20,7 +20,6 @@
 #include "graphics/skybox.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/texture_shader.hpp"
 
 #include <algorithm>

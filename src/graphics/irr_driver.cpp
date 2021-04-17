@@ -52,7 +52,6 @@
 #include "graphics/sp/sp_texture_manager.hpp"
 #include "graphics/stk_text_billboard.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/sun.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/message_queue.hpp"
@@ -1535,12 +1534,8 @@ void IrrDriver::removeMeshFromCache(scene::IMesh *mesh)
  */
 void IrrDriver::removeTexture(video::ITexture *t)
 {
-    STKTexture* stkt = dynamic_cast<STKTexture*>(t);
-    if (stkt)
-    {
-        STKTexManager::getInstance()->removeTexture(stkt);
+    if (STKTexManager::getInstance()->removeTexture(t))
         return;
-    }
     m_video_driver->removeTexture(t);
 }   // removeTexture
 
