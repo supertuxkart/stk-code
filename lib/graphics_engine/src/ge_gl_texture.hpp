@@ -73,7 +73,9 @@ public:
     virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------
     virtual void reload();
-
+    // ------------------------------------------------------------------------
+    virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
+                               u32 w, u32 h, u32 x, u32 y);
 };   // GEGLTexture
 
 }

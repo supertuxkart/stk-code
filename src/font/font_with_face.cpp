@@ -246,27 +246,10 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
     if (bits->buffer != NULL && !GUIEngine::isNoGraphics())
     {
         video::ITexture* tex = m_spritebank->getTexture(cur_tex);
-        glBindTexture(GL_TEXTURE_2D, tex->getTextureHandler());
         if (bits->pixel_mode == FT_PIXEL_MODE_GRAY)
         {
-            if (CVS->isARBTextureSwizzleUsable() && !useColorGlyphPage())
-            {
-                glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                    bits->width, bits->rows, GL_RED, GL_UNSIGNED_BYTE,
-                    bits->buffer);
-            }
-            else
-            {
-                const unsigned int size = bits->width * bits->rows;
-                uint8_t* image_data = new uint8_t[size * 4];
-                memset(image_data, 255, size * 4);
-                for (unsigned int i = 0; i < size; i++)
-                    image_data[4 * i + 3] = bits->buffer[i];
-                glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                    bits->width, bits->rows, GL_RGBA, GL_UNSIGNED_BYTE,
-                    image_data);
-                delete[] image_data;
-            }
+            tex->updateTexture(bits->buffer, video::ECF_R8, bits->width,
+                bits->rows, m_used_width, m_used_height);
         }
         else if (bits->pixel_mode == FT_PIXEL_MODE_BGRA)
         {
@@ -315,9 +298,9 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
                 scaled_data[i * 4] = scaled_data[i * 4 + 2];
                 scaled_data[i * 4 + 2] = tmp_val;
             }
-            glTexSubImage2D(GL_TEXTURE_2D, 0, m_used_width, m_used_height,
-                cur_glyph_width, cur_glyph_height, GL_RGBA, GL_UNSIGNED_BYTE,
-                scaled_data);
+            tex->updateTexture(scaled_data, video::ECF_A8R8G8B8,
+                cur_glyph_width, cur_glyph_height, m_used_width,
+                m_used_height);
             unscaled->drop();
             scaled->drop();
         }
@@ -325,9 +308,6 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
         {
             assert(false && "Invalid pixel mode");
         }
-        if (tex->hasMipMaps())
-            glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
     }
 
     // Store the rectangle of current glyph

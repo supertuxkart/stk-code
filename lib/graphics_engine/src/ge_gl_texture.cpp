@@ -166,4 +166,41 @@ void GEGLTexture::formatConversion(uint8_t* data, unsigned int* format,
     }
 }   // formatConversion
 
+//-----------------------------------------------------------------------------
+void GEGLTexture::updateTexture(void* data, video::ECOLOR_FORMAT format, u32 w,
+                                u32 h, u32 x, u32 y)
+{
+    glBindTexture(GL_TEXTURE_2D, m_texture_name);
+
+    if (m_single_channel)
+    {
+        if (format == video::ECF_R8)
+        {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, GL_RED,
+                GL_UNSIGNED_BYTE, data);
+        }
+    }
+    else
+    {
+        if (format == video::ECF_R8)
+        {
+            const unsigned int size = w * h;
+            std::vector<uint8_t> image_data(size * 4, 255);
+            uint8_t* orig_data = (uint8_t*)data;
+            for (unsigned int i = 0; i < size; i++)
+                image_data[4 * i + 3] = orig_data[i];
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA,
+                GL_UNSIGNED_BYTE, image_data.data());
+        }
+        else if (format == video::ECF_A8R8G8B8)
+        {
+            glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA,
+                GL_UNSIGNED_BYTE, data);
+        }
+    }
+    if (hasMipMaps())
+        glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
+}   // updateTexture
+
 }
