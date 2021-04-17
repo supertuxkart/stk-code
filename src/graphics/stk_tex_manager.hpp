@@ -26,6 +26,7 @@
 #include "ITexture.h"
 
 #include <cassert>
+#include <functional>
 #include <string>
 #include <unordered_map>
 
@@ -74,7 +75,8 @@ public:
     // ------------------------------------------------------------------------
     ~STKTexManager();
     // ------------------------------------------------------------------------
-    irr::video::ITexture* getTexture(const std::string& path);
+    irr::video::ITexture* getTexture(const std::string& path,
+                std::function<void(irr::video::IImage*)> image_mani = nullptr);
     // ------------------------------------------------------------------------
     irr::video::ITexture* addTexture(irr::video::ITexture* texture);
     // ------------------------------------------------------------------------

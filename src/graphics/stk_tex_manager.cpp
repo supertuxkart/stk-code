@@ -62,7 +62,8 @@ video::ITexture* STKTexManager::findTextureInFileSystem(const std::string& filen
 }   // findTextureInFileSystem
 
 // ----------------------------------------------------------------------------
-video::ITexture* STKTexManager::getTexture(const std::string& path)
+video::ITexture* STKTexManager::getTexture(const std::string& path,
+                                std::function<void(video::IImage*)> image_mani)
 {
     if (path.empty())
     {
@@ -97,7 +98,8 @@ video::ITexture* STKTexManager::getTexture(const std::string& path)
     else
     {
         new_texture =
-            GE::createTexture(full_path.empty() ? path : full_path);
+            GE::createTexture(full_path.empty() ? path : full_path,
+            image_mani);
     }
     if (new_texture->getTextureHandler() == 0)
     {

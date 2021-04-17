@@ -25,13 +25,14 @@
 
 #include <array>
 #include <assert.h>
+#include <functional>
 #include <map>
 #include <string>
 #include <vector>
 
 namespace irr
 {
-    namespace video { class ITexture; class SMaterial; }
+    namespace video { class ITexture; class IImage; class SMaterial; }
     namespace scene { class ISceneNode; class IMeshBuffer; }
 }
 using namespace irr;
@@ -201,7 +202,7 @@ private:
     std::string      m_colorization_mask;
 
     void  init    ();
-    void  install (bool srgb = false, bool premul_alpha = false);
+    void  install (std::function<void(video::IImage*)> image_mani = nullptr);
     void  initCustomSFX(const XMLNode *sfx);
     void  initParticlesEffect(const XMLNode *node);
 
