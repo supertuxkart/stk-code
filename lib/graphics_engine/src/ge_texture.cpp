@@ -1,4 +1,5 @@
 #include "ge_main.hpp"
+#include "ge_gl_texture.hpp"
 #include "ge_texture.hpp"
 
 #include <IVideoDriver.h>
@@ -7,11 +8,14 @@
 namespace GE
 {
 using namespace irr;
-video::IImage* getResizedImage(const std::string& path)
+video::IImage* getResizedImage(const std::string& path,
+                               core::dimension2d<u32>* orig_size)
 {
     video::IImage* image = getDriver()->createImageFromFile(path.c_str());
     if (image == NULL)
         return NULL;
+    if (orig_size)
+        *orig_size = image->getDimension();
 
     core::dimension2du img_size = image->getDimension();
     bool has_npot = !getGEConfig()->m_disable_npot_texture &&
@@ -40,6 +44,34 @@ video::IImage* getResizedImage(const std::string& path)
     }
 
     return image;
-}
+}   // getResizedImage
+
+// ----------------------------------------------------------------------------
+irr::video::ITexture* createTexture(const std::string& path,
+    std::function<void(irr::video::IImage*)> image_mani)
+{
+    switch (GE::getDriver()->getDriverType())
+    {
+    case video::EDT_OPENGL:
+    case video::EDT_OGLES2:
+        return new GEGLTexture(path, image_mani);
+    default:
+        return NULL;
+    }
+}   // createTexture
+
+// ----------------------------------------------------------------------------
+irr::video::ITexture* createTexture(video::IImage* img,
+                                    const std::string& name)
+{
+    switch (GE::getDriver()->getDriverType())
+    {
+    case video::EDT_OPENGL:
+    case video::EDT_OGLES2:
+        return new GEGLTexture(img, name);
+    default:
+        return NULL;
+    }
+}   // createTexture
 
 }

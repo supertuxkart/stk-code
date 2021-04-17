@@ -26,11 +26,10 @@
 
 class FrameBuffer;
 class RTT;
-class STKTexture;
 
 namespace irr
 {
-    namespace video { class IVideoDriver; }
+    namespace video { class IVideoDriver; class ITexture; }
     namespace scene { class ICameraSceneNode; }
 }
 
@@ -47,7 +46,7 @@ private:
      *  have a stronger effect. */
     std::vector<float>  m_boost_time;
 
-    STKTexture* m_areamap;
+    video::ITexture* m_areamap;
 
 public:
                  PostProcessing();

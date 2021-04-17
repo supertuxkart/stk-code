@@ -201,6 +201,7 @@ public:
 
 	virtual void updateTexture(void* data, ECOLOR_FORMAT format, u32 w, u32 h, u32 x, u32 y) {}
 
+	virtual void reload() {}
 protected:
 
 	//! Helper function, helps to get the desired texture creation format from the flags.

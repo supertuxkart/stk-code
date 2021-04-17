@@ -19,7 +19,6 @@
 #include "graphics/central_settings.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stk_tex_manager.hpp"
-#include "graphics/stk_texture.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -32,6 +31,9 @@
 #include <IGUIButton.h>
 #include <IGUIStaticText.h>
 #include <algorithm>
+#ifndef SERVER_ONLY
+#include <ge_texture.hpp>
+#endif
 
 using namespace GUIEngine;
 using namespace irr::video;
@@ -365,13 +367,8 @@ const video::ITexture* IconButtonWidget::getTexture()
 // -----------------------------------------------------------------------------
 video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* texture)
 {
-#if !defined(SERVER_ONLY) && !defined(USE_GLES2)
-    STKTexture* stk_tex = static_cast<STKTexture*>(texture);
-    // Compressed texture can't be turned into greyscale
-    if (stk_tex->isMeshTexture() && CVS->isTextureCompressionEnabled())
-        return stk_tex;
-
-    std::string name = stk_tex->getName().getPtr();
+#ifndef SERVER_ONLY
+    std::string name = texture->getName().getPtr();
     name += "_disabled";
     STKTexManager* stkm = STKTexManager::getInstance();
     if (!stkm->hasTexture(name))
@@ -381,8 +378,8 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
 
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
         video::IImage* image = driver->createImageFromData
-            (video::ECF_A8R8G8B8, stk_tex->getSize(), stk_tex->lock(),
-            stk_tex->getTextureImage() == NULL/*ownForeignMemory*/);
+            (video::ECF_A8R8G8B8, texture->getSize(), texture->lock(),
+            true/*ownForeignMemory*/);
         texture->unlock();
 
         //Turn the image into grayscale
@@ -396,12 +393,12 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
                 image->setPixel(x, y, c);
             }
         }
-        return stkm->addTexture(new STKTexture(image, name));
+        return stkm->addTexture(GE::createTexture(image, name));
     }
     return stkm->getTexture(name);
 #else
     return texture;
-#endif   // !SERVER_ONLY
+#endif
 }
 
 // -----------------------------------------------------------------------------

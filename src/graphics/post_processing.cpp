@@ -29,7 +29,6 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shared_gpu_objects.hpp"
-#include "graphics/stk_texture.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "graphics/texture_shader.hpp"
 #include "graphics/weather.hpp"
@@ -48,6 +47,7 @@
 #include "utils/cpp2011.hpp"
 
 #include <SViewFrustum.h>
+#include <ge_texture.hpp>
 
 using namespace video;
 using namespace scene;
@@ -749,7 +749,7 @@ PostProcessing::PostProcessing()
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
                          "AreaMap33", false);
     video::IImage* img = irr_driver->getVideoDriver()->createImageFromFile(areamap);
-    m_areamap = new STKTexture(img, "AreaMap33");
+    m_areamap = GE::createTexture(img, "AreaMap33");
     if (m_areamap->getTextureHandler() == 0)
     {
         Log::fatal("postprocessing", "Failed to load the areamap");

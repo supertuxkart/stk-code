@@ -28,6 +28,9 @@
 #include "utils/log.hpp"
 
 #include <algorithm>
+#ifndef SERVER_ONLY
+#include <ge_texture.hpp>
+#endif
 
 // ----------------------------------------------------------------------------
 STKTexManager::~STKTexManager()
@@ -96,7 +99,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path)
     else
     {
         new_texture =
-            new STKTexture(full_path.empty() ? path : full_path, NULL);
+            GE::createTexture(full_path.empty() ? path : full_path);
     }
     if (new_texture->getTextureHandler() == 0)
     {
