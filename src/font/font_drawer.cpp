@@ -165,15 +165,16 @@ void FontDrawer::draw()
 
     if (g_clip)
     {
-        glEnable(GL_SCISSOR_TEST);
         const core::dimension2d<u32>& render_target_size =
             irr_driver->getActualScreenSize();
-        glScissor(g_clip->UpperLeftCorner.X,
-            (s32)render_target_size.Height - g_clip->LowerRightCorner.Y,
-            g_clip->getWidth(), g_clip->getHeight());
+        s32 y = (s32)render_target_size.Height - g_clip->LowerRightCorner.Y;
+        core::rect<s32> r(g_clip->UpperLeftCorner.X, y,
+            g_clip->UpperLeftCorner.X + g_clip->getWidth(),
+            y + g_clip->getHeight());
+        irr_driver->getVideoDriver()->enableScissorTest(r);
     }
     else
-        glDisable(GL_SCISSOR_TEST);
+        irr_driver->getVideoDriver()->disableScissorTest();
 
     for (auto& glyph : g_glyphs)
     {
@@ -258,7 +259,7 @@ void FontDrawer::draw()
 
     if (g_clip)
     {
-        glDisable(GL_SCISSOR_TEST);
+        irr_driver->getVideoDriver()->disableScissorTest();
         g_clip.reset();
     }
 

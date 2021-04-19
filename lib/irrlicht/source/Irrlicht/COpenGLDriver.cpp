@@ -4939,6 +4939,17 @@ GLenum COpenGLDriver::getZBufferBits() const
 	return bits;
 }
 
+void COpenGLDriver::enableScissorTest(const core::rect<s32>& r)
+{
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(r.UpperLeftCorner.X, r.UpperLeftCorner.Y,
+		r.getWidth(), r.getHeight());
+}
+
+void COpenGLDriver::disableScissorTest()
+{
+	glDisable(GL_SCISSOR_TEST);
+}
 
 } // end namespace
 } // end namespace

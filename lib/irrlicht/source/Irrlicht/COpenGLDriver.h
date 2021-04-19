@@ -38,6 +38,9 @@ namespace video
 		friend class COpenGLTexture;
 	public:
 
+		virtual void enableScissorTest(const core::rect<s32>& r);
+		virtual void disableScissorTest();
+
 		#ifdef _IRR_COMPILE_WITH_WINDOWS_DEVICE_
 		COpenGLDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, CIrrDeviceWin32* device);
 		//! inits the windows specific parts of the open gl driver

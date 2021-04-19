@@ -2703,6 +2703,18 @@ namespace video
 		return Material;
 	}
 
+	void COGLES2Driver::enableScissorTest(const core::rect<s32>& r)
+	{
+		glEnable(GL_SCISSOR_TEST);
+		glScissor(r.UpperLeftCorner.X, r.UpperLeftCorner.Y,
+			r.getWidth(), r.getHeight());
+	}
+
+	void COGLES2Driver::disableScissorTest()
+	{
+		glDisable(GL_SCISSOR_TEST);
+	}
+
 	COGLES2CallBridge* COGLES2Driver::getBridgeCalls() const
 	{
 		return BridgeCalls;
