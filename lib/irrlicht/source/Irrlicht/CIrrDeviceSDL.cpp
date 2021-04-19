@@ -318,26 +318,30 @@ bool CIrrDeviceSDL::createWindow()
 {
 	// Ignore alpha size here, this follow irr_driver.cpp:450
 	// Try 32 and, upon failure, 24 then 16 bit per pixels
-	if (CreationParams.Bits == 32)
+	if (CreationParams.DriverType == video::EDT_OPENGL ||
+		CreationParams.DriverType == video::EDT_OGLES2)
 	{
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-	}
-	else if (CreationParams.Bits == 24)
-	{
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
-	}
-	else
-	{
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 3);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 3);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 2);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+		if (CreationParams.Bits == 32)
+		{
+			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
+			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
+			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+		}
+		else if (CreationParams.Bits == 24)
+		{
+			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
+			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 5);
+			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+		}
+		else
+		{
+			SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 3);
+			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 3);
+			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 2);
+			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+		}
 	}
 
 	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
@@ -352,14 +356,30 @@ bool CIrrDeviceSDL::createWindow()
 	flags |= SDL_WINDOW_BORDERLESS | SDL_WINDOW_MAXIMIZED;
 #endif
 
-	tryCreateOpenGLContext(flags);
-	if (!Window || !Context)
+	if (CreationParams.DriverType == video::EDT_OPENGL ||
+		CreationParams.DriverType == video::EDT_OGLES2)
 	{
-		os::Printer::log( "Could not initialize display!" );
-		return false;
+		tryCreateOpenGLContext(flags);
+		if (!Window || !Context)
+		{
+			os::Printer::log( "Could not initialize display!" );
+			return false;
+		}
+		update_swap_interval(CreationParams.SwapInterval);
 	}
-
-	update_swap_interval(CreationParams.SwapInterval);
+	else
+	{
+		Window = SDL_CreateWindow("",
+			(float)CreationParams.WindowPosition.X / g_native_scale_x,
+			(float)CreationParams.WindowPosition.Y / g_native_scale_y,
+			(float)CreationParams.WindowSize.Width / g_native_scale_x,
+			(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+		if (!Window)
+		{
+			os::Printer::log( "Could not initialize display!" );
+			return false;
+		}
+	}
 	return true;
 }
 
