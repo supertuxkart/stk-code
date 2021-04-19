@@ -37,6 +37,7 @@ void CentralVideoSettings::init()
     m_gl_major_version = 2;
     m_gl_minor_version = 1;
     m_gl_mem = 0;
+    m_glsl = false;
 
     // Parse extensions
     hasBufferStorage = false;
@@ -66,6 +67,16 @@ void CentralVideoSettings::init()
     // Call to glGetIntegerv should not be made if --no-graphics is used
     if (!GUIEngine::isNoGraphics())
     {
+        if (GE::getDriver()->getDriverType() != video::EDT_OPENGL &&
+            GE::getDriver()->getDriverType() != video::EDT_OGLES2)
+        {
+            GraphicsRestrictions::init("", "", GE::getDriver()->getVendorInfo().c_str());
+            GE::getGEConfig()->m_disable_npot_texture =
+                GraphicsRestrictions::isDisabled(
+                GraphicsRestrictions::GR_NPOT_TEXTURES);
+            return;
+        }
+
         glGetIntegerv(GL_MAJOR_VERSION, &m_gl_major_version);
         glGetIntegerv(GL_MINOR_VERSION, &m_gl_minor_version);
         const char *vendor = (const char *)glGetString(GL_VENDOR);

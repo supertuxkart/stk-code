@@ -475,11 +475,7 @@ void IrrDriver::initDevice()
             UserConfigParams::m_gamepad_visualisation);
 
         // Try 32 and, upon failure, 24 then 16 bit per pixels
-#ifdef __SWITCH__
-        int bits=24;
-#else
         for (int bits=32; bits>15; bits -=8)
-#endif
         {
             if(UserConfigParams::logMisc())
                 Log::verbose("irr_driver", "Trying to create device with "
@@ -536,12 +532,8 @@ void IrrDriver::initDevice()
             */
             m_device = createDeviceEx(params);
 
-#ifdef __SWITCH__
-            assert(m_device != NULL);
-#else
             if(m_device)
                 break;
-#endif
         }   // for bits=32, 24, 16
 
 
@@ -580,6 +572,7 @@ void IrrDriver::initDevice()
     }
 #ifndef SERVER_ONLY 
 
+    GE::init(m_device->getVideoDriver());
     // Assume sp is supported
     CentralVideoSettings::m_supports_sp = true;
     CVS->init();
@@ -625,9 +618,6 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-#ifndef SERVER_ONLY
-    GE::init(m_video_driver);
-#endif
 
     B3DMeshLoader* b3dl = new B3DMeshLoader(m_scene_manager);
     m_scene_manager->addExternalMeshLoader(b3dl);
