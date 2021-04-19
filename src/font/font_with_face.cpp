@@ -291,13 +291,6 @@ void FontWithFace::insertGlyph(unsigned font_number, unsigned glyph_index)
                 }
             }
             uint8_t* scaled_data = (uint8_t*)scaled->lock();
-            for (unsigned int i = 0; i < cur_glyph_width * cur_glyph_height;
-                 i++)
-            {
-                uint8_t tmp_val = scaled_data[i * 4];
-                scaled_data[i * 4] = scaled_data[i * 4 + 2];
-                scaled_data[i * 4 + 2] = tmp_val;
-            }
             tex->updateTexture(scaled_data, video::ECF_A8R8G8B8,
                 cur_glyph_width, cur_glyph_height, m_used_width,
                 m_used_height);

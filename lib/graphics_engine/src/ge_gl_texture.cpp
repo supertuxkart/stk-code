@@ -194,8 +194,15 @@ void GEGLTexture::updateTexture(void* data, video::ECOLOR_FORMAT format, u32 w,
         }
         else if (format == video::ECF_A8R8G8B8)
         {
+             uint8_t* u8_data = (uint8_t*)data;
+             for (unsigned int i = 0; i < w * h; i++)
+             {
+                 uint8_t tmp_val = u8_data[i * 4];
+                 u8_data[i * 4] = u8_data[i * 4 + 2];
+                 u8_data[i * 4 + 2] = tmp_val;
+             }
             glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA,
-                GL_UNSIGNED_BYTE, data);
+                GL_UNSIGNED_BYTE, u8_data);
         }
     }
     if (hasMipMaps())
