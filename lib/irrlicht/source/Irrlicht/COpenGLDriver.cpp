@@ -4942,8 +4942,14 @@ GLenum COpenGLDriver::getZBufferBits() const
 void COpenGLDriver::enableScissorTest(const core::rect<s32>& r)
 {
 	glEnable(GL_SCISSOR_TEST);
-	glScissor(r.UpperLeftCorner.X, r.UpperLeftCorner.Y,
-		r.getWidth(), r.getHeight());
+	// The x​ and y​ is the window-space lower-left position of the scissor box,
+	// and width​ and height​ define the size of the rectangle.
+	s32 y = (s32)getCurrentRenderTargetSize().Height - r.LowerRightCorner.Y;
+		core::rect<s32> rect_reverse(r.UpperLeftCorner.X, y,
+		r.UpperLeftCorner.X + r.getWidth(),
+		y + r.getHeight());
+	glScissor(rect_reverse.UpperLeftCorner.X, rect_reverse.UpperLeftCorner.Y,
+		rect_reverse.getWidth(), rect_reverse.getHeight());
 }
 
 void COpenGLDriver::disableScissorTest()
