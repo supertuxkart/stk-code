@@ -611,6 +611,7 @@ void IrrDriver::initDevice()
             Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
         }
 
+        GE::init(m_device->getVideoDriver());
         CVS->init();
     }
 #endif
