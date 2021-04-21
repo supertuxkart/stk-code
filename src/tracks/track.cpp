@@ -2484,15 +2484,23 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
 #ifndef SERVER_ONLY
         for (unsigned int i = 0; i<v.size(); i++)
         {
-            video::IImage* img = getSkyTexture(v[i]);
-            if (img)
+            if (CVS->isGLSL())
             {
-                m_spherical_harmonics_textures.push_back(img);
+                video::IImage* img = getSkyTexture(v[i]);
+                if (img)
+                {
+                    m_spherical_harmonics_textures.push_back(img);
+                }
+                else
+                {
+                    Log::error("track", "Sky-box spherical harmonics texture '%s' not found - ignored.",
+                        v[i].c_str());
+                }
             }
             else
             {
-                Log::error("track", "Sky-box spherical harmonics texture '%s' not found - ignored.",
-                    v[i].c_str());
+                // We only need m_spherical_harmonics_textures.size()
+                m_spherical_harmonics_textures.push_back((void*)0x0);
             }
         }   // for i<v.size()
 #endif   // !SERVER_ONLY
