@@ -27,6 +27,10 @@ endif()
 
 option(USE_SWITCH "Build targetting switch" OFF)
 
+if(WIN32)
+option(USE_DIRECTX "Build DirectX 9 driver (requires DirectX SDK)" OFF)
+endif()
+
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 option(USE_SYSTEM_ANGELSCRIPT "Use system angelscript instead of built-in angelscript. If you enable this option, make sure to use a compatible version." OFF)
@@ -156,6 +160,10 @@ if(WIN32)
     add_definitions(-D_IRR_STATIC_LIB_)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
     include_directories(${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include)
+endif()
+
+if(WIN32 AND NOT USE_DIRECTX)
+    add_definitions(-DNO_IRR_COMPILE_WITH_DIRECT3D_9_)
 endif()
 
 if(USE_GLES2)

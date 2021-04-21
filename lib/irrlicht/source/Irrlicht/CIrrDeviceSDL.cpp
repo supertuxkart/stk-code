@@ -33,7 +33,10 @@ namespace irr
 			io::IFileSystem* io, CIrrDeviceSDL* device);
 		IVideoDriver* createOGLES2Driver(const SIrrlichtCreationParameters& params,
 			io::IFileSystem* io, CIrrDeviceSDL* device, u32 default_fb);
-
+#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
+		IVideoDriver* createDirectX9Driver(const SIrrlichtCreationParameters& params,
+			io::IFileSystem* io, HWND window);
+#endif
 	} // end namespace video
 
 } // end namespace irr
@@ -573,6 +576,16 @@ void CIrrDeviceSDL::createDriver()
 		VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this, default_fb);
 		#else
 		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
+		#endif
+		break;
+	}
+
+	case video::EDT_DIRECT3D9:
+	{
+		#ifdef _IRR_COMPILE_WITH_DIRECT3D_9_
+		VideoDriver = video::createDirectX9Driver(CreationParams, FileSystem, Info.info.win.window);
+		#else
+		os::Printer::log("No DirectX 9 support compiled in.", ELL_ERROR);
 		#endif
 		break;
 	}
