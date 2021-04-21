@@ -5,6 +5,12 @@
 
 #include <vector>
 
+// TODO remove it after vulkan is done
+namespace irr
+{
+    namespace video { extern bool useCoreContext; }
+}
+
 namespace GE
 {
 GEGLTexture::GEGLTexture(const std::string& path,
@@ -58,12 +64,15 @@ GEGLTexture::GEGLTexture(const std::string& name, unsigned int size,
             texture_swizzle = false;
     }
     else
-        texture_swizzle = GE::hasGLExtension("GL_ARB_texture_swizzle");
+    {
+        texture_swizzle = irr::video::useCoreContext &&
+            GE::hasGLExtension("GL_ARB_texture_swizzle");
+    }
 
     if (single_channel && texture_swizzle)
         m_single_channel = true;
     std::vector<uint8_t> data;
-    data.resize(size * size * (single_channel ? 1 : 4), 0);
+    data.resize(size * size * (m_single_channel ? 1 : 4), 0);
     upload(data.data());
 }   // GEGLTexture
 
