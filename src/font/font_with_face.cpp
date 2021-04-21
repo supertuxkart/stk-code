@@ -370,16 +370,16 @@ void FontWithFace::dumpGlyphPage(const std::string& name)
         video::ITexture* tex = m_spritebank->getTexture(i);
         core::dimension2d<u32> size = tex->getSize();
         video::ECOLOR_FORMAT col_format = tex->getColorFormat();
-        void* data = tex->lock();
+        void* data = tex->lock(video::ETLM_READ_ONLY);
         if (!data)
             continue;
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(col_format, size, data,
-            true/*ownForeignMemory*/);
-        tex->unlock();
+            false/*ownForeignMemory*/);
         irr_driver->getVideoDriver()->writeImageToFile(image, std::string
             (name + "_" + StringUtils::toString(i) + ".png").c_str());
         image->drop();
+        tex->unlock();
     }
 #endif
 }   // dumpGlyphPage

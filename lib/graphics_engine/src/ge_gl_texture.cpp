@@ -16,9 +16,9 @@ namespace GE
 GEGLTexture::GEGLTexture(const std::string& path,
                          std::function<void(video::IImage*)> image_mani)
            : video::ITexture(path.c_str()), m_image_mani(image_mani),
-             m_single_channel(false), m_texture_name(0), m_texture_size(0),
+             m_locked_data(NULL), m_texture_name(0), m_texture_size(0),
              m_driver_type(GE::getDriver()->getDriverType()),
-             m_disable_reload(false)
+             m_disable_reload(false), m_single_channel(false)
 {
     reload();
 }   // GEGLTexture
@@ -26,9 +26,9 @@ GEGLTexture::GEGLTexture(const std::string& path,
 // ----------------------------------------------------------------------------
 GEGLTexture::GEGLTexture(video::IImage* img, const std::string& name)
            : video::ITexture(name.c_str()), m_image_mani(nullptr),
-             m_single_channel(false), m_texture_name(0), m_texture_size(0),
+             m_locked_data(NULL), m_texture_name(0), m_texture_size(0),
              m_driver_type(GE::getDriver()->getDriverType()),
-             m_disable_reload(true)
+             m_disable_reload(true), m_single_channel(false)
 {
     if (!img)
         return;
@@ -44,9 +44,9 @@ GEGLTexture::GEGLTexture(video::IImage* img, const std::string& name)
 GEGLTexture::GEGLTexture(const std::string& name, unsigned int size,
                          bool single_channel)
            : video::ITexture(name.c_str()), m_image_mani(nullptr),
-             m_single_channel(false), m_texture_name(0), m_texture_size(0),
+             m_locked_data(NULL), m_texture_name(0), m_texture_size(0),
              m_driver_type(GE::getDriver()->getDriverType()),
-             m_disable_reload(true)
+             m_disable_reload(true), m_single_channel(false)
 {
     glGenTextures(1, &m_texture_name);
     m_orig_size.Width = size;
@@ -141,23 +141,27 @@ void GEGLTexture::upload(uint8_t* data)
 // ----------------------------------------------------------------------------
 void* GEGLTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 {
+    if (mode != video::ETLM_READ_ONLY)
+        return NULL;
+
     if (m_driver_type == video::EDT_OGLES2 || !glGetTexImage)
     {
         video::IImage* img = getResizedImage(NamedPath.getPtr());
         if (!img)
             return NULL;
         img->setDeleteMemory(false);
-        void* data = img->lock();
+        m_locked_data = (uint8_t*)img->lock();
+        img->unlock();
         img->drop();
-        return data;
+        return m_locked_data;
     }
-    uint8_t* pixels = new uint8_t[m_size.Width * m_size.Height * 4]();
+    m_locked_data = new uint8_t[m_size.Width * m_size.Height * 4]();
     GLint tmp_texture;
     glGetIntegerv(GL_TEXTURE_BINDING_2D, &tmp_texture);
     glBindTexture(GL_TEXTURE_2D, m_texture_name);
-    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, pixels);
+    glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_BYTE, m_locked_data);
     glBindTexture(GL_TEXTURE_2D, tmp_texture);
-    return pixels;
+    return m_locked_data;
 }   // lock
 
 //-----------------------------------------------------------------------------

@@ -376,12 +376,16 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
         SColor c;
         u32 g;
 
+        void* tex_data = texture->lock(video::ETLM_READ_ONLY);
+        if (!tex_data)
+            return texture;
         video::IVideoDriver* driver = irr_driver->getVideoDriver();
         video::IImage* image = driver->createImageFromData
-            (video::ECF_A8R8G8B8, texture->getSize(), texture->lock(),
-            true/*ownForeignMemory*/);
-        texture->unlock();
+            (video::ECF_A8R8G8B8, texture->getSize(), tex_data,
+            false/*ownForeignMemory*/);
 
+        // GE::createTexture image will drop the image
+        image->grab();
         //Turn the image into grayscale
         for (u32 x = 0; x < image->getDimension().Width; x++)
         {
@@ -393,7 +397,10 @@ video::ITexture* IconButtonWidget::getDeactivatedTexture(video::ITexture* textur
                 image->setPixel(x, y, c);
             }
         }
-        return stkm->addTexture(GE::createTexture(image, name));
+        video::ITexture* disabled_tex = GE::createTexture(image, name);
+        image->drop();
+        texture->unlock();
+        return stkm->addTexture(disabled_tex);
     }
     return stkm->getTexture(name);
 #else

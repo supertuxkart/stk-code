@@ -18,7 +18,7 @@ private:
 
     std::function<void(video::IImage*)> m_image_mani;
 
-    bool m_single_channel;
+    uint8_t* m_locked_data;
 
     GLuint m_texture_name;
 
@@ -27,6 +27,8 @@ private:
     const video::E_DRIVER_TYPE m_driver_type;
 
     const bool m_disable_reload;
+
+    bool m_single_channel;
 
     // ------------------------------------------------------------------------
     void upload(uint8_t* data);
@@ -49,7 +51,14 @@ public:
     virtual void* lock(video::E_TEXTURE_LOCK_MODE mode =
                        video::ETLM_READ_WRITE, u32 mipmap_level = 0);
     // ------------------------------------------------------------------------
-    virtual void unlock()                                                    {}
+    virtual void unlock()
+    {
+        if (m_locked_data)
+        {
+            delete [] m_locked_data;
+            m_locked_data = NULL;
+        }
+    }
     // ------------------------------------------------------------------------
     virtual const core::dimension2d<u32>& getOriginalSize() const
                                                         { return m_orig_size; }
