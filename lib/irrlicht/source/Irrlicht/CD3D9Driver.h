@@ -337,6 +337,9 @@ namespace video
 		const CGcontext& getCgContext();
 		#endif
 
+		virtual void enableScissorTest(const core::rect<s32>& r);
+		virtual void disableScissorTest();
+
 	private:
 
 		//! enumeration for rendering modes such as 2d and 3d for minizing the switching of renderStates.

@@ -3591,6 +3591,25 @@ core::dimension2du CD3D9Driver::getMaxTextureSize() const
 	return core::dimension2du(Caps.MaxTextureWidth, Caps.MaxTextureHeight);
 }
 
+
+void CD3D9Driver::enableScissorTest(const core::rect<s32>& r)
+{
+	pID3DDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+	RECT rect;
+	rect.left = r.UpperLeftCorner.X;
+	rect.top = r.UpperLeftCorner.Y;
+	rect.right = r.LowerRightCorner.X;
+	rect.bottom = r.LowerRightCorner.Y;
+	pID3DDevice->SetScissorRect(&rect);
+}
+
+
+void CD3D9Driver::disableScissorTest()
+{
+	pID3DDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+}
+
+
 #ifdef _IRR_COMPILE_WITH_CG_
 const CGcontext& CD3D9Driver::getCgContext()
 {
