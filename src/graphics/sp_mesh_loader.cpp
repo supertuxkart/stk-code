@@ -20,11 +20,13 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/mini_glm.hpp"
+#include "utils/string_utils.hpp"
 
 #include "../../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"
 const uint8_t VERSION_NOW = 1;
@@ -33,6 +35,9 @@ const uint8_t VERSION_NOW = 1;
 #include <cmath>
 #include <IVideoDriver.h>
 #include <IFileSystem.h>
+#ifndef SERVER_ONLY
+#include <ge_texture.hpp>
+#endif
 
 // ----------------------------------------------------------------------------
 bool SPMeshLoader::isALoadableFileExtension(const io::path& filename) const
@@ -147,8 +152,49 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
                 {
                     tex_name_1 = full_path;
                 }
+                std::function<void(irr::video::IImage*)> image_mani;
+#ifndef SERVER_ONLY
+                std::string mask_full_path;
+                Material* m = material_manager->getMaterial(tex_name_1,
+                    /*is_full_path*/false,
+                    /*make_permanent*/false,
+                    /*complain_if_not_found*/true,
+                    /*strip_path*/true, /*install*/true,
+                    /*create_if_not_found*/false);
+                if (m && !m->getAlphaMask().empty())
+                {
+                    mask_full_path =
+                        StringUtils::getPath(m->getSamplerPath(0)) +
+                        "/" + m->getAlphaMask();
+                }
+                if (!mask_full_path.empty())
+                {
+                    image_mani = [mask_full_path](video::IImage* img)->void
+                    {
+                        video::IImage* converted_mask = GE::getResizedImage(mask_full_path);
+                        if (converted_mask == NULL)
+                        {
+                            Log::warn("SPMeshLoader", "Applying mask failed for '%s'!",
+                                mask_full_path.c_str());
+                            return;
+                        }
+                        const core::dimension2du& dim = img->getDimension();
+                        for (unsigned int x = 0; x < dim.Width; x++)
+                        {
+                            for (unsigned int y = 0; y < dim.Height; y++)
+                            {
+                                video::SColor col = img->getPixel(x, y);
+                                video::SColor alpha = converted_mask->getPixel(x, y);
+                                col.setAlpha(alpha.getRed());
+                                img->setPixel(x, y, col, false);
+                            }   // for y
+                        }   // for x
+                        converted_mask->drop();
+                    };
+                }
+#endif
                 video::ITexture* tex = STKTexManager::getInstance()
-                    ->getTexture(tex_name_1);
+                    ->getTexture(tex_name_1, image_mani);
                 if (tex != NULL)
                 {
                     textures[0] = tex;
