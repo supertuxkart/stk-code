@@ -30,9 +30,6 @@ class HighScoreInfoDialog : public GUIEngine::ModalDialog
 {
 
 private:
-
-    bool  m_self_destroy;
-
     Highscores* m_hs;
 
     GUIEngine::RibbonWidget*      m_action_widget;
