@@ -388,6 +388,31 @@ void IrrDriver::initDevice()
 {
     SIrrlichtCreationParameters params;
 
+    video::E_DRIVER_TYPE driver_created = video::EDT_NULL;
+    if (std::string(UserConfigParams::m_render_driver) == "gl")
+    {
+#if defined(USE_GLES2)
+        driver_created = video::EDT_OGLES2;
+#else
+        driver_created = video::EDT_OPENGL;
+#endif
+    }
+    else if (std::string(UserConfigParams::m_render_driver) == "directx9")
+    {
+        driver_created = video::EDT_DIRECT3D9;
+    }
+    else
+    {
+        Log::warn("IrrDriver", "Unknown driver %s, revert to gl",
+            UserConfigParams::m_render_driver.c_str());
+        UserConfigParams::m_render_driver.revertToDefaults();
+#if defined(USE_GLES2)
+        driver_created = video::EDT_OGLES2;
+#else
+        driver_created = video::EDT_OPENGL;
+#endif
+    }
+
 #ifndef __SWITCH__
     // If --no-graphics option was used, the null device can still be used.
     if (!GUIEngine::isNoGraphics())
@@ -481,11 +506,7 @@ void IrrDriver::initDevice()
                 Log::verbose("irr_driver", "Trying to create device with "
                              "%i bits\n", bits);
 
-#if defined(USE_GLES2)
-            params.DriverType    = video::EDT_OGLES2;
-#else
-            params.DriverType    = video::EDT_OPENGL;
-#endif
+            params.DriverType    = driver_created;
             params.PrivateData   = NULL;
             params.Stencilbuffer = false;
             params.Bits          = bits;
@@ -543,11 +564,7 @@ void IrrDriver::initDevice()
         {
             UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
             UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
-#if defined(USE_GLES2)
-            m_device = createDevice(video::EDT_OGLES2,
-#else
-            m_device = createDevice(video::EDT_OPENGL,
-#endif
+            m_device = createDevice(driver_created,
                         core::dimension2du(UserConfigParams::m_width,
                                            UserConfigParams::m_height ),
                                     32, //bits per pixel

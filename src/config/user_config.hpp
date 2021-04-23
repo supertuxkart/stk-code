@@ -692,6 +692,10 @@ namespace UserConfigParams
         PARAM_DEFAULT(  FloatUserConfigParam(3, "font_size",
         &m_video_group, "The size of fonts. 0 is the smallest and 6 is the biggest") );
 
+    PARAM_PREFIX StringUserConfigParam         m_render_driver
+        PARAM_DEFAULT(  StringUserConfigParam("gl", "render_driver",
+        &m_video_group, "Render video driver to use, at the moment gl or directx9 is supported.") );
+
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
         PARAM_DEFAULT(GroupUserConfigParam("Recording",

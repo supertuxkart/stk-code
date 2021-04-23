@@ -684,6 +684,7 @@ void cmdLineHelp()
     "                           Takes precedence over trilinear or bilinear\n"
     "                           texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
+    "       --render-driver=n   Render driver to use (gl or directx9).\n"
     "       --apitrace          This will disable buffer storage and\n"
     "                           writing gpu query strings to opengl, which\n"
     "                           can be seen later in apitrace.\n"
@@ -836,6 +837,8 @@ int handleCmdLinePreliminary()
         stk_config->load(file_manager->getAsset(s));
         Log::info("main", "STK config will be read from %s.",s.c_str());
     }
+    if(CommandLine::has("--render-driver", &s))
+        UserConfigParams::m_render_driver = s;
     if(CommandLine::has("--trackdir", &s))
         TrackManager::addTrackSearchDir(s);
     if(CommandLine::has("--kartdir", &s))
