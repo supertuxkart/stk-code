@@ -536,11 +536,11 @@ void RaceManager::startNextRace()
     if (type == PT_MAIN)
     {
         IrrlichtDevice* device = irr_driver->getDevice();
+        device->getVideoDriver()->beginScene(true, true,
+                                            video::SColor(255,100,101,140));
         GUIEngine::clearLoadingTips();
         GUIEngine::renderLoading(true/*clearIcons*/, false/*launching*/, false/*update_tips*/);
         device->getVideoDriver()->endScene();
-        device->getVideoDriver()->beginScene(true, true,
-                                            video::SColor(255,100,101,140));
     }
 
     m_num_finished_karts   = 0;
