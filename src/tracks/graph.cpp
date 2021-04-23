@@ -121,7 +121,8 @@ void Graph::cleanupDebugMesh()
 /** Creates the actual mesh that is used by createDebugMesh() or makeMiniMap()
  */
 void Graph::createMesh(bool show_invisible, bool enable_transparency,
-                       const video::SColor *track_color, bool invert_x_z)
+                       const video::SColor *track_color, bool invert_x_z,
+                       bool flatten)
 {
 #ifndef SERVER_ONLY
     // The debug track will not be lighted or culled.
@@ -173,9 +174,9 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
         differentNodeColor(count, &this_color);
         // Transfer the 4 points of the current quad to the list of vertices
         m_all_nodes[count]->getVertices(new_v+4*i, this_color);
+        auto* vptr = new_v + 4 * i;
         if (invert_x_z)
         {
-            auto* vptr = new_v + 4 * i;
             vptr[0].Pos.X = -vptr[0].Pos.X;
             vptr[0].Pos.Z = -vptr[0].Pos.Z;
             vptr[1].Pos.X = -vptr[1].Pos.X;
@@ -184,6 +185,13 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
             vptr[2].Pos.Z = -vptr[2].Pos.Z;
             vptr[3].Pos.X = -vptr[3].Pos.X;
             vptr[3].Pos.Z = -vptr[3].Pos.Z;
+        }
+        if (flatten)
+        {
+            vptr[0].Pos.Y = 0;
+            vptr[1].Pos.Y = 0;
+            vptr[2].Pos.Y = 0;
+            vptr[3].Pos.Y = 0;
         }
 
         // Set up the indices for the triangles
@@ -206,6 +214,13 @@ void Graph::createMesh(bool show_invisible, bool enable_transparency,
         irr::u16         lap_ind[6];
         video::SColor    lap_color(128, 255, 0, 0);
         m_all_nodes[0]->getVertices(lap_v, lap_color);
+        if (flatten)
+        {
+            lap_v[0].Pos.Y = 0;
+            lap_v[1].Pos.Y = 0;
+            lap_v[2].Pos.Y = 0;
+            lap_v[3].Pos.Y = 0;
+        }
 
         // Now scale the length (distance between vertix 0 and 3
         // and between 1 and 2) to be 'length':
@@ -417,7 +432,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     {
         createMesh(/*show_invisible part of the track*/ false,
             /*enable_transparency*/ false, /*track_color*/&fill_color,
-            invert_x_z);
+            invert_x_z, true/*flatten*/);
     }
 #endif
 
@@ -436,6 +451,18 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
         m_bb_min.min(blue_flag);
     }
 
+    Vec3 bb_min = m_bb_min;
+    Vec3 bb_max = m_bb_max;
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL())
+    {
+        // Flatten the minimap for DirectX 9 driver, otherwise some vertices
+        // too far from camera will not be rendered
+        bb_min.setY(0);
+        bb_max.setY(0);
+    }
+#endif
+
     m_node = irr_driver->addMesh(m_mesh, "mini_map");
 #ifdef DEBUG
     m_node->setName("minimap-mesh");
@@ -447,10 +474,10 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     // Add the camera:
     // ---------------
     scene::ICameraSceneNode *camera = irr_driver->addCameraSceneNode();
-    Vec3 center = (m_bb_max+m_bb_min)*0.5f;
+    Vec3 center = (bb_max+bb_min)*0.5f;
 
-    float dx = m_bb_max.getX()-m_bb_min.getX();
-    float dz = m_bb_max.getZ()-m_bb_min.getZ();
+    float dx = bb_max.getX()-bb_min.getX();
+    float dz = bb_max.getZ()-bb_min.getZ();
 
     // Set the scaling correctly. Also the center point (which is used
     // as the camera position) needs to be adjusted: the track must
@@ -485,7 +512,7 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     core::matrix4 projection;
     projection.buildProjectionMatrixOrthoLH
         (range /* width */, range /* height */, -1,
-        m_bb_max.getY()-m_bb_min.getY()+1);
+        bb_max.getY()-bb_min.getY()+1);
     camera->setProjectionMatrix(projection, true);
 
     irr_driver->suppressSkyBox();
@@ -494,12 +521,12 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
     // Adjust Y position by +1 for max, -1 for min - this helps in case that
     // the maximum Y coordinate is negative (otherwise the minimap is mirrored)
     // and avoids problems for tracks which have a flat (max Y=min Y) minimap.
-    camera->setPosition(core::vector3df(center.getX(), m_bb_min.getY() + 1.0f,
+    camera->setPosition(core::vector3df(center.getX(), bb_min.getY() + 1.0f,
         center.getZ()));
     //camera->setPosition(core::vector3df(center.getX() - 5.0f,
-    //    m_bb_min.getY() - 1 - 5.0f, center.getZ() - 15.0f));
+    //    bb_min.getY() - 1 - 5.0f, center.getZ() - 15.0f));
     camera->setUpVector(core::vector3df(0, 0, 1));
-    camera->setTarget(core::vector3df(center.getX(), m_bb_min.getY() - 1,
+    camera->setTarget(core::vector3df(center.getX(), bb_min.getY() - 1,
         center.getZ()));
     //camera->setAspectRatio(1.0f);
     camera->updateAbsolutePosition();

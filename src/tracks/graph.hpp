@@ -94,7 +94,7 @@ private:
     void createMesh(bool show_invisible=true,
                     bool enable_transparency=false,
                     const video::SColor *track_color=NULL,
-                    bool invert_x_z = false);
+                    bool invert_x_z = false, bool flatten = false);
     // ------------------------------------------------------------------------
     void createMeshSP(bool show_invisible=true,
                       bool enable_transparency=false,
