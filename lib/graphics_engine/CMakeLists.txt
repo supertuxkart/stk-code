@@ -8,5 +8,6 @@ add_library(graphics_engine STATIC
     src/vulkan.c
     src/ge_main.cpp
     src/ge_texture.cpp
+    src/ge_dx9_texture.cpp
     src/ge_gl_texture.cpp
 )
