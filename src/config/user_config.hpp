@@ -45,6 +45,8 @@
 #include <sstream>
 
 #include <irrString.h>
+#include <IrrCompileConfig.h>
+
 using irr::core::stringc;
 using irr::core::stringw;
 
@@ -692,9 +694,15 @@ namespace UserConfigParams
         PARAM_DEFAULT(  FloatUserConfigParam(3, "font_size",
         &m_video_group, "The size of fonts. 0 is the smallest and 6 is the biggest") );
 
+#if defined(_IRR_COMPILE_WITH_DIRECT3D_9_) && defined(_M_ARM64)
+    PARAM_PREFIX StringUserConfigParam         m_render_driver
+        PARAM_DEFAULT(  StringUserConfigParam("directx9", "render_driver",
+        &m_video_group, "Render video driver to use, at the moment gl or directx9 is supported.") );
+#else
     PARAM_PREFIX StringUserConfigParam         m_render_driver
         PARAM_DEFAULT(  StringUserConfigParam("gl", "render_driver",
         &m_video_group, "Render video driver to use, at the moment gl or directx9 is supported.") );
+#endif
 
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
