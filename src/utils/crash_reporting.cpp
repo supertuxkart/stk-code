@@ -239,10 +239,15 @@
                 stackframe.AddrPC.Mode      = AddrModeFlat;
                 stackframe.AddrStack.Mode   = AddrModeFlat;
                 stackframe.AddrFrame.Mode   = AddrModeFlat;
-#ifdef _WIN64
+#if defined(_M_ARM64)
+                stackframe.AddrPC.Offset    = pContext->Pc;
+                stackframe.AddrStack.Offset = pContext->Sp;
+                stackframe.AddrFrame.Offset = pContext->Fp;
+                const DWORD machine_type    = IMAGE_FILE_MACHINE_ARM64;
+#elif defined(_WIN64)
                 stackframe.AddrPC.Offset    = pContext->Rip;
                 stackframe.AddrStack.Offset = pContext->Rsp;
-                stackframe.AddrFrame.Offset = pContext->Rsp;
+                stackframe.AddrFrame.Offset = pContext->Rbp;
                 const DWORD machine_type    = IMAGE_FILE_MACHINE_AMD64;
 #else
                 stackframe.AddrPC.Offset    = pContext->Eip;
