@@ -1,0 +1,244 @@
+name: windows
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request: {}
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        arch: [i686, x86_64, aarch64]
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: false
+      - name: Set up environment for windows-latest
+        shell : bash
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          echo "wget=C:\msys64\usr\bin\wget.exe" >> $GITHUB_ENV
+          echo "unzip=C:\msys64\usr\bin\unzip.exe" >> $GITHUB_ENV
+          if [ ${{ matrix.arch }} = "i686" ]; then
+            echo "cmake_arch=Win32" >> $GITHUB_ENV
+          elif [ ${{ matrix.arch }} = "x86_64" ]; then
+            echo "cmake_arch=x64" >> $GITHUB_ENV
+          else
+            echo "cmake_arch=ARM64" >> $GITHUB_ENV
+          fi
+      - name: Set up environment for ubuntu-latest
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          echo "wget=wget" >> $GITHUB_ENV
+          echo "unzip=unzip" >> $GITHUB_ENV
+      - name: Restore timestamps
+        run: |
+          ${{ env.wget }} https://github.com/MestreLion/git-tools/archive/refs/heads/master.zip
+          ${{ env.unzip }} master.zip
+          python git-tools-master/git-restore-mtime
+      - name: Cache build
+        uses: actions/cache@v2
+        with:
+          path: |
+            build
+          key: ${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-windows-build
+      - name: Download dependencies
+        run: |
+          ${{ env.wget }} https://github.com/supertuxkart/dependencies/releases/download/latest/dependencies-win-${{ matrix.arch }}.zip
+          ${{ env.unzip }} dependencies-win-${{ matrix.arch }}.zip
+      - name: Install MinGW for i686 or x86_64
+        if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'i686' || matrix.arch == 'x86_64' ) }}
+        run: |
+          cd /
+          sudo mkdir -p /data/mxe/usr
+          cd /data/mxe/usr
+          # It's compiled from https://github.com/mxe/mxe
+          sudo wget https://github.com/supertuxkart/dependencies/releases/download/latest/mxe_static_mingw.zip
+          sudo unzip mxe_static_mingw.zip
+          sudo rm mxe_static_mingw.zip
+      - name: Install MinGW for aarch64
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'aarch64' }}
+        run: |
+          cd /
+          sudo wget https://github.com/mstorsjo/llvm-mingw/releases/download/20210423/llvm-mingw-20210423-msvcrt-ubuntu-18.04-x86_64.tar.xz
+          sudo tar xf llvm-mingw-20210423-msvcrt-ubuntu-18.04-x86_64.tar.xz
+          sudo mv llvm-mingw-20210423-msvcrt-ubuntu-18.04-x86_64 llvm-mingw
+      - name: Set up MinGW Toolchain for i686
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686' }}
+        run: |
+          echo "SET(CMAKE_SYSTEM_NAME Windows)" > toolchain.cmake
+          echo "SET(CMAKE_C_COMPILER /data/mxe/usr/bin/i686-w64-mingw32.static.posix.dw2-gcc)" >> toolchain.cmake
+          echo "SET(CMAKE_CXX_COMPILER /data/mxe/usr/bin/i686-w64-mingw32.static.posix.dw2-g++)" >> toolchain.cmake
+          echo "SET(CMAKE_RC_COMPILER /data/mxe/usr/bin/i686-w64-mingw32.static.posix.dw2-windres)" >> toolchain.cmake
+          echo "SET(CMAKE_FIND_ROOT_PATH \${PROJECT_SOURCE_DIR}/dependencies-win-i686 /data/mxe/usr/i686-w64-mingw32.static.posix.dw2/ /data/mxe/usr/lib/gcc/i686-w64-mingw32.static.posix.dw2/5.5.0/)" >> toolchain.cmake
+          echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> toolchain.cmake
+          echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ALWAYS)" >> toolchain.cmake
+          echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
+      - name: Set up MinGW Toolchain for x86_64
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'x86_64' }}
+        run: |
+          echo "SET(CMAKE_SYSTEM_NAME Windows)" > toolchain.cmake
+          echo "SET(CMAKE_C_COMPILER /data/mxe/usr/bin/x86_64-w64-mingw32.static.posix.seh-gcc)" >> toolchain.cmake
+          echo "SET(CMAKE_CXX_COMPILER /data/mxe/usr/bin/x86_64-w64-mingw32.static.posix.seh-g++)" >> toolchain.cmake
+          echo "SET(CMAKE_RC_COMPILER /data/mxe/usr/bin/x86_64-w64-mingw32.static.posix.seh-windres)" >> toolchain.cmake
+          echo "SET(CMAKE_FIND_ROOT_PATH \${PROJECT_SOURCE_DIR}/dependencies-win-x86_64 /data/mxe/usr/x86_64-w64-mingw32.static.posix.seh/ /data/mxe/usr/lib/gcc/x86_64-w64-mingw32.static.posix.seh/5.5.0/)" >> toolchain.cmake
+          echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> toolchain.cmake
+          echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ALWAYS)" >> toolchain.cmake
+          echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
+      # Manually specify CMAKE_SYSTEM_PROCESSOR, it can only be set together with -DDCMAKE_SYSTEM_NAME
+      - name: Configure bulid for MSVC
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          mkdir -Force build
+          cd build
+          cmake .. -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -A ${{ env.cmake_arch }} -DCHECK_ASSETS=OFF
+      - name: Configure bulid for MinGW (i686 or x86_64)
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch != 'aarch64' }}
+        run: |
+          mkdir -p build
+          cd build
+          # Always run with -DUSE_DIRECTX=ON breaks the cache
+          if [[ ! -f CMakeCache.txt ]]; then
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
+          else
+            cmake ..
+          fi
+      - name: Configure bulid for MinGW (aarch64)
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'aarch64' }}
+        run: |
+          mkdir -p build
+          cd build
+          if [[ ! -f CMakeCache.txt ]]; then
+            cmake .. -DLLVM_ARCH=aarch64 -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
+          else
+            cmake ..
+          fi
+      - name: Build for MSVC
+        if: ${{ matrix.os == 'windows-latest' }}
+        working-directory: build
+        run: |
+          cmake --build . --config Debug
+      - name: Build for MinGW
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        working-directory: build
+        run: |
+          make -j4
+      - name: Upload binaries of MinGW
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.arch }}
+          path: build/bin/*
+      - name: Upload stk-code/data
+        # We only need to upload stk-code/data once
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: data
+          path: data
+      - name: Upload stk-code/tools
+        # We only need to upload stk-code/tools once
+        if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
+        uses: actions/upload-artifact@v2
+        with:
+          name: tools
+          path: tools
+
+  packaging:
+    name: Packaging STK
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - name: Configure packaging name for git master branch
+        shell : bash
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          echo "release_tag=git`date +%Y%m%d`" >> $GITHUB_ENV
+          echo "release_name=preview" >> $GITHUB_ENV
+      - name: Configure packaging name for tag
+        shell : bash
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
+          echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
+      - name: Configure packaging name for non-releasing branch
+        shell : bash
+        if: ${{ (github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/')) || github.repository_owner != 'supertuxkart' }}
+        run: |
+          echo "release_tag=" >> $GITHUB_ENV
+          echo "release_name=" >> $GITHUB_ENV
+      - name: Check for prerelease
+        shell : bash
+        if: ${{ github.ref == 'refs/heads/master' || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=true" >> $GITHUB_ENV
+      - name: Check for non-prerelease
+        shell : bash
+        if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref, 'rc') && !contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=false" >> $GITHUB_ENV
+      - name: Show packaging name
+        shell : bash
+        run : |
+          echo "${{ env.release_tag }}"
+          echo "${{ env.release_name }}"
+          echo "${{ env.release_pre }}"
+      - name: Download MinGW binaries and data
+        uses: actions/download-artifact@v2
+      - name: Generate .pdb files
+        if: ${{ env.release_tag != '' }}
+        run: |
+          C:\msys64\usr\bin\wget.exe -O cv2pdb.exe https://ci.appveyor.com/api/projects/rainers/visuald/artifacts/cv2pdb.exe?job=Environment%3A%20os%3DVisual%20Studio%202015%2C%20VS%3D14%2C%20APPVEYOR_BUILD_WORKER_IMAGE%3DVisual%20Studio%202015
+          cd i686
+          ..\cv2pdb.exe supertuxkart.exe
+          cd ..
+          cd x86_64
+          ..\cv2pdb.exe supertuxkart.exe
+      - name: Downloading stk-assets
+        if: ${{ env.release_tag != '' }}
+        run: |
+          C:\msys64\usr\bin\wget.exe https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
+          mkdir stk-assets
+          cd stk-assets
+          unzip ..\stk-assets-full.zip
+      - name: Move folders
+        shell : bash
+        if: ${{ env.release_tag != '' }}
+        run: |
+          ls
+          mkdir SuperTuxKart-${{ env.release_tag }}-win
+          mv stk-assets SuperTuxKart-${{ env.release_tag }}-win
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code
+          mv data SuperTuxKart-${{ env.release_tag }}-win/stk-code
+          mv tools/run_game.bat SuperTuxKart-${{ env.release_tag }}-win
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw64
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64
+          mv i686 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw/bin
+          mv x86_64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw64/bin
+          mv aarch64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64/bin
+          # libwinpthread-1.dll is useless because we statically link
+          rm -f SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64/bin/libwinpthread-1.dll
+      - name: Start packaging STK
+        if: ${{ env.release_tag != '' }}
+        run: |
+          C:\msys64\usr\bin\zip.exe -r SuperTuxKart-${{ env.release_tag }}-win.zip SuperTuxKart-${{ env.release_tag }}-win
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        if: ${{ env.release_tag != '' }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "SuperTuxKart-*.zip"
+          tag: ${{ env.release_name }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          allowUpdates: true
+          prerelease: ${{ env.release_pre }}
