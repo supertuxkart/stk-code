@@ -24,9 +24,9 @@ namespace video
 		"; c0-3: Transposed world matrix \n"\
 		"; c8-11: Transposed worldViewProj matrix (Projection * View * World) \n"\
 		"; c12: Light01 position \n"\
-		"; c13: x,y,z: Light01 color; .w: 1/LightRadius² \n"\
+		"; c13: x,y,z: Light01 color; .w: 1/LightRadius^2 \n"\
 		"; c14: Light02 position \n"\
-		"; c15: x,y,z: Light02 color; .w: 1/LightRadius² \n"\
+		"; c15: x,y,z: Light02 color; .w: 1/LightRadius^2 \n"\
 		"vs.1.1\n"\
 		"dcl_position  v0              ; position \n"\
 		"dcl_normal    v1              ; normal \n"\
@@ -65,13 +65,13 @@ namespace video
 		"mad oT3.xyz, r9.xyz, c95, c95 ; move light vector 2 from -1..1 into 0..1 \n"\
 		"\n"\
 		" ; calculate attenuation of light 1 \n"\
-		"dp3 r2.x, r2.xyz, r2.xyz      ; r2.x = r2.x² + r2.y² + r2.z² \n"\
+		"dp3 r2.x, r2.xyz, r2.xyz      ; r2.x = r2.x^2 + r2.y^2 + r2.z^2 \n"\
 		"mul r2.x, r2.x, c13.w         ; r2.x * attenutation \n"\
 		"rsq r2, r2.x                  ; r2.xyzw = 1/sqrt(r2.x * attenutation)\n"\
 		"mul oD0, r2, c13              ; resulting light color = lightcolor * attenuation \n"\
 		"\n"\
 		" ; calculate attenuation of light 2 \n"\
-		"dp3 r3.x, r3.xyz, r3.xyz      ; r3.x = r3.x² + r3.y² + r3.z² \n"\
+		"dp3 r3.x, r3.xyz, r3.xyz      ; r3.x = r3.x^2 + r3.y^2 + r3.z^2 \n"\
 		"mul r3.x, r3.x, c15.w         ; r2.x * attenutation \n"\
 		"rsq r3, r3.x                  ; r2.xyzw = 1/sqrt(r2.x * attenutation)\n"\
 		"mul oD1, r3, c15              ; resulting light color = lightcolor * attenuation \n"\
