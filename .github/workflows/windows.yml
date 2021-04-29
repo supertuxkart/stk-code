@@ -44,12 +44,31 @@ jobs:
           ${{ env.wget }} https://github.com/MestreLion/git-tools/archive/refs/heads/master.zip
           ${{ env.unzip }} master.zip
           python git-tools-master/git-restore-mtime
-      - name: Cache build
+      - name: List build cache restore keys
+        shell : bash
+        run: |
+          # Look for the last 9 build caches (GitHub supports max 10 including current one)
+          for number in 1 2 3 4 5 6 7 8 9
+          do
+            id=$((${{ github.run_number }} - number))
+            echo "cache_$number=windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
+          done
+      - name: Handle build cache
         uses: actions/cache@v2
         with:
           path: |
             build
-          key: ${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-windows-build
+          key: windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ env.cache_1 }}
+            ${{ env.cache_2 }}
+            ${{ env.cache_3 }}
+            ${{ env.cache_4 }}
+            ${{ env.cache_5 }}
+            ${{ env.cache_6 }}
+            ${{ env.cache_7 }}
+            ${{ env.cache_8 }}
+            ${{ env.cache_9 }}
       - name: Download dependencies
         run: |
           ${{ env.wget }} https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-win-${{ matrix.arch }}.zip
@@ -105,22 +124,13 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          # Always run with -DUSE_DIRECTX=ON breaks the cache
-          if [[ ! -f CMakeCache.txt ]]; then
-            cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
-          else
-            cmake ..
-          fi
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
       - name: Configure bulid for MinGW (aarch64)
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'aarch64' }}
         run: |
           mkdir -p build
           cd build
-          if [[ ! -f CMakeCache.txt ]]; then
-            cmake .. -DLLVM_ARCH=aarch64 -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
-          else
-            cmake ..
-          fi
+          cmake .. -DLLVM_ARCH=aarch64 -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
       - name: Build for MSVC
         if: ${{ matrix.os == 'windows-latest' }}
         working-directory: build
