@@ -715,7 +715,6 @@ void World::onGo()
             }
         }
     }
-    m_last_time_target_sound_update_time = getTime();
 }   // onGo
 
 //-----------------------------------------------------------------------------
@@ -945,14 +944,27 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
 // ----------------------------------------------------------------------------
 void World::updateTimeTargetSound()
 {
-    float time_elapsed = getTime();
-    float time_target = RaceManager::get()->getTimeTarget();
-    if(time_target - time_elapsed <= 5 && time_elapsed - m_last_time_target_sound_update_time >= 1 && time_target - time_elapsed > 0)
+    if(!RewindManager::get()->isRewinding())
     {
-        SFXManager::get()->quickSound("pre_start_race");
-        m_last_time_target_sound_update_time = getTime();
+        float time_elapsed = getTime();
+        float time_target = RaceManager::get()->getTimeTarget();
+        if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+            RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
+        {
+            if(time_elapsed <= 5 && getTimeTicks() % 120 == 0 && !World::getWorld()->isRaceOver())
+            {
+                SFXManager::get()->quickSound("pre_start_race");
+            }
+        }
+        else
+        {
+            if(time_target - time_elapsed <= 5 && getTimeTicks() % 120 == 0 && time_target - time_elapsed > 0)
+            {
+                SFXManager::get()->quickSound("pre_start_race");
+            }
+        }
     }
-    
 }
 // ----------------------------------------------------------------------------
 void World::schedulePause(Phase phase)
@@ -1214,6 +1226,10 @@ void World::update(int ticks)
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_POP_CPU_MARKER();
+    if (RaceManager::get()->hasTimeTarget())
+    {
+        updateTimeTargetSound();
+    }
 
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);

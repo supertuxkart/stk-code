@@ -428,7 +428,7 @@ void RaceGUI::drawGlobalTimer()
 
     float elapsed_time = World::getWorld()->getTime();
     if (!RaceManager::get()->hasTimeTarget() ||
-        RaceManager::get()->getMinorMode() ==RaceManager::MINOR_MODE_SOCCER ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
         RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
     {
@@ -456,7 +456,12 @@ void RaceGUI::drawGlobalTimer()
         }
         
     }
-
+    if(elapsed_time <= 5 && RaceManager::get()->hasTimeTarget() && (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG))
+    {
+        time_color = video::SColor(255,255,255,0);
+    }
     core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right,
                         irr_driver->getActualScreenSize().Height*2/100,
                         irr_driver->getActualScreenSize().Width,

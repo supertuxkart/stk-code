@@ -174,8 +174,6 @@ protected:
 
     Phase m_scheduled_pause_phase;
 
-    float m_last_time_target_sound_update_time;
-
     /** Set when the world needs to be deleted but you can't do it immediately
      * because you are e.g. within World::update()
      */
