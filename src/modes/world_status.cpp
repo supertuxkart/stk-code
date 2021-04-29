@@ -456,6 +456,8 @@ void WorldStatus::updateTime(int ticks)
                 m_time_ticks++;
                 m_time  = stk_config->ticks2Time(m_time_ticks);
                 m_count_up_ticks++;
+                if(RaceManager::get()->hasTimeTarget())
+                    World::getWorld()->updateTimeTargetSound();
             }
             break;
         case CLOCK_COUNTDOWN:

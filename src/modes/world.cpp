@@ -715,6 +715,7 @@ void World::onGo()
             }
         }
     }
+    m_last_time_target_sound_update_time = getTime();
 }   // onGo
 
 //-----------------------------------------------------------------------------
@@ -941,7 +942,18 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     Track::getCurrentTrack()->getCheckManager()->resetAfterKartMove(kart);
 
 }   // moveKartTo
-
+// ----------------------------------------------------------------------------
+void World::updateTimeTargetSound()
+{
+    float time_elapsed = getTime();
+    float time_target = RaceManager::get()->getTimeTarget();
+    if(time_target - time_elapsed <= 5 && time_elapsed - m_last_time_target_sound_update_time >= 1 && time_target - time_elapsed > 0)
+    {
+        SFXManager::get()->quickSound("pre_start_race");
+        m_last_time_target_sound_update_time = getTime();
+    }
+    
+}
 // ----------------------------------------------------------------------------
 void World::schedulePause(Phase phase)
 {

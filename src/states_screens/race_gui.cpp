@@ -440,6 +440,8 @@ void RaceGUI::drawGlobalTimer()
         float time_target = RaceManager::get()->getTimeTarget();
         if (elapsed_time < time_target)
         {
+            if(time_target-elapsed_time <= 5)
+                time_color = video::SColor(255,255,255,0);
             sw = core::stringw (
               StringUtils::timeToString(time_target - elapsed_time).c_str());
         }
@@ -452,12 +454,7 @@ void RaceGUI::drawGlobalTimer()
             time_color = video::SColor(255,255,0,0);
             use_digit_font = false;
         }
-        if(time_target-elapsed_time <= 5 && time_target-elapsed_time == (int)(time_target-elapsed_time) && elapsed_time < time_target){
-            
-            SFXManager::get()->quickSound("pre_start_race");
-        }
-        if(time_target-elapsed_time <= 5 && elapsed_time < time_target)
-            time_color = video::SColor(255,255,255,0);
+        
     }
 
     core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right,
