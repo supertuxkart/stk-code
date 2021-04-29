@@ -482,7 +482,6 @@ void WorldStatus::updateTime(int ticks)
                 // event
                 countdownReachedZero();
             }
-            World::getWorld()->updateTimeTargetSound();
             break;
         default: break;
     }   // switch m_phase
