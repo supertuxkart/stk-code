@@ -136,7 +136,7 @@ if(WIN32)
     ADD_DEFINITIONS(-DUNICODE)
     ADD_DEFINITIONS(-D_UNICODE)
     if(NOT IS_DIRECTORY "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}")
-        message(FATAL_ERROR "Dependencies directory not found.")
+        message(FATAL_ERROR "Dependencies directory not found, make sure dependencies-win-(arch) exists inside stk-code directory.")
     endif()
 endif()
 

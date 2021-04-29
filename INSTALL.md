@@ -134,15 +134,16 @@ To Build SuperTuxKart on Windows, follow these instructions:
 
 1. Download and install Visual Studio from here: [Visual Studio - Download](https://www.visualstudio.com/downloads/). The free Visual Studio Community edition works fine. Remember to select "Desktop development with C++" in the installer.
 
-2. If you want the stable version, download the SuperTuxKart source package from the latest stable version [SuperTuxKart download area - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart/) and unpack it.
+2. If you want the stable version, download the SuperTuxKart source package from the latest stable version [SuperTuxKart on GitHub](https://github.com/supertuxkart/stk-code/releases) and unpack it.
 
 3. If you want the development version, you will need a Git client and a SVN client. More information can be found here: [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control).
 Open your file browser and find somewhere you want to put the development version of SuperTuxKart. For example in C:\Users\<Your Username> as the Git and SVN clients will have write permissions there, and you should create its own directory, for example SuperTuxKart-dev. Enter that directory, and create a directory inside called stk-assets, and enter it. If you installed TortoiseSVN, right-click, select TortoiseSVN -> Checkout... and paste the corresponding URL found in [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control). While it is downloading the game assets, go back to your file browser and one level up. Right-click again somewhere empty and select "Git clone..." and paste the corresponding link found in [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control).
 *Note: Both `stk-code` and `stk-assets` **must** be in the same directory, otherwise the build will likely fail!*
 
-4. If you got the stable version, download the Windows dependencies package from [SuperTuxKart download area: Dependencies - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/Windows/) and unpack it.
+4. If you got the stable version, download the Windows dependencies package from [SuperTuxKart on GitHub - Dependencies Releases](https://github.com/supertuxkart/dependencies/releases), find the stk-code version there and download the `dependencies(arch).zip` as needed and unpack the archive into the `stk-code` directory.
 
-5. If you got the development version go to SuperTuxKart-dev in your file browser, right-click somewhere empty, select "Git clone..." and paste <https://github.com/supertuxkart/dependencies.git> in the URL field; click OK. When finished, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory; rename the latter to `dependencies-64bit` if you want to compile a 64-bit build.
+5. If you got the development version go to SuperTuxKart-dev in your file browser, then visit [SuperTuxKart on GitHub - Dependencies latest preview release](https://github.com/supertuxkart/dependencies/releases/tag/preview)
+and unpack the archive into the `stk-code` directory. Download `i686` if you use Win32 generator of MSVC, `x86_64` for x64 and `aarch64` for ARM64.
 
 6. Download CMake from here: [CMake - download page](https://cmake.org/download/), install it; once CMake is installed, double click on the CMake icon on your desktop, and point it towards your `stk-code` directory in the 'Where is the source code' field, and point 'Where to build the binaries' to a new directory called `build` or `bld` inside the stk-code directory.
 
@@ -169,11 +170,10 @@ Visual Studio 2013| 13
 
 1. Download and install Visual Studio from here: [Visual Studio - Download](https://www.visualstudio.com/downloads/), the free Visual Studio Community edition works fine.
 
-2. Download a source package from either [SuperTuxKart 0.9.2 download area - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart/0.9.2) or [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control)
-NOTE: the `stk-code` and `stk-assets` directories **must** be in the same directory
-3. Download the Windows dependencies package from either [SuperTuxKart download area - SourceForge.net](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/Windows/)
-or [SuperTuxKart on GitHub - Dependencies](https://github.com/supertuxkart/dependencies)
-and unpack the archive; once unpacked, copy the `dependencies` directory from either the `windows` or the `windows_64bit` directories into the `stk-code` directory
+2. Download a source package from either [SuperTuxKart on GitHub](https://github.com/supertuxkart/stk-code/releases) or [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control)
+NOTE: the `stk-code` and `stk-assets` directories **must** be in the same directory, `stk-assets` is not needed if you download the full source tarball `(SuperTuxKart-version-src.tar.xz)`.
+3. Download the Windows dependencies package from [SuperTuxKart on GitHub - Dependencies latest preview release](https://github.com/supertuxkart/dependencies/releases/tag/preview)
+and unpack the archive into the `stk-code` directory. Download `i686` if you use Win32 generator of MSVC, `x86_64` for x64 and `aarch64` for ARM64.
 4. Download CMake from here: [CMake - download page](https://cmake.org/download/); and install it. Navigate to the `stk-code` directory; and create an directory called "build":
 
     ```cmd
