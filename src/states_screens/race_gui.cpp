@@ -61,7 +61,7 @@ using namespace irr;
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
+#include "audio/sfx_manager.hpp"
 #include <algorithm>
 
 /** The constructor is called before anything is attached to the scene node.
@@ -452,6 +452,12 @@ void RaceGUI::drawGlobalTimer()
             time_color = video::SColor(255,255,0,0);
             use_digit_font = false;
         }
+        if(time_target-elapsed_time <= 5 && time_target-elapsed_time == (int)(time_target-elapsed_time) && elapsed_time < time_target){
+            
+            SFXManager::get()->quickSound("pre_start_race");
+        }
+        if(time_target-elapsed_time <= 5 && elapsed_time < time_target)
+            time_color = video::SColor(255,255,255,0);
     }
 
     core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right,
