@@ -90,7 +90,7 @@ jobs:
         run: |
           # Something funky happens with freetype if mono is left
           sudo mv /Library/Frameworks/Mono.framework /Library/Frameworks/Mono.framework-disabled
-          wget https://github.com/supertuxkart/dependencies/releases/download/latest/dependencies-mac.tar.xz
+          wget https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-mac.tar.xz
           # Remove any existing installation to avoid conflict with bundled dependencies
           rm -rf /usr/local/include/*
           rm -rf /usr/local/opt/openssl@1.1/include

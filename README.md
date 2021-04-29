@@ -1,6 +1,7 @@
 # SuperTuxKart
-[![Build Status](https://github.com/supertuxkart/stk-code/workflows/main/badge.svg?branch=master)](https://github.com/supertuxkart/stk-code/actions?query=workflow%3Amain)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/supertuxkart/stk-code?svg=true&branch=master)](https://ci.appveyor.com/project/supertuxkart/stk-code)
+[![Unix build status](https://github.com/supertuxkart/stk-code/actions/workflows/main.yml/badge.svg)](https://github.com/supertuxkart/stk-code/actions/workflows/main.yml)
+[![Windows build status](https://github.com/supertuxkart/stk-code/actions/workflows/windows.yml/badge.svg)](https://github.com/supertuxkart/stk-code/actions/workflows/windows.yml)
+[![Switch build status](https://github.com/supertuxkart/stk-code/actions/workflows/switch.yml/badge.svg)](https://github.com/supertuxkart/stk-code/actions/workflows/switch.yml)
 [![#supertuxkart on the freenode IRC network](https://img.shields.io/badge/freenode-%23supertuxkart-brightgreen.svg)](https://webchat.freenode.net/?channels=supertuxkart)
 
 SuperTuxKart is a free kart racing game. It focuses on fun and not on realistic kart physics. Instructions can be found on the in-game help page.

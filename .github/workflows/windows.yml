@@ -52,7 +52,7 @@ jobs:
           key: ${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-windows-build
       - name: Download dependencies
         run: |
-          ${{ env.wget }} https://github.com/supertuxkart/dependencies/releases/download/latest/dependencies-win-${{ matrix.arch }}.zip
+          ${{ env.wget }} https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-win-${{ matrix.arch }}.zip
           ${{ env.unzip }} dependencies-win-${{ matrix.arch }}.zip
       - name: Install MinGW for i686 or x86_64
         if: ${{ matrix.os == 'ubuntu-latest' && ( matrix.arch == 'i686' || matrix.arch == 'x86_64' ) }}
@@ -61,7 +61,7 @@ jobs:
           sudo mkdir -p /data/mxe/usr
           cd /data/mxe/usr
           # It's compiled from https://github.com/mxe/mxe
-          sudo wget https://github.com/supertuxkart/dependencies/releases/download/latest/mxe_static_mingw.zip
+          sudo wget https://github.com/supertuxkart/dependencies/releases/download/preview/mxe_static_mingw.zip
           sudo unzip mxe_static_mingw.zip
           sudo rm mxe_static_mingw.zip
       - name: Install MinGW for aarch64
