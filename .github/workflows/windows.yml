@@ -141,6 +141,8 @@ jobs:
         working-directory: build
         run: |
           make -j4
+          cd ..
+          mv COPYING tools
       - name: Upload binaries of MinGW
         if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v2
@@ -228,30 +230,60 @@ jobs:
         shell : bash
         if: ${{ env.release_tag != '' }}
         run: |
-          ls
           mkdir SuperTuxKart-${{ env.release_tag }}-win
           mv stk-assets SuperTuxKart-${{ env.release_tag }}-win
           mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code
           mv data SuperTuxKart-${{ env.release_tag }}-win/stk-code
           mv tools/run_game.bat SuperTuxKart-${{ env.release_tag }}-win
-          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw
-          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw64
-          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64
-          mv i686 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw/bin
-          mv x86_64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw64/bin
-          mv aarch64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64/bin
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-i686
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-x86_64
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-aarch64
+          mv i686 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-i686/bin
+          mv x86_64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-x86_64/bin
+          mv aarch64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-aarch64/bin
           # libwinpthread-1.dll is useless because we statically link
-          rm -f SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64/bin/libwinpthread-1.dll
+          rm -f SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-aarch64/bin/libwinpthread-1.dll
       - name: Start packaging STK
         if: ${{ env.release_tag != '' }}
         run: |
           C:\msys64\usr\bin\zip.exe -r SuperTuxKart-${{ env.release_tag }}-win.zip SuperTuxKart-${{ env.release_tag }}-win
+      - name: Configure NSIS script
+        shell : bash
+        if: ${{ env.release_tag != '' && startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          mv tools SuperTuxKart-${{ env.release_tag }}-win/stk-code
+          cd SuperTuxKart-${{ env.release_tag }}-win/stk-code/tools/windows_installer
+          for arch in i686 x86_64 aarch64
+          do
+            cp supertuxkart-github-actions.nsi $arch.nsi
+            sed -i "s/define APPNAMEANDVERSION \"\"/define APPNAMEANDVERSION \"SuperTuxKart ${{ env.release_tag }}\"/g" $arch.nsi
+            sed -i "s/define ARCH \"\"/define ARCH \"$arch\"/g" $arch.nsi
+            sed -i "s/OutFile \"\"/OutFile \"SuperTuxKart-${{ env.release_tag }}-installer-$arch.exe\"/g" $arch.nsi
+            for filename in $(ls ../../build-$arch/bin)
+            do
+              file="\\\\$filename"
+              sed -i "286a\  DELETE /REBOOTOK \"\$INSTDIR$file\"" $arch.nsi
+            done
+            # Print result
+            #cat $arch.nsi
+          done
+          mv ../COPYING ../..
+      - name: Run makensis.exe
+        if: ${{ env.release_tag != '' && startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          cd SuperTuxKart-${{ env.release_tag }}-win\stk-code\tools\windows_installer
+          C:\msys64\usr\bin\wget.exe https://nsis.sourceforge.io/mediawiki/images/6/6c/Shelllink.zip
+          C:\msys64\usr\bin\unzip.exe Shelllink.zip
+          Move-Item Unicode\Plugins\ShellLink.dll .
+          & "C:\Program Files (x86)\NSIS\makensis.exe" i686.nsi
+          & "C:\Program Files (x86)\NSIS\makensis.exe" x86_64.nsi
+          & "C:\Program Files (x86)\NSIS\makensis.exe" aarch64.nsi
       - name: Create release
         uses: ncipollo/release-action@v1
         if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "SuperTuxKart-*.zip"
+          artifacts: "SuperTuxKart-*.zip, SuperTuxKart-${{ env.release_tag }}-win/stk-code/tools/windows_installer/*.exe"
           tag: ${{ env.release_name }}
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true
