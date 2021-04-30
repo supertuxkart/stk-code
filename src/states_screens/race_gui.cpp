@@ -61,6 +61,7 @@ using namespace irr;
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
 #include <algorithm>
 
 /** The constructor is called before anything is attached to the scene node.
