@@ -941,6 +941,7 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     Track::getCurrentTrack()->getCheckManager()->resetAfterKartMove(kart);
 
 }   // moveKartTo
+
 // ----------------------------------------------------------------------------
 void World::updateTimeTargetSound()
 {
