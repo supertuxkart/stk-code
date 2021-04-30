@@ -483,6 +483,7 @@ void WorldStatus::updateTime(int ticks)
                 countdownReachedZero();
             }
             break;
+
         default: break;
     }   // switch m_phase
 
