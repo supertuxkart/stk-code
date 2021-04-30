@@ -161,6 +161,11 @@ jobs:
         with:
           name: tools
           path: tools
+      - name: Remove built binaries for less cache size
+        shell : bash
+        run: |
+          rm -rf build/Debug
+          rm -rf build/bin
 
   packaging:
     name: Packaging STK
