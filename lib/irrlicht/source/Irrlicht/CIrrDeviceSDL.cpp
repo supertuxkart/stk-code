@@ -43,7 +43,7 @@ namespace irr
 
 extern "C" void init_objc(SDL_SysWMinfo* info, float* top, float* bottom, float* left, float* right);
 extern "C" int handle_app_event(void* userdata, SDL_Event* event);
-extern "C" void Android_initDisplayCutout(float* top, float* bottom, float* left, float* right);
+extern "C" void Android_initDisplayCutout(float* top, float* bottom, float* left, float* right, int* initial_orientation);
 extern "C" int Android_disablePadding();
 
 namespace irr
@@ -59,8 +59,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	MouseX(0), MouseY(0), MouseButtonStates(0),
 	Width(param.WindowSize.Width), Height(param.WindowSize.Height),
 	TopPadding(0), BottomPadding(0), LeftPadding(0), RightPadding(0),
-	WindowHasFocus(false), WindowMinimized(false), Resizable(false),
-	AccelerometerIndex(-1), AccelerometerInstance(-1),
+	InitialOrientation(0), WindowHasFocus(false), WindowMinimized(false),
+	Resizable(false), AccelerometerIndex(-1), AccelerometerInstance(-1),
 	GyroscopeIndex(-1), GyroscopeInstance(-1)
 {
 	#ifdef _DEBUG
@@ -117,7 +117,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 			init_objc(&Info, &TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
 #endif
 #ifdef ANDROID
-			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding);
+			Android_initDisplayCutout(&TopPadding, &BottomPadding, &LeftPadding, &RightPadding, &InitialOrientation);
 #endif
 			core::stringc sdlversion = "SDL Version ";
 			sdlversion += Info.version.major;
@@ -1469,7 +1469,9 @@ s32 CIrrDeviceSDL::getLeftPadding()
 	if (Android_disablePadding() != 0)
 		return 0;
 #if SDL_VERSION_ATLEAST(2, 0, 9)
-	if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
+	if ((InitialOrientation == SDL_ORIENTATION_LANDSCAPE ||
+		InitialOrientation == SDL_ORIENTATION_LANDSCAPE_FLIPPED) &&
+		SDL_GetDisplayOrientation(0) != InitialOrientation)
 		return RightPadding;
 #endif
 	return LeftPadding;
@@ -1485,7 +1487,9 @@ s32 CIrrDeviceSDL::getRightPadding()
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 	if (Android_disablePadding() != 0)
 		return 0;
-	if (SDL_GetDisplayOrientation(0) == SDL_ORIENTATION_LANDSCAPE_FLIPPED)
+	if ((InitialOrientation == SDL_ORIENTATION_LANDSCAPE ||
+		InitialOrientation == SDL_ORIENTATION_LANDSCAPE_FLIPPED) &&
+		SDL_GetDisplayOrientation(0) != InitialOrientation)
 		return LeftPadding;
 #endif
 	return RightPadding;

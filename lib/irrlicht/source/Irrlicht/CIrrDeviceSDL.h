@@ -291,6 +291,7 @@ namespace irr
 		f32 BottomPadding;
 		f32 LeftPadding;
 		f32 RightPadding;
+		int InitialOrientation;
 
 		bool WindowHasFocus;
 		bool WindowMinimized;
