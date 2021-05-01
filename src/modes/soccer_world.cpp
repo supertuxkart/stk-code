@@ -706,6 +706,12 @@ void SoccerWorld::resetKartsToSelfGoals()
         if (kart->isEliminated())
             continue;
 
+        if (kart->getKartAnimation())
+        {
+            AbstractKartAnimation* ka = kart->getKartAnimation();
+            kart->setKartAnimation(NULL);
+            delete ka;
+        }
         kart->getBody()->setLinearVelocity(Vec3(0.0f));
         kart->getBody()->setAngularVelocity(Vec3(0.0f));
         unsigned index = m_kart_position_map.at(kart->getWorldKartId());
