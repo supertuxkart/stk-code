@@ -86,9 +86,16 @@ jobs:
           echo "${{ env.release_tag }}"
           echo "${{ env.release_name }}"
           echo "${{ env.release_pre }}"
-
-      - name: Cache cmake_build
-        id: cache-switch-cmake
+      - name: List build cache restore keys
+        shell : bash
+        run: |
+          # Look for the last 9 build caches (GitHub supports max 10 including current one)
+          for number in 1 2 3 4 5 6 7 8 9
+          do
+            id=$((${{ github.run_number }} - number))
+            echo "cache_$number=switch-${{ github.ref }}-$id" >> $GITHUB_ENV
+          done
+      - name: Handle build cache
         uses: actions/cache@v2
         with:
           # This is unnecessarily verbose and might break, but again ! seems broken
@@ -104,8 +111,17 @@ jobs:
             stk-code/lib/openal/cmake_build
             stk-code/lib/harfbuzz/cmake_build
           # Make sure PRs can't overwrite!
-          key: ${{ github.ref }}-switch-cmake-0
-
+          key: switch-${{ github.ref }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ env.cache_1 }}
+            ${{ env.cache_2 }}
+            ${{ env.cache_3 }}
+            ${{ env.cache_4 }}
+            ${{ env.cache_5 }}
+            ${{ env.cache_6 }}
+            ${{ env.cache_7 }}
+            ${{ env.cache_8 }}
+            ${{ env.cache_9 }}
       - name: Run build script
         run: |
           cp -v stk-code/switch/pkgbuild-scripts/* "$DEVKITPRO/"

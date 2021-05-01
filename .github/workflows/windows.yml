@@ -44,12 +44,31 @@ jobs:
           ${{ env.wget }} https://github.com/MestreLion/git-tools/archive/refs/heads/master.zip
           ${{ env.unzip }} master.zip
           python git-tools-master/git-restore-mtime
-      - name: Cache build
+      - name: List build cache restore keys
+        shell : bash
+        run: |
+          # Look for the last 9 build caches (GitHub supports max 10 including current one)
+          for number in 1 2 3 4 5 6 7 8 9
+          do
+            id=$((${{ github.run_number }} - number))
+            echo "cache_$number=windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
+          done
+      - name: Handle build cache
         uses: actions/cache@v2
         with:
           path: |
             build
-          key: ${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-windows-build
+          key: windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ env.cache_1 }}
+            ${{ env.cache_2 }}
+            ${{ env.cache_3 }}
+            ${{ env.cache_4 }}
+            ${{ env.cache_5 }}
+            ${{ env.cache_6 }}
+            ${{ env.cache_7 }}
+            ${{ env.cache_8 }}
+            ${{ env.cache_9 }}
       - name: Download dependencies
         run: |
           ${{ env.wget }} https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-win-${{ matrix.arch }}.zip
@@ -105,22 +124,13 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          # Always run with -DUSE_DIRECTX=ON breaks the cache
-          if [[ ! -f CMakeCache.txt ]]; then
-            cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
-          else
-            cmake ..
-          fi
+          cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
       - name: Configure bulid for MinGW (aarch64)
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch == 'aarch64' }}
         run: |
           mkdir -p build
           cd build
-          if [[ ! -f CMakeCache.txt ]]; then
-            cmake .. -DLLVM_ARCH=aarch64 -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
-          else
-            cmake ..
-          fi
+          cmake .. -DLLVM_ARCH=aarch64 -DLLVM_PREFIX=/llvm-mingw -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-llvm-mingw.cmake -DCHECK_ASSETS=OFF -DUSE_DIRECTX=ON
       - name: Build for MSVC
         if: ${{ matrix.os == 'windows-latest' }}
         working-directory: build
@@ -131,6 +141,8 @@ jobs:
         working-directory: build
         run: |
           make -j4
+          cd ..
+          mv COPYING tools
       - name: Upload binaries of MinGW
         if: ${{ matrix.os == 'ubuntu-latest' }}
         uses: actions/upload-artifact@v2
@@ -151,6 +163,11 @@ jobs:
         with:
           name: tools
           path: tools
+      - name: Remove built binaries for less cache size
+        shell : bash
+        run: |
+          rm -rf build/Debug
+          rm -rf build/bin
 
   packaging:
     name: Packaging STK
@@ -213,30 +230,60 @@ jobs:
         shell : bash
         if: ${{ env.release_tag != '' }}
         run: |
-          ls
           mkdir SuperTuxKart-${{ env.release_tag }}-win
           mv stk-assets SuperTuxKart-${{ env.release_tag }}-win
           mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code
           mv data SuperTuxKart-${{ env.release_tag }}-win/stk-code
           mv tools/run_game.bat SuperTuxKart-${{ env.release_tag }}-win
-          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw
-          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw64
-          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64
-          mv i686 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw/bin
-          mv x86_64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingw64/bin
-          mv aarch64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64/bin
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-i686
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-x86_64
+          mkdir SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-aarch64
+          mv i686 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-i686/bin
+          mv x86_64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-x86_64/bin
+          mv aarch64 SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-aarch64/bin
           # libwinpthread-1.dll is useless because we statically link
-          rm -f SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-mingwa64/bin/libwinpthread-1.dll
+          rm -f SuperTuxKart-${{ env.release_tag }}-win/stk-code/build-aarch64/bin/libwinpthread-1.dll
       - name: Start packaging STK
         if: ${{ env.release_tag != '' }}
         run: |
           C:\msys64\usr\bin\zip.exe -r SuperTuxKart-${{ env.release_tag }}-win.zip SuperTuxKart-${{ env.release_tag }}-win
+      - name: Configure NSIS script
+        shell : bash
+        if: ${{ env.release_tag != '' && startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          mv tools SuperTuxKart-${{ env.release_tag }}-win/stk-code
+          cd SuperTuxKart-${{ env.release_tag }}-win/stk-code/tools/windows_installer
+          for arch in i686 x86_64 aarch64
+          do
+            cp supertuxkart-github-actions.nsi $arch.nsi
+            sed -i "s/define APPNAMEANDVERSION \"\"/define APPNAMEANDVERSION \"SuperTuxKart ${{ env.release_tag }}\"/g" $arch.nsi
+            sed -i "s/define ARCH \"\"/define ARCH \"$arch\"/g" $arch.nsi
+            sed -i "s/OutFile \"\"/OutFile \"SuperTuxKart-${{ env.release_tag }}-installer-$arch.exe\"/g" $arch.nsi
+            for filename in $(ls ../../build-$arch/bin)
+            do
+              file="\\\\$filename"
+              sed -i "286a\  DELETE /REBOOTOK \"\$INSTDIR$file\"" $arch.nsi
+            done
+            # Print result
+            #cat $arch.nsi
+          done
+          mv ../COPYING ../..
+      - name: Run makensis.exe
+        if: ${{ env.release_tag != '' && startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          cd SuperTuxKart-${{ env.release_tag }}-win\stk-code\tools\windows_installer
+          C:\msys64\usr\bin\wget.exe https://nsis.sourceforge.io/mediawiki/images/6/6c/Shelllink.zip
+          C:\msys64\usr\bin\unzip.exe Shelllink.zip
+          Move-Item Unicode\Plugins\ShellLink.dll .
+          & "C:\Program Files (x86)\NSIS\makensis.exe" i686.nsi
+          & "C:\Program Files (x86)\NSIS\makensis.exe" x86_64.nsi
+          & "C:\Program Files (x86)\NSIS\makensis.exe" aarch64.nsi
       - name: Create release
         uses: ncipollo/release-action@v1
         if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "SuperTuxKart-*.zip"
+          artifacts: "SuperTuxKart-*.zip, SuperTuxKart-${{ env.release_tag }}-win/stk-code/tools/windows_installer/*.exe"
           tag: ${{ env.release_name }}
           omitBodyDuringUpdate: true
           omitNameDuringUpdate: true

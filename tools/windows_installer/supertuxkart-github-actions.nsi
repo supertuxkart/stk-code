@@ -6,14 +6,13 @@
 ; To use just put this in a directory below the supertuxkart directory
 ; which should be called "supertuxkart" and then copy the
 ; GPL in the supertuxkart directory to 'license.txt'.
-; Next to supertuxkart create a subdirectory called 'prerequisites'
-; and copy the VC++ (vcredist_x86.exe) redistributables.
 ; You will then need to make an icon, you can use:
 ; http://tools.dynamicdrive.com/favicon/ to convert a png to an icon.
 ; Once you have made an icon put it in the supertuxkart dir and call it
-; icon.ico. You will need to do the same for install.ico nd uninstall.ico
+; icon.ico. You will need to do the same for install.ico and uninstall.ico
 ; Once there done then all you need to do is compile with NSIS.
 
+Unicode True
 ;--------------------------------
 ;Include Modern UI
   !include "MUI2.nsh"
@@ -27,23 +26,23 @@
   !include "FileFunc.nsh"
 
 ;--------------------------------
+;Include x64 lib
+  !include "x64.nsh"
+
+;--------------------------------
+; We save ShellLink.dll in current directory
+  !addplugindir .
+;--------------------------------
 ;General
 
-  ; Version information
-  ; TOOD get these from the source code directly
-  !define VERSION_MAJOR 0
-  !define VERSION_MINOR 10
-  !define VERSION_REVISION 0
-  ; Empty means stable, could be -git, -rc1
-  !define VERSION_BUILD "-git"
-  
   ;Name and file
   !define APPNAME "SuperTuxKart"
-  !define APPNAMEANDVERSION "${APPNAME} ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}${VERSION_BUILD}"
+  !define APPNAMEANDVERSION ""
+  !define ARCH ""
   !define DESCRIPTION "3D open-source arcade racer with a variety characters, tracks, and modes to play"
 
   Name "${APPNAMEANDVERSION}"
-  OutFile "${APPNAMEANDVERSION} installer-32bit.exe"
+  OutFile ""
 
   # These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
   # It is possible to use "mailto:" links in here to open the email client
@@ -53,7 +52,7 @@
 
   RequestExecutionLevel admin
 
-  ;Default installation folder
+  ; Overwrite later by onInit
   InstallDir "$PROGRAMFILES\${APPNAMEANDVERSION}"
 
   ;Get installation folder from registry if available
@@ -65,7 +64,7 @@
   ;Set the icon
   !define MUI_ICON "install.ico"
   !define MUI_UNICON "uninstall.ico"
-  !define MUI_HEADERIMAGE	
+  !define MUI_HEADERIMAGE
   !define MUI_WELCOMEFINISHPAGE_BITMAP "stk_installer.bmp"
   !define MUI_WELCOMEFINISHPAGE_BITMAP_NOSTRETCH
   !define MUI_HEADERIMAGE_BITMAP "logo_slim.bmp"
@@ -81,6 +80,26 @@
 
   ; For the uninstaller in the remove programs
   !define ADD_REMOVE_KEY_NAME "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APPNAMEANDVERSION}"
+
+  Function .onInit
+    ;Default installation folder
+    ${If} "${ARCH}" == "x86_64"
+    ${OrIf} "${ARCH}" == "aarch64"
+      ${If} ${RunningX64}
+      ${OrIf} ${IsNativeARM64}
+        StrCpy $INSTDIR "$PROGRAMFILES64\${APPNAMEANDVERSION}"
+      ${Else}
+        StrCpy $INSTDIR "$PROGRAMFILES\${APPNAMEANDVERSION}"
+      ${EndIf}
+    ${Else}
+      ${If} ${RunningX64}
+      ${OrIf} ${IsNativeARM64}
+        StrCpy $INSTDIR "$PROGRAMFILES32\${APPNAMEANDVERSION}"
+      ${Else}
+        StrCpy $INSTDIR "$PROGRAMFILES\${APPNAMEANDVERSION}"
+      ${EndIf}
+    ${EndIf}
+  FunctionEnd
 
 ;--------------------------------
 ;Variables
@@ -174,46 +193,43 @@ Section "Install" SecMain
 
   ; Try to find the binary directory in a list of 'typical' names:
   ; The first found directory is used
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\RelWithDebInfo\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\Release\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\RelWithDebInfo\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\Release\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\RelWithDebInfo\*.*
-  ${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\Release\*.*
-
-  File /x *.ilk ${EXEC_PATH}
+  ;${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\RelWithDebInfo\*.*
+  ;${!setIfUndefinedAndExists} EXEC_PATH ..\..\bld\bin\Release\*.*
+  ;${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\RelWithDebInfo\*.*
+  ;${!setIfUndefinedAndExists} EXEC_PATH ..\..\build\bin\Release\*.*
+  ;${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\RelWithDebInfo\*.*
+  ;${!setIfUndefinedAndExists} EXEC_PATH ..\..\cmake_build\bin\Release\*.*
 
   ; Check various options for the editor. Note that us devs mostly use 'bld',
   ; but documented is the name 'build'
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\RelWithDebInfo
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\Release
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\RelWithDebInfo
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\Release
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\RelWithDebInfo
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\Release
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\build\RelWithDebInfo
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\build\Release
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\build\RelWithDebInfo
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\build\Release
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\build\RelWithDebInfo
-  ${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\build\Release
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\RelWithDebInfo
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\bld\Release
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\RelWithDebInfo
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\bld\Release
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\RelWithDebInfo
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\bld\Release
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\build\RelWithDebInfo
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\editor\build\Release
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\build\RelWithDebInfo
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\stk-editor\build\Release
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\build\RelWithDebInfo
+  ;${!setIfUndefinedAndExists} EDITOR_PATH ..\..\..\supertuxkart-editor\build\Release
+
+  File /x *.ilk ..\..\build-${ARCH}\bin\*.*
 
   !ifdef EDITOR_PATH
     File ${EDITOR_PATH}\supertuxkart-editor.exe ${EDITOR_PATH}\supertuxkart-editor.pdb
     File ${EDITOR_PATH}\..\..\supertuxkart-editor.ico
   !endif
- 
-  File *.ico 
-  ; prereqs
-  SetOutPath "$INSTDIR\prerequisites"
-  File /r prerequisites\vcredist_x86.exe
+
+  File *.ico
 
   ; data + assets
   SetOutPath "$INSTDIR\data\"
   File /r /x .svn /x wip-* ..\..\..\stk-assets\*.*
   File /r /x *.sh ..\..\data\*.*
 
-    
+
   ;Store installation folder
   WriteRegStr HKCU "Software\${APPNAMEANDVERSION}" "" $INSTDIR
 
@@ -237,18 +253,18 @@ Section "Install" SecMain
   ; Registry information for add/remove programs
   ; See http://nsis.sourceforge.net/Add_uninstall_information_to_Add/Remove_Programs
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" \
-                 "DisplayName" "${APPNAMEANDVERSION} - ${DESCRIPTION}"
-  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "Publisher" "${APPNAME}"
+                 "DisplayName" "${APPNAMEANDVERSION} - ${ARCH}"
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "Publisher" "SuperTuxKart Team"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayIcon" "$\"$INSTDIR\icon.ico$\""
-  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "HelpLink" "$\"${HELPURL}$\""
-  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLUpdateInfo" "$\"${UPDATEURL}$\""
-  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLInfoAbout" "$\"${ABOUTURL}$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "HelpLink" "${HELPURL}"
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLUpdateInfo" "${UPDATEURL}"
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLInfoAbout" "${ABOUTURL}"
   # There is no option for modifying or repairing the install
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "NoModify" 1
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "NoRepair" 1
 
-  ; Write size 
+  ; Write size
   ; [...copy all files here, before GetSize...]
   ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
   IntFmt $0 "0x%08X" $0
@@ -256,14 +272,6 @@ Section "Install" SecMain
 
 SectionEnd
 
-Section -Prerequisites
-  ;SetOutPath $INSTDIR\Prerequisites
-  MessageBox MB_YESNO "Install Microsoft VC++ runtime libraries?" /SD IDYES IDNO endVC
-    File "prerequisites\vcredist_x86.exe"
-    ExecWait "$INSTDIR\prerequisites\vcredist_x86.exe /q"
-    Goto endVC
-  endVC:
-SectionEnd
 ;--------------------------------
 ;Uninstaller Section
 
@@ -273,47 +281,18 @@ Section "Uninstall" redist
   ; DO NOT USE RMDIR ... $INSTDIR\*.*  - if someone should e.g.
   ; install supertuxkart in c:\Program Files  (note: no subdirectory)
   ; this could remove all files in Program Files!!!!!!!!!!!!!!!!!!!
+  ; GitHub Actions script will add installed files as seen in windows.yml
 
   RMDir /r /REBOOTOK $INSTDIR\data
-  RMDir /r /REBOOTOK $INSTDIR\prerequisites
-
   DELETE /REBOOTOK "$INSTDIR\install.ico"
   DELETE /REBOOTOK "$INSTDIR\icon.ico"
-  DELETE /REBOOTOK "$INSTDIR\Irrlicht.dll"
-  DELETE /REBOOTOK "$INSTDIR\libcurl.dll"
-  DELETE /REBOOTOK "$INSTDIR\libeay32.dll"
-  DELETE /REBOOTOK "$INSTDIR\libidn-11.dll"
-  DELETE /REBOOTOK "$INSTDIR\License.txt"
-  DELETE /REBOOTOK "$INSTDIR\freetype6.dll"
-  DELETE /REBOOTOK "$INSTDIR\libogg.dll"
-  DELETE /REBOOTOK "$INSTDIR\OpenAL32.dll"
-  DELETE /REBOOTOK "$INSTDIR\physfs.dll"
-  DELETE /REBOOTOK "$INSTDIR\pthreadVC2.dll"
-  DELETE /REBOOTOK "$INSTDIR\ssleay32.dll"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.exe"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.ico"
   DELETE /REBOOTOK "$INSTDIR\supertuxkart.icon"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart.pdb"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.exe"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.ico"
-  DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.pdb"
   DELETE /REBOOTOK "$INSTDIR\uninstall.ico"
-  DELETE /REBOOTOK "$INSTDIR\libvorbis.dll"
-  DELETE /REBOOTOK "$INSTDIR\libvorbisenc.dll"
-  DELETE /REBOOTOK "$INSTDIR\libvorbisfile.dll"
-  DELETE /REBOOTOK "$INSTDIR\wiiuse.dll"
-  DELETE /REBOOTOK "$INSTDIR\wiiuse.ilk"
-  DELETE /REBOOTOK "$INSTDIR\wiiuse.pdb"
-  DELETE /REBOOTOK "$INSTDIR\wrap_oal.dll"
-  DELETE /REBOOTOK "$INSTDIR\zlib.dll"
-  DELETE /REBOOTOK "$INSTDIR\zlib.pdb"
-  DELETE /REBOOTOK "$INSTDIR\zlib1.dll"
-  DELETE /REBOOTOK "$INSTDIR\libjpeg-62.dll"
-  DELETE /REBOOTOK "$INSTDIR\libturbojpeg.dll"
-  DELETE /REBOOTOK "$INSTDIR\libvpx.dll"
-  DELETE /REBOOTOK "$INSTDIR\openglrecorder.dll"
-
   Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
+  ;DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.exe"
+  ;DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.ico"
+  ;DELETE /REBOOTOK "$INSTDIR\supertuxkart-editor.pdb"
   RMDir "$INSTDIR"
 
   SetShellVarContext all
@@ -323,7 +302,7 @@ Section "Uninstall" redist
 
   Delete "$SMPROGRAMS\$MUI_TEMP\Uninstall ${APPNAMEANDVERSION}.lnk"
   Delete "$SMPROGRAMS\$MUI_TEMP\${APPNAMEANDVERSION}.lnk"
-  Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart-editor (beta).lnk"
+  ;Delete "$SMPROGRAMS\$MUI_TEMP\supertuxkart-editor (beta).lnk"
 
   ;Delete empty start menu parent diretories
   StrCpy $MUI_TEMP "$SMPROGRAMS\$MUI_TEMP"
