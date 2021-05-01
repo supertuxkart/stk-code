@@ -65,6 +65,7 @@ public class SuperTuxKartActivity extends SDLActivity
     private ImageView m_splash_screen;
     private STKEditText m_stk_edittext;
     private int m_bottom_y;
+    private int m_intial_orientation;
     private float m_top_padding;
     private float m_bottom_padding;
     private float m_left_padding;
@@ -186,7 +187,7 @@ public class SuperTuxKartActivity extends SDLActivity
         m_progress_dialog = null;
         m_progress_bar = null;
         m_splash_screen = null;
-        m_bottom_y = 0;
+        m_bottom_y = m_intial_orientation = 0;
         m_top_padding = m_bottom_padding = m_left_padding = m_right_padding =
             0.0f;
         final View root = getWindow().getDecorView().findViewById(
@@ -398,6 +399,9 @@ public class SuperTuxKartActivity extends SDLActivity
     // ------------------------------------------------------------------------
     public float getRightPadding()                  { return m_right_padding; }
     // ------------------------------------------------------------------------
+    public int getInitialOrientation()         { return m_intial_orientation; }
+    // ------------------------------------------------------------------------
+
     public void showExtractProgress(final int progress)
     {
         runOnUiThread(new Runnable()
@@ -485,6 +489,9 @@ public class SuperTuxKartActivity extends SDLActivity
                 m_bottom_padding = (float)dc.getBoundingRectBottom().height();
                 m_left_padding = (float)dc.getBoundingRectLeft().width();
                 m_right_padding = (float)dc.getBoundingRectRight().width();
+                // Left or right will depend on the device initial orientation
+                // So save it for dealing with device rotation later
+                m_intial_orientation = SDLActivity.getCurrentOrientation();
             }
         }
     }

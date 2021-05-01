@@ -62,7 +62,8 @@ ANDROID_HANDLE_PADDING_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
 }
 
 extern "C" void Android_initDisplayCutout(float* top, float* bottom,
-                                          float* left, float* right)
+                                          float* left, float* right,
+                                          int* initial_orientation)
 {
     JNIEnv* env = NULL;
     jobject activity = NULL;
@@ -71,6 +72,7 @@ extern "C" void Android_initDisplayCutout(float* top, float* bottom,
     jmethodID bottom_method = NULL;
     jmethodID left_method = NULL;
     jmethodID right_method = NULL;
+    jmethodID initial_orientation_method = NULL;
 
     env = (JNIEnv*)SDL_AndroidGetJNIEnv();
     if (!env)
@@ -104,6 +106,10 @@ extern "C" void Android_initDisplayCutout(float* top, float* bottom,
         goto exit;
     *right = env->CallFloatMethod(activity, right_method);
 
+    initial_orientation_method = env->GetMethodID(class_native_activity, "getInitialOrientation", "()I");
+    if (initial_orientation_method == NULL)
+        goto exit;
+    *initial_orientation = env->CallIntMethod(activity, initial_orientation_method);
 exit:
     if (!env)
         return;
