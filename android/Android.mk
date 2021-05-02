@@ -11,42 +11,49 @@ include $(CLEAR_VARS)
 
 # OGG
 LOCAL_MODULE := ogg
-LOCAL_SRC_FILES := obj/libogg/src/.libs/libogg.a
+LOCAL_SRC_FILES := obj/libogg/libogg.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # Vorbis
 LOCAL_MODULE := vorbis
-LOCAL_SRC_FILES := obj/libvorbis/lib/.libs/libvorbis.a
+LOCAL_SRC_FILES := obj/libvorbis/lib/libvorbis.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # Vorbisfile
 LOCAL_MODULE := vorbisfile
-LOCAL_SRC_FILES := obj/libvorbis/lib/.libs/libvorbisfile.a
+LOCAL_SRC_FILES := obj/libvorbis/lib/libvorbisfile.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # CURL
 LOCAL_MODULE := curl
-LOCAL_SRC_FILES := obj/curl/lib/.libs/libcurl.a
+LOCAL_SRC_FILES := obj/curl/lib/libcurl.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
-# libcrypto
-LOCAL_MODULE := libcrypto
-LOCAL_SRC_FILES := obj/openssl/libcrypto.a
+# libmbedtls
+LOCAL_MODULE := libmbedtls
+LOCAL_SRC_FILES := obj/mbedtls/library/libmbedtls.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
-# libssl
-LOCAL_MODULE := libssl
-LOCAL_SRC_FILES := obj/openssl/libssl.a
+# libmbedcrypto
+LOCAL_MODULE := libmbedcrypto
+LOCAL_SRC_FILES := obj/mbedtls/library/libmbedcrypto.a
+include $(PREBUILT_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
+# libmbedx509
+LOCAL_MODULE := libmbedx509
+LOCAL_SRC_FILES := obj/mbedtls/library/libmbedx509.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -74,14 +81,14 @@ include $(CLEAR_VARS)
 
 # Freetype
 LOCAL_MODULE := freetype
-LOCAL_SRC_FILES := obj/freetype/objs/.libs/libfreetype.a
+LOCAL_SRC_FILES := obj/freetype/build/libfreetype.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # Harfbuzz
 LOCAL_MODULE       := harfbuzz
-LOCAL_SRC_FILES    := obj/harfbuzz/src/.libs/libharfbuzz.a
+LOCAL_SRC_FILES    := obj/harfbuzz/build/libharfbuzz.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -276,12 +283,12 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -Iobj/libogg/include              \
                       -Iobj/libvorbis/include           \
                       -Iobj/openal/include              \
-                      -Iobj/openssl/include             \
+                      -Iobj/mbedtls/include             \
                       -DUSE_GLES2      \
                       -DMOBILE_STK     \
                       -DENABLE_SOUND   \
                       -DENABLE_IPV6    \
-                      -DENABLE_CRYPTO_OPENSSL           \
+                      -DENABLE_CRYPTO_MBEDTLS           \
                       -DNDEBUG         \
                       -DDISABLE_ICONV  \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
@@ -291,9 +298,10 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
 LOCAL_CPPFLAGS     := -std=gnu++0x
 
 LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript mcpp SDL2 \
-                          vorbisfile vorbis ogg openal curl libssl libcrypto \
-                          c++_static sheenbidi harfbuzz freetype \
-                          tinygettext graphics_utils graphics_engine
+                          vorbisfile vorbis ogg openal curl libmbedtls       \
+                          libmbedcrypto libmbedx509 c++_static sheenbidi     \
+                          harfbuzz freetype tinygettext graphics_utils       \
+                          graphics_engine
 
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
