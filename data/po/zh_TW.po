@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
 "PO-Revision-Date: 2021-03-14 05:34+0000\n"
 "Last-Translator: 黃柏諺 <s8321414@gmail.com>\n"
 "Language-Team: Chinese (Taiwan) (http://www.transifex.com/supertuxkart/supertuxkart/language/zh_TW/)\n"
@@ -1329,6 +1329,7 @@ msgstr "香蕉"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "故事模式"
 
@@ -2809,21 +2810,21 @@ msgid ""
 "created."
 msgstr "您的設定檔太舊了，它已經被移除並由一份新的取代。"
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "開始視訊錄製。"
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "視訊儲存於「%s」。"
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "編碼進度："
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS：%d/%d/%d - %d KTris，Ping：%d毫秒"
@@ -3506,7 +3507,7 @@ msgstr[0] "找到 %d 個 Wii 搖桿"
 msgid "Could not detect any wiimote :/"
 msgstr "未偵測到任何 Wii 搖桿 :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
 msgstr "準備比賽"
 

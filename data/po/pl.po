@@ -5,16 +5,16 @@
 # Translators:
 # Deve <deveee@gmail.com>, 2015
 # Deve <deveee@gmail.com>, 2016-2020
-# Yogitex <ctrahg123@gmail.com>, 2016
+# Jakub Wojtkowiak <ctrahg123@gmail.com>, 2016,2021
 # Patryk Wychowaniec <patryk1303@gmail.com>, 2015-2016
 # Tomek Woźniak <tomek.wozniak1@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
-"PO-Revision-Date: 2021-03-12 16:56+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
+"PO-Revision-Date: 2021-03-31 07:39+0000\n"
+"Last-Translator: Jakub Wojtkowiak <ctrahg123@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/supertuxkart/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -376,7 +376,7 @@ msgstr "Akceptuj"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr ""
+msgstr "Przywróć"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -415,12 +415,12 @@ msgstr "Kamera tylna"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "Śledź piłkę w trybie piłki nożnej"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Reset"
-msgstr ""
+msgstr "Reset"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -1324,6 +1324,7 @@ msgstr "Banany"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "Historia"
 
@@ -1679,7 +1680,7 @@ msgstr "Gdy urządzenia zostały skonfigurowane, wybierz ikonę \"Podzielony ekr
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 msgid "High Score Selection"
-msgstr ""
+msgstr "Wybór rekordu"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1724,7 +1725,7 @@ msgstr "Samouczek"
 #. I18N: In the main screen
 #: src/states_screens/track_info_screen.cpp:332
 msgid "High Scores"
-msgstr ""
+msgstr "Rekordy"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2242,7 +2243,7 @@ msgstr "Poziom efektów graficznych"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr ""
+msgstr "Rozdzielczość renderowania"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2804,21 +2805,21 @@ msgid ""
 "created."
 msgstr "Plik konfiguracyjny za stary. Usuwanie i tworzenie nowego."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "Rozpoczęto nagrywanie wideo."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Wideo zapisane w \"%s\"."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "Postęp kodowania:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
@@ -3477,7 +3478,7 @@ msgstr "Tylko Mistrz Gry może działać w tym miejscu!"
 #: src/input/sdl_controller.cpp:241
 #, c-format
 msgid "%s has low battery level."
-msgstr ""
+msgstr "%s ma niski poziom baterii."
 
 #: src/input/wiimote_manager.cpp:379
 msgid ""
@@ -3504,9 +3505,9 @@ msgstr[3] "Znaleziono %d Wiimote"
 msgid "Could not detect any wiimote :/"
 msgstr "Nie można wykryć konsoli Wiimote :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
-msgstr ""
+msgstr "Przygotowywanie się do wyścigu"
 
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
@@ -3535,7 +3536,7 @@ msgstr "Wygrałeś wyścig!"
 #: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "Ukończyłeś wyścig na %d miejscu!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
@@ -4694,27 +4695,27 @@ msgstr "Nie"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:87
 #, c-format
 msgid "Top %d High Scores"
-msgstr ""
+msgstr "%d najlepszych rekordów"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:89
 #, c-format
 msgid "Track: %s"
-msgstr ""
+msgstr "Trasa: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:102
 #, c-format
 msgid "Number of karts: %d"
-msgstr ""
+msgstr "Liczba gokartów: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:105
 #, c-format
 msgid "Laps: %d"
-msgstr ""
+msgstr "Okrążenia: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:109
 #, c-format
 msgid "Reverse: %s"
-msgstr ""
+msgstr "Odwrotnie: %s"
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:169
@@ -4795,7 +4796,7 @@ msgstr "Powiedz administratorowi serwera o tym graczu(%s)"
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "Naciśnij dowolny klawisz...\n(Naciśnij ESC, aby anulować)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
@@ -5158,15 +5159,15 @@ msgstr "Ukończono Grand Prix!"
 #: src/states_screens/high_score_selection.cpp:134
 msgctxt "column_name"
 msgid "Number of karts"
-msgstr ""
+msgstr "Liczba gokartów"
 
 #: src/states_screens/high_score_selection.cpp:267
 msgid "Are you sure you want to remove this high score entry?"
-msgstr ""
+msgstr "Czy na pewno chcesz usunąć ten rekord?"
 
 #: src/states_screens/high_score_selection.cpp:275
 msgid "Are you sure you want to remove all of your high scores?"
-msgstr ""
+msgstr "Czy na pewno chcesz usunąć wszystkie twoje rekordy?"
 
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
@@ -5221,7 +5222,7 @@ msgstr "Proszę czekać, dodatki są ładowane."
 
 #: src/states_screens/main_menu_screen.cpp:654
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "Czy na pewno chcesz wyjść z STK?"
 
 #: src/states_screens/online/create_server_screen.cpp:96
 msgid "Create LAN Server"

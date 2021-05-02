@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
 "PO-Revision-Date: 2021-03-12 16:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Czech (http://www.transifex.com/supertuxkart/supertuxkart/language/cs/)\n"
@@ -1324,6 +1324,7 @@ msgstr "Banány"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "Režim příběhu"
 
@@ -2804,21 +2805,21 @@ msgid ""
 "created."
 msgstr "Soubor nastavení byl zastaralý, proto byl smazán a bude vytvořen nový."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "Zahájeno nahrávání videa."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video uloženo do „%s“."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "Průběh enkódování:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d tisíc trojúhelníků, ping: %d ms"
@@ -3504,7 +3505,7 @@ msgstr[3] "Nalezeno %d Wiimote ovladačů"
 msgid "Could not detect any wiimote :/"
 msgstr "Nepodařilo se nalézt žádný Wiimote ovladač :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
 msgstr ""
 

@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
 "PO-Revision-Date: 2021-03-12 16:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Korean (http://www.transifex.com/supertuxkart/supertuxkart/language/ko/)\n"
@@ -1324,6 +1324,7 @@ msgstr "바나나"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "이야기 모드"
 
@@ -2804,21 +2805,21 @@ msgid ""
 "created."
 msgstr "당신의 구성 파일이 너무 오래되어서, 이는 삭제되었고 새로운 구성이 만들어질 것입니다."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "동영상 녹화가 시작되었습니다."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "동영상이 \"%s\"에 저장되었습니다."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "인코딩 진행 상황:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, 핑: %dms"
@@ -3501,7 +3502,7 @@ msgstr[0] "Wii 리모컨 %d개를 찾았습니다"
 msgid "Could not detect any wiimote :/"
 msgstr "Wii 리모컨을 감지할 수 없었습니다 :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
 msgstr ""
 
