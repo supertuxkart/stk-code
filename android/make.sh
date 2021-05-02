@@ -563,6 +563,7 @@ echo "    <style name=\"Theme.STKSplashScreen\" parent=\"android:style/Theme.Hol
 echo "         <item name=\"android:windowBackground\">#A8A8A8</item>" >> "$STYLES_FILE"
 echo "         <item name=\"android:windowFullscreen\">true</item>" >> "$STYLES_FILE"
 echo "         <item name=\"android:windowNoTitle\">true</item>" >> "$STYLES_FILE"
+echo "         <item name=\"android:windowLayoutInDisplayCutoutMode\">shortEdges</item>" >> "$STYLES_FILE"
 echo "         <item name=\"android:windowContentOverlay\">@null</item>" >> "$STYLES_FILE"
 echo "    </style>"                                     >> "$STYLES_FILE"
 echo "</resources>"                                     >> "$STYLES_FILE"

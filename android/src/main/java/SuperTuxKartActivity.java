@@ -261,11 +261,6 @@ public class SuperTuxKartActivity extends SDLActivity
             }
             catch(Exception e) {}
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        {
-            getWindow().getAttributes().layoutInDisplayCutoutMode =
-                LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
-        }
     }
     // ------------------------------------------------------------------------
     @Override
