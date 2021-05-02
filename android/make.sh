@@ -374,7 +374,8 @@ if [ ! -f "$DIRNAME/obj/freetype_bootstrap.stamp" ]; then
              -DPNG_LIBRARY="$DIRNAME/obj/libpng/libpng.a"                  \
              -DPNG_PNG_INCLUDE_DIR="$DIRNAME/obj/libpng/"                  \
              -DFT_WITH_HARFBUZZ=OFF -DFT_WITH_BZIP2=OFF                    \
-             -DFT_WITH_BROTLI=OFF -DFT_WITH_ZLIB=ON -DFT_WITH_PNG=ON &&
+             -DFT_WITH_BROTLI=OFF -DFT_WITH_ZLIB=ON -DFT_WITH_PNG=ON       \
+             -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     # We need to rebuild freetype after harfbuzz is compiled
@@ -416,7 +417,8 @@ if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
              -DHARFBUZZ_LIBRARIES="$DIRNAME/obj/harfbuzz/build/libharfbuzz.a" \
              -DHARFBUZZ_INCLUDE_DIRS="$DIRNAME/obj/harfbuzz/src/"             \
              -DFT_WITH_HARFBUZZ=ON -DFT_WITH_BZIP2=OFF                        \
-             -DFT_WITH_BROTLI=OFF -DFT_WITH_ZLIB=ON -DFT_WITH_PNG=ON &&
+             -DFT_WITH_BROTLI=OFF -DFT_WITH_ZLIB=ON -DFT_WITH_PNG=ON          \
+             -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/freetype.stamp"
@@ -429,11 +431,11 @@ if [ ! -f "$DIRNAME/obj/openal.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/openal/"* "$DIRNAME/obj/openal"
 
     cd "$DIRNAME/obj/openal"
-    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST -DARCH=$ARCH                                     \
-            -DALSOFT_UTILS=0                                              \
-            -DALSOFT_EXAMPLES=0                                           \
-            -DALSOFT_TESTS=0 -DLIBTYPE=STATIC                             \
+    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake   \
+            -DHOST=$HOST -DARCH=$ARCH  -DALSOFT_UTILS=0 -DALSOFT_EXAMPLES=0 \
+            -DLIBTYPE=STATIC -DOPENSL_LIBRARY="-lOpenSLES"                  \
+            -DOPENSL_INCLUDE_DIR="$DIRNAME/obj/sysroot/usr/include/SLES/"   \
+            -DOPENSL_ANDROID_INCLUDE_DIR="$DIRNAME/obj/sysroot/usr/include/SLES/" \
             -DCMAKE_C_FLAGS="-fpic" -DCMAKE_CXX_FLAGS="-fpic" &&
     make $@
     check_error
