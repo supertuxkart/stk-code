@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
-"PO-Revision-Date: 2021-03-12 16:56+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
+"PO-Revision-Date: 2021-04-05 11:45+0000\n"
+"Last-Translator: Crystal Da Eevee <rutmaria3333@hotmail.com>\n"
 "Language-Team: Portuguese (http://www.transifex.com/supertuxkart/supertuxkart/language/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -379,7 +379,7 @@ msgstr "Aceitar"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr ""
+msgstr "Reverter"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -1327,6 +1327,7 @@ msgstr "Bananas"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "Modo História"
 
@@ -2807,21 +2808,21 @@ msgid ""
 "created."
 msgstr "O ficheiro de configurações é antigo e por isso foi eliminado. Vai ser criado um novo."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "Começou a gravação do vídeo."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Vídeo gravado em \"%s\"."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "Processo de codificação:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
@@ -3505,9 +3506,9 @@ msgstr[1] "Foram encontrados %d wiimotes"
 msgid "Could not detect any wiimote :/"
 msgstr "Não foi possível detetar nenhum wiimote :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
-msgstr ""
+msgstr "A preparar para correr"
 
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
@@ -4786,7 +4787,7 @@ msgstr "Denunciar ao administrador sobre deste jogador (%s):"
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "Pressiona qualquer tecla/botão...\n(Pressiona ESC para cancelar)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
@@ -5212,7 +5213,7 @@ msgstr "Por favor aguarda enquanto os add-ons são carregados"
 
 #: src/states_screens/main_menu_screen.cpp:654
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "Tens a certeza que queres sair do STK?"
 
 #: src/states_screens/online/create_server_screen.cpp:96
 msgid "Create LAN Server"
@@ -6221,7 +6222,7 @@ msgstr "Apanha as garrafas de nitro (vamos usá-las após a curva)."
 #: ../stk-assets/tracks/tutorial/scripting.as:121
 #, c-format
 msgid "Oops! When you're in trouble, press <%s> to be rescued."
-msgstr "Aiii! Quando estiveres com problemas carrega na tecla <%s> para chamar o reboque."
+msgstr "Oh não! Quando estiveres preso ou saires da pista, carrega na tecla <%s> para chamar o Thunderbird e voltares ao percurso."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:127
 msgid "Oops! When you're in trouble, press the bird icon to be rescued."

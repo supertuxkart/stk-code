@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# Boden <Bodenchuk@bigmir.net>, 2021
 # fedik <fedikw@gmail.com>, 2015-2017,2019
 # Max Lyashuk <m_lyashuk@ukr.net>, 2015-2016
 # Olexandr Nesterenko <nolexndr@gmail.com>, 2020
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
-"PO-Revision-Date: 2021-03-12 16:56+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
+"PO-Revision-Date: 2021-04-01 12:30+0000\n"
+"Last-Translator: Boden <Bodenchuk@bigmir.net>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/supertuxkart/supertuxkart/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1324,6 +1325,7 @@ msgstr "Банани"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "Режим історії"
 
@@ -2804,21 +2806,21 @@ msgid ""
 "created."
 msgstr "Ваш файл налаштувань застарів. Він буде вилучений і замінений новим."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "Запис відео розпочато."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Відео збережено в \"%s\"."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "Поступ кодування:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "Кадр./сек: %d/%d/%d - %d KTris, Пінг: %dмс"
@@ -3504,7 +3506,7 @@ msgstr[3] "Знайдено %d контролерів Wii"
 msgid "Could not detect any wiimote :/"
 msgstr "Не виявлено пристроїв wiimote :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
 msgstr ""
 
@@ -5733,17 +5735,17 @@ msgstr "Приховано"
 #. I18N: In the UI options, minimap position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:99
 msgid "Centered"
-msgstr ""
+msgstr "По центру"
 
 #. I18N: In the UI options, splitscreen_method in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:117
 msgid "Vertical"
-msgstr ""
+msgstr "Вертикально"
 
 #. I18N: In the UI options, splitscreen_method position in the race UI
 #: src/states_screens/options/options_screen_ui.cpp:119
 msgid "Horizontal"
-msgstr ""
+msgstr "Горизонтально"
 
 #. I18N: In the UI options, Very small font size
 #: src/states_screens/options/options_screen_ui.cpp:130
@@ -6273,7 +6275,7 @@ msgstr ""
 #. semicolons
 #: supertuxkart.desktop:11
 msgid "tux;game;race;"
-msgstr ""
+msgstr "пінгвін;гра;перегони;"
 
 #: supertuxkart.appdata.xml:8
 msgid ""
@@ -6304,7 +6306,7 @@ msgstr ""
 
 #: supertuxkart.appdata.xml:17
 msgid "This game is free and without ads."
-msgstr ""
+msgstr "Ця гра безкоштовна і без реклами."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
@@ -6325,4 +6327,4 @@ msgstr ""
 
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
-msgstr ""
+msgstr "Команда SuperTuxKart"

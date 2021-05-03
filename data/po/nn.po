@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
 "PO-Revision-Date: 2021-03-12 16:56+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Norwegian Nynorsk (http://www.transifex.com/supertuxkart/supertuxkart/language/nn/)\n"
@@ -1320,6 +1320,7 @@ msgstr "Bananar"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "Forteljings­modus"
 
@@ -2800,21 +2801,21 @@ msgid ""
 "created."
 msgstr "Oppsettfila var for gammal, og vart derfor sletta."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "Videoopptak starta."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Videoen vart lagra i «%s»."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "Kodar video:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d – %d kilotrekantar – ping: %d ms"
@@ -3498,7 +3499,7 @@ msgstr[1] "Fann %d Wii-kontrollarar"
 msgid "Could not detect any wiimote :/"
 msgstr "Fann ikkje nokon Wii-kontrollar"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
 msgstr ""
 

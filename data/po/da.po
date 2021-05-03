@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
-"PO-Revision-Date: 2021-03-16 17:04+0000\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
+"PO-Revision-Date: 2021-03-22 17:29+0000\n"
 "Last-Translator: Lars Lyngby <larslyngby@hotmail.com>\n"
 "Language-Team: Danish (http://www.transifex.com/supertuxkart/supertuxkart/language/da/)\n"
 "MIME-Version: 1.0\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr "Udpakker spildata ..."
+msgstr "Udpakker spildata..."
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
@@ -42,7 +42,7 @@ msgstr "Afslut"
 
 #. I18N: ./data/achievements.xml
 msgid "Christoffel Columbus"
-msgstr "Christoffer Columbus"
+msgstr "Christoffel Columbus"
 
 #. I18N: ./data/achievements.xml
 msgid "Play every official track at least once."
@@ -444,12 +444,12 @@ msgstr "Bloom"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Light shaft (God rays)"
-msgstr "Tusmørkestråler"
+msgstr "Lysstråler"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Ambient occlusion"
-msgstr "Ambient occlusion"
+msgstr "Tæt indeslutning"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -1324,6 +1324,7 @@ msgstr "Bananaer"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "Fortælletilstand"
 
@@ -2804,21 +2805,21 @@ msgid ""
 "created."
 msgstr "Din konfigurationsfil var for gammel, så den blev slettet og en ny oprettet."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "Startede videooptagelse."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video gemt i \"%s\"."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "Kodningsforløb:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d ktris, ping: %dms"
@@ -3502,7 +3503,7 @@ msgstr[1] "Fandt %d wiimoter"
 msgid "Could not detect any wiimote :/"
 msgstr "Kunne ikke registrere nogen wiimote :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
 msgstr "Gør klar til løb"
 

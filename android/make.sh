@@ -363,15 +363,19 @@ fi
 
 # Freetype bootstrap
 if [ ! -f "$DIRNAME/obj/freetype_bootstrap.stamp" ]; then
-    echo "Compiling freetype"
-    mkdir -p "$DIRNAME/obj/freetype"
+    echo "Compiling freetype bootstrap"
+    mkdir -p "$DIRNAME/obj/freetype/build"
     cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
-
-    cd "$DIRNAME/obj/freetype"
-    ZLIB_CFLAGS="-I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a"\
-    LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a"\
-    ./configure --host=$HOST --enable-shared=no \
-                --without-harfbuzz --without-brotli --without-bzip2 &&
+    cd "$DIRNAME/obj/freetype/build"
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+             -DHOST=$HOST -DARCH=$ARCH                                     \
+             -DZLIB_LIBRARY="$DIRNAME/obj/zlib/libz.a"                     \
+             -DZLIB_INCLUDE_DIR="$DIRNAME/obj/zlib/"                       \
+             -DPNG_LIBRARY="$DIRNAME/obj/libpng/libpng.a"                  \
+             -DPNG_PNG_INCLUDE_DIR="$DIRNAME/obj/libpng/"                  \
+             -DFT_WITH_HARFBUZZ=OFF -DFT_WITH_BZIP2=OFF                    \
+             -DFT_WITH_BROTLI=OFF -DFT_WITH_ZLIB=ON -DFT_WITH_PNG=ON       \
+             -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     # We need to rebuild freetype after harfbuzz is compiled
@@ -381,15 +385,17 @@ fi
 # Harfbuzz
 if [ ! -f "$DIRNAME/obj/harfbuzz.stamp" ]; then
     echo "Compiling harfbuzz"
-    mkdir -p "$DIRNAME/obj/harfbuzz"
+    mkdir -p "$DIRNAME/obj/harfbuzz/build"
     cp -a -f "$DIRNAME/../lib/harfbuzz/"* "$DIRNAME/obj/harfbuzz"
 
-    cd "$DIRNAME/obj/harfbuzz"
-    FREETYPE_CFLAGS="-I$DIRNAME/obj/freetype/include" \
-    FREETYPE_LIBS="$DIRNAME/obj/freetype/objs/.libs/libfreetype.a $DIRNAME/obj/libpng/libpng.a $DIRNAME/obj/zlib/libz.a"\
-    ./configure --host=$HOST --enable-shared=no \
-                --with-glib=no --with-gobject=no --with-cairo=no \
-                --with-fontconfig=no --with-icu=no --with-graphite2=no &&
+    cd "$DIRNAME/obj/harfbuzz/build"
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake    \
+             -DHOST=$HOST -DARCH=$ARCH -DBUILD_SHARED_LIBS=OFF                \
+             -DFREETYPE_LIBRARY="$DIRNAME/obj/freetype/build/libfreetype.a $DIRNAME/obj/libpng/libpng.a $DIRNAME/obj/zlib/libz.a" \
+             -DFREETYPE_INCLUDE_DIRS="$DIRNAME/obj/freetype/include/"         \
+             -DHB_HAVE_GLIB=OFF -DHB_HAVE_GOBJECT=OFF -DHB_HAVE_ICU=OFF       \
+             -DHB_HAVE_FREETYPE=ON -DHB_BUILD_SUBSET=OFF                      \
+             -DCMAKE_C_FLAGS="-fpic" -DCMAKE_CXX_FLAGS="-std=gnu++0x -fpic" &&
     make $@
     check_error
     mkdir -p "$DIRNAME/obj/harfbuzz/include/harfbuzz"
@@ -400,14 +406,19 @@ fi
 # Freetype
 if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
     echo "Compiling freetype"
-    mkdir -p "$DIRNAME/obj/freetype"
-    cp -a -f "$DIRNAME/../lib/freetype/"* "$DIRNAME/obj/freetype"
-
-    cd "$DIRNAME/obj/freetype"
-    ZLIB_CFLAGS="-fpic -I$DIRNAME/obj/zlib/" ZLIB_LIBS="$DIRNAME/obj/zlib/libz.a" \
-    LIBPNG_CFLAGS="-I$DIRNAME/obj/libpng/" LIBPNG_LIBS="$DIRNAME/obj/libpng/libpng.a" \
-    HARFBUZZ_CFLAGS="-I$DIRNAME/obj/harfbuzz/src/" HARFBUZZ_LIBS="$DIRNAME/obj/harfbuzz/src/.libs/libharfbuzz.a" \
-    ./configure --host=$HOST --enable-shared=no --without-brotli --without-bzip2
+    cd "$DIRNAME/obj/freetype/build"
+    rm -rf *
+    cmake .. -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake    \
+             -DHOST=$HOST -DARCH=$ARCH                                        \
+             -DZLIB_LIBRARY="$DIRNAME/obj/zlib/libz.a"                        \
+             -DZLIB_INCLUDE_DIR="$DIRNAME/obj/zlib/"                          \
+             -DPNG_LIBRARY="$DIRNAME/obj/libpng/libpng.a"                     \
+             -DPNG_PNG_INCLUDE_DIR="$DIRNAME/obj/libpng/"                     \
+             -DHARFBUZZ_LIBRARIES="$DIRNAME/obj/harfbuzz/build/libharfbuzz.a" \
+             -DHARFBUZZ_INCLUDE_DIRS="$DIRNAME/obj/harfbuzz/src/"             \
+             -DFT_WITH_HARFBUZZ=ON -DFT_WITH_BZIP2=OFF                        \
+             -DFT_WITH_BROTLI=OFF -DFT_WITH_ZLIB=ON -DFT_WITH_PNG=ON          \
+             -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/freetype.stamp"
@@ -420,30 +431,31 @@ if [ ! -f "$DIRNAME/obj/openal.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/openal/"* "$DIRNAME/obj/openal"
 
     cd "$DIRNAME/obj/openal"
-    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
-            -DHOST=$HOST -DARCH=$ARCH                                     \
-            -DALSOFT_UTILS=0                                              \
-            -DALSOFT_EXAMPLES=0                                           \
-            -DALSOFT_TESTS=0                                              \
-            -DLIBTYPE=STATIC &&
+    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake   \
+            -DHOST=$HOST -DARCH=$ARCH  -DALSOFT_UTILS=0 -DALSOFT_EXAMPLES=0 \
+            -DLIBTYPE=STATIC -DOPENSL_LIBRARY="-lOpenSLES"                  \
+            -DOPENSL_INCLUDE_DIR="$DIRNAME/obj/sysroot/usr/include/SLES/"   \
+            -DOPENSL_ANDROID_INCLUDE_DIR="$DIRNAME/obj/sysroot/usr/include/SLES/" \
+            -DCMAKE_C_FLAGS="-fpic" -DCMAKE_CXX_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/openal.stamp"
 fi
 
-# OpenSSL
-if [ ! -f "$DIRNAME/obj/openssl.stamp" ]; then
-    echo "Compiling openssl"
-    mkdir -p "$DIRNAME/obj/openssl"
-    cp -a -f "$DIRNAME/../lib/openssl/"* "$DIRNAME/obj/openssl"
+# MbedTLS
+if [ ! -f "$DIRNAME/obj/mbedtls.stamp" ]; then
+    echo "Compiling mbedtls"
+    mkdir -p "$DIRNAME/obj/mbedtls"
+    cp -a -f "$DIRNAME/../lib/mbedtls/"* "$DIRNAME/obj/mbedtls"
 
-    cd "$DIRNAME/obj/openssl"
-    export ANDROID_NDK_HOME="$DIRNAME/obj/"
-    ./Configure android-$ARCH
+    cd "$DIRNAME/obj/mbedtls"
+    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+            -DHOST=$HOST -DARCH=$ARCH -DBUILD_SHARED_LIBS=OFF             \
+            -DENABLE_TESTING=OFF -DENABLE_PROGRAMS=OFF                    \
+            -DCMAKE_C_FLAGS="-fpic" &&
     make $@
-    unset ANDROID_NDK_HOME
     check_error
-    touch "$DIRNAME/obj/openssl.stamp"
+    touch "$DIRNAME/obj/mbedtls.stamp"
 fi
 
 # Curl
@@ -453,13 +465,20 @@ if [ ! -f "$DIRNAME/obj/curl.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/curl/"* "$DIRNAME/obj/curl"
 
     cd "$DIRNAME/obj/curl"
-    CPPFLAGS="-I$DIRNAME/obj/openssl/include -I$DIRNAME/obj/zlib $CPPFLAGS" \
-    LDFLAGS="-L$DIRNAME/obj/openssl/ -L$DIRNAME/obj/zlib $LDFLAGS"          \
-    ./configure --host=$HOST                            \
-                --with-ssl                              \
-                --disable-shared                        \
-                --enable-static                         \
-                --enable-threaded-resolver &&
+    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake       \
+            -DHOST=$HOST -DARCH=$ARCH -DBUILD_SHARED_LIBS=OFF                   \
+            -DZLIB_LIBRARY="$DIRNAME/obj/zlib/libz.a"                           \
+            -DZLIB_INCLUDE_DIR="$DIRNAME/obj/zlib/"                             \
+            -DMBEDCRYPTO_LIBRARY="$DIRNAME/obj/mbedtls/library/libmbedcrypto.a" \
+            -DMBEDTLS_LIBRARY="$DIRNAME/obj/mbedtls/library/libmbedtls.a"       \
+            -DMBEDX509_LIBRARY="$DIRNAME/obj/mbedtls/library/libmbedx509.a"     \
+            -DMBEDTLS_INCLUDE_DIRS="$DIRNAME/obj/mbedtls/include/"              \
+            -DBUILD_TESTING=OFF -DBUILD_CURL_EXE=OFF                            \
+            -DCMAKE_USE_MBEDTLS=ON -DUSE_ZLIB=ON -DCMAKE_USE_OPENSSL=OFF        \
+            -DCMAKE_USE_LIBSSH=OFF -DCMAKE_USE_LIBSSH2=OFF                      \
+            -DCMAKE_USE_GSSAPI=OFF -DUSE_NGHTTP2=OFF -DUSE_QUICHE=OFF           \
+            -DHTTP_ONLY=ON -DCURL_CA_BUNDLE=none -DCURL_CA_PATH=none            \
+            -DENABLE_THREADED_RESOLVER=ON &&
     make $@
     check_error
     touch "$DIRNAME/obj/curl.stamp"
@@ -486,8 +505,8 @@ if [ ! -f "$DIRNAME/obj/libogg.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/libogg/"* "$DIRNAME/obj/libogg"
 
     cd "$DIRNAME/obj/libogg"
-    CPPFLAGS="-fpic $CPPFLAGS" \
-    ./configure --host=$HOST &&
+    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+            -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic" &&
     make $@
     check_error
     touch "$DIRNAME/obj/libogg.stamp"
@@ -500,11 +519,10 @@ if [ ! -f "$DIRNAME/obj/libvorbis.stamp" ]; then
     cp -a -f "$DIRNAME/../lib/libvorbis/"* "$DIRNAME/obj/libvorbis"
 
     cd "$DIRNAME/obj/libvorbis"
-    CPPFLAGS="-fpic -I$DIRNAME/obj/libogg/include $CPPFLAGS" \
-    LDFLAGS="-L$DIRNAME/obj/libogg/src/.libs -lm $LDFLAGS" \
-    ./configure --host=$HOST &&
-    sed -i '/#define size_t/d' config.h
-    sed -i 's/-mno-ieee-fp//' lib/Makefile
+    cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+            -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic"             \
+            -DOGG_LIBRARY="$DIRNAME/obj/libogg/libogg.a"                  \
+            -DOGG_INCLUDE_DIR="$DIRNAME/obj/libogg/include" &&
     make $@
     check_error
     touch "$DIRNAME/obj/libvorbis.stamp"
@@ -545,6 +563,7 @@ echo "    <style name=\"Theme.STKSplashScreen\" parent=\"android:style/Theme.Hol
 echo "         <item name=\"android:windowBackground\">#A8A8A8</item>" >> "$STYLES_FILE"
 echo "         <item name=\"android:windowFullscreen\">true</item>" >> "$STYLES_FILE"
 echo "         <item name=\"android:windowNoTitle\">true</item>" >> "$STYLES_FILE"
+echo "         <item name=\"android:windowLayoutInDisplayCutoutMode\">shortEdges</item>" >> "$STYLES_FILE"
 echo "         <item name=\"android:windowContentOverlay\">@null</item>" >> "$STYLES_FILE"
 echo "    </style>"                                     >> "$STYLES_FILE"
 echo "</resources>"                                     >> "$STYLES_FILE"

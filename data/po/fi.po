@@ -6,14 +6,15 @@
 # Jaakoppi Horila <supermariojaska5@gmail.com>, 2018-2019
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2015-2021
 # Kristian Laakkonen, 2018-2019
+# Markus Mikkonen <markus.mikkonen@outlook.com>, 2021
 # Oi Suomi On! <oisuomion@protonmail.com>, 2020-2021
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-13 00:51+0800\n"
-"PO-Revision-Date: 2021-03-12 16:56+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-03-22 08:10+0800\n"
+"PO-Revision-Date: 2021-04-24 08:14+0000\n"
+"Last-Translator: Markus Mikkonen <markus.mikkonen@outlook.com>\n"
 "Language-Team: Finnish (http://www.transifex.com/supertuxkart/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1323,6 +1324,7 @@ msgstr "Banaanit"
 #. I18N: Tab in help menu
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: Main menu button
+#: src/io/rich_presence.cpp:501
 msgid "Story Mode"
 msgstr "Tarinapeli"
 
@@ -2728,7 +2730,7 @@ msgstr "Aika-ajo - nitrohaaste"
 
 #: src/challenges/challenge_data.cpp:314
 msgid "Normal Race (single race)"
-msgstr "Tavallinen kilpailu (yksittäinen kisa)"
+msgstr "Tavallinen kilpailu (yksittäinen kilpailu)"
 
 #: src/challenges/challenge_data.cpp:316
 msgid "Time-Trial (single race)"
@@ -2803,21 +2805,21 @@ msgid ""
 "created."
 msgstr "Asetustiedosto oli liian vanha, joten se poistettiin ja uusi luodaan tilalle."
 
-#: src/graphics/irr_driver.cpp:635
+#: src/graphics/irr_driver.cpp:643
 msgid "Video recording started."
 msgstr "Videon tallennus aloitettu."
 
-#: src/graphics/irr_driver.cpp:642
+#: src/graphics/irr_driver.cpp:650
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video tallennettu sijaintiin \"%s\"."
 
-#: src/graphics/irr_driver.cpp:646
+#: src/graphics/irr_driver.cpp:654
 msgid "Encoding progress:"
 msgstr "Pakkauksen edistyminen:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
+#: src/graphics/irr_driver.cpp:1867
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %d ms"
@@ -3501,9 +3503,9 @@ msgstr[1] "Löydetty %d wiimotea"
 msgid "Could not detect any wiimote :/"
 msgstr "Yhtäkään Wiimotea ei löytynyt :/"
 
-#: src/io/rich_presence.cpp:440
+#: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
-msgstr ""
+msgstr "Valmistaudutaan kilpailuun"
 
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
@@ -4782,7 +4784,7 @@ msgstr "Ilmoita palvelimen ylläpidolle tästä pelaajasta (%s):"
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "Paina mitä tahansa painiketta...\n(Paina ESC peruaksesi)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."

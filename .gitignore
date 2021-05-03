@@ -82,5 +82,6 @@ lib/openal
 lib/openssl
 lib/harfbuzz
 lib/sdl2
+lib/mbedtls
 
 .DS_Store
