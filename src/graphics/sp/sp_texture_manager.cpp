@@ -25,6 +25,10 @@
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
 
+#ifdef __HAIKU__
+#include <kernel/scheduler.h>
+#endif
+
 #include <string>
 
 namespace SP
@@ -49,8 +53,16 @@ SPTextureManager::SPTextureManager()
             [this, i]()->void
             {
                 using namespace StringUtils;
-                VS::setThreadName((toString(i) + "SPTM").c_str());
-                while (true)
+		auto thdName = (toString(i) + "SPTM").c_str();
+                VS::setThreadName(thdName);
+#ifdef __HAIKU__
+		if (set_thread_priority(find_thread(thdName),
+					suggest_thread_priority(B_REAL_TIME_DISPLAY_PRIORITY)) < B_OK)
+		{
+		    Log::warn("SPTextureManager", "%s: Thread priority elevation failed!", thdName);
+		}
+#endif
+		while (true)
                 {
                     std::unique_lock<std::mutex> ul(m_thread_obj_mutex);
                     m_thread_obj_cv.wait(ul, [this]
