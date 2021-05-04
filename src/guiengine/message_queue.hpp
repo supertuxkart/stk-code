@@ -19,8 +19,6 @@
 #ifndef HEADER_MESSAGE_QUEUE_HPP
 #define HEADER_MESSAGE_QUEUE_HPP
 
-#include "guiengine/widgets/label_widget.hpp"
-
 #include "irrString.h"
 
 #include <queue>

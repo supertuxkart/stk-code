@@ -9,8 +9,10 @@
 #include <atomic>
 #include <jni.h>
 #include <SDL_system.h>
+#include <string>
 #include <vector>
 #include "../../../../src/utils/utf8/unchecked.h"
+#include "../../../../src/guiengine/message_queue.hpp"
 
 using namespace irr;
 
@@ -32,6 +34,27 @@ extern "C" int Android_getMovedHeight()
 extern "C" int Android_disablePadding()
 {
     return g_disable_padding.load();
+}
+
+#define MAKE_DEBUG_MSG_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_debugMsg(JNIEnv* env, jclass cls, jstring msg)
+#define ANDROID_DEBUG_MSG_CALLBACK(PKG_NAME) MAKE_DEBUG_MSG_CALLBACK(PKG_NAME)
+
+extern "C"
+ANDROID_DEBUG_MSG_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+{
+    if (msg == NULL)
+        return;
+    const uint16_t* utf16_text =
+        (const uint16_t*)env->GetStringChars(msg, NULL);
+    if (utf16_text == NULL)
+        return;
+    const size_t str_len = env->GetStringLength(msg);
+    std::u32string tmp;
+    utf8::unchecked::utf16to32(
+        utf16_text, utf16_text + str_len, std::back_inserter(tmp));
+    env->ReleaseStringChars(msg, utf16_text);
+    core::stringw message = (wchar_t*)tmp.c_str();
+    MessageQueue::add(MessageQueue::MT_GENERIC, message);
 }
 
 #define MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveKeyboardHeight(JNIEnv* env, jclass cls, jint height)

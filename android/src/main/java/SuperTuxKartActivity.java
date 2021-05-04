@@ -71,6 +71,8 @@ public class SuperTuxKartActivity extends SDLActivity
     private float m_left_padding;
     private float m_right_padding;
     // ------------------------------------------------------------------------
+    public native static void debugMsg(String msg);
+    // ------------------------------------------------------------------------
     private native static void handlePadding(boolean val);
     // ------------------------------------------------------------------------
     private native static void saveKeyboardHeight(int height);
