@@ -38,10 +38,29 @@ Additionally some dependencies for optimize_data script:
 
     advancecomp, libjpeg-progs, optipng
 
-Before compilation you must download the package with dependencies from:
-https://github.com/supertuxkart/dependencies
-and extract it to stk-code/lib. It contains sources of libraries that are used
-in STK, but are not availiable in stk-code repository (curl, freetype, openal).
+Before compilation you must download dependencies-android-src.tar.xz from:
+https://github.com/supertuxkart/dependencies/releases
+Choose the corresponding STK version you are compiling, use "preview" for git.
+It contains sources of libraries that are used in STK, but are not available
+in stk-code repository (curl, freetype, openal...).
+
+These libraries are compiled and then statically linked with STK by the Android
+build script.
+
+You need to extract that packed file to stk-code/lib directory, so that the
+directory will have following structure:
+> stk-code
+  > build
+  > data
+  > lib
+    > angelscript
+    > bullet
+    > curl
+    > enet
+    > freetype
+    > ...
+  > src
+  > ...
 
 You need also Android SDK for android-19 platform (the API for Android 4.4) and
 Android NDK. Version r20 is recommended, because it's known that it works
