@@ -649,7 +649,7 @@ endif()
 
 if(NOT SERVER_ONLY)
     if (IOS)
-        target_link_libraries(supertuxkart "-framework CoreHaptics -framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework CoreMotion -framework Foundation -framework GLKit")
+        target_link_libraries(supertuxkart "-weak_framework CoreHaptics -framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework CoreMotion -framework Foundation -framework GLKit")
     endif()
 
     target_link_libraries(supertuxkart
