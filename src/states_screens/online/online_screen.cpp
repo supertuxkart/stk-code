@@ -46,7 +46,7 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
-
+#include "states_screens/dialogs/enter_address_dialog.hpp"
 #include <string>
 
 
@@ -235,41 +235,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
             MessageQueue::add(MessageQueue::MT_ERROR, msg);
             return;
         }
-        core::stringw instruction =
-            _("Enter the server address optionally followed by : and"
-            " then port.");
-        auto gtfd = new GeneralTextFieldDialog(instruction.c_str(),
-            [] (const irr::core::stringw& text) {},
-            [this] (GUIEngine::LabelWidget* lw,
-                   GUIEngine::TextBoxWidget* tb)->bool
-            {
-                core::stringw addr_w = tb->getText();
-                std::string addr_u = StringUtils::wideToUtf8(addr_w);
-                SocketAddress server_addr(addr_u);
-                if (server_addr.getIP() == 0 && !server_addr.isIPv6())
-                {
-                    core::stringw err = _("Invalid server address: %s.",
-                        addr_w);
-                    lw->setText(err, true);
-                    return false;
-                }
-                SocketAddress ipv4_addr = server_addr;
-                if (server_addr.isIPv6())
-                    ipv4_addr.setIP(0);
-                auto server =
-                    std::make_shared<UserDefinedServer>(addr_w, ipv4_addr);
-                if (server_addr.isIPv6())
-                {
-                    server->setIPV6Address(server_addr);
-                    server->setIPV6Connection(true);
-                }
-                m_entered_server = server;
-                return true;
-            });
-        if (!m_entered_server_name.empty())
-        {
-            gtfd->getTextField()->setText(m_entered_server_name);
-        }
+        new EnterAddressDialog(&m_entered_server);
     }
 }   // eventCallback
 
