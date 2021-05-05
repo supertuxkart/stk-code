@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <div x="2%" y="2%" width="96%" height="50%" layout="vertical-row">
+        <label id="title" raw_text="Text" width="100%" height="36%"/>
+        <list id="list_history" x="0" y="37%" width="96%" height="63%" word_wrap="true" />
+    </div>
+    <div x="2%" y="70%" width="96%" height="30%" layout="vertical-row" >
+        <spacer height="7%" width="10" />
+        <textbox id="textfield" width="75%" align="center" />
+        <spacer height="9%" width="10" />
+
+        <buttonbar id="buttons" height="50%" width="54%" align="center">
+
+            <icon-button id="ok" width="128" height="128" icon="gui/icons/green_check.png"
+                I18N="In the enter address dialog" text="OK" align="center"/>
+
+            <icon-button id="cancel" width="128" height="128" icon="gui/icons/remove.png"
+                I18N="In the enter address dialog" text="Cancel" align="center"/>
+
+        </buttonbar>
+        <spacer height="1f" width="20" />
+    </div>
+</stkgui>
