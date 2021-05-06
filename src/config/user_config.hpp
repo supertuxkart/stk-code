@@ -140,7 +140,7 @@ public:
 
     irr::core::stringc toString() const;
 
-    operator std::map<T, U>&() const
+    operator std::map<T, U>&()
     {
         return m_elements;
     }
@@ -735,10 +735,7 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_record_fps
         PARAM_DEFAULT(IntUserConfigParam(30, "record_fps",
         &m_recording_group, "Specify the fps of recording video"));
-    // ---- Others
-    PARAM_PREFIX StringToUIntUserConfigParam    m_address_history
-        PARAM_DEFAULT(StringToUIntUserConfigParam("address-history",
-        "Last 5 IP addresses that user entered",{{"server-address","address","lastly_connected"}},{}));
+
     // ---- Debug - not saved to config file
     /** If high scores will not be saved. For repeated testing on tracks. */
     PARAM_PREFIX bool m_no_high_scores PARAM_DEFAULT(false);
@@ -806,6 +803,11 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
     // ---- Networking
+    PARAM_PREFIX StringToUIntUserConfigParam    m_address_history
+        PARAM_DEFAULT(StringToUIntUserConfigParam("address-history",
+        "Last 5 IP addresses that user entered",
+        {{ "server-address", "address", "last-connection" }}, {}));
+
     // These stk domains have only a record to each ipv6 stun below,
     // so we can use this to know ipv4 address of nat64 gateway (if any)
     PARAM_PREFIX StringToUIntUserConfigParam m_stun_servers_v4
