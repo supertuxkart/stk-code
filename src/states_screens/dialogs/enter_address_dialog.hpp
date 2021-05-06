@@ -30,14 +30,6 @@
 class EnterAddressDialog : public GUIEngine::ModalDialog
 {
 private:
-    class AddressListEntry{
-    public:
-        uint32_t lastly_connected;
-        std::string address;
-        bool operator<(const AddressListEntry& e1)
-        {return lastly_connected<e1.lastly_connected;}
-    };
-    
     GUIEngine::LabelWidget* m_title;
     GUIEngine::TextBoxWidget* m_text_field;
     std::shared_ptr<Server>* m_entered_server;
@@ -48,10 +40,8 @@ private:
     // ------------------------------------------------------------------------
     bool validate();
     // ------------------------------------------------------------------------
-    void deleteOldest();
-    // ------------------------------------------------------------------------
 public:
-    EnterAddressDialog(std::shared_ptr<Server>* enteredServer);
+    EnterAddressDialog(std::shared_ptr<Server>* entered_server);
     // ------------------------------------------------------------------------
     ~EnterAddressDialog();
     // ------------------------------------------------------------------------
@@ -59,7 +49,7 @@ public:
     // ------------------------------------------------------------------------
     virtual void onEnterPressedInternal() OVERRIDE;
     // ------------------------------------------------------------------------
-    GUIEngine::EventPropagation processEvent(const std::string& eventSource)
+    GUIEngine::EventPropagation processEvent(const std::string& event_source)
         OVERRIDE;
     // ------------------------------------------------------------------------
     GUIEngine::TextBoxWidget* getTextField() const     { return m_text_field; }
