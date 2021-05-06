@@ -17,12 +17,19 @@
 
 #ifndef HEADER_ENTER_ADDRESS_DIALOG_HPP
 #define HEADER_ENTER_ADDRESS_DIALOG_HPP
+
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets/label_widget.hpp"
-#include "guiengine/widgets/text_box_widget.hpp"
 #include "utils/cpp2011.hpp"
-#include "network/server.hpp"
-#include "guiengine/widgets/list_widget.hpp"
+#include <memory>
+
+class Server;
+namespace GUIEngine
+{
+    class LabelWidget;
+    class ListWidget;
+    class TextBoxWidget;
+}
+
 /**
  * \brief Dialog that shows up when user wants to enter server address
  * \ingroup states_screens
