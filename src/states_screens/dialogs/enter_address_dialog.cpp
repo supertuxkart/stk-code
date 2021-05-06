@@ -15,21 +15,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 #include "states_screens/dialogs/enter_address_dialog.hpp"
-#include "utils/translation.hpp"
-#include "utils/string_utils.hpp"
+#include "config/user_config.hpp"
+#include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
+#include "guiengine/widgets/ribbon_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
+#include "network/server.hpp"
 #include "network/socket_address.hpp"
 #include "states_screens/state_manager.hpp"
-#include "guiengine/widgets/icon_button_widget.hpp"
-#include "guiengine/widgets/ribbon_widget.hpp"
-#include <IGUIEnvironment.h>
-#include "io/file_manager.hpp"
-#include "io/utf_writer.hpp"
-#include "config/user_config.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
 #include <vector>
 #include <utility>
+#include <IGUIEnvironment.h>
+
 // ------------------------------------------------------------------------
 EnterAddressDialog::EnterAddressDialog(std::shared_ptr<Server>* entered_server)
     : ModalDialog(0.95f, 0.8f, GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM),
@@ -165,4 +166,3 @@ void EnterAddressDialog::loadList()
             break;
     }
 }   // loadList
-
