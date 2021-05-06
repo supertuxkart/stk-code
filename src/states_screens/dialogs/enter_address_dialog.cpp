@@ -27,34 +27,42 @@
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "config/user_config.hpp"
+
+#include <vector>
+#include <utility>
 // ------------------------------------------------------------------------
-EnterAddressDialog::EnterAddressDialog(std::shared_ptr<Server>* enteredServer)
-    : ModalDialog(0.95f,0.8f,GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM),
+EnterAddressDialog::EnterAddressDialog(std::shared_ptr<Server>* entered_server)
+    : ModalDialog(0.95f, 0.8f, GUIEngine::MODAL_DIALOG_LOCATION_BOTTOM),
     m_self_destroy(false)
 {
     loadFromFile("enter_address_dialog.stkgui");
     m_text_field = getWidget<GUIEngine::TextBoxWidget>("textfield");
     m_title = getWidget<GUIEngine::LabelWidget>("title");
     m_title->setText(_("Enter the server address optionally followed by : and"
-            " then port or select address from list."),false);
-    m_entered_server=enteredServer;
+            " then port or select address from list."), false);
+    m_entered_server = entered_server;
     m_list = getWidget<GUIEngine::ListWidget>("list_history");
-    
+
     loadList();
-    
+
+    GUIEngine::RibbonWidget* buttons_ribbon =
+        getWidget<GUIEngine::RibbonWidget>("buttons");
+    buttons_ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    buttons_ribbon->select("cancel", PLAYER_ID_GAME_MASTER);
 }   // EnterAddressDialog
+
 // ------------------------------------------------------------------------
 EnterAddressDialog::~EnterAddressDialog()
 {
     m_text_field->getIrrlichtElement()->remove();
     m_text_field->clearListeners();
 }   // ~EnterAddressDialog
+
 // ------------------------------------------------------------------------
 void EnterAddressDialog::onUpdate(float dt)
 {
     if (m_self_destroy)
     {
-        stringw name = m_text_field->getText().trim();
         GUIEngine::getGUIEnv()
             ->removeFocus(m_text_field->getIrrlichtElement());
         GUIEngine::getGUIEnv()->removeFocus(m_irrlicht_window);
@@ -64,51 +72,46 @@ void EnterAddressDialog::onUpdate(float dt)
 // ------------------------------------------------------------------------
 void EnterAddressDialog::onEnterPressedInternal()
 {
-    GUIEngine::IconButtonWidget* cancel_button = getWidget<GUIEngine::IconButtonWidget>("cancel");
-    if (GUIEngine::isFocusedForPlayer(cancel_button, PLAYER_ID_GAME_MASTER))
-    {
-        std::string fake_event = "cancel";
-        processEvent(fake_event);
-        return;
-    }
-
     if (!m_self_destroy && validate())
+    {
         m_self_destroy = true;
+        UserConfigParams::m_address_history[
+            StringUtils::wideToUtf8(m_text_field->getText())] = (uint32_t)StkTime::getTimeSinceEpoch();
+    }
 }   // onEnterPressedInternal
+
 // ------------------------------------------------------------------------
-GUIEngine::EventPropagation EnterAddressDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation EnterAddressDialog::processEvent(const std::string& event_source)
 {
-    if (eventSource=="buttons")
+    if (event_source == "buttons")
     {
         GUIEngine::RibbonWidget* buttons_ribbon =
             getWidget<GUIEngine::RibbonWidget>("buttons");
         const std::string& button =
-	        buttons_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (button=="cancel")
+            buttons_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if (button == "cancel")
         {
             dismiss();
             return GUIEngine::EVENT_BLOCK;
         }
-        else if (button=="ok")
+        else if (button == "ok")
         {
             if (!m_self_destroy && validate())
             {
                 m_self_destroy = true;
-                
-                UserConfigParams::m_address_history[StringUtils::wideToUtf8(m_text_field->getText())] = (uint32_t)StkTime::getTimeSinceEpoch();
-                if (UserConfigParams::m_address_history.size()>5)
-                    deleteOldest();
+                UserConfigParams::m_address_history[
+                    StringUtils::wideToUtf8(m_text_field->getText())] = (uint32_t)StkTime::getTimeSinceEpoch();
             }
-            
             return GUIEngine::EVENT_BLOCK;
         }
     }
-    if (eventSource=="list_history")
+    if (event_source == "list_history")
     {
         m_text_field->setText(m_list->getSelectionLabel());
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
+
 // ------------------------------------------------------------------------
 bool EnterAddressDialog::validate()
 {
@@ -135,31 +138,31 @@ bool EnterAddressDialog::validate()
     *m_entered_server = server;
     return true;
 }   // validate
+
 // ------------------------------------------------------------------------
 void EnterAddressDialog::loadList()
 {
-    std::vector<AddressListEntry> entries;
-    for(std::map<std::string,uint32_t>::iterator i=UserConfigParams::m_address_history.begin(); i!=UserConfigParams::m_address_history.end(); i++)
-    {
-        entries.push_back(AddressListEntry{i->second,i->first});
-    }
-    std::sort(entries.begin(),entries.end());
-    for(int i=entries.size()-1; i>=0; i--)
+    const unsigned MAX_ENTRIES = 5;
+    std::map<std::string, uint32_t>& addr = UserConfigParams::m_address_history;
+    std::vector<std::pair<std::string, uint32_t> > entries;
+    for (std::map<std::string,uint32_t>::iterator i = addr.begin();
+        i != addr.end(); i++)
+        entries.emplace_back(i->first, i->second);
+    std::sort(entries.begin(),entries.end(),
+        [](const std::pair<std::string,uint32_t>& a,
+           const std::pair<std::string,uint32_t>& b)->bool
+        { return a.second > b.second; });
+
+    addr.clear();
+    for (unsigned i = 0; i < entries.size(); i++)
     {
         m_list->addItem("list_item",
-        std::vector<GUIEngine::ListWidget::ListCell>{GUIEngine::ListWidget::ListCell(irr::core::stringw(entries[i].address.c_str())),GUIEngine::ListWidget::ListCell(StringUtils::toWString(StkTime::toString(entries[i].lastly_connected)))});
+            std::vector<GUIEngine::ListWidget::ListCell>
+            { GUIEngine::ListWidget::ListCell(StringUtils::utf8ToWide(entries[i].first)),
+            GUIEngine::ListWidget::ListCell(StringUtils::utf8ToWide(StkTime::toString(entries[i].second)))});
+        addr[entries[i].first] = entries[i].second;
+        if (i >= MAX_ENTRIES - 1)
+            break;
     }
 }   // loadList
-void EnterAddressDialog::deleteOldest()
-{
-    uint32_t oldestTime=UserConfigParams::m_address_history.begin()->second;
-    std::string key=UserConfigParams::m_address_history.begin()->first;
-    for(std::map<std::string,uint32_t>::iterator i = UserConfigParams::m_address_history.begin(); i != UserConfigParams::m_address_history.end(); i++)
-    {
-        if (i->second<oldestTime){
-            oldestTime = i->second;
-            key = i->first;
-        }
-    }
-    UserConfigParams::m_address_history.erase(key);
-}   // deleteOldest
+
