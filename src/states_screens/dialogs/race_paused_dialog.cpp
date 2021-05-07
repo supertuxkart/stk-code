@@ -135,9 +135,6 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
         getWidget<IconButtonWidget>("backbtn")->setLabel(_("Back to Race"));
         getWidget<IconButtonWidget>("newrace")->setLabel(_("Setup New Race"));
         getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Race"));
-        IconButtonWidget* endrace=getWidget<IconButtonWidget>("endrace");
-        if(endrace)
-            endrace->setLabel(_("Give Up Race"));
         getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Race"));
     }
 #ifndef MOBILE_STK
