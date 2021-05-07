@@ -648,14 +648,11 @@ bool CIrrDeviceSDL::run()
 				// Mobile STK specific
 				if (irrevent.AccelerometerEvent.X < 0.0)
 					irrevent.AccelerometerEvent.X *= -1.0;
-#ifdef IOS_STK
-				if (o == SDL_ORIENTATION_LANDSCAPE)
-					irrevent.AccelerometerEvent.Y *= -1.0;
-#else
+
 				if (o == SDL_ORIENTATION_LANDSCAPE_FLIPPED ||
 					o == SDL_ORIENTATION_PORTRAIT_FLIPPED)
 					irrevent.AccelerometerEvent.Y *= -1.0;
-#endif
+
 				postEventFromUser(irrevent);
 			}
 			else if (SDL_event.sensor.which == GyroscopeInstance)
