@@ -123,20 +123,26 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
     {
         World::getWorld()->schedulePause(WorldStatus::IN_GAME_MENU_PHASE);
     }
-    if(RaceManager::get()->isBattleMode() || RaceManager::get()->isCTFMode())
+    if (dynamic_cast<OverWorld*>(World::getWorld()) == NULL)
     {
-        getWidget<IconButtonWidget>("backbtn")->setLabel(_("Back to Battle"));
-        getWidget<IconButtonWidget>("newrace")->setLabel(_("Setup New Game"));
-        getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Battle"));
-        getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Battle"));
+        if (RaceManager::get()->isBattleMode() || RaceManager::get()->isCTFMode())
+        {
+            getWidget<IconButtonWidget>("backbtn")->setLabel(_("Back to Battle"));
+            if (!NetworkConfig::get()->isNetworking())
+                getWidget<IconButtonWidget>("newrace")->setLabel(_("Setup New Game"));
+            getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Battle"));
+            getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Battle"));
+        }
+        else
+        {
+            getWidget<IconButtonWidget>("backbtn")->setLabel(_("Back to Race"));
+            if (!NetworkConfig::get()->isNetworking())
+                getWidget<IconButtonWidget>("newrace")->setLabel(_("Setup New Race"));
+            getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Race"));
+            getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Race"));
+        }
     }
-    else
-    {
-        getWidget<IconButtonWidget>("backbtn")->setLabel(_("Back to Race"));
-        getWidget<IconButtonWidget>("newrace")->setLabel(_("Setup New Race"));
-        getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Race"));
-        getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Race"));
-    }
+    
 #ifndef MOBILE_STK
     if (m_text_box && UserConfigParams::m_lobby_chat)
         m_text_box->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
