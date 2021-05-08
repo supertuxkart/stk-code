@@ -29,6 +29,8 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <SDL_system.h>
+
 using namespace GUIEngine;
 using namespace Online;
 using namespace irr::gui;
@@ -107,6 +109,13 @@ DownloadAssets::DownloadAssets()
         "(including high quality textures and music) for better "
         "gaming experience, this will use your mobile data if you don't have "
         "a wifi connection.");
+    if (SDL_IsAndroidTV())
+    {
+        // I18N: In download assets dialog
+        msg = _("SuperTuxKart will download full assets "
+            "(including high quality textures and music) for better "
+            "gaming experience.");
+    }
     getWidget<BubbleWidget>("description")->setText(msg);
 }   // DownloadAssets
 
