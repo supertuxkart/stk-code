@@ -305,6 +305,7 @@
   <developer_name xml:lang="zh_TW">SuperTuxKart 團隊</developer_name>
   <developer_name xml:lang="zh_HK">SuperTuxKart 團隊</developer_name>
   <developer_name xml:lang="zh_CN">SuperTuxKart开发团队</developer_name>
+  <developer_name xml:lang="uk">Команда SuperTuxKart</developer_name>
   <developer_name xml:lang="tr">SuperTuxKart Takımı</developer_name>
   <developer_name xml:lang="sv">SuperTuxKart-team</developer_name>
   <developer_name xml:lang="sr">Дружина СуперТаксКолица</developer_name>
@@ -356,7 +357,7 @@
     <lang percentage="99">ca</lang>
     <lang percentage="96">cs</lang>
     <lang>da</lang>
-    <lang percentage="99">de</lang>
+    <lang>de</lang>
     <lang>el</lang>
     <lang percentage="61">eo</lang>
     <lang percentage="99">es</lang>
@@ -369,7 +370,7 @@
     <lang percentage="22">ga</lang>
     <lang percentage="99">gd</lang>
     <lang percentage="54">gl</lang>
-    <lang percentage="92">he</lang>
+    <lang percentage="94">he</lang>
     <lang percentage="29">hr</lang>
     <lang percentage="99">hu</lang>
     <lang>id</lang>
@@ -390,8 +391,8 @@
     <lang percentage="99">nn</lang>
     <lang percentage="30">oc</lang>
     <lang percentage="2">os</lang>
-    <lang percentage="98">pl</lang>
-    <lang percentage="99">pt</lang>
+    <lang>pl</lang>
+    <lang>pt</lang>
     <lang>pt_BR</lang>
     <lang percentage="26">ro</lang>
     <lang percentage="99">ru</lang>
