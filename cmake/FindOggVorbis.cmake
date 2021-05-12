@@ -11,7 +11,7 @@
 
 
 if(UNIX OR USE_SWITCH)
-    pkg_check_modules(OGGVORBIS vorbis)
+    pkg_check_modules(OGGVORBIS vorbisfile)
 else()
 
 find_path(OGGVORBIS_OGG_INCLUDE_DIR NAMES ogg/ogg.h PATHS "${PROJECT_SOURCE_DIR}/${DEPENDENCIES}/include")
