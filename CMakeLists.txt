@@ -44,6 +44,10 @@ CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
 
+if(UNIX OR USE_SWITCH)
+    include(FindPkgConfig)
+endif()
+
 if(APPLE AND NOT IOS)
     if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
 	set(ARCHFLAGS "arm64")
@@ -378,13 +382,7 @@ if (NOT SERVER_ONLY)
     SET(SHEENBIDI_LIBRARY sheenbidi)
 
     # Freetype
-    if (USE_SWITCH)
-        SET(FREETYPE_INCLUDE_DIRS /opt/devkitpro/portlibs/switch/include/freetype2)
-        find_library(FREETYPE_LIBRARIES freetype libfreetype REQUIRED)
-        SET(FREETYPE_FOUND YES)
-    else()
-        find_package(Freetype)
-    endif()
+    find_package(Freetype)
     if(FREETYPE_FOUND)
         include_directories(${FREETYPE_INCLUDE_DIRS})
     else()
