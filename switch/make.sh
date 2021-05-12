@@ -5,10 +5,6 @@ OLD_PWD="$(pwd)"
 SWITCH_DIR=$(realpath "$(dirname "$0")")
 STK_DIR=$(dirname "${SWITCH_DIR}")
 
-# Some shells don't set BASH_SOURCE. Let's set it just in case:
-BASH_SOURCE="${DEVKITPRO}/switchvars.sh"
-source "${DEVKITPRO}/switchvars.sh" # Sets environment variables needed for cross-compiling
-
 echo "Compiling STK"
 
 if [[ ! -d "${STK_DIR}/cmake_build" ]]; then
@@ -21,8 +17,8 @@ cd "${STK_DIR}/cmake_build"
     -DCMAKE_INSTALL_PREFIX=/  \
     ../
 
-make -j$(nproc)
-make install DESTDIR=./install
+make -j$(nproc) || exit 1
+make install DESTDIR=./install || exit 1
 
 # Build nro (executable for switch)
 "${SWITCH_DIR}/package.sh"
