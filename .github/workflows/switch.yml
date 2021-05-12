@@ -29,7 +29,7 @@ jobs:
           rm stk-assets-full.zip
       - name: Restore modified date
         run: |
-          sudo apt install -y git-restore-mtime
+          sudo apt update && sudo install -y git-restore-mtime
           cd stk-code
           git restore-mtime .
           cd ..
