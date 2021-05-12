@@ -16,33 +16,14 @@ jobs:
     container:
       image: 'devkitpro/devkita64'
     steps:
-      - name: Install git
-        run: |
-          echo "deb http://ftp.debian.org/debian stretch-backports main" | sudo tee /etc/apt/sources.list.d/stretch-backports.list
-          sudo apt update
-          sudo apt install -t stretch-backports git -y
       - name: Checkout code
         uses: actions/checkout@v2
         with:
           # We need 0 so we get all commits for mtime!
           fetch-depth: 0
           path: "./stk-code"
-      - name: Checkout OpenAL
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          path: "./stk-code/lib/openal"
-          repository: "kcat/openal-soft"
-      - name: Checkout Harfbuzz
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-          path: "./stk-code/lib/harfbuzz"
-          repository: "harfbuzz/harfbuzz"
       - name: Grab assets
         run: |
-          sudo apt update
-          sudo apt install unzip zip -y
           wget -q https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
           unzip -q stk-assets-full.zip -d stk-assets
           rm stk-assets-full.zip
@@ -51,11 +32,7 @@ jobs:
           sudo apt install -y git-restore-mtime
           cd stk-code
           git restore-mtime .
-          cd lib/openal
-          git restore-mtime .
-          cd ../../lib/harfbuzz
-          git restore-mtime .
-          cd ../../..
+          cd ..
 
       # Env setup!
       - name: Configure packaging name for git master branch
@@ -108,8 +85,6 @@ jobs:
             stk-code/cmake_build/*.cmake
             stk-code/cmake_build/*.txt
 
-            stk-code/lib/openal/cmake_build
-            stk-code/lib/harfbuzz/cmake_build
           # Make sure PRs can't overwrite!
           key: switch-${{ github.ref }}-${{ github.run_number }}
           restore-keys: |
@@ -124,7 +99,6 @@ jobs:
             ${{ env.cache_9 }}
       - name: Run build script
         run: |
-          cp -v stk-code/switch/pkgbuild-scripts/* "$DEVKITPRO/"
           cd stk-code/switch
           PROJECT_VERSION="${{ env.release_tag }}" ./make.sh
       - name: Create release
