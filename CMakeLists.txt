@@ -19,7 +19,11 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-option(USE_SWITCH "Build targetting switch" OFF)
+option(USE_SWITCH "Build targeting switch" OFF)
+
+if(NINTENDO_SWITCH)
+  set(USE_SWITCH ON)
+endif()
 
 if(WIN32)
 option(USE_DIRECTX "Build DirectX 9 driver (requires DirectX SDK)" OFF)
@@ -43,6 +47,10 @@ CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of t
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
+
+if((UNIX AND NOT APPLE) OR NINTENDO_SWITCH)
+    include(FindPkgConfig)
+endif()
 
 if(APPLE AND NOT IOS)
     if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm")
@@ -378,13 +386,7 @@ if (NOT SERVER_ONLY)
     SET(SHEENBIDI_LIBRARY sheenbidi)
 
     # Freetype
-    if (USE_SWITCH)
-        SET(FREETYPE_INCLUDE_DIRS /opt/devkitpro/portlibs/switch/include/freetype2)
-        find_library(FREETYPE_LIBRARIES freetype libfreetype REQUIRED)
-        SET(FREETYPE_FOUND YES)
-    else()
-        find_package(Freetype)
-    endif()
+    find_package(Freetype)
     if(FREETYPE_FOUND)
         include_directories(${FREETYPE_INCLUDE_DIRS})
     else()
