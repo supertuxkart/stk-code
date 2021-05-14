@@ -114,7 +114,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the buffer associated with this sfx. */
-    virtual const SFXBuffer* getBuffer() const OVERRIDE
+    virtual SFXBuffer* getBuffer() const OVERRIDE
                                                      { return m_sound_buffer; }
 
 };   // SFXOpenAL
