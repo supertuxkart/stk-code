@@ -23,12 +23,7 @@
 
 #include <assert.h>
 #include <atomic>
-#ifdef __APPLE__
-#  define OPENAL_DEPRECATED
-#  include <OpenAL/al.h>
-#else
-#  include <AL/al.h>
-#endif
+#include <AL/al.h>
 #include "audio/sfx_base.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/cpp2011.hpp"

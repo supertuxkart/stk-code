@@ -47,6 +47,7 @@ CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of t
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
+CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE" ON)
 
 if((UNIX AND NOT APPLE) OR NINTENDO_SWITCH)
     include(FindPkgConfig)
@@ -368,8 +369,14 @@ endif()
 
 if(NOT SERVER_ONLY)
     # OpenAL
-    find_package(OpenAL REQUIRED)
-    include_directories(${OPENAL_INCLUDE_DIR})
+    if (USE_MOJOAL)
+        add_definitions(-DAL_LIBTYPE_STATIC)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/mojoal")
+        include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/mojoal")
+    else()
+        find_package(OpenAL REQUIRED)
+        include_directories(${OPENAL_INCLUDE_DIR})
+    endif()
 
     # OggVorbis
     find_package(OggVorbis REQUIRED)
@@ -633,6 +640,14 @@ if (USE_SWITCH)
   )
 endif()
 
+if(NOT SERVER_ONLY)
+    if (USE_MOJOAL)
+        target_link_libraries(supertuxkart mojoal)
+    else()
+        target_link_libraries(supertuxkart ${OPENAL_LIBRARY})
+    endif()
+endif()
+
 if (USE_DNS_C)
     target_link_libraries(supertuxkart dnsc)
 else()
@@ -658,7 +673,6 @@ if(NOT SERVER_ONLY)
         ${SQUISH_LIBRARY}
         ${JPEG_LIBRARIES}
         ${OGGVORBIS_LIBRARIES}
-        ${OPENAL_LIBRARY}
         ${FREETYPE_LIBRARIES}
         ${HARFBUZZ_LIBRARY}
         ${SDL2_LIBRARY}
