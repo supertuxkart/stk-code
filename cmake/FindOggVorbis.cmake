@@ -10,7 +10,7 @@
 #     OggVorbis library list
 
 
-if(UNIX OR USE_SWITCH)
+if((UNIX AND NOT APPLE) OR NINTENDO_SWITCH)
     pkg_check_modules(OGGVORBIS vorbisfile)
 else()
 
