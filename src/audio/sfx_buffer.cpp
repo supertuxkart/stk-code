@@ -204,6 +204,13 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
                  data.get(), len, info->rate);
     success = true;
 
+    int buffer_size, frequency, bits_per_sample, channels;
+    buffer_size = len;
+    frequency = info->rate;
+    // We use AL_FORMAT_MONO16 or AL_FORMAT_STEREO16 so it's always 16
+    bits_per_sample = 16;
+    channels = info->channels;
+
     ov_clear(&oggFile);
     fclose(file);
 
@@ -211,11 +218,6 @@ bool SFXBuffer::loadVorbisBuffer(const std::string &name, ALuint buffer)
     // duration (which is the norm), compute it:
     if(m_duration < 0)
     {
-        ALint buffer_size, frequency, bits_per_sample, channels;
-        alGetBufferi(buffer, AL_SIZE,      &buffer_size    );
-        alGetBufferi(buffer, AL_FREQUENCY, &frequency      );
-        alGetBufferi(buffer, AL_CHANNELS,  &channels       );
-        alGetBufferi(buffer, AL_BITS,      &bits_per_sample);
         m_duration = float(buffer_size) 
                    / (frequency*channels*(bits_per_sample / 8));
     }
