@@ -23,6 +23,10 @@
 
 #include "karts/controller/player_controller.hpp"
 #include <memory>
+#include <SDL.h>
+#if SDL_VERSION_ATLEAST(1,3,0)
+#include <SDL_haptic.h>
+#endif
 
 class AbstractKart;
 class ParticleEmitter;
@@ -51,6 +55,11 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
+#if SDL_VERSION_ATLEAST(1,3,0)
+    float        m_last_crash = 0.0f;
+    SDL_Haptic*  m_haptic = nullptr;
+#endif
+
     HandicapLevel m_handicap;
 
     SFXBase     *m_wee_sound;
@@ -64,6 +73,8 @@ private:
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
+
+    void doCrashHaptics();
 
 public:
                  LocalPlayerController(AbstractKart *kart,
@@ -82,6 +93,9 @@ public:
     virtual void finishedRace      (float time) OVERRIDE;
     virtual void resetInputState   () OVERRIDE;
     virtual bool canGetAchievements() const OVERRIDE;
+
+    virtual void crashed(const AbstractKart *k) OVERRIDE;
+    virtual void crashed(const Material *m) OVERRIDE;
 
     // ------------------------------------------------------------------------
     virtual bool isPlayerController() const OVERRIDE {return true;}

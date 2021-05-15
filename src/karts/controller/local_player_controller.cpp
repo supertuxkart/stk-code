@@ -50,6 +50,9 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include "input/device_manager.hpp"
+#include "input/gamepad_device.hpp"
+
 /** The constructor for a loca player kart, i.e. a player that is playing
  *  on this machine (non-local player would be network clients).
  *  \param kart_name Name of the kart.
@@ -86,6 +89,41 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
 
     m_is_above_nitro_target = false;
     initParticleEmitter();
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+    DeviceManager* deviceManager = input_manager->getDeviceManager();
+    int count = deviceManager->getGamePadAmount();
+    while(count--) {
+        GamePadDevice* pad = deviceManager->getGamePad(count);
+        if (pad->getPlayer() == m_player) {
+            // found a match!
+            int joyInstanceId = pad->getIrrIndex();
+            count = SDL_NumJoysticks();
+            while(count--) {
+                SDL_Joystick* joystick = SDL_JoystickOpen(count);
+                if(!joystick)
+                    continue;
+                if (SDL_JoystickInstanceID(joystick) == joyInstanceId)
+                {
+                    SDL_Haptic* haptic = SDL_HapticOpenFromJoystick(joystick);
+                    if (!haptic || SDL_HapticRumbleInit(haptic))
+                      {
+                          Log::warn(
+                              "LocalPlayerController",
+                              "Couldn't initialize haptics for joystick %s: %s",
+                              pad->getName().c_str(),
+                              SDL_GetError()
+                          );
+                          break;
+                      }
+                    m_haptic = haptic;
+                    break;
+                }
+            }
+            break;
+        }
+    }
+#endif
 }   // LocalPlayerController
 
 //-----------------------------------------------------------------------------
@@ -93,6 +131,9 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
  */
 LocalPlayerController::~LocalPlayerController()
 {
+#if SDL_VERSION_ATLEAST(1,3,0)
+    SDL_HapticClose(m_haptic);
+#endif
     m_wee_sound->deleteSFX();
 }   // ~LocalPlayerController
 
@@ -225,7 +266,7 @@ void LocalPlayerController::steer(int ticks, int steer_val)
                              video::SColor(255, 255, 0, 255), false);
     }
     PlayerController::steer(ticks, steer_val);
-    
+
     if(UserConfigParams::m_gamepad_debug)
     {
         Log::debug("LocalPlayerController", "  set to: %f\n",
@@ -414,7 +455,7 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
-/** If the nitro level has gone under the nitro goal, play a bad effect sound 
+/** If the nitro level has gone under the nitro goal, play a bad effect sound
  */
 void LocalPlayerController::nitroNotFullSound()
 {
@@ -429,7 +470,7 @@ void LocalPlayerController::nitroNotFullSound()
  *        collect achievements - synching to online account will happen
  *        next time the account gets online.
  */
-bool LocalPlayerController::canGetAchievements() const 
+bool LocalPlayerController::canGetAchievements() const
 {
     return !RewindManager::get()->isRewinding() &&
         m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
@@ -447,3 +488,34 @@ core::stringw LocalPlayerController::getName(bool include_handicap_string) const
 
     return name;
 }   // getName
+
+void LocalPlayerController::doCrashHaptics() {
+#if SDL_VERSION_ATLEAST(1,3,0)
+    if (!m_haptic)
+    {
+        // printf("Why no haptics??\n");
+        return;
+    }
+    float now = World::getWorld()->getTicksSinceStart();
+    float lastCrash = m_last_crash;
+    m_last_crash = now;
+    if ((now - lastCrash) < stk_config->time2Ticks(0.2f))
+        return;
+
+    float strength = pow(2, (abs(m_player->getKart()->getVelocity().length())) / 15.0f) - 1.0f;
+
+    SDL_HapticRumblePlay(m_haptic, std::min(std::max(strength, 0.0f), 1.0f), 200);
+#endif
+}
+
+void LocalPlayerController::crashed(const AbstractKart* k) {
+    doCrashHaptics();
+
+    PlayerController::crashed(k);
+}
+
+void LocalPlayerController::crashed(const Material *m) {
+    doCrashHaptics();
+
+    PlayerController::crashed(m);
+}
