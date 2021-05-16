@@ -35,8 +35,6 @@
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "input/gamepad_device.hpp"
-#include <SDL_joystick.h>
-#include <SDL_haptic.h>
 
 #include <SColor.h>
 
