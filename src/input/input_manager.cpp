@@ -225,6 +225,14 @@ void InputManager::handleJoystick(SDL_Event& event)
         Log::error("SDLController", "Error in handleJoystick() %s", e.what());
     }
 }   // handleJoystick
+
+SDLController* InputManager::getSDLController(unsigned i) {
+    assert(i < m_sdl_controller.size());
+    auto it = m_sdl_controller.begin();
+    for(unsigned j = 0; j < i; ++j)
+            it++;
+    return it->second.get();
+}
 #endif
 
 // -----------------------------------------------------------------------------

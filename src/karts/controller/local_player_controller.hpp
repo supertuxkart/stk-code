@@ -23,10 +23,6 @@
 
 #include "karts/controller/player_controller.hpp"
 #include <memory>
-#include <SDL.h>
-#if SDL_VERSION_ATLEAST(1,3,0)
-#include <SDL_haptic.h>
-#endif
 
 class AbstractKart;
 class ParticleEmitter;
@@ -55,10 +51,7 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
-#if SDL_VERSION_ATLEAST(1,3,0)
     float        m_last_crash = 0.0f;
-    SDL_Haptic*  m_haptic = nullptr;
-#endif
 
     HandicapLevel m_handicap;
 
