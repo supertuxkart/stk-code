@@ -34,6 +34,7 @@
 #include "items/swatter.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
+#include "karts/controller/local_player_controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -309,6 +310,12 @@ void Attachment::hitBanana(ItemState *item_state)
         {
             HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
                 "explosion_bomb.xml");
+            // Rumble!
+            Controller* controller = m_kart->getController();
+            if (controller && controller->isLocalPlayerController())
+            {
+                ((LocalPlayerController*) controller)->rumble(0, 0.8f, 500);
+            }
             if (m_kart->getController()->isLocalPlayerController())
                 he->setLocalPlayerKartHit();
             ProjectileManager::get()->addHitEffect(he);
@@ -520,6 +527,12 @@ void Attachment::update(int ticks)
             {
                 HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
                     "explosion_bomb.xml");
+                // Rumble!
+                Controller* controller = m_kart->getController();
+                if (controller && controller->isLocalPlayerController())
+                {
+                    ((LocalPlayerController*) controller)->rumble(0, 0.8f, 500);
+                }
                 if (m_kart->getController()->isLocalPlayerController())
                     he->setLocalPlayerKartHit();
                 ProjectileManager::get()->addHitEffect(he);

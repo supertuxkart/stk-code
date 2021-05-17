@@ -162,7 +162,7 @@ public:
     // ------------------------------------------------------------------------
     void checkPowerLevel();
     // ------------------------------------------------------------------------
-    void doRumble(float strength, uint32_t duration_ms);
+    void doRumble(float strength_low, float strength_high, uint32_t duration_ms);
     GamePadDevice* getGamePadDevice() const { return m_gamepad; }
 };
 

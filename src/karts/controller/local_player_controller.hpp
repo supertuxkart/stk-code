@@ -90,6 +90,8 @@ public:
     virtual void crashed(const AbstractKart *k) OVERRIDE;
     virtual void crashed(const Material *m) OVERRIDE;
 
+    virtual void rumble(float strength_low, float strength_high, uint16_t duration);
+
     // ------------------------------------------------------------------------
     virtual bool isPlayerController() const OVERRIDE {return true;}
     // ------------------------------------------------------------------------

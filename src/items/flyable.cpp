@@ -49,6 +49,7 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
+#include "karts/controller/local_player_controller.hpp"
 
 #include <typeinfo>
 
@@ -611,6 +612,13 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
                     PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS, 1);
                     if (RaceManager::get()->isLinearRaceMode())
                         PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
+                }
+
+                // Rumble!
+                Controller* controller = kart->getController();
+                if (controller && controller->isLocalPlayerController())
+                {
+                    ((LocalPlayerController*) controller)->rumble(0, 0.8f, 500);
                 }
             }
         }

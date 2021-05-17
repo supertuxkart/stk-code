@@ -460,18 +460,23 @@ void LocalPlayerController::doCrashHaptics() {
     if ((now - lastCrash) < stk_config->time2Ticks(0.2f))
         return;
 
+    float strength =
+        pow(2, (abs(m_player->getKart()->getVelocity().length())) / 15.0f) - 1.0f;
+    rumble(strength, strength, 200);
+#endif
+}
+
+void LocalPlayerController::rumble(float strength_low, float strength_high, uint16_t duration) {
     int count = input_manager->getGamepadCount();
-    while(count--) {
+    while(count--)
+    {
         SDLController* controller = input_manager->getSDLController(count);
         if (controller && controller->getGamePadDevice()->getPlayer() == m_player)
         {
-                float strength =
-                    pow(2, (abs(m_player->getKart()->getVelocity().length())) / 15.0f) - 1.0f;
-                controller->doRumble(strength, 200);
+                controller->doRumble(strength_low, strength_high, duration);
                 break;
         }
     }
-#endif
 }
 
 void LocalPlayerController::crashed(const AbstractKart* k) {

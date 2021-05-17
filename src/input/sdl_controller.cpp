@@ -258,18 +258,19 @@ void SDLController::checkPowerLevel()
 #endif
 }   // checkPowerLevel
 
-void SDLController::doRumble(float strength, uint32_t duration_ms)
+void SDLController::doRumble(float strength_low, float strength_high, uint32_t duration_ms)
 {
 #if SDL_VERSION_ATLEAST(1,3,0)
     if (m_haptic)
     {
-        SDL_HapticRumblePlay(m_haptic, strength, duration_ms);
+        SDL_HapticRumblePlay(m_haptic, (strength_low + strength_high) / 2, duration_ms);
     }
     else
 #endif
     {
-        uint16_t scaled = strength * pow(2, 16);
-        SDL_GameControllerRumble(m_game_controller, scaled, scaled, duration_ms);
+        uint16_t scaled_low = strength_low * pow(2, 16);
+        uint16_t scaled_high = strength_high * pow(2, 16);
+        SDL_GameControllerRumble(m_game_controller, scaled_low, scaled_high, duration_ms);
     }
 }
 
