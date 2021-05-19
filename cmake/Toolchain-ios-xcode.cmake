@@ -56,6 +56,8 @@ set(MBEDTLS_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CAC
 set(LIBRESOLV_LIBRARY -lresolv CACHE STRING "")
 set(SDL2_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libSDL2.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libSDL2.a CACHE STRING "")
 set(SDL2_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/SDL2 CACHE STRING "")
+set(LIBSAMPLERATE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libsamplerate.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libsamplerate.a CACHE STRING "")
+set(LIBSAMPLERATE_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
 
 # Standard config
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
