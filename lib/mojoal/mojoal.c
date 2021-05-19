@@ -22,6 +22,7 @@
 #include "AL/al.h"
 #include "AL/alc.h"
 #include "SDL.h"
+#include "samplerate.h"
 
 #ifdef __SSE__  /* if you are on x86 or x86-64, we assume you have SSE1 by now. */
 #define NEED_SCALAR_FALLBACK 0
@@ -444,7 +445,7 @@ SIMDALIGNEDSTRUCT ALsource
     ALfloat cone_outer_angle;
     ALfloat cone_outer_gain;
     ALbuffer *buffer;
-    SDL_AudioStream *stream;  /* for resampling. */
+    SRC_STATE *src_state;  /* for resampling. */
     BufferQueue buffer_queue;
     BufferQueue buffer_queue_processed;
     ALsizei offset;  /* offset in bytes for converted stream! */
@@ -1171,33 +1172,58 @@ static ALboolean mix_source_buffer(ALCcontext *ctx, ALsource *src, BufferQueueIt
         const int bufferframesize = (int) (buffer->channels * sizeof (float));
         const int deviceframesize = ctx->device->framesize;
         const int framesneeded = *len / deviceframesize;
+        const float pitch = src->pitch;
 
         SDL_assert(src->offset < buffer->len);
 
-        if (src->stream) {  /* resampling? */
-            int mixframes, mixlen, remainingmixframes;
-            while ( (((mixlen = SDL_AudioStreamAvailable(src->stream)) / bufferframesize) < framesneeded) && (src->offset < buffer->len) ) {
-                const int framesput = (buffer->len - src->offset) / bufferframesize;
-                const int bytesput = SDL_min(framesput, 1024) * bufferframesize;
-                FIXME("dynamically adjust frames here?");  /* we hardcode 1024 samples when opening the audio device, too. */
-                SDL_AudioStreamPut(src->stream, data, bytesput);
-                src->offset += bytesput;
-                data += bytesput / sizeof (float);
-            }
-
-            mixframes = SDL_min(mixlen / bufferframesize, framesneeded);
-            remainingmixframes = mixframes;
-            while (remainingmixframes > 0) {
-                float mixbuf[256];
-                const int mixbuflen = sizeof (mixbuf);
-                const int mixbufframes = mixbuflen / bufferframesize;
-                const int getframes = SDL_min(remainingmixframes, mixbufframes);
-                SDL_AudioStreamGet(src->stream, mixbuf, getframes * bufferframesize);
-                mix_buffer(buffer, src->panning, mixbuf, *stream, getframes);
-                *len -= getframes * deviceframesize;
-                *stream += getframes * ctx->device->channels;
-                remainingmixframes -= getframes;
-            }
+        /*
+        SRC_SINC_BEST_QUALITY
+        SRC_SINC_MEDIUM_QUALITY
+        SRC_SINC_FASTEST
+        SRC_ZERO_ORDER_HOLD
+        SRC_LINEAR
+        */
+        const int converter = SRC_LINEAR;
+        int src_error = 0;
+        if ((pitch != 1.0f || ctx->device->frequency != buffer->frequency) && src->src_state == NULL) {
+            src->src_state = src_new(converter, buffer->channels, &src_error);
+            if (src->src_state == NULL)
+                fprintf(stderr, "src_new error: %s\n", src_strerror(src_error));
+        }
+        else if (pitch == 1.0f && ctx->device->frequency == buffer->frequency && src->src_state != NULL) {
+            src_delete(src->src_state);
+            src->src_state = NULL;
+        }
+        else if (src->src_state != NULL && src_get_channels(src->src_state) != buffer->channels) {
+            src_delete(src->src_state);
+            src->src_state = src_new(converter, buffer->channels, &src_error);
+            if (src->src_state == NULL)
+                fprintf(stderr, "src_new error: %s\n", src_strerror(src_error));
+        }
+        if (src->src_state) {  /* resampling? */
+            int used_frame = 0;
+            do {
+                SRC_DATA src_data = {};
+                src_data.input_frames = (buffer->len - src->offset) / buffer->channels / sizeof (float);
+                src_data.output_frames = framesneeded - used_frame;
+                if (src_data.output_frames <= 0 || src->offset >= buffer->len)
+                    break;
+                src_data.data_in = data;
+                float *data_out = (float *) alloca((framesneeded - used_frame) * buffer->channels * sizeof (float));
+                src_data.data_out = data_out;
+                src_data.src_ratio = (double) ctx->device->frequency / (double) buffer->frequency / pitch;
+                int ret = src_process(src->src_state, &src_data);
+                if (ret != 0) {
+                    fprintf(stderr, "src_process error: %s\n", src_strerror(ret));
+                    break;
+                }
+                mix_buffer(buffer, src->panning, src_data.data_out, *stream, src_data.output_frames_gen);
+                *len -= src_data.output_frames_gen * deviceframesize;
+                *stream += src_data.output_frames_gen * ctx->device->channels;
+                src->offset += src_data.input_frames_used * buffer->channels * sizeof (float);
+                used_frame += src_data.output_frames_gen;
+                data += src_data.input_frames_used * buffer->channels;
+            } while (*len > 0);
         } else {
             const int framesavail = (buffer->len - src->offset) / bufferframesize;
             const int mixframes = SDL_min(framesneeded, framesavail);
@@ -2035,7 +2061,8 @@ static void _alcDestroyContext(ALCcontext *ctx)
                     continue;
                 }
 
-                SDL_FreeAudioStream(src->stream);
+                if (src->src_state)
+                    src_delete(src->src_state);
                 source_release_buffer_queue(ctx, src);
                 if (--sb->used == 0) {
                     break;
@@ -3415,9 +3442,9 @@ static void _alDeleteSources(const ALsizei n, const ALuint *names)
                 (void) SDL_AtomicDecRef(&source->buffer->refcount);
                 source->buffer = NULL;
             }
-            if (source->stream) {
-                SDL_FreeAudioStream(source->stream);
-                source->stream = NULL;
+            if (source->src_state) {
+                src_delete(source->src_state);
+                source->src_state = NULL;
             }
             block->used--;
         }
@@ -3448,7 +3475,16 @@ static void _alSourcefv(const ALuint name, const ALenum param, const ALfloat *va
         case AL_REFERENCE_DISTANCE: src->reference_distance = *values; break;
         case AL_ROLLOFF_FACTOR: src->rolloff_factor = *values; break;
         case AL_MAX_DISTANCE: src->max_distance = *values; break;
-        case AL_PITCH: src->pitch = *values; break;
+        case AL_PITCH:
+        {
+            float pitch = *values;
+            if (pitch < 0.5f)
+                pitch = 0.5f;
+            else if (pitch > 2.0f)
+                pitch = 2.0f;
+            src->pitch = pitch;
+            break;
+        }
         case AL_CONE_INNER_ANGLE: src->cone_inner_angle = *values; break;
         case AL_CONE_OUTER_ANGLE: src->cone_outer_angle = *values; break;
         case AL_CONE_OUTER_GAIN: src->cone_outer_gain = *values; break;
@@ -3517,18 +3553,6 @@ static void set_source_static_buffer(ALCcontext *ctx, ALsource *src, const ALuin
             set_al_error(ctx, AL_INVALID_VALUE);
         } else {
             const ALboolean must_lock = SDL_AtomicGet(&src->mixer_accessible) ? AL_TRUE : AL_FALSE;
-            SDL_AudioStream *stream = NULL;
-            SDL_AudioStream *freestream = NULL;
-            /* We only use the stream for resampling, not for channel conversion. */
-            FIXME("keep the existing stream if formats match?");
-            if (buffer && (ctx->device->frequency != buffer->frequency)) {
-                stream = SDL_NewAudioStream(AUDIO_F32SYS, buffer->channels, buffer->frequency, AUDIO_F32SYS, buffer->channels, ctx->device->frequency);
-                if (!stream) {
-                    set_al_error(ctx, AL_OUT_OF_MEMORY);
-                    return;
-                }
-                FIXME("need a way to prealloc space in the stream, so the mixer doesn't have to malloc");
-            }
 
             /* this can happen if you alSource(AL_BUFFER) while the exact source is in the middle of mixing */
             FIXME("Double-check this lock; we shouldn't be able to reach this if the source is playing.");
@@ -3552,17 +3576,12 @@ static void set_source_static_buffer(ALCcontext *ctx, ALsource *src, const ALuin
 
             source_release_buffer_queue(ctx, src);
 
-            if (src->stream != stream) {
-                freestream = src->stream;  /* free this after unlocking. */
-                src->stream = stream;
+            if (src->src_state) {
+                src_reset(src->src_state);
             }
 
             if (must_lock) {
                 SDL_UnlockMutex(ctx->source_lock);
-            }
-
-            if (freestream) {
-                SDL_FreeAudioStream(freestream);
             }
         }
     }
@@ -4052,7 +4071,6 @@ static void _alSourceQueueBuffers(const ALuint name, const ALsizei nb, const ALu
     ALint queue_channels = 0;
     ALsizei queue_frequency = 0;
     ALboolean failed = AL_FALSE;
-    SDL_AudioStream *stream = NULL;
 
     if (!src) {
         return;
@@ -4129,16 +4147,6 @@ static void _alSourceQueueBuffers(const ALuint name, const ALsizei nb, const ALu
 
     if (!src->queue_frequency) {
         SDL_assert(!src->queue_channels);
-        SDL_assert(!src->stream);
-        /* We only use the stream for resampling, not for channel conversion. */
-        if (ctx->device->frequency != queue_frequency) {
-            stream = SDL_NewAudioStream(AUDIO_F32SYS, queue_channels, queue_frequency, AUDIO_F32SYS, queue_channels, ctx->device->frequency);
-            if (!stream) {
-                set_al_error(ctx, AL_OUT_OF_MEMORY);
-                failed = AL_TRUE;
-            }
-            FIXME("need a way to prealloc space in the stream, so the mixer doesn't have to malloc");
-        }
     }
 
     if (failed) {
@@ -4155,9 +4163,6 @@ static void _alSourceQueueBuffers(const ALuint name, const ALsizei nb, const ALu
             queueend->next = ctx->device->playback.buffer_queue_pool;
             ctx->device->playback.buffer_queue_pool = queue;
         }
-        if (stream) {
-            SDL_FreeAudioStream(stream);
-        }
         return;
     }
 
@@ -4169,7 +4174,6 @@ static void _alSourceQueueBuffers(const ALuint name, const ALsizei nb, const ALu
     if (!src->queue_channels) {
         src->queue_channels = queue_channels;
         src->queue_frequency = queue_frequency;
-        src->stream = stream;
     }
 
     /* so we're going to put these on a linked list called just_queued,
