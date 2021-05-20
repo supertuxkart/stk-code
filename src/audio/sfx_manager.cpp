@@ -943,7 +943,8 @@ void SFXManager::reallyResumeAllNow()
     {
         // Some buffer not added to m_all_sfx_types need to be loaded here
         // For example sound for entering challenge house in overworld
-        (*i)->getBuffer()->load();
+        if ((*i)->getBuffer())
+            (*i)->getBuffer()->load();
         (*i)->reallyResumeNow();
     }   // for i in m_all_sfx
     m_all_sfx.unlock();
