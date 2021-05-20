@@ -675,7 +675,16 @@ endif()
 
 if(NOT SERVER_ONLY)
     if (IOS)
-        target_link_libraries(supertuxkart "-weak_framework CoreHaptics -framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework CoreMotion -framework Foundation -framework GLKit")
+        target_link_libraries(supertuxkart "-weak_framework CoreHaptics -framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework Foundation -framework GLKit")
+        # tvOS doesn't have CoreMotion framwork
+        include(CheckCSourceCompiles)
+        set(prev_req_lib ${CMAKE_REQUIRED_LIBRARIES})
+        set(CMAKE_REQUIRED_LIBRARIES "-framework CoreMotion")
+        check_c_source_compiles("int main() { return 0; }" COREMOTION_EXISTS)
+        set(CMAKE_REQUIRED_LIBRARIES ${prev_req_lib})
+        if (COREMOTION_EXISTS)
+            target_link_libraries(supertuxkart "-framework CoreMotion")
+        endif()
     endif()
 
     target_link_libraries(supertuxkart
