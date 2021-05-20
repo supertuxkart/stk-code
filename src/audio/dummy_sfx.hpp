@@ -66,7 +66,7 @@ public:
     virtual SFXStatus  getStatus() OVERRIDE { return SFX_STOPPED; }
     virtual void       onSoundEnabledBack() OVERRIDE {}
     virtual void       setRolloff(float rolloff) OVERRIDE {}
-    virtual const SFXBuffer* getBuffer() const OVERRIDE { return NULL; }
+    virtual SFXBuffer* getBuffer() const OVERRIDE { return NULL; }
 
 };   // DummySFX
 

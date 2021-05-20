@@ -23,14 +23,8 @@
 #include <fstream>
 
 #ifdef ENABLE_SOUND
-#  ifdef __APPLE__
-#    define OPENAL_DEPRECATED
-#    include <OpenAL/al.h>
-#    include <OpenAL/alc.h>
-#  else
-#    include <AL/al.h>
-#    include <AL/alc.h>
-#  endif
+#  include <AL/al.h>
+#  include <AL/alc.h>
 #endif
 
 #include "audio/music_ogg.hpp"

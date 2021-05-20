@@ -109,6 +109,7 @@ DownloadAssets::DownloadAssets()
         "(including high quality textures and music) for better "
         "gaming experience, this will use your mobile data if you don't have "
         "a wifi connection.");
+#ifdef ANDROID
     if (SDL_IsAndroidTV())
     {
         // I18N: In download assets dialog
@@ -116,6 +117,7 @@ DownloadAssets::DownloadAssets()
             "(including high quality textures and music) for better "
             "gaming experience.");
     }
+#endif
     getWidget<BubbleWidget>("description")->setText(msg);
 }   // DownloadAssets
 
