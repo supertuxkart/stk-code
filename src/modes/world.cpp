@@ -954,7 +954,7 @@ void World::updateTimeTargetSound()
             RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
         {
             if (time_elapsed <= 5 && getTimeTicks() % stk_config->time2Ticks(1.0f) == 0 &&
-                !World::getWorld()->isRaceOver())
+                !World::getWorld()->isRaceOver() && time_elapsed > 0)
             {
                 SFXManager::get()->quickSound("pre_start_race");
             }
