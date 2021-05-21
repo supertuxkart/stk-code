@@ -1,5 +1,9 @@
 uniform sampler2D ntex;
+#if defined(GL_ES) && defined(GL_FRAGMENT_PRECISION_HIGH)
+uniform highp sampler2D dtex;
+#else
 uniform sampler2D dtex;
+#endif
 uniform sampler2DArrayShadow shadowtex;
 
 uniform float split0;
