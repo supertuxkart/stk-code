@@ -201,32 +201,19 @@ SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supe
 
 Install the developer tools, either from the OS X Install DVD or from Apple's website.
 
-If you have never built anything before, you have create `/usr/local/include/` first:
-
-```bash
-sudo mkdir -p /usr/local/include/
-```
-
-The first link is required in order to find libcurl.
-
-### STK 0.10 or later (or latest git)
-
-Install [homebrew](https://brew.sh/)
-Install all of the dependencies using homebrew:
-
-```bash
-cd /path/to/stk-code
-brew bundle
-```
+Download `dependencies-macosx.tar.xz` from `Assets` section [here](https://github.com/supertuxkart/dependencies/releases) and extract it inside stk-code directory, use `preview` version for git stk-code.
 
 Build STK
 
 ```bash
+cd /path/to/stk-code
 mkdir cmake_build
 cd cmake_build
-CMAKE_PREFIX_PATH=/usr/local/opt/freetype/:/usr/local/opt/curl/:/usr/local/opt/libogg/:/usr/local/opt/libogg/:/usr/local/opt/libvorbis/ cmake .. -DFREETYPE_INCLUDE_DIRS=/usr/local/opt/freetype/include/freetype2/ -DOPENAL_INCLUDE_DIR=/usr/local/opt/openal-soft/include/ -DOPENAL_LIBRARY=/usr/local/opt/openal-soft/lib/libopenal.dylib -DFREETYPE_LIBRARY=/usr/local/opt/freetype/lib/libfreetype.dylib -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/
+cmake .. -DCMAKE_FIND_ROOT_PATH=$(pwd)/../dependencies-macosx -DUSE_CRYPTO_OPENSSL=FALSE
 make
 ```
+
+Add ` -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9` for 10.9 compatibility.
 
 #### (Optional) packaging for distribution
 
@@ -237,49 +224,3 @@ dylibbundler -od -b -x ./bin/SuperTuxKart.app/Contents/MacOS/supertuxkart -d ./b
 ```
 
 Afterwards, copy the contents of `stk-assets` into `/SuperTuxKart.app/Contents/Resources/data`.
-
-### STK 0.9.3 or earlier
-
-Download pre-built dependencies from [here](https://sourceforge.net/projects/supertuxkart/files/SuperTuxKart%20Dependencies/OSX/) and put the frameworks in [hard disk root]/Library/Frameworks
-
-Building with clang:
-
-```bash
-cd /path/to/stk-code
-mkdir cmake_build
-cd cmake_build
-cmake ..
-make
-```
-
-Building with GCC:
-
-```bash
-cd /path/to/stk-code
-mkdir cmake_build
-cd cmake_build
-cmake .. -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_C_COMPILER=/usr/bin/gcc
-make
-```
-
-Building on 10.10 with 10.9 compatibility:
-
-```bash
-cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk  -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9
-```
-
-#### Xcode
-
-Place an additional copy of the dependencies into `Users/<YOUR_USERNAME>/Library/Frameworks`.
-Then cd to your cloned stk-code directory and execute the following commands:
-
-```bash
-mkdir xcode_build && cd xcode_build
-cmake .. -GXcode
-```
-
-Use Finder to navigate to your stk-code/xcode_build folder and open the newly generated Xcode project (`SuperTuxKart.xcodeproj`).
-
-You can then build the project in Xcode using Product -> Build
-
-Note: Xcode is much less well tested than makefiles, so there may be issues when trying to use Xcode.
