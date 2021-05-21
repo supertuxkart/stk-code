@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 08:10+0800\n"
-"PO-Revision-Date: 2021-03-12 16:56+0000\n"
+"POT-Creation-Date: 2021-05-08 11:13+0800\n"
+"PO-Revision-Date: 2021-05-08 03:43+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Arabic (http://www.transifex.com/supertuxkart/supertuxkart/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -195,7 +195,7 @@ msgstr "اختر ما يناسبك من أنواع التحكّم"
 #. I18N: Control type
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-#: src/states_screens/dialogs/race_paused_dialog.cpp:520
+#: src/states_screens/dialogs/race_paused_dialog.cpp:543
 msgid "Accelerometer"
 msgstr "مقياس التسارع"
 
@@ -209,13 +209,13 @@ msgstr "مقياس التسارع"
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:525
+#: src/states_screens/dialogs/race_paused_dialog.cpp:548
 msgid "Gyroscope"
 msgstr "المِدوار"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
-#: src/states_screens/dialogs/race_paused_dialog.cpp:515
+#: src/states_screens/dialogs/race_paused_dialog.cpp:538
 msgid "Steering wheel"
 msgstr "المِقود"
 
@@ -334,6 +334,8 @@ msgstr "نعم"
 #. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
+#. I18N: ./data/gui/dialogs/enter_address_dialog.stkgui
+#. I18N: In the enter address dialog
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
@@ -529,6 +531,8 @@ msgstr "* أعِد تشغيل STK لتطبيق الإعدادات الجديدة
 msgid "Close"
 msgstr "أغلِق"
 
+#. I18N: ./data/gui/dialogs/enter_address_dialog.stkgui
+#. I18N: In the enter address dialog
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
@@ -639,8 +643,7 @@ msgstr "أرسِل"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:140
 msgid "Back to Race"
 msgstr "عُد إلى السباق"
 
@@ -652,8 +655,7 @@ msgstr "عُد إلى الرِواق"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:144
 msgid "Restart Race"
 msgstr "أعد السّباق"
 
@@ -966,17 +968,6 @@ msgstr "أسند إلى مفتاح ESC"
 #. I18N: When configuring input
 msgid "Assign nothing"
 msgstr "أسند لا شيء"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:320
-msgid "Setup New Race"
-msgstr "أعدّ سباق جديد"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Exit Race"
-msgstr "اخرج من السباق"
 
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/race_setup.stkgui
@@ -2809,21 +2800,21 @@ msgid ""
 "created."
 msgstr "ملفّ ضبطك كان قديمًا جدًّا، لذلك حُذف وسيُنشأ آخر جديد."
 
-#: src/graphics/irr_driver.cpp:643
+#: src/graphics/irr_driver.cpp:657
 msgid "Video recording started."
 msgstr "بدأ تسجيل الفيديو."
 
-#: src/graphics/irr_driver.cpp:650
+#: src/graphics/irr_driver.cpp:664
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "تم حفظ الفيديو خلال \"%s\"."
 
-#: src/graphics/irr_driver.cpp:654
+#: src/graphics/irr_driver.cpp:668
 msgid "Encoding progress:"
 msgstr "تقدم الترميز:"
 
-#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
-#: src/graphics/irr_driver.cpp:1867
+#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1857
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "إطار/ثا: %d/%d/%d - %d كيلومثلّث، اختبار الاتصال: %d ملي ثانية"
@@ -3545,12 +3536,12 @@ msgid "You finished the race in rank %d!"
 msgstr "لقد أنهيت السباق في الترتيب %d!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1127
 #, c-format
 msgid "%s left the game."
 msgstr "%s خرج من اللعبة."
 
-#: src/main.cpp:2009
+#: src/main.cpp:2012
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3559,16 +3550,16 @@ msgid ""
 "Internet\")."
 msgstr "قد يتصل \"عربة البطريق الممتاز\" بخادم لتنزيل الإضافات وإعلامك بالتحديثات. يرجى قراءة سياسة الخصوصية الخاصة بنا على https://supertuxkart.net/Privacy. هل ترغب في تمكين هذه الميزة؟ (لتغيير هذا الإعداد في وقت لاحق، انتقل إلى الخيارات، وحدد علامة التبويب \"عام\"، ثم قم بتعديل \"الاتصال بالشبكة\")."
 
-#: src/main.cpp:2358
+#: src/main.cpp:2361
 msgid "Your screen resolution is too low to run STK."
 msgstr "دقة الشاشة منخفضة جدا لتشغيل اللعبة."
 
-#: src/main.cpp:2393
+#: src/main.cpp:2396
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "إصدارة مشغّلك قديمة جدًّا. فضلًا ثبّت أحدث مشغّلات المرئيّات."
 
-#: src/main.cpp:2411
+#: src/main.cpp:2414
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3665,11 +3656,11 @@ msgstr[3] "تم إنتاج %i إطارات إحتياطية للكارت"
 msgstr[4] "تم إنتاج %i إطار إحتياطي للكارت"
 msgstr[5] "تم إنتاج %i إطار احتياطي للعربة!"
 
-#: src/modes/world.cpp:1383
+#: src/modes/world.cpp:1412
 msgid "You have been eliminated!"
 msgstr "لقد استُبعدت!"
 
-#: src/modes/world.cpp:1390
+#: src/modes/world.cpp:1419
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "لقد استُبعد '%s'."
@@ -3783,73 +3774,73 @@ msgstr "تم رفض الاتصال: الخادم مشغول."
 msgid "Connection refused: You are banned from the server."
 msgstr "الاتصال مرفوض: أنت ممنوع من الخادم."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:943
 msgid "Connection refused: Server password is incorrect."
 msgstr "تم رفض الاتصال: كلمة مرور الخادم غير صحيحة."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:947
 msgid "Connection refused: Game data is incompatible."
 msgstr "تم رفض الاتصال: بيانات اللعبة غير متوافقة."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:951
 msgid "Connection refused: Server is full."
 msgstr "تم رفض الاتصال: الخادم ممتلئ."
 
-#: src/network/protocols/client_lobby.cpp:954
+#: src/network/protocols/client_lobby.cpp:955
 msgid "Connection refused: Invalid player connecting."
 msgstr "تم رفض الاتصال: اتصال لاعب غير صالح."
 
-#: src/network/protocols/client_lobby.cpp:982
+#: src/network/protocols/client_lobby.cpp:983
 msgid "Failed to start the network game."
 msgstr "فشل بدء لعبة الشبكة."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1196
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "انتهت اللعبة، لا يمكنك الانضمام أو المشاهدة بعد الآن."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1200
 msgid "No remaining place in the arena - live join disabled."
 msgstr "لا يوجد مكان متبق في الساحة - تم تعطيل الانضمام المباشر."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1203
+#: src/network/protocols/client_lobby.cpp:1204
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "بقي لاعب واحد فقط، العودة إلى الرواق."
 
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1210
 msgid "Server owner quit the game."
 msgstr "مالك الخادم ترك اللعبة."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1213
+#: src/network/protocols/client_lobby.cpp:1214
 msgid "You will be spectating the next game."
 msgstr "سوف تشاهد اللعبة القادمة."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1381
+#: src/network/protocols/client_lobby.cpp:1382
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s انضم للفريق الأحمر."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1387
+#: src/network/protocols/client_lobby.cpp:1388
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%sانضم للفريق الأزرق."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1393
+#: src/network/protocols/client_lobby.cpp:1394
 #, c-format
 msgid "%s joined the game."
 msgstr "%s انضم الى اللعبة."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1584
+#: src/network/protocols/client_lobby.cpp:1585
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3857,7 +3848,7 @@ msgid ""
 msgstr "إضغط <%s> أو <%s> لتغيير اللاعب المستهدف، <%s> أو <%s> لمكان المُصوِرة."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1600
+#: src/network/protocols/client_lobby.cpp:1601
 #, c-format
 msgid "Successfully reported %s."
 msgstr "تم الإبلاغ بنجاح %s."
@@ -4504,14 +4495,14 @@ msgstr "مميّزة"
 #. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:180
 #: src/states_screens/dialogs/addons_pack.cpp:173
-#: src/states_screens/dialogs/download_assets.cpp:102
+#: src/states_screens/dialogs/download_assets.cpp:104
 #, c-format
 msgid "Size: %s"
 msgstr "الحجم: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:292
 #: src/states_screens/dialogs/addons_pack.cpp:185
-#: src/states_screens/dialogs/download_assets.cpp:180
+#: src/states_screens/dialogs/download_assets.cpp:189
 msgid "Sorry, downloading the add-on failed"
 msgstr "آسفون، فشل تنزيل الإضافة"
 
@@ -4522,7 +4513,7 @@ msgstr "مشاكل في تثبيت الإضافة '%s'."
 
 #: src/states_screens/dialogs/addons_loading.cpp:379
 #: src/states_screens/dialogs/addons_loading.cpp:428
-#: src/states_screens/dialogs/download_assets.cpp:245
+#: src/states_screens/dialogs/download_assets.cpp:254
 msgid "Try again"
 msgstr "حاول مجدّدًا"
 
@@ -4534,7 +4525,7 @@ msgstr "مشاكل في إزالة الإضافة '%s'."
 #. I18N: Shown when there is download error for assets download
 #. in the first run
 #: src/states_screens/dialogs/addons_pack.cpp:225
-#: src/states_screens/dialogs/download_assets.cpp:230
+#: src/states_screens/dialogs/download_assets.cpp:239
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
@@ -4646,12 +4637,30 @@ msgid "Very Low"
 msgstr "منخفض جدا"
 
 #. I18N: In download assets dialog
-#: src/states_screens/dialogs/download_assets.cpp:106
+#: src/states_screens/dialogs/download_assets.cpp:108
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
 msgstr "ستقوم \"عربة البطريق الممتاز\" بتنزيل الأصول الكاملة (بما في ذلك القوام والموسيقى عالية الجودة) للحصول على تجربة لعب أفضل، وهذا سيستخدم بيانات هاتفك المحمول إذا لم يكن لديك اتصال لاسلكي."
+
+#. I18N: In download assets dialog
+#: src/states_screens/dialogs/download_assets.cpp:115
+msgid ""
+"SuperTuxKart will download full assets (including high quality textures and "
+"music) for better gaming experience."
+msgstr ""
+
+#: src/states_screens/dialogs/enter_address_dialog.cpp:42
+msgid ""
+"Enter the server address optionally followed by : and then port or select "
+"address from list."
+msgstr ""
+
+#: src/states_screens/dialogs/enter_address_dialog.cpp:124
+#, c-format
+msgid "Invalid server address: %s."
+msgstr "عنوان الخادم غير صالح: %s ."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4823,6 +4832,31 @@ msgstr "اضغط على اي مفتاح..."
 #: src/states_screens/online/networking_lobby.cpp:836
 msgid "Chat is disabled, enable in options menu."
 msgstr "تم تعطيل الدردشة، قم بتمكينها في قائمة الخيارات."
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:130
+msgid "Back to Battle"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:133
+msgid "Setup New Game"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:134
+msgid "Restart Battle"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:136
+msgid "Exit Battle"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:143
+#: src/states_screens/race_result_gui.cpp:320
+msgid "Setup New Race"
+msgstr "أعدّ سباق جديد"
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:146
+msgid "Exit Race"
+msgstr "اخرج من السباق"
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
@@ -5420,15 +5454,6 @@ msgid ""
 "Internet\"."
 msgstr "لا يمكنك اللعب على الشّبكة بلا نفاذ إلى الشّابكة. إن أردت اللعب على الشّبكة، اذهب إلى الخيارات، اختر لسان 'واجهة المستخدم'، وحرّر 'اتّصل بالشّابكة'."
 
-#: src/states_screens/online/online_screen.cpp:239
-msgid "Enter the server address optionally followed by : and then port."
-msgstr "أدخل عنوان الخادم اختياريًا متبوعًا بـ : ثم المنفذ."
-
-#: src/states_screens/online/online_screen.cpp:251
-#, c-format
-msgid "Invalid server address: %s."
-msgstr "عنوان الخادم غير صالح: %s ."
-
 #: src/states_screens/online/online_user_search.cpp:179
 #: src/states_screens/online/online_user_search.cpp:242
 msgid "Searching"
@@ -5995,7 +6020,7 @@ msgstr "اتبع المتزعّم!"
 msgid "Top %i"
 msgstr "أفضل %i"
 
-#: src/states_screens/race_gui.cpp:445
+#: src/states_screens/race_gui.cpp:450
 msgid "Challenge Failed"
 msgstr "فشل التّحدّي"
 

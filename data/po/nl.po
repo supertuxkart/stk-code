@@ -5,6 +5,7 @@
 # Translators:
 # Dennis Holierhoek <dennis.hh@hotmail.com>, 2016
 # Frans van Rijn <asciimonster@yahoo.co.uk>, 2015-2016
+# Heimen Stoffels <vistausss@fastmail.com>, 2021
 # Heimen Stoffels <vistausss@fastmail.com>, 2019-2021
 # Steven van Tetering <steven.van.tetering@gmail.com>, 2019
 # Ward Muylaert <ward.muylaert@gmail.com>, 2015-2017
@@ -14,8 +15,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 08:10+0800\n"
-"PO-Revision-Date: 2021-03-12 18:46+0000\n"
+"POT-Creation-Date: 2021-05-08 11:13+0800\n"
+"PO-Revision-Date: 2021-05-08 10:20+0000\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/supertuxkart/supertuxkart/language/nl/)\n"
 "MIME-Version: 1.0\n"
@@ -26,7 +27,7 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr "Bezig met uitpakken van spelelementen..."
+msgstr "Bezig met uitpakken van spelelementen…"
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
@@ -124,7 +125,7 @@ msgstr "Geheim"
 
 #. I18N: ./data/achievements.xml
 msgid "Really ... a secret."
-msgstr "Echt waar... een geheim."
+msgstr "Echt waar… een geheim."
 
 #. I18N: ./data/achievements.xml
 msgid "Mosquito Hunter"
@@ -193,7 +194,7 @@ msgstr "Kies hoe je karts wilt besturen"
 #. I18N: Control type
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-#: src/states_screens/dialogs/race_paused_dialog.cpp:520
+#: src/states_screens/dialogs/race_paused_dialog.cpp:543
 msgid "Accelerometer"
 msgstr "Versnellingsmeter"
 
@@ -207,13 +208,13 @@ msgstr "Versnellingsmeter"
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:525
+#: src/states_screens/dialogs/race_paused_dialog.cpp:548
 msgid "Gyroscope"
 msgstr "Gyroscoop"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
-#: src/states_screens/dialogs/race_paused_dialog.cpp:515
+#: src/states_screens/dialogs/race_paused_dialog.cpp:538
 msgid "Steering wheel"
 msgstr "Extern stuur"
 
@@ -332,6 +333,8 @@ msgstr "Ja"
 #. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
+#. I18N: ./data/gui/dialogs/enter_address_dialog.stkgui
+#. I18N: In the enter address dialog
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
@@ -527,6 +530,8 @@ msgstr "* Herstart STK om nieuwe instellingen toe te passen"
 msgid "Close"
 msgstr "Sluiten"
 
+#. I18N: ./data/gui/dialogs/enter_address_dialog.stkgui
+#. I18N: In the enter address dialog
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
@@ -637,8 +642,7 @@ msgstr "Versturen"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:140
 msgid "Back to Race"
 msgstr "Terug naar wedstrijd"
 
@@ -650,8 +654,7 @@ msgstr "Terug naar lobby"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:144
 msgid "Restart Race"
 msgstr "Wedstrijd herstarten"
 
@@ -953,7 +956,7 @@ msgstr "Terug naar menu"
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When changing input configurations
 msgid "Press fully and release..."
-msgstr "Druk helemaal in en laat weer los..."
+msgstr "Druk helemaal in en laat weer los…"
 
 #. I18N: ./data/gui/dialogs/press_a_key_dialog.stkgui
 #. I18N: When configuring input
@@ -964,17 +967,6 @@ msgstr "Esc-toets gebruiken"
 #. I18N: When configuring input
 msgid "Assign nothing"
 msgstr "Niets toewijzen"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:320
-msgid "Setup New Race"
-msgstr "Nieuwe wedstrijd organiseren"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Exit Race"
-msgstr "Wedstrijd verlaten"
 
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/race_setup.stkgui
@@ -1632,7 +1624,7 @@ msgstr "Als je een andere kart een paar seconden lang op korte afstand volgt, da
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "SuperTuxKart can be played in multiplayer mode online...:"
-msgstr "SuperTuxKart kan door meerdere spelers online worden gespeeld...:"
+msgstr "SuperTuxKart kan door meerdere spelers online worden gespeeld…:"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1657,7 +1649,7 @@ msgstr "Als je je op een server bevindt, moet je wachten tot de beheerder (die m
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
 msgid "... or on the same device:"
-msgstr "... of op hetzelfde apparaat:"
+msgstr "…of op hetzelfde apparaat:"
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1844,7 +1836,7 @@ msgstr "Jouw profiel"
 #. I18N: ./data/gui/screens/online/profile_friends.stkgui
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 msgid "..."
-msgstr "..."
+msgstr "…"
 
 #. I18N: ./data/gui/screens/online/profile_achievements_tab.stkgui
 #. I18N: In the achievements screen
@@ -2215,7 +2207,7 @@ msgstr "Camera"
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
 msgid "Custom..."
-msgstr "Aangepast..."
+msgstr "Aangepast…"
 
 #. I18N: ./data/gui/screens/options_ui.stkgui
 #. I18N: In the ui settings
@@ -2260,7 +2252,7 @@ msgstr "Verticale synchronisatie"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Custom settings..."
-msgstr "Aangepaste instellingen..."
+msgstr "Aangepaste instellingen…"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2605,7 +2597,7 @@ msgstr "Wat scheelt er, kleine hippies? Is jullie grote gnoe-leider verdwenen?"
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "Oh yes, see, he's in my castle now and will be served for supper..."
-msgstr "Jazeker! Die zit nu in mijn kasteel en wordt opgediend als diner..."
+msgstr "Jazeker! Die zit nu in mijn kasteel en wordt opgediend als diner…"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2807,21 +2799,21 @@ msgid ""
 "created."
 msgstr "Je configuratiebestand was verouderd. Het is verwijderd en er wordt een nieuw bestand aangemaakt."
 
-#: src/graphics/irr_driver.cpp:643
+#: src/graphics/irr_driver.cpp:657
 msgid "Video recording started."
 msgstr "Video-opname gestart."
 
-#: src/graphics/irr_driver.cpp:650
+#: src/graphics/irr_driver.cpp:664
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "De video is opgeslagen in '%s'."
 
-#: src/graphics/irr_driver.cpp:654
+#: src/graphics/irr_driver.cpp:668
 msgid "Encoding progress:"
 msgstr "Omzetproces:"
 
-#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
-#: src/graphics/irr_driver.cpp:1867
+#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1857
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %dms"
@@ -2834,7 +2826,7 @@ msgstr "Tip: %s"
 
 #: src/guiengine/engine.cpp:1483
 msgid "Loading"
-msgstr "Bezig met laden..."
+msgstr "Bezig met laden…"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:104
 msgid "Mass"
@@ -3486,7 +3478,7 @@ msgstr "%s heeft een laag accuniveau."
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
 "instructions at supertuxkart.net/Wiimote"
-msgstr "Koppel je wiimote via Bluetooth-beheer en druk dan op Oké. Uitgebreide instructies zijn te vinden op supertuxkart.net/Wiimote (Engels)"
+msgstr "Koppel je wiimote via bluetoothbeheer en druk dan op Oké. Uitgebreide instructies zijn te vinden op supertuxkart.net/Wiimote (Engels)"
 
 #: src/input/wiimote_manager.cpp:382
 msgid ""
@@ -3539,12 +3531,12 @@ msgid "You finished the race in rank %d!"
 msgstr "Je bent geëindigd op plaats %d!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1127
 #, c-format
 msgid "%s left the game."
 msgstr "%s heeft de wedstrijd verlaten."
 
-#: src/main.cpp:2009
+#: src/main.cpp:2012
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3553,16 +3545,16 @@ msgid ""
 "Internet\")."
 msgstr "SuperTuxKart kan verbinding maken met het internet om add-ons te downloaden en updatemeldingen te tonen. Wij verzamelen ook geanonimiseerde gegevens over hardwareprestaties t.b.v. productverbetering. Lees onze privacyverklaring op https://supertuxkart.net/Privacy Wil je deze optie activeren? (Als je dit later wilt aanpassen, ga dan naar Instellingen -> Algemeen en pas 'Verbinden met het internet' aan.)"
 
-#: src/main.cpp:2358
+#: src/main.cpp:2361
 msgid "Your screen resolution is too low to run STK."
 msgstr "Je schermresolutie is te laag om STK te kunnen spelen."
 
-#: src/main.cpp:2393
+#: src/main.cpp:2396
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Je videostuurprogramma is verouderd. Installeer een recenter stuurprogramma."
 
-#: src/main.cpp:2411
+#: src/main.cpp:2414
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3655,11 +3647,11 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i banden uitdelende kart is verschenen!"
 msgstr[1] "%i banden uitdelende karts zijn verschenen!"
 
-#: src/modes/world.cpp:1383
+#: src/modes/world.cpp:1412
 msgid "You have been eliminated!"
 msgstr "Je bent uitgeschakeld!"
 
-#: src/modes/world.cpp:1390
+#: src/modes/world.cpp:1419
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "%s is uitgeschakeld."
@@ -3773,73 +3765,73 @@ msgstr "Verbinding geweigerd: de server is bezig."
 msgid "Connection refused: You are banned from the server."
 msgstr "Verbinding geweigerd: je bent verbannen van de server."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:943
 msgid "Connection refused: Server password is incorrect."
 msgstr "Verbinding geweigerd: het serverwachtwoord is onjuist."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:947
 msgid "Connection refused: Game data is incompatible."
 msgstr "Verbinding geweigerd: de spelgegevens zijn incompatibel."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:951
 msgid "Connection refused: Server is full."
 msgstr "Verbinding geweigerd: er is geen plaats meer op de server."
 
-#: src/network/protocols/client_lobby.cpp:954
+#: src/network/protocols/client_lobby.cpp:955
 msgid "Connection refused: Invalid player connecting."
 msgstr "Verbinding geweigerd: een ongeldige speler probeert verbinding te maken."
 
-#: src/network/protocols/client_lobby.cpp:982
+#: src/network/protocols/client_lobby.cpp:983
 msgid "Failed to start the network game."
 msgstr "Kan netwerkspel niet starten."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1196
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "De wedstrijd is afgelopen; je kunt niet langer deelnemen of toekijken."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1200
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Geen plaats meer in de arena - deelname is uitgeschakeld."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1203
+#: src/network/protocols/client_lobby.cpp:1204
 msgid "Only 1 player remaining, returning to lobby."
-msgstr "Slechts één resterende speler; je gaat terug naar de foyer..."
+msgstr "Slechts één resterende speler; je gaat terug naar de foyer…"
 
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1210
 msgid "Server owner quit the game."
 msgstr "De servereigenaar heeft het spel verlaten."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1213
+#: src/network/protocols/client_lobby.cpp:1214
 msgid "You will be spectating the next game."
 msgstr "Bij de volgende ronde ben je alleen toeschouwer."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1381
+#: src/network/protocols/client_lobby.cpp:1382
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s heeft zich aangesloten bij het rode team."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1387
+#: src/network/protocols/client_lobby.cpp:1388
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%sheeft zich aangesloten bij het blauwe team. "
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1393
+#: src/network/protocols/client_lobby.cpp:1394
 #, c-format
 msgid "%s joined the game."
 msgstr "%s neemt deel aan de wedstrijd."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1584
+#: src/network/protocols/client_lobby.cpp:1585
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3847,7 +3839,7 @@ msgid ""
 msgstr "Druk op <%s> of <%s> om een andere speler te kiezen, of op <%s> of <%s> om de camera te verstellen."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1600
+#: src/network/protocols/client_lobby.cpp:1601
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%s is gerapporteerd."
@@ -4017,7 +4009,7 @@ msgstr "%s door %s"
 
 #: src/states_screens/addons_screen.cpp:443
 msgid "Please wait while addons are updated"
-msgstr "Bezig met bijwerken; even geduld..."
+msgstr "Bezig met bijwerken; even geduld…"
 
 #: src/states_screens/addons_screen.cpp:523
 #: src/states_screens/main_menu_screen.cpp:626
@@ -4482,14 +4474,14 @@ msgstr "uitgelicht"
 #. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:180
 #: src/states_screens/dialogs/addons_pack.cpp:173
-#: src/states_screens/dialogs/download_assets.cpp:102
+#: src/states_screens/dialogs/download_assets.cpp:104
 #, c-format
 msgid "Size: %s"
 msgstr "Grootte: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:292
 #: src/states_screens/dialogs/addons_pack.cpp:185
-#: src/states_screens/dialogs/download_assets.cpp:180
+#: src/states_screens/dialogs/download_assets.cpp:189
 msgid "Sorry, downloading the add-on failed"
 msgstr "De uitbreiding kan niet worden gedownload"
 
@@ -4500,7 +4492,7 @@ msgstr "De uitbreiding '%s' kan niet worden geïnstalleerd."
 
 #: src/states_screens/dialogs/addons_loading.cpp:379
 #: src/states_screens/dialogs/addons_loading.cpp:428
-#: src/states_screens/dialogs/download_assets.cpp:245
+#: src/states_screens/dialogs/download_assets.cpp:254
 msgid "Try again"
 msgstr "Opnieuw proberen"
 
@@ -4512,7 +4504,7 @@ msgstr "De uitbreiding '%s' kan niet worden verwijderd."
 #. I18N: Shown when there is download error for assets download
 #. in the first run
 #: src/states_screens/dialogs/addons_pack.cpp:225
-#: src/states_screens/dialogs/download_assets.cpp:230
+#: src/states_screens/dialogs/download_assets.cpp:239
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
@@ -4540,7 +4532,7 @@ msgstr "Het wachtwoord is gewijzigd."
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
 #: src/states_screens/online/register_screen.cpp:420
 msgid "Validating info"
-msgstr "Bezig met valideren..."
+msgstr "Bezig met controleren…"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
@@ -4620,12 +4612,30 @@ msgid "Very Low"
 msgstr "Heel laag"
 
 #. I18N: In download assets dialog
-#: src/states_screens/dialogs/download_assets.cpp:106
+#: src/states_screens/dialogs/download_assets.cpp:108
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
-msgstr "SuperTuxKart moet alles downloaden (alle parcours en muziek in hoge kwaliteit). Als je niet verbonden bent met Wi-Fi, dan wordt je mobiele internetverbinding gebruikt."
+msgstr "SuperTuxKart moet alles downloaden (alle parcours en muziek in hoge kwaliteit). Als je niet verbonden bent met wifi, dan wordt je mobiele internetverbinding gebruikt."
+
+#. I18N: In download assets dialog
+#: src/states_screens/dialogs/download_assets.cpp:115
+msgid ""
+"SuperTuxKart will download full assets (including high quality textures and "
+"music) for better gaming experience."
+msgstr "SuperTuxKart moet alles downloaden (alle parcours en muziek in hoge kwaliteit) om je een betere spelbeleving te geven."
+
+#: src/states_screens/dialogs/enter_address_dialog.cpp:42
+msgid ""
+"Enter the server address optionally followed by : and then port or select "
+"address from list."
+msgstr "Voer het serveradres in, gevolgd door : (optioneel) en het poortnummer."
+
+#: src/states_screens/dialogs/enter_address_dialog.cpp:124
+#, c-format
+msgid "Invalid server address: %s."
+msgstr "Ongeldig serveradres: %s."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4773,7 +4783,7 @@ msgstr "Speler rapporteren"
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:141
 #, c-format
 msgid "Fetching ranking info for %s"
-msgstr "Bezig met ophalen van klassementsinformatie over %s..."
+msgstr "Bezig met ophalen van klassementsinformatie over %s…"
 
 #. I18N: In the network player dialog, instruction for reporting player
 #: src/states_screens/dialogs/network_player_dialog.cpp:194
@@ -4790,13 +4800,38 @@ msgstr "Druk op een toets…\n(of Esc om te annuleren)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
-msgstr "Druk op een toets..."
+msgstr "Druk op een toets…"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
 #: src/states_screens/online/networking_lobby.cpp:244
 #: src/states_screens/online/networking_lobby.cpp:836
 msgid "Chat is disabled, enable in options menu."
 msgstr "Chatten is uitgeschakeld. Schakel chatten in via de instellingen."
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:130
+msgid "Back to Battle"
+msgstr "Terug naar gevecht"
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:133
+msgid "Setup New Game"
+msgstr "Nieuwe wedstrijd organiseren"
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:134
+msgid "Restart Battle"
+msgstr "Gevecht herstarten"
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:136
+msgid "Exit Battle"
+msgstr "Gevecht verlaten"
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:143
+#: src/states_screens/race_result_gui.cpp:320
+msgid "Setup New Race"
+msgstr "Nieuwe wedstrijd organiseren"
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:146
+msgid "Exit Race"
+msgstr "Wedstrijd verlaten"
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
@@ -4965,11 +5000,11 @@ msgstr "Het vriendschapsverzoek is geannuleerd!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:480
 msgid "Processing"
-msgstr "Bezig met verwerken..."
+msgstr "Bezig met verwerken…"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:169
 msgid "Fetching last vote"
-msgstr "Bezig met ophalen van laatste stem..."
+msgstr "Bezig met ophalen van laatste stem…"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:188
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -4987,7 +5022,7 @@ msgstr "Je hebt gestemd! Dit scherm kan worden afgesloten."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:243
 msgid "Performing vote"
-msgstr "Bezig met stemmen..."
+msgstr "Bezig met stemmen…"
 
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:606
@@ -5208,7 +5243,7 @@ msgstr "De uitbreidingenmodule is momenteel uitgeschakeld op de instellingenpagi
 
 #: src/states_screens/main_menu_screen.cpp:633
 msgid "Please wait while the add-ons are loading"
-msgstr "Bezig met laden van uitbreidingen; even geduld..."
+msgstr "Bezig met laden van uitbreidingen; even geduld…"
 
 #: src/states_screens/main_menu_screen.cpp:654
 msgid "Are you sure you want to quit STK?"
@@ -5320,11 +5355,11 @@ msgstr[1] "De wedstrijd gaat van start over %d seconden, of zodra iedereen op 'K
 #: src/states_screens/online/networking_lobby.cpp:538
 #, c-format
 msgid "Connecting to server %s"
-msgstr "Bezig met verbinden met %s..."
+msgstr "Bezig met verbinden met %s…"
 
 #: src/states_screens/online/networking_lobby.cpp:543
 msgid "Finding a quick play server"
-msgstr "Bezig met zoeken naar server voor snelle wedstrijden..."
+msgstr "Bezig met zoeken naar server voor snelle wedstrijden…"
 
 #. I18N: In kart screen, show before the voting period in network ends.
 #: src/states_screens/online/network_kart_selection.cpp:195
@@ -5341,7 +5376,7 @@ msgstr "Doelen"
 #: src/states_screens/online/online_profile_achievements.cpp:116
 #: src/states_screens/online/online_profile_achievements.cpp:315
 msgid "Fetching achievements"
-msgstr "Bezig met ophalen van prestaties..."
+msgstr "Bezig met ophalen van prestaties…"
 
 #: src/states_screens/online/online_profile_base.cpp:117
 #, c-format
@@ -5359,7 +5394,7 @@ msgstr "Status"
 #: src/states_screens/online/online_profile_friends.cpp:94
 #: src/states_screens/online/online_profile_friends.cpp:274
 msgid "Fetching friends"
-msgstr "Bezig met ophalen van vrienden..."
+msgstr "Bezig met ophalen van vrienden…"
 
 #: src/states_screens/online/online_profile_friends.cpp:236
 msgid "New Request"
@@ -5386,19 +5421,10 @@ msgid ""
 "Internet\"."
 msgstr "Zonder internettoegang kun je niet online spelen. Ga, als je online wilt spelen, naar Instellingen --> Uiterlijk en kies de optie 'Verbinden met het internet'."
 
-#: src/states_screens/online/online_screen.cpp:239
-msgid "Enter the server address optionally followed by : and then port."
-msgstr "Voer het serveradres in, gevolgd door (optioneel) : en het poortnummer."
-
-#: src/states_screens/online/online_screen.cpp:251
-#, c-format
-msgid "Invalid server address: %s."
-msgstr "Ongeldig serveradres: %s."
-
 #: src/states_screens/online/online_user_search.cpp:179
 #: src/states_screens/online/online_user_search.cpp:242
 msgid "Searching"
-msgstr "Bezig met zoeken..."
+msgstr "Bezig met zoeken…"
 
 #: src/states_screens/online/register_screen.cpp:164
 #: src/states_screens/options/user_screen.cpp:127
@@ -5489,7 +5515,7 @@ msgstr "Er zijn geen servers beschikbaar."
 
 #: src/states_screens/online/server_selection.cpp:425
 msgid "Fetching servers"
-msgstr "Bezig met ophalen van servers..."
+msgstr "Bezig met ophalen van servers…"
 
 #. I18N: In track screen for networking, clarify voting phase
 #: src/states_screens/online/tracks_screen.cpp:317
@@ -5886,12 +5912,12 @@ msgstr "Je moet een wachtwoord invoeren."
 #: src/states_screens/options/user_screen.cpp:580
 #, c-format
 msgid "Logging out '%s'"
-msgstr "Bezig met uitloggen van '%s'..."
+msgstr "Bezig met uitloggen van '%s'…"
 
 #: src/states_screens/options/user_screen.cpp:581
 #, c-format
 msgid "Logging in '%s'"
-msgstr "Bezig met inloggen van '%s'..."
+msgstr "Bezig met inloggen van '%s'…"
 
 #: src/states_screens/options/user_screen.cpp:662
 msgid "You can't delete the only player."
@@ -5928,12 +5954,12 @@ msgstr "DOELPUNT!"
 #: src/states_screens/race_gui_base.cpp:79
 #: src/states_screens/race_result_gui.cpp:366
 msgid "Waiting for others"
-msgstr "Bezig met wachten op anderen..."
+msgstr "Bezig met wachten op anderen…"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
 #: src/states_screens/race_gui_base.cpp:81
 msgid "Waiting for the server"
-msgstr "Bezig met wachten op server..."
+msgstr "Bezig met wachten op server…"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
 #: src/states_screens/race_gui_base.cpp:638
@@ -5961,7 +5987,7 @@ msgstr "Zwaan, kleef aan!"
 msgid "Top %i"
 msgstr "Top %i"
 
-#: src/states_screens/race_gui.cpp:445
+#: src/states_screens/race_gui.cpp:450
 msgid "Challenge Failed"
 msgstr "Uitdaging niet volbracht"
 

@@ -229,6 +229,7 @@
       <caption xml:lang="fi">Taistelu</caption>
       <caption xml:lang="eu">Borroka</caption>
       <caption xml:lang="es">Batalla</caption>
+      <caption xml:lang="eo">Batalo</caption>
       <caption xml:lang="el">Μονομαχία</caption>
       <caption xml:lang="de">Kampf</caption>
       <caption xml:lang="da">Kamp</caption>
@@ -349,34 +350,34 @@
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
   <languages>
-    <lang percentage="99">ar</lang>
-    <lang percentage="95">be</lang>
-    <lang percentage="99">bg</lang>
+    <lang percentage="98">ar</lang>
+    <lang percentage="94">be</lang>
+    <lang>bg</lang>
     <lang percentage="71">br</lang>
     <lang percentage="73">bs</lang>
-    <lang percentage="99">ca</lang>
+    <lang>ca</lang>
     <lang percentage="96">cs</lang>
     <lang>da</lang>
     <lang>de</lang>
     <lang>el</lang>
-    <lang percentage="61">eo</lang>
-    <lang percentage="99">es</lang>
+    <lang percentage="67">eo</lang>
+    <lang>es</lang>
     <lang percentage="26">et</lang>
     <lang percentage="94">eu</lang>
     <lang percentage="2">fa</lang>
-    <lang percentage="99">fi</lang>
-    <lang percentage="98">fr</lang>
-    <lang percentage="98">fr_CA</lang>
-    <lang percentage="22">ga</lang>
+    <lang>fi</lang>
+    <lang percentage="97">fr</lang>
+    <lang percentage="97">fr_CA</lang>
+    <lang percentage="21">ga</lang>
     <lang percentage="99">gd</lang>
-    <lang percentage="54">gl</lang>
-    <lang percentage="94">he</lang>
+    <lang percentage="53">gl</lang>
+    <lang percentage="93">he</lang>
     <lang percentage="29">hr</lang>
     <lang percentage="99">hu</lang>
     <lang>id</lang>
     <lang percentage="2">is</lang>
     <lang>it</lang>
-    <lang percentage="92">ja</lang>
+    <lang percentage="91">ja</lang>
     <lang percentage="11">jbo</lang>
     <lang percentage="99">ko</lang>
     <lang percentage="54">krl</lang>
@@ -388,29 +389,29 @@
     <lang>ml</lang>
     <lang percentage="71">nb</lang>
     <lang>nl</lang>
-    <lang percentage="99">nn</lang>
+    <lang>nn</lang>
     <lang percentage="30">oc</lang>
     <lang percentage="2">os</lang>
-    <lang>pl</lang>
-    <lang>pt</lang>
+    <lang percentage="99">pl</lang>
+    <lang percentage="99">pt</lang>
     <lang>pt_BR</lang>
     <lang percentage="26">ro</lang>
-    <lang percentage="99">ru</lang>
+    <lang>ru</lang>
     <lang percentage="1">sc</lang>
     <lang percentage="1">sco</lang>
-    <lang percentage="82">sk</lang>
+    <lang percentage="81">sk</lang>
     <lang percentage="64">sl</lang>
     <lang percentage="3">sq</lang>
     <lang percentage="98">sr</lang>
     <lang>sv</lang>
-    <lang percentage="85">sw</lang>
-    <lang percentage="95">szl</lang>
-    <lang percentage="70">th</lang>
+    <lang percentage="84">sw</lang>
+    <lang percentage="94">szl</lang>
+    <lang percentage="73">th</lang>
     <lang percentage="98">tr</lang>
     <lang percentage="54">tt</lang>
     <lang percentage="79">uk</lang>
     <lang percentage="20">vi</lang>
-    <lang percentage="98">zh_CN</lang>
+    <lang percentage="97">zh_CN</lang>
     <lang>zh_HK</lang>
     <lang>zh_TW</lang>
   </languages>
