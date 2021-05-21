@@ -20,7 +20,6 @@
 
 #ifndef SERVER_ONLY
 
-#include <SDL.h>
 #include <SDL_events.h>
 #include <SDL_gamecontroller.h>
 #include <SDL_joystick.h>
@@ -28,6 +27,7 @@
 #include <bitset>
 #include "utils/types.hpp"
 
+#include <SDL_version.h>
 #if SDL_VERSION_ATLEAST(1,3,0)
 #include <SDL_haptic.h>
 #endif
