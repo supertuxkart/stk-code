@@ -32,9 +32,6 @@
 #include "karts/abstract_kart.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "input/gamepad_device.hpp"
 
 #include <SColor.h>
 
