@@ -49,7 +49,6 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/vs.hpp"
-#include "karts/controller/local_player_controller.hpp"
 
 #include <typeinfo>
 
@@ -618,7 +617,7 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
                 Controller* controller = kart->getController();
                 if (controller && controller->isLocalPlayerController())
                 {
-                    ((LocalPlayerController*) controller)->rumble(0, 0.8f, 500);
+                    controller->rumble(0, 0.8f, 500);
                 }
             }
         }
