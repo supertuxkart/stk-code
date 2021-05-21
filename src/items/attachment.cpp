@@ -34,7 +34,6 @@
 #include "items/swatter.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
-#include "karts/controller/local_player_controller.hpp"
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
@@ -314,7 +313,7 @@ void Attachment::hitBanana(ItemState *item_state)
             Controller* controller = m_kart->getController();
             if (controller && controller->isLocalPlayerController())
             {
-                ((LocalPlayerController*) controller)->rumble(0, 0.8f, 500);
+                controller->rumble(0, 0.8f, 500);
             }
             if (m_kart->getController()->isLocalPlayerController())
                 he->setLocalPlayerKartHit();
