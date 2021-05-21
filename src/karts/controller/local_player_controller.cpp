@@ -456,6 +456,8 @@ core::stringw LocalPlayerController::getName(bool include_handicap_string) const
 
 void LocalPlayerController::doCrashHaptics() {
 #ifndef SERVER_ONLY
+    if (RewindManager::get()->isRewinding())
+        return;
     int now = World::getWorld()->getTicksSinceStart();
     int lastCrash = m_last_crash;
     m_last_crash = now;
