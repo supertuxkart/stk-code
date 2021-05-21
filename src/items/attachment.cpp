@@ -530,7 +530,7 @@ void Attachment::update(int ticks)
                 Controller* controller = m_kart->getController();
                 if (controller && controller->isLocalPlayerController())
                 {
-                    ((LocalPlayerController*) controller)->rumble(0, 0.8f, 500);
+                    controller->rumble(0, 0.8f, 500);
                 }
                 if (m_kart->getController()->isLocalPlayerController())
                     he->setLocalPlayerKartHit();
