@@ -66,6 +66,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              HandicapLevel h)
                      : PlayerController(kart)
 {
+    m_last_crashed = 0;
     m_has_started = false;
     m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
@@ -132,6 +133,7 @@ void LocalPlayerController::initParticleEmitter()
 void LocalPlayerController::reset()
 {
     PlayerController::reset();
+    m_last_crashed = 0;
     m_sound_schedule = false;
     m_has_started = false;
 }   // reset
@@ -454,8 +456,8 @@ core::stringw LocalPlayerController::getName(bool include_handicap_string) const
 
 void LocalPlayerController::doCrashHaptics() {
 #ifndef SERVER_ONLY
-    float now = World::getWorld()->getTicksSinceStart();
-    float lastCrash = m_last_crash;
+    int now = World::getWorld()->getTicksSinceStart();
+    int lastCrash = m_last_crash;
     m_last_crash = now;
     if ((now - lastCrash) < stk_config->time2Ticks(0.2f))
         return;
