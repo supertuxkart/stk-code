@@ -66,7 +66,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              HandicapLevel h)
                      : PlayerController(kart)
 {
-    m_last_crashed = 0;
+    m_last_crash = 0;
     m_has_started = false;
     m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
@@ -133,7 +133,7 @@ void LocalPlayerController::initParticleEmitter()
 void LocalPlayerController::reset()
 {
     PlayerController::reset();
-    m_last_crashed = 0;
+    m_last_crash = 0;
     m_sound_schedule = false;
     m_has_started = false;
 }   // reset
