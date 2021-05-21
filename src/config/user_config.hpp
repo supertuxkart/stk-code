@@ -922,7 +922,7 @@ namespace UserConfigParams
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
 
     PARAM_PREFIX IntUserConfigParam         m_swap_interval
-            PARAM_DEFAULT( IntUserConfigParam(0, "swap_interval",
+            PARAM_DEFAULT( IntUserConfigParam(0, "swap-interval",
                            &m_graphics_quality,
                            "Swap interval for vsync: 0 = disabled, 1 = full") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur

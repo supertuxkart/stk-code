@@ -309,6 +309,12 @@ void Attachment::hitBanana(ItemState *item_state)
         {
             HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
                 "explosion_bomb.xml");
+            // Rumble!
+            Controller* controller = m_kart->getController();
+            if (controller && controller->isLocalPlayerController())
+            {
+                controller->rumble(0, 0.8f, 500);
+            }
             if (m_kart->getController()->isLocalPlayerController())
                 he->setLocalPlayerKartHit();
             ProjectileManager::get()->addHitEffect(he);
@@ -520,6 +526,12 @@ void Attachment::update(int ticks)
             {
                 HitEffect* he = new Explosion(m_kart->getXYZ(), "explosion",
                     "explosion_bomb.xml");
+                // Rumble!
+                Controller* controller = m_kart->getController();
+                if (controller && controller->isLocalPlayerController())
+                {
+                    controller->rumble(0, 0.8f, 500);
+                }
                 if (m_kart->getController()->isLocalPlayerController())
                     he->setLocalPlayerKartHit();
                 ProjectileManager::get()->addHitEffect(he);

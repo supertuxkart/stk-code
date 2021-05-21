@@ -79,7 +79,7 @@ public:
     virtual bool  disableSlipstreamBonus() const = 0;
     virtual bool  saveState(BareNetworkString *buffer) const = 0;
     virtual void  rewindTo(BareNetworkString *buffer) = 0;
-
+    virtual void rumble(float strength_low, float strength_high, uint16_t duration) {}
     // ---------------------------------------------------------------------------
     /** Sets the controller name for this controller. */
     virtual void setControllerName(const std::string &name)

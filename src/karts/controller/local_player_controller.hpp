@@ -51,6 +51,8 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
+    int m_last_crash;
+
     HandicapLevel m_handicap;
 
     SFXBase     *m_wee_sound;
@@ -64,6 +66,8 @@ private:
     virtual void steer(int, int) OVERRIDE;
     virtual void displayPenaltyWarning() OVERRIDE;
     void         nitroNotFullSound();
+
+    void doCrashHaptics();
 
 public:
                  LocalPlayerController(AbstractKart *kart,
@@ -82,6 +86,11 @@ public:
     virtual void finishedRace      (float time) OVERRIDE;
     virtual void resetInputState   () OVERRIDE;
     virtual bool canGetAchievements() const OVERRIDE;
+
+    virtual void crashed(const AbstractKart *k) OVERRIDE;
+    virtual void crashed(const Material *m) OVERRIDE;
+
+    virtual void rumble(float strength_low, float strength_high, uint16_t duration) OVERRIDE;
 
     // ------------------------------------------------------------------------
     virtual bool isPlayerController() const OVERRIDE {return true;}

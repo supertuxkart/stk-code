@@ -1217,7 +1217,7 @@ static ALboolean mix_source_buffer(ALCcontext *ctx, ALsource *src, BufferQueueIt
                     fprintf(stderr, "src_process error: %s\n", src_strerror(ret));
                     break;
                 }
-                mix_buffer(buffer, src->panning, src_data.data_out, *stream, src_data.output_frames_gen);
+                mix_buffer(buffer, src->panning, src_data.data_out, *stream, (ALsizei)src_data.output_frames_gen);
                 *len -= src_data.output_frames_gen * deviceframesize;
                 *stream += src_data.output_frames_gen * ctx->device->channels;
                 src->offset += src_data.input_frames_used * buffer->channels * sizeof (float);

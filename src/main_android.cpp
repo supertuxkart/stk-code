@@ -66,11 +66,6 @@ void override_default_params_for_mobile()
     // Enable multitouch race GUI
     UserConfigParams::m_multitouch_draw_gui = true;
 
-#ifdef IOS_STK
-    // Default 30 fps for battery saving (only used in iOS)
-    UserConfigParams::m_swap_interval = 2;
-#endif
-
 #ifdef ANDROID
     // For usage in StringUtils::getUserAgentString
     if (SDL_IsAndroidTV())

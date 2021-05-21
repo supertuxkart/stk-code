@@ -189,7 +189,8 @@ void RaceResultGUI::init()
     }
 
 #ifndef SERVER_ONLY
-    if (!human_win && !NetworkConfig::get()->isNetworking())
+    if (!human_win && !NetworkConfig::get()->isNetworking() &&
+        !TipsManager::get()->isEmpty())
     {
         std::string tipset = "race";
         if (RaceManager::get()->isSoccerMode())

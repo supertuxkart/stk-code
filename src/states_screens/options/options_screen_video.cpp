@@ -234,9 +234,9 @@ void OptionsScreenVideo::init()
 #ifdef IOS_STK
     //I18N: In the video options, maximum frame per second
     getWidget("vsync_label")->setText(_("Maximum FPS"));
-    vsync->addLabel("120");
-    vsync->addLabel("60");
     vsync->addLabel("30");
+    vsync->addLabel("60");
+    vsync->addLabel("120");
     vsync->setValue(UserConfigParams::m_swap_interval);
 #else
     vsync->addLabel(_("Disabled"));

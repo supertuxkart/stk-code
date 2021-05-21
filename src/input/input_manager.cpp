@@ -118,6 +118,14 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
         Log::error("InputManager", "Failed to init SDL game controller: %s",
             SDL_GetError());
     }
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+    if (SDL_InitSubSystem(SDL_INIT_HAPTIC) != 0)
+    {
+        Log::error("InputManager", "Failed to init SDL haptics: %s",
+            SDL_GetError());
+    }
+#endif
 #endif // SERVER_ONLY
 }
 
@@ -217,6 +225,14 @@ void InputManager::handleJoystick(SDL_Event& event)
         Log::error("SDLController", "Error in handleJoystick() %s", e.what());
     }
 }   // handleJoystick
+
+SDLController* InputManager::getSDLController(unsigned i) {
+    assert(i < m_sdl_controller.size());
+    auto it = m_sdl_controller.begin();
+    for(unsigned j = 0; j < i; ++j)
+            it++;
+    return it->second.get();
+}
 #endif
 
 // -----------------------------------------------------------------------------
