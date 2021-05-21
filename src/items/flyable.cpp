@@ -612,6 +612,13 @@ void Flyable::explode(AbstractKart *kart_hit, PhysicalObject *object,
                     if (RaceManager::get()->isLinearRaceMode())
                         PlayerManager::increaseAchievement(AchievementsStatus::ALL_HITS_1RACE, 1);
                 }
+
+                // Rumble!
+                Controller* controller = kart->getController();
+                if (controller && controller->isLocalPlayerController())
+                {
+                    controller->rumble(0, 0.8f, 500);
+                }
             }
         }
     }
