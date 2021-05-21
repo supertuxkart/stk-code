@@ -7,7 +7,7 @@
 # You can also use -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=xxxxxxxxxx to specify team
 
 # Increase every upload to App store
-SET(IOS_BUILD_VERSION 22)
+SET(IOS_BUILD_VERSION 23)
 
 # Get SDK path
 execute_process(COMMAND xcodebuild -version -sdk iphoneos Path
@@ -30,34 +30,37 @@ endif()
 set(CMAKE_OSX_SYSROOT "iphoneos" CACHE INTERNAL "")
 
 # Manaully set the values for both arm64 and simulator
-set(JPEG_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libjpeg.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libjpeg.a CACHE STRING "")
+set(JPEG_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libjpeg.a CACHE STRING "")
 set(JPEG_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
-set(ZLIB_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libz.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libz.a CACHE STRING "")
+set(ZLIB_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libz.a CACHE STRING "")
 set(ZLIB_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
-set(PNG_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libpng16.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libpng16.a CACHE STRING "")
+set(PNG_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libpng16.a CACHE STRING "")
 set(PNG_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
 set(PNG_PNG_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
-set(OGGVORBIS_OGG_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libogg.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libogg.a CACHE STRING "")
+set(OGGVORBIS_OGG_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libogg.a CACHE STRING "")
 set(OGGVORBIS_OGG_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/ogg CACHE STRING "")
-set(OGGVORBIS_VORBIS_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libvorbis.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libvorbis.a CACHE STRING "")
+set(OGGVORBIS_VORBIS_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libvorbis.a CACHE STRING "")
 set(OGGVORBIS_VORBIS_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/vorbis CACHE STRING "")
-set(OGGVORBIS_VORBISFILE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libvorbisfile.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libvorbisfile.a CACHE STRING "")
+set(OGGVORBIS_VORBISFILE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libvorbisfile.a CACHE STRING "")
 set(OGGVORBIS_VORBISFILE_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/vorbis CACHE STRING "")
-set(OGGVORBIS_VORBISENC_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libvorbisenc.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libvorbisenc.a CACHE STRING "")
+set(OGGVORBIS_VORBISENC_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libvorbisenc.a CACHE STRING "")
 set(OGGVORBIS_VORBISENC_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/vorbis CACHE STRING "")
-set(HARFBUZZ_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libharfbuzz.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libharfbuzz.a CACHE STRING "")
+set(HARFBUZZ_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libharfbuzz.a CACHE STRING "")
 set(HARFBUZZ_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
-set(FREETYPE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libfreetype.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libfreetype.a CACHE STRING "")
+set(FREETYPE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libfreetype.a CACHE STRING "")
 set(FREETYPE_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/freetype2 CACHE STRING "")
-set(CURL_LIBRARY "${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libcurl.a;${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libmbedtls.a;${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libmbedx509.a;${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libmbedcrypto.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libcurl.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libmbedtls.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libmbedx509.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libmbedcrypto.a" CACHE STRING "")
+set(CURL_LIBRARY "${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libcurl.a;${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libmbedtls.a;${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libmbedx509.a;${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libmbedcrypto.a" CACHE STRING "")
 set(CURL_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
-set(MBEDCRYPTO_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libmbedcrypto.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libmbedcrypto.a CACHE STRING "")
+set(MBEDCRYPTO_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libmbedcrypto.a CACHE STRING "")
 set(MBEDTLS_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
-set(LIBRESOLV_LIBRARY -lresolv CACHE STRING "")
-set(SDL2_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libSDL2.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libSDL2.a CACHE STRING "")
+set(SDL2_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libSDL2.a CACHE STRING "")
 set(SDL2_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/SDL2 CACHE STRING "")
-set(LIBSAMPLERATE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/lib/libsamplerate.a;${PROJECT_SOURCE_DIR}/dependencies-iphonesimulator/lib/libsamplerate.a CACHE STRING "")
+set(LIBSAMPLERATE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libsamplerate.a CACHE STRING "")
 set(LIBSAMPLERATE_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
+
+# For universal iOS and simulator
+set(LIBRESOLV_LIBRARY -lresolv CACHE STRING "")
+set(PTHREAD_LIBRARY -lpthread CACHE STRING "")
 
 # Standard config
 set(CMAKE_SYSTEM_VERSION ${SDK_VERSION} CACHE INTERNAL "")
@@ -69,7 +72,7 @@ set(CMAKE_RANLIB ranlib CACHE FILEPATH "" FORCE)
 set(CMAKE_STRIP strip CACHE FILEPATH "" FORCE)
 
 # Set the architectures for which to build
-set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architecture for iOS")
+set(CMAKE_OSX_ARCHITECTURES "arm64 x86_64" CACHE STRING "Build architecture for iOS")
 set(CMAKE_C_SIZEOF_DATA_PTR 8)
 set(CMAKE_CXX_SIZEOF_DATA_PTR 8)
 set(CMAKE_SYSTEM_PROCESSOR "arm64")
@@ -109,3 +112,13 @@ set(IOS_LAUNCHSCREEN ${DEPS_PATH}/ios-icon/launch_screen.storyboard)
 set(IOS_IMAGES_XCASSETS ${DEPS_PATH}/ios-icon/Images.xcassets)
 set(SDK_NAME_VERSION_FLAGS "-miphoneos-version-min=9.0")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 9.0 CACHE STRING "Set CMake deployment target" FORCE)
+
+set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphoneos*] "arm64")
+set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphoneos*] "arm64")
+
+set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] "x86_64")
+set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphonesimulator*] "x86_64")
+
+# Replace the above two with these if you use an apple silicon
+#set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] "arm64")
+#set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphonesimulator*] "arm64")
