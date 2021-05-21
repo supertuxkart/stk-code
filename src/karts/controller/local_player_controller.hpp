@@ -51,7 +51,7 @@ private:
      *  camera object is managed in the Camera class, so no need to free it. */
     int  m_camera_index;
 
-    float        m_last_crash;
+    int m_last_crash;
 
     HandicapLevel m_handicap;
 
