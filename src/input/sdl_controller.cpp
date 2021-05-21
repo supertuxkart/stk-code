@@ -43,7 +43,7 @@ SDLController::SDLController(int device_id)
         irr::SEvent::SJoystickEvent::NUMBER_OF_AXES * sizeof(int16_t));
     m_game_controller = NULL;
     m_joystick = NULL;
-    m_haptics = NULL;
+    m_haptic = NULL;
     m_id = -1;
 
     if (SDL_IsGameController(device_id))
