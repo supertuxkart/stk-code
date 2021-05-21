@@ -467,6 +467,7 @@ void LocalPlayerController::doCrashHaptics() {
 }
 
 void LocalPlayerController::rumble(float strength_low, float strength_high, uint16_t duration) {
+#ifndef SERVER_ONLY
     int count = input_manager->getGamepadCount();
     while(count--)
     {
@@ -477,6 +478,7 @@ void LocalPlayerController::rumble(float strength_low, float strength_high, uint
                 break;
         }
     }
+#endif
 }
 
 void LocalPlayerController::crashed(const AbstractKart* k) {
