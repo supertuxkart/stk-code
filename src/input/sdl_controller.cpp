@@ -43,6 +43,7 @@ SDLController::SDLController(int device_id)
         irr::SEvent::SJoystickEvent::NUMBER_OF_AXES * sizeof(int16_t));
     m_game_controller = NULL;
     m_joystick = NULL;
+    m_haptics = NULL;
     m_id = -1;
 
     if (SDL_IsGameController(device_id))
@@ -177,6 +178,13 @@ SDLController::SDLController(int device_id)
     if (created)
         cfg->initSDLMapping();
     cfg->setPlugged();
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+    m_haptic = SDL_HapticOpenFromJoystick(m_joystick);
+    if (m_haptic)
+        SDL_HapticRumbleInit(m_haptic);
+#endif
+
     for (int i = 0; i < dm->getGamePadAmount(); i++)
     {
         GamePadDevice* d = dm->getGamePad(i);
@@ -196,13 +204,6 @@ SDLController::SDLController(int device_id)
     dm->addGamepad(m_gamepad);
     if (created)
         dm->save();
-
-
-#if SDL_VERSION_ATLEAST(1,3,0)
-    m_haptic = SDL_HapticOpenFromJoystick(m_joystick);
-    if (m_haptic)
-        SDL_HapticRumbleInit(m_haptic);
-#endif
 }   // SDLController
 
 // ----------------------------------------------------------------------------
