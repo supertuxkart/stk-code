@@ -196,28 +196,56 @@ Material::Material(const XMLNode *node, bool deprecated)
     if (!node->get("shader", &s))
     {
         // BACKWARS COMPATIBILITY, EVENTUALLY REMOVE
+
         bool b = false;
-        if (node->get("additive", &b))
+        node->get("additive", &b);
+        if (b)
         {
-            Log::warn("material", "'additive=' property is deprecated and removed. Please use shaders now");
+            m_shader_name = "alphablend";
         }
+
         b = false;
-        if (node->get("alpha", &b))
+        node->get("transparency", &b);
+        if (b)
         {
-            Log::warn("material", "'alpha=' property is deprecated and removed. Please use shaders now");
+            m_shader_name = "alphatest";
         }
-        b = true;
-        if (node->get("light", &b))
+
+        //node->get("lightmap", &m_lightmap);
+
+        b = false;
+        node->get("alpha", &b);
+        if (b)
         {
-            Log::warn("material", "'light=' property is deprecated and removed. Please use shaders now");
+            m_shader_name = "alphablend";
+        }
+
+        b = true;
+        node->get("light", &b);
+        if (!b)
+        {
+            m_shader_name = "unlit";
         }
         if (node->get("compositing", &s))
         {
-            Log::warn("material", "'compositing=' property is deprecated and removed. Please use shaders now");
-        }
-        if (node->get("transparency", &s))
-        {
-            Log::warn("material", "'transparency=' property is deprecated and removed. Please use shaders now");
+            if (s == "blend")
+            {
+                m_shader_name = "alphablend";
+            }
+            else if (s == "test")
+            {
+                m_shader_name = "alphatest";
+            }
+            else if (s == "additive")
+            {
+                m_shader_name = "additive";
+            }
+            else if (s == "coverage")
+            {
+                m_shader_name = "alphatest";
+            }
+            else if (s != "none")
+                Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
         }
 
         s = "";
