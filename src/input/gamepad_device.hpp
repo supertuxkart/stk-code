@@ -61,7 +61,7 @@ public:
 
     // ------------------------------------------------------------------------
     void setIrrIndex(int i ) { m_irr_index = i; }
-
+    bool useForceFeedback() const;
 };   // class GamepadDevice
 
 #endif
