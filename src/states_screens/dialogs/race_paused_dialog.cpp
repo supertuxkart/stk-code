@@ -131,7 +131,8 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
             if (!NetworkConfig::get()->isNetworking())
             {
                 getWidget<IconButtonWidget>("newrace")->setLabel(_("Setup New Game"));
-                getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Battle"));
+                if (getWidget<IconButtonWidget>("restart"))
+                    getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Battle"));
             }
             getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Battle"));
         }
@@ -141,7 +142,8 @@ RacePausedDialog::RacePausedDialog(const float percentWidth,
             if (!NetworkConfig::get()->isNetworking())
             {
                 getWidget<IconButtonWidget>("newrace")->setLabel(_("Setup New Race"));
-                getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Race"));
+                if (getWidget<IconButtonWidget>("restart"))
+                    getWidget<IconButtonWidget>("restart")->setLabel(_("Restart Race"));
             }
             getWidget<IconButtonWidget>("exit")->setLabel(_("Exit Race"));
         }
