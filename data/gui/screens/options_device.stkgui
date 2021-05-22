@@ -29,38 +29,41 @@
             <box width="78%" height="100%" layout="vertical-row">
 
                 <!-- Configuration name -->
-                 <spacer height="1%" width="10"/>
-                 <label id="title" width="100%" text_align="center" />
-                 <spacer height="2%" width="10"/>
+                <spacer height="1%" width="10"/>
+                <label id="title" width="100%" text_align="center" />
+                <spacer height="2%" width="10"/>
 
-                 <!-- List of key bindings -->
-                 <box proportion="10" width="75%" align="center" layout="vertical-row" padding="8">
-                     <list id="actions" x="0" y="0" width="100%" height="100%"/>
-                 </box>
+                <!-- List of key bindings -->
+                <box proportion="10" width="75%" align="center" layout="vertical-row" padding="8">
+                    <list id="actions" x="0" y="0" width="100%" height="100%"/>
+                </box>
 
-                 <!-- Bottom buttons -->
+                <!-- Bottom buttons -->
 
-                 <spacer width="50" height="2%" />
-                 <div height="4f" width="100%"  layout="horizontal-row">
-                     <div height="100%" width="fit" layout="vertical-row">
-                         <button id="delete"
-                                 I18N="In the input configuration screen"  text="Delete Configuration"/>
-                         <spacer width="50" height="2%" />
-                         <button id="disable_toggle"
-                                 I18N="In the input configuration screen"  text="Disable Configuration"/>
-                         <spacer width="50" height="2%" />
-                         <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
-                         <spacer width="50" height="2%" />
-                     </div>
+                <spacer width="50" height="2%" />
+                <div height="4f" width="100%"  layout="horizontal-row">
+                    <div height="100%" width="fit" layout="vertical-row">
+                        <button id="delete"
+                                I18N="In the input configuration screen"  text="Delete Configuration"/>
+                        <spacer width="50" height="2%" />
+                        <button id="disable_toggle"
+                                I18N="In the input configuration screen"  text="Disable Configuration"/>
+                        <spacer width="50" height="2%" />
+                        <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
+                        <spacer width="50" height="2%" />
+                    </div>
 
-                     <spacer width="2%" height="10" />
-                     
-                     <button id="rename_config" I18N="In the input configuration screen"  text="Rename Configuration"/>
-                     <spacer width="5%"/>
-                     <checkbox id="force_feedback"/>
-                     <spacer width="1%"/>
-                     <label id="force_feedback_text" I18N="In the input configuration screen, for gamepad" text="Enable force feedback (if support)"/>
-                 </div>
+                    <spacer width="2%" height="10" />
+                    <div height="100%" width="40%" layout="vertical-row">
+                        <button id="rename_config" I18N="In the input configuration screen"  text="Rename Configuration"/>
+                        <spacer height="15%"/>
+                        <div height="1f" width="100%"  layout="horizontal-row">
+                            <checkbox id="force_feedback"/>
+                            <spacer width="3%"/>
+                            <label id="force_feedback_text" I18N="In the input configuration screen, for gamepad" text="Enable force feedback (if support)" word_wrap="true"/>
+                        </div>
+                    </div>
+                </div>
             </box>
         </div>
     </div>
