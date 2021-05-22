@@ -101,6 +101,7 @@ void OptionsScreenDevice::init()
         // Only allow to enable or disable a gamepad,
         // as it is only in the list when connected
         delete_button->setActive(false);
+        disable_toggle->setActive(true);
 
         label = (m_config->isEnabled()
                 ? //I18N: button to disable a gamepad configuration
