@@ -480,8 +480,10 @@ void LocalPlayerController::rumble(float strength_low, float strength_high, uint
         SDLController* controller = input_manager->getSDLController(count);
         if (controller && controller->getGamePadDevice()->getPlayer() == m_player)
         {
-                controller->doRumble(strength_low, strength_high, duration);
-                break;
+            if (!controller->getGamePadDevice()->useForceFeedback())
+                return;
+            controller->doRumble(strength_low, strength_high, duration);
+            break;
         }
     }
 #endif

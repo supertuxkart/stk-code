@@ -59,6 +59,8 @@ private:
      *  values close to 0 the joystick will react less sensitive. */
     bool m_desensitize;
 
+    bool m_use_force_feedback;
+
     std::map<std::tuple<int, Input::AxisDirection>, int> m_sdl_mapping;
 
     std::set<int> m_digital_axes;
@@ -118,6 +120,10 @@ public:
                            int hats);
     // ------------------------------------------------------------------------
     void initSDLMapping();
+    // ------------------------------------------------------------------------
+    bool useForceFeedback() const             { return m_use_force_feedback; }
+    // ------------------------------------------------------------------------
+    void setForceFeedback(bool val)            { m_use_force_feedback = val; }
 };   // class GamepadConfig
 
 #endif

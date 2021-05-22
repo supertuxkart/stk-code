@@ -50,13 +50,16 @@
                                  I18N="In the input configuration screen"  text="Disable Configuration"/>
                          <spacer width="50" height="2%" />
                          <button id="back_to_device_list" I18N="In the input configuration screen"  text="Back to device list"/>
-
                          <spacer width="50" height="2%" />
                      </div>
 
                      <spacer width="2%" height="10" />
                      
                      <button id="rename_config" I18N="In the input configuration screen"  text="Rename Configuration"/>
+                     <spacer width="5%"/>
+                     <checkbox id="force_feedback"/>
+                     <spacer width="1%"/>
+                     <label id="force_feedback_text" I18N="In the input configuration screen, for gamepad" text="Enable force feedback (if support)"/>
                  </div>
             </box>
         </div>
