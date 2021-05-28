@@ -70,6 +70,8 @@ public:
     /** Get a tip by ID. */
     const irr::core::stringw& getTip(const std::string& id) const;
     // ------------------------------------------------------------------------
+    bool isEmpty() const { return m_all_tip_sets.empty(); }
+    // ------------------------------------------------------------------------
 };   // class TipsManager
 
 #endif

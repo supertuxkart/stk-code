@@ -47,6 +47,7 @@ CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of t
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
+CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE" ON)
 
 if((UNIX AND NOT APPLE) OR NINTENDO_SWITCH)
     include(FindPkgConfig)
@@ -368,8 +369,23 @@ endif()
 
 if(NOT SERVER_ONLY)
     # OpenAL
-    find_package(OpenAL REQUIRED)
-    include_directories(${OPENAL_INCLUDE_DIR})
+    if (USE_MOJOAL)
+        find_library(LIBSAMPLERATE_LIBRARY NAMES samplerate libsamplerate)
+        find_path(LIBSAMPLERATE_INCLUDEDIR NAMES samplerate.h PATHS)
+        if (NOT LIBSAMPLERATE_LIBRARY OR NOT LIBSAMPLERATE_INCLUDEDIR)
+            message(FATAL_ERROR "libsamplerate not found. "
+                "libsamplerate is required to handle pitch for MojoAL.")
+        else()
+            include_directories("${LIBSAMPLERATE_INCLUDEDIR}")
+            MESSAGE(STATUS "Use system libsamplerate: ${LIBSAMPLERATE_LIBRARY}")
+        endif()
+        add_definitions(-DAL_LIBTYPE_STATIC)
+        add_subdirectory("${PROJECT_SOURCE_DIR}/lib/mojoal")
+        include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/mojoal")
+    else()
+        find_package(OpenAL REQUIRED)
+        include_directories(${OPENAL_INCLUDE_DIR})
+    endif()
 
     # OggVorbis
     find_package(OggVorbis REQUIRED)
@@ -633,6 +649,14 @@ if (USE_SWITCH)
   )
 endif()
 
+if(NOT SERVER_ONLY)
+    if (USE_MOJOAL)
+        target_link_libraries(supertuxkart mojoal ${LIBSAMPLERATE_LIBRARY})
+    else()
+        target_link_libraries(supertuxkart ${OPENAL_LIBRARY})
+    endif()
+endif()
+
 if (USE_DNS_C)
     target_link_libraries(supertuxkart dnsc)
 else()
@@ -651,14 +675,22 @@ endif()
 
 if(NOT SERVER_ONLY)
     if (IOS)
-        target_link_libraries(supertuxkart "-weak_framework CoreHaptics -framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework CoreMotion -framework Foundation -framework GLKit")
+        target_link_libraries(supertuxkart "-weak_framework CoreHaptics -framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework Foundation -framework GLKit")
+        # tvOS doesn't have CoreMotion framwork
+        include(CheckCSourceCompiles)
+        set(prev_req_lib ${CMAKE_REQUIRED_LIBRARIES})
+        set(CMAKE_REQUIRED_LIBRARIES "-framework CoreMotion")
+        check_c_source_compiles("int main() { return 0; }" COREMOTION_EXISTS)
+        set(CMAKE_REQUIRED_LIBRARIES ${prev_req_lib})
+        if (COREMOTION_EXISTS)
+            target_link_libraries(supertuxkart "-framework CoreMotion")
+        endif()
     endif()
 
     target_link_libraries(supertuxkart
         ${SQUISH_LIBRARY}
         ${JPEG_LIBRARIES}
         ${OGGVORBIS_LIBRARIES}
-        ${OPENAL_LIBRARY}
         ${FREETYPE_LIBRARIES}
         ${HARFBUZZ_LIBRARY}
         ${SDL2_LIBRARY}
@@ -798,7 +830,6 @@ install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128/
 install(FILES data/supertuxkart_256.png DESTINATION share/icons/hicolor/256x256/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_512.png DESTINATION share/icons/hicolor/512x512/apps RENAME supertuxkart.png)
 install(FILES data/supertuxkart_1024.png DESTINATION share/icons/hicolor/1024x1024/apps RENAME supertuxkart.png)
-install(FILES data/supertuxkart_512.png DESTINATION share/pixmaps RENAME supertuxkart.png)
 install(FILES data/supertuxkart.appdata.xml DESTINATION share/metainfo)
 
 if(MINGW)

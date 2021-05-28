@@ -1,0 +1,160 @@
+name: apple
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  pull_request: {}
+  workflow_dispatch:
+
+jobs:
+  build:
+
+    strategy:
+      fail-fast: true
+      matrix:
+        platform: [iPhoneOS, MacOSX]
+        arch: [arm64, x86_64]
+        exclude:
+          - platform: iPhoneOS
+            arch: x86_64
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: true
+      - id: sysroot
+        uses: ASzc/change-string-case-action@v1
+        with:
+          string: ${{ matrix.platform }}
+      - name: Download cctools
+        run: |
+          cd /opt
+          wget https://github.com/supertuxkart/dependencies/releases/download/preview/cctools.tar.xz
+          tar xf cctools.tar.xz
+      - name: Restore timestamps
+        run: |
+          wget https://github.com/MestreLion/git-tools/archive/refs/heads/master.zip
+          unzip master.zip
+          python git-tools-master/git-restore-mtime
+      - name: List build cache restore keys
+        run: |
+          # Look for the last 9 build caches (GitHub supports max 10 including current one)
+          for number in 1 2 3 4 5 6 7 8 9
+          do
+            id=$((${{ github.run_number }} - number))
+            echo "cache_$number=apple-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.platform }}-$id" >> $GITHUB_ENV
+          done
+      - name: Handle build cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            build
+          key: apple-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.platform }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ env.cache_1 }}
+            ${{ env.cache_2 }}
+            ${{ env.cache_3 }}
+            ${{ env.cache_4 }}
+            ${{ env.cache_5 }}
+            ${{ env.cache_6 }}
+            ${{ env.cache_7 }}
+            ${{ env.cache_8 }}
+            ${{ env.cache_9 }}
+      - name: Download dependencies
+        run: |
+          wget https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-${{ steps.sysroot.outputs.lowercase }}.tar.xz
+          tar xf dependencies-${{ steps.sysroot.outputs.lowercase }}.tar.xz
+      - name: Configure clang runtime name
+        run: |
+          if [ ${{ matrix.platform }} = "MacOSX" ]; then
+            echo "rt=osx" >> $GITHUB_ENV
+          elif [ ${{ matrix.platform }} = "iPhoneOS" ]; then
+            echo "rt=ios" >> $GITHUB_ENV
+          elif [ ${{ matrix.platform }} = "AppleTVOS" ]; then
+            echo "rt=tvos" >> $GITHUB_ENV
+          elif [ ${{ matrix.platform }} = "iPhoneSimulator" ]; then
+            echo "rt=iossim" >> $GITHUB_ENV
+          elif [ ${{ matrix.platform }} = "AppleTVSimulator" ]; then
+            echo "rt=tvossim" >> $GITHUB_ENV
+          fi
+      - name: Configure bulid
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -DCCTOOLS_PREFIX=/opt/cctools -DCCTOOLS_ARCH=${{ matrix.arch }} -DCCTOOLS_PLATFORM=${{ matrix.platform }} \
+          -DRT=/opt/cctools/darwin/libclang_rt.${{ env.rt }}.a -DCMAKE_TOOLCHAIN_FILE=../cmake/Toolchain-cctools.cmake -DCHECK_ASSETS=OFF
+      - name: Build
+        run: |
+          cd build
+          make -j4
+          mv bin ../${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
+      - name: Upload binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
+          path: ${{ steps.sysroot.outputs.lowercase }}-${{ matrix.arch }}
+  packaging:
+    name: Packaging STK
+    needs: build
+    runs-on: macos-latest
+    steps:
+      - name: Configure packaging name for git master branch
+        if: ${{ github.ref == 'refs/heads/master' }}
+        run: |
+          echo "release_tag=git`date +%Y%m%d`" >> $GITHUB_ENV
+          echo "release_name=preview" >> $GITHUB_ENV
+      - name: Configure packaging name for tag
+        if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo "release_tag=`basename $GITHUB_REF`" >> $GITHUB_ENV
+          echo "release_name=`basename $GITHUB_REF`" >> $GITHUB_ENV
+      - name: Configure packaging name for non-releasing branch
+        if: ${{ (github.ref != 'refs/heads/master' && !startsWith(github.ref, 'refs/tags/')) || github.repository_owner != 'supertuxkart' }}
+        run: |
+          echo "release_tag=" >> $GITHUB_ENV
+          echo "release_name=" >> $GITHUB_ENV
+      - name: Check for prerelease
+        if: ${{ github.ref == 'refs/heads/master' || contains(github.ref, 'rc') || contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=true" >> $GITHUB_ENV
+      - name: Check for non-prerelease
+        if: ${{ github.ref != 'refs/heads/master' && !contains(github.ref, 'rc') && !contains(github.ref, 'beta') }}
+        run: |
+          echo "release_pre=false" >> $GITHUB_ENV
+      - name: Show packaging name
+        run : |
+          echo "${{ env.release_tag }}"
+          echo "${{ env.release_name }}"
+          echo "${{ env.release_pre }}"
+      - name: Download binaries
+        uses: actions/download-artifact@v2
+      - name: Run dylibbundler and archive
+        if: ${{ env.release_tag != '' }}
+        run: |
+          wget https://github.com/supertuxkart/dependencies/releases/download/preview/dependencies-macosx.tar.xz
+          tar xf dependencies-macosx.tar.xz
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install dylibbundler
+          lipo -create ./macosx-x86_64/supertuxkart.app/Contents/MacOS/supertuxkart ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -output ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
+          chmod 755 ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart
+          dylibbundler -od -b -x ./macosx-arm64/supertuxkart.app/Contents/MacOS/supertuxkart -d ./macosx-arm64/supertuxkart.app/Contents/libs/ -p @executable_path/../libs/ -s dependencies-macosx/lib
+          cd ./macosx-arm64/supertuxkart.app/Contents/Resources/data
+          wget https://github.com/supertuxkart/stk-assets-mobile/releases/download/git/stk-assets-full.zip
+          unzip stk-assets-full.zip
+          rm stk-assets-full.zip
+          cd ../../../../..
+          mv ./macosx-arm64/supertuxkart.app SuperTuxKart.app
+          zip -r SuperTuxKart-${{ env.release_tag }}-mac.zip SuperTuxKart.app
+      - name: Create release
+        if: ${{ env.release_tag != '' }}
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "SuperTuxKart*.zip"
+          tag: ${{ env.release_name }}
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          allowUpdates: true
+          prerelease: ${{ env.release_pre }}

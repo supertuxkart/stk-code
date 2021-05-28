@@ -50,6 +50,10 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include "input/device_manager.hpp"
+#include "input/gamepad_device.hpp"
+#include "input/sdl_controller.hpp"
+
 /** The constructor for a loca player kart, i.e. a player that is playing
  *  on this machine (non-local player would be network clients).
  *  \param kart_name Name of the kart.
@@ -62,6 +66,7 @@ LocalPlayerController::LocalPlayerController(AbstractKart *kart,
                                              HandicapLevel h)
                      : PlayerController(kart)
 {
+    m_last_crash = 0;
     m_has_started = false;
     m_handicap = h;
     m_player = StateManager::get()->getActivePlayer(local_player_id);
@@ -128,6 +133,7 @@ void LocalPlayerController::initParticleEmitter()
 void LocalPlayerController::reset()
 {
     PlayerController::reset();
+    m_last_crash = 0;
     m_sound_schedule = false;
     m_has_started = false;
 }   // reset
@@ -225,7 +231,7 @@ void LocalPlayerController::steer(int ticks, int steer_val)
                              video::SColor(255, 255, 0, 255), false);
     }
     PlayerController::steer(ticks, steer_val);
-    
+
     if(UserConfigParams::m_gamepad_debug)
     {
         Log::debug("LocalPlayerController", "  set to: %f\n",
@@ -414,7 +420,7 @@ void LocalPlayerController::collectedItem(const ItemState &item_state,
 }   // collectedItem
 
 //-----------------------------------------------------------------------------
-/** If the nitro level has gone under the nitro goal, play a bad effect sound 
+/** If the nitro level has gone under the nitro goal, play a bad effect sound
  */
 void LocalPlayerController::nitroNotFullSound()
 {
@@ -429,7 +435,7 @@ void LocalPlayerController::nitroNotFullSound()
  *        collect achievements - synching to online account will happen
  *        next time the account gets online.
  */
-bool LocalPlayerController::canGetAchievements() const 
+bool LocalPlayerController::canGetAchievements() const
 {
     return !RewindManager::get()->isRewinding() &&
         m_player->getConstProfile() == PlayerManager::getCurrentPlayer();
@@ -447,3 +453,50 @@ core::stringw LocalPlayerController::getName(bool include_handicap_string) const
 
     return name;
 }   // getName
+
+void LocalPlayerController::doCrashHaptics() {
+#ifndef SERVER_ONLY
+    if (RewindManager::get()->isRewinding())
+        return;
+    int now = World::getWorld()->getTicksSinceStart();
+    int lastCrash = m_last_crash;
+    m_last_crash = now;
+    if ((now - lastCrash) < stk_config->time2Ticks(0.2f))
+        return;
+
+    float strength =
+        pow(2, (abs(m_player->getKart()->getVelocity().length())) / 15.0f) - 1.0f;
+    rumble(strength, strength, 200);
+#endif
+}
+
+void LocalPlayerController::rumble(float strength_low, float strength_high, uint16_t duration) {
+#ifndef SERVER_ONLY
+    if (RewindManager::get()->isRewinding())
+        return;
+    int count = input_manager->getGamepadCount();
+    while(count--)
+    {
+        SDLController* controller = input_manager->getSDLController(count);
+        if (controller && controller->getGamePadDevice()->getPlayer() == m_player)
+        {
+            if (!controller->getGamePadDevice()->useForceFeedback())
+                return;
+            controller->doRumble(strength_low, strength_high, duration);
+            break;
+        }
+    }
+#endif
+}
+
+void LocalPlayerController::crashed(const AbstractKart* k) {
+    doCrashHaptics();
+
+    PlayerController::crashed(k);
+}
+
+void LocalPlayerController::crashed(const Material *m) {
+    doCrashHaptics();
+
+    PlayerController::crashed(m);
+}

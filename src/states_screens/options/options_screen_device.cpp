@@ -24,12 +24,14 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/button_widget.hpp"
+#include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/gamepad_config.hpp"
 #include "input/gamepad_device.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
@@ -91,17 +93,23 @@ void OptionsScreenDevice::init()
 
     core::stringw label;
 
+    CheckBoxWidget* ff = getWidget<CheckBoxWidget>("force_feedback");
+    ff->setVisible(!m_config->isKeyboard());
+    getWidget("force_feedback_text")->setVisible(!m_config->isKeyboard());
     if (!m_config->isKeyboard())
     {
         // Only allow to enable or disable a gamepad,
         // as it is only in the list when connected
         delete_button->setActive(false);
+        disable_toggle->setActive(true);
 
         label = (m_config->isEnabled()
                 ? //I18N: button to disable a gamepad configuration
                     _("Disable Device")
                 : //I18N: button to enable a gamepad configuration
                     _("Enable Device"));
+        ff->setState(
+            static_cast<GamepadConfig*>(m_config)->useForceFeedback());
     }
     else
     {
@@ -645,7 +653,16 @@ void OptionsScreenDevice::eventCallback(Widget* widget,
                 return true;
             });
     }
-
+    else if (name == "force_feedback")
+    {
+        GamepadConfig* gc = dynamic_cast<GamepadConfig*>(m_config);
+        if (gc)
+        {
+            gc->setForceFeedback(
+                getWidget<CheckBoxWidget>("force_feedback")->getState());
+            input_manager->getDeviceManager()->save();
+        }
+    }
 }   // eventCallback
 
 // -----------------------------------------------------------------------------

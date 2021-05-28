@@ -170,6 +170,9 @@ void AddonsScreen::init()
     GUIEngine::TextBoxWidget* w_filter_name =
                         getWidget<GUIEngine::TextBoxWidget>("filter_name");
     w_filter_name->setText(L"");
+    // Add listener for incremental update when search text is changed
+    w_filter_name->clearListeners();
+    w_filter_name->addListener(this);
     GUIEngine::SpinnerWidget* w_filter_date =
                         getWidget<GUIEngine::SpinnerWidget>("filter_date");
     w_filter_date->setValue(0);

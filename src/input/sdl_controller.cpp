@@ -43,6 +43,7 @@ SDLController::SDLController(int device_id)
         irr::SEvent::SJoystickEvent::NUMBER_OF_AXES * sizeof(int16_t));
     m_game_controller = NULL;
     m_joystick = NULL;
+    m_haptic = NULL;
     m_id = -1;
 
     if (SDL_IsGameController(device_id))
@@ -177,6 +178,13 @@ SDLController::SDLController(int device_id)
     if (created)
         cfg->initSDLMapping();
     cfg->setPlugged();
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+    m_haptic = SDL_HapticOpenFromJoystick(m_joystick);
+    if (m_haptic)
+        SDL_HapticRumbleInit(m_haptic);
+#endif
+
     for (int i = 0; i < dm->getGamePadAmount(); i++)
     {
         GamePadDevice* d = dm->getGamePad(i);
@@ -206,6 +214,10 @@ SDLController::~SDLController()
         SDL_GameControllerClose(m_game_controller);
     else
         SDL_JoystickClose(m_joystick);
+#if SDL_VERSION_ATLEAST(1,3,0)
+    if (m_haptic)
+        SDL_HapticClose(m_haptic);
+#endif
     m_gamepad->getConfiguration()->unPlugged();
     m_gamepad->setIrrIndex(-1);
     m_gamepad->setConnected(false);
@@ -246,6 +258,22 @@ void SDLController::checkPowerLevel()
     }
 #endif
 }   // checkPowerLevel
+
+void SDLController::doRumble(float strength_low, float strength_high, uint32_t duration_ms)
+{
+#if SDL_VERSION_ATLEAST(1,3,0)
+    if (m_haptic)
+    {
+        SDL_HapticRumblePlay(m_haptic, (strength_low + strength_high) / 2, duration_ms);
+    }
+    else
+#endif
+    {
+        uint16_t scaled_low = strength_low * pow(2, 16);
+        uint16_t scaled_high = strength_high * pow(2, 16);
+        SDL_GameControllerRumble(m_game_controller, scaled_low, scaled_high, duration_ms);
+    }
+}
 
 // ----------------------------------------------------------------------------
 #ifdef ANDROID

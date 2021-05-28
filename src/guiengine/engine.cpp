@@ -1432,7 +1432,7 @@ namespace GUIEngine
     void renderLoading(bool clearIcons, bool launching, bool update_tips)
     {
 #ifndef SERVER_ONLY
-        if (update_tips)
+        if (!TipsManager::get()->isEmpty() && update_tips)
         {
             core::stringw tip = TipsManager::get()->getTip("general");
             //I18N: Tip shown in gui for giving player hints

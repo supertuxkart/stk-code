@@ -120,6 +120,8 @@ public:
     const irr::SEvent& getEventForGamePad(unsigned i) const;
 
     void   handleJoystick(SDL_Event& event);
+
+    SDLController* getSDLController(unsigned i);
 #endif
 
     void   dispatchInput(Input::InputType, int deviceID, int btnID,

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-22 08:10+0800\n"
-"PO-Revision-Date: 2021-03-12 16:56+0000\n"
+"POT-Creation-Date: 2021-05-08 11:13+0800\n"
+"PO-Revision-Date: 2021-05-08 03:43+0000\n"
 "Last-Translator: Benau\n"
 "Language-Team: Korean (http://www.transifex.com/supertuxkart/supertuxkart/language/ko/)\n"
 "MIME-Version: 1.0\n"
@@ -191,7 +191,7 @@ msgstr "선호하는 조작법을 선택하세요"
 #. I18N: Control type
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-#: src/states_screens/dialogs/race_paused_dialog.cpp:520
+#: src/states_screens/dialogs/race_paused_dialog.cpp:543
 msgid "Accelerometer"
 msgstr "속도계"
 
@@ -205,13 +205,13 @@ msgstr "속도계"
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:525
+#: src/states_screens/dialogs/race_paused_dialog.cpp:548
 msgid "Gyroscope"
 msgstr "자이로스코프"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
-#: src/states_screens/dialogs/race_paused_dialog.cpp:515
+#: src/states_screens/dialogs/race_paused_dialog.cpp:538
 msgid "Steering wheel"
 msgstr "스티어링 휠"
 
@@ -330,6 +330,8 @@ msgstr "확인"
 #. I18N: In the ui/camera screen
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
+#. I18N: ./data/gui/dialogs/enter_address_dialog.stkgui
+#. I18N: In the enter address dialog
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/kart_color_slider.stkgui
@@ -376,7 +378,7 @@ msgstr "동의"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr ""
+msgstr "되돌리기"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -525,6 +527,8 @@ msgstr "* 새로운 설정을 적용하려면 게임을 다시 시작하세요"
 msgid "Close"
 msgstr "닫기"
 
+#. I18N: ./data/gui/dialogs/enter_address_dialog.stkgui
+#. I18N: In the enter address dialog
 #. I18N: ./data/gui/dialogs/general_text_field_dialog.stkgui
 #. I18N: In the general textfield dialog
 #. I18N: ./data/gui/dialogs/online/achievement_progress_dialog.stkgui
@@ -635,8 +639,7 @@ msgstr "보내기"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:140
 msgid "Back to Race"
 msgstr "경주로 돌아가기"
 
@@ -648,8 +651,7 @@ msgstr "대기실로 돌아가기"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
+#: src/states_screens/dialogs/race_paused_dialog.cpp:144
 msgid "Restart Race"
 msgstr "경주 다시 시작"
 
@@ -962,17 +964,6 @@ msgstr "ESC 키로 할당하기"
 #. I18N: When configuring input
 msgid "Assign nothing"
 msgstr "아무 것도 할당하지 않기"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-#: src/states_screens/race_result_gui.cpp:320
-msgid "Setup New Race"
-msgstr "새 경주 설정"
-
-#. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
-#. I18N: Race paused button
-msgid "Exit Race"
-msgstr "경주 종료"
 
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/race_setup.stkgui
@@ -2805,21 +2796,21 @@ msgid ""
 "created."
 msgstr "당신의 구성 파일이 너무 오래되어서, 이는 삭제되었고 새로운 구성이 만들어질 것입니다."
 
-#: src/graphics/irr_driver.cpp:643
+#: src/graphics/irr_driver.cpp:657
 msgid "Video recording started."
 msgstr "동영상 녹화가 시작되었습니다."
 
-#: src/graphics/irr_driver.cpp:650
+#: src/graphics/irr_driver.cpp:664
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "동영상이 \"%s\"에 저장되었습니다."
 
-#: src/graphics/irr_driver.cpp:654
+#: src/graphics/irr_driver.cpp:668
 msgid "Encoding progress:"
 msgstr "인코딩 진행 상황:"
 
-#: src/graphics/irr_driver.cpp:1827 src/graphics/irr_driver.cpp:1862
-#: src/graphics/irr_driver.cpp:1867
+#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
+#: src/graphics/irr_driver.cpp:1857
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, 핑: %dms"
@@ -3504,7 +3495,7 @@ msgstr "Wii 리모컨을 감지할 수 없었습니다 :/"
 
 #: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
-msgstr ""
+msgstr "경주를 준비하는 중"
 
 #: src/karts/controller/local_player_controller.cpp:307
 msgid "Penalty time!!"
@@ -3536,12 +3527,12 @@ msgid "You finished the race in rank %d!"
 msgstr "당신은 경주를 %d위로 마쳤습니다!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1126
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1127
 #, c-format
 msgid "%s left the game."
 msgstr "%s가 게임에서 떠났습니다."
 
-#: src/main.cpp:2009
+#: src/main.cpp:2012
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3550,16 +3541,16 @@ msgid ""
 "Internet\")."
 msgstr "슈퍼턱스카트는 부가 기능을 다운로드하고 사용자에게 업데이트를 알리기 위해 서버에 연결할 수 있습니다. 개인 정보 보호 정책은  https://supertuxkart.net/Privacy 에서 읽어주세요. 이 기능을 활성화시키겠습니까? (나중에 변경하려면, 설정에서 '일반'을 선택하고 \"인터넷에 연결\"을 수정하세요.)"
 
-#: src/main.cpp:2358
+#: src/main.cpp:2361
 msgid "Your screen resolution is too low to run STK."
 msgstr "당신의 화면 해상도는 게임를 실행하기에 너무 낮습니다."
 
-#: src/main.cpp:2393
+#: src/main.cpp:2396
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "당신의 드라이버 버전이 너무 오래되었습니다. 최신 비디오 드라이버를 설치해주세요."
 
-#: src/main.cpp:2411
+#: src/main.cpp:2414
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3651,11 +3642,11 @@ msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i의 스페어 타이어 카트가 산란되었습니다!"
 
-#: src/modes/world.cpp:1383
+#: src/modes/world.cpp:1412
 msgid "You have been eliminated!"
 msgstr "당신은 탈락했습니다!"
 
-#: src/modes/world.cpp:1390
+#: src/modes/world.cpp:1419
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s'이(가) 탈락했습니다."
@@ -3769,73 +3760,73 @@ msgstr "연결 거부됨: 서버가 바쁩니다."
 msgid "Connection refused: You are banned from the server."
 msgstr "연결 거부됨: 당신은 서버에서 차단되어 있습니다."
 
-#: src/network/protocols/client_lobby.cpp:942
+#: src/network/protocols/client_lobby.cpp:943
 msgid "Connection refused: Server password is incorrect."
 msgstr "연결 거부됨: 서버 비밀번호가 잘못되었습니다."
 
-#: src/network/protocols/client_lobby.cpp:946
+#: src/network/protocols/client_lobby.cpp:947
 msgid "Connection refused: Game data is incompatible."
 msgstr "연결 거부됨: 게임 데이터가 호환되지 않습니다."
 
-#: src/network/protocols/client_lobby.cpp:950
+#: src/network/protocols/client_lobby.cpp:951
 msgid "Connection refused: Server is full."
 msgstr "연결 거부됨: 서버가 가득 찼습니다."
 
-#: src/network/protocols/client_lobby.cpp:954
+#: src/network/protocols/client_lobby.cpp:955
 msgid "Connection refused: Invalid player connecting."
 msgstr "연결 거부됨: 잘못된 플레이어를 연결 중입니다."
 
-#: src/network/protocols/client_lobby.cpp:982
+#: src/network/protocols/client_lobby.cpp:983
 msgid "Failed to start the network game."
 msgstr "네트워크 게임을 시작하는데 실패했습니다."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1195
+#: src/network/protocols/client_lobby.cpp:1196
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "게임이 끝났습니다, 당신은 더 이상 실시간 참가나 관람할 수 없습니다."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1199
+#: src/network/protocols/client_lobby.cpp:1200
 msgid "No remaining place in the arena - live join disabled."
 msgstr "아레나에 남아 있는 장소가 없습니다 - 실시간 참가가 비활성화되었습니다."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1203
+#: src/network/protocols/client_lobby.cpp:1204
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "플레이어 1명만이 남아 있어, 대기실로 돌아갑니다."
 
-#: src/network/protocols/client_lobby.cpp:1209
+#: src/network/protocols/client_lobby.cpp:1210
 msgid "Server owner quit the game."
 msgstr "서버 주인이 게임을 나갔습니다."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1213
+#: src/network/protocols/client_lobby.cpp:1214
 msgid "You will be spectating the next game."
 msgstr "다음 게임을 관전할 수 있습니다."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1381
+#: src/network/protocols/client_lobby.cpp:1382
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s가 레드 팀에 참가되었습니다."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1387
+#: src/network/protocols/client_lobby.cpp:1388
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s가 블루 팀에 참가되었습니다."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1393
+#: src/network/protocols/client_lobby.cpp:1394
 #, c-format
 msgid "%s joined the game."
 msgstr "%s가 게임에 참가되었습니다."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1584
+#: src/network/protocols/client_lobby.cpp:1585
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3843,7 +3834,7 @@ msgid ""
 msgstr "대상 플레이어를 변경하려면 <%s>또는<%s>을 누르세요, 카메라 위치를 변경하려면<%s>또는<%s>을 누르세요."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1600
+#: src/network/protocols/client_lobby.cpp:1601
 #, c-format
 msgid "Successfully reported %s."
 msgstr "성공적으로 %s를 신고했습니다."
@@ -4475,14 +4466,14 @@ msgstr "추천"
 #. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:180
 #: src/states_screens/dialogs/addons_pack.cpp:173
-#: src/states_screens/dialogs/download_assets.cpp:102
+#: src/states_screens/dialogs/download_assets.cpp:104
 #, c-format
 msgid "Size: %s"
 msgstr "크기: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:292
 #: src/states_screens/dialogs/addons_pack.cpp:185
-#: src/states_screens/dialogs/download_assets.cpp:180
+#: src/states_screens/dialogs/download_assets.cpp:189
 msgid "Sorry, downloading the add-on failed"
 msgstr "죄송하지만, 부가 기능을 다운로드하는 데 실패했습니다"
 
@@ -4493,7 +4484,7 @@ msgstr "부가 기능 '%s'를 설치하는 데 문제가 있습니다."
 
 #: src/states_screens/dialogs/addons_loading.cpp:379
 #: src/states_screens/dialogs/addons_loading.cpp:428
-#: src/states_screens/dialogs/download_assets.cpp:245
+#: src/states_screens/dialogs/download_assets.cpp:254
 msgid "Try again"
 msgstr "다시 시도하세요"
 
@@ -4505,7 +4496,7 @@ msgstr "부가 기능 '%s'를 제거하는 데 문제가 있습니다."
 #. I18N: Shown when there is download error for assets download
 #. in the first run
 #: src/states_screens/dialogs/addons_pack.cpp:225
-#: src/states_screens/dialogs/download_assets.cpp:230
+#: src/states_screens/dialogs/download_assets.cpp:239
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
@@ -4612,12 +4603,30 @@ msgid "Very Low"
 msgstr "매우 낮음"
 
 #. I18N: In download assets dialog
-#: src/states_screens/dialogs/download_assets.cpp:106
+#: src/states_screens/dialogs/download_assets.cpp:108
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience, this will use your mobile data if you "
 "don't have a wifi connection."
 msgstr "슈퍼턱스카트는 더 나은 게임 경험을 위해 전체 자산(고품질 텍스처 및 음악 포함)을 다운로드할 것이고, 와이파이가 연결되지 않은 경우 모바일 데이터를 사용할것 입니다."
+
+#. I18N: In download assets dialog
+#: src/states_screens/dialogs/download_assets.cpp:115
+msgid ""
+"SuperTuxKart will download full assets (including high quality textures and "
+"music) for better gaming experience."
+msgstr ""
+
+#: src/states_screens/dialogs/enter_address_dialog.cpp:42
+msgid ""
+"Enter the server address optionally followed by : and then port or select "
+"address from list."
+msgstr ""
+
+#: src/states_screens/dialogs/enter_address_dialog.cpp:124
+#, c-format
+msgid "Invalid server address: %s."
+msgstr "잘못된 서버 주소: %s입니다."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
@@ -4778,7 +4787,7 @@ msgstr "서버 관리자에게 이 플레이어(%s)에 대해 알려주세요:"
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "아무 키나 누르세요...\n(취소하려면 ESC를 누르세요)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
@@ -4789,6 +4798,31 @@ msgstr "아무키나 누르세요"
 #: src/states_screens/online/networking_lobby.cpp:836
 msgid "Chat is disabled, enable in options menu."
 msgstr "채팅이 비활성화되어 있습니다, 옵션 메뉴에서 활성화하세요."
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:130
+msgid "Back to Battle"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:133
+msgid "Setup New Game"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:134
+msgid "Restart Battle"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:136
+msgid "Exit Battle"
+msgstr ""
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:143
+#: src/states_screens/race_result_gui.cpp:320
+msgid "Setup New Race"
+msgstr "새 경주 설정"
+
+#: src/states_screens/dialogs/race_paused_dialog.cpp:146
+msgid "Exit Race"
+msgstr "경주 종료"
 
 #. I18N: In the network player dialog, indiciating a network
 #. player has no ranking
@@ -5376,15 +5410,6 @@ msgid ""
 "Internet\"."
 msgstr "당신은 인터넷 접속 없이 온라인으로 플레이할 수 없습니다. 온라인으로 플레이하려면, 옵션에 가서, '사용자 인터페이스' 탭을 선택하고, \"인터넷에 연결\"을 편집하세요."
 
-#: src/states_screens/online/online_screen.cpp:239
-msgid "Enter the server address optionally followed by : and then port."
-msgstr "선택적으로 서버 주소를 입력하고 :를 입력한 다음 포트를 입력하세요."
-
-#: src/states_screens/online/online_screen.cpp:251
-#, c-format
-msgid "Invalid server address: %s."
-msgstr "잘못된 서버 주소: %s입니다."
-
 #: src/states_screens/online/online_user_search.cpp:179
 #: src/states_screens/online/online_user_search.cpp:242
 msgid "Searching"
@@ -5653,7 +5678,7 @@ msgstr "이 구성을 영구적으로 삭제하시겠습니까?"
 
 #: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enter new configuration name, leave empty to revert default value."
-msgstr "새로운 구성 이름을 입력하고, 기본값으로 돌아가려면 비워두세요."
+msgstr "새로운 구성 이름을 입력하고, 기본값으로 되돌리려면 비워두세요."
 
 #. I18N: Tooltip in the UI menu. Use enough linebreaks to make sure the text
 #. fits the screen in low resolutions.
@@ -5951,7 +5976,7 @@ msgstr "대장의 꼬리를 잡으세요!"
 msgid "Top %i"
 msgstr "상위 %i"
 
-#: src/states_screens/race_gui.cpp:445
+#: src/states_screens/race_gui.cpp:450
 msgid "Challenge Failed"
 msgstr "도전 실패"
 

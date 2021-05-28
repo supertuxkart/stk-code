@@ -242,3 +242,7 @@ bool GamePadDevice::processAndMapInput(Input::InputType type, const int id,
 }   // processAndMapInput
 
 // ----------------------------------------------------------------------------
+bool GamePadDevice::useForceFeedback() const
+{
+    return static_cast<GamepadConfig*>(m_configuration)->useForceFeedback();
+}   // useForceFeedback

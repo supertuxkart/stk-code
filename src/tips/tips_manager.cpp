@@ -36,7 +36,11 @@ TipsManager* TipsManager::m_tips_manager = NULL;
 TipsManager::TipsManager()
 {
     const std::string file_name = file_manager->getAsset("tips.xml");
+    if (file_name.empty())
+        return;
     const XMLNode *root = file_manager->createXMLTree(file_name);
+    if (!root)
+        return;
     unsigned int num_nodes = root->getNumNodes();
 
     for (unsigned int i = 0; i < num_nodes; i++)
