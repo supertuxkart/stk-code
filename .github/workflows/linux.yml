@@ -10,7 +10,7 @@
 # Note: Parts of this code were taken from the SuperTux project.
 #         ~ Semphris (responsible for transfering and adapting the file)
 
-name: main
+name: linux
 on:
   push:
     branches:

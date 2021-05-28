@@ -21,6 +21,7 @@
 #include "addons/addons_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 
 /* used for the installed/unsinstalled icons*/
@@ -41,7 +42,8 @@ struct DateFilter {
   */
 class AddonsScreen : public GUIEngine::Screen,
                      public GUIEngine::ScreenSingleton<AddonsScreen>,
-                     public GUIEngine::IListWidgetHeaderListener
+                     public GUIEngine::IListWidgetHeaderListener,
+                     public GUIEngine::ITextBoxWidgetListener
 {
     friend class GUIEngine::ScreenSingleton<AddonsScreen>;
 private:
@@ -102,6 +104,12 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
+
+    /** \brief rebuild the list based on search text */
+    virtual void onTextUpdated() OVERRIDE
+    {
+        loadList();
+    }
 
     void    setLastSelected();
 
