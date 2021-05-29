@@ -33,7 +33,6 @@ ChangeEmailDialog::ChangeEmailDialog() : ModalDialog(0.8f,0.7f),m_self_destroy(f
     loadFromFile("online/change_email_dialog.stkgui");
     m_options_widget = getWidget<RibbonWidget>("options");
     m_info_widget = getWidget<LabelWidget>("info");
-    m_current_email_widget = getWidget<TextBoxWidget>("current_email");
     m_new_email_widget = getWidget<TextBoxWidget>("new_email");
     
 }   // ChangeEmailDialog
@@ -70,7 +69,7 @@ void ChangeEmailDialog::onUpdate(float dt)
         ModalDialog::dismiss();
     }
 }   // onUpdate
-void ChangeEmailDialog::changeEmail(const irr::core::stringw &current_email,const irr::core::stringw &new_email)
+void ChangeEmailDialog::changeEmail(const irr::core::stringw &new_email)
 {
     class ChangeEmailRequest : public XMLRequest
     {
@@ -92,7 +91,6 @@ void ChangeEmailDialog::changeEmail(const irr::core::stringw &current_email,cons
     };  // ChangeEmailRequest
     auto request = std::make_shared<ChangeEmailRequest>();
     PlayerManager::setUserDetails(request, "change-email");
-    request->addParameter("current", current_email);
     request->addParameter("new", new_email);
     request->queue();
 }   // changeEmail
@@ -101,7 +99,6 @@ void ChangeEmailDialog::success()
     m_info_widget->setDefaultColor();
     m_info_widget->setText(_("E-Mail successfully changed."), false);
     m_options_widget->setActive(true);
-    m_current_email_widget->setText("");
     m_new_email_widget->setText("");
 }   // success
 void ChangeEmailDialog::error(const irr::core::stringw &info)
@@ -110,20 +107,12 @@ void ChangeEmailDialog::error(const irr::core::stringw &info)
     m_info_widget->setErrorColor();
     m_info_widget->setText(info, false);
     m_options_widget->setActive(true);
-    m_current_email_widget->setText("");
     m_new_email_widget->setText("");
 }   // error
 void ChangeEmailDialog::submit()
 {
-    const irr::core::stringw current_email = m_current_email_widget->getText().trim();
     const irr::core::stringw new_email = m_new_email_widget->getText().trim();
-    if(current_email.size() < 5 || current_email.size() > 254)
-    {
-        m_info_widget->setText(_("Current Email is invalid!"), false);
-        m_info_widget->setErrorColor();
-        SFXManager::get()->quickSound("anvil");
-    }
-    else if (new_email.size() < 5 || new_email.size() > 254)
+    if (new_email.size() < 5 || new_email.size() > 254)
     {
         m_info_widget->setText(_("New Email has to be between 5 and 254 characters long!"), false);
         m_info_widget->setErrorColor();
@@ -141,6 +130,6 @@ void ChangeEmailDialog::submit()
     {
         m_options_widget->setActive(false);
         m_info_widget->setDefaultColor();
-        changeEmail(current_email, new_email);
+        changeEmail(new_email);
     }
 }   // submit

@@ -30,10 +30,9 @@ class ChangeEmailDialog : public GUIEngine::ModalDialog
 private:
     GUIEngine::RibbonWidget* m_options_widget;
     GUIEngine::LabelWidget* m_info_widget;
-    GUIEngine::TextBoxWidget* m_current_email_widget;
     GUIEngine::TextBoxWidget* m_new_email_widget;
     bool m_self_destroy;
-    void changeEmail(const irr::core::stringw &current_email,const irr::core::stringw &new_email);
+    void changeEmail(const irr::core::stringw &new_email);
     void success();
     void error(const irr::core::stringw &info);
     void submit();

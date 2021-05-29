@@ -8,13 +8,6 @@
                 <label proportion="1" height="100%" text_align="left" text="Current E-mail"/>
                 <textbox proportion="2" height="fit" id="current_email"/>
             </div>
-
-            <spacer height="12%" width="20"/>
-
-            <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" height="100%" text_align="left" text="New E-mail"/>
-                <textbox proportion="2" height="fit" id="new_email"/>
-            </div>
         </div>
 
         <spacer height="2%" width="50"/>
