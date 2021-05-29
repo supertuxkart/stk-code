@@ -38,6 +38,7 @@ class OnlineProfileSettings : public OnlineProfileBase, public GUIEngine::Screen
 protected:
     OnlineProfileSettings();
     GUIEngine::ButtonWidget * m_change_password_button;
+    GUIEngine::ButtonWidget* m_change_email_button;
 
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileSettings>;
