@@ -23,8 +23,12 @@
 #include "guiengine/widget.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
-#include "states_screens/dialogs/change_email_dialog.hpp"
+#include "states_screens/dialogs/general_text_field_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "utils/translation.hpp"
+#include "online/xml_request.hpp"
+#include "config/player_manager.hpp"
+#include "audio/sfx_manager.hpp"
 
 #include <IGUIButton.h>
 
@@ -72,7 +76,51 @@ void OnlineProfileSettings::eventCallback(Widget* widget, const std::string& nam
    }
     if (name == m_change_email_button->m_properties[GUIEngine::PROP_ID])
     {
-        new ChangeEmailDialog();
+        new GeneralTextFieldDialog(_("Change E-mail"),[](const irr::core::stringw& str){},[&](GUIEngine::LabelWidget* lw,GUIEngine::TextBoxWidget* tb)->bool
+        {
+            const irr::core::stringw new_email = tb->getText().trim();
+            if (new_email.size() < 5 || new_email.size() > 254)
+            {
+                lw->setText(_("New Email has to be between 5 and 254 characters long!"), false);
+                lw->setErrorColor();
+                SFXManager::get()->quickSound("anvil");
+                return false;
+            }
+            else if (  new_email.find(L"@")== -1 || new_email.find(L".")== -1 ||
+                    (new_email.findLast(L'.') - new_email.findLast(L'@') <= 2 ) ||
+                        new_email.findLast(L'@')==0 )
+            {
+                lw->setText(_("New Email is invalid!"), false);
+                lw->setErrorColor();
+                SFXManager::get()->quickSound("anvil");
+                return false;
+            }
+            else
+            {
+                lw->setDefaultColor();
+                changeEmail(new_email);
+                return true;
+            }
+            
+        });
     }
 }   // eventCallback
-
+void OnlineProfileSettings::changeEmail(const irr::core::stringw &new_email)
+{
+    class ChangeEmailRequest : public XMLRequest
+    {
+        virtual void callback()
+        {
+            if(isSuccess())
+                new MessageDialog(_("E-mail changed!"));
+            else
+                new MessageDialog(_("Failed to change E-mail: %s",getInfo()));
+        }   // callback
+        public:
+            ChangeEmailRequest() : XMLRequest() {}
+    };  // ChangeEmailRequest
+    auto request = std::make_shared<ChangeEmailRequest>();
+    PlayerManager::setUserDetails(request, "change-email");
+    request->addParameter("new", new_email);
+    request->queue();
+}   // changeEmail
