@@ -821,6 +821,8 @@ void RaceResultGUI::displayCTFResults()
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_kart_icon = icon;
+            ri->m_kart_color = RaceManager::get()->getKartColor(kart->getWorldKartId());
+            ri->m_kart_scolor = kart->getKartProperties()->getColor();
 
             // FTL karts will get a time assigned, they are not shown as eliminated
             if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
@@ -1249,6 +1251,8 @@ void RaceResultGUI::displayCTFResults()
                     ri->m_kart_name += flag;
                 }
             }
+            ri->m_kart_color = RaceManager::get()->getKartColor(kart_id);
+            ri->m_kart_scolor = kart->getKartProperties()->getColor();
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
             if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
@@ -1312,6 +1316,24 @@ void RaceResultGUI::displayCTFResults()
             : video::SColor(255, 255, 255, 255);
 
         unsigned int current_x = x;
+
+        // Draw kart color if requested
+        if (UserConfigParams::m_karts_color_gui)
+        {
+            irr::video::SColor kart_color(ri->m_kart_scolor);
+            if (ri->m_kart_color > 0.0)
+            {
+                irr::video::SColorHSL kart_colorHSL(ri->m_kart_color * 360.0, 80.0, 50.0);
+                irr::video::SColorf kart_colorf;
+                kart_colorHSL.toRGB(kart_colorf);
+                kart_color = kart_colorf.toSColor();
+            }
+            kart_color.setAlpha(216);
+            int safe_left_x  = std::max(x - (m_width_icon/2), (unsigned int)0);
+            int safe_right_x = std::min(safe_left_x + (m_width_icon/2), (unsigned int)x);
+            core::rect<s32> kart_color_pos(safe_left_x,y,safe_right_x,y+m_width_icon);
+            GL32_draw2DRectangle(kart_color, kart_color_pos);
+        }
 
         // First draw the icon
         // -------------------
