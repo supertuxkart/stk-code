@@ -1008,6 +1008,33 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             kart->getController()->isLocalPlayerController();
 
         int w = is_local ? ICON_PLAYER_WIDTH : ICON_WIDTH;
+
+        if (UserConfigParams::m_karts_color_gui && (minor_mode == RaceManager::MINOR_MODE_NORMAL_RACE
+                    || minor_mode == RaceManager::MINOR_MODE_TIME_TRIAL))
+        {
+            // Position for kart color, to the left of icon
+            int y_offset = (ICON_PLAYER_WIDTH - w) / 2;
+            core::rect<s32> kart_color_pos(x - (x_base / 2), y + y_offset,
+                            x + (w / 6), y + ICON_PLAYER_WIDTH - y_offset);
+            // Get color of kart
+            // Since kart->getKartProperties()->getColor() only gets the
+            // standard color of a kart of same type, we have to check if the user
+            // (or network manager) changed it. In that case we have to use
+            // hue value instead.
+            irr::video::SColor kart_color = kart->getKartProperties()->getColor();
+            float kart_hue = RaceManager::get()->getKartColor(kart_id);
+            if (kart_hue > 0.0)
+            {
+                // convert Hue to SColor
+                irr::video::SColorHSL kart_colorHSL(kart_hue * 360.0, 80.0, 50.0);
+                irr::video::SColorf kart_colorf;
+                kart_colorHSL.toRGB(kart_colorf);
+                kart_color = kart_colorf.toSColor();
+            }
+            kart_color.setAlpha(216);
+            GL32_draw2DRectangle(kart_color, kart_color_pos);
+        }
+
         drawPlayerIcon(kart, x, y, w, is_local);
     } //next position
 #endif
