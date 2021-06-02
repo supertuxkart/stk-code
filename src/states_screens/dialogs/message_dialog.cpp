@@ -65,6 +65,7 @@ MessageDialog::MessageDialog(const irr::core::stringw &msg, bool from_queue)
     m_type         = MessageDialog::MESSAGE_DIALOG_OK;
     m_listener     = NULL;
     m_own_listener = false;
+    m_focus_on_cancel = false;
     if (!from_queue) doInit(false);
 }   // MessageDialog(stringw)
 
