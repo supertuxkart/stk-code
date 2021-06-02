@@ -76,7 +76,7 @@ void OnlineProfileSettings::eventCallback(Widget* widget, const std::string& nam
    }
     if (name == m_change_email_button->m_properties[GUIEngine::PROP_ID])
     {
-        new GeneralTextFieldDialog(_("Change E-mail"),[](const irr::core::stringw& str){},[&](GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
+        new GeneralTextFieldDialog(_("Enter new E-mail below"),[](const irr::core::stringw& str){},[&](GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
         {
             const irr::core::stringw new_email = tb->getText().trim();
             if (new_email.size() < 5 || new_email.size() > 254)
