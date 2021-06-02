@@ -76,7 +76,7 @@ void OnlineProfileSettings::eventCallback(Widget* widget, const std::string& nam
    }
     if (name == m_change_email_button->m_properties[GUIEngine::PROP_ID])
     {
-        new GeneralTextFieldDialog(_("Change E-mail"),[](const irr::core::stringw& str){},[&](GUIEngine::LabelWidget* lw,GUIEngine::TextBoxWidget* tb)->bool
+        new GeneralTextFieldDialog(_("Change E-mail"),[](const irr::core::stringw& str){},[&](GUIEngine::LabelWidget* lw, GUIEngine::TextBoxWidget* tb)->bool
         {
             const irr::core::stringw new_email = tb->getText().trim();
             if (new_email.size() < 5 || new_email.size() > 254)
@@ -105,6 +105,9 @@ void OnlineProfileSettings::eventCallback(Widget* widget, const std::string& nam
         });
     }
 }   // eventCallback
+
+// -----------------------------------------------------------------------------
+
 void OnlineProfileSettings::changeEmail(const irr::core::stringw &new_email)
 {
     class ChangeEmailRequest : public XMLRequest
@@ -114,13 +117,13 @@ void OnlineProfileSettings::changeEmail(const irr::core::stringw &new_email)
             if(isSuccess())
                 new MessageDialog(_("E-mail changed!"));
             else
-                new MessageDialog(_("Failed to change E-mail: %s",getInfo()));
+                new MessageDialog(_("Failed to change E-mail: %s", getInfo()));
         }   // callback
         public:
             ChangeEmailRequest() : XMLRequest() {}
     };  // ChangeEmailRequest
     auto request = std::make_shared<ChangeEmailRequest>();
     PlayerManager::setUserDetails(request, "change-email");
-    request->addParameter("new", new_email);
+    request->addParameter("new-email", new_email);
     request->queue();
 }   // changeEmail
