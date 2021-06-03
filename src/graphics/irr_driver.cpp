@@ -167,6 +167,7 @@ const bool ALLOW_1280_X_720    = true;
  */
 IrrDriver::IrrDriver()
 {
+    m_logger_level = irr::ELL_WARNING;
     m_screen_orientation = -1;
     m_render_nw_debug = false;
     m_resolution_changing = RES_CHANGE_NONE;
@@ -2236,11 +2237,25 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
     {
     case irr::EET_LOG_TEXT_EVENT:
     {
-        // Ignore 'normal' messages
-        if (event.LogEvent.Level > 1)
+        if (event.LogEvent.Level >= m_logger_level)
         {
-            Log::warn("[IrrDriver Temp Logger]", "Level %d: %s\n",
-                   event.LogEvent.Level,event.LogEvent.Text);
+            switch (event.LogEvent.Level)
+            {
+            case ELL_DEBUG:
+                Log::debug("[IrrDriver Logger]", "%s", event.LogEvent.Text);
+                break;
+            case ELL_INFORMATION:
+                Log::info("[IrrDriver Logger]", "%s", event.LogEvent.Text);
+                break;
+            case ELL_WARNING:
+                Log::warn("[IrrDriver Logger]", "%s", event.LogEvent.Text);
+                break;
+            case ELL_ERROR:
+                Log::error("[IrrDriver Logger]", "%s", event.LogEvent.Text);
+                break;
+            default:
+                break;
+            }
         }
         return true;
     }

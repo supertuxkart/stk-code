@@ -186,7 +186,7 @@ private:
     float m_ssao_radius;
     float m_ssao_k;
     float m_ssao_sigma;
-    
+    irr::ELOG_LEVEL m_logger_level;
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
