@@ -1027,6 +1027,11 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                                  bool is_local)
 {
 #ifndef SERVER_ONLY
+    // this flag is set to true if we show at least one custom color for other karts
+    // in that case we want to draw a bigger circle around the player's own kart
+    // to make it easier for the player to identify
+    static bool showing_kart_colors = false;
+
     video::ITexture *icon =
     kart->getKartProperties()->getIconMaterial()->getTexture();
 
@@ -1087,20 +1092,32 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
             colors[i].setAlpha(
                                120+(int)(120*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
         }
+        core::rect<s32> icon_pos;
+        if (showing_kart_colors)
+        {
+            // we are showing other kart's colors, so draw bigger circle
+            icon_pos = core::rect<s32>(x-8, y-8, x+w+8, y+w+3);
+        }
+        else
+        {
+            icon_pos = pos;
+        }
         const core::rect<s32> rect(core::position2d<s32>(0,0),
                                    m_icons_kart_list->getSize());
-        draw2DImage(m_icons_kart_list, pos, rect,NULL, colors, true);
+        draw2DImage(m_icons_kart_list, icon_pos, rect,NULL, colors, true);
     }
     else if (kart_hue > 0.0 && (minor_mode == RaceManager::MINOR_MODE_NORMAL_RACE
             || minor_mode == RaceManager::MINOR_MODE_TIME_TRIAL))
     {
         // when in normal mode or time trial draw kart color circles for karts with custom color
-        const core::rect<s32> color_pos(x, y, x+w, y+w);
-        video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
+        // draw a little bigger in case an addon kart uses the full icon size
+        const core::rect<s32> color_pos(x-5, y-2, x+w+3, y+w+6);
+        const video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
         const core::rect<s32> rect(core::position2d<s32>(0,0),
                                    m_icons_kart_color->getSize());
         kart_color.setAlpha(140);
         draw2DImage(m_icons_kart_color, color_pos, rect, NULL, colors, true);
+        showing_kart_colors = true;
     }
 
     // Fixes crash bug, why are certain icons not showing up?
