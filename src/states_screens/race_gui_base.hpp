@@ -193,6 +193,9 @@ protected:
     /** The frame around player karts in the kart list. */
     video::ITexture* m_icons_kart_list;
 
+    /** The frame to show kart color in the kart list. */
+    video::ITexture* m_icons_kart_color;
+
     /** Texture for the lap icon*/
     video::ITexture* m_lap_flag;
     

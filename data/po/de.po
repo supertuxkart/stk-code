@@ -2242,11 +2242,6 @@ msgstr "Story-Modus-Stoppuhr aktivieren"
 msgid "Enable the speedrun timer"
 msgstr "Speedrun-Stoppuhr aktivieren"
 
-#. I18N: ./data/gui/screens/options_ui.stkgui
-#. I18N: In the ui settings
-msgid "Show karts' colors"
-msgstr "Farbe der Karts zeigen"
-
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Graphical Effects Level"

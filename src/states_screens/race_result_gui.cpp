@@ -822,7 +822,6 @@ void RaceResultGUI::displayCTFResults()
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_kart_icon = icon;
             ri->m_kart_color = RaceManager::get()->getKartColor(kart->getWorldKartId());
-            ri->m_kart_scolor = kart->getKartProperties()->getColor();
 
             // FTL karts will get a time assigned, they are not shown as eliminated
             if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
@@ -1252,7 +1251,6 @@ void RaceResultGUI::displayCTFResults()
                 }
             }
             ri->m_kart_color = RaceManager::get()->getKartColor(kart_id);
-            ri->m_kart_scolor = kart->getKartProperties()->getColor();
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
             if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
@@ -1317,24 +1315,21 @@ void RaceResultGUI::displayCTFResults()
 
         unsigned int current_x = x;
 
-        // Draw kart color if requested
-        if (UserConfigParams::m_karts_color_gui)
+        // Draw kart color circle if kart has custom color
+        if (ri->m_kart_color > 0.0)
         {
-            irr::video::SColor kart_color(ri->m_kart_scolor);
-            if (ri->m_kart_color > 0.0)
-            {
-                irr::video::SColorHSL kart_colorHSL(ri->m_kart_color * 360.0, 80.0, 50.0);
-                irr::video::SColorf kart_colorf;
-                kart_colorHSL.toRGB(kart_colorf);
-                kart_color = kart_colorf.toSColor();
-            }
-            kart_color.setAlpha(216);
-            int safe_left_x  = std::max(x - (m_width_icon/2), (unsigned int)0);
-            int safe_right_x = std::min(safe_left_x + (m_width_icon/2), (unsigned int)x);
-            core::rect<s32> kart_color_pos(safe_left_x,y,safe_right_x,y+m_width_icon);
-            GL32_draw2DRectangle(kart_color, kart_color_pos);
+            video::SColorHSL kart_colorHSL(ri->m_kart_color * 360.0, 80.0, 50.0);
+            video::SColorf kart_colorf;
+            kart_colorHSL.toRGB(kart_colorf);
+            video::SColor kart_color = kart_colorf.toSColor();
+            video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
+            core::recti source_rect(core::vector2di(0, 0), m_icons_frame->getSize());
+            // make frame bigger than icon to make color visible for all cases
+            int extra_width = std::max((unsigned int)5, m_width_icon / 8);
+            core::recti dest_rect(current_x - extra_width, y - extra_width,
+                current_x + m_width_icon + extra_width, y + m_width_icon + extra_width);
+            draw2DImage(m_icons_frame, dest_rect, source_rect, NULL, colors, true);
         }
-
         // First draw the icon
         // -------------------
         if (ri->m_kart_icon)

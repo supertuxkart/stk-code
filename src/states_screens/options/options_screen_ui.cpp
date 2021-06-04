@@ -286,10 +286,6 @@ void OptionsScreenUI::init()
     assert(karts_powerup_gui != NULL);
     karts_powerup_gui->setState(UserConfigParams::m_karts_powerup_gui);
 
-    CheckBoxWidget* karts_color_gui = getWidget<CheckBoxWidget>("karts_color_gui");
-    assert(karts_color_gui != NULL);
-    karts_color_gui->setState(UserConfigParams::m_karts_color_gui);
-
     CheckBoxWidget* fps = getWidget<CheckBoxWidget>("showfps");
     assert( fps != NULL );
     fps->setState( UserConfigParams::m_display_fps );
@@ -465,12 +461,6 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         CheckBoxWidget* karts_powerup_gui = getWidget<CheckBoxWidget>("karts_powerup_gui");
         assert(karts_powerup_gui != NULL);
         UserConfigParams::m_karts_powerup_gui = karts_powerup_gui->getState();
-    }
-    else if (name == "karts_color_gui")
-    {
-        CheckBoxWidget* karts_color_gui = getWidget<CheckBoxWidget>("karts_color_gui");
-        assert(karts_color_gui != NULL);
-        UserConfigParams::m_karts_color_gui = karts_color_gui->getState();
     }
     else if (name == "showfps")
     {

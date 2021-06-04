@@ -101,6 +101,12 @@ RaceGUIBase::RaceGUIBase()
     else
     {
         m_icons_frame = irr_driver->getTexture("icons-frame.png");
+        m_icons_kart_color = irr_driver->getTexture("icons-frame_color.png");
+        if (!m_icons_kart_color)
+        {
+            Log::error("RaceGuiBase",
+                    "Can't find 'icons-frame_color.png' texture, aborting.");
+        }
     }
     m_icons_kart_list = irr_driver->getTexture("icons-frame.png");
     if (!m_icons_frame)
@@ -1008,33 +1014,6 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             kart->getController()->isLocalPlayerController();
 
         int w = is_local ? ICON_PLAYER_WIDTH : ICON_WIDTH;
-
-        if (UserConfigParams::m_karts_color_gui && (minor_mode == RaceManager::MINOR_MODE_NORMAL_RACE
-                    || minor_mode == RaceManager::MINOR_MODE_TIME_TRIAL))
-        {
-            // Position for kart color, to the left of icon
-            int y_offset = (ICON_PLAYER_WIDTH - w) / 2;
-            core::rect<s32> kart_color_pos(x - (x_base / 2), y + y_offset,
-                            x + (w / 6), y + ICON_PLAYER_WIDTH - y_offset);
-            // Get color of kart
-            // Since kart->getKartProperties()->getColor() only gets the
-            // standard color of a kart of same type, we have to check if the user
-            // (or network manager) changed it. In that case we have to use
-            // hue value instead.
-            irr::video::SColor kart_color = kart->getKartProperties()->getColor();
-            float kart_hue = RaceManager::get()->getKartColor(kart_id);
-            if (kart_hue > 0.0)
-            {
-                // convert Hue to SColor
-                irr::video::SColorHSL kart_colorHSL(kart_hue * 360.0, 80.0, 50.0);
-                irr::video::SColorf kart_colorf;
-                kart_colorHSL.toRGB(kart_colorf);
-                kart_color = kart_colorf.toSColor();
-            }
-            kart_color.setAlpha(216);
-            GL32_draw2DRectangle(kart_color, kart_color_pos);
-        }
-
         drawPlayerIcon(kart, x, y, w, is_local);
     } //next position
 #endif
@@ -1081,19 +1060,47 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
 
     const core::rect<s32> pos(x, y, x+w, y+w);
 
+    // Get color of kart
+    // Since kart->getKartProperties()->getColor() only gets the
+    // standard color of a kart of same type, we have to check if the user
+    // (or network manager) changed it. In that case we have to use
+    // hue value instead.
+    video::SColor kart_color = kart->getKartProperties()->getColor();
+    const float kart_hue = RaceManager::get()->getKartColor(kart->getWorldKartId());
+    if (kart_hue > 0.0)
+    {
+        // convert Hue to SColor
+        const video::SColorHSL kart_colorHSL(kart_hue * 360.0, 80.0, 50.0);
+        video::SColorf kart_colorf;
+        kart_colorHSL.toRGB(kart_colorf);
+        kart_color = kart_colorf.toSColor();
+    }
+
     //to bring to light the player's icon: add a background
+    const RaceManager::MinorRaceModeType  minor_mode = RaceManager::get()->getMinorMode();
     if (is_local && m_icons_kart_list != NULL)
     {
         video::SColor colors[4];
         for (unsigned int i=0;i<4;i++)
         {
-            colors[i]=kart->getKartProperties()->getColor();
+            colors[i]=kart_color;
             colors[i].setAlpha(
-                               100+(int)(100*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
+                               120+(int)(120*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
         }
         const core::rect<s32> rect(core::position2d<s32>(0,0),
                                    m_icons_kart_list->getSize());
         draw2DImage(m_icons_kart_list, pos, rect,NULL, colors, true);
+    }
+    else if (kart_hue > 0.0 && (minor_mode == RaceManager::MINOR_MODE_NORMAL_RACE
+            || minor_mode == RaceManager::MINOR_MODE_TIME_TRIAL))
+    {
+        // when in normal mode or time trial draw kart color circles for karts with custom color
+        const core::rect<s32> color_pos(x, y, x+w, y+w);
+        video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
+        const core::rect<s32> rect(core::position2d<s32>(0,0),
+                                   m_icons_kart_color->getSize());
+        kart_color.setAlpha(140);
+        draw2DImage(m_icons_kart_color, color_pos, rect, NULL, colors, true);
     }
 
     // Fixes crash bug, why are certain icons not showing up?

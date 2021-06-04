@@ -103,7 +103,6 @@ private:
         core::stringw    m_finish_time_string;
         /** The kart color */
         float            m_kart_color;
-        video::SColor    m_kart_scolor;
     };   // Rowinfo
 
     /** The team icons. */
