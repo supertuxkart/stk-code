@@ -101,12 +101,6 @@ RaceGUIBase::RaceGUIBase()
     else
     {
         m_icons_frame = irr_driver->getTexture("icons-frame.png");
-        m_icons_kart_color = irr_driver->getTexture("icons-frame_color.png");
-        if (!m_icons_kart_color)
-        {
-            Log::error("RaceGuiBase",
-                    "Can't find 'icons-frame_color.png' texture, aborting.");
-        }
     }
     m_icons_kart_list = irr_driver->getTexture("icons-frame.png");
     if (!m_icons_frame)
@@ -1096,7 +1090,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
         if (showing_kart_colors)
         {
             // we are showing other kart's colors, so draw bigger circle
-            icon_pos = core::rect<s32>(x-8, y-8, x+w+8, y+w+3);
+            icon_pos = core::rect<s32>(x-9, y-7, x+w+7, y+w+2);
         }
         else
         {
@@ -1109,14 +1103,16 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
     else if (kart_hue > 0.0 && (minor_mode == RaceManager::MINOR_MODE_NORMAL_RACE
             || minor_mode == RaceManager::MINOR_MODE_TIME_TRIAL))
     {
-        // when in normal mode or time trial draw kart color circles for karts with custom color
+        // in normal mode or time trial draw kart color circles for karts with custom color
         // draw a little bigger in case an addon kart uses the full icon size
-        const core::rect<s32> color_pos(x-5, y-2, x+w+3, y+w+6);
-        const video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
-        const core::rect<s32> rect(core::position2d<s32>(0,0),
-                                   m_icons_kart_color->getSize());
-        kart_color.setAlpha(140);
-        draw2DImage(m_icons_kart_color, color_pos, rect, NULL, colors, true);
+        const core::rect<s32> color_pos(x-7, y+2, x+w, y+w+2);
+        video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
+        colors[0].setAlpha(240);    // higher alpha for left part
+        colors[1].setAlpha(240);
+        colors[2].setAlpha(125);    // lower alpha for right part
+        colors[3].setAlpha(125);
+        const core::rect<s32> rect(core::position2d<s32>(0,0), m_icons_frame->getSize());
+        draw2DImage(m_icons_frame, color_pos, rect, NULL, colors, true);
         showing_kart_colors = true;
     }
 

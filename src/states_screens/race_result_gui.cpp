@@ -1318,7 +1318,7 @@ void RaceResultGUI::displayCTFResults()
         // Draw kart color circle if kart has custom color
         if (ri->m_kart_color > 0.0)
         {
-            video::SColorHSL kart_colorHSL(ri->m_kart_color * 360.0, 80.0, 50.0);
+            const video::SColorHSL kart_colorHSL(ri->m_kart_color * 360.0, 80.0, 50.0);
             video::SColorf kart_colorf;
             kart_colorHSL.toRGB(kart_colorf);
             const video::SColor kart_color = kart_colorf.toSColor();
