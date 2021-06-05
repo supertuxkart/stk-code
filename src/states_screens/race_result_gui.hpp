@@ -101,6 +101,8 @@ private:
         video::ITexture *m_kart_icon;
         /** The times of all karts in the right order. */
         core::stringw    m_finish_time_string;
+        /** The kart color */
+        float            m_kart_color;
     };   // Rowinfo
 
     /** The team icons. */

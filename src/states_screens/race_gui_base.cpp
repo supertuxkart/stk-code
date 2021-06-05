@@ -1021,6 +1021,11 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                                  bool is_local)
 {
 #ifndef SERVER_ONLY
+    // this flag is set to true if we show at least one custom color for other karts
+    // in that case we want to draw a bigger circle around the player's own kart
+    // to make it easier for the player to identify
+    static bool showing_kart_colors = false;
+
     video::ITexture *icon =
     kart->getKartProperties()->getIconMaterial()->getTexture();
 
@@ -1054,19 +1059,61 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
 
     const core::rect<s32> pos(x, y, x+w, y+w);
 
+    // Get color of kart
+    // Since kart->getKartProperties()->getColor() only gets the
+    // standard color of a kart of same type, we have to check if the user
+    // (or network manager) changed it. In that case we have to use
+    // hue value instead.
+    video::SColor kart_color = kart->getKartProperties()->getColor();
+    const float kart_hue = RaceManager::get()->getKartColor(kart->getWorldKartId());
+    if (kart_hue > 0.0)
+    {
+        // convert Hue to SColor
+        const video::SColorHSL kart_colorHSL(kart_hue * 360.0, 80.0, 50.0);
+        video::SColorf kart_colorf;
+        kart_colorHSL.toRGB(kart_colorf);
+        kart_color = kart_colorf.toSColor();
+    }
+
     //to bring to light the player's icon: add a background
+    const RaceManager::MinorRaceModeType  minor_mode = RaceManager::get()->getMinorMode();
     if (is_local && m_icons_kart_list != NULL)
     {
         video::SColor colors[4];
         for (unsigned int i=0;i<4;i++)
         {
-            colors[i]=kart->getKartProperties()->getColor();
+            colors[i]=kart_color;
             colors[i].setAlpha(
-                               100+(int)(100*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
+                               120+(int)(120*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
+        }
+        core::rect<s32> icon_pos;
+        if (showing_kart_colors)
+        {
+            // we are showing other kart's colors, so draw bigger circle
+            icon_pos = core::rect<s32>(x-9, y-7, x+w+7, y+w+2);
+        }
+        else
+        {
+            icon_pos = pos;
         }
         const core::rect<s32> rect(core::position2d<s32>(0,0),
                                    m_icons_kart_list->getSize());
-        draw2DImage(m_icons_kart_list, pos, rect,NULL, colors, true);
+        draw2DImage(m_icons_kart_list, icon_pos, rect,NULL, colors, true);
+    }
+    else if (kart_hue > 0.0 && (minor_mode == RaceManager::MINOR_MODE_NORMAL_RACE
+            || minor_mode == RaceManager::MINOR_MODE_TIME_TRIAL))
+    {
+        // in normal mode or time trial draw kart color circles for karts with custom color
+        // draw a little bigger in case an addon kart uses the full icon size
+        const core::rect<s32> color_pos(x-7, y+2, x+w, y+w+2);
+        video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
+        colors[0].setAlpha(240);    // higher alpha for left part
+        colors[1].setAlpha(240);
+        colors[2].setAlpha(125);    // lower alpha for right part
+        colors[3].setAlpha(125);
+        const core::rect<s32> rect(core::position2d<s32>(0,0), m_icons_frame->getSize());
+        draw2DImage(m_icons_frame, color_pos, rect, NULL, colors, true);
+        showing_kart_colors = true;
     }
 
     // Fixes crash bug, why are certain icons not showing up?

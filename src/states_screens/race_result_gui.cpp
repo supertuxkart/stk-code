@@ -821,6 +821,7 @@ void RaceResultGUI::displayCTFResults()
             video::ITexture *icon =
                 kart->getKartProperties()->getIconMaterial()->getTexture();
             ri->m_kart_icon = icon;
+            ri->m_kart_color = RaceManager::get()->getKartColor(kart->getWorldKartId());
 
             // FTL karts will get a time assigned, they are not shown as eliminated
             if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
@@ -1249,6 +1250,7 @@ void RaceResultGUI::displayCTFResults()
                     ri->m_kart_name += flag;
                 }
             }
+            ri->m_kart_color = RaceManager::get()->getKartColor(kart_id);
             // In FTL karts do have a time, which is shown even when the kart
             // is eliminated
             if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
@@ -1313,6 +1315,21 @@ void RaceResultGUI::displayCTFResults()
 
         unsigned int current_x = x;
 
+        // Draw kart color circle if kart has custom color
+        if (ri->m_kart_color > 0.0)
+        {
+            const video::SColorHSL kart_colorHSL(ri->m_kart_color * 360.0, 80.0, 50.0);
+            video::SColorf kart_colorf;
+            kart_colorHSL.toRGB(kart_colorf);
+            const video::SColor kart_color = kart_colorf.toSColor();
+            const video::SColor colors[4] = {kart_color, kart_color, kart_color, kart_color};
+            const core::recti source_rect(core::vector2di(0, 0), m_icons_frame->getSize());
+            // make frame bigger than icon to make color visible for all cases
+            const int extra_width = std::max((unsigned int)5, m_width_icon / 8);
+            core::recti dest_rect(current_x - extra_width, y - extra_width,
+                current_x + m_width_icon + extra_width, y + m_width_icon + extra_width);
+            draw2DImage(m_icons_frame, dest_rect, source_rect, NULL, colors, true);
+        }
         // First draw the icon
         // -------------------
         if (ri->m_kart_icon)
