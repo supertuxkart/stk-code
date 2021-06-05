@@ -64,6 +64,7 @@ namespace irr
 
 RaceGUIBase::RaceGUIBase()
 {
+    m_enabled_network_spectator = false;
     initSize();
     m_ignore_unimportant_messages = false;
     //I18N: as in "ready, set, go", shown at the beginning of the race
