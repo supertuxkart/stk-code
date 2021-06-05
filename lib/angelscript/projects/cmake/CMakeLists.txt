@@ -103,7 +103,11 @@ set(ANGELSCRIPT_SOURCE
     ../../source/as_variablescope.cpp
 )
 
-if(MSVC AND CMAKE_CL_64 AND NOT ${CMAKE_GENERATOR_PLATFORM} MATCHES "(ARM64)")
+set(BUILD_ARCH "unknown")
+if (CMAKE_GENERATOR_PLATFORM)
+    set(BUILD_ARCH "${CMAKE_GENERATOR_PLATFORM}")
+endif()
+if(MSVC AND CMAKE_CL_64 AND NOT ${BUILD_ARCH} MATCHES "(ARM64)")
     enable_language(ASM_MASM)
     if(CMAKE_ASM_MASM_COMPILER_WORKS)
         set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_x64_msvc_asm.asm)
