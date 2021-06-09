@@ -7,7 +7,8 @@ if(NOT SERVER_ONLY)
                         "${JPEG_INCLUDE_DIR}"
                         "${PNG_INCLUDE_DIRS}"
                         "${ZLIB_INCLUDE_DIR}"
-                        "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
+                        "${CMAKE_CURRENT_SOURCE_DIR}/../../src"
+                        "${CMAKE_CURRENT_SOURCE_DIR}/../graphics_engine/include")
 else()
     include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
                         "${CMAKE_CURRENT_SOURCE_DIR}/../../src")
@@ -25,6 +26,8 @@ else()
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_)
     add_definitions(-DNO_IRR_COMPILE_WITH_WAYLAND_DEVICE_)
     add_definitions(-DNO_IRR_COMPILE_WITH_SDL_DEVICE_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_DIRECT3D_9_)
+    add_definitions(-DNO_IRR_COMPILE_WITH_VULKAN_)
 endif()
 
 if(APPLE AND NOT IOS)

@@ -37,6 +37,10 @@ namespace irr
 		IVideoDriver* createDirectX9Driver(const SIrrlichtCreationParameters& params,
 			io::IFileSystem* io, HWND window);
 #endif
+#ifdef _IRR_COMPILE_WITH_VULKAN_
+		IVideoDriver* createVulkanDriver(const SIrrlichtCreationParameters& params,
+			io::IFileSystem* io, SDL_Window* win);
+#endif
 	} // end namespace video
 
 } // end namespace irr
@@ -354,6 +358,8 @@ bool CIrrDeviceSDL::createWindow()
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
 		CreationParams.DriverType == video::EDT_OGLES2)
 		flags |= SDL_WINDOW_OPENGL;
+	else if (CreationParams.DriverType == video::EDT_VULKAN)
+		flags |= SDL_WINDOW_VULKAN;
 
 #ifdef MOBILE_STK
 	flags |= SDL_WINDOW_BORDERLESS | SDL_WINDOW_MAXIMIZED;
@@ -576,6 +582,23 @@ void CIrrDeviceSDL::createDriver()
 		VideoDriver = video::createOGLES2Driver(CreationParams, FileSystem, this, default_fb);
 		#else
 		os::Printer::log("No OpenGL ES 2.0 support compiled in.", ELL_ERROR);
+		#endif
+		break;
+	}
+
+	case video::EDT_VULKAN:
+	{
+		#ifdef _IRR_COMPILE_WITH_VULKAN_
+		try
+		{
+			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window);
+		}
+		catch (std::exception& e)
+		{
+			os::Printer::log("createVulkanDriver failed", e.what(), ELL_ERROR);
+		}
+		#else
+		os::Printer::log("No Vulkan support compiled in.", ELL_ERROR);
 		#endif
 		break;
 	}

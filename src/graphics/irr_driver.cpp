@@ -402,6 +402,10 @@ void IrrDriver::initDevice()
     {
         driver_created = video::EDT_DIRECT3D9;
     }
+    else if (std::string(UserConfigParams::m_render_driver) == "vulkan")
+    {
+        driver_created = video::EDT_VULKAN;
+    }
     else
     {
         Log::warn("IrrDriver", "Unknown driver %s, revert to gl",
@@ -414,6 +418,7 @@ void IrrDriver::initDevice()
 #endif
     }
 
+    m_logger_level = irr::ELL_INFORMATION;
 #ifndef __SWITCH__
     // If --no-graphics option was used, the null device can still be used.
     if (!GUIEngine::isNoGraphics())
@@ -633,6 +638,7 @@ void IrrDriver::initDevice()
         CVS->init();
     }
 #endif
+    m_logger_level = irr::ELL_WARNING;
 
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();

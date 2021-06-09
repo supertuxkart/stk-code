@@ -147,10 +147,11 @@ include $(CLEAR_VARS)
 # Graphics engine
 LOCAL_MODULE       := graphics_engine
 LOCAL_PATH         := .
-LOCAL_CPP_FEATURES += rtti
+LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c) \
                       $(wildcard ../lib/graphics_engine/src/*.cpp)
 LOCAL_CFLAGS       := -I../lib/graphics_engine/include \
+                      -I../lib/sdl2/include/           \
                       -I../lib/irrlicht/include/
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
@@ -189,7 +190,7 @@ include $(CLEAR_VARS)
 # Irrlicht
 LOCAL_MODULE       := irrlicht
 LOCAL_PATH         := .
-LOCAL_CPP_FEATURES += rtti
+LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \

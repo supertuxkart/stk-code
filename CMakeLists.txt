@@ -693,10 +693,10 @@ if(NOT SERVER_ONLY)
         ${OGGVORBIS_LIBRARIES}
         ${FREETYPE_LIBRARIES}
         ${HARFBUZZ_LIBRARY}
-        ${SDL2_LIBRARY}
         ${SHEENBIDI_LIBRARY}
         graphics_utils
         graphics_engine
+        ${SDL2_LIBRARY}
         tinygettext)
 endif()
 
