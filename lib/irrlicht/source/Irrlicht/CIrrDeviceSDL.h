@@ -23,6 +23,7 @@
 
 namespace irr
 {
+class MoltenVK;
 
 	class CIrrDeviceSDL : public CIrrDeviceStub, video::IImagePresenter
 	{
@@ -323,6 +324,9 @@ namespace irr
 		std::map<SDL_Scancode, irr::EKEY_CODE> ScanCodeMap;
 		SDL_SysWMinfo Info;
 		void tryCreateOpenGLContext(u32 flags);
+#ifdef DLOPEN_MOLTENVK
+		MoltenVK* m_moltenvk;
+#endif
 	};
 
 } // end namespace irr

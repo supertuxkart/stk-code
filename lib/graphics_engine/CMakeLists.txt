@@ -7,15 +7,30 @@ else()
     include_directories("${SDL2_INCLUDEDIR}")
 endif()
 
+if(APPLE AND NOT DLOPEN_MOLTENVK)
+    find_path(VULKAN_INCLUDEDIR NAMES vulkan/vulkan.h PATHS)
+    if (NOT VULKAN_INCLUDEDIR)
+        message(FATAL_ERROR "Vulkan not found.")
+    else()
+        include_directories("${VULKAN_INCLUDEDIR}")
+    endif()
+endif()
+
 if(UNIX OR MINGW)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
 endif()
-add_library(graphics_engine STATIC
+
+set(GE_SOURCES
     src/gl.c
-    src/vulkan.c
     src/ge_main.cpp
     src/ge_texture.cpp
     src/ge_dx9_texture.cpp
     src/ge_vulkan_driver.cpp
     src/ge_gl_texture.cpp
 )
+
+if(NOT APPLE OR DLOPEN_MOLTENVK)
+    set(GE_SOURCES ${GE_SOURCES} src/vulkan.c)
+endif()
+
+add_library(graphics_engine STATIC ${GE_SOURCES})

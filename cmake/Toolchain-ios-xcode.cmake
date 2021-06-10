@@ -7,7 +7,7 @@
 # You can also use -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=xxxxxxxxxx to specify team
 
 # Increase every upload to App store
-SET(IOS_BUILD_VERSION 23)
+SET(IOS_BUILD_VERSION 24)
 
 # Get SDK path
 execute_process(COMMAND xcodebuild -version -sdk iphoneos Path
@@ -57,6 +57,8 @@ set(SDL2_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/l
 set(SDL2_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include/SDL2 CACHE STRING "")
 set(LIBSAMPLERATE_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libsamplerate.a CACHE STRING "")
 set(LIBSAMPLERATE_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
+set(MOLTENVK_LIBRARY ${PROJECT_SOURCE_DIR}/dependencies\${EFFECTIVE_PLATFORM_NAME}/lib/libMoltenVK.a CACHE STRING "")
+set(VULKAN_INCLUDEDIR ${PROJECT_SOURCE_DIR}/dependencies-iphoneos/include CACHE STRING "")
 
 # For universal iOS and simulator
 set(LIBRESOLV_LIBRARY -lresolv CACHE STRING "")

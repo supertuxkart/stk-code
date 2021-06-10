@@ -5,7 +5,7 @@
 
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 
-#include "glad/vulkan.h"
+#include "vulkan_wrapper.h"
 #include "SDL_video.h"
 
 #include "../source/Irrlicht/CNullDriver.h"

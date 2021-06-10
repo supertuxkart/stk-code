@@ -21,6 +21,7 @@
 
 #include "guiengine/engine.hpp"
 #include "glad/gl.h"
+#include "MoltenVK.h"
 
 extern bool GLContextDebugBit;
 
@@ -70,6 +71,10 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceSDL");
 	#endif
+
+#ifdef DLOPEN_MOLTENVK
+	m_moltenvk = NULL;
+#endif
 
 	Operator = 0;
 	// Initialize SDL... Timer for sleep, video for the obvious, and
@@ -194,6 +199,9 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		VideoDriver->drop();
 		VideoDriver = NULL;
 	}
+#ifdef DLOPEN_MOLTENVK
+	delete m_moltenvk;
+#endif
 	if (Context)
 		SDL_GL_DeleteContext(Context);
 	if (Window)
@@ -359,7 +367,17 @@ bool CIrrDeviceSDL::createWindow()
 		CreationParams.DriverType == video::EDT_OGLES2)
 		flags |= SDL_WINDOW_OPENGL;
 	else if (CreationParams.DriverType == video::EDT_VULKAN)
+	{
+#ifdef DLOPEN_MOLTENVK
+		m_moltenvk = new MoltenVK();
+		if (!m_moltenvk->loaded())
+		{
+			os::Printer::log("Current MacOSX version doesn't support Vulkan or MoltenVK failed to load", ELL_WARNING);
+			return false;
+		}
+#endif
 		flags |= SDL_WINDOW_VULKAN;
+	}
 
 #ifdef MOBILE_STK
 	flags |= SDL_WINDOW_BORDERLESS | SDL_WINDOW_MAXIMIZED;

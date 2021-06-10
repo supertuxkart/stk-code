@@ -531,6 +531,15 @@ include/vector2d.h
 include/vector3d.h
 )
 
+if(DLOPEN_MOLTENVK)
+    set(IRRLICHT_SOURCES
+        ${IRRLICHT_SOURCES}
+        source/Irrlicht/MoltenVK.mm
+        source/Irrlicht/MoltenVK.h)
+    set_source_files_properties(source/Irrlicht/MoltenVK.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
+    set_source_files_properties(source/Irrlicht/MoltenVK.mm PROPERTIES LANGUAGE C)
+endif()
+
 if(IOS)
     set(IRRLICHT_SOURCES
         ${IRRLICHT_SOURCES}

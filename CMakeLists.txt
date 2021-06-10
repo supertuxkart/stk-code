@@ -26,7 +26,7 @@ if(NINTENDO_SWITCH)
 endif()
 
 if(WIN32)
-option(USE_DIRECTX "Build DirectX 9 driver (requires DirectX SDK)" OFF)
+    option(USE_DIRECTX "Build DirectX 9 driver (requires DirectX SDK)" OFF)
 endif()
 
 option(SERVER_ONLY "Create a server only (i.e. no graphics or sound)" OFF)
@@ -38,6 +38,11 @@ CMAKE_DEPENDENT_OPTION(USE_IPV6 "Allow create or connect to game server with IPv
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
 
+if(APPLE)
+    CMAKE_DEPENDENT_OPTION(DLOPEN_MOLTENVK "Use dlopen to load MoltenVK for Apple." ON
+        "NOT IOS;NOT SERVER_ONLY" OFF)
+endif()
+
 CMAKE_DEPENDENT_OPTION(USE_CRYPTO_OPENSSL "Use OpenSSL instead of MbedTLS for cryptography in STK." ON
     "NOT USE_SWITCH;NOT WIN32" OFF)
 CMAKE_DEPENDENT_OPTION(BUILD_RECORDER "Build opengl recorder" ON
@@ -48,6 +53,10 @@ CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
 CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE" ON)
+
+if (DLOPEN_MOLTENVK)
+    ADD_DEFINITIONS(-DDLOPEN_MOLTENVK)
+endif()
 
 if((UNIX AND NOT APPLE) OR NINTENDO_SWITCH)
     include(FindPkgConfig)
@@ -674,6 +683,10 @@ else()
 endif()
 
 if(NOT SERVER_ONLY)
+    if (APPLE AND NOT DLOPEN_MOLTENVK)
+        find_library(MOLTENVK_LIBRARY NAMES MoltenVK libMoltenVK REQUIRED)
+        target_link_libraries(supertuxkart "-framework Metal -weak_framework IOSurface -framework QuartzCore ${MOLTENVK_LIBRARY}")
+    endif()
     if (IOS)
         target_link_libraries(supertuxkart "-weak_framework CoreHaptics -framework QuartzCore -framework CoreGraphics -framework AVFoundation -framework AudioToolbox -framework Metal -framework GameController -framework OpenGLES -framework UIKit -framework CoreAudio -framework Foundation -framework GLKit")
         # tvOS doesn't have CoreMotion framwork

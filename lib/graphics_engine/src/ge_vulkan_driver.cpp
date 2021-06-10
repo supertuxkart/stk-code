@@ -8,6 +8,7 @@
 
 #include "../source/Irrlicht/os.h"
 
+#if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
 struct GE_VK_UserPointer
 {
     VkInstance instance;
@@ -430,6 +431,7 @@ extern "C" PFN_vkVoidFunction loader(void* user_ptr, const char* name)
         return NULL;
     return get_instance_proc_addr(instance, name);
 }   // loader
+#endif
 
 namespace GE
 {
@@ -446,6 +448,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     createInstance(window);
 
+#if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
     GE_VK_UserPointer user_ptr = {};
     user_ptr.instance = m_vk.instance;
     if (gladLoadVulkanUserPtr(NULL,
@@ -454,12 +457,15 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         throw std::runtime_error("gladLoadVulkanUserPtr failed "
             "with non-NULL instance");
     }
+#endif
+
     if (SDL_Vulkan_CreateSurface(window, m_vk.instance, &m_vk.surface) == SDL_FALSE)
         throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
     m_device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     findPhysicalDevice();
     createDevice();
 
+#if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
     user_ptr.device = m_vk.device;
     if (gladLoadVulkanUserPtr(m_physical_device,
         (GLADuserptrloadfunc)loader, &user_ptr) == 0)
@@ -467,6 +473,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         throw std::runtime_error("gladLoadVulkanUserPtr failed with "
             "non-NULL instance and non-NULL m_physical_device");
     }
+#endif
 
     vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
@@ -485,10 +492,13 @@ GEVulkanDriver::~GEVulkanDriver()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createInstance(SDL_Window* window)
 {
+#if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
     if (gladLoadVulkanUserPtr(NULL, (GLADuserptrloadfunc)loader, NULL) == 0)
     {
         throw std::runtime_error("gladLoadVulkanUserPtr failed 1st time");
     }
+#endif
+
     unsigned int count = 0;
     if (!SDL_Vulkan_GetInstanceExtensions(window, &count, NULL))
         throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions failed with NULL extensions");
