@@ -51,9 +51,9 @@ export DIRNAME="$(dirname "$(readlink -f "$0")")"
 
 export STK_VERSION="git`date +%Y%m%d`"
 export THREADS_NUMBER=`nproc`
-export SCHROOT_32BIT_NAME="chroot-jessie32"
-export SCHROOT_64BIT_NAME="chroot-jessie64"
-export SCHROOT_ARMV7_NAME="chroot-jessie-armhf"
+export SCHROOT_32BIT_NAME="chroot-stretch32"
+export SCHROOT_64BIT_NAME="chroot-stretch64"
+export SCHROOT_ARMV7_NAME="chroot-stretch-armhf"
 export SCHROOT_ARM64_NAME="chroot-stretch-arm64"
 
 export STKCODE_DIR="$DIRNAME/.."
@@ -137,7 +137,8 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/zlib/"* "$DEPENDENCIES_DIR/zlib"
     
         cd "$DEPENDENCIES_DIR/zlib"
-        cmake . -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
                 -DINSTALL_PKGCONFIG_DIR="$PKG_CONFIG_PATH" &&
         make -j$THREADS_NUMBER &&
         make install
@@ -153,8 +154,6 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/libpng/"* "$DEPENDENCIES_DIR/libpng"
     
         cd "$DEPENDENCIES_DIR/libpng"
-        CPPFLAGS="-I$INSTALL_INCLUDE_DIR" \
-        LDFLAGS="-L$INSTALL_LIB_DIR"          \
         ./configure --prefix="$INSTALL_DIR" &&
         make -j$THREADS_NUMBER &&
         make install
@@ -164,21 +163,27 @@ build_stk()
     
     # Freetype bootstrap
     if [ ! -f "$DEPENDENCIES_DIR/freetype_bootstrap.stamp" ]; then
-        echo "Compiling freetype"
-        mkdir -p "$DEPENDENCIES_DIR/freetype"
+        echo "Compiling freetype bootstrap"
+        mkdir -p "$DEPENDENCIES_DIR/freetype/build"
         cp -a -f "$DEPENDENCIES_DIR/../lib/freetype/"* "$DEPENDENCIES_DIR/freetype"
     
-        cd "$DEPENDENCIES_DIR/freetype"
-        ZLIB_CFLAGS="-I$INSTALL_INCLUDE_DIR" ZLIB_LIBS="-L$INSTALL_LIB_DIR -l:libz.so"\
-        LIBPNG_CFLAGS="-I$INSTALL_INCLUDE_DIR" LIBPNG_LIBS="-L$INSTALL_LIB_DIR -l:libpng.so"\
-        ./configure --prefix="$INSTALL_DIR" --with-bzip2=no --with-harfbuzz=no --with-png=yes --with-zlib=yes &&
+        cd "$DEPENDENCIES_DIR/freetype/build"
+        cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                 -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+                 -DBUILD_SHARED_LIBS=1 \
+                 -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=1 \
+                 -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=1 \
+                 -DFT_WITH_HARFBUZZ=0 \
+                 -DFT_WITH_BZIP2=0 \
+                 -DFT_WITH_BROTLI=0 \
+                 -DFT_WITH_ZLIB=1 \
+                 -DFT_WITH_PNG=1 &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
-        # We need to rebuild freetype after harfbuzz is compiled
         touch "$DEPENDENCIES_DIR/freetype_bootstrap.stamp"
     fi
-    
+
     # Harfbuzz
     if [ ! -f "$DEPENDENCIES_DIR/harfbuzz.stamp" ]; then
         echo "Compiling harfbuzz"
@@ -186,33 +191,44 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/harfbuzz/"* "$DEPENDENCIES_DIR/harfbuzz"
     
         cd "$DEPENDENCIES_DIR/harfbuzz"
-        FREETYPE_CFLAGS="-I$INSTALL_INCLUDE_DIR -I$INSTALL_INCLUDE_DIR/freetype2" \
-        FREETYPE_LIBS="-L$INSTALL_LIB_DIR -l:libfreetype.so -l:libpng.so -l:libz.so"\
-        ./configure --prefix="$INSTALL_DIR" --with-glib=no --with-gobject=no --with-cairo=no \
-                    --with-fontconfig=no --with-icu=no --with-graphite2=no &&
+        ./autogen.sh
+        ./configure --prefix="$INSTALL_DIR" \
+                    --with-glib=no \
+                    --with-gobject=no \
+                    --with-cairo=no \
+                    --with-fontconfig=no \
+                    --with-icu=no \
+                    --with-graphite2=no &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
         touch "$DEPENDENCIES_DIR/harfbuzz.stamp"
     fi
-    
+
     # Freetype
     if [ ! -f "$DEPENDENCIES_DIR/freetype.stamp" ]; then
         echo "Compiling freetype"
-        mkdir -p "$DEPENDENCIES_DIR/freetype"
+        mkdir -p "$DEPENDENCIES_DIR/freetype/build"
         cp -a -f "$DEPENDENCIES_DIR/../lib/freetype/"* "$DEPENDENCIES_DIR/freetype"
-    
-        cd "$DEPENDENCIES_DIR/freetype"
-        ZLIB_CFLAGS="-I$INSTALL_INCLUDE_DIR" ZLIB_LIBS="-L$INSTALL_LIB_DIR -l:libz.so" \
-        LIBPNG_CFLAGS="-I$INSTALL_INCLUDE_DIR" LIBPNG_LIBS="-L$INSTALL_LIB_DIR -l:libpng.so" \
-        HARFBUZZ_CFLAGS="-I$INSTALL_INCLUDE_DIR/harfbuzz" HARFBUZZ_LIBS="-L$INSTALL_LIB_DIR -l:libharfbuzz.so" \
-        ./configure --prefix="$INSTALL_DIR" --with-bzip2=no --with-harfbuzz=yes --with-png=yes --with-zlib=yes &&
+
+        cd "$DEPENDENCIES_DIR/freetype/build"
+        rm -rf ./*
+        cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                 -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+                 -DBUILD_SHARED_LIBS=1 \
+                 -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=1 \
+                 -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=1 \
+                 -DFT_WITH_HARFBUZZ=1 \
+                 -DFT_WITH_BZIP2=0 \
+                 -DFT_WITH_BROTLI=0 \
+                 -DFT_WITH_ZLIB=1 \
+                 -DFT_WITH_PNG=1 &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
         touch "$DEPENDENCIES_DIR/freetype.stamp"
     fi
-    
+
     # Openal
     if [ ! -f "$DEPENDENCIES_DIR/openal.stamp" ]; then
         echo "Compiling openal"
@@ -224,7 +240,8 @@ build_stk()
         fi
     
         cd "$DEPENDENCIES_DIR/openal"
-        cmake . -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
                 -DALSOFT_UTILS=0         \
                 -DALSOFT_EXAMPLES=0      \
                 -DALSOFT_TESTS=0         \
@@ -236,18 +253,22 @@ build_stk()
         touch "$DEPENDENCIES_DIR/openal.stamp"
     fi
     
-    # OpenSSL
-    if [ ! -f "$DEPENDENCIES_DIR/openssl.stamp" ]; then
-        echo "Compiling openssl"
-        mkdir -p "$DEPENDENCIES_DIR/openssl"
-        cp -a -f "$DEPENDENCIES_DIR/../lib/openssl/"* "$DEPENDENCIES_DIR/openssl"
+    # MbedTLS
+    if [ ! -f "$DEPENDENCIES_DIR/mbedtls.stamp" ]; then
+        echo "Compiling mbedtls"
+        mkdir -p "$DEPENDENCIES_DIR/mbedtls"
+        cp -a -f "$DEPENDENCIES_DIR/../lib/mbedtls/"* "$DEPENDENCIES_DIR/mbedtls"
     
-        cd "$DEPENDENCIES_DIR/openssl"
-        ./config --prefix="$INSTALL_DIR" &&
+        cd "$DEPENDENCIES_DIR/mbedtls"
+        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+                -DUSE_SHARED_MBEDTLS_LIBRARY=1 \
+                -DENABLE_TESTING=0 \
+                -DENABLE_PROGRAMS=0 &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
-        touch "$DEPENDENCIES_DIR/openssl.stamp"
+        touch "$DEPENDENCIES_DIR/mbedtls.stamp"
     fi
     
     # Curl
@@ -257,19 +278,23 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/curl/"* "$DEPENDENCIES_DIR/curl"
     
         cd "$DEPENDENCIES_DIR/curl"
-        CPPFLAGS="-I$INSTALL_INCLUDE_DIR" \
-        LDFLAGS="-L$INSTALL_LIB_DIR"          \
-        ./configure --prefix="$INSTALL_DIR" \
-                    --with-ssl                              \
-                    --enable-shared                        \
-                    --enable-threaded-resolver \
-                    --disable-ldap \
-                    --without-libidn \
-                    --without-libidn2 \
-                    --without-libpsl \
-                    --without-librtmp \
-                    --without-libssh2 &&
-        make -j$THREADS_NUMBER && \
+        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+                -DBUILD_TESTING=0 \
+                -DBUILD_CURL_EXE=0 \
+                -DCMAKE_USE_MBEDTLS=1 \
+                -DUSE_ZLIB=1 \
+                -DCMAKE_USE_OPENSSL=0 \
+                -DCMAKE_USE_LIBSSH=0 \
+                -DCMAKE_USE_LIBSSH2=0 \
+                -DCMAKE_USE_GSSAPI=0 \
+                -DUSE_NGHTTP2=0 \
+                -DUSE_QUICHE=0 \
+                -DHTTP_ONLY=1 \
+                -DCURL_CA_BUNDLE=none \
+                -DCURL_CA_PATH=none \
+                -DENABLE_THREADED_RESOLVER=1 &&
+        make -j$THREADS_NUMBER && 
         make install
         check_error
         touch "$DEPENDENCIES_DIR/curl.stamp"
@@ -283,7 +308,9 @@ build_stk()
     
         cd "$DEPENDENCIES_DIR/libjpeg"
         chmod a+x ./configure
-        cmake . -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" &&
+        ASM_NASM=yasm \
+        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -297,6 +324,7 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/libogg/"* "$DEPENDENCIES_DIR/libogg"
     
         cd "$DEPENDENCIES_DIR/libogg"
+        ./autogen.sh
         ./configure --prefix="$INSTALL_DIR" &&
         make -j$THREADS_NUMBER &&
         make install
@@ -311,8 +339,8 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/libvorbis/"* "$DEPENDENCIES_DIR/libvorbis"
     
         cd "$DEPENDENCIES_DIR/libvorbis"
-        CPPFLAGS="-I$INSTALL_INCLUDE_DIR" \
-        LDFLAGS="-L$INSTALL_LIB_DIR -lm" \
+        ./autogen.sh
+        LDFLAGS="$LDFLAGS -lm" \
         ./configure --prefix="$INSTALL_DIR" &&
         make -j$THREADS_NUMBER &&
         make install
@@ -371,6 +399,7 @@ build_stk()
         cp -a -f "$DEPENDENCIES_DIR/../lib/bluez/"* "$DEPENDENCIES_DIR/bluez"
     
         cd "$DEPENDENCIES_DIR/bluez"
+        ./bootstrap
         ./configure --prefix="$INSTALL_DIR" \
                     --enable-library \
                     --disable-debug \
@@ -393,10 +422,12 @@ build_stk()
         echo "Compiling sqlite"
         mkdir -p "$DEPENDENCIES_DIR/sqlite"
         cp -a -f "$DEPENDENCIES_DIR/../lib/sqlite/"* "$DEPENDENCIES_DIR/sqlite"
+        sed -i s/' STATIC '/' SHARED '/g "$DEPENDENCIES_DIR/sqlite/CMakeLists.txt"
     
         cd "$DEPENDENCIES_DIR/sqlite"
-        ./configure --prefix="$INSTALL_DIR" \
-                    --disable-tcl &&
+        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+                -DINSTALL_PKGCONFIG_DIR="$PKG_CONFIG_PATH" &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -426,6 +457,7 @@ build_stk()
              -DUSE_SYSTEM_ANGELSCRIPT=0 \
              -DUSE_SYSTEM_ENET=0 \
              -DUSE_SYSTEM_WIIUSE=0 \
+             -DUSE_CRYPTO_OPENSSL=0 \
              -DENABLE_WAYLAND_DEVICE=0 \
              -DCMAKE_DISABLE_FIND_PACKAGE_Fontconfig=1 \
              $STK_CMAKE_FLAGS &&
