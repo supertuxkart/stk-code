@@ -70,6 +70,8 @@ export BUILD_DIR="build-linux"
 export DEPENDENCIES_DIR="$STKCODE_DIR/dependencies-linux"
 export STK_INSTALL_DIR="$STKCODE_DIR/build-linux-install"
 
+export STATIC_GCC=1
+
 # Use it if you build STK with Debian Jessie
 export ENABLE_JESSIE_HACKS=1
 
@@ -126,6 +128,10 @@ build_stk()
     export CFLAGS="-I$INSTALL_INCLUDE_DIR"
     export CPPFLAGS="-I$INSTALL_INCLUDE_DIR"
     export LDFLAGS="-Wl,-rpath,$INSTALL_LIB_DIR -L$INSTALL_LIB_DIR"
+    
+    if [ "$STATIC_GCC" -gt 0 ]; then
+        LDFLAGS="$LDFLAGS -static-libgcc -static-libstdc++"
+    fi
     
     cd "$STKCODE_DIR"
     mkdir -p "$DEPENDENCIES_DIR"
@@ -337,11 +343,11 @@ build_stk()
         echo "Compiling libvorbis"
         mkdir -p "$DEPENDENCIES_DIR/libvorbis"
         cp -a -f "$DEPENDENCIES_DIR/../lib/libvorbis/"* "$DEPENDENCIES_DIR/libvorbis"
-    
+        
         cd "$DEPENDENCIES_DIR/libvorbis"
-        ./autogen.sh
-        LDFLAGS="$LDFLAGS -lm" \
-        ./configure --prefix="$INSTALL_DIR" &&
+        cmake . -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
+                -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
+                -DBUILD_SHARED_LIBS=1 &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -583,8 +589,10 @@ create_package()
     
     find "$STK_PACKAGE_DIR/lib" -type f -exec strip -s {} \;
     
-    mv "$STK_PACKAGE_DIR/lib/libgcc_s.so.1" "$STK_PACKAGE_DIR/lib/libgcc_s.so.1-orig"
-    mv "$STK_PACKAGE_DIR/lib/libstdc++.so.6" "$STK_PACKAGE_DIR/lib/libstdc++.so.6-orig"
+    if [ "$STATIC_GCC" -eq 0 ]; then
+        mv "$STK_PACKAGE_DIR/lib/libgcc_s.so.1" "$STK_PACKAGE_DIR/lib/libgcc_s.so.1-orig"
+        mv "$STK_PACKAGE_DIR/lib/libstdc++.so.6" "$STK_PACKAGE_DIR/lib/libstdc++.so.6-orig"
+    fi
     
     write_run_game_sh "$STK_PACKAGE_DIR"
     
