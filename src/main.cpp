@@ -1463,6 +1463,7 @@ int handleCmdLine(bool has_server_config, bool has_parent_process)
 
     if (NetworkConfig::get()->isServer())
     {
+        PlayerManager::get()->enforceCurrentPlayer();
         const std::string& server_name = ServerConfig::m_server_name;
         if (ServerConfig::m_wan_server)
         {
