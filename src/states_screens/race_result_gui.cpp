@@ -824,7 +824,12 @@ void RaceResultGUI::displayCTFResults()
             ri->m_kart_color = RaceManager::get()->getKartColor(kart->getWorldKartId());
 
             // FTL karts will get a time assigned, they are not shown as eliminated
-            if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
+            if (kart->isEliminated() && RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_3_STRIKES)
+            {
+                ri->m_finish_time_string = core::stringw(_("Eliminated after %s",
+                    StringUtils::toWString(StringUtils::timeToString(kart->getFinishTime(), time_precision))));
+            }
+            else if (kart->isEliminated() && !(RaceManager::get()->isFollowMode()))
             {
                 ri->m_finish_time_string = core::stringw(_("Eliminated"));
             }
