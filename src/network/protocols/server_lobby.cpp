@@ -63,6 +63,41 @@
 #include <iostream>
 #include <iterator>
 
+
+// ========================================================================
+class SubmitRankingRequest : public Online::XMLRequest
+{
+public:
+    SubmitRankingRequest(uint32_t online_id, double scores,
+                         double max_scores, unsigned num_races,
+                         double raw_scores, double rating_deviation,
+                         uint64_t disconnects,
+                         const std::string& country_code)
+        : XMLRequest(Online::RequestManager::HTTP_MAX_PRIORITY)
+    {
+        addParameter("id", online_id);
+        addParameter("scores", scores);
+        addParameter("max-scores", max_scores);
+        addParameter("num-races-done", num_races);
+        addParameter("raw-scores", raw_scores);
+        addParameter("rating-deviation", rating_deviation);
+        addParameter("disconnects", disconnects);
+        addParameter("country-code", country_code);
+    }
+    virtual void afterOperation()
+    {
+        Online::XMLRequest::afterOperation();
+        const XMLNode* result = getXMLData();
+        std::string rec_success;
+        if (!(result->get("success", &rec_success) &&
+            rec_success == "yes"))
+        {
+            Log::error("ServerLobby", "Failed to submit scores.");
+        }
+    }
+};   // UpdatePlayerRankingRequest
+// ========================================================================
+
 // We use max priority for all server requests to avoid downloading of addons
 // icons blocking the poll request in all-in-one graphical client server
 
@@ -4601,40 +4636,6 @@ void ServerLobby::submitRankingsToAddons()
     if (!RaceManager::get()->modeHasLaps())
         return;
 
-    // ========================================================================
-    class SubmitRankingRequest : public Online::XMLRequest
-    {
-    public:
-        SubmitRankingRequest(uint32_t online_id, double scores,
-                             double max_scores, unsigned num_races,
-                             double raw_scores, double rating_deviation,
-                             uint64_t disconnects,
-                             const std::string& country_code)
-            : XMLRequest(Online::RequestManager::HTTP_MAX_PRIORITY)
-        {
-            addParameter("id", online_id);
-            addParameter("scores", scores);
-            addParameter("max-scores", max_scores);
-            addParameter("num-races-done", num_races);
-            addParameter("raw-scores", raw_scores);
-            addParameter("rating-deviation", rating_deviation);
-            addParameter("disconnects", disconnects);
-            addParameter("country-code", country_code);
-        }
-        virtual void afterOperation()
-        {
-            Online::XMLRequest::afterOperation();
-            const XMLNode* result = getXMLData();
-            std::string rec_success;
-            if (!(result->get("success", &rec_success) &&
-                rec_success == "yes"))
-            {
-                Log::error("ServerLobby", "Failed to submit scores.");
-            }
-        }
-    };   // UpdatePlayerRankingRequest
-    // ========================================================================
-
     for (unsigned i = 0; i < RaceManager::get()->getNumPlayers(); i++)
     {
         const uint32_t id = RaceManager::get()->getKartInfo(i).getOnlineId();
@@ -5240,6 +5241,24 @@ void ServerLobby::handlePlayerDisconnection() const
 
             World::getWorld()->eliminateKart(i,
                 false/*notify_of_elimination*/);
+            if (ServerConfig::m_ranked)
+            {
+                // Handle disconnection earlier to prevent cheating by joining
+                // another ranked server
+                // Real score will be submitted later in computeNewRankings
+                const uint32_t id =
+                    RaceManager::get()->getKartInfo(i).getOnlineId();
+                unsigned num_races = m_num_ranked_races.at(id);
+                uint64_t disconnects = m_num_ranked_disconnects.at(id) << 1;
+                auto request = std::make_shared<SubmitRankingRequest>
+                    (id, m_scores.at(id) - 200.0, m_max_scores.at(id),
+                    ++num_races, m_raw_scores.at(id) - 200.0,
+                    m_rating_deviations.at(id), ++disconnects,
+                    RaceManager::get()->getKartInfo(i).getCountryCode());
+                NetworkConfig::get()->setUserDetails(request,
+                    "submit-ranking");
+                request->queue();
+            }
             k->setPosition(
                 World::getWorld()->getCurrentNumKarts() + 1);
             k->finishedRace(World::getWorld()->getTime(), true/*from_server*/);
