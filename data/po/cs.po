@@ -3,6 +3,7 @@
 # This file is distributed under the same license as the supertuxkart package.
 # 
 # Translators:
+# GamingasCZ <gamingforyou875@gmail.com>, 2021
 # Jakub Vaněk <vanek.jakub4@seznam.cz>, 2015-2016
 # Pavel Borecki <pavel.borecki@gmail.com>, 2015-2019
 # ToMáš Marný, 2015
@@ -12,9 +13,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-08 11:13+0800\n"
-"PO-Revision-Date: 2021-05-08 03:43+0000\n"
-"Last-Translator: Benau\n"
+"POT-Creation-Date: 2021-05-22 00:50+0800\n"
+"PO-Revision-Date: 2021-06-15 14:29+0000\n"
+"Last-Translator: GamingasCZ <gamingforyou875@gmail.com>\n"
 "Language-Team: Czech (http://www.transifex.com/supertuxkart/supertuxkart/language/cs/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -178,7 +179,7 @@ msgstr "Odinstalovat"
 #. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:149
+#: src/input/gamepad_config.cpp:153
 #: src/states_screens/dialogs/addons_loading.cpp:297
 msgid "Back"
 msgstr "Zpět"
@@ -378,7 +379,7 @@ msgstr "Přijmout"
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
 msgid "Revert"
-msgstr ""
+msgstr "Vrátit zpět"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 msgid "Camera Settings"
@@ -417,12 +418,12 @@ msgstr "Zpětná kamera"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "Následovat míč v módu fotbalu"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Reset"
-msgstr ""
+msgstr "Resetovat"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 msgid "Graphics Settings"
@@ -980,9 +981,9 @@ msgstr "Nastavení závodu"
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:237
-#: src/states_screens/race_result_gui.cpp:266
-#: src/states_screens/race_result_gui.cpp:274
+#: src/states_screens/race_result_gui.cpp:238
+#: src/states_screens/race_result_gui.cpp:267
+#: src/states_screens/race_result_gui.cpp:275
 msgid "Continue"
 msgstr "Pokračovat"
 
@@ -1671,7 +1672,7 @@ msgstr "Pokud jsou vstupní zařízení nastavena, vyberte ikonu „Hra více hr
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 msgid "High Score Selection"
-msgstr ""
+msgstr "Výběr nejlepšího skóre"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1716,7 +1717,7 @@ msgstr "Výuka"
 #. I18N: In the main screen
 #: src/states_screens/track_info_screen.cpp:332
 msgid "High Scores"
-msgstr ""
+msgstr "Nejlepší skóre"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -2102,8 +2103,8 @@ msgstr "Smazat nastavení"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:117
-#: src/states_screens/options/options_screen_device.cpp:626
+#: src/states_screens/options/options_screen_device.cpp:123
+#: src/states_screens/options/options_screen_device.cpp:632
 msgid "Disable Configuration"
 msgstr "Vypnout nastavování"
 
@@ -2116,6 +2117,11 @@ msgstr "Zpět k seznamu zařízení"
 #. I18N: In the input configuration screen
 msgid "Rename Configuration"
 msgstr "Přejmenovat konfiguraci"
+
+#. I18N: ./data/gui/screens/options_device.stkgui
+#. I18N: In the input configuration screen, for gamepad
+msgid "Enable force feedback (if support)"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2234,7 +2240,7 @@ msgstr "Úroveň grafických efektů"
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
 msgid "Render resolution"
-msgstr ""
+msgstr "Rozlišení vykreslování"
 
 #. I18N: ./data/gui/screens/options_video.stkgui
 #. I18N: In the video settings
@@ -2519,7 +2525,7 @@ msgstr "Puffy"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Pepper"
-msgstr ""
+msgstr "Paprika"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara"
@@ -2816,7 +2822,7 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d tisíc trojúhelníků, ping: %d ms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:198
+#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:199
 #, c-format
 msgid "Tip: %s"
 msgstr "Tip: %s"
@@ -2845,12 +2851,12 @@ msgstr "Nitro efektivita"
 #. activated for this kart (i.e. it will drive slower)
 #: src/guiengine/widgets/player_kart_widget.cpp:387
 #: src/guiengine/widgets/player_kart_widget.cpp:758
-#: src/karts/controller/local_player_controller.cpp:446
+#: src/karts/controller/local_player_controller.cpp:452
 #: src/karts/controller/player_controller.cpp:413
 #: src/network/protocols/client_lobby.cpp:824
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1475
-#: src/states_screens/race_result_gui.cpp:1537
+#: src/states_screens/race_result_gui.cpp:1476
+#: src/states_screens/race_result_gui.cpp:1538
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (handicapovaný)"
@@ -3358,115 +3364,115 @@ msgid "Your input config file is not compatible with this version of STK."
 msgstr "Formát souboru s nastaveními ovládacích zařízení není slučitelný s touto verzí SuperTuxKart."
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:151
+#: src/input/gamepad_config.cpp:155
 msgid "Guide"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:153
+#: src/input/gamepad_config.cpp:157
 msgid "Start"
 msgstr "Start"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:155
+#: src/input/gamepad_config.cpp:159
 msgid "Left thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:157
+#: src/input/gamepad_config.cpp:161
 msgid "Right thumbstick press"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:159
+#: src/input/gamepad_config.cpp:163
 msgid "Left shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:161
+#: src/input/gamepad_config.cpp:165
 msgid "Right shoulder"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:163
+#: src/input/gamepad_config.cpp:167
 msgid "DPad up"
 msgstr "DPad nahoru"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:165
+#: src/input/gamepad_config.cpp:169
 msgid "DPad down"
 msgstr "DPad dolů"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:167
+#: src/input/gamepad_config.cpp:171
 msgid "DPad left"
 msgstr "DPad doleva"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:169
+#: src/input/gamepad_config.cpp:173
 msgid "DPad right"
 msgstr "DPad doprava"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:173
+#: src/input/gamepad_config.cpp:177
 msgid "Left thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:175
+#: src/input/gamepad_config.cpp:179
 msgid "Left thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:177
+#: src/input/gamepad_config.cpp:181
 msgid "Left thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:179
+#: src/input/gamepad_config.cpp:183
 msgid "Left thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:181
+#: src/input/gamepad_config.cpp:185
 msgid "Right thumbstick right"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:183
+#: src/input/gamepad_config.cpp:187
 msgid "Right thumbstick left"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:185
+#: src/input/gamepad_config.cpp:189
 msgid "Right thumbstick down"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:187
+#: src/input/gamepad_config.cpp:191
 msgid "Right thumbstick up"
 msgstr ""
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:189
+#: src/input/gamepad_config.cpp:193
 msgid "Left trigger"
 msgstr "Levý spouštěč"
 
 #. I18N: name of buttons on gamepads
-#: src/input/gamepad_config.cpp:191
+#: src/input/gamepad_config.cpp:195
 msgid "Right trigger"
 msgstr "Pravý spouštěč"
 
-#: src/input/input_manager.cpp:832
+#: src/input/input_manager.cpp:848
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
 msgstr "„%s“ je ignorováno. Abyste se mohli zúčastnit, je třeba se do hry připojit dříve!"
 
-#: src/input/input_manager.cpp:868
+#: src/input/input_manager.cpp:884
 msgid "Only the Game Master may act at this point!"
 msgstr "V tomto okamžiku může jednat pouze hráč zakládající hru!"
 
-#: src/input/sdl_controller.cpp:241
+#: src/input/sdl_controller.cpp:253
 #, c-format
 msgid "%s has low battery level."
 msgstr ""
@@ -3500,11 +3506,11 @@ msgstr "Nepodařilo se nalézt žádný Wiimote ovladač :/"
 msgid "Getting ready to race"
 msgstr ""
 
-#: src/karts/controller/local_player_controller.cpp:307
+#: src/karts/controller/local_player_controller.cpp:313
 msgid "Penalty time!!"
 msgstr "Trestný čas!!"
 
-#: src/karts/controller/local_player_controller.cpp:310
+#: src/karts/controller/local_player_controller.cpp:316
 msgid "Don't accelerate before 'Set!'"
 msgstr "Nezrychlujte před povelem 'Pozor!'"
 
@@ -3527,7 +3533,7 @@ msgstr "Vyhráli jste závod!"
 #: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "Dokončili jste závod na %d. místě!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1127
@@ -3702,7 +3708,7 @@ msgstr "Název serveru: %s"
 #: src/network/protocols/client_lobby.cpp:695
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:92
 #: src/states_screens/dialogs/server_info_dialog.cpp:84
-#: src/states_screens/race_result_gui.cpp:1841
+#: src/states_screens/race_result_gui.cpp:1842
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Obtížnost: %s"
@@ -4345,7 +4351,7 @@ msgstr "Posbírané banány"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:276
+#: src/states_screens/options/options_screen_device.cpp:282
 msgid "Skidding"
 msgstr "Smyk"
 
@@ -4488,7 +4494,7 @@ msgstr "Velikost: %s"
 
 #: src/states_screens/dialogs/addons_loading.cpp:292
 #: src/states_screens/dialogs/addons_pack.cpp:185
-#: src/states_screens/dialogs/download_assets.cpp:189
+#: src/states_screens/dialogs/download_assets.cpp:191
 msgid "Sorry, downloading the add-on failed"
 msgstr "Omlouváme se, ale stahování doplňku se nezdařilo"
 
@@ -4499,7 +4505,7 @@ msgstr "Problémy s instalací doplňku „%s“."
 
 #: src/states_screens/dialogs/addons_loading.cpp:379
 #: src/states_screens/dialogs/addons_loading.cpp:428
-#: src/states_screens/dialogs/download_assets.cpp:254
+#: src/states_screens/dialogs/download_assets.cpp:256
 msgid "Try again"
 msgstr "Zkuste znovu"
 
@@ -4511,7 +4517,7 @@ msgstr "Problémy s odinstalací doplňku „%s“."
 #. I18N: Shown when there is download error for assets download
 #. in the first run
 #: src/states_screens/dialogs/addons_pack.cpp:225
-#: src/states_screens/dialogs/download_assets.cpp:239
+#: src/states_screens/dialogs/download_assets.cpp:241
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
@@ -4629,17 +4635,17 @@ msgid ""
 msgstr "SuperTuxKart stáhne veškeré herní prvky (včetně vysoce kvalitních textur a hudby) pro váš lepší herní zážitek. Pokud nemáte připojení Wi-Fi, použijí se k tomu vaše mobilní data."
 
 #. I18N: In download assets dialog
-#: src/states_screens/dialogs/download_assets.cpp:115
+#: src/states_screens/dialogs/download_assets.cpp:116
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience."
-msgstr ""
+msgstr "SuperTuxKart stáhne veškeré herní prvky (včetně vysoce kvalitních textur a hudby) pro váš lepší herní zážitek."
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:42
 msgid ""
 "Enter the server address optionally followed by : and then port or select "
 "address from list."
-msgstr ""
+msgstr "Zadejte adresu serveru, případně také : a číslo portu, nebo vyberte adresu ze seznamu."
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:124
 #, c-format
@@ -4709,17 +4715,17 @@ msgstr ""
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:89
 #, c-format
 msgid "Track: %s"
-msgstr ""
+msgstr "Trať: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:102
 #, c-format
 msgid "Number of karts: %d"
-msgstr ""
+msgstr "Počet motokár: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:105
 #, c-format
 msgid "Laps: %d"
-msgstr ""
+msgstr "Kola: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:109
 #, c-format
@@ -4805,7 +4811,7 @@ msgstr "Říct správci serveru o tomto hráči (%s):"
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "Stiskněte jakoukoli klávesu...\n(Pro zrušení stiskněte ESC)"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
@@ -4819,22 +4825,22 @@ msgstr "Chat vypnut, zapnete v nabídce předvoleb."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:130
 msgid "Back to Battle"
-msgstr ""
+msgstr "Vrátit se do bitvy"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:133
 msgid "Setup New Game"
-msgstr ""
+msgstr "Nastavit novou hru"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:134
 msgid "Restart Battle"
-msgstr ""
+msgstr "Restartovat zápas"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:136
 msgid "Exit Battle"
-msgstr ""
+msgstr "Opustit bitvu"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:143
-#: src/states_screens/race_result_gui.cpp:320
+#: src/states_screens/race_result_gui.cpp:321
 msgid "Setup New Race"
 msgstr "Nastavit nový závod"
 
@@ -4880,7 +4886,7 @@ msgstr "Opakovaný závod s duchem"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1831
+#: src/states_screens/race_result_gui.cpp:1832
 #, c-format
 msgid "Laps: %i"
 msgstr "Kol: %i"
@@ -5178,7 +5184,7 @@ msgid "Better luck next time!"
 msgstr "Příště více štěstí!"
 
 #: src/states_screens/grand_prix_win.cpp:166
-#: src/states_screens/race_result_gui.cpp:256
+#: src/states_screens/race_result_gui.cpp:257
 msgid "You completed a challenge!"
 msgstr "Dokončili jste výzvu!"
 
@@ -5193,15 +5199,15 @@ msgstr "Velká cena dokončena!"
 #: src/states_screens/high_score_selection.cpp:134
 msgctxt "column_name"
 msgid "Number of karts"
-msgstr ""
+msgstr "Počet motokár"
 
 #: src/states_screens/high_score_selection.cpp:267
 msgid "Are you sure you want to remove this high score entry?"
-msgstr ""
+msgstr "Opravdu chcete smazat toto vysoké skóre?"
 
 #: src/states_screens/high_score_selection.cpp:275
 msgid "Are you sure you want to remove all of your high scores?"
-msgstr ""
+msgstr "Opravdu chcete smazat všechna svá nejlepší skóre?"
 
 #: src/states_screens/kart_selection.cpp:434
 msgid "Connect a keyboard or gamepad to play splitscreen multiplayer"
@@ -5256,7 +5262,7 @@ msgstr "Chvíli strpení, načítají se doplňky"
 
 #: src/states_screens/main_menu_screen.cpp:654
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "Opravdu chcete opustit STK?"
 
 #: src/states_screens/online/create_server_screen.cpp:96
 msgid "Create LAN Server"
@@ -5569,126 +5575,126 @@ msgstr "Jet pozpátku"
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "Zamčeno: splň aktivní výzvy k získání přístupu!"
 
-#: src/states_screens/options/options_screen_device.cpp:74
+#: src/states_screens/options/options_screen_device.cpp:76
 msgid "Action"
 msgstr "Akce"
 
-#: src/states_screens/options/options_screen_device.cpp:75
+#: src/states_screens/options/options_screen_device.cpp:77
 msgid "Key binding"
 msgstr "Přiřazená klávesa"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:102
-#: src/states_screens/options/options_screen_device.cpp:621
+#: src/states_screens/options/options_screen_device.cpp:106
+#: src/states_screens/options/options_screen_device.cpp:627
 msgid "Disable Device"
 msgstr "Zakázat zařízení"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:104
-#: src/states_screens/options/options_screen_device.cpp:622
+#: src/states_screens/options/options_screen_device.cpp:108
+#: src/states_screens/options/options_screen_device.cpp:628
 msgid "Enable Device"
 msgstr "Povolit zařízení"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:119
-#: src/states_screens/options/options_screen_device.cpp:627
+#: src/states_screens/options/options_screen_device.cpp:125
+#: src/states_screens/options/options_screen_device.cpp:633
 msgid "Enable Configuration"
 msgstr "Zapnout nastavení"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:168
+#: src/states_screens/options/options_screen_device.cpp:174
 msgid "Game Keys"
 msgstr "Herní klávesy"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:182
+#: src/states_screens/options/options_screen_device.cpp:188
 msgid "Menu Keys"
 msgstr "Klávesy nabídky"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:258
+#: src/states_screens/options/options_screen_device.cpp:264
 msgid "Steer Left"
 msgstr "Zatočit doleva"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:261
+#: src/states_screens/options/options_screen_device.cpp:267
 msgid "Steer Right"
 msgstr "Zatočit doprava"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:264
+#: src/states_screens/options/options_screen_device.cpp:270
 msgid "Accelerate"
 msgstr "Zrychlení"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:267
+#: src/states_screens/options/options_screen_device.cpp:273
 msgid "Brake / Reverse"
 msgstr "Brzda / zpátečka"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:270
+#: src/states_screens/options/options_screen_device.cpp:276
 msgid "Fire"
 msgstr "Střelba"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:273
+#: src/states_screens/options/options_screen_device.cpp:279
 msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:279
+#: src/states_screens/options/options_screen_device.cpp:285
 msgid "Look Back"
 msgstr "Ohlédnout se"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:282
+#: src/states_screens/options/options_screen_device.cpp:288
 msgid "Rescue"
 msgstr "Záchrana"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:285
+#: src/states_screens/options/options_screen_device.cpp:291
 msgid "Pause Game"
 msgstr "Pozastavit hru"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:290
+#: src/states_screens/options/options_screen_device.cpp:296
 msgid "Up"
 msgstr "Zrychlení"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:293
+#: src/states_screens/options/options_screen_device.cpp:299
 msgid "Down"
 msgstr "Dolů"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:296
+#: src/states_screens/options/options_screen_device.cpp:302
 msgid "Left"
 msgstr "Doleva"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:299
+#: src/states_screens/options/options_screen_device.cpp:305
 msgid "Right"
 msgstr "Doprava"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:302
+#: src/states_screens/options/options_screen_device.cpp:308
 msgid "Select"
 msgstr "Vybrat"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:305
+#: src/states_screens/options/options_screen_device.cpp:311
 msgid "Cancel/Back"
 msgstr "Zrušit/Zpět"
 
-#: src/states_screens/options/options_screen_device.cpp:396
+#: src/states_screens/options/options_screen_device.cpp:402
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Modrá položka znamená konflikt s jiným nastavením"
 
-#: src/states_screens/options/options_screen_device.cpp:401
+#: src/states_screens/options/options_screen_device.cpp:407
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Červená položka znamená konflikt ve stávajícím nastavení"
 
-#: src/states_screens/options/options_screen_device.cpp:508
+#: src/states_screens/options/options_screen_device.cpp:514
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5696,11 +5702,11 @@ msgid ""
 msgstr "Upozornění: Klávesa „Shift“ se nedoporučuje. Pokud zmáčknete „Shift“, všechny klávesy které představují znak, který je odlišný při stisknuté klávese „Shift“, zde přestanou fungovat."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:607
+#: src/states_screens/options/options_screen_device.cpp:613
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Opravdu chcete trvale smazat toto nastavení?"
 
-#: src/states_screens/options/options_screen_device.cpp:635
+#: src/states_screens/options/options_screen_device.cpp:641
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "Zadejte nový název konfigurace, ponechte prázdné, pokud chcete vrátit výchozí hodnotu."
 
@@ -5965,7 +5971,7 @@ msgstr "GÓL!"
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:79
-#: src/states_screens/race_result_gui.cpp:366
+#: src/states_screens/race_result_gui.cpp:367
 msgid "Waiting for others"
 msgstr "Čekání na ostatní"
 
@@ -6024,85 +6030,85 @@ msgstr "Klepnutím na ikonu pódia zahajte výzvu"
 msgid "Press fire to start the challenge"
 msgstr "Stiskněte tlačítko střelby pro zahájení výzvy"
 
-#: src/states_screens/race_result_gui.cpp:242
+#: src/states_screens/race_result_gui.cpp:243
 msgid "Quit the server"
 msgstr "Opustit server"
 
-#: src/states_screens/race_result_gui.cpp:257
+#: src/states_screens/race_result_gui.cpp:258
 msgid "You completed challenges!"
 msgstr "Dokončili jste výzvy!"
 
-#: src/states_screens/race_result_gui.cpp:280
+#: src/states_screens/race_result_gui.cpp:281
 msgid "Abort Grand Prix"
 msgstr "Ukončit Velkou cenu"
 
-#: src/states_screens/race_result_gui.cpp:300
+#: src/states_screens/race_result_gui.cpp:301
 msgid "Restart"
 msgstr "Restart"
 
-#: src/states_screens/race_result_gui.cpp:307
+#: src/states_screens/race_result_gui.cpp:308
 msgid "Back to challenge selection"
 msgstr "Zpět na výběr výzev"
 
-#: src/states_screens/race_result_gui.cpp:315
+#: src/states_screens/race_result_gui.cpp:316
 msgid "Race against the new ghost replay"
 msgstr "Závod proti nové opakovačce s duchem"
 
-#: src/states_screens/race_result_gui.cpp:323
+#: src/states_screens/race_result_gui.cpp:324
 msgid "Back to the menu"
 msgstr "Zpět do nabídky"
 
-#: src/states_screens/race_result_gui.cpp:492
+#: src/states_screens/race_result_gui.cpp:493
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Opravdu chcete ukončit Velkou cenu?"
 
-#: src/states_screens/race_result_gui.cpp:590
-#: src/states_screens/race_result_gui.cpp:1402
+#: src/states_screens/race_result_gui.cpp:591
+#: src/states_screens/race_result_gui.cpp:1403
 msgid "Red Team Wins"
 msgstr "Vyhrává červený tým"
 
-#: src/states_screens/race_result_gui.cpp:592
-#: src/states_screens/race_result_gui.cpp:1406
+#: src/states_screens/race_result_gui.cpp:593
+#: src/states_screens/race_result_gui.cpp:1407
 msgid "Blue Team Wins"
 msgstr "Vyhrává modrý tým"
 
-#: src/states_screens/race_result_gui.cpp:594
-#: src/states_screens/race_result_gui.cpp:1411
+#: src/states_screens/race_result_gui.cpp:595
+#: src/states_screens/race_result_gui.cpp:1412
 msgid "It's a draw"
 msgstr "Je to remíza"
 
-#: src/states_screens/race_result_gui.cpp:827
-#: src/states_screens/race_result_gui.cpp:1255
+#: src/states_screens/race_result_gui.cpp:828
+#: src/states_screens/race_result_gui.cpp:1256
 msgid "Eliminated"
 msgstr "Vyřazen"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1481
-#: src/states_screens/race_result_gui.cpp:1543
+#: src/states_screens/race_result_gui.cpp:1482
+#: src/states_screens/race_result_gui.cpp:1544
 msgid "(Own Goal)"
 msgstr "(vlastní gól)"
 
-#: src/states_screens/race_result_gui.cpp:1622
+#: src/states_screens/race_result_gui.cpp:1623
 #, c-format
 msgid "Track %i/%i"
 msgstr "Trať %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1706
+#: src/states_screens/race_result_gui.cpp:1707
 msgid "Grand Prix progress:"
 msgstr "Průběh Velké ceny:"
 
-#: src/states_screens/race_result_gui.cpp:1752
+#: src/states_screens/race_result_gui.cpp:1753
 msgid "Highscores"
 msgstr "Nejvyšší skóre"
 
-#: src/states_screens/race_result_gui.cpp:1855
+#: src/states_screens/race_result_gui.cpp:1856
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Nejlepší čas kola: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1869
+#: src/states_screens/race_result_gui.cpp:1870
 #, c-format
 msgid "by %s"
 msgstr "od %s"
