@@ -317,10 +317,27 @@ void DriveGraph::computeChecklineRequirements(DriveNode* node,
         }
         */
 
+        bool doRecursion = true;
         if (new_latest_checkline != -1)
-            succ->setChecklineRequirements(new_latest_checkline);
-
-        computeChecklineRequirements(succ, new_latest_checkline);
+        {
+            // If we are about to add a 'new_latest_checkline' that has already been added,
+            // we won't add new information and don't need to recurse.
+            // This will greatly speed up computeChecklineRequirements for tracks with a higher number
+            // of alternative drive lines and will also avoid adding the same value more than once.
+            const std::vector<int>& checkline_requirements = succ->getChecklineRequirements();
+            for (unsigned int i=0; i<checkline_requirements.size(); i++)
+            {
+                if (checkline_requirements[i] == new_latest_checkline)
+                {
+                    doRecursion = false;
+                    break;
+                }
+            }
+            if (doRecursion) // we haven't been here, so add it
+                succ->setChecklineRequirements(new_latest_checkline);
+        }
+        if (doRecursion)
+            computeChecklineRequirements(succ, new_latest_checkline);
     }
 }   // computeChecklineRequirements
 
