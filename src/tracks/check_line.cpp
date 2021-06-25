@@ -179,7 +179,8 @@ void CheckLine::resetAfterKartMove(unsigned int kart_index)
 // ----------------------------------------------------------------------------
 void CheckLine::changeDebugColor(bool is_active)
 {
-    assert(m_debug_dy_dc);
+    if (!m_debug_dy_dc)
+        return;
     video::SColor color = is_active ? video::SColor(192, 255, 0, 0)
                                     : video::SColor(192, 128, 128, 128);
     for(unsigned int i = 0; i < 4; i++)

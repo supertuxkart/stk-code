@@ -144,9 +144,12 @@ void CheckStructure::changeStatus(const std::vector<int> &indices,
                                   int kart_index,
                                   ChangeState change_state)
 {
+    int player_kart_index = 0;
+    if (World::getWorld()->getPlayerKart(0))
+        player_kart_index = World::getWorld()->getPlayerKart(0)->getWorldKartId();
     bool update_debug_colors =
         UserConfigParams::m_check_debug && RaceManager::get()->getNumPlayers()>0 &&
-        kart_index == (int)World::getWorld()->getPlayerKart(0)->getWorldKartId();
+        kart_index == player_kart_index;
 
     CheckManager* cm = Track::getCurrentTrack()->getCheckManager();
     for(unsigned int i=0; i<indices.size(); i++)
