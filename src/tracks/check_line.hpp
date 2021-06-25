@@ -20,9 +20,8 @@
 #define HEADER_CHECK_LINE_HPP
 
 #include <ISceneNode.h>
-#include <line2d.h>
-#include <vector2d.h>
 #include <memory>
+
 using namespace irr;
 
 #include "tracks/check_structure.hpp"
@@ -50,16 +49,10 @@ namespace SP
 class CheckLine : public CheckStructure
 {
 private:
-    /** The line that is tested for being crossed. */
-    core::line2df   m_line;
-
     /** True if this line should ignore the height test. This is required
-     *  e.g. for basketball cannons, since the ball can be too height to
+     *  e.g. for basketball cannons, since the ball can be too high to
      *  otherwise trigger the cannon. */
     bool            m_ignore_height;
-
-    /** The minimum height of the checkline. */
-    float           m_min_height;
 
     /** The actual (or estimated) left and right end points in 3d. This is
      *  used by the cannon. If the xml file stores only the min_height, those
@@ -74,14 +67,8 @@ private:
     /** Used to display debug information about checklines. */
     std::shared_ptr<SP::SPDynamicDrawCall> m_debug_dy_dc;
 
-    /** How much a kart is allowed to be under the minimum height of a
-     *  quad and still considered to be able to cross it. */
-    static const int m_under_min_height = 1;
-
-    /** How much a kart is allowed to be over the minimum height of a
-     *  quad and still considered to be able to cross it. */
-    static const int m_over_min_height  = 4;
-
+    /** The planes that are tested for being crossed. */
+    irr::core::triangle3df m_check_plane[4];
 public:
                  CheckLine(const XMLNode &node, unsigned int index);
     virtual     ~CheckLine();
@@ -93,9 +80,6 @@ public:
                                             { resetAfterKartMove(kart_index); }
     virtual void changeDebugColor(bool is_active) OVERRIDE;
     virtual bool triggeringCheckline() const OVERRIDE { return true; }
-    // ------------------------------------------------------------------------
-    /** Returns the actual line data for this checkpoint. */
-    const core::line2df &getLine2D() const {return m_line;}
     // ------------------------------------------------------------------------
     /** Sets if this check line should not do a height test for testing
      *  if a line is crossed. Used for basket calls in cannon (the ball can

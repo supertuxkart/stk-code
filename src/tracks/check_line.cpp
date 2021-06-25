@@ -29,6 +29,8 @@
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
 #include "race/race_manager.hpp"
+#include "tracks/graph.hpp"
+#include "tracks/quad.hpp"
 
 #include "irrlicht.h"
 
@@ -57,23 +59,68 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         p1_string = "target-p1";
         p2_string = "target-p2";
     }
+    float min_height = 0.0f;
+    Vec3 normal(0, 1, 0);
+    Vec3 center;
     core::vector2df p1, p2;
     if(node.get(p1_string, &p1)   &&
         node.get(p2_string, &p2)  &&
-        node.get("min-height", &m_min_height))
+        node.get("min-height", &min_height))
     {
-        m_left_point  = Vec3(p1.X, m_min_height, p1.Y);
-        m_right_point = Vec3(p2.X, m_min_height, p2.Y);
+        m_left_point  = Vec3(p1.X, min_height, p1.Y);
+        m_right_point = Vec3(p2.X, min_height, p2.Y);
+        center = (m_left_point + m_right_point) * 0.5f;
     }
     else
     {
         node.get(p1_string, &m_left_point);
-        p1 = core::vector2df(m_left_point.getX(), m_left_point.getZ());
         node.get(p2_string, &m_right_point);
-        p2 = core::vector2df(m_right_point.getX(), m_right_point.getZ());
-        m_min_height = std::min(m_left_point.getY(), m_right_point.getY());
+        center = (m_left_point + m_right_point) * 0.5f;
+        int sector = -1;
+        if (Graph::get())
+            Graph::get()->findRoadSector(center, &sector);
+        if (sector != -1)
+            normal = Graph::get()->getQuad(sector)->getNormal();
     }
-    m_line.setLine(p1, p2);
+
+    // How much a kart is allowed to be under the minimum height of a
+    // quad and still considered to be able to cross it.
+    float under_min_height = 1.0f;
+
+    // How much a kart is allowed to be over the minimum height of a
+    // quad and still considered to be able to cross it.
+    float over_min_height = 4.0f;
+
+    m_check_plane[0].pointA = Vec3(m_left_point + (normal *
+        under_min_height * -1.0f)).toIrrVector();
+    m_check_plane[0].pointB = Vec3(m_right_point + (normal *
+        under_min_height * -1.0f)).toIrrVector();
+    m_check_plane[0].pointC = Vec3(m_left_point + (normal *
+        over_min_height)).toIrrVector();
+    m_check_plane[1].pointA = Vec3(m_left_point + (normal *
+        over_min_height)).toIrrVector();
+    m_check_plane[1].pointB = Vec3(m_right_point + (normal *
+        under_min_height * -1.0f)).toIrrVector();
+    m_check_plane[1].pointC = Vec3(m_right_point + (normal *
+        over_min_height)).toIrrVector();
+
+    // 2, 3 are scaled for testing ignoring height (used only by basketball atm)
+    // Only scale upwards a little because basket ball cannot be too high
+    // Also to avoid check plane overlapping
+    over_min_height = 10.0f;
+    m_check_plane[2].pointA = Vec3(m_left_point + (normal *
+        under_min_height * -1.0f)).toIrrVector();
+    m_check_plane[2].pointB = Vec3(m_right_point + (normal *
+        under_min_height * -1.0f)).toIrrVector();
+    m_check_plane[2].pointC = Vec3(m_left_point + (normal *
+        over_min_height)).toIrrVector();
+    m_check_plane[3].pointA = Vec3(m_left_point + (normal *
+        over_min_height)).toIrrVector();
+    m_check_plane[3].pointB = Vec3(m_right_point + (normal *
+        under_min_height * -1.0f)).toIrrVector();
+    m_check_plane[3].pointC = Vec3(m_right_point + (normal *
+        over_min_height)).toIrrVector();
+
     if(UserConfigParams::m_check_debug && !GUIEngine::isNoGraphics())
     {
 #ifndef SERVER_ONLY
@@ -84,14 +131,10 @@ CheckLine::CheckLine(const XMLNode &node,  unsigned int index)
         SP::addDynamicDrawCall(m_debug_dy_dc);
         m_debug_dy_dc->getVerticesVector().resize(4);
         auto& vertices = m_debug_dy_dc->getVerticesVector();
-        vertices[0].m_position = core::vector3df(p1.X,
-            m_min_height - m_under_min_height, p1.Y);
-        vertices[1].m_position = core::vector3df(p2.X,
-            m_min_height - m_under_min_height, p2.Y);
-        vertices[2].m_position = core::vector3df(p1.X,
-            m_min_height + m_over_min_height, p1.Y);
-        vertices[3].m_position = core::vector3df(p2.X,
-            m_min_height + m_over_min_height, p2.Y);
+        vertices[0].m_position = m_check_plane[0].pointA;
+        vertices[1].m_position = m_check_plane[0].pointB;
+        vertices[2].m_position = m_check_plane[0].pointC;
+        vertices[3].m_position = m_check_plane[1].pointC;
         for(unsigned int i = 0; i < 4; i++)
         {
             vertices[i].m_color = m_active_at_reset
@@ -119,8 +162,9 @@ void CheckLine::reset(const Track &track)
 
     for (unsigned int i = 0; i<m_previous_sign.size(); i++)
     {
-        core::vector2df p = m_previous_position[i].toIrrVector2d();
-        m_previous_sign[i] = m_line.getPointOrientation(p) >= 0;
+        m_previous_sign[i] = m_previous_position[i].sideofPlane(
+            m_check_plane[0].pointA,
+            m_check_plane[0].pointB, m_check_plane[0].pointC) >= 0;
     }
 }   // reset
 
@@ -158,53 +202,44 @@ bool CheckLine::isTriggered(const Vec3 &old_pos, const Vec3 &new_pos,
                             int kart_index)
 {
     World* w = World::getWorld();
-    core::vector2df p=new_pos.toIrrVector2d();
-    bool sign = m_line.getPointOrientation(p)>=0;
-    bool result;
+    // Sign here is for old client (<= 1.2) in networking, it's not used
+    // anymore now
+    bool sign = new_pos.sideofPlane(m_check_plane[0].pointA,
+        m_check_plane[0].pointB, m_check_plane[0].pointC) >= 0;
+    bool result = false;
 
-    bool previous_sign;
-
-    if (kart_index < 0)
+    bool ignore_height = m_ignore_height;
+    bool check_line_debug = false;
+start:
+    irr::core::triangle3df* check_plane =
+        ignore_height ? &m_check_plane[2] : &m_check_plane[0];
+    core::line3df test(old_pos.toIrrVector(), new_pos.toIrrVector());
+    core::vector3df intersect;
+    if (check_plane[0].getIntersectionWithLimitedLine(test, intersect) ||
+        check_plane[1].getIntersectionWithLimitedLine(test, intersect))
     {
-        core::vector2df p = old_pos.toIrrVector2d();
-        previous_sign = (m_line.getPointOrientation(p) >= 0);
-    }
-    else
-    {
-        previous_sign = m_previous_sign[kart_index];
-    }
-
-    // If the sign has changed, i.e. the infinite line was crossed somewhere,
-    // check if the finite line was actually crossed:
-    core::vector2df cross_point;
-    if (sign != previous_sign &&
-        m_line.intersectWith(core::line2df(old_pos.toIrrVector2d(),
-                                           new_pos.toIrrVector2d()),
-                             cross_point) )
-    {
-        // Now check the minimum height: the kart position must be within a
-        // reasonable distance in the Z axis - 'reasonable' for now to be
-        // between -1 and 4 units (negative numbers are unlikely, but help
-        // in case that the kart is 'somewhat' inside of the track, or the
-        // checklines are a bit off in Z direction.
-        result = m_ignore_height || 
-                        (new_pos.getY()-m_min_height<m_over_min_height   &&
-                         new_pos.getY()-m_min_height>-m_under_min_height     );
-        if (UserConfigParams::m_check_debug && !result)
+        if (UserConfigParams::m_check_debug && check_line_debug)
         {
             if (kart_index >= 0)
-                Log::info("CheckLine", "Kart %s crosses line, but wrong height "
-                          "(%f vs %f).",
-                          World::getWorld()->getKart(kart_index)->getIdent().c_str(),
-                          new_pos.getY(), m_min_height);
-            else if (!result)
-                Log::info("CheckLine", "Object crosses line, but wrong height "
-                          "(%f vs %f).",
-                          new_pos.getY(), m_min_height);
+            {
+                Log::info("CheckLine", "Kart %s crosses line, but wrong height.",
+                    World::getWorld()->getKart(kart_index)->getIdent().c_str());
+            }
+            else
+            {
+                Log::info("CheckLine", "Object crosses line, but wrong height.");
+            }
         }
+        else
+            result = true;
     }
-    else
-        result = false;
+    else if (UserConfigParams::m_check_debug && !ignore_height &&
+        !check_line_debug)
+    {
+        check_line_debug = true;
+        ignore_height = true;
+        goto start;
+    }
 
     if (kart_index >= 0)
     {
