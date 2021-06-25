@@ -2868,7 +2868,10 @@ void Track::copyFromMainProcess()
     {
         TrackObject* clone = to->cloneToChild();
         if (clone)
+        {
             m_track_object_manager->insertObject(clone);
+            m_track_object_manager->insertDriveableObject(clone);
+        }
     }
 
     m_track_mesh = new TriangleMesh(/*can_be_transformed*/false);

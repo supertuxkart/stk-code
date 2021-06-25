@@ -274,6 +274,13 @@ void TrackObjectManager::insertObject(TrackObject* object)
 }
 
 // ----------------------------------------------------------------------------
+void TrackObjectManager::insertDriveableObject(TrackObject* object)
+{
+    if (object && object->isDriveable())
+        m_driveable_objects.push_back(object);
+}
+
+// ----------------------------------------------------------------------------
 /** Removes the object from the scene graph, bullet, and the list of
  *  track objects, and then frees the object.
  *  \param obj The physical object to remove.

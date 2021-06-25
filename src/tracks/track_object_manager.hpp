@@ -70,7 +70,7 @@ public:
                  bool interpolate_normal = false) const;
 
     void insertObject(TrackObject* object);
-
+    void insertDriveableObject(TrackObject* object);
     void removeObject(TrackObject* who);
     void removeDriveableObject(TrackObject* obj) { m_driveable_objects.remove(obj); }
     TrackObject* getTrackObject(const std::string& libraryInstance, const std::string& name);
