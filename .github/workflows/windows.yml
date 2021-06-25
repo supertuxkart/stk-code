@@ -213,7 +213,7 @@ jobs:
       - name: Generate .pdb files
         if: ${{ env.release_tag != '' }}
         run: |
-          C:\msys64\usr\bin\wget.exe -O cv2pdb.exe https://ci.appveyor.com/api/projects/rainers/visuald/artifacts/cv2pdb.exe?job=Environment%3A%20os%3DVisual%20Studio%202015%2C%20VS%3D14%2C%20APPVEYOR_BUILD_WORKER_IMAGE%3DVisual%20Studio%202015
+          C:\msys64\usr\bin\wget.exe https://github.com/supertuxkart/dependencies/releases/download/preview/cv2pdb.exe
           cd i686
           ..\cv2pdb.exe supertuxkart.exe
           cd ..
