@@ -739,6 +739,12 @@ void RaceResultGUI::displayCTFResults()
     }
 #endif
 }
+//-----------------------------------------------------------------------------
+void RaceResultGUI::unload()
+{
+    cleanupGPProgress();
+    Screen::unload();
+}
 
 //-----------------------------------------------------------------------------
     void RaceResultGUI::onConfirm()

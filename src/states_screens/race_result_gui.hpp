@@ -213,6 +213,7 @@ public:
     virtual void init() OVERRIDE;
     virtual void tearDown() OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
+    virtual void unload() OVERRIDE;
     virtual GUIEngine::EventPropagation
                  filterActions(PlayerAction action, int deviceID, const unsigned int value,
                                Input::InputType type, int playerId) OVERRIDE;
