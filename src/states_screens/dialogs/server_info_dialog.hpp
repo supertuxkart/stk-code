@@ -54,15 +54,23 @@ private:
     /** The cancel button. */
     GUIEngine::IconButtonWidget *m_cancel_widget;
 
+    GUIEngine::IconButtonWidget *m_bookmark_widget;
+
     /** Specify server password if needed. */
     GUIEngine::TextBoxWidget* m_password;
 
+    video::ITexture* m_bookmark_icon;
+
+    video::ITexture* m_remove_icon;
+
+    void updateBookmarkStatus(bool change_bookmark);
 public:
     ServerInfoDialog(std::shared_ptr<Server> server);
     ~ServerInfoDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    virtual void beforeAddingWidgets();
 
     virtual bool onEscapePressed();
     virtual void onUpdate(float dt);

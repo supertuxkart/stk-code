@@ -208,6 +208,8 @@ public:
     // ------------------------------------------------------------------------
     void setReconnectWhenQuitLobby(bool val)
                                          { m_reconnect_when_quit_lobby = val; }
+    // ------------------------------------------------------------------------
+    std::string getBookmarkKey() const;
 };   // Server
 
 class UserDefinedServer : public Server

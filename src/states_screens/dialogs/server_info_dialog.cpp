@@ -17,6 +17,8 @@
 
 #include "states_screens/dialogs/server_info_dialog.hpp"
 
+#include "io/file_manager.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -27,6 +29,7 @@
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/online/server_selection.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
@@ -53,6 +56,11 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
        server->getServerId(), server->getServerOwner());
     m_self_destroy = false;
     m_join_server = false;
+
+    m_bookmark_icon = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "story_mode_book.png"));
+    m_remove_icon = irr_driver->getTexture
+        (file_manager->getAsset(FileManager::GUI_ICON, "remove.png"));
 
     loadFromFile("online/server_info_dialog.stkgui");
     getWidget<LabelWidget>("title")->setText(server->getName(), true);
@@ -145,6 +153,8 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
     {
         getWidget("player-list")->setVisible(false);
     }
+    if (m_server->getServerOwner() != 0)
+        updateBookmarkStatus(false);
 }   // ServerInfoDialog
 
 // -----------------------------------------------------------------------------
@@ -186,9 +196,14 @@ GUIEngine::EventPropagation
             m_self_destroy = true;
             return GUIEngine::EVENT_BLOCK;
         }
-        else if(selection == m_join_widget->m_properties[PROP_ID])
+        else if (selection == m_join_widget->m_properties[PROP_ID])
         {
             m_join_server = true;
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == m_bookmark_widget->m_properties[PROP_ID])
+        {
+            updateBookmarkStatus(true);
             return GUIEngine::EVENT_BLOCK;
         }
     }
@@ -234,3 +249,45 @@ void ServerInfoDialog::onUpdate(float dt)
     if (m_join_server)
         requestJoin();
 }   // onUpdate
+
+// -----------------------------------------------------------------------------
+void ServerInfoDialog::updateBookmarkStatus(bool change_bookmark)
+{
+    const std::string& key = m_server->getBookmarkKey();
+    std::map<std::string, uint32_t>& bookmarks =
+        UserConfigParams::m_server_bookmarks;
+    auto it = bookmarks.find(key);
+    if (it == bookmarks.end())
+    {
+        if (change_bookmark)
+        {
+            bookmarks[key] = m_server->getServerOwner();
+            m_bookmark_widget->setLabel(_("Remove from bookmarks"));
+            m_bookmark_widget->setImage(m_remove_icon);
+        }
+    }
+    else
+    {
+        if (change_bookmark)
+        {
+            bookmarks.erase(key);
+            m_bookmark_widget->setLabel(_("Bookmark this server"));
+            m_bookmark_widget->setImage(m_bookmark_icon);
+        }
+        else
+        {
+            m_bookmark_widget->setLabel(_("Remove from bookmarks"));
+            m_bookmark_widget->setImage(m_remove_icon);
+        }
+    }
+    ServerSelection::getInstance()->copyFromServerList();
+}   // updateBookmarkStatus
+
+// -----------------------------------------------------------------------------
+void ServerInfoDialog::beforeAddingWidgets()
+{
+    m_bookmark_widget = getWidget<IconButtonWidget>("bookmark");
+    assert(m_bookmark_widget != NULL);
+    if (m_server->getServerOwner() == 0)
+        m_bookmark_widget->setVisible(false);
+}

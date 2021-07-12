@@ -29,6 +29,8 @@
         <buttonbar id="options" width="90%" proportion="4" align="center">
                 <icon-button id="join" width="128" height="128" icon="gui/icons/green_check.png"
                              I18N="In the server info dialog"  text="Join" label_location="bottom"/>
+                <icon-button id="bookmark" width="128" height="128" icon="gui/icons/story_mode_book.png"
+                             I18N="In the server info dialog"  text="Bookmark this server" label_location="bottom"/>
                 <icon-button id="cancel" width="128" height="128" icon="gui/icons/main_quit.png"
                              I18N="In the server info dialog" text="Cancel" label_location="bottom"/>
         </buttonbar>

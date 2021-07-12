@@ -241,6 +241,13 @@ void Server::setAddress(const SocketAddress& addr)
 }   // setAddress
 
 // ----------------------------------------------------------------------------
+std::string Server::getBookmarkKey() const
+{
+    return StringUtils::xmlEncode(m_name) +
+        StringUtils::toString(m_server_owner);
+}   // getBookmarkKey
+
+// ----------------------------------------------------------------------------
 void UserDefinedServer::saveServer() const
 {
     OnlineScreen::getInstance()->setEnteredServerName(m_name);

@@ -803,6 +803,11 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
     // ---- Networking
+    PARAM_PREFIX StringToUIntUserConfigParam    m_server_bookmarks
+        PARAM_DEFAULT(StringToUIntUserConfigParam("server-bookmarks",
+        "Wan server bookmarks",
+        {{ "server-bookmarks", "server-name", "owner" }}, {}));
+
     PARAM_PREFIX StringToUIntUserConfigParam    m_address_history
         PARAM_DEFAULT(StringToUIntUserConfigParam("address-history",
         "Last 5 IP addresses that user entered",

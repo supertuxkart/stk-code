@@ -64,6 +64,9 @@ private:
     GUIEngine::CheckBoxWidget* m_private_server;
     GUIEngine::CheckBoxWidget* m_ipv6;
     GUIEngine::IconButtonWidget* m_reload_widget;
+    GUIEngine::IconButtonWidget* m_bookmark_widget;
+    video::ITexture* m_bookmark_icon;
+    video::ITexture* m_global_icon;
     GUIEngine::LabelWidget* m_update_status;
     GUIEngine::ListWidget* m_server_list_widget;
     GUIEngine::TextBoxWidget* m_searcher;
@@ -81,7 +84,7 @@ private:
     /** Load the servers into the main list.*/
     void loadList();
 
-    void copyFromServerList();
+    void updateHeader();
 
     void refresh();
 
@@ -118,6 +121,7 @@ public:
     virtual bool onEnterPressed(const irr::core::stringw& text) OVERRIDE
                                                               { return false; }
 
+    void copyFromServerList();
 };   // ServerSelection
 
 #endif
