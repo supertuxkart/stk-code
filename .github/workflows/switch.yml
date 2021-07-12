@@ -85,7 +85,7 @@ jobs:
             stk-code/cmake_build/*.txt
 
           # Make sure PRs can't overwrite!
-          key: switch-${{ github.ref }}-${{ github.run_number }}
+          key: switch-2-${{ github.ref }}-${{ github.run_number }}
           restore-keys: |
             ${{ env.cache_1 }}
             ${{ env.cache_2 }}
