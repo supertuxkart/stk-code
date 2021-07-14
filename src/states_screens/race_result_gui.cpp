@@ -1325,12 +1325,12 @@ void RaceResultGUI::unload()
             : video::SColor(255, 255, 255, 255);
 
         unsigned int current_x = x;
-        if (RaceManager::get()->getNumPlayers() >= 10)
+        if (RaceManager::get()->getNumberOfKarts() >= 10)
         {
             int pos_rank_width = m_font->getDimension(core::stringw(n + 1).c_str()).Width;
             core::recti pos_rank(current_x, y, pos_rank_width, m_distance_between_rows);
             m_font->draw(core::stringw(n + 1), pos_rank, color);
-            current_x += pos_rank_width + m_width_column_space;
+            current_x += 48;
         }
 
         // Draw kart color circle if kart has custom color
