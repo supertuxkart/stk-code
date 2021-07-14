@@ -184,7 +184,7 @@ namespace Online
             if(isSuccess())
                 login->loginSuccessful();
             else
-                login->loginError(getInfo());
+                login->loginError(getInfo(), !hadDownloadError());
         }   // if dialog
 
         // Check if failure happened during automatic (saved) signin.
@@ -205,7 +205,8 @@ namespace Online
             // this function is called from the main thread, so we can 
             // push screens without synchronisations.
             UserScreen::getInstance()->push();
-            UserScreen::getInstance()->loginError(getInfo());
+            UserScreen::getInstance()->loginError(getInfo(),
+                !hadDownloadError());
         }
 
 

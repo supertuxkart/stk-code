@@ -604,13 +604,15 @@ void BaseUserScreen::loginSuccessful()
 /** Callback from player profile if login was unsuccessful.
  *  \param error_message Contains the error message.
  */
-void BaseUserScreen::loginError(const irr::core::stringw & error_message)
+void BaseUserScreen::loginError(const irr::core::stringw & error_message,
+                                bool clear_password)
 {
     m_state = (UserScreenState) (m_state & ~STATE_LOGIN);
     PlayerProfile *player = getSelectedPlayer();
     // Clear information about saved session in case of a problem,
     // which allows the player to enter a new password.
-    if(player && player->hasSavedSession())
+    // Only if not a download error
+    if(clear_password && player && player->hasSavedSession())
         player->clearSession();
     player->setLastOnlineName("");
     makeEntryFieldsVisible();

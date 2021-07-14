@@ -125,7 +125,7 @@ public:
                            const core::stringw &online_name="",
                            const core::stringw &password="");
     void loginSuccessful();
-    void loginError(const irr::core::stringw &error_message);
+    void loginError(const irr::core::stringw &error_message, bool clear_password);
     void logoutSuccessful();
     void logoutError(const irr::core::stringw &error_message);
 
