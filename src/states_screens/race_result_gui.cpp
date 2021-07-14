@@ -1326,6 +1326,10 @@ void RaceResultGUI::unload()
 
         unsigned int current_x = x;
 
+        int pos_rank_width = m_font->getDimension(core::stringw(n + 1).c_str()).Width;
+        core::recti pos_rank(current_x, y, pos_rank_width, m_distance_between_rows);
+        m_font->draw(core::stringw(n + 1), pos_rank, color);
+        current_x += pos_rank_width + m_width_column_space;
         // Draw kart color circle if kart has custom color
         if (ri->m_kart_color > 0.0)
         {
