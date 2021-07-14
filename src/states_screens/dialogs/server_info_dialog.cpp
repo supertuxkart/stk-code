@@ -261,7 +261,7 @@ void ServerInfoDialog::updateBookmarkStatus(bool change_bookmark)
     {
         if (change_bookmark)
         {
-            bookmarks[key] = m_server->getServerOwner();
+            bookmarks[key] = StkTime::getTimeSinceEpoch();
             m_bookmark_widget->setLabel(_("Remove from bookmarks"));
             m_bookmark_widget->setImage(m_remove_icon);
         }

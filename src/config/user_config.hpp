@@ -806,7 +806,7 @@ namespace UserConfigParams
     PARAM_PREFIX StringToUIntUserConfigParam    m_server_bookmarks
         PARAM_DEFAULT(StringToUIntUserConfigParam("server-bookmarks",
         "Wan server bookmarks",
-        {{ "server-bookmarks", "server-name", "owner" }}, {}));
+        {{ "server-bookmarks", "server-name", "last-online" }}, {}));
 
     PARAM_PREFIX StringToUIntUserConfigParam    m_address_history
         PARAM_DEFAULT(StringToUIntUserConfigParam("address-history",

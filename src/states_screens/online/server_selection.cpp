@@ -69,6 +69,8 @@ void ServerSelection::tearDown()
     m_servers.clear();
     m_server_list_widget->clear();
     m_server_list = nullptr;
+    if (!UserConfigParams::m_server_bookmarks.empty())
+        user_config->saveConfig();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -422,7 +424,7 @@ void ServerSelection::onUpdate(float dt)
             std::set<std::string> all_possible_keys;
             if (NetworkConfig::get()->isWAN())
             {
-                // Remove offline server from bookmarks
+                // Remove offline server from bookmarks if inactive for 3 days
                 for (auto& server : m_server_list->m_servers)
                     all_possible_keys.insert(server->getBookmarkKey());
                 std::map<std::string, uint32_t>& bookmarks =
@@ -430,11 +432,21 @@ void ServerSelection::onUpdate(float dt)
                 auto it = bookmarks.begin();
                 while (it != bookmarks.end())
                 {
+                    uint64_t three_days = 60 * 60 * 24 * 3;
+                    uint64_t limit = StkTime::getTimeSinceEpoch() - three_days;
                     if (all_possible_keys.find(it->first) ==
                         all_possible_keys.end())
-                        it = bookmarks.erase(it);
+                    {
+                        if (it->second < limit)
+                            it = bookmarks.erase(it);
+                        else
+                            it++;
+                    }
                     else
+                    {
+                        it->second = StkTime::getTimeSinceEpoch();
                         it++;
+                    }
                 }
             }
             int selection = m_server_list_widget->getSelectionID();
