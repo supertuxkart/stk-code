@@ -138,7 +138,10 @@ void ServerSelection::beforeAddingWidget()
         m_server_list_widget->addColumn(_C("column_name", "Owner"), 3);
         // I18N: In server selection screen, distance to server
         m_server_list_widget->addColumn(_C("column_name", "Distance (km)"), 3);
+        m_bookmark_widget->setVisible(true);
     }
+    else
+        m_bookmark_widget->setVisible(false);
 }   // beforeAddingWidget
 
 // ----------------------------------------------------------------------------
@@ -520,7 +523,7 @@ void ServerSelection::updateHeader()
 {
     m_bookmark_widget->setImage(g_bookmarks_next ?
         m_global_icon : m_bookmark_icon);
-    if (g_bookmarks_next)
+    if (g_bookmarks_next && NetworkConfig::get()->isWAN())
         getWidget("title_header")->setText(_("Server Bookmarks"));
     else
         getWidget("title_header")->setText(_("Server Selection"));
