@@ -243,7 +243,8 @@ void Server::setAddress(const SocketAddress& addr)
 // ----------------------------------------------------------------------------
 std::string Server::getBookmarkKey() const
 {
-    return StringUtils::xmlEncode(m_name) +
+    core::stringw name = m_name;
+    return StringUtils::xmlEncode(name.trim().removeChars(L"\n\r\t")) +
         StringUtils::toString(m_server_owner);
 }   // getBookmarkKey
 
