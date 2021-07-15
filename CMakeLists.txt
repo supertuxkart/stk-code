@@ -19,11 +19,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-option(USE_SWITCH "Build targeting switch" OFF)
-
-if(NINTENDO_SWITCH)
-  set(USE_SWITCH ON)
-endif()
+CMAKE_DEPENDENT_OPTION(USE_SWITCH "Build targeting switch" OFF "NOT NINTENDO_SWITCH" ON)
 
 if(WIN32)
     option(USE_DIRECTX "Build DirectX 9 driver (requires DirectX SDK)" OFF)
@@ -52,7 +48,7 @@ CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of t
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
-CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE" ON)
+CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE;NOT USE_SWITCH" ON)
 
 if (DLOPEN_MOLTENVK)
     ADD_DEFINITIONS(-DDLOPEN_MOLTENVK)

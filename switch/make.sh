@@ -13,7 +13,6 @@ fi
 cd "${STK_DIR}/cmake_build"
 
 "${DEVKITPRO}/portlibs/switch/bin/aarch64-none-elf-cmake" -G"Unix Makefiles" \
-    -DUSE_SWITCH=ON -DUSE_MOJOAL=ON \
     -DCMAKE_INSTALL_PREFIX=/  \
     ../
 
