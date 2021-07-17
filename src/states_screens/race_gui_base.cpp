@@ -125,6 +125,7 @@ RaceGUIBase::RaceGUIBase()
 
     m_referee               = NULL;
     m_multitouch_gui        = NULL;
+    m_showing_kart_colors   = false;
 }   // RaceGUIBase
 
 // ----------------------------------------------------------------------------
@@ -185,6 +186,7 @@ void RaceGUIBase::reset()
     m_plunger_offset    = core::vector2di(0,0);
     m_plunger_speed     = core::vector2df(0,0);
     m_plunger_state     = PLUNGER_STATE_INIT;
+    m_showing_kart_colors = false;
     m_enabled_network_spectator = false;
     clearAllMessages();
     
@@ -1022,11 +1024,6 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                                  bool is_local)
 {
 #ifndef SERVER_ONLY
-    // this flag is set to true if we show at least one custom color for other karts
-    // in that case we want to draw a bigger circle around the player's own kart
-    // to make it easier for the player to identify
-    static bool showing_kart_colors = false;
-
     video::ITexture *icon =
     kart->getKartProperties()->getIconMaterial()->getTexture();
 
@@ -1088,7 +1085,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
                                120+(int)(120*cosf(M_PI/2*i+World::getWorld()->getTime()*2)));
         }
         core::rect<s32> icon_pos;
-        if (showing_kart_colors)
+        if (m_showing_kart_colors)
         {
             // we are showing other kart's colors, so draw bigger circle
             icon_pos = core::rect<s32>(x-9, y-7, x+w+7, y+w+2);
@@ -1114,7 +1111,7 @@ void RaceGUIBase::drawPlayerIcon(AbstractKart *kart, int x, int y, int w,
         colors[3].setAlpha(125);
         const core::rect<s32> rect(core::position2d<s32>(0,0), m_icons_frame->getSize());
         draw2DImage(m_icons_frame, color_pos, rect, NULL, colors, true);
-        showing_kart_colors = true;
+        m_showing_kart_colors = true;
     }
 
     // Fixes crash bug, why are certain icons not showing up?

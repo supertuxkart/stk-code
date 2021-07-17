@@ -154,6 +154,10 @@ private:
      * finished). */
     bool m_enabled_network_spectator;
 
+    /* this flag is set to true if we show at least one custom color for other karts
+     * in that case we want to draw a bigger circle around the player's own kart
+     * to make it easier for the player to identify */
+    bool m_showing_kart_colors;
 protected:
 
     /** State of the plunger: From the 'init' states the plunger switches
