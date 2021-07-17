@@ -352,68 +352,68 @@
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
   <languages>
-    <lang percentage="98">ar</lang>
-    <lang percentage="94">be</lang>
+    <lang percentage="97">ar</lang>
+    <lang percentage="93">be</lang>
     <lang>bg</lang>
-    <lang percentage="71">br</lang>
-    <lang percentage="73">bs</lang>
+    <lang percentage="70">br</lang>
+    <lang percentage="72">bs</lang>
     <lang>ca</lang>
-    <lang percentage="98">cs</lang>
+    <lang percentage="97">cs</lang>
     <lang>da</lang>
-    <lang>de</lang>
-    <lang percentage="99">el</lang>
+    <lang percentage="99">de</lang>
+    <lang percentage="98">el</lang>
     <lang percentage="67">eo</lang>
     <lang>es</lang>
     <lang percentage="26">et</lang>
-    <lang percentage="93">eu</lang>
+    <lang percentage="92">eu</lang>
     <lang percentage="2">fa</lang>
-    <lang>fi</lang>
-    <lang percentage="97">fr</lang>
-    <lang percentage="97">fr_CA</lang>
+    <lang percentage="99">fi</lang>
+    <lang percentage="96">fr</lang>
+    <lang percentage="96">fr_CA</lang>
     <lang percentage="21">ga</lang>
-    <lang percentage="98">gd</lang>
+    <lang>gd</lang>
     <lang percentage="53">gl</lang>
-    <lang percentage="97">he</lang>
-    <lang percentage="29">hr</lang>
-    <lang percentage="98">hu</lang>
-    <lang>id</lang>
+    <lang percentage="99">he</lang>
+    <lang percentage="28">hr</lang>
+    <lang percentage="97">hu</lang>
+    <lang percentage="99">id</lang>
     <lang percentage="2">is</lang>
     <lang percentage="99">it</lang>
-    <lang percentage="91">ja</lang>
+    <lang percentage="90">ja</lang>
     <lang percentage="11">jbo</lang>
     <lang percentage="99">ko</lang>
     <lang percentage="54">krl</lang>
     <lang percentage="44">kw</lang>
     <lang percentage="15">ky</lang>
-    <lang percentage="53">la</lang>
-    <lang percentage="65">lt</lang>
+    <lang percentage="52">la</lang>
+    <lang percentage="64">lt</lang>
     <lang percentage="41">lv</lang>
-    <lang>ml</lang>
-    <lang percentage="71">nb</lang>
+    <lang percentage="99">ml</lang>
+    <lang percentage="70">nb</lang>
     <lang>nl</lang>
     <lang percentage="99">nn</lang>
     <lang percentage="30">oc</lang>
     <lang percentage="2">os</lang>
-    <lang percentage="99">pl</lang>
-    <lang percentage="99">pt</lang>
+    <lang percentage="98">pl</lang>
+    <lang>pt</lang>
     <lang>pt_BR</lang>
     <lang percentage="26">ro</lang>
     <lang>ru</lang>
     <lang percentage="1">sc</lang>
     <lang percentage="1">sco</lang>
-    <lang percentage="81">sk</lang>
-    <lang percentage="64">sl</lang>
+    <lang percentage="80">sk</lang>
+    <lang percentage="63">sl</lang>
     <lang percentage="3">sq</lang>
-    <lang percentage="97">sr</lang>
-    <lang>sv</lang>
-    <lang percentage="84">sw</lang>
-    <lang percentage="94">szl</lang>
-    <lang percentage="73">th</lang>
-    <lang percentage="98">tr</lang>
+    <lang percentage="96">sr</lang>
+    <lang percentage="99">sv</lang>
+    <lang percentage="83">sw</lang>
+    <lang percentage="93">szl</lang>
+    <lang percentage="72">th</lang>
+    <lang percentage="97">tr</lang>
     <lang percentage="54">tt</lang>
-    <lang percentage="79">uk</lang>
+    <lang percentage="78">uk</lang>
     <lang percentage="20">vi</lang>
-    <lang percentage="97">zh_CN</lang>
+    <lang>zh_CN</lang>
     <lang>zh_HK</lang>
     <lang>zh_TW</lang>
   </languages>

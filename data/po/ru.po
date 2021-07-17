@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-22 00:50+0800\n"
-"PO-Revision-Date: 2021-05-22 10:55+0000\n"
+"POT-Creation-Date: 2021-07-14 10:48+0800\n"
+"PO-Revision-Date: 2021-07-14 06:50+0000\n"
 "Last-Translator: Andrei Stepanov <adem4ik@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/supertuxkart/supertuxkart/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -196,7 +196,7 @@ msgstr "Выберите предпочтительный тип управле�
 #. I18N: Control type
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-#: src/states_screens/dialogs/race_paused_dialog.cpp:543
+#: src/states_screens/dialogs/race_paused_dialog.cpp:545
 msgid "Accelerometer"
 msgstr "Акселерометр"
 
@@ -210,13 +210,13 @@ msgstr "Акселерометр"
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:548
+#: src/states_screens/dialogs/race_paused_dialog.cpp:550
 msgid "Gyroscope"
 msgstr "Гироскоп"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
-#: src/states_screens/dialogs/race_paused_dialog.cpp:538
+#: src/states_screens/dialogs/race_paused_dialog.cpp:540
 msgid "Steering wheel"
 msgstr "Руль"
 
@@ -547,8 +547,8 @@ msgstr "Закрыть"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/message_dialog.cpp:125
-#: src/states_screens/dialogs/message_dialog.cpp:136
+#: src/states_screens/dialogs/message_dialog.cpp:126
+#: src/states_screens/dialogs/message_dialog.cpp:137
 msgid "OK"
 msgstr "ОК"
 
@@ -644,7 +644,7 @@ msgstr "Подтвердить"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:140
+#: src/states_screens/dialogs/race_paused_dialog.cpp:141
 msgid "Back to Race"
 msgstr "Вернуться в гонку"
 
@@ -656,7 +656,7 @@ msgstr "Вернуться в лобби"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:144
+#: src/states_screens/dialogs/race_paused_dialog.cpp:146
 msgid "Restart Race"
 msgstr "Начать заново"
 
@@ -883,6 +883,12 @@ msgstr "Пароль"
 #. I18N: In the server info dialog
 msgid "Join"
 msgstr "Присоединиться"
+
+#. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#: src/states_screens/dialogs/server_info_dialog.cpp:274
+msgid "Bookmark this server"
+msgstr "Добавить сервер в избранное"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -1885,6 +1891,11 @@ msgstr "Пароль:"
 msgid "Change"
 msgstr "Изменить"
 
+#. I18N: ./data/gui/screens/online/profile_settings.stkgui
+#. I18N: In the online account settings screen
+msgid "E-mail:"
+msgstr "Эл. почта:"
+
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Create User"
@@ -1930,6 +1941,7 @@ msgid ""
 msgstr "Вы можете играть без создания сетевого аккаунта, просто выберите «Автономный аккаунт». Но тогда вы не сможете связываться с друзьями, голосовать за дополнения и т. д. Пожалуйста, прочтите наше заявление о конфиденциальности на http://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
+#: src/states_screens/online/server_selection.cpp:541
 msgid "Server Selection"
 msgstr "Выбор сервера"
 
@@ -2107,8 +2119,8 @@ msgstr "Удалить схему"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:123
-#: src/states_screens/options/options_screen_device.cpp:632
+#: src/states_screens/options/options_screen_device.cpp:125
+#: src/states_screens/options/options_screen_device.cpp:634
 msgid "Disable Configuration"
 msgstr "Отключить схему"
 
@@ -2555,6 +2567,10 @@ msgstr "Ксю"
 msgid "Antediluvian Abyss"
 msgstr "Допотопная пропасть"
 
+#. I18N: ../stk-assets/tracks/alien_signal/track.xml
+msgid "Alien Signal"
+msgstr "Инопланетный сигнал"
+
 #. I18N: ../stk-assets/tracks/arena_candela_city/track.xml
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
@@ -2806,21 +2822,21 @@ msgid ""
 "created."
 msgstr "Ваш файл с настройками устарел, поэтому он был удалён и заменён новым."
 
-#: src/graphics/irr_driver.cpp:657
+#: src/graphics/irr_driver.cpp:664
 msgid "Video recording started."
 msgstr "Началась запись видео."
 
-#: src/graphics/irr_driver.cpp:664
+#: src/graphics/irr_driver.cpp:671
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Видео сохранено в «%s»."
 
-#: src/graphics/irr_driver.cpp:668
+#: src/graphics/irr_driver.cpp:675
 msgid "Encoding progress:"
 msgstr "Прогресс кодирования:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1824 src/graphics/irr_driver.cpp:1859
+#: src/graphics/irr_driver.cpp:1864
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d КПол, Пинг: %d мс"
@@ -2859,8 +2875,8 @@ msgstr "Эффективность нитро"
 #: src/karts/controller/player_controller.cpp:413
 #: src/network/protocols/client_lobby.cpp:824
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1476
-#: src/states_screens/race_result_gui.cpp:1538
+#: src/states_screens/race_result_gui.cpp:1504
+#: src/states_screens/race_result_gui.cpp:1566
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (с гандикапом)"
@@ -3545,7 +3561,7 @@ msgstr "Вы завершили гонку на %d месте!"
 msgid "%s left the game."
 msgstr "%s покинул(а) игру."
 
-#: src/main.cpp:2012
+#: src/main.cpp:2013
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3554,16 +3570,16 @@ msgid ""
 "Internet\")."
 msgstr "SuperTuxKart может подключаться к серверу для загрузки дополнений и уведомлять вас об обновлениях.  Пожалуйста, прочтите нашу политику конфиденциальности на https://supertuxkart.net/Privacy. Вам нужна такая возможность? (Для изменения этой настройки перейдите в «Настройки» -> «Основные» -> «Подключаться к интернету»)."
 
-#: src/main.cpp:2361
+#: src/main.cpp:2362
 msgid "Your screen resolution is too low to run STK."
 msgstr "Разрешение вашего монитора слишком низкое для запуска игры."
 
-#: src/main.cpp:2396
+#: src/main.cpp:2397
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "У вас старый видеодрайвер. Пожалуйста, обновите его."
 
-#: src/main.cpp:2414
+#: src/main.cpp:2415
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3685,7 +3701,7 @@ msgid "Bad network connection is detected."
 msgstr "Обнаружено плохое соединение с сетью."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3812
+#: src/network/protocols/server_lobby.cpp:3847
 msgid "Bot"
 msgstr "Бот"
 
@@ -3711,8 +3727,8 @@ msgstr "Имя сервера: %s"
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:695
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:92
-#: src/states_screens/dialogs/server_info_dialog.cpp:84
-#: src/states_screens/race_result_gui.cpp:1842
+#: src/states_screens/dialogs/server_info_dialog.cpp:92
+#: src/states_screens/race_result_gui.cpp:1870
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Сложность: %s"
@@ -3725,7 +3741,7 @@ msgstr "Максимальное число игроков: %d"
 
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:713
-#: src/states_screens/dialogs/server_info_dialog.cpp:88
+#: src/states_screens/dialogs/server_info_dialog.cpp:96
 #, c-format
 msgid "Game mode: %s"
 msgstr "Режим игры: %s"
@@ -3895,23 +3911,23 @@ msgstr "Свободный заезд"
 msgid "Capture The Flag"
 msgstr "Захват флага"
 
-#: src/online/online_player_profile.cpp:454
+#: src/online/online_player_profile.cpp:455
 #, c-format
 msgid "%s is now online."
 msgstr "%s сейчас в сети."
 
-#: src/online/online_player_profile.cpp:458
+#: src/online/online_player_profile.cpp:459
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s и %s сейчас в сети."
 
-#: src/online/online_player_profile.cpp:463
+#: src/online/online_player_profile.cpp:464
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s и %s сейчас в сети."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:469
+#: src/online/online_player_profile.cpp:470
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3921,12 +3937,12 @@ msgstr[2] "%d друзей в сети."
 msgstr[3] "%d друзей в сети."
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:518
+#: src/online/online_player_profile.cpp:519
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "%s сейчас на сервере «%s»."
 
-#: src/online/online_player_profile.cpp:549
+#: src/online/online_player_profile.cpp:550
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
@@ -3935,7 +3951,7 @@ msgstr[1] "У вас %d новых запроса в друзья!"
 msgstr[2] "У вас %d новых запросов в друзья!"
 msgstr[3] "У вас %d новых запросов в друзья!"
 
-#: src/online/online_player_profile.cpp:555
+#: src/online/online_player_profile.cpp:556
 msgid "You have a new friend request!"
 msgstr "У вас новый запрос в друзья!"
 
@@ -4016,17 +4032,17 @@ msgid "Not installed"
 msgstr "Не установлено"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:322
+#: src/states_screens/addons_screen.cpp:325
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s, автор: %s"
 
-#: src/states_screens/addons_screen.cpp:443
+#: src/states_screens/addons_screen.cpp:446
 msgid "Please wait while addons are updated"
 msgstr "Пожалуйста, подождите, пока дополнения обновятся"
 
-#: src/states_screens/addons_screen.cpp:523
+#: src/states_screens/addons_screen.cpp:526
 #: src/states_screens/main_menu_screen.cpp:626
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
@@ -4067,10 +4083,6 @@ msgstr[0] "%d арена недоступна в одиночном режиме
 msgstr[1] "%d арен недоступно в одиночном режиме."
 msgstr[2] "%d арен недоступно в одиночном режиме."
 msgstr[3] "%d арены недоступны в одиночном режиме."
-
-#: src/states_screens/credits.cpp:184
-msgid "translator-credits"
-msgstr "Участники Launchpad:\n  AleXoundOS https://launchpad.net/~alexoundos\n  Alexander 'FONTER' Zinin https://launchpad.net/~spore-09\n  Andrey Olykainen https://launchpad.net/~andrey.olykainen\n  Denis Deryabin https://launchpad.net/~denis2010der\n  Dmitriy Koshel https://launchpad.net/~gaim4a\n  Dmitry https://launchpad.net/~dmitry-ashkadov\n  Dmitry Dubrov https://launchpad.net/~dimprogpro\n  Helen Antonova https://launchpad.net/~vigonett\n  Igor Shtompel https://launchpad.net/~i.shtompel\n  Kirill Babeev https://launchpad.net/~kirill-babeev\n  KroArtem https://launchpad.net/~kroartem\n  Maxim Kalinin https://launchpad.net/~kalinin-maxim\n  STK-team https://launchpad.net/~stk\n  Tae-Wong SEO https://launchpad.net/~seotaewong40\n  adem https://launchpad.net/~adem4ik\n  pingvin https://launchpad.net/~penguin-tux\n  Дмитрий https://launchpad.net/~starwars32\n  Олег https://launchpad.net/~laoltomsk\n  Jay ZDLin https://launchpad.net/~black-buddha666"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4355,7 +4367,7 @@ msgstr "Собрано бананов"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:282
+#: src/states_screens/options/options_screen_device.cpp:284
 msgid "Skidding"
 msgstr "Занос"
 
@@ -4666,7 +4678,7 @@ msgstr "Обратное направление"
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
 #: src/states_screens/high_score_selection.cpp:131
-#: src/states_screens/online/server_selection.cpp:127
+#: src/states_screens/online/server_selection.cpp:135
 msgctxt "column_name"
 msgid "Difficulty"
 msgstr "Сложность"
@@ -4704,7 +4716,7 @@ msgstr "Версия"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:107
-#: src/states_screens/dialogs/message_dialog.cpp:130
+#: src/states_screens/dialogs/message_dialog.cpp:131
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
 #: src/states_screens/high_score_selection.cpp:208
@@ -4835,20 +4847,20 @@ msgstr "Вернуться в битву"
 msgid "Setup New Game"
 msgstr "Настроить новую игру"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:134
+#: src/states_screens/dialogs/race_paused_dialog.cpp:135
 msgid "Restart Battle"
 msgstr "Начать битву заново"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:136
+#: src/states_screens/dialogs/race_paused_dialog.cpp:137
 msgid "Exit Battle"
 msgstr "Покинуть битву"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:143
+#: src/states_screens/dialogs/race_paused_dialog.cpp:144
 #: src/states_screens/race_result_gui.cpp:321
 msgid "Setup New Race"
 msgstr "Новая гонка"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:146
+#: src/states_screens/dialogs/race_paused_dialog.cpp:148
 msgid "Exit Race"
 msgstr "Выйти из гонки"
 
@@ -4890,7 +4902,7 @@ msgstr "Гонка с призраком из повтора"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1832
+#: src/states_screens/race_result_gui.cpp:1860
 #, c-format
 msgid "Laps: %i"
 msgstr "Число кругов: %i"
@@ -4940,38 +4952,43 @@ msgstr "Режим футбола"
 
 #. I18N: In the server info dialog, show the server location with
 #. country name (based on IP geolocation)
-#: src/states_screens/dialogs/server_info_dialog.cpp:97
+#: src/states_screens/dialogs/server_info_dialog.cpp:105
 #, c-format
 msgid "Server location: %s"
 msgstr "Расположение сервера: %s"
 
 #. I18N: In server info dialog, showing the current track playing in server
-#: src/states_screens/dialogs/server_info_dialog.cpp:106
+#: src/states_screens/dialogs/server_info_dialog.cpp:114
 #, c-format
 msgid "Current track: %s"
 msgstr "Текущая трасса: %s"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:116
+#: src/states_screens/dialogs/server_info_dialog.cpp:124
 msgid "Rank"
 msgstr "Ранг"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:119
+#: src/states_screens/dialogs/server_info_dialog.cpp:127
 msgid "Player"
 msgstr "Игрок"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:122
+#: src/states_screens/dialogs/server_info_dialog.cpp:130
 msgid "Scores"
 msgstr "Очки"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:125
+#: src/states_screens/dialogs/server_info_dialog.cpp:133
 msgid "Time played"
 msgstr "Время в игре"
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:265
+#: src/states_screens/dialogs/server_info_dialog.cpp:279
+msgid "Remove from bookmarks"
+msgstr "Удалить сервер из избранного"
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:130
 msgid "Input device already exists."
@@ -5134,7 +5151,7 @@ msgid "Track"
 msgstr "Трасса"
 
 #: src/states_screens/ghost_replay_selection.cpp:164
-#: src/states_screens/online/server_selection.cpp:126
+#: src/states_screens/online/server_selection.cpp:134
 msgctxt "column_name"
 msgid "Players"
 msgstr "Игроки"
@@ -5431,6 +5448,27 @@ msgstr "Ожидание"
 msgid "Offline"
 msgstr "Не в сети"
 
+#: src/states_screens/online/online_profile_settings.cpp:79
+msgid "Enter new E-mail below"
+msgstr "Введите новую электронную почту ниже"
+
+#: src/states_screens/online/online_profile_settings.cpp:84
+msgid "New Email has to be between 5 and 254 characters long!"
+msgstr "Адрес новой почты должен быть в пределах от 5 до 254 символов!"
+
+#: src/states_screens/online/online_profile_settings.cpp:93
+msgid "New Email is invalid!"
+msgstr "Новая почта является недопустимой!"
+
+#: src/states_screens/online/online_profile_settings.cpp:118
+msgid "E-mail changed!"
+msgstr "Электронная почта изменена!"
+
+#: src/states_screens/online/online_profile_settings.cpp:120
+#, c-format
+msgid "Failed to change E-mail: %s"
+msgstr "Не удалось сменить почту: %s"
+
 #. I18N: Shown to players when he is not is not logged in
 #: src/states_screens/online/online_screen.cpp:201
 msgid ""
@@ -5494,51 +5532,55 @@ msgstr "Вы получите письмо с дальнейшими инстр�
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Доступ в интернет отключён, пожалуйста, включите его в настройках"
 
-#: src/states_screens/online/server_selection.cpp:124
+#: src/states_screens/online/server_selection.cpp:132
 msgctxt "column_name"
 msgid "Name"
 msgstr "Имя"
 
-#: src/states_screens/online/server_selection.cpp:125
+#: src/states_screens/online/server_selection.cpp:133
 msgctxt "column_name"
 msgid "Game mode"
 msgstr "Режим игры"
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/online/server_selection.cpp:132
+#: src/states_screens/online/server_selection.cpp:140
 msgctxt "column_name"
 msgid "Owner"
 msgstr "Владелец"
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/online/server_selection.cpp:134
+#: src/states_screens/online/server_selection.cpp:142
 msgctxt "column_name"
 msgid "Distance (km)"
 msgstr "Дистанция (км)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:272
+#: src/states_screens/online/server_selection.cpp:286
 msgid "Unknown"
 msgstr "Неизвестно"
 
 #. I18N: Message shown to user if no IPv4 detected by STK
-#: src/states_screens/online/server_selection.cpp:315
+#: src/states_screens/online/server_selection.cpp:329
 msgid "No IPv4 detected, you may not be able to join any servers."
 msgstr "Не удалось распознать IPv4, скорее всего вы не сможете подключаться к серверам."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
-#: src/states_screens/online/server_selection.cpp:317
+#: src/states_screens/online/server_selection.cpp:331
 msgid "No IPv6 detected, you may not be able to join any servers."
 msgstr "Не удалось распознать IPv6, скорее всего вы не сможете подключаться к серверам."
 
-#: src/states_screens/online/server_selection.cpp:417
+#: src/states_screens/online/server_selection.cpp:465
 msgid "No server is available."
 msgstr "Нет доступных серверов."
 
-#: src/states_screens/online/server_selection.cpp:425
+#: src/states_screens/online/server_selection.cpp:473
 msgid "Fetching servers"
 msgstr "Получение серверов"
+
+#: src/states_screens/online/server_selection.cpp:539
+msgid "Server Bookmarks"
+msgstr "Избранные серверы"
 
 #. I18N: In track screen for networking, clarify voting phase
 #: src/states_screens/online/tracks_screen.cpp:317
@@ -5588,117 +5630,117 @@ msgid "Key binding"
 msgstr "Привязка клавиш"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:106
-#: src/states_screens/options/options_screen_device.cpp:627
+#: src/states_screens/options/options_screen_device.cpp:108
+#: src/states_screens/options/options_screen_device.cpp:629
 msgid "Disable Device"
 msgstr "Отключить устройство"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:108
-#: src/states_screens/options/options_screen_device.cpp:628
+#: src/states_screens/options/options_screen_device.cpp:110
+#: src/states_screens/options/options_screen_device.cpp:630
 msgid "Enable Device"
 msgstr "Включить устройство"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:125
-#: src/states_screens/options/options_screen_device.cpp:633
+#: src/states_screens/options/options_screen_device.cpp:127
+#: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enable Configuration"
 msgstr "Включить схему"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:174
+#: src/states_screens/options/options_screen_device.cpp:176
 msgid "Game Keys"
 msgstr "Игровые клавиши"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:188
+#: src/states_screens/options/options_screen_device.cpp:190
 msgid "Menu Keys"
 msgstr "Клавиши меню"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:264
+#: src/states_screens/options/options_screen_device.cpp:266
 msgid "Steer Left"
 msgstr "Поворот налево"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:267
+#: src/states_screens/options/options_screen_device.cpp:269
 msgid "Steer Right"
 msgstr "Поворот направо"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:270
+#: src/states_screens/options/options_screen_device.cpp:272
 msgid "Accelerate"
 msgstr "Газ"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:273
+#: src/states_screens/options/options_screen_device.cpp:275
 msgid "Brake / Reverse"
 msgstr "Тормоз / задний ход"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:276
+#: src/states_screens/options/options_screen_device.cpp:278
 msgid "Fire"
 msgstr "Огонь"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:279
+#: src/states_screens/options/options_screen_device.cpp:281
 msgid "Nitro"
 msgstr "Нитро"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:285
+#: src/states_screens/options/options_screen_device.cpp:287
 msgid "Look Back"
 msgstr "Оглянуться назад"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:288
+#: src/states_screens/options/options_screen_device.cpp:290
 msgid "Rescue"
 msgstr "Возврат на трассу"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:291
+#: src/states_screens/options/options_screen_device.cpp:293
 msgid "Pause Game"
 msgstr "Поставить на паузу"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:296
+#: src/states_screens/options/options_screen_device.cpp:298
 msgid "Up"
 msgstr "Вверх"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:299
+#: src/states_screens/options/options_screen_device.cpp:301
 msgid "Down"
 msgstr "Вниз"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:302
+#: src/states_screens/options/options_screen_device.cpp:304
 msgid "Left"
 msgstr "Влево"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:305
+#: src/states_screens/options/options_screen_device.cpp:307
 msgid "Right"
 msgstr "Вправо"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:308
+#: src/states_screens/options/options_screen_device.cpp:310
 msgid "Select"
 msgstr "Выбрать"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:311
+#: src/states_screens/options/options_screen_device.cpp:313
 msgid "Cancel/Back"
 msgstr "Отмена / назад"
 
-#: src/states_screens/options/options_screen_device.cpp:402
+#: src/states_screens/options/options_screen_device.cpp:404
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Синий цвет означает конфликт с другой схемой"
 
-#: src/states_screens/options/options_screen_device.cpp:407
+#: src/states_screens/options/options_screen_device.cpp:409
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Красный цвет означает конфликт в текущей схеме"
 
-#: src/states_screens/options/options_screen_device.cpp:514
+#: src/states_screens/options/options_screen_device.cpp:516
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5706,11 +5748,11 @@ msgid ""
 msgstr "Внимание! Не рекомендуется использовать клавишу «Shift», так как при её нажатии все клавиши нижнего регистра могут не работать."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:613
+#: src/states_screens/options/options_screen_device.cpp:615
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Вы действительно хотите удалить эту схему?"
 
-#: src/states_screens/options/options_screen_device.cpp:641
+#: src/states_screens/options/options_screen_device.cpp:643
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "Введите название новой схемы или оставьте его пустым, чтобы вернуть стандартное значение."
 
@@ -5942,70 +5984,70 @@ msgstr "Выход из «%s»"
 msgid "Logging in '%s'"
 msgstr "Вход как «%s»"
 
-#: src/states_screens/options/user_screen.cpp:662
+#: src/states_screens/options/user_screen.cpp:664
 msgid "You can't delete the only player."
 msgstr "Вы не можете удалить единственного игрока."
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:670
+#: src/states_screens/options/user_screen.cpp:672
 #, c-format
 msgid "Do you really want to delete player '%s'?"
 msgstr "Вы действительно хотите удалить игрока «%s»?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:70
+#: src/states_screens/race_gui_base.cpp:71
 msgid "Ready!"
 msgstr "На старт!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:72
+#: src/states_screens/race_gui_base.cpp:73
 msgid "Set!"
 msgstr "Внимание!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:74
+#: src/states_screens/race_gui_base.cpp:75
 msgid "Go!"
 msgstr "Газ!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:76
+#: src/states_screens/race_gui_base.cpp:77
 msgid "GOAL!"
 msgstr "ГОЛ!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:79
+#: src/states_screens/race_gui_base.cpp:80
 #: src/states_screens/race_result_gui.cpp:367
 msgid "Waiting for others"
 msgstr "Ожидание других игроков"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:81
+#: src/states_screens/race_gui_base.cpp:82
 msgid "Waiting for the server"
 msgstr "Ожидание сервера"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:638
+#: src/states_screens/race_gui_base.cpp:639
 #, c-format
 msgid "\"%s\""
 msgstr "«%s»"
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:648
+#: src/states_screens/race_gui_base.cpp:649
 msgid "by"
 msgstr "автор:"
 
-#: src/states_screens/race_gui_base.cpp:756
+#: src/states_screens/race_gui_base.cpp:757
 msgid "Collect nitro!"
 msgstr "Соберите нитро-заряды!"
 
-#: src/states_screens/race_gui_base.cpp:758
+#: src/states_screens/race_gui_base.cpp:759
 msgid "Follow the leader!"
 msgstr "Следуйте за лидером!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:941
+#: src/states_screens/race_gui_base.cpp:942
 #, c-format
 msgid "Top %i"
 msgstr "Топ-%i"
@@ -6067,52 +6109,57 @@ msgid "Do you really want to abort the Grand Prix?"
 msgstr "Вы действительно хотите прервать Гран-при?"
 
 #: src/states_screens/race_result_gui.cpp:591
-#: src/states_screens/race_result_gui.cpp:1403
+#: src/states_screens/race_result_gui.cpp:1431
 msgid "Red Team Wins"
 msgstr "Красная команда победила"
 
 #: src/states_screens/race_result_gui.cpp:593
-#: src/states_screens/race_result_gui.cpp:1407
+#: src/states_screens/race_result_gui.cpp:1435
 msgid "Blue Team Wins"
 msgstr "Синяя команда победила"
 
 #: src/states_screens/race_result_gui.cpp:595
-#: src/states_screens/race_result_gui.cpp:1412
+#: src/states_screens/race_result_gui.cpp:1440
 msgid "It's a draw"
 msgstr "Ничья"
 
-#: src/states_screens/race_result_gui.cpp:828
-#: src/states_screens/race_result_gui.cpp:1256
+#: src/states_screens/race_result_gui.cpp:835
+#, c-format
+msgid "Eliminated after %s"
+msgstr "Выбыл после %s"
+
+#: src/states_screens/race_result_gui.cpp:840
+#: src/states_screens/race_result_gui.cpp:1269
 msgid "Eliminated"
 msgstr "Выбыл(а) из гонки"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1482
-#: src/states_screens/race_result_gui.cpp:1544
+#: src/states_screens/race_result_gui.cpp:1510
+#: src/states_screens/race_result_gui.cpp:1572
 msgid "(Own Goal)"
 msgstr "(автогол)"
 
-#: src/states_screens/race_result_gui.cpp:1623
+#: src/states_screens/race_result_gui.cpp:1651
 #, c-format
 msgid "Track %i/%i"
 msgstr "Трасса %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1707
+#: src/states_screens/race_result_gui.cpp:1735
 msgid "Grand Prix progress:"
 msgstr "Прогресс Гран-при:"
 
-#: src/states_screens/race_result_gui.cpp:1753
+#: src/states_screens/race_result_gui.cpp:1781
 msgid "Highscores"
 msgstr "Результаты"
 
-#: src/states_screens/race_result_gui.cpp:1856
+#: src/states_screens/race_result_gui.cpp:1884
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Лучшее время круга: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1870
+#: src/states_screens/race_result_gui.cpp:1898
 #, c-format
 msgid "by %s"
 msgstr "от %s"
@@ -6362,3 +6409,7 @@ msgstr "Если вам нужна большая надёжность, восп
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
 msgstr "Команда SuperTuxKart"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nAndrei Stepanov, 2015-2021\nBenau, 2018-2020\nDmitry Dubrov, 2015\nLev Belousov, 2020\nMazur Bogdan, 2018-2019\nMIKHAIL DOMCHENKOV, 2020\nOleg, 2015\nValeri, 2016,2018\nVladislav Tananaev, 2018\nОлег Лазарев, 2017,2019\nAleXoundOS\nAlexander 'FONTER' Zinin\nAndrey Olykainen\nDenis Deryabin\nDmitriy Koshel\nDmitry\nDmitry Dubrov\nHelen Antonova\nIgor Shtompel\nKirill Babeev\nKroArtem\nMaxim Kalinin\nSTK-team\nTae-Wong SEO\nadem\npingvin\nДмитрий\nОлег\nJay ZDLin"

@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-22 00:50+0800\n"
-"PO-Revision-Date: 2021-05-22 09:31+0000\n"
+"POT-Creation-Date: 2021-07-14 10:48+0800\n"
+"PO-Revision-Date: 2021-07-14 10:23+0000\n"
 "Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/supertuxkart/supertuxkart/language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -191,7 +191,7 @@ msgstr "Valitse ensisijainen ohjaustapa"
 #. I18N: Control type
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 #. I18N: In the multitouch settings screen
-#: src/states_screens/dialogs/race_paused_dialog.cpp:543
+#: src/states_screens/dialogs/race_paused_dialog.cpp:545
 msgid "Accelerometer"
 msgstr "Kiihtyvyysanturi"
 
@@ -205,13 +205,13 @@ msgstr "Kiihtyvyysanturi"
 #. I18N: Race paused button
 #. I18N: ./data/gui/dialogs/race_paused_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:548
+#: src/states_screens/dialogs/race_paused_dialog.cpp:550
 msgid "Gyroscope"
 msgstr "Gyroskooppi"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: Control type
-#: src/states_screens/dialogs/race_paused_dialog.cpp:538
+#: src/states_screens/dialogs/race_paused_dialog.cpp:540
 msgid "Steering wheel"
 msgstr "Ratti"
 
@@ -542,8 +542,8 @@ msgstr "Sulje"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/message_dialog.cpp:125
-#: src/states_screens/dialogs/message_dialog.cpp:136
+#: src/states_screens/dialogs/message_dialog.cpp:126
+#: src/states_screens/dialogs/message_dialog.cpp:137
 msgid "OK"
 msgstr "OK"
 
@@ -639,7 +639,7 @@ msgstr "Vaihda salasana"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:140
+#: src/states_screens/dialogs/race_paused_dialog.cpp:141
 msgid "Back to Race"
 msgstr "Takaisin kilpailuun"
 
@@ -651,7 +651,7 @@ msgstr "Takaisin aulaan"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Race paused button
-#: src/states_screens/dialogs/race_paused_dialog.cpp:144
+#: src/states_screens/dialogs/race_paused_dialog.cpp:146
 msgid "Restart Race"
 msgstr "Käynnistä kilpailu uudelleen"
 
@@ -878,6 +878,12 @@ msgstr "Salasana"
 #. I18N: In the server info dialog
 msgid "Join"
 msgstr "Liity"
+
+#. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
+#. I18N: In the server info dialog
+#: src/states_screens/dialogs/server_info_dialog.cpp:274
+msgid "Bookmark this server"
+msgstr "Lisää palvelin kirjanmerkkeihin"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -1880,6 +1886,11 @@ msgstr "Salasana:"
 msgid "Change"
 msgstr "Vaihda"
 
+#. I18N: ./data/gui/screens/online/profile_settings.stkgui
+#. I18N: In the online account settings screen
+msgid "E-mail:"
+msgstr "Sähköposti:"
+
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
 msgid "Create User"
@@ -1925,6 +1936,7 @@ msgid ""
 msgstr "Voit pelata luomatta verkkotiliä valitsemalla \"Yhteydetön tili\". Yhteydettömällä tilillä et voi yhdistää kavereidesi kanssa, äänestää lisäosia jne. Lue yksityisyyssuoja osoitteessa http://privacy.supertuxkart.net"
 
 #. I18N: ./data/gui/screens/online/server_selection.stkgui
+#: src/states_screens/online/server_selection.cpp:541
 msgid "Server Selection"
 msgstr "Palvelinvalinta"
 
@@ -2102,8 +2114,8 @@ msgstr "Poista näppäinasetukset"
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:123
-#: src/states_screens/options/options_screen_device.cpp:632
+#: src/states_screens/options/options_screen_device.cpp:125
+#: src/states_screens/options/options_screen_device.cpp:634
 msgid "Disable Configuration"
 msgstr "Poista asetukset käytöstä"
 
@@ -2550,6 +2562,10 @@ msgstr "Xue"
 msgid "Antediluvian Abyss"
 msgstr "Vedenalainen maailma"
 
+#. I18N: ../stk-assets/tracks/alien_signal/track.xml
+msgid "Alien Signal"
+msgstr "Muukalaissignaali"
+
 #. I18N: ../stk-assets/tracks/arena_candela_city/track.xml
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
@@ -2801,21 +2817,21 @@ msgid ""
 "created."
 msgstr "Asetustiedosto oli liian vanha, joten se poistettiin ja uusi luodaan tilalle."
 
-#: src/graphics/irr_driver.cpp:657
+#: src/graphics/irr_driver.cpp:664
 msgid "Video recording started."
 msgstr "Videon tallennus aloitettu."
 
-#: src/graphics/irr_driver.cpp:664
+#: src/graphics/irr_driver.cpp:671
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "Video tallennettu sijaintiin \"%s\"."
 
-#: src/graphics/irr_driver.cpp:668
+#: src/graphics/irr_driver.cpp:675
 msgid "Encoding progress:"
 msgstr "Pakkauksen edistyminen:"
 
-#: src/graphics/irr_driver.cpp:1817 src/graphics/irr_driver.cpp:1852
-#: src/graphics/irr_driver.cpp:1857
+#: src/graphics/irr_driver.cpp:1824 src/graphics/irr_driver.cpp:1859
+#: src/graphics/irr_driver.cpp:1864
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, Ping: %d ms"
@@ -2854,8 +2870,8 @@ msgstr "Nitron tehokkuus"
 #: src/karts/controller/player_controller.cpp:413
 #: src/network/protocols/client_lobby.cpp:824
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1476
-#: src/states_screens/race_result_gui.cpp:1538
+#: src/states_screens/race_result_gui.cpp:1504
+#: src/states_screens/race_result_gui.cpp:1566
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (tasoitettu)"
@@ -3538,7 +3554,7 @@ msgstr "Kisa päättyi osaltasi sijoitukseen %d!"
 msgid "%s left the game."
 msgstr "%s poistui pelistä."
 
-#: src/main.cpp:2012
+#: src/main.cpp:2013
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3547,16 +3563,16 @@ msgid ""
 "Internet\")."
 msgstr "SuperTuxKart voi yhdistää palvelimelle ladatakseen lisäosia sekä ilmoittaakseen sinulle päivityksistä. Lue yksityisyyskäytäntömme osoitteessa https://supertuxkart.net/Privacy. Haluatko että tämä kyseinen ominaisuus kytketään päälle? (Muuttaaksesi tätä asetusta myöhemmin, mene asetuksiin, valitse välilehti 'Yleistä', ja muokkaa \"Yhdistä internetiin\") "
 
-#: src/main.cpp:2361
+#: src/main.cpp:2362
 msgid "Your screen resolution is too low to run STK."
 msgstr "Näyttösi resoluutio on liian matala STK:n pelaamista varten."
 
-#: src/main.cpp:2396
+#: src/main.cpp:2397
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "Ajuriversiosi on liian vanha. Asenna näytönohjaimen uusin ajuri."
 
-#: src/main.cpp:2414
+#: src/main.cpp:2415
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3676,7 +3692,7 @@ msgid "Bad network connection is detected."
 msgstr "Verkkoyhteydessä havaittiin ongelmia."
 
 #: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3812
+#: src/network/protocols/server_lobby.cpp:3847
 msgid "Bot"
 msgstr "Botti"
 
@@ -3702,8 +3718,8 @@ msgstr "Palvelimen nimi: %s"
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:695
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:92
-#: src/states_screens/dialogs/server_info_dialog.cpp:84
-#: src/states_screens/race_result_gui.cpp:1842
+#: src/states_screens/dialogs/server_info_dialog.cpp:92
+#: src/states_screens/race_result_gui.cpp:1870
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Vaikeustaso: %s"
@@ -3716,7 +3732,7 @@ msgstr "Pelaajia enintään: %d"
 
 #. I18N: In server info dialog
 #: src/network/protocols/client_lobby.cpp:713
-#: src/states_screens/dialogs/server_info_dialog.cpp:88
+#: src/states_screens/dialogs/server_info_dialog.cpp:96
 #, c-format
 msgid "Game mode: %s"
 msgstr "Pelitila: %s"
@@ -3886,23 +3902,23 @@ msgstr "Kaikki vastaan kaikki"
 msgid "Capture The Flag"
 msgstr "Lipunryöstö"
 
-#: src/online/online_player_profile.cpp:454
+#: src/online/online_player_profile.cpp:455
 #, c-format
 msgid "%s is now online."
 msgstr "%s on nyt linjoilla."
 
-#: src/online/online_player_profile.cpp:458
+#: src/online/online_player_profile.cpp:459
 #, c-format
 msgid "%s and %s are now online."
 msgstr "%s ja %s ovat nyt linjoilla."
 
-#: src/online/online_player_profile.cpp:463
+#: src/online/online_player_profile.cpp:464
 #, c-format
 msgid "%s, %s and %s are now online."
 msgstr "%s, %s ja %s ovat nyt linjoilla."
 
 #. I18N: Only used for count > 3
-#: src/online/online_player_profile.cpp:469
+#: src/online/online_player_profile.cpp:470
 #, c-format
 msgid "%d friend is now online."
 msgid_plural "%d friends are now online."
@@ -3910,19 +3926,19 @@ msgstr[0] "%d kaveri on nyt linjoilla."
 msgstr[1] "%d kaveria on nyt linjoilla."
 
 #. I18N: Tell your friend if he is on any server in game
-#: src/online/online_player_profile.cpp:518
+#: src/online/online_player_profile.cpp:519
 #, c-format
 msgid "%s is now on server \"%s\"."
 msgstr "%s on nyt palvelimella \"%s\"."
 
-#: src/online/online_player_profile.cpp:549
+#: src/online/online_player_profile.cpp:550
 #, c-format
 msgid "You have %d new friend request!"
 msgid_plural "You have %d new friend requests!"
 msgstr[0] "Sinulla on %d uusi kaveripyyntö!"
 msgstr[1] "Sinulla on %d uutta kaveripyyntöä!"
 
-#: src/online/online_player_profile.cpp:555
+#: src/online/online_player_profile.cpp:556
 msgid "You have a new friend request!"
 msgstr "Sinulla on uusi kaveripyyntö!"
 
@@ -4003,17 +4019,17 @@ msgid "Not installed"
 msgstr "Ei asennettu"
 
 #. I18N: as in: The Old Island by Johannes Sjolund
-#: src/states_screens/addons_screen.cpp:322
+#: src/states_screens/addons_screen.cpp:325
 #, c-format
 msgctxt "addons"
 msgid "%s by %s"
 msgstr "%s, tekijä: %s"
 
-#: src/states_screens/addons_screen.cpp:443
+#: src/states_screens/addons_screen.cpp:446
 msgid "Please wait while addons are updated"
 msgstr "Odota, lisäosia päivitetään"
 
-#: src/states_screens/addons_screen.cpp:523
+#: src/states_screens/addons_screen.cpp:526
 #: src/states_screens/main_menu_screen.cpp:626
 msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
@@ -4052,10 +4068,6 @@ msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%d areena ei käytettävissä yksinpelissä."
 msgstr[1] "%d areenaa ei käytettävissä yksinpelissä."
-
-#: src/states_screens/credits.cpp:184
-msgid "translator-credits"
-msgstr "Jiri Grönroos\n\nLaunchpad Contributions:\n  Dawid Gan https://launchpad.net/~deveee\n  Joonas Nurmi https://launchpad.net/~joonas-nurmi\n  Kristian Laakkonen https://launchpad.net/~kristian-laakkonen\n  STK-team https://launchpad.net/~stk"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4340,7 +4352,7 @@ msgstr "Banaaneja kerätty"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:256
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:260
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
-#: src/states_screens/options/options_screen_device.cpp:282
+#: src/states_screens/options/options_screen_device.cpp:284
 msgid "Skidding"
 msgstr "Sivuluisu"
 
@@ -4649,7 +4661,7 @@ msgstr "Käänteinen"
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
 #: src/states_screens/high_score_selection.cpp:131
-#: src/states_screens/online/server_selection.cpp:127
+#: src/states_screens/online/server_selection.cpp:135
 msgctxt "column_name"
 msgid "Difficulty"
 msgstr "Vaikeustaso"
@@ -4687,7 +4699,7 @@ msgstr "Versio"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:107
-#: src/states_screens/dialogs/message_dialog.cpp:130
+#: src/states_screens/dialogs/message_dialog.cpp:131
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
 #: src/states_screens/high_score_selection.cpp:208
@@ -4818,20 +4830,20 @@ msgstr "Takaisin taisteluun"
 msgid "Setup New Game"
 msgstr "Määritä uusi peli"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:134
+#: src/states_screens/dialogs/race_paused_dialog.cpp:135
 msgid "Restart Battle"
 msgstr "Käynnistä taistelu uudelleen"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:136
+#: src/states_screens/dialogs/race_paused_dialog.cpp:137
 msgid "Exit Battle"
 msgstr "Poistu taistelusta"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:143
+#: src/states_screens/dialogs/race_paused_dialog.cpp:144
 #: src/states_screens/race_result_gui.cpp:321
 msgid "Setup New Race"
 msgstr "Uusi kilpailu"
 
-#: src/states_screens/dialogs/race_paused_dialog.cpp:146
+#: src/states_screens/dialogs/race_paused_dialog.cpp:148
 msgid "Exit Race"
 msgstr "Poistu kilpailusta"
 
@@ -4873,7 +4885,7 @@ msgstr "Haamu-uusinta"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1832
+#: src/states_screens/race_result_gui.cpp:1860
 #, c-format
 msgid "Laps: %i"
 msgstr "Kierroksia: %i"
@@ -4923,38 +4935,43 @@ msgstr "Jalkapallopelin tyyppi"
 
 #. I18N: In the server info dialog, show the server location with
 #. country name (based on IP geolocation)
-#: src/states_screens/dialogs/server_info_dialog.cpp:97
+#: src/states_screens/dialogs/server_info_dialog.cpp:105
 #, c-format
 msgid "Server location: %s"
 msgstr "Palvelimen sijainti: %s"
 
 #. I18N: In server info dialog, showing the current track playing in server
-#: src/states_screens/dialogs/server_info_dialog.cpp:106
+#: src/states_screens/dialogs/server_info_dialog.cpp:114
 #, c-format
 msgid "Current track: %s"
 msgstr "Nykyinen rata: %s"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:116
+#: src/states_screens/dialogs/server_info_dialog.cpp:124
 msgid "Rank"
 msgstr "Sijoitus"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:119
+#: src/states_screens/dialogs/server_info_dialog.cpp:127
 msgid "Player"
 msgstr "Pelaaja"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:122
+#: src/states_screens/dialogs/server_info_dialog.cpp:130
 msgid "Scores"
 msgstr "Pisteet"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:125
+#: src/states_screens/dialogs/server_info_dialog.cpp:133
 msgid "Time played"
 msgstr "Peliaika"
+
+#: src/states_screens/dialogs/server_info_dialog.cpp:265
+#: src/states_screens/dialogs/server_info_dialog.cpp:279
+msgid "Remove from bookmarks"
+msgstr "Poista kirjanmerkeistä"
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:130
 msgid "Input device already exists."
@@ -5117,7 +5134,7 @@ msgid "Track"
 msgstr "Rata"
 
 #: src/states_screens/ghost_replay_selection.cpp:164
-#: src/states_screens/online/server_selection.cpp:126
+#: src/states_screens/online/server_selection.cpp:134
 msgctxt "column_name"
 msgid "Players"
 msgstr "Pelaajat"
@@ -5410,6 +5427,27 @@ msgstr "Odottaa"
 msgid "Offline"
 msgstr "Ei linjoilla"
 
+#: src/states_screens/online/online_profile_settings.cpp:79
+msgid "Enter new E-mail below"
+msgstr "Kirjoita uusi sähköpostiosoite alapuolelle"
+
+#: src/states_screens/online/online_profile_settings.cpp:84
+msgid "New Email has to be between 5 and 254 characters long!"
+msgstr "Uuden sähköpostiosoitteen tulee olla 5-254 merkkiä pitkä!"
+
+#: src/states_screens/online/online_profile_settings.cpp:93
+msgid "New Email is invalid!"
+msgstr "Uusi sähköpostiosoite on virheellinen!"
+
+#: src/states_screens/online/online_profile_settings.cpp:118
+msgid "E-mail changed!"
+msgstr "Sähköpostiosoite vaihdettu!"
+
+#: src/states_screens/online/online_profile_settings.cpp:120
+#, c-format
+msgid "Failed to change E-mail: %s"
+msgstr "Sähköpostiosoitteen vaihtaminen epäonnistui: %s"
+
 #. I18N: Shown to players when he is not is not logged in
 #: src/states_screens/online/online_screen.cpp:201
 msgid ""
@@ -5473,51 +5511,55 @@ msgstr "Saat sähköpostiviestin, jossa on lisäohjeet tilin aktivointia varten.
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "Pääsy internetiin on estetty, muuta valintaa asetuksista"
 
-#: src/states_screens/online/server_selection.cpp:124
+#: src/states_screens/online/server_selection.cpp:132
 msgctxt "column_name"
 msgid "Name"
 msgstr "Nimi"
 
-#: src/states_screens/online/server_selection.cpp:125
+#: src/states_screens/online/server_selection.cpp:133
 msgctxt "column_name"
 msgid "Game mode"
 msgstr "Pelimuoto"
 
 #. I18N: In server selection screen, owner of server, only displayed
 #. if it's localhost or friends'
-#: src/states_screens/online/server_selection.cpp:132
+#: src/states_screens/online/server_selection.cpp:140
 msgctxt "column_name"
 msgid "Owner"
 msgstr "Omistaja"
 
 #. I18N: In server selection screen, distance to server
-#: src/states_screens/online/server_selection.cpp:134
+#: src/states_screens/online/server_selection.cpp:142
 msgctxt "column_name"
 msgid "Distance (km)"
 msgstr "Etäisyys (km)"
 
 #. I18N: In server selection screen, unknown distance to server
-#: src/states_screens/online/server_selection.cpp:272
+#: src/states_screens/online/server_selection.cpp:286
 msgid "Unknown"
 msgstr "Tuntematon"
 
 #. I18N: Message shown to user if no IPv4 detected by STK
-#: src/states_screens/online/server_selection.cpp:315
+#: src/states_screens/online/server_selection.cpp:329
 msgid "No IPv4 detected, you may not be able to join any servers."
 msgstr "IPv4:ää ei havaittu, liittyminen palvelimille ei välttämättä ole mahdollista."
 
 #. I18N: Message shown to user if no IPv6 detected by STK
-#: src/states_screens/online/server_selection.cpp:317
+#: src/states_screens/online/server_selection.cpp:331
 msgid "No IPv6 detected, you may not be able to join any servers."
 msgstr "IPv6:tta ei havaittu, liittyminen palvelimille ei välttämättä ole mahdollista."
 
-#: src/states_screens/online/server_selection.cpp:417
+#: src/states_screens/online/server_selection.cpp:465
 msgid "No server is available."
 msgstr "Ei palvelinta käytettävissä."
 
-#: src/states_screens/online/server_selection.cpp:425
+#: src/states_screens/online/server_selection.cpp:473
 msgid "Fetching servers"
 msgstr "Noudetaan palvelimia"
+
+#: src/states_screens/online/server_selection.cpp:539
+msgid "Server Bookmarks"
+msgstr "Palvelinten kirjanmerkit"
 
 #. I18N: In track screen for networking, clarify voting phase
 #: src/states_screens/online/tracks_screen.cpp:317
@@ -5567,117 +5609,117 @@ msgid "Key binding"
 msgstr "Näppäinsidos"
 
 #. I18N: button to disable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:106
-#: src/states_screens/options/options_screen_device.cpp:627
+#: src/states_screens/options/options_screen_device.cpp:108
+#: src/states_screens/options/options_screen_device.cpp:629
 msgid "Disable Device"
 msgstr "Poista laite käytöstä"
 
 #. I18N: button to enable a gamepad configuration
-#: src/states_screens/options/options_screen_device.cpp:108
-#: src/states_screens/options/options_screen_device.cpp:628
+#: src/states_screens/options/options_screen_device.cpp:110
+#: src/states_screens/options/options_screen_device.cpp:630
 msgid "Enable Device"
 msgstr "Ota laite käyttöön"
 
 #. I18N: button to enable a keyboard configuration
-#: src/states_screens/options/options_screen_device.cpp:125
-#: src/states_screens/options/options_screen_device.cpp:633
+#: src/states_screens/options/options_screen_device.cpp:127
+#: src/states_screens/options/options_screen_device.cpp:635
 msgid "Enable Configuration"
 msgstr "Ota asetukset käyttöön"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:174
+#: src/states_screens/options/options_screen_device.cpp:176
 msgid "Game Keys"
 msgstr "Pelinäppäimet"
 
 #. I18N: Key binding section
-#: src/states_screens/options/options_screen_device.cpp:188
+#: src/states_screens/options/options_screen_device.cpp:190
 msgid "Menu Keys"
 msgstr "Valikkonäppäimet"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:264
+#: src/states_screens/options/options_screen_device.cpp:266
 msgid "Steer Left"
 msgstr "Ohjaa vasemmalle"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:267
+#: src/states_screens/options/options_screen_device.cpp:269
 msgid "Steer Right"
 msgstr "Ohjaa oikealle"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:270
+#: src/states_screens/options/options_screen_device.cpp:272
 msgid "Accelerate"
 msgstr "Kiihdytä"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:273
+#: src/states_screens/options/options_screen_device.cpp:275
 msgid "Brake / Reverse"
 msgstr "Jarru/peruutus"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:276
+#: src/states_screens/options/options_screen_device.cpp:278
 msgid "Fire"
 msgstr "Ampumisnäppäin"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:279
+#: src/states_screens/options/options_screen_device.cpp:281
 msgid "Nitro"
 msgstr "Nitro"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:285
+#: src/states_screens/options/options_screen_device.cpp:287
 msgid "Look Back"
 msgstr "Katso taakse"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:288
+#: src/states_screens/options/options_screen_device.cpp:290
 msgid "Rescue"
 msgstr "Pelastus"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:291
+#: src/states_screens/options/options_screen_device.cpp:293
 msgid "Pause Game"
 msgstr "Pysäytä peli"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:296
+#: src/states_screens/options/options_screen_device.cpp:298
 msgid "Up"
 msgstr "Ylös"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:299
+#: src/states_screens/options/options_screen_device.cpp:301
 msgid "Down"
 msgstr "Alas"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:302
+#: src/states_screens/options/options_screen_device.cpp:304
 msgid "Left"
 msgstr "Vasen"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:305
+#: src/states_screens/options/options_screen_device.cpp:307
 msgid "Right"
 msgstr "Oikea"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:308
+#: src/states_screens/options/options_screen_device.cpp:310
 msgid "Select"
 msgstr "Valitse"
 
 #. I18N: Key binding name
-#: src/states_screens/options/options_screen_device.cpp:311
+#: src/states_screens/options/options_screen_device.cpp:313
 msgid "Cancel/Back"
 msgstr "Peru/takaisin"
 
-#: src/states_screens/options/options_screen_device.cpp:402
+#: src/states_screens/options/options_screen_device.cpp:404
 msgid "* A blue item means a conflict with another configuration"
 msgstr "* Sininen merkintä tarkoittaa ristiriitaa toisen asetuksen kanssa"
 
-#: src/states_screens/options/options_screen_device.cpp:407
+#: src/states_screens/options/options_screen_device.cpp:409
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* Punainen merkintä tarkoittaa ristiriitaa nykyisten asetusten kanssa"
 
-#: src/states_screens/options/options_screen_device.cpp:514
+#: src/states_screens/options/options_screen_device.cpp:516
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5685,11 +5727,11 @@ msgid ""
 msgstr "Varoitus: Shift-näppäimen käyttöä ei suositella. Shift-näppäintä painettaessa kaikki ne näppäimet, jotka tuottavat eri merkin yhdessä Shift-näppäimen kanssa, eivät toimi."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:613
+#: src/states_screens/options/options_screen_device.cpp:615
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "Haluatko varmasti poistaa nämä asetukset?"
 
-#: src/states_screens/options/options_screen_device.cpp:641
+#: src/states_screens/options/options_screen_device.cpp:643
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "Syötä asetuksille uusi nimi, jätä tyhjäksi palataksesi vakioarvoihin."
 
@@ -5921,70 +5963,70 @@ msgstr "Kirjataan ulos '%s'"
 msgid "Logging in '%s'"
 msgstr "Kirjataan sisään '%s'"
 
-#: src/states_screens/options/user_screen.cpp:662
+#: src/states_screens/options/user_screen.cpp:664
 msgid "You can't delete the only player."
 msgstr "Et voi poistaa ainoaa pelaajaa."
 
 #. I18N: In the player info dialog (when deleting)
-#: src/states_screens/options/user_screen.cpp:670
+#: src/states_screens/options/user_screen.cpp:672
 #, c-format
 msgid "Do you really want to delete player '%s'?"
 msgstr "Haluatko varmasti poistaa pelaajan '%s'?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:70
+#: src/states_screens/race_gui_base.cpp:71
 msgid "Ready!"
 msgstr "Paikoillenne!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:72
+#: src/states_screens/race_gui_base.cpp:73
 msgid "Set!"
 msgstr "Valmiit!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:74
+#: src/states_screens/race_gui_base.cpp:75
 msgid "Go!"
 msgstr "Aja!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:76
+#: src/states_screens/race_gui_base.cpp:77
 msgid "GOAL!"
 msgstr "MAALI!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:79
+#: src/states_screens/race_gui_base.cpp:80
 #: src/states_screens/race_result_gui.cpp:367
 msgid "Waiting for others"
 msgstr "Odotetaan muita"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:81
+#: src/states_screens/race_gui_base.cpp:82
 msgid "Waiting for the server"
 msgstr "Odotetaan palvelinta"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:638
+#: src/states_screens/race_gui_base.cpp:639
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:648
+#: src/states_screens/race_gui_base.cpp:649
 msgid "by"
 msgstr "tekijä:"
 
-#: src/states_screens/race_gui_base.cpp:756
+#: src/states_screens/race_gui_base.cpp:757
 msgid "Collect nitro!"
 msgstr "Kerää nitroa!"
 
-#: src/states_screens/race_gui_base.cpp:758
+#: src/states_screens/race_gui_base.cpp:759
 msgid "Follow the leader!"
 msgstr "Seuraa johtajaa!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:941
+#: src/states_screens/race_gui_base.cpp:942
 #, c-format
 msgid "Top %i"
 msgstr "%i:n kärki"
@@ -6046,52 +6088,57 @@ msgid "Do you really want to abort the Grand Prix?"
 msgstr "Haluatko varmasti keskeyttää Grand Prixin?"
 
 #: src/states_screens/race_result_gui.cpp:591
-#: src/states_screens/race_result_gui.cpp:1403
+#: src/states_screens/race_result_gui.cpp:1431
 msgid "Red Team Wins"
 msgstr "Punainen joukkue voittaa"
 
 #: src/states_screens/race_result_gui.cpp:593
-#: src/states_screens/race_result_gui.cpp:1407
+#: src/states_screens/race_result_gui.cpp:1435
 msgid "Blue Team Wins"
 msgstr "Sininen joukkue voittaa"
 
 #: src/states_screens/race_result_gui.cpp:595
-#: src/states_screens/race_result_gui.cpp:1412
+#: src/states_screens/race_result_gui.cpp:1440
 msgid "It's a draw"
 msgstr "Tasapeli"
 
-#: src/states_screens/race_result_gui.cpp:828
-#: src/states_screens/race_result_gui.cpp:1256
+#: src/states_screens/race_result_gui.cpp:835
+#, c-format
+msgid "Eliminated after %s"
+msgstr ""
+
+#: src/states_screens/race_result_gui.cpp:840
+#: src/states_screens/race_result_gui.cpp:1269
 msgid "Eliminated"
 msgstr "Poistettu"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1482
-#: src/states_screens/race_result_gui.cpp:1544
+#: src/states_screens/race_result_gui.cpp:1510
+#: src/states_screens/race_result_gui.cpp:1572
 msgid "(Own Goal)"
 msgstr "(Oma maali)"
 
-#: src/states_screens/race_result_gui.cpp:1623
+#: src/states_screens/race_result_gui.cpp:1651
 #, c-format
 msgid "Track %i/%i"
 msgstr "Rata %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1707
+#: src/states_screens/race_result_gui.cpp:1735
 msgid "Grand Prix progress:"
 msgstr "Grand Prix'n tilanne:"
 
-#: src/states_screens/race_result_gui.cpp:1753
+#: src/states_screens/race_result_gui.cpp:1781
 msgid "Highscores"
 msgstr "Huippupisteet"
 
-#: src/states_screens/race_result_gui.cpp:1856
+#: src/states_screens/race_result_gui.cpp:1884
 #, c-format
 msgid "Best lap time: %s"
 msgstr "Paras kierrosaika: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1870
+#: src/states_screens/race_result_gui.cpp:1898
 #, c-format
 msgid "by %s"
 msgstr "pelaaja %s"
@@ -6341,3 +6388,7 @@ msgstr "Jos tarvitset enemmän vakautta, harkitse vakaan version käyttöä: %s"
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
 msgstr "SuperTuxKart-tiimi"
+
+#: src/states_screens/credits.cpp:209
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nJaakoppi Horila, 2018-2019\nJiri Grönroos, 2015-2021\nKristian Laakkonen, 2018-2019\nMarkus Mikkonen, 2021\nOi Suomi On!, 2020-2021\nLaunchpad Contributions:\nDawid Gan\nJoonas Nurmi\nKristian Laakkonen\nSTK-team"
