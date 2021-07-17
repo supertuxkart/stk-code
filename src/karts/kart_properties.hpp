@@ -159,14 +159,6 @@ private:
     /** Wheel base of the kart. */
     float       m_wheel_base;
 
-    /** The maximum roll a kart graphics should show when driving in a fast
-     *  curve. This is read in as degrees, but stored in radians. */
-     float      m_max_lean;
-
-     /** The speed with which the roll (when leaning in a curve) changes
-      *  (in radians/second). */
-     float      m_lean_speed;
-
     /** Engine sound effect. */
     std::string m_engine_sfx_type;
 
@@ -208,6 +200,15 @@ private:
                              const std::string &node);
     void combineCharacteristics(HandicapLevel h);
 
+    void setWheelBase(float kart_length)
+    {
+        // The longer the kart,the bigger its turn radius if using an identical
+        // wheel base, exactly proportionally to its length.
+        // The wheel base is used to compensate this
+        // We divide by 1.425 to have a default turn radius which conforms
+        // closely (+-0,1%) with the specifications in kart_characteristics.xml
+        m_wheel_base = fabsf(kart_length / 1.425f);
+    }
 public:
     /** Returns the string representation of a handicap level. */
     static std::string      getHandicapAsString(HandicapLevel h);
@@ -217,6 +218,13 @@ public:
     void  copyForPlayer     (const KartProperties *source,
                              HandicapLevel h = HANDICAP_NONE);
     void  adjustForOnlineAddonKart(const KartProperties* source);
+    void  updateForOnlineKart(const std::string& id, const Vec3& gravity_shift,
+                              float kart_length)
+    {
+        m_ident = id;
+        m_gravity_center_shift = gravity_shift;
+        setWheelBase(kart_length);
+    }
     void  copyFrom          (const KartProperties *source);
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);

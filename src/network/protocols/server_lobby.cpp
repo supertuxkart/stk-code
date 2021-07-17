@@ -26,6 +26,7 @@
 #include "karts/controller/player_controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/official_karts.hpp"
 #include "modes/capture_the_flag.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
@@ -207,8 +208,6 @@ ServerLobby::ServerLobby() : LobbyProtocol()
 {
     m_client_server_host_id.store(0);
     m_lobby_players.store(0);
-    std::vector<int> all_k =
-        kart_properties_manager->getKartsInGroup("standard");
     std::vector<int> all_t =
         track_manager->getTracksInGroup("standard");
     std::vector<int> all_arenas =
@@ -218,16 +217,7 @@ ServerLobby::ServerLobby() : LobbyProtocol()
     all_t.insert(all_t.end(), all_arenas.begin(), all_arenas.end());
     all_t.insert(all_t.end(), all_soccers.begin(), all_soccers.end());
 
-    for (int kart : all_k)
-    {
-        const KartProperties* kp = kart_properties_manager->getKartById(kart);
-        // Some distro put kart itself, ignore it online for the rest of stk
-        // user
-        if (kp->getIdent() == "geeko")
-            continue;
-        if (!kp->isAddon())
-            m_official_kts.first.insert(kp->getIdent());
-    }
+    m_official_kts.first = OfficialKarts::getOfficialKarts();
     for (int track : all_t)
     {
         Track* t = track_manager->getTrack(track);
@@ -614,9 +604,18 @@ void ServerLobby::updateAddons()
             m_addon_kts.second.insert(t->getIdent());
     }
 
-    auto all_k = kart_properties_manager->getAllAvailableKarts();
-    if (all_k.size() >= 65536)
-        all_k.resize(65535);
+    std::vector<std::string> all_k;
+    for (unsigned i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* kp = kart_properties_manager->getKartById(i);
+        if (kp->isAddon())
+            all_k.push_back(kp->getIdent());
+    }
+    std::set<std::string> oks = OfficialKarts::getOfficialKarts();
+    if (all_k.size() >= 65536 - (unsigned)oks.size())
+        all_k.resize(65535 - (unsigned)oks.size());
+    for (const std::string& k : oks)
+        all_k.push_back(k);
     if (ServerConfig::m_live_players)
         m_available_kts.first = m_official_kts.first;
     else

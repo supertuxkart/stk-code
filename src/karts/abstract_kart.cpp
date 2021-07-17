@@ -26,9 +26,11 @@
 #include "karts/kart_model.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/official_karts.hpp"
 #include "network/network_config.hpp"
 #include "physics/physics.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 
 /** Creates a kart.
  *  \param ident The identifier of the kart.
@@ -81,6 +83,8 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
     m_kart_properties.reset(new KartProperties());
     const KartProperties* kp = kart_properties_manager->getKart(new_ident);
     const KartProperties* kp_addon = NULL;
+    const KartProperties* official_kp = NULL;
+    Vec3 gravity_shift;
     if (NetworkConfig::get()->isNetworking() &&
         NetworkConfig::get()->useTuxHitboxAddon() && kp && kp->isAddon())
     {
@@ -92,17 +96,30 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
     }
     if (kp == NULL)
     {
+        bool official_kart = !StringUtils::startsWith(new_ident, "addon_");
         if (!NetworkConfig::get()->isNetworking() ||
-            !NetworkConfig::get()->useTuxHitboxAddon())
+            (!NetworkConfig::get()->useTuxHitboxAddon() && !official_kart))
         {
             Log::warn("Abstract_Kart", "Unknown kart %s, fallback to tux",
                 new_ident.c_str());
         }
         kp = kart_properties_manager->getKart(std::string("tux"));
+        if (NetworkConfig::get()->isNetworking() && official_kart)
+        {
+            official_kp = OfficialKarts::getKartByIdent(new_ident,
+                &m_kart_width, &m_kart_height, &m_kart_length, &gravity_shift);
+            if (official_kp)
+                kp = official_kp;
+        }
     }
     m_kart_properties->copyForPlayer(kp, handicap);
     if (kp_addon)
         m_kart_properties->adjustForOnlineAddonKart(kp_addon);
+    if (official_kp)
+    {
+        m_kart_properties->updateForOnlineKart(new_ident, gravity_shift,
+            m_kart_length);
+    }
     m_name = m_kart_properties->getName();
     m_handicap = handicap;
     m_kart_animation  = NULL;
@@ -119,9 +136,12 @@ void AbstractKart::loadKartProperties(const std::string& new_ident,
         m_kart_model.reset(kp_addon->getKartModelCopy(ri));
     else
         m_kart_model.reset(m_kart_properties->getKartModelCopy(ri));
-    m_kart_width  = kp->getMasterKartModel().getWidth();
-    m_kart_height = kp->getMasterKartModel().getHeight();
-    m_kart_length = kp->getMasterKartModel().getLength();
+    if (official_kp == NULL)
+    {
+        m_kart_width  = kp->getMasterKartModel().getWidth();
+        m_kart_height = kp->getMasterKartModel().getHeight();
+        m_kart_length = kp->getMasterKartModel().getLength();
+    }
     m_kart_highest_point = m_kart_model->getHighestPoint();
     m_wheel_graphics_position = m_kart_model->getWheelsGraphicsPosition();
 }   // loadKartProperties

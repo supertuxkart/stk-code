@@ -36,6 +36,7 @@
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "karts/official_karts.hpp"
 #include "modes/linear_world.hpp"
 #include "network/crypto.hpp"
 #include "network/event.hpp"
@@ -1785,10 +1786,20 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
 // ----------------------------------------------------------------------------
 void ClientLobby::getKartsTracksNetworkString(BareNetworkString* ns)
 {
-    auto all_k = kart_properties_manager->getAllAvailableKarts();
+    std::vector<std::string> all_k;
+    for (unsigned i = 0; i < kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* kp = kart_properties_manager->getKartById(i);
+        if (kp->isAddon())
+            all_k.push_back(kp->getIdent());
+    }
+    std::set<std::string> oks = OfficialKarts::getOfficialKarts();
+    if (all_k.size() >= 65536 - (unsigned)oks.size())
+        all_k.resize(65535 - (unsigned)oks.size());
+    for (const std::string& k : oks)
+        all_k.push_back(k);
+
     auto all_t = track_manager->getAllTrackIdentifiers();
-    if (all_k.size() >= 65536)
-        all_k.resize(65535);
     if (all_t.size() >= 65536)
         all_t.resize(65535);
     ns->addUInt16((uint16_t)all_k.size()).addUInt16((uint16_t)all_t.size());
