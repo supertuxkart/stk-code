@@ -1,0 +1,31 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: SuperTuxKart
+Upstream-Contact:
+ Marianne Gagnon <auria.mg@gmail.com>
+ Jean-Manuel Clémençon <sam.un@protonmail.com>
+Source: https://supertuxkart.net
+
+Files:
+ blur_bg_button.png
+ blur_bg_button_focus.png
+ drift.png
+ nitro.png
+ nitro_empty.png
+ pause.png
+ steering_wheel.png
+ thunderbird_reset.png
+ wing_mirror.png
+Copyright: Copyright 2017 Néd J. Édoire
+License: CC BY-SA 4.0
+Comment: Icons originally made for SuperTuxKart UI on Android.
+
+Files:
+ accelerator.png
+ accelerator_handle.png
+ accelerator_icon.png
+ gyroscope_icon.png
+ steering_wheel_mask_down.png
+ steering_wheel_mask_up.png
+Copyright: Copyright 2019 Benau
+License: CC-BY-SA 4.0
+Comment: License clarified/assigned in Jul 2021 via IRC.  accelerator_icon.png was committed in 2020, but is just a copy of accelerator.png with a square aspect ratio.
