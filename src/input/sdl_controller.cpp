@@ -269,9 +269,11 @@ void SDLController::doRumble(float strength_low, float strength_high, uint32_t d
     else
 #endif
     {
+#if SDL_VERSION_ATLEAST(2,0,9)
         uint16_t scaled_low = strength_low * pow(2, 16);
         uint16_t scaled_high = strength_high * pow(2, 16);
         SDL_GameControllerRumble(m_game_controller, scaled_low, scaled_high, duration_ms);
+#endif
     }
 }
 
