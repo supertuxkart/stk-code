@@ -24,6 +24,7 @@
 
 #include <mbedtls/base64.h>
 #include <mbedtls/sha256.h>
+#include <mbedtls/version.h>
 #include <cstring>
 
 // ============================================================================
@@ -56,8 +57,13 @@ std::vector<uint8_t> Crypto::decode64(std::string input)
 std::array<uint8_t, 32> Crypto::sha256(const std::string& input)
 {
     std::array<uint8_t, 32> result;
+#if MBEDTLS_VERSION_MAJOR >= 3
+    mbedtls_sha256((unsigned char*)&input[0], input.size(),
+        result.data(), 0/*not 224*/);
+#else
     mbedtls_sha256_ret((unsigned char*)&input[0], input.size(),
         result.data(), 0/*not 224*/);
+#endif
     return result;
 }   // sha256
 
