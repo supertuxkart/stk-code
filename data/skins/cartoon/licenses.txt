@@ -8,9 +8,9 @@ Source: https://supertuxkart.net
 Files:
  glass_iconhighlight_focus.png
  bubble.png
-Copyright: ???
+Copyright: 2010 Dakal and/or Marianne Gagnon (Auria)
 License: CC-BY-SA 3.0
-Comment: From peach skin
+Comment: From peach skin, first found in commit 5cddb8ffb61001407ce97ee5a8c63faa18a08c2c.  It is unclear which author made these particular files.
 
 Files:
  src/Inter-UI-Black.ttf
