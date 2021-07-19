@@ -44,6 +44,7 @@ class CutsceneWorld : public World
 
     double m_duration;
     bool m_aborted;
+    bool m_cleared_cutscene;
 
     float m_fade_duration;
 
@@ -58,6 +59,7 @@ class CutsceneWorld : public World
 
     std::vector<std::string> m_parts;
 
+    void clearCutscene();
 public:
 
     CutsceneWorld();

@@ -66,6 +66,7 @@ CutsceneWorld::CutsceneWorld() : World()
     m_play_ready_set_go_sounds = false;
     m_fade_duration = 1.0f;
     m_camera = NULL;
+    m_cleared_cutscene = false;
 }   // CutsceneWorld
 
 //-----------------------------------------------------------------------------
@@ -177,6 +178,7 @@ void CutsceneWorld::init()
 CutsceneWorld::~CutsceneWorld()
 {
     main_loop->setAllowLargeDt(false);
+    clearCutscene();
 }   // ~CutsceneWorld
 //-----------------------------------------------------------------------------
 void CutsceneWorld::reset(bool restart)
@@ -402,13 +404,23 @@ void CutsceneWorld::update(int ticks)
 
 //-----------------------------------------------------------------------------
 
-void CutsceneWorld::enterRaceOverState()
+void CutsceneWorld::clearCutscene()
 {
+    if (m_cleared_cutscene)
+        return;
+
     GUIEngine::CutsceneScreen* cs = dynamic_cast<GUIEngine::CutsceneScreen*>(
         GUIEngine::getCurrentScreen());
     if (cs != NULL)
         cs->onCutsceneEnd();
+    m_cleared_cutscene = true;
+}
 
+//-----------------------------------------------------------------------------
+
+void CutsceneWorld::enterRaceOverState()
+{
+    clearCutscene();
 
     int partId = -1;
     for (int i=0; i<(int)m_parts.size(); i++)
@@ -592,9 +604,9 @@ void CutsceneWorld::enterRaceOverState()
 
         RaceManager::get()->exitRace();
         RaceManager::get()->startSingleRace(next_part, 999, RaceManager::get()->raceWasStartedFromOverworld());
-        
+
         // Keep showing cutscene gui if previous scene was using it
-        CutSceneGeneral* csg = dynamic_cast<CutSceneGeneral*>(cs);
+        CutSceneGeneral* csg = dynamic_cast<CutSceneGeneral*>(GUIEngine::getCurrentScreen());
         if (csg != NULL)
         {
             CutSceneGeneral* scene = CutSceneGeneral::getInstance();
