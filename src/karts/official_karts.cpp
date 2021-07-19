@@ -84,6 +84,7 @@ void load()
         g_official_karts.emplace_back(name, type, width, height, length,
             gravity_shift);
     }
+    delete root;
 }   // load
 
 // ----------------------------------------------------------------------------
