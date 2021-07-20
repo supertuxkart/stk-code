@@ -389,6 +389,7 @@ if(NOT SERVER_ONLY)
         include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/mojoal")
     else()
         find_package(OpenAL REQUIRED)
+        # Unclear why this happens, but on switch OPENAL_LIBRARY never set!
         if (NOT OPENAL_LIBRARY)
             find_library(OPENAL_LIBRARY NAMES al OpenAL AL openal REQUIRED)
         endif()
