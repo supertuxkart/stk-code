@@ -48,7 +48,7 @@ CMAKE_DEPENDENT_OPTION(USE_SYSTEM_SQUISH "Use system Squish library instead of t
 CMAKE_DEPENDENT_OPTION(USE_WIIUSE "Support for wiimote input devices" ON
     "NOT SERVER_ONLY;NOT CYGWIN;NOT USE_SWITCH;NOT MSVC" OFF)
 CMAKE_DEPENDENT_OPTION(USE_DNS_C "Build bundled dns resolver" OFF "NOT CYGWIN;NOT USE_SWITCH" ON)
-CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE;NOT USE_SWITCH" ON)
+CMAKE_DEPENDENT_OPTION(USE_MOJOAL "Use bundled MojoAL instead of system OpenAL" OFF "NOT APPLE" ON)
 
 if (DLOPEN_MOLTENVK)
     ADD_DEFINITIONS(-DDLOPEN_MOLTENVK)
@@ -389,6 +389,12 @@ if(NOT SERVER_ONLY)
         include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/mojoal")
     else()
         find_package(OpenAL REQUIRED)
+        if (NOT OPENAL_LIBRARY)
+            find_library(OPENAL_LIBRARY NAMES al OpenAL AL openal REQUIRED)
+        endif()
+        if (NOT OPENAL_INCLUDE_DIR)
+            find_path(OPENAL_INCLUDE_DIR NAMES AL/al.h REQUIRED)
+        endif()
         include_directories(${OPENAL_INCLUDE_DIR})
     endif()
 
