@@ -785,8 +785,14 @@ namespace computeGPRanksData
         int m_score;
         int m_position;
         float m_race_time;
+        bool m_race_time_greater_if_score_equality = false;
         bool operator<(const SortData &a)
         {
+            if (m_race_time_greater_if_score_equality)
+            {
+                return ( (m_score > a.m_score) ||
+                (m_score == a.m_score && m_race_time > a.m_race_time) );
+            }
             return ( (m_score > a.m_score) ||
                 (m_score == a.m_score && m_race_time < a.m_race_time) );
         }
@@ -830,6 +836,10 @@ void RaceManager::computeGPRanks()
         sd->m_position  = kart_id;
         sd->m_score     = getKartScore(kart_id);
         sd->m_race_time = getOverallTime(kart_id);
+        if (start)
+        {
+            sd->m_race_time_greater_if_score_equality = true;
+        }
         sort_data.push_back(sd);
         if(UserConfigParams::m_ftl_debug)
         {
