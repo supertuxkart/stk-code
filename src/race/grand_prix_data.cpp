@@ -344,7 +344,6 @@ void GrandPrixData::reload()
         node->get("reverse", &reversed );
         if (!t->reverseAvailable())
             reversed = false;
-
         // Adding parsed data
         m_tracks.push_back(track_id);
         m_laps.push_back(number_of_laps);
@@ -434,8 +433,7 @@ bool GrandPrixData::isTrackAvailable(const std::string &id,
     else if (id == "fortmagma")
         return !PlayerManager::getCurrentPlayer()->isLocked("fortmagma");
     else
-        return (!m_editable ||
-                !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
+        return !PlayerManager::get()->getCurrentPlayer()->isLocked(id);
 }   // isTrackAvailable
 
 // ----------------------------------------------------------------------------

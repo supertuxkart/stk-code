@@ -135,7 +135,7 @@ void GPInfoScreen::beforeAddingWidget()
             RaceManager::get()->getMinorMode(),
             RaceManager::get()->getNumLocalPlayers());
             
-        int tracks = (int)m_gp.getTrackNames().size();
+        int tracks = (int)m_gp.getTrackNames(true).size();
         bool continue_visible = saved_gp && saved_gp->getNextTrack() > 0 &&
                                             saved_gp->getNextTrack() < tracks;
 
@@ -263,7 +263,7 @@ void GPInfoScreen::init()
  */
 void GPInfoScreen::addTracks()
 {
-    const std::vector<std::string> tracks = m_gp.getTrackNames();
+    const std::vector<std::string> tracks = m_gp.getTrackNames(true);
 
     ListWidget *list = getWidget<ListWidget>("tracks");
     list->clear();
