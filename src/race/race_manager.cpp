@@ -787,6 +787,11 @@ namespace computeGPRanksData
         float m_race_time;
         bool operator<(const SortData &a)
         {
+            if (RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+            {
+                return ( (m_score > a.m_score) ||
+                (m_score == a.m_score && m_race_time > a.m_race_time) );
+            }
             return ( (m_score > a.m_score) ||
                 (m_score == a.m_score && m_race_time < a.m_race_time) );
         }
