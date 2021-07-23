@@ -1,0 +1,117 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Icons for stk-code
+Upstream-Contact:
+ Jean-Manuel "samuncle" Clémençon <sam.un@protonmail.com>
+Source: https://supertuxkart.net
+License: Various
+
+Files: materials.xml
+Copyright: SuperTuxKart dev team
+License: CC-BY-SA 3.0
+Comment: Material data
+
+Files: *.png
+Copyright: SuperTuxKart dev team
+License: CC-BY-SA 3.0+
+Comment:
+ All icons come from Open Game Art (art by onyum.com, comissionned by Bart Kelsey)
+ released under CC-BY-SA 3+, options_players & random_kart were tweaked by Marianne Gagnon
+
+Files:
+ addons.png
+ back.png
+ main_*.png
+ package*.png
+Copyright: yeKcim (Anthony Carré)
+License: CC-BY-SA 3.0
+
+Files:
+ mode_*.png
+ race_giveup.png
+ tutorial.png
+Copyright: Totoplus62
+License: CC-BY-SA 3.0
+
+Files:
+ hourglass.png
+ tablet.png
+ blue_flag.png
+ heart.png
+ red_flag.png
+ tablet.png
+Copyright: Benau
+License: CC0
+
+Files:
+ logo*.png
+Copyright: rastapax
+License: CC-BY-SA 3.0+
+
+Files:
+ soccer_ball*.png
+Copyright: Néd J. Édoire
+License: CC-BY-SA 3.0
+
+Files:
+ difficulty_*.png
+Copyright: Conso (Constantin Pelikan)
+License: CC-BY-SA 3.0
+
+Files:
+ screen*.png
+ mass.png
+ power.png
+Copyright: Marianne Gagnon
+License: CC-BY-SA 3.0
+Comment:
+ power.png by Auria, based on https://openclipart.org/detail/193925/check-engine and https://openclipart.org/detail/144799/power-icon, released under CC-0
+
+Files: speed.png
+Copyright: Alayan
+License: CC-BY-SA 3.0
+Comment:
+ with elements by Totoplus62
+
+Files: menu_story.png
+Copyright: tavariz91
+License: CC0
+
+Files:
+ crown.png
+Copyright: glitch
+License: CC0
+Comment:
+ from https://openclipart.org/detail/210257/misc-game-crown, released under public domain
+
+Files:
+ speed*.png
+ gauge*.png
+ ghost_plus.png
+Copyright: Alayan
+License: CC0
+
+Files:
+ options_language.png
+Copyright: Alayan
+License: CC-BY-SA 3+
+Comment:
+ based on http://www.languageicon.org/
+
+Files:
+ options_general.png
+Copyright: Alayan
+License: CC-BY-SA 4
+
+Files:
+ lap_flag.png
+Copyright: Alayan
+License: CC-BY-SA 3
+Comment:
+ original by Alina Oleynik from The Noun Project
+
+Files:
+ robot.png
+Copyright: Benau
+License: CC0
+Comment:
+ source: https://publicdomainvectors.org/en/free-clipart/Outlined-robot-image/74151.html
