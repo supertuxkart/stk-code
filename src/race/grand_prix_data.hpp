@@ -136,6 +136,7 @@ public:
     bool                     isEditable() const;
     const std::string&       getTrackId(const unsigned int track) const;
     irr::core::stringw       getTrackName(const unsigned int track) const;
+    bool                     containsUnavailableTracks() const;
     unsigned int             getLaps(const unsigned int track) const;
     bool                     getReverse(const unsigned int track) const;
     void                     moveUp(const unsigned int track);

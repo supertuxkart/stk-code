@@ -30,6 +30,7 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
 #include "states_screens/gp_info_screen.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -102,9 +103,17 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
-            GPInfoScreen *gpis = GPInfoScreen::getInstance();
-            gpis->setGP(selection);
-            gpis->push();
+            const GrandPrixData* gp_data=grand_prix_manager->getGrandPrix(selection);
+            if(gp_data->containsUnavailableTracks() && RaceManager::get()->getNumLocalPlayers()==1)
+            {
+                new MessageDialog(_("You cannot play this grandprix because it contains tracks that aren't unlocked!"));
+            }
+            else
+            {
+                GPInfoScreen *gpis = GPInfoScreen::getInstance();
+                gpis->setGP(selection);
+                gpis->push();
+            }
         }
     }
     else if (name == "rand-gp")
