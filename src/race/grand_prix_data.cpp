@@ -515,6 +515,12 @@ irr::core::stringw GrandPrixData::getTrackName(const unsigned int track) const
     assert(t != NULL);
     return t->getName();
 }   // getTrackName
+// ----------------------------------------------------------------------------
+
+bool GrandPrixData::containsUnavailableTracks() const
+{
+    return getNumberOfTracks() < getNumberOfTracks(true);
+}   // containsUnavailableTracks
 
 // ----------------------------------------------------------------------------
 const std::string& GrandPrixData::getTrackId(const unsigned int track) const
