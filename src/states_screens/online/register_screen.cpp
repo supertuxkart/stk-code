@@ -305,15 +305,17 @@ void RegisterScreen::doRegister()
     handleLocalName(local_name);
 
     // If no online account is requested, don't register
-    if(m_account_mode!=ACCOUNT_NEW_ONLINE|| m_existing_player)
+    if(m_account_mode==ACCOUNT_EXISTING_ONLINE)
     {
-        bool online = m_account_mode == ACCOUNT_EXISTING_ONLINE;
-        core::stringw password = online ? m_password_widget->getText() : "";
-        core::stringw online_name = 
-            online ? getWidget<TextBoxWidget>("username")->getText().trim() 
-                   : "";
-        m_parent_screen->setNewAccountData(online, /*auto login*/true,
+        core::stringw password = m_password_widget->getText();
+        core::stringw online_name = getWidget<TextBoxWidget>("username")->getText().trim();
+        m_parent_screen->setNewAccountData(true, /*auto login*/true,
                                            online_name, password);
+        StateManager::get()->popMenu();
+        return;
+    }
+    else if(m_existing_player && m_account_mode==ACCOUNT_OFFLINE)
+    {
         m_existing_player = NULL;
         StateManager::get()->popMenu();
         return;
