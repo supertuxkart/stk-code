@@ -196,6 +196,10 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 {
 	if (VideoDriver)
 	{
+		// Irrlicht calls gl function when quiting, but SDL has dropped its context, manually clear the loaded GL functions
+		irr::video::COpenGLExtensionHandler* h = dynamic_cast<irr::video::COpenGLExtensionHandler*>(VideoDriver);
+		if (h)
+			h->clearGLExtenstions();
 		VideoDriver->drop();
 		VideoDriver = NULL;
 	}

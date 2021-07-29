@@ -1091,6 +1091,148 @@ class COpenGLExtensionHandler
 	// the global feature array
 	bool FeatureAvailable[IRR_OpenGL_Feature_Count];
 
+	void clearGLExtenstions()
+	{
+	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
+		pGlActiveTextureARB = 0;
+		pGlClientActiveTextureARB = 0;
+		pGlGenProgramsARB = 0;
+		pGlGenProgramsNV = 0;
+		pGlBindProgramARB = 0;
+		pGlBindProgramNV = 0;
+		pGlDeleteProgramsARB = 0;
+		pGlDeleteProgramsNV = 0;
+		pGlProgramStringARB = 0;
+		pGlLoadProgramNV = 0;
+		pGlProgramLocalParameter4fvARB = 0;
+		pGlCreateShaderObjectARB = 0;
+		pGlShaderSourceARB = 0;
+		pGlCompileShaderARB = 0;
+		pGlCreateProgramObjectARB = 0;
+		pGlAttachObjectARB = 0;
+		pGlLinkProgramARB = 0;
+		pGlUseProgramObjectARB = 0;
+		pGlDeleteObjectARB = 0;
+		pGlCreateProgram = 0;
+		pGlUseProgram = 0;
+		pGlDeleteProgram = 0;
+		pGlDeleteShader = 0;
+		pGlGetAttachedObjectsARB = 0;
+		pGlGetAttachedShaders = 0;
+		pGlCreateShader = 0;
+		pGlShaderSource = 0;
+		pGlCompileShader = 0;
+		pGlAttachShader = 0;
+		pGlLinkProgram = 0;
+		pGlGetInfoLogARB = 0;
+		pGlGetShaderInfoLog = 0;
+		pGlGetProgramInfoLog = 0;
+		pGlGetObjectParameterivARB = 0;
+		pGlGetShaderiv = 0;
+		pGlGetProgramiv = 0;
+		pGlGetUniformLocationARB = 0;
+		pGlGetUniformLocation = 0;
+		pGlUniform1fvARB = 0;
+		pGlUniform2fvARB = 0;
+		pGlUniform3fvARB = 0;
+		pGlUniform4fvARB = 0;
+		pGlUniform1ivARB = 0;
+		pGlUniform2ivARB = 0;
+		pGlUniform3ivARB = 0;
+		pGlUniform4ivARB = 0;
+		pGlUniformMatrix2fvARB = 0;
+		pGlUniformMatrix3fvARB = 0;
+		pGlUniformMatrix4fvARB = 0;
+		pGlGetActiveUniformARB = 0;
+		pGlGetActiveUniform = 0;
+		pGlPointParameterfARB = 0;
+		pGlPointParameterfvARB = 0;
+		pGlStencilFuncSeparate = 0;
+		pGlStencilOpSeparate = 0;
+		pGlStencilFuncSeparateATI = 0;
+		pGlStencilOpSeparateATI = 0;
+		pGlCompressedTexImage2D = 0;
+		// ARB framebuffer object
+		pGlBindFramebuffer = 0;
+		pGlDeleteFramebuffers = 0;
+		pGlGenFramebuffers = 0;
+		pGlCheckFramebufferStatus = 0;
+		pGlFramebufferTexture2D = 0;
+		pGlBindRenderbuffer = 0;
+		pGlDeleteRenderbuffers = 0;
+		pGlGenRenderbuffers = 0;
+		pGlRenderbufferStorage = 0;
+		pGlFramebufferRenderbuffer = 0;
+		pGlGenerateMipmap = 0;
+		// EXT framebuffer object
+		pGlBindFramebufferEXT = 0;
+		pGlDeleteFramebuffersEXT = 0;
+		pGlGenFramebuffersEXT = 0;
+		pGlCheckFramebufferStatusEXT = 0;
+		pGlFramebufferTexture2DEXT = 0;
+		pGlBindRenderbufferEXT = 0;
+		pGlDeleteRenderbuffersEXT = 0;
+		pGlGenRenderbuffersEXT = 0;
+		pGlRenderbufferStorageEXT = 0;
+		pGlFramebufferRenderbufferEXT = 0;
+		pGlGenerateMipmapEXT = 0;
+		pGlActiveStencilFaceEXT = 0;
+		pGlDrawBuffersARB = 0;
+		pGlDrawBuffersATI = 0;
+		pGlGenBuffersARB = 0;
+		pGlBindBufferARB = 0;
+		pGlBufferDataARB = 0;
+		pGlDeleteBuffersARB = 0;
+		pGlBufferSubDataARB = 0;
+		pGlGetBufferSubDataARB = 0;
+		pGlMapBufferARB = 0;
+		pGlUnmapBufferARB = 0;
+		pGlIsBufferARB = 0;
+		pGlGetBufferParameterivARB = 0;
+		pGlGetBufferPointervARB = 0;
+		pGlProvokingVertexARB = 0;
+		pGlProvokingVertexEXT = 0;
+		pGlColorMaskIndexedEXT = 0;
+		pGlEnableIndexedEXT = 0;
+		pGlDisableIndexedEXT = 0;
+		pGlBlendFuncIndexedAMD = 0;
+		pGlBlendFunciARB = 0;
+		pGlBlendEquationIndexedAMD = 0;
+		pGlBlendEquationiARB = 0;
+		pGlProgramParameteriARB = 0;
+		pGlProgramParameteriEXT = 0;
+		pGlGenQueriesARB = 0;
+		pGlDeleteQueriesARB = 0;
+		pGlIsQueryARB = 0;
+		pGlBeginQueryARB = 0;
+		pGlEndQueryARB = 0;
+		pGlGetQueryivARB = 0;
+		pGlGetQueryObjectivARB = 0;
+		pGlGetQueryObjectuivARB = 0;
+		pGlGenOcclusionQueriesNV = 0;
+		pGlDeleteOcclusionQueriesNV = 0;
+		pGlIsOcclusionQueryNV = 0;
+		pGlBeginOcclusionQueryNV = 0;
+		pGlEndOcclusionQueryNV = 0;
+		pGlGetOcclusionQueryivNV = 0;
+		pGlGetOcclusionQueryuivNV = 0;
+		pGlBlendEquationEXT = 0;
+		pGlBlendEquation = 0;
+		#if defined(WGL_EXT_swap_control)
+		pWglSwapIntervalEXT = 0;
+		#endif
+		#if defined(GLX_SGI_swap_control)
+		pGlxSwapIntervalSGI = 0;
+		#endif
+		#if defined(GLX_EXT_swap_control)
+		pGlxSwapIntervalEXT = 0;
+		#endif
+		#if defined(GLX_MESA_swap_control)
+		pGlxSwapIntervalMESA = 0;
+		#endif
+	#endif
+	}
+
 	protected:
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
 		PFNGLACTIVETEXTUREARBPROC pGlActiveTextureARB;
