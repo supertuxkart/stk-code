@@ -394,7 +394,6 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     else if(name=="reverse-spinner")
     {
         updateHighscores();
-        Log::info("Info","Info");
     }
 
 }   // eventCallback
