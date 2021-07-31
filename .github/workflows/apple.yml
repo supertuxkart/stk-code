@@ -36,9 +36,9 @@ jobs:
           tar xf cctools.tar.xz
       - name: Restore timestamps
         run: |
-          wget https://github.com/MestreLion/git-tools/archive/refs/heads/master.zip
-          unzip master.zip
-          python git-tools-master/git-restore-mtime
+          wget https://github.com/MestreLion/git-tools/archive/refs/heads/main.zip
+          unzip main.zip
+          python git-tools-main/git-restore-mtime
       - name: List build cache restore keys
         run: |
           # Look for the last 9 build caches (GitHub supports max 10 including current one)
