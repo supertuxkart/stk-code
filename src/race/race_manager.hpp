@@ -333,7 +333,6 @@ private:
     unsigned int                     m_num_spare_tire_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
-    unsigned int                     m_skipped_tracks_in_gp;
     unsigned                         m_flag_return_ticks;
     unsigned                         m_flag_deactivated_ticks;
     int                              m_coin_target;
@@ -428,10 +427,6 @@ public:
     void setNumPlayers(int players, int local_players=-1);
     void setDefaultAIKartList(const std::vector<std::string> &ai_list);
     void computeRandomKartList();
-    /** Returns number of tracks that player skipped in grandprix */
-    unsigned int getSkippedTracksInGP() { return m_skipped_tracks_in_gp; }
-    /** Increments skipped tracks by 1 */
-    void incrementSkippedTracksInGP();
 
     // ----------------------------------------------------------------------------------------
     bool hasTimeTarget() const { return m_time_target > 0.0f; }

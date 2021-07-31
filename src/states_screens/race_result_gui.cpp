@@ -206,7 +206,7 @@ void RaceResultGUI::init()
     if(RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
         if(RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
-           && RaceManager::get()->getSkippedTracksInGP() == 0)
+           && !RaceManager::get()->getGrandPrix().isRandomGP())
         {
             Highscores* highscores = World::getWorld()->getGPHighscores();
             const AbstractKart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));

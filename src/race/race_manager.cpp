@@ -131,7 +131,6 @@ RaceManager::RaceManager()
     m_hit_capture_limit = 0;
     m_flag_return_ticks = stk_config->time2Ticks(20.0f);
     m_flag_deactivated_ticks = stk_config->time2Ticks(3.0f);
-    m_skipped_tracks_in_gp = 0;
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
@@ -160,7 +159,6 @@ void RaceManager::reset()
 {
     m_num_finished_karts   = 0;
     m_num_finished_players = 0;
-    m_skipped_tracks_in_gp = 0;
 }  // reset
 
 // ----------------------------------------------------------------------------
@@ -364,11 +362,6 @@ void RaceManager::computeRandomKartList()
     }
 
 }   // computeRandomKartList
-
-void RaceManager::incrementSkippedTracksInGP()
-{
-    m_skipped_tracks_in_gp++;
-}
 
 //---------------------------------------------------------------------------------------------
 /** \brief Starts a new race or GP (or other mode).

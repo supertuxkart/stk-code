@@ -378,7 +378,6 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     else if (name=="track-spinner")
     {
         m_gp.changeTrackNumber(m_num_tracks_spinner->getValue(), m_group_name);
-        updateHighscores();
         addTracks();
     }
     else if (name=="ai-spinner")
@@ -391,6 +390,11 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     else if(name=="back")
     {
         StateManager::get()->escapePressed();
+    }
+    else if(name=="reverse-spinner")
+    {
+        updateHighscores();
+        Log::info("Info","Info");
     }
 
 }   // eventCallback
@@ -462,13 +466,15 @@ int GPInfoScreen::getMaxNumTracks(std::string group)
 // -----------------------------------------------------------------------
 void GPInfoScreen::updateHighscores()
 {
+    if(m_gp.isRandomGP())
+        return;
     const Highscores::HighscoreType type = "HST_GRANDPRIX";
     Highscores* highscores = highscore_manager->getHighscores(type, 
                                                               RaceManager::get()->getNumberOfKarts(),
                                                               RaceManager::get()->getDifficulty(),
                                                               m_gp.getId(),
                                                               0,
-                                                              0);
+                                                              getReverse() == GrandPrixData::GP_ALL_REVERSE);
     m_highscore_list->clear();
     int count = highscores->getNumberEntries();
     std::string kart;
