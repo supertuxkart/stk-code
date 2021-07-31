@@ -66,6 +66,13 @@ libjpeg-dev libogg-dev libopenal-dev libpng-dev \
 libssl-dev libvorbis-dev nettle-dev pkg-config zlib1g-dev
 ```
 
+Solus command:
+```bash
+sudo eopkg it openal-soft-devel libogg-dev libvorbis-devel freetype2-devel \
+harfbuzz-devel curl-devel bluez-devel openssl-devel libpng-devel zlib-devel \
+libjpeg-turbo-devel sdl2-devel
+```
+
 ### In-game recorder
 
 To build the in-game recorder for STK, you have to install
