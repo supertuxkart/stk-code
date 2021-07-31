@@ -384,6 +384,8 @@ GUIEngine::EventPropagation
             ModalDialog::dismiss();
             World::getWorld()->getRaceGUI()->removeReferee();
             World::getWorld()->endRaceEarly();
+            if(RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+                RaceManager::get()->incrementSkippedTracksInGP();
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "selectkart")

@@ -1277,6 +1277,21 @@ Highscores* World::getHighscores() const
     return highscores;
 }   // getHighscores
 
+// ---------------------------------------------------------------------------
+Highscores* World::getGPHighscores() const
+{
+    if(isNetworkWorld() || RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX)
+        return NULL;
+    const Highscores::HighscoreType type = "HST_GRANDPRIX";
+    Highscores* highscores = highscore_manager->getHighscores(type,
+                                                              RaceManager::get()->getNumNonGhostKarts(),
+                                                              RaceManager::get()->getDifficulty(),
+                                                              RaceManager::get()->getGrandPrix().getId(),
+                                                              0,
+                                                              RaceManager::get()->getGrandPrix().getReverseType() == GrandPrixData::GP_ALL_REVERSE);
+    return highscores;
+}
+
 // ----------------------------------------------------------------------------
 /** Called at the end of a race. Checks if the current times are worth a new
  *  score, if so it notifies the HighscoreManager so the new score is added

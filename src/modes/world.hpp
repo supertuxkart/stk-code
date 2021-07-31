@@ -315,6 +315,7 @@ public:
     // Other functions
     // ===============
     Highscores     *getHighscores() const;
+    Highscores     *getGPHighscores() const; 
     void            schedulePause(Phase phase);
     void            scheduleUnpause();
     void            scheduleExitRace() { m_schedule_exit_race = true; }
