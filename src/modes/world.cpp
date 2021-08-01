@@ -1280,7 +1280,7 @@ Highscores* World::getHighscores() const
 // ---------------------------------------------------------------------------
 Highscores* World::getGPHighscores() const
 {
-    if(isNetworkWorld() || RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX)
+    if (isNetworkWorld() || RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX)
         return NULL;
     const Highscores::HighscoreType type = "HST_GRANDPRIX";
     Highscores* highscores = highscore_manager->getHighscores(type,
