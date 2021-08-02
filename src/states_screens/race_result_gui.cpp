@@ -54,6 +54,7 @@
 #include "network/stk_host.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "race/highscores.hpp"
+#include "race/highscore_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "scriptengine/property_animator.hpp"
@@ -201,6 +202,19 @@ void RaceResultGUI::init()
         MessageQueue::add(MessageQueue::MT_GENERIC, tips_string);
     }
 #endif
+    
+    if(RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        if(RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
+           && !RaceManager::get()->getGrandPrix().isRandomGP())
+        {
+            Highscores* highscores = World::getWorld()->getGPHighscores();
+            const AbstractKart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
+            float full_time = RaceManager::get()->getOverallTime(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
+            std::string gp_name = RaceManager::get()->getGrandPrix().getId();
+            highscores->addGPData(k->getIdent(), k->getController()->getName(), gp_name, full_time);
+        }
+    }
 }   // init
 
 //-----------------------------------------------------------------------------

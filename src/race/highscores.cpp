@@ -159,14 +159,8 @@ int Highscores::matches(const HighscoreType &highscore_type,
             m_reverse         == reverse            );
 }   // matches
 
-// -----------------------------------------------------------------------------
-/** Inserts the data into the highscore list.
- *  If the new entry is fast enough to
- *  be in the highscore list, the new position (1-HIGHSCORE_LEN) is returned,
- *  otherwise a 0.
- */
-int Highscores::addData(const std::string& kart_name,
-                        const core::stringw& name, const float time)
+int Highscores::findHighscorePosition(const std::string& kart_name, 
+                              const core::stringw& name, const float time)
 {
     int position=-1;
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -191,7 +185,19 @@ int Highscores::addData(const std::string& kart_name,
             break;
         }
     }//next score slot
+    return position;
+}
 
+// -----------------------------------------------------------------------------
+/** Inserts the data into the highscore list.
+ *  If the new entry is fast enough to
+ *  be in the highscore list, the new position (1-HIGHSCORE_LEN) is returned,
+ *  otherwise a 0.
+ */
+int Highscores::addData(const std::string& kart_name,
+                        const core::stringw& name, const float time)
+{
+    int position = findHighscorePosition(kart_name, name, time);
     if(position>=0)
     {
         m_track               = RaceManager::get()->getTrackName();
@@ -206,6 +212,25 @@ int Highscores::addData(const std::string& kart_name,
 
     return position+1;
 }   // addData
+// -----------------------------------------------------------------------------
+int Highscores::addGPData(const std::string& kart_name,
+                          const core::stringw& name, std::string track_name, const float time)
+{
+    int position = findHighscorePosition(kart_name, name, time);
+    if(position>=0)
+    {
+        m_track               = track_name;
+        m_number_of_karts     = RaceManager::get()->getNumNonGhostKarts();
+        m_difficulty          = RaceManager::get()->getDifficulty();
+        m_number_of_laps      = 0;
+        m_reverse             = RaceManager::get()->getReverseTrack();
+        m_name[position]      = name;
+        m_time[position]      = time;
+        m_kart_name[position] = kart_name;
+    }
+
+    return position+1;
+}
 
 // -----------------------------------------------------------------------------
 int Highscores::getNumberEntries() const

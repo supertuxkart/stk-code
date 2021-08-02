@@ -23,6 +23,8 @@
 #include "config/player_manager.hpp"
 #include "config/saved_grand_prix.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "graphics/irr_driver.hpp"
+#include "graphics/material.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
@@ -34,11 +36,14 @@
 #include "race/grand_prix_manager.hpp"
 #include "race/grand_prix_data.hpp"
 #include "race/race_manager.hpp"
+#include "race/highscore_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "karts/kart_properties.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIStaticText.h>
@@ -85,6 +90,18 @@ void GPInfoScreen::loadedFromFile()
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
     screenshot->m_tab_stop = false;
+
+    m_highscore_list = getWidget<ListWidget>("highscore-entries");
+
+    m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
+    for(unsigned int i=0; i < kart_properties_manager->getNumberOfKarts(); i++)
+    {
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        m_icon_bank->addTextureAsSprite(prop->getIconMaterial()->getTexture());
+    }
+    video::ITexture* kart_not_found = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "random_kart.png"));
+    m_unknown_kart_icon = m_icon_bank->addTextureAsSprite(kart_not_found);
+    
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
@@ -93,8 +110,9 @@ void GPInfoScreen::loadedFromFile()
  */
 void GPInfoScreen::setGP(const std::string &gp_ident)
 {
-    if(gp_ident!=GrandPrixData::getRandomGPID())
+    if(gp_ident!=GrandPrixData::getRandomGPID()){
         m_gp = *grand_prix_manager->getGrandPrix(gp_ident);
+    }
     else
     {
         // Doesn't matter what kind of GP we create, it just gets the
@@ -172,6 +190,31 @@ void GPInfoScreen::init()
     getWidget<LabelWidget  >("group-text"   )->setVisible(random);
     m_group_spinner->setVisible(random);
 
+    // Number of AIs
+    // -------------
+    const bool has_AI = RaceManager::get()->hasAI();
+    m_ai_kart_spinner->setVisible(has_AI);
+    getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
+    if (has_AI)
+    {
+        const int local_players = RaceManager::get()->getNumLocalPlayers();
+        int min_ai = 0;
+        int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
+            [RaceManager::MAJOR_MODE_GRAND_PRIX]) - local_players;
+
+        // A ftl reace needs at least three karts to make any sense
+        if (RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            min_ai = std::max(0, 3 - local_players);
+        }
+        
+        num_ai = std::max(min_ai, num_ai);
+        
+        m_ai_kart_spinner->setActive(true);
+        m_ai_kart_spinner->setValue(num_ai);
+        m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
+        m_ai_kart_spinner->setMin(min_ai);
+    }   // has_AI
 
     if(random)
     {
@@ -222,34 +265,16 @@ void GPInfoScreen::init()
     {
         getWidget<LabelWidget>("name")->setText(m_gp.getName(), false);
         m_gp.checkConsistency();
+
+        int icon_height = GUIEngine::getFontHeight();
+        int row_height = GUIEngine::getFontHeight() * 1.2f;
+        m_icon_bank->setScale(icon_height/128.0f);
+        m_icon_bank->setTargetIconSize(128,128);
+        m_highscore_list->setIcons(m_icon_bank,row_height);
+        RaceManager::get()->setNumKarts(RaceManager::get()->getNumLocalPlayers() + m_ai_kart_spinner->getValue());
+        // We don't save highscores for random gps so load highscores here
+        updateHighscores();
     }
-
-    // Number of AIs
-    // -------------
-    const bool has_AI = RaceManager::get()->hasAI();
-    m_ai_kart_spinner->setVisible(has_AI);
-    getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
-
-    if (has_AI)
-    {
-        const int local_players = RaceManager::get()->getNumLocalPlayers();
-        int min_ai = 0;
-        int num_ai = int(UserConfigParams::m_num_karts_per_gamemode
-            [RaceManager::MAJOR_MODE_GRAND_PRIX]) - local_players;
-
-        // A ftl reace needs at least three karts to make any sense
-        if (RaceManager::get()->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
-        {
-            min_ai = std::max(0, 3 - local_players);
-        }
-        
-        num_ai = std::max(min_ai, num_ai);
-        
-        m_ai_kart_spinner->setActive(true);
-        m_ai_kart_spinner->setValue(num_ai);
-        m_ai_kart_spinner->setMax(stk_config->m_max_karts - local_players);
-        m_ai_kart_spinner->setMin(min_ai);
-    }   // has_AI
 
     addTracks();
     addScreenshot();
@@ -360,10 +385,15 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
         const int num_ai = m_ai_kart_spinner->getValue();
         RaceManager::get()->setNumKarts( RaceManager::get()->getNumLocalPlayers() + num_ai );
         UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = RaceManager::get()->getNumLocalPlayers() + num_ai;
+        updateHighscores();
     }
     else if(name=="back")
     {
         StateManager::get()->escapePressed();
+    }
+    else if(name=="reverse-spinner")
+    {
+        updateHighscores();
     }
 
 }   // eventCallback
@@ -430,4 +460,54 @@ int GPInfoScreen::getMaxNumTracks(std::string group)
     }
     
     return max_num_tracks;
-}
+}   // getNumTracks
+
+// -----------------------------------------------------------------------
+void GPInfoScreen::updateHighscores()
+{
+    if(m_gp.isRandomGP())
+        return;
+    const Highscores::HighscoreType type = "HST_GRANDPRIX";
+    Highscores* highscores = highscore_manager->getHighscores(type, 
+                                                              RaceManager::get()->getNumberOfKarts(),
+                                                              RaceManager::get()->getDifficulty(),
+                                                              m_gp.getId(),
+                                                              0,
+                                                              getReverse() == GrandPrixData::GP_ALL_REVERSE);
+    m_highscore_list->clear();
+    int count = highscores->getNumberEntries();
+    std::string kart;
+    irr::core::stringw name;
+    float time;
+    for(int i=0; i<Highscores::HIGHSCORE_LEN; i++)
+    {
+        irr::core::stringw line;
+        int icon = -1;
+        if(i < count)
+        {
+            highscores->getEntry(i, kart, name, &time);
+            std::string time_string = StringUtils::timeToString(time);
+            for(unsigned int n=0; n<kart_properties_manager->getNumberOfKarts(); n++)
+            {
+                const KartProperties* prop = kart_properties_manager->getKartById(n);
+                if(kart == prop->getIdent())
+                {
+                    icon = n;
+                    break;
+                }
+            }
+            line = name + "    " + irr::core::stringw(time_string.c_str());
+        }
+        else
+        {
+            line = _("(Empty)");
+        }
+        if(icon == -1)
+        {
+            icon = m_unknown_kart_icon;
+        }
+        std::vector<ListWidget::ListCell> row;
+        row.push_back(ListWidget::ListCell(line, icon, 1, false));
+        m_highscore_list->addItem(StringUtils::toString(i),row);
+    }
+}   // updateHighscores

@@ -68,6 +68,9 @@ private:
 
     static SortOrder m_sort_order;
 
+    int findHighscorePosition(const std::string& kart_name, 
+                              const core::stringw& name, const float time);
+
 public:
     bool operator < (const Highscores& hi) const;
 
@@ -93,6 +96,8 @@ public:
     // ------------------------------------------------------------------------
     int  addData   (const std::string& kart_name,
                     const irr::core::stringw& name, const float time);
+    int addGPData  (const std::string& kart_name,
+                    const irr::core::stringw& name, std::string gp_name, const float time);
     // ------------------------------------------------------------------------
     int  getNumberEntries() const;
     // ------------------------------------------------------------------------
