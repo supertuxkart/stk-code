@@ -203,9 +203,10 @@ void RaceResultGUI::init()
     }
 #endif
     
-    if(RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+        !NetworkConfig::get()->isNetworking())
     {
-        if(RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
+        if (RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
            && !RaceManager::get()->getGrandPrix().isRandomGP())
         {
             Highscores* highscores = World::getWorld()->getGPHighscores();
