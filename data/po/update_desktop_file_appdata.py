@@ -45,20 +45,19 @@ STK_APPDATA_P1 = 'Karts. Nitro. Action! SuperTuxKart is a 3D open-source arcade 
 with a variety of characters, tracks, and modes to play. \
 Our aim is to create a game that is more fun than realistic, \
 and provide an enjoyable experience for all ages.'
-STK_APPDATA_P2 = 'Discover the mystery of an underwater world, \
-or drive through the jungles of Val Verde and visit the famous Cocoa Temple. \
-Race underground or in a spaceship, through a rural farmland or a strange alien planet. \
-Or rest under the palm trees on the beach, watching the other karts overtake you. \
-But don\'t eat the bananas! Watch for bowling balls, plungers, bubble gum, \
+STK_APPDATA_P2 = 'We have several tracks with various themes for players to enjoy, \
+from driving underwater, rural farmlands, jungles or even in space! \
+Try your best while avoiding other karts as they may overtake you, \
+but don\'t eat the bananas! Watch for bowling balls, plungers, bubble gum, \
 and cakes thrown by your opponents.'
 STK_APPDATA_P3 = 'You can do a single race against other karts, \
 compete in one of several Grand Prix, \
 try to beat the high score in time trials on your own, \
 play battle mode against the computer or your friends, \
-and more! For a greater challenge, race online against players from all over the world \
+and more! For a greater challenge, join online and meet players from all over the world \
 and prove your racing skills!'
 # Used in google play only for now
-STK_APPDATA_P4 = 'This game is free and without ads.'
+STK_APPDATA_P4 = 'This game has no ads.'
 # Used in google play beta only for now
 STK_APPDATA_P5 = 'This is an unstable version of SuperTuxKart that contains latest improvements. \
 It is released mainly for testing, to make stable STK as good as possible.'
