@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
-        <header align="center" height="8%" width="80%" text="Create User" text_align="center"
+        <header id="create_user" align="center" height="8%" width="80%" text="Create User" text_align="center"
                 I18N="In the registration dialog" />
         <spacer height="1%" width="10"/>
 

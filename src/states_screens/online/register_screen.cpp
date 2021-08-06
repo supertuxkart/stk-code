@@ -67,6 +67,11 @@ RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 // -----------------------------------------------------------------------------
 void RegisterScreen::init()
 {
+    if (m_existing_player)
+        getWidget("create_user")->setText(_("Rename"));
+    else
+        getWidget("create_user")->setText(_("Create User"));
+
     getWidget<TextBoxWidget>("username")->setText(L"");
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
@@ -314,7 +319,7 @@ void RegisterScreen::doRegister()
         StateManager::get()->popMenu();
         return;
     }
-    else if(m_existing_player && m_account_mode==ACCOUNT_OFFLINE)
+    else if(m_account_mode==ACCOUNT_OFFLINE)
     {
         m_existing_player = NULL;
         StateManager::get()->popMenu();
