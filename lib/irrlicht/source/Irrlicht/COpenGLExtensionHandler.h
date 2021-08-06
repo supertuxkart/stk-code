@@ -1091,7 +1091,7 @@ class COpenGLExtensionHandler
 	// the global feature array
 	bool FeatureAvailable[IRR_OpenGL_Feature_Count];
 
-	void clearGLExtenstions()
+	void clearGLExtensions()
 	{
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
 		pGlActiveTextureARB = 0;

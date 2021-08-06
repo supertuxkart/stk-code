@@ -200,7 +200,7 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 #ifdef _IRR_COMPILE_WITH_OPENGL_
 		irr::video::COpenGLExtensionHandler* h = dynamic_cast<irr::video::COpenGLExtensionHandler*>(VideoDriver);
 		if (h)
-			h->clearGLExtenstions();
+			h->clearGLExtensions();
 #endif
 		VideoDriver->drop();
 		VideoDriver = NULL;
