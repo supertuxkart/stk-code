@@ -202,6 +202,8 @@ CGUIEditBox::CGUIEditBox(const wchar_t* text, bool border,
 
     Text = text;
     m_edit_text = StringUtils::wideToUtf32(text);
+    if (!m_edit_text.empty())
+        updateGlyphLayouts();
 
 #ifndef SERVER_ONLY
     if (Environment)
@@ -312,6 +314,8 @@ void CGUIEditBox::setPasswordBox(bool passwordBox, wchar_t passwordChar)
     PasswordBox = passwordBox;
     if (PasswordBox)
         PasswordChar = (char32_t)passwordChar;
+    if (!m_edit_text.empty())
+        updateGlyphLayouts();
 }
 
 
