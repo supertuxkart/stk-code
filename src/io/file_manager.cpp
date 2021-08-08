@@ -414,8 +414,8 @@ void FileManager::init()
 {
     discoverPaths();
     addAssetsSearchPath();
-    m_cert_bundle_location = m_file_system->getAbsolutePath(
-        getAsset("cacert.pem").c_str()).c_str();
+    m_cert_bundle_location = FileUtils::getPortableWritingPath(
+        m_file_system->getAbsolutePath(getAsset("cacert.pem").c_str()).c_str());
 
     // Clean up left-over files in addons/tmp that are older than 24h
     // ==============================================================
