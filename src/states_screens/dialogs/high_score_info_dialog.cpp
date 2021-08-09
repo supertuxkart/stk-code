@@ -139,7 +139,10 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
     m_start_widget = getWidget<IconButtonWidget>("start");
 
     // Disable starting a grand prix, as there is currently no way to tell the minor mode used
-    getWidget<IconButtonWidget>("start")->setActive(major_mode == RaceManager::MAJOR_MODE_SINGLE);
+    if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        m_start_widget->setActive(false);
+    else
+        m_start_widget->setActive(!PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()));
 
     m_action_widget = getWidget<RibbonWidget>("actions");
 
