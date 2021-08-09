@@ -146,8 +146,8 @@ void HighScoreSelection::beforeAddingWidget()
         if (m_major_mode != RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             m_high_scores_list_widget->addColumn(_C("column_name", "Laps"), 3);
-            m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
         }
+            m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
     }
 
     m_high_scores_list_widget->createHeader();
@@ -241,9 +241,9 @@ void HighScoreSelection::loadList()
             {
                 row.push_back(GUIEngine::ListWidget::ListCell
                     (StringUtils::toWString(hs->m_number_of_laps), -1, 3, true));
+            }
                 row.push_back(GUIEngine::ListWidget::ListCell
                     (hs->m_reverse ? _("Yes") : _("No"), -1, 3, true));
-            }
         }
         m_high_scores_list_widget->addItem(StringUtils::toString(i), row);
     }
