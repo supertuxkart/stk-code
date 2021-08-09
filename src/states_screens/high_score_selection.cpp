@@ -130,14 +130,14 @@ void HighScoreSelection::loadedFromFile()
  */
 void HighScoreSelection::beforeAddingWidget()
 {
-    const char* track_type_name;
+    core::stringw track_type_name;
 
     if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        track_type_name = "Grand Prix";
+        track_type_name = _("Grand Prix");
     else
-        track_type_name = "Track";
+        track_type_name = _("Track");
 
-    m_high_scores_list_widget->addColumn(_C("column_name", track_type_name), 7);
+    m_high_scores_list_widget->addColumn(_C("column_name", track_type_name.c_str()), 7);
     m_high_scores_list_widget->addColumn(_C("column_name", "Difficulty"), 4);
     if (m_active_mode_is_linear)
     {
@@ -304,7 +304,6 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
         }
         else if (selection == "tab_grand_prix")
         {
-            //m_active_mode = RaceManager::MAJOR_MODE_GRAND_PRIX;
             m_major_mode = RaceManager::MAJOR_MODE_GRAND_PRIX;
         }
 

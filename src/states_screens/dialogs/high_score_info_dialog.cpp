@@ -66,13 +66,13 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
         m_gp = grand_prix_manager->getGrandPrix(m_hs->m_track);
         track = track_manager->getTrack(m_gp->getTrackId(0));
         track_name = m_gp->getName();
-        track_type_name = "Grand Prix";
+        track_type_name = _("Grand Prix");
     }
     else
     {
         track = track_manager->getTrack(m_hs->m_track);
         track_name = track->getName();
-        track_type_name = "Track";
+        track_type_name = _("Track");
     }
 
     irr::video::ITexture* image = STKTexManager::getInstance()
@@ -106,7 +106,7 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
     m_high_score_label->setText(_("Top %d High Scores", m_hs->HIGHSCORE_LEN), true);
     m_track_name_label = getWidget<LabelWidget>("track-name");
     m_track_name_label->setText(_("%s: %s",
-                                track_type_name, track_name), true);
+                                track_type_name.c_str(), track_name), true);
     m_difficulty_label = getWidget<LabelWidget>("difficulty");
     m_difficulty_label->setText(_("Difficulty: %s", RaceManager::get()->
                                 getDifficultyName((RaceManager::Difficulty)
