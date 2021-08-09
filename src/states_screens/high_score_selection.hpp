@@ -46,6 +46,7 @@ private:
     GUIEngine::RibbonWidget*   m_mode_tabs;
     bool                       m_active_mode_is_linear;
     bool                       m_reverse_sort;
+    RaceManager::MajorRaceModeType m_major_mode;
     RaceManager::MinorRaceModeType m_active_mode;
     int                         m_selected_index;
 

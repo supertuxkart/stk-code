@@ -26,6 +26,8 @@
 #include "input/input_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "race/grand_prix_data.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "race/highscores.hpp"
 #include "race/highscore_manager.hpp"
 #include "race/race_manager.hpp"
@@ -40,14 +42,13 @@ using namespace GUIEngine;
 using namespace irr::core;
 
 // -----------------------------------------------------------------------------
-HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear)
+HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, RaceManager::MajorRaceModeType major_mode)
                       : ModalDialog(0.75f,0.75f)
 {
     m_hs = highscore;
+    m_major_mode = major_mode;
 
     loadFromFile("high_score_info_dialog.stkgui");
-
-    Track* track = track_manager->getTrack(m_hs->m_track);
 
     m_track_screenshot_widget = getWidget<IconButtonWidget>("track_screenshot");
     m_track_screenshot_widget->setFocusable(false);
@@ -55,6 +56,24 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear)
 
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     m_track_screenshot_widget->m_properties[PROP_ICON] = "gui/icons/main_help.png";
+
+    Track* track;
+    core::stringw track_name;
+    core::stringw track_type_name;
+
+    if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        m_gp = grand_prix_manager->getGrandPrix(m_hs->m_track);
+        track = track_manager->getTrack(m_gp->getTrackId(0));
+        track_name = m_gp->getName();
+        track_type_name = _("Grand Prix");
+    }
+    else
+    {
+        track = track_manager->getTrack(m_hs->m_track);
+        track_name = track->getName();
+        track_type_name = _("Track");
+    }
 
     irr::video::ITexture* image = STKTexManager::getInstance()
         ->getTexture(track->getScreenshotFile(),
@@ -82,12 +101,12 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear)
 
     updateHighscoreEntries();
 
-    //Setup static text labels
+    // Setup static text labels
     m_high_score_label = getWidget<LabelWidget>("name");
     m_high_score_label->setText(_("Top %d High Scores", m_hs->HIGHSCORE_LEN), true);
     m_track_name_label = getWidget<LabelWidget>("track-name");
-    m_track_name_label->setText(_("Track: %s",
-                                track_manager->getTrack(m_hs->m_track)->getName()), true);
+    m_track_name_label->setText(_("%s: %s",
+                                track_type_name.c_str(), track_name), true);
     m_difficulty_label = getWidget<LabelWidget>("difficulty");
     m_difficulty_label->setText(_("Difficulty: %s", RaceManager::get()->
                                 getDifficultyName((RaceManager::Difficulty)
@@ -101,12 +120,14 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear)
         m_num_karts_label->setVisible(true);
         m_num_karts_label->setText(_("Number of karts: %d", m_hs->m_number_of_karts), true);
 
-        m_num_laps_label->setVisible(true);
-        m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
-
-        stringw is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
-        m_reverse_label->setVisible(true);
-        m_reverse_label->setText(_("Reverse: %s", is_reverse), true);
+        if (m_major_mode != RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            m_num_laps_label->setVisible(true);
+            m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
+        }
+            stringw is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
+            m_reverse_label->setVisible(true);
+            m_reverse_label->setText(_("Reverse: %s", is_reverse), true);
     }
     else
     {
@@ -114,6 +135,11 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear)
         m_num_laps_label->setVisible(false);
         m_reverse_label->setVisible(false);
     }
+
+    m_start_widget = getWidget<IconButtonWidget>("start");
+
+    // Disable starting a grand prix, as there is currently no way to tell the minor mode used
+    getWidget<IconButtonWidget>("start")->setActive(major_mode == RaceManager::MAJOR_MODE_SINGLE);
 
     m_action_widget = getWidget<RibbonWidget>("actions");
 
@@ -247,3 +273,31 @@ GUIEngine::EventPropagation
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
+
+// ----------------------------------------------------------------------------
+/** Called every update. Used to cycle the screenshots for grand prix entries.
+ *  \param dt Time step size.
+ */
+void HighScoreInfoDialog::onUpdate(float dt)
+{
+    if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+    {
+        if (dt == 0)
+            return; // if nothing changed, return right now
+
+        m_curr_time += dt;
+        int frame_after = (int)(m_curr_time / 1.5f);
+
+        const std::vector<std::string> tracks = m_gp->getTrackNames();
+        if (frame_after >= (int)tracks.size())
+        {
+            frame_after = 0;
+            m_curr_time = 0;
+        }
+
+        Track* track = track_manager->getTrack(tracks[frame_after]);
+        std::string file = track->getScreenshotFile();
+        m_track_screenshot_widget->setImage(file, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        m_track_screenshot_widget->m_properties[PROP_ICON] = file;
+    }
+}   // onUpdate

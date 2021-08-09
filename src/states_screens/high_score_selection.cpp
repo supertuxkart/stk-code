@@ -24,6 +24,8 @@
 #include "guiengine/CGUISpriteBank.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "race/grand_prix_data.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "race/highscores.hpp"
 #include "race/highscore_manager.hpp"
 #include "states_screens/dialogs/high_score_info_dialog.hpp"
@@ -86,7 +88,7 @@ void HighScoreSelection::refresh(bool forced_update, bool update_columns)
     if (update_columns)
     {
         m_high_scores_list_widget->clearColumns();
-        beforeAddingWidget();//Reload the columns used
+        beforeAddingWidget(); //Reload the columns used
     }
 }   // refresh
 
@@ -101,6 +103,7 @@ void HighScoreSelection::loadedFromFile()
 
     m_mode_tabs = getWidget<GUIEngine::RibbonWidget>("race_mode");
     m_active_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
+    m_major_mode = RaceManager::MAJOR_MODE_SINGLE;
     m_active_mode_is_linear = true;
 
     m_icon_bank = new irr::gui::STKModifiedSpriteBank( GUIEngine::getGUIEnv());
@@ -127,13 +130,24 @@ void HighScoreSelection::loadedFromFile()
  */
 void HighScoreSelection::beforeAddingWidget()
 {
-    m_high_scores_list_widget->addColumn(_C("column_name", "Track"), 7);
+    core::stringw track_type_name;
+
+    if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        track_type_name = _("Grand Prix");
+    else
+        track_type_name = _("Track");
+
+    m_high_scores_list_widget->addColumn(_C("column_name", track_type_name.c_str()), 7);
     m_high_scores_list_widget->addColumn(_C("column_name", "Difficulty"), 4);
     if (m_active_mode_is_linear)
     {
         m_high_scores_list_widget->addColumn(_C("column_name", "Number of karts"), 4);
-        m_high_scores_list_widget->addColumn(_C("column_name", "Laps"), 3);
-        m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
+
+        if (m_major_mode != RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            m_high_scores_list_widget->addColumn(_C("column_name", "Laps"), 3);
+        }
+            m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
     }
 
     m_high_scores_list_widget->createHeader();
@@ -170,24 +184,44 @@ void HighScoreSelection::loadList()
     {
         Highscores* hs = highscore_manager->getHighscoresAt(i);
 
-        if (m_active_mode == RaceManager::MINOR_MODE_NORMAL_RACE &&
-            hs->m_highscore_type != "HST_STANDARD")
-            continue;
-        else if (m_active_mode == RaceManager::MINOR_MODE_TIME_TRIAL &&
-            hs->m_highscore_type != "HST_STD_TIMETRIAL")
-            continue;
-        else if (m_active_mode == RaceManager::MINOR_MODE_EASTER_EGG &&
-            hs->m_highscore_type != "HST_EASTER_EGG_HUNT")
-            continue;
-
-        Track* track = track_manager->getTrack(hs->m_track);
-
-        if (track == NULL || hs->getNumberEntries() < 1)
+        if (m_major_mode == RaceManager::MAJOR_MODE_SINGLE)
+        {
+            if (m_active_mode == RaceManager::MINOR_MODE_NORMAL_RACE &&
+                hs->m_highscore_type != "HST_STANDARD")
+                continue;
+            else if (m_active_mode == RaceManager::MINOR_MODE_TIME_TRIAL &&
+                hs->m_highscore_type != "HST_STD_TIMETRIAL")
+                continue;
+            else if (m_active_mode == RaceManager::MINOR_MODE_EASTER_EGG &&
+                hs->m_highscore_type != "HST_EASTER_EGG_HUNT")
+                continue;
+        }
+        else if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX &&
+            hs->m_highscore_type != "HST_GRANDPRIX")
             continue;
 
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        //The third argument should match the numbers used in beforeAddingWidget
-        row.push_back(GUIEngine::ListWidget::ListCell(track->getName() , -1, 7));
+
+        if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            const GrandPrixData* gp = grand_prix_manager->getGrandPrix(hs->m_track);
+
+            if (gp == NULL || hs->getNumberEntries() < 1)
+                continue;
+
+            //The third argument should match the numbers used in beforeAddingWidget
+            row.push_back(GUIEngine::ListWidget::ListCell(gp->getName() , -1, 7));
+        }
+        else
+        {
+            Track* track = track_manager->getTrack(hs->m_track);
+
+            if (track == NULL || hs->getNumberEntries() < 1)
+                continue;
+
+            //The third argument should match the numbers used in beforeAddingWidget
+            row.push_back(GUIEngine::ListWidget::ListCell(track->getName() , -1, 7));
+        }
 
         bool display_lock = false;
         if ((RaceManager::Difficulty)hs->m_difficulty == RaceManager::DIFFICULTY_BEST &&
@@ -202,10 +236,14 @@ void HighScoreSelection::loadList()
         {
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(hs->m_number_of_karts), -1, 4, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (StringUtils::toWString(hs->m_number_of_laps), -1, 3, true));
-            row.push_back(GUIEngine::ListWidget::ListCell
-                (hs->m_reverse ? _("Yes") : _("No"), -1, 3, true));
+
+            if (m_major_mode != RaceManager::MAJOR_MODE_GRAND_PRIX)
+            {
+                row.push_back(GUIEngine::ListWidget::ListCell
+                    (StringUtils::toWString(hs->m_number_of_laps), -1, 3, true));
+            }
+                row.push_back(GUIEngine::ListWidget::ListCell
+                    (hs->m_reverse ? _("Yes") : _("No"), -1, 3, true));
         }
         m_high_scores_list_widget->addItem(StringUtils::toString(i), row);
     }
@@ -243,20 +281,36 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
                 return;
         }
 
-        new HighScoreInfoDialog(highscore_manager->getHighscoresAt(m_selected_index), m_active_mode_is_linear);
+        new HighScoreInfoDialog(highscore_manager->getHighscoresAt(m_selected_index), m_active_mode_is_linear, m_major_mode);
     }   // click on high score entry
     else if (name == "race_mode")
     {
         std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "tab_normal_race")
+        {
             m_active_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
+            m_major_mode = RaceManager::MAJOR_MODE_SINGLE;
+        }
         else if (selection == "tab_time_trial")
+        {
             m_active_mode = RaceManager::MINOR_MODE_TIME_TRIAL;
+            m_major_mode = RaceManager::MAJOR_MODE_SINGLE;
+        }
         else if (selection == "tab_egg_hunt")
+        {
             m_active_mode = RaceManager::MINOR_MODE_EASTER_EGG;
+            m_major_mode = RaceManager::MAJOR_MODE_SINGLE;
+        }
+        else if (selection == "tab_grand_prix")
+        {
+            m_major_mode = RaceManager::MAJOR_MODE_GRAND_PRIX;
+        }
 
-        m_active_mode_is_linear = RaceManager::get()->isLinearRaceMode(m_active_mode);
+        if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            m_active_mode_is_linear = true;
+        else
+            m_active_mode_is_linear = RaceManager::get()->isLinearRaceMode(m_active_mode);
         refresh(/*keep high score list*/ false, /* update columns */ true);
     }
 }   // eventCallback
