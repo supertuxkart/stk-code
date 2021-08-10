@@ -91,15 +91,10 @@ void main(void)
 #else
     // :::::::: Compute Space Screen Reflection ::::::::::::::::::::::::::::::::::::
 
-    float lineardepth = textureLod(dtex, uv, 0.).x;
-
     // Fallback (if the ray can't find an intersection we display the sky)
     vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
 
-    float View_Depth            = makeLinear(1000.0, 1.0, lineardepth);
-    vec3 ScreenPos              = xpos.xyz;
-    vec4 View_Pos               = u_inverse_projection_matrix * vec4(ScreenPos, 1.0f);
-         View_Pos              /= View_Pos.w;
+    vec3 View_Pos               = CalcViewPositionFromDepth(uv);
 
     // Reflection vector
     vec3 reflected              = normalize(reflect(eyedir, normal));
@@ -107,7 +102,7 @@ void main(void)
     // Ray cast
     vec3 hitPos                 = View_Pos.xyz;
     float dDepth;
-    float minRayStep            = 100.0f;
+    float minRayStep            = 50.0f;
 
     vec2 coords = RayCast(reflected * max(minRayStep, -View_Pos.z),
                             hitPos, dDepth);
