@@ -16,23 +16,15 @@ out vec4 Spec;
 #stk_include "utils/SpecularIBL.frag"
 
 
-vec3 getXcYcZc(int x, int y, float zC)
-{
-    // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
-    float xC= (2. * (float(x)) / u_screen.x - 1.) * zC / u_projection_matrix[0][0];
-    float yC= (2. * (float(y)) / u_screen.y - 1.) * zC / u_projection_matrix[1][1];
-    return vec3(xC, yC, zC);
-}
-
 float makeLinear(float f, float n, float z)
 {
     return (2.0f * n) / (f + n - z * (f - n));
 }
 
-vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
+vec3 CalcViewPositionFromDepth(in vec2 TexCoord)
 {
     // Combine UV & depth into XY & Z (NDC)
-    float z = makeLinear(1000.0, 1.0, textureLod(DepthMap, TexCoord, 0.).x);
+    float z = makeLinear(1000.0, 1.0, textureLod(dtex, TexCoord, 0.).x);
     vec3 rawPosition                = vec3(TexCoord, z);
 
     // Convert from (0, 1) range to (-1, 1)
@@ -52,7 +44,7 @@ float GetVignette(float factor)
     return clamp(pow(vignette, factor), 0., 1.0);
 }
 
-vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D DepthMap, in vec3 fallback, float spread)
+vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in vec3 fallback)
 {
     dir *= 0.25f;
 
@@ -63,7 +55,7 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
         projectedCoord.xy      /= projectedCoord.w;
         projectedCoord.xy       = projectedCoord.xy * 0.5 + 0.5;
 
-        float depth             = CalcViewPositionFromDepth(projectedCoord.xy, DepthMap).z;
+        float depth             = CalcViewPositionFromDepth(projectedCoord.xy).z;
         dDepth                  = hitCoord.z - depth;
 
         if(dDepth < 0.0)
@@ -83,7 +75,7 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
                )
             {
                 // FIXME We need to generate mipmap to take into account the gloss map
-                vec3 finalColor = textureLod(albedo, projectedCoord.xy, spread).rgb;
+                vec3 finalColor = textureLod(albedo, projectedCoord.xy, 0.0).rgb;
                 //return finalColor;
                 return mix(fallback, finalColor, GetVignette(4.));
 
@@ -138,7 +130,7 @@ void main(void)
     float minRayStep            = 100.0f;
 
     vec3 outColor = RayCast(reflected * max(minRayStep, -xpos.z),
-                            hitPos, dDepth, dtex, fallback, 0.0);
+                            hitPos, dDepth, fallback);
     
     // TODO temporary measure the lack of mipmaping for RTT albedo
     // Implement it in proper way
