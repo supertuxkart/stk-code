@@ -37,14 +37,14 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord)
     return                          ViewPosition.xyz / ViewPosition.w;
 }
 
-float GetVignette(float factor)
+float GetVignette(vec2 coords, float factor)
 {
-    vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
-    float vignette = 1. - dot(inside, inside) * 5.0;
+    vec2 inside = coords - 0.5;
+    float vignette = 1. - dot(inside, inside) * 4.0;
     return clamp(pow(vignette, factor), 0., 1.0);
 }
 
-vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in vec3 fallback)
+vec2 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth)
 {
     dir *= 0.25f;
 
@@ -58,26 +58,16 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in vec3 fallback)
         float depth             = CalcViewPositionFromDepth(projectedCoord.xy).z;
         dDepth                  = hitCoord.z - depth;
 
-        if(dDepth < 0.0)
+        if (dDepth < 0.0 
+            && (projectedCoord.x > 0.0 && projectedCoord.x < 1.0) 
+            && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0) 
+            )
         {
-            if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) 
-                && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0) 
-               )
-            {
-                // FIXME We need to generate mipmap to take into account the gloss map
-                vec3 finalColor = textureLod(albedo, projectedCoord.xy, 0.0).rgb;
-                //return finalColor;
-                return mix(fallback, finalColor, GetVignette(4.));
-
-            }
-            else
-            {
-                return fallback;
-            }
+            return projectedCoord.xy;
         }
     }
 
-    return fallback;
+    return vec2(0.f);
 }
 
 // Main ===================================================================
@@ -119,8 +109,18 @@ void main(void)
     float dDepth;
     float minRayStep            = 100.0f;
 
-    vec3 outColor = RayCast(reflected * max(minRayStep, -xpos.z),
-                            hitPos, dDepth, fallback);
+    vec2 coords = RayCast(reflected * max(minRayStep, -View_Pos.z),
+                            hitPos, dDepth);
+
+    vec3 outColor;
+
+    if (coords.x == 0.0 && coords.y == 0.0) {
+        outColor = fallback;
+    } else {
+        // FIXME We need to generate mipmap to take into account the gloss map
+        outColor = textureLod(albedo, coords, 0.f).rgb;
+        outColor = mix(fallback, outColor, GetVignette(coords, 2.5));
+    }
     
     // TODO temporary measure the lack of mipmaping for RTT albedo
     // Implement it in proper way
