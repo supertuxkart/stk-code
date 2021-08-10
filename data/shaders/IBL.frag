@@ -60,18 +60,8 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in vec3 fallback)
 
         if(dDepth < 0.0)
         {
-            // Texture wrapping to extand artifcially the range of the lookup texture
-            // FIXME can be improved to lessen the distortion
-            projectedCoord.y = min(.99, projectedCoord.y);
-            projectedCoord.x = min(.99, projectedCoord.x);
-            projectedCoord.x = max(.01, projectedCoord.x);
-
-            // We want only reflection on nearly horizontal surfaces
-            float cutout = dot(dir, vec3(0., 0., -1.));
-
             if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) 
                 && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0) 
-                && (cutout > 10.0)
                )
             {
                 // FIXME We need to generate mipmap to take into account the gloss map
