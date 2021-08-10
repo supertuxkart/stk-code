@@ -71,6 +71,7 @@ RubberBall::RubberBall(AbstractKart *kart)
 
     m_target = NULL;
     m_ping_sfx = SFXManager::get()->createSoundSource("ball_bounce");
+    fixSFXSplitscreen(m_ping_sfx);
 }   // RubberBall
 
 // ----------------------------------------------------------------------------

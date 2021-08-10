@@ -26,6 +26,7 @@
 #include <IMeshManipulator.h>
 #include <IMeshSceneNode.h>
 
+#include "audio/sfx_base.hpp"
 #include "achievements/achievements_status.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/explosion.hpp"
@@ -808,5 +809,13 @@ void Flyable::onDeleteFlyable()
     m_has_server_state = false;
     moveToInfinity();
 }   // onDeleteFlyable
+
+// ----------------------------------------------------------------------------
+/* Make specifc sfx lower volume if needed in splitscreen multiplayer. */
+void Flyable::fixSFXSplitscreen(SFXBase* sfx)
+{
+    if (sfx && RaceManager::get()->getNumLocalPlayers() > 1)
+        sfx->setVolume(1.0f / (float)RaceManager::get()->getNumLocalPlayers());
+}   // fixSFXSplitscreen
 
 /* EOF */

@@ -38,6 +38,7 @@ Bowling::Bowling(AbstractKart *kart)
 {
     m_has_hit_kart = false;
     m_roll_sfx = SFXManager::get()->createSoundSource("bowling_roll");
+    fixSFXSplitscreen(m_roll_sfx);
     m_roll_sfx->play();
     m_roll_sfx->setLoop(true);
 }   // Bowling

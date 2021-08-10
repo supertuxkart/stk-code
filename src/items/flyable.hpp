@@ -39,6 +39,7 @@ class AbstractKart;
 class AbstractKartAnimation;
 class HitEffect;
 class PhysicalObject;
+class SFXBase;
 class XMLNode;
 
 /**
@@ -184,6 +185,7 @@ protected:
 
     void              moveToInfinity(bool set_moveable_trans = true);
     void              removePhysics();
+    void              fixSFXSplitscreen(SFXBase* sfx);
 public:
 
                  Flyable     (AbstractKart* kart,
