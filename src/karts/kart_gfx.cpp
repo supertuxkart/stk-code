@@ -183,6 +183,11 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
     {
 
         kind = ParticleKindManager::get()->getParticles(file_name);
+        if (!kind)
+        {
+            std::string err = "Failed to load particles: " + file_name;
+            throw std::runtime_error(err);
+        }
         //kind    = new ParticleKind(file_manager->getGfxFile(file_name));
         // Skid0 and Skid2 are only used to store the emitter type, and a
         // wheeless kart has no terrain effects.
