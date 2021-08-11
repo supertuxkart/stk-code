@@ -111,7 +111,14 @@ AddonsPack::AddonsPack(const std::string& url) : ModalDialog(0.8f, 0.8f)
     m_progress->setVisible(true);
     GUIEngine::RibbonWidget* actions_ribbon =
             getWidget<GUIEngine::RibbonWidget>("actions");
-    actions_ribbon->setVisible(false);
+    actions_ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    actions_ribbon->select("back", PLAYER_ID_GAME_MASTER);
+    getWidget("install")->setVisible(false);
+    getWidget("uninstall")->setVisible(false);
+    icon = getWidget<IconButtonWidget>("back");
+    icon->setImage(file_manager->getAsset(FileManager::GUI_ICON, "remove.png"),
+        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    icon->setLabel(_("Cancel"));
     m_download_request = std::make_shared<AddonsPackRequest>(url);
     m_download_request->queue();
 }   // AddonsPack

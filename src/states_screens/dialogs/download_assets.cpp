@@ -166,7 +166,17 @@ GUIEngine::EventPropagation DownloadAssets::processEvent(const std::string& even
             m_progress->setValue(0);
             m_progress->setVisible(true);
 
-            actions_ribbon->setVisible(false);
+            GUIEngine::RibbonWidget* actions_ribbon =
+                    getWidget<GUIEngine::RibbonWidget>("actions");
+            actions_ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+            actions_ribbon->select("back", PLAYER_ID_GAME_MASTER);
+            getWidget("install")->setVisible(false);
+            getWidget("uninstall")->setVisible(false);
+            GUIEngine::IconButtonWidget* icon =
+                getWidget<IconButtonWidget>("back");
+            icon->setImage(file_manager->getAsset(FileManager::GUI_ICON,
+                "remove.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            icon->setLabel(_("Cancel"));
 
             startDownload();
             return GUIEngine::EVENT_BLOCK;

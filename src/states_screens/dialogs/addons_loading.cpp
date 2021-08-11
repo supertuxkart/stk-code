@@ -209,11 +209,15 @@ void AddonsLoading::tryInstall()
     {
         m_progress->setValue(0);
         m_progress->setVisible(true);
-        // Change the 'back' button into a 'cancel' button.
-        m_back_button->setLabel(_("Cancel"));
         GUIEngine::RibbonWidget* actions_ribbon =
             getWidget<GUIEngine::RibbonWidget>("actions");
-        actions_ribbon->setVisible(false);
+        actions_ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+        actions_ribbon->select("back", PLAYER_ID_GAME_MASTER);
+        getWidget("install")->setVisible(false);
+        m_back_button->setImage(file_manager->getAsset(FileManager::GUI_ICON,
+            "remove.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        // Change the 'back' button into a 'cancel' button.
+        m_back_button->setLabel(_("Cancel"));
         startDownload();
     }
 #endif

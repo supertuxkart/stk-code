@@ -22,9 +22,11 @@
         </div>
 
         <bubble word_wrap="true" id="description" height="100%" width="90%" proportion="5" align="center" />
-        
+
         <spacer proportion="1" />
-        
+        <progressbar id="progress" x="0" y="20%" width="100%" height="2f" />
+        <spacer proportion="2" />
+
         <div width="80%" proportion="4" align="center">
             <buttonbar id="actions" x="0" y="0" height="100%" width="100%" align="center">
                 <icon-button id="install" width="128" height="128"
@@ -37,7 +39,6 @@
                              icon="gui/icons/back.png"
                              I18N="Add-on screen action" text="Back" />
             </buttonbar>
-            <progressbar id="progress" x="0" y="20%" width="100%" height="2f" />
         </div>
     </div>
 </stkgui>
