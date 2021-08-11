@@ -37,6 +37,11 @@ enum HandicapLevel : uint8_t;
 class BareNetworkString;
 class Server;
 
+namespace Online
+{
+    class HTTPRequest;
+}
+
 struct LobbyPlayer
 {
     irr::core::stringw m_user_name;
@@ -132,6 +137,10 @@ private:
 
     irr::core::stringw m_total_players;
 
+    static std::thread m_background_download;
+
+    static std::shared_ptr<Online::HTTPRequest> m_download_request;
+
     void liveJoinAcknowledged(Event* event);
     void handleKartInfo(Event* event);
     void finishLiveJoin();
@@ -140,6 +149,7 @@ private:
          std::shared_ptr<STKPeer> peer = nullptr,
          bool* is_spectator = NULL) const;
     void getKartsTracksNetworkString(BareNetworkString* ns);
+    void doInstallAddonsPack();
 public:
              ClientLobby(std::shared_ptr<Server> s);
     virtual ~ClientLobby();
@@ -184,9 +194,13 @@ public:
     const std::vector<float>& getRankingChanges() const
                                                   { return m_ranking_changes; }
     void handleClientCommand(const std::string& cmd);
-    void updateAssetsToServer();
     ClientState getCurrentState() const { return m_state.load(); }
     std::shared_ptr<Server> getJoinedServer() const { return m_server; }
+    static bool startedDownloadAddonsPack()
+             { return m_background_download.joinable() || m_download_request; }
+    static void downloadAddonsPack(std::shared_ptr<Online::HTTPRequest> r);
+    static void destroyBackgroundDownload();
+    void updateAssetsToServer();
 };
 
 #endif // CLIENT_LOBBY_HPP

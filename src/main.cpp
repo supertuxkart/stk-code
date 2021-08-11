@@ -2583,6 +2583,7 @@ int main(int argc, char *argv[])
 
     if (STKHost::existHost())
         STKHost::get()->shutdown();
+    ClientLobby::destroyBackgroundDownload();
 
     cleanSuperTuxKart();
     NetworkConfig::destroy();

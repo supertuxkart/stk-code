@@ -35,7 +35,6 @@ private:
     GUIEngine::LabelWidget* m_size;
 
     void stopDownload();
-    void doInstall();
 
     /** A pointer to the download request, which gives access
      *  to the progress of a download. */

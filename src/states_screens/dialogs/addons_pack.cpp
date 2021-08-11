@@ -25,10 +25,9 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "guiengine/message_queue.hpp"
 #include "network/protocols/client_lobby.hpp"
 #include "online/http_request.hpp"
-#include "race/grand_prix_manager.hpp"
-#include "replay/replay_play.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -47,7 +46,8 @@ class AddonsPackRequest : public HTTPRequest
 {
 private:
     bool m_extraction_error;
-    virtual void afterOperation()
+    bool m_background_download;
+    virtual void afterOperation() OVERRIDE
     {
         Online::HTTPRequest::afterOperation();
         if (isCancelled())
@@ -61,12 +61,18 @@ private:
         file_manager->checkAndCreateDirectory(tmp_extract);
         m_extraction_error =
             !extract_zip(getFileName(), tmp_extract, true/*recursive*/);
+        if (!m_extraction_error && m_background_download)
+        {
+            core::stringw msg = _("Background download completed.");
+            MessageQueue::add(MessageQueue::MT_GENERIC, msg);
+        }
     }
 public:
     AddonsPackRequest(const std::string& url)
     : HTTPRequest(StringUtils::getBasename(url), /*priority*/5)
     {
         m_extraction_error = true;
+        m_background_download = false;
         if (url.find("https://") != std::string::npos ||
             url.find("http://") != std::string::npos)
         {
@@ -87,7 +93,9 @@ public:
         file_manager->removeDirectory(
             file_manager->getAddonsFile("tmp_extract"));
     }
-    bool hadError() const { return hadDownloadError() || m_extraction_error; }
+    void backgroundDownload()                 { m_background_download = true; }
+    virtual bool hadDownloadError() const OVERRIDE
+              { return HTTPRequest::hadDownloadError() || m_extraction_error; }
 };   // DownloadAssetsRequest
 
 // ----------------------------------------------------------------------------
@@ -113,14 +121,26 @@ AddonsPack::AddonsPack(const std::string& url) : ModalDialog(0.8f, 0.8f)
             getWidget<GUIEngine::RibbonWidget>("actions");
     actions_ribbon->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     actions_ribbon->select("back", PLAYER_ID_GAME_MASTER);
-    getWidget("install")->setVisible(false);
+    icon = getWidget<IconButtonWidget>("install");
+    icon->setImage(file_manager->getAsset(FileManager::GUI_ICON,
+        "blue_plus.png"), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    icon->setLabel(_("Background download"));
+    icon->setVisible(true);
     getWidget("uninstall")->setVisible(false);
     icon = getWidget<IconButtonWidget>("back");
     icon->setImage(file_manager->getAsset(FileManager::GUI_ICON, "remove.png"),
         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     icon->setLabel(_("Cancel"));
-    m_download_request = std::make_shared<AddonsPackRequest>(url);
-    m_download_request->queue();
+    if (ClientLobby::startedDownloadAddonsPack())
+    {
+        core::stringw msg = _("Background download has already started.");
+        MessageQueue::add(MessageQueue::MT_ERROR, msg);
+    }
+    else
+    {
+        m_download_request = std::make_shared<AddonsPackRequest>(url);
+        ClientLobby::downloadAddonsPack(m_download_request);
+    }
 }   // AddonsPack
 
 // ----------------------------------------------------------------------------
@@ -158,7 +178,15 @@ GUIEngine::EventPropagation AddonsPack::processEvent(const std::string& event_so
     {
         const std::string& selection =
             actions_ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (selection == "back")
+        if (selection == "install")
+        {
+            if (m_download_request)
+                m_download_request->backgroundDownload();
+            m_download_request = nullptr;
+            dismiss();
+            return GUIEngine::EVENT_BLOCK;
+        }
+        else if (selection == "back")
         {
             dismiss();
             return GUIEngine::EVENT_BLOCK;
@@ -192,14 +220,17 @@ void AddonsPack::onUpdate(float delta)
             new MessageDialog(_("Sorry, downloading the add-on failed"));
             return;
         }
-        else if (m_download_request->isDone())
+        else if (m_download_request->isDone() ||
+            m_download_request->isCancelled())
         {
             // No sense to update state text, since it all
             // happens before the GUI is refrehsed.
-            doInstall();
+            dismiss();
             return;
         }
-    }   // if (m_progress->isVisible())
+    }
+    else
+        dismiss();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -212,119 +243,11 @@ void AddonsPack::stopDownload()
     // (and not uninstalling an installed one):
     if (m_download_request)
     {
-        m_download_request->cancel();
+        if (!m_download_request->isDone())
+            m_download_request->cancel();
         m_download_request = nullptr;
     }
 }   // startDownload
-
-
-// ----------------------------------------------------------------------------
-/** Called when the asynchronous download of the addon finished.
- */
-void AddonsPack::doInstall()
-{
-    core::stringw msg;
-    if (m_download_request->hadError())
-    {
-        // Reset the download buttons so user can redownload if needed
-        // I18N: Shown when there is download error for assets download
-        // in the first run
-        msg = _("Failed to download assets, check your storage space or internet connection and try again later.");
-    }
-
-    if (!msg.empty())
-    {
-        dismiss();
-        new MessageDialog(msg);
-    }
-    else
-    {
-        std::shared_ptr<AddonsPackRequest> request = m_download_request;
-        dismiss();
-        std::set<std::string> result;
-        std::string tmp_extract = file_manager->getAddonsFile("tmp_extract");
-        file_manager->listFiles(result, tmp_extract);
-        tmp_extract += "/";
-        bool addon_kart_installed = false;
-        bool addon_track_installed = false;
-        bool track_installed = false;
-        for (auto& r : result)
-        {
-            if (r == ".." || r == ".")
-                continue;
-            std::string addon_id = Addon::createAddonId(r);
-            // We assume the addons pack the user downloaded use the latest
-            // revision from the stk-addons (if exists)
-            if (file_manager->fileExists(tmp_extract + r + "/stkskin.xml"))
-            {
-                std::string skins = file_manager->getAddonsFile("skins");
-                file_manager->checkAndCreateDirectoryP(skins);
-                if (file_manager->isDirectory(skins + "/" + r))
-                    file_manager->removeDirectory(skins + "/" + r);
-                file_manager->moveDirectoryInto(tmp_extract + r, skins);
-                // Skin is not supported in stk-addons atm
-            }
-            else if (file_manager->fileExists(tmp_extract + r + "/kart.xml"))
-            {
-                std::string karts = file_manager->getAddonsFile("karts");
-                file_manager->checkAndCreateDirectoryP(karts);
-                if (file_manager->isDirectory(karts + "/" + r))
-                {
-                    const KartProperties* prop =
-                        kart_properties_manager->getKart(addon_id);
-                    // If the model already exist, first remove the old kart
-                    if (prop)
-                        kart_properties_manager->removeKart(addon_id);
-                    file_manager->removeDirectory(karts + "/" + r);
-                }
-                if (file_manager->moveDirectoryInto(tmp_extract + r, karts))
-                {
-                    kart_properties_manager->loadKart(karts + "/" + r);
-                    Addon* addon = addons_manager->getAddon(addon_id);
-                    if (addon)
-                    {
-                        addon_kart_installed = true;
-                        addon->setInstalled(true);
-                    }
-                }
-            }
-            else if (file_manager->fileExists(tmp_extract + r + "/track.xml"))
-            {
-                track_installed = true;
-                std::string tracks = file_manager->getAddonsFile("tracks");
-                file_manager->checkAndCreateDirectoryP(tracks);
-                if (file_manager->isDirectory(tracks + "/" + r))
-                    file_manager->removeDirectory(tracks + "/" + r);
-                if (file_manager->moveDirectoryInto(tmp_extract + r, tracks))
-                {
-                    Addon* addon = addons_manager->getAddon(addon_id);
-                    if (addon)
-                    {
-                        addon_track_installed = true;
-                        addon->setInstalled(true);
-                    }
-                }
-            }
-        }
-        if (addon_kart_installed || addon_track_installed)
-            addons_manager->saveInstalled();
-        if (track_installed)
-        {
-            track_manager->loadTrackList();
-            // Update the replay file list to use latest track pointer
-            ReplayPlay::get()->loadAllReplayFile();
-            delete grand_prix_manager;
-            grand_prix_manager = new GrandPrixManager();
-            grand_prix_manager->checkConsistency();
-        }
-        AddonsScreen* as = dynamic_cast<AddonsScreen*>(
-            GUIEngine::getCurrentScreen());
-        if (as)
-            as->loadList();
-        if (auto cl = LobbyProtocol::get<ClientLobby>())
-            cl->updateAssetsToServer();
-    }
-}   // doInstall
 
 // ----------------------------------------------------------------------------
 void AddonsPack::install(const std::string& name)

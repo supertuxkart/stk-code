@@ -55,9 +55,12 @@
 #include "network/server_config.hpp"
 #include "network/stk_host.hpp"
 #include "network/stk_peer.hpp"
+#include "race/grand_prix_manager.hpp"
+#include "replay/replay_play.hpp"
 #include "online/online_profile.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/addons_pack.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/online/network_kart_selection.hpp"
 #include "states_screens/online/tracks_screen.hpp"
@@ -76,6 +79,21 @@ extern "C"
     #include <SheenBidi.h>
 }
 #endif
+
+// ============================================================================
+std::thread ClientLobby::m_background_download;
+std::shared_ptr<Online::HTTPRequest> ClientLobby::m_download_request;
+//-----------------------------------------------------------------------------
+void ClientLobby::destroyBackgroundDownload()
+{
+    if (m_download_request)
+    {
+        m_download_request->cancel();
+        m_download_request = nullptr;
+    }
+    if (m_background_download.joinable())
+        m_background_download.join();
+}
 
 // ============================================================================
 /** The protocol that manages starting a race with the server. It uses a 
@@ -482,6 +500,17 @@ void ClientLobby::update(int ticks)
             NetworkString start(PROTOCOL_LOBBY_ROOM);
             start.addUInt8(LobbyProtocol::LE_REQUEST_BEGIN);
             STKHost::get()->sendToServer(&start, true);
+        }
+        if (m_background_download.joinable())
+        {
+            if (m_download_request && (m_download_request->isCancelled() ||
+                m_download_request->isDone()))
+            {
+                m_background_download.join();
+                if (m_download_request->isDone())
+                    doInstallAddonsPack();
+                m_download_request = nullptr;
+            }
         }
     case SELECTING_ASSETS:
     case RACING:
@@ -1611,7 +1640,26 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
     auto argv = StringUtils::split(cmd, ' ');
     if (argv.size() == 0)
         return;
-    if (argv[0] == "installaddon" && argv.size() == 2)
+    if (argv[0] == "addondownloadprogress")
+    {
+        float progress = 0.0f;
+        if (m_download_request)
+            progress = m_download_request->getProgress();
+        core::stringw msg = L"Background download progress: ";
+        msg += progress;
+        NetworkingLobby::getInstance()->addMoreServerInfo(msg);
+    }
+    else if (argv[0] == "stopaddondownload")
+    {
+        if (m_download_request)
+        {
+            m_download_request->cancel();
+            m_download_request = nullptr;
+        }
+        if (m_background_download.joinable())
+            m_background_download.join();
+    }
+    else if (argv[0] == "installaddon" && argv.size() == 2)
         AddonsPack::install(argv[1]);
     else if (argv[0] == "uninstalladdon" && argv.size() == 2)
         AddonsPack::uninstall(argv[1]);
@@ -1822,3 +1870,116 @@ void ClientLobby::updateAssetsToServer()
     sendToServer(ns, /*reliable*/true);
     delete ns;
 }   // updateAssetsToServer
+
+// ----------------------------------------------------------------------------
+void ClientLobby::downloadAddonsPack(std::shared_ptr<Online::HTTPRequest> r)
+{
+    if (startedDownloadAddonsPack())
+        return;
+    m_download_request = r;
+    m_background_download = std::thread([r](){ r->executeNow(); });
+}   // downloadAddonsPack
+
+// ----------------------------------------------------------------------------
+/** Called when the asynchronous download of the addon finished.
+ */
+void ClientLobby::doInstallAddonsPack()
+{
+#ifndef SERVER_ONLY
+    core::stringw msg;
+    if (!m_download_request->isCancelled() &&
+        m_download_request->hadDownloadError())
+    {
+        // Reset the download buttons so user can redownload if needed
+        // I18N: Shown when there is download error for assets download
+        // in the first run
+        msg = _("Failed to download assets, check your storage space or "
+            "internet connection and try again later.");
+    }
+
+    if (!msg.empty())
+    {
+        new MessageDialog(msg);
+    }
+    else
+    {
+        std::set<std::string> result;
+        std::string tmp_extract = file_manager->getAddonsFile("tmp_extract");
+        file_manager->listFiles(result, tmp_extract);
+        tmp_extract += "/";
+        bool addon_kart_installed = false;
+        bool addon_track_installed = false;
+        bool track_installed = false;
+        for (auto& r : result)
+        {
+            if (r == ".." || r == ".")
+                continue;
+            std::string addon_id = Addon::createAddonId(r);
+            // We assume the addons pack the user downloaded use the latest
+            // revision from the stk-addons (if exists)
+            if (file_manager->fileExists(tmp_extract + r + "/stkskin.xml"))
+            {
+                std::string skins = file_manager->getAddonsFile("skins");
+                file_manager->checkAndCreateDirectoryP(skins);
+                if (file_manager->isDirectory(skins + "/" + r))
+                    file_manager->removeDirectory(skins + "/" + r);
+                file_manager->moveDirectoryInto(tmp_extract + r, skins);
+                // Skin is not supported in stk-addons atm
+            }
+            else if (file_manager->fileExists(tmp_extract + r + "/kart.xml"))
+            {
+                std::string karts = file_manager->getAddonsFile("karts");
+                file_manager->checkAndCreateDirectoryP(karts);
+                if (file_manager->isDirectory(karts + "/" + r))
+                {
+                    const KartProperties* prop =
+                        kart_properties_manager->getKart(addon_id);
+                    // If the model already exist, first remove the old kart
+                    if (prop)
+                        kart_properties_manager->removeKart(addon_id);
+                    file_manager->removeDirectory(karts + "/" + r);
+                }
+                if (file_manager->moveDirectoryInto(tmp_extract + r, karts))
+                {
+                    kart_properties_manager->loadKart(karts + "/" + r);
+                    Addon* addon = addons_manager->getAddon(addon_id);
+                    if (addon)
+                    {
+                        addon_kart_installed = true;
+                        addon->setInstalled(true);
+                    }
+                }
+            }
+            else if (file_manager->fileExists(tmp_extract + r + "/track.xml"))
+            {
+                track_installed = true;
+                std::string tracks = file_manager->getAddonsFile("tracks");
+                file_manager->checkAndCreateDirectoryP(tracks);
+                if (file_manager->isDirectory(tracks + "/" + r))
+                    file_manager->removeDirectory(tracks + "/" + r);
+                if (file_manager->moveDirectoryInto(tmp_extract + r, tracks))
+                {
+                    Addon* addon = addons_manager->getAddon(addon_id);
+                    if (addon)
+                    {
+                        addon_track_installed = true;
+                        addon->setInstalled(true);
+                    }
+                }
+            }
+        }
+        if (addon_kart_installed || addon_track_installed)
+            addons_manager->saveInstalled();
+        if (track_installed)
+        {
+            track_manager->loadTrackList();
+            // Update the replay file list to use latest track pointer
+            ReplayPlay::get()->loadAllReplayFile();
+            delete grand_prix_manager;
+            grand_prix_manager = new GrandPrixManager();
+            grand_prix_manager->checkConsistency();
+        }
+        updateAssetsToServer();
+    }
+#endif
+}   // doInstall

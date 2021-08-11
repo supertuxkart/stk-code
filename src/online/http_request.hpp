@@ -112,7 +112,7 @@ namespace Online
 
         // ------------------------------------------------------------------------
         /** Returns true if there was an error downloading the file. */
-        bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
+        virtual bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
         // ------------------------------------------------------------------------
         void setDownloadAssetsRequest(bool val)
                                                { m_download_assets_request = val; }
