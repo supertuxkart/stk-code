@@ -58,12 +58,17 @@ vec2 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth)
         float depth             = CalcViewPositionFromDepth(projectedCoord.xy).z;
         dDepth                  = hitCoord.z - depth;
 
-        if (dDepth < 0.0 
-            && (projectedCoord.x > 0.0 && projectedCoord.x < 1.0) 
-            && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0) 
-            )
+        if (dDepth < 0.0)
         {
-            return projectedCoord.xy;
+            if (projectedCoord.x > 0.0 && projectedCoord.x < 1.0 &&
+                projectedCoord.y > 0.0 && projectedCoord.y < 1.0)
+            {
+                return projectedCoord.xy;
+            }
+            else
+            {
+                return vec2(0.f);
+            }
         }
     }
 
