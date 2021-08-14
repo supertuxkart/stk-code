@@ -121,6 +121,7 @@ void SpinnerWidget::add()
     std::string max_s = m_properties[PROP_MAX_VALUE];
 
     m_wrap_around = (m_properties[PROP_WRAP_AROUND] == "true");
+    m_color_slider = (m_properties[PROP_COLOR_SLIDER] == "true");
 
     if (min_s.size() > 0)
     {

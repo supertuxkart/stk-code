@@ -13,7 +13,7 @@
         </div>
         <spacer height="20" width="10"/>
         <div height="fit" width="100%" layout="horizontal-row">
-            <gauge id="color-slider" min_value="1" max_value="100" proportion="1" wrap_around="true"/>
+            <gauge id="color-slider" min_value="1" max_value="100" proportion="1" wrap_around="true" color_slider="true"/>
         </div>
         <spacer height="10" width="10"/>
         <buttonbar id="buttons" height="20%" width="30%" align="center">

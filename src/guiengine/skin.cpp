@@ -1568,15 +1568,36 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     }
     else if (widget->m_deactivated)
     {
-        params=&SkinConfig::m_render_params["spinner::deactivated"];
+        if (q->isColorSlider())
+        {
+            params=&SkinConfig::m_render_params["spinner_rainbow::deactivated"];
+        }
+        else
+        {
+            params=&SkinConfig::m_render_params["spinner::deactivated"];
+        }
     }
     else if (focused || pressed)
     {
-        params=&SkinConfig::m_render_params["spinner::focused"];
+        if (q->isColorSlider())
+        {
+            params=&SkinConfig::m_render_params["spinner_rainbow::focused"];
+        }
+        else
+        {
+            params=&SkinConfig::m_render_params["spinner::focused"];
+        }
     }
     else
     {
-        params=&SkinConfig::m_render_params["spinner::neutral"];
+        if (q->isColorSlider())
+        {
+            params=&SkinConfig::m_render_params["spinner_rainbow::neutral"];
+        }
+        else
+        {
+            params=&SkinConfig::m_render_params["spinner::neutral"];
+        }
     }
 
     for (unsigned i = 1; i < MAX_PLAYER_COUNT + 1; i++)
@@ -1650,9 +1671,17 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                                                (int)((widget->m_w
                                                       - 2*handle_size)*value),
                                         rect.UpperLeftCorner.Y + widget->m_h);
-    
-            const ITexture* texture =
-                SkinConfig::m_render_params["gaugefill::neutral"].getImage();
+
+            ITexture* texture;
+            if (w->isColorSlider())
+            {
+                texture = SkinConfig::m_render_params["gaugefillrainbow::neutral"].getImage();
+            }
+            else
+            {
+                texture = SkinConfig::m_render_params["gaugefill::neutral"].getImage();
+            }
+
             const int texture_w = texture->getSize().Width;
             const int texture_h = texture->getSize().Height;
     

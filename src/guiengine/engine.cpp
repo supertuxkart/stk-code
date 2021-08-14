@@ -497,6 +497,14 @@ namespace GUIEngine
 
 
  \n
+ \subsection prop21 PROP_COLOR_SLIDER
+ <em> Name in XML files: </em> \c "color_slider"
+
+ Used for gauges only, to indicate if it is a color slider.
+ Value can be "true" or "false"
+
+
+ \n
  <HR>
  \section code Using the engine in code
  <HR>

@@ -118,6 +118,7 @@ namespace GUIEngine
         PROP_KEEP_SELECTION,
         PROP_CUSTOM_RATIO,
         PROP_ICON_ALIGN,
+        PROP_COLOR_SLIDER, // this one is used to identify if a gauge is used as the color slider
     };
 
     bool isWithinATextBox();

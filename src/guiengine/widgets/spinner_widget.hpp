@@ -78,6 +78,9 @@ namespace GUIEngine
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
 
+        /** \brief Whether this widget is a color slider */
+        bool m_color_slider;
+
         /** \brief Whether the left arrow is the currently selected one  */
         bool m_left_selected;
 
@@ -185,7 +188,12 @@ namespace GUIEngine
           * \return whether this spinner is of "gauge" type
           */
         bool isGauge()  const { return m_gauge; }
-        
+
+        /**
+          * \return whether this spinner is of "color_slider" type
+          */
+        bool isColorSlider()  const { return m_color_slider; }
+
         /**
          * \brief retrieve the current value of the spinner
          * \return the current value of the spinner, in a int form

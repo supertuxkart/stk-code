@@ -111,6 +111,7 @@ when the border that intersect at this corner are enabled.
       
 <element type="progress" state="fill" image="glasssgauge_fill.png"
       left_border="5" right_border="5" top_border="5" bottom_border="5" />
+<element type="gaugefillrainbow" common="y" image="gauge_fill_rainbow.png" />
 
 <element type="progress" state="neutral" common="y" image="progress_bg.png"
       left_border="31" right_border="31" top_border="15" bottom_border="15" />
@@ -182,6 +183,19 @@ when the border that intersect at this corner are enabled.
 <element type="spinner" state="deactivated" common="y" image="glassspinner_deactivated.png"
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
+<!-- color spinner in kart color selection -->
+<element type="spinner_rainbow" state="neutral" image="spinner_rainbow.png"
+      left_border="104" right_border="104" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+
+<element type="spinner_rainbow" state="focused" image="spinner_rainbow_focus.png"
+      left_border="104" right_border="104" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+
+<element type="spinner_rainbow" state="deactivated" image="spinner_rainbow_deactivated.png"
+      left_border="104" right_border="104" top_border="0" bottom_border="36"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
 
 <!-- player name spinner color in multiplayer-->
 <element type="spinner1" state="neutral" common="y" image="glass_square_cyan.png"

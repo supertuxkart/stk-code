@@ -253,6 +253,7 @@ if(prop_name != NULL) widget.m_properties[prop_flag] = core::stringc(prop_name).
                 READ_PROPERTY(label_location, PROP_LABELS_LOCATION);
                 READ_PROPERTY(max_rows,       PROP_MAX_ROWS);
                 READ_PROPERTY(wrap_around,    PROP_WRAP_AROUND);
+                READ_PROPERTY(color_slider,   PROP_COLOR_SLIDER);
                 READ_PROPERTY(padding,        PROP_DIV_PADDING);
                 READ_PROPERTY(keep_selection, PROP_KEEP_SELECTION);
 #undef READ_PROPERTY
