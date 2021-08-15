@@ -135,8 +135,6 @@ all types of ttf.
 <element type="progress" state="fill" image="gauge_fill.png"
       left_border="7" right_border="7" top_border="7" bottom_border="7"
       preserve_h_aspect_ratios="false" />
-<!-- used for the color slider. -->
-<element type="gaugefillrainbow" common="y" image="gauge_fill_rainbow.png" />
 
 <element type="progress" state="neutral" image="section.png"
       left_border="7" right_border="7" top_border="7" bottom_border="7"
@@ -213,15 +211,15 @@ all types of ttf.
 <!-- color spinner in kart color selection -->
 <element type="spinner_rainbow" state="neutral" image="spinner_rainbow.png"
       left_border="104" right_border="104" top_border="0" bottom_border="36"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0"/>
 
 <element type="spinner_rainbow" state="focused" image="spinner_rainbow_focus.png"
       left_border="104" right_border="104" top_border="0" bottom_border="36"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0"/>
 
 <element type="spinner_rainbow" state="deactivated" image="spinner_rainbow_deactivated.png"
       left_border="104" right_border="104" top_border="0" bottom_border="36"
-      preserve_h_aspect_ratios="true" hborder_out_portion="0.0" common="y"/>
+      preserve_h_aspect_ratios="true" hborder_out_portion="0.0"/>
 
 <!-- player name spinner color in multiplayer-->
 <element type="spinner1" state="neutral" image="spinner_red.png"
@@ -257,6 +255,8 @@ all types of ttf.
 <!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
      Note: the body of a guage is the same as for for spinners. -->
 <element type="gaugefill" image="spinner_fill.png" />
+<!-- used for the color slider. -->
+<element type="gaugefillrainbow" common="y" image="gauge_fill_rainbow.png"/>
 
 <!-- Lists are always in neutral state for now -->
 <element type="list" image="section.png"
