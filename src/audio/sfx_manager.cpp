@@ -425,6 +425,8 @@ void SFXManager::mainLoop(void *obj)
         case SFX_UPDATE:     me->reallyUpdateNow(current);        break;
         case SFX_MUSIC_START:
         {
+            if (!current->m_music_information->preStart())
+                break;
             current->m_music_information->setDefaultVolume();
             current->m_music_information->startMusic();           break;
         }
@@ -445,6 +447,7 @@ void SFXManager::mainLoop(void *obj)
             mi->setTemporaryVolume(current->m_parameter.getX());  break;
         }
         case SFX_MUSIC_WAITING:
+               current->m_music_information->preStart();
                current->m_music_information->setMusicWaiting();   break;
         case SFX_MUSIC_DEFAULT_VOLUME:
         {

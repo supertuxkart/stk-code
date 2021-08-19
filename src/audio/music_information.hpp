@@ -97,6 +97,8 @@ private:
     void   switchToFastMusic();
     void   setTemporaryVolume(float volume);
     // ------------------------------------------------------------------------
+    bool   preStart();
+    // ------------------------------------------------------------------------
     /** Sets the music to be waiting, i.e. startMusic still needs to be
     *  called. Used to pre-load track music during track loading time. */
     void setMusicWaiting() { m_music_waiting = true; }

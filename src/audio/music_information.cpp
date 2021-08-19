@@ -22,6 +22,7 @@
 #include <iostream>
 
 #include "audio/music_dummy.hpp"
+#include "audio/music_manager.hpp"
 #include "audio/music_ogg.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
@@ -142,6 +143,29 @@ void MusicInformation::addMusicToTracks()
         if(track) track->addMusic(this);
     }
 }   // addMusicToTracks
+
+//-----------------------------------------------------------------------------
+/** Return false if it should not be started, done in sfx thread.
+ */
+bool MusicInformation::preStart()
+{
+    MusicInformation* old_mi = music_manager->m_current_music.load();
+    // If this music is already playing, ignore this call.
+    if (isPlaying() ||
+        (old_mi != NULL && old_mi == this && old_mi->isPlaying()))
+    {
+        return false;
+    }
+    // It is possible here that startMusic() will be called without first
+    // calling stopMusic(). This would cause a memory leak by overwriting
+    // m_current_music without first releasing its resources. Guard against
+    // this here by making sure that stopMusic() is called before starting
+    // new music.
+    if (old_mi)
+        old_mi->stopMusic();
+    music_manager->m_current_music.store(this);
+    return true;
+}   // preStart
 
 //-----------------------------------------------------------------------------
 /** Starts the music.

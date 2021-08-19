@@ -175,24 +175,22 @@ void MusicManager::startMusic()
  */
 void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
 {
-    if (STKProcess::getType() != PT_MAIN)
+    if (STKProcess::getType() != PT_MAIN || !m_initialized)
         return;
 
-    // If this music is already playing, ignore this call.
-    if (m_current_music != NULL &&
-        m_current_music == mi &&
-        m_current_music->isPlaying())
+    if (!UserConfigParams::m_music)
+    {
+        // Save it so it can be turned on later in options menu
+        m_current_music = mi;
         return;
+    }
 
-    // It is possible here that startMusic() will be called without first
-    // calling stopMusic(). This would cause a memory leak by overwriting
-    // m_current_music without first releasing its resources. Guard against
-    // this here by making sure that stopMusic() is called before starting
-    // new music.
-    stopMusic();
-    m_current_music = mi;
-
-    if(!mi || !UserConfigParams::m_music || !m_initialized) return;
+    if (!mi)
+    {
+        // NULL music will stop current music
+        clearCurrentMusic();
+        return;
+    }
 
     SFXManager::get()->queue(start_right_now ? SFXManager::SFX_MUSIC_START
                                              : SFXManager::SFX_MUSIC_WAITING,
