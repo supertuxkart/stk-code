@@ -112,7 +112,6 @@ when the border that intersect at this corner are enabled.
       
 <element type="progress" state="fill" image="glasssgauge_fill.png"
       left_border="5" right_border="5" top_border="5" bottom_border="5" />
-<element type="gaugefillrainbow" common="y" image="gauge_fill_rainbow.png" />
 
 <element type="progress" state="neutral" common="y" image="progress_bg.png"
       left_border="31" right_border="31" top_border="15" bottom_border="15" />
@@ -233,6 +232,7 @@ when the border that intersect at this corner are enabled.
 <!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
      Note: the body of a guage is the same as for for spinners. -->
 <element type="gaugefill" image="glasssgauge_fill.png" />
+<element type="gaugefillrainbow" common="y" image="gauge_fill_rainbow.png" />
 
 <!-- Lists are always in neutral state for now -->
 <element type="list" common="y" image="glass_section.png"
