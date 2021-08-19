@@ -164,6 +164,8 @@ private:
      *  animation can be skipped. */
     bool                       m_gp_position_was_changed;
 
+    bool                       m_started_race_over_music;
+
     /** The previous monospace state of the font. */
     //bool                       m_was_monospace;
 

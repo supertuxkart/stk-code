@@ -95,6 +95,7 @@ void RaceResultGUI::init()
     getWidget("middle")->setVisible(false);
     getWidget("right")->setVisible(false);
 
+    m_started_race_over_music = false;
     music_manager->stopMusic();
 
     bool human_win = true;
@@ -1021,13 +1022,15 @@ void RaceResultGUI::unload()
     void RaceResultGUI::onUpdate(float dt)
     {
         // When the finish sound has been played, start the race over music.
-        if (m_finish_sound && m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
+        if (!m_started_race_over_music &&
+            m_finish_sound && m_finish_sound->getStatus() != SFXBase::SFX_PLAYING)
         {
             try
             {
                 // This call is done once each frame, but startMusic() is cheap
                 // if the music is already playing.
                 music_manager->startMusic(m_race_over_music);
+                m_started_race_over_music = true;
             }
             catch (std::exception& e)
             {
