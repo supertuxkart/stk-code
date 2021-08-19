@@ -2206,7 +2206,7 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
     core::recti r(pos, size);
     drawBoxFromStretchableTexture(widget, r,
                               SkinConfig::m_render_params["tooltip::neutral"]);
-    font->draw(widget->getTooltipText(), r, video::SColor(255, 0, 0, 0),
+    font->draw(widget->getTooltipText(), r, GUIEngine::getSkin()->getColor("text::neutral"),
                false, false);
 }   // drawTooltip
 
