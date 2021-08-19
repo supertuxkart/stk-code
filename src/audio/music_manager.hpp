@@ -79,7 +79,11 @@ public:
     MusicInformation* getCurrentMusic() { return m_current_music; }
     // ------------------------------------------------------------------------
     /** Stops and removes the current music. */
-    void clearCurrentMusic() { m_current_music = NULL; }
+    void clearCurrentMusic()
+    {
+        stopMusic();
+        m_current_music = NULL;
+    }
 };
 
 extern MusicManager* music_manager;
