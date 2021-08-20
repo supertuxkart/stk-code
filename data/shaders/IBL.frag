@@ -96,35 +96,46 @@ void main(void)
 #else
     // :::::::: Compute Space Screen Reflection ::::::::::::::::::::::::::::::::::::
 
+    // Output color
+    vec3 outColor;
+
     // Fallback (if the ray can't find an intersection we display the sky)
     vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
 
-    vec3 View_Pos               = CalcViewPositionFromDepth(uv);
+    // Only calculate reflections if the reflectivity value is high enough,
+    // otherwise just use specular IBL
+    if (specval > 0.5)
+    {
+        vec3 View_Pos               = CalcViewPositionFromDepth(uv);
 
-    // Reflection vector
-    vec3 reflected              = normalize(reflect(eyedir, normal));
+        // Reflection vector
+        vec3 reflected              = normalize(reflect(eyedir, normal));
 
-    // Ray cast
-    vec3 hitPos                 = View_Pos.xyz;
-    float dDepth;
-    float minRayStep            = 50.0f;
+        // Ray cast
+        vec3 hitPos                 = View_Pos.xyz;
+        float dDepth;
+        float minRayStep            = 50.0f;
 
-    vec2 coords = RayCast(reflected * max(minRayStep, -View_Pos.z),
-                            hitPos, dDepth);
+        vec2 coords = RayCast(reflected * max(minRayStep, -View_Pos.z),
+                                hitPos, dDepth);
 
-    vec3 outColor;
-
-    if (coords.x == 0.0 && coords.y == 0.0) {
-        outColor = fallback;
-    } else {
-        // FIXME We need to generate mipmap to take into account the gloss map
-        outColor = textureLod(albedo, coords, 0.f).rgb;
-        outColor = mix(fallback, outColor, GetVignette(coords, 2.5));
+        if (coords.x == 0.0 && coords.y == 0.0) {
+            outColor = fallback;
+        } else {
+            // FIXME We need to generate mipmap to take into account the gloss map
+            outColor = textureLod(albedo, coords, 0.f).rgb;
+            outColor = mix(fallback, outColor, GetVignette(coords, 2.5));
+            // TODO temporary measure the lack of mipmapping for RTT albedo
+            // Implement it in proper way
+            // Use (specval - 0.5) * 2.0 to bring specval from 0.5-1.0 range to 0.0-1.0 range
+            outColor = mix(fallback, outColor, (specval - 0.5) * 2.0);
+        }
     }
-    
-    // TODO temporary measure the lack of mipmaping for RTT albedo
-    // Implement it in proper way
-    outColor = mix(fallback, outColor, specval);
+    else
+    {
+        outColor = fallback;
+    }
+
     Spec = vec4(outColor.rgb, 1.0);
 #endif
 
