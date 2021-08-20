@@ -2049,6 +2049,16 @@ void Kart::handleMaterialGFX(float dt)
             return;  // no particle effect, return
         }
         m_kart_gfx->updateTerrain(pk);
+
+        // Make sure camera is reset if on ground, see #2916
+        for (unsigned i = 0; i < Camera::getNumCameras(); i++)
+        {
+            Camera *camera = Camera::getCamera(i);
+            if (camera->getKart() != this)
+                continue;
+            if (camera->getMode() == Camera::CM_FALLING)
+                camera->setMode(Camera::CM_NORMAL);
+        }   // for i in all cameras for this kart
         return;
     }
 
