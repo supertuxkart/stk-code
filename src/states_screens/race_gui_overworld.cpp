@@ -99,8 +99,8 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     calculateMinimapSize();
 
-    m_speed_meter_icon = material_manager->getMaterial("speedback.png");
-    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
+    m_speed_meter_icon = irr_driver->getTexture(FileManager::GUI_ICON, "speedback.png");
+    m_speed_bar_icon   = irr_driver->getTexture(FileManager::GUI_ICON, "speedfore.png");
     //createMarkerTexture();
 
     m_active_challenge = NULL;

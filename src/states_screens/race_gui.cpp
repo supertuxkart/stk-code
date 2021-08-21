@@ -91,10 +91,8 @@ RaceGUI::RaceGUI()
     m_is_tutorial = (RaceManager::get()->getTrackName() == "tutorial");
 
     // Load speedmeter texture before rendering the first frame
-    m_speed_meter_icon = material_manager->getMaterial("speedback.png");
-    m_speed_meter_icon->getTexture(false,false);
-    m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
-    m_speed_bar_icon->getTexture(false,false);
+    m_speed_meter_icon = irr_driver->getTexture(FileManager::GUI_ICON, "speedback.png");
+    m_speed_bar_icon   = irr_driver->getTexture(FileManager::GUI_ICON, "speedfore.png");
     //createMarkerTexture();
 
     // Load icon textures for later reuse
@@ -1010,10 +1008,9 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                     (int)(offset.Y-meter_height),
                                     (int)(offset.X+meter_width),
                                     (int)offset.Y);
-    video::ITexture *meter_texture = m_speed_meter_icon->getTexture();
     const core::rect<s32> meter_texture_coords(core::position2d<s32>(0,0),
-                                               meter_texture->getSize());
-    draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL,
+                                               m_speed_meter_icon->getSize());
+    draw2DImage(m_speed_meter_icon, meter_pos, meter_texture_coords, NULL,
                        NULL, true);
     // TODO: temporary workaround, shouldn't have to use
     // draw2DVertexPrimitiveList to render a simple rectangle
@@ -1104,7 +1101,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                                      speed_ratio, meter_width, meter_height, offset);
 
 
-    drawMeterTexture(m_speed_bar_icon->getTexture(), vertices, count);
+    drawMeterTexture(m_speed_bar_icon, vertices, count);
 #endif
 }   // drawSpeedEnergyRank
 

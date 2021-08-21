@@ -49,9 +49,6 @@ class RaceGUIOverworld : public RaceGUIBase
 {
 private:
 
-    Material        *m_speed_meter_icon;
-    Material        *m_speed_bar_icon;
-
     bool             m_close_to_a_challenge;
 
     // Minimap related variables
@@ -63,6 +60,10 @@ private:
 
 
     video::ITexture* m_icons[7];
+
+    /** Texture for speedometer. */
+    irr::video::ITexture *m_speed_meter_icon;
+    irr::video::ITexture *m_speed_bar_icon;
 
     /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */

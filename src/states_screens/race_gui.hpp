@@ -41,9 +41,6 @@ class RaceGUI : public RaceGUIBase
 {
 private:
 
-    Material        *m_speed_meter_icon;
-    Material        *m_speed_bar_icon;
-
     // Minimap related variables
     // -------------------------
     /** The size of a single marker on the screen for AI karts,
@@ -102,6 +99,10 @@ private:
     irr::video::ITexture *m_basket_ball_icon;
     /** Texture for the hit limit icon*/
     irr::video::ITexture* m_champion;
+
+    /** Texture for speedometer. */
+    irr::video::ITexture *m_speed_meter_icon;
+    irr::video::ITexture *m_speed_bar_icon;
 
     /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */
