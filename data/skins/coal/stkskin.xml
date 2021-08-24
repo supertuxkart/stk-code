@@ -287,7 +287,7 @@ when the border that intersect at this corner are enabled.
       hborder_out_portion="1.0" vborder_out_portion="0.2" />
 
 <!-- Stateless -->
-<element type="tooltip" common="y" image="tooltip.png"
+<element type="tooltip" image="tooltip.png"
     left_border="10" right_border="10" top_border="10" bottom_border="10"
     hborder_out_portion="1.0" vborder_out_portion="1.0" />
     
