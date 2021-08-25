@@ -11,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 10:48+0800\n"
-"PO-Revision-Date: 2021-07-14 04:25+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2021-08-11 10:50+0800\n"
+"PO-Revision-Date: 2021-08-12 06:44+0000\n"
+"Last-Translator: Adithyan S S <AssG.Fight.Fairy@gmail.com>\n"
 "Language-Team: Malayalam (http://www.transifex.com/supertuxkart/supertuxkart/language/ml/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -49,7 +49,7 @@ msgstr " ഔദ്യോഗിക ട്രാക്കുകളെല്ലാ�
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
-msgstr "പ്ധാക്ക്!"
+msgstr "പൊളിച്ചേ!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
@@ -73,11 +73,11 @@ msgstr "ട്രാക്കിൻ്റെ സ്വതേയുള്ള ല�
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
-msgstr "സ്കിഡ്-നിര"
+msgstr "സ്കിഡ്ഡ്-നിര"
 
 #. I18N: ./data/achievements.xml
 msgid "Skid 5 times in a single lap."
-msgstr "ഒരൊറ്റ ലാപ്പിൽ 5 പ്രാവശ്യം സ്കിഡ് ചെയ്യുക."
+msgstr "ഒരൊറ്റ ലാപ്പിൽ 5 പ്രാവശ്യം സ്കിഡ്ഡ് ചെയ്യുക."
 
 #. I18N: ./data/achievements.xml
 msgid "Gold driver"
@@ -141,7 +141,7 @@ msgstr "ഭാഗ്യത്തിനുമപ്പുറം"
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "വിദ്വാനിലോ സൂപ്പർടക്സിലോ 10 ഒറ്റയാൾ റേസുകളിൽ 5 AI കാർട്ടുകൾക്കെതിരെയെങ്കിലും വിജയിക്കണം. ശ്രദ്ധിക്കുക, ഒരു റേസ് പുനരാരംഭിക്കുകയാണെങ്കിൽ പരാജയമായി കണക്കാക്കുന്നു."
+msgstr "വിദ്വാനിലോ സൂപ്പർടക്സിലോ 10 ഒറ്റയാൾ റേസുകളിൽ 5 AIകൾക്കെതിരെയെങ്കിലും വിജയിക്കണം. ശ്രദ്ധിക്കുക, ഒരു റേസ് പുനരാരംഭിക്കുകയാണെങ്കിൽ പരാജയമായി കണക്കാക്കുന്നു."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -178,7 +178,7 @@ msgstr "അൺ ഇൻസ്റ്റാൾ ചെയ്യുക"
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:153
-#: src/states_screens/dialogs/addons_loading.cpp:297
+#: src/states_screens/dialogs/addons_loading.cpp:301
 msgid "Back"
 msgstr "പിന്നോട്ട്"
 
@@ -316,10 +316,10 @@ msgstr "പൂർവ്വസ്ഥിതിയിലാക്കുക"
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:128
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
-#: src/states_screens/high_score_selection.cpp:208
+#: src/states_screens/high_score_selection.cpp:246
 msgid "Yes"
 msgstr "അതെ"
 
@@ -357,8 +357,10 @@ msgstr "അതെ"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
-#: src/states_screens/dialogs/addons_loading.cpp:213
-#: src/states_screens/online/register_screen.cpp:163
+#: src/states_screens/dialogs/addons_loading.cpp:220
+#: src/states_screens/dialogs/addons_pack.cpp:133
+#: src/states_screens/dialogs/download_assets.cpp:179
+#: src/states_screens/online/register_screen.cpp:168
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "റദ്ദാക്കുക"
@@ -500,7 +502,7 @@ msgstr "തന്മാത്രാഗുണങ്ങൾ"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Rendered image quality"
-msgstr "അവതരിപ്പിച്ച ചിത്രത്തിൻ്റെ വ്യക്തത"
+msgstr "അവതരണചിത്രത്തിൻ്റെ വ്യക്തത"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -569,8 +571,6 @@ msgstr "മറ്റൊരു പ്രേതവുമായി താരതമ�
 #. I18N: High score info screen action
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/gp_info.stkgui
-#. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
@@ -772,7 +772,7 @@ msgstr "പ്രയാസം"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1241
+#: src/race/race_manager.cpp:1246
 msgid "Novice"
 msgstr "തുടക്കക്കാരൻ"
 
@@ -784,7 +784,7 @@ msgstr "തുടക്കക്കാരൻ"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1242
+#: src/race/race_manager.cpp:1247
 msgid "Intermediate"
 msgstr "അർധജ്ഞാനി"
 
@@ -796,7 +796,7 @@ msgstr "അർധജ്ഞാനി"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1243
+#: src/race/race_manager.cpp:1248
 msgid "Expert"
 msgstr "വിദ്വാൻ"
 
@@ -808,7 +808,7 @@ msgstr "വിദ്വാൻ"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1244
+#: src/race/race_manager.cpp:1249
 msgid "SuperTux"
 msgstr "സൂപ്പർടക്സ്"
 
@@ -827,7 +827,7 @@ msgstr "ഗെയിം മോഡ്"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1216
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1221
 #: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "സാധാരണ റേസ്"
@@ -841,7 +841,7 @@ msgstr "സാധാരണ റേസ്"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1218
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1223
 msgid "Time Trial"
 msgstr "ടൈം ട്രയൽ"
 
@@ -858,7 +858,7 @@ msgstr "യുദ്ധം"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1230
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1235
 #: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "സോക്കർ"
@@ -882,7 +882,7 @@ msgstr "ചേരുക"
 #. I18N: In the server info dialog
 #: src/states_screens/dialogs/server_info_dialog.cpp:274
 msgid "Bookmark this server"
-msgstr ""
+msgstr "ഈ സെർവർ ബുക്ക്മാർക്ക് ചെയ്യാം"
 
 #. I18N: ./data/gui/dialogs/online/splitscreen_player_dialog.stkgui
 #. I18N: Splitscreen player in network
@@ -985,9 +985,9 @@ msgstr "റേസ് രൂപീകരണം"
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:238
-#: src/states_screens/race_result_gui.cpp:267
-#: src/states_screens/race_result_gui.cpp:275
+#: src/states_screens/race_result_gui.cpp:254
+#: src/states_screens/race_result_gui.cpp:283
+#: src/states_screens/race_result_gui.cpp:291
 msgid "Continue"
 msgstr "തുടരാം"
 
@@ -1015,8 +1015,6 @@ msgstr "കാർട്ടുകൾ"
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In the addons screen
 #. I18N: ./data/gui/screens/gp_info.stkgui
-#. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Tracks"
 msgstr "ട്രാക്കുകൾ"
@@ -1057,7 +1055,7 @@ msgstr "സ്റ്റാൻഡേർഡ്"
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:337
 #: src/states_screens/kart_selection.cpp:317
-#: src/states_screens/tracks_and_gp_screen.cpp:152
+#: src/states_screens/tracks_and_gp_screen.cpp:161
 msgid "Add-Ons"
 msgstr "ആഡ്-ഓണുകൾ"
 
@@ -1073,11 +1071,11 @@ msgstr "ആഡ്-ഓണുകൾ"
 #: src/states_screens/arenas_screen.cpp:74
 #: src/states_screens/easter_egg_screen.cpp:137
 #: src/states_screens/edit_track_screen.cpp:111
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:79
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:309
 #: src/states_screens/online/tracks_screen.cpp:354
-#: src/states_screens/tracks_and_gp_screen.cpp:142
+#: src/states_screens/tracks_and_gp_screen.cpp:151
 msgid "All"
 msgstr "എല്ലാം"
 
@@ -1151,7 +1149,7 @@ msgstr "പ്രേത റീപ്ലേ തിരഞ്ഞെടുക്ക�
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1228
+#: src/race/race_manager.cpp:1233
 msgid "Egg Hunt"
 msgstr "മുട്ട വേട്ട"
 
@@ -1187,30 +1185,22 @@ msgstr "പ്രേത റീപ്ലേ റെക്കോർഡ് ചെയ
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
-#. I18N: In the grand prix info screen
 msgid "AI karts"
 msgstr "AI കാർട്ടുകൾ"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
-#. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Reverse"
 msgstr "എതിർദിശ"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
-#. I18N: In the grand prix info screen
 msgid "Track group"
 msgstr "ട്രാക്ക് ഗ്രൂപ്പ്"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
-#. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:163
 msgid "Continue saved GP"
 msgstr "സൂക്ഷിച്ച GP തുടരാം"
 
@@ -1235,6 +1225,7 @@ msgstr "പകർത്തുക"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
+#: src/states_screens/online/register_screen.cpp:71
 msgid "Rename"
 msgstr "പേരുമാറ്റുക"
 
@@ -1322,7 +1313,7 @@ msgstr "പഴത്തൊലികൾ"
 #. I18N: Main menu button
 #: src/io/rich_presence.cpp:501
 msgid "Story Mode"
-msgstr "കഥ മോഡ്"
+msgstr "കഥാ മോഡ്"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: Tab in help menu
@@ -1386,7 +1377,7 @@ msgstr "നൈട്രോ ശേഖരിക്കുന്നതിലൂട�
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "ഇതുപോലെ ഒരു പൂട്ട് അടങ്ങിയ ഒരു ബട്ടൺ നിങ്ങൾ കാണുകയാണെങ്കിൽ, അതു തുറക്കാൻ നിങ്ങൾക്ക് ഒരു വെല്ലുവിളി പൂർത്തിയാക്കേണ്ടതുണ്ട് എന്നർത്ഥം."
+msgstr "ഇത്തരം ഒരു പൂട്ട് അടങ്ങിയ ഒരു ബട്ടൺ നിങ്ങൾ കാണുകയാണെങ്കിൽ, അതു തുറക്കാൻ നിങ്ങൾക്ക് ഒരു വെല്ലുവിളി പൂർത്തിയാക്കേണ്ടതുണ്ട് എന്നർത്ഥം."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1395,7 +1386,7 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr "ഒരു പ്രത്യേക കിയോ ബട്ടണോ അമർത്തുന്നതിലുടെ നിങ്ങൾക്ക് സ്കിഡ് ചെയ്യാൻ കഴിയുന്നതാണ്. വിജയകരമായ ചെറിയ സ്കിഡുകൾ കൂർത്ത തിരിവുകൾ എടുക്കാൻ സഹായിക്കും; മിതമായ സ്കിഡുകൾ നിങ്ങളുെടെ വേഗത വർദ്ധിപ്പിക്കുമ്പോൾ, ദൈർഘ്യമേറിയ സ്കിഡുകൾ അതിനും മേലെയാണ്. സ്കിഡിങ്ങിനിടെ നിങ്ങൾക്ക് തിരിയുന്നത് തടയാനാവില്ല, അതിനാൽ നിങ്ങളുടെ കാർട്ടിനെ ശ്രദ്ധാപൂർവ്വം വിന്യസിക്കേണേ!"
+msgstr "ഒരു പ്രത്യേക കിയോ ബട്ടണോ അമർത്തുന്നതിലുടെ നിങ്ങൾ സ്കിഡ്ഡ് ചെയ്യുന്നു. അനുസ്യൂതമായ ചെറിയ സ്കിഡ്ഡുകൾ കൂർത്ത തിരിവുകൾ എടുക്കാൻ സഹായിക്കും; മിതമായ സ്കിഡ്ഡുകൾ നിങ്ങളുടെ വേഗത വർദ്ധിപ്പിക്കുമ്പോൾ, ദൈർഘ്യമേറിയ സ്കിഡ്ഡുകൾ അതിനും മേലെയാണ്. സ്കിഡ്ഡിങ്ങിനിടെയുള്ള തിരിയൽ അനിയന്ത്രിതമാണ്, അതിനാൽ നിങ്ങളുടെ കാർട്ടിനെ ശ്രദ്ധാപൂർവ്വം വിന്യസിക്കേണേ!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1422,7 +1413,7 @@ msgstr "സാധാരണ റേസ്: എല്ലാ പ്രഹരങ്�
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
 msgid "Time Trial: Contains no powerups, so only your driving skills matter!"
-msgstr "ടൈം ട്രയൽ: ആയുധങ്ങളൊന്നുമില്ല, അതുകൊണ്ട് നിങ്ങളുടെ ഡ്രെെവിങ്ങ് മിടുക്കുകൾക്കാണ് ഇവിടെ കാര്യം!"
+msgstr "ടൈം ട്രയൽ: ആയുധങ്ങൾ ഒന്നുമില്ല, അതിനാൽ നിങ്ങളുടെ ഡ്രെെവിങ്ങ് മിടുക്കുകൾക്കാണ് ഇവിടെ കാര്യം!"
 
 #. I18N: ./data/gui/screens/help2.stkgui
 #. I18N: In the help menu
@@ -1678,6 +1669,16 @@ msgstr "ഇൻപുട്ട് ഉപകരണങ്ങൾ ക്രമീക�
 msgid "High Score Selection"
 msgstr "ഉയർന്ന സ്കോർ തിരഞ്ഞെടുക്കൽ"
 
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
+#. I18N: ./data/gui/screens/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:69
+#: src/states_screens/dialogs/select_challenge.cpp:51
+#: src/states_screens/high_score_selection.cpp:136
+msgid "Grand Prix"
+msgstr "ഗ്രാന്റ് പ്രീ"
+
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
@@ -1768,7 +1769,7 @@ msgstr "സൃഷ്ടിക്കുക"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 msgid "Local Networking"
-msgstr "പ്രാദേശിക നെറ്റ്‌വർക്കിങ്"
+msgstr "പ്രാദേശിക നെറ്റ്‌വർക്കിംഗ്"
 
 #. I18N: ./data/gui/screens/online/lan.stkgui
 #. I18N: In the online multiplayer screen
@@ -1813,12 +1814,12 @@ msgstr "സ്പ്ലിറ്റ്സ്ക്രീൻ അഥവാ കള�
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Local networking"
-msgstr "പ്രാദേശിക നെറ്റ്‌വർക്കിങ്"
+msgstr "പ്രാദേശിക നെറ്റ്‌വർക്കിംഗ്"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
 msgid "Global networking"
-msgstr "ആഗോള നെറ്റ്‌വർക്കിങ്"
+msgstr "ആഗോള നെറ്റ്‌വർക്കിംഗ്"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -1863,7 +1864,7 @@ msgstr "തിരയുക"
 
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 msgid "Global Networking"
-msgstr "ആഗോള നെറ്റ്‌വർക്കിങ്"
+msgstr "ആഗോള നെറ്റ്‌വർക്കിംഗ്"
 
 #. I18N: ./data/gui/screens/online/profile_servers.stkgui
 #. I18N: In the online multiplayer screen
@@ -1892,6 +1893,7 @@ msgstr "ഇ-മെയിൽ:"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
+#: src/states_screens/online/register_screen.cpp:73
 msgid "Create User"
 msgstr "ഉപയോക്താവിനെ സൃഷ്ടിക്കാം"
 
@@ -2331,13 +2333,7 @@ msgstr "നീല ടീം AI കാർട്ടുകളുടെ എണ്ണ
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:51
-msgid "Grand Prix"
-msgstr "ഗ്രാന്റ് പ്രീ"
-
-#. I18N: ./data/gui/screens/tracks_and_gp.stkgui
-#. I18N: In the track and grand prix selection screen
-#: src/race/grand_prix_data.cpp:616
+#: src/race/grand_prix_data.cpp:622
 msgid "Random Grand Prix"
 msgstr "ആകസ്മിക ഗ്രാന്റ് പ്രീ"
 
@@ -2419,7 +2415,7 @@ msgstr "ബോംബുകളെയും പാരഷ്യൂട്ടുക�
 msgid ""
 "You can't stop turning while skidding. Good kart orientation at the skid's "
 "start is paramount."
-msgstr "സ്കിഡിങ്ങിനിടെ നിങ്ങൾക്ക് തിരിയൽ തടയാനാവില്ല. മികച്ച കാർട്ട് വിന്യാസമാണ് ഒരു സ്കിഡിന്റെ തുടക്കത്തിൽ പരമപ്രധാനം."
+msgstr "സ്കിഡ്ഡിങ്ങിനിടെയുള്ള തിരിയൽ അനിയന്ത്രിതമാണ്. മികച്ച കാർട്ട് വിന്യാസമാണ് ഒരു സ്കിഡ്ഡിന്റെ തുടക്കത്തിൽ പരമപ്രധാനം."
 
 #. I18N: ./data/tips.xml
 msgid "You get a startup boost if you start accelerating during \"Set\"."
@@ -2836,7 +2832,7 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d കെട്രിസ്, പിങ്: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:199
+#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:201
 #, c-format
 msgid "Tip: %s"
 msgstr "സൂത്രം: %s"
@@ -2867,10 +2863,10 @@ msgstr "നൈട്രോ ക്ഷമത"
 #: src/guiengine/widgets/player_kart_widget.cpp:758
 #: src/karts/controller/local_player_controller.cpp:452
 #: src/karts/controller/player_controller.cpp:413
-#: src/network/protocols/client_lobby.cpp:824
+#: src/network/protocols/client_lobby.cpp:854
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1504
-#: src/states_screens/race_result_gui.cpp:1566
+#: src/states_screens/race_result_gui.cpp:1527
+#: src/states_screens/race_result_gui.cpp:1589
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (ദുർബലപ്പെടുത്തി)"
@@ -3548,12 +3544,12 @@ msgid "You finished the race in rank %d!"
 msgstr "റാങ്ക് %d-ൽ നിങ്ങൾ റേസ് പൂർത്തീകരിച്ചു!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1127
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1157
 #, c-format
 msgid "%s left the game."
 msgstr "%s ഗെയിം വിട്ടു"
 
-#: src/main.cpp:2013
+#: src/main.cpp:2021
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3562,16 +3558,16 @@ msgid ""
 "Internet\")."
 msgstr "സൂപ്പർടക്സ്കാർട്ട് ആഡ്-ഓണുകൾ ഡൗൺലോഡ് ചെയ്യുന്നതിനും പുതുമകളപ്പറ്റി താങ്കളെ അറിയിക്കുന്നതിനുമായി ഒരു സെർവറുമായി ബന്ധപ്പെട്ടേക്കാം. ദയവായി ഞങ്ങളുടെ സ്വകാര്യതാനയം https://supertuxkart.net/Privacy -ൽ വായിക്കുക. താങ്കൾ ഈ പ്രത്യേകത ലഭ്യമാക്കാൻ ആഗ്രഹിക്കുന്നുവോ? (ഈ ക്രമീകരണം പിൽക്കാലത്ത് മാറ്റുന്നതിനായി, ഐച്ഛികങ്ങളിലേക്കു പോകുക, 'സാധാരണം' ടാബ് തിരഞ്ഞെടുക്കുക, ശേഷം \"ഇന്റർനെറ്റുമായി ബന്ധപ്പെടുക\" തിരുത്തുക)."
 
-#: src/main.cpp:2362
+#: src/main.cpp:2371
 msgid "Your screen resolution is too low to run STK."
 msgstr "താങ്കളുടെ സ്ക്രീൻ മിഴിവ് STK പ്രവർത്തിക്കാൻ തീരെ കുറവാണ്."
 
-#: src/main.cpp:2397
+#: src/main.cpp:2406
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "താങ്കളുടെ ഡ്രൈവർ വേർഷൻ തീരെ പഴയതാണ്. ദയവായി ഏറ്റവുംപുതിയ വീഡിയോ ഡ്രൈവറുകൾ ഇൻസ്റ്റാൾ ചെയ്യുക."
 
-#: src/main.cpp:2415
+#: src/main.cpp:2424
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3579,7 +3575,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "താങ്കളുടെ ഗ്രാഫിക്സ് ഡ്രൈവർ വളരെ പഴയതായി കാണുന്നു. ദയവായി ഏതെങ്കിലും അപ്ഡേറ്റുകൾ ഉണ്ടോയെന്ന് പരിശോധിക്കുക. സൂപ്പർടക്സ്കാർട്ട് ശുപാർശ ചെയ്യുന്നത് %s-ഓ മികച്ചതോ പിന്തുണയ്ക്കുന്ന ഒരു ഡ്രൈവറാണ്. ഗെയിം ഇപ്പോഴും പ്രവർത്തിക്കാനാണ് സാധ്യത, ഒരു ലഘു-ഗ്രാഫിക്സ് മോഡിലാണെന്നുമാത്രം."
 
-#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:128
 msgid "Server connection timed out."
 msgstr "സെർവറുമായി ബന്ധപ്പെടൽ സമയം നീണ്ടു."
 
@@ -3664,80 +3660,80 @@ msgid_plural "%i spare tire karts have been spawned!"
 msgstr[0] "%i സ്‌പെയർ ചക്ര കാർട്ടിനെ നിരത്തിലിറക്കിയിരിക്കുന്നു!"
 msgstr[1] "%i സ്‌പെയർ ചക്ര കാർട്ടുകളെ നിരത്തിലിറക്കിയിരിക്കുന്നു!"
 
-#: src/modes/world.cpp:1412
+#: src/modes/world.cpp:1425
 msgid "You have been eliminated!"
 msgstr "നിങ്ങളെ സ്ഥാനഭ്രംശം ചെയ്തിരിക്കുന്നു!"
 
-#: src/modes/world.cpp:1419
+#: src/modes/world.cpp:1432
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "'%s' എന്നയാളെ സ്ഥാനഭ്രംശം ചെയ്തിരിക്കുന്നു!"
 
-#: src/network/protocols/client_lobby.cpp:110
+#: src/network/protocols/client_lobby.cpp:129
 msgid "Server has been shut down."
 msgstr "സെർവർ ഷട്ട് ഡൗൺ ചെയ്തിരിക്കുന്നു."
 
-#: src/network/protocols/client_lobby.cpp:111
+#: src/network/protocols/client_lobby.cpp:130
 msgid "You were kicked from the server."
 msgstr "നിങ്ങളെ സെർവറിൽ നിന്ന് തട്ടിമാറ്റിയിരിക്കുന്നു."
 
-#: src/network/protocols/client_lobby.cpp:113
+#: src/network/protocols/client_lobby.cpp:132
 msgid "You were kicked: Ping too high."
 msgstr "നിങ്ങളെ തട്ടിമാറ്റി: പിങ് തീരെ കൂടുതൽ."
 
-#: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:868
+#: src/network/protocols/client_lobby.cpp:281
+#: src/network/protocols/client_lobby.cpp:898
 msgid "Bad network connection is detected."
 msgstr "മോശം നെറ്റ്‌വർക്ക് കണക്ഷൻ കണ്ടെത്തി."
 
-#: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3847
+#: src/network/protocols/client_lobby.cpp:446
+#: src/network/protocols/server_lobby.cpp:3846
 msgid "Bot"
 msgstr "യന്ത്രം"
 
-#: src/network/protocols/client_lobby.cpp:597
+#: src/network/protocols/client_lobby.cpp:627
 #, c-format
 msgid "%s disconnected."
 msgstr "%s ബന്ധം വിച്ഛേദിച്ചു."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:628
+#: src/network/protocols/client_lobby.cpp:658
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "കളിക്കാരുടെ നിർവ്വഹണത്തിനും റാങ്കിംഗ് വിവരങ്ങൾക്കുമായി ലിസ്റ്റിൽ കളിക്കാരന്റെ പേരിനുനേരെ അമർത്തുക."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:687
+#: src/network/protocols/client_lobby.cpp:717
 #, c-format
 msgid "Server name: %s"
 msgstr "സെർവർ നാമം: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:695
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:92
+#: src/network/protocols/client_lobby.cpp:725
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:111
 #: src/states_screens/dialogs/server_info_dialog.cpp:92
-#: src/states_screens/race_result_gui.cpp:1870
+#: src/states_screens/race_result_gui.cpp:1893
 #, c-format
 msgid "Difficulty: %s"
 msgstr "പ്രയാസം: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:700
+#: src/network/protocols/client_lobby.cpp:730
 #, c-format
 msgid "Max players: %d"
 msgstr "ഏറിയ കളിക്കാർ: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:713
+#: src/network/protocols/client_lobby.cpp:743
 #: src/states_screens/dialogs/server_info_dialog.cpp:96
 #, c-format
 msgid "Game mode: %s"
 msgstr "ഗെയിം മോഡ്: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:726
+#: src/network/protocols/client_lobby.cpp:756
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:367
@@ -3745,7 +3741,7 @@ msgid "Time limit"
 msgstr "സമയപരിധി"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:727
+#: src/network/protocols/client_lobby.cpp:757
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
 #: src/states_screens/track_info_screen.cpp:368
@@ -3753,102 +3749,102 @@ msgid "Goals limit"
 msgstr "ഗോൾ പരിധി"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:731
+#: src/network/protocols/client_lobby.cpp:761
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "സോക്കർ ഗെയിം രീതി: %s"
 
-#: src/network/protocols/client_lobby.cpp:741
+#: src/network/protocols/client_lobby.cpp:771
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "ഗ്രാന്റ് പ്രീ പുരോഗതി: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:860
+#: src/network/protocols/client_lobby.cpp:890
 msgid "All players joined red or blue team."
 msgstr "ചുവപ്പോ നീലയോ ടീമുകളിലായി എല്ലാ കളിക്കാരും ചേർന്നിരിക്കുന്നു."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:880
+#: src/network/protocols/client_lobby.cpp:910
 msgid "You are now the owner of server."
 msgstr "നിങ്ങളാണ് ഇപ്പോൾ സെർവറിന്റെ ഉടമ."
 
-#: src/network/protocols/client_lobby.cpp:923
+#: src/network/protocols/client_lobby.cpp:953
 msgid "Connection refused: Server is busy."
 msgstr "ബന്ധപ്പെടൽ വിലക്കി: സെർവർ തിരക്കിലാണ്."
 
-#: src/network/protocols/client_lobby.cpp:928
+#: src/network/protocols/client_lobby.cpp:958
 msgid "Connection refused: You are banned from the server."
 msgstr "ബന്ധപ്പെടൽ വിലക്കി: നിങ്ങളെ സെർവറിൽ നിന്ന് നിരോധിച്ചിരിക്കയാണ്."
 
-#: src/network/protocols/client_lobby.cpp:943
+#: src/network/protocols/client_lobby.cpp:973
 msgid "Connection refused: Server password is incorrect."
 msgstr "ബന്ധപ്പെടൽ വിലക്കി: സെർവർ രഹസ്യവാക്ക് തെറ്റാണ്."
 
-#: src/network/protocols/client_lobby.cpp:947
+#: src/network/protocols/client_lobby.cpp:977
 msgid "Connection refused: Game data is incompatible."
 msgstr "ബന്ധപ്പെടൽ വിലക്കി: ഗെയിം വിവരങ്ങൾ അപര്യാപ്തമാണ്."
 
-#: src/network/protocols/client_lobby.cpp:951
+#: src/network/protocols/client_lobby.cpp:981
 msgid "Connection refused: Server is full."
 msgstr "ബന്ധപ്പെടൽ വിലക്കി: സെർവർ നിറഞ്ഞിരിക്കുന്നു."
 
-#: src/network/protocols/client_lobby.cpp:955
+#: src/network/protocols/client_lobby.cpp:985
 msgid "Connection refused: Invalid player connecting."
 msgstr "ബന്ധപ്പെടൽ വിലക്കി: അസാധുവായ കളിക്കാരൻ ബന്ധപ്പെടുന്നു."
 
-#: src/network/protocols/client_lobby.cpp:983
+#: src/network/protocols/client_lobby.cpp:1013
 msgid "Failed to start the network game."
 msgstr "നെറ്റ്‌വർക്ക് ഗെയിം ആരംഭിക്കാൻ പരാജയപ്പെട്ടു."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1196
+#: src/network/protocols/client_lobby.cpp:1226
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "ഗെയിം അവസാനിച്ചിരിക്കുന്നു, നിങ്ങൾക്ക് ഇനിയധികം തത്സമയം ചേരാനോ ദർശിക്കാനോ കഴിയുകയില്ല."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1200
+#: src/network/protocols/client_lobby.cpp:1230
 msgid "No remaining place in the arena - live join disabled."
 msgstr "ഒരവശേഷിക്കുന്ന ഒഴിവും മേഖലയിലില്ല - തത്സമയ ചേരൽ ലഭ്യമല്ല."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1204
+#: src/network/protocols/client_lobby.cpp:1234
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "1 കളിക്കാൻ മാത്രമേ ശേഷിക്കുന്നുള്ളു, ഉപശാലയിലേക്ക് മടങ്ങുന്നു."
 
-#: src/network/protocols/client_lobby.cpp:1210
+#: src/network/protocols/client_lobby.cpp:1240
 msgid "Server owner quit the game."
 msgstr "സെർവർ ഉടമ ഗെയിം ഉപേക്ഷിച്ചു."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1214
+#: src/network/protocols/client_lobby.cpp:1244
 msgid "You will be spectating the next game."
 msgstr "നിങ്ങൾ അടുത്ത ഗെയിം ദർശിക്കുന്നതായിരിക്കും."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1382
+#: src/network/protocols/client_lobby.cpp:1412
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s ചുവപ്പ് ടീമിൽ ചേർന്നു."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1388
+#: src/network/protocols/client_lobby.cpp:1418
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s നീല ടീമിൽ ചേർന്നു."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1394
+#: src/network/protocols/client_lobby.cpp:1424
 #, c-format
 msgid "%s joined the game."
 msgstr "%s ഗെയിമിൽ ചേർന്നു."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1585
+#: src/network/protocols/client_lobby.cpp:1615
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3856,10 +3852,19 @@ msgid ""
 msgstr "ലക്ഷ്യംവച്ച കളിക്കാരനെ മാറ്റുവാൻ <%s> അല്ലെങ്കിൽ <%s> അമർത്തുക, <%s> അല്ലെങ്കിൽ <%s> ക്യാമറ സ്ഥാനത്തിനായും."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1601
+#: src/network/protocols/client_lobby.cpp:1631
 #, c-format
 msgid "Successfully reported %s."
 msgstr "%s എന്നയാളെ വിജയകരമായി പരാതിപ്പെട്ടു."
+
+#. I18N: Shown when there is download error for assets download
+#. in the first run
+#: src/network/protocols/client_lobby.cpp:1896
+#: src/states_screens/dialogs/download_assets.cpp:251
+msgid ""
+"Failed to download assets, check your storage space or internet connection "
+"and try again later."
+msgstr "ആസ്ഥികൾ ഡൗൺലോഡ് ചെയ്യൽ പരാജയപ്പെട്ടു, നിങ്ങളുടെ സംഭരണശേഷിയോ ഇന്റർനെറ്റ് കണക്ഷനോ പരിശോധിച്ചതിനു ശേഷം വീണ്ടും ശ്രമിക്കുക."
 
 #: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
@@ -3886,7 +3891,7 @@ msgstr "ടൈം ട്രയൽ (ഗ്രാന്റ് പ്രീ)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1224
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1229
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
@@ -3895,7 +3900,7 @@ msgstr "എല്ലാറ്റിനും-സ്വാതന്ത്ര്�
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1226
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1231
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
@@ -3954,12 +3959,12 @@ msgid ""
 msgstr "ഉയർന്ന സ്കോറുകളുടെ ഫയൽ തീരെ പഴയതായിരുന്നു,\nഎല്ലാ ഉയർന്ന സ്കോറുകളും മായ്ച്ചിരിക്കുന്നു."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1220
+#: src/race/race_manager.cpp:1225
 msgid "Follow the Leader"
 msgstr "നേതാവിനെ പിന്തുടരൂ"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1222 src/states_screens/track_info_screen.cpp:250
+#: src/race/race_manager.cpp:1227 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr "3 പ്രഹര യുദ്ധം"
 
@@ -4043,7 +4048,7 @@ msgstr "ക്ഷമിക്കണം, ആഡ്-ഓണുകളുടെ വ�
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:143
 #: src/states_screens/kart_selection.cpp:315
-#: src/states_screens/tracks_and_gp_screen.cpp:150
+#: src/states_screens/tracks_and_gp_screen.cpp:159
 msgid "standard"
 msgstr "സ്റ്റാൻഡേർഡ്"
 
@@ -4353,7 +4358,7 @@ msgstr "ശേഖരിച്ച പഴത്തൊലികൾ"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:267
 #: src/states_screens/options/options_screen_device.cpp:284
 msgid "Skidding"
-msgstr "സ്കിഡിംഗ്"
+msgstr "സ്കിഡ്ഡിംഗ്"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4486,54 +4491,57 @@ msgstr "സവിശേഷം"
 
 #. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:180
-#: src/states_screens/dialogs/addons_pack.cpp:173
+#: src/states_screens/dialogs/addons_pack.cpp:208
 #: src/states_screens/dialogs/download_assets.cpp:104
 #, c-format
 msgid "Size: %s"
 msgstr "വലിപ്പം: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:292
-#: src/states_screens/dialogs/addons_pack.cpp:185
-#: src/states_screens/dialogs/download_assets.cpp:191
+#: src/states_screens/dialogs/addons_loading.cpp:296
+#: src/states_screens/dialogs/addons_pack.cpp:220
+#: src/states_screens/dialogs/download_assets.cpp:201
 msgid "Sorry, downloading the add-on failed"
 msgstr "ക്ഷമിക്കണം, ആഡ്-ഓൺ ഡൗൺലോഡ് ചെയ്യൽ പരാജയപ്പെട്ടു"
 
-#: src/states_screens/dialogs/addons_loading.cpp:368
+#: src/states_screens/dialogs/addons_loading.cpp:372
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "ആഡോൺ '%s' ഇൻസ്റ്റാൾ ചെയ്യുന്നതിൽ പ്രശ്നങ്ങൾ."
 
-#: src/states_screens/dialogs/addons_loading.cpp:379
-#: src/states_screens/dialogs/addons_loading.cpp:428
-#: src/states_screens/dialogs/download_assets.cpp:256
+#: src/states_screens/dialogs/addons_loading.cpp:383
+#: src/states_screens/dialogs/addons_loading.cpp:432
+#: src/states_screens/dialogs/download_assets.cpp:266
 msgid "Try again"
 msgstr "വീണ്ടും ശ്രമിക്കാം"
 
-#: src/states_screens/dialogs/addons_loading.cpp:417
+#: src/states_screens/dialogs/addons_loading.cpp:421
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "ആഡോൺ '%s' നീക്കം ചെയ്യുന്നതിൽ പ്രശ്നങ്ങൾ."
 
-#. I18N: Shown when there is download error for assets download
-#. in the first run
-#: src/states_screens/dialogs/addons_pack.cpp:225
-#: src/states_screens/dialogs/download_assets.cpp:241
-msgid ""
-"Failed to download assets, check your storage space or internet connection "
-"and try again later."
-msgstr "ആസ്ഥികൾ ഡൗൺലോഡ് ചെയ്യൽ പരാജയപ്പെട്ടു, നിങ്ങളുടെ സംഭരണശേഷിയോ ഇന്റർനെറ്റ് കണക്ഷനോ പരിശോധിച്ചതിനു ശേഷം വീണ്ടും ശ്രമിക്കുക."
+#: src/states_screens/dialogs/addons_pack.cpp:66
+msgid "Background download completed."
+msgstr "പശ്ചാത്തല ഡൗൺലോഡ് പൂർത്തിയാക്കി."
+
+#: src/states_screens/dialogs/addons_pack.cpp:127
+msgid "Background download"
+msgstr "പശ്ചാത്തല ഡൗൺലോഡ്"
+
+#: src/states_screens/dialogs/addons_pack.cpp:136
+msgid "Background download has already started."
+msgstr "പശ്ചാത്തല ഡൗൺലോഡ് ഇതിനകം ആരംഭിച്ചിരിക്കുന്നു."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:135
 msgid "Current password invalid."
 msgstr "ഇപ്പോഴത്തെ രഹസ്യവാക്ക് അസാധുവാണ്."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:355
+#: src/states_screens/online/register_screen.cpp:362
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "രഹസ്യവാക്ക് 8നും 30നും മദ്ധ്യേ പ്രതീകങ്ങൾ നീളുന്നതാകണം!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:339
+#: src/states_screens/online/register_screen.cpp:346
 msgid "Passwords don't match!"
 msgstr "രഹസ്യവാക്കുകൾ തമ്മിൽ യോജിക്കുന്നില്ല!"
 
@@ -4543,7 +4551,7 @@ msgstr "രഹസ്യവാക്ക് വിജയകരമായി മാ�
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:420
+#: src/states_screens/online/register_screen.cpp:427
 msgid "Validating info"
 msgstr "വിവരം സാധൂകരിക്കുന്നു"
 
@@ -4652,14 +4660,14 @@ msgstr "അസാധുവായ സെർവർ വിലാസം: %s."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
-#: src/states_screens/high_score_selection.cpp:136
+#: src/states_screens/high_score_selection.cpp:150
 msgctxt "column_name"
 msgid "Reverse"
 msgstr "എതിർദിശ"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
-#: src/states_screens/high_score_selection.cpp:131
+#: src/states_screens/high_score_selection.cpp:141
 #: src/states_screens/online/server_selection.cpp:135
 msgctxt "column_name"
 msgid "Difficulty"
@@ -4667,7 +4675,7 @@ msgstr "പ്രയാസം"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
-#: src/states_screens/high_score_selection.cpp:135
+#: src/states_screens/high_score_selection.cpp:148
 msgctxt "column_name"
 msgid "Laps"
 msgstr "ലാപ്പുകൾ"
@@ -4697,41 +4705,48 @@ msgid "Version"
 msgstr "വേർഷൻ"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:128
 #: src/states_screens/dialogs/message_dialog.cpp:131
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
-#: src/states_screens/high_score_selection.cpp:208
+#: src/states_screens/high_score_selection.cpp:246
 msgid "No"
 msgstr "ഇല്ല"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:87
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:75
+#: src/states_screens/edit_gp_screen.cpp:151
+#: src/states_screens/high_score_selection.cpp:138
+msgid "Track"
+msgstr "ട്രാക്ക്"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:106
 #, c-format
 msgid "Top %d High Scores"
 msgstr "ആദ്യ %d ഉയർന്ന സ്കോറുകൾ"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:89
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:108
 #, c-format
-msgid "Track: %s"
-msgstr "ട്രാക്ക്: %s"
+msgid "%s: %s"
+msgstr "%s: %s"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:102
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:121
 #, c-format
 msgid "Number of karts: %d"
 msgstr "കാർട്ടുകളുടെ എണ്ണം: %d"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:105
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:126
 #, c-format
 msgid "Laps: %d"
 msgstr "ലാപ്പുകൾ: %d"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:109
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:130
 #, c-format
 msgid "Reverse: %s"
 msgstr "എതിർദിശ: %s"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:169
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:198
+#: src/states_screens/gp_info_screen.cpp:503
 #: src/states_screens/track_info_screen.cpp:526
 msgid "(Empty)"
 msgstr "(ശൂന്യം)"
@@ -4838,7 +4853,7 @@ msgid "Exit Battle"
 msgstr "യുദ്ധം വിടുക"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:144
-#: src/states_screens/race_result_gui.cpp:321
+#: src/states_screens/race_result_gui.cpp:337
 msgid "Setup New Race"
 msgstr "പുതിയ റേസ് രൂപീകരിക്കുക"
 
@@ -4884,7 +4899,7 @@ msgstr "പ്രേത റീപ്ലേ റേസ്"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1860
+#: src/states_screens/race_result_gui.cpp:1883
 #, c-format
 msgid "Laps: %i"
 msgstr "ലാപ്പുകൾ: %i"
@@ -4897,18 +4912,21 @@ msgstr "രീതി: %s"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:90
+#: src/states_screens/race_result_gui.cpp:1975
 #, c-format
 msgid "Required Rank: %i"
 msgstr "അനിവാര്യ സ്ഥാനം: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:96
+#: src/states_screens/race_result_gui.cpp:1983
 #, c-format
 msgid "Required Time: %i"
 msgstr "അനിവാര്യ സമയം: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:103
+#: src/states_screens/race_result_gui.cpp:1994
 #, c-format
 msgid "Required Nitro Points: %i"
 msgstr "അനിവാര്യ നൈട്രോ പോയിന്റുകൾ: %i"
@@ -4970,7 +4988,7 @@ msgstr "കളിച്ച സമയം"
 #: src/states_screens/dialogs/server_info_dialog.cpp:265
 #: src/states_screens/dialogs/server_info_dialog.cpp:279
 msgid "Remove from bookmarks"
-msgstr ""
+msgstr "ബുക്ക്മാർക്ക് നീക്കം ചെയ്യാം"
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:130
 msgid "Input device already exists."
@@ -5044,7 +5062,7 @@ msgstr "വോട്ട് പ്രകടിപ്പിക്കുന്ന�
 
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:606
-#: src/states_screens/tracks_and_gp_screen.cpp:296
+#: src/states_screens/tracks_and_gp_screen.cpp:305
 msgid "Random Track"
 msgstr "ആകസ്മിക ട്രാക്ക്"
 
@@ -5059,10 +5077,6 @@ msgstr "നിങ്ങൾക്ക് '%s' നീക്കംചെയ്യണ
 #: src/states_screens/edit_gp_screen.cpp:382
 msgid "Do you want to save your changes?"
 msgstr "നിങ്ങളുടെ മാറ്റങ്ങൾ നിങ്ങൾക്കു സൂക്ഷിക്കണോ?"
-
-#: src/states_screens/edit_gp_screen.cpp:151
-msgid "Track"
-msgstr "ട്രാക്ക്"
 
 #: src/states_screens/edit_gp_screen.cpp:152
 msgid "Laps"
@@ -5127,7 +5141,6 @@ msgid "You unlocked grand prix %0"
 msgstr "നിങ്ങൾ തുറന്നു ഗ്രാന്റ് പ്രീ %0"
 
 #: src/states_screens/ghost_replay_selection.cpp:153
-#: src/states_screens/high_score_selection.cpp:130
 msgctxt "column_name"
 msgid "Track"
 msgstr "ട്രാക്ക്"
@@ -5138,20 +5151,20 @@ msgctxt "column_name"
 msgid "Players"
 msgstr "കളിക്കാർ"
 
-#: src/states_screens/gp_info_screen.cpp:72
+#: src/states_screens/gp_info_screen.cpp:77
 msgid "Default"
 msgstr "സ്വതേയുള്ളത്"
 
-#: src/states_screens/gp_info_screen.cpp:73
+#: src/states_screens/gp_info_screen.cpp:78
 msgid "None"
 msgstr "ഒന്നുമില്ല"
 
-#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/gp_info_screen.cpp:80
 msgid "Random"
 msgstr "ആകസ്മികം"
 
-#: src/states_screens/gp_info_screen.cpp:153
-#: src/states_screens/gp_info_screen.cpp:179
+#: src/states_screens/gp_info_screen.cpp:171
+#: src/states_screens/gp_info_screen.cpp:222
 msgid "Reload"
 msgstr "പുനർനിയമിക്കുക"
 
@@ -5187,7 +5200,7 @@ msgid "Better luck next time!"
 msgstr "അടുത്ത തവണ ഭാഗ്യം തുണയ്ക്കും!"
 
 #: src/states_screens/grand_prix_win.cpp:166
-#: src/states_screens/race_result_gui.cpp:257
+#: src/states_screens/race_result_gui.cpp:273
 msgid "You completed a challenge!"
 msgstr "നിങ്ങൾ ഒരു വെല്ലുവിളി പൂർത്തീകരിച്ചിരിക്കുന്നു!"
 
@@ -5199,16 +5212,16 @@ msgstr "നിങ്ങൾ ഗ്രാന്റ് പ്രീ വിജയി
 msgid "You completed the Grand Prix!"
 msgstr "നിങ്ങൾ ഗ്രാന്റ് പ്രീ പൂർത്തീകരിച്ചിരിക്കുന്നു!"
 
-#: src/states_screens/high_score_selection.cpp:134
+#: src/states_screens/high_score_selection.cpp:144
 msgctxt "column_name"
 msgid "Number of karts"
 msgstr "കാർട്ടുകളുടെ എണ്ണം"
 
-#: src/states_screens/high_score_selection.cpp:267
+#: src/states_screens/high_score_selection.cpp:321
 msgid "Are you sure you want to remove this high score entry?"
 msgstr "നിങ്ങൾക്ക് ഈ ഉയർന്ന സ്കോർ രേഖ നീക്കംചെയ്യണമെന്ന് ഉറപ്പാണോ?"
 
-#: src/states_screens/high_score_selection.cpp:275
+#: src/states_screens/high_score_selection.cpp:329
 msgid "Are you sure you want to remove all of your high scores?"
 msgstr "നിങ്ങൾക്ക് നിങ്ങളുടെ ഉയർന്ന സ്കോറുകളെല്ലാം നീക്കംചെയ്യണമെന്ന് ഉറപ്പാണോ?"
 
@@ -5465,48 +5478,48 @@ msgstr "ഇന്റർനെറ്റ് ലഭ്യതയില്ലാത�
 msgid "Searching"
 msgstr "തിരയുന്നു"
 
-#: src/states_screens/online/register_screen.cpp:164
+#: src/states_screens/online/register_screen.cpp:169
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "ഗെയിം വിടുക"
 
-#: src/states_screens/online/register_screen.cpp:277
-#: src/states_screens/online/register_screen.cpp:284
+#: src/states_screens/online/register_screen.cpp:282
+#: src/states_screens/online/register_screen.cpp:289
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "'%s' കളിക്കാരനെ സൃഷ്ടിക്കാൻ സാധിച്ചില്ല."
 
-#: src/states_screens/online/register_screen.cpp:301
+#: src/states_screens/online/register_screen.cpp:306
 msgid "User name cannot be empty."
 msgstr "ഉപയോക്തൃനാമം ശൂന്യമാകരുത്."
 
-#: src/states_screens/online/register_screen.cpp:343
+#: src/states_screens/online/register_screen.cpp:350
 msgid "Emails don't match!"
 msgstr "ഇമെയിലുകൾ തമ്മിൽ യോജിക്കുന്നില്ല!"
 
-#: src/states_screens/online/register_screen.cpp:347
+#: src/states_screens/online/register_screen.cpp:354
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "ഓൺലൈൻ ഉപയോക്തൃനാമം 3നും 30നും മദ്ധ്യേ പ്രതീകങ്ങൾ നീളുന്നതാകണം!"
 
-#: src/states_screens/online/register_screen.cpp:351
+#: src/states_screens/online/register_screen.cpp:358
 msgid "Online username must not start with a number!"
 msgstr "ഓൺലൈൻ ഉപയോക്തൃനാമം ഒരു അക്കവുമായി ആരംഭിക്കരുത്!"
 
-#: src/states_screens/online/register_screen.cpp:359
+#: src/states_screens/online/register_screen.cpp:366
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "ഇമെയിൽ 5നും 254നും മദ്ധ്യേ പ്രതീകങ്ങൾ നീളുന്നതാകണം!"
 
-#: src/states_screens/online/register_screen.cpp:365
+#: src/states_screens/online/register_screen.cpp:372
 msgid "Email is invalid!"
 msgstr "ഇമെയിൽ അസാധുവാണ്!"
 
-#: src/states_screens/online/register_screen.cpp:428
+#: src/states_screens/online/register_screen.cpp:435
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "അക്കൗണ്ട് ത്വരിതപ്പെടുത്തലുമായി ബന്ധപ്പെട്ട് ഇനിയുള്ള നിർദ്ദേശങ്ങൾ അടങ്ങിയ ഒരു ഇമെയിൽ താങ്കൾക്ക് ലഭിക്കുന്നതായിരിക്കും. ദയവായി ക്ഷമയോടെ കാത്തിരിക്കുക. ഒപ്പം താങ്കളുടെ സ്പാം ഫോൾഡർ പരിശോധിച്ചെന്ന് ഉറപ്പാക്കുക."
 
-#: src/states_screens/online/register_screen.cpp:467
+#: src/states_screens/online/register_screen.cpp:474
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "ഇന്റർനെറ്റ് ലഭ്യത നിഷേധിച്ചിരിക്കുന്നു, ഐച്ഛികമെനുവിൽ ലഭ്യമാക്കുക."
 
@@ -5558,7 +5571,7 @@ msgstr "സെർവറുകൾ കണ്ടെടുക്കുന്നു"
 
 #: src/states_screens/online/server_selection.cpp:539
 msgid "Server Bookmarks"
-msgstr ""
+msgstr "സെർവർ ബുക്ക്മാർക്കുകൾ"
 
 #. I18N: In track screen for networking, clarify voting phase
 #: src/states_screens/online/tracks_screen.cpp:317
@@ -5595,7 +5608,7 @@ msgid "Drive in reverse"
 msgstr "എതിർദിശയിൽ ഓടിക്കുക"
 
 #: src/states_screens/online/tracks_screen.cpp:592
-#: src/states_screens/tracks_and_gp_screen.cpp:282
+#: src/states_screens/tracks_and_gp_screen.cpp:291
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "പൂട്ടിയിരിക്കുന്നു: കൂടുതൽ യോഗ്യതകൾ പ്രാപ്തമാക്കാൻ സജീവ വെല്ലുവിളികൾ പരിഹരിക്കൂ!"
 
@@ -5995,7 +6008,7 @@ msgstr "ഗോോൾ!"
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:80
-#: src/states_screens/race_result_gui.cpp:367
+#: src/states_screens/race_result_gui.cpp:383
 msgid "Waiting for others"
 msgstr "മറ്റുള്ളവർക്കായി കാക്കുന്നു"
 
@@ -6005,27 +6018,27 @@ msgid "Waiting for the server"
 msgstr "സെർവറിനായി കാക്കുന്നു"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:639
+#: src/states_screens/race_gui_base.cpp:641
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:649
+#: src/states_screens/race_gui_base.cpp:651
 msgid "by"
 msgstr "നിർമ്മിച്ചത്:"
 
-#: src/states_screens/race_gui_base.cpp:757
+#: src/states_screens/race_gui_base.cpp:759
 msgid "Collect nitro!"
 msgstr "നൈട്രോ ശേഖരിക്കൂ!"
 
-#: src/states_screens/race_gui_base.cpp:759
+#: src/states_screens/race_gui_base.cpp:761
 msgid "Follow the leader!"
 msgstr "നേതാവിനെ പിന്തുടരൂ!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:942
+#: src/states_screens/race_gui_base.cpp:944
 #, c-format
 msgid "Top %i"
 msgstr "ആദ്യ %i"
@@ -6054,93 +6067,105 @@ msgstr "വെല്ലുവിളി ആരംഭിക്കുവാൻ സ�
 msgid "Press fire to start the challenge"
 msgstr "വെല്ലുവിളി ആരംഭിക്കുവാൻ ഫയർ അമർത്തൂ"
 
-#: src/states_screens/race_result_gui.cpp:243
+#: src/states_screens/race_result_gui.cpp:259
 msgid "Quit the server"
 msgstr "സെർവർ ഉപേക്ഷിക്കുക"
 
-#: src/states_screens/race_result_gui.cpp:258
+#: src/states_screens/race_result_gui.cpp:274
 msgid "You completed challenges!"
 msgstr "നിങ്ങൾ വെല്ലുവിളികൾ പൂർത്തീകരിച്ചിരിക്കുന്നു!"
 
-#: src/states_screens/race_result_gui.cpp:281
+#: src/states_screens/race_result_gui.cpp:297
 msgid "Abort Grand Prix"
 msgstr "ഗ്രാന്റ് പ്രീ നിഷ്ഫലമാക്കുക"
 
-#: src/states_screens/race_result_gui.cpp:301
+#: src/states_screens/race_result_gui.cpp:317
 msgid "Restart"
 msgstr "പുനരാരംഭിക്കുക"
 
-#: src/states_screens/race_result_gui.cpp:308
+#: src/states_screens/race_result_gui.cpp:324
 msgid "Back to challenge selection"
 msgstr "തിരികെ വെല്ലുവിളി തിരയലിലേക്ക്"
 
-#: src/states_screens/race_result_gui.cpp:316
+#: src/states_screens/race_result_gui.cpp:332
 msgid "Race against the new ghost replay"
 msgstr "പുതിയ പ്രേത റീപ്ലേയ്ക്കെതിരെ റേസ് ചെയ്യാം"
 
-#: src/states_screens/race_result_gui.cpp:324
+#: src/states_screens/race_result_gui.cpp:340
 msgid "Back to the menu"
 msgstr "തിരികെ മെനുവിലേക്ക്"
 
-#: src/states_screens/race_result_gui.cpp:493
+#: src/states_screens/race_result_gui.cpp:509
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "നിങ്ങൾക്ക് ശരിക്കും ഗ്രാന്റ് പ്രീ നിഷ്ഫലമാക്കണോ?"
 
-#: src/states_screens/race_result_gui.cpp:591
-#: src/states_screens/race_result_gui.cpp:1431
+#: src/states_screens/race_result_gui.cpp:607
+#: src/states_screens/race_result_gui.cpp:1454
 msgid "Red Team Wins"
 msgstr "ചുവപ്പ് ടീമിന് ജയം"
 
-#: src/states_screens/race_result_gui.cpp:593
-#: src/states_screens/race_result_gui.cpp:1435
+#: src/states_screens/race_result_gui.cpp:609
+#: src/states_screens/race_result_gui.cpp:1458
 msgid "Blue Team Wins"
 msgstr "നീല ടീമിന് ജയം"
 
-#: src/states_screens/race_result_gui.cpp:595
-#: src/states_screens/race_result_gui.cpp:1440
+#: src/states_screens/race_result_gui.cpp:611
+#: src/states_screens/race_result_gui.cpp:1463
 msgid "It's a draw"
 msgstr "അത് സമനിലയിലെത്തി"
 
-#: src/states_screens/race_result_gui.cpp:835
+#: src/states_screens/race_result_gui.cpp:851
 #, c-format
 msgid "Eliminated after %s"
 msgstr "%s-നു ശേഷം സ്ഥാനഭ്രംശനാക്കി"
 
-#: src/states_screens/race_result_gui.cpp:840
-#: src/states_screens/race_result_gui.cpp:1269
+#: src/states_screens/race_result_gui.cpp:856
+#: src/states_screens/race_result_gui.cpp:1285
 msgid "Eliminated"
 msgstr "സ്ഥാനഭ്രംശനാക്കി"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1510
-#: src/states_screens/race_result_gui.cpp:1572
+#: src/states_screens/race_result_gui.cpp:1533
+#: src/states_screens/race_result_gui.cpp:1595
 msgid "(Own Goal)"
 msgstr "(സ്വയം ഗോൾ)"
 
-#: src/states_screens/race_result_gui.cpp:1651
+#: src/states_screens/race_result_gui.cpp:1674
 #, c-format
 msgid "Track %i/%i"
 msgstr "ട്രാക്ക്: %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1735
+#: src/states_screens/race_result_gui.cpp:1758
 msgid "Grand Prix progress:"
 msgstr "ഗ്രാന്റ് പ്രീ പുരോഗതി:"
 
-#: src/states_screens/race_result_gui.cpp:1781
+#: src/states_screens/race_result_gui.cpp:1804
 msgid "Highscores"
 msgstr "ഉയർന്ന സ്കോറുകൾ"
 
-#: src/states_screens/race_result_gui.cpp:1884
+#: src/states_screens/race_result_gui.cpp:1907
 #, c-format
 msgid "Best lap time: %s"
 msgstr "മികച്ച ലാപ്പ് സമയം: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1898
+#: src/states_screens/race_result_gui.cpp:1921
 #, c-format
 msgid "by %s"
 msgstr "%s കൈവരിച്ചു"
+
+#: src/states_screens/race_result_gui.cpp:1960
+msgid "You completed the challenge!"
+msgstr "നിങ്ങൾ വെല്ലുവിളി പൂർത്തീകരിച്ചിരിക്കുന്നു!"
+
+#: src/states_screens/race_result_gui.cpp:1960
+msgid "You failed the challenge!"
+msgstr "നിങ്ങൾ വെല്ലുവിളിയിൽ പരാജയപ്പെട്ടു!"
+
+#: src/states_screens/race_result_gui.cpp:2011
+msgid "Reached Requirements of SuperTux"
+msgstr "സൂപ്പർടക്സിന്റെ യോഗ്യതകളിൽ എത്തിച്ചേർന്നു."
 
 #: src/states_screens/race_setup_screen.cpp:88
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -6193,12 +6218,18 @@ msgstr "പരമ. പിന്തുണയ്ക്കുന്ന കളിക
 msgid "Number of red team AI karts"
 msgstr "ചുവപ്പ് ടീം AI കാർട്ടുകളുടെ എണ്ണം"
 
+#: src/states_screens/tracks_and_gp_screen.cpp:109
+msgid ""
+"You cannot play this grandprix because it contains tracks that aren't "
+"unlocked!"
+msgstr "ഈ ഗ്രാന്റ് പ്രീയിൽ അടങ്ങിയിരിക്കുന്ന ചില ട്രാക്കുകൾ തുറക്കപ്പെടാത്തതിനാൽ കളിക്കാൻ സാധിക്കുന്നതല്ല."
+
 #. I18N: track group name
-#: src/states_screens/tracks_and_gp_screen.cpp:148
+#: src/states_screens/tracks_and_gp_screen.cpp:157
 msgid "all"
 msgstr "എല്ലാം"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:203
+#: src/states_screens/tracks_and_gp_screen.cpp:212
 msgid "Locked!"
 msgstr "പൂട്ടിയിരിക്കുന്നു!"
 
@@ -6306,19 +6337,19 @@ msgstr "അയ്യോ! നിങ്ങൾ കുഴപ്പത്തിലാ
 msgid ""
 "Accelerate and press the <%s> key while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr "സ്കീഡ് ചെയ്യാൻ ത്വരണംചെയ്ത് തിരിയുന്നതിനിടെ <%s> അമർത്തൂ.\nഅല്പനേരം സ്കിഡ് ചെയ്യുന്നത് വേഗത്തിൽ തിരിയാൻ ഉതകുന്നതുവഴി നിങ്ങളെ കൂർത്ത വളവുകൾ എടുക്കാൻ സഹായിക്കും."
+msgstr "സ്കിഡ്ഡ് ചെയ്യാൻ ത്വരണംചെയ്ത് തിരിയുന്നതിനിടെ <%s> അമർത്തൂ.\nഅല്പനേരത്തെ സ്കിഡ്ഡിംഗ് വേഗത്തിൽ തിരിയാൻ ഉതകുന്നതുവഴി നിങ്ങളെ കൂർത്ത വളവുകൾ എടുക്കാൻ സഹായിക്കും."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:145
 msgid ""
 "Accelerate and press the skid icon while turning to skid.\n"
 "Skidding for a short while can help you turn faster to take sharp turns."
-msgstr "സ്കീഡ് ചെയ്യാൻ ത്വരണംചെയ്ത് തിരിയുന്നതിനിടെ സ്കീഡ് ഐകൺ അമർത്തൂ.\nഅല്പനേരം സ്കിഡ് ചെയ്യുന്നത് വേഗത്തിൽ തിരിയാൻ ഉതകുന്നതുവഴി നിങ്ങളെ കൂർത്ത വളവുകൾ എടുക്കാൻ സഹായിക്കും."
+msgstr "സ്കിഡ്ഡ് ചെയ്യാൻ ത്വരണംചെയ്ത് തിരിയുന്നതിനിടെ സ്കിഡ്ഡ് ഐകൺ അമർത്തൂ.\nഅല്പനേരം സ്കിഡ്ഡ് ചെയ്യുന്നത് വേഗത്തിൽ തിരിയാൻ ഉതകുന്നതുവഴി നിങ്ങളെ കൂർത്ത വളവുകൾ എടുക്കാൻ സഹായിക്കും."
 
 #: ../stk-assets/tracks/tutorial/scripting.as:156
 msgid ""
 "Note that if you manage to skid for several seconds, you will receive a "
 "bonus speedup as a reward!"
-msgstr "കുറേനിമിഷത്തേക്ക് നിങ്ങൾ സ്കിഡ് കൈകാര്യം ചെയ്താൽ, ഒരു പ്രതിഫലമായി നിങ്ങൾക്കൊരു വേഗോന്നതി ബോണസ് ലഭിക്കുമെന്ന് ഓർക്കുക!"
+msgstr "കുറേനിമിഷത്തേക്ക് നിങ്ങൾ സ്കിഡ്ഡ് കൈകാര്യം ചെയ്താൽ, ഒരു പ്രതിഫലമായി നിങ്ങൾക്കൊരു വേഗോന്നതി ബോണസ് ലഭിക്കുമെന്ന് ഓർക്കുക!"
 
 #: ../stk-assets/tracks/tutorial/scripting.as:164
 msgid "You are now ready to race. Good luck!"
@@ -6346,26 +6377,25 @@ msgstr "കാർട്ടുകൾ. നൈട്രോ. ആക്ഷൻ! സൂ
 
 #: supertuxkart.appdata.xml:11
 msgid ""
-"Discover the mystery of an underwater world, or drive through the jungles of"
-" Val Verde and visit the famous Cocoa Temple. Race underground or in a "
-"spaceship, through a rural farmland or a strange alien planet. Or rest under"
-" the palm trees on the beach, watching the other karts overtake you. But "
-"don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
-"cakes thrown by your opponents."
-msgstr "ഒരു ജലാന്ധർലോകത്തെ നിഗൂഢതകളുടെ ചുരുളഴിക്കൂ, അല്ലെങ്കിൽ വാൽ വെർഡെ വനങ്ങളിലൂടെ സഞ്ചരിച്ച് പ്രസിദ്ധമായ കൊക്കോ ക്ഷേത്രം സന്ദർശിക്കൂ. ഭൂമിക്കടിയിലോ ശുന്യാകാശനൗകയിലോ, ഒരു ഗ്രാമീണ കൃഷിയിടത്തിലൂടെ അതുമല്ലെങ്കിൽ ഒരു വിചിത്ര അന്യഗ്രഹത്തിലൂടെ റേസ് ചെയ്യൂ. അതുപോരെങ്കിൽ കടൽത്തീരത്തെ പനമരങ്ങൾക്കുതാഴെ മറ്റു കാർട്ടുകൾ നിങ്ങളെ പിന്നിലാക്കി പോകുന്നതുകണ്ട് വിശ്രമിക്കു. പക്ഷേ പഴത്തൊലികൾ തിന്നരുതേ! നിങ്ങളുടെ എതിരാളികൾ എറിയുന്ന ബൗളിംഗ് ബോളുകളുടെയും, പ്ലഞ്ചറുകളുടെയും, ബബിൾ ഗമ്മുകളുടെയും, പിന്നെ കേക്കുകളുടെയും മേൽ ഒരു കണ്ണൂവേണം."
+"We have several tracks with various themes for players to enjoy, from "
+"driving underwater, rural farmlands, jungles or even in space! Try your best"
+" while avoiding other karts as they may overtake you, but don't eat the "
+"bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
+"your opponents."
+msgstr "കളിക്കാരുടെ ആസ്വാദനത്തിനായി ഞങ്ങൾ അവതരിപ്പിക്കുന്നു വിവിധ ആശയങ്ങൾ ഉൾക്കൊള്ളിച്ച ട്രാക്കുകൾ, പന്തയം ആഴക്കടൽ, ഗ്രാമീണ കൃഷിയിടങ്ങൾ, വനങ്ങൾ എന്നിവയിൽ തുടങ്ങി ശൂന്യകാശം വരെയെത്തുന്നു! മറ്റു കാർട്ടുകൾ നിങ്ങളെ എതിരിടുമെന്നതിനാൽ അവരെ പരമാവധി ഒഴിവാക്കാൻ ശ്രമിക്കുക, പക്ഷേ പഴത്തൊലികൾ തിന്നരുത്! നിങ്ങളുടെ എതിരാളികൾ എറിയുന്ന ബൗളിംഗ് ബോളുകൾ, പ്ലഞ്ചറുകൾ, ബബിൾ ഗം, പിന്നെ കേക്കുകൾ എന്നിവയ്ക്കുമേൽ ഒരു കണ്ണു വേണം."
 
 #: supertuxkart.appdata.xml:14
 msgid ""
 "You can do a single race against other karts, compete in one of several "
 "Grand Prix, try to beat the high score in time trials on your own, play "
 "battle mode against the computer or your friends, and more! For a greater "
-"challenge, race online against players from all over the world and prove "
+"challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr "മറ്റു കാർട്ടുകൾക്കെതിരെ നിങ്ങൾക്ക് ഒരു ഒറ്റയാൾ റേസ് നടത്താൻ സാധിക്കും, ഒരുപാട് ഗ്രാന്റ് പ്രീകളിലൊന്നിൽ മത്സരിക്കാനും, നിങ്ങൾക്ക് സ്വന്തമായി ടൈം ട്രയലുകളിലെ ഉയർന്ന സ്കോർ പരാജയപ്പെടുത്താനും, കമ്പ്യൂട്ടറിനോ നിങ്ങളുടെ സുഹൃത്തുക്കൾക്കോ എതിരെ യുദ്ധമോഡിൽ കളിക്കാനും കൂടാതെ ധാരാളം! വിപുലമായ ഒരു വെല്ലുവിളിക്കായി, ലോകത്താകമാനമുള്ള കളിക്കാർക്കെതിരെ ഓൺലൈനിൽ റേസ് ചെയ്ത് നിങ്ങളുടെ റേസിംഗ് മിടുക്കുകൾ തെളിയിക്കു!"
+msgstr "മറ്റു കാർട്ടുകൾക്കെതിരെ നിങ്ങൾക്ക് ഒരു ഒറ്റയാൾ റേസ് നടത്താൻ സാധിക്കും, ഒരുപാട് ഗ്രാന്റ് പ്രീകളിലൊന്നിൽ മത്സരിക്കാനും, നിങ്ങൾക്ക് സ്വന്തമായി ടൈം ട്രയലുകളിലെ ഉയർന്ന സ്കോർ പരാജയപ്പെടുത്താനും, കമ്പ്യൂട്ടറിനോ നിങ്ങളുടെ സുഹൃത്തുക്കൾക്കോ എതിരെ യുദ്ധമോഡിൽ കളിക്കാനും കൂടാതെ ധാരാളം! വിപുലമായ ഒരു വെല്ലുവിളിക്കായി, ഓൺലൈനിൽ ചേർന്ന് ലോകത്താകമാനമുള്ള കളിക്കാരെ കണ്ടുമുട്ടി നിങ്ങളുടെ റേസിംഗ് മിടുക്കുകൾ തെളിയിക്കു!"
 
 #: supertuxkart.appdata.xml:17
-msgid "This game is free and without ads."
-msgstr "ഈ ഗെയിം സൗജന്യവും പരസ്യരഹിതവുമാണ്."
+msgid "This game has no ads."
+msgstr "ഈ ഗെയിം പരസ്യരഹിതമാണ്"
 
 #: supertuxkart.appdata.xml:20
 msgid ""

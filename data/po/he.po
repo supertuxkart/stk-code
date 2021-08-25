@@ -20,9 +20,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-14 10:48+0800\n"
-"PO-Revision-Date: 2021-07-15 16:51+0000\n"
-"Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>\n"
+"POT-Creation-Date: 2021-08-11 10:50+0800\n"
+"PO-Revision-Date: 2021-08-11 03:14+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Hebrew (http://www.transifex.com/supertuxkart/supertuxkart/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -32,7 +32,7 @@ msgstr ""
 
 #. I18N: In Android UI, po_extract_game_data
 msgid "Extracting game data..."
-msgstr "כעת בחילוץ נתוני המשחק..."
+msgstr "נתוני המשחק מחולצים..."
 
 #. I18N: In Android UI, po_extract_error
 msgid "Game data extraction error"
@@ -114,7 +114,7 @@ msgstr "בלי רסן"
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr "לנצח ב־5 מרוצים יחידים ברצף נגד 3 מתחרים מדומים לפחות. זהירות, התחלת מרוץ מחדש תחשיב אותו כהפסד."
+msgstr "לנצח ב־5 מרוצים יחידים ברצף נגד 3 מתחרים מדומים לפחות. זהירות, התחלת מרוץ מחדש תחשיבו כהפסד."
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -150,7 +150,7 @@ msgstr "מעבר למזל"
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "לנצח ב־10 מרוצים יחידים ברצף נגד 5 מתחרים מדומים לפחות ברמה למומחים או ברמת סופר־טַקס. זהירות, התחלת מרוץ מחדש תחשיב אותו כהפסד."
+msgstr "לנצח ב־10 מרוצים יחידים ברצף נגד 5 מתחרים מדומים לפחות ברמה למומחים או ברמת סופר־טַקס. זהירות, התחלת מרוץ מחדש תחשיבו כהפסד."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -187,7 +187,7 @@ msgstr "הסרה"
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:153
-#: src/states_screens/dialogs/addons_loading.cpp:297
+#: src/states_screens/dialogs/addons_loading.cpp:301
 msgid "Back"
 msgstr "חזרה (Back)"
 
@@ -325,10 +325,10 @@ msgstr "שחזור לברירת מחדל"
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:128
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
-#: src/states_screens/high_score_selection.cpp:208
+#: src/states_screens/high_score_selection.cpp:246
 msgid "Yes"
 msgstr "כן"
 
@@ -366,8 +366,10 @@ msgstr "כן"
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
 #: src/states_screens/dialogs/add_device_dialog.cpp:125
-#: src/states_screens/dialogs/addons_loading.cpp:213
-#: src/states_screens/online/register_screen.cpp:163
+#: src/states_screens/dialogs/addons_loading.cpp:220
+#: src/states_screens/dialogs/addons_pack.cpp:133
+#: src/states_screens/dialogs/download_assets.cpp:179
+#: src/states_screens/online/register_screen.cpp:168
 #: src/states_screens/options/user_screen.cpp:128
 msgid "Cancel"
 msgstr "ביטול"
@@ -579,8 +581,6 @@ msgstr "השוואה לרוח רפאים אחרת"
 #. I18N: ./data/gui/dialogs/select_challenge.stkgui
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
-#. I18N: In the grand prix info screen
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Start Race"
@@ -781,7 +781,7 @@ msgstr "רמת קושי"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1241
+#: src/race/race_manager.cpp:1246
 msgid "Novice"
 msgstr "למתחילים"
 
@@ -793,7 +793,7 @@ msgstr "למתחילים"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1242
+#: src/race/race_manager.cpp:1247
 msgid "Intermediate"
 msgstr "רמת ביניים"
 
@@ -805,7 +805,7 @@ msgstr "רמת ביניים"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1243
+#: src/race/race_manager.cpp:1248
 msgid "Expert"
 msgstr "למומחים"
 
@@ -817,7 +817,7 @@ msgstr "למומחים"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1244
+#: src/race/race_manager.cpp:1249
 msgid "SuperTux"
 msgstr "רמת סופר־טַקס"
 
@@ -836,7 +836,7 @@ msgstr "מצב משחק"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1216
+#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1221
 #: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "מרוץ רגיל"
@@ -850,7 +850,7 @@ msgstr "מרוץ רגיל"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1218
+#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1223
 msgid "Time Trial"
 msgstr "נגד השעון"
 
@@ -867,7 +867,7 @@ msgstr "קרב"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1230
+#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1235
 #: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "כדורגל"
@@ -994,9 +994,9 @@ msgstr "הגדרת המרוץ"
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:238
-#: src/states_screens/race_result_gui.cpp:267
-#: src/states_screens/race_result_gui.cpp:275
+#: src/states_screens/race_result_gui.cpp:254
+#: src/states_screens/race_result_gui.cpp:283
+#: src/states_screens/race_result_gui.cpp:291
 msgid "Continue"
 msgstr "המשך"
 
@@ -1024,8 +1024,6 @@ msgstr "מכוניות"
 #. I18N: ./data/gui/screens/addons_screen.stkgui
 #. I18N: In the addons screen
 #. I18N: ./data/gui/screens/gp_info.stkgui
-#. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Tracks"
 msgstr "מסלולים"
@@ -1066,7 +1064,7 @@ msgstr "רגיל"
 #: src/states_screens/easter_egg_screen.cpp:145
 #: src/states_screens/grand_prix_editor_screen.cpp:337
 #: src/states_screens/kart_selection.cpp:317
-#: src/states_screens/tracks_and_gp_screen.cpp:152
+#: src/states_screens/tracks_and_gp_screen.cpp:161
 msgid "Add-Ons"
 msgstr "תוספים"
 
@@ -1082,11 +1080,11 @@ msgstr "תוספים"
 #: src/states_screens/arenas_screen.cpp:74
 #: src/states_screens/easter_egg_screen.cpp:137
 #: src/states_screens/edit_track_screen.cpp:111
-#: src/states_screens/gp_info_screen.cpp:74
+#: src/states_screens/gp_info_screen.cpp:79
 #: src/states_screens/grand_prix_editor_screen.cpp:334
 #: src/states_screens/kart_selection.cpp:309
 #: src/states_screens/online/tracks_screen.cpp:354
-#: src/states_screens/tracks_and_gp_screen.cpp:142
+#: src/states_screens/tracks_and_gp_screen.cpp:151
 msgid "All"
 msgstr "הכול"
 
@@ -1160,7 +1158,7 @@ msgstr "בחירת שידור רפאים"
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1228
+#: src/race/race_manager.cpp:1233
 msgid "Egg Hunt"
 msgstr "ציד ביצים"
 
@@ -1196,30 +1194,22 @@ msgstr "הקלטת שידור רפאים"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
-#. I18N: In the grand prix info screen
 msgid "AI karts"
 msgstr "מתחרים מדומים"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
-#. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "Reverse"
 msgstr "היפוך"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
-#. I18N: In the grand prix info screen
 msgid "Track group"
 msgstr "קבוצת מסלולים"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
-#. I18N: ./data/gui/screens/highscore_info.stkgui
-#. I18N: In the grand prix info screen
-#: src/states_screens/gp_info_screen.cpp:145
+#: src/states_screens/gp_info_screen.cpp:163
 msgid "Continue saved GP"
 msgstr "להמשיך גרנד פרי שמור"
 
@@ -1244,6 +1234,7 @@ msgstr "העתקה"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
+#: src/states_screens/online/register_screen.cpp:71
 msgid "Rename"
 msgstr "שינוי שם"
 
@@ -1395,7 +1386,7 @@ msgstr "איסוף ניטרו מאפשר לך להאיץ את המהירות ש�
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "אם תראו לחצן עם מנעול כמו זה, יהיה עליכם להשלים אתגר כדי לפתוח אותו."
+msgstr "אם רואים כפתור עם מנעול כמו זה, יש להשלים אתגר כדי לשחרר אותו."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1486,7 +1477,7 @@ msgstr "כדי לעזור לך לנצח, ישנם חיזוקים שניתן לא
 msgid ""
 "BubbleGum - protect yourself with a shield, or use while looking back to "
 "leave a sticky pink puddle behind you."
-msgstr "גומי לעיסה – הגנו על עצמכם בעזרת מגן, או השתמשו בעת מבט לאחור כדי להותיר מאחוריכם שלולית ורודה ודביקה."
+msgstr "גומי לעיסה – מאפשרת להגן על עצמך בעזרת מגן, או להשתמש במהלך מבט לאחור כדי להותיר שלולית ורודה ודביקה מאחור."
 
 #. I18N: ./data/gui/screens/help3.stkgui
 msgid ""
@@ -1655,7 +1646,7 @@ msgid ""
 " enough players. Then, you can choose your kart and vote for the next track "
 "to race on. An addon track is allowed only if it exists on all joined "
 "players and the server."
-msgstr "כשמחוברים לשרת, המרוצים מתחילים כשהבעלים של השרת (מסומנים בכתר) מחליטים להתחילם. בשרתים רשמיים המרוצים עשויים להתחיל אוטומטית כשיש מספיק שחקנים. אז, יהיה אפשר לבחור את המכונית שלך ולהצביע למסלול הבא. מכוניות מִתּוֹספים מורשות רק אם הן קיימות אצל כל השחקנים שהצטרפו ובשרת."
+msgstr "כשמחוברים לשרת, המרוצים מתחילים כשהבעלי השרת (מסומנים בכתר) מחליטים להתחילם. בשרתים רשמיים המרוצים עשויים להתחיל אוטומטית כשיש מספיק שחקנים. אז, יהיה אפשר לבחור את המכונית שלך ולהצביע למסלול הבא. מכוניות מִתּוֹספים מורשות רק אם הן קיימות אצל כל השחקנים שהצטרפו ובשרת."
 
 #. I18N: ./data/gui/screens/help7.stkgui
 #. I18N: In the help menu
@@ -1680,12 +1671,22 @@ msgid ""
 "keyboard to join the game, and use their input device to select their kart. "
 "The game continues when everyone selected their kart. Note that the mouse "
 "may not be used for this operation."
-msgstr "כאשר מוגדרים התקני קלט, אפשר לבחור בסמל \"משחק מרובה משתתפים במסך מפוצל\" בתפריט הראשי. כל השחקנים יכולים ללחוץ על מקש \"ירייה\" של בקר המשחק או המקלדת כדי להצטרף למשחק, ולהשתמש בהתקן הקלט שלהם לבחירת המכונית. המשחק נמשך לאחר שכולם בחרו מכוניות. נא לשים לב שייתכן שלא ניתן להשתמש בעכבר לצורך פעולה זו."
+msgstr "כשמוגדרים התקני קלט, אפשר לבחור בסמל \"משחק מרובה משתתפים במסך מפוצל\" בתפריט הראשי. כל השחקנים יכולים ללחוץ על מקש \"ירייה\" של בקר המשחק או המקלדת כדי להצטרף למשחק, ולהשתמש בהתקן הקלט שלהם לבחירת המכונית המשחק נמשך לאחר שכולם בחרו מכוניות. נא לשים לב שייתכן שלא ניתן להשתמש בעכבר לצורך פעולה זו."
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 msgid "High Score Selection"
 msgstr "בחירת שיאים"
+
+#. I18N: ./data/gui/screens/high_score_selection.stkgui
+#. I18N: In the high score selection screen
+#. I18N: ./data/gui/screens/tracks_and_gp.stkgui
+#. I18N: In the track and grand prix selection screen
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:69
+#: src/states_screens/dialogs/select_challenge.cpp:51
+#: src/states_screens/high_score_selection.cpp:136
+msgid "Grand Prix"
+msgstr "גרנד פרי"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -1901,6 +1902,7 @@ msgstr "דוא״ל:"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
+#: src/states_screens/online/register_screen.cpp:73
 msgid "Create User"
 msgstr "יצירת משתמש"
 
@@ -2340,13 +2342,7 @@ msgstr "מספר המתחרים המדומים בקבוצה הכחולה"
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
-#: src/states_screens/dialogs/select_challenge.cpp:51
-msgid "Grand Prix"
-msgstr "גרנד פרי"
-
-#. I18N: ./data/gui/screens/tracks_and_gp.stkgui
-#. I18N: In the track and grand prix selection screen
-#: src/race/grand_prix_data.cpp:616
+#: src/race/grand_prix_data.cpp:622
 msgid "Random Grand Prix"
 msgstr "גרנד פרי אקראי"
 
@@ -2391,7 +2387,7 @@ msgstr "ניתן לשנות את גודל הגופן באפשרויות הממש
 
 #. I18N: ./data/tips.xml
 msgid "The help menu has lots of useful information."
-msgstr "לתפריט העזרה כמות רבה של מידע שימושי."
+msgstr "תפריט העזרה מכיל המון מידע שימושי."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
@@ -2408,7 +2404,7 @@ msgstr "האצת ניטרו קצרה יעילה יותר."
 
 #. I18N: ./data/tips.xml
 msgid "Only use zippers when it is safe. Long straight lines are ideal."
-msgstr "יש להשתמש במאיצנים כאשר בטוח להשתמש בהם. קווים ישרים וארוכים מומלצים."
+msgstr "יש להשתמש במאיצנים כשבטוח להשתמש בהם. קווים ישרים וארוכים מומלצים."
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2448,7 +2444,7 @@ msgstr "מקש (כפתור) החילוץ שימושי מאוד."
 
 #. I18N: ./data/tips.xml
 msgid "Be careful when close to other karts, they may attack you!"
-msgstr "יש להיזהר כאשר קרובים אל מכוניות אחרות, הן עלולות לתקוף אותך!"
+msgstr "יש להיזהר כשקרובים למכוניות אחרות, הן עלולות לתקוף אותך!"
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2474,7 +2470,7 @@ msgstr "בכדורגל, יש לעבוד כקבוצה תמיד בשביל תוצ�
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr "אם אתם מתגעגעים לכדור ויריב מתקרב, אפשר לנסות להכות אותם באמצעות חיזוק או לחסום את דרכו."
+msgstr "אם אתם מתגעגעים לכדור ויריב מתקרב, אפשר לנסות להכותו באמצעות חיזוק או לחסום את דרכו."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
@@ -2618,7 +2614,7 @@ msgstr "מגרש כדורגל מקרח"
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
 msgid "What's wrong, little hippies? Your great gnu leader is missing?"
-msgstr "מה הבעיה, ילדי פרחים קטנטנים? גנו מנהיגכם הדגול איננו?"
+msgstr "מה הבעיה, ילדי פרחים קטנטנים? מנהיגכם הדגול גנו נעלם?"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2817,13 +2813,13 @@ msgstr "אורח/ת %d"
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "נמצא קובץ תצורה מעוות, הקובץ נמחק ויוחלף בקובץ חדש."
+msgstr "קובץ התצורה שלך היה מעוות, ולכן הוא נמחק ויוחלף בקובץ חדש."
 
 #: src/config/user_config.cpp:700
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
-msgstr "קובץ התצורה ישן מדי, הוא נמחק ויוחלף בקובץ חדש."
+msgstr "קובץ התצורה שלך היה ישן מדיי, ולכן הוא נמחק ויוחלף בקובץ חדש."
 
 #: src/graphics/irr_driver.cpp:664
 msgid "Video recording started."
@@ -2845,14 +2841,14 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS:‏ %d/%d/%d ‏- %d KTris, פינג: %dמ״ש"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:199
+#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:201
 #, c-format
 msgid "Tip: %s"
 msgstr "עצה: %s"
 
 #: src/guiengine/engine.cpp:1483
 msgid "Loading"
-msgstr "כעת בטעינה"
+msgstr "מתבצעת טעינה"
 
 #: src/guiengine/widgets/kart_stats_widget.cpp:104
 msgid "Mass"
@@ -2876,10 +2872,10 @@ msgstr "יעילות ניטרו"
 #: src/guiengine/widgets/player_kart_widget.cpp:758
 #: src/karts/controller/local_player_controller.cpp:452
 #: src/karts/controller/player_controller.cpp:413
-#: src/network/protocols/client_lobby.cpp:824
+#: src/network/protocols/client_lobby.cpp:854
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1504
-#: src/states_screens/race_result_gui.cpp:1566
+#: src/states_screens/race_result_gui.cpp:1527
+#: src/states_screens/race_result_gui.cpp:1589
 #, c-format
 msgid "%s (handicapped)"
 msgstr "‏%s (עם מגבלות)"
@@ -3559,12 +3555,12 @@ msgid "You finished the race in rank %d!"
 msgstr "סיימת את המרוץ במקום ה־%d!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1127
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1157
 #, c-format
 msgid "%s left the game."
 msgstr "‏%s עזב/ה את המשחק."
 
-#: src/main.cpp:2013
+#: src/main.cpp:2021
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3573,16 +3569,16 @@ msgid ""
 "Internet\")."
 msgstr "באפשרות SuperTuxKart להתחבר לשרת כדי להוריד תוספים ולהודיע לך על עדכונים. נא לקרוא את מדיניות הפרטיות בכתובת https://supertuxkart.net/Privacy. האם ברצונך להפעיל תכונה זו? (כדי לשנות הגדרה זו מאוחר יותר, יש לעבור למסך האפשרויות, לבחור בלשונית \"ממשק המשתמש\" ולערוך את הסימון של \"התחברות לאינטרנט\")."
 
-#: src/main.cpp:2362
+#: src/main.cpp:2371
 msgid "Your screen resolution is too low to run STK."
-msgstr "רזולוצית המסך שלך נמוכה מכדי להפעיל את SuperTuxKart."
+msgstr "רזולוציית המסך שלך נמוכה מכדי להפעיל את SuperTuxKart."
 
-#: src/main.cpp:2397
+#: src/main.cpp:2406
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "גרסת מנהל ההתקן ישנה מדי. נא להתקין את מנהל ההתקן העדכני ביותר. "
 
-#: src/main.cpp:2415
+#: src/main.cpp:2424
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
@@ -3590,7 +3586,7 @@ msgid ""
 "game will likely still run, but in a reduced-graphics mode."
 msgstr "מנהל התקני הגרפיקה שלך נראה ישן מאוד. נא לבדוק אם עדכון זמין. SuperTuxKart ממליץ על מנהל התקנים שתומך ב־%s וטובים יותר. סביר להניח שהמשחק עדיין יפעל, אך במצב גרפיקה מופחתת."
 
-#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:109
+#: src/main_loop.cpp:504 src/network/protocols/client_lobby.cpp:128
 msgid "Server connection timed out."
 msgstr "זמן החיבור לשרת אזל."
 
@@ -3652,7 +3648,7 @@ msgstr "%s על ידי %s"
 
 #: src/modes/linear_world.cpp:547
 msgid "New fastest lap"
-msgstr "שיא חדש בזמן ההקפה"
+msgstr "שיא חדש מהירות חדש להקפה"
 
 #: src/modes/linear_world.cpp:1089
 msgid "WRONG WAY!"
@@ -3672,85 +3668,85 @@ msgstr "אופס, הובקע גול עצמי על ידי %s!"
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
-msgstr[0] "הופיעה מכונית %i של צמיגים חלופיים!"
-msgstr[1] "הופיעו %i מכוניות של צמיגים חלופיים!"
-msgstr[2] "הופיעו %i מכוניות של צמיגים חלופיים!"
-msgstr[3] "הופיעו %i מכוניות של צמיגים חלופיים!"
+msgstr[0] "הופיעה מכונית צמיגים חלופיים %i!"
+msgstr[1] "הופיעו %i מכוניות צמיגים חלופיים!"
+msgstr[2] "הופיעו %i מכוניות צמיגים חלופיים!"
+msgstr[3] "הופיעו %i מכוניות צמיגים חלופיים!"
 
-#: src/modes/world.cpp:1412
+#: src/modes/world.cpp:1425
 msgid "You have been eliminated!"
 msgstr "נפסלת!"
 
-#: src/modes/world.cpp:1419
+#: src/modes/world.cpp:1432
 #, c-format
 msgid "'%s' has been eliminated."
 msgstr "\"%s\" נפסל/ה."
 
-#: src/network/protocols/client_lobby.cpp:110
+#: src/network/protocols/client_lobby.cpp:129
 msgid "Server has been shut down."
 msgstr "השרת נכבה."
 
-#: src/network/protocols/client_lobby.cpp:111
+#: src/network/protocols/client_lobby.cpp:130
 msgid "You were kicked from the server."
 msgstr "סולקת מהשרת."
 
-#: src/network/protocols/client_lobby.cpp:113
+#: src/network/protocols/client_lobby.cpp:132
 msgid "You were kicked: Ping too high."
 msgstr "סולקת: פינג גבוה מדיי."
 
-#: src/network/protocols/client_lobby.cpp:262
-#: src/network/protocols/client_lobby.cpp:868
+#: src/network/protocols/client_lobby.cpp:281
+#: src/network/protocols/client_lobby.cpp:898
 msgid "Bad network connection is detected."
 msgstr "זוהה חיבור לא תקין לרשת."
 
-#: src/network/protocols/client_lobby.cpp:427
-#: src/network/protocols/server_lobby.cpp:3847
+#: src/network/protocols/client_lobby.cpp:446
+#: src/network/protocols/server_lobby.cpp:3846
 msgid "Bot"
 msgstr "בוט"
 
-#: src/network/protocols/client_lobby.cpp:597
+#: src/network/protocols/client_lobby.cpp:627
 #, c-format
 msgid "%s disconnected."
 msgstr "‏%s התנתק/ה."
 
 #. I18N: Message shown in network lobby to tell user that
 #. player name is clickable
-#: src/network/protocols/client_lobby.cpp:628
+#: src/network/protocols/client_lobby.cpp:658
 msgid ""
 "Press player name in the list for player management and ranking information."
 msgstr "יש ללחוץ על שם השחקן/ית ברשימה לניהול ולפרטי דירוג השחקן/ית."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:687
+#: src/network/protocols/client_lobby.cpp:717
 #, c-format
 msgid "Server name: %s"
 msgstr "שם השרת: %s"
 
 #. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:695
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:92
+#: src/network/protocols/client_lobby.cpp:725
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:111
 #: src/states_screens/dialogs/server_info_dialog.cpp:92
-#: src/states_screens/race_result_gui.cpp:1870
+#: src/states_screens/race_result_gui.cpp:1893
 #, c-format
 msgid "Difficulty: %s"
 msgstr "רמה: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:700
+#: src/network/protocols/client_lobby.cpp:730
 #, c-format
 msgid "Max players: %d"
 msgstr "מספר שחקנים מרבי: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:713
+#: src/network/protocols/client_lobby.cpp:743
 #: src/states_screens/dialogs/server_info_dialog.cpp:96
 #, c-format
 msgid "Game mode: %s"
 msgstr "מצב משחק: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:726
+#: src/network/protocols/client_lobby.cpp:756
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:367
@@ -3758,7 +3754,7 @@ msgid "Time limit"
 msgstr "הגבלת זמן"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:727
+#: src/network/protocols/client_lobby.cpp:757
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
 #: src/states_screens/track_info_screen.cpp:368
@@ -3766,102 +3762,102 @@ msgid "Goals limit"
 msgstr "הגבלת גולים"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:731
+#: src/network/protocols/client_lobby.cpp:761
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "סוג משחק כדורגל: %s"
 
-#: src/network/protocols/client_lobby.cpp:741
+#: src/network/protocols/client_lobby.cpp:771
 #, c-format
 msgid "Grand prix progress: %d / %d"
-msgstr "התקדמות הגרנד פרי: %d / %d"
+msgstr "התקדמות בגרנד פרי: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:860
+#: src/network/protocols/client_lobby.cpp:890
 msgid "All players joined red or blue team."
 msgstr "כל השחקנים הצטרפו לקבוצה האדומה או הכחולה."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:880
+#: src/network/protocols/client_lobby.cpp:910
 msgid "You are now the owner of server."
 msgstr "הינך הבעלים של השרת כעת."
 
-#: src/network/protocols/client_lobby.cpp:923
+#: src/network/protocols/client_lobby.cpp:953
 msgid "Connection refused: Server is busy."
 msgstr "החיבור נדחה: עומס על השרת."
 
-#: src/network/protocols/client_lobby.cpp:928
+#: src/network/protocols/client_lobby.cpp:958
 msgid "Connection refused: You are banned from the server."
 msgstr "החיבור נדחה: סולקת מהשרת."
 
-#: src/network/protocols/client_lobby.cpp:943
+#: src/network/protocols/client_lobby.cpp:973
 msgid "Connection refused: Server password is incorrect."
 msgstr "החיבור נדחה: הסיסמה לשרת הינה שגויה."
 
-#: src/network/protocols/client_lobby.cpp:947
+#: src/network/protocols/client_lobby.cpp:977
 msgid "Connection refused: Game data is incompatible."
 msgstr "החיבור נדחה: נתוני המשחק אינם שלמים."
 
-#: src/network/protocols/client_lobby.cpp:951
+#: src/network/protocols/client_lobby.cpp:981
 msgid "Connection refused: Server is full."
 msgstr "החיבור נדחה: השרת מלא."
 
-#: src/network/protocols/client_lobby.cpp:955
+#: src/network/protocols/client_lobby.cpp:985
 msgid "Connection refused: Invalid player connecting."
 msgstr "החיבור נדחה: התחברות שחקן/ית בלתי־תקינה."
 
-#: src/network/protocols/client_lobby.cpp:983
+#: src/network/protocols/client_lobby.cpp:1013
 msgid "Failed to start the network game."
 msgstr "התחלת משחק הרשת נכשלה."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1196
+#: src/network/protocols/client_lobby.cpp:1226
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "המשחק הסתיים, אין באפשרותך להצטרף אליו בזמן־אמת או לצפות בו מהצד  עוד."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1200
+#: src/network/protocols/client_lobby.cpp:1230
 msgid "No remaining place in the arena - live join disabled."
 msgstr "לא נותר מקום בזירה - ההצטרפות בזמן־אמת הושבתה."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1204
+#: src/network/protocols/client_lobby.cpp:1234
 msgid "Only 1 player remaining, returning to lobby."
-msgstr "כעת בחזרה למבואה, נותר/ה שחקן/ית 1 בלבד."
+msgstr "נותר/ה שחקן/ית 1, מתבצעת חזרה למבואה."
 
-#: src/network/protocols/client_lobby.cpp:1210
+#: src/network/protocols/client_lobby.cpp:1240
 msgid "Server owner quit the game."
-msgstr "הבעלים של השרת יצאו מהמשחק."
+msgstr "בעלי השרת יצאו מהמשחק."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1214
+#: src/network/protocols/client_lobby.cpp:1244
 msgid "You will be spectating the next game."
 msgstr "עד המשחק הבא יש לצפות במשחק הנוכחי מהצד."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1382
+#: src/network/protocols/client_lobby.cpp:1412
 #, c-format
 msgid "%s joined the red team."
 msgstr "‏%s הצטרף/ה לקבוצה האדומה."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1388
+#: src/network/protocols/client_lobby.cpp:1418
 #, c-format
 msgid "%s joined the blue team."
 msgstr "‏%s הצטרף/ה לקבוצה הכחולה."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1394
+#: src/network/protocols/client_lobby.cpp:1424
 #, c-format
 msgid "%s joined the game."
 msgstr "‏%s הצטרף/ה למשחק."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1585
+#: src/network/protocols/client_lobby.cpp:1615
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3869,10 +3865,19 @@ msgid ""
 msgstr "יש ללחוץ על <%s> או על <%s> כדי לבחור שחקן/ית אחר/ת, על <%s> או על <%s> לשינוי זווית המצלמה."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1601
+#: src/network/protocols/client_lobby.cpp:1631
 #, c-format
 msgid "Successfully reported %s."
 msgstr "הדיווח על %s הצליח."
+
+#. I18N: Shown when there is download error for assets download
+#. in the first run
+#: src/network/protocols/client_lobby.cpp:1896
+#: src/states_screens/dialogs/download_assets.cpp:251
+msgid ""
+"Failed to download assets, check your storage space or internet connection "
+"and try again later."
+msgstr "הורדת המשאבים נכשלה, יש לבדוק את שטח האחסון שלך או את החיבור שלך לאינטרנט ולנסות שוב מאוחר יותר."
 
 #: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
@@ -3899,7 +3904,7 @@ msgstr "מוגבל בזמן (גרנד פרי)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1224
+#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1229
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:226
 #: src/states_screens/track_info_screen.cpp:251
@@ -3908,7 +3913,7 @@ msgstr "תחרות חופשית"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1226
+#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1231
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:228
 msgid "Capture The Flag"
@@ -3971,12 +3976,12 @@ msgid ""
 msgstr "קובץ השיאים ישן מדי.\nכל השיאים נמחקו."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1220
+#: src/race/race_manager.cpp:1225
 msgid "Follow the Leader"
 msgstr "בעקבות המוביל/ה"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1222 src/states_screens/track_info_screen.cpp:250
+#: src/race/race_manager.cpp:1227 src/states_screens/track_info_screen.cpp:250
 msgid "3 Strikes Battle"
 msgstr "קרב 3 פגיעות"
 
@@ -4060,7 +4065,7 @@ msgstr "סליחה, אירעה שגיאה בחיבור לאתר התוספים. 
 #: src/states_screens/arenas_screen.cpp:80
 #: src/states_screens/easter_egg_screen.cpp:143
 #: src/states_screens/kart_selection.cpp:315
-#: src/states_screens/tracks_and_gp_screen.cpp:150
+#: src/states_screens/tracks_and_gp_screen.cpp:159
 msgid "standard"
 msgstr "רגיל"
 
@@ -4400,7 +4405,7 @@ msgstr "מרוצים שהחלו"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:288
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:294
 msgid " (maximum on one official track)"
-msgstr ""
+msgstr " (על מסלול רשמי אחד לכל היותר)"
 
 #. I18N: A goal for achievements. If this text is in (), it's a precision
 #. added to multiple different goals.
@@ -4471,7 +4476,7 @@ msgstr "סיבובי ציד ביצים שהסתיימו"
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:313
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:319
 msgid " (official tracks matching the goal)"
-msgstr ""
+msgstr " (מסלולים רשמיים שמתאימים למטרה)"
 
 #: src/states_screens/dialogs/add_device_dialog.cpp:64
 msgid ""
@@ -4505,54 +4510,57 @@ msgstr "מומלצים"
 
 #. I18N: File size of game assets or addons downloading
 #: src/states_screens/dialogs/addons_loading.cpp:180
-#: src/states_screens/dialogs/addons_pack.cpp:173
+#: src/states_screens/dialogs/addons_pack.cpp:208
 #: src/states_screens/dialogs/download_assets.cpp:104
 #, c-format
 msgid "Size: %s"
 msgstr "גודל: %s"
 
-#: src/states_screens/dialogs/addons_loading.cpp:292
-#: src/states_screens/dialogs/addons_pack.cpp:185
-#: src/states_screens/dialogs/download_assets.cpp:191
+#: src/states_screens/dialogs/addons_loading.cpp:296
+#: src/states_screens/dialogs/addons_pack.cpp:220
+#: src/states_screens/dialogs/download_assets.cpp:201
 msgid "Sorry, downloading the add-on failed"
 msgstr "הורדת התוסף נכשלה, עמך הסליחה"
 
-#: src/states_screens/dialogs/addons_loading.cpp:368
+#: src/states_screens/dialogs/addons_loading.cpp:372
 #, c-format
 msgid "Problems installing the addon '%s'."
 msgstr "בעיות בהתקנת התוסף \"%s\"."
 
-#: src/states_screens/dialogs/addons_loading.cpp:379
-#: src/states_screens/dialogs/addons_loading.cpp:428
-#: src/states_screens/dialogs/download_assets.cpp:256
+#: src/states_screens/dialogs/addons_loading.cpp:383
+#: src/states_screens/dialogs/addons_loading.cpp:432
+#: src/states_screens/dialogs/download_assets.cpp:266
 msgid "Try again"
 msgstr "ניסיון חוזר"
 
-#: src/states_screens/dialogs/addons_loading.cpp:417
+#: src/states_screens/dialogs/addons_loading.cpp:421
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "בעיות בהסרת התוסף \"%s\"."
 
-#. I18N: Shown when there is download error for assets download
-#. in the first run
-#: src/states_screens/dialogs/addons_pack.cpp:225
-#: src/states_screens/dialogs/download_assets.cpp:241
-msgid ""
-"Failed to download assets, check your storage space or internet connection "
-"and try again later."
-msgstr "הורדת המשאבים נכשלה, יש לבדוק את שטח האחסון שלך או את החיבור שלך לאינטרנט ולנסות שוב מאוחר יותר."
+#: src/states_screens/dialogs/addons_pack.cpp:66
+msgid "Background download completed."
+msgstr ""
+
+#: src/states_screens/dialogs/addons_pack.cpp:127
+msgid "Background download"
+msgstr ""
+
+#: src/states_screens/dialogs/addons_pack.cpp:136
+msgid "Background download has already started."
+msgstr ""
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:135
 msgid "Current password invalid."
 msgstr "הסיסמה הנוכחית שגויה."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:141
-#: src/states_screens/online/register_screen.cpp:355
+#: src/states_screens/online/register_screen.cpp:362
 msgid "Password has to be between 8 and 30 characters long!"
 msgstr "על אורך סיסמה להיות בין 8 ל־30 תווים!"
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:148
-#: src/states_screens/online/register_screen.cpp:339
+#: src/states_screens/online/register_screen.cpp:346
 msgid "Passwords don't match!"
 msgstr "הסיסמות אינן תואמות!"
 
@@ -4562,9 +4570,9 @@ msgstr "הסיסמה שונתה בהצלחה."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:236
 #: src/states_screens/dialogs/recovery_dialog.cpp:207
-#: src/states_screens/online/register_screen.cpp:420
+#: src/states_screens/online/register_screen.cpp:427
 msgid "Validating info"
-msgstr "כעת באימות המידע"
+msgstr "המידע בהליכי אימות"
 
 #. I18N: In the 'confirm resolution' dialog, that's shown when switching
 #. resoluton
@@ -4673,14 +4681,14 @@ msgstr "כתובת שרת לא תקינה: %s."
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
 #: src/states_screens/ghost_replay_selection.cpp:155
-#: src/states_screens/high_score_selection.cpp:136
+#: src/states_screens/high_score_selection.cpp:150
 msgctxt "column_name"
 msgid "Reverse"
 msgstr "רוורס"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
 #: src/states_screens/ghost_replay_selection.cpp:157
-#: src/states_screens/high_score_selection.cpp:131
+#: src/states_screens/high_score_selection.cpp:141
 #: src/states_screens/online/server_selection.cpp:135
 msgctxt "column_name"
 msgid "Difficulty"
@@ -4688,7 +4696,7 @@ msgstr "רמת קושי"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
 #: src/states_screens/ghost_replay_selection.cpp:159
-#: src/states_screens/high_score_selection.cpp:135
+#: src/states_screens/high_score_selection.cpp:148
 msgctxt "column_name"
 msgid "Laps"
 msgstr "הקפות"
@@ -4718,41 +4726,48 @@ msgid "Version"
 msgstr "גרסה"
 
 #: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:107
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:128
 #: src/states_screens/dialogs/message_dialog.cpp:131
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
-#: src/states_screens/high_score_selection.cpp:208
+#: src/states_screens/high_score_selection.cpp:246
 msgid "No"
 msgstr "לא"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:87
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:75
+#: src/states_screens/edit_gp_screen.cpp:151
+#: src/states_screens/high_score_selection.cpp:138
+msgid "Track"
+msgstr "מסלול"
+
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:106
 #, c-format
 msgid "Top %d High Scores"
 msgstr "%d השיאים הטובים ביותר"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:89
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:108
 #, c-format
-msgid "Track: %s"
-msgstr "מסלול: %s"
+msgid "%s: %s"
+msgstr ""
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:102
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:121
 #, c-format
 msgid "Number of karts: %d"
 msgstr "מספר מכוניות: %d"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:105
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:126
 #, c-format
 msgid "Laps: %d"
 msgstr "הקפות: %d"
 
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:109
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:130
 #, c-format
 msgid "Reverse: %s"
 msgstr "נסיעה לאחור: %s"
 
 #. I18N: for empty highscores entries
-#: src/states_screens/dialogs/high_score_info_dialog.cpp:169
+#: src/states_screens/dialogs/high_score_info_dialog.cpp:198
+#: src/states_screens/gp_info_screen.cpp:503
 #: src/states_screens/track_info_screen.cpp:526
 msgid "(Empty)"
 msgstr "(ריק)"
@@ -4817,13 +4832,13 @@ msgstr "דיווח על השחקן/ית"
 #: src/states_screens/dialogs/player_rankings_dialog.cpp:141
 #, c-format
 msgid "Fetching ranking info for %s"
-msgstr "כעת במשיכת נתוני הדירוג של %s"
+msgstr "נתוני הדירוג של %s מתקבלים"
 
 #. I18N: In the network player dialog, instruction for reporting player
 #: src/states_screens/dialogs/network_player_dialog.cpp:194
 #, c-format
 msgid "Tell server administrator about this player (%s):"
-msgstr "לספר למנהל/ת השרת על השחקן/ית (%s):"
+msgstr "דיווח למנהל/ת השרת על השחקן/ית (%s):"
 
 #. I18N: In press a key dialog, tell user to press a key to bind configuration
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:43
@@ -4859,7 +4874,7 @@ msgid "Exit Battle"
 msgstr "יציאה מהקרב"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:144
-#: src/states_screens/race_result_gui.cpp:321
+#: src/states_screens/race_result_gui.cpp:337
 msgid "Setup New Race"
 msgstr "הגדרת מרוץ חדש"
 
@@ -4905,7 +4920,7 @@ msgstr "מרוץ שידור רפאים"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1860
+#: src/states_screens/race_result_gui.cpp:1883
 #, c-format
 msgid "Laps: %i"
 msgstr "הקפות: %i"
@@ -4918,18 +4933,21 @@ msgstr "סוג: %s"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:90
+#: src/states_screens/race_result_gui.cpp:1975
 #, c-format
 msgid "Required Rank: %i"
 msgstr "מקום נדרש: %i לפחות"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:96
+#: src/states_screens/race_result_gui.cpp:1983
 #, c-format
 msgid "Required Time: %i"
 msgstr "זמן נדרש: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:103
+#: src/states_screens/race_result_gui.cpp:1994
 #, c-format
 msgid "Required Nitro Points: %i"
 msgstr "נקודות ניטרו נדרשות: %i"
@@ -5031,7 +5049,7 @@ msgstr "בקשת החברות נדחתה!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:319
 msgid "Friend removed!"
-msgstr "החבר/ה הוסר/ה!"
+msgstr "הסרת את החבר/ה!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:370
 msgid "Friend request cancelled!"
@@ -5039,11 +5057,11 @@ msgstr "בקשת החברות בוטלה!"
 
 #: src/states_screens/dialogs/user_info_dialog.cpp:480
 msgid "Processing"
-msgstr "כעת בעיבוד"
+msgstr "מתבצע עיבוד"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:169
 msgid "Fetching last vote"
-msgstr "כעת במשיכת ההצבעה האחרונה"
+msgstr "ההצבעה האחרונה מתקבלת"
 
 #: src/states_screens/dialogs/vote_dialog.cpp:188
 msgid "You can adapt your previous rating by clicking the stars beneath."
@@ -5061,11 +5079,11 @@ msgstr "ההצבעה הצליחה! ניתן לסגור חלון זה."
 
 #: src/states_screens/dialogs/vote_dialog.cpp:243
 msgid "Performing vote"
-msgstr "כעת בהצבעה"
+msgstr "מתבצעת הצבעה"
 
 #: src/states_screens/easter_egg_screen.cpp:270
 #: src/states_screens/online/tracks_screen.cpp:606
-#: src/states_screens/tracks_and_gp_screen.cpp:296
+#: src/states_screens/tracks_and_gp_screen.cpp:305
 msgid "Random Track"
 msgstr "מסלול אקראי"
 
@@ -5080,10 +5098,6 @@ msgstr "האם להסיר את \"%s\"?"
 #: src/states_screens/edit_gp_screen.cpp:382
 msgid "Do you want to save your changes?"
 msgstr "האם לשמור את השינויים?"
-
-#: src/states_screens/edit_gp_screen.cpp:151
-msgid "Track"
-msgstr "מסלול"
 
 #: src/states_screens/edit_gp_screen.cpp:152
 msgid "Laps"
@@ -5148,7 +5162,6 @@ msgid "You unlocked grand prix %0"
 msgstr "שחררת את גרנד פרי %0"
 
 #: src/states_screens/ghost_replay_selection.cpp:153
-#: src/states_screens/high_score_selection.cpp:130
 msgctxt "column_name"
 msgid "Track"
 msgstr "מסלול"
@@ -5159,20 +5172,20 @@ msgctxt "column_name"
 msgid "Players"
 msgstr "שחקנים"
 
-#: src/states_screens/gp_info_screen.cpp:72
+#: src/states_screens/gp_info_screen.cpp:77
 msgid "Default"
 msgstr "ברירת מחדל"
 
-#: src/states_screens/gp_info_screen.cpp:73
+#: src/states_screens/gp_info_screen.cpp:78
 msgid "None"
 msgstr "ללא"
 
-#: src/states_screens/gp_info_screen.cpp:75
+#: src/states_screens/gp_info_screen.cpp:80
 msgid "Random"
 msgstr "אקראי"
 
-#: src/states_screens/gp_info_screen.cpp:153
-#: src/states_screens/gp_info_screen.cpp:179
+#: src/states_screens/gp_info_screen.cpp:171
+#: src/states_screens/gp_info_screen.cpp:222
 msgid "Reload"
 msgstr "טעינה מחדש"
 
@@ -5208,7 +5221,7 @@ msgid "Better luck next time!"
 msgstr "בהצלחה בפעם הבאה!"
 
 #: src/states_screens/grand_prix_win.cpp:166
-#: src/states_screens/race_result_gui.cpp:257
+#: src/states_screens/race_result_gui.cpp:273
 msgid "You completed a challenge!"
 msgstr "השלמת אתגר!"
 
@@ -5220,16 +5233,16 @@ msgstr "ניצחת בגרנד פרי!"
 msgid "You completed the Grand Prix!"
 msgstr "השלמת את הגרנד פרי!"
 
-#: src/states_screens/high_score_selection.cpp:134
+#: src/states_screens/high_score_selection.cpp:144
 msgctxt "column_name"
 msgid "Number of karts"
 msgstr "מספר מכוניות"
 
-#: src/states_screens/high_score_selection.cpp:267
+#: src/states_screens/high_score_selection.cpp:321
 msgid "Are you sure you want to remove this high score entry?"
 msgstr "האם להסיר את ערך טבלת השיאים הזה?"
 
-#: src/states_screens/high_score_selection.cpp:275
+#: src/states_screens/high_score_selection.cpp:329
 msgid "Are you sure you want to remove all of your high scores?"
 msgstr "האם להסיר את כל השיאים שלך?"
 
@@ -5255,13 +5268,13 @@ msgstr "כולם:\nלחצו על כפתור \"בחירה\" כדי להצטרף �
 
 #: src/states_screens/main_menu_screen.cpp:262
 msgid "Would you like to play the tutorial of the game?"
-msgstr "האם ברצונך להפעיל את ההדרכה של המשחק?"
+msgstr "להפעיל את ההדרכה של המשחק?"
 
 #: src/states_screens/main_menu_screen.cpp:558
 msgid ""
 "You can not play online without internet access. If you want to play online,"
 " go in the options menu, and check \"Connect to the Internet\"."
-msgstr "לא ניתן לשחק ברשת ללא גישה לאינטרנט. אם ברצונך לשחק ברשת, נא להיכנס אל תפריט האפשרויות, ולסמן את \"התחברות לאינטרנט\"."
+msgstr "לא ניתן לשחק ברשת ללא גישה לאינטרנט. אם ברצונך לשחק ברשת, נא להיכנס לתפריט האפשרויות, ולסמן את \"התחברות לאינטרנט\"."
 
 #: src/states_screens/main_menu_screen.cpp:573
 msgid ""
@@ -5344,7 +5357,7 @@ msgstr "מבואה (פינג: %dמ״ש)"
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
-msgstr "נא להמתין עד הסוף של המשחק הנוכחי (%s), זמן נותר משוער: %s."
+msgstr "נא להמתין עד סוף המשחק הנוכחי (%s), זמן נותר משוער: %s."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
@@ -5358,20 +5371,20 @@ msgstr "נא להמתין עד הסוף המשחק הנוכחי, זמן נותר
 #. percent, showing the current track name inside bracket
 #: src/states_screens/online/networking_lobby.cpp:403
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
-msgstr "נא להמתין עד הסוף של המשחק הנוכחי (%s), התקדמות משוערת: %s%."
+msgstr "נא להמתין עד סוף המשחק הנוכחי (%s), התקדמות משוערת: %s%."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
 #: src/states_screens/online/networking_lobby.cpp:412
 msgid "Please wait for the current game's end, estimated progress: %d%."
-msgstr "נא להמתין עד הסוף של המשחק הנוכחי, התקדמות משוערת: %d%."
+msgstr "נא להמתין עד סוף המשחק הנוכחי, התקדמות משוערת: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
 #: src/states_screens/online/networking_lobby.cpp:420
 msgid "Please wait for the current game's end."
-msgstr "נא להמתין עד הסוף של המשחק הנוכחי."
+msgstr "נא להמתין עד סוף המשחק הנוכחי."
 
 #: src/states_screens/online/networking_lobby.cpp:487
 #, c-format
@@ -5402,7 +5415,7 @@ msgstr "כעתבהתחברות לשרת %s"
 
 #: src/states_screens/online/networking_lobby.cpp:543
 msgid "Finding a quick play server"
-msgstr "כעת באיתור שרת למשחק מהיר"
+msgstr "מתבצע איתור שרת למשחק מהיר"
 
 #. I18N: In kart screen, show before the voting period in network ends.
 #: src/states_screens/online/network_kart_selection.cpp:195
@@ -5419,7 +5432,7 @@ msgstr "מטרות"
 #: src/states_screens/online/online_profile_achievements.cpp:116
 #: src/states_screens/online/online_profile_achievements.cpp:315
 msgid "Fetching achievements"
-msgstr "כעת במשיכת ההישגים"
+msgstr "ההישגים מתקבלים"
 
 #: src/states_screens/online/online_profile_base.cpp:117
 #, c-format
@@ -5437,7 +5450,7 @@ msgstr "מצב"
 #: src/states_screens/online/online_profile_friends.cpp:94
 #: src/states_screens/online/online_profile_friends.cpp:274
 msgid "Fetching friends"
-msgstr "כעת במשיכת החברים"
+msgstr "החברים מתקבלים"
 
 #: src/states_screens/online/online_profile_friends.cpp:236
 msgid "New Request"
@@ -5488,50 +5501,50 @@ msgstr "לא ניתן לשחק ברשת ללא גישה לאינטרנט. אם �
 #: src/states_screens/online/online_user_search.cpp:179
 #: src/states_screens/online/online_user_search.cpp:242
 msgid "Searching"
-msgstr "כעת בחיפוש"
+msgstr "מתבצע חיפוש"
 
-#: src/states_screens/online/register_screen.cpp:164
+#: src/states_screens/online/register_screen.cpp:169
 #: src/states_screens/options/user_screen.cpp:127
 msgid "Exit game"
 msgstr "יציאה מהמשחק"
 
-#: src/states_screens/online/register_screen.cpp:277
-#: src/states_screens/online/register_screen.cpp:284
+#: src/states_screens/online/register_screen.cpp:282
+#: src/states_screens/online/register_screen.cpp:289
 #, c-format
 msgid "Could not create player '%s'."
 msgstr "לא ניתן ליצור את השחקן/ית \"%s\"."
 
-#: src/states_screens/online/register_screen.cpp:301
+#: src/states_screens/online/register_screen.cpp:306
 msgid "User name cannot be empty."
 msgstr "שדה שם המשתמש לא יכול להיות ריק."
 
-#: src/states_screens/online/register_screen.cpp:343
+#: src/states_screens/online/register_screen.cpp:350
 msgid "Emails don't match!"
 msgstr "כתובות הדוא״ל אינן תואמות!"
 
-#: src/states_screens/online/register_screen.cpp:347
+#: src/states_screens/online/register_screen.cpp:354
 msgid "Online username has to be between 3 and 30 characters long!"
 msgstr "על אורך שם משתמש מקוון להיות בין 3 ל־30 תווים!"
 
-#: src/states_screens/online/register_screen.cpp:351
+#: src/states_screens/online/register_screen.cpp:358
 msgid "Online username must not start with a number!"
 msgstr "שם משתמש מקוון אינו יכול להתחיל במספר!"
 
-#: src/states_screens/online/register_screen.cpp:359
+#: src/states_screens/online/register_screen.cpp:366
 msgid "Email has to be between 5 and 254 characters long!"
 msgstr "על אורך כתובת הדוא״ל להיות בין 5 ל־254 תווים!"
 
-#: src/states_screens/online/register_screen.cpp:365
+#: src/states_screens/online/register_screen.cpp:372
 msgid "Email is invalid!"
 msgstr "כתובת דוא״ל לא תקפה!"
 
-#: src/states_screens/online/register_screen.cpp:428
+#: src/states_screens/online/register_screen.cpp:435
 msgid ""
 "You will receive an email with further instructions regarding account "
 "activation. Please be patient and be sure to check your spam folder."
 msgstr "הודעה עם הוראות להפעלת החשבון תגיע לכתובת הדוא״ל שלך. נא להתאזר בסבלנות ולוודא שבדקת את תיקיית דואר הזבל שלך."
 
-#: src/states_screens/online/register_screen.cpp:467
+#: src/states_screens/online/register_screen.cpp:474
 msgid "Internet access is disabled, please enable it in the options"
 msgstr "הגישה לאינטרנט מושבתת, נא להפעילה בתפריט האפשרויות"
 
@@ -5579,7 +5592,7 @@ msgstr "אין שרתים זמינים."
 
 #: src/states_screens/online/server_selection.cpp:473
 msgid "Fetching servers"
-msgstr "כעת במשיכת השרתים"
+msgstr "השרתים מתקבלים"
 
 #: src/states_screens/online/server_selection.cpp:539
 msgid "Server Bookmarks"
@@ -5620,7 +5633,7 @@ msgid "Drive in reverse"
 msgstr "נסיעה לאחור"
 
 #: src/states_screens/online/tracks_screen.cpp:592
-#: src/states_screens/tracks_and_gp_screen.cpp:282
+#: src/states_screens/tracks_and_gp_screen.cpp:291
 msgid "Locked: solve active challenges to gain access to more!"
 msgstr "נעול: יש להשלים אתגרים פעילים כדי לקבל גישה לעוד!"
 
@@ -5876,7 +5889,7 @@ msgstr "מלא"
 msgid ""
 "Vsync forces the graphics card to supply a new frame\n"
 "only when the monitor is ready to display it."
-msgstr "Vsync מכריח את כרטיס הגרפיקה לספק מסגרת חדשה\nרק כאשר הצג מוכן להציג אותה."
+msgstr "Vsync מכריח את כרטיס הגרפיקה לספק מסגרת חדשה\nרק כאשר הצג מוכן להציגה."
 
 #. I18N: in graphical options.
 #: src/states_screens/options/options_screen_video.cpp:253
@@ -5971,7 +5984,7 @@ msgstr "עומק שדה : %s"
 
 #: src/states_screens/options/user_screen.cpp:366
 msgid "Internet access is disabled. Do you want to enable it?"
-msgstr "הגישה לאינטרנט נדחתה. האם לאפשר אותה?"
+msgstr "הגישה לאינטרנט מושבתת. האם להפעילה?"
 
 #: src/states_screens/options/user_screen.cpp:559
 msgid "You need to enter a password."
@@ -5980,12 +5993,12 @@ msgstr "יש להזין סיסמה."
 #: src/states_screens/options/user_screen.cpp:580
 #, c-format
 msgid "Logging out '%s'"
-msgstr "כעת ביציאה מחשבון \"%s\""
+msgstr "מתבצעת יציאה מחשבון \"%s\""
 
 #: src/states_screens/options/user_screen.cpp:581
 #, c-format
 msgid "Logging in '%s'"
-msgstr "כעת בהתחברות לחשבון \"%s\""
+msgstr "מתבצעת התחברות לחשבון \"%s\""
 
 #: src/states_screens/options/user_screen.cpp:664
 msgid "You can't delete the only player."
@@ -6020,37 +6033,37 @@ msgstr "גול!"
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
 #: src/states_screens/race_gui_base.cpp:80
-#: src/states_screens/race_result_gui.cpp:367
+#: src/states_screens/race_result_gui.cpp:383
 msgid "Waiting for others"
-msgstr "כעת בהמתנה לאחרים"
+msgstr "בהמתנה לאחרים"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
 #: src/states_screens/race_gui_base.cpp:82
 msgid "Waiting for the server"
-msgstr "כעת בהמתנה לשרת"
+msgstr "בהמתנה לשרת"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:639
+#: src/states_screens/race_gui_base.cpp:641
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:649
+#: src/states_screens/race_gui_base.cpp:651
 msgid "by"
 msgstr "מאת"
 
-#: src/states_screens/race_gui_base.cpp:757
+#: src/states_screens/race_gui_base.cpp:759
 msgid "Collect nitro!"
 msgstr "צאו לאסוף ניטרו!"
 
-#: src/states_screens/race_gui_base.cpp:759
+#: src/states_screens/race_gui_base.cpp:761
 msgid "Follow the leader!"
 msgstr "צאו בעקבות המוביל/ה!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:942
+#: src/states_screens/race_gui_base.cpp:944
 #, c-format
 msgid "Top %i"
 msgstr "%i הטובים ביותר"
@@ -6079,93 +6092,105 @@ msgstr "יש ללחוץ על סמל הפודיום להתחלת האתגר"
 msgid "Press fire to start the challenge"
 msgstr "יש ללחוץ על ירייה להתחלת האתגר"
 
-#: src/states_screens/race_result_gui.cpp:243
+#: src/states_screens/race_result_gui.cpp:259
 msgid "Quit the server"
 msgstr "יציאה מהשרת"
 
-#: src/states_screens/race_result_gui.cpp:258
+#: src/states_screens/race_result_gui.cpp:274
 msgid "You completed challenges!"
 msgstr "השלמת אתגרים!"
 
-#: src/states_screens/race_result_gui.cpp:281
+#: src/states_screens/race_result_gui.cpp:297
 msgid "Abort Grand Prix"
 msgstr "נטישת גרנד פרי"
 
-#: src/states_screens/race_result_gui.cpp:301
+#: src/states_screens/race_result_gui.cpp:317
 msgid "Restart"
 msgstr "התחלה מחדש"
 
-#: src/states_screens/race_result_gui.cpp:308
+#: src/states_screens/race_result_gui.cpp:324
 msgid "Back to challenge selection"
 msgstr "חזרה לבחירת אתגרים"
 
-#: src/states_screens/race_result_gui.cpp:316
+#: src/states_screens/race_result_gui.cpp:332
 msgid "Race against the new ghost replay"
 msgstr "להתחרות נגד שידור הרפאים החדש"
 
-#: src/states_screens/race_result_gui.cpp:324
+#: src/states_screens/race_result_gui.cpp:340
 msgid "Back to the menu"
 msgstr "חזרה לתפריט"
 
-#: src/states_screens/race_result_gui.cpp:493
+#: src/states_screens/race_result_gui.cpp:509
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "האם לנטוש את הגרנד פרי?"
 
-#: src/states_screens/race_result_gui.cpp:591
-#: src/states_screens/race_result_gui.cpp:1431
+#: src/states_screens/race_result_gui.cpp:607
+#: src/states_screens/race_result_gui.cpp:1454
 msgid "Red Team Wins"
 msgstr "הניצחון בידי הקבוצה האדומה"
 
-#: src/states_screens/race_result_gui.cpp:593
-#: src/states_screens/race_result_gui.cpp:1435
+#: src/states_screens/race_result_gui.cpp:609
+#: src/states_screens/race_result_gui.cpp:1458
 msgid "Blue Team Wins"
 msgstr "הניצחון בידי הקבוצה הכחולה"
 
-#: src/states_screens/race_result_gui.cpp:595
-#: src/states_screens/race_result_gui.cpp:1440
+#: src/states_screens/race_result_gui.cpp:611
+#: src/states_screens/race_result_gui.cpp:1463
 msgid "It's a draw"
 msgstr "זה תיקו"
 
-#: src/states_screens/race_result_gui.cpp:835
+#: src/states_screens/race_result_gui.cpp:851
 #, c-format
 msgid "Eliminated after %s"
-msgstr ""
+msgstr "נפסלת לאחר %s"
 
-#: src/states_screens/race_result_gui.cpp:840
-#: src/states_screens/race_result_gui.cpp:1269
+#: src/states_screens/race_result_gui.cpp:856
+#: src/states_screens/race_result_gui.cpp:1285
 msgid "Eliminated"
 msgstr "נפסל/ה"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1510
-#: src/states_screens/race_result_gui.cpp:1572
+#: src/states_screens/race_result_gui.cpp:1533
+#: src/states_screens/race_result_gui.cpp:1595
 msgid "(Own Goal)"
 msgstr "(גול עצמי)"
 
-#: src/states_screens/race_result_gui.cpp:1651
+#: src/states_screens/race_result_gui.cpp:1674
 #, c-format
 msgid "Track %i/%i"
 msgstr "מסלול %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1735
+#: src/states_screens/race_result_gui.cpp:1758
 msgid "Grand Prix progress:"
 msgstr "התקדמות בגרנד פרי:"
 
-#: src/states_screens/race_result_gui.cpp:1781
+#: src/states_screens/race_result_gui.cpp:1804
 msgid "Highscores"
 msgstr "שיאים"
 
-#: src/states_screens/race_result_gui.cpp:1884
+#: src/states_screens/race_result_gui.cpp:1907
 #, c-format
 msgid "Best lap time: %s"
 msgstr "זמן ההקפה הטוב ביותר: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1898
+#: src/states_screens/race_result_gui.cpp:1921
 #, c-format
 msgid "by %s"
 msgstr "על ידי %s"
+
+#: src/states_screens/race_result_gui.cpp:1960
+msgid "You completed the challenge!"
+msgstr "השלמת את האתגר!"
+
+#: src/states_screens/race_result_gui.cpp:1960
+msgid "You failed the challenge!"
+msgstr "נכשלת באתגר!"
+
+#: src/states_screens/race_result_gui.cpp:2011
+msgid "Reached Requirements of SuperTux"
+msgstr "הגעת לדרישות של סופר־טַקס"
 
 #: src/states_screens/race_setup_screen.cpp:88
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -6178,7 +6203,7 @@ msgstr "ללא חיזוקים כלל, כך שרק כישורי הנהיגה של
 #. I18N: short definition for follow-the-leader game mode
 #: src/states_screens/race_setup_screen.cpp:108
 msgid "Keep up with the leader kart but don't overtake it!"
-msgstr "יש להיצמד למכונית המוביל/ה אך לא לעקוף אותה!"
+msgstr "יש להיצמד למכונית המוביל/ה אך לא לעוקפה!"
 
 #: src/states_screens/race_setup_screen.cpp:114
 msgid "Hit others with weapons until they lose all their lives."
@@ -6218,12 +6243,18 @@ msgstr "מספר השחקנים המרבי שנתמך: %d"
 msgid "Number of red team AI karts"
 msgstr "מספר המתחרים המדומים בקבוצה האדומה"
 
+#: src/states_screens/tracks_and_gp_screen.cpp:109
+msgid ""
+"You cannot play this grandprix because it contains tracks that aren't "
+"unlocked!"
+msgstr "לא ניתן לשחק בגרנד פרי הזה כי הוא מכיל מסלולים שלא שחררת!"
+
 #. I18N: track group name
-#: src/states_screens/tracks_and_gp_screen.cpp:148
+#: src/states_screens/tracks_and_gp_screen.cpp:157
 msgid "all"
 msgstr "הכול"
 
-#: src/states_screens/tracks_and_gp_screen.cpp:203
+#: src/states_screens/tracks_and_gp_screen.cpp:212
 msgid "Locked!"
 msgstr "נעול!"
 
@@ -6371,26 +6402,25 @@ msgstr "מכוניות. ניטרו. אקשן! SuperTuxKart הוא משחק אר�
 
 #: supertuxkart.appdata.xml:11
 msgid ""
-"Discover the mystery of an underwater world, or drive through the jungles of"
-" Val Verde and visit the famous Cocoa Temple. Race underground or in a "
-"spaceship, through a rural farmland or a strange alien planet. Or rest under"
-" the palm trees on the beach, watching the other karts overtake you. But "
-"don't eat the bananas! Watch for bowling balls, plungers, bubble gum, and "
-"cakes thrown by your opponents."
-msgstr "אפשר לחקור את המצולות המסתוריות, או לנסוע בג׳ונגלים של וַאל וֶרדֶה ולעבור דרך מקדש הקקאו המפורסם. להתחרות מתחת לאדמה או בחלל, בשטח חקלאות או בכוכב לכת זר. או לנוח תחת עצי הדקל על החוף, ולראות את המכוניות האחרות עוקפות אותך. אך אין לאכול את הבננות! אפשר גם לראות את כדורי הכדורת, הפומפות, המסטיק, והעוגות שנזרקות על היריבים."
+"We have several tracks with various themes for players to enjoy, from "
+"driving underwater, rural farmlands, jungles or even in space! Try your best"
+" while avoiding other karts as they may overtake you, but don't eat the "
+"bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
+"your opponents."
+msgstr "יש לנו כמה מסלולים עם מגוון נושאים שהשחקנים יכולים ליהנות מהם, החל מצלילה במצולות, חוות חקלאיות, ג׳ונגלים, ועד לחלל! יש לעשות את מיטב יכולתך תוך הימנעות ממכוניות אחרות שעלולות לעקוף אותך, ולא לאכול את הבננות! אפשר לצפות בכדורי כדורת, פומפות, גומי לעיסה, ועוגות שזורקים היריבים שלך."
 
 #: supertuxkart.appdata.xml:14
 msgid ""
 "You can do a single race against other karts, compete in one of several "
 "Grand Prix, try to beat the high score in time trials on your own, play "
 "battle mode against the computer or your friends, and more! For a greater "
-"challenge, race online against players from all over the world and prove "
+"challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr "אפשר להתחרות במרוץ בודד נגד מכוניות אחרות, להתמודד באחד מכמה גרנד פרי, לנסות לשבור את השיא שלך לבד במרוצים נגד השעון, לשחק במצב קרב מול המחשב או החברים, ועוד! אתגר גדול יותר: להתחרות במרוץ ברשת נגד שחקנים מכל רחבי העולם ולהוכיח את כישורי המירוץ שלך!"
+msgstr "אפשר להתחרות במרוץ בודד נגד מכוניות אחרות, להתמודד באחד מכמה גרנד פרי, לנסות לשבור את השיא שלך לבד במרוצים נגד השעון, לשחק במצב קרב מול המחשב או החברים, ועוד! אתגר גדול יותר: להצטרף למרוצים ברשת ולפגוש שחקנים מכל רחבי העולם ולהוכיח את כישורי המירוץ שלך!"
 
 #: supertuxkart.appdata.xml:17
-msgid "This game is free and without ads."
-msgstr "המשחק הזה חופשי ובלי פרסומות."
+msgid "This game has no ads."
+msgstr "אין פרסומות במשחק הזה."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
