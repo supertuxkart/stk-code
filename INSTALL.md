@@ -68,9 +68,9 @@ libssl-dev libvorbis-dev nettle-dev pkg-config zlib1g-dev
 
 Solus command:
 ```bash
-sudo eopkg it openal-soft-devel libogg-dev libvorbis-devel freetype2-devel \
+sudo eopkg it cmake openal-soft-devel libogg-devel libvorbis-devel freetype2-devel \
 harfbuzz-devel curl-devel bluez-devel openssl-devel libpng-devel zlib-devel \
-libjpeg-turbo-devel sdl2-devel
+libjpeg-turbo-devel sdl2-devel enet-devel libjpeg-turbo-devel bluez-devel curl-devel
 ```
 
 ### In-game recorder
