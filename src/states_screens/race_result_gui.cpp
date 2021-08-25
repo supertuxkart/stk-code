@@ -1353,7 +1353,7 @@ void RaceResultGUI::unload()
         }
 
         // Draw kart color circle if kart has custom color
-        if (ri->m_kart_color > 0.0)
+        if (m_icons_frame && ri->m_kart_color > 0.0)
         {
             const video::SColorHSL kart_colorHSL(ri->m_kart_color * 360.0, 80.0, 50.0);
             video::SColorf kart_colorf;
