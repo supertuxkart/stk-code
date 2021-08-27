@@ -37,11 +37,15 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord)
     return                          ViewPosition.xyz / ViewPosition.w;
 }
 
-float GetVignette(vec2 coords, float factor)
+// Fade out edges of screen buffer tex
+// 1 means full render tex, 0 means full IBL tex
+float GetEdgeFade(vec2 coords)
 {
-    vec2 inside = coords - 0.5;
-    float vignette = 1. - dot(inside, inside) * 4.0;
-    return clamp(pow(vignette, factor), 0., 1.0);
+    float gradL = smoothstep(0.0, 0.4, coords.x);
+    float gradR = 1.0 - smoothstep(0.6, 1.0, coords.x);
+    float gradT = smoothstep(0.0, 0.4, coords.y);
+    float gradB = 1.0 - smoothstep(0.6, 1.0, coords.y);
+    return min(min(gradL, gradR), min(gradT, gradB));
 }
 
 vec2 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth)
@@ -124,7 +128,7 @@ void main(void)
         } else {
             // FIXME We need to generate mipmap to take into account the gloss map
             outColor = textureLod(albedo, coords, 0.f).rgb;
-            outColor = mix(fallback, outColor, GetVignette(coords, 2.5));
+            outColor = mix(fallback, outColor, GetEdgeFade(coords));
             // TODO temporary measure the lack of mipmapping for RTT albedo
             // Implement it in proper way
             // Use (specval - 0.5) * 2.0 to bring specval from 0.5-1.0 range to 0.0-1.0 range
