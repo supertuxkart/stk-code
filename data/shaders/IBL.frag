@@ -16,23 +16,15 @@ out vec4 Spec;
 #stk_include "utils/SpecularIBL.frag"
 
 
-vec3 getXcYcZc(int x, int y, float zC)
-{
-    // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
-    float xC= (2. * (float(x)) / u_screen.x - 1.) * zC / u_projection_matrix[0][0];
-    float yC= (2. * (float(y)) / u_screen.y - 1.) * zC / u_projection_matrix[1][1];
-    return vec3(xC, yC, zC);
-}
-
 float makeLinear(float f, float n, float z)
 {
     return (2.0f * n) / (f + n - z * (f - n));
 }
 
-vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
+vec3 CalcViewPositionFromDepth(in vec2 TexCoord)
 {
     // Combine UV & depth into XY & Z (NDC)
-    float z = makeLinear(1000.0, 1.0, textureLod(DepthMap, TexCoord, 0.).x);
+    float z = makeLinear(1000.0, 1.0, textureLod(dtex, TexCoord, 0.).x);
     vec3 rawPosition                = vec3(TexCoord, z);
 
     // Convert from (0, 1) range to (-1, 1)
@@ -45,14 +37,18 @@ vec3 CalcViewPositionFromDepth(in vec2 TexCoord, in sampler2D DepthMap)
     return                          ViewPosition.xyz / ViewPosition.w;
 }
 
-float GetVignette(float factor)
+// Fade out edges of screen buffer tex
+// 1 means full render tex, 0 means full IBL tex
+float GetEdgeFade(vec2 coords)
 {
-    vec2 inside = (gl_FragCoord.xy / u_screen) - 0.5;
-    float vignette = 1. - dot(inside, inside) * 5.0;
-    return clamp(pow(vignette, factor), 0., 1.0);
+    float gradL = smoothstep(0.0, 0.4, coords.x);
+    float gradR = 1.0 - smoothstep(0.6, 1.0, coords.x);
+    float gradT = smoothstep(0.0, 0.4, coords.y);
+    float gradB = 1.0 - smoothstep(0.6, 1.0, coords.y);
+    return min(min(gradL, gradR), min(gradT, gradB));
 }
 
-vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D DepthMap, in vec3 fallback, float spread)
+vec2 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth)
 {
     dir *= 0.25f;
 
@@ -63,39 +59,24 @@ vec3 RayCast(vec3 dir, inout vec3 hitCoord, out float dDepth, in sampler2D Depth
         projectedCoord.xy      /= projectedCoord.w;
         projectedCoord.xy       = projectedCoord.xy * 0.5 + 0.5;
 
-        float depth             = CalcViewPositionFromDepth(projectedCoord.xy, DepthMap).z;
+        float depth             = CalcViewPositionFromDepth(projectedCoord.xy).z;
         dDepth                  = hitCoord.z - depth;
 
-        if(dDepth < 0.0)
+        if (dDepth < 0.0)
         {
-            // Texture wrapping to extand artifcially the range of the lookup texture
-            // FIXME can be improved to lessen the distortion
-            projectedCoord.y = min(.99, projectedCoord.y);
-            projectedCoord.x = min(.99, projectedCoord.x);
-            projectedCoord.x = max(.01, projectedCoord.x);
-
-            // We want only reflection on nearly horizontal surfaces
-            float cutout = dot(dir, vec3(0., 0., -1.));
-
-            if ((projectedCoord.x > 0.0 && projectedCoord.x < 1.0) 
-                && (projectedCoord.y > 0.0 && projectedCoord.y < 1.0) 
-                && (cutout > 10.0)
-               )
+            if (projectedCoord.x > 0.0 && projectedCoord.x < 1.0 &&
+                projectedCoord.y > 0.0 && projectedCoord.y < 1.0)
             {
-                // FIXME We need to generate mipmap to take into account the gloss map
-                vec3 finalColor = textureLod(albedo, projectedCoord.xy, spread).rgb;
-                //return finalColor;
-                return mix(fallback, finalColor, GetVignette(4.));
-
+                return projectedCoord.xy;
             }
             else
             {
-                return fallback;
+                return vec2(0.f);
             }
         }
     }
 
-    return fallback;
+    return vec2(0.f);
 }
 
 // Main ===================================================================
@@ -119,30 +100,46 @@ void main(void)
 #else
     // :::::::: Compute Space Screen Reflection ::::::::::::::::::::::::::::::::::::
 
-    float lineardepth = textureLod(dtex, uv, 0.).x;
+    // Output color
+    vec3 outColor;
 
     // Fallback (if the ray can't find an intersection we display the sky)
     vec3 fallback = .25 * SpecularIBL(normal, eyedir, specval);
 
-    float View_Depth            = makeLinear(1000.0, 1.0, lineardepth);
-    vec3 ScreenPos              = xpos.xyz;
-    vec4 View_Pos               = u_inverse_projection_matrix * vec4(ScreenPos, 1.0f);
-         View_Pos              /= View_Pos.w;
+    // Only calculate reflections if the reflectivity value is high enough,
+    // otherwise just use specular IBL
+    if (specval > 0.5)
+    {
+        vec3 View_Pos               = CalcViewPositionFromDepth(uv);
 
-    // Reflection vector
-    vec3 reflected              = normalize(reflect(eyedir, normal));
+        // Reflection vector
+        vec3 reflected              = normalize(reflect(eyedir, normal));
 
-    // Ray cast
-    vec3 hitPos                 = View_Pos.xyz;
-    float dDepth;
-    float minRayStep            = 100.0f;
+        // Ray cast
+        vec3 hitPos                 = View_Pos.xyz;
+        float dDepth;
+        float minRayStep            = 50.0f;
 
-    vec3 outColor = RayCast(reflected * max(minRayStep, -xpos.z),
-                            hitPos, dDepth, dtex, fallback, 0.0);
-    
-    // TODO temporary measure the lack of mipmaping for RTT albedo
-    // Implement it in proper way
-    outColor = mix(fallback, outColor, specval);
+        vec2 coords = RayCast(reflected * max(minRayStep, -View_Pos.z),
+                                hitPos, dDepth);
+
+        if (coords.x == 0.0 && coords.y == 0.0) {
+            outColor = fallback;
+        } else {
+            // FIXME We need to generate mipmap to take into account the gloss map
+            outColor = textureLod(albedo, coords, 0.f).rgb;
+            outColor = mix(fallback, outColor, GetEdgeFade(coords));
+            // TODO temporary measure the lack of mipmapping for RTT albedo
+            // Implement it in proper way
+            // Use (specval - 0.5) * 2.0 to bring specval from 0.5-1.0 range to 0.0-1.0 range
+            outColor = mix(fallback, outColor, (specval - 0.5) * 2.0);
+        }
+    }
+    else
+    {
+        outColor = fallback;
+    }
+
     Spec = vec4(outColor.rgb, 1.0);
 #endif
 
