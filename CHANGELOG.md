@@ -5,6 +5,21 @@ It should be kept in mind that some versions have a less complete changelog than
 
 For similar reasons, and because some features are vastly more complex than others, attributions of main changes should not be taken as a shortcut for overall contribution.
 
+## SuperTuxKart 1.3
+### Networking
+* Server bookmarks by Benau
+### General
+* Switch port by Mary
+* Gamepad force feedback support by Mary
+* Highscore screen by RQWorldblender
+* Improved screen space reflection by QwertyChouskie
+* Render resolution changing by Deve and QwertyChouskie
+### Tracks and modeling
+* Alien Signal by Samuncle
+* Ancient Colosseum Labyrinth by Typhon306
+* New Pepper kart by McRavenINDo
+* Improved kart Adiumy, Emule, GNU and Sara by McRavenINDo
+
 ## SuperTuxKart 1.2 (27. August 2020)
 
 ### Networking
