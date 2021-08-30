@@ -414,8 +414,8 @@ if [ ! -f "$DIRNAME/obj/freetype.stamp" ]; then
              -DZLIB_INCLUDE_DIR="$DIRNAME/obj/zlib/"                          \
              -DPNG_LIBRARY="$DIRNAME/obj/libpng/libpng.a"                     \
              -DPNG_PNG_INCLUDE_DIR="$DIRNAME/obj/libpng/"                     \
-             -DHARFBUZZ_LIBRARIES="$DIRNAME/obj/harfbuzz/build/libharfbuzz.a" \
-             -DHARFBUZZ_INCLUDE_DIRS="$DIRNAME/obj/harfbuzz/src/"             \
+             -DHarfBuzz_LIBRARY="$DIRNAME/obj/harfbuzz/build/libharfbuzz.a"   \
+             -DHarfBuzz_INCLUDE_DIR="$DIRNAME/obj/harfbuzz/src/"              \
              -DFT_WITH_HARFBUZZ=ON -DFT_WITH_BZIP2=OFF                        \
              -DFT_WITH_BROTLI=OFF -DFT_WITH_ZLIB=ON -DFT_WITH_PNG=ON          \
              -DCMAKE_C_FLAGS="-fpic" &&
