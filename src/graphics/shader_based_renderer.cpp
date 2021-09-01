@@ -44,6 +44,7 @@
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
+#include "utils/string_utils.hpp"
 
 #include "../../lib/irrlicht/source/Irrlicht/CSceneManager.h"
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
@@ -912,7 +913,9 @@ void ShaderBasedRenderer::renderToTexture(GL3RenderTarget *render_target,
         video::IImage* image = irr_driver->getVideoDriver()
             ->createImageFromData(video::ECF_A8R8G8B8, size, pixels,
             true/*ownForeignMemory*/);
-        irr_driver->getVideoDriver()->writeImageToFile(image, "rtt.png");
+        irr_driver->getVideoDriver()->writeImageToFile(image,
+            core::stringc("rtt_") + StringUtils::toString(
+            StkTime::getMonoTimeMs()).c_str() + ".png");
         image->drop();
 #endif
     }
