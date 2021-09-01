@@ -132,6 +132,9 @@ void History::updateReplay(int world_ticks)
  */
 void History::Save()
 {
+    World *world   = World::getWorld();
+    if (!world)
+        return;
     FILE *fd = fopen("history.dat","w");
     if(fd)
         Log::info("History", "Saved in ./history.dat.");
@@ -150,7 +153,6 @@ void History::Save()
         return;
     }
 
-    World *world   = World::getWorld();
     const int num_karts = world->getNumKarts();
     fprintf(fd, "STK-version:      %s\n",   STK_VERSION);
     fprintf(fd, "History-version:  %d\n",   1);

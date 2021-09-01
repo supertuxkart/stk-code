@@ -363,7 +363,7 @@ void InputManager::handleStaticAction(int key, int value)
         }
         case IRR_KEY_F11:
         {
-            if (value && world)
+            if (value)
             {
                 if (control_is_pressed)
                 {
