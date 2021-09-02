@@ -75,6 +75,7 @@ using namespace GUIEngine;
 NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
 {
     m_server_info_height = 0;
+    m_header_text_width = 0;
 
     m_back_widget = NULL;
     m_header = NULL;
@@ -198,7 +199,8 @@ void NetworkingLobby::init()
     m_install_addon_text = _("Install addon");
 
     //I18N: In the networking lobby
-    m_header->setText(_("Lobby"), false);
+    setHeader(_("Lobby"));
+
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setVisible(false);
     m_config_button->setVisible(false);
@@ -305,6 +307,13 @@ void NetworkingLobby::onUpdate(float delta)
     if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
 
+    if (m_header_text_width > m_header->m_w)
+    {
+        m_header->update(delta);
+        if (m_header->scrolledOff())
+            m_header->setText(m_header->getText(), true);
+    }
+
     if (m_reload_server_info)
     {
         m_reload_server_info = false;
@@ -330,11 +339,6 @@ void NetworkingLobby::onUpdate(float delta)
         m_ping_update_timer = StkTime::getMonoTimeMs() + 2000;
         updatePlayerPings();
     }
-
-    //I18N: In the networking lobby, display ping when connected
-    const uint32_t ping = STKHost::get()->getClientPingToServer();
-    if (ping != 0)
-        m_header->setText(_("Lobby (ping: %dms)", ping), false);
 
     auto cl = LobbyProtocol::get<ClientLobby>();
     if (cl && UserConfigParams::m_lobby_chat)
@@ -872,3 +876,25 @@ void NetworkingLobby::setStartingTimerTo(float t)
     m_cur_starting_timer =
         (int64_t)StkTime::getMonoTimeMs() + (int64_t)(t * 1000.0f);
 }   // setStartingTimerTo
+
+// ----------------------------------------------------------------------------
+void NetworkingLobby::setHeader(const core::stringw& header)
+{
+    if (m_header->getText() == header)
+        return;
+    m_header_text_width =
+        GUIEngine::getTitleFont()->getDimension(header.c_str()).Width;
+    m_header->getIrrlichtElement()->remove();
+    if (m_header_text_width > m_header->m_w)
+    {
+        m_header->setScrollSpeed(GUIEngine::getTitleFontHeight() / 2);
+        m_header->add();
+        m_header->setText(header, true);
+    }
+    else
+    {
+        m_header->setScrollSpeed(0);
+        m_header->add();
+        m_header->setText(header, true);
+    }
+}   // setHeader

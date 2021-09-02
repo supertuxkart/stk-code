@@ -72,7 +72,7 @@ private:
     std::shared_ptr<Server> m_joined_server;
 
     std::vector<gui::GlyphLayout> m_server_info;
-    int m_server_info_height;
+    int m_server_info_height, m_header_text_width;
 
     core::stringw m_start_text, m_ready_text, m_live_join_text,
         m_configuration_text, m_spectate_text, m_install_addon_text;
@@ -150,6 +150,7 @@ public:
     void setStartingTimerTo(float t);
     void toggleServerConfigButton(bool val)    { m_server_configurable = val; }
     void reloadServerInfos()                   { m_reload_server_info = true; }
+    void setHeader(const core::stringw& header);
 };   // class NetworkingLobby
 
 #endif

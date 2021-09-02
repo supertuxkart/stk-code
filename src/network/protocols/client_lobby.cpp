@@ -712,10 +712,8 @@ void ClientLobby::handleServerInfo(Event* event)
     // Add server info
     uint8_t u_data;
     data.decodeStringW(&str);
-
-    //I18N: In the networking lobby
-    total_lines += _("Server name: %s", str);
-    total_lines += L"\n";
+    str.remove(L'\n');
+    NetworkingLobby::getInstance()->setHeader(str);
 
     u_data = data.getUInt8();
     const core::stringw& difficulty_name =
