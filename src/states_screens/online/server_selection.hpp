@@ -122,6 +122,9 @@ public:
                                                               { return false; }
 
     void copyFromServerList();
+
+    GUIEngine::ListWidget* getServerList() const
+                                               { return m_server_list_widget; }
 };   // ServerSelection
 
 #endif
