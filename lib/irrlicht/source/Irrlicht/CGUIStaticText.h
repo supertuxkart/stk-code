@@ -110,7 +110,9 @@ namespace gui
 		virtual void clearGlyphLayouts() { m_glyph_layouts.clear(); }
 		virtual void setUseGlyphLayoutsOnly(bool gls_only) { m_use_glyph_layouts_only = gls_only; }
 		virtual bool useGlyphLayoutsOnly() const { return m_use_glyph_layouts_only; }
-
+		//! called if an event happened.
+		virtual bool OnEvent(const SEvent& event);
+		virtual void setMouseCallback(std::function<bool(IGUIStaticText* text, SEvent::SMouseInput)> cb) { m_callback = cb; }
 	private:
 
 		//! Breaks the single text line.
@@ -131,6 +133,7 @@ namespace gui
 		//! If true, setText / updating this element will not reshape with Text object
 		bool m_use_glyph_layouts_only;
 		std::vector<GlyphLayout> m_glyph_layouts;
+		std::function<bool(IGUIStaticText* text, irr::SEvent::SMouseInput)> m_callback;
 	};
 
 } // end namespace gui

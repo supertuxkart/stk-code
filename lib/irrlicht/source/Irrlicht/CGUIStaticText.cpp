@@ -375,6 +375,24 @@ void CGUIStaticText::deserializeAttributes(io::IAttributes* in, io::SAttributeRe
 }
 
 
+bool CGUIStaticText::OnEvent(const SEvent& event)
+{
+	if (IsEnabled)
+	{
+		switch(event.EventType)
+		{
+		case EET_MOUSE_INPUT_EVENT:
+		{
+			if (m_callback && m_callback(this, event.MouseInput))
+				return true;
+		}
+		default:
+			break;
+		}
+	}
+	return IGUIElement::OnEvent(event);
+}
+
 } // end namespace gui
 } // end namespace irr
 

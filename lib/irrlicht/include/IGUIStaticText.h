@@ -8,6 +8,7 @@
 #include "IGUIElement.h"
 #include "SColor.h"
 
+#include <functional>
 #include <vector>
 
 namespace irr
@@ -123,6 +124,7 @@ namespace gui
 		virtual void clearGlyphLayouts() = 0;
 		virtual void setUseGlyphLayoutsOnly(bool gls_only) = 0;
 		virtual bool useGlyphLayoutsOnly() const = 0;
+		virtual void setMouseCallback(std::function<bool(IGUIStaticText* text, SEvent::SMouseInput)> cb) {}
 	};
 
 
