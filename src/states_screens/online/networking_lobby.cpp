@@ -257,6 +257,159 @@ void NetworkingLobby::init()
                 updatePlayers();
         }
     }
+#ifndef SERVER_ONLY
+    gui::IGUIStaticText* st =
+        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
+    st->setMouseCallback([](gui::IGUIStaticText* text, SEvent::SMouseInput mouse)->bool
+    {
+        if (mouse.Event == EMIE_LMOUSE_PRESSED_DOWN)
+        {
+            core::position2di p;
+            p.X = mouse.X - text->getAbsolutePosition().UpperLeftCorner.X;
+            p.Y = mouse.Y - text->getAbsolutePosition().UpperLeftCorner.Y;
+            if (p.X < 0 || p.Y < 0)
+                return false;
+
+            const std::vector<GlyphLayout>& gls = text->getGlyphLayouts();
+            if (gls.empty())
+                return false;
+
+            gui::IGUIFont* font = GUIEngine::getFont();
+            auto width_per_line = gui::getGlyphLayoutsWidthPerLine(gls,
+                font->getInverseShaping(), font->getScale());
+            if (width_per_line.empty())
+                return false;
+
+            // Check if the line is RTL
+            auto position = text->getAbsolutePosition();
+            bool rtl = (gls[0].flags & gui::GLF_RTL_LINE) != 0;
+            int offset = 0;
+            int cur_line = 0;
+            if (rtl)
+                offset = (s32)(position.getWidth() - width_per_line[cur_line]);
+
+            float next_line_height = font->getHeightPerLine();
+            if (width_per_line.size() > 1 &&
+                width_per_line.size() * next_line_height > position.getHeight())
+            {
+                next_line_height = (float)position.getHeight() /
+                    (float)width_per_line.size();
+            }
+
+            int idx = -1;
+            core::recti r;
+            r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
+            r.LowerRightCorner.Y = (int)next_line_height;
+            bool line_changed = false;
+            for (unsigned i = 0; i < gls.size(); i++)
+            {
+                const GlyphLayout& glyph_layout = gls[i];
+                if ((glyph_layout.flags & GLF_NEWLINE) != 0)
+                {
+                    r.UpperLeftCorner.Y += (int)next_line_height;
+                    r.LowerRightCorner.Y += (int)next_line_height;
+                    cur_line++;
+                    line_changed = true;
+                    continue;
+                }
+                if (line_changed)
+                {
+                    line_changed = false;
+                    rtl = (glyph_layout.flags & gui::GLF_RTL_LINE) != 0;
+                    offset = 0;
+                    if (rtl)
+                    {
+                        offset = (s32)
+                            (position.getWidth() - width_per_line[cur_line]);
+                    }
+                    r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
+                }
+                r.LowerRightCorner.X += int(
+                    (float)glyph_layout.x_advance * font->getInverseShaping() *
+                    font->getScale());
+                if (r.isPointInside(p))
+                {
+                    idx = i;
+                    break;
+                }
+            }
+            if (idx == -1)
+                return false;
+
+            auto s = gls[idx].orig_string;
+            unsigned cluster = gls[idx].cluster.front();
+            if (cluster > s->size())
+                return false;
+
+            size_t start = s->substr(0, cluster).rfind(U'\n');
+            size_t end = s->substr(cluster, s->size()).find(U'\n');
+            if (start == std::string::npos)
+                start = 0;
+            else
+                start += 1; // Skip newline character
+            if (end == std::string::npos)
+                end = s->size();
+            else
+                end += cluster - start;
+            if (idx == -1)
+                return false;
+            std::u32string substr = s->substr(start, end);
+            int local_pos = (int)cluster - (int)start;
+            if ((size_t)local_pos > substr.size())
+                return false;
+
+            size_t space_pos_1, space_pos_2;
+            size_t addon = substr.substr(0, local_pos).rfind(U"/installaddon");
+            if (addon == std::string::npos)
+                goto handle_player_message_copy;
+            space_pos_1 = substr.substr(0, local_pos).rfind(U' ');
+            space_pos_2 = substr.substr(local_pos, substr.size()).find(U' ');
+            if (space_pos_1 == std::string::npos || space_pos_1 < 13)
+                goto handle_player_message_copy;
+            if (space_pos_2 == std::string::npos)
+                space_pos_2 = substr.size();
+            else
+                space_pos_2 += local_pos - space_pos_1 - 1;
+            if (space_pos_1 != std::string::npos && addon + 13 == space_pos_1)
+            {
+                std::string argv = StringUtils::utf32ToUtf8(
+                    substr.substr(addon + 14, space_pos_2));
+                AddonsPack::install(argv);
+                return true;
+            }
+
+handle_player_message_copy:
+            for (auto& p : NetworkingLobby::getInstance()->m_player_names)
+            {
+                size_t colon = substr.substr(0, local_pos).rfind(U": ");
+                if (colon == std::string::npos)
+                    continue;
+                std::u32string player_name = substr.substr(0, colon);
+                if (player_name.empty())
+                    continue;
+                int padding = 2;
+                // RTL handling
+                if (player_name[0] == 0x200F || player_name[0] == 0x200E)
+                {
+                    player_name = player_name.substr(1, player_name.size() - 1);
+                    padding++;
+                }
+                if (StringUtils::wideToUtf32(p.second.m_user_name)
+                    .find(player_name) != std::string::npos)
+                {
+                    GUIEngine::getGUIEnv()->getOSOperator()->copyToClipboard(
+                        StringUtils::utf32ToUtf8(
+                        substr.substr(player_name.size() + padding)).c_str());
+                    return true;
+                }
+            }
+            GUIEngine::getGUIEnv()->getOSOperator()->copyToClipboard(
+                StringUtils::utf32ToUtf8(substr).c_str());
+            return true;
+        }
+        return false;
+    });
+#endif
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -717,6 +870,9 @@ void NetworkingLobby::unloaded()
 // ----------------------------------------------------------------------------
 void NetworkingLobby::tearDown()
 {
+    gui::IGUIStaticText* st =
+        m_text_bubble->getIrrlichtElement<gui::IGUIStaticText>();
+    st->setMouseCallback(nullptr);
     m_player_list = NULL;
     m_joined_server.reset();
     // Server has a dummy network lobby too
