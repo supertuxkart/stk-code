@@ -301,6 +301,7 @@ void FontManager::shape(const std::u32string& text,
     if (text.back() == U'\n')
         lines.push_back(U"");
 
+    int start = 0;
     for (unsigned l = 0; l < lines.size(); l++)
     {
         std::vector<ShapeGlyph> glyphs;
@@ -312,12 +313,9 @@ void FontManager::shape(const std::u32string& text,
         }
 
         std::u32string& str = lines[l];
-        str.erase(std::remove(str.begin(), str.end(), U'\r'), str.end());
-        str.erase(std::remove(str.begin(), str.end(), U'\t'), str.end());
         if (str.empty())
         {
-            if (line_data)
-                line_data->push_back(str);
+            start += 1;
             continue;
         }
 
@@ -501,6 +499,9 @@ void FontManager::shape(const std::u32string& text,
             translations->insertThaiBreakMark(str, breakable);
             for (unsigned idx = 0; idx < glyphs.size(); idx++)
             {
+                // Skip control characters with not printable glyph
+                if (str[glyphs[idx].cluster] < 32 && glyphs[idx].index == 0)
+                    continue;
                 gui::GlyphLayout gl = { 0 };
                 gl.index = glyphs[idx].index;
                 gl.cluster.push_back(glyphs[idx].cluster);
@@ -560,11 +561,14 @@ void FontManager::shape(const std::u32string& text,
                 int last_cluster = gl.cluster.back();
                 if (breakable[last_cluster])
                     gl.flags |= gui::GLF_BREAKABLE;
+                // Add start offset to clusters
+                for (int& each_cluster : gl.cluster)
+                    each_cluster += start;
             }
             gls.insert(gls.end(), cur_line.begin(), cur_line.end());
-            if (line_data)
-                line_data->push_back(str);
         }
+        // Next str will have a newline
+        start += str.size() + 1;
     }
 }   // shape
 
