@@ -263,8 +263,7 @@ namespace LineBreakingRules
 // ----------------------------------------------------------------------------
 /* Turn text into glyph layout for rendering by libraqm. */
 void FontManager::shape(const std::u32string& text,
-                        std::vector<irr::gui::GlyphLayout>& gls,
-                        std::vector<std::u32string>* line_data)
+                        std::vector<irr::gui::GlyphLayout>& gls)
 {
     // Helper struct
     struct ShapeGlyph
@@ -302,6 +301,8 @@ void FontManager::shape(const std::u32string& text,
         lines.push_back(U"");
 
     int start = 0;
+    std::shared_ptr<std::u32string> orig_string =
+        std::make_shared<std::u32string>(text);
     for (unsigned l = 0; l < lines.size(); l++)
     {
         std::vector<ShapeGlyph> glyphs;
@@ -516,6 +517,7 @@ void FontManager::shape(const std::u32string& text,
                     gl.flags |= gui::GLF_RTL_CHAR;
                 if (FT_HAS_COLOR(glyphs[idx].ftface))
                     gl.flags |= gui::GLF_COLORED;
+                gl.orig_string = orig_string;
                 cur_line.push_back(gl);
             }
             // Sort glyphs in logical order
@@ -590,22 +592,19 @@ std::vector<irr::gui::GlyphLayout>&
 }   // getCachedLayouts
 
 // ----------------------------------------------------------------------------
-/** Convert text to glyph layouts for fast rendering with caching enabled
- *  If line_data is not null, each broken line u32string will be saved and
- *  can be used for advanced glyph and text mapping, and cache will be
- *  disabled, no newline characters are allowed in text if line_data is not
- *  NULL.
+/** Convert text to glyph layouts for fast rendering with (optional) caching
+ *  enabled.
  */
 void FontManager::initGlyphLayouts(const core::stringw& text,
                                    std::vector<irr::gui::GlyphLayout>& gls,
-                                   std::vector<std::u32string>* line_data)
+                                   u32 shape_flag)
 {
     if (GUIEngine::isNoGraphics() || text.empty())
         return;
 
-    if (line_data != NULL)
+    if ((shape_flag & gui::SF_DISABLE_CACHE) != 0)
     {
-        shape(StringUtils::wideToUtf32(text), gls, line_data);
+        shape(StringUtils::wideToUtf32(text), gls);
         return;
     }
 

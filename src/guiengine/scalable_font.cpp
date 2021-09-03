@@ -154,17 +154,15 @@ s32 ScalableFont::getHeightPerLine() const
 }   // getHeightPerLine
 
 // ----------------------------------------------------------------------------
-/** Convert text to glyph layouts for fast rendering with caching enabled
- *  If line_data is not null, each broken line u32string will be saved and
- *  can be used for advanced glyph and text mapping, and cache will be
- *  disabled.
+/** Convert text to glyph layouts for fast rendering with optional caching
+ *  enabled.
  */
 void ScalableFont::initGlyphLayouts(const core::stringw& text,
                                     std::vector<GlyphLayout>& gls,
-                                    std::vector<std::u32string>* line_data)
+                                    u32 shape_flag)
 {
 #ifndef SERVER_ONLY
-    font_manager->initGlyphLayouts(text, gls, line_data);
+    font_manager->initGlyphLayouts(text, gls, shape_flag);
 #endif
 }   // initGlyphLayouts
 

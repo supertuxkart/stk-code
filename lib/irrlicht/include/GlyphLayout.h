@@ -9,13 +9,20 @@
 #include "dimension2d.h"
 
 #include <algorithm>
+#include <memory>
 #include <numeric>
+#include <string>
 #include <vector>
 
 namespace irr
 {
 namespace gui
 {
+
+enum ShapeFlag
+{
+SF_DISABLE_CACHE = 1, /* Disable caching glyph layouts. */
+};
 
 enum GlyphLayoutFlag
 {
@@ -51,6 +58,8 @@ u32 original_index;
 u16 flags;
 //! this is the face_idx used in stk face ttf
 u16 face_idx;
+//! original string, which is used to map with cluster above
+std::shared_ptr<std::u32string> orig_string;
 };
 
 namespace Private

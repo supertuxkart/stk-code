@@ -265,10 +265,8 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
 #ifndef SERVER_ONLY
     const unsigned box_width = m_text_bubble->getDimension().Width;
     const float box_height = m_text_bubble->getDimension().Height;
-    // For future copy text from lobby chat
-    std::vector<std::u32string> text_line;
     std::vector<GlyphLayout> cur_info;
-    font_manager->initGlyphLayouts(info, cur_info, &text_line);
+    font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE);
     gui::IGUIFont* font = GUIEngine::getFont();
     gui::breakGlyphLayouts(cur_info, box_width,
         font->getInverseShaping(), font->getScale());

@@ -120,11 +120,9 @@ public:
 	*/
 	virtual void setInvisibleCharacters( const wchar_t *s ) = 0;
 
-	//! Convert text to glyph layouts for fast rendering with caching enabled
-	/* If line_data is not null, each broken line u32string will be saved and
-	can be used for advanced glyph and text mapping, and cache will be disabled. */
+	//! Convert text to glyph layouts for fast rendering with optional caching enabled. */
 	virtual void initGlyphLayouts(const core::stringw& text,
-		std::vector<GlyphLayout>& gls, std::vector<std::u32string>* line_data = NULL) = 0;
+		std::vector<GlyphLayout>& gls, u32 shape_flag = 0) = 0;
 
 	virtual f32 getInverseShaping() const = 0;
 	virtual f32 getScale() const = 0;
