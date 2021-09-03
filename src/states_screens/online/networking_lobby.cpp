@@ -1034,7 +1034,7 @@ void NetworkingLobby::setStartingTimerTo(float t)
 // ----------------------------------------------------------------------------
 void NetworkingLobby::setHeader(const core::stringw& header)
 {
-    if (m_header->getText() == header)
+    if (!m_header || m_header->getText() == header)
         return;
     m_header_text_width =
         GUIEngine::getTitleFont()->getDimension(header.c_str()).Width;
