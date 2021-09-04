@@ -712,7 +712,8 @@ void ClientLobby::handleServerInfo(Event* event)
     // Add server info
     uint8_t u_data;
     data.decodeStringW(&str);
-    str.remove(L'\n');
+    str.removeChars(L"\n\r\t");
+
     NetworkingLobby::getInstance()->setHeader(str);
 
     u_data = data.getUInt8();
