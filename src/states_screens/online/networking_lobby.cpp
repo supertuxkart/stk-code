@@ -264,81 +264,11 @@ void NetworkingLobby::init()
     {
         if (mouse.Event == EMIE_LMOUSE_PRESSED_DOWN)
         {
-            core::position2di p;
-            p.X = mouse.X - text->getAbsolutePosition().UpperLeftCorner.X;
-            p.Y = mouse.Y - text->getAbsolutePosition().UpperLeftCorner.Y;
-            if (p.X < 0 || p.Y < 0)
-                return false;
-
-            const std::vector<GlyphLayout>& gls = text->getGlyphLayouts();
-            if (gls.empty())
-                return false;
-
-            gui::IGUIFont* font = GUIEngine::getFont();
-            auto width_per_line = gui::getGlyphLayoutsWidthPerLine(gls,
-                font->getInverseShaping(), font->getScale());
-            if (width_per_line.empty())
-                return false;
-
-            // Check if the line is RTL
-            auto position = text->getAbsolutePosition();
-            bool rtl = (gls[0].flags & gui::GLF_RTL_LINE) != 0;
-            int offset = 0;
-            int cur_line = 0;
-            if (rtl)
-                offset = (s32)(position.getWidth() - width_per_line[cur_line]);
-
-            float next_line_height = font->getHeightPerLine();
-            if (width_per_line.size() > 1 &&
-                width_per_line.size() * next_line_height > position.getHeight())
-            {
-                next_line_height = (float)position.getHeight() /
-                    (float)width_per_line.size();
-            }
-
-            int idx = -1;
-            core::recti r;
-            r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
-            r.LowerRightCorner.Y = (int)next_line_height;
-            bool line_changed = false;
-            for (unsigned i = 0; i < gls.size(); i++)
-            {
-                const GlyphLayout& glyph_layout = gls[i];
-                if ((glyph_layout.flags & GLF_NEWLINE) != 0)
-                {
-                    r.UpperLeftCorner.Y += (int)next_line_height;
-                    r.LowerRightCorner.Y += (int)next_line_height;
-                    cur_line++;
-                    line_changed = true;
-                    continue;
-                }
-                if (line_changed)
-                {
-                    line_changed = false;
-                    rtl = (glyph_layout.flags & gui::GLF_RTL_LINE) != 0;
-                    offset = 0;
-                    if (rtl)
-                    {
-                        offset = (s32)
-                            (position.getWidth() - width_per_line[cur_line]);
-                    }
-                    r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
-                }
-                r.LowerRightCorner.X += int(
-                    (float)glyph_layout.x_advance * font->getInverseShaping() *
-                    font->getScale());
-                if (r.isPointInside(p))
-                {
-                    idx = i;
-                    break;
-                }
-            }
-            if (idx == -1)
-                return false;
-
-            auto s = gls[idx].orig_string;
-            unsigned cluster = gls[idx].cluster.front();
-            if (cluster > s->size())
+            std::shared_ptr<std::u32string> s;
+            int cluster = text->getCluster(
+                mouse.X - text->getAbsolutePosition().UpperLeftCorner.X,
+                mouse.Y - text->getAbsolutePosition().UpperLeftCorner.Y, &s);
+            if (cluster == -1 || (unsigned)cluster > s->size())
                 return false;
 
             size_t start = s->substr(0, cluster).rfind(U'\n');
@@ -351,10 +281,9 @@ void NetworkingLobby::init()
                 end = s->size();
             else
                 end += cluster - start;
-            if (idx == -1)
-                return false;
+
             std::u32string substr = s->substr(start, end);
-            int local_pos = (int)cluster - (int)start;
+            int local_pos = cluster - (int)start;
             if ((size_t)local_pos > substr.size())
                 return false;
 

@@ -393,6 +393,89 @@ bool CGUIStaticText::OnEvent(const SEvent& event)
 	return IGUIElement::OnEvent(event);
 }
 
+
+s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* out_orig_str)
+{
+	core::position2di p;
+	p.X = x;
+	p.Y = y;
+	if (p.X < 0 || p.Y < 0)
+		return -1;
+
+	if (m_glyph_layouts.empty())
+		return -1;
+
+	IGUIFont* font = getActiveFont();
+	std::vector<f32> width_per_line = gui::getGlyphLayoutsWidthPerLine(
+		m_glyph_layouts, font->getInverseShaping(), font->getScale());
+	if (width_per_line.empty())
+		return -1;
+
+	// Check if the line is RTL
+	core::rect<s32> position = getAbsolutePosition();
+	bool rtl = (m_glyph_layouts[0].flags & gui::GLF_RTL_LINE) != 0;
+	int offset = 0;
+	int cur_line = 0;
+	if (rtl)
+		offset = (s32)(position.getWidth() - width_per_line[cur_line]);
+
+	float next_line_height = font->getHeightPerLine();
+	if (width_per_line.size() > 1 &&
+		width_per_line.size() * next_line_height > position.getHeight())
+	{
+		next_line_height = (float)position.getHeight() /
+		(float)width_per_line.size();
+	}
+
+	int idx = -1;
+	core::recti r;
+	r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
+	r.LowerRightCorner.Y = (int)next_line_height;
+	bool line_changed = false;
+	for (unsigned i = 0; i < m_glyph_layouts.size(); i++)
+	{
+		const GlyphLayout& glyph_layout = m_glyph_layouts[i];
+		if ((glyph_layout.flags & GLF_NEWLINE) != 0)
+		{
+			r.UpperLeftCorner.Y += (int)next_line_height;
+			r.LowerRightCorner.Y += (int)next_line_height;
+			cur_line++;
+			line_changed = true;
+			continue;
+		}
+		if (line_changed)
+		{
+			line_changed = false;
+			rtl = (glyph_layout.flags & gui::GLF_RTL_LINE) != 0;
+			offset = 0;
+			if (rtl)
+			{
+				offset = (s32)
+					(position.getWidth() - width_per_line[cur_line]);
+			}
+			r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
+		}
+		r.LowerRightCorner.X += int(
+			(float)glyph_layout.x_advance * font->getInverseShaping() *
+			font->getScale());
+		if (r.isPointInside(p))
+		{
+			idx = i;
+			break;
+		}
+	}
+	if (idx == -1)
+		return -1;
+
+	std::shared_ptr<std::u32string> s = m_glyph_layouts[idx].orig_string;
+	unsigned cluster = m_glyph_layouts[idx].cluster.front();
+	if (cluster > s->size())
+		return -1;
+	*out_orig_str = s;
+	return cluster;
+}
+
+
 } // end namespace gui
 } // end namespace irr
 
