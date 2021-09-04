@@ -500,8 +500,9 @@ void FontManager::shape(const std::u32string& text,
             translations->insertThaiBreakMark(str, breakable);
             for (unsigned idx = 0; idx < glyphs.size(); idx++)
             {
-                // Skip control characters with not printable glyph
-                if (str[glyphs[idx].cluster] < 32 && glyphs[idx].index == 0)
+                // Skip some control characters
+                if (str[glyphs[idx].cluster] == U'\t' ||
+                    str[glyphs[idx].cluster] == U'\r')
                     continue;
                 gui::GlyphLayout gl = { 0 };
                 gl.index = glyphs[idx].index;
