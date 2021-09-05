@@ -7,6 +7,7 @@
 
 #include "irrTypes.h"
 #include "dimension2d.h"
+#include "rect.h"
 
 #include <algorithm>
 #include <memory>
@@ -273,6 +274,71 @@ inline void breakGlyphLayouts(std::vector<GlyphLayout>& gls, f32 max_line_width,
         for (auto& glyph : line)
             gls.push_back(glyph);
     }
+}
+
+inline bool getDrawOffset(const core::rect<s32>& position, bool hcenter,
+                          bool vcenter, const std::vector<GlyphLayout>& gls,
+                          f32 inverse_shaping, s32 font_max_height,
+                          s32 glyph_max_height, f32 scale,
+                          const core::rect<s32>* clip,
+                          core::position2d<f32>* out_offset,
+                          f32* out_next_line_height,
+                          std::vector<f32>* out_width_per_line)
+{
+    core::position2d<f32> offset(f32(position.UpperLeftCorner.X),
+        f32(position.UpperLeftCorner.Y));
+    core::dimension2d<s32> text_dimension;
+    std::vector<f32> width_per_line = gui::getGlyphLayoutsWidthPerLine(gls,
+        inverse_shaping, scale);
+    if (width_per_line.empty())
+        return false;
+
+    bool too_long_broken_text = false;
+    f32 next_line_height = font_max_height * scale;
+    if (width_per_line.size() > 1 &&
+        width_per_line.size() * next_line_height > position.getHeight())
+    {
+        // Make too long broken text draw as fit as possible
+        next_line_height = (f32)position.getHeight() / width_per_line.size();
+        too_long_broken_text = true;
+    }
+
+    // The offset must be round to integer when setting the offests
+    // or * inverse_shaping, so the glyph is drawn without blurring effects
+    if (hcenter || vcenter || clip)
+    {
+        text_dimension = gui::getGlyphLayoutsDimension(
+            gls, next_line_height, inverse_shaping, scale);
+
+        if (hcenter)
+        {
+            offset.X += (s32)(
+                (position.getWidth() - width_per_line[0]) / 2.0f);
+        }
+        if (vcenter)
+        {
+            if (too_long_broken_text)
+                offset.Y -= (s32)
+                    ((font_max_height - glyph_max_height) * scale);
+            else
+            {
+                offset.Y += (s32)(
+                    (position.getHeight() - text_dimension.Height) / 2.0f);
+            }
+        }
+        if (clip)
+        {
+            core::rect<s32> clippedRect(core::position2d<s32>
+                (s32(offset.X), s32(offset.Y)), text_dimension);
+            clippedRect.clipAgainst(*clip);
+            if (!clippedRect.isValid())
+                return false;
+        }
+    }
+    *out_offset = offset;
+    *out_next_line_height = next_line_height;
+    *out_width_per_line = width_per_line;
+    return true;
 }
 
 namespace Private

@@ -125,7 +125,10 @@ public:
     virtual void setInvisibleCharacters( const wchar_t *s ) {}
     // ------------------------------------------------------------------------
     virtual f32 getInverseShaping() const;
-
+    // ------------------------------------------------------------------------
+    virtual s32 getFaceFontMaxHeight() const;
+    // ------------------------------------------------------------------------
+    virtual s32 getFaceGlyphMaxHeight() const;
 };
 
 } // end namespace gui

@@ -118,6 +118,7 @@ namespace gui
 
 		//! Breaks the single text line.
 		void breakText();
+		void getDrawPosition(core::rect<s32>* draw_pos, bool* hcenter, const core::rect<s32>** clip);
 
 		EGUI_ALIGNMENT HAlign, VAlign;
 		bool Border;

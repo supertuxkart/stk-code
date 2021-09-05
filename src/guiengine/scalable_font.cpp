@@ -176,5 +176,25 @@ f32 ScalableFont::getInverseShaping() const
 #endif
 }   // getShapingScale
 
+// ----------------------------------------------------------------------------
+s32 ScalableFont::getFaceFontMaxHeight() const
+{
+#ifndef SERVER_ONLY
+    return m_face->getFontMaxHeight();
+#else
+    return 1;
+#endif
+}   // getFaceFontMaxHeight
+
+// ----------------------------------------------------------------------------
+s32 ScalableFont::getFaceGlyphMaxHeight() const
+{
+#ifndef SERVER_ONLY
+    return m_face->getGlyphMaxHeight();
+#else
+    return 1;
+#endif
+}   // getFaceGlyphMaxHeight
+
 } // end namespace gui
 } // end namespace irr

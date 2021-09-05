@@ -591,55 +591,13 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         font_settings->setShadow(true);
     }
 
-    core::position2d<float> offset(float(position.UpperLeftCorner.X),
-        float(position.UpperLeftCorner.Y));
-    core::dimension2d<s32> text_dimension;
-    auto width_per_line = gui::getGlyphLayoutsWidthPerLine(gl,
-        m_inverse_shaping, scale);
-    if (width_per_line.empty())
+    core::position2d<float> offset;
+    f32 next_line_height = 0.0f;
+    std::vector<f32> width_per_line;
+    if (!gui::getDrawOffset(position, hcenter, vcenter, gl, m_inverse_shaping,
+        m_font_max_height, m_glyph_max_height, scale, clip, &offset,
+        &next_line_height, &width_per_line))
         return;
-
-    bool too_long_broken_text = false;
-    float next_line_height = m_font_max_height * scale;
-    if (width_per_line.size() > 1 &&
-        width_per_line.size() * next_line_height > position.getHeight())
-    {
-        // Make too long broken text draw as fit as possible
-        next_line_height = (float)position.getHeight() / width_per_line.size();
-        too_long_broken_text = true;
-    }
-
-    // The offset must be round to integer when setting the offests
-    // or * m_inverse_shaping, so the glyph is drawn without blurring effects
-    if (hcenter || vcenter || clip)
-    {
-        text_dimension = gui::getGlyphLayoutsDimension(
-            gl, next_line_height, m_inverse_shaping, scale);
-
-        if (hcenter)
-        {
-            offset.X += (s32)(
-                (position.getWidth() - width_per_line[0]) / 2.0f);
-        }
-        if (vcenter)
-        {
-            if (too_long_broken_text)
-                offset.Y -= (s32)
-                    ((m_font_max_height - m_glyph_max_height) * scale);
-            else
-            {
-                offset.Y += (s32)(
-                    (position.getHeight() - text_dimension.Height) / 2.0f);
-            }
-        }
-        if (clip)
-        {
-            core::rect<s32> clippedRect(core::position2d<s32>
-                (s32(offset.X), s32(offset.Y)), text_dimension);
-            clippedRect.clipAgainst(*clip);
-            if (!clippedRect.isValid()) return;
-        }
-    }
 
     // Collect character locations
     const unsigned int text_size = gl.size();

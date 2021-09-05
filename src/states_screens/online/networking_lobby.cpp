@@ -265,9 +265,7 @@ void NetworkingLobby::init()
         if (mouse.Event == EMIE_LMOUSE_PRESSED_DOWN)
         {
             std::shared_ptr<std::u32string> s;
-            int cluster = text->getCluster(
-                mouse.X - text->getAbsolutePosition().UpperLeftCorner.X,
-                mouse.Y - text->getAbsolutePosition().UpperLeftCorner.Y, &s);
+            int cluster = text->getCluster(mouse.X, mouse.Y, &s);
             if (cluster == -1 || (unsigned)cluster > s->size())
                 return false;
 

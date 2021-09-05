@@ -90,28 +90,13 @@ void CGUIStaticText::draw()
 				breakText();
 
 			core::rect<s32> r = frameRect;
-			auto dim = getGlyphLayoutsDimension(m_glyph_layouts,
-				font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
-
-			s32 totalHeight = dim.Height;
-			if (VAlign == EGUIA_CENTER)
-			{
-				r.UpperLeftCorner.Y = r.getCenter().Y - (totalHeight / 2);
-			}
-			else if (VAlign == EGUIA_LOWERRIGHT)
-			{
-				r.UpperLeftCorner.Y = r.LowerRightCorner.Y - totalHeight;
-			}
-
-
-			if (HAlign == EGUIA_LOWERRIGHT)
-			{
-				r.UpperLeftCorner.X = frameRect.LowerRightCorner.X - dim.Width;
-			}
+			bool hcenter;
+			const core::rect<s32>* clip;
+			getDrawPosition(&r, &hcenter, &clip);
 
 			font->draw(m_glyph_layouts, r,
 				OverrideColorEnabled ? OverrideColor : skin->getColor(isEnabled() ? EGDC_BUTTON_TEXT : EGDC_GRAY_TEXT),
-				HAlign == EGUIA_CENTER, false, (RestrainTextInside ? &AbsoluteClippingRect : NULL));
+				hcenter, false, clip);
 		}
 	}
 
@@ -405,40 +390,49 @@ s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* ou
 	if (m_glyph_layouts.empty())
 		return -1;
 
+	core::rect<s32> draw_pos = AbsoluteRect;
+	IGUISkin* skin = Environment->getSkin();
+	if (!skin)
+		return -1;
+	if (Border)
+		draw_pos.UpperLeftCorner.X += skin->getSize(EGDS_TEXT_DISTANCE_X);
+
 	IGUIFont* font = getActiveFont();
-	std::vector<f32> width_per_line = gui::getGlyphLayoutsWidthPerLine(
-		m_glyph_layouts, font->getInverseShaping(), font->getScale());
-	if (width_per_line.empty())
+	bool hcenter;
+	const core::rect<s32>* clip;
+	getDrawPosition(&draw_pos, &hcenter, &clip);
+
+	core::position2d<float> offset;
+	f32 next_line_height = 0.0f;
+	std::vector<f32> width_per_line;
+	if (!gui::getDrawOffset(draw_pos, hcenter, false, m_glyph_layouts,
+		font->getInverseShaping(), font->getFaceFontMaxHeight(),
+		font->getFaceGlyphMaxHeight(), font->getScale(), clip, &offset,
+		&next_line_height, &width_per_line))
 		return -1;
 
 	// Check if the line is RTL
-	core::rect<s32> position = getAbsolutePosition();
 	bool rtl = (m_glyph_layouts[0].flags & gui::GLF_RTL_LINE) != 0;
-	int offset = 0;
-	int cur_line = 0;
-	if (rtl)
-		offset = (s32)(position.getWidth() - width_per_line[cur_line]);
+	if (!hcenter && rtl)
+		offset.X += (s32)(draw_pos.getWidth() - width_per_line[0]);
 
-	float next_line_height = font->getHeightPerLine();
-	if (width_per_line.size() > 1 &&
-		width_per_line.size() * next_line_height > position.getHeight())
-	{
-		next_line_height = (float)position.getHeight() /
-		(float)width_per_line.size();
-	}
+	unsigned cur_line = 0;
+	bool line_changed = false;
 
 	int idx = -1;
-	core::recti r;
-	r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
-	r.LowerRightCorner.Y = (int)next_line_height;
-	bool line_changed = false;
+	core::recti test_rect;
+	test_rect.UpperLeftCorner.X = test_rect.LowerRightCorner.X = (s32)offset.X;
+	test_rect.UpperLeftCorner.Y = (s32)offset.Y;
+	test_rect.LowerRightCorner.Y = (s32)offset.Y + (s32)next_line_height;
+
 	for (unsigned i = 0; i < m_glyph_layouts.size(); i++)
 	{
 		const GlyphLayout& glyph_layout = m_glyph_layouts[i];
+		// Newline handling (from font with face render)
 		if ((glyph_layout.flags & GLF_NEWLINE) != 0)
 		{
-			r.UpperLeftCorner.Y += (int)next_line_height;
-			r.LowerRightCorner.Y += (int)next_line_height;
+			test_rect.UpperLeftCorner.Y += (int)next_line_height;
+			test_rect.LowerRightCorner.Y += (int)next_line_height;
 			cur_line++;
 			line_changed = true;
 			continue;
@@ -447,18 +441,25 @@ s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* ou
 		{
 			line_changed = false;
 			rtl = (glyph_layout.flags & gui::GLF_RTL_LINE) != 0;
-			offset = 0;
-			if (rtl)
+			offset.X = float(draw_pos.UpperLeftCorner.X);
+			if (hcenter)
 			{
-				offset = (s32)
-					(position.getWidth() - width_per_line[cur_line]);
+				offset.X += (s32)(
+					(draw_pos.getWidth() - width_per_line.at(cur_line)) / 2.f);
 			}
-			r.UpperLeftCorner.X = r.LowerRightCorner.X = offset;
+			else if (rtl)
+			{
+				offset.X +=
+					(s32)(draw_pos.getWidth() - width_per_line.at(cur_line));
+			}
+			test_rect.UpperLeftCorner.X = test_rect.LowerRightCorner.X =
+				(s32)offset.X;
 		}
-		r.LowerRightCorner.X += int(
-			(float)glyph_layout.x_advance * font->getInverseShaping() *
+		test_rect.LowerRightCorner.X += s32(
+			(f32)glyph_layout.x_advance * font->getInverseShaping() *
 			font->getScale());
-		if (r.isPointInside(p))
+
+		if (test_rect.isPointInside(p))
 		{
 			idx = i;
 			break;
@@ -473,6 +474,35 @@ s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* ou
 		return -1;
 	*out_orig_str = s;
 	return cluster;
+}
+
+
+void CGUIStaticText::getDrawPosition(core::rect<s32>* draw_pos, bool* hcenter, const core::rect<s32>** clip)
+{
+	core::rect<s32> r = *draw_pos;
+	IGUIFont* font = getActiveFont();
+	auto dim = getGlyphLayoutsDimension(m_glyph_layouts,
+		font->getHeightPerLine(), font->getInverseShaping(), font->getScale());
+
+	s32 totalHeight = dim.Height;
+	if (VAlign == EGUIA_CENTER)
+	{
+		r.UpperLeftCorner.Y = r.getCenter().Y - (totalHeight / 2);
+	}
+	else if (VAlign == EGUIA_LOWERRIGHT)
+	{
+		r.UpperLeftCorner.Y = r.LowerRightCorner.Y - totalHeight;
+	}
+
+	if (HAlign == EGUIA_LOWERRIGHT)
+	{
+		r.UpperLeftCorner.X = AbsoluteRect.LowerRightCorner.X - dim.Width;
+	}
+
+	*draw_pos = r;
+	*hcenter = (HAlign == EGUIA_CENTER);
+	*clip = (RestrainTextInside ? &AbsoluteClippingRect : NULL);
+
 }
 
 

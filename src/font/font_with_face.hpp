@@ -300,6 +300,8 @@ public:
     // ------------------------------------------------------------------------
     int getFontMaxHeight() const                  { return m_font_max_height; }
     // ------------------------------------------------------------------------
+    int getGlyphMaxHeight() const                { return m_glyph_max_height; }
+    // ------------------------------------------------------------------------
     virtual bool disableTextShaping() const                   { return false; }
     // ------------------------------------------------------------------------
     float getInverseShaping() const               { return m_inverse_shaping; }
