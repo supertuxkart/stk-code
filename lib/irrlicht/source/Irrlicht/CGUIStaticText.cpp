@@ -469,6 +469,8 @@ s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* ou
 		return -1;
 
 	std::shared_ptr<std::u32string> s = m_glyph_layouts[idx].orig_string;
+	if (!s)
+		return -1;
 	unsigned cluster = m_glyph_layouts[idx].cluster.front();
 	if (cluster > s->size())
 		return -1;

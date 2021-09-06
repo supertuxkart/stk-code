@@ -24,6 +24,7 @@ enum ShapeFlag
 {
 SF_DISABLE_CACHE = 1, /* Disable caching glyph layouts. */
 SF_DISABLE_URL_HIGHLIGHT = 2, /* Disable URL highlight. */
+SF_ENABLE_CLUSTER_TEST = 4, /* If on getCluster will work on these layouts, which the original string will be stored, it will be turned on too if any URL is found. */
 };
 
 enum GlyphLayoutFlag

@@ -332,6 +332,8 @@ void FontManager::shape(const std::u32string& text,
         }
         return 0;
     };
+
+    bool save_orig_string = (shape_flag & gui::SF_ENABLE_CLUSTER_TEST) != 0;
     if ((shape_flag & gui::SF_DISABLE_URL_HIGHLIGHT) == 0)
     {
         size_t pos = text.find(U"http://", 0);
@@ -376,6 +378,8 @@ void FontManager::shape(const std::u32string& text,
             pos = text.find(U"https://", pos + 1);
         }
     }
+    if (!http_pos.empty())
+        save_orig_string = true;
 
     int start = 0;
     std::shared_ptr<std::u32string> orig_string =
@@ -595,7 +599,8 @@ void FontManager::shape(const std::u32string& text,
                     gl.flags |= gui::GLF_RTL_CHAR;
                 if (FT_HAS_COLOR(glyphs[idx].ftface))
                     gl.flags |= gui::GLF_COLORED;
-                gl.orig_string = orig_string;
+                if (save_orig_string)
+                    gl.orig_string = orig_string;
                 cur_line.push_back(gl);
             }
             // Sort glyphs in logical order
