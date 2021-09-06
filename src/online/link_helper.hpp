@@ -25,7 +25,7 @@ namespace Online
     {
     public:
         static bool isSupported();
-        static void openURL (std::string url);
+        static void openURL(const std::string& url);
     }; //class LinkHelper
 } // namespace Online
 #endif // link_helper_HPP

@@ -23,8 +23,13 @@
 #include <shellapi.h>
 #endif
 
-#ifdef ANDROID
+#ifndef SERVER_ONLY
+#include "SDL_version.h"
+
+#if SDL_VERSION_ATLEAST(2, 0, 14)
 #include "SDL_misc.h"
+#endif
+
 #endif
 
 #ifdef IOS_STK
@@ -37,18 +42,26 @@ namespace Online
 {
     bool LinkHelper::isSupported()
     {
-#if defined(_WIN32) || defined(__APPLE__) || (defined(__linux__))
+#ifdef SERVER_ONLY
+        return false;
+#else
+
+#if defined(_WIN32) || defined(__APPLE__) || (!defined(__ANDROID__) && (defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__HAIKU__)))
+        return true;
+#elif SDL_VERSION_ATLEAST(2, 0, 14)
         return true;
 #else
         return false;
 #endif
+
+#endif
     }
 
-    void LinkHelper::openURL (std::string url)
+    void LinkHelper::openURL(const std::string& url)
     {
-#if defined(ANDROID)
-        SDL_OpenURL(url.c_str());
-#elif defined(_WIN32)
+#ifndef SERVER_ONLY
+
+#if defined(_WIN32)
         ShellExecuteA(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
 #elif defined(IOS_STK)
         irr::CIrrDeviceiOS::openURLiOS(url.c_str());
@@ -58,9 +71,9 @@ namespace Online
         {
             Log::error("OpenURL", "Command returned non-zero exit status");
         }
-#elif defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__HAIKU__)
+#elif !defined(__ANDROID__) && (defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) || defined(__HAIKU__))
         std::string command = std::string("xdg-open ").append(url);
-        
+
         const char* lib_path = getenv("LD_LIBRARY_PATH");
         const char* system_lib_path = getenv("SYSTEM_LD_LIBRARY_PATH");
 
@@ -85,8 +98,12 @@ namespace Online
                 unsetenv("LD_LIBRARY_PATH");
             }
         }
+#elif SDL_VERSION_ATLEAST(2, 0, 14)
+        SDL_OpenURL(url.c_str());
 #else
         Log::error("OpenURL", "Not implemented for this platform!");
+#endif
+
 #endif
     }
 }
