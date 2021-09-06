@@ -1500,7 +1500,9 @@ namespace GUIEngine
             core::rect<s32> tipRect(core::position2d<s32>(0, y_from - text_height),
                                     core::dimension2d<s32>(screen_w, text_height));
             GL32_draw2DRectangle(Skin::getColor("tips_background::neutral"), tipRect);
-            Private::g_font->draw(g_tips_string, tipRect,
+            std::vector<GlyphLayout> gls;
+            Private::g_font->initGlyphLayouts(g_tips_string, gls, gui::SF_DISABLE_URL_HIGHLIGHT);
+            Private::g_font->draw(gls, tipRect,
                 Skin::getColor("brighttext::neutral"),
                 true /* hcenter */, true /* vcenter */);
         }

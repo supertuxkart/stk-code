@@ -346,7 +346,8 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     const unsigned box_width = m_text_bubble->getDimension().Width;
     const float box_height = m_text_bubble->getDimension().Height;
     std::vector<GlyphLayout> cur_info;
-    font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE);
+    font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE |
+        gui::SF_DISABLE_URL_HIGHLIGHT);
     gui::IGUIFont* font = GUIEngine::getFont();
     gui::breakGlyphLayouts(cur_info, box_width,
         font->getInverseShaping(), font->getScale());
@@ -978,4 +979,6 @@ void NetworkingLobby::setHeader(const core::stringw& header)
         m_header->add();
         m_header->setText(header, true);
     }
+    // Make sure server name is not clickable for URL
+    m_header->getIrrlichtElement<IGUIStaticText>()->setMouseCallback(nullptr);
 }   // setHeader

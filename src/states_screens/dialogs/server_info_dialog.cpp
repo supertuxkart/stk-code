@@ -64,7 +64,10 @@ ServerInfoDialog::ServerInfoDialog(std::shared_ptr<Server> server)
         (file_manager->getAsset(FileManager::GUI_ICON, "remove.png"));
 
     loadFromFile("online/server_info_dialog.stkgui");
-    getWidget<LabelWidget>("title")->setText(server->getName(), true);
+    LabelWidget* title = getWidget<LabelWidget>("title");
+    title->setText(server->getName(), true);
+    // Make sure server name is not clickable for URL
+    title->getIrrlichtElement<IGUIStaticText>()->setMouseCallback(nullptr);
 
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
