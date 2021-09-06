@@ -132,7 +132,8 @@ public:
     unsigned getShapingDPI() const                    { return m_shaping_dpi; }
     // ------------------------------------------------------------------------
     void shape(const std::u32string& text,
-               std::vector<irr::gui::GlyphLayout>& gls);
+               std::vector<irr::gui::GlyphLayout>& gls,
+               irr::u32 shape_flag = 0);
     // ------------------------------------------------------------------------
     std::vector<irr::gui::GlyphLayout>& getCachedLayouts
                   (const irr::core::stringw& str);

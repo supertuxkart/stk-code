@@ -601,7 +601,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
 
     // Collect character locations
     const unsigned int text_size = gl.size();
-    std::vector<std::pair<s32, bool> > indices;
+    std::vector<std::pair<int, int> > indices;
     core::array<core::position2d<float>> offsets(text_size);
     std::vector<bool> fallback(text_size);
     core::array<core::position2d<float>> gld_offsets;
@@ -704,8 +704,7 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             offset.Y -= glyph_offset_y;
         }
 
-        indices.emplace_back(area->spriteno,
-            (glyph_layout.flags & gui::GLF_COLORED) != 0);
+        indices.emplace_back(area->spriteno, glyph_layout.flags);
         if ((glyph_layout.flags & gui::GLF_QUICK_DRAW) != 0)
         {
             offset.X += glyph_layout.x_advance * scale;
@@ -860,7 +859,8 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             m_fallback_font->m_spritebank->getTexture(tex_id) :
             m_spritebank->getTexture(tex_id));
 
-        const bool is_colored = indices[n].second;
+        const bool is_colored = (indices[n].second & gui::GLF_COLORED) != 0;
+        const bool is_url = (indices[n].second & gui::GLF_URL) != 0;
         if (isBold())
         {
             if (char_collector != NULL)
@@ -885,8 +885,13 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
             }
             else
             {
+                video::SColor single_color = color;
+                if (is_url)
+                    single_color = text_marked;
+                else if (is_colored)
+                    single_color = video::SColor(-1);
                 FontDrawer::addGlyph(texture, dest, source, clip,
-                    is_colored ? video::SColor(-1) : color);
+                    single_color);
             }
         }
     }
