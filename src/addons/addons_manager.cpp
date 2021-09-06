@@ -273,6 +273,12 @@ void AddonsManager::initAddons(const XMLNode *xml)
 
     for(unsigned int i=0; i<count;)
     {
+        // if installed addon needs an update, set flag
+        if (m_addons_list.getData()[i].isInstalled() &&
+            m_addons_list.getData()[i].needsUpdate())
+        {
+            m_has_new_addons = true;
+        }
         if(m_addons_list.getData()[i].getStillExists() ||
             m_addons_list.getData()[i].isInstalled())
         {
@@ -568,6 +574,16 @@ bool AddonsManager::install(const Addon &addon)
             Log::error("addons", "Cannot load track '%s' : %s.",
                         addon.getDataDir().c_str(), e.what());
         }
+    }
+    // if we have installed/updated at least one addon
+    // we remove the notification in main menu
+    m_has_new_addons = false;
+    // check if there are still addons that need an update
+    for (unsigned int i=0; i<addons_manager->getNumAddons() && !m_has_new_addons; i++)
+    {
+        const Addon & addon = addons_manager->getAddon(i);
+        if (addon.isInstalled() && addon.needsUpdate())
+            m_has_new_addons = true;
     }
     saveInstalled();
     return true;
