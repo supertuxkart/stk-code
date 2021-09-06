@@ -379,7 +379,7 @@ bool CGUIStaticText::OnEvent(const SEvent& event)
 }
 
 
-s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* out_orig_str)
+s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* out_orig_str, int* out_glyph_idx)
 {
 	core::position2di p;
 	p.X = x;
@@ -473,6 +473,8 @@ s32 CGUIStaticText::getCluster(int x, int y, std::shared_ptr<std::u32string>* ou
 	if (cluster > s->size())
 		return -1;
 	*out_orig_str = s;
+	if (out_glyph_idx)
+		*out_glyph_idx = idx;
 	return cluster;
 }
 

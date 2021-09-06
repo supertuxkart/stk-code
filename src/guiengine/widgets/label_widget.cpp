@@ -20,6 +20,7 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/skin.hpp"
+#include "online/link_helper.hpp"
 
 #include <IGUIElement.h>
 #include <IGUIEnvironment.h>
@@ -84,6 +85,7 @@ void LabelWidget::add()
         irrwidget->setTextRestrainedInside(false);
     }
 
+    irrwidget->setMouseCallback(Online::LinkHelper::openURLIrrElement);
     m_element = irrwidget;
     irrwidget->setTextAlignment( align, valign );
 

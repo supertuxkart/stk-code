@@ -113,7 +113,7 @@ namespace gui
 		//! called if an event happened.
 		virtual bool OnEvent(const SEvent& event);
 		virtual void setMouseCallback(std::function<bool(IGUIStaticText* text, SEvent::SMouseInput)> cb) { m_callback = cb; }
-		virtual s32 getCluster(int x, int y, std::shared_ptr<std::u32string>* out_orig_str);
+		virtual s32 getCluster(int x, int y, std::shared_ptr<std::u32string>* out_orig_str, int* out_glyph_idx = NULL);
 	private:
 
 		//! Breaks the single text line.

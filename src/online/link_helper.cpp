@@ -17,7 +17,12 @@
 #include "online/link_helper.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
+#include "utils/string_utils.hpp"
 #include <string>
+
+#include <GlyphLayout.h>
+#include <IGUIStaticText.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #include <shellapi.h>
@@ -40,6 +45,41 @@ using namespace Online;
 
 namespace Online
 {
+    bool LinkHelper::openURLIrrElement(irr::gui::IGUIStaticText* text,
+                                       irr::SEvent::SMouseInput mouse)
+    {
+        if (mouse.Event != EMIE_LMOUSE_PRESSED_DOWN)
+            return false;
+        std::shared_ptr<std::u32string> s;
+        int glyph_idx = -1;
+        int cluster = text->getCluster(mouse.X, mouse.Y, &s, &glyph_idx);
+        if (cluster == -1 || (unsigned)cluster > s->size())
+            return false;
+        const std::vector<gui::GlyphLayout>& gls = text->getGlyphLayouts();
+        const gui::GlyphLayout& gl = gls[glyph_idx];
+        if ((gl.flags & gui::GLF_URL) == 0)
+            return false;
+        int start = glyph_idx;
+        while (start != 0)
+        {
+            if ((gls[start - 1].flags & gui::GLF_URL) == 0)
+                break;
+            start--;
+        }
+        size_t end = glyph_idx;
+        while (gls.size() - end > 1)
+        {
+            size_t next_end = end + 1;
+            if ((gls[next_end].flags & gui::GLF_URL) == 0)
+                break;
+            end = next_end;
+        }
+        std::u32string url = s->substr(gls[start].cluster.front(),
+            gls[end].cluster.back() - gls[start].cluster.front() + 1);
+        openURL(StringUtils::utf32ToUtf8(url));
+        return true;
+    }
+
     bool LinkHelper::isSupported()
     {
 #ifdef SERVER_ONLY

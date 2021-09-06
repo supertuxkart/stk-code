@@ -17,6 +17,7 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/bubble_widget.hpp"
+#include "online/link_helper.hpp"
 #include <algorithm>
 
 #include <IGUIStaticText.h>
@@ -52,6 +53,7 @@ void BubbleWidget::add()
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
+    irrwidget->setMouseCallback(Online::LinkHelper::openURLIrrElement);
 
     m_element = irrwidget;
     replaceText();

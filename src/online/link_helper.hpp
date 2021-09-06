@@ -19,6 +19,16 @@
 
 #include <string>
 
+#include <IEventReceiver.h>
+namespace irr
+{
+    namespace gui
+    {
+        class IGUIStaticText;
+    }
+}
+
+
 namespace Online
 {
     class LinkHelper
@@ -26,6 +36,7 @@ namespace Online
     public:
         static bool isSupported();
         static void openURL(const std::string& url);
+        static bool openURLIrrElement(irr::gui::IGUIStaticText* text, irr::SEvent::SMouseInput mouse);
     }; //class LinkHelper
 } // namespace Online
 #endif // link_helper_HPP
