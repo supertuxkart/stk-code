@@ -3299,10 +3299,9 @@ double ServerLobby::computeDataAccuracy(double player1_rd, double player2_rd, do
         double diff = strong_lowerbound - weak_upperbound;
         diff = diff / (BASE_RANKING_POINTS / 2.0);
 
+        // The expected result is that of the weaker player and is between 0 and 0.5
         double expected_result = 1.0/ (1.0 + std::pow(10.0, diff));
-        // Renormalize so expected result 50% is 1.0 and expected result 100% is 0.0
-        expected_result = 2.0 - 2 * expected_result;
-        expected_result = std::max(0.2, sqrt(expected_result));
+        expected_result = std::max(0.2, sqrt(2*expected_result));
 
         accuracy *= expected_result;
     }
