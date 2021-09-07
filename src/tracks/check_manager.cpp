@@ -224,7 +224,10 @@ int CheckManager::getChecklineTriggering(const Vec3 &from,
         CheckStructure* c = getCheckStructure(i);
 
         // FIXME: why is the lapline skipped?
-        if (dynamic_cast<CheckLap*>(c) != NULL) continue;
+        // CheckCannon is skipped because after using 3D check planes,
+        // sometimes getChecklineTriggering will return true for CheckCannon
+        if (dynamic_cast<CheckLap*>(c) != NULL ||
+            dynamic_cast<CheckCannon*>(c) != NULL) continue;
 
         if (c->isTriggered(from, to, -1 /* kart id */))
             return i;
