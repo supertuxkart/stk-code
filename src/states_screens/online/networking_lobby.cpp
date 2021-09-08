@@ -347,7 +347,8 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     const float box_height = m_text_bubble->getDimension().Height;
     std::vector<GlyphLayout> cur_info;
     font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE |
-        gui::SF_DISABLE_URL_HIGHLIGHT | gui::SF_ENABLE_CLUSTER_TEST);
+        gui::SF_ENABLE_CLUSTER_TEST);
+    gui::removeHighlightedURL(cur_info);
     gui::IGUIFont* font = GUIEngine::getFont();
     gui::breakGlyphLayouts(cur_info, box_width,
         font->getInverseShaping(), font->getScale());

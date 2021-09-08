@@ -333,51 +333,50 @@ void FontManager::shape(const std::u32string& text,
         return 0;
     };
 
-    bool save_orig_string = (shape_flag & gui::SF_ENABLE_CLUSTER_TEST) != 0;
-    if ((shape_flag & gui::SF_DISABLE_URL_HIGHLIGHT) == 0)
+    // Auto URL highlighting for http:// or https://
+    size_t pos = text.find(U"http://", 0);
+    while (pos != std::u32string::npos)
     {
-        size_t pos = text.find(U"http://", 0);
-        while (pos != std::u32string::npos)
+        // Find nearest newline or whitespace
+        size_t newline_pos = text.find(U'\n', pos + 1);
+        size_t space_pos = text.find(U' ', pos + 1);
+        size_t end_pos = std::u32string::npos;
+        if (newline_pos != std::u32string::npos ||
+            space_pos != std::u32string::npos)
         {
-            // Find nearest newline or whitespace
-            size_t newline_pos = text.find(U'\n', pos + 1);
-            size_t space_pos = text.find(U' ', pos + 1);
-            size_t end_pos = std::u32string::npos;
-            if (newline_pos != std::u32string::npos ||
-                space_pos != std::u32string::npos)
-            {
-                if (space_pos > newline_pos)
-                    end_pos = newline_pos;
-                else
-                    end_pos = space_pos;
-            }
+            if (space_pos > newline_pos)
+                end_pos = newline_pos;
             else
-                end_pos = text.size();
-            end_pos = fix_end_pos(text, pos, end_pos);
-            http_pos.emplace_back((int)pos, (int)end_pos);
-            pos = text.find(U"http://", pos + 1);
+                end_pos = space_pos;
         }
-        pos = text.find(U"https://", 0);
-        while (pos != std::u32string::npos)
-        {
-            size_t newline_pos = text.find(U'\n', pos + 1);
-            size_t space_pos = text.find(U' ', pos + 1);
-            size_t end_pos = std::u32string::npos;
-            if (newline_pos != std::u32string::npos ||
-                space_pos != std::u32string::npos)
-            {
-                if (space_pos > newline_pos)
-                    end_pos = newline_pos;
-                else
-                    end_pos = space_pos;
-            }
-            else
-                end_pos = text.size();
-            end_pos = fix_end_pos(text, pos, end_pos);
-            http_pos.emplace_back((int)pos, (int)end_pos);
-            pos = text.find(U"https://", pos + 1);
-        }
+        else
+            end_pos = text.size();
+        end_pos = fix_end_pos(text, pos, end_pos);
+        http_pos.emplace_back((int)pos, (int)end_pos);
+        pos = text.find(U"http://", pos + 1);
     }
+    pos = text.find(U"https://", 0);
+    while (pos != std::u32string::npos)
+    {
+        size_t newline_pos = text.find(U'\n', pos + 1);
+        size_t space_pos = text.find(U' ', pos + 1);
+        size_t end_pos = std::u32string::npos;
+        if (newline_pos != std::u32string::npos ||
+            space_pos != std::u32string::npos)
+        {
+            if (space_pos > newline_pos)
+                end_pos = newline_pos;
+            else
+                end_pos = space_pos;
+        }
+        else
+            end_pos = text.size();
+        end_pos = fix_end_pos(text, pos, end_pos);
+        http_pos.emplace_back((int)pos, (int)end_pos);
+        pos = text.find(U"https://", pos + 1);
+    }
+
+    bool save_orig_string = (shape_flag & gui::SF_ENABLE_CLUSTER_TEST) != 0;
     if (!http_pos.empty())
         save_orig_string = true;
 

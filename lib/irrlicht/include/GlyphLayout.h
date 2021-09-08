@@ -23,8 +23,7 @@ namespace gui
 enum ShapeFlag
 {
 SF_DISABLE_CACHE = 1, /* Disable caching glyph layouts. */
-SF_DISABLE_URL_HIGHLIGHT = 2, /* Disable URL highlight. */
-SF_ENABLE_CLUSTER_TEST = 4, /* If on getCluster will work on these layouts, which the original string will be stored, it will be turned on too if any URL is found. */
+SF_ENABLE_CLUSTER_TEST = 2, /* If on getCluster will work on these layouts, which the original string will be stored, it will be turned on too if any URL is found. */
 };
 
 enum GlyphLayoutFlag
@@ -342,6 +341,12 @@ inline bool getDrawOffset(const core::rect<s32>& position, bool hcenter,
     *out_next_line_height = next_line_height;
     *out_width_per_line = width_per_line;
     return true;
+}
+
+inline void removeHighlightedURL(std::vector<GlyphLayout>& gls)
+{
+    for (GlyphLayout& gl : gls)
+        gl.flags &= ~gui::GLF_URL;
 }
 
 namespace Private

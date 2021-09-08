@@ -591,8 +591,7 @@ void CGUISTKListBox::draw()
                         Font->initGlyphLayouts(Items[i].m_contents[x].m_text,
                             Items[i].m_contents[x].m_glyph_layouts);
                         // Remove highlighted link if cache already has it
-                        for (gui::GlyphLayout& gl : Items[i].m_contents[x].m_glyph_layouts)
-                            gl.flags &= ~gui::GLF_URL;
+                        gui::removeHighlightedURL(Items[i].m_contents[x].m_glyph_layouts);
                         if (Items[i].m_word_wrap)
                         {
                             gui::breakGlyphLayouts(Items[i].m_contents[x].m_glyph_layouts,

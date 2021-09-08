@@ -146,6 +146,7 @@ public:
         const unsigned height = m_screen_size.Height;
         m_font = GUIEngine::getFont();
         m_font->initGlyphLayouts(m_message, m_gls);
+        gui::removeHighlightedURL(m_gls);
         // Reserve space for 3 lines of text, it will occupy the circle
         const int max_width = width - (brp.m_left_border +
             brp.m_right_border) - (m_font->getHeightPerLine() * 3);

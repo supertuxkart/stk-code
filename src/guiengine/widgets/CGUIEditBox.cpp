@@ -953,7 +953,8 @@ void CGUIEditBox::draw()
         const s32 realcbgn = m_cursor_pos;
         const s32 realcend = m_cursor_pos + (s32)m_composing_text.size();
         total.insert(m_cursor_pos, m_composing_text);
-        font_manager->shape(total, ct, gui::SF_DISABLE_URL_HIGHLIGHT);
+        font_manager->shape(total, ct);
+        gui::removeHighlightedURL(ct);
         for (unsigned i = 0; i < ct.size(); i++)
         {
             GlyphLayout& glyph = ct[i];
@@ -1542,7 +1543,10 @@ void CGUIEditBox::updateGlyphLayouts()
             m_glyph_layouts);
     }
     else
-        font_manager->shape(m_edit_text, m_glyph_layouts, gui::SF_DISABLE_URL_HIGHLIGHT);
+    {
+        font_manager->shape(m_edit_text, m_glyph_layouts);
+        gui::removeHighlightedURL(m_glyph_layouts);
+    }
     Text = StringUtils::utf32ToWide(m_edit_text);
 #endif
 }
