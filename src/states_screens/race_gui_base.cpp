@@ -52,6 +52,7 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#include <GlyphLayout.h>
 #include <ICameraSceneNode.h>
 
 namespace irr
@@ -678,15 +679,20 @@ void RaceGUIBase::drawGlobalMusicDescription()
     {
         core::rect<s32> pos_by(textXFrom, text_y+fheight,
                                textXTo,   text_y+fheight);
-        font->draw(thetext_composer, pos_by, white,
-                   true, true);
+        std::vector<gui::GlyphLayout> gls;
+        font->initGlyphLayouts(thetext_composer, gls);
+        gui::removeHighlightedURL(gls);
+        font->draw(gls, pos_by, white, true, true);
     }
 
     // ---- Draw "song name" text
     core::rect<s32> pos(textXFrom, text_y,
                         textXTo,   text_y);
 
-    font->draw(thetext.c_str(), pos, white, true /* hcenter */,
+    std::vector<gui::GlyphLayout> gls;
+    font->initGlyphLayouts(thetext, gls);
+    gui::removeHighlightedURL(gls);
+    font->draw(gls, pos, white, true /* hcenter */,
                true /* vcenter */);
 
     // Draw music icon
