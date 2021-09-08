@@ -43,7 +43,7 @@ using namespace irr::core;
 
 // -----------------------------------------------------------------------------
 HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, RaceManager::MajorRaceModeType major_mode)
-                      : ModalDialog(0.75f,0.75f)
+                      : ModalDialog(0.80f,0.82f)
 {
     m_hs = highscore;
     m_major_mode = major_mode;

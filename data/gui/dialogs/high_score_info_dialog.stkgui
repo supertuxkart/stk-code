@@ -2,7 +2,7 @@
 <stkgui>
     <div x="1%" y="4%" width="98%" height="92%" layout="vertical-row">
 
-        <div width="100%" height="55%" layout="vertical-row">
+        <div width="100%" height="58%" layout="vertical-row">
             <div width="100%" height="15%" align="center" layout="vertical-row" >
                 <label id="name" width="100%" text_align="center"/>
             </div>
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <div width="100%" height="45%" layout="horizontal-row">
+        <div width="100%" height="42%" layout="horizontal-row">
             <div width="40%" height="100%" layout="vertical-row">
                 <spacer width="10" height="5%"/>
                 <icon-button proportion="1" width="100%" height="100%" id="track_screenshot" custom_ratio="1.33333"/>
