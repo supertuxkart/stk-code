@@ -50,7 +50,6 @@ private:
 
     /** WiiUse wiimote handles */
     wiimote_t**     m_all_wiimote_handles;
-    int             m_number_wiimotes;
 
     // While the wiimote code can technically work without threading,
     // its too slow (high latency), but it is useful for debugging.
