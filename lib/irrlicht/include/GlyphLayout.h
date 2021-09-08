@@ -34,7 +34,8 @@ GLF_BREAKABLE = 4, /* This glyph is breakable when line breaking. */
 GLF_QUICK_DRAW = 8, /* This glyph is not created by libraqm, which get x_advance_x directly from font. */
 GLF_NEWLINE = 16, /* This glyph will start a newline. */
 GLF_COLORED = 32, /* This glyph is a colored one (for example emoji). */
-GLF_URL = 64 /* This glyph contains clickable url (https or http atm). */
+GLF_URL = 64, /* This glyph contains clickable url (https or http atm). */
+GLF_BREAKTEXT_NEWLINE = 128 /* Newline added via breakGlyphLayouts. */
 };
 
 enum GlyphLayoutDraw
@@ -238,6 +239,17 @@ inline void breakGlyphLayouts(std::vector<GlyphLayout>& gls, f32 max_line_width,
 {
     if (gls.size() < 2)
         return;
+    auto it = gls.begin();
+    while (it != gls.end())
+    {
+        if ((it->flags & GLF_BREAKTEXT_NEWLINE) != 0)
+        {
+            it = gls.erase(it);
+            continue;
+        }
+        it++;
+    }
+
     std::vector<std::vector<GlyphLayout> > broken_line;
     u32 start = 0;
     for (u32 i = 0; i < gls.size(); i++)
@@ -245,12 +257,13 @@ inline void breakGlyphLayouts(std::vector<GlyphLayout>& gls, f32 max_line_width,
         GlyphLayout& glyph = gls[i];
         if ((glyph.flags & GLF_NEWLINE) != 0)
         {
-            Private::breakLine({ gls.begin() + start, gls.begin() + i},
+            Private::breakLine({ gls.begin() + start, gls.begin() + i },
                 max_line_width, inverse_shaping, scale, broken_line);
             start = i + 1;
+            broken_line.push_back(std::vector<GlyphLayout>());
         }
     }
-    if (start - gls.size() - 1 > 0)
+    if (gls.size() > start)
     {
         Private::breakLine({ gls.begin() + start, gls.begin() + gls.size() },
             max_line_width, inverse_shaping, scale, broken_line);
@@ -260,12 +273,6 @@ inline void breakGlyphLayouts(std::vector<GlyphLayout>& gls, f32 max_line_width,
     // Sort glyphs in original order
     for (u32 i = 0; i < broken_line.size(); i++)
     {
-        if (i != 0)
-        {
-            gui::GlyphLayout gl = { 0 };
-            gl.flags = gui::GLF_NEWLINE;
-            gls.push_back(gl);
-        }
         auto& line = broken_line[i];
         std::sort(line.begin(), line.end(), []
             (const irr::gui::GlyphLayout& a_gi,
@@ -275,6 +282,17 @@ inline void breakGlyphLayouts(std::vector<GlyphLayout>& gls, f32 max_line_width,
             });
         for (auto& glyph : line)
             gls.push_back(glyph);
+        if (i != broken_line.size() - 1)
+        {
+            gui::GlyphLayout gl = { 0 };
+            gl.flags = gui::GLF_NEWLINE | gui::GLF_BREAKTEXT_NEWLINE;
+            if (broken_line.at(i + 1).empty())
+            {
+                gl.flags &= ~gui::GLF_BREAKTEXT_NEWLINE;
+                i += 1;
+            }
+            gls.push_back(gl);
+        }
     }
 }
 

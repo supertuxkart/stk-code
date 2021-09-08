@@ -62,7 +62,13 @@ namespace Online
         int start = glyph_idx;
         while (start != 0)
         {
-            if ((gls[start - 1].flags & gui::GLF_URL) == 0)
+            const gui::GlyphLayout& cur_gl = gls[start - 1];
+            if ((cur_gl.flags & gui::GLF_BREAKTEXT_NEWLINE) != 0)
+            {
+                start--;
+                continue;
+            }
+            if ((cur_gl.flags & gui::GLF_URL) == 0)
                 break;
             start--;
         }
@@ -70,7 +76,13 @@ namespace Online
         while (gls.size() - end > 1)
         {
             size_t next_end = end + 1;
-            if ((gls[next_end].flags & gui::GLF_URL) == 0)
+            const gui::GlyphLayout& cur_gl = gls[next_end];
+            if ((cur_gl.flags & gui::GLF_BREAKTEXT_NEWLINE) != 0)
+            {
+                end = next_end;
+                continue;
+            }
+            if ((cur_gl.flags & gui::GLF_URL) == 0)
                 break;
             end = next_end;
         }

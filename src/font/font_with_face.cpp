@@ -557,6 +557,7 @@ int FontWithFace::getCharacterFromPos(const wchar_t* text, int pixel_x,
  *  \param font_settings \ref FontSettings to use.
  *  \param char_collector \ref FontCharCollector to render billboard text.
  */
+#undef DEBUG_NEWLINE
 void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
                           const core::rect<s32>& position,
                           const video::SColor& color, bool hcenter,
@@ -619,6 +620,21 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         const gui::GlyphLayout& glyph_layout = gl[i];
         if ((glyph_layout.flags & gui::GLF_NEWLINE) != 0)
         {
+#ifdef DEBUG_NEWLINE
+            if ((glyph_layout.flags & gui::GLF_BREAKTEXT_NEWLINE) != 0)
+            {
+                GL32_draw2DRectangle(video::SColor(255, 255, 50, 50),
+                    core::recti(offset.X, offset.Y, offset.X + 3,
+                    offset.Y + next_line_height));
+            }
+            else
+            {
+                GL32_draw2DRectangle(video::SColor(255, 50, 50, 255),
+                    core::recti(offset.X, offset.Y, offset.X + 3,
+                    offset.Y + next_line_height));
+            }
+#endif
+            offset.X = float(position.UpperLeftCorner.X);
             offset.Y += (s32)next_line_height;
             cur_line++;
             line_changed = true;
@@ -628,7 +644,6 @@ void FontWithFace::render(const std::vector<gui::GlyphLayout>& gl,
         {
             line_changed = false;
             rtl = (glyph_layout.flags & gui::GLF_RTL_LINE) != 0;
-            offset.X = float(position.UpperLeftCorner.X);
             if (hcenter)
             {
                 offset.X += (s32)(
