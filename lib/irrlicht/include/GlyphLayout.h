@@ -367,6 +367,73 @@ inline void removeHighlightedURL(std::vector<GlyphLayout>& gls)
         gl.flags &= ~gui::GLF_URL;
 }
 
+inline int getGlyphIndexFromCluster(const std::vector<GlyphLayout>& gls, int cluster, std::shared_ptr<std::u32string> orig_string_in_gls = nullptr)
+{
+    if (gls.empty())
+        return -1;
+    if (!orig_string_in_gls)
+        orig_string_in_gls = gls[0].orig_string;
+    if (!orig_string_in_gls)
+        return -1;
+    for (int i = 0; i < (int)gls.size(); i++)
+    {
+        const GlyphLayout& gl = gls[i];
+        if (gl.orig_string != orig_string_in_gls)
+            continue;
+        if ((gl.flags & gui::GLF_NEWLINE) != 0)
+            continue;
+        for (int c : gl.cluster)
+        {
+            if (c == cluster)
+                return i;
+        }
+    }
+    return -1;
+}
+
+inline std::u32string extractURLFromGlyphLayouts(const std::vector<GlyphLayout>& gls, unsigned url_glyph)
+{
+    if (gls.empty() || url_glyph >= gls.size())
+        return U"";
+
+    const gui::GlyphLayout& gl = gls[url_glyph];
+    if ((gl.flags & gui::GLF_URL) == 0 || !gl.orig_string || gl.cluster.empty())
+        return U"";
+
+    std::shared_ptr<std::u32string> orig_string_in_gls = gl.orig_string;
+    int start = gl.cluster.back();
+    while (start != 0)
+    {
+        char32_t ch = (*orig_string_in_gls)[start - 1];
+        if (ch == U'\n' || ch == U'\t' || ch == U'\r')
+            break;
+        int gi = getGlyphIndexFromCluster(gls, start - 1, orig_string_in_gls);
+        if (gi == -1 || gi >= (int)gls.size())
+            return U"";
+        const gui::GlyphLayout& cur_gl = gls[gi];
+        if ((cur_gl.flags & gui::GLF_URL) == 0)
+            break;
+        start--;
+    }
+    int end = gl.cluster.front();
+    while ((int)orig_string_in_gls->size() - end > 1)
+    {
+        size_t next_end = end + 1;
+        char32_t ch = (*orig_string_in_gls)[next_end];
+        if (ch == U'\n' || ch == U'\t' || ch == U'\r')
+            break;
+        int gi = getGlyphIndexFromCluster(gls, next_end, orig_string_in_gls);
+        if (gi == -1 || gi >= (int)gls.size())
+            return U"";
+        const gui::GlyphLayout& cur_gl = gls[gi];
+        if ((cur_gl.flags & gui::GLF_URL) == 0)
+            break;
+        end = next_end;
+    }
+    std::u32string url = orig_string_in_gls->substr(start, end - start + 1);
+    return url;
+}
+
 namespace Private
 {
     /** Used it only for single line (ie without line breaking mark). */

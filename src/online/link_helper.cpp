@@ -56,38 +56,9 @@ namespace Online
         if (cluster == -1 || (unsigned)cluster > s->size())
             return false;
         const std::vector<gui::GlyphLayout>& gls = text->getGlyphLayouts();
-        const gui::GlyphLayout& gl = gls[glyph_idx];
-        if ((gl.flags & gui::GLF_URL) == 0)
+        std::u32string url = gui::extractURLFromGlyphLayouts(gls, glyph_idx);
+        if (url.empty())
             return false;
-        int start = glyph_idx;
-        while (start != 0)
-        {
-            const gui::GlyphLayout& cur_gl = gls[start - 1];
-            if ((cur_gl.flags & gui::GLF_BREAKTEXT_NEWLINE) != 0)
-            {
-                start--;
-                continue;
-            }
-            if ((cur_gl.flags & gui::GLF_URL) == 0)
-                break;
-            start--;
-        }
-        size_t end = glyph_idx;
-        while (gls.size() - end > 1)
-        {
-            size_t next_end = end + 1;
-            const gui::GlyphLayout& cur_gl = gls[next_end];
-            if ((cur_gl.flags & gui::GLF_BREAKTEXT_NEWLINE) != 0)
-            {
-                end = next_end;
-                continue;
-            }
-            if ((cur_gl.flags & gui::GLF_URL) == 0)
-                break;
-            end = next_end;
-        }
-        std::u32string url = s->substr(gls[start].cluster.front(),
-            gls[end].cluster.back() - gls[start].cluster.front() + 1);
         openURL(StringUtils::utf32ToUtf8(url));
         return true;
     }
