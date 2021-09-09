@@ -391,7 +391,7 @@ inline int getGlyphIndexFromCluster(const std::vector<GlyphLayout>& gls, int clu
     return -1;
 }
 
-inline std::u32string extractURLFromGlyphLayouts(const std::vector<GlyphLayout>& gls, unsigned url_glyph)
+inline std::u32string extractURLFromGlyphLayouts(const std::vector<GlyphLayout>& gls, unsigned url_glyph, int* start_cluster = NULL)
 {
     if (gls.empty() || url_glyph >= gls.size())
         return U"";
@@ -431,6 +431,8 @@ inline std::u32string extractURLFromGlyphLayouts(const std::vector<GlyphLayout>&
         end = next_end;
     }
     std::u32string url = orig_string_in_gls->substr(start, end - start + 1);
+    if (start_cluster)
+        *start_cluster = start;
     return url;
 }
 

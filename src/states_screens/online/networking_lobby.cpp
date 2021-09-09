@@ -48,6 +48,7 @@
 #include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "network/network_timer_synchronizer.hpp"
+#include "online/link_helper.hpp"
 #include "states_screens/dialogs/addons_pack.hpp"
 #include "states_screens/dialogs/splitscreen_player_dialog.hpp"
 #include "states_screens/dialogs/network_player_dialog.hpp"
@@ -265,10 +266,28 @@ void NetworkingLobby::init()
         if (mouse.Event == EMIE_LMOUSE_PRESSED_DOWN)
         {
             std::shared_ptr<std::u32string> s;
-            int cluster = text->getCluster(mouse.X, mouse.Y, &s);
+            int glyph_idx = -1;
+            int cluster = text->getCluster(mouse.X, mouse.Y, &s, &glyph_idx);
             if (cluster == -1 || (unsigned)cluster > s->size())
                 return false;
-
+            const std::vector<gui::GlyphLayout>& gls = text->getGlyphLayouts();
+            int start_cluster = -1;
+            const std::u32string ia = U"/installaddon ";
+            std::u32string url = gui::extractURLFromGlyphLayouts(gls,
+                glyph_idx, &start_cluster);
+            if (url.empty())
+                goto handle_player_message_copy;
+            if ((unsigned)start_cluster >= ia.size() &&
+                s->substr(start_cluster - (int)ia.size(), ia.size()) == ia)
+            {
+                AddonsPack::install(StringUtils::utf32ToUtf8(url));
+            }
+            else
+            {
+                Online::LinkHelper::openURL(StringUtils::utf32ToUtf8(url));
+            }
+            return true;
+handle_player_message_copy:
             size_t start = s->substr(0, cluster).rfind(U'\n');
             size_t end = s->substr(cluster, s->size()).find(U'\n');
             if (start == std::string::npos)
@@ -284,28 +303,6 @@ void NetworkingLobby::init()
             int local_pos = cluster - (int)start;
             if ((size_t)local_pos > substr.size())
                 return false;
-
-            size_t space_pos_1, space_pos_2;
-            size_t addon = substr.substr(0, local_pos).rfind(U"/installaddon");
-            if (addon == std::string::npos)
-                goto handle_player_message_copy;
-            space_pos_1 = substr.substr(0, local_pos).rfind(U' ');
-            space_pos_2 = substr.substr(local_pos, substr.size()).find(U' ');
-            if (space_pos_1 == std::string::npos || space_pos_1 < 13)
-                goto handle_player_message_copy;
-            if (space_pos_2 == std::string::npos)
-                space_pos_2 = substr.size();
-            else
-                space_pos_2 += local_pos - space_pos_1 - 1;
-            if (space_pos_1 != std::string::npos && addon + 13 == space_pos_1)
-            {
-                std::string argv = StringUtils::utf32ToUtf8(
-                    substr.substr(addon + 14, space_pos_2));
-                AddonsPack::install(argv);
-                return true;
-            }
-
-handle_player_message_copy:
             for (auto& p : NetworkingLobby::getInstance()->m_player_names)
             {
                 size_t colon = substr.substr(0, local_pos).rfind(U": ");
@@ -348,7 +345,46 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
     std::vector<GlyphLayout> cur_info;
     font_manager->initGlyphLayouts(info, cur_info, gui::SF_DISABLE_CACHE |
         gui::SF_ENABLE_CLUSTER_TEST);
-    gui::removeHighlightedURL(cur_info);
+
+    // Highlight addon name from /installaddon
+    if (cur_info.empty() || !cur_info[0].orig_string)
+        return;
+    std::shared_ptr<std::u32string> orig_str = cur_info[0].orig_string;
+    std::set<int> addon_names;
+    const std::u32string ia = U"/installaddon ";
+    size_t pos = orig_str->find(ia, 0);
+    while (pos != std::u32string::npos)
+    {
+        size_t newline_pos = orig_str->find(U'\n', pos + ia.size());
+        size_t space_pos = orig_str->find(U' ', pos + ia.size());
+        size_t end_pos = std::u32string::npos;
+        if (newline_pos != std::u32string::npos ||
+            space_pos != std::u32string::npos)
+        {
+            if (space_pos > newline_pos)
+                end_pos = newline_pos;
+            else
+                end_pos = space_pos;
+        }
+        else
+            end_pos = orig_str->size();
+        for (size_t p = pos + ia.size(); p < end_pos; p++)
+            addon_names.insert((int)p);
+        pos = orig_str->find(ia, pos + ia.size());
+    }
+
+    for (gui::GlyphLayout& gl : cur_info)
+    {
+        for (int c : gl.cluster)
+        {
+            if (addon_names.find(c) != addon_names.end())
+            {
+                gl.flags |= gui::GLF_URL;
+                continue;
+            }
+        }
+    }
+
     gui::IGUIFont* font = GUIEngine::getFont();
     gui::breakGlyphLayouts(cur_info, box_width,
         font->getInverseShaping(), font->getScale());
