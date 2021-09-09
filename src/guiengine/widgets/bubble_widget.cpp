@@ -53,7 +53,16 @@ void BubbleWidget::add()
                                                       false, true /* word wrap */, m_parent,
                                                       (m_focusable ? getNewID() : getNewNoFocusID()));
     irrwidget->setTextRestrainedInside(false);
-    irrwidget->setMouseCallback(Online::LinkHelper::openURLIrrElement);
+    irrwidget->setMouseCallback([this](irr::gui::IGUIStaticText* text,
+                                       irr::SEvent::SMouseInput mouse)->bool
+    {
+        if (getText() != m_shrinked_text &&
+            stringw(text->getText()) == m_shrinked_text)
+        {
+            return false;
+        }
+        return Online::LinkHelper::openURLIrrElement(text, mouse);
+    });
 
     m_element = irrwidget;
     replaceText();
