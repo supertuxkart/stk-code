@@ -368,6 +368,14 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
         }
         else
             end_pos = orig_str->size();
+        std::u32string name = orig_str->substr(pos + ia.size(),
+            end_pos - pos - ia.size());
+        if (name.rfind(U"https://", 0) == 0 ||
+            name.rfind(U"http://", 0) == 0)
+        {
+            pos = orig_str->find(ia, pos + ia.size());
+            continue;
+        }
         for (size_t p = pos + ia.size(); p < end_pos; p++)
             addon_names.insert((int)p);
         pos = orig_str->find(ia, pos + ia.size());
