@@ -425,41 +425,35 @@ void RaceGUI::drawGlobalTimer()
     bool use_digit_font = true;
 
     float elapsed_time = World::getWorld()->getTime();
-    if (!RaceManager::get()->hasTimeTarget() ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG)
-    {
-        sw = core::stringw (
-            StringUtils::timeToString(elapsed_time).c_str() );
-    }
-    else
+    // In linear mode with a time target, the internal time
+    // still counts up but needs to be displayed down.
+    if (RaceManager::get()->hasTimeTarget() &&
+        RaceManager::get()->isLinearRaceMode())
     {
         float time_target = RaceManager::get()->getTimeTarget();
-        if (elapsed_time < time_target)
+        elapsed_time = time_target - elapsed_time;
+    }
+
+    sw = core::stringw (StringUtils::timeToString(elapsed_time).c_str() );
+
+    if (RaceManager::get()->hasTimeTarget())
+    {
+        // This assumes only challenges have a time target
+        // and don't end the race when reaching the target.
+        if (elapsed_time < 0) 
         {
-            if(time_target-elapsed_time <= 5)
-                time_color = video::SColor(255,255,255,0);
-            sw = core::stringw (
-              StringUtils::timeToString(time_target - elapsed_time).c_str());
-        }
-        else
-        {
-            sw = _("Challenge Failed");
-            int string_width =
-                GUIEngine::getFont()->getDimension(sw.c_str()).Width;
+            sw = _("Challenge Failed"); // We just overwrite the default case
+            int string_width = GUIEngine::getFont()->getDimension(sw.c_str()).Width;
             dist_from_right = 10 + string_width;
             time_color = video::SColor(255,255,0,0);
             use_digit_font = false;
         }
-        
+        else if (elapsed_time <= 5)
+            time_color = video::SColor(255,255,160,0);
+        else if (elapsed_time <= 15)
+            time_color = video::SColor(255,255,255,0);
     }
-    if(elapsed_time <= 5 && RaceManager::get()->hasTimeTarget() && (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_SOCCER ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FREE_FOR_ALL ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_CAPTURE_THE_FLAG))
-    {
-        time_color = video::SColor(255,255,255,0);
-    }
+
     core::rect<s32> pos(irr_driver->getActualScreenSize().Width - dist_from_right,
                         irr_driver->getActualScreenSize().Height*2/100,
                         irr_driver->getActualScreenSize().Width,
