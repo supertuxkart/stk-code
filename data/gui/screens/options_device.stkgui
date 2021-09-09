@@ -60,7 +60,7 @@
                         <div height="1f" width="100%"  layout="horizontal-row">
                             <checkbox id="force_feedback"/>
                             <spacer width="3%"/>
-                            <label id="force_feedback_text" I18N="In the input configuration screen, for gamepad" text="Enable force feedback (if support)" word_wrap="true"/>
+                            <label id="force_feedback_text" I18N="In the input configuration screen, for gamepad" text="Enable force feedback (if supported)" word_wrap="true"/>
                         </div>
                     </div>
                 </div>

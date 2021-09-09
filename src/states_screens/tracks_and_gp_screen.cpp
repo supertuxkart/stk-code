@@ -106,7 +106,7 @@ void TracksAndGPScreen::eventCallback(Widget* widget, const std::string& name,
             const GrandPrixData* gp_data=grand_prix_manager->getGrandPrix(selection);
             if(gp_data->containsUnavailableTracks() && RaceManager::get()->getNumLocalPlayers()==1)
             {
-                new MessageDialog(_("You cannot play this grandprix because it contains tracks that aren't unlocked!"));
+                new MessageDialog(_("You cannot play this Grand Prix because it contains tracks that aren't unlocked!"));
             }
             else
             {
