@@ -410,6 +410,8 @@ void AddonsLoading::doInstall()
 void AddonsLoading::doUninstall()
 {
 #ifndef SERVER_ONLY
+    if (m_download_request)
+        m_download_request->cancel();
     m_download_request = nullptr;
     bool error = !addons_manager->uninstall(m_addon);
     if(error)
