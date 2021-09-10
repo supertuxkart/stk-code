@@ -1382,7 +1382,9 @@ namespace StringUtils
     std::string getUserAgentString()
     {
         std::string uagent(std::string("SuperTuxKart/") + STK_VERSION);
-#if defined(IOS_STK)
+#if defined(__SWITCH__)
+        uagent += (std::string)" (Switch)";
+#elif defined(IOS_STK)
         uagent += (std::string)" (iOS)";
 #elif defined(WIN32)
         uagent += (std::string)" (Windows)";
