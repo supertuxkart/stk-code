@@ -151,7 +151,7 @@ jobs:
           zip -r SuperTuxKart-${{ env.release_tag }}-mac.zip SuperTuxKart.app
       - name: Create release
         if: ${{ env.release_tag != '' }}
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.8.8
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           artifacts: "SuperTuxKart*.zip"

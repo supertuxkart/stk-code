@@ -279,7 +279,7 @@ jobs:
           & "C:\Program Files (x86)\NSIS\makensis.exe" x86_64.nsi
           & "C:\Program Files (x86)\NSIS\makensis.exe" aarch64.nsi
       - name: Create release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.8.8
         if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

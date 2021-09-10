@@ -101,7 +101,7 @@ jobs:
           cd stk-code/switch
           PROJECT_VERSION="${{ env.release_tag }}" ./make.sh
       - name: Create release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@v1.8.8
         if: ${{ env.release_tag != '' }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
