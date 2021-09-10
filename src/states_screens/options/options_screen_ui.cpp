@@ -548,7 +548,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     }
     else if(name == "custom_camera")
     {
-        new CustomCameraSettingsDialog(0.8f, 0.9f);
+        new CustomCameraSettingsDialog(0.8f, 0.95f);
     }
 #endif
 }   // eventCallback
