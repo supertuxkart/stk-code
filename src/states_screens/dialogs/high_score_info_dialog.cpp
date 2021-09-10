@@ -47,6 +47,7 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
 {
     m_hs = highscore;
     m_major_mode = major_mode;
+    m_curr_time = 0.0f;
 
     loadFromFile("high_score_info_dialog.stkgui");
 
