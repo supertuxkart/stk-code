@@ -205,7 +205,8 @@ void RaceResultGUI::init()
 #endif
     
     if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
-        !NetworkConfig::get()->isNetworking())
+        !NetworkConfig::get()->isNetworking() &&
+        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL))
     {
         if (RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
            && !RaceManager::get()->getGrandPrix().isRandomGP())
