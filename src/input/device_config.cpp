@@ -319,7 +319,7 @@ bool DeviceConfig::load(const XMLNode *config)
         const XMLNode *action = config->getNode(i);
         if(action->getName()!="action")
         {
-            Log::warn("DeviceConfig", "Invalid configuration '%s' - ignored.");
+            Log::warn("DeviceConfig", "Invalid configuration '%s' - ignored.", action->getName().c_str());
             continue;
         }
         std::string name;
