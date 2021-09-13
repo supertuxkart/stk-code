@@ -33,6 +33,7 @@
 #include "states_screens/race_gui_base.hpp"
 #include "tracks/arena_graph.hpp"
 #include "tracks/arena_node.hpp"
+#include "tracks/terrain_info.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
@@ -40,6 +41,7 @@
 #include "utils/translation.hpp"
 
 #include <algorithm>
+#include <deque>
 #include <string>
 #include <IMeshSceneNode.h>
 
@@ -669,7 +671,9 @@ void ThreeStrikesBattle::loadCustomModels()
             // Don't create too many spare tire karts
             const unsigned int max_sta_num = unsigned(m_karts.size() * 0.8f);
             unsigned int pos_created = 0;
-            std::vector<int> used;
+            std::deque<int> sta_possible_nodes;
+            for (int i = 0; i < all_nodes; i++)
+                sta_possible_nodes.push_back(i);
             std::vector<btTransform> pos;
 
             // Fill all current starting position into used first
@@ -679,31 +683,62 @@ void ThreeStrikesBattle::loadCustomModels()
                 ag->findRoadSector(getRescueTransform(i).getOrigin(), &node,
                     NULL, true);
                 assert(node != -1);
-                used.push_back(node);
+                sta_possible_nodes.erase(std::remove_if(
+                    sta_possible_nodes.begin(), sta_possible_nodes.end(),
+                    [node](const int n) { return n == node; }),
+                    sta_possible_nodes.end());
             }
 
             // Find random nodes to pre-spawn spare tire karts
-            RandomGenerator random;
-            while (true)
+            std::random_shuffle(sta_possible_nodes.begin(),
+                sta_possible_nodes.end());
+
+            // Compute a random kart list
+            std::vector<std::string> sta_list;
+            kart_properties_manager->getRandomKartList(max_sta_num, NULL,
+                &sta_list);
+            if (sta_list.size() != max_sta_num)
+                return;
+
+            TerrainInfo terrain;
+            while (!sta_possible_nodes.empty())
             {
-                const int node = random.get(all_nodes);
-                if (std::find(used.begin(), used.end(), node) != used.end())
-                    continue;
+                const int node = sta_possible_nodes.front();
                 const ArenaNode* n = ag->getNode(node);
                 btTransform t;
                 t.setOrigin(n->getCenter());
                 t.setRotation(shortestArcQuat(Vec3(0, 1, 0), n->getNormal()));
+
+                // Make sure starting position is valid for spare tire karts,
+                // see #4615
+                terrain.update(t.getBasis(),
+                    t.getOrigin() + t.getBasis() * Vec3(0, 0.3f, 0));
+                Vec3 from = (Vec3)t.getOrigin();
+                const KartProperties* kp = kart_properties_manager->getKart(
+                    sta_list[pos.size()]);
+                if (!kp)
+                    return;
+                float kh = kp->getMasterKartModel().getHeight();
+                //start projection from top of kart
+                Vec3 up_offset = terrain.getNormal() * (0.5f * kh);
+                from += up_offset;
+                Vec3 down = t.getBasis() * Vec3(0, -10000.0f, 0);
+
+                Vec3 hit_point, normal;
+                if (!Track::getCurrentTrack()->isOnGround(from, down,
+                    &hit_point, &normal, false/*print_warning*/))
+                {
+                    sta_possible_nodes.pop_front();
+                    continue;
+                }
                 pos.push_back(t);
                 pos_created++;
-                used.push_back(node);
-                if (pos_created >= max_sta_num) break;
+                sta_possible_nodes.pop_front();
+                if (pos_created == max_sta_num) break;
             }
 
-            // Compute a random kart list
-            std::vector<std::string> sta_list;
-            kart_properties_manager->getRandomKartList((int)pos.size(), NULL,
-                                                       &sta_list);
-
+            if (pos_created != max_sta_num)
+                return;
             assert(sta_list.size() == pos.size());
             // Now add them
             for (unsigned int i = 0; i < pos.size(); i++)

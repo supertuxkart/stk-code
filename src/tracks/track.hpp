@@ -731,7 +731,7 @@ public:
     ItemManager* getItemManager() const        { return m_item_manager.get(); }
     // ------------------------------------------------------------------------
     bool isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
-                    Vec3* normal);
+                    Vec3* normal, bool print_warning = true);
 };   // class Track
 
 #endif

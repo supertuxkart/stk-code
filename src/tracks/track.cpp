@@ -2735,7 +2735,7 @@ const core::vector3df& Track::getSunRotation()
 
 //-----------------------------------------------------------------------------
 bool Track::isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
-                       Vec3* normal)
+                       Vec3* normal, bool print_warning)
 {
     // Material and hit point are not needed;
     const Material *m;
@@ -2751,8 +2751,11 @@ bool Track::isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
 
     if (!over_ground && !over_driveable)
     {
-        Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
-                  xyz.getX(),xyz.getY(),xyz.getZ());
+        if (print_warning)
+        {
+            Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
+                xyz.getX(),xyz.getY(),xyz.getZ());
+        }
         return false;
     }
 
@@ -2760,9 +2763,12 @@ bool Track::isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
     // a reset. If so, this is not a valid position.
     if(m && m->isDriveReset())
     {
-        Log::warn("physics","Kart at (%f %f %f) over reset terrain '%s'",
-                   xyz.getX(),xyz.getY(),xyz.getZ(),
-                   m->getTexFname().c_str());
+        if (print_warning)
+        {
+            Log::warn("physics","Kart at (%f %f %f) over reset terrain '%s'",
+                xyz.getX(),xyz.getY(),xyz.getZ(),
+                m->getTexFname().c_str());
+        }
         return false;
     }
 
@@ -2770,10 +2776,13 @@ bool Track::isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
     // too long.
     if(xyz.getY() - hit_point->getY() > 5)
     {
-        Log::warn("physics",
-                  "Kart at (%f %f %f) is too high above ground at (%f %f %f)",
-                  xyz.getX(),xyz.getY(),xyz.getZ(),
-                  hit_point->getX(),hit_point->getY(),hit_point->getZ());
+        if (print_warning)
+        {
+            Log::warn("physics",
+                "Kart at (%f %f %f) is too high above ground at (%f %f %f)",
+                xyz.getX(),xyz.getY(),xyz.getZ(),
+                hit_point->getX(),hit_point->getY(),hit_point->getZ());
+        }
         return false;
     }
     return true;
