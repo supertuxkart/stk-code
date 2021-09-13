@@ -269,7 +269,6 @@ int Highscores::addGPData(const std::string& kart_name,
         m_name[position]      = name;
         m_time[position]      = time;
         m_kart_name[position] = kart_name;
-        Log::info("addGPData","Type: %d",(int)m_gp_reverse_type);
     }
 
     return position+1;
