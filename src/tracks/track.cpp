@@ -2732,30 +2732,22 @@ const core::vector3df& Track::getSunRotation()
 {
     return m_sun->getRotation();
 }
+
 //-----------------------------------------------------------------------------
-/** Determines if the kart is over ground.
- *  Used in setting the starting positions of all the karts.
- *  \param k The kart to project downward.
- *  \return True of the kart is on terrain.
- */
-
-bool Track::findGround(AbstractKart *kart)
+bool Track::isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
+                       Vec3* normal)
 {
-    const Vec3 &xyz = kart->getXYZ();
-    Vec3 down = kart->getTrans().getBasis() * Vec3(0, -10000.0f, 0);
-
     // Material and hit point are not needed;
     const Material *m;
-    Vec3 hit_point, normal;
-    bool over_ground = m_track_mesh->castRay(xyz, down, &hit_point,
-                                             &m, &normal);
+    bool over_ground = m_track_mesh->castRay(xyz, down, hit_point,
+                                             &m, normal);
 
     // Now also raycast against all track objects (that are driveable). If
     // there should be a closer result (than the one against the main track
     // mesh), its data will be returned.
     // From TerrainInfo::update
     bool over_driveable = m_track_object_manager->castRay(xyz, down,
-        &hit_point, &m, &normal, /*interpolate*/false);
+        hit_point, &m, normal, /*interpolate*/false);
 
     if (!over_ground && !over_driveable)
     {
@@ -2776,14 +2768,32 @@ bool Track::findGround(AbstractKart *kart)
 
     // See if the kart is too high above the ground - it would drop
     // too long.
-    if(xyz.getY() - hit_point.getY() > 5)
+    if(xyz.getY() - hit_point->getY() > 5)
     {
         Log::warn("physics",
                   "Kart at (%f %f %f) is too high above ground at (%f %f %f)",
                   xyz.getX(),xyz.getY(),xyz.getZ(),
-                  hit_point.getX(),hit_point.getY(),hit_point.getZ());
+                  hit_point->getX(),hit_point->getY(),hit_point->getZ());
         return false;
     }
+    return true;
+}   // isOnGround
+
+//-----------------------------------------------------------------------------
+/** Determines if the kart is over ground.
+ *  Used in setting the starting positions of all the karts.
+ *  \param k The kart to project downward.
+ *  \return True of the kart is on terrain.
+ */
+
+bool Track::findGround(AbstractKart *kart)
+{
+    const Vec3 &xyz = kart->getXYZ();
+    Vec3 down = kart->getTrans().getBasis() * Vec3(0, -10000.0f, 0);
+
+    Vec3 hit_point, normal;
+    if (!isOnGround(xyz, down, &hit_point, &normal))
+        return false;
 
     btTransform t = kart->getBody()->getCenterOfMassTransform();
     // The computer offset is slightly too large, it should take
