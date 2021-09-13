@@ -31,7 +31,7 @@
 #include "utils/translation.hpp"
 
 HighscoreManager* highscore_manager=0;
-const unsigned int HighscoreManager::CURRENT_HSCORE_FILE_VERSION = 4;
+const unsigned int HighscoreManager::CURRENT_HSCORE_FILE_VERSION = 5;
 
 HighscoreManager::HighscoreManager()
 {
@@ -201,3 +201,27 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType &hig
     m_all_scores.push_back(std::unique_ptr<Highscores>(highscores));
     return highscores;
 }   // getHighscores
+// -----------------------------------------------------------------------------
+Highscores* HighscoreManager::getGPHighscores(int num_karts,
+                                              const RaceManager::Difficulty difficulty,
+                                              const std::string &trackName,
+                                              GrandPrixData::GPReverseType reverse_type)
+{
+    Highscores *highscores = 0;
+
+    // See if we already have a record for this type
+    for (auto& hs : m_all_scores)
+    {
+        if (hs->matches(num_karts, difficulty, trackName, reverse_type))
+        {
+            // we found one entry for this kind of race, return it
+            return hs.get();
+        }
+    }   // for i in m_all_scores
+
+    // we don't have an entry for such a race currently. Create one.
+    highscores = new Highscores(num_karts, difficulty,
+                                trackName, reverse_type);
+    m_all_scores.push_back(std::unique_ptr<Highscores>(highscores));
+    return highscores;
+}   // get

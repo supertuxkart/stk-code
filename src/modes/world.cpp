@@ -1271,13 +1271,10 @@ Highscores* World::getHighscores() const
 // ---------------------------------------------------------------------------
 Highscores* World::getGPHighscores() const
 {
-    const Highscores::HighscoreType type = "HST_GRANDPRIX";
-    Highscores* highscores = highscore_manager->getHighscores(type,
-                                                              RaceManager::get()->getNumNonGhostKarts(),
-                                                              RaceManager::get()->getDifficulty(),
-                                                              RaceManager::get()->getGrandPrix().getId(),
-                                                              0,
-                                                              RaceManager::get()->getGrandPrix().getReverseType() == GrandPrixData::GP_ALL_REVERSE);
+    Highscores* highscores = highscore_manager->getGPHighscores(RaceManager::get()->getNumNonGhostKarts(),
+                                                                RaceManager::get()->getDifficulty(),
+                                                                RaceManager::get()->getGrandPrix().getId(),
+                                                                RaceManager::get()->getGrandPrix().getReverseType());
     return highscores;
 }
 
