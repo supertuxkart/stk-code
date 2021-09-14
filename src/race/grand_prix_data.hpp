@@ -169,6 +169,7 @@ public:
                                       const { return m_reverse_type;           }
     static const char*        getRandomGPID()   { return "random";             }
     static irr::core::stringw getRandomGPName();
+    static irr::core::stringw reverseTypeToString(GPReverseType reverse_type);
 };   // GrandPrixData
 
 #endif

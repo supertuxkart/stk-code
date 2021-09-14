@@ -59,6 +59,12 @@ public:
                               const int number_of_laps,
                               const bool reverse);
     // ------------------------------------------------------------------------
+    /** getHighscores method for grandprix highscores */
+    Highscores *getGPHighscores(int num_karts,
+                                const RaceManager::Difficulty difficulty,
+                                const std::string &trackName,
+                                GrandPrixData::GPReverseType reverse_type);
+    // ------------------------------------------------------------------------
     void deleteHighscores(int i)        { m_all_scores.erase
                                         (m_all_scores.begin() + i); }
     // ------------------------------------------------------------------------

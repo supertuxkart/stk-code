@@ -242,8 +242,16 @@ void HighScoreSelection::loadList()
                 row.push_back(GUIEngine::ListWidget::ListCell
                     (StringUtils::toWString(hs->m_number_of_laps), -1, 3, true));
             }
+            if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            {
+                row.push_back(GUIEngine::ListWidget::ListCell(
+                    GrandPrixData::reverseTypeToString((GrandPrixData::GPReverseType)hs->m_gp_reverse_type), -1, 3, true));
+            }
+            else
+            {
                 row.push_back(GUIEngine::ListWidget::ListCell
                     (hs->m_reverse ? _("Yes") : _("No"), -1, 3, true));
+            }
         }
         m_high_scores_list_widget->addItem(StringUtils::toString(i), row);
     }

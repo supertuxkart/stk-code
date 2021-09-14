@@ -126,9 +126,17 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
             m_num_laps_label->setVisible(true);
             m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
         }
-            stringw is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
-            m_reverse_label->setVisible(true);
-            m_reverse_label->setText(_("Reverse: %s", is_reverse), true);
+        stringw is_reverse;
+        if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        {
+            is_reverse = GrandPrixData::reverseTypeToString((GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
+        }
+        else
+        {
+            is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
+        }
+        m_reverse_label->setVisible(true);
+        m_reverse_label->setText(_("Reverse: %s", is_reverse), true);
     }
     else
     {
