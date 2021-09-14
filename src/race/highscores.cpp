@@ -44,6 +44,7 @@ Highscores::Highscores(const HighscoreType &highscore_type,
     m_difficulty      = difficulty;
     m_number_of_laps  = number_of_laps;
     m_reverse         = reverse;
+    m_gp_reverse_type = (int)GrandPrixData::GP_DEFAULT_REVERSE;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
@@ -62,6 +63,7 @@ Highscores::Highscores(int num_karts, const RaceManager::Difficulty &difficulty,
     m_number_of_karts = num_karts;
     m_difficulty      = difficulty;
     m_number_of_laps  = 0;
+    m_reverse         = false;
     m_gp_reverse_type = reverse_type;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
@@ -80,6 +82,7 @@ Highscores::Highscores(const XMLNode &node)
     m_difficulty      = -1;
     m_number_of_laps  = 0;
     m_reverse         = false;
+    m_gp_reverse_type = (int)GrandPrixData::GP_DEFAULT_REVERSE;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
