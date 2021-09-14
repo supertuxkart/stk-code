@@ -108,6 +108,7 @@ public:
     virtual void onUpdate(float dt) OVERRIDE;
 
     void setGP(const std::string &gp_ident);
+    virtual void unloaded() OVERRIDE;
 };   // GPInfoScreen
 
 #endif

@@ -511,3 +511,10 @@ void GPInfoScreen::updateHighscores()
         m_highscore_list->addItem(StringUtils::toString(i),row);
     }
 }   // updateHighscores
+
+// -----------------------------------------------------------------------
+void GPInfoScreen::unloaded()
+{
+    delete m_icon_bank;
+    m_icon_bank = NULL;
+}   // unloaded
