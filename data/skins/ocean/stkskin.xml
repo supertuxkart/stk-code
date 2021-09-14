@@ -64,7 +64,7 @@ when the border that intersect at this corner are enabled.
 
 -->
 
-<skin name="Ocean" author="Dakal & Marianne Gagnon (Auria)">
+<skin name="Classic - Ocean" author="Dakal & Marianne Gagnon (Auria)">
 
 <!--  Stateless -->
 <element type="background" common="y" image="background.jpg" />

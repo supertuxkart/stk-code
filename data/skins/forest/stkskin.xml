@@ -65,7 +65,7 @@ when the border that intersect at this corner are enabled.
 
 -->
 
-<skin name="Forest" author="Benau">
+<skin name="Classic - Forest" author="Benau">
 
 <!--  Stateless -->
 <element type="background" common="y" image="background.jpg" />

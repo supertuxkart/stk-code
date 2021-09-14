@@ -1183,7 +1183,7 @@ namespace UserConfigParams
                            "If debug logging should be enabled for rich presence") );
 
     PARAM_PREFIX StringUserConfigParam      m_skin_file
-            PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_name",
+            PARAM_DEFAULT(  StringUserConfigParam("cartoon", "gui_skin_name",
                                                   "Name of the skin to use") );
 
     PARAM_PREFIX IntUserConfigParam        m_minimap_display

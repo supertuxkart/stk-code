@@ -65,7 +65,7 @@ when the border that intersect at this corner are enabled.
 When there is a common="y" with image tag, the image will be loaded only from data/skins/common in stk-code.
 -->
 
-<skin name="Peach" author="Dakal & Marianne Gagnon (Auria)">
+<skin name="Classic - Peach" author="Dakal & Marianne Gagnon (Auria)">
 
 <!--
 Here you can configure advanced theming rules for this skin
