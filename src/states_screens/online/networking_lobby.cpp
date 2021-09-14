@@ -347,12 +347,20 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
         gui::SF_ENABLE_CLUSTER_TEST);
 
     // Highlight addon name from /installaddon
-    if (cur_info.empty() || !cur_info[0].orig_string)
-        return;
-    std::shared_ptr<std::u32string> orig_str = cur_info[0].orig_string;
     std::set<int> addon_names;
     const std::u32string ia = U"/installaddon ";
-    size_t pos = orig_str->find(ia, 0);
+    size_t pos = 0;
+    std::shared_ptr<std::u32string> orig_str;
+    for (gui::GlyphLayout& gl : cur_info)
+    {
+        orig_str = gl.orig_string;
+        if (orig_str)
+            break;
+    }
+    if (!orig_str)
+        goto break_glyph_layouts;
+
+    pos = orig_str->find(ia, 0);
     while (pos != std::u32string::npos)
     {
         size_t newline_pos = orig_str->find(U'\n', pos + ia.size());
@@ -393,6 +401,7 @@ void NetworkingLobby::addMoreServerInfo(core::stringw info)
         }
     }
 
+break_glyph_layouts:
     gui::IGUIFont* font = GUIEngine::getFont();
     gui::breakGlyphLayouts(cur_info, box_width,
         font->getInverseShaping(), font->getScale());
