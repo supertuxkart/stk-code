@@ -63,7 +63,7 @@ public:
     void           remove(const std::string& id);
     // ------------------------------------------------------------------------
     /** Returns a pointer to the data for the specified GP.
-    *  \param i Index of the GP. */
+    *  \param s Name of the GP. */
     const GrandPrixData* getGrandPrix(const std::string& s) const;
     // ------------------------------------------------------------------------
     /** Returns a pointer to the data for the specified GP.
