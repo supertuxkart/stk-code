@@ -1938,8 +1938,9 @@ void RaceResultGUI::unload()
         }   // if not soccer mode
 
         // Display challenge result and goals
+        bool is_gp = RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX;
         if(RaceManager::get()->raceWasStartedFromOverworld() &&
-            (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+            (!is_gp ||
             RaceManager::get()->getTrackNumber() + 1 == RaceManager::get()->getNumOfTracks()))
         {
             current_y += int(m_distance_between_meta_rows * 0.4f);
@@ -1952,15 +1953,33 @@ void RaceResultGUI::unload()
             video::SColor special_color = video::SColor(255, 0, 255, 255);
             AbstractKart* kart = World::getWorld()->getPlayerKart(0);
             bool lose_all = false;
+            bool position_passed = false;
+            bool time_passed = false;
+            bool energy_passed = false;
 
-            if (kart->isEliminated())
+            if (is_gp)
+            {
+                // GP has no best while slower
                 lose_all = true;
-            bool position_passed = (kart->getPosition() <= c_data->getMaxPosition(difficulty) && lose_all == false)
+                if (RaceManager::get()->getKartGPRank(kart->getWorldKartId()) == 0)
+                {
+                    position_passed = true;
+                    time_passed = true;
+                    energy_passed = true;
+                }
+            }
+            else
+            {
+                if (kart->isEliminated())
+                    lose_all = true;
+                position_passed = (kart->getPosition() <= c_data->getMaxPosition(difficulty) && lose_all == false)
                                 || c_data->getMaxPosition(difficulty) == -1;
-            bool time_passed = (kart->getFinishTime() <= c_data->getTimeRequirement(difficulty) && lose_all == false)
+                time_passed = (kart->getFinishTime() <= c_data->getTimeRequirement(difficulty) && lose_all == false)
                                 || c_data->getTimeRequirement(difficulty) <= 0.0f;
-            bool energy_passed = (kart->getEnergy() >= c_data->getEnergy(difficulty) && lose_all == false)
+                energy_passed = (kart->getEnergy() >= c_data->getEnergy(difficulty) && lose_all == false)
                                 || c_data->getEnergy(difficulty) <= 0;
+            }
+
             bool all_passed = position_passed && time_passed && energy_passed;
 
             core::stringw text_string = all_passed ? _("You completed the challenge!") : _("You failed the challenge!");
