@@ -86,6 +86,7 @@ Attachment::Attachment(AbstractKart* kart)
  */
 Attachment::~Attachment()
 {
+    clear();
     if(m_node)
         irr_driver->removeNode(m_node);
 
