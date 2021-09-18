@@ -131,6 +131,7 @@ RaceManager::RaceManager()
     m_hit_capture_limit = 0;
     m_flag_return_ticks = stk_config->time2Ticks(20.0f);
     m_flag_deactivated_ticks = stk_config->time2Ticks(3.0f);
+    m_skipped_tracks_in_gp = 0;
     setMaxGoal(0);
     setTimeTarget(0.0f);
     setReverseTrack(false);
@@ -419,6 +420,7 @@ void RaceManager::startNew(bool from_overworld)
                     m_grand_prix.changeReverse((GrandPrixData::GPReverseType)
                                                 m_saved_gp->getReverseType());
                     m_reverse_track = m_grand_prix.getReverse();
+                    m_skipped_tracks_in_gp = m_saved_gp->getSkippedTracks();
                 }   // if m_saved_gp==NULL
             }   // if m_continue_saved_gp
         }   // if !network_world
@@ -743,6 +745,7 @@ void RaceManager::saveGP()
             (int)m_player_karts.size(),
             m_track_number,
             m_grand_prix.getReverseType(),
+            m_skipped_tracks_in_gp,
             m_kart_status);
 
         // If a new GP is saved, delete any other saved data for this
@@ -1045,6 +1048,8 @@ void RaceManager::startGP(const GrandPrixData &gp, bool from_overworld,
     setGrandPrix(gp);
     setupPlayerKartInfo();
     m_continue_saved_gp = continue_saved_gp;
+    if (!continue_saved_gp)
+        m_skipped_tracks_in_gp = 0;
 
     setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
     startNew(from_overworld);

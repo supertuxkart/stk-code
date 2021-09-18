@@ -382,6 +382,8 @@ GUIEngine::EventPropagation
         else if (selection == "endrace")
         {
             ModalDialog::dismiss();
+            if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+                RaceManager::get()->addSkippedTrackInGP();
             World::getWorld()->getRaceGUI()->removeReferee();
             World::getWorld()->endRaceEarly();
             return GUIEngine::EVENT_BLOCK;

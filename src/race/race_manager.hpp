@@ -339,6 +339,7 @@ private:
     float                            m_time_target;
     int                              m_goal_target;
     int                              m_hit_capture_limit;
+    int                              m_skipped_tracks_in_gp;
     void startNextRace();    // start a next race
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)
@@ -894,6 +895,10 @@ public:
     // ----------------------------------------------------------------------------------------
     unsigned getFlagDeactivatedTicks() const
                                            { return m_flag_deactivated_ticks; }
+    // ----------------------------------------------------------------------------------------
+    int getSkippedTracksInGP() const { return m_skipped_tracks_in_gp; }
+    // ----------------------------------------------------------------------------------------
+    void addSkippedTrackInGP() { m_skipped_tracks_in_gp++; }
     // ----------------------------------------------------------------------------------------
     /** Whether the current game mode allow live joining even the current game
      *. started in network*/

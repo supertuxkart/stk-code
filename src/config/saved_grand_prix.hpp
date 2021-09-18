@@ -82,6 +82,9 @@ protected:
     /** GPReverseType of the GP as int */
     IntUserConfigParam          m_reverse_type;
 
+    /** Count of tracks that player skipped */
+    IntUserConfigParam          m_skipped_tracks;
+
     PtrVector<SavedGPKart> m_karts;
 
 public:
@@ -96,6 +99,7 @@ public:
                    int player_karts,
                    int last_track,
                    int reverse_type,
+                   int skipped_tracks,
                    const std::vector<RaceManager::KartStatus> &kart_list);
 
     /**
@@ -137,6 +141,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the reverse Type. */
     int getReverseType() const { return m_reverse_type; }
+
+    // ------------------------------------------------------------------------
+    /** Returns skipped tracks count */
+    int getSkippedTracks() const { return m_skipped_tracks; }
 
     // ------------------------------------------------------------------------
     /** Sets the index of the last track finished. */

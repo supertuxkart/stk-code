@@ -209,7 +209,7 @@ void RaceResultGUI::init()
         (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL))
     {
         if (RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
-           && !RaceManager::get()->getGrandPrix().isRandomGP())
+           && !RaceManager::get()->getGrandPrix().isRandomGP() && RaceManager::get()->getSkippedTracksInGP() == 0)
         {
             Highscores* highscores = World::getWorld()->getGPHighscores();
             const AbstractKart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
