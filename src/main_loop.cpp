@@ -129,6 +129,7 @@ MainLoop::~MainLoop()
 }   // ~MainLoop
 
 #ifdef MOBILE_STK
+extern "C" void update_swap_interval(int swap_interval);
 //-----------------------------------------------------------------------------
 extern "C" void pause_mainloop()
 {
@@ -168,6 +169,8 @@ extern "C" void resume_mainloop()
     if (World::getWorld() && RewindManager::isEnabled())
         RewindManager::get()->resetSmoothNetworkBody();
     Online::RequestManager::get()->setPaused(false);
+    // Android atm needs this to reset the swap interval when changing activity
+    update_swap_interval(UserConfigParams::m_swap_interval);
 }  // resume_mainloop
 #endif
 
