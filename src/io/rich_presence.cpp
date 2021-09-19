@@ -475,7 +475,7 @@ void RichPresence::update(bool force)
     HardwareStats::Json activity;
 
     std::string trackName = _("Getting ready to race");
-    Track* track;
+    Track* track = nullptr;
     if (world)
     {
         track = track_manager->getTrack(trackId);
