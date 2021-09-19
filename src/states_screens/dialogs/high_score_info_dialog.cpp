@@ -187,7 +187,16 @@ void HighScoreInfoDialog::updateHighscoreEntries()
         {
             m_hs->getEntry(n, kart_name, name, &time);
 
-            std::string time_string = StringUtils::timeToString(time, time_precision);
+            std::string time_string;
+            if (time > 60.0f * 60.0f)
+            {
+                time_string = StringUtils::timeToString(time, time_precision,
+                    /*display_minutes_if_zero*/true, /*display_hours*/true);
+            }
+            else
+            {
+                time_string = StringUtils::timeToString(time, time_precision);
+            }
 
             for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
             {
