@@ -472,7 +472,8 @@ void GPInfoScreen::updateHighscores()
                                                                 RaceManager::get()->getNumberOfKarts(),
                                                                 RaceManager::get()->getDifficulty(),
                                                                 m_gp.getId(),
-                                                                getReverse());
+                                                                getReverse(),
+                                                                RaceManager::get()->getMinorMode());
     m_highscore_list->clear();
     int count = highscores->getNumberEntries();
     std::string kart;

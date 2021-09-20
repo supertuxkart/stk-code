@@ -205,14 +205,15 @@ Highscores* HighscoreManager::getHighscores(const Highscores::HighscoreType &hig
 Highscores* HighscoreManager::getGPHighscores(int num_karts,
                                               const RaceManager::Difficulty difficulty,
                                               const std::string &trackName,
-                                              GrandPrixData::GPReverseType reverse_type)
+                                              GrandPrixData::GPReverseType reverse_type,
+                                              RaceManager::MinorRaceModeType minor_mode)
 {
     Highscores *highscores = 0;
 
     // See if we already have a record for this type
     for (auto& hs : m_all_scores)
     {
-        if (hs->matches(num_karts, difficulty, trackName, reverse_type))
+        if (hs->matches(num_karts, difficulty, trackName, reverse_type, minor_mode))
         {
             // we found one entry for this kind of race, return it
             return hs.get();
@@ -221,7 +222,7 @@ Highscores* HighscoreManager::getGPHighscores(int num_karts,
 
     // we don't have an entry for such a race currently. Create one.
     highscores = new Highscores(num_karts, difficulty,
-                                trackName, reverse_type);
+                                trackName, reverse_type, minor_mode);
     m_all_scores.push_back(std::unique_ptr<Highscores>(highscores));
     return highscores;
 }   // get
