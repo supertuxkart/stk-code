@@ -1252,9 +1252,6 @@ void RaceResultGUI::unload()
 #ifndef SERVER_ONLY
         unsigned int num_karts = RaceManager::get()->getNumberOfKarts();
         std::vector<int> old_rank(num_karts, 0);
-        // Update the kart GP ranks
-        // This is useful, e.g., when continuing a saved GP.
-        RaceManager::get()->computeGPRanks();
 
         int time_precision = RaceManager::get()->currentModeTimePrecision();
 

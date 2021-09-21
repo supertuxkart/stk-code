@@ -499,6 +499,9 @@ void RaceManager::startNew(bool from_overworld)
             if (next_track < (int)m_tracks.size())
                 m_track_number = next_track;
             m_saved_gp->loadKarts(m_kart_status);
+            // Update the kart GP ranks
+            // This is useful, e.g., when continuing a saved GP, see #2776
+            computeGPRanks();
         }
         else 
         {
