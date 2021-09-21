@@ -1274,7 +1274,8 @@ Highscores* World::getGPHighscores() const
     Highscores* highscores = highscore_manager->getGPHighscores(RaceManager::get()->getNumNonGhostKarts(),
                                                                 RaceManager::get()->getDifficulty(),
                                                                 RaceManager::get()->getGrandPrix().getId(),
-                                                                RaceManager::get()->getGrandPrix().getReverseType());
+                                                                RaceManager::get()->getGrandPrix().getReverseType(),
+                                                                RaceManager::get()->getMinorMode());
     return highscores;
 }
 
