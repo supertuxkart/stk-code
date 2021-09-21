@@ -45,6 +45,7 @@ Highscores::Highscores(const HighscoreType &highscore_type,
     m_number_of_laps  = number_of_laps;
     m_reverse         = reverse;
     m_gp_reverse_type = (int)GrandPrixData::GP_DEFAULT_REVERSE;
+    m_gp_minor_mode   = (int)RaceManager::MINOR_MODE_NORMAL_RACE;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
