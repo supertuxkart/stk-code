@@ -373,6 +373,16 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         const std::string& action =
             getWidget<GUIEngine::RibbonWidget>("operations")->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if (m_animation_state == RR_WAITING_GP_RESULT && action == "left")
+        {
+            GUIEngine::IconButtonWidget *left = getWidget<GUIEngine::IconButtonWidget>("left");
+            left->setVisible(false);
+            m_all_row_infos = m_all_row_info_waiting;
+            m_animation_state = RR_OLD_GP_RESULTS;
+            m_timer = 0;
+            return;
+        }
+
         // If we're playing online :
         if (World::getWorld()->isNetworkWorld())
         {
@@ -1095,10 +1105,21 @@ void RaceResultGUI::unload()
                     break;
                 }
 
+                m_animation_state = RR_WAITING_GP_RESULT;
+                std::vector<RowInfo> prev_infos = m_all_row_infos;
                 determineGPLayout();
-                m_animation_state = RR_OLD_GP_RESULTS;
-                m_timer = 0;
+                m_all_row_info_waiting = m_all_row_infos;
+                m_all_row_infos = prev_infos;
+                GUIEngine::IconButtonWidget *left = getWidget<GUIEngine::IconButtonWidget>("left");
+                GUIEngine::RibbonWidget *operations = getWidget<GUIEngine::RibbonWidget>("operations");
+                operations->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+                left->setLabel(_("Continue"));
+                left->setImage("gui/icons/green_check.png");
+                left->setVisible(true);
+                operations->select("left", PLAYER_ID_GAME_MASTER);
             }
+            break;
+        case RR_WAITING_GP_RESULT:
             break;
         case RR_OLD_GP_RESULTS:
             if (m_timer > m_time_overall_scroll)
@@ -1184,6 +1205,7 @@ void RaceResultGUI::unload()
                     // Both states use the same scrolling:
                 case RR_INIT: break;   // Remove compiler warning
                 case RR_RACE_RESULT:
+                case RR_WAITING_GP_RESULT:
                 case RR_OLD_GP_RESULTS:
                     if (m_timer > ri->m_start_at)
                     {   // if active
@@ -1230,7 +1252,7 @@ void RaceResultGUI::unload()
 
         // Display highscores
         if (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
-            m_animation_state == RR_RACE_RESULT)
+            m_animation_state == RR_WAITING_GP_RESULT)
         {
             displayPostRaceInfo();
         }
@@ -1400,7 +1422,8 @@ void RaceResultGUI::unload()
         // Only display points in GP mode and when the GP results are displayed.
         // =====================================================================
         if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
-            m_animation_state != RR_RACE_RESULT)
+            m_animation_state != RR_RACE_RESULT &&
+            m_animation_state != RR_WAITING_GP_RESULT)
         {
             // Draw the new points
             // -------------------
