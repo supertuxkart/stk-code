@@ -1229,14 +1229,8 @@ void RaceResultGUI::unload()
         }
 
         // Display highscores
-        if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        {
-            // After determineGPLayout the GP ranking in race manager is correct
-            if (m_animation_state >= RR_OLD_GP_RESULTS &&
-                m_animation_state <= RR_WAIT_TILL_END)
-                displayPostRaceInfo();
-        }
-        else if (m_animation_state >= RR_RACE_RESULT)
+        if (RaceManager::get()->getMajorMode() != RaceManager::MAJOR_MODE_GRAND_PRIX ||
+            m_animation_state == RR_RACE_RESULT)
         {
             displayPostRaceInfo();
         }
