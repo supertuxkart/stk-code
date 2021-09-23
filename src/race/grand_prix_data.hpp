@@ -104,7 +104,12 @@ public:
     GrandPrixData(const std::string& filename, enum GPGroupType group);
 
     /** Needed for simple creation of an instance of GrandPrixData */
-    GrandPrixData() {}
+    GrandPrixData()
+    {
+        m_editable = false;
+        m_group = GP_NONE;
+        m_reverse_type = GP_NO_REVERSE;
+    }
 
     virtual ~GrandPrixData() {}
     virtual std::vector<std::string> getTrackNames(const bool includeLocked=false) const;

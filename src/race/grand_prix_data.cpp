@@ -47,6 +47,7 @@ GrandPrixData::GrandPrixData(const std::string& filename, enum GPGroupType group
     m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
     m_group    = group;
+    m_reverse_type = GP_NO_REVERSE;
 
     reload();
 }   // GrandPrixData
