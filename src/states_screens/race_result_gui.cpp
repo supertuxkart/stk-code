@@ -1971,7 +1971,11 @@ void RaceResultGUI::unload()
             current_y += int(m_distance_between_meta_rows * 0.4f);
 
             const ChallengeStatus* c_stat = PlayerManager::getCurrentPlayer()->getCurrentChallengeStatus();
+            if (!c_stat)
+                return;
             const ChallengeData* c_data = c_stat->getData();
+            if (!c_data)
+                return;
             RaceManager::Difficulty difficulty = RaceManager::get()->getDifficulty();
             video::SColor win_color = video::SColor(255, 0, 255, 0);
             video::SColor lose_color = video::SColor(255, 255, 0, 0);
