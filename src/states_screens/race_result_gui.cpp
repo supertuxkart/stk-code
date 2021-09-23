@@ -1981,7 +1981,7 @@ void RaceResultGUI::unload()
             {
                 // GP has no best while slower
                 lose_all = true;
-                if (RaceManager::get()->getKartGPRank(kart->getWorldKartId()) == 0)
+                if (c_data->isGPFulfilled())
                 {
                     position_passed = true;
                     time_passed = true;
