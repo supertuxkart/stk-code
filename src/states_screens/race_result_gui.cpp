@@ -1072,6 +1072,7 @@ void RaceResultGUI::unload()
         m_timer += dt;
         assert(World::getWorld()->getPhase() == WorldStatus::RESULT_DISPLAY_PHASE);
         unsigned int num_karts = (unsigned int)m_all_row_infos.size();
+        float time_overall_scroll = m_time_overall_scroll;
 
         // First: Update the finite state machine
         // ======================================
@@ -1088,7 +1089,11 @@ void RaceResultGUI::unload()
             m_animation_state = RR_RACE_RESULT;
             break;
         case RR_RACE_RESULT:
-            if (m_timer > m_time_overall_scroll)
+            // GP mode has a continue button so no extra time is needed
+            if (RaceManager::get()->getMajorMode() ==
+                RaceManager::MAJOR_MODE_GRAND_PRIX)
+                time_overall_scroll -= 2.0f;
+            if (m_timer > time_overall_scroll)
             {
                 // Make sure that all lines are aligned to the left
                 // (in case that the animation was skipped).
