@@ -1683,6 +1683,17 @@ void ClientLobby::handleClientCommand(const std::string& cmd)
         else
             music_manager->setMasterMusicVolume((float)vol / 10);
     }
+    else if (argv[0] == "addonrevision" && argv.size() == 2)
+    {
+        Addon* addon = addons_manager->getAddon(Addon::createAddonId(argv[1]));
+        if (!addon)
+            return;
+        core::stringw ret = addon->getName();
+        ret += core::stringw(L": revision ") +
+            core::stringw(addon->getInstalledRevision()) +
+            L"/" + core::stringw(addon->getRevision());
+        NetworkingLobby::getInstance()->addMoreServerInfo(ret);
+    }
     else if (argv[0] == "liststkaddon")
     {
         if (argv.size() > 3)
