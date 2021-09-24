@@ -870,11 +870,20 @@ namespace UserConfigParams
         "(for gui server creation."));
      PARAM_PREFIX IntUserConfigParam m_timer_sync_difference_tolerance
         PARAM_DEFAULT(IntUserConfigParam(5, "timer-sync-difference-tolerance",
-        &m_network_group, "Max time difference tolerance (in ms) to synchronize timer with server."));
+        &m_network_group, "Max time difference tolerance (in ms) to "
+        "synchronize timer with server."));
     PARAM_PREFIX IntUserConfigParam m_default_ip_type
         PARAM_DEFAULT(IntUserConfigParam(0, "default-ip-type",
         &m_network_group, "Default IP type of this machine, "
         "0 detect every time, 1 IPv4, 2 IPv6, 3 IPv6 NAT64, 4 Dual stack."));
+    PARAM_PREFIX BoolUserConfigParam m_lan_server_gp
+        PARAM_DEFAULT(BoolUserConfigParam(false, "lan-server-gp",
+        &m_network_group, "Show grand prix option in create LAN server "
+        "screen, false will show AI option."));
+    PARAM_PREFIX BoolUserConfigParam m_wan_server_gp
+        PARAM_DEFAULT(BoolUserConfigParam(true, "wan-server-gp",
+        &m_network_group, "Show grand prix option in create WAN server "
+        "screen, false will show AI option."));
 
     // ---- Gamemode setup
     PARAM_PREFIX UIntToUIntUserConfigParam m_num_karts_per_gamemode

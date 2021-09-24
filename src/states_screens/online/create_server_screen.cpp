@@ -89,7 +89,11 @@ void CreateServerScreen::loadedFromFile()
 void CreateServerScreen::init()
 {
     Screen::init();
-    m_supports_ai = NetworkConfig::get()->isLAN();
+    if (NetworkConfig::get()->isLAN())
+        m_supports_ai = !UserConfigParams::m_lan_server_gp;
+    else
+        m_supports_ai = !UserConfigParams::m_wan_server_gp;
+
     m_info_widget->setText("", false);
     LabelWidget *title = getWidget<LabelWidget>("title");
 
