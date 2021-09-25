@@ -91,7 +91,8 @@ to just run:
     export SDK_PATH=/path/to/your/android/sdk
     export NDK_PATH=/path/to/your/android/ndk
     ./generate_assets.sh
-    ./make.sh -j5
+    ./make_deps.sh
+    ./make.sh -j $(($(nproc) + 1))
 
 
 
@@ -101,8 +102,8 @@ to just run:
 
 COMPILE_ARCH    - Allows one to choose CPU architecture for which the package will
                   be compiled. 
-                  Possible values: armv7, aarch64, x86, x86_64.
-                  Default is: armv7.
+                  Possible values: all, armv7, aarch64, x86, x86_64.
+                  Default is: all.
 
 BUILD_TYPE      - Allows one to set build type.
                   Possible values: debug, release, beta.
@@ -152,4 +153,5 @@ variables, so that the apk files can be signed.
 and then you make standard compilation with:
 
     ./generate_assets.sh
+    ./make_deps.sh
     ./make.sh -j $(($(nproc) + 1))

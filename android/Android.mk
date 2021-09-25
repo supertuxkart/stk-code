@@ -4,91 +4,91 @@ include $(CLEAR_VARS)
 
 # OpenAL
 LOCAL_MODULE := openal
-LOCAL_SRC_FILES := obj/openal/libopenal.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/openal/libopenal.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # OGG
 LOCAL_MODULE := ogg
-LOCAL_SRC_FILES := obj/libogg/libogg.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/libogg/libogg.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # Vorbis
 LOCAL_MODULE := vorbis
-LOCAL_SRC_FILES := obj/libvorbis/lib/libvorbis.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/libvorbis/lib/libvorbis.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # Vorbisfile
 LOCAL_MODULE := vorbisfile
-LOCAL_SRC_FILES := obj/libvorbis/lib/libvorbisfile.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/libvorbis/lib/libvorbisfile.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # CURL
 LOCAL_MODULE := curl
-LOCAL_SRC_FILES := obj/curl/lib/libcurl.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/curl/lib/libcurl.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # libmbedtls
 LOCAL_MODULE := libmbedtls
-LOCAL_SRC_FILES := obj/mbedtls/library/libmbedtls.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/mbedtls/library/libmbedtls.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # libmbedcrypto
 LOCAL_MODULE := libmbedcrypto
-LOCAL_SRC_FILES := obj/mbedtls/library/libmbedcrypto.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/mbedtls/library/libmbedcrypto.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # libmbedx509
 LOCAL_MODULE := libmbedx509
-LOCAL_SRC_FILES := obj/mbedtls/library/libmbedx509.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/mbedtls/library/libmbedx509.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # JPEG
 LOCAL_MODULE := libjpeg
-LOCAL_SRC_FILES := obj/libjpeg/libjpeg.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/libjpeg/libjpeg.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # zlib
 LOCAL_MODULE := zlib
-LOCAL_SRC_FILES := obj/zlib/libz.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/zlib/libz.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # PNG
 LOCAL_MODULE := png
-LOCAL_SRC_FILES := obj/libpng/libpng.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/libpng/libpng.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # Freetype
 LOCAL_MODULE := freetype
-LOCAL_SRC_FILES := obj/freetype/build/libfreetype.a
+LOCAL_SRC_FILES := deps-$(TARGET_ARCH_ABI)/freetype/build/libfreetype.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
 # Harfbuzz
 LOCAL_MODULE       := harfbuzz
-LOCAL_SRC_FILES    := obj/harfbuzz/build/libharfbuzz.a
+LOCAL_SRC_FILES    := deps-$(TARGET_ARCH_ABI)/harfbuzz/build/libharfbuzz.a
 include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -195,9 +195,9 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/irrlicht/source/Irrlicht/*.cpp)
 LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -I../lib/irrlicht/include/         \
                       -I../src                           \
-                      -Iobj/libjpeg/                     \
-                      -Iobj/libpng/                      \
-                      -Iobj/zlib/                        \
+                      -Ideps-$(TARGET_ARCH_ABI)/libjpeg/ \
+                      -Ideps-$(TARGET_ARCH_ABI)/libpng/  \
+                      -Ideps-$(TARGET_ARCH_ABI)/zlib/    \
                       -I../lib/sdl2/include/             \
                       -I../lib/graphics_engine/include   \
                       -DMOBILE_STK                       \
@@ -278,18 +278,18 @@ LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/sdl2/include             \
                       -I../lib/tinygettext/include      \
                       -I../src                          \
-                      -Iobj/curl/include                \
-                      -Iobj/freetype/include            \
-                      -Iobj/harfbuzz/include            \
-                      -Iobj/libogg/include              \
-                      -Iobj/libvorbis/include           \
-                      -Iobj/openal/include              \
-                      -Iobj/mbedtls/include             \
+                      -Ideps-$(TARGET_ARCH_ABI)/curl/include      \
+                      -Ideps-$(TARGET_ARCH_ABI)/freetype/include  \
+                      -Ideps-$(TARGET_ARCH_ABI)/harfbuzz/include  \
+                      -Ideps-$(TARGET_ARCH_ABI)/libogg/include    \
+                      -Ideps-$(TARGET_ARCH_ABI)/libvorbis/include \
+                      -Ideps-$(TARGET_ARCH_ABI)/openal/include    \
+                      -Ideps-$(TARGET_ARCH_ABI)/mbedtls/include   \
                       -DUSE_GLES2      \
                       -DMOBILE_STK     \
                       -DENABLE_SOUND   \
                       -DENABLE_IPV6    \
-                      -DENABLE_CRYPTO_MBEDTLS           \
+                      -DENABLE_CRYPTO_MBEDTLS \
                       -DNDEBUG         \
                       -DDISABLE_ICONV  \
                       -DANDROID_PACKAGE_NAME=\"$(PACKAGE_NAME)\"    \
