@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <random>
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -488,6 +489,19 @@ void RaceManager::startNew(bool from_overworld)
                 m_player_karts[i].getKartName().c_str());
         }
         init_gp_rank ++;
+    }
+
+    const bool random_pos_available = (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE
+                                    || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL
+                                    || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER);
+    
+    if (UserConfigParams::m_random_player_pos == true)
+    {
+        if (random_pos_available)
+        {
+            unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::shuffle(m_kart_status.begin(), m_kart_status.end(), std::default_random_engine(seed));
+        }
     }
 
     m_track_number = 0;

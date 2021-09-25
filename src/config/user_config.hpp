@@ -486,6 +486,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam          m_addon_tux_online
             PARAM_DEFAULT(  BoolUserConfigParam(false, "addon-tux-online",
             &m_race_setup_group, "Always show online addon karts as tux when live join is on.") );
+    PARAM_PREFIX BoolUserConfigParam          m_random_player_pos
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "random-player-pos",
+            &m_race_setup_group, "Randomize the position of the players at the start of a race. Doesn't apply to story mode.") );
 
     // ---- Wiimote data
     PARAM_PREFIX GroupUserConfigParam        m_wiimote_group
