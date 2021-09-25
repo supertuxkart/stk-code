@@ -9,9 +9,8 @@
 SET(CMAKE_SYSTEM_NAME Linux)
 
 # which compilers to use for C and C++
-SET(CMAKE_C_COMPILER "${HOST}-gcc")
-SET(CMAKE_CXX_COMPILER "${HOST}-g++")
-SET(CMAKE_RC_COMPILER "${HOST}-windres")
+SET(CMAKE_C_COMPILER "${HOST}-clang")
+SET(CMAKE_CXX_COMPILER "${HOST}-clang++")
 
 set(CMAKE_SYSTEM_PROCESSOR ${ARCH})
 

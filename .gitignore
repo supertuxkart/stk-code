@@ -60,6 +60,7 @@ android/android-sdk*
 android/assets
 android/bin
 android/build
+android/deps-*
 android/libs
 android/obj
 android/res
