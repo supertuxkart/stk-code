@@ -148,9 +148,8 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
 
     m_start_widget = getWidget<IconButtonWidget>("start");
 
-    // Disable starting a grand prix, as there is currently no way to tell the minor mode used
     if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        m_start_widget->setActive(false);
+        m_start_widget->setActive(!PlayerManager::getCurrentPlayer()->isLocked(m_gp.getId()));
     else
         m_start_widget->setActive(!PlayerManager::getCurrentPlayer()->isLocked(track->getIdent()));
 
@@ -245,13 +244,8 @@ GUIEngine::EventPropagation
             // Create player and associate player with device
             StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(), device);
 
-            RaceManager::get()->setMinorMode(HighScoreSelection::getInstance()->getActiveMode());
-
-            bool reverse = m_hs->m_reverse;
-            std::string track_name = m_hs->m_track;
-            int laps = m_hs->m_number_of_laps;
-
-            RaceManager::get()->setDifficulty((RaceManager::Difficulty) m_hs->m_difficulty);
+            RaceManager::get()->setMinorMode(m_minor_mode);
+            RaceManager::get()->setDifficulty((RaceManager::Difficulty)m_hs->m_difficulty);
 
             RaceManager::get()->setNumKarts(m_hs->m_number_of_karts);
             RaceManager::get()->setNumPlayers(1);
@@ -267,8 +261,6 @@ GUIEngine::EventPropagation
             // Disable accidentally unlocking of a challenge
             PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
-            RaceManager::get()->setReverseTrack(reverse);
-
             // ASSIGN should make sure that only input from assigned devices is read
             input_manager->getDeviceManager()->setAssignMode(ASSIGN);
             input_manager->getDeviceManager()
@@ -276,7 +268,17 @@ GUIEngine::EventPropagation
 
             ModalDialog::dismiss();
 
-            RaceManager::get()->startSingleRace(track_name, laps, false);
+            if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            {
+                m_gp = *grand_prix_manager->getGrandPrix(m_hs->m_track);
+                m_gp.changeReverse((GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
+                RaceManager::get()->startGP(m_gp, false, false);
+            }
+            else
+            {
+                RaceManager::get()->setReverseTrack(m_hs->m_reverse);
+                RaceManager::get()->startSingleRace(m_hs->m_track, m_hs->m_number_of_laps, false);
+            }
             return GUIEngine::EVENT_BLOCK;
         }
         else if (selection == "remove")
