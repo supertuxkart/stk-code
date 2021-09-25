@@ -7,29 +7,46 @@ For similar reasons, and because some features are vastly more complex than othe
 
 ## SuperTuxKart 1.3
 ### Networking
-* Server bookmarks by Benau
+* Server bookmarks, by Benau
 
 ### Graphics
-* Introduce render resolution scaling for the modern renderer, by QwertyChouskie and Deve. For users with limited GPU power, this allows to get significant performance (FPS) gains at the cost of image quality. It can also allow additional graphics effects to be enabled at the same performance. This is especially useful for users with high-resolution and high-DPI screens. The scaling only affects the 3D scene, the UI remains crisp at full-resolution.
+* Introduce render resolution scaling for the modern renderer, by QwertyChouskie and Deve. For users with limited GPU power, this allows to get significant performance (FPS) gains at the cost of image quality. It can also allow additional graphics effects at the same performance. This is especially useful for users with high-resolution and high-DPI screens. The scaling only affects the 3D scene, the UI remains crisp at full-resolution.
+* Simplification through removal of unused deprecated graphical effects, by Samuncle
+* Many updates to texture-related code, by Benau
+* Auto-compute Level of Detail distances for 3D models set to use LOD depending on track complexity, by Samuncle. The geometry level parameter allows partial control over the drawing distances.
+* Improved screen space reflection, by QwertyChouskie
 
 ### General
-* Switch port by Mary
-* Gamepad force feedback support by Mary
-* Highscore screen by RQWorldblender
-* Improved screen space reflection by QwertyChouskie
-* Render resolution changing by Deve and QwertyChouskie
+* Switch port, by Mary
+* Gamepad force feedback support, by Mary
+* Highscore screen, by RQWorldblender
+* Grand Prix highscores, by Mrkubax
 * Updates to the bundled tinygettext library, by Benau
-* And bugfixes and enhancements too small to be detailed
+* Enable custom skidding sounds for karts, by Benau
+* Greatly sped up loading of tracks with many checklines through optimization, by heuchi
+* And many bugfixes and enhancements too small or specific to be detailed
 
 ### User Interface
 * Display the skin-appropriate iconset without having to restart, by Benau
 * Fix some issues with the options menu when used during a pause, by Benau
+* Add a confirmation dialog before closing the game through the "go back" key/button, by Benau
+* In the result screen, display the race position with a number with 10 karts or more, by Mrkubax
+* In the result screen, display the challenge result and the requirements met or failed, by CodingJellyFish
+* Many small menu and dialogs improvements, by RQWorldblender and others
+* Usability and functionality improvements to the debug menu, by RQWorldblender
+#### In-race UI
+* Add visual and sound feedback when a timed challenge or timed game is about to end, by Mrkubax and Alayan
+
+### Mobile
+* Fix a precision issue that caused artefacted shadows, by icecream95 and Benau
+#### iOS
+* Use MojoAL instead of OpenAL, which iOS currently has issues with, by Benau
 
 ### Tracks and modeling
-* Alien Signal by Samuncle
-* Ancient Colosseum Labyrinth by Typhon306
-* New Pepper kart by McRavenINDo
-* Improved kart Adiumy, Emule, GNU and Sara by McRavenINDo
+* Alien Signal, by Samuncle
+* Ancient Colosseum Labyrinth, by Typhon306
+* New Pepper kart, by McRavenINDo
+* Improved Adiumy, Emule, GNU and Sara karts, by McRavenINDo
 
 ## SuperTuxKart 1.2 (27. August 2020)
 
