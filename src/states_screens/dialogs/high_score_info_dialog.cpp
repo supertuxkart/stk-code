@@ -64,16 +64,19 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
 
     if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        m_gp = grand_prix_manager->getGrandPrix(m_hs->m_track);
-        track = track_manager->getTrack(m_gp->getTrackId(0));
-        track_name = m_gp->getName();
+        m_gp = *grand_prix_manager->getGrandPrix(m_hs->m_track);
+        m_gp.checkConsistency();
+        track = track_manager->getTrack(m_gp.getTrackId(0));
+        track_name = m_gp.getName();
         track_type_name = _("Grand Prix");
+        m_minor_mode = RaceManager::getModeIDFromInternalName(m_hs->m_gp_minor_mode);
     }
     else
     {
         track = track_manager->getTrack(m_hs->m_track);
         track_name = track->getName();
         track_type_name = _("Track");
+        m_minor_mode = HighScoreSelection::getInstance()->getActiveMode();
     }
 
     irr::video::ITexture* image = STKTexManager::getInstance()
@@ -121,19 +124,17 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
         m_num_karts_label->setVisible(true);
         m_num_karts_label->setText(_("Number of karts: %d", m_hs->m_number_of_karts), true);
 
-        if (m_major_mode != RaceManager::MAJOR_MODE_GRAND_PRIX)
-        {
-            m_num_laps_label->setVisible(true);
-            m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
-        }
         stringw is_reverse;
         if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             is_reverse = GrandPrixData::reverseTypeToString((GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
+            m_num_laps_label->setText(_("Game mode: %d", RaceManager::getNameOf(m_minor_mode)), true);
         }
         else
         {
             is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
+            m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
+
         }
         m_reverse_label->setVisible(true);
         m_reverse_label->setText(_("Reverse: %s", is_reverse), true);
@@ -309,7 +310,7 @@ void HighScoreInfoDialog::onUpdate(float dt)
         m_curr_time += dt;
         int frame_after = (int)(m_curr_time / 1.5f);
 
-        const std::vector<std::string> tracks = m_gp->getTrackNames();
+        const std::vector<std::string> tracks = m_gp.getTrackNames();
         if (frame_after >= (int)tracks.size())
         {
             frame_after = 0;

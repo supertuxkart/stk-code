@@ -249,7 +249,7 @@ void HighScoreSelection::loadList()
             if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
             {
                 row.push_back(GUIEngine::ListWidget::ListCell(
-                    RaceManager::getNameOf((RaceManager::MinorRaceModeType)hs->m_gp_minor_mode), -1, 3, true));
+                    RaceManager::getNameOf(RaceManager::getModeIDFromInternalName(hs->m_gp_minor_mode)), -1, 3, true));
                 row.push_back(GUIEngine::ListWidget::ListCell(
                     GrandPrixData::reverseTypeToString((GrandPrixData::GPReverseType)hs->m_gp_reverse_type), -1, 3, true));
             }
