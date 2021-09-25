@@ -9,8 +9,8 @@
 # STK for your own use, then use android/make.sh script instead.
 
 export BUILD_TYPE=Beta
-export PROJECT_VERSION=git20200827
-export PROJECT_CODE=192
+export PROJECT_VERSION=git20210925
+export PROJECT_CODE=296
 export STK_STOREPASS="xxx"
 export STK_KEYSTORE="/path/to/stk.keystore"
 export STK_ALIAS="alias"
@@ -28,66 +28,12 @@ clean()
 {
     echo "Clean everything"
 
-    rm -rf ./android-armv7
-    rm -rf ./android-aarch64
-    rm -rf ./android-x86
-    rm -rf ./android-x86_64
     rm -rf ./android/assets
     rm -rf ./android-output
 
     cd android
     ./make.sh clean
     cd -
-}
-
-init_directories()
-{
-    echo "Init directories"
-
-    if [ ! -d "./android-armv7" ]; then
-        echo "Creating android-armv7 directory"
-
-        mkdir android-armv7
-        cd android-armv7
-    
-        ln -s ../android/Android.mk
-        ln -s ../android/AndroidManifest.xml
-        ln -s ../android/banner.png
-        ln -s ../android/build.gradle
-        ln -s ../android/gradle
-        ln -s ../android/gradlew
-        ln -s ../android/icon.png
-        ln -s ../android/icon-dbg.png
-        ln -s ../android/icon_adaptive_fg.png
-        ln -s ../android/icon_adaptive_fg-dbg.png
-        ln -s ../android/make.sh
-        ln -s ../android/android-ndk
-        ln -s ../android/android-sdk
-        ln -s ../android/assets
-        ln -s ../android/src
-    
-        cd -
-    fi
-
-    if [ ! -d "./android-aarch64" ]; then
-        echo "Creating android-aarch64 directory"
-        cp -a ./android-armv7 ./android-aarch64
-    fi
-
-    if [ ! -d "./android-x86" ]; then
-        echo "Creating android-x86 directory"
-        cp -a ./android-armv7 ./android-x86
-    fi
-
-    if [ ! -d "./android-x86_64" ]; then
-        echo "Creating android-x86_64 directory"
-        cp -a ./android-armv7 ./android-x86_64
-    fi
-
-    if [ ! -d "./android-output" ]; then
-        echo "Creating android-output directory"
-        mkdir ./android-output
-    fi
 }
 
 generate_assets()
@@ -204,46 +150,6 @@ generate_lq_assets()
     cd ../
 }
 
-build_package()
-{
-    export ARCH1=$1
-    export ARCH2=$2
-
-    echo "Build package for $ARCH1"
-
-    if [ -f "./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1.apk" ]; then
-        echo "Package for architecture $ARCH1 is already built"
-        #return
-    fi
-
-    export COMPILE_ARCH=$ARCH1
-
-    cd ./android-$ARCH1
-    ./make.sh -j $(($(nproc) + 1))
-    cd -
-
-    if [ ! -f ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release.apk ]; then
-        echo "Error: Couldn't build apk for architecture $ARCH1"
-        return
-    fi
-
-    if [ ! -f ./android-$ARCH1/build/outputs/bundle/release/android-$ARCH1.aab ]; then
-        echo "Error: Couldn't build app bundle for architecture $ARCH1"
-        return
-    fi
-
-    cp ./android-$ARCH1/build/outputs/apk/release/android-$ARCH1-release.apk \
-       ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1.apk
-
-    cp ./android-$ARCH1/build/outputs/bundle/release/android-$ARCH1.aab \
-       ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1.aab
-
-    cp ./android-$ARCH1/obj/local/$ARCH2/libmain.so \
-       ./android-output/SuperTuxKart-$PROJECT_VERSION-$ARCH1-libmain.so
-
-}
-
-
 # Handle clean command
 if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     clean
@@ -251,30 +157,33 @@ if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
 fi
 
 #Build packages
-init_directories
 
 generate_lq_assets
 generate_full_assets
 generate_assets
 
-if [ -z "$1" ] || [ "$1" = "armv7" ]; then
-    build_package armv7 armeabi-v7a
+if [ -f "./android-output/SuperTuxKart-$PROJECT_VERSION.apk" ]; then
+    echo "Package for architecture $ARCH1 is already built"
+    #exit
 fi
 
-PROJECT_CODE=$(($PROJECT_CODE + 1))
+cd ./android
+./make_deps.sh
+./make.sh
+cd -
 
-if [ -z "$1" ] || [ "$1" = "aarch64" ]; then
-    build_package aarch64 arm64-v8a
+if [ ! -f ./android/build/outputs/apk/release/android-release.apk ]; then
+    echo "Error: Couldn't build apk"
+    exit
 fi
 
-PROJECT_CODE=$(($PROJECT_CODE + 1))
-
-if [ -z "$1" ] || [ "$1" = "x86" ]; then
-    build_package x86 x86
+if [ ! -f ./android/build/outputs/bundle/release/android-release.aab ]; then
+    echo "Error: Couldn't build app bundle"
+    exit
 fi
 
-PROJECT_CODE=$(($PROJECT_CODE + 1))
+cp ./android/build/outputs/apk/release/android-release.apk \
+   ./android-output/SuperTuxKart-$PROJECT_VERSION.apk
 
-if [ -z "$1" ] || [ "$1" = "x86_64" ]; then
-    build_package x86_64 x86_64
-fi
+cp ./android/build/outputs/bundle/release/android-release.aab \
+   ./android-output/SuperTuxKart-$PROJECT_VERSION.aab
