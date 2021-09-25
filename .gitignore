@@ -65,6 +65,7 @@ android/libs
 android/obj
 android/res
 android/.gradle
+android/.cxx
 android/src/main/java/HID*
 android/src/main/java/SDL*
 android-*

@@ -92,7 +92,7 @@ to just run:
     export NDK_PATH=/path/to/your/android/ndk
     ./generate_assets.sh
     ./make_deps.sh
-    ./make.sh -j $(($(nproc) + 1))
+    ./make.sh
 
 
 
@@ -154,4 +154,4 @@ and then you make standard compilation with:
 
     ./generate_assets.sh
     ./make_deps.sh
-    ./make.sh -j $(($(nproc) + 1))
+    ./make.sh

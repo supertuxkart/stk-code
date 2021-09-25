@@ -28,8 +28,6 @@
         </activity>
     </application>
 
-    <uses-sdk android:minSdkVersion="16"
-              android:targetSdkVersion="29" />
     <uses-feature android:glEsVersion="0x00020000" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.software.input_methods" android:required="false" />

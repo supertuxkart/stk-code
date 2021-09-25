@@ -8,7 +8,9 @@ buildscript
 
     dependencies
     {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        // 4.1.2 is the minimum version to support native debug symbols file
+        // https://developer.android.com/studio/build/shrink-code#android_gradle_plugin_version_41_or_later
+        classpath 'com.android.tools.build:gradle:4.1.2'
     }
 }
 
@@ -27,6 +29,41 @@ android
 {
     compileSdkVersion compile_sdk_version.toInteger()
     buildToolsVersion build_tools_ver
+    ndkVersion ndk_version
+    externalNativeBuild
+    {
+        ndkBuild
+        {
+            path 'Android.mk'
+        }
+    }
+
+    defaultConfig
+    {
+        minSdkVersion 16
+        targetSdkVersion 29
+        externalNativeBuild
+        {
+            ndkBuild
+            {
+                arguments 'APP_PLATFORM=android-16', 'APP_STL=c++_static', cpu_core
+                if (project.getProperty('compile_arch') == 'all')
+                {
+                    abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                }
+                else
+                {
+                    abiFilters project.getProperty('compile_arch')
+                }
+            }
+        }
+        def runTasks = gradle.startParameter.taskNames
+        if ('bundleRelease' in runTasks)
+        {
+            // use SYMBOL_TABLE if too large later (max limit on google play is 300MB)
+            ndk.debugSymbolLevel 'FULL'
+        }
+    }
 
     signingConfigs
     {
@@ -41,8 +78,34 @@ android
 
     buildTypes
     {
+        debug
+        {
+            debuggable true
+            jniDebuggable true
+            minifyEnabled false
+            shrinkResources false
+            multiDexEnabled true
+            externalNativeBuild
+            {
+                ndkBuild
+                {
+                    arguments 'NDK_DEBUG=1'
+                    cFlags '-O0'
+                    cppFlags '-O0'
+                }
+            }
+        }
+
         release
         {
+            externalNativeBuild
+            {
+                ndkBuild
+                {
+                    cFlags '-O3'
+                    cppFlags '-O3'
+                }
+            }
             signingConfig signingConfigs.release
         }
     }

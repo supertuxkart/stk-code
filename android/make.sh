@@ -13,27 +13,9 @@ export SDK_PATH_DEFAULT="$DIRNAME/android-sdk"
 export NDK_BUILD_SCRIPT="$DIRNAME/Android.mk"
 
 #export NDK_CCACHE=ccache
-export NDK_CPPFLAGS="-O3 -g"
+export CPU_CORE="-j$(($(nproc) + 1))"
 
-export NDK_ABI_ARMV7=armeabi-v7a
-export MIN_SDK_VERSION_ARMV7=16
-export TARGET_SDK_VERSION_ARMV7=29
-export COMPILE_SDK_VERSION_ARMV7=29
-
-export NDK_ABI_AARCH64=arm64-v8a
-export MIN_SDK_VERSION_AARCH64=21
-export TARGET_SDK_VERSION_AARCH64=29
-export COMPILE_SDK_VERSION_AARCH64=29
-
-export NDK_ABI_X86=x86
-export MIN_SDK_VERSION_X86=16
-export TARGET_SDK_VERSION_X86=29
-export COMPILE_SDK_VERSION_X86=29
-
-export NDK_ABI_X86_64=x86_64
-export MIN_SDK_VERSION_X86_64=21
-export TARGET_SDK_VERSION_X86_64=29
-export COMPILE_SDK_VERSION_X86_64=29
+export COMPILE_SDK_VERSION=29
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
@@ -77,21 +59,8 @@ if [ ! -z "$1" ] && [ "$1" = "clean" ]; then
     rm -rf "$DIRNAME/obj"
     rm -rf "$DIRNAME/res"
     rm -rf "$DIRNAME/.gradle"
+    rm -rf "$DIRNAME/.cxx"
     exit
-fi
-
-# Check if compilation for different platform has been started before
-if [ -f "$DIRNAME/obj/compile_arch" ]; then
-    PROJECT_ARCH=$(cat "$DIRNAME/obj/compile_arch") 
-
-    if [ -z "$COMPILE_ARCH" ]; then
-        COMPILE_ARCH="$PROJECT_ARCH"
-    elif [ "$PROJECT_ARCH" != "$COMPILE_ARCH" ]; then
-        echo "Error: Compilation for different platform has been already made."
-        echo "Run './make.sh clean' first or set COMPILE_ARCH variable" \
-             "to '$PROJECT_ARCH.'"
-        exit
-    fi
 fi
 
 # Update variables for selected architecture
@@ -99,32 +68,12 @@ if [ -z "$COMPILE_ARCH" ]; then
     COMPILE_ARCH="all"
 fi
 
-if [ "$COMPILE_ARCH" = "all" ]; then
-    export NDK_ABI="armeabi-v7a arm64-v8a x86 x86_64"
-    export MIN_SDK_VERSION=$MIN_SDK_VERSION_ARMV7
-    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_ARMV7
-    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_ARMV7
-elif [ "$COMPILE_ARCH" = "armv7" ]; then
-    export NDK_ABI=$NDK_ABI_ARMV7
-    export MIN_SDK_VERSION=$MIN_SDK_VERSION_ARMV7
-    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_ARMV7
-    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_ARMV7
+if [ "$COMPILE_ARCH" = "armv7" ]; then
+    COMPILE_ARCH="armeabi-v7a"
 elif [ "$COMPILE_ARCH" = "aarch64" ]; then
-    export NDK_ABI=$NDK_ABI_AARCH64
-    export MIN_SDK_VERSION=$MIN_SDK_VERSION_AARCH64
-    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_AARCH64
-    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_AARCH64
-elif [ "$COMPILE_ARCH" = "x86" ]; then
-    export NDK_ABI=$NDK_ABI_X86
-    export MIN_SDK_VERSION=$MIN_SDK_VERSION_X86
-    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_X86
-    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_X86
-elif [ "$COMPILE_ARCH" = "x86_64" ]; then
-    export NDK_ABI=$NDK_ABI_X86_64
-    export MIN_SDK_VERSION=$MIN_SDK_VERSION_X86_64
-    export TARGET_SDK_VERSION=$TARGET_SDK_VERSION_X86_64
-    export COMPILE_SDK_VERSION=$COMPILE_SDK_VERSION_X86_64
-else
+    COMPILE_ARCH="arm64-v8a"
+elif [ "$COMPILE_ARCH" != "x86" ] && [ "$COMPILE_ARCH" != "x86_64" ] && \
+     [ "$COMPILE_ARCH" != "all" ]; then
     echo "Unknown COMPILE_ARCH: $COMPILE_ARCH. Possible values are:" \
          "all, armv7, aarch64, x86, x86_64"
     exit
@@ -286,23 +235,9 @@ if [ ! -f "$DIRNAME/obj/make_standalone_toolchain.stamp" ]; then
     rm -rf "$DIRNAME/obj"
     mkdir "$DIRNAME/obj"
     touch "$DIRNAME/obj/make_standalone_toolchain.stamp"
-    echo $COMPILE_ARCH > "$DIRNAME/obj/compile_arch"
 fi
 
 echo "$PROJECT_VERSION" > "$DIRNAME/obj/project_version"
-
-# STK
-echo "Compiling STK"
-cd "$DIRNAME"
-${NDK_PATH}/ndk-build $@                 \
-    APP_BUILD_SCRIPT="$NDK_BUILD_SCRIPT" \
-    APP_ABI="$NDK_ABI"                   \
-    APP_PLATFORM=android-16              \
-    APP_CPPFLAGS="$NDK_CPPFLAGS"         \
-    APP_STL=c++_static                   \
-    NDK_DEBUG=$IS_DEBUG_BUILD
-
-check_error
 
 # Build apk
 echo "Building APK"
@@ -421,12 +356,6 @@ echo "    <background android:drawable=\"@drawable/icon_bg\" />"       >> "$ADAP
 echo "    <foreground android:drawable=\"@drawable/icon_fg\" />"       >> "$ADAPTIVE_ICON_FILE"
 echo "</adaptive-icon>"                                                >> "$ADAPTIVE_ICON_FILE"
 
-sed -i "s/minSdkVersion=\".*\"/minSdkVersion=\"$MIN_SDK_VERSION\"/g" \
-       "$DIRNAME/AndroidManifest.xml"
-       
-sed -i "s/targetSdkVersion=\".*\"/targetSdkVersion=\"$TARGET_SDK_VERSION\"/g" \
-       "$DIRNAME/AndroidManifest.xml"
-       
 sed -i "s/package=\".*\"/package=\"$PACKAGE_NAME\"/g" \
        "$DIRNAME/AndroidManifest.xml"
 
@@ -508,6 +437,9 @@ export ANDROID_HOME="$SDK_PATH"
           -Pstorepass="$STK_STOREPASS"               \
           -Pkeystore="$STK_KEYSTORE"                 \
           -Palias="$STK_ALIAS"                       \
+          -Pndk_version="20.1.5948944"               \
+          -Pcompile_arch="$COMPILE_ARCH"             \
+          -Pcpu_core="$CPU_CORE"                     \
           $GRADLE_BUILD_TYPE
 
 if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
@@ -516,6 +448,9 @@ if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
           -Pstorepass="$STK_STOREPASS"               \
           -Pkeystore="$STK_KEYSTORE"                 \
           -Palias="$STK_ALIAS"                       \
+          -Pndk_version="20.1.5948944"               \
+          -Pcompile_arch="$COMPILE_ARCH"             \
+          -Pcpu_core="$CPU_CORE"                     \
           "bundleRelease"
 fi
 
