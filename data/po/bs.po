@@ -6426,5 +6426,5 @@ msgid "SuperTuxKart Team"
 msgstr ""
 
 #: src/states_screens/credits.cpp:209
-msgid "translator-credits\n"
+msgid "translator-credits"
 msgstr "Launchpad Contributions:\nSiddhartha Gautama, 2016-2018\nSiddhartha Gautama, 2018\n"
