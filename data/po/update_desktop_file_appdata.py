@@ -125,6 +125,14 @@ STK_APPDATA_FILE_5 = """  </description>
     <content_attribute id=\"violence-cartoon\">mild</content_attribute>
     <content_attribute id=\"social-chat\">intense</content_attribute>
   </content_rating>
+  <releases>
+    <release version="1.3-rc1" date="2021-08-31">
+      <url>https://blog.supertuxkart.net/2021/08/supertuxkart-13-release-candiate.html</url>
+    </release>
+    <release version="1.2" date="2020-08-27"/>
+    <release version="1.1" date="2020-01-05"/>
+    <release version="1.0" date="2019-04-21"/>
+  </releases>
   <languages>
 """
 STK_APPDATA_FILE_6 = """  </languages>
