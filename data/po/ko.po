@@ -7,14 +7,15 @@
 # Myeongjin <aranet100@gmail.com>, 2019,2021
 # Roland Kim <dyn4micwork@gmail.com>, 2015
 # sooyeon73 <sooy8951@gmail.com>, 2020
+# sooyeon73 <sooy8951@gmail.com>, 2020
 # YieJun Choi <rosyres@daum.net>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-11 10:50+0800\n"
-"PO-Revision-Date: 2021-08-12 18:39+0000\n"
-"Last-Translator: Myeongjin <aranet100@gmail.com>\n"
+"POT-Creation-Date: 2021-09-10 01:06+0800\n"
+"PO-Revision-Date: 2021-09-25 05:29+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Korean (http://www.transifex.com/supertuxkart/supertuxkart/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -881,7 +882,7 @@ msgstr "참가"
 
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-#: src/states_screens/dialogs/server_info_dialog.cpp:274
+#: src/states_screens/dialogs/server_info_dialog.cpp:278
 msgid "Bookmark this server"
 msgstr "이 서버를 북마크에 추가"
 
@@ -986,9 +987,9 @@ msgstr "경주 설정"
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:254
-#: src/states_screens/race_result_gui.cpp:283
-#: src/states_screens/race_result_gui.cpp:291
+#: src/states_screens/race_result_gui.cpp:255
+#: src/states_screens/race_result_gui.cpp:284
+#: src/states_screens/race_result_gui.cpp:292
 msgid "Continue"
 msgstr "계속"
 
@@ -1790,20 +1791,20 @@ msgstr "서버 만들기"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:201
+#: src/states_screens/online/networking_lobby.cpp:203
 msgid "Lobby"
 msgstr "대기실"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:186
+#: src/states_screens/online/networking_lobby.cpp:188
 msgid "Start race"
 msgstr "경주 시작"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:194
+#: src/states_screens/online/networking_lobby.cpp:196
 msgid "Configuration"
 msgstr "구성"
 
@@ -2133,8 +2134,8 @@ msgstr "구성 이름 변경"
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen, for gamepad
-msgid "Enable force feedback (if support)"
-msgstr "강제 피드백 활성화 (지원하는 경우)"
+msgid "Enable force feedback (if supported)"
+msgstr ""
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
@@ -2562,6 +2563,10 @@ msgstr "대홍수 이전의 심연"
 msgid "Alien Signal"
 msgstr ""
 
+#. I18N: ../stk-assets/tracks/ancient_colosseum_labyrinth/track.xml
+msgid "Ancient Colosseum Labyrinth"
+msgstr ""
+
 #. I18N: ../stk-assets/tracks/arena_candela_city/track.xml
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
@@ -2833,12 +2838,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS: %d/%d/%d - %d KTris, 핑: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:201
+#: src/guiengine/engine.cpp:1447 src/states_screens/race_result_gui.cpp:202
 #, c-format
 msgid "Tip: %s"
 msgstr "팁: %s"
 
-#: src/guiengine/engine.cpp:1483
+#: src/guiengine/engine.cpp:1491
 msgid "Loading"
 msgstr "불러오는 중"
 
@@ -2864,10 +2869,10 @@ msgstr "니트로 효율"
 #: src/guiengine/widgets/player_kart_widget.cpp:758
 #: src/karts/controller/local_player_controller.cpp:452
 #: src/karts/controller/player_controller.cpp:413
-#: src/network/protocols/client_lobby.cpp:854
+#: src/network/protocols/client_lobby.cpp:853
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1527
-#: src/states_screens/race_result_gui.cpp:1589
+#: src/states_screens/race_result_gui.cpp:1530
+#: src/states_screens/race_result_gui.cpp:1592
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (핸디캡 적용됨)"
@@ -3491,14 +3496,15 @@ msgstr "%s의 배터리 수준이 부족합니다."
 #: src/input/wiimote_manager.cpp:379
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
-"instructions at supertuxkart.net/Wiimote"
-msgstr "Bluetooth 관리자에 당신의 Wii 리모컨을 연결하고 나서, 확인을 클릭하세요. supertuxkart.net/Wiimote 에 자세한 지침이 있습니다"
+"instructions at https://supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:382
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
-"mode, then click on Ok. Detailed instructions at supertuxkart.net/Wiimote"
-msgstr "당신의 Wii 리모컨에서 버튼 1+2를 동시에 눌러 발견 모드로 전환하고 나서, 확인을 클릭하세요. supertuxkart.net/Wiimote 에 자세한 지침이 있습니다"
+"mode, then click on Ok. Detailed instructions at "
+"https://supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:405
 #, c-format
@@ -3544,7 +3550,7 @@ msgid "You finished the race in rank %d!"
 msgstr "당신은 경주를 %d위로 마쳤습니다!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1157
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1156
 #, c-format
 msgid "%s left the game."
 msgstr "%s가 게임에서 떠났습니다."
@@ -3681,12 +3687,12 @@ msgid "You were kicked: Ping too high."
 msgstr "당신은 추방되었습니다: 핑이 너무 높습니다."
 
 #: src/network/protocols/client_lobby.cpp:281
-#: src/network/protocols/client_lobby.cpp:898
+#: src/network/protocols/client_lobby.cpp:897
 msgid "Bad network connection is detected."
 msgstr "잘못된 네트워크 연결이 감지되었습니다."
 
 #: src/network/protocols/client_lobby.cpp:446
-#: src/network/protocols/server_lobby.cpp:3846
+#: src/network/protocols/server_lobby.cpp:3845
 msgid "Bot"
 msgstr "봇"
 
@@ -3703,36 +3709,30 @@ msgid ""
 msgstr "플레이어 관리 및 순위 정보에 대해서는 목록에서 플레이어 이름을 누르세요."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:717
-#, c-format
-msgid "Server name: %s"
-msgstr "서버 이름: %s"
-
-#. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:725
+#: src/network/protocols/client_lobby.cpp:724
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:111
-#: src/states_screens/dialogs/server_info_dialog.cpp:92
-#: src/states_screens/race_result_gui.cpp:1893
+#: src/states_screens/dialogs/server_info_dialog.cpp:96
+#: src/states_screens/race_result_gui.cpp:1896
 #, c-format
 msgid "Difficulty: %s"
 msgstr "난이도: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:730
+#: src/network/protocols/client_lobby.cpp:729
 #, c-format
 msgid "Max players: %d"
 msgstr "최대 플레이어: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:743
-#: src/states_screens/dialogs/server_info_dialog.cpp:96
+#: src/network/protocols/client_lobby.cpp:742
+#: src/states_screens/dialogs/server_info_dialog.cpp:100
 #, c-format
 msgid "Game mode: %s"
 msgstr "게임 모드: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:756
+#: src/network/protocols/client_lobby.cpp:755
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:367
@@ -3740,7 +3740,7 @@ msgid "Time limit"
 msgstr "시간 제한"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:757
+#: src/network/protocols/client_lobby.cpp:756
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
 #: src/states_screens/track_info_screen.cpp:368
@@ -3748,102 +3748,102 @@ msgid "Goals limit"
 msgstr "목표 제한"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:761
+#: src/network/protocols/client_lobby.cpp:760
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "축구 게임 유형: %s"
 
-#: src/network/protocols/client_lobby.cpp:771
+#: src/network/protocols/client_lobby.cpp:770
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "그랑프리 진행 상황: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:890
+#: src/network/protocols/client_lobby.cpp:889
 msgid "All players joined red or blue team."
 msgstr "모든 플레이어가 레드 또는 블루 팀에 참가되었습니다."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:910
+#: src/network/protocols/client_lobby.cpp:909
 msgid "You are now the owner of server."
 msgstr "당신은 이제 서버의 소유자가 되었습니다."
 
-#: src/network/protocols/client_lobby.cpp:953
+#: src/network/protocols/client_lobby.cpp:952
 msgid "Connection refused: Server is busy."
 msgstr "연결 거부됨: 서버가 바쁩니다."
 
-#: src/network/protocols/client_lobby.cpp:958
+#: src/network/protocols/client_lobby.cpp:957
 msgid "Connection refused: You are banned from the server."
 msgstr "연결 거부됨: 당신은 서버에서 차단되어 있습니다."
 
-#: src/network/protocols/client_lobby.cpp:973
+#: src/network/protocols/client_lobby.cpp:972
 msgid "Connection refused: Server password is incorrect."
 msgstr "연결 거부됨: 서버 비밀번호가 잘못되었습니다."
 
-#: src/network/protocols/client_lobby.cpp:977
+#: src/network/protocols/client_lobby.cpp:976
 msgid "Connection refused: Game data is incompatible."
 msgstr "연결 거부됨: 게임 데이터가 호환되지 않습니다."
 
-#: src/network/protocols/client_lobby.cpp:981
+#: src/network/protocols/client_lobby.cpp:980
 msgid "Connection refused: Server is full."
 msgstr "연결 거부됨: 서버가 가득 찼습니다."
 
-#: src/network/protocols/client_lobby.cpp:985
+#: src/network/protocols/client_lobby.cpp:984
 msgid "Connection refused: Invalid player connecting."
 msgstr "연결 거부됨: 잘못된 플레이어를 연결 중입니다."
 
-#: src/network/protocols/client_lobby.cpp:1013
+#: src/network/protocols/client_lobby.cpp:1012
 msgid "Failed to start the network game."
 msgstr "네트워크 게임을 시작하는데 실패했습니다."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1226
+#: src/network/protocols/client_lobby.cpp:1225
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "게임이 끝났습니다, 당신은 더 이상 실시간 참가나 관람할 수 없습니다."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1230
+#: src/network/protocols/client_lobby.cpp:1229
 msgid "No remaining place in the arena - live join disabled."
 msgstr "아레나에 남아 있는 장소가 없습니다 - 실시간 참가가 비활성화되었습니다."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1234
+#: src/network/protocols/client_lobby.cpp:1233
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "플레이어 1명만이 남아 있어, 대기실로 돌아갑니다."
 
-#: src/network/protocols/client_lobby.cpp:1240
+#: src/network/protocols/client_lobby.cpp:1239
 msgid "Server owner quit the game."
 msgstr "서버 주인이 게임을 나갔습니다."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1244
+#: src/network/protocols/client_lobby.cpp:1243
 msgid "You will be spectating the next game."
 msgstr "다음 게임을 관전할 수 있습니다."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1412
+#: src/network/protocols/client_lobby.cpp:1411
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s가 레드 팀에 참가되었습니다."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1418
+#: src/network/protocols/client_lobby.cpp:1417
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%s가 블루 팀에 참가되었습니다."
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1424
+#: src/network/protocols/client_lobby.cpp:1423
 #, c-format
 msgid "%s joined the game."
 msgstr "%s가 게임에 참가되었습니다."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1615
+#: src/network/protocols/client_lobby.cpp:1614
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3851,14 +3851,14 @@ msgid ""
 msgstr "대상 플레이어를 변경하려면 <%s>또는<%s>을 누르세요, 카메라 위치를 변경하려면<%s>또는<%s>을 누르세요."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1631
+#: src/network/protocols/client_lobby.cpp:1630
 #, c-format
 msgid "Successfully reported %s."
 msgstr "성공적으로 %s를 신고했습니다."
 
 #. I18N: Shown when there is download error for assets download
 #. in the first run
-#: src/network/protocols/client_lobby.cpp:1896
+#: src/network/protocols/client_lobby.cpp:1895
 #: src/states_screens/dialogs/download_assets.cpp:251
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
@@ -4068,6 +4068,10 @@ msgstr "랜덤 아레나"
 msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "아레나 %d곳이 싱글 플레이어에서 사용할 수 없습니다."
+
+#: src/states_screens/credits.cpp:184
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nMyeongjin, 2019,2021\nRoland Kim, 2015\nsooyeon73, 2020\nYieJun Choi, 2020\nRoland Kim - Dynamicw0rk\nLaunchpad Contributions:\nJJ\nTae-Wong SEO"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4505,12 +4509,12 @@ msgid "Problems installing the addon '%s'."
 msgstr "부가 기능 '%s'를 설치하는 데 문제가 있습니다."
 
 #: src/states_screens/dialogs/addons_loading.cpp:383
-#: src/states_screens/dialogs/addons_loading.cpp:432
+#: src/states_screens/dialogs/addons_loading.cpp:434
 #: src/states_screens/dialogs/download_assets.cpp:266
 msgid "Try again"
 msgstr "다시 시도하세요"
 
-#: src/states_screens/dialogs/addons_loading.cpp:421
+#: src/states_screens/dialogs/addons_loading.cpp:423
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "부가 기능 '%s'를 제거하는 데 문제가 있습니다."
@@ -4826,8 +4830,8 @@ msgid "Press any key..."
 msgstr "아무키나 누르세요"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
-#: src/states_screens/online/networking_lobby.cpp:244
-#: src/states_screens/online/networking_lobby.cpp:836
+#: src/states_screens/online/networking_lobby.cpp:247
+#: src/states_screens/online/networking_lobby.cpp:967
 msgid "Chat is disabled, enable in options menu."
 msgstr "채팅이 비활성화되어 있습니다, 옵션 메뉴에서 활성화하세요."
 
@@ -4848,7 +4852,7 @@ msgid "Exit Battle"
 msgstr ""
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:144
-#: src/states_screens/race_result_gui.cpp:337
+#: src/states_screens/race_result_gui.cpp:338
 msgid "Setup New Race"
 msgstr "새 경주 설정"
 
@@ -4894,7 +4898,7 @@ msgstr "고스트 리플레이 경주"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1883
+#: src/states_screens/race_result_gui.cpp:1886
 #, c-format
 msgid "Laps: %i"
 msgstr "바퀴: %i"
@@ -4907,21 +4911,21 @@ msgstr "유형: %s"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:90
-#: src/states_screens/race_result_gui.cpp:1975
+#: src/states_screens/race_result_gui.cpp:1978
 #, c-format
 msgid "Required Rank: %i"
 msgstr "요구 순위: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:96
-#: src/states_screens/race_result_gui.cpp:1983
+#: src/states_screens/race_result_gui.cpp:1986
 #, c-format
 msgid "Required Time: %i"
 msgstr "요구 시간: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:103
-#: src/states_screens/race_result_gui.cpp:1994
+#: src/states_screens/race_result_gui.cpp:1997
 #, c-format
 msgid "Required Nitro Points: %i"
 msgstr "요구 니트로 수: %i"
@@ -4947,41 +4951,41 @@ msgstr "축구 게임 유형"
 
 #. I18N: In the server info dialog, show the server location with
 #. country name (based on IP geolocation)
-#: src/states_screens/dialogs/server_info_dialog.cpp:105
+#: src/states_screens/dialogs/server_info_dialog.cpp:109
 #, c-format
 msgid "Server location: %s"
 msgstr "서버 위치: %s"
 
 #. I18N: In server info dialog, showing the current track playing in server
-#: src/states_screens/dialogs/server_info_dialog.cpp:114
+#: src/states_screens/dialogs/server_info_dialog.cpp:118
 #, c-format
 msgid "Current track: %s"
 msgstr "현재 트랙: %s"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:124
+#: src/states_screens/dialogs/server_info_dialog.cpp:128
 msgid "Rank"
 msgstr "순위"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:127
+#: src/states_screens/dialogs/server_info_dialog.cpp:131
 msgid "Player"
 msgstr "플레이어"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:130
+#: src/states_screens/dialogs/server_info_dialog.cpp:134
 msgid "Scores"
 msgstr "점수"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:133
+#: src/states_screens/dialogs/server_info_dialog.cpp:137
 msgid "Time played"
 msgstr "플레이한 시간"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:265
-#: src/states_screens/dialogs/server_info_dialog.cpp:279
+#: src/states_screens/dialogs/server_info_dialog.cpp:269
+#: src/states_screens/dialogs/server_info_dialog.cpp:283
 msgid "Remove from bookmarks"
 msgstr "북마크에서 제거"
 
@@ -5195,7 +5199,7 @@ msgid "Better luck next time!"
 msgstr "다음 기회에 행운을 빌어요!"
 
 #: src/states_screens/grand_prix_win.cpp:166
-#: src/states_screens/race_result_gui.cpp:273
+#: src/states_screens/race_result_gui.cpp:274
 msgid "You completed a challenge!"
 msgstr "도전을 완료했습니다!"
 
@@ -5234,7 +5238,7 @@ msgid "Locked"
 msgstr "잠김"
 
 #: src/states_screens/kart_selection.cpp:1032
-#: src/states_screens/online/networking_lobby.cpp:518
+#: src/states_screens/online/networking_lobby.cpp:646
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5299,35 +5303,30 @@ msgstr "비밀번호에 잘못된 문자가 있습니다!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:189
+#: src/states_screens/online/networking_lobby.cpp:191
 msgid "Ready"
 msgstr "준비"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:192
+#: src/states_screens/online/networking_lobby.cpp:194
 msgid "Live join"
 msgstr "실시간 참가"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:197
+#: src/states_screens/online/networking_lobby.cpp:199
 msgid "Spectate"
 msgstr "관전"
 
-#: src/states_screens/online/networking_lobby.cpp:198
+#: src/states_screens/online/networking_lobby.cpp:200
 msgid "Install addon"
 msgstr "부가기능 설치하기"
-
-#: src/states_screens/online/networking_lobby.cpp:337
-#, c-format
-msgid "Lobby (ping: %dms)"
-msgstr "대기실 (핑: %dms)"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:383
+#: src/states_screens/online/networking_lobby.cpp:511
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -5335,7 +5334,7 @@ msgstr "현재 게임(%s)이 끝날 때까지 기다려 주세요, 예상 남은
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:391
+#: src/states_screens/online/networking_lobby.cpp:519
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "현재 게임이 끝날 때까지 기다려 주세요, 예상 남은 시간: %s."
@@ -5343,24 +5342,24 @@ msgstr "현재 게임이 끝날 때까지 기다려 주세요, 예상 남은 시
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:403
+#: src/states_screens/online/networking_lobby.cpp:531
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr "현재 게임(%s)이 끝날 때까지 기다려 주세요, 예상 진행 상황: %s%."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:412
+#: src/states_screens/online/networking_lobby.cpp:540
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "현재 게임이 끝날 때까지 기다려 주세요, 예상 진행 상황: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:420
+#: src/states_screens/online/networking_lobby.cpp:548
 msgid "Please wait for the current game's end."
 msgstr "현재 게임이 끝날 때까지 기다려 주세요."
 
-#: src/states_screens/online/networking_lobby.cpp:487
+#: src/states_screens/online/networking_lobby.cpp:615
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5368,7 +5367,7 @@ msgstr[0] "게임은 플레이어 %d명 이상이면 시작될 거예요."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:501
+#: src/states_screens/online/networking_lobby.cpp:629
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5376,12 +5375,12 @@ msgid_plural ""
 "Starting after %d seconds, or once everyone has pressed the 'Ready' button."
 msgstr[0] "%d초 뒤에, 또는 모두가 '준비' 버튼을 눌러 놓고 있으면 시작해요."
 
-#: src/states_screens/online/networking_lobby.cpp:538
+#: src/states_screens/online/networking_lobby.cpp:666
 #, c-format
 msgid "Connecting to server %s"
 msgstr "서버 %s에 연결 중"
 
-#: src/states_screens/online/networking_lobby.cpp:543
+#: src/states_screens/online/networking_lobby.cpp:671
 msgid "Finding a quick play server"
 msgstr "빠른 플레이 서버를 찾는 중"
 
@@ -5979,64 +5978,64 @@ msgid "Do you really want to delete player '%s'?"
 msgstr "정말 플레이어 '%s'를 삭제하시겠습니까?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:72
 msgid "Ready!"
 msgstr "레디!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:73
+#: src/states_screens/race_gui_base.cpp:74
 msgid "Set!"
 msgstr "셋!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:75
+#: src/states_screens/race_gui_base.cpp:76
 msgid "Go!"
 msgstr "고!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:77
+#: src/states_screens/race_gui_base.cpp:78
 msgid "GOAL!"
 msgstr "골!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:80
-#: src/states_screens/race_result_gui.cpp:383
+#: src/states_screens/race_gui_base.cpp:81
+#: src/states_screens/race_result_gui.cpp:384
 msgid "Waiting for others"
 msgstr "상대방들을 위해 기다리는 중"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:82
+#: src/states_screens/race_gui_base.cpp:83
 msgid "Waiting for the server"
 msgstr "서버를 위해 기다리는 중"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:641
+#: src/states_screens/race_gui_base.cpp:642
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:651
+#: src/states_screens/race_gui_base.cpp:652
 msgid "by"
 msgstr "작곡:"
 
-#: src/states_screens/race_gui_base.cpp:759
+#: src/states_screens/race_gui_base.cpp:765
 msgid "Collect nitro!"
 msgstr "니트로를 모으세요!"
 
-#: src/states_screens/race_gui_base.cpp:761
+#: src/states_screens/race_gui_base.cpp:767
 msgid "Follow the leader!"
 msgstr "대장의 꼬리를 잡으세요!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:944
+#: src/states_screens/race_gui_base.cpp:950
 #, c-format
 msgid "Top %i"
 msgstr "상위 %i"
 
-#: src/states_screens/race_gui.cpp:450
+#: src/states_screens/race_gui.cpp:448
 msgid "Challenge Failed"
 msgstr "도전 실패"
 
@@ -6060,103 +6059,103 @@ msgstr "도전을 시작하려면 시상대 아이콘을 누르세요."
 msgid "Press fire to start the challenge"
 msgstr "도전을 시작하려면 발사를 누르세요"
 
-#: src/states_screens/race_result_gui.cpp:259
+#: src/states_screens/race_result_gui.cpp:260
 msgid "Quit the server"
 msgstr "서버 종료"
 
-#: src/states_screens/race_result_gui.cpp:274
+#: src/states_screens/race_result_gui.cpp:275
 msgid "You completed challenges!"
 msgstr "당신은 도전들을 완료했습니다!"
 
-#: src/states_screens/race_result_gui.cpp:297
+#: src/states_screens/race_result_gui.cpp:298
 msgid "Abort Grand Prix"
 msgstr "그랑프리 중단"
 
-#: src/states_screens/race_result_gui.cpp:317
+#: src/states_screens/race_result_gui.cpp:318
 msgid "Restart"
 msgstr "다시 시작"
 
-#: src/states_screens/race_result_gui.cpp:324
+#: src/states_screens/race_result_gui.cpp:325
 msgid "Back to challenge selection"
 msgstr "도전 선택으로 돌아가기"
 
-#: src/states_screens/race_result_gui.cpp:332
+#: src/states_screens/race_result_gui.cpp:333
 msgid "Race against the new ghost replay"
 msgstr "새 고스트 리플레이와 경주"
 
-#: src/states_screens/race_result_gui.cpp:340
+#: src/states_screens/race_result_gui.cpp:341
 msgid "Back to the menu"
 msgstr "메뉴로 돌아가기"
 
-#: src/states_screens/race_result_gui.cpp:509
+#: src/states_screens/race_result_gui.cpp:510
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "그랑프리를 중단하시겠습니까?"
 
-#: src/states_screens/race_result_gui.cpp:607
-#: src/states_screens/race_result_gui.cpp:1454
+#: src/states_screens/race_result_gui.cpp:608
+#: src/states_screens/race_result_gui.cpp:1457
 msgid "Red Team Wins"
 msgstr "레드 팀 승리"
 
-#: src/states_screens/race_result_gui.cpp:609
-#: src/states_screens/race_result_gui.cpp:1458
+#: src/states_screens/race_result_gui.cpp:610
+#: src/states_screens/race_result_gui.cpp:1461
 msgid "Blue Team Wins"
 msgstr "블루 팀 승리"
 
-#: src/states_screens/race_result_gui.cpp:611
-#: src/states_screens/race_result_gui.cpp:1463
+#: src/states_screens/race_result_gui.cpp:612
+#: src/states_screens/race_result_gui.cpp:1466
 msgid "It's a draw"
 msgstr "무승부입니다"
 
-#: src/states_screens/race_result_gui.cpp:851
+#: src/states_screens/race_result_gui.cpp:852
 #, c-format
 msgid "Eliminated after %s"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:856
-#: src/states_screens/race_result_gui.cpp:1285
+#: src/states_screens/race_result_gui.cpp:857
+#: src/states_screens/race_result_gui.cpp:1288
 msgid "Eliminated"
 msgstr "탈락됨"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1533
-#: src/states_screens/race_result_gui.cpp:1595
+#: src/states_screens/race_result_gui.cpp:1536
+#: src/states_screens/race_result_gui.cpp:1598
 msgid "(Own Goal)"
 msgstr "(자책골)"
 
-#: src/states_screens/race_result_gui.cpp:1674
+#: src/states_screens/race_result_gui.cpp:1677
 #, c-format
 msgid "Track %i/%i"
 msgstr "트랙 %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1758
+#: src/states_screens/race_result_gui.cpp:1761
 msgid "Grand Prix progress:"
 msgstr "그랑프리 진행 상황:"
 
-#: src/states_screens/race_result_gui.cpp:1804
+#: src/states_screens/race_result_gui.cpp:1807
 msgid "Highscores"
 msgstr "최고 점수"
 
-#: src/states_screens/race_result_gui.cpp:1907
+#: src/states_screens/race_result_gui.cpp:1910
 #, c-format
 msgid "Best lap time: %s"
 msgstr "최단 바퀴 시간: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1921
+#: src/states_screens/race_result_gui.cpp:1924
 #, c-format
 msgid "by %s"
 msgstr "- %s"
 
-#: src/states_screens/race_result_gui.cpp:1960
+#: src/states_screens/race_result_gui.cpp:1963
 msgid "You completed the challenge!"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:1960
+#: src/states_screens/race_result_gui.cpp:1963
 msgid "You failed the challenge!"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:2011
+#: src/states_screens/race_result_gui.cpp:2014
 msgid "Reached Requirements of SuperTux"
 msgstr ""
 
@@ -6213,7 +6212,7 @@ msgstr "빨간팀 AI 카트 개수"
 
 #: src/states_screens/tracks_and_gp_screen.cpp:109
 msgid ""
-"You cannot play this grandprix because it contains tracks that aren't "
+"You cannot play this Grand Prix because it contains tracks that aren't "
 "unlocked!"
 msgstr ""
 
@@ -6388,7 +6387,7 @@ msgstr ""
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."
-msgstr ""
+msgstr "이 게임에는 광고가 없습니다."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
@@ -6410,7 +6409,3 @@ msgstr "만약 더 안정적인걸 원한다면, 안정된 버전: %s을 사용�
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
 msgstr "슈퍼턱스카트 팀"
-
-#: src/states_screens/credits.cpp:209
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\nMyeongjin, 2019,2021\nRoland Kim, 2015\nsooyeon73, 2020\nYieJun Choi, 2020\nRoland Kim - Dynamicw0rk\nLaunchpad Contributions:\nJJ\nTae-Wong SEO"

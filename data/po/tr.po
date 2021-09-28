@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-11 10:50+0800\n"
-"PO-Revision-Date: 2021-08-11 10:50+0000\n"
-"Last-Translator: Serdar Sağlam <teknomobil@msn.com>\n"
+"POT-Creation-Date: 2021-09-10 01:06+0800\n"
+"PO-Revision-Date: 2021-09-25 05:28+0000\n"
+"Last-Translator: Benau\n"
 "Language-Team: Turkish (http://www.transifex.com/supertuxkart/supertuxkart/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -881,7 +881,7 @@ msgstr "Katıl"
 
 #. I18N: ./data/gui/dialogs/online/server_info_dialog.stkgui
 #. I18N: In the server info dialog
-#: src/states_screens/dialogs/server_info_dialog.cpp:274
+#: src/states_screens/dialogs/server_info_dialog.cpp:278
 msgid "Bookmark this server"
 msgstr ""
 
@@ -986,9 +986,9 @@ msgstr "Yarış Kurulumu"
 #. I18N: ./data/gui/screens/online/network_karts.stkgui
 #. I18N: ./data/gui/screens/soccer_setup.stkgui
 #. I18N: In soccer setup screen
-#: src/states_screens/race_result_gui.cpp:254
-#: src/states_screens/race_result_gui.cpp:283
-#: src/states_screens/race_result_gui.cpp:291
+#: src/states_screens/race_result_gui.cpp:255
+#: src/states_screens/race_result_gui.cpp:284
+#: src/states_screens/race_result_gui.cpp:292
 msgid "Continue"
 msgstr "Devam"
 
@@ -1723,7 +1723,7 @@ msgstr "Öğretici"
 #. I18N: In the main screen
 #: src/states_screens/track_info_screen.cpp:332
 msgid "High Scores"
-msgstr ""
+msgstr "Yüksek Puanlar"
 
 #. I18N: ./data/gui/screens/main_menu.stkgui
 #. I18N: In the main screen
@@ -1790,20 +1790,20 @@ msgstr "Sunucu Oluştur"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:201
+#: src/states_screens/online/networking_lobby.cpp:203
 msgid "Lobby"
 msgstr "Lobi"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:186
+#: src/states_screens/online/networking_lobby.cpp:188
 msgid "Start race"
 msgstr "Yarışı başlat"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:194
+#: src/states_screens/online/networking_lobby.cpp:196
 msgid "Configuration"
 msgstr "Yapılandırma"
 
@@ -1890,7 +1890,7 @@ msgstr "Değiştir"
 #. I18N: ./data/gui/screens/online/profile_settings.stkgui
 #. I18N: In the online account settings screen
 msgid "E-mail:"
-msgstr ""
+msgstr "E-posta:"
 
 #. I18N: ./data/gui/screens/online/register.stkgui
 #. I18N: In the registration dialog
@@ -2133,7 +2133,7 @@ msgstr "Yapılandırmayı Yeniden Adlandır"
 
 #. I18N: ./data/gui/screens/options_device.stkgui
 #. I18N: In the input configuration screen, for gamepad
-msgid "Enable force feedback (if support)"
+msgid "Enable force feedback (if supported)"
 msgstr ""
 
 #. I18N: ./data/gui/screens/options_general.stkgui
@@ -2562,6 +2562,10 @@ msgstr "Su Altı Akvaryumu"
 msgid "Alien Signal"
 msgstr ""
 
+#. I18N: ../stk-assets/tracks/ancient_colosseum_labyrinth/track.xml
+msgid "Ancient Colosseum Labyrinth"
+msgstr ""
+
 #. I18N: ../stk-assets/tracks/arena_candela_city/track.xml
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
 msgid "Candela City"
@@ -2833,12 +2837,12 @@ msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "Fps: %d/%d/%d - %d Ktris, Ping: %dms"
 
 #. I18N: Tip shown in gui for giving player hints
-#: src/guiengine/engine.cpp:1439 src/states_screens/race_result_gui.cpp:201
+#: src/guiengine/engine.cpp:1447 src/states_screens/race_result_gui.cpp:202
 #, c-format
 msgid "Tip: %s"
 msgstr "İpucu: %s"
 
-#: src/guiengine/engine.cpp:1483
+#: src/guiengine/engine.cpp:1491
 msgid "Loading"
 msgstr "Yükleniyor"
 
@@ -2864,10 +2868,10 @@ msgstr "Nitro verimi"
 #: src/guiengine/widgets/player_kart_widget.cpp:758
 #: src/karts/controller/local_player_controller.cpp:452
 #: src/karts/controller/player_controller.cpp:413
-#: src/network/protocols/client_lobby.cpp:854
+#: src/network/protocols/client_lobby.cpp:853
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1527
-#: src/states_screens/race_result_gui.cpp:1589
+#: src/states_screens/race_result_gui.cpp:1530
+#: src/states_screens/race_result_gui.cpp:1592
 #, c-format
 msgid "%s (handicapped)"
 msgstr "%s (engelli)"
@@ -3491,14 +3495,15 @@ msgstr "%s düşük pil seviyesi. "
 #: src/input/wiimote_manager.cpp:379
 msgid ""
 "Connect your wiimote to the Bluetooth manager, then click on Ok. Detailed "
-"instructions at supertuxkart.net/Wiimote"
-msgstr "Wiimote'unuzu Bluetooth yöneticisine bağlayın, ardından Tamam'a tıklayın. Supertuxkart.net/Wiimote adresindeki ayrıntılı talimatlar"
+"instructions at https://supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:382
 msgid ""
 "Press the buttons 1+2 simultaneously on your wiimote to put it in discovery "
-"mode, then click on Ok. Detailed instructions at supertuxkart.net/Wiimote"
-msgstr "Keşif kipine getirmek için kablosuz üzerinde 1+2 düğmelerine aynı anda basın, ardından Tamam'a tıklayın. Supertuxkart.net/Wiimote adresinde ayrıntı talimatlar var"
+"mode, then click on Ok. Detailed instructions at "
+"https://supertuxkart.net/Wiimote"
+msgstr ""
 
 #: src/input/wiimote_manager.cpp:405
 #, c-format
@@ -3513,7 +3518,7 @@ msgstr "Hiç wiimote tespit edilmedi :/"
 
 #: src/io/rich_presence.cpp:477
 msgid "Getting ready to race"
-msgstr ""
+msgstr "Yarışa hazırlanıyor"
 
 #: src/karts/controller/local_player_controller.cpp:313
 msgid "Penalty time!!"
@@ -3545,7 +3550,7 @@ msgid "You finished the race in rank %d!"
 msgstr "Yarışı %d sırada bitirdin!"
 
 #. I18N: Message shown in game to tell player left the game in network
-#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1157
+#: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1156
 #, c-format
 msgid "%s left the game."
 msgstr "%s oyundan ayrıldı."
@@ -3683,12 +3688,12 @@ msgid "You were kicked: Ping too high."
 msgstr "Atıldın: Ping çok yüksek."
 
 #: src/network/protocols/client_lobby.cpp:281
-#: src/network/protocols/client_lobby.cpp:898
+#: src/network/protocols/client_lobby.cpp:897
 msgid "Bad network connection is detected."
 msgstr "Kötü ağ bağlantısı tespit edildi."
 
 #: src/network/protocols/client_lobby.cpp:446
-#: src/network/protocols/server_lobby.cpp:3846
+#: src/network/protocols/server_lobby.cpp:3845
 msgid "Bot"
 msgstr "Bot"
 
@@ -3705,36 +3710,30 @@ msgid ""
 msgstr "Oyuncu yönetimi ve sıralama bilgileri için listede oyuncu adına basın."
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:717
-#, c-format
-msgid "Server name: %s"
-msgstr "Sunucu adı: %s"
-
-#. I18N: In the networking lobby
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:725
+#: src/network/protocols/client_lobby.cpp:724
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:111
-#: src/states_screens/dialogs/server_info_dialog.cpp:92
-#: src/states_screens/race_result_gui.cpp:1893
+#: src/states_screens/dialogs/server_info_dialog.cpp:96
+#: src/states_screens/race_result_gui.cpp:1896
 #, c-format
 msgid "Difficulty: %s"
 msgstr "Zorluk: %s"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:730
+#: src/network/protocols/client_lobby.cpp:729
 #, c-format
 msgid "Max players: %d"
 msgstr "En fazla oyuncu: %d"
 
 #. I18N: In server info dialog
-#: src/network/protocols/client_lobby.cpp:743
-#: src/states_screens/dialogs/server_info_dialog.cpp:96
+#: src/network/protocols/client_lobby.cpp:742
+#: src/states_screens/dialogs/server_info_dialog.cpp:100
 #, c-format
 msgid "Game mode: %s"
 msgstr "Oyun kipi: %s"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:756
+#: src/network/protocols/client_lobby.cpp:755
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:174
 #: src/states_screens/online/create_server_screen.cpp:242
 #: src/states_screens/track_info_screen.cpp:367
@@ -3742,7 +3741,7 @@ msgid "Time limit"
 msgstr "Zamana karşı"
 
 #. I18N: In the create server screen for soccer server
-#: src/network/protocols/client_lobby.cpp:757
+#: src/network/protocols/client_lobby.cpp:756
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:175
 #: src/states_screens/online/create_server_screen.cpp:244
 #: src/states_screens/track_info_screen.cpp:368
@@ -3750,102 +3749,102 @@ msgid "Goals limit"
 msgstr "Gol sınırı"
 
 #. I18N: In the networking lobby
-#: src/network/protocols/client_lobby.cpp:761
+#: src/network/protocols/client_lobby.cpp:760
 #, c-format
 msgid "Soccer game type: %s"
 msgstr "Futbol oyunu türü: %s"
 
-#: src/network/protocols/client_lobby.cpp:771
+#: src/network/protocols/client_lobby.cpp:770
 #, c-format
 msgid "Grand prix progress: %d / %d"
 msgstr "Grand prix ilerlemesi: %d / %d"
 
 #. I18N: Display when all players are in red or blue team, which the race
 #. will not be allowed to start
-#: src/network/protocols/client_lobby.cpp:890
+#: src/network/protocols/client_lobby.cpp:889
 msgid "All players joined red or blue team."
 msgstr "Tüm oyuncular kırmızı veya mavi takıma katıldı."
 
 #. I18N: Display when a player is allow to control the server
-#: src/network/protocols/client_lobby.cpp:910
+#: src/network/protocols/client_lobby.cpp:909
 msgid "You are now the owner of server."
 msgstr "Artık sunucunun sahibisiniz."
 
-#: src/network/protocols/client_lobby.cpp:953
+#: src/network/protocols/client_lobby.cpp:952
 msgid "Connection refused: Server is busy."
 msgstr "Bağlantı reddedildi: Sunucu meşgul."
 
-#: src/network/protocols/client_lobby.cpp:958
+#: src/network/protocols/client_lobby.cpp:957
 msgid "Connection refused: You are banned from the server."
 msgstr "Bağlantı reddedildi: Sunucudan yasaklandınız."
 
-#: src/network/protocols/client_lobby.cpp:973
+#: src/network/protocols/client_lobby.cpp:972
 msgid "Connection refused: Server password is incorrect."
 msgstr "Bağlantı reddedildi: Sunucu parolası yanlış."
 
-#: src/network/protocols/client_lobby.cpp:977
+#: src/network/protocols/client_lobby.cpp:976
 msgid "Connection refused: Game data is incompatible."
 msgstr "Bağlantı reddedildi: Oyun verileri uyumlu değil."
 
-#: src/network/protocols/client_lobby.cpp:981
+#: src/network/protocols/client_lobby.cpp:980
 msgid "Connection refused: Server is full."
 msgstr "Bağlantı reddedildi: Sunucu dolu."
 
-#: src/network/protocols/client_lobby.cpp:985
+#: src/network/protocols/client_lobby.cpp:984
 msgid "Connection refused: Invalid player connecting."
 msgstr "Bağlantı reddedildi: Geçersiz oyuncu bağlanıyor."
 
-#: src/network/protocols/client_lobby.cpp:1013
+#: src/network/protocols/client_lobby.cpp:1012
 msgid "Failed to start the network game."
 msgstr "Ağ oyunu başlatılamadı."
 
 #. I18N: Error message shown if live join or spectate failed in network
-#: src/network/protocols/client_lobby.cpp:1226
+#: src/network/protocols/client_lobby.cpp:1225
 msgid "The game has ended, you can't live join or spectate anymore."
 msgstr "Oyun sona erdi, artık katılamazsınız ya da izleyemezsiniz."
 
 #. I18N: Error message shown if live join failed in network
-#: src/network/protocols/client_lobby.cpp:1230
+#: src/network/protocols/client_lobby.cpp:1229
 msgid "No remaining place in the arena - live join disabled."
 msgstr "Arenada yer kalmadı - canlı katılım engelli."
 
 #. I18N: Error message shown if only 1 player remains in network
-#: src/network/protocols/client_lobby.cpp:1234
+#: src/network/protocols/client_lobby.cpp:1233
 msgid "Only 1 player remaining, returning to lobby."
 msgstr "Lobiye dönen sadece 1 oyuncu kaldı."
 
-#: src/network/protocols/client_lobby.cpp:1240
+#: src/network/protocols/client_lobby.cpp:1239
 msgid "Server owner quit the game."
 msgstr "Sunucu sahibi oyundan ayrıldı."
 
 #. I18N: Status shown to player when he will be spectating the next game
-#: src/network/protocols/client_lobby.cpp:1244
+#: src/network/protocols/client_lobby.cpp:1243
 msgid "You will be spectating the next game."
 msgstr "Bir sonraki oyunu izleyeceksiniz."
 
 #. I18N: Show when player join red team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1412
+#: src/network/protocols/client_lobby.cpp:1411
 #, c-format
 msgid "%s joined the red team."
 msgstr "%s kırmızı takıma katıldı."
 
 #. I18N: Show when player join blue team of the started game in
 #. network
-#: src/network/protocols/client_lobby.cpp:1418
+#: src/network/protocols/client_lobby.cpp:1417
 #, c-format
 msgid "%s joined the blue team."
 msgstr "%smavi takıma katıldı. "
 
 #. I18N: Show when player join the started game in network
-#: src/network/protocols/client_lobby.cpp:1424
+#: src/network/protocols/client_lobby.cpp:1423
 #, c-format
 msgid "%s joined the game."
 msgstr "%s oyuna katıldı."
 
 #. I18N: Message shown in game to tell the player it's possible to change
 #. the camera target in spectate mode of network
-#: src/network/protocols/client_lobby.cpp:1615
+#: src/network/protocols/client_lobby.cpp:1614
 #, c-format
 msgid ""
 "Press <%s> or <%s> to change the targeted player, <%s> or <%s> for the "
@@ -3853,14 +3852,14 @@ msgid ""
 msgstr "Bas <%s> yada <%s> hedeflenen oyuncuyu değiştirmek için, <%s> yada <%s> kamera konumu için."
 
 #. I18N: Tell player he has successfully report this named player
-#: src/network/protocols/client_lobby.cpp:1631
+#: src/network/protocols/client_lobby.cpp:1630
 #, c-format
 msgid "Successfully reported %s."
 msgstr "Başarıyla rapor edildi %s."
 
 #. I18N: Shown when there is download error for assets download
 #. in the first run
-#: src/network/protocols/client_lobby.cpp:1896
+#: src/network/protocols/client_lobby.cpp:1895
 #: src/states_screens/dialogs/download_assets.cpp:251
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
@@ -4073,6 +4072,10 @@ msgid "%d arena unavailable in single player."
 msgid_plural "%d arenas unavailable in single player."
 msgstr[0] "%darenası tek oyuncuda kullanılamıyor. "
 msgstr[1] "%d arenası tek oyuncuda kullanılamıyor."
+
+#: src/states_screens/credits.cpp:184
+msgid "translator-credits"
+msgstr "Launchpad Contributions:\nSerdar Sağlam, 2019-2021\nU. Ozan Basar, 2015\nVolkan Gezer, 2015\nyakup, 2015-2017\nDawid Gan\nMuhammet Kara\nOsman Tosun\nSTK-team\nVolkan Gezer\nemre can yılmaz\nlinuxseven\nmaidis\nyakup\nzeugma\nSerdar Sağlam"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4510,27 +4513,27 @@ msgid "Problems installing the addon '%s'."
 msgstr "'%s' eklentisini yüklerken hata."
 
 #: src/states_screens/dialogs/addons_loading.cpp:383
-#: src/states_screens/dialogs/addons_loading.cpp:432
+#: src/states_screens/dialogs/addons_loading.cpp:434
 #: src/states_screens/dialogs/download_assets.cpp:266
 msgid "Try again"
 msgstr "Tekrar dene"
 
-#: src/states_screens/dialogs/addons_loading.cpp:421
+#: src/states_screens/dialogs/addons_loading.cpp:423
 #, c-format
 msgid "Problems removing the addon '%s'."
 msgstr "'%s' eklentisini kaldırırken hata."
 
 #: src/states_screens/dialogs/addons_pack.cpp:66
 msgid "Background download completed."
-msgstr ""
+msgstr "Arka planda indirme tamamlandı."
 
 #: src/states_screens/dialogs/addons_pack.cpp:127
 msgid "Background download"
-msgstr ""
+msgstr "Arka planda indir"
 
 #: src/states_screens/dialogs/addons_pack.cpp:136
 msgid "Background download has already started."
-msgstr ""
+msgstr "Arka planda indirme zaten başladı."
 
 #: src/states_screens/dialogs/change_password_dialog.cpp:135
 msgid "Current password invalid."
@@ -4832,29 +4835,29 @@ msgid "Press any key..."
 msgstr "herhangi bir tuşa bas..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
-#: src/states_screens/online/networking_lobby.cpp:244
-#: src/states_screens/online/networking_lobby.cpp:836
+#: src/states_screens/online/networking_lobby.cpp:247
+#: src/states_screens/online/networking_lobby.cpp:967
 msgid "Chat is disabled, enable in options menu."
 msgstr "Sohbet devre dışı, seçenekler menüsünden etkinleştirin."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:130
 msgid "Back to Battle"
-msgstr ""
+msgstr "Savaşa Geri Dön"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:133
 msgid "Setup New Game"
-msgstr ""
+msgstr "Yeni Oyun Kur"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:135
 msgid "Restart Battle"
-msgstr ""
+msgstr "Savaşı Yeniden Başlat"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:137
 msgid "Exit Battle"
-msgstr ""
+msgstr "Savaştan Çık"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:144
-#: src/states_screens/race_result_gui.cpp:337
+#: src/states_screens/race_result_gui.cpp:338
 msgid "Setup New Race"
 msgstr "Yeni Yarış Kur"
 
@@ -4900,7 +4903,7 @@ msgstr "Hayaletine Karşı Yarış"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1883
+#: src/states_screens/race_result_gui.cpp:1886
 #, c-format
 msgid "Laps: %i"
 msgstr "Turlar: %i"
@@ -4913,21 +4916,21 @@ msgstr "Tür: %s"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:90
-#: src/states_screens/race_result_gui.cpp:1975
+#: src/states_screens/race_result_gui.cpp:1978
 #, c-format
 msgid "Required Rank: %i"
 msgstr "Gerekli Sıra %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:96
-#: src/states_screens/race_result_gui.cpp:1983
+#: src/states_screens/race_result_gui.cpp:1986
 #, c-format
 msgid "Required Time: %i"
 msgstr "Gerekli Zaman: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:103
-#: src/states_screens/race_result_gui.cpp:1994
+#: src/states_screens/race_result_gui.cpp:1997
 #, c-format
 msgid "Required Nitro Points: %i"
 msgstr "Gerekli Nitro Puanları: %i"
@@ -4953,43 +4956,43 @@ msgstr "Futbol oyunu türü"
 
 #. I18N: In the server info dialog, show the server location with
 #. country name (based on IP geolocation)
-#: src/states_screens/dialogs/server_info_dialog.cpp:105
+#: src/states_screens/dialogs/server_info_dialog.cpp:109
 #, c-format
 msgid "Server location: %s"
 msgstr "Sunucu konumu: %s"
 
 #. I18N: In server info dialog, showing the current track playing in server
-#: src/states_screens/dialogs/server_info_dialog.cpp:114
+#: src/states_screens/dialogs/server_info_dialog.cpp:118
 #, c-format
 msgid "Current track: %s"
 msgstr "Mevcut yol: %s"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:124
+#: src/states_screens/dialogs/server_info_dialog.cpp:128
 msgid "Rank"
 msgstr "Sıra"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user name on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:127
+#: src/states_screens/dialogs/server_info_dialog.cpp:131
 msgid "Player"
 msgstr "Oyuncu"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the scores of user calculated by player rankings
-#: src/states_screens/dialogs/server_info_dialog.cpp:130
+#: src/states_screens/dialogs/server_info_dialog.cpp:134
 msgid "Scores"
 msgstr "Puanlar"
 
 #. I18N: Show above the player list in server info dialog, tell
 #. the user time played on server
-#: src/states_screens/dialogs/server_info_dialog.cpp:133
+#: src/states_screens/dialogs/server_info_dialog.cpp:137
 msgid "Time played"
 msgstr "Oynanan zaman"
 
-#: src/states_screens/dialogs/server_info_dialog.cpp:265
-#: src/states_screens/dialogs/server_info_dialog.cpp:279
+#: src/states_screens/dialogs/server_info_dialog.cpp:269
+#: src/states_screens/dialogs/server_info_dialog.cpp:283
 msgid "Remove from bookmarks"
-msgstr ""
+msgstr "Yer imlerinden kaldır"
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:130
 msgid "Input device already exists."
@@ -5201,7 +5204,7 @@ msgid "Better luck next time!"
 msgstr "Bir dahaki oyunda iyi şanslar!"
 
 #: src/states_screens/grand_prix_win.cpp:166
-#: src/states_screens/race_result_gui.cpp:273
+#: src/states_screens/race_result_gui.cpp:274
 msgid "You completed a challenge!"
 msgstr "Bir görev tamamladınız!"
 
@@ -5240,7 +5243,7 @@ msgid "Locked"
 msgstr "Kilitli"
 
 #: src/states_screens/kart_selection.cpp:1032
-#: src/states_screens/online/networking_lobby.cpp:518
+#: src/states_screens/online/networking_lobby.cpp:646
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5305,35 +5308,30 @@ msgstr "Parola içinde yanlış karakterler var!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:189
+#: src/states_screens/online/networking_lobby.cpp:191
 msgid "Ready"
 msgstr "Hazır"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:192
+#: src/states_screens/online/networking_lobby.cpp:194
 msgid "Live join"
 msgstr "Canlı katılım"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:197
+#: src/states_screens/online/networking_lobby.cpp:199
 msgid "Spectate"
 msgstr "Seyret"
 
-#: src/states_screens/online/networking_lobby.cpp:198
+#: src/states_screens/online/networking_lobby.cpp:200
 msgid "Install addon"
 msgstr "Eklenti kur"
-
-#: src/states_screens/online/networking_lobby.cpp:337
-#, c-format
-msgid "Lobby (ping: %dms)"
-msgstr "Lobi (ping: %dms)"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:383
+#: src/states_screens/online/networking_lobby.cpp:511
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -5341,7 +5339,7 @@ msgstr "Lütfen mevcut oyunun (%s) sonunu bekleyin, kalan tahmini süre: %s."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:391
+#: src/states_screens/online/networking_lobby.cpp:519
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "Lütfen mevcut oyunun sona ermesini bekleyin, kalan tahmini süre: %s."
@@ -5349,24 +5347,24 @@ msgstr "Lütfen mevcut oyunun sona ermesini bekleyin, kalan tahmini süre: %s."
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:403
+#: src/states_screens/online/networking_lobby.cpp:531
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr "Lütfen mevcut oyunun (%s) sonunu bekleyin, tahmini ilerleme: %%s"
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:412
+#: src/states_screens/online/networking_lobby.cpp:540
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "Lütfen mevcut oyunun sona ermesini bekleyin, tahmini ilerleme: %%d"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:420
+#: src/states_screens/online/networking_lobby.cpp:548
 msgid "Please wait for the current game's end."
 msgstr "Lütfen mevcut oyunun bitmesini bekleyin."
 
-#: src/states_screens/online/networking_lobby.cpp:487
+#: src/states_screens/online/networking_lobby.cpp:615
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5375,7 +5373,7 @@ msgstr[1] "%d'den fazla oyuncu varsa oyun başlayacaktır."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:501
+#: src/states_screens/online/networking_lobby.cpp:629
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5384,12 +5382,12 @@ msgid_plural ""
 msgstr[0] "%d saniye sonra veya herkes 'hazır' düğmesine bastıktan sonra başlayacak."
 msgstr[1] "%d saniye sonra veya herkes 'hazır' düğmesine bastıktan sonra başlayacak."
 
-#: src/states_screens/online/networking_lobby.cpp:538
+#: src/states_screens/online/networking_lobby.cpp:666
 #, c-format
 msgid "Connecting to server %s"
 msgstr "Sunucuya bağlanıyor %s"
 
-#: src/states_screens/online/networking_lobby.cpp:543
+#: src/states_screens/online/networking_lobby.cpp:671
 msgid "Finding a quick play server"
 msgstr "Hızlıca bir oyun sunucusu bul"
 
@@ -5987,64 +5985,64 @@ msgid "Do you really want to delete player '%s'?"
 msgstr "Gerçekten oyuncu silmek istiyor musunuz '%s'?"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:71
+#: src/states_screens/race_gui_base.cpp:72
 msgid "Ready!"
 msgstr "Hazır!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:73
+#: src/states_screens/race_gui_base.cpp:74
 msgid "Set!"
 msgstr "Dikkat!"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
-#: src/states_screens/race_gui_base.cpp:75
+#: src/states_screens/race_gui_base.cpp:76
 msgid "Go!"
 msgstr "Git!"
 
 #. I18N: Shown when a goal is scored
-#: src/states_screens/race_gui_base.cpp:77
+#: src/states_screens/race_gui_base.cpp:78
 msgid "GOAL!"
 msgstr "GOL!"
 
 #. I18N: Shown waiting for other players in network to finish loading or
 #. waiting
-#: src/states_screens/race_gui_base.cpp:80
-#: src/states_screens/race_result_gui.cpp:383
+#: src/states_screens/race_gui_base.cpp:81
+#: src/states_screens/race_result_gui.cpp:384
 msgid "Waiting for others"
 msgstr "Başkalarını bekliyorum"
 
 #. I18N: Shown waiting for the server in network if live join or spectate
-#: src/states_screens/race_gui_base.cpp:82
+#: src/states_screens/race_gui_base.cpp:83
 msgid "Waiting for the server"
 msgstr "Sunucuyu bekliyorum"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:641
+#: src/states_screens/race_gui_base.cpp:642
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:651
+#: src/states_screens/race_gui_base.cpp:652
 msgid "by"
 msgstr "-"
 
-#: src/states_screens/race_gui_base.cpp:759
+#: src/states_screens/race_gui_base.cpp:765
 msgid "Collect nitro!"
 msgstr "Nitro biriktir!"
 
-#: src/states_screens/race_gui_base.cpp:761
+#: src/states_screens/race_gui_base.cpp:767
 msgid "Follow the leader!"
 msgstr "Lideri takip et!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:944
+#: src/states_screens/race_gui_base.cpp:950
 #, c-format
 msgid "Top %i"
 msgstr "En İyi %i"
 
-#: src/states_screens/race_gui.cpp:450
+#: src/states_screens/race_gui.cpp:448
 msgid "Challenge Failed"
 msgstr "Mücadele Başarısız"
 
@@ -6068,105 +6066,105 @@ msgstr "Meydan okumaya başlamak için podyum simgesine bas"
 msgid "Press fire to start the challenge"
 msgstr "Mücadeleyi başlatmak için ateş düğmesine bas"
 
-#: src/states_screens/race_result_gui.cpp:259
+#: src/states_screens/race_result_gui.cpp:260
 msgid "Quit the server"
 msgstr "Sunucudan çık"
 
-#: src/states_screens/race_result_gui.cpp:274
+#: src/states_screens/race_result_gui.cpp:275
 msgid "You completed challenges!"
 msgstr "Görevleri tamamladınız!"
 
-#: src/states_screens/race_result_gui.cpp:297
+#: src/states_screens/race_result_gui.cpp:298
 msgid "Abort Grand Prix"
 msgstr "Grand Prix'i Durdur"
 
-#: src/states_screens/race_result_gui.cpp:317
+#: src/states_screens/race_result_gui.cpp:318
 msgid "Restart"
 msgstr "Yeniden Başlat"
 
-#: src/states_screens/race_result_gui.cpp:324
+#: src/states_screens/race_result_gui.cpp:325
 msgid "Back to challenge selection"
 msgstr "Meydan okuma seçimine geri dön"
 
-#: src/states_screens/race_result_gui.cpp:332
+#: src/states_screens/race_result_gui.cpp:333
 msgid "Race against the new ghost replay"
 msgstr "Hayaletine Karşı Tekrar Yarış"
 
-#: src/states_screens/race_result_gui.cpp:340
+#: src/states_screens/race_result_gui.cpp:341
 msgid "Back to the menu"
 msgstr "Menüye Dön"
 
-#: src/states_screens/race_result_gui.cpp:509
+#: src/states_screens/race_result_gui.cpp:510
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "Gerçekten Büyük Yarış'ı iptal etmek istiyor musun?"
 
-#: src/states_screens/race_result_gui.cpp:607
-#: src/states_screens/race_result_gui.cpp:1454
+#: src/states_screens/race_result_gui.cpp:608
+#: src/states_screens/race_result_gui.cpp:1457
 msgid "Red Team Wins"
 msgstr "Kırmızı Takım Kazandı"
 
-#: src/states_screens/race_result_gui.cpp:609
-#: src/states_screens/race_result_gui.cpp:1458
+#: src/states_screens/race_result_gui.cpp:610
+#: src/states_screens/race_result_gui.cpp:1461
 msgid "Blue Team Wins"
 msgstr "Mavi Takım Kazandı"
 
-#: src/states_screens/race_result_gui.cpp:611
-#: src/states_screens/race_result_gui.cpp:1463
+#: src/states_screens/race_result_gui.cpp:612
+#: src/states_screens/race_result_gui.cpp:1466
 msgid "It's a draw"
 msgstr "Beraberlik"
 
-#: src/states_screens/race_result_gui.cpp:851
+#: src/states_screens/race_result_gui.cpp:852
 #, c-format
 msgid "Eliminated after %s"
 msgstr ""
 
-#: src/states_screens/race_result_gui.cpp:856
-#: src/states_screens/race_result_gui.cpp:1285
+#: src/states_screens/race_result_gui.cpp:857
+#: src/states_screens/race_result_gui.cpp:1288
 msgid "Eliminated"
 msgstr "Elendi"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1533
-#: src/states_screens/race_result_gui.cpp:1595
+#: src/states_screens/race_result_gui.cpp:1536
+#: src/states_screens/race_result_gui.cpp:1598
 msgid "(Own Goal)"
 msgstr "(Kendi Kalesine Gol)"
 
-#: src/states_screens/race_result_gui.cpp:1674
+#: src/states_screens/race_result_gui.cpp:1677
 #, c-format
 msgid "Track %i/%i"
 msgstr "Yol %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1758
+#: src/states_screens/race_result_gui.cpp:1761
 msgid "Grand Prix progress:"
 msgstr "Grand Prix ilerlemesi:"
 
-#: src/states_screens/race_result_gui.cpp:1804
+#: src/states_screens/race_result_gui.cpp:1807
 msgid "Highscores"
 msgstr "Yüksek Puanlar"
 
-#: src/states_screens/race_result_gui.cpp:1907
+#: src/states_screens/race_result_gui.cpp:1910
 #, c-format
 msgid "Best lap time: %s"
 msgstr "En iyi tur zamanı: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1921
+#: src/states_screens/race_result_gui.cpp:1924
 #, c-format
 msgid "by %s"
 msgstr "%s tarafından"
 
-#: src/states_screens/race_result_gui.cpp:1960
+#: src/states_screens/race_result_gui.cpp:1963
 msgid "You completed the challenge!"
-msgstr ""
+msgstr "Meydan okumayı tamamladın!"
 
-#: src/states_screens/race_result_gui.cpp:1960
+#: src/states_screens/race_result_gui.cpp:1963
 msgid "You failed the challenge!"
-msgstr ""
+msgstr "Meydan okumada başarısız oldun!"
 
-#: src/states_screens/race_result_gui.cpp:2011
+#: src/states_screens/race_result_gui.cpp:2014
 msgid "Reached Requirements of SuperTux"
-msgstr ""
+msgstr "SuperTux'un Ulaşılan Gereksinimleri"
 
 #: src/states_screens/race_setup_screen.cpp:88
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -6221,9 +6219,9 @@ msgstr "Kırmızı takım Araç sayısı"
 
 #: src/states_screens/tracks_and_gp_screen.cpp:109
 msgid ""
-"You cannot play this grandprix because it contains tracks that aren't "
+"You cannot play this Grand Prix because it contains tracks that aren't "
 "unlocked!"
-msgstr ""
+msgstr "Kilidi açılmamış bölümler içerdiğinden bu Grand Prix'i oynayamazsınız!"
 
 #. I18N: track group name
 #: src/states_screens/tracks_and_gp_screen.cpp:157
@@ -6392,11 +6390,11 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "Diğer araçlara karşı tek bir yarış yapabilir, birkaç Grand Prix'den birinde yarışabilir, zaman denemelerinde kendi başınıza yüksek puanı geçmeye çalışabilir, bilgisayara veya arkadaşlarınıza karşı savaş kipini oynayabilir ve daha fazlasını yapabilirsiniz! Daha büyük bir meydan okuma için çevrimiçi katılın ve dünyanın her yerinden oyuncularla tanışın ve yarış becerilerinizi kanıtlayın!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."
-msgstr ""
+msgstr "Bu oyunda reklam yok."
 
 #: supertuxkart.appdata.xml:20
 msgid ""
@@ -6418,7 +6416,3 @@ msgstr "Daha fazla kararlılığa ihtiyacınız varsa kararlı sürümü kullan�
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"
 msgstr "SuperTuxKart Takımı"
-
-#: src/states_screens/credits.cpp:209
-msgid "translator-credits"
-msgstr "Launchpad Contributions:\nSerdar Sağlam, 2019-2021\nU. Ozan Basar, 2015\nVolkan Gezer, 2015\nyakup, 2015-2017\nDawid Gan\nMuhammet Kara\nOsman Tosun\nSTK-team\nVolkan Gezer\nemre can yılmaz\nlinuxseven\nmaidis\nyakup\nzeugma\nSerdar Sağlam"
