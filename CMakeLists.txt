@@ -128,7 +128,11 @@ endif()
 
 set(STK_SOURCE_DIR "src")
 set(STK_DATA_DIR "${PROJECT_SOURCE_DIR}/data")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+
+# CMAKE_RUNTIME_OUTPUT_DIRECTORY removes dSYMs in Xcode archive
+if(NOT CMAKE_GENERATOR MATCHES "Xcode")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+endif()
 
 # Define install paths
 set(STK_INSTALL_BINARY_DIR "bin" CACHE
@@ -578,6 +582,7 @@ else()
                 if (NOT target MATCHES "supertuxkart")
                     set_target_properties(${target} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib$(EFFECTIVE_PLATFORM_NAME)/${target})
                 endif()
+                configure_xcode_defaults(${target})
             endforeach()
         endif()
     else()

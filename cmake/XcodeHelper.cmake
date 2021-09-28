@@ -12,3 +12,20 @@ function(get_all_targets _result _dir)
     get_directory_property(_sub_targets DIRECTORY "${_dir}" BUILDSYSTEM_TARGETS)
     set(${_result} ${${_result}} ${_sub_targets} PARENT_SCOPE)
 endfunction()
+
+# set(CMAKE_XCODE_ATTRIBUTE_GCC_GENERATE_DEBUGGING_SYMBOLS doesn't work in ios toolchain, below fixed it
+macro(configure_xcode_defaults _EXE_NAME)
+
+if (APPLE)
+    macro(set_xcode_property TARGET XCODE_PROPERTY XCODE_VALUE)
+        set_property(TARGET ${TARGET} PROPERTY XCODE_ATTRIBUTE_${XCODE_PROPERTY} ${XCODE_VALUE})
+    endmacro()
+endif()
+
+if (APPLE)
+    set_xcode_property(${_EXE_NAME} GCC_GENERATE_DEBUGGING_SYMBOLS[variant=Debug] YES)
+    set_xcode_property(${_EXE_NAME} GCC_GENERATE_DEBUGGING_SYMBOLS[variant=MinSizeRel] YES)
+    set_xcode_property(${_EXE_NAME} GCC_GENERATE_DEBUGGING_SYMBOLS[variant=RelWithDebInfo] YES)
+    set_xcode_property(${_EXE_NAME} GCC_GENERATE_DEBUGGING_SYMBOLS[variant=Release] YES)
+endif()
+endmacro()

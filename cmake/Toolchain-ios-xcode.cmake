@@ -7,7 +7,7 @@
 # You can also use -DCMAKE_XCODE_ATTRIBUTE_DEVELOPMENT_TEAM=xxxxxxxxxx to specify team
 
 # Increase every upload to App store
-SET(IOS_BUILD_VERSION 24)
+SET(IOS_BUILD_VERSION 26)
 
 # Get SDK path
 execute_process(COMMAND xcodebuild -version -sdk iphoneos Path
@@ -120,6 +120,8 @@ set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphoneos*] "arm64")
 
 set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] "x86_64")
 set(CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS[sdk=iphonesimulator*] "x86_64")
+
+set(CMAKE_XCODE_ATTRIBUTE_DEBUG_INFORMATION_FORMAT "dwarf-with-dsym" CACHE INTERNAL "")
 
 # Replace the above two with these if you use an apple silicon
 #set(CMAKE_XCODE_ATTRIBUTE_ARCHS[sdk=iphonesimulator*] "arm64")
