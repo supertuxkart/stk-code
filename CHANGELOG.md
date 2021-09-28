@@ -20,7 +20,7 @@ For similar reasons, and because some features are vastly more complex than othe
 * Switch port, by Mary
 * Gamepad force feedback support, by Mary
 * Highscore screen, by RQWorldblender
-* Grand Prix highscores, by Mrkubax
+* Grand Prix highscores, by mrkubax10
 * Updates to the bundled tinygettext library, by Benau
 * Enable custom skidding sounds for karts, by Benau
 * Greatly sped up loading of tracks with many checklines through optimization, by heuchi
@@ -30,14 +30,14 @@ For similar reasons, and because some features are vastly more complex than othe
 * Display the skin-appropriate iconset without having to restart, by Benau
 * Fix some issues with the options menu when used during a pause, by Benau
 * Add a confirmation dialog before closing the game through the "go back" key/button, by Benau
-* In the result screen, display the race position with a number with 10 karts or more, by Mrkubax
+* In the result screen, display the race position with a number with 10 karts or more, by mrkubax10
 * In the result screen, display the challenge result and the requirements met or failed, by CodingJellyFish
 * Many small menu and dialogs improvements, by RQWorldblender and others
 * Usability and functionality improvements to the debug menu, by RQWorldblender
 * Clickable URLs in text, by Benau
 
 #### In-race UI
-* Add visual and sound feedback when a timed challenge or timed game is about to end, by Mrkubax and Alayan
+* Add visual and sound feedback when a timed challenge or timed game is about to end, by mrkubax10 and Alayan
 
 ### Mobile
 * Fix a precision issue that caused artefacted shadows, by icecream95 and Benau
