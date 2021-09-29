@@ -53,7 +53,6 @@ private:
 
     float m_curr_time;
 
-protected:
     GrandPrixData m_gp;
 
 public:
