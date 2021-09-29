@@ -266,18 +266,23 @@ GUIEngine::EventPropagation
             input_manager->getDeviceManager()
                 ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
+            bool reverse = m_hs->m_reverse;
+            GrandPrixData::GPReverseType gp_reverse = (GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
+            std::string track_name = m_hs->m_track;
+            int laps = m_hs->m_number_of_laps;
+
             ModalDialog::dismiss();
 
             if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
             {
-                m_gp = *grand_prix_manager->getGrandPrix(m_hs->m_track);
-                m_gp.changeReverse((GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
-                RaceManager::get()->startGP(m_gp, false, false);
+                GrandPrixData gp = *grand_prix_manager->getGrandPrix(track_name);
+                gp.changeReverse(gp_reverse);
+                RaceManager::get()->startGP(gp, false, false);
             }
             else
             {
-                RaceManager::get()->setReverseTrack(m_hs->m_reverse);
-                RaceManager::get()->startSingleRace(m_hs->m_track, m_hs->m_number_of_laps, false);
+                RaceManager::get()->setReverseTrack(reverse);
+                RaceManager::get()->startSingleRace(track_name, laps, false);
             }
             return GUIEngine::EVENT_BLOCK;
         }
