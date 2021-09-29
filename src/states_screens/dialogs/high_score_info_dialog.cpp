@@ -270,10 +270,11 @@ GUIEngine::EventPropagation
             GrandPrixData::GPReverseType gp_reverse = (GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type;
             std::string track_name = m_hs->m_track;
             int laps = m_hs->m_number_of_laps;
+            RaceManager::MajorRaceModeType major_mode = m_major_mode;
 
             ModalDialog::dismiss();
 
-            if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            if (major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
             {
                 GrandPrixData gp = *grand_prix_manager->getGrandPrix(track_name);
                 gp.changeReverse(gp_reverse);
