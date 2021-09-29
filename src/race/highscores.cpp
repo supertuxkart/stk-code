@@ -209,7 +209,7 @@ int Highscores::matches(int num_karts,
             m_difficulty      == difficulty       &&
             m_number_of_karts == num_karts        &&
             m_gp_reverse_type == reverse_type     &&
-            m_gp_minor_mode   == minor_mode);
+            m_gp_minor_mode   == minor_mode         );
 }
 
 int Highscores::findHighscorePosition(const std::string& kart_name, 
