@@ -491,11 +491,12 @@ void RaceManager::startNew(bool from_overworld)
         init_gp_rank ++;
     }
 
-    const bool random_pos_available = (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE
-                                    || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL
-                                    || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER);
-    
-    if (UserConfigParams::m_random_player_pos == true)
+    const bool random_pos_available = !NetworkConfig::get()->isNetworking() &&
+        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE
+        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL
+        || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER);
+
+    if (UserConfigParams::m_random_player_pos)
     {
         if (random_pos_available)
         {
