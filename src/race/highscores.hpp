@@ -61,7 +61,7 @@ public:
     int                 m_number_of_laps;
     bool                m_reverse;
     int                 m_gp_reverse_type;
-    std::string         m_gp_minor_mode;
+    int                 m_gp_minor_mode;
 
 private:
     std::array<std::string, HIGHSCORE_LEN> m_kart_name;

@@ -69,7 +69,7 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
         track = track_manager->getTrack(m_gp.getTrackId(0));
         track_name = m_gp.getName();
         track_type_name = _("Grand Prix");
-        m_minor_mode = RaceManager::getModeIDFromInternalName(m_hs->m_gp_minor_mode);
+        m_minor_mode = (RaceManager::MinorRaceModeType)m_hs->m_gp_minor_mode;
     }
     else
     {

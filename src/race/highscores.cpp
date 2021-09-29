@@ -45,7 +45,7 @@ Highscores::Highscores(const HighscoreType &highscore_type,
     m_number_of_laps  = number_of_laps;
     m_reverse         = reverse;
     m_gp_reverse_type = (int)GrandPrixData::GP_DEFAULT_REVERSE;
-    m_gp_minor_mode   = IDENT_STD;
+    m_gp_minor_mode   = (int)RaceManager::MINOR_MODE_NORMAL_RACE;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
@@ -66,7 +66,7 @@ Highscores::Highscores(int num_karts, const RaceManager::Difficulty &difficulty,
     m_number_of_laps  = 0;
     m_reverse         = false;
     m_gp_reverse_type = reverse_type;
-    m_gp_minor_mode   = RaceManager::getIdentOf(minor_mode);
+    m_gp_minor_mode   = minor_mode;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
@@ -85,7 +85,7 @@ Highscores::Highscores(const XMLNode &node)
     m_number_of_laps  = 0;
     m_reverse         = false;
     m_gp_reverse_type = (int)GrandPrixData::GP_DEFAULT_REVERSE;
-    m_gp_minor_mode   = IDENT_STD;
+    m_gp_minor_mode   = (int)RaceManager::MINOR_MODE_NORMAL_RACE;
 
     for(int i=0; i<HIGHSCORE_LEN; i++)
     {
@@ -209,7 +209,7 @@ int Highscores::matches(int num_karts,
             m_difficulty      == difficulty       &&
             m_number_of_karts == num_karts        &&
             m_gp_reverse_type == reverse_type     &&
-            m_gp_minor_mode   == RaceManager::getIdentOf(minor_mode));
+            m_gp_minor_mode   == minor_mode);
 }
 
 int Highscores::findHighscorePosition(const std::string& kart_name, 
@@ -277,7 +277,7 @@ int Highscores::addGPData(const std::string& kart_name,
         m_difficulty          = RaceManager::get()->getDifficulty();
         m_number_of_laps      = 0;
         m_gp_reverse_type     = RaceManager::get()->getGrandPrix().getReverseType();
-        m_gp_minor_mode       = RaceManager::getIdentOf(RaceManager::get()->getMinorMode());
+        m_gp_minor_mode       = RaceManager::get()->getMinorMode();
         m_name[position]      = name;
         m_time[position]      = time;
         m_kart_name[position] = kart_name;
