@@ -267,7 +267,7 @@ GUIEngine::EventPropagation
                 ->setSinglePlayer( StateManager::get()->getActivePlayer(0) );
 
             bool reverse = m_hs->m_reverse;
-            GrandPrixData::GPReverseType gp_reverse = (GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
+            GrandPrixData::GPReverseType gp_reverse = (GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type;
             std::string track_name = m_hs->m_track;
             int laps = m_hs->m_number_of_laps;
 
