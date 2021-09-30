@@ -165,8 +165,8 @@ void Highscores::writeEntry(UTFWriter &writer)
         writer << "             number-of-laps=\"" << m_number_of_laps          << "\"\n";
     if (m_highscore_type == "HST_GRANDPRIX")
     {
-        writer << "             reverse-type=\"" << m_gp_reverse_type       << "\"\n";
-        writer << "             minor-mode=\"" << m_gp_minor_mode       << "\">\n";
+        writer << "             reverse-type  =\"" << m_gp_reverse_type       << "\"\n";
+        writer << "             minor-mode    =\"" << m_gp_minor_mode       << "\">\n";
     }
     else
         writer << "             reverse       =\"" << m_reverse             << "\">\n";
