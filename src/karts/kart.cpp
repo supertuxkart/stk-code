@@ -1021,7 +1021,7 @@ void Kart::finishedRace(float time, bool from_server)
 
             m->addMessage((too_slow     ? _("You were too slow!") :
                            won_the_race ? _("You won the race!")  :
-                                          _("You finished the race in rank %d!", getPosition())),
+                           RaceManager::get()->getNumberOfKarts() > 1 ? _("You finished the race in rank %d!", getPosition()) : _("You finished the race")),
             this, 2.0f, video::SColor(255, 255, 255, 255), true, true, true);
         }
     }
