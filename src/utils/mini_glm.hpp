@@ -449,12 +449,12 @@ namespace MiniGLM
             extra_2_bit = 3;
         }
         const float sqrt_2 = sqrtf(2.0f);
+        const float neg = normalized[extra_2_bit] < 0.0f ? -1.0f : 1.0f;
         std::array<float, 3> compressed;
         switch (extra_2_bit)
         {
         case 0:
         {
-            float neg = normalized[0] < 0.0f ? -1.0f : 1.0f;
             compressed[0] = normalized[1] * neg * sqrt_2;
             compressed[1] = normalized[2] * neg * sqrt_2;
             compressed[2] = normalized[3] * neg * sqrt_2;
@@ -462,7 +462,6 @@ namespace MiniGLM
         }
         case 1:
         {
-            float neg = normalized[1] < 0.0f ? -1.0f : 1.0f;
             compressed[0] = normalized[0] * neg * sqrt_2;
             compressed[1] = normalized[2] * neg * sqrt_2;
             compressed[2] = normalized[3] * neg * sqrt_2;
@@ -470,7 +469,6 @@ namespace MiniGLM
         }
         case 2:
         {
-            float neg = normalized[2] < 0.0f ? -1.0f : 1.0f;
             compressed[0] = normalized[0] * neg * sqrt_2;
             compressed[1] = normalized[1] * neg * sqrt_2;
             compressed[2] = normalized[3] * neg * sqrt_2;
@@ -478,7 +476,6 @@ namespace MiniGLM
         }
         case 3:
         {
-            float neg = normalized[3] < 0.0f ? -1.0f : 1.0f;
             compressed[0] = normalized[0] * neg * sqrt_2;
             compressed[1] = normalized[1] * neg * sqrt_2;
             compressed[2] = normalized[2] * neg * sqrt_2;
