@@ -448,7 +448,7 @@ namespace MiniGLM
         if (max_val < abs(normalized[3])) {
             extra_2_bit = 3;
         }
-        float sqrt_2 = sqrtf(2.0f);
+        const float sqrt_2 = sqrtf(2.0f);
         std::array<float, 3> tmp_3;
         switch (extra_2_bit)
         {
