@@ -428,7 +428,7 @@ namespace MiniGLM
     {
         const float length = q.length();
         assert(length != 0.0f);
-        std::array<float, 4> tmp_2 =
+        std::array<float, 4> normalized =
             {{
                 q.x() / length,
                 q.y() / length,
@@ -436,42 +436,42 @@ namespace MiniGLM
                 q.w() / length
             }};
         std::array<float, 3> tmp_3;
-        auto ret = std::max_element(tmp_2.begin(), tmp_2.end(),
+        auto ret = std::max_element(normalized.begin(), normalized.end(),
             [](float a, float b) { return std::abs(a) < std::abs(b); });
-        int extra_2_bit = int(std::distance(tmp_2.begin(), ret));
+        int extra_2_bit = int(std::distance(normalized.begin(), ret));
         float sqrt_2 = sqrtf(2.0f);
         switch (extra_2_bit)
         {
         case 0:
         {
-            float neg = tmp_2[0] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[1] * neg * sqrt_2;
-            tmp_3[1] = tmp_2[2] * neg * sqrt_2;
-            tmp_3[2] = tmp_2[3] * neg * sqrt_2;
+            float neg = normalized[0] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = normalized[1] * neg * sqrt_2;
+            tmp_3[1] = normalized[2] * neg * sqrt_2;
+            tmp_3[2] = normalized[3] * neg * sqrt_2;
             break;
         }
         case 1:
         {
-            float neg = tmp_2[1] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[0] * neg * sqrt_2;
-            tmp_3[1] = tmp_2[2] * neg * sqrt_2;
-            tmp_3[2] = tmp_2[3] * neg * sqrt_2;
+            float neg = normalized[1] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = normalized[0] * neg * sqrt_2;
+            tmp_3[1] = normalized[2] * neg * sqrt_2;
+            tmp_3[2] = normalized[3] * neg * sqrt_2;
             break;
         }
         case 2:
         {
-            float neg = tmp_2[2] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[0] * neg * sqrt_2;
-            tmp_3[1] = tmp_2[1] * neg * sqrt_2;
-            tmp_3[2] = tmp_2[3] * neg * sqrt_2;
+            float neg = normalized[2] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = normalized[0] * neg * sqrt_2;
+            tmp_3[1] = normalized[1] * neg * sqrt_2;
+            tmp_3[2] = normalized[3] * neg * sqrt_2;
             break;
         }
         case 3:
         {
-            float neg = tmp_2[3] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = tmp_2[0] * neg * sqrt_2;
-            tmp_3[1] = tmp_2[1] * neg * sqrt_2;
-            tmp_3[2] = tmp_2[2] * neg * sqrt_2;
+            float neg = normalized[3] < 0.0f ? -1.0f : 1.0f;
+            tmp_3[0] = normalized[0] * neg * sqrt_2;
+            tmp_3[1] = normalized[1] * neg * sqrt_2;
+            tmp_3[2] = normalized[2] * neg * sqrt_2;
             break;
         }
         default:
