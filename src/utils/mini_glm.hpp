@@ -436,9 +436,19 @@ namespace MiniGLM
                 q.w() / length
             }};
         std::array<float, 3> tmp_3;
-        auto ret = std::max_element(normalized.begin(), normalized.end(),
-            [](float a, float b) { return std::abs(a) < std::abs(b); });
-        int extra_2_bit = int(std::distance(normalized.begin(), ret));
+        int extra_2_bit = 0;
+        float max_val = abs(normalized[0]);
+        if (max_val < abs(normalized[1])) {
+            extra_2_bit = 1;
+            max_val = abs(normalized[1]);
+        }
+        if (max_val < abs(normalized[2])) {
+            extra_2_bit = 2;
+            max_val = abs(normalized[2]);
+        }
+        if (max_val < abs(normalized[3])) {
+            extra_2_bit = 3;
+        }
         float sqrt_2 = sqrtf(2.0f);
         switch (extra_2_bit)
         {
