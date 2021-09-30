@@ -1012,8 +1012,8 @@ void Kart::finishedRace(float time, bool from_server)
             if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)
                 win_position = 2;
 
-            if (getPosition() == (int)win_position &&
-                World::getWorld()->getNumKarts() > win_position)
+            if ((getPosition() == (int)win_position &&
+                World::getWorld()->getNumKarts() > win_position) || RaceManager::get()->getNumberOfKarts() == 1)
                 won_the_race = true;
 
             if (RaceManager::get()->hasTimeTarget() && m_finish_time > RaceManager::get()->getTimeTarget())
