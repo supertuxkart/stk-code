@@ -449,46 +449,46 @@ namespace MiniGLM
             extra_2_bit = 3;
         }
         const float sqrt_2 = sqrtf(2.0f);
-        std::array<float, 3> tmp_3;
+        std::array<float, 3> compressed;
         switch (extra_2_bit)
         {
         case 0:
         {
             float neg = normalized[0] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = normalized[1] * neg * sqrt_2;
-            tmp_3[1] = normalized[2] * neg * sqrt_2;
-            tmp_3[2] = normalized[3] * neg * sqrt_2;
+            compressed[0] = normalized[1] * neg * sqrt_2;
+            compressed[1] = normalized[2] * neg * sqrt_2;
+            compressed[2] = normalized[3] * neg * sqrt_2;
             break;
         }
         case 1:
         {
             float neg = normalized[1] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = normalized[0] * neg * sqrt_2;
-            tmp_3[1] = normalized[2] * neg * sqrt_2;
-            tmp_3[2] = normalized[3] * neg * sqrt_2;
+            compressed[0] = normalized[0] * neg * sqrt_2;
+            compressed[1] = normalized[2] * neg * sqrt_2;
+            compressed[2] = normalized[3] * neg * sqrt_2;
             break;
         }
         case 2:
         {
             float neg = normalized[2] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = normalized[0] * neg * sqrt_2;
-            tmp_3[1] = normalized[1] * neg * sqrt_2;
-            tmp_3[2] = normalized[3] * neg * sqrt_2;
+            compressed[0] = normalized[0] * neg * sqrt_2;
+            compressed[1] = normalized[1] * neg * sqrt_2;
+            compressed[2] = normalized[3] * neg * sqrt_2;
             break;
         }
         case 3:
         {
             float neg = normalized[3] < 0.0f ? -1.0f : 1.0f;
-            tmp_3[0] = normalized[0] * neg * sqrt_2;
-            tmp_3[1] = normalized[1] * neg * sqrt_2;
-            tmp_3[2] = normalized[2] * neg * sqrt_2;
+            compressed[0] = normalized[0] * neg * sqrt_2;
+            compressed[1] = normalized[1] * neg * sqrt_2;
+            compressed[2] = normalized[2] * neg * sqrt_2;
             break;
         }
         default:
             assert(false);
             break;
         }
-        return normalizedSignedFloatsTo1010102(tmp_3, extra_2_bit);
+        return normalizedSignedFloatsTo1010102(compressed, extra_2_bit);
     }   // compressQuaternion
     // ------------------------------------------------------------------------
     inline uint32_t compressIrrQuaternion(const core::quaternion& q)
