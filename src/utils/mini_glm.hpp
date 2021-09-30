@@ -435,7 +435,6 @@ namespace MiniGLM
                 q.z() / length,
                 q.w() / length
             }};
-        std::array<float, 3> tmp_3;
         int extra_2_bit = 0;
         float max_val = abs(normalized[0]);
         if (max_val < abs(normalized[1])) {
@@ -450,6 +449,7 @@ namespace MiniGLM
             extra_2_bit = 3;
         }
         float sqrt_2 = sqrtf(2.0f);
+        std::array<float, 3> tmp_3;
         switch (extra_2_bit)
         {
         case 0:
