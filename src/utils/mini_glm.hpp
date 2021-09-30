@@ -436,16 +436,16 @@ namespace MiniGLM
                 q.w() / length
             }};
         int extra_2_bit = 0;
-        float max_val = abs(normalized[0]);
-        if (max_val < abs(normalized[1])) {
+        float max_val = std::abs(normalized[0]);
+        if (max_val < std::abs(normalized[1])) {
             extra_2_bit = 1;
-            max_val = abs(normalized[1]);
+            max_val = std::abs(normalized[1]);
         }
-        if (max_val < abs(normalized[2])) {
+        if (max_val < std::abs(normalized[2])) {
             extra_2_bit = 2;
-            max_val = abs(normalized[2]);
+            max_val = std::abs(normalized[2]);
         }
-        if (max_val < abs(normalized[3])) {
+        if (max_val < std::abs(normalized[3])) {
             extra_2_bit = 3;
         }
         const float sqrt_2 = sqrtf(2.0f);
