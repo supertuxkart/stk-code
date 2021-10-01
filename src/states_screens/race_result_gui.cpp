@@ -91,6 +91,7 @@ void RaceResultGUI::init()
 
     m_timer = 0;
 
+    getWidget("operations")->setActive(false);
     getWidget("left")->setVisible(false);
     getWidget("middle")->setVisible(false);
     getWidget("right")->setVisible(false);
@@ -243,6 +244,7 @@ void RaceResultGUI::enableAllButtons()
     GUIEngine::IconButtonWidget *middle = getWidget<GUIEngine::IconButtonWidget>("middle");
     GUIEngine::IconButtonWidget *right = getWidget<GUIEngine::IconButtonWidget>("right");
     GUIEngine::RibbonWidget *operations = getWidget<GUIEngine::RibbonWidget>("operations");
+    operations->setActive(true);
     operations->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
@@ -377,6 +379,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         {
             GUIEngine::IconButtonWidget *left = getWidget<GUIEngine::IconButtonWidget>("left");
             left->setVisible(false);
+            getWidget("operations")->setActive(false);
             m_all_row_infos = m_all_row_info_waiting;
             m_animation_state = RR_OLD_GP_RESULTS;
             m_timer = 0;
@@ -1117,6 +1120,7 @@ void RaceResultGUI::unload()
                 m_all_row_infos = prev_infos;
                 GUIEngine::IconButtonWidget *left = getWidget<GUIEngine::IconButtonWidget>("left");
                 GUIEngine::RibbonWidget *operations = getWidget<GUIEngine::RibbonWidget>("operations");
+                operations->setActive(true);
                 operations->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
                 left->setLabel(_("Continue"));
                 left->setImage("gui/icons/green_check.png");
