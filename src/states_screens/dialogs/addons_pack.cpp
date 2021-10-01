@@ -262,7 +262,8 @@ void AddonsPack::install(const std::string& name)
     Addon* addon = addons_manager->getAddon(Addon::createAddonId(name));
     if (addon)
     {
-        if (addon->isInstalled())
+        if (addon->isInstalled() &&
+            addon->getRevision() == addon->getInstalledRevision())
         {
             if (nl)
                 nl->addMoreServerInfo(L"Addon already installed");
