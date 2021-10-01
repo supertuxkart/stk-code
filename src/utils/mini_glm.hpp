@@ -435,7 +435,7 @@ namespace MiniGLM
                 q.z() / length,
                 q.w() / length
             }};
-        std::array<float, 3> tmp_3;
+        std::array<float, 3> tmp_3 = {};
         auto ret = std::max_element(tmp_2.begin(), tmp_2.end(),
             [](float a, float b) { return std::abs(a) < std::abs(b); });
         int extra_2_bit = int(std::distance(tmp_2.begin(), ret));
