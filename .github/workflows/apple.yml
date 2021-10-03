@@ -148,6 +148,9 @@ jobs:
           rm stk-assets-full.zip
           cd ../../../../..
           mv ./macosx-arm64/supertuxkart.app SuperTuxKart.app
+          # Use Ad Hoc certificate for now, use Apple developer certificate after STK is on App Store later
+          codesign --force -s - SuperTuxKart.app/Contents/libs/*.dylib
+          codesign --force --deep -s - SuperTuxKart.app
           zip -r SuperTuxKart-${{ env.release_tag }}-mac.zip SuperTuxKart.app
       - name: Create release
         if: ${{ env.release_tag != '' }}
