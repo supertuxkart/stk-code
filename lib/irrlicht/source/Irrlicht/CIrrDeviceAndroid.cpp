@@ -18,17 +18,69 @@ using namespace irr;
 
 // Call when android keyboard is opened or close, and save its height for
 // moving screen
-std::atomic<int> g_keyboard_height(0);
-std::atomic<int> g_moved_height(0);
 std::atomic<int> g_disable_padding(0);
 extern "C" int Android_getKeyboardHeight()
 {
-    return g_keyboard_height.load();
+    JNIEnv* env = NULL;
+    jobject activity = NULL;
+    jclass class_native_activity = NULL;
+    jmethodID method = NULL;
+    jint keyboard_height = 0;
+
+    env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    if (!env)
+        goto exit;
+
+    activity = (jobject)SDL_AndroidGetActivity();
+    if (!activity)
+        goto exit;
+
+    class_native_activity = env->GetObjectClass(activity);
+    if (class_native_activity == NULL)
+        goto exit;
+
+    method = env->GetMethodID(class_native_activity, "getKeyboardHeight", "()I");
+    if (method == NULL)
+        goto exit;
+    keyboard_height = env->CallIntMethod(activity, method);
+exit:
+    if (!env)
+        return 0;
+    env->DeleteLocalRef(class_native_activity);
+    env->DeleteLocalRef(activity);
+    return keyboard_height;
 }
 
 extern "C" int Android_getMovedHeight()
 {
-    return g_moved_height.load();
+    JNIEnv* env = NULL;
+    jobject activity = NULL;
+    jclass class_native_activity = NULL;
+    jmethodID method = NULL;
+    jint moved_height = 0;
+
+    env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    if (!env)
+        goto exit;
+
+    activity = (jobject)SDL_AndroidGetActivity();
+    if (!activity)
+        goto exit;
+
+    class_native_activity = env->GetObjectClass(activity);
+    if (class_native_activity == NULL)
+        goto exit;
+
+    method = env->GetMethodID(class_native_activity, "getMovedHeight", "()I");
+    if (method == NULL)
+        goto exit;
+    moved_height = env->CallIntMethod(activity, method);
+exit:
+    if (!env)
+        return 0;
+    env->DeleteLocalRef(class_native_activity);
+    env->DeleteLocalRef(activity);
+    return moved_height;
 }
 
 extern "C" int Android_disablePadding()
@@ -36,11 +88,7 @@ extern "C" int Android_disablePadding()
     return g_disable_padding.load();
 }
 
-#define MAKE_DEBUG_MSG_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_debugMsg(JNIEnv* env, jclass cls, jstring msg)
-#define ANDROID_DEBUG_MSG_CALLBACK(PKG_NAME) MAKE_DEBUG_MSG_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_DEBUG_MSG_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+extern "C" JNIEXPORT void JNICALL debugMsg(JNIEnv* env, jclass cls, jstring msg)
 {
     if (msg == NULL)
         return;
@@ -57,29 +105,7 @@ ANDROID_DEBUG_MSG_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
     MessageQueue::add(MessageQueue::MT_GENERIC, message);
 }
 
-#define MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveKeyboardHeight(JNIEnv* env, jclass cls, jint height)
-#define ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_KBD_HEIGHT_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_SAVE_KBD_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
-{
-    g_keyboard_height.store((int)height);
-}
-
-#define MAKE_ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_saveMovedHeight(JNIEnv* env, jclass cls, jint height)
-#define ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(PKG_NAME) MAKE_ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_SAVE_MOVED_HEIGHT_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
-{
-    g_moved_height.store((int)height);
-}
-
-#define MAKE_ANDROID_HANDLE_PADDING_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_handlePadding(JNIEnv* env, jclass cls, jboolean val)
-#define ANDROID_HANDLE_PADDING_CALLBACK(PKG_NAME) MAKE_ANDROID_HANDLE_PADDING_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_HANDLE_PADDING_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+extern "C" JNIEXPORT void JNICALL handlePadding(JNIEnv* env, jclass cls, jboolean val)
 {
     g_disable_padding.store((int)val);
 }

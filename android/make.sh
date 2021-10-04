@@ -19,7 +19,7 @@ export COMPILE_SDK_VERSION=29
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
-export PACKAGE_CALLBACK_NAME_RELEASE="org_supertuxkart_stk"
+export PACKAGE_CLASS_NAME_RELEASE="org/supertuxkart/stk"
 export APP_DIR_NAME_RELEASE="supertuxkart"
 export APP_ICON_RELEASE="$DIRNAME/icon.png"
 export APP_ICON_ADAPTIVE_BG_RELEASE="$DIRNAME/icon_adaptive_bg.png"
@@ -27,7 +27,7 @@ export APP_ICON_ADAPTIVE_FG_RELEASE="$DIRNAME/icon_adaptive_fg.png"
 
 export APP_NAME_BETA="SuperTuxKart Beta"
 export PACKAGE_NAME_BETA="org.supertuxkart.stk_beta"
-export PACKAGE_CALLBACK_NAME_BETA="org_supertuxkart_stk_1beta"
+export PACKAGE_CLASS_NAME_BETA="org/supertuxkart/stk_beta"
 export APP_DIR_NAME_BETA="supertuxkart-beta"
 export APP_ICON_BETA="$DIRNAME/icon-dbg.png"
 export APP_ICON_ADAPTIVE_BG_BETA="$DIRNAME/icon_adaptive_bg-dbg.png"
@@ -35,7 +35,7 @@ export APP_ICON_ADAPTIVE_FG_BETA="$DIRNAME/icon_adaptive_fg-dbg.png"
 
 export APP_NAME_DEBUG="SuperTuxKart Debug"
 export PACKAGE_NAME_DEBUG="org.supertuxkart.stk_dbg"
-export PACKAGE_CALLBACK_NAME_DEBUG="org_supertuxkart_stk_1dbg"
+export PACKAGE_CLASS_NAME_DEBUG="org/supertuxkart/stk_dbg"
 export APP_DIR_NAME_DEBUG="supertuxkart-dbg"
 export APP_ICON_DEBUG="$DIRNAME/icon-dbg.png"
 export APP_ICON_ADAPTIVE_BG_DEBUG="$DIRNAME/icon_adaptive_bg-dbg.png"
@@ -89,7 +89,7 @@ if [ "$BUILD_TYPE" = "debug" ] || [ "$BUILD_TYPE" = "Debug" ]; then
     export IS_DEBUG_BUILD=1
     export APP_NAME="$APP_NAME_DEBUG"
     export PACKAGE_NAME="$PACKAGE_NAME_DEBUG"
-    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_DEBUG"
+    export PACKAGE_CLASS_NAME="$PACKAGE_CLASS_NAME_DEBUG"
     export APP_DIR_NAME="$APP_DIR_NAME_DEBUG"
     export APP_ICON="$APP_ICON_DEBUG"
     export APP_ICON_ADAPTIVE_BG="$APP_ICON_ADAPTIVE_BG_DEBUG"
@@ -99,7 +99,7 @@ elif [ "$BUILD_TYPE" = "release" ] || [ "$BUILD_TYPE" = "Release" ]; then
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_RELEASE"
     export PACKAGE_NAME="$PACKAGE_NAME_RELEASE"
-    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_RELEASE"
+    export PACKAGE_CLASS_NAME="$PACKAGE_CLASS_NAME_RELEASE"
     export APP_DIR_NAME="$APP_DIR_NAME_RELEASE"
     export APP_ICON="$APP_ICON_RELEASE"
     export APP_ICON_ADAPTIVE_BG="$APP_ICON_ADAPTIVE_BG_RELEASE"
@@ -109,7 +109,7 @@ elif [ "$BUILD_TYPE" = "beta" ] || [ "$BUILD_TYPE" = "Beta" ]; then
     export IS_DEBUG_BUILD=0
     export APP_NAME="$APP_NAME_BETA"
     export PACKAGE_NAME="$PACKAGE_NAME_BETA"
-    export PACKAGE_CALLBACK_NAME="$PACKAGE_CALLBACK_NAME_BETA"
+    export PACKAGE_CLASS_NAME="$PACKAGE_CLASS_NAME_BETA"
     export APP_DIR_NAME="$APP_DIR_NAME_BETA"
     export APP_ICON="$APP_ICON_BETA"
     export APP_ICON_ADAPTIVE_BG="$APP_ICON_ADAPTIVE_BG_BETA"

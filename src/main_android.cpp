@@ -23,15 +23,76 @@
 #include "utils/string_utils.hpp"
 
 #ifdef ANDROID
+#include "SDL_stdinc.h"
 #include "SDL_system.h"
 #include <jni.h>
 std::string g_android_main_user_agent;
 
 extern int android_main(int argc, char *argv[]);
 
+extern "C" JNIEXPORT void JNICALL debugMsg(JNIEnv* env, jclass cls, jstring msg);
+extern "C" JNIEXPORT void JNICALL handlePadding(JNIEnv* env, jclass cls, jboolean val);
+extern "C" JNIEXPORT void JNICALL addDNSSrvRecords(JNIEnv* env, jclass cls, jstring name, jint weight);
+
+extern "C" JNIEXPORT void JNICALL editText2STKEditbox(JNIEnv* env, jclass cls, jint widget_id, jstring text, jint start, jint end, jint composing_start, jint composing_end);
+extern "C" JNIEXPORT void JNICALL handleActionNext(JNIEnv* env, jclass cls, jint widget_id);
+extern "C" JNIEXPORT void JNICALL handleLeftRight(JNIEnv* env, jclass cls, jboolean left, jint widget_id);
+
+#if !defined(ANDROID_PACKAGE_CLASS_NAME)
+    #error
+#endif
+
+void registering_natives()
+{
+    JNINativeMethod stkactivity_tab[] =
+    {
+        { "debugMsg",           "(Ljava/lang/String;)V", (void*)&debugMsg },
+        { "handlePadding",      "(Z)V", (void*)&handlePadding },
+        { "addDNSSrvRecords",   "(Ljava/lang/String;I)V", (void*)&addDNSSrvRecords }
+    };
+    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
+    assert(env);
+    const char* stkactivity_class = ANDROID_PACKAGE_CLASS_NAME "/SuperTuxKartActivity";
+    jclass clazz = env->FindClass(stkactivity_class);
+    if (clazz == NULL)
+    {
+        Log::error("MainAndroid", "Failed to find class %s.",
+            stkactivity_class);
+        return;
+    }
+    if (env->RegisterNatives(
+        clazz, stkactivity_tab, (int)SDL_arraysize(stkactivity_tab)) < 0)
+    {
+        Log::error("MainAndroid", "Failed to register methods of %s.",
+            stkactivity_class);
+    }
+
+    JNINativeMethod stkeditbox_tab[] =
+    {
+        { "editText2STKEditbox", "(ILjava/lang/String;IIII)V", (void*)&editText2STKEditbox },
+        { "handleActionNext",    "(I)V", (void*)&handleActionNext },
+        { "handleLeftRight",     "(ZI)V", (void*)&handleLeftRight }
+    };
+    const char* stkeditbox_class = ANDROID_PACKAGE_CLASS_NAME "/STKEditText";
+    clazz = env->FindClass(stkeditbox_class);
+    if (clazz == NULL)
+    {
+        Log::error("MainAndroid", "Failed to find class %s.",
+            stkeditbox_class);
+        return;
+    }
+    if (env->RegisterNatives(
+        clazz, stkeditbox_tab, (int)SDL_arraysize(stkeditbox_tab)) < 0)
+    {
+        Log::error("MainAndroid", "Failed to register methods of %s.",
+            stkeditbox_class);
+    }
+}
+
 void override_default_params_for_mobile();
 extern "C" int SDL_main(int argc, char *argv[])
 {
+    registering_natives();
     override_default_params_for_mobile();
     int result = android_main(argc, argv);
     // TODO: Irrlicht device is properly waiting for destroy event, but

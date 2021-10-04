@@ -69,12 +69,7 @@
 #include "SDL_system.h"
 
 std::vector<std::pair<std::string, int> >* g_list = NULL;
-
-#define MAKE_ADD_DNS_SRV_RECORD_CALLBACK(x) JNIEXPORT void JNICALL Java_ ## x##_SuperTuxKartActivity_addDNSSrvRecords(JNIEnv* env, jclass cls, jstring name, jint weight)
-#define ANDROID_ADD_DNS_SRV_RECORD_CALLBACK(PKG_NAME) MAKE_ADD_DNS_SRV_RECORD_CALLBACK(PKG_NAME)
-
-extern "C"
-ANDROID_ADD_DNS_SRV_RECORD_CALLBACK(ANDROID_PACKAGE_CALLBACK_NAME)
+extern "C" JNIEXPORT void JNICALL addDNSSrvRecords(JNIEnv* env, jclass cls, jstring name, jint weight)
 {
     if (!g_list || name == NULL)
         return;
