@@ -34,7 +34,6 @@
   <card                           os="android"                     disable="ColorBufferFloat"/>
   <card                           os="android"                     disable="TextureCompressionS3TC"/>
   <card contains="Adreno"         os="android"  version="<=19"     disable="VertexIdWorking"/>
-  <card                           os="android"  version="<19"      disable="SystemScreenKeyboard"/>
   <card contains="Android Emulator" os="android"                   disable="ForceLegacyDevice"/>
   <card contains="Android Emulator" os="android"                   disable="NpotTextures"/>
   <card contains="Apple Software Renderer" os="ios"                disable="ForceLegacyDevice"/>
