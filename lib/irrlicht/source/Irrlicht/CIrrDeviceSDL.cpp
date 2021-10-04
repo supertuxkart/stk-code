@@ -672,6 +672,16 @@ bool CIrrDeviceSDL::run()
 		case SDL_APP_DIDENTERFOREGROUND:
 			resume_mainloop();
 			break;
+#ifdef ANDROID
+		// From https://github.com/libsdl-org/SDL/blob/main/docs/README-android.md
+		// However, there's a chance (on older hardware, or on systems under heavy load),
+		// where the GL context can not be restored. In that case you have to
+		// listen for a specific message (SDL_RENDER_DEVICE_RESET) and restore
+		// your textures manually or quit the app.
+		case SDL_RENDER_DEVICE_RESET:
+			Close = true;
+			break;
+#endif
 #endif
 #if SDL_VERSION_ATLEAST(2, 0, 9)
 		case SDL_SENSORUPDATE:
