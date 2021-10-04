@@ -94,15 +94,7 @@ extern "C" int SDL_main(int argc, char *argv[])
 {
     registering_natives();
     override_default_params_for_mobile();
-    int result = android_main(argc, argv);
-    // TODO: Irrlicht device is properly waiting for destroy event, but
-    // some global variables are not initialized/cleared in functions and thus
-    // its state is remembered when the window is restored. We will use exit
-    // call to make sure that all variables are cleared until a proper fix will
-    // be done.
-    fflush(NULL);
-    _exit(0);
-    return 0;
+    return android_main(argc, argv);
 }
 #endif
 
