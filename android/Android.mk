@@ -207,15 +207,28 @@ LOCAL_STATIC_LIBRARIES := libjpeg png zlib
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
+
+# hidapi
+LOCAL_MODULE       := libhidapi
+LOCAL_CPPFLAGS     += -std=c++11
+LOCAL_SRC_FILES    := ../lib/sdl2/src/hidapi/android/hid.cpp
+LOCAL_LDLIBS       := -llog
+
+include $(BUILD_SHARED_LIBRARY)
+include $(CLEAR_VARS)
+
+
 # SDL2
 LOCAL_MODULE       := SDL2
 LOCAL_PATH         := .
-LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/sdl2/src/*.c) \
                       $(wildcard ../lib/sdl2/src/audio/*.c) \
                       $(wildcard ../lib/sdl2/src/audio/android/*.c) \
                       $(wildcard ../lib/sdl2/src/audio/dummy/*.c) \
+                      $(wildcard ../lib/sdl2/src/audio/aaudio/*.c) \
                       $(wildcard ../lib/sdl2/src/audio/openslES/*.c) \
+                      ../lib/sdl2/src/atomic/SDL_atomic.c.arm \
+                      ../lib/sdl2/src/atomic/SDL_spinlock.c.arm \
                       $(wildcard ../lib/sdl2/src/core/android/*.c) \
                       $(wildcard ../lib/sdl2/src/cpuinfo/*.c) \
                       $(wildcard ../lib/sdl2/src/dynapi/*.c) \
@@ -246,15 +259,13 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/sdl2/src/*.c) \
                       $(wildcard ../lib/sdl2/src/timer/unix/*.c) \
                       $(wildcard ../lib/sdl2/src/video/*.c) \
                       $(wildcard ../lib/sdl2/src/video/android/*.c) \
-                      $(wildcard ../lib/sdl2/src/video/yuv2rgb/*.c) \
-                      ../lib/sdl2/src/atomic/SDL_atomic.c.arm \
-                      ../lib/sdl2/src/atomic/SDL_spinlock.c.arm \
-                      ../lib/sdl2/src/hidapi/android/hid.cpp
+                      $(wildcard ../lib/sdl2/src/video/yuv2rgb/*.c)
 LOCAL_CFLAGS       := -I../lib/sdl2/include/ -DGL_GLEXT_PROTOTYPES
-LOCAL_CPPFLAGS     := -std=gnu++0x
+LOCAL_LDLIBS       := -ldl -lGLESv1_CM -lGLESv2 -lOpenSLES -llog -landroid
+LOCAL_SHARED_LIBRARIES := hidapi
 LOCAL_STATIC_LIBRARIES := cpufeatures
 
-include $(BUILD_STATIC_LIBRARY)
+include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
 # STK
@@ -264,7 +275,7 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../src/*.cpp)     \
                       $(wildcard ../src/*/*.cpp)   \
                       $(wildcard ../src/*/*/*.cpp)
-LOCAL_LDLIBS       := -llog -landroid -lGLESv1_CM -lGLESv2 -lOpenSLES -ldl -lm
+LOCAL_LDLIBS       := -llog -lm -lOpenSLES
 LOCAL_CFLAGS       := -I../lib/angelscript/include      \
                       -I../lib/bullet/src               \
                       -I../lib/sheenbidi/Headers        \

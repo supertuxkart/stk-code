@@ -272,11 +272,15 @@ public class SuperTuxKartActivity extends SDLActivity
         hideKeyboardNative(false/*clear_text*/);
     }
     // ------------------------------------------------------------------------
-
-    /* STK statically link SDL2. */
+    /* SDL manually dlopen main to allow unload after main thread exit. */
     protected String[] getLibraries()
     {
-        return new String[]{ "main" };
+        return new String[]{ "hidapi", "SDL2" };
+    }
+    // ------------------------------------------------------------------------
+    protected String getMainSharedObject()
+    {
+        return getContext().getApplicationInfo().nativeLibraryDir + "/libmain.so";
     }
     // ------------------------------------------------------------------------
     public void showKeyboard(final int type, final int y)
