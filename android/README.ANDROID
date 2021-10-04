@@ -13,9 +13,9 @@
 To run SuperTuxKart on Android, you need a device that meets following
 requirements:
 
-- Android 4.4 or later
+- Android 4.1 or later
 - Processor compatible with armv7 or x86
-- GPU that supports OpenGL ES 3.0
+- GPU that supports OpenGL ES 2.0
 - 1 GB RAM (STK uses ~150 MB in minimal configuration)
 - 300 MB of free space on internal storage
 - Touch screen or external keyboard
@@ -62,9 +62,10 @@ directory will have following structure:
   > src
   > ...
 
-You need also Android SDK for android-19 platform (the API for Android 4.4) and
-Android NDK. Version r20 is recommended, because it's known that it works
-without issues.
+You also need Android SDK for android-26 platform or later (SDL2 requirement) and
+Android NDK. Version r22 is recommended, because it's known that it works
+without issues. r24 or later is not compatible because it removes Android 4.1
+support (https://github.com/android/ndk/wiki/Changelog-r23#announcements)
 
 You need to create proper "android-sdk" and "android-ndk" symlinks in the
 directory with Android project, so that the compilation script will have access

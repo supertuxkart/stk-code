@@ -98,6 +98,11 @@ LOCAL_MODULE    := ifaddrs
 LOCAL_PATH      := .
 LOCAL_SRC_FILES := ../lib/ifaddrs/ifaddrs.c
 LOCAL_CFLAGS    := -I../lib/ifaddrs
+# Starting NDK21 it enables NEON by default on 32-bit ARM target
+# Disable it to support more phones
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON  := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -109,6 +114,9 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/angelscript/source/*.S)   \
                       $(wildcard ../lib/angelscript/source/*.cpp)
 LOCAL_CFLAGS       := -I../lib/angelscript/source/
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -119,6 +127,9 @@ LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/enet/*.c)
 LOCAL_CFLAGS       := -I../lib/enet/include/ -DHAS_SOCKLEN_T -DENABLE_IPV6
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -130,6 +141,9 @@ LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/bullet/src/*/*.cpp)   \
                       $(wildcard ../lib/bullet/src/*/*/*.cpp)
 LOCAL_CFLAGS       := -I../lib/bullet/src/
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -140,6 +154,9 @@ LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_utils/mipmap/*.c)
 LOCAL_CFLAGS       := -I../lib/graphics_utils/mipmap
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -153,6 +170,9 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c) \
 LOCAL_CFLAGS       := -I../lib/graphics_engine/include \
                       -I../lib/sdl2/include/           \
                       -I../lib/irrlicht/include/
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -163,6 +183,9 @@ LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/mcpp/*.c)
 LOCAL_CFLAGS       := -DMCPP_LIB -DHAVE_CONFIG_H
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -173,6 +196,9 @@ LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/sheenbidi/Source/*.c)
 LOCAL_CFLAGS       := -I../lib/sheenbidi/Headers
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -183,6 +209,9 @@ LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/tinygettext/src/*.cpp)
 LOCAL_CFLAGS       := -I../lib/tinygettext/include -DDISABLE_ICONV
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -204,6 +233,9 @@ LOCAL_CFLAGS       := -I../lib/irrlicht/source/Irrlicht/ \
                       -DANDROID_PACKAGE_CALLBACK_NAME=$(PACKAGE_CALLBACK_NAME)
 LOCAL_CPPFLAGS     := -std=gnu++0x
 LOCAL_STATIC_LIBRARIES := libjpeg png zlib
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -214,6 +246,9 @@ LOCAL_CPPFLAGS     += -std=c++11
 LOCAL_SRC_FILES    := ../lib/sdl2/src/hidapi/android/hid.cpp
 LOCAL_LDLIBS       := -llog
 
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -265,6 +300,9 @@ LOCAL_LDLIBS       := -ldl -lGLESv1_CM -lGLESv2 -lOpenSLES -llog -landroid
 LOCAL_SHARED_LIBRARIES := hidapi
 LOCAL_STATIC_LIBRARIES := cpufeatures
 
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 
@@ -315,6 +353,9 @@ LOCAL_STATIC_LIBRARIES := irrlicht bullet enet ifaddrs angelscript mcpp SDL2 \
                           harfbuzz freetype tinygettext graphics_utils       \
                           graphics_engine
 
+ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
+LOCAL_ARM_NEON     := false
+endif
 include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 $(call import-module, android/cpufeatures)

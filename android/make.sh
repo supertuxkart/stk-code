@@ -437,7 +437,7 @@ export ANDROID_HOME="$SDK_PATH"
           -Pstorepass="$STK_STOREPASS"               \
           -Pkeystore="$STK_KEYSTORE"                 \
           -Palias="$STK_ALIAS"                       \
-          -Pndk_version="20.1.5948944"               \
+          -Pndk_version="22.1.7171670"               \
           -Pcompile_arch="$COMPILE_ARCH"             \
           -Pcpu_core="$CPU_CORE"                     \
           $GRADLE_BUILD_TYPE
@@ -448,7 +448,7 @@ if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
           -Pstorepass="$STK_STOREPASS"               \
           -Pkeystore="$STK_KEYSTORE"                 \
           -Palias="$STK_ALIAS"                       \
-          -Pndk_version="20.1.5948944"               \
+          -Pndk_version="22.1.7171670"               \
           -Pcompile_arch="$COMPILE_ARCH"             \
           -Pcpu_core="$CPU_CORE"                     \
           "bundleRelease"

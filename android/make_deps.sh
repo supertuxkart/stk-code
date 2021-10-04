@@ -1,5 +1,5 @@
 #!/bin/sh
-# Tested with NDK 20.1.5948944
+# Tested with NDK 22.1.7171670
 
 export DIRNAME=$(realpath "$(dirname "$0")")
 
