@@ -9,8 +9,8 @@
 # STK for your own use, then use android/make.sh script instead.
 
 export BUILD_TYPE=Beta
-export PROJECT_VERSION=git20210925
-export PROJECT_CODE=296
+export PROJECT_VERSION=git20211004
+export PROJECT_CODE=299
 export STK_STOREPASS="xxx"
 export STK_KEYSTORE="/path/to/stk.keystore"
 export STK_ALIAS="alias"
@@ -169,6 +169,7 @@ fi
 
 cd ./android
 ./make_deps.sh
+check_error
 ./make.sh
 cd -
 
