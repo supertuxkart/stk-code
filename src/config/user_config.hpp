@@ -805,6 +805,10 @@ namespace UserConfigParams
     /** True if graphical profiler should be displayed */
     PARAM_PREFIX bool m_profiler_enabled  PARAM_DEFAULT( false );
 
+    PARAM_PREFIX bool m_disable_addon_karts  PARAM_DEFAULT( false );
+
+    PARAM_PREFIX bool m_disable_addon_tracks  PARAM_DEFAULT( false );
+
     // ---- Networking
     PARAM_PREFIX StringToUIntUserConfigParam    m_server_bookmarks
         PARAM_DEFAULT(StringToUIntUserConfigParam("server-bookmarks",

@@ -686,6 +686,8 @@ void cmdLineHelp()
     "                           texture filtering.\n"
     "       --shadows=n         Set resolution of shadows (0 to disable).\n"
     "       --render-driver=n   Render driver to use (gl or directx9).\n"
+    "       --disable-addon-karts Disable loading of addon karts.\n"
+    "       --disable-addon-tracks Disable loading of addon tracks.\n"
     "       --dump-official-karts Dump official karts for current stk-assets.\n"
     "       --apitrace          This will disable buffer storage and\n"
     "                           writing gpu query strings to opengl, which\n"
@@ -999,6 +1001,11 @@ int handleCmdLinePreliminary()
         srand(n);
         Log::info("main", "STK using random seed (%d)", n);
     }
+
+    if (CommandLine::has("--disable-addon-karts"))
+        UserConfigParams::m_disable_addon_karts = true;
+    if (CommandLine::has("--disable-addon-tracks"))
+        UserConfigParams::m_disable_addon_tracks = true;
 
     return 0;
 }   // handleCmdLinePreliminary
@@ -1939,10 +1946,16 @@ void initRest()
     // The maximum texture size can not be set earlier, since
     // e.g. the background image needs to be loaded in high res.
     irr_driver->setMaxTextureSize();
-    KartPropertiesManager::addKartSearchDir(
-                 file_manager->getAddonsFile("karts/"));
-    track_manager->addTrackSearchDir(
-                 file_manager->getAddonsFile("tracks/"));
+    if (!UserConfigParams::m_disable_addon_karts)
+    {
+        KartPropertiesManager::addKartSearchDir(
+            file_manager->getAddonsFile("karts/"));
+    }
+    if (!UserConfigParams::m_disable_addon_tracks)
+    {
+        track_manager->addTrackSearchDir(
+            file_manager->getAddonsFile("tracks/"));
+    }
 
     {
         XMLNode characteristicsNode(file_manager->getAsset("kart_characteristics.xml"));
