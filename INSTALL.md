@@ -63,7 +63,7 @@ Debian-based Distributions command:
 sudo apt-get install build-essential cmake libbluetooth-dev libsdl2-dev \
 libcurl4-openssl-dev libenet-dev libfreetype6-dev libharfbuzz-dev \
 libjpeg-dev libogg-dev libopenal-dev libpng-dev \
-libssl-dev libvorbis-dev nettle-dev pkg-config zlib1g-dev
+libssl-dev libvorbis-dev libmbedtls-dev pkg-config zlib1g-dev
 ```
 
 Solus command:
