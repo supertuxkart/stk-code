@@ -738,7 +738,7 @@ void cmdDebugHelp()
     "       --rendering-debug           Enable displaying of ambient/diffuse/specularity\n"
     "                                   in RGB & all anisotropic.\n"
     "       --ai-debug                  Enable displaying of AI controllers as on-screen text.\n"
-    "                                   Makes it easier to distingush between different AI controllers.\n"
+    "                                   Makes it easier to distinguish between different AI controllers.\n"
     "       --fps-debug                 Enable verbose logging of the FPS counter on every frame.\n"
     "       --rewind                    Enable the rewind manager.\n"
     "       --battle-ai-stats           Enable verbose logging of AI karts in battle modes.\n"

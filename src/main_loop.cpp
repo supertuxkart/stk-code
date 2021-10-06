@@ -358,7 +358,7 @@ void MainLoop::updateRace(int ticks, bool fast_forward)
 
 //-----------------------------------------------------------------------------
 /** Run the actual main loop.
- *  The sequnce in which various parts of STK are updated is:
+ *  The sequence in which various parts of STK are updated is:
  *  - Determine next time step size (`getLimitedDt`). This takes maximum fps
  *    into account (i.e. sleep if the fps would be too high), and will actually
  *    slow down the in-game clock if the fps are too low (if more than 3/60 of
