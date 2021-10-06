@@ -60,6 +60,7 @@ private:
     bool m_desensitize;
 
     bool m_use_force_feedback;
+    int m_auto_center;
 
     std::map<std::tuple<int, Input::AxisDirection>, int> m_sdl_mapping;
 
@@ -124,6 +125,10 @@ public:
     bool useForceFeedback() const             { return m_use_force_feedback; }
     // ------------------------------------------------------------------------
     void setForceFeedback(bool val)            { m_use_force_feedback = val; }
+    // ------------------------------------------------------------------------
+    int getAutoCenterStrength() const                { return m_auto_center; }
+    // ------------------------------------------------------------------------
+    void setAutoCenter(bool val)               { m_auto_center = val; }
 };   // class GamepadConfig
 
 #endif

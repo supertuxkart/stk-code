@@ -64,6 +64,7 @@ GamepadConfig::GamepadConfig( const std::string &name,
     m_deadzone     = 4096;
     m_desensitize  = false;
     m_use_force_feedback = true;
+    m_auto_center = 20;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -77,6 +78,7 @@ GamepadConfig::GamepadConfig() : DeviceConfig()
     m_deadzone     = 4096;
     m_desensitize  = false;
     m_use_force_feedback = true;
+    m_auto_center = 20;
     setDefaultBinds();
 }   // GamepadConfig
 
@@ -90,6 +92,7 @@ bool GamepadConfig::load(const XMLNode *config)
     config->get("deadzone",     &m_deadzone    );
     config->get("desensitize",  &m_desensitize );
     config->get("force-feedback", &m_use_force_feedback);
+    config->get("auto-center",    &m_auto_center);
     bool ok = DeviceConfig::load(config);
 
     if(getName()=="")
@@ -111,6 +114,7 @@ void GamepadConfig::save (std::ofstream& stream)
     stream << "<gamepad name =\"" << getName()
            << "\" deadzone=\""    << m_deadzone
            << "\" desensitize=\"" << m_desensitize
+           << "\" auto-center=\"" << m_auto_center
            << "\" force-feedback=\"" << m_use_force_feedback << "\" ";
     DeviceConfig::save(stream);
     stream << "</gamepad>\n\n";

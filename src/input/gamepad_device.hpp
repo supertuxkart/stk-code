@@ -62,6 +62,7 @@ public:
     // ------------------------------------------------------------------------
     void setIrrIndex(int i ) { m_irr_index = i; }
     bool useForceFeedback() const;
+    int getAutoCenterStrength() const;
 };   // class GamepadDevice
 
 #endif
