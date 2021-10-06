@@ -179,12 +179,6 @@ SDLController::SDLController(int device_id)
         cfg->initSDLMapping();
     cfg->setPlugged();
 
-#if SDL_VERSION_ATLEAST(1,3,0)
-    m_haptic = SDL_HapticOpenFromJoystick(m_joystick);
-    if (m_haptic)
-        SDL_HapticRumbleInit(m_haptic);
-#endif
-
     for (int i = 0; i < dm->getGamePadAmount(); i++)
     {
         GamePadDevice* d = dm->getGamePad(i);
@@ -196,7 +190,7 @@ SDLController::SDLController(int device_id)
             d->setConfiguration(cfg);
             if (created)
                 dm->save();
-            return;
+            goto finish;
         }
     }
 
@@ -204,6 +198,16 @@ SDLController::SDLController(int device_id)
     dm->addGamepad(m_gamepad);
     if (created)
         dm->save();
+
+finish:
+#if SDL_VERSION_ATLEAST(1,3,0)
+    m_haptic = SDL_HapticOpenFromJoystick(m_joystick);
+    if (m_haptic)
+    {
+        SDL_HapticRumbleInit(m_haptic);
+        updateAutoCenter(getGamePadDevice()->getAutoCenterStrength());
+    }
+#endif
 }   // SDLController
 
 // ----------------------------------------------------------------------------
@@ -276,6 +280,14 @@ void SDLController::doRumble(float strength_low, float strength_high, uint32_t d
 #endif
     }
 }
+
+#if SDL_VERSION_ATLEAST(1,3,0)
+void SDLController::updateAutoCenter(int state)
+{
+    m_auto_center = state;
+    SDL_HapticSetAutocenter(m_haptic, m_auto_center);
+}
+#endif
 
 // ----------------------------------------------------------------------------
 #ifdef ANDROID

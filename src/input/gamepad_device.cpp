@@ -246,3 +246,9 @@ bool GamePadDevice::useForceFeedback() const
 {
     return static_cast<GamepadConfig*>(m_configuration)->useForceFeedback();
 }   // useForceFeedback
+
+// ----------------------------------------------------------------------------
+int GamePadDevice::getAutoCenterStrength() const
+{
+    return static_cast<GamepadConfig*>(m_configuration)->getAutoCenterStrength();
+}   // shouldAutoCenter
