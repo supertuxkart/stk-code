@@ -190,7 +190,7 @@ SDLController::SDLController(int device_id)
             d->setConfiguration(cfg);
             if (created)
                 dm->save();
-            return;
+            goto finish;
         }
     }
 
@@ -199,6 +199,7 @@ SDLController::SDLController(int device_id)
     if (created)
         dm->save();
 
+finish:
 #if SDL_VERSION_ATLEAST(1,3,0)
     m_haptic = SDL_HapticOpenFromJoystick(m_joystick);
     if (m_haptic) {
