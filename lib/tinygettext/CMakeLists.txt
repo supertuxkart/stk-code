@@ -94,7 +94,7 @@ file(GLOB TINYGETTEXT_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} include/tinyg
 
 ## define a target for building the library
 
-add_library(tinygettext ${TINYGETTEXT_SOURCES})
+add_library(tinygettext STATIC ${TINYGETTEXT_SOURCES})
 
 ## Add tinygettext dir to search path
 
