@@ -797,27 +797,27 @@ std::vector<std::pair<core::dimension2du, unsigned> >
     assert(c->getReferenceCount() == 1);
     std::shared_ptr<video::IImage> compressed(c);
 
-    uint8_t* mips = new uint8_t[image->getDimension().getArea() * 4]();
-    uint8_t* mips_loc = mips;
+    uint8_t* mipmaps = new uint8_t[image->getDimension().getArea() * 4]();
+    uint8_t* mipmaps_loc = mipmaps;
     uint8_t* compressed_loc = (uint8_t*)compressed->lock();
     squishCompressImage((uint8_t*)image->lock(),
         mipmap_sizes[0].first.Width, mipmap_sizes[0].first.Height,
         mipmap_sizes[0].first.Width * 4, compressed->lock(), tc_flag);
 
     // Now compress mipmap
-    generateHQMipmap(image->lock(), mipmap_sizes, mips);
+    generateHQMipmap(image->lock(), mipmap_sizes, mipmaps);
     compressed_loc += mipmap_sizes[0].second;
     for (unsigned mip = 1; mip < mipmap_sizes.size(); mip++)
     {
-        squishCompressImage(mips_loc,
+        squishCompressImage(mipmaps_loc,
             mipmap_sizes[mip].first.Width, mipmap_sizes[mip].first.Height,
             mipmap_sizes[mip].first.Width * 4, compressed_loc, tc_flag);
-        mips_loc += mipmap_sizes[mip].first.Width *
+        mipmaps_loc += mipmap_sizes[mip].first.Width *
             mipmap_sizes[mip].first.Height * 4;
         compressed_loc += mipmap_sizes[mip].second;
     }
 
-    delete [] mips;
+    delete [] mipmaps;
     image.swap(compressed);
 #endif
     return mipmap_sizes;
