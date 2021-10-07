@@ -119,13 +119,11 @@ InputManager::InputManager() : m_mode(BOOTSTRAP),
             SDL_GetError());
     }
 
-#if SDL_VERSION_ATLEAST(1,3,0)
     if (SDL_InitSubSystem(SDL_INIT_HAPTIC) != 0)
     {
         Log::error("InputManager", "Failed to init SDL haptics: %s",
             SDL_GetError());
     }
-#endif
 #endif // SERVER_ONLY
 }
 

@@ -28,9 +28,7 @@
 #include "utils/types.hpp"
 
 #include <SDL_version.h>
-#if SDL_VERSION_ATLEAST(1,3,0)
 #include <SDL_haptic.h>
-#endif
 
 class GamePadDevice;
 
@@ -43,10 +41,8 @@ private:
 
     GamePadDevice* m_gamepad;
 
-#if SDL_VERSION_ATLEAST(1,3,0)
     SDL_Haptic* m_haptic;
     int m_auto_center;
-#endif
 
     int m_buttons;
 
@@ -65,9 +61,7 @@ private:
     void handleDirectScanCode(const SDL_Event& event);
 #endif
 
-#if SDL_VERSION_ATLEAST(1,3,0)
     void updateAutoCenter(int state);
-#endif
 public:
     // ------------------------------------------------------------------------
     SDLController(int device_id);
