@@ -128,7 +128,7 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
         if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
         {
             is_reverse = GrandPrixData::reverseTypeToString((GrandPrixData::GPReverseType)m_hs->m_gp_reverse_type);
-            m_num_laps_label->setText(_("Game mode: %d", RaceManager::getNameOf(m_minor_mode)), true);
+            m_num_laps_label->setText(_("Game mode: %s", RaceManager::getNameOf(m_minor_mode)), true);
         }
         else
         {
