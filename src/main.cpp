@@ -2410,6 +2410,22 @@ int main(int argc, char *argv[])
             }
             #endif
 
+            class DriverDialog :
+                  public MessageDialog::IConfirmDialogListener
+            {
+            public:
+                virtual void onConfirm()
+                {
+                    GUIEngine::ModalDialog::dismiss();
+                }   // onConfirm
+                // --------------------------------------------------------
+                virtual void onCancel()
+                {
+                    UserConfigParams::m_old_driver_popup = false;
+                    GUIEngine::ModalDialog::dismiss();
+                }   // onCancel
+            };   // DriverDialog
+
             if (GraphicsRestrictions::isDisabled(
                 GraphicsRestrictions::GR_DRIVER_RECENT_ENOUGH))
             {
@@ -2418,7 +2434,9 @@ int main(int argc, char *argv[])
                     MessageDialog *dialog =
                         new MessageDialog(_("Your driver version is too old. "
                                             "Please install the latest video "
-                                            "drivers."), /*from queue*/ true);
+                                            "drivers."),
+                        MessageDialog::MESSAGE_DIALOG_OK_DONTSHOWAGAIN,
+                        new DriverDialog(), /*delete_listener*/ true, /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
                 Log::warn("OpenGL", "Driver is too old!");
@@ -2438,7 +2456,9 @@ int main(int argc, char *argv[])
                         "check if an update is available. SuperTuxKart "
                         "recommends a driver supporting %s or better. The game "
                         "will likely still run, but in a reduced-graphics mode.",
-                        version), /*from queue*/ true);
+                        version),
+                        MessageDialog::MESSAGE_DIALOG_OK_DONTSHOWAGAIN,
+                        new DriverDialog(), /*delete_listener*/ true, /*from queue*/ true);
                     GUIEngine::DialogQueue::get()->pushDialog(dialog);
                 }
                 #endif

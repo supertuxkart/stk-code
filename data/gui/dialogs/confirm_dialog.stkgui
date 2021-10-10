@@ -5,7 +5,7 @@
 
         <spacer height="5%" width="10" />
 
-        <buttonbar id="buttons" height="30%" width="30%" align="center">
+        <buttonbar id="buttons" height="30%" width="70%" align="center">
 
             <icon-button id="confirm" width="128" height="128" icon="gui/icons/green_check.png"
                 I18N="In a 'are you sure?' dialog" text="Yes" align="center"/>

@@ -136,6 +136,13 @@ void MessageDialog::loadedFromFile()
         IconButtonWidget* yesbtn = getWidget<IconButtonWidget>("confirm");
         yesbtn->setText(_("OK"));
     }
+    else if (m_type == MessageDialog::MESSAGE_DIALOG_OK_DONTSHOWAGAIN)
+    {
+        IconButtonWidget* yesbtn = getWidget<IconButtonWidget>("confirm");
+        yesbtn->setText(_("OK"));
+        IconButtonWidget* cancel = getWidget<IconButtonWidget>("cancel");
+        cancel->setText(_("Don't show again"));
+    }
 }
 
 // ----------------------------------------------------------------------------
