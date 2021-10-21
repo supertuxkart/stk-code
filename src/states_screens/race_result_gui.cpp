@@ -1354,6 +1354,7 @@ void RaceResultGUI::unload()
             ri->m_centre_point = m_top + (gp_position + j)*m_distance_between_rows*0.5f;
             int p = RaceManager::get()->getKartScore(i);
             ri->m_new_overall_points = p;
+            ri->m_new_gp_rank = gp_position;
         }   // i < num_karts
 #endif
     }   // determineGPLayout
@@ -1373,13 +1374,22 @@ void RaceResultGUI::unload()
             : video::SColor(255, 255, 255, 255);
 
         unsigned int current_x = x;
+
+        // Draw rank order
+        // (only when num. of karts >=10 )
         if (RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_FREE_FOR_ALL &&
             !ri->m_finish_time_string.empty() &&
             RaceManager::get()->getNumberOfKarts() >= 10)
         {
-            int pos_rank_width = m_font->getDimension(core::stringw(n + 1).c_str()).Width;
+            int rankNo = (
+                m_animation_state >= RR_RESORT_TABLE
+                    ? ri->m_new_gp_rank
+                    : n
+            ) + 1;
+
+            int pos_rank_width = m_font->getDimension(core::stringw(rankNo).c_str()).Width;
             core::recti pos_rank(current_x, y, pos_rank_width, m_distance_between_rows);
-            m_font->draw(core::stringw(n + 1), pos_rank, color);
+            m_font->draw(core::stringw(rankNo), pos_rank, color);
             current_x += 48;
         }
 
