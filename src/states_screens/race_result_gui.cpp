@@ -1382,6 +1382,7 @@ void RaceResultGUI::unload()
             RaceManager::get()->getNumberOfKarts() >= 10)
         {
             int rankNo = (
+                RaceManager::get()->getMajorMode()==RaceManager::MAJOR_MODE_GRAND_PRIX &&
                 m_animation_state >= RR_RESORT_TABLE
                     ? ri->m_new_gp_rank
                     : n
