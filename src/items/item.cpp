@@ -147,7 +147,26 @@ void ItemState::collected(const AbstractKart *kart)
     }
     else
     {
-        m_ticks_till_return = stk_config->time2Ticks(2.0f);
+        switch (m_type)
+        {
+            case ITEM_BONUS_BOX:
+                m_ticks_till_return = stk_config->m_bonusbox_item_return_ticks;
+                break;
+            case ITEM_NITRO_BIG:
+            case ITEM_NITRO_SMALL:
+                m_ticks_till_return = stk_config->m_nitro_item_return_ticks;
+                break;
+            case ITEM_BANANA:
+                m_ticks_till_return = stk_config->m_banana_item_return_ticks;
+                break;
+            case ITEM_BUBBLEGUM:
+            case ITEM_BUBBLEGUM_NOLOK:
+                m_ticks_till_return = stk_config->m_bubblegum_item_return_ticks;
+                break;
+            default:
+                m_ticks_till_return = stk_config->time2Ticks(2.0f);
+                break;
+        }
     }
 
     if (RaceManager::get()->isBattleMode())

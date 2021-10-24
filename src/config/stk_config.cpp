@@ -191,6 +191,10 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_snb_min_adjust_speed, "network smoothing: min-adjust-speed");
     CHECK_NEG(m_snb_max_adjust_time, "network smoothing: max-adjust-time");
     CHECK_NEG(m_snb_adjust_length_threshold, "network smoothing: adjust-length-threshold");
+    CHECK_NEG(m_bonusbox_item_return_ticks, "bonus box return time");
+    CHECK_NEG(m_nitro_item_return_ticks, "nitro return time");
+    CHECK_NEG(m_banana_item_return_ticks, "banana return time");
+    CHECK_NEG(m_bubblegum_item_return_ticks, "bubble gum return time");
 
     // Square distance to make distance checks cheaper (no sqrt)
     m_default_kart_properties->checkAllSet(filename);
@@ -261,6 +265,11 @@ void STKConfig::init_defaults()
     m_snb_min_adjust_length = m_snb_max_adjust_length =
         m_snb_min_adjust_speed = m_snb_max_adjust_time =
         m_snb_adjust_length_threshold = UNDEFINED;
+
+    m_bonusbox_item_return_ticks  = -100;
+    m_nitro_item_return_ticks     = -100;
+    m_banana_item_return_ticks    = -100;
+    m_bubblegum_item_return_ticks = -100;
 
     m_score_increase.clear();
     m_leader_intervals.clear();
@@ -476,6 +485,19 @@ void STKConfig::getAllData(const XMLNode * root)
     {
         bomb_node->get("time", &m_bomb_time);
         bomb_node->get("time-increase", &m_bomb_time_increase);
+    }
+
+    if(const XMLNode *item_return_node= root->getNode("item-return-time"))
+    {
+        float f;
+        if(item_return_node->get("bonusbox", &f))
+            m_bonusbox_item_return_ticks = time2Ticks(f);
+        if(item_return_node->get("nitro", &f))
+            m_nitro_item_return_ticks = time2Ticks(f);
+        if(item_return_node->get("banana", &f))
+            m_banana_item_return_ticks = time2Ticks(f);
+        if(item_return_node->get("bubblegum", &f))
+            m_bubblegum_item_return_ticks = time2Ticks(f);
     }
 
     if(const XMLNode *powerup_node= root->getNode("powerup"))

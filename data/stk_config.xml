@@ -224,6 +224,11 @@
        to timer when bomb is passed on. -->
   <bomb time="30.0" time-increase="0.0"/>
 
+  <!-- Item return times.
+       Time until an item that has been collected returns. Can be set
+       differently for bonus (gift) boxes, nitro, bananas and bubble gums -->
+  <item-return-time bonusbox="2.0" nitro="2.0" banana="2.0" bubblegum="2.0"/>
+
   <!-- Powerup collect-mode decides what is collected if a kart has already an
        powerup: same: get one more item of the same type.
                 new:  always get a new item.
