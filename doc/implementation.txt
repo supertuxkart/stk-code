@@ -346,7 +346,7 @@ models - perhaps just one if it's simple enough.
 
 The model files can be in any format that PLIB's "SSG" library can
 load - there are quite a few loaders now for a range of common
-formats. I havn't tested many of them though and I suspect that some
+formats. I haven't tested many of them though and I suspect that some
 of them are 'patchy' in implementation.
 
 I've been using AC3D to model stuff for TuxKart - and the AC3D file
@@ -416,7 +416,7 @@ COORDINATE SYSTEMS:
 -------------------
 I have chosen one 'unit' in the database to be one meter in the real
 world - but since we don't really know how big Tux and his friends
-are, this is pretty arbitary. Another way to think of this is that Tux
+are, this is pretty arbitrary. Another way to think of this is that Tux
 is one meter tall (that's just how big I think of him as being) - so
 one 'unit' is one 'tux' high - which is one meter. Real world penguins
 do get as big as a meter tall - but Tux is a 'Jackass Penguin' and
