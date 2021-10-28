@@ -78,12 +78,10 @@ void GPInfoScreen::loadedFromFile()
     m_reverse_spinner->addLabel(_("None"));
     m_reverse_spinner->addLabel(_("All"));
     m_reverse_spinner->addLabel(_("Random"));
-    m_reverse_spinner->setValue(0);
 
     m_num_tracks_spinner = getWidget<SpinnerWidget>("track-spinner");
     // Only init the number of tracks here, this way the previously selected
     // number of tracks will be the default.
-    m_num_tracks_spinner->setValue(1);
 
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
     
@@ -216,6 +214,8 @@ void GPInfoScreen::init()
         m_ai_kart_spinner->setMin(min_ai);
     }   // has_AI
 
+    m_reverse_spinner->setValue( UserConfigParams::m_gp_reverse );
+
     if(random)
     {
         RibbonWidget *rb = getWidget<RibbonWidget>("buttons");
@@ -246,6 +246,7 @@ void GPInfoScreen::init()
         else
             m_group_name = stringc(m_group_names[m_group_spinner->getValue()].c_str()).c_str();
 
+        m_num_tracks_spinner->setValue( UserConfigParams::m_rand_gp_num_tracks );
         m_max_num_tracks = getMaxNumTracks(m_group_name);
 
         m_num_tracks_spinner->setMax(m_max_num_tracks);
@@ -377,7 +378,9 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     }
     else if (name=="track-spinner")
     {
-        m_gp.changeTrackNumber(m_num_tracks_spinner->getValue(), m_group_name);
+        const int num_tranks = m_num_tracks_spinner->getValue();
+        m_gp.changeTrackNumber(num_tranks, m_group_name);
+        UserConfigParams::m_rand_gp_num_tracks = num_tranks;
         addTracks();
     }
     else if (name=="ai-spinner")
@@ -393,6 +396,8 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     }
     else if(name=="reverse-spinner")
     {
+        const int reverse = m_reverse_spinner->getValue();
+        UserConfigParams::m_gp_reverse = reverse;
         updateHighscores();
     }
 
