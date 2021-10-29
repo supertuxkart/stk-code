@@ -172,7 +172,7 @@ namespace SkinConfig
       * \brief loads skin information from a STK skin file
       * \throw std::runtime_error if file cannot be read
       */
-    static void loadFromFile(std::string file, bool load_advanced_only)
+    static void loadFromFile(std::string file)
     {
         // Clear global variables for android
         m_render_params.clear();
@@ -208,11 +208,11 @@ namespace SkinConfig
         {
             const XMLNode* node = root->getNode(i);
 
-            if (node->getName() == "element" && !load_advanced_only)
+            if (node->getName() == "element")
             {
                 parseElement(node);
             }
-            else if (node->getName() == "color" && !load_advanced_only)
+            else if (node->getName() == "color")
             {
                 parseColor(node);
             }
@@ -271,7 +271,7 @@ namespace SkinConfig
                         list_ttf_path.begin(), list_ttf_path.end());
                 }
             }
-            else if (!load_advanced_only)
+            else
             {
                 Log::error("skin", "Unknown node in XML file '%s'.",
                            node->getName().c_str());
@@ -507,7 +507,6 @@ X##_yflip.LowerRightCorner.Y =  y1;}
 
 Skin::Skin(IGUISkin* fallback_skin)
 {
-    // fallback_skin will be null if load only basic theming data
     std::string skin_id = UserConfigParams::m_skin_file;
     std::string skin_name = skin_id.find("addon_") != std::string::npos ?
         file_manager->getAddonsFile(
@@ -516,7 +515,7 @@ Skin::Skin(IGUISkin* fallback_skin)
 
     try
     {
-        SkinConfig::loadFromFile(skin_name, /*load_advanced_only*/fallback_skin == NULL);
+        SkinConfig::loadFromFile(skin_name);
     }
     catch (std::runtime_error& e)
     {
@@ -526,18 +525,14 @@ Skin::Skin(IGUISkin* fallback_skin)
         std::string default_skin_id = UserConfigParams::m_skin_file;
         skin_name = file_manager->getAsset(FileManager::SKIN,
                                            default_skin_id + "/stkskin.xml");
-        SkinConfig::loadFromFile(skin_name, /*load_advanced_only*/fallback_skin == NULL);
+        SkinConfig::loadFromFile(skin_name);
     }
 
     m_bg_image = NULL;
 
-    m_fallback_skin = NULL;
-    if (fallback_skin)
-    {
-        m_fallback_skin = fallback_skin;
-        m_fallback_skin->grab();
-        assert(fallback_skin != NULL);
-    }
+    assert(fallback_skin != NULL);
+    m_fallback_skin = fallback_skin;
+    m_fallback_skin->grab();
 
     m_dialog = false;
     m_dialog_size = 0.0f;

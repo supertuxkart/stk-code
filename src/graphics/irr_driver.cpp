@@ -1055,8 +1055,7 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
         SP::loadShaders();
 #endif
 
-    font_manager = new FontManager();
-    font_manager->loadFonts();
+    font_manager = new FontManager(); // Fonts are loaded in GUIEngine::init
 
     input_manager = new InputManager();
     input_manager->setMode(InputManager::MENU);
