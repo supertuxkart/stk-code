@@ -424,8 +424,6 @@ namespace GUIEngine
 
         gui::IGUISkin* getFallbackSkin() { return m_fallback_skin; }
 
-        const std::string& getDataPath() const;
-
         bool hasIconTheme() const;
 
         bool hasFont() const;

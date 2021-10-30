@@ -2878,12 +2878,6 @@ void Skin::setSpriteBank (IGUISpriteBank *bank)
 }   // setSpriteBank
 
 // -----------------------------------------------------------------------------
-const std::string& Skin::getDataPath() const
-{
-    return SkinConfig::m_data_path;
-}   // getDataPath
-
-// -----------------------------------------------------------------------------
 /* All TTF list here are in absolute path. */
 const std::vector<std::string>& Skin::getNormalTTF() const
 {
