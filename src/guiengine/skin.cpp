@@ -2938,13 +2938,6 @@ std::string Skin::getThemedIcon(const std::string& relative_path) const
             }
         }
 
-        if (relative_path2.find(SkinConfig::m_data_path) != std::string::npos &&
-            file_manager->fileExists(relative_path2))
-        {
-            // Absolute path given
-            return relative_path2;
-        }
-
         std::string test_path = SkinConfig::m_data_path + "data/" + relative_path2;
         if (file_manager->fileExists(test_path))
         {
