@@ -603,7 +603,12 @@ public:
     // ----------------------------------------------------------------------------------------
     core::stringw getDifficultyName(Difficulty diff) const;
     // ----------------------------------------------------------------------------------------
-    const std::string& getTrackName() const { return m_tracks[m_track_number];}
+    const std::string getTrackName() const
+    {
+        if (m_tracks.empty())
+            return "";
+        return m_tracks[m_track_number];
+    }
     // ----------------------------------------------------------------------------------------
     const GrandPrixData& getGrandPrix() const { return m_grand_prix; }
     // ----------------------------------------------------------------------------------------
