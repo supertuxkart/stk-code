@@ -795,16 +795,7 @@ std::string FileManager::getAsset(FileManager::AssetType type,
 {
     if (type == GUI_ICON && GUIEngine::getSkin()->hasIconTheme())
     {
-        // remove the extension to check both .svg and .png
-        const std::string test_path = StringUtils::removeExtension
-            (GUIEngine::getSkin()->getDataPath() + "data/gui/icons/" + name);
-        // first check if there is an SVG version
-        if (fileExists(test_path + ".svg"))
-            return test_path + ".svg";
-        else if (fileExists(test_path + ".png"))
-            return test_path + ".png";
-        else
-            return m_subdir_name[type] + name;
+        return GUIEngine::getSkin()->getThemedIcon("gui/icons/" + name);
     }
     return m_subdir_name[type] + name;
 }   // getAsset
