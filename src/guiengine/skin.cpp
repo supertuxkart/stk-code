@@ -57,7 +57,7 @@ namespace SkinConfig
     static std::vector<std::string> m_normal_ttf;
     static std::vector<std::string> m_digit_ttf;
     static std::string m_color_emoji_ttf;
-    static bool m_icon_theme;
+    static std::vector<std::string> m_icon_theme_paths;
     static bool m_font;
 
     static void parseElement(const XMLNode* node)
@@ -172,26 +172,29 @@ namespace SkinConfig
       * \brief loads skin information from a STK skin file
       * \throw std::runtime_error if file cannot be read
       */
-    static void loadFromFile(std::string file)
+    static void loadFromFile(std::string file, bool clear_prev_params)
     {
-        // Clear global variables for android
-        m_render_params.clear();
-        m_colors.clear();
         m_data_path.clear();
-        m_normal_ttf.clear();
-        for (auto& p : stk_config->m_normal_ttf)
-            m_normal_ttf.push_back(file_manager->getAssetChecked(FileManager::TTF, p, true));
-        m_digit_ttf.clear();
-        for (auto& p : stk_config->m_digit_ttf)
-            m_digit_ttf.push_back(file_manager->getAssetChecked(FileManager::TTF, p, true));
-        m_color_emoji_ttf.clear();
-        if (!stk_config->m_color_emoji_ttf.empty())
+        if (clear_prev_params)
         {
-            m_color_emoji_ttf = file_manager->getAssetChecked(FileManager::TTF,
-                stk_config->m_color_emoji_ttf, true);
+            // Clear global variables
+            m_render_params.clear();
+            m_colors.clear();
+            m_normal_ttf.clear();
+            for (auto& p : stk_config->m_normal_ttf)
+                m_normal_ttf.push_back(file_manager->getAssetChecked(FileManager::TTF, p, true));
+            m_digit_ttf.clear();
+            for (auto& p : stk_config->m_digit_ttf)
+                m_digit_ttf.push_back(file_manager->getAssetChecked(FileManager::TTF, p, true));
+            m_color_emoji_ttf.clear();
+            if (!stk_config->m_color_emoji_ttf.empty())
+            {
+                m_color_emoji_ttf = file_manager->getAssetChecked(FileManager::TTF,
+                    stk_config->m_color_emoji_ttf, true);
+            }
+            m_icon_theme_paths.clear();
+            m_font = false;
         }
-        m_icon_theme = false;
-        m_font = false;
 
         XMLNode* root = file_manager->createXMLTree(file);
         if(!root)
@@ -203,6 +206,12 @@ namespace SkinConfig
 
         m_data_path = StringUtils::getPath(file_manager
             ->getFileSystem()->getAbsolutePath(file.c_str()).c_str()) + "/";
+
+        // Check for icon folder in theme, and add to search paths if present
+        if (file_manager->fileExists(m_data_path + "data/gui/icons/"))
+            m_icon_theme_paths.insert(m_icon_theme_paths.begin(),
+                m_data_path);
+
         const int amount = root->getNumNodes();
         for (int i=0; i<amount; i++)
         {
@@ -218,12 +227,6 @@ namespace SkinConfig
             }
             else if (node->getName() == "advanced")
             {
-                bool ret = false;
-                if (node->get("icon_theme", &ret))
-                {
-                    if (file_manager->fileExists(m_data_path + "data/gui/icons/"))
-                        m_icon_theme = true;
-                }
                 std::string color_ttf;
                 if (node->get("color_emoji_ttf", &color_ttf))
                 {
@@ -257,7 +260,6 @@ namespace SkinConfig
                 list_ttf_path.clear();
                 if (node->get("digit_ttf", &list_ttf))
                 {
-                    m_digit_ttf.clear();
                     for (auto& t : list_ttf)
                     {
                         std::string test_path = m_data_path + "data/ttf/" + t;
@@ -280,6 +282,40 @@ namespace SkinConfig
 
         delete root;
     }   // loadFromFile
+
+    std::vector<std::string> getDependencyChain(std::string initial_skin_id)
+    {
+        std::vector<std::string> chain;
+        chain.insert(chain.begin(), initial_skin_id);
+        
+        for(size_t i=0, n=chain.size(); i<n; i++)
+        {
+            std::string skin_file = chain[0].find("addon_") != std::string::npos ?
+                file_manager->getAddonsFile(
+                    std::string("skins/") + chain[0].substr(6) + "/stkskin.xml") :
+                file_manager->getAsset(FileManager::SKIN, chain[0] + "/stkskin.xml");
+
+            XMLNode* root = file_manager->createXMLTree(skin_file);
+            if (!root)
+            {
+                Log::error("skin", "Could not read XML file '%s'.",
+                           skin_file.c_str());
+                throw std::runtime_error("Invalid skin file");
+            }
+
+            std::string base_theme;
+            if (root->get("base_theme", &base_theme) != 0)
+            {
+                Log::info("GUI", "Inserting base theme %s into dependency chain", base_theme.c_str());
+                chain.insert(chain.begin(), base_theme);
+                ++n;
+            }
+
+            delete root;
+        }
+
+        return chain;
+    }   // getDependencyChain
 
     // ------------------------------------------------------------------------
     float getVerticalInnerPadding(int wtype, Widget* widget)
@@ -508,24 +544,45 @@ X##_yflip.LowerRightCorner.Y =  y1;}
 Skin::Skin(IGUISkin* fallback_skin)
 {
     std::string skin_id = UserConfigParams::m_skin_file;
-    std::string skin_name = skin_id.find("addon_") != std::string::npos ?
-        file_manager->getAddonsFile(
-            std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
-        file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
 
     try
     {
-        SkinConfig::loadFromFile(skin_name);
+        std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
+
+        bool reset = true;
+        for (auto skin_id : load_chain)
+        {
+            std::string skin_name = skin_id.find("addon_") != std::string::npos ?
+                file_manager->getAddonsFile(
+                    std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
+                file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
+
+            Log::info("GUI", "Loading skin data from file: %s", skin_name.c_str());
+            SkinConfig::loadFromFile(skin_name, reset);
+            reset = false;
+        }
     }
     catch (std::runtime_error& e)
     {
         (void)e;   // avoid compiler warning
         // couldn't load skin. Try to revert to default
+        Log::error("GUI", "Could not load skin, reverting to default.");
         UserConfigParams::m_skin_file.revertToDefaults();
-        std::string default_skin_id = UserConfigParams::m_skin_file;
-        skin_name = file_manager->getAsset(FileManager::SKIN,
-                                           default_skin_id + "/stkskin.xml");
-        SkinConfig::loadFromFile(skin_name);
+        skin_id = UserConfigParams::m_skin_file;
+        std::vector<std::string> load_chain = SkinConfig::getDependencyChain(skin_id);
+
+        bool reset = true;
+        for (auto skin_id : load_chain)
+        {
+            std::string skin_name = skin_id.find("addon_") != std::string::npos ?
+                file_manager->getAddonsFile(
+                    std::string("skins/") + skin_id.substr(6) + "/stkskin.xml") :
+                file_manager->getAsset(FileManager::SKIN, skin_id + "/stkskin.xml");
+
+            Log::info("GUI", "Loading skin data from file: %s", skin_name.c_str());
+            SkinConfig::loadFromFile(skin_name, reset);
+            reset = false;
+        }
     }
 
     m_bg_image = NULL;
@@ -2899,7 +2956,7 @@ const std::string& Skin::getColorEmojiTTF() const
 // -----------------------------------------------------------------------------
 bool Skin::hasIconTheme() const
 {
-    return SkinConfig::m_icon_theme;
+    return SkinConfig::m_icon_theme_paths.size() > 0;
 }   // hasIconTheme
 
 // -----------------------------------------------------------------------------
@@ -2913,31 +2970,36 @@ bool Skin::hasFont() const
  * icon. */
 std::string Skin::getThemedIcon(const std::string& relative_path) const
 {
-    // First check if an svg icon is available
+    // File extensions to check
     const std::vector<std::string> ext {".svg", ".png"};
-    // get the path without extension
+    // Get the requested path without extension
     const std::string path_no_extension = StringUtils::removeExtension(relative_path);
-    // loop the file extensions: svg first
-    for(auto s : ext)
+
+    // Look for the requested icon in each theme in the dependency chain
+    for (auto p : SkinConfig::m_icon_theme_paths)
     {
-        std::string relative_path2 = path_no_extension + s;
-        if (!SkinConfig::m_icon_theme ||
-            (relative_path2.find("karts/") == std::string::npos &&
-             relative_path2.find("gui/icons/") == std::string::npos))
+        // Loop through possible file extensions (svg first)
+        for (auto s : ext)
         {
-            std::string tmp_path = file_manager->getAsset(relative_path2);
-            if (file_manager->fileExists(tmp_path))
+            std::string relative_path2 = path_no_extension + s;
+            if (!hasIconTheme() ||
+                (relative_path2.find("karts/") == std::string::npos &&
+                 relative_path2.find("gui/icons/") == std::string::npos))
             {
-                return tmp_path;
+                std::string tmp_path = file_manager->getAsset(relative_path2);
+                if (file_manager->fileExists(tmp_path))
+                {
+                    return tmp_path;
+                }
+            }
+
+            std::string test_path = p + "data/" + relative_path2;
+            if (file_manager->fileExists(test_path))
+            {
+                return test_path;
             }
         }
-
-        std::string test_path = SkinConfig::m_data_path + "data/" + relative_path2;
-        if (file_manager->fileExists(test_path))
-        {
-            return test_path;
-        }
     }
-    // if nothing found, return the bundled one
+    // If nothing found, return the bundled icon
     return file_manager->getAsset(relative_path);
 }   // getThemedIcon

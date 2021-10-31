@@ -58,14 +58,34 @@ that take a float from 0 to 1, representing the percentage of each border that g
 area (this might include stuff like shadows, etc.). The 'h' one is for horizontal borders,
 the 'v' one is for vertical borders.
 
-Finnally : the image is split, as shown above, into 9 areas. In osme cases, you may not want
+Finnally : the image is split, as shown above, into 9 areas. In some cases, you may not want
 all areas to be rendered. Then you can pass parameter areas="body+left+right+top+bottom"
 and explicitely specify which parts you want to see. The 4 corner areas are only visible
 when the border that intersect at this corner are enabled.
 
+When there is a common="y" with image tag, the image will be loaded only from data/skins/common in stk-code.
+
+Any information not specified in this theme will be inherited from the specified base theme,
+if any.  To specify a base theme, add base_theme="themename" to the <skin> tag.
+
+To use an icon theme, place the replacement icons (PNG or SVG) into [skin folder]/data/gui/icons
+STK will prefer these icons first, if not found it will fallback to icons from the base theme(s).
 -->
 
-<skin name="Forest" author="Benau">
+<skin name="Forest" author="Benau" base_theme="peach">
+
+<!--
+Here you can configure advanced theming rules for this skin
+
+For TTF specify the list like the following, for normal and digit ttf it will be added at the beginning of the
+font list in STK, so those TTF will be used first, and any missing characters will be rendered from the base
+theme font list. For color emoji ttf it will replace the base theme color emoji directly. You are not required
+to specify all types of ttf.
+
+<advanced normal_ttf="xxx.ttf yyy.ttf"
+          digit_ttf="zzz.ttf"
+          color_emoji_ttf="www.ttf"/>
+-->
 
 <!--  Stateless -->
 <element type="background" common="y" image="background.jpg" />
