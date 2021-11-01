@@ -649,7 +649,8 @@ void RaceManager::startNextRace()
     else if(m_minor_mode==MINOR_MODE_LAP_TRIAL)
     {
         World::setWorld(new LapTrial());
-        RaceManager::get()->setTimeTarget(m_gp_time_target);
+        if (m_major_mode == MAJOR_MODE_GRAND_PRIX)
+            RaceManager::get()->setTimeTarget(m_gp_time_target);
     }
     else if(m_minor_mode==MINOR_MODE_TUTORIAL)
         World::setWorld(new TutorialWorld());
