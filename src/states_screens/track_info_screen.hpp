@@ -49,6 +49,8 @@ class TrackInfoScreen : public GUIEngine::Screen,
 
     bool m_is_soccer;
 
+    bool m_is_lap_trial;
+
     bool m_show_ffa_spinner;
 
     // When there is no need to tab through / click on images/labels, we can add directly

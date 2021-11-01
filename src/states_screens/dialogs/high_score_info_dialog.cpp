@@ -133,7 +133,10 @@ HighScoreInfoDialog::HighScoreInfoDialog(Highscores* highscore, bool is_linear, 
         else
         {
             is_reverse = m_hs->m_reverse ? _("Yes") : _("No");
-            m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
+            if (m_minor_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
+                m_num_karts_label->setText(_("Time target: %s",StringUtils::toWString(StringUtils::timeToString(m_hs->m_number_of_laps))),true);
+            else
+                m_num_laps_label->setText(_("Laps: %d", m_hs->m_number_of_laps), true);
 
         }
         m_reverse_label->setVisible(true);
@@ -187,15 +190,22 @@ void HighScoreInfoDialog::updateHighscoreEntries()
         {
             m_hs->getEntry(n, kart_name, name, &time);
 
-            std::string time_string;
-            if (time > 60.0f * 60.0f)
+            std::string highscore_string;
+            if (m_minor_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
             {
-                time_string = StringUtils::timeToString(time, time_precision,
-                    /*display_minutes_if_zero*/true, /*display_hours*/true);
+                highscore_string = std::to_string(static_cast<int>(time));
             }
             else
             {
-                time_string = StringUtils::timeToString(time, time_precision);
+                if (time > 60.0f * 60.0f)
+                {
+                    highscore_string = StringUtils::timeToString(time, time_precision,
+                        /*display_minutes_if_zero*/true, /*display_hours*/true);
+                }
+                else
+                {
+                    highscore_string = StringUtils::timeToString(time, time_precision);
+                }
             }
 
             for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
@@ -208,7 +218,7 @@ void HighScoreInfoDialog::updateHighscoreEntries()
                 }
             }
 
-            line = name + "    " + core::stringw(time_string.c_str());
+            line = name + "    " + core::stringw(highscore_string.c_str());
         }
         else
         {
@@ -272,6 +282,11 @@ GUIEngine::EventPropagation
             int laps = m_hs->m_number_of_laps;
             RaceManager::MajorRaceModeType major_mode = m_major_mode;
 
+            if (RaceManager::get()->isLapTrialMode())
+            {
+                RaceManager::get()->setTimeTarget(static_cast<float>(m_hs->m_number_of_laps));
+            }
+
             ModalDialog::dismiss();
 
             if (major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
@@ -283,7 +298,7 @@ GUIEngine::EventPropagation
             else
             {
                 RaceManager::get()->setReverseTrack(reverse);
-                RaceManager::get()->startSingleRace(track_name, laps, false);
+                RaceManager::get()->startSingleRace(track_name, RaceManager::get()->isLapTrialMode() ? -1 : laps, false);
             }
             return GUIEngine::EVENT_BLOCK;
         }

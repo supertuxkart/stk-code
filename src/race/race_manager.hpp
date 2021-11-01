@@ -50,6 +50,7 @@ static const std::string IDENT_SOCCER   ("SOCCER"          );
 static const std::string IDENT_GHOST    ("GHOST"           );
 static const std::string IDENT_OVERWORLD("OVERWORLD"       );
 static const std::string IDENT_CUTSCENE ("CUTSCENE"        );
+static const std::string IDENT_LAP_TRIAL("LAP_TRIAL"       );
 
 /**
  * The race manager has two functions:
@@ -121,7 +122,8 @@ public:
 
         MINOR_MODE_OVERWORLD        = MISC(0),
         MINOR_MODE_TUTORIAL         = MISC(1),
-        MINOR_MODE_CUTSCENE         = MISC(2)
+        MINOR_MODE_CUTSCENE         = MISC(2),
+        MINOR_MODE_LAP_TRIAL        = MISC(3)
     };
 
     // ----------------------------------------------------------------------------------------
@@ -144,6 +146,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:      return IDENT_STD;
             case MINOR_MODE_TIME_TRIAL:       return IDENT_TTRIAL;
             case MINOR_MODE_FOLLOW_LEADER:    return IDENT_FTL;
+            case MINOR_MODE_LAP_TRIAL:        return IDENT_LAP_TRIAL;
             case MINOR_MODE_3_STRIKES:        return IDENT_STRIKES;
             case MINOR_MODE_FREE_FOR_ALL:     return IDENT_FFA;
             case MINOR_MODE_CAPTURE_THE_FLAG: return IDENT_CTF;
@@ -165,6 +168,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:    return "/gui/icons/mode_normal.png";
             case MINOR_MODE_TIME_TRIAL:     return "/gui/icons/mode_tt.png";
             case MINOR_MODE_FOLLOW_LEADER:  return "/gui/icons/mode_ftl.png";
+            case MINOR_MODE_LAP_TRIAL:      return "/gui/icons/mode_normal.png"; // TODO: Add lap trial icon
             case MINOR_MODE_3_STRIKES:      return "/gui/icons/mode_3strikes.png";
             case MINOR_MODE_FREE_FOR_ALL:   return "/gui/icons/mode_weapons.png";
             case MINOR_MODE_CAPTURE_THE_FLAG: return "/gui/icons/mode_weapons.png";
@@ -185,6 +189,7 @@ public:
             case MINOR_MODE_NORMAL_RACE:    return true;
             case MINOR_MODE_TIME_TRIAL:     return true;
             case MINOR_MODE_FOLLOW_LEADER:  return true;
+            case MINOR_MODE_LAP_TRIAL:      return true;
             case MINOR_MODE_3_STRIKES:      return true;
             case MINOR_MODE_FREE_FOR_ALL:   return false;
             case MINOR_MODE_CAPTURE_THE_FLAG: return false;
@@ -340,6 +345,10 @@ private:
     int                              m_goal_target;
     int                              m_hit_capture_limit;
     int                              m_skipped_tracks_in_gp;
+    /** Time target for GP, used in Lap Trial mode */
+    float                            m_gp_time_target;
+    /** Total laps from every track, used in Lap Trial mode */
+    int                              m_gp_total_laps;
     void startNextRace();    // start a next race
 
     friend bool operator< (const KartStatus& left, const KartStatus& right)
@@ -753,6 +762,8 @@ public:
     // ----------------------------------------------------------------------------------------
     bool isTimeTrialMode() const { return m_minor_mode == MINOR_MODE_TIME_TRIAL; }
     // ----------------------------------------------------------------------------------------
+    bool isLapTrialMode() const  { return m_minor_mode == MINOR_MODE_LAP_TRIAL; }
+    // ----------------------------------------------------------------------------------------
      /** \brief Returns the number of second's decimals to display */
     int currentModeTimePrecision() const
     {
@@ -904,6 +915,12 @@ public:
     int getSkippedTracksInGP() const { return m_skipped_tracks_in_gp; }
     // ----------------------------------------------------------------------------------------
     void addSkippedTrackInGP() { m_skipped_tracks_in_gp++; }
+    // ----------------------------------------------------------------------------------------
+    void setGPTimeTarget(float time_target) { m_gp_time_target = time_target; }
+    // ----------------------------------------------------------------------------------------
+    int getGPTotalLaps() const { return m_gp_total_laps; }
+    // ----------------------------------------------------------------------------------------
+    void addGPTotalLaps(int laps) { m_gp_total_laps += laps; }
     // ----------------------------------------------------------------------------------------
     /** Whether the current game mode allow live joining even the current game
      *. started in network*/

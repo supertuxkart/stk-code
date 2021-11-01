@@ -1369,7 +1369,10 @@ void RaceGUI::drawLap(const AbstractKart* kart,
     pos.LowerRightCorner.X -= icon_width;
 
     std::ostringstream out;
-    out << lap + 1 << "/" << RaceManager::get()->getNumLaps();
+    if (world->showLapsTarget())
+        out << lap + 1 << "/" << RaceManager::get()->getNumLaps();
+    else
+        out << lap;
 
     gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     font->setBlackBorder(true);

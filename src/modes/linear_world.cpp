@@ -516,11 +516,19 @@ void LinearWorld::newLap(unsigned int kart_index)
     int ticks_per_lap;
     if (kart_info.m_finished_laps == 1) // just completed first lap
     {
-        ticks_per_lap = getTimeTicks();
+        // To avoid negative times in countdown mode
+        if (getClockMode() == CLOCK_COUNTDOWN)
+            ticks_per_lap = stk_config->time2Ticks(RaceManager::get()->getTimeTarget()) - getTimeTicks();
+        else
+            ticks_per_lap = getTimeTicks();
     }
     else //completing subsequent laps
     {
-        ticks_per_lap = getTimeTicks() - kart_info.m_lap_start_ticks;
+        // To avoid negative times in countdown mode
+        if (getClockMode() == CLOCK_COUNTDOWN)
+            ticks_per_lap = kart_info.m_lap_start_ticks - getTimeTicks();
+        else
+            ticks_per_lap = getTimeTicks() - kart_info.m_lap_start_ticks;
     }
 
     // if new fastest lap

@@ -1027,7 +1027,8 @@ void Kart::finishedRace(float time, bool from_server)
     }
 
     if (RaceManager::get()->isLinearRaceMode() || RaceManager::get()->isBattleMode() ||
-        RaceManager::get()->isSoccerMode()     || RaceManager::get()->isEggHuntMode())
+        RaceManager::get()->isSoccerMode()     || RaceManager::get()->isEggHuntMode() ||
+        RaceManager::get()->isLapTrialMode())
     {
         // Save for music handling in race result gui
         setRaceResult();
@@ -1052,7 +1053,8 @@ void Kart::finishedRace(float time, bool from_server)
 void Kart::setRaceResult()
 {
     if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE ||
-        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL)
+        RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL  ||
+        RaceManager::get()->isLapTrialMode())
     {
         if (m_controller->isLocalPlayerController()) // if player is on this computer
         {

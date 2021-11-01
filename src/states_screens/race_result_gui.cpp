@@ -207,14 +207,20 @@ void RaceResultGUI::init()
     
     if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
         !NetworkConfig::get()->isNetworking() &&
-        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL))
+        (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_NORMAL_RACE || RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_TIME_TRIAL ||
+        RaceManager::get()->isLapTrialMode()))
     {
+        const AbstractKart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
+        RaceManager::get()->addGPTotalLaps(World::getWorld()->getFinishedLapsOfKart(k->getWorldKartId()));
         if (RaceManager::get()->getNumOfTracks() == RaceManager::get()->getTrackNumber() + 1
            && !RaceManager::get()->getGrandPrix().isRandomGP() && RaceManager::get()->getSkippedTracksInGP() == 0)
         {
             Highscores* highscores = World::getWorld()->getGPHighscores();
-            const AbstractKart* k = RaceManager::get()->getKartWithGPRank(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
-            float full_time = RaceManager::get()->getOverallTime(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
+            float full_time;
+            if (RaceManager::get()->isLapTrialMode())
+                full_time = static_cast<float>(RaceManager::get()->getGPTotalLaps());
+            else
+                full_time = RaceManager::get()->getOverallTime(RaceManager::get()->getLocalPlayerGPRank(PLAYER_ID_GAME_MASTER));
             std::string gp_name = RaceManager::get()->getGrandPrix().getId();
             highscores->addGPData(k->getIdent(), k->getController()->getName(), gp_name, full_time);
         }
@@ -1439,6 +1445,16 @@ void RaceResultGUI::unload()
             NULL, true /* ignoreRTL */);
         current_x += m_width_finish_time + m_width_column_space;
 
+        if (RaceManager::get()->isLapTrialMode())
+        {
+            core::recti pos_laps = core::recti(current_x, y, current_x + 100, y + 10);
+            int laps = World::getWorld()->getFinishedLapsOfKart(n);
+            m_font->draw(irr::core::stringw(laps), pos_laps, color, false, false,
+                NULL, true /* ignoreRTL */);
+        }
+
+        current_x += 100 + m_width_column_space;
+
         // Only display points in GP mode and when the GP results are displayed.
         // =====================================================================
         if (RaceManager::get()->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
@@ -1913,8 +1929,12 @@ void RaceResultGUI::unload()
                 current_x = (int)(UserConfigParams::m_width * 0.85f);
 
                 // Finally draw the time
-                std::string time_string = StringUtils::timeToString(time, time_precision);
-                GUIEngine::getSmallFont()->draw(time_string.c_str(),
+                std::string highscore_string;
+                if (RaceManager::get()->isLapTrialMode())
+                    highscore_string = std::to_string(static_cast<int>(time));
+                else
+                    highscore_string = StringUtils::timeToString(time, time_precision);
+                GUIEngine::getSmallFont()->draw(highscore_string.c_str(),
                     core::recti(current_x, current_y, current_x + 100, current_y + 10),
                     text_color,
                     false, false, NULL, true /* ignoreRTL */);

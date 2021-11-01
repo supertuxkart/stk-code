@@ -1262,7 +1262,7 @@ Highscores* World::getHighscores() const
                                          RaceManager::get()->getNumNonGhostKarts(),
                                          RaceManager::get()->getDifficulty(),
                                          RaceManager::get()->getTrackName(),
-                                         RaceManager::get()->getNumLaps(),
+                                         RaceManager::get()->isLapTrialMode() ? RaceManager::get()->getTimeTarget() : RaceManager::get()->getNumLaps(),
                                          RaceManager::get()->getReverseTrack());
 
     return highscores;
@@ -1341,9 +1341,19 @@ void World::updateHighscores(int* best_highscore_rank)
 
         int highscore_rank = 0;
         // The player is a local player, so there is a name:
-        highscore_rank = highscores->addData(k->getIdent(),
-                                             k->getController()->getName(),
-                                             k->getFinishTime()    );
+        if (RaceManager::get()->isLapTrialMode())
+        {
+            highscore_rank = highscores->addData(k->getIdent(),
+                                                 k->getController()->getName(),
+                                                 static_cast<float>(getFinishedLapsOfKart(index[pos])));
+        }
+        else
+        {
+            highscore_rank = highscores->addData(k->getIdent(),
+                                                 k->getController()->getName(),
+                                                 k->getFinishTime()    );
+        }
+        
 
         if (highscore_rank > 0)
         {

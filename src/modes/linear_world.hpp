@@ -236,6 +236,8 @@ public:
     void updateCheckLinesClient(const BareNetworkString& b);
     // ------------------------------------------------------------------------
     void handleServerCheckStructureCount(unsigned count);
+    // ------------------------------------------------------------------------
+    virtual bool showLapsTarget() OVERRIDE { return true; }
 };   // LinearWorld
 
 #endif
