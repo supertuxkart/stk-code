@@ -772,7 +772,6 @@ void RaceManager::saveGP()
     }
     else  if(!m_grand_prix.isRandomGP())
     {
-        Log::info("RaceManager","%d",isLapTrialMode());
         m_saved_gp = new SavedGrandPrix(
             StateManager::get()->getActivePlayerProfile(0)->getUniqueID(),
             m_grand_prix.getId(),
