@@ -86,6 +86,8 @@ void GPInfoScreen::loadedFromFile()
     m_num_tracks_spinner->setValue(1);
 
     m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
+
+    m_time_target_spinner = getWidget<SpinnerWidget>("time-target-spinner");
     
     GUIEngine::IconButtonWidget* screenshot = getWidget<IconButtonWidget>("screenshot");
     screenshot->setFocusable(false);
@@ -101,6 +103,7 @@ void GPInfoScreen::loadedFromFile()
     }
     video::ITexture* kart_not_found = irr_driver->getTexture(file_manager->getAsset(FileManager::GUI_ICON, "random_kart.png"));
     m_unknown_kart_icon = m_icon_bank->addTextureAsSprite(kart_not_found);
+
     
 }   // loadedFromFile
 
@@ -189,6 +192,11 @@ void GPInfoScreen::init()
     m_num_tracks_spinner->setVisible(random);
     getWidget<LabelWidget  >("group-text"   )->setVisible(random);
     m_group_spinner->setVisible(random);
+
+    m_time_target_spinner->setVisible(RaceManager::get()->isLapTrialMode());
+    getWidget<LabelWidget>("time-target-text")->setVisible(RaceManager::get()->isLapTrialMode());
+    if (RaceManager::get()->isLapTrialMode())
+        m_time_target_spinner->setValue(UserConfigParams::m_lap_trial_time_limit);
 
     // Number of AIs
     // -------------
@@ -349,6 +357,11 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
             RaceManager::get()->setNumKarts(local_players + num_ai);
             UserConfigParams::m_num_karts_per_gamemode[RaceManager::MAJOR_MODE_GRAND_PRIX] = local_players + num_ai;
             
+            if (RaceManager::get()->isLapTrialMode())
+            {
+                RaceManager::get()->setGPTimeTarget(static_cast<int>(m_time_target_spinner->getValue()) * 60);
+            }
+
             m_gp.changeReverse(getReverse());
             RaceManager::get()->startGP(m_gp, false, false);
         }
@@ -393,6 +406,11 @@ void GPInfoScreen::eventCallback(Widget *, const std::string &name,
     }
     else if(name=="reverse-spinner")
     {
+        updateHighscores();
+    }
+    else if(name == "time-target-spinner")
+    {
+        UserConfigParams::m_lap_trial_time_limit = m_time_target_spinner->getValue();
         updateHighscores();
     }
 
@@ -486,7 +504,13 @@ void GPInfoScreen::updateHighscores()
         if(i < count)
         {
             highscores->getEntry(i, kart, name, &time);
-            std::string time_string = StringUtils::timeToString(time);
+
+            std::string highscore_string;
+            if (RaceManager::get()->isLapTrialMode())
+                highscore_string = std::to_string(static_cast<int>(time));
+            else
+                highscore_string = StringUtils::timeToString(time);
+
             for(unsigned int n=0; n<kart_properties_manager->getNumberOfKarts(); n++)
             {
                 const KartProperties* prop = kart_properties_manager->getKartById(n);
@@ -496,7 +520,7 @@ void GPInfoScreen::updateHighscores()
                     break;
                 }
             }
-            line = name + "    " + irr::core::stringw(time_string.c_str());
+            line = name + "    " + irr::core::stringw(highscore_string.c_str());
         }
         else
         {

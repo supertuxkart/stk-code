@@ -226,7 +226,7 @@ int Highscores::findHighscorePosition(const std::string& kart_name,
         }
         // Check if new entry is faster than than in slot 'i', if so
         // move times etc and insert new entry
-        if(time < m_time[i])
+        if(RaceManager::get()->isLapTrialMode() ? (time > m_time[i]) : (time < m_time[i]))
         {
             for(int j=HIGHSCORE_LEN-2;j>=i;j--)
             {
@@ -256,7 +256,10 @@ int Highscores::addData(const std::string& kart_name,
         m_track               = RaceManager::get()->getTrackName();
         m_number_of_karts     = RaceManager::get()->getNumNonGhostKarts();
         m_difficulty          = RaceManager::get()->getDifficulty();
-        m_number_of_laps      = RaceManager::get()->getNumLaps();
+        if (RaceManager::get()->isLapTrialMode())
+            m_number_of_laps  = static_cast<int>(RaceManager::get()->getTimeTarget());
+        else
+            m_number_of_laps  = RaceManager::get()->getNumLaps();
         m_reverse             = RaceManager::get()->getReverseTrack();
         m_name[position]      = name;
         m_time[position]      = time;
@@ -275,7 +278,10 @@ int Highscores::addGPData(const std::string& kart_name,
         m_track               = track_name;
         m_number_of_karts     = RaceManager::get()->getNumNonGhostKarts();
         m_difficulty          = RaceManager::get()->getDifficulty();
-        m_number_of_laps      = 0;
+        if (RaceManager::get()->isLapTrialMode())
+            m_number_of_laps  = static_cast<int>(RaceManager::get()->getTimeTarget());
+        else
+            m_number_of_laps  = RaceManager::get()->getNumLaps();
         m_gp_reverse_type     = RaceManager::get()->getGrandPrix().getReverseType();
         m_gp_minor_mode       = RaceManager::get()->getMinorMode();
         m_name[position]      = name;

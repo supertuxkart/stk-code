@@ -260,6 +260,9 @@ public:
      *  counting laps. */
     virtual bool raceHasLaps() = 0;
     // ------------------------------------------------------------------------
+    /** If true lap counter shows lap count in format: 4/20 or if false then in format: 4 */
+    virtual bool showLapsTarget() { return false; }
+    // ------------------------------------------------------------------------
     /** Returns the number of laps for a given kart. Only valid when
      *  raceHasLaps() - otherwise STK will abort. */
     virtual int getFinishedLapsOfKart(unsigned int kart_index) const

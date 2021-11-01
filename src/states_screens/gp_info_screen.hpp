@@ -55,6 +55,9 @@ private:
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
 
+    /** Spinner for time target in Lap Trial */
+    GUIEngine::SpinnerWidget* m_time_target_spinner;
+
     /** List with last 5 highscores */
     GUIEngine::ListWidget* m_highscore_list;
 

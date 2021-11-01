@@ -147,12 +147,15 @@ void HighScoreSelection::beforeAddingWidget()
         {
             m_high_scores_list_widget->addColumn(_("Game mode"),3);
         }
-        else
+        else if (m_active_mode != RaceManager::MINOR_MODE_LAP_TRIAL)
         {
             m_high_scores_list_widget->addColumn(_C("column_name", "Laps"), 3);
         }
             m_high_scores_list_widget->addColumn(_C("column_name", "Reverse"), 3);
     }
+
+    if (m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
+        m_high_scores_list_widget->addColumn(_("Time limit"),4);
 
     m_high_scores_list_widget->createHeader();
 }   // beforeAddingWidget
@@ -199,6 +202,9 @@ void HighScoreSelection::loadList()
             else if (m_active_mode == RaceManager::MINOR_MODE_EASTER_EGG &&
                 hs->m_highscore_type != "HST_EASTER_EGG_HUNT")
                 continue;
+            else if (m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL &&
+                hs->m_highscore_type != "HST_LAP_TRIAL")
+                continue;
         }
         else if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX &&
             hs->m_highscore_type != "HST_GRANDPRIX")
@@ -236,12 +242,12 @@ void HighScoreSelection::loadList()
                 getDifficultyName((RaceManager::Difficulty) hs->m_difficulty),
                                    display_lock ? m_icon_lock : -1, 4, true));
 
-        if (m_active_mode_is_linear)
+        if (m_active_mode_is_linear || m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
         {
             row.push_back(GUIEngine::ListWidget::ListCell
                 (StringUtils::toWString(hs->m_number_of_karts), -1, 4, true));
 
-            if (m_major_mode != RaceManager::MAJOR_MODE_GRAND_PRIX)
+            if (m_major_mode != RaceManager::MAJOR_MODE_GRAND_PRIX && m_active_mode != RaceManager::MINOR_MODE_LAP_TRIAL)
             {
                 row.push_back(GUIEngine::ListWidget::ListCell
                     (StringUtils::toWString(hs->m_number_of_laps), -1, 3, true));
@@ -258,6 +264,11 @@ void HighScoreSelection::loadList()
                 row.push_back(GUIEngine::ListWidget::ListCell
                     (hs->m_reverse ? _("Yes") : _("No"), -1, 3, true));
             }
+        }
+        if (m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
+        {
+            row.push_back(GUIEngine::ListWidget::ListCell(
+                StringUtils::toWString(StringUtils::timeToString(hs->m_number_of_laps)), -1, 4, true));
         }
         m_high_scores_list_widget->addItem(StringUtils::toString(i), row);
     }
@@ -316,12 +327,18 @@ void HighScoreSelection::eventCallback(GUIEngine::Widget* widget,
             m_active_mode = RaceManager::MINOR_MODE_EASTER_EGG;
             m_major_mode = RaceManager::MAJOR_MODE_SINGLE;
         }
+        else if (selection == "tab_lap_trial")
+        {
+            m_active_mode = RaceManager::MINOR_MODE_LAP_TRIAL;
+            m_major_mode = RaceManager::MAJOR_MODE_SINGLE;
+        }
         else if (selection == "tab_grand_prix")
         {
+            m_active_mode = RaceManager::MINOR_MODE_NORMAL_RACE;
             m_major_mode = RaceManager::MAJOR_MODE_GRAND_PRIX;
         }
 
-        if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
+        if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX || m_active_mode == RaceManager::MINOR_MODE_LAP_TRIAL)
             m_active_mode_is_linear = true;
         else
             m_active_mode_is_linear = RaceManager::get()->isLinearRaceMode(m_active_mode);
