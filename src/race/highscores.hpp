@@ -85,7 +85,7 @@ public:
                 const bool reverse);
     /** Constructor for grandprix highscores */
     Highscores (int num_karts, const RaceManager::Difficulty &difficulty,
-                const std::string &trackName,
+                const std::string &trackName, const int target,
                 const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode);
     /** Creates an entry from a file
      */
@@ -103,7 +103,7 @@ public:
     /** matches method for grandprix highscores */
     int matches(int num_karts,
                 const RaceManager::Difficulty &difficulty,
-                const std::string &track,
+                const std::string &track, const int target,
                 const GrandPrixData::GPReverseType reverse_type, RaceManager::MinorRaceModeType minor_mode);
     // ------------------------------------------------------------------------
     int  addData   (const std::string& kart_name,

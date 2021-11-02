@@ -1266,6 +1266,8 @@ const core::stringw RaceManager::getNameOf(const MinorRaceModeType mode)
         //I18N: Game mode
         case MINOR_MODE_FOLLOW_LEADER:  return _("Follow the Leader");
         //I18N: Game mode
+        case MINOR_MODE_LAP_TRIAL:      return _("Lap Trial");
+        //I18N: Game mode
         case MINOR_MODE_3_STRIKES:      return _("3 Strikes Battle");
         //I18N: Game mode
         case MINOR_MODE_FREE_FOR_ALL:   return _("Free-For-All");

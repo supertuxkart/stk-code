@@ -76,6 +76,8 @@ private:
     class RowInfo
     {
     public:
+        /** Kart ID in World */
+        unsigned int     m_kart_id;
         /** Start time for each line of the animation. */
         float            m_start_at;
         /** Currenct X position. */
