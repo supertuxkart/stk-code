@@ -849,6 +849,7 @@ void RaceResultGUI::unload()
                 continue;
             // Save a pointer to the current row_info entry
             RowInfo *ri = &(m_all_row_infos[position - first_position]);
+            ri->m_kart_id = kart->getWorldKartId();
             ri->m_is_player_kart = kart->getController()->isLocalPlayerController();
             ri->m_kart_name = kart->getController()->getName();
             if (RaceManager::get()->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
@@ -1439,16 +1440,17 @@ void RaceResultGUI::unload()
             true /* ignoreRTL */);
         current_x += m_width_kart_name + m_width_column_space;
 
-
-        core::recti dest_rect = core::recti(current_x, y, current_x + 100, y + 10);
-        m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false,
-            NULL, true /* ignoreRTL */);
-        current_x += m_width_finish_time + m_width_column_space;
-
+        if (!RaceManager::get()->isLapTrialMode())
+        {
+            core::recti dest_rect = core::recti(current_x, y, current_x + 100, y + 10);
+            m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false,
+                NULL, true /* ignoreRTL */);
+            current_x += m_width_finish_time + m_width_column_space;
+        }
         if (RaceManager::get()->isLapTrialMode())
         {
             core::recti pos_laps = core::recti(current_x, y, current_x + 100, y + 10);
-            int laps = World::getWorld()->getFinishedLapsOfKart(n);
+            int laps = World::getWorld()->getFinishedLapsOfKart(ri->m_kart_id);
             m_font->draw(irr::core::stringw(laps), pos_laps, color, false, false,
                 NULL, true /* ignoreRTL */);
         }

@@ -63,6 +63,7 @@ public:
     Highscores *getGPHighscores(int num_karts,
                                 const RaceManager::Difficulty difficulty,
                                 const std::string &trackName,
+                                const int target,
                                 GrandPrixData::GPReverseType reverse_type,
                                 RaceManager::MinorRaceModeType minor_mode);
     // ------------------------------------------------------------------------

@@ -495,6 +495,7 @@ void GPInfoScreen::updateHighscores()
                                                                 RaceManager::get()->getNumberOfKarts(),
                                                                 RaceManager::get()->getDifficulty(),
                                                                 m_gp.getId(),
+                                                                RaceManager::get()->isLapTrialMode() ? m_time_target_spinner->getValue() * 60 : 0,
                                                                 getReverse(),
                                                                 RaceManager::get()->getMinorMode());
     m_highscore_list->clear();
