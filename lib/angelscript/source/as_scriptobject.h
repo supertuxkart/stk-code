@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -94,7 +94,7 @@ public:
 
 	// Miscellaneous
 	asIScriptEngine *GetEngine() const;
-	int              CopyFrom(asIScriptObject *other);
+	int              CopyFrom(const asIScriptObject *other);
 
 	// User data
 	void *SetUserData(void *data, asPWORD type = 0);
@@ -119,8 +119,9 @@ public:
 	// Used for properties
 	void *AllocateUninitializedObject(asCObjectType *objType, asCScriptEngine *engine);
 	void FreeObject(void *ptr, asCObjectType *objType, asCScriptEngine *engine);
-	void CopyObject(void *src, void *dst, asCObjectType *objType, asCScriptEngine *engine);
+	void CopyObject(const void *src, void *dst, asCObjectType *objType, asCScriptEngine *engine);
 	void CopyHandle(asPWORD *src, asPWORD *dst, asCObjectType *objType, asCScriptEngine *engine);
+	int  CopyFromAs(const asCScriptObject *other, asCObjectType *objType);
 
 	void CallDestructor();
 
@@ -157,6 +158,7 @@ void ScriptObject_ConstructUnitialized(asCObjectType *objType, asCScriptObject *
 void RegisterScriptObject(asCScriptEngine *engine);
 
 asIScriptObject *ScriptObjectFactory(const asCObjectType *objType, asCScriptEngine *engine);
+asIScriptObject *ScriptObjectCopyFactory(const asCObjectType *objType, void *origObj, asCScriptEngine *engine);
 
 END_AS_NAMESPACE
 

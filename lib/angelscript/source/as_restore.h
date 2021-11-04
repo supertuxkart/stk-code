@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -76,7 +76,10 @@ protected:
 	void               ReadByteCode(asCScriptFunction *func);
 	asWORD             ReadEncodedUInt16();
 	asUINT             ReadEncodedUInt();
+	int                ReadEncodedInt();
 	asQWORD            ReadEncodedUInt64();
+	asUINT             SanityCheck(asUINT val, asUINT max);
+	int                SanityCheck(int val, asUINT max);
 
 	void ReadUsedTypeIds();
 	void ReadUsedFunctions();

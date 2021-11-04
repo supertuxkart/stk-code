@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -142,11 +142,13 @@ public:
 	int ParseTemplateDecl(const char *decl, asCString *name, asCArray<asCString> &subtypeNames);
 	int ParseFunctionDeclaration(asCObjectType *type, const char *decl, asCScriptFunction *func, bool isSystemFunction, asCArray<bool> *paramAutoHandles = 0, bool *returnAutoHandle = 0, asSNameSpace *ns = 0, asCScriptNode **outListPattern = 0, asCObjectType **outParentClass = 0);
 	int ParseVariableDeclaration(const char *decl, asSNameSpace *implicitNamespace, asCString &outName, asSNameSpace *&outNamespace, asCDataType &outDt);
-	int CheckNameConflict(const char *name, asCScriptNode *node, asCScriptCode *code, asSNameSpace *ns);
-	int CheckNameConflictMember(asCTypeInfo *type, const char *name, asCScriptNode *node, asCScriptCode *code, bool isProperty);
+	int CheckNameConflict(const char *name, asCScriptNode *node, asCScriptCode *code, asSNameSpace *ns, bool isProperty, bool isVirtualProperty);
+	int CheckNameConflictMember(asCTypeInfo *type, const char *name, asCScriptNode *node, asCScriptCode *code, bool isProperty, bool isVirtualProperty);
+	int ValidateVirtualProperty(asCScriptFunction *func);
 
 #ifndef AS_NO_COMPILER
 	int AddCode(const char *name, const char *code, int codeLength, int lineOffset, int sectionIdx, bool makeCopy);
+	asCScriptCode *FindOrAddCode(const char *name, const char *code, size_t length);
 	int Build();
 
 	int CompileFunction(const char *sectionName, const char *code, int lineOffset, asDWORD compileFlags, asCScriptFunction **outFunc);
@@ -215,7 +217,7 @@ protected:
 	int                RegisterEnum(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns);
 	int                RegisterTypedef(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns);
 	int                RegisterFuncDef(asCScriptNode *node, asCScriptCode *file, asSNameSpace *ns, asCObjectType *parent);
-	asCScriptFunction *RegisterLambda(asCScriptNode *node, asCScriptCode *file, asCScriptFunction *funcDef, const asCString &name, asSNameSpace *ns);
+	asCScriptFunction *RegisterLambda(asCScriptNode *node, asCScriptCode *file, asCScriptFunction *funcDef, const asCString &name, asSNameSpace *ns, bool isShared);
 	void               CompleteFuncDef(sFuncDef *funcDef);
 	void               CompileInterfaces();
 	void               CompileClasses(asUINT originalNumTempl);
@@ -238,6 +240,7 @@ protected:
 	void               GetFunctionDescriptions(const char *name, asCArray<int> &funcs, asSNameSpace *ns);
 	void               GetObjectMethodDescriptions(const char *name, asCObjectType *objectType, asCArray<int> &methods, bool objIsConst, const asCString &scope = "", asCScriptNode *errNode = 0, asCScriptCode *script = 0);
 	void               EvaluateTemplateInstances(asUINT startIdx, bool keepSilent);
+	void               CleanupEnumValues();
 
 	asCArray<asCScriptCode *>                  scripts;
 	asCArray<sFunctionDescription *>           functions;

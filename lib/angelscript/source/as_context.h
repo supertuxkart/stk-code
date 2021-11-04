@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2014 Andreas Jonsson
+   Copyright (c) 2003-2018 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -99,10 +99,11 @@ public:
 	void   *GetAddressOfReturnValue();
 
 	// Exception handling
-	int                SetException(const char *descr);
+	int                SetException(const char *descr, bool allowCatch = true);
 	int                GetExceptionLineNumber(int *column, const char **sectionName);
 	asIScriptFunction *GetExceptionFunction();
 	const char *       GetExceptionString();
+	bool               WillExceptionBeCaught();
 	int                SetExceptionCallback(asSFuncPtr callback, void *obj, int callConv);
 	void               ClearExceptionCallback();
 
@@ -138,17 +139,19 @@ public:
 	void CallExceptionCallback();
 
 	int  CallGeneric(asCScriptFunction *func);
-
+#ifndef AS_NO_EXCEPTIONS
+	void HandleAppException();
+#endif
 	void DetachEngine();
 
 	void ExecuteNext();
-	void CleanStack();
-	void CleanStackFrame();
+	void CleanStack(bool catchException = false);
+	bool CleanStackFrame(bool catchException = false);
 	void CleanArgsOnStack();
 	void CleanReturnObject();
 	void DetermineLiveObjects(asCArray<int> &liveObjects, asUINT stackLevel);
 
-	void PushCallState();
+	int  PushCallState();
 	void PopCallState();
 	void CallScriptFunction(asCScriptFunction *func);
 	void CallInterfaceMethod(asCScriptFunction *func);
@@ -156,7 +159,8 @@ public:
 
 	bool ReserveStackSpace(asUINT size);
 
-	void SetInternalException(const char *descr);
+	void SetInternalException(const char *descr, bool allowCatch = true);
+	bool FindExceptionTryCatch();
 
 	// Must be protected for multiple accesses
 	mutable asCAtomic m_refCount;
@@ -190,6 +194,7 @@ public:
 	int       m_exceptionSectionIdx;
 	int       m_exceptionLine;
 	int       m_exceptionColumn;
+	bool      m_exceptionWillBeCaught;
 
 	// The last prepared function, and some cached values related to it
 	asCScriptFunction *m_initialFunction;

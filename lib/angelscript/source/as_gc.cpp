@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2018 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -60,6 +60,9 @@ asCGarbageCollector::asCGarbageCollector()
 	seqAtSweepStart[0] = 0;
 	seqAtSweepStart[1] = 0;
 	seqAtSweepStart[2] = 0;
+
+	circularRefDetectCallbackFunc  = 0;
+	circularRefDetectCallbackParam = 0;
 }
 
 asCGarbageCollector::~asCGarbageCollector()
@@ -857,6 +860,25 @@ int asCGarbageCollector::IdentifyGarbageWithCyclicRefs()
 		{
 			gcMap.MoveFirst(&gcMapCursor);
 			detectState = breakCircles_loop;
+
+			// If the application has requested a callback for detected circular references,
+			// then make that callback now for all the objects in the list. This step is not
+			// done in incremental steps as it is only meant for debugging purposes and thus
+			// doesn't require interactivity
+			if (gcMapCursor && circularRefDetectCallbackFunc)
+			{
+				while (gcMapCursor)
+				{
+					void *gcObj = gcMap.GetKey(gcMapCursor);
+					asCObjectType *type = gcMap.GetValue(gcMapCursor).type;
+					circularRefDetectCallbackFunc(type, gcObj, circularRefDetectCallbackParam);
+
+					gcMap.MoveNext(&gcMapCursor, gcMapCursor);
+				}
+
+				// Reset iterator
+				gcMap.MoveFirst(&gcMapCursor);
+			}
 		}
 		break;
 

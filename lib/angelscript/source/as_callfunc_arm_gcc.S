@@ -1,6 +1,6 @@
 /*
   AngelCode Scripting Library
-  Copyright (c) 2003-2016 Andreas Jonsson
+  Copyright (c) 2003-2020 Andreas Jonsson
 
   This software is provided 'as-is', without any express or implied
   warranty. In no event will the authors be held liable for any
@@ -43,7 +43,7 @@
 
 #if defined(__arm__) || defined(__ARM__) || defined(I3D_ARCH_ARM)
 
-#if !defined(__linux__) || defined(__ANDROID__) || defined(ANDROID) || defined(__SOFTFP__)
+#if !defined(__linux__) || defined(__ANDROID__) || defined(ANDROID) || defined(__SOFTFP__) || defined(__ARM_PCS)
 
 /* iOS, Android, Marmalade, and Linux with soft-float ABI goes here */
 
@@ -287,7 +287,7 @@ nomoreargsarmFuncR0R1:
     ldmia   sp!, {r4-r8, pc}
 
 /* --------------------------------------------------------------------------------------------*/
-#elif defined(__linux__) && !defined(__SOFTFP__)
+#elif defined(__linux__) && !defined(__SOFTFP__) && !defined(__ARM_PCS)
 
 /* The Linux with hard-float ABI code goes here */
 

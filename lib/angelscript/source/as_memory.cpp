@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2020 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -241,6 +241,11 @@ void asCMemoryMgr::FreeScriptNode(void *ptr)
 		scriptNodePool.Allocate(100, 0);
 
 	scriptNodePool.PushLast(ptr);
+	
+#ifdef AS_DEBUG
+	// clear the memory to facilitate identification of use after free
+	memset(ptr, 0xCDCDCDCD, sizeof(asCScriptNode));
+#endif
 
 	LEAVECRITICALSECTION(cs);
 }
@@ -249,6 +254,8 @@ void asCMemoryMgr::FreeScriptNode(void *ptr)
 
 void *asCMemoryMgr::AllocByteInstruction()
 {
+	// This doesn't need a critical section because, only one compilation is allowed at a time
+	
 	if( byteInstructionPool.GetLength() )
 		return byteInstructionPool.PopLast();
 
@@ -266,6 +273,11 @@ void asCMemoryMgr::FreeByteInstruction(void *ptr)
 		byteInstructionPool.Allocate(100, 0);
 
 	byteInstructionPool.PushLast(ptr);
+	
+#ifdef AS_DEBUG
+	// clear the memory to facilitate identification of use after free
+	memset(ptr, 0xCDCDCDCD, sizeof(asCByteInstruction));
+#endif
 }
 
 #endif // AS_NO_COMPILER

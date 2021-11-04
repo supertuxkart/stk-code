@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2015 Andreas Jonsson
+   Copyright (c) 2003-2018 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -65,6 +65,10 @@ public:
 	int    ReportAndReleaseUndestroyedObjects();
 
 	asCScriptEngine *engine;
+
+	// Callback for when circular reference are detected
+	asCIRCULARREFFUNC_t circularRefDetectCallbackFunc;
+	void *              circularRefDetectCallbackParam;
 
 protected:
 	struct asSObjTypePair {void *obj; asCObjectType *type; asUINT seqNbr;};

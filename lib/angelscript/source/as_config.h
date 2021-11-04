@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -177,6 +177,14 @@
 // Oracle Solaris Studio (previously known as Sun CC compiler)
 // __SUNPRO_CC is defined
 
+// Local (or Little) C Compiler
+// __LCC__ is defined
+// __e2k__ is not defined
+
+// MCST eLbrus C Compiler
+// __LCC__ is defined
+// __e2k__ is defined
+
 
 
 //
@@ -208,6 +216,9 @@
 // AS_ARM
 // Use assembler code for the ARM CPU family
 
+// AS_ARM64
+// Use assembler code for the ARM64/AArch64 CPU family
+
 // AS_SOFTFP
 // Use to tell compiler that ARM soft-float ABI
 // should be used instead of ARM hard-float ABI
@@ -227,6 +238,10 @@
 // AS_SPARC
 // Define this for SPARC CPU family
 
+// AS_E2K
+// Define this for MCST Elbrus 2000 CPU family
+
+
 
 
 //
@@ -237,26 +252,27 @@
 // compiler is the same for both, when this is so these flags are used to produce the
 // right code.
 
-// AS_WIN       - Microsoft Windows
-// AS_LINUX     - Linux
-// AS_MAC       - Apple Macintosh
-// AS_BSD       - BSD based OS (FreeBSD, DragonFly, OpenBSD, etc)
-// AS_XBOX      - Microsoft XBox
-// AS_XBOX360   - Microsoft XBox 360
-// AS_PSP       - Sony Playstation Portable
-// AS_PSVITA    - Sony Playstation Vita
-// AS_PS2       - Sony Playstation 2
-// AS_PS3       - Sony Playstation 3
-// AS_DC        - Sega Dreamcast
-// AS_GC        - Nintendo GameCube
-// AS_WII       - Nintendo Wii
-// AS_WIIU      - Nintendo Wii U
-// AS_IPHONE    - Apple IPhone
-// AS_ANDROID   - Android
-// AS_HAIKU     - Haiku
-// AS_ILLUMOS   - Illumos like (OpenSolaris, OpenIndiana, NCP, etc)
-// AS_MARMALADE - Marmalade cross platform SDK (a layer on top of the OS)
-// AS_SUN       - Sun UNIX
+// AS_WIN            - Microsoft Windows
+// AS_LINUX          - Linux
+// AS_MAC            - Apple Macintosh
+// AS_BSD            - BSD based OS (FreeBSD, DragonFly, OpenBSD, etc)
+// AS_XBOX           - Microsoft XBox
+// AS_XBOX360        - Microsoft XBox 360
+// AS_PSP            - Sony Playstation Portable
+// AS_PSVITA         - Sony Playstation Vita
+// AS_PS2            - Sony Playstation 2
+// AS_PS3            - Sony Playstation 3
+// AS_DC             - Sega Dreamcast
+// AS_GC             - Nintendo GameCube
+// AS_WII            - Nintendo Wii
+// AS_WIIU           - Nintendo Wii U
+// AS_NINTENDOSWITCH - Nintendo Switch
+// AS_IPHONE         - Apple IPhone
+// AS_ANDROID        - Android
+// AS_HAIKU          - Haiku
+// AS_ILLUMOS        - Illumos like (OpenSolaris, OpenIndiana, NCP, etc)
+// AS_MARMALADE      - Marmalade cross platform SDK (a layer on top of the OS)
+// AS_SUN            - Sun UNIX
 
 
 
@@ -357,6 +373,14 @@
 
 // Not implemented by default. Undefined with tested platforms.
 #define AS_NO_THISCALL_FUNCTOR_METHOD
+
+
+// Emscripten compiler toolchain
+// ref: https://emscripten.org/
+#if defined(__EMSCRIPTEN__)
+  #define AS_MAX_PORTABILITY
+#endif
+
 
 
 // Embarcadero C++Builder
@@ -482,7 +506,7 @@
 			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
 			#define AS_LARGE_OBJS_PASSED_BY_REF
 			#define AS_LARGE_OBJ_MIN_SIZE 3
-			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_CONSTRUCTOR | asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_CONSTRUCTOR | asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY | asOBJ_APP_CLASS_MORE_CONSTRUCTORS)
 			#define COMPLEX_MASK (asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
 		#endif
 	#endif
@@ -502,12 +526,18 @@
 		#endif
 	#endif
 
+	#if defined(_M_ARM64)
+		#define AS_ARM64
+
+		// TODO: MORE HERE
+	#endif
+
 	#ifndef COMPLEX_MASK
 		#define COMPLEX_MASK (asOBJ_APP_ARRAY)
 	#endif
 
 	#ifndef COMPLEX_RETURN_MASK
-		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_CONSTRUCTOR | asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_ARRAY)
+		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_CONSTRUCTOR | asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_ASSIGNMENT | asOBJ_APP_ARRAY | asOBJ_APP_CLASS_MORE_CONSTRUCTORS)
 	#endif
 
 	#define UNREACHABLE_RETURN
@@ -627,6 +657,37 @@
 		// Native calling conventions are not yet supported
 		#define AS_MAX_PORTABILITY
 
+	// Nintendo Switch
+	// Note, __SWITCH__ is not an official define in the Nintendo dev kit. 
+	// You need to manually add this to the project when compiling for Switch.
+	#elif defined(__SWITCH__)
+		#define AS_NINTENDOSWITCH
+
+		#if (!defined(__LP64__))
+			#error write me
+		#else
+			#define AS_ARM64
+			#undef STDCALL
+			#define STDCALL
+
+			#undef GNU_STYLE_VIRTUAL_METHOD
+			#undef AS_NO_THISCALL_FUNCTOR_METHOD
+
+			#define HAS_128_BIT_PRIMITIVES
+
+			#define CDECL_RETURN_SIMPLE_IN_MEMORY
+			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+
+			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+			#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+
+			#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 5
+			#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE    5
+			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE  5
+		#endif
+
 	// Marmalade is a cross platform SDK. It uses g++ to compile for iOS and Android
 	#elif defined(__S3E__)
 		#ifndef AS_MARMALADE
@@ -728,7 +789,7 @@
 			#undef STDCALL
 			#define STDCALL
 
-		#elif (defined(__arm64__))
+		#elif (defined(__aarch64__))
 			// The IPhone 5S+ uses an ARM64 processor
 
 			// AngelScript currently doesn't support native calling
@@ -750,7 +811,7 @@
 			#undef COMPLEX_RETURN_MASK
 			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
 
-		#elif defined(__LP64__) && !defined(__ppc__) && !defined(__PPC__) && !defined(__arm64__)
+		#elif defined(__LP64__) && !defined(__ppc__) && !defined(__PPC__) && !defined(__aarch64__)
 			// http://developer.apple.com/library/mac/#documentation/DeveloperTools/Conceptual/LowLevelABI/140-x86-64_Function_Calling_Conventions/x86_64.html#//apple_ref/doc/uid/TP40005035-SW1
 			#define AS_X64_GCC
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
@@ -864,7 +925,7 @@
 		#elif defined(__ARMEL__) || defined(__arm__) || defined(__aarch64__) || defined(__AARCH64EL__)
 			// arm 
 
-			// The assembler code currently doesn't support arm v4, nor 64bit (v8)
+			// The assembler code currently doesn't support arm v4
 			#if !defined(__ARM_ARCH_4__) && !defined(__ARM_ARCH_4T__) && !defined(__LP64__)
 				#define AS_ARM
 
@@ -894,13 +955,35 @@
 				#endif
 
 				// Verify if soft-float or hard-float ABI is used
-				#if defined(__SOFTFP__) && __SOFTFP__ == 1
+				#if (defined(__SOFTFP__) && __SOFTFP__ == 1) || defined(__ARM_PCS)
 					// -ffloat-abi=softfp or -ffloat-abi=soft
 					#define AS_SOFTFP
 				#endif
 
 				// Tested with both hard float and soft float abi
 				#undef AS_NO_THISCALL_FUNCTOR_METHOD
+			#elif defined(__LP64__) || defined(__aarch64__)
+				#define AS_ARM64
+
+				#undef STDCALL
+				#define STDCALL
+
+				#undef GNU_STYLE_VIRTUAL_METHOD
+				#undef AS_NO_THISCALL_FUNCTOR_METHOD
+
+				#define HAS_128_BIT_PRIMITIVES
+
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY
+
+				#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+				#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
+
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 5
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE    5
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE  5
 			#endif
 
 		#elif defined(__mips__)
@@ -932,6 +1015,17 @@
 			// although use 64bit PPC only uses 32bit pointers.
 			// TODO: Add support for native calling conventions on Linux with PPC 64bit
 			#define AS_MAX_PORTABILITY
+		#elif defined(__e2k__)
+			// 64bit MCST Elbrus 2000
+			// ref: https://en.wikipedia.org/wiki/Elbrus_2000
+			#define AS_E2K
+			// AngelScript currently doesn't support native calling
+			// for MCST Elbrus 2000 processor so it's necessary to turn on
+			// portability mode
+			#define AS_MAX_PORTABILITY
+			// STDCALL is not available on 64bit Linux
+			#undef STDCALL
+			#define STDCALL
 		#else
 			#define AS_MAX_PORTABILITY
 		#endif
@@ -1029,30 +1123,40 @@
 		#undef COMPLEX_RETURN_MASK
 		#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
 
-		#if (defined(_ARM_) || defined(__arm__))
+		#if (defined(_ARM_) || defined(__arm__) || defined(__aarch64__) || defined(__AARCH64EL__))
 			// Android ARM
-
-			// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
-			#define AS_NO_EXCEPTIONS
 
 			#undef THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 			#undef CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
 			#undef STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE
-
-			#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
-			#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
 
 			// The stdcall calling convention is not used on the arm cpu
 			#undef STDCALL
 			#define STDCALL
 
 			#undef GNU_STYLE_VIRTUAL_METHOD
-
-			#define AS_ARM
 			#undef AS_NO_THISCALL_FUNCTOR_METHOD
-			#define AS_SOFTFP
-			#define AS_CALLEE_DESTROY_OBJ_BY_VAL
+
+			#if (!defined(__LP64__))
+				// TODO: The stack unwind on exceptions currently fails due to the assembler code in as_callfunc_arm_gcc.S
+				#define AS_NO_EXCEPTIONS
+
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 2
+
+				#define AS_ARM
+				#define AS_SOFTFP
+				#define AS_CALLEE_DESTROY_OBJ_BY_VAL
+			#elif (defined(__LP64__) || defined(__aarch64__))
+				#define AS_ARM64
+
+				#define HAS_128_BIT_PRIMITIVES
+
+				#define THISCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE 5
+				#define CDECL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE    5
+				#define STDCALL_RETURN_SIMPLE_IN_MEMORY_MIN_SIZE  5
+			#endif
 		#elif (defined(i386) || defined(__i386) || defined(__i386__)) && !defined(__LP64__)
 			// Android Intel x86 (same config as Linux x86). Tested with Intel x86 Atom System Image.
 
@@ -1091,20 +1195,20 @@
 			#define THISCALL_RETURN_SIMPLE_IN_MEMORY
 			#define CDECL_RETURN_SIMPLE_IN_MEMORY
 			#define STDCALL_RETURN_SIMPLE_IN_MEMORY
-                #elif defined(__x86_64__)
-                        #define AS_X64_GCC
-                        #define HAS_128_BIT_PRIMITIVES
-                        #define SPLIT_OBJS_BY_MEMBER_TYPES
-                        #undef COMPLEX_MASK
-                        #define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
-                        #undef COMPLEX_RETURN_MASK
-                        #define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
-                        #define AS_LARGE_OBJS_PASSED_BY_REF
-                        #define AS_LARGE_OBJ_MIN_SIZE 5
-                        #undef STDCALL
-                        #define STDCALL
-                #else
-                        #define AS_MAX_PORTABILITY
+		#elif defined(__x86_64__)
+			#define AS_X64_GCC
+			#define HAS_128_BIT_PRIMITIVES
+			#define SPLIT_OBJS_BY_MEMBER_TYPES
+			#undef COMPLEX_MASK
+			#define COMPLEX_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
+			#undef COMPLEX_RETURN_MASK
+			#define COMPLEX_RETURN_MASK (asOBJ_APP_CLASS_DESTRUCTOR | asOBJ_APP_CLASS_COPY_CONSTRUCTOR | asOBJ_APP_ARRAY)
+			#define AS_LARGE_OBJS_PASSED_BY_REF
+			#define AS_LARGE_OBJ_MIN_SIZE 5
+			#undef STDCALL
+			#define STDCALL
+		#else
+			#define AS_MAX_PORTABILITY
 		#endif
 
 	// Illumos
@@ -1196,7 +1300,7 @@
 
 // If there are no current support for native calling
 // conventions, then compile with AS_MAX_PORTABILITY
-#if (!defined(AS_X86) && !defined(AS_SH4) && !defined(AS_MIPS) && !defined(AS_PPC) && !defined(AS_PPC_64) && !defined(AS_XENON) && !defined(AS_X64_GCC) && !defined(AS_X64_MSVC) && !defined(AS_ARM) && !defined(AS_X64_MINGW))
+#if (!defined(AS_X86) && !defined(AS_SH4) && !defined(AS_MIPS) && !defined(AS_PPC) && !defined(AS_PPC_64) && !defined(AS_XENON) && !defined(AS_X64_GCC) && !defined(AS_X64_MSVC) && !defined(AS_ARM) && !defined(AS_ARM64) && !defined(AS_X64_MINGW))
 	#ifndef AS_MAX_PORTABILITY
 		#define AS_MAX_PORTABILITY
 	#endif

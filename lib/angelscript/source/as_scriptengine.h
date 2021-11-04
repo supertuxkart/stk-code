@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -184,6 +184,9 @@ public:
 	virtual int  NotifyGarbageCollectorOfNewObject(void *obj, asITypeInfo *type);
 	virtual int  GetObjectInGC(asUINT idx, asUINT *seqNbr, void **obj = 0, asITypeInfo **type = 0);
 	virtual void GCEnumCallback(void *reference);
+	virtual void ForwardGCEnumReferences(void *ref, asITypeInfo *type);
+	virtual void ForwardGCReleaseReferences(void *ref, asITypeInfo *type);
+	virtual void SetCircularRefDetectedCallback(asCIRCULARREFFUNC_t callback, void *param = 0);
 
 	// User data
 	virtual void *SetUserData(void *data, asPWORD type);
@@ -194,6 +197,9 @@ public:
 	virtual void  SetFunctionUserDataCleanupCallback(asCLEANFUNCTIONFUNC_t callback, asPWORD type);
 	virtual void  SetTypeInfoUserDataCleanupCallback(asCLEANTYPEINFOFUNC_t callback, asPWORD type);
 	virtual void  SetScriptObjectUserDataCleanupCallback(asCLEANSCRIPTOBJECTFUNC_t callback, asPWORD type);
+
+	// Exception handling
+	virtual int SetTranslateAppExceptionCallback(asSFuncPtr callback, void *param, int callConv);
 
 //===========================================================
 // internal methods
@@ -299,6 +305,8 @@ public:
 
 	asCFuncdefType    *FindMatchingFuncdef(asCScriptFunction *func, asCModule *mod);
 
+	int                DetermineNameAndNamespace(const char *in_name, asSNameSpace *implicitNs, asCString &out_name, asSNameSpace *&out_ns) const;
+	
 	// Global property management
 	asCGlobalProperty *AllocateGlobalProperty();
 	void RemoveGlobalProperty(asCGlobalProperty *prop);
@@ -314,8 +322,6 @@ public:
 // internal properties
 //===========================================================
 	asCMemoryMgr memoryMgr;
-
-	asUINT initialContextStackSize;
 
 	asCObjectType   *defaultArrayObjectType;
 	asCObjectType    scriptTypeBehaviours;
@@ -469,6 +475,7 @@ public:
 		bool   optimizeByteCode;
 		bool   copyScriptSections;
 		asUINT maximumContextStackSize;
+		asUINT initContextStackSize;
 		bool   useCharacterLiterals;
 		bool   allowMultilineStrings;
 		bool   allowImplicitHandleTypes;
@@ -494,7 +501,17 @@ public:
 		bool   allowUnicodeIdentifiers;
 		int    heredocTrimMode;
 		asUINT maxNestedCalls;
+		asUINT genericCallMode;
+		asUINT initCallStackSize;
+		asUINT maxCallStackSize;
 	} ep;
+
+	// Callbacks
+#ifndef AS_NO_EXCEPTIONS
+	bool                       translateExceptionCallback;
+	asSSystemFunctionInterface translateExceptionCallbackFunc;
+	void *                     translateExceptionCallbackObj;
+#endif
 
 	// This flag is to allow a quicker shutdown when releasing the engine
 	bool shuttingDown;

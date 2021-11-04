@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -91,10 +91,11 @@ struct asSListPatternDataTypeNode : public asSListPatternNode
 
 enum asEObjVarInfoOption
 {
-	asOBJ_UNINIT,
-	asOBJ_INIT,
-	asBLOCK_BEGIN,
-	asBLOCK_END
+	asOBJ_UNINIT,	// object is uninitialized/destroyed
+	asOBJ_INIT,		// object is initialized
+	asBLOCK_BEGIN,	// scope block begins
+	asBLOCK_END,	// scope block ends
+	asOBJ_VARDECL	// object variable is declared (but not necessarily initialized)
 };
 
 enum asEFuncTrait
@@ -107,7 +108,9 @@ enum asEFuncTrait
 	asTRAIT_FINAL       = 32,
 	asTRAIT_OVERRIDE    = 64,
 	asTRAIT_SHARED      = 128,
-	asTRAIT_EXTERNAL    = 256
+	asTRAIT_EXTERNAL    = 256,
+	asTRAIT_EXPLICIT    = 512,
+	asTRAIT_PROPERTY    = 1024
 };
 
 struct asSFunctionTraits
@@ -124,6 +127,12 @@ struct asSObjectVariableInfo
 	asUINT              programPos;
 	int                 variableOffset;
 	asEObjVarInfoOption option;
+};
+
+struct asSTryCatchInfo
+{
+	asUINT tryPos;
+	asUINT catchPos;
 };
 
 struct asSSystemFunctionInterface;
@@ -166,6 +175,8 @@ public:
 	bool                 IsFinal() const;
 	bool                 IsOverride() const;
 	bool                 IsShared() const;
+	bool                 IsExplicit() const;
+	bool                 IsProperty() const;
 	asUINT               GetParamCount() const;
 	int                  GetParam(asUINT index, int *typeId, asDWORD *flags = 0, const char **name = 0, const char **defaultArg = 0) const;
 	int                  GetReturnTypeId(asDWORD *flags = 0) const;
@@ -196,12 +207,15 @@ public:
 	//-----------------------------------
 	// Internal methods
 
-	void SetShared(bool set) {traits.SetTrait(asTRAIT_SHARED, set);}
+	void SetShared(bool set) { traits.SetTrait(asTRAIT_SHARED, set); }
 	void SetReadOnly(bool set) { traits.SetTrait(asTRAIT_CONST, set); }
 	void SetFinal(bool set) { traits.SetTrait(asTRAIT_FINAL, set); }
 	void SetOverride(bool set) { traits.SetTrait(asTRAIT_OVERRIDE, set); }
+	void SetExplicit(bool set) { traits.SetTrait(asTRAIT_EXPLICIT, set); }
 	void SetProtected(bool set) { traits.SetTrait(asTRAIT_PROTECTED, set); }
 	void SetPrivate(bool set) { traits.SetTrait(asTRAIT_PRIVATE, set); }
+	void SetProperty(bool set) { traits.SetTrait(asTRAIT_PROPERTY, set); }
+	bool IsFactory() const;
 
 	asCScriptFunction(asCScriptEngine *engine, asCModule *mod, asEFuncType funcType);
 	~asCScriptFunction();
@@ -317,7 +331,7 @@ public:
 		// These hold information on objects and function pointers, including temporary
 		// variables used by exception handler and when saving bytecode
 		asCArray<asCTypeInfo*>          objVariableTypes;
-		asCArray<int>                   objVariablePos;
+		asCArray<int>                   objVariablePos; // offset on stackframe
 
 		// The first variables in above array are allocated on the heap, the rest on the stack.
 		// This variable shows how many are on the heap.
@@ -325,6 +339,9 @@ public:
 
 		// Holds information on scope for object variables on the stack
 		asCArray<asSObjectVariableInfo> objVariableInfo;
+
+		// Holds information on try/catch blocks for exception handling
+		asCArray<asSTryCatchInfo>       tryCatchInfo;
 
 		// The stack needed to execute the function
 		int                             stackNeeded;

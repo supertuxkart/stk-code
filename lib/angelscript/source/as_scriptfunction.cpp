@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2021 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -306,7 +306,9 @@ int asCScriptFunction::ParseListPattern(asSListPatternNode *&target, const char 
 			asCBuilder builder(engine, 0);
 			asCScriptCode code;
 			code.SetCode("", decl, 0, false);
-			dt = builder.CreateDataTypeFromNode(listNodes, &code, engine->defaultNamespace, false, CastToObjectType(returnType.GetTypeInfo()));
+
+			// For list factory we get the object type from the return type, for list constructor we get it from the object type directly
+			dt = builder.CreateDataTypeFromNode(listNodes, &code, engine->defaultNamespace, false, objectType ? objectType : CastToObjectType(returnType.GetTypeInfo()));
 
 			node->next = asNEW(asSListPatternDataTypeNode)(dt);
 			node = node->next;
@@ -584,9 +586,7 @@ bool asCScriptFunction::IsCompatibleWithTypeId(int typeId) const
 const char *asCScriptFunction::GetModuleName() const
 {
 	if( module )
-	{
-		return module->name.AddressOf();
-	}
+		return module->GetName();
 
 	return 0;
 }
@@ -709,7 +709,7 @@ asCString asCScriptFunction::GetDeclarationStr(bool includeObjectName, bool incl
 		else
 			str += "_unnamed_type_::";
 	}
-	else if( includeNamespace && nameSpace->name != "" )
+	else if( includeNamespace && nameSpace->name != "" && !objectType )
 	{
 		str += nameSpace->name + "::";
 	}
@@ -1683,7 +1683,7 @@ void asCScriptFunction::ReleaseAllHandles(asIScriptEngine *)
 	objForDelegate = 0;
 }
 
-// internal
+// interface
 bool asCScriptFunction::IsShared() const
 {
 	// All system functions are shared
@@ -1700,16 +1700,43 @@ bool asCScriptFunction::IsShared() const
 	return traits.GetTrait(asTRAIT_SHARED);
 }
 
-// internal
+// interface
 bool asCScriptFunction::IsFinal() const
 {
 	return traits.GetTrait(asTRAIT_FINAL);
 }
 
-// internal
+// interface
 bool asCScriptFunction::IsOverride() const
 {
 	return traits.GetTrait(asTRAIT_OVERRIDE);
+}
+
+// interface
+bool asCScriptFunction::IsExplicit() const
+{
+	return traits.GetTrait(asTRAIT_EXPLICIT);
+}
+
+// interface
+bool asCScriptFunction::IsProperty() const
+{
+	return traits.GetTrait(asTRAIT_PROPERTY);
+}
+
+// internal
+bool asCScriptFunction::IsFactory() const
+{
+	if (objectType) return false;
+	
+	asCObjectType* type = CastToObjectType(returnType.GetTypeInfo());
+	if (type == 0) return false;
+
+	if (type->name != name) return false;
+
+	if (type->nameSpace != nameSpace) return false;
+	
+	return true;
 }
 
 END_AS_NAMESPACE

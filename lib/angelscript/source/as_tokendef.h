@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2017 Andreas Jonsson
+   Copyright (c) 2003-2019 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -174,7 +174,9 @@ enum eTokenType
 	ttProtected,           // protected
 	ttNamespace,           // namespace
 	ttMixin,               // mixin
-	ttAuto                 // auto
+	ttAuto,                // auto
+	ttTry,                 // try
+	ttCatch                // catch
 };
 
 struct sTokenWord
@@ -246,6 +248,7 @@ sTokenWord const tokenWords[] =
 	asTokenDef("break"     , ttBreak),
 	asTokenDef("case"      , ttCase),
 	asTokenDef("cast"      , ttCast),
+	asTokenDef("catch"     , ttCatch),
 	asTokenDef("class"     , ttClass),
 	asTokenDef("const"     , ttConst),
 	asTokenDef("continue"  , ttContinue),
@@ -284,6 +287,7 @@ sTokenWord const tokenWords[] =
 	asTokenDef("return"    , ttReturn),
 	asTokenDef("switch"    , ttSwitch),
 	asTokenDef("true"      , ttTrue),
+	asTokenDef("try"       , ttTry),
 	asTokenDef("typedef"   , ttTypedef),
 	asTokenDef("uint"      , ttUInt),
 	asTokenDef("uint8"     , ttUInt8),
@@ -314,6 +318,8 @@ const char * const ABSTRACT_TOKEN  = "abstract";
 const char * const FUNCTION_TOKEN  = "function";
 const char * const IF_HANDLE_TOKEN = "if_handle_then_const";
 const char * const EXTERNAL_TOKEN  = "external";
+const char * const EXPLICIT_TOKEN  = "explicit";
+const char * const PROPERTY_TOKEN  = "property";
 
 END_AS_NAMESPACE
 
