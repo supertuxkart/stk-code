@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
 
+# STK Fix llvm mingw crashes
+if (MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+  ADD_DEFINITIONS(-DAS_MAX_PORTABILITY)
+endif()
+
 project(angelscript)
 
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
@@ -104,7 +109,21 @@ set(ANGELSCRIPT_SOURCE
     ../../source/as_variablescope.cpp
 )
 
-if(MSVC AND CMAKE_CL_64)
+# STK
+set(BUILD_ARCH "unknown")
+if (CMAKE_GENERATOR_PLATFORM)
+    set(BUILD_ARCH "${CMAKE_GENERATOR_PLATFORM}")
+endif()
+if(MSVC AND CMAKE_CL_64 AND NOT ${CMAKE_GENERATOR_PLATFORM} MATCHES "(ARM64)")
+    enable_language(ASM_MASM)
+    if(CMAKE_ASM_MASM_COMPILER_WORKS)
+        set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_x64_msvc_asm.asm)
+    else()
+        message(FATAL ERROR "MSVC x86_64 target requires a working assembler")
+    endif()
+endif()
+
+if(MSVC AND CMAKE_CL_64 AND NOT ${BUILD_ARCH} MATCHES "(ARM64)")
     enable_language(ASM_MASM)
     if(CMAKE_ASM_MASM_COMPILER_WORKS)
         set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_x64_msvc_asm.asm)
@@ -117,7 +136,9 @@ if(${ARCHFLAGS} MATCHES "^arm")
     enable_language(ASM)
     if(CMAKE_ASM_COMPILER_WORKS)
         set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_arm.cpp ../../source/as_callfunc_arm_gcc.S)
-        set_property(SOURCE ../../source/as_callfunc_arm_gcc.S APPEND PROPERTY COMPILE_FLAGS " -Wa,-mimplicit-it=always")
+        if (NOT APPLE)
+            set_property(SOURCE ../../source/as_callfunc_arm_gcc.S APPEND PROPERTY COMPILE_FLAGS " -Wa,-mimplicit-it=always")
+        endif()
     else()
         message(FATAL ERROR "ARM target requires a working assembler")
     endif()
@@ -127,7 +148,7 @@ if(${ARCHFLAGS} MATCHES "^aarch64")
     enable_language(ASM)
     if(CMAKE_ASM_COMPILER_WORKS)
         set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_arm64.cpp ../../source/as_callfunc_arm64_gcc.S)
-        #set_property(SOURCE ../../source/as_callfunc_arm64_gcc.S APPEND PROPERTY COMPILE_FLAGS " -Wa")
+        set_property(SOURCE ../../source/as_callfunc_arm64_gcc.S APPEND PROPERTY COMPILE_FLAGS " -Wa")
     else()
         message(FATAL ERROR "ARM target requires a working assembler")
     endif()
@@ -160,7 +181,7 @@ if(AS_NO_EXCEPTIONS)
 endif()
 
 # Fix x64 issues on Linux
-if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND UNIX AND NOT APPLE)
+if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND UNIX AND NOT APPLE AND NOT WIN32)
     target_compile_options(${ANGELSCRIPT_LIBRARY_NAME} PRIVATE -fPIC)
 endif()
 
