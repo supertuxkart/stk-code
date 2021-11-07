@@ -146,12 +146,7 @@ endif()
 
 if(${ARCHFLAGS} MATCHES "^aarch64")
     enable_language(ASM)
-    if(CMAKE_ASM_COMPILER_WORKS)
-        set(ANGELSCRIPT_SOURCE ${ANGELSCRIPT_SOURCE} ../../source/as_callfunc_arm64.cpp ../../source/as_callfunc_arm64_gcc.S)
-        set_property(SOURCE ../../source/as_callfunc_arm64_gcc.S APPEND PROPERTY COMPILE_FLAGS " -Wa")
-    else()
-        message(FATAL ERROR "ARM target requires a working assembler")
-    endif()
+    ADD_DEFINITIONS(-DAS_MAX_PORTABILITY)
 endif()
 
 if(MSVC)
