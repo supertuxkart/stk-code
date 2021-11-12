@@ -15,7 +15,7 @@ export NDK_BUILD_SCRIPT="$DIRNAME/Android.mk"
 #export NDK_CCACHE=ccache
 export CPU_CORE="-j$(($(nproc) + 1))"
 
-export COMPILE_SDK_VERSION=29
+export COMPILE_SDK_VERSION=30
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
