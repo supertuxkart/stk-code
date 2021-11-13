@@ -35,7 +35,6 @@
 #include "states_screens/options/user_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
-
 #ifdef __SWITCH__
 extern "C" {
   #define u64 uint64_t
@@ -340,6 +339,13 @@ void RegisterScreen::doRegister()
                           : getWidget<TextBoxWidget>("email")->getText();
     email_confirm.trim();
     m_info_widget->setErrorColor();
+    bool namecheck = false;
+    for (int i = 0; i < username.size();i++) {
+        if (!((username[i] >= '0' && username[i] <= '9') || (username[i] >= 'a' && username[i] <= 'z') || (username[i] >= 'A' && username[i] <= 'Z') || username[i] == '.' || username[i] == '-' || username[i] == '_')) {
+            namecheck = true;
+            break;
+        }
+    }
 
     if (password != password_confirm)
     {
@@ -349,6 +355,11 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Emails don't match!"), false);
     }
+    
+    else if (namecheck) {
+        m_info_widget->setText(_("Your username can only contain alphanumeric characters, periods, dasges and underscores"), false);
+    }
+    
     else if (username.size() < 3 || username.size() > 30)
     {
         m_info_widget->setText(_("Online username has to be between 3 and 30 characters long!"), false);
@@ -367,10 +378,11 @@ void RegisterScreen::doRegister()
     }
     else if (  email.find(L"@")== -1 || email.find(L".")== -1 ||
               (email.findLast(L'.') - email.findLast(L'@') <= 2 ) ||
-                email.findLast(L'@')==0 )
+                email.findLast(L'@')==0 || email[(email.size())-1]=='.')
     {
        m_info_widget->setText(_("Email is invalid!"), false);
     }
+   
     else
     {
         m_info_widget->setDefaultColor();
