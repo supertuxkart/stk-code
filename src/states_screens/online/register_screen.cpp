@@ -341,6 +341,18 @@ void RegisterScreen::doRegister()
     email_confirm.trim();
     m_info_widget->setErrorColor();
 
+    bool namecheck = false;
+    for (int i = 0; i < username.size();i++)
+    {
+        if (!((username[i] >= '0' && username[i] <= '9') ||
+            (username[i] >= 'a' && username[i] <= 'z') ||
+            (username[i] >= 'A' && username[i] <= 'Z') ||
+            username[i] == '.' || username[i] == '-' || username[i] == '_'))
+        {
+            namecheck = true;
+            break;
+        }
+    }
     if (password != password_confirm)
     {
         m_info_widget->setText(_("Passwords don't match!"), false);
@@ -348,6 +360,10 @@ void RegisterScreen::doRegister()
     else if (email != email_confirm)
     {
         m_info_widget->setText(_("Emails don't match!"), false);
+    }
+    else if (namecheck)
+    {
+        m_info_widget->setText(_("Your username can only contain alphanumeric characters, periods, dashes and underscores!"), false);
     }
     else if (username.size() < 3 || username.size() > 30)
     {
@@ -367,10 +383,11 @@ void RegisterScreen::doRegister()
     }
     else if (  email.find(L"@")== -1 || email.find(L".")== -1 ||
               (email.findLast(L'.') - email.findLast(L'@') <= 2 ) ||
-                email.findLast(L'@')==0 )
+                email.findLast(L'@')==0 || email[(email.size())-1]=='.')
     {
-       m_info_widget->setText(_("Email is invalid!"), false);
+        m_info_widget->setText(_("Email is invalid!"), false);
     }
+   
     else
     {
         m_info_widget->setDefaultColor();
