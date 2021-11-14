@@ -35,6 +35,7 @@
 #include "states_screens/options/user_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
+
 #ifdef __SWITCH__
 extern "C" {
   #define u64 uint64_t
