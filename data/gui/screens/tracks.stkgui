@@ -36,11 +36,13 @@
         </box>
     </div>
     <div id="vote" x="63%" y="1%" width="36%" height="88%" layout="vertical-row">
-        <div width="100%" proportion="2" layout="horizontal-row">
+        <div width="100%" height="92%" layout="horizontal-row">
             <box proportion="2" height="100%" layout="vertical-row">
                 <list id="vote-list" width="100%" height="100%" word_wrap="true"/>
             </box>
         </div>
+        <spacer height="1%"/>
+        <textbox id="search_track" width="100%" height="fit"/>
     </div>
     <progressbar x="2%" y="93%" id="timer" height="1f" width="96%"></progressbar>
 </stkgui>

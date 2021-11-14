@@ -219,6 +219,7 @@ void TracksScreen::beforeAddingWidget()
     Screen::init();
 
     m_selected_track = NULL;
+    m_search_track = NULL;
     m_timer = getWidget<GUIEngine::ProgressBarWidget>("timer");
     m_timer->showLabel(false);
 
@@ -367,7 +368,14 @@ void TracksScreen::beforeAddingWidget()
 void TracksScreen::init()
 {
     if (m_network_tracks)
+    {
+        m_search_track = getWidget<TextBoxWidget>("search_track");
+        m_search_track->setText(L"");
+        // Add listener for incremental update when search text is changed
+        m_search_track->clearListeners();
+        m_search_track->addListener(this);
         updateProgressBarText();
+    }
 
     // change the back button image (because it makes the game quit)
     if (m_quit_server)
@@ -563,6 +571,15 @@ void TracksScreen::buildTrackList()
     for (int n = 0; n < track_amount; n++)
     {
         Track* curr = track_manager->getTrack(n);
+        core::stringw search_text;
+        if (m_search_track)
+        {
+            search_text = m_search_track->getText();
+            search_text.make_lower();
+        }
+        if (!search_text.empty() &&
+            curr->getName().make_lower().find(search_text.c_str()) == -1)
+            continue;
         if (RaceManager::get()->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
             && !curr->hasEasterEggs())
             continue;

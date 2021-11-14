@@ -19,6 +19,7 @@
 #define HEADER_TRACKS_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 
 #include <deque>
 #include <limits>
@@ -50,7 +51,8 @@ namespace irr
   * \ingroup states_screens
   */
 class TracksScreen : public GUIEngine::Screen,
-                     public GUIEngine::ScreenSingleton<TracksScreen>
+                     public GUIEngine::ScreenSingleton<TracksScreen>,
+                     public GUIEngine::ITextBoxWidgetListener
 {
     friend class GUIEngine::ScreenSingleton<TracksScreen>;
 
@@ -60,6 +62,7 @@ private:
     GUIEngine::CheckBoxWidget* m_reversed;
     GUIEngine::SpinnerWidget* m_laps;
     GUIEngine::ListWidget* m_vote_list;
+    GUIEngine::TextBoxWidget* m_search_track;
 
     /** Pointer to progress bar widget which is used as a timer
     *  (going backwards). */
@@ -147,6 +150,11 @@ public:
     }
     // ------------------------------------------------------------------------
     void updatePlayerVotes();
+    // ------------------------------------------------------------------------
+    virtual void onTextUpdated() OVERRIDE
+    {
+        eventCallback(m_search_track, "trackgroups", 0);
+    }
 };
 
 #endif
