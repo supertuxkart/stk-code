@@ -342,7 +342,7 @@ void RegisterScreen::doRegister()
     m_info_widget->setErrorColor();
 
     bool namecheck = false;
-    for (int i = 0; i < username.size();i++)
+    for (unsigned i = 0; i < username.size(); i++)
     {
         if (!((username[i] >= '0' && username[i] <= '9') ||
             (username[i] >= 'a' && username[i] <= 'z') ||
@@ -357,13 +357,17 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Passwords don't match!"), false);
     }
+    else if (username == password)
+    {
+        m_info_widget->setText(_("Online username and password must not be the same!"), false);
+    }
     else if (email != email_confirm)
     {
         m_info_widget->setText(_("Emails don't match!"), false);
     }
     else if (namecheck)
     {
-        m_info_widget->setText(_("Your username can only contain alphanumeric characters, periods, dashes and underscores!"), false);
+        m_info_widget->setText(_("Online username can only contain alphanumeric characters, periods, dashes and underscores!"), false);
     }
     else if (username.size() < 3 || username.size() > 30)
     {
