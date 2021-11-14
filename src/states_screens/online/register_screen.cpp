@@ -340,6 +340,7 @@ void RegisterScreen::doRegister()
                           : getWidget<TextBoxWidget>("email")->getText();
     email_confirm.trim();
     m_info_widget->setErrorColor();
+
     bool namecheck = false;
     for (int i = 0; i < username.size();i++)
     {
