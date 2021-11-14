@@ -6141,7 +6141,7 @@ msgstr "최고 점수"
 
 #: src/states_screens/race_result_gui.cpp:1910
 #, c-format
-msgid "Best lap timeAAAA: %s"
+msgid "Best lap time: %s"
 msgstr "최단 바퀴 시간: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
