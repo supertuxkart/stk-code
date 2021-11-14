@@ -138,8 +138,9 @@ void RaceSetupScreen::init()
     name6 += _("Race against ghost karts and try to beat them!");
     w2->addItem( name6, IDENT_GHOST, "/gui/icons/mode_ghost.png");
 
+    // I18N: Lap Trial: Complete as many laps as possible in a given amount of time.
     irr::core::stringw name7 = irr::core::stringw(_("Lap Trial")) + L"\n";
-    name7 += _("Get highest lap count in certain amount of time.");
+    name7 += _("Complete as many laps as possible in a given amount of time.");
     w2->addItem(name7, IDENT_LAP_TRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_LAP_TRIAL));
 
     w2->updateItemDisplay();
