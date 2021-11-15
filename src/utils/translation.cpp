@@ -160,7 +160,7 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
 
     if (m_localized_name.empty())
     {
-        const std::string file_name = file_manager->getAsset("localized_name.txt");
+        const std::string file_name = file_manager->getAsset("localized_name.tsv");
         try
         {
             std::ifstream in(FileUtils::getPortableReadingPath(file_name));
@@ -171,30 +171,25 @@ Translations::Translations() //: m_dictionary_manager("UTF-16")
             }
             else
             {
-                for (std::string line; std::getline(in, line, ';'); )
+                std::string line;
+                while (!StringUtils::safeGetline(in, line).eof())
                 {
-                    line = StringUtils::removeWhitespaces(line);
-
-                    if (line.empty())
-                        continue;
-
-                    std::size_t pos = line.find("=");
-
-                    if (pos == std::string::npos)
-                        continue;
-
-                    std::string name = line.substr(0, pos);
-                    std::string localized_name = line.substr(pos + 1);
-
-                    if (name.empty() || localized_name.empty())
-                        continue;
-
-                    if (localized_name == "0")
+                    std::vector<std::string> lists = StringUtils::split(line, '\t');
+                    if (lists.size() != 2)
                     {
-                        localized_name =
-                            tinygettext::Language::from_name(name).get_name();
+                        Log::error("translation", "Invaild list.");
+                        break;
                     }
-                    m_localized_name[name] = localized_name;
+                    if (lists[0] == "language_code")
+                    {
+                        continue;
+                    }
+                    if (lists[1] == "0")
+                    {
+                        lists[1] =
+                            tinygettext::Language::from_name(lists[0]).get_name();
+                    }
+                    m_localized_name[lists[0]] = lists[1];
                 }
             }
         }
@@ -695,10 +690,11 @@ std::string Translations::getCurrentLanguageNameCode()
 }   // getCurrentLanguageNameCode
 
 // ----------------------------------------------------------------------------
-const std::string& Translations::getLocalizedName(const std::string& str) const
+const std::string Translations::getLocalizedName(const std::string& str) const
 {
     std::map<std::string, std::string>::const_iterator n = m_localized_name.find(str);
-    assert (n != m_localized_name.end());
+    if (n == m_localized_name.end())
+        return tinygettext::Language::from_name(str).get_name();
     return n->second;
 }   // getLocalizedName
 

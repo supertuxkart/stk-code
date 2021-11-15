@@ -87,7 +87,7 @@ public:
 
     std::string              getCurrentLanguageNameCode();
 
-    const std::string&       getLocalizedName(const std::string& str) const;
+    const std::string        getLocalizedName(const std::string& str) const;
 
     irr::core::stringw       getLocalizedCountryName(const std::string& country_code) const;
 
