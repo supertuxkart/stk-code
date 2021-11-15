@@ -100,7 +100,11 @@ void OptionsScreenLanguage::init()
     {
         std::string code_name = (*lang_list)[n];
         std::string s_name = translations->getLocalizedName(code_name) +
-         " (" + tinygettext::Language::from_name(code_name).get_language() + ")";
+         " (" + tinygettext::Language::from_name(code_name).get_language();
+        std::string country = tinygettext::Language::from_name(code_name).get_country();
+        if (!country.empty())
+            s_name += "_" + country;
+        s_name += ")";
         core::stringw nice_name = StringUtils::utf8ToWide(s_name);
         nice_lang_list.push_back(nice_name);
         nice_name_2_id[nice_name] = code_name;
