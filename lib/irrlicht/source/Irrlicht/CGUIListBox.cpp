@@ -611,11 +611,14 @@ u32 CGUIListBox::addItem(const wchar_t* text, s32 icon)
 
 void CGUIListBox::setSpriteBank(IGUISpriteBank* bank)
 {
-    if ( bank == IconBank ) return;
-	if (IconBank) IconBank->drop();
+	if ( bank == IconBank )
+		return;
+	if (IconBank)
+		IconBank->drop();
 
 	IconBank = bank;
-	if (IconBank) IconBank->grab();
+	if (IconBank)
+		IconBank->grab();
 }
 
 
