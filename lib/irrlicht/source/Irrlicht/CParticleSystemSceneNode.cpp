@@ -72,8 +72,8 @@ IParticleEmitter* CParticleSystemSceneNode::getEmitter()
 //! Sets the particle emitter, which creates the particles.
 void CParticleSystemSceneNode::setEmitter(IParticleEmitter* emitter)
 {
-    if (emitter == Emitter)
-        return;
+	if (emitter == Emitter)
+		return;
 	if (Emitter)
 		Emitter->drop();
 
