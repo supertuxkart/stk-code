@@ -1055,13 +1055,8 @@ void CGUITreeView::setIconFont( IGUIFont* font )
 {
 	s32	height;
 
-    if ( font )
-        font->grab();
-	if ( IconFont )
-	{
-		IconFont->drop();
-	}
-
+    if ( font ) font->grab();
+	if ( IconFont ) IconFont->drop();
 	IconFont = font;
 	if( IconFont )
 	{
@@ -1077,13 +1072,8 @@ void CGUITreeView::setIconFont( IGUIFont* font )
 //! The default is 0 (no images).
 void CGUITreeView::setImageList( IGUIImageList* imageList )
 {
-    if (imageList )
-        imageList->grab();
-	if( ImageList )
-	{
-		ImageList->drop();
-	}
-
+    if (imageList ) imageList->grab();
+	if( ImageList ) ImageList->drop();
 	ImageList = imageList;
 	if( ImageList )
 	{

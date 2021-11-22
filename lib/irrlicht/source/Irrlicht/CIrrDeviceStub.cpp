@@ -327,10 +327,8 @@ IRandomizer* CIrrDeviceStub::createDefaultRandomizer() const
 //! Sets the input receiving scene manager.
 void CIrrDeviceStub::setInputReceivingSceneManager(scene::ISceneManager* sceneManager)
 {
-    if (sceneManager)
-        sceneManager->grab();
-	if (InputReceivingSceneManager)
-		InputReceivingSceneManager->drop();
+    if (sceneManager) sceneManager->grab();
+	if (InputReceivingSceneManager) InputReceivingSceneManager->drop();
 
 	InputReceivingSceneManager = sceneManager;
 }

@@ -40,10 +40,8 @@ CGUIMeshViewer::~CGUIMeshViewer()
 //! sets the mesh to be shown
 void CGUIMeshViewer::setMesh(scene::IAnimatedMesh* mesh)
 {
-    if (mesh)
-        mesh->grab();
-	if (Mesh)
-		Mesh->drop();
+    if (mesh) mesh->grab();
+	if (Mesh) Mesh->drop();
 
 	Mesh = mesh;
 
