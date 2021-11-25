@@ -143,6 +143,10 @@ void MessageDialog::loadedFromFile()
         IconButtonWidget* cancel = getWidget<IconButtonWidget>("cancel");
         cancel->setText(_("Don't show again"));
     }
+    else if (m_type == MessageDialog::MESSAGE_DIALOG_CONFIRM)
+    {
+        this->setFocusCancel();
+    }
 }
 
 // ----------------------------------------------------------------------------
