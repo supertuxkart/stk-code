@@ -172,6 +172,9 @@ private:
 
     bool                       m_started_race_over_music;
 
+    /** True if second/comparative ghost */
+    bool                       m_second_ghost = false;
+
     /** The previous monospace state of the font. */
     //bool                       m_was_monospace;
 

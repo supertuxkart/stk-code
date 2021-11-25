@@ -1367,6 +1367,22 @@ void RaceResultGUI::unload()
     }   // determineGPLayout
 
     //-----------------------------------------------------------------------------
+
+    void addGhostDifficulty(const stringw& difficulty,
+                            irr::gui::ScalableFont* m_font,
+                            int current_x, float y,
+                            video::SColor color,
+                            unsigned int m_width_finish_time,
+                            unsigned int m_width_column_space)
+    {
+        core::recti diff_ghost = core::recti(current_x, y, current_x + 200, y + 20);
+        m_font->draw(difficulty, diff_ghost, color, false, false, NULL, true);
+        current_x += m_width_finish_time + m_width_column_space;
+    }
+
+    // ----------------------------------------------------------------------------
+
+    //-----------------------------------------------------------------------------
     /** Displays the race results for a single kart.
      *  \param n Index of the kart to be displayed.
      *  \param display_points True if GP points should be displayed, too
@@ -1453,6 +1469,51 @@ void RaceResultGUI::unload()
             int laps = World::getWorld()->getFinishedLapsOfKart(ri->m_kart_id);
             m_font->draw(irr::core::stringw(laps), pos_laps, color, false, false,
                 NULL, true /* ignoreRTL */);
+        }
+
+        // Draw the difficulty (only works with descriptive replay filenames)
+        // ------------------------------------------------------------------
+
+        if (RaceManager::get()->isWatchingReplay() && RaceManager::get()->hasGhostKarts() && !RaceManager::get()->isRecordingRace()){
+
+            if (m_second_ghost == false) {
+                if (ReplayPlay::get()->getReplayFilename(2).find("novice") != std::string::npos) {
+                    addGhostDifficulty("Novice", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                else if (ReplayPlay::get()->getReplayFilename(2).find("intermediate") != std::string::npos) {
+                    addGhostDifficulty("Intermediate", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                else if (ReplayPlay::get()->getReplayFilename(2).find("expert") != std::string::npos) {
+                    addGhostDifficulty("Expert", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                else if (ReplayPlay::get()->getReplayFilename(2).find("supertux") != std::string::npos) {
+                    addGhostDifficulty("SuperTux", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                // other cases (standard race, custom replay... wip)
+                else {
+                }
+                m_second_ghost = true;
+            }
+
+            else if (m_second_ghost == true) {
+                if (ReplayPlay::get()->getReplayFilename().find("novice") != std::string::npos) {
+                    addGhostDifficulty("Novice", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                else if (ReplayPlay::get()->getReplayFilename().find("intermediate") != std::string::npos) {
+                    addGhostDifficulty("Intermediate", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                else if (ReplayPlay::get()->getReplayFilename().find("expert") != std::string::npos) {
+                    addGhostDifficulty("Expert", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                else if (ReplayPlay::get()->getReplayFilename().find("supertux") != std::string::npos) {
+                    addGhostDifficulty("SuperTux", m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                // other cases (custom replay... wip)
+                else {
+                }
+                m_second_ghost = false;
+            }
+
         }
 
         current_x += 100 + m_width_column_space;
@@ -1958,7 +2019,7 @@ void RaceResultGUI::unload()
             // display difficulty
             const core::stringw& difficulty_name =
                 RaceManager::get()->getDifficultyName(RaceManager::get()->getDifficulty());
-            core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
+            core::stringw difficulty_string = _("Selected difficulty: %s", difficulty_name);
             current_y += int(m_distance_between_meta_rows * 0.8f);
             GUIEngine::getFont()->draw(difficulty_string,
                 // 0.96 from stkgui
