@@ -15,8 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/online/networking_lobby.hpp"
 
+#include "states_screens/online/networking_lobby.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include <cmath>
 #include <algorithm>
 #include <string>
@@ -702,13 +703,18 @@ void NetworkingLobby::updatePlayerPings()
     for (auto& p : m_player_names)
     {
         core::stringw name_with_ping = p.second.m_user_name;
-        const core::stringw& flag = StringUtils::getCountryFlag(
-            p.second.m_country_code);
-        if (!flag.empty())
+
+        if (UserConfigParams::m_enable_flag == true)
         {
-            name_with_ping += L" ";
-            name_with_ping += flag;
+            const core::stringw& flag = StringUtils::getCountryFlag(
+                p.second.m_country_code);
+            if (!flag.empty())
+            {
+                name_with_ping += L" ";
+                name_with_ping += flag;
+            }
         }
+        
         auto host_online_ids = StringUtils::splitToUInt(p.first, '_');
         if (host_online_ids.size() != 3)
             continue;
@@ -912,12 +918,17 @@ void NetworkingLobby::updatePlayers()
             StringUtils::toString(player.m_online_id) + "_" +
             StringUtils::toString(player.m_local_player_id);
         core::stringw player_name = player.m_user_name;
-        const core::stringw& flag = StringUtils::getCountryFlag(
-            player.m_country_code);
-        if (!flag.empty())
+
+
+        if (UserConfigParams::m_enable_flag == true)
         {
-            player_name += L" ";
-            player_name += flag;
+            const core::stringw& flag = StringUtils::getCountryFlag(
+                player.m_country_code);
+            if (!flag.empty())
+            {
+                player_name += L" ";
+                player_name += flag;
+            }
         }
         m_player_list->addItem(internal_name, player_name,
             player.m_icon_id);

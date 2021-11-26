@@ -2155,6 +2155,11 @@ msgstr "Options Internet"
 
 #. I18N: ./data/gui/screens/options_general.stkgui
 #. I18N: In the general settings
+msgid "Display flags"
+msgstr "Afficher les drapeaux"
+
+#. I18N: ./data/gui/screens/options_general.stkgui
+#. I18N: In the general settings
 msgid "Always show login screen"
 msgstr "Toujours afficher l’écran de connexion"
 

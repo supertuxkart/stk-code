@@ -19,6 +19,7 @@
 #define HEADER_NETWORKING_LOBBY_HPP
 
 #include "guiengine/screen.hpp"
+#include "states_screens/options/options_screen_general.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "GlyphLayout.h"
 #include <map>
@@ -30,7 +31,7 @@ class InputDevice;
 class Server;
 enum KartTeam : int8_t;
 struct LobbyPlayer;
-
+extern bool flag_;
 namespace GUIEngine
 { 
     class ButtonWidget;
@@ -67,6 +68,7 @@ private:
 
     NetworkingLobby();
 
+    
     uint64_t m_ping_update_timer;
     std::map<std::string, LobbyPlayer> m_player_names;
     std::shared_ptr<Server> m_joined_server;

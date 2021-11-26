@@ -685,12 +685,15 @@ void RaceResultGUI::displayCTFResults()
         result_text = kart->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
         {
-            const core::stringw& flag = StringUtils::getCountryFlag(
-                RaceManager::get()->getKartInfo(kart_id).getCountryCode());
-            if (!flag.empty())
+            if (UserConfigParams::m_enable_flag == true)
             {
-                result_text += L" ";
-                result_text += flag;
+                const core::stringw& flag = StringUtils::getCountryFlag(
+                    RaceManager::get()->getKartInfo(kart_id).getCountryCode());
+                if (!flag.empty())
+                {
+                    result_text += L" ";
+                    result_text += flag;
+                }
             }
         }
         result_text.append("  ");
@@ -733,12 +736,15 @@ void RaceResultGUI::displayCTFResults()
         result_text = kart->getController()->getName();
         if (RaceManager::get()->getKartGlobalPlayerId(kart_id) > -1)
         {
-            const core::stringw& flag = StringUtils::getCountryFlag(
-                RaceManager::get()->getKartInfo(kart_id).getCountryCode());
-            if (!flag.empty())
+            if (UserConfigParams::m_enable_flag == true)
             {
-                result_text += L" ";
-                result_text += flag;
+                const core::stringw& flag = StringUtils::getCountryFlag(
+                    RaceManager::get()->getKartInfo(i).getCountryCode());
+                if (!flag.empty())
+                {
+                    result_text += L" ";
+                    result_text += flag;
+                }
             }
         }
         result_text.append("  ");
@@ -847,12 +853,15 @@ void RaceResultGUI::unload()
             ri->m_kart_name = kart->getController()->getName();
             if (RaceManager::get()->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
             {
-                const core::stringw& flag = StringUtils::getCountryFlag(
-                    RaceManager::get()->getKartInfo(kart->getWorldKartId()).getCountryCode());
-                if (!flag.empty())
+                if (UserConfigParams::m_enable_flag == true)
                 {
-                    ri->m_kart_name += L" ";
-                    ri->m_kart_name += flag;
+                    const core::stringw& flag = StringUtils::getCountryFlag(
+                        RaceManager::get()->getKartInfo(kart->getWorldKartId()).getCountryCode());
+                    if (!flag.empty())
+                    {
+                        ri->m_kart_name += L" ";
+                        ri->m_kart_name += flag;
+                    }
                 }
             }
             video::ITexture *icon =
@@ -1301,12 +1310,15 @@ void RaceResultGUI::unload()
             ri->m_kart_name = kart->getController()->getName();
             if (RaceManager::get()->getKartGlobalPlayerId(kart->getWorldKartId()) > -1)
             {
-                const core::stringw& flag = StringUtils::getCountryFlag(
-                    RaceManager::get()->getKartInfo(kart->getWorldKartId()).getCountryCode());
-                if (!flag.empty())
+                if (UserConfigParams::m_enable_flag == true)
                 {
-                    ri->m_kart_name += L" ";
-                    ri->m_kart_name += flag;
+                    const core::stringw& flag = StringUtils::getCountryFlag(
+                        RaceManager::get()->getKartInfo(kart->getWorldKartId()).getCountryCode());
+                    if (!flag.empty())
+                    {
+                        ri->m_kart_name += L" ";
+                        ri->m_kart_name += flag;
+                    }
                 }
             }
             ri->m_kart_color = RaceManager::get()->getKartColor(kart_id);

@@ -672,13 +672,17 @@ void LinearWorld::getKartsDisplayInfo(
             rank_info.m_text = kart->getController()->getName();
             if (RaceManager::get()->getKartGlobalPlayerId(i) > -1)
             {
-                const core::stringw& flag = StringUtils::getCountryFlag(
-                    RaceManager::get()->getKartInfo(i).getCountryCode());
-                if (!flag.empty())
+                if (UserConfigParams::m_enable_flag == true)
                 {
-                    rank_info.m_text += L" ";
-                    rank_info.m_text += flag;
+                    const core::stringw& flag = StringUtils::getCountryFlag(
+                        RaceManager::get()->getKartInfo(i).getCountryCode());
+                    if (!flag.empty())
+                    {
+                        rank_info.m_text += L" ";
+                        rank_info.m_text += flag;
+                    }
                 }
+               
             }
         }
         else

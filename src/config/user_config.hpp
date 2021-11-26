@@ -810,6 +810,8 @@ namespace UserConfigParams
     PARAM_PREFIX bool m_disable_addon_tracks  PARAM_DEFAULT( false );
 
     // ---- Networking
+    PARAM_PREFIX bool m_enable_flag PARAM_DEFAULT( true );
+    
     PARAM_PREFIX StringToUIntUserConfigParam    m_server_bookmarks
         PARAM_DEFAULT(StringToUIntUserConfigParam("server-bookmarks",
         "Wan server bookmarks",

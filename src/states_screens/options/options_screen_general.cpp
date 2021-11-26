@@ -45,6 +45,8 @@
 #include "states_screens/options/options_screen_input.hpp"
 #include "states_screens/options/options_screen_language.hpp"
 #include "states_screens/options/options_screen_ui.hpp"
+
+
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
@@ -61,6 +63,7 @@ using namespace GUIEngine;
 using namespace Online;
 
 // -----------------------------------------------------------------------------
+
 
 OptionsScreenGeneral::OptionsScreenGeneral() : Screen("options_general.stkgui")
 {
@@ -93,6 +96,10 @@ void OptionsScreenGeneral::init()
                                      ==RequestManager::IPERM_ALLOWED );
 
     setInternetCheckboxes(internet_enabled->getState());
+
+    CheckBoxWidget* flag = getWidget<CheckBoxWidget>("enable-flag");
+    assert( flag != NULL );
+    //UserConfigParams::m_enable_flag = true;
 
     CheckBoxWidget* handicap = getWidget<CheckBoxWidget>("enable-handicap");
     assert( handicap != NULL );
@@ -218,6 +225,14 @@ void OptionsScreenGeneral::eventCallback(Widget* widget, const std::string& name
         assert( handicap != NULL );
         UserConfigParams::m_per_player_difficulty = handicap->getState();
     }
+    else if (name=="enable-flag")
+    {
+        CheckBoxWidget* flag = getWidget<CheckBoxWidget>("enable-flag");
+        assert ( flag != NULL ); 
+        if (flag->getState()) UserConfigParams::m_enable_flag = true;
+        if (!flag->getState()) UserConfigParams::m_enable_flag = false;
+    }    
+ 
 #ifdef MOBILE_STK
     else if (name=="assets_settings")
     {

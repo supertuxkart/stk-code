@@ -23,6 +23,8 @@
 
 #include "guiengine/screen.hpp"
 
+
+
 namespace GUIEngine { class Widget; }
 
 struct Input;
@@ -35,6 +37,9 @@ class OptionsScreenGeneral : public GUIEngine::Screen, public GUIEngine::ScreenS
 {
     OptionsScreenGeneral();
     bool m_inited;
+    bool flag_;
+
+    
 
     std::vector<std::string> m_skins;
 

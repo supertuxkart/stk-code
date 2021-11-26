@@ -27,6 +27,7 @@
 #include "tracks/track_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
+#include "config/user_config.hpp"
 
 #include <algorithm>
 
@@ -96,11 +97,14 @@ Server::Server(const XMLNode& server_info) : m_supports_encrytion(true)
         std::get<1>(t) = StringUtils::utf8ToWide(username);
         std::string country;
         player_info->get("country-code", &country);
-        const core::stringw& flag = StringUtils::getCountryFlag(country);
-        if (!flag.empty())
-        {
-            std::get<1>(t) += L" ";
-            std::get<1>(t) += flag;
+        if (UserConfigParams::m_enable_flag == true)
+        {    
+            const core::stringw& flag = StringUtils::getCountryFlag(country);
+            if (!flag.empty())
+            {
+                std::get<1>(t) += L" ";
+                std::get<1>(t) += flag;
+            }
         }
         m_lower_case_player_names += StringUtils::toLowerCase(username);
         player_info->get("scores", &std::get<2>(t));
