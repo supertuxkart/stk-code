@@ -40,14 +40,14 @@ MessageDialog::MessageDialog(const irr::core::stringw &msg,
                              MessageDialogType type,
                              IConfirmDialogListener* listener,
                              bool own_listener, bool from_queue,
-                             float width, float height)
+                             float width, float height, bool focus_on_cancel)
              : ModalDialog(width, height)
 {
     m_msg             = msg;
     m_type            = type;
     m_listener        = listener;
     m_own_listener    = own_listener;
-    m_focus_on_cancel = false;
+    m_focus_on_cancel = focus_on_cancel;
     doInit(from_queue);
 }   // MessageDialog(stringw, type, listener, own_listener)
 
@@ -58,14 +58,15 @@ MessageDialog::MessageDialog(const irr::core::stringw &msg,
  *         loadFromFile() is not called (it will be called when the dialog
  *         is finally being removed from the queue and shown).
  */
-MessageDialog::MessageDialog(const irr::core::stringw &msg, bool from_queue)
+MessageDialog::MessageDialog(const irr::core::stringw &msg, bool from_queue,
+                             bool focus_on_cancel)
              : ModalDialog(0.6f, 0.6f)
 {
     m_msg          = msg;
     m_type         = MessageDialog::MESSAGE_DIALOG_OK;
     m_listener     = NULL;
     m_own_listener = false;
-    m_focus_on_cancel = false;
+    m_focus_on_cancel = focus_on_cancel;
     if (!from_queue) doInit(false);
 }   // MessageDialog(stringw)
 

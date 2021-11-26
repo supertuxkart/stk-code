@@ -528,7 +528,9 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             else if (action == "right")        // Abort
             {
                 new MessageDialog(_("Do you really want to abort the Grand Prix?"),
-                    MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false);
+                    MessageDialog::MESSAGE_DIALOG_CONFIRM, this,
+                    /*delete_listener*/false, /*from_queue*/false,
+                    /*width*/0.6f, /*height*/0.6f, /*focus_on_cancel*/true);
             }
             else if (!getWidget(action.c_str())->isVisible())
             {
