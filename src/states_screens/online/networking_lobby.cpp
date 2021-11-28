@@ -79,6 +79,8 @@ NetworkingLobby::NetworkingLobby() : Screen("online/networking_lobby.stkgui")
     m_header_text_width = 0;
 
     m_back_widget = NULL;
+    //I18N: In the networking lobby
+    m_header_text = _("Lobby");
     m_header = NULL;
     m_text_bubble = NULL;
     m_timeout_message = NULL;
@@ -199,9 +201,7 @@ void NetworkingLobby::init()
     m_spectate_text = _("Spectate");
     m_install_addon_text = _("Install addon");
 
-    //I18N: In the networking lobby
-    setHeader(_("Lobby"));
-
+    setHeader(m_header_text);
     m_server_info_height = GUIEngine::getFont()->getDimension(L"X").Height;
     m_start_button->setVisible(false);
     m_config_button->setVisible(false);
@@ -439,6 +439,27 @@ void NetworkingLobby::onUpdate(float delta)
     m_addon_install = NULL;
     if (NetworkConfig::get()->isServer() || !STKHost::existHost())
         return;
+
+    if (m_header->getText() != m_header_text)
+    {
+        m_header_text_width =
+            GUIEngine::getTitleFont()->getDimension(m_header_text.c_str()).Width;
+        m_header->getIrrlichtElement()->remove();
+        if (m_header_text_width > m_header->m_w)
+        {
+            m_header->setScrollSpeed(GUIEngine::getTitleFontHeight() / 2);
+            m_header->add();
+            m_header->setText(m_header_text, true);
+        }
+        else
+        {
+            m_header->setScrollSpeed(0);
+            m_header->add();
+            m_header->setText(m_header_text, true);
+        }
+        // Make sure server name is not clickable for URL
+        m_header->getIrrlichtElement<IGUIStaticText>()->setMouseCallback(nullptr);
+    }
 
     if (m_header_text_width > m_header->m_w)
     {
@@ -857,6 +878,8 @@ void NetworkingLobby::tearDown()
     st->setMouseCallback(nullptr);
     m_player_list = NULL;
     m_joined_server.reset();
+    m_header_text = _("Lobby");
+    m_header_text_width = 0;
     // Server has a dummy network lobby too
     if (!NetworkConfig::get()->isClient())
         return;
@@ -870,6 +893,8 @@ bool NetworkingLobby::onEscapePressed()
     if (NetworkConfig::get()->isAddingNetworkPlayers())
         NetworkConfig::get()->cleanNetworkPlayers();
     m_joined_server.reset();
+    m_header_text = _("Lobby");
+    m_header_text_width = 0;
     input_manager->getDeviceManager()->mapFireToSelect(false);
     input_manager->getDeviceManager()->setAssignMode(NO_ASSIGN);
     STKHost::get()->shutdown();
@@ -1014,25 +1039,9 @@ void NetworkingLobby::setStartingTimerTo(float t)
 }   // setStartingTimerTo
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::setHeader(const core::stringw& header)
+void NetworkingLobby::setJoinedServer(std::shared_ptr<Server> server)
 {
-    if (!m_header || m_header->getText() == header)
-        return;
-    m_header_text_width =
-        GUIEngine::getTitleFont()->getDimension(header.c_str()).Width;
-    m_header->getIrrlichtElement()->remove();
-    if (m_header_text_width > m_header->m_w)
-    {
-        m_header->setScrollSpeed(GUIEngine::getTitleFontHeight() / 2);
-        m_header->add();
-        m_header->setText(header, true);
-    }
-    else
-    {
-        m_header->setScrollSpeed(0);
-        m_header->add();
-        m_header->setText(header, true);
-    }
-    // Make sure server name is not clickable for URL
-    m_header->getIrrlichtElement<IGUIStaticText>()->setMouseCallback(nullptr);
-}   // setHeader
+    m_joined_server = server;
+    m_server_info.clear();
+    m_header_text = _("Lobby");
+}   // setJoinedServer

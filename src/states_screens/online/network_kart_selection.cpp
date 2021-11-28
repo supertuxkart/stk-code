@@ -23,6 +23,7 @@
 #include "network/network_config.hpp"
 #include "network/network_string.hpp"
 #include "network/protocols/client_lobby.hpp"
+#include "network/server.hpp"
 #include "network/stk_host.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online/networking_lobby.hpp"
@@ -173,6 +174,8 @@ bool NetworkKartSelectionScreen::onEscapePressed()
     }
     // Rewrite the previous server infos saved (game mode, chat lists...)
     NetworkingLobby::getInstance()->reloadServerInfos();
+    if (auto cl = LobbyProtocol::get<ClientLobby>())
+        NetworkingLobby::getInstance()->setHeader(cl->getJoinedServer()->getName());
     return true; // remove the screen
 }   // onEscapePressed
 
