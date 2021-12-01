@@ -1369,6 +1369,45 @@ void RaceResultGUI::unload()
     }   // determineGPLayout
 
     //-----------------------------------------------------------------------------
+
+    int gdiff_int, gdiff_int1;
+    bool m_second_ghost = false;
+
+    void drawGhostDifficulty(int gdiff_int, irr::gui::ScalableFont* m_font,
+                            int current_x, float y, video::SColor color,
+                            unsigned int m_width_finish_time, unsigned int m_width_column_space)
+    {
+        const core::stringw& gdiff_name = RaceManager::get()->getDifficultyName( (RaceManager::Difficulty)gdiff_int );
+        core::stringw gdiff_name_string = _("%s", gdiff_name);
+        core::recti diff_ghost = core::recti(current_x, y, current_x + 200, y + 20);
+        m_font->draw(gdiff_name_string, diff_ghost, color, false, false, NULL, true);
+        current_x += m_width_finish_time + m_width_column_space;
+    }
+
+    //-----------------------------------------------------------------------------
+
+    void compareAndDrawDifficulties(FILE* file, FILE* file1, irr::gui::ScalableFont* m_font,
+                                    int current_x, float y, video::SColor color,
+                                    unsigned int m_width_finish_time, unsigned int m_width_column_space)
+    {
+        char s[1024], s1[1024];
+        for (int i=0; i<7; i++) {
+            fgets(s, 1023, file); fgets(s1, 1023, file1);
+        }
+        sscanf(s, "difficulty: %d", &gdiff_int); sscanf(s1, "difficulty: %d", &gdiff_int1);
+        fclose(file); fclose(file1);
+
+        if (gdiff_int > gdiff_int1){
+            drawGhostDifficulty(gdiff_int, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+            gdiff_int = 5;
+        }
+        else {
+            drawGhostDifficulty(gdiff_int1, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+            gdiff_int1 = 5;
+        }
+    }
+
+    //-----------------------------------------------------------------------------
     /** Displays the race results for a single kart.
      *  \param n Index of the kart to be displayed.
      *  \param display_points True if GP points should be displayed, too
@@ -1455,6 +1494,47 @@ void RaceResultGUI::unload()
             int laps = World::getWorld()->getFinishedLapsOfKart(ri->m_kart_id);
             m_font->draw(irr::core::stringw(laps), pos_laps, color, false, false,
                 NULL, true /* ignoreRTL */);
+        }
+
+        // Draw the difficulty
+        // -------------------
+
+        if (RaceManager::get()->isWatchingReplay() && RaceManager::get()->hasGhostKarts() && !RaceManager::get()->isRecordingRace()){
+
+            std::string gfile_custom_1 = file_manager->getReplayDir() + ReplayPlay::get()->getReplayFilename(2);
+            std::string gfile_custom_2 = file_manager->getReplayDir() + ReplayPlay::get()->getReplayFilename();
+            std::string gfile_base_1 = ReplayPlay::get()->getReplayFilename(2);
+            std::string gfile_base_2 = ReplayPlay::get()->getReplayFilename();
+
+            if (m_second_ghost == false) {
+
+                if (FILE *file = fopen(gfile_custom_1.c_str(), "r")) {
+                    if (FILE *file1 = fopen(gfile_custom_2.c_str(), "r")) {
+                        compareAndDrawDifficulties(file, file1, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                    }
+                    else if (FILE *file1 = fopen(gfile_base_2.c_str(), "r")) {
+                        compareAndDrawDifficulties(file, file1, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                    }
+                }
+                else if (FILE *file = fopen(gfile_base_1.c_str(), "r")) {
+                    if (FILE *file1 = fopen(gfile_custom_2.c_str(), "r")) {
+                        compareAndDrawDifficulties(file, file1, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                    }
+                    else if (FILE *file1 = fopen(gfile_base_2.c_str(), "r")) {
+                        compareAndDrawDifficulties(file, file1, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                    }
+                }
+                m_second_ghost = true;
+            }
+            else if (m_second_ghost == true) {
+                if (gdiff_int == 5) {
+                    drawGhostDifficulty(gdiff_int1, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                if (gdiff_int1 == 5) {
+                    drawGhostDifficulty(gdiff_int, m_font, current_x, y, color, m_width_finish_time, m_width_column_space);
+                }
+                m_second_ghost = false;
+            }
         }
 
         current_x += 100 + m_width_column_space;
