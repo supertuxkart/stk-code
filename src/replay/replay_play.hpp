@@ -217,6 +217,13 @@ public:
             return m_replay_file_list.at(m_current_replay_file).m_filename;
     }
     // ------------------------------------------------------------------------
+    unsigned int getCurrentReplayFileIndex() const
+                                              { return m_current_replay_file; }
+    // ------------------------------------------------------------------------
+    unsigned int getSecondReplayFileIndex() const
+                                               { return m_second_replay_file; }
+    // ------------------------------------------------------------------------
+    bool isSecondReplayEnabled() const      { return m_second_replay_enabled; }
 };   // Replay
 
 #endif

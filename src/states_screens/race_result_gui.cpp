@@ -1958,8 +1958,17 @@ void RaceResultGUI::unload()
                     white_color, false, false, nullptr, true);
             }
             // display difficulty
-            const core::stringw& difficulty_name =
+            core::stringw difficulty_name =
                 RaceManager::get()->getDifficultyName(RaceManager::get()->getDifficulty());
+            core::stringw difficulty_two;
+            if (RaceManager::get()->hasGhostKarts() && ReplayPlay::get()->isSecondReplayEnabled())
+            {
+                unsigned idx = ReplayPlay::get()->getSecondReplayFileIndex();
+                const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(idx);
+                difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
+                if (difficulty_name != difficulty_two)
+                    difficulty_name += core::stringw(L"/") + difficulty_two;
+            }
             core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
             current_y += int(m_distance_between_meta_rows * 0.8f);
             GUIEngine::getFont()->draw(difficulty_string,
