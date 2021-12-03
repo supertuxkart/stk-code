@@ -22,7 +22,7 @@ To run SuperTuxKart, make sure that your computer's specifications are equal or 
 * Ideally, you'll want a joystick with at least 6 buttons.
 
 ## License
-The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file. Information about the licenses for the artwork is contained in `data/licenses`.
+The software is released under the GNU General Public License (GPL) which can be found in the file [`COPYING`](/COPYING) in the same directory as this file.
 
 ---
 
