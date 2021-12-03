@@ -39,4 +39,10 @@
   <card contains="Apple Software Renderer" os="ios"                disable="ForceLegacyDevice"/>
   <card contains="Apple Software Renderer" os="ios"                disable="NpotTextures"/>
   <card vendor="Broadcom"         os="linux"                       disable="HighDefinitionTextures256"/>
+  <card contains="PowerVR SGX 520" disable="NpotTextures"/>
+  <card contains="PowerVR SGX 530" disable="NpotTextures"/>
+  <card contains="PowerVR SGX 531" disable="NpotTextures"/>
+  <card contains="PowerVR SGX 535" disable="NpotTextures"/>
+  <card contains="PowerVR SGX 540" disable="NpotTextures"/>
+  <card contains="PowerVR SGX 545" disable="NpotTextures"/>
 </graphical-restrictions>
