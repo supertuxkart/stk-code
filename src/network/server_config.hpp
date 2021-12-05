@@ -134,6 +134,12 @@ namespace ServerConfig
         "Maximum number of players on the server, setting this to a value "
         "greater than 8 can cause performance degradation."));
 
+    SERVER_CFG_PREFIX IntServerConfigParam m_max_players_in_game
+        SERVER_CFG_DEFAULT(IntServerConfigParam(0, "max-players-in-game",
+        "Maximum number of players in the game, all other players on "
+        "the server are spectators. Specify 0 to allow all players on "
+        "the server to play."));
+
     SERVER_CFG_PREFIX StringServerConfigParam m_private_server_password
         SERVER_CFG_DEFAULT(StringServerConfigParam("",
         "private-server-password", "Password for private server, "

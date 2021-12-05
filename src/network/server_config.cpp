@@ -336,6 +336,9 @@ void loadServerLobbyFromConfig()
         m_server_max_players > 10)
         m_server_max_players = 10;
 
+    m_max_players_in_game = (m_max_players_in_game <= 0) ? m_server_max_players :
+        std::min(m_max_players_in_game, m_server_max_players);
+
     if (m_ipv6_connection)
     {
 #ifndef ENABLE_IPV6
@@ -352,7 +355,7 @@ void loadServerLobbyFromConfig()
     }
     if (m_owner_less)
     {
-        if (m_min_start_game_players > m_server_max_players)
+        if (m_min_start_game_players > m_max_players_in_game)
             m_min_start_game_players = 1;
         if (!m_live_players)
             m_team_choosing = false;
