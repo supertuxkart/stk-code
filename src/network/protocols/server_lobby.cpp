@@ -1451,6 +1451,7 @@ void ServerLobby::asynchronousUpdate()
         if (NetworkConfig::get()->isLAN())
         {
             m_state = WAITING_FOR_START_GAME;
+            updatePlayerList();
             STKHost::get()->startListening();
             return;
         }
@@ -1482,6 +1483,7 @@ void ServerLobby::asynchronousUpdate()
         if (m_game_setup->isGrandPrixStarted() || m_registered_for_once_only)
         {
             m_state = WAITING_FOR_START_GAME;
+            updatePlayerList();
             break;
         }
         // Register this server with the STK server. This will block
@@ -1500,6 +1502,7 @@ void ServerLobby::asynchronousUpdate()
                 if (allowJoinedPlayersWaiting())
                     m_registered_for_once_only = true;
                 m_state = WAITING_FOR_START_GAME;
+                updatePlayerList();
             }
         }
         break;
@@ -4775,6 +4778,7 @@ void ServerLobby::resetServer()
     setup();
     m_state = NetworkConfig::get()->isLAN() ?
         WAITING_FOR_START_GAME : REGISTER_SELF_ADDRESS;
+    updatePlayerList();
 }   // resetServer
 
 //-----------------------------------------------------------------------------
