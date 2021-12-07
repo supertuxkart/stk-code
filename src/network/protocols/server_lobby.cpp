@@ -5513,10 +5513,10 @@ std::set<std::shared_ptr<STKPeer>> ServerLobby::getSpectatorsByLimit()
     auto peers = STKHost::get()->getPeers();
     std::set<std::shared_ptr<STKPeer>> always_spectate_peers;
 
-    int player_limit = ServerConfig::m_max_players_in_game;
+    unsigned player_limit = ServerConfig::m_max_players_in_game;
     // only 10 players allowed for battle or soccer
     if (RaceManager::get()->isBattleMode() || RaceManager::get()->isSoccerMode())
-        player_limit = std::min(player_limit, 10);
+        player_limit = std::min(player_limit, 10u);
 
     unsigned ingame_players = 0, waiting_players = 0, total_players = 0;
     STKHost::get()->updatePlayers(&ingame_players, &waiting_players, &total_players);
@@ -5535,7 +5535,7 @@ std::set<std::shared_ptr<STKPeer>> ServerLobby::getSpectatorsByLimit()
                 ingame_players -= (int)peer->getPlayerProfiles().size();
     }
 
-    int player_count = 0;
+    unsigned player_count = 0;
     for (unsigned i = 0; i < peers.size(); i++)
     {
         auto& peer = peers[i];
@@ -5545,7 +5545,7 @@ std::set<std::shared_ptr<STKPeer>> ServerLobby::getSpectatorsByLimit()
         {
             if (peer->alwaysSpectate() || peer->isWaitingForGame())
                 continue;
-            player_count += (int)peer->getPlayerProfiles().size();
+            player_count += (unsigned)peer->getPlayerProfiles().size();
             if (player_count > player_limit)
                 spectators_by_limit.insert(peer);
         }
@@ -5553,7 +5553,7 @@ std::set<std::shared_ptr<STKPeer>> ServerLobby::getSpectatorsByLimit()
         {
             if (peer->isSpectator())
                 continue;
-            player_count += (int)peer->getPlayerProfiles().size();
+            player_count += (unsigned)peer->getPlayerProfiles().size();
             if (peer->isWaitingForGame() && (player_count > player_limit || ingame_players >= player_limit))
                 spectators_by_limit.insert(peer);
         }
