@@ -101,6 +101,7 @@ RaceGUI::RaceGUI()
     m_red_flag = irr_driver->getTexture(FileManager::GUI_ICON, "red_flag.png");
     m_blue_flag = irr_driver->getTexture(FileManager::GUI_ICON, "blue_flag.png");
     m_soccer_ball = irr_driver->getTexture(FileManager::GUI_ICON, "soccer_ball_normal.png");
+    m_puck_ball = irr_driver->getTexture(FileManager::GUI_ICON, "puck_ball.png");
     m_heart_icon = irr_driver->getTexture(FileManager::GUI_ICON, "heart.png");
     m_basket_ball_icon = irr_driver->getTexture(FileManager::GUI_ICON, "rubber_ball-icon.png");
     m_champion = irr_driver->getTexture(FileManager::GUI_ICON, "cup_gold.png");
@@ -751,13 +752,19 @@ void RaceGUI::drawGlobalMiniMap()
     {
         Vec3 draw_at;
         track->mapPoint2MiniMap(soccer_world->getBallPosition(), &draw_at);
-
+        core::stringw a = track->getName();
+        bool b = a.equalsn("Icy Soccer Field", 16);
         core::rect<s32> source(core::position2di(0, 0), m_soccer_ball->getSize());
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-(m_minimap_player_size/2.5f)),
                                  lower_y   -(int)(draw_at.getY()+(m_minimap_player_size/2.5f)),
                                  m_map_left+(int)(draw_at.getX()+(m_minimap_player_size/2.5f)),
                                  lower_y   -(int)(draw_at.getY()-(m_minimap_player_size/2.5f)));
-        draw2DImage(m_soccer_ball, position, source, NULL, NULL, true);
+        if (b) {
+            draw2DImage(m_puck_ball, position, source, NULL, NULL, true);
+        }
+        else {
+            draw2DImage(m_soccer_ball, position, source, NULL, NULL, true);
+        }
     }
 #endif
 }   // drawGlobalMiniMap
