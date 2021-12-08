@@ -1960,14 +1960,20 @@ void RaceResultGUI::unload()
             // display difficulty
             core::stringw difficulty_name =
                 RaceManager::get()->getDifficultyName(RaceManager::get()->getDifficulty());
+            core::stringw difficulty_one;
             core::stringw difficulty_two;
             if (RaceManager::get()->hasGhostKarts() && ReplayPlay::get()->isSecondReplayEnabled())
             {
+                unsigned idw = ReplayPlay::get()->getCurrentReplayFileIndex();
                 unsigned idx = ReplayPlay::get()->getSecondReplayFileIndex();
-                const ReplayPlay::ReplayData& rd = ReplayPlay::get()->getReplayData(idx);
-                difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
-                if (difficulty_name != difficulty_two)
-                    difficulty_name += core::stringw(L"/") + difficulty_two;
+                const ReplayPlay::ReplayData& rd1 = ReplayPlay::get()->getReplayData(idw);
+                const ReplayPlay::ReplayData& rd2 = ReplayPlay::get()->getReplayData(idx);
+                difficulty_one = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd1.m_difficulty);
+                difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd2.m_difficulty);
+                if (difficulty_one != difficulty_two)
+                    difficulty_name = difficulty_one +" / "+ difficulty_two;
+                else
+                    difficulty_name = difficulty_one;
             }
             core::stringw difficulty_string = _("Difficulty: %s", difficulty_name);
             current_y += int(m_distance_between_meta_rows * 0.8f);
