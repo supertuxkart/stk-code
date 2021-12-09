@@ -23,6 +23,7 @@
 #include "graphics/stk_tex_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "states_screens/ghost_replay_selection.hpp"
 #include "states_screens/state_manager.hpp"
@@ -239,7 +240,8 @@ GUIEngine::EventPropagation
 
             RaceManager::get()->setRecordRace(m_record_race);
             RaceManager::get()->setWatchingReplay(m_watch_only);
-          
+            if (m_watch_only)
+                RaceManager::get()->setDifficulty((RaceManager::Difficulty)m_rd.m_difficulty);
             ReplayPlay::get()->setReplayFile(replay_id);
             if (m_compare_ghost)
             {
