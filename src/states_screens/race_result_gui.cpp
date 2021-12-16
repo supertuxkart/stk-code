@@ -1368,6 +1368,8 @@ void RaceResultGUI::unload()
 #endif
     }   // determineGPLayout
 
+    bool m_second_ghost = false;
+
     //-----------------------------------------------------------------------------
     /** Displays the race results for a single kart.
      *  \param n Index of the kart to be displayed.
@@ -1455,6 +1457,38 @@ void RaceResultGUI::unload()
             int laps = World::getWorld()->getFinishedLapsOfKart(ri->m_kart_id);
             m_font->draw(irr::core::stringw(laps), pos_laps, color, false, false,
                 NULL, true /* ignoreRTL */);
+        }
+
+        // Draw the difficulty
+        // -------------------
+        core::stringw difficulty_one;
+        core::stringw difficulty_two;
+        core::recti diff_ghost = core::recti(current_x, y, current_x + 200, y + 20);
+
+        if (RaceManager::get()->hasGhostKarts() && ReplayPlay::get()->isSecondReplayEnabled())
+        {
+            unsigned idw = ReplayPlay::get()->getCurrentReplayFileIndex();
+            unsigned idx = ReplayPlay::get()->getSecondReplayFileIndex();
+            const ReplayPlay::ReplayData& rd1 = ReplayPlay::get()->getReplayData(idw);
+            const ReplayPlay::ReplayData& rd2 = ReplayPlay::get()->getReplayData(idx);
+            difficulty_one = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd1.m_difficulty);
+            difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd2.m_difficulty);
+
+            if (m_second_ghost == false) {
+                if (rd1.m_difficulty > rd2.m_difficulty){
+                    m_font->draw(difficulty_one, diff_ghost, color, false, false, NULL, true);
+                } else {
+                    m_font->draw(difficulty_two, diff_ghost, color, false, false, NULL, true);
+                }
+                m_second_ghost = true;
+            } else {
+                if (rd1.m_difficulty > rd2.m_difficulty){
+                    m_font->draw(difficulty_two, diff_ghost, color, false, false, NULL, true);
+                } else {
+                    m_font->draw(difficulty_one, diff_ghost, color, false, false, NULL, true);
+                }
+                m_second_ghost = false;
+            }
         }
 
         current_x += 100 + m_width_column_space;
