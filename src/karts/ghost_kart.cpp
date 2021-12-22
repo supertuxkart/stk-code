@@ -32,11 +32,13 @@
 #include "LinearMath/btQuaternion.h"
 
 GhostKart::GhostKart(const std::string& ident, unsigned int world_kart_id,
-                     int position, float color_hue)
+                     int position, float color_hue,
+                     const ReplayPlay::ReplayData& rd)
           : Kart(ident, world_kart_id,
                  position, btTransform(btQuaternion(0, 0, 0, 1)),
                  HANDICAP_NONE,
-                 std::make_shared<RenderInfo>(color_hue, true/*transparent*/))
+                 std::make_shared<RenderInfo>(color_hue, true/*transparent*/)),
+                 m_replay_data(rd)
 {
 }   // GhostKart
 

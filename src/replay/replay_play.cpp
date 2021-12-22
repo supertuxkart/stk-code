@@ -382,7 +382,7 @@ void ReplayPlay::readKartData(FILE *fd, char *next_line, bool second_replay)
     ReplayData &rd = m_replay_file_list[replay_index];
     m_ghost_karts.push_back(std::make_shared<GhostKart>
         (rd.m_kart_list.at(kart_num-first_loaded_f_num), kart_num, kart_num + 1,
-        rd.m_kart_color.at(kart_num-first_loaded_f_num)));
+        rd.m_kart_color.at(kart_num-first_loaded_f_num), rd));
     m_ghost_karts[kart_num]->init(RaceManager::KT_GHOST);
     Controller* controller = new GhostController(getGhostKart(kart_num).get(),
                                                  rd.m_name_list[kart_num-first_loaded_f_num]);
