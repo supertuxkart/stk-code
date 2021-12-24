@@ -240,19 +240,6 @@ include $(BUILD_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
-# hidapi
-LOCAL_MODULE       := libhidapi
-LOCAL_CPPFLAGS     += -std=c++11
-LOCAL_SRC_FILES    := ../lib/sdl2/src/hidapi/android/hid.cpp
-LOCAL_LDLIBS       := -llog
-
-ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
-LOCAL_ARM_NEON     := false
-endif
-include $(BUILD_SHARED_LIBRARY)
-include $(CLEAR_VARS)
-
-
 # SDL2
 LOCAL_MODULE       := SDL2
 LOCAL_PATH         := .
@@ -271,13 +258,15 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/sdl2/src/*.c) \
                       $(wildcard ../lib/sdl2/src/file/*.c) \
                       $(wildcard ../lib/sdl2/src/haptic/*.c) \
                       $(wildcard ../lib/sdl2/src/haptic/android/*.c) \
+                      $(wildcard ../lib/sdl2/src/hidapi/*.c) \
+                      $(wildcard ../lib/sdl2/src/hidapi/android/*.cpp) \
                       $(wildcard ../lib/sdl2/src/joystick/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/android/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/hidapi/*.c) \
                       $(wildcard ../lib/sdl2/src/joystick/virtual/*.c) \
+                      $(wildcard ../lib/sdl2/src/loadso/dlopen/*.c) \
                       $(wildcard ../lib/sdl2/src/locale/android/*.c) \
                       $(wildcard ../lib/sdl2/src/locale/*.c) \
-                      $(wildcard ../lib/sdl2/src/loadso/dlopen/*.c) \
                       $(wildcard ../lib/sdl2/src/misc/*.c) \
                       $(wildcard ../lib/sdl2/src/misc/android/*.c) \
                       $(wildcard ../lib/sdl2/src/power/*.c) \
@@ -297,7 +286,6 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/sdl2/src/*.c) \
                       $(wildcard ../lib/sdl2/src/video/yuv2rgb/*.c)
 LOCAL_CFLAGS       := -I../lib/sdl2/include/ -DGL_GLEXT_PROTOTYPES
 LOCAL_LDLIBS       := -ldl -lGLESv1_CM -lGLESv2 -lOpenSLES -llog -landroid
-LOCAL_SHARED_LIBRARIES := hidapi
 LOCAL_STATIC_LIBRARIES := cpufeatures
 
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)

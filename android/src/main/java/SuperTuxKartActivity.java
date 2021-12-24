@@ -288,7 +288,7 @@ public class SuperTuxKartActivity extends SDLActivity
     /* SDL manually dlopen main to allow unload after main thread exit. */
     protected String[] getLibraries()
     {
-        return new String[]{ "hidapi", "SDL2" };
+        return new String[]{ "SDL2" };
     }
     // ------------------------------------------------------------------------
     protected String getMainSharedObject()
