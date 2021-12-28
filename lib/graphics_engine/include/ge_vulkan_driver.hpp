@@ -199,7 +199,7 @@ namespace GE
 
         //! Only used by the internal engine. Used to notify the driver that
         //! the window was resized.
-        virtual void OnResize(const core::dimension2d<u32>& size) {}
+        virtual void OnResize(const core::dimension2d<u32>& size);
 
         //! Returns type of video driver
         virtual E_DRIVER_TYPE getDriverType() const { return video::EDT_VULKAN; }
@@ -263,6 +263,13 @@ namespace GE
         virtual void disableScissorTest() {}
 
     private:
+        struct SwapChainSupportDetails
+        {
+            VkSurfaceCapabilitiesKHR capabilities;
+            std::vector<VkSurfaceFormatKHR> formats;
+            std::vector<VkPresentModeKHR> presentModes;
+        };
+
         //! returns a device dependent texture from a software surface (IImage)
         //! THIS METHOD HAS TO BE OVERRIDDEN BY DERIVED DRIVERS WITH OWN TEXTURES
         virtual video::ITexture* createDeviceDependentTexture(IImage* surface, const io::path& name, void* mipmapData=0) { return NULL; }
@@ -294,29 +301,42 @@ namespace GE
             s32 userData = 0,
             E_GPU_SHADING_LANGUAGE shadingLang = EGSL_DEFAULT) { return 0; }
 
+        SIrrlichtCreationParameters m_params;
         // RAII to auto cleanup
         struct VK
         {
             VkInstance instance;
             VkSurfaceKHR surface;
             VkDevice device;
+            VkSwapchainKHR swap_chain;
+            std::vector<VkImage> swap_chain_images;
+            std::vector<VkImageView> swap_chain_image_views;
             VK()
             {
                 instance = VK_NULL_HANDLE;
                 surface = VK_NULL_HANDLE;
                 device = VK_NULL_HANDLE;
+                swap_chain = VK_NULL_HANDLE;
             }
             ~VK()
             {
+                for (VkImageView& image_view : swap_chain_image_views)
+                    vkDestroyImageView(device, image_view, NULL);
+                if (swap_chain != VK_NULL_HANDLE)
+                    vkDestroySwapchainKHR(device, swap_chain, NULL);
                 if (device != VK_NULL_HANDLE)
                     vkDestroyDevice(device, NULL);
                 if (surface != VK_NULL_HANDLE)
                     vkDestroySurfaceKHR(instance, surface, NULL);
                 if (instance != VK_NULL_HANDLE)
                     vkDestroyInstance(instance, NULL);
+                if (instance != VK_NULL_HANDLE)
+                    vkDestroyInstance(instance, NULL);
             }
         };
         VK m_vk;
+        VkFormat m_swap_chain_image_format;
+        VkExtent2D m_swap_chain_extent;
         VkPhysicalDevice m_physical_device;
         std::vector<const char*> m_device_extensions;
         VkSurfaceCapabilitiesKHR m_surface_capabilities;
@@ -339,6 +359,7 @@ namespace GE
                                       std::vector<VkSurfaceFormatKHR>* surface_formats,
                                       std::vector<VkPresentModeKHR>* present_modes);
         void createDevice();
+        void createSwapChain();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
     };
