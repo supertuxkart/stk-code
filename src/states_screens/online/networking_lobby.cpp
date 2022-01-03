@@ -177,7 +177,6 @@ void NetworkingLobby::init()
 
     m_server_configurable = false;
     m_player_names.clear();
-    m_allow_change_team = false;
     m_has_auto_start_in_server = false;
     m_client_live_joinable = false;
     m_addon_install = NULL;
@@ -803,7 +802,7 @@ void NetworkingLobby::eventCallback(Widget* widget, const std::string& name,
             return;
         new NetworkPlayerDialog(host_online_local_ids[0],
             host_online_local_ids[1], host_online_local_ids[2],
-            lp.m_user_name, lp.m_country_code, m_allow_change_team,
+            lp.m_user_name, lp.m_country_code, lp.m_kart_team != KART_TEAM_NONE,
             lp.m_handicap);
     }   // click on a user
     else if (name == m_send_button->m_properties[PROP_ID])
@@ -931,7 +930,6 @@ void NetworkingLobby::updatePlayers()
             icon_bank = NULL;
         }
         KartTeam cur_team = player.m_kart_team;
-        m_allow_change_team = cur_team != KART_TEAM_NONE;
         const std::string internal_name =
             StringUtils::toString(player.m_host_id) + "_" +
             StringUtils::toString(player.m_online_id) + "_" +

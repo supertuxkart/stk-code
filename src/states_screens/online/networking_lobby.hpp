@@ -82,7 +82,7 @@ private:
     int64_t m_cur_starting_timer;
     unsigned m_min_start_game_players;
 
-    bool m_allow_change_team, m_has_auto_start_in_server,
+    bool m_has_auto_start_in_server,
         m_server_configurable, m_client_live_joinable,
         m_reload_server_info;
 

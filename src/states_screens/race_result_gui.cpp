@@ -39,10 +39,10 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "io/file_manager.hpp"
-#include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/controller/end_controller.hpp"
 #include "karts/controller/local_player_controller.hpp"
+#include "karts/ghost_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
@@ -1986,14 +1986,20 @@ void RaceResultGUI::unload()
             core::stringw difficulty_two;
             if (RaceManager::get()->hasGhostKarts() && ReplayPlay::get()->isSecondReplayEnabled())
             {
-                unsigned idw = ReplayPlay::get()->getCurrentReplayFileIndex();
-                unsigned idx = ReplayPlay::get()->getSecondReplayFileIndex();
-                const ReplayPlay::ReplayData& rd1 = ReplayPlay::get()->getReplayData(idw);
-                const ReplayPlay::ReplayData& rd2 = ReplayPlay::get()->getReplayData(idx);
-                difficulty_one = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd1.m_difficulty);
-                difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd2.m_difficulty);
+                WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
+                for (unsigned k = 0; k < wwr->getNumKarts(); k++)
+                {
+                    GhostKart* gk = dynamic_cast<GhostKart*>(wwr->getKartAtPosition(k + 1));
+                    if (!gk)
+                        continue;
+                    const ReplayPlay::ReplayData& rd = gk->getReplayData();
+                    if (difficulty_one.empty())
+                        difficulty_one = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
+                    else if (difficulty_two.empty())
+                        difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
+                }
                 if (difficulty_one != difficulty_two)
-                    difficulty_name = difficulty_one +" / "+ difficulty_two;
+                    difficulty_name = difficulty_one + L" / " + difficulty_two;
                 else
                     difficulty_name = difficulty_one;
             }

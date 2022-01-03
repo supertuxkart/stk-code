@@ -39,7 +39,11 @@ if [ -z "$NDK_PATH" ]; then
     export NDK_PATH="$NDK_PATH_DEFAULT"
 fi
 
-NDK_PATH=$(realpath "$NDK_PATH")
+if [ -z "$STK_NDK_VERSION" ]; then
+    export STK_NDK_VERSION=23.1.7779620
+fi
+
+NDK_PATH="$(realpath "$NDK_PATH")/${STK_NDK_VERSION}"
 if [ ! -d "$NDK_PATH" ]; then
     echo "Error: Couldn't find $NDK_PATH directory. Please create a symlink" \
          "to your Android NDK installation in the $NDK_PATH_DEFAULT or set"  \

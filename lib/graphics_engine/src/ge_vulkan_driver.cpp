@@ -2,6 +2,7 @@
 
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "SDL_vulkan.h"
+#include <limits>
 #include <set>
 #include <sstream>
 #include <stdexcept>
@@ -437,7 +438,8 @@ namespace GE
 {
 GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                io::IFileSystem* io, SDL_Window* window)
-              : CNullDriver(io, core::dimension2d<u32>(0, 0))
+              : CNullDriver(io, core::dimension2d<u32>(0, 0)),
+                m_params(params)
 {
     m_physical_device = VK_NULL_HANDLE;
     m_graphics_queue = VK_NULL_HANDLE;
@@ -461,6 +463,11 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     if (SDL_Vulkan_CreateSurface(window, m_vk.instance, &m_vk.surface) == SDL_FALSE)
         throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
+    int w, h = 0;
+    SDL_Vulkan_GetDrawableSize(window, &w, &h);
+    ScreenSize.Width = w;
+    ScreenSize.Height = h;
+
     m_device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     findPhysicalDevice();
     createDevice();
@@ -476,6 +483,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 #endif
 
     vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
+    createSwapChain();
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
@@ -741,6 +749,157 @@ std::string GEVulkanDriver::getDriverVersionString() const
     }
     return driver_version.str();
 }   // getDriverVersionString
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createSwapChain()
+{
+    VkSurfaceFormatKHR surface_format = m_surface_formats[0];
+
+    if (m_surface_formats.size() == 1 &&
+        m_surface_formats[0].format == VK_FORMAT_UNDEFINED)
+    {
+        surface_format =
+        {
+            VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR
+        };
+    }
+    else
+    {
+        for (VkSurfaceFormatKHR& available_format : m_surface_formats)
+        {
+            if (available_format.format == VK_FORMAT_B8G8R8A8_UNORM &&
+                available_format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            {
+                surface_format = available_format;
+                break;
+            }
+        }
+    }
+
+    VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
+    if (m_params.SwapInterval == 0)
+    {
+        for (VkPresentModeKHR& available_mode : m_present_modes)
+        {
+            if (available_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+            {
+                present_mode = available_mode;
+                break;
+            }
+        }
+    }
+    else
+    {
+        for (VkPresentModeKHR& available_mode : m_present_modes)
+        {
+            if (available_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+            {
+                present_mode = available_mode;
+                break;
+            }
+        }
+    }
+
+    VkExtent2D image_extent = m_surface_capabilities.currentExtent;
+    if (m_surface_capabilities.currentExtent.width == std::numeric_limits<uint32_t>::max())
+    {
+        VkExtent2D max_extent = m_surface_capabilities.maxImageExtent;
+        VkExtent2D min_extent = m_surface_capabilities.minImageExtent;
+
+        VkExtent2D actual_extent =
+        {
+            std::max(
+                std::min(ScreenSize.Width, max_extent.width), min_extent.width),
+            std::max(
+                std::min(ScreenSize.Height, max_extent.height), min_extent.height)
+        };
+        image_extent = actual_extent;
+    }
+
+    // Try to get triple buffering by default
+    // https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
+    uint32_t swap_chain_images_count = m_surface_capabilities.minImageCount + 1;
+    if (m_surface_capabilities.maxImageCount > 0 &&
+        swap_chain_images_count > m_surface_capabilities.maxImageCount)
+    {
+        swap_chain_images_count = m_surface_capabilities.maxImageCount;
+    }
+
+    VkSwapchainCreateInfoKHR create_info = {};
+    create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    create_info.surface = m_vk.surface;
+    create_info.minImageCount = swap_chain_images_count;
+    create_info.imageFormat = surface_format.format;
+    create_info.imageColorSpace = surface_format.colorSpace;
+    create_info.imageExtent = image_extent;
+    create_info.imageArrayLayers = 1;
+    create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+
+    if (m_graphics_family != m_present_family)
+    {
+        uint32_t queueFamilyIndices[] =
+            { m_graphics_family, m_present_family };
+        create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        create_info.queueFamilyIndexCount = 2;
+        create_info.pQueueFamilyIndices = queueFamilyIndices;
+    }
+    else
+    {
+        create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    }
+
+    create_info.preTransform = m_surface_capabilities.currentTransform;
+    create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    create_info.presentMode = present_mode;
+    create_info.clipped = VK_TRUE;
+    create_info.oldSwapchain = VK_NULL_HANDLE;
+
+    VkResult result = vkCreateSwapchainKHR(m_vk.device, &create_info, NULL,
+        &m_vk.swap_chain);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkCreateSwapchainKHR failed");
+
+    vkGetSwapchainImagesKHR(m_vk.device, m_vk.swap_chain, &swap_chain_images_count, NULL);
+    m_vk.swap_chain_images.resize(swap_chain_images_count);
+    vkGetSwapchainImagesKHR(m_vk.device, m_vk.swap_chain, &swap_chain_images_count,
+        &m_vk.swap_chain_images[0]);
+
+    m_swap_chain_image_format = surface_format.format;
+    m_swap_chain_extent = image_extent;
+
+    for (unsigned int i = 0; i < m_vk.swap_chain_images.size(); i++)
+    {
+        VkImageViewCreateInfo create_info = {};
+        create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        create_info.image = m_vk.swap_chain_images[i];
+        create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        create_info.format = m_swap_chain_image_format;
+        create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+        create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        create_info.subresourceRange.baseMipLevel = 0;
+        create_info.subresourceRange.levelCount = 1;
+        create_info.subresourceRange.baseArrayLayer = 0;
+        create_info.subresourceRange.layerCount = 1;
+
+        VkImageView swap_chain_image_view = VK_NULL_HANDLE;
+        VkResult result = vkCreateImageView(m_vk.device, &create_info, NULL,
+            &swap_chain_image_view);
+
+        if (result != VK_SUCCESS)
+            throw std::runtime_error("vkCreateImageView failed");
+        m_vk.swap_chain_image_views.push_back(swap_chain_image_view);
+    }
+}   // createSwapChain
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)
+{
+    CNullDriver::OnResize(size);
+}   // OnResize
 
 }
 

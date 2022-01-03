@@ -2,7 +2,7 @@ buildscript
 {
     repositories
     {
-        jcenter()
+        mavenCentral()
         google()
     }
 
@@ -10,7 +10,8 @@ buildscript
     {
         // 4.1.2 is the minimum version to support native debug symbols file
         // https://developer.android.com/studio/build/shrink-code#android_gradle_plugin_version_41_or_later
-        classpath 'com.android.tools.build:gradle:4.1.2'
+        // 7.0.0 to fix https://stackoverflow.com/questions/68387270/android-studio-error-installed-build-tools-revision-31-0-0-is-corrupted
+        classpath 'com.android.tools.build:gradle:7.0.0'
     }
 }
 
@@ -18,7 +19,7 @@ allprojects
 {
     repositories
     {
-        jcenter()
+        mavenCentral()
         google()
     }
 }
@@ -27,8 +28,10 @@ apply plugin: 'com.android.application'
 
 android
 {
+    // buildToolsVersion is no longer needed https://developer.android.com/studio/releases/gradle-plugin.html#behavior_changes_1
+    // Quote:
+    // Build Tools 27.0.3 or higher. Keep in mind, you no longer need to specify a version for the build tools using the android.buildToolsVersion property—the plugin uses the minimum required version by default.
     compileSdkVersion compile_sdk_version.toInteger()
-    buildToolsVersion build_tools_ver
     ndkVersion ndk_version
     externalNativeBuild
     {
@@ -40,13 +43,14 @@ android
 
     defaultConfig
     {
-        minSdkVersion 16
-        targetSdkVersion 30
+        minSdkVersion min_sdk_version.toInteger()
+        targetSdkVersion target_sdk_version.toInteger()
         externalNativeBuild
         {
             ndkBuild
             {
-                arguments 'APP_PLATFORM=android-16', 'APP_STL=c++_static', cpu_core
+                def app_platform = "APP_PLATFORM=android-${min_sdk_version}"
+                arguments app_platform, 'APP_STL=c++_static', cpu_core
                 if (project.getProperty('compile_arch') == 'all')
                 {
                     abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'

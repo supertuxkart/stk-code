@@ -15,7 +15,17 @@ export NDK_BUILD_SCRIPT="$DIRNAME/Android.mk"
 #export NDK_CCACHE=ccache
 export CPU_CORE="-j$(($(nproc) + 1))"
 
-export COMPILE_SDK_VERSION=30
+if [ -z "$STK_MIN_ANDROID_SDK" ]; then
+    export STK_MIN_ANDROID_SDK=16
+fi
+
+if [ -z "$STK_TARGET_ANDROID_SDK" ]; then
+    export STK_TARGET_ANDROID_SDK=30
+fi
+
+if [ -z "$STK_NDK_VERSION" ]; then
+    export STK_NDK_VERSION=23.1.7779620
+fi
 
 export APP_NAME_RELEASE="SuperTuxKart"
 export PACKAGE_NAME_RELEASE="org.supertuxkart.stk"
@@ -129,7 +139,7 @@ if [ -z "$SDK_PATH" ]; then
     export SDK_PATH="$SDK_PATH_DEFAULT"
 fi
 
-NDK_PATH=$(realpath "$NDK_PATH")
+NDK_PATH="$(realpath "$NDK_PATH")/${STK_NDK_VERSION}"
 SDK_PATH=$(realpath "$SDK_PATH")
 
 if [ ! -d "$NDK_PATH" ]; then
@@ -189,6 +199,9 @@ if [ -z "$BUILD_TOOLS_VER" ] || [ ! -d "$SDK_PATH/build-tools/$BUILD_TOOLS_VER" 
     echo "Error: Couldn't detect build-tools version."
     exit
 fi
+
+BUILD_TOOLS_FULL=(${BUILD_TOOLS_VER//./ })
+export COMPILE_SDK_VERSION="${BUILD_TOOLS_FULL[0]}"
 
 # Set project version and code
 if [ -f "$DIRNAME/obj/project_version" ]; then
@@ -432,25 +445,27 @@ if [ -f "/usr/lib/jvm/java-8-openjdk-amd64/bin/java" ]; then
 fi
 
 export ANDROID_HOME="$SDK_PATH"
-./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
-          -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
-          -Pstorepass="$STK_STOREPASS"               \
-          -Pkeystore="$STK_KEYSTORE"                 \
-          -Palias="$STK_ALIAS"                       \
-          -Pndk_version="22.1.7171670"               \
-          -Pcompile_arch="$COMPILE_ARCH"             \
-          -Pcpu_core="$CPU_CORE"                     \
+./gradlew -Pcompile_sdk_version="$COMPILE_SDK_VERSION"   \
+          -Pmin_sdk_version="$STK_MIN_ANDROID_SDK"       \
+          -Ptarget_sdk_version="$STK_TARGET_ANDROID_SDK" \
+          -Pstorepass="$STK_STOREPASS"                   \
+          -Pkeystore="$STK_KEYSTORE"                     \
+          -Palias="$STK_ALIAS"                           \
+          -Pndk_version="$STK_NDK_VERSION"               \
+          -Pcompile_arch="$COMPILE_ARCH"                 \
+          -Pcpu_core="$CPU_CORE"                         \
           $GRADLE_BUILD_TYPE
 
 if [ "$GRADLE_BUILD_TYPE" = "assembleRelease" ]; then
-./gradlew -Pcompile_sdk_version=$COMPILE_SDK_VERSION \
-          -Pbuild_tools_ver="$BUILD_TOOLS_VER"       \
-          -Pstorepass="$STK_STOREPASS"               \
-          -Pkeystore="$STK_KEYSTORE"                 \
-          -Palias="$STK_ALIAS"                       \
-          -Pndk_version="22.1.7171670"               \
-          -Pcompile_arch="$COMPILE_ARCH"             \
-          -Pcpu_core="$CPU_CORE"                     \
+./gradlew -Pcompile_sdk_version="$COMPILE_SDK_VERSION"   \
+          -Pmin_sdk_version="$STK_MIN_ANDROID_SDK"       \
+          -Ptarget_sdk_version="$STK_TARGET_ANDROID_SDK" \
+          -Pstorepass="$STK_STOREPASS"                   \
+          -Pkeystore="$STK_KEYSTORE"                     \
+          -Palias="$STK_ALIAS"                           \
+          -Pndk_version="$STK_NDK_VERSION"               \
+          -Pcompile_arch="$COMPILE_ARCH"                 \
+          -Pcpu_core="$CPU_CORE"                         \
           "bundleRelease"
 fi
 

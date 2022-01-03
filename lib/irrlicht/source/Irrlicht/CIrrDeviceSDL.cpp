@@ -81,6 +81,9 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	// noparachute prevents SDL from catching fatal errors.
 	SDL_SetHint(SDL_HINT_NO_SIGNAL_HANDLERS, "1");
 	SDL_SetHint(SDL_HINT_ACCELEROMETER_AS_JOYSTICK, "0");
+#if SDL_VERSION_ATLEAST(2, 0, 18)
+	SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+#endif
 
 	// Switch SDL disables this hint by default: https://github.com/devkitPro/SDL/pull/55#issuecomment-633775255
 	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
