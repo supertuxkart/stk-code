@@ -63,7 +63,7 @@ directory will have following structure:
   > ...
 
 You also need Android SDK for android-26 platform or later (SDL2 requirement) and
-Android NDK. Version r22 is recommended, because it's known that it works
+Android NDK. Version r23 is recommended, because it's known that it works
 without issues. r24 or later is not compatible because it removes Android 4.1
 support (https://github.com/android/ndk/wiki/Changelog-r23#announcements)
 
@@ -91,11 +91,18 @@ to just run:
 
     export SDK_PATH=/path/to/your/android/sdk
     export NDK_PATH=/path/to/your/android/ndk
+    # Optional for STK_MIN_ANDROID_SDK, STK_TARGET_ANDROID_SDK and STK_NDK_VERSION
+    # If unset it will use the below values
+    export STK_MIN_ANDROID_SDK=16
+    export STK_TARGET_ANDROID_SDK=30
+    export STK_NDK_VERSION=23.1.7779620
     ./generate_assets.sh
     ./make_deps.sh
     ./make.sh
 
-
+You may need to add org.gradle.jvmargs=-XX:MaxHeapSize=2048m -Xmx2048m to
+.gradle/gradle.properties if you see java.lang.OutOfMemoryError / Java heap
+space execption error.
 
 --------------------------------------------------------------------------------
  ENVIRONMENT VARIABLES
@@ -114,7 +121,8 @@ BUILD_TOOLS_VER - Allows to override the SDK build-tools version.
 
 SDK_PATH        - Path to SDK directory
 
-NDK_PATH        - Path to NDK directory
+NDK_PATH        - Path to NDK directory, it should include a list of installed
+                  NDK version folders
 
 PROJECT_VERSION - Set Supertuxkart version number, for example "0.9.3" or 
                   "git20170409" or whatever. The version must match with file
