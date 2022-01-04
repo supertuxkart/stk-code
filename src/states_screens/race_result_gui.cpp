@@ -1982,9 +1982,11 @@ void RaceResultGUI::unload()
                     difficulty_name = difficulty_one;
 
                 //Left side difficulty display
-                int ax = m_width_kart_name + m_width_finish_time + 170;
-                const core::recti diff_ghost_one = core::recti(ax, 55, ax + 200, 75);
-                const core::recti diff_ghost_two = core::recti(ax, 115, ax + 200, 75);
+                RowInfo *ri = &(m_all_row_infos[0]);
+                int ax = ri->m_x_pos + m_width_icon + m_width_kart_name + m_width_finish_time + m_width_column_space + 20;
+                int ay = ri->m_y_pos;
+                const core::recti diff_ghost_one = core::recti(ax, ay, ax + 200, ay + 20);
+                const core::recti diff_ghost_two = core::recti(ax, ay*2 + 5, ax + 200, ay + 20);
                 m_font->draw(difficulty_one, diff_ghost_one, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
                 m_font->draw(difficulty_two, diff_ghost_two, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
             }
