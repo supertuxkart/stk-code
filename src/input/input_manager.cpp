@@ -49,6 +49,9 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/online/networking_lobby.hpp"
 #include "states_screens/options/options_screen_device.hpp"
+#ifdef MOBILE_STK
+#include "states_screens/race_gui_multitouch.hpp"
+#endif
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/string_utils.hpp"
@@ -810,6 +813,22 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
             Controller* controller = pk->getController();
             if (controller != NULL) controller->action(action, abs(value));
+#ifdef MOBILE_STK
+            if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+            {
+                if (UserConfigParams::m_multitouch_draw_gui &&
+                    irr_driver->getDevice()->isAccelerometerAvailable() &&
+                    World::getWorld() && World::getWorld()->getRaceGUI() &&
+                    World::getWorld()->getRaceGUI()->getMultitouchGUI() &&
+                    !World::getWorld()->getRaceGUI()->getMultitouchGUI()->isSpectatorMode() &&
+                    UserConfigParams::m_multitouch_controls != MULTITOUCH_CONTROLS_STEERING_WHEEL)
+                {
+                    // Disable accelerometer or gyroscope control if gamepad events trigger, see #4705
+                    UserConfigParams::m_multitouch_controls = MULTITOUCH_CONTROLS_STEERING_WHEEL;
+                    World::getWorld()->getRaceGUI()->recreateGUI();
+                }
+            }
+#endif
         }
         else if (RaceManager::get() &&
             RaceManager::get()->isWatchingReplay() && !GUIEngine::ModalDialog::isADialogActive() &&
