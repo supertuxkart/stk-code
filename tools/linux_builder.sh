@@ -631,7 +631,7 @@ create_package()
     echo "Compress package..."
     
     cd "$STK_INSTALL_DIR"
-    tar cf - "SuperTuxKart-$STK_VERSION-linux-$ARCH" | xz -z -e -f - > "SuperTuxKart-$STK_VERSION-linux-$ARCH.tar.xz"
+    tar cf - "SuperTuxKart-$STK_VERSION-linux-$ARCH" | xz -T$THREADS_NUMBER -z -e -f - > "SuperTuxKart-$STK_VERSION-linux-$ARCH.tar.xz"
     cd -
 }
 
