@@ -1962,6 +1962,7 @@ void RaceResultGUI::unload()
                 RaceManager::get()->getDifficultyName(RaceManager::get()->getDifficulty());
             core::stringw difficulty_one;
             core::stringw difficulty_two;
+            core::recti diff_ghost_one, diff_ghost_two;
             if (RaceManager::get()->hasGhostKarts() && ReplayPlay::get()->isSecondReplayEnabled())
             {
                 WorldWithRank* wwr = dynamic_cast<WorldWithRank*>(World::getWorld());
@@ -1972,21 +1973,32 @@ void RaceResultGUI::unload()
                         continue;
                     const ReplayPlay::ReplayData& rd = gk->getReplayData();
                     if (difficulty_one.empty())
+                    {
                         difficulty_one = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
+                        core::dimension2d<u32> dim_1 = m_font->getDimension(difficulty_one.c_str());
+                        RowInfo* ri_1 = &(m_all_row_infos[k]);
+                        diff_ghost_one.UpperLeftCorner.X = ri_1->m_x_pos + m_width_icon + m_width_kart_name + m_width_finish_time + m_width_column_space + 20;
+                        diff_ghost_one.UpperLeftCorner.Y = ri_1->m_y_pos;
+                        diff_ghost_one.LowerRightCorner.X = diff_ghost_one.UpperLeftCorner.X + dim_1.Width;
+                        diff_ghost_one.LowerRightCorner.Y = diff_ghost_one.UpperLeftCorner.Y + dim_1.Height;
+                    }
                     else if (difficulty_two.empty())
+                    {
                         difficulty_two = RaceManager::get()->getDifficultyName((RaceManager::Difficulty)rd.m_difficulty);
+                        core::dimension2d<u32> dim_2 = m_font->getDimension(difficulty_two.c_str());
+                        RowInfo* ri_2 = &(m_all_row_infos[k]);
+                        diff_ghost_two.UpperLeftCorner.X = ri_2->m_x_pos + m_width_icon + m_width_kart_name + m_width_finish_time + m_width_column_space + 20;
+                        diff_ghost_two.UpperLeftCorner.Y = ri_2->m_y_pos;
+                        diff_ghost_two.LowerRightCorner.X = diff_ghost_two.UpperLeftCorner.X + dim_2.Width;
+                        diff_ghost_two.LowerRightCorner.Y = diff_ghost_two.UpperLeftCorner.Y + dim_2.Height;
+                    }
                 }
                 if (difficulty_one != difficulty_two)
                     difficulty_name = difficulty_one + L" / " + difficulty_two;
                 else
                     difficulty_name = difficulty_one;
 
-                //Left side difficulty display
-                RowInfo *ri = &(m_all_row_infos[0]);
-                int ax = ri->m_x_pos + m_width_icon + m_width_kart_name + m_width_finish_time + m_width_column_space + 20;
-                int ay = ri->m_y_pos;
-                const core::recti diff_ghost_one = core::recti(ax, ay, ax + 200, ay + 20);
-                const core::recti diff_ghost_two = core::recti(ax, ay*2 + 5, ax + 200, ay + 20);
+                // Left side difficulty display
                 m_font->draw(difficulty_one, diff_ghost_one, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
                 m_font->draw(difficulty_two, diff_ghost_two, video::SColor(255, 255, 255, 255), false, false, nullptr, true);
             }
