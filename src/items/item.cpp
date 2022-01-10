@@ -116,11 +116,7 @@ void ItemState::initItem(ItemType type, const Vec3& xyz, const Vec3& normal)
 void ItemState::update(int ticks)
 {
     if (m_deactive_ticks > 0) m_deactive_ticks -= ticks;
-    if (m_ticks_till_return>0)
-    {
-        m_ticks_till_return -= ticks;
-    }   // if collected
-
+    m_ticks_till_return -= ticks;
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -430,7 +426,13 @@ void Item::updateGraphics(float dt)
             m_node->setRotation(hpr.toIrrHPR());
         }
         m_node->setVisible(true);
-        m_node->setScale(core::vector3df(1, 1, 1)*(1 - time_till_return));
+
+        float f = time_till_return, p = (1.0f - time_till_return);
+        float factor_v = sin(-13.0f * M_PI_2 * (p + 1.0f))
+                        * pow(2.0f, -10.0f * p) + 1.0f;
+        float factor_h = 1.0f - (f * f * f * f * f - f * f * f * sin(f * M_PI));
+
+        m_node->setScale(core::vector3df(factor_h, factor_v, factor_h));
     }
     if (isAvailable())
     {
