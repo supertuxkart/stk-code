@@ -458,6 +458,10 @@ void Item::updateGraphics(float dt)
                         * pow(2.0f, -10.0f * p) + 1.0f;
         float factor_h = 1.0f - (f * f * f * f * f - f * f * f * sin(f * M_PI));
 
+        // This will do a "bump" when items become available.
+        factor_v *= 0.8f;
+        factor_h *= 0.8f;
+
         m_node->setScale(core::vector3df(factor_h, factor_v, factor_h));
     }
     if (isAvailable())
