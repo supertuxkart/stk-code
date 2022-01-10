@@ -88,6 +88,10 @@ private:
      *  > 0 it means that the item is not available. */
     int m_ticks_till_return;
 
+    /** Time since the item either was last collected, if it isn't available, or
+     *  the time since the item last respawned, if it is available. */
+    int m_ticks_since_last_event;
+
     /** Index in item_manager field. This field can also take on a negative
      *  value when used in the NetworkItemManager. */
     int  m_item_id;
@@ -199,8 +203,9 @@ public:
     /** Resets an item to its start state. */
     virtual void reset()
     {
-        m_deactive_ticks    = 0;
-        m_ticks_till_return = 0;
+        m_deactive_ticks         = 0;
+        m_ticks_till_return      = 0;
+        m_ticks_since_last_event = 0;
         setDisappearCounter();
         // If the item was switched:
         if (m_original_type != ITEM_NONE)
@@ -262,6 +267,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this item is currently collected. */
     bool isAvailable() const { return m_ticks_till_return <= 0; }
+    // ------------------------------------------------------------------------
+    /** Returns the number of ticks since the last event (collection/respawn) */
+    int getTicksSinceLastEvent() const { return m_ticks_since_last_event; }
+    // ------------------------------------------------------------------------
+    /** Sets the number of ticks since the last event (collection/respawn) */
+    void setTicksSinceLastEvent(int t) { m_ticks_since_last_event = t; }
     // ------------------------------------------------------------------------
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
@@ -329,6 +340,9 @@ private:
 
     /** Graphical type of the mesh. */
     ItemType m_graphical_type;
+
+    /** Vector containing the sparks */
+    std::vector<scene::ISceneNode*> m_spark_nodes;
 
     /** Stores if the item was available in the previously rendered frame. */
     bool m_was_available_previously;

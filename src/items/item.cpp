@@ -38,6 +38,9 @@
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 
+const int SPARK_AMOUNT = 10;
+const float SPARK_SIZE = 0.4f;
+const float SPARK_SPEED_H = 1.0f;
 
 // ----------------------------------------------------------------------------
 /** Constructor.
@@ -66,6 +69,7 @@ ItemState::ItemState(const BareNetworkString& buffer)
     m_type = (ItemType)buffer.getUInt8();
     m_original_type = (ItemType)buffer.getUInt8();
     m_ticks_till_return = buffer.getUInt32();
+    m_ticks_since_last_event = buffer.getUInt32();
     m_item_id = buffer.getUInt32();
     m_deactive_ticks = buffer.getUInt32();
     m_used_up_counter = buffer.getUInt32();
@@ -100,10 +104,11 @@ void ItemState::setDisappearCounter()
  */
 void ItemState::initItem(ItemType type, const Vec3& xyz, const Vec3& normal)
 {
-    m_xyz               = xyz;
-    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
-    m_original_type     = ITEM_NONE;
-    m_ticks_till_return = 0;
+    m_xyz                    = xyz;
+    m_original_rotation      = shortestArcQuat(Vec3(0, 1, 0), normal);
+    m_original_type          = ITEM_NONE;
+    m_ticks_till_return      = 0;
+    m_ticks_since_last_event = 0;
     setDisappearCounter();
 }   // initItem
 
@@ -117,6 +122,8 @@ void ItemState::update(int ticks)
 {
     if (m_deactive_ticks > 0) m_deactive_ticks -= ticks;
     m_ticks_till_return -= ticks;
+
+    m_ticks_since_last_event += ticks;
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -125,6 +132,8 @@ void ItemState::update(int ticks)
  */
 void ItemState::collected(const AbstractKart *kart)
 {
+    m_ticks_since_last_event = 0;
+
     if (m_type == ITEM_EASTER_EGG)
     {
         // They will disappear 'forever'
@@ -187,9 +196,9 @@ Item::ItemType ItemState::getGrahpicalType() const
 void ItemState::saveCompleteState(BareNetworkString* buffer) const
 {
     buffer->addUInt8((uint8_t)m_type).addUInt8((uint8_t)m_original_type)
-        .addUInt32(m_ticks_till_return).addUInt32(m_item_id)
-        .addUInt32(m_deactive_ticks).addUInt32(m_used_up_counter)
-        .add(m_xyz).add(m_original_rotation)
+        .addUInt32(m_ticks_till_return).addUInt32(m_ticks_since_last_event)
+        .addUInt32(m_item_id).addUInt32(m_deactive_ticks)
+        .addUInt32(m_used_up_counter).add(m_xyz).add(m_original_rotation)
         .addUInt8(m_previous_owner ?
             (int8_t)m_previous_owner->getWorldKartId() : (int8_t)-1);
 }   // saveCompleteState
@@ -255,6 +264,20 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     hpr.setHPR(getOriginalRotation());
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
+
+    for (int n = 0; n < SPARK_AMOUNT; n++)
+    {
+        scene::ISceneNode* billboard =
+            irr_driver->addBillboard(core::dimension2df(SPARK_SIZE, SPARK_SIZE),
+                                     "item_spark.png", m_node);
+#ifdef DEBUG
+        billboard->setName("spark");
+#endif
+
+        billboard->setVisible(true);
+
+        m_spark_nodes.push_back(billboard);
+    }
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
 //-----------------------------------------------------------------------------
@@ -294,7 +317,6 @@ void Item::initItem(ItemType type, const Vec3 &xyz, const Vec3&normal)
         m_avoidance_points[0] = new Vec3(getXYZ() + delta);
         m_avoidance_points[1] = new Vec3(getXYZ() - delta);
     }
-
 }   // initItem
 
 //-----------------------------------------------------------------------------
@@ -333,6 +355,9 @@ Item::~Item()
 {
     if (m_node != NULL)
     {
+        for (auto* node : m_spark_nodes)
+            m_node->removeChild(node);
+
         irr_driver->removeNode(m_node);
         m_node->drop();
     }
@@ -407,6 +432,7 @@ void Item::updateGraphics(float dt)
         // This item is now available again - make sure it is not
         // scaled anymore.
         m_node->setScale(core::vector3df(1, 1, 1));
+        setTicksSinceLastEvent(0);
     }
 
     if (!isAvailable() && time_till_return <= 1.0f)
@@ -454,5 +480,37 @@ void Item::updateGraphics(float dt)
             hpr.setHPR(getOriginalRotation());
         m_node->setRotation(hpr.toIrrHPR());
     }   // if item is available
+
+    float time = stk_config->ticks2Time(getTicksSinceLastEvent());
+    for (size_t i = 0; i < SPARK_AMOUNT; i++)
+    {
+        float x = sin(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI)
+                    * time * SPARK_SPEED_H;
+        float y = isAvailable() ? (3.0f * time - 2.0f * time * time + 0.5f) :
+                                    (2.0f * time - time * time - 0.5f);
+        float z = cos(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI)
+                    * time * SPARK_SPEED_H;
+
+        m_spark_nodes[i]->setPosition(core::vector3df(x, y, z));
+
+        float factor = std::max(0.0f, 1.0f - time / 2.0f);
+
+        if (factor < 0.001f)
+        {
+            m_spark_nodes[i]->setVisible(false);
+        }
+        else
+        {
+            m_spark_nodes[i]->setVisible(true);
+
+            if (!isAvailable())
+                factor /= 2.0f;
+
+            ((scene::IBillboardSceneNode*)m_spark_nodes[i])
+                    ->setSize(core::dimension2df(factor * SPARK_SIZE,
+                                                 factor * SPARK_SIZE));
+        }
+    }
+
     m_was_available_previously = isAvailable();
 }   // updateGraphics
