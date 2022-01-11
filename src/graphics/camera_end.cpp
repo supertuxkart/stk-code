@@ -33,8 +33,24 @@ CameraEnd::CameraEnd(int camera_index, AbstractKart* kart)
     reset();
     if(m_end_cameras.size()>0)
         m_camera->setPosition(m_end_cameras[0].m_position.toIrrVector());
-    m_next_end_camera    = m_end_cameras.size()>1 ? 1 : 0;
     m_current_end_camera = 0;
+    if (m_end_cameras.size() > 1)
+    {
+        for (unsigned i = 0; i < m_end_cameras.size(); i++)
+        {
+            if (m_end_cameras[i].isReached(kart->getSmoothedXYZ()))
+            {
+                m_camera->setPosition(m_end_cameras[i].m_position.toIrrVector());
+                m_current_end_camera = i;
+                m_next_end_camera = i + 1;
+                if (m_next_end_camera >= (unsigned)m_end_cameras.size())
+                    m_next_end_camera = 0;
+                break;
+            }
+        }
+    }
+    else
+        m_next_end_camera = 0;
     setFoV();
     update(0);
 }   // Camera
