@@ -1,6 +1,7 @@
 #include "ge_vulkan_driver.hpp"
 
 #ifdef _IRR_COMPILE_WITH_VULKAN_
+const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
 #include "SDL_vulkan.h"
 #include <limits>
 #include <set>
@@ -484,6 +485,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
     createSwapChain();
+    createSyncObjects();
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
@@ -894,6 +896,51 @@ void GEVulkanDriver::createSwapChain()
         m_vk.swap_chain_image_views.push_back(swap_chain_image_view);
     }
 }   // createSwapChain
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createSyncObjects()
+{
+    VkSemaphoreCreateInfo semaphore_info = {};
+    semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkFenceCreateInfo fence_info = {};
+    fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    for (unsigned int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    {
+        VkSemaphore image_available_semaphore;
+        VkResult result = vkCreateSemaphore(m_vk.device, &semaphore_info, NULL,
+            &image_available_semaphore);
+
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error(
+                "vkCreateSemaphore on image_available_semaphore failed");
+        }
+
+        VkSemaphore render_finished_semaphore;
+        result = vkCreateSemaphore(m_vk.device, &semaphore_info, NULL,
+            &render_finished_semaphore);
+
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error(
+                "vkCreateSemaphore on render_finished_semaphore failed");
+        }
+
+        VkFence in_flight_fence;
+        result = vkCreateFence(m_vk.device, &fence_info, NULL,
+            &in_flight_fence);
+
+        if (result != VK_SUCCESS)
+            throw std::runtime_error("vkCreateFence failed");
+
+        m_vk.image_available_semaphores.push_back(image_available_semaphore);
+        m_vk.render_finished_semaphores.push_back(render_finished_semaphore);
+        m_vk.in_flight_fences.push_back(in_flight_fence);
+    }
+}   // createSyncObjects
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)

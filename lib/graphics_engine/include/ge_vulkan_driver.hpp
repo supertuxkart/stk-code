@@ -311,6 +311,9 @@ namespace GE
             VkSwapchainKHR swap_chain;
             std::vector<VkImage> swap_chain_images;
             std::vector<VkImageView> swap_chain_image_views;
+            std::vector<VkSemaphore> image_available_semaphores;
+            std::vector<VkSemaphore> render_finished_semaphores;
+            std::vector<VkFence> in_flight_fences;
             VK()
             {
                 instance = VK_NULL_HANDLE;
@@ -320,6 +323,12 @@ namespace GE
             }
             ~VK()
             {
+                for (VkSemaphore& semaphore : image_available_semaphores)
+                    vkDestroySemaphore(device, semaphore, NULL);
+                for (VkSemaphore& semaphore : render_finished_semaphores)
+                    vkDestroySemaphore(device, semaphore, NULL);
+                for (VkFence& fence : in_flight_fences)
+                    vkDestroyFence(device, fence, NULL);
                 for (VkImageView& image_view : swap_chain_image_views)
                     vkDestroyImageView(device, image_view, NULL);
                 if (swap_chain != VK_NULL_HANDLE)
@@ -360,6 +369,7 @@ namespace GE
                                       std::vector<VkPresentModeKHR>* present_modes);
         void createDevice();
         void createSwapChain();
+        void createSyncObjects();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
     };
