@@ -486,6 +486,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
     createSwapChain();
     createSyncObjects();
+    createCommandPool();
+    createCommandBuffers();
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
@@ -941,6 +943,40 @@ void GEVulkanDriver::createSyncObjects()
         m_vk.in_flight_fences.push_back(in_flight_fence);
     }
 }   // createSyncObjects
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createCommandPool()
+{
+    VkCommandPoolCreateInfo pool_info = {};
+    pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    pool_info.queueFamilyIndex = m_graphics_family;
+
+    VkResult result = vkCreateCommandPool(m_vk.device, &pool_info, NULL,
+        &m_vk.command_pool);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkCreateCommandPool failed");
+}   // createCommandPool
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createCommandBuffers()
+{
+    std::vector<VkCommandBuffer> buffers(m_vk.swap_chain_images.size());
+
+    VkCommandBufferAllocateInfo alloc_info = {};
+    alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    alloc_info.commandPool = m_vk.command_pool;
+    alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    alloc_info.commandBufferCount = (uint32_t)buffers.size();
+
+    VkResult result = vkAllocateCommandBuffers(m_vk.device, &alloc_info,
+        &buffers[0]);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkAllocateCommandBuffers failed");
+
+    m_vk.command_buffers = buffers;
+}   // createCommandBuffers
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)

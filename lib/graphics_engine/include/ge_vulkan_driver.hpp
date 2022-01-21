@@ -314,15 +314,26 @@ namespace GE
             std::vector<VkSemaphore> image_available_semaphores;
             std::vector<VkSemaphore> render_finished_semaphores;
             std::vector<VkFence> in_flight_fences;
+            VkCommandPool command_pool;
+            std::vector<VkCommandBuffer> command_buffers;
             VK()
             {
                 instance = VK_NULL_HANDLE;
                 surface = VK_NULL_HANDLE;
                 device = VK_NULL_HANDLE;
                 swap_chain = VK_NULL_HANDLE;
+                command_pool = VK_NULL_HANDLE;
             }
             ~VK()
             {
+                if (!command_buffers.empty())
+                {
+                    vkFreeCommandBuffers(device, command_pool,
+                        (uint32_t)(command_buffers.size()),
+                        &command_buffers[0]);
+                }
+                if (command_pool != VK_NULL_HANDLE)
+                    vkDestroyCommandPool(device, command_pool, NULL);
                 for (VkSemaphore& semaphore : image_available_semaphores)
                     vkDestroySemaphore(device, semaphore, NULL);
                 for (VkSemaphore& semaphore : render_finished_semaphores)
@@ -370,6 +381,8 @@ namespace GE
         void createDevice();
         void createSwapChain();
         void createSyncObjects();
+        void createCommandPool();
+        void createCommandBuffers();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
     };
