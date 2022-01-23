@@ -480,20 +480,6 @@ void Item::updateGraphics(float dt)
 
     if (!isAvailable() && time_till_return <= 1.0f)
     {
-        // Make it visible by scaling it from 0 to 1:
-        /*if (rotating())
-        {
-            float angle =
-                fmodf((float)(World::getWorld()->getTicksSinceStart() +
-                getTicksTillReturn()) / 40.0f, M_PI * 2);
-            btMatrix3x3 m;
-            m.setRotation(getOriginalRotation());
-            btQuaternion r = btQuaternion(m.getColumn(1), angle) *
-                getOriginalRotation();
-            Vec3 hpr;
-            hpr.setHPR(r);
-            m_node->setRotation(hpr.toIrrHPR());
-        }*/
         m_node->setVisible(true);
 
         // Make it de facto invisible, but the model needs to be visible for
