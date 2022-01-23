@@ -488,6 +488,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     createSyncObjects();
     createCommandPool();
     createCommandBuffers();
+    createSamplers();
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
@@ -977,6 +978,34 @@ void GEVulkanDriver::createCommandBuffers()
 
     m_vk.command_buffers = buffers;
 }   // createCommandBuffers
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createSamplers()
+{
+    VkSampler sampler = VK_NULL_HANDLE;
+    bool supported_anisotropy = m_features.samplerAnisotropy == VK_TRUE;
+    // GVS_NEAREST
+    VkSamplerCreateInfo sampler_info = {};
+    sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+    sampler_info.magFilter = VK_FILTER_NEAREST;
+    sampler_info.minFilter = VK_FILTER_NEAREST;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.anisotropyEnable = supported_anisotropy;
+    sampler_info.maxAnisotropy = 1.0;
+    sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    sampler_info.unnormalizedCoordinates = VK_FALSE;
+    sampler_info.compareEnable = VK_FALSE;
+    sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    VkResult result = vkCreateSampler(m_vk.device, &sampler_info, NULL,
+        &sampler);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkCreateSampler failed for GVS_NEAREST");
+    m_vk.samplers[GVS_NEAREST] = sampler;
+}   // createSamplers
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)

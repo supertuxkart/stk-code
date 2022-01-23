@@ -11,6 +11,7 @@
 #include "../source/Irrlicht/CNullDriver.h"
 #include "SIrrCreationParameters.h"
 #include "SColor.h"
+#include <map>
 #include <string>
 #include <vector>
 
@@ -19,6 +20,11 @@ using namespace video;
 
 namespace GE
 {
+    enum GEVulkanSampler : unsigned
+    {
+        GVS_MIN,
+        GVS_NEAREST = GVS_MIN
+    };
     class GEVulkanDriver : public video::CNullDriver
     {
     public:
@@ -261,6 +267,12 @@ namespace GE
 
         virtual void enableScissorTest(const core::rect<s32>& r) {}
         virtual void disableScissorTest() {}
+        VkSampler getSampler(GEVulkanSampler s) const
+        {
+            if (m_vk.samplers.find(s) == m_vk.samplers.end())
+                return VK_NULL_HANDLE;
+            return m_vk.samplers.at(s);
+        }
 
     private:
         struct SwapChainSupportDetails
@@ -316,6 +328,7 @@ namespace GE
             std::vector<VkFence> in_flight_fences;
             VkCommandPool command_pool;
             std::vector<VkCommandBuffer> command_buffers;
+            std::map<GEVulkanSampler, VkSampler> samplers;
             VK()
             {
                 instance = VK_NULL_HANDLE;
@@ -326,6 +339,8 @@ namespace GE
             }
             ~VK()
             {
+                for (auto& sampler : samplers)
+                    vkDestroySampler(device, sampler.second, NULL);
                 if (!command_buffers.empty())
                 {
                     vkFreeCommandBuffers(device, command_pool,
@@ -383,6 +398,7 @@ namespace GE
         void createSyncObjects();
         void createCommandPool();
         void createCommandBuffers();
+        void createSamplers();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
     };
