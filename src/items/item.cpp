@@ -532,7 +532,7 @@ void Item::updateGraphics(float dt)
         float t = time_since_return + 0.5f;
         float t2 = time_since_return + 1.0f;
 
-        float node_angle =
+        float node_angle = !rotating() ? 0.0f :
                 fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
                 M_PI * 2);
 
