@@ -90,7 +90,7 @@ private:
 
     /** Time since the item either was last collected, if it isn't available, or
      *  the time since the item last respawned, if it is available. */
-    int m_ticks_since_last_event;
+    int m_ticks_since_return;
 
     /** Index in item_manager field. This field can also take on a negative
      *  value when used in the NetworkItemManager. */
@@ -205,7 +205,7 @@ public:
     {
         m_deactive_ticks         = 0;
         m_ticks_till_return      = 0;
-        m_ticks_since_last_event = 0;
+        m_ticks_since_return = 0;
         setDisappearCounter();
         // If the item was switched:
         if (m_original_type != ITEM_NONE)
@@ -269,10 +269,10 @@ public:
     bool isAvailable() const { return m_ticks_till_return <= 0; }
     // ------------------------------------------------------------------------
     /** Returns the number of ticks since the last event (collection/respawn) */
-    int getTicksSinceLastEvent() const { return m_ticks_since_last_event; }
+    int getTicksSinceReturn() const { return m_ticks_since_return; }
     // ------------------------------------------------------------------------
     /** Sets the number of ticks since the last event (collection/respawn) */
-    void setTicksSinceLastEvent(int t) { m_ticks_since_last_event = t; }
+    void setTicksSinceReturn(int t) { m_ticks_since_return = t; }
     // ------------------------------------------------------------------------
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
@@ -344,6 +344,9 @@ private:
     /** Vector containing the sparks */
     std::vector<scene::ISceneNode*> m_spark_nodes;
 
+    /** Billboard that shows when the item is about to respawn */
+    scene::ISceneNode* m_icon_node;
+
     /** Stores if the item was available in the previously rendered frame. */
     bool m_was_available_previously;
 
@@ -369,7 +372,7 @@ private:
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                        scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-                       const AbstractKart *owner);
+                       const std::string& icon, const AbstractKart *owner);
     virtual       ~Item ();
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset() OVERRIDE;
