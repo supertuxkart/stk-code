@@ -47,6 +47,7 @@
 std::vector<scene::IMesh *>  ItemManager::m_item_mesh;
 std::vector<scene::IMesh *>  ItemManager::m_item_lowres_mesh;
 std::vector<video::SColorf>  ItemManager::m_glow_color;
+std::vector<std::string>     ItemManager::m_icon;
 bool                         ItemManager::m_disable_item_collection = false;
 std::mt19937                 ItemManager::m_random_engine;
 uint32_t                     ItemManager::m_random_seed = 0;
@@ -59,9 +60,11 @@ void ItemManager::loadDefaultItemMeshes()
     m_item_mesh.clear();
     m_item_lowres_mesh.clear();
     m_glow_color.clear();
+    m_icon.clear();
     m_item_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
     m_glow_color.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1,
                         video::SColorf(255.0f, 255.0f, 255.0f) );
+    m_icon.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, "");
 
     m_item_lowres_mesh.resize(ItemState::ITEM_LAST-ItemState::ITEM_FIRST+1, NULL);
 
@@ -113,6 +116,7 @@ void ItemManager::loadDefaultItemMeshes()
 #endif
             m_item_lowres_mesh[i]->grab();
         }
+        m_icon[i] = "icon-" + item_names[(ItemState::ItemType)i] + ".png";
     }   // for i
     delete root;
 }   // loadDefaultItemMeshes
@@ -297,7 +301,8 @@ Item* ItemManager::dropNewItem(ItemState::ItemType type,
     }
 
     Item* item = new Item(type, pos, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type], /*prev_owner*/kart);
+                          m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
+                          /*prev_owner*/kart);
 
     // restoreState in NetworkItemManager will handle the insert item
     if (!server_xyz)
@@ -329,7 +334,8 @@ Item* ItemManager::placeItem(ItemState::ItemType type, const Vec3& xyz,
     ItemState::ItemType mesh_type = type;
 
     Item* item = new Item(type, xyz, normal, m_item_mesh[mesh_type],
-                          m_item_lowres_mesh[mesh_type], /*prev_owner*/NULL);
+                          m_item_lowres_mesh[mesh_type], m_icon[mesh_type],
+                          /*prev_owner*/NULL);
 
     insertItem(item);
     if (m_switch_ticks >= 0)

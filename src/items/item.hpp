@@ -330,6 +330,12 @@ private:
     /** Graphical type of the mesh. */
     ItemType m_graphical_type;
 
+    /** Vector containing the sparks */
+    std::vector<scene::ISceneNode*> m_spark_nodes;
+
+    /** Billboard that shows when the item is about to respawn */
+    scene::ISceneNode* m_icon_node;
+
     /** Stores if the item was available in the previously rendered frame. */
     bool m_was_available_previously;
 
@@ -344,6 +350,9 @@ private:
      *  is not on any quad. */
     float m_distance_from_center;
 
+    /** Time ticks since the item last respawned */
+    int m_animation_start_ticks;
+
     /** The closest point to the left and right of this item at which it
      *  would not be collected. Used by the AI to avoid items. */
     Vec3 *m_avoidance_points[2];
@@ -355,7 +364,7 @@ private:
 public:
                   Item(ItemType type, const Vec3& xyz, const Vec3& normal,
                        scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-                       const AbstractKart *owner);
+                       const std::string& icon, const AbstractKart *owner);
     virtual       ~Item ();
     virtual void  updateGraphics(float dt) OVERRIDE;
     virtual void  reset() OVERRIDE;

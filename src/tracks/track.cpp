@@ -2904,7 +2904,7 @@ void Track::copyFromMainProcess()
     {
         ItemState* it = m_item_manager->getItem(i);
         nim->insertItem(new Item(it->getType(), it->getXYZ(), it->getNormal(),
-            NULL/*mesh*/, NULL/*lowres_mesh*/, NULL/*owner*/));
+            NULL/*mesh*/, NULL/*lowres_mesh*/, "", NULL/*owner*/));
     }
     m_item_manager = nim;
 }   // copyFromMainProcess

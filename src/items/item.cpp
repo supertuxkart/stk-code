@@ -19,6 +19,7 @@
 
 #include "items/item.hpp"
 
+#include "SColor.h"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/sp/sp_mesh.hpp"
@@ -38,6 +39,10 @@
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 
+const float ICON_SIZE = 0.7f;
+const int SPARK_AMOUNT = 10;
+const float SPARK_SIZE = 0.4f;
+const float SPARK_SPEED_H = 1.0f;
 
 // ----------------------------------------------------------------------------
 /** Constructor.
@@ -52,8 +57,8 @@ ItemState::ItemState(ItemType type, const AbstractKart *owner, int id)
     m_item_id = id;
     m_previous_owner = owner;
     m_used_up_counter = -1;
-     if (owner)
-         setDeactivatedTicks(stk_config->time2Ticks(1.5f));
+    if (owner)
+        setDeactivatedTicks(stk_config->time2Ticks(1.5f));
     else
         setDeactivatedTicks(0);
 }   // ItemState(ItemType)
@@ -212,9 +217,10 @@ void ItemState::saveCompleteState(BareNetworkString* buffer) const
  */
 Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            scene::IMesh* mesh, scene::IMesh* lowres_mesh,
-           const AbstractKart *owner)
+           const std::string& icon, const AbstractKart *owner)
     : ItemState(type, owner)
 {
+    m_icon_node = NULL;
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
@@ -259,6 +265,31 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
     hpr.setHPR(getOriginalRotation());
     m_node->setRotation(hpr.toIrrHPR());
     m_node->grab();
+
+    for (int n = 0; n < SPARK_AMOUNT; n++)
+    {
+        scene::ISceneNode* billboard =
+            irr_driver->addBillboard(core::dimension2df(SPARK_SIZE, SPARK_SIZE),
+                                     "item_spark.png", m_node);
+#ifdef DEBUG
+        billboard->setName("spark");
+#endif
+
+        billboard->setVisible(true);
+
+        m_spark_nodes.push_back(billboard);
+    }
+
+    if (!icon.empty())
+    {
+        m_icon_node = irr_driver->addBillboard(core::dimension2df(1.0f, 1.0f),
+                                        icon, m_node);
+
+        m_icon_node->setPosition(core::vector3df(0.0f, 0.5f, 0.0f));
+        m_icon_node->setVisible(false);
+        ((scene::IBillboardSceneNode*)m_icon_node)
+            ->setColor(ItemManager::getGlowColor(type).toSColor());
+    }
 }   // Item(type, xyz, normal, mesh, lowres_mesh)
 
 //-----------------------------------------------------------------------------
@@ -337,6 +368,11 @@ Item::~Item()
 {
     if (m_node != NULL)
     {
+        for (auto* node : m_spark_nodes)
+            m_node->removeChild(node);
+        if (m_icon_node)
+            m_node->removeChild(m_icon_node);
+
         irr_driver->removeNode(m_node);
         m_node->drop();
     }
@@ -352,6 +388,7 @@ Item::~Item()
 void Item::reset()
 {
     m_was_available_previously = true;
+    m_animation_start_ticks = 0;
     ItemState::reset();
 
     if (m_node != NULL)
@@ -379,6 +416,21 @@ void Item::handleNewMesh(ItemType type)
     Vec3 hpr;
     hpr.setHPR(getOriginalRotation());
     m_node->setRotation(hpr.toIrrHPR());
+
+    if (m_icon_node)
+        m_node->removeChild(m_icon_node);
+    auto icon = ItemManager::getIcon(type);
+    
+    if (!icon.empty())
+    {
+        m_icon_node = irr_driver->addBillboard(core::dimension2df(1.0f, 1.0f),
+                                        icon, m_node);
+
+        m_icon_node->setPosition(core::vector3df(0.0f, 0.5f, 0.0f));
+        m_icon_node->setVisible(false);
+        ((scene::IBillboardSceneNode*)m_icon_node)
+            ->setColor(ItemManager::getGlowColor(type).toSColor());
+    }
 #endif
 }   // handleNewMesh
 
@@ -408,29 +460,37 @@ void Item::updateGraphics(float dt)
 
     if (!m_was_available_previously && isAvailable())
     {
-        // This item is now available again - make sure it is not
-        // scaled anymore.
-        m_node->setScale(core::vector3df(1, 1, 1));
+        // Play animation when item respawns
+        m_node->setScale(core::vector3df(0, 0, 0));
+        m_animation_start_ticks = World::getWorld()->getTicksSinceStart();
+    }
+
+    float time_since_return = stk_config->ticks2Time(
+        World::getWorld()->getTicksSinceStart() - m_animation_start_ticks);
+
+    if (isAvailable() && time_since_return <= 1.0f)
+    {
+        float p = time_since_return, f = (1.0f - time_since_return);
+        float factor_v = sin(-13.0f * M_PI_2 * (p + 1.0f))
+                        * pow(2.0f, -10.0f * p) + 1.0f;
+        float factor_h = 1.0f - (f * f * f * f * f - f * f * f * sin(f * M_PI));
+
+        m_node->setScale(core::vector3df(factor_h, factor_v, factor_h));
+    }
+
+    if (isAvailable() && time_since_return > 1.0f)
+    {
+        // Ensure the model has the wanted scale
+        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
     }
 
     if (!isAvailable() && time_till_return <= 1.0f)
     {
-        // Make it visible by scaling it from 0 to 1:
-        if (rotating())
-        {
-            float angle =
-                fmodf((float)(World::getWorld()->getTicksSinceStart() +
-                getTicksTillReturn()) / 40.0f, M_PI * 2);
-            btMatrix3x3 m;
-            m.setRotation(getOriginalRotation());
-            btQuaternion r = btQuaternion(m.getColumn(1), angle) *
-                getOriginalRotation();
-            Vec3 hpr;
-            hpr.setHPR(r);
-            m_node->setRotation(hpr.toIrrHPR());
-        }
         m_node->setVisible(true);
-        m_node->setScale(core::vector3df(1, 1, 1)*(1 - time_till_return));
+
+        // Make it de facto invisible, but the model needs to be visible for
+        // particles to show
+        m_node->setScale(core::vector3df(0.0f, 1.0f, 0.0f));
     }
     if (isAvailable())
     {
@@ -452,5 +512,63 @@ void Item::updateGraphics(float dt)
             hpr.setHPR(getOriginalRotation());
         m_node->setRotation(hpr.toIrrHPR());
     }   // if item is available
+
+    for (size_t i = 0; i < SPARK_AMOUNT; i++)
+    {
+        if (time_since_return >= 1.0f)
+        {
+            m_spark_nodes[i]->setVisible(false);
+            continue;
+        }
+
+        float t = time_since_return + 0.5f;
+        float t2 = time_since_return + 1.0f;
+
+        float node_angle = !rotating() ? 0.0f :
+                fmodf((float)World::getWorld()->getTicksSinceStart() / 40.0f,
+                M_PI * 2);
+
+        float x = sin(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI - node_angle)
+                    * t * SPARK_SPEED_H;
+        float y = 2.0f * t2 - t2 * t2 - 0.5f;
+        float z = cos(float(i) / float(SPARK_AMOUNT) * 2.0f * M_PI - node_angle)
+                    * t * SPARK_SPEED_H;
+
+        m_spark_nodes[i]->setPosition(core::vector3df(x, y, z));
+
+        float factor = std::max(0.0f, 1.0f - t / 2.0f);
+
+        if (factor < 0.001f)
+        {
+            m_spark_nodes[i]->setVisible(false);
+        }
+        else
+        {
+            m_spark_nodes[i]->setVisible(true);
+
+            ((scene::IBillboardSceneNode*)m_spark_nodes[i])
+                    ->setSize(core::dimension2df(factor * SPARK_SIZE,
+                                                 factor * SPARK_SIZE));
+        }
+    }
+
+    if (m_icon_node)
+    {
+        if (!isAvailable() && time_till_return <= 1.0f)
+        {
+            m_icon_node->setVisible(true);
+            float size = 1.0f / (pow(6.0f, -time_till_return - 0.2f) *
+                        (-time_till_return - 0.2f)) + 7.0f;
+
+            ((scene::IBillboardSceneNode*)m_icon_node)
+                    ->setSize(core::dimension2df(size * ICON_SIZE,
+                                                 size * ICON_SIZE));
+        }
+        else
+        {
+            m_icon_node->setVisible(false);
+        }
+    }
+
     m_was_available_previously = isAvailable();
 }   // updateGraphics
