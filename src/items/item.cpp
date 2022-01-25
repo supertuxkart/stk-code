@@ -105,11 +105,10 @@ void ItemState::setDisappearCounter()
  */
 void ItemState::initItem(ItemType type, const Vec3& xyz, const Vec3& normal)
 {
-    m_xyz                    = xyz;
-    m_original_rotation      = shortestArcQuat(Vec3(0, 1, 0), normal);
-    m_original_type          = ITEM_NONE;
-    m_ticks_till_return      = 0;
-    m_ticks_since_return     = 0;
+    m_xyz               = xyz;
+    m_original_rotation = shortestArcQuat(Vec3(0, 1, 0), normal);
+    m_original_type     = ITEM_NONE;
+    m_ticks_till_return = 0;
     setDisappearCounter();
 }   // initItem
 
@@ -122,9 +121,11 @@ void ItemState::initItem(ItemType type, const Vec3& xyz, const Vec3& normal)
 void ItemState::update(int ticks)
 {
     if (m_deactive_ticks > 0) m_deactive_ticks -= ticks;
-    m_ticks_till_return -= ticks;
+    if (m_ticks_till_return>0)
+    {
+        m_ticks_till_return -= ticks;
+    }   // if collected
 
-    m_ticks_since_return += ticks;
 }   // update
 
 // ----------------------------------------------------------------------------
@@ -196,8 +197,9 @@ void ItemState::saveCompleteState(BareNetworkString* buffer) const
 {
     buffer->addUInt8((uint8_t)m_type).addUInt8((uint8_t)m_original_type)
         .addUInt32(m_ticks_till_return).addUInt32(m_item_id)
-        .addUInt32(m_deactive_ticks).addUInt32(m_used_up_counter).add(m_xyz)
-        .add(m_original_rotation).addUInt8(m_previous_owner ?
+        .addUInt32(m_deactive_ticks).addUInt32(m_used_up_counter)
+        .add(m_xyz).add(m_original_rotation)
+        .addUInt8(m_previous_owner ?
             (int8_t)m_previous_owner->getWorldKartId() : (int8_t)-1);
 }   // saveCompleteState
 
@@ -326,6 +328,7 @@ void Item::initItem(ItemType type, const Vec3 &xyz, const Vec3&normal)
         m_avoidance_points[0] = new Vec3(getXYZ() + delta);
         m_avoidance_points[1] = new Vec3(getXYZ() - delta);
     }
+
 }   // initItem
 
 //-----------------------------------------------------------------------------
@@ -384,6 +387,7 @@ Item::~Item()
 void Item::reset()
 {
     m_was_available_previously = true;
+    m_animation_start_ticks = 0;
     ItemState::reset();
 
     if (m_node != NULL)
@@ -457,10 +461,11 @@ void Item::updateGraphics(float dt)
     {
         // Play animation when item respawns
         m_node->setScale(core::vector3df(0, 0, 0));
-        setTicksSinceReturn(0);
+        m_animation_start_ticks = World::getWorld()->getTicksSinceStart();
     }
 
-    float time_since_return = stk_config->ticks2Time(getTicksSinceReturn());
+    float time_since_return = stk_config->ticks2Time(
+        World::getWorld()->getTicksSinceStart() - m_animation_start_ticks);
 
     if (isAvailable() && time_since_return <= 1.0f)
     {

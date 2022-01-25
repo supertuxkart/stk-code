@@ -88,10 +88,6 @@ private:
      *  > 0 it means that the item is not available. */
     int m_ticks_till_return;
 
-    /** Time since the item either was last collected, if it isn't available, or
-     *  the time since the item last respawned, if it is available. */
-    int m_ticks_since_return;
-
     /** Index in item_manager field. This field can also take on a negative
      *  value when used in the NetworkItemManager. */
     int  m_item_id;
@@ -203,9 +199,8 @@ public:
     /** Resets an item to its start state. */
     virtual void reset()
     {
-        m_deactive_ticks         = 0;
-        m_ticks_till_return      = 0;
-        m_ticks_since_return = 0;
+        m_deactive_ticks    = 0;
+        m_ticks_till_return = 0;
         setDisappearCounter();
         // If the item was switched:
         if (m_original_type != ITEM_NONE)
@@ -267,12 +262,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if this item is currently collected. */
     bool isAvailable() const { return m_ticks_till_return <= 0; }
-    // ------------------------------------------------------------------------
-    /** Returns the number of ticks since the last event (collection/respawn) */
-    int getTicksSinceReturn() const { return m_ticks_since_return; }
-    // ------------------------------------------------------------------------
-    /** Sets the number of ticks since the last event (collection/respawn) */
-    void setTicksSinceReturn(int t) { m_ticks_since_return = t; }
     // ------------------------------------------------------------------------
     /** Returns the type of this item. */
     ItemType getType() const { return m_type; }
@@ -360,6 +349,11 @@ private:
      *  >0 if it is to the right of the center, and undefined if this quad
      *  is not on any quad. */
     float m_distance_from_center;
+
+    /** Time ticks when the item either was last collected, if it isn't
+     *  available, or the time since the item last respawned, if it is
+     *  available. */
+    int m_animation_start_ticks;
 
     /** The closest point to the left and right of this item at which it
      *  would not be collected. Used by the AI to avoid items. */
