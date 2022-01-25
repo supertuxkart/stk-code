@@ -350,9 +350,7 @@ private:
      *  is not on any quad. */
     float m_distance_from_center;
 
-    /** Time ticks when the item either was last collected, if it isn't
-     *  available, or the time since the item last respawned, if it is
-     *  available. */
+    /** Time ticks since the item last respawned */
     int m_animation_start_ticks;
 
     /** The closest point to the left and right of this item at which it
