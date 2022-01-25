@@ -3,6 +3,7 @@
     <tipset id="general">
         <tip text="The UI skin can be changed in the UI options."/>
         <tip text="You can see other karts' powerups by enabling it in the UI options."/>
+        <tip text="You can see exactly how fast your kart is travelling at by enabling it in the UI options."/>
         <tip text="The font size can be changed in the UI options."/>
         <tip text="The help menu has lots of useful information."/>
         <tip text="In single-player, you can watch and challenge recorded time-trials."/>

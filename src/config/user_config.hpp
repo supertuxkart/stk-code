@@ -1215,6 +1215,10 @@ namespace UserConfigParams
         PARAM_DEFAULT(IntUserConfigParam(0, "minimap_display",
                       "Minimap: 0 bottom-left, 1 middle-right, 2 hidden, 3 center"));
 
+    PARAM_PREFIX BoolUserConfigParam       m_digital_speedometer
+            PARAM_DEFAULT(BoolUserConfigParam(false, "digital_speedometer",
+                                             "Whether to show a digital speedometer on top of the current one, showing speed in km/h and m/s."));
+
     // ---- Settings for spectator camera
     PARAM_PREFIX GroupUserConfigParam       m_spectator
             PARAM_DEFAULT( GroupUserConfigParam("Spectator",
