@@ -367,7 +367,7 @@ void RegisterScreen::doRegister()
     }
     else if (namecheck)
     {
-        m_info_widget->setText(_("Online username can only contain alphanumeric characters, periods, dashes and underscores!"), false);
+        m_info_widget->setText(_("Online username can only contain alphanumeric (ASCII) characters, periods, dashes and underscores!"), false);
     }
     else if (username.size() < 3 || username.size() > 30)
     {
