@@ -220,6 +220,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
            const std::string& icon, const AbstractKart *owner)
     : ItemState(type, owner)
 {
+    m_icon_node = NULL;
     m_was_available_previously = true;
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
