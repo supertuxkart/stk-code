@@ -222,6 +222,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     m_icon_node = NULL;
     m_was_available_previously = true;
+    m_animation_start_ticks = 0;
     m_distance_2        = 1.2f;
     initItem(type, xyz, normal);
     m_graphical_type    = getGrahpicalType();
@@ -461,39 +462,36 @@ void Item::updateGraphics(float dt)
     if (!m_was_available_previously && isAvailable())
     {
         // Play animation when item respawns
-        m_node->setScale(core::vector3df(0, 0, 0));
         m_animation_start_ticks = World::getWorld()->getTicksSinceStart();
+        m_node->setScale(core::vector3df(0.0f, 0.0f, 0.0f));
     }
 
     float time_since_return = stk_config->ticks2Time(
         World::getWorld()->getTicksSinceStart() - m_animation_start_ticks);
 
-    if (isAvailable() && time_since_return <= 1.0f)
+    if (is_visible)
     {
-        float p = time_since_return, f = (1.0f - time_since_return);
-        float factor_v = sin(-13.0f * M_PI_2 * (p + 1.0f))
-                        * pow(2.0f, -10.0f * p) + 1.0f;
-        float factor_h = 1.0f - (f * f * f * f * f - f * f * f * sin(f * M_PI));
+        if (!isAvailable() && !(getType() == ITEM_BUBBLEGUM &&
+                getOriginalType() == ITEM_NONE && !isUsedUp()))
+        {
+            // Keep it visible so particles work, but hide the model
+            m_node->setScale(core::vector3df(0.0f, 1.0f, 0.0f));
+        }
+        else if (time_since_return <= 1.0f && m_animation_start_ticks)
+        {
+            float p = time_since_return, f = (1.0f - time_since_return);
+            float factor_v = sin(-13.0f * M_PI_2 * (p + 1.0f))
+                            * pow(2.0f, -10.0f * p) + 1.0f;
+            float factor_h = 1.0f - (f * f * f * f * f - f * f * f * sin(f * M_PI));
 
-        m_node->setScale(core::vector3df(factor_h, factor_v, factor_h));
-    }
+            m_node->setScale(core::vector3df(factor_h, factor_v, factor_h));
+        }
+        else
+        {
+            m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
+        }
 
-    if (isAvailable() && time_since_return > 1.0f)
-    {
-        // Ensure the model has the wanted scale
-        m_node->setScale(core::vector3df(1.0f, 1.0f, 1.0f));
-    }
-
-    if (!isAvailable() && time_till_return <= 1.0f)
-    {
-        m_node->setVisible(true);
-
-        // Make it de facto invisible, but the model needs to be visible for
-        // particles to show
-        m_node->setScale(core::vector3df(0.0f, 1.0f, 0.0f));
-    }
-    if (isAvailable())
-    {
+        // Handle rotation of the item
         Vec3 hpr;
         if (rotating())
         {
@@ -511,7 +509,7 @@ void Item::updateGraphics(float dt)
         else
             hpr.setHPR(getOriginalRotation());
         m_node->setRotation(hpr.toIrrHPR());
-    }   // if item is available
+    } // if item is available
 
     for (size_t i = 0; i < SPARK_AMOUNT; i++)
     {
