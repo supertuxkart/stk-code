@@ -8,6 +8,10 @@ stk-editor/
 .vscode/
 tags.*
 
+# clangd
+.cache/
+compile_commands.json
+
 .config/
 supertuxkart-64
 make*.bat
