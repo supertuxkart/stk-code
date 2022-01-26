@@ -109,6 +109,8 @@ private:
         core::stringw    m_finish_time_string;
         /** The kart color */
         float            m_kart_color;
+        /** Number of laps that kart finished */
+        unsigned int     m_laps;
     };   // Rowinfo
 
     /** The team icons. */

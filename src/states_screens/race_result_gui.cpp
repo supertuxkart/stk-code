@@ -909,6 +909,7 @@ void RaceResultGUI::unload()
                         ri->m_finish_time_string += StringUtils::toWString(ranking_change);
                 }
             }
+            ri->m_laps = World::getWorld()->getFinishedLapsOfKart(ri->m_kart_id);
 
             core::dimension2du rect =
                 m_font->getDimension(ri->m_kart_name.c_str());
@@ -1364,6 +1365,7 @@ void RaceResultGUI::unload()
             int p = RaceManager::get()->getKartScore(i);
             ri->m_new_overall_points = p;
             ri->m_new_gp_rank = gp_position;
+            ri->m_laps = World::getWorld()->getFinishedLapsOfKart(i);
         }   // i < num_karts
 #endif
     }   // determineGPLayout
@@ -1442,20 +1444,20 @@ void RaceResultGUI::unload()
             true /* ignoreRTL */);
         current_x += m_width_kart_name + m_width_column_space;
 
-        if (!RaceManager::get()->isLapTrialMode())
+        if (RaceManager::get()->isLapTrialMode())
+        {
+            core::recti pos_laps = core::recti(current_x, y, current_x + 100, y + 10);
+            m_font->draw(irr::core::stringw(ri->m_laps), pos_laps, color, false, false,
+                NULL, true /* ignoreRTL */);
+        }
+        else
         {
             core::recti dest_rect = core::recti(current_x, y, current_x + 100, y + 10);
             m_font->draw(ri->m_finish_time_string, dest_rect, color, false, false,
                 NULL, true /* ignoreRTL */);
             current_x += m_width_finish_time + m_width_column_space;
         }
-        if (RaceManager::get()->isLapTrialMode())
-        {
-            core::recti pos_laps = core::recti(current_x, y, current_x + 100, y + 10);
-            int laps = World::getWorld()->getFinishedLapsOfKart(ri->m_kart_id);
-            m_font->draw(irr::core::stringw(laps), pos_laps, color, false, false,
-                NULL, true /* ignoreRTL */);
-        }
+        
 
         current_x += 100 + m_width_column_space;
 
