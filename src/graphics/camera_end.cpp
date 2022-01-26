@@ -36,6 +36,7 @@ CameraEnd::CameraEnd(int camera_index, AbstractKart* kart)
     m_current_end_camera = 0;
     if (m_end_cameras.size() > 1)
     {
+        bool found = false;
         for (unsigned i = 0; i < m_end_cameras.size(); i++)
         {
             if (m_end_cameras[i].isReached(kart->getSmoothedXYZ()))
@@ -45,9 +46,12 @@ CameraEnd::CameraEnd(int camera_index, AbstractKart* kart)
                 m_next_end_camera = i + 1;
                 if (m_next_end_camera >= (unsigned)m_end_cameras.size())
                     m_next_end_camera = 0;
+                found = true;
                 break;
             }
         }
+        if (!found)
+            m_next_end_camera = 1;
     }
     else
         m_next_end_camera = 0;
