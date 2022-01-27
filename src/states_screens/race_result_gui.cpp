@@ -909,7 +909,7 @@ void RaceResultGUI::unload()
                         ri->m_finish_time_string += StringUtils::toWString(ranking_change);
                 }
             }
-            ri->m_laps = RaceManager::get()->modeHasLaps() ?
+            ri->m_laps = World::getWorld()->raceHasLaps() ?
                 World::getWorld()->getFinishedLapsOfKart(ri->m_kart_id) : 0;
 
             core::dimension2du rect =
