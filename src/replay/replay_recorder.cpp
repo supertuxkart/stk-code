@@ -254,10 +254,8 @@ void ReplayRecorder::update(int ticks)
             // Only print this message once.
             if (m_count_transforms[i] == m_transform_events[i].size())
             {
-                char buffer[100];
-                sprintf(buffer, "Can't store more events for kart %s.",
-                        kart->getIdent().c_str());
-                Log::warn("ReplayRecorder", buffer);
+                Log::warn("ReplayRecorder", "Can't store more events for kart %s.",
+                    kart->getIdent().c_str());
                 m_incorrect_replay = single_player;
             }
             continue;
