@@ -228,13 +228,6 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     else if (selection == "enter-address")
     {
         m_entered_server = nullptr;
-        if (NetworkConfig::get()->isAddingNetworkPlayers())
-        {
-            core::stringw msg =
-                _("No player available for connecting to server.");
-            MessageQueue::add(MessageQueue::MT_ERROR, msg);
-            return;
-        }
         new EnterAddressDialog(&m_entered_server);
     }
 }   // eventCallback
