@@ -47,8 +47,6 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
     float max_distance        = 80.0f;
     m_gravity                 = 9.8f;
 
-    if (m_gravity < 0) m_gravity *= -1.0f;
-
     node.get("max-distance",    &max_distance  );
     m_st_max_distance_squared = max_distance*max_distance;
 }   // init
