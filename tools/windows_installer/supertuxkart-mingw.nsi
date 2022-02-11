@@ -28,7 +28,7 @@
 ;General
 
   ; Version information
-  ; TOOD get these from the source code directly
+  ; TODO get these from the source code directly
   !define VERSION_MAJOR 1
   !define VERSION_MINOR 2
   !define VERSION_REVISION 0
