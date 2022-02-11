@@ -35,9 +35,18 @@ Unicode True
 ;--------------------------------
 ;General
 
+  ; Version information
+  ; TODO get these from the source code directly
+  !define VERSION_MAJOR 1
+  !define VERSION_MINOR 2
+  !define VERSION_REVISION 0
+  ; Empty means stable, could be -git, -rc1
+  !define VERSION_BUILD ""
+
   ;Name and file
   !define APPNAME "SuperTuxKart"
-  !define APPNAMEANDVERSION ""
+  !define APPNAMEANDVERSION "${APPNAME} ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}${VERSION_BUILD}"
+  !define VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}${VERSION_BUILD}"
   !define ARCH ""
   !define DESCRIPTION "3D open-source arcade racer with a variety characters, tracks, and modes to play"
 
@@ -257,6 +266,7 @@ Section "Install" SecMain
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "Publisher" "SuperTuxKart Team"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayIcon" "$\"$INSTDIR\icon.ico$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayVersion" "${VERSION}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "HelpLink" "${HELPURL}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLUpdateInfo" "${UPDATEURL}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLInfoAbout" "${ABOUTURL}"
