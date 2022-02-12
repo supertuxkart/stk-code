@@ -429,6 +429,8 @@
             path = realpath("/proc/self/exe", NULL);
 #elif defined(__NetBSD__)
             path = realpath("/proc/curproc/exe", NULL);
+#elif defined(__sun)
+	    path = realpath("/proc/self/path/a.out", NULL);
 #elif defined(__APPLE__)
             path = (char*)malloc(PATH_MAX+1);
             uint32_t len = PATH_MAX;

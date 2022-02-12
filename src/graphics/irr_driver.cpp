@@ -2278,7 +2278,7 @@ bool IrrDriver::OnEvent(const irr::SEvent &event)
 scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
                                        float energy, float radius,
                                        float r, float g, float b,
-                                       bool sun, scene::ISceneNode* parent)
+                                       bool sun_, scene::ISceneNode* parent)
 {
 #ifndef SERVER_ONLY
     if (CVS->isGLSL())
@@ -2286,7 +2286,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
         if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;
 
-        if (!sun)
+        if (!sun_)
             light = new LightNode(m_scene_manager, parent, energy, radius,
                                   r, g, b);
         else
@@ -2297,7 +2297,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos,
 
         m_lights.push_back(light);
 
-        if (sun)
+        if (sun_)
         {
             m_renderer->addSunLight(pos);
         }

@@ -196,7 +196,7 @@ if(UNIX OR MINGW)
     endif()
 endif()
 
-if(UNIX AND NOT APPLE)
+if(UNIX AND NOT APPLE AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
     find_package(PkgConfig REQUIRED)
 
     if(NOT PKGCONFIG_FOUND)
@@ -361,6 +361,11 @@ if(APPLE AND NOT IOS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch ${ARCHFLAGS} -F/Library/Frameworks")
 elseif(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")   # Enable multi-processor compilation (faster)
+endif()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "SunOs")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m64")
 endif()
 
 
@@ -684,6 +689,10 @@ if(NOT SERVER_ONLY)
     else()
         target_link_libraries(supertuxkart ${OPENAL_LIBRARY})
     endif()
+endif()
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
+	target_link_libraries(supertuxkart nsl socket vorbisfile)
 endif()
 
 if (USE_DNS_C)

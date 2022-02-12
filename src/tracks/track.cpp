@@ -2135,9 +2135,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 #ifndef SERVER_ONLY
     if (!CVS->isGLSL())
     {
-        scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
+        scene::ILightSceneNode *sun_ = (scene::ILightSceneNode *) m_sun;
 
-        sun->setLightType(video::ELT_DIRECTIONAL);
+        sun_->setLightType(video::ELT_DIRECTIONAL);
 
         // The angle of the light is rather important - let the sun
         // point towards (0,0,0).
@@ -2148,7 +2148,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         else
             m_sun->setRotation((-m_sun_position).getHorizontalAngle());
 
-        sun->getLightData().SpecularColor = m_sun_specular_color;
+        sun_->getLightData().SpecularColor = m_sun_specular_color;
     }
     else
     {

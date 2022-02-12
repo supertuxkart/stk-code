@@ -40,7 +40,7 @@
 #  include <windows.h>
 #endif
 
-#if (defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)) || defined(__NetBSD__) || defined(__APPLE__)
+#if (defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)) || defined(__NetBSD__) || defined(__APPLE__) || defined(__sun)
 #  include <pthread.h>
 #endif
 
@@ -95,7 +95,7 @@ namespace VS
     static void setThreadName(const char* name)
     {
 #if defined(__linux__) && defined(__GLIBC__) && defined(__GLIBC_MINOR__)
-#if __GLIBC__ > 2 || __GLIBC_MINOR__ > 11
+#if __GLIBC__ > 2 || __GLIBC_MINOR__ > 11 || defined(__sun)
         pthread_setname_np(pthread_self(), name);
 #endif
 #elif defined(__FreeBSD__) || defined(__DragonFly__)
