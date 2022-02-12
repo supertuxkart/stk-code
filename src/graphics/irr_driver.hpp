@@ -410,7 +410,7 @@ public:
     // ------------------------------------------------------------------------
     scene::ISceneNode *addLight(const core::vector3df &pos, float energy,
                                 float radius, float r, float g, float b,
-                                bool sun = false, 
+                                bool sun_ = false, 
                                 scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
