@@ -35,19 +35,11 @@ Unicode True
 ;--------------------------------
 ;General
 
-  ; Version information
-  ; TODO get these from the source code directly
-  !define VERSION_MAJOR 1
-  !define VERSION_MINOR 2
-  !define VERSION_REVISION 0
-  ; Empty means stable, could be -git, -rc1
-  !define VERSION_BUILD ""
-
   ;Name and file
   !define APPNAME "SuperTuxKart"
-  !define APPNAMEANDVERSION "${APPNAME} ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}${VERSION_BUILD}"
-  !define VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}${VERSION_BUILD}"
+  !define APPNAMEANDVERSION ""
   !define ARCH ""
+  !define VERSION ""
   !define DESCRIPTION "3D open-source arcade racer with a variety characters, tracks, and modes to play"
 
   Name "${APPNAMEANDVERSION}"
