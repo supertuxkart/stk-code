@@ -39,6 +39,7 @@ Unicode True
   !define APPNAME "SuperTuxKart"
   !define APPNAMEANDVERSION ""
   !define ARCH ""
+  !define VERSION ""
   !define DESCRIPTION "3D open-source arcade racer with a variety characters, tracks, and modes to play"
 
   Name "${APPNAMEANDVERSION}"
@@ -257,6 +258,7 @@ Section "Install" SecMain
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "Publisher" "SuperTuxKart Team"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "UninstallString" "$\"$INSTDIR\Uninstall.exe$\""
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayIcon" "$\"$INSTDIR\icon.ico$\""
+  WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "DisplayVersion" "${VERSION}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "HelpLink" "${HELPURL}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLUpdateInfo" "${UPDATEURL}"
   WriteRegStr HKLM "${ADD_REMOVE_KEY_NAME}" "URLInfoAbout" "${ABOUTURL}"
