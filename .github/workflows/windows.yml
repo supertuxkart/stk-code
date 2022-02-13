@@ -258,11 +258,12 @@ jobs:
             cp supertuxkart-github-actions.nsi $arch.nsi
             sed -i "s/define APPNAMEANDVERSION \"\"/define APPNAMEANDVERSION \"SuperTuxKart ${{ env.release_tag }}\"/g" $arch.nsi
             sed -i "s/define ARCH \"\"/define ARCH \"$arch\"/g" $arch.nsi
+            sed -i "s/define VERSION \"\"/define VERSION \"${{ env.release_tag }}\"/g" $arch.nsi
             sed -i "s/OutFile \"\"/OutFile \"SuperTuxKart-${{ env.release_tag }}-installer-$arch.exe\"/g" $arch.nsi
             for filename in $(ls ../../build-$arch/bin)
             do
               file="\\\\$filename"
-              sed -i "286a\  DELETE /REBOOTOK \"\$INSTDIR$file\"" $arch.nsi
+              sed -i "288a\  DELETE /REBOOTOK \"\$INSTDIR$file\"" $arch.nsi
             done
             # Print result
             #cat $arch.nsi
