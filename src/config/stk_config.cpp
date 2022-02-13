@@ -174,9 +174,6 @@ void STKConfig::load(const std::string &filename)
     CHECK_NEG(m_replay_delta_steering,     "replay delta-steering"      );
     CHECK_NEG(m_replay_delta_speed,        "replay delta-speed     "    );
     CHECK_NEG(m_replay_dt,                 "replay delta-t"             );
-    CHECK_NEG(m_minimap_size,              "minimap size"               );
-    CHECK_NEG(m_minimap_ai_icon,           "minimap ai_icon"            );
-    CHECK_NEG(m_minimap_player_icon,       "minimap player_icon"        );
     CHECK_NEG(m_smooth_angle_limit,        "physics smooth-angle-limit" );
     CHECK_NEG(m_default_track_friction,    "physics default-track-friction");
     CHECK_NEG(m_physics_fps,               "physics fps"                );
@@ -231,9 +228,6 @@ void STKConfig::init_defaults()
     m_replay_delta_steering      = -100;
     m_replay_delta_speed         = -100;
     m_replay_dt                  = -100;
-    m_minimap_size               = -100;
-    m_minimap_ai_icon            = -100;
-    m_minimap_player_icon        = -100;
     m_donate_url                 = "";
     m_password_reset_url         = "";
     m_no_explosive_items_timeout = -100.0f;
@@ -556,13 +550,6 @@ void STKConfig::getAllData(const XMLNode * root)
         replay_node->get("delta-t",     &m_replay_dt               );
         replay_node->get("max-frames",    &m_replay_max_frames     );
 
-    }
-
-    if(const XMLNode *replay_node = root->getNode("minimap"))
-    {
-        replay_node->get("size",        &m_minimap_size         );
-        replay_node->get("ai-icon",     &m_minimap_ai_icon      );
-        replay_node->get("player-icon", &m_minimap_player_icon  );
     }
 
     if (const XMLNode *urls = root->getNode("urls"))

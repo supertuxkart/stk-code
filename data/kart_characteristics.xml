@@ -145,7 +145,6 @@
             visual-time: How long it takes for the visual skid to reach maximum.
             revert-visual-time: how long it takes when stopping a skid to revert
                 the visual skid and bring visuals and physics in sync again.
-            angular-velocity: Angular velocity to be used for the kart when skidding.
             min-speed: Minimum speed a kart must have before it can skid. Must be
                 >0, otherwise the kart can skid at the start of the race.
             time-till-bonus: How long a kart needs to skid in order to get a bonus.

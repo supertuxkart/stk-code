@@ -1211,9 +1211,38 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("peach", "skin_name",
                                                   "Name of the skin to use") );
 
+    // ---- settings for minimap display
+    PARAM_PREFIX GroupUserConfigParam        m_minimap_setup_group
+        PARAM_DEFAULT( GroupUserConfigParam("Minimap",
+                                            "Minimap Setup Settings") );
+
     PARAM_PREFIX IntUserConfigParam        m_minimap_display
-        PARAM_DEFAULT(IntUserConfigParam(0, "minimap_display",
-                      "Minimap: 0 bottom-left, 1 middle-right, 2 hidden, 3 center"));
+        PARAM_DEFAULT(IntUserConfigParam(0, "display",
+                     &m_minimap_setup_group, "display: 0 bottom-left, 1 middle-right, 2 hidden, 3 center"));
+
+    PARAM_PREFIX FloatUserConfigParam      m_minimap_size
+            PARAM_DEFAULT(  FloatUserConfigParam(180.0f, "size",
+            &m_minimap_setup_group, "Size of the the minimap (480 = full screen height; scaled afterwards)") );
+
+    PARAM_PREFIX FloatUserConfigParam      m_minimap_ai_icon_size
+            PARAM_DEFAULT(  FloatUserConfigParam(16.0f, "ai-icon",
+            &m_minimap_setup_group, "The size of the icons for the AI karts on the minimap.") );
+
+    PARAM_PREFIX FloatUserConfigParam      m_minimap_player_icon_size
+            PARAM_DEFAULT(  FloatUserConfigParam(20.0f, "player-icon",
+            &m_minimap_setup_group, "The size of the icons for the player kart.") );
+
+    // ---- settings for powerup display
+    PARAM_PREFIX GroupUserConfigParam      m_powerup_setup_group
+        PARAM_DEFAULT( GroupUserConfigParam("PowerUp",
+                                            "PowerUp Setup Settings") );
+
+    PARAM_PREFIX IntUserConfigParam        m_powerup_display
+        PARAM_DEFAULT(IntUserConfigParam(0, "display",
+            &m_powerup_setup_group, "display: 0 center, 1 right side, 2 hidden (see karts' held powerups)"));
+    PARAM_PREFIX FloatUserConfigParam      m_powerup_size
+            PARAM_DEFAULT(  FloatUserConfigParam(64.0f, "powerup-icon-size",
+            &m_powerup_setup_group, "Size of the powerup icon (scaled afterwards)") );
 
     // ---- Settings for spectator camera
     PARAM_PREFIX GroupUserConfigParam       m_spectator

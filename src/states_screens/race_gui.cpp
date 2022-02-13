@@ -195,7 +195,7 @@ void RaceGUI::calculateMinimapSize()
     // Originally m_map_height was 100, and we take 480 as minimum res
     float scaling = std::min(irr_driver->getFrameSize().Height,  
                              irr_driver->getFrameSize().Width) / 480.0f;
-    const float map_size = stk_config->m_minimap_size * map_size_splitscreen;
+    const float map_size = UserConfigParams::m_minimap_size * map_size_splitscreen;
     const float top_margin = 3.5f * m_font_height;
     
     // Check if we have enough space for minimap when touch steering is enabled
@@ -218,8 +218,8 @@ void RaceGUI::calculateMinimapSize()
     
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_minimap_ai_size       = (int)( stk_config->m_minimap_ai_icon     * scaling);
-    m_minimap_player_size   = (int)( stk_config->m_minimap_player_icon * scaling);
+    m_minimap_ai_size       = (int)(UserConfigParams::m_minimap_ai_icon_size * scaling);
+    m_minimap_player_size   = (int)(UserConfigParams::m_minimap_player_icon_size * scaling);
     m_map_width             = (int)(map_size * scaling);
     m_map_height            = (int)(map_size * scaling);
 

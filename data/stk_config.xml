@@ -102,7 +102,8 @@
        it will be ignored. -->
   <news max-display="10"/>
 
-  <!-- smooth-normals: If the normals (for wheel raycasts) should be smoothened.
+  <!-- Physics
+       smooth-normals: If the normals (for wheel raycasts) should be smoothened.
           This is a global setting, it still needs to be activated for each
           track individually.
        smooth-angle-limits: If the angle between the normal of a vertex and
@@ -188,13 +189,7 @@
   <replay max-frames="12000" delta-t="0.100"  delta-speed="0.6"
           delta-steering="0.26" />
 
-  <!--  Determines the minimap related values.
-        size: The size of the minimap (scaled afterwards) 480 = full screen height)
-        ai-icon: The size of the icons for the AI karts on the minimap.
-        player-icon: The size of the icons for the player karts. -->
-
-  <minimap size="180.0" ai-icon="16.0" player-icon="20.0"/>
-
+  <!-- Special urls -->
   <urls donate="https://supertuxkart.net/Donate"
         password-reset="https://online.supertuxkart.net/password-reset.php"
         assets-download="https://github.com/supertuxkart/stk-assets-mobile/releases/download/"/>
@@ -229,14 +224,15 @@
        differently for bonus (gift) boxes, nitro, bananas and bubble gums -->
   <item-return-time bonusbox="2.0" nitro="2.0" banana="2.0" bubblegum="2.0"/>
 
-  <!-- Powerup collect-mode decides what is collected if a kart has already an
-       powerup: same: get one more item of the same type.
-                new:  always get a new item.
-                only-if-same: if the random item is the same one as the
+  <!-- Powerup
+       collect-mode : decides what is collected if a kart has already an
+               same: get one more item of the same type.
+               new:  always get a new item.
+               only-if-same: if the random item is the same one as the
                       one currently owned, increase the number, otherwise
                       no more/new item s are given to the kart.
        no-explosive-items-timeout determines if world time is less than this value
-       then no cake or basketball is given by bonus boxes. -->
+               then no cake or basketball is given by bonus boxes. -->
   <powerup collect-mode="new" no-explosive-items-timeout="15.0"/>
   <!-- time: How long a switch is being effective.
        items for each item list the index of the item it is switched with.
@@ -244,7 +240,8 @@
                     easter egg-->
   <switch time="5"  items="1 0 4 4 2 2 6"/>
 
-  <!-- disappear-counter: How often bubblegum gets driven over before it disappears.
+  <!-- Bubblegum
+       disappear-counter: How often bubblegum gets driven over before it disappears.
        shield-time: How long the bubblegum shield lasts
        restrict-weapons: If true, using weapons will destroy the user's shield -->
   <bubblegum disappear-counter="1" shield-time="10.0" restrict-weapons="false"/>
@@ -264,12 +261,14 @@
   <networking steering-reduction="1.0"
               max-moveable-objects="15"/>
 
-  <!-- The field od views for 1-4 player split screen. fov-3 is
+  <!-- Camera
+       The field of views for 1-4 player split screen. fov-3 is
        actually not used (since 3 player split screen uses the
        same layout as 4 player split screen) -->
   <camera fov-1="80" fov-2="65" fov-3="50" fov-4="75" cutscene-fov="0.61" />
 
-  <!-- disable-while-unskid: Disable steering when stop skidding during
+  <!-- Steer
+       disable-while-unskid: Disable steering when stop skidding during
            the time it takes to adjust the physical body with the graphics.
        camera-follow-skid: If true the camera will stay behind the kart,
            potentially making it easier to see where the kart is going to
@@ -281,40 +280,7 @@
        ============================ -->
   <general-kart-defaults>
 
-    <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
-         decrease: multiplicative decrease of skidding factor in each frame.
-         max: maximum skidding factor = maximum increase of steering angle.
-         time-till-max: Time till maximum skidding is reached.
-         visual: Additional graphical rotation of kart. The graphical rotation
-           of the kart also determines the direction the kart is driving to
-           when skidding is stopped.
-         visual-time: How long it takes for the visual skid to reach maximum.
-         revert-visual-time: how long it takes when stopping a skid to revert
-           the visual skid and bring visuals and physics in sync again.
-         angular-velocity: Angular velocity to be used for the kart when skidding.
-         min-speed: Minimum speed a kart must have before it can skid. Must be
-           >0, otherwise the kart can skid at the start of the race.
-         time-till-bonus: How long a kart needs to skid in order to get a bonus.
-         bonus-force: A speedup applied to the kart whick skidded for a while.
-         bonus-time: How long the bonus-force is applied.
-         bonus-force: Additional engine force (this is used to offset the fact
-           that turning after skidding (e.g. to correct direction) often uses
-           up the skid bonus).
-         post-skid-rotate-factor: a factor to be used to determine how much
-           the chassis of a kart should rotate to match the graphical view.
-           A factor of 1 is identical, a smaller factor will rotate the kart
-           less (which might  feel better).
-         physical-jump-time: Time for a physical jump at the beginning of a skid.
-         graphical-jump-time: Time for a graphics-only jump at the beginning
-           of a skid.
-         reduce-turn-min/max: The steering done by the controller (which is in
-           [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
-           is active (for left turn, right turn will use [-max, -min]). The
-           effect is that while you skid (say left) you can adjust the direction
-           of the turn the kart is doing somewhat by steering to the left and right,
-           but you will always keep on doing a left turn, just more or less. -->
-
-    <!-- Kart-specific settings used by the AI.
+  <!-- Kart-specific settings used by the AI.
          use-slipstream: if the AI should try to overtake karts using slipstream.
          disable-slipstream-usage: even if the AI is not trying to use slipstream,
            it can get a lot of bonus, esp. on easy since the AI creates trains.
@@ -337,8 +303,6 @@
          skidding-threshold: only for old-style skidding: when sharp turn
            should be triggered. Smaller values means it will sharp turn
            earlier, resulting in better driving in thight curves.
-
-
          max-item-angle: Items that would need more than this change in
            direction are not considered for collection.
          time-full-steer is the time for the AI to go from neutral steering to
@@ -356,10 +320,8 @@
            direction.
          straight-length-for-zipper is the minimum length a straight
            section of the track should have in order to activate a zipper.
-
            competitive when ahead of the player, or more competitive
            when behind the player.
-
          skid-probability: Since the AI is usually very good at using
            skidding, this is used to implement some rubber-banding for
            the AI: depending on distance to the player, the AI will
@@ -517,7 +479,8 @@
                restitution="0:1.0 5:1.0 20:0.2" bevel-factor="0.5 0.0 0.3"
                physical-wheel-position="0" />
 
-     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
+     <!-- Skidding
+              increase: multiplicative increase of skidding factor in each frame.
               decrease: multiplicative decrease of skidding factor in each frame.
               max: maximum skidding factor = maximum increase of steering angle.
               time-till-max: Time till maximum skidding is reached.
@@ -527,11 +490,10 @@
               visual-time: How long it takes for the visual skid to reach maximum.
               revert-visual-time: how long it takes when stopping a skid to revert
                 the visual skid and bring visuals and physics in sync again.
-              angular-velocity: Angular velocity to be used for the kart when skidding.
               min-speed: Minimum speed a kart must have before it can skid. Must be
                 >0, otherwise the kart can skid at the start of the race.
               time-till-bonus: How long a kart needs to skid in order to get a bonus.
-              bonus-force: A speedup applied to the kart whick skidded for a while.
+              bonus-speed: A speedup applied to the kart whick skidded for a while.
               bonus-time: How long the bonus-force is applied.
               bonus-force: Additional engine force (this is used to offset the fact
                 that turning after skidding (e.g. to correct direction) often uses

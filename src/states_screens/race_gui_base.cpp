@@ -381,6 +381,8 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
                                    const core::vector2df &scaling)
 {
 #ifndef SERVER_ONLY
+    if (UserConfigParams::m_powerup_display == 2) return;
+
     // If player doesn't have any powerups or has completed race, do nothing.
     const Powerup* powerup = kart->getPowerup();
     if (powerup->getType() == PowerupManager::POWERUP_NOTHING
@@ -397,14 +399,15 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
 
     float scale = (float)(std::min(scaling.X, scaling.Y));
 
-    int nSize = (int)(64.0f * scale);
+    int nSize = (int)(UserConfigParams::m_powerup_size * scale);
 
-    int itemSpacing = (int)(scale * 32.0f);
+    int itemSpacing = (int)(scale * UserConfigParams::m_powerup_size / 2);
 
     int x1, y1;
 
-    // When there is not much height, move items on the side
-    if ((float) viewport.getWidth() / (float) viewport.getHeight() > 2.0f)
+    // When there is not much height or set by user, move items on the side
+    if ((UserConfigParams::m_powerup_display == 1) || 
+        ((float) viewport.getWidth() / (float) viewport.getHeight() > 2.0f))
     {
         x1 = viewport.UpperLeftCorner.X  + 3*(viewport.getWidth()/4)
            - ((n * itemSpacing)/2);
