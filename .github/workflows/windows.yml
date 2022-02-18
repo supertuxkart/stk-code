@@ -26,7 +26,7 @@ jobs:
         if: ${{ matrix.os == 'windows-latest' }}
         run: |
           echo "wget=C:\msys64\usr\bin\wget.exe" >> $GITHUB_ENV
-          echo "unzip=C:\msys64\usr\bin\unzip.exe" >> $GITHUB_ENV
+          echo "unzip=unzip" >> $GITHUB_ENV
           if [ ${{ matrix.arch }} = "i686" ]; then
             echo "cmake_arch=Win32" >> $GITHUB_ENV
           elif [ ${{ matrix.arch }} = "x86_64" ]; then
@@ -51,14 +51,14 @@ jobs:
           for number in 1 2 3 4 5 6 7 8 9
           do
             id=$((${{ github.run_number }} - number))
-            echo "cache_$number=windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
+            echo "cache_$number=windows-2022-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
         uses: actions/cache@v2
         with:
           path: |
             build
-          key: windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-${{ github.run_number }}
+          key: windows-2022-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-${{ github.run_number }}
           restore-keys: |
             ${{ env.cache_1 }}
             ${{ env.cache_2 }}
@@ -118,7 +118,7 @@ jobs:
         run: |
           mkdir -Force build
           cd build
-          cmake .. -G "Visual Studio 16 2019" -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -A ${{ env.cmake_arch }} -DCHECK_ASSETS=OFF
+          cmake .. -G "Visual Studio 17 2022" -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_SYSTEM_PROCESSOR=${{ matrix.arch }} -A ${{ env.cmake_arch }} -DCHECK_ASSETS=OFF
       - name: Configure bulid for MinGW (i686 or x86_64)
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.arch != 'aarch64' }}
         run: |
@@ -213,7 +213,8 @@ jobs:
       - name: Generate .pdb files
         if: ${{ env.release_tag != '' }}
         run: |
-          C:\msys64\usr\bin\wget.exe https://github.com/supertuxkart/dependencies/releases/download/preview/cv2pdb.exe
+          C:\msys64\usr\bin\wget.exe https://github.com/rainers/cv2pdb/releases/download/v0.50/cv2pdb-0.50.zip
+          unzip cv2pdb-0.50.zip
           cd i686
           ..\cv2pdb.exe supertuxkart.exe
           cd ..
@@ -246,7 +247,7 @@ jobs:
       - name: Start packaging STK
         if: ${{ env.release_tag != '' }}
         run: |
-          C:\msys64\usr\bin\zip.exe -r SuperTuxKart-${{ env.release_tag }}-win.zip SuperTuxKart-${{ env.release_tag }}-win
+          Compress-Archive -LiteralPath SuperTuxKart-${{ env.release_tag }}-win -DestinationPath SuperTuxKart-${{ env.release_tag }}-win.zip
       - name: Configure NSIS script
         shell : bash
         if: ${{ env.release_tag != '' && startsWith(github.ref, 'refs/tags/') }}
@@ -274,7 +275,7 @@ jobs:
         run: |
           cd SuperTuxKart-${{ env.release_tag }}-win\stk-code\tools\windows_installer
           C:\msys64\usr\bin\wget.exe https://nsis.sourceforge.io/mediawiki/images/6/6c/Shelllink.zip
-          C:\msys64\usr\bin\unzip.exe Shelllink.zip
+          unzip Shelllink.zip
           Move-Item Unicode\Plugins\ShellLink.dll .
           & "C:\Program Files (x86)\NSIS\makensis.exe" i686.nsi
           & "C:\Program Files (x86)\NSIS\makensis.exe" x86_64.nsi
