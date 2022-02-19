@@ -31,6 +31,16 @@
 #include <assert.h>
 #include <string>
 
+#if defined(CURLOPT_XFERINFODATA)
+#define PROGRESSDATA     CURLOPT_XFERINFODATA
+#define PROGRESSFUNCTION CURLOPT_XFERINFOFUNCTION
+typedef curl_off_t progress_t;
+#else
+#define PROGRESSDATA     CURLOPT_PROGRESSDATA
+#define PROGRESSFUNCTION CURLOPT_PROGRESSFUNCTION
+typedef double progress_t;
+#endif
+
 namespace Online
 {
     class API
@@ -84,9 +94,9 @@ namespace Online
         virtual void operation() OVERRIDE;
         virtual void afterOperation() OVERRIDE;
 
-        static int progressDownload(void *clientp, double dltotal,
-                                    double dlnow,  double ultotal,
-                                    double ulnow);
+        static int progressDownload(void *clientp, progress_t dltotal,
+                                    progress_t dlnow,  progress_t ultotal,
+                                    progress_t ulnow);
 
         static size_t writeCallback(void *contents, size_t size,
                                     size_t nmemb,   void *userp);

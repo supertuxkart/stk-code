@@ -25,6 +25,7 @@
 
 #include <enet/enet.h>
 
+#define OPENSSL_API_COMPAT 0x09800000L
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 

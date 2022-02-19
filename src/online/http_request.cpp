@@ -163,8 +163,8 @@ namespace Online
         curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1L);
         curl_easy_setopt(m_curl_session, CURLOPT_NOPROGRESS, 0);
-        curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, this);
-        curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSFUNCTION,
+        curl_easy_setopt(m_curl_session, PROGRESSDATA, this);
+        curl_easy_setopt(m_curl_session, PROGRESSFUNCTION,
                                          &HTTPRequest::progressDownload);
         curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
@@ -352,8 +352,8 @@ namespace Online
      *  \param upload_now     How muc has been uploaded so far.
      */
     int HTTPRequest::progressDownload(void *clientp,
-                                      double download_total, double download_now,
-                                      double upload_total,   double upload_now)
+                                      progress_t download_total, progress_t download_now,
+                                      progress_t upload_total,   progress_t upload_now)
     {
         HTTPRequest *request = (HTTPRequest *)clientp;
 
