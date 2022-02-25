@@ -832,7 +832,8 @@ namespace StringUtils
             if (utf32[i] >= 128 || utf32[i] == '&' || utf32[i] == '<' ||
                 utf32[i] == '>' || utf32[i] == '\"' || utf32[i] == ' ')
             {
-                output << "&#x" << std::hex << std::uppercase << utf32[i] << ";";
+                unsigned code = (unsigned)utf32[i];
+                output << "&#x" << std::hex << std::uppercase << code << ";";
             }
             else
             {
