@@ -32,11 +32,6 @@ void Binding::save(std::ofstream& stream) const
     stream << "event=\"" << m_type << "\" ";
     stream << "id=\"" << m_id << "\" ";
 
-    if (m_type == Input::IT_KEYBOARD)
-    {
-        stream << "character=\"" << m_character << "\" ";
-    }
-
     // Only serialize the direction and the range for stick motions
     if (m_type == Input::IT_STICKMOTION)
     {
@@ -58,12 +53,6 @@ bool Binding::load(const XMLNode *action)
     // Default settings for button
     m_range = Input::AR_HALF;
     m_dir = Input::AD_NEUTRAL;
-    m_character = 0;
-    // XMLNode only supports stringw, not wchar_t*
-    core::stringw s;
-    action->get("character", &s);
-    if(s.size()>0)
-        m_character = s[0];
 
     // If the action is not a stick motion (button or key)
     if (m_type == Input::IT_STICKMOTION)
@@ -97,9 +86,6 @@ irr::core::stringw Binding::getAsString() const
             break;
         case Input::IT_KEYBOARD:
             s = "?";
-            if(m_character)
-                s[0]=m_character;
-
             switch(m_id)
             {
              //I18N: input configuration screen: mouse button

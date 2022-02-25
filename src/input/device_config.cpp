@@ -179,10 +179,9 @@ void DeviceConfig::setBinding ( const PlayerAction      action,
                                 const Input::InputType  type,
                                 const int               id,
                                 Input::AxisDirection    direction,
-                                Input::AxisRange        range,
-                                wchar_t                 character)
+                                Input::AxisRange        range)
 {
-    m_bindings[action].set(type, id, direction, range, character);
+    m_bindings[action].set(type, id, direction, range);
 }   // setBinding
 
 //------------------------------------------------------------------------------

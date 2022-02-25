@@ -436,8 +436,7 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
         KeyboardConfig* keyboard = (KeyboardConfig*)m_config;
         keyboard->setBinding(binding_to_set, Input::IT_KEYBOARD,
                              sensed_input.m_button_id, Input::AD_NEUTRAL,
-                             Input::AR_HALF,
-                             sensed_input.m_character);
+                             Input::AR_HALF);
 
         // refresh display
         updateInputButtons();
@@ -495,8 +494,7 @@ void OptionsScreenDevice::gotSensedInput(const Input& sensed_input)
         KeyboardConfig* keyboard = (KeyboardConfig*)m_config;
         keyboard->setBinding(binding_to_set, Input::IT_NONE,
                              sensed_input.m_button_id, Input::AD_NEUTRAL,
-                             Input::AR_HALF,
-                             sensed_input.m_character);
+                             Input::AR_HALF);
 
         // refresh display
         updateInputButtons();

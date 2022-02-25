@@ -89,8 +89,7 @@ public:
                     const Input::InputType type,
                     const int              id,
                     Input::AxisDirection   direction = Input::AD_NEUTRAL,
-                    Input::AxisRange       range     = Input::AR_HALF,
-                    wchar_t                character=0);
+                    Input::AxisRange       range     = Input::AR_HALF);
     bool getMenuAction(Input::InputType       type,
                        const int              id,
                        int*                   value,
