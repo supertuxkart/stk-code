@@ -273,6 +273,13 @@ namespace GE
                 return VK_NULL_HANDLE;
             return m_vk.samplers.at(s);
         }
+        VkDevice getDevice() const { return m_vk.device; }
+        bool createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                          VkMemoryPropertyFlags properties, VkBuffer& buffer,
+                          VkDeviceMemory& buffer_memory);
+        VkPhysicalDevice getPhysicalDevice() const { return m_physical_device; }
+        VkCommandBuffer beginSingleTimeCommands();
+        void endSingleTimeCommands(VkCommandBuffer command_buffer);
 
     private:
         struct SwapChainSupportDetails
@@ -285,13 +292,6 @@ namespace GE
         //! returns a device dependent texture from a software surface (IImage)
         //! THIS METHOD HAS TO BE OVERRIDDEN BY DERIVED DRIVERS WITH OWN TEXTURES
         virtual video::ITexture* createDeviceDependentTexture(IImage* surface, const io::path& name, void* mipmapData=0) { return NULL; }
-
-        //! returns the current size of the screen or rendertarget
-        virtual const core::dimension2d<u32>& getCurrentRenderTargetSize() const
-        {
-            static core::dimension2d<u32> unused;
-            return unused;
-        }
 
         //! Adds a new material renderer to the VideoDriver, based on a high level shading
         //! language.

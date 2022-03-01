@@ -1,4 +1,5 @@
 #include "ge_main.hpp"
+#include "ge_vulkan_driver.hpp"
 
 namespace GE
 {
@@ -13,6 +14,11 @@ void init(irr::video::IVideoDriver* driver)
 irr::video::IVideoDriver* getDriver()
 {
     return g_driver;
+}
+
+GE::GEVulkanDriver* getVKDriver()
+{
+    return dynamic_cast<GE::GEVulkanDriver*>(g_driver);
 }
 
 GEConfig* getGEConfig()

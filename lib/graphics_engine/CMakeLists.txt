@@ -26,6 +26,7 @@ set(GE_SOURCES
     src/ge_texture.cpp
     src/ge_dx9_texture.cpp
     src/ge_vulkan_driver.cpp
+    src/ge_vulkan_texture.cpp
     src/ge_gl_texture.cpp
 )
 

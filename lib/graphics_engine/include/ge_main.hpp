@@ -5,6 +5,7 @@
 
 namespace GE
 {
+class GEVulkanDriver;
 struct GEConfig
 {
 bool m_disable_npot_texture;
@@ -12,6 +13,7 @@ bool m_disable_npot_texture;
 
 void init(irr::video::IVideoDriver* driver);
 irr::video::IVideoDriver* getDriver();
+GE::GEVulkanDriver* getVKDriver();
 GEConfig* getGEConfig();
 void deinit();
 }
