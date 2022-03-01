@@ -12,6 +12,7 @@
 #include "SIrrCreationParameters.h"
 #include "SColor.h"
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -269,11 +270,16 @@ namespace GE
         virtual void disableScissorTest() {}
         VkSampler getSampler(GEVulkanSampler s) const
         {
-            if (m_vk.samplers.find(s) == m_vk.samplers.end())
+            if (m_vk->samplers.find(s) == m_vk->samplers.end())
                 return VK_NULL_HANDLE;
-            return m_vk.samplers.at(s);
+            return m_vk->samplers.at(s);
         }
-        VkDevice getDevice() const { return m_vk.device; }
+        VkDevice getDevice() const { return m_vk->device; }
+        void destroyVulkan()
+        {
+            delete m_vk.get();
+            m_vk.release();
+        }
         bool createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                           VkMemoryPropertyFlags properties, VkBuffer& buffer,
                           VkDeviceMemory& buffer_memory);
@@ -365,11 +371,9 @@ namespace GE
                     vkDestroySurfaceKHR(instance, surface, NULL);
                 if (instance != VK_NULL_HANDLE)
                     vkDestroyInstance(instance, NULL);
-                if (instance != VK_NULL_HANDLE)
-                    vkDestroyInstance(instance, NULL);
             }
         };
-        VK m_vk;
+        std::unique_ptr<VK> m_vk;
         VkFormat m_swap_chain_image_format;
         VkExtent2D m_swap_chain_extent;
         VkPhysicalDevice m_physical_device;

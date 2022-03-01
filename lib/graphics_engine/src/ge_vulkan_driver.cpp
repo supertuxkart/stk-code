@@ -442,6 +442,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
                 m_params(params)
 {
+    m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
     m_graphics_queue = VK_NULL_HANDLE;
     m_present_queue = VK_NULL_HANDLE;
@@ -453,7 +454,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
     GE_VK_UserPointer user_ptr = {};
-    user_ptr.instance = m_vk.instance;
+    user_ptr.instance = m_vk->instance;
     if (gladLoadVulkanUserPtr(NULL,
         (GLADuserptrloadfunc)loader, &user_ptr) == 0)
     {
@@ -462,7 +463,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     }
 #endif
 
-    if (SDL_Vulkan_CreateSurface(window, m_vk.instance, &m_vk.surface) == SDL_FALSE)
+    if (SDL_Vulkan_CreateSurface(window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
         throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
     int w, h = 0;
     SDL_Vulkan_GetDrawableSize(window, &w, &h);
@@ -474,7 +475,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     createDevice();
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
-    user_ptr.device = m_vk.device;
+    user_ptr.device = m_vk->device;
     if (gladLoadVulkanUserPtr(m_physical_device,
         (GLADuserptrloadfunc)loader, &user_ptr) == 0)
     {
@@ -522,7 +523,7 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.enabledExtensionCount = extensions.size();
     create_info.ppEnabledExtensionNames = extensions.data();
-    VkResult result = vkCreateInstance(&create_info, NULL, &m_vk.instance);
+    VkResult result = vkCreateInstance(&create_info, NULL, &m_vk->instance);
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateInstance failed");
 }   // createInstance
@@ -531,13 +532,13 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
 void GEVulkanDriver::findPhysicalDevice()
 {
     uint32_t device_count = 0;
-    vkEnumeratePhysicalDevices(m_vk.instance, &device_count, NULL);
+    vkEnumeratePhysicalDevices(m_vk->instance, &device_count, NULL);
 
     if (device_count < 1)
         throw std::runtime_error("findPhysicalDevice has < 1 device_count");
 
     std::vector<VkPhysicalDevice> devices(device_count);
-    vkEnumeratePhysicalDevices(m_vk.instance, &device_count, &devices[0]);
+    vkEnumeratePhysicalDevices(m_vk->instance, &device_count, &devices[0]);
 
     for (VkPhysicalDevice& device : devices)
     {
@@ -604,25 +605,25 @@ bool GEVulkanDriver::updateSurfaceInformation(VkPhysicalDevice device,
                                               std::vector<VkPresentModeKHR>* present_modes)
 {
     uint32_t format_count;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_vk.surface, &format_count, NULL);
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_vk->surface, &format_count, NULL);
 
     if (format_count < 1)
         return false;
 
     uint32_t mode_count;
-    vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_vk.surface, &mode_count, NULL);
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_vk->surface, &mode_count, NULL);
 
     if (mode_count < 1)
         return false;
 
-    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_vk.surface, surface_capabilities);
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, m_vk->surface, surface_capabilities);
 
     (*surface_formats).resize(format_count);
-    vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_vk.surface, &format_count,
+    vkGetPhysicalDeviceSurfaceFormatsKHR(device, m_vk->surface, &format_count,
         &(*surface_formats)[0]);
 
     (*present_modes).resize(mode_count);
-    vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_vk.surface, &mode_count,
+    vkGetPhysicalDeviceSurfacePresentModesKHR(device, m_vk->surface, &mode_count,
         &(*present_modes)[0]);
 
     return true;
@@ -659,7 +660,7 @@ bool GEVulkanDriver::findQueueFamilies(VkPhysicalDevice device,
     for (unsigned int i = 0; i < queue_families.size(); i++)
     {
         VkBool32 present_support = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_vk.surface, &present_support);
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, m_vk->surface, &present_support);
 
         if (queue_families[i].queueCount > 0 && present_support)
         {
@@ -701,13 +702,13 @@ void GEVulkanDriver::createDevice()
     create_info.ppEnabledExtensionNames = &m_device_extensions[0];
     create_info.enabledLayerCount = 0;
 
-    VkResult result = vkCreateDevice(m_physical_device, &create_info, NULL, &m_vk.device);
+    VkResult result = vkCreateDevice(m_physical_device, &create_info, NULL, &m_vk->device);
 
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateDevice failed");
 
-    vkGetDeviceQueue(m_vk.device, m_graphics_family, 0, &m_graphics_queue);
-    vkGetDeviceQueue(m_vk.device, m_present_family, 0, &m_present_queue);
+    vkGetDeviceQueue(m_vk->device, m_graphics_family, 0, &m_graphics_queue);
+    vkGetDeviceQueue(m_vk->device, m_present_family, 0, &m_present_queue);
 }   // createDevice
 
 // ----------------------------------------------------------------------------
@@ -832,7 +833,7 @@ void GEVulkanDriver::createSwapChain()
 
     VkSwapchainCreateInfoKHR create_info = {};
     create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    create_info.surface = m_vk.surface;
+    create_info.surface = m_vk->surface;
     create_info.minImageCount = swap_chain_images_count;
     create_info.imageFormat = surface_format.format;
     create_info.imageColorSpace = surface_format.colorSpace;
@@ -859,25 +860,25 @@ void GEVulkanDriver::createSwapChain()
     create_info.clipped = VK_TRUE;
     create_info.oldSwapchain = VK_NULL_HANDLE;
 
-    VkResult result = vkCreateSwapchainKHR(m_vk.device, &create_info, NULL,
-        &m_vk.swap_chain);
+    VkResult result = vkCreateSwapchainKHR(m_vk->device, &create_info, NULL,
+        &m_vk->swap_chain);
 
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateSwapchainKHR failed");
 
-    vkGetSwapchainImagesKHR(m_vk.device, m_vk.swap_chain, &swap_chain_images_count, NULL);
-    m_vk.swap_chain_images.resize(swap_chain_images_count);
-    vkGetSwapchainImagesKHR(m_vk.device, m_vk.swap_chain, &swap_chain_images_count,
-        &m_vk.swap_chain_images[0]);
+    vkGetSwapchainImagesKHR(m_vk->device, m_vk->swap_chain, &swap_chain_images_count, NULL);
+    m_vk->swap_chain_images.resize(swap_chain_images_count);
+    vkGetSwapchainImagesKHR(m_vk->device, m_vk->swap_chain, &swap_chain_images_count,
+        &m_vk->swap_chain_images[0]);
 
     m_swap_chain_image_format = surface_format.format;
     m_swap_chain_extent = image_extent;
 
-    for (unsigned int i = 0; i < m_vk.swap_chain_images.size(); i++)
+    for (unsigned int i = 0; i < m_vk->swap_chain_images.size(); i++)
     {
         VkImageViewCreateInfo create_info = {};
         create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        create_info.image = m_vk.swap_chain_images[i];
+        create_info.image = m_vk->swap_chain_images[i];
         create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
         create_info.format = m_swap_chain_image_format;
         create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -891,12 +892,12 @@ void GEVulkanDriver::createSwapChain()
         create_info.subresourceRange.layerCount = 1;
 
         VkImageView swap_chain_image_view = VK_NULL_HANDLE;
-        VkResult result = vkCreateImageView(m_vk.device, &create_info, NULL,
+        VkResult result = vkCreateImageView(m_vk->device, &create_info, NULL,
             &swap_chain_image_view);
 
         if (result != VK_SUCCESS)
             throw std::runtime_error("vkCreateImageView failed");
-        m_vk.swap_chain_image_views.push_back(swap_chain_image_view);
+        m_vk->swap_chain_image_views.push_back(swap_chain_image_view);
     }
 }   // createSwapChain
 
@@ -913,7 +914,7 @@ void GEVulkanDriver::createSyncObjects()
     for (unsigned int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
     {
         VkSemaphore image_available_semaphore;
-        VkResult result = vkCreateSemaphore(m_vk.device, &semaphore_info, NULL,
+        VkResult result = vkCreateSemaphore(m_vk->device, &semaphore_info, NULL,
             &image_available_semaphore);
 
         if (result != VK_SUCCESS)
@@ -923,7 +924,7 @@ void GEVulkanDriver::createSyncObjects()
         }
 
         VkSemaphore render_finished_semaphore;
-        result = vkCreateSemaphore(m_vk.device, &semaphore_info, NULL,
+        result = vkCreateSemaphore(m_vk->device, &semaphore_info, NULL,
             &render_finished_semaphore);
 
         if (result != VK_SUCCESS)
@@ -933,15 +934,15 @@ void GEVulkanDriver::createSyncObjects()
         }
 
         VkFence in_flight_fence;
-        result = vkCreateFence(m_vk.device, &fence_info, NULL,
+        result = vkCreateFence(m_vk->device, &fence_info, NULL,
             &in_flight_fence);
 
         if (result != VK_SUCCESS)
             throw std::runtime_error("vkCreateFence failed");
 
-        m_vk.image_available_semaphores.push_back(image_available_semaphore);
-        m_vk.render_finished_semaphores.push_back(render_finished_semaphore);
-        m_vk.in_flight_fences.push_back(in_flight_fence);
+        m_vk->image_available_semaphores.push_back(image_available_semaphore);
+        m_vk->render_finished_semaphores.push_back(render_finished_semaphore);
+        m_vk->in_flight_fences.push_back(in_flight_fence);
     }
 }   // createSyncObjects
 
@@ -952,8 +953,8 @@ void GEVulkanDriver::createCommandPool()
     pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     pool_info.queueFamilyIndex = m_graphics_family;
 
-    VkResult result = vkCreateCommandPool(m_vk.device, &pool_info, NULL,
-        &m_vk.command_pool);
+    VkResult result = vkCreateCommandPool(m_vk->device, &pool_info, NULL,
+        &m_vk->command_pool);
 
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateCommandPool failed");
@@ -962,21 +963,21 @@ void GEVulkanDriver::createCommandPool()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createCommandBuffers()
 {
-    std::vector<VkCommandBuffer> buffers(m_vk.swap_chain_images.size());
+    std::vector<VkCommandBuffer> buffers(m_vk->swap_chain_images.size());
 
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    alloc_info.commandPool = m_vk.command_pool;
+    alloc_info.commandPool = m_vk->command_pool;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     alloc_info.commandBufferCount = (uint32_t)buffers.size();
 
-    VkResult result = vkAllocateCommandBuffers(m_vk.device, &alloc_info,
+    VkResult result = vkAllocateCommandBuffers(m_vk->device, &alloc_info,
         &buffers[0]);
 
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkAllocateCommandBuffers failed");
 
-    m_vk.command_buffers = buffers;
+    m_vk->command_buffers = buffers;
 }   // createCommandBuffers
 
 // ----------------------------------------------------------------------------
@@ -999,12 +1000,12 @@ void GEVulkanDriver::createSamplers()
     sampler_info.compareEnable = VK_FALSE;
     sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
     sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
-    VkResult result = vkCreateSampler(m_vk.device, &sampler_info, NULL,
+    VkResult result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
         &sampler);
 
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateSampler failed for GVS_NEAREST");
-    m_vk.samplers[GVS_NEAREST] = sampler;
+    m_vk->samplers[GVS_NEAREST] = sampler;
 }   // createSamplers
 
 // ----------------------------------------------------------------------------
@@ -1019,13 +1020,13 @@ bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
     buffer_info.usage = usage;
     buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    VkResult result = vkCreateBuffer(m_vk.device, &buffer_info, NULL, &buffer);
+    VkResult result = vkCreateBuffer(m_vk->device, &buffer_info, NULL, &buffer);
 
     if (result != VK_SUCCESS)
         return false;
 
     VkMemoryRequirements mem_requirements;
-    vkGetBufferMemoryRequirements(m_vk.device, buffer, &mem_requirements);
+    vkGetBufferMemoryRequirements(m_vk->device, buffer, &mem_requirements);
 
     VkPhysicalDeviceMemoryProperties mem_properties;
     vkGetPhysicalDeviceMemoryProperties(m_physical_device, &mem_properties);
@@ -1051,12 +1052,12 @@ bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
     alloc_info.allocationSize = mem_requirements.size;
     alloc_info.memoryTypeIndex = memory_type_index;
 
-    result = vkAllocateMemory(m_vk.device, &alloc_info, NULL, &buffer_memory);
+    result = vkAllocateMemory(m_vk->device, &alloc_info, NULL, &buffer_memory);
 
     if (result != VK_SUCCESS)
         return false;
 
-    vkBindBufferMemory(m_vk.device, buffer, buffer_memory, 0);
+    vkBindBufferMemory(m_vk->device, buffer, buffer_memory, 0);
 
     return true;
 }   // createBuffer
@@ -1067,11 +1068,11 @@ VkCommandBuffer GEVulkanDriver::beginSingleTimeCommands()
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    alloc_info.commandPool = m_vk.command_pool;
+    alloc_info.commandPool = m_vk->command_pool;
     alloc_info.commandBufferCount = 1;
 
     VkCommandBuffer command_buffer;
-    vkAllocateCommandBuffers(m_vk.device, &alloc_info, &command_buffer);
+    vkAllocateCommandBuffers(m_vk->device, &alloc_info, &command_buffer);
 
     VkCommandBufferBeginInfo begin_info = {};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1095,7 +1096,7 @@ void GEVulkanDriver::endSingleTimeCommands(VkCommandBuffer command_buffer)
     vkQueueSubmit(m_graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
     vkQueueWaitIdle(m_graphics_queue);
 
-    vkFreeCommandBuffers(m_vk.device, m_vk.command_pool, 1, &command_buffer);
+    vkFreeCommandBuffers(m_vk->device, m_vk->command_pool, 1, &command_buffer);
 }   // beginSingleTimeCommands
 
 // ----------------------------------------------------------------------------

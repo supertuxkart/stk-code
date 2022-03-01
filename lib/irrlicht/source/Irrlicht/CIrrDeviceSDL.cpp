@@ -21,6 +21,7 @@
 
 #include "guiengine/engine.hpp"
 #include "glad/gl.h"
+#include "ge_vulkan_driver.hpp"
 #include "MoltenVK.h"
 
 extern bool GLContextDebugBit;
@@ -205,6 +206,9 @@ CIrrDeviceSDL::~CIrrDeviceSDL()
 		if (h)
 			h->clearGLExtensions();
 #endif
+		GE::GEVulkanDriver* gevk = dynamic_cast<GE::GEVulkanDriver*>(VideoDriver);
+		if (gevk)
+			gevk->destroyVulkan();
 		VideoDriver->drop();
 		VideoDriver = NULL;
 	}
