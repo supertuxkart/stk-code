@@ -51,14 +51,14 @@ jobs:
           for number in 1 2 3 4 5 6 7 8 9
           do
             id=$((${{ github.run_number }} - number))
-            echo "cache_$number=windows-2022-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
+            echo "cache_$number=windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-$id" >> $GITHUB_ENV
           done
       - name: Handle build cache
         uses: actions/cache@v2
         with:
           path: |
             build
-          key: windows-2022-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-${{ github.run_number }}
+          key: windows-${{ github.ref }}-${{ matrix.arch }}-${{ matrix.os }}-${{ github.run_number }}
           restore-keys: |
             ${{ env.cache_1 }}
             ${{ env.cache_2 }}
