@@ -1,7 +1,7 @@
 #ifndef HEADER_GE_VULKAN_TEXTURE_HPP
 #define HEADER_GE_VULKAN_TEXTURE_HPP
 
-#include "glad/vulkan.h"
+#include "vulkan_wrapper.h"
 
 #include <functional>
 #include <string>
