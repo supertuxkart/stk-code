@@ -2037,6 +2037,17 @@ void Kart::handleMaterialGFX(float dt)
     if (material && isOnGround() && !material->isBelowSurface() &&
         !getKartAnimation()      && UserConfigParams::m_particles_effects > 1)
     {
+        // Make sure camera is reset if on ground, see #2916 and #4737
+        for (unsigned i = 0; i < Camera::getNumCameras(); i++)
+        {
+            if (material->isDriveReset())
+                break;
+            Camera *camera = Camera::getCamera(i);
+            if (camera->getKart() != this)
+                continue;
+            if (camera->getMode() == Camera::CM_FALLING)
+                camera->setMode(Camera::CM_NORMAL);
+        }   // for i in all cameras for this kart
 
         // Get the appropriate particle data depending on
         // wether the kart is skidding or driving.
@@ -2051,16 +2062,6 @@ void Kart::handleMaterialGFX(float dt)
             return;  // no particle effect, return
         }
         m_kart_gfx->updateTerrain(pk);
-
-        // Make sure camera is reset if on ground, see #2916
-        for (unsigned i = 0; i < Camera::getNumCameras(); i++)
-        {
-            Camera *camera = Camera::getCamera(i);
-            if (camera->getKart() != this)
-                continue;
-            if (camera->getMode() == Camera::CM_FALLING)
-                camera->setMode(Camera::CM_NORMAL);
-        }   // for i in all cameras for this kart
         return;
     }
 
