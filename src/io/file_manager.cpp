@@ -31,6 +31,7 @@
 #include "utils/extract_mobile_assets.hpp"
 #include "utils/file_utils.hpp"
 #include "utils/log.hpp"
+#include "utils/mem_utils.hpp"
 #include "utils/string_utils.hpp"
 
 #ifdef ANDROID
@@ -1560,23 +1561,16 @@ bool FileManager::removeDirectory(const std::string &name) const
 bool FileManager::copyFile(const std::string &source, const std::string &dest)
 {
     FILE *f_source = FileUtils::fopenU8Path(source, "rb");
-    if(!f_source) return false;
-
     FILE *f_dest = FileUtils::fopenU8Path(dest, "wb");
-    if(!f_dest)
-    {
-        fclose(f_source);
-        return false;
-    }
-
-    const int BUFFER_SIZE=32768;
+    constexpr int BUFFER_SIZE=32768;
     char *buffer = new char[BUFFER_SIZE];
-    if(!buffer)
-    {
-        fclose(f_source);
-        fclose(f_dest);
-        return false;
-    }
+    auto scoped = [&]() {
+        if (f_source) fclose(f_source);
+        if (f_dest) fclose(f_dest);
+        if (buffer) delete [] buffer;
+    };
+    MemUtils::deref<decltype(scoped)> cls(scoped); 
+    if(!f_source || !f_dest || !buffer) return false;
     size_t n;
     while((n=fread(buffer, 1, BUFFER_SIZE, f_source))>0)
     {
@@ -1584,17 +1578,11 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
         {
             Log::error("FileManager", "Write error copying '%s' to '%s",
                         source.c_str(), dest.c_str());
-            delete[] buffer;
-            fclose(f_source);
-            fclose(f_dest);
             return false;
 
         }   // if fwrite()!=n
     }   // while
 
-    delete[] buffer;
-    fclose(f_source);
-    fclose(f_dest);
     return true;
 }   // copyFile
 
