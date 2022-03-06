@@ -434,13 +434,13 @@ void Powerup::use()
             {
                 AbstractKart *kart=world->getKart(i);
                 if(kart->isEliminated() || kart== m_kart || kart->isInvulnerable()) continue;
-                if(kart->isShielded())
-                {
-                    kart->decreaseShieldTime();
-                    continue;
-                }
                 if(m_kart->getPosition() > kart->getPosition())
                 {
+                    if(kart->isShielded())
+                    {
+                        kart->decreaseShieldTime();
+                        continue;
+                    }
                     float rank_mult, position_factor;
                     //0 if the one before the item user ; 1 if first ; scaled inbetween
                     if (kart->getPosition() == 1)
