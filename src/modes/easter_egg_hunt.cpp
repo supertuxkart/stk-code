@@ -23,6 +23,7 @@
 #include "karts/ghost_kart.hpp"
 #include "replay/replay_play.hpp"
 #include "tracks/track.hpp"
+#include "utils/mem_utils.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -80,12 +81,13 @@ void EasterEggHunt::readData(const std::string &filename)
     XMLNode *easter = file_manager->createXMLTree(filename);
     if(!easter)
         return;
+    auto scoped = [&]() { delete easter; };
+    MemUtils::deref<decltype(scoped)> cls(scoped);
 
     if(easter->getName()!="EasterEggHunt")
     {
         Log::error("[EasterEggHunt]", "Can't load easter egg file '%s' - no EasterEggHunt element.",
                 filename.c_str());
-        delete easter;
         return;
     }
 
@@ -111,7 +113,6 @@ void EasterEggHunt::readData(const std::string &filename)
 
     if(!data)
     {
-        delete easter;
         return;
     }
     m_number_of_eggs = 0;
@@ -128,8 +129,6 @@ void EasterEggHunt::readData(const std::string &filename)
         Track::getCurrentTrack()->itemCommand(egg);
         m_number_of_eggs++;
     }   // for i <num_nodes
-
-    delete easter;
 
     WorldStatus::setClockMode(CLOCK_CHRONO);
 
