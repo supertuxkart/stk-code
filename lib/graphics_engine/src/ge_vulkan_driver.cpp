@@ -3,6 +3,7 @@
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
 #include "SDL_vulkan.h"
+#include <algorithm>
 #include <limits>
 #include <set>
 #include <sstream>

@@ -164,7 +164,7 @@ void MusicManager::addMusicToTracks()
  */
 void MusicManager::startMusic()
 {
-    if (m_current_music && UserConfigParams::m_music)
+    if (m_current_music.load() != NULL && UserConfigParams::m_music)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_START, m_current_music);
 }   // startMusic
 
@@ -202,7 +202,7 @@ void MusicManager::startMusic(MusicInformation* mi, bool start_right_now)
  */
 void MusicManager::stopMusic()
 {
-    if (m_current_music)
+    if (m_current_music.load() != NULL)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_STOP, m_current_music);
 }   // stopMusic
 
@@ -211,7 +211,7 @@ void MusicManager::stopMusic()
  */
 void MusicManager::pauseMusic()
 {
-    if (m_current_music)
+    if (m_current_music.load() != NULL)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_PAUSE, m_current_music);
 }   // pauseMusic
 
@@ -220,7 +220,7 @@ void MusicManager::pauseMusic()
  */
 void MusicManager::resumeMusic()
 {
-    if (m_current_music)
+    if (m_current_music.load() != NULL)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_RESUME, m_current_music);
 }   // resumeMusic
 
@@ -229,7 +229,7 @@ void MusicManager::resumeMusic()
  */
 void MusicManager::switchToFastMusic()
 {
-    if (m_current_music)
+    if (m_current_music.load() != NULL)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_SWITCH_FAST,
                                 m_current_music);
 }   // switchToFastMusic
@@ -241,7 +241,7 @@ void MusicManager::switchToFastMusic()
  */
 void MusicManager::setTemporaryVolume(float gain)
 {
-    if (m_current_music)
+    if (m_current_music.load() != NULL)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_SET_TMP_VOLUME, 
                                  m_current_music, gain);
 }   // setTemporaryVolume
@@ -251,7 +251,7 @@ void MusicManager::setTemporaryVolume(float gain)
  */
 void MusicManager::resetTemporaryVolume()
 {
-    if (m_current_music)
+    if (m_current_music.load() != NULL)
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_DEFAULT_VOLUME,
                                  m_current_music);
 }   // resetTemporaryVolume
@@ -268,7 +268,7 @@ void MusicManager::setMasterMusicVolume(float gain)
         gain = 0.0f;
 
     m_master_gain = gain;
-    if (m_current_music)
+    if (m_current_music.load() != NULL)
     {
         // Sets the music volume to m_master_gain
         SFXManager::get()->queue(SFXManager::SFX_MUSIC_DEFAULT_VOLUME,
