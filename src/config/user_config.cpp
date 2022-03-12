@@ -669,12 +669,11 @@ UserConfig::~UserConfig()
 bool UserConfig::loadConfig()
 {
     const std::string filename = file_manager->getUserConfigFile(m_filename);
-    XMLNode* root = file_manager->createXMLTree(filename);
+    auto root = std::unique_ptr<XMLNode>(file_manager->createXMLTree(filename));
     if(!root || root->getName() != "stkconfig")
     {
         Log::info("UserConfig",
                    "Could not read user config file '%s'.  A new file will be created.", filename.c_str());
-        if(root) delete root;
         // Create a default config file - just in case that stk crashes later
         // there is a config file that can be modified (to e.g. disable
         // shaders)
@@ -699,7 +698,6 @@ bool UserConfig::loadConfig()
 
         GUIEngine::showMessage(_("Your config file was too old, so it was deleted and a new one will be created."), 10.0f);
         Log::info("UserConfig", "Your config file was too old, so it was deleted and a new one will be created.");
-        delete root;
         return false;
 
     }   // if configFileVersion<SUPPORTED_CONFIG_VERSION
@@ -708,7 +706,7 @@ bool UserConfig::loadConfig()
     //      you want them automatically read from the config file)
     for (unsigned i = 0; i < all_params.size(); i++)
     {
-        all_params[i]->findYourDataInAChildOf(root);
+        all_params[i]->findYourDataInAChildOf(root.get());
     }
 
 
@@ -722,7 +720,6 @@ bool UserConfig::loadConfig()
         UserConfigParams::m_saved_grand_prix_list.push_back(
                                            new SavedGrandPrix( saved_gps[i]) );
     }
-    delete root;
 
     return true;
 }   // loadConfig

@@ -77,7 +77,7 @@ EasterEggHunt::~EasterEggHunt()
 */
 void EasterEggHunt::readData(const std::string &filename)
 {
-    XMLNode *easter = file_manager->createXMLTree(filename);
+    auto easter = std::unique_ptr<XMLNode>(file_manager->createXMLTree(filename));
     if(!easter)
         return;
 
@@ -85,7 +85,6 @@ void EasterEggHunt::readData(const std::string &filename)
     {
         Log::error("[EasterEggHunt]", "Can't load easter egg file '%s' - no EasterEggHunt element.",
                 filename.c_str());
-        delete easter;
         return;
     }
 
@@ -111,7 +110,6 @@ void EasterEggHunt::readData(const std::string &filename)
 
     if(!data)
     {
-        delete easter;
         return;
     }
     m_number_of_eggs = 0;
@@ -128,8 +126,6 @@ void EasterEggHunt::readData(const std::string &filename)
         Track::getCurrentTrack()->itemCommand(egg);
         m_number_of_eggs++;
     }   // for i <num_nodes
-
-    delete easter;
 
     WorldStatus::setClockMode(CLOCK_CHRONO);
 

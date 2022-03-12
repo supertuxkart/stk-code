@@ -449,7 +449,7 @@ void AddonsManager::loadInstalledAddons()
         Log::info("addons", "Loading an xml file for installed addons: %s.",
                     m_file_installed.c_str());
     }
-    const XMLNode *xml = file_manager->createXMLTree(m_file_installed);
+    auto xml = std::unique_ptr<XMLNode>(file_manager->createXMLTree(m_file_installed));
     if(!xml)
         return;
 
@@ -463,8 +463,6 @@ void AddonsManager::loadInstalledAddons()
             m_addons_list.getData().push_back(addon);
         }
     }   // for i <= xml->getNumNodes()
-
-    delete xml;
 }   // loadInstalledAddons
 
 // ----------------------------------------------------------------------------

@@ -42,14 +42,13 @@ MusicInformation *MusicInformation::create(const std::string &filename)
 {
     assert(filename.size() > 0);
 
-    XMLNode* root = file_manager->createXMLTree(filename);
+    auto root = std::unique_ptr<XMLNode>(file_manager->createXMLTree(filename));
     if (!root) return NULL;
     if(root->getName()!="music")
     {
         Log::error("MusicInformation",
                    "Music file '%s' does not contain music node.\n",
                    filename.c_str());
-        delete root;
         return NULL;
     }
     std::string s;
@@ -61,11 +60,9 @@ MusicInformation *MusicInformation::create(const std::string &filename)
                     "One of 'title' or 'file' attribute "
                     "is missing in the music XML file '%s'!\n",
                     filename.c_str());
-        delete root;
         return NULL;
     }
-    MusicInformation *mi = new MusicInformation(root, filename);
-    delete root;
+    MusicInformation *mi = new MusicInformation(root.get(), filename);
     return mi;
 }   // create()
 
