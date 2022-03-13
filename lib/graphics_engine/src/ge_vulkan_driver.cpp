@@ -687,8 +687,11 @@ void GEVulkanDriver::createDevice()
     queue_create_info.pQueuePriorities = &queue_priority;
     queue_create_infos.push_back(queue_create_info);
 
-    queue_create_info.queueFamilyIndex = m_present_family;
-    queue_create_infos.push_back(queue_create_info);
+    if (m_present_family != m_graphics_family)
+    {
+        queue_create_info.queueFamilyIndex = m_present_family;
+        queue_create_infos.push_back(queue_create_info);
+    }
 
     VkPhysicalDeviceFeatures device_features = {};
     if (m_features.samplerAnisotropy == VK_TRUE)
