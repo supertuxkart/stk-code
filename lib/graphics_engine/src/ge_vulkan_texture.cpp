@@ -215,6 +215,15 @@ void GEVulkanTexture::transitionImageLayout(VkImageLayout old_layout,
         source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
         destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
     }
+    else if (old_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL &&
+        new_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+    {
+        barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+        source_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        destination_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
     else if (old_layout == VK_IMAGE_LAYOUT_UNDEFINED &&
         new_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
     {
@@ -415,7 +424,13 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
             vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
         }
     }
+
+    transitionImageLayout(VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     copyBufferToImage(staging_buffer, w, h, x, y);
+    transitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
     vkDestroyBuffer(m_vulkan_device, staging_buffer, NULL);
     vkFreeMemory(m_vulkan_device, staging_buffer_memory, NULL);
 }   // updateTexture
