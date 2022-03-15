@@ -82,15 +82,21 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
     if (!success)
         return false;
 
+    VkResult ret = VK_SUCCESS;
     void* data;
-    vkMapMemory(m_vulkan_device, staging_buffer_memory, 0, image_size, 0, &data);
+    if ((ret = vkMapMemory(m_vulkan_device, staging_buffer_memory, 0,
+        image_size, 0, &data)) != VK_SUCCESS)
+        goto destroy;
     memcpy(data, texture_data, (size_t)(image_size));
     vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
 
     success = createImage(VK_IMAGE_USAGE_TRANSFER_DST_BIT |
         VK_IMAGE_USAGE_SAMPLED_BIT);
     if (!success)
-        return false;
+    {
+        ret = VK_NOT_READY;
+        goto destroy;
+    }
 
     transitionImageLayout(VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -100,10 +106,11 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
     transitionImageLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+destroy:
     vkDestroyBuffer(m_vulkan_device, staging_buffer, NULL);
     vkFreeMemory(m_vulkan_device, staging_buffer_memory, NULL);
 
-    return true;
+    return ret == VK_SUCCESS;
 }   // createTextureImage
 
 // ----------------------------------------------------------------------------
