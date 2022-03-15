@@ -61,6 +61,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
 // ----------------------------------------------------------------------------
 GEVulkanTexture::~GEVulkanTexture()
 {
+    getVKDriver()->waitIdle();
     clearVulkanData();
 }   // ~GEVulkanTexture
 
