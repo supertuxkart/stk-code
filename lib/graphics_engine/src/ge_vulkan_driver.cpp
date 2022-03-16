@@ -791,24 +791,30 @@ void GEVulkanDriver::createSwapChain()
     {
         for (VkPresentModeKHR& available_mode : m_present_modes)
         {
-            if (available_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
-            {
-                present_mode = available_mode;
-                break;
-            }
-        }
-    }
-    else
-    {
-        for (VkPresentModeKHR& available_mode : m_present_modes)
-        {
             if (available_mode == VK_PRESENT_MODE_MAILBOX_KHR)
             {
                 present_mode = available_mode;
-                break;
+                goto found_mode;
+            }
+        }
+        for (VkPresentModeKHR& available_mode : m_present_modes)
+        {
+            if (available_mode == VK_PRESENT_MODE_IMMEDIATE_KHR)
+            {
+                present_mode = available_mode;
+                goto found_mode;
+            }
+        }
+        for (VkPresentModeKHR& available_mode : m_present_modes)
+        {
+            if (available_mode == VK_PRESENT_MODE_FIFO_RELAXED_KHR)
+            {
+                present_mode = available_mode;
+                goto found_mode;
             }
         }
     }
+found_mode:
 
     VkExtent2D image_extent = m_surface_capabilities.currentExtent;
     if (m_surface_capabilities.currentExtent.width == std::numeric_limits<uint32_t>::max())
