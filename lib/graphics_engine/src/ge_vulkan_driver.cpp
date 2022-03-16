@@ -967,7 +967,7 @@ void GEVulkanDriver::createCommandPool()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createCommandBuffers()
 {
-    std::vector<VkCommandBuffer> buffers(m_vk->swap_chain_images.size());
+    std::vector<VkCommandBuffer> buffers(MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
