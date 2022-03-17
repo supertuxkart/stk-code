@@ -31,17 +31,17 @@ target_include_directories(shaderc
     PRIVATE ${glslang_SOURCE_DIR}
             ${SPIRV-Headers_SOURCE_DIR}/include)
 
-add_library(shaderc_shared SHARED ${SHADERC_SOURCES})
-shaderc_default_compile_options(shaderc_shared)
-target_include_directories(shaderc_shared
-    PUBLIC include
-    PRIVATE ${glslang_SOURCE_DIR}
-            ${SPIRV-Headers_SOURCE_DIR}/include)
-target_compile_definitions(shaderc_shared
-    PRIVATE SHADERC_IMPLEMENTATION
-    PUBLIC SHADERC_SHAREDLIB
-)
-set_target_properties(shaderc_shared PROPERTIES SOVERSION 1)
+#add_library(shaderc_shared SHARED ${SHADERC_SOURCES})
+#shaderc_default_compile_options(shaderc_shared)
+#target_include_directories(shaderc_shared
+#    PUBLIC include
+#    PRIVATE ${glslang_SOURCE_DIR}
+#            ${SPIRV-Headers_SOURCE_DIR}/include)
+#target_compile_definitions(shaderc_shared
+#    PRIVATE SHADERC_IMPLEMENTATION
+#    PUBLIC SHADERC_SHAREDLIB
+#)
+#set_target_properties(shaderc_shared PROPERTIES SOVERSION 1)
 
 if(SHADERC_ENABLE_INSTALL)
   install(
@@ -54,10 +54,10 @@ if(SHADERC_ENABLE_INSTALL)
     DESTINATION
       ${CMAKE_INSTALL_INCLUDEDIR}/shaderc)
 
-  install(TARGETS shaderc shaderc_shared
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+#  install(TARGETS shaderc shaderc_shared
+#    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+#    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+#    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 endif(SHADERC_ENABLE_INSTALL)
 
 find_package(Threads)
@@ -69,7 +69,7 @@ set(SHADERC_LIBS
 )
 
 target_link_libraries(shaderc PRIVATE ${SHADERC_LIBS})
-target_link_libraries(shaderc_shared PRIVATE ${SHADERC_LIBS})
+#target_link_libraries(shaderc_shared PRIVATE ${SHADERC_LIBS})
 
 shaderc_add_tests(
   TEST_PREFIX shaderc
@@ -82,16 +82,16 @@ shaderc_add_tests(
     shaderc_cpp
     shaderc_private)
 
-shaderc_add_tests(
-  TEST_PREFIX shaderc_shared
-  LINK_LIBS shaderc_shared SPIRV-Tools
-  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${glslang_SOURCE_DIR}
-               ${spirv-tools_SOURCE_DIR}/include
-               ${SPIRV-Headers_SOURCE_DIR}/include
-  TEST_NAMES
-    shaderc
-    shaderc_cpp
-    shaderc_private)
+#shaderc_add_tests(
+#  TEST_PREFIX shaderc_shared
+#  LINK_LIBS shaderc_shared SPIRV-Tools
+#  INCLUDE_DIRS include ${shaderc_SOURCE_DIR}/libshaderc_util/include ${glslang_SOURCE_DIR}
+#               ${spirv-tools_SOURCE_DIR}/include
+#               ${SPIRV-Headers_SOURCE_DIR}/include
+#  TEST_NAMES
+#    shaderc
+#    shaderc_cpp
+#    shaderc_private)
 
 shaderc_combine_static_lib(shaderc_combined shaderc)
 
