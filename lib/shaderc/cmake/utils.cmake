@@ -192,9 +192,15 @@ function(shaderc_combine_static_lib new_target target)
     string(REPLACE ";" ">;$<TARGET_FILE:" temp_string "${all_libs}")
     set(lib_target_list "$<TARGET_FILE:${temp_string}>")
 
+    if(DEFINED CCTOOLS_PREFIX)
+      set(apple_libtool ${CCTOOLS_PREFIX}/bin/llvm-libtool-darwin)
+    else()
+      set(apple_libtool libtool)
+    endif()
+
     add_custom_command(OUTPUT ${libname}
       DEPENDS ${all_libs}
-      COMMAND libtool -static -o ${libname} ${lib_target_list})
+      COMMAND ${apple_libtool} -static -o ${libname} ${lib_target_list})
   else()
     string(REPLACE ";" "> \naddlib $<TARGET_FILE:" temp_string "${all_libs}")
     set(start_of_file
