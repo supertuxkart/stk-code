@@ -39,6 +39,9 @@ option(SPIRV_ALLOW_TIMERS "Allow timers via clock_gettime on supported platforms
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   add_definitions(-DSPIRV_LINUX)
   set(SPIRV_TIMER_ENABLED ${SPIRV_ALLOW_TIMERS})
+elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "NintendoSwitch")
+    # STK addition treat it as linux, SPIRV_LINUX is used in source/print.cpp:17 only
+    add_definitions(-DSPIRV_LINUX)
 elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
     add_definitions(-DSPIRV_EMSCRIPTEN)
 elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")

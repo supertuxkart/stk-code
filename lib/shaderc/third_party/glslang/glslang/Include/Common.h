@@ -46,6 +46,7 @@
 #endif
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 #include <list>
 #include <map>
 #include <set>
@@ -98,9 +99,15 @@ std::string to_string(const T& val) {
     }
 #endif
 
-#if defined(_MSC_VER)
-#define strdup _strdup
-#endif
+inline char* __Strdup(const char* s)
+{
+    size_t slen = strlen(s);
+    char* result = (char*)malloc(slen + 1);
+    if (result == NULL)
+        return NULL;
+    memcpy(result, s, slen + 1);
+    return result;
+}
 
 /* windows only pragma */
 #ifdef _MSC_VER

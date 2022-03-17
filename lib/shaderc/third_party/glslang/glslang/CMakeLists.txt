@@ -33,7 +33,7 @@
 
 if(WIN32)
     add_subdirectory(OSDependent/Windows)
-elseif(UNIX OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Fuchsia")
+elseif(UNIX OR "${CMAKE_SYSTEM_NAME}" STREQUAL "Fuchsia" OR "${CMAKE_SYSTEM_NAME}" STREQUAL "NintendoSwitch")
     add_subdirectory(OSDependent/Unix)
 else()
     message("unknown platform")
