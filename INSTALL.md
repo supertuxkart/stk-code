@@ -137,7 +137,7 @@ location, specify `CMAKE_INSTALL_PREFIX` when running cmake, e.g.:
 
 ## Building SuperTuxKart on Windows
 
-To Build SuperTuxKart on Windows, follow these instructions:
+To Build SuperTuxKart on Windows, first you need to install [Python](https://www.python.org/downloads/windows/) for [shaderc](https://github.com/google/shaderc) used by SuperTuxKart, after installing Python (if needed) follow these instructions:
 
 1. Download and install Visual Studio from here: [Visual Studio - Download](https://www.visualstudio.com/downloads/). The free Visual Studio Community edition works fine. Remember to select "Desktop development with C++" in the installer.
 
