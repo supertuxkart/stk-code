@@ -173,7 +173,9 @@ LOCAL_CFLAGS       := -I../lib/graphics_engine/include \
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 LOCAL_ARM_NEON     := false
 endif
+LOCAL_STATIC_LIBRARIES := shaderc
 include $(BUILD_STATIC_LIBRARY)
+$(call import-module, third_party/shaderc)
 include $(CLEAR_VARS)
 
 
