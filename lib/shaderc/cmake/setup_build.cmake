@@ -25,11 +25,11 @@ endif()
 
 # Find asciidoctor; see shaderc_add_asciidoc() from utils.cmake for
 # adding documents.
-find_program(ASCIIDOCTOR_EXE NAMES asciidoctor)
-if (NOT ASCIIDOCTOR_EXE)
-  message(STATUS "asciidoctor was not found - no documentation will be"
-          " generated")
-endif()
+#find_program(ASCIIDOCTOR_EXE NAMES asciidoctor)
+#if (NOT ASCIIDOCTOR_EXE)
+#  message(STATUS "asciidoctor was not found - no documentation will be"
+#          " generated")
+#endif()
 
 # On Windows, CMake by default compiles with the shared CRT.
 # Ensure that gmock compiles the same, otherwise failures will occur.
