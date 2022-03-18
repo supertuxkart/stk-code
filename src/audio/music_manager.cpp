@@ -55,11 +55,13 @@ MusicManager::MusicManager()
         if (UserConfigParams::m_sfx || UserConfigParams::m_music)
         {
 #endif
-            ALCdevice* device = alcOpenDevice(NULL); //The default sound device
+            std::string m_audio_device = UserConfigParams::m_audio_device;
+            const char *strdevice = m_audio_device != "default" ? m_audio_device.c_str() : NULL;
+            ALCdevice* device = alcOpenDevice(strdevice); //The sound device from option
             
             if (device == NULL)
             {
-                Log::warn("MusicManager", "Could not open the default sound "
+                Log::warn("MusicManager", "Could not open the sound "
                                           "device.");
                 m_initialized = false;
             }

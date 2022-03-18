@@ -24,6 +24,7 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
@@ -34,6 +35,7 @@
 #include "states_screens/options/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/options/user_screen.hpp"
+#include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>
@@ -87,6 +89,22 @@ void OptionsScreenAudio::init()
         getWidget<SpinnerWidget>("sfx_volume")->setActive(false);
     if(!UserConfigParams::m_music)
         getWidget<SpinnerWidget>("music_volume")->setActive(false);
+
+    ListWidget *list_widget = getWidget<ListWidget>("device");
+    list_widget->addItem("default", _("Default device"));
+#ifndef SERVER_ONLY
+
+    const char *rawdevices = alcGetString(NULL, ALC_ALL_DEVICES_SPECIFIER);
+    if (!rawdevices)
+        rawdevices = alcGetString(NULL, ALC_DEVICE_SPECIFIER);
+
+    for(; rawdevices && rawdevices[0] != '\0';) {
+        list_widget->addItem(rawdevices, rawdevices);
+        rawdevices += strlen(rawdevices) + 1;
+    }
+#endif
+
+    list_widget->setSelectionID( list_widget->getItemID(UserConfigParams::m_audio_device) );
 
 }   // init
 
@@ -186,6 +204,16 @@ void OptionsScreenAudio::eventCallback(Widget* widget, const std::string& name, 
         {
             getWidget<SpinnerWidget>("sfx_volume")->setActive(false);
         }
+    }
+    else if(name == "device")
+    {
+        ListWidget* list_widget = getWidget<ListWidget>("device");
+        UserConfigParams::m_audio_device = list_widget->getSelectionInternalName().c_str();
+        if (UserConfigParams::m_sfx)
+        {
+            SFXManager::get()->quickSound("horn");
+        }
+        Log::info("OptionsScreenAudio", "Device is now %s", UserConfigParams::m_audio_device.c_str());
     }
 }   // eventCallback
 

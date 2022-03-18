@@ -422,6 +422,10 @@ namespace UserConfigParams
             PARAM_DEFAULT(  FloatUserConfigParam(0.5f, "music_volume",
             &m_audio_group, "Music volume from 0.0 to 1.0") );
 
+    PARAM_PREFIX StringUserConfigParam      m_audio_device
+            PARAM_DEFAULT( StringUserConfigParam("default", "device", &m_audio_group,
+            "Which audio device to use") );
+
     // ---- Race setup
     PARAM_PREFIX GroupUserConfigParam        m_race_setup_group
         PARAM_DEFAULT( GroupUserConfigParam("RaceSetup",
