@@ -5,8 +5,9 @@ namespace GE
 {
 irr::video::IVideoDriver* g_driver = NULL;
 GEConfig g_config = {};
+std::string g_shader_folder = "";
 
-void init(irr::video::IVideoDriver* driver)
+void setVideoDriver(irr::video::IVideoDriver* driver)
 {
     g_driver = driver;
 }
@@ -24,6 +25,16 @@ GE::GEVulkanDriver* getVKDriver()
 GEConfig* getGEConfig()
 {
     return &g_config;
+}
+
+void setShaderFolder(const std::string& path)
+{
+    g_shader_folder = path + "ge_shaders/";
+}
+
+const std::string& getShaderFolder()
+{
+    return g_shader_folder;
 }
 
 void deinit()

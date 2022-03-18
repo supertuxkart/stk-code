@@ -275,18 +275,17 @@ namespace GE
             return m_vk->samplers.at(s);
         }
         VkDevice getDevice() const { return m_vk->device; }
-        void destroyVulkan()
-        {
-            delete m_vk.get();
-            m_vk.release();
-        }
+        void destroyVulkan();
         bool createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                           VkMemoryPropertyFlags properties, VkBuffer& buffer,
                           VkDeviceMemory& buffer_memory);
         VkPhysicalDevice getPhysicalDevice() const { return m_physical_device; }
         void waitIdle()                   { vkQueueWaitIdle(m_graphics_queue); }
+        const VkPhysicalDeviceProperties& getPhysicalDeviceProperties() const
+                                                        { return m_properties; }
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer command_buffer);
+        io::IFileSystem* getFileSystem() const            { return FileSystem; }
 
     private:
         struct SwapChainSupportDetails

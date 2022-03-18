@@ -1,5 +1,7 @@
 #include "ge_vulkan_driver.hpp"
 
+#include "ge_vulkan_shader_manager.hpp"
+
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
 #include "SDL_vulkan.h"
@@ -491,6 +493,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     createCommandPool();
     createCommandBuffers();
     createSamplers();
+    GEVulkanShaderManager::init(this);
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
@@ -503,6 +506,14 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 GEVulkanDriver::~GEVulkanDriver()
 {
 }   // ~GEVulkanDriver
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::destroyVulkan()
+{
+    GEVulkanShaderManager::destroy();
+    delete m_vk.get();
+    m_vk.release();
+}   // destroyVulkan
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createInstance(SDL_Window* window)
