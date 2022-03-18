@@ -694,6 +694,10 @@ void GEVulkanDriver::createDevice()
     }
 
     VkPhysicalDeviceFeatures device_features = {};
+    if (m_features.shaderSampledImageArrayDynamicIndexing == VK_FALSE)
+        throw std::runtime_error("doesn't support shaderSampledImageArrayDynamicIndexing");
+    device_features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+
     if (m_features.samplerAnisotropy == VK_TRUE)
         device_features.samplerAnisotropy = VK_TRUE;
 
