@@ -82,6 +82,12 @@ bool GEVulkanFeatures::supportsNonUniformIndexing()
 }   // supportsNonUniformIndexing
 
 // ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsDifferentTexturePerDraw()
+{
+    return g_supports_descriptor_indexing && g_supports_non_uniform_indexing;
+}   // supportsDifferentTexturePerDraw
+
+// ----------------------------------------------------------------------------
 bool GEVulkanFeatures::supportsPartiallyBound()
 {
     return g_supports_partially_bound;

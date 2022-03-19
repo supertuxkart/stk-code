@@ -17,6 +17,8 @@ bool supportsDescriptorIndexing();
 // ----------------------------------------------------------------------------
 bool supportsNonUniformIndexing();
 // ----------------------------------------------------------------------------
+bool supportsDifferentTexturePerDraw();
+// ----------------------------------------------------------------------------
 bool supportsPartiallyBound();
 };   // GEVulkanFeatures
 

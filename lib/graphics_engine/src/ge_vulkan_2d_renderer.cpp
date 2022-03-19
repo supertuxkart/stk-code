@@ -3,6 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
+#include "ge_vulkan_features.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 
 #include <algorithm>
@@ -421,8 +422,34 @@ void GEVulkan2dRenderer::render()
         VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
         &g_descriptor_sets[g_vk->getCurrentFrame()], 0, NULL);
 
-    vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(),
-        (uint32_t)(g_tris_index_queue.size()), 1, 0, 0, 0);
+    if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
+    {
+        vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(),
+            (uint32_t)(g_tris_index_queue.size()), 1, 0, 0, 0);
+    }
+    else
+    {
+        unsigned idx = 0;
+        unsigned idx_count = 0;
+        int sampler_idx = g_tris_queue[0].sampler_idx;
+        for (; idx < g_tris_index_queue.size(); idx += 3)
+        {
+            Tri& cur_tri = g_tris_queue[g_tris_index_queue[idx]];
+            if (cur_tri.sampler_idx != sampler_idx)
+            {
+                vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
+                    idx - idx_count, 0, 0);
+                sampler_idx = cur_tri.sampler_idx;
+                idx_count = 3;
+            }
+            else
+            {
+                idx_count += 3;
+            }
+        }
+        vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
+            idx - idx_count, 0, 0);
+    }
 
 end_cmd:
     vkCmdEndRenderPass(g_vk->getCurrentCommandBuffer());

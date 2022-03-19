@@ -42,7 +42,7 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
     std::ostringstream oss;
     oss << "#version 450\n";
     oss << "#define SAMPLER_SIZE " << g_sampler_size << "\n";
-    if (GEVulkanFeatures::supportsDescriptorIndexing())
+    if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
     {
         oss << "#extension GL_EXT_nonuniform_qualifier : enable\n";
         oss << "#define GE_SAMPLE_TEX_INDEX nonuniformEXT\n";
