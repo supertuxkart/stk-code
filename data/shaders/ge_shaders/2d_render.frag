@@ -8,5 +8,5 @@ layout(location = 0) out vec4 o_color;
 
 void main()
 {
-    o_color = texture(f_tex[f_sampler_index], f_uv) * f_color;
+    o_color = texture(f_tex[GE_SAMPLE_TEX_INDEX(f_sampler_index)], f_uv) * f_color;
 }

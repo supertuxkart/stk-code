@@ -2,6 +2,7 @@
 
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_features.hpp"
 
 #include <algorithm>
 #include <sstream>
@@ -12,6 +13,8 @@
 
 namespace GE
 {
+namespace GEVulkanShaderManager
+{
 // ============================================================================
 GEVulkanDriver* g_vk = NULL;
 irr::io::IFileSystem* g_file_system = NULL;
@@ -21,6 +24,8 @@ uint32_t g_sampler_size = 0;
 
 VkShaderModule g_2d_render_vert = VK_NULL_HANDLE;
 VkShaderModule g_2d_render_frag = VK_NULL_HANDLE;
+}   // GEVulkanShaderManager
+
 // ============================================================================
 void GEVulkanShaderManager::init(GEVulkanDriver* vk)
 {
@@ -37,6 +42,13 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
     std::ostringstream oss;
     oss << "#version 450\n";
     oss << "#define SAMPLER_SIZE " << g_sampler_size << "\n";
+    if (GEVulkanFeatures::supportsDescriptorIndexing())
+    {
+        oss << "#extension GL_EXT_nonuniform_qualifier : enable\n";
+        oss << "#define GE_SAMPLE_TEX_INDEX nonuniformEXT\n";
+    }
+    else
+        oss << "#define GE_SAMPLE_TEX_INDEX int\n";
     g_predefines = oss.str();
 
     // 2D rendering shader
@@ -99,4 +111,23 @@ VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
     return shader_module;
 }   // loadShader
 
+// ----------------------------------------------------------------------------
+unsigned GEVulkanShaderManager::getSamplerSize()
+{
+    return g_sampler_size;
+}   // getSamplerSize
+
+// ----------------------------------------------------------------------------
+VkShaderModule GEVulkanShaderManager::get2dRenderVert()
+{
+    return g_2d_render_vert;
+}   // get2dRenderVert
+
+// ----------------------------------------------------------------------------
+VkShaderModule GEVulkanShaderManager::get2dRenderFrag()
+{
+    return g_2d_render_frag;
+}   // get2dRenderFrag
+
+// ----------------------------------------------------------------------------
 }

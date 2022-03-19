@@ -11,7 +11,7 @@
 #include "../source/Irrlicht/CNullDriver.h"
 #include "SIrrCreationParameters.h"
 #include "SColor.h"
-#include <map>
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
@@ -23,8 +23,9 @@ namespace GE
 {
     enum GEVulkanSampler : unsigned
     {
-        GVS_MIN,
-        GVS_NEAREST = GVS_MIN
+        GVS_MIN = 0,
+        GVS_NEAREST = GVS_MIN,
+        GVS_COUNT,
     };
     class GEVulkanDriver : public video::CNullDriver
     {
@@ -40,10 +41,10 @@ namespace GE
         virtual bool beginScene(bool backBuffer=true, bool zBuffer=true,
                 SColor color=SColor(255,0,0,0),
                 const SExposedVideoData& videoData=SExposedVideoData(),
-                core::rect<s32>* sourceRect=0) { return true; }
+                core::rect<s32>* sourceRect=0);
 
         //! applications must call this method after performing any rendering. returns false if failed.
-        virtual bool endScene() { return true; }
+        virtual bool endScene();
 
         //! queries the features of the driver, returns true if feature is available
         virtual bool queryFeature(E_VIDEO_DRIVER_FEATURE feature) const  { return true; }
@@ -52,7 +53,7 @@ namespace GE
         virtual void setTransform(E_TRANSFORMATION_STATE state, const core::matrix4& mat) {}
 
         //! sets a material
-        virtual void setMaterial(const SMaterial& material) {}
+        virtual void setMaterial(const SMaterial& material) { Material = material; }
 
         //! sets a render target
         virtual bool setRenderTarget(video::ITexture* texture,
@@ -120,17 +121,17 @@ namespace GE
         virtual void draw2DVertexPrimitiveList(const void* vertices, u32 vertexCount,
                 const void* indexList, u32 primitiveCount,
                 E_VERTEX_TYPE vType, scene::E_PRIMITIVE_TYPE pType,
-                E_INDEX_TYPE iType) {}
+                E_INDEX_TYPE iType);
 
         //! draws an 2d image, using a color (if color is other then Color(255,255,255,255)) and the alpha channel of the texture if wanted.
         virtual void draw2DImage(const video::ITexture* texture, const core::position2d<s32>& destPos,
             const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,
-            SColor color=SColor(255,255,255,255), bool useAlphaChannelOfTexture=false) {}
+            SColor color=SColor(255,255,255,255), bool useAlphaChannelOfTexture=false);
 
         //! Draws a part of the texture into the rectangle.
         virtual void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
             const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect = 0,
-            const video::SColor* const colors=0, bool useAlphaChannelOfTexture=false) {}
+            const video::SColor* const colors=0, bool useAlphaChannelOfTexture=false);
 
         //! Draws a set of 2d images, using a color and the alpha channel of the texture.
         virtual void draw2DImageBatch(const video::ITexture* texture,
@@ -138,7 +139,7 @@ namespace GE
                 const core::array<core::rect<s32> >& sourceRects,
                 const core::rect<s32>* clipRect=0,
                 SColor color=SColor(255,255,255,255),
-                bool useAlphaChannelOfTexture=false) {}
+                bool useAlphaChannelOfTexture=false);
 
         //!Draws an 2d rectangle with a gradient.
         virtual void draw2DRectangle(const core::rect<s32>& pos,
@@ -268,11 +269,12 @@ namespace GE
 
         virtual void enableScissorTest(const core::rect<s32>& r) {}
         virtual void disableScissorTest() {}
+        virtual const core::dimension2d<u32>& getCurrentRenderTargetSize() const { return ScreenSize; }
         VkSampler getSampler(GEVulkanSampler s) const
         {
-            if (m_vk->samplers.find(s) == m_vk->samplers.end())
+            if (s >= GVS_COUNT)
                 return VK_NULL_HANDLE;
-            return m_vk->samplers.at(s);
+            return m_vk->samplers[s];
         }
         VkDevice getDevice() const { return m_vk->device; }
         void destroyVulkan();
@@ -286,7 +288,22 @@ namespace GE
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer command_buffer);
         io::IFileSystem* getFileSystem() const            { return FileSystem; }
+        VkExtent2D getSwapChainExtent() const    { return m_swap_chain_extent; }
+        size_t getSwapChainImagesCount() const
+                                      { return m_vk->swap_chain_images.size(); }
+        VkRenderPass getRenderPass() const         { return m_vk->render_pass; }
+        void copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer, VkDeviceSize size);
+        VkCommandBuffer getCurrentCommandBuffer()
+                              { return m_vk->command_buffers[m_current_frame]; }
+        std::vector<VkImage>& getSwapChainImages()
+                                             { return m_vk->swap_chain_images; }
+        std::vector<VkFramebuffer>& getSwapChainFramebuffers()
+                                       { return m_vk->swap_chain_framebuffers; }
 
+        unsigned int getCurrentFrame() const         { return m_current_frame; }
+        unsigned int getCurrentImageIndex() const      { return m_image_index; }
+        constexpr static unsigned getMaxFrameInFlight()            { return 2; }
+        video::SColor getClearColor() const            { return m_clear_color; }
     private:
         struct SwapChainSupportDetails
         {
@@ -320,6 +337,7 @@ namespace GE
             E_GPU_SHADING_LANGUAGE shadingLang = EGSL_DEFAULT) { return 0; }
 
         SIrrlichtCreationParameters m_params;
+        SMaterial Material;
         // RAII to auto cleanup
         struct VK
         {
@@ -334,7 +352,9 @@ namespace GE
             std::vector<VkFence> in_flight_fences;
             VkCommandPool command_pool;
             std::vector<VkCommandBuffer> command_buffers;
-            std::map<GEVulkanSampler, VkSampler> samplers;
+            std::array<VkSampler, GVS_COUNT> samplers;
+            VkRenderPass render_pass;
+            std::vector<VkFramebuffer> swap_chain_framebuffers;
             VK()
             {
                 instance = VK_NULL_HANDLE;
@@ -342,11 +362,16 @@ namespace GE
                 device = VK_NULL_HANDLE;
                 swap_chain = VK_NULL_HANDLE;
                 command_pool = VK_NULL_HANDLE;
+                samplers = {{}};
+                render_pass = VK_NULL_HANDLE;
             }
             ~VK()
             {
-                for (auto& sampler : samplers)
-                    vkDestroySampler(device, sampler.second, NULL);
+                for (VkFramebuffer& framebuffer : swap_chain_framebuffers)
+                    vkDestroyFramebuffer(device, framebuffer, NULL);
+                vkDestroyRenderPass(device, render_pass, NULL);
+                for (unsigned i = 0; i < GVS_COUNT; i++)
+                    vkDestroySampler(device, samplers[i], NULL);
                 if (!command_buffers.empty())
                 {
                     vkFreeCommandBuffers(device, command_pool,
@@ -389,6 +414,10 @@ namespace GE
         VkPhysicalDeviceProperties m_properties;
         VkPhysicalDeviceFeatures m_features;
 
+        unsigned int m_current_frame;
+        uint32_t m_image_index;
+        video::SColor m_clear_color;
+
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
         bool checkDeviceExtensions(VkPhysicalDevice device);
@@ -403,6 +432,8 @@ namespace GE
         void createCommandPool();
         void createCommandBuffers();
         void createSamplers();
+        void createRenderPass();
+        void createFramebuffers();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
     };

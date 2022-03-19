@@ -1,28 +1,24 @@
-#ifndef HEADER_GE_VULKAN_SHADER_MANAGER_HPP
-#define HEADER_GE_VULKAN_SHADER_MANAGER_HPP
+#ifndef HEADER_GE_VULKAN_FEATURES_HPP
+#define HEADER_GE_VULKAN_FEATURES_HPP
 
 #include "vulkan_wrapper.h"
-#include <string>
-#include <shaderc/shaderc.hpp>
 
 namespace GE
 {
 class GEVulkanDriver;
-namespace GEVulkanShaderManager
+namespace GEVulkanFeatures
 {
 // ----------------------------------------------------------------------------
 void init(GEVulkanDriver*);
 // ----------------------------------------------------------------------------
-void destroy();
+void printStats();
 // ----------------------------------------------------------------------------
-VkShaderModule loadShader(shaderc_shader_kind, const std::string&);
+bool supportsDescriptorIndexing();
 // ----------------------------------------------------------------------------
-VkShaderModule get2dRenderVert();
+bool supportsNonUniformIndexing();
 // ----------------------------------------------------------------------------
-VkShaderModule get2dRenderFrag();
-// ----------------------------------------------------------------------------
-unsigned getSamplerSize();
-};   // GEVulkanShaderManager
+bool supportsPartiallyBound();
+};   // GEVulkanFeatures
 
 }
 

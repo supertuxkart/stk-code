@@ -1,9 +1,12 @@
 #include "ge_vulkan_driver.hpp"
 
+#include "ge_vulkan_2d_renderer.hpp"
+#include "ge_vulkan_features.hpp"
+#include "ge_main.hpp"
 #include "ge_vulkan_shader_manager.hpp"
+#include "ge_vulkan_texture.hpp"
 
 #ifdef _IRR_COMPILE_WITH_VULKAN_
-const unsigned int MAX_FRAMES_IN_FLIGHT = 2;
 #include "SDL_vulkan.h"
 #include <algorithm>
 #include <limits>
@@ -453,6 +456,10 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_properties = {};
     m_features = {};
 
+    m_current_frame = 0;
+    m_image_index = 0;
+    m_clear_color = video::SColor(0);
+
     createInstance(window);
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
@@ -475,6 +482,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     m_device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     findPhysicalDevice();
+    GEVulkanFeatures::init(this);
     createDevice();
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
@@ -493,13 +501,19 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     createCommandPool();
     createCommandBuffers();
     createSamplers();
+    createRenderPass();
+    createFramebuffers();
     GEVulkanShaderManager::init(this);
+    // For GEVulkanDynamicBuffer
+    GE::setVideoDriver(this);
+    GEVulkan2dRenderer::init(this);
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
     os::Printer::log("Vulkan driver version", getDriverVersionString().c_str());
     for (const char* ext : m_device_extensions)
         os::Printer::log("Vulkan enabled extension", ext);
+    GEVulkanFeatures::printStats();
 }   // GEVulkanDriver
 
 // ----------------------------------------------------------------------------
@@ -510,6 +524,7 @@ GEVulkanDriver::~GEVulkanDriver()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::destroyVulkan()
 {
+    GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
     delete m_vk.get();
     m_vk.release();
@@ -518,6 +533,9 @@ void GEVulkanDriver::destroyVulkan()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createInstance(SDL_Window* window)
 {
+#define VK_MAKE_API_VERSION(variant, major, minor, patch) \
+    ((((uint32_t)(variant)) << 29) | (((uint32_t)(major)) << 22) | (((uint32_t)(minor)) << 12) | ((uint32_t)(patch)))
+
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
     if (gladLoadVulkanUserPtr(NULL, (GLADuserptrloadfunc)loader, NULL) == 0)
     {
@@ -531,10 +549,43 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     std::vector<const char*> extensions(count, NULL);
     if (!SDL_Vulkan_GetInstanceExtensions(window, &count, extensions.data()))
         throw std::runtime_error("SDL_Vulkan_GetInstanceExtensions failed with extensions vector");
+
+    uint32_t vk_version = 0;
+    bool vulkan_1_1 = false;
+#if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
+    PFN_vkEnumerateInstanceVersion e_ver = (PFN_vkEnumerateInstanceVersion)
+        vkGetInstanceProcAddr(NULL, "vkEnumerateInstanceVersion");
+    vulkan_1_1 = (e_ver && e_ver(&vk_version) == VK_SUCCESS &&
+        vk_version >= VK_MAKE_API_VERSION(0, 1, 1, 0));
+#else
+    vulkan_1_1 = (vkEnumerateInstanceVersion(&vk_version) == VK_SUCCESS &&
+        vk_version >= VK_MAKE_API_VERSION(0, 1, 1, 0));
+#endif
+
+    uint32_t layer_count = 0;
+    vkEnumerateInstanceLayerProperties(&layer_count, NULL);
+    std::vector<VkLayerProperties> available_layers(layer_count);
+    vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
+
+    std::vector<const char*> enabled_validation_layers;
+#ifdef ENABLE_VALIDATION
+    for (VkLayerProperties& prop : available_layers)
+    {
+        if (std::string(prop.layerName) == "VK_LAYER_KHRONOS_validation")
+            enabled_validation_layers.push_back("VK_LAYER_KHRONOS_validation");
+    }
+#endif
+
     VkInstanceCreateInfo create_info = {};
+    VkApplicationInfo app_info = {};
+    if (vulkan_1_1)
+        app_info.apiVersion = vk_version;
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.enabledExtensionCount = extensions.size();
     create_info.ppEnabledExtensionNames = extensions.data();
+    create_info.pApplicationInfo = &app_info;
+    create_info.enabledLayerCount = enabled_validation_layers.size();
+    create_info.ppEnabledLayerNames = enabled_validation_layers.data();
     VkResult result = vkCreateInstance(&create_info, NULL, &m_vk->instance);
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateInstance failed");
@@ -709,6 +760,15 @@ void GEVulkanDriver::createDevice()
         throw std::runtime_error("doesn't support shaderSampledImageArrayDynamicIndexing");
     device_features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
 
+    VkPhysicalDeviceVulkan12Features vulkan12_features = {};
+    vulkan12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
+    vulkan12_features.descriptorIndexing =
+        GEVulkanFeatures::supportsDescriptorIndexing();
+    vulkan12_features.shaderSampledImageArrayNonUniformIndexing =
+        GEVulkanFeatures::supportsNonUniformIndexing();
+    vulkan12_features.descriptorBindingPartiallyBound =
+        GEVulkanFeatures::supportsPartiallyBound();
+
     if (m_features.samplerAnisotropy == VK_TRUE)
         device_features.samplerAnisotropy = VK_TRUE;
 
@@ -720,6 +780,7 @@ void GEVulkanDriver::createDevice()
     create_info.enabledExtensionCount = m_device_extensions.size();
     create_info.ppEnabledExtensionNames = &m_device_extensions[0];
     create_info.enabledLayerCount = 0;
+    create_info.pNext = &vulkan12_features;
 
     VkResult result = vkCreateDevice(m_physical_device, &create_info, NULL, &m_vk->device);
 
@@ -898,6 +959,8 @@ found_mode:
 
     m_swap_chain_image_format = surface_format.format;
     m_swap_chain_extent = image_extent;
+    ScreenSize.Width = m_swap_chain_extent.width;
+    ScreenSize.Height = m_swap_chain_extent.height;
 
     for (unsigned int i = 0; i < m_vk->swap_chain_images.size(); i++)
     {
@@ -936,7 +999,7 @@ void GEVulkanDriver::createSyncObjects()
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    for (unsigned int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+    for (unsigned int i = 0; i < getMaxFrameInFlight(); i++)
     {
         VkSemaphore image_available_semaphore;
         VkResult result = vkCreateSemaphore(m_vk->device, &semaphore_info, NULL,
@@ -977,6 +1040,7 @@ void GEVulkanDriver::createCommandPool()
     VkCommandPoolCreateInfo pool_info = {};
     pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     pool_info.queueFamilyIndex = m_graphics_family;
+    pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 
     VkResult result = vkCreateCommandPool(m_vk->device, &pool_info, NULL,
         &m_vk->command_pool);
@@ -988,7 +1052,7 @@ void GEVulkanDriver::createCommandPool()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createCommandBuffers()
 {
-    std::vector<VkCommandBuffer> buffers(MAX_FRAMES_IN_FLIGHT);
+    std::vector<VkCommandBuffer> buffers(getMaxFrameInFlight());
 
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -1032,6 +1096,84 @@ void GEVulkanDriver::createSamplers()
         throw std::runtime_error("vkCreateSampler failed for GVS_NEAREST");
     m_vk->samplers[GVS_NEAREST] = sampler;
 }   // createSamplers
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createRenderPass()
+{
+    VkAttachmentDescription color_attachment = {};
+    color_attachment.format = m_swap_chain_image_format;
+    color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkAttachmentReference color_attachment_ref = {};
+    color_attachment_ref.attachment = 0;
+    color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkSubpassDescription subpass = {};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &color_attachment_ref;
+
+    VkSubpassDependency dependency = {};
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+    std::array<VkAttachmentDescription, 1> attachments = { color_attachment };
+    VkRenderPassCreateInfo render_pass_info = {};
+    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    render_pass_info.attachmentCount = (uint32_t)(attachments.size());
+    render_pass_info.pAttachments = &attachments[0];
+    render_pass_info.subpassCount = 1;
+    render_pass_info.pSubpasses = &subpass;
+    render_pass_info.dependencyCount = 1;
+    render_pass_info.pDependencies = &dependency;
+
+    VkResult result = vkCreateRenderPass(m_vk->device, &render_pass_info, NULL,
+        &m_vk->render_pass);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkCreateRenderPass failed");
+}   // createRenderPass
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createFramebuffers()
+{
+    const std::vector<VkImageView>& image_views = m_vk->swap_chain_image_views;
+    for (unsigned int i = 0; i < image_views.size(); i++)
+    {
+        std::array<VkImageView, 1> attachments =
+        {
+            image_views[i]
+        };
+
+        VkFramebufferCreateInfo framebuffer_info = {};
+        framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebuffer_info.renderPass = m_vk->render_pass;
+        framebuffer_info.attachmentCount = (uint32_t)(attachments.size());
+        framebuffer_info.pAttachments = &attachments[0];
+        framebuffer_info.width = m_swap_chain_extent.width;
+        framebuffer_info.height = m_swap_chain_extent.height;
+        framebuffer_info.layers = 1;
+
+        VkFramebuffer swap_chain_framebuffer = VK_NULL_HANDLE;
+        VkResult result = vkCreateFramebuffer(m_vk->device, &framebuffer_info,
+            NULL, &swap_chain_framebuffer);
+        if (result != VK_SUCCESS)
+            throw std::runtime_error("vkCreateFramebuffer failed");
+
+        m_vk->swap_chain_framebuffers.push_back(swap_chain_framebuffer);
+    }
+}   // createFramebuffers
 
 // ----------------------------------------------------------------------------
 bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
@@ -1088,6 +1230,19 @@ bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 }   // createBuffer
 
 // ----------------------------------------------------------------------------
+void GEVulkanDriver::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer,
+                                VkDeviceSize size)
+{
+    VkCommandBuffer command_buffer = beginSingleTimeCommands();
+
+    VkBufferCopy copy_region = {};
+    copy_region.size = size;
+    vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, 1, &copy_region);
+
+    endSingleTimeCommands(command_buffer);
+}   // copyBuffer
+
+// ----------------------------------------------------------------------------
 VkCommandBuffer GEVulkanDriver::beginSingleTimeCommands()
 {
     VkCommandBufferAllocateInfo alloc_info = {};
@@ -1129,6 +1284,418 @@ void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)
 {
     CNullDriver::OnResize(size);
 }   // OnResize
+
+// ----------------------------------------------------------------------------
+bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
+                                const SExposedVideoData& videoData,
+                                core::rect<s32>* sourceRect)
+{
+    if (!video::CNullDriver::beginScene(backBuffer, zBuffer, color, videoData,
+        sourceRect))
+        return false;
+
+    m_clear_color = color;
+    VkFence fence = m_vk->in_flight_fences[m_current_frame];
+    vkWaitForFences(m_vk->device, 1, &fence, VK_TRUE,
+        std::numeric_limits<uint64_t>::max());
+    vkResetFences(m_vk->device, 1, &fence);
+
+    VkSemaphore semaphore = m_vk->image_available_semaphores[m_current_frame];
+    VkResult result = vkAcquireNextImageKHR(m_vk->device, m_vk->swap_chain,
+        std::numeric_limits<uint64_t>::max(), semaphore, VK_NULL_HANDLE,
+        &m_image_index);
+
+    return (result != VK_ERROR_OUT_OF_DATE_KHR);
+}   // beginScene
+
+// ----------------------------------------------------------------------------
+bool GEVulkanDriver::endScene()
+{
+    GEVulkan2dRenderer::render();
+
+    VkSemaphore wait_semaphores[] = {m_vk->image_available_semaphores[m_current_frame]};
+    VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    VkSemaphore signal_semaphores[] = {m_vk->render_finished_semaphores[m_current_frame]};
+
+    VkSubmitInfo submit_info = {};
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.waitSemaphoreCount = 1;
+    submit_info.pWaitSemaphores = wait_semaphores;
+    submit_info.pWaitDstStageMask = wait_stages;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = &m_vk->command_buffers[m_current_frame];
+    submit_info.signalSemaphoreCount = 1;
+    submit_info.pSignalSemaphores = signal_semaphores;
+
+    VkResult result = vkQueueSubmit(m_graphics_queue, 1, &submit_info,
+        m_vk->in_flight_fences[m_current_frame]);
+
+    if (result != VK_SUCCESS)
+        return false;
+
+    VkSemaphore semaphores[] =
+    {
+        m_vk->render_finished_semaphores[m_current_frame]
+    };
+    VkSwapchainKHR swap_chains[] =
+    {
+        m_vk->swap_chain
+    };
+
+    VkPresentInfoKHR present_info = {};
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount = 1;
+    present_info.pWaitSemaphores = semaphores;
+    present_info.swapchainCount = 1;
+    present_info.pSwapchains = swap_chains;
+    present_info.pImageIndices = &m_image_index;
+
+    m_current_frame = (m_current_frame + 1) % getMaxFrameInFlight();
+
+    result = vkQueuePresentKHR(m_present_queue, &present_info);
+
+    if (!video::CNullDriver::endScene())
+        return false;
+
+    return (result != VK_ERROR_OUT_OF_DATE_KHR && result != VK_SUBOPTIMAL_KHR);
+}   // endScene
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::draw2DVertexPrimitiveList(const void* vertices,
+                                               u32 vertexCount,
+                                               const void* indexList,
+                                               u32 primitiveCount,
+                                               E_VERTEX_TYPE vType,
+                                               scene::E_PRIMITIVE_TYPE pType,
+                                               E_INDEX_TYPE iType)
+{
+    const GEVulkanTexture* texture =
+        dynamic_cast<const GEVulkanTexture*>(Material.getTexture(0));
+    if (!texture)
+        return;
+    if (vType != EVT_STANDARD || iType != EIT_16BIT)
+        return;
+    if (pType == irr::scene::EPT_TRIANGLES)
+    {
+        S3DVertex* v = (S3DVertex*)vertices;
+        u16* i = (u16*)indexList;
+        GEVulkan2dRenderer::addVerticesIndices(v, vertexCount, i,
+            primitiveCount, texture);
+    }
+}   // draw2DVertexPrimitiveList
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::draw2DImage(const video::ITexture* tex,
+                                 const core::position2d<s32>& destPos,
+                                 const core::rect<s32>& sourceRect,
+                                 const core::rect<s32>* clipRect,
+                                 SColor color, bool useAlphaChannelOfTexture)
+{
+    const GEVulkanTexture* texture = dynamic_cast<const GEVulkanTexture*>(tex);
+    if (!texture)
+        return;
+
+    if (!sourceRect.isValid())
+        return;
+
+    core::position2d<s32> targetPos = destPos;
+    core::position2d<s32> sourcePos = sourceRect.UpperLeftCorner;
+    // This needs to be signed as it may go negative.
+    core::dimension2d<s32> sourceSize(sourceRect.getSize());
+
+    if (clipRect)
+    {
+        if (targetPos.X < clipRect->UpperLeftCorner.X)
+        {
+            sourceSize.Width += targetPos.X - clipRect->UpperLeftCorner.X;
+            if (sourceSize.Width <= 0)
+                return;
+
+            sourcePos.X -= targetPos.X - clipRect->UpperLeftCorner.X;
+            targetPos.X = clipRect->UpperLeftCorner.X;
+        }
+
+        if (targetPos.X + (s32)sourceSize.Width > clipRect->LowerRightCorner.X)
+        {
+            sourceSize.Width -= (targetPos.X + sourceSize.Width) - clipRect->LowerRightCorner.X;
+            if (sourceSize.Width <= 0)
+                return;
+        }
+
+        if (targetPos.Y < clipRect->UpperLeftCorner.Y)
+        {
+            sourceSize.Height += targetPos.Y - clipRect->UpperLeftCorner.Y;
+            if (sourceSize.Height <= 0)
+                return;
+
+            sourcePos.Y -= targetPos.Y - clipRect->UpperLeftCorner.Y;
+            targetPos.Y = clipRect->UpperLeftCorner.Y;
+        }
+
+        if (targetPos.Y + (s32)sourceSize.Height > clipRect->LowerRightCorner.Y)
+        {
+            sourceSize.Height -= (targetPos.Y + sourceSize.Height) - clipRect->LowerRightCorner.Y;
+            if (sourceSize.Height <= 0)
+                return;
+        }
+    }
+
+    // clip these coordinates
+
+    if (targetPos.X<0)
+    {
+        sourceSize.Width += targetPos.X;
+        if (sourceSize.Width <= 0)
+            return;
+
+        sourcePos.X -= targetPos.X;
+        targetPos.X = 0;
+    }
+
+    const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
+
+    if (targetPos.X + sourceSize.Width > (s32)renderTargetSize.Width)
+    {
+        sourceSize.Width -= (targetPos.X + sourceSize.Width) - renderTargetSize.Width;
+        if (sourceSize.Width <= 0)
+            return;
+    }
+
+    if (targetPos.Y<0)
+    {
+        sourceSize.Height += targetPos.Y;
+        if (sourceSize.Height <= 0)
+            return;
+
+        sourcePos.Y -= targetPos.Y;
+        targetPos.Y = 0;
+    }
+
+    if (targetPos.Y + sourceSize.Height > (s32)renderTargetSize.Height)
+    {
+        sourceSize.Height -= (targetPos.Y + sourceSize.Height) - renderTargetSize.Height;
+        if (sourceSize.Height <= 0)
+            return;
+    }
+
+    // ok, we've clipped everything.
+    // now draw it.
+
+    core::rect<f32> tcoords;
+    tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getSize().Width ;
+    tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getSize().Height;
+    tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getSize().Width);
+    tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getSize().Height);
+
+    const core::rect<s32> poss(targetPos, sourceSize);
+
+    S3DVertex vtx[4];
+    vtx[0] = S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.UpperLeftCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[1] = S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.LowerRightCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[2] = S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.LowerRightCorner.X, tcoords.LowerRightCorner.Y);
+    vtx[3] = S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, color,
+            tcoords.UpperLeftCorner.X, tcoords.LowerRightCorner.Y);
+
+    u16 indices[6] = {0,1,2,0,2,3};
+
+    GEVulkan2dRenderer::addVerticesIndices(&vtx[0], 4, &indices[0], 2, texture);
+}   // draw2DImage
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::draw2DImage(const video::ITexture* tex,
+                                 const core::rect<s32>& destRect,
+                                 const core::rect<s32>& sourceRect,
+                                 const core::rect<s32>* clipRect,
+                                 const video::SColor* const colors,
+                                 bool useAlphaChannelOfTexture)
+{
+    const GEVulkanTexture* texture = dynamic_cast<const GEVulkanTexture*>(tex);
+    if (!texture)
+        return;
+
+    const core::dimension2d<u32>& ss = texture->getSize();
+    core::rect<f32> tcoords;
+    tcoords.UpperLeftCorner.X = (f32)sourceRect.UpperLeftCorner.X / (f32)ss.Width;
+    tcoords.UpperLeftCorner.Y = (f32)sourceRect.UpperLeftCorner.Y / (f32)ss.Height;
+    tcoords.LowerRightCorner.X = (f32)sourceRect.LowerRightCorner.X / (f32)ss.Width;
+    tcoords.LowerRightCorner.Y = (f32)sourceRect.LowerRightCorner.Y / (f32)ss.Height;
+
+    const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
+
+    const video::SColor temp[4] =
+    {
+        0xFFFFFFFF,
+        0xFFFFFFFF,
+        0xFFFFFFFF,
+        0xFFFFFFFF
+    };
+
+    const video::SColor* const useColor = colors ? colors : temp;
+
+    S3DVertex vtx[4];
+    vtx[0] = S3DVertex((f32)destRect.UpperLeftCorner.X, (f32)destRect.UpperLeftCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, useColor[0],
+            tcoords.UpperLeftCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[1] = S3DVertex((f32)destRect.LowerRightCorner.X, (f32)destRect.UpperLeftCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, useColor[3],
+            tcoords.LowerRightCorner.X, tcoords.UpperLeftCorner.Y);
+    vtx[2] = S3DVertex((f32)destRect.LowerRightCorner.X, (f32)destRect.LowerRightCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, useColor[2],
+            tcoords.LowerRightCorner.X, tcoords.LowerRightCorner.Y);
+    vtx[3] = S3DVertex((f32)destRect.UpperLeftCorner.X, (f32)destRect.LowerRightCorner.Y, 0.0f,
+            0.0f, 0.0f, 0.0f, useColor[1],
+            tcoords.UpperLeftCorner.X, tcoords.LowerRightCorner.Y);
+
+    u16 indices[6] = {0,1,2,0,2,3};
+
+    GEVulkan2dRenderer::addVerticesIndices(&vtx[0], 4, &indices[0], 2, texture);
+}   // draw2DImage
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::draw2DImageBatch(const video::ITexture* tex,
+                          const core::array<core::position2d<s32> >& positions,
+                          const core::array<core::rect<s32> >& sourceRects,
+                          const core::rect<s32>* clipRect, SColor color,
+                          bool useAlphaChannelOfTexture)
+{
+    const GEVulkanTexture* texture = dynamic_cast<const GEVulkanTexture*>(tex);
+    if (!texture)
+        return;
+
+    const irr::u32 drawCount = core::min_<u32>(positions.size(), sourceRects.size());
+
+    core::array<S3DVertex> vtx(drawCount * 4);
+    core::array<u16> indices(drawCount * 6);
+
+    for(u32 i = 0;i < drawCount;i++)
+    {
+        core::position2d<s32> targetPos = positions[i];
+        core::position2d<s32> sourcePos = sourceRects[i].UpperLeftCorner;
+        // This needs to be signed as it may go negative.
+        core::dimension2d<s32> sourceSize(sourceRects[i].getSize());
+
+        if (clipRect)
+        {
+            if (targetPos.X < clipRect->UpperLeftCorner.X)
+            {
+                sourceSize.Width += targetPos.X - clipRect->UpperLeftCorner.X;
+                if (sourceSize.Width <= 0)
+                    continue;
+
+                sourcePos.X -= targetPos.X - clipRect->UpperLeftCorner.X;
+                targetPos.X = clipRect->UpperLeftCorner.X;
+            }
+
+            if (targetPos.X + (s32)sourceSize.Width > clipRect->LowerRightCorner.X)
+            {
+                sourceSize.Width -= (targetPos.X + sourceSize.Width) - clipRect->LowerRightCorner.X;
+                if (sourceSize.Width <= 0)
+                    continue;
+            }
+
+            if (targetPos.Y < clipRect->UpperLeftCorner.Y)
+            {
+                sourceSize.Height += targetPos.Y - clipRect->UpperLeftCorner.Y;
+                if (sourceSize.Height <= 0)
+                    continue;
+
+                sourcePos.Y -= targetPos.Y - clipRect->UpperLeftCorner.Y;
+                targetPos.Y = clipRect->UpperLeftCorner.Y;
+            }
+
+            if (targetPos.Y + (s32)sourceSize.Height > clipRect->LowerRightCorner.Y)
+            {
+                sourceSize.Height -= (targetPos.Y + sourceSize.Height) - clipRect->LowerRightCorner.Y;
+                if (sourceSize.Height <= 0)
+                    continue;
+            }
+        }
+
+        // clip these coordinates
+
+        if (targetPos.X<0)
+        {
+            sourceSize.Width += targetPos.X;
+            if (sourceSize.Width <= 0)
+                continue;
+
+            sourcePos.X -= targetPos.X;
+            targetPos.X = 0;
+        }
+
+        const core::dimension2d<u32>& renderTargetSize = getCurrentRenderTargetSize();
+
+        if (targetPos.X + sourceSize.Width > (s32)renderTargetSize.Width)
+        {
+            sourceSize.Width -= (targetPos.X + sourceSize.Width) - renderTargetSize.Width;
+            if (sourceSize.Width <= 0)
+                continue;
+        }
+
+        if (targetPos.Y<0)
+        {
+            sourceSize.Height += targetPos.Y;
+            if (sourceSize.Height <= 0)
+                continue;
+
+            sourcePos.Y -= targetPos.Y;
+            targetPos.Y = 0;
+        }
+
+        if (targetPos.Y + sourceSize.Height > (s32)renderTargetSize.Height)
+        {
+            sourceSize.Height -= (targetPos.Y + sourceSize.Height) - renderTargetSize.Height;
+            if (sourceSize.Height <= 0)
+                continue;
+        }
+
+        // ok, we've clipped everything.
+        // now draw it.
+
+        core::rect<f32> tcoords;
+        tcoords.UpperLeftCorner.X = (((f32)sourcePos.X)) / texture->getSize().Width ;
+        tcoords.UpperLeftCorner.Y = (((f32)sourcePos.Y)) / texture->getSize().Height;
+        tcoords.LowerRightCorner.X = tcoords.UpperLeftCorner.X + ((f32)(sourceSize.Width) / texture->getSize().Width);
+        tcoords.LowerRightCorner.Y = tcoords.UpperLeftCorner.Y + ((f32)(sourceSize.Height) / texture->getSize().Height);
+
+        const core::rect<s32> poss(targetPos, sourceSize);
+
+        vtx.push_back(S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+                0.0f, 0.0f, 0.0f, color,
+                tcoords.UpperLeftCorner.X, tcoords.UpperLeftCorner.Y));
+        vtx.push_back(S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.UpperLeftCorner.Y, 0.0f,
+                0.0f, 0.0f, 0.0f, color,
+                tcoords.LowerRightCorner.X, tcoords.UpperLeftCorner.Y));
+        vtx.push_back(S3DVertex((f32)poss.LowerRightCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+                0.0f, 0.0f, 0.0f, color,
+                tcoords.LowerRightCorner.X, tcoords.LowerRightCorner.Y));
+        vtx.push_back(S3DVertex((f32)poss.UpperLeftCorner.X, (f32)poss.LowerRightCorner.Y, 0.0f,
+                0.0f, 0.0f, 0.0f, color,
+                tcoords.UpperLeftCorner.X, tcoords.LowerRightCorner.Y));
+
+        const u32 curPos = vtx.size()-4;
+        indices.push_back(0+curPos);
+        indices.push_back(1+curPos);
+        indices.push_back(2+curPos);
+
+        indices.push_back(0+curPos);
+        indices.push_back(2+curPos);
+        indices.push_back(3+curPos);
+    }
+
+    if (vtx.size())
+    {
+        GEVulkan2dRenderer::addVerticesIndices(vtx.pointer(), vtx.size(),
+            indices.pointer(), indices.size() / 3, texture);
+    }
+}   // draw2DImageBatch
 
 }
 
