@@ -482,6 +482,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     m_device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     findPhysicalDevice();
+    vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
     GEVulkanFeatures::init(this);
     createDevice();
 
@@ -495,7 +496,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     }
 #endif
 
-    vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
     createSwapChain();
     createSyncObjects();
     createCommandPool();
@@ -756,9 +756,8 @@ void GEVulkanDriver::createDevice()
     }
 
     VkPhysicalDeviceFeatures device_features = {};
-    if (m_features.shaderSampledImageArrayDynamicIndexing == VK_FALSE)
-        throw std::runtime_error("doesn't support shaderSampledImageArrayDynamicIndexing");
-    device_features.shaderSampledImageArrayDynamicIndexing = VK_TRUE;
+    device_features.shaderSampledImageArrayDynamicIndexing =
+        GEVulkanFeatures::supportsBindTexturesAtOnce();
 
     VkPhysicalDeviceVulkan12Features vulkan12_features = {};
     vulkan12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;

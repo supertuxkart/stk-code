@@ -20,7 +20,7 @@ GEVulkanDriver* g_vk = NULL;
 irr::io::IFileSystem* g_file_system = NULL;
 
 std::string g_predefines = "";
-uint32_t g_sampler_size = 0;
+uint32_t g_sampler_size = 256;
 
 VkShaderModule g_2d_render_vert = VK_NULL_HANDLE;
 VkShaderModule g_2d_render_frag = VK_NULL_HANDLE;
@@ -32,16 +32,12 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
     g_vk = vk;
     g_file_system = vk->getFileSystem();
 
-    VkPhysicalDeviceLimits limit = g_vk->getPhysicalDeviceProperties().limits;
-    // According to https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxDescriptorSetSampledImages&platform=all
-    // almost all users have at least 96
-    if (limit.maxDescriptorSetSampledImages < 96)
-        throw std::runtime_error("maxDescriptorSetSampledImages is too low");
-    g_sampler_size = 96;
-
     std::ostringstream oss;
     oss << "#version 450\n";
     oss << "#define SAMPLER_SIZE " << g_sampler_size << "\n";
+    if (GEVulkanFeatures::supportsBindTexturesAtOnce())
+        oss << "#define BIND_TEXTURES_AT_ONCE\n";
+
     if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
     {
         oss << "#extension GL_EXT_nonuniform_qualifier : enable\n";
