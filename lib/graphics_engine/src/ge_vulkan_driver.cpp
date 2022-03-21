@@ -960,6 +960,7 @@ found_mode:
     m_swap_chain_extent = image_extent;
     ScreenSize.Width = m_swap_chain_extent.width;
     ScreenSize.Height = m_swap_chain_extent.height;
+    m_clip = getFullscreenClip();
 
     for (unsigned int i = 0; i < m_vk->swap_chain_images.size(); i++)
     {
@@ -1504,7 +1505,11 @@ void GEVulkanDriver::draw2DImage(const video::ITexture* tex,
 
     u16 indices[6] = {0,1,2,0,2,3};
 
+    if (clipRect)
+        enableScissorTest(*clipRect);
     GEVulkan2dRenderer::addVerticesIndices(&vtx[0], 4, &indices[0], 2, texture);
+    if (clipRect)
+        disableScissorTest();
 }   // draw2DImage
 
 // ----------------------------------------------------------------------------
@@ -1554,7 +1559,11 @@ void GEVulkanDriver::draw2DImage(const video::ITexture* tex,
 
     u16 indices[6] = {0,1,2,0,2,3};
 
+    if (clipRect)
+        enableScissorTest(*clipRect);
     GEVulkan2dRenderer::addVerticesIndices(&vtx[0], 4, &indices[0], 2, texture);
+    if (clipRect)
+        disableScissorTest();
 }   // draw2DImage
 
 // ----------------------------------------------------------------------------
@@ -1691,8 +1700,12 @@ void GEVulkanDriver::draw2DImageBatch(const video::ITexture* tex,
 
     if (vtx.size())
     {
+        if (clipRect)
+            enableScissorTest(*clipRect);
         GEVulkan2dRenderer::addVerticesIndices(vtx.pointer(), vtx.size(),
             indices.pointer(), indices.size() / 3, texture);
+        if (clipRect)
+            disableScissorTest();
     }
 }   // draw2DImageBatch
 

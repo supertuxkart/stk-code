@@ -267,8 +267,12 @@ namespace GE
         //! Returns the maximum texture size supported.
         virtual core::dimension2du getMaxTextureSize() const { return core::dimension2du(16384, 16384); }
 
-        virtual void enableScissorTest(const core::rect<s32>& r) {}
-        virtual void disableScissorTest() {}
+        virtual void enableScissorTest(const core::rect<s32>& r) { m_clip = r; }
+        core::rect<s32> getFullscreenClip() const
+        {
+            return core::rect<s32>(0, 0, ScreenSize.Width, ScreenSize.Height);
+        }
+        virtual void disableScissorTest()      { m_clip = getFullscreenClip(); }
         virtual const core::dimension2d<u32>& getCurrentRenderTargetSize() const { return ScreenSize; }
         VkSampler getSampler(GEVulkanSampler s) const
         {
@@ -306,6 +310,7 @@ namespace GE
         unsigned int getCurrentImageIndex() const      { return m_image_index; }
         constexpr static unsigned getMaxFrameInFlight()            { return 2; }
         video::SColor getClearColor() const            { return m_clear_color; }
+        const core::rect<s32>& getCurrentClip() const         { return m_clip; }
     private:
         struct SwapChainSupportDetails
         {
@@ -419,6 +424,7 @@ namespace GE
         unsigned int m_current_frame;
         uint32_t m_image_index;
         video::SColor m_clear_color;
+        core::rect<s32> m_clip;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

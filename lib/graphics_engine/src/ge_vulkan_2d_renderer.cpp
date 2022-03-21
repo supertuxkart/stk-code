@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <utility>
 
+#include "rect.h"
 #include "vector2d.h"
 #include "SColor.h"
 
@@ -46,6 +47,7 @@ struct Tri
 };
 
 std::map<const irr::video::ITexture*, unsigned> g_tex_map;
+std::vector<irr::core::recti> g_tris_clip;
 std::vector<Tri> g_tris_queue;
 std::vector<uint16_t> g_tris_index_queue;
 }   // GEVulkan2dRenderer
@@ -242,6 +244,12 @@ void GEVulkan2dRenderer::createGraphicsPipeline()
     color_blending.blendConstants[2] = 0.0f;
     color_blending.blendConstants[3] = 0.0f;
 
+    VkDynamicState dynamic_state = VK_DYNAMIC_STATE_SCISSOR;
+    VkPipelineDynamicStateCreateInfo dynamic_state_info = {};
+    dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+    dynamic_state_info.dynamicStateCount = 1,
+    dynamic_state_info.pDynamicStates = &dynamic_state;
+
     VkGraphicsPipelineCreateInfo pipeline_info = {};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipeline_info.stageCount = 2;
@@ -253,6 +261,7 @@ void GEVulkan2dRenderer::createGraphicsPipeline()
     pipeline_info.pMultisampleState = &multisampling;
     pipeline_info.pDepthStencilState = &depth_stencil;
     pipeline_info.pColorBlendState = &color_blending;
+    pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = g_pipeline_layout;
     pipeline_info.renderPass = g_vk->getRenderPass();
     pipeline_info.subpass = 0;
@@ -420,6 +429,10 @@ void GEVulkan2dRenderer::render()
     VkDeviceSize offsets[] = {0};
     VkBuffer vertex_buffer = VK_NULL_HANDLE;
     VkBuffer indices_buffer = VK_NULL_HANDLE;
+    unsigned idx = 0;
+    unsigned idx_count = 0;
+    int sampler_idx = 0;
+    core::recti clip;
 
     VkResult result = vkBeginCommandBuffer(g_vk->getCurrentCommandBuffer(),
         &begin_info);
@@ -456,48 +469,60 @@ void GEVulkan2dRenderer::render()
             &g_descriptor_sets[g_vk->getCurrentFrame()], 0, NULL);
     }
 
-    if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
+    sampler_idx = g_tris_queue[0].sampler_idx;
+    clip = g_tris_clip[0];
+    for (; idx < g_tris_index_queue.size(); idx += 3)
     {
-        vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(),
-            (uint32_t)(g_tris_index_queue.size()), 1, 0, 0, 0);
+        Tri& cur_tri = g_tris_queue[g_tris_index_queue[idx]];
+        int cur_sampler_idx = cur_tri.sampler_idx;
+        if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
+            cur_sampler_idx = g_tris_queue[0].sampler_idx;
+        const core::recti& cur_clip = g_tris_clip[g_tris_index_queue[idx]];
+        if (cur_sampler_idx != sampler_idx || cur_clip != clip)
+        {
+            if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
+            {
+                const unsigned set_idx = g_vk->getCurrentFrame() * GEVulkanShaderManager::getSamplerSize() + sampler_idx;
+                vkCmdBindDescriptorSets(g_vk->getCurrentCommandBuffer(),
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
+                    &g_descriptor_sets[set_idx], 0, NULL);
+            }
+
+            VkRect2D scissor;
+            scissor.offset.x = clip.UpperLeftCorner.X;
+            scissor.offset.y = clip.UpperLeftCorner.Y;
+            scissor.extent.width = clip.getWidth();
+            scissor.extent.height = clip.getHeight();
+            vkCmdSetScissor(g_vk->getCurrentCommandBuffer(), 0, 1, &scissor);
+
+            vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
+                idx - idx_count, 0, 0);
+            sampler_idx = cur_sampler_idx;
+            clip = cur_clip;
+            idx_count = 3;
+        }
+        else
+        {
+            idx_count += 3;
+        }
     }
-    else
+    if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
     {
-        unsigned idx = 0;
-        unsigned idx_count = 0;
-        int sampler_idx = g_tris_queue[0].sampler_idx;
-        for (; idx < g_tris_index_queue.size(); idx += 3)
-        {
-            Tri& cur_tri = g_tris_queue[g_tris_index_queue[idx]];
-            if (cur_tri.sampler_idx != sampler_idx)
-            {
-                if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
-                {
-                    const unsigned set_idx = g_vk->getCurrentFrame() * GEVulkanShaderManager::getSamplerSize() + sampler_idx;
-                    vkCmdBindDescriptorSets(g_vk->getCurrentCommandBuffer(),
-                        VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
-                        &g_descriptor_sets[set_idx], 0, NULL);
-                }
-                vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
-                    idx - idx_count, 0, 0);
-                sampler_idx = cur_tri.sampler_idx;
-                idx_count = 3;
-            }
-            else
-            {
-                idx_count += 3;
-            }
-        }
-        if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
-        {
-            const unsigned set_idx = g_vk->getCurrentFrame() * GEVulkanShaderManager::getSamplerSize() + sampler_idx;
-            vkCmdBindDescriptorSets(g_vk->getCurrentCommandBuffer(),
-                VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
-                &g_descriptor_sets[set_idx], 0, NULL);
-        }
-        vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
-            idx - idx_count, 0, 0);
+        const unsigned set_idx = g_vk->getCurrentFrame() * GEVulkanShaderManager::getSamplerSize() + sampler_idx;
+        vkCmdBindDescriptorSets(g_vk->getCurrentCommandBuffer(),
+            VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
+            &g_descriptor_sets[set_idx], 0, NULL);
     }
+
+    VkRect2D scissor;
+    scissor.offset.x = clip.UpperLeftCorner.X;
+    scissor.offset.y = clip.UpperLeftCorner.Y;
+    scissor.extent.width = clip.getWidth();
+    scissor.extent.height = clip.getHeight();
+    vkCmdSetScissor(g_vk->getCurrentCommandBuffer(), 0, 1, &scissor);
+
+    vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
+        idx - idx_count, 0, 0);
 
 end_cmd:
     vkCmdEndRenderPass(g_vk->getCurrentCommandBuffer());
@@ -507,6 +532,7 @@ end:
     g_tex_map.clear();
     g_tris_queue.clear();
     g_tris_index_queue.clear();
+    g_tris_clip.clear();
 }   // render
 
 // ----------------------------------------------------------------------------
@@ -541,12 +567,28 @@ void GEVulkan2dRenderer::addVerticesIndices(irr::video::S3DVertex* vertices,
         t.uv = vertex.TCoords;
         t.sampler_idx = sampler_idx;
         g_tris_queue.push_back(t);
+        g_tris_clip.push_back(g_vk->getCurrentClip());
     }
+    const core::recti& fclip = g_vk->getFullscreenClip();
     for (unsigned idx = 0; idx < indices_count * 3; idx += 3)
     {
         g_tris_index_queue.push_back(last_index + indices[idx]);
         g_tris_index_queue.push_back(last_index + indices[idx + 1]);
         g_tris_index_queue.push_back(last_index + indices[idx + 2]);
+        const core::recti& cur_clip = g_tris_clip[last_index + indices[idx]];
+        const core::vector3df& pos_1 = vertices[indices[idx]].Pos;
+        const core::vector3df& pos_2 = vertices[indices[idx + 1]].Pos;
+        const core::vector3df& pos_3 = vertices[indices[idx + 2]].Pos;
+        if (GEVulkanFeatures::supportsDifferentTexturePerDraw() &&
+            fclip != cur_clip &&
+            cur_clip.isPointInside(core::position2di(pos_1.X, pos_1.Y)) &&
+            cur_clip.isPointInside(core::position2di(pos_2.X, pos_2.Y)) &&
+            cur_clip.isPointInside(core::position2di(pos_3.X, pos_3.Y)))
+        {
+            g_tris_clip[last_index + indices[idx]] = fclip;
+            g_tris_clip[last_index + indices[idx + 1]] = fclip;
+            g_tris_clip[last_index + indices[idx + 2]] = fclip;
+        }
     }
 }   // addVerticesIndices
 
