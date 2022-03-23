@@ -459,6 +459,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_current_frame = 0;
     m_image_index = 0;
     m_clear_color = video::SColor(0);
+    m_white_texture = NULL;
 
     createInstance(window);
 
@@ -507,6 +508,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     // For GEVulkanDynamicBuffer
     GE::setVideoDriver(this);
     GEVulkan2dRenderer::init(this);
+    createUnicolorTextures();
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
@@ -524,11 +526,39 @@ GEVulkanDriver::~GEVulkanDriver()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::destroyVulkan()
 {
+    if (m_white_texture)
+    {
+        m_white_texture->drop();
+        m_white_texture = NULL;
+    }
+    if (m_transparent_texture)
+    {
+        m_transparent_texture->drop();
+        m_transparent_texture = NULL;
+    }
+
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
     delete m_vk.get();
     m_vk.release();
 }   // destroyVulkan
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createUnicolorTextures()
+{
+    constexpr unsigned size = 2;
+    std::array<uint8_t, size * size * 4> data;
+    data.fill(255);
+    video::IImage* img = createImageFromData(video::ECF_A8R8G8B8,
+        core::dimension2d<u32>(size, size), data.data(),
+        /*ownForeignMemory*/true, /*deleteMemory*/false);
+    m_white_texture = new GEVulkanTexture(img, "unicolor_white");
+    data.fill(0);
+    img = createImageFromData(video::ECF_A8R8G8B8,
+        core::dimension2d<u32>(size, size), data.data(),
+        /*ownForeignMemory*/true, /*deleteMemory*/false);
+    m_transparent_texture = new GEVulkanTexture(img, "unicolor_transparent");
+}   // createUnicolorTextures
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createInstance(SDL_Window* window)

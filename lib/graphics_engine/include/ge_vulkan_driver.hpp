@@ -144,7 +144,11 @@ namespace GE
         //!Draws an 2d rectangle with a gradient.
         virtual void draw2DRectangle(const core::rect<s32>& pos,
             SColor colorLeftUp, SColor colorRightUp, SColor colorLeftDown, SColor colorRightDown,
-            const core::rect<s32>* clip) {}
+            const core::rect<s32>* clip)
+        {
+            SColor color[4] = { colorLeftUp, colorLeftDown, colorRightDown, colorRightUp };
+            draw2DImage(m_white_texture, pos, core::recti(0, 0, 2, 2), clip, color, true);
+        }
 
         //! Draws a 2d line.
         virtual void draw2DLine(const core::position2d<s32>& start,
@@ -311,6 +315,9 @@ namespace GE
         constexpr static unsigned getMaxFrameInFlight()            { return 2; }
         video::SColor getClearColor() const            { return m_clear_color; }
         const core::rect<s32>& getCurrentClip() const         { return m_clip; }
+        video::ITexture* getWhiteTexture() const     { return m_white_texture; }
+        video::ITexture* getTransparentTexture() const
+                                               { return m_transparent_texture; }
     private:
         struct SwapChainSupportDetails
         {
@@ -426,6 +433,9 @@ namespace GE
         video::SColor m_clear_color;
         core::rect<s32> m_clip;
 
+        video::ITexture* m_white_texture;
+        video::ITexture* m_transparent_texture;
+
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
         bool checkDeviceExtensions(VkPhysicalDevice device);
@@ -442,6 +452,7 @@ namespace GE
         void createSamplers();
         void createRenderPass();
         void createFramebuffers();
+        void createUnicolorTextures();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
     };
