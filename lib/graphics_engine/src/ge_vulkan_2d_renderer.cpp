@@ -244,11 +244,15 @@ void GEVulkan2dRenderer::createGraphicsPipeline()
     color_blending.blendConstants[2] = 0.0f;
     color_blending.blendConstants[3] = 0.0f;
 
-    VkDynamicState dynamic_state = VK_DYNAMIC_STATE_SCISSOR;
+    std::array<VkDynamicState, 2> dynamic_state =
+    {
+        VK_DYNAMIC_STATE_SCISSOR,
+        VK_DYNAMIC_STATE_VIEWPORT
+    };
     VkPipelineDynamicStateCreateInfo dynamic_state_info = {};
     dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-    dynamic_state_info.dynamicStateCount = 1,
-    dynamic_state_info.pDynamicStates = &dynamic_state;
+    dynamic_state_info.dynamicStateCount = dynamic_state.size(),
+    dynamic_state_info.pDynamicStates = dynamic_state.data();
 
     VkGraphicsPipelineCreateInfo pipeline_info = {};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -461,6 +465,15 @@ void GEVulkan2dRenderer::render()
 
     vkCmdBindIndexBuffer(g_vk->getCurrentCommandBuffer(), indices_buffer, 0,
         VK_INDEX_TYPE_UINT16);
+
+    VkViewport vp;
+    vp.x = g_vk->getViewPort().UpperLeftCorner.X;
+    vp.y = g_vk->getViewPort().UpperLeftCorner.Y;
+    vp.width = g_vk->getViewPort().getWidth();
+    vp.height = g_vk->getViewPort().getHeight();
+    vp.minDepth = 0;
+    vp.maxDepth = 1.0f;
+    vkCmdSetViewport(g_vk->getCurrentCommandBuffer(), 0, 1, &vp);
 
     if (GEVulkanFeatures::supportsBindTexturesAtOnce())
     {

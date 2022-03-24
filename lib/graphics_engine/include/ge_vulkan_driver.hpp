@@ -66,14 +66,10 @@ namespace GE
             SColor color=video::SColor(0,0,0,0)) { return true; }
 
         //! sets a viewport
-        virtual void setViewPort(const core::rect<s32>& area) {}
+        virtual void setViewPort(const core::rect<s32>& area);
 
         //! gets the area of the current viewport
-        virtual const core::rect<s32>& getViewPort() const
-        {
-            static core::rect<s32> unused;
-            return unused;
-        }
+        virtual const core::rect<s32>& getViewPort() const { return m_viewport; }
 
         //! updates hardware buffer if needed
         virtual bool updateHardwareBuffer(SHWBufferLink *HWBuffer) { return false; }
@@ -432,6 +428,7 @@ namespace GE
         uint32_t m_image_index;
         video::SColor m_clear_color;
         core::rect<s32> m_clip;
+        core::rect<s32> m_viewport;
 
         video::ITexture* m_white_texture;
         video::ITexture* m_transparent_texture;

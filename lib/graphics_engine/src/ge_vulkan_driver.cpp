@@ -460,6 +460,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_image_index = 0;
     m_clear_color = video::SColor(0);
     m_white_texture = NULL;
+    m_transparent_texture = NULL;
 
     createInstance(window);
 
@@ -991,6 +992,7 @@ found_mode:
     ScreenSize.Width = m_swap_chain_extent.width;
     ScreenSize.Height = m_swap_chain_extent.height;
     m_clip = getFullscreenClip();
+    setViewPort(core::recti(0, 0, ScreenSize.Width, ScreenSize.Height));
 
     for (unsigned int i = 0; i < m_vk->swap_chain_images.size(); i++)
     {
@@ -1738,6 +1740,16 @@ void GEVulkanDriver::draw2DImageBatch(const video::ITexture* tex,
             disableScissorTest();
     }
 }   // draw2DImageBatch
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::setViewPort(const core::rect<s32>& area)
+{
+    core::rect<s32> vp = area;
+    core::rect<s32> rendert(0,0, getCurrentRenderTargetSize().Width, getCurrentRenderTargetSize().Height);
+    vp.clipAgainst(rendert);
+    if (vp.getHeight() > 0 && vp.getWidth() > 0)
+        m_viewport = vp;
+}
 
 }
 
