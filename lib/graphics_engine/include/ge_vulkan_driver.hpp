@@ -314,6 +314,10 @@ namespace GE
         video::ITexture* getWhiteTexture() const     { return m_white_texture; }
         video::ITexture* getTransparentTexture() const
                                                { return m_transparent_texture; }
+        void getRotatedRect2D(VkRect2D* rect);
+        void getRotatedViewport(VkViewport* vp);
+        const core::matrix4& getPreRotationMatrix()
+                                               { return m_pre_rotation_matrix; }
     private:
         struct SwapChainSupportDetails
         {
@@ -429,6 +433,7 @@ namespace GE
         video::SColor m_clear_color;
         core::rect<s32> m_clip;
         core::rect<s32> m_viewport;
+        core::matrix4 m_pre_rotation_matrix;
 
         video::ITexture* m_white_texture;
         video::ITexture* m_transparent_texture;
@@ -450,6 +455,7 @@ namespace GE
         void createRenderPass();
         void createFramebuffers();
         void createUnicolorTextures();
+        void initPreRotationMatrix();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
     };

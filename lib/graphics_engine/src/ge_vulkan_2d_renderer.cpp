@@ -473,6 +473,7 @@ void GEVulkan2dRenderer::render()
     vp.height = g_vk->getViewPort().getHeight();
     vp.minDepth = 0;
     vp.maxDepth = 1.0f;
+    g_vk->getRotatedViewport(&vp);
     vkCmdSetViewport(g_vk->getCurrentCommandBuffer(), 0, 1, &vp);
 
     if (GEVulkanFeatures::supportsBindTexturesAtOnce())
@@ -506,6 +507,7 @@ void GEVulkan2dRenderer::render()
             scissor.offset.y = clip.UpperLeftCorner.Y;
             scissor.extent.width = clip.getWidth();
             scissor.extent.height = clip.getHeight();
+            g_vk->getRotatedRect2D(&scissor);
             vkCmdSetScissor(g_vk->getCurrentCommandBuffer(), 0, 1, &scissor);
 
             vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
@@ -532,6 +534,7 @@ void GEVulkan2dRenderer::render()
     scissor.offset.y = clip.UpperLeftCorner.Y;
     scissor.extent.width = clip.getWidth();
     scissor.extent.height = clip.getHeight();
+    g_vk->getRotatedRect2D(&scissor);
     vkCmdSetScissor(g_vk->getCurrentCommandBuffer(), 0, 1, &scissor);
 
     vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
@@ -576,6 +579,9 @@ void GEVulkan2dRenderer::addVerticesIndices(irr::video::S3DVertex* vertices,
             vertex.Pos.Y / g_vk->getCurrentRenderTargetSize().Height);
         t.pos = t.pos * 2.0f;
         t.pos -= 1.0f;
+        core::vector3df position = core::vector3df(t.pos.X, t.pos.Y, 0);
+        g_vk->getPreRotationMatrix().transformVect(position);
+        t.pos = core::vector2df(position.X, position.Y);
         t.color = vertex.Color;
         t.uv = vertex.TCoords;
         t.sampler_idx = sampler_idx;

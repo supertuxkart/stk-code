@@ -461,6 +461,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_clear_color = video::SColor(0);
     m_white_texture = NULL;
     m_transparent_texture = NULL;
+    m_pre_rotation_matrix = core::matrix4(core::matrix4::EM4CONST_IDENTITY);
 
     createInstance(window);
 
@@ -970,11 +971,24 @@ found_mode:
         create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
 
-    create_info.preTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+    create_info.preTransform = m_surface_capabilities.currentTransform;
     create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     create_info.presentMode = present_mode;
     create_info.clipped = VK_TRUE;
     create_info.oldSwapchain = VK_NULL_HANDLE;
+
+    m_swap_chain_extent = image_extent;
+    ScreenSize.Width = m_swap_chain_extent.width;
+    ScreenSize.Height = m_swap_chain_extent.height;
+    m_clip = getFullscreenClip();
+    setViewPort(core::recti(0, 0, ScreenSize.Width, ScreenSize.Height));
+    initPreRotationMatrix();
+    if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR) != 0 ||
+        (m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR) != 0)
+    {
+        std::swap(create_info.imageExtent.width, create_info.imageExtent.height);
+        std::swap(m_swap_chain_extent.width, m_swap_chain_extent.height);
+    }
 
     VkResult result = vkCreateSwapchainKHR(m_vk->device, &create_info, NULL,
         &m_vk->swap_chain);
@@ -988,12 +1002,6 @@ found_mode:
         &m_vk->swap_chain_images[0]);
 
     m_swap_chain_image_format = surface_format.format;
-    m_swap_chain_extent = image_extent;
-    ScreenSize.Width = m_swap_chain_extent.width;
-    ScreenSize.Height = m_swap_chain_extent.height;
-    m_clip = getFullscreenClip();
-    setViewPort(core::recti(0, 0, ScreenSize.Width, ScreenSize.Height));
-
     for (unsigned int i = 0; i < m_vk->swap_chain_images.size(); i++)
     {
         VkImageViewCreateInfo create_info = {};
@@ -1749,7 +1757,73 @@ void GEVulkanDriver::setViewPort(const core::rect<s32>& area)
     vp.clipAgainst(rendert);
     if (vp.getHeight() > 0 && vp.getWidth() > 0)
         m_viewport = vp;
-}
+}   // setViewPort
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::getRotatedRect2D(VkRect2D* rect)
+{
+    // https://developer.android.com/games/optimize/vulkan-prerotation
+    if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR) != 0)
+    {
+        VkRect2D ret =
+        {
+            (int)(m_swap_chain_extent.width - rect->extent.height - rect->offset.y),
+            rect->offset.x,
+            rect->extent.height,
+            rect->extent.width
+        };
+        *rect = ret;
+    }
+    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR) != 0)
+    {
+        VkRect2D ret =
+        {
+            (int)(m_swap_chain_extent.width - rect->extent.width - rect->offset.x),
+            (int)(m_swap_chain_extent.height - rect->extent.height - rect->offset.y),
+            rect->extent.width,
+            rect->extent.height
+        };
+        *rect = ret;
+    }
+    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR) != 0)
+    {
+        VkRect2D ret =
+        {
+            rect->offset.y,
+            (int)(m_swap_chain_extent.height - rect->extent.width - rect->offset.x),
+            rect->extent.height,
+            rect->extent.width
+        };
+        *rect = ret;
+    }
+}   // getRotatedRect2D
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::getRotatedViewport(VkViewport* vp)
+{
+    VkRect2D rect;
+    rect.offset.x = vp->x;
+    rect.offset.y = vp->y;
+    rect.extent.width = vp->width;
+    rect.extent.height = vp->height;
+    getRotatedRect2D(&rect);
+    vp->x = rect.offset.x;
+    vp->y = rect.offset.y;
+    vp->width = rect.extent.width;
+    vp->height = rect.extent.height;
+}   // getRotatedViewport
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::initPreRotationMatrix()
+{
+    const double pi = 3.14159265358979323846;
+    if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR) != 0)
+        m_pre_rotation_matrix.setRotationAxisRadians(90.0 * pi / 180., core::vector3df(0.0f, 0.0f, 1.0f));
+    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR) != 0)
+        m_pre_rotation_matrix.setRotationAxisRadians(180.0 * pi / 180., core::vector3df(0.0f, 0.0f, 1.0f));
+    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR) != 0)
+        m_pre_rotation_matrix.setRotationAxisRadians(270.0 * pi / 180., core::vector3df(0.0f, 0.0f, 1.0f));
+}   // initPreRotationMatrix
 
 }
 
