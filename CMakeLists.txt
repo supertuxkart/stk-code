@@ -722,6 +722,10 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
 	target_link_libraries(supertuxkart nsl socket vorbisfile)
 endif()
 
+if (${CMAKE_SYSTEM_NAME} MATCHES "Haiku")
+	target_link_libraries(supertuxkart vorbisfile)
+endif()
+
 if (USE_DNS_C)
     target_link_libraries(supertuxkart dnsc)
 else()
