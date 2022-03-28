@@ -389,6 +389,9 @@ bool CIrrDeviceSDL::createWindow()
 			return false;
 		}
 #endif
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+		SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "1");
+#endif
 		flags |= SDL_WINDOW_VULKAN;
 	}
 
@@ -417,6 +420,10 @@ bool CIrrDeviceSDL::createWindow()
 		if (!Window)
 		{
 			os::Printer::log( "Could not initialize display!" );
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+			if (CreationParams.DriverType == video::EDT_VULKAN)
+				SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0");
+#endif
 			return false;
 		}
 	}
@@ -626,6 +633,9 @@ void CIrrDeviceSDL::createDriver()
 		}
 		catch (std::exception& e)
 		{
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+			SDL_SetHint(SDL_HINT_VIDEO_EXTERNAL_CONTEXT, "0");
+#endif
 			os::Printer::log("createVulkanDriver failed", e.what(), ELL_ERROR);
 		}
 		#else
