@@ -723,7 +723,7 @@ if (${CMAKE_SYSTEM_NAME} MATCHES "SunOS")
 endif()
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Haiku")
-	target_link_libraries(supertuxkart vorbisfile)
+	target_link_libraries(supertuxkart be network vorbisfile)
 endif()
 
 if (USE_DNS_C)

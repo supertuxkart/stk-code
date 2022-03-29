@@ -38,6 +38,11 @@
 #include "io/assets_android.hpp"
 #endif
 
+#ifdef __HAIKU__
+#include <Path.h>
+#include <FindDirectory.h>
+#endif
+
 #include <irrlicht.h>
 
 #include <stdio.h>
@@ -1008,6 +1013,19 @@ void FileManager::checkAndCreateConfigDir()
         const std::string CONFIGDIR("SuperTuxKart");
         m_user_config_dir += CONFIGDIR;
 
+#elif defined(__HAIKU__)
+
+        BPath settings_dir;
+        if (find_directory(B_USER_SETTINGS_DIRECTORY, &settings_dir, true, NULL) == B_OK) {
+            m_user_config_dir = std::string(settings_dir.Path());
+	} else {
+            if (getenv("HOME") != NULL)
+            {
+                m_user_config_dir = getenv("HOME");
+                m_user_config_dir += "/config/settings";
+            }
+	}
+
 #else
 
         // Remaining unix variants. Use the new standards for config directory
@@ -1076,6 +1094,8 @@ void FileManager::checkAndCreateAddonsDir()
 #elif defined(__APPLE__)
     m_addons_dir  = getenv("HOME");
     m_addons_dir += "/Library/Application Support/SuperTuxKart/Addons/";
+#elif defined(__HAIKU__)
+    m_addons_dir  = m_user_config_dir+"addons/";
 #else
     m_addons_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
                                           ".local/share", ".stkaddons");
@@ -1108,7 +1128,7 @@ void FileManager::checkAndCreateAddonsDir()
  */
 void FileManager::checkAndCreateScreenshotDir()
 {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__HAIKU__)
     m_screenshot_dir  = m_user_config_dir+"screenshots/";
 #elif defined(__APPLE__)
     m_screenshot_dir  = getenv("HOME");
@@ -1134,7 +1154,7 @@ void FileManager::checkAndCreateScreenshotDir()
  */
 void FileManager::checkAndCreateReplayDir()
 {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__HAIKU__)
     m_replay_dir = m_user_config_dir + "replay/";
 #elif defined(__APPLE__)
     m_replay_dir  = getenv("HOME");
@@ -1185,7 +1205,7 @@ void FileManager::checkAndCreateCachedTexturesDir()
  */
 void FileManager::checkAndCreateGPDir()
 {
-#if defined(WIN32)
+#if defined(WIN32) || defined(__HAIKU__)
     m_gp_dir = m_user_config_dir + "grandprix/";
 #elif defined(__APPLE__)
     m_gp_dir  = getenv("HOME");
