@@ -973,6 +973,8 @@ found_mode:
 
     create_info.preTransform = m_surface_capabilities.currentTransform;
     create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    if ((m_surface_capabilities.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) == 0)
+        create_info.compositeAlpha = VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR;
     create_info.presentMode = present_mode;
     create_info.clipped = VK_TRUE;
     create_info.oldSwapchain = VK_NULL_HANDLE;
