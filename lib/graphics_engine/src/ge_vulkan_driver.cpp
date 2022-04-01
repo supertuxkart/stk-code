@@ -1373,7 +1373,7 @@ bool GEVulkanDriver::endScene()
         m_vk->in_flight_fences[m_current_frame]);
 
     if (result != VK_SUCCESS)
-        return false;
+        throw std::runtime_error("vkQueueSubmit failed");
 
     VkSemaphore semaphores[] =
     {
