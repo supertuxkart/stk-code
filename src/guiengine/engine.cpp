@@ -1531,6 +1531,14 @@ namespace GUIEngine
                 x = ICON_MARGIN;
             }
         }
+#endif
+    } // renderLoading
+
+    // -----------------------------------------------------------------------
+
+    void flushRenderLoading(bool launching)
+    {
+#ifndef SERVER_ONLY
         // This will avoid no response in windows, also allow showing loading
         // icon in apple device, because apple device only update render
         // buffer if you poll the mainloop
@@ -1542,7 +1550,7 @@ namespace GUIEngine
         }
 
         // If launch is finished, pause & display the story mode timers
-        if ( !launching)
+        if (!launching)
         {
             // For speedruns only, display the timer on loading screens
             if (UserConfigParams::m_speedrun_mode)
@@ -1557,7 +1565,7 @@ namespace GUIEngine
             irr_driver->handleWindowResize();
         }
 #endif
-    } // renderLoading
+    } // flushRenderLoading
 
     // -----------------------------------------------------------------------
 
@@ -1571,6 +1579,7 @@ namespace GUIEngine
                     ->beginScene(true, true, video::SColor(255,100,101,140));
             renderLoading(false, true, false);
             g_device->getVideoDriver()->endScene();
+            GUIEngine::flushRenderLoading(true/*launching*/);
         }
         else
         {

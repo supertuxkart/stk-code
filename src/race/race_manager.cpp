@@ -556,6 +556,7 @@ void RaceManager::startNextRace()
         GUIEngine::clearLoadingTips();
         GUIEngine::renderLoading(true/*clearIcons*/, false/*launching*/, false/*update_tips*/);
         device->getVideoDriver()->endScene();
+        GUIEngine::flushRenderLoading(false/*launching*/);
     }
 
     m_num_finished_karts   = 0;

@@ -1874,6 +1874,7 @@ void initRest()
     // Input manager set first so it recieves SDL joystick event
     GUIEngine::init(device, driver, StateManager::get());
     GUIEngine::renderLoading(true, true, false);
+    GUIEngine::flushRenderLoading(true/*launching*/);
 
 #ifdef ANDROID
     JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
