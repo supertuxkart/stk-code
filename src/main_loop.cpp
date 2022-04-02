@@ -800,12 +800,17 @@ extern "C" int handle_app_event(void* userdata, SDL_Event* event)
 {
     if (!main_loop)
         return 1;
+    IrrlichtDevice* dev = irr_driver->getDevice();
     switch (event->type)
     {
     case SDL_APP_WILLENTERBACKGROUND:
+        if (dev && dev->getVideoDriver())
+            dev->getVideoDriver()->pauseRendering();
         main_loop->setPaused(true);
         break;
     case SDL_APP_DIDENTERFOREGROUND:
+        if (dev && dev->getVideoDriver())
+            dev->getVideoDriver()->unpauseRendering();
         main_loop->setPaused(false);
         break;
     default:

@@ -30,6 +30,8 @@ void createTrisBuffers();
 // ----------------------------------------------------------------------------
 void render();
 // ----------------------------------------------------------------------------
+void clear();
+// ----------------------------------------------------------------------------
 void addVerticesIndices(irr::video::S3DVertex* vertices,
                         unsigned vertices_count, uint16_t* indices,
                         unsigned indices_count,

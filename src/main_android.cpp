@@ -33,6 +33,7 @@ extern int android_main(int argc, char *argv[]);
 extern "C" JNIEXPORT void JNICALL debugMsg(JNIEnv* env, jclass cls, jstring msg);
 extern "C" JNIEXPORT void JNICALL handlePadding(JNIEnv* env, jclass cls, jboolean val);
 extern "C" JNIEXPORT void JNICALL addDNSSrvRecords(JNIEnv* env, jclass cls, jstring name, jint weight);
+extern "C" JNIEXPORT void JNICALL pauseRenderingJNI(JNIEnv* env, jclass cls);
 
 extern "C" JNIEXPORT void JNICALL editText2STKEditbox(JNIEnv* env, jclass cls, jint widget_id, jstring text, jint start, jint end, jint composing_start, jint composing_end);
 extern "C" JNIEXPORT void JNICALL handleActionNext(JNIEnv* env, jclass cls, jint widget_id);
@@ -48,7 +49,8 @@ void registering_natives()
     {
         { "debugMsg",           "(Ljava/lang/String;)V", (void*)&debugMsg },
         { "handlePadding",      "(Z)V", (void*)&handlePadding },
-        { "addDNSSrvRecords",   "(Ljava/lang/String;I)V", (void*)&addDNSSrvRecords }
+        { "addDNSSrvRecords",   "(Ljava/lang/String;I)V", (void*)&addDNSSrvRecords },
+        { "pauseRenderingJNI",   "()V", (void*)&pauseRenderingJNI }
     };
     JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
     assert(env);

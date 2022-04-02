@@ -318,6 +318,8 @@ namespace GE
         void getRotatedViewport(VkViewport* vp);
         const core::matrix4& getPreRotationMatrix()
                                                { return m_pre_rotation_matrix; }
+        virtual void pauseRendering();
+        virtual void unpauseRendering();
     private:
         struct SwapChainSupportDetails
         {
@@ -383,7 +385,8 @@ namespace GE
             {
                 for (VkFramebuffer& framebuffer : swap_chain_framebuffers)
                     vkDestroyFramebuffer(device, framebuffer, NULL);
-                vkDestroyRenderPass(device, render_pass, NULL);
+                if (render_pass != VK_NULL_HANDLE)
+                    vkDestroyRenderPass(device, render_pass, NULL);
                 for (unsigned i = 0; i < GVS_COUNT; i++)
                     vkDestroySampler(device, samplers[i], NULL);
                 if (!command_buffers.empty())
@@ -438,6 +441,8 @@ namespace GE
         video::ITexture* m_white_texture;
         video::ITexture* m_transparent_texture;
 
+        SDL_Window* m_window;
+
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
         bool checkDeviceExtensions(VkPhysicalDevice device);
@@ -458,6 +463,8 @@ namespace GE
         void initPreRotationMatrix();
         std::string getVulkanVersionString() const;
         std::string getDriverVersionString() const;
+        void destroySwapChainRelated(bool handle_surface);
+        void createSwapChainRelated(bool handle_surface);
     };
 
 }

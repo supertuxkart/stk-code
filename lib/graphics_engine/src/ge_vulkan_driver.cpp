@@ -9,11 +9,11 @@
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "SDL_vulkan.h"
 #include <algorithm>
+#include <atomic>
 #include <limits>
 #include <set>
 #include <sstream>
 #include <stdexcept>
-
 #include "../source/Irrlicht/os.h"
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
@@ -443,6 +443,10 @@ extern "C" PFN_vkVoidFunction loader(void* user_ptr, const char* name)
 
 namespace GE
 {
+std::atomic_bool g_device_created(false);
+std::atomic_bool g_schedule_pausing_rendering(false);
+std::atomic_bool g_paused_rendering(false);
+
 GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                io::IFileSystem* io, SDL_Window* window)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
@@ -462,6 +466,11 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_white_texture = NULL;
     m_transparent_texture = NULL;
     m_pre_rotation_matrix = core::matrix4(core::matrix4::EM4CONST_IDENTITY);
+
+    m_window = window;
+    g_schedule_pausing_rendering.store(false);
+    g_paused_rendering.store(false);
+    g_device_created.store(true);
 
     createInstance(window);
 
@@ -523,6 +532,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 // ----------------------------------------------------------------------------
 GEVulkanDriver::~GEVulkanDriver()
 {
+    g_device_created.store(false);
 }   // ~GEVulkanDriver
 
 // ----------------------------------------------------------------------------
@@ -923,22 +933,6 @@ void GEVulkanDriver::createSwapChain()
     }
 found_mode:
 
-    VkExtent2D image_extent = m_surface_capabilities.currentExtent;
-    if (m_surface_capabilities.currentExtent.width == std::numeric_limits<uint32_t>::max())
-    {
-        VkExtent2D max_extent = m_surface_capabilities.maxImageExtent;
-        VkExtent2D min_extent = m_surface_capabilities.minImageExtent;
-
-        VkExtent2D actual_extent =
-        {
-            std::max(
-                std::min(ScreenSize.Width, max_extent.width), min_extent.width),
-            std::max(
-                std::min(ScreenSize.Height, max_extent.height), min_extent.height)
-        };
-        image_extent = actual_extent;
-    }
-
     // Try to get triple buffering by default
     // https://vulkan-tutorial.com/Drawing_a_triangle/Presentation/Swap_chain
     uint32_t swap_chain_images_count = m_surface_capabilities.minImageCount + 1;
@@ -948,13 +942,25 @@ found_mode:
         swap_chain_images_count = m_surface_capabilities.maxImageCount;
     }
 
+    int w, h = 0;
+    SDL_Vulkan_GetDrawableSize(m_window, &w, &h);
+    VkExtent2D max_extent = m_surface_capabilities.maxImageExtent;
+    VkExtent2D min_extent = m_surface_capabilities.minImageExtent;
+    VkExtent2D actual_extent =
+    {
+        std::max(
+            std::min((unsigned)w, max_extent.width), min_extent.width),
+        std::max(
+            std::min((unsigned)h, max_extent.height), min_extent.height)
+    };
+
     VkSwapchainCreateInfoKHR create_info = {};
     create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     create_info.surface = m_vk->surface;
     create_info.minImageCount = swap_chain_images_count;
     create_info.imageFormat = surface_format.format;
     create_info.imageColorSpace = surface_format.colorSpace;
-    create_info.imageExtent = image_extent;
+    create_info.imageExtent = actual_extent;
     create_info.imageArrayLayers = 1;
     create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -979,7 +985,7 @@ found_mode:
     create_info.clipped = VK_TRUE;
     create_info.oldSwapchain = VK_NULL_HANDLE;
 
-    m_swap_chain_extent = image_extent;
+    m_swap_chain_extent = actual_extent;
     ScreenSize.Width = m_swap_chain_extent.width;
     ScreenSize.Height = m_swap_chain_extent.height;
     m_clip = getFullscreenClip();
@@ -1325,6 +1331,11 @@ void GEVulkanDriver::endSingleTimeCommands(VkCommandBuffer command_buffer)
 void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)
 {
     CNullDriver::OnResize(size);
+    if (g_paused_rendering.load() == false)
+    {
+        destroySwapChainRelated(false/*handle_surface*/);
+        createSwapChainRelated(false/*handle_surface*/);
+    }
 }   // OnResize
 
 // ----------------------------------------------------------------------------
@@ -1332,7 +1343,14 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
                                 const SExposedVideoData& videoData,
                                 core::rect<s32>* sourceRect)
 {
-    if (!video::CNullDriver::beginScene(backBuffer, zBuffer, color, videoData,
+    if (g_schedule_pausing_rendering.load())
+    {
+        pauseRendering();
+        g_schedule_pausing_rendering.store(false);
+    }
+
+    if (g_paused_rendering.load() ||
+        !video::CNullDriver::beginScene(backBuffer, zBuffer, color, videoData,
         sourceRect))
         return false;
 
@@ -1353,6 +1371,12 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
 // ----------------------------------------------------------------------------
 bool GEVulkanDriver::endScene()
 {
+    if (g_paused_rendering.load())
+    {
+        GEVulkan2dRenderer::clear();
+        return false;
+    }
+
     GEVulkan2dRenderer::render();
 
     VkSemaphore wait_semaphores[] = {m_vk->image_available_semaphores[m_current_frame]};
@@ -1827,6 +1851,66 @@ void GEVulkanDriver::initPreRotationMatrix()
         m_pre_rotation_matrix.setRotationAxisRadians(270.0 * pi / 180., core::vector3df(0.0f, 0.0f, 1.0f));
 }   // initPreRotationMatrix
 
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::pauseRendering()
+{
+    if (g_paused_rendering.load() != false)
+        return;
+
+    destroySwapChainRelated(true/*handle_surface*/);
+    g_paused_rendering.store(true);
+}   // pauseRendering
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::unpauseRendering()
+{
+    if (g_paused_rendering.load() != true)
+        return;
+
+    createSwapChainRelated(true/*handle_surface*/);
+    g_paused_rendering.store(false);
+}   // unpauseRendering
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::destroySwapChainRelated(bool handle_surface)
+{
+    vkDeviceWaitIdle(m_vk->device);
+    for (VkFramebuffer& framebuffer : m_vk->swap_chain_framebuffers)
+        vkDestroyFramebuffer(m_vk->device, framebuffer, NULL);
+    m_vk->swap_chain_framebuffers.clear();
+    if (m_vk->render_pass != VK_NULL_HANDLE)
+        vkDestroyRenderPass(m_vk->device, m_vk->render_pass, NULL);
+    m_vk->render_pass = VK_NULL_HANDLE;
+    for (VkImageView& image_view : m_vk->swap_chain_image_views)
+        vkDestroyImageView(m_vk->device, image_view, NULL);
+    m_vk->swap_chain_image_views.clear();
+    if (m_vk->swap_chain != VK_NULL_HANDLE)
+        vkDestroySwapchainKHR(m_vk->device, m_vk->swap_chain, NULL);
+    m_vk->swap_chain = VK_NULL_HANDLE;
+    if (handle_surface)
+    {
+        if (m_vk->surface != VK_NULL_HANDLE)
+            vkDestroySurfaceKHR(m_vk->instance, m_vk->surface, NULL);
+        m_vk->surface = VK_NULL_HANDLE;
+    }
+}   // destroySwapChainRelated
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::createSwapChainRelated(bool handle_surface)
+{
+    vkDeviceWaitIdle(m_vk->device);
+    if (handle_surface)
+    {
+        if (SDL_Vulkan_CreateSurface(m_window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
+            throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
+    }
+    updateSurfaceInformation(m_physical_device, &m_surface_capabilities,
+        &m_surface_formats, &m_present_modes);
+    createSwapChain();
+    createRenderPass();
+    createFramebuffers();
+}   // createSwapChainRelated
+
 }
 
 namespace irr
@@ -1840,4 +1924,25 @@ namespace video
     }   // createVulkanDriver
 }
 }
+
+#ifdef ANDROID
+#include <jni.h>
+extern "C" JNIEXPORT void JNICALL pauseRenderingJNI(JNIEnv* env, jclass cls)
+{
+    using namespace GE;
+    if (g_device_created.load() == false || g_schedule_pausing_rendering.load() == true)
+        return;
+    g_schedule_pausing_rendering.store(true);
+    if (g_paused_rendering.load() == false)
+    {
+        while (true)
+        {
+            if (g_device_created.load() == false || g_paused_rendering.load() == true)
+                break;
+        }
+    }
+}   // pauseRenderingJNI
+
+#endif
+
 #endif

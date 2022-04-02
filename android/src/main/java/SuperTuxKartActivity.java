@@ -84,6 +84,8 @@ public class SuperTuxKartActivity extends SDLActivity
     // ------------------------------------------------------------------------
     private native static void addDNSSrvRecords(String name, int weight);
     // ------------------------------------------------------------------------
+    private native static void pauseRenderingJNI();
+    // ------------------------------------------------------------------------
     private void showExtractProgressPrivate()
     {
         WindowManager wm =
@@ -283,6 +285,8 @@ public class SuperTuxKartActivity extends SDLActivity
     {
         super.onPause();
         hideKeyboardNative(false/*clear_text*/);
+        if (SDLActivity.mSDLThread != null)
+            pauseRenderingJNI();
     }
     // ------------------------------------------------------------------------
     /* SDL manually dlopen main to allow unload after main thread exit. */

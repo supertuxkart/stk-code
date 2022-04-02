@@ -1481,6 +1481,8 @@ namespace video
 		virtual u32 getDefaultFramebuffer() const =0;
 		virtual void enableScissorTest(const core::rect<s32>& r) {}
 		virtual void disableScissorTest() {}
+		virtual void pauseRendering() {}
+		virtual void unpauseRendering() {}
 	};
 
 } // end namespace video

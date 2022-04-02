@@ -545,11 +545,17 @@ end_cmd:
     vkEndCommandBuffer(g_vk->getCurrentCommandBuffer());
 
 end:
+    clear();
+}   // render
+
+// ----------------------------------------------------------------------------
+void GEVulkan2dRenderer::clear()
+{
     g_tex_map.clear();
     g_tris_queue.clear();
     g_tris_index_queue.clear();
     g_tris_clip.clear();
-}   // render
+}   // clear
 
 // ----------------------------------------------------------------------------
 void GEVulkan2dRenderer::addVerticesIndices(irr::video::S3DVertex* vertices,
