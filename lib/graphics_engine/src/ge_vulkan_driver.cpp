@@ -906,12 +906,20 @@ void GEVulkanDriver::createSwapChain()
     VkPresentModeKHR present_mode = VK_PRESENT_MODE_FIFO_KHR;
     if (m_params.SwapInterval == 0)
     {
-        for (VkPresentModeKHR& available_mode : m_present_modes)
+        // Workaround for https://gitlab.freedesktop.org/mesa/mesa/-/issues/5516
+        bool ignore_mailbox_mode = false;
+#ifdef __LINUX__
+        ignore_mailbox_mode =  true;
+#endif
+        if (!ignore_mailbox_mode)
         {
-            if (available_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+            for (VkPresentModeKHR& available_mode : m_present_modes)
             {
-                present_mode = available_mode;
-                goto found_mode;
+                if (available_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+                {
+                    present_mode = available_mode;
+                    goto found_mode;
+                }
             }
         }
         for (VkPresentModeKHR& available_mode : m_present_modes)
