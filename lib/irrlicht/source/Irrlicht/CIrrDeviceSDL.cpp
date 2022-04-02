@@ -20,6 +20,7 @@
 #include "COpenGLExtensionHandler.h"
 
 #include "guiengine/engine.hpp"
+#include "ge_main.hpp"
 #include "glad/gl.h"
 #include "ge_vulkan_driver.hpp"
 #include "MoltenVK.h"
@@ -329,6 +330,13 @@ extern "C" void update_swap_interval(int swap_interval)
 	// iOS always use vertical sync
 	if (swap_interval > 1)
 		swap_interval = 1;
+
+	GE::GEVulkanDriver* gevk = GE::getVKDriver();
+	if (gevk)
+	{
+		gevk->updateSwapInterval(swap_interval);
+		return;
+	}
 
 	// Try adaptive vsync first if support
 	if (swap_interval > 0)

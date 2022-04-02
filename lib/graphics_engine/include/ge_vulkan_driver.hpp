@@ -320,6 +320,14 @@ namespace GE
                                                { return m_pre_rotation_matrix; }
         virtual void pauseRendering();
         virtual void unpauseRendering();
+        void updateSwapInterval(int value)
+        {
+            if (m_params.SwapInterval == value)
+                return;
+            m_params.SwapInterval = value;
+            destroySwapChainRelated(false/*handle_surface*/);
+            createSwapChainRelated(false/*handle_surface*/);
+        }
     private:
         struct SwapChainSupportDetails
         {
