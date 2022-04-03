@@ -1018,13 +1018,13 @@ void FileManager::checkAndCreateConfigDir()
         BPath settings_dir;
         if (find_directory(B_USER_SETTINGS_DIRECTORY, &settings_dir, true, NULL) == B_OK) {
             m_user_config_dir = std::string(settings_dir.Path());
-	} else {
+        } else {
             if (getenv("HOME") != NULL)
             {
                 m_user_config_dir = getenv("HOME");
                 m_user_config_dir += "/config/settings";
             }
-	}
+        }
 
 #else
 

@@ -681,7 +681,11 @@ namespace UserConfigParams
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
         &m_video_group, "Enable Light Shafts"));
     PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
+#ifndef __HAIKU__
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_dynamic_lights",
+#else
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
+#endif
         &m_video_group, "Enable Dynamic Lights"));
     PARAM_PREFIX BoolUserConfigParam        m_dof
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
@@ -922,7 +926,11 @@ namespace UserConfigParams
                                                 "Graphics Quality Settings") );
 
     PARAM_PREFIX IntUserConfigParam        m_particles_effects
+#ifndef __HAIKU__
             PARAM_DEFAULT(  IntUserConfigParam(2, "particles-effecs",
+#else
+            PARAM_DEFAULT(  IntUserConfigParam(0, "particles-effecs",
+#endif
                             &m_graphics_quality, "Particles effects: 0 disabled, 1 only important, 2 enabled") );
 
     // This saves the actual user preference.
@@ -941,13 +949,21 @@ namespace UserConfigParams
                 "Whether to display animated characters") );
 
     PARAM_PREFIX IntUserConfigParam        m_geometry_level
+#ifndef __HAIKU__
             PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_0,
+#else
+            PARAM_DEFAULT(  IntUserConfigParam(GEOLEVEL_2,
+#endif
                             "geometry_level", &m_graphics_quality,
                 "Geometry quality 0=everything is displayed; "
                 "1=a few details are displayed; 2=lowest level, no details") );
 
     PARAM_PREFIX IntUserConfigParam         m_anisotropic
+#ifndef __HAIKU__
             PARAM_DEFAULT( IntUserConfigParam(4, "anisotropic",
+#else
+            PARAM_DEFAULT( IntUserConfigParam(0, "anisotropic",
+#endif
                            &m_graphics_quality,
                            "Quality of anisotropic filtering (usual values include 2-4-8-16; 0 to disable)") );
 
@@ -968,7 +984,11 @@ namespace UserConfigParams
                            "ssao", &m_graphics_quality,
                            "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX BoolUserConfigParam         m_light_scatter
+#ifndef __HAIKU__
             PARAM_DEFAULT(BoolUserConfigParam(true,
+#else
+            PARAM_DEFAULT(BoolUserConfigParam(false,
+#endif
                            "light_scatter", &m_graphics_quality,
                            "Enable light scattering shaders") );
     PARAM_PREFIX IntUserConfigParam          m_shadows_resolution
