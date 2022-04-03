@@ -50,6 +50,8 @@ private:
     // ------------------------------------------------------------------------
     void clearVulkanData();
     // ------------------------------------------------------------------------
+    void reloadInternal();
+    // ------------------------------------------------------------------------
 public:
     // ------------------------------------------------------------------------
     GEVulkanTexture(const std::string& path,
@@ -95,7 +97,11 @@ public:
     // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------
-    virtual void reload();
+    virtual void reload()
+    {
+        vkDeviceWaitIdle(m_vulkan_device);
+        reloadInternal();
+    }
     // ------------------------------------------------------------------------
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
                                u32 w, u32 h, u32 x, u32 y);

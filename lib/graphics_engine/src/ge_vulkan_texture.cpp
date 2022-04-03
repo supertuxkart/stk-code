@@ -19,7 +19,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
                  m_disable_reload(false), m_single_channel(false)
 {
-    reload();
+    reloadInternal();
 }   // GEVulkanTexture
 
 // ----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
 // ----------------------------------------------------------------------------
 GEVulkanTexture::~GEVulkanTexture()
 {
-    getVKDriver()->waitIdle();
+    vkDeviceWaitIdle(m_vulkan_device);
     clearVulkanData();
 }   // ~GEVulkanTexture
 
@@ -315,7 +315,7 @@ void GEVulkanTexture::clearVulkanData()
 }   // clearVulkanData
 
 // ----------------------------------------------------------------------------
-void GEVulkanTexture::reload()
+void GEVulkanTexture::reloadInternal()
 {
     if (m_disable_reload)
         return;
@@ -333,7 +333,7 @@ void GEVulkanTexture::reload()
     upload(data);
     texture_image->unlock();
     texture_image->drop();
-}   // reload
+}   // reloadInternal
 
 // ----------------------------------------------------------------------------
 void GEVulkanTexture::upload(uint8_t* data)

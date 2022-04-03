@@ -286,7 +286,6 @@ namespace GE
                           VkMemoryPropertyFlags properties, VkBuffer& buffer,
                           VkDeviceMemory& buffer_memory);
         VkPhysicalDevice getPhysicalDevice() const { return m_physical_device; }
-        void waitIdle()                   { vkQueueWaitIdle(m_graphics_queue); }
         const VkPhysicalDeviceFeatures& getPhysicalDeviceFeatures() const
                                                           { return m_features; }
         const VkPhysicalDeviceProperties& getPhysicalDeviceProperties() const
