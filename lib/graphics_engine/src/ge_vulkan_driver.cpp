@@ -575,9 +575,6 @@ void GEVulkanDriver::createUnicolorTextures()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createInstance(SDL_Window* window)
 {
-#define VK_MAKE_API_VERSION(variant, major, minor, patch) \
-    ((((uint32_t)(variant)) << 29) | (((uint32_t)(major)) << 22) | (((uint32_t)(minor)) << 12) | ((uint32_t)(patch)))
-
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
     if (gladLoadVulkanUserPtr(NULL, (GLADuserptrloadfunc)loader, NULL) == 0)
     {
@@ -598,10 +595,10 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     PFN_vkEnumerateInstanceVersion e_ver = (PFN_vkEnumerateInstanceVersion)
         vkGetInstanceProcAddr(NULL, "vkEnumerateInstanceVersion");
     vulkan_1_1 = (e_ver && e_ver(&vk_version) == VK_SUCCESS &&
-        vk_version >= VK_MAKE_API_VERSION(0, 1, 1, 0));
+        vk_version >= VK_API_VERSION_1_1);
 #else
     vulkan_1_1 = (vkEnumerateInstanceVersion(&vk_version) == VK_SUCCESS &&
-        vk_version >= VK_MAKE_API_VERSION(0, 1, 1, 0));
+        vk_version >= VK_API_VERSION_1_1);
 #endif
 
     uint32_t layer_count = 0;
@@ -621,7 +618,11 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     VkInstanceCreateInfo create_info = {};
     VkApplicationInfo app_info = {};
     if (vulkan_1_1)
-        app_info.apiVersion = vk_version;
+    {
+        // From https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VkApplicationInfo.html
+        // Implementations that support Vulkan 1.1 or later must not return VK_ERROR_INCOMPATIBLE_DRIVER for any value of apiVersion.
+        app_info.apiVersion = VK_API_VERSION_1_2;
+    }
     create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     create_info.enabledExtensionCount = extensions.size();
     create_info.ppEnabledExtensionNames = extensions.data();

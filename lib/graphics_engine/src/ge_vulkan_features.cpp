@@ -62,7 +62,8 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
     supported_features.pNext = &descriptor_indexing_features;
 
-    if (!vkGetPhysicalDeviceFeatures2)
+    if (vk->getPhysicalDeviceProperties().apiVersion < VK_API_VERSION_1_1 ||
+        !vkGetPhysicalDeviceFeatures2)
         return;
     vkGetPhysicalDeviceFeatures2(vk->getPhysicalDevice(), &supported_features);
     if (supported_features.sType !=
