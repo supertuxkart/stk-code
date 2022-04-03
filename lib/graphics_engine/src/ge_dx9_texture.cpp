@@ -5,6 +5,7 @@
 #include "ge_main.hpp"
 #include "ge_texture.hpp"
 
+#include <IAttributes.h>
 #include <vector>
 
 namespace GE
@@ -15,6 +16,8 @@ GEDX9Texture::GEDX9Texture(const std::string& path,
              m_device_9(NULL), m_texture_9(NULL), m_texture_size(0),
              m_disable_reload(false)
 {
+    m_max_size = getDriver()->getDriverAttributes()
+        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     getDevice9();
     reload();
 }   // GEDX9Texture
@@ -87,7 +90,7 @@ void GEDX9Texture::reload()
     if (!m_device_9 || m_disable_reload)
         return;
     video::IImage* texture_image = getResizedImage(NamedPath.getPtr(),
-        &m_orig_size);
+        m_max_size, &m_orig_size);
     if (texture_image == NULL)
         return;
     m_size = texture_image->getDimension();

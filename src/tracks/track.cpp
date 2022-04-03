@@ -2965,6 +2965,7 @@ video::IImage* Track::getSkyTexture(std::string path) const
         path = file_manager->getFileSystem()->getAbsolutePath(relative_path)
             .c_str();
     }
-    return GE::getResizedImage(path);
+    return GE::getResizedImage(path, irr_driver->getVideoDriver()
+        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE"));
 #endif
 }   // getSkyTexture

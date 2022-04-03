@@ -5,12 +5,12 @@
 #include "ge_texture.hpp"
 
 #include <IVideoDriver.h>
-#include <IAttributes.h>
 
 namespace GE
 {
 using namespace irr;
 video::IImage* getResizedImage(const std::string& path,
+                               const core::dimension2du& max_size,
                                core::dimension2d<u32>* orig_size)
 {
     video::IImage* image = getDriver()->createImageFromFile(path.c_str());
@@ -24,9 +24,6 @@ video::IImage* getResizedImage(const std::string& path,
         getDriver()->queryFeature(video::EVDF_TEXTURE_NPOT);
 
     core::dimension2du tex_size = img_size.getOptimalSize(!has_npot);
-    const core::dimension2du& max_size = getDriver()->getDriverAttributes().
-        getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
-
     if (tex_size.Width > max_size.Width)
         tex_size.Width = max_size.Width;
     if (tex_size.Height > max_size.Height)

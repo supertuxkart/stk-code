@@ -20,6 +20,7 @@
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/central_settings.hpp"
+#include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
@@ -171,7 +172,9 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
                 {
                     image_mani = [mask_full_path](video::IImage* img)->void
                     {
-                        video::IImage* converted_mask = GE::getResizedImage(mask_full_path);
+                        video::IImage* converted_mask = GE::getResizedImage(mask_full_path,
+                            irr_driver->getVideoDriver()->getDriverAttributes()
+                            .getAttributeAsDimension2d("MAX_TEXTURE_SIZE"));
                         if (converted_mask == NULL)
                         {
                             Log::warn("SPMeshLoader", "Applying mask failed for '%s'!",

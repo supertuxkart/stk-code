@@ -14,7 +14,7 @@ namespace GE
 class GEGLTexture : public video::ITexture
 {
 private:
-    core::dimension2d<u32> m_size, m_orig_size;
+    core::dimension2d<u32> m_size, m_orig_size, m_max_size;
 
     std::function<void(video::IImage*)> m_image_mani;
 

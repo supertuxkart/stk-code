@@ -5,6 +5,7 @@
 #include "ge_main.hpp"
 #include "ge_texture.hpp"
 
+#include <IAttributes.h>
 #include <limits>
 #include <vector>
 
@@ -19,6 +20,8 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
                  m_disable_reload(false), m_single_channel(false)
 {
+    m_max_size = getDriver()->getDriverAttributes()
+        .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     reloadInternal();
 }   // GEVulkanTexture
 
@@ -322,7 +325,7 @@ void GEVulkanTexture::reloadInternal()
 
     clearVulkanData();
     video::IImage* texture_image = getResizedImage(NamedPath.getPtr(),
-        &m_orig_size);
+        m_max_size, &m_orig_size);
     if (texture_image == NULL)
         return;
     m_size = texture_image->getDimension();
