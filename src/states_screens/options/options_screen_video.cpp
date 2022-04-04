@@ -442,11 +442,13 @@ void OptionsScreenVideo::init()
     res->setActive(!in_game);
     full->setActive(!in_game);
     applyBtn->setActive(!in_game);
-    gfx->setActive(!in_game);
+#ifndef SERVER_ONLY
+    gfx->setActive(!in_game && CVS->isGLSL());
+#endif
     getWidget<ButtonWidget>("custom")->setActive(!in_game);
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game);
-    
+
 #if defined(MOBILE_STK) || defined(__SWITCH__)
     applyBtn->setVisible(false);
     full->setVisible(false);
@@ -529,14 +531,16 @@ void OptionsScreenVideo::updateGfxSlider()
         gfx->setCustomText( _("Custom") );
     }
 
+#ifndef SERVER_ONLY
     // Enable the blur slider if the modern renderer is used
     getWidget<GUIEngine::SpinnerWidget>("blur_level")->
-        setActive(UserConfigParams::m_dynamic_lights);
+        setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
     // Same with Render resolution slider
     getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
-        setActive(UserConfigParams::m_dynamic_lights);
+        setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
 
     updateTooltip();
+#endif
 } // updateGfxSlider
 
 // --------------------------------------------------------------------------------------------

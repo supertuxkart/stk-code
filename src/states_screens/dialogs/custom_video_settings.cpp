@@ -208,6 +208,11 @@ void CustomVideoSettingsDialog::updateActivation()
 {
 #ifndef SERVER_ONLY
     bool light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
+    if (!CVS->isGLSL())
+    {
+        getWidget<CheckBoxWidget>("dynamiclight")->setActive(false);
+        light = false;
+    }
     getWidget<CheckBoxWidget>("motionblur")->setActive(light);
     getWidget<CheckBoxWidget>("dof")->setActive(light);
     getWidget<SpinnerWidget>("shadows")->setActive(light);
