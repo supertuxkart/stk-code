@@ -986,6 +986,20 @@ found_mode:
         create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
     }
 
+    if (m_surface_capabilities.currentTransform != VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR)
+    {
+        if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR ||
+            m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR ||
+            m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
+        {
+            os::Printer::log("Vulkan preTransform", "using pre-rotation matrix");
+        }
+        else
+        {
+            m_surface_capabilities.currentTransform = VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
+            os::Printer::log("Vulkan preTransform", "forcing identity, may affect performance");
+        }
+    }
     create_info.preTransform = m_surface_capabilities.currentTransform;
     create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
     if ((m_surface_capabilities.supportedCompositeAlpha & VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR) == 0)
@@ -1000,8 +1014,8 @@ found_mode:
     m_clip = getFullscreenClip();
     setViewPort(core::recti(0, 0, ScreenSize.Width, ScreenSize.Height));
     initPreRotationMatrix();
-    if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR) != 0 ||
-        (m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR) != 0)
+    if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR ||
+        m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
     {
         std::swap(create_info.imageExtent.width, create_info.imageExtent.height);
         std::swap(m_swap_chain_extent.width, m_swap_chain_extent.height);
@@ -1798,7 +1812,7 @@ void GEVulkanDriver::setViewPort(const core::rect<s32>& area)
 void GEVulkanDriver::getRotatedRect2D(VkRect2D* rect)
 {
     // https://developer.android.com/games/optimize/vulkan-prerotation
-    if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR) != 0)
+    if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR)
     {
         VkRect2D ret =
         {
@@ -1809,7 +1823,7 @@ void GEVulkanDriver::getRotatedRect2D(VkRect2D* rect)
         };
         *rect = ret;
     }
-    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR) != 0)
+    else if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR)
     {
         VkRect2D ret =
         {
@@ -1820,7 +1834,7 @@ void GEVulkanDriver::getRotatedRect2D(VkRect2D* rect)
         };
         *rect = ret;
     }
-    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR) != 0)
+    else if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
     {
         VkRect2D ret =
         {
@@ -1852,11 +1866,11 @@ void GEVulkanDriver::getRotatedViewport(VkViewport* vp)
 void GEVulkanDriver::initPreRotationMatrix()
 {
     const double pi = 3.14159265358979323846;
-    if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR) != 0)
+    if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR)
         m_pre_rotation_matrix.setRotationAxisRadians(90.0 * pi / 180., core::vector3df(0.0f, 0.0f, 1.0f));
-    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR) != 0)
+    else if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR)
         m_pre_rotation_matrix.setRotationAxisRadians(180.0 * pi / 180., core::vector3df(0.0f, 0.0f, 1.0f));
-    else if ((m_surface_capabilities.currentTransform & VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR) != 0)
+    else if (m_surface_capabilities.currentTransform == VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR)
         m_pre_rotation_matrix.setRotationAxisRadians(270.0 * pi / 180., core::vector3df(0.0f, 0.0f, 1.0f));
 }   // initPreRotationMatrix
 
