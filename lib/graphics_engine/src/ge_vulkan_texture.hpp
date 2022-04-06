@@ -41,10 +41,12 @@ private:
     // ------------------------------------------------------------------------
     bool createImageView(VkImageAspectFlags aspect_flags);
     // ------------------------------------------------------------------------
-    void transitionImageLayout(VkImageLayout old_layout,
+    void transitionImageLayout(VkCommandBuffer command_buffer,
+                               VkImageLayout old_layout,
                                VkImageLayout new_layout);
     // ------------------------------------------------------------------------
-    void copyBufferToImage(VkBuffer buffer, u32 w, u32 h, s32 x, s32 y);
+    void copyBufferToImage(VkCommandBuffer command_buffer, VkBuffer buffer,
+                           u32 w, u32 h, s32 x, s32 y);
     // ------------------------------------------------------------------------
     void upload(uint8_t* data);
     // ------------------------------------------------------------------------
