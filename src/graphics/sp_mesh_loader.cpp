@@ -170,11 +170,12 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
                 }
                 if (!mask_full_path.empty())
                 {
-                    image_mani = [mask_full_path](video::IImage* img)->void
+                    core::dimension2du max_size = irr_driver->getVideoDriver()
+                        ->getDriverAttributes().getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
+                    image_mani = [mask_full_path, max_size](video::IImage* img)->void
                     {
-                        video::IImage* converted_mask = GE::getResizedImage(mask_full_path,
-                            irr_driver->getVideoDriver()->getDriverAttributes()
-                            .getAttributeAsDimension2d("MAX_TEXTURE_SIZE"));
+                        video::IImage* converted_mask =
+                            GE::getResizedImage(mask_full_path, max_size);
                         if (converted_mask == NULL)
                         {
                             Log::warn("SPMeshLoader", "Applying mask failed for '%s'!",
