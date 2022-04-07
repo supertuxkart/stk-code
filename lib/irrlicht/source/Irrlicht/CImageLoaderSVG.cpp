@@ -13,6 +13,7 @@
 #include "os.h"
 #include "irrString.h"
 #include "CNullDriver.h"
+#include "ge_main.hpp"
 
 namespace irr
 {
@@ -23,12 +24,6 @@ namespace video
 //! constructor
 CImageLoaderSVG::CImageLoaderSVG()
 {
-}
-
-//! set the screen size
-void CImageLoaderSVG::setScreenSize(const core::dimension2d<u32> &screen_size)
-{
-    ScreenSize = screen_size;
 }
 
 //! returns true if the file maybe is able to be loaded by this class
@@ -109,7 +104,7 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) cons
     if ( strstr(file->getFileName().c_str(),"gui/icons/") )
     {
         // determine scaling based on screen size
-        float screen_height = ScreenSize.Height;
+        float screen_height = (float)GE::getDriver()->getCurrentRenderTargetSize().Height;
         float desired_icon_size = 0.21*screen_height + 30.0f; // phenomenological
         scale = desired_icon_size/img->height;
     }
