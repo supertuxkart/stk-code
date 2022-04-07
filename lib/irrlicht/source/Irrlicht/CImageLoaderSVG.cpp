@@ -13,7 +13,9 @@
 #include "os.h"
 #include "irrString.h"
 #include "CNullDriver.h"
+#ifndef SERVER_ONLY
 #include "ge_main.hpp"
+#endif
 
 namespace irr
 {
@@ -103,10 +105,12 @@ IImage* CImageLoaderSVG::loadImage(io::IReadFile* file, bool skip_checking) cons
     // only rescale the icons
     if ( strstr(file->getFileName().c_str(),"gui/icons/") )
     {
+#ifndef SERVER_ONLY
         // determine scaling based on screen size
         float screen_height = (float)GE::getDriver()->getCurrentRenderTargetSize().Height;
         float desired_icon_size = 0.21*screen_height + 30.0f; // phenomenological
         scale = desired_icon_size/img->height;
+#endif
     }
 
     // create surface
