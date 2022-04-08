@@ -434,10 +434,12 @@ void ReplayRecorder::save()
     for (unsigned int k = 0; k < num_karts; k++)
     {
         if (world->getKart(k)->isGhostKart()) continue;
-        fprintf(fd, "size:     %d\n", m_count_transforms[k]);
 
-        unsigned int num_transforms = std::min(m_max_frames,
-                                               m_count_transforms[k]);
+        const unsigned int num_transforms = std::min(m_max_frames,
+                                                     m_count_transforms[k]);
+
+        fprintf(fd, "size:     %d\n", num_transforms);
+
         for (unsigned int i = 0; i < num_transforms; i++)
         {
             const TransformEvent *p  = &(m_transform_events[k][i]);
