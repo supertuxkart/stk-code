@@ -49,9 +49,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Optional;
 import java.util.Set;
 
 import org.minidns.hla.DnssecResolverApi;
@@ -61,6 +63,7 @@ import org.minidns.record.TXT;
 
 public class SuperTuxKartActivity extends SDLActivity
 {
+    private String[] argv;
     private AlertDialog m_progress_dialog;
     private ProgressBar m_progress_bar;
     private ImageView m_splash_screen;
@@ -191,6 +194,8 @@ public class SuperTuxKartActivity extends SDLActivity
     public void onCreate(Bundle instance)
     {
         super.onCreate(instance);
+        argv = Optional.ofNullable(getIntent().getStringArrayExtra("argv")).orElse(new String[0]);
+        Log.i("SuperTuxKartActivity", String.format("cmdline: %s", String.join(" ", argv)));
         m_keyboard_height = new AtomicInteger();
         m_moved_height = new AtomicInteger();
         m_progress_dialog = null;
@@ -298,6 +303,11 @@ public class SuperTuxKartActivity extends SDLActivity
     protected String getMainSharedObject()
     {
         return getContext().getApplicationInfo().nativeLibraryDir + "/libmain.so";
+    }
+    // ------------------------------------------------------------------------
+    protected String[] getArguments()
+    {
+        return argv;
     }
     // ------------------------------------------------------------------------
     public void showKeyboard(final int type, final int y)
