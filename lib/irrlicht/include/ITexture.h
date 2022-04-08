@@ -100,7 +100,7 @@ class ITexture : public virtual IReferenceCounted
 public:
 
 	//! constructor
-	ITexture(const io::path& name) : NamedPath(name)
+	ITexture(const io::path& name) : NamedPath(name), LoadingFailed(false)
 	{
 	}
 
@@ -202,6 +202,8 @@ public:
 	virtual void updateTexture(void* data, ECOLOR_FORMAT format, u32 w, u32 h, u32 x, u32 y) {}
 
 	virtual void reload() {}
+
+	virtual bool loadingFailed() const { return LoadingFailed; }
 protected:
 
 	//! Helper function, helps to get the desired texture creation format from the flags.
@@ -221,6 +223,7 @@ protected:
 	}
 
 	io::SNamedPath NamedPath;
+	bool LoadingFailed;
 };
 
 

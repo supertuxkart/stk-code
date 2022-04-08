@@ -101,7 +101,7 @@ video::ITexture* STKTexManager::getTexture(const std::string& path,
             GE::createTexture(full_path.empty() ? path : full_path,
             image_mani);
     }
-    if (new_texture->getTextureHandler() == 0)
+    if (new_texture->loadingFailed())
     {
         const char* name = new_texture->getName().getPtr();
         if (!m_texture_error_message.empty())

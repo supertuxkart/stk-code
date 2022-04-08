@@ -35,7 +35,10 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
                  m_disable_reload(true), m_single_channel(false)
 {
     if (!img)
+    {
+        LoadingFailed = true;
         return;
+    }
     m_size = m_orig_size = img->getDimension();
     uint8_t* data = (uint8_t*)img->lock();
     upload(data);
@@ -329,7 +332,10 @@ void GEVulkanTexture::reloadInternal()
     video::IImage* texture_image = getResizedImage(NamedPath.getPtr(),
         m_max_size, &m_orig_size);
     if (texture_image == NULL)
+    {
+        LoadingFailed = true;
         return;
+    }
     m_size = texture_image->getDimension();
     if (m_image_mani)
         m_image_mani(texture_image);

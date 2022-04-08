@@ -30,14 +30,20 @@ GEDX9Texture::GEDX9Texture(video::IImage* img, const std::string& name)
 {
     getDevice9();
     if (!m_device_9 || !img)
+    {
+        LoadingFailed = true;
         return;
+    }
     uint8_t* data = NULL;
     m_size = m_orig_size = img->getDimension();
     HRESULT hr = m_device_9->CreateTexture(m_size.Width, m_size.Height,
         0, D3DUSAGE_AUTOGENMIPMAP, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED,
         &m_texture_9, NULL);
     if (FAILED(hr))
+    {
+        LoadingFailed = true;
         goto exit;
+    }
     data = (uint8_t*)img->lock();
     upload(data);
 exit:
@@ -53,7 +59,10 @@ GEDX9Texture::GEDX9Texture(const std::string& name, unsigned int size)
 {
     getDevice9();
     if (!m_device_9)
+    {
+        LoadingFailed = true;
         return;
+    }
     m_orig_size.Width = size;
     m_orig_size.Height = size;
     m_size = m_orig_size;
@@ -61,7 +70,10 @@ GEDX9Texture::GEDX9Texture(const std::string& name, unsigned int size)
         0, D3DUSAGE_AUTOGENMIPMAP, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED,
         &m_texture_9, NULL);
     if (FAILED(hr))
+    {
+        LoadingFailed = true;
         return;
+    }
     std::vector<uint8_t> data;
     data.resize(size * size * 4, 0);
     upload(data.data());
@@ -87,12 +99,22 @@ void GEDX9Texture::getDevice9()
 // ----------------------------------------------------------------------------
 void GEDX9Texture::reload()
 {
-    if (!m_device_9 || m_disable_reload)
+    if (m_disable_reload)
         return;
+
+    if (!m_device_9)
+    {
+        LoadingFailed = true;
+        return;
+    }
+
     video::IImage* texture_image = getResizedImage(NamedPath.getPtr(),
         m_max_size, &m_orig_size);
     if (texture_image == NULL)
+    {
+        LoadingFailed = true;
         return;
+    }
     m_size = texture_image->getDimension();
     if (m_image_mani)
         m_image_mani(texture_image);
@@ -106,7 +128,10 @@ void GEDX9Texture::reload()
         0, D3DUSAGE_AUTOGENMIPMAP, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED,
         &m_texture_9, NULL);
     if (FAILED(hr))
+    {
+        LoadingFailed = true;
         goto exit;
+    }
     upload(data);
 exit:
     texture_image->unlock();
