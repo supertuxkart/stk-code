@@ -943,13 +943,9 @@ IFileList* CFileSystem::createEmptyFileList(const io::path& path, bool ignoreCas
 }
 
 
-//! determines if a file exists and would be able to be opened.
-bool CFileSystem::existFile(const io::path& filename) const
+//! Determines if a file exists and could be opened (thread-safe, ignore file archives).
+bool CFileSystem::existFileThreadSafe(const path& filename) const
 {
-	for (u32 i=0; i < FileArchives.size(); ++i)
-		if (FileArchives[i]->getFileList()->findFile(filename)!=-1)
-			return true;
-
 #if defined(_IRR_WINDOWS_CE_PLATFORM_)
 #if defined(_IRR_WCHAR_FILESYSTEM)
 	HANDLE hFile = CreateFileW(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
@@ -983,6 +979,16 @@ bool CFileSystem::existFile(const io::path& filename) const
 	return (access(filename.c_str(), 0) != -1);
 #endif
 #endif
+}
+
+
+//! determines if a file exists and would be able to be opened.
+bool CFileSystem::existFile(const io::path& filename) const
+{
+	for (u32 i=0; i < FileArchives.size(); ++i)
+		if (FileArchives[i]->getFileList()->findFile(filename)!=-1)
+			return true;
+	return existFileThreadSafe(filename);
 }
 
 

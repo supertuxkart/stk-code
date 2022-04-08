@@ -324,6 +324,11 @@ public:
 	\return True if file exists, and false if it does not exist or an error occured. */
 	virtual bool existFile(const path& filename) const =0;
 
+	//! Determines if a file exists and could be opened (thread-safe, ignore file archives).
+	/** \param filename is the string identifying the file which should be tested for existence.
+	\return True if file exists, and false if it does not exist or an error occured. */
+	virtual bool existFileThreadSafe(const path& filename) const =0;
+
 	//! Creates a XML Reader from a file which returns all parsed strings as wide characters (wchar_t*).
 	/** Use createXMLReaderUTF8() if you prefer char* instead of wchar_t*. See IIrrXMLReader for
 	more information on how to use the parser.
