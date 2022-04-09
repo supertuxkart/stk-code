@@ -1,4 +1,4 @@
-set(_version_file "${CMAKE_CURRENT_SOURCE_DIR}/src/wiiuse.h")
+set(_version_file "${CMAKE_CURRENT_SOURCE_DIR}/src/include/wiiuse.h")
 if(EXISTS "${_version_file}")
 	file(READ "${_version_file}" _version_contents)
 endif()

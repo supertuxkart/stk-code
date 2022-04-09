@@ -2,6 +2,9 @@ if(NOT MSVC)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra")
 endif()
 
+# Modified for STK to avoid compiler warnings with MinGW
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 set(SOURCES
 	classic.c
 	dynamics.c
@@ -28,7 +31,7 @@ set(SOURCES
 	wiiuse_internal.h
 	wiiboard.h)
 set(API
-	wiiuse.h)
+	include/wiiuse.h)
 
 if(WIN32)
 	list(APPEND SOURCES os_win.c)
@@ -51,7 +54,7 @@ else()
 endif()
 
 if(MSVC)
-	list(APPEND API wiiuse_msvcstdint.h)
+	list(APPEND API include/wiiuse_msvcstdint.h)
 endif()
 
 add_definitions(-DWIIUSE_COMPILE_LIB)
