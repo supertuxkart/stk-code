@@ -742,10 +742,13 @@ void UserConfig::saveConfig()
     try
     {
         std::string s = ss.str();
-        std::ofstream configfile(FileUtils::getPortableWritingPath(filename),
+        // Save to a new file and rename later to avoid disk space problem, see #4709
+        std::ofstream configfile(FileUtils::getPortableWritingPath(filename + "new"),
             std::ofstream::out);
         configfile << ss.rdbuf();
         configfile.close();
+        file_manager->removeFile(filename);
+        FileUtils::renameU8Path(filename + "new", filename);
     }
     catch (std::runtime_error& e)
     {

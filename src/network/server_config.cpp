@@ -186,10 +186,13 @@ void writeServerConfigToDisk()
     const std::string& config_xml = getServerConfigXML();
     try
     {
+        // Save to a new file and rename later to avoid disk space problem, see #4709
         std::ofstream configfile(FileUtils::getPortableWritingPath(
-            g_server_config_path), std::ofstream::out);
+            g_server_config_path + "new"), std::ofstream::out);
         configfile << config_xml;
         configfile.close();
+        file_manager->removeFile(g_server_config_path);
+        FileUtils::renameU8Path(g_server_config_path + "new", g_server_config_path);
     }
     catch (std::runtime_error& e)
     {

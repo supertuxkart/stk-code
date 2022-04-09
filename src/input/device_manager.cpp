@@ -545,11 +545,11 @@ bool DeviceManager::load()
 // -----------------------------------------------------------------------------
 void DeviceManager::save()
 {
-    static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
+    std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serializing input.xml...");
 
-
-    std::ofstream configfile(FileUtils::getPortableWritingPath(filepath));
+    // Save to a new file and rename later to avoid disk space problem, see #4709
+    std::ofstream configfile(FileUtils::getPortableWritingPath(filepath + "new"));
 
     if(!configfile.is_open())
     {
@@ -558,29 +558,40 @@ void DeviceManager::save()
     }
 
 
-    configfile << "<input version=\"" << INPUT_FILE_VERSION << "\">\n\n";
-
-    configfile << "<!--\n"
-        << "Event 1 : Keyboard button press\n"
-        << "    'id' indicates which button, as defined by irrlicht's EKEY_CODE enum\n"
-        << "Event 2 : Gamepad stick motion\n"
-        << "    'id' indicates which stick, starting from 0\n"
-        << "    'direction' 0 means negative, 1 means positive\n"
-        << "Event 3 : Gamepad button press\n"
-        << "    'id' indicates which button, starting from 0\n"
-        << "-->\n\n";
-
-    for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
+    try
     {
-        m_keyboard_configs[n].save(configfile);
+        configfile << "<input version=\"" << INPUT_FILE_VERSION << "\">\n\n";
+
+        configfile << "<!--\n"
+            << "Event 1 : Keyboard button press\n"
+            << "    'id' indicates which button, as defined by irrlicht's EKEY_CODE enum\n"
+            << "Event 2 : Gamepad stick motion\n"
+            << "    'id' indicates which stick, starting from 0\n"
+            << "    'direction' 0 means negative, 1 means positive\n"
+            << "Event 3 : Gamepad button press\n"
+            << "    'id' indicates which button, starting from 0\n"
+            << "-->\n\n";
+
+        for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
+        {
+            m_keyboard_configs[n].save(configfile);
+        }
+        for(unsigned int n=0; n<m_gamepad_configs.size(); n++)
+        {
+            m_gamepad_configs[n].save(configfile);
+        }
+
+        configfile << "</input>\n";
+        configfile.close();
+        file_manager->removeFile(filepath);
+        FileUtils::renameU8Path(filepath + "new", filepath);
     }
-    for(unsigned int n=0; n<m_gamepad_configs.size(); n++)
+    catch (std::exception& e)
     {
-        m_gamepad_configs[n].save(configfile);
+        Log::error("Device manager", "Failed to write %s to %s, "
+            "because %s", INPUT_FILE_NAME, filepath.c_str(), e.what());
     }
 
-    configfile << "</input>\n";
-    configfile.close();
     if(UserConfigParams::logMisc()) Log::info("Device manager","Serialization complete.");
 }   // save
 
