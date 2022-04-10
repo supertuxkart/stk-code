@@ -973,10 +973,9 @@ found_mode:
     create_info.imageArrayLayers = 1;
     create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
+    uint32_t queueFamilyIndices[] = { m_graphics_family, m_present_family };
     if (m_graphics_family != m_present_family)
     {
-        uint32_t queueFamilyIndices[] =
-            { m_graphics_family, m_present_family };
         create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
         create_info.queueFamilyIndexCount = 2;
         create_info.pQueueFamilyIndices = queueFamilyIndices;
