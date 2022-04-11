@@ -8,8 +8,6 @@
 #include "IFileSystem.h"
 #include "irrArray.h"
 
-#include <mutex>
-
 namespace irr
 {
 namespace io
@@ -158,6 +156,8 @@ public:
 
 	//! Creates a new empty collection of attributes, usable for serialization and more.
 	virtual IAttributes* createEmptyAttributes(video::IVideoDriver* driver);
+
+	virtual std::unique_lock<std::recursive_mutex> acquireFileArchivesMutex() const;
 
 private:
 

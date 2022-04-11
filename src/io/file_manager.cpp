@@ -633,6 +633,8 @@ io::path FileManager::createAbsoluteFilename(const std::string &f)
 void FileManager::pushModelSearchPath(const std::string& path)
 {
     m_model_search_path.push_back(path);
+    std::unique_lock<std::recursive_mutex> ul = m_file_system->acquireFileArchivesMutex();
+
     const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
                                   /*ignoreCase*/false,
@@ -660,6 +662,8 @@ void FileManager::pushModelSearchPath(const std::string& path)
 void FileManager::pushTextureSearchPath(const std::string& path, const std::string& container_id)
 {
     m_texture_search_path.push_back(TextureSearchPath(path, container_id));
+    std::unique_lock<std::recursive_mutex> ul = m_file_system->acquireFileArchivesMutex();
+
     const int n=m_file_system->getFileArchiveCount();
     m_file_system->addFileArchive(createAbsoluteFilename(path),
                                   /*ignoreCase*/false,

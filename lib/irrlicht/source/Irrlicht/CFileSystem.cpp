@@ -1092,6 +1092,12 @@ IAttributes* CFileSystem::createEmptyAttributes(video::IVideoDriver* driver)
 }
 
 
+std::unique_lock<std::recursive_mutex> CFileSystem::acquireFileArchivesMutex() const
+{
+	return std::unique_lock<std::recursive_mutex>(m_file_archives_mutex);
+}
+
+
 } // end namespace irr
 } // end namespace io
 

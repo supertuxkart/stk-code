@@ -9,6 +9,8 @@
 #include "IXMLReader.h"
 #include "IFileArchive.h"
 
+#include <mutex>
+
 namespace irr
 {
 namespace video
@@ -386,6 +388,8 @@ public:
 	If you no longer need the object, you should call IAttributes::drop().
 	See IReferenceCounted::drop() for more information. */
 	virtual IAttributes* createEmptyAttributes(video::IVideoDriver* driver=0) =0;
+
+	virtual std::unique_lock<std::recursive_mutex> acquireFileArchivesMutex() const = 0;
 };
 
 
