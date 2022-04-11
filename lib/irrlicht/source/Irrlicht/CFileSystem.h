@@ -8,6 +8,8 @@
 #include "IFileSystem.h"
 #include "irrArray.h"
 
+#include <mutex>
+
 namespace irr
 {
 namespace io
@@ -172,6 +174,8 @@ private:
 	core::array<IArchiveLoader*> ArchiveLoader;
 	//! currently attached Archives
 	core::array<IFileArchive*> FileArchives;
+
+	mutable std::recursive_mutex m_file_archives_mutex;
 };
 
 
