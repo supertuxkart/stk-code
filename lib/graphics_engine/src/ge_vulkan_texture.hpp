@@ -32,7 +32,7 @@ private:
 
     const bool m_disable_reload;
 
-    bool m_single_channel;
+    const bool m_single_channel;
 
     // ------------------------------------------------------------------------
     bool createTextureImage(uint8_t* texture_data);
@@ -53,6 +53,8 @@ private:
     void clearVulkanData();
     // ------------------------------------------------------------------------
     void reloadInternal();
+    // ------------------------------------------------------------------------
+    void convertBGRA(video::IImage* img);
     // ------------------------------------------------------------------------
 public:
     // ------------------------------------------------------------------------

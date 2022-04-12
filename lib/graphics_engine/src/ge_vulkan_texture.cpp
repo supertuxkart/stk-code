@@ -40,6 +40,7 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
         return;
     }
     m_size = m_orig_size = img->getDimension();
+    convertBGRA(img);
     uint8_t* data = (uint8_t*)img->lock();
     upload(data);
     img->unlock();
@@ -337,6 +338,8 @@ void GEVulkanTexture::reloadInternal()
         return;
     }
     m_size = texture_image->getDimension();
+
+    convertBGRA(texture_image);
     if (m_image_mani)
         m_image_mani(texture_image);
 
@@ -349,15 +352,6 @@ void GEVulkanTexture::reloadInternal()
 // ----------------------------------------------------------------------------
 void GEVulkanTexture::upload(uint8_t* data)
 {
-    if (!m_single_channel)
-    {
-        for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
-        {
-            uint8_t tmp_val = data[i * 4];
-            data[i * 4] = data[i * 4 + 2];
-            data[i * 4 + 2] = tmp_val;
-        }
-    }
     if (!createTextureImage(data))
         return;
     if (!createImageView(VK_IMAGE_ASPECT_COLOR_BIT))
@@ -456,5 +450,17 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
     vkDestroyBuffer(m_vulkan_device, staging_buffer, NULL);
     vkFreeMemory(m_vulkan_device, staging_buffer_memory, NULL);
 }   // updateTexture
+
+//-----------------------------------------------------------------------------
+void GEVulkanTexture::convertBGRA(video::IImage* img)
+{
+    uint8_t* data = (uint8_t*)img->lock();
+    for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
+    {
+        uint8_t tmp_val = data[i * 4];
+        data[i * 4] = data[i * 4 + 2];
+        data[i * 4 + 2] = tmp_val;
+    }
+}   // convertBGRA
 
 }
