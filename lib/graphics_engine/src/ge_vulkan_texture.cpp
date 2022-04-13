@@ -339,9 +339,9 @@ void GEVulkanTexture::reloadInternal()
     }
     m_size = texture_image->getDimension();
 
-    convertBGRA(texture_image);
     if (m_image_mani)
         m_image_mani(texture_image);
+    convertBGRA(texture_image);
 
     uint8_t* data = (uint8_t*)texture_image->lock();
     upload(data);
