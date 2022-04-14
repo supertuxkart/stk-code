@@ -288,12 +288,12 @@ build_stk()
                 -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
                 -DBUILD_TESTING=0 \
                 -DBUILD_CURL_EXE=0 \
-                -DCMAKE_USE_MBEDTLS=1 \
+                -DCURL_USE_MBEDTLS=1 \
                 -DUSE_ZLIB=1 \
-                -DCMAKE_USE_OPENSSL=0 \
-                -DCMAKE_USE_LIBSSH=0 \
-                -DCMAKE_USE_LIBSSH2=0 \
-                -DCMAKE_USE_GSSAPI=0 \
+                -DCURL_USE_OPENSSL=0 \
+                -DCURL_USE_LIBSSH=0 \
+                -DCURL_USE_LIBSSH2=0 \
+                -DCURL_USE_GSSAPI=0 \
                 -DUSE_NGHTTP2=0 \
                 -DUSE_QUICHE=0 \
                 -DHTTP_ONLY=1 \
