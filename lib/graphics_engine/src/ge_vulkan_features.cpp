@@ -25,22 +25,27 @@ bool g_supports_partially_bound = false;
 void GEVulkanFeatures::init(GEVulkanDriver* vk)
 {
     g_supports_bind_textures_at_once = true;
+    bool dynamic_indexing = true;
     VkPhysicalDeviceLimits limit = vk->getPhysicalDeviceProperties().limits;
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxDescriptorSetSamplers&platform=all
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxDescriptorSetSampledImages&platform=all
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxPerStageDescriptorSamplers&platform=all
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxPerStageDescriptorSampledImages&platform=all
     // We decide 256 (GEVulkanShaderManager::getSamplerSize()) based on those infos
-    if (limit.maxDescriptorSetSamplers < GEVulkanShaderManager::getSamplerSize())
+    const unsigned max_sampler_size = GEVulkanShaderManager::getSamplerSize();
+    if (limit.maxDescriptorSetSamplers < max_sampler_size)
         g_supports_bind_textures_at_once = false;
-    if (limit.maxDescriptorSetSampledImages < GEVulkanShaderManager::getSamplerSize())
+    if (limit.maxDescriptorSetSampledImages < max_sampler_size)
         g_supports_bind_textures_at_once = false;
-    if (limit.maxPerStageDescriptorSamplers < GEVulkanShaderManager::getSamplerSize())
+    if (limit.maxPerStageDescriptorSamplers < max_sampler_size)
         g_supports_bind_textures_at_once = false;
-    if (limit.maxPerStageDescriptorSampledImages < GEVulkanShaderManager::getSamplerSize())
+    if (limit.maxPerStageDescriptorSampledImages < max_sampler_size)
         g_supports_bind_textures_at_once = false;
     if (vk->getPhysicalDeviceFeatures().shaderSampledImageArrayDynamicIndexing == VK_FALSE)
+    {
+        dynamic_indexing = false;
         g_supports_bind_textures_at_once = false;
+    }
 
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(vk->getPhysicalDevice(), NULL,
@@ -74,6 +79,30 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         .shaderSampledImageArrayNonUniformIndexing == VK_TRUE);
     g_supports_partially_bound = (descriptor_indexing_features
         .descriptorBindingPartiallyBound == VK_TRUE);
+
+    bool missing_vkGetPhysicalDeviceProperties2 =
+        !vkGetPhysicalDeviceProperties2;
+    if (!missing_vkGetPhysicalDeviceProperties2 &&
+        !g_supports_bind_textures_at_once && dynamic_indexing)
+    {
+        // Required for moltenvk argument buffers
+        VkPhysicalDeviceProperties2 props1 = {};
+        props1.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_PROPERTIES_2;
+        VkPhysicalDeviceDescriptorIndexingProperties props2 = {};
+        props2.sType =
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES;
+        props1.pNext = &props2;
+        vkGetPhysicalDeviceProperties2(vk->getPhysicalDevice(), &props1);
+        if (props2.sType ==
+            VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES)
+        {
+            g_supports_bind_textures_at_once =
+                props2.maxPerStageDescriptorUpdateAfterBindSamplers > max_sampler_size &&
+                props2.maxPerStageDescriptorUpdateAfterBindSampledImages > max_sampler_size &&
+                props2.maxDescriptorSetUpdateAfterBindSamplers > max_sampler_size &&
+                props2.maxDescriptorSetUpdateAfterBindSampledImages > max_sampler_size;
+        }
+    }
 }   // init
 
 // ----------------------------------------------------------------------------

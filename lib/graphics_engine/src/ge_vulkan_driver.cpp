@@ -472,6 +472,15 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     g_paused_rendering.store(false);
     g_device_created.store(true);
 
+#if defined(__APPLE__)
+    MVKConfiguration cfg = {};
+    size_t cfg_size = sizeof(MVKConfiguration);
+    vkGetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
+    // Enable to allow binding all textures at once
+    cfg.useMetalArgumentBuffers = VK_TRUE;
+    vkSetMoltenVKConfigurationMVK(VK_NULL_HANDLE, &cfg, &cfg_size);
+#endif
+
     createInstance(window);
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
@@ -495,6 +504,14 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_device_extensions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
     findPhysicalDevice();
     vkGetPhysicalDeviceProperties(m_physical_device, &m_properties);
+
+#if defined(__APPLE__)
+    // Debug usage only
+    MVKPhysicalDeviceMetalFeatures mvk_features = {};
+    size_t mvk_features_size = sizeof(MVKPhysicalDeviceMetalFeatures);
+    vkGetPhysicalDeviceMetalFeaturesMVK(m_physical_device, &mvk_features, &mvk_features_size);
+#endif
+
     GEVulkanFeatures::init(this);
     createDevice();
 

@@ -8,6 +8,7 @@ class MoltenVK
 {
 private:
     bool m_loaded;
+    void* m_handle;
 public:
     // ------------------------------------------------------------------------
     MoltenVK();
