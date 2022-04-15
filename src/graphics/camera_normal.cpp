@@ -213,7 +213,7 @@ void CameraNormal::getCameraSettings(float *above_kart, float *cam_angle,
                 MultitouchDevice* device = input_manager->getDeviceManager()->getMultitouchDevice();
                 if (device)
                 {
-                    *cam_roll_angle = -device->getOrientation();
+                    *cam_roll_angle = device->getOrientation();
                 }
             }
             break;
@@ -416,26 +416,25 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
     }
 
     Kart *kart = dynamic_cast<Kart*>(m_kart);
+
+    // Rotate the up vector (0,1,0) by the rotation ... which is just column 1
+    const Vec3& up = m_kart->getSmoothedTrans().getBasis().getColumn(1);
+    const irr::core::vector3df straight_up = irr::core::vector3df(0, 1, 0);
+
     if (kart && !kart->isFlying())
     {
-        // Rotate the up vector (0,1,0) by the rotation ... which is just column 1
-        Vec3 up = m_kart->getSmoothedTrans().getBasis().getColumn(1);
         float f = 0.04f;  // weight for new up vector to reduce shaking
         m_camera->setUpVector(        f  * up.toIrrVector() +
                               (1.0f - f) * m_camera->getUpVector());
     }   // kart && !flying
     else
-        m_camera->setUpVector(core::vector3df(0, 1, 0));
+        m_camera->setUpVector(straight_up);
 
     if (cam_roll_angle != 0.0f)
     {
-        irr::core::vector3df up(0, 1, 0);
-        irr::core::vector3df forward = m_camera->getTarget() - m_camera->getPosition();
-        float direction = atan2f(forward.Z, forward.X) - 90.0f;
-        if (direction < -180.0f)
-            direction += 360.0f;
-        up.rotateXYBy(cam_roll_angle * (180.0f / M_PI));
-        up.rotateXZBy(direction * (180.0f / M_PI));
-        m_camera->setUpVector(up);
+        irr::core::vector3df rotated = straight_up;
+        rotated.rotateXYBy(cam_roll_angle * (180.0f / M_PI));
+        btQuaternion q = shortestArcQuat(Vec3(straight_up), Vec3(rotated).normalize());
+        m_camera->setUpVector(Vec3(quatRotate(q, up)).toIrrVector());
     }
 }   // positionCamera
