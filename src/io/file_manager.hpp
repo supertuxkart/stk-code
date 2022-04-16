@@ -157,7 +157,7 @@ public:
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
     void checkAndCreateDirForAddons(const std::string &dir);
-    bool isDirectory(const std::string &path) const;
+    static bool isDirectory(const std::string &path);
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
     // ------------------------------------------------------------------------

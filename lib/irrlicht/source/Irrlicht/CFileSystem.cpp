@@ -20,6 +20,8 @@
 #include "CLimitReadFile.h"
 #include "irrList.h"
 
+#include "io/file_manager.hpp"
+
 #if defined (_IRR_WINDOWS_API_)
 	#include "utils/string_utils.hpp"
 	#if !defined ( _WIN32_WCE )
@@ -958,10 +960,31 @@ IFileList* CFileSystem::createEmptyFileList(const io::path& path, bool ignoreCas
 	return new CFileList(path, ignoreCase, ignorePaths);
 }
 
-
-//! Determines if a file exists and could be opened (thread-safe, ignore file archives).
-bool CFileSystem::existFileThreadSafe(const path& filename) const
+//! Determines if a file exists and could be opened (thread-safe, ignore file archives), this function returns false for directory
+bool CFileSystem::existFileOnly(const path& filename) const
 {
+	if (FileManager::isDirectory(filename.c_str()))
+		return false;
+
+	io::IReadFile* file = createReadFile(filename);
+	if (file)
+	{
+		file->drop();
+		return true;
+	}
+	return false;
+}
+
+
+//! determines if a file exists and would be able to be opened.
+bool CFileSystem::existFile(const io::path& filename) const
+{
+	std::unique_lock<std::recursive_mutex> ul(m_file_archives_mutex);
+	for (u32 i=0; i < FileArchives.size(); ++i)
+		if (FileArchives[i]->getFileList()->findFile(filename)!=-1)
+			return true;
+	ul.unlock();
+
 #if defined(_IRR_WINDOWS_CE_PLATFORM_)
 #if defined(_IRR_WCHAR_FILESYSTEM)
 	HANDLE hFile = CreateFileW(filename.c_str(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
@@ -995,18 +1018,6 @@ bool CFileSystem::existFileThreadSafe(const path& filename) const
 	return (access(filename.c_str(), 0) != -1);
 #endif
 #endif
-}
-
-
-//! determines if a file exists and would be able to be opened.
-bool CFileSystem::existFile(const io::path& filename) const
-{
-	std::unique_lock<std::recursive_mutex> ul(m_file_archives_mutex);
-	for (u32 i=0; i < FileArchives.size(); ++i)
-		if (FileArchives[i]->getFileList()->findFile(filename)!=-1)
-			return true;
-	ul.unlock();
-	return existFileThreadSafe(filename);
 }
 
 

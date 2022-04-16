@@ -133,8 +133,8 @@ public:
 	//! determines if a file exists and would be able to be opened.
 	virtual bool existFile(const io::path& filename) const;
 
-	//! Determines if a file exists and could be opened (thread-safe, ignore file archives).
-	virtual bool existFileThreadSafe(const path& filename) const;
+	//! Determines if a file exists and could be opened (thread-safe, ignore file archives), this function returns false for directory
+	virtual bool existFileOnly(const path& filename) const;
 
 	//! Creates a XML Reader from a file.
 	virtual IXMLReader* createXMLReader(const io::path& filename);

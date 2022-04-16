@@ -1439,7 +1439,7 @@ std::string FileManager::searchModel(const std::string& file_name) const
 /** Returns true if the given name is a directory.
  *  \param path File name to test.
  */
-bool FileManager::isDirectory(const std::string &path) const
+bool FileManager::isDirectory(const std::string &path)
 {
     struct stat mystat;
     std::string s(path);
