@@ -40,8 +40,8 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
         return;
     }
     m_size = m_orig_size = img->getDimension();
-    convertBGRA(img);
     uint8_t* data = (uint8_t*)img->lock();
+    bgraConversion(data);
     upload(data);
     img->unlock();
     img->drop();
@@ -98,8 +98,8 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
     memcpy(data, texture_data, (size_t)(image_size));
     vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
 
-    success = createImage(VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-        VK_IMAGE_USAGE_SAMPLED_BIT);
+    success = createImage(VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
+        VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
     if (!success)
     {
         ret = VK_NOT_READY;
@@ -246,6 +246,24 @@ void GEVulkanTexture::transitionImageLayout(VkCommandBuffer command_buffer,
         source_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
         destination_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
     }
+    else if (old_layout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL &&
+        new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    {
+        barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+        source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    else if (old_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL &&
+        new_layout == VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL)
+    {
+        barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+        source_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        destination_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
     else if (old_layout == VK_IMAGE_LAYOUT_UNDEFINED &&
         new_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
     {
@@ -341,9 +359,9 @@ void GEVulkanTexture::reloadInternal()
 
     if (m_image_mani)
         m_image_mani(texture_image);
-    convertBGRA(texture_image);
 
     uint8_t* data = (uint8_t*)texture_image->lock();
+    bgraConversion(data);
     upload(data);
     texture_image->unlock();
     texture_image->drop();
@@ -362,8 +380,82 @@ void GEVulkanTexture::upload(uint8_t* data)
 // ----------------------------------------------------------------------------
 void* GEVulkanTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 {
-    return NULL;
+    uint8_t* texture_data = getTextureData();
+    if (m_single_channel)
+    {
+        m_locked_data = new uint8_t[m_size.Width * m_size.Height * 4]();
+        for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
+        {
+            m_locked_data[i * 4 + 2] = texture_data[i];
+            m_locked_data[i * 4 + 3] = 255;
+        }
+        delete [] texture_data;
+        return m_locked_data;
+    }
+    else
+    {
+        m_locked_data = texture_data;
+        bgraConversion(m_locked_data);
+        return m_locked_data;
+    }
 }   // lock
+
+// ----------------------------------------------------------------------------
+uint8_t* GEVulkanTexture::getTextureData()
+{
+    VkBuffer buffer;
+    VkDeviceMemory buffer_memory;
+    VkDeviceSize image_size =
+        m_size.Width * m_size.Height * (m_single_channel ? 1 : 4);
+    if (!getVKDriver()->createBuffer(image_size,
+        VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, buffer, buffer_memory))
+        return NULL;
+
+    VkCommandBuffer command_buffer = getVKDriver()->beginSingleTimeCommands();
+
+    transitionImageLayout(command_buffer,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+    VkBufferImageCopy region = {};
+    region.bufferOffset = 0;
+    region.bufferRowLength = 0;
+    region.bufferImageHeight = 0;
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.baseArrayLayer = 0;
+    region.imageSubresource.layerCount = 1;
+    region.imageOffset = {0, 0, 0};
+    region.imageExtent = {m_size.Width, m_size.Height, 1};
+
+    vkCmdCopyImageToBuffer(command_buffer, m_image,
+        VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, buffer, 1, &region);
+
+    transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    getVKDriver()->endSingleTimeCommands(command_buffer);
+
+    uint8_t* texture_data = new uint8_t[image_size];
+    void* mapped_data;
+    if (vkMapMemory(m_vulkan_device, buffer_memory, 0, image_size,
+        0, &mapped_data) != VK_SUCCESS)
+    {
+        delete [] texture_data;
+        texture_data = NULL;
+        goto cleanup;
+    }
+
+    memcpy(texture_data, mapped_data, image_size);
+    vkUnmapMemory(m_vulkan_device, buffer_memory);
+
+cleanup:
+    vkDestroyBuffer(m_vulkan_device, buffer, NULL);
+    vkFreeMemory(m_vulkan_device, buffer_memory, NULL);
+    return texture_data;
+}   // getTextureData
 
 //-----------------------------------------------------------------------------
 void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
@@ -452,15 +544,14 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
 }   // updateTexture
 
 //-----------------------------------------------------------------------------
-void GEVulkanTexture::convertBGRA(video::IImage* img)
+void GEVulkanTexture::bgraConversion(uint8_t* img_data)
 {
-    uint8_t* data = (uint8_t*)img->lock();
     for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
     {
-        uint8_t tmp_val = data[i * 4];
-        data[i * 4] = data[i * 4 + 2];
-        data[i * 4 + 2] = tmp_val;
+        uint8_t tmp_val = img_data[i * 4];
+        img_data[i * 4] = img_data[i * 4 + 2];
+        img_data[i * 4 + 2] = tmp_val;
     }
-}   // convertBGRA
+}   // bgraConversion
 
 }
