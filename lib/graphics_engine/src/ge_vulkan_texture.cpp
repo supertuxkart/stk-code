@@ -1,5 +1,6 @@
 #include "ge_vulkan_texture.hpp"
 
+#include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_gl_utils.hpp"
 #include "ge_main.hpp"
@@ -106,7 +107,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
         goto destroy;
     }
 
-    command_buffer = getVKDriver()->beginSingleTimeCommands();
+    command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
 
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -117,7 +118,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    getVKDriver()->endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
 destroy:
     vkDestroyBuffer(m_vulkan_device, staging_buffer, NULL);
@@ -413,7 +414,7 @@ uint8_t* GEVulkanTexture::getTextureData()
         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, buffer, buffer_memory))
         return NULL;
 
-    VkCommandBuffer command_buffer = getVKDriver()->beginSingleTimeCommands();
+    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
 
     transitionImageLayout(command_buffer,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
@@ -436,7 +437,7 @@ uint8_t* GEVulkanTexture::getTextureData()
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-    getVKDriver()->endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
     uint8_t* texture_data = new uint8_t[image_size];
     void* mapped_data;
@@ -530,14 +531,14 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
         }
     }
 
-    VkCommandBuffer command_buffer = getVKDriver()->beginSingleTimeCommands();
+    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
     transitionImageLayout(command_buffer,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     copyBufferToImage(command_buffer, staging_buffer, w, h, x, y);
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    getVKDriver()->endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
     vkDestroyBuffer(m_vulkan_device, staging_buffer, NULL);
     vkFreeMemory(m_vulkan_device, staging_buffer_memory, NULL);

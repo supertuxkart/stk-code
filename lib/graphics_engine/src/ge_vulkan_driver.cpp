@@ -529,7 +529,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     createSwapChain();
     createSyncObjects();
-    createCommandPool();
     createSamplers();
     createRenderPass();
     createFramebuffers();
@@ -574,6 +573,13 @@ void GEVulkanDriver::destroyVulkan()
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
+    if (!m_vk->command_buffers.empty())
+    {
+        vkFreeCommandBuffers(m_vk->device,
+            GEVulkanCommandLoader::getCurrentCommandPool(),
+            (uint32_t)(m_vk->command_buffers.size()),
+            &m_vk->command_buffers[0]);
+    }
     GEVulkanCommandLoader::destroy();
     for (std::mutex* m : m_graphics_queue_mutexes)
         delete m;
@@ -1173,28 +1179,13 @@ void GEVulkanDriver::createSyncObjects()
 }   // createSyncObjects
 
 // ----------------------------------------------------------------------------
-void GEVulkanDriver::createCommandPool()
-{
-    VkCommandPoolCreateInfo pool_info = {};
-    pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    pool_info.queueFamilyIndex = m_graphics_family;
-    pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-
-    VkResult result = vkCreateCommandPool(m_vk->device, &pool_info, NULL,
-        &m_vk->command_pool);
-
-    if (result != VK_SUCCESS)
-        throw std::runtime_error("vkCreateCommandPool failed");
-}   // createCommandPool
-
-// ----------------------------------------------------------------------------
 void GEVulkanDriver::createCommandBuffers()
 {
     std::vector<VkCommandBuffer> buffers(getMaxFrameInFlight());
 
     VkCommandBufferAllocateInfo alloc_info = {};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    alloc_info.commandPool = m_vk->command_pool;
+    alloc_info.commandPool = GEVulkanCommandLoader::getCurrentCommandPool();
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     alloc_info.commandBufferCount = (uint32_t)buffers.size();
 
@@ -1371,54 +1362,14 @@ bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 void GEVulkanDriver::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer,
                                 VkDeviceSize size)
 {
-    VkCommandBuffer command_buffer = beginSingleTimeCommands();
+    VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
 
     VkBufferCopy copy_region = {};
     copy_region.size = size;
     vkCmdCopyBuffer(command_buffer, src_buffer, dst_buffer, 1, &copy_region);
 
-    endSingleTimeCommands(command_buffer);
+    GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 }   // copyBuffer
-
-// ----------------------------------------------------------------------------
-VkCommandBuffer GEVulkanDriver::beginSingleTimeCommands()
-{
-    VkCommandBufferAllocateInfo alloc_info = {};
-    alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    alloc_info.commandPool = m_vk->command_pool;
-    alloc_info.commandBufferCount = 1;
-
-    VkCommandBuffer command_buffer;
-    vkAllocateCommandBuffers(m_vk->device, &alloc_info, &command_buffer);
-
-    VkCommandBufferBeginInfo begin_info = {};
-    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
-    vkBeginCommandBuffer(command_buffer, &begin_info);
-
-    return command_buffer;
-}   // beginSingleTimeCommands
-
-// ----------------------------------------------------------------------------
-void GEVulkanDriver::endSingleTimeCommands(VkCommandBuffer command_buffer)
-{
-    vkEndCommandBuffer(command_buffer);
-
-    VkSubmitInfo submit_info = {};
-    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submit_info.commandBufferCount = 1;
-    submit_info.pCommandBuffers = &command_buffer;
-
-    VkQueue queue = VK_NULL_HANDLE;
-    std::unique_lock<std::mutex> ul = getGraphicsQueue(&queue);
-    vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
-    vkQueueWaitIdle(queue);
-    ul.unlock();
-
-    vkFreeCommandBuffers(m_vk->device, m_vk->command_pool, 1, &command_buffer);
-}   // beginSingleTimeCommands
 
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::OnResize(const core::dimension2d<u32>& size)

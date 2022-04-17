@@ -291,8 +291,6 @@ namespace GE
                                                           { return m_features; }
         const VkPhysicalDeviceProperties& getPhysicalDeviceProperties() const
                                                         { return m_properties; }
-        VkCommandBuffer beginSingleTimeCommands();
-        void endSingleTimeCommands(VkCommandBuffer command_buffer);
         io::IFileSystem* getFileSystem() const            { return FileSystem; }
         VkExtent2D getSwapChainExtent() const    { return m_swap_chain_extent; }
         size_t getSwapChainImagesCount() const
@@ -378,7 +376,6 @@ namespace GE
             std::vector<VkSemaphore> image_available_semaphores;
             std::vector<VkSemaphore> render_finished_semaphores;
             std::vector<VkFence> in_flight_fences;
-            VkCommandPool command_pool;
             std::vector<VkCommandBuffer> command_buffers;
             std::array<VkSampler, GVS_COUNT> samplers;
             VkRenderPass render_pass;
@@ -389,7 +386,6 @@ namespace GE
                 surface = VK_NULL_HANDLE;
                 device = VK_NULL_HANDLE;
                 swap_chain = VK_NULL_HANDLE;
-                command_pool = VK_NULL_HANDLE;
                 samplers = {{}};
                 render_pass = VK_NULL_HANDLE;
             }
@@ -401,14 +397,6 @@ namespace GE
                     vkDestroyRenderPass(device, render_pass, NULL);
                 for (unsigned i = 0; i < GVS_COUNT; i++)
                     vkDestroySampler(device, samplers[i], NULL);
-                if (!command_buffers.empty())
-                {
-                    vkFreeCommandBuffers(device, command_pool,
-                        (uint32_t)(command_buffers.size()),
-                        &command_buffers[0]);
-                }
-                if (command_pool != VK_NULL_HANDLE)
-                    vkDestroyCommandPool(device, command_pool, NULL);
                 for (VkSemaphore& semaphore : image_available_semaphores)
                     vkDestroySemaphore(device, semaphore, NULL);
                 for (VkSemaphore& semaphore : render_finished_semaphores)
@@ -468,7 +456,6 @@ namespace GE
         void createDevice();
         void createSwapChain();
         void createSyncObjects();
-        void createCommandPool();
         void createCommandBuffers();
         void createSamplers();
         void createRenderPass();
