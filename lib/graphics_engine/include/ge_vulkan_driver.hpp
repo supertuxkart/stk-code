@@ -13,6 +13,7 @@
 #include "SColor.h"
 #include <array>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -327,6 +328,10 @@ namespace GE
             destroySwapChainRelated(false/*handle_surface*/);
             createSwapChainRelated(false/*handle_surface*/);
         }
+        uint32_t getGraphicsFamily() const         { return m_graphics_family; }
+        unsigned getGraphicsQueueCount() const
+                                              { return m_graphics_queue_count; }
+        std::unique_lock<std::mutex> getGraphicsQueue(VkQueue* queue) const;
     private:
         struct SwapChainSupportDetails
         {
@@ -430,11 +435,13 @@ namespace GE
         VkSurfaceCapabilitiesKHR m_surface_capabilities;
         std::vector<VkSurfaceFormatKHR> m_surface_formats;
         std::vector<VkPresentModeKHR> m_present_modes;
-        VkQueue m_graphics_queue;
+        std::vector<VkQueue> m_graphics_queue;
         VkQueue m_present_queue;
+        mutable std::vector<std::mutex*> m_graphics_queue_mutexes;
 
         uint32_t m_graphics_family;
         uint32_t m_present_family;
+        unsigned m_graphics_queue_count;
         VkPhysicalDeviceProperties m_properties;
         VkPhysicalDeviceFeatures m_features;
 
@@ -453,7 +460,7 @@ namespace GE
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
         bool checkDeviceExtensions(VkPhysicalDevice device);
-        bool findQueueFamilies(VkPhysicalDevice device, uint32_t* graphics_family, uint32_t* present_family);
+        bool findQueueFamilies(VkPhysicalDevice device, uint32_t* graphics_family, unsigned* graphics_queue_count, uint32_t* present_family);
         bool updateSurfaceInformation(VkPhysicalDevice device,
                                       VkSurfaceCapabilitiesKHR* surface_capabilities,
                                       std::vector<VkSurfaceFormatKHR>* surface_formats,

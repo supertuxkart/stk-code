@@ -1,10 +1,12 @@
 #include "ge_vulkan_driver.hpp"
 
+#include "ge_main.hpp"
+
 #include "ge_vulkan_2d_renderer.hpp"
 #include "ge_vulkan_features.hpp"
-#include "ge_main.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 #include "ge_vulkan_texture.hpp"
+#include "ge_vulkan_command_loader.hpp"
 
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "SDL_vulkan.h"
@@ -454,9 +456,9 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
-    m_graphics_queue = VK_NULL_HANDLE;
     m_present_queue = VK_NULL_HANDLE;
     m_graphics_family = m_present_family = 0;
+    m_graphics_queue_count = 0;
     m_properties = {};
     m_features = {};
 
@@ -528,21 +530,24 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     createSwapChain();
     createSyncObjects();
     createCommandPool();
-    createCommandBuffers();
     createSamplers();
     createRenderPass();
     createFramebuffers();
-    GEVulkanShaderManager::init(this);
-    // For GEVulkanDynamicBuffer
-    GE::setVideoDriver(this);
-    GEVulkan2dRenderer::init(this);
-    createUnicolorTextures();
+
     os::Printer::log("Vulkan version", getVulkanVersionString().c_str());
     os::Printer::log("Vulkan vendor", getVendorInfo().c_str());
     os::Printer::log("Vulkan renderer", m_properties.deviceName);
     os::Printer::log("Vulkan driver version", getDriverVersionString().c_str());
     for (const char* ext : m_device_extensions)
         os::Printer::log("Vulkan enabled extension", ext);
+    GEVulkanCommandLoader::init(this);
+    createCommandBuffers();
+
+    GEVulkanShaderManager::init(this);
+    // For GEVulkanDynamicBuffer
+    GE::setVideoDriver(this);
+    GEVulkan2dRenderer::init(this);
+    createUnicolorTextures();
     GEVulkanFeatures::printStats();
 }   // GEVulkanDriver
 
@@ -568,6 +573,12 @@ void GEVulkanDriver::destroyVulkan()
 
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
+
+    GEVulkanCommandLoader::destroy();
+    for (std::mutex* m : m_graphics_queue_mutexes)
+        delete m;
+    m_graphics_queue_mutexes.clear();
+
     delete m_vk.get();
     m_vk.release();
 }   // destroyVulkan
@@ -667,8 +678,10 @@ void GEVulkanDriver::findPhysicalDevice()
     {
         uint32_t graphics_family = 0;
         uint32_t present_family = 0;
+        unsigned graphics_queue_count = 0;
 
-        bool success = findQueueFamilies(device, &graphics_family, &present_family);
+        bool success = findQueueFamilies(device, &graphics_family,
+            &graphics_queue_count, &present_family);
 
         if (!success)
             continue;
@@ -690,6 +703,7 @@ void GEVulkanDriver::findPhysicalDevice()
 
         vkGetPhysicalDeviceFeatures(device, &m_features);
         m_graphics_family = graphics_family;
+        m_graphics_queue_count = graphics_queue_count;
         m_present_family = present_family;
         m_surface_capabilities = surface_capabilities;
         m_surface_formats = surface_formats;
@@ -755,6 +769,7 @@ bool GEVulkanDriver::updateSurfaceInformation(VkPhysicalDevice device,
 // ----------------------------------------------------------------------------
 bool GEVulkanDriver::findQueueFamilies(VkPhysicalDevice device,
                                        uint32_t* graphics_family,
+                                       unsigned* graphics_queue_count,
                                        uint32_t* present_family)
 {
     uint32_t queue_family_count = 0;
@@ -775,6 +790,7 @@ bool GEVulkanDriver::findQueueFamilies(VkPhysicalDevice device,
             queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             *graphics_family = i;
+            *graphics_queue_count = queue_families[i].queueCount;
             found_graphics_family = true;
             break;
         }
@@ -800,18 +816,20 @@ bool GEVulkanDriver::findQueueFamilies(VkPhysicalDevice device,
 void GEVulkanDriver::createDevice()
 {
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
-    float queue_priority = 1.0f;
+    std::vector<float> queue_priority;
+    queue_priority.resize(m_graphics_queue_count, 1.0f);
 
     VkDeviceQueueCreateInfo queue_create_info = {};
     queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     queue_create_info.queueFamilyIndex = m_graphics_family;
-    queue_create_info.queueCount = 1;
-    queue_create_info.pQueuePriorities = &queue_priority;
+    queue_create_info.queueCount = m_graphics_queue_count;
+    queue_create_info.pQueuePriorities = queue_priority.data();
     queue_create_infos.push_back(queue_create_info);
 
     if (m_present_family != m_graphics_family)
     {
         queue_create_info.queueFamilyIndex = m_present_family;
+        queue_create_info.queueCount = 1;
         queue_create_infos.push_back(queue_create_info);
     }
 
@@ -846,9 +864,42 @@ void GEVulkanDriver::createDevice()
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateDevice failed");
 
-    vkGetDeviceQueue(m_vk->device, m_graphics_family, 0, &m_graphics_queue);
-    vkGetDeviceQueue(m_vk->device, m_present_family, 0, &m_present_queue);
+    m_graphics_queue.resize(m_graphics_queue_count);
+    for (unsigned i = 0; i < m_graphics_queue_count; i++)
+    {
+        vkGetDeviceQueue(m_vk->device, m_graphics_family, i,
+            &m_graphics_queue[i]);
+        m_graphics_queue_mutexes.push_back(new std::mutex());
+    }
+
+    if (m_present_family != m_graphics_family)
+        vkGetDeviceQueue(m_vk->device, m_present_family, 0, &m_present_queue);
 }   // createDevice
+
+// ----------------------------------------------------------------------------
+std::unique_lock<std::mutex> GEVulkanDriver::getGraphicsQueue(VkQueue* queue) const
+{
+    if (m_graphics_queue_count == 0)
+        throw std::runtime_error("No graphics queue created");
+    if (m_graphics_queue_count == 1)
+    {
+        *queue = m_graphics_queue[0];
+        return std::unique_lock<std::mutex>(*m_graphics_queue_mutexes[0]);
+    }
+    while (true)
+    {
+        for (unsigned i = 0; i < m_graphics_queue_count; i++)
+        {
+            std::unique_lock<std::mutex> lock(*m_graphics_queue_mutexes[i],
+                std::defer_lock);
+            if (lock.try_lock())
+            {
+                *queue = m_graphics_queue[i];
+                return lock;
+            }
+        }
+    }
+}   // getGraphicsQueue
 
 // ----------------------------------------------------------------------------
 std::string GEVulkanDriver::getVulkanVersionString() const
@@ -1360,8 +1411,11 @@ void GEVulkanDriver::endSingleTimeCommands(VkCommandBuffer command_buffer)
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = &command_buffer;
 
-    vkQueueSubmit(m_graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
-    vkQueueWaitIdle(m_graphics_queue);
+    VkQueue queue = VK_NULL_HANDLE;
+    std::unique_lock<std::mutex> ul = getGraphicsQueue(&queue);
+    vkQueueSubmit(queue, 1, &submit_info, VK_NULL_HANDLE);
+    vkQueueWaitIdle(queue);
+    ul.unlock();
 
     vkFreeCommandBuffers(m_vk->device, m_vk->command_pool, 1, &command_buffer);
 }   // beginSingleTimeCommands
@@ -1432,8 +1486,11 @@ bool GEVulkanDriver::endScene()
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = signal_semaphores;
 
-    VkResult result = vkQueueSubmit(m_graphics_queue, 1, &submit_info,
+    VkQueue queue = VK_NULL_HANDLE;
+    std::unique_lock<std::mutex> ul = getGraphicsQueue(&queue);
+    VkResult result = vkQueueSubmit(queue, 1, &submit_info,
         m_vk->in_flight_fences[m_current_frame]);
+    ul.unlock();
 
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkQueueSubmit failed");
@@ -1457,8 +1514,15 @@ bool GEVulkanDriver::endScene()
 
     m_current_frame = (m_current_frame + 1) % getMaxFrameInFlight();
 
-    result = vkQueuePresentKHR(m_present_queue, &present_info);
-
+    if (m_present_queue)
+        result = vkQueuePresentKHR(m_present_queue, &present_info);
+    else
+    {
+        VkQueue present_queue = VK_NULL_HANDLE;
+        std::unique_lock<std::mutex> ul = getGraphicsQueue(&present_queue);
+        result = vkQueuePresentKHR(present_queue, &present_info);
+        ul.unlock();
+    }
     if (!video::CNullDriver::endScene())
         return false;
 
