@@ -539,15 +539,24 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     os::Printer::log("Vulkan driver version", getDriverVersionString().c_str());
     for (const char* ext : m_device_extensions)
         os::Printer::log("Vulkan enabled extension", ext);
-    GEVulkanCommandLoader::init(this);
-    createCommandBuffers();
 
-    GEVulkanShaderManager::init(this);
-    // For GEVulkanDynamicBuffer
-    GE::setVideoDriver(this);
-    GEVulkan2dRenderer::init(this);
-    createUnicolorTextures();
-    GEVulkanFeatures::printStats();
+    try
+    {
+        GEVulkanCommandLoader::init(this);
+        createCommandBuffers();
+
+        GEVulkanShaderManager::init(this);
+        // For GEVulkanDynamicBuffer
+        GE::setVideoDriver(this);
+        GEVulkan2dRenderer::init(this);
+        createUnicolorTextures();
+        GEVulkanFeatures::printStats();
+    }
+    catch (std::exception& e)
+    {
+        destroyVulkan();
+        throw std::runtime_error("GEVulkanDriver constructor failed");
+    }
 }   // GEVulkanDriver
 
 // ----------------------------------------------------------------------------
