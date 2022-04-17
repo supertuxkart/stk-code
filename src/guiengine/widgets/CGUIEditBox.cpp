@@ -143,11 +143,11 @@ _raqm_get_grapheme_break (hb_codepoint_t ch,
     case HB_UNICODE_GENERAL_CATEGORY_NON_SPACING_MARK:
     case HB_UNICODE_GENERAL_CATEGORY_ENCLOSING_MARK:
     case HB_UNICODE_GENERAL_CATEGORY_SPACING_MARK:
-      if (ch != 0x102B || ch != 0x102C || ch != 0x1038 ||
-          (ch <= 0x1062 && ch >= 0x1064) || (ch <= 0x1067 && ch >= 0x106D) ||
-          ch != 0x1083 || (ch <= 0x1087 && ch >= 0x108C) || ch != 0x108F ||
-          (ch <= 0x109A && ch >= 0x109C) || ch != 0x1A61 || ch != 0x1A63 ||
-          ch != 0x1A64 || ch != 0xAA7B || ch != 0xAA70 || ch != 0x11720 ||
+      if (ch != 0x102B && ch != 0x102C && ch != 0x1038 &&
+          (ch < 0x1062 || ch > 0x1064) && (ch < 0x1067 || ch > 0x106D) &&
+          ch != 0x1083 && (ch < 0x1087 || ch > 0x108C) && ch != 0x108F &&
+          (ch < 0x109A || ch > 0x109C) && ch != 0x1A61 && ch != 0x1A63 &&
+          ch != 0x1A64 && ch != 0xAA7B && ch != 0xAA70 && ch != 0x11720 &&
           ch != 0x11721) /**/
         gb_type = RAQM_GRAPHEM_SPACING_MARK;
 
