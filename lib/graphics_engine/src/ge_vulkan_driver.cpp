@@ -470,6 +470,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_pre_rotation_matrix = core::matrix4(core::matrix4::EM4CONST_IDENTITY);
 
     m_window = window;
+    m_disable_wait_idle = false;
     g_schedule_pausing_rendering.store(false);
     g_paused_rendering.store(false);
     g_device_created.store(true);
@@ -1937,7 +1938,7 @@ void GEVulkanDriver::unpauseRendering()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::destroySwapChainRelated(bool handle_surface)
 {
-    vkDeviceWaitIdle(m_vk->device);
+    waitIdle();
     for (VkFramebuffer& framebuffer : m_vk->swap_chain_framebuffers)
         vkDestroyFramebuffer(m_vk->device, framebuffer, NULL);
     m_vk->swap_chain_framebuffers.clear();
@@ -1961,7 +1962,7 @@ void GEVulkanDriver::destroySwapChainRelated(bool handle_surface)
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createSwapChainRelated(bool handle_surface)
 {
-    vkDeviceWaitIdle(m_vk->device);
+    waitIdle();
     if (handle_surface)
     {
         if (SDL_Vulkan_CreateSurface(m_window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
@@ -1973,6 +1974,19 @@ void GEVulkanDriver::createSwapChainRelated(bool handle_surface)
     createRenderPass();
     createFramebuffers();
 }   // createSwapChainRelated
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::waitIdle()
+{
+    if (m_disable_wait_idle)
+        return;
+    // Host access to all VkQueue objects created from device must be externally synchronized
+    for (std::mutex* m : m_graphics_queue_mutexes)
+        m->lock();
+    vkDeviceWaitIdle(m_vk->device);
+    for (std::mutex* m : m_graphics_queue_mutexes)
+        m->unlock();
+}   // waitIdle
 
 }
 

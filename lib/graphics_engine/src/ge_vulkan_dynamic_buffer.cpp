@@ -190,7 +190,7 @@ void GEVulkanDynamicBuffer::destroyPerFrame(unsigned frame)
 // ----------------------------------------------------------------------------
 void GEVulkanDynamicBuffer::destroy()
 {
-    vkDeviceWaitIdle(getVKDriver()->getDevice());
+    getVKDriver()->waitIdle();
     for (unsigned i = 0; i < GEVulkanDriver::getMaxFrameInFlight(); i++)
         destroyPerFrame(i);
 }   // destroy

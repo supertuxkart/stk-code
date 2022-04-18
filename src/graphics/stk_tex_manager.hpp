@@ -65,15 +65,7 @@ public:
     // ------------------------------------------------------------------------
     int dumpTextureUsage();
     // ------------------------------------------------------------------------
-    void reloadAllTextures()
-    {
-        for (auto p : m_all_textures)
-        {
-            if (p.second == NULL)
-                continue;
-            p.second->reload();
-        }
-    }
+    void reloadAllTextures();
     // ------------------------------------------------------------------------
     /** Returns the currently defined texture error message, which is used
      *  by event_handler.cpp to print additional info about irrlicht

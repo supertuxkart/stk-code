@@ -329,6 +329,8 @@ namespace GE
         unsigned getGraphicsQueueCount() const
                                               { return m_graphics_queue_count; }
         std::unique_lock<std::mutex> getGraphicsQueue(VkQueue* queue) const;
+        void waitIdle();
+        void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
     private:
         struct SwapChainSupportDetails
         {
@@ -443,6 +445,7 @@ namespace GE
         video::ITexture* m_transparent_texture;
 
         SDL_Window* m_window;
+        bool m_disable_wait_idle;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

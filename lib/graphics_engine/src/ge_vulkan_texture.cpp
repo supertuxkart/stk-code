@@ -82,7 +82,10 @@ GEVulkanTexture::~GEVulkanTexture()
     m_image_view_lock.lock();
     m_image_view_lock.unlock();
 
-    vkDeviceWaitIdle(m_vulkan_device);
+    if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
+        m_image_memory != VK_NULL_HANDLE)
+        getVKDriver()->waitIdle();
+
     clearVulkanData();
 }   // ~GEVulkanTexture
 
@@ -589,7 +592,10 @@ void GEVulkanTexture::reload()
     m_image_view_lock.lock();
     m_image_view_lock.unlock();
 
-    vkDeviceWaitIdle(m_vulkan_device);
+    if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
+        m_image_memory != VK_NULL_HANDLE)
+        getVKDriver()->waitIdle();
+
     if (!m_disable_reload)
     {
         m_size_lock.lock();
