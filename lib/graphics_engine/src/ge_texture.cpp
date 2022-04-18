@@ -4,6 +4,7 @@
 #include "ge_vulkan_texture.hpp"
 #include "ge_texture.hpp"
 
+#include <IFileSystem.h>
 #include <IVideoDriver.h>
 
 namespace GE
@@ -13,7 +14,21 @@ video::IImage* getResizedImage(const std::string& path,
                                const core::dimension2du& max_size,
                                core::dimension2d<u32>* orig_size)
 {
-    video::IImage* image = getDriver()->createImageFromFile(path.c_str());
+    io::IReadFile* file =
+        getDriver()->getFileSystem()->createAndOpenFile(path.c_str());
+    if (file == NULL)
+        return NULL;
+    video::IImage* image = getResizedImage(file, max_size, orig_size);
+    file->drop();
+    return image;
+}   // getResizedImage
+
+// ----------------------------------------------------------------------------
+video::IImage* getResizedImage(irr::io::IReadFile* file,
+                               const core::dimension2du& max_size,
+                               core::dimension2d<u32>* orig_size)
+{
+    video::IImage* image = getDriver()->createImageFromFile(file);
     if (image == NULL)
         return NULL;
     if (orig_size)

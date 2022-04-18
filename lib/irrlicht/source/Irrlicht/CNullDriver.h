@@ -672,6 +672,7 @@ namespace video
 
 		virtual bool checkDriverReset() {return false;}
 		virtual u32 getDefaultFramebuffer() const { return 0; }
+		virtual io::IFileSystem* getFileSystem() const { return FileSystem; }
 	protected:
 
 		//! deletes all textures

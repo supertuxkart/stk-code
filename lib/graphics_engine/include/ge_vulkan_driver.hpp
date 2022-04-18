@@ -291,7 +291,6 @@ namespace GE
                                                           { return m_features; }
         const VkPhysicalDeviceProperties& getPhysicalDeviceProperties() const
                                                         { return m_properties; }
-        io::IFileSystem* getFileSystem() const            { return FileSystem; }
         VkExtent2D getSwapChainExtent() const    { return m_swap_chain_extent; }
         size_t getSwapChainImagesCount() const
                                       { return m_vk->swap_chain_images.size(); }

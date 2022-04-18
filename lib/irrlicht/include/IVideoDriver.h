@@ -25,6 +25,7 @@ namespace irr
 namespace io
 {
 	class IAttributes;
+	class IFileSystem;
 	struct SAttributeReadWriteOptions;
 	class IReadFile;
 	class IWriteFile;
@@ -1483,6 +1484,7 @@ namespace video
 		virtual void disableScissorTest() {}
 		virtual void pauseRendering() {}
 		virtual void unpauseRendering() {}
+		virtual io::IFileSystem* getFileSystem() const = 0;
 	};
 
 } // end namespace video
