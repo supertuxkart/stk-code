@@ -3,6 +3,8 @@
 
 #include "vulkan_wrapper.h"
 
+#include "ge_spin_lock.hpp"
+
 #include <functional>
 #include <string>
 #include <ITexture.h>
@@ -33,6 +35,12 @@ private:
     const bool m_disable_reload;
 
     const bool m_single_channel;
+
+    GESpinLock m_size_lock;
+
+    GESpinLock m_image_view_lock;
+
+    io::path m_full_path;
 
     // ------------------------------------------------------------------------
     bool createTextureImage(uint8_t* texture_data);
@@ -83,9 +91,18 @@ public:
     }
     // ------------------------------------------------------------------------
     virtual const core::dimension2d<u32>& getOriginalSize() const
-                                                        { return m_orig_size; }
+    {
+        m_size_lock.lock();
+        m_size_lock.unlock();
+        return m_orig_size;
+    }
     // ------------------------------------------------------------------------
-    virtual const core::dimension2d<u32>& getSize() const    { return m_size; }
+    virtual const core::dimension2d<u32>& getSize() const
+    {
+        m_size_lock.lock();
+        m_size_lock.unlock();
+        return m_size;
+    }
     // ------------------------------------------------------------------------
     virtual video::E_DRIVER_TYPE getDriverType() const
                                                   { return video::EDT_VULKAN; }
@@ -99,15 +116,21 @@ public:
     // ------------------------------------------------------------------------
     virtual void regenerateMipMapLevels(void* mipmap_data = NULL)            {}
     // ------------------------------------------------------------------------
-    virtual u64 getTextureHandler() const         { return (u64)m_image_view; }
-    // ------------------------------------------------------------------------
-    virtual unsigned int getTextureSize() const      { return m_texture_size; }
-    // ------------------------------------------------------------------------
-    virtual void reload()
+    virtual u64 getTextureHandler() const
     {
-        vkDeviceWaitIdle(m_vulkan_device);
-        reloadInternal();
+        m_image_view_lock.lock();
+        m_image_view_lock.unlock();
+        return (u64)m_image_view;
     }
+    // ------------------------------------------------------------------------
+    virtual unsigned int getTextureSize() const
+    {
+        m_image_view_lock.lock();
+        m_image_view_lock.unlock();
+        return m_texture_size;
+    }
+    // ------------------------------------------------------------------------
+    virtual void reload();
     // ------------------------------------------------------------------------
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
                                u32 w, u32 h, u32 x, u32 y);

@@ -23,7 +23,17 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
 {
     m_max_size = getDriver()->getDriverAttributes()
         .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
-    reloadInternal();
+    m_full_path = getDriver()->getFileSystem()->getAbsolutePath(NamedPath);
+    if (!getDriver()->getFileSystem()->existFileOnly(m_full_path))
+    {
+        LoadingFailed = true;
+        return;
+    }
+
+    m_size_lock.lock();
+    m_image_view_lock.lock();
+    GEVulkanCommandLoader::addMultiThreadingCommand(
+        std::bind(&GEVulkanTexture::reloadInternal, this));
 }   // GEVulkanTexture
 
 // ----------------------------------------------------------------------------
@@ -69,6 +79,9 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
 // ----------------------------------------------------------------------------
 GEVulkanTexture::~GEVulkanTexture()
 {
+    m_image_view_lock.lock();
+    m_image_view_lock.unlock();
+
     vkDeviceWaitIdle(m_vulkan_device);
     clearVulkanData();
 }   // ~GEVulkanTexture
@@ -349,14 +362,21 @@ void GEVulkanTexture::reloadInternal()
         return;
 
     clearVulkanData();
-    video::IImage* texture_image = getResizedImage(NamedPath.getPtr(),
-        m_max_size, &m_orig_size);
-    if (texture_image == NULL)
+
+    io::IReadFile* file = io::createReadFile(m_full_path);
+    if (file == NULL)
     {
-        LoadingFailed = true;
-        return;
+        // We checked for file existence so we should always get a file
+        throw std::runtime_error("File missing in getResizedImage");
     }
+    video::IImage* texture_image = getResizedImage(file, m_max_size,
+        &m_orig_size);
+    if (texture_image == NULL)
+        throw std::runtime_error("Missing texture_image in getResizedImage");
+    file->drop();
+
     m_size = texture_image->getDimension();
+    m_size_lock.unlock();
 
     if (m_image_mani)
         m_image_mani(texture_image);
@@ -364,6 +384,8 @@ void GEVulkanTexture::reloadInternal()
     uint8_t* data = (uint8_t*)texture_image->lock();
     bgraConversion(data);
     upload(data);
+    m_image_view_lock.unlock();
+
     texture_image->unlock();
     texture_image->drop();
 }   // reloadInternal
@@ -404,6 +426,9 @@ void* GEVulkanTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 // ----------------------------------------------------------------------------
 uint8_t* GEVulkanTexture::getTextureData()
 {
+    m_image_view_lock.lock();
+    m_image_view_lock.unlock();
+
     VkBuffer buffer;
     VkDeviceMemory buffer_memory;
     VkDeviceSize image_size =
@@ -462,6 +487,9 @@ cleanup:
 void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
                                     u32 w, u32 h, u32 x, u32 y)
 {
+    m_image_view_lock.lock();
+    m_image_view_lock.unlock();
+
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
     if (m_single_channel)
@@ -554,5 +582,21 @@ void GEVulkanTexture::bgraConversion(uint8_t* img_data)
         img_data[i * 4 + 2] = tmp_val;
     }
 }   // bgraConversion
+
+//-----------------------------------------------------------------------------
+void GEVulkanTexture::reload()
+{
+    m_image_view_lock.lock();
+    m_image_view_lock.unlock();
+
+    vkDeviceWaitIdle(m_vulkan_device);
+    if (!m_disable_reload)
+    {
+        m_size_lock.lock();
+        m_image_view_lock.lock();
+        GEVulkanCommandLoader::addMultiThreadingCommand(
+            std::bind(&GEVulkanTexture::reloadInternal, this));
+    }
+}   // reload
 
 }
