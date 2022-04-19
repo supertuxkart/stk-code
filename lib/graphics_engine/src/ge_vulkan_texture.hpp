@@ -5,8 +5,11 @@
 
 #include "ge_spin_lock.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <functional>
 #include <string>
+#include <vector>
 #include <ITexture.h>
 
 using namespace irr;
@@ -36,6 +39,8 @@ private:
 
     const bool m_single_channel;
 
+    bool m_has_mipmaps;
+
     GESpinLock m_size_lock;
 
     GESpinLock m_image_view_lock;
@@ -43,7 +48,7 @@ private:
     io::path m_full_path;
 
     // ------------------------------------------------------------------------
-    bool createTextureImage(uint8_t* texture_data);
+    bool createTextureImage(uint8_t* texture_data, bool generate_hq_mipmap);
     // ------------------------------------------------------------------------
     bool createImage(VkImageUsageFlags usage);
     // ------------------------------------------------------------------------
@@ -54,9 +59,10 @@ private:
                                VkImageLayout new_layout);
     // ------------------------------------------------------------------------
     void copyBufferToImage(VkCommandBuffer command_buffer, VkBuffer buffer,
-                           u32 w, u32 h, s32 x, s32 y);
+                           u32 w, u32 h, s32 x, s32 y, u32 offset,
+                           u32 mipmap_level);
     // ------------------------------------------------------------------------
-    void upload(uint8_t* data);
+    void upload(uint8_t* data, bool generate_hq_mipmap = false);
     // ------------------------------------------------------------------------
     void clearVulkanData();
     // ------------------------------------------------------------------------
@@ -65,6 +71,37 @@ private:
     void bgraConversion(uint8_t* img_data);
     // ------------------------------------------------------------------------
     uint8_t* getTextureData();
+    // ------------------------------------------------------------------------
+    std::vector<std::pair<core::dimension2du, unsigned> > getMipmapSizes()
+    {
+        std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes;
+        unsigned width = m_size.Width;
+        unsigned height = m_size.Height;
+        mipmap_sizes.emplace_back(core::dimension2du(width, height),
+            0);
+        while (true)
+        {
+            width = width < 2 ? 1 : width >> 1;
+            height = height < 2 ? 1 : height >> 1;
+            mipmap_sizes.emplace_back(core::dimension2du(width, height), 0);
+            if (width == 1 && height == 1)
+            {
+                break;
+            }
+        }
+        return mipmap_sizes;
+    }
+    // ------------------------------------------------------------------------
+    void generateHQMipmap(void* in,
+                          std::vector<std::pair<core::dimension2du,
+                          unsigned> >& mms, uint8_t* out);
+    // ------------------------------------------------------------------------
+    unsigned getMipmapLevels() const
+    {
+        if (!hasMipMaps())
+            return 1;
+        return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
+    }
     // ------------------------------------------------------------------------
 public:
     // ------------------------------------------------------------------------
@@ -112,7 +149,7 @@ public:
     // ------------------------------------------------------------------------
     virtual u32 getPitch() const                                  { return 0; }
     // ------------------------------------------------------------------------
-    virtual bool hasMipMaps() const                           { return false; }
+    virtual bool hasMipMaps() const                   { return m_has_mipmaps; }
     // ------------------------------------------------------------------------
     virtual void regenerateMipMapLevels(void* mipmap_data = NULL)            {}
     // ------------------------------------------------------------------------

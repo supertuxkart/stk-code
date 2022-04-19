@@ -1,14 +1,20 @@
 #include "ge_vulkan_texture.hpp"
 
 #include "ge_vulkan_command_loader.hpp"
+#include "ge_vulkan_features.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_gl_utils.hpp"
 #include "ge_main.hpp"
 #include "ge_texture.hpp"
 
+extern "C"
+{
+    #include <mipmap/img.h>
+    #include <mipmap/imgresize.h>
+}
+
 #include <IAttributes.h>
 #include <limits>
-#include <vector>
 
 namespace GE
 {
@@ -19,7 +25,8 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-                 m_disable_reload(false), m_single_channel(false)
+                 m_disable_reload(false), m_single_channel(false),
+                 m_has_mipmaps(true)
 {
     m_max_size = getDriver()->getDriverAttributes()
         .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
@@ -43,7 +50,8 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-                 m_disable_reload(true), m_single_channel(false)
+                 m_disable_reload(true), m_single_channel(false),
+                 m_has_mipmaps(true)
 {
     if (!img)
     {
@@ -53,7 +61,7 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
     m_size = m_orig_size = img->getDimension();
     uint8_t* data = (uint8_t*)img->lock();
     bgraConversion(data);
-    upload(data);
+    upload(data, true/*generate_hq_mipmap*/);
     img->unlock();
     img->drop();
 }   // GEVulkanTexture
@@ -65,8 +73,14 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
              m_locked_data(NULL), m_vulkan_device(getVKDriver()->getDevice()),
              m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
              m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-             m_disable_reload(true), m_single_channel(single_channel)
+             m_disable_reload(true), m_single_channel(single_channel),
+             m_has_mipmaps(true)
 {
+    if (m_single_channel && !GEVulkanFeatures::supportsR8Blit())
+        m_has_mipmaps = false;
+    else if (!m_single_channel && !GEVulkanFeatures::supportsRGBA8Blit())
+        m_has_mipmaps = false;
+
     m_orig_size.Width = size;
     m_orig_size.Height = size;
     m_size = m_orig_size;
@@ -90,14 +104,32 @@ GEVulkanTexture::~GEVulkanTexture()
 }   // ~GEVulkanTexture
 
 // ----------------------------------------------------------------------------
-bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
+bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
+                                         bool generate_hq_mipmap)
 {
+    video::IImage* mipmap = NULL;
+    std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes =
+        getMipmapSizes();
+    VkDeviceSize mipmap_data_size = 0;
+
     unsigned channels = (m_single_channel ? 1 : 4);
     VkDeviceSize image_size = m_size.Width * m_size.Height * channels;
+    if (generate_hq_mipmap)
+    {
+        mipmap = getDriver()->createImage(video::ECF_A8R8G8B8,
+            mipmap_sizes[0].first);
+        if (mipmap == NULL)
+            throw std::runtime_error("Creating mipmap memory failed");
+        generateHQMipmap(texture_data, mipmap_sizes, (uint8_t*)mipmap->lock());
+        mipmap_data_size = mipmap_sizes.back().second +
+            mipmap_sizes.back().first.getArea() * channels - image_size;
+    }
+
+    VkDeviceSize image_total_size = image_size + mipmap_data_size;
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
 
-    bool success = getVKDriver()->createBuffer(image_size,
+    bool success = getVKDriver()->createBuffer(image_total_size,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
@@ -107,12 +139,17 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
         return false;
 
     VkResult ret = VK_SUCCESS;
-    void* data;
+    uint8_t* data;
     VkCommandBuffer command_buffer = VK_NULL_HANDLE;
     if ((ret = vkMapMemory(m_vulkan_device, staging_buffer_memory, 0,
-        image_size, 0, &data)) != VK_SUCCESS)
+        image_total_size, 0, (void**)&data)) != VK_SUCCESS)
         goto destroy;
-    memcpy(data, texture_data, (size_t)(image_size));
+    memcpy(data, texture_data, image_size);
+    if (mipmap)
+    {
+        memcpy(data + image_size, mipmap->lock(), mipmap_data_size);
+        mipmap->drop();
+    }
     vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
 
     success = createImage(VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
@@ -128,8 +165,20 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data)
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-    copyBufferToImage(command_buffer, staging_buffer, m_size.Width,
-        m_size.Height, 0, 0);
+    if (generate_hq_mipmap)
+    {
+        unsigned level = 0;
+        for (auto& mip : mipmap_sizes)
+        {
+            copyBufferToImage(command_buffer, staging_buffer, mip.first.Width,
+                mip.first.Height, 0, 0, mip.second, level++);
+        }
+    }
+    else
+    {
+        copyBufferToImage(command_buffer, staging_buffer, m_size.Width,
+            m_size.Height, 0, 0, 0, 0);
+    }
 
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -152,7 +201,7 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     image_info.extent.width = m_size.Width;
     image_info.extent.height = m_size.Height;
     image_info.extent.depth = 1;
-    image_info.mipLevels = 1;
+    image_info.mipLevels = getMipmapLevels();
     image_info.arrayLayers = 1;
     image_info.format =
         (m_single_channel ? VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM);
@@ -220,7 +269,7 @@ void GEVulkanTexture::transitionImageLayout(VkCommandBuffer command_buffer,
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.image = m_image;
     barrier.subresourceRange.baseMipLevel = 0;
-    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.levelCount = getMipmapLevels();
     barrier.subresourceRange.baseArrayLayer = 0;
     barrier.subresourceRange.layerCount = 1;
 
@@ -303,14 +352,14 @@ void GEVulkanTexture::transitionImageLayout(VkCommandBuffer command_buffer,
 // ----------------------------------------------------------------------------
 void GEVulkanTexture::copyBufferToImage(VkCommandBuffer command_buffer,
                                         VkBuffer buffer, u32 w, u32 h, s32 x,
-                                        s32 y)
+                                        s32 y, u32 offset, u32 mipmap_level)
 {
     VkBufferImageCopy region = {};
-    region.bufferOffset = 0;
+    region.bufferOffset = offset;
     region.bufferRowLength = 0;
     region.bufferImageHeight = 0;
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.mipLevel = mipmap_level;
     region.imageSubresource.baseArrayLayer = 0;
     region.imageSubresource.layerCount = 1;
     region.imageOffset = {x, y, 0};
@@ -331,7 +380,7 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
         (m_single_channel ? VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM);
     view_info.subresourceRange.aspectMask = aspect_flags;
     view_info.subresourceRange.baseMipLevel = 0;
-    view_info.subresourceRange.levelCount = 1;
+    view_info.subresourceRange.levelCount = getMipmapLevels();
     view_info.subresourceRange.baseArrayLayer = 0;
     view_info.subresourceRange.layerCount = 1;
     if (m_single_channel)
@@ -386,7 +435,7 @@ void GEVulkanTexture::reloadInternal()
 
     uint8_t* data = (uint8_t*)texture_image->lock();
     bgraConversion(data);
-    upload(data);
+    upload(data, true/*generate_hq_mipmap*/);
     m_image_view_lock.unlock();
 
     texture_image->unlock();
@@ -394,9 +443,9 @@ void GEVulkanTexture::reloadInternal()
 }   // reloadInternal
 
 // ----------------------------------------------------------------------------
-void GEVulkanTexture::upload(uint8_t* data)
+void GEVulkanTexture::upload(uint8_t* data, bool generate_hq_mipmap)
 {
-    if (!createTextureImage(data))
+    if (!createTextureImage(data, generate_hq_mipmap))
         return;
     if (!createImageView(VK_IMAGE_ASPECT_COLOR_BIT))
         return;
@@ -566,7 +615,80 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
     transitionImageLayout(command_buffer,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    copyBufferToImage(command_buffer, staging_buffer, w, h, x, y);
+    copyBufferToImage(command_buffer, staging_buffer, w, h, x, y, 0, 0);
+
+    bool blit_mipmap = true;
+    if (m_single_channel && !GEVulkanFeatures::supportsR8Blit())
+        blit_mipmap = false;
+    else if (!m_single_channel && !GEVulkanFeatures::supportsRGBA8Blit())
+        blit_mipmap = false;
+    if (blit_mipmap)
+    {
+        VkImageMemoryBarrier barrier = {};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.image = m_image;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+        barrier.subresourceRange.levelCount = 1;
+
+        int mip_width = m_size.Width;
+        int mip_height = m_size.Height;
+        unsigned mip_levels = getMipmapLevels();
+
+        for (unsigned i = 1; i < mip_levels; i++)
+        {
+            barrier.subresourceRange.baseMipLevel = i - 1;
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+
+            vkCmdPipelineBarrier(command_buffer,
+                VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+                0, 0, NULL, 0, NULL, 1, &barrier);
+
+            VkImageBlit blit{};
+            blit.srcOffsets[0] = {0, 0, 0};
+            blit.srcOffsets[1] = {mip_width, mip_height, 1};
+            blit.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.srcSubresource.mipLevel = i - 1;
+            blit.srcSubresource.baseArrayLayer = 0;
+            blit.srcSubresource.layerCount = 1;
+            blit.dstOffsets[0] = {0, 0, 0};
+            blit.dstOffsets[1] =
+            {
+                mip_width > 1 ? mip_width / 2 : 1,
+                mip_height > 1 ? mip_height / 2 : 1,
+                1
+            };
+            blit.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            blit.dstSubresource.mipLevel = i;
+            blit.dstSubresource.baseArrayLayer = 0;
+            blit.dstSubresource.layerCount = 1;
+
+            vkCmdBlitImage(command_buffer,
+                m_image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL,
+                m_image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blit,
+                VK_FILTER_LINEAR);
+
+            barrier.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL;
+            barrier.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_READ_BIT;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+            vkCmdPipelineBarrier(command_buffer,
+                VK_PIPELINE_STAGE_TRANSFER_BIT,
+                VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, NULL, 0, NULL, 1,
+                &barrier);
+
+            if (mip_width > 1) mip_width /= 2;
+            if (mip_height > 1) mip_height /= 2;
+        }
+    }
+
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
@@ -604,5 +726,42 @@ void GEVulkanTexture::reload()
             std::bind(&GEVulkanTexture::reloadInternal, this));
     }
 }   // reload
+
+// ----------------------------------------------------------------------------
+void GEVulkanTexture::generateHQMipmap(void* in,
+                                       std::vector<std::pair
+                                       <core::dimension2du, unsigned> >& mms,
+                                       uint8_t* out)
+{
+    imMipmapCascade cascade;
+    imReduceOptions options;
+    imReduceSetOptions(&options,
+        std::string(NamedPath.getPtr()).find("_Normal.") != std::string::npos ?
+        IM_REDUCE_FILTER_NORMALMAP: IM_REDUCE_FILTER_LINEAR/*filter*/,
+        2/*hopcount*/, 2.0f/*alpha*/, 1.0f/*amplifynormal*/,
+        0.0f/*normalsustainfactor*/);
+
+    unsigned channels = (m_single_channel ? 1 : 4);
+#ifdef DEBUG
+    int ret = imBuildMipmapCascade(&cascade, in, mms[0].first.Width,
+        mms[0].first.Height, 1/*layercount*/, channels,
+        mms[0].first.Width * channels, &options, 0);
+    if (ret != 1)
+        throw std::runtime_error("imBuildMipmapCascade failed");
+#else
+    imBuildMipmapCascade(&cascade, in, mms[0].first.Width,
+        mms[0].first.Height, 1/*layercount*/, channels,
+        mms[0].first.Width * channels, &options, 0);
+#endif
+    for (unsigned int i = 1; i < mms.size(); i++)
+    {
+        const unsigned copy_size = mms[i].first.getArea() * channels;
+        memcpy(out, cascade.mipmap[i], copy_size);
+        out += copy_size;
+        mms[i].second = mms[i - 1].first.getArea() * channels +
+            mms[i - 1].second;
+    }
+    imFreeMipmapCascade(&cascade);
+}   // generateHQMipmap
 
 }

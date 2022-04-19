@@ -168,6 +168,7 @@ LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c) \
                       $(wildcard ../lib/graphics_engine/src/*.cpp)
 LOCAL_CFLAGS       := -I../lib/graphics_engine/include \
+                      -I../lib/graphics_utils          \
                       -I../lib/sdl2/include/           \
                       -I../lib/irrlicht/include/
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)

@@ -15,6 +15,8 @@ namespace GEVulkanFeatures
 {
 // ============================================================================
 bool g_supports_bind_textures_at_once = false;
+bool g_supports_rgba8_blit = false;
+bool g_supports_r8_blit = false;
 // https://chunkstories.xyz/blog/a-note-on-descriptor-indexing
 bool g_supports_descriptor_indexing = false;
 bool g_supports_non_uniform_indexing = false;
@@ -46,6 +48,15 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         dynamic_indexing = false;
         g_supports_bind_textures_at_once = false;
     }
+
+    VkFormatProperties format_properties = {};
+    vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
+        VK_FORMAT_R8G8B8A8_UNORM, &format_properties);
+    g_supports_rgba8_blit = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
+    format_properties = {};
+    vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
+        VK_FORMAT_R8_UNORM, &format_properties);
+    g_supports_r8_blit = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_FILTER_LINEAR_BIT;
 
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(vk->getPhysicalDevice(), NULL,
@@ -112,6 +123,12 @@ void GEVulkanFeatures::printStats()
         "Vulkan can bind textures at once in shader",
         g_supports_bind_textures_at_once ? "true" : "false");
     os::Printer::log(
+        "Vulkan supports linear blitting for rgba8",
+        g_supports_rgba8_blit ? "true" : "false");
+    os::Printer::log(
+        "Vulkan supports linear blitting for r8",
+        g_supports_r8_blit ? "true" : "false");
+    os::Printer::log(
         "Vulkan supports VK_EXT_descriptor_indexing",
         g_supports_descriptor_indexing ? "true" : "false");
     os::Printer::log(
@@ -127,6 +144,18 @@ bool GEVulkanFeatures::supportsBindTexturesAtOnce()
 {
     return g_supports_bind_textures_at_once;
 }   // supportsBindTexturesAtOnce
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsRGBA8Blit()
+{
+    return g_supports_rgba8_blit;
+}   // supportsRGBA8Blit
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsR8Blit()
+{
+    return g_supports_r8_blit;
+}   // supportsR8Blit
 
 // ----------------------------------------------------------------------------
 bool GEVulkanFeatures::supportsDescriptorIndexing()
