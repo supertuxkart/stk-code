@@ -387,7 +387,7 @@ void GEVulkan2dRenderer::render()
         VkDescriptorImageInfo image_info;
         image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
         image_info.imageView = (VkImageView)tex.first->getTextureHandler();
-        image_info.sampler = g_vk->getSampler(GVS_NEAREST);
+        image_info.sampler = g_vk->getSampler(GVS_2D_RENDER);
         image_infos.push_back(image_info);
         if (image_infos.size() >= GEVulkanShaderManager::getSamplerSize())
             break;

@@ -26,6 +26,7 @@ namespace GE
     {
         GVS_MIN = 0,
         GVS_NEAREST = GVS_MIN,
+        GVS_2D_RENDER,
         GVS_COUNT,
     };
     class GEVulkanDriver : public video::CNullDriver
