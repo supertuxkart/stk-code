@@ -1525,6 +1525,20 @@ void GEVulkanDriver::draw2DVertexPrimitiveList(const void* vertices,
         GEVulkan2dRenderer::addVerticesIndices(v, vertexCount, i,
             primitiveCount, texture);
     }
+    else if (pType == irr::scene::EPT_TRIANGLE_FAN)
+    {
+        std::vector<uint16_t> new_idx;
+        uint16_t* idx = (uint16_t*)indexList;
+        for (unsigned i = 0; i < primitiveCount; i++)
+        {
+            new_idx.push_back(idx[0]);
+            new_idx.push_back(idx[i + 1]);
+            new_idx.push_back(idx[i + 2]);
+        }
+        S3DVertex* v = (S3DVertex*)vertices;
+        GEVulkan2dRenderer::addVerticesIndices(v, vertexCount, new_idx.data(),
+            primitiveCount, texture);
+    }
 }   // draw2DVertexPrimitiveList
 
 // ----------------------------------------------------------------------------
