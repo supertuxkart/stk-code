@@ -177,13 +177,11 @@ build_stk()
         cmake .. -DCMAKE_FIND_ROOT_PATH="$INSTALL_DIR" \
                  -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
                  -DBUILD_SHARED_LIBS=1 \
-                 -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=1 \
-                 -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=1 \
-                 -DFT_WITH_HARFBUZZ=0 \
-                 -DFT_WITH_BZIP2=0 \
-                 -DFT_WITH_BROTLI=0 \
-                 -DFT_WITH_ZLIB=1 \
-                 -DFT_WITH_PNG=1 &&
+                 -DFT_DISABLE_HARFBUZZ=1 \
+                 -DFT_DISABLE_BZIP2=1 \
+                 -DFT_DISABLE_BROTLI=1 \
+                 -DFT_REQUIRE_ZLIB=1 \
+                 -DFT_REQUIRE_PNG=1 &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
@@ -199,6 +197,7 @@ build_stk()
         cd "$DEPENDENCIES_DIR/harfbuzz"
         ./autogen.sh
         ./configure --prefix="$INSTALL_DIR" \
+                    --with-freetype=yes \
                     --with-glib=no \
                     --with-gobject=no \
                     --with-cairo=no \
@@ -224,11 +223,11 @@ build_stk()
                  -DBUILD_SHARED_LIBS=1 \
                  -DCMAKE_DISABLE_FIND_PACKAGE_BZip2=1 \
                  -DCMAKE_DISABLE_FIND_PACKAGE_BrotliDec=1 \
-                 -DFT_WITH_HARFBUZZ=1 \
-                 -DFT_WITH_BZIP2=0 \
-                 -DFT_WITH_BROTLI=0 \
-                 -DFT_WITH_ZLIB=1 \
-                 -DFT_WITH_PNG=1 &&
+                 -DFT_REQUIRE_HARFBUZZ=1 \
+                 -DFT_DISABLE_BZIP2=1 \
+                 -DFT_DISABLE_BROTLI=1 \
+                 -DFT_REQUIRE_ZLIB=1 \
+                 -DFT_REQUIRE_PNG=1 &&
         make -j$THREADS_NUMBER &&
         make install
         check_error
