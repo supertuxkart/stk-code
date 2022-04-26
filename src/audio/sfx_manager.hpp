@@ -300,7 +300,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current position of the listener. */
-    Vec3 getListenerPos() const { return m_listener_position.getData(); }
+    Vec3 getListenerPos() const { return m_listener_position.getAtomic(); }
 
     // ------------------------------------------------------------------------
 
