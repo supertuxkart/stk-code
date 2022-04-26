@@ -124,11 +124,9 @@ void ThreeStrikesBattle::reset(bool restart)
 
         scene::ISceneNode* kart_node = m_karts[n]->getNode();
 
-        core::list<scene::ISceneNode*>& children = kart_node->getChildren();
-        for (core::list<scene::ISceneNode*>::Iterator it = children.begin();
-            it != children.end(); it++)
+        for (unsigned i = 0; i < kart_node->getChildren().size(); i++)
         {
-            scene::ISceneNode* curr = *it;
+            scene::ISceneNode* curr = kart_node->getChildren()[i];
 
             if (core::stringc(curr->getName()) == "tire1")
             {
@@ -302,11 +300,9 @@ bool ThreeStrikesBattle::kartHit(int kart_id, int hitter)
     }
 
     scene::ISceneNode* kart_node = m_karts[kart_id]->getNode();
-    core::list<scene::ISceneNode*>& children = kart_node->getChildren();
-    for (core::list<scene::ISceneNode*>::Iterator it = children.begin();
-                                                  it != children.end(); it++)
+    for (unsigned i = 0; i < kart_node->getChildren().size(); i++)
     {
-        scene::ISceneNode* curr = *it;
+        scene::ISceneNode* curr = kart_node->getChildren()[i];
 
         if (core::stringc(curr->getName()) == "tire1")
         {
@@ -590,11 +586,9 @@ void ThreeStrikesBattle::addKartLife(unsigned int id)
     updateKartRanks();
 
     scene::ISceneNode* kart_node = m_karts[id]->getNode();
-    core::list<scene::ISceneNode*>& children = kart_node->getChildren();
-    for (core::list<scene::ISceneNode*>::Iterator it = children.begin();
-                                                  it != children.end(); it++)
+    for (unsigned i = 0; i < kart_node->getChildren().size(); i++)
     {
-        scene::ISceneNode* curr = *it;
+        scene::ISceneNode* curr = kart_node->getChildren()[i];
         if (core::stringc(curr->getName()) == "tire1")
         {
             curr->setVisible(m_kart_info[id].m_lives >= 3);

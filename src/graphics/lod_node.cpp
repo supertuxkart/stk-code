@@ -129,15 +129,14 @@ void LODNode::OnAnimate(u32 timeMs)
         Box = m_nodes[m_detail.size()-1]->getBoundingBox();
 
         // If this node has children other than the LOD nodes, animate it
-        core::list<ISceneNode*>::Iterator it;
-        for (it = Children.begin(); it != Children.end(); it++)
+        for (unsigned i = 0; i < Children.size(); ++i)
         {
-            if (m_nodes_set.find(*it) == m_nodes_set.end())
+            if (m_nodes_set.find(Children[i]) == m_nodes_set.end())
             {
-                assert(*it != NULL);
-                if ((*it)->isVisible())
+                assert(Children[i] != NULL);
+                if (Children[i]->isVisible())
                 {
-                    (*it)->OnAnimate(timeMs);
+                    Children[i]->OnAnimate(timeMs);
                 }
             }
         }
@@ -178,11 +177,8 @@ void LODNode::OnRegisterSceneNode()
 #ifndef SERVER_ONLY
     if (!CVS->isGLSL())
     {
-        for (core::list<ISceneNode*>::Iterator it = Children.begin();
-            it != Children.end(); it++)
-        {
-            (*it)->updateAbsolutePosition();
-        }
+        for (unsigned i = 0; i < Children.size(); ++i)
+            Children[i]->updateAbsolutePosition();
     }
 #endif
     scene::ISceneNode::OnRegisterSceneNode();

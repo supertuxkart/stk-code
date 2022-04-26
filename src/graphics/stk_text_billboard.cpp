@@ -453,14 +453,13 @@ void STKTextBillboard::reload()
 }   // reload
 
 // ----------------------------------------------------------------------------
-static void updateTextBillboard(core::list<scene::ISceneNode*>& List)
+static void updateTextBillboard(core::array<scene::ISceneNode*>& List)
 {
-    core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
-    for (; I != E; ++I)
+    for (unsigned i = 0; i < List.size(); i++)
     {
-        if (STKTextBillboard* tb = dynamic_cast<STKTextBillboard*>(*I))
+        if (STKTextBillboard* tb = dynamic_cast<STKTextBillboard*>(List[i]))
             tb->reload();
-        updateTextBillboard((*I)->getChildren());
+        updateTextBillboard(List[i]->getChildren());
     }
 }   // updateTextBillboard
 

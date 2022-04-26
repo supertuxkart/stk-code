@@ -33,7 +33,7 @@ private:
     GLsync                                m_sync;
     std::vector<float>                    m_bounding_boxes;
 
-    void parseSceneManager(core::list<scene::ISceneNode*> &List,
+    void parseSceneManager(core::array<scene::ISceneNode*> &List,
                            const scene::ICameraSceneNode *cam);
 
     bool isCulledPrecise(const scene::ICameraSceneNode *cam,

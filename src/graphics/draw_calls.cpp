@@ -136,49 +136,48 @@ void DrawCalls::renderBoundingBoxes()
 }   // renderBoundingBoxes
 
 // ----------------------------------------------------------------------------
-void DrawCalls::parseSceneManager(core::list<scene::ISceneNode*> &List,
+void DrawCalls::parseSceneManager(core::array<scene::ISceneNode*> &List,
                                   const scene::ICameraSceneNode *cam)
 {
-    core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
-    for (; I != E; ++I)
+    for (unsigned i = 0; i < List.size(); ++i)
     {
-        if (LODNode *node = dynamic_cast<LODNode *>(*I))
+        if (LODNode *node = dynamic_cast<LODNode *>(List[i]))
         {
             node->updateVisibility();
         }
-        (*I)->updateAbsolutePosition();
-        if (!(*I)->isVisible())
+        List[i]->updateAbsolutePosition();
+        if (!List[i]->isVisible())
             continue;
 
-        if (STKParticle *node = dynamic_cast<STKParticle*>(*I))
+        if (STKParticle *node = dynamic_cast<STKParticle*>(List[i]))
         {
-            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()))
+            if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 CPUParticleManager::getInstance()->addParticleNode(node);
             continue;
         }
 
         if (scene::IBillboardSceneNode *node =
-            dynamic_cast<scene::IBillboardSceneNode*>(*I))
+            dynamic_cast<scene::IBillboardSceneNode*>(List[i]))
         {
-            if (!isCulledPrecise(cam, *I))
+            if (!isCulledPrecise(cam, List[i]))
                 CPUParticleManager::getInstance()->addBillboardNode(node);
             continue;
         }
 
         if (STKTextBillboard *tb =
-            dynamic_cast<STKTextBillboard*>(*I))
+            dynamic_cast<STKTextBillboard*>(List[i]))
         {
-            if (!isCulledPrecise(cam, *I, irr_driver->getBoundingBoxesViz()))
+            if (!isCulledPrecise(cam, List[i], irr_driver->getBoundingBoxesViz()))
                 TextBillboardDrawer::addTextBillboard(tb);
             continue;
         }
 
-        SP::SPMeshNode* node = dynamic_cast<SP::SPMeshNode*>(*I);
+        SP::SPMeshNode* node = dynamic_cast<SP::SPMeshNode*>(List[i]);
         if (node)
         {
             SP::addObject(node);
         }
-        parseSceneManager((*I)->getChildren(), cam);
+        parseSceneManager(List[i]->getChildren(), cam);
     }
 }
 

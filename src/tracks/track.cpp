@@ -1747,11 +1747,8 @@ static void recursiveUpdatePosition(scene::ISceneNode *node)
 {
     node->updateAbsolutePosition();
 
-    scene::ISceneNodeList::ConstIterator it = node->getChildren().begin();
-    for (; it != node->getChildren().end(); ++it)
-    {
-        recursiveUpdatePosition(*it);
-    }
+    for (unsigned i = 0; i < node->getChildren().size(); i++)
+        recursiveUpdatePosition(node->getChildren()[i]);
 }   // recursiveUpdatePosition
 
 // ----------------------------------------------------------------------------

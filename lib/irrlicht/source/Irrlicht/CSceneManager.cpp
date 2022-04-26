@@ -1668,11 +1668,9 @@ ISceneNode* CSceneManager::getSceneNodeFromName(const char* name, ISceneNode* st
 
 	ISceneNode* node = 0;
 
-	const ISceneNodeList& list = start->getChildren();
-	ISceneNodeList::ConstIterator it = list.begin();
-	for (; it!=list.end(); ++it)
+	for (unsigned i = 0; i < start->getChildren().size(); ++i)
 	{
-		node = getSceneNodeFromName(name, *it);
+		node = getSceneNodeFromName(name, start->getChildren()[i]);
 		if (node)
 			return node;
 	}
@@ -1692,11 +1690,9 @@ ISceneNode* CSceneManager::getSceneNodeFromId(s32 id, ISceneNode* start)
 
 	ISceneNode* node = 0;
 
-	const ISceneNodeList& list = start->getChildren();
-	ISceneNodeList::ConstIterator it = list.begin();
-	for (; it!=list.end(); ++it)
+	for (unsigned i = 0; i < start->getChildren().size(); ++i)
 	{
-		node = getSceneNodeFromId(id, *it);
+		node = getSceneNodeFromId(id, start->getChildren()[i]);
 		if (node)
 			return node;
 	}
@@ -1716,11 +1712,9 @@ ISceneNode* CSceneManager::getSceneNodeFromType(scene::ESCENE_NODE_TYPE type, IS
 
 	ISceneNode* node = 0;
 
-	const ISceneNodeList& list = start->getChildren();
-	ISceneNodeList::ConstIterator it = list.begin();
-	for (; it!=list.end(); ++it)
+	for (unsigned i = 0; i < start->getChildren().size(); ++i)
 	{
-		node = getSceneNodeFromType(type, *it);
+		node = getSceneNodeFromType(type, start->getChildren()[i]);
 		if (node)
 			return node;
 	}
@@ -1738,12 +1732,9 @@ void CSceneManager::getSceneNodesFromType(ESCENE_NODE_TYPE type, core::array<sce
 	if (start->getType() == type || ESNT_ANY == type)
 		outNodes.push_back(start);
 
-	const ISceneNodeList& list = start->getChildren();
-	ISceneNodeList::ConstIterator it = list.begin();
-
-	for (; it!=list.end(); ++it)
+	for (unsigned i = 0; i < start->getChildren().size(); ++i)
 	{
-		getSceneNodesFromType(type, outNodes, *it);
+		getSceneNodesFromType(type, outNodes, start->getChildren()[i]);
 	}
 }
 
@@ -2101,9 +2092,8 @@ void CSceneManager::writeSceneNode(io::IXMLWriter* writer, ISceneNode* node, ISc
 	}
 	else
 	{
-		ISceneNodeList::ConstIterator it = node->getChildren().begin();
-		for (; it != node->getChildren().end(); ++it)
-			writeSceneNode(writer, (*it), userDataSerializer, currentPath);
+		for (unsigned i = 0; i < node->getChildren().size(); ++i)
+			writeSceneNode(writer, node->getChildren()[i], userDataSerializer, currentPath);
 	}
 
 	attr->drop();
