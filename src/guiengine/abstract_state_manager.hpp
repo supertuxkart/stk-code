@@ -19,6 +19,7 @@
 #ifndef HEADER_ABSTRACT_STATE_MANAGER_HPP
 #define HEADER_ABSTRACT_STATE_MANAGER_HPP
 
+#include <atomic>
 #include <vector>
 #include <string>
 #include "guiengine/engine.hpp"
@@ -36,7 +37,7 @@ namespace GUIEngine
     /**
       * \ingroup guiengine
       */
-    enum GameState
+    enum GameState : unsigned int
     {
         MENU,
         GAME,
@@ -55,7 +56,7 @@ namespace GUIEngine
         /**
          * Whether we are in game mode
          */
-        GameState m_game_mode;
+        std::atomic<GameState> m_game_mode;
 
         /**
          *  This stack will contain menu names (e.g. main.stkgui),
@@ -137,7 +138,7 @@ namespace GUIEngine
         template<typename T>
         void hardResetAndGoToScreen()
         {
-            if (m_game_mode != GAME) GUIEngine::getCurrentScreen()->tearDown();
+            if (m_game_mode.load() != GAME) GUIEngine::getCurrentScreen()->tearDown();
 
             GUIEngine::clearScreenCache();
 

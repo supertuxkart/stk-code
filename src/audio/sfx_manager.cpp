@@ -22,8 +22,8 @@
 #include "audio/sfx_buffer.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "modes/world.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/profiler.hpp"
 #include "utils/string_utils.hpp"
@@ -290,7 +290,7 @@ void SFXManager::queueCommand(SFXCommand *command)
         return;
         
     m_sfx_commands.lock();
-    if(World::getWorld() && 
+    if (StateManager::get()->getGameState() != GUIEngine::MENU &&
         m_sfx_commands.getData().size() > 20*RaceManager::get()->getNumberOfKarts()+20 &&
         RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
