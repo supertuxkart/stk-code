@@ -392,6 +392,7 @@ void SFXManager::mainLoop(void *obj)
             break;
 #endif
         }
+        bool empty_queue = me->m_sfx_commands.getData().empty();
         ul.unlock();
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("Execute", 0, 255, 0);
@@ -462,9 +463,7 @@ void SFXManager::mainLoop(void *obj)
         current = NULL;
         PROFILER_POP_CPU_MARKER();
         PROFILER_PUSH_CPU_MARKER("yield", 0, 0, 255);
-        // We access the size without lock, doesn't matter if we
-        // should get an incorrect value because of concurrent read/writes
-        if (me->m_sfx_commands.getData().size() == 0 && me->sfxAllowed())
+        if (empty_queue && me->sfxAllowed())
         {
             // Wait some time to let other threads run, then queue an
             // update event to keep music playing.
