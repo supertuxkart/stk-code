@@ -118,6 +118,7 @@ private:
     std::string              m_screenshot;
     bool                     m_is_day;
     std::vector<MusicInformation*> m_music;
+    unsigned                       m_music_idx;
 
     /** Will only be used on overworld */
     std::vector<OverworldChallenge> m_challenges;
@@ -732,6 +733,13 @@ public:
     // ------------------------------------------------------------------------
     bool isOnGround(const Vec3& xyz, const Vec3& down, Vec3* hit_point,
                     Vec3* normal, bool print_warning = true);
+    // ------------------------------------------------------------------------
+    MusicInformation* getTrackMusic() const
+    {
+        if (m_music_idx < m_music.size())
+            return m_music[m_music_idx];
+        return NULL;
+    }
 };   // class Track
 
 #endif

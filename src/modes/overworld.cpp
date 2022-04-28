@@ -124,10 +124,11 @@ void OverWorld::update(int ticks)
         setPhase(RACE_PHASE);
         // Normally done in WorldStatus::update(), during phase SET_PHASE,
         // so we have to start music 'manually', since we skip all phases.
+        MusicInformation* mi = Track::getCurrentTrack()->getTrackMusic();
         Track::getCurrentTrack()->startMusic();
 
         if (UserConfigParams::m_music)
-            music_manager->startMusic();
+            music_manager->startMusic(mi);
         m_karts[0]->startEngineSFX();
     }
     World::update(ticks);

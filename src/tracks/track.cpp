@@ -176,6 +176,7 @@ Track::Track(const std::string &filename)
     m_minimap_y_scale       = 1.0f;
     m_force_disable_fog     = false;
     m_startup_run           = false;
+    m_music_idx             = 0;
     m_red_flag = m_blue_flag =
         btTransform(btQuaternion(0.0f, 0.0f, 0.0f, 1.0f));
     m_default_number_of_laps = 3;
@@ -709,6 +710,8 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
             "Music information for track '%s' replaced by default music.\n",
             m_name.c_str());
     }
+    if (!m_music.empty())
+        m_music_idx = rand() % m_music.size();
 
 }   // getMusicInformation
 
@@ -719,7 +722,7 @@ void Track::startMusic() const
 {
     // In case that the music wasn't found (a warning was already printed)
     if(m_music.size()>0)
-        music_manager->startMusic(m_music[rand()% m_music.size()], false);
+        music_manager->startMusic(m_music[m_music_idx], false);
     else
         music_manager->clearCurrentMusic();
 }   // startMusic
