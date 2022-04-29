@@ -291,6 +291,7 @@ void SFXManager::queueCommand(SFXCommand *command)
         
     m_sfx_commands.lock();
     if (StateManager::get()->getGameState() != GUIEngine::MENU &&
+        RaceManager::get() &&
         m_sfx_commands.getData().size() > 20*RaceManager::get()->getNumberOfKarts()+20 &&
         RaceManager::get()->getMinorMode() != RaceManager::MINOR_MODE_CUTSCENE)
     {
