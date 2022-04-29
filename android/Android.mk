@@ -153,7 +153,8 @@ LOCAL_MODULE       := graphics_utils
 LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti
 LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_utils/mipmap/*.c)
-LOCAL_CFLAGS       := -I../lib/graphics_utils/mipmap
+LOCAL_CFLAGS       := -I../lib/graphics_utils/mipmap \
+                      -I../lib/simd_wrapper
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 LOCAL_ARM_NEON     := false
 endif

@@ -776,7 +776,7 @@ static void imStaticKernel4Linear( unsigned char *dst, int pointx, int pointy, i
   }
 
 #if CPU_SSE2_SUPPORT
-  _mm_store_ss( (void *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
 #else
   dst[0] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, sum0 + 0.5f ) ) );
   dst[1] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, sum1 + 0.5f ) ) );
@@ -825,7 +825,7 @@ static void imStaticKernel4Linear_Core( unsigned char *dst, int pointx, int poin
       mapy = 0;
   }
 
-  _mm_store_ss( (void *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
 
   return;
 }
@@ -1091,7 +1091,7 @@ static void imStaticKernel2sRGB( unsigned char *dst, int pointx, int pointy, imS
     uint32_t i;
   } u;
   vsum = linear2srgb3( vsum );
-  _mm_store_ss( (void *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
   dst[0] = u.c[0];
   dst[1] = u.c[1];
 #else
@@ -1157,7 +1157,7 @@ static void imStaticKernel3sRGB( unsigned char *dst, int pointx, int pointy, imS
     uint32_t i;
   } u;
   vsum = linear2srgb3( vsum );
-  _mm_store_ss( (void *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
   dst[0] = u.c[0];
   dst[1] = u.c[1];
   dst[2] = u.c[2];
@@ -1222,7 +1222,7 @@ static void imStaticKernel4sRGB( unsigned char *dst, int pointx, int pointy, imS
 
 #if CPU_SSE2_SUPPORT
   vsum = linear2srgb3( vsum );
-  _mm_store_ss( (void *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
 #else
   dst[0] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, linear2srgb( sum0 ) + 0.5f ) ) );
   dst[1] = (unsigned char)( fmaxf( 0.0f, fminf( 255.0f, linear2srgb( sum1 ) + 0.5f ) ) );
@@ -1291,7 +1291,7 @@ static void imStaticKernel3sRGB_Core( unsigned char *dst, int pointx, int pointy
  #endif
 
   vsum0 = linear2srgb3( vsum0 );
-  _mm_store_ss( (void *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum0 ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum0 ), vzero ), vzero ) ) );
   dst[0] = u.c[0];
   dst[1] = u.c[1];
   dst[2] = u.c[2];
@@ -1332,7 +1332,7 @@ static void imStaticKernel4sRGB_Core( unsigned char *dst, int pointx, int pointy
   }
 
   vsum = linear2srgb3( vsum );
-  _mm_store_ss( (void *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
 
   return;
 }
@@ -2729,7 +2729,7 @@ static void imDynamicKernel2sRGB( unsigned char *dst, imGenericMatrixState *stat
     uint32_t i;
   } u;
   vsum = linear2srgb3( _mm_div_ps( vsum, _mm_set1_ps( matrixsum ) ) );
-  _mm_store_ss( (void *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
   dst[0] = u.c[0];
   dst[1] = u.c[1];
 #else
@@ -2800,7 +2800,7 @@ static void imDynamicKernel3sRGB( unsigned char *dst, imGenericMatrixState *stat
     uint32_t i;
   } u;
   vsum = linear2srgb3( _mm_div_ps( vsum, _mm_set1_ps( matrixsum ) ) );
-  _mm_store_ss( (void *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)&u.i, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
   dst[0] = u.c[0];
   dst[1] = u.c[1];
   dst[2] = u.c[2];
@@ -2871,7 +2871,7 @@ static void imDynamicKernel4sRGB( unsigned char *dst, imGenericMatrixState *stat
 
 #if CPU_SSE2_SUPPORT
   vsum = linear2srgb3( _mm_div_ps( vsum, _mm_set1_ps( matrixsum ) ) );
-  _mm_store_ss( (void *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
+  _mm_store_ss( (float *)dst, _mm_castsi128_ps( _mm_packus_epi16( _mm_packs_epi32( _mm_cvtps_epi32( vsum ), vzero ), vzero ) ) );
 #else
   matrixsum = 1.0f / matrixsum;
   sum0 *= matrixsum;

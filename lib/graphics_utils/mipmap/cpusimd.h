@@ -32,36 +32,8 @@
 
 
 ////
+#include <simd_wrapper.h>
 
-
-#if __MMX__ || CPU_ENABLE_MMX
- #include <mmintrin.h>
- #define CPU_MMX_SUPPORT (1)
-#endif
-#if __SSE__ || defined(_M_X64) || ( defined(_M_IX86_FP) && ( _M_IX86_FP >= 1 ) ) || CPU_ENABLE_SSE
- #include <xmmintrin.h>
- #define CPU_SSE_SUPPORT (1)
-#endif
-#if __SSE2__ || defined(_M_X64) || ( defined(_M_IX86_FP) && ( _M_IX86_FP >= 2 ) ) || CPU_ENABLE_SSE2
- #include <emmintrin.h>
- #define CPU_SSE2_SUPPORT (1)
-#endif
-#if __SSE3__ || __AVX__ || CPU_ENABLE_SSE3
- #include <pmmintrin.h>
- #define CPU_SSE3_SUPPORT (1)
-#endif
-#if __SSSE3__ || __AVX__  || CPU_ENABLE_SSSE3
- #include <tmmintrin.h>
- #define CPU_SSSE3_SUPPORT (1)
-#endif
-#if __SSE4_1__ || __AVX__  || CPU_ENABLE_SSE4_1
- #include <smmintrin.h>
- #define CPU_SSE4_1_SUPPORT (1)
-#endif
-#if __SSE4_2__ || CPU_ENABLE_SSE4_2
- #include <nmmintrin.h>
- #define CPU_SSE4_2_SUPPORT (1)
-#endif
 #if __SSE4A__ || CPU_ENABLE_SSE4A
  #include <ammintrin.h>
  #define CPU_SSE4A_SUPPORT (1)
@@ -355,7 +327,7 @@ static inline CC_ALWAYSINLINE __m128 simd4f_pow5d12_inline_ps( __m128 vx )
 static inline void simdPrintDebugSSE4f( char *str, __m128 v )
 {
   float CPU_ALIGN16 store[4];
-  _mm_store_ps( (void *)store, v );
+  _mm_store_ps( (float *)store, v );
   printf( "%s %f %f %f %f\n", str, (double)store[0], (double)store[1], (double)store[2], (double)store[3] );
   return;
 }
@@ -363,7 +335,7 @@ static inline void simdPrintDebugSSE4f( char *str, __m128 v )
 static inline void simdPrintDebugSSE2d( char *str, __m128d v )
 {
   double CPU_ALIGN16 store[2];
-  _mm_store_pd( (void *)store, v );
+  _mm_store_pd( (double *)store, v );
   printf( "%s %f %f\n", str, store[0], store[1] );
   return;
 }
