@@ -432,11 +432,8 @@ void CameraNormal::positionCamera(float dt, float above_kart, float cam_angle,
 
     if (cam_roll_angle != 0.0f)
     {
-#ifdef IOS_STK
-        cam_roll_angle *= -1.0f;
-#endif
         btQuaternion q(m_kart->getSmoothedTrans().getBasis().getColumn(2),
-            cam_roll_angle);
+            -cam_roll_angle);
         q *= m_kart->getSmoothedTrans().getRotation();
         btMatrix3x3 m(q);
         m_camera->setUpVector(((Vec3)m.getColumn(1)).toIrrVector());
