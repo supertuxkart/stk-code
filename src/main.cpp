@@ -2689,6 +2689,21 @@ static void cleanSuperTuxKart()
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();
+
+    if (SFXManager::get() &&
+        !SFXManager::get()->waitForReadyToDeleted(2.0f))
+    {
+        Log::info("Thread", "SFXManager not stopping, exiting anyway.");
+    }
+    SFXManager::destroy();
+
+    // Music manager can not be deleted before the SFX thread is stopped
+    // (since SFX commands can contain music information, which are
+    // deleted by the music manager).
+    delete music_manager;
+
+    // Race manager needs to be deleted after sfx manager as it checks for
+    // the kart size structure from race manager
     RaceManager::destroy();
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
@@ -2745,18 +2760,6 @@ static void cleanSuperTuxKart()
             Log::warn("Thread", "Request Manager not aborting in time, proceeding without cleanup.");
         }
     }
-
-    if (SFXManager::get() &&
-        !SFXManager::get()->waitForReadyToDeleted(2.0f))
-    {
-        Log::info("Thread", "SFXManager not stopping, exiting anyway.");
-    }
-    SFXManager::destroy();
-
-    // Music manager can not be deleted before the SFX thread is stopped
-    // (since SFX commands can contain music information, which are
-    // deleted by the music manager).
-    delete music_manager;
 
     // The add-ons manager might still be called from a currenty running request
     // in the request manager, so it can not be deleted earlier.
