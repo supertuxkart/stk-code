@@ -305,7 +305,14 @@ void SoccerWorld::init()
     if (!m_ball)
         Log::fatal("SoccerWorld","Ball is missing in soccer field, abort.");
 
-    m_bgd->init(m_ball->getPhysicalObject()->getRadius());
+    float radius = m_ball->getPhysicalObject()->getRadius();
+    if (radius <= 0.0f)
+    {
+        btVector3 min, max;
+        m_ball->getPhysicalObject()->getBody()->getAabb(min, max);
+        radius = (max.y() - min.y()) / 2.0f;
+    }
+    m_bgd->init(radius);
 
 }   // init
 
