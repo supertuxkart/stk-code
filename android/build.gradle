@@ -98,6 +98,17 @@ android
                     cppFlags '-O0'
                 }
             }
+            ndk
+            {
+                if (project.getProperty('compile_arch') == 'all')
+                {
+                    abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                }
+                else
+                {
+                    abiFilters project.getProperty('compile_arch')
+                }
+            }
         }
 
         release
@@ -111,6 +122,17 @@ android
                 }
             }
             signingConfig signingConfigs.release
+            ndk
+            {
+                if (project.getProperty('compile_arch') == 'all')
+                {
+                    abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
+                }
+                else
+                {
+                    abiFilters project.getProperty('compile_arch')
+                }
+            }
         }
     }
 
@@ -119,7 +141,6 @@ android
         main
         {
             manifest.srcFile 'AndroidManifest.xml'
-            jniLibs.srcDirs = ['libs']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
         }
