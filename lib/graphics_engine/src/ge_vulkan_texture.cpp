@@ -59,9 +59,11 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
         return;
     }
     m_size = m_orig_size = img->getDimension();
+    if (m_size.Width < 4 || m_size.Height < 4)
+        m_has_mipmaps = false;
     uint8_t* data = (uint8_t*)img->lock();
     bgraConversion(data);
-    upload(data, true/*generate_hq_mipmap*/);
+    upload(data, m_has_mipmaps/*generate_hq_mipmap*/);
     img->unlock();
     img->drop();
 }   // GEVulkanTexture
@@ -428,6 +430,8 @@ void GEVulkanTexture::reloadInternal()
     file->drop();
 
     m_size = texture_image->getDimension();
+    if (m_size.Width < 4 || m_size.Height < 4)
+        m_has_mipmaps = false;
     m_size_lock.unlock();
 
     if (m_image_mani)
@@ -435,7 +439,7 @@ void GEVulkanTexture::reloadInternal()
 
     uint8_t* data = (uint8_t*)texture_image->lock();
     bgraConversion(data);
-    upload(data, true/*generate_hq_mipmap*/);
+    upload(data, m_has_mipmaps/*generate_hq_mipmap*/);
     m_image_view_lock.unlock();
 
     texture_image->unlock();
