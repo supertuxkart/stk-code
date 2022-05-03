@@ -505,6 +505,9 @@ void IrrDriver::initDevice()
         m_device->run();
         m_device->drop();
         m_device  = NULL;
+#if !defined(SERVER_ONLY)
+        GE::setVideoDriver(NULL);
+#endif
 
         params.ForceLegacyDevice = (UserConfigParams::m_force_legacy_device ||
             UserConfigParams::m_gamepad_visualisation);
