@@ -1422,6 +1422,18 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
         return false;
 
     m_clear_color = color;
+    return true;
+}   // beginScene
+
+// ----------------------------------------------------------------------------
+bool GEVulkanDriver::endScene()
+{
+    if (g_paused_rendering.load())
+    {
+        GEVulkan2dRenderer::clear();
+        return false;
+    }
+
     VkFence fence = m_vk->in_flight_fences[m_current_frame];
     vkWaitForFences(m_vk->device, 1, &fence, VK_TRUE,
         std::numeric_limits<uint64_t>::max());
@@ -1432,14 +1444,9 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
         std::numeric_limits<uint64_t>::max(), semaphore, VK_NULL_HANDLE,
         &m_image_index);
 
-    return (result != VK_ERROR_OUT_OF_DATE_KHR);
-}   // beginScene
-
-// ----------------------------------------------------------------------------
-bool GEVulkanDriver::endScene()
-{
-    if (g_paused_rendering.load())
+    if (result != VK_SUCCESS)
     {
+        video::CNullDriver::endScene();
         GEVulkan2dRenderer::clear();
         return false;
     }
@@ -1462,7 +1469,7 @@ bool GEVulkanDriver::endScene()
 
     VkQueue queue = VK_NULL_HANDLE;
     std::unique_lock<std::mutex> ul = getGraphicsQueue(&queue);
-    VkResult result = vkQueueSubmit(queue, 1, &submit_info,
+    result = vkQueueSubmit(queue, 1, &submit_info,
         m_vk->in_flight_fences[m_current_frame]);
     ul.unlock();
 
