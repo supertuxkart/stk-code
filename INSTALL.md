@@ -196,11 +196,33 @@ and unpack the archive into the `stk-code` directory. Download `i686` if you use
 
 6. Now that CMake finished configuring and creating the necessary files for the build, run the build command in the same directory:
 
-```cmd
-msbuild.exe SuperTuxKart.sln
-```
+    ```cmd
+    msbuild.exe SuperTuxKart.sln
+    ```
 
 SuperTuxKart can now be run as `bin\Debug\supertuxkart.exe` or `bin\Release\supertuxkart.exe`
+
+## Building SuperTuxKart on Windows using LLVM MinGW
+
+1. Get the LLVM Mingw archive [here](https://github.com/mstorsjo/llvm-mingw/releases/latest), get the `*-msvcrt-i686.zip or` `*-msvcrt-x86_64.zip` depending on whether you have an Intel / AMD 32 or 64-bit Windows. If you are using ARM64 Windows get the `*-msvcrt-i686.zip` should be fine (untested). After downloading extract it as `C:\llvm-mingw` so `C:\llvm-mingw` contains `bin`, `include`, `lib`, etc.
+2. Get Ninja [here](https://github.com/ninja-build/ninja/releases/latest), download the `ninja-win.zip` and extract the `ninja.exe` from the archive to `C:\llvm-mingw`. If you are not using Intel / AMD 64-bit Windows use [this link](https://packages.msys2.org/package/mingw-w64-i686-ninja) and extract `mingw32\bin\ninja.exe` inside the `tar.zst`.
+3. Download a source package from either [SuperTuxKart on GitHub](https://github.com/supertuxkart/stk-code/releases) or [SuperTuxKart.net - Source Control](https://supertuxkart.net/Source_control)
+NOTE: the `stk-code` and `stk-assets` directories **must** be in the same directory, `stk-assets` is not needed if you download the full source tarball `(SuperTuxKart-version-src.tar.xz)`. Also make sure they lie within the C drive.
+4. Download the Windows dependencies package from [SuperTuxKart on GitHub - Dependencies latest preview release](https://github.com/supertuxkart/dependencies/releases/tag/preview)
+and unpack the archive into the `stk-code` directory. Download `i686` if you compile for Intel / AMD 32-bit Windows, `x86_64` for Intel / AMD 64-bit Windows and `aarch64` for ARM64 Windows.
+6. Download CMake from here: [CMake - download page](https://cmake.org/download/), install it; once CMake is installed, double click on the CMake icon on your desktop, and point it towards your `stk-code` directory in the 'Where is the source code' field, and point 'Where to build the binaries' to a new directory called `build` inside the stk-code directory.
+7. Press the `Add Entry` button and add the values below:
+* Name: `LLVM_ARCH` Type: `STRING`  Value: `i686`, `x86_64` or `aarch64`
+* Name: `LLVM_PREFIX` Type: `STRING`  Value: `C:/llvm-mingw`
+* Name: `CMAKE_MAKE_PROGRAM` Type: `STRING` Value: `C:/llvm-mingw/ninja.exe`
+* Name: `USE_WIIUSE` Type: `BOOL`  Value: `Empty (unchecked)`
+8. Press 'Configure'; CMake will ask you if it is OK to create the aforementioned directory, press `Yes`. Choose `Ninja` from `Specify the generator for this project`, choose `Specify toolchain file for cross-compiling` then press `Next`. Specify the toolchain file which is located in `stk-code\cmake\Toolchain-llvm-mingw.cmake` and press `Finish`. If no error appears then press 'Generate'
+9. Once inside the build directory using command line `cmd.exe` or PowerShell:
+    ```cmd
+    C:\llvm-mingw\ninja.exe
+    ```
+
+SuperTuxKart can now be run as `bin\supertuxkart.exe`.
 
 ## Building SuperTuxKart on macOS
 
