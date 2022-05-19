@@ -1144,6 +1144,32 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                     }   // for j
                 } // for matrix_index
             }
+            else if (mb->getVertexType() == video::EVT_SKINNED_MESH)
+            {
+                video::S3DVertexSkinnedMesh* mbVertices = (video::S3DVertexSkinnedMesh*)mb->getVertices();
+                for (unsigned int matrix_index = 0; matrix_index < matrices.size(); matrix_index++)
+                {
+                    for (unsigned int j = 0; j < mb->getIndexCount(); j += 3)
+                    {
+                        for (unsigned int k = 0; k < 3; k++)
+                        {
+                            int indx = mbIndices[j + k];
+                            core::vector3df v = mbVertices[indx].m_position;
+                            matrices[matrix_index].transformVect(v);
+                            vertices[k] = v;
+                            normals[k] = MiniGLM::decompressVector3(mbVertices[indx].m_normal);
+                        }   // for k
+
+                        if (tmesh)
+                        {
+                            tmesh->addTriangle(vertices[0], vertices[1],
+                                vertices[2], normals[0],
+                                normals[1], normals[2],
+                                material);
+                        }
+                    }   // for j
+                } // for matrix_index
+            }
         }
     }   // for i<getMeshBufferCount
 
