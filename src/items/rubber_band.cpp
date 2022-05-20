@@ -200,8 +200,9 @@ void RubberBand::update(int ticks)
             m_plunger->setKeepAlive(0);
             return;
         }
-
-        diff.normalize();   // diff can't be zero here
+        // diff can be zero if the rubber band hits its owner
+        if (diff.x() != 0.0f && diff.y() != 0.0f && diff.z() != 0.0f)
+            diff.normalize();
         m_owner->getBody()->applyCentralForce(diff*force);
         m_owner->increaseMaxSpeed(MaxSpeed::MS_INCREASE_RUBBER,
             kp->getPlungerBandSpeedIncrease(),
