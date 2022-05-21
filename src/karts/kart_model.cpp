@@ -1328,6 +1328,8 @@ void KartModel::initInverseBoneMatrices()
             node->setCurrentFrame(striaght_frame);
             node->OnAnimate(0);
             scene::IBoneSceneNode* bone = node->getJointNode(i);
+            if (!bone)
+                continue;
             bone->updateAbsolutePosition();
             node->setCurrentFrame(striaght_frame);
             node->OnAnimate(0);
@@ -1352,8 +1354,11 @@ void KartModel::initInverseBoneMatrices()
 const core::matrix4& KartModel::getInverseBoneMatrix
                                            (const std::string& bone_name) const
 {
+    // Remove after GESPM animation is done
+    static core::matrix4 unused;
     assert(m_version >= 3);
     auto ret = m_inverse_bone_matrices.find(bone_name);
-    assert(ret != m_inverse_bone_matrices.end());
+    if (ret == m_inverse_bone_matrices.end())
+        return unused;
     return ret->second;
 }   // getInverseBoneMatrix

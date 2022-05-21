@@ -256,7 +256,8 @@ void ModelViewWidget::setupRTTScene()
         scene::ISceneNode* parent = bone_attachment ?
             animated_node->getJointNode(m_bone_attached[n].c_str()) :
             m_rtt_main_node;
-        assert(parent);
+        if (!parent)
+            continue;
         if (m_model_frames[n].first == -1)
         {
             scene::ISceneNode* node =
