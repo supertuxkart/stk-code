@@ -34,6 +34,7 @@ set(GE_SOURCES
     src/ge_vulkan_shader_manager.cpp
     src/ge_vulkan_texture.cpp
     src/ge_gl_texture.cpp
+    src/ge_spm.cpp
 )
 
 if(NOT APPLE OR DLOPEN_MOLTENVK)

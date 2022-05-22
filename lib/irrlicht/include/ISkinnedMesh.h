@@ -185,9 +185,6 @@ namespace scene
 		//! exposed for loaders: joints list
 		virtual const core::array<SJoint*>& getAllJoints() const = 0;
 
-		//! loaders should call this after populating the mesh
-		virtual void finalize() = 0;
-
 		//! Adds a new meshbuffer to the mesh, access it as last one
 		virtual SSkinMeshBuffer* addMeshBuffer() = 0;
 

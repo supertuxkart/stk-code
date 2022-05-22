@@ -50,6 +50,9 @@ namespace scene
 		//! Halflife MDL model file
 		EAMT_MDL_HALFLIFE,
 
+		//! STK .spm file
+		EAMT_SPM,
+
 		//! generic skinned mesh
 		EAMT_SKINNED
 	};
@@ -106,6 +109,9 @@ namespace scene
 		{
 			return EAMT_UNKNOWN;
 		}
+
+		//! loaders should call this after populating the mesh
+		virtual void finalize() = 0;
 	};
 
 } // end namespace scene

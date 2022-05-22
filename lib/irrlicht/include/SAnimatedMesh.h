@@ -168,6 +168,11 @@ namespace scene
 				Meshes[i]->setDirty(buffer);
 		}
 
+		//! loaders should call this after populating the mesh
+		virtual void finalize()
+		{
+		}
+
 		//! All meshes defining the animated mesh
 		core::array<IMesh*> Meshes;
 
