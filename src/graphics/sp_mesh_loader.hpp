@@ -53,6 +53,12 @@ private:
                     bool read_tangent, bool uv_one, bool uv_two,
                     SPVertexType vt, const video::SMaterial& m);
     // ------------------------------------------------------------------------
+    void decompressGESPM(irr::io::IReadFile* spm, unsigned vertices_count,
+                         unsigned indices_count, bool read_normal,
+                         bool read_vcolor, bool read_tangent, bool uv_one,
+                         bool uv_two, SPVertexType vt,
+                         const video::SMaterial& m);
+    // ------------------------------------------------------------------------
     void decompressSPM(irr::io::IReadFile* spm, unsigned vertices_count,
                        unsigned indices_count, bool read_normal,
                        bool read_vcolor, bool read_tangent, bool uv_one,
@@ -63,7 +69,7 @@ private:
     // ------------------------------------------------------------------------
     void convertIrrlicht();
 
-    scene::ISkinnedMesh* m_mesh;
+    scene::IAnimatedMesh* m_mesh;
 
     scene::ISceneManager* m_scene_manager;
 
