@@ -308,6 +308,11 @@ public:
         return m_vertices.data();
     }
     // ------------------------------------------------------------------------
+    std::vector<video::S3DVertexSkinnedMesh>& getVerticesRef()
+    {
+        return m_vertices;
+    }
+    // ------------------------------------------------------------------------
     virtual u32 getVertexCount() const
     {
         return (unsigned)m_vertices.size();
@@ -316,6 +321,11 @@ public:
     virtual video::E_INDEX_TYPE getIndexType() const
     {
         return video::EIT_16BIT;
+    }
+    // ------------------------------------------------------------------------
+    std::vector<u16>& getIndicesRef()
+    {
+        return m_indices;
     }
     // ------------------------------------------------------------------------
     virtual const u16* getIndices() const

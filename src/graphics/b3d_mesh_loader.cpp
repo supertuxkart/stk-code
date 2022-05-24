@@ -5,6 +5,7 @@
 #include "graphics/b3d_mesh_loader.hpp"
 #include "graphics/central_settings.hpp"
 #include "graphics/stk_tex_manager.hpp"
+#include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
 #include "graphics/sp/sp_animation.hpp"
@@ -17,6 +18,12 @@
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 
 #include <algorithm>
+
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#include <ge_spm_buffer.hpp>
+#include <ge_spm.hpp>
+#endif
 
 int B3DMeshLoader::m_straight_frame = 0;
 
@@ -76,7 +83,8 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
     }
 
 #ifndef SERVER_ONLY
-    if (CVS->isGLSL())
+    bool convert_spm = CVS->isGLSL() || GE::getVKDriver() != NULL;
+    if (convert_spm)
     {
         if (!AnimatedMesh)
         {
@@ -86,8 +94,30 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
         SP::SPMesh* spm = toSPM(static_cast<scene::CSkinnedMesh*>
             (AnimatedMesh->getMesh(m_straight_frame)));
         m_texture_string.clear();
-        spm->setMinMax(min.toIrrVector(), max.toIrrVector());
-        return spm;
+        if (CVS->isGLSL())
+        {
+            spm->finalize();
+            spm->setMinMax(min.toIrrVector(), max.toIrrVector());
+            return spm;
+        }
+        GE::GESPM* ge_spm = new GE::GESPM();
+        for (unsigned i = 0; i < spm->getMeshBufferCount(); i++)
+        {
+            SP::SPMeshBuffer* spbuf = spm->getSPMeshBuffer(i);
+            GE::GESPMBuffer* gebuf = new GE::GESPMBuffer();
+            ge_spm->m_buffer.push_back(gebuf);
+            std::swap(gebuf->m_vertices, spbuf->getVerticesRef());
+            std::swap(gebuf->m_indices, spbuf->getIndicesRef());
+            Material* stk_material = spbuf->getSTKMaterial(0);
+            stk_material->setMaterialProperties(&gebuf->getMaterial(), gebuf);
+            gebuf->getMaterial().TextureLayer[0].Texture =
+                stk_material->getTexture();
+            gebuf->recalculateBoundingBox();
+        }
+        ge_spm->finalize();
+        ge_spm->setMinMax(min.toIrrVector(), max.toIrrVector());
+        spm->drop();
+        return ge_spm;
     }
 #endif
 
@@ -255,7 +285,6 @@ SP::SPMesh* B3DMeshLoader::toSPM(scene::CSkinnedMesh* mesh)
         }
     }
 
-    spm->finalize();
     mesh->drop();
     return spm;
 }
@@ -1311,7 +1340,8 @@ void B3DMeshLoader::loadTextures(SB3dMaterial& material, scene::IMeshBuffer* mb)
                 full_path = fs->getFileBasename(B3dTexture->TextureName);
 
 #ifndef SERVER_ONLY
-            if (CVS->isGLSL())
+            bool convert_spm = CVS->isGLSL() || GE::getVKDriver() != NULL;
+            if (convert_spm)
             {
                 auto& ret = m_texture_string[mb];
                 if (i == 0)
