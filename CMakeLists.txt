@@ -89,7 +89,8 @@ endif()
 
 if((UNIX AND NOT APPLE) AND NOT SERVER_ONLY)
     if((${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm") OR 
-       (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64"))
+       (${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64") OR
+       (${CMAKE_SYSTEM_PROCESSOR} MATCHES "riscv64"))
         option(USE_GLES2 "Use OpenGL ES2 renderer" ON)
     else()
         option(USE_GLES2 "Use OpenGL ES2 renderer" OFF)
