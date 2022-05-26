@@ -34,7 +34,8 @@ namespace GE
     public:
 
         //! constructor
-        GEVulkanDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, SDL_Window* window);
+        GEVulkanDriver(const SIrrlichtCreationParameters& params, io::IFileSystem* io, SDL_Window* window,
+                       IrrlichtDevice* device);
 
         //! destructor
         virtual ~GEVulkanDriver();
@@ -332,6 +333,7 @@ namespace GE
         std::unique_lock<std::mutex> getGraphicsQueue(VkQueue* queue) const;
         void waitIdle();
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
+        IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
     private:
         struct SwapChainSupportDetails
         {
@@ -447,6 +449,8 @@ namespace GE
 
         SDL_Window* m_window;
         bool m_disable_wait_idle;
+
+        IrrlichtDevice* m_irrlicht_device;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

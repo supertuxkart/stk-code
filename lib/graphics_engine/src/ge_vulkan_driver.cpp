@@ -450,9 +450,10 @@ std::atomic_bool g_schedule_pausing_rendering(false);
 std::atomic_bool g_paused_rendering(false);
 
 GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
-                               io::IFileSystem* io, SDL_Window* window)
+                               io::IFileSystem* io, SDL_Window* window,
+                               IrrlichtDevice* device)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
-                m_params(params)
+                m_params(params), m_irrlicht_device(device)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -2029,9 +2030,10 @@ namespace irr
 namespace video
 {
     IVideoDriver* createVulkanDriver(const SIrrlichtCreationParameters& params,
-                                     io::IFileSystem* io, SDL_Window* window)
+                                     io::IFileSystem* io, SDL_Window* window,
+                                     IrrlichtDevice* device)
     {
-        return new GE::GEVulkanDriver(params, io, window);
+        return new GE::GEVulkanDriver(params, io, window, device);
     }   // createVulkanDriver
 }
 }

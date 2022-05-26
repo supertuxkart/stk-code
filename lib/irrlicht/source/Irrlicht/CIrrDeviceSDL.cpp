@@ -42,7 +42,7 @@ namespace irr
 #endif
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 		IVideoDriver* createVulkanDriver(const SIrrlichtCreationParameters& params,
-			io::IFileSystem* io, SDL_Window* win);
+			io::IFileSystem* io, SDL_Window* win, IrrlichtDevice* device);
 #endif
 	} // end namespace video
 
@@ -637,7 +637,7 @@ void CIrrDeviceSDL::createDriver()
 		#ifdef _IRR_COMPILE_WITH_VULKAN_
 		try
 		{
-			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window);
+			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window, this);
 		}
 		catch (std::exception& e)
 		{
