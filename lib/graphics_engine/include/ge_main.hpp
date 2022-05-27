@@ -2,6 +2,7 @@
 #define HEADER_GE_MAIN_HPP
 
 #include <IVideoDriver.h>
+#include <cstdint>
 #include <string>
 
 namespace GE
@@ -19,6 +20,7 @@ GE::GEVulkanDriver* getVKDriver();
 const std::string& getShaderFolder();
 GEConfig* getGEConfig();
 void deinit();
+uint64_t getMonoTimeMs();
 }
 
 #endif
