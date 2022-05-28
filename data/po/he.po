@@ -23,7 +23,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SuperTuxKart\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-14 16:16+0800\n"
+"POT-Creation-Date: 2022-05-25 09:02+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
 "Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>, 2020-2022\n"
 "Language-Team: Hebrew (http://www.transifex.com/supertuxkart/supertuxkart/language/he/)\n"
@@ -61,7 +61,7 @@ msgstr "לשחק בכל מסלול רשמי פעם אחת לפחות."
 
 #. I18N: ./data/achievements.xml
 msgid "Strike!"
-msgstr "פגיעה!"
+msgstr "בול פגיעה!"
 
 #. I18N: ./data/achievements.xml
 msgid "Hit 10 karts with a bowling-ball."
@@ -323,11 +323,11 @@ msgstr "Y רגישות"
 
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
 msgid "Restore defaults"
-msgstr "שחזור לברירת מחדל"
+msgstr "שחזור לברירת המחדל"
 
 #. I18N: ./data/gui/dialogs/confirm_dialog.stkgui
 #. I18N: In a 'are you sure?' dialog
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:200
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:135
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
@@ -555,9 +555,9 @@ msgstr "סגירה"
 #. I18N: In the user screen
 #. I18N: ./data/gui/screens/user_screen_tab.stkgui
 #. I18N: In the user screen
-#: src/states_screens/dialogs/message_dialog.cpp:126
-#: src/states_screens/dialogs/message_dialog.cpp:137
-#: src/states_screens/dialogs/message_dialog.cpp:142
+#: src/states_screens/dialogs/message_dialog.cpp:127
+#: src/states_screens/dialogs/message_dialog.cpp:138
+#: src/states_screens/dialogs/message_dialog.cpp:143
 msgid "OK"
 msgstr "אישור"
 
@@ -785,7 +785,7 @@ msgstr "רמת קושי"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1290
+#: src/race/race_manager.cpp:1291
 msgid "Novice"
 msgstr "למתחילים"
 
@@ -797,7 +797,7 @@ msgstr "למתחילים"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1291
+#: src/race/race_manager.cpp:1292
 msgid "Intermediate"
 msgstr "רמת ביניים"
 
@@ -809,7 +809,7 @@ msgstr "רמת ביניים"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1292
+#: src/race/race_manager.cpp:1293
 msgid "Expert"
 msgstr "למומחים"
 
@@ -821,7 +821,7 @@ msgstr "למומחים"
 #. I18N: Difficulty
 #. I18N: ./data/gui/screens/race_setup.stkgui
 #. I18N: Difficulty
-#: src/race/race_manager.cpp:1293
+#: src/race/race_manager.cpp:1294
 msgid "SuperTux"
 msgstr "רמת סופר־טַקס"
 
@@ -841,7 +841,7 @@ msgstr "מצב משחק"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:260 src/race/race_manager.cpp:1263
+#: src/network/server_config.cpp:263 src/race/race_manager.cpp:1264
 #: supertuxkart.appdata.xml:33
 msgid "Normal Race"
 msgstr "מרוץ רגיל"
@@ -855,7 +855,7 @@ msgstr "מרוץ רגיל"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:262 src/race/race_manager.cpp:1265
+#: src/network/server_config.cpp:265 src/race/race_manager.cpp:1266
 msgid "Time Trial"
 msgstr "נגד השעון"
 
@@ -872,7 +872,7 @@ msgstr "קרב"
 #. I18N: ./data/gui/screens/online/create_server.stkgui
 #. I18N: Multiplayer game mode
 #. I18N: Game mode
-#: src/network/server_config.cpp:264 src/race/race_manager.cpp:1279
+#: src/network/server_config.cpp:267 src/race/race_manager.cpp:1280
 #: supertuxkart.appdata.xml:41
 msgid "Soccer"
 msgstr "כדורגל"
@@ -1002,7 +1002,7 @@ msgstr "הגדרת המרוץ"
 #: src/states_screens/race_result_gui.cpp:264
 #: src/states_screens/race_result_gui.cpp:293
 #: src/states_screens/race_result_gui.cpp:301
-#: src/states_screens/race_result_gui.cpp:1132
+#: src/states_screens/race_result_gui.cpp:1136
 msgid "Continue"
 msgstr "המשך"
 
@@ -1164,7 +1164,7 @@ msgstr "בחירת שידור רפאים"
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1277
+#: src/race/race_manager.cpp:1278
 msgid "Egg Hunt"
 msgstr "ציד ביצים"
 
@@ -1387,7 +1387,7 @@ msgstr "יש לאסוף את קופסאות המתנה הכחולות, הן יע
 #. I18N: In the help menu
 #: ../stk-assets/tracks/tutorial/scripting.as:49
 msgid "Avoid bananas!"
-msgstr "יש להימנע מבננות!"
+msgstr "יש להיזהר מבננות!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1395,14 +1395,14 @@ msgid ""
 "Collecting nitro allows you to get speed boosts whenever you wish by "
 "pressing the appropriate key or button. You can see your current level of "
 "nitro in the gauge at the bottom-right of the race screen."
-msgstr "איסוף ניטרו מאפשר לך להאיץ את מהירותך בכל זמן שבו מתחשק לך בלחיצה על המקש או על הכפתור המתאים. ניתן לראות את הרמה הנוכחית של הניטרו שלך בפס שנמצא למטה בצידו הימני של מסך המרוץ."
+msgstr "איסוף ניטרוֹ מאפשר להאיץ את המהירות מתי שרוצים בלחיצה על המקש או הכפתור המתאים. ניתן לראות את רמת הניטרו הנוכחית שלך בפס שנמצא למטה בצידו הימני של מסך המרוץ."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
 msgid ""
 "If you see a button with a lock like this one, you need to complete a "
 "challenge to unlock it."
-msgstr "אם רואים כפתור עם מנעול כמו זה, יש להשלים אתגר כדי לשחרר אותו."
+msgstr "כשרואים כפתור עם מנעול כמו זה, יש להשלים אתגר כדי לשחרר אותו."
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1411,7 +1411,7 @@ msgid ""
 "help to take sharp turns; while medium skids will boost your speed, long "
 "skids more so. You can't stop turning while skidding, so orient your kart "
 "carefully before!"
-msgstr "אפשר להחליק באמצעות לחיצה על מקש או כפתור מיוחדים. החלקות קצרות ורצופות עוזרות בפניות חדות; בעוד החלקה בינונית תגביר את מהירותך, החלקות ארוכות יגבירו יותר. אי אפשר להפסיק להסתובב בזמן ההחלקה, אז יש לכוון את המכונית שלך בזהירות לפני כן!"
+msgstr "אפשר להחליק בעזרת לחיצה על מקש או כפתור מיוחדים. החלקות קצרות ורצופות עוזרות בפניות חדות. החלקות בינוניות יאיצו את המהירות שלך, אבל החלקות ארוכות יאיצו יותר. אי אפשר להפסיק להסתובב בזמן החלקה, אז חשוב לכוון את המכונית בזהירות לפני כן!"
 
 #. I18N: ./data/gui/screens/help1.stkgui
 #. I18N: In the help menu
@@ -1699,7 +1699,7 @@ msgstr "בחירת שיאים"
 #. I18N: Game mode
 #. I18N: Lap Trial: Complete as many laps as possible in a given amount of
 #. time.
-#: src/race/race_manager.cpp:1269 src/states_screens/race_setup_screen.cpp:142
+#: src/race/race_manager.cpp:1270 src/states_screens/race_setup_screen.cpp:142
 msgid "Lap Trial"
 msgstr "כמה שיותר הקפות"
 
@@ -1823,20 +1823,23 @@ msgstr "יצירת שרת"
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In networking lobby
 #. I18N: In the networking lobby
-#: src/states_screens/online/networking_lobby.cpp:203
+#: src/states_screens/online/networking_lobby.cpp:83
+#: src/states_screens/online/networking_lobby.cpp:880
+#: src/states_screens/online/networking_lobby.cpp:895
+#: src/states_screens/online/networking_lobby.cpp:1044
 msgid "Lobby"
 msgstr "מבואה"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
-#: src/states_screens/online/networking_lobby.cpp:188
+#: src/states_screens/online/networking_lobby.cpp:189
 msgid "Start race"
 msgstr "התחלת המרוץ"
 
 #. I18N: ./data/gui/screens/online/networking_lobby.stkgui
 #. I18N: In the network lobby
 #. I18N: In networking lobby to configuration server settings
-#: src/states_screens/online/networking_lobby.cpp:196
+#: src/states_screens/online/networking_lobby.cpp:197
 msgid "Configuration"
 msgstr "הגדרה"
 
@@ -2126,8 +2129,8 @@ msgstr "מוזיקה"
 #. I18N: in the graphical options tooltip;
 #. indicates a graphical feature is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:68
-#: src/states_screens/options/options_screen_video.cpp:607
-#: src/states_screens/options/options_screen_video.cpp:680
+#: src/states_screens/options/options_screen_video.cpp:611
+#: src/states_screens/options/options_screen_video.cpp:684
 msgid "Enabled"
 msgstr "פעיל"
 
@@ -2150,7 +2153,7 @@ msgstr "מחיקת תצורה"
 #. I18N: In the input configuration screen
 #. I18N: button to disable a keyboard configuration
 #: src/states_screens/options/options_screen_device.cpp:125
-#: src/states_screens/options/options_screen_device.cpp:634
+#: src/states_screens/options/options_screen_device.cpp:632
 msgid "Disable Configuration"
 msgstr "בטל הגדרה"
 
@@ -2435,11 +2438,11 @@ msgstr "יש להשתמש במאיצנים רק כאשר בטוח להשתמש �
 msgid ""
 "Don't use multiple zippers quickly in row, instead, wait until the speed "
 "boost wears off."
-msgstr "אין להשתמש במאיצנים מרובים במהירות ברצף, לחלופין, יש להמתין עד שהאצת המהירות מפסיקה."
+msgstr "אין להשתמש במאיצנים מרובים במהירות ברצף, אלא יש להמתין עד שהאצת המהירות מפסיקה."
 
 #. I18N: ./data/tips.xml
 msgid "Skidding makes you much faster, do it whenever safe."
-msgstr "החלקה מאיצה אותך הרבה, יש לעשות זאת כשזה בטוח."
+msgstr "ההחלקה מגבירה מאוד את המהירות, יש לעשות זאת רק כשבטוח."
 
 #. I18N: ./data/tips.xml
 msgid "The swatter can be used to remove bombs or parachutes."
@@ -2495,11 +2498,11 @@ msgstr "בכדורגל, יש לעבוד כקבוצה תמיד בשביל תוצ�
 msgid ""
 "If you miss the ball and an opponent is approaching, try hitting them with a"
 " powerup or block their way."
-msgstr "אם אתם מתגעגעים לכדור ויריב מתקרב, אפשר לנסות להכותו באמצעות חיזוק או לחסום את דרכו."
+msgstr "אם הכדור לא נמצא אצלך ויריב מתקרב, אפשר לנסות לפגוע בו באמצעות חיזוק או לחסום את דרכו."
 
 #. I18N: ./data/tips.xml
 msgid "Good rotation of positions (attack and defense) is essential."
-msgstr "בחירת מקומות טובים (להתקפה ולהגנה) היא חיונית."
+msgstr "בחירת המקומות הטובים (להתקפה ולהגנה) חיונית."
 
 #. I18N: ./data/tips.xml
 msgid "Make sure to store at least 2 big cans worth of nitro."
@@ -2507,7 +2510,7 @@ msgstr "כדאי לדאוג לאחסן לפחות 2 פחיות גדולות של
 
 #. I18N: ./data/tips.xml
 msgid "Never use the three bowling balls all at the same time."
-msgstr "אין להשתמש בשלושה כדורי כדורת בו זמנית."
+msgstr "לא כדאי להשתמש בשלושה כדורי כדורת בו זמנית."
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -2533,7 +2536,7 @@ msgstr "אימיוּל"
 
 #. I18N: ../stk-assets/karts/gavroche/kart.xml
 msgid "Gavroche"
-msgstr "גָּאברוֹש"
+msgstr "גַּאברוֹש"
 
 #. I18N: ../stk-assets/karts/gnu/kart.xml
 msgid "Gnu"
@@ -2634,11 +2637,11 @@ msgstr "אי גראן פראדיסו"
 
 #. I18N: ../stk-assets/tracks/hacienda/track.xml
 msgid "Hacienda"
-msgstr "אסיינדה"
+msgstr "אַסְיֶינדַה"
 
 #. I18N: ../stk-assets/tracks/icy_soccer_field/track.xml
 msgid "Icy Soccer Field"
-msgstr "מגרש כדורגל מקרח"
+msgstr "מגרש הכדורגל הקפוא"
 
 #. I18N: Cutscene subtitle from ../stk-assets/tracks/introcutscene2/scene.xml
 #. I18N: ../stk-assets/tracks/introcutscene2/scene.xml
@@ -2757,7 +2760,7 @@ msgstr "ההתחברות לשרת התוספים של SuperTuxKart נכשלה."
 msgid "Error downloading news: '%s'."
 msgstr "שגיאה בהורדת החדשות: \"%s\"."
 
-#: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:256
+#: src/challenges/challenge_data.cpp:303 src/network/server_config.cpp:259
 msgid "Normal Race (Grand Prix)"
 msgstr "מרוץ רגיל (גרנד פרי)"
 
@@ -2828,43 +2831,43 @@ msgid ""
 msgstr "מצב המשחק המהיר מושבת. ניתן להפעילו רק אם המשחק לא נסגר מאז הפעלת מצב העלילה לראשונה.\n\nסגירת מצב העלילה לפני השלמת מצב העלילה תבטל את קוצב הזמן.\n\nכדי להשתמש במצב המשחק המהיר, נא להשתמש בפרופיל חדש."
 
 #. I18N: Name of first guest player (without number)
-#: src/config/player_manager.cpp:392
+#: src/config/player_manager.cpp:396
 msgid "Guest"
 msgstr "אורח/ת"
 
 #. I18N: Name of further guest players, with a 1, 2, ... attached
-#: src/config/player_manager.cpp:397
+#: src/config/player_manager.cpp:401
 #, c-format
 msgid "Guest %d"
 msgstr "אורח/ת %d"
 
-#: src/config/user_config.cpp:689
+#: src/config/user_config.cpp:688
 msgid ""
 "Your config file was malformed, so it was deleted and a new one will be "
 "created."
-msgstr "קובץ התצורה שלך היה מעוות, ולכן הוא נמחק ויוחלף בקובץ חדש."
+msgstr "קובץ התצורה שלך היה פגום, ולכן הוא נמחק ויוחלף בקובץ חדש."
 
-#: src/config/user_config.cpp:700
+#: src/config/user_config.cpp:699
 msgid ""
 "Your config file was too old, so it was deleted and a new one will be "
 "created."
 msgstr "קובץ התצורה שלך היה ישן מדיי, ולכן הוא נמחק ויוחלף בקובץ חדש."
 
-#: src/graphics/irr_driver.cpp:665
+#: src/graphics/irr_driver.cpp:671
 msgid "Video recording started."
 msgstr "הקלטת וידאו החלה."
 
-#: src/graphics/irr_driver.cpp:672
+#: src/graphics/irr_driver.cpp:678
 #, c-format
 msgid "Video saved in \"%s\"."
 msgstr "ההקלטה נשמרה בתוך \"%s\"."
 
-#: src/graphics/irr_driver.cpp:676
+#: src/graphics/irr_driver.cpp:682
 msgid "Encoding progress:"
 msgstr "התקדמות הקידוד:"
 
-#: src/graphics/irr_driver.cpp:1824 src/graphics/irr_driver.cpp:1859
-#: src/graphics/irr_driver.cpp:1864
+#: src/graphics/irr_driver.cpp:1830 src/graphics/irr_driver.cpp:1865
+#: src/graphics/irr_driver.cpp:1870
 #, c-format
 msgid "FPS: %d/%d/%d - %d KTris, Ping: %dms"
 msgstr "FPS:‏ %d/%d/%d ‏- %d KTris, פינג: %dמ״ש"
@@ -2903,8 +2906,8 @@ msgstr "יעילות ניטרו"
 #: src/karts/controller/player_controller.cpp:413
 #: src/network/protocols/client_lobby.cpp:853
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:121
-#: src/states_screens/race_result_gui.cpp:1591
-#: src/states_screens/race_result_gui.cpp:1653
+#: src/states_screens/race_result_gui.cpp:1596
+#: src/states_screens/race_result_gui.cpp:1658
 #, c-format
 msgid "%s (handicapped)"
 msgstr "‏%s (עם מגבלות)"
@@ -2915,489 +2918,489 @@ msgid "%s is ready"
 msgstr "%s מוכן/ה"
 
 #. I18N: Unbound key binding
-#: src/input/binding.cpp:96
+#: src/input/binding.cpp:85
 msgid "[none]"
 msgstr "[אין]"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:106
+#: src/input/binding.cpp:92
 msgctxt "input_key"
 msgid "Left Mouse Button"
 msgstr "לחצן עכבר שמאלי"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:108
+#: src/input/binding.cpp:94
 msgctxt "input_key"
 msgid "Right Mouse Button"
 msgstr "לחצן עכבר ימני"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:110
+#: src/input/binding.cpp:96
 msgctxt "input_key"
 msgid "Cancel"
 msgstr "ביטול"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:112
+#: src/input/binding.cpp:98
 msgctxt "input_key"
 msgid "Middle Mouse Button"
 msgstr "לחצן עכבר אמצעי"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:114
+#: src/input/binding.cpp:100
 msgctxt "input_key"
 msgid "X1 Mouse Button"
 msgstr "לחצן עכבר X1"
 
 #. I18N: input configuration screen: mouse button
-#: src/input/binding.cpp:116
+#: src/input/binding.cpp:102
 msgctxt "input_key"
 msgid "X2 Mouse Button"
 msgstr "לחצן עכבר X2"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:118
+#: src/input/binding.cpp:104
 msgctxt "input_key"
 msgid "Backspace"
 msgstr "מקש Backspace"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:120
+#: src/input/binding.cpp:106
 msgctxt "input_key"
 msgid "Tab"
 msgstr "טאב"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:122
+#: src/input/binding.cpp:108
 msgctxt "input_key"
 msgid "Clear"
 msgstr "ניקוי"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:124
+#: src/input/binding.cpp:110
 msgctxt "input_key"
 msgid "Return"
-msgstr "מקש Return"
+msgstr "מקש Enter"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:126
+#: src/input/binding.cpp:112
 msgctxt "input_key"
 msgid "Shift"
 msgstr "Shift"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:128
+#: src/input/binding.cpp:114
 msgctxt "input_key"
 msgid "Control"
-msgstr "מקש Control"
+msgstr "Ctrl"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:130
+#: src/input/binding.cpp:116
 msgctxt "input_key"
 msgid "Alt/Menu"
 msgstr "Alt/תפריט"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:132
+#: src/input/binding.cpp:118
 msgctxt "input_key"
 msgid "Pause"
 msgstr "השהיה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:134
+#: src/input/binding.cpp:120
 msgctxt "input_key"
 msgid "Caps Lock"
 msgstr "Caps Lock"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:136
+#: src/input/binding.cpp:122
 msgctxt "input_key"
 msgid "Kana"
 msgstr "Kana"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:138
+#: src/input/binding.cpp:124
 msgctxt "input_key"
 msgid "Junja"
 msgstr "Junja"
 
 #. I18N: input configuration screen: keyboard key
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:141
+#: src/input/binding.cpp:127
 msgctxt "input_key"
 msgid "Final"
 msgstr "סופי"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:143
+#: src/input/binding.cpp:129
 msgctxt "input_key"
 msgid "Escape"
-msgstr "Escape"
+msgstr "Esc"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:145
+#: src/input/binding.cpp:131
 msgctxt "input_key"
 msgid "Convert"
 msgstr "המרה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:147
+#: src/input/binding.cpp:133
 msgctxt "input_key"
 msgid "Nonconvert"
 msgstr "אל־המרה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:149
+#: src/input/binding.cpp:135
 msgctxt "input_key"
 msgid "Accept"
 msgstr "קבלה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:151
+#: src/input/binding.cpp:137
 msgctxt "input_key"
 msgid "Modechange"
 msgstr "החלפת מצב"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:153
+#: src/input/binding.cpp:139
 msgctxt "input_key"
 msgid "Space"
 msgstr "רווח"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:155
+#: src/input/binding.cpp:141
 msgctxt "input_key"
 msgid "Page Up"
 msgstr "Page Up"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:157
+#: src/input/binding.cpp:143
 msgctxt "input_key"
 msgid "Page Down"
 msgstr "Page Down"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:159
+#: src/input/binding.cpp:145
 msgctxt "input_key"
 msgid "End"
 msgstr "End"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:161
+#: src/input/binding.cpp:147
 msgctxt "input_key"
 msgid "Home"
 msgstr "בית (Home)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:163
+#: src/input/binding.cpp:149
 msgctxt "input_key"
 msgid "Left"
 msgstr "שמאלה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:165
+#: src/input/binding.cpp:151
 msgctxt "input_key"
 msgid "Up"
 msgstr "למעלה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:167
+#: src/input/binding.cpp:153
 msgctxt "input_key"
 msgid "Right"
 msgstr "ימינה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:169
+#: src/input/binding.cpp:155
 msgctxt "input_key"
 msgid "Down"
 msgstr "למטה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:171
+#: src/input/binding.cpp:157
 msgctxt "input_key"
 msgid "Select"
 msgstr "בחירה (Select)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:173
+#: src/input/binding.cpp:159
 msgctxt "input_key"
 msgid "Print"
 msgstr "הדפסה (Print)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:175
+#: src/input/binding.cpp:161
 msgctxt "input_key"
 msgid "Exec"
 msgstr "ביצוע (Exec)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:177
+#: src/input/binding.cpp:163
 msgctxt "input_key"
 msgid "Print Screen"
 msgstr "Print Screen"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:179
+#: src/input/binding.cpp:165
 msgctxt "input_key"
 msgid "Insert"
 msgstr "Insert"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:181
+#: src/input/binding.cpp:167
 msgctxt "input_key"
 msgid "Delete"
 msgstr "מחיקה (Delete)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:183
+#: src/input/binding.cpp:169
 msgctxt "input_key"
 msgid "Help"
 msgstr "עזרה"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:221
+#: src/input/binding.cpp:207
 msgctxt "input_key"
 msgid "Left Logo"
 msgstr "סמליל שמאלי"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:223
+#: src/input/binding.cpp:209
 msgctxt "input_key"
 msgid "Right Logo"
 msgstr "סמליל ימני"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:225
+#: src/input/binding.cpp:211
 msgctxt "input_key"
 msgid "Apps"
 msgstr "יישומים"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:227
+#: src/input/binding.cpp:213
 msgctxt "input_key"
 msgid "Sleep"
 msgstr "שינה (Sleep)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:229
+#: src/input/binding.cpp:215
 msgctxt "input_key"
 msgid "Numpad 0"
 msgstr "Numpad 0"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:231
+#: src/input/binding.cpp:217
 msgctxt "input_key"
 msgid "Numpad 1"
 msgstr "Numpad 1"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:233
+#: src/input/binding.cpp:219
 msgctxt "input_key"
 msgid "Numpad 2"
 msgstr "Numpad 2"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:235
+#: src/input/binding.cpp:221
 msgctxt "input_key"
 msgid "Numpad 3"
 msgstr "Numpad 3"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:237
+#: src/input/binding.cpp:223
 msgctxt "input_key"
 msgid "Numpad 4"
 msgstr "Numpad 4"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:239
+#: src/input/binding.cpp:225
 msgctxt "input_key"
 msgid "Numpad 5"
 msgstr "Numpad 5"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:241
+#: src/input/binding.cpp:227
 msgctxt "input_key"
 msgid "Numpad 6"
 msgstr "Numpad 6"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:243
+#: src/input/binding.cpp:229
 msgctxt "input_key"
 msgid "Numpad 7"
 msgstr "Numpad 7"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:245
+#: src/input/binding.cpp:231
 msgctxt "input_key"
 msgid "Numpad 8"
 msgstr "Numpad 8"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:247
+#: src/input/binding.cpp:233
 msgctxt "input_key"
 msgid "Numpad 9"
 msgstr "Numpad 9"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:251
+#: src/input/binding.cpp:237
 msgctxt "input_key"
 msgid "Separator"
 msgstr "מפריד"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:253
+#: src/input/binding.cpp:239
 msgctxt "input_key"
 msgid "- (Subtract)"
 msgstr "- (חיסור)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:255
+#: src/input/binding.cpp:241
 msgctxt "input_key"
 msgid "Decimal"
 msgstr "עשרוני"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:257
+#: src/input/binding.cpp:243
 msgctxt "input_key"
 msgid "/ (Divide)"
 msgstr "/ (חילוק)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:283
+#: src/input/binding.cpp:269
 msgctxt "input_key"
 msgid "Num Lock"
 msgstr "Num Lock"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:285
+#: src/input/binding.cpp:271
 msgctxt "input_key"
 msgid "Scroll Lock"
 msgstr "Scroll Lock"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:287
+#: src/input/binding.cpp:273
 msgctxt "input_key"
 msgid "Left Shift"
 msgstr "Shift שמאלי"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:289
+#: src/input/binding.cpp:275
 msgctxt "input_key"
 msgid "Right Shift"
 msgstr "Shift ימני"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:291
+#: src/input/binding.cpp:277
 msgctxt "input_key"
 msgid "Left Control"
-msgstr "Control שמאלי"
+msgstr "‏Ctrl שמאלי"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:293
+#: src/input/binding.cpp:279
 msgctxt "input_key"
 msgid "Right Control"
-msgstr "Control ימני"
+msgstr "‏Ctrl ימני"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:295
+#: src/input/binding.cpp:281
 msgctxt "input_key"
 msgid "Left Menu"
 msgstr "תפריט שמאלי"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:297
+#: src/input/binding.cpp:283
 msgctxt "input_key"
 msgid "Right Menu"
 msgstr "תפריט ימני"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:303
+#: src/input/binding.cpp:289
 msgctxt "input_key"
 msgid "Attn"
 msgstr "Attn"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:305
+#: src/input/binding.cpp:291
 msgctxt "input_key"
 msgid "Crsel"
 msgstr "Crsel"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:307
+#: src/input/binding.cpp:293
 msgctxt "input_key"
 msgid "Exsel"
 msgstr "Exsel"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:309
+#: src/input/binding.cpp:295
 msgctxt "input_key"
 msgid "Ereof"
 msgstr "Ereof"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:311
+#: src/input/binding.cpp:297
 msgctxt "input_key"
 msgid "Play"
 msgstr "נגינה (Play)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:313
+#: src/input/binding.cpp:299
 msgctxt "input_key"
 msgid "Zoom"
 msgstr "תקריב (Zoom)"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:315
+#: src/input/binding.cpp:301
 msgctxt "input_key"
 msgid "Pa1"
 msgstr "Pa1"
 
 #. I18N: input configuration screen: keyboard key
-#: src/input/binding.cpp:317
+#: src/input/binding.cpp:303
 msgctxt "input_key"
 msgid "Oem Clear"
 msgstr "Oem Clear"
 
 #. I18N: to appear in input configuration screen, for gamepad hats
-#: src/input/binding.cpp:357 src/input/binding.cpp:362
+#: src/input/binding.cpp:343 src/input/binding.cpp:348
 #, c-format
 msgid "Gamepad hat %d"
 msgstr "מתג בקר %d"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:369
+#: src/input/binding.cpp:355
 #, c-format
 msgid "Axis %d %s"
 msgstr "ציר %d %s"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:376
+#: src/input/binding.cpp:362
 #, c-format
 msgid "Axis %d inverted"
 msgstr "ציר %d הפוך"
 
 #. I18N: to appear in input configuration screen, for gamepad axes
-#: src/input/binding.cpp:381
+#: src/input/binding.cpp:367
 #, c-format
 msgid "Axis %d"
 msgstr "ציר %d"
 
 #. I18N: to appear in input configuration screen, for gamepad buttons
-#: src/input/binding.cpp:389
+#: src/input/binding.cpp:375
 #, c-format
 msgid "Gamepad button %d"
 msgstr "לחצן בקר %d"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
-#: src/input/binding.cpp:392
+#: src/input/binding.cpp:378
 #, c-format
 msgid "Mouse button %d"
 msgstr "כפתור עכבר %d"
 
 #. I18N: to appear in input configuration screen, for mouse (might not be used
 #. at all)
-#: src/input/binding.cpp:396
+#: src/input/binding.cpp:382
 #, c-format
 msgid "Mouse axis %d %s"
 msgstr "ציר עכבר %d %s"
@@ -3511,12 +3514,12 @@ msgstr "הדק שמאלי (LT)"
 msgid "Right trigger"
 msgstr "הדק ימני (RT)"
 
-#: src/input/input_manager.cpp:846
+#: src/input/input_manager.cpp:865
 #, c-format
 msgid "Ignoring '%s'. You needed to join earlier to play!"
-msgstr "בהתעלמות מ־\"%s\". יש להצטרף מוקדם יותר כדי לשחק!"
+msgstr "בהתעלמות מ־\"%s\". היה צריך להצטרף מוקדם יותר כדי לשחק!"
 
-#: src/input/input_manager.cpp:882
+#: src/input/input_manager.cpp:901
 msgid "Only the Game Master may act at this point!"
 msgstr "רק מנהל המשחק יכול לפעול בנקודה זו!"
 
@@ -3590,7 +3593,7 @@ msgstr "סיימת את המרוץ במקום ה־%d!"
 msgid "%s left the game."
 msgstr "‏%s עזב/ה את המשחק."
 
-#: src/main.cpp:2028
+#: src/main.cpp:2029
 msgid ""
 "SuperTuxKart may connect to a server to download add-ons and notify you of "
 "updates. Please read our privacy policy at https://supertuxkart.net/Privacy."
@@ -3599,22 +3602,22 @@ msgid ""
 "Internet\")."
 msgstr "באפשרות SuperTuxKart להתחבר לשרת כדי להוריד תוספים ולהודיע לך על עדכונים. נא לקרוא את מדיניות הפרטיות בכתובת https://supertuxkart.net/Privacy. ברצונך להפעיל תכונה זו? (כדי לשנות הגדרה זו מאוחר יותר, יש לעבור למסך האפשרויות, לבחור בלשונית \"ממשק המשתמש\" ולערוך את הסימון של \"התחברות לאינטרנט\")."
 
-#: src/main.cpp:2378
+#: src/main.cpp:2379
 msgid "Your screen resolution is too low to run STK."
-msgstr "רזולוציית המסך שלך נמוכה מכדי להפעיל את SuperTuxKart."
+msgstr "רזולוציית המסך שלך נמוכה מדי להפעלת SuperTuxKart."
 
-#: src/main.cpp:2429
+#: src/main.cpp:2430
 msgid ""
 "Your driver version is too old. Please install the latest video drivers."
 msgstr "גרסת מנהל ההתקן ישנה מדי. נא להתקין את מנהל ההתקן העדכני ביותר. "
 
-#: src/main.cpp:2449
+#: src/main.cpp:2450
 #, c-format
 msgid ""
 "Your graphics driver appears to be very old. Please check if an update is "
 "available. SuperTuxKart recommends a driver supporting %s or better. The "
 "game will likely still run, but in a reduced-graphics mode."
-msgstr "מנהל התקני הגרפיקה שלך נראה ישן מאוד. נא לבדוק אם עדכון זמין. SuperTuxKart ממליץ על מנהל התקנים שתומך ב־%s וטובים יותר. סביר להניח שהמשחק עדיין יפעל, אך במצב גרפיקה מופחתת."
+msgstr "מנהל ההתקן של כרטיס המסך שלך נראה ישן מאוד. נא לבדוק אם עדכון זמין. SuperTuxKart ממליצים על מנהל התקנים שתומך ב־%s וטובים יותר. סביר להניח שהמשחק עדיין יפעל, אך במצב של גרפיקה מופחתת."
 
 #: src/main_loop.cpp:507 src/network/protocols/client_lobby.cpp:128
 msgid "Server connection timed out."
@@ -3652,7 +3655,7 @@ msgstr "הדגל הכחול נתפס על ידי %s!"
 msgid "%s captured the red flag!"
 msgstr "הדגל האדום נתפס על ידי %s!"
 
-#: src/modes/easter_egg_hunt.cpp:226
+#: src/modes/easter_egg_hunt.cpp:222
 #, c-format
 msgid "Eggs: %d / %d"
 msgstr "ביצים: %d / %d"
@@ -3684,17 +3687,17 @@ msgstr "שיא חדש מהירות חדש להקפה"
 msgid "WRONG WAY!"
 msgstr "טעות בדרך!"
 
-#: src/modes/soccer_world.cpp:524 src/modes/soccer_world.cpp:651
+#: src/modes/soccer_world.cpp:531 src/modes/soccer_world.cpp:658
 #, c-format
 msgid "%s scored a goal!"
 msgstr "הובקע גול על ידי %s!"
 
-#: src/modes/soccer_world.cpp:526 src/modes/soccer_world.cpp:653
+#: src/modes/soccer_world.cpp:533 src/modes/soccer_world.cpp:660
 #, c-format
 msgid "Oops, %s made an own goal!"
 msgstr "אופס, הובקע גול עצמי על ידי %s!"
 
-#: src/modes/three_strikes_battle.cpp:647
+#: src/modes/three_strikes_battle.cpp:641
 #, c-format
 msgid "%i spare tire kart has been spawned!"
 msgid_plural "%i spare tire karts have been spawned!"
@@ -3730,7 +3733,7 @@ msgid "Bad network connection is detected."
 msgstr "זוהה חיבור לא תקין לרשת."
 
 #: src/network/protocols/client_lobby.cpp:446
-#: src/network/protocols/server_lobby.cpp:3845
+#: src/network/protocols/server_lobby.cpp:3833
 msgid "Bot"
 msgstr "בוט"
 
@@ -3751,7 +3754,7 @@ msgstr "יש ללחוץ על שם השחקן/ית ברשימה לניהול ול
 #: src/network/protocols/client_lobby.cpp:724
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:115
 #: src/states_screens/dialogs/server_info_dialog.cpp:96
-#: src/states_screens/race_result_gui.cpp:1961
+#: src/states_screens/race_result_gui.cpp:2008
 #, c-format
 msgid "Difficulty: %s"
 msgstr "רמה: %s"
@@ -3898,12 +3901,12 @@ msgstr "הדיווח על %s הצליח."
 
 #. I18N: Shown when there is download error for assets download
 #. in the first run
-#: src/network/protocols/client_lobby.cpp:1906
+#: src/network/protocols/client_lobby.cpp:1916
 #: src/states_screens/dialogs/download_assets.cpp:251
 msgid ""
 "Failed to download assets, check your storage space or internet connection "
 "and try again later."
-msgstr "הורדת המשאבים נכשלה, יש לבדוק את שטח האחסון שלך או את החיבור שלך לאינטרנט ולנסות שוב מאוחר יותר."
+msgstr "הורדת המשאבים נכשלה, יש לבדוק את שטח האחסון שלך או את החיבור לאינטרנט ולנסות שוב מאוחר יותר."
 
 #: src/network/protocols/connect_to_server.cpp:230
 msgid "No quick play server available."
@@ -3924,13 +3927,13 @@ msgstr "כשל בזיהוי מספר הפִּתחה של השרת %s."
 msgid "Network grand prix has been finished."
 msgstr "הגרנד פרי ברשת הסתיים."
 
-#: src/network/server_config.cpp:258
+#: src/network/server_config.cpp:261
 msgid "Time Trial (Grand Prix)"
 msgstr "מוגבל בזמן (גרנד פרי)"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:268 src/race/race_manager.cpp:1273
+#: src/network/server_config.cpp:271 src/race/race_manager.cpp:1274
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:161
 #: src/states_screens/online/create_server_screen.cpp:230
 #: src/states_screens/track_info_screen.cpp:252
@@ -3939,7 +3942,7 @@ msgstr "תחרות חופשית"
 
 #. I18N: Game mode
 #. I18N: In the create server screen for battle server
-#: src/network/server_config.cpp:270 src/race/race_manager.cpp:1275
+#: src/network/server_config.cpp:273 src/race/race_manager.cpp:1276
 #: src/states_screens/dialogs/server_configuration_dialog.cpp:162
 #: src/states_screens/online/create_server_screen.cpp:232
 msgid "Capture The Flag"
@@ -4007,27 +4010,27 @@ msgstr "ללא"
 msgid "Random"
 msgstr "אקראי"
 
-#: src/race/highscore_manager.cpp:101
+#: src/race/highscore_manager.cpp:102
 msgid ""
 "The highscore file was too old,\n"
 "all highscores have been erased."
-msgstr "קובץ השיאים ישן מדי.\nכל השיאים נמחקו."
+msgstr "קובץ השיאים היה ישן מדי.\nכל השיאים נמחקו."
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1267
+#: src/race/race_manager.cpp:1268
 msgid "Follow the Leader"
 msgstr "בעקבות המכונית המובילה"
 
 #. I18N: Game mode
-#: src/race/race_manager.cpp:1271 src/states_screens/track_info_screen.cpp:251
+#: src/race/race_manager.cpp:1272 src/states_screens/track_info_screen.cpp:251
 msgid "3 Strikes Battle"
 msgstr "קרב 3 פגיעות"
 
-#: src/replay/replay_recorder.cpp:360
+#: src/replay/replay_recorder.cpp:358
 msgid "Incomplete replay file will not be saved."
 msgstr "קובץ שידור שאינו שלם לא יישמר."
 
-#: src/replay/replay_recorder.cpp:396
+#: src/replay/replay_recorder.cpp:394
 #, c-format
 msgid "Replay saved in \"%s\"."
 msgstr "השידור נשמר בתוך \"%s\"."
@@ -4094,7 +4097,7 @@ msgid ""
 "Sorry, an error occurred while contacting the add-ons website. Make sure you"
 " are connected to the Internet and that SuperTuxKart is not blocked by a "
 "firewall"
-msgstr "סליחה, אירעה שגיאה בחיבור לאתר התוספים. נא לוודא שהאינטרנט מחובר, וכי SuperTuxKart אינו חסום על ידי חומת אש"
+msgstr "אירעה שגיאה בעת ההתחברות לאתר התוספים, עמך הסליחה. נא לוודא שיש לך חיבור לאינטרנט ושחומת אש לא חוסמת את SuperTuxKart"
 
 #. I18N: arena group name
 #. I18N: track group name
@@ -4132,7 +4135,7 @@ msgstr[3] "%d זירות אינן זמינות במשחק לבד."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nNiv Baehr, 2016-2017\nCapri, 2015\nGenghisKhan, 2015-2016\nLiran, 2016-2017\nOmeritzics Games, 2020-2021\nOmeritzics Games, 2020\nעומר רוזנר, 2018\nYaroslav Serhieiev, 2018\nYevgney Sliosarenko, 2015\nעומר רוזנר, 2018-2019\n‫רואי לוי‬‎, 2016\nAsael\nAuria\nDdorda\nGenghisKhan\nJorge Mariano\nLeo Juszkiewicz\nNiv Baehr\nReuma Mordechai\nSTK-team\nShai Shapira\nShimi Chen\nYaron\nOmer I.S., "
+msgstr "Launchpad Contributions:\nNiv Baehr, 2016-2017\nCapri, 2015\nGenghisKhan, 2015-2016\nLiran, 2016-2017\nOmer I.S., 2020-2022\nעומר רוזנר, 2018\nYaroslav Serhieiev, 2018\nYevgney Sliosarenko, 2015\nעומר רוזנר, 2018-2019\n‫רואי לוי‬‎, 2016\nAsael\nAuria\nDdorda\nGenghisKhan\nJorge Mariano\nLeo Juszkiewicz\nNiv Baehr\nReuma Mordechai\nSTK-team\nShai Shapira\nShimi Chen\nYaron"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4643,9 +4646,9 @@ msgstr "מרדף מזל״טים"
 #. I18N: custom video settings
 #: src/states_screens/dialogs/custom_camera_settings.cpp:103
 #: src/states_screens/options/options_screen_ui.cpp:160
-#: src/states_screens/options/options_screen_video.cpp:529
-#: src/states_screens/options/options_screen_video.cpp:564
-#: src/states_screens/options/options_screen_video.cpp:592
+#: src/states_screens/options/options_screen_video.cpp:531
+#: src/states_screens/options/options_screen_video.cpp:568
+#: src/states_screens/options/options_screen_video.cpp:596
 msgid "Custom"
 msgstr "מותאמת"
 
@@ -4657,14 +4660,14 @@ msgstr "מותאמת"
 #: src/states_screens/dialogs/custom_video_settings.cpp:89
 #: src/states_screens/online/create_server_screen.cpp:210
 #: src/states_screens/options/options_screen_video.cpp:242
-#: src/states_screens/options/options_screen_video.cpp:610
-#: src/states_screens/options/options_screen_video.cpp:681
+#: src/states_screens/options/options_screen_video.cpp:614
+#: src/states_screens/options/options_screen_video.cpp:685
 msgid "Disabled"
 msgstr "מושבת"
 
 #. I18N: if only important particles effects is enabled
 #: src/states_screens/dialogs/custom_video_settings.cpp:67
-#: src/states_screens/options/options_screen_video.cpp:612
+#: src/states_screens/options/options_screen_video.cpp:616
 msgid "Important only"
 msgstr "חשובים בלבד"
 
@@ -4674,7 +4677,7 @@ msgstr "חשובים בלבד"
 #: src/states_screens/dialogs/custom_video_settings.cpp:75
 #: src/states_screens/dialogs/custom_video_settings.cpp:84
 #: src/states_screens/dialogs/custom_video_settings.cpp:90
-#: src/states_screens/options/options_screen_video.cpp:619
+#: src/states_screens/options/options_screen_video.cpp:623
 msgid "Low"
 msgstr "נמוכה"
 
@@ -4684,14 +4687,14 @@ msgstr "נמוכה"
 #: src/states_screens/dialogs/custom_video_settings.cpp:77
 #: src/states_screens/dialogs/custom_video_settings.cpp:85
 #: src/states_screens/dialogs/custom_video_settings.cpp:91
-#: src/states_screens/options/options_screen_video.cpp:622
+#: src/states_screens/options/options_screen_video.cpp:626
 msgid "High"
 msgstr "גבוהה"
 
 #. I18N: in the graphical options tooltip;
 #. indicates the rendered image quality is very low
 #: src/states_screens/dialogs/custom_video_settings.cpp:83
-#: src/states_screens/options/options_screen_video.cpp:616
+#: src/states_screens/options/options_screen_video.cpp:620
 msgid "Very Low"
 msgstr "נמוכה מאוד"
 
@@ -4721,14 +4724,14 @@ msgstr "נא לספק את כתובת השרת אליה ניתן להוסיף \"
 msgid "Invalid server address: %s."
 msgstr "כתובת שרת לא תקינה: %s."
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:145
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:146
 #: src/states_screens/ghost_replay_selection.cpp:155
 #: src/states_screens/high_score_selection.cpp:154
 msgctxt "column_name"
 msgid "Reverse"
 msgstr "רוורס"
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:147
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:148
 #: src/states_screens/ghost_replay_selection.cpp:157
 #: src/states_screens/high_score_selection.cpp:141
 #: src/states_screens/online/server_selection.cpp:135
@@ -4736,40 +4739,40 @@ msgctxt "column_name"
 msgid "Difficulty"
 msgstr "רמת קושי"
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:150
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:151
 #: src/states_screens/ghost_replay_selection.cpp:159
 #: src/states_screens/high_score_selection.cpp:152
 msgctxt "column_name"
 msgid "Laps"
 msgstr "הקפות"
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:152
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:153
 #: src/states_screens/ghost_replay_selection.cpp:160
 msgctxt "column_name"
 msgid "Time"
 msgstr "זמן"
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:154
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:155
 #: src/states_screens/ghost_replay_selection.cpp:161
 msgctxt "column_name"
 msgid "Kart"
 msgstr "מכונית"
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:156
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:157
 #: src/states_screens/ghost_replay_selection.cpp:162
 msgctxt "column_name"
 msgid "User"
 msgstr "משתמש/ת"
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:158
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:159
 #: src/states_screens/ghost_replay_selection.cpp:166
 msgctxt "column_name"
 msgid "Version"
 msgstr "גרסה"
 
-#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:199
+#: src/states_screens/dialogs/ghost_replay_info_dialog.cpp:200
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:135
-#: src/states_screens/dialogs/message_dialog.cpp:131
+#: src/states_screens/dialogs/message_dialog.cpp:132
 #: src/states_screens/edit_gp_screen.cpp:261
 #: src/states_screens/ghost_replay_selection.cpp:388
 #: src/states_screens/high_score_selection.cpp:265
@@ -4829,7 +4832,7 @@ msgstr "שימוש בצבע המקורי"
 msgid "Pick a color from slider"
 msgstr "נא לבחור צבע מהמחוון"
 
-#: src/states_screens/dialogs/message_dialog.cpp:144
+#: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
 msgstr "לא להציג שוב"
 
@@ -4903,8 +4906,8 @@ msgid "Press any key..."
 msgstr "נא ללחוץ על מקש כרצונך..."
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:115
-#: src/states_screens/online/networking_lobby.cpp:247
-#: src/states_screens/online/networking_lobby.cpp:976
+#: src/states_screens/online/networking_lobby.cpp:246
+#: src/states_screens/online/networking_lobby.cpp:999
 msgid "Chat is disabled, enable in options menu."
 msgstr "הצ׳אט מושבת, אפשר להפעילו בתפריט האפשרויות."
 
@@ -4971,7 +4974,7 @@ msgstr "מרוץ שידור רפאים"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:72
-#: src/states_screens/race_result_gui.cpp:1951
+#: src/states_screens/race_result_gui.cpp:1956
 #, c-format
 msgid "Laps: %i"
 msgstr "הקפות: %i"
@@ -4984,21 +4987,21 @@ msgstr "סוג: %s"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:90
-#: src/states_screens/race_result_gui.cpp:2066
+#: src/states_screens/race_result_gui.cpp:2113
 #, c-format
 msgid "Required Rank: %i"
 msgstr "מקום נדרש: %i לפחות"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:96
-#: src/states_screens/race_result_gui.cpp:2074
+#: src/states_screens/race_result_gui.cpp:2121
 #, c-format
 msgid "Required Time: %i"
 msgstr "זמן נדרש: %i"
 
 #. I18N: In the Select challenge dialog
 #: src/states_screens/dialogs/select_challenge.cpp:103
-#: src/states_screens/race_result_gui.cpp:2085
+#: src/states_screens/race_result_gui.cpp:2132
 #, c-format
 msgid "Required Nitro Points: %i"
 msgstr "נקודות ניטרו נדרשות: %i"
@@ -5067,7 +5070,6 @@ msgid "Input device already exists."
 msgstr "התקן הקלט כבר קיים."
 
 #: src/states_screens/dialogs/splitscreen_player_dialog.cpp:147
-#: src/states_screens/online/online_screen.cpp:234
 msgid "No player available for connecting to server."
 msgstr "אין שחקנים מחוברים לשרת."
 
@@ -5299,7 +5301,7 @@ msgid "Locked"
 msgstr "נעול"
 
 #: src/states_screens/kart_selection.cpp:1032
-#: src/states_screens/online/networking_lobby.cpp:655
+#: src/states_screens/online/networking_lobby.cpp:675
 msgid ""
 "Everyone:\n"
 "Press the 'Select' button to join the game"
@@ -5364,30 +5366,30 @@ msgstr "תווים שגויים בסיסמה!"
 
 #. I18N: In the networking lobby, ready button is to allow player to tell
 #. server that he is ready for next game for owner less server
-#: src/states_screens/online/networking_lobby.cpp:191
+#: src/states_screens/online/networking_lobby.cpp:192
 msgid "Ready"
 msgstr "מוכנים"
 
 #. I18N: Live join is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:194
+#: src/states_screens/online/networking_lobby.cpp:195
 msgid "Live join"
 msgstr "הצטרפות בזמן־אמת"
 
 #. I18N: Spectate is displayed in networking lobby to allow players
 #. to join the current started in-progress game
-#: src/states_screens/online/networking_lobby.cpp:199
+#: src/states_screens/online/networking_lobby.cpp:200
 msgid "Spectate"
 msgstr "צפייה מהצד"
 
-#: src/states_screens/online/networking_lobby.cpp:200
+#: src/states_screens/online/networking_lobby.cpp:201
 msgid "Install addon"
 msgstr "התקנת התוסף"
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish with remaining time,
 #. showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:520
+#: src/states_screens/online/networking_lobby.cpp:540
 #, c-format
 msgid ""
 "Please wait for the current game's (%s) end, estimated remaining time: %s."
@@ -5395,7 +5397,7 @@ msgstr "נא להמתין עד סוף המשחק הנוכחי (%s), זמן נו�
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with remaining time
-#: src/states_screens/online/networking_lobby.cpp:528
+#: src/states_screens/online/networking_lobby.cpp:548
 #, c-format
 msgid "Please wait for the current game's end, estimated remaining time: %s."
 msgstr "נא להמתין עד הסוף המשחק הנוכחי, זמן נותר משוער: %s."
@@ -5403,24 +5405,24 @@ msgstr "נא להמתין עד הסוף המשחק הנוכחי, זמן נותר
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent, showing the current track name inside bracket
-#: src/states_screens/online/networking_lobby.cpp:540
+#: src/states_screens/online/networking_lobby.cpp:560
 msgid "Please wait for the current game's (%s) end, estimated progress: %s%."
 msgstr "נא להמתין עד סוף המשחק הנוכחי (%s), התקדמות משוערת: %s%."
 
 #. I18N: In the networking lobby, show when player is required
 #. to wait before the current game finish with progress in
 #. percent
-#: src/states_screens/online/networking_lobby.cpp:549
+#: src/states_screens/online/networking_lobby.cpp:569
 msgid "Please wait for the current game's end, estimated progress: %d%."
 msgstr "נא להמתין עד סוף המשחק הנוכחי, התקדמות משוערת: %d%."
 
 #. I18N: In the networking lobby, show when player is required to
 #. wait before the current game finish
-#: src/states_screens/online/networking_lobby.cpp:557
+#: src/states_screens/online/networking_lobby.cpp:577
 msgid "Please wait for the current game's end."
 msgstr "נא להמתין עד סוף המשחק הנוכחי."
 
-#: src/states_screens/online/networking_lobby.cpp:624
+#: src/states_screens/online/networking_lobby.cpp:644
 #, c-format
 msgid "Game will start if there is more than %d player."
 msgid_plural "Game will start if there are more than %d players."
@@ -5431,7 +5433,7 @@ msgstr[3] "המשחק יתחיל אם ישנם יותר מ־%d שחקנים."
 
 #. I18N: In the networking lobby, display the starting timeout
 #. for owner-less server to begin a game
-#: src/states_screens/online/networking_lobby.cpp:638
+#: src/states_screens/online/networking_lobby.cpp:658
 #, c-format
 msgid ""
 "Starting after %d second, or once everyone has pressed the 'Ready' button."
@@ -5442,17 +5444,17 @@ msgstr[1] "מתחילים לאחר %d שניות, או לאחר שכולם לח�
 msgstr[2] "מתחילים לאחר %d שניות, או לאחר שכולם לחצו על כפתור \"מוכנים\"."
 msgstr[3] "מתחילים לאחר %d שניות, או לאחר שכולם לחצו על כפתור \"מוכנים\"."
 
-#: src/states_screens/online/networking_lobby.cpp:675
+#: src/states_screens/online/networking_lobby.cpp:695
 #, c-format
 msgid "Connecting to server %s"
 msgstr "כעתבהתחברות לשרת %s"
 
-#: src/states_screens/online/networking_lobby.cpp:680
+#: src/states_screens/online/networking_lobby.cpp:700
 msgid "Finding a quick play server"
 msgstr "מתבצע איתור שרת למשחק מהיר"
 
 #. I18N: In kart screen, show before the voting period in network ends.
-#: src/states_screens/online/network_kart_selection.cpp:195
+#: src/states_screens/online/network_kart_selection.cpp:198
 #: src/states_screens/online/tracks_screen.cpp:879
 #, c-format
 msgid "Remaining time: %d"
@@ -5562,9 +5564,9 @@ msgstr "כתובות הדוא״ל אינן תואמות!"
 
 #: src/states_screens/online/register_screen.cpp:370
 msgid ""
-"Online username can only contain alphanumeric characters, periods, dashes "
-"and underscores!"
-msgstr "שם המשתמש המקוון יכול להכיל רק אותיות ומספרים, נקודות, קווים מפרידים ומקפים תחתונים!"
+"Online username can only contain alphanumeric (ASCII) characters, periods, "
+"dashes and underscores!"
+msgstr "שם המשתמש המקוון יכול להכיל רק אותיות ומספרים (תווי ASCII), נקודות, קווים מפרידים ומקפים תחתונים!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -5684,19 +5686,19 @@ msgstr "מקשים"
 
 #. I18N: button to disable a gamepad configuration
 #: src/states_screens/options/options_screen_device.cpp:108
-#: src/states_screens/options/options_screen_device.cpp:629
+#: src/states_screens/options/options_screen_device.cpp:627
 msgid "Disable Device"
 msgstr "נטרול התקן"
 
 #. I18N: button to enable a gamepad configuration
 #: src/states_screens/options/options_screen_device.cpp:110
-#: src/states_screens/options/options_screen_device.cpp:630
+#: src/states_screens/options/options_screen_device.cpp:628
 msgid "Enable Device"
 msgstr "הפעלת ההתקן"
 
 #. I18N: button to enable a keyboard configuration
 #: src/states_screens/options/options_screen_device.cpp:127
-#: src/states_screens/options/options_screen_device.cpp:635
+#: src/states_screens/options/options_screen_device.cpp:633
 msgid "Enable Configuration"
 msgstr "אפשר הגדרה"
 
@@ -5793,7 +5795,7 @@ msgstr "* פריט כחול פירושו התנגשות עם תצורה אחרת
 msgid "* A red item means a conflict in the current configuration"
 msgstr "* פריט אדום פירושו התנגשות עם התצורה הנוכחית"
 
-#: src/states_screens/options/options_screen_device.cpp:516
+#: src/states_screens/options/options_screen_device.cpp:514
 msgid ""
 "Warning: The 'Shift' is not a recommended key. When 'Shift' is pressed down,"
 " all keys that contain a character that is different in upper-case will stop"
@@ -5801,11 +5803,11 @@ msgid ""
 msgstr "אזהרה: המקש \"Shift\" אינו מקש מומלץ. כאשר \"Shift\" לחוץ, כל המקשים הדו־מצביים יפסיקו לעבוד."
 
 #. I18N: shown before deleting an input configuration
-#: src/states_screens/options/options_screen_device.cpp:615
+#: src/states_screens/options/options_screen_device.cpp:613
 msgid "Are you sure you want to permanently delete this configuration?"
 msgstr "למחוק הגדרה זו לצמיתות?"
 
-#: src/states_screens/options/options_screen_device.cpp:643
+#: src/states_screens/options/options_screen_device.cpp:641
 msgid "Enter new configuration name, leave empty to revert default value."
 msgstr "נא לספק שם הגדרה חדש, יש להשאיר ריק כדי לשחזר לערך ברירת המחדל."
 
@@ -5939,82 +5941,82 @@ msgid "Vsync will not work if your drivers don't support it."
 msgstr "Vsync לא יעבוד אם מנהלי ההתקנים שלך לא תומכים בו."
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:625
+#: src/states_screens/options/options_screen_video.cpp:629
 #, c-format
 msgid "Particles Effects: %s"
 msgstr "אפקטים של חלקיקים: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:631
+#: src/states_screens/options/options_screen_video.cpp:635
 #, c-format
 msgid "Animated Characters: %s"
 msgstr "דמויות מונפשות: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:634
+#: src/states_screens/options/options_screen_video.cpp:638
 #, c-format
 msgid "Dynamic lights: %s"
 msgstr "אורות דינאמיים: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:637
+#: src/states_screens/options/options_screen_video.cpp:641
 #, c-format
 msgid "Light scattering: %s"
 msgstr "פיר אור: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:640
+#: src/states_screens/options/options_screen_video.cpp:644
 #, c-format
 msgid "Anti-aliasing: %s"
 msgstr "הפחתת מדרג עקומות: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:643
+#: src/states_screens/options/options_screen_video.cpp:647
 #, c-format
 msgid "Ambient occlusion: %s"
 msgstr "אטימות מקיפה: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:647
+#: src/states_screens/options/options_screen_video.cpp:651
 #, c-format
 msgid "Shadows: %s"
 msgstr "צללים: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:649
+#: src/states_screens/options/options_screen_video.cpp:653
 #, c-format
 msgid "Shadows: %i"
 msgstr "צללים: %i"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:652
+#: src/states_screens/options/options_screen_video.cpp:656
 #, c-format
 msgid "Bloom: %s"
 msgstr "פריחה: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:656
+#: src/states_screens/options/options_screen_video.cpp:660
 #, c-format
 msgid "Glow (outlines): %s"
 msgstr "זוהר (מתווה): %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:660
+#: src/states_screens/options/options_screen_video.cpp:664
 #, c-format
 msgid "Light shaft (God rays): %s"
 msgstr "פיר אור: %s"
 
-#: src/states_screens/options/options_screen_video.cpp:665
+#: src/states_screens/options/options_screen_video.cpp:669
 #, c-format
 msgid "Rendered image quality: %s"
 msgstr "איכות מסירת תמונה: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:684
+#: src/states_screens/options/options_screen_video.cpp:688
 #, c-format
 msgid "Motion blur: %s"
 msgstr "טשטוש תנועה: %s"
 
 #. I18N: in graphical options
-#: src/states_screens/options/options_screen_video.cpp:688
+#: src/states_screens/options/options_screen_video.cpp:692
 #, c-format
 msgid "Depth of field: %s"
 msgstr "עומק שדה : %s"
@@ -6080,27 +6082,27 @@ msgid "Waiting for the server"
 msgstr "בהמתנה לשרת"
 
 #. I18N: string used to show the song title (e.g. "Sunny Song")
-#: src/states_screens/race_gui_base.cpp:642
+#: src/states_screens/race_gui_base.cpp:645
 #, c-format
 msgid "\"%s\""
 msgstr "\"%s\""
 
 #. I18N: string used to show the author of the music. (e.g. "Sunny Song" by
 #. "John Doe")
-#: src/states_screens/race_gui_base.cpp:652
+#: src/states_screens/race_gui_base.cpp:655
 msgid "by"
 msgstr "מאת"
 
-#: src/states_screens/race_gui_base.cpp:765
+#: src/states_screens/race_gui_base.cpp:768
 msgid "Collect nitro!"
 msgstr "צאו לאסוף ניטרו!"
 
-#: src/states_screens/race_gui_base.cpp:767
+#: src/states_screens/race_gui_base.cpp:770
 msgid "Follow the leader!"
 msgstr "צאו בעקבות המכונית המובילה!"
 
 #. I18N: When some GlobalPlayerIcons are hidden, write "Top 10" to show it
-#: src/states_screens/race_gui_base.cpp:950
+#: src/states_screens/race_gui_base.cpp:953
 #, c-format
 msgid "Top %i"
 msgstr "%i הטובים ביותר"
@@ -6161,71 +6163,71 @@ msgstr "חזרה לתפריט"
 msgid "Do you really want to abort the Grand Prix?"
 msgstr "לנטוש את הגרנד פרי?"
 
-#: src/states_screens/race_result_gui.cpp:628
-#: src/states_screens/race_result_gui.cpp:1518
+#: src/states_screens/race_result_gui.cpp:630
+#: src/states_screens/race_result_gui.cpp:1523
 msgid "Red Team Wins"
 msgstr "הניצחון בידי הקבוצה האדומה"
 
-#: src/states_screens/race_result_gui.cpp:630
-#: src/states_screens/race_result_gui.cpp:1522
+#: src/states_screens/race_result_gui.cpp:632
+#: src/states_screens/race_result_gui.cpp:1527
 msgid "Blue Team Wins"
 msgstr "הניצחון בידי הקבוצה הכחולה"
 
-#: src/states_screens/race_result_gui.cpp:632
-#: src/states_screens/race_result_gui.cpp:1527
+#: src/states_screens/race_result_gui.cpp:634
+#: src/states_screens/race_result_gui.cpp:1532
 msgid "It's a draw"
 msgstr "זה תיקו"
 
-#: src/states_screens/race_result_gui.cpp:873
+#: src/states_screens/race_result_gui.cpp:875
 #, c-format
 msgid "Eliminated after %s"
 msgstr "נפסלת לאחר %s"
 
-#: src/states_screens/race_result_gui.cpp:878
-#: src/states_screens/race_result_gui.cpp:1324
+#: src/states_screens/race_result_gui.cpp:880
+#: src/states_screens/race_result_gui.cpp:1328
 msgid "Eliminated"
 msgstr "נפסל/ה"
 
 #. I18N: indicates a player that scored in their own goal in result screen
-#: src/states_screens/race_result_gui.cpp:1597
-#: src/states_screens/race_result_gui.cpp:1659
+#: src/states_screens/race_result_gui.cpp:1602
+#: src/states_screens/race_result_gui.cpp:1664
 msgid "(Own Goal)"
 msgstr "(גול עצמי)"
 
-#: src/states_screens/race_result_gui.cpp:1738
+#: src/states_screens/race_result_gui.cpp:1743
 #, c-format
 msgid "Track %i/%i"
 msgstr "מסלול %i/%i"
 
-#: src/states_screens/race_result_gui.cpp:1822
+#: src/states_screens/race_result_gui.cpp:1827
 msgid "Grand Prix progress:"
 msgstr "התקדמות בגרנד פרי:"
 
-#: src/states_screens/race_result_gui.cpp:1868
+#: src/states_screens/race_result_gui.cpp:1873
 msgid "Highscores"
 msgstr "שיאים"
 
-#: src/states_screens/race_result_gui.cpp:1975
+#: src/states_screens/race_result_gui.cpp:2022
 #, c-format
 msgid "Best lap time: %s"
 msgstr "זמן ההקפה הטוב ביותר: %s"
 
 #. I18N: is used to indicate who has the bast laptime (best laptime "by
 #. kart_name")
-#: src/states_screens/race_result_gui.cpp:1989
+#: src/states_screens/race_result_gui.cpp:2036
 #, c-format
 msgid "by %s"
 msgstr "על ידי %s"
 
-#: src/states_screens/race_result_gui.cpp:2051
+#: src/states_screens/race_result_gui.cpp:2098
 msgid "You completed the challenge!"
 msgstr "השלמת את האתגר!"
 
-#: src/states_screens/race_result_gui.cpp:2051
+#: src/states_screens/race_result_gui.cpp:2098
 msgid "You failed the challenge!"
 msgstr "נכשלת באתגר!"
 
-#: src/states_screens/race_result_gui.cpp:2102
+#: src/states_screens/race_result_gui.cpp:2149
 msgid "Reached Requirements of SuperTux"
 msgstr "הגעת לדרישות של סופר־טַקס"
 
@@ -6299,12 +6301,12 @@ msgstr "הכול"
 msgid "Locked!"
 msgstr "נעול!"
 
-#: src/utils/string_utils.cpp:1241
+#: src/utils/string_utils.cpp:1242
 #, c-format
 msgid "%s MB"
 msgstr "%s מ״ב"
 
-#: src/utils/string_utils.cpp:1248 src/utils/string_utils.cpp:1252
+#: src/utils/string_utils.cpp:1249 src/utils/string_utils.cpp:1253
 #, c-format
 msgid "%s KB"
 msgstr "%s ק״ב"
