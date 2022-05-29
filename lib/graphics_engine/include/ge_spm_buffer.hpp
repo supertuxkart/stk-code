@@ -1,6 +1,7 @@
 #ifndef HEADER_GE_SPM_BUFFER_HPP
 #define HEADER_GE_SPM_BUFFER_HPP
 
+#include <cstddef>
 #include <vector>
 #include "IMeshBuffer.h"
 
@@ -21,7 +22,17 @@ private:
     std::vector<irr::u16> m_indices;
 
     irr::core::aabbox3d<irr::f32> m_bounding_box;
+
+    size_t m_vbo_offset;
+
+    size_t m_ibo_offset;
 public:
+    // ------------------------------------------------------------------------
+    GESPMBuffer()
+    {
+        m_vbo_offset = 0;
+        m_ibo_offset = 0;
+    }
     // ------------------------------------------------------------------------
     virtual const irr::video::SMaterial& getMaterial() const
                                                          { return m_material; }
@@ -33,7 +44,6 @@ public:
                                                   { return m_vertices.data(); }
     // ------------------------------------------------------------------------
     virtual void* getVertices()                   { return m_vertices.data(); }
-
     // ------------------------------------------------------------------------
     virtual irr::u32 getVertexCount() const       { return m_vertices.size(); }
     // ------------------------------------------------------------------------
@@ -139,7 +149,14 @@ public:
     virtual irr::u32 getChangedID_Vertex() const                  { return 0; }
     // ------------------------------------------------------------------------
     virtual irr::u32 getChangedID_Index() const                   { return 0; }
-
+    // ------------------------------------------------------------------------
+    void setVBOOffset(size_t offset)                 { m_vbo_offset = offset; }
+    // ------------------------------------------------------------------------
+    size_t getVBOOffset() const                        { return m_vbo_offset; }
+    // ------------------------------------------------------------------------
+    void setIBOOffset(size_t offset)                 { m_ibo_offset = offset; }
+    // ------------------------------------------------------------------------
+    size_t getIBOOffset() const                        { return m_ibo_offset; }
 };
 
 } // end namespace irr

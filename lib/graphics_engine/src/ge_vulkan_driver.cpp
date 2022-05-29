@@ -4,6 +4,7 @@
 
 #include "ge_vulkan_2d_renderer.hpp"
 #include "ge_vulkan_features.hpp"
+#include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 #include "ge_vulkan_texture.hpp"
 #include "ge_vulkan_command_loader.hpp"
@@ -551,6 +552,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         // For GEVulkanDynamicBuffer
         GE::setVideoDriver(this);
         GEVulkan2dRenderer::init(this);
+        GEVulkanMeshCache::init(this);
         createUnicolorTextures();
         GEVulkanFeatures::printStats();
     }
@@ -581,6 +583,7 @@ void GEVulkanDriver::destroyVulkan()
         m_transparent_texture = NULL;
     }
 
+    GEVulkanMeshCache::destroy();
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 

@@ -6,6 +6,10 @@
 #include "IAnimatedMesh.h"
 #include "IMesh.h"
 
+#ifndef SERVER_ONLY
+#include <ge_vulkan_mesh_cache.hpp>
+#endif
+
 namespace irr
 {
 namespace scene
@@ -29,6 +33,9 @@ void CMeshCache::addMesh(const io::path& filename, IAnimatedMesh* mesh)
 	e.Mesh = mesh;
 
 	Meshes.push_back(e);
+#ifndef SERVER_ONLY
+	GE::GEVulkanMeshCache::irrlichtMeshChanged();
+#endif
 }
 
 
@@ -43,6 +50,9 @@ void CMeshCache::removeMesh(const IMesh* const mesh)
 		{
 			Meshes[i].Mesh->drop();
 			Meshes.erase(i);
+#ifndef SERVER_ONLY
+			GE::GEVulkanMeshCache::irrlichtMeshChanged();
+#endif
 			return;
 		}
 	}
@@ -156,6 +166,9 @@ void CMeshCache::clear()
 		Meshes[i].Mesh->drop();
 
 	Meshes.clear();
+#ifndef SERVER_ONLY
+	GE::GEVulkanMeshCache::irrlichtMeshChanged();
+#endif
 }
 
 //! Clears all meshes that are held in the mesh cache but not used anywhere else.
@@ -168,6 +181,9 @@ void CMeshCache::clearUnusedMeshes()
 			Meshes[i].Mesh->drop();
 			Meshes.erase(i);
 			--i;
+#ifndef SERVER_ONLY
+			GE::GEVulkanMeshCache::irrlichtMeshChanged();
+#endif
 		}
 	}
 }

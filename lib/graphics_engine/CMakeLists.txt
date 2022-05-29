@@ -31,6 +31,7 @@ set(GE_SOURCES
     src/ge_vulkan_driver.cpp
     src/ge_vulkan_dynamic_buffer.cpp
     src/ge_vulkan_features.cpp
+    src/ge_vulkan_mesh_cache.cpp
     src/ge_vulkan_shader_manager.cpp
     src/ge_vulkan_texture.cpp
     src/ge_gl_texture.cpp
