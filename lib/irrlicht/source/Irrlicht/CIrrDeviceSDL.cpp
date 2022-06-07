@@ -23,6 +23,7 @@
 #include "ge_main.hpp"
 #include "glad/gl.h"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_scene_manager.hpp"
 #include "MoltenVK.h"
 
 extern bool GLContextDebugBit;
@@ -189,7 +190,12 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	createDriver();
 
 	if (VideoDriver)
-		createGUIAndScene();
+	{
+		if (CreationParams.DriverType == video::EDT_VULKAN)
+			createGUIAndVulkanScene();
+		else
+			createGUIAndScene();
+	}
 #ifdef IOS_STK
 	SDL_SetEventFilter(handle_app_event, NULL);
 #endif
@@ -1579,6 +1585,20 @@ s32 CIrrDeviceSDL::getRightPadding()
 #else
 	return RightPadding * getNativeScaleX();
 #endif
+}
+
+
+void CIrrDeviceSDL::createGUIAndVulkanScene()
+{
+	#ifdef _IRR_COMPILE_WITH_GUI_
+	// create gui environment
+	GUIEnvironment = gui::createGUIEnvironment(FileSystem, VideoDriver, Operator);
+	#endif
+
+	// create Scene manager
+	SceneManager = new GE::GEVulkanSceneManager(VideoDriver, FileSystem, CursorControl, NULL, GUIEnvironment);
+
+	setEventReceiver(UserReceiver);
 }
 
 
