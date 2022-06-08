@@ -22,6 +22,7 @@ using namespace video;
 
 namespace GE
 {
+    class GEVulkanMeshCache;
     enum GEVulkanSampler : unsigned
     {
         GVS_MIN = 0,
@@ -473,6 +474,7 @@ namespace GE
         std::string getDriverVersionString() const;
         void destroySwapChainRelated(bool handle_surface);
         void createSwapChainRelated(bool handle_surface);
+        GEVulkanMeshCache* getVulkanMeshCache() const;
     };
 
 }

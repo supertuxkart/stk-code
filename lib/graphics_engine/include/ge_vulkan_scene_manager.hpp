@@ -14,7 +14,6 @@ public:
     GEVulkanSceneManager(irr::video::IVideoDriver* driver,
                          irr::io::IFileSystem* fs,
                          irr::gui::ICursorControl* cursor_control,
-                         irr::scene::IMeshCache* cache,
                          irr::gui::IGUIEnvironment* gui_environment);
     // ------------------------------------------------------------------------
     ~GEVulkanSceneManager();

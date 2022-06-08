@@ -113,6 +113,8 @@ namespace scene
 
 		//! loaded meshes
 		core::array<MeshEntry> Meshes;
+
+		virtual void meshCacheChanged() {}
 	};
 
 

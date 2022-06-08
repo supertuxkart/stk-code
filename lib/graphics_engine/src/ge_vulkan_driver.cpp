@@ -9,6 +9,9 @@
 #include "ge_vulkan_texture.hpp"
 #include "ge_vulkan_command_loader.hpp"
 
+#include "ISceneManager.h"
+#include "IrrlichtDevice.h"
+
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "SDL_vulkan.h"
 #include <algorithm>
@@ -552,7 +555,6 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         // For GEVulkanDynamicBuffer
         GE::setVideoDriver(this);
         GEVulkan2dRenderer::init(this);
-        GEVulkanMeshCache::init(this);
         createUnicolorTextures();
         GEVulkanFeatures::printStats();
     }
@@ -583,7 +585,7 @@ void GEVulkanDriver::destroyVulkan()
         m_transparent_texture = NULL;
     }
 
-    GEVulkanMeshCache::destroy();
+    getVulkanMeshCache()->destroy();
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
@@ -2025,6 +2027,13 @@ void GEVulkanDriver::waitIdle()
     for (std::mutex* m : m_graphics_queue_mutexes)
         m->unlock();
 }   // waitIdle
+
+// ----------------------------------------------------------------------------
+GEVulkanMeshCache* GEVulkanDriver::getVulkanMeshCache() const
+{
+    return static_cast<GEVulkanMeshCache*>
+        (m_irrlicht_device->getSceneManager()->getMeshCache());
+}   // getVulkanMeshCache
 
 }
 

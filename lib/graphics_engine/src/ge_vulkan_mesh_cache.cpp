@@ -5,59 +5,45 @@
 #include "ge_vulkan_driver.hpp"
 
 #include "IAnimatedMesh.h"
-#include "IMeshCache.h"
-#include "ISceneManager.h"
-#include "IrrlichtDevice.h"
 
 #include <vector>
 
 namespace GE
 {
-namespace GEVulkanMeshCache
-{
-// ============================================================================
-GEVulkanDriver* g_vk;
-uint64_t g_irrlicht_cache_time;
-uint64_t g_ge_cache_time;
-VkBuffer g_vbo_buffer;
-VkDeviceMemory g_vbo_memory;
-VkBuffer g_ibo_buffer;
-VkDeviceMemory g_ibo_memory;
 // ----------------------------------------------------------------------------
-void init(GEVulkanDriver* vk)
+GEVulkanMeshCache::GEVulkanMeshCache()
+                 : irr::scene::CMeshCache()
 {
-    g_vk = vk;
-    g_irrlicht_cache_time = getMonoTimeMs();
-    g_ge_cache_time = 0;
-    g_vbo_buffer = VK_NULL_HANDLE;
-    g_vbo_memory = VK_NULL_HANDLE;
-    g_ibo_buffer = VK_NULL_HANDLE;
-    g_ibo_memory = VK_NULL_HANDLE;
+    m_vk = getVKDriver();
+    m_irrlicht_cache_time = getMonoTimeMs();
+    m_ge_cache_time = 0;
+    m_vbo_buffer = VK_NULL_HANDLE;
+    m_vbo_memory = VK_NULL_HANDLE;
+    m_ibo_buffer = VK_NULL_HANDLE;
+    m_ibo_memory = VK_NULL_HANDLE;
 }   // init
 
 // ----------------------------------------------------------------------------
-void irrlichtMeshChanged()
+void GEVulkanMeshCache::meshCacheChanged()
 {
-    g_irrlicht_cache_time = getMonoTimeMs();
-}   // irrlichtMeshChanged
+    m_irrlicht_cache_time = getMonoTimeMs();
+}   // meshCacheChanged
 
 // ----------------------------------------------------------------------------
-void updateCache()
+void GEVulkanMeshCache::updateCache()
 {
-    if (g_irrlicht_cache_time <= g_ge_cache_time)
+    if (m_irrlicht_cache_time <= m_ge_cache_time)
         return;
-    g_ge_cache_time = g_irrlicht_cache_time;
+    m_ge_cache_time = m_irrlicht_cache_time;
 
     destroy();
     size_t vbo_size, ibo_size;
     vbo_size = 0;
     ibo_size = 0;
-    scene::IMeshCache* cache = g_vk->getIrrlichtDevice()->getSceneManager()
-        ->getMeshCache();
     std::vector<GESPMBuffer*> buffers;
-    for (unsigned i = 0; i < cache->getMeshCount(); i++)
+    for (unsigned i = 0; i < Meshes.size(); i++)
     {
-        scene::IAnimatedMesh* mesh = cache->getMeshByIndex(i);
+        scene::IAnimatedMesh* mesh = Meshes[i].Mesh;
         if (mesh->getMeshType() != scene::EAMT_SPM)
             continue;
         for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
@@ -74,7 +60,7 @@ void updateCache()
     VkBuffer staging_buffer = VK_NULL_HANDLE;
     VkDeviceMemory staging_memory = VK_NULL_HANDLE;
 
-    if (!g_vk->createBuffer(vbo_size,
+    if (!m_vk->createBuffer(vbo_size,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -82,7 +68,7 @@ void updateCache()
         throw std::runtime_error("updateCache create staging vbo failed");
 
     uint8_t* mapped;
-    if (vkMapMemory(g_vk->getDevice(), staging_memory, 0,
+    if (vkMapMemory(m_vk->getDevice(), staging_memory, 0,
         vbo_size, 0, (void**)&mapped) != VK_SUCCESS)
         throw std::runtime_error("updateCache vkMapMemory failed");
     size_t offset = 0;
@@ -96,25 +82,25 @@ void updateCache()
         offset += copy_size;
     }
 
-    if (!g_vk->createBuffer(vbo_size,
+    if (!m_vk->createBuffer(vbo_size,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        g_vbo_buffer, g_vbo_memory))
+        m_vbo_buffer, m_vbo_memory))
         throw std::runtime_error("updateCache create vbo failed");
 
-    g_vk->copyBuffer(staging_buffer, g_vbo_buffer, vbo_size);
-    vkUnmapMemory(g_vk->getDevice(), staging_memory);
-    vkFreeMemory(g_vk->getDevice(), staging_memory, NULL);
-    vkDestroyBuffer(g_vk->getDevice(), staging_buffer, NULL);
+    m_vk->copyBuffer(staging_buffer, m_vbo_buffer, vbo_size);
+    vkUnmapMemory(m_vk->getDevice(), staging_memory);
+    vkFreeMemory(m_vk->getDevice(), staging_memory, NULL);
+    vkDestroyBuffer(m_vk->getDevice(), staging_buffer, NULL);
 
-    if (!g_vk->createBuffer(ibo_size,
+    if (!m_vk->createBuffer(ibo_size,
         VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         staging_buffer, staging_memory))
         throw std::runtime_error("updateCache create staging ibo failed");
 
-    if (vkMapMemory(g_vk->getDevice(), staging_memory, 0,
+    if (vkMapMemory(m_vk->getDevice(), staging_memory, 0,
         ibo_size, 0, (void**)&mapped) != VK_SUCCESS)
         throw std::runtime_error("updateCache vkMapMemory failed");
     offset = 0;
@@ -126,50 +112,36 @@ void updateCache()
         offset += copy_size;
     }
 
-    if (!g_vk->createBuffer(ibo_size,
+    if (!m_vk->createBuffer(ibo_size,
         VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-        g_ibo_buffer, g_ibo_memory))
+        m_ibo_buffer, m_ibo_memory))
         throw std::runtime_error("updateCache create ibo failed");
 
-    g_vk->copyBuffer(staging_buffer, g_ibo_buffer, ibo_size);
-    vkUnmapMemory(g_vk->getDevice(), staging_memory);
-    vkFreeMemory(g_vk->getDevice(), staging_memory, NULL);
-    vkDestroyBuffer(g_vk->getDevice(), staging_buffer, NULL);
+    m_vk->copyBuffer(staging_buffer, m_ibo_buffer, ibo_size);
+    vkUnmapMemory(m_vk->getDevice(), staging_memory);
+    vkFreeMemory(m_vk->getDevice(), staging_memory, NULL);
+    vkDestroyBuffer(m_vk->getDevice(), staging_buffer, NULL);
 }   // updateCache
 
 // ----------------------------------------------------------------------------
-void destroy()
+void GEVulkanMeshCache::destroy()
 {
-    g_vk->waitIdle();
+    m_vk->waitIdle();
 
-    if (g_vbo_memory != VK_NULL_HANDLE)
-        vkFreeMemory(g_vk->getDevice(), g_vbo_memory, NULL);
-    g_vbo_memory = VK_NULL_HANDLE;
-    if (g_vbo_buffer != VK_NULL_HANDLE)
-        vkDestroyBuffer(g_vk->getDevice(), g_vbo_buffer, NULL);
-    g_vbo_buffer = VK_NULL_HANDLE;
+    if (m_vbo_memory != VK_NULL_HANDLE)
+        vkFreeMemory(m_vk->getDevice(), m_vbo_memory, NULL);
+    m_vbo_memory = VK_NULL_HANDLE;
+    if (m_vbo_buffer != VK_NULL_HANDLE)
+        vkDestroyBuffer(m_vk->getDevice(), m_vbo_buffer, NULL);
+    m_vbo_buffer = VK_NULL_HANDLE;
 
-    if (g_ibo_memory != VK_NULL_HANDLE)
-        vkFreeMemory(g_vk->getDevice(), g_ibo_memory, NULL);
-    g_ibo_memory = VK_NULL_HANDLE;
-    if (g_ibo_buffer != VK_NULL_HANDLE)
-        vkDestroyBuffer(g_vk->getDevice(), g_ibo_buffer, NULL);
-    g_ibo_buffer = VK_NULL_HANDLE;
+    if (m_ibo_memory != VK_NULL_HANDLE)
+        vkFreeMemory(m_vk->getDevice(), m_ibo_memory, NULL);
+    m_ibo_memory = VK_NULL_HANDLE;
+    if (m_ibo_buffer != VK_NULL_HANDLE)
+        vkDestroyBuffer(m_vk->getDevice(), m_ibo_buffer, NULL);
+    m_ibo_buffer = VK_NULL_HANDLE;
 }   // destroy
-
-// ----------------------------------------------------------------------------
-VkBuffer getVBO()
-{
-    return g_vbo_buffer;
-}   // getVBO
-
-// ----------------------------------------------------------------------------
-VkBuffer getIBO()
-{
-    return g_ibo_buffer;
-}   // getIBO
-
-}
 
 }
