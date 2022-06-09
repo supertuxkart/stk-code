@@ -12,6 +12,8 @@ GEVulkanSceneManager::GEVulkanSceneManager(irr::video::IVideoDriver* driver,
                     : CSceneManager(driver, fs, cursor_control,
                                     new GEVulkanMeshCache(), gui_environment)
 {
+    // CSceneManager grabbed it
+    getMeshCache()->drop();
 }   // GEVulkanSceneManager
 
 // ----------------------------------------------------------------------------
