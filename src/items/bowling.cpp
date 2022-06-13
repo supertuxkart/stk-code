@@ -234,12 +234,6 @@ void Bowling::onFireFlyable()
     // this would disable gravity.
     setAdjustUpVelocity(false);
 
-    // unset no_contact_response flags, so that the ball
-    // will bounce off the track
-    int flag = getBody()->getCollisionFlags();
-    flag = flag & (~ btCollisionObject::CF_NO_CONTACT_RESPONSE);
-    getBody()->setCollisionFlags(flag);
-
     // should not live forever, auto-destruct after 20 seconds
     m_max_lifespan = stk_config->time2Ticks(20);
 }   // onFireFlyable

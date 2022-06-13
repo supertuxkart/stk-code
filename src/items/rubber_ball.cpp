@@ -90,6 +90,12 @@ void RubberBall::onFireFlyable()
                   btVector3(.0f,.0f,.0f) /*gravity*/,
                   true /*rotates*/);
 
+    // add no_contact_response flags, so that the ball
+    // will not explode if hitting the track or objects
+    int flag = getBody()->getCollisionFlags();
+    flag |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
+    getBody()->setCollisionFlags(flag);
+
     // Do not adjust the up velocity
     setAdjustUpVelocity(false);
     m_max_lifespan       = stk_config->time2Ticks(9999);

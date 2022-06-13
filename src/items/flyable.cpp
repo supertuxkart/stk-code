@@ -186,8 +186,6 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
         m_body->setLinearVelocity(v);
         if(!rotates) m_body->setAngularFactor(0.0f);   // prevent rotations
     }
-    m_body->setCollisionFlags(m_body->getCollisionFlags() |
-                              btCollisionObject::CF_NO_CONTACT_RESPONSE);
 }   // createPhysics
 
 // -----------------------------------------------------------------------------
