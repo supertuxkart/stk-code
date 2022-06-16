@@ -18,6 +18,11 @@ public:
     // ------------------------------------------------------------------------
     ~GEVulkanSceneManager();
     // ------------------------------------------------------------------------
+    virtual irr::scene::ICameraSceneNode* addCameraSceneNode(
+        irr::scene::ISceneNode* parent = 0,
+        const irr::core::vector3df& position = irr::core::vector3df(0, 0, 0),
+        const irr::core::vector3df& lookat = irr::core::vector3df(0, 0, 100),
+        irr::s32 id = -1, bool make_active = true);
 };   // GEVulkanSceneManager
 
 }
