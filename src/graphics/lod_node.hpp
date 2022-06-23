@@ -32,6 +32,7 @@ namespace irr
 using namespace irr;
 
 #include <set>
+#include <memory>
 
 namespace irr
 {
@@ -62,19 +63,10 @@ private:
      *  m_forced_lod is >=0, only this level is be used. */
     int m_forced_lod;
 
+    std::unique_ptr<int> m_current_level;
+
     // Area of the bounding box (for autoLOD computation)
     float m_area;
-
-    enum PreviousVisibility
-    {
-        FIRST_PASS,
-        WAS_SHOWN,
-        WAS_HIDDEN
-    };
-
-    PreviousVisibility m_previous_visibility;
-
-    u32 m_last_tick;
 
 public:
 

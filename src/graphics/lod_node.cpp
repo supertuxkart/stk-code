@@ -40,8 +40,6 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
 
     m_group_name = group_name;
 
-    m_previous_visibility = FIRST_PASS;
-
     // At this stage refcount is two: one because of the object being
     // created, and once because it is a child of the parent. Drop once,
     // so that only the reference from the parent is active, causing this
@@ -49,8 +47,14 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
     drop();
 
     m_forced_lod = -1;
-    m_last_tick = 0;
     m_area = 0;
+#ifndef SERVER_ONLY
+    if (!CVS->isGLSL())
+    {
+        m_current_level.reset(new int);
+        *m_current_level = -1;
+    }
+#endif
 }
 
 LODNode::~LODNode()
@@ -121,6 +125,7 @@ void LODNode::OnAnimate(u32 timeMs)
 #endif
         {
             int level = getLevel();
+            *m_current_level = level;
             // Assume all the scene node have the same bouding box
             if(level>=0)
                 m_nodes[level]->OnAnimate(timeMs);
@@ -149,7 +154,11 @@ void LODNode::updateVisibility(bool* shown)
     if (!isVisible()) return;
     if (m_nodes.size() == 0) return;
 
-    unsigned int level = getLevel();
+    unsigned int level = 0;
+    if (m_current_level)
+        level = *m_current_level;
+    else
+        level = getLevel();
     for (size_t i = 0; i < m_nodes.size(); i++)
     {
         m_nodes[i]->setVisible(i == level);
@@ -170,10 +179,6 @@ void LODNode::OnRegisterSceneNode()
     }
 #endif
 
-    const u32 now = irr_driver->getDevice()->getTimer()->getTime();
-
-    m_previous_visibility = (shown ? WAS_SHOWN : WAS_HIDDEN);
-    m_last_tick = now;
 #ifndef SERVER_ONLY
     if (!CVS->isGLSL())
     {
