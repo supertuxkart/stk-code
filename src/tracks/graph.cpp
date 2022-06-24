@@ -33,6 +33,10 @@
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#endif
+
 const int Graph::UNKNOWN_SECTOR = -1;
 const float Graph::MIN_HEIGHT_TESTING = -1.0f;
 const float Graph::MAX_HEIGHT_TESTING = 5.0f;
@@ -410,7 +414,11 @@ RenderTarget* Graph::makeMiniMap(const core::dimension2du &dimension,
                                  bool invert_x_z)
 {
     // Skip minimap when profiling
-    if (GUIEngine::isNoGraphics()) return NULL;
+#ifdef SERVER_ONLY
+    return NULL;
+#else
+    if (GUIEngine::isNoGraphics() || GE::getVKDriver()) return NULL;
+#endif
 
     const video::SColor oldClearColor = irr_driver->getClearColor();
     irr_driver->setClearbackBufferColor(video::SColor(0, 255, 255, 255));
