@@ -47,7 +47,8 @@ namespace scene
 			: RelativeTranslation(position), RelativeRotation(rotation), RelativeScale(scale),
 				Parent(0), SceneManager(mgr), TriangleSelector(0), ID(id),
 				AutomaticCullingState(EAC_BOX), DebugDataVisible(EDS_OFF),
-				IsVisible(true), IsDebugObject(false)
+				IsVisible(true), IsDebugObject(false),
+				NeedsUpdateAbsTrans(true), UpdatedAbsTrans(false)
 		{
 			if (parent)
 				parent->addChild(this);
@@ -473,7 +474,10 @@ namespace scene
 		/** \param scale New scale of the node, relative to its parent. */
 		virtual void setScale(const core::vector3df& scale)
 		{
+			if (RelativeScale == scale)
+				return;
 			RelativeScale = scale;
+			NeedsUpdateAbsTrans = true;
 		}
 
 
@@ -493,7 +497,10 @@ namespace scene
 		\param rotation New rotation of the node in degrees. */
 		virtual void setRotation(const core::vector3df& rotation)
 		{
+			if (RelativeRotation == rotation)
+				return;
 			RelativeRotation = rotation;
+			NeedsUpdateAbsTrans = true;
 		}
 
 
@@ -512,7 +519,10 @@ namespace scene
 		\param newpos New relative position of the scene node. */
 		virtual void setPosition(const core::vector3df& newpos)
 		{
+			if (RelativeTranslation == newpos)
+				return;
 			RelativeTranslation = newpos;
+			NeedsUpdateAbsTrans = true;
 		}
 
 
@@ -663,15 +673,27 @@ namespace scene
 			hierarchy you might want to update the parents first.*/
 		virtual void updateAbsolutePosition()
 		{
+			bool updated_trans = false;
 			if (Parent)
 			{
-				AbsoluteTransformation =
-					Parent->getAbsoluteTransformation() * getRelativeTransformation();
+				if (Parent->UpdatedAbsTrans || NeedsUpdateAbsTrans)
+				{
+					AbsoluteTransformation =
+						Parent->getAbsoluteTransformation() * getRelativeTransformation();
+					updated_trans = true;
+				}
 			}
 			else
-				AbsoluteTransformation = getRelativeTransformation();
+			{
+				if (NeedsUpdateAbsTrans)
+				{
+					AbsoluteTransformation = getRelativeTransformation();
+					updated_trans = true;
+				}
+			}
+			UpdatedAbsTrans = updated_trans;
+			NeedsUpdateAbsTrans = false;
 		}
-
 
 		//! Returns the parent of this scene node
 		/** \return A pointer to the parent. */
@@ -759,6 +781,12 @@ namespace scene
 		/** \return The node's scene manager. */
 		virtual ISceneManager* getSceneManager(void) const { return SceneManager; }
 
+		//! STK addition to optimize updateAbsolutePosition, only do that if changed transformation.
+		bool getNeedsUpdateAbsTrans() const { return NeedsUpdateAbsTrans; }
+		bool getUpdatedAbsTrans() const { return UpdatedAbsTrans; }
+		void setNeedsUpdateAbsTrans(bool val) { NeedsUpdateAbsTrans = val; }
+		void setUpdatedAbsTrans(bool val) { UpdatedAbsTrans = val; }
+
 	protected:
 
 		//! A clone function for the ISceneNode members.
@@ -779,6 +807,8 @@ namespace scene
 			DebugDataVisible = toCopyFrom->DebugDataVisible;
 			IsVisible = toCopyFrom->IsVisible;
 			IsDebugObject = toCopyFrom->IsDebugObject;
+			NeedsUpdateAbsTrans = true;
+			UpdatedAbsTrans = false;
 
 			if (newManager)
 				SceneManager = newManager;
@@ -858,6 +888,8 @@ namespace scene
 
 		//! Is debug object?
 		bool IsDebugObject;
+
+		bool NeedsUpdateAbsTrans, UpdatedAbsTrans;
 	};
 
 
