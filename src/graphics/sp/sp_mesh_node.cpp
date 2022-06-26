@@ -171,7 +171,7 @@ IMesh* SPMeshNode::getMeshForCurrentFrame()
     }
     m_mesh->getSkinningMatrices(getFrameNr(), m_skinning_matrices.data(),
         m_saved_transition_frame, TransitingBlend);
-    updateAbsolutePosition();
+    recursiveUpdateAbsolutePosition();
 
     for (Armature& arm : m_mesh->getArmatures())
     {
