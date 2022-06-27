@@ -135,7 +135,9 @@ void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz,
     }
     m_node->setRotation(hpr);
     m_node->setScale(scale);
+    bool prev_needs_update = m_node->getNeedsUpdateAbsTrans();
     m_node->updateAbsolutePosition();
+    m_node->setNeedsUpdateAbsTrans(prev_needs_update);
 }   // move
 
 // ----------------------------------------------------------------------------
@@ -279,6 +281,7 @@ TrackObjectPresentationLibraryNode::TrackObjectPresentationLibraryNode(
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);
     m_node->updateAbsolutePosition();
+    m_node->setNeedsUpdateAbsTrans(true);
 
     assert(libroot != NULL);
     Track::getCurrentTrack()->loadObjects(libroot, lib_path, model_def_loader,

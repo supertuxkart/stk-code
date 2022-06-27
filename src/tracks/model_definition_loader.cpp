@@ -157,6 +157,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
         std::string debug_name = groupname+" (LOD track-object)";
         lod_node->setName(debug_name.c_str());
 #endif
+        lod_node->setNeedsUpdateAbsTrans(true);
         return lod_node;
     }
     else

@@ -254,4 +254,5 @@ void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
     node->drop();
 
     node->updateAbsolutePosition();
+    node->setNeedsUpdateAbsTrans(true);
 }
