@@ -85,6 +85,7 @@ btWheelInfo& btKart::addWheel(const btVector3& connectionPointCS,
     m_wheelInfo.push_back( btWheelInfo(ci));
 
     btWheelInfo& wheel = m_wheelInfo[getNumWheels()-1];
+    memset(&wheel.m_raycastInfo, 0, sizeof(wheel.m_raycastInfo));
 
     updateWheelTransformsWS(wheel, getChassisWorldTransform(), false);
     updateWheelTransform(getNumWheels()-1,false);
