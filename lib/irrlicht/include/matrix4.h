@@ -12,9 +12,6 @@
 #include "aabbox3d.h"
 #include "rect.h"
 #include "irrString.h"
-#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
-	#include <intrin.h>
-#endif
 
 // enable this to keep track of changes to the matrix
 // and make simpler identity check for seldomly changing matrices
@@ -48,9 +45,6 @@ namespace core
 	class CMatrix4
 	{
     private:
-#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
-        float M_raw[24];
-#endif
 		public:
 
 			//! Constructor Flags
@@ -409,12 +403,7 @@ namespace core
 			bool equals(const core::CMatrix4<T>& other, const T tolerance=(T)ROUNDING_ERROR_f64) const;
 
 		private:
-#if defined(WIN32) && !defined(__MINGW32__)  && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
-			//! Matrix data, stored in row-major order
-            T* M = (T*)((uintptr_t)&M_raw[4] & ~0xF);
-#else
-            T M[16];
-#endif
+			T M[16];
 #if defined ( USE_MATRIX_TEST )
 			//! Flag is this matrix is identity matrix
 			mutable u32 definitelyIdentityMatrix;
@@ -669,58 +658,6 @@ namespace core
 		const T *m1 = other_a.M;
 		const T *m2 = other_b.M;
 
-#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
-        // From http://drrobsjournal.blogspot.fr/2012/10/fast-simd-4x4-matrix-multiplication.html
-        // Use unaligned load/store
-
-        const float *matA = other_a.pointer();
-
-        const __m128 a = _mm_load_ps(matA); // First row
-        const __m128 b = _mm_load_ps(&matA[4]); // Second row
-        const __m128 c = _mm_load_ps(&matA[8]); // Third row
-        const __m128 d = _mm_load_ps(&matA[12]); // Fourth row
-
-         __m128 t1 = _mm_set1_ps(m2[0]);
-         __m128 t2 = _mm_mul_ps(a, t1);
-        t1 = _mm_set1_ps(m2[1]);
-        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
-        t1 = _mm_set1_ps(m2[2]);
-        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
-        t1 = _mm_set1_ps(m2[3]);
-        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[0], t2);
-
-        t1 = _mm_set1_ps(m2[4]);
-        t2 = _mm_mul_ps(a, t1);
-        t1 = _mm_set1_ps(m2[5]);
-        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
-        t1 = _mm_set1_ps(m2[6]);
-        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
-        t1 = _mm_set1_ps(m2[7]);
-        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[4], t2);
-
-        t1 = _mm_set1_ps(m2[8]);
-        t2 = _mm_mul_ps(a, t1);
-        t1 = _mm_set1_ps(m2[9]);
-        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
-        t1 = _mm_set1_ps(m2[10]);
-        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
-        t1 = _mm_set1_ps(m2[11]);
-        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[8], t2);
-
-        t1 = _mm_set1_ps(m2[12]);
-        t2 = _mm_mul_ps(a, t1);
-        t1 = _mm_set1_ps(m2[13]);
-        t2 = _mm_add_ps(_mm_mul_ps(b, t1), t2);
-        t1 = _mm_set1_ps(m2[14]);
-        t2 = _mm_add_ps(_mm_mul_ps(c, t1), t2);
-        t1 = _mm_set1_ps(m2[15]);
-        t2 = _mm_add_ps(_mm_mul_ps(d, t1), t2);
-        _mm_store_ps(&M[12], t2);
-#else
-
 		M[0] = m1[0]*m2[0] + m1[4]*m2[1] + m1[8]*m2[2] + m1[12]*m2[3];
 		M[1] = m1[1]*m2[0] + m1[5]*m2[1] + m1[9]*m2[2] + m1[13]*m2[3];
 		M[2] = m1[2]*m2[0] + m1[6]*m2[1] + m1[10]*m2[2] + m1[14]*m2[3];
@@ -742,7 +679,6 @@ namespace core
 		M[15] = m1[3]*m2[12] + m1[7]*m2[13] + m1[11]*m2[14] + m1[15]*m2[15];
 #if defined ( USE_MATRIX_TEST )
 		definitelyIdentityMatrix=false;
-#endif
 #endif
 		return *this;
 	}
@@ -1385,97 +1321,6 @@ namespace core
         }
 #endif
         const CMatrix4<T> &m = *this;
-#if defined(WIN32) && !defined(__MINGW32__) && (defined(__x86_64__) || defined(_M_X64) || defined(__i386) || defined(_M_IX86))
-        float *src = (float*)m.pointer();
-        float *dst = (float*)out.pointer();
-        // from http://www.intel.com/design/pentiumiii/sml/245043.htm
-        {
-            __m128 minor0 = {}, minor1 = {}, minor2 = {}, minor3 = {};
-            __m128 row0 = {}, row1 = {}, row2 = {}, row3 = {};
-            __m128 det = {}, tmp1 = {};
-            tmp1 = _mm_loadh_pi(_mm_loadl_pi(tmp1, (__m64*)(src)), (__m64*)(src + 4));
-            row1 = _mm_loadh_pi(_mm_loadl_pi(row1, (__m64*)(src + 8)), (__m64*)(src + 12));
-            row0 = _mm_shuffle_ps(tmp1, row1, 0x88);
-            row1 = _mm_shuffle_ps(row1, tmp1, 0xDD);
-            tmp1 = _mm_loadh_pi(_mm_loadl_pi(tmp1, (__m64*)(src + 2)), (__m64*)(src + 6));
-            row3 = _mm_loadh_pi(_mm_loadl_pi(row3, (__m64*)(src + 10)), (__m64*)(src + 14));
-            row2 = _mm_shuffle_ps(tmp1, row3, 0x88);
-            row3 = _mm_shuffle_ps(row3, tmp1, 0xDD);
-            // -----------------------------------------------
-            tmp1 = _mm_mul_ps(row2, row3);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
-            minor0 = _mm_mul_ps(row1, tmp1);
-            minor1 = _mm_mul_ps(row0, tmp1);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
-            minor0 = _mm_sub_ps(_mm_mul_ps(row1, tmp1), minor0);
-            minor1 = _mm_sub_ps(_mm_mul_ps(row0, tmp1), minor1);
-            minor1 = _mm_shuffle_ps(minor1, minor1, 0x4E);
-            // -----------------------------------------------
-            tmp1 = _mm_mul_ps(row1, row2);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
-            minor0 = _mm_add_ps(_mm_mul_ps(row3, tmp1), minor0);
-            minor3 = _mm_mul_ps(row0, tmp1);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
-            minor0 = _mm_sub_ps(minor0, _mm_mul_ps(row3, tmp1));
-            minor3 = _mm_sub_ps(_mm_mul_ps(row0, tmp1), minor3);
-            minor3 = _mm_shuffle_ps(minor3, minor3, 0x4E);
-            // -----------------------------------------------
-            tmp1 = _mm_mul_ps(_mm_shuffle_ps(row1, row1, 0x4E), row3);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
-            row2 = _mm_shuffle_ps(row2, row2, 0x4E);
-            minor0 = _mm_add_ps(_mm_mul_ps(row2, tmp1), minor0);
-            minor2 = _mm_mul_ps(row0, tmp1);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
-            minor0 = _mm_sub_ps(minor0, _mm_mul_ps(row2, tmp1));
-            minor2 = _mm_sub_ps(_mm_mul_ps(row0, tmp1), minor2);
-            minor2 = _mm_shuffle_ps(minor2, minor2, 0x4E);
-            // -----------------------------------------------
-            tmp1 = _mm_mul_ps(row0, row1);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
-            minor2 = _mm_add_ps(_mm_mul_ps(row3, tmp1), minor2);
-            minor3 = _mm_sub_ps(_mm_mul_ps(row2, tmp1), minor3);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
-            minor2 = _mm_sub_ps(_mm_mul_ps(row3, tmp1), minor2);
-            minor3 = _mm_sub_ps(minor3, _mm_mul_ps(row2, tmp1));
-            // -----------------------------------------------
-            tmp1 = _mm_mul_ps(row0, row3);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
-            minor1 = _mm_sub_ps(minor1, _mm_mul_ps(row2, tmp1));
-            minor2 = _mm_add_ps(_mm_mul_ps(row1, tmp1), minor2);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
-            minor1 = _mm_add_ps(_mm_mul_ps(row2, tmp1), minor1);
-            minor2 = _mm_sub_ps(minor2, _mm_mul_ps(row1, tmp1));
-            // -----------------------------------------------
-            tmp1 = _mm_mul_ps(row0, row2);
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0xB1);
-            minor1 = _mm_add_ps(_mm_mul_ps(row3, tmp1), minor1);
-            minor3 = _mm_sub_ps(minor3, _mm_mul_ps(row1, tmp1));
-            tmp1 = _mm_shuffle_ps(tmp1, tmp1, 0x4E);
-            minor1 = _mm_sub_ps(minor1, _mm_mul_ps(row3, tmp1));
-            minor3 = _mm_add_ps(_mm_mul_ps(row1, tmp1), minor3);
-            // -----------------------------------------------
-            det = _mm_mul_ps(row0, minor0);
-            det = _mm_add_ps(_mm_shuffle_ps(det, det, 0x4E), det);
-            det = _mm_add_ss(_mm_shuffle_ps(det, det, 0xB1), det);
-            tmp1 = _mm_rcp_ss(det);
-            det = _mm_sub_ss(_mm_add_ss(tmp1, tmp1), _mm_mul_ss(det, _mm_mul_ss(tmp1, tmp1)));
-            det = _mm_shuffle_ps(det, det, 0x00);
-            minor0 = _mm_mul_ps(det, minor0);
-            _mm_storel_pi((__m64*)(dst), minor0);
-            _mm_storeh_pi((__m64*)(dst + 2), minor0);
-            minor1 = _mm_mul_ps(det, minor1);
-            _mm_storel_pi((__m64*)(dst + 4), minor1);
-            _mm_storeh_pi((__m64*)(dst + 6), minor1);
-            minor2 = _mm_mul_ps(det, minor2);
-            _mm_storel_pi((__m64*)(dst + 8), minor2);
-            _mm_storeh_pi((__m64*)(dst + 10), minor2);
-            minor3 = _mm_mul_ps(det, minor3);
-            _mm_storel_pi((__m64*)(dst + 12), minor3);
-            _mm_storeh_pi((__m64*)(dst + 14), minor3);
-        }
-        return true;
-#else
-
 		f32 d = (m(0, 0) * m(1, 1) - m(0, 1) * m(1, 0)) * (m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2)) -
 			(m(0, 0) * m(1, 2) - m(0, 2) * m(1, 0)) * (m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1)) +
 			(m(0, 0) * m(1, 3) - m(0, 3) * m(1, 0)) * (m(2, 1) * m(3, 2) - m(2, 2) * m(3, 1)) +
@@ -1541,7 +1386,6 @@ namespace core
 		out.definitelyIdentityMatrix = definitelyIdentityMatrix;
 #endif
 		return true;
-#endif
 	}
 
 
