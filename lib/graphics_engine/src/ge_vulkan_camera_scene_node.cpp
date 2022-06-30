@@ -26,23 +26,21 @@ GEVulkanCameraSceneNode::~GEVulkanCameraSceneNode()
 void GEVulkanCameraSceneNode::render()
 {
     irr::scene::CCameraSceneNode::render();
-    memcpy(m_ubo_data.m_view_matrix.data(),
-        ViewArea.getTransform(irr::video::ETS_VIEW).pointer(),
-        16 * sizeof(float));
-    memcpy(m_ubo_data.m_projection_matrix.data(),
-        ViewArea.getTransform(irr::video::ETS_PROJECTION).pointer(),
-        16 * sizeof(float));
+
+    m_ubo_data.m_view_matrix = ViewArea.getTransform(irr::video::ETS_VIEW);
+    m_ubo_data.m_projection_matrix = ViewArea.getTransform(irr::video::ETS_PROJECTION);
+
     irr::core::matrix4 mat;
     ViewArea.getTransform(irr::video::ETS_VIEW).getInverse(mat);
-    memcpy(m_ubo_data.m_inverse_view_matrix.data(), mat.pointer(),
-        16 * sizeof(float));
+    m_ubo_data.m_inverse_view_matrix = mat;
+
     ViewArea.getTransform(irr::video::ETS_PROJECTION).getInverse(mat);
-    memcpy(m_ubo_data.m_inverse_projection_matrix.data(), mat.pointer(),
-        16 * sizeof(float));
+    m_ubo_data.m_inverse_projection_matrix = mat;
+
     mat = ViewArea.getTransform(irr::video::ETS_PROJECTION) *
         ViewArea.getTransform(irr::video::ETS_VIEW);
-    memcpy(m_ubo_data.m_projection_view_matrix.data(), mat.pointer(),
-        16 * sizeof(float));
+
+    m_ubo_data.m_projection_view_matrix = mat;
 }   // render
 
 }

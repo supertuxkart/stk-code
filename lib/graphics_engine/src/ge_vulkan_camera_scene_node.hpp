@@ -9,11 +9,11 @@ namespace GE
 {
 struct GEVulkanCameraUBO
 {
-std::array<float, 16> m_view_matrix;
-std::array<float, 16> m_projection_matrix;
-std::array<float, 16> m_inverse_view_matrix;
-std::array<float, 16> m_inverse_projection_matrix;
-std::array<float, 16> m_projection_view_matrix;
+irr::core::matrix4 m_view_matrix;
+irr::core::matrix4 m_projection_matrix;
+irr::core::matrix4 m_inverse_view_matrix;
+irr::core::matrix4 m_inverse_projection_matrix;
+irr::core::matrix4 m_projection_view_matrix;
 };
 
 class GEVulkanDynamicBuffer;
