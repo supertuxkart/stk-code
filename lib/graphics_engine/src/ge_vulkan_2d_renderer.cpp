@@ -72,6 +72,8 @@ void GEVulkan2dRenderer::destroy()
     delete g_tris_index_buffer;
     g_tris_index_buffer = NULL;
 
+    if (!g_vk)
+        return;
     vkDestroyDescriptorSetLayout(g_vk->getDevice(), g_descriptor_set_layout,
         NULL);
     vkDestroyDescriptorPool(g_vk->getDevice(), g_descriptor_pool, NULL);

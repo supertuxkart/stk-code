@@ -561,7 +561,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     catch (std::exception& e)
     {
         destroyVulkan();
-        throw std::runtime_error("GEVulkanDriver constructor failed");
+        throw std::runtime_error(std::string(
+            "GEVulkanDriver constructor failed: ") + e.what());
     }
 }   // GEVulkanDriver
 
@@ -585,7 +586,9 @@ void GEVulkanDriver::destroyVulkan()
         m_transparent_texture = NULL;
     }
 
-    getVulkanMeshCache()->destroy();
+    if (m_irrlicht_device->getSceneManager() &&
+        m_irrlicht_device->getSceneManager()->getMeshCache())
+        getVulkanMeshCache()->destroy();
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
