@@ -210,6 +210,7 @@ extern "C" PFN_vkVoidFunction loader(void* user_ptr, const char* name)
         "vkCreateBufferView",
         "vkCreateCommandPool",
         "vkCreateComputePipelines",
+        "vkCreateDebugUtilsMessengerEXT",
         "vkCreateDeferredOperationKHR",
         "vkCreateDescriptorPool",
         "vkCreateDescriptorSetLayout",
@@ -448,6 +449,17 @@ extern "C" PFN_vkVoidFunction loader(void* user_ptr, const char* name)
 }   // loader
 #endif
 
+#ifdef ENABLE_VALIDATION
+extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL validationDebugInfo(VkDebugUtilsMessageSeverityFlagBitsEXT sev,
+                                                                     VkDebugUtilsMessageTypeFlagsEXT type,
+                                                                     const VkDebugUtilsMessengerCallbackDataEXT *cb,
+                                                                     void *priv)
+{
+    os::Printer::log("Vulkan validation layer debug", cb->pMessage);
+    return VK_FALSE;
+}
+#endif
+
 namespace GE
 {
 std::atomic_bool g_device_created(false);
@@ -505,6 +517,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
 
     if (SDL_Vulkan_CreateSurface(window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
         throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
+
     int w, h = 0;
     SDL_Vulkan_GetDrawableSize(window, &w, &h);
     ScreenSize.Width = w;
@@ -668,6 +681,7 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
 
     std::vector<const char*> enabled_validation_layers;
 #ifdef ENABLE_VALIDATION
+// TODO could become a UI toggle ?
     for (VkLayerProperties& prop : available_layers)
     {
         if (std::string(prop.layerName) == "VK_LAYER_KHRONOS_validation")
@@ -692,6 +706,22 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     VkResult result = vkCreateInstance(&create_info, NULL, &m_vk->instance);
     if (result != VK_SUCCESS)
         throw std::runtime_error("vkCreateInstance failed");
+#ifdef ENABLE_VALIDATION
+    if (vkCreateDebugUtilsMessengerEXT)
+    {
+        VkDebugUtilsMessengerCreateInfoEXT debug_callback = {};
+        debug_callback.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        debug_callback.pNext = NULL;
+        debug_callback.flags = 0;
+        debug_callback.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        debug_callback.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        debug_callback.pfnUserCallback = validationDebugInfo;
+        debug_callback.pUserData = NULL;
+
+        if (vkCreateDebugUtilsMessengerEXT && vkCreateDebugUtilsMessengerEXT(m_vk->instance, &debug_callback, NULL, &m_vk->debug))
+            os::Printer::log("Vulkan debug validation layers", "failed");
+    }
+#endif
 }   // createInstance
 
 // ----------------------------------------------------------------------------

@@ -376,6 +376,7 @@ namespace GE
             VkSurfaceKHR surface;
             VkDevice device;
             VkSwapchainKHR swap_chain;
+            VkDebugUtilsMessengerEXT debug;
             std::vector<VkImage> swap_chain_images;
             std::vector<VkImageView> swap_chain_image_views;
             std::vector<VkSemaphore> image_available_semaphores;
@@ -391,6 +392,7 @@ namespace GE
                 surface = VK_NULL_HANDLE;
                 device = VK_NULL_HANDLE;
                 swap_chain = VK_NULL_HANDLE;
+                debug = VK_NULL_HANDLE;
                 samplers = {{}};
                 render_pass = VK_NULL_HANDLE;
             }
@@ -416,6 +418,8 @@ namespace GE
                     vkDestroyDevice(device, NULL);
                 if (surface != VK_NULL_HANDLE)
                     vkDestroySurfaceKHR(instance, surface, NULL);
+                if (debug != VK_NULL_HANDLE)
+                    vkDestroyDebugUtilsMessengerEXT(instance, debug, NULL);
                 if (instance != VK_NULL_HANDLE)
                     vkDestroyInstance(instance, NULL);
             }

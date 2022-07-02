@@ -33,6 +33,7 @@ CMAKE_DEPENDENT_OPTION(USE_IPV6 "Allow create or connect to game server with IPv
   "NOT USE_SWITCH" OFF)
 option(USE_SYSTEM_WIIUSE "Use system WiiUse instead of the built-in version, when available." OFF)
 option(USE_SQLITE3 "Use sqlite to manage server stats and ban list." ON)
+option(ENABLE_VALIDATION "Enable vulkan validation layer." OFF)
 
 if(APPLE)
     CMAKE_DEPENDENT_OPTION(DLOPEN_MOLTENVK "Use dlopen to load MoltenVK for Apple." ON
@@ -188,6 +189,8 @@ endif()
 if(SERVER_ONLY)
     add_definitions(-DSERVER_ONLY)
     add_definitions(-DNO_IRR_COMPILE_WITH_X11_ -DNO_IRR_COMPILE_WITH_OPENGL_)
+elseif(ENABLE_VALIDATION)
+    add_definitions(-DENABLE_VALIDATION)
 endif()
 
 if(UNIX OR MINGW)
