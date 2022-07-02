@@ -9,6 +9,7 @@
 #include "ge_vulkan_texture.hpp"
 #include "ge_vulkan_command_loader.hpp"
 
+#include "ICameraSceneNode.h"
 #include "ISceneManager.h"
 #include "IrrlichtDevice.h"
 
@@ -584,6 +585,12 @@ void GEVulkanDriver::destroyVulkan()
     {
         m_transparent_texture->drop();
         m_transparent_texture = NULL;
+    }
+
+    if (m_irrlicht_device->getSceneManager() &&
+        m_irrlicht_device->getSceneManager()->getActiveCamera())
+    {
+        m_irrlicht_device->getSceneManager()->setActiveCamera(NULL);
     }
 
     if (m_irrlicht_device->getSceneManager() &&
