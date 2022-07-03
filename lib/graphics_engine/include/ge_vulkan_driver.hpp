@@ -475,6 +475,7 @@ namespace GE
         void destroySwapChainRelated(bool handle_surface);
         void createSwapChainRelated(bool handle_surface);
         GEVulkanMeshCache* getVulkanMeshCache() const;
+        void buildCommandBuffers();
     };
 
 }

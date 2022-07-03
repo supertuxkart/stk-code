@@ -334,43 +334,22 @@ void GEVulkan2dRenderer::createDescriptorSets()
 }   // createDescriptorSets
 
 // ----------------------------------------------------------------------------
+void GEVulkan2dRenderer::uploadTrisBuffers()
+{
+    if (g_tex_map.empty())
+        return;
+
+    g_tris_buffer->setCurrentData(g_tris_queue.data(),
+        g_tris_queue.size() * sizeof(Tri));
+    g_tris_index_buffer->setCurrentData(g_tris_index_queue.data(),
+        g_tris_index_queue.size() * sizeof(uint16_t));
+}   // uploadTrisBuffers
+
+// ----------------------------------------------------------------------------
 void GEVulkan2dRenderer::render()
 {
-    std::array<VkClearValue, 2> clear_values = {};
-    video::SColorf cf(g_vk->getClearColor());
-    clear_values[0].color =
-    {
-        cf.getRed(), cf.getGreen(), cf.getBlue(), cf.getAlpha()
-    };
-    clear_values[1].depthStencil = {1.0f, 0};
-
-    VkRenderPassBeginInfo render_pass_info = {};
-    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    render_pass_info.renderPass = g_vk->getRenderPass();
-    render_pass_info.framebuffer =
-        g_vk->getSwapChainFramebuffers()[g_vk->getCurrentImageIndex()];
-    render_pass_info.renderArea.offset = {0, 0};
-    render_pass_info.renderArea.extent = g_vk->getSwapChainExtent();
-    render_pass_info.clearValueCount = (uint32_t)(clear_values.size());
-    render_pass_info.pClearValues = &clear_values[0];
-
-    VkCommandBufferBeginInfo begin_info = {};
-    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-
     if (g_tex_map.empty())
-    {
-        VkResult result = vkBeginCommandBuffer(g_vk->getCurrentCommandBuffer(),
-            &begin_info);
-        if (result != VK_SUCCESS)
-            return;
-
-        vkCmdBeginRenderPass(g_vk->getCurrentCommandBuffer(), &render_pass_info,
-            VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdEndRenderPass(g_vk->getCurrentCommandBuffer());
-        vkEndCommandBuffer(g_vk->getCurrentCommandBuffer());
         return;
-    }
 
     std::vector<std::pair<const irr::video::ITexture*, unsigned> > tex_map;
     for (auto& tex : g_tex_map)
@@ -440,24 +419,11 @@ void GEVulkan2dRenderer::render()
     int sampler_idx = 0;
     core::recti clip;
 
-    VkResult result = vkBeginCommandBuffer(g_vk->getCurrentCommandBuffer(),
-        &begin_info);
-    if (result != VK_SUCCESS)
-        goto end;
-
-    g_tris_buffer->setCurrentData(g_tris_queue.data(),
-        g_tris_queue.size() * sizeof(Tri));
-    g_tris_index_buffer->setCurrentData(g_tris_index_queue.data(),
-        g_tris_index_queue.size() * sizeof(uint16_t));
-
-    vkCmdBeginRenderPass(g_vk->getCurrentCommandBuffer(), &render_pass_info,
-        VK_SUBPASS_CONTENTS_INLINE);
-
     vertex_buffer = g_tris_buffer->getCurrentBuffer();
     indices_buffer = g_tris_index_buffer->getCurrentBuffer();
 
     if (vertex_buffer == VK_NULL_HANDLE || indices_buffer == VK_NULL_HANDLE)
-        goto end_cmd;
+        goto end;
 
     vkCmdBindPipeline(g_vk->getCurrentCommandBuffer(),
         VK_PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
@@ -541,10 +507,6 @@ void GEVulkan2dRenderer::render()
 
     vkCmdDrawIndexed(g_vk->getCurrentCommandBuffer(), idx_count, 1,
         idx - idx_count, 0, 0);
-
-end_cmd:
-    vkCmdEndRenderPass(g_vk->getCurrentCommandBuffer());
-    vkEndCommandBuffer(g_vk->getCurrentCommandBuffer());
 
 end:
     clear();

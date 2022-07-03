@@ -1467,7 +1467,7 @@ bool GEVulkanDriver::endScene()
         return false;
     }
 
-    GEVulkan2dRenderer::render();
+    buildCommandBuffers();
 
     VkSemaphore wait_semaphores[] = {m_vk->image_available_semaphores[m_current_frame]};
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
@@ -2044,6 +2044,47 @@ GEVulkanMeshCache* GEVulkanDriver::getVulkanMeshCache() const
     return static_cast<GEVulkanMeshCache*>
         (m_irrlicht_device->getSceneManager()->getMeshCache());
 }   // getVulkanMeshCache
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::buildCommandBuffers()
+{
+    std::array<VkClearValue, 2> clear_values = {};
+    video::SColorf cf(getClearColor());
+    clear_values[0].color =
+    {
+        cf.getRed(), cf.getGreen(), cf.getBlue(), cf.getAlpha()
+    };
+    clear_values[1].depthStencil = {1.0f, 0};
+
+    VkRenderPassBeginInfo render_pass_info = {};
+    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    render_pass_info.renderPass = getRenderPass();
+    render_pass_info.framebuffer =
+        getSwapChainFramebuffers()[getCurrentImageIndex()];
+    render_pass_info.renderArea.offset = {0, 0};
+    render_pass_info.renderArea.extent = getSwapChainExtent();
+    render_pass_info.clearValueCount = (uint32_t)(clear_values.size());
+    render_pass_info.pClearValues = &clear_values[0];
+
+    VkCommandBufferBeginInfo begin_info = {};
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    VkResult result = vkBeginCommandBuffer(getCurrentCommandBuffer(),
+        &begin_info);
+    if (result != VK_SUCCESS)
+        return;
+
+    GEVulkan2dRenderer::uploadTrisBuffers();
+
+    vkCmdBeginRenderPass(getCurrentCommandBuffer(), &render_pass_info,
+        VK_SUBPASS_CONTENTS_INLINE);
+
+    GEVulkan2dRenderer::render();
+
+    vkCmdEndRenderPass(getCurrentCommandBuffer());
+    vkEndCommandBuffer(getCurrentCommandBuffer());
+}   // buildCommandBuffers
 
 }
 
