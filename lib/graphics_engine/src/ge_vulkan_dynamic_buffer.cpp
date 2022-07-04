@@ -17,7 +17,7 @@ GEVulkanDynamicBuffer::GEVulkanDynamicBuffer(GEVulkanDynamicBufferType t,
 {
     m_type = t;
     m_usage = usage;
-    m_size = initial_size;
+    m_size = m_real_size = initial_size;
 
     m_buffer = new VkBuffer[GEVulkanDriver::getMaxFrameInFlight()];
     m_memory = new VkDeviceMemory[GEVulkanDriver::getMaxFrameInFlight()];
@@ -206,6 +206,7 @@ void GEVulkanDynamicBuffer::setCurrentData(void* data, size_t size)
         for (unsigned i = 0; i < GEVulkanDriver::getMaxFrameInFlight(); i++)
             initPerFrame(i);
     }
+    m_real_size = size;
     if (m_mapped_addr[cur_frame] == NULL)
         return;
     memcpy(m_mapped_addr[cur_frame], data, size);

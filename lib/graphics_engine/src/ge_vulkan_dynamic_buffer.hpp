@@ -31,7 +31,7 @@ private:
 
     static VkMemoryPropertyFlags m_host_flag;
 
-    size_t m_size;
+    size_t m_size, m_real_size;
 
     // ------------------------------------------------------------------------
     void initPerFrame(unsigned frame);
@@ -49,6 +49,8 @@ public:
     void setCurrentData(void* data, size_t size);
     // ------------------------------------------------------------------------
     VkBuffer getCurrentBuffer() const;
+    // ------------------------------------------------------------------------
+    size_t getRealSize() const                          { return m_real_size; }
 };   // GEVulkanDynamicBuffer
 
 }
