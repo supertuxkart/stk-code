@@ -207,7 +207,7 @@ void GEVulkanDynamicBuffer::setCurrentData(void* data, size_t size)
             initPerFrame(i);
     }
     m_real_size = size;
-    if (m_mapped_addr[cur_frame] == NULL)
+    if (size == 0 || m_mapped_addr[cur_frame] == NULL)
         return;
     memcpy(m_mapped_addr[cur_frame], data, size);
     if (m_type == GVDBT_GPU_RAM)
