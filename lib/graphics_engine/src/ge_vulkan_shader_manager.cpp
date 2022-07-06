@@ -55,6 +55,8 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
 // ----------------------------------------------------------------------------
 void GEVulkanShaderManager::destroy()
 {
+    if (!g_vk)
+        return;
     vkDestroyShaderModule(g_vk->getDevice(), g_2d_render_vert, NULL);
     vkDestroyShaderModule(g_vk->getDevice(), g_2d_render_frag, NULL);
 }   // destroy
