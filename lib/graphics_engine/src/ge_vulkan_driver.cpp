@@ -3,11 +3,12 @@
 #include "ge_main.hpp"
 
 #include "ge_vulkan_2d_renderer.hpp"
+#include "ge_vulkan_camera_scene_node.hpp"
+#include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 #include "ge_vulkan_texture.hpp"
-#include "ge_vulkan_command_loader.hpp"
 
 #include "ICameraSceneNode.h"
 #include "ISceneManager.h"
@@ -1896,7 +1897,16 @@ void GEVulkanDriver::setViewPort(const core::rect<s32>& area)
     core::rect<s32> rendert(0,0, getCurrentRenderTargetSize().Width, getCurrentRenderTargetSize().Height);
     vp.clipAgainst(rendert);
     if (vp.getHeight() > 0 && vp.getWidth() > 0)
+    {
         m_viewport = vp;
+        if (m_irrlicht_device->getSceneManager() &&
+            m_irrlicht_device->getSceneManager()->getActiveCamera())
+        {
+            GEVulkanCameraSceneNode* cam = static_cast<GEVulkanCameraSceneNode*>
+                (m_irrlicht_device->getSceneManager()->getActiveCamera());
+            cam->setViewPort(area);
+        }
+    }
 }   // setViewPort
 
 // ----------------------------------------------------------------------------

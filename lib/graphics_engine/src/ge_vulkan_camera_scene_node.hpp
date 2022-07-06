@@ -24,6 +24,8 @@ private:
     GEVulkanDynamicBuffer* m_buffer;
 
     GEVulkanCameraUBO m_ubo_data;
+
+    irr::core::rect<irr::s32> m_viewport;
 public:
     // ------------------------------------------------------------------------
     GEVulkanCameraSceneNode(irr::scene::ISceneNode* parent,
@@ -36,6 +38,11 @@ public:
     virtual void render();
     // ------------------------------------------------------------------------
     GEVulkanDynamicBuffer* getBuffer() const               { return m_buffer; }
+    // ------------------------------------------------------------------------
+    void setViewPort(const irr::core::rect<irr::s32>& area)
+                                                         { m_viewport = area; }
+    // ------------------------------------------------------------------------
+    const irr::core::rect<irr::s32>& getViewPort() const { return m_viewport; }
 };   // GEVulkanCameraSceneNode
 
 }
