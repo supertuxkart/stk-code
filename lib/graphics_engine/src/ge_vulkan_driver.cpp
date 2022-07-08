@@ -2005,6 +2005,15 @@ void GEVulkanDriver::destroySwapChainRelated(bool handle_surface)
     if (m_vk->render_pass != VK_NULL_HANDLE)
         vkDestroyRenderPass(m_vk->device, m_vk->render_pass, NULL);
     m_vk->render_pass = VK_NULL_HANDLE;
+    for (VkSemaphore& semaphore : m_vk->image_available_semaphores)
+        vkDestroySemaphore(m_vk->device, semaphore, NULL);
+    m_vk->image_available_semaphores.clear();
+    for (VkSemaphore& semaphore : m_vk->render_finished_semaphores)
+        vkDestroySemaphore(m_vk->device, semaphore, NULL);
+    m_vk->render_finished_semaphores.clear();
+    for (VkFence& fence : m_vk->in_flight_fences)
+        vkDestroyFence(m_vk->device, fence, NULL);
+    m_vk->in_flight_fences.clear();
     for (VkImageView& image_view : m_vk->swap_chain_image_views)
         vkDestroyImageView(m_vk->device, image_view, NULL);
     m_vk->swap_chain_image_views.clear();
@@ -2031,6 +2040,7 @@ void GEVulkanDriver::createSwapChainRelated(bool handle_surface)
     updateSurfaceInformation(m_physical_device, &m_surface_capabilities,
         &m_surface_formats, &m_present_modes);
     createSwapChain();
+    createSyncObjects();
     createRenderPass();
     createFramebuffers();
 }   // createSwapChainRelated
