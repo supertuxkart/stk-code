@@ -68,6 +68,7 @@ private:
     // Area of the bounding box (for autoLOD computation)
     float m_area;
 
+    bool m_update_box_every_frame;
 public:
 
     LODNode(std::string group_name, scene::ISceneNode* parent, scene::ISceneManager* mgr, s32 id=-1);

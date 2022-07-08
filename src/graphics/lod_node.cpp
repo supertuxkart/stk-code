@@ -35,6 +35,7 @@ LODNode::LODNode(std::string group_name, scene::ISceneNode* parent,
                  scene::ISceneManager* mgr, s32 id)
     : ISceneNode(parent, mgr, id)
 {
+    m_update_box_every_frame = false;
     assert(mgr != NULL);
     assert(parent != NULL);
 
@@ -131,7 +132,8 @@ void LODNode::OnAnimate(u32 timeMs)
                 m_nodes[level]->OnAnimate(timeMs);
         }
 
-        Box = m_nodes[m_detail.size()-1]->getBoundingBox();
+        if (m_update_box_every_frame)
+            Box = m_nodes[m_detail.size() - 1]->getBoundingBox();
 
         // If this node has children other than the LOD nodes, animate it
         for (unsigned i = 0; i < Children.size(); ++i)
@@ -220,6 +222,14 @@ void LODNode::autoComputeLevel(float scale)
         m_detail[i] = ((step / biais) * (i + 1));
         biais--;
     }
+    const size_t max_level = m_detail.size() - 1;
+
+    // Only animated mesh needs to be updated bounding box every frame,
+    // which only affects culling
+    m_update_box_every_frame =
+        m_nodes[max_level]->getType() == scene::ESNT_ANIMATED_MESH ||
+        m_nodes[max_level]->getType() == scene::ESNT_LOD_NODE;
+    Box = m_nodes[max_level]->getBoundingBox();
 }
 
 void LODNode::add(int level, scene::ISceneNode* node, bool reparent)
