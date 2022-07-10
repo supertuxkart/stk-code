@@ -378,6 +378,7 @@ namespace GE
         struct VK
         {
             VkInstance instance;
+            VkDebugUtilsMessengerEXT debug;
             VkSurfaceKHR surface;
             VkDevice device;
             VkSwapchainKHR swap_chain;
@@ -393,6 +394,7 @@ namespace GE
             VK()
             {
                 instance = VK_NULL_HANDLE;
+                debug = VK_NULL_HANDLE;
                 surface = VK_NULL_HANDLE;
                 device = VK_NULL_HANDLE;
                 swap_chain = VK_NULL_HANDLE;
@@ -421,6 +423,8 @@ namespace GE
                     vkDestroyDevice(device, NULL);
                 if (surface != VK_NULL_HANDLE)
                     vkDestroySurfaceKHR(instance, surface, NULL);
+                if (vkDestroyDebugUtilsMessengerEXT && debug != VK_NULL_HANDLE)
+                     vkDestroyDebugUtilsMessengerEXT(instance, debug, NULL);
                 if (instance != VK_NULL_HANDLE)
                     vkDestroyInstance(instance, NULL);
             }

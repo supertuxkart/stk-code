@@ -15,6 +15,10 @@
 #include "ISceneManager.h"
 #include "IrrlichtDevice.h"
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 #include "SDL_vulkan.h"
 #include <algorithm>
@@ -24,6 +28,29 @@
 #include <sstream>
 #include <stdexcept>
 #include "../source/Irrlicht/os.h"
+
+extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
+    VkDebugUtilsMessageTypeFlagsEXT message_type,
+    const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
+    void* user_data)
+{
+#ifdef __ANDROID__
+    android_LogPriority alp;
+    switch (message_severity)
+    {
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT: alp = ANDROID_LOG_DEBUG;   break;
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT: alp = ANDROID_LOG_INFO;    break;
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT: alp = ANDROID_LOG_WARN;    break;
+    case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: alp = ANDROID_LOG_ERROR;   break;
+    default: alp = ANDROID_LOG_INFO;
+    }
+    __android_log_print(alp, "VALIDATION:", "%s", callback_data->pMessage);
+#else
+    printf("%s\n", callback_data->pMessage);
+#endif
+    return VK_FALSE;
+};
 
 #if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
 struct GE_VK_UserPointer
@@ -455,6 +482,7 @@ namespace GE
 std::atomic_bool g_device_created(false);
 std::atomic_bool g_schedule_pausing_rendering(false);
 std::atomic_bool g_paused_rendering(false);
+bool g_debug_print = false;
 
 GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                io::IFileSystem* io, SDL_Window* window,
@@ -505,6 +533,22 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
             "with non-NULL instance");
     }
 #endif
+
+    VkDebugUtilsMessengerCreateInfoEXT debug_create_info = {};
+    debug_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    debug_create_info.messageSeverity =
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    debug_create_info.messageType =
+        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+    debug_create_info.pfnUserCallback = debug_callback;
+    if (g_debug_print && vkCreateDebugUtilsMessengerEXT)
+    {
+        vkCreateDebugUtilsMessengerEXT(m_vk->instance, &debug_create_info,
+            NULL, &m_vk->debug);
+    }
 
     if (SDL_Vulkan_CreateSurface(window, m_vk->instance, &m_vk->surface) == SDL_FALSE)
         throw std::runtime_error("SDL_Vulkan_CreateSurface failed");
@@ -674,16 +718,29 @@ void GEVulkanDriver::createInstance(SDL_Window* window)
     std::vector<VkLayerProperties> available_layers(layer_count);
     vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
+    VkInstanceCreateInfo create_info = {};
     std::vector<const char*> enabled_validation_layers;
+
 #ifdef ENABLE_VALIDATION
+    g_debug_print = true;
     for (VkLayerProperties& prop : available_layers)
     {
         if (std::string(prop.layerName) == "VK_LAYER_KHRONOS_validation")
             enabled_validation_layers.push_back("VK_LAYER_KHRONOS_validation");
     }
+
+    VkValidationFeaturesEXT validation_features = {};
+    validation_features.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+    validation_features.enabledValidationFeatureCount = 1;
+    VkValidationFeatureEnableEXT enabled_validation_features =
+        VK_VALIDATION_FEATURE_ENABLE_BEST_PRACTICES_EXT;
+    validation_features.pEnabledValidationFeatures = &enabled_validation_features;
+
+    create_info.pNext = &validation_features;
+    const char* debug_ext = "VK_EXT_debug_utils";
+    extensions.push_back(debug_ext);
 #endif
 
-    VkInstanceCreateInfo create_info = {};
     VkApplicationInfo app_info = {};
     if (vulkan_1_1)
     {
