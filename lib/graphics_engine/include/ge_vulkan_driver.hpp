@@ -22,6 +22,7 @@ using namespace video;
 
 namespace GE
 {
+    class GEVulkanDepthTexture;
     class GEVulkanMeshCache;
     enum GEVulkanSampler : unsigned
     {
@@ -335,6 +336,10 @@ namespace GE
         void waitIdle();
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
+        GEVulkanDepthTexture* getDepthTexture() const { return m_depth_texture; }
+        VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
+                                     VkImageTiling tiling,
+                                     VkFormatFeatureFlags features);
     private:
         struct SwapChainSupportDetails
         {
@@ -452,6 +457,7 @@ namespace GE
         bool m_disable_wait_idle;
 
         IrrlichtDevice* m_irrlicht_device;
+        GEVulkanDepthTexture* m_depth_texture;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

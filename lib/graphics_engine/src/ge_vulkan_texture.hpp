@@ -16,9 +16,10 @@ using namespace irr;
 
 namespace GE
 {
+class GEVulkanDriver;
 class GEVulkanTexture : public video::ITexture
 {
-private:
+protected:
     core::dimension2d<u32> m_size, m_orig_size, m_max_size;
 
     std::function<void(video::IImage*)> m_image_mani;
@@ -37,8 +38,6 @@ private:
 
     const bool m_disable_reload;
 
-    const bool m_single_channel;
-
     bool m_has_mipmaps;
 
     GESpinLock m_size_lock;
@@ -46,6 +45,10 @@ private:
     GESpinLock m_image_view_lock;
 
     io::path m_full_path;
+
+    VkFormat m_internal_format;
+
+    GEVulkanDriver* m_vk;
 
     // ------------------------------------------------------------------------
     bool createTextureImage(uint8_t* texture_data, bool generate_hq_mipmap);
@@ -98,11 +101,15 @@ private:
     // ------------------------------------------------------------------------
     unsigned getMipmapLevels() const
     {
-        if (!hasMipMaps())
+        if (!m_has_mipmaps)
             return 1;
         return std::floor(std::log2(std::max(m_size.Width, m_size.Height))) + 1;
     }
     // ------------------------------------------------------------------------
+    bool isSingleChannel() const
+                            { return m_internal_format == VK_FORMAT_R8_UNORM; }
+    // ------------------------------------------------------------------------
+    GEVulkanTexture() : video::ITexture(""), m_disable_reload(true)          {}
 public:
     // ------------------------------------------------------------------------
     GEVulkanTexture(const std::string& path,
@@ -171,6 +178,8 @@ public:
     // ------------------------------------------------------------------------
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
                                u32 w, u32 h, u32 x, u32 y);
+    // ------------------------------------------------------------------------
+    VkFormat getInternalFormat() const            { return m_internal_format; }
 };   // GEVulkanTexture
 
 }

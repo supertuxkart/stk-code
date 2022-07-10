@@ -5,6 +5,7 @@
 #include "ge_vulkan_2d_renderer.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
+#include "ge_vulkan_depth_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_shader_manager.hpp"
@@ -459,7 +460,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                io::IFileSystem* io, SDL_Window* window,
                                IrrlichtDevice* device)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
-                m_params(params), m_irrlicht_device(device)
+                m_params(params), m_irrlicht_device(device),
+                m_depth_texture(NULL)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -577,6 +579,11 @@ GEVulkanDriver::~GEVulkanDriver()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::destroyVulkan()
 {
+    if (m_depth_texture)
+    {
+        m_depth_texture->drop();
+        m_depth_texture = NULL;
+    }
     if (m_white_texture)
     {
         m_white_texture->drop();
@@ -1158,6 +1165,10 @@ found_mode:
             throw std::runtime_error("vkCreateImageView failed");
         m_vk->swap_chain_image_views.push_back(swap_chain_image_view);
     }
+
+    m_depth_texture = new GEVulkanDepthTexture(this,
+        core::dimension2du(m_swap_chain_extent.width,
+        m_swap_chain_extent.height));
 }   // createSwapChain
 
 // ----------------------------------------------------------------------------
@@ -1283,21 +1294,43 @@ void GEVulkanDriver::createRenderPass()
     color_attachment_ref.attachment = 0;
     color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
+    VkAttachmentDescription depth_attachment = {};
+    depth_attachment.format = m_depth_texture->getInternalFormat();
+    depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    VkAttachmentReference depth_attachment_ref = {};
+    depth_attachment_ref.attachment = 1;
+    depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
     VkSubpassDescription subpass = {};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &color_attachment_ref;
+    subpass.pDepthStencilAttachment = &depth_attachment_ref;
 
     VkSubpassDependency dependency = {};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
     dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+        VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     dependency.srcAccessMask = 0;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+        VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
-        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+        VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-    std::array<VkAttachmentDescription, 1> attachments = { color_attachment };
+    std::array<VkAttachmentDescription, 2> attachments =
+        {
+            color_attachment,
+            depth_attachment
+        };
     VkRenderPassCreateInfo render_pass_info = {};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     render_pass_info.attachmentCount = (uint32_t)(attachments.size());
@@ -1320,9 +1353,9 @@ void GEVulkanDriver::createFramebuffers()
     const std::vector<VkImageView>& image_views = m_vk->swap_chain_image_views;
     for (unsigned int i = 0; i < image_views.size(); i++)
     {
-        std::array<VkImageView, 1> attachments =
+        std::array<VkImageView, 2> attachments =
         {
-            image_views[i]
+            image_views[i], (VkImageView)m_depth_texture->getTextureHandler()
         };
 
         VkFramebufferCreateInfo framebuffer_info = {};
@@ -1999,6 +2032,11 @@ void GEVulkanDriver::unpauseRendering()
 void GEVulkanDriver::destroySwapChainRelated(bool handle_surface)
 {
     waitIdle();
+    if (m_depth_texture)
+    {
+        m_depth_texture->drop();
+        m_depth_texture = NULL;
+    }
     for (VkFramebuffer& framebuffer : m_vk->swap_chain_framebuffers)
         vkDestroyFramebuffer(m_vk->device, framebuffer, NULL);
     m_vk->swap_chain_framebuffers.clear();
@@ -2105,6 +2143,25 @@ void GEVulkanDriver::buildCommandBuffers()
     vkCmdEndRenderPass(getCurrentCommandBuffer());
     vkEndCommandBuffer(getCurrentCommandBuffer());
 }   // buildCommandBuffers
+
+// ----------------------------------------------------------------------------
+VkFormat GEVulkanDriver::findSupportedFormat(const std::vector<VkFormat>& candidates,
+                                             VkImageTiling tiling,
+                                             VkFormatFeatureFlags features)
+{
+    for (VkFormat format : candidates)
+    {
+        VkFormatProperties props;
+        vkGetPhysicalDeviceFormatProperties(m_physical_device, format, &props);
+        if (tiling == VK_IMAGE_TILING_LINEAR &&
+            (props.linearTilingFeatures & features) == features)
+            return format;
+        else if (tiling == VK_IMAGE_TILING_OPTIMAL &&
+            (props.optimalTilingFeatures & features) == features)
+            return format;
+    }
+    throw std::runtime_error("failed to find supported format!");
+}
 
 }
 

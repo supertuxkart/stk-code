@@ -25,8 +25,9 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-                 m_disable_reload(false), m_single_channel(false),
-                 m_has_mipmaps(true)
+                 m_disable_reload(false), m_has_mipmaps(true),
+                 m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
+                 m_vk(getVKDriver())
 {
     m_max_size = getDriver()->getDriverAttributes()
         .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
@@ -50,8 +51,9 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-                 m_disable_reload(true), m_single_channel(false),
-                 m_has_mipmaps(true)
+                 m_disable_reload(true), m_has_mipmaps(true),
+                 m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
+                 m_vk(getVKDriver())
 {
     if (!img)
     {
@@ -75,12 +77,14 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
              m_locked_data(NULL), m_vulkan_device(getVKDriver()->getDevice()),
              m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
              m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-             m_disable_reload(true), m_single_channel(single_channel),
-             m_has_mipmaps(true)
+             m_disable_reload(true), m_has_mipmaps(true),
+             m_internal_format(single_channel ?
+             VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM),
+             m_vk(getVKDriver())
 {
-    if (m_single_channel && !GEVulkanFeatures::supportsR8Blit())
+    if (isSingleChannel() && !GEVulkanFeatures::supportsR8Blit())
         m_has_mipmaps = false;
-    else if (!m_single_channel && !GEVulkanFeatures::supportsRGBA8Blit())
+    else if (!isSingleChannel() && !GEVulkanFeatures::supportsRGBA8Blit())
         m_has_mipmaps = false;
 
     m_orig_size.Width = size;
@@ -88,7 +92,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
     m_size = m_orig_size;
 
     std::vector<uint8_t> data;
-    data.resize(size * size * (m_single_channel ? 1 : 4), 0);
+    data.resize(size * size * (isSingleChannel() ? 1 : 4), 0);
     upload(data.data());
 }   // GEVulkanTexture
 
@@ -100,7 +104,7 @@ GEVulkanTexture::~GEVulkanTexture()
 
     if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
         m_image_memory != VK_NULL_HANDLE)
-        getVKDriver()->waitIdle();
+        m_vk->waitIdle();
 
     clearVulkanData();
 }   // ~GEVulkanTexture
@@ -114,7 +118,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
         getMipmapSizes();
     VkDeviceSize mipmap_data_size = 0;
 
-    unsigned channels = (m_single_channel ? 1 : 4);
+    unsigned channels = (isSingleChannel() ? 1 : 4);
     VkDeviceSize image_size = m_size.Width * m_size.Height * channels;
     if (generate_hq_mipmap)
     {
@@ -131,7 +135,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
 
-    bool success = getVKDriver()->createBuffer(image_total_size,
+    bool success = m_vk->createBuffer(image_total_size,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
@@ -205,8 +209,7 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     image_info.extent.depth = 1;
     image_info.mipLevels = getMipmapLevels();
     image_info.arrayLayers = 1;
-    image_info.format =
-        (m_single_channel ? VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM);
+    image_info.format = m_internal_format;
     image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
     image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     image_info.usage = usage;
@@ -223,7 +226,7 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     vkGetImageMemoryRequirements(m_vulkan_device, m_image, &mem_requirements);
 
     VkPhysicalDeviceMemoryProperties mem_properties;
-    vkGetPhysicalDeviceMemoryProperties(getVKDriver()->getPhysicalDevice(),
+    vkGetPhysicalDeviceMemoryProperties(m_vk->getPhysicalDevice(),
         &mem_properties);
 
     uint32_t memory_type_index = std::numeric_limits<uint32_t>::max();
@@ -378,14 +381,13 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
     view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     view_info.image = m_image;
     view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    view_info.format =
-        (m_single_channel ? VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM);
+    view_info.format = m_internal_format;
     view_info.subresourceRange.aspectMask = aspect_flags;
     view_info.subresourceRange.baseMipLevel = 0;
     view_info.subresourceRange.levelCount = getMipmapLevels();
     view_info.subresourceRange.baseArrayLayer = 0;
     view_info.subresourceRange.layerCount = 1;
-    if (m_single_channel)
+    if (isSingleChannel())
     {
         view_info.components.r = VK_COMPONENT_SWIZZLE_ONE;
         view_info.components.g = VK_COMPONENT_SWIZZLE_ONE;
@@ -453,14 +455,14 @@ void GEVulkanTexture::upload(uint8_t* data, bool generate_hq_mipmap)
         return;
     if (!createImageView(VK_IMAGE_ASPECT_COLOR_BIT))
         return;
-    m_texture_size = m_size.Width * m_size.Height * (m_single_channel ? 1 : 4);
+    m_texture_size = m_size.Width * m_size.Height * (isSingleChannel() ? 1 : 4);
 }   // upload
 
 // ----------------------------------------------------------------------------
 void* GEVulkanTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 {
     uint8_t* texture_data = getTextureData();
-    if (m_single_channel)
+    if (isSingleChannel())
     {
         m_locked_data = new uint8_t[m_size.Width * m_size.Height * 4]();
         for (unsigned int i = 0; i < m_size.Width * m_size.Height; i++)
@@ -488,8 +490,8 @@ uint8_t* GEVulkanTexture::getTextureData()
     VkBuffer buffer;
     VkDeviceMemory buffer_memory;
     VkDeviceSize image_size =
-        m_size.Width * m_size.Height * (m_single_channel ? 1 : 4);
-    if (!getVKDriver()->createBuffer(image_size,
+        m_size.Width * m_size.Height * (isSingleChannel() ? 1 : 4);
+    if (!m_vk->createBuffer(image_size,
         VK_BUFFER_USAGE_TRANSFER_DST_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
         VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, buffer, buffer_memory))
@@ -548,12 +550,12 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
 
     VkBuffer staging_buffer;
     VkDeviceMemory staging_buffer_memory;
-    if (m_single_channel)
+    if (isSingleChannel())
     {
         if (format == video::ECF_R8)
         {
             unsigned image_size = w * h;
-            if (!getVKDriver()->createBuffer(image_size,
+            if (!m_vk->createBuffer(image_size,
                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
@@ -572,7 +574,7 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
         if (format == video::ECF_R8)
         {
             unsigned image_size = w * h * 4;
-            if (!getVKDriver()->createBuffer(w * h * 4,
+            if (!m_vk->createBuffer(w * h * 4,
                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
@@ -593,7 +595,7 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
         else if (format == video::ECF_A8R8G8B8)
         {
             unsigned image_size = w * h * 4;
-            if (!getVKDriver()->createBuffer(w * h * 4,
+            if (!m_vk->createBuffer(w * h * 4,
                 VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
@@ -622,9 +624,9 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
     copyBufferToImage(command_buffer, staging_buffer, w, h, x, y, 0, 0);
 
     bool blit_mipmap = true;
-    if (m_single_channel && !GEVulkanFeatures::supportsR8Blit())
+    if (isSingleChannel() && !GEVulkanFeatures::supportsR8Blit())
         blit_mipmap = false;
-    else if (!m_single_channel && !GEVulkanFeatures::supportsRGBA8Blit())
+    else if (!isSingleChannel() && !GEVulkanFeatures::supportsRGBA8Blit())
         blit_mipmap = false;
     if (blit_mipmap)
     {
@@ -720,7 +722,7 @@ void GEVulkanTexture::reload()
 
     if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
         m_image_memory != VK_NULL_HANDLE)
-        getVKDriver()->waitIdle();
+        m_vk->waitIdle();
 
     if (!m_disable_reload)
     {
@@ -745,7 +747,7 @@ void GEVulkanTexture::generateHQMipmap(void* in,
         2/*hopcount*/, 2.0f/*alpha*/, 1.0f/*amplifynormal*/,
         0.0f/*normalsustainfactor*/);
 
-    unsigned channels = (m_single_channel ? 1 : 4);
+    unsigned channels = (isSingleChannel() ? 1 : 4);
 #ifdef DEBUG
     int ret = imBuildMipmapCascade(&cascade, in, mms[0].first.Width,
         mms[0].first.Height, 1/*layercount*/, channels,
