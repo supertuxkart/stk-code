@@ -581,6 +581,23 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     }
 #endif
 
+    VmaAllocatorCreateInfo allocator_create_info = {};
+    allocator_create_info.physicalDevice = m_physical_device;
+    allocator_create_info.device = m_vk->device;
+    allocator_create_info.instance = m_vk->instance;
+
+#if !defined(__APPLE__) || defined(DLOPEN_MOLTENVK)
+    VmaVulkanFunctions vulkan_functions = {};
+    vulkan_functions.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
+    vulkan_functions.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
+    allocator_create_info.pVulkanFunctions = &vulkan_functions;
+#endif
+    if (vmaCreateAllocator(&allocator_create_info, &m_vk->allocator) !=
+        VK_SUCCESS)
+    {
+        throw std::runtime_error("vmaCreateAllocator failed");
+    }
+
     createSwapChain();
     createSyncObjects();
     createSamplers();

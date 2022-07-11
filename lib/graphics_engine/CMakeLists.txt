@@ -26,6 +26,7 @@ set(GE_SOURCES
     src/ge_main.cpp
     src/ge_texture.cpp
     src/ge_dx9_texture.cpp
+    src/ge_vma.cpp
     src/ge_vulkan_2d_renderer.cpp
     src/ge_vulkan_camera_scene_node.cpp
     src/ge_vulkan_command_loader.cpp

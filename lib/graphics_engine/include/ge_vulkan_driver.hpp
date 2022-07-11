@@ -6,6 +6,7 @@
 #ifdef _IRR_COMPILE_WITH_VULKAN_
 
 #include "vulkan_wrapper.h"
+#include "ge_vma.hpp"
 #include "SDL_video.h"
 
 #include "../source/Irrlicht/CNullDriver.h"
@@ -340,6 +341,7 @@ namespace GE
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates,
                                      VkImageTiling tiling,
                                      VkFormatFeatureFlags features);
+        VmaAllocator getVmaAllocator() const         { return m_vk->allocator; }
     private:
         struct SwapChainSupportDetails
         {
@@ -381,6 +383,7 @@ namespace GE
             VkDebugUtilsMessengerEXT debug;
             VkSurfaceKHR surface;
             VkDevice device;
+            VmaAllocator allocator;
             VkSwapchainKHR swap_chain;
             std::vector<VkImage> swap_chain_images;
             std::vector<VkImageView> swap_chain_image_views;
@@ -397,6 +400,7 @@ namespace GE
                 debug = VK_NULL_HANDLE;
                 surface = VK_NULL_HANDLE;
                 device = VK_NULL_HANDLE;
+                allocator = VK_NULL_HANDLE;
                 swap_chain = VK_NULL_HANDLE;
                 samplers = {{}};
                 render_pass = VK_NULL_HANDLE;
@@ -419,6 +423,8 @@ namespace GE
                     vkDestroyImageView(device, image_view, NULL);
                 if (swap_chain != VK_NULL_HANDLE)
                     vkDestroySwapchainKHR(device, swap_chain, NULL);
+                if (allocator != VK_NULL_HANDLE)
+                    vmaDestroyAllocator(allocator);
                 if (device != VK_NULL_HANDLE)
                     vkDestroyDevice(device, NULL);
                 if (surface != VK_NULL_HANDLE)
