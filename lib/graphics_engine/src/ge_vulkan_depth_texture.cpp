@@ -12,7 +12,7 @@ GEVulkanDepthTexture::GEVulkanDepthTexture(GEVulkanDriver* vk,
     m_vk = vk;
     m_vulkan_device = m_vk->getDevice();
     m_image = VK_NULL_HANDLE;
-    m_image_memory = VK_NULL_HANDLE;
+    m_vma_allocation = VK_NULL_HANDLE;
     m_image_view = VK_NULL_HANDLE;
     m_has_mipmaps = false;
     m_locked_data = NULL;

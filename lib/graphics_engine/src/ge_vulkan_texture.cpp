@@ -23,7 +23,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
                : video::ITexture(path.c_str()), m_image_mani(image_mani),
                  m_locked_data(NULL),
                  m_vulkan_device(getVKDriver()->getDevice()),
-                 m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
+                 m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
                  m_disable_reload(false), m_has_mipmaps(true),
                  m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
@@ -49,7 +49,7 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
                : video::ITexture(name.c_str()), m_image_mani(nullptr),
                  m_locked_data(NULL),
                  m_vulkan_device(getVKDriver()->getDevice()),
-                 m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
+                 m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
                  m_image_view(VK_NULL_HANDLE), m_texture_size(0),
                  m_disable_reload(true), m_has_mipmaps(true),
                  m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
@@ -75,7 +75,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
                                  bool single_channel)
            : video::ITexture(name.c_str()), m_image_mani(nullptr),
              m_locked_data(NULL), m_vulkan_device(getVKDriver()->getDevice()),
-             m_image(VK_NULL_HANDLE), m_image_memory(VK_NULL_HANDLE),
+             m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
              m_image_view(VK_NULL_HANDLE), m_texture_size(0),
              m_disable_reload(true), m_has_mipmaps(true),
              m_internal_format(single_channel ?
@@ -103,7 +103,7 @@ GEVulkanTexture::~GEVulkanTexture()
     m_image_view_lock.unlock();
 
     if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
-        m_image_memory != VK_NULL_HANDLE)
+        m_vma_allocation != VK_NULL_HANDLE)
         m_vk->waitIdle();
 
     clearVulkanData();
@@ -133,13 +133,15 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
 
     VkDeviceSize image_total_size = image_size + mipmap_data_size;
     VkBuffer staging_buffer;
-    VkDeviceMemory staging_buffer_memory;
+    VmaAllocation staging_buffer_allocation;
+    VmaAllocationCreateInfo staging_buffer_create_info = {};
+    staging_buffer_create_info.usage = VMA_MEMORY_USAGE_AUTO;
+    staging_buffer_create_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+    staging_buffer_create_info.preferredFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
     bool success = m_vk->createBuffer(image_total_size,
-        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
-        staging_buffer_memory);
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
+        staging_buffer, staging_buffer_allocation);
 
     if (!success)
         return false;
@@ -147,8 +149,8 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     VkResult ret = VK_SUCCESS;
     uint8_t* data;
     VkCommandBuffer command_buffer = VK_NULL_HANDLE;
-    if ((ret = vkMapMemory(m_vulkan_device, staging_buffer_memory, 0,
-        image_total_size, 0, (void**)&data)) != VK_SUCCESS)
+    if ((ret = vmaMapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation,
+        (void**)&data)) != VK_SUCCESS)
         goto destroy;
     memcpy(data, texture_data, image_size);
     if (mipmap)
@@ -156,7 +158,9 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
         memcpy(data + image_size, mipmap->lock(), mipmap_data_size);
         mipmap->drop();
     }
-    vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
+    vmaUnmapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation);
+    vmaFlushAllocation(m_vk->getVmaAllocator(),
+        staging_buffer_allocation, 0, image_total_size);
 
     success = createImage(VK_IMAGE_USAGE_TRANSFER_SRC_BIT |
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT);
@@ -192,9 +196,8 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
 destroy:
-    vkDestroyBuffer(m_vulkan_device, staging_buffer, NULL);
-    vkFreeMemory(m_vulkan_device, staging_buffer_memory, NULL);
-
+    vmaDestroyBuffer(m_vk->getVmaAllocator(), staging_buffer,
+        staging_buffer_allocation);
     return ret == VK_SUCCESS;
 }   // createTextureImage
 
@@ -216,48 +219,14 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    VkResult result = vkCreateImage(m_vulkan_device, &image_info, NULL,
-        &m_image);
+    VmaAllocationCreateInfo alloc_info = {};
+    alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
+    VkResult result = vmaCreateImage(m_vk->getVmaAllocator(), &image_info,
+        &alloc_info, &m_image, &m_vma_allocation, NULL);
 
     if (result != VK_SUCCESS)
         return false;
 
-    VkMemoryRequirements mem_requirements;
-    vkGetImageMemoryRequirements(m_vulkan_device, m_image, &mem_requirements);
-
-    VkPhysicalDeviceMemoryProperties mem_properties;
-    vkGetPhysicalDeviceMemoryProperties(m_vk->getPhysicalDevice(),
-        &mem_properties);
-
-    uint32_t memory_type_index = std::numeric_limits<uint32_t>::max();
-    uint32_t type_filter = mem_requirements.memoryTypeBits;
-    VkMemoryPropertyFlags properties = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT;
-
-    for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++)
-    {
-        if ((type_filter & (1 << i)) &&
-            (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
-        {
-            memory_type_index = i;
-            break;
-        }
-    }
-
-    if (memory_type_index == std::numeric_limits<uint32_t>::max())
-        return false;
-
-    VkMemoryAllocateInfo alloc_info = {};
-    alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    alloc_info.allocationSize = mem_requirements.size;
-    alloc_info.memoryTypeIndex = memory_type_index;
-
-    result = vkAllocateMemory(m_vulkan_device, &alloc_info, NULL,
-        &m_image_memory);
-
-    if (result != VK_SUCCESS)
-        return false;
-
-    vkBindImageMemory(m_vulkan_device, m_image, m_image_memory, 0);
     return true;
 }   // createImage
 
@@ -406,9 +375,7 @@ void GEVulkanTexture::clearVulkanData()
     if (m_image_view != VK_NULL_HANDLE)
         vkDestroyImageView(m_vulkan_device, m_image_view, NULL);
     if (m_image != VK_NULL_HANDLE)
-        vkDestroyImage(m_vulkan_device, m_image, NULL);
-    if (m_image_memory != VK_NULL_HANDLE)
-        vkFreeMemory(m_vulkan_device, m_image_memory, NULL);
+        vmaDestroyImage(m_vk->getVmaAllocator(), m_image, m_vma_allocation);
 }   // clearVulkanData
 
 // ----------------------------------------------------------------------------
@@ -488,13 +455,17 @@ uint8_t* GEVulkanTexture::getTextureData()
     m_image_view_lock.unlock();
 
     VkBuffer buffer;
-    VkDeviceMemory buffer_memory;
+    VmaAllocation buffer_allocation;
     VkDeviceSize image_size =
         m_size.Width * m_size.Height * (isSingleChannel() ? 1 : 4);
+    VmaAllocationCreateInfo buffer_create_info = {};
+    buffer_create_info.usage = VMA_MEMORY_USAGE_AUTO;
+    buffer_create_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_RANDOM_BIT;
+    buffer_create_info.preferredFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+
     if (!m_vk->createBuffer(image_size,
-        VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, buffer, buffer_memory))
+        VK_BUFFER_USAGE_TRANSFER_DST_BIT, buffer_create_info, buffer,
+        buffer_allocation))
         return NULL;
 
     VkCommandBuffer command_buffer = GEVulkanCommandLoader::beginSingleTimeCommands();
@@ -524,20 +495,21 @@ uint8_t* GEVulkanTexture::getTextureData()
 
     uint8_t* texture_data = new uint8_t[image_size];
     void* mapped_data;
-    if (vkMapMemory(m_vulkan_device, buffer_memory, 0, image_size,
-        0, &mapped_data) != VK_SUCCESS)
+    if (vmaMapMemory(m_vk->getVmaAllocator(), buffer_allocation,
+        &mapped_data) != VK_SUCCESS)
     {
         delete [] texture_data;
         texture_data = NULL;
         goto cleanup;
     }
 
+    vmaInvalidateAllocation(m_vk->getVmaAllocator(), buffer_allocation,
+        0, image_size);
     memcpy(texture_data, mapped_data, image_size);
-    vkUnmapMemory(m_vulkan_device, buffer_memory);
+    vmaUnmapMemory(m_vk->getVmaAllocator(), buffer_allocation);
 
 cleanup:
-    vkDestroyBuffer(m_vulkan_device, buffer, NULL);
-    vkFreeMemory(m_vulkan_device, buffer_memory, NULL);
+    vmaDestroyBuffer(m_vk->getVmaAllocator(), buffer, buffer_allocation);
     return texture_data;
 }   // getTextureData
 
@@ -549,24 +521,28 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
     m_image_view_lock.unlock();
 
     VkBuffer staging_buffer;
-    VkDeviceMemory staging_buffer_memory;
+    VmaAllocation staging_buffer_allocation;
+    VmaAllocationCreateInfo staging_buffer_create_info = {};
+    staging_buffer_create_info.usage = VMA_MEMORY_USAGE_AUTO;
+    staging_buffer_create_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+    staging_buffer_create_info.preferredFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
     if (isSingleChannel())
     {
         if (format == video::ECF_R8)
         {
             unsigned image_size = w * h;
             if (!m_vk->createBuffer(image_size,
-                VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
-                staging_buffer_memory))
+                VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
+                staging_buffer, staging_buffer_allocation))
                 return;
 
             void* mapped_data;
-            vkMapMemory(m_vulkan_device, staging_buffer_memory, 0, image_size,
-                0, &mapped_data);
+            vmaMapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation,
+                &mapped_data);
             memcpy(mapped_data, data, (size_t)(image_size));
-            vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
+            vmaUnmapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation);
+            vmaFlushAllocation(m_vk->getVmaAllocator(),
+                staging_buffer_allocation, 0, image_size);
         }
     }
     else
@@ -575,10 +551,8 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
         {
             unsigned image_size = w * h * 4;
             if (!m_vk->createBuffer(w * h * 4,
-                VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
-                staging_buffer_memory))
+                VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
+                staging_buffer, staging_buffer_allocation))
                 return;
 
             const unsigned int size = w * h;
@@ -587,19 +561,19 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
             for (unsigned int i = 0; i < size; i++)
                 image_data[4 * i + 3] = orig_data[i];
             void* mapped_data;
-            vkMapMemory(m_vulkan_device, staging_buffer_memory, 0, image_size,
-                0, &mapped_data);
+            vmaMapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation,
+                &mapped_data);
             memcpy(mapped_data, image_data.data(), (size_t)(image_size));
-            vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
+            vmaUnmapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation);
+            vmaFlushAllocation(m_vk->getVmaAllocator(),
+                staging_buffer_allocation, 0, image_size);
         }
         else if (format == video::ECF_A8R8G8B8)
         {
             unsigned image_size = w * h * 4;
             if (!m_vk->createBuffer(w * h * 4,
-                VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-                VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-                VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, staging_buffer,
-                staging_buffer_memory))
+                VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
+                staging_buffer, staging_buffer_allocation))
                 return;
 
             uint8_t* u8_data = (uint8_t*)data;
@@ -610,10 +584,12 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
                 u8_data[i * 4 + 2] = tmp_val;
             }
             void* mapped_data;
-            vkMapMemory(m_vulkan_device, staging_buffer_memory, 0, image_size,
-                0, &mapped_data);
+            vmaMapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation,
+                &mapped_data);
             memcpy(mapped_data, u8_data, (size_t)(image_size));
-            vkUnmapMemory(m_vulkan_device, staging_buffer_memory);
+            vmaUnmapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation);
+            vmaFlushAllocation(m_vk->getVmaAllocator(),
+                staging_buffer_allocation, 0, image_size);
         }
     }
 
@@ -699,8 +675,8 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
-    vkDestroyBuffer(m_vulkan_device, staging_buffer, NULL);
-    vkFreeMemory(m_vulkan_device, staging_buffer_memory, NULL);
+    vmaDestroyBuffer(m_vk->getVmaAllocator(), staging_buffer,
+        staging_buffer_allocation);
 }   // updateTexture
 
 //-----------------------------------------------------------------------------
@@ -721,7 +697,7 @@ void GEVulkanTexture::reload()
     m_image_view_lock.unlock();
 
     if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
-        m_image_memory != VK_NULL_HANDLE)
+        m_vma_allocation != VK_NULL_HANDLE)
         m_vk->waitIdle();
 
     if (!m_disable_reload)

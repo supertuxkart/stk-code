@@ -3,6 +3,7 @@
 
 #include "vulkan_wrapper.h"
 
+#include "ge_vma.hpp"
 #include "ge_spin_lock.hpp"
 
 #include <algorithm>
@@ -30,7 +31,7 @@ protected:
 
     VkImage m_image;
 
-    VkDeviceMemory m_image_memory;
+    VmaAllocation m_vma_allocation;
 
     VkImageView m_image_view;
 

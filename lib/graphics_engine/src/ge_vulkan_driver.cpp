@@ -1506,6 +1506,23 @@ bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
 }   // createBuffer
 
 // ----------------------------------------------------------------------------
+bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
+                                  VmaAllocationCreateInfo& alloc_create_info,
+                                  VkBuffer& buffer,
+                                  VmaAllocation& buffer_allocation)
+{
+    VkBufferCreateInfo buffer_info = {};
+    buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    buffer_info.size = size;
+    buffer_info.usage = usage;
+    buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    return vmaCreateBuffer(m_vk->allocator,
+        &buffer_info, &alloc_create_info, &buffer, &buffer_allocation, NULL) ==
+        VK_SUCCESS;
+}   // createBuffer
+
+// ----------------------------------------------------------------------------
 void GEVulkanDriver::copyBuffer(VkBuffer src_buffer, VkBuffer dst_buffer,
                                 VkDeviceSize size)
 {
