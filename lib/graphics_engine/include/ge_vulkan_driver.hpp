@@ -289,9 +289,6 @@ namespace GE
         VkDevice getDevice() const { return m_vk->device; }
         void destroyVulkan();
         bool createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                          VkMemoryPropertyFlags properties, VkBuffer& buffer,
-                          VkDeviceMemory& buffer_memory);
-        bool createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
                           VmaAllocationCreateInfo& alloc_create_info,
                           VkBuffer& buffer, VmaAllocation& buffer_allocation);
         VkPhysicalDevice getPhysicalDevice() const { return m_physical_device; }

@@ -1451,59 +1451,6 @@ void GEVulkanDriver::createFramebuffers()
     }
 }   // createFramebuffers
 
-// ----------------------------------------------------------------------------
-bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,
-                                  VkMemoryPropertyFlags properties,
-                                  VkBuffer& buffer,
-                                  VkDeviceMemory& buffer_memory)
-{
-    VkBufferCreateInfo buffer_info = {};
-    buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-    buffer_info.size = size;
-    buffer_info.usage = usage;
-    buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
-    VkResult result = vkCreateBuffer(m_vk->device, &buffer_info, NULL, &buffer);
-
-    if (result != VK_SUCCESS)
-        return false;
-
-    VkMemoryRequirements mem_requirements;
-    vkGetBufferMemoryRequirements(m_vk->device, buffer, &mem_requirements);
-
-    VkPhysicalDeviceMemoryProperties mem_properties;
-    vkGetPhysicalDeviceMemoryProperties(m_physical_device, &mem_properties);
-
-    uint32_t memory_type_index = std::numeric_limits<uint32_t>::max();
-    uint32_t type_filter = mem_requirements.memoryTypeBits;
-
-    for (uint32_t i = 0; i < mem_properties.memoryTypeCount; i++)
-    {
-        if ((type_filter & (1 << i)) &&
-            (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
-        {
-            memory_type_index = i;
-            break;
-        }
-    }
-
-    if (memory_type_index == std::numeric_limits<uint32_t>::max())
-        return false;
-
-    VkMemoryAllocateInfo alloc_info = {};
-    alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    alloc_info.allocationSize = mem_requirements.size;
-    alloc_info.memoryTypeIndex = memory_type_index;
-
-    result = vkAllocateMemory(m_vk->device, &alloc_info, NULL, &buffer_memory);
-
-    if (result != VK_SUCCESS)
-        return false;
-
-    vkBindBufferMemory(m_vk->device, buffer, buffer_memory, 0);
-
-    return true;
-}   // createBuffer
 
 // ----------------------------------------------------------------------------
 bool GEVulkanDriver::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage,

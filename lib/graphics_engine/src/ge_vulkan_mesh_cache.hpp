@@ -2,6 +2,7 @@
 #define HEADER_GE_VULKAN_MESH_CACHE_HPP
 
 #include "vulkan_wrapper.h"
+#include "ge_vma.hpp"
 #include "../source/Irrlicht/CMeshCache.h"
 
 #include <cstdint>
@@ -18,7 +19,7 @@ private:
 
     VkBuffer m_vbo_buffer, m_ibo_buffer;
 
-    VkDeviceMemory m_vbo_memory, m_ibo_memory;
+    VmaAllocation m_vbo_memory, m_ibo_memory;
 public:
     // ------------------------------------------------------------------------
     GEVulkanMeshCache();
