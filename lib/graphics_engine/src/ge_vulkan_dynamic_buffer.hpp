@@ -2,6 +2,7 @@
 #define HEADER_GE_VULKAN_DYNAMIC_BUFFER_HPP
 
 #include "vulkan_wrapper.h"
+#include "ge_vma.hpp"
 
 namespace GE
 {
@@ -17,11 +18,11 @@ class GEVulkanDynamicBuffer
 private:
     VkBuffer* m_buffer;
 
-    VkDeviceMemory* m_memory;
+    VmaAllocation* m_memory;
 
     VkBuffer* m_staging_buffer;
 
-    VkDeviceMemory* m_staging_memory;
+    VmaAllocation* m_staging_memory;
 
     void** m_mapped_addr;
 
@@ -29,10 +30,9 @@ private:
 
     GEVulkanDynamicBufferType m_type;
 
-    static VkMemoryPropertyFlags m_host_flag;
-
     size_t m_size, m_real_size;
 
+    static int m_supports_host_transfer;
     // ------------------------------------------------------------------------
     void initPerFrame(unsigned frame);
     // ------------------------------------------------------------------------
