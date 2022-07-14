@@ -4,6 +4,9 @@
 #include "vulkan_wrapper.h"
 #include "ge_vma.hpp"
 
+#include <vector>
+#include <utility>
+
 namespace GE
 {
 
@@ -46,7 +49,10 @@ public:
     // ------------------------------------------------------------------------
     ~GEVulkanDynamicBuffer();
     // ------------------------------------------------------------------------
-    void setCurrentData(void* data, size_t size);
+    void setCurrentData(const std::vector<std::pair<void*, size_t> >& data);
+    // ------------------------------------------------------------------------
+    void setCurrentData(void* data, size_t size)
+                                          { setCurrentData({{ data, size }}); }
     // ------------------------------------------------------------------------
     VkBuffer getCurrentBuffer() const;
     // ------------------------------------------------------------------------

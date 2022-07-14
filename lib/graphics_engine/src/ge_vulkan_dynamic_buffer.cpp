@@ -154,10 +154,15 @@ void GEVulkanDynamicBuffer::destroy()
 }   // destroy
 
 // ----------------------------------------------------------------------------
-void GEVulkanDynamicBuffer::setCurrentData(void* data, size_t size)
+void GEVulkanDynamicBuffer::setCurrentData(const std::vector<
+                                           std::pair<void*, size_t> >& data)
 {
     GEVulkanDriver* vk = getVKDriver();
     const unsigned cur_frame = vk->getCurrentFrame();
+
+    size_t size = 0;
+    for (auto& p : data)
+        size += p.second;
     if (size > m_size)
     {
         destroy();
@@ -168,7 +173,13 @@ void GEVulkanDynamicBuffer::setCurrentData(void* data, size_t size)
     m_real_size = size;
     if (size == 0 || m_mapped_addr[cur_frame] == NULL)
         return;
-    memcpy(m_mapped_addr[cur_frame], data, size);
+
+    uint8_t* addr = (uint8_t*)m_mapped_addr[cur_frame];
+    for (auto& p : data)
+    {
+        memcpy(addr, p.first, p.second);
+        addr += p.second;
+    }
     vmaFlushAllocation(vk->getVmaAllocator(), m_staging_memory != NULL ?
         m_staging_memory[cur_frame] : m_memory[cur_frame], 0, size);
 

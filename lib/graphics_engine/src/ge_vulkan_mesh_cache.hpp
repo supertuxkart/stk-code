@@ -17,9 +17,11 @@ private:
 
     uint64_t m_irrlicht_cache_time, m_ge_cache_time;
 
-    VkBuffer m_vbo_buffer, m_ibo_buffer;
+    VkBuffer m_buffer;
 
-    VmaAllocation m_vbo_memory, m_ibo_memory;
+    VmaAllocation m_memory;
+
+    size_t m_ibo_offset;
 public:
     // ------------------------------------------------------------------------
     GEVulkanMeshCache();
@@ -30,9 +32,9 @@ public:
     // ------------------------------------------------------------------------
     void destroy();
     // ------------------------------------------------------------------------
-    VkBuffer getVBO() const                            { return m_vbo_buffer; }
+    VkBuffer getBuffer() const                             { return m_buffer; }
     // ------------------------------------------------------------------------
-    VkBuffer getIBO() const                            { return m_ibo_buffer; }
+    size_t getIBOOffset() const                        { return m_ibo_offset; }
 };   // GEVulkanMeshCache
 
 }

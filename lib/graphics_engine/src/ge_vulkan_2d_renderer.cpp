@@ -34,8 +34,6 @@ VkDescriptorSetLayout g_descriptor_set_layout = VK_NULL_HANDLE;
 
 GEVulkanDynamicBuffer* g_tris_buffer = NULL;
 
-GEVulkanDynamicBuffer* g_tris_index_buffer = NULL;
-
 std::vector<VkDescriptorSet> g_descriptor_sets;
 
 struct Tri
@@ -69,8 +67,6 @@ void GEVulkan2dRenderer::destroy()
 {
     delete g_tris_buffer;
     g_tris_buffer = NULL;
-    delete g_tris_index_buffer;
-    g_tris_index_buffer = NULL;
 
     if (!g_vk)
         return;
@@ -284,9 +280,8 @@ void GEVulkan2dRenderer::createGraphicsPipeline()
 void GEVulkan2dRenderer::createTrisBuffers()
 {
     g_tris_buffer = new GEVulkanDynamicBuffer(GVDBT_SYSTEM_RAM,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, 10000);
-    g_tris_index_buffer = new GEVulkanDynamicBuffer(GVDBT_SYSTEM_RAM,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT, 2000);
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        12000);
 }   // createTrisBuffers
 
 // ----------------------------------------------------------------------------
@@ -339,10 +334,11 @@ void GEVulkan2dRenderer::uploadTrisBuffers()
     if (g_tex_map.empty())
         return;
 
-    g_tris_buffer->setCurrentData(g_tris_queue.data(),
-        g_tris_queue.size() * sizeof(Tri));
-    g_tris_index_buffer->setCurrentData(g_tris_index_queue.data(),
-        g_tris_index_queue.size() * sizeof(uint16_t));
+    g_tris_buffer->setCurrentData(
+    {
+        { (void*)g_tris_queue.data(), g_tris_queue.size() * sizeof(Tri) },
+        { (void*)g_tris_index_queue.data(), g_tris_index_queue.size() * sizeof(uint16_t) }
+    });
 }   // uploadTrisBuffers
 
 // ----------------------------------------------------------------------------
@@ -412,27 +408,24 @@ void GEVulkan2dRenderer::render()
     }
 
     VkDeviceSize offsets[] = {0};
-    VkBuffer vertex_buffer = VK_NULL_HANDLE;
-    VkBuffer indices_buffer = VK_NULL_HANDLE;
+    VkBuffer buffer = VK_NULL_HANDLE;
     unsigned idx = 0;
     unsigned idx_count = 0;
     int sampler_idx = 0;
     core::recti clip;
 
-    vertex_buffer = g_tris_buffer->getCurrentBuffer();
-    indices_buffer = g_tris_index_buffer->getCurrentBuffer();
-
-    if (vertex_buffer == VK_NULL_HANDLE || indices_buffer == VK_NULL_HANDLE)
+    buffer = g_tris_buffer->getCurrentBuffer();
+    if (buffer == VK_NULL_HANDLE)
         goto end;
 
     vkCmdBindPipeline(g_vk->getCurrentCommandBuffer(),
         VK_PIPELINE_BIND_POINT_GRAPHICS, g_graphics_pipeline);
 
     vkCmdBindVertexBuffers(g_vk->getCurrentCommandBuffer(), 0, 1,
-        &vertex_buffer, offsets);
+        &buffer, offsets);
 
-    vkCmdBindIndexBuffer(g_vk->getCurrentCommandBuffer(), indices_buffer, 0,
-        VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(g_vk->getCurrentCommandBuffer(), buffer,
+        g_tris_queue.size() * sizeof(Tri), VK_INDEX_TYPE_UINT16);
 
     VkViewport vp;
     vp.x = g_vk->getViewPort().UpperLeftCorner.X;

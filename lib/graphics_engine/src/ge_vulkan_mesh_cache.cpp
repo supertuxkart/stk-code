@@ -17,10 +17,9 @@ GEVulkanMeshCache::GEVulkanMeshCache()
     m_vk = getVKDriver();
     m_irrlicht_cache_time = getMonoTimeMs();
     m_ge_cache_time = 0;
-    m_vbo_buffer = VK_NULL_HANDLE;
-    m_vbo_memory = VK_NULL_HANDLE;
-    m_ibo_buffer = VK_NULL_HANDLE;
-    m_ibo_memory = VK_NULL_HANDLE;
+    m_buffer = VK_NULL_HANDLE;
+    m_memory = VK_NULL_HANDLE;
+    m_ibo_offset = 0;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -66,10 +65,11 @@ void GEVulkanMeshCache::updateCache()
         VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
     staging_buffer_create_info.preferredFlags = VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
-    if (!m_vk->createBuffer(vbo_size,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        staging_buffer_create_info, staging_buffer, staging_memory))
-        throw std::runtime_error("updateCache create staging vbo failed");
+    if (!m_vk->createBuffer(vbo_size + ibo_size,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT, staging_buffer_create_info,
+        staging_buffer, staging_memory))
+        throw std::runtime_error("updateCache create staging buffer failed");
 
     uint8_t* mapped;
     if (vmaMapMemory(m_vk->getVmaAllocator(), staging_memory,
@@ -86,33 +86,13 @@ void GEVulkanMeshCache::updateCache()
             offset / getVertexPitchFromType(video::EVT_SKINNED_MESH));
         offset += copy_size;
     }
-    vmaUnmapMemory(m_vk->getVmaAllocator(), staging_memory);
-    vmaFlushAllocation(m_vk->getVmaAllocator(), staging_memory, 0, offset);
+    m_ibo_offset = offset;
 
-    VmaAllocationCreateInfo local_create_info = {};
-    local_create_info.usage = VMA_MEMORY_USAGE_AUTO;
-    local_create_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
-    if (!m_vk->createBuffer(vbo_size,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        local_create_info, m_vbo_buffer, m_vbo_memory))
-        throw std::runtime_error("updateCache create vbo failed");
-
-    m_vk->copyBuffer(staging_buffer, m_vbo_buffer, vbo_size);
-    vmaDestroyBuffer(m_vk->getVmaAllocator(), staging_buffer, staging_memory);
-
-    if (!m_vk->createBuffer(ibo_size,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
-        staging_buffer_create_info, staging_buffer, staging_memory))
-        throw std::runtime_error("updateCache create staging ibo failed");
-
-    if (vmaMapMemory(m_vk->getVmaAllocator(), staging_memory,
-        (void**)&mapped) != VK_SUCCESS)
-        throw std::runtime_error("updateCache vmaMapMemory failed");
     offset = 0;
     for (GESPMBuffer* spm_buffer : buffers)
     {
         size_t copy_size = spm_buffer->getIndexCount() * sizeof(uint16_t);
-        uint8_t* loc = mapped + offset;
+        uint8_t* loc = mapped + offset + m_ibo_offset;
         memcpy(loc, spm_buffer->getIndices(), copy_size);
         spm_buffer->setIBOOffset(offset / sizeof(uint16_t));
         offset += copy_size;
@@ -120,12 +100,16 @@ void GEVulkanMeshCache::updateCache()
     vmaUnmapMemory(m_vk->getVmaAllocator(), staging_memory);
     vmaFlushAllocation(m_vk->getVmaAllocator(), staging_memory, 0, offset);
 
-    if (!m_vk->createBuffer(ibo_size,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
-        local_create_info, m_ibo_buffer, m_ibo_memory))
-        throw std::runtime_error("updateCache create ibo failed");
+    VmaAllocationCreateInfo local_create_info = {};
+    local_create_info.usage = VMA_MEMORY_USAGE_AUTO;
+    local_create_info.flags = VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
+    if (!m_vk->createBuffer(vbo_size + ibo_size,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
+        VK_BUFFER_USAGE_TRANSFER_DST_BIT, local_create_info, m_buffer,
+        m_memory))
+        throw std::runtime_error("updateCache create buffer failed");
 
-    m_vk->copyBuffer(staging_buffer, m_ibo_buffer, ibo_size);
+    m_vk->copyBuffer(staging_buffer, m_buffer, vbo_size + ibo_size);
     vmaDestroyBuffer(m_vk->getVmaAllocator(), staging_buffer, staging_memory);
 }   // updateCache
 
@@ -134,13 +118,10 @@ void GEVulkanMeshCache::destroy()
 {
     m_vk->waitIdle();
 
-    vmaDestroyBuffer(m_vk->getVmaAllocator(), m_vbo_buffer, m_vbo_memory);
-    vmaDestroyBuffer(m_vk->getVmaAllocator(), m_ibo_buffer, m_ibo_memory);
-
-    m_vbo_memory = VK_NULL_HANDLE;
-    m_vbo_buffer = VK_NULL_HANDLE;
-    m_ibo_memory = VK_NULL_HANDLE;
-    m_ibo_buffer = VK_NULL_HANDLE;
+    vmaDestroyBuffer(m_vk->getVmaAllocator(), m_buffer, m_memory);
+    m_buffer = VK_NULL_HANDLE;
+    m_memory = VK_NULL_HANDLE;
+    m_ibo_offset = 0;
 }   // destroy
 
 }
