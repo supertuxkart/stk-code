@@ -5,6 +5,7 @@
 #include "ge_vulkan_features.hpp"
 
 #include <algorithm>
+#include <map>
 #include <sstream>
 #include <string>
 #include <stdexcept>
@@ -22,8 +23,7 @@ irr::io::IFileSystem* g_file_system = NULL;
 std::string g_predefines = "";
 uint32_t g_sampler_size = 256;
 
-VkShaderModule g_2d_render_vert = VK_NULL_HANDLE;
-VkShaderModule g_2d_render_frag = VK_NULL_HANDLE;
+std::map<std::string, VkShaderModule> g_shaders;
 }   // GEVulkanShaderManager
 
 // ============================================================================
@@ -47,9 +47,7 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
         oss << "#define GE_SAMPLE_TEX_INDEX int\n";
     g_predefines = oss.str();
 
-    // 2D rendering shader
-    g_2d_render_vert = loadShader(shaderc_vertex_shader, "2d_render.vert");
-    g_2d_render_frag = loadShader(shaderc_fragment_shader, "2d_render.frag");
+    loadAllShaders();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -57,9 +55,39 @@ void GEVulkanShaderManager::destroy()
 {
     if (!g_vk)
         return;
-    vkDestroyShaderModule(g_vk->getDevice(), g_2d_render_vert, NULL);
-    vkDestroyShaderModule(g_vk->getDevice(), g_2d_render_frag, NULL);
+    for (auto& p : g_shaders)
+        vkDestroyShaderModule(g_vk->getDevice(), p.second, NULL);
+    g_shaders.clear();
 }   // destroy
+
+// ----------------------------------------------------------------------------
+void GEVulkanShaderManager::loadAllShaders()
+{
+    irr::io::IFileList* files = g_file_system->createFileList(
+        getShaderFolder().c_str());
+    for (unsigned i = 0; i < files->getFileCount(); i++)
+    {
+        if (files->isDirectory(i))
+            continue;
+        std::string filename = files->getFileName(i).c_str();
+        std::string ext = filename.substr(filename.find_last_of(".") + 1);
+        shaderc_shader_kind kind;
+        if (ext == "vert")
+            kind = shaderc_vertex_shader;
+        else if (ext == "frag")
+            kind = shaderc_fragment_shader;
+        else if (ext == "comp")
+            kind = shaderc_compute_shader;
+        else if (ext == "tesc")
+            kind = shaderc_tess_control_shader;
+        else if (ext == "tese")
+            kind = shaderc_tess_evaluation_shader;
+        else
+            continue;
+        g_shaders[filename] = loadShader(kind, filename);
+    }
+    files->drop();
+}   // loadAllShaders
 
 // ----------------------------------------------------------------------------
 VkShaderModule GEVulkanShaderManager::loadShader(shaderc_shader_kind kind,
@@ -116,16 +144,9 @@ unsigned GEVulkanShaderManager::getSamplerSize()
 }   // getSamplerSize
 
 // ----------------------------------------------------------------------------
-VkShaderModule GEVulkanShaderManager::get2dRenderVert()
+VkShaderModule GEVulkanShaderManager::getShader(const std::string& filename)
 {
-    return g_2d_render_vert;
-}   // get2dRenderVert
+    return g_shaders.at(filename);
+}   // getShader
 
-// ----------------------------------------------------------------------------
-VkShaderModule GEVulkanShaderManager::get2dRenderFrag()
-{
-    return g_2d_render_frag;
-}   // get2dRenderFrag
-
-// ----------------------------------------------------------------------------
 }
