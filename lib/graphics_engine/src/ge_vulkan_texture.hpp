@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cmath>
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 #include <ITexture.h>
@@ -33,7 +34,7 @@ protected:
 
     VmaAllocation m_vma_allocation;
 
-    VkImageView m_image_view;
+    std::shared_ptr<VkImageView> m_image_view;
 
     unsigned int m_texture_size;
 
@@ -165,7 +166,7 @@ public:
     {
         m_image_view_lock.lock();
         m_image_view_lock.unlock();
-        return (u64)m_image_view;
+        return m_image_view ? (u64)*(m_image_view.get()) : 0;
     }
     // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const
@@ -179,6 +180,13 @@ public:
     // ------------------------------------------------------------------------
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
                                u32 w, u32 h, u32 x, u32 y);
+    // ------------------------------------------------------------------------
+    virtual std::shared_ptr<VkImageView> getImageView() const
+    {
+        m_image_view_lock.lock();
+        m_image_view_lock.unlock();
+        return m_image_view;
+    }
     // ------------------------------------------------------------------------
     VkFormat getInternalFormat() const            { return m_internal_format; }
 };   // GEVulkanTexture

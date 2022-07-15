@@ -24,8 +24,8 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
                  m_locked_data(NULL),
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
-                 m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-                 m_disable_reload(false), m_has_mipmaps(true),
+                 m_texture_size(0), m_disable_reload(false),
+                 m_has_mipmaps(true),
                  m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
                  m_vk(getVKDriver())
 {
@@ -50,8 +50,8 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
                  m_locked_data(NULL),
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
-                 m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-                 m_disable_reload(true), m_has_mipmaps(true),
+                 m_texture_size(0), m_disable_reload(true),
+                 m_has_mipmaps(true),
                  m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
                  m_vk(getVKDriver())
 {
@@ -76,8 +76,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
            : video::ITexture(name.c_str()), m_image_mani(nullptr),
              m_locked_data(NULL), m_vulkan_device(getVKDriver()->getDevice()),
              m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
-             m_image_view(VK_NULL_HANDLE), m_texture_size(0),
-             m_disable_reload(true), m_has_mipmaps(true),
+             m_texture_size(0), m_disable_reload(true), m_has_mipmaps(true),
              m_internal_format(single_channel ?
              VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM),
              m_vk(getVKDriver())
@@ -102,7 +101,7 @@ GEVulkanTexture::~GEVulkanTexture()
     m_image_view_lock.lock();
     m_image_view_lock.unlock();
 
-    if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
+    if (m_image_view || m_image != VK_NULL_HANDLE ||
         m_vma_allocation != VK_NULL_HANDLE)
         m_vk->waitIdle();
 
@@ -364,16 +363,26 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
         view_info.components.a = VK_COMPONENT_SWIZZLE_R;
     }
 
+    std::shared_ptr<VkImageView> image_view = std::make_shared<VkImageView>();
     VkResult result = vkCreateImageView(m_vulkan_device, &view_info, NULL,
-        &m_image_view);
-    return (result == VK_SUCCESS);
+        image_view.get());
+    if (result == VK_SUCCESS)
+    {
+        m_image_view = image_view;
+        return true;
+    }
+    return false;
 }   // createImageView
 
 // ----------------------------------------------------------------------------
 void GEVulkanTexture::clearVulkanData()
 {
-    if (m_image_view != VK_NULL_HANDLE)
-        vkDestroyImageView(m_vulkan_device, m_image_view, NULL);
+    if (m_image_view)
+    {
+        vkDestroyImageView(m_vulkan_device, *m_image_view.get(), NULL);
+        *(m_image_view.get()) = VK_NULL_HANDLE;
+        m_image_view.reset();
+    }
     if (m_image != VK_NULL_HANDLE)
         vmaDestroyImage(m_vk->getVmaAllocator(), m_image, m_vma_allocation);
 }   // clearVulkanData
@@ -696,7 +705,7 @@ void GEVulkanTexture::reload()
     m_image_view_lock.lock();
     m_image_view_lock.unlock();
 
-    if (m_image_view != VK_NULL_HANDLE || m_image != VK_NULL_HANDLE ||
+    if (m_image_view || m_image != VK_NULL_HANDLE ||
         m_vma_allocation != VK_NULL_HANDLE)
         m_vk->waitIdle();
 
