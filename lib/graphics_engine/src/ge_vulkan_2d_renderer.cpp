@@ -5,6 +5,7 @@
 #include "ge_vulkan_dynamic_buffer.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_shader_manager.hpp"
+#include "ge_vulkan_texture_descriptor.hpp"
 
 #include <algorithm>
 #include <cstddef>
@@ -29,8 +30,7 @@ GEVulkanDriver* g_vk;
 VkPipelineLayout g_pipeline_layout = VK_NULL_HANDLE;
 VkPipeline g_graphics_pipeline = VK_NULL_HANDLE;
 
-VkDescriptorPool g_descriptor_pool = VK_NULL_HANDLE;
-VkDescriptorSetLayout g_descriptor_set_layout = VK_NULL_HANDLE;
+GEVulkanTextureDescriptor* g_texture_descriptor = NULL;
 
 GEVulkanDynamicBuffer* g_tris_buffer = NULL;
 
@@ -44,7 +44,6 @@ struct Tri
     int sampler_idx;
 };
 
-std::map<const irr::video::ITexture*, unsigned> g_tex_map;
 std::vector<irr::core::recti> g_tris_clip;
 std::vector<Tri> g_tris_queue;
 std::vector<uint16_t> g_tris_index_queue;
@@ -54,12 +53,13 @@ std::vector<uint16_t> g_tris_index_queue;
 void GEVulkan2dRenderer::init(GEVulkanDriver* vk)
 {
     g_vk = vk;
-    createDescriptorSetLayout();
+    g_texture_descriptor = new GEVulkanTextureDescriptor(
+        GEVulkanShaderManager::getSamplerSize(), 1,
+        GEVulkanFeatures::supportsBindTexturesAtOnce());
+    g_texture_descriptor->setSamplerUse(GVS_2D_RENDER);
     createPipelineLayout();
     createGraphicsPipeline();
     createTrisBuffers();
-    createDescriptorPool();
-    createDescriptorSets();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -70,42 +70,11 @@ void GEVulkan2dRenderer::destroy()
 
     if (!g_vk)
         return;
-    vkDestroyDescriptorSetLayout(g_vk->getDevice(), g_descriptor_set_layout,
-        NULL);
-    vkDestroyDescriptorPool(g_vk->getDevice(), g_descriptor_pool, NULL);
+    delete g_texture_descriptor;
+    g_texture_descriptor = NULL;
     vkDestroyPipeline(g_vk->getDevice(), g_graphics_pipeline, NULL);
     vkDestroyPipelineLayout(g_vk->getDevice(), g_pipeline_layout, NULL);
-    g_descriptor_sets.clear();
 }   // destroy
-
-// ----------------------------------------------------------------------------
-void GEVulkan2dRenderer::createDescriptorSetLayout()
-{
-    VkDescriptorSetLayoutBinding sampler_layout_binding = {};
-    sampler_layout_binding.binding = 0;
-    sampler_layout_binding.descriptorCount =
-        GEVulkanFeatures::supportsBindTexturesAtOnce() ?
-        GEVulkanShaderManager::getSamplerSize() : 1;
-    sampler_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    sampler_layout_binding.pImmutableSamplers = NULL;
-    sampler_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-    std::array<VkDescriptorSetLayoutBinding, 1> bindings =
-    {
-        sampler_layout_binding
-    };
-
-    VkDescriptorSetLayoutCreateInfo layout_info = {};
-    layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layout_info.bindingCount = (uint32_t)(bindings.size());
-    layout_info.pBindings = &bindings[0];
-
-    VkResult result = vkCreateDescriptorSetLayout(g_vk->getDevice(), &layout_info,
-        NULL, &g_descriptor_set_layout);
-
-    if (result != VK_SUCCESS)
-        throw std::runtime_error("vkCreateDescriptorSetLayout failed");
-}   // createDescriptorSetLayout
 
 // ----------------------------------------------------------------------------
 void GEVulkan2dRenderer::createPipelineLayout()
@@ -113,7 +82,7 @@ void GEVulkan2dRenderer::createPipelineLayout()
     VkPipelineLayoutCreateInfo pipeline_layout_info = {};
     pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipeline_layout_info.setLayoutCount = 1;
-    pipeline_layout_info.pSetLayouts = &g_descriptor_set_layout;
+    pipeline_layout_info.pSetLayouts = g_texture_descriptor->getDescriptorSetLayout();
 
     VkResult result = vkCreatePipelineLayout(g_vk->getDevice(), &pipeline_layout_info,
         nullptr, &g_pipeline_layout);
@@ -285,53 +254,9 @@ void GEVulkan2dRenderer::createTrisBuffers()
 }   // createTrisBuffers
 
 // ----------------------------------------------------------------------------
-void GEVulkan2dRenderer::createDescriptorPool()
-{
-    uint32_t descriptor_count = g_vk->getMaxFrameInFlight();
-    if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
-        descriptor_count *= GEVulkanShaderManager::getSamplerSize();
-
-    std::array<VkDescriptorPoolSize, 1> pool_sizes = {};
-    pool_sizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    pool_sizes[0].descriptorCount = GEVulkanShaderManager::getSamplerSize() *
-        g_vk->getMaxFrameInFlight();
-
-    VkDescriptorPoolCreateInfo pool_info = {};
-    pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    pool_info.poolSizeCount = (uint32_t)(pool_sizes.size());
-    pool_info.pPoolSizes = &pool_sizes[0];
-    pool_info.maxSets = descriptor_count;
-
-    if (vkCreateDescriptorPool(g_vk->getDevice(), &pool_info, NULL,
-        &g_descriptor_pool) != VK_SUCCESS)
-        throw std::runtime_error("createDescriptorPool failed");
-}   // createDescriptorPool
-
-// ----------------------------------------------------------------------------
-void GEVulkan2dRenderer::createDescriptorSets()
-{
-    unsigned set_size = g_vk->getMaxFrameInFlight();
-    if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
-        set_size *= GEVulkanShaderManager::getSamplerSize();
-    g_descriptor_sets.resize(set_size);
-    std::vector<VkDescriptorSetLayout> layouts(g_descriptor_sets.size(),
-        g_descriptor_set_layout);
-
-    VkDescriptorSetAllocateInfo alloc_info = {};
-    alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    alloc_info.descriptorPool = g_descriptor_pool;
-    alloc_info.descriptorSetCount = (uint32_t)(layouts.size());
-    alloc_info.pSetLayouts = layouts.data();
-
-    if (vkAllocateDescriptorSets(g_vk->getDevice(), &alloc_info,
-        g_descriptor_sets.data()) != VK_SUCCESS)
-        throw std::runtime_error("vkAllocateDescriptorSets failed");
-}   // createDescriptorSets
-
-// ----------------------------------------------------------------------------
 void GEVulkan2dRenderer::uploadTrisBuffers()
 {
-    if (g_tex_map.empty())
+    if (g_tris_queue.empty())
         return;
 
     g_tris_buffer->setCurrentData(
@@ -339,73 +264,21 @@ void GEVulkan2dRenderer::uploadTrisBuffers()
         { (void*)g_tris_queue.data(), g_tris_queue.size() * sizeof(Tri) },
         { (void*)g_tris_index_queue.data(), g_tris_index_queue.size() * sizeof(uint16_t) }
     });
+
+    g_texture_descriptor->updateDescriptor();
 }   // uploadTrisBuffers
+
+// ----------------------------------------------------------------------------
+void GEVulkan2dRenderer::handleDeletedTextures()
+{
+    g_texture_descriptor->handleDeletedTextures();
+}   // handleDeletedTextures
 
 // ----------------------------------------------------------------------------
 void GEVulkan2dRenderer::render()
 {
-    if (g_tex_map.empty())
+    if (g_tris_queue.empty())
         return;
-
-    std::vector<std::pair<const irr::video::ITexture*, unsigned> > tex_map;
-    for (auto& tex : g_tex_map)
-        tex_map.emplace_back(tex.first, (unsigned)tex.second);
-
-    std::sort(tex_map.begin(), tex_map.end(),
-        [](const std::pair<const irr::video::ITexture*, unsigned>& a,
-        const std::pair<const irr::video::ITexture*, unsigned>& b)
-        {
-            return a.second < b.second;
-        });
-
-    std::vector<VkDescriptorImageInfo> image_infos;
-    for (auto& tex : tex_map)
-    {
-        VkDescriptorImageInfo image_info;
-        image_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        image_info.imageView = (VkImageView)tex.first->getTextureHandler();
-        image_info.sampler = g_vk->getSampler(GVS_2D_RENDER);
-        image_infos.push_back(image_info);
-        if (image_infos.size() >= GEVulkanShaderManager::getSamplerSize())
-            break;
-    }
-
-    if (GEVulkanFeatures::supportsBindTexturesAtOnce())
-    {
-        image_infos.resize(GEVulkanShaderManager::getSamplerSize(), image_infos[0]);
-
-        VkWriteDescriptorSet write_descriptor_set = {};
-        write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        write_descriptor_set.dstBinding = 0;
-        write_descriptor_set.dstArrayElement = 0;
-        write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        write_descriptor_set.descriptorCount = GEVulkanShaderManager::getSamplerSize();
-        write_descriptor_set.pBufferInfo = 0;
-        write_descriptor_set.dstSet = g_descriptor_sets[g_vk->getCurrentFrame()];
-        write_descriptor_set.pImageInfo = image_infos.data();
-
-        vkUpdateDescriptorSets(g_vk->getDevice(), 1, &write_descriptor_set, 0,
-            NULL);
-    }
-    else
-    {
-        for (unsigned i = 0; i < image_infos.size(); i++)
-        {
-            VkWriteDescriptorSet write_descriptor_set = {};
-            write_descriptor_set.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            write_descriptor_set.dstBinding = 0;
-            write_descriptor_set.dstArrayElement = 0;
-            write_descriptor_set.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            write_descriptor_set.descriptorCount = 1;
-            write_descriptor_set.pBufferInfo = 0;
-            const unsigned set_idx = g_vk->getCurrentFrame() * GEVulkanShaderManager::getSamplerSize() + i;
-            write_descriptor_set.dstSet = g_descriptor_sets[set_idx];
-            write_descriptor_set.pImageInfo = &image_infos[i];
-
-            vkUpdateDescriptorSets(g_vk->getDevice(), 1, &write_descriptor_set,
-                0, NULL);
-        }
-    }
 
     VkDeviceSize offsets[] = {0};
     VkBuffer buffer = VK_NULL_HANDLE;
@@ -413,6 +286,8 @@ void GEVulkan2dRenderer::render()
     unsigned idx_count = 0;
     int sampler_idx = 0;
     core::recti clip;
+    const VkDescriptorSet* descriptor_set =
+        g_texture_descriptor->getDescriptorSet();
 
     buffer = g_tris_buffer->getCurrentBuffer();
     if (buffer == VK_NULL_HANDLE)
@@ -441,7 +316,7 @@ void GEVulkan2dRenderer::render()
     {
         vkCmdBindDescriptorSets(g_vk->getCurrentCommandBuffer(),
             VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
-            &g_descriptor_sets[g_vk->getCurrentFrame()], 0, NULL);
+            descriptor_set, 0, NULL);
     }
 
     sampler_idx = g_tris_queue[0].sampler_idx;
@@ -457,10 +332,9 @@ void GEVulkan2dRenderer::render()
         {
             if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
             {
-                const unsigned set_idx = g_vk->getCurrentFrame() * GEVulkanShaderManager::getSamplerSize() + sampler_idx;
                 vkCmdBindDescriptorSets(g_vk->getCurrentCommandBuffer(),
                     VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
-                    &g_descriptor_sets[set_idx], 0, NULL);
+                    &descriptor_set[sampler_idx], 0, NULL);
             }
 
             VkRect2D scissor;
@@ -484,10 +358,9 @@ void GEVulkan2dRenderer::render()
     }
     if (!GEVulkanFeatures::supportsBindTexturesAtOnce())
     {
-        const unsigned set_idx = g_vk->getCurrentFrame() * GEVulkanShaderManager::getSamplerSize() + sampler_idx;
         vkCmdBindDescriptorSets(g_vk->getCurrentCommandBuffer(),
             VK_PIPELINE_BIND_POINT_GRAPHICS, g_pipeline_layout, 0, 1,
-            &g_descriptor_sets[set_idx], 0, NULL);
+            &descriptor_set[sampler_idx], 0, NULL);
     }
 
     VkRect2D scissor;
@@ -508,7 +381,6 @@ end:
 // ----------------------------------------------------------------------------
 void GEVulkan2dRenderer::clear()
 {
-    g_tex_map.clear();
     g_tris_queue.clear();
     g_tris_index_queue.clear();
     g_tris_clip.clear();
@@ -521,18 +393,10 @@ void GEVulkan2dRenderer::addVerticesIndices(irr::video::S3DVertex* vertices,
                                             unsigned indices_count,
                                             const irr::video::ITexture* t)
 {
-    if (g_tex_map.find(t) == g_tex_map.end())
-    {
-        unsigned pre_size = g_tex_map.size();
-        g_tex_map[t] = pre_size;
-    }
-    int sampler_idx = g_tex_map.at(t);
-    // In STK we rarely use more than 256 textures per (2d) draw call
-    if (sampler_idx >= (int)GEVulkanShaderManager::getSamplerSize())
-        sampler_idx = GEVulkanShaderManager::getSamplerSize() - 1;
     uint16_t last_index = (uint16_t)g_tris_queue.size();
     if (last_index + vertices_count > 65535)
         return;
+    int sampler_idx = g_texture_descriptor->getTextureID(&t);
     for (unsigned idx = 0; idx < vertices_count; idx++)
     {
         Tri t;

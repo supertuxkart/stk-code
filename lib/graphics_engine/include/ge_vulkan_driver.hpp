@@ -492,6 +492,7 @@ namespace GE
         void createSwapChainRelated(bool handle_surface);
         GEVulkanMeshCache* getVulkanMeshCache() const;
         void buildCommandBuffers();
+        void handleDeletedTextures();
     };
 
 }

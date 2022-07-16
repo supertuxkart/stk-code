@@ -619,8 +619,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         GEVulkanShaderManager::init(this);
         // For GEVulkanDynamicBuffer
         GE::setVideoDriver(this);
-        GEVulkan2dRenderer::init(this);
         createUnicolorTextures();
+        GEVulkan2dRenderer::init(this);
         GEVulkanFeatures::printStats();
     }
     catch (std::exception& e)
@@ -1536,6 +1536,7 @@ bool GEVulkanDriver::endScene()
     {
         video::CNullDriver::endScene();
         GEVulkan2dRenderer::clear();
+        handleDeletedTextures();
         return false;
     }
 
@@ -2180,6 +2181,8 @@ void GEVulkanDriver::buildCommandBuffers()
 
     vkCmdEndRenderPass(getCurrentCommandBuffer());
     vkEndCommandBuffer(getCurrentCommandBuffer());
+
+    handleDeletedTextures();
 }   // buildCommandBuffers
 
 // ----------------------------------------------------------------------------
@@ -2199,7 +2202,13 @@ VkFormat GEVulkanDriver::findSupportedFormat(const std::vector<VkFormat>& candid
             return format;
     }
     throw std::runtime_error("failed to find supported format!");
-}
+}   // findSupportedFormat
+
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::handleDeletedTextures()
+{
+    GEVulkan2dRenderer::handleDeletedTextures();
+}   // handleDeletedTextures
 
 }
 
