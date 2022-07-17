@@ -28,6 +28,7 @@ set(GE_SOURCES
     src/ge_dx9_texture.cpp
     src/ge_vma.cpp
     src/ge_vulkan_2d_renderer.cpp
+    src/ge_vulkan_animated_mesh_scene_node.cpp
     src/ge_vulkan_camera_scene_node.cpp
     src/ge_vulkan_command_loader.cpp
     src/ge_vulkan_depth_texture.cpp
@@ -35,6 +36,7 @@ set(GE_SOURCES
     src/ge_vulkan_dynamic_buffer.cpp
     src/ge_vulkan_features.cpp
     src/ge_vulkan_mesh_cache.cpp
+    src/ge_vulkan_mesh_scene_node.cpp
     src/ge_vulkan_scene_manager.cpp
     src/ge_vulkan_shader_manager.cpp
     src/ge_vulkan_texture.cpp

@@ -1,7 +1,10 @@
 #include "ge_vulkan_scene_manager.hpp"
 
+#include "ge_spm.hpp"
+#include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
+#include "ge_vulkan_mesh_scene_node.hpp"
 
 namespace GE
 {
@@ -41,5 +44,50 @@ irr::scene::ICameraSceneNode* GEVulkanSceneManager::addCameraSceneNode(
 
     return node;
 }   // addCameraSceneNode
+
+// ----------------------------------------------------------------------------
+irr::scene::IAnimatedMeshSceneNode* GEVulkanSceneManager::addAnimatedMeshSceneNode(
+    irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
+    irr::s32 id,
+    const irr::core::vector3df& position,
+    const irr::core::vector3df& rotation,
+    const irr::core::vector3df& scale,
+    bool alsoAddIfMeshPointerZero)
+{
+    if (!alsoAddIfMeshPointerZero && (!mesh || !dynamic_cast<GESPM*>(mesh)))
+        return NULL;
+
+    if (!parent)
+        parent = this;
+
+    irr::scene::IAnimatedMeshSceneNode* node =
+        new GEVulkanAnimatedMeshSceneNode(mesh, parent, this, id, position,
+        rotation, scale);
+    node->drop();
+    node->setMesh(mesh);
+    return node;
+}   // addAnimatedMeshSceneNode
+
+// ----------------------------------------------------------------------------
+irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
+    irr::scene::IMesh* mesh,
+    irr::scene::ISceneNode* parent, irr::s32 id,
+    const irr::core::vector3df& position,
+    const irr::core::vector3df& rotation,
+    const irr::core::vector3df& scale,
+    bool alsoAddIfMeshPointerZero)
+{
+    if (!alsoAddIfMeshPointerZero && (!mesh || !dynamic_cast<GESPM*>(mesh)))
+        return NULL;
+
+    if (!parent)
+        parent = this;
+
+    irr::scene::IMeshSceneNode* node =
+        new GEVulkanMeshSceneNode(mesh, parent, this, id, position, rotation,
+        scale);
+    node->drop();
+    return node;
+}   // addMeshSceneNode
 
 }
