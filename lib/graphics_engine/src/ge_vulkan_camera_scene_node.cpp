@@ -3,6 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
+#include "ge_vulkan_scene_manager.hpp"
 
 namespace GE
 {
@@ -16,12 +17,14 @@ GEVulkanCameraSceneNode::GEVulkanCameraSceneNode(irr::scene::ISceneNode* parent,
 {
     m_buffer = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM,
         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(GEVulkanCameraUBO));
+    static_cast<GEVulkanSceneManager*>(SceneManager)->addDrawCall(this);
 }   // GEVulkanCameraSceneNode
 
 // ----------------------------------------------------------------------------
 GEVulkanCameraSceneNode::~GEVulkanCameraSceneNode()
 {
     delete m_buffer;
+    static_cast<GEVulkanSceneManager*>(SceneManager)->removeDrawCall(this);
 }   // ~GEVulkanCameraSceneNode
 
 // ----------------------------------------------------------------------------
@@ -50,5 +53,13 @@ void GEVulkanCameraSceneNode::render()
 
     m_ubo_data.m_projection_view_matrix = mat;
 }   // render
+
+// ----------------------------------------------------------------------------
+irr::core::matrix4 GEVulkanCameraSceneNode::getPVM() const
+{
+    // Use the original unedited matrix for culling
+    return ViewArea.getTransform(irr::video::ETS_PROJECTION) *
+        ViewArea.getTransform(irr::video::ETS_VIEW);
+}   // getPVM
 
 }

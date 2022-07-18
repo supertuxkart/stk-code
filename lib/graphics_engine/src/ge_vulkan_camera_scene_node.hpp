@@ -43,6 +43,8 @@ public:
                                                          { m_viewport = area; }
     // ------------------------------------------------------------------------
     const irr::core::rect<irr::s32>& getViewPort() const { return m_viewport; }
+    // ------------------------------------------------------------------------
+    irr::core::matrix4 getPVM() const;
 };   // GEVulkanCameraSceneNode
 
 }

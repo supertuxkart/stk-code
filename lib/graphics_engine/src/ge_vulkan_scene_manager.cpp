@@ -1,8 +1,11 @@
 #include "ge_vulkan_scene_manager.hpp"
 
+#include "../source/Irrlicht/os.h"
+
 #include "ge_spm.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
+#include "ge_vulkan_draw_call.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
 
@@ -77,8 +80,22 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
     const irr::core::vector3df& scale,
     bool alsoAddIfMeshPointerZero)
 {
-    if (!alsoAddIfMeshPointerZero && (!mesh || !dynamic_cast<GESPM*>(mesh)))
+    if (!alsoAddIfMeshPointerZero && !mesh)
         return NULL;
+
+    if (mesh)
+    {
+        for (unsigned i = 0; i < mesh->getMeshBufferCount(); i++)
+        {
+            irr::scene::IMeshBuffer* b = mesh->getMeshBuffer(i);
+            if (b->getVertexType() != irr::video::EVT_SKINNED_MESH)
+            {
+                return irr::scene::CSceneManager::addMeshSceneNode(
+                    mesh, parent, id, position, rotation, scale,
+                    alsoAddIfMeshPointerZero);
+            }
+        }
+    }
 
     if (!parent)
         parent = this;
@@ -89,5 +106,62 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
     node->drop();
     return node;
 }   // addMeshSceneNode
+
+// ----------------------------------------------------------------------------
+void GEVulkanSceneManager::drawAll(irr::u32 flags)
+{
+    static_cast<GEVulkanMeshCache*>(getMeshCache())->updateCache();
+    GEVulkanCameraSceneNode* cam = NULL;
+    if (getActiveCamera())
+    {
+        cam = static_cast<
+            GEVulkanCameraSceneNode*>(getActiveCamera());
+    }
+    OnAnimate(os::Timer::getTime());
+    if (cam)
+    {
+        cam->render();
+        auto it = m_draw_calls.find(cam);
+        if (it == m_draw_calls.end())
+            return;
+
+        it->second->prepare(cam);
+        OnRegisterSceneNode();
+        it->second->generate();
+    }
+}   // drawAll
+
+// ----------------------------------------------------------------------------
+irr::u32 GEVulkanSceneManager::registerNodeForRendering(
+    irr::scene::ISceneNode* node,
+    irr::scene::E_SCENE_NODE_RENDER_PASS pass)
+{
+    if (!getActiveCamera())
+        return 0;
+
+    GEVulkanCameraSceneNode* cam = static_cast<
+        GEVulkanCameraSceneNode*>(getActiveCamera());
+
+    if ((node->getType() == irr::scene::ESNT_ANIMATED_MESH &&
+        pass != irr::scene::ESNRP_SOLID) ||
+        (node->getType() == irr::scene::ESNT_MESH &&
+        pass != irr::scene::ESNRP_SOLID))
+        return 0;
+
+    m_draw_calls.at(cam)->addNode(node);
+    return 1;
+}   // registerNodeForRendering
+
+// ----------------------------------------------------------------------------
+void GEVulkanSceneManager::addDrawCall(GEVulkanCameraSceneNode* cam)
+{
+    m_draw_calls[cam] = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
+}   // addDrawCall
+
+// ----------------------------------------------------------------------------
+void GEVulkanSceneManager::removeDrawCall(GEVulkanCameraSceneNode* cam)
+{
+    m_draw_calls.erase(cam);
+}   // removeDrawCall
 
 }
