@@ -342,6 +342,7 @@ namespace GE
                                      VkImageTiling tiling,
                                      VkFormatFeatureFlags features);
         VmaAllocator getVmaAllocator() const         { return m_vk->allocator; }
+        GEVulkanMeshCache* getVulkanMeshCache() const;
     private:
         struct SwapChainSupportDetails
         {
@@ -490,7 +491,6 @@ namespace GE
         std::string getDriverVersionString() const;
         void destroySwapChainRelated(bool handle_surface);
         void createSwapChainRelated(bool handle_surface);
-        GEVulkanMeshCache* getVulkanMeshCache() const;
         void buildCommandBuffers();
         void handleDeletedTextures();
     };

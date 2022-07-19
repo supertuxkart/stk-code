@@ -2,7 +2,6 @@
 
 #include "ge_main.hpp"
 #include "ge_vulkan_driver.hpp"
-#include "ge_vulkan_dynamic_buffer.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 
 namespace GE
@@ -15,15 +14,12 @@ GEVulkanCameraSceneNode::GEVulkanCameraSceneNode(irr::scene::ISceneNode* parent,
                                              const irr::core::vector3df& lookat)
                        : CCameraSceneNode(parent, mgr, id, position, lookat)
 {
-    m_buffer = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM,
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(GEVulkanCameraUBO));
     static_cast<GEVulkanSceneManager*>(SceneManager)->addDrawCall(this);
 }   // GEVulkanCameraSceneNode
 
 // ----------------------------------------------------------------------------
 GEVulkanCameraSceneNode::~GEVulkanCameraSceneNode()
 {
-    delete m_buffer;
     static_cast<GEVulkanSceneManager*>(SceneManager)->removeDrawCall(this);
 }   // ~GEVulkanCameraSceneNode
 

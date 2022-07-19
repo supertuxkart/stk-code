@@ -6,12 +6,13 @@
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_depth_texture.hpp"
+#include "ge_vulkan_draw_call.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
+#include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 #include "ge_vulkan_texture.hpp"
 
-#include "ICameraSceneNode.h"
 #include "ISceneManager.h"
 #include "IrrlichtDevice.h"
 
@@ -2173,10 +2174,20 @@ void GEVulkanDriver::buildCommandBuffers()
         return;
 
     GEVulkan2dRenderer::uploadTrisBuffers();
+    for (auto& p : static_cast<GEVulkanSceneManager*>(
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
+    {
+        p.second->uploadDynamicData(this, p.first);
+    }
 
     vkCmdBeginRenderPass(getCurrentCommandBuffer(), &render_pass_info,
         VK_SUBPASS_CONTENTS_INLINE);
 
+    for (auto& p : static_cast<GEVulkanSceneManager*>(
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
+    {
+        p.second->render(this, p.first);
+    }
     GEVulkan2dRenderer::render();
 
     vkCmdEndRenderPass(getCurrentCommandBuffer());

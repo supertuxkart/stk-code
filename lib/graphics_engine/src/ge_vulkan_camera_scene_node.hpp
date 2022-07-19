@@ -16,13 +16,9 @@ irr::core::matrix4 m_inverse_projection_matrix;
 irr::core::matrix4 m_projection_view_matrix;
 };
 
-class GEVulkanDynamicBuffer;
-
 class GEVulkanCameraSceneNode : public irr::scene::CCameraSceneNode
 {
 private:
-    GEVulkanDynamicBuffer* m_buffer;
-
     GEVulkanCameraUBO m_ubo_data;
 
     irr::core::rect<irr::s32> m_viewport;
@@ -37,14 +33,14 @@ public:
     // ------------------------------------------------------------------------
     virtual void render();
     // ------------------------------------------------------------------------
-    GEVulkanDynamicBuffer* getBuffer() const               { return m_buffer; }
-    // ------------------------------------------------------------------------
     void setViewPort(const irr::core::rect<irr::s32>& area)
                                                          { m_viewport = area; }
     // ------------------------------------------------------------------------
     const irr::core::rect<irr::s32>& getViewPort() const { return m_viewport; }
     // ------------------------------------------------------------------------
     irr::core::matrix4 getPVM() const;
+    // ------------------------------------------------------------------------
+    void* getUBOData() const                     { return (void*)&m_ubo_data; }
 };   // GEVulkanCameraSceneNode
 
 }

@@ -18,6 +18,8 @@ namespace GE
 class GECullingTool;
 class GESPMBuffer;
 class GEVulkanCameraSceneNode;
+class GEVulkanDriver;
+class GEVulkanDynamicBuffer;
 
 class GEVulkanDrawCall
 {
@@ -29,6 +31,25 @@ private:
     std::vector<VkDrawIndexedIndirectCommand> m_cmds;
 
     std::vector<irr::core::matrix4> m_visible_trans;
+
+    GEVulkanDynamicBuffer* m_dynamic_data;
+
+    size_t m_object_data_padded_size;
+
+    char* m_object_data_padding;
+
+    VkDescriptorSetLayout m_data_layout;
+
+    VkDescriptorPool m_descriptor_pool;
+
+    std::vector<VkDescriptorSet> m_data_descriptor_sets;
+
+    VkPipelineLayout m_pipeline_layout;
+
+    VkPipeline m_graphics_pipeline;
+
+    // ------------------------------------------------------------------------
+    void createVulkanData();
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
@@ -40,6 +61,10 @@ public:
     void prepare(GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
     void generate();
+    // ------------------------------------------------------------------------
+    void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
+    // ------------------------------------------------------------------------
+    void render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
 };   // GEVulkanDrawCall
 
 }

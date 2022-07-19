@@ -53,6 +53,9 @@ public:
     void addDrawCall(GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
     void removeDrawCall(GEVulkanCameraSceneNode* cam);
+    // ------------------------------------------------------------------------
+    std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> >&
+                                        getDrawCalls() { return m_draw_calls; }
 };   // GEVulkanSceneManager
 
 }
