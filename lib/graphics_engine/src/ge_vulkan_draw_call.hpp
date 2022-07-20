@@ -65,6 +65,14 @@ public:
     void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
     // ------------------------------------------------------------------------
     void render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
+    // ------------------------------------------------------------------------
+    unsigned getPolyCount() const
+    {
+        unsigned result = 0;
+        for (auto& cmd : m_cmds)
+            result += (cmd.indexCount / 3) * cmd.instanceCount;
+        return result;
+    }
 };   // GEVulkanDrawCall
 
 }

@@ -1849,14 +1849,22 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    if ((UserConfigParams::m_artist_debug_mode)&&(CVS->isGLSL()))
+    if (UserConfigParams::m_artist_debug_mode)
     {
-        fps_string = StringUtils::insertValues
-                    (L"FPS: %d/%d/%d - PolyCount: %d Solid, %d Shadows - LightDist: %d\n"
-                      "Complexity %d, Total skinning joints: %d, Ping: %dms",
-                    min, fps, max, SP::sp_solid_poly_count,
-                    SP::sp_shadow_poly_count, m_last_light_bucket_distance, irr_driver->getSceneComplexity(),
-                    m_skinning_joint, ping);
+        if (CVS->isGLSL())
+        {
+            fps_string = StringUtils::insertValues
+                        (L"FPS: %d/%d/%d - PolyCount: %d Solid, %d Shadows - LightDist: %d\n"
+                          "Complexity %d, Total skinning joints: %d, Ping: %dms",
+                        min, fps, max, SP::sp_solid_poly_count,
+                        SP::sp_shadow_poly_count, m_last_light_bucket_distance, irr_driver->getSceneComplexity(),
+                        m_skinning_joint, ping);
+        }
+        else
+        {
+            fps_string = StringUtils::insertValues(L"FPS: %d/%d/%d - PolyCount: %d Solid, Ping: %dms", min, fps,
+                max, m_video_driver->getPrimitiveCountDrawn(0), ping);
+        }
     }
     else
     {

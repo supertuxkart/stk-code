@@ -2187,6 +2187,7 @@ void GEVulkanDriver::buildCommandBuffers()
         m_irrlicht_device->getSceneManager())->getDrawCalls())
     {
         p.second->render(this, p.first);
+        PrimitivesDrawn += p.second->getPolyCount();
     }
     GEVulkan2dRenderer::render();
 
