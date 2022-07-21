@@ -20,6 +20,20 @@ class GESPMBuffer;
 class GEVulkanCameraSceneNode;
 class GEVulkanDriver;
 class GEVulkanDynamicBuffer;
+class GEVulkanTextureDescriptor;
+
+struct ObjectData
+{
+    float m_mat_1[4];
+    float m_mat_2[4];
+    float m_mat_3[4];
+    float m_mat_4[4];
+    int m_skinning_offset;
+    int m_material_id;
+    float m_texture_trans[2];
+    // ------------------------------------------------------------------------
+    ObjectData(irr::scene::ISceneNode* node, int material_id);
+};
 
 class GEVulkanDrawCall
 {
@@ -30,7 +44,7 @@ private:
 
     std::vector<VkDrawIndexedIndirectCommand> m_cmds;
 
-    std::vector<irr::core::matrix4> m_visible_trans;
+    std::vector<ObjectData> m_visible_objects;
 
     GEVulkanDynamicBuffer* m_dynamic_data;
 
@@ -48,6 +62,9 @@ private:
 
     VkPipeline m_graphics_pipeline;
 
+    std::vector<int> m_materials;
+
+    GEVulkanTextureDescriptor* m_texture_descriptor;
     // ------------------------------------------------------------------------
     void createVulkanData();
 public:

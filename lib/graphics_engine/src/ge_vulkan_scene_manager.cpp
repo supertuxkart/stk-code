@@ -6,8 +6,10 @@
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_draw_call.hpp"
+#include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
+#include "ge_vulkan_texture_descriptor.hpp"
 
 namespace GE
 {
@@ -27,6 +29,14 @@ GEVulkanSceneManager::GEVulkanSceneManager(irr::video::IVideoDriver* driver,
 GEVulkanSceneManager::~GEVulkanSceneManager()
 {
 }   // ~GEVulkanSceneManager
+
+// ----------------------------------------------------------------------------
+void GEVulkanSceneManager::clear()
+{
+    irr::scene::CSceneManager::clear();
+    static_cast<GEVulkanDriver*>(getVideoDriver())
+        ->getMeshTextureDescriptor()->clear();
+}   // clear
 
 // ----------------------------------------------------------------------------
 irr::scene::ICameraSceneNode* GEVulkanSceneManager::addCameraSceneNode(

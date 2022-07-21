@@ -54,6 +54,13 @@ public:
     // ------------------------------------------------------------------------
     ~GEVulkanTextureDescriptor();
     // ------------------------------------------------------------------------
+    void clear()
+    {
+        m_texture_list.clear();
+        m_needs_update_descriptor = true;
+        m_recreate_next_frame = false;
+    }
+    // ------------------------------------------------------------------------
     void handleDeletedTextures()
     {
         bool has_deleted_image_view = false;
@@ -69,11 +76,7 @@ public:
             }
         }
         if (has_deleted_image_view || m_recreate_next_frame)
-        {
-            m_texture_list.clear();
-            m_needs_update_descriptor = true;
-            m_recreate_next_frame = false;
-        }
+            clear();
     }
     // ------------------------------------------------------------------------
     int getTextureID(const irr::video::ITexture** list);

@@ -45,6 +45,8 @@ public:
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
         bool alsoAddIfMeshPointerZero = false);
     // ------------------------------------------------------------------------
+    virtual void clear();
+    // ------------------------------------------------------------------------
     virtual void drawAll(irr::u32 flags = 0xFFFFFFFF);
     // ------------------------------------------------------------------------
     virtual irr::u32 registerNodeForRendering(irr::scene::ISceneNode* node,

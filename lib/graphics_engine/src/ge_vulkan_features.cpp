@@ -3,6 +3,7 @@
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 
+#include <algorithm>
 #include <set>
 #include <string>
 #include <vector>
@@ -21,6 +22,7 @@ bool g_supports_r8_blit = false;
 bool g_supports_descriptor_indexing = false;
 bool g_supports_non_uniform_indexing = false;
 bool g_supports_partially_bound = false;
+uint32_t g_max_sampler_supported = 0;
 }   // GEVulkanFeatures
 
 // ============================================================================
@@ -34,14 +36,15 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxPerStageDescriptorSamplers&platform=all
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxPerStageDescriptorSampledImages&platform=all
     // We decide 256 (GEVulkanShaderManager::getSamplerSize()) based on those infos
+    g_max_sampler_supported = std::min(
+    {
+        limit.maxDescriptorSetSamplers,
+        limit.maxDescriptorSetSampledImages,
+        limit.maxPerStageDescriptorSamplers,
+        limit.maxPerStageDescriptorSampledImages
+    });
     const unsigned max_sampler_size = GEVulkanShaderManager::getSamplerSize();
-    if (limit.maxDescriptorSetSamplers < max_sampler_size)
-        g_supports_bind_textures_at_once = false;
-    if (limit.maxDescriptorSetSampledImages < max_sampler_size)
-        g_supports_bind_textures_at_once = false;
-    if (limit.maxPerStageDescriptorSamplers < max_sampler_size)
-        g_supports_bind_textures_at_once = false;
-    if (limit.maxPerStageDescriptorSampledImages < max_sampler_size)
+    if (max_sampler_size > g_max_sampler_supported)
         g_supports_bind_textures_at_once = false;
     if (vk->getPhysicalDeviceFeatures().shaderSampledImageArrayDynamicIndexing == VK_FALSE)
     {
@@ -107,11 +110,15 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         if (props2.sType ==
             VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_PROPERTIES)
         {
+            g_max_sampler_supported = std::min(
+            {
+                props2.maxPerStageDescriptorUpdateAfterBindSamplers,
+                props2.maxPerStageDescriptorUpdateAfterBindSampledImages,
+                props2.maxDescriptorSetUpdateAfterBindSamplers,
+                props2.maxDescriptorSetUpdateAfterBindSampledImages
+            });
             g_supports_bind_textures_at_once =
-                props2.maxPerStageDescriptorUpdateAfterBindSamplers > max_sampler_size &&
-                props2.maxPerStageDescriptorUpdateAfterBindSampledImages > max_sampler_size &&
-                props2.maxDescriptorSetUpdateAfterBindSamplers > max_sampler_size &&
-                props2.maxDescriptorSetUpdateAfterBindSampledImages > max_sampler_size;
+                g_max_sampler_supported >= max_sampler_size;
         }
     }
 }   // init
@@ -122,6 +129,9 @@ void GEVulkanFeatures::printStats()
     os::Printer::log(
         "Vulkan can bind textures at once in shader",
         g_supports_bind_textures_at_once ? "true" : "false");
+    os::Printer::log(
+        "Vulkan can bind mesh textures at once in shader",
+        supportsBindMeshTexturesAtOnce() ? "true" : "false");
     os::Printer::log(
         "Vulkan supports linear blitting for rgba8",
         g_supports_rgba8_blit ? "true" : "false");
@@ -181,5 +191,15 @@ bool GEVulkanFeatures::supportsPartiallyBound()
 {
     return g_supports_partially_bound;
 }   // supportsPartiallyBound
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsBindMeshTexturesAtOnce()
+{
+    if (!g_supports_bind_textures_at_once)
+        return false;
+    const unsigned sampler_count = GEVulkanShaderManager::getSamplerSize() *
+        GEVulkanShaderManager::getMeshTextureLayer();
+    return g_max_sampler_supported >= sampler_count;
+}   // supportsBindMeshTexturesAtOnce
 
 }

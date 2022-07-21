@@ -11,7 +11,7 @@
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
-#include "ge_vulkan_texture.hpp"
+#include "ge_vulkan_texture_descriptor.hpp"
 
 #include "ISceneManager.h"
 #include "IrrlichtDevice.h"
@@ -490,7 +490,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                IrrlichtDevice* device)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
                 m_params(params), m_irrlicht_device(device),
-                m_depth_texture(NULL)
+                m_depth_texture(NULL), m_mesh_texture_descriptor(NULL)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -622,6 +622,10 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         GE::setVideoDriver(this);
         createUnicolorTextures();
         GEVulkan2dRenderer::init(this);
+        m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
+            GEVulkanShaderManager::getSamplerSize(),
+            GEVulkanShaderManager::getMeshTextureLayer(),
+            GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
         GEVulkanFeatures::printStats();
     }
     catch (std::exception& e)
@@ -666,6 +670,7 @@ void GEVulkanDriver::destroyVulkan()
     if (m_irrlicht_device->getSceneManager() &&
         m_irrlicht_device->getSceneManager()->getMeshCache())
         getVulkanMeshCache()->destroy();
+    delete m_mesh_texture_descriptor;
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
@@ -2220,6 +2225,7 @@ VkFormat GEVulkanDriver::findSupportedFormat(const std::vector<VkFormat>& candid
 void GEVulkanDriver::handleDeletedTextures()
 {
     GEVulkan2dRenderer::handleDeletedTextures();
+    m_mesh_texture_descriptor->handleDeletedTextures();
 }   // handleDeletedTextures
 
 }

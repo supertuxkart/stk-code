@@ -22,6 +22,8 @@ VkShaderModule getShader(const std::string& filename);
 VkShaderModule loadShader(shaderc_shader_kind, const std::string&);
 // ----------------------------------------------------------------------------
 unsigned getSamplerSize();
+// ----------------------------------------------------------------------------
+unsigned getMeshTextureLayer();
 };   // GEVulkanShaderManager
 
 }

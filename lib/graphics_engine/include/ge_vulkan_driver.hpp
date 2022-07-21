@@ -25,6 +25,7 @@ namespace GE
 {
     class GEVulkanDepthTexture;
     class GEVulkanMeshCache;
+    class GEVulkanTextureDescriptor;
     enum GEVulkanSampler : unsigned
     {
         GVS_MIN = 0,
@@ -343,6 +344,8 @@ namespace GE
                                      VkFormatFeatureFlags features);
         VmaAllocator getVmaAllocator() const         { return m_vk->allocator; }
         GEVulkanMeshCache* getVulkanMeshCache() const;
+        GEVulkanTextureDescriptor* getMeshTextureDescriptor() const
+                                           { return m_mesh_texture_descriptor; }
     private:
         struct SwapChainSupportDetails
         {
@@ -469,6 +472,7 @@ namespace GE
 
         IrrlichtDevice* m_irrlicht_device;
         GEVulkanDepthTexture* m_depth_texture;
+        GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();

@@ -21,6 +21,10 @@ GEVulkanDriver* g_vk = NULL;
 irr::io::IFileSystem* g_file_system = NULL;
 
 std::string g_predefines = "";
+
+// More when PBR is used later
+uint32_t g_mesh_texture_layer = 2;
+
 uint32_t g_sampler_size = 256;
 
 std::map<std::string, VkShaderModule> g_shaders;
@@ -109,8 +113,11 @@ void GEVulkanShaderManager::init(GEVulkanDriver* vk)
     std::ostringstream oss;
     oss << "#version 450\n";
     oss << "#define SAMPLER_SIZE " << g_sampler_size << "\n";
+    oss << "#define TOTAL_MESH_TEXTURE_LAYER " << g_mesh_texture_layer << "\n";
     if (GEVulkanFeatures::supportsBindTexturesAtOnce())
         oss << "#define BIND_TEXTURES_AT_ONCE\n";
+    if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+        oss << "#define BIND_MESH_TEXTURES_AT_ONCE\n";
 
     if (GEVulkanFeatures::supportsDifferentTexturePerDraw())
     {
@@ -221,6 +228,12 @@ unsigned GEVulkanShaderManager::getSamplerSize()
 {
     return g_sampler_size;
 }   // getSamplerSize
+
+// ----------------------------------------------------------------------------
+unsigned GEVulkanShaderManager::getMeshTextureLayer()
+{
+    return g_mesh_texture_layer;
+}   // getMeshTextureLayer
 
 // ----------------------------------------------------------------------------
 VkShaderModule GEVulkanShaderManager::getShader(const std::string& filename)
