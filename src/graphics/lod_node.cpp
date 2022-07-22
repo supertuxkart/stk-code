@@ -129,7 +129,10 @@ void LODNode::OnAnimate(u32 timeMs)
             *m_current_level = level;
             // Assume all the scene node have the same bouding box
             if(level>=0)
+            {
+                m_nodes[level]->setVisible(true);
                 m_nodes[level]->OnAnimate(timeMs);
+            }
         }
 
         if (m_update_box_every_frame)
