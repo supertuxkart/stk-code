@@ -2,6 +2,8 @@
 
 #include "ge_spm.hpp"
 
+#include "ISceneManager.h"
+
 namespace GE
 {
 GEVulkanAnimatedMeshSceneNode::GEVulkanAnimatedMeshSceneNode(irr::scene::IAnimatedMesh* mesh,
@@ -19,5 +21,14 @@ GESPM* GEVulkanAnimatedMeshSceneNode::getSPM() const
 {
     return static_cast<GESPM*>(Mesh);
 }   // getSPM
+
+// ----------------------------------------------------------------------------
+void GEVulkanAnimatedMeshSceneNode::OnRegisterSceneNode()
+{
+    if (!IsVisible)
+        return;
+    SceneManager->registerNodeForRendering(this, scene::ESNRP_SOLID);
+    ISceneNode::OnRegisterSceneNode();
+}   // OnRegisterSceneNode
 
 }

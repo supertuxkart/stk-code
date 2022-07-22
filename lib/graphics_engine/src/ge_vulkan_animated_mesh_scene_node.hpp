@@ -18,6 +18,8 @@ public:
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
     // ------------------------------------------------------------------------
     GESPM* getSPM() const;
+    // ------------------------------------------------------------------------
+    virtual void OnRegisterSceneNode();
 };   // GEVulkanAnimatedMeshSceneNode
 
 }
