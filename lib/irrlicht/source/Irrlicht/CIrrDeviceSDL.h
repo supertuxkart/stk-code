@@ -303,6 +303,8 @@ class MoltenVK;
 		s32 GyroscopeIndex;
 		s32 GyroscopeInstance;
 
+		f32 NativeScaleX, NativeScaleY;
+
 		struct SKeyMap
 		{
 			SKeyMap() {}
@@ -328,6 +330,7 @@ class MoltenVK;
 		MoltenVK* m_moltenvk;
 #endif
 		void createGUIAndVulkanScene();
+		void updateNativeScale();
 	};
 
 } // end namespace irr

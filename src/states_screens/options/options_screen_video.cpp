@@ -326,8 +326,8 @@ void OptionsScreenVideo::init()
             r.fullscreen = true;
             m_resolutions.push_back(r);
 
-            if (r.width  == UserConfigParams::m_width &&
-                r.height == UserConfigParams::m_height)
+            if (r.width  == UserConfigParams::m_real_width &&
+                r.height == UserConfigParams::m_real_height)
             {
                 found_config_res = true;
             }
@@ -344,8 +344,8 @@ void OptionsScreenVideo::init()
 
         if (!found_config_res)
         {
-            r.width  = UserConfigParams::m_width;
-            r.height = UserConfigParams::m_height;
+            r.width  = UserConfigParams::m_real_width;
+            r.height = UserConfigParams::m_real_height;
             r.fullscreen = false;
             m_resolutions.push_back(r);
 
@@ -418,8 +418,8 @@ void OptionsScreenVideo::init()
 
     // ---- select current resolution every time
     char searching_for[32];
-    snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_width,
-                                         (int)UserConfigParams::m_height);
+    snprintf(searching_for, 32, "%ix%i", (int)UserConfigParams::m_real_width,
+                                         (int)UserConfigParams::m_real_height);
 
 
     if (!res->setSelection(searching_for, PLAYER_ID_GAME_MASTER,

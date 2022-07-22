@@ -26,6 +26,8 @@
 #include "ge_vulkan_scene_manager.hpp"
 #include "MoltenVK.h"
 
+#include <SDL_vulkan.h>
+
 extern bool GLContextDebugBit;
 
 namespace irr
@@ -57,9 +59,6 @@ extern "C" int Android_disablePadding();
 namespace irr
 {
 
-float g_native_scale_x = 1.0f;
-float g_native_scale_y = 1.0f;
-
 //! constructor
 CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
@@ -69,7 +68,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	TopPadding(0), BottomPadding(0), LeftPadding(0), RightPadding(0),
 	InitialOrientation(0), WindowHasFocus(false), WindowMinimized(false),
 	Resizable(false), AccelerometerIndex(-1), AccelerometerInstance(-1),
-	GyroscopeIndex(-1), GyroscopeInstance(-1)
+	GyroscopeIndex(-1), GyroscopeInstance(-1), NativeScaleX(1.0f),
+	NativeScaleY(1.0f)
 {
 	#ifdef _DEBUG
 	setDebugName("CIrrDeviceSDL");
@@ -155,33 +155,12 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		}
 		else
 			return;
+		updateNativeScale();
+		Width = (u32)((f32)Width * NativeScaleX);
+		Height = (u32)((f32)Height * NativeScaleY);
+		CreationParams.WindowSize.Width = Width;
+		CreationParams.WindowSize.Height = Height;
 	}
-#if !defined(ANDROID) && !defined(__SWITCH__)
-	else if (!GUIEngine::isNoGraphics())
-	{
-		// Get highdpi native scale using renderer so it will work with any
-		// backend later (opengl or vulkan)
-		// Android doesn't use high dpi
-		SDL_Window* window = NULL;
-		SDL_Renderer* renderer = NULL;
-		if (SDL_CreateWindowAndRenderer(640, 480,
-			SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_HIDDEN,
-			&window, &renderer) == 0)
-		{
-			int w, h, rw, rh;
-			w = h = rw = rh = 0;
-			SDL_GetWindowSize(window, &w, &h);
-			SDL_GetRendererOutputSize(renderer, &rw, &rh);
-			if (w != 0 && h != 0 && rw != 0 && rh != 0)
-			{
-				g_native_scale_x = (float)rw / (float)w;
-				g_native_scale_y = (float)rh / (float)h;
-			}
-			SDL_DestroyRenderer(renderer);
-			SDL_DestroyWindow(window);
-		}
-	}
-#endif
 
 	// create cursor control
 	CursorControl = new CCursorControl(this);
@@ -199,6 +178,26 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 #ifdef IOS_STK
 	SDL_SetEventFilter(handle_app_event, NULL);
 #endif
+}
+
+
+void CIrrDeviceSDL::updateNativeScale()
+{
+	int width, height = 0;
+	SDL_GetWindowSize(Window, &width, &height);
+	int real_width = width;
+	int real_height = height;
+	if (CreationParams.DriverType == video::EDT_OPENGL ||
+		CreationParams.DriverType == video::EDT_OGLES2)
+	{
+		SDL_GL_GetDrawableSize(Window, &real_width, &real_height);
+	}
+	else if (CreationParams.DriverType == video::EDT_VULKAN)
+	{
+		SDL_Vulkan_GetDrawableSize(Window, &real_width, &real_height);
+	}
+	NativeScaleX = (f32)real_width / (f32)width;
+	NativeScaleY = (f32)real_height / (f32)height;
 }
 
 
@@ -386,7 +385,14 @@ bool CIrrDeviceSDL::createWindow()
 		}
 	}
 
-	u32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI;
+	u32 flags = SDL_WINDOW_SHOWN;
+#if !defined(ANDROID) && !defined(__SWITCH__)
+	if (CreationParams.DriverType == video::EDT_OPENGL ||
+		CreationParams.DriverType == video::EDT_OGLES2 ||
+		CreationParams.DriverType == video::EDT_VULKAN)
+		flags |= SDL_WINDOW_ALLOW_HIGHDPI;
+#endif
+
 	if (CreationParams.Fullscreen)
 		flags |= SDL_WINDOW_FULLSCREEN;
 
@@ -427,10 +433,10 @@ bool CIrrDeviceSDL::createWindow()
 	else
 	{
 		Window = SDL_CreateWindow("",
-			(float)CreationParams.WindowPosition.X / g_native_scale_x,
-			(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-			(float)CreationParams.WindowSize.Width / g_native_scale_x,
-			(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+			(float)CreationParams.WindowPosition.X,
+			(float)CreationParams.WindowPosition.Y,
+			(float)CreationParams.WindowSize.Width,
+			(float)CreationParams.WindowSize.Height, flags);
 		if (!Window)
 		{
 			os::Printer::log( "Could not initialize display!" );
@@ -477,10 +483,10 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+		(float)CreationParams.WindowPosition.X,
+		(float)CreationParams.WindowPosition.Y,
+		(float)CreationParams.WindowSize.Width,
+		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
@@ -503,10 +509,10 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+		(float)CreationParams.WindowPosition.X,
+		(float)CreationParams.WindowPosition.Y,
+		(float)CreationParams.WindowSize.Width,
+		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
@@ -528,10 +534,10 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+		(float)CreationParams.WindowPosition.X,
+		(float)CreationParams.WindowPosition.Y,
+		(float)CreationParams.WindowSize.Width,
+		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
@@ -553,10 +559,10 @@ start:
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+		(float)CreationParams.WindowPosition.X,
+		(float)CreationParams.WindowPosition.Y,
+		(float)CreationParams.WindowSize.Width,
+		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
@@ -590,10 +596,10 @@ legacy:
 	else
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, 0);
 	Window = SDL_CreateWindow("",
-		(float)CreationParams.WindowPosition.X / g_native_scale_x,
-		(float)CreationParams.WindowPosition.Y / g_native_scale_y,
-		(float)CreationParams.WindowSize.Width / g_native_scale_x,
-		(float)CreationParams.WindowSize.Height / g_native_scale_y, flags);
+		(float)CreationParams.WindowPosition.X,
+		(float)CreationParams.WindowPosition.Y,
+		(float)CreationParams.WindowSize.Width,
+		(float)CreationParams.WindowSize.Height, flags);
 	if (Window)
 	{
 		Context = SDL_GL_CreateContext(Window);
@@ -644,6 +650,10 @@ void CIrrDeviceSDL::createDriver()
 		try
 		{
 			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window, this);
+			// SDL_Vulkan_GetDrawableSize only works after driver is created
+			updateNativeScale();
+			Width = (u32)((f32)Width * NativeScaleX);
+			Height = (u32)((f32)Height * NativeScaleY);
 		}
 		catch (std::exception& e)
 		{
@@ -782,8 +792,8 @@ bool CIrrDeviceSDL::run()
 		case SDL_MOUSEMOTION:
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-			MouseX = irrevent.MouseInput.X = SDL_event.motion.x * g_native_scale_x;
-			MouseY = irrevent.MouseInput.Y = SDL_event.motion.y * g_native_scale_y;
+			MouseX = irrevent.MouseInput.X = SDL_event.motion.x * NativeScaleX;
+			MouseY = irrevent.MouseInput.Y = SDL_event.motion.y * NativeScaleY;
 			irrevent.MouseInput.ButtonStates = MouseButtonStates;
 
 			postEventFromUser(irrevent);
@@ -793,8 +803,8 @@ bool CIrrDeviceSDL::run()
 		case SDL_MOUSEBUTTONUP:
 
 			irrevent.EventType = irr::EET_MOUSE_INPUT_EVENT;
-			irrevent.MouseInput.X = SDL_event.button.x * g_native_scale_x;
-			irrevent.MouseInput.Y = SDL_event.button.y * g_native_scale_y;
+			irrevent.MouseInput.X = SDL_event.button.x * NativeScaleX;
+			irrevent.MouseInput.Y = SDL_event.button.y * NativeScaleY;
 
 			irrevent.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
 
@@ -900,16 +910,19 @@ bool CIrrDeviceSDL::run()
 
 		case SDL_WINDOWEVENT:
 			{
-				u32 new_width = SDL_event.window.data1 * g_native_scale_x;
-				u32 new_height = SDL_event.window.data2 * g_native_scale_y;
-				if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED &&
-					((new_width != Width) || (new_height != Height)))
+				if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 				{
-					Width = new_width;
-					Height = new_height;
-					if (VideoDriver)
-						VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
-					reset_network_body();
+					updateNativeScale();
+					u32 new_width = SDL_event.window.data1 * NativeScaleX;
+					u32 new_height = SDL_event.window.data2 * NativeScaleY;
+					if (new_width != Width || new_height != Height)
+					{
+						Width = new_width;
+						Height = new_height;
+						if (VideoDriver)
+							VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
+						reset_network_body();
+					}
 				}
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_MINIMIZED)
 				{
@@ -1050,20 +1063,20 @@ video::IVideoModeList* CIrrDeviceSDL::getVideoModeList()
 		if (SDL_GetDesktopDisplayMode(0, &mode) == 0)
 		{
 			VideoModeList.setDesktop(SDL_BITSPERPIXEL(mode.format),
-				core::dimension2d<u32>(mode.w * g_native_scale_x, mode.h * g_native_scale_y));
+				core::dimension2d<u32>(mode.w, mode.h));
 		}
 
 #ifdef MOBILE_STK
 	// SDL2 will return w,h and h,w for mobile STK, as we only use landscape
 	// so we just use desktop resolution for now
-	VideoModeList.addMode(core::dimension2d<u32>(mode.w * g_native_scale_x, mode.h * g_native_scale_y),
+	VideoModeList.addMode(core::dimension2d<u32>(mode.w, mode.h),
 		SDL_BITSPERPIXEL(mode.format));
 #else
 		for (int i = 0; i < mode_count; i++)
 		{
 			if (SDL_GetDisplayMode(0, i, &mode) == 0)
 			{
-				VideoModeList.addMode(core::dimension2d<u32>(mode.w * g_native_scale_x, mode.h * g_native_scale_y),
+				VideoModeList.addMode(core::dimension2d<u32>(mode.w, mode.h),
 					SDL_BITSPERPIXEL(mode.format));
 			}
 		}
@@ -1498,7 +1511,7 @@ extern "C" int Android_getMovedHeight();
 s32 CIrrDeviceSDL::getMovedHeight() const
 {
 #if defined(IOS_STK)
-	return SDL_GetMovedHeightByScreenKeyboard() * g_native_scale_y;
+	return SDL_GetMovedHeightByScreenKeyboard() * NativeScaleY;
 #elif defined(ANDROID)
 	return Android_getMovedHeight();
 #else
@@ -1511,7 +1524,7 @@ extern "C" int Android_getKeyboardHeight();
 u32 CIrrDeviceSDL::getOnScreenKeyboardHeight() const
 {
 #if defined(IOS_STK)
-	return SDL_GetScreenKeyboardHeight() * g_native_scale_y;
+	return SDL_GetScreenKeyboardHeight() * NativeScaleY;
 #elif defined(ANDROID)
 	return Android_getKeyboardHeight();
 #else
@@ -1522,13 +1535,13 @@ u32 CIrrDeviceSDL::getOnScreenKeyboardHeight() const
 
 f32 CIrrDeviceSDL::getNativeScaleX() const
 {
-	return g_native_scale_x;
+	return NativeScaleX;
 }
 
 
 f32 CIrrDeviceSDL::getNativeScaleY() const
 {
-	return g_native_scale_y;
+	return NativeScaleY;
 }
 
 

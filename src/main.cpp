@@ -867,13 +867,13 @@ int handleCmdLinePreliminary()
                 UserConfigParams::m_blacklist_res.end(),res) ==
                 UserConfigParams::m_blacklist_res.end())
             {
-                UserConfigParams::m_prev_width =
-                    UserConfigParams::m_width = width;
-                UserConfigParams::m_prev_height =
-                    UserConfigParams::m_height = height;
+                UserConfigParams::m_prev_real_width =
+                    UserConfigParams::m_real_width = width;
+                UserConfigParams::m_prev_real_height =
+                    UserConfigParams::m_real_height = height;
                 Log::verbose("main", "You choose to use %dx%d.",
-                    (int)UserConfigParams::m_width,
-                    (int)UserConfigParams::m_height );
+                    (int)UserConfigParams::m_real_width,
+                    (int)UserConfigParams::m_real_height );
             }
             else
                 Log::warn("main", "Resolution %s has been blacklisted, so "

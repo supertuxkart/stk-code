@@ -453,13 +453,13 @@ void IrrDriver::initDevice()
         {
             Log::warn("irr_driver", "Unknown desktop resolution.");
         }
-        else if (UserConfigParams::m_width > (int)ssize.Width ||
-                 UserConfigParams::m_height > (int)ssize.Height)
+        else if (UserConfigParams::m_real_width > (int)ssize.Width ||
+                 UserConfigParams::m_real_height > (int)ssize.Height)
         {
             Log::warn("irr_driver", "The window size specified in "
                       "user config is larger than your screen!");
-            UserConfigParams::m_width = (int)ssize.Width;
-            UserConfigParams::m_height = (int)ssize.Height;
+            UserConfigParams::m_real_width = (int)ssize.Width;
+            UserConfigParams::m_real_height = (int)ssize.Height;
         }
 
         if (UserConfigParams::m_fullscreen)
@@ -467,12 +467,12 @@ void IrrDriver::initDevice()
             if (modes->getVideoModeCount() > 0)
             {
                 core::dimension2d<u32> res = core::dimension2du(
-                                                    UserConfigParams::m_width,
-                                                    UserConfigParams::m_height);
+                                                    UserConfigParams::m_real_width,
+                                                    UserConfigParams::m_real_height);
                 res = modes->getVideoModeResolution(res, res);
 
-                UserConfigParams::m_width = res.Width;
-                UserConfigParams::m_height = res.Height;
+                UserConfigParams::m_real_width = res.Width;
+                UserConfigParams::m_real_height = res.Height;
             }
             else
             {
@@ -482,12 +482,12 @@ void IrrDriver::initDevice()
             }
         }
 
-        if (UserConfigParams::m_width < 1 || UserConfigParams::m_height < 1)
+        if (UserConfigParams::m_real_width < 1 || UserConfigParams::m_real_height < 1)
         {
             Log::warn("irr_driver", "Invalid window size. "
                          "Try to use the default one.");
-            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
-            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+            UserConfigParams::m_real_width = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_real_height = MIN_SUPPORTED_HEIGHT;
         }
 
         m_device->closeDevice();
@@ -528,8 +528,8 @@ void IrrDriver::initDevice()
             params.SwapInterval  = UserConfigParams::m_swap_interval;
             params.FileSystem    = file_manager->getFileSystem();
             params.WindowSize    =
-                core::dimension2du(UserConfigParams::m_width,
-                                   UserConfigParams::m_height);
+                core::dimension2du(UserConfigParams::m_real_width,
+                                   UserConfigParams::m_real_height);
             params.HandleSRGB    = false;
             params.ShadersPath   = (file_manager->getShadersDir() +
                                                            "irrlicht/").c_str();
@@ -575,11 +575,11 @@ void IrrDriver::initDevice()
         // size is the problem
         if(!m_device)
         {
-            UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
-            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+            UserConfigParams::m_real_width  = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_real_height = MIN_SUPPORTED_HEIGHT;
             m_device = createDevice(driver_created,
-                        core::dimension2du(UserConfigParams::m_width,
-                                           UserConfigParams::m_height ),
+                        core::dimension2du(UserConfigParams::m_real_width,
+                                           UserConfigParams::m_real_height ),
                                     32, //bits per pixel
                                     UserConfigParams::m_fullscreen,
                                     false,  // stencil buffers
@@ -600,6 +600,9 @@ void IrrDriver::initDevice()
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
     }
+    UserConfigParams::m_width = (unsigned)((float)UserConfigParams::m_real_width * m_device->getNativeScaleX());
+    UserConfigParams::m_height = (unsigned)((float)UserConfigParams::m_real_height * m_device->getNativeScaleY());
+
 #ifndef SERVER_ONLY 
 
     GE::setVideoDriver(m_device->getVideoDriver());
@@ -958,12 +961,12 @@ void IrrDriver::changeResolution(const int w, const int h,
                                  const bool fullscreen)
 {
     // update user config values
-    UserConfigParams::m_prev_width = UserConfigParams::m_width;
-    UserConfigParams::m_prev_height = UserConfigParams::m_height;
+    UserConfigParams::m_prev_real_width = UserConfigParams::m_real_width;
+    UserConfigParams::m_prev_real_height = UserConfigParams::m_real_height;
     UserConfigParams::m_prev_fullscreen = UserConfigParams::m_fullscreen;
 
-    UserConfigParams::m_width = w;
-    UserConfigParams::m_height = h;
+    UserConfigParams::m_real_width = w;
+    UserConfigParams::m_real_height = h;
     UserConfigParams::m_fullscreen = fullscreen;
 
     // Setting this flag will trigger a call to applyResolutionSetting()
@@ -987,10 +990,9 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
     if (recreate_device)
     {
         m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
-        GL32_draw2DRectangle( video::SColor(255, 0, 0, 0),
-                                core::rect<s32>(0, 0,
-                                                UserConfigParams::m_prev_width,
-                                                UserConfigParams::m_prev_height) );
+        GL32_draw2DRectangle( video::SColor(255, 0, 0, 0), core::rect<s32>(0, 0,
+            s32(m_device->getNativeScaleX() * (float)UserConfigParams::m_prev_real_width),
+            s32(m_device->getNativeScaleY() * (float)UserConfigParams::m_prev_real_height)) );
         m_video_driver->endScene();
     }
     track_manager->removeAllCachedData();
@@ -1119,8 +1121,8 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
 
 void IrrDriver::cancelResChange()
 {
-    UserConfigParams::m_width = UserConfigParams::m_prev_width;
-    UserConfigParams::m_height = UserConfigParams::m_prev_height;
+    UserConfigParams::m_real_width = UserConfigParams::m_prev_real_width;
+    UserConfigParams::m_real_height = UserConfigParams::m_prev_real_height;
     UserConfigParams::m_fullscreen = UserConfigParams::m_prev_fullscreen;
 
     // This will trigger calling applyResolutionSettings in update(). This is
@@ -2025,6 +2027,8 @@ void IrrDriver::handleWindowResize()
         m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
         UserConfigParams::m_width = m_actual_screen_size.Width;
         UserConfigParams::m_height = m_actual_screen_size.Height;
+        UserConfigParams::m_real_width = (unsigned)((float)m_actual_screen_size.Width / m_device->getNativeScaleX());
+        UserConfigParams::m_real_height = (unsigned)((float)m_actual_screen_size.Height / m_device->getNativeScaleY());
         resizeWindow();
     }
     // In case reset by opening options in game
