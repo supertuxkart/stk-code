@@ -956,6 +956,10 @@ void GEVulkanDriver::createDevice()
     VkPhysicalDeviceFeatures device_features = {};
     device_features.shaderSampledImageArrayDynamicIndexing =
         GEVulkanFeatures::supportsBindTexturesAtOnce();
+    device_features.multiDrawIndirect =
+        GEVulkanFeatures::supportsMultiDrawIndirect();
+    device_features.drawIndirectFirstInstance =
+        GEVulkanFeatures::supportsMultiDrawIndirect();
 
     VkPhysicalDeviceVulkan12Features vulkan12_features = {};
     vulkan12_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;

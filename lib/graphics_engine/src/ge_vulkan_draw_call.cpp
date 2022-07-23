@@ -405,9 +405,15 @@ void GEVulkanDrawCall::createVulkanData()
     size_t size = m_visible_objects.size();
     if (m_visible_objects.empty())
         size = 100;
-    m_dynamic_data = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM,
-        VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+
+    const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
+        GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
+    VkBufferUsageFlags flags = VK_BUFFER_USAGE_STORAGE_BUFFER_BIT |
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+    if (use_multidraw)
+        flags |= VK_BUFFER_USAGE_INDIRECT_BUFFER_BIT;
+
+    m_dynamic_data = new GEVulkanDynamicBuffer(GVDBT_GPU_RAM, flags,
         (sizeof(ObjectData) * size) + sizeof(GEVulkanCameraUBO));
 }   // createVulkanData
 
@@ -428,11 +434,24 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
         ubo_padding = object_data_size % ubo_alignment;
     m_object_data_padded_size = object_data_size + ubo_padding;
 
+    // https://github.com/google/filament/pull/3814
+    // Need both vertex and fragment bit
+    VkPipelineStageFlags dst_stage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
+        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
     std::vector<std::pair<void*, size_t> > data;
     data.emplace_back((void*)m_visible_objects.data(), object_data_size);
     if (ubo_padding > 0)
         data.emplace_back((void*)m_object_data_padding, ubo_padding);
     data.emplace_back(cam->getUBOData(), sizeof(GEVulkanCameraUBO));
+
+    const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
+        GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
+    if (use_multidraw)
+    {
+        data.emplace_back(m_cmds.data(),
+            sizeof(VkDrawIndexedIndirectCommand) * m_cmds.size());
+        dst_stage |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
+    }
     m_dynamic_data->setCurrentData(data);
 
     VkBufferMemoryBarrier barrier = {};
@@ -444,12 +463,8 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     barrier.buffer = m_dynamic_data->getCurrentBuffer();
     barrier.size = m_dynamic_data->getRealSize();
 
-    // https://github.com/google/filament/pull/3814
-    // Need both vertex and fragment bit
     vkCmdPipelineBarrier(vk->getCurrentCommandBuffer(),
-        VK_PIPELINE_STAGE_TRANSFER_BIT,
-        VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
-        VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, NULL, 1, &barrier, 0,
+        VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0, NULL, 1, &barrier, 0,
         NULL);
 }   // uploadDynamicData
 
@@ -533,19 +548,31 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam)
     scissor.extent.height = vp.height;
     vkCmdSetScissor(vk->getCurrentCommandBuffer(), 0, 1, &scissor);
 
-    for (unsigned i = 0; i < m_cmds.size(); i++)
+    const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
+        GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
+    if (use_multidraw)
     {
-        if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+        vkCmdDrawIndexedIndirect(vk->getCurrentCommandBuffer(),
+            m_dynamic_data->getCurrentBuffer(),
+            m_object_data_padded_size + sizeof(GEVulkanCameraUBO),
+            m_cmds.size(), sizeof(VkDrawIndexedIndirectCommand));
+    }
+    else
+    {
+        for (unsigned i = 0; i < m_cmds.size(); i++)
         {
-            vkCmdBindDescriptorSets(vk->getCurrentCommandBuffer(),
-                VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1,
-                &m_texture_descriptor->getDescriptorSet()[m_materials[i]], 0,
-                NULL);
+            if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+            {
+                vkCmdBindDescriptorSets(vk->getCurrentCommandBuffer(),
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1,
+                    &m_texture_descriptor->getDescriptorSet()[m_materials[i]],
+                    0, NULL);
+            }
+            const VkDrawIndexedIndirectCommand& cmd = m_cmds[i];
+            vkCmdDrawIndexed(vk->getCurrentCommandBuffer(), cmd.indexCount,
+                cmd.instanceCount, cmd.firstIndex, cmd.vertexOffset,
+                cmd.firstInstance);
         }
-        const VkDrawIndexedIndirectCommand& cmd = m_cmds[i];
-        vkCmdDrawIndexed(vk->getCurrentCommandBuffer(), cmd.indexCount,
-            cmd.instanceCount, cmd.firstIndex, cmd.vertexOffset,
-            cmd.firstInstance);
     }
 }   // render
 

@@ -23,6 +23,7 @@ bool g_supports_descriptor_indexing = false;
 bool g_supports_non_uniform_indexing = false;
 bool g_supports_partially_bound = false;
 uint32_t g_max_sampler_supported = 0;
+bool g_supports_multi_draw_indirect = false;
 }   // GEVulkanFeatures
 
 // ============================================================================
@@ -51,6 +52,8 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
         dynamic_indexing = false;
         g_supports_bind_textures_at_once = false;
     }
+    g_supports_multi_draw_indirect = vk->getPhysicalDeviceFeatures().multiDrawIndirect &&
+         vk->getPhysicalDeviceFeatures().drawIndirectFirstInstance;
 
     VkFormatProperties format_properties = {};
     vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
@@ -142,6 +145,9 @@ void GEVulkanFeatures::printStats()
         "Vulkan supports VK_EXT_descriptor_indexing",
         g_supports_descriptor_indexing ? "true" : "false");
     os::Printer::log(
+        "Vulkan supports multi-draw indirect",
+        g_supports_multi_draw_indirect ? "true" : "false");
+    os::Printer::log(
         "Vulkan descriptor indexes can be dynamically non-uniform",
         g_supports_non_uniform_indexing ? "true" : "false");
     os::Printer::log(
@@ -200,6 +206,12 @@ bool GEVulkanFeatures::supportsBindMeshTexturesAtOnce()
     const unsigned sampler_count = GEVulkanShaderManager::getSamplerSize() *
         GEVulkanShaderManager::getMeshTextureLayer();
     return g_max_sampler_supported >= sampler_count;
+}   // supportsBindMeshTexturesAtOnce
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsMultiDrawIndirect()
+{
+    return g_supports_multi_draw_indirect;
 }   // supportsBindMeshTexturesAtOnce
 
 }

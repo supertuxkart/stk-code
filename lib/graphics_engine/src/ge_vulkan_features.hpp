@@ -28,6 +28,8 @@ bool supportsDifferentTexturePerDraw();
 bool supportsPartiallyBound();
 // ----------------------------------------------------------------------------
 bool supportsBindMeshTexturesAtOnce();
+// ----------------------------------------------------------------------------
+bool supportsMultiDrawIndirect();
 };   // GEVulkanFeatures
 
 }
