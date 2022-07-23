@@ -418,8 +418,11 @@ namespace GE
                     vkDestroyFramebuffer(device, framebuffer, NULL);
                 if (render_pass != VK_NULL_HANDLE)
                     vkDestroyRenderPass(device, render_pass, NULL);
-                for (unsigned i = 0; i < GVS_COUNT; i++)
-                    vkDestroySampler(device, samplers[i], NULL);
+                if (device != VK_NULL_HANDLE)
+                {
+                    for (unsigned i = 0; i < GVS_COUNT; i++)
+                        vkDestroySampler(device, samplers[i], NULL);
+                }
                 for (VkSemaphore& semaphore : image_available_semaphores)
                     vkDestroySemaphore(device, semaphore, NULL);
                 for (VkSemaphore& semaphore : render_finished_semaphores)
