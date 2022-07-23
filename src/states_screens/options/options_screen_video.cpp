@@ -41,6 +41,13 @@
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#include <ge_vulkan_driver.hpp>
+#include <ge_vulkan_texture_descriptor.hpp>
+#endif
+
+
 #include <iostream>
 #include <sstream>
 
@@ -151,26 +158,37 @@ int OptionsScreenVideo::getImageQuality()
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::setImageQuality(int quality)
 {
+#ifndef SERVER_ONLY
+    GE::GEVulkanTextureDescriptor* td = NULL;
+    if (GE::getVKDriver())
+        td = GE::getVKDriver()->getMeshTextureDescriptor();
     switch (quality)
     {
         case 0:
             UserConfigParams::m_anisotropic = 2;
             UserConfigParams::m_high_definition_textures = 0x02;
             UserConfigParams::m_hq_mipmap = false;
+            if (td)
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
             break;
         case 1:
             UserConfigParams::m_anisotropic = 4;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = false;
+            if (td)
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
             break;
         case 2:
             UserConfigParams::m_anisotropic = 16;
             UserConfigParams::m_high_definition_textures = 0x03;
             UserConfigParams::m_hq_mipmap = true;
+            if (td)
+                td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
             break;
         default:
             assert(false);
     }
+#endif
 }   // setImageQuality
 
 // --------------------------------------------------------------------------------------------
@@ -444,10 +462,10 @@ void OptionsScreenVideo::init()
     applyBtn->setActive(!in_game);
 #ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
-#endif
-    getWidget<ButtonWidget>("custom")->setActive(!in_game);
+    getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game);
+#endif
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
     applyBtn->setVisible(false);

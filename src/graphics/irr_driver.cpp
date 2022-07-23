@@ -97,6 +97,8 @@
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>
+#include <ge_vulkan_driver.hpp>
+#include <ge_vulkan_texture_descriptor.hpp>
 #endif
 
 #ifdef ENABLE_RECORDER
@@ -606,6 +608,29 @@ void IrrDriver::initDevice()
 #ifndef SERVER_ONLY 
 
     GE::setVideoDriver(m_device->getVideoDriver());
+
+    GE::GEVulkanDriver* vk = GE::getVKDriver();
+    if (vk)
+    {
+        GE::GEVulkanTextureDescriptor* td = vk->getMeshTextureDescriptor();
+        switch (UserConfigParams::m_anisotropic)
+        {
+        case 16:
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
+            break;
+        case 4:
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_4);
+            break;
+        case 2:
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_2);
+            break;
+        default:
+            Log::warn("irr_driver", "Unsupported anisotropic values, revert");
+            UserConfigParams::m_anisotropic = 16;
+            td->setSamplerUse(GE::GVS_3D_MESH_MIPMAP_16);
+            break;
+        }
+    }
     // Assume sp is supported
     CentralVideoSettings::m_supports_sp = true;
     CVS->init();

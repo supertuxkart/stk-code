@@ -1344,11 +1344,53 @@ void GEVulkanDriver::createSamplers()
         throw std::runtime_error("vkCreateSampler failed for GVS_NEAREST");
     m_vk->samplers[GVS_NEAREST] = sampler;
 
+    const float max_aniso = m_properties.limits.maxSamplerAnisotropy;
+    // GVS_3D_MESH_MIPMAP_2
+    sampler_info.magFilter = VK_FILTER_LINEAR;
+    sampler_info.minFilter = VK_FILTER_LINEAR;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    sampler_info.maxAnisotropy = std::min(2.0f, max_aniso);
+    result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
+        &sampler);
+
+    if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error(
+            "vkCreateSampler failed for GVS_3D_MESH_MIPMAP_2");
+    }
+    m_vk->samplers[GVS_3D_MESH_MIPMAP_2] = sampler;
+
+    // GVS_3D_MESH_MIPMAP_4
+    sampler_info.maxAnisotropy = std::min(4.0f, max_aniso);
+    result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
+        &sampler);
+
+    if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error(
+            "vkCreateSampler failed for GVS_3D_MESH_MIPMAP_4");
+    }
+    m_vk->samplers[GVS_3D_MESH_MIPMAP_4] = sampler;
+
+    // GVS_3D_MESH_MIPMAP_16
+    sampler_info.maxAnisotropy = std::min(16.0f, max_aniso);
+    result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
+        &sampler);
+
+    if (result != VK_SUCCESS)
+    {
+        throw std::runtime_error(
+            "vkCreateSampler failed for GVS_3D_MESH_MIPMAP_16");
+    }
+    m_vk->samplers[GVS_3D_MESH_MIPMAP_16] = sampler;
+
     // GVS_2D_RENDER
     sampler_info.magFilter = VK_FILTER_LINEAR;
     sampler_info.minFilter = VK_FILTER_LINEAR;
     // Avoid artifacts when resizing down the screen
     sampler_info.maxLod = 0.25f;
+    sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+    sampler_info.maxAnisotropy = 1.0f;
     result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
         &sampler);
 
