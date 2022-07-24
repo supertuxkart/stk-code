@@ -23,6 +23,16 @@ GEConfig* getGEConfig();
 void deinit();
 uint64_t getMonoTimeMs();
 void mathPlaneFrustumf(float* out, const irr::core::matrix4& pvm);
+inline size_t getPadding(size_t in, size_t alignment)
+{
+    if (in == 0 || alignment == 0)
+        return 0;
+    size_t mod = in % alignment;
+    if (mod == 0)
+        return 0;
+    else
+        return alignment - mod;
+}
 }
 
 #endif

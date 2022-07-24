@@ -432,9 +432,7 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     const size_t object_data_size =
         sizeof(ObjectData) * m_visible_objects.size();
     size_t ubo_alignment = limit.minUniformBufferOffsetAlignment;
-    size_t ubo_padding = 0;
-    if (ubo_alignment > 0)
-        ubo_padding = object_data_size % ubo_alignment;
+    size_t ubo_padding = getPadding(object_data_size, ubo_alignment);
     m_object_data_padded_size = object_data_size + ubo_padding;
 
     // https://github.com/google/filament/pull/3814
