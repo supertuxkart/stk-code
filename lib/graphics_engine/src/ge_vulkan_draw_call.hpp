@@ -79,9 +79,11 @@ public:
     // ------------------------------------------------------------------------
     void generate();
     // ------------------------------------------------------------------------
-    void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
+    void uploadDynamicData(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
+                           VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
     // ------------------------------------------------------------------------
-    void render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam);
+    void render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
+                VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
     // ------------------------------------------------------------------------
     unsigned getPolyCount() const
     {

@@ -419,10 +419,14 @@ void GEVulkanDrawCall::createVulkanData()
 
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
-                                         GEVulkanCameraSceneNode* cam)
+                                         GEVulkanCameraSceneNode* cam,
+                                         VkCommandBuffer custom_cmd)
 {
     if (!m_dynamic_data)
         return;
+
+    VkCommandBuffer cmd =
+        custom_cmd ? custom_cmd : vk->getCurrentCommandBuffer();
 
     const VkPhysicalDeviceLimits& limit =
         vk->getPhysicalDeviceProperties().limits;
@@ -452,7 +456,7 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
             sizeof(VkDrawIndexedIndirectCommand) * m_cmds.size());
         dst_stage |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
     }
-    m_dynamic_data->setCurrentData(data);
+    m_dynamic_data->setCurrentData(data, cmd);
 
     VkBufferMemoryBarrier barrier = {};
     barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -463,17 +467,19 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     barrier.buffer = m_dynamic_data->getCurrentBuffer();
     barrier.size = m_dynamic_data->getRealSize();
 
-    vkCmdPipelineBarrier(vk->getCurrentCommandBuffer(),
-        VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0, NULL, 1, &barrier, 0,
-        NULL);
+    vkCmdPipelineBarrier(cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, dst_stage, 0, 0,
+        NULL, 1, &barrier, 0, NULL);
 }   // uploadDynamicData
 
 // ----------------------------------------------------------------------------
-void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam)
+void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
+                              VkCommandBuffer custom_cmd)
 {
     if (m_data_layout == VK_NULL_HANDLE || m_cmds.empty())
         return;
 
+    VkCommandBuffer cmd =
+        custom_cmd ? custom_cmd : vk->getCurrentCommandBuffer();
     const unsigned cur_frame = vk->getCurrentFrame();
 
     VkDescriptorBufferInfo ubo_info;
@@ -508,28 +514,26 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam)
 
     m_texture_descriptor->updateDescriptor();
 
-    vkCmdBindPipeline(vk->getCurrentCommandBuffer(),
-        VK_PIPELINE_BIND_POINT_GRAPHICS, m_graphics_pipeline);
+    vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_graphics_pipeline);
 
     if (GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
     {
-        vkCmdBindDescriptorSets(vk->getCurrentCommandBuffer(),
-            VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1,
-            m_texture_descriptor->getDescriptorSet(), 0, NULL);
+        vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+            m_pipeline_layout, 0, 1, m_texture_descriptor->getDescriptorSet(),
+            0, NULL);
     }
 
-    vkCmdBindDescriptorSets(vk->getCurrentCommandBuffer(),
-        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
-        &m_data_descriptor_sets[cur_frame], 0, NULL);
+    vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_pipeline_layout, 1, 1, &m_data_descriptor_sets[cur_frame], 0, NULL);
 
     VkDeviceSize offsets[] = {0};
     GEVulkanMeshCache* mc = vk->getVulkanMeshCache();
     VkBuffer vertex_buffer = mc->getBuffer();
-    vkCmdBindVertexBuffers(vk->getCurrentCommandBuffer(), 0, 1, &vertex_buffer,
-        offsets);
+    vkCmdBindVertexBuffers(cmd, 0, 1, &vertex_buffer, offsets);
 
-    vkCmdBindIndexBuffer(vk->getCurrentCommandBuffer(), mc->getBuffer(),
-        mc->getIBOOffset(), VK_INDEX_TYPE_UINT16);
+    vkCmdBindIndexBuffer(cmd, mc->getBuffer(), mc->getIBOOffset(),
+        VK_INDEX_TYPE_UINT16);
 
     VkViewport vp;
     vp.x = cam->getViewPort().UpperLeftCorner.X;
@@ -539,21 +543,20 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam)
     vp.minDepth = 0;
     vp.maxDepth = 1.0f;
     vk->getRotatedViewport(&vp);
-    vkCmdSetViewport(vk->getCurrentCommandBuffer(), 0, 1, &vp);
+    vkCmdSetViewport(cmd, 0, 1, &vp);
 
     VkRect2D scissor;
     scissor.offset.x = vp.x;
     scissor.offset.y = vp.y;
     scissor.extent.width = vp.width;
     scissor.extent.height = vp.height;
-    vkCmdSetScissor(vk->getCurrentCommandBuffer(), 0, 1, &scissor);
+    vkCmdSetScissor(cmd, 0, 1, &scissor);
 
     const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
     if (use_multidraw)
     {
-        vkCmdDrawIndexedIndirect(vk->getCurrentCommandBuffer(),
-            m_dynamic_data->getCurrentBuffer(),
+        vkCmdDrawIndexedIndirect(cmd, m_dynamic_data->getCurrentBuffer(),
             m_object_data_padded_size + sizeof(GEVulkanCameraUBO),
             m_cmds.size(), sizeof(VkDrawIndexedIndirectCommand));
     }
@@ -563,15 +566,14 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam)
         {
             if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
             {
-                vkCmdBindDescriptorSets(vk->getCurrentCommandBuffer(),
-                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0, 1,
+                vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    m_pipeline_layout, 0, 1,
                     &m_texture_descriptor->getDescriptorSet()[m_materials[i]],
                     0, NULL);
             }
-            const VkDrawIndexedIndirectCommand& cmd = m_cmds[i];
-            vkCmdDrawIndexed(vk->getCurrentCommandBuffer(), cmd.indexCount,
-                cmd.instanceCount, cmd.firstIndex, cmd.vertexOffset,
-                cmd.firstInstance);
+            const VkDrawIndexedIndirectCommand& cur_cmd = m_cmds[i];
+            vkCmdDrawIndexed(cmd, cur_cmd.indexCount, cur_cmd.instanceCount,
+                cur_cmd.firstIndex, cur_cmd.vertexOffset, cur_cmd.firstInstance);
         }
     }
 }   // render

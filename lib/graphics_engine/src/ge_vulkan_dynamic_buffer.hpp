@@ -49,10 +49,12 @@ public:
     // ------------------------------------------------------------------------
     ~GEVulkanDynamicBuffer();
     // ------------------------------------------------------------------------
-    void setCurrentData(const std::vector<std::pair<void*, size_t> >& data);
+    void setCurrentData(const std::vector<std::pair<void*, size_t> >& data,
+                        VkCommandBuffer custom_cmd = VK_NULL_HANDLE);
     // ------------------------------------------------------------------------
-    void setCurrentData(void* data, size_t size)
-                                          { setCurrentData({{ data, size }}); }
+    void setCurrentData(void* data, size_t size,
+                        VkCommandBuffer custom_cmd = VK_NULL_HANDLE)
+                              { setCurrentData({{ data, size }}, custom_cmd); }
     // ------------------------------------------------------------------------
     VkBuffer getCurrentBuffer() const;
     // ------------------------------------------------------------------------

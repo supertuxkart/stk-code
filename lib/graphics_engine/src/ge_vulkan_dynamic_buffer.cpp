@@ -155,7 +155,8 @@ void GEVulkanDynamicBuffer::destroy()
 
 // ----------------------------------------------------------------------------
 void GEVulkanDynamicBuffer::setCurrentData(const std::vector<
-                                           std::pair<void*, size_t> >& data)
+                                           std::pair<void*, size_t> >& data,
+                                           VkCommandBuffer custom_cmd)
 {
     GEVulkanDriver* vk = getVKDriver();
     const unsigned cur_frame = vk->getCurrentFrame();
@@ -187,7 +188,7 @@ void GEVulkanDynamicBuffer::setCurrentData(const std::vector<
     {
         VkBufferCopy copy_region = {};
         copy_region.size = size;
-        vkCmdCopyBuffer(vk->getCurrentCommandBuffer(),
+        vkCmdCopyBuffer(custom_cmd ? custom_cmd : vk->getCurrentCommandBuffer(),
             m_staging_buffer[cur_frame], m_buffer[cur_frame], 1, &copy_region);
     }
 }   // setCurrentData
