@@ -49,9 +49,9 @@ GL1RenderTarget::GL1RenderTarget(const irr::core::dimension2du &dimension,
 
 GL1RenderTarget::~GL1RenderTarget()
 {
-        /*assert(m_old_rtt_mini_map->getReferenceCount() == 1);
-        irr_driver->removeTexture(m_old_rtt_mini_map);
-        m_old_rtt_mini_map = NULL;*/
+    // GE doesn't add rtt texture to cache
+    if (m_render_target_texture->getDriverType() == video::EDT_VULKAN)
+        m_render_target_texture->drop();
 }
 
 //-----------------------------------------------------------------------------

@@ -35,8 +35,12 @@ void GEVulkanCameraSceneNode::render()
     // The easiest way to compensate for that is to flip the sign on the
     // scaling factor of the Y axis in the projection matrix.
     m_ubo_data.m_projection_matrix(1, 1) *= -1.0f;
-    m_ubo_data.m_projection_matrix = getVKDriver()->getPreRotationMatrix() *
-        m_ubo_data.m_projection_matrix;
+    GEVulkanDriver* vk = getVKDriver();
+    if (!vk->getRTTTexture())
+    {
+        m_ubo_data.m_projection_matrix = vk->getPreRotationMatrix() *
+            m_ubo_data.m_projection_matrix;
+    }
 
     irr::core::matrix4 mat;
     ViewArea.getTransform(irr::video::ETS_VIEW).getInverse(mat);

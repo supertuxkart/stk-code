@@ -7,6 +7,7 @@
 #include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_depth_texture.hpp"
 #include "ge_vulkan_draw_call.hpp"
+#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_scene_manager.hpp"
@@ -490,7 +491,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
                                IrrlichtDevice* device)
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
                 m_params(params), m_irrlicht_device(device),
-                m_depth_texture(NULL), m_mesh_texture_descriptor(NULL)
+                m_depth_texture(NULL), m_mesh_texture_descriptor(NULL),
+                m_rtt_texture(NULL), m_rtt_polycount(0)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -503,6 +505,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
     m_current_frame = 0;
     m_image_index = 0;
     m_clear_color = video::SColor(0);
+    m_rtt_clear_color = m_clear_color;
     m_white_texture = NULL;
     m_transparent_texture = NULL;
     m_pre_rotation_matrix = core::matrix4(core::matrix4::EM4CONST_IDENTITY);
@@ -1562,6 +1565,8 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
         return false;
 
     m_clear_color = color;
+    PrimitivesDrawn = m_rtt_polycount;
+    m_rtt_polycount = 0;
     return true;
 }   // beginScene
 
@@ -2075,6 +2080,9 @@ void GEVulkanDriver::getRotatedRect2D(VkRect2D* rect)
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::getRotatedViewport(VkViewport* vp)
 {
+    if (m_rtt_texture)
+        return;
+
     VkRect2D rect;
     rect.offset.x = vp->x;
     rect.offset.y = vp->y;
@@ -2273,6 +2281,27 @@ void GEVulkanDriver::handleDeletedTextures()
     GEVulkan2dRenderer::handleDeletedTextures();
     m_mesh_texture_descriptor->handleDeletedTextures();
 }   // handleDeletedTextures
+
+// ----------------------------------------------------------------------------
+ITexture* GEVulkanDriver::addRenderTargetTexture(const core::dimension2d<u32>& size,
+    const io::path& name, const ECOLOR_FORMAT format,
+    const bool useStencil)
+{
+    GEVulkanFBOTexture* rtt = new GEVulkanFBOTexture(size, true/*create_depth*/);
+    rtt->createRTT();
+    return rtt;
+}   // addRenderTargetTexture
+
+// ----------------------------------------------------------------------------
+bool GEVulkanDriver::setRenderTarget(video::ITexture* texture,
+                                     bool clearBackBuffer, bool clearZBuffer,
+                                     SColor color)
+{
+    m_rtt_texture = dynamic_cast<GEVulkanFBOTexture*>(texture);
+    if (m_rtt_texture)
+        m_rtt_clear_color = color;
+    return true;
+}   // setRenderTarget
 
 }
 

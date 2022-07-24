@@ -23,6 +23,7 @@ using namespace video;
 
 namespace GE
 {
+    class GEVulkanFBOTexture;
     class GEVulkanDepthTexture;
     class GEVulkanMeshCache;
     class GEVulkanTextureDescriptor;
@@ -68,7 +69,7 @@ namespace GE
         //! sets a render target
         virtual bool setRenderTarget(video::ITexture* texture,
             bool clearBackBuffer=true, bool clearZBuffer=true,
-            SColor color=video::SColor(0,0,0,0)) { return true; }
+            SColor color=video::SColor(0,0,0,0));
 
         //! Sets multiple render targets
         virtual bool setRenderTarget(const core::array<video::IRenderTarget>& texture,
@@ -231,7 +232,7 @@ namespace GE
 
         //! Creates a render target texture.
         virtual ITexture* addRenderTargetTexture(const core::dimension2d<u32>& size,
-                const io::path& name, const ECOLOR_FORMAT format = ECF_UNKNOWN, const bool useStencil = false) { return NULL; }
+                const io::path& name, const ECOLOR_FORMAT format = ECF_UNKNOWN, const bool useStencil = false);
 
         //! Clears the ZBuffer.
         virtual void clearZBuffer() {}
@@ -316,6 +317,7 @@ namespace GE
         unsigned int getCurrentImageIndex() const      { return m_image_index; }
         constexpr static unsigned getMaxFrameInFlight()            { return 2; }
         video::SColor getClearColor() const            { return m_clear_color; }
+        video::SColor getRTTClearColor() const     { return m_rtt_clear_color; }
         const core::rect<s32>& getCurrentClip() const         { return m_clip; }
         video::ITexture* getWhiteTexture() const     { return m_white_texture; }
         video::ITexture* getTransparentTexture() const
@@ -349,6 +351,9 @@ namespace GE
         GEVulkanMeshCache* getVulkanMeshCache() const;
         GEVulkanTextureDescriptor* getMeshTextureDescriptor() const
                                            { return m_mesh_texture_descriptor; }
+        GEVulkanFBOTexture* getRTTTexture() const      { return m_rtt_texture; }
+        void handleDeletedTextures();
+        void addRTTPolyCount(unsigned count)       { m_rtt_polycount += count; }
     private:
         struct SwapChainSupportDetails
         {
@@ -465,7 +470,7 @@ namespace GE
 
         unsigned int m_current_frame;
         uint32_t m_image_index;
-        video::SColor m_clear_color;
+        video::SColor m_clear_color, m_rtt_clear_color;
         core::rect<s32> m_clip;
         core::rect<s32> m_viewport;
         core::matrix4 m_pre_rotation_matrix;
@@ -479,6 +484,8 @@ namespace GE
         IrrlichtDevice* m_irrlicht_device;
         GEVulkanDepthTexture* m_depth_texture;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
+        GEVulkanFBOTexture* m_rtt_texture;
+        u32 m_rtt_polycount;
 
         void createInstance(SDL_Window* window);
         void findPhysicalDevice();
@@ -502,7 +509,6 @@ namespace GE
         void destroySwapChainRelated(bool handle_surface);
         void createSwapChainRelated(bool handle_surface);
         void buildCommandBuffers();
-        void handleDeletedTextures();
     };
 
 }

@@ -5,8 +5,10 @@
 #include "ge_spm.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
+#include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_draw_call.hpp"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
@@ -118,7 +120,7 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
 }   // addMeshSceneNode
 
 // ----------------------------------------------------------------------------
-void GEVulkanSceneManager::drawAll(irr::u32 flags)
+void GEVulkanSceneManager::drawAllInternal()
 {
     static_cast<GEVulkanMeshCache*>(getMeshCache())->updateCache();
     GEVulkanCameraSceneNode* cam = NULL;
@@ -139,6 +141,53 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
         OnRegisterSceneNode();
         it->second->generate();
     }
+}   // drawAllInternal
+
+// ----------------------------------------------------------------------------
+void GEVulkanSceneManager::drawAll(irr::u32 flags)
+{
+    drawAllInternal();
+    GEVulkanDriver* vk = static_cast<GEVulkanDriver*>(getVideoDriver());
+    GEVulkanFBOTexture* rtt = vk->getRTTTexture();
+    if (!rtt)
+        return;
+
+    std::array<VkClearValue, 2> clear_values = {};
+    video::SColorf cf(vk->getRTTClearColor());
+    clear_values[0].color =
+    {
+        cf.getRed(), cf.getGreen(), cf.getBlue(), cf.getAlpha()
+    };
+    clear_values[1].depthStencil = {1.0f, 0};
+
+    VkCommandBuffer cmd = GEVulkanCommandLoader::beginSingleTimeCommands();
+
+    GEVulkanCameraSceneNode* cam = static_cast<
+        GEVulkanCameraSceneNode*>(getActiveCamera());
+    std::unique_ptr<GEVulkanDrawCall>& dc = m_draw_calls.at(cam);
+    dc->uploadDynamicData(vk, cam, cmd);
+
+    VkRenderPassBeginInfo render_pass_info = {};
+    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    render_pass_info.renderPass = rtt->getRTTRenderPass();
+    render_pass_info.framebuffer = rtt->getRTTFramebuffer();
+    render_pass_info.renderArea.offset = {0, 0};
+    render_pass_info.renderArea.extent =
+        { rtt->getSize().Width, rtt->getSize().Height };
+    render_pass_info.clearValueCount = (uint32_t)(clear_values.size());
+    render_pass_info.pClearValues = &clear_values[0];
+    vkCmdBeginRenderPass(cmd, &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
+
+    cam->setViewPort(
+        core::recti(0, 0, rtt->getSize().Width, rtt->getSize().Height));
+    dc->render(vk, cam, cmd);
+    vk->addRTTPolyCount(dc->getPolyCount());
+    dc->reset();
+
+    vkCmdEndRenderPass(cmd);
+
+    GEVulkanCommandLoader::endSingleTimeCommands(cmd);
+    vk->handleDeletedTextures();
 }   // drawAll
 
 // ----------------------------------------------------------------------------

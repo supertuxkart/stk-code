@@ -92,6 +92,14 @@ public:
             result += (cmd.indexCount / 3) * cmd.instanceCount;
         return result;
     }
+    // ------------------------------------------------------------------------
+    void reset()
+    {
+        m_visible_nodes.clear();
+        m_cmds.clear();
+        m_visible_objects.clear();
+        m_materials.clear();
+    }
 };   // GEVulkanDrawCall
 
 }

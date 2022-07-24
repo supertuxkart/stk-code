@@ -7,6 +7,7 @@
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_dynamic_buffer.hpp"
+#include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
@@ -137,10 +138,7 @@ void GEVulkanDrawCall::generate()
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
 {
-    m_visible_nodes.clear();
-    m_cmds.clear();
-    m_visible_objects.clear();
-    m_materials.clear();
+    reset();
     m_culling_tool->init(cam);
 }   // prepare
 
@@ -392,7 +390,8 @@ void GEVulkanDrawCall::createVulkanData()
     pipeline_info.pColorBlendState = &color_blending;
     pipeline_info.pDynamicState = &dynamic_state_info;
     pipeline_info.layout = m_pipeline_layout;
-    pipeline_info.renderPass = vk->getRenderPass();
+    pipeline_info.renderPass = vk->getRTTTexture() ?
+        vk->getRTTTexture()->getRTTRenderPass() : vk->getRenderPass();
     pipeline_info.subpass = 0;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
@@ -422,7 +421,7 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
                                          GEVulkanCameraSceneNode* cam,
                                          VkCommandBuffer custom_cmd)
 {
-    if (!m_dynamic_data)
+    if (!m_dynamic_data || m_cmds.empty())
         return;
 
     VkCommandBuffer cmd =

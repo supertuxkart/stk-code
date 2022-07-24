@@ -15,6 +15,8 @@ class GEVulkanSceneManager : public irr::scene::CSceneManager
 private:
     std::map<GEVulkanCameraSceneNode*, std::unique_ptr<GEVulkanDrawCall> > m_draw_calls;
 
+    // ------------------------------------------------------------------------
+    void drawAllInternal();
 public:
     // ------------------------------------------------------------------------
     GEVulkanSceneManager(irr::video::IVideoDriver* driver,
