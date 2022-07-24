@@ -79,7 +79,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 

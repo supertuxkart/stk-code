@@ -30,7 +30,7 @@
 #include "tracks/check_cannon.hpp"
 #include "tracks/check_manager.hpp"
 #include "tracks/track.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 #include "LinearMath/btTransform.h"
 

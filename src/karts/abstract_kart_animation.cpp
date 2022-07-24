@@ -29,7 +29,7 @@
 #include "physics/physics.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 #include <limits>
 

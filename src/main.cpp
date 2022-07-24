@@ -286,7 +286,7 @@ extern "C" {
 #include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/profiler.hpp"
 #include "utils/stk_process.hpp"
 #include "utils/string_utils.hpp"

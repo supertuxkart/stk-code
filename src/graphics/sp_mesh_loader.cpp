@@ -26,7 +26,7 @@
 #include "graphics/mesh_tools.hpp"
 #include "graphics/stk_tex_manager.hpp"
 #include "utils/constants.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
 #include "../../lib/irrlicht/source/Irrlicht/CSkinnedMesh.h"

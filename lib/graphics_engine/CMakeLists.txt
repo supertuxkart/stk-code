@@ -1,6 +1,7 @@
 include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_engine/include")
 include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
+include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
 find_path(SDL2_INCLUDEDIR NAMES SDL.h PATH_SUFFIXES SDL2 include/SDL2 include PATHS)
 if (NOT SDL2_INCLUDEDIR)
     message(FATAL_ERROR "SDL2 not found.")

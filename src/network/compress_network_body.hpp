@@ -20,7 +20,7 @@
 #define HEADER_COMPRESS_NETWORK_BODY_HPP
 
 #include "network/network_string.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 #include "LinearMath/btMotionState.h"
 #include "btBulletDynamicsCommon.h"

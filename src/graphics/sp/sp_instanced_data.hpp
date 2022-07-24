@@ -18,7 +18,7 @@
 #ifndef HEADER_SP_INSTANCED_DATA_HPP
 #define HEADER_SP_INSTANCED_DATA_HPP
 
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/vec3.hpp"
 #include <cassert>
 #include <matrix4.h>

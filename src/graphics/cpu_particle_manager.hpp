@@ -22,7 +22,7 @@
 
 #include "graphics/gl_headers.hpp"
 #include "utils/constants.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/singleton.hpp"
 

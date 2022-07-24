@@ -33,7 +33,7 @@
 #include "karts/skidding.hpp"
 #include "modes/world.hpp"
 #include "physics/btKart.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 #ifndef SERVER_ONLY
 

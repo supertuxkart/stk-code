@@ -32,7 +32,7 @@
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
 #include "race/race_manager.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
 /** RubberBand constructor. It creates a simple quad and attaches it to the

@@ -22,7 +22,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "graphics/sp/sp_shader_manager.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/vec3.hpp"
 
 /** ShowCurve constructor. It just creates an empty dynamic draw call.

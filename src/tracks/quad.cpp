@@ -18,7 +18,7 @@
 
 #include "tracks/quad.hpp"
 #include "tracks/graph.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/log.hpp"
 
 #include <algorithm>

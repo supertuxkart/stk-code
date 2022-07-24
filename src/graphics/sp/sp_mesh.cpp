@@ -19,7 +19,7 @@
 #include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/material.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 #include <algorithm>
 

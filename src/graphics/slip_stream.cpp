@@ -36,7 +36,7 @@
 #include "network/rewind_manager.hpp"
 #include "tracks/quad.hpp"
 #include "utils/constants.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 /** Creates the slip stream object
  *  \param kart Pointer to the kart to which the slip stream

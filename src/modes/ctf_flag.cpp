@@ -22,7 +22,7 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 #include "network/network_string.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 #include "LinearMath/btQuaternion.h"
 

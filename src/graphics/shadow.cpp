@@ -22,7 +22,7 @@
 #include "graphics/sp/sp_shader_manager.hpp"
 #include "graphics/sp/sp_dynamic_draw_call.hpp"
 #include "physics/btKart.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/vec3.hpp"
 
 #ifndef SERVER_ONLY

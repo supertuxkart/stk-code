@@ -21,7 +21,7 @@
 #include "graphics/sp/sp_shader.hpp"
 #include "graphics/sp/sp_texture.hpp"
 #include "graphics/sp/sp_texture_manager.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 #include "utils/string_utils.hpp"
 
 namespace SP

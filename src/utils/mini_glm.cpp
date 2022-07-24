@@ -17,7 +17,7 @@
 
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 namespace MiniGLM
 {

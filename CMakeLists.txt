@@ -271,8 +271,9 @@ if(NOT SERVER_ONLY)
     endif()
 
     add_subdirectory("${PROJECT_SOURCE_DIR}/lib/graphics_engine")
-    include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/graphics_engine/include")
 endif()
+# MiniGLM is there
+include_directories(BEFORE "${PROJECT_SOURCE_DIR}/lib/graphics_engine/include")
 
 if (NOT SERVER_ONLY)
     # Add jpeg library

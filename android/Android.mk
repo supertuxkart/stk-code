@@ -171,6 +171,7 @@ LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c) \
 LOCAL_CFLAGS       := -I../lib/graphics_engine/include \
                       -I../lib/graphics_utils          \
                       -I../lib/sdl2/include/           \
+                      -I../lib/bullet/src/             \
                       -I../lib/irrlicht/include/
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 LOCAL_ARM_NEON     := false

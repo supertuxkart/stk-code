@@ -11,7 +11,7 @@
 #include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
-#include "utils/mini_glm.hpp"
+#include "mini_glm.hpp"
 
 #include <IVideoDriver.h>
 #include <IFileSystem.h>
