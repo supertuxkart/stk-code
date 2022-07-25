@@ -144,7 +144,13 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
                 video::S3DVertexSkinnedMesh sp;
                 sp.m_position = v_ptr[j].Pos;
                 sp.m_normal = MiniGLM::compressVector3(v_ptr[j].Normal);
-                sp.m_color = v_ptr[j].Color;
+                video::SColorf orig(v_ptr[j].Color);
+                video::SColorf diffuse(mb->getMaterial().DiffuseColor);
+                orig.r = orig.r * diffuse.r;
+                orig.g = orig.g * diffuse.g;
+                orig.b = orig.b * diffuse.b;
+                orig.a = orig.a * diffuse.a;
+                sp.m_color = orig.toSColor();
                 sp.m_all_uvs[0] = MiniGLM::toFloat16(v_ptr[j].TCoords.X);
                 sp.m_all_uvs[1] = MiniGLM::toFloat16(v_ptr[j].TCoords.Y);
                 spm_mb->m_vertices.push_back(sp);
