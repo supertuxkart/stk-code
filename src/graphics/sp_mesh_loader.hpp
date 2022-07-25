@@ -18,7 +18,7 @@
 #ifndef HEADER_SP_MESH_LOADER_HPP
 #define HEADER_SP_MESH_LOADER_HPP
 
-#include "graphics/sp/sp_animation.hpp"
+#include "ge_animation.hpp"
 
 #include <IMeshLoader.h>
 #include <ISceneManager.h>
@@ -38,7 +38,7 @@ private:
     // ------------------------------------------------------------------------
     unsigned m_bind_frame, m_joint_count, m_frame_count;
     // ------------------------------------------------------------------------
-    std::vector<SP::Armature> m_all_armatures;
+    std::vector<GE::Armature> m_all_armatures;
     // ------------------------------------------------------------------------
     std::vector<core::matrix4> m_to_bind_pose_matrices;
     // ------------------------------------------------------------------------

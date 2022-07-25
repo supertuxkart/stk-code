@@ -31,7 +31,6 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/sp/sp_mesh_node.hpp"
@@ -48,6 +47,7 @@
 
 #include "IMeshManipulator.h"
 #include <algorithm>
+#include <ge_animation.hpp>
 
 #define SKELETON_DEBUG 0
 
@@ -1299,7 +1299,7 @@ void KartModel::initInverseBoneMatrices()
     SPMesh* spm = dynamic_cast<SPMesh*>(m_mesh);
     if (spm)
     {
-        for (Armature& arm : spm->getArmatures())
+        for (GE::Armature& arm : spm->getArmatures())
         {
             arm.getInterpolatedMatrices(striaght_frame);
             for (auto& p : arm.m_world_matrices)

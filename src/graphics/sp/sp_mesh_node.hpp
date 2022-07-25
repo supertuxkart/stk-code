@@ -54,7 +54,7 @@ private:
 
     float m_saved_transition_frame;
 
-    std::vector<std::array<float, 16> > m_skinning_matrices;
+    std::vector<core::matrix4> m_skinning_matrices;
 
     video::SColorf m_glow_color;
 
@@ -128,7 +128,7 @@ public:
     // ------------------------------------------------------------------------
     SPShader* getShader(unsigned mesh_buffer_id) const;
     // ------------------------------------------------------------------------
-    const std::array<float, 16>* getSkinningMatrices() const 
+    const core::matrix4* getSkinningMatrices() const 
                                          { return m_skinning_matrices.data(); }
     // ------------------------------------------------------------------------
     RenderInfo* getRenderInfo(unsigned mb_id) const

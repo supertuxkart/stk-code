@@ -16,7 +16,6 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/sp/sp_mesh_node.hpp"
-#include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_base.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
@@ -29,6 +28,7 @@
 
 #include "../../../lib/irrlicht/source/Irrlicht/CBoneSceneNode.h"
 #include <algorithm>
+#include <ge_animation.hpp>
 
 namespace SP
 {
@@ -103,7 +103,7 @@ void SPMeshNode::setMesh(irr::scene::IAnimatedMesh* mesh)
 #endif
             unsigned bone_idx = 0;
             m_skinning_matrices.resize(m_mesh->getJointCount());
-            for (Armature& arm : m_mesh->getArmatures())
+            for (GE::Armature& arm : m_mesh->getArmatures())
             {
                 for (const std::string& bone_name : arm.m_joint_names)
                 {
@@ -169,11 +169,11 @@ IMesh* SPMeshNode::getMeshForCurrentFrame()
     {
         return m_mesh;
     }
-    m_mesh->getSkinningMatrices(getFrameNr(), m_skinning_matrices.data(),
+    m_mesh->getSkinningMatrices(getFrameNr(), m_skinning_matrices,
         m_saved_transition_frame, TransitingBlend);
     recursiveUpdateAbsolutePosition();
 
-    for (Armature& arm : m_mesh->getArmatures())
+    for (GE::Armature& arm : m_mesh->getArmatures())
     {
         for (unsigned i = 0; i < arm.m_joint_names.size(); i++)
         {

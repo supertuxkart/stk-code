@@ -734,8 +734,8 @@ void SPMeshLoader::createAnimationData(irr::io::IReadFile* spm)
     unsigned accumulated_joints = 0;
     for (unsigned i = 0; i < armature_size; i++)
     {
-        m_all_armatures[i].getPose((float)m_bind_frame,
-            &m_to_bind_pose_matrices[accumulated_joints]);
+        m_all_armatures[i].getPose(&m_to_bind_pose_matrices[accumulated_joints],
+            (float)m_bind_frame);
         accumulated_joints += m_all_armatures[i].m_joint_used;
     }
 

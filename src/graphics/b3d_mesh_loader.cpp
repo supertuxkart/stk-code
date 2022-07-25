@@ -8,7 +8,6 @@
 #include "graphics/material.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_mesh.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "mini_glm.hpp"
@@ -18,6 +17,7 @@
 #include "../../lib/irrlicht/source/Irrlicht/os.h"
 
 #include <algorithm>
+#include <ge_animation.hpp>
 
 #ifndef SERVER_ONLY
 #include <ge_main.hpp>

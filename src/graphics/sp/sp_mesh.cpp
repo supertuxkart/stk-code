@@ -16,11 +16,11 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/sp/sp_mesh.hpp"
-#include "graphics/sp/sp_animation.hpp"
 #include "graphics/sp/sp_mesh_buffer.hpp"
 #include "graphics/material.hpp"
 #include "mini_glm.hpp"
 
+#include <ge_animation.hpp>
 #include <algorithm>
 
 namespace SP
@@ -103,7 +103,7 @@ s32 SPMesh::getJointIDWithArm(const c8* name, unsigned* arm_id) const
 {
     for (unsigned i = 0; i < m_all_armatures.size(); i++)
     {
-        const Armature& arm = m_all_armatures[i];
+        const GE::Armature& arm = m_all_armatures[i];
         auto found = std::find(arm.m_joint_names.begin(),
             arm.m_joint_names.end(), name);
         if (found != arm.m_joint_names.end())
@@ -119,7 +119,7 @@ s32 SPMesh::getJointIDWithArm(const c8* name, unsigned* arm_id) const
 }   // getJointIDWithArm
 
 // ----------------------------------------------------------------------------
-void SPMesh::getSkinningMatrices(f32 frame, std::array<float, 16>* dest,
+void SPMesh::getSkinningMatrices(f32 frame, std::vector<core::matrix4>& dest,
                                  float frame_interpolating, float rate)
 {
     unsigned accumulated_joints = 0;
@@ -147,7 +147,7 @@ void SPMesh::updateBoundingBox()
 void SPMesh::finalize()
 {
     updateBoundingBox();
-    for (Armature& arm : getArmatures())
+    for (GE::Armature& arm : getArmatures())
     {
         arm.getInterpolatedMatrices((float)m_bind_frame);
         for (auto& p : arm.m_world_matrices)

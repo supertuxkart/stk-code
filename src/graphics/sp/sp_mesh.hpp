@@ -31,10 +31,14 @@ using namespace scene;
 class B3DMeshLoader;
 class SPMeshLoader;
 
+namespace GE
+{
+    struct Armature;
+}
+
 namespace SP
 {
 class SPMeshBuffer;
-struct Armature;
 
 class SPMesh : public ISkinnedMesh
 {
@@ -49,7 +53,7 @@ private:
 
     unsigned m_bind_frame, m_total_joints, m_joint_using, m_frame_count;
 
-    std::vector<SP::Armature> m_all_armatures;
+    std::vector<GE::Armature> m_all_armatures;
 
 public:
     // ------------------------------------------------------------------------
@@ -150,9 +154,9 @@ public:
     // ------------------------------------------------------------------------
     virtual void updateBoundingBox(void);
     // ------------------------------------------------------------------------
-    std::vector<Armature>& getArmatures() { return m_all_armatures; }
+    std::vector<GE::Armature>& getArmatures() { return m_all_armatures; }
     // ------------------------------------------------------------------------
-    void getSkinningMatrices(f32 frame, std::array<float, 16>* dest,
+    void getSkinningMatrices(f32 frame, std::vector<core::matrix4>& dest,
                         float frame_interpolating = -1.0f, float rate = -1.0f);
     // ------------------------------------------------------------------------
     s32 getJointIDWithArm(const c8* name, unsigned* arm_id) const;

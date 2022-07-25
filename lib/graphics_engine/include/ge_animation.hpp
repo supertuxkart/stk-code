@@ -1,38 +1,43 @@
-//  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2018 SuperTuxKart-Team
-//
-//  This program is free software; you can redistribute it and/or
-//  modify it under the terms of the GNU General Public License
-//  as published by the Free Software Foundation; either version 3
-//  of the License, or (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+/* ==========================================================================
+ * Copyright (c) 2022 SuperTuxKart-Team
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the
+ * "Software"), to deal in the Software without restriction, including
+ * without limitation the rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the Software, and to permit
+ * persons to whom the Software is furnished to do so, subject to the
+ * following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ * OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+ * NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+ * USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * ==========================================================================
+ */
 
-#ifndef HEADER_SP_ANIMATION_HPP
-#define HEADER_SP_ANIMATION_HPP
-
-#include "utils/log.hpp"
-#include "utils/types.hpp"
+#ifndef HEADER_GE_ANIMATION_HPP
+#define HEADER_GE_ANIMATION_HPP
 
 #include <IReadFile.h>
 #include <matrix4.h>
 #include <quaternion.h>
 
-#include <array>
 #include <cassert>
+#include <cstdint>
+#include <cstdlib>
 #include <vector>
 #include <string>
 
 using namespace irr;
 
-namespace SP
+namespace GE
 {
 
 struct LocRotScale
@@ -120,7 +125,8 @@ struct Armature
         }
         if (!non_parent_bone)
         {
-            Log::fatal("SPMeshLoader::Armature", "Non-parent bone missing in armature");
+            printf("SPMeshLoader::Armature: Non-parent bone missing in armature");
+            exit(-1);
         }
         unsigned frame_size = 0;
         spm->read(&frame_size, 2);
@@ -138,8 +144,7 @@ struct Armature
         }
     }
     // ------------------------------------------------------------------------
-    /* Because matrix4 in windows is not 64 bytes */
-    void getPose(float frame, std::array<float, 16>* dest,
+    void getPose(float frame, core::matrix4* dest,
                  float frame_interpolating = -1.0f, float rate = -1.0f)
     {
         getInterpolatedMatrices(frame);
@@ -166,13 +171,12 @@ struct Armature
         }
         for (unsigned i = 0; i < m_joint_used; i++)
         {
-            core::matrix4 m = getWorldMatrix(m_interpolated_matrices, i) *
+            dest[i] = getWorldMatrix(m_interpolated_matrices, i) *
                 m_joint_matrices[i];
-            memcpy(&dest[i], m.pointer(), 64);
         }
     }
     // ------------------------------------------------------------------------
-    void getPose(float frame, core::matrix4* dest)
+    void getPose(core::matrix4* dest, float frame)
     {
         getInterpolatedMatrices(frame);
         for (auto& p : m_world_matrices)
