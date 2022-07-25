@@ -2,7 +2,9 @@
 
 #include "../source/Irrlicht/os.h"
 
+#include "ge_main.hpp"
 #include "ge_spm.hpp"
+#include "ge_spm_buffer.hpp"
 #include "ge_vulkan_animated_mesh_scene_node.hpp"
 #include "ge_vulkan_camera_scene_node.hpp"
 #include "ge_vulkan_command_loader.hpp"
@@ -12,6 +14,9 @@
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
+
+#include "mini_glm.hpp"
+#include <sstream>
 
 namespace GE
 {
@@ -95,6 +100,7 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
     if (!alsoAddIfMeshPointerZero && !mesh)
         return NULL;
 
+    bool convert_irrlicht_mesh = false;
     if (mesh)
     {
         for (unsigned i = 0; i < mesh->getMeshBufferCount(); i++)
@@ -102,9 +108,17 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
             irr::scene::IMeshBuffer* b = mesh->getMeshBuffer(i);
             if (b->getVertexType() != irr::video::EVT_SKINNED_MESH)
             {
-                return irr::scene::CSceneManager::addMeshSceneNode(
-                    mesh, parent, id, position, rotation, scale,
-                    alsoAddIfMeshPointerZero);
+                if (!getGEConfig()->m_convert_irrlicht_mesh)
+                {
+                    return irr::scene::CSceneManager::addMeshSceneNode(
+                        mesh, parent, id, position, rotation, scale,
+                        alsoAddIfMeshPointerZero);
+                }
+                else
+                {
+                    convert_irrlicht_mesh = true;
+                    break;
+                }
             }
         }
     }
@@ -112,10 +126,54 @@ irr::scene::IMeshSceneNode* GEVulkanSceneManager::addMeshSceneNode(
     if (!parent)
         parent = this;
 
-    irr::scene::IMeshSceneNode* node =
+    if (convert_irrlicht_mesh)
+    {
+        GESPM* spm = new GESPM();
+        for (unsigned i = 0; i < mesh->getMeshBufferCount(); i++)
+        {
+            std::vector<video::S3DVertexSkinnedMesh> vertices;
+            scene::IMeshBuffer* mb = mesh->getMeshBuffer(i);
+            if (!mb)
+                continue;
+
+            GESPMBuffer* spm_mb = new GESPMBuffer();
+            assert(mb->getVertexType() == video::EVT_STANDARD);
+            video::S3DVertex* v_ptr = (video::S3DVertex*)mb->getVertices();
+            for (unsigned j = 0; j < mb->getVertexCount(); j++)
+            {
+                video::S3DVertexSkinnedMesh sp;
+                sp.m_position = v_ptr[j].Pos;
+                sp.m_normal = MiniGLM::compressVector3(v_ptr[j].Normal);
+                sp.m_color = v_ptr[j].Color;
+                sp.m_all_uvs[0] = MiniGLM::toFloat16(v_ptr[j].TCoords.X);
+                sp.m_all_uvs[1] = MiniGLM::toFloat16(v_ptr[j].TCoords.Y);
+                spm_mb->m_vertices.push_back(sp);
+            }
+            uint16_t* idx_ptr = mb->getIndices();
+            std::vector<uint16_t> indices(idx_ptr, idx_ptr + mb->getIndexCount());
+            std::swap(spm_mb->m_indices, indices);
+            spm_mb->m_material = mb->getMaterial();
+            spm_mb->recalculateBoundingBox();
+            spm->m_buffer.push_back(spm_mb);
+        }
+        spm->finalize();
+        std::stringstream oss;
+        oss << (uint64_t)spm;
+        getMeshCache()->addMesh(oss.str().c_str(), spm);
+        mesh = spm;
+    }
+
+    GEVulkanMeshSceneNode* vulkan_node =
         new GEVulkanMeshSceneNode(mesh, parent, this, id, position, rotation,
         scale);
+    irr::scene::IMeshSceneNode* node = vulkan_node;
     node->drop();
+
+    if (convert_irrlicht_mesh)
+    {
+        vulkan_node->setRemoveFromMeshCache(true);
+        mesh->drop();
+    }
     return node;
 }   // addMeshSceneNode
 

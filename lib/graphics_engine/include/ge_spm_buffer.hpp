@@ -10,8 +10,11 @@ class SPMeshLoader;
 
 namespace GE
 {
+class GEVulkanSceneManager;
+
 class GESPMBuffer : public irr::scene::IMeshBuffer
 {
+friend class GEVulkanSceneManager;
 friend class ::B3DMeshLoader;
 friend class ::SPMeshLoader;
 private:

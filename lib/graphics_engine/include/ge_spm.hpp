@@ -15,9 +15,11 @@ class SPMeshLoader;
 namespace GE
 {
 class GESPMBuffer;
+class GEVulkanSceneManager;
 
 class GESPM : public IAnimatedMesh
 {
+friend class GEVulkanSceneManager;
 friend class ::B3DMeshLoader;
 friend class ::SPMeshLoader;
 private:

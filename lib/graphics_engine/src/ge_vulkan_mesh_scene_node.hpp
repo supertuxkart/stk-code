@@ -9,6 +9,8 @@ class GESPM;
 
 class GEVulkanMeshSceneNode : public irr::scene::CMeshSceneNode
 {
+private:
+    bool m_remove_from_mesh_cache;
 public:
     // ------------------------------------------------------------------------
     GEVulkanMeshSceneNode(irr::scene::IMesh* mesh,
@@ -16,6 +18,10 @@ public:
         const irr::core::vector3df& position = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& rotation = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
+    // ------------------------------------------------------------------------
+    ~GEVulkanMeshSceneNode();
+    // ------------------------------------------------------------------------
+    void setRemoveFromMeshCache(bool val)   { m_remove_from_mesh_cache = val; }
     // ------------------------------------------------------------------------
     GESPM* getSPM() const;
     // ------------------------------------------------------------------------

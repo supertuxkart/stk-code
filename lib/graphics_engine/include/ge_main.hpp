@@ -12,6 +12,7 @@ class GEVulkanDriver;
 struct GEConfig
 {
 bool m_disable_npot_texture;
+bool m_convert_irrlicht_mesh;
 };
 
 void setVideoDriver(irr::video::IVideoDriver* driver);

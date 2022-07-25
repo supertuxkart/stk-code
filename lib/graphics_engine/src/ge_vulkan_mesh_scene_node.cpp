@@ -2,6 +2,7 @@
 
 #include "ge_spm.hpp"
 
+#include "IMeshCache.h"
 #include "ISceneManager.h"
 
 namespace GE
@@ -14,7 +15,15 @@ GEVulkanMeshSceneNode::GEVulkanMeshSceneNode(irr::scene::IMesh* mesh,
     : irr::scene::CMeshSceneNode(mesh, parent, mgr, id, position, rotation,
                                  scale)
 {
+    m_remove_from_mesh_cache = false;
 }   // GEVulkanMeshSceneNode
+
+// ----------------------------------------------------------------------------
+GEVulkanMeshSceneNode::~GEVulkanMeshSceneNode()
+{
+    if (m_remove_from_mesh_cache)
+        SceneManager->getMeshCache()->removeMesh(Mesh);
+}   // ~GEVulkanMeshSceneNode
 
 // ----------------------------------------------------------------------------
 GESPM* GEVulkanMeshSceneNode::getSPM() const
