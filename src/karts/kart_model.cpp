@@ -48,6 +48,7 @@
 #include "IMeshManipulator.h"
 #include <algorithm>
 #include <ge_animation.hpp>
+#include <ge_spm.hpp>
 
 #define SKELETON_DEBUG 0
 
@@ -1295,11 +1296,21 @@ void KartModel::initInverseBoneMatrices()
             m_model_filename.c_str());
         striaght_frame = 0.0f;
     }
+    std::vector<GE::Armature> armatures;
+
+#ifndef SERVER_ONLY
     using namespace SP;
     SPMesh* spm = dynamic_cast<SPMesh*>(m_mesh);
+    GE::GESPM* ge_spm = dynamic_cast<GE::GESPM*>(m_mesh);
     if (spm)
+        armatures = spm->getArmatures();
+    else if (ge_spm)
+        armatures = ge_spm->getArmatures();
+#endif
+
+    if (!armatures.empty())
     {
-        for (GE::Armature& arm : spm->getArmatures())
+        for (GE::Armature& arm : armatures)
         {
             arm.getInterpolatedMatrices(striaght_frame);
             for (auto& p : arm.m_world_matrices)

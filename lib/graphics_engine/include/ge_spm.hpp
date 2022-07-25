@@ -14,6 +14,7 @@ class SPMeshLoader;
 
 namespace GE
 {
+struct Armature;
 class GESPMBuffer;
 class GEVulkanSceneManager;
 
@@ -31,6 +32,7 @@ private:
 
     unsigned m_bind_frame, m_total_joints, m_joint_using, m_frame_count;
 
+    std::vector<Armature> m_all_armatures;
 public:
     // ------------------------------------------------------------------------
     GESPM();
@@ -70,6 +72,17 @@ public:
     virtual E_ANIMATED_MESH_TYPE getMeshType() const       { return EAMT_SPM; }
     // ------------------------------------------------------------------------
     virtual void finalize();
+    // ------------------------------------------------------------------------
+    std::vector<Armature>& getArmatures()           { return m_all_armatures; }
+    // ------------------------------------------------------------------------
+    void getSkinningMatrices(f32 frame, std::vector<core::matrix4>& dest,
+                        float frame_interpolating = -1.0f, float rate = -1.0f);
+    // ------------------------------------------------------------------------
+    s32 getJointIDWithArm(const c8* name, unsigned* arm_id) const;
+    // ------------------------------------------------------------------------
+    bool isStatic() const                   { return m_all_armatures.empty(); }
+    // ------------------------------------------------------------------------
+    unsigned getJointCount() const                    { return m_joint_using; }
 
 };
 

@@ -335,6 +335,26 @@ scene::IAnimatedMesh* SPMeshLoader::createMesh(io::IReadFile* f)
         }
         spm->m_all_armatures = std::move(m_all_armatures);
     }
+#ifndef SERVER_ONLY
+    else if (ge_spm)
+    {
+        GE::GESPM* spm = static_cast<GE::GESPM*>(m_mesh);
+        spm->m_bind_frame = m_bind_frame;
+        spm->m_joint_using = m_joint_count;
+        // Because the last frame in spm is usable
+        if (has_armature)
+        {
+            spm->m_frame_count = m_frame_count + 1;
+        }
+        for (unsigned i = 0; i < m_all_armatures.size(); i++)
+        {
+            // This is diffferent from m_joint_using
+            spm->m_total_joints +=
+                (unsigned)m_all_armatures[i].m_joint_names.size();
+        }
+        spm->m_all_armatures = std::move(m_all_armatures);
+    }
+#endif
     m_mesh->finalize();
     scene::CSkinnedMesh* cmesh = dynamic_cast<scene::CSkinnedMesh*>(m_mesh);
     if (cmesh && !real_spm && has_armature)

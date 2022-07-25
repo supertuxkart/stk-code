@@ -114,6 +114,11 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
                 stk_material->getTexture();
             gebuf->recalculateBoundingBox();
         }
+        ge_spm->m_bind_frame = spm->m_bind_frame;
+        ge_spm->m_total_joints = spm->m_total_joints;
+        ge_spm->m_joint_using = spm->m_joint_using;
+        ge_spm->m_frame_count = spm->m_frame_count;
+        std::swap(ge_spm->m_all_armatures, spm->m_all_armatures);
         ge_spm->finalize();
         ge_spm->setMinMax(min.toIrrVector(), max.toIrrVector());
         spm->drop();
