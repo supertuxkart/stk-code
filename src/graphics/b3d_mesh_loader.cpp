@@ -207,7 +207,7 @@ SP::SPMesh* B3DMeshLoader::toSPM(scene::CSkinnedMesh* mesh)
             for (unsigned j = 0; j < 4; j++)
             {
                 JointInfluence influence;
-                influence.joint_idx = -32768;
+                influence.joint_idx = -31768;
                 influence.weight = j == 0 ? 1.0f : 0.0f;
                 this_influence.push_back(influence);
             }

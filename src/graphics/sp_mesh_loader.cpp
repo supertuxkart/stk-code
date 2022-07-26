@@ -551,8 +551,8 @@ void SPMeshLoader::decompressGESPM(irr::io::IReadFile* spm,
                 // -0.0 in half float (16bit)
                 vertex.m_weight[0] == -32768)
             {
-                // For the skinned mesh shader
-                vertex.m_joint_idx[0] = -32767;
+                // For the skinned mesh shader (reserve 1000 bones for offsets)
+                vertex.m_joint_idx[0] = -31768;
                 // 1.0 in half float (16bit)
                 vertex.m_weight[0] = 15360;
             }

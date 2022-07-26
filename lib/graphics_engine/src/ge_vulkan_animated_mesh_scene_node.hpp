@@ -54,6 +54,9 @@ public:
     GESPM* getSPM() const;
     // ------------------------------------------------------------------------
     virtual void OnRegisterSceneNode();
+    // ------------------------------------------------------------------------
+    const std::vector<irr::core::matrix4>& getSkinningMatrices() const
+                                                { return m_skinning_matrices; }
 };   // GEVulkanAnimatedMeshSceneNode
 
 }
