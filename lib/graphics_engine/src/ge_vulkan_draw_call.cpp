@@ -150,7 +150,8 @@ void GEVulkanDrawCall::generate()
         }};
         const irr::video::ITexture** list = &textures[0];
         const int material_id = m_texture_descriptor->getTextureID(list);
-        m_materials.push_back(material_id);
+        if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+            m_materials[p.first->getVBOOffset()] = material_id;
         unsigned visible_count = p.second.size();
         if (visible_count != 0)
         {
@@ -177,6 +178,18 @@ void GEVulkanDrawCall::generate()
             m_cmds.emplace_back(cmd, skinning ? "solid_skinning" : "solid");
         }
     }
+    if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+    {
+        std::stable_sort(m_cmds.begin(), m_cmds.end(),
+            [this](
+            const std::pair<VkDrawIndexedIndirectCommand, std::string>& a,
+            const std::pair<VkDrawIndexedIndirectCommand, std::string>& b)
+            {
+                return m_materials[a.first.vertexOffset] <
+                    m_materials[b.first.vertexOffset];
+            });
+    }
+
     std::stable_sort(m_cmds.begin(), m_cmds.end(),
         [](const std::pair<VkDrawIndexedIndirectCommand, std::string>& a,
         const std::pair<VkDrawIndexedIndirectCommand, std::string>& b)
@@ -694,16 +707,27 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     }
     else
     {
+        int cur_mid = m_materials[m_cmds[0].first.vertexOffset];
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
             m_graphics_pipelines[cur_pipeline].first);
+        if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+        {
+            vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
+                m_pipeline_layout, 0, 1,
+                &m_texture_descriptor->getDescriptorSet()[cur_mid], 0, NULL);
+        }
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
-            if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+            const VkDrawIndexedIndirectCommand& cur_cmd = m_cmds[i].first;
+            int mid = m_materials[cur_cmd.vertexOffset];
+            if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce() &&
+                cur_mid != mid)
             {
+                cur_mid = mid;
                 vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_pipeline_layout, 0, 1,
-                    &m_texture_descriptor->getDescriptorSet()[m_materials[i]],
-                    0, NULL);
+                    &m_texture_descriptor->getDescriptorSet()[cur_mid], 0,
+                    NULL);
             }
             if (m_cmds[i].second != cur_pipeline)
             {
@@ -711,7 +735,6 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                 vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_graphics_pipelines[cur_pipeline].first);
             }
-            const VkDrawIndexedIndirectCommand& cur_cmd = m_cmds[i].first;
             vkCmdDrawIndexed(cmd, cur_cmd.indexCount, cur_cmd.instanceCount,
                 cur_cmd.firstIndex, cur_cmd.vertexOffset, cur_cmd.firstInstance);
         }

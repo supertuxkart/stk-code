@@ -76,7 +76,7 @@ private:
     std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
         m_graphics_pipelines;
 
-    std::vector<int> m_materials;
+    std::unordered_map<int32_t, int> m_materials;
 
     GEVulkanTextureDescriptor* m_texture_descriptor;
 
