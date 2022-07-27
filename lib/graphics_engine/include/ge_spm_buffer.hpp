@@ -29,12 +29,15 @@ private:
     size_t m_vbo_offset;
 
     size_t m_ibo_offset;
+
+    bool m_has_skinning;
 public:
     // ------------------------------------------------------------------------
     GESPMBuffer()
     {
         m_vbo_offset = 0;
         m_ibo_offset = 0;
+        m_has_skinning = false;
     }
     // ------------------------------------------------------------------------
     virtual const irr::video::SMaterial& getMaterial() const
@@ -160,6 +163,8 @@ public:
     void setIBOOffset(size_t offset)                 { m_ibo_offset = offset; }
     // ------------------------------------------------------------------------
     size_t getIBOOffset() const                        { return m_ibo_offset; }
+    // ------------------------------------------------------------------------
+    bool hasSkinning() const                         { return m_has_skinning; }
 };
 
 } // end namespace irr

@@ -105,6 +105,7 @@ scene::IAnimatedMesh* B3DMeshLoader::createMesh(io::IReadFile* f)
         {
             SP::SPMeshBuffer* spbuf = spm->getSPMeshBuffer(i);
             GE::GESPMBuffer* gebuf = new GE::GESPMBuffer();
+            gebuf->m_has_skinning = !spm->isStatic();
             ge_spm->m_buffer.push_back(gebuf);
             std::swap(gebuf->m_vertices, spbuf->getVerticesRef());
             std::swap(gebuf->m_indices, spbuf->getIndicesRef());

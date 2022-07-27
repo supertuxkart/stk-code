@@ -556,6 +556,7 @@ void SPMeshLoader::decompressGESPM(irr::io::IReadFile* spm,
                 // 1.0 in half float (16bit)
                 vertex.m_weight[0] = 15360;
             }
+            mb->m_has_skinning = true;
         }
         vertices.push_back(vertex);
     }

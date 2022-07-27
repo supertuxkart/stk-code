@@ -155,16 +155,13 @@ void GEVulkanDrawCall::generate()
         unsigned visible_count = p.second.size();
         if (visible_count != 0)
         {
-            bool skinning = false;
+            bool skinning = p.first->hasSkinning();
             for (auto* node : p.second)
             {
                 int skinning_offset = -1000;
                 auto it = skinning_offets.find(node);
                 if (it != skinning_offets.end())
-                {
-                    skinning = true;
                     skinning_offset = it->second;
-                }
                 m_visible_objects.emplace_back(node, material_id,
                     skinning_offset);
             }
@@ -213,23 +210,27 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
 {
     PipelineSettings settings;
     settings.m_vertex_shader = "spm.vert";
+    settings.m_skinning_vertex_shader = "spm_skinning.vert";
     settings.m_fragment_shader = "solid.frag";
     settings.m_shader_name = "solid";
     createPipeline(vk, settings);
 
-    settings.m_vertex_shader = "spm_skinning.vert";
-    settings.m_shader_name = "solid_skinning";
-    createPipeline(vk, settings);
 }   // createAllPipelines
 
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
                                       const PipelineSettings& settings)
 {
+    bool creating_animated_pipeline_for_skinning = false;
+    std::string shader_name = settings.m_shader_name;
+
+start:
     VkPipelineShaderStageCreateInfo vert_shader_stage_info = {};
     vert_shader_stage_info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vert_shader_stage_info.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vert_shader_stage_info.module = GEVulkanShaderManager::getShader(settings.m_vertex_shader);
+    vert_shader_stage_info.module = GEVulkanShaderManager::getShader(
+        creating_animated_pipeline_for_skinning ?
+        settings.m_skinning_vertex_shader : settings.m_vertex_shader);
     vert_shader_stage_info.pName = "main";
 
     VkPipelineShaderStageCreateInfo frag_shader_stage_info = {};
@@ -244,10 +245,15 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
         frag_shader_stage_info
     }};
 
-    VkVertexInputBindingDescription binding_description = {};
-    binding_description.binding = 0;
-    binding_description.stride = sizeof(irr::video::S3DVertexSkinnedMesh);
-    binding_description.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    size_t bone_pitch = sizeof(int16_t) * 8;
+    size_t static_pitch = sizeof(irr::video::S3DVertexSkinnedMesh) - bone_pitch;
+    std::array<VkVertexInputBindingDescription, 2> binding_descriptions;
+    binding_descriptions[0].binding = 0;
+    binding_descriptions[0].stride = static_pitch;
+    binding_descriptions[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+    binding_descriptions[1].binding = 1;
+    binding_descriptions[1].stride = bone_pitch;
+    binding_descriptions[1].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
 
     std::array<VkVertexInputAttributeDescription, 8> attribute_descriptions = {};
     attribute_descriptions[0].binding = 0;
@@ -274,21 +280,21 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     attribute_descriptions[5].location = 5;
     attribute_descriptions[5].format = VK_FORMAT_A2B10G10R10_SNORM_PACK32;
     attribute_descriptions[5].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_tangent);
-    attribute_descriptions[6].binding = 0;
+    attribute_descriptions[6].binding = 1;
     attribute_descriptions[6].location = 6;
     attribute_descriptions[6].format = VK_FORMAT_R16G16B16A16_SINT;
-    attribute_descriptions[6].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_joint_idx);
-    attribute_descriptions[7].binding = 0;
+    attribute_descriptions[6].offset = 0;
+    attribute_descriptions[7].binding = 1;
     attribute_descriptions[7].location = 7;
     attribute_descriptions[7].format = VK_FORMAT_R16G16B16A16_SFLOAT;
-    attribute_descriptions[7].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_weight);
+    attribute_descriptions[7].offset = sizeof(int16_t) * 4;
 
     VkPipelineVertexInputStateCreateInfo vertex_input_info = {};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertex_input_info.vertexBindingDescriptionCount = 1;
-    vertex_input_info.vertexAttributeDescriptionCount = attribute_descriptions.size();
-    vertex_input_info.pVertexBindingDescriptions = &binding_description;
-    vertex_input_info.pVertexAttributeDescriptions = &attribute_descriptions[0];
+    vertex_input_info.vertexBindingDescriptionCount = 2;
+    vertex_input_info.vertexAttributeDescriptionCount = 8;
+    vertex_input_info.pVertexBindingDescriptions = binding_descriptions.data();
+    vertex_input_info.pVertexAttributeDescriptions = attribute_descriptions.data();
 
     VkPipelineInputAssemblyStateCreateInfo input_assembly = {};
     input_assembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -390,10 +396,19 @@ void GEVulkanDrawCall::createPipeline(GEVulkanDriver* vk,
     if (result != VK_SUCCESS)
     {
         throw std::runtime_error("vkCreateGraphicsPipelines failed for " +
-            settings.m_shader_name);
+            shader_name);
     }
-    m_graphics_pipelines[settings.m_shader_name] = std::make_pair(
+    m_graphics_pipelines[shader_name] = std::make_pair(
         graphics_pipeline, settings);
+
+    if (settings.m_skinning_vertex_shader.empty())
+        return;
+    else if (creating_animated_pipeline_for_skinning)
+        return;
+
+    creating_animated_pipeline_for_skinning = true;
+    shader_name = settings.m_shader_name + "_skinning";
+    goto start;
 }   // createPipeline
 
 // ----------------------------------------------------------------------------
@@ -648,10 +663,19 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
         m_pipeline_layout, 1, 1, &m_data_descriptor_sets[cur_frame], 0, NULL);
 
-    VkDeviceSize offsets[] = {0};
     GEVulkanMeshCache* mc = vk->getVulkanMeshCache();
-    VkBuffer vertex_buffer = mc->getBuffer();
-    vkCmdBindVertexBuffers(cmd, 0, 1, &vertex_buffer, offsets);
+    std::array<VkBuffer, 2> vertex_buffer =
+    {{
+        mc->getBuffer(),
+        mc->getBuffer()
+    }};
+    std::array<VkDeviceSize, 2> offsets =
+    {{
+        0,
+        mc->getSkinningVBOOffset()
+    }};
+    vkCmdBindVertexBuffers(cmd, 0, vertex_buffer.size(), vertex_buffer.data(),
+        offsets.data());
 
     vkCmdBindIndexBuffer(cmd, mc->getBuffer(), mc->getIBOOffset(),
         VK_INDEX_TYPE_UINT16);

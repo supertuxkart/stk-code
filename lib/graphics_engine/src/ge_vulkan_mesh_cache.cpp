@@ -6,6 +6,8 @@
 
 #include "IAnimatedMesh.h"
 
+#include <algorithm>
+#include <cassert>
 #include <vector>
 
 namespace GE
@@ -19,7 +21,7 @@ GEVulkanMeshCache::GEVulkanMeshCache()
     m_ge_cache_time = 0;
     m_buffer = VK_NULL_HANDLE;
     m_memory = VK_NULL_HANDLE;
-    m_ibo_offset = 0;
+    m_ibo_offset = m_skinning_vbo_offset = 0;
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -36,6 +38,10 @@ void GEVulkanMeshCache::updateCache()
     m_ge_cache_time = m_irrlicht_cache_time;
 
     destroy();
+    size_t total_pitch = getVertexPitchFromType(video::EVT_SKINNED_MESH);
+    size_t bone_pitch = sizeof(int16_t) * 8;
+    size_t static_pitch = total_pitch - bone_pitch;
+
     size_t vbo_size, ibo_size;
     vbo_size = 0;
     ibo_size = 0;
@@ -47,14 +53,21 @@ void GEVulkanMeshCache::updateCache()
             continue;
         for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
         {
-            scene::IMeshBuffer* mb = mesh->getMeshBuffer(j);
-            vbo_size += mesh->getMeshBuffer(j)->getVertexCount();
-            ibo_size += mesh->getMeshBuffer(j)->getIndexCount();
-            buffers.push_back(static_cast<GESPMBuffer*>(mb));
+            GESPMBuffer* mb = static_cast<GESPMBuffer*>(mesh->getMeshBuffer(j));
+            size_t pitch = mb->hasSkinning() ? total_pitch : static_pitch;
+            vbo_size += mb->getVertexCount() * pitch;
+            ibo_size += mb->getIndexCount();
+            buffers.push_back(mb);
         }
     }
-    vbo_size *= getVertexPitchFromType(video::EVT_SKINNED_MESH);
     ibo_size *= sizeof(uint16_t);
+    // Some devices (Apple for now) require vertex offset of alignment 4 bytes
+    ibo_size += getPadding(ibo_size, 4);
+    std::stable_partition(buffers.begin(), buffers.end(),
+        [](const GESPMBuffer* mb)
+        {
+            return !mb->hasSkinning();
+        });
 
     VkBuffer staging_buffer = VK_NULL_HANDLE;
     VmaAllocation staging_memory = VK_NULL_HANDLE;
@@ -78,12 +91,16 @@ void GEVulkanMeshCache::updateCache()
     size_t offset = 0;
     for (GESPMBuffer* spm_buffer : buffers)
     {
-        size_t copy_size = spm_buffer->getVertexCount() *
-            getVertexPitchFromType(video::EVT_SKINNED_MESH);
+        size_t real_size = spm_buffer->getVertexCount() * total_pitch;
+        size_t copy_size = spm_buffer->getVertexCount() * static_pitch;
         uint8_t* loc = mapped + offset;
-        memcpy(loc, spm_buffer->getVertices(), copy_size);
-        spm_buffer->setVBOOffset(
-            offset / getVertexPitchFromType(video::EVT_SKINNED_MESH));
+        for (unsigned i = 0; i < real_size; i += total_pitch)
+        {
+            uint8_t* vertices = ((uint8_t*)spm_buffer->getVertices()) + i;
+            memcpy(loc, vertices, static_pitch);
+            loc += static_pitch;
+        }
+        spm_buffer->setVBOOffset(offset / static_pitch);
         offset += copy_size;
     }
     m_ibo_offset = offset;
@@ -97,6 +114,33 @@ void GEVulkanMeshCache::updateCache()
         spm_buffer->setIBOOffset(offset / sizeof(uint16_t));
         offset += copy_size;
     }
+    m_skinning_vbo_offset = m_ibo_offset + offset;
+    m_skinning_vbo_offset += getPadding(m_skinning_vbo_offset, 4);
+
+    offset = 0;
+    size_t static_vertex_offset = 0;
+    for (GESPMBuffer* spm_buffer : buffers)
+    {
+        if (!spm_buffer->hasSkinning())
+        {
+            static_vertex_offset += spm_buffer->getVertexCount() * bone_pitch;
+            continue;
+        }
+        uint8_t* loc = mapped + offset + m_skinning_vbo_offset;
+        size_t real_size = spm_buffer->getVertexCount() * total_pitch;
+        for (unsigned i = 0; i < real_size; i += total_pitch)
+        {
+            uint8_t* vertices = ((uint8_t*)spm_buffer->getVertices()) + i +
+                static_pitch;
+            memcpy(loc, vertices, bone_pitch);
+            loc += bone_pitch;
+        }
+        offset += spm_buffer->getVertexCount() * bone_pitch;
+    }
+    assert(m_skinning_vbo_offset + offset == vbo_size + ibo_size);
+    assert(static_vertex_offset < m_skinning_vbo_offset);
+    m_skinning_vbo_offset -= static_vertex_offset;
+
     vmaUnmapMemory(m_vk->getVmaAllocator(), staging_memory);
     vmaFlushAllocation(m_vk->getVmaAllocator(), staging_memory, 0, offset);
 
@@ -121,7 +165,7 @@ void GEVulkanMeshCache::destroy()
     vmaDestroyBuffer(m_vk->getVmaAllocator(), m_buffer, m_memory);
     m_buffer = VK_NULL_HANDLE;
     m_memory = VK_NULL_HANDLE;
-    m_ibo_offset = 0;
+    m_ibo_offset = m_skinning_vbo_offset = 0;
 }   // destroy
 
 }

@@ -42,6 +42,7 @@ struct ObjectData
 struct PipelineSettings
 {
     std::string m_vertex_shader;
+    std::string m_skinning_vertex_shader;
     std::string m_fragment_shader;
     std::string m_shader_name;
 };

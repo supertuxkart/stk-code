@@ -21,7 +21,7 @@ private:
 
     VmaAllocation m_memory;
 
-    size_t m_ibo_offset;
+    size_t m_ibo_offset, m_skinning_vbo_offset;
 public:
     // ------------------------------------------------------------------------
     GEVulkanMeshCache();
@@ -35,6 +35,8 @@ public:
     VkBuffer getBuffer() const                             { return m_buffer; }
     // ------------------------------------------------------------------------
     size_t getIBOOffset() const                        { return m_ibo_offset; }
+    // ------------------------------------------------------------------------
+    size_t getSkinningVBOOffset() const       { return m_skinning_vbo_offset; }
 };   // GEVulkanMeshCache
 
 }
