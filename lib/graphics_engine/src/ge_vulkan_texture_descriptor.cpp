@@ -26,20 +26,27 @@ GEVulkanTextureDescriptor::GEVulkanTextureDescriptor(unsigned max_texture_list,
     m_vk = getVKDriver();
 
     // m_descriptor_set_layout
-    VkDescriptorSetLayoutBinding texture_layout_binding = {};
-    texture_layout_binding.binding = m_binding;
-    texture_layout_binding.descriptorCount =
-        single_descriptor ? m_max_texture_list * m_max_layer : m_max_layer;
-    texture_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    texture_layout_binding.pImmutableSamplers = NULL;
-    texture_layout_binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    std::vector<VkDescriptorSetLayoutBinding> texture_layout_binding;
+    texture_layout_binding.resize(1);
+    texture_layout_binding[0].binding = m_binding;
+    texture_layout_binding[0].descriptorCount =
+        single_descriptor ? m_max_texture_list * m_max_layer : 1;
+    texture_layout_binding[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    texture_layout_binding[0].pImmutableSamplers = NULL;
+    texture_layout_binding[0].stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+    if (!single_descriptor)
+    {
+        texture_layout_binding.resize(m_max_layer, texture_layout_binding[0]);
+        for (unsigned i = 1; i < m_max_layer; i++)
+            texture_layout_binding[i].binding = m_binding + i;
+    }
 
     VkDescriptorSetLayoutCreateInfo setinfo = {};
     setinfo.flags = 0;
     setinfo.pNext = NULL;
     setinfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    setinfo.pBindings = &texture_layout_binding;
-    setinfo.bindingCount = 1;
+    setinfo.pBindings = texture_layout_binding.data();
+    setinfo.bindingCount = texture_layout_binding.size();
     if (vkCreateDescriptorSetLayout(m_vk->getDevice(), &setinfo,
         NULL, &m_descriptor_set_layout) != VK_SUCCESS)
     {
