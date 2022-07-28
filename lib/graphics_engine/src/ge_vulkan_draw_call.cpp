@@ -16,6 +16,7 @@
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include <algorithm>
+#include <limits>
 
 namespace GE
 {
@@ -137,8 +138,42 @@ void GEVulkanDrawCall::generate()
         m_skinning_data_padded_size += bone_size;
     }
 
-    unsigned accumulated_instance = 0;
+    using Nodes = std::pair<GESPMBuffer*, std::unordered_map<
+        std::string, std::vector<std::pair<irr::scene::ISceneNode*, unsigned
+        > > > >;
+    std::vector<Nodes> visible_nodes;
+
     for (auto& p : m_visible_nodes)
+        visible_nodes.emplace_back(p.first, std::move(p.second));
+    std::unordered_map<GESPMBuffer*, float> nodes_area;
+    for (auto& p : visible_nodes)
+    {
+        if (p.second.empty())
+        {
+            nodes_area[p.first] = std::numeric_limits<float>::max();
+            continue;
+        }
+        for (auto& q : p.second)
+        {
+            if (q.second.empty())
+            {
+                nodes_area[p.first] = std::numeric_limits<float>::max();
+                continue;
+            }
+            irr::core::aabbox3df bb = p.first->getBoundingBox();
+            q.second[0].first->getAbsoluteTransformation().transformBoxEx(bb);
+            nodes_area[p.first] = bb.getArea() * (float)q.second.size();
+            break;
+        }
+    }
+    std::sort(visible_nodes.begin(), visible_nodes.end(),
+        [&nodes_area](const Nodes& a, const Nodes& b)
+        {
+            return nodes_area.at(a.first) < nodes_area.at(b.first) ;
+        });
+
+    unsigned accumulated_instance = 0;
+    for (auto& p : visible_nodes)
     {
         irr::video::SMaterial& m = p.first->getMaterial();
         std::array<const irr::video::ITexture*, 8> textures =
