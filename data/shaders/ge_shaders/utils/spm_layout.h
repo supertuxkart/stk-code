@@ -36,4 +36,5 @@ layout(location = 7) in vec4 v_weight;
 
 layout(location = 0) out vec4 f_vertex_color;
 layout(location = 1) out vec2 f_uv;
-layout(location = 2) flat out int f_material_id;
+layout(location = 2) out vec2 f_uv_two;
+layout(location = 3) flat out int f_material_id;

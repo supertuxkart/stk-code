@@ -779,6 +779,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                   m_texname.c_str());
     }
 
+    bool is_vk = irr_driver->getVideoDriver()->getDriverType() == EDT_VULKAN;
     // Default solid
     m->MaterialType = video::EMT_SOLID;
     if (RaceManager::get()->getReverseTrack() &&
@@ -834,6 +835,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             video::EMFN_MODULATE_1X,
             video::EAS_TEXTURE |
             video::EAS_VERTEX_COLOR);
+        if (is_vk)
+            m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
     }
     else if (m_shader_name == "grass")
     {
@@ -852,9 +855,16 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->EmissiveColor = video::SColor(255, 150, 150, 150);
             m->SpecularColor = video::SColor(255, 150, 150, 150);
         }
+        if (is_vk)
+            m->MaterialType = video::EMT_STK_GRASS;
 #endif
 
 #endif
+    }
+    else if (m_shader_name == "decal")
+    {
+        if (is_vk)
+            m->MaterialType = video::EMT_SOLID_2_LAYER;
     }
 
     if (isTransparent())

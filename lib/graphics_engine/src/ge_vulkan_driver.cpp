@@ -37,6 +37,9 @@ extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     const VkDebugUtilsMessengerCallbackDataEXT* callback_data,
     void* user_data)
 {
+    std::string msg = callback_data->pMessage;
+    if (msg.find("UNASSIGNED-CoreValidation-Shader-OutputNotConsumed") != std::string::npos)
+        return VK_FALSE;
 #ifdef __ANDROID__
     android_LogPriority alp;
     switch (message_severity)
@@ -47,9 +50,9 @@ extern "C" VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT: alp = ANDROID_LOG_ERROR;   break;
     default: alp = ANDROID_LOG_INFO;
     }
-    __android_log_print(alp, "VALIDATION:", "%s", callback_data->pMessage);
+    __android_log_print(alp, "VALIDATION:", "%s", msg.c_str());
 #else
-    printf("%s\n", callback_data->pMessage);
+    printf("%s\n", msg.c_str());
 #endif
     return VK_FALSE;
 };

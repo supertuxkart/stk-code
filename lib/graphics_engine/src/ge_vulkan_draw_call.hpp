@@ -45,16 +45,33 @@ struct PipelineSettings
     std::string m_skinning_vertex_shader;
     std::string m_fragment_shader;
     std::string m_shader_name;
+    bool m_alphablend;
+    bool m_additive;
+    bool m_backface_culling;
+    bool m_depth_test;
+    bool m_depth_write;
+    char m_drawing_priority;
+
+    bool isTransparent() const { return m_alphablend || m_additive; }
+};
+
+struct DrawCallData
+{
+    VkDrawIndexedIndirectCommand m_cmd;
+    std::string m_shader;
+    std::string m_sorting_key;
 };
 
 class GEVulkanDrawCall
 {
 private:
-    std::unordered_map<GESPMBuffer*, std::vector<irr::scene::ISceneNode*> > m_visible_nodes;
+    std::unordered_map<GESPMBuffer*, std::unordered_map<std::string,
+        std::vector<std::pair<irr::scene::ISceneNode*, unsigned> > > >
+        m_visible_nodes;
 
     GECullingTool* m_culling_tool;
 
-    std::vector<std::pair<VkDrawIndexedIndirectCommand, std::string> > m_cmds;
+    std::vector<DrawCallData> m_cmds;
 
     std::vector<ObjectData> m_visible_objects;
 
@@ -91,6 +108,8 @@ private:
     void createPipeline(GEVulkanDriver* vk, const PipelineSettings& settings);
     // ------------------------------------------------------------------------
     void createVulkanData();
+    // ------------------------------------------------------------------------
+    std::string getShader(irr::scene::ISceneNode* node, int material_id);
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();
@@ -113,7 +132,7 @@ public:
     {
         unsigned result = 0;
         for (auto& cmd : m_cmds)
-            result += (cmd.first.indexCount / 3) * cmd.first.instanceCount;
+            result += (cmd.m_cmd.indexCount / 3) * cmd.m_cmd.instanceCount;
         return result;
     }
     // ------------------------------------------------------------------------

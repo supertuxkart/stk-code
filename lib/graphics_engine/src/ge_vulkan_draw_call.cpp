@@ -103,7 +103,8 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
             mesh->getMeshBuffer(i));
         if (m_culling_tool->isCulled(buffer, node))
             continue;
-        m_visible_nodes[buffer].push_back(node);
+        const std::string& shader = getShader(node, i);
+        m_visible_nodes[buffer][shader].emplace_back(node, i);
         if (anode && !added_skinning &&
             !anode->getSkinningMatrices().empty() &&
             m_skinning_nodes.find(anode) == m_skinning_nodes.end())
@@ -117,6 +118,9 @@ void GEVulkanDrawCall::addNode(irr::scene::ISceneNode* node)
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::generate()
 {
+    if (!m_visible_nodes.empty() && m_data_layout == VK_NULL_HANDLE)
+        createVulkanData();
+
     std::unordered_map<irr::scene::ISceneNode*, int> skinning_offets;
     int added_joint = 1;
     m_skinning_data_padded_size = sizeof(irr::core::matrix4);
@@ -152,12 +156,22 @@ void GEVulkanDrawCall::generate()
         const int material_id = m_texture_descriptor->getTextureID(list);
         if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
             m_materials[p.first->getVBOOffset()] = material_id;
-        unsigned visible_count = p.second.size();
-        if (visible_count != 0)
+
+        const bool skinning = p.first->hasSkinning();
+        for (auto& q : p.second)
         {
-            bool skinning = p.first->hasSkinning();
-            for (auto* node : p.second)
+            unsigned visible_count = q.second.size();
+            if (visible_count == 0)
+                continue;
+            std::string cur_shader = q.first;
+            if (skinning)
+                cur_shader += "_skinning";
+            if (m_graphics_pipelines.find(cur_shader) ==
+                m_graphics_pipelines.end())
+                continue;
+            for (auto& r : q.second)
             {
+                irr::scene::ISceneNode* node = r.first;
                 int skinning_offset = -1000;
                 auto it = skinning_offets.find(node);
                 if (it != skinning_offets.end())
@@ -172,31 +186,44 @@ void GEVulkanDrawCall::generate()
             cmd.vertexOffset = p.first->getVBOOffset();
             cmd.firstInstance = accumulated_instance;
             accumulated_instance += visible_count;
-            m_cmds.emplace_back(cmd, skinning ? "solid_skinning" : "solid");
+            const PipelineSettings& settings =
+                m_graphics_pipelines[cur_shader].second;
+            std::string sorting_key =
+                std::string(1, settings.m_drawing_priority) + cur_shader;
+            m_cmds.push_back({ cmd, cur_shader, sorting_key });
         }
     }
     if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
     {
         std::stable_sort(m_cmds.begin(), m_cmds.end(),
-            [this](
-            const std::pair<VkDrawIndexedIndirectCommand, std::string>& a,
-            const std::pair<VkDrawIndexedIndirectCommand, std::string>& b)
+            [this](const DrawCallData& a, const DrawCallData& b)
             {
-                return m_materials[a.first.vertexOffset] <
-                    m_materials[b.first.vertexOffset];
+                return m_materials[a.m_cmd.vertexOffset] <
+                    m_materials[b.m_cmd.vertexOffset];
             });
     }
 
     std::stable_sort(m_cmds.begin(), m_cmds.end(),
-        [](const std::pair<VkDrawIndexedIndirectCommand, std::string>& a,
-        const std::pair<VkDrawIndexedIndirectCommand, std::string>& b)
+        [](const DrawCallData& a, const DrawCallData& b)
         {
-            return a.second < b.second;
+            return a.m_sorting_key < b.m_sorting_key;
         });
-
-    if (!m_cmds.empty() && m_data_layout == VK_NULL_HANDLE)
-        createVulkanData();
 }   // generate
+
+// ----------------------------------------------------------------------------
+std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
+                                        int material_id)
+{
+    irr::video::SMaterial& m = node->getMaterial(material_id);
+    switch (m.MaterialType)
+    {
+    case irr::video::EMT_TRANSPARENT_ADD_COLOR: return "additive";
+    case irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF: return "alphatest";
+    case irr::video::EMT_ONETEXTURE_BLEND: return "alphablend";
+    case irr::video::EMT_SOLID_2_LAYER: return "decal";
+    default: return "solid";
+    }
+}   // getShader
 
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
@@ -208,13 +235,40 @@ void GEVulkanDrawCall::prepare(GEVulkanCameraSceneNode* cam)
 // ----------------------------------------------------------------------------
 void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
 {
-    PipelineSettings settings;
+    PipelineSettings settings = {};
+    settings.m_depth_test = true;
+    settings.m_depth_write = true;
+    settings.m_backface_culling = true;
+
     settings.m_vertex_shader = "spm.vert";
     settings.m_skinning_vertex_shader = "spm_skinning.vert";
     settings.m_fragment_shader = "solid.frag";
     settings.m_shader_name = "solid";
     createPipeline(vk, settings);
 
+    settings.m_fragment_shader = "decal.frag";
+    settings.m_shader_name = "decal";
+    createPipeline(vk, settings);
+
+    settings.m_fragment_shader = "alphatest.frag";
+    settings.m_shader_name = "alphatest";
+    settings.m_drawing_priority = (char)5;
+    createPipeline(vk, settings);
+
+    settings.m_depth_write = false;
+    settings.m_backface_culling = false;
+    settings.m_alphablend = true;
+    settings.m_drawing_priority = (char)10;
+
+    settings.m_fragment_shader = "transparent.frag";
+    settings.m_shader_name = "alphablend";
+    createPipeline(vk, settings);
+
+    settings.m_alphablend = false;
+    settings.m_additive = true;
+    settings.m_fragment_shader = "transparent.frag";
+    settings.m_shader_name = "additive";
+    createPipeline(vk, settings);
 }   // createAllPipelines
 
 // ----------------------------------------------------------------------------
@@ -326,7 +380,8 @@ start:
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
-    rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
+    rasterizer.cullMode = settings.m_backface_culling ?
+        VK_CULL_MODE_BACK_BIT : VK_CULL_MODE_NONE;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
 
@@ -337,8 +392,8 @@ start:
 
     VkPipelineDepthStencilStateCreateInfo depth_stencil = {};
     depth_stencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
-    depth_stencil.depthTestEnable = VK_TRUE;
-    depth_stencil.depthWriteEnable = VK_TRUE;
+    depth_stencil.depthTestEnable = settings.m_depth_test;
+    depth_stencil.depthWriteEnable = settings.m_depth_write;
     depth_stencil.depthCompareOp = VK_COMPARE_OP_LESS;
     depth_stencil.depthBoundsTestEnable = VK_FALSE;
     depth_stencil.stencilTestEnable = VK_FALSE;
@@ -347,8 +402,25 @@ start:
     color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
         VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
         VK_COLOR_COMPONENT_A_BIT;
-    color_blend_attachment.blendEnable = VK_FALSE;
-
+    color_blend_attachment.blendEnable = settings.isTransparent();
+    if (settings.m_alphablend)
+    {
+        color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
+        color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+    }
+    if (settings.m_additive)
+    {
+        color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
+        color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+        color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
+    }
     VkPipelineColorBlendStateCreateInfo color_blending = {};
     color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     color_blending.logicOpEnable = VK_FALSE;
@@ -578,7 +650,7 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
         for (auto& cmd : m_cmds)
         {
             m_data_uploading.emplace_back(
-                (void*)&cmd.first, sizeof(VkDrawIndexedIndirectCommand));
+                (void*)&cmd.m_cmd, sizeof(VkDrawIndexedIndirectCommand));
         }
         dst_stage |= VK_PIPELINE_STAGE_DRAW_INDIRECT_BIT;
     }
@@ -700,7 +772,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
 
-    std::string cur_pipeline = m_cmds[0].second;
+    std::string cur_pipeline = m_cmds[0].m_shader;
     if (use_multidraw)
     {
         size_t indirect_offset = m_skinning_data_padded_size +
@@ -709,7 +781,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         unsigned draw_count = 0;
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
-            if (m_cmds[i].second != cur_pipeline)
+            if (m_cmds[i].m_shader != cur_pipeline)
             {
                 vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_graphics_pipelines[cur_pipeline].first);
@@ -718,20 +790,20 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     draw_count, indirect_size);
                 indirect_offset += draw_count * indirect_size;
                 draw_count = 1;
-                cur_pipeline = m_cmds[i].second;
+                cur_pipeline = m_cmds[i].m_shader;
                 continue;
             }
             draw_count++;
         }
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_graphics_pipelines[m_cmds.back().second].first);
+            m_graphics_pipelines[m_cmds.back().m_shader].first);
         vkCmdDrawIndexedIndirect(cmd,
             m_dynamic_data->getCurrentBuffer(), indirect_offset,
             draw_count, indirect_size);
     }
     else
     {
-        int cur_mid = m_materials[m_cmds[0].first.vertexOffset];
+        int cur_mid = m_materials[m_cmds[0].m_cmd.vertexOffset];
         vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
             m_graphics_pipelines[cur_pipeline].first);
         if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
@@ -742,7 +814,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         }
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
-            const VkDrawIndexedIndirectCommand& cur_cmd = m_cmds[i].first;
+            const VkDrawIndexedIndirectCommand& cur_cmd = m_cmds[i].m_cmd;
             int mid = m_materials[cur_cmd.vertexOffset];
             if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce() &&
                 cur_mid != mid)
@@ -753,9 +825,9 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                     &m_texture_descriptor->getDescriptorSet()[cur_mid], 0,
                     NULL);
             }
-            if (m_cmds[i].second != cur_pipeline)
+            if (m_cmds[i].m_shader != cur_pipeline)
             {
-                cur_pipeline = m_cmds[i].second;
+                cur_pipeline = m_cmds[i].m_shader;
                 vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_graphics_pipelines[cur_pipeline].first);
             }

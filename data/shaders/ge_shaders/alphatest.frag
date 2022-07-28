@@ -8,6 +8,8 @@ layout(location = 0) out vec4 o_color;
 
 void main()
 {
-    vec3 mixed_color = sampleMeshTexture0(f_material_id, f_uv).xyz * f_vertex_color.xyz;
-    o_color = vec4(mixed_color, 1.0);
+    vec4 mixed_color = sampleMeshTexture0(f_material_id, f_uv)* f_vertex_color;
+    if (mixed_color.a < 0.5)
+        discard;
+    o_color = vec4(mixed_color.xyz, 1.0);
 }
