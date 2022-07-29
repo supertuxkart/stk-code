@@ -1,6 +1,7 @@
 #ifndef HEADER_GE_VULKAN_DRAW_CALL_HPP
 #define HEADER_GE_VULKAN_DRAW_CALL_HPP
 
+#include <functional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -51,6 +52,7 @@ struct PipelineSettings
     bool m_depth_test;
     bool m_depth_write;
     char m_drawing_priority;
+    std::function<void(uint32_t*, void**)> m_push_constants_func;
 
     bool isTransparent() const { return m_alphablend || m_additive; }
 };
@@ -110,6 +112,20 @@ private:
     void createVulkanData();
     // ------------------------------------------------------------------------
     std::string getShader(irr::scene::ISceneNode* node, int material_id);
+    // ------------------------------------------------------------------------
+    void bindPipeline(VkCommandBuffer cmd, const std::string& name) const
+    {
+        auto& ret = m_graphics_pipelines.at(name);
+        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, ret.first);
+        if (ret.second.m_push_constants_func)
+        {
+            uint32_t size;
+            void* data;
+            ret.second.m_push_constants_func(&size, &data);
+            vkCmdPushConstants(cmd, m_pipeline_layout,
+                VK_SHADER_STAGE_ALL_GRAPHICS, 0, size, data);
+        }
+    }
 public:
     // ------------------------------------------------------------------------
     GEVulkanDrawCall();

@@ -256,6 +256,7 @@ std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
     case irr::video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF: return "alphatest";
     case irr::video::EMT_ONETEXTURE_BLEND: return "alphablend";
     case irr::video::EMT_SOLID_2_LAYER: return "decal";
+    case irr::video::EMT_STK_GRASS: return "grass";
     default: return "solid";
     }
 }   // getShader
@@ -290,6 +291,23 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_drawing_priority = (char)5;
     createPipeline(vk, settings);
 
+    settings.m_vertex_shader = "grass.vert";
+    settings.m_skinning_vertex_shader = "";
+    settings.m_shader_name = "grass";
+    settings.m_drawing_priority = (char)5;
+    settings.m_push_constants_func = [](uint32_t* size, void** data)
+    {
+        static irr::core::vector3df wind_direction;
+        wind_direction = irr::core::vector3df(1.0f, 0.0f, 0.0f) *
+            (getMonoTimeMs() / 1000.0f) * 1.5f;
+        *size = sizeof(irr::core::vector3df);
+        *data = &wind_direction;
+    };
+    createPipeline(vk, settings);
+
+    settings.m_vertex_shader = "spm.vert";
+    settings.m_skinning_vertex_shader = "spm_skinning.vert";
+    settings.m_push_constants_func = nullptr;
     settings.m_depth_write = false;
     settings.m_backface_culling = false;
     settings.m_alphablend = true;
@@ -615,6 +633,15 @@ void GEVulkanDrawCall::createVulkanData()
     pipeline_layout_info.setLayoutCount = all_layouts.size();
     pipeline_layout_info.pSetLayouts = all_layouts.data();
 
+    VkPushConstantRange push_constant;
+    push_constant.offset = 0;
+    const VkPhysicalDeviceLimits& limit =
+        vk->getPhysicalDeviceProperties().limits;
+    push_constant.size = std::min(limit.maxPushConstantsSize, 128u);
+    push_constant.stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS;
+    pipeline_layout_info.pPushConstantRanges = &push_constant;
+    pipeline_layout_info.pushConstantRangeCount = 1;
+
     result = vkCreatePipelineLayout(vk->getDevice(), &pipeline_layout_info,
         NULL, &m_pipeline_layout);
 
@@ -818,8 +845,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         {
             if (m_cmds[i].m_shader != cur_pipeline)
             {
-                vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    m_graphics_pipelines[cur_pipeline].first);
+                bindPipeline(cmd, cur_pipeline);
                 vkCmdDrawIndexedIndirect(cmd,
                     m_dynamic_data->getCurrentBuffer(), indirect_offset,
                     draw_count, indirect_size);
@@ -830,8 +856,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             }
             draw_count++;
         }
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_graphics_pipelines[m_cmds.back().m_shader].first);
+        bindPipeline(cmd, m_cmds.back().m_shader);
         vkCmdDrawIndexedIndirect(cmd,
             m_dynamic_data->getCurrentBuffer(), indirect_offset,
             draw_count, indirect_size);
@@ -839,8 +864,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     else
     {
         int cur_mid = m_materials[m_cmds[0].m_cmd.vertexOffset];
-        vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-            m_graphics_pipelines[cur_pipeline].first);
+        bindPipeline(cmd, cur_pipeline);
         if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
         {
             vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
@@ -863,8 +887,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
             if (m_cmds[i].m_shader != cur_pipeline)
             {
                 cur_pipeline = m_cmds[i].m_shader;
-                vkCmdBindPipeline(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
-                    m_graphics_pipelines[cur_pipeline].first);
+                bindPipeline(cmd, cur_pipeline);
             }
             vkCmdDrawIndexed(cmd, cur_cmd.indexCount, cur_cmd.instanceCount,
                 cur_cmd.firstIndex, cur_cmd.vertexOffset, cur_cmd.firstInstance);
