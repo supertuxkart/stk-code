@@ -195,6 +195,9 @@ namespace video
 		//! Alphatest material for grass without using vertex color in stk. */
 		EMT_STK_GRASS,
 
+		//! Render objects like ghost in stk (used by ghost karts for now). */
+		EMT_STK_GHOST,
+
 		//! This value is not used. It only forces this enumeration to compile to 32 bit.
 		EMT_FORCE_32BIT = 0x7fffffff
 	};

@@ -50,10 +50,12 @@ private:
 
     unsigned int                             m_last_egg_idx = 0;
 
+    int m_current_attachment;
     // ----------------------------------------------------------------------------
     /** Compute the time at which the ghost finished the race */
     void          computeFinishTime();
-
+    // ----------------------------------------------------------------------------
+    void setGhostKartMaterial();
 public:
                   GhostKart(const std::string& ident, unsigned int world_kart_id,
                             int position, float color_hue,

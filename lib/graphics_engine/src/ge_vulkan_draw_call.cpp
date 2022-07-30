@@ -257,6 +257,7 @@ std::string GEVulkanDrawCall::getShader(irr::scene::ISceneNode* node,
     case irr::video::EMT_ONETEXTURE_BLEND: return "alphablend";
     case irr::video::EMT_SOLID_2_LAYER: return "decal";
     case irr::video::EMT_STK_GRASS: return "grass";
+    case irr::video::EMT_STK_GHOST: return "ghost";
     default: return "solid";
     }
 }   // getShader
@@ -308,9 +309,17 @@ void GEVulkanDrawCall::createAllPipelines(GEVulkanDriver* vk)
     settings.m_vertex_shader = "spm.vert";
     settings.m_skinning_vertex_shader = "spm_skinning.vert";
     settings.m_push_constants_func = nullptr;
+
+    settings.m_depth_write = true;
+    settings.m_backface_culling = true;
+    settings.m_alphablend = true;
+    settings.m_drawing_priority = (char)9;
+    settings.m_fragment_shader = "ghost.frag";
+    settings.m_shader_name = "ghost";
+    createPipeline(vk, settings);
+
     settings.m_depth_write = false;
     settings.m_backface_culling = false;
-    settings.m_alphablend = true;
     settings.m_drawing_priority = (char)10;
 
     settings.m_fragment_shader = "transparent.frag";
