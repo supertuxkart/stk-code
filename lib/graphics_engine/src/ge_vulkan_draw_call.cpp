@@ -731,6 +731,8 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     barrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
     barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
     barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    if (use_multidraw)
+        barrier.dstAccessMask |= VK_ACCESS_INDIRECT_COMMAND_READ_BIT;
     barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
     barrier.buffer = m_dynamic_data->getCurrentBuffer();
