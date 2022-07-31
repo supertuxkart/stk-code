@@ -438,6 +438,8 @@ void GEVulkanTexture::upload(uint8_t* data, bool generate_hq_mipmap)
 void* GEVulkanTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 {
     uint8_t* texture_data = getTextureData();
+    if (!texture_data)
+        return NULL;
     if (isSingleChannel())
     {
         m_locked_data = new uint8_t[m_size.Width * m_size.Height * 4]();
