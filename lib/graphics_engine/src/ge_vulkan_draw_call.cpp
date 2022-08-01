@@ -374,7 +374,7 @@ start:
     std::array<VkVertexInputAttributeDescription, 8> attribute_descriptions = {};
     attribute_descriptions[0].binding = 0;
     attribute_descriptions[0].location = 0;
-    attribute_descriptions[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+    attribute_descriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
     attribute_descriptions[0].offset = offsetof(irr::video::S3DVertexSkinnedMesh, m_position);
     attribute_descriptions[1].binding = 0;
     attribute_descriptions[1].location = 1;
