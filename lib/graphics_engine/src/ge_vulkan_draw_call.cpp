@@ -704,36 +704,27 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     VkCommandBuffer cmd =
         custom_cmd ? custom_cmd : vk->getCurrentCommandBuffer();
 
-    const VkPhysicalDeviceLimits& limit =
-        vk->getPhysicalDeviceProperties().limits;
-
-    size_t sbo_alignment = limit.minStorageBufferOffsetAlignment;
-    size_t sbo_padding = getPadding(m_skinning_data_padded_size, sbo_alignment);
-    if (sbo_padding != 0)
-    {
-        m_skinning_data_padded_size += sbo_padding;
-        m_data_uploading.emplace_back((void*)m_data_padding, sbo_padding);
-    }
-
     // https://github.com/google/filament/pull/3814
     // Need both vertex and fragment bit
     VkPipelineStageFlags dst_stage = VK_PIPELINE_STAGE_VERTEX_SHADER_BIT |
         VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 
-    size_t ubo_alignment = limit.minUniformBufferOffsetAlignment;
-    size_t ubo_padding = 0;
+    std::vector<std::pair<void*, size_t> > object_data_uploading;
+    const VkPhysicalDeviceLimits& limit =
+        vk->getPhysicalDeviceProperties().limits;
+    size_t sbo_alignment = limit.minStorageBufferOffsetAlignment;
+    size_t sbo_padding = 0;
     const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
     if (use_base_vertex)
     {
         const size_t object_data_size =
             sizeof(ObjectData) * m_visible_objects.size();
-        m_data_uploading.emplace_back((void*)m_visible_objects.data(),
+        object_data_uploading.emplace_back((void*)m_visible_objects.data(),
             object_data_size);
-        ubo_padding = getPadding(
-            m_skinning_data_padded_size + object_data_size, ubo_alignment);
-        if (ubo_padding > 0)
-            m_data_uploading.emplace_back((void*)m_data_padding, ubo_padding);
-        m_object_data_padded_size = object_data_size + ubo_padding;
+        sbo_padding = getPadding(object_data_size, sbo_alignment);
+        if (sbo_padding > 0)
+            object_data_uploading.emplace_back((void*)m_data_padding, sbo_padding);
+        m_object_data_padded_size = object_data_size + sbo_padding;
     }
     else
     {
@@ -743,15 +734,14 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
             auto& cmd = m_cmds[i];
             size_t instance_size =
                 cmd.m_cmd.instanceCount * sizeof(ObjectData);
-            m_data_uploading.emplace_back(
+            object_data_uploading.emplace_back(
                 &m_visible_objects[cmd.m_cmd.firstInstance], instance_size);
-            size_t cur_padding = getPadding(
-                m_skinning_data_padded_size + m_object_data_padded_size +
+            size_t cur_padding = getPadding(m_object_data_padded_size +
                 instance_size, sbo_alignment);
             if (cur_padding > 0)
             {
                 instance_size += cur_padding;
-                m_data_uploading.emplace_back((void*)m_data_padding,
+                object_data_uploading.emplace_back((void*)m_data_padding,
                     cur_padding);
             }
             m_sbo_data_offset.push_back(m_object_data_padded_size);
@@ -760,19 +750,40 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
     }
     if (!use_base_vertex)
     {
-        ubo_padding = getPadding(m_skinning_data_padded_size +
-            m_object_data_padded_size, ubo_alignment);
-        if (ubo_padding > 0)
+        sbo_padding = getPadding(m_object_data_padded_size, sbo_alignment);
+        if (sbo_padding > 0)
         {
-            m_data_uploading.emplace_back((void*)m_data_padding,
-                ubo_padding);
-            m_object_data_padded_size += ubo_padding;
+            object_data_uploading.emplace_back((void*)m_data_padding,
+                sbo_padding);
+            m_object_data_padded_size += sbo_padding;
         }
-        // Make sure dynamic offset won't become invaild
-        m_dynamic_data->resizeIfNeeded(m_skinning_data_padded_size +
-            m_object_data_padded_size * 2 + sizeof(GEVulkanCameraUBO));
     }
+
+    size_t ubo_alignment = limit.minUniformBufferOffsetAlignment;
+    size_t ubo_padding = getPadding(m_object_data_padded_size +
+        m_skinning_data_padded_size, ubo_alignment);
+    if (ubo_padding != 0)
+    {
+        m_skinning_data_padded_size += ubo_padding;
+        m_data_uploading.emplace_back((void*)m_data_padding, ubo_padding);
+    }
+
+    if (!use_base_vertex)
+    {
+        // Make sure dynamic offset won't become invaild
+        size_t remain = m_skinning_data_padded_size + sizeof(GEVulkanCameraUBO);
+        if (m_object_data_padded_size > remain)
+        {
+            m_dynamic_data->resizeIfNeeded(m_skinning_data_padded_size +
+                m_object_data_padded_size + sizeof(GEVulkanCameraUBO) +
+                (m_object_data_padded_size - remain));
+        }
+    }
+
     m_data_uploading.emplace_back(cam->getUBOData(), sizeof(GEVulkanCameraUBO));
+    object_data_uploading.insert(object_data_uploading.end(),
+        m_data_uploading.begin(), m_data_uploading.end());
+    std::swap(m_data_uploading, object_data_uploading);
 
     const bool use_multidraw = GEVulkanFeatures::supportsMultiDrawIndirect() &&
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
@@ -832,7 +843,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
 
     VkDescriptorBufferInfo sbo_info_objects;
     sbo_info_objects.buffer = m_dynamic_data->getCurrentBuffer();
-    sbo_info_objects.offset = m_skinning_data_padded_size;
+    sbo_info_objects.offset = 0;
     sbo_info_objects.range = m_object_data_padded_size;
 
     data_set[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -847,7 +858,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
 
     VkDescriptorBufferInfo sbo_info_skinning;
     sbo_info_skinning.buffer = m_dynamic_data->getCurrentBuffer();
-    sbo_info_skinning.offset = 0;
+    sbo_info_skinning.offset = m_object_data_padded_size;
     sbo_info_skinning.range = m_skinning_data_padded_size;
 
     data_set[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
