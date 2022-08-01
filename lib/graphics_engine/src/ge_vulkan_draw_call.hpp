@@ -104,6 +104,8 @@ private:
 
     std::vector<std::pair<void*, size_t> > m_data_uploading;
 
+    std::vector<size_t> m_sbo_data_offset;
+
     // ------------------------------------------------------------------------
     void createAllPipelines(GEVulkanDriver* vk);
     // ------------------------------------------------------------------------
@@ -160,6 +162,7 @@ public:
         m_materials.clear();
         m_skinning_nodes.clear();
         m_data_uploading.clear();
+        m_sbo_data_offset.clear();
     }
 };   // GEVulkanDrawCall
 

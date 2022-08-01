@@ -58,6 +58,8 @@ public:
     // ------------------------------------------------------------------------
     VkBuffer getCurrentBuffer() const;
     // ------------------------------------------------------------------------
+    void resizeIfNeeded(size_t new_size);
+    // ------------------------------------------------------------------------
     size_t getRealSize() const                          { return m_real_size; }
 };   // GEVulkanDynamicBuffer
 

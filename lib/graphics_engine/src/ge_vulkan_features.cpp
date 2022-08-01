@@ -24,6 +24,7 @@ bool g_supports_non_uniform_indexing = false;
 bool g_supports_partially_bound = false;
 uint32_t g_max_sampler_supported = 0;
 bool g_supports_multi_draw_indirect = false;
+bool g_supports_base_vertex_rendering = true;
 }   // GEVulkanFeatures
 
 // ============================================================================
@@ -124,6 +125,16 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
                 g_max_sampler_supported >= max_sampler_size;
         }
     }
+
+#if defined(__APPLE__)
+    MVKPhysicalDeviceMetalFeatures mvk_features = {};
+    size_t mvk_features_size = sizeof(MVKPhysicalDeviceMetalFeatures);
+    vkGetPhysicalDeviceMetalFeaturesMVK(vk->getPhysicalDevice(), &mvk_features,
+        &mvk_features_size);
+    g_supports_base_vertex_rendering = mvk_features.baseVertexInstanceDrawing;
+    if (!g_supports_base_vertex_rendering)
+        g_supports_multi_draw_indirect = false;
+#endif
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -147,6 +158,9 @@ void GEVulkanFeatures::printStats()
     os::Printer::log(
         "Vulkan supports multi-draw indirect",
         g_supports_multi_draw_indirect ? "true" : "false");
+    os::Printer::log(
+        "Vulkan supports base vertex rendering",
+        g_supports_base_vertex_rendering ? "true" : "false");
     os::Printer::log(
         "Vulkan descriptor indexes can be dynamically non-uniform",
         g_supports_non_uniform_indexing ? "true" : "false");
@@ -212,6 +226,12 @@ bool GEVulkanFeatures::supportsBindMeshTexturesAtOnce()
 bool GEVulkanFeatures::supportsMultiDrawIndirect()
 {
     return g_supports_multi_draw_indirect;
+}   // supportsBindMeshTexturesAtOnce
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsBaseVertexRendering()
+{
+    return g_supports_base_vertex_rendering;
 }   // supportsBindMeshTexturesAtOnce
 
 }

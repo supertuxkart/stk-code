@@ -164,13 +164,8 @@ void GEVulkanDynamicBuffer::setCurrentData(const std::vector<
     size_t size = 0;
     for (auto& p : data)
         size += p.second;
-    if (size > m_size)
-    {
-        destroy();
-        m_size = size + 100;
-        for (unsigned i = 0; i < GEVulkanDriver::getMaxFrameInFlight(); i++)
-            initPerFrame(i);
-    }
+    resizeIfNeeded(size);
+
     m_real_size = size;
     if (size == 0 || m_mapped_addr[cur_frame] == NULL)
         return;
@@ -192,6 +187,18 @@ void GEVulkanDynamicBuffer::setCurrentData(const std::vector<
             m_staging_buffer[cur_frame], m_buffer[cur_frame], 1, &copy_region);
     }
 }   // setCurrentData
+
+// ----------------------------------------------------------------------------
+void GEVulkanDynamicBuffer::resizeIfNeeded(size_t new_size)
+{
+    if (new_size > m_size)
+    {
+        destroy();
+        m_size = new_size + 100;
+        for (unsigned i = 0; i < GEVulkanDriver::getMaxFrameInFlight(); i++)
+            initPerFrame(i);
+    }
+}   // resizeIfNeeded
 
 // ----------------------------------------------------------------------------
 VkBuffer GEVulkanDynamicBuffer::getCurrentBuffer() const
