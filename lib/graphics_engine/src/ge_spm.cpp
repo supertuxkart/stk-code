@@ -45,7 +45,10 @@ void GESPM::finalize()
 {
     m_bounding_box.reset(0.0f, 0.0f, 0.0f);
     for (unsigned i = 0; i < m_buffer.size(); i++)
+    {
         m_bounding_box.addInternalBox(m_buffer[i]->getBoundingBox());
+        m_buffer[i]->createVertexIndexBuffer();
+    }
 
     for (Armature& arm : getArmatures())
     {

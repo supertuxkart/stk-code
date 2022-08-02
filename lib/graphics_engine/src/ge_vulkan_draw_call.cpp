@@ -172,6 +172,7 @@ void GEVulkanDrawCall::generate()
             return nodes_area.at(a.first) < nodes_area.at(b.first) ;
         });
 
+    const bool use_base_vertex = GEVulkanFeatures::supportsBaseVertexRendering();
     unsigned accumulated_instance = 0;
     for (auto& p : visible_nodes)
     {
@@ -190,7 +191,12 @@ void GEVulkanDrawCall::generate()
         const irr::video::ITexture** list = &textures[0];
         const int material_id = m_texture_descriptor->getTextureID(list);
         if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
-            m_materials[p.first->getVBOOffset()] = material_id;
+        {
+            if (use_base_vertex)
+                m_materials[p.first->getVBOOffset()] = material_id;
+            else
+                m_materials[(size_t)p.first] = material_id;
+        }
 
         const bool skinning = p.first->hasSkinning();
         for (auto& q : p.second)
@@ -217,25 +223,37 @@ void GEVulkanDrawCall::generate()
             VkDrawIndexedIndirectCommand cmd;
             cmd.indexCount = p.first->getIndexCount();
             cmd.instanceCount = visible_count;
-            cmd.firstIndex = p.first->getIBOOffset();
-            cmd.vertexOffset = p.first->getVBOOffset();
+            cmd.firstIndex = use_base_vertex ? p.first->getIBOOffset() : 0;
+            cmd.vertexOffset = use_base_vertex ? p.first->getVBOOffset() : 0;
             cmd.firstInstance = accumulated_instance;
             accumulated_instance += visible_count;
             const PipelineSettings& settings =
                 m_graphics_pipelines[cur_shader].second;
             std::string sorting_key =
                 std::string(1, settings.m_drawing_priority) + cur_shader;
-            m_cmds.push_back({ cmd, cur_shader, sorting_key });
+            m_cmds.push_back({ cmd, cur_shader, sorting_key, p.first });
         }
     }
     if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
     {
-        std::stable_sort(m_cmds.begin(), m_cmds.end(),
-            [this](const DrawCallData& a, const DrawCallData& b)
-            {
-                return m_materials[a.m_cmd.vertexOffset] <
-                    m_materials[b.m_cmd.vertexOffset];
-            });
+        if (use_base_vertex)
+        {
+            std::stable_sort(m_cmds.begin(), m_cmds.end(),
+                [this](const DrawCallData& a, const DrawCallData& b)
+                {
+                    return m_materials[a.m_cmd.vertexOffset] <
+                        m_materials[b.m_cmd.vertexOffset];
+                });
+        }
+        else
+        {
+            std::stable_sort(m_cmds.begin(), m_cmds.end(),
+                [this](const DrawCallData& a, const DrawCallData& b)
+                {
+                    return m_materials[(size_t)a.m_mb] <
+                        m_materials[(size_t)b.m_mb];
+                });
+        }
     }
 
     std::stable_sort(m_cmds.begin(), m_cmds.end(),
@@ -888,24 +906,24 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
             m_pipeline_layout, 1, 1, &m_data_descriptor_sets[cur_frame], 0,
             NULL);
+
+        GEVulkanMeshCache* mc = vk->getVulkanMeshCache();
+        std::array<VkBuffer, 2> vertex_buffer =
+        {{
+            mc->getBuffer(),
+            mc->getBuffer()
+        }};
+        std::array<VkDeviceSize, 2> offsets =
+        {{
+            0,
+            mc->getSkinningVBOOffset()
+        }};
+        vkCmdBindVertexBuffers(cmd, 0, vertex_buffer.size(),
+            vertex_buffer.data(), offsets.data());
+
+        vkCmdBindIndexBuffer(cmd, mc->getBuffer(), mc->getIBOOffset(),
+            VK_INDEX_TYPE_UINT16);
     }
-
-    GEVulkanMeshCache* mc = vk->getVulkanMeshCache();
-    std::array<VkBuffer, 2> vertex_buffer =
-    {{
-        mc->getBuffer(),
-        mc->getBuffer()
-    }};
-    std::array<VkDeviceSize, 2> offsets =
-    {{
-        0,
-        mc->getSkinningVBOOffset()
-    }};
-    vkCmdBindVertexBuffers(cmd, 0, vertex_buffer.size(), vertex_buffer.data(),
-        offsets.data());
-
-    vkCmdBindIndexBuffer(cmd, mc->getBuffer(), mc->getIBOOffset(),
-        VK_INDEX_TYPE_UINT16);
 
     VkViewport vp;
     vp.x = cam->getViewPort().UpperLeftCorner.X;
@@ -956,7 +974,11 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     }
     else
     {
-        int cur_mid = m_materials[m_cmds[0].m_cmd.vertexOffset];
+        int cur_mid = 0;
+        if (use_base_vertex)
+            cur_mid = m_materials[m_cmds[0].m_cmd.vertexOffset];
+        else
+            cur_mid = m_materials[(size_t)m_cmds[0].m_mb];
         bindPipeline(cmd, cur_pipeline);
         if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
         {
@@ -967,7 +989,11 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
             const VkDrawIndexedIndirectCommand& cur_cmd = m_cmds[i].m_cmd;
-            int mid = m_materials[cur_cmd.vertexOffset];
+            int mid = 0;
+            if (use_base_vertex)
+                mid = m_materials[cur_cmd.vertexOffset];
+            else
+                mid = m_materials[(size_t)m_cmds[i].m_mb];
             if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce() &&
                 cur_mid != mid)
             {
@@ -993,6 +1019,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                 vkCmdBindDescriptorSets(cmd, VK_PIPELINE_BIND_POINT_GRAPHICS,
                     m_pipeline_layout, 1, 1, &m_data_descriptor_sets[cur_frame],
                     dynamic_offsets.size(), dynamic_offsets.data());
+                m_cmds[i].m_mb->bindVertexIndexBuffer(cmd);
             }
             vkCmdDrawIndexed(cmd, cur_cmd.indexCount, cur_cmd.instanceCount,
                 cur_cmd.firstIndex, cur_cmd.vertexOffset,

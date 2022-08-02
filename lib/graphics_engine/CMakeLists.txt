@@ -47,6 +47,7 @@ set(GE_SOURCES
     src/ge_vulkan_texture_descriptor.cpp
     src/ge_gl_texture.cpp
     src/ge_spm.cpp
+    src/ge_spm_buffer.cpp
 )
 
 if(NOT APPLE OR DLOPEN_MOLTENVK)

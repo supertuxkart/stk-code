@@ -1,8 +1,10 @@
 #include "ge_vulkan_mesh_cache.hpp"
 
 #include "ge_main.hpp"
+
 #include "ge_spm_buffer.hpp"
 #include "ge_vulkan_driver.hpp"
+#include "ge_vulkan_features.hpp"
 
 #include "IAnimatedMesh.h"
 
@@ -33,6 +35,9 @@ void GEVulkanMeshCache::meshCacheChanged()
 // ----------------------------------------------------------------------------
 void GEVulkanMeshCache::updateCache()
 {
+    if (!GEVulkanFeatures::supportsBaseVertexRendering())
+        return;
+
     if (m_irrlicht_cache_time <= m_ge_cache_time)
         return;
     m_ge_cache_time = m_irrlicht_cache_time;
@@ -161,10 +166,30 @@ void GEVulkanMeshCache::updateCache()
 void GEVulkanMeshCache::destroy()
 {
     m_vk->waitIdle();
+    m_vk->setDisableWaitIdle(true);
+    if (!GEVulkanFeatures::supportsBaseVertexRendering())
+    {
+        for (unsigned i = 0; i < Meshes.size(); i++)
+        {
+            scene::IAnimatedMesh* mesh = Meshes[i].Mesh;
+            if (mesh->getMeshType() != scene::EAMT_SPM)
+                continue;
+            for (unsigned j = 0; j < mesh->getMeshBufferCount(); j++)
+            {
+                GESPMBuffer* mb = static_cast<GESPMBuffer*>(
+                    mesh->getMeshBuffer(j));
+                mb->destroyVertexIndexBuffer();
+            }
+        }
+    }
+    else
+    {
+        vmaDestroyBuffer(m_vk->getVmaAllocator(), m_buffer, m_memory);
+        m_buffer = VK_NULL_HANDLE;
+        m_memory = VK_NULL_HANDLE;
+    }
+    m_vk->setDisableWaitIdle(false);
 
-    vmaDestroyBuffer(m_vk->getVmaAllocator(), m_buffer, m_memory);
-    m_buffer = VK_NULL_HANDLE;
-    m_memory = VK_NULL_HANDLE;
     m_ibo_offset = m_skinning_vbo_offset = 0;
 }   // destroy
 

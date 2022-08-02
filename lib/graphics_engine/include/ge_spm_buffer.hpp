@@ -1,9 +1,13 @@
 #ifndef HEADER_GE_SPM_BUFFER_HPP
 #define HEADER_GE_SPM_BUFFER_HPP
 
+#include <array>
 #include <cstddef>
 #include <vector>
 #include "IMeshBuffer.h"
+
+#include "ge_vma.hpp"
+#include "vulkan_wrapper.h"
 
 class B3DMeshLoader;
 class SPMeshLoader;
@@ -30,6 +34,12 @@ private:
 
     size_t m_ibo_offset;
 
+    size_t m_skinning_vbo_offset;
+
+    VkBuffer m_buffer;
+
+    VmaAllocation m_memory;
+
     bool m_has_skinning;
 public:
     // ------------------------------------------------------------------------
@@ -37,8 +47,13 @@ public:
     {
         m_vbo_offset = 0;
         m_ibo_offset = 0;
+        m_skinning_vbo_offset = 0;
+        m_buffer = VK_NULL_HANDLE;
+        m_memory = VK_NULL_HANDLE;
         m_has_skinning = false;
     }
+    // ------------------------------------------------------------------------
+    ~GESPMBuffer()                              { destroyVertexIndexBuffer(); }
     // ------------------------------------------------------------------------
     virtual const irr::video::SMaterial& getMaterial() const
                                                          { return m_material; }
@@ -165,6 +180,28 @@ public:
     size_t getIBOOffset() const                        { return m_ibo_offset; }
     // ------------------------------------------------------------------------
     bool hasSkinning() const                         { return m_has_skinning; }
+    // ------------------------------------------------------------------------
+    void bindVertexIndexBuffer(VkCommandBuffer cmd)
+    {
+        std::array<VkBuffer, 2> vertex_buffer =
+        {{
+            m_buffer,
+            m_buffer
+        }};
+        std::array<VkDeviceSize, 2> offsets =
+        {{
+            0,
+            m_skinning_vbo_offset
+        }};
+        vkCmdBindVertexBuffers(cmd, 0, vertex_buffer.size(),
+            vertex_buffer.data(), offsets.data());
+        vkCmdBindIndexBuffer(cmd, m_buffer, m_ibo_offset,
+            VK_INDEX_TYPE_UINT16);
+    }
+    // ------------------------------------------------------------------------
+    void createVertexIndexBuffer();
+    // ------------------------------------------------------------------------
+    void destroyVertexIndexBuffer();
 };
 
 } // end namespace irr

@@ -62,6 +62,7 @@ struct DrawCallData
     VkDrawIndexedIndirectCommand m_cmd;
     std::string m_shader;
     std::string m_sorting_key;
+    GESPMBuffer* m_mb;
 };
 
 class GEVulkanDrawCall
@@ -96,7 +97,7 @@ private:
     std::unordered_map<std::string, std::pair<VkPipeline, PipelineSettings> >
         m_graphics_pipelines;
 
-    std::unordered_map<int32_t, int> m_materials;
+    std::unordered_map<size_t, int> m_materials;
 
     GEVulkanTextureDescriptor* m_texture_descriptor;
 
