@@ -402,6 +402,7 @@ namespace GE
             std::vector<VkSemaphore> image_available_semaphores;
             std::vector<VkSemaphore> render_finished_semaphores;
             std::vector<VkFence> in_flight_fences;
+            std::vector<VkCommandPool> command_pools;
             std::vector<VkCommandBuffer> command_buffers;
             std::array<VkSampler, GVS_COUNT> samplers;
             VkRenderPass render_pass;
@@ -419,6 +420,12 @@ namespace GE
             }
             ~VK()
             {
+                for (unsigned i = 0; i < command_buffers.size(); i++)
+                {
+                    vkFreeCommandBuffers(device, command_pools[i], 1,
+                        &command_buffers[i]);
+                    vkDestroyCommandPool(device, command_pools[i], NULL);
+                }
                 for (VkFramebuffer& framebuffer : swap_chain_framebuffers)
                     vkDestroyFramebuffer(device, framebuffer, NULL);
                 if (render_pass != VK_NULL_HANDLE)

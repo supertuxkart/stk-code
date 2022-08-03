@@ -680,13 +680,6 @@ void GEVulkanDriver::destroyVulkan()
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
-    if (!m_vk->command_buffers.empty())
-    {
-        vkFreeCommandBuffers(m_vk->device,
-            GEVulkanCommandLoader::getCurrentCommandPool(),
-            (uint32_t)(m_vk->command_buffers.size()),
-            &m_vk->command_buffers[0]);
-    }
     GEVulkanCommandLoader::destroy();
     for (std::mutex* m : m_graphics_queue_mutexes)
         delete m;
@@ -1309,21 +1302,29 @@ void GEVulkanDriver::createSyncObjects()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::createCommandBuffers()
 {
-    std::vector<VkCommandBuffer> buffers(getMaxFrameInFlight());
+    m_vk->command_pools.resize(getMaxFrameInFlight());
+    m_vk->command_buffers.resize(getMaxFrameInFlight());
+    for (unsigned i = 0; i < getMaxFrameInFlight(); i++)
+    {
+        VkCommandPoolCreateInfo pool_info = {};
+        pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        pool_info.queueFamilyIndex = m_graphics_family;
+        VkResult result = vkCreateCommandPool(m_vk->device, &pool_info,
+            NULL, &m_vk->command_pools[i]);
+        if (result != VK_SUCCESS)
+            throw std::runtime_error("vkCreateCommandPool failed");
 
-    VkCommandBufferAllocateInfo alloc_info = {};
-    alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    alloc_info.commandPool = GEVulkanCommandLoader::getCurrentCommandPool();
-    alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    alloc_info.commandBufferCount = (uint32_t)buffers.size();
+        VkCommandBufferAllocateInfo alloc_info = {};
+        alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        alloc_info.commandPool = m_vk->command_pools[i];
+        alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        alloc_info.commandBufferCount = 1;
 
-    VkResult result = vkAllocateCommandBuffers(m_vk->device, &alloc_info,
-        &buffers[0]);
-
-    if (result != VK_SUCCESS)
-        throw std::runtime_error("vkAllocateCommandBuffers failed");
-
-    m_vk->command_buffers = buffers;
+        result = vkAllocateCommandBuffers(m_vk->device, &alloc_info,
+            &m_vk->command_buffers[i]);
+        if (result != VK_SUCCESS)
+            throw std::runtime_error("vkAllocateCommandBuffers failed");
+    }
 }   // createCommandBuffers
 
 // ----------------------------------------------------------------------------
@@ -1586,6 +1587,7 @@ bool GEVulkanDriver::endScene()
     vkWaitForFences(m_vk->device, 1, &fence, VK_TRUE,
         std::numeric_limits<uint64_t>::max());
     vkResetFences(m_vk->device, 1, &fence);
+    vkResetCommandPool(m_vk->device, m_vk->command_pools[m_current_frame], 0);
 
     VkSemaphore semaphore = m_vk->image_available_semaphores[m_current_frame];
     VkResult result = vkAcquireNextImageKHR(m_vk->device, m_vk->swap_chain,
