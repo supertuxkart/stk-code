@@ -25,6 +25,7 @@ bool g_supports_partially_bound = false;
 uint32_t g_max_sampler_supported = 0;
 bool g_supports_multi_draw_indirect = false;
 bool g_supports_base_vertex_rendering = true;
+bool g_supports_compute_in_main_queue = false;
 }   // GEVulkanFeatures
 
 // ============================================================================
@@ -76,6 +77,23 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     {
         if (std::string(prop.extensionName) == "VK_EXT_descriptor_indexing")
             g_supports_descriptor_indexing = true;
+    }
+
+    uint32_t queue_family_count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(vk->getPhysicalDevice(),
+        &queue_family_count, NULL);
+    if (queue_family_count != 0)
+    {
+        std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+        vkGetPhysicalDeviceQueueFamilyProperties(vk->getPhysicalDevice(),
+            &queue_family_count, &queue_families[0]);
+        uint32_t main_family = vk->getGraphicsFamily();
+        if (main_family < queue_families.size())
+        {
+            g_supports_compute_in_main_queue =
+                (queue_families[main_family].queueFlags & VK_QUEUE_COMPUTE_BIT)
+                != 0;
+        }
     }
 
     VkPhysicalDeviceFeatures2 supported_features = {};
@@ -162,6 +180,9 @@ void GEVulkanFeatures::printStats()
         "Vulkan supports base vertex rendering",
         g_supports_base_vertex_rendering ? "true" : "false");
     os::Printer::log(
+        "Vulkan supports compute in main queue",
+        g_supports_compute_in_main_queue ? "true" : "false");
+    os::Printer::log(
         "Vulkan descriptor indexes can be dynamically non-uniform",
         g_supports_non_uniform_indexing ? "true" : "false");
     os::Printer::log(
@@ -226,12 +247,18 @@ bool GEVulkanFeatures::supportsBindMeshTexturesAtOnce()
 bool GEVulkanFeatures::supportsMultiDrawIndirect()
 {
     return g_supports_multi_draw_indirect;
-}   // supportsBindMeshTexturesAtOnce
+}   // supportsMultiDrawIndirect
 
 // ----------------------------------------------------------------------------
 bool GEVulkanFeatures::supportsBaseVertexRendering()
 {
     return g_supports_base_vertex_rendering;
-}   // supportsBindMeshTexturesAtOnce
+}   // supportsBaseVertexRendering
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsComputeInMainQueue()
+{
+    return g_supports_compute_in_main_queue;
+}   // supportsComputeInMainQueue
 
 }

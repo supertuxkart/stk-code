@@ -32,6 +32,8 @@ bool supportsBindMeshTexturesAtOnce();
 bool supportsMultiDrawIndirect();
 // ----------------------------------------------------------------------------
 bool supportsBaseVertexRendering();
+// ----------------------------------------------------------------------------
+bool supportsComputeInMainQueue();
 };   // GEVulkanFeatures
 
 }
