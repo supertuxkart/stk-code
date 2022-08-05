@@ -1,11 +1,11 @@
 #include "ge_vulkan_texture.hpp"
 
+#include "ge_main.hpp"
+#include "ge_mipmap_generator.hpp"
+#include "ge_texture.hpp"
 #include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_features.hpp"
 #include "ge_vulkan_driver.hpp"
-#include "ge_gl_utils.hpp"
-#include "ge_main.hpp"
-#include "ge_texture.hpp"
 
 extern "C"
 {
@@ -112,22 +112,18 @@ GEVulkanTexture::~GEVulkanTexture()
 bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
                                          bool generate_hq_mipmap)
 {
-    video::IImage* mipmap = NULL;
-    std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes =
-        getMipmapSizes();
     VkDeviceSize mipmap_data_size = 0;
+    GEMipmapGenerator* mipmap_generator = NULL;
 
     unsigned channels = (isSingleChannel() ? 1 : 4);
     VkDeviceSize image_size = m_size.Width * m_size.Height * channels;
     if (generate_hq_mipmap)
     {
-        mipmap = getDriver()->createImage(video::ECF_A8R8G8B8,
-            mipmap_sizes[0].first);
-        if (mipmap == NULL)
-            throw std::runtime_error("Creating mipmap memory failed");
-        generateHQMipmap(texture_data, mipmap_sizes, (uint8_t*)mipmap->lock());
-        mipmap_data_size = mipmap_sizes.back().second +
-            mipmap_sizes.back().first.getArea() * channels - image_size;
+        const bool normal_map = (std::string(NamedPath.getPtr()).find(
+            "_Normal.") != std::string::npos);
+        mipmap_generator = new GEMipmapGenerator(texture_data, channels,
+            m_size, normal_map);
+        mipmap_data_size = mipmap_generator->getMipmapSizes();
     }
 
     VkDeviceSize image_total_size = image_size + mipmap_data_size;
@@ -151,12 +147,17 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     if ((ret = vmaMapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation,
         (void**)&data)) != VK_SUCCESS)
         goto destroy;
-    memcpy(data, texture_data, image_size);
-    if (mipmap)
+
+    if (mipmap_generator)
     {
-        memcpy(data + image_size, mipmap->lock(), mipmap_data_size);
-        mipmap->drop();
+        for (GEImageLevel& level : mipmap_generator->getAllLevels())
+        {
+            memcpy(data, level.m_data, level.m_size);
+            data += level.m_size;
+        }
     }
+    else
+        memcpy(data, texture_data, image_size);
     vmaUnmapMemory(m_vk->getVmaAllocator(), staging_buffer_allocation);
     vmaFlushAllocation(m_vk->getVmaAllocator(),
         staging_buffer_allocation, 0, image_total_size);
@@ -174,13 +175,16 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_UNDEFINED,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-    if (generate_hq_mipmap)
+    if (mipmap_generator)
     {
-        unsigned level = 0;
-        for (auto& mip : mipmap_sizes)
+        unsigned offset = 0;
+        std::vector<GEImageLevel>& levels = mipmap_generator->getAllLevels();
+        for (unsigned i = 0; i < levels.size(); i++)
         {
-            copyBufferToImage(command_buffer, staging_buffer, mip.first.Width,
-                mip.first.Height, 0, 0, mip.second, level++);
+            GEImageLevel& level = levels[i];
+            copyBufferToImage(command_buffer, staging_buffer,
+                level.m_dim.Width, level.m_dim.Height, 0, 0, offset, i);
+            offset += level.m_size;
         }
     }
     else
@@ -195,6 +199,7 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     GEVulkanCommandLoader::endSingleTimeCommands(command_buffer);
 
 destroy:
+    delete mipmap_generator;
     vmaDestroyBuffer(m_vk->getVmaAllocator(), staging_buffer,
         staging_buffer_allocation);
     return ret == VK_SUCCESS;
@@ -719,42 +724,5 @@ void GEVulkanTexture::reload()
             std::bind(&GEVulkanTexture::reloadInternal, this));
     }
 }   // reload
-
-// ----------------------------------------------------------------------------
-void GEVulkanTexture::generateHQMipmap(void* in,
-                                       std::vector<std::pair
-                                       <core::dimension2du, unsigned> >& mms,
-                                       uint8_t* out)
-{
-    imMipmapCascade cascade;
-    imReduceOptions options;
-    imReduceSetOptions(&options,
-        std::string(NamedPath.getPtr()).find("_Normal.") != std::string::npos ?
-        IM_REDUCE_FILTER_NORMALMAP: IM_REDUCE_FILTER_LINEAR/*filter*/,
-        2/*hopcount*/, 2.0f/*alpha*/, 1.0f/*amplifynormal*/,
-        0.0f/*normalsustainfactor*/);
-
-    unsigned channels = (isSingleChannel() ? 1 : 4);
-#ifdef DEBUG
-    int ret = imBuildMipmapCascade(&cascade, in, mms[0].first.Width,
-        mms[0].first.Height, 1/*layercount*/, channels,
-        mms[0].first.Width * channels, &options, 0);
-    if (ret != 1)
-        throw std::runtime_error("imBuildMipmapCascade failed");
-#else
-    imBuildMipmapCascade(&cascade, in, mms[0].first.Width,
-        mms[0].first.Height, 1/*layercount*/, channels,
-        mms[0].first.Width * channels, &options, 0);
-#endif
-    for (unsigned int i = 1; i < mms.size(); i++)
-    {
-        const unsigned copy_size = mms[i].first.getArea() * channels;
-        memcpy(out, cascade.mipmap[i], copy_size);
-        out += copy_size;
-        mms[i].second = mms[i - 1].first.getArea() * channels +
-            mms[i - 1].second;
-    }
-    imFreeMipmapCascade(&cascade);
-}   // generateHQMipmap
 
 }

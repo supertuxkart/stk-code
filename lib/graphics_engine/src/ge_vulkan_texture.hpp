@@ -77,30 +77,6 @@ protected:
     // ------------------------------------------------------------------------
     uint8_t* getTextureData();
     // ------------------------------------------------------------------------
-    std::vector<std::pair<core::dimension2du, unsigned> > getMipmapSizes()
-    {
-        std::vector<std::pair<core::dimension2du, unsigned> > mipmap_sizes;
-        unsigned width = m_size.Width;
-        unsigned height = m_size.Height;
-        mipmap_sizes.emplace_back(core::dimension2du(width, height),
-            0);
-        while (true)
-        {
-            width = width < 2 ? 1 : width >> 1;
-            height = height < 2 ? 1 : height >> 1;
-            mipmap_sizes.emplace_back(core::dimension2du(width, height), 0);
-            if (width == 1 && height == 1)
-            {
-                break;
-            }
-        }
-        return mipmap_sizes;
-    }
-    // ------------------------------------------------------------------------
-    void generateHQMipmap(void* in,
-                          std::vector<std::pair<core::dimension2du,
-                          unsigned> >& mms, uint8_t* out);
-    // ------------------------------------------------------------------------
     unsigned getMipmapLevels() const
     {
         if (!m_has_mipmaps)
