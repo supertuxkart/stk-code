@@ -101,13 +101,14 @@
                 getCallStack(callstack);
 
             std::string msg =   "SuperTuxKart crashed!\n"
-                                "Please hit Ctrl+C to copy to clipboard and signal the problem\n"
-                                "to the developers on our forum: http://forum.freegamedev.net/viewforum.php?f=16\n"
+                                "If you continue to encounter this issue, please hit Ctrl+C to copy this error\n"
+                                "to the clipboard and report the problem to the developers on our forum:\n"
+                                "http://forum.freegamedev.net/viewforum.php?f=17\n"
                                 "\n"
                                 "Call stack:\n";
             msg += callstack;
             Log::error("StackTrace", "%s", msg.c_str());
-            MessageBoxA(NULL, msg.c_str(), "SuperTuxKart crashed :/", MB_ICONERROR | MB_OK);
+            MessageBoxA(NULL, msg.c_str(), "SuperTuxKart crashed!", MB_ICONERROR | MB_OK);
         }   // winCrashHandler
 
         // --------------------------------------------------------------------
