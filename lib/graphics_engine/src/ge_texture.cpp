@@ -24,6 +24,19 @@ video::IImage* getResizedImage(const std::string& path,
 }   // getResizedImage
 
 // ----------------------------------------------------------------------------
+video::IImage* getResizedImageFullPath(const io::path& fullpath,
+                                       const core::dimension2d<u32>& max_size,
+                                       core::dimension2d<u32>* orig_size)
+{
+    io::IReadFile* file = io::createReadFile(fullpath);
+    if (file == NULL)
+        return NULL;
+    video::IImage* texture_image = getResizedImage(file, max_size, orig_size);
+    file->drop();
+    return texture_image;
+}   // getResizedImageFullPath
+
+// ----------------------------------------------------------------------------
 video::IImage* getResizedImage(irr::io::IReadFile* file,
                                const core::dimension2du& max_size,
                                core::dimension2d<u32>* orig_size)

@@ -413,17 +413,13 @@ void GEVulkanTexture::reloadInternal()
 
     clearVulkanData();
 
-    io::IReadFile* file = io::createReadFile(m_full_path);
-    if (file == NULL)
-    {
-        // We checked for file existence so we should always get a file
-        throw std::runtime_error("File missing in getResizedImage");
-    }
-    video::IImage* texture_image = getResizedImage(file, m_max_size,
-        &m_orig_size);
+    video::IImage* texture_image = getResizedImageFullPath(m_full_path,
+        m_max_size, &m_orig_size);
     if (texture_image == NULL)
-        throw std::runtime_error("Missing texture_image in getResizedImage");
-    file->drop();
+    {
+        throw std::runtime_error(
+            "Missing texture_image in getResizedImageFullPath");
+    }
 
     m_size = texture_image->getDimension();
     if (m_size.Width < 4 || m_size.Height < 4)
@@ -480,6 +476,22 @@ void* GEVulkanTexture::lock(video::E_TEXTURE_LOCK_MODE mode, u32 mipmap_level)
 // ----------------------------------------------------------------------------
 uint8_t* GEVulkanTexture::getTextureData()
 {
+    if (m_internal_format != VK_FORMAT_R8G8B8A8_UNORM ||
+        m_internal_format != VK_FORMAT_R8_UNORM)
+    {
+        if (m_full_path.empty())
+            return NULL;
+
+        video::IImage* texture_image = getResizedImageFullPath(m_full_path,
+            m_max_size, &m_orig_size);
+        if (texture_image == NULL)
+            return NULL;
+        texture_image->setDeleteMemory(false);
+        uint8_t* data = (uint8_t*)texture_image->lock();
+        texture_image->drop();
+        return data;
+    }
+
     m_image_view_lock.lock();
     m_image_view_lock.unlock();
 
