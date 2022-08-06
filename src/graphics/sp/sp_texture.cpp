@@ -712,54 +712,9 @@ void SPTexture::generateHQMipmap(void* in,
 #endif
 }   // generateHQMipmap
 
-// ----------------------------------------------------------------------------
-void SPTexture::squishCompressImage(uint8_t* rgba, int width, int height,
-                                    int pitch, void* blocks, unsigned flags)
-{
-#if !(defined(SERVER_ONLY) || defined(MOBILE_STK))
-    // This function is copied from CompressImage in libsquish to avoid omp
-    // if enabled by shared libsquish, because we are already using
-    // multiple thread
-    for (int y = 0; y < height; y += 4)
-    {
-        // initialise the block output
-        uint8_t* target_block = reinterpret_cast<uint8_t*>(blocks);
-        target_block += ((y >> 2) * ((width + 3) >> 2)) * 16;
-        for (int x = 0; x < width; x += 4)
-        {
-            // build the 4x4 block of pixels
-            uint8_t source_rgba[16 * 4];
-            uint8_t* target_pixel = source_rgba;
-            int mask = 0;
-            for (int py = 0; py < 4; py++)
-            {
-                for (int px = 0; px < 4; px++)
-                {
-                    // get the source pixel in the image
-                    int sx = x + px;
-                    int sy = y + py;
-                    // enable if we're in the image
-                    if (sx < width && sy < height)
-                    {
-                        // copy the rgba value
-                        uint8_t* source_pixel = rgba + pitch * sy + 4 * sx;
-                        memcpy(target_pixel, source_pixel, 4);
-                        // enable this pixel
-                        mask |= (1 << (4 * py + px));
-                    }
-                    // advance to the next pixel
-                    target_pixel += 4;
-                }
-            }
-            // compress it into the output
-            squish::CompressMasked(source_rgba, mask, target_block, flags);
-            // advance
-            target_block += 16;
-        }
-    }
-#endif
-}   // squishCompressImage
-
+// ============================================================================
+extern "C" void squishCompressImage(uint8_t* rgba, int width, int height,
+                                    int pitch, void* blocks, unsigned flags);
 // ----------------------------------------------------------------------------
 std::vector<std::pair<core::dimension2du, unsigned> >
                SPTexture::compressTexture(std::shared_ptr<video::IImage>& image)

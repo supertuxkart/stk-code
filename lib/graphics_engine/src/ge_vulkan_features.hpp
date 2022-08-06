@@ -34,6 +34,8 @@ bool supportsMultiDrawIndirect();
 bool supportsBaseVertexRendering();
 // ----------------------------------------------------------------------------
 bool supportsComputeInMainQueue();
+// ----------------------------------------------------------------------------
+bool supportsS3TCBC3();
 };   // GEVulkanFeatures
 
 }

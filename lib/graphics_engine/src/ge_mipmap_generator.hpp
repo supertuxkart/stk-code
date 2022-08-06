@@ -26,6 +26,7 @@ class GEMipmapGenerator
 private:
     imMipmapCascade* m_cascade;
 
+protected:
     unsigned m_mipmap_sizes;
 
     std::vector<GEImageLevel> m_levels;
@@ -87,7 +88,7 @@ public:
             m_levels[i].m_data = m_cascade->mipmap[i];
     }
     // ------------------------------------------------------------------------
-    ~GEMipmapGenerator()                               { freeMipmapCascade(); }
+    virtual ~GEMipmapGenerator()                       { freeMipmapCascade(); }
     // ------------------------------------------------------------------------
     unsigned getMipmapSizes() const                  { return m_mipmap_sizes; }
     // ------------------------------------------------------------------------

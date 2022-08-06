@@ -24,6 +24,7 @@ endif()
 
 set(GE_SOURCES
     src/gl.c
+    src/ge_compressor_s3tc_bc3.cpp
     src/ge_culling_tool.cpp
     src/ge_dx9_texture.cpp
     src/ge_main.cpp
@@ -55,3 +56,5 @@ if(NOT APPLE OR DLOPEN_MOLTENVK)
 endif()
 
 add_library(graphics_engine STATIC ${GE_SOURCES})
+
+target_link_libraries(graphics_engine ${SQUISH_LIBRARY})

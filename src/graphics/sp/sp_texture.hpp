@@ -38,6 +38,10 @@ class Material;
 
 using namespace irr;
 
+// ----------------------------------------------------------------------------
+extern "C" void squishCompressImage(uint8_t* rgba, int width, int height,
+                                    int pitch, void* blocks, unsigned flags);
+
 namespace SP
 {
 
@@ -58,9 +62,6 @@ private:
 
     const bool m_undo_srgb;
 
-    // ------------------------------------------------------------------------
-    void squishCompressImage(uint8_t* rgba, int width, int height, int pitch,
-                             void* blocks, unsigned flags);
     // ------------------------------------------------------------------------
     void generateHQMipmap(void* in,
                           const std::vector<std::pair<core::dimension2du,

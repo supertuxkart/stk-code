@@ -2,6 +2,7 @@
 
 #include "ge_main.hpp"
 #include "ge_mipmap_generator.hpp"
+#include "ge_compressor_s3tc_bc3.hpp"
 #include "ge_texture.hpp"
 #include "ge_vulkan_command_loader.hpp"
 #include "ge_vulkan_features.hpp"
@@ -121,8 +122,20 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
     {
         const bool normal_map = (std::string(NamedPath.getPtr()).find(
             "_Normal.") != std::string::npos);
-        mipmap_generator = new GEMipmapGenerator(texture_data, channels,
-            m_size, normal_map);
+        bool texture_compression = getGEConfig()->m_texture_compression;
+        if (texture_compression && GEVulkanFeatures::supportsS3TCBC3())
+        {
+            image_size = get4x4CompressedTextureSize(m_size.Width,
+                m_size.Height);
+            m_internal_format = VK_FORMAT_BC3_UNORM_BLOCK;
+            mipmap_generator = new GECompressorS3TCBC3(texture_data, channels,
+                m_size, normal_map);
+        }
+        else
+        {
+            mipmap_generator = new GEMipmapGenerator(texture_data, channels,
+                m_size, normal_map);
+        }
         mipmap_data_size = mipmap_generator->getMipmapSizes();
     }
 
