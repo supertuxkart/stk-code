@@ -1,3 +1,42 @@
+# Distro package just use libastcenc.so, find it first
+find_library(LIBASTCENC_LIBRARY NAMES libastcenc astcenc astcenc-avx2-static astcenc-sse4.1-static astcenc-sse2-static astcenc-neon-static astcenc-native-static)
+find_path(LIBASTCENC_INCLUDEDIR NAMES astcenc.h PATHS)
+if (LIBASTCENC_LIBRARY AND LIBASTCENC_INCLUDEDIR)
+    set(ENABLE_LIBASTCENC 1)
+    add_definitions(-DENABLE_LIBASTCENC)
+    include_directories("${LIBASTCENC_INCLUDEDIR}")
+    message(STATUS "Use libastcenc: ${LIBASTCENC_LIBRARY}")
+
+    if (NOT MSVC)
+        set(CMAKE_REQUIRED_FLAGS "-std=c++11")
+    endif()
+    set(CMAKE_REQUIRED_INCLUDES ${LIBASTCENC_INCLUDEDIR})
+    set(CMAKE_REQUIRED_LIBRARIES ${LIBASTCENC_LIBRARY})
+    include(CheckCXXSourceCompiles)
+    check_cxx_source_compiles("
+    #define ASTCENC_DYNAMIC_LIBRARY 1
+    #include <astcenc.h>
+    int main()
+    {
+        astcenc_context_free(NULL);
+        return 0;
+    }
+    " ASTCENC_DLL)
+    if (NOT MSVC)
+        unset(CMAKE_REQUIRED_FLAGS)
+    endif()
+    unset(CMAKE_REQUIRED_INCLUDES)
+    unset(CMAKE_REQUIRED_LIBRARIES)
+    if (ASTCENC_DLL)
+        message(STATUS "libastcenc: -DASTCENC_DYNAMIC_LIBRARY required")
+        add_definitions(-DASTCENC_DYNAMIC_LIBRARY)
+    endif()
+
+else()
+    message(WARNING "Missing astc-encoder for astc support, "
+        "visit https://github.com/ARM-software/astc-encoder for details")
+endif()
+
 include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_engine/include")
 include_directories("${PROJECT_SOURCE_DIR}/lib/graphics_utils")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
@@ -24,6 +63,7 @@ endif()
 
 set(GE_SOURCES
     src/gl.c
+    src/ge_compressor_astc_4x4.cpp
     src/ge_compressor_s3tc_bc3.cpp
     src/ge_culling_tool.cpp
     src/ge_dx9_texture.cpp
@@ -58,3 +98,7 @@ endif()
 add_library(graphics_engine STATIC ${GE_SOURCES})
 
 target_link_libraries(graphics_engine ${SQUISH_LIBRARY})
+
+if(ENABLE_LIBASTCENC)
+    target_link_libraries(graphics_engine ${LIBASTCENC_LIBRARY})
+endif()

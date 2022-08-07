@@ -36,6 +36,8 @@ bool supportsBaseVertexRendering();
 bool supportsComputeInMainQueue();
 // ----------------------------------------------------------------------------
 bool supportsS3TCBC3();
+// ----------------------------------------------------------------------------
+bool supportsASTC4x4();
 };   // GEVulkanFeatures
 
 }

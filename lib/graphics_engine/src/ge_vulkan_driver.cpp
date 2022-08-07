@@ -1,5 +1,6 @@
 #include "ge_vulkan_driver.hpp"
 
+#include "ge_compressor_astc_4x4.hpp"
 #include "ge_main.hpp"
 
 #include "ge_vulkan_2d_renderer.hpp"
@@ -632,6 +633,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
             GEVulkanShaderManager::getSamplerSize(),
             GEVulkanShaderManager::getMeshTextureLayer(),
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
+        GECompressorASTC4x4::init();
         GEVulkanFeatures::printStats();
     }
     catch (std::exception& e)
@@ -651,6 +653,7 @@ GEVulkanDriver::~GEVulkanDriver()
 // ----------------------------------------------------------------------------
 void GEVulkanDriver::destroyVulkan()
 {
+    GECompressorASTC4x4::destroy();
     if (m_depth_texture)
     {
         m_depth_texture->drop();

@@ -1,5 +1,6 @@
 #include "ge_vulkan_features.hpp"
 
+#include "ge_compressor_astc_4x4.hpp"
 #include "ge_vulkan_driver.hpp"
 #include "ge_vulkan_shader_manager.hpp"
 
@@ -27,6 +28,7 @@ bool g_supports_multi_draw_indirect = false;
 bool g_supports_base_vertex_rendering = true;
 bool g_supports_compute_in_main_queue = false;
 bool g_supports_s3tc_bc3 = false;
+bool g_supports_astc_4x4 = false;
 }   // GEVulkanFeatures
 
 // ============================================================================
@@ -70,6 +72,10 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
         VK_FORMAT_BC3_UNORM_BLOCK, &format_properties);
     g_supports_s3tc_bc3 = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    format_properties = {};
+    vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
+        VK_FORMAT_ASTC_4x4_UNORM_BLOCK, &format_properties);
+    g_supports_astc_4x4 = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
 
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(vk->getPhysicalDevice(), NULL,
@@ -191,6 +197,9 @@ void GEVulkanFeatures::printStats()
         "Vulkan supports s3 texture compression (bc3, dxt5)",
         g_supports_s3tc_bc3 ? "true" : "false");
     os::Printer::log(
+        "Vulkan supports adaptive scalable texture compression (4x4 block)",
+        supportsASTC4x4() ? "true" : "false");
+    os::Printer::log(
         "Vulkan descriptor indexes can be dynamically non-uniform",
         g_supports_non_uniform_indexing ? "true" : "false");
     os::Printer::log(
@@ -274,5 +283,11 @@ bool GEVulkanFeatures::supportsS3TCBC3()
 {
     return g_supports_s3tc_bc3;
 }   // supportsS3TCBC3
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsASTC4x4()
+{
+    return g_supports_astc_4x4 && GECompressorASTC4x4::loaded();
+}   // supportsASTC4x4
 
 }
