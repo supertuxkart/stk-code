@@ -442,7 +442,12 @@ bool CentralVideoSettings::isShadowEnabled() const
 
 bool CentralVideoSettings::isTextureCompressionEnabled() const
 {
+#ifdef MOBILE_STK
+    // MOBILE_STK currently doesn't handle libsquish in SP
+    return false;
+#else
     return supportsTextureCompression() && UserConfigParams::m_texture_compression;
+#endif
 }
 
 bool CentralVideoSettings::isDeferredEnabled() const
