@@ -283,6 +283,64 @@ build_deps()
         check_error
         touch "$DIRNAME/deps-$ARCH_OPTION/libvorbis.stamp"
     fi
+
+    # Libsquish
+    if [ ! -f "$DIRNAME/deps-$ARCH_OPTION/libsquish.stamp" ]; then
+        echo "Compiling $ARCH_OPTION libsquish"
+        mkdir -p "$DIRNAME/deps-$ARCH_OPTION/libsquish"
+        cp -a -f "$DIRNAME/../lib/libsquish/"* "$DIRNAME/deps-$ARCH_OPTION/libsquish"
+    
+        cd "$DIRNAME/deps-$ARCH_OPTION/libsquish"
+        if [[ "$ARCH_OPTION" = "x86" || "$ARCH_OPTION" = "x86_64" ]]; then
+            cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+                    -DHOST=$HOST -DARCH=$ARCH                                     \
+                    -DCMAKE_C_FLAGS="-fpic -O3 -g -DSQUISH_USE_SSE=2 -msse2"      \
+                    -DCMAKE_CXX_FLAGS="-fpic -O3 -g -DSQUISH_USE_SSE=2 -msse2"
+        else
+            cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+                    -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
+                    -DCMAKE_CXX_FLAGS="-fpic -O3 -g"
+        fi
+        make -j $(($(nproc) + 1)) VERBOSE=1
+        check_error
+        touch "$DIRNAME/deps-$ARCH_OPTION/libsquish.stamp"
+    fi
+
+    # ASTC-encoder
+    if [ ! -f "$DIRNAME/deps-$ARCH_OPTION/astc-encoder.stamp" ]; then
+        echo "Compiling $ARCH_OPTION astc-encoder"
+        mkdir -p "$DIRNAME/deps-$ARCH_OPTION/astc-encoder"
+        cp -a -f "$DIRNAME/../lib/astc-encoder/"* "$DIRNAME/deps-$ARCH_OPTION/astc-encoder"
+
+        cd "$DIRNAME/deps-$ARCH_OPTION/astc-encoder"
+        sed -i '/-Werror/d' Source/cmake_core.cmake
+        sed -i 's|${ASTC_TARGET}-static|astcenc|g' Source/cmake_core.cmake
+        if [ "$ARCH_OPTION" = "armeabi-v7a" ]; then
+            cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+                    -DHOST=$HOST -DARCH=$ARCH -DSTK_ARM_NEON=ON                   \
+                    -DCMAKE_C_FLAGS="-fpic -O3 -g -mfpu=neon"                     \
+                    -DCMAKE_CXX_FLAGS="-fpic -O3 -g -mfpu=neon"                   \
+                    -DNO_INVARIANCE=ON -DCLI=OFF
+        elif [ "$ARCH_OPTION" = "arm64-v8a" ]; then
+            cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+                    -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
+                    -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
+                    -DISA_NEON=ON -DNO_INVARIANCE=ON -DCLI=OFF
+        elif [ "$ARCH_OPTION" = "x86" ]; then
+            cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+                    -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
+                    -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
+                    -DISA_SSE2=ON -DNO_INVARIANCE=ON -DCLI=OFF
+        else
+            cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake \
+                    -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3 -g"      \
+                    -DCMAKE_CXX_FLAGS="-fpic -O3 -g"                              \
+                    -DISA_SSE41=ON -DNO_INVARIANCE=ON -DCLI=OFF
+        fi
+        make -j $(($(nproc) + 1))
+        check_error
+        touch "$DIRNAME/deps-$ARCH_OPTION/astc-encoder.stamp"
+    fi
 }
 
 if [ -z "$COMPILE_ARCH" ] || [ "$COMPILE_ARCH" = "all" ]; then

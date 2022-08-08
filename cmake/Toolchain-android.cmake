@@ -16,7 +16,7 @@ set(CMAKE_SYSTEM_PROCESSOR ${ARCH})
 
 # Starting NDK21 it enables NEON by default on 32-bit ARM target
 # Disable it to support more devices
-if("${ARCH}" STREQUAL "arm")
+if("${ARCH}" STREQUAL "arm" AND NOT STK_ARM_NEON)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mfpu=vfpv3-d16")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mfpu=vfpv3-d16")
 endif()
