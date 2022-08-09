@@ -93,6 +93,13 @@ include $(PREBUILT_STATIC_LIBRARY)
 include $(CLEAR_VARS)
 
 
+# shaderc
+LOCAL_MODULE       := shaderc
+LOCAL_SRC_FILES    := deps-$(TARGET_ARCH_ABI)/shaderc/libshaderc/libshaderc_combined.a
+include $(PREBUILT_STATIC_LIBRARY)
+include $(CLEAR_VARS)
+
+
 # libsquish
 LOCAL_MODULE       := libsquish
 LOCAL_SRC_FILES    := deps-$(TARGET_ARCH_ABI)/libsquish/libsquish.a
@@ -182,20 +189,20 @@ LOCAL_PATH         := .
 LOCAL_CPP_FEATURES += rtti exceptions
 LOCAL_SRC_FILES    := $(wildcard ../lib/graphics_engine/src/*.c) \
                       $(wildcard ../lib/graphics_engine/src/*.cpp)
-LOCAL_CFLAGS       := -DENABLE_LIBASTCENC              \
-                      -I../lib/graphics_engine/include \
-                      -I../lib/graphics_utils          \
-                      -I../lib/sdl2/include/           \
-                      -I../lib/bullet/src/             \
-                      -I../lib/irrlicht/include/       \
-                      -I../lib/libsquish               \
+LOCAL_CFLAGS       := -DENABLE_LIBASTCENC                 \
+                      -I../lib/graphics_engine/include    \
+                      -I../lib/graphics_utils             \
+                      -I../lib/sdl2/include/              \
+                      -I../lib/bullet/src/                \
+                      -I../lib/irrlicht/include/          \
+                      -I../lib/shaderc/libshaderc/include \
+                      -I../lib/libsquish                  \
                       -Ideps-$(TARGET_ARCH_ABI)/astc-encoder/Source
 ifeq ($(TARGET_ARCH_ABI), armeabi-v7a)
 LOCAL_ARM_NEON     := false
 endif
 LOCAL_STATIC_LIBRARIES := shaderc libsquish libastcenc
 include $(BUILD_STATIC_LIBRARY)
-$(call import-module, third_party/shaderc)
 include $(CLEAR_VARS)
 
 

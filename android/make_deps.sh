@@ -284,6 +284,28 @@ build_deps()
         touch "$DIRNAME/deps-$ARCH_OPTION/libvorbis.stamp"
     fi
 
+    # Shaderc
+    if [ ! -f "$DIRNAME/deps-$ARCH_OPTION/shaderc.stamp" ]; then
+        echo "Compiling $ARCH_OPTION shaderc"
+        mkdir -p "$DIRNAME/deps-$ARCH_OPTION/shaderc"
+        cp -a -f "$DIRNAME/../lib/shaderc/"* "$DIRNAME/deps-$ARCH_OPTION/shaderc"
+
+        cd "$DIRNAME/deps-$ARCH_OPTION/shaderc"
+        cmake . -DCMAKE_TOOLCHAIN_FILE=../../../cmake/Toolchain-android.cmake  \
+                -DHOST=$HOST -DARCH=$ARCH -DCMAKE_C_FLAGS="-fpic -O3"          \
+                -DCMAKE_CXX_FLAGS="-fpic -O3" -DSHADERC_SKIP_INSTALL=1         \
+                -DSHADERC_SKIP_TESTS=1 -DSHADERC_SKIP_EXAMPLES=1               \
+                -DSPIRV_HEADERS_SKIP_INSTALL=1 -DSPIRV_HEADERS_SKIP_EXAMPLES=1 \
+                -DSKIP_SPIRV_TOOLS_INSTALL=1 -DSPIRV_SKIP_TESTS=1              \
+                -DSPIRV_SKIP_EXECUTABLES=1 -DENABLE_GLSLANG_BINARIES=0         \
+                -DENABLE_CTEST=0 &&
+        make -j $(($(nproc) + 1))
+        # Strip debug symbol to make app bundle smaller
+        llvm-strip --strip-debug "$DIRNAME/deps-$ARCH_OPTION/shaderc/libshaderc/libshaderc_combined.a"
+        check_error
+        touch "$DIRNAME/deps-$ARCH_OPTION/shaderc.stamp"
+    fi
+
     # Libsquish
     if [ ! -f "$DIRNAME/deps-$ARCH_OPTION/libsquish.stamp" ]; then
         echo "Compiling $ARCH_OPTION libsquish"
