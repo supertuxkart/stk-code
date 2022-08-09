@@ -411,6 +411,10 @@ void IrrDriver::initDevice()
     else if (std::string(UserConfigParams::m_render_driver) == "vulkan")
     {
         driver_created = video::EDT_VULKAN;
+#ifndef SERVER_ONLY
+        GE::getGEConfig()->m_texture_compression =
+            UserConfigParams::m_texture_compression;
+#endif
     }
     else
     {
