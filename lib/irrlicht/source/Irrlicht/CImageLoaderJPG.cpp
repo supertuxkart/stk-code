@@ -120,14 +120,11 @@ bool CImageLoaderJPG::isALoadableFileFormat(io::IReadFile* file) const
 	return false;
 	#else
 
-	if (!file)
+	if (!(file && file->seek(0)))
 		return false;
-
-	s32 jfif = 0;
-	file->seek(6);
-	file->read(&jfif, sizeof(s32));
-	return (jfif == 0x4a464946 || jfif == 0x4649464a);
-
+	unsigned char header[3];
+	size_t headerLen = file->read(header, sizeof(header));
+	return headerLen >= 3 && !memcmp(header, "\xFF\xD8\xFF", 3);
 	#endif
 }
 
