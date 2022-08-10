@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <cstdio>
 #include <deque>
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -46,6 +47,7 @@ std::atomic_uint g_loader_count(0);
 
 std::vector<VkCommandPool> g_command_pools;
 std::vector<VkFence> g_command_fences;
+std::vector<std::unique_ptr<std::atomic<bool> > > g_thread_idle;
 }   // GEVulkanCommandLoader
 
 // ============================================================================
@@ -84,6 +86,12 @@ void GEVulkanCommandLoader::init(GEVulkanDriver* vk)
         }
     }
 
+    for (unsigned i = 0; i < thread_count - 1; i++)
+    {
+        std::unique_ptr<std::atomic<bool> > idle;
+        idle.reset(new std::atomic<bool>(true));
+        g_thread_idle.push_back(std::move(idle));
+    }
     g_loader_count.store(thread_count);
     for (unsigned i = 0; i < thread_count - 1; i++)
     {
@@ -93,6 +101,7 @@ void GEVulkanCommandLoader::init(GEVulkanDriver* vk)
                 g_loader_id = i + 1;
                 while (true)
                 {
+                    g_thread_idle[i]->store(true);
                     std::unique_lock<std::mutex> ul(g_loaders_mutex);
                     g_loaders_cv.wait(ul, []
                         {
@@ -101,6 +110,7 @@ void GEVulkanCommandLoader::init(GEVulkanDriver* vk)
                     if (g_loader_count.load() == 0)
                         return;
 
+                    g_thread_idle[i]->store(false);
                     std::function<void()> copied = g_threaded_commands.front();
                     g_threaded_commands.pop_front();
                     ul.unlock();
@@ -132,6 +142,7 @@ void GEVulkanCommandLoader::destroy()
     for (auto& f : g_threaded_commands)
         f();
     g_threaded_commands.clear();
+    g_thread_idle.clear();
 
     for (VkCommandPool& pool : g_command_pools)
         vkDestroyCommandPool(g_vk->getDevice(), pool, NULL);
@@ -230,5 +241,24 @@ void GEVulkanCommandLoader::endSingleTimeCommands(VkCommandBuffer command_buffer
     vkFreeCommandBuffers(g_vk->getDevice(), g_command_pools[loader_id], 1,
         &command_buffer);
 }   // endSingleTimeCommands
+
+// ----------------------------------------------------------------------------
+void GEVulkanCommandLoader::waitIdle()
+{
+    while (true)
+    {
+        std::lock_guard<std::mutex> lock(g_loaders_mutex);
+        if (g_threaded_commands.empty())
+            break;
+    }
+
+    unsigned i = 0;
+    while (i < g_thread_idle.size())
+    {
+        if (g_thread_idle[i]->load() == false)
+            continue;
+        i++;
+    }
+}   // waitIdle
 
 }

@@ -33,6 +33,8 @@ VkCommandBuffer beginSingleTimeCommands();
 // ----------------------------------------------------------------------------
 void endSingleTimeCommands(VkCommandBuffer command_buffer,
                            VkQueueFlagBits bit = VK_QUEUE_GRAPHICS_BIT);
+// ----------------------------------------------------------------------------
+void waitIdle();
 };   // GEVulkanCommandLoader
 
 }

@@ -2191,7 +2191,7 @@ void GEVulkanDriver::createSwapChainRelated(bool handle_surface)
 }   // createSwapChainRelated
 
 // ----------------------------------------------------------------------------
-void GEVulkanDriver::waitIdle()
+void GEVulkanDriver::waitIdle(bool flush_command_loader)
 {
     if (m_disable_wait_idle)
         return;
@@ -2201,6 +2201,9 @@ void GEVulkanDriver::waitIdle()
     vkDeviceWaitIdle(m_vk->device);
     for (std::mutex* m : m_graphics_queue_mutexes)
         m->unlock();
+
+    if (flush_command_loader)
+        GEVulkanCommandLoader::waitIdle();
 }   // waitIdle
 
 // ----------------------------------------------------------------------------

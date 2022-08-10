@@ -39,7 +39,7 @@ STKTexManager::~STKTexManager()
     GE::GEVulkanDriver* gevd = GE::getVKDriver();
     if (gevd)
     {
-        gevd->waitIdle();
+        gevd->waitIdle(/*flush_command_loader*/true);
         gevd->setDisableWaitIdle(true);
     }
 #endif

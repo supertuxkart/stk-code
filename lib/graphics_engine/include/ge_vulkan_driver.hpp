@@ -340,7 +340,7 @@ namespace GE
         unsigned getGraphicsQueueCount() const
                                               { return m_graphics_queue_count; }
         std::unique_lock<std::mutex> getGraphicsQueue(VkQueue* queue) const;
-        void waitIdle();
+        void waitIdle(bool flush_command_loader = false);
         void setDisableWaitIdle(bool val)         { m_disable_wait_idle = val; }
         IrrlichtDevice* getIrrlichtDevice() const  { return m_irrlicht_device; }
         GEVulkanDepthTexture* getDepthTexture() const { return m_depth_texture; }
