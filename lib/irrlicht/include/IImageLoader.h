@@ -43,8 +43,7 @@ public:
 	/** \param file File handle to check.
 	\return Pointer to newly created image, or 0 upon error. */
 	virtual IImage* loadImage(io::IReadFile* file, bool skip_checking = false) const = 0;
-	virtual core::dimension2du getImageSize(io::IReadFile* file) const { return core::dimension2du(0, 0); }
-	virtual bool supportThreadedLoading() const { return false; }
+	virtual bool getImageSize(io::IReadFile* file, core::dimension2du* dim) const { return false; }
 };
 
 

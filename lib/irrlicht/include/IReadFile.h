@@ -42,6 +42,7 @@ namespace io
 		//! Get name of file.
 		/** \return File name as zero terminated character string. */
 		virtual const io::path& getFileName() const = 0;
+		virtual void* getFileHandle() const { return NULL; }
 	};
 
 	//! Internal function, please do not use.

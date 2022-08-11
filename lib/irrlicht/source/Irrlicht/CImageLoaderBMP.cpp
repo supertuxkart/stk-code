@@ -214,12 +214,11 @@ void CImageLoaderBMP::decompress4BitRLE(u8*& bmpData, s32 size, s32 width, s32 h
 }
 
 
-
-//! creates a surface from the file
-IImage* CImageLoaderBMP::loadImage(io::IReadFile* file, bool skip_checking) const
+SBMPHeader CImageLoaderBMP::getHeader(io::IReadFile* file) const
 {
 	SBMPHeader header;
 
+	file->seek(0);
 	file->read(&header, sizeof(header));
 
 #ifdef __BIG_ENDIAN__
@@ -238,6 +237,27 @@ IImage* CImageLoaderBMP::loadImage(io::IReadFile* file, bool skip_checking) cons
 	header.Colors = os::Byteswap::byteswap(header.Colors);
 	header.ImportantColors = os::Byteswap::byteswap(header.ImportantColors);
 #endif
+	return header;
+}
+
+
+bool CImageLoaderBMP::getImageSize(io::IReadFile* file, core::dimension2du* dim) const
+{
+	if (!file || !dim)
+		return false;
+	SBMPHeader header = getHeader(file);
+	if (header.Id != 0x4d42)
+		return false;
+	*dim = core::dimension2du(header.Width, header.Height);
+	file->seek(0);
+	return true;
+}
+
+
+//! creates a surface from the file
+IImage* CImageLoaderBMP::loadImage(io::IReadFile* file, bool skip_checking) const
+{
+	SBMPHeader header = getHeader(file);
 
 	s32 pitch = 0;
 

@@ -51,6 +51,7 @@ public:
 	//! creates a surface from the file
 	virtual IImage* loadImage(io::IReadFile* file, bool skip_checking = false) const;
 
+	virtual bool getImageSize(io::IReadFile* file, core::dimension2du* dim) const;
 private:
 
     #ifdef _IRR_COMPILE_WITH_LIBJPEG_

@@ -252,24 +252,23 @@ IImage* CImageLoaderPng::loadImage(io::IReadFile* file, bool skip_checking) cons
 #endif // _IRR_COMPILE_WITH_LIBPNG_
 }
 
-core::dimension2du CImageLoaderPng::getImageSize(io::IReadFile* file) const
+bool CImageLoaderPng::getImageSize(io::IReadFile* file, core::dimension2du* dim) const
 {
 #ifdef _IRR_COMPILE_WITH_LIBPNG_
-	if (!file || !isALoadableFileFormat(file))
-		return core::dimension2du(0, 0);
-	core::dimension2d<u32> dim;
+	if (!dim || !file || !isALoadableFileFormat(file))
+		return false;
 	file->seek(16);
-	file->read(&dim.Width, 4);
+	file->read(&dim->Width, 4);
 	file->seek(20);
-	file->read(&dim.Height, 4);
+	file->read(&dim->Height, 4);
 	file->seek(0);
 #ifndef __BIG_ENDIAN__
-	dim.Width = os::Byteswap::byteswap(dim.Width);
-	dim.Height = os::Byteswap::byteswap(dim.Height);
+	dim->Width = os::Byteswap::byteswap(dim->Width);
+	dim->Height = os::Byteswap::byteswap(dim->Height);
 #endif
-	return dim;
+	return true;
 #else
-	return core::dimension2du(0, 0);
+	return false;
 #endif // _IRR_COMPILE_WITH_LIBPNG_
 }
 

@@ -83,11 +83,14 @@ public:
 	//! creates a surface from the file
 	virtual IImage* loadImage(io::IReadFile* file, bool skip_checking = false) const;
 
+	virtual bool getImageSize(io::IReadFile* file, core::dimension2du* dim) const;
 private:
 
 	void decompress8BitRLE(u8*& BmpData, s32 size, s32 width, s32 height, s32 pitch) const;
 
 	void decompress4BitRLE(u8*& BmpData, s32 size, s32 width, s32 height, s32 pitch) const;
+
+	SBMPHeader getHeader(io::IReadFile* file) const;
 };
 
 

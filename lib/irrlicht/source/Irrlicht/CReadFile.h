@@ -47,6 +47,8 @@ namespace io
 		//! returns name of file
 		virtual const io::path& getFileName() const;
 
+		virtual void* getFileHandle() const { return (void*)File; }
+
 	private:
 
 		//! opens the file

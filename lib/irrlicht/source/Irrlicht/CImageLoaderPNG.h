@@ -34,8 +34,8 @@ public:
 
 	//! creates a surface from the file
 	virtual IImage* loadImage(io::IReadFile* file, bool skip_checking = false) const;
-	virtual core::dimension2du getImageSize(io::IReadFile* file) const;
-	virtual bool supportThreadedLoading() const { return true; }
+
+	virtual bool getImageSize(io::IReadFile* file, core::dimension2du* dim) const;
 };
 
 

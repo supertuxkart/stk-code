@@ -48,6 +48,11 @@ public:
 	//! creates a surface from the file
 	virtual IImage* loadImage(io::IReadFile* file, bool skip_checking = false) const;
 
+	virtual bool getImageSize(io::IReadFile* file, core::dimension2du* dim) const;
+private:
+	struct NSVGimage* getSVGImage(io::IReadFile* file, float* scale) const;
+
+	core::dimension2du getImageSize(struct NSVGimage* img, float scale) const;
 };
 
 
