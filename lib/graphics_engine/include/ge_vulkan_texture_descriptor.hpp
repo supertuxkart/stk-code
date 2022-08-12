@@ -10,6 +10,7 @@ namespace irr
 }
 
 #include <array>
+#include <atomic>
 #include <map>
 #include <memory>
 #include <vector>
@@ -21,12 +22,14 @@ enum GEVulkanSampler : unsigned;
 
 class GEVulkanTextureDescriptor
 {
-    typedef std::array<std::shared_ptr<VkImageView>,
+    typedef std::array<std::shared_ptr<std::atomic<VkImageView> >,
         _IRR_MATERIAL_MAX_TEXTURES_> TextureList;
 
     std::map<TextureList, int> m_texture_list;
 
-    std::shared_ptr<VkImageView> m_white_image, m_transparent_image;
+    std::shared_ptr<std::atomic<VkImageView> > m_white_image;
+
+    std::shared_ptr<std::atomic<VkImageView> > m_transparent_image;
 
     VkDescriptorSetLayout m_descriptor_set_layout;
 
@@ -68,7 +71,7 @@ public:
         {
             for (auto& t : p.first)
             {
-                if (*(t.get()) == VK_NULL_HANDLE)
+                if (t.get()->load() == VK_NULL_HANDLE)
                 {
                     has_deleted_image_view = true;
                     break;

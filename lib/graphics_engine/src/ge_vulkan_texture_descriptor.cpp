@@ -131,9 +131,9 @@ void GEVulkanTextureDescriptor::updateDescriptor()
             VkDescriptorImageInfo info;
             info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             info.sampler = m_vk->getSampler(m_sampler_use);
-            info.imageView = *(p.first[i].get());
+            info.imageView = p.first[i].get()->load();
             if (info.imageView == VK_NULL_HANDLE)
-                info.imageView = *m_transparent_image.get();
+                info.imageView = m_transparent_image.get()->load();
             image_infos[p.second * m_max_layer + i] = info;
         }
     }
@@ -143,7 +143,7 @@ void GEVulkanTextureDescriptor::updateDescriptor()
     {
         VkDescriptorImageInfo dummy_info;
         dummy_info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        dummy_info.imageView = *m_transparent_image.get();
+        dummy_info.imageView = m_transparent_image.get()->load();
         dummy_info.sampler = m_vk->getSampler(m_sampler_use);
         image_infos.resize(m_max_texture_list * m_max_layer, dummy_info);
     }

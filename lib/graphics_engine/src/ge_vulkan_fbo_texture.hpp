@@ -36,7 +36,7 @@ public:
     virtual void regenerateMipMapLevels(void* mipmap_data = NULL)            {}
     // ------------------------------------------------------------------------
     virtual u64 getTextureHandler() const
-                                         { return (u64)*(m_image_view.get()); }
+                                  { return (u64)(m_image_view.get()->load()); }
     // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const      { return m_texture_size; }
     // ------------------------------------------------------------------------
@@ -45,7 +45,7 @@ public:
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
                                u32 w, u32 h, u32 x, u32 y)                   {}
     // ------------------------------------------------------------------------
-    virtual std::shared_ptr<VkImageView> getImageView() const
+    virtual std::shared_ptr<std::atomic<VkImageView> > getImageView() const
                                                        { return m_image_view; }
     // ------------------------------------------------------------------------
     void createRTT();

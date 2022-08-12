@@ -7,6 +7,7 @@
 #include "ge_spin_lock.hpp"
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 #include <functional>
 #include <memory>
@@ -34,13 +35,19 @@ protected:
 
     VmaAllocation m_vma_allocation;
 
-    std::shared_ptr<VkImageView> m_image_view;
+    std::shared_ptr<std::atomic<VkImageView> > m_image_view;
+
+    std::shared_ptr<std::atomic<VkImageView> > m_placeholder_view;
 
     unsigned int m_texture_size;
 
     const bool m_disable_reload;
 
     bool m_has_mipmaps;
+
+    bool m_ondemand_load;
+
+    mutable std::atomic<bool> m_ondemand_loading;
 
     GESpinLock m_size_lock;
 
@@ -87,7 +94,28 @@ protected:
     bool isSingleChannel() const
                             { return m_internal_format == VK_FORMAT_R8_UNORM; }
     // ------------------------------------------------------------------------
-    GEVulkanTexture() : video::ITexture(""), m_disable_reload(true)          {}
+    void setPlaceHolderView();
+    // ------------------------------------------------------------------------
+    std::shared_ptr<std::atomic<VkImageView> > getImageViewLive() const;
+    // ------------------------------------------------------------------------
+    bool waitImageView()
+    {
+        if (!m_ondemand_load)
+        {
+            m_image_view_lock.lock();
+            m_image_view_lock.unlock();
+        }
+        else
+        {
+            while (m_ondemand_loading.load());
+            if (m_image == VK_NULL_HANDLE)
+                return false;
+        }
+        return true;
+    }
+    // ------------------------------------------------------------------------
+    GEVulkanTexture() : video::ITexture(""), m_disable_reload(true),
+                        m_ondemand_load(false), m_ondemand_loading(false)    {}
 public:
     // ------------------------------------------------------------------------
     GEVulkanTexture(const std::string& path,
@@ -114,15 +142,21 @@ public:
     // ------------------------------------------------------------------------
     virtual const core::dimension2d<u32>& getOriginalSize() const
     {
-        m_size_lock.lock();
-        m_size_lock.unlock();
+        if (!m_ondemand_load)
+        {
+            m_size_lock.lock();
+            m_size_lock.unlock();
+        }
         return m_orig_size;
     }
     // ------------------------------------------------------------------------
     virtual const core::dimension2d<u32>& getSize() const
     {
-        m_size_lock.lock();
-        m_size_lock.unlock();
+        if (!m_ondemand_load)
+        {
+            m_size_lock.lock();
+            m_size_lock.unlock();
+        }
         return m_size;
     }
     // ------------------------------------------------------------------------
@@ -140,15 +174,26 @@ public:
     // ------------------------------------------------------------------------
     virtual u64 getTextureHandler() const
     {
-        m_image_view_lock.lock();
-        m_image_view_lock.unlock();
-        return m_image_view ? (u64)*(m_image_view.get()) : 0;
+        if (!m_ondemand_load)
+        {
+            m_image_view_lock.lock();
+            m_image_view_lock.unlock();
+            return m_image_view ? (u64)(m_image_view.get()->load()) : 0;
+        }
+        else
+        {
+            auto image_view = getImageViewLive();
+            return (u64)(image_view.get()->load());
+        }
     }
     // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const
     {
-        m_image_view_lock.lock();
-        m_image_view_lock.unlock();
+        if (!m_ondemand_load)
+        {
+            m_image_view_lock.lock();
+            m_image_view_lock.unlock();
+        }
         return m_texture_size;
     }
     // ------------------------------------------------------------------------
@@ -157,11 +202,16 @@ public:
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,
                                u32 w, u32 h, u32 x, u32 y);
     // ------------------------------------------------------------------------
-    virtual std::shared_ptr<VkImageView> getImageView() const
+    virtual std::shared_ptr<std::atomic<VkImageView> > getImageView() const
     {
-        m_image_view_lock.lock();
-        m_image_view_lock.unlock();
-        return m_image_view;
+        if (!m_ondemand_load)
+        {
+            m_image_view_lock.lock();
+            m_image_view_lock.unlock();
+            return m_image_view;
+        }
+        else
+            return getImageViewLive();
     }
     // ------------------------------------------------------------------------
     VkFormat getInternalFormat() const            { return m_internal_format; }

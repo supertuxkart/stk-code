@@ -1298,13 +1298,19 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file, video::IImageLoade
 	{
 		if (SurfaceLoader[i]->isALoadableFileExtension(file->getFileName()))
 		{
-			if (loader)
-			{
-				*loader = SurfaceLoader[i];
-				return 0;
-			}
 			// reset file position which might have changed due to previous loadImage calls
 			file->seek(0);
+			if (loader)
+			{
+				if (SurfaceLoader[i]->isALoadableFileFormat(file))
+				{
+					file->seek(0);
+					*loader = SurfaceLoader[i];
+					return 0;
+				}
+				else
+					continue;
+			}
 			image = SurfaceLoader[i]->loadImage(file);
 			if (image)
 				return image;
@@ -1318,12 +1324,12 @@ IImage* CNullDriver::createImageFromFile(io::IReadFile* file, video::IImageLoade
 		file->seek(0);
 		if (SurfaceLoader[i]->isALoadableFileFormat(file))
 		{
+			file->seek(0);
 			if (loader)
 			{
 				*loader = SurfaceLoader[i];
 				return 0;
 			}
-			file->seek(0);
 			image = SurfaceLoader[i]->loadImage(file);
 			if (image)
 				return image;
