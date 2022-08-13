@@ -3,8 +3,10 @@
 
 #include <IVideoDriver.h>
 #include <matrix4.h>
+
 #include <cstdint>
 #include <string>
+#include <unordered_set>
 
 namespace GE
 {
@@ -14,6 +16,7 @@ struct GEConfig
 bool m_disable_npot_texture;
 bool m_convert_irrlicht_mesh;
 bool m_texture_compression;
+std::unordered_set<std::string> m_ondemand_load_texture_paths;
 };
 
 void setVideoDriver(irr::video::IVideoDriver* driver);

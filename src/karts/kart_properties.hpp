@@ -60,7 +60,7 @@ class KartProperties
 {
 private:
     /** Base directory for this kart. */
-    std::string              m_root;
+    std::string              m_root, m_root_absolute_path;
 
     /** AI Properties for this kart, as a separate object in order to
      *  reduce dependencies (and therefore compile time) when changing
@@ -209,6 +209,8 @@ private:
         // closely (+-0,1%) with the specifications in kart_characteristics.xml
         m_wheel_base = fabsf(kart_length / 1.425f);
     }
+
+    void handleOnDemandLoadTexture();
 public:
     /** Returns the string representation of a handicap level. */
     static std::string      getHandicapAsString(HandicapLevel h);

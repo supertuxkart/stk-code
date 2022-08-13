@@ -119,6 +119,9 @@ public:
         return getTexture(filename, std::string(error_message),
                           std::string(detail));
     }   // getTexture
+    // ------------------------------------------------------------------------
+    std::unordered_map<std::string, irr::video::ITexture*>& getAllTextures()
+                                                     { return m_all_textures; }
 
 };   // STKTexManager
 

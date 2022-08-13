@@ -1132,6 +1132,8 @@ void IrrDriver::applyResolutionSettings(bool recreate_device)
 
 
     kart_properties_manager->loadAllKarts();
+    kart_properties_manager->onDemandLoadKartTextures(
+        { UserConfigParams::m_default_kart }, false/*unload_unused*/);
 
     attachment_manager->loadModels();
     file_manager->popTextureSearchPath();

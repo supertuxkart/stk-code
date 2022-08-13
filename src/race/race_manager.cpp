@@ -449,6 +449,12 @@ void RaceManager::startNew(bool from_overworld)
 
     Log::verbose("RaceManager", "Nb of karts=%u, ghost karts:%u ai:%lu players:%lu\n",
         (unsigned int) m_num_karts, m_num_ghost_karts, m_ai_kart_list.size(), m_player_karts.size());
+    std::set<std::string> used_karts;
+    for (auto& kart : m_ai_kart_list)
+        used_karts.insert(kart);
+    for (auto& kart : m_player_karts)
+        used_karts.insert(kart.getKartName());
+    kart_properties_manager->onDemandLoadKartTextures(used_karts);
 
     assert((unsigned int)m_num_karts == m_num_ghost_karts+m_ai_kart_list.size()+m_player_karts.size());
 
@@ -979,6 +985,7 @@ void RaceManager::exitRace(bool delete_world)
         setNumKarts(0);
         setNumPlayers(0);
 
+        std::set<std::string> used_karts;
         if (some_human_player_well_ranked)
         {
             startSingleRace("gpwin", 999,
@@ -987,6 +994,9 @@ void RaceManager::exitRace(bool delete_world)
             scene->push();
             scene->setKarts(winners);
             scene->setPlayerWon(some_human_player_won);
+            std::set<std::string> karts;
+            for (auto& kart : winners)
+                used_karts.insert(kart.first);
         }
         else
         {
@@ -998,6 +1008,8 @@ void RaceManager::exitRace(bool delete_world)
             if (humanLosers.size() >= 1)
             {
                 scene->setKarts(humanLosers);
+                for (auto& kart : humanLosers)
+                    used_karts.insert(kart.first);
             }
             else
             {
@@ -1005,9 +1017,11 @@ void RaceManager::exitRace(bool delete_world)
                            "This should have never happened\n");
                 std::vector<std::pair<std::string, float> > karts;
                 karts.emplace_back(UserConfigParams::m_default_kart, 0.0f);
+                used_karts.insert(UserConfigParams::m_default_kart);
                 scene->setKarts(karts);
             }
         }
+        kart_properties_manager->onDemandLoadKartTextures(used_karts);
     }
 
     if (delete_world)

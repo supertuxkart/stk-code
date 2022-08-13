@@ -2282,6 +2282,8 @@ int main(int argc, char *argv[])
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI_ICON,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
+        kart_properties_manager->onDemandLoadKartTextures(
+            { UserConfigParams::m_default_kart }, false/*unload_unused*/);
         OfficialKarts::load();
         handleXmasMode();
         handleEasterEarMode();

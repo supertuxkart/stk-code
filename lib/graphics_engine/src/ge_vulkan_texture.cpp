@@ -43,6 +43,8 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
         return;
     }
 
+    auto& paths = getGEConfig()->m_ondemand_load_texture_paths;
+    m_ondemand_load = (paths.find(m_full_path.c_str()) != paths.end());
     if (m_ondemand_load)
     {
         video::IImageLoader* loader = NULL;

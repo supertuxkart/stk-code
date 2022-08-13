@@ -38,6 +38,12 @@
 #include <stdexcept>
 #include <iostream>
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#include <ge_vulkan_driver.hpp>
+#include "graphics/stk_tex_manager.hpp"
+#endif
+
 KartPropertiesManager *kart_properties_manager=0;
 
 std::vector<std::string> KartPropertiesManager::m_kart_search_path;
@@ -610,5 +616,84 @@ void KartPropertiesManager::getRandomKartList(int count,
     // There should always be enough karts
     assert(count==0);
 }   // getRandomKartList
+
+//-----------------------------------------------------------------------------
+void KartPropertiesManager::onDemandLoadKartTextures(
+                                        const std::set<std::string>& kart_list,
+                                                            bool unload_unused)
+{
+#ifndef SERVER_ONLY
+    if (kart_list.empty())
+        return;
+
+    GE::GEVulkanDriver* gevd = GE::getVKDriver();
+    if (!gevd)
+        return;
+    gevd->waitIdle();
+    gevd->setDisableWaitIdle(true);
+
+    std::set<std::string> karts_folder;
+    for (auto& dir : m_kart_search_path)
+    {
+        std::string kart_dir = file_manager->getFileSystem()
+            ->getAbsolutePath(dir.c_str()).c_str();
+        karts_folder.insert(StringUtils::getPath(kart_dir));
+    }
+
+    std::set<std::string> ingame_karts_folder;
+    for (auto& kart : kart_list)
+    {
+        const KartProperties* kp = getKart(kart);
+        if (!kp)
+            continue;
+        std::string kart_dir = file_manager->getFileSystem()
+            ->getAbsolutePath(kp->getKartDir().c_str()).c_str();
+        ingame_karts_folder.insert(StringUtils::getPath(kart_dir));
+    }
+
+    bool unloaded_unused = false;
+    for (auto tex : STKTexManager::getInstance()->getAllTextures())
+    {
+        if (!tex.second || !tex.second->useOnDemandLoad())
+            continue;
+        std::string full_path = tex.second->getFullPath().c_str();
+        bool is_kart_texture = false;
+        bool in_use = false;
+        for (auto& dir : karts_folder)
+        {
+            if (StringUtils::startsWith(full_path, dir))
+            {
+                is_kart_texture = true;
+                break;
+            }
+        }
+        if (is_kart_texture)
+        {
+            for (auto& dir : ingame_karts_folder)
+            {
+                if (StringUtils::startsWith(full_path, dir))
+                {
+                    in_use = true;
+                    break;
+                }
+            }
+        }
+        // This will load the ondemand kart textures now or unload the unused
+        // kart textures
+        if (in_use)
+            tex.second->getTextureHandler();
+        else if (unload_unused)
+        {
+            unloaded_unused = true;
+            tex.second->reload();
+        }
+    }
+
+    gevd->setDisableWaitIdle(false);
+    if (unloaded_unused)
+        gevd->handleDeletedTextures();
+#endif
+}   // onDemandLoadKartTextures
+
 
 /* EOF */

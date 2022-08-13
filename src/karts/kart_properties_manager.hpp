@@ -23,6 +23,7 @@
 #include "utils/ptr_vector.hpp"
 #include <map>
 #include <memory>
+#include <set>
 
 #include "network/remote_kart_info.hpp"
 #include "utils/no_copy.hpp"
@@ -137,6 +138,9 @@ public:
     const unsigned int getNumberOfKarts() const {
         return (unsigned int)m_karts_properties.size();
     }   // getNumberOfKarts
+    // ------------------------------------------------------------------------
+    void onDemandLoadKartTextures(const std::set<std::string>& kart_list,
+                                  bool unload_unused = true);
 };
 
 extern KartPropertiesManager *kart_properties_manager;

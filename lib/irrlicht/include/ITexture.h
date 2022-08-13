@@ -204,6 +204,10 @@ public:
 	virtual void reload() {}
 
 	virtual bool loadingFailed() const { return LoadingFailed; }
+
+	virtual bool useOnDemandLoad() const { return false; }
+
+	virtual const io::path& getFullPath() const { return NamedPath.getPath(); }
 protected:
 
 	//! Helper function, helps to get the desired texture creation format from the flags.

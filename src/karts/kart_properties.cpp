@@ -47,6 +47,9 @@
 #include <stdexcept>
 #include <string>
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#endif
 
 float KartProperties::UNDEFINED = -99.9f;
 
@@ -116,12 +119,27 @@ KartProperties::KartProperties(const std::string &filename)
 KartProperties::~KartProperties()
 {
 #ifndef SERVER_ONLY
-    if (CVS->isGLSL() && m_kart_model.use_count() == 1)
+    if (m_kart_model.use_count() == 1)
     {
-        m_kart_model = nullptr;
-        SP::SPShaderManager::get()->removeUnusedShaders();
-        ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
-        SP::SPTextureManager::get()->removeUnusedTextures();
+        if (CVS->isGLSL())
+        {
+            m_kart_model = nullptr;
+            SP::SPShaderManager::get()->removeUnusedShaders();
+            ShaderFilesManager::getInstance()->removeUnusedShaderFiles();
+            SP::SPTextureManager::get()->removeUnusedTextures();
+        }
+
+        if (GE::getDriver()->getDriverType() != video::EDT_VULKAN)
+            return;
+        auto& paths = GE::getGEConfig()->m_ondemand_load_texture_paths;
+        auto it = paths.begin();
+        while (it != paths.end())
+        {
+            if (StringUtils::startsWith(*it, m_root_absolute_path))
+                it = paths.erase(it);
+            else
+                it++;
+        }
     }
 #endif
 }   // ~KartProperties
@@ -177,6 +195,33 @@ void KartProperties::copyFrom(const KartProperties *source)
 }   // copyFrom
 
 //-----------------------------------------------------------------------------
+void KartProperties::handleOnDemandLoadTexture()
+{
+#ifndef SERVER_ONLY
+    if (GE::getDriver()->getDriverType() != video::EDT_VULKAN)
+        return;
+    std::set<std::string> files;
+    // Remove the last /
+    m_root_absolute_path = StringUtils::getPath(m_root);
+    m_root_absolute_path = file_manager->getFileSystem()
+        ->getAbsolutePath(m_root_absolute_path.c_str()).c_str();
+
+    file_manager->listFiles(files, m_root_absolute_path,
+        true/*make_full_path*/);
+    std::set<std::string> image_extensions =
+    {
+        "png", "jpg", "jpeg", "jpe", "svg"
+    };
+    for (const std::string& f : files)
+    {
+        if (image_extensions.find(StringUtils::getExtension(f)) !=
+            image_extensions.end())
+            GE::getGEConfig()->m_ondemand_load_texture_paths.insert(f);
+    }
+#endif
+}   // handleOnDemandLoadTexture
+
+//-----------------------------------------------------------------------------
 /** Loads the kart properties from a file.
  *  \param filename Filename to load.
  *  \param node Name of the xml node to load the data from
@@ -220,6 +265,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_is_addon = true;
     }
 
+    handleOnDemandLoadTexture();
     try
     {
         if(!root || root->getName()!="kart")
