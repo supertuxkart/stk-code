@@ -190,6 +190,11 @@ Track::Track(const std::string &filename)
 /** Destructor, removes quad data structures etc. */
 Track::~Track()
 {
+#ifndef SERVER_ONLY
+    if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+        GE::getGEConfig()->m_ondemand_load_texture_paths.erase(m_screenshot);
+#endif
+
     // Note that the music information in m_music is globally managed
     // by the music_manager, and is freed there. So no need to free it
     // here (esp. since various track might share the same music).
@@ -614,6 +619,14 @@ void Track::loadTrackInfo()
     if (m_screenshot.length() > 0)
     {
         m_screenshot = m_root+m_screenshot;
+#ifndef SERVER_ONLY
+        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+        {
+            m_screenshot = file_manager->getFileSystem()
+                ->getAbsolutePath(m_screenshot.c_str()).c_str();
+            GE::getGEConfig()->m_ondemand_load_texture_paths.insert(m_screenshot);
+        }
+#endif
     }
     delete root;
 

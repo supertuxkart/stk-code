@@ -1031,6 +1031,8 @@ void RaceManager::exitRace(bool delete_world)
         World::deleteWorld();
     }
 
+    // Reload track screenshot after delete_world (track textures are unloaded)
+    track_manager->onDemandLoadTrackScreenshots();
     m_saved_gp = NULL;
     m_track_number = 0;
 

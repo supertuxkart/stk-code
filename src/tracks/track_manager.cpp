@@ -175,6 +175,7 @@ void TrackManager::loadTrackList()
             loadTrack(dir+*subdir+"/");
         }   // for dir in dirs
     }   // for i <m_track_search_path.size()
+    onDemandLoadTrackScreenshots();
 }  // loadTrackList
 
 // ----------------------------------------------------------------------------
@@ -341,3 +342,19 @@ int TrackManager::getTrackIndexByIdent(const std::string& ident) const
     }
     return -1;
 }   // getTrackIndexByIdent
+
+// ----------------------------------------------------------------------------
+void TrackManager::onDemandLoadTrackScreenshots()
+{
+    if (irr_driver->getVideoDriver()->getDriverType() != video::EDT_VULKAN)
+        return;
+    for (unsigned i = 0; i < m_tracks.size(); i++)
+    {
+        if (m_tracks[i]->isInternal())
+            continue;
+        irr::video::ITexture* screenshot = irr_driver->getTexture(
+            m_tracks[i]->getScreenshotFile());
+        if (screenshot && screenshot->useOnDemandLoad())
+            screenshot->getTextureHandler();
+    }
+}   // onDemandLoadTrackScreenshots
