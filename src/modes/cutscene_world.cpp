@@ -251,7 +251,15 @@ void CutsceneWorld::update(int ticks)
         double now = StkTime::getRealTime();
         m_time = now - m_time_at_second_reset;
     }
-    
+
+    if (m_aborted)
+    {
+        // We can only set end duration after m_time is updated in the previous
+        // step
+        if (m_time < m_duration - m_fade_duration)
+            m_duration = m_time + m_fade_duration;
+    }
+
     float fade = 0.0f;
     float fadeIn = -1.0f;
     float fadeOut = -1.0f;

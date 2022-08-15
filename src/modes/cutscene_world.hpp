@@ -113,11 +113,7 @@ public:
     // ------------------------------------------------------------------------
     static void setUseDuration(bool use_duration) { s_use_duration = use_duration; }
     // ------------------------------------------------------------------------
-    void abortCutscene()
-    {
-        if (m_time < m_duration - m_fade_duration) m_duration = m_time + m_fade_duration;
-        m_aborted = true;
-    }
+    void abortCutscene() { m_aborted = true; }
 
 };   // CutsceneWorld
 
