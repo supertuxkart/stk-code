@@ -610,11 +610,13 @@ void CutsceneWorld::enterRaceOverState()
         // 'exitRace' will destroy this object so get the next part right now
         std::string next_part = m_parts[partId + 1];
 
+        // Save current screen pointer before exitRace
+        CutSceneGeneral* csg = dynamic_cast<CutSceneGeneral*>(GUIEngine::getCurrentScreen());
+
         RaceManager::get()->exitRace();
         RaceManager::get()->startSingleRace(next_part, 999, RaceManager::get()->raceWasStartedFromOverworld());
 
         // Keep showing cutscene gui if previous scene was using it
-        CutSceneGeneral* csg = dynamic_cast<CutSceneGeneral*>(GUIEngine::getCurrentScreen());
         if (csg != NULL)
         {
             CutSceneGeneral* scene = CutSceneGeneral::getInstance();
