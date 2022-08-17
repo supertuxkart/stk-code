@@ -57,6 +57,10 @@
 
 #include <iostream>
 
+#ifndef SERVER_ONLY
+#include <ge_main.hpp>
+#endif
+
 using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
@@ -417,6 +421,12 @@ void FeatureUnlockedCutScene::init()
 #endif
         else if (!m_unlocked_stuff[n].m_pictures.empty())
         {
+#ifndef SERVER_ONLY
+            bool vk = (GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+            if (vk)
+                GE::getGEConfig()->m_convert_irrlicht_mesh = true;
+#endif
+
             video::SMaterial m;
             //m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
             m.BackfaceCulling = true;
@@ -452,6 +462,11 @@ void FeatureUnlockedCutScene::init()
             m_unlocked_stuff[n].m_side_2
                 ->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
             mesh->drop();
+
+#ifndef SERVER_ONLY
+            if (vk)
+                GE::getGEConfig()->m_convert_irrlicht_mesh = false;
+#endif
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked track picture");
 #endif
