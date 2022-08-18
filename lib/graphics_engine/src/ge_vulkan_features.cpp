@@ -41,7 +41,7 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxDescriptorSetSampledImages&platform=all
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxPerStageDescriptorSamplers&platform=all
     // https://vulkan.gpuinfo.org/displaydevicelimit.php?name=maxPerStageDescriptorSampledImages&platform=all
-    // We decide 256 (GEVulkanShaderManager::getSamplerSize()) based on those infos
+    // We decide 512 (GEVulkanShaderManager::getSamplerSize()) based on those infos
     g_max_sampler_supported = std::min(
     {
         limit.maxDescriptorSetSamplers,

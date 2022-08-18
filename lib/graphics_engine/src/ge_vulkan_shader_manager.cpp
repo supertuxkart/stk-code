@@ -25,7 +25,7 @@ std::string g_predefines = "";
 // More when PBR is used later
 uint32_t g_mesh_texture_layer = 2;
 
-uint32_t g_sampler_size = 256;
+uint32_t g_sampler_size = 512;
 
 std::map<std::string, VkShaderModule> g_shaders;
 }   // GEVulkanShaderManager
