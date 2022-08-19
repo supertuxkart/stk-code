@@ -576,7 +576,7 @@ if(APPLE AND NOT IOS)
 
     if(CMAKE_GENERATOR MATCHES "Xcode")
         add_custom_command(TARGET supertuxkart POST_BUILD
-            COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/\${CONFIGURATION}/supertuxkart.app/Contents/Resources)
+            COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/\${CONFIGURATION}/supertuxkart.app/Contents/Resources)
     else()
         add_custom_command(TARGET supertuxkart POST_BUILD
             COMMAND ln -f -s ${PROJECT_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/bin/supertuxkart.app/Contents/Resources)
