@@ -38,6 +38,7 @@ CSkyBoxSceneNode::CSkyBoxSceneNode(video::ITexture* top, video::ITexture* bottom
 
 	video::SMaterial mat;
 	mat.Lighting = false;
+	mat.ZBuffer = video::ECFN_NEVER;
 	mat.ZWriteEnable = false;
 	mat.AntiAliasing=0;
 	mat.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
@@ -119,10 +120,10 @@ CSkyBoxSceneNode::CSkyBoxSceneNode(video::ITexture* top, video::ITexture* bottom
 
 	Material[5] = mat;
 	Material[5].setTexture(0, bottom);
-	Vertices[20] = video::S3DVertex( 1,-1, 1, 0,1,0, video::SColor(255,255,255,255), o, o);
-	Vertices[21] = video::S3DVertex( 1,-1,-1, 0,1,0, video::SColor(255,255,255,255), t, o);
-	Vertices[22] = video::S3DVertex(-1,-1,-1, 0,1,0, video::SColor(255,255,255,255), t, t);
-	Vertices[23] = video::S3DVertex(-1,-1, 1, 0,1,0, video::SColor(255,255,255,255), o, t);
+	Vertices[20] = video::S3DVertex( 1,-1, 1, 0,1,0, video::SColor(255,255,255,255), t, t);
+	Vertices[21] = video::S3DVertex( 1,-1,-1, 0,1,0, video::SColor(255,255,255,255), o, t);
+	Vertices[22] = video::S3DVertex(-1,-1,-1, 0,1,0, video::SColor(255,255,255,255), o, o);
+	Vertices[23] = video::S3DVertex(-1,-1, 1, 0,1,0, video::SColor(255,255,255,255), t, o);
 }
 
 
