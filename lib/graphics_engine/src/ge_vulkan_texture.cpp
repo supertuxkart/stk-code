@@ -28,9 +28,10 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
                  m_locked_data(NULL),
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
-                 m_texture_size(0), m_disable_reload(false),
-                 m_has_mipmaps(true), m_ondemand_load(false),
-                 m_ondemand_loading(false),
+                 m_texture_size(0), m_layer_count(1),
+                 m_image_view_type(VK_IMAGE_VIEW_TYPE_2D),
+                 m_disable_reload(false), m_has_mipmaps(true),
+                 m_ondemand_load(false), m_ondemand_loading(false),
                  m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
                  m_vk(getVKDriver())
 {
@@ -75,9 +76,10 @@ GEVulkanTexture::GEVulkanTexture(video::IImage* img, const std::string& name)
                  m_locked_data(NULL),
                  m_vulkan_device(getVKDriver()->getDevice()),
                  m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
-                 m_texture_size(0), m_disable_reload(true),
-                 m_has_mipmaps(true), m_ondemand_load(false),
-                 m_ondemand_loading(false),
+                 m_texture_size(0), m_layer_count(1),
+                 m_image_view_type(VK_IMAGE_VIEW_TYPE_2D),
+                 m_disable_reload(true), m_has_mipmaps(true),
+                 m_ondemand_load(false), m_ondemand_loading(false),
                  m_internal_format(VK_FORMAT_R8G8B8A8_UNORM),
                  m_vk(getVKDriver())
 {
@@ -102,9 +104,10 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
            : video::ITexture(name.c_str()), m_image_mani(nullptr),
              m_locked_data(NULL), m_vulkan_device(getVKDriver()->getDevice()),
              m_image(VK_NULL_HANDLE), m_vma_allocation(VK_NULL_HANDLE),
-             m_texture_size(0), m_disable_reload(true), m_has_mipmaps(true),
-             m_ondemand_load(false), m_ondemand_loading(false),
-             m_internal_format(single_channel ?
+             m_texture_size(0), m_layer_count(1),
+             m_image_view_type(VK_IMAGE_VIEW_TYPE_2D), m_disable_reload(true),
+             m_has_mipmaps(true), m_ondemand_load(false),
+             m_ondemand_loading(false), m_internal_format(single_channel ?
              VK_FORMAT_R8_UNORM : VK_FORMAT_R8G8B8A8_UNORM),
              m_vk(getVKDriver())
 {
@@ -229,14 +232,14 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
         {
             GEImageLevel& level = levels[i];
             copyBufferToImage(command_buffer, staging_buffer,
-                level.m_dim.Width, level.m_dim.Height, 0, 0, offset, i);
+                level.m_dim.Width, level.m_dim.Height, 0, 0, offset, i, 0);
             offset += level.m_size;
         }
     }
     else
     {
         copyBufferToImage(command_buffer, staging_buffer, m_size.Width,
-            m_size.Height, 0, 0, 0, 0);
+            m_size.Height, 0, 0, 0, 0, 0);
     }
 
     transitionImageLayout(command_buffer, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
@@ -261,13 +264,16 @@ bool GEVulkanTexture::createImage(VkImageUsageFlags usage)
     image_info.extent.height = m_size.Height;
     image_info.extent.depth = 1;
     image_info.mipLevels = getMipmapLevels();
-    image_info.arrayLayers = 1;
+    image_info.arrayLayers = m_layer_count;
     image_info.format = m_internal_format;
     image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
     image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     image_info.usage = usage;
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+    if (m_image_view_type == VK_IMAGE_VIEW_TYPE_CUBE ||
+        m_image_view_type == VK_IMAGE_VIEW_TYPE_CUBE_ARRAY)
+        image_info.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT;
 
     VmaAllocationCreateInfo alloc_info = {};
     alloc_info.usage = VMA_MEMORY_USAGE_AUTO;
@@ -295,7 +301,7 @@ void GEVulkanTexture::transitionImageLayout(VkCommandBuffer command_buffer,
     barrier.subresourceRange.baseMipLevel = 0;
     barrier.subresourceRange.levelCount = getMipmapLevels();
     barrier.subresourceRange.baseArrayLayer = 0;
-    barrier.subresourceRange.layerCount = 1;
+    barrier.subresourceRange.layerCount = m_layer_count;
 
     if (new_layout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
     {
@@ -376,7 +382,8 @@ void GEVulkanTexture::transitionImageLayout(VkCommandBuffer command_buffer,
 // ----------------------------------------------------------------------------
 void GEVulkanTexture::copyBufferToImage(VkCommandBuffer command_buffer,
                                         VkBuffer buffer, u32 w, u32 h, s32 x,
-                                        s32 y, u32 offset, u32 mipmap_level)
+                                        s32 y, u32 offset, u32 mipmap_level,
+                                        u32 layer_level)
 {
     VkBufferImageCopy region = {};
     region.bufferOffset = offset;
@@ -384,7 +391,7 @@ void GEVulkanTexture::copyBufferToImage(VkCommandBuffer command_buffer,
     region.bufferImageHeight = 0;
     region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
     region.imageSubresource.mipLevel = mipmap_level;
-    region.imageSubresource.baseArrayLayer = 0;
+    region.imageSubresource.baseArrayLayer = layer_level;
     region.imageSubresource.layerCount = 1;
     region.imageOffset = {x, y, 0};
     region.imageExtent = {w, h, 1};
@@ -399,13 +406,13 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
     VkImageViewCreateInfo view_info = {};
     view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     view_info.image = m_image;
-    view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    view_info.viewType = m_image_view_type;
     view_info.format = m_internal_format;
     view_info.subresourceRange.aspectMask = aspect_flags;
     view_info.subresourceRange.baseMipLevel = 0;
     view_info.subresourceRange.levelCount = getMipmapLevels();
     view_info.subresourceRange.baseArrayLayer = 0;
-    view_info.subresourceRange.layerCount = 1;
+    view_info.subresourceRange.layerCount = m_layer_count;
     if (isSingleChannel())
     {
         view_info.components.r = VK_COMPONENT_SWIZZLE_ONE;
@@ -694,7 +701,7 @@ void GEVulkanTexture::updateTexture(void* data, video::ECOLOR_FORMAT format,
     transitionImageLayout(command_buffer,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    copyBufferToImage(command_buffer, staging_buffer, w, h, x, y, 0, 0);
+    copyBufferToImage(command_buffer, staging_buffer, w, h, x, y, 0, 0, 0);
 
     bool blit_mipmap = true;
     if (isSingleChannel() && !GEVulkanFeatures::supportsR8Blit())

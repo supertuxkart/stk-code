@@ -39,6 +39,10 @@ protected:
 
     std::shared_ptr<std::atomic<VkImageView> > m_placeholder_view;
 
+    unsigned m_layer_count;
+
+    VkImageViewType m_image_view_type;
+
     unsigned int m_texture_size;
 
     const bool m_disable_reload;
@@ -72,7 +76,7 @@ protected:
     // ------------------------------------------------------------------------
     void copyBufferToImage(VkCommandBuffer command_buffer, VkBuffer buffer,
                            u32 w, u32 h, s32 x, s32 y, u32 offset,
-                           u32 mipmap_level);
+                           u32 mipmap_level, u32 layer_level);
     // ------------------------------------------------------------------------
     void upload(uint8_t* data, bool generate_hq_mipmap = false);
     // ------------------------------------------------------------------------
@@ -114,8 +118,10 @@ protected:
         return true;
     }
     // ------------------------------------------------------------------------
-    GEVulkanTexture() : video::ITexture(""), m_disable_reload(true),
-                        m_ondemand_load(false), m_ondemand_loading(false)    {}
+    GEVulkanTexture() : video::ITexture(""), m_layer_count(1),
+                        m_image_view_type(VK_IMAGE_VIEW_TYPE_2D),
+                        m_disable_reload(true), m_ondemand_load(false),
+                        m_ondemand_loading(false)                            {}
 public:
     // ------------------------------------------------------------------------
     GEVulkanTexture(const std::string& path,
