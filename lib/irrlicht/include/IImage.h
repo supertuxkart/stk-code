@@ -100,6 +100,8 @@ public:
 
 	virtual void setDeleteMemory(bool val) = 0;
 
+	virtual void setMemory(u8* memory) = 0;
+
 	//! get the amount of Bits per Pixel of the given color format
 	static u32 getBitsPerPixelFromFormat(const ECOLOR_FORMAT format)
 	{

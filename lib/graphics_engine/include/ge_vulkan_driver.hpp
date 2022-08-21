@@ -31,6 +31,7 @@ namespace GE
     {
         GVS_MIN = 0,
         GVS_NEAREST = GVS_MIN,
+        GVS_SKYBOX,
         GVS_3D_MESH_MIPMAP_2,
         GVS_3D_MESH_MIPMAP_4,
         GVS_3D_MESH_MIPMAP_16,

@@ -52,6 +52,9 @@ void GEVulkanCameraSceneNode::render()
     mat = m_ubo_data.m_projection_matrix * m_ubo_data.m_view_matrix;
 
     m_ubo_data.m_projection_view_matrix = mat;
+
+    m_ubo_data.m_projection_view_matrix.getInverse(
+        m_ubo_data.m_inverse_projection_view_matrix);
 }   // render
 
 // ----------------------------------------------------------------------------

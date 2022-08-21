@@ -462,5 +462,10 @@ void CImage::setDeleteMemory(bool val)
 	DeleteMemory = val;
 }
 
+void CImage::setMemory(u8* memory)
+{
+	Data = memory;
+}
+
 } // end namespace video
 } // end namespace irr

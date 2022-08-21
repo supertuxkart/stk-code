@@ -13,6 +13,7 @@
 #include "ge_vulkan_fbo_texture.hpp"
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
+#include "ge_vulkan_skybox_renderer.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "mini_glm.hpp"
@@ -43,6 +44,7 @@ void GEVulkanSceneManager::clear()
     irr::scene::CSceneManager::clear();
     static_cast<GEVulkanDriver*>(getVideoDriver())
         ->getMeshTextureDescriptor()->clear();
+    GEVulkanSkyBoxRenderer::destroy();
 }   // clear
 
 // ----------------------------------------------------------------------------
@@ -264,6 +266,12 @@ irr::u32 GEVulkanSceneManager::registerNodeForRendering(
 
     GEVulkanCameraSceneNode* cam = static_cast<
         GEVulkanCameraSceneNode*>(getActiveCamera());
+
+    if (node->getType() == irr::scene::ESNT_SKY_BOX)
+    {
+        GEVulkanSkyBoxRenderer::addSkyBox(cam, node);
+        return 1;
+    }
 
     if ((node->getType() == irr::scene::ESNT_ANIMATED_MESH &&
         pass != irr::scene::ESNRP_SOLID) ||

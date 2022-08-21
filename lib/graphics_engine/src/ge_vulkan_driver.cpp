@@ -13,6 +13,7 @@
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_scene_manager.hpp"
 #include "ge_vulkan_shader_manager.hpp"
+#include "ge_vulkan_skybox_renderer.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include "ISceneManager.h"
@@ -629,6 +630,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
         GE::setVideoDriver(this);
         createUnicolorTextures();
         GEVulkan2dRenderer::init(this);
+        GEVulkanSkyBoxRenderer::init();
         m_mesh_texture_descriptor = new GEVulkanTextureDescriptor(
             GEVulkanShaderManager::getSamplerSize(),
             GEVulkanShaderManager::getMeshTextureLayer(),
@@ -680,6 +682,7 @@ void GEVulkanDriver::destroyVulkan()
         m_irrlicht_device->getSceneManager()->getMeshCache())
         getVulkanMeshCache()->destroy();
     delete m_mesh_texture_descriptor;
+    GEVulkanSkyBoxRenderer::destroy();
     GEVulkan2dRenderer::destroy();
     GEVulkanShaderManager::destroy();
 
@@ -1358,11 +1361,27 @@ void GEVulkanDriver::createSamplers()
         throw std::runtime_error("vkCreateSampler failed for GVS_NEAREST");
     m_vk->samplers[GVS_NEAREST] = sampler;
 
-    const float max_aniso = m_properties.limits.maxSamplerAnisotropy;
-    // GVS_3D_MESH_MIPMAP_2
+    // GVS_SKYBOX
+    sampler_info.anisotropyEnable = false;
     sampler_info.magFilter = VK_FILTER_LINEAR;
     sampler_info.minFilter = VK_FILTER_LINEAR;
     sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+    result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
+        &sampler);
+
+    if (result != VK_SUCCESS)
+        throw std::runtime_error("vkCreateSampler failed for GVS_SKYBOX");
+    m_vk->samplers[GVS_SKYBOX] = sampler;
+
+    const float max_aniso = m_properties.limits.maxSamplerAnisotropy;
+    // GVS_3D_MESH_MIPMAP_2
+    sampler_info.anisotropyEnable = supported_anisotropy;
+    sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+    sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
     sampler_info.maxAnisotropy = std::min(2.0f, max_aniso);
     result = vkCreateSampler(m_vk->device, &sampler_info, NULL,
         &sampler);

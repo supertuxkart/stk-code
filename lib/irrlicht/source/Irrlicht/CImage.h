@@ -105,6 +105,8 @@ public:
 
 	virtual void setDeleteMemory(bool val);
 
+	virtual void setMemory(u8* memory);
+
 private:
 
 	//! assumes format and size has been set and creates the rest

@@ -14,6 +14,7 @@ irr::core::matrix4 m_projection_matrix;
 irr::core::matrix4 m_inverse_view_matrix;
 irr::core::matrix4 m_inverse_projection_matrix;
 irr::core::matrix4 m_projection_view_matrix;
+irr::core::matrix4 m_inverse_projection_view_matrix;
 };
 
 class GEVulkanCameraSceneNode : public irr::scene::CCameraSceneNode
@@ -40,7 +41,7 @@ public:
     // ------------------------------------------------------------------------
     irr::core::matrix4 getPVM() const;
     // ------------------------------------------------------------------------
-    void* getUBOData() const                     { return (void*)&m_ubo_data; }
+    const GEVulkanCameraUBO* const getUBOData() const   { return &m_ubo_data; }
 };   // GEVulkanCameraSceneNode
 
 }

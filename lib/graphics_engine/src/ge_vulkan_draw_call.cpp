@@ -798,7 +798,8 @@ void GEVulkanDrawCall::uploadDynamicData(GEVulkanDriver* vk,
         }
     }
 
-    m_data_uploading.emplace_back(cam->getUBOData(), sizeof(GEVulkanCameraUBO));
+    m_data_uploading.emplace_back((void*)cam->getUBOData(),
+        sizeof(GEVulkanCameraUBO));
     object_data_uploading.insert(object_data_uploading.end(),
         m_data_uploading.begin(), m_data_uploading.end());
     std::swap(m_data_uploading, object_data_uploading);
