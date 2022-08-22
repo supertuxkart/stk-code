@@ -13,6 +13,7 @@
 #include "ge_vulkan_mesh_cache.hpp"
 #include "ge_vulkan_mesh_scene_node.hpp"
 #include "ge_vulkan_shader_manager.hpp"
+#include "ge_vulkan_skybox_renderer.hpp"
 #include "ge_vulkan_texture_descriptor.hpp"
 
 #include <algorithm>
@@ -231,7 +232,8 @@ void GEVulkanDrawCall::generate()
                 m_graphics_pipelines[cur_shader].second;
             std::string sorting_key =
                 std::string(1, settings.m_drawing_priority) + cur_shader;
-            m_cmds.push_back({ cmd, cur_shader, sorting_key, p.first });
+            m_cmds.push_back({ cmd, cur_shader, sorting_key, p.first,
+                settings.isTransparent() });
         }
     }
     if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
@@ -260,6 +262,12 @@ void GEVulkanDrawCall::generate()
         [](const DrawCallData& a, const DrawCallData& b)
         {
             return a.m_sorting_key < b.m_sorting_key;
+        });
+
+    std::stable_partition(m_cmds.begin(), m_cmds.end(),
+        [](const DrawCallData& a)
+        {
+            return !a.m_transparent;
         });
 }   // generate
 
@@ -947,6 +955,7 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         GEVulkanFeatures::supportsBindMeshTexturesAtOnce();
 
     std::string cur_pipeline = m_cmds[0].m_shader;
+    bool drawn_skybox = false;
     if (use_multidraw)
     {
         size_t indirect_offset = m_skinning_data_padded_size +
@@ -964,6 +973,20 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                 indirect_offset += draw_count * indirect_size;
                 draw_count = 1;
                 cur_pipeline = m_cmds[i].m_shader;
+
+                if (m_cmds[i].m_transparent && !drawn_skybox)
+                {
+                    drawn_skybox = true;
+                    GEVulkanSkyBoxRenderer::render(cmd, cam);
+
+                    vkCmdBindDescriptorSets(cmd,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0,
+                        1, m_texture_descriptor->getDescriptorSet(), 0, NULL);
+
+                    vkCmdBindDescriptorSets(cmd,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1, 1,
+                    &m_data_descriptor_sets[cur_frame], 0, NULL);
+                }
                 continue;
             }
             draw_count++;
@@ -990,6 +1013,26 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
         for (unsigned i = 0; i < m_cmds.size(); i++)
         {
             const VkDrawIndexedIndirectCommand& cur_cmd = m_cmds[i].m_cmd;
+            if (m_cmds[i].m_transparent && !drawn_skybox)
+            {
+                drawn_skybox = true;
+                GEVulkanSkyBoxRenderer::render(cmd, cam);
+
+                if (!GEVulkanFeatures::supportsBindMeshTexturesAtOnce())
+                {
+                    vkCmdBindDescriptorSets(cmd,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 0,
+                        1, &m_texture_descriptor->getDescriptorSet()[cur_mid],
+                        0, NULL);
+                }
+                if (use_base_vertex)
+                {
+                    vkCmdBindDescriptorSets(cmd,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline_layout, 1,
+                        1, &m_data_descriptor_sets[cur_frame], 0, NULL);
+                }
+            }
+
             int mid = 0;
             if (use_base_vertex)
                 mid = m_materials[cur_cmd.vertexOffset];
@@ -1027,6 +1070,8 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
                 use_base_vertex ? cur_cmd.firstInstance : 0);
         }
     }
+    if (!drawn_skybox)
+        GEVulkanSkyBoxRenderer::render(cmd, cam);
 }   // render
 
 }

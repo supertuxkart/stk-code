@@ -63,6 +63,7 @@ struct DrawCallData
     std::string m_shader;
     std::string m_sorting_key;
     GESPMBuffer* m_mb;
+    bool m_transparent;
 };
 
 class GEVulkanDrawCall
