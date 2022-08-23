@@ -425,6 +425,13 @@ void Track::cleanup()
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
     {
         video::ITexture* tex = (video::ITexture*)m_sky_textures[i];
+#ifndef SERVER_ONLY
+        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+        {
+            std::string fullpath = tex->getFullPath().c_str();
+            GE::getGEConfig()->m_ondemand_load_texture_paths.erase(fullpath);
+        }
+#endif
         tex->drop();
         if (tex->getReferenceCount() == 1)
             irr_driver->removeTexture(tex);
@@ -2490,6 +2497,19 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
             else
 #endif   // !SERVER_ONLY
             {
+#ifndef SERVER_ONLY
+                if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+                {
+                    io::path p = file_manager->searchTexture(v[i]).c_str();
+                    if (!p.empty())
+                    {
+                        io::path fullpath = file_manager->getFileSystem()
+                            ->getAbsolutePath(p).c_str();
+                        GE::getGEConfig()->m_ondemand_load_texture_paths.
+                            insert(fullpath.c_str());
+                    }
+                }
+#endif
                 video::ITexture* t = irr_driver->getTexture(v[i]);
                 if (t)
                 {
