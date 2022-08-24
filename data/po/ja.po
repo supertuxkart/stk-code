@@ -5,6 +5,7 @@
 # Translators:
 # Benau, 2020
 # Benau, 2020
+# Bobby Youstra, 2022
 # David Blaszyk <david@sudomail.ne.jp>, 2017
 # Happymc! <isena200536@gmail.com>, 2019-2020,2022
 # lindwurm, 2015
@@ -14,6 +15,7 @@
 # lip_of_cygnus <Shinya1248@gmail.com>, 2015
 # Masayuki Sugahara <brindflontia@gmail.com>, 2015
 # ミスターK <kazma.otsubo@gmail.com>, 2020
+# Otsubo Kazma, 2022
 # paontv <paonntv@gmail.com>, 2020
 # paontv <paonntv@gmail.com>, 2020
 # lip_of_cygnus <Shinya1248@gmail.com>, 2015
@@ -27,7 +29,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-25 09:02+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Happymc! <isena200536@gmail.com>, 2019-2020,2022\n"
+"Last-Translator: Otsubo Kazma, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/supertuxkart/supertuxkart/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -432,7 +434,7 @@ msgstr "後ろ向きのカメラ"
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
 msgid "Follow ball in soccer mode"
-msgstr ""
+msgstr "サッカーモードでボールを追う"
 
 #. I18N: ./data/gui/dialogs/custom_camera_settings.stkgui
 #. I18N: In the ui/camera screen
@@ -1218,7 +1220,7 @@ msgstr "逆方向"
 #: src/states_screens/track_info_screen.cpp:284
 #: src/states_screens/track_info_screen.cpp:450
 msgid "Maximum time (min.)"
-msgstr ""
+msgstr "最高時間 （分）"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -3584,7 +3586,7 @@ msgstr "勝った！"
 #: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr ""
+msgstr "ランク%d位でフィニッシュ！"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1156
@@ -4701,7 +4703,7 @@ msgstr ""
 msgid ""
 "Enter the server address optionally followed by : and then port or select "
 "address from list."
-msgstr ""
+msgstr " サーバーアドレスを入力してください（ポートの入力は任意）"
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:124
 #, c-format
@@ -4782,7 +4784,7 @@ msgstr ""
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:125
 #, c-format
 msgid "Number of karts: %d"
-msgstr ""
+msgstr "カートの数：%d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:137
 #, c-format
@@ -4818,7 +4820,7 @@ msgstr "スライダーから色を選んでください"
 
 #: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
-msgstr ""
+msgstr "二度と表示しない"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:50
@@ -4883,7 +4885,7 @@ msgstr "サーバー管理者にこのプレイヤーについて教える (%s):
 msgid ""
 "Press any key...\n"
 "(Press ESC to cancel)"
-msgstr ""
+msgstr "どれかキーを押してください…（ESCを押してキャンセル）"
 
 #: src/states_screens/dialogs/press_a_key_dialog.cpp:49
 msgid "Press any key..."
@@ -4909,7 +4911,7 @@ msgstr "バトルをリスタートする"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:137
 msgid "Exit Battle"
-msgstr ""
+msgstr "バトルをやめる"
 
 #: src/states_screens/dialogs/race_paused_dialog.cpp:144
 #: src/states_screens/race_result_gui.cpp:347
@@ -5261,7 +5263,7 @@ msgstr "グランプリを制覇しました！"
 #: src/states_screens/high_score_selection.cpp:144
 msgctxt "column_name"
 msgid "Number of karts"
-msgstr ""
+msgstr "カートの数"
 
 #: src/states_screens/high_score_selection.cpp:352
 msgid "Are you sure you want to remove this high score entry?"
@@ -5324,7 +5326,7 @@ msgstr "アドオンがロードされるまで、しばらくお待ち下さい
 
 #: src/states_screens/main_menu_screen.cpp:654
 msgid "Are you sure you want to quit STK?"
-msgstr ""
+msgstr "STKを終了しますか？"
 
 #: src/states_screens/online/create_server_screen.cpp:100
 msgid "Create LAN Server"
@@ -5480,19 +5482,19 @@ msgstr "オフライン"
 
 #: src/states_screens/online/online_profile_settings.cpp:79
 msgid "Enter new E-mail below"
-msgstr ""
+msgstr "下に新しいメールアドレスを入力してください"
 
 #: src/states_screens/online/online_profile_settings.cpp:84
 msgid "New Email has to be between 5 and 254 characters long!"
-msgstr ""
+msgstr "Eメールを5文字から254文字にしてください！"
 
 #: src/states_screens/online/online_profile_settings.cpp:93
 msgid "New Email is invalid!"
-msgstr ""
+msgstr "新しいEメールが無効です！"
 
 #: src/states_screens/online/online_profile_settings.cpp:118
 msgid "E-mail changed!"
-msgstr ""
+msgstr "Eメールが変更されました！"
 
 #: src/states_screens/online/online_profile_settings.cpp:120
 #, c-format
@@ -5534,7 +5536,7 @@ msgstr "ユーザー名を空にすることができません。"
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr ""
+msgstr "ユーザー名とパスワードを同じにすることはできません。"
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
@@ -5893,7 +5895,7 @@ msgstr "ゲームはストーリーモードを初めて以来閉じていない
 #. I18N: In the video options, maximum frame per second
 #: src/states_screens/options/options_screen_video.cpp:236
 msgid "Maximum FPS"
-msgstr ""
+msgstr "最大FPS"
 
 #. I18N: In the video options, full vertical sync (usually 60fps)
 #: src/states_screens/options/options_screen_video.cpp:244
@@ -6240,7 +6242,7 @@ msgstr "ゴーストカートと競争して、記録を破ってみてくださ
 
 #: src/states_screens/race_setup_screen.cpp:143
 msgid "Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "限られた時間の中で出来る限りラップを完了しよう。"
 
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118
@@ -6268,7 +6270,7 @@ msgstr "赤いチームのAIカートの数:"
 msgid ""
 "You cannot play this Grand Prix because it contains tracks that aren't "
 "unlocked!"
-msgstr ""
+msgstr "まだアンロックしていないコースがあるので、グランプリをプレイできません！"
 
 #. I18N: track group name
 #: src/states_screens/tracks_and_gp_screen.cpp:157
@@ -6419,7 +6421,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr ""
+msgstr "カート、ニトロ、アクション! SuperTuxKartは3Dオープンソースのアーケードレースゲームで、様々なキャラクター、トラック、モードが遊べます。私たちは、リアルさよりも楽しさを追求し、あらゆる年齢層の方に楽しんでいただけるゲームを目指しています。"
 
 #: supertuxkart.appdata.xml:11
 msgid ""
@@ -6428,7 +6430,7 @@ msgid ""
 " while avoiding other karts as they may overtake you, but don't eat the "
 "bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
 "your opponents."
-msgstr ""
+msgstr "水中、農村、ジャングル、宇宙など、様々なテーマのコースを用意しています。他のカートに追い越されないように、バナナを食べずに頑張ってください。ボウリングの玉、ラバーカップ、ガム、ケーキなど、敵が投げてくるものにも気をつけよう。"
 
 #: supertuxkart.appdata.xml:14
 msgid ""
@@ -6437,28 +6439,28 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr ""
+msgstr "他のカートとのシングルレース、いくつかのグランプリでの競争、タイムトライアルでのハイスコア更新、コンピューターや友人とのバトルモードなど、さまざまなことができます。より大きな挑戦として、オンラインに参加して世界中のプレーヤーと出会い、あなたのレーススキルを証明しよう!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."
-msgstr ""
+msgstr "このゲームは広告がありません。"
 
 #: supertuxkart.appdata.xml:20
 msgid ""
 "This is an unstable version of SuperTuxKart that contains latest "
 "improvements. It is released mainly for testing, to make stable STK as good "
 "as possible."
-msgstr ""
+msgstr "このSuperTuxKartは最新の改善点を含めた不安定なバージョンです。これらはSTKをより安定にするためにリリースされています。"
 
 #: supertuxkart.appdata.xml:23
 msgid ""
 "This version can be installed in parallel with the stable version on the "
 "device."
-msgstr ""
+msgstr "このバージョンは端末で安定したバージョンとパラレルでインストールできます。"
 
 #: supertuxkart.appdata.xml:26
 msgid "If you need more stability, consider using the stable version: %s"
-msgstr ""
+msgstr "もっと安定性が必要なら、安定したバージョン%sを検討してください。"
 
 #: supertuxkart.appdata.xml:44
 msgid "SuperTuxKart Team"

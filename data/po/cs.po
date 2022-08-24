@@ -3407,7 +3407,7 @@ msgstr "Formát souboru s nastaveními ovládacích zařízení není slučiteln
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:159
 msgid "Guide"
-msgstr ""
+msgstr "Průvodce"
 
 #. I18N: name of buttons on gamepads
 #: src/input/gamepad_config.cpp:161
@@ -4793,7 +4793,7 @@ msgstr "Počet motokár: %d"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:137
 #, c-format
 msgid "Time target: %s"
-msgstr ""
+msgstr "Cílový čas: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:139
 #, c-format
@@ -4824,7 +4824,7 @@ msgstr "Barvu zvolíte posuvníkem"
 
 #: src/states_screens/dialogs/message_dialog.cpp:145
 msgid "Don't show again"
-msgstr ""
+msgstr "Nezobrazovat znovu"
 
 #. I18N: In the network player dialog
 #: src/states_screens/dialogs/network_player_dialog.cpp:50
@@ -5546,7 +5546,7 @@ msgstr "Uživatelské jméno je třeba vyplnit."
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr ""
+msgstr "On-line uživatelské jméno a heslo nesmí být stejné!"
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
@@ -5556,7 +5556,7 @@ msgstr "E-maily se neshodují!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "On-line uživatelské jméno může obsahovat pouze alfanumerické (ASCII) znaky, tečky, pomlčky a podtržítka!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -6219,7 +6219,7 @@ msgstr "Neuspěli jste ve výzvě!"
 
 #: src/states_screens/race_result_gui.cpp:2149
 msgid "Reached Requirements of SuperTux"
-msgstr ""
+msgstr "Splněny požadavky úrovně SuperTux"
 
 #: src/states_screens/race_setup_screen.cpp:89
 msgid "All blows allowed, so catch weapons and make clever use of them!"
@@ -6252,7 +6252,7 @@ msgstr "Závoďte proti motokárám duchů a pokuste se je porazit!"
 
 #: src/states_screens/race_setup_screen.cpp:143
 msgid "Complete as many laps as possible in a given amount of time."
-msgstr ""
+msgstr "Dokončete co nejvíce kol za daný čas."
 
 #. I18N: In soccer setup screen
 #: src/states_screens/soccer_setup_screen.cpp:118

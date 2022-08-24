@@ -5554,7 +5554,7 @@ msgstr "Chan eil an dà phost-d co-ionnann!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Chan fhaod ach litrichean gun sràcan ’s àireamhan (ASCII), puingean, tàthanan is fo-loidhnichean a bhith san ainm-cleachdaiche air loidhne!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"

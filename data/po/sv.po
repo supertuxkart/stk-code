@@ -1712,7 +1712,7 @@ msgstr "Varvförsök"
 #: src/states_screens/dialogs/select_challenge.cpp:51
 #: src/states_screens/high_score_selection.cpp:136
 msgid "Grand Prix"
-msgstr "Grand prix-tävling"
+msgstr "Grand Prix"
 
 #. I18N: ./data/gui/screens/karts.stkgui
 #. I18N: In the kart selection (player setup) screen
@@ -5551,7 +5551,7 @@ msgstr "E-posten matchar inte!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Användarnamn på nätet kan endast innehålla alfanumeriska (ASCII) tecken, punkter, bindestreck och understreck!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"

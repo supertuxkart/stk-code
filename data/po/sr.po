@@ -10,7 +10,7 @@
 # SUABNINISAN alalalala <sinisaisepicbutpleasemorealts@gmail.com>, 2020
 # SUABNINISAN alalalala <sinisaisepicbutpleasemorealts@gmail.com>, 2020
 # Мирослав Николић <miroslavnikolic@rocketmail.com>, 2011
-# Саша Петровић <salepetronije@gmail.com>, 2012-2014,2016,2018,2020-2021
+# Саша Петровић <salepetronije@gmail.com>, 2012-2014,2016,2018,2020-2022
 # Саша Петровић <salepetronije@gmail.com>, 2015-2016
 # Саша Петровић <salepetronije@gmail.com>, 2016
 # Саша Петровић <salepetronije@gmail.com>, 2016-2017
@@ -22,7 +22,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-25 09:02+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Саша Петровић <salepetronije@gmail.com>, 2012-2014,2016,2018,2020-2021\n"
+"Last-Translator: Саша Петровић <salepetronije@gmail.com>, 2012-2014,2016,2018,2020-2022\n"
 "Language-Team: Serbian (http://www.transifex.com/supertuxkart/supertuxkart/language/sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1698,7 +1698,7 @@ msgstr "Избор врхунских достигнућа"
 #. time.
 #: src/race/race_manager.cpp:1270 src/states_screens/race_setup_screen.cpp:142
 msgid "Lap Trial"
-msgstr ""
+msgstr "Пробни круг"
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen

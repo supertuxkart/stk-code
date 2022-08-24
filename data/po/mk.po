@@ -5535,7 +5535,7 @@ msgstr "Електронските пошти не се поклопуваат!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Онлајн корисничкото име може да содржи само алфанумерички  (ASCII) карактери, точки, коси црти и долни црти!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"

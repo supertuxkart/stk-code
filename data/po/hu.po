@@ -6,7 +6,7 @@
 # Balázs Meskó <meskobalazs@mailbox.org>, 2019
 # Balázs Meskó <meskobalazs@mailbox.org>, 2019,2021
 # Balázs Úr, 2019
-# Balázs Úr, 2019-2021
+# Balázs Úr, 2019-2022
 # Balázs Úr, 2018-2019
 # Balázs Úr, 2016-2018
 # Bangó Máté <matepenpals@hotmail.com>, 2016
@@ -19,7 +19,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-25 09:02+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Guih48, 2022\n"
+"Last-Translator: Balázs Úr, 2019-2022\n"
 "Language-Team: Hungarian (http://www.transifex.com/supertuxkart/supertuxkart/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1695,7 +1695,7 @@ msgstr "Legmagasabb pontszám kiválasztás"
 #. time.
 #: src/race/race_manager.cpp:1270 src/states_screens/race_setup_screen.cpp:142
 msgid "Lap Trial"
-msgstr ""
+msgstr "Körfutam"
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
@@ -4119,7 +4119,7 @@ msgstr[1] "%d aréna nem érhető el egyszemélyes módban."
 
 #: src/states_screens/credits.cpp:184
 msgid "translator-credits"
-msgstr "Launchpad Contributions:\nBalázs Meskó, 2019\nBalázs Úr, 2019\nBalázs Úr, 2019-2021\nBalázs Úr, 2018-2019\nBalázs Úr, 2016-2018\nBangó Máté, 2016\nViktor Busanszki, 2015\nBalint\nGyönki Bendegúz\nJacob\nJf. Tasz\nMolditz György\nPapp Bence\nSTK-team\nÚr Balázs"
+msgstr "Launchpad Contributions:\nBangó Máté, 2016\nBusanszki Viktor, 2015\nGyönki Bendegúz\nMeskó Balázs, 2019-2022\nMolditz György\nPapp Bence\nÚr Balázs, 2016-2022"
 
 #: src/states_screens/dialogs/achievement_progress_dialog.cpp:65
 msgctxt "achievement_info"
@@ -4699,7 +4699,7 @@ msgstr "A SuperTuxKart program le fogja tölteni a teljes adatelemet (beleértve
 msgid ""
 "Enter the server address optionally followed by : and then port or select "
 "address from list."
-msgstr "Add meg a kiszolgáló címét és opcionálisan kettősponttal elválasztva a portot, vagy válassz címet a listából."
+msgstr "Add meg a kiszolgáló címét és esetlegesen kettősponttal elválasztva a portot, vagy válassz címet a listából."
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:124
 #, c-format
@@ -5480,24 +5480,24 @@ msgstr "Kilépett"
 
 #: src/states_screens/online/online_profile_settings.cpp:79
 msgid "Enter new E-mail below"
-msgstr "Adj meg új e-mail címet lent"
+msgstr "Adj meg új e-mail-címet lent"
 
 #: src/states_screens/online/online_profile_settings.cpp:84
 msgid "New Email has to be between 5 and 254 characters long!"
-msgstr "Az új e-mail címnek 5 és 254 karakter közötti hosszúnak kell lennie!"
+msgstr "Az új e-mail-címnek 5 és 254 karakter közötti hosszúnak kell lennie!"
 
 #: src/states_screens/online/online_profile_settings.cpp:93
 msgid "New Email is invalid!"
-msgstr "Az új e-mail cím érvénytelen!"
+msgstr "Az új e-mail-cím érvénytelen!"
 
 #: src/states_screens/online/online_profile_settings.cpp:118
 msgid "E-mail changed!"
-msgstr "Az e-mail cím megváltozott!"
+msgstr "Az e-mail-cím megváltozott!"
 
 #: src/states_screens/online/online_profile_settings.cpp:120
 #, c-format
 msgid "Failed to change E-mail: %s"
-msgstr "Az e-mail cím módosítása sikertelen: %s"
+msgstr "Az e-mail-cím megváltoztatása sikertelen: %s"
 
 #. I18N: Shown to players when he is not is not logged in
 #: src/states_screens/online/online_screen.cpp:201
@@ -5534,7 +5534,7 @@ msgstr "A felhasználónév nem lehet üres."
 
 #: src/states_screens/online/register_screen.cpp:362
 msgid "Online username and password must not be the same!"
-msgstr "Online felhasználóneved és jelszavad nem lehet azonos!"
+msgstr "Internetes felhasználóneved és jelszavad nem lehet azonos!"
 
 #: src/states_screens/online/register_screen.cpp:366
 msgid "Emails don't match!"
@@ -5544,7 +5544,7 @@ msgstr "Az e-mail címek nem egyeznek!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Az internetes felhasználónév csak alfanumerikus (ASCII) karaktereket, pontokat, kötőjeleket és aláhúzásokat tartalmazhat!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -6419,7 +6419,7 @@ msgid ""
 "variety of characters, tracks, and modes to play. Our aim is to create a "
 "game that is more fun than realistic, and provide an enjoyable experience "
 "for all ages."
-msgstr "Gokartok. Nitró. Akcíó! A SuperTuxKart egy 3D-s nyílt forráskódú versenyjáték számos karakterrel, pályával és játékmóddal. A célunk hogy a játék szórakoztatóbb legyen, mintsem valósághű, és szórakoztató élményt nyújtson minden korosztálynak."
+msgstr "Gokartok. Nitró. Akcíó! A SuperTuxKart egy 3D-s, nyílt forráskódú versenyjáték számos karakterrel, pályával és játékmóddal. A célunk, hogy a játék szórakoztatóbb legyen, mintsem valósághű, és szórakoztató élményt nyújtson minden korosztálynak."
 
 #: supertuxkart.appdata.xml:11
 msgid ""
@@ -6428,7 +6428,7 @@ msgid ""
 " while avoiding other karts as they may overtake you, but don't eat the "
 "bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
 "your opponents."
-msgstr "Számos pályánk van különböző témával, melyet élvezhetnek a játékosok: vezetés a víz alatt, egy vidéki gazdaságban, a dzsungelben vagy akár akár a világűrben! Próbáld elkerülni a többi gokartot, mert leelőzhetnek, de ne edd meg a banánokat! Figyelj az ellenfelek által kilőtt tekegolyókra, WC-pumpákra, rágógumikra és tortákra. "
+msgstr "Számos pályánk van különböző témával, amelyet élvezhetnek a játékosok: vezetés a víz alatt, egy vidéki gazdaságban, a dzsungelben vagy akár akár a világűrben! Próbáld elkerülni a többi gokartot, mert leelőzhetnek, de ne edd meg a banánokat! Figyelj az ellenfelek által kilőtt tekegolyókra, WC-pumpákra, rágógumikra és tortákra. "
 
 #: supertuxkart.appdata.xml:14
 msgid ""
@@ -6437,7 +6437,7 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr "Versenyezhetsz más gokartokkal különálló futamokon, részt vehetsz nagydíjakon, megpróbálhatod egyedül elérni a legjobb köridőt, játszhatsz csata módban a számítógép ellen, vagy barátokkal, és még sok mást! A nagyobb kihíváshoz csatlakozz online, találkozz játékosokkal a világ minden tájáról, és mutasd meg a vezetési képességeidet!"
+msgstr "Versenyezhetsz más gokartokkal különálló futamokon, részt vehetsz nagydíjakon, megpróbálhatod egyedül elérni a legjobb köridőt, játszhatsz csata módban a számítógép ellen vagy barátokkal, és még sok mást! A nagyobb kihíváshoz csatlakozz az internetre, találkozz játékosokkal a világ minden tájáról, és mutasd meg a vezetési képességeidet!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."

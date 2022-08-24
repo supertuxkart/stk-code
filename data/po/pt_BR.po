@@ -98,7 +98,7 @@ msgstr "Ás do volante"
 msgid ""
 "Win against at least 3 AIs in normal race, time-trial, and follow the "
 "leader."
-msgstr "Ganhe de pelo menos três bots nas modalidades corrida normal, corrida sem itens e siga o mestre."
+msgstr "Ganhe de pelo menos três karts computadorizados nas modalidades corrida normal, corrida sem itens e siga o mestre."
 
 #. I18N: ./data/achievements.xml
 msgid "Powerup Love"
@@ -116,7 +116,7 @@ msgstr "Imbatível"
 msgid ""
 "Win 5 single races in a row against at least 3 AIs. Beware, restarting a "
 "race counts as a loss."
-msgstr "Ganhe cinco corridas seguidas contra pelo menos três bots.\nTome cuidado, pois reiniciar uma corrida conta como derrota."
+msgstr "Ganhe cinco corridas seguidas contra pelo menos três karts computadorizados.\nTome cuidado, pois reiniciar uma corrida conta como derrota."
 
 #. I18N: ./data/achievements.xml
 msgid "Banana Lover"
@@ -152,7 +152,7 @@ msgstr "Não é só sorte"
 msgid ""
 "Win 10 single races in a row in Expert or SuperTux against at least 5 AIs. "
 "Beware, restarting a race counts as a loss."
-msgstr "Ganhe dez corridas seguidas contra pelo menos cinco bots nas dificuldades Experiente ou Super Tux.\nTome cuidado, pois reiniciar uma corrida conta como derrota."
+msgstr "Ganhe dez corridas seguidas contra pelo menos cinco karts computadorizados nas dificuldades Experiente ou Super Tux.\nTome cuidado, pois reiniciar uma corrida conta como derrota."
 
 #. I18N: ./data/grandprix/1_penguinplayground.grandprix
 msgid "Penguin Playground"
@@ -233,7 +233,7 @@ msgstr "Aceleração automática"
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 msgid "You can change it later in touch device settings."
-msgstr "Opção presente nas configurações para dispositivos táteis."
+msgstr "Para alterar essa configuração depois, acesse o menu de opções para dispositivos táteis."
 
 #. I18N: ./data/gui/dialogs/android/init_android.stkgui
 #. I18N: ./data/gui/dialogs/android/multitouch_settings.stkgui
@@ -652,7 +652,7 @@ msgstr "Enviar"
 #. I18N: Race paused button
 #: src/states_screens/dialogs/race_paused_dialog.cpp:141
 msgid "Back to Race"
-msgstr "Retornar à corrida"
+msgstr "Retornar ao jogo"
 
 #. I18N: ./data/gui/dialogs/online/network_ingame_dialog.stkgui
 #. I18N: Show in network ingame dialog to allow user to go back to lobby to
@@ -1200,7 +1200,7 @@ msgstr "Gravar replay para modo fantasma"
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
 msgid "AI karts"
-msgstr "Quantidade de bots"
+msgstr "Karts controlados pelo computador"
 
 #. I18N: ./data/gui/screens/gp_info.stkgui
 #. I18N: In the grand prix info screen
@@ -1845,7 +1845,7 @@ msgstr "Configurações"
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: In the networking menu
 msgid "Enable splitscreen or player handicaps"
-msgstr "Ativar multijogador local ou desvantagens individuais"
+msgstr "Jogar com mais de um jogador neste dispositivo"
 
 #. I18N: ./data/gui/screens/online/online.stkgui
 #. I18N: Networking menu button
@@ -2360,12 +2360,12 @@ msgstr "Número de voltas"
 #: src/states_screens/online/create_server_screen.cpp:189
 #: src/states_screens/track_info_screen.cpp:195
 msgid "Number of AI karts"
-msgstr "Quantidade de \"bots\""
+msgstr "Karts controlados pelo computador"
 
 #. I18N: ./data/gui/screens/track_info.stkgui
 #. I18N: In the track info screen
 msgid "Number of blue team AI karts"
-msgstr "\"Bots\" no time azul"
+msgstr "Karts azuis computadorizados"
 
 #. I18N: ./data/gui/screens/tracks_and_gp.stkgui
 #. I18N: In the track and grand prix selection screen
@@ -2418,7 +2418,7 @@ msgstr "O menu de ajuda contém várias informações úteis."
 
 #. I18N: ./data/tips.xml
 msgid "In single-player, you can watch and challenge recorded time-trials."
-msgstr "No modo de um jogador, é possível assistir e enfrentar fantasmas gravados em corridas cronometradas."
+msgstr "No modo de um jogador, você pode assistir aos fantasmas de corridas sem itens e até mesmo correr contra eles."
 
 #. I18N: ./data/tips.xml
 msgid ""
@@ -3732,7 +3732,7 @@ msgstr "Má conexão"
 #: src/network/protocols/client_lobby.cpp:446
 #: src/network/protocols/server_lobby.cpp:3833
 msgid "Bot"
-msgstr "Bot"
+msgstr "Computadorizado"
 
 #: src/network/protocols/client_lobby.cpp:627
 #, c-format
@@ -3845,7 +3845,7 @@ msgstr "A partida já terminou. Não é mais possível participar ou assistir."
 #. I18N: Error message shown if live join failed in network
 #: src/network/protocols/client_lobby.cpp:1229
 msgid "No remaining place in the arena - live join disabled."
-msgstr "Não há lugares restantes, e este servidor não permite entrar em partidas em andamento."
+msgstr "Não há lugares restantes e não é possível entrar no meio de partidas neste servidor."
 
 #. I18N: Error message shown if only 1 player remains in network
 #: src/network/protocols/client_lobby.cpp:1233
@@ -5557,7 +5557,7 @@ msgstr "Os e-mails se diferem."
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "O nome de usuário só pode conter pontos, hífens, sublinhados e caracteres alfanuméricos sem acentuação."
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -6043,17 +6043,17 @@ msgstr "Deseja mesmo excluir o jogador \"%s\"?"
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:72
 msgid "Ready!"
-msgstr "Atenção!"
+msgstr "Em suas marcas,"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:74
 msgid "Set!"
-msgstr "Prepare-se!"
+msgstr "Preparar,"
 
 #. I18N: as in "ready, set, go", shown at the beginning of the race
 #: src/states_screens/race_gui_base.cpp:76
 msgid "Go!"
-msgstr "Já!"
+msgstr "JÁ!"
 
 #. I18N: Shown when a goal is scored
 #: src/states_screens/race_gui_base.cpp:78
@@ -6275,7 +6275,7 @@ msgstr "Máximo de jogadores: %d"
 
 #: src/states_screens/track_info_screen.cpp:390
 msgid "Number of red team AI karts"
-msgstr "Número de bots no time vermelho"
+msgstr "Karts vermelhos computadorizados"
 
 #: src/states_screens/tracks_and_gp_screen.cpp:109
 msgid ""
@@ -6450,7 +6450,7 @@ msgid ""
 "battle mode against the computer or your friends, and more! For a greater "
 "challenge, join online and meet players from all over the world and prove "
 "your racing skills!"
-msgstr "Participe de corridas, entre em campeonatos, diminua seu tempo em corridas sem itens, mostre seu talento com a bola e encare bots e amigos no modo batalha! Para realmente demonstrar suas habilidades, entre no modo online e enfrente jogadores de todas as partes do mundo!"
+msgstr "Participe de corridas, entre em campeonatos, diminua seu tempo nas pistas, mostre seu talento com a bola e encare seus adversários no modo batalha! Para mostrar do que é capaz, entre no modo online e enfrente jogadores de todas as partes do mundo!"
 
 #: supertuxkart.appdata.xml:17
 msgid "This game has no ads."

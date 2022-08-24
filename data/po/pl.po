@@ -7,6 +7,8 @@
 # Deve <deveee@gmail.com>, 2015-2021
 # Jakub Fabijan <animatorzpolski@gmail.com>, 2021
 # Jakub Wojtkowiak <ctrahg123@gmail.com>, 2016,2021
+# Marcin Węclewski, 2022
+# mrkubax10 _ <mrkubax10@onet.pl>, 2022
 # Patryk Wychowaniec <patryk1303@gmail.com>, 2015-2016
 # Tomek Woźniak <tomek.wozniak1@gmail.com>, 2019
 msgid ""
@@ -15,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-25 09:02+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Jakub Fabijan <animatorzpolski@gmail.com>, 2021\n"
+"Last-Translator: Marcin Węclewski, 2022\n"
 "Language-Team: Polish (http://www.transifex.com/supertuxkart/supertuxkart/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1691,7 +1693,7 @@ msgstr "Wybór rekordu"
 #. time.
 #: src/race/race_manager.cpp:1270 src/states_screens/race_setup_screen.cpp:142
 msgid "Lap Trial"
-msgstr ""
+msgstr "Próba okrążenia"
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
@@ -4793,7 +4795,7 @@ msgstr "Liczba gokartów: %d"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:137
 #, c-format
 msgid "Time target: %s"
-msgstr ""
+msgstr "Cel czasowy: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:139
 #, c-format
@@ -5556,7 +5558,7 @@ msgstr "Pola e-mail nie zgadzają się!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Nazwa użytkownika online może zawierać tylko znaki alfanumeryczne (ASCII), kropki, myślniki i podkreślenia!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"

@@ -2563,7 +2563,7 @@ msgstr "Паффи"
 
 #. I18N: ../stk-assets/karts/sara_the_racer/kart.xml
 msgid "Pepper"
-msgstr "Пеппер"
+msgstr "Перчинка"
 
 #. I18N: ../stk-assets/karts/sara_the_wizard/kart.xml
 msgid "Sara"
@@ -2695,7 +2695,7 @@ msgstr "Тыквенный парк"
 
 #. I18N: ../stk-assets/tracks/ravenbridge_mansion/track.xml
 msgid "Ravenbridge Mansion"
-msgstr "Особняк Равенбридж"
+msgstr "Особняк Рейвенбридж"
 
 #. I18N: ../stk-assets/tracks/sandtrack/track.xml
 msgid "Shifting Sands"
@@ -3580,7 +3580,7 @@ msgstr "Вы выиграли гонку!"
 #: src/karts/kart.cpp:1024
 #, c-format
 msgid "You finished the race in rank %d!"
-msgstr "Вы завершили гонку на %d месте!"
+msgstr "Вы финишировали на %d месте!"
 
 #. I18N: Message shown in game to tell player left the game in network
 #: src/karts/kart_rewinder.cpp:126 src/network/protocols/client_lobby.cpp:1156
@@ -3595,7 +3595,7 @@ msgid ""
 " Would you like this feature to be enabled? (To change this setting at a "
 "later time, go to options, select tab 'General', and edit \"Connect to the "
 "Internet\")."
-msgstr "SuperTuxKart может подключаться к серверу для загрузки дополнений и уведомлять вас об обновлениях.  Пожалуйста, прочтите нашу политику конфиденциальности на https://supertuxkart.net/Privacy. Вам нужна такая возможность? (Для изменения этой настройки перейдите в «Настройки» -> «Основные» -> «Подключаться к интернету»)."
+msgstr "SuperTuxKart может подключаться к серверу для загрузки дополнений и уведомлять вас об обновлениях.  Пожалуйста, прочтите нашу политику конфиденциальности на https://supertuxkart.net/Privacy. Вам нужна такая возможность? (Для изменения этой настройки перейдите в «Настройки» > «Основные» > «Подключаться к интернету»)."
 
 #: src/main.cpp:2379
 msgid "Your screen resolution is too low to run STK."
@@ -3725,7 +3725,7 @@ msgstr "Вас выкинуло: слишком высокий пинг."
 #: src/network/protocols/client_lobby.cpp:281
 #: src/network/protocols/client_lobby.cpp:897
 msgid "Bad network connection is detected."
-msgstr "Обнаружено плохое соединение с сетью."
+msgstr "Обнаружено нестабильное соединение с сетью."
 
 #: src/network/protocols/client_lobby.cpp:446
 #: src/network/protocols/server_lobby.cpp:3833

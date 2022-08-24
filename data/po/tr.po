@@ -1691,7 +1691,7 @@ msgstr "Yüksek Puan Seçimi"
 #. time.
 #: src/race/race_manager.cpp:1270 src/states_screens/race_setup_screen.cpp:142
 msgid "Lap Trial"
-msgstr ""
+msgstr "Tur Denemesi"
 
 #. I18N: ./data/gui/screens/high_score_selection.stkgui
 #. I18N: In the high score selection screen
@@ -2586,11 +2586,11 @@ msgstr "Su Altı Akvaryumu"
 
 #. I18N: ../stk-assets/tracks/alien_signal/track.xml
 msgid "Alien Signal"
-msgstr ""
+msgstr "Uzaylı Sinyali"
 
 #. I18N: ../stk-assets/tracks/ancient_colosseum_labyrinth/track.xml
 msgid "Ancient Colosseum Labyrinth"
-msgstr ""
+msgstr "Antik Kolezyum Labirenti"
 
 #. I18N: ../stk-assets/tracks/arena_candela_city/track.xml
 #. I18N: ../stk-assets/tracks/candela_city/track.xml
@@ -4689,7 +4689,7 @@ msgstr "SuperTuxKart daha iyi oyun deneyimi için tam varlıkları (yüksek kali
 msgid ""
 "SuperTuxKart will download full assets (including high quality textures and "
 "music) for better gaming experience."
-msgstr ""
+msgstr "SuperTuxKart, daha iyi oyun deneyimi için tüm varlıkları (yüksek kaliteli dokular ve müzik dahil) indirecektir."
 
 #: src/states_screens/dialogs/enter_address_dialog.cpp:42
 msgid ""
@@ -4766,7 +4766,7 @@ msgstr "Yol"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:110
 #, c-format
 msgid "Top %d High Scores"
-msgstr ""
+msgstr "En İyi %d Yüksek Puanlar "
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:112
 #, c-format
@@ -4781,17 +4781,17 @@ msgstr "Araç sayısı: %d"
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:137
 #, c-format
 msgid "Time target: %s"
-msgstr ""
+msgstr "Zaman hedefi: %s"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:139
 #, c-format
 msgid "Laps: %d"
-msgstr ""
+msgstr "Turlar: %d"
 
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:143
 #, c-format
 msgid "Reverse: %s"
-msgstr ""
+msgstr "Tersten: %s"
 
 #. I18N: for empty highscores entries
 #: src/states_screens/dialogs/high_score_info_dialog.cpp:226
@@ -5540,7 +5540,7 @@ msgstr "E-postalar uyuşmuyor!"
 msgid ""
 "Online username can only contain alphanumeric (ASCII) characters, periods, "
 "dashes and underscores!"
-msgstr ""
+msgstr "Çevrimiçi kullanıcı adı yalnızca alfanümerik (ASCII) karakterler, noktalar, tireler ve alt çizgiler içerebilir!"
 
 #: src/states_screens/online/register_screen.cpp:374
 msgid "Online username has to be between 3 and 30 characters long!"
@@ -6424,7 +6424,7 @@ msgid ""
 " while avoiding other karts as they may overtake you, but don't eat the "
 "bananas! Watch for bowling balls, plungers, bubble gum, and cakes thrown by "
 "your opponents."
-msgstr ""
+msgstr "Su altında, kırsal tarım arazilerinde, ormanlarda ve hatta uzayda sürüşten, oyuncuların eğlenmesi için çeşitli temalara sahip birkaç yolumuz var! Sizi geçebilecekleri için diğer araçlardan kaçınırken elinizden gelenin en iyisini yapın, ancak muzları yemeyin! Rakipleriniz tarafından fırlatılan bowling toplarına, pistonlara, sakızlara ve keklere dikkat edin."
 
 #: supertuxkart.appdata.xml:14
 msgid ""

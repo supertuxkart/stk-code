@@ -6,6 +6,7 @@
 # Benau, 2018
 # Benau, 2018
 # Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2022
+# MxtApps <mxtapps@gmail.com>, 2022
 # Tagomago <tagomago@disroot.org>, 2020-2021
 # Verónica Clémençon, 2017
 # Verónica Clémençon, 2017
@@ -17,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-05-25 09:02+0800\n"
 "PO-Revision-Date: 2015-02-15 01:58+0000\n"
-"Last-Translator: Marc Coll Carrillo <marc.coll.carrillo@gmail.com>, 2015-2022\n"
+"Last-Translator: MxtApps <mxtapps@gmail.com>, 2022\n"
 "Language-Team: Spanish (http://www.transifex.com/supertuxkart/supertuxkart/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -73,7 +74,7 @@ msgstr "Corredor de maratones"
 
 #. I18N: ./data/achievements.xml
 msgid "Finish a race with at least twice the track's default lap number."
-msgstr "Acaba una carrera con como mínimo el doble de vueltas por defecto del circuito."
+msgstr "Acaba una carrera con por lo menos el doble de vueltas por defecto del circuito."
 
 #. I18N: ./data/achievements.xml
 msgid "Skid-row"
@@ -471,7 +472,7 @@ msgstr "Resplandor (contornos)"
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
 msgid "Anti-aliasing"
-msgstr "Antialiasing"
+msgstr "Suavizado"
 
 #. I18N: ./data/gui/dialogs/custom_video_settings.stkgui
 #. I18N: Video settings
@@ -721,7 +722,7 @@ msgstr "Recuperación de la cuenta"
 msgid ""
 "You will receive an email with further instructions on how to reset your "
 "password. Please be patient and be sure to check your spam folder."
-msgstr "Recibirás un correo electrónico con más instrucciones sobre como reiniciar tu contraseña. Sé paciente y asegúrate de comprobar tu carpeta de correo basura."
+msgstr "Recibirás un correo electrónico con más instrucciones sobre como reiniciar tu contraseña. Por favor sé paciente y asegúrate de comprobar tu carpeta de correo basura."
 
 #. I18N: ./data/gui/dialogs/online/recovery_input.stkgui
 msgid ""
