@@ -26,6 +26,7 @@ GECompressorBPTCBC7::GECompressorBPTCBC7(uint8_t* texture, unsigned channels,
                                          bool normal_map)
                    : GEMipmapGenerator(texture, channels, size, normal_map)
 {
+    m_compressed_data = NULL;
 #ifdef BC7_ISPC
     assert(channels == 4);
     size_t total_size = 0;
