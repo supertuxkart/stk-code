@@ -64,6 +64,7 @@ endif()
 set(GE_SOURCES
     src/gl.c
     src/ge_compressor_astc_4x4.cpp
+    src/ge_compressor_bptc_bc7.cpp
     src/ge_compressor_s3tc_bc3.cpp
     src/ge_culling_tool.cpp
     src/ge_dx9_texture.cpp
@@ -97,7 +98,22 @@ if(NOT APPLE OR DLOPEN_MOLTENVK)
     set(GE_SOURCES ${GE_SOURCES} src/vulkan.c)
 endif()
 
+option(BC7_ISPC "Enable BC7 (BPTC) support (requires ispc and cmake >= 3.19)" OFF)
+if(BC7_ISPC)
+    add_definitions(-DBC7_ISPC)
+    enable_language(ISPC)
+    set(CMAKE_ISPC_FLAGS "${CMAKE_ISPC_FLAGS} --opt=fast-math --opt=disable-assertions --pic")
+    set(GE_SOURCES
+        ${GE_SOURCES}
+        src/bc7e.ispc
+    )
+    include_directories("${CMAKE_CURRENT_BINARY_DIR}")
+endif()
+
 add_library(graphics_engine STATIC ${GE_SOURCES})
+if(BC7_ISPC)
+    set_property(TARGET graphics_engine PROPERTY ISPC_INSTRUCTION_SETS avx2)
+endif()
 
 target_link_libraries(graphics_engine ${SQUISH_LIBRARY})
 

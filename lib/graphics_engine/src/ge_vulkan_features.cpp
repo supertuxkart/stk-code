@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "../source/Irrlicht/os.h"
+#include <SDL_cpuinfo.h>
 
 namespace GE
 {
@@ -28,6 +29,7 @@ bool g_supports_multi_draw_indirect = false;
 bool g_supports_base_vertex_rendering = true;
 bool g_supports_compute_in_main_queue = false;
 bool g_supports_s3tc_bc3 = false;
+bool g_supports_bptc_bc7 = false;
 bool g_supports_astc_4x4 = false;
 }   // GEVulkanFeatures
 
@@ -72,6 +74,16 @@ void GEVulkanFeatures::init(GEVulkanDriver* vk)
     vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
         VK_FORMAT_BC3_UNORM_BLOCK, &format_properties);
     g_supports_s3tc_bc3 = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+#ifdef BC7_ISPC
+    format_properties = {};
+    // We compile bc7e.ispc with avx2 on
+    if (SDL_HasAVX2() == SDL_TRUE)
+    {
+        vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
+            VK_FORMAT_BC7_UNORM_BLOCK, &format_properties);
+        g_supports_bptc_bc7 = format_properties.optimalTilingFeatures & VK_FORMAT_FEATURE_SAMPLED_IMAGE_BIT;
+    }
+#endif
     format_properties = {};
     vkGetPhysicalDeviceFormatProperties(vk->getPhysicalDevice(),
         VK_FORMAT_ASTC_4x4_UNORM_BLOCK, &format_properties);
@@ -197,6 +209,9 @@ void GEVulkanFeatures::printStats()
         "Vulkan supports s3 texture compression (bc3, dxt5)",
         g_supports_s3tc_bc3 ? "true" : "false");
     os::Printer::log(
+        "Vulkan supports BPTC texture compression (bc7)",
+        g_supports_bptc_bc7 ? "true" : "false");
+    os::Printer::log(
         "Vulkan supports adaptive scalable texture compression (4x4 block)",
         supportsASTC4x4() ? "true" : "false");
     os::Printer::log(
@@ -283,6 +298,12 @@ bool GEVulkanFeatures::supportsS3TCBC3()
 {
     return g_supports_s3tc_bc3;
 }   // supportsS3TCBC3
+
+// ----------------------------------------------------------------------------
+bool GEVulkanFeatures::supportsBPTCBC7()
+{
+    return g_supports_bptc_bc7;
+}   // supportsBPTCBC7
 
 // ----------------------------------------------------------------------------
 bool GEVulkanFeatures::supportsASTC4x4()

@@ -1,6 +1,7 @@
 #include "ge_vulkan_driver.hpp"
 
 #include "ge_compressor_astc_4x4.hpp"
+#include "ge_compressor_bptc_bc7.hpp"
 #include "ge_main.hpp"
 
 #include "ge_vulkan_2d_renderer.hpp"
@@ -636,6 +637,7 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
             GEVulkanShaderManager::getMeshTextureLayer(),
             GEVulkanFeatures::supportsBindMeshTexturesAtOnce());
         GECompressorASTC4x4::init();
+        GECompressorBPTCBC7::init();
         GEVulkanFeatures::printStats();
     }
     catch (std::exception& e)

@@ -3,6 +3,7 @@
 #include "ge_main.hpp"
 #include "ge_mipmap_generator.hpp"
 #include "ge_compressor_astc_4x4.hpp"
+#include "ge_compressor_bptc_bc7.hpp"
 #include "ge_compressor_s3tc_bc3.hpp"
 #include "ge_texture.hpp"
 #include "ge_vulkan_command_loader.hpp"
@@ -157,6 +158,14 @@ bool GEVulkanTexture::createTextureImage(uint8_t* texture_data,
                 m_size.Height);
             m_internal_format = VK_FORMAT_ASTC_4x4_UNORM_BLOCK;
             mipmap_generator = new GECompressorASTC4x4(texture_data, channels,
+                m_size, normal_map);
+        }
+        else if (texture_compression && GEVulkanFeatures::supportsBPTCBC7())
+        {
+            image_size = get4x4CompressedTextureSize(m_size.Width,
+                m_size.Height);
+            m_internal_format = VK_FORMAT_BC7_UNORM_BLOCK;
+            mipmap_generator = new GECompressorBPTCBC7(texture_data, channels,
                 m_size, normal_map);
         }
         else if (texture_compression && GEVulkanFeatures::supportsS3TCBC3())
