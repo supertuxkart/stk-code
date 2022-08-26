@@ -10,7 +10,9 @@ layout(std140, set = 1, binding = 0) uniform CameraBuffer
 
 struct ObjectData
 {
-    mat4 m_model;
+    vec4 m_position;
+    vec4 m_rotation;
+    vec4 m_scale;
     int m_skinning_offest;
     int m_material_id;
     vec2 m_texture_trans;

@@ -28,10 +28,9 @@ class GEVulkanTextureDescriptor;
 
 struct ObjectData
 {
-    float m_mat_1[4];
-    float m_mat_2[4];
-    float m_mat_3[4];
-    float m_mat_4[4];
+    float m_position[4];
+    float m_rotation[4];
+    float m_scale[4];
     int m_skinning_offset;
     int m_material_id;
     float m_texture_trans[2];

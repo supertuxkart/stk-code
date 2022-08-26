@@ -1,4 +1,5 @@
 #include "utils/spm_layout.h"
+#include "../utils/get_world_location.vert"
 
 void main()
 {
@@ -8,9 +9,13 @@ void main()
         v_weight[1] * u_skinning_matrices.m_mat[max(v_joint[1] + offset, 0)] +
         v_weight[2] * u_skinning_matrices.m_mat[max(v_joint[2] + offset, 0)] +
         v_weight[3] * u_skinning_matrices.m_mat[max(v_joint[3] + offset, 0)];
-    mat4 model_matrix = u_object_buffer.m_objects[gl_InstanceIndex].m_model;
-    gl_Position = u_camera.m_projection_view_matrix * model_matrix *
-        joint_matrix * vec4(v_position, 1.0);
+    vec4 v_skinning_position = joint_matrix * vec4(v_position.xyz, 1.0);
+    vec4 v_world_position = getWorldPosition(
+        u_object_buffer.m_objects[gl_InstanceIndex].m_position.xyz,
+        u_object_buffer.m_objects[gl_InstanceIndex].m_rotation,
+        u_object_buffer.m_objects[gl_InstanceIndex].m_scale.xyz,
+        v_skinning_position.xyz);
+    gl_Position = u_camera.m_projection_view_matrix * v_world_position;
     f_vertex_color = v_color.zyxw;
     f_uv = v_uv;
     f_uv_two = v_uv_two;
