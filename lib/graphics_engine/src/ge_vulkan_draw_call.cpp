@@ -959,13 +959,16 @@ void GEVulkanDrawCall::render(GEVulkanDriver* vk, GEVulkanCameraSceneNode* cam,
     }
 
     VkViewport vp;
-    vp.x = cam->getViewPort().UpperLeftCorner.X;
-    vp.y = cam->getViewPort().UpperLeftCorner.Y;
-    vp.width = cam->getViewPort().getWidth();
-    vp.height = cam->getViewPort().getHeight();
+    float scale = getGEConfig()->m_render_scale;
+    if (vk->getSeparateRTTTexture())
+        scale = 1.0f;
+    vp.x = cam->getViewPort().UpperLeftCorner.X * scale;
+    vp.y = cam->getViewPort().UpperLeftCorner.Y * scale;
+    vp.width = cam->getViewPort().getWidth() * scale;
+    vp.height = cam->getViewPort().getHeight() * scale;
     vp.minDepth = 0;
     vp.maxDepth = 1.0f;
-    vk->getRotatedViewport(&vp);
+    vk->getRotatedViewport(&vp, true/*handle_rtt*/);
     vkCmdSetViewport(cmd, 0, 1, &vp);
 
     VkRect2D scissor;

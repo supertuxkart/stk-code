@@ -9,11 +9,12 @@
 
 namespace GE
 {
-GEVulkanFBOTexture::GEVulkanFBOTexture(const core::dimension2d<u32>& size,
+GEVulkanFBOTexture::GEVulkanFBOTexture(GEVulkanDriver* vk,
+                                       const core::dimension2d<u32>& size,
                                        bool create_depth)
                   : GEVulkanTexture()
 {
-    m_vk = getVKDriver();
+    m_vk = vk;
     m_vulkan_device = m_vk->getDevice();
     m_image = VK_NULL_HANDLE;
     m_vma_allocation = VK_NULL_HANDLE;

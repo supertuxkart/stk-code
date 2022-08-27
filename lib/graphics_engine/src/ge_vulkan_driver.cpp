@@ -498,7 +498,8 @@ GEVulkanDriver::GEVulkanDriver(const SIrrlichtCreationParameters& params,
               : CNullDriver(io, core::dimension2d<u32>(0, 0)),
                 m_params(params), m_irrlicht_device(device),
                 m_depth_texture(NULL), m_mesh_texture_descriptor(NULL),
-                m_rtt_texture(NULL), m_rtt_polycount(0)
+                m_rtt_texture(NULL), m_prev_rtt_texture(NULL),
+                m_separate_rtt_texture(NULL), m_rtt_polycount(0)
 {
     m_vk.reset(new VK());
     m_physical_device = VK_NULL_HANDLE;
@@ -662,6 +663,11 @@ void GEVulkanDriver::destroyVulkan()
     {
         m_depth_texture->drop();
         m_depth_texture = NULL;
+    }
+    if (m_rtt_texture)
+    {
+        m_rtt_texture->drop();
+        m_rtt_texture = NULL;
     }
     if (m_white_texture)
     {
@@ -1260,6 +1266,16 @@ found_mode:
     m_depth_texture = new GEVulkanDepthTexture(this,
         core::dimension2du(m_swap_chain_extent.width,
         m_swap_chain_extent.height));
+    const float scale = getGEConfig()->m_render_scale;
+    if (scale != 1.0f)
+    {
+        core::dimension2du screen_size = ScreenSize;
+        screen_size.Width *= scale;
+        screen_size.Height *= scale;
+        m_rtt_texture = new GEVulkanFBOTexture(this, screen_size,
+            true/*create_depth*/);
+        m_rtt_texture->createRTT();
+    }
 }   // createSwapChain
 
 // ----------------------------------------------------------------------------
@@ -1595,6 +1611,14 @@ bool GEVulkanDriver::beginScene(bool backBuffer, bool zBuffer, SColor color,
     m_clear_color = color;
     PrimitivesDrawn = m_rtt_polycount;
     m_rtt_polycount = 0;
+
+    if (m_rtt_texture)
+    {
+        draw2DImage(m_rtt_texture,core::recti(0, 0,
+            ScreenSize.Width, ScreenSize.Height),
+            core::recti(0, 0,
+            m_rtt_texture->getSize().Width, m_rtt_texture->getSize().Height));
+    }
     return true;
 }   // beginScene
 
@@ -2107,9 +2131,9 @@ void GEVulkanDriver::getRotatedRect2D(VkRect2D* rect)
 }   // getRotatedRect2D
 
 // ----------------------------------------------------------------------------
-void GEVulkanDriver::getRotatedViewport(VkViewport* vp)
+void GEVulkanDriver::getRotatedViewport(VkViewport* vp, bool handle_rtt)
 {
-    if (m_rtt_texture)
+    if (handle_rtt && m_rtt_texture)
         return;
 
     VkRect2D rect;
@@ -2164,6 +2188,11 @@ void GEVulkanDriver::destroySwapChainRelated(bool handle_surface)
     {
         m_depth_texture->drop();
         m_depth_texture = NULL;
+    }
+    if (m_rtt_texture)
+    {
+        m_rtt_texture->drop();
+        m_rtt_texture = NULL;
     }
     for (VkFramebuffer& framebuffer : m_vk->swap_chain_framebuffers)
         vkDestroyFramebuffer(m_vk->device, framebuffer, NULL);
@@ -2247,13 +2276,24 @@ void GEVulkanDriver::buildCommandBuffers()
 
     VkRenderPassBeginInfo render_pass_info = {};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    render_pass_info.renderPass = getRenderPass();
-    render_pass_info.framebuffer =
-        getSwapChainFramebuffers()[getCurrentImageIndex()];
-    render_pass_info.renderArea.offset = {0, 0};
-    render_pass_info.renderArea.extent = getSwapChainExtent();
     render_pass_info.clearValueCount = (uint32_t)(clear_values.size());
     render_pass_info.pClearValues = &clear_values[0];
+    render_pass_info.renderArea.offset = {0, 0};
+
+    if (m_rtt_texture)
+    {
+        render_pass_info.renderPass = m_rtt_texture->getRTTRenderPass();
+        render_pass_info.framebuffer = m_rtt_texture->getRTTFramebuffer();
+        render_pass_info.renderArea.extent = { m_rtt_texture->getSize().Width,
+            m_rtt_texture->getSize().Height };
+    }
+    else
+    {
+        render_pass_info.renderPass = getRenderPass();
+        render_pass_info.framebuffer =
+            getSwapChainFramebuffers()[getCurrentImageIndex()];
+        render_pass_info.renderArea.extent = getSwapChainExtent();
+    }
 
     VkCommandBufferBeginInfo begin_info = {};
     begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -2280,6 +2320,18 @@ void GEVulkanDriver::buildCommandBuffers()
         p.second->render(this, p.first);
         PrimitivesDrawn += p.second->getPolyCount();
     }
+
+    if (m_rtt_texture)
+    {
+        vkCmdEndRenderPass(getCurrentCommandBuffer());
+        render_pass_info.renderPass = getRenderPass();
+        render_pass_info.framebuffer =
+            getSwapChainFramebuffers()[getCurrentImageIndex()];
+        render_pass_info.renderArea.extent = getSwapChainExtent();
+        vkCmdBeginRenderPass(getCurrentCommandBuffer(), &render_pass_info,
+            VK_SUBPASS_CONTENTS_INLINE);
+    }
+
     GEVulkan2dRenderer::render();
 
     vkCmdEndRenderPass(getCurrentCommandBuffer());
@@ -2319,7 +2371,8 @@ ITexture* GEVulkanDriver::addRenderTargetTexture(const core::dimension2d<u32>& s
     const io::path& name, const ECOLOR_FORMAT format,
     const bool useStencil)
 {
-    GEVulkanFBOTexture* rtt = new GEVulkanFBOTexture(size, true/*create_depth*/);
+    GEVulkanFBOTexture* rtt = new GEVulkanFBOTexture(this, size,
+        true/*create_depth*/);
     rtt->createRTT();
     return rtt;
 }   // addRenderTargetTexture
@@ -2329,9 +2382,21 @@ bool GEVulkanDriver::setRenderTarget(video::ITexture* texture,
                                      bool clearBackBuffer, bool clearZBuffer,
                                      SColor color)
 {
-    m_rtt_texture = dynamic_cast<GEVulkanFBOTexture*>(texture);
-    if (m_rtt_texture)
+    GEVulkanFBOTexture* new_rtt = dynamic_cast<GEVulkanFBOTexture*>(texture);
+    if (m_separate_rtt_texture == new_rtt)
+        return true;
+    m_separate_rtt_texture = new_rtt;
+    if (m_separate_rtt_texture)
+    {
         m_rtt_clear_color = color;
+        m_prev_rtt_texture = m_rtt_texture;
+        m_rtt_texture = m_separate_rtt_texture;
+    }
+    else
+    {
+        m_rtt_texture = m_prev_rtt_texture;
+        m_prev_rtt_texture = NULL;
+    }
     return true;
 }   // setRenderTarget
 

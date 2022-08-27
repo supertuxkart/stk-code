@@ -6,7 +6,14 @@
 namespace GE
 {
 irr::video::IVideoDriver* g_driver = NULL;
-GEConfig g_config = {};
+GEConfig g_config =
+{
+    false,
+    false,
+    false,
+    {},
+    1.0f
+};
 std::string g_shader_folder = "";
 std::chrono::steady_clock::time_point g_mono_start =
     std::chrono::steady_clock::now();

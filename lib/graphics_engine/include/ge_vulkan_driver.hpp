@@ -324,7 +324,7 @@ namespace GE
         video::ITexture* getTransparentTexture() const
                                                { return m_transparent_texture; }
         void getRotatedRect2D(VkRect2D* rect);
-        void getRotatedViewport(VkViewport* vp);
+        void getRotatedViewport(VkViewport* vp, bool handle_rtt);
         const core::matrix4& getPreRotationMatrix()
                                                { return m_pre_rotation_matrix; }
         virtual void pauseRendering();
@@ -353,6 +353,8 @@ namespace GE
         GEVulkanTextureDescriptor* getMeshTextureDescriptor() const
                                            { return m_mesh_texture_descriptor; }
         GEVulkanFBOTexture* getRTTTexture() const      { return m_rtt_texture; }
+        GEVulkanFBOTexture* getSeparateRTTTexture() const
+                                              { return m_separate_rtt_texture; }
         void handleDeletedTextures();
         void addRTTPolyCount(unsigned count)       { m_rtt_polycount += count; }
     private:
@@ -493,6 +495,8 @@ namespace GE
         GEVulkanDepthTexture* m_depth_texture;
         GEVulkanTextureDescriptor* m_mesh_texture_descriptor;
         GEVulkanFBOTexture* m_rtt_texture;
+        GEVulkanFBOTexture* m_prev_rtt_texture;
+        GEVulkanFBOTexture* m_separate_rtt_texture;
         u32 m_rtt_polycount;
 
         void createInstance(SDL_Window* window);

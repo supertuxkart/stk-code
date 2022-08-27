@@ -309,7 +309,7 @@ void GEVulkan2dRenderer::render()
     vp.height = g_vk->getViewPort().getHeight();
     vp.minDepth = 0;
     vp.maxDepth = 1.0f;
-    g_vk->getRotatedViewport(&vp);
+    g_vk->getRotatedViewport(&vp, false/*handle_rtt*/);
     vkCmdSetViewport(g_vk->getCurrentCommandBuffer(), 0, 1, &vp);
 
     if (GEVulkanFeatures::supportsBindTexturesAtOnce())

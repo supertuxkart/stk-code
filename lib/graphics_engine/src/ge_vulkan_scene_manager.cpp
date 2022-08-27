@@ -214,7 +214,7 @@ void GEVulkanSceneManager::drawAll(irr::u32 flags)
 {
     drawAllInternal();
     GEVulkanDriver* vk = static_cast<GEVulkanDriver*>(getVideoDriver());
-    GEVulkanFBOTexture* rtt = vk->getRTTTexture();
+    GEVulkanFBOTexture* rtt = vk->getSeparateRTTTexture();
     if (!rtt)
         return;
 
