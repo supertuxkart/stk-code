@@ -1263,9 +1263,6 @@ found_mode:
         m_vk->swap_chain_image_views.push_back(swap_chain_image_view);
     }
 
-    m_depth_texture = new GEVulkanDepthTexture(this,
-        core::dimension2du(m_swap_chain_extent.width,
-        m_swap_chain_extent.height));
     const float scale = getGEConfig()->m_render_scale;
     if (scale != 1.0f)
     {
@@ -1275,6 +1272,12 @@ found_mode:
         m_rtt_texture = new GEVulkanFBOTexture(this, screen_size,
             true/*create_depth*/);
         m_rtt_texture->createRTT();
+    }
+    else
+    {
+        m_depth_texture = new GEVulkanDepthTexture(this,
+            core::dimension2du(m_swap_chain_extent.width,
+            m_swap_chain_extent.height));
     }
 }   // createSwapChain
 
@@ -1468,7 +1471,8 @@ void GEVulkanDriver::createRenderPass()
     color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     VkAttachmentDescription depth_attachment = {};
-    depth_attachment.format = m_depth_texture->getInternalFormat();
+    if (m_depth_texture)
+        depth_attachment.format = m_depth_texture->getInternalFormat();
     depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
     depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -1485,25 +1489,30 @@ void GEVulkanDriver::createRenderPass()
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &color_attachment_ref;
-    subpass.pDepthStencilAttachment = &depth_attachment_ref;
+    if (m_depth_texture)
+        subpass.pDepthStencilAttachment = &depth_attachment_ref;
 
     VkSubpassDependency dependency = {};
     dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
     dependency.dstSubpass = 0;
-    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
-        VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    if (m_depth_texture)
+        dependency.srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     dependency.srcAccessMask = 0;
-    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
-        VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    if (m_depth_texture)
+        dependency.dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT |
-        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
-        VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    if (m_depth_texture)
+        dependency.dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 
-    std::array<VkAttachmentDescription, 2> attachments =
+    std::vector<VkAttachmentDescription> attachments =
         {
             color_attachment,
-            depth_attachment
         };
+    if (m_depth_texture)
+        attachments.push_back(depth_attachment);
     VkRenderPassCreateInfo render_pass_info = {};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     render_pass_info.attachmentCount = (uint32_t)(attachments.size());
@@ -1526,11 +1535,15 @@ void GEVulkanDriver::createFramebuffers()
     const std::vector<VkImageView>& image_views = m_vk->swap_chain_image_views;
     for (unsigned int i = 0; i < image_views.size(); i++)
     {
-        std::array<VkImageView, 2> attachments =
+        std::vector<VkImageView> attachments =
         {
-            image_views[i], (VkImageView)m_depth_texture->getTextureHandler()
+            image_views[i]
         };
-
+        if (m_depth_texture)
+        {
+            attachments.push_back(
+                (VkImageView)m_depth_texture->getTextureHandler());
+        }
         VkFramebufferCreateInfo framebuffer_info = {};
         framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
         framebuffer_info.renderPass = m_vk->render_pass;
