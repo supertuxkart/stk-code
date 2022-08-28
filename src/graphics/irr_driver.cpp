@@ -414,6 +414,8 @@ void IrrDriver::initDevice()
 #ifndef SERVER_ONLY
         GE::getGEConfig()->m_texture_compression =
             UserConfigParams::m_texture_compression;
+        GE::getGEConfig()->m_render_scale =
+            UserConfigParams::m_scale_rtts_factor;
 #endif
     }
     else

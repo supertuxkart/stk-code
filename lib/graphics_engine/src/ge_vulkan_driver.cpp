@@ -2413,6 +2413,25 @@ bool GEVulkanDriver::setRenderTarget(video::ITexture* texture,
     return true;
 }   // setRenderTarget
 
+// ----------------------------------------------------------------------------
+void GEVulkanDriver::updateRenderScale(float value)
+{
+    if (getGEConfig()->m_render_scale == value)
+        return;
+    waitIdle();
+    setDisableWaitIdle(true);
+    destroySwapChainRelated(false/*handle_surface*/);
+    getGEConfig()->m_render_scale = value;
+    createSwapChainRelated(false/*handle_surface*/);
+    for (auto& dc : static_cast<GEVulkanSceneManager*>(
+        m_irrlicht_device->getSceneManager())->getDrawCalls())
+        dc.second = std::unique_ptr<GEVulkanDrawCall>(new GEVulkanDrawCall);
+    GEVulkanSkyBoxRenderer::destroy();
+    GEVulkan2dRenderer::destroy();
+    GEVulkan2dRenderer::init(this);
+    setDisableWaitIdle(false);
+}   // updateRenderScale
+
 }
 
 namespace irr

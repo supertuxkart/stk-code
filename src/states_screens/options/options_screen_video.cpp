@@ -464,7 +464,10 @@ void OptionsScreenVideo::init()
     gfx->setActive(!in_game && CVS->isGLSL());
     getWidget<ButtonWidget>("custom")->setActive(!in_game || !CVS->isGLSL());
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
-        getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game);
+    {
+        getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
+            GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+    }
 #endif
 
 #if defined(MOBILE_STK) || defined(__SWITCH__)
@@ -555,7 +558,8 @@ void OptionsScreenVideo::updateGfxSlider()
         setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
     // Same with Render resolution slider
     getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
-        setActive(UserConfigParams::m_dynamic_lights && CVS->isGLSL());
+        setActive((UserConfigParams::m_dynamic_lights && CVS->isGLSL()) ||
+        GE::getDriver()->getDriverType() == video::EDT_VULKAN);
 
     updateTooltip();
 #endif
@@ -791,9 +795,11 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         getWidget<GUIEngine::SpinnerWidget>("blur_level")->setActive(level >= 2);
 
         // Same with Render resolution slider
+#ifndef SERVER_ONLY
         getWidget<GUIEngine::SpinnerWidget>("scale_rtts")->
-            setActive(UserConfigParams::m_dynamic_lights);
-
+            setActive(UserConfigParams::m_dynamic_lights ||
+            GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+#endif
         UserConfigParams::m_animated_characters = m_presets[level].animatedCharacters;
         UserConfigParams::m_particles_effects = m_presets[level].particles;
         setImageQuality(m_presets[level].image_quality);
@@ -844,7 +850,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         assert(level < (int)m_scale_rtts_custom_presets.size());
 
         UserConfigParams::m_scale_rtts_factor = m_scale_rtts_custom_presets[level].value;
-
+#ifndef SERVER_ONLY
+        if (GE::getVKDriver())
+            GE::getVKDriver()->updateRenderScale(UserConfigParams::m_scale_rtts_factor);
+#endif
         updateScaleRTTsSlider();
     }
     else if (name == "rememberWinpos")

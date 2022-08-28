@@ -337,6 +337,7 @@ namespace GE
             destroySwapChainRelated(false/*handle_surface*/);
             createSwapChainRelated(false/*handle_surface*/);
         }
+        void updateRenderScale(float value);
         uint32_t getGraphicsFamily() const         { return m_graphics_family; }
         unsigned getGraphicsQueueCount() const
                                               { return m_graphics_queue_count; }
