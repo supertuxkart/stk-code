@@ -358,6 +358,7 @@ namespace GE
                                               { return m_separate_rtt_texture; }
         void handleDeletedTextures();
         void addRTTPolyCount(unsigned count)       { m_rtt_polycount += count; }
+        SDL_Window* getWindow() const                       { return m_window; }
     private:
         struct SwapChainSupportDetails
         {

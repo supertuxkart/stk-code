@@ -608,8 +608,11 @@ void IrrDriver::initDevice()
     {
         Log::fatal("irr_driver", "Couldn't initialise irrlicht device. Quitting.\n");
     }
-    UserConfigParams::m_width = (unsigned)((float)UserConfigParams::m_real_width * m_device->getNativeScaleX());
-    UserConfigParams::m_height = (unsigned)((float)UserConfigParams::m_real_height * m_device->getNativeScaleY());
+    m_actual_screen_size = m_device->getVideoDriver()->getCurrentRenderTargetSize();
+    UserConfigParams::m_width = m_actual_screen_size.Width;
+    UserConfigParams::m_height = m_actual_screen_size.Height;
+    UserConfigParams::m_real_width = (unsigned)((float)UserConfigParams::m_width / m_device->getNativeScaleX());
+    UserConfigParams::m_real_height = (unsigned)((float)UserConfigParams::m_height / m_device->getNativeScaleY());
 
 #ifndef SERVER_ONLY 
 
@@ -692,8 +695,6 @@ void IrrDriver::initDevice()
     SPMeshLoader* spml = new SPMeshLoader(m_scene_manager);
     m_scene_manager->addExternalMeshLoader(spml);
     spml->drop();
-
-    m_actual_screen_size = m_video_driver->getCurrentRenderTargetSize();
 
 #ifdef ENABLE_RECORDER
     ogrRegGeneralCallback(OGR_CBT_START_RECORDING,

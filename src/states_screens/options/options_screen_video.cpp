@@ -47,7 +47,6 @@
 #include <ge_vulkan_texture_descriptor.hpp>
 #endif
 
-
 #include <iostream>
 #include <sstream>
 
@@ -317,6 +316,12 @@ void OptionsScreenVideo::init()
                                    getWidget<LabelWidget>("rememberWinposText");
     assert( rememberWinposText != NULL );
 #endif
+
+    bool is_vulkan = false;
+#ifndef SERVER_ONLY
+    is_vulkan = GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+#endif
+
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
     {
@@ -360,11 +365,20 @@ void OptionsScreenVideo::init()
             }
         }
 
+        // Vulkan use fullscreen desktop so only show current screen size
+        if (is_vulkan)
+        {
+            found_config_res = false;
+            m_resolutions.clear();
+            found_1024_768 = true;
+            found_1280_720 = true;
+        }
+
         if (!found_config_res)
         {
             r.width  = UserConfigParams::m_real_width;
             r.height = UserConfigParams::m_real_height;
-            r.fullscreen = false;
+            r.fullscreen = is_vulkan;
             m_resolutions.push_back(r);
 
             if (r.width == 1024 && r.height == 768)
@@ -457,8 +471,8 @@ void OptionsScreenVideo::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    res->setActive(!in_game);
-    full->setActive(!in_game);
+    res->setActive(!in_game || is_vulkan);
+    full->setActive(!in_game || is_vulkan);
     applyBtn->setActive(!in_game);
 #ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
@@ -466,7 +480,7 @@ void OptionsScreenVideo::init()
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
     {
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
-            GE::getDriver()->getDriverType() == video::EDT_VULKAN);
+            is_vulkan);
     }
 #endif
 
@@ -719,6 +733,7 @@ void OptionsScreenVideo::updateBlurTooltip()
 
 // --------------------------------------------------------------------------------------------
 extern "C" void update_swap_interval(int swap_interval);
+extern "C" void update_fullscreen_desktop(int val);
 
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
@@ -867,8 +882,15 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         CheckBoxWidget* rememberWinpos = getWidget<CheckBoxWidget>("rememberWinpos");
 
         rememberWinpos->setActive(!fullscreen->getState());
-        
-        updateResolutionsList();
+#ifndef SERVER_ONLY
+        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+        {
+            UserConfigParams::m_fullscreen = fullscreen->getState();
+            update_fullscreen_desktop(UserConfigParams::m_fullscreen);
+        }
+        else
+            updateResolutionsList();
+#endif
     }
 }   // eventCallback
 

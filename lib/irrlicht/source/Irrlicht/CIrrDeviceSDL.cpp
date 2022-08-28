@@ -58,7 +58,6 @@ extern "C" int Android_disablePadding();
 
 namespace irr
 {
-
 //! constructor
 CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 	: CIrrDeviceStub(param),
@@ -93,7 +92,8 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 #ifndef MOBILE_STK
 	// Prevent fullscreen minimizes when losing focus
-	if (CreationParams.Fullscreen)
+	if (CreationParams.Fullscreen &&
+		CreationParams.DriverType != video::EDT_VULKAN)
 		SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 #endif
 
@@ -155,7 +155,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 		}
 		else
 			return;
-		updateNativeScale();
+		updateNativeScale(&Width, &Height);
 		Width = (u32)((f32)Width * NativeScaleX);
 		Height = (u32)((f32)Height * NativeScaleY);
 		CreationParams.WindowSize.Width = Width;
@@ -181,7 +181,7 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 }
 
 
-void CIrrDeviceSDL::updateNativeScale()
+void CIrrDeviceSDL::updateNativeScale(u32* saving_width, u32* saving_height)
 {
 	int width, height = 0;
 	SDL_GetWindowSize(Window, &width, &height);
@@ -198,6 +198,10 @@ void CIrrDeviceSDL::updateNativeScale()
 	}
 	NativeScaleX = (f32)real_width / (f32)width;
 	NativeScaleY = (f32)real_height / (f32)height;
+	if (saving_width)
+		*saving_width = width;
+	if (saving_height)
+		*saving_height = height;
 }
 
 
@@ -328,6 +332,29 @@ bool versionCorrect(int major, int minor)
 }
 
 
+// Used in OptionsScreenVideo for live fullscreen toggle for vulkan driver
+extern "C" void update_fullscreen_desktop(int val)
+{
+	GE::GEVulkanDriver* gevk = GE::getVKDriver();
+	if (!gevk)
+		return;
+	SDL_Window* window = gevk->getWindow();
+
+	int prev_width = 0;
+	int prev_height = 0;
+	SDL_GetWindowSize(window, &prev_width, &prev_height);
+
+	if (val != 0)
+		val = SDL_WINDOW_FULLSCREEN_DESKTOP;
+	SDL_SetWindowFullscreen(window, val);
+	if (val == 0)
+	{
+		SDL_SetWindowSize(window, prev_width * 0.8f, prev_height * 0.8f);
+		SDL_RaiseWindow(window);
+	}
+}
+
+
 // Used in OptionsScreenVideo for live updating vertical sync config
 extern "C" void update_swap_interval(int swap_interval)
 {
@@ -394,7 +421,17 @@ bool CIrrDeviceSDL::createWindow()
 #endif
 
 	if (CreationParams.Fullscreen)
-		flags |= SDL_WINDOW_FULLSCREEN;
+	{
+#ifndef MOBILE_STK
+		if (CreationParams.DriverType == video::EDT_VULKAN)
+		{
+			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			CreationParams.Fullscreen = false;
+		}
+		else
+#endif
+			flags |= SDL_WINDOW_FULLSCREEN;
+	}
 
 	if (CreationParams.DriverType == video::EDT_OPENGL ||
 		CreationParams.DriverType == video::EDT_OGLES2)
@@ -651,7 +688,7 @@ void CIrrDeviceSDL::createDriver()
 		{
 			VideoDriver = video::createVulkanDriver(CreationParams, FileSystem, Window, this);
 			// SDL_Vulkan_GetDrawableSize only works after driver is created
-			updateNativeScale();
+			updateNativeScale(&Width, &Height);
 			Width = (u32)((f32)Width * NativeScaleX);
 			Height = (u32)((f32)Height * NativeScaleY);
 		}

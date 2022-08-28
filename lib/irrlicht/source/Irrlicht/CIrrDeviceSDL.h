@@ -28,7 +28,6 @@ class MoltenVK;
 	class CIrrDeviceSDL : public CIrrDeviceStub, video::IImagePresenter
 	{
 	public:
-
 		//! constructor
 		CIrrDeviceSDL(const SIrrlichtCreationParameters& param);
 
@@ -330,7 +329,7 @@ class MoltenVK;
 		MoltenVK* m_moltenvk;
 #endif
 		void createGUIAndVulkanScene();
-		void updateNativeScale();
+		void updateNativeScale(u32* saving_width = NULL, u32* saving_height = NULL);
 	};
 
 } // end namespace irr
