@@ -463,8 +463,9 @@ void IrrDriver::initDevice()
         {
             Log::warn("irr_driver", "Unknown desktop resolution.");
         }
-        else if (UserConfigParams::m_real_width > (int)ssize.Width ||
-                 UserConfigParams::m_real_height > (int)ssize.Height)
+        else if (!UserConfigParams::m_fullscreen &&
+            (UserConfigParams::m_real_width > (int)ssize.Width ||
+            UserConfigParams::m_real_height > (int)ssize.Height))
         {
             Log::warn("irr_driver", "The window size specified in "
                       "user config is larger than your screen!");
