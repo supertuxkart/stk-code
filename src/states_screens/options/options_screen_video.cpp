@@ -45,8 +45,11 @@
 #include <ge_main.hpp>
 #include <ge_vulkan_driver.hpp>
 #include <ge_vulkan_texture_descriptor.hpp>
+#include <SDL_video.h>
+#include "../../lib/irrlicht/source/Irrlicht/CIrrDeviceSDL.h"
 #endif
 
+#include <functional>
 #include <iostream>
 #include <sstream>
 
@@ -736,6 +739,7 @@ void OptionsScreenVideo::updateBlurTooltip()
 // --------------------------------------------------------------------------------------------
 extern "C" void update_swap_interval(int swap_interval);
 extern "C" void update_fullscreen_desktop(int val);
+extern "C" void reset_network_body();
 
 void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                                        const int playerID)
@@ -885,11 +889,26 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         rememberWinpos->setActive(!fullscreen->getState());
 #ifndef SERVER_ONLY
-        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN &&
-            GE::getGEConfig()->m_vulkan_fullscreen_desktop)
+        GE::GEVulkanDriver* gevk = GE::getVKDriver();
+        if (gevk && GE::getGEConfig()->m_vulkan_fullscreen_desktop)
         {
             UserConfigParams::m_fullscreen = fullscreen->getState();
             update_fullscreen_desktop(UserConfigParams::m_fullscreen);
+            if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+            {
+                StateManager::get()->popMenu();
+                std::function<Screen*()> screen_function =
+                    getNewScreenPointer();
+                int new_width = 0;
+                int new_height = 0;
+                SDL_GetWindowSize(gevk->getSDLWindow(), &new_width,
+                    &new_height);
+                static_cast<CIrrDeviceSDL*>(gevk->getIrrlichtDevice())
+                    ->handleNewSize(new_width, new_height);
+                irr_driver->handleWindowResize();
+                Screen* new_screen = screen_function();
+                new_screen->push();
+            }
         }
         else
             updateResolutionsList();

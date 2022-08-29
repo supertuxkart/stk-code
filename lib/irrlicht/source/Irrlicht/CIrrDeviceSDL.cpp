@@ -342,7 +342,7 @@ extern "C" void update_fullscreen_desktop(int val)
 	GE::GEVulkanDriver* gevk = GE::getVKDriver();
 	if (!gevk || !GE::getGEConfig()->m_vulkan_fullscreen_desktop)
 		return;
-	SDL_Window* window = gevk->getWindow();
+	SDL_Window* window = gevk->getSDLWindow();
 
 	int prev_width = 0;
 	int prev_height = 0;
@@ -952,17 +952,7 @@ bool CIrrDeviceSDL::run()
 			{
 				if (SDL_event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED)
 				{
-					updateNativeScale();
-					u32 new_width = SDL_event.window.data1 * NativeScaleX;
-					u32 new_height = SDL_event.window.data2 * NativeScaleY;
-					if (new_width != Width || new_height != Height)
-					{
-						Width = new_width;
-						Height = new_height;
-						if (VideoDriver)
-							VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
-						reset_network_body();
-					}
+					handleNewSize(SDL_event.window.data1, SDL_event.window.data2);
 				}
 				else if (SDL_event.window.event == SDL_WINDOWEVENT_MINIMIZED)
 				{
@@ -1027,6 +1017,23 @@ bool CIrrDeviceSDL::run()
 
 	return !Close;
 }
+
+
+void CIrrDeviceSDL::handleNewSize(u32 width, u32 height)
+{
+	updateNativeScale();
+	u32 new_width = width * NativeScaleX;
+	u32 new_height = height * NativeScaleY;
+	if (new_width != Width || new_height != Height)
+	{
+		Width = new_width;
+		Height = new_height;
+		if (VideoDriver)
+			VideoDriver->OnResize(core::dimension2d<u32>(Width, Height));
+		reset_network_body();
+	}
+}
+
 
 //! Activate any joysticks, and generate events for them.
 bool CIrrDeviceSDL::activateJoysticks(core::array<SJoystickInfo> & joystickInfo)

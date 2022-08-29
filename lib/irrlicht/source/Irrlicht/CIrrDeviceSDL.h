@@ -143,6 +143,7 @@ class MoltenVK;
 		virtual bool isGyroscopeAvailable();
 
 		virtual void resetPaused() { clearAllTouchIds(); }
+		void handleNewSize(u32 width, u32 height);
 
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl
