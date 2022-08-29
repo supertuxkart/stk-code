@@ -114,7 +114,7 @@ private:
      *  the confirmation dialog needs an additional warning message.
      *  Same indicates a change of the resolution (back to the original
      *  one), but no confirmation dialog. */
-    enum {RES_CHANGE_NONE, RES_CHANGE_YES,
+    enum {RES_CHANGE_NONE, RES_CHANGE_YES, RES_CHANGE_CANCEL,
           RES_CHANGE_SAME, RES_CHANGE_YES_WARN} m_resolution_changing;
 
 
