@@ -317,9 +317,11 @@ void OptionsScreenVideo::init()
     assert( rememberWinposText != NULL );
 #endif
 
-    bool is_vulkan = false;
+    bool is_vulkan_fullscreen_desktop = false;
 #ifndef SERVER_ONLY
-    is_vulkan = GE::getDriver()->getDriverType() == video::EDT_VULKAN;
+    is_vulkan_fullscreen_desktop =
+        GE::getDriver()->getDriverType() == video::EDT_VULKAN &&
+        GE::getGEConfig()->m_vulkan_fullscreen_desktop;
 #endif
 
     // --- get resolution list from irrlicht the first time
@@ -366,7 +368,7 @@ void OptionsScreenVideo::init()
         }
 
         // Vulkan use fullscreen desktop so only show current screen size
-        if (is_vulkan)
+        if (is_vulkan_fullscreen_desktop)
         {
             found_config_res = false;
             m_resolutions.clear();
@@ -378,7 +380,7 @@ void OptionsScreenVideo::init()
         {
             r.width  = UserConfigParams::m_real_width;
             r.height = UserConfigParams::m_real_height;
-            r.fullscreen = is_vulkan;
+            r.fullscreen = is_vulkan_fullscreen_desktop;
             m_resolutions.push_back(r);
 
             if (r.width == 1024 && r.height == 768)
@@ -471,8 +473,8 @@ void OptionsScreenVideo::init()
     // disabled)
     bool in_game = StateManager::get()->getGameState() == GUIEngine::INGAME_MENU;
 
-    res->setActive(!in_game || is_vulkan);
-    full->setActive(!in_game || is_vulkan);
+    res->setActive(!in_game || is_vulkan_fullscreen_desktop);
+    full->setActive(!in_game || is_vulkan_fullscreen_desktop);
     applyBtn->setActive(!in_game);
 #ifndef SERVER_ONLY
     gfx->setActive(!in_game && CVS->isGLSL());
@@ -480,7 +482,7 @@ void OptionsScreenVideo::init()
     if (getWidget<SpinnerWidget>("scale_rtts")->isActivated())
     {
         getWidget<SpinnerWidget>("scale_rtts")->setActive(!in_game ||
-            is_vulkan);
+            GE::getDriver()->getDriverType() == video::EDT_VULKAN);
     }
 #endif
 
@@ -883,7 +885,8 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
         rememberWinpos->setActive(!fullscreen->getState());
 #ifndef SERVER_ONLY
-        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN)
+        if (GE::getDriver()->getDriverType() == video::EDT_VULKAN &&
+            GE::getGEConfig()->m_vulkan_fullscreen_desktop)
         {
             UserConfigParams::m_fullscreen = fullscreen->getState();
             update_fullscreen_desktop(UserConfigParams::m_fullscreen);

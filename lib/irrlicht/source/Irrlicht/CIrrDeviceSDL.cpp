@@ -92,9 +92,13 @@ CIrrDeviceSDL::CIrrDeviceSDL(const SIrrlichtCreationParameters& param)
 
 #ifndef MOBILE_STK
 	// Prevent fullscreen minimizes when losing focus
-	if (CreationParams.Fullscreen &&
-		CreationParams.DriverType != video::EDT_VULKAN)
-		SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+	if (CreationParams.Fullscreen)
+	{
+		if (CreationParams.DriverType != video::EDT_VULKAN)
+			SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+		else if (!GE::getGEConfig()->m_vulkan_fullscreen_desktop)
+			SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+	}
 #endif
 
 	u32 init_flags = SDL_INIT_TIMER | SDL_INIT_VIDEO;
@@ -336,7 +340,7 @@ bool versionCorrect(int major, int minor)
 extern "C" void update_fullscreen_desktop(int val)
 {
 	GE::GEVulkanDriver* gevk = GE::getVKDriver();
-	if (!gevk)
+	if (!gevk || !GE::getGEConfig()->m_vulkan_fullscreen_desktop)
 		return;
 	SDL_Window* window = gevk->getWindow();
 
@@ -422,14 +426,13 @@ bool CIrrDeviceSDL::createWindow()
 
 	if (CreationParams.Fullscreen)
 	{
-#ifndef MOBILE_STK
-		if (CreationParams.DriverType == video::EDT_VULKAN)
+		if (CreationParams.DriverType == video::EDT_VULKAN &&
+			GE::getGEConfig()->m_vulkan_fullscreen_desktop)
 		{
 			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 			CreationParams.Fullscreen = false;
 		}
 		else
-#endif
 			flags |= SDL_WINDOW_FULLSCREEN;
 	}
 

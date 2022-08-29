@@ -416,6 +416,8 @@ void IrrDriver::initDevice()
             UserConfigParams::m_texture_compression;
         GE::getGEConfig()->m_render_scale =
             UserConfigParams::m_scale_rtts_factor;
+        GE::getGEConfig()->m_vulkan_fullscreen_desktop =
+            UserConfigParams::m_vulkan_fullscreen_desktop;
 #endif
     }
     else

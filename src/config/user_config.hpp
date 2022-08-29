@@ -722,6 +722,16 @@ namespace UserConfigParams
         &m_video_group, "Render video driver to use, at the moment gl or directx9 is supported.") );
 #endif
 
+#if defined(MOBILE_STK)
+    PARAM_PREFIX BoolUserConfigParam        m_vulkan_fullscreen_desktop
+        PARAM_DEFAULT(BoolUserConfigParam(false, "vulkan_fullscreen_desktop",
+        &m_video_group, "Use SDL_WINDOW_FULLSCREEN_DESKTOP for vulkan device"));
+#else
+    PARAM_PREFIX BoolUserConfigParam        m_vulkan_fullscreen_desktop
+        PARAM_DEFAULT(BoolUserConfigParam(true, "vulkan_fullscreen_desktop",
+        &m_video_group, "Use SDL_WINDOW_FULLSCREEN_DESKTOP for vulkan device"));
+#endif
+
     // ---- Recording
     PARAM_PREFIX GroupUserConfigParam        m_recording_group
         PARAM_DEFAULT(GroupUserConfigParam("Recording",
