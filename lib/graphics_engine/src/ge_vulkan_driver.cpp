@@ -1645,8 +1645,18 @@ bool GEVulkanDriver::endScene()
     }
 
     VkFence fence = m_vk->in_flight_fences[m_current_frame];
-    vkWaitForFences(m_vk->device, 1, &fence, VK_TRUE,
-        std::numeric_limits<uint64_t>::max());
+    if (vkWaitForFences(m_vk->device, 1, &fence, VK_TRUE, 2000000000) ==
+        VK_TIMEOUT)
+    {
+        // Attempt to restore after out focus in gnome fullscreen
+        video::CNullDriver::endScene();
+        GEVulkan2dRenderer::clear();
+        handleDeletedTextures();
+        destroySwapChainRelated(false/*handle_surface*/);
+        createSwapChainRelated(false/*handle_surface*/);
+        return true;
+    }
+
     vkResetFences(m_vk->device, 1, &fence);
     vkResetCommandPool(m_vk->device, m_vk->command_pools[m_current_frame], 0);
 
