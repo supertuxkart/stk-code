@@ -89,6 +89,7 @@ struct Resolution
 class OptionsScreenVideo : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<OptionsScreenVideo>
 {
 private:
+    static bool m_fullscreen_checkbox_focus;
     bool m_prev_adv_pipline;
     int m_prev_img_quality;
     OptionsScreenVideo();
@@ -121,6 +122,8 @@ public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded() OVERRIDE;
+
+    virtual bool onEscapePressed() OVERRIDE;
 
     void         updateGfxSlider();
     void         updateBlurSlider();

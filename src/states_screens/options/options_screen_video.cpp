@@ -54,6 +54,7 @@
 #include <sstream>
 
 using namespace GUIEngine;
+bool OptionsScreenVideo::m_fullscreen_checkbox_focus = false;
 
 // --------------------------------------------------------------------------------------------
 void OptionsScreenVideo::initPresets()
@@ -498,7 +499,12 @@ void OptionsScreenVideo::init()
 #endif
 
     updateResolutionsList();
-    
+
+    if (m_fullscreen_checkbox_focus)
+    {
+        m_fullscreen_checkbox_focus = false;
+        getWidget("fullscreen")->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    }
 }   // init
 
 // --------------------------------------------------------------------------------------------
@@ -907,8 +913,11 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
                     ->handleNewSize(new_width, new_height);
                 irr_driver->handleWindowResize();
                 Screen* new_screen = screen_function();
+                OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
                 new_screen->push();
             }
+            else
+                OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
         }
         else
             updateResolutionsList();
@@ -920,6 +929,10 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 
 void OptionsScreenVideo::tearDown()
 {
+    if (getWidget("fullscreen")->isVisible() &&
+        getWidget("fullscreen")->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
+        OptionsScreenVideo::m_fullscreen_checkbox_focus = true;
+
     GUIEngine::getDevice()->setResizable(false);
 #ifndef SERVER_ONLY
     if (m_prev_adv_pipline != UserConfigParams::m_dynamic_lights &&
@@ -936,6 +949,14 @@ void OptionsScreenVideo::tearDown()
     user_config->saveConfig();
 #endif
 }   // tearDown
+
+// --------------------------------------------------------------------------------------------
+
+bool OptionsScreenVideo::onEscapePressed()
+{
+    GUIEngine::focusNothingForPlayer(PLAYER_ID_GAME_MASTER);
+    return true;
+}
 
 // --------------------------------------------------------------------------------------------
 
