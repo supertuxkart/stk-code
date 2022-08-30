@@ -673,6 +673,7 @@ void IrrDriver::initDevice()
         m_device->clearSystemMessages();
         m_device->run();
         m_device->drop();
+        GE::setVideoDriver(NULL);
 
         m_device = createDeviceEx(params);
 
