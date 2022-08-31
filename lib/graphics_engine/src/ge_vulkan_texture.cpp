@@ -67,6 +67,7 @@ GEVulkanTexture::GEVulkanTexture(const std::string& path,
 
     m_size_lock.lock();
     m_image_view_lock.lock();
+    m_thread_loading_lock.lock();
     GEVulkanCommandLoader::addMultiThreadingCommand(
         std::bind(&GEVulkanTexture::reloadInternal, this));
 }   // GEVulkanTexture
@@ -129,7 +130,8 @@ GEVulkanTexture::GEVulkanTexture(const std::string& name, unsigned int size,
 // ----------------------------------------------------------------------------
 GEVulkanTexture::~GEVulkanTexture()
 {
-    waitImageView();
+    m_thread_loading_lock.lock();
+    m_thread_loading_lock.unlock();
 
     if (m_image_view || m_image != VK_NULL_HANDLE ||
         m_vma_allocation != VK_NULL_HANDLE)
@@ -512,6 +514,7 @@ void GEVulkanTexture::reloadInternal()
 
     texture_image->unlock();
     texture_image->drop();
+    m_thread_loading_lock.unlock();
 }   // reloadInternal
 
 // ----------------------------------------------------------------------------
@@ -839,6 +842,7 @@ void GEVulkanTexture::reload()
     {
         m_size_lock.lock();
         m_image_view_lock.lock();
+        m_thread_loading_lock.lock();
         GEVulkanCommandLoader::addMultiThreadingCommand(
             std::bind(&GEVulkanTexture::reloadInternal, this));
     }
@@ -866,9 +870,10 @@ std::shared_ptr<std::atomic<VkImageView> > GEVulkanTexture::getImageViewLive() c
         else
         {
             GEVulkanTexture* tex = const_cast<GEVulkanTexture*>(this);
+            tex->m_thread_loading_lock.lock();
+            tex->m_ondemand_loading.store(true);
             GEVulkanCommandLoader::addMultiThreadingCommand(
                 std::bind(&GEVulkanTexture::reloadInternal, tex));
-            m_ondemand_loading.store(true);
             return m_placeholder_view;
         }
     }

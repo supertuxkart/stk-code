@@ -49,6 +49,7 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
 
     m_size_lock.lock();
     m_image_view_lock.lock();
+    m_thread_loading_lock.lock();
     GEVulkanCommandLoader::addMultiThreadingCommand(
         [list, image_mani, this]()
         {
@@ -251,6 +252,7 @@ destroy:
         vmaDestroyBuffer(m_vk->getVmaAllocator(), staging_buffer,
             staging_buffer_allocation);
     }
+    m_thread_loading_lock.unlock();
 
 }   // reloadInternal
 

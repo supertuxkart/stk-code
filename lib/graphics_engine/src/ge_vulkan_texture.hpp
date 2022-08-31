@@ -57,6 +57,8 @@ protected:
 
     GESpinLock m_image_view_lock;
 
+    GESpinLock m_thread_loading_lock;
+
     io::path m_full_path;
 
     VkFormat m_internal_format;
