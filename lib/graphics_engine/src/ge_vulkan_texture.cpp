@@ -806,8 +806,18 @@ void GEVulkanTexture::bgraConversion(uint8_t* img_data)
 //-----------------------------------------------------------------------------
 void GEVulkanTexture::reload()
 {
-    if (!waitImageView())
-        return;
+    // Copied from waitImageView
+    if (!m_ondemand_load)
+    {
+        m_image_view_lock.lock();
+        m_image_view_lock.unlock();
+    }
+    else
+    {
+        bool is_currently_loading = m_ondemand_loading.load();
+        if (is_currently_loading || m_image == VK_NULL_HANDLE)
+            return;
+    }
 
     if (m_image_view || m_image != VK_NULL_HANDLE ||
         m_vma_allocation != VK_NULL_HANDLE)
