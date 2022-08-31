@@ -444,7 +444,11 @@ bool GEVulkanTexture::createImageView(VkImageAspectFlags aspect_flags)
         m_ondemand_loading.store(false);
         return true;
     }
-    return false;
+    else
+    {
+        m_ondemand_loading.store(false);
+        return false;
+    }
 }   // createImageView
 
 // ----------------------------------------------------------------------------
@@ -514,7 +518,10 @@ void GEVulkanTexture::reloadInternal()
 void GEVulkanTexture::upload(uint8_t* data, bool generate_hq_mipmap)
 {
     if (!createTextureImage(data, generate_hq_mipmap))
+    {
+        m_ondemand_loading.store(false);
         return;
+    }
     if (!createImageView(VK_IMAGE_ASPECT_COLOR_BIT))
         return;
     m_texture_size = m_size.Width * m_size.Height * (isSingleChannel() ? 1 : 4);
