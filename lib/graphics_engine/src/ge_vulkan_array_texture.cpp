@@ -45,7 +45,6 @@ GEVulkanArrayTexture::GEVulkanArrayTexture(const std::vector<io::path>& list,
     m_max_size = m_vk->getDriverAttributes()
         .getAttributeAsDimension2d("MAX_TEXTURE_SIZE");
     m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
-    m_texture_size = 0;
 
     m_size_lock.lock();
     m_image_view_lock.lock();

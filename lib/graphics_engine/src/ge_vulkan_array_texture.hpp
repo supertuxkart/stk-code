@@ -44,8 +44,6 @@ public:
     // ------------------------------------------------------------------------
     virtual void regenerateMipMapLevels(void* mipmap_data = NULL)            {}
     // ------------------------------------------------------------------------
-    virtual unsigned int getTextureSize() const      { return m_texture_size; }
-    // ------------------------------------------------------------------------
     virtual void reload()                                                    {}
     // ------------------------------------------------------------------------
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,

@@ -21,7 +21,6 @@ GEVulkanFBOTexture::GEVulkanFBOTexture(GEVulkanDriver* vk,
     m_has_mipmaps = false;
     m_locked_data = NULL;
     m_size = m_orig_size = m_max_size = size;
-    m_texture_size = m_size.Width * m_size.Height * 4;
     m_internal_format = VK_FORMAT_R8G8B8A8_UNORM;
 
     if (!createImage(VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT |

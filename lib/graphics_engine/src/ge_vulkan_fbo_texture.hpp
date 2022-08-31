@@ -39,8 +39,6 @@ public:
     virtual u64 getTextureHandler() const
                                   { return (u64)(m_image_view.get()->load()); }
     // ------------------------------------------------------------------------
-    virtual unsigned int getTextureSize() const      { return m_texture_size; }
-    // ------------------------------------------------------------------------
     virtual void reload()                                                    {}
     // ------------------------------------------------------------------------
     virtual void updateTexture(void* data, irr::video::ECOLOR_FORMAT format,

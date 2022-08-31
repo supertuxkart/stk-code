@@ -35,6 +35,8 @@ protected:
 
     VmaAllocation m_vma_allocation;
 
+    VmaAllocationInfo m_vma_info;
+
     std::shared_ptr<std::atomic<VkImageView> > m_image_view;
 
     std::shared_ptr<std::atomic<VkImageView> > m_placeholder_view;
@@ -42,8 +44,6 @@ protected:
     unsigned m_layer_count;
 
     VkImageViewType m_image_view_type;
-
-    unsigned int m_texture_size;
 
     const bool m_disable_reload;
 
@@ -55,7 +55,7 @@ protected:
 
     GESpinLock m_size_lock;
 
-    GESpinLock m_image_view_lock;
+    mutable GESpinLock m_image_view_lock;
 
     GESpinLock m_thread_loading_lock;
 
@@ -104,7 +104,7 @@ protected:
     // ------------------------------------------------------------------------
     std::shared_ptr<std::atomic<VkImageView> > getImageViewLive() const;
     // ------------------------------------------------------------------------
-    bool waitImageView()
+    bool waitImageView() const
     {
         if (!m_ondemand_load)
         {
@@ -120,7 +120,7 @@ protected:
         return true;
     }
     // ------------------------------------------------------------------------
-    GEVulkanTexture() : video::ITexture(""), m_layer_count(1),
+    GEVulkanTexture() : video::ITexture(""), m_vma_info(), m_layer_count(1),
                         m_image_view_type(VK_IMAGE_VIEW_TYPE_2D),
                         m_disable_reload(true), m_ondemand_load(false),
                         m_ondemand_loading(false)                            {}
@@ -197,12 +197,8 @@ public:
     // ------------------------------------------------------------------------
     virtual unsigned int getTextureSize() const
     {
-        if (!m_ondemand_load)
-        {
-            m_image_view_lock.lock();
-            m_image_view_lock.unlock();
-        }
-        return m_texture_size;
+        waitImageView();
+        return (unsigned int)m_vma_info.size;
     }
     // ------------------------------------------------------------------------
     virtual void reload();
